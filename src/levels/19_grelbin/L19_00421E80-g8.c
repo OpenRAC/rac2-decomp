@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned char u8;
 /* The resident position is copied as a complete 16-byte vector elsewhere. */
 extern float D_00189EA0[4];
@@ -13,61 +14,62 @@ extern float func_00282C48(float);
 extern void func_L19_00422238(void *);
 
 /* Trigger the rise, wait and fall cycle while maintaining the attached effects. */
-void func_L19_00421E80(u8 *object)
+/* Waits for the player to come near, rises up, then slams back down and shakes the screen. Dust puffs are made all the time. */
+void func_L19_00421E80(u8 *moby)
 {
-    char *state=*(char **)(object+0x68);
-    switch(object[0x20]) {
+    char *vars=*(char **)(moby+0x68);
+    switch(moby[0x20]) {
     case 0:
-        *(int *)(state+0x0C)=0;
-        *(int *)(state+0x24)=0;
-        *(int *)(state+0x54)=0;
-        *(float *)(state+0x10)=0.55f;
-        *(float *)(state+0x14)=0.01f;
-        *(float *)(state+0x18)=0.05f;
-        *(int *)(state+0x1C)=*(int *)(state+0x5C)+60;
-        *(int *)(state+0x20)=60;
-        *(float *)(state+0x28)=1.0f;
-        *(int *)(state+0x2C)=3;
-        *(float *)(state+0x30)=105000.0f;
-        *(unsigned int *)(state+0x34)=0x80803C14;
-        *(unsigned int *)(state+0x38)=0x60400000;
-        *(int *)(state+0x3C)=10;
-        *(int *)(state+0x40)=55;
-        *(int *)(state+0x44)=1;
-        *(float *)(state+0x48)=210000.0f;
-        *(unsigned int *)(state+0x4C)=0x80808080;
-        *(unsigned int *)(state+0x50)=0x40804040;
-        *(int *)(state+0x58)=40;
-        func_002A7750(object,1,-1);
+        *(int *)(vars+0x0C)=0;
+        *(int *)(vars+0x24)=0;
+        *(int *)(vars+0x54)=0;
+        *(float *)(vars+0x10)=0.55f;
+        *(float *)(vars+0x14)=0.01f;
+        *(float *)(vars+0x18)=0.05f;
+        *(int *)(vars+0x1C)=*(int *)(vars+0x5C)+60;
+        *(int *)(vars+0x20)=60;
+        *(float *)(vars+0x28)=1.0f;
+        *(int *)(vars+0x2C)=3;
+        *(float *)(vars+0x30)=105000.0f;
+        *(unsigned int *)(vars+0x34)=0x80803C14;
+        *(unsigned int *)(vars+0x38)=0x60400000;
+        *(int *)(vars+0x3C)=10;
+        *(int *)(vars+0x40)=55;
+        *(int *)(vars+0x44)=1;
+        *(float *)(vars+0x48)=210000.0f;
+        *(unsigned int *)(vars+0x4C)=0x80808080;
+        *(unsigned int *)(vars+0x50)=0x40804040;
+        *(int *)(vars+0x58)=40;
+        SetMobyState(moby,1,-1);
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0,*(int *)state)) func_002A7750(object,2,-1);
+        if (IsPointInCuboid(gHeroPosition,*(int *)vars)) SetMobyState(moby,2,-1);
         break;
     case 2:
-        if (func_002B3868(object)) func_002E5CF8(0,0,(char *)object);
-        if (func_00282948((int *)(state+0x1C))) func_002A7750(object,3,-1);
-        *(float *)(state+0x24)+=(float)(60-*(int *)(state+0x1C))*0.25f;
+        if (SetFirstPendingFlag(moby)) PlayMobySound(0,0,(char *)moby);
+        if (FastFloatHelperD((int *)(vars+0x1C))) SetMobyState(moby,3,-1);
+        *(float *)(vars+0x24)+=(float)(60-*(int *)(vars+0x1C))*0.25f;
         break;
     case 3:
-        if (*(float *)(object+0x18)<*(float *)(state+8)) func_002A7750(object,4,-1);
-        *(float *)(state+0x24)+=1.5f;
-        func_002AA548((float *)(object+0x18),(float *)(state+0x0C),
-            *(float *)(state+8)-20.0f,*(float *)(state+0x14),99999.0f,*(float *)(state+0x10));
+        if (*(float *)(moby+0x18)<*(float *)(vars+8)) SetMobyState(moby,4,-1);
+        *(float *)(vars+0x24)+=1.5f;
+        StepValueTowardTarget((float *)(moby+0x18),(float *)(vars+0x0C),
+            *(float *)(vars+8)-20.0f,*(float *)(vars+0x14),99999.0f,*(float *)(vars+0x10));
         break;
     case 4:
-        if (func_002B3868(object)) {
-            func_002E5CF8(1,0,(char *)object);
+        if (SetFirstPendingFlag(moby)) {
+            PlayMobySound(1,0,(char *)moby);
             D_L19_001B9900.strength=1.0f;
             D_L19_001B9900.ticks=20;
             D_L19_001B9900.mode=0;
         }
-        if (func_00282C48((*(float *)(object+0x18)-*(float *)(state+8))+*(float *)(state+0x28))<0.03f)
-            func_002A7750(object,5,-1);
-        func_002AA548((float *)(object+0x18),(float *)(state+0x0C),
-            *(float *)(state+8)-*(float *)(state+0x28),99999.0f,*(float *)(state+0x18),*(float *)(state+0x10));
+        if (FloatAbs((*(float *)(moby+0x18)-*(float *)(vars+8))+*(float *)(vars+0x28))<0.03f)
+            SetMobyState(moby,5,-1);
+        StepValueTowardTarget((float *)(moby+0x18),(float *)(vars+0x0C),
+            *(float *)(vars+8)-*(float *)(vars+0x28),99999.0f,*(float *)(vars+0x18),*(float *)(vars+0x10));
         break;
     case 5:
         break;
     }
-    func_L19_00422238(object);
+    SpawnDustPuffs(moby);
 }

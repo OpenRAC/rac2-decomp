@@ -36,6 +36,7 @@ extern void func_002FEE50(int);
 extern void func_L00_0038DE70(void *, void *, void *);
 
 extern void func_00282CC0(char *, char *, char *);
+/* Moves a flying shot each frame, bounces or splashes it on hits, and blows it up when it is done. */
 void func_L04_003B3168(unsigned char *obj) {
     struct {
         ProjectileVec old, velocity, normal;
@@ -59,52 +60,52 @@ void func_L04_003B3168(unsigned char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
-    func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
-    func_00300190(position, position);
-    func_00300248(ctx, ctx);
-    func_002FE880(position, ctx, 0.0030555557f);
-    func_L00_0038F178(obj);
+    FastVecAdd(position, ctx, position);
+    SteerEffectDirection(*(int *)(ctx + 0x1C), ctx, 0);
+    TransformVectorOrCopy(position, position);
+    TriggerCurrentStateEffect(ctx, ctx);
+    AddObjectDirectionScaled(position, ctx, 0.0030555557f);
+    EmitSparkleParticles(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((ProjectileMaterial *)((u32)ref_L04_003B3168_04 + D_00139568[12] * sizeof(ProjectileMaterial)))->material;
+        ((ProjectileMaterial *)((u32)ref_L04_003B3168_04 + gItemSlotToRecord[12] * sizeof(ProjectileMaterial)))->material;
     qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.kind = 2;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             ProjectileVec *spread;
-            func_002FD1B8(ref_L04_003B3168_01, ref_L04_003B3168_02, 1,
+            RippleDisturb(ref_L04_003B3168_01, ref_L04_003B3168_02, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
-            func_00282C88(ctx);
+            ClearVector128(ctx);
             *(float *)(ctx + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
             frame.position.f[2] = ref_L04_003B3168_03.point.f[2];
-            effect = func_00312D58(&frame.position, 2.0f);
+            effect = SpawnScaledEffectMoby(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
             spread = &frame.spread;
             i = 15;
             do {
                 --i;
-                angle = func_002A7940();
-                speed = func_002A7878(0.0f, 0.050000004f);
-                frame.spread.f[0] = func_00283180(angle) * speed;
-                frame.spread.f[1] = func_00283198(angle) * speed;
-                frame.spread.f[2] = func_002A7878(0.050000004f, 0.10833334f);
-                lifetime = func_002A7820(90, 120);
-                func_002BFB38(&frame.position, spread, func_002A77E0(2), lifetime);
+                angle = RandomAngle();
+                speed = RandomFloatRange(0.0f, 0.050000004f);
+                frame.spread.f[0] = FastSinOrCosA(angle) * speed;
+                frame.spread.f[1] = FastSinOrCosB(angle) * speed;
+                frame.spread.f[2] = RandomFloatRange(0.050000004f, 0.10833334f);
+                lifetime = RandomIntRange(90, 120);
+                SpawnSparkParticle_002BFB38(&frame.position, spread, RandomIntBelow(2), lifetime);
             } while (i >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
@@ -115,34 +116,34 @@ void func_L04_003B3168(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 ProjectileCollision *reread;
-                if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) > 0x121)
+                if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
                 reread = &ref_L04_003B3168_03;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == ref_L04_003B3168_00 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == ref_L04_003B3168_00 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
-                func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                FastVectorNormalize(&frame.velocity, ctx, &reread->normal);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
-                func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                FastVectorNormalize(&frame.velocity, ctx, &collision->normal);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
-    } else if (func_00282948(ctx + 0x18)) {
+    } else if (FastFloatHelperD(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (obj[0xBC]) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
-        func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+        ClearEntryFlag(*(int *)(ctx + 0x1C));
+        SpawnBigExplosionEffect(obj, &frame.velocity, &frame.normal);
     }
 }

@@ -14,13 +14,13 @@ extern History D_00138180;
    first entry's mask bits, storing how far back it was */
 s32 func_L00_0032EF10(u32 mask, s32 arg1, s32 *out)
 {
-    s32 n = D_00138180.count;
+    s32 n = gPadState.count;
     s32 i;
 
     if (n >= arg1)
         n = arg1;
     for (i = 1; i < n + 1; i++) {
-        s32 *p = &D_00138180.ring[(D_00138180.head - i + 30) % 30];
+        s32 *p = &gPadState.ring[(gPadState.head - i + 30) % 30];
 
         if ((*p & mask) != 0) {
             if (out != 0)

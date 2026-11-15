@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int func_00336A40(void *);
 
@@ -63,152 +64,167 @@ extern void func_0027EB88(int top, int bottom, int left, int right, int alpha, i
 extern void func_003384C0(char *, unsigned int, unsigned int, float, float, float, float);
 
 /* Reads a float through a pointer field; returns when it is zero or when a word field is zero, otherwise calls a helper, adjusts a float loaded from another pointer field by half or all of the helper's result depending on a small mode word, and finally calls a second helper with three pointers and three floats taken from the object and from two further pointer fields. */
-void func_00336A78(char *o)
+/* Draws one line of text at its stored position, shifting it left by half or all of its width when it is centred or right-aligned. */
+void func_00336A78(char *label)
 {
-    float f20;
-    int s4;
-    int r;
-    int s2v;
-    char *p0;
-    char *p1;
+    float drawX;
+    int textWidth;
+    int color;
+    int fontId;
+    char *position;
+    char *depthPos;
 
-    if (*(float *)(*(char **)(o + 16)) == 0.0f) {
+    if (*(float *)(*(char **)(label + 16)) == 0.0f) {
         return;
     }
-    if (*(int *)(o + 64) == 0) {
+    if (*(int *)(label + 64) == 0) {
         return;
     }
-    s4 = func_00336A40(o);
-    f20 = *(float *)(*(char **)(o));
-    switch (*(int *)(o + 68)) {
+    textWidth = DrawWidgetText(label);
+    drawX = *(float *)(*(char **)(label));
+    switch (*(int *)(label + 68)) {
     case 0:
         break;
     case 1:
-        f20 = f20 - (float)(s4 >> 1);
+        drawX = drawX - (float)(textWidth >> 1);
         break;
     case 2:
-        f20 = f20 - (float)s4;
+        drawX = drawX - (float)textWidth;
         break;
     }
-    p0 = *(char **)(o);
-    p1 = *(char **)(o + 4);
-    s2v = *(int *)(*(char **)(o + 12));
-    r = func_0027C878_2(*(int *)(o + 56));
-    func_0027F640(f20, *(float *)(p0 + 4), *(float *)(p1), s2v, *(int *)(o + 64),
-            s4, r, *(int *)(o + 52));
+    position = *(char **)(label);
+    depthPos = *(char **)(label + 4);
+    fontId = *(int *)(*(char **)(label + 12));
+    color = func_0027C878_2(*(int *)(label + 56));
+    FontPrintScaled(drawX, *(float *)(position + 4), *(float *)(depthPos), fontId, *(int *)(label + 64),
+            textWidth, color, *(int *)(label + 52));
 }
 
 /* Complete boot bodies from liolu PRs #72 and #75; refreshed in one combined batch. */
-void func_00336B90(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x40) = a1; }
+/* Sets the largest value a progress meter can show. */
+void func_00336B90(u8 *meter, s32 maxValue) { *(s32 *)(meter + 0x40) = maxValue; }
 
-void func_00336B98(char *object, int value)
+/* Sets how full a progress meter looks, never past its maximum, by resizing its bar. */
+void func_00336B98(char *meter, int amount)
 {
-    unsigned int limit = *(unsigned int *)(object + 0x40);
-    unsigned int clamped;
-    if (limit < (unsigned int)value) clamped = limit;
-    else clamped = value;
-    if ((float)limit == 0.0f) {
-        **(float **)(object + 4) = 0.0f;
+    unsigned int maximum = *(unsigned int *)(meter + 0x40);
+    unsigned int shown;
+    if (maximum < (unsigned int)amount) shown = maximum;
+    else shown = amount;
+    if ((float)maximum == 0.0f) {
+        **(float **)(meter + 4) = 0.0f;
         return;
     }
-    **(float **)(object + 4) = ((float)clamped / (float)*(unsigned int *)(object + 0x40)) * (float)*(unsigned int *)(object + 0x3C);
+    **(float **)(meter + 4) = ((float)shown / (float)*(unsigned int *)(meter + 0x40)) * (float)*(unsigned int *)(meter + 0x3C);
 }
 
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_00336CC0(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x38) = a1; }
+/* Stores a number in a widget's field at offset 0x38. */
+void func_00336CC0(u8 *widget, s32 value) { *(s32 *)(widget + 0x38) = value; }
 
-void func_00336CC8(u8 *a0,s32 a1) {
- (*(f32 **)(a0+4))[1]=(f32)a1;
+/* Sets the vertical position of a widget. */
+void func_00336CC8(u8 *widget,s32 y) {
+ (*(f32 **)(widget+4))[1]=(f32)y;
 }
 
-void func_00336CE0(u8 *object, s32 value) {
-    *(s32 *)(object + 0x44) = value;
+/* Sets how a text label is lined up (left, centre or right). */
+void func_00336CE0(u8 *label, s32 alignment) {
+    *(s32 *)(label + 0x44) = alignment;
 }
 
 extern void func_00300618(void *);
 
-void func_00336CE8(char *object)
+/* Turns the offsets stored in a table into real pointers and prepares each entry. */
+void func_00336CE8(char *table)
 {
-    int count = *(int *)(object + 0x18);
+    int entryCount = *(int *)(table + 0x18);
     int i;
-    int *row = (int *)(object + 0x1C);
-    for (i = 0; i < count; i++) {
-        row[i * 2 + 1] += (int)object;
-        func_00300618((void *)row[i * 2 + 1]);
+    int *entries = (int *)(table + 0x1C);
+    for (i = 0; i < entryCount; i++) {
+        entries[i * 2 + 1] += (int)table;
+        func_00300618((void *)entries[i * 2 + 1]);
     }
 }
 
-s32 func_00336D50(u8 *a0,s32 a1) {
- s32 count=*(s32 *)(a0+0x18); s32 i,out=0;u8 *base=a0+0x1c;
+/* Looks for an entry with the given id in a table and returns its data, or 0 if it is missing. */
+s32 func_00336D50(u8 *table,s32 id) {
+ s32 count=*(s32 *)(table+0x18); s32 i,result=0;u8 *entries=table+0x1c;
  for(i=0;i<count;i++) {
-  s32 *p=(s32 *)((i<<3)+(u32)base);
-  if(p[0]==a1) {out=p[1];break;}
+  s32 *entry=(s32 *)((i<<3)+(u32)entries);
+  if(entry[0]==id) {result=entry[1];break;}
  }
- return out;
+ return result;
 }
 
+/* Does nothing. */
 void func_00336DA0(void)
 {
 }
 
+/* Returns its second argument and ignores the first. */
 void *func_00336DA8(void *first, void *second) { (void) first; return second; }
 
-void *func_00336DB0(void *object) {
-    return object;
+/* Returns the object it was given. */
+void *func_00336DB0(void *self) {
+    return self;
 }
 
 /* shared native body of family 5b6bba31 */
-void func_00336DB8(int *p, unsigned int a1, int a2, int a3)
+/* Sets up a pool that hands out fixed-size cells from a block of memory. */
+void func_00336DB8(int *pool, unsigned int cellSize, int memory, int capacity)
 {
-    if (a1 < 4)
+    if (cellSize < 4)
         D_00115E38(D_L00_001ADDD8, 37, D_L00_001ADDF8);
-    p[1] = a3;
-    p[2] = a1;
-    p[4] = 0;
-    p[5] = 0;
-    p[3] = 0;
-    p[0] = a2;
+    pool[1] = capacity;
+    pool[2] = cellSize;
+    pool[4] = 0;
+    pool[5] = 0;
+    pool[3] = 0;
+    pool[0] = memory;
 }
 
 
 /* a bump/free-list allocator. `p` (the parameter, moved to `$a1`) is a six-word */
-void *func_00336E40(T *p)
+/* Takes one cell from a pool, reusing a freed cell first, and returns 0 if the pool is full. */
+void *func_00336E40(T *pool)
 {
-    unsigned int off, size;
-    void *r;
+    unsigned int used, cellSize;
+    void *cell;
 
-    if (p->f20 != 0)
+    if (pool->f20 != 0)
     {
-        unsigned int *x = (unsigned int *)p->f20;
+        unsigned int *freeCell = (unsigned int *)pool->f20;
 
-        p->f20 = x[0];
-        p->f16 = p->f16 + 1;
-        return x;
+        pool->f20 = freeCell[0];
+        pool->f16 = pool->f16 + 1;
+        return freeCell;
     }
-    off = p->f12;
-    size = p->f8;
-    if (p->f4 < off + size)
+    used = pool->f12;
+    cellSize = pool->f8;
+    if (pool->f4 < used + cellSize)
     {
         D_00115E38_1(D_L00_001ADDD8_1, 83, D_L00_001ADE20);
         return 0;
     }
-    r = (void *)(p->f0 + off);
-    p->f12 = off + size;
-    p->f16 = p->f16 + 1;
-    return r;
+    cell = (void *)(pool->f0 + used);
+    pool->f12 = used + cellSize;
+    pool->f16 = pool->f16 + 1;
+    return cell;
 }
 
-void func_00336ED0(u8 *a0, u8 *a1) {
-    *(u8 **)(a1 + 0) = *(u8 **)(a0 + 0x14);
-    *(u8 **)(a0 + 0x14) = a1;
-    *(s32 *)(a0 + 0x10) = *(s32 *)(a0 + 0x10) - 1;
+/* Gives a cell back to its pool so it can be reused. */
+void func_00336ED0(u8 *pool, u8 *cell) {
+    *(u8 **)(cell + 0) = *(u8 **)(pool + 0x14);
+    *(u8 **)(pool + 0x14) = cell;
+    *(s32 *)(pool + 0x10) = *(s32 *)(pool + 0x10) - 1;
 }
 
 extern int D_001ADB10 __attribute__((sda));
 
+/* Returns a stored menu setting value. */
 int func_00336EF0(void) {
-    return D_001ADB10;
+    return gSelectedItemMaterial;
 }
 
 
@@ -216,10 +232,11 @@ int func_00336EF0(void) {
 
 extern void *func_003361A8(void *);
 
-void *func_00337BD8(char *object) {
-    func_003361A8(object + 0x10);
-    func_003361A8(object + 0x5C);
-    return object;
+/* Shuts down the two border pieces of a text panel and returns the panel. */
+void *func_00337BD8(char *panel) {
+    ConstructDerivedObjectA(panel + 0x10);
+    ConstructDerivedObjectA(panel + 0x5C);
+    return panel;
 }
 
 extern int *func_00335E20(void *);
@@ -237,82 +254,84 @@ extern char *D_001A8CFC[] __attribute__((sda));
    cells), then sets up the "aTxBrack" and "aTxTop" widgets at +0x10 and +0x5C with
    D_001A8CFC[0] + 0x8710 and colour 0x55F0C070. The cleared cells store word 0 last, as in
    func_00339078; the colour cell is cleared as floats before its integer colour is stored. */
-void func_00337C10(char *obj, void *pool)
+/* Sets up a text panel that shows a message: its position, colours and border pieces. */
+void func_00337C10(char *panel, void *pool)
 {
     char *top;
     char *bracket;
 
-    obj[0xA8] = 0;
-    *(int *)(obj + 0x1AC) = 0;
-    *(int *)(obj + 0x1A8) = 0;
-    *(int *)(obj + 0x1C8) = 0;
-    *(int *)(obj + 0x1CC) = 0;
-    *(int *)(obj + 0x1D4) = 0x28;
-    *(int *)(obj + 0x1C4) = 1;
-    *(int *)(obj + 0x1B0) = 1;
-    func_00115484(obj + 0x1D8, 0, 0x78);
+    panel[0xA8] = 0;
+    *(int *)(panel + 0x1AC) = 0;
+    *(int *)(panel + 0x1A8) = 0;
+    *(int *)(panel + 0x1C8) = 0;
+    *(int *)(panel + 0x1CC) = 0;
+    *(int *)(panel + 0x1D4) = 0x28;
+    *(int *)(panel + 0x1C4) = 1;
+    *(int *)(panel + 0x1B0) = 1;
+    memset(panel + 0x1D8, 0, 0x78);
     if (pool != 0) {
         float *xy;
         float *colour;
         int *cell4;
         int *cellC;
 
-        xy = func_00336DA8((void *)16, func_00336E40(pool));
+        xy = ReturnSecondArgument((void *)16, AllocPoolCell(pool));
         xy[0] = 255.0f;
         xy[1] = 108.0f;
         ((int *)xy)[2] = 0;
         ((int *)xy)[3] = 0;
-        *(float **)(obj + 0) = xy;
-        colour = func_00336DA8((void *)16, func_00336E40(pool));
+        *(float **)(panel + 0) = xy;
+        colour = ReturnSecondArgument((void *)16, AllocPoolCell(pool));
         colour[0] = 0.0f;
         colour[1] = 0.0f;
         *(int *)colour = 0x60442D00;
         ((int *)colour)[2] = 0;
         ((int *)colour)[3] = 0;
-        *(float **)(obj + 8) = colour;
-        cell4 = func_00336DA8((void *)16, func_00336E40(pool));
-        *(int **)(obj + 4) = cell4;
+        *(float **)(panel + 8) = colour;
+        cell4 = ReturnSecondArgument((void *)16, AllocPoolCell(pool));
+        *(int **)(panel + 4) = cell4;
         cell4[1] = 0;
         cell4[2] = 0;
         cell4[3] = 0;
         cell4[0] = 0;
-        cellC = func_00336DA8((void *)16, func_00336E40(pool));
-        *(int **)(obj + 12) = cellC;
+        cellC = ReturnSecondArgument((void *)16, AllocPoolCell(pool));
+        *(int **)(panel + 12) = cellC;
         cellC[1] = 0;
         cellC[2] = 0;
         cellC[3] = 0;
         cellC[0] = 0;
     }
-    bracket = obj + 0x10;
-    top = obj + 0x5C;
-    func_003361E0(bracket, D_001ADB40, pool);
-    func_00336390(bracket, (int)(D_001A8CFC[0] + 0x8710), 0x57);
-    func_003363C0(bracket, 0.02f);
-    func_00335E68(bracket, 1);
-    *func_00335E20(bracket) = 0x55F0C070;
-    func_003361E0(top, D_001ADB50, pool);
-    func_00336390(top, (int)(D_001A8CFC[0] + 0x8710), 0x58);
-    func_00335E68(top, 1);
-    *func_00335E20(top) = 0x55F0C070;
-    **(int **)(obj + 12) = 0x80F0F0F0;
-    *(int *)(obj + 0x1B8) = 0;
-    **(int **)(obj + 4) = 0;
+    bracket = panel + 0x10;
+    top = panel + 0x5C;
+    InitDerivedArrays(bracket, D_001ADB40, pool);
+    SetFieldAt40(bracket, (int)(D_001A8CFC[0] + 0x8710), 0x57);
+    SetFloatAt38(bracket, 0.02f);
+    SetFlagValue(bracket, 1);
+    *GetFieldC(bracket) = 0x55F0C070;
+    InitDerivedArrays(top, D_001ADB50, pool);
+    SetFieldAt40(top, (int)(D_001A8CFC[0] + 0x8710), 0x58);
+    SetFlagValue(top, 1);
+    *GetFieldC(top) = 0x55F0C070;
+    **(int **)(panel + 12) = 0x80F0F0F0;
+    *(int *)(panel + 0x1B8) = 0;
+    **(int **)(panel + 4) = 0;
 }
 
 
 /* Initialises an object: two float stores through the pointer at +0, clears byte +423, stores an int at +440, calls a callee with (this+168, -1) storing its result at +468 and the address at +472, sets +432 to 1 and writes 1.0f through the pointer at +4. */
-void func_00337E30(char *p, int a1, int a2, float f12, float f13)
+/* Starts a message box: sets its position, how long it shows and its text buffer. */
+void func_00337E30(char *box, int a1, int duration, float x, float y)
 {
-    char *q = p + 168;
+    char *text = box + 168;
 
-    *(float *)(*(int *)p) = f12;
-    *(float *)(*(int *)p + 4) = f13;
-    p[423] = 0;
-    *(int *)(p + 440) = a2;
-    *(int *)(p + 472) = (int)q;
-    *(int *)(p + 468) = func_L00_002E9100(q, -1);
-    *(int *)(p + 432) = 1;
-    *(float *)(*(int *)(p + 4)) = 1.0f;
+    *(float *)(*(int *)box) = x;
+    *(float *)(*(int *)box + 4) = y;
+    box[423] = 0;
+    *(int *)(box + 440) = duration;
+    *(int *)(box + 472) = (int)text;
+    *(int *)(box + 468) = MeasureTextWidthSet1(text, -1);
+    *(int *)(box + 432) = 1;
+    *(float *)(*(int *)(box + 4)) = 1.0f;
 }
 
 /* Sets the box's text up: position, duration, then splits the text at each 1 byte into the line
@@ -331,8 +350,8 @@ void func_00337E98(TextBox *box, int unused, int duration, float x, float y)
     box->text[0xFF] = 0;
     box->maxWidth = 0;
     box->lineCount = 1;
-    func_00115484(line, 0, sizeof(line));
-    func_00115484(box->lines, 0, sizeof(box->lines));
+    memset(line, 0, sizeof(line));
+    memset(box->lines, 0, sizeof(box->lines));
     box->lines[box->lineCount - 1] = box->text;
     single = 1;
     i = 0;
@@ -347,7 +366,7 @@ void func_00337E98(TextBox *box, int unused, int duration, float x, float y)
                 length = 0;
                 box->lines[box->lineCount] = next;
                 box->lineCount++;
-                width = func_0027F178(line, -1);
+                width = MeasureTextWidthSmallFont(line, -1);
                 box->maxWidth = (box->maxWidth < width) ? width : box->maxWidth;
             } else {
                 line[length] = box->text[i];
@@ -356,22 +375,23 @@ void func_00337E98(TextBox *box, int unused, int duration, float x, float y)
         }
     }
     if (single) {
-        box->maxWidth = func_0027F178(box->text, -1);
+        box->maxWidth = MeasureTextWidthSmallFont(box->text, -1);
     } else {
-        width = func_0027F178(line, -1);
+        width = MeasureTextWidthSmallFont(line, -1);
         box->maxWidth = (box->maxWidth < width) ? width : box->maxWidth;
     }
     box->scale[0] = 1.0f;
 }
 
 /* clamps a caller-supplied terminator value (-1 meaning unset) to 360, then runs two callees on two sub-objects of one handle, the second with a float pair */
-void func_00338040(int object, int value, int count)
+/* Prepares a long (about six seconds) message with its text value and position on screen. */
+void func_00338040(int screen, int textValue, int requestedDuration)
 {
-    int limit = (count == -1) ? 360 : count;
-    int inner = object + 8124;
+    int duration = (requestedDuration == -1) ? 360 : requestedDuration;
+    int textBox = screen + 8124;
 
-    func_00115AC0_1((void *)(object + 8292), value, 255);
-    func_00337E98_1((void *)inner, 1, limit, 255.0f, 80.0f);
+    func_00115AC0_1((void *)(screen + 8292), textValue, 255);
+    func_00337E98_1((void *)textBox, 1, duration, 255.0f, 80.0f);
 }
 
 /* Formats text (with up to three extra strings) into a buffer, lays it out in the box with the
@@ -390,28 +410,28 @@ void func_003380B0(void *object, short *box, int style, char *text, int mode,
     if (first) {
         if (second) {
             if (third) {
-                if (single) func_00115DA8(buffer, D_001ADB58, text, 1, first, 1, second);
-                else func_00115DA8(buffer, D_001ADB68, text, 1, 1, first, 1, second);
+                if (single) Sprintf(buffer, D_001ADB58, text, 1, first, 1, second);
+                else Sprintf(buffer, D_001ADB68, text, 1, 1, first, 1, second);
             } else {
-                if (single) func_00115DA8(buffer, D_001ADB78, text, 1, first, second);
-                else func_00115DA8(buffer, D_001ADB90, text, 1, 1, first, second);
+                if (single) Sprintf(buffer, D_001ADB78, text, 1, first, second);
+                else Sprintf(buffer, D_001ADB90, text, 1, 1, first, second);
             }
         } else {
-            if (single) func_00115DA8(buffer, D_001ADBB0, text, 1, first);
-            else func_00115DA8(buffer, D_001ADBB8, text, 1, 1, first);
+            if (single) Sprintf(buffer, D_001ADBB0, text, 1, first);
+            else Sprintf(buffer, D_001ADBB8, text, 1, 1, first);
         }
     } else {
-        func_00115DA8(buffer, D_001ADBC8, text);
+        Sprintf(buffer, D_001ADBC8, text);
     }
     box[9] |= 4;
     switch (mode) {
-    case 0: func_00280200(box, style, buffer, length); break;
-    case 1: func_00280190(box, style, buffer, length); break;
-    case 2: func_00280270(box, style, buffer, length); break;
+    case 0: DrawTextWindowMediumFont(box, style, buffer, length); break;
+    case 1: DrawTextWindowSmallFont(box, style, buffer, length); break;
+    case 2: DrawTextWindowLargeFont(box, style, buffer, length); break;
     }
     if (center) {
         int height = (unsigned short)box[7];
-        int newTop = (D_001A7340[1] - (short)height) >> 1;
+        int newTop = (gScreenWidth[1] - (short)height) >> 1;
         int middle = newTop + ((short)height >> 1);
 
         box[1] = newTop + height;
@@ -419,9 +439,9 @@ void func_003380B0(void *object, short *box, int style, char *text, int mode,
         box[0] = newTop;
     }
     switch (mode) {
-    case 0: func_00280200(box, style, buffer, length); break;
-    case 1: func_00280190(box, style, buffer, length); break;
-    case 2: func_00280270(box, style, buffer, length); break;
+    case 0: DrawTextWindowMediumFont(box, style, buffer, length); break;
+    case 1: DrawTextWindowSmallFont(box, style, buffer, length); break;
+    case 2: DrawTextWindowLargeFont(box, style, buffer, length); break;
     }
     halfWidth = (box[6] >> 1) + 10;
     halfHeight = (box[7] >> 1) + 5;
@@ -432,12 +452,12 @@ void func_003380B0(void *object, short *box, int style, char *text, int mode,
     left = x - halfWidth;
     right = x + halfWidth;
     bottom = y + halfHeight;
-    func_0027EB88(top, bottom, left, right, 96, 0x60442D00);
-    func_003384C0(object, 96, 0x55F0C070, (float)top, (float)bottom, (float)left, (float)right);
+    DrawRoundedBox(top, bottom, left, right, 96, 0x60442D00);
+    DrawTextBoxFrame(object, 96, 0x55F0C070, (float)top, (float)bottom, (float)left, (float)right);
     switch (mode) {
-    case 0: func_00280200(box, style, buffer, length); break;
-    case 1: func_00280190(box, style, buffer, length); break;
-    case 2: func_00280270(box, style, buffer, length); break;
+    case 0: DrawTextWindowMediumFont(box, style, buffer, length); break;
+    case 1: DrawTextWindowSmallFont(box, style, buffer, length); break;
+    case 2: DrawTextWindowLargeFont(box, style, buffer, length); break;
     }
     box[9] = flags;
 }
@@ -466,26 +486,26 @@ void func_003384C0(char *obj, unsigned int alpha, unsigned int color, float top,
         scale = 1.0f;
         saved = view->fB0;
         view->fB0 = 0.62f;
-        func_0027AB40();
+        UpdateViewContext();
         uv = ((bottom - top) - 26.0f) * 0.008928571827709675f;
         uv = uv * 0.3110000193119049f + 0.03750000149011612f;
-        if (func_00335E08() == 1)
+        if (GetStoredCounter() == 1)
             scale = 0.9f;
         alpha <<= 24;
         alpha |= color;
-        func_00300A00(*(int *)(obj + 0x220c), left, top, alpha, -1.0f, scale, uv);
+        DrawScaledObjectTwoAxes(*(int *)(obj + 0x220c), left, top, alpha, -1.0f, scale, uv);
         border = 16.0f;
-        func_00300A00(*(int *)(obj + 0x220c), right, top, alpha, 1.0f, scale, uv);
+        DrawScaledObjectTwoAxes(*(int *)(obj + 0x220c), right, top, alpha, 1.0f, scale, uv);
         uv = ((right - left) - 150.0f) * 0.003267973894253373f;
         insetLeft = left + border;
         insetRight = right - border;
         uv = uv * 0.43300002813339233f + 0.10199999809265137f;
-        func_00300A00(*(int *)(obj + 0x2210), insetLeft, top, alpha, -1.0f, 1.0f, uv);
-        func_00300A00(*(int *)(obj + 0x2210), insetRight, top, alpha, 1.0f, 1.0f, uv);
-        func_00300A00(*(int *)(obj + 0x2210), insetLeft, bottom, alpha, -1.0f, -1.0f, uv);
-        func_00300A00(*(int *)(obj + 0x2210), insetRight, bottom, alpha, 1.0f, -1.0f, uv);
+        DrawScaledObjectTwoAxes(*(int *)(obj + 0x2210), insetLeft, top, alpha, -1.0f, 1.0f, uv);
+        DrawScaledObjectTwoAxes(*(int *)(obj + 0x2210), insetRight, top, alpha, 1.0f, 1.0f, uv);
+        DrawScaledObjectTwoAxes(*(int *)(obj + 0x2210), insetLeft, bottom, alpha, -1.0f, -1.0f, uv);
+        DrawScaledObjectTwoAxes(*(int *)(obj + 0x2210), insetRight, bottom, alpha, 1.0f, -1.0f, uv);
         view->fB0 = saved;
-        func_0027AB40();
+        UpdateViewContext();
     }
 }
 
@@ -503,6 +523,6 @@ void func_00338718(char *object, int text_id, int value, int count)
     int limit = (count == -1) ? 120 : count;
     char *buffer = object + 0x1E14;
 
-    func_00115DA8(buffer, func_00288FB8(text_id), value);
-    func_00337E30(sub, 1, limit, 255.0f, 135.0f);
+    Sprintf(buffer, GetLocalizedString(text_id), value);
+    InitMessageBoxState(sub, 1, limit, 255.0f, 135.0f);
 }

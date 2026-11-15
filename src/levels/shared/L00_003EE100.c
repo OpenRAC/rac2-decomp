@@ -152,6 +152,7 @@ typedef struct Obj_Fe48725c6 {
 extern void func_002A0488_1(Node24_Fe48725c6 *a, unsigned char b, unsigned char c, unsigned char d);
 
 /* Family 40487154aa250cc8: fixed-field addend writes into one resource record. */
+/* Makes the object pulse: it scales its three axes by wobbling amounts and eases the wobble values back. */
 void func_L00_003EE100(char *object)
 {
     char *data;
@@ -173,22 +174,24 @@ void func_L00_003EE100(char *object)
 }
 
 /* calls two guards and returns 1 only when both succeed and the object's float field is not positive */
+/* Says whether the object can be used as a target, which needs both checks to pass and its health to be zero or less. */
 int func_L00_003EE228(char *object)
 {
-    float *p;
+    float *info;
 
-    if (func_002ABB78(object) != 0)
+    if (IsMobyInSpecialClassRange(object) != 0)
         return 0;
-    p = func_002AB1F0(object);
-    if (p == 0)
+    info = GetMobyPrivateValue0(object);
+    if (info == 0)
         return 0;
-    if (0.0f < *p)
+    if (0.0f < *info)
         return 0;
     return 1;
 }
 
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
+/* Draws the aiming effect of a weapon object while its active flag is set. */
 void func_L00_003EE8E8(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
@@ -206,6 +209,7 @@ void func_L00_003EE8E8(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 
 extern int D_L00_001B0838 __attribute__((sda));
 
+/* Clears an effect flag. */
 void func_L00_003EF548(void)
 {
     D_L00_001B0838 = 0;
@@ -215,6 +219,7 @@ extern int D_L00_001B0838 __attribute__((sda));
 
 extern int D_L00_001B2BB4 __attribute__((sda));
 
+/* Clears the effect record table pointer and an effect flag. */
 void func_L00_003EF550(void)
 {
     D_L00_001B2BB4 = 0;
@@ -242,6 +247,7 @@ extern float func_00283B98_4(float, float);
 /* The record is reached through three handles (entry for the header and the first trail,
    shape for the position/velocity block and the second): that is what reproduces retail's
    saved-register assignment. */
+/* Starts a new trail effect in a free record slot, then steps it 100 times to fill in its shape. */
 void func_L00_003EFF58(char *owner, int value, char *direction, char *position, float scale)
 {
     TI128_FF58 local;
@@ -274,7 +280,7 @@ void func_L00_003EFF58(char *owner, int value, char *direction, char *position, 
         func_00282F20_2((char *)&local, position, 2.0f);
         func_00282CC0_2((char *)&local, (char *)&local, velocity);
         func_00282DD8_2(normal, velocity, (char *)&local);
-        angle = func_002A7940();
+        angle = RandomAngle();
         for (step = 99; step >= 0; step--) {
             func_L00_003F0198_2((char *)entry, 2, angle, 0.0f, 0);
             func_L00_003F0198_2((char *)shape, 0, angle, 0.0f, 0);
@@ -290,7 +296,8 @@ extern int func_00282948(char *p);
 
 extern void func_L00_003F0680(char *rec);
 
-void func_L00_003F00A0(char *obj)
+/* Updates every effect record that belongs to the given object and frees those whose timer has run out. */
+void func_L00_003F00A0(char *ownerMoby)
 {
     char *rec;
     int i;
@@ -301,10 +308,10 @@ void func_L00_003F00A0(char *obj)
     do {
         i--;
         rec = (char *)(offset + (int)D_L00_001B2BB4_1);
-        if (*(int *)(rec + 0x30) == (int)obj) {
-            if (func_00282948(rec + 0x34) != 0 && *(int *)(rec + 0x38) == 0)
+        if (*(int *)(rec + 0x30) == (int)ownerMoby) {
+            if (FastFloatHelperD(rec + 0x34) != 0 && *(int *)(rec + 0x38) == 0)
                 *(int *)(rec + 0x30) = 0;
-            func_L00_003F0680(rec);
+            UpdateBlastPoolRecords(rec);
         }
         offset += 0x50;
     } while (i >= 0);
@@ -312,7 +319,8 @@ void func_L00_003F00A0(char *obj)
 
 extern void func_L00_003F09A0(char *rec);
 
-void func_L00_003F0130(char *obj)
+/* Goes through the effect records of the given object and draws each one. */
+void func_L00_003F0130(char *ownerMoby)
 {
     char *rec;
     int i;
@@ -323,8 +331,8 @@ void func_L00_003F0130(char *obj)
     do {
         i--;
         rec = (char *)(offset + (int)D_L00_001B2BB4_1);
-        if (*(int *)(rec + 0x30) == (int)obj)
-            func_L00_003F09A0(rec);
+        if (*(int *)(rec + 0x30) == (int)ownerMoby)
+            RespawnOwnerParticles(rec);
         offset += 0x50;
     } while (i >= 0);
 }
@@ -336,14 +344,15 @@ extern char *D_L00_001B2BB8 __attribute__((sda));
 extern void ref_L00_003F09A0_00(char *rec, float f1, int a1, int a2, int a3,
                                 float f2, int a4, float f3);
 
-void func_L00_003F09A0(char *obj)
+/* Finds all particles that belong to the given object and respawns them. */
+void func_L00_003F09A0(char *ownerMoby)
 {
     char *rec;
     int i;
 
     for (i = 0; i < 320; i++) {
         rec = (char *)(i * 128 + (int)D_L00_001B2BB8);
-        if (*(int *)(rec + 0x7C) == (int)obj)
+        if (*(int *)(rec + 0x7C) == (int)ownerMoby)
             ref_L00_003F09A0_00(rec, *(float *)(rec + 0x48), *(int *)(rec + 0x68),
                                 *(int *)(rec + 0x60), 46, *(float *)(rec + 0x34),
                                 *(int *)(rec + 0x70), 0.25f);
@@ -351,43 +360,45 @@ void func_L00_003F09A0(char *obj)
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_003F0A20(char *p)
+/* Sets a block of four quad corner vectors and packet fields to their starting values. */
+void func_L00_003F0A20(char *entry)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(entry + 112) = 0LL;
+    *(int *)(entry + 80) = 0;
+    *(int *)(entry + 84) = 0;
+    *(float *)(entry + 88) = 1.0f;
+    *(int *)(entry + 92) = 0;
+    *(int *)(entry + 96) = 0;
+    *(float *)(entry + 100) = 1.0f;
+    *(float *)(entry + 104) = 1.0f;
+    *(float *)(entry + 108) = 1.0f;
+    *(float *)(entry + 8) = -1.0f;
+    *(float *)(entry + 24) = 1.0f;
+    *(float *)(entry + 40) = -1.0f;
+    *(float *)(entry + 56) = 1.0f;
+    *(float *)(entry + 4) = -1.0f;
+    *(float *)(entry + 36) = 1.0f;
+    *(float *)(entry + 52) = 1.0f;
+    *(int *)(entry + 0) = 0;
+    *(int *)(entry + 16) = 0;
+    *(int *)(entry + 32) = 0;
+    *(int *)(entry + 48) = 0;
+    *(float *)(entry + 12) = 1.0f;
+    *(float *)(entry + 28) = 1.0f;
+    *(float *)(entry + 44) = 1.0f;
+    *(long long *)(entry + 128) = 280993940374112LL;
+    *(float *)(entry + 20) = -1.0f;
+    *(float *)(entry + 60) = 1.0f;
 }
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L00_003F0AA8(char *p, float scale)
+/* Scales four vectors in a row by the same amount. */
+void func_L00_003F0AA8(char *vectors, float scale)
 {
-    func_00282D30_2(p, p, scale);
-    func_00282D30_2(p + 16, p + 16, scale);
-    func_00282D30_2(p + 32, p + 32, scale);
-    func_00282D30_2(p + 48, p + 48, scale);
+    func_00282D30_2(vectors, vectors, scale);
+    func_00282D30_2(vectors + 16, vectors + 16, scale);
+    func_00282D30_2(vectors + 32, vectors + 32, scale);
+    func_00282D30_2(vectors + 48, vectors + 48, scale);
 }
 
 extern void ref_L00_003F0B10_00(char *pkt);
@@ -422,45 +433,46 @@ typedef struct {
 extern Aimvec_F0b10 D_L00_001B8C80;
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void func_L00_003F0B10(char *pos, int a1, int a2, char *a3, int t0,
-                       float fA, float fB, float fC)
+/* Draws a flat sprite at a position that turns to face the camera. */
+void func_L00_003F0B10(char *pos, int colorBase, int alpha, char *texture, int flagBits,
+                       float size, float roll, float pull)
 {
-    char pkt[144];
-    float m[16];
+    char packet[144];
+    float matrix[16];
     float quat[4];
-    float off[4];
-    long long r;
+    float offset[4];
+    long long textureKey;
 
-    ref_L00_003F0B10_00(pkt);
-    r = func_0027C878(a3);
+    ref_L00_003F0B10_00(packet);
+    textureKey = GetEffectTextureDescriptor(texture);
 
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
+    *(long long *)(packet + 136) = ((long long)flagBits << 2) | 0x8000000040LL;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(int *)(packet + 76) = colorBase + (alpha << 24);
+    *(int *)(packet + 72) = colorBase + (alpha << 24);
+    *(int *)(packet + 68) = colorBase + (alpha << 24);
+    *(int *)(packet + 64) = colorBase + (alpha << 24);
+    *(long long *)(packet + 112) = 0LL;
+    *(long long *)(packet + 120) = textureKey;
 
     quat[3] = 0.0f;
-    quat[2] = func_00283248(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
+    quat[2] = FastMatrixHelperA(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
                             D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, &D_L00_001B8C80.x_140),
+    quat[1] = -FastMatrixHelperA(vec_distance_xy(pos, &D_L00_001B8C80.x_140),
                              D_L00_001B8C80.z_148 - *(float *)(pos + 8));
-    quat[0] = fB;
+    quat[0] = roll;
 
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_L00_001B8C80.x_140, pos);
-    func_00282F20(off, off, fC);
+    euler_to_matrix(matrix, quat);
+    FastVecSub(offset, &D_L00_001B8C80.x_140, pos);
+    vec_scale_to_length(offset, offset, pull);
 
-    m[12] = *(float *)(pos + 0) + off[0];
-    m[13] = *(float *)(pos + 4) + off[1];
-    m[14] = *(float *)(pos + 8) + off[2];
-    m[15] = 1.0f;
+    matrix[12] = *(float *)(pos + 0) + offset[0];
+    matrix[13] = *(float *)(pos + 4) + offset[1];
+    matrix[14] = *(float *)(pos + 8) + offset[2];
+    matrix[15] = 1.0f;
 
-    ref_L00_003F0B10_01(pkt, fA);
-    func_00280B90(pkt, m, 0);
+    ref_L00_003F0B10_01(packet, size);
+    draw_world_quad(packet, matrix, 0);
 }
 
 
@@ -468,49 +480,52 @@ void func_L00_003F0B10(char *pos, int a1, int a2, char *a3, int t0,
 
 extern int D_L00_001B08D0 __attribute__((sda));
 
+/* Clears the flag that says the lightning burst exists. */
 void func_L00_003F1448(void)
 {
     D_L00_001B08D0 = 0;
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_003F1DC8(char *p)
+/* Sets a block of four quad corner vectors and packet fields to their starting values. */
+void func_L00_003F1DC8(char *entry)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(entry + 112) = 0LL;
+    *(int *)(entry + 80) = 0;
+    *(int *)(entry + 84) = 0;
+    *(float *)(entry + 88) = 1.0f;
+    *(int *)(entry + 92) = 0;
+    *(int *)(entry + 96) = 0;
+    *(float *)(entry + 100) = 1.0f;
+    *(float *)(entry + 104) = 1.0f;
+    *(float *)(entry + 108) = 1.0f;
+    *(float *)(entry + 8) = -1.0f;
+    *(float *)(entry + 24) = 1.0f;
+    *(float *)(entry + 40) = -1.0f;
+    *(float *)(entry + 56) = 1.0f;
+    *(float *)(entry + 4) = -1.0f;
+    *(float *)(entry + 36) = 1.0f;
+    *(float *)(entry + 52) = 1.0f;
+    *(int *)(entry + 0) = 0;
+    *(int *)(entry + 16) = 0;
+    *(int *)(entry + 32) = 0;
+    *(int *)(entry + 48) = 0;
+    *(float *)(entry + 12) = 1.0f;
+    *(float *)(entry + 28) = 1.0f;
+    *(float *)(entry + 44) = 1.0f;
+    *(long long *)(entry + 128) = 280993940374112LL;
+    *(float *)(entry + 20) = -1.0f;
+    *(float *)(entry + 60) = 1.0f;
 }
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L00_003F1E50(char *p, float scale)
+/* Scales four vectors in a row by the same amount. */
+void func_L00_003F1E50(char *vectors, float scale)
 {
-    func_00282D30_2(p, p, scale);
-    func_00282D30_2(p + 16, p + 16, scale);
-    func_00282D30_2(p + 32, p + 32, scale);
-    func_00282D30_2(p + 48, p + 48, scale);
+    func_00282D30_2(vectors, vectors, scale);
+    func_00282D30_2(vectors + 16, vectors + 16, scale);
+    func_00282D30_2(vectors + 32, vectors + 32, scale);
+    func_00282D30_2(vectors + 48, vectors + 48, scale);
 }
 
 extern Aimvec_F0b10 D_L00_001B8C80;
@@ -520,50 +535,52 @@ extern void ref_L00_003F1EB8_00(char *pkt);
 extern void ref_L00_003F1EB8_01(char *, float);
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void func_L00_003F1EB8(char *pos, int a1, int a2, char *a3, int t0,
-                       float fA, float fB, float fC)
+/* Draws a flat sprite at a position that turns to face the camera. */
+void func_L00_003F1EB8(char *pos, int colorBase, int alpha, char *texture, int flagBits,
+                       float size, float roll, float pull)
 {
-    char pkt[144];
-    float m[16];
+    char packet[144];
+    float matrix[16];
     float quat[4];
-    float off[4];
-    long long r;
+    float offset[4];
+    long long textureKey;
 
-    ref_L00_003F1EB8_00(pkt);
-    r = func_0027C878(a3);
+    ref_L00_003F1EB8_00(packet);
+    textureKey = GetEffectTextureDescriptor(texture);
 
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
+    *(long long *)(packet + 136) = ((long long)flagBits << 2) | 0x8000000040LL;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(int *)(packet + 76) = colorBase + (alpha << 24);
+    *(int *)(packet + 72) = colorBase + (alpha << 24);
+    *(int *)(packet + 68) = colorBase + (alpha << 24);
+    *(int *)(packet + 64) = colorBase + (alpha << 24);
+    *(long long *)(packet + 112) = 0LL;
+    *(long long *)(packet + 120) = textureKey;
 
     quat[3] = 0.0f;
-    quat[2] = func_00283248(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
+    quat[2] = FastMatrixHelperA(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
                             D_L00_001B8C80.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, &D_L00_001B8C80.x_140),
+    quat[1] = -FastMatrixHelperA(vec_distance_xy(pos, &D_L00_001B8C80.x_140),
                              D_L00_001B8C80.z_148 - *(float *)(pos + 8));
-    quat[0] = fB;
+    quat[0] = roll;
 
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_L00_001B8C80.x_140, pos);
-    func_00282F20(off, off, fC);
+    euler_to_matrix(matrix, quat);
+    FastVecSub(offset, &D_L00_001B8C80.x_140, pos);
+    vec_scale_to_length(offset, offset, pull);
 
-    m[12] = *(float *)(pos + 0) + off[0];
-    m[13] = *(float *)(pos + 4) + off[1];
-    m[14] = *(float *)(pos + 8) + off[2];
-    m[15] = 1.0f;
+    matrix[12] = *(float *)(pos + 0) + offset[0];
+    matrix[13] = *(float *)(pos + 4) + offset[1];
+    matrix[14] = *(float *)(pos + 8) + offset[2];
+    matrix[15] = 1.0f;
 
-    ref_L00_003F1EB8_01(pkt, fA);
-    func_00280B90(pkt, m, 0);
+    ref_L00_003F1EB8_01(packet, size);
+    draw_world_quad(packet, matrix, 0);
 }
 
 /* func_L00_003F26C8 is defined in L00_003F26C8-qcopy.c. */
 
 /* Derives a 16-byte element at index-1 from its index-2 and index-3 neighbours through two bound helpers; original game role is unknown. */
+/* Computes the next point of a chain from the two points before it. */
 void func_L00_003F28A0(Vec16_Fc936841d *object, int index)
 {
     char local[16];
@@ -601,87 +618,88 @@ extern unsigned char *D_L00_001B2514 __attribute__((sda));
    colours; when it changed, its three bytes go to every entity of the group's id list. State 2
    re-binds the handler. The two stores of the byte at +0x30 sit in the arms of the select: the
    record's word at +0x68 either supplies its low byte or the object gets 0xFF. */
-void func_L00_003F3160(char *obj)
+/* Fades a group of lights or objects between two colors over time, and passes the new color to every object in the group. */
+void func_L00_003F3160(char *moby)
 {
-    unsigned char *st = *(unsigned char **)(obj + 0x68);
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
     int group;
     int prev;
     int stamp;
-    int word_a, word_b;
+    int colorA, colorB;
     int target;
     float angle;
-    unsigned short *q;
-    unsigned char *e;
-    int r, g, b;
+    unsigned short *idList;
+    unsigned char *entity;
+    int red, green, blue;
 
-    switch (*(unsigned char *)(obj + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        group = *(int *)st;
+        group = *(int *)vars;
         if (group >= D_L00_001A9018 || D_L00_001A9014[group] == 0 || group == -1) {
-            func_0029F338(obj);
+            MarkMobySpawned(moby);
             return;
         }
-        *(float *)(st + 8) = *(float *)(st + 8) * 0.017453294f;
-        *(float *)(st + 4) = *(float *)(st + 4) * 0.00029088825f;
-        *(int *)(st + 0x14) = st[0x22] << 16 | st[0x21] << 8 | st[0x20];
-        *(int *)(st + 0x18) = st[0x25] << 16 | st[0x24] << 8 | st[0x23];
-        if (*(int *)(st + 0x68) != 0) {
-            stamp = st[0x68];
-            obj[0x30] = stamp;
+        *(float *)(vars + 8) = *(float *)(vars + 8) * 0.017453294f;
+        *(float *)(vars + 4) = *(float *)(vars + 4) * 0.00029088825f;
+        *(int *)(vars + 0x14) = vars[0x22] << 16 | vars[0x21] << 8 | vars[0x20];
+        *(int *)(vars + 0x18) = vars[0x25] << 16 | vars[0x24] << 8 | vars[0x23];
+        if (*(int *)(vars + 0x68) != 0) {
+            stamp = vars[0x68];
+            moby[0x30] = stamp;
         } else {
             stamp = 0xFF;
-            obj[0x30] = stamp;
+            moby[0x30] = stamp;
         }
-        if (*(int *)(st + 0x1C) != 0) {
-            obj[0x20] = 1;
+        if (*(int *)(vars + 0x1C) != 0) {
+            moby[0x20] = 1;
             return;
         }
-        word_a = st[0x29] << 24 | st[0x28] << 16;
-        word_a |= st[0x27] << 8;
-        word_a |= st[0x26];
-        *(int *)(st + 0x30) = word_a;
-        word_b = st[0x2D] << 24 | st[0x2C] << 16;
-        word_b |= st[0x2B] << 8;
-        word_b |= st[0x2A];
-        *(int *)(st + 0x34) = word_b;
-        if (*(float *)(st + 0x40) == 0.0f && *(float *)(st + 0x44) == 0.0f &&
-            *(float *)(st + 0x48) == 0.0f)
-            *(int *)(st + 0x6C) = 1;
-        ref_L00_003F3160_00((void *)func_L00_003F3518, obj);
-        obj[0x20] = 2;
+        colorA = vars[0x29] << 24 | vars[0x28] << 16;
+        colorA |= vars[0x27] << 8;
+        colorA |= vars[0x26];
+        *(int *)(vars + 0x30) = colorA;
+        colorB = vars[0x2D] << 24 | vars[0x2C] << 16;
+        colorB |= vars[0x2B] << 8;
+        colorB |= vars[0x2A];
+        *(int *)(vars + 0x34) = colorB;
+        if (*(float *)(vars + 0x40) == 0.0f && *(float *)(vars + 0x44) == 0.0f &&
+            *(float *)(vars + 0x48) == 0.0f)
+            *(int *)(vars + 0x6C) = 1;
+        ref_L00_003F3160_00((void *)DrawLitGroupPoints, moby);
+        moby[0x20] = 2;
         return;
     case 1:
-        if (*(int *)(st + 0x64) != -1) {
-            if (func_002ACBC8(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) == 0)
+        if (*(int *)(vars + 0x64) != -1) {
+            if (IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(vars + 0x64)) == 0)
                 return;
         }
-        angle = func_00283B98(*(float *)(st + 0xC), *(float *)(st + 4));
-        prev = *(int *)(st + 0x10);
-        *(float *)(st + 0xC) = angle;
-        if (*(float *)(st + 8) != 0.0f) {
-            target = *(int *)(st + 0x14);
-            if (angle > *(float *)(st + 8))
-                target = *(int *)(st + 0x18);
-            *(int *)(st + 0x10) = func_00283D38(prev, target, 0.1f);
+        angle = FastAddRotations(*(float *)(vars + 0xC), *(float *)(vars + 4));
+        prev = *(int *)(vars + 0x10);
+        *(float *)(vars + 0xC) = angle;
+        if (*(float *)(vars + 8) != 0.0f) {
+            target = *(int *)(vars + 0x14);
+            if (angle > *(float *)(vars + 8))
+                target = *(int *)(vars + 0x18);
+            *(int *)(vars + 0x10) = FastTweenColor(prev, target, 0.1f);
         } else {
-            *(int *)(st + 0x10) = func_00283D38(*(int *)(st + 0x14), *(int *)(st + 0x18),
-                                                func_00283198(angle) * 0.5f + 0.5f);
+            *(int *)(vars + 0x10) = FastTweenColor(*(int *)(vars + 0x14), *(int *)(vars + 0x18),
+                                                FastSinOrCosB(angle) * 0.5f + 0.5f);
         }
-        if (*(int *)(st + 0x10) == prev)
+        if (*(int *)(vars + 0x10) == prev)
             return;
-        q = D_L00_001A9014[*(int *)st];
-        r = *(int *)(st + 0x10) & 0xFF;
-        g = (*(int *)(st + 0x10) >> 8) & 0xFF;
-        b = (*(int *)(st + 0x10) >> 16) & 0xFF;
-        for (; q != 0 && ((short)q[-1] >= 0 || q == D_L00_001A9014[*(int *)st]) &&
-               (e = D_L00_001B2514 + ((*q & 0x7FFF) << 5)) != 0;
-             q++)
-            func_L00_0036EF68((char *)e, r, g, b);
+        idList = D_L00_001A9014[*(int *)vars];
+        red = *(int *)(vars + 0x10) & 0xFF;
+        green = (*(int *)(vars + 0x10) >> 8) & 0xFF;
+        blue = (*(int *)(vars + 0x10) >> 16) & 0xFF;
+        for (; idList != 0 && ((short)idList[-1] >= 0 || idList == D_L00_001A9014[*(int *)vars]) &&
+               (entity = D_L00_001B2514 + ((*idList & 0x7FFF) << 5)) != 0;
+             idList++)
+            func_L00_0036EF68((char *)entity, red, green, blue);
         return;
     case 2:
-        if (*(int *)(st + 0x64) == -1 ||
-            func_002ACBC8(&D_L00_001B8C80.x_140, *(int *)(st + 0x64)) != 0)
-            ref_L00_003F3160_00((void *)func_L00_003F3518, obj);
+        if (*(int *)(vars + 0x64) == -1 ||
+            IsPointInCuboid(&D_L00_001B8C80.x_140, *(int *)(vars + 0x64)) != 0)
+            ref_L00_003F3160_00((void *)DrawLitGroupPoints, moby);
         return;
     }
 }
@@ -705,15 +723,16 @@ typedef struct Obj_L00_003F37A0 {
     float fE8;
 } Obj_L00_003F37A0;
 
-void func_L00_003F37A0(Obj_L00_003F37A0 *obj)
+/* Starts a drawn shape object, setting its scale to one, and keeps its draw function running. */
+void func_L00_003F37A0(Obj_L00_003F37A0 *moby)
 {
-    if (obj->f20 == 0) {
-        obj->f20 = 1;
-        obj->fC0 = 1.0f;
-        obj->fD4 = 1.0f;
-        obj->fE8 = 1.0f;
+    if (moby->f20 == 0) {
+        moby->f20 = 1;
+        moby->fC0 = 1.0f;
+        moby->fD4 = 1.0f;
+        moby->fE8 = 1.0f;
     }
-    ref_L00_003F37A0_00((void *)func_L00_003F37E8, (char *)obj);
+    ref_L00_003F37A0_00((void *)DrawFiftyQuadShapeA, (char *)moby);
 }
 
 extern void func_00283098(void *, void *, void *);
@@ -729,6 +748,7 @@ extern float D_L00_0029D490[][2];
    second table vector is transformed, and both go to func_00282DB0 (its result is unused);
    the four corners then take their vertices and UVs from tables, and a corner at
    z = -0.002112 gets a transparent colour. */
+/* Draws the 50 quads of the first shape, fading with the object alpha. */
 void func_L00_003F37E8(char *object)
 {
     RenderPacket packet;
@@ -741,7 +761,7 @@ void func_L00_003F37E8(char *object)
     unsigned int color;
     Vector *matrix;
 
-    packet.f78 = func_0027C878((char *)5);
+    packet.f78 = GetEffectTextureDescriptor((char *)5);
     matrix = scratch.frame.row;
     packet.f80 = 0xff9000000260LL;
     packet.flags = 0x8000000048LL;
@@ -759,24 +779,24 @@ void func_L00_003F37E8(char *object)
     packet.color[1] = color;
     packet.color[0] = color;
     for (face = 0; face < 50; face++) {
-        func_00282D30(&scratch.transformed, &D_L00_0029DAE0[face], 1.0f);
-        func_002830C0(&scratch.transformed, &scratch.transformed, &scratch.frame);
-        func_00282CF0((char *)&scratch.facing, (char *)&scratch.transformed,
+        FastVecScale(&scratch.transformed, &D_L00_0029DAE0[face], 1.0f);
+        transform_vector(&scratch.transformed, &scratch.transformed, &scratch.frame);
+        FastVecSub((char *)&scratch.facing, (char *)&scratch.transformed,
                       (char *)&D_L00_001B8C80.x_140);
-        func_00282F20((char *)&scratch.facing, (char *)&scratch.facing, 1.0f);
-        func_00283098(&scratch.transformed, &D_L00_0029D7C0[face], matrix);
-        func_00282DB0(&scratch.facing, &scratch.transformed);
+        vec_scale_to_length((char *)&scratch.facing, (char *)&scratch.facing, 1.0f);
+        matrix_mul_vec3(&scratch.transformed, &D_L00_0029D7C0[face], matrix);
+        FastVecDot(&scratch.facing, &scratch.transformed);
         for (corner = 0; corner < 4; corner++) {
             Vector *position = &D_L00_0029CB30[D_L00_0029D170[face][corner][0]];
             int uv = D_L00_0029D170[face][corner][1];
 
-            func_00282D30(&packet.vertex[corner], position, 1.0f);
+            FastVecScale(&packet.vertex[corner], position, 1.0f);
             packet.uv[corner][0] = D_L00_0029D490[uv][0];
             packet.uv[corner][1] = D_L00_0029D490[uv][1];
             if (position->v[2] == -0.002112f)
                 packet.color[corner] = 0xff0000;
         }
-        func_00280B90((char *)&packet, (float *)&scratch.frame, 0);
+        draw_world_quad((char *)&packet, (float *)&scratch.frame, 0);
     }
 }
 
@@ -793,15 +813,16 @@ typedef struct Obj_L00_003F3A88 {
     float fE8;
 } Obj_L00_003F3A88;
 
-void func_L00_003F3A88(Obj_L00_003F3A88 *obj)
+/* Starts a second drawn shape object, setting its scale to one, and keeps its draw function running. */
+void func_L00_003F3A88(Obj_L00_003F3A88 *moby)
 {
-    if (obj->f20 == 0) {
-        obj->f20 = 1;
-        obj->fC0 = 1.0f;
-        obj->fD4 = 1.0f;
-        obj->fE8 = 1.0f;
+    if (moby->f20 == 0) {
+        moby->f20 = 1;
+        moby->fC0 = 1.0f;
+        moby->fD4 = 1.0f;
+        moby->fE8 = 1.0f;
     }
-    ref_L00_003F3A88_00((void *)func_L00_003F3AD0, (char *)obj);
+    ref_L00_003F3A88_00((void *)DrawFiftyQuadShapeB, (char *)moby);
 }
 
 extern Vector D_L00_0029EDB0[];
@@ -810,6 +831,7 @@ extern Vector D_L00_0029DE00[];
 extern short D_L00_0029E440[][4][2];
 extern float D_L00_0029E760[][2];
 
+/* Draws the 50 quads of the second shape, fading with the object alpha. */
 void func_L00_003F3AD0(char *object)
 {
     RenderPacket packet;
@@ -822,7 +844,7 @@ void func_L00_003F3AD0(char *object)
     unsigned int color;
     Vector *matrix;
 
-    packet.f78 = func_0027C878((char *)5);
+    packet.f78 = GetEffectTextureDescriptor((char *)5);
     matrix = scratch.frame.row;
     packet.f80 = 0xff9000000260LL;
     packet.flags = 0x8000000048LL;
@@ -840,24 +862,24 @@ void func_L00_003F3AD0(char *object)
     packet.color[1] = color;
     packet.color[0] = color;
     for (face = 0; face < 50; face++) {
-        func_00282D30(&scratch.transformed, &D_L00_0029EDB0[face], 1.0f);
-        func_002830C0(&scratch.transformed, &scratch.transformed, &scratch.frame);
-        func_00282CF0((char *)&scratch.facing, (char *)&scratch.transformed,
+        FastVecScale(&scratch.transformed, &D_L00_0029EDB0[face], 1.0f);
+        transform_vector(&scratch.transformed, &scratch.transformed, &scratch.frame);
+        FastVecSub((char *)&scratch.facing, (char *)&scratch.transformed,
                       (char *)&D_L00_001B8C80.x_140);
-        func_00282F20((char *)&scratch.facing, (char *)&scratch.facing, 1.0f);
-        func_00283098(&scratch.transformed, &D_L00_0029EA90[face], matrix);
-        func_00282DB0(&scratch.facing, &scratch.transformed);
+        vec_scale_to_length((char *)&scratch.facing, (char *)&scratch.facing, 1.0f);
+        matrix_mul_vec3(&scratch.transformed, &D_L00_0029EA90[face], matrix);
+        FastVecDot(&scratch.facing, &scratch.transformed);
         for (corner = 0; corner < 4; corner++) {
             Vector *position = &D_L00_0029DE00[D_L00_0029E440[face][corner][0]];
             int uv = D_L00_0029E440[face][corner][1];
 
-            func_00282D30(&packet.vertex[corner], position, 1.0f);
+            FastVecScale(&packet.vertex[corner], position, 1.0f);
             packet.uv[corner][0] = D_L00_0029E760[uv][0];
             packet.uv[corner][1] = D_L00_0029E760[uv][1];
             if (position->v[2] == 0.001432f)
                 packet.color[corner] = 0xff0000;
         }
-        func_00280B90((char *)&packet, (float *)&scratch.frame, 0);
+        draw_world_quad((char *)&packet, (float *)&scratch.frame, 0);
     }
 }
 
@@ -869,22 +891,24 @@ void func_L00_003F3AD0(char *object)
 
 
 /* Computes two sub-record addresses of a 192-byte block and hands three of its sub-records to four helpers, threading a second argument through two of them. */
-void func_L00_003F51A0(char *obj, char *arg)
+/* Builds three axis vectors for the object from its direction and a reference vector. */
+void func_L00_003F51A0(char *moby, char *reference)
 {
-    char *base = obj + 192;
-    char *other = obj + 208;
+    char *base = moby + 192;
+    char *other = moby + 208;
     float one = 1.0f;
 
-    func_00282F20_1(base, (char *)(*(int *)(obj + 104)), one);
-    func_00282DD8(other, base, arg);
+    func_00282F20_1(base, (char *)(*(int *)(moby + 104)), one);
+    FastVecCross(other, base, reference);
     func_00282F20_1(other, other, one);
-    func_00282DD8(obj + 224, other, base);
+    FastVecCross(moby + 224, other, base);
 }
 
 /* func_L00_003F5238 is in L00_003F5238-helpers.c. */
 
 /* func_L00_003F5390 is in L00_003F5390-g8.c. */
 
+/* Does nothing. */
 void func_L00_003F5658(void)
 {
 }
@@ -898,30 +922,32 @@ extern void ref_L00_003F5660_00(void (*handler)(char *), char *object);
 /* Runs the three per-frame passes; when any of them reports work the record is handed to the
    binder with the shared follow-up pass as its handler, otherwise a record in state 2 is
    advanced by the shared state call. */
-void func_L00_003F5660(char *a0)
+/* Updates the Vaporizer by running its three passes; it keeps running while any pass has work and ends when all are done. */
+void func_L00_003F5660(char *moby)
 {
-    int a = func_L00_003F59F0(a0);
-    int b = func_L00_003F6168(a0);
-    int c = func_L00_003F6A58((int *)a0);
+    int chainActive = UpdateVaporizerJointChain(moby);
+    int passB = UpdateBoltTrailSample(moby);
+    int recordCount = UpdateVaporizerTimedRecords((int *)moby);
 
-    if (a == 0 && b == 0 && c == 0) {
-        if (*(unsigned char *)(a0 + 0x20) == 2) {
-            func_0029F338_1(a0);
+    if (chainActive == 0 && passB == 0 && recordCount == 0) {
+        if (*(unsigned char *)(moby + 0x20) == 2) {
+            func_0029F338_1(moby);
         }
     } else {
-        ref_L00_003F5660_00(func_L00_003F56F0, a0);
+        ref_L00_003F5660_00(DrawVaporizerEffects, moby);
     }
 }
 
 /* Reads the short at +26 of the object held at +104, calls a callee with (3076, that short), then calls one callee with this when the result is zero or three callees with this when it is non-zero. */
-void func_L00_003F56F0(char *p)
+/* Draws the Vaporizer effects, or removes the object if its table entry is gone. */
+void func_L00_003F56F0(char *moby)
 {
-    if (func_002B4038(3076, *(short *)(*(int *)(p + 104) + 26)) == 0)
-        func_0029F338_1(p);
+    if (IsSavedRecordValue(3076 /* Vaporizer */, *(short *)(*(int *)(moby + 104) + 26)) == 0)
+        func_0029F338_1(moby);
     else {
-        func_L00_003F5B10(p);
-        func_L00_003F6308(p);
-        func_L00_003F6B10(p);
+        RenderTwoLayerEffectStrip(moby);
+        DrawBoltBeamRings(moby);
+        DrawBoltSparks(moby);
     }
 }
 
@@ -939,31 +965,32 @@ void func_L00_003F56F0(char *p)
 /* func_L00_003F6900 is defined in L00_003F6900-g8-qcopy.c. */
 
 /* Walks 120 records of 64 bytes from a base resolved through two descriptor lookups; for each live record it calls an update helper and, when that reports zero, counts it and advances a float pair by one step, clearing the record's live flag otherwise. */
-int func_L00_003F6A58(int *a0)
+/* Updates up to 120 timed records of the Vaporizer and returns how many are still running. */
+int func_L00_003F6A58(int *moby)
 {
     int i;
     int count = 0;
     char *base;
-    char *rec;
-    char *obj;
+    char *entry;
+    char *timer;
 
-    rec = *(char **)((char *)a0 + 104);
-    base = func_L00_0032A088(3076, *(short *)(rec + 26));
-    base = base + *(int *)(func_L00_0032A0B8(3076, *(short *)(rec + 26)) + 4);
-    obj = base + 16;
-    rec = base;
+    entry = *(char **)((char *)moby + 104);
+    base = GetSlotBody(3076 /* Vaporizer */, *(short *)(entry + 26));
+    base = base + *(int *)(GetSlotHeader(3076 /* Vaporizer */, *(short *)(entry + 26)) + 4);
+    timer = base + 16;
+    entry = base;
 
     for (i = 119; i >= 0; i--) {
-        if (*(short *)(rec + 18) != 0) {
-            if (func_00282978(obj) != 0) {
-                *(short *)(rec + 18) = 0;
+        if (*(short *)(entry + 18) != 0) {
+            if (FastDecTimer(timer) != 0) {
+                *(short *)(entry + 18) = 0;
             } else {
                 count++;
-                *(float *)(rec + 24) = func_00283B98(*(float *)(rec + 24), *(float *)(rec + 28));
+                *(float *)(entry + 24) = FastAddRotations(*(float *)(entry + 24), *(float *)(entry + 28));
             }
         }
-        obj += 64;
-        rec += 64;
+        timer += 64;
+        entry += 64;
     }
     return count;
 }
@@ -979,18 +1006,19 @@ extern void ref_L00_003F71E8_01(void *p, char *obj);
 
 extern void ref_L00_003F71E8_00(void);
 
-void func_L00_003F71E8(char *a0)
+/* Moves an object along with its target and removes it when its timer has run out. */
+void func_L00_003F71E8(char *moby)
 {
-    char *s1 = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    if (*(char **)(s1 + 0x3C) != 0) {
-        func_002AD0E0(a0, *(char **)(s1 + 0x3C), a0 + 0x10, a0 + 0xF0, a0 + 0x10, a0 + 0xF0);
+    if (*(char **)(vars + 0x3C) != 0) {
+        TransformPointAndRotationByParent(moby, *(char **)(vars + 0x3C), moby + 0x10, moby + 0xF0, moby + 0x10, moby + 0xF0);
     }
-    if (func_00282978(s1) == 0) {
-        func_00282978(s1 + 4);
-        ref_L00_003F71E8_01((void *)ref_L00_003F71E8_00, a0);
+    if (FastDecTimer(vars) == 0) {
+        FastDecTimer(vars + 4);
+        ref_L00_003F71E8_01((void *)ref_L00_003F71E8_00, moby);
     } else {
-        func_0029F338(a0);
+        MarkMobySpawned(moby);
     }
 }
 
@@ -1015,7 +1043,7 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
     } scratch;
     Vector *corner;
 
-    func_00281DE8(&packet, texture, 1, 0x80);
+    InitQuadPacketState(&packet, texture, 1, 0x80);
     packet.flags = 0x800000004aULL;
     packet.color[3] = 0x80808080;
     packet.color[2] = 0x80808080;
@@ -1030,34 +1058,34 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
     qcopy(&frame.position, position);
-    func_00282CF0((char *)&frame.row[0], (char *)&D_L00_001B8C80.x_140, (char *)&frame.position);
-    func_00282F20((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    func_00282DD8((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
-    func_00282F20((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
-    func_00282DD8((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
+    FastVecSub((char *)&frame.row[0], (char *)&D_L00_001B8C80.x_140, (char *)&frame.position);
+    vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
+    FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {
         scratch.angles.word = 0;
         scratch.angles.v[0] = roll;
-        func_002833F0(scratch.u.rotation, &scratch.angles);
-        func_00283738(frame.row, frame.row, scratch.u.rotation);
+        euler_rotation_basis(scratch.u.rotation, &scratch.angles);
+        multiply_matrix3x3(frame.row, frame.row, scratch.u.rotation);
     }
-    func_00282D30(&scratch.angles, &frame.row[0], offset);
-    func_00282CC0(&frame.position, &frame.position, &scratch.angles);
+    FastVecScale(&scratch.angles, &frame.row[0], offset);
+    FastVecAdd(&frame.position, &frame.position, &scratch.angles);
     {
         Vector *vertex = packet.vertex;
         int count;
         corner = D_L00_001AA310;
         count = 3;
         do {
-            func_00282D30(vertex, corner, size);
+            FastVecScale(vertex, corner, size);
             ++corner;
             --count;
-            func_002830C0(vertex, vertex, &frame);
+            transform_vector(vertex, vertex, &frame);
             ++vertex;
         } while (count >= 0);
     }
-    func_002FC560(0x47, 0x31001ULL);
-    func_00280B90((char *)&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x31001ULL);
+    draw_world_quad((char *)&packet, 0, 0);
     if (mode != 0) {
         int i;
 
@@ -1067,23 +1095,23 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
             int count;
             count = 2;
             do {
-                func_00282CC0(&scratch.u.projection.center, &scratch.u.projection.center,
+                FastVecAdd(&scratch.u.projection.center, &scratch.u.projection.center,
                               vertex);
                 ++vertex;
                 --count;
             } while (count >= 0);
         }
-        func_00282D30(&scratch.u.projection.center, &scratch.u.projection.center, 0.25f);
+        FastVecScale(&scratch.u.projection.center, &scratch.u.projection.center, 0.25f);
         for (i = 0; i < 4; ++i) {
-            func_00282CF0((char *)&scratch.u.projection.point, (char *)&packet.vertex[i],
+            FastVecSub((char *)&scratch.u.projection.point, (char *)&packet.vertex[i],
                           (char *)&scratch.u.projection.center);
-            func_00282D30(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
-            func_00282CC0(&scratch.u.projection.point, &scratch.u.projection.center,
+            FastVecScale(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
+            FastVecAdd(&scratch.u.projection.point, &scratch.u.projection.center,
                           &scratch.u.projection.point);
-            func_0027C768((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
-            if (func_002A77E0(1) == 0) {
-                packet.uv[i][0] += func_002A7878(-jitter, jitter);
-                packet.uv[i][1] += func_002A7878(-jitter, jitter);
+            ProjectWorldToScreen((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
+            if (RandomIntBelow(1) == 0) {
+                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
+                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -1094,10 +1122,10 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
         int i;
 
         for (i = 0; i < 4; ++i) {
-            func_0027C768((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
-            if (func_002A77E0(1) == 0) {
-                packet.uv[i][0] += func_002A7878(-jitter, jitter);
-                packet.uv[i][1] += func_002A7878(-jitter, jitter);
+            ProjectWorldToScreen((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
+            if (RandomIntBelow(1) == 0) {
+                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
+                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -1105,33 +1133,34 @@ void func_L00_003F8280(Vector *position, float size, float offset, float roll,
             else if (packet.uv[i][1] < 0.0f) packet.uv[i][1] = 0.0f;
         }
     }
-    func_00281DE8(&packet, -1, 1, 0x80);
+    InitQuadPacketState(&packet, -1, 1, 0x80);
     packet.flags = 0x8000000054ULL;
-    func_002FC560(0x47, 0x33001ULL);
-    func_00280B90((char *)&packet, 0, 0);
-    func_002FC560(0x47, 0x5360bULL);
+    VU1_addGSregister(0x47, 0x33001ULL);
+    draw_world_quad((char *)&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x5360bULL);
 }
 
 /* func_L00_003F87B0 is in L00_003F87B0.c. */
 
 /* Same body as 23626ad829daa908 with the node field 4 bytes earlier: calls a helper with a referenced node and three identity bytes, then copies them into a linked record guarded by a flag bit and a non-zero leading short. */
-void func_L00_003F89F8(Obj_Fe48725c6 *p)
+/* Copies three color bytes of the object into the record linked to it, if that record is in use. */
+void func_L00_003F89F8(Obj_Fe48725c6 *link)
 {
-    Node24_Fe48725c6 *s;
-    Node16_Fe48725c6 *d;
-    int v;
+    Node24_Fe48725c6 *node;
+    Node16_Fe48725c6 *entry;
+    int blueByte;
 
-    func_002A0488_1(p->f24, p->u.b.b4, p->u.b.b5, p->u.b.h6);
-    s = p->f24;
-    if ((s->h52 & 0x20) == 0)
+    func_002A0488_1(link->f24, link->u.b.b4, link->u.b.b5, link->u.b.h6);
+    node = link->f24;
+    if ((node->h52 & 0x20) == 0)
         return;
-    d = ((Node104_Fe48725c6 *)s->p104)->p16;
-    if (d == 0)
+    entry = ((Node104_Fe48725c6 *)node->p104)->p16;
+    if (entry == 0)
         return;
-    if (d->h0 == 0)
+    if (entry->h0 == 0)
         return;
-    d->b4 = p->u.b.b4;
-    d->b5 = p->u.f4 >> 8;
-    v = p->u.b.h6;
-    d->b6 = v;
+    entry->b4 = link->u.b.b4;
+    entry->b5 = link->u.f4 >> 8;
+    blueByte = link->u.b.h6;
+    entry->b6 = blueByte;
 }

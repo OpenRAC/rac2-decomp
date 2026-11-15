@@ -35,14 +35,14 @@ void func_L04_00418A58(char *obj, char *aux) {
         }
         ref_L04_00418A58_00 = 0;
     }
-    FLD(D_00189E20, int, 0x24A0) = 26;
+    FLD(gHeroState, int, 0x24A0) = 26;
     ref_L04_00418A58_04[0] = 0;
-    FLD(D_00189E20, u8, 0x22B7) = 1;
-    FLD(D_00189E20, u8, 0x22B5) = 1;
-    FLD(FLD(D_00189E20, char *, 0x2290), int, 0x98) = 0;
-    FLD(D_00189E20, u8, 0x22C2) = 1;
+    FLD(gHeroState, u8, 0x22B7) = 1;
+    FLD(gHeroState, u8, 0x22B5) = 1;
+    FLD(FLD(gHeroState, char *, 0x2290), int, 0x98) = 0;
+    FLD(gHeroState, u8, 0x22C2) = 1;
     FLD(obj, float, 0x2C) = FLD(FLD(obj, char *, 0x24), float, 0x24) * 0.25f;
-    rec = FLD(D_00189E20, char *, 0x2290);
+    rec = FLD(gHeroState, char *, 0x2290);
     FLD(rec, float, 0x2C) = FLD(FLD(rec, char *, 0x24), float, 0x24) * 0.25f;
     ref_L04_00418A58_05(obj, aux);
     ref_L04_00418A58_06(obj, aux);

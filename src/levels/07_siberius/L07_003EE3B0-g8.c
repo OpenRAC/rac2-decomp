@@ -29,53 +29,55 @@ extern float D_L07_001B0C30_gp[] SDATA(D_L07_001B0C30);
 /* A four-state burst: state 1 passes the rotated, offset position to func_0032DA58, state 2
    spawns nine children that run this function in state 3, where each counts down a random
    lifetime. */
-void func_L07_003EE3B0(char *arg)
+/* Per-frame update for moby class 3387: a burst effect that spawns nine short-lived pieces and
+   then goes away. */
+void func_L07_003EE3B0(char *moby)
 {
-    float v[4] __attribute__((aligned(16)));
+    float velocity[4] __attribute__((aligned(16)));
     int i;
-    float f, g;
-    char *e;
+    float childParamA, childParamB;
+    char *child;
 
-    switch (*(unsigned char *)(arg + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        func_002A7750(arg, 1, -1);
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        if (func_002B38B8(arg)) {
-            func_00283098(v, D_L07_001B0C20, arg + 0xC0);
-            func_00282CC0(v, v, arg + 0x10);
-            func_0032DA58(arg, v, arg + 0xD0, 0.0f);
-            func_002A7750(arg, 2, -1);
+        if (IsThirdPendingFlagSet(moby)) {
+            matrix_mul_vec3(velocity, D_L07_001B0C20, moby + 0xC0);
+            FastVecAdd(velocity, velocity, moby + 0x10);
+            SpawnBlastEffectMoby(moby, velocity, moby + 0xD0, 0.0f);
+            SetMobyState(moby, 2, -1);
         }
         break;
     case 2:
-        if (func_002B3868(arg))
-            func_002E5CF8(0, 0, arg);
+        if (SetFirstPendingFlag(moby))
+            PlayMobySound(0, 0, moby);
         for (i = 0; i < 9; i++) {
-            v[0] = func_002A7878(D_L07_001B0C00[0], D_L07_001B0C00[4]) * 0.016666667f;
-            v[1] = func_002A7878(D_L07_001B0C00[1], D_L07_001B0C00[5]) * 0.016666667f;
-            v[2] = func_002A7878(D_L07_001B0C00[2], D_L07_001B0C00[6]) * 0.016666667f;
-            func_00283098(v, v, arg + 0xC0);
-            f = func_002A78D8(D_L07_001B0C30[0], D_L07_001B0C30[1]);
-            g = func_002A7878(D_L07_001B0C30_gp[2], D_L07_001B0C30[3]);
-            e = func_00273730(arg, 2, *(short *)(arg + 0xAA), i, arg + 0x10, arg + 0xF0, v, 255, f, g);
-            if (e) {
-                *(void (**)(char *))(e + 0x64) = func_L07_003EE3B0;
-                *(unsigned short *)(e + 0x34) |= 0x2000;
-                func_002A7750(e, 3, -1);
+            velocity[0] = RandomFloatRange(D_L07_001B0C00[0], D_L07_001B0C00[4]) * 0.016666667f;
+            velocity[1] = RandomFloatRange(D_L07_001B0C00[1], D_L07_001B0C00[5]) * 0.016666667f;
+            velocity[2] = RandomFloatRange(D_L07_001B0C00[2], D_L07_001B0C00[6]) * 0.016666667f;
+            matrix_mul_vec3(velocity, velocity, moby + 0xC0);
+            childParamA = RandomSignedFloatRange(D_L07_001B0C30[0], D_L07_001B0C30[1]);
+            childParamB = RandomFloatRange(D_L07_001B0C30_gp[2], D_L07_001B0C30[3]);
+            child = CreateCameraMoby(moby, 2, *(short *)(moby + 0xAA), i, moby + 0x10, moby + 0xF0, velocity, 255, childParamA, childParamB);
+            if (child) {
+                *(void (**)(char *))(child + 0x64) = UpdateBurstDebrisMoby;
+                *(unsigned short *)(child + 0x34) |= 0x2000;
+                SetMobyState(child, 3, -1);
             }
         }
-        func_0029F338(arg);
+        MarkMobySpawned(moby);
         break;
     case 3:
-        if (func_002B3868(arg))
-            *(unsigned short *)(arg + 0x96) = func_002A7820(0, 60);
-        func_00273B70(arg);
-        if (*(unsigned short *)(arg + 0x96) == 0 || --*(unsigned short *)(arg + 0x96) == 0) {
-            if (*(unsigned char *)(arg + 0x23) >= 4)
-                *(unsigned char *)(arg + 0x23) -= 4;
+        if (SetFirstPendingFlag(moby))
+            *(unsigned short *)(moby + 0x96) = RandomIntRange(0, 60);
+        UpdateCameraMoby(moby);
+        if (*(unsigned short *)(moby + 0x96) == 0 || --*(unsigned short *)(moby + 0x96) == 0) {
+            if (*(unsigned char *)(moby + 0x23) >= 4)
+                *(unsigned char *)(moby + 0x23) -= 4;
             else
-                func_0029F338(arg);
+                MarkMobySpawned(moby);
         }
         break;
     }

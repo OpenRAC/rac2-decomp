@@ -83,36 +83,39 @@ extern f32 func_002AA548(void *, void *, f32, f32, f32, f32);
 
 /* Defined in L11_003DD068-g8.c. */
 
-void func_L11_003F1C68(u8 *arg0) {
-    u8 *s0 = arg0;
-    if (*(u8 *)(s0 + 0x20) == 0) {
-        func_L11_003F1D18();
+/* Per-frame update for the Joba enemy. On the first frame it sets itself up; after that it
+   runs damage, its state machine, its movement and its effects. */
+void func_L11_003F1C68(u8 *mobyArg) {
+    u8 *moby = mobyArg;
+    if (*(u8 *)(moby + 0x20) == 0) {
+        InitJobaEnemy();
     } else {
-        if (func_L11_003F2E00(s0) != 0)
+        if (IsJobaEnemyActive(moby) != 0)
             return;
-        if (*(u8 *)(s0 + 0x31) != 0
-            && func_00282E48(s0 + 0x10, D_L11_001BA8C0) < 48.0f) {
-            func_002A93B0(s0);
-            *(u8 *)(s0 + 0x6F) = 0x2D;
+        if (*(u8 *)(moby + 0x31) != 0
+            && fast_vec_dist(moby + 0x10, D_L11_001BA8C0) < 48.0f) {
+            UpdateMobyGroundCheck(moby);
+            *(u8 *)(moby + 0x6F) = 0x2D;
         }
-        func_L11_003F1DB0(s0);
-        func_L11_003F1F48(s0);
-        func_L11_003F2A30(s0);
-        func_L11_003F2C28(s0);
+        ApplyJobaEnemyDamage(moby);
+        UpdateJobaEnemyStateMachine(moby);
+        UpdateJobaEnemyOrbit(moby);
+        UpdateJobaEnemyEffects(moby);
     }
 }
-void func_L11_003F1D18(u8 *arg0) {
-    u8 *s1 = arg0;
-    u8 *s0 = *(u8 **)(s1 + 0x68);
-    *(u8 *)(s0 + 0x48) = func_00283CF0(15.0f);
-    *(u8 *)(s0 + 0x4A) = func_00283CF0(16.0f);
-    func_002A04B8(s1, s0 + 0x280, s0 + 0x284, s0 + 0x288);
-    *(u8 *)(s0 + 0x28) = 3;
-    *(f32 *)(s0 + 0x30) = 1.5f;
-    *(u8 *)(s0 + 0x29) = 1;
-    *(u16 *)(s1 + 0x34) |= 0x100;
-    func_L11_003F3098(s1);
-    *(s32 *)(s0 + 0x290) = -1;
+/* Sets up a new Joba enemy: fills in its starting values and puts it in its idle state. */
+void func_L11_003F1D18(u8 *mobyArg) {
+    u8 *moby = mobyArg;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    *(u8 *)(vars + 0x48) = FloatToInt(15.0f);
+    *(u8 *)(vars + 0x4A) = FloatToInt(16.0f);
+    get_moby_color(moby, vars + 0x280, vars + 0x284, vars + 0x288);
+    *(u8 *)(vars + 0x28) = 3;
+    *(f32 *)(vars + 0x30) = 1.5f;
+    *(u8 *)(vars + 0x29) = 1;
+    *(u16 *)(moby + 0x34) |= 0x100;
+    ResetJobaEnemy(moby);
+    *(s32 *)(vars + 0x290) = -1;
 }
 
 /* func_L11_003F1DB0 is defined in L11_003D6270-g8.c (this unit has no $gp access for it). */
@@ -125,92 +128,99 @@ void func_L11_003F1D18(u8 *arg0) {
 
 
 /* True when the engine's two global gates are both clear and the stage byte is not nine. */
-s32 func_L11_003F2E00(u8 *arg0) {
-    s32 v1 = 0;
+s32 func_L11_003F2E00(u8 *moby) {
+    s32 result = 0;
 
     if (D_L11_001A8FF0 == 0 || D_L11_001A8FF4 == 0)
-        v1 = *(u8 *)(arg0 + 0x20) != 9;
-    return v1;
+        result = *(u8 *)(moby + 0x20) != 9;
+    return result;
 }
 
-void func_L11_003F2D18(u8 *arg0) {
-    func_002A7750(arg0, 4, -1);
+/* Puts the enemy back into state 4. */
+void func_L11_003F2D18(u8 *moby) {
+    SetMobyState(moby, 4, -1);
 }
 
-void func_L11_003F2DC8(u8 *arg0) {
-    u8 *v0 = arg0;
-    s32 a3 = *(s32 *)(v0 + 0x68);
-    u8 t0 = *(u8 *)(v0 + 0x20);
-    u8 v1 = *(u8 *)(v0 + 0x95);
-    *(u8 *)(v0 + 0x94) = t0;
-    *(u16 *)(a3 + 0x294) = v1;
-    func_002A7750(arg0, 3, -1);
+/* Remembers the enemy's current state, then switches it to its hit reaction state. */
+void func_L11_003F2DC8(u8 *mobyArg) {
+    u8 *moby = mobyArg;
+    s32 vars = *(s32 *)(moby + 0x68);
+    u8 oldState = *(u8 *)(moby + 0x20);
+    u8 savedValue = *(u8 *)(moby + 0x95);
+    *(u8 *)(moby + 0x94) = oldState;
+    *(u16 *)(vars + 0x294) = savedValue;
+    SetMobyState(mobyArg, 3, -1);
 }
 
 /* Reports the signed area of the triangle (arg0, arg1, arg2). */
-f32 func_L11_003F2F00(f32 *arg0, f32 *arg1, f32 *arg2) {
-    return (arg0[0] - arg2[0]) * (arg1[1] - arg2[1])
-         - (arg0[1] - arg2[1]) * (arg1[0] - arg2[0]);
+f32 func_L11_003F2F00(f32 *pointA, f32 *pointB, f32 *pointC) {
+    return (pointA[0] - pointC[0]) * (pointB[1] - pointC[1])
+         - (pointA[1] - pointC[1]) * (pointB[0] - pointC[0]);
 }
 
 
-void func_L11_003F3098(u8 *arg0) {
-    func_L11_003F31C0(arg0);
-    func_002A7470(arg0, 0, 0, 3);
-    func_002A05A8(arg0);
-    func_002A7750(arg0, 1, 0);
-    *(u8 *)(arg0 + 0x31) = 0;
-    *(s32 *)(arg0 + 0x98) = 0;
-    *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 1) & 0xEFFF;
+/* Resets the enemy to its idle look and clears its counters. */
+void func_L11_003F3098(u8 *moby) {
+    ClearJobaEnemyCounters(moby);
+    StartAnimationBlended(moby, 0, 0, 3);
+    func_002A05A8(moby);
+    SetMobyState(moby, 1, 0);
+    *(u8 *)(moby + 0x31) = 0;
+    *(s32 *)(moby + 0x98) = 0;
+    *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 1) & 0xEFFF;
 }
 
-void func_L11_003F3108(u8 *arg0) {
+/* Clears one pair of the enemy's counters and sets the other pair to 1. */
+void func_L11_003F3108(u8 *moby) {
     s32 i = 1;
-    u16 *v0 = (u16 *)(*(u8 **)(arg0 + 0x68) + 0x278);
+    u16 *counters = (u16 *)(*(u8 **)(moby + 0x68) + 0x278);
     do {
-        v0[-2] = 0;
-        v0[0] = 1;
+        counters[-2] = 0;
+        counters[0] = 1;
         i--;
-        v0++;
+        counters++;
     } while (i >= 0);
 }
 
-void func_L11_003F3140(u8 *arg0) {
+/* Clears one pair of the enemy's counters, sets the other pair to 2 and starts its sound
+   effect if it has none. */
+void func_L11_003F3140(u8 *mobyArg) {
     s32 i = 1;
-    u8 *s0 = arg0;
-    u8 *s1 = *(u8 **)(s0 + 0x68);
-    u16 *v0 = (u16 *)(s1 + 0x278);
+    u8 *moby = mobyArg;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u16 *counters = (u16 *)(vars + 0x278);
     do {
-        v0[-2] = 0;
-        v0[0] = 2;
+        counters[-2] = 0;
+        counters[0] = 2;
         i--;
-        v0++;
+        counters++;
     } while (i >= 0);
-    if (func_002E59B0(s0, *(s32 *)(s1 + 0x290)) == 0) {
-        *(s32 *)(s1 + 0x290) = func_002E5CF8(2, 4, s0);
+    if (IsVoicePlayingForOwner(moby, *(s32 *)(vars + 0x290)) == 0) {
+        *(s32 *)(vars + 0x290) = PlayMobySound(2, 4, moby);
     }
 }
 
-void func_L11_003F31C0(u8 *arg0) {
+/* Clears the enemy's counters and stops its sound effect. */
+void func_L11_003F31C0(u8 *mobyArg) {
     s32 i = 1;
-    u8 *a2 = arg0;
-    u8 *s0 = *(u8 **)(a2 + 0x68);
-    u16 *v0 = (u16 *)(s0 + 0x278);
-    s32 a1;
+    u8 *moby = mobyArg;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u16 *counters = (u16 *)(vars + 0x278);
+    s32 soundIndex;
     do {
-        v0[-2] = 0;
-        v0[0] = 0;
+        counters[-2] = 0;
+        counters[0] = 0;
         i--;
-        v0++;
+        counters++;
     } while (i >= 0);
-    a1 = *(s32 *)(s0 + 0x290);
-    if (a1 != -1) {
-        u8 *v1 = D_L11_00188660 + a1 * 0x70;
-        if (*(u8 **)(v1 + 0x88) == a2 && *(u8 *)(v1 + 0x74) != 0) {
-            func_002E59F8(a1);
+    soundIndex = *(s32 *)(vars + 0x290);
+    if (soundIndex != -1) {
+        u8 *sound = D_L11_00188660 + soundIndex * 0x70;
+        if (*(u8 **)(sound + 0x88) == moby && *(u8 *)(sound + 0x74) != 0) {
+            StopSoundVoice(soundIndex);
         }
     }
-    *(s32 *)(s0 + 0x290) = -1;
+    *(s32 *)(vars + 0x290) = -1;
 }
 
 /* func_L11_003F3258 is defined in L11_003F3258-g8.c. */
@@ -243,88 +253,92 @@ void func_L11_003F31C0(u8 *arg0) {
 
 /* Steps a seven-state swing, easing the angle at 0xF0 between -90 and -75/-85 degrees, then
    places the linked table entity at this one's position, offset along two of its axes. */
-void func_L11_004169E0(u8 *arg0) {
-    f32 tmp[4], tmp2[4];
-    u8 *s2 = arg0;
-    u8 *s1 = *(u8 **)(s2 + 0x68);
-    u8 *s0 = D_L11_001B359C[0] + *(s32 *)s1 * 256;
+/* Swings a part of the object between a few angles and keeps a linked object attached in
+   front of it. */
+void func_L11_004169E0(u8 *mobyArg) {
+    f32 frontOffset[4], sideOffset[4];
+    u8 *moby = mobyArg;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *linked = gMobyTable_L11[0] + *(s32 *)vars * 256;
     u8 *pos;
 
-    switch (*(u8 *)(s2 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        func_002A7750(s2, 1, -1);
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        if (func_002B38B8(s0)) {
-            func_002E5CF8(0, 0, s2);
-            func_002A7750(s2, 2, -1);
+        if (IsThirdPendingFlagSet(linked)) {
+            PlayMobySound(0, 0, moby);
+            SetMobyState(moby, 2, -1);
         }
-        if (D_0019B2E8[D_001A79F0[0]][*(u8 *)(s2 + 0xB0)] & 0x80) {
-            *(f32 *)(s2 + 0xF0) = func_00283BE0(*(f32 *)(s2 + 0xF0), 1.5707964897155762f);
-            func_002A7750(s2, 6, -1);
+        if (D_0019B2E8[gCurrentMapIndex[0]][*(u8 *)(moby + 0xB0)] & 0x80) {
+            *(f32 *)(moby + 0xF0) = fast_subtract_rotations(*(f32 *)(moby + 0xF0), 1.5707964897155762f);
+            SetMobyState(moby, 6, -1);
         }
         break;
     case 2:
-        func_002AA548(s2 + 0xF0, s1 + 4, -1.5707964897155762f, 0.0005332950968295336f,
+        StepValueTowardTarget(moby + 0xF0, vars + 4, -1.5707964897155762f, 0.0005332950968295336f,
                       174.53294372558594f, 290.8882751464844f);
-        if (*(f32 *)(s2 + 0xF0) <= -1.5707964897155762f) {
-            *(s32 *)(s1 + 4) = 0;
-            func_002A7750(s2, 3, -1);
-            func_002E5CF8(1, 0, s2);
+        if (*(f32 *)(moby + 0xF0) <= -1.5707964897155762f) {
+            *(s32 *)(vars + 4) = 0;
+            SetMobyState(moby, 3, -1);
+            PlayMobySound(1, 0, moby);
         }
         break;
     case 3:
-        func_002AA548(s2 + 0xF0, s1 + 4, -1.3089970350265503f, 0.01745329424738884f,
+        StepValueTowardTarget(moby + 0xF0, vars + 4, -1.3089970350265503f, 0.01745329424738884f,
                       0.0004363323678262532f, 0.872664749622345f);
-        if (*(f32 *)(s2 + 0xF0) >= -1.3089970350265503f) {
-            *(s32 *)(s1 + 4) = 0;
-            func_002A7750(s2, 4, -1);
+        if (*(f32 *)(moby + 0xF0) >= -1.3089970350265503f) {
+            *(s32 *)(vars + 4) = 0;
+            SetMobyState(moby, 4, -1);
         }
         break;
     case 4:
-        func_002AA548(s2 + 0xF0, s1 + 4, -1.5707964897155762f, 0.0004363323678262532f,
+        StepValueTowardTarget(moby + 0xF0, vars + 4, -1.5707964897155762f, 0.0004363323678262532f,
                       0.174532949924469f, 2.9088826179504395f);
-        if (*(f32 *)(s2 + 0xF0) <= -1.5707964897155762f) {
-            *(s32 *)(s1 + 4) = 0;
-            func_002A7750(s2, 5, -1);
-            func_002E5CF8(1, 0, s2);
+        if (*(f32 *)(moby + 0xF0) <= -1.5707964897155762f) {
+            *(s32 *)(vars + 4) = 0;
+            SetMobyState(moby, 5, -1);
+            PlayMobySound(1, 0, moby);
         }
         break;
     case 5:
-        func_002AA548(s2 + 0xF0, s1 + 4, -1.483530044555664f, 0.01745329424738884f,
+        StepValueTowardTarget(moby + 0xF0, vars + 4, -1.483530044555664f, 0.01745329424738884f,
                       0.0004363323678262532f, 0.872664749622345f);
-        if (*(f32 *)(s2 + 0xF0) >= -1.483530044555664f) {
-            *(s32 *)(s1 + 4) = 0;
-            func_002A7750(s2, 6, -1);
+        if (*(f32 *)(moby + 0xF0) >= -1.483530044555664f) {
+            *(s32 *)(vars + 4) = 0;
+            SetMobyState(moby, 6, -1);
         }
         break;
     case 6:
-        func_002AA548(s2 + 0xF0, s1 + 4, -1.5707964897155762f, 0.0004363323678262532f,
+        StepValueTowardTarget(moby + 0xF0, vars + 4, -1.5707964897155762f, 0.0004363323678262532f,
                       0.174532949924469f, 2.9088826179504395f);
-        if (*(f32 *)(s2 + 0xF0) <= -1.5707964897155762f) {
-            *(s32 *)(s1 + 4) = 0;
-            func_002A7750(s2, 7, -1);
-            func_002E5CF8(1, 0, s2);
+        if (*(f32 *)(moby + 0xF0) <= -1.5707964897155762f) {
+            *(s32 *)(vars + 4) = 0;
+            SetMobyState(moby, 7, -1);
+            PlayMobySound(1, 0, moby);
         }
         break;
     }
-    pos = s0 + 0x10;
-    qcopy(pos, s2 + 0x10);
-    func_00282F20(tmp, s2 + 0xE0, 5.7f);
-    func_00282CC0(pos, pos, tmp);
-    func_00282F20(tmp2, s2 + 0xD0, 0.35f);
-    func_00282CC0(pos, pos, tmp2);
+    pos = linked + 0x10;
+    qcopy(pos, moby + 0x10);
+    vec_scale_to_length(frontOffset, moby + 0xE0, 5.7f);
+    FastVecAdd(pos, pos, frontOffset);
+    vec_scale_to_length(sideOffset, moby + 0xD0, 0.35f);
+    FastVecAdd(pos, pos, sideOffset);
 }
 
 
 /* func_L11_00417340 is defined in L11_003D6270-g8.c (this unit has no $gp access for it). */
 
 /* Reports whether the helper found the measured resource and updates its timer. */
-s32 func_L11_00420C38(u8 *arg0) {
-    u8 *s0 = *(u8 **)(arg0 + 0x68);
-    u8 *v0 = func_002A9640(*(s32 *)(s0 + 0x280), 0x10000, 0);
-    if (v0 != 0) {
-        *(f32 *)(s0 + 0x20) = *(f32 *)(s0 + 0x20) - *(f32 *)(v0 + 0x2C);
+/* Checks whether the enemy's damage source still exists and takes its damage off the
+   enemy's health. */
+s32 func_L11_00420C38(u8 *mobyArg) {
+    u8 *vars = *(u8 **)(mobyArg + 0x68);
+    u8 *source = FindOwnedEffectSlot(*(s32 *)(vars + 0x280), 0x10000, 0);
+    if (source != 0) {
+        *(f32 *)(vars + 0x20) = *(f32 *)(vars + 0x20) - *(f32 *)(source + 0x2C);
         return 1;
     }
     return 0;

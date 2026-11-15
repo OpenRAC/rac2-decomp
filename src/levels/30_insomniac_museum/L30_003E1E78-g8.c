@@ -73,6 +73,7 @@ extern void func_L08_002F2D10(void *,void *),func_L00_003E8A98(void);
 extern float func_00283BE0(float,float),func_00283198(float),func_00283180(float);
 typedef struct { float timer; int handle, anim, unknown; float charge, angle; char pad[8]; MuseumWeaponVec origin; float gap, sine, gap2, cosine; } MuseumWeaponVars;
 typedef struct { char position[0x20]; unsigned char state; char pad21[0x22]; unsigned char animation; char pad44[0x1C]; unsigned char flags; char pad61[7]; MuseumWeaponVars *vars; } MuseumWeaponMoby;
+/* Updates the Plasma Coil weapon (moby class 3146, Plasma Coil): it draws the aiming reticle, charges and recovers, and fires a projectile at the target. */
 void func_L30_003E1E78(MuseumWeaponMoby *obj) {
     MuseumWeaponVec velocity, origin, target, delta, point;
     int unused;
@@ -84,8 +85,8 @@ void func_L30_003E1E78(MuseumWeaponMoby *obj) {
     switch (obj->state) {
     case 0: {
         int i;
-        if (obj->animation != 0 || (obj->flags&2)) func_002A7470(obj,1,0,0);
-        func_0029F978(obj,0,&st->origin);
+        if (obj->animation != 0 || (obj->flags&2)) StartAnimationBlended(obj,1,0,0);
+        AttachManipulator(obj,0,&st->origin);
         st->timer=0.36666667f;
         st->unknown=-1;
         st->charge=0;
@@ -94,67 +95,67 @@ void func_L30_003E1E78(MuseumWeaponMoby *obj) {
         D_L30_001B3B40.reticle=-1.0f;
         D_L30_001B0C08=0;
         D_L30_001B0BF0=0;
-        st->handle=func_L00_00329E90(obj,0,&unused);
-        st->anim=func_L00_0032A088(H(obj,0xAA),st->handle);
+        st->handle=AcquireEntitySlot(obj,0,&unused);
+        st->anim=GetSlotBody(H(obj,0xAA),st->handle);
         for (i=0;i<4;i++) {
             D_L30_00256050[i].values[0]=0; D_L30_00256050[i].values[1]=0; D_L30_00256050[i].values[2]=0;
-            D_L30_00256050[i].values[3]=func_002A78D8(0.05f,0.3f);
-            D_L30_00256050[i].values[4]=func_002A78D8(0.05f,0.3f);
-            D_L30_00256050[i].values[5]=func_002A78D8(0.05f,0.3f);
-            D_L30_00256050[i].values[6]=func_002A7878(0.25f,0.75f);
-            D_L30_00256050[i].values[7]=func_002A7878(0.25f,0.75f);
-            D_L30_00256050[i].values[8]=func_002A7878(0.25f,0.75f);
+            D_L30_00256050[i].values[3]=RandomSignedFloatRange(0.05f,0.3f);
+            D_L30_00256050[i].values[4]=RandomSignedFloatRange(0.05f,0.3f);
+            D_L30_00256050[i].values[5]=RandomSignedFloatRange(0.05f,0.3f);
+            D_L30_00256050[i].values[6]=RandomFloatRange(0.25f,0.75f);
+            D_L30_00256050[i].values[7]=RandomFloatRange(0.25f,0.75f);
+            D_L30_00256050[i].values[8]=RandomFloatRange(0.25f,0.75f);
             D_L30_00256050[i].values[9]=0; D_L30_00256050[i].values[10]=0; D_L30_00256050[i].values[11]=0;
-            D_L30_00256050[i].values[12]=func_002A78D8(0.05f,0.3f);
-            D_L30_00256050[i].values[13]=func_002A78D8(0.05f,0.3f);
-            D_L30_00256050[i].values[14]=func_002A78D8(0.05f,0.3f);
-            D_L30_00256050[i].values[15]=func_002A7878(0.25f,0.75f);
-            D_L30_00256050[i].values[16]=func_002A7878(0.25f,0.75f);
-            D_L30_00256050[i].values[17]=func_002A7878(0.25f,0.75f);
-            func_00282C88(&D_L30_00256050[i].a);
-            func_00282C88(&D_L30_00256050[i].b);
+            D_L30_00256050[i].values[12]=RandomSignedFloatRange(0.05f,0.3f);
+            D_L30_00256050[i].values[13]=RandomSignedFloatRange(0.05f,0.3f);
+            D_L30_00256050[i].values[14]=RandomSignedFloatRange(0.05f,0.3f);
+            D_L30_00256050[i].values[15]=RandomFloatRange(0.25f,0.75f);
+            D_L30_00256050[i].values[16]=RandomFloatRange(0.25f,0.75f);
+            D_L30_00256050[i].values[17]=RandomFloatRange(0.25f,0.75f);
+            ClearVector128(&D_L30_00256050[i].a);
+            ClearVector128(&D_L30_00256050[i].b);
         }
-        func_L00_003CBBE0();
+        ClearSheepinatorRecords();
         break;
     }
     case 1:
         D_L30_001B3B40.reticle=-1;
-        if (D_00189E20.selected) D_00189E20.held=D_00189E20.selected;
+        if (gHeroState.selected) gHeroState.held=gHeroState.selected;
         if (!D_L30_001B0BF0) D_L30_001B0BF0=1;
-        if (D_00189E20.mode==1) func_L00_002C42E0(29,1);
+        if (gHeroState.mode==1) SetHeroAction_L00(29,1);
         enabled=1;
-        if (D_00189E20.mode==29) {
-            if (!func_00282948(&D_00189E20.timer)) enabled=0;
+        if (gHeroState.mode==29) {
+            if (!FastFloatHelperD(&gHeroState.timer)) enabled=0;
             {
                 unsigned int color;
-                if (st->timer!=0 && func_L00_002D4040(-1)) color=0x600000FF;
+                if (st->timer!=0 && get_ammo(-1)) color=0x600000FF;
                 else color=0x600FFF0F;
-                func_00273318(obj,color,1,0,0,38,-1,90,4);
+                AddMobyMarker(obj,color,1,0,0,38,-1,90,4);
             }
-        } else D_00189E20.timer=40;
-        func_0029FCC0(obj,0,&origin);
-        if (D_00189E20.held) func_L00_0032A1A8(D_00189E20.held,&origin,&velocity,speed);
-        else hit=func_L00_00324E48(&D_00189E20.camera,1,0.17453295f,0.17453295f,20,0.7853982448577881f,0.7853982448577881f);
-        if (st->timer==0 && hit && func_L00_002D4040(-1)) {
+        } else gHeroState.timer=40;
+        TransformMobyJointToWorld(obj,0,&origin);
+        if (gHeroState.held) ComputeObjectToTargetVector(gHeroState.held,&origin,&velocity,speed);
+        else hit=StartEffectInFrontOfHero(&gHeroState.camera,1,0.17453295f,0.17453295f,20,0.7853982448577881f,0.7853982448577881f);
+        if (st->timer==0 && hit && get_ammo(-1)) {
             char *extra;
             /* The copy only writes target; no scalar local or source field aliases it. */
             qcopy_nc(&target,hit+0x10);
-            extra=func_002AB1F0(hit);
+            extra=GetMobyPrivateValue0(hit);
             if (extra) {
-                func_002AFFD8(hit+0x10,&delta,1);
-                func_00282D30(&delta,&delta,F(extra,0x10));
-                func_00282CC0(&target,&delta,hit+0x10);
+                ComputeViewDirection(hit+0x10,&delta,1);
+                FastVecScale(&delta,&delta,F(extra,0x10));
+                FastVecAdd(&target,&delta,hit+0x10);
             }
             {
-                float scale=func_00282C48(0.9f-func_00282E48(D_L30_001B9DC0,&target)*0.006666667f*0.65f);
-                func_00273318(obj,0xFF0FFF0F,scale,&target,0,38,-1,90,4);
+                float scale=FloatAbs(0.9f-fast_vec_dist(D_L30_001B9DC0,&target)*0.006666667f*0.65f);
+                AddMobyMarker(obj,0xFF0FFF0F,scale,&target,0,38,-1,90,4);
             }
         }
-        if (func_002829D8(st) && !D_00189E20.locked) {
-            if ((D_00138180.pressed&D_00189E20.mask) && enabled && !func_L00_003CBBD0() && D_00189E20.frame>=23) {
-                if (func_L00_002D3F30(-1,1)) {
+        if (FastVectorHelperB(st) && !gHeroState.locked) {
+            if ((gPadState.pressed&gHeroState.mask) && enabled && !IsSheepinatorModeFour() && gHeroState.frame>=23) {
+                if (SpendWeaponAmmo(-1,1)) {
                     D_L30_001B3B40.active=1;
-                    func_002E5CF8(2,0,obj);
+                    PlayMobySound(2,0,obj);
                     switch (D_L30_001B0C08) {
                     case 0:
                         D_L30_001B0C08=1; st->charge=D_L30_001B0BFC; st->timer=0.5f;
@@ -163,8 +164,8 @@ void func_L30_003E1E78(MuseumWeaponMoby *obj) {
                         D_L30_001B0C08=1; st->timer=0.5f;
                         break;
                     }
-                } else if ((D_00138180.released&D_00189E20.mask) || D_L30_001B3B40.active==1) {
-                    func_002E5CF8(7,0,obj); D_L30_001B3B40.active=0;
+                } else if ((gPadState.released&gHeroState.mask) || D_L30_001B3B40.active==1) {
+                    PlayMobySound(7,0,obj); D_L30_001B3B40.active=0;
                 }
             }
         }
@@ -178,37 +179,37 @@ void func_L30_003E1E78(MuseumWeaponMoby *obj) {
         case 1:
             st->charge+=D_L30_001B0BF4;
             if (st->charge>D_L30_001B0C04) {
-                func_0029FCC0(obj,0,&target);
-                if (D_00189E20.direction==1) func_00282F20(&velocity,(char *)obj+0xD0,-speed);
-                else func_00282F20(&velocity,&D_00189E20.camera,speed);
-                count=func_00277F48(&target,0,obj,0,1.0f);
+                TransformMobyJointToWorld(obj,0,&target);
+                if (gHeroState.direction==1) vec_scale_to_length(&velocity,(char *)obj+0xD0,-speed);
+                else vec_scale_to_length(&velocity,&gHeroState.camera,speed);
+                count=ProcessCollisionHit(&target,0,obj,0,1.0f);
                 for(i=0;i<count;i++) {
                     char *candidate=D_L30_001C4280[i];
-                    char *details=func_002AB1F0(candidate);
-                    if (candidate==D_00189E20.player || !(U(candidate,0x34)&0x1000) || H(candidate,0xAA)==0xC87 || H(candidate,0xAA)==0xECC) continue;
+                    char *details=GetMobyPrivateValue0(candidate);
+                    if (candidate==gHeroState.player || !(U(candidate,0x34)&0x1000) || H(candidate,0xAA)==0xC87 /* moby class 3207 */ || H(candidate,0xAA)==0xECC /* moby class 3788 */) continue;
                     qcopy(&point,candidate+0x10);
                     if (details) {
-                        func_L00_003252A8(candidate,&delta,1);
-                        func_00282D30(&delta,&delta,F(details,0x10));
-                        func_00282CC0(&point,&delta,&point);
+                        ForwardObjectPositionCall(candidate,&delta,1);
+                        FastVecScale(&delta,&delta,F(details,0x10));
+                        FastVecAdd(&point,&delta,&point);
                     }
-                    func_00282CF0(&velocity,&point,&target);
-                    func_00282F20(&velocity,&velocity,speed);
+                    FastVecSub(&velocity,&point,&target);
+                    vec_scale_to_length(&velocity,&velocity,speed);
                     break;
                 }
                 if (hit) {
                     char *extra;
                     qcopy(&delta,hit+0x10);
-                    extra=func_002AB1F0(hit);
+                    extra=GetMobyPrivateValue0(hit);
                     if (extra) {
-                        func_002AFFD8(hit+0x10,&point,1);
-                        func_00282D30(&point,&point,F(extra,0x10));
-                        func_00282CC0(&delta,&point,hit+0x10);
+                        ComputeViewDirection(hit+0x10,&point,1);
+                        FastVecScale(&point,&point,F(extra,0x10));
+                        FastVecAdd(&delta,&point,hit+0x10);
                     }
-                    func_00282CF0(&velocity,&delta,&target);
-                    func_00282F20(&velocity,&velocity,speed);
+                    FastVecSub(&velocity,&delta,&target);
+                    vec_scale_to_length(&velocity,&velocity,speed);
                 }
-                D_L30_001B0C0C=func_L00_003CB980(obj,st->handle,&target,&velocity);
+                D_L30_001B0C0C=SpawnParticlePoolMoby(obj,st->handle,&target,&velocity);
                 if (D_L30_001B0C0C) *(MuseumWeaponMoby **)(D_L30_001B0C0C+0xB8)=obj;
                 D_L30_001B0C10=50; D_L30_001B0C08=2;
             }
@@ -218,10 +219,10 @@ void func_L30_003E1E78(MuseumWeaponMoby *obj) {
             if (st->charge<=D_L30_001B0BFC) { st->charge=D_L30_001B0BFC; D_L30_001B0C08=0; }
             break;
         }
-        if (B(obj,0x31)) func_L08_002F2D10(func_L00_003E8A98,obj);
-        st->angle=func_00283BE0(st->angle,st->charge*0.3141593f);
-        st->sine=func_00283198(st->angle*0.5f);
-        st->cosine=func_00283180(st->angle*0.5f);
+        if (B(obj,0x31)) QueueDrawCallback(DrawPlasmaCoilBeams,obj);
+        st->angle=fast_subtract_rotations(st->angle,st->charge*0.3141593f);
+        st->sine=FastSinOrCosB(st->angle*0.5f);
+        st->cosine=FastSinOrCosA(st->angle*0.5f);
         break;
     }
 }

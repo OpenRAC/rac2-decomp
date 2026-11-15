@@ -24,20 +24,20 @@ void func_L00_002BA138(void *object, int count)
     char *base;
 
     if (count != 0) {
-        base = D_00189E20;
+        base = gHeroState;
         if (*(short *)(base + 0xbfe) == 0) {
-            func_002E5CF8(1, 0, object);
+            PlayMobySound(1, 0, object);
             *(short *)(base + 0xbfe) = 1;
         }
         if (count > 0) {
             remaining = count;
-            slot = D_L00_001C3280;
+            slot = gAreaHitTargets;
             do {
                 type = object_type(*slot);
                 if (type == 5 || type == 9) {
                     qcopy(position, *slot + 0x10);
-                    func_L00_002D3778(position, position, 0.5f);
-                    func_L00_0038B888(position, 4);
+                    ApplyHeroModeTransformReversed(position, position, 0.5f);
+                    SpawnSparkBurst_L00_2(position, 4);
                 }
                 remaining--;
                 slot++;

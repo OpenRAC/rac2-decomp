@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Level counterpart of func_00327D50; the vector clear takes one register,
    as in the matched boot unit. */
@@ -39,21 +40,22 @@ extern short D_L00_002967A0[][4][2];
 extern RenderVec D_L00_002961A0[];
 extern float D_L00_002474F0[][2];
 
+/* Draws a wobbling 3D ball made of 48 textured faces around the object, facing the camera. The wobble shrinks as the object grows. */
 void func_L00_003DF338(char *object)
 {
     RenderPacket packet;
     RenderVec matrix[4];
     RenderVector up;
-    char *state;
+    char *vars;
     int face, corner, index, vtx;
     long long flags;
-    float *u, *v, *uv;
-    float delta, scale, c, s;
+    float *texU, *texV, *uvStart;
+    float delta, scale, cosValue, sinValue;
 
-    state = *(char **)(object + 0x68);
+    vars = *(char **)(object + 0x68);
     up.word = 0;
     up.v[2] = 1.0f;
-    packet.tag[1] = func_0027C878(D_L00_001B0508);
+    packet.tag[1] = GetEffectTextureDescriptor(D_L00_001B0508);
     packet.tag[2] = 0xFF9000000260LL;
     flags = (long long)D_L00_001B04F4;
     flags |= (long long)D_L00_001B04F8 << 2;
@@ -62,11 +64,11 @@ void func_L00_003DF338(char *object)
     flags |= (long long)D_L00_001B0504 << 32;
     packet.tag[3] = flags;
     packet.tag[0] = 0;
-    func_00282CF0(&matrix[0], D_L00_001B8DC0, object + 0x10);
-    func_00282F20(&matrix[0], &matrix[0], 1.0f);
-    func_00282DD8(&matrix[1], &matrix[0], &up);
-    func_00282F20(&matrix[1], &matrix[1], 1.0f);
-    func_00282DD8(&matrix[2], &matrix[1], &matrix[0]);
+    FastVecSub(&matrix[0], gCameraPosition_L00, object + 0x10);
+    vec_scale_to_length(&matrix[0], &matrix[0], 1.0f);
+    FastVecCross(&matrix[1], &matrix[0], &up);
+    vec_scale_to_length(&matrix[1], &matrix[1], 1.0f);
+    FastVecCross(&matrix[2], &matrix[1], &matrix[0]);
     matrix[3].x = *(float *)(object + 0x10);
     matrix[3].y = *(float *)(object + 0x14);
     matrix[3].z = *(float *)(object + 0x18);
@@ -75,33 +77,33 @@ void func_L00_003DF338(char *object)
     packet.color[2] = D_L00_001B050C;
     packet.color[1] = D_L00_001B050C;
     packet.color[0] = D_L00_001B050C;
-    uv = &packet.uv[0][0];
+    uvStart = &packet.uv[0][0];
     for (face = 0; face < 48; face++) {
-        v = &packet.uv[0][1];
-        u = uv;
+        texV = &packet.uv[0][1];
+        texU = uvStart;
         for (corner = 0; corner < 4; corner++) {
             vtx = D_L00_002967A0[face][corner][0];
             index = D_L00_002967A0[face][corner][1];
-            func_00282D30(&packet.vertex[corner], &D_L00_002961A0[vtx], *(float *)(state + 0x24) * 2.0f);
-            func_002830C0(&packet.vertex[corner], &packet.vertex[corner], matrix);
-            func_0027C768(&packet.vertex[corner], &packet.uv[corner][0], &packet.uv[corner][1]);
-            c = func_00283180(D_L00_002474F0[index][0]);
-            delta = c * func_002A7798((1.0f - *(float *)(state + 0x24) / D_L00_001B0434) * 0.0125f);
-            *u += delta;
-            s = func_00283198(D_L00_002474F0[index][0]);
-            scale = func_002A7798((1.0f - *(float *)(state + 0x24) / D_L00_001B0434) * 0.0125f);
-            delta = -s;
+            FastVecScale(&packet.vertex[corner], &D_L00_002961A0[vtx], *(float *)(vars + 0x24) * 2.0f);
+            transform_vector(&packet.vertex[corner], &packet.vertex[corner], matrix);
+            ProjectWorldToScreen(&packet.vertex[corner], &packet.uv[corner][0], &packet.uv[corner][1]);
+            cosValue = FastSinOrCosA(D_L00_002474F0[index][0]);
+            delta = cosValue * EaseOutQuad((1.0f - *(float *)(vars + 0x24) / D_L00_001B0434) * 0.0125f);
+            *texU += delta;
+            sinValue = FastSinOrCosB(D_L00_002474F0[index][0]);
+            scale = EaseOutQuad((1.0f - *(float *)(vars + 0x24) / D_L00_001B0434) * 0.0125f);
+            delta = -sinValue;
             delta *= scale;
-            *v += delta;
-            if (*u > 1.0f) *u = 1.0f;
-            else if (*u < 0.0f) *u = 0.0f;
-            if (*v > 1.0f) *v = 1.0f;
-            else if (*v < 0.0f) *v = 0.0f;
-            v += 2;
-            u += 2;
+            *texV += delta;
+            if (*texU > 1.0f) *texU = 1.0f;
+            else if (*texU < 0.0f) *texU = 0.0f;
+            if (*texV > 1.0f) *texV = 1.0f;
+            else if (*texV < 0.0f) *texV = 0.0f;
+            texV += 2;
+            texU += 2;
         }
-        func_00280B90(&packet, 0, 0);
+        draw_world_quad(&packet, 0, 0);
     }
     for (face = 0; face < 98; face++)
-        D_L00_002474F0[face][0] = func_00283B98(D_L00_002474F0[face][0], D_L00_002474F0[face][1]);
+        D_L00_002474F0[face][0] = FastAddRotations(D_L00_002474F0[face][0], D_L00_002474F0[face][1]);
 }

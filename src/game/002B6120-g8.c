@@ -39,19 +39,20 @@ extern Node *ref_002B6658_00 __attribute__((sda));
    live object: advances its animation unless flag 0x40 is set, calls its update
    hook (call_hook, as RAC1's update_visible_resident_objects does) and refreshes
    its bounds unless flag 4 is set. */
+/* Updates every visible object once per frame. */
 void func_002B6658(void)
 {
-    Node *t;
+    Node *node;
 
     ref_002B6658_00 = func_002A08A0();
-    t = ref_002B6658_00;
-    for (; t != 0; t = t->next) {
-        if (t->flag20 >= 0) {
-            if ((t->flags & 0x40) == 0)
-                func_002A05A8(t);
-            call_hook(t->vfunc, t);
-            if ((t->flags & 4) == 0)
-                func_002A0F48(t);
+    node = ref_002B6658_00;
+    for (; node != 0; node = node->next) {
+        if (node->flag20 >= 0) {
+            if ((node->flags & 0x40) == 0)
+                func_002A05A8(node);
+            call_hook(node->vfunc, node);
+            if ((node->flags & 4) == 0)
+                func_002A0F48(node);
         }
     }
 }

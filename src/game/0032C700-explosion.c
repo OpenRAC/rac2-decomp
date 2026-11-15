@@ -49,7 +49,7 @@ char *func_0032C700(EffectVector *position, int flash, int n0, int n1,
     EffectState *state;
     float angle;
     EffectCamera *camera;
-    object=func_0029EFD0(0x13A0);
+    object=CreateMoby(0x13A0 /* moby class 5024 */);
     if (object) {
         *(unsigned char *)(object+0x30)=255;
         object[0x20]=0;
@@ -57,13 +57,13 @@ char *func_0032C700(EffectVector *position, int flash, int n0, int n1,
         state=*(EffectState **)(object+0x68);
         qcopy(object+0x10,position);
         FLOAT_AT(object,0x1C)=1.0f;
-        func_00282CF0(&delta,&D_001B5200.position,object+0x10);
-        func_00282F20(&delta,&delta,1.0f);
-        func_002AFFD8(object+0x10,(char *)&radial,1);
+        FastVecSub(&delta,&gActiveCamera.position,object+0x10);
+        vec_scale_to_length(&delta,&delta,1.0f);
+        ComputeViewDirection(object+0x10,(char *)&radial,1);
         qcopy(object+0xC0,&delta);
-        func_00282DD8(object+0xD0,object+0xC0,&radial);
-        func_00282F20(object+0xD0,object+0xD0,1.0f);
-        func_00282DD8(object+0xE0,object+0xD0,object+0xC0);
+        FastVecCross(object+0xD0,object+0xC0,&radial);
+        vec_scale_to_length(object+0xD0,object+0xD0,1.0f);
+        FastVecCross(object+0xE0,object+0xD0,object+0xC0);
         FLOAT_AT(object,0xCC)=FLOAT_AT(object,0xDC)=FLOAT_AT(object,0xEC)=0.0f;
         state->values[0]=n0;
         state->values[1]=n1;
@@ -80,22 +80,22 @@ char *func_0032C700(EffectVector *position, int flash, int n0, int n1,
         state->orient=orient;
         state->owner=owner;
         qzero_nc(&attachment);
-        if (owner) func_002AD330(object,owner,object+0x10,(char *)&attachment);
+        if (owner) TransformPointByMobyAttachment(object,owner,object+0x10,(char *)&attachment);
         qcopy(&sphere,object+0x10);
         sphere.w=size*3.0f;
-        if (func_00283DB8(&sphere,128.0f)==1) {
+        if (FastMathHelperA(&sphere,128.0f)==1) {
             state->visible=10;
             state->fade=0.1f;
-            if (func_00282E48(position,&D_001B5200.position)<48.0f && flash) {
-                camera=&D_001B5200;
+            if (fast_vec_dist(position,&gActiveCamera.position)<48.0f && flash) {
+                camera=&gActiveCamera;
                 camera->shake_flag=0;
                 camera->shake_duration=40;
                 camera->shake_amplitude=0.075f;
             }
             if (state->orient) {
-                func_00282CF0(&direction,object+0x10,&D_001B5200.position);
-                func_00282F20(&direction,&direction,1.0f);
-                angle=1.5707963705062866f-func_002831B0(func_00282DB0(&direction,&D_001B5200.forward));
+                FastVecSub(&direction,object+0x10,&gActiveCamera.position);
+                vec_scale_to_length(&direction,&direction,1.0f);
+                angle=1.5707963705062866f-FastAngleHelper(FastVecDot(&direction,&gActiveCamera.forward));
                 if (angle<0.45378565788269043f) state->orient=1;
                 else state->orient=0;
             }
@@ -103,7 +103,7 @@ char *func_0032C700(EffectVector *position, int flash, int n0, int n1,
             state->visible=0;
             state->orient=0;
         }
-        func_0032CA40(object,&radial,&attachment,distance);
+        EmitExplosionParticles(object,&radial,&attachment,distance);
     }
     return object;
 }

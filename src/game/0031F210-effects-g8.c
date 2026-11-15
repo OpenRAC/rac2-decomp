@@ -10,6 +10,7 @@ extern short *D_001EE5A0[];
 extern char *D_001B1B5C;
 extern int D_001B1B78 __attribute__((sda));
 
+/* Draws glowing effects at three joints of the object and of the other members of its group. */
 void func_00325EC0(unsigned char *self)
 {
     float pos[4] __attribute__((aligned(16)));
@@ -22,13 +23,13 @@ void func_00325EC0(unsigned char *self)
         if ((unsigned char)self[0x31]) {
             *(GroupEffectQuad *)offset = 0;
             offset[0] = 0.25f; offset[3] = 1.0f;
-            func_0029FCC0(self,4,pos);
-            func_0029FCC0(self,5,other);
-            func_0029FC20(self,6,matrix);
-            func_002830C0(offset,offset,matrix);
-            func_00325638((int)self,(char *)pos,0.125f,0x36F6,0x20000000,0x20000000);
-            func_00325638((int)self,(char *)other,0.15f,0xFF3E00,0x30000000,0x20000000);
-            func_00325638((int)self,(char *)offset,0.15f,0xFF3E00,0x10000000,0x30000000);
+            TransformMobyJointToWorld(self,4,pos);
+            TransformMobyJointToWorld(self,5,other);
+            TransformMobyJointPoint(self,6,matrix);
+            transform_vector(offset,offset,matrix);
+            DrawCameraFacingFlashB((int)self,(char *)pos,0.125f,0x36F6,0x20000000,0x20000000);
+            DrawCameraFacingFlashB((int)self,(char *)other,0.15f,0xFF3E00,0x30000000,0x20000000);
+            DrawCameraFacingFlashB((int)self,(char *)offset,0.15f,0xFF3E00,0x10000000,0x30000000);
         }
     } else {
         list = D_001EE5A0[(unsigned char)self[0x21]];
@@ -40,13 +41,13 @@ void func_00325EC0(unsigned char *self)
             if ((unsigned char)object[0x31] && *(short *)(object+0xAA) == *(short *)(self+0xAA)) {
                 *(GroupEffectQuad *)offset = 0;
                 offset[0] = 0.25f; offset[3] = 1.0f;
-                func_0029FCC0(object,4,pos);
-                func_0029FCC0(object,5,other);
-                func_0029FC20(object,6,matrix);
-                func_002830C0(offset,offset,matrix);
-                func_00325638((int)object,(char *)pos,0.125f,0x36F6,0x20000000,0x20000000);
-                func_00325638((int)object,(char *)other,0.15f,0xFF3E00,0x30000000,0x20000000);
-                func_00325638((int)object,(char *)offset,0.15f,0xFF3E00,0x10000000,0x30000000);
+                TransformMobyJointToWorld(object,4,pos);
+                TransformMobyJointToWorld(object,5,other);
+                TransformMobyJointPoint(object,6,matrix);
+                transform_vector(offset,offset,matrix);
+                DrawCameraFacingFlashB((int)object,(char *)pos,0.125f,0x36F6,0x20000000,0x20000000);
+                DrawCameraFacingFlashB((int)object,(char *)other,0.15f,0xFF3E00,0x30000000,0x20000000);
+                DrawCameraFacingFlashB((int)object,(char *)offset,0.15f,0xFF3E00,0x10000000,0x30000000);
             }
 next:
             list++;

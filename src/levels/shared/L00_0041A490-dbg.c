@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L00_0041A490 is a unit of its own: it needs the debug profile (-g, config/cflags.txt).
    The line labels cc1 emits with -g ($LM) are code labels, and a code label right in front of
@@ -22,10 +23,10 @@ s32 func_L00_0041A490(s32 value)
     f32 q;
 
     if (value % divisor != 0) {
-        q = func_00283CE0(value);
+        q = IntToFloat(value);
         fdiv = (f32)divisor;
         q = q / fdiv;
-        value = (func_00283CF0(q) + 1) << 4;
+        value = (FloatToInt(q) + 1) << 4;
     }
     return value;
 }

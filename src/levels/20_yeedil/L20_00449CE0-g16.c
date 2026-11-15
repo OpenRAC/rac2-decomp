@@ -52,6 +52,7 @@ extern void func_00283958(void *, void *);
 extern void func_00283738(void *, void *, void *);
 extern int func_00282948(int *);
 
+/* Update handler for moby class 4846, a flying projectile: it moves, bounces off walls, falls and spins, and is removed when it hits something or its time runs out. */
 void func_L20_00449CE0(u8 *moby)
 {
     float rate;
@@ -63,44 +64,44 @@ void func_L20_00449CE0(u8 *moby)
     float spin[12] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(moby + 0x68);
     int collided;
-    if (D_L20_001A8F00 == 2) { func_0029F338(moby); return; }
+    if (D_L20_001A8F00 == 2) { MarkMobySpawned(moby); return; }
     if (moby[0x20] != 1) return;
     qcopy(previous, (float *)(moby + 0x10));
     collided = 0;
-    func_00282CC0((float *)(moby + 0x10), (float *)(moby + 0x10), state);
-    if (func_00282DF0(state) > D_L20_001B23F8 * 0.1f && func_002761F8(previous, (float *)(moby + 0x10), 2, moby, 0)) {
+    FastVecAdd((float *)(moby + 0x10), (float *)(moby + 0x10), state);
+    if (FastVecLength(state) > D_L20_001B23F8 * 0.1f && CollLine(previous, (float *)(moby + 0x10), 2, moby, 0)) {
         collided = 1;
-        func_00282F20((float *)(moby + 0x10), D_L20_001C0400.normal, 0.01f);
-        func_00282CC0((float *)(moby + 0x10), (float *)(moby + 0x10), D_L20_001C0400.correction);
+        vec_scale_to_length((float *)(moby + 0x10), D_L20_001C0400.normal, 0.01f);
+        FastVecAdd((float *)(moby + 0x10), (float *)(moby + 0x10), D_L20_001C0400.correction);
     }
-    if (func_00277258((float *)(moby + 0x10), 0, moby, D_L20_001B23F8 * 0.1f)) {
+    if (TestPointAgainstCollision((float *)(moby + 0x10), 0, moby, D_L20_001B23F8 * 0.1f)) {
         collided = 1;
         if (D_L20_001C0400.polygon < 0 &&
             (D_L20_001C0400.object != *(u8 **)(moby + 0xb8) || !*(int *)(state + 0x20)) &&
             *(short *)(D_L20_001C0400.object + 0xaa) != *(short *)(moby + 0xaa)) {
-            func_L20_0044A108((char *)moby, (char *)(D_L20_001C0400.object == D_0018C0B0 ? 0x10001 : 0x10000));
+            ExplodeProjectileMoby((char *)moby, (char *)(D_L20_001C0400.object == gHeroMoby_0018C0B0 ? 0x10001 : 0x10000));
             return;
         }
         qcopy((float *)(moby + 0x10), D_L20_001C0400.point);
     }
-    if (collided) *(float *)(state + 8) = func_002A7878(D_L20_001B2400, D_L20_001B2400_4[1]) * 0.016666668f;
+    if (collided) *(float *)(state + 8) = RandomFloatRange(D_L20_001B2400, D_L20_001B2400_4[1]) * 0.016666668f;
     else *(float *)(state + 8) -= *(float *)(state + 0x10);
-    rate = func_00282E20(state);
-    func_002AA2E8(&rate, D_L20_001B23FC * 0.016666668f, 0.0013888889f);
-    func_00282F70(rate, state, state);
+    rate = vec_length_xy(state);
+    ApproachValue(&rate, D_L20_001B23FC * 0.016666668f, 0.0013888889f);
+    FastVectorNormalizeHelper(rate, state, state);
     *(ProjectileQuadword *)rotation = 0;
     rotation[2] = *(float *)(state + 0x14);
     *(ProjectileQuadword *)angles = *(ProjectileQuadword *)rotation;
-    func_002833F0(basis, angles);
-    func_00283098(state, state, basis);
+    euler_rotation_basis(basis, angles);
+    matrix_mul_vec3(state, state, basis);
     if (moby[0x31]) {
-        func_002A9288((char *)moby, D_L20_001B2408);
-        func_00282C98(rotation);
-        func_00282DD8(quaternion, rotation, state);
-        func_002ACE78(quaternion, quaternion, 0.026179943233728409f);
-        func_00283958(quaternion, spin);
-        func_00283738(moby + 0xc0, spin, moby + 0xc0);
+        QueueGroundShadow((char *)moby, D_L20_001B2408);
+        VectorCopyHelperA(rotation);
+        FastVecCross(quaternion, rotation, state);
+        SetDirectionWithComplement(quaternion, quaternion, 0.026179943233728409f);
+        quaternion_to_rotation_basis(quaternion, spin);
+        multiply_matrix3x3(moby + 0xc0, spin, moby + 0xc0);
     }
-    func_00282948((int *)(state + 0x20));
-    if (func_00282948((int *)(state + 0x18))) func_L20_0044A108((char *)moby, 0);
+    FastFloatHelperD((int *)(state + 0x20));
+    if (FastFloatHelperD((int *)(state + 0x18))) ExplodeProjectileMoby((char *)moby, 0);
 }

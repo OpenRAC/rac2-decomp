@@ -26,17 +26,18 @@
 
 extern s32  D_001B2754[] __attribute__((sda));
 
-void func_0031E528(s32 arg0) {
-    s32 var_v1;
-    s32 var_a1;
+/* Frees every glow ring entry that belongs to the given object. */
+void func_0031E528(s32 owner) {
+    s32 entry;
+    s32 remaining;
 
-    var_v1 = D_001B2754[0];
-    var_a1 = 0x3F;
+    entry = D_001B2754[0];
+    remaining = 0x3F;
     do {
-        if ((*(s32 *)((char *)(var_v1) + (0x10))) == arg0) {
-            (*(s32 *)((char *)(var_v1) + (0x10))) = 0;
+        if ((*(s32 *)((char *)(entry) + (0x10))) == owner) {
+            (*(s32 *)((char *)(entry) + (0x10))) = 0;
         }
-        var_a1 -= 1;
-        var_v1 += 0x30;
-    } while (var_a1 >= 0);
+        remaining -= 1;
+        entry += 0x30;
+    } while (remaining >= 0);
 }

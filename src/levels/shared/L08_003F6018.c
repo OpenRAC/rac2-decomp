@@ -21,26 +21,28 @@ typedef struct {
     int slots[2];
 } PoolSlotsPrefix;
 
+/* Takes a free object from the owner's two pool slots, sets it up at the given position facing
+   the given direction, and returns it (or 0 if none is free). */
 u8 *func_L08_003F6018(u8 *owner, SpawnQuad *position, float *direction)
 {
     u8 *child;
-    PoolSlotsPrefix *state;
+    PoolSlotsPrefix *vars;
     u8 *part;
-    u8 *c;
-    u8 *head;
+    u8 *result;
+    u8 *headPart;
     int i;
     if (owner == 0)
         return 0;
-    state = *(PoolSlotsPrefix **)(owner + 0x68);
+    vars = *(PoolSlotsPrefix **)(owner + 0x68);
     child = 0;
     for (i = 0; i < 2; i++) {
-        if (func_002A8600(&child, state->slots[i], 1, 1) != 0)
+        if (GetFirstMobyInGroup(&child, vars->slots[i], 1, 1) != 0)
             continue;
-        state->activeCount++;
+        vars->activeCount++;
         {
-            u8 *fresh = child;
-            *(SpawnQuad *)(fresh + 0x10) = *position;
-            *(int *)(fresh + 0x1c) = 0;
+            u8 *newObject = child;
+            *(SpawnQuad *)(newObject + 0x10) = *position;
+            *(int *)(newObject + 0x1c) = 0;
         }
         child[0x20] = 0;
         child[0xbc] = 0;
@@ -68,13 +70,13 @@ u8 *func_L08_003F6018(u8 *owner, SpawnQuad *position, float *direction)
         child[0x7f] = 0;
         *(int *)(child + 0xf0) = 0;
         *(int *)(child + 0xf4) = 0;
-        *(float *)(child + 0xf8) = func_00283248(direction[0], direction[1]);
-        head = (u8 *)func_002AB220(child);
-        if (head != 0)
-            *(SpawnQuad *)(head + 0x80) = *(SpawnQuad *)direction;
+        *(float *)(child + 0xf8) = FastMatrixHelperA(direction[0], direction[1]);
+        headPart = (u8 *)GetMobyPrivateValue4(child);
+        if (headPart != 0)
+            *(SpawnQuad *)(headPart + 0x80) = *(SpawnQuad *)direction;
         else
-            func_0026FEB8(D_L08_001B0B68, *(short *)(child + 0xaa), *(short *)(child + 0xb2), D_L08_001B2508);
-        if (state->smallScale)
+            STUB_printf(D_L08_001B0B68, *(short *)(child + 0xaa), *(short *)(child + 0xb2), D_L08_001B2508);
+        if (vars->smallScale)
             *(float *)(child + 0x2c) = *(float *)(*(u8 **)(child + 0x24) + 0x24) * 0.1f;
         if (*(short *)(owner + 0xb4) < *(short *)(child + 0xb4))
             *(short *)(child + 0xb4) = *(short *)(owner + 0xb4);
@@ -85,19 +87,19 @@ u8 *func_L08_003F6018(u8 *owner, SpawnQuad *position, float *direction)
         child[0x6e] = 0;
         child[0x6c] = 255;
         child[0x6d] = 255;
-        func_0029F390(child);
+        update_moby_animation_state(child);
         *(int *)(child + 0x98) = *(int *)(*(u8 **)(child + 0x24) + 0x10);
-        func_002AB650(child);
+        CopyHeroField38ToMoby(child);
         func_002A0F48(child);
-        c = child;
-        part = (u8 *)func_002AB1F0(c);
+        result = child;
+        part = (u8 *)GetMobyPrivateValue0(result);
         if (part != 0) {
             *(int *)(part + 0x24) = 0;
             *(int *)(part + 0x20) = 0;
             *(float *)part = *(short *)(part + 4);
         }
-        return c;
+        return result;
     }
-    func_0026FEB8(D_L08_001B0BA8, *(short *)(owner + 0xb2), D_L08_001B2508);
+    STUB_printf(D_L08_001B0BA8, *(short *)(owner + 0xb2), D_L08_001B2508);
     return 0;
 }

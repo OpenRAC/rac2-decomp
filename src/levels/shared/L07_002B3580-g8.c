@@ -40,21 +40,22 @@ extern s32 D_L07_001B1010 __attribute__((sda));
    a random speed from the range at D_L07_001B0FE8 (per frame at 60 Hz), with the second colour
    and size. Each kind byte is random in a range (D_L07_001B1000 then D_L07_001B1008), the next
    byte random up to 0xFF. The velocity goes to the first spawn before func_00282C88 clears it. */
-void func_L07_003F6F00(u8 *a0)
+/* Spawns a puff of falling particles around an object. */
+void func_L07_003F6F00(u8 *moby)
 {
     f32 vel[4];
     f32 pos[4];
     s32 i;
 
-    func_002C3150(a0 + 0x10, vel, D_L07_001B0FF8, (u8)func_002A7820(D_L07_001B1000, D_L07_001B1004),
-                  (u8)func_002A77E0(0xFF), 0, D_L07_001B0FF0);
-    func_00282C88(vel);
+    SpawnHeroRelativeParticle(moby + 0x10, vel, D_L07_001B0FF8, (u8)RandomIntRange(D_L07_001B1000, D_L07_001B1004),
+                  (u8)RandomIntBelow(0xFF), 0, D_L07_001B0FF0);
+    ClearVector128(vel);
     for (i = 0; i < D_L07_001B1010; i++) {
-        func_002A7A00(pos, 0.0f, 0.5f);
-        func_00282CC0(pos, pos, a0 + 0x10);
-        vel[2] = -(func_002A7878(D_L07_001B0FE8[0], D_L07_001B0FE8[1]) * 0.016666668f);
-        func_002C3150(pos, vel, D_L07_001B0FFC, (u8)func_002A7820(D_L07_001B1008, D_L07_001B100C),
-                      (u8)func_002A77E0(0xFF), 0, D_L07_001B0FF4);
+        RandomDirectionVector(pos, 0.0f, 0.5f);
+        FastVecAdd(pos, pos, moby + 0x10);
+        vel[2] = -(RandomFloatRange(D_L07_001B0FE8[0], D_L07_001B0FE8[1]) * 0.016666668f);
+        SpawnHeroRelativeParticle(pos, vel, D_L07_001B0FFC, (u8)RandomIntRange(D_L07_001B1008, D_L07_001B100C),
+                      (u8)RandomIntBelow(0xFF), 0, D_L07_001B0FF4);
     }
 }
 
@@ -77,29 +78,30 @@ extern f32 ref_L07_00410B48_02[2] __attribute__((sda));
 
 /* The state byte at 0x20 picks the path: 0 clears the moby list of class 1, 1 asks the
    spawner and marks the object, 2 replaces the moby and runs the level's setup. */
-void func_L07_00410B48(u8 *a0)
+/* Updates a moby (class 4769): it waits for a condition, then spawns an effect and removes itself. */
+void func_L07_00410B48(u8 *moby0)
 {
-    u8 *s0 = a0;
-    u8 *s1 = *(u8 **)(s0 + 0x68);
+    u8 *moby = moby0;
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    switch (s0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        func_002A7750(s0, 1, -1);
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        if (func_002A9640(s0, 0x04010000, 0) == 0)
+        if (FindOwnedEffectSlot(moby, 0x04010000, 0) == 0)
             goto done;
-        if (*(int *)s1 != 0)
+        if (*(int *)vars != 0)
             goto done;
-        func_002A7750(s0, 2, -1);
+        SetMobyState(moby, 2, -1);
     done:
-        s0[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2:
-        func_002E5CF8(0, 0, s0);
-        func_L00_0032A258(s0, ref_L07_00410B48_02, ref_L07_00410B48_01,
+        PlayMobySound(0, 0, moby);
+        ExplodeObjectIntoPieces(moby, ref_L07_00410B48_02, ref_L07_00410B48_01,
                           ref_L07_00410B48_00, 0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
-        func_0029F338(s0);
+        MarkMobySpawned(moby);
         break;
     }
 }

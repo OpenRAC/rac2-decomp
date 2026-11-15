@@ -14,12 +14,13 @@ extern void func_002AD6F0(void *, void *, void *, void *);
 extern s32 func_002E5CF8(s32, s32, u8 *);
 extern void func_002E59F8(s32);
 
-void func_L11_00416658(u8 *arg0) {
-    f32 tmp[4] __attribute__((aligned(16)));
-    u8 *base = D_L11_001B359C;
-    u8 *entity = arg0;
+/* Waits for its trigger object to become active, then bobs the object out and back in a smooth wave with a sound, and repeats. */
+void func_L11_00416658(u8 *mobyArg) {
+    f32 offset[4] __attribute__((aligned(16)));
+    u8 *mobyTable = gMobyTable_L11;
+    u8 *entity = mobyArg;
     u8 *state = *(u8 **)(entity + 0x68);
-    u8 *target = base + *(s32 *)(state + 0x68) * 256;
+    u8 *target = mobyTable + *(s32 *)(state + 0x68) * 256;
     switch (*(u8 *)(entity + 0x20)) {
     case 0:
         *(u32 *)(state + 0x5C) |= 4;
@@ -30,14 +31,14 @@ void func_L11_00416658(u8 *arg0) {
         qcopy(state + 0x80, entity + 0x10);
         /* fall through */
     case 1: {
-        u8 *entry;
+        u8 *soundSlot;
         if (*(s32 *)(state + 0x60) && *(u8 *)(target + 0x20) == 2) {
-            entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)D_00188660);
-            if (*(u8 **)(entry + 0x88) == entity) {
-                if (!*(u8 *)(entry + 0x74))
-                    *(s32 *)(state + 0x74) = func_002E5CF8(0, 4, entity);
+            soundSlot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)gSoundState);
+            if (*(u8 **)(soundSlot + 0x88) == entity) {
+                if (!*(u8 *)(soundSlot + 0x74))
+                    *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
             } else {
-                *(s32 *)(state + 0x74) = func_002E5CF8(0, 4, entity);
+                *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
             }
             *(u8 *)(entity + 0x20) = 2;
             *(f32 *)(state + 0x6C) = 3.1415927410125732f;
@@ -46,46 +47,46 @@ void func_L11_00416658(u8 *arg0) {
         break;
     }
     case 2: {
-        u8 *entry;
+        u8 *soundSlot;
         *(f32 *)(state + 0x70) += 0.05235988646745682f;
-        *(f32 *)(state + 0x6C) = func_00283B98(*(f32 *)(state + 0x6C), 0.05235988646745682f);
+        *(f32 *)(state + 0x6C) = FastAddRotations(*(f32 *)(state + 0x6C), 0.05235988646745682f);
         if (*(f32 *)(state + 0x70) >= 3.1415927410125732f) {
             if (*(s32 *)(state + 0x74) != -1) {
-                entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)D_00188660);
-                if (*(u8 **)(entry + 0x88) == entity && *(u8 *)(entry + 0x74))
-                    func_002E59F8(*(s32 *)(state + 0x74));
+                soundSlot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)gSoundState);
+                if (*(u8 **)(soundSlot + 0x88) == entity && *(u8 *)(soundSlot + 0x74))
+                    StopSoundVoice(*(s32 *)(state + 0x74));
             }
             *(s32 *)(state + 0x74) = -1;
             *(u8 *)(entity + 0x20) = 3;
         } else {
-            func_00282F20(tmp, entity + 0xD0, -(func_00283180(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
-            func_00282CC0(entity + 0x10, tmp, state + 0x80);
+            vec_scale_to_length(offset, entity + 0xD0, -(FastSinOrCosA(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
+            FastVecAdd(entity + 0x10, offset, state + 0x80);
         }
         break;
     }
     case 3: {
-        u8 *entry;
+        u8 *soundSlot;
         if (*(u8 *)(target + 0x20) != 2) {
-            entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)D_00188660);
-            if (*(u8 **)(entry + 0x88) == entity) {
-                if (!*(u8 *)(entry + 0x74))
-                    *(s32 *)(state + 0x74) = func_002E5CF8(0, 4, entity);
+            soundSlot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)gSoundState);
+            if (*(u8 **)(soundSlot + 0x88) == entity) {
+                if (!*(u8 *)(soundSlot + 0x74))
+                    *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
             } else {
-                *(s32 *)(state + 0x74) = func_002E5CF8(0, 4, entity);
+                *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
             }
             *(u8 *)(entity + 0x20) = 4;
         }
         break;
     }
     case 4: {
-        u8 *entry;
+        u8 *soundSlot;
         *(f32 *)(state + 0x70) += 0.05235988646745682f;
-        *(f32 *)(state + 0x6C) = func_00283B98(*(f32 *)(state + 0x6C), 0.05235988646745682f);
+        *(f32 *)(state + 0x6C) = FastAddRotations(*(f32 *)(state + 0x6C), 0.05235988646745682f);
         if (*(f32 *)(state + 0x70) >= 6.2831854820251465f) {
             if (*(s32 *)(state + 0x74) != -1) {
-                entry = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)D_00188660);
-                if (*(u8 **)(entry + 0x88) == entity && *(u8 *)(entry + 0x74))
-                    func_002E59F8(*(s32 *)(state + 0x74));
+                soundSlot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)gSoundState);
+                if (*(u8 **)(soundSlot + 0x88) == entity && *(u8 *)(soundSlot + 0x74))
+                    StopSoundVoice(*(s32 *)(state + 0x74));
             }
             *(s32 *)(state + 0x74) = -1;
             *(u8 *)(entity + 0x20) = 1;
@@ -93,11 +94,11 @@ void func_L11_00416658(u8 *arg0) {
             *(s32 *)(state + 0x70) = 0;
             qcopy(entity + 0x10, state + 0x80);
         } else {
-            func_00282F20(tmp, entity + 0xD0, -(func_00283180(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
-            func_00282CC0(entity + 0x10, tmp, state + 0x80);
+            vec_scale_to_length(offset, entity + 0xD0, -(FastSinOrCosA(*(f32 *)(state + 0x6C)) + 1.0f) * 4.0f);
+            FastVecAdd(entity + 0x10, offset, state + 0x80);
         }
         break;
     }
     }
-    func_002AD6F0(state + 0x20, &D_L11_001A8F20, entity + 0xF0, entity + 0xF0);
+    CombineTransformsAndStore(state + 0x20, &D_L11_001A8F20, entity + 0xF0, entity + 0xF0);
 }

@@ -30,7 +30,7 @@ extern void func_00282C88(void *);
 void func_L00_002A5368(void) {
  u8 *p=D_L24_0025B710;
  u8 *end=p+0x1b80;
- do {func_L00_002A5048(p);p+=0xb0;}while((s32)p<(s32)end);
+ do {UpdateAttachmentRecord(p);p+=0xb0;}while((s32)p<(s32)end);
 }
 
 /* walks the 0x1b80-byte array in 0xb0-byte steps: a per-element callback, three
@@ -82,45 +82,45 @@ void func_L00_002A6008(void) {
     u8 *obj;
     u8 *p;
 
-    if (D_00189E20.p1860 == 0) {
-        obj = func_0029EFD0(0x47A);
-        D_00189E20.p1860 = obj;
+    if (gHeroState.p1860 == 0) {
+        obj = CreateMoby(0x47A /* moby class 1146 */);
+        gHeroState.p1860 = obj;
         if (obj == 0) {
             return;
         }
         p = obj + 0x10;
-        qcopy(p, &D_00189E20.q080);
-        qcopy(obj + 0xF0, &D_00189E20.q090);
+        qcopy(p, &gHeroState.q080);
+        qcopy(obj + 0xF0, &gHeroState.q090);
         *(u16 *)(obj + 0x32) = 0x40;
-        *(u8 *)(D_00189E20.p1860 + 0x31) = 1;
-        *(u8 *)(D_00189E20.p1860 + 0x30) = 0;
-        *(u16 *)(D_00189E20.p1860 + 0x34) = 0;
-        func_002A0F48(D_00189E20.p1860);
-        if (D_00189E20.p1860 == 0) {
+        *(u8 *)(gHeroState.p1860 + 0x31) = 1;
+        *(u8 *)(gHeroState.p1860 + 0x30) = 0;
+        *(u16 *)(gHeroState.p1860 + 0x34) = 0;
+        func_002A0F48(gHeroState.p1860);
+        if (gHeroState.p1860 == 0) {
             return;
         }
     }
     {
         u8 *held;
 
-        func_0029FC20(D_00189E20.p2290, 5, s.matrix);
-        held = D_00189E20.p1860;
+        TransformMobyJointPoint(gHeroState.p2290, 5, s.matrix);
+        held = gHeroState.p1860;
         qcopy(held + 0x10, s.matrix[3]);
         func_002A0F48(held);
-        func_00282C88(s.euler);
-        s.euler[2] = -((float *)&D_00189E20.q090)[2];
-        func_00283410(s.rotation, s.euler);
-        func_00283788(s.matrix, s.matrix, s.rotation);
-        func_00283678(D_00189E20.p1860 + 0xC0, s.matrix);
-        *(u64 *)(D_00189E20.p1860 + 0x38) = *(u64 *)(D_00189E20.p2290 + 0x38);
-        if (D_00189E20.f2294 == 0x4B) {
-            if (*(u8 *)(D_00189E20.p1860 + 0x43) != 1) {
-                func_002A7470(D_00189E20.p1860, 1, 0, 0xA);
+        ClearVector128(s.euler);
+        s.euler[2] = -((float *)&gHeroState.q090)[2];
+        euler_to_matrix(s.rotation, s.euler);
+        multiply_matrix(s.matrix, s.matrix, s.rotation);
+        copy_matrix3x4(gHeroState.p1860 + 0xC0, s.matrix);
+        *(u64 *)(gHeroState.p1860 + 0x38) = *(u64 *)(gHeroState.p2290 + 0x38);
+        if (gHeroState.f2294 == 0x4B) {
+            if (*(u8 *)(gHeroState.p1860 + 0x43) != 1) {
+                StartAnimationBlended(gHeroState.p1860, 1, 0, 0xA);
             }
         } else {
-            p = D_00189E20.p1860;
+            p = gHeroState.p1860;
             if (*(u8 *)(p + 0x43) != 0) {
-                func_002A7470(D_00189E20.p1860, 0, 0, 0x11);
+                StartAnimationBlended(gHeroState.p1860, 0, 0, 0x11);
             }
         }
     }
@@ -129,6 +129,6 @@ void func_L00_002A6008(void) {
 /* passes the measured byte and constants to two callees */
 void func_L00_002A6188(void) {
  func_L00_002A61C8_1(D_0018B2BC[1],0,1,0x32);
- func_L00_002B9C58(0x16,7,0);
+ QueueDelayedHeroEvent(0x16,7,0);
 }
 

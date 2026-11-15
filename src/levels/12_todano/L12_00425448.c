@@ -13,11 +13,11 @@ extern s32 D_L12_001B20C0 __attribute__((sda));
 
 /* Starts the sub-object's timer when it has finished, then tells the engine to
    advance to mode 1.  The gp word at 0x30D0 needs its `sda` declaration (measured). */
-void func_L12_00425448(u8 *a0) {
-    u8 *s0 = *(u8 **)(a0 + 0x68);
+void func_L12_00425448(u8 *self) {
+    u8 *vars = *(u8 **)(self + 0x68);
 
-    if (func_00282948(s0 + 0x2C0) != 0) {
-        *(s32 *)(s0 + 0x2C0) = func_002A7820(D_L12_001B20C0, (s32)D_L12_001B20C4);
-        func_002E5CF8(1, 0, a0);
+    if (FastFloatHelperD(vars + 0x2C0) != 0) {
+        *(s32 *)(vars + 0x2C0) = RandomIntRange(D_L12_001B20C0, (s32)D_L12_001B20C4);
+        PlayMobySound(1, 0, self);
     }
 }

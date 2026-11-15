@@ -23,66 +23,67 @@ extern char D_00189E20[];
 /* Only the observed table/group fields are described. */
 struct OwnerPrefix { char reserved00[0x60]; int tableIndex, groupIndex; };
 
+/* Pushes group members and the player up through the launch volume when they step into it. */
 void func_L14_003CB868(char *self) {
     float mtx[16] __attribute__((aligned(16)));
-    float off[4] __attribute__((aligned(16)));
-    float tmp[4] __attribute__((aligned(16)));
-    float vec[4] __attribute__((aligned(16)));
+    float localOffset[4] __attribute__((aligned(16)));
+    float projected[4] __attribute__((aligned(16)));
+    float launchVelocity[4] __attribute__((aligned(16)));
     struct OwnerPrefix *state = *(struct OwnerPrefix **)(self + 0x68);
-    unsigned short *p;
-    unsigned char *e;
-    char *hero;
-    char *hero2;
+    unsigned short *listEntry;
+    unsigned char *member;
+    char *heroBase;
+    char *heroNow;
     int inside;
-    float a;
-    float b;
-    float c;
+    float topHeight;
+    float riseHeight;
+    float fallHeight;
     float duration;
 
-    func_00283698(mtx, self + 0xC0);
-    for (p = D_L14_001FB060[state->groupIndex];
+    matrix_from_basis_rows(mtx, self + 0xC0);
+    for (listEntry = gGroupEntityLists[state->groupIndex];
          (state->groupIndex & 0xFF) != 0xFF && state->groupIndex <= D_L14_001B25B8 &&
-         p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L14_001FB060[state->groupIndex]);
-         p++) {
-        e = ((*p & 0x7FFF) << 8) + D_L14_001B259C;
-        if (e == 0)
+         listEntry != 0 && ((listEntry != 0 && (short)listEntry[-1] >= 0) || listEntry == gGroupEntityLists[state->groupIndex]);
+         listEntry++) {
+        member = ((*listEntry & 0x7FFF) << 8) + gMobyPool_L14;
+        if (member == 0)
             break;
-        if (e[0x20] != 0xFE) {
-            if (e[0x20] != 0xFD) {
-                func_00282CF0(off, e + 0x10, self + 0x10);
-                func_002AFDD8(self, (char *)off, (char *)off, (char *)mtx);
-                off[3] = 1.0f;
-                off[0] = off[0] + 2.0f;
-                inside = func_00282C48(off[0]) < 1.0f && func_00282C48(off[1]) < 1.0f;
+        if (member[0x20] != 0xFE) {
+            if (member[0x20] != 0xFD) {
+                FastVecSub(localOffset, member + 0x10, self + 0x10);
+                TransformVectorByObjectOrGiven(self, (char *)localOffset, (char *)localOffset, (char *)mtx);
+                localOffset[3] = 1.0f;
+                localOffset[0] = localOffset[0] + 2.0f;
+                inside = FloatAbs(localOffset[0]) < 1.0f && FloatAbs(localOffset[1]) < 1.0f;
                 if (inside) {
-                    func_002830C0(tmp, off, &D_L14_001B268C[state->tableIndex]);
-                    func_L14_003C96E0((char *)e, tmp,
+                    transform_vector(projected, localOffset, &D_L14_001B268C[state->tableIndex]);
+                    StartLaunchTowardTarget((char *)member, projected,
                                       D_L14_001B268C[state->tableIndex].height +
-                                          func_002A7878(1.0f, 2.0f),
+                                          RandomFloatRange(1.0f, 2.0f),
                                       0.0055555557f, 0.0055555557f);
                 }
             }
         }
     }
-    hero = D_00189E20;
-    if ((*(char **)(hero + 0x33C) == self && *(int *)(hero + 0x340) != 0) ||
-        *(float *)(hero + 0x31C) < 0.5f) {
-        func_00282CF0(off, D_00189E20 + 0x80, self + 0x10);
-        func_002AFDD8(self, (char *)off, (char *)off, (char *)mtx);
-        off[3] = 1.0f;
-        off[0] = off[0] + 2.0f;
-        inside = func_00282C48(off[0]) < 1.0f && func_00282C48(off[1]) < 1.0f;
+    heroBase = gHeroState;
+    if ((*(char **)(heroBase + 0x33C) == self && *(int *)(heroBase + 0x340) != 0) ||
+        *(float *)(heroBase + 0x31C) < 0.5f) {
+        FastVecSub(localOffset, gHeroState + 0x80, self + 0x10);
+        TransformVectorByObjectOrGiven(self, (char *)localOffset, (char *)localOffset, (char *)mtx);
+        localOffset[3] = 1.0f;
+        localOffset[0] = localOffset[0] + 2.0f;
+        inside = FloatAbs(localOffset[0]) < 1.0f && FloatAbs(localOffset[1]) < 1.0f;
         if (inside) {
-            func_002830C0(tmp, off, &D_L14_001B268C[state->tableIndex]);
-            hero2 = D_00189E20;
-            a = D_L14_001B268C[state->tableIndex].height + 1.5f;
-            b = a - *(float *)(hero2 + 0x88);
-            b *= 2.0f; duration = func_00282C10(b / 0.0055555557f);
-            c = (a - tmp[2]) * 2.0f; duration += func_00282C10(c / 0.0055555557f);
-            func_00282CF0(vec, tmp, hero2 + 0x80); func_00282D30(vec, vec, 1.0f / duration);
-            vec[2] = func_00282C10(b * 0.0055555557f);
-            func_L00_002C42E0(0x44, 1);
-            qcopy(hero2 + 0xF0, vec);
+            transform_vector(projected, localOffset, &D_L14_001B268C[state->tableIndex]);
+            heroNow = gHeroState;
+            topHeight = D_L14_001B268C[state->tableIndex].height + 1.5f;
+            riseHeight = topHeight - *(float *)(heroNow + 0x88);
+            riseHeight *= 2.0f; duration = square_root(riseHeight / 0.0055555557f);
+            fallHeight = (topHeight - projected[2]) * 2.0f; duration += square_root(fallHeight / 0.0055555557f);
+            FastVecSub(launchVelocity, projected, heroNow + 0x80); FastVecScale(launchVelocity, launchVelocity, 1.0f / duration);
+            launchVelocity[2] = square_root(riseHeight * 0.0055555557f);
+            SetHeroAction_L00(0x44, 1);
+            qcopy(heroNow + 0xF0, launchVelocity);
         }
     }
 }

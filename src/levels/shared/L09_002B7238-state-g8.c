@@ -21,83 +21,84 @@ extern void func_L09_003E99E0(void *);
 extern void func_L09_003EA360(void *);
 extern void func_L09_003E9AA0(void *);
 extern void func_L09_003EA9D0(void *);
-void func_L09_003EAB20(char *object)
+/* Per-frame update of this enemy: handles its state changes, starts its animations and keeps its position in sync. */
+void func_L09_003EAB20(char *moby)
 {
     char *state;
     char *position;
     int ready;
     if (D_L09_001B0C4C) return;
-    position=object+0x10;
-    if (!func_002ACD38(position)) return;
-    state=FIELD(object,char *,0x68);
-    func_L09_003EAA18(object);
+    position=moby+0x10;
+    if (!IsObjectInSelectedZone(position)) return;
+    state=FIELD(moby,char *,0x68);
+    StepEnemyAnimation(moby);
     qcopy(position,state+0x330);
-    switch (FIELD(object,unsigned char,0x95)) {
-    case 0: func_0026FEB8(D_L09_001B0C50,FIELD(object,short,0xB2),FIELD(object,short,0xAA)); break;
+    switch (FIELD(moby,unsigned char,0x95)) {
+    case 0: STUB_printf(D_L09_001B0C50,FIELD(moby,short,0xB2),FIELD(moby,short,0xAA)); break;
     case 1:
-        if (FIELD(state,int,0x154)==1 || func_002B38B8(object)) {
+        if (FIELD(state,int,0x154)==1 || IsThirdPendingFlagSet(moby)) {
             FIELD(state,int,0x354)=FIELD(state,int,0x378);
-            func_002A7750(object,2,2);
+            SetMobyState(moby,2,2);
         }
         break;
     case 3:
         if (FIELD(state,int,0x154)==1) {
-            func_002B60B0(object,D_L09_001B0C10*0.00027777778f,D_L09_001B0C14*0.016666668f,D_L09_001B0C18*4.84813745061e-06f,D_L09_001B0C1C*0.000290888245218f);
-            func_002A7750(object,4,4);
+            SetControllerSpeedLimits(moby,D_L09_001B0C10*0.00027777778f,D_L09_001B0C14*0.016666668f,D_L09_001B0C18*4.84813745061e-06f,D_L09_001B0C1C*0.000290888245218f);
+            SetMobyState(moby,4,4);
         }
         break;
     case 2: case 5: break;
     case 4:
         if (FIELD(state,int,0x154)!=1 && !FIELD(state,unsigned char,0x369)) {
-            if (FIELD(object,unsigned char,0x43)) func_002A7470(object,0,0,0);
-            func_002B60B0(object,D_L09_001B0C00*0.00027777778f,D_L09_001B0C04*0.016666668f,D_L09_001B0C08*4.84813745061e-06f,D_L09_001B0C0C*0.000290888245218f);
-            func_002A7750(object,3,3);
+            if (FIELD(moby,unsigned char,0x43)) StartAnimationBlended(moby,0,0,0);
+            SetControllerSpeedLimits(moby,D_L09_001B0C00*0.00027777778f,D_L09_001B0C04*0.016666668f,D_L09_001B0C08*4.84813745061e-06f,D_L09_001B0C0C*0.000290888245218f);
+            SetMobyState(moby,3,3);
         }
         break;
     }
-    switch (FIELD(object,unsigned char,0x20)) {
-    case 0: func_0026FEB8(D_L09_001B0C50,FIELD(object,short,0xB2),FIELD(object,short,0xAA)); break;
+    switch (FIELD(moby,unsigned char,0x20)) {
+    case 0: STUB_printf(D_L09_001B0C50,FIELD(moby,short,0xB2),FIELD(moby,short,0xAA)); break;
     case 1: break;
     case 2:
         ready = 1;
-        if (FIELD(state,int,0x36C)!=-1) ready = func_L09_003EA058(object,FIELD(state,int,0x36C)) != 0;
+        if (FIELD(state,int,0x36C)!=-1) ready = AdvancePathIndexAndMove(moby,FIELD(state,int,0x36C)) != 0;
         if (ready) {
-            func_002B60B0(object,D_L09_001B0C00*0.00027777778f,D_L09_001B0C04*0.016666668f,D_L09_001B0C08*4.84813745061e-06f,D_L09_001B0C0C*0.000290888245218f);
-            func_L09_003EA2D0(object,FIELD(state,int,0x350),-1);
+            SetControllerSpeedLimits(moby,D_L09_001B0C00*0.00027777778f,D_L09_001B0C04*0.016666668f,D_L09_001B0C08*4.84813745061e-06f,D_L09_001B0C0C*0.000290888245218f);
+            StartMobyOnPathEntry(moby,FIELD(state,int,0x350),-1);
             FIELD(state,int,0x380)=1;
-            func_002A7750(object,3,3);
+            SetMobyState(moby,3,3);
         } break;
     case 3:
         ready = 1;
-        if (FIELD(state,int,0x350)!=-1) ready = func_L09_003EA058(object,FIELD(state,int,0x350)) != 0;
+        if (FIELD(state,int,0x350)!=-1) ready = AdvancePathIndexAndMove(moby,FIELD(state,int,0x350)) != 0;
         if (ready) {
             if(FIELD(state,short,0x11A)) FIELD(state,short,0x11A)=0;
-            else FIELD(state,short,0x11A)=func_L09_0033E658(FIELD(state,int,0x350));
+            else FIELD(state,short,0x11A)=GetPathTableEntryId(FIELD(state,int,0x350));
         } break;
     case 4:
-        if(FIELD(state,int,0x350)!=-1) func_L09_003EA108(object,FIELD(state,int,0x350));
+        if(FIELD(state,int,0x350)!=-1) SteerMobyToNearestPathPoint(moby,FIELD(state,int,0x350));
         break;
     case 5:
-        if(func_002B1C20(object,state+0x180)&2) {
-            if(FIELD(state,float,0x20)<=0) func_002A7750(object,6,-1);
+        if(DispatchActionByKind(moby,state+0x180)&2) {
+            if(FIELD(state,float,0x20)<=0) SetMobyState(moby,6,-1);
             else {
                 FIELD(state,int,0x37C)=0;
                 if(FIELD(state,int,0x380)) {
                     FIELD(state,unsigned char,0x369)=0;
                     FIELD(state,int,0x354)=FIELD(state,int,0x378);
-                    func_002A7750(object,4,4);
+                    SetMobyState(moby,4,4);
                 } else {
-                    if(FIELD(object,unsigned char,0x43)) func_002A7470(object,0,0,0);
+                    if(FIELD(moby,unsigned char,0x43)) StartAnimationBlended(moby,0,0,0);
                     FIELD(state,int,0x354)=FIELD(state,int,0x378);
-                    func_002A7750(object,2,2);
+                    SetMobyState(moby,2,2);
                 }
             }
         } break;
-    case 6: func_L09_003EAF60(object); break;
+    case 6: DestroyMobyWithExplosion(moby); break;
     }
-    func_L09_003E99E0(object);
-    FIELD(object,int,0xF0)=0;
-    func_L09_003EA360(object);
-    func_L09_003E9AA0(object);
-    func_L09_003EA9D0(object);
+    EaseMobyTurnAngles(moby);
+    FIELD(moby,int,0xF0)=0;
+    FaceHeroAndSwayEnemy(moby);
+    SpawnFallingParticles(moby);
+    BumpFrameCounterResetTimers(moby);
 }

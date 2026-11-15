@@ -34,123 +34,124 @@ extern s32 func_00282978();
 extern s8 D_002B7DF8[];
 extern s8 D_002B7FF0[];
 extern s8 D_002B8048[];
-void func_002B7380(s32 arg0) {
-    s16 temp_v1;
-    s16 temp_v1_2;
-    u16 temp_u16;
-    s32 temp_a0;
-    s32 temp_a0_2;
-    s32 temp_a0_3;
-    s32 temp_s1;
-    u64 temp_s0;
+/* Updates one music stream channel each frame: starts, pauses, fades out or clears it depending on its state. */
+void func_002B7380(s32 channel) {
+    s16 state;
+    s16 stateNow;
+    u16 stateBits;
+    s32 handle;
+    s32 handleNow;
+    s32 handleCopy;
+    s32 oldHandle;
+    u64 channelAddr;
 
-    temp_v1 = (*(s16 *)((s8 *)(arg0) + (0xA)));
-    if (temp_v1 == 9) {
+    state = (*(s16 *)((s8 *)(channel) + (0xA)));
+    if (state == 9) {
         goto block_29;
     }
-    temp_a0 = (*(s32 *)((s8 *)(arg0) + (0)));
-    if (temp_a0 == 0) {
+    handle = (*(s32 *)((s8 *)(channel) + (0)));
+    if (handle == 0) {
         goto block_29;
     }
-    if (temp_a0 == 0xFFFFFFFF) {
+    if (handle == 0xFFFFFFFF) {
         goto block_28;
     }
-    if (temp_v1 != 5) {
+    if (state != 5) {
         goto block_6;
     }
-    if (temp_a0 == 0) {
+    if (handle == 0) {
         goto block_8;
     }
-    func_00132A70(temp_a0);
-    (*(s16 *)((s8 *)(arg0) + (0xA))) = 6;
+    func_00132A70(handle);
+    (*(s16 *)((s8 *)(channel) + (0xA))) = 6;
     goto block_9;
 block_6:
-    if (temp_v1 != 6) {
+    if (state != 6) {
         goto block_9;
     }
-    if (temp_a0 != 0) {
+    if (handle != 0) {
         goto block_10;
     }
 block_8:
-    (*(s16 *)((s8 *)(arg0) + (0xA))) = 0;
+    (*(s16 *)((s8 *)(channel) + (0xA))) = 0;
 block_9:
-    if ((*(s32 *)((s8 *)(arg0) + (0))) == 0) {
+    if ((*(s32 *)((s8 *)(channel) + (0))) == 0) {
         goto block_32;
     }
 block_10:
-    if (!((*(s16 *)((s8 *)(arg0) + (0xC))) & 0x8000)) {
+    if (!((*(s16 *)((s8 *)(channel) + (0xC))) & 0x8000)) {
         goto block_15;
     }
-    if ((*(s16 *)((s8 *)(arg0) + (0xA))) & 0x8000) {
+    if ((*(s16 *)((s8 *)(channel) + (0xA))) & 0x8000) {
         goto block_13;
     }
-    func_001333D0((*(s32 *)((s8 *)(arg0) + (0))));
-    (*(s16 *)((s8 *)(arg0) + (0xA))) = (s16) ((u16) (*(s16 *)((s8 *)(arg0) + (0xA))) | 0x8000);
+    func_001333D0((*(s32 *)((s8 *)(channel) + (0))));
+    (*(s16 *)((s8 *)(channel) + (0xA))) = (s16) ((u16) (*(s16 *)((s8 *)(channel) + (0xA))) | 0x8000);
 block_13:
-    if (func_00282978(arg0 + 0xE) != 2) {
+    if (FastDecTimer(channel + 0xE) != 2) {
         goto block_17;
     }
-    (*(s16 *)((s8 *)(arg0) + (0xC))) = 4;
+    (*(s16 *)((s8 *)(channel) + (0xC))) = 4;
     goto block_17;
 block_15:
-    if (!((*(s16 *)((s8 *)(arg0) + (0xA))) & 0x8000)) {
+    if (!((*(s16 *)((s8 *)(channel) + (0xA))) & 0x8000)) {
         goto block_18;
     }
-    func_00133400((*(s32 *)((s8 *)(arg0) + (0))));
-    (*(s16 *)((s8 *)(arg0) + (0xA))) = (s16) ((u16) (*(s16 *)((s8 *)(arg0) + (0xA))) ^ 0x8000);
+    SendSoundCommand46((*(s32 *)((s8 *)(channel) + (0))));
+    (*(s16 *)((s8 *)(channel) + (0xA))) = (s16) ((u16) (*(s16 *)((s8 *)(channel) + (0xA))) ^ 0x8000);
 block_17:
-    if ((*(s16 *)((s8 *)(arg0) + (0xA))) & 0x8000) {
+    if ((*(s16 *)((s8 *)(channel) + (0xA))) & 0x8000) {
         goto block_32;
     }
 block_18:
-    temp_v1_2 = (*(s16 *)((s8 *)(arg0) + (0xA)));
-    temp_u16 = (*(u16 *)((s8 *)(arg0) + (0xA)));
-    if (temp_v1_2 == 1) {
+    stateNow = (*(s16 *)((s8 *)(channel) + (0xA)));
+    stateBits = (*(u16 *)((s8 *)(channel) + (0xA)));
+    if (stateNow == 1) {
         goto block_32;
     }
-    if (temp_v1_2 == 8) {
+    if (stateNow == 8) {
         goto block_32;
     }
-    if (temp_v1_2 == 9) {
+    if (stateNow == 9) {
         goto block_32;
     }
-    if ((u32) (temp_u16 - 2) >= 2U) {
+    if ((u32) (stateBits - 2) >= 2U) {
         goto block_23;
     }
-    temp_a0_2 = (*(s32 *)((s8 *)(arg0) + (0)));
+    handleNow = (*(s32 *)((s8 *)(channel) + (0)));
     goto block_25;
 block_23:
-    temp_s1 = (*(s32 *)((s8 *)(arg0) + (0)));
-    temp_a0_3 = temp_s1;
-    (*(u32 *)((s8 *)(arg0) + (0))) = 0xFFFFFFFF;
-    temp_s0 = (u64) ((s64) arg0 << 0x20) >> 0x20;
-    func_00133430(temp_a0_3, ((s32)D_002B8048), temp_s0);
-    func_00132B58(temp_s1, ((s32)D_002B7FF0), temp_s0);
+    oldHandle = (*(s32 *)((s8 *)(channel) + (0)));
+    handleCopy = oldHandle;
+    (*(u32 *)((s8 *)(channel) + (0))) = 0xFFFFFFFF;
+    channelAddr = (u64) ((s64) channel << 0x20) >> 0x20;
+    SendSoundCommand50_00133430(handleCopy, ((s32)D_002B8048), channelAddr);
+    SendSoundCommand25(oldHandle, ((s32)D_002B7FF0), channelAddr);
     goto block_32;
 block_25:
-    if (temp_a0_2 == 0xFFFFFFFF) {
+    if (handleNow == 0xFFFFFFFF) {
         goto block_32;
     }
-    if (temp_v1_2 != 2) {
+    if (stateNow != 2) {
         goto block_32;
     }
-    func_00133460(temp_a0_2, ((s32)D_002B7DF8), (u64) ((s64) arg0 << 0x20) >> 0x20);
+    SendSoundCommand79(handleNow, ((s32)D_002B7DF8), (u64) ((s64) channel << 0x20) >> 0x20);
     goto block_32;
 block_28:
 block_29:
-    if (temp_v1 == 7) {
+    if (state == 7) {
         goto block_31;
     }
-    if ((*(s32 *)((s8 *)(arg0) + (0))) != 0) {
+    if ((*(s32 *)((s8 *)(channel) + (0))) != 0) {
         goto block_32;
     }
 block_31:
-    (*(s16 *)((s8 *)(arg0) + (0xA))) = 0;
+    (*(s16 *)((s8 *)(channel) + (0xA))) = 0;
 block_32:
-    if ((*(s16 *)((s8 *)(arg0) + (0xA))) != 0) {
+    if ((*(s16 *)((s8 *)(channel) + (0xA))) != 0) {
         goto block_34;
     }
-    (*(s16 *)((s8 *)(arg0) + (4))) = -1;
+    (*(s16 *)((s8 *)(channel) + (4))) = -1;
 block_34:
     return;
 }

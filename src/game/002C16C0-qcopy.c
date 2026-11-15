@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int Quad __attribute__((mode(TI)));
 typedef struct {
@@ -18,27 +19,28 @@ extern unsigned char *D_001F25F0;
 
 /* Another func_002C2210-style effect record (kind 0x2C): the colour split into its bytes in
    the payload, a byte count from `count` and the remaining sizes as given. */
+/* Creates a coloured burst particle with the given size, colour and speed. */
 Particle *func_002C16C0(Quad *position, float *vector, int size, int alpha, int rgb, int count,
                         float life, float second, float third, float fourth, float phase)
 {
-    Particle *p = func_002B9030(0x2C);
+    Particle *p = AllocParticle(0x2C);
     if (p) {
         unsigned char *out;
         p->position.q = *position;
         out = (unsigned char *)p->payload;
         p->color = (alpha << 24) | rgb;
         p->position.f[3] = phase;
-        p->alpha = func_00283CF0(4.0f) + 0x40;
+        p->alpha = FloatToInt(4.0f) + 0x40;
         p->life = life;
         p->b1 = 0;
         p->b3 = 0x48;
-        p->seed = func_002A77E0(255);
+        p->seed = RandomIntBelow(255);
         p->b2 = *D_001F25F0;
         p->size = size;
         ((float *)out)[0] = vector[0];
         ((float *)out)[1] = vector[1];
         ((float *)out)[2] = vector[2];
-        out[0x10] = func_00283CF0((float)count);
+        out[0x10] = FloatToInt((float)count);
         ((float *)out)[5] = second;
         out[0x12] = rgb >> 8;
         ((float *)out)[6] = (third - 1.0f) + 1.0f;

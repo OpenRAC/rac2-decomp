@@ -1,3 +1,4 @@
+#include "names.h"
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00282D30(void *, void *, float);
 extern float func_00283248(float, float);
@@ -14,59 +15,60 @@ extern char *func_002BDCE8(void *, int, float, float, void *, float, int, int, f
 extern void func_L01_00321178(void *, void *);
 extern float D_L04_002AF630[];
 
-void func_L04_003E5B10(char *o, float *dest)
+/* Moves the object along its animation toward a target point and turns it to face that point. On two key frames it also sprays a burst of sparks. */
+void func_L04_003E5B10(char *moby, float *targetPos)
 {
-    float v[4], pos[4], vel[4], random[4], spawn[4];
-    float frame, t, color;
-    int index, i, kind;
+    float step[4], pos[4], vel[4], random[4], spawn[4];
+    float frame, frameStart, brightness;
+    int frameIndex, i, sparkKind;
     unsigned short lifetime;
-    char *particle, *data;
+    char *particle, *particleData;
 
-    if ((unsigned char)o[0x42] != (unsigned char)o[0x43]) {
-        func_L01_00321178(o, dest);
+    if ((unsigned char)moby[0x42] != (unsigned char)moby[0x43]) {
+        TurnMobyTowardTarget(moby, targetPos);
         return;
     }
-    frame = func_0029F530(o);
-    index = func_00283CF0(frame);
+    frame = GetMobyAnimationValue(moby);
+    frameIndex = FloatToInt(frame);
     {
-        int nextIndex = index + 1;
-        t = func_00283CE0(index);
-        frame -= t;
-        func_00282D30(v, o + 0xc0,
-                      D_L04_002AF630[index] + (D_L04_002AF630[nextIndex] - D_L04_002AF630[index]) * frame);
+        int nextIndex = frameIndex + 1;
+        frameStart = IntToFloat(frameIndex);
+        frame -= frameStart;
+        FastVecScale(step, moby + 0xc0,
+                      D_L04_002AF630[frameIndex] + (D_L04_002AF630[nextIndex] - D_L04_002AF630[frameIndex]) * frame);
     }
-    func_00282CC0(o + 0x10, v, o + 0x10);
-    func_002B5278(o, func_00283248(dest[0] - *(float *)(o + 0x10), dest[1] - *(float *)(o + 0x14)));
-    *(float *)(o + 0x18) = func_002A89A8(o + 0x10, 0, 0.5f);
-    if (index != 5 && index != 15) {
+    FastVecAdd(moby + 0x10, step, moby + 0x10);
+    StepMovementAtOwnPositionWithFactor(moby, FastMatrixHelperA(targetPos[0] - *(float *)(moby + 0x10), targetPos[1] - *(float *)(moby + 0x14)));
+    *(float *)(moby + 0x18) = ProbeGroundHeightBelow(moby + 0x10, 0, 0.5f);
+    if (frameIndex != 5 && frameIndex != 15) {
         return;
     }
-    if (index == 5) {
-        func_0029FCC0(o, 3, pos);
+    if (frameIndex == 5) {
+        TransformMobyJointToWorld(moby, 3, pos);
     } else {
-        func_0029FCC0(o, 2, pos);
+        TransformMobyJointToWorld(moby, 2, pos);
     }
-    func_00282D30(vel, o + 0xc0, 0.5f);
-    func_00282CC0(pos, pos, vel);
+    FastVecScale(vel, moby + 0xc0, 0.5f);
+    FastVecAdd(pos, pos, vel);
     pos[2] -= 0.2f;
     lifetime = 60;
     for (i = 9; i >= 0; i--) {
-        func_002A7A00(random, 0.005000000353902578f, 0.050000004f);
-        kind = func_00283CF0(func_002A78D8(1.0f, 3.0f));
-        color = func_002A7878(0.3f, 1.0f) * 210000.0f;
-        spawn[0] = pos[0] + func_002A78D8(0.0f, 0.3f);
-        spawn[1] = pos[1] + func_002A78D8(0.0f, 0.3f);
-        spawn[2] = pos[2] + func_002A78D8(0.0f, 0.3f);
-        particle = func_002BDCE8(spawn, kind, 0.0f, 1.0f, random, 1.01f, 0x406080, 0, color);
+        RandomDirectionVector(random, 0.005000000353902578f, 0.050000004f);
+        sparkKind = FloatToInt(RandomSignedFloatRange(1.0f, 3.0f));
+        brightness = RandomFloatRange(0.3f, 1.0f) * 210000.0f;
+        spawn[0] = pos[0] + RandomSignedFloatRange(0.0f, 0.3f);
+        spawn[1] = pos[1] + RandomSignedFloatRange(0.0f, 0.3f);
+        spawn[2] = pos[2] + RandomSignedFloatRange(0.0f, 0.3f);
+        particle = SpawnSpinningSparkParticle(spawn, sparkKind, 0.0f, 1.0f, random, 1.01f, 0x406080, 0, brightness);
         if (particle) {
             *(unsigned short *)(particle + 0xa) = lifetime;
-            data = particle + 0x20;
+            particleData = particle + 0x20;
             particle[3] = 0x44;
-            particle[9] = func_00283CF0(4.0f) + 0x40;
-            *(float *)(data + 0x1c) = func_00283CE0(5);
-            *(int *)(data + 4) = 3;
-            data[0xa] = 0x20;
-            data[0xb] = particle[0xa];
+            particle[9] = FloatToInt(4.0f) + 0x40;
+            *(float *)(particleData + 0x1c) = IntToFloat(5);
+            *(int *)(particleData + 4) = 3;
+            particleData[0xa] = 0x20;
+            particleData[0xb] = particle[0xa];
         }
     }
 }

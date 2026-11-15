@@ -39,6 +39,8 @@ extern void func_002AFFD8(void *, void *, int);
 extern void func_00282DD8(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 
+/* Writes a fresh trail record for a bolt, with its position, side directions and fade timer,
+   so its trail starts here. */
 void func_L00_003F5F90(Actor *self)
 {
     Slot *slots;
@@ -48,19 +50,19 @@ void func_L00_003F5F90(Actor *self)
 
     source = self->source;
     if (D_0018C0B4 == 0x1D) return;
-    base = func_L00_0032A088(0xC04, source->id);
-    slots = (Slot *)(base + *func_L00_0032A0B8(0xC04, source->id));
-    func_00282F20(&m, source, 1.0f);
+    base = GetSlotBody(0xC04 /* Vaporizer */, source->id);
+    slots = (Slot *)(base + *GetSlotHeader(0xC04 /* Vaporizer */, source->id));
+    vec_scale_to_length(&m, source, 1.0f);
     dir.q = 0;
     dir.f[2] = 1.0f;
     dir.f[3] = 1.0f;
-    if (D_L00_001A8FF0) func_002AFFD8(&self->pos, &dir, 1);
-    func_00282DD8(&tmp, &m, &dir);
-    func_00282F20(&tmp, &tmp, 1.0f);
-    func_00282DD8(&slots[source->index].d, &tmp, &m);
+    if (D_L00_001A8FF0) ComputeViewDirection(&self->pos, &dir, 1);
+    FastVecCross(&tmp, &m, &dir);
+    vec_scale_to_length(&tmp, &tmp, 1.0f);
+    FastVecCross(&slots[source->index].d, &tmp, &m);
     qcopy_nc(&slots[source->index].c, &m);
     qcopy_nc(&slots[source->index].pos, &self->pos);
-    func_00282CC0(&slots[source->index].a, &self->pos, source);
+    FastVecAdd(&slots[source->index].a, &self->pos, source);
     qcopy_nc(&slots[source->index].b, &slots[source->index].a);
     slots[source->index].count = D_L00_001B0998;
     slots[source->index].rate = 1.0f / slots[source->index].count;

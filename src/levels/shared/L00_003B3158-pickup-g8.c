@@ -29,6 +29,7 @@ extern int D_L00_001A8F08 MACRO_ADDR;
 extern int D_L00_001A8FF4 MACRO_ADDR;
 extern int D_00138324 NOT_SDA;
 
+/* Updates the Spiderbot Glove pickup. When the player presses the button near it and nothing blocks the way, the glove is picked up and the player's pickup action starts. */
 void func_L00_003B7D48(char *m) {
     float pos[4], sweep_storage[4], normal[4];
     float *sweep;
@@ -39,18 +40,18 @@ void func_L00_003B7D48(char *m) {
     float height;
 
     {
-        char *g = D_00189E20;
+        char *g = gHeroState;
 
         if (*(int *)(g + 0x1244) == 3)
             D_L00_001AFBC0 = 0;
-        func_0029FCC0(m, 0, pos);
+        TransformMobyJointToWorld(m, 0, pos);
         *(int *)(d + 0x2C) = 0;
         sweep = sweep_storage;
         height = (*(int *)(g + 0x2294) == 29) ? 11.0f : 4.5f;
-        func_002FDF40(sweep, pos, 0, 0, 1.6f, height, 0.13333334028720856f, 0.003055555745959282f);
+        CalculateAimedLaunchVelocity(sweep, pos, 0, 0, 1.6f, height, 0.13333334028720856f, 0.003055555745959282f);
     }
-    *(int *)(d + 0x24) = func_002FE5A0(pos, sweep, d, d + 0x10, m, &hit, &aux, 0.003055555745959282f);
-    result = func_00300540(aux);
+    *(int *)(d + 0x24) = TraceProjectileToImpact(pos, sweep, d, d + 0x10, m, &hit, &aux, 0.003055555745959282f);
+    result = GetWeaponGroup(aux);
     if (D_L00_001A8F00 || D_L00_001A8F08 != -2)
         *(int *)(d + 0x2C) = 1;
     if (D_L00_001A8FF4 && *(float *)(d + 8) < 462.42999267578125f)
@@ -58,30 +59,30 @@ void func_L00_003B7D48(char *m) {
     if (result || !*(int *)(d + 0x24) || !*(int *)(d + 0x28))
         goto blocked;
     {
-        char *g = D_00189E20;
+        char *g = gHeroState;
 
         state = *(int *)(g + 0x2294);
         if (state == 40 || state == 62 || state == 39 || state == 41 || state == 42 || state == 6 ||
             state == 116 || state == 129)
             goto blocked;
-        if (*(char **)(g + 0x33C) && (*(short *)(*(char **)(g + 0x33C) + 0xAA) == 0x330 ||
-                                      *(short *)(*(char **)(g + 0x33C) + 0xAA) == 0xB21))
+        if (*(char **)(g + 0x33C) && (*(short *)(*(char **)(g + 0x33C) + 0xAA) == 0x330 /* Taxi */ ||
+                                      *(short *)(*(char **)(g + 0x33C) + 0xAA) == 0xB21 /* moby class 2849 */))
             goto blocked;
-        if (hit && (*(short *)(hit + 0xAA) == 0xB21 || *(short *)(hit + 0xAA) == 0xB5B))
+        if (hit && (*(short *)(hit + 0xAA) == 0xB21 /* moby class 2849 */ || *(short *)(hit + 0xAA) == 0xB5B /* moby class 2907 */))
             goto blocked;
     }
-    func_002FE8D8(d, normal);
-    if (!(func_00282DB0(d + 0x10, normal) < 0.75f))
+    GetObjectFacingDirection(d, normal);
+    if (!(FastVecDot(d + 0x10, normal) < 0.75f))
         goto timer;
 blocked:
     *(int *)(d + 0x2C) = 1;
 timer:
     {
-        char *g = D_00189E20;
+        char *g = gHeroState;
 
         ready = 1;
         if (*(int *)(g + 0x2294) == 29) {
-            if (!func_00282948(g + 0x2534))
+            if (!FastFloatHelperD(g + 0x2534))
                 ready = 0;
         } else
             *(int *)(g + 0x2534) = 40;
@@ -94,39 +95,39 @@ timer:
         *(int *)(d + 0x24) = 0;
         /* falls through */
     case 1: {
-        char *g = D_00189E20;
+        char *g = gHeroState;
 
         if ((D_00138324 & *(int *)(g + 0x1230)) && !*(unsigned char *)(g + 0x22BC) &&
             !*(int *)(d + 0x2C) && ready) {
-            if (func_L00_002D3F30(-1, 1)) {
+            if (SpendWeaponAmmo(-1, 1)) {
                 *(short *)(g + 0x1E0) = 120;
-                func_002B0CE0(6, 0, 1);
+                ForceClaimNotice(6, 0, 1);
                 *(short *)(g + 0x1D2) = 0;
-                func_L00_002AF568();
+                start_equipped_item_animation();
                 *(unsigned char *)(m + 0x20) = 2;
                 *(int *)(d + 0x20) = 12;
                 *(int *)(d + 0x28) = 0;
             } else
-                func_002E5CF8(0, 0, m);
+                PlayMobySound(0, 0, m);
         }
         break;
     }
     case 2:
-        if (func_00282948(d + 0x20)) {
-            char *p = func_L00_003DE088(pos, sweep);
+        if (FastFloatHelperD(d + 0x20)) {
+            char *p = SpawnSpiderBotMoby(pos, sweep);
 
             if (p)
                 *(char **)(p + 0xB8) = m;
-            func_002E5CF8(1, 0, m);
-            func_L00_002AF7D0();
+            PlayMobySound(1, 0, m);
+            cancel_hero_item_animation();
             *(unsigned char *)(m + 0x20) = 3;
             *(int *)(d + 0x20) = 5;
         }
         break;
     case 3:
-        if (func_00282948(d + 0x20))
+        if (FastFloatHelperD(d + 0x20))
             *(unsigned char *)(m + 0x20) = 1;
         break;
     }
-    ref_L00_003B7D48_00(func_L00_003B8158, m);
+    ref_L00_003B7D48_00(UpdateHelperObjectHitTest, m);
 }

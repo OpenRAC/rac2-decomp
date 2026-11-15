@@ -11,6 +11,8 @@ extern void func_0029F338(void *);
 extern void func_L00_002E6DB8(void *, void *);
 extern void func_L05_00428518(void *);
 
+/* Per-frame update of an effect object. It picks its strength from the distance to the
+   camera and removes itself when it is done. */
 void func_L23_004265D0(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -19,22 +21,22 @@ void func_L23_004265D0(char *object)
         D_L23_001B38E8[*(int *)(state + 0x3C)] = 0.01f;
         D_L23_001B3900[*(int *)(state + 0x3C)] = 0xFF;
         *(unsigned char *)(object + 0x20) = 1;
-        if (func_00282E48(object + 0x10, D_L23_001BA640) > 200.0f)
+        if (fast_vec_dist(object + 0x10, gCameraPosition_L23) > 200.0f)
             *(float *)(state + 0x40) = 4.0f;
-        else if (func_00282E48(object + 0x10, D_L23_001BA640) > 100.0f)
+        else if (fast_vec_dist(object + 0x10, gCameraPosition_L23) > 100.0f)
             *(float *)(state + 0x40) = 2.0f;
-        else if (func_00282E48(object + 0x10, D_L23_001BA640) > 25.0f)
+        else if (fast_vec_dist(object + 0x10, gCameraPosition_L23) > 25.0f)
             *(float *)(state + 0x40) = 1.0f;
-        else if (func_00282E48(object + 0x10, D_L23_001BA640) > 0.0f)
+        else if (fast_vec_dist(object + 0x10, gCameraPosition_L23) > 0.0f)
             *(float *)(state + 0x40) = 0.5f;
     }
-    if (!func_00282978(state)) {
-        func_00282978(state + 4);
-        func_L00_002E6DB8(func_L05_00428518, object);
+    if (!FastDecTimer(state)) {
+        FastDecTimer(state + 4);
+        AddDrawCallbackToList2(DrawExpandingBillboardEffect, object);
     } else {
-        D_L23_001B3918[*(int *)(state + 0x3C)] = 0;
-        D_L23_001B19FC -= 1.0f;
-        func_0029F338(object);
+        gSlotEffectInUse[*(int *)(state + 0x3C)] = 0;
+        gActiveSlotEffectCount -= 1.0f;
+        MarkMobySpawned(object);
     }
 }
 

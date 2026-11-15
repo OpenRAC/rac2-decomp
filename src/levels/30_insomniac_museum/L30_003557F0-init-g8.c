@@ -14,6 +14,7 @@ extern InitEntry12 D_L30_0021DEF0[];
 extern int * volatile D_L30_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L30_001CA3A0;
 
+/* Fills in the museum menu entries in order and selects the one that matches the current choice. */
 int func_L30_003557F0(char *obj) {
     int i, entry;
     int *list;

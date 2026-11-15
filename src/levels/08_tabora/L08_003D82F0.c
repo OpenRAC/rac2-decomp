@@ -5,11 +5,12 @@
 typedef unsigned int ti_word __attribute__((mode(TI)));
 extern float func_L08_003D8290(void *, float, float);
 
-void func_L08_003D82F0(char *obj) {
-    ti_word copy;
-    char *state = *(char **)(obj + 0x68);
-    float value;
-    qcopy(&copy, obj + 0x10);
-    value = *(float *)(state + 0x3E8);
-    *(float *)(state + 0x434) = func_L08_003D8290(&copy, value + 3.0f, value - 20.0f);
+/* Finds the ground height below the object and stores it in its private data. */
+void func_L08_003D82F0(char *moby) {
+    ti_word position;
+    char *vars = *(char **)(moby + 0x68);
+    float baseHeight;
+    qcopy(&position, moby + 0x10);
+    baseHeight = *(float *)(vars + 0x3E8);
+    *(float *)(vars + 0x434) = FindGroundHeightBetween(&position, baseHeight + 3.0f, baseHeight - 20.0f);
 }

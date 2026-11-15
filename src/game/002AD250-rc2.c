@@ -5,6 +5,7 @@
    TImode copy in a unit, so the unit holds this function alone. */
 
 #include "include_asm.h"
+#include "names.h"
 
 /* The 128-bit integer mode is what reaches retail's lq/sq copies. */
 typedef int TI128 __attribute__((mode(TI)));
@@ -20,23 +21,23 @@ extern void func_00283098(char *a, char *b, char *c);
 /* Puts the matrix of the object the second argument names into the third
    argument, and its two 128-bit fields into the fourth; without the object's
    flag the fields stay as they are. */
-int func_002AD250(void *unused, void *a1, void *a2, void *a3)
+int func_002AD250(void *unused, void *object, void *input, void *output)
 {
-    Matrix64_002AA800 m0, m1, m2;
-    char *p = (char *)func_002AD0B0((unsigned char *)a1);
+    Matrix64_002AA800 targetMatrix, tempMatrix, sourceMatrix;
+    char *target = (char *)GetMobyPrivateValue2((unsigned char *)object);
 
-    if (p == 0) {
-        *(TI128 *)a3 = *(TI128 *)a2;
+    if (target == 0) {
+        *(TI128 *)output = *(TI128 *)input;
         return 0;
     }
-    func_00283410((char *)&m0, p);
-    if (*(int *)(p + 0x3C) & 2) {
-        func_00283410((char *)&m2, p + 0x20);
-        func_00283698((char *)&m1, (char *)&m2);
-        func_00283098((char *)a3, (char *)a2, (char *)&m1);
-        func_00283098((char *)a3, (char *)a3, (char *)a1 + 0xC0);
+    euler_to_matrix((char *)&targetMatrix, target);
+    if (*(int *)(target + 0x3C) & 2) {
+        euler_to_matrix((char *)&sourceMatrix, target + 0x20);
+        matrix_from_basis_rows((char *)&tempMatrix, (char *)&sourceMatrix);
+        matrix_mul_vec3((char *)output, (char *)input, (char *)&tempMatrix);
+        matrix_mul_vec3((char *)output, (char *)output, (char *)object + 0xC0);
     } else {
-        func_00283098((char *)a3, (char *)a2, (char *)&m0);
+        matrix_mul_vec3((char *)output, (char *)input, (char *)&targetMatrix);
     }
     return 1;
 }

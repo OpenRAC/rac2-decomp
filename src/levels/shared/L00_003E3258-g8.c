@@ -17,22 +17,24 @@ extern int D_L00_001B2B60;
 
 extern void func_00282A88(char *buf, int size);
 
+/* Draws a white screen flash over the whole screen, using the blast's current brightness. */
 void func_L00_003E55B0(char *object)
 {
     char *s1;
 
     s1 = *(char **)(object + 0x68);
     if (*(int *)(s1 + 0x24) != 0) {
-        func_002FC560(0x4E, (((long long)(D_001A72E0 >> 13) | 0x1000000) | (1LL << 32)));
-        func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], (*(int *)(s1 + 0x24) << 24) | 0xFFFFFF);
-        func_002FC560(0x4E, (D_001A72E0_1 >> 13) | 0x1000000);
+        VU1_addGSregister(0x4E, (((long long)(D_001A72E0 >> 13) | 0x1000000) | (1LL << 32)));
+        DrawColoredRectangle(0, gScreenAdjustOffsets[0xA9], 0, gScreenAdjustOffsets[0xA8], (*(int *)(s1 + 0x24) << 24) | 0xFFFFFF);
+        VU1_addGSregister(0x4E, (D_001A72E0_1 >> 13) | 0x1000000);
     }
 }
 
+/* Empties the list of fading objects. */
 void func_L00_003E8150(void)
 {
-    func_00282A88(D_L00_0024EFC0, 0x800);
-    D_L00_001B2B60 = 0;
+    FastMemoryHelperB(gFadingMobyList, 0x800);
+    gFadingMobyCount = 0;
 }
 
 typedef float QuadVector[4] __attribute__((aligned(16)));
@@ -74,16 +76,16 @@ void func_L00_003E5710(char *object)
     int quad, corner;
     float *first_u, *first_v;
 
-    registers[1] = func_0027C878(D_L00_001B05F4);
+    registers[1] = GetEffectTextureDescriptor(D_L00_001B05F4);
     registers[2] = 0xFF9000000260ULL;
     registers[3] = D_L00_001B05E0 | (unsigned long long)D_L00_001B05E4 << 2;
     registers[3] |= (unsigned long long)D_L00_001B05E8 << 4;
     registers[3] |= (unsigned long long)D_L00_001B05EC << 6;
     registers[3] |= (unsigned long long)D_L00_001B05F0 << 32;
     registers[0] = 0;
-    func_00282C88(matrix[0]);
-    func_00282C88(matrix[1]);
-    func_00282C88(matrix[2]);
+    ClearVector128(matrix[0]);
+    ClearVector128(matrix[1]);
+    ClearVector128(matrix[2]);
     matrix[0][0] = *(float *)(state + 0x10) * 2.0f;
     matrix[1][1] = *(float *)(state + 0x10) * 2.0f;
     matrix[2][2] = *(float *)(state + 0x10) * 0.25f;
@@ -101,23 +103,24 @@ void func_L00_003E5710(char *object)
             int vertex = D_L00_00297020[quad][corner][0];
             int texel = D_L00_00297020[quad][corner][1];
 
-            func_00282D30(vertices[corner], D_L00_00296B20[vertex], D_L00_001B05FC);
+            FastVecScale(vertices[corner], D_L00_00296B20[vertex], D_L00_001B05FC);
             *u = D_L00_00297420[texel][0];
             *v = D_L00_00297420[texel][1];
-            func_00283098(vertices[corner], vertices[corner], matrix);
-            func_00283098(vertices[corner], vertices[corner], object + 0xC0);
-            func_00282CC0(vertices[corner], vertices[corner], object + 0x10);
-            func_00282F20(matrix[3], matrix[3], 0.5f);
-            func_00282CC0(vertices[corner], vertices[corner], matrix[3]);
+            matrix_mul_vec3(vertices[corner], vertices[corner], matrix);
+            matrix_mul_vec3(vertices[corner], vertices[corner], object + 0xC0);
+            FastVecAdd(vertices[corner], vertices[corner], object + 0x10);
+            vec_scale_to_length(matrix[3], matrix[3], 0.5f);
+            FastVecAdd(vertices[corner], vertices[corner], matrix[3]);
             u += 2;
             v += 2;
         }
-        func_00280B90(vertices, 0, 0);
+        draw_world_quad(vertices, 0, 0);
     } while (++quad < 64);
 }
 
 /* The same mesh at the state's size (an eighth on the third axis); the position pointer is
    taken again for every quad. */
+/* Draws a smaller copy of the blast mesh, a flatter shell at the blast's size. */
 void func_L00_003E5978(char *object)
 {
     QuadVector vertices[4];
@@ -130,16 +133,16 @@ void func_L00_003E5978(char *object)
     char *position;
     float *first_u, *first_v;
 
-    registers[1] = func_0027C878(D_L00_001B05F4);
+    registers[1] = GetEffectTextureDescriptor(D_L00_001B05F4);
     registers[2] = 0xFF9000000260ULL;
     registers[3] = D_L00_001B05E0 | (unsigned long long)D_L00_001B05E4 << 2;
     registers[3] |= (unsigned long long)D_L00_001B05E8 << 4;
     registers[3] |= (unsigned long long)D_L00_001B05EC << 6;
     registers[3] |= (unsigned long long)D_L00_001B05F0 << 32;
     registers[0] = 0;
-    func_00282C88(matrix[0]);
-    func_00282C88(matrix[1]);
-    func_00282C88(matrix[2]);
+    ClearVector128(matrix[0]);
+    ClearVector128(matrix[1]);
+    ClearVector128(matrix[2]);
     matrix[0][0] = *(float *)(state + 0x10) * 1.0f;
     matrix[1][1] = *(float *)(state + 0x10) * 1.0f;
     matrix[2][2] = *(float *)(state + 0x10) * 0.125f;
@@ -158,18 +161,18 @@ void func_L00_003E5978(char *object)
             int vertex = D_L00_00297020[quad][corner][0];
             int texel = D_L00_00297020[quad][corner][1];
 
-            func_00282D30(vertices[corner], D_L00_00296B20[vertex], D_L00_001B05FC);
+            FastVecScale(vertices[corner], D_L00_00296B20[vertex], D_L00_001B05FC);
             *u = D_L00_00297420[texel][0];
             *v = D_L00_00297420[texel][1];
-            func_00283098(vertices[corner], vertices[corner], matrix);
-            func_00283098(vertices[corner], vertices[corner], object + 0xC0);
-            func_00282CC0(vertices[corner], vertices[corner], position);
-            func_00282F20(matrix[3], matrix[3], 0.5f);
-            func_00282CC0(vertices[corner], vertices[corner], matrix[3]);
+            matrix_mul_vec3(vertices[corner], vertices[corner], matrix);
+            matrix_mul_vec3(vertices[corner], vertices[corner], object + 0xC0);
+            FastVecAdd(vertices[corner], vertices[corner], position);
+            vec_scale_to_length(matrix[3], matrix[3], 0.5f);
+            FastVecAdd(vertices[corner], vertices[corner], matrix[3]);
             u += 2;
             v += 2;
         }
-        func_00280B90(vertices, 0, 0);
+        draw_world_quad(vertices, 0, 0);
     } while (++quad < 64);
 }
 
@@ -216,6 +219,7 @@ extern void func_L00_003E6628(void *);
 extern void ref_L00_003E4BF0_00(void (*)(void *),void *);
 extern void func_L00_003E5650(void *);
 typedef struct { char pad[0x10]; float phase; int timer; float rate; int alpha, unused, count, handle; } State4BF0;
+/* Updates the Mini-Nuke blast: it grows, hurts everything inside its radius, shakes the camera, then fades out and removes itself. */
 void func_L00_003E4BF0(char *object)
 {
     Vec4BF0 center, offset, query, direction;
@@ -224,8 +228,8 @@ void func_L00_003E4BF0(char *object)
     int *timer;
     State4BF0 *data = *(State4BF0 **)(object+0x68);
     float scale;
-    if (*(unsigned char *)(object+0x20) && !func_002B4038(*(short *)(object+0xAA),data->handle)) goto destroy;
-    func_00300190(object+0x10,object+0x10);
+    if (*(unsigned char *)(object+0x20) && !IsSavedRecordValue(*(short *)(object+0xAA),data->handle)) goto destroy;
+    TransformVectorOrCopy(object+0x10,object+0x10);
     switch (*(unsigned char *)(object+0x20)) {
     case 0: {
         int i;
@@ -236,25 +240,25 @@ void func_L00_003E4BF0(char *object)
         data->rate=2.0f/3.0f;
         data->alpha=127;
         data->count=111;
-        data->handle=func_L00_00329E90(object,0,&allocation);
-        mem=func_L00_0032A088(*(short *)(object+0xAA),data->handle);
+        data->handle=AcquireEntitySlot(object,0,&allocation);
+        mem=GetSlotBody(*(short *)(object+0xAA),data->handle);
         D_L00_001B2B50=mem;
-        D_L00_001B2B54=(char *)func_L00_003E4B80((int)(mem+0x50));
-        D_L00_001B2B58[0]=(int *)func_L00_003E4B80((int)(D_L00_001B2B54+0xA000));
+        D_L00_001B2B54=(char *)AlignSizeUpTo16((int)(mem+0x50));
+        D_L00_001B2B58[0]=(int *)AlignSizeUpTo16((int)(D_L00_001B2B54+0xA000));
         i=0;
         do { D_L00_001B2B58[0][i]=0; i++; } while(i<144);
         { char *p = D_L00_001B2B54+319*128+124;
         for(i=319;i>=0;i--,p-=128) *(int *)p=0; }
         *(int *)(D_L00_001B2B50_1+0x30)=0;
         qcopy(center,object+0x10);
-        func_002AFFD8(object+0x10,offset,1);
-        func_00282CC0(center,object+0x10,offset);
-        func_002AC728(object,center,-1,2.0f,20.0f);
-        func_L00_003E64F8(object,20,object+0x10,data,1.0f/6.0f);
-        func_L00_003E5340(object,object+0x10);
+        ComputeViewDirection(object+0x10,offset,1);
+        FastVecAdd(center,object+0x10,offset);
+        SpawnExplosionWithSparks(object,center,-1,2.0f,20.0f);
+        InitBlastEffectRecord(object,20,object+0x10,data,1.0f/6.0f);
+        SpawnBlastSparks(object,object+0x10);
         qcopy(query,center);
         query[3]=2.0f;
-        if(func_00283DB8(query,100.0f)!=-1) {
+        if(FastMathHelperA(query,100.0f)!=-1) {
             D_L00_001B8C80.amount=0.45f;
             D_L00_001B8C80.timer=40;
             D_L00_001B8C80.state=0;
@@ -267,24 +271,24 @@ void func_L00_003E4BF0(char *object)
         if(data->count<0) data->count=0;
         data->phase+=data->rate;
         timer=&data->timer;
-        scale=1.0f-func_00283CE0(*timer)/func_00283CE0(20);
+        scale=1.0f-IntToFloat(*timer)/IntToFloat(20);
         scale*=8.0f;
-        count=func_00277F48(object+0x10,0,object,0,scale+0.001f);
+        count=ProcessCollisionHit(object+0x10,0,object,0,scale+0.001f);
         for(i=0;i<count;i++) {
-            if((func_002AB1F0(D_L00_001C3280[i]) || (*(unsigned short *)(D_L00_001C3280[i]+0x34)&0x4000)) && D_L00_001C3280[i]!=D_00189E20.target && *(short *)(D_L00_001C3280[i]+0xAA)!=0xA5A) {
-                func_00282CF0(direction,D_L00_001C3280[i]+0x10,object+0x10);
-                func_00282F20(direction,direction,1.0f);
-                func_00282F20(&hit,&hit,1.0f);
-                func_002A8C00(((Weapon4BF0 *)((unsigned int)D_L00_00262570 + D_00139568[0x2A] * sizeof(Weapon4BF0)))->damage,&hit,object,0x830000,direction);
+            if((GetMobyPrivateValue0(gAreaHitTargets[i]) || (*(unsigned short *)(gAreaHitTargets[i]+0x34)&0x4000)) && gAreaHitTargets[i]!=gHeroState.target && *(short *)(gAreaHitTargets[i]+0xAA)!=0xA5A /* Mini-Nuke */) {
+                FastVecSub(direction,gAreaHitTargets[i]+0x10,object+0x10);
+                vec_scale_to_length(direction,direction,1.0f);
+                vec_scale_to_length(&hit,&hit,1.0f);
+                make_hit_descriptor(((Weapon4BF0 *)((unsigned int)gWeaponTable_L00 + gItemSlotToRecord[0x2A] * sizeof(Weapon4BF0)))->damage,&hit,object,0x830000,direction);
                 *(TI4BF0 *)hit.point = *(TI4BF0 *)direction;
                 hit.flags=3; hit.type=5; hit.active=1;
                 hit.point[3]=5627.925f;
-                hit.id=*(short *)(D_L00_001C3280[i]+0xAA);
-                func_002A8E20(D_L00_001C3280[i],&hit);
-                func_0032D758(D_L00_001C3280[i],71,*(int *)(object+0xB8));
+                hit.id=*(short *)(gAreaHitTargets[i]+0xAA);
+                QueueMobyImpact(gAreaHitTargets[i],&hit);
+                StartAttachedEffect(gAreaHitTargets[i],71,*(int *)(object+0xB8));
             }
         }
-        if(func_00282948(timer)) {
+        if(FastFloatHelperD(timer)) {
             *(unsigned char *)(object+0x20)=2;
             data->timer=40;
         }
@@ -292,12 +296,12 @@ void func_L00_003E4BF0(char *object)
     }
     case 2:
         data->phase+=data->rate;
-        scale=func_00283CE0(data->timer)*0.025f;
-        if(data->timer==20) func_L00_003E5340(object,object+0x10);
-        if(func_00282948(&data->timer)) {
+        scale=IntToFloat(data->timer)*0.025f;
+        if(data->timer==20) SpawnBlastSparks(object,object+0x10);
+        if(FastFloatHelperD(&data->timer)) {
             if(data->alpha) --data->alpha;
             else { data->alpha=0; *(unsigned char *)(object+0x20)=6; }
-        } else data->alpha=func_00283CF0(func_00283CE0(127)*scale);
+        } else data->alpha=FloatToInt(IntToFloat(127)*scale);
         break;
     case 6:
         data->rate-=0.016666668f;
@@ -305,14 +309,14 @@ void func_L00_003E4BF0(char *object)
         data->phase+=data->rate;
         if(!*(int *)(D_L00_001B2B50_1+0x38)) {
 destroy:
-            func_L00_003E5330();
-            func_0029F338(object); return;
+            ClearBlastState();
+            MarkMobySpawned(object); return;
         }
         break;
     }
     D_L00_001B05D8-=0.04f;
     if(D_L00_001B05D4 < -8.0f) D_L00_001B05D4+=8.0f;
     if(D_L00_001B05D8 < -8.0f) D_L00_001B05D8+=8.0f;
-    func_L00_003E6628(object);
-    ref_L00_003E4BF0_00(func_L00_003E5650,object);
+    UpdateBlastEffectRecords(object);
+    ref_L00_003E4BF0_00(DrawMiniNukeBlast,object);
 }

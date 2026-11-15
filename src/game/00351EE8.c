@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int func_00351E58(unsigned char *);
 
@@ -8,16 +9,18 @@ typedef unsigned char u8;
 
 typedef unsigned int u32;
 
-int func_00351EE8(int *owner)
+/* Returns the next free video output frame, or 0 if there is none. */
+int func_00351EE8(int *pool)
 {
     int result;
-    long status;
-    status = func_00351E58((unsigned char *)owner);
-    if (status == 0)
-        result = *owner + owner[2] * 0xd0000;
+    long isFull;
+    isFull = voBufIsFull((unsigned char *)pool);
+    if (isFull == 0)
+        result = *pool + pool[2] * 0xd0000;
     else
         result = 0;
     return result;
 }
 
-s32 func_00351F28(u8 *a0) { return *(u32 *)(a0 + 0xc) < 1; }
+/* Returns true when no video output frame is filled. */
+s32 func_00351F28(u8 *pool) { return *(u32 *)(pool + 0xc) < 1; }

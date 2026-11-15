@@ -50,6 +50,7 @@ typedef struct {
    290 points of D_L00_00292370 through it and draws them as three strips in the record's
    colour, then draws 32 quads whose corners are D_L00_00293EB0 points picked by D_L00_002944B0,
    corners 0-1 scaled by D_L00_001AFF30 and corners 2-3 by that times D_L00_001AFF34. */
+/* Draws the glowing sphere effect: a ring of lit points facing the camera, then 32 soft quads around it. */
 void func_L00_003C4B98(char *owner)
 {
     struct {
@@ -65,46 +66,46 @@ void func_L00_003C4B98(char *owner)
     short *indices;
     float scale, scale2;
 
-    frame.quad.regs[1] = func_0027C878(D_L00_001AFF28);
+    frame.quad.regs[1] = GetEffectTextureDescriptor(D_L00_001AFF28);
     frame.quad.regs[2] = 0xFF9000000260UL;
     frame.quad.regs[3] = 0x8000000044UL;
     frame.quad.regs[0] = 0;
-    func_002FC560(0x47, 0x53001);
+    VU1_addGSregister(0x47, 0x53001);
     qcopy(frame.position, ctx->position);
     frame.position[3] = 1.0f;
     basis = frame.basis;
-    func_00282CF0(frame.delta, D_L00_001B8DC0, frame.position);
-    func_00282F20(basis[0], frame.delta, 1.0f);
-    func_00282D30(frame.up, D_0018A0E0, -1.0f);
-    func_00282DD8(basis[1], basis[0], frame.up);
-    func_00282F20(basis[1], basis[1], 1.0f);
-    func_00282DD8(basis[2], basis[1], basis[0]);
-    func_00282D30(basis[0], basis[0], D_L00_001AFF2C);
-    func_00282D30(basis[1], basis[1], D_L00_001AFF2C);
-    func_00282D30(basis[2], basis[2], D_L00_001AFF2C);
+    FastVecSub(frame.delta, gCameraPosition_L00, frame.position);
+    vec_scale_to_length(basis[0], frame.delta, 1.0f);
+    FastVecScale(frame.up, D_0018A0E0, -1.0f);
+    FastVecCross(basis[1], basis[0], frame.up);
+    vec_scale_to_length(basis[1], basis[1], 1.0f);
+    FastVecCross(basis[2], basis[1], basis[0]);
+    FastVecScale(basis[0], basis[0], D_L00_001AFF2C);
+    FastVecScale(basis[1], basis[1], D_L00_001AFF2C);
+    FastVecScale(basis[2], basis[2], D_L00_001AFF2C);
     rgba = D_L00_001AFF38 | ctx->color;
     frame.quad.colors[3] = rgba;
     frame.quad.colors[2] = rgba;
     frame.quad.colors[1] = rgba;
     frame.quad.colors[0] = rgba;
-    func_002FC560(6, func_0027C878(D_L00_001AFF28));
-    func_002FC560(0x42, 0x8000000044UL);
-    func_002FC560(8, 0);
-    func_002FC560(0x14, 0xFF9000000260UL);
-    func_002FC560(0x4A, 0);
-    func_00280328();
+    VU1_addGSregister(6, GetEffectTextureDescriptor(D_L00_001AFF28));
+    VU1_addGSregister(0x42, 0x8000000044UL);
+    VU1_addGSregister(8, 0);
+    VU1_addGSregister(0x14, 0xFF9000000260UL);
+    VU1_addGSregister(0x4A, 0);
+    font_queue_vu_state();
     for (j = 0; j < 290; j++) {
-        func_002830C0(frame.point, D_L00_00292370[j], frame.basis);
+        transform_vector(frame.point, D_L00_00292370[j], frame.basis);
         D_L00_0023A770[j][0] = frame.point[0];
         D_L00_0023A770[j][1] = frame.point[1];
         D_L00_0023A770[j][2] = frame.point[2];
         frame.colors[j] = frame.quad.colors[0];
     }
-    func_00281810(148, D_L00_0023A770[0], &frame.colors[0], D_L00_00293590[0], 1);
-    func_00281810(109, D_L00_0023A770[146], &frame.colors[146], D_L00_00293590[146], 1);
-    func_00281810(36, D_L00_0023A770[254], &frame.colors[254], D_L00_00293590[254], 1);
+    DrawGlintEffect(148, D_L00_0023A770[0], &frame.colors[0], D_L00_00293590[0], 1);
+    DrawGlintEffect(109, D_L00_0023A770[146], &frame.colors[146], D_L00_00293590[146], 1);
+    DrawGlintEffect(36, D_L00_0023A770[254], &frame.colors[254], D_L00_00293590[254], 1);
 
-    frame.quad.regs[1] = func_0027C878(11);
+    frame.quad.regs[1] = GetEffectTextureDescriptor(11);
     frame.quad.regs[3] = 0x8000000048UL;
     scale = D_L00_001AFF30;
     rim = ctx->color | 0x40000000;
@@ -118,9 +119,9 @@ void func_L00_003C4B98(char *owner)
         for (j = 0; j < 4; j++) {
             k = indices[j];
             if (j >= 2)
-                func_00282D30(frame.quad.corners[j], D_L00_00293EB0[k], scale2);
+                FastVecScale(frame.quad.corners[j], D_L00_00293EB0[k], scale2);
             else
-                func_00282D30(frame.quad.corners[j], D_L00_00293EB0[k], scale);
+                FastVecScale(frame.quad.corners[j], D_L00_00293EB0[k], scale);
         }
         frame.quad.uvs[0][0] = 0.5f;
         frame.quad.uvs[0][1] = 0.5f;
@@ -130,7 +131,7 @@ void func_L00_003C4B98(char *owner)
         frame.quad.uvs[2][1] = 1.0f;
         frame.quad.uvs[3][0] = 0.5f;
         frame.quad.uvs[3][1] = 1.0f;
-        func_00280B90(&frame.quad, frame.basis, 0);
+        draw_world_quad(&frame.quad, frame.basis, 0);
     }
 }
 
@@ -149,7 +150,8 @@ extern void func_00281EB8(char *a, int b, unsigned int c, int d, float e, float 
    after it says whether it is free. Without interblock scheduling the two skips stay likely
    branches. Each sprite's colour is its own local: one shared variable dies twice, becomes a
    global pseudo, and the shifted alpha no longer ties to its saved register. */
-void func_L00_003BBF48(char *a0)
+/* Draws two small sprites for each effect slot that belongs to this owner and is still active. */
+void func_L00_003BBF48(char *owner)
 {
     unsigned int firstRGB = 0x103080;
     unsigned int secondRGB = 0xFFFFFF;
@@ -157,22 +159,22 @@ void func_L00_003BBF48(char *a0)
     char *p = base + 0x30;
     char *q = base;
     int i;
-    int color;
-    int color2;
-    float f;
+    int firstColor;
+    int secondColor;
+    float scroll;
 
     for (i = 29; i >= 0; p += 0xA0, i--, q += 0xA0) {
-        if (*(int *)(p + 0x5C) == (int)a0) {
-            func_L00_003BC228(a0, q);
+        if (*(int *)(p + 0x5C) == (int)owner) {
+            DrawLightningCurve(owner, q);
             if (*(int *)(p + 0x64) == 0) {
-                color = func_002A7820(0x50, 0x60);
-                color = (int)(color << 24) | firstRGB;
-                f = func_002A7940();
-                func_00281EB8(p, 0x31, color, 1, 0.5f, 0.15f, f);
-                color2 = func_002A7820(0x50, 0x60);
-                color2 = (int)(color2 << 24) | secondRGB;
-                f = func_002A7940();
-                func_00281EB8(p, 0x31, color2, 1, 0.3f, 0.151f, f);
+                firstColor = RandomIntRange(0x50, 0x60);
+                firstColor = (int)(firstColor << 24) | firstRGB;
+                scroll = RandomAngle();
+                DrawBillboardQuad_00281EB8(p, 0x31, firstColor, 1, 0.5f, 0.15f, scroll);
+                secondColor = RandomIntRange(0x50, 0x60);
+                secondColor = (int)(secondColor << 24) | secondRGB;
+                scroll = RandomAngle();
+                DrawBillboardQuad_00281EB8(p, 0x31, secondColor, 1, 0.3f, 0.151f, scroll);
             }
         }
     }

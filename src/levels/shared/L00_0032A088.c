@@ -12,6 +12,7 @@ typedef struct {
 
 extern Slot D_L00_00268E20[];
 
+/* Returns the main data of a slot if the slot belongs to this key, otherwise nothing. */
 u8 *func_L00_0032A088(int key, int index)
 {
     if (D_L00_00268E20[index].key != key)
@@ -19,6 +20,7 @@ u8 *func_L00_0032A088(int key, int index)
     return D_L00_00268E20[index].body;
 }
 
+/* Returns the header data of a slot if the slot belongs to this key, otherwise nothing. */
 u8 *func_L00_0032A0B8(int key, int index)
 {
     if (D_L00_00268E20[index].key != key)

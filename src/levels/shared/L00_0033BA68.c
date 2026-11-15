@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef unsigned int u32;
@@ -32,18 +33,19 @@ extern int *ref_L00_0033BA68_00;
 
 /* Allocates the 0x46 record, copies the caller's sixteen-byte block into it and
    fills its flag bytes, its tag word and its two level-derived fields. */
+/* Creates a short glow effect at a position, with brightness scaled by the given value. */
 Obj_L00_0033BA68 *func_L00_0033BA68(char *src1, int index, f32 value)
 {
-    Obj_L00_0033BA68 *o = (Obj_L00_0033BA68 *)func_002B9030(0x46);
+    Obj_L00_0033BA68 *o = (Obj_L00_0033BA68 *)AllocParticle(0x46);
 
     if (o != 0) {
         o->v10 = *(V4_L00_0033BA68 *)src1;
         o->w4 = 0x5A404040;
-        o->b9 = func_00283CF0(1.0f) + 0x20;
+        o->b9 = FloatToInt(1.0f) + 0x20;
         o->b3 = 0x44;
         o->b1 = 1;
         o->b2 = *((unsigned char *)ref_L00_0033BA68_00 + index);
-        o->b8 = func_00283CF0(value * 40.7436637878418f) - 0x20;
+        o->b8 = FloatToInt(value * 40.7436637878418f) - 0x20;
         o->f_c = 105000.0f;
         o->s_a = 0x78;
     }

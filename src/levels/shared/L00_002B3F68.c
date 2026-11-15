@@ -1,3 +1,4 @@
+#include "names.h"
 typedef struct {
     unsigned char prefix[0x40F];
     unsigned char alternate;
@@ -10,9 +11,10 @@ extern char D_00189E20[];
 extern int func_L00_002ADEA0(int index);
 extern void func_L00_002B3EF8(int index, float a, float b, float c);
 
+/* Picks how quickly the hero turns, based on how fast the hero moves and the current state, then applies it. */
 void func_L00_002B3F68(void)
 {
-    float speed = ((MovementView *)D_00189E20)->speed;
+    float speed = ((MovementView *)gHeroState)->speed;
     float first;
     float second;
     float third;
@@ -25,7 +27,7 @@ void func_L00_002B3F68(void)
         if (first < 0.01f)
             first = 0.01f;
     }
-    if (((MovementView *)D_00189E20)->speed == 1.0f) {
+    if (((MovementView *)gHeroState)->speed == 1.0f) {
         third = 0.09308424592018127f;
     } else {
         third = speed * 0.06399541348218918f;
@@ -35,18 +37,18 @@ void func_L00_002B3F68(void)
             third = 0.03199770674109459f;
     }
     second = 0.27f;
-    if (((MovementView *)D_00189E20)->alternate) {
+    if (((MovementView *)gHeroState)->alternate) {
         first = 0.035f;
         third = 0.19489513337612152f;
     }
-    switch (func_L00_002ADEA0(0)) {
+    switch (hero_slot_item_id(0)) {
     case 16:
     case 28:
     case 29:
     case 30:
     case 39:
     case 46:
-        if (((MovementView *)D_00189E20)->special && !((MovementView *)D_00189E20)->alternate) {
+        if (((MovementView *)gHeroState)->special && !((MovementView *)gHeroState)->alternate) {
             if (speed > 0.95f) {
                 first = 0.017f;
                 second = 0.18f;
@@ -61,5 +63,5 @@ void func_L00_002B3F68(void)
     default:
         break;
     }
-    func_L00_002B3EF8(0, first, second, third);
+    SteerHeroHeading(0, first, second, third);
 }

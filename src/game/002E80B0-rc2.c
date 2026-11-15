@@ -34,26 +34,27 @@ extern s32 D_001B22A8;
 extern s64 D_001B2160;
 extern s64 D_001B2168;
 
+/* Loads a data block for the next scene and keeps its first two values for drawing. */
 void func_002E80B0(void) {
-    s64 sp[4];
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_s1;
-    s32 temp_s1_2;
+    s64 values[4];
+    s32 levelIndex;
+    s32 clampedIndex;
+    s32 archive;
+    s32 loaded;
 
-    temp_s1 = D_001A7288;
-    if (*(s32 *)(temp_s1 + 0x50) != -1) {
-        temp_s0 = D_001A7BB4 - 1;
-        temp_s0_2 = (temp_s0 > -1) ? temp_s0 : 0;
-        func_0011AEA0(0);
-        func_0029D4D0(temp_s1 + *(s32 *)(temp_s1 + 0x50), D_001B22A8);
-        func_0011AEA0(0);
-        temp_s1_2 = D_001B22A8;
+    archive = D_001A7288;
+    if (*(s32 *)(archive + 0x50) != -1) {
+        levelIndex = D_001A7BB4 - 1;
+        clampedIndex = (levelIndex > -1) ? levelIndex : 0;
+        FlushCache(0);
+        fast_decompress(archive + *(s32 *)(archive + 0x50), gDmaPacketCursor);
+        FlushCache(0);
+        loaded = gDmaPacketCursor;
         D_001A72D0 = D_001A72D4;
-        func_00291850(temp_s1_2 + *(s32 *)(temp_s1_2 + 4), sp);
-        D_001B2160 = sp[0];
-        func_00291850(temp_s1_2 + *(s32 *)(temp_s1_2 + temp_s0_2 * 4 + 8), sp);
-        D_001B2168 = sp[0];
+        UploadMipTexture(loaded + *(s32 *)(loaded + 4), values);
+        D_001B2160 = values[0];
+        UploadMipTexture(loaded + *(s32 *)(loaded + clampedIndex * 4 + 8), values);
+        D_001B2168 = values[0];
         D_001A72D4 = D_001A72D0 + 0x2000;
     }
 }

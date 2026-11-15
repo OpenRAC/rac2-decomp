@@ -47,39 +47,39 @@ extern char *func_002FF300(int, int);
    line 1511 (key 2000 + 1511) if it is idle, and picks the item's model. */
 void func_002FF0D8(void)
 {
-    D_001B2310.count = D_001AD7F8;
-    D_001B2310.rate = 1.0f / func_00283CE0(D_001B2310.count);
-    qcopy(D_001B2310.from, ((ResidentPreviewPrefix *)D_00189E20)->previewFrom);
-    qcopy(D_001B2310.to, ((ResidentPreviewPrefix *)D_00189E20)->previewTo);
-    D_001B2310.elapsed = 0;
-    if (!D_001A63A8.active && D_001A63A8.key == -1) {
+    gObjectPreviewState.count = D_001AD7F8;
+    gObjectPreviewState.rate = 1.0f / IntToFloat(gObjectPreviewState.count);
+    qcopy(gObjectPreviewState.from, ((ResidentPreviewPrefix *)gHeroState)->previewFrom);
+    qcopy(gObjectPreviewState.to, ((ResidentPreviewPrefix *)gHeroState)->previewTo);
+    gObjectPreviewState.elapsed = 0;
+    if (!gMusicState.active && gMusicState.key == -1) {
         /* key before selection: the second store of the pair then holds the
            base's death, so sched1 keeps both ahead of the flag stores, and
            sched2 (where $a1 has no known base) issues selection first. */
-        D_001A63A8.key = 0xDB7;
-        D_001A63A8.selection = 0;
+        gMusicState.key = 0xDB7;
+        gMusicState.selection = 0;
         D_001AD7E4 = 1;
         D_001AD7E8 = 0;
     }
-    D_001B2310.flag1C = 0;
-    D_001B2310.flag1D = 0;
-    if (D_001B2310.item == 31) {
-        unsigned char *record = D_00139568[31] * 0xE0 + D_00239BA0;
-        D_001B2310.model = (unsigned char *)func_002FF300(*(int *)(record + 0x14), 1);
-        D_001B2310.owned = 0;
-    } else if (D_001B2310.item == 45) {
-        unsigned char *record = D_00139568[45] * 0xE0 + D_00239BA0;
-        D_001B2310.model = (unsigned char *)func_002FF300(*(int *)(record + 0x14), -1);
-        D_001B2310.owned = 0;
-    } else if (D_001B2310.item == 9) {
-        D_001B2310.model = (unsigned char *)func_002FF300(601, 0);
-        D_001B2310.owned = 0;
+    gObjectPreviewState.flag1C = 0;
+    gObjectPreviewState.flag1D = 0;
+    if (gObjectPreviewState.item == 31) {
+        unsigned char *record = gItemSlotToRecord[31] * 0xE0 + gWeaponTable_00239BA0;
+        gObjectPreviewState.model = (unsigned char *)InitSharedEffectObject(*(int *)(record + 0x14), 1);
+        gObjectPreviewState.owned = 0;
+    } else if (gObjectPreviewState.item == 45) {
+        unsigned char *record = gItemSlotToRecord[45] * 0xE0 + gWeaponTable_00239BA0;
+        gObjectPreviewState.model = (unsigned char *)InitSharedEffectObject(*(int *)(record + 0x14), -1);
+        gObjectPreviewState.owned = 0;
+    } else if (gObjectPreviewState.item == 9) {
+        gObjectPreviewState.model = (unsigned char *)InitSharedEffectObject(601, 0);
+        gObjectPreviewState.owned = 0;
     } else {
         unsigned char *record;
         char *resident;
-        D_001B2310.owned = 1;
-        record = D_00239BA0 + D_00139568[D_001B2310.item] * 0xE0;
-        resident = (char *)D_00189E20;
-        D_001B2310.model = *(unsigned char **)(resident + *(int *)(record + 0xC) * 0x50 + 0x1220);
+        gObjectPreviewState.owned = 1;
+        record = gWeaponTable_00239BA0 + gItemSlotToRecord[gObjectPreviewState.item] * 0xE0;
+        resident = (char *)gHeroState;
+        gObjectPreviewState.model = *(unsigned char **)(resident + *(int *)(record + 0xC) * 0x50 + 0x1220);
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The shared state record supplies the active player and current mode. */
 typedef struct {
@@ -23,48 +24,49 @@ extern void func_L04_003A1FA0(void *);
 extern void func_L04_003A1FE0(void *);
 extern void func_L04_003A5C08(void *, float);
 
-void func_L04_003E7E68(char *object)
+/* Runs the shared per-frame code for an object that belongs to a group, calling a different routine for each of its states. */
+void func_L04_003E7E68(char *moby)
 {
-    char *state;
-    L04DispatchGlobals *globals = &D_00189E20;
+    char *vars;
+    L04DispatchGlobals *globals = &gHeroState;
     char *player = globals->player;
     if (player && *(short *)(player + 0xAA) == 0x45 &&
         (unsigned char)player[0x20] != 0xFE && (unsigned char)player[0x20] != 0xFD &&
         globals->mode == 0x31) return;
-    state = *(char **)(object + 0x68);
-    if (state) {
-        int index = *(int *)(state + 0x18);
-        int increment = 1;
-        if (index != -1) increment = D_L04_001AFFA0[index];
+    vars = *(char **)(moby + 0x68);
+    if (vars) {
+        int groupIndex = *(int *)(vars + 0x18);
+        int slotCount = 1;
+        if (groupIndex != -1) slotCount = D_L04_001AFFA0[groupIndex];
         {
-            int args[13];
-            increment += *(int *)(state + 0x10);
-            args[0] = 10;
-            args[1] = increment;
-            args[8] = (int)&D_L04_001AFFD4;
-            args[9] = (int)&D_L04_001AFFD8;
-            args[2] = (int)D_L04_002AF6C0;
-            args[3] = (int)D_L04_002405C0;
-            args[4] = (int)D_L04_001AFFC0;
-            args[5] = (int)D_L04_001AFFA0;
-            args[6] = (int)D_L04_00240660;
-            args[7] = (int)D_L04_002BA660;
-            args[11] = (int)func_L04_003E7FE8;
-            args[12] = (int)func_L00_002E6EF8;
-            args[10] = (int)object;
-            switch ((unsigned char)object[0x20]) {
+            int callArgs[13];
+            slotCount += *(int *)(vars + 0x10);
+            callArgs[0] = 10;
+            callArgs[1] = slotCount;
+            callArgs[8] = (int)&D_L04_001AFFD4;
+            callArgs[9] = (int)&D_L04_001AFFD8;
+            callArgs[2] = (int)D_L04_002AF6C0;
+            callArgs[3] = (int)D_L04_002405C0;
+            callArgs[4] = (int)D_L04_001AFFC0;
+            callArgs[5] = (int)D_L04_001AFFA0;
+            callArgs[6] = (int)D_L04_00240660;
+            callArgs[7] = (int)D_L04_002BA660;
+            callArgs[11] = (int)RunSharedGroupRoutine;
+            callArgs[12] = (int)AddDrawCallbackToList3;
+            callArgs[10] = (int)moby;
+            switch ((unsigned char)moby[0x20]) {
             case 0:
-                func_L04_003A1A78(args);
-                func_L04_003A5C08(object, *(float *)(state + 0x28));
+                InitWaterObject(callArgs);
+                AddWaterSplashEntry(moby, *(float *)(vars + 0x28));
                 /* Fall through. */
             case 1:
-                func_L04_003A1C98(args);
+                UpdateWaterController(callArgs);
                 break;
             case 2:
-                func_L04_003A1FA0(args);
+                AdvanceWaterControllerState(callArgs);
                 break;
             }
-            func_L04_003A1FE0(args);
+            UpdateWaterRipplePatches_L04(callArgs);
         }
     }
 }

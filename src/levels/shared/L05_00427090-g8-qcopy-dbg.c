@@ -15,77 +15,79 @@ extern int D_L05_001B151C __attribute__((sda));
 extern float D_L05_001B1524 __attribute__((sda));
 extern float D_L05_001B1528 __attribute__((sda));
 
-char *func_L05_00427090(char *pos, char *vec, int a2, char *a3, int flag, int a5)
+/* Creates a moving projectile object that travels from a position along a direction, with a lifetime counted in frames. */
+char *func_L05_00427090(char *pos, char *vec, int a2, char *target, int flag, int extraParam)
 {
-    char *obj = func_0029EFD0(0x1182);
+    char *projectile = CreateMoby(0x1182);
 
-    if (obj != 0) {
-        char *st = *(char **)(obj + 0x68);
-        float f20;
-        float f21;
-        float f22;
+    if (projectile != 0) {
+        char *vars = *(char **)(projectile + 0x68);
+        float one;
+        float travelFrames;
+        float frameTime;
         int count;
 
-        *(unsigned char *)(obj + 0x30) = 0xFF;
-        *(unsigned short *)(obj + 0x32) = 0x1FF;
-        *(unsigned char *)(obj + 0x31) = 1;
-        *(unsigned char *)(obj + 0x20) = 1;
-        *(int *)(st + 0x24) = flag;
-        f22 = (flag ? D_L05_001B1518 : D_L05_001B1514) * (1.0f / 60.0f);
-        f21 = (flag ? D_L05_001B1528 : D_L05_001B1524) / f22;
-        f20 = 1.0f;
-        count = func_00283CF0(f21);
-        *(int *)(st + 0x28) = D_L05_001B151C;
-        *(int *)(st + 0x18) = count;
-        *(int *)(st + 0x10) = a2;
-        *(int *)(st + 0x2C) = a5;
-        *(char **)(st + 0x20) = a3;
-        *(int *)(st + 0x14) = 0;
-        *(float *)(st + 0x1C) = f20 / f21;
-        *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
-        qcopy(obj + 0x10, pos);
-        func_00282F20(st, vec, f22);
-        func_00282F20(obj + 0xC0, st, f20);
-        func_00282DD8(obj + 0xD0, obj + 0xC0, a3 + 0xE0);
-        func_00282F20(obj + 0xD0, obj + 0xD0, f20);
-        func_00282DD8(obj + 0xE0, obj + 0xD0, obj + 0xC0);
+        *(unsigned char *)(projectile + 0x30) = 0xFF;
+        *(unsigned short *)(projectile + 0x32) = 0x1FF;
+        *(unsigned char *)(projectile + 0x31) = 1;
+        *(unsigned char *)(projectile + 0x20) = 1;
+        *(int *)(vars + 0x24) = flag;
+        frameTime = (flag ? D_L05_001B1518 : D_L05_001B1514) * (1.0f / 60.0f);
+        travelFrames = (flag ? D_L05_001B1528 : D_L05_001B1524) / frameTime;
+        one = 1.0f;
+        count = FloatToInt(travelFrames);
+        *(int *)(vars + 0x28) = D_L05_001B151C;
+        *(int *)(vars + 0x18) = count;
+        *(int *)(vars + 0x10) = a2;
+        *(int *)(vars + 0x2C) = extraParam;
+        *(char **)(vars + 0x20) = target;
+        *(int *)(vars + 0x14) = 0;
+        *(float *)(vars + 0x1C) = one / travelFrames;
+        *(unsigned short *)(projectile + 0x34) = *(unsigned short *)(projectile + 0x34) | 0x100;
+        qcopy(projectile + 0x10, pos);
+        vec_scale_to_length(vars, vec, frameTime);
+        vec_scale_to_length(projectile + 0xC0, vars, one);
+        FastVecCross(projectile + 0xD0, projectile + 0xC0, target + 0xE0);
+        vec_scale_to_length(projectile + 0xD0, projectile + 0xD0, one);
+        FastVecCross(projectile + 0xE0, projectile + 0xD0, projectile + 0xC0);
     }
-    return obj;
+    return projectile;
 }
 
-char *func_L05_00427988(char *pos, char *vec, int a2, char *a3, int flag)
+/* Creates a second kind of moving projectile object, like the one above but without the extra value. */
+char *func_L05_00427988(char *pos, char *vec, int a2, char *target, int flag)
 {
-    char *obj = func_0029EFD0(0x1191);
+    char *projectile = CreateMoby(0x1191);
 
-    if (obj != 0) {
-        char *st = *(char **)(obj + 0x68);
-        float f20;
-        float f21;
-        float f22;
+    if (projectile != 0) {
+        char *vars = *(char **)(projectile + 0x68);
+        float one;
+        float travelFrames;
+        float frameTime;
         int count;
 
-        *(unsigned char *)(obj + 0x30) = 0xFF;
-        *(unsigned short *)(obj + 0x32) = 0x1FF;
-        *(unsigned char *)(obj + 0x31) = 1;
-        *(unsigned char *)(obj + 0x20) = 1;
-        *(int *)(st + 0x24) = flag;
-        f22 = (flag ? D_L05_001B1550 : D_L05_001B154C) * (1.0f / 60.0f);
-        f21 = (flag ? D_L05_001B1560 : D_L05_001B155C) / f22;
-        f20 = 1.0f;
-        count = func_00283CF0(f21);
-        *(int *)(st + 0x28) = D_L05_001B1554;
-        *(int *)(st + 0x18) = count;
-        *(int *)(st + 0x10) = a2;
-        *(char **)(st + 0x20) = a3;
-        *(int *)(st + 0x14) = 0;
-        *(float *)(st + 0x1C) = f20 / f21;
-        *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
-        qcopy(obj + 0x10, pos);
-        func_00282F20(st, vec, f22);
-        func_00282F20(obj + 0xC0, st, f20);
-        func_00282DD8(obj + 0xD0, obj + 0xC0, a3 + 0xE0);
-        func_00282F20(obj + 0xD0, obj + 0xD0, f20);
-        func_00282DD8(obj + 0xE0, obj + 0xD0, obj + 0xC0);
+        *(unsigned char *)(projectile + 0x30) = 0xFF;
+        *(unsigned short *)(projectile + 0x32) = 0x1FF;
+        *(unsigned char *)(projectile + 0x31) = 1;
+        *(unsigned char *)(projectile + 0x20) = 1;
+        *(int *)(vars + 0x24) = flag;
+        frameTime = (flag ? D_L05_001B1550 : D_L05_001B154C) * (1.0f / 60.0f);
+        travelFrames = (flag ? D_L05_001B1560 : D_L05_001B155C) / frameTime;
+        one = 1.0f;
+        count = FloatToInt(travelFrames);
+        *(int *)(vars + 0x28) = D_L05_001B1554;
+        *(int *)(vars + 0x18) = count;
+        *(int *)(vars + 0x10) = a2;
+        *(char **)(vars + 0x20) = target;
+        *(int *)(vars + 0x14) = 0;
+        *(float *)(vars + 0x1C) = one / travelFrames;
+        *(unsigned short *)(projectile + 0x34) = *(unsigned short *)(projectile + 0x34) | 0x100;
+        qcopy(projectile + 0x10, pos);
+        vec_scale_to_length(vars, vec, frameTime);
+        vec_scale_to_length(projectile + 0xC0, vars, one);
+        FastVecCross(projectile + 0xD0, projectile + 0xC0, target + 0xE0);
+        vec_scale_to_length(projectile + 0xD0, projectile + 0xD0, one);
+        FastVecCross(projectile + 0xE0, projectile + 0xD0, projectile + 0xC0);
     }
-    return obj;
+    return projectile;
 }

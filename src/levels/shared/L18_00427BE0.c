@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -19,9 +20,9 @@ extern void func_3DB8F8(void *, void *);
 extern char ref_L18_002571A0_00[];
 
 /* Only the tagged object starts the sequence; the answer is always false. */
-s32 func_L18_00428100(char *a0) {
-    if (*(s16 *)(a0 + 0xAA) == 0xEE1)
-        func_3DB8F8(a0, ref_L18_002571A0_00);
+s32 func_L18_00428100(char *moby) {
+    if (*(s16 *)(moby + 0xAA) == 0xEE1 /* Receiver Bot */)
+        func_3DB8F8(moby, ref_L18_002571A0_00);
     return 0;
 }
 /* func_L18_00428138 lives in L18_00428138-g8.c. */
@@ -30,15 +31,16 @@ s32 func_L18_00428100(char *a0) {
 /* Maps the class identifier this level tags an object with to its small integer. The unit is
    built with -frac2-keep-block-order (config/cflags.txt): the switch keeps its default last,
    behind the dispatch's `b`, as in retail. */
-s32 func_L18_004283F0(u8 *a0) {
-    s32 r;
+/* Gives each enemy kind a small number, or -1 for an unknown kind. */
+s32 func_L18_004283F0(u8 *moby) {
+    s32 result;
 
-    switch (*(s16 *)(a0 + 0xAA)) {
-    case 0xEC0: r = 3; break;
-    case 0xEE1: r = 10; break;
-    default: r = -1; break;
+    switch (*(s16 *)(moby + 0xAA)) {
+    case 0xEC0 /* moby class 3776 */: result = 3; break;
+    case 0xEE1 /* Receiver Bot */: result = 10; break;
+    default: result = -1; break;
     }
-    return r;
+    return result;
 }
 
 /* func_L18_00428428 lives in L18_00427BE0-shot-g8.c. */
@@ -51,18 +53,19 @@ extern u16 D_L18_001B1240 __attribute__((sda));
 
 extern u8 D_L18_001B1360[];
 
-void func_L18_004286D0(u8 *a0) {
-    u8 *state = *(u8 **)(a0 + 0x68);
-    switch (*(s16 *)(a0 + 0xAA)) {
-        case 0xEC0:
+/* Resets the enemy's timer from a shared value for the first kind, and does nothing for two other kinds. */
+void func_L18_004286D0(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
+    switch (*(s16 *)(moby + 0xAA)) {
+        case 0xEC0 /* moby class 3776 */:
             *(u16 *)(state + 0x392) = D_L18_001B1240;
             break;
-        case 0xED4:
+        case 0xED4 /* moby class 3796 */:
             break;
-        case 0xEE1:
+        case 0xEE1 /* Receiver Bot */:
             break;
         default:
-            func_0026FEB8(D_L18_001B1360);
+            STUB_printf(D_L18_001B1360);
             break;
     }
 }
@@ -105,20 +108,21 @@ extern f32 func_00283180(f32);
 
 extern f32 func_00283198(f32);
 
-void func_L18_0043F040(u8 *obj) {
-    u8 *state = *(u8 **)(obj + 0x68);
+/* Updates the spinning angles of two groups of parts and works out the rotation values for each. */
+void func_L18_0043F040(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
     s32 i;
     for (i = 0; i < 2; i++) {
-        u8 *s = state + i * 0xA0;
+        u8 *partBlock = state + i * 0xA0;
         s32 j;
         for (j = 1; j >= 0; j--) {
-            *(f32 *)(s + 0x40) = func_00283B98(*(f32 *)(s + 0x40), *(f32 *)(s + 0x60));
-            *(f32 *)(s + 0x44) = func_00283B98(*(f32 *)(s + 0x44), *(f32 *)(s + 0x64));
-            *(f32 *)(s + 0x48) = func_00283B98(*(f32 *)(s + 0x48), *(f32 *)(s + 0x68));
-            *(f32 *)(s + 0x20) = func_00283180(*(f32 *)(s + 0x40)) * *(f32 *)(s + 0x80);
-            *(f32 *)(s + 0x24) = func_00283198(*(f32 *)(s + 0x44)) * *(f32 *)(s + 0x84);
-            *(f32 *)(s + 0x28) = -func_00283198(*(f32 *)(s + 0x48)) * *(f32 *)(s + 0x88);
-            s += 0x10;
+            *(f32 *)(partBlock + 0x40) = FastAddRotations(*(f32 *)(partBlock + 0x40), *(f32 *)(partBlock + 0x60));
+            *(f32 *)(partBlock + 0x44) = FastAddRotations(*(f32 *)(partBlock + 0x44), *(f32 *)(partBlock + 0x64));
+            *(f32 *)(partBlock + 0x48) = FastAddRotations(*(f32 *)(partBlock + 0x48), *(f32 *)(partBlock + 0x68));
+            *(f32 *)(partBlock + 0x20) = FastSinOrCosA(*(f32 *)(partBlock + 0x40)) * *(f32 *)(partBlock + 0x80);
+            *(f32 *)(partBlock + 0x24) = FastSinOrCosB(*(f32 *)(partBlock + 0x44)) * *(f32 *)(partBlock + 0x84);
+            *(f32 *)(partBlock + 0x28) = -FastSinOrCosB(*(f32 *)(partBlock + 0x48)) * *(f32 *)(partBlock + 0x88);
+            partBlock += 0x10;
         }
     }
 }
@@ -130,8 +134,8 @@ void func_L18_0043F040(u8 *obj) {
 /* func_L18_004401E0 is in L18_00427BE0-sparks.c. */
 
 /* Store the supplied unsigned 32-bit word at owner byte offset 0xB 8. */
-void func_L18_0046B1E0(int param_1, unsigned int param_2)
+void func_L18_0046B1E0(int owner, unsigned int value)
 {
-  *(unsigned int *)(param_1 + 0xb8) = param_2;
+  *(unsigned int *)(owner + 0xb8) = value;
   return;
 }

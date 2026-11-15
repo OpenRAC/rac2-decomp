@@ -12,22 +12,23 @@ extern int D_00138320;
 extern int D_L00_001B9080;
 extern void func_L00_002C42E0(int mode, int flag);
 extern int func_002761F8(void *start, void *end, int flags, void *object, int mode);
+/* Decides which ledge-grab or climb move the hero starts when close to a ledge, if any. */
 int func_L00_002C8CB0(void)
 {
-    char *pre = D_00189E20;
+    char *pre = gHeroState;
     char *base;
     char *object;
     Vector start, end;
     if (*(int *)(pre + 0x229c) == 0x11) {
         if (*(float *)(pre + 0x330) + 0.4f < *(float *)(pre + 0x88)) {
             D_L00_001B9080 = 0;
-            func_L00_002C42E0(6, 1);
+            SetHeroAction_L00(6, 1);
             return 1;
         }
     } else if (*(int *)(pre + 0x2294) != 0x67 && *(int *)(pre + 0x2294) != 0x73) {
         *(int *)(pre + 0x24c0) = 10000;
     }
-    base = D_00189E20;
+    base = gHeroState;
     if (*(short *)(base + 0x1fe) != 0)
         goto fail;
     object = *(char **)(base + 0x2290);
@@ -39,12 +40,12 @@ int func_L00_002C8CB0(void)
     start.v[2] = *(float *)(base + 0x330) + 0.01f;
     qcopy(&end, &start);
     end.v[2] += 0.3f;
-    if (func_002761F8(&start, &end, 2, object, 0) == 0)
+    if (CollLine(&start, &end, 2, object, 0) == 0)
         goto fail;
     if (*(short *)(base + 0x24fc) == 0 && (D_00138320 & 10) != 0)
-        func_L00_002C42E0(0x34, 1);
+        SetHeroAction_L00(0x34, 1);
     else
-        func_L00_002C42E0(0x32, 1);
+        SetHeroAction_L00(0x32, 1);
     return 1;
 fail:
     return 0;

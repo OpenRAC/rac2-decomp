@@ -30,29 +30,30 @@ extern void func_00132028(void);
 extern void func_00133220(void);
 extern void func_00282A38(s32);
 
-s16 func_002B7CE0(s32 arg0) {
-    s16 *q;
+/* Runs the music and disc read steps once, or repeatedly until the disc read is idle when asked. Returns the read state. */
+s16 func_002B7CE0(s32 waitUntilIdle) {
+    s16 *state;
 
-    if (arg0 != 0) {
+    if (waitUntilIdle != 0) {
         while (1) {
-            func_002B7578();
-            func_00133230();
-            func_00132028();
-            func_00133220();
-            if (D_001A63A8[2] == 0) {
+            UpdateMusicSystem();
+            ClearSoundFlagAndUpdate();
+            snd_Pump();
+            SetSoundCurrentBufferFlag();
+            if (gMusicState[2] == 0) {
                 break;
             }
-            func_00282A38(10000);
-            if (D_001A63A8[2] == 0) {
+            FastMemoryHelperA(10000);
+            if (gMusicState[2] == 0) {
                 break;
             }
         }
     } else {
-        func_002B7578();
-        func_00133230();
-        func_00132028();
-        func_00133220();
+        UpdateMusicSystem();
+        ClearSoundFlagAndUpdate();
+        snd_Pump();
+        SetSoundCurrentBufferFlag();
     }
-    q = D_001A63A8;
-    return q[2];
+    state = gMusicState;
+    return state[2];
 }

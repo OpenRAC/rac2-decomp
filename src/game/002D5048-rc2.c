@@ -38,16 +38,17 @@ extern MenuGameState D_00138180;
 extern CallbackState D_001F2840;
 extern unsigned char D_001A7BB4;
 extern int D_0025E0B0 __attribute__((nosda));
+/* Checks whether a menu item matches the current selection and reports accept, cancel or nothing based on the buttons pressed. */
 int func_002D5048(int selection)
 {
-    CallbackState *state = &D_001F2840;
+    CallbackState *state = &gPauseMenuState;
     D_0025E0B0 = D_001A7BB4;
     if (*(int *)(state->source + 0xE8) != selection)
         return 0;
-    if ((D_00138180.flags & 0x900) && state->fallback == 0)
+    if ((gPadState.flags & 0x900) && state->fallback == 0)
         return 1;
-    if (D_00138180.flags & 0x10) {
-        CallbackState *update = &D_001F2840;
+    if (gPadState.flags & 0x10) {
+        CallbackState *update = &gPauseMenuState;
         int value = *(int *)(update->source + 0xE0);
         int result;
         if (value != 0)

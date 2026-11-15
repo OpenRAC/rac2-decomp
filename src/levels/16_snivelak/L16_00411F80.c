@@ -37,10 +37,10 @@ extern u8 D_001395B8[];
 #define CHILD(off) ((GroupPart *)*(u8 **)(state + (off)))
 
 /* Turns this moby, its three linked parts and its three moby groups on or off. */
-void func_L16_00411F80(u8 *arg, s32 enable)
+void func_L16_00411F80(u8 *self, s32 enable)
 {
-    GroupPart *moby = (GroupPart *)arg;
-    u8 *state = *(u8 **)(arg + 0x68);
+    GroupPart *moby = (GroupPart *)self;
+    u8 *state = *(u8 **)(self + 0x68);
     GroupPart *part;
 
     if (enable) {

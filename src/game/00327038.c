@@ -141,163 +141,169 @@ extern void func_00280B90(char *pkt, float *matrix, int mode);
 /* func_003285C0 is matched in its own unit, src/game/003285C0-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */
 
 
+/* Checks the player and records in the owner whether he can be hurt; if he can, raises his hit counter. */
 void func_00328758(char *self)
 {
-    unsigned char *object = D_001BAF98[0];
-    char *owner = *(char **)(self + 0x68);
-    unsigned char *state;
-    char *context;
-    if (object == 0)
+    unsigned char *player = D_001BAF98[0];
+    char *vars = *(char **)(self + 0x68);
+    unsigned char *playerVars;
+    char *gameState;
+    if (player == 0)
         return;
-    if (*(short *)(*(char **)(object + 0x24) + 0x46) != 18)
+    if (*(short *)(*(char **)(player + 0x24) + 0x46) != 18)
         return;
-    state = *(unsigned char **)(object + 0x68);
-    if (state != 0) {
-        if (*(short *)(state + 0x16) == 0) {
-            if (state[0x14] != 0) {
-                object[0xBC] += 2;
-                if (object[0xBC] >= 25) {
-                    context = D_001A63A8;
-                    if (*(short *)(context + 0x72) == 3 && *(short *)(context + 0x6C) < 6000)
-                        func_002B6D28();
+    playerVars = *(unsigned char **)(player + 0x68);
+    if (playerVars != 0) {
+        if (*(short *)(playerVars + 0x16) == 0) {
+            if (playerVars[0x14] != 0) {
+                player[0xBC] += 2;
+                if (player[0xBC] >= 25) {
+                    gameState = gMusicState;
+                    if (*(short *)(gameState + 0x72) == 3 && *(short *)(gameState + 0x6C) < 6000)
+                        ResumeMusicStream();
                 }
-                if (object[0x21] != 255)
-                    func_002A8598(object[0x21], object[0xBC]);
+                if (player[0x21] != 255)
+                    SetByteOnGroupMobys(player[0x21], player[0xBC]);
             }
-            *(int *)(owner + 0x54) = 0;
+            *(int *)(vars + 0x54) = 0;
         } else {
-            *(int *)(owner + 0x54) = 1;
+            *(int *)(vars + 0x54) = 1;
         }
     } else {
-        func_0026FEB8(D_001B01F0, *(short *)(object + 0xAA));
+        STUB_printf(D_001B01F0, *(short *)(player + 0xAA));
     }
 }
 
-void func_00328848(char *a0)
+/* Claims a free spark record for the owner and gives it a random direction. */
+void func_00328848(char *self)
 {
-    char *rec = D_0022B0A0;
-    int *owner = *(int **)(a0 + 0x68);
+    char *record = gSparkRecords_0022B0A0;
+    int *vars = *(int **)(self + 0x68);
     int i;
 
     for (i = 0; i < 100; i++) {
-        if (*(int *)(rec + 0x34) != 0) {
-            rec += 0x40;
+        if (*(int *)(record + 0x34) != 0) {
+            record += 0x40;
             continue;
         }
-        *(int *)(rec + 0x34) = (int)a0;
-        *(int *)(rec + 0x30) = 0;
-        *(float *)(rec + 0x0) = func_002A7878(-1.0f, 1.0f);
-        *(float *)(rec + 0x4) = func_002A7878(-1.0f, 1.0f);
-        *(float *)(rec + 0x8) = func_002A7878(-1.0f, 1.0f);
-        func_00282F20((float *)rec, (float *)rec, 0.1275f);
-        owner[0x48 / 4]++;
+        *(int *)(record + 0x34) = (int)self;
+        *(int *)(record + 0x30) = 0;
+        *(float *)(record + 0x0) = RandomFloatRange(-1.0f, 1.0f);
+        *(float *)(record + 0x4) = RandomFloatRange(-1.0f, 1.0f);
+        *(float *)(record + 0x8) = RandomFloatRange(-1.0f, 1.0f);
+        vec_scale_to_length((float *)record, (float *)record, 0.1275f);
+        vars[0x48 / 4]++;
         break;
     }
 }
 
+/* Moves the owner's spark records around it and frees each one after it has turned a full circle. */
 void func_00328918(char *owner)
 {
-    int address = (int)D_0022B0A0;
-    char *position = (char *)(address + 0x10);
-    char *other = (char *)(address + 0x20);
-    int remaining = 99;
-    char *base = (char *)address;
-    char *data = *(char **)(owner + 0x68);
+    int tableAddr = (int)gSparkRecords_0022B0A0;
+    char *sparkPos = (char *)(tableAddr + 0x10);
+    char *sparkAux = (char *)(tableAddr + 0x20);
+    int left = 99;
+    char *sparkBase = (char *)tableAddr;
+    char *vars = *(char **)(owner + 0x68);
     do {
-        if (*(char **)(position + 0x24) == owner) {
-            func_00283098(position, base, owner + 0xC0);
-            func_00282F20((float *)other, (float *)position, 1.0f);
-            func_00282CC0(position, position, owner + 0x10);
-            *(float *)(position + 0x20) += 0.6283186078071594f;
-            if (*(float *)(position + 0x20) >= 6.2831854820251465f) {
-                *(int *)(position + 0x24) = 0;
-                --*(int *)(data + 0x48);
+        if (*(char **)(sparkPos + 0x24) == owner) {
+            matrix_mul_vec3(sparkPos, sparkBase, owner + 0xC0);
+            vec_scale_to_length((float *)sparkAux, (float *)sparkPos, 1.0f);
+            FastVecAdd(sparkPos, sparkPos, owner + 0x10);
+            *(float *)(sparkPos + 0x20) += 0.6283186078071594f;
+            if (*(float *)(sparkPos + 0x20) >= 6.2831854820251465f) {
+                *(int *)(sparkPos + 0x24) = 0;
+                --*(int *)(vars + 0x48);
             }
         }
-        base += 0x40;
-        other += 0x40;
-        position += 0x40;
-    } while (--remaining >= 0);
+        sparkBase += 0x40;
+        sparkAux += 0x40;
+        sparkPos += 0x40;
+    } while (--left >= 0);
 }
 
 /* func_00328A20 is in 00328A20.c. */
 
 /* func_00328B68 is in 00328A20.c. */
 
-void func_00328CA8(char *p)
+/* Resets a drawing packet to a flat white square with default settings. */
+void func_00328CA8(char *packet)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(packet + 112) = 0LL;
+    *(int *)(packet + 80) = 0;
+    *(int *)(packet + 84) = 0;
+    *(float *)(packet + 88) = 1.0f;
+    *(int *)(packet + 92) = 0;
+    *(int *)(packet + 96) = 0;
+    *(float *)(packet + 100) = 1.0f;
+    *(float *)(packet + 104) = 1.0f;
+    *(float *)(packet + 108) = 1.0f;
+    *(float *)(packet + 8) = -1.0f;
+    *(float *)(packet + 24) = 1.0f;
+    *(float *)(packet + 40) = -1.0f;
+    *(float *)(packet + 56) = 1.0f;
+    *(float *)(packet + 4) = -1.0f;
+    *(float *)(packet + 36) = 1.0f;
+    *(float *)(packet + 52) = 1.0f;
+    *(int *)(packet + 0) = 0;
+    *(int *)(packet + 16) = 0;
+    *(int *)(packet + 32) = 0;
+    *(int *)(packet + 48) = 0;
+    *(float *)(packet + 12) = 1.0f;
+    *(float *)(packet + 28) = 1.0f;
+    *(float *)(packet + 44) = 1.0f;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(float *)(packet + 20) = -1.0f;
+    *(float *)(packet + 60) = 1.0f;
 }
 
-void func_00328D30(char *p, float scale)
+/* Scales the four corner vectors of a drawing packet. */
+void func_00328D30(char *packet, float scale)
 {
-    F2c74c194_FUN_00282D30(p, p, scale);
-    F2c74c194_FUN_00282D30(p + 16, p + 16, scale);
-    F2c74c194_FUN_00282D30(p + 32, p + 32, scale);
-    F2c74c194_FUN_00282D30(p + 48, p + 48, scale);
+    F2c74c194_FUN_00282D30(packet, packet, scale);
+    F2c74c194_FUN_00282D30(packet + 16, packet + 16, scale);
+    F2c74c194_FUN_00282D30(packet + 32, packet + 32, scale);
+    F2c74c194_FUN_00282D30(packet + 48, packet + 48, scale);
 }
 
-void func_00328D98(char *pos, int a1, int a2, char *a3, int t0,
-                                        char *src, float f12, float f13)
+/* Draws a sprite at a position, facing the camera, with a given color, brightness, size and tilt. */
+void func_00328D98(char *pos, int color, int alpha, char *textureId, int blendMode,
+                                        char *direction, float size, float roll)
 {
-    char pkt[144];
-    float m[16];
-    float quat[4];
-    float off[4];
-    long long r;
+    char packet[144];
+    float matrix[16];
+    float rotation[4];
+    float offset[4];
+    long long textureReg;
 
-    F8411efa9_FUN_00328CA8(pkt);
-    r = F8411efa9_FUN_0027C878(a3);
+    F8411efa9_FUN_00328CA8(packet);
+    textureReg = F8411efa9_FUN_0027C878(textureId);
 
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
+    *(int *)(packet + 76) = color + (alpha << 24);
+    *(int *)(packet + 72) = color + (alpha << 24);
+    *(int *)(packet + 68) = color + (alpha << 24);
+    *(int *)(packet + 64) = color + (alpha << 24);
+    *(long long *)(packet + 112) = 0LL;
+    *(long long *)(packet + 120) = textureReg;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(long long *)(packet + 136) = ((long long)blendMode << 2) | 0x8000000040LL;
 
-    quat[3] = 0.0f;
-    quat[2] = F8411efa9_FUN_00283248(*(float *)(src + 0), *(float *)(src + 4));
-    quat[1] = -F8411efa9_FUN_00283248(F8411efa9_FUN_00282E20(src), *(float *)(src + 8));
-    quat[0] = f13;
+    rotation[3] = 0.0f;
+    rotation[2] = F8411efa9_FUN_00283248(*(float *)(direction + 0), *(float *)(direction + 4));
+    rotation[1] = -F8411efa9_FUN_00283248(F8411efa9_FUN_00282E20(direction), *(float *)(direction + 8));
+    rotation[0] = roll;
 
-    F8411efa9_FUN_00283410(m, quat);
-    F8411efa9_FUN_00282F20(off, src, 0.025f);
+    F8411efa9_FUN_00283410(matrix, rotation);
+    F8411efa9_FUN_00282F20(offset, direction, 0.025f);
 
-    m[12] = *(float *)(pos + 0) + off[0];
-    m[13] = *(float *)(pos + 4) + off[1];
-    m[14] = *(float *)(pos + 8) + off[2];
-    m[15] = 1.0f;
+    matrix[12] = *(float *)(pos + 0) + offset[0];
+    matrix[13] = *(float *)(pos + 4) + offset[1];
+    matrix[14] = *(float *)(pos + 8) + offset[2];
+    matrix[15] = 1.0f;
 
-    F8411efa9_FUN_00328D30(pkt, f12);
-    F8411efa9_FUN_00280B90(pkt, m, 0);
+    F8411efa9_FUN_00328D30(packet, size);
+    F8411efa9_FUN_00280B90(packet, matrix, 0);
 }
 
 /* func_00328F18 follows func_0032B3E0 below, after the helpers it declares. */
@@ -340,29 +346,30 @@ extern void func_00282CC0(void *, void *, void *);
 extern void func_00282D30(void *, void *, float);
 extern int func_00282948(void *);
 
-void func_00329328(void *obj) {
-    F328Particle *base = D_0022C9A0;
-    F328Particle *p;
-    F328Owner *o = *(F328Owner **)((char *)obj + 0x68);
+/* Updates the owner's particles: their color fades, they spin and drift, and each is freed when its time is up. */
+void func_00329328(void *owner) {
+    F328Particle *particles = gObjectParticles;
+    F328Particle *particle;
+    F328Owner *vars = *(F328Owner **)((char *)owner + 0x68);
     int i;
-    float scale;
-    float half = 0.5f;
+    float timeRatio;
+    float halfValue = 0.5f;
 
     for (i = 0; i < 300; i++) {
-        p = &base[i];
-        if (p->t.owner != obj)
+        particle = &particles[i];
+        if (particle->t.owner != owner)
             continue;
-        scale = func_00283CE0(p->t.f30);
-        scale /= func_00283CE0(p->t.f34);
-        p->t.f28 = func_00283CF0((float)p->t.f24 * scale);
-        p->t.f20 = func_00283D38(scale * half, 0, p->t.f1C);
-        p->t.f14 = func_00283B98(p->t.f14, p->t.f10);
-        p->t.f18 += func_002A7878(0.001f, 0.003f);
-        func_00282CC0(p, p, &p->t);
-        func_00282D30(&p->t, &p->t, 0.99f);
-        if (func_00282948(&p->t.f30)) {
-            p->t.owner = 0;
-            o->count--;
+        timeRatio = IntToFloat(particle->t.f30);
+        timeRatio /= IntToFloat(particle->t.f34);
+        particle->t.f28 = FloatToInt((float)particle->t.f24 * timeRatio);
+        particle->t.f20 = FastTweenColor(timeRatio * halfValue, 0, particle->t.f1C);
+        particle->t.f14 = FastAddRotations(particle->t.f14, particle->t.f10);
+        particle->t.f18 += RandomFloatRange(0.001f, 0.003f);
+        FastVecAdd(particle, particle, &particle->t);
+        FastVecScale(&particle->t, &particle->t, 0.99f);
+        if (FastFloatHelperD(&particle->t.f30)) {
+            particle->t.owner = 0;
+            vars->count--;
         }
     }
 }
@@ -374,41 +381,41 @@ void func_00329328(void *obj) {
  * position, then dispatches the packet. */
 void func_00329630(char *self)
 {
-    char pkt[144];
-    float m[16];
-    float quat[4];
-    long long r;
-    int colour;
+    char packet[144];
+    float matrix[16];
+    float rotation[4];
+    long long textureReg;
+    int color;
 
-    F8411efa9_FUN_00328CA8(pkt);
-    r = func_0027C878((char *)0x2E);
+    F8411efa9_FUN_00328CA8(packet);
+    textureReg = GetEffectTextureDescriptor((char *)0x2E);
 
-    *(long long *)(pkt + 0x78) = r;
-    *(long long *)(pkt + 0x80) = 280993940374112LL;
-    *(long long *)(pkt + 0x88) = ((long long)*(int *)(self + 0x3C) << 2) | 0x8000000040LL;
-    colour = *(int *)(self + 0x30) + (*(unsigned char *)(self + 0x38) << 24);
-    *(long long *)(pkt + 0x70) = 0LL;
-    *(int *)(pkt + 0x4C) = colour;
-    *(int *)(pkt + 0x48) = colour;
-    *(int *)(pkt + 0x44) = colour;
-    *(int *)(pkt + 0x40) = colour;
+    *(long long *)(packet + 0x78) = textureReg;
+    *(long long *)(packet + 0x80) = 280993940374112LL;
+    *(long long *)(packet + 0x88) = ((long long)*(int *)(self + 0x3C) << 2) | 0x8000000040LL;
+    color = *(int *)(self + 0x30) + (*(unsigned char *)(self + 0x38) << 24);
+    *(long long *)(packet + 0x70) = 0LL;
+    *(int *)(packet + 0x4C) = color;
+    *(int *)(packet + 0x48) = color;
+    *(int *)(packet + 0x44) = color;
+    *(int *)(packet + 0x40) = color;
 
-    quat[3] = 0.0f;
-    quat[2] = func_00283248(D_001B5200.x_140 - *(float *)(self + 0),
-                            D_001B5200.y_144 - *(float *)(self + 4));
-    quat[1] = -func_00283248(func_00282E80(self, &D_001B5200.x_140),
-                             D_001B5200.z_148 - *(float *)(self + 8));
-    quat[0] = *(float *)(self + 0x24);
+    rotation[3] = 0.0f;
+    rotation[2] = FastMatrixHelperA(gActiveCamera.x_140 - *(float *)(self + 0),
+                            gActiveCamera.y_144 - *(float *)(self + 4));
+    rotation[1] = -FastMatrixHelperA(vec_distance_xy(self, &gActiveCamera.x_140),
+                             gActiveCamera.z_148 - *(float *)(self + 8));
+    rotation[0] = *(float *)(self + 0x24);
 
-    func_00283410(m, quat);
+    euler_to_matrix(matrix, rotation);
 
-    m[12] = *(float *)(self + 0);
-    m[13] = *(float *)(self + 4);
-    m[14] = *(float *)(self + 8);
-    m[15] = 1.0f;
+    matrix[12] = *(float *)(self + 0);
+    matrix[13] = *(float *)(self + 4);
+    matrix[14] = *(float *)(self + 8);
+    matrix[15] = 1.0f;
 
-    F8411efa9_FUN_00328D30(pkt, *(float *)(self + 0x28));
-    func_00280B90(pkt, m, 0);
+    F8411efa9_FUN_00328D30(packet, *(float *)(self + 0x28));
+    draw_world_quad(packet, matrix, 0);
 }
 
 /* func_00329768 uses small data in 00329768-g8.c. */
@@ -416,24 +423,25 @@ void func_00329630(char *self)
 
 
 /* Per frame: scales the value one helper returns by the factor another helper returns, stores both scaled samples and a third sample into a three-float record, and hands the record to a setter with two selector results. */
-void func_00329E60(char *a0)
+/* Throws out 48 sparks from the object in random directions. */
+void func_00329E60(char *self)
 {
-    float v[3];
-    float a;
-    float b;
+    float velocity[3];
+    float angle;
+    float speed;
     int i;
-    int m;
-    int n;
+    int lifetime;
+    int sparkType;
 
     for (i = 47; i >= 0; i--) {
-        a = func_002A7940();
-        b = func_002A7878_1(0.0f, 0.050000004f);
-        v[0] = func_00283180(a) * b;
-        v[1] = func_00283198(a) * b;
-        v[2] = func_002A7878_1(0.050000004f, 1.0833334177732467651367e-01f);
-        m = func_002A7820(90, 120);
-        n = func_002A77E0(2);
-        func_002BFB38(a0 + 16, v, n, m);
+        angle = RandomAngle();
+        speed = func_002A7878_1(0.0f, 0.050000004f);
+        velocity[0] = FastSinOrCosA(angle) * speed;
+        velocity[1] = FastSinOrCosB(angle) * speed;
+        velocity[2] = func_002A7878_1(0.050000004f, 1.0833334177732467651367e-01f);
+        lifetime = RandomIntRange(90, 120);
+        sparkType = RandomIntBelow(2);
+        SpawnSparkParticle_002BFB38(self + 16, velocity, sparkType, lifetime);
     }
 }
 
@@ -449,82 +457,85 @@ extern int func_002FD828(float *, float *, float, float, float);
 extern void func_002FD1B8(int, int, int, float, float, float, float);
 extern int func_0026F800(void);
 
+/* Checks whether the player is under the falling object and, if so, hurts him or locks on to him. */
 void func_00329F40(char *self)
 {
-    unsigned char *target = D_001BAF98[0];
-    char *state = *(char **)(self + 0x68);
-    unsigned char *object;
-    unsigned char *obj_state;
-    char *probe;
-    float aux[4];
-    float result[4];
-    char *context;
-    int mode;
+    unsigned char *heroSlot = D_001BAF98[0];
+    char *vars = *(char **)(self + 0x68);
+    unsigned char *player;
+    unsigned char *playerVars;
+    char *playerVars2;
+    float auxVec[4];
+    float groundVec[4];
+    char *gameState;
+    int lockMode;
 
-    if (target == 0) {
-        if (*(int *)(state + 0x38) != 2)
+    if (heroSlot == 0) {
+        if (*(int *)(vars + 0x38) != 2)
             return;
     }
-    mode = *(int *)(state + 0x38);
-    object = target;
-    if (mode == 2)
-        object = *(unsigned char **)(state + 0x48);
-    if (*(short *)(*(char **)(object + 0x24) + 0x46) == 18) {
-        obj_state = *(unsigned char **)(object + 0x68);
-        if (obj_state != 0) {
-            if (*(short *)(obj_state + 0x16) == 0) {
-                *(int *)&result[0] = 0;
-                if (mode != 2)
-                    func_002FD828(result, aux, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
+    lockMode = *(int *)(vars + 0x38);
+    player = heroSlot;
+    if (lockMode == 2)
+        player = *(unsigned char **)(vars + 0x48);
+    if (*(short *)(*(char **)(player + 0x24) + 0x46) == 18) {
+        playerVars = *(unsigned char **)(player + 0x68);
+        if (playerVars != 0) {
+            if (*(short *)(playerVars + 0x16) == 0) {
+                *(int *)&groundVec[0] = 0;
+                if (lockMode != 2)
+                    SampleSurfaceHeightMap(groundVec, auxVec, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
                 else
-                    func_002FD828(result, aux, *(float *)(state + 0x20), *(float *)(state + 0x24), *(float *)(state + 0x28));
-                probe = *(char **)(object + 0x68);
-                if (*(float *)(self + 0x18) > result[0] && *(float *)(probe + 0xC) == 0.0f) {
-                    *(unsigned char **)(state + 0x48) = object;
-                    *(int *)(state + 0x38) = 2;
+                    SampleSurfaceHeightMap(groundVec, auxVec, *(float *)(vars + 0x20), *(float *)(vars + 0x24), *(float *)(vars + 0x28));
+                playerVars2 = *(char **)(player + 0x68);
+                if (*(float *)(self + 0x18) > groundVec[0] && *(float *)(playerVars2 + 0xC) == 0.0f) {
+                    *(unsigned char **)(vars + 0x48) = player;
+                    *(int *)(vars + 0x38) = 2;
                     return;
                 }
-                if (obj_state[0x14] == 0) {
-                    func_002FD1B8(D_001B22D0[0], D_001B22D8[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
-                    if (func_0026F800() == 0) {
-                        object[0xBC] += 1;
-                        if (object[0xBC] >= 25) {
-                            context = D_001A63A8;
-                            if (*(short *)(context + 0x72) == 3 && *(short *)(context + 0x6C) < 6000)
-                                func_002B6D28();
+                if (playerVars[0x14] == 0) {
+                    RippleDisturb(gSurfaceHeightTiles[0], D_001B22D8[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
+                    if (EmptyStubF800() == 0) {
+                        player[0xBC] += 1;
+                        if (player[0xBC] >= 25) {
+                            gameState = gMusicState;
+                            if (*(short *)(gameState + 0x72) == 3 && *(short *)(gameState + 0x6C) < 6000)
+                                ResumeMusicStream();
                         }
-                        if (object[0x21] != 255)
-                            func_002A8598(object[0x21], object[0xBC]);
+                        if (player[0x21] != 255)
+                            SetByteOnGroupMobys(player[0x21], player[0xBC]);
                     }
                 }
-                *(int *)(state + 0x44) = 0;
+                *(int *)(vars + 0x44) = 0;
             } else {
-                *(int *)(state + 0x44) = 1;
+                *(int *)(vars + 0x44) = 1;
             }
         } else {
-            func_0026FEB8(D_001B0238, *(short *)(object + 0xAA));
+            STUB_printf(D_001B0238, *(short *)(player + 0xAA));
         }
-        *(int *)(state + 0x38) = 1;
+        *(int *)(vars + 0x38) = 1;
     } else {
-        *(int *)(state + 0x38) = 0;
+        *(int *)(vars + 0x38) = 0;
     }
 }
 
+/* An empty function that does nothing. */
 void func_0032A130(void)
 {
 }
 
+/* Fills a table of 50 random direction vectors. */
 void func_0032A978(void)
 {
     int i;
-    char *row = (char *)D_L00_00252C40;
+    char *entry = (char *)D_L00_00252C40;
     for (i = 49; i >= 0; i--) {
-        float first = func_002A7878(0.01f, 7.0f);
-        float second = func_002A7940();
-        float third = func_002A7878(0.0f, 3.1415927f);
-        func_002AF000(row, first, second, third);
-        func_00282CC0(row, row, D_L00_00189F00);
-        row += 16;
+        float length = RandomFloatRange(0.01f, 7.0f);
+        float yaw = RandomAngle();
+        float pitch = RandomFloatRange(0.0f, 3.1415927f);
+        BuildSphericalOffset(entry, length, yaw, pitch);
+        FastVecAdd(entry, entry, D_L00_00189F00);
+        entry += 16;
     }
 }
 
@@ -540,125 +551,128 @@ void func_0032A978(void)
 
 /* func_0032B190 is defined in 0032B190-dbg.c (-g). */
 
-void func_0032B2F0(char *p)
+/* Resets a drawing packet to a flat white square with default settings. */
+void func_0032B2F0(char *packet)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(packet + 112) = 0LL;
+    *(int *)(packet + 80) = 0;
+    *(int *)(packet + 84) = 0;
+    *(float *)(packet + 88) = 1.0f;
+    *(int *)(packet + 92) = 0;
+    *(int *)(packet + 96) = 0;
+    *(float *)(packet + 100) = 1.0f;
+    *(float *)(packet + 104) = 1.0f;
+    *(float *)(packet + 108) = 1.0f;
+    *(float *)(packet + 8) = -1.0f;
+    *(float *)(packet + 24) = 1.0f;
+    *(float *)(packet + 40) = -1.0f;
+    *(float *)(packet + 56) = 1.0f;
+    *(float *)(packet + 4) = -1.0f;
+    *(float *)(packet + 36) = 1.0f;
+    *(float *)(packet + 52) = 1.0f;
+    *(int *)(packet + 0) = 0;
+    *(int *)(packet + 16) = 0;
+    *(int *)(packet + 32) = 0;
+    *(int *)(packet + 48) = 0;
+    *(float *)(packet + 12) = 1.0f;
+    *(float *)(packet + 28) = 1.0f;
+    *(float *)(packet + 44) = 1.0f;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(float *)(packet + 20) = -1.0f;
+    *(float *)(packet + 60) = 1.0f;
 }
 
-void func_0032B378(char *p, float scale)
+/* Scales the four corner vectors of a drawing packet. */
+void func_0032B378(char *packet, float scale)
 {
-    F2c74c194_FUN_00282D30(p, p, scale);
-    F2c74c194_FUN_00282D30(p + 16, p + 16, scale);
-    F2c74c194_FUN_00282D30(p + 32, p + 32, scale);
-    F2c74c194_FUN_00282D30(p + 48, p + 48, scale);
+    F2c74c194_FUN_00282D30(packet, packet, scale);
+    F2c74c194_FUN_00282D30(packet + 16, packet + 16, scale);
+    F2c74c194_FUN_00282D30(packet + 32, packet + 32, scale);
+    F2c74c194_FUN_00282D30(packet + 48, packet + 48, scale);
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B5200 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void func_0032B3E0(char *pos, int a1, int a2, char *a3, int t0,
-                   float f12, float f13, float f14)
+void func_0032B3E0(char *pos, int color, int alpha, char *textureId, int blendMode,
+                   float size, float roll, float cameraShift)
 {
-    char pkt[144];
-    float m[16];
-    float quat[4];
-    float off[4];
-    long long r;
+    char packet[144];
+    float matrix[16];
+    float rotation[4];
+    float offset[4];
+    long long textureReg;
 
-    func_0032B2F0(pkt);
-    r = func_0027C878(a3);
+    ResetDrawPacketCopy(packet);
+    textureReg = GetEffectTextureDescriptor(textureId);
 
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
+    *(long long *)(packet + 136) = ((long long)blendMode << 2) | 0x8000000040LL;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(int *)(packet + 76) = color + (alpha << 24);
+    *(int *)(packet + 72) = color + (alpha << 24);
+    *(int *)(packet + 68) = color + (alpha << 24);
+    *(int *)(packet + 64) = color + (alpha << 24);
+    *(long long *)(packet + 112) = 0LL;
+    *(long long *)(packet + 120) = textureReg;
 
-    quat[3] = 0.0f;
-    quat[2] = func_00283248(D_001B5200.x_140 - *(float *)(pos + 0),
-                            D_001B5200.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, &D_001B5200.x_140),
-                             D_001B5200.z_148 - *(float *)(pos + 8));
-    quat[0] = f13;
+    rotation[3] = 0.0f;
+    rotation[2] = FastMatrixHelperA(gActiveCamera.x_140 - *(float *)(pos + 0),
+                            gActiveCamera.y_144 - *(float *)(pos + 4));
+    rotation[1] = -FastMatrixHelperA(vec_distance_xy(pos, &gActiveCamera.x_140),
+                             gActiveCamera.z_148 - *(float *)(pos + 8));
+    rotation[0] = roll;
 
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_001B5200.x_140, pos);
-    func_00282F20(off, off, f14);
+    euler_to_matrix(matrix, rotation);
+    FastVecSub(offset, &gActiveCamera.x_140, pos);
+    vec_scale_to_length(offset, offset, cameraShift);
 
-    m[12] = *(float *)(pos + 0) + off[0];
-    m[13] = *(float *)(pos + 4) + off[1];
-    m[14] = *(float *)(pos + 8) + off[2];
-    m[15] = 1.0f;
+    matrix[12] = *(float *)(pos + 0) + offset[0];
+    matrix[13] = *(float *)(pos + 4) + offset[1];
+    matrix[14] = *(float *)(pos + 8) + offset[2];
+    matrix[15] = 1.0f;
 
-    func_0032B378(pkt, f12);
-    func_00280B90(pkt, m, 0);
+    ScaleDrawPacketCornersCopy(packet, size);
+    draw_world_quad(packet, matrix, 0);
 }
 
-void func_00328F18(char *pos, int a1, int a2, char *a3, int t0,
-                   float f12, float f13, float f14)
+/* Draws a sprite at a position, nudged toward the camera, with a given color, brightness, size and tilt. */
+void func_00328F18(char *pos, int color, int alpha, char *textureId, int blendMode,
+                   float size, float roll, float cameraShift)
 {
-    char pkt[144];
-    float m[16];
-    float quat[4];
-    float off[4];
-    long long r;
+    char packet[144];
+    float matrix[16];
+    float rotation[4];
+    float offset[4];
+    long long textureReg;
 
-    func_00328CA8(pkt);
-    r = func_0027C878(a3);
+    ResetDrawPacket(packet);
+    textureReg = GetEffectTextureDescriptor(textureId);
 
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
+    *(long long *)(packet + 136) = ((long long)blendMode << 2) | 0x8000000040LL;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(int *)(packet + 76) = color + (alpha << 24);
+    *(int *)(packet + 72) = color + (alpha << 24);
+    *(int *)(packet + 68) = color + (alpha << 24);
+    *(int *)(packet + 64) = color + (alpha << 24);
+    *(long long *)(packet + 112) = 0LL;
+    *(long long *)(packet + 120) = textureReg;
 
-    quat[3] = 0.0f;
-    quat[2] = func_00283248(D_001B5200.x_140 - *(float *)(pos + 0),
-                            D_001B5200.y_144 - *(float *)(pos + 4));
-    quat[1] = -func_00283248(func_00282E80(pos, &D_001B5200.x_140),
-                             D_001B5200.z_148 - *(float *)(pos + 8));
-    quat[0] = f13;
+    rotation[3] = 0.0f;
+    rotation[2] = FastMatrixHelperA(gActiveCamera.x_140 - *(float *)(pos + 0),
+                            gActiveCamera.y_144 - *(float *)(pos + 4));
+    rotation[1] = -FastMatrixHelperA(vec_distance_xy(pos, &gActiveCamera.x_140),
+                             gActiveCamera.z_148 - *(float *)(pos + 8));
+    rotation[0] = roll;
 
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_001B5200.x_140, pos);
-    func_00282F20(off, off, f14);
+    euler_to_matrix(matrix, rotation);
+    FastVecSub(offset, &gActiveCamera.x_140, pos);
+    vec_scale_to_length(offset, offset, cameraShift);
 
-    m[12] = *(float *)(pos + 0) + off[0];
-    m[13] = *(float *)(pos + 4) + off[1];
-    m[14] = *(float *)(pos + 8) + off[2];
-    m[15] = 1.0f;
+    matrix[12] = *(float *)(pos + 0) + offset[0];
+    matrix[13] = *(float *)(pos + 4) + offset[1];
+    matrix[14] = *(float *)(pos + 8) + offset[2];
+    matrix[15] = 1.0f;
 
-    func_00328D30(pkt, f12);
-    func_00280B90(pkt, m, 0);
+    ScaleDrawPacketCorners(packet, size);
+    draw_world_quad(packet, matrix, 0);
 }
 
 /* func_0032B598 is in 0032B598-qcopy.c. */
@@ -668,12 +682,13 @@ void func_00328F18(char *pos, int a1, int a2, char *a3, int t0,
 
 /* func_0032BBF0 is defined in 00316BC8-qcopy.c. */
 
-void func_0032BDC8(Vec16_Fc936841d *object, int index)
+/* Adds one more point to a line by continuing it from the previous two points. */
+void func_0032BDC8(Vec16_Fc936841d *points, int index)
 {
-    char local[16];
+    char step[16];
 
-    Fc936841d_FUN_00282CF0(local, (char *)&object[index - 2], (char *)&object[index - 3]);
-    Fc936841d_FUN_00282CC0((char *)&object[index - 1], (char *)&object[index - 2], local);
+    Fc936841d_FUN_00282CF0(step, (char *)&points[index - 2], (char *)&points[index - 3]);
+    Fc936841d_FUN_00282CC0((char *)&points[index - 1], (char *)&points[index - 2], step);
 }
 
 /* func_0032BE30 is defined in 0032BE30-beam.c. */
@@ -691,7 +706,7 @@ s32 func_0032D700(void *object) {
     s32 result = -1;
     s32 index;
     for (index = 0; index < 30; index++) {
-        if (D_L00_002533B0[index].field14 == object) {
+        if (gHealthDrainSlots_L00[index].field14 == object) {
             result = index;
             break;
         }

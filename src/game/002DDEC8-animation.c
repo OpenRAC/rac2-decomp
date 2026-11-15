@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef struct {
@@ -32,6 +33,7 @@ extern int func_002B6D28(void);
 extern void func_002A7470(AnimationMoby *, int, int, int);
 
 /* Corresponds to RAC1 update_streamed_moby_animation. */
+/* Updates the streamed animation of a talking character: waits for the animation data to load, then plays idle and talking animations in turn. */
 int func_002DE0D0(AnimationStream *stream)
 {
     AnimationMoby *moby;
@@ -48,13 +50,13 @@ int func_002DE0D0(AnimationStream *stream)
     case 1:
         if (D_001A63AC != 0) break;
         D_001F291B = 0;
-        func_0029D4D0(stream->buffer + stream->offset, stream->buffer);
+        fast_decompress(stream->buffer + stream->offset, stream->buffer);
         resource = &D_001CDB80[D_001CEC85];
         header = stream->buffer;
         for (i = 0; i < 3; i++) {
             table = stream->buffer + *(int *)(header + (i << 3));
             (*resource)->tables[i + 1] = table;
-            func_00293260(*resource, i + 1);
+            relocate_asset_entry_pointers(*resource, i + 1);
         }
         stream->state = 2;
         if (D_001A7A0A[0] == 0) stream->moby->state = 0;
@@ -69,23 +71,23 @@ int func_002DE0D0(AnimationStream *stream)
             moby->counter++;
             if (moby->counter > 120) moby->counter = 120;
             if (moby->counter < 120) return 0;
-            dialogue = &D_001A63A8;
+            dialogue = &gMusicState;
             if (dialogue->phase != 3) return 0;
             if (dialogue->count >= 6000) return 0;
             moby->counter = 0;
             moby->state++;
-            func_002A7470(moby, animation + 1, 0, 24);
+            StartAnimationBlended(moby, animation + 1, 0, 24);
             break;
         case 1: case 3: case 5:
             if (moby->counter == 0 && moby->primary == moby->secondary) {
-                func_002B6D28();
+                ResumeMusicStream();
                 moby->counter = 1;
             }
             if (moby->flags & 2) {
                 if (moby->state == 1) moby->state = moby->state + 1;
                 else moby->state = 6;
                 moby->counter = 0;
-                func_002A7470(moby, 0, 0, 24);
+                StartAnimationBlended(moby, 0, 0, 24);
             }
             break;
         case 6:

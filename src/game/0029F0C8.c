@@ -80,6 +80,7 @@ extern u8 *D_001B1B5C __attribute__((sda));
 extern void func_00282A60(void *, int, int);
 extern void func_0029F390(u8 *);
 
+/* Sets up a freshly allocated moby slot for a class: clears it, sets default colours and flags, and picks its update function and model data. */
 void func_0029F0C8(void *object, int classId)
 {
     InitialMoby *m = object;
@@ -87,7 +88,7 @@ void func_0029F0C8(void *object, int classId)
     int index;
     InitialClass *resource;
 
-    func_00282A60(m, 0, 0x100);
+    ClearMemory(m, 0, 0x100);
     slot = D_001CE4E0[classId];
     m->unknown23 = 0x80;
     m->classSlot = slot;
@@ -142,7 +143,7 @@ void func_0029F0C8(void *object, int classId)
         m->unknown63 = 0x18;
     if (m->pClass->sequences[0] == 0)
         return;
-    func_0029F390((u8 *)m);
+    update_moby_animation_state((u8 *)m);
     if (m->pClass->sequences[0]->frameCount >= 2)
         m->flags &= 0xFFFD;
     {

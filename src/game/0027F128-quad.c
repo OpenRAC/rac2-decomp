@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned long u64;
 typedef int TI128 __attribute__((mode(TI)));
@@ -26,6 +27,7 @@ extern void func_0027C768(int, float *, float *);
 /* Draws a camera-facing quad, then redraws it with texture coordinates from its projected
    corners. Assigning through value leaves one store after the join, its address computed
    before the branch: that is retail's copy of the y cursor. */
+/* Draws a glowing sprite that always faces the camera, in two passes. */
 void func_002820D0(UiVector *position, int alpha, float **uv,
                    float size, float inset, float distance)
 {
@@ -34,19 +36,19 @@ void func_002820D0(UiVector *position, int alpha, float **uv,
     int i;
     unsigned int color;
     matrix[3].bits = position->bits;
-    func_00282CF0(&matrix[0], D_001B5340, &matrix[3]);
-    func_00282F20(&matrix[0], &matrix[0], 1.0f);
-    func_00282DD8(&matrix[1], &matrix[0], D_0018A0E0);
-    func_00282F20(&matrix[1], &matrix[1], 1.0f);
-    func_00282DD8(&matrix[2], &matrix[1], &matrix[0]);
-    func_00282D30(&offset, &matrix[0], distance);
-    func_00282CC0(&matrix[3], &matrix[3], &offset);
+    FastVecSub(&matrix[0], gCameraState_001B5340, &matrix[3]);
+    vec_scale_to_length(&matrix[0], &matrix[0], 1.0f);
+    FastVecCross(&matrix[1], &matrix[0], D_0018A0E0);
+    vec_scale_to_length(&matrix[1], &matrix[1], 1.0f);
+    FastVecCross(&matrix[2], &matrix[1], &matrix[0]);
+    FastVecScale(&offset, &matrix[0], distance);
+    FastVecAdd(&matrix[3], &matrix[3], &offset);
     for (i = 3; i >= 0; i--) {
         int index = 3 - i;
-        func_00282D30(&packet.vertices[index], D_001A9FD0 + index, size);
-        func_002830C0(&packet.vertices[index], &packet.vertices[index], matrix);
+        FastVecScale(&packet.vertices[index], D_001A9FD0 + index, size);
+        transform_vector(&packet.vertices[index], &packet.vertices[index], matrix);
     }
-    func_00281DE8((QuadPacket *)&packet, 59, 5, 128);
+    InitQuadPacketState((QuadPacket *)&packet, 59, 5, 128);
     color = (alpha << 24) | 0x808080;
     packet.uv[0][0] = 0.0f;
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = color;
@@ -57,9 +59,9 @@ void func_002820D0(UiVector *position, int alpha, float **uv,
     packet.uv[2][1] = 0.0f;
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
-    func_00280B90(&packet, 0, 0);
-    func_00281DE8((QuadPacket *)&packet, -1, 6, 128);
-    func_00282D30(&offset, &matrix[0], distance + 0.01f);
+    draw_world_quad(&packet, 0, 0);
+    InitQuadPacketState((QuadPacket *)&packet, -1, 6, 128);
+    FastVecScale(&offset, &matrix[0], distance + 0.01f);
     if (uv != 0) {
         for (i = 3; i >= 0; i--) {
             int index = 3 - i;
@@ -76,7 +78,7 @@ void func_002820D0(UiVector *position, int alpha, float **uv,
         }
     } else {
         for (i = 0; i < 4; i++) {
-            func_0027C768((int)&packet.vertices[i], &packet.uv[i][0], &packet.uv[i][1]);
+            ProjectWorldToScreen((int)&packet.vertices[i], &packet.uv[i][0], &packet.uv[i][1]);
             if (i >> 1)
                 packet.uv[i][0] -= inset;
             else
@@ -95,5 +97,5 @@ void func_002820D0(UiVector *position, int alpha, float **uv,
                 packet.uv[i][1] = 0.0f;
         }
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
 }

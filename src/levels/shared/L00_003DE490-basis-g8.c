@@ -29,8 +29,8 @@ void func_L00_003DE490(char *object)
 
     qcopy(vectors[0], object + 0xC0);
     qcopy(vectors[3], object + 0xD0);
-    func_00282D30(vectors[1], vectors[0], -1.0f);
-    func_00282D30(vectors[2], vectors[3], -1.0f);
+    FastVecScale(vectors[1], vectors[0], -1.0f);
+    FastVecScale(vectors[2], vectors[3], -1.0f);
     qcopy(base + 0x40, vectors[0]);
     qcopy(base + 0x50, vectors[1]);
     qcopy(base + 0x60, vectors[2]);
@@ -39,12 +39,12 @@ void func_L00_003DE490(char *object)
     out = base;
     for (i = 0; i < 8; i++) {
         if (i < 4)
-            func_00282CC0(out, vectors[i >> 1], vectors[2 + (i & 1)]);
-        func_00282F20(out, out, D_L00_001B044C);
-        func_00282CC0(out, out, pos);
-        func_00282F20(temp, D_L00_001B2B30, -D_L00_001B0448);
-        func_00282CC0(out, out, temp);
+            FastVecAdd(out, vectors[i >> 1], vectors[2 + (i & 1)]);
+        vec_scale_to_length(out, out, D_L00_001B044C);
+        FastVecAdd(out, out, pos);
+        vec_scale_to_length(temp, D_L00_001B2B30, -D_L00_001B0448);
+        FastVecAdd(out, out, temp);
         out += 16;
-        func_00282CC0(sum, temp, pos);
+        FastVecAdd(sum, temp, pos);
     }
 }

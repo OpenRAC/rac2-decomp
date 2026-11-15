@@ -12,25 +12,26 @@ extern float func_00283198(float);
 extern void func_002A9288(char *, float);
 extern void func_L20_0044AA88(char *);
 
-void func_L20_0044A838(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    u16 n = *(u16 *)(arg0 + 0x96);
-    float r;
+/* Ends each turret frame: counts the frame, bobs the turret up and down, and turns its aim. */
+void func_L20_0044A838(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    u16 frame = *(u16 *)(moby + 0x96);
+    float phase;
 
-    *(u16 *)(arg0 + 0x96) = n + 1;
-    if (*(u8 *)(arg0 + 0x31)) {
-        qcopy((arg0 + 0x10), (state + 0x180));
-        r = D_L20_001B2414;
-        r = func_00283B98(*(float *)(state + 0x1A0), r * 0.000290888245f);
-        *(float *)(state + 0x1A0) = r;
-        r = func_00283198(r);
+    *(u16 *)(moby + 0x96) = frame + 1;
+    if (*(u8 *)(moby + 0x31)) {
+        qcopy((moby + 0x10), (state + 0x180));
+        phase = D_L20_001B2414;
+        phase = FastAddRotations(*(float *)(state + 0x1A0), phase * 0.000290888245f);
+        *(float *)(state + 0x1A0) = phase;
+        phase = FastSinOrCosB(phase);
         {
             float amount = D_L20_001B241C;
-            *(float *)(arg0 + 0x18) = *(float *)(arg0 + 0x18) + D_L20_001B2410 * r;
-            func_002A9288(arg0, amount);
+            *(float *)(moby + 0x18) = *(float *)(moby + 0x18) + D_L20_001B2410 * phase;
+            QueueGroundShadow(moby, amount);
         }
     }
-    if (((*(u16 *)(arg0 + 0x34)) ^ 1) & 1) {
-        func_L20_0044AA88(arg0);
+    if (((*(u16 *)(moby + 0x34)) ^ 1) & 1) {
+        TurnTurretTowardTarget(moby);
     }
 }

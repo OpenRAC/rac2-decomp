@@ -128,7 +128,7 @@ extern void func_002833F0(void *, void *);
 extern void func_002A0F48(void *);
 extern char D_L00_001B8FF0[];
 
-void func_L00_003B69D8(NODE *a0)
+void func_L00_003B69D8(NODE *object)
 {
     void **slots;
     void **p;
@@ -136,26 +136,27 @@ void func_L00_003B69D8(NODE *a0)
     char *v;
     int i;
 
-    slots = a0->f68;
-    func_L00_003B6B70();
+    slots = object->f68;
+    UpdatePairedActorMovement();
     v = (char *)slots;
-    func_L00_003B6F88(a0);
+    ResolvePairedActorCollisions(object);
     q = v + 0x10;
     p = slots;
     for (i = 1; i >= 0; i--) {
-        func_00283098((char *)*p + 0x10, q, D_L00_001B8FF0);
+        matrix_mul_vec3((char *)*p + 0x10, q, D_L00_001B8FF0);
         q += 0x10;
-        func_00282CC0((char *)*p + 0x10, (char *)*p + 0x10, D_L00_001B8FF0 - 0x230);
+        FastVecAdd((char *)*p + 0x10, (char *)*p + 0x10, D_L00_001B8FF0 - 0x230);
         v = (char *)*p + 0xF0;
-        func_002833F0((char *)*p + 0xC0, v);
+        euler_rotation_basis((char *)*p + 0xC0, v);
         func_002A0F48(*p);
         p++;
     }
 }
 
-void func_L00_003B6A90(NODE *a0)
+/* Removes the two ships and every other object of the same kind when the minigame ends. */
+void func_L00_003B6A90(NODE *object)
 {
-    void **b = (void **)a0->f68;
+    void **b = (void **)object->f68;
     OBJ *p;
     short key;
 
@@ -185,20 +186,21 @@ void func_L00_003B6A90(NODE *a0)
 
 
 
-void func_L00_003B7190(float *a0, float *a1)
+/* Wraps two coordinates around to the opposite side when they go past the edge of the play area. */
+void func_L00_003B7190(float *valueA, float *valueB)
 {
-    if (func_2EE048(*a0) > ref_L00_003B7190_00) {
-        if (*a0 < -ref_L00_003B7190_00)
-            *a0 = ref_L00_003B7190_00;
-        else if (*a0 > ref_L00_003B7190_00)
-            *a0 = -ref_L00_003B7190_00;
+    if (func_2EE048(*valueA) > ref_L00_003B7190_00) {
+        if (*valueA < -ref_L00_003B7190_00)
+            *valueA = ref_L00_003B7190_00;
+        else if (*valueA > ref_L00_003B7190_00)
+            *valueA = -ref_L00_003B7190_00;
     }
 
-    if (func_2EE048(*a1) > ref_L00_003B7190_01) {
-        if (*a1 < -ref_L00_003B7190_01)
-            *a1 = ref_L00_003B7190_01;
-        else if (*a1 > ref_L00_003B7190_01)
-            *a1 = -ref_L00_003B7190_01;
+    if (func_2EE048(*valueB) > ref_L00_003B7190_01) {
+        if (*valueB < -ref_L00_003B7190_01)
+            *valueB = ref_L00_003B7190_01;
+        else if (*valueB > ref_L00_003B7190_01)
+            *valueB = -ref_L00_003B7190_01;
     }
 }
 
@@ -207,6 +209,7 @@ void func_L00_003B7190(float *a0, float *a1)
 
 
 /* shared native body of family 32969de2c02196ef */
+/* Calls the update function of every other live object of the same kind as the main object. */
 void func_L00_003B75C8(void *object)
 {
     OBJ *p;
@@ -230,18 +233,19 @@ void func_L00_003B75C8(void *object)
 
 /* func_L00_003B79A0 is defined in L00_003B3158-collect-g8.c. */
 
-void func_L00_003B8158(NODE *a0)
+/* Updates the helper object by testing its position, with an extra offset when one is set. */
+void func_L00_003B8158(NODE *object)
 {
-    NODE *o = a0->f68;
+    NODE *vars = object->f68;
 
-    if (o->f24 == 0)
+    if (vars->f24 == 0)
         return;
-    if (o->f2C == 0) {
-        func_37CB80(o, (char *)o + 0x10, 1.0f, 0);
+    if (vars->f2C == 0) {
+        func_37CB80(vars, (char *)vars + 0x10, 1.0f, 0);
     } else {
         V2 v = D_L00_001AFBC8;
 
-        func_37CB80(o, (char *)o + 0x10, 1.0f, &v);
+        func_37CB80(vars, (char *)vars + 0x10, 1.0f, &v);
     }
 }
 
@@ -265,27 +269,27 @@ Moby *func_L00_003B8E58(void *origin, void *direction, Moby *preferred,
     TargetVars *fallbackVars;
     int j;
 
-    current = D_00189E20.target;
+    current = gHeroState.target;
     if (current && current->state != 0xFE && current->state != 0xFD) {
-        info = func_002AB1F0(current);
+        info = GetMobyPrivateValue0(current);
         if (info && *info > 0.0f)
-            return D_00189E20.target;
+            return gHeroState.target;
     }
 
-    func_002AF580(origin, direction, &count, candidates, 20, 0, 0, 0,
+    SelectBestTargetInCone(origin, direction, &count, candidates, 20, 0, 0, 0,
                   angle0, angle1, range, angle2, angle3);
 
     /* The preferred moby first. */
-    if (D_00189E20.f340 && !D_00189E20.f34E && (D_00138320[0] & D_00189E20.buttonMask)
+    if (gHeroState.f340 && !gHeroState.f34E && (D_00138320[0] & gHeroState.buttonMask)
         && preferred && preferred->state != 0xFE && preferred->state != 0xFD) {
         for (i = 0; i < count; ++i) {
             candidate = candidates[i];
             if (candidate && candidate->state != 0xFE && candidate->state != 0xFD
-                && candidate == preferred && candidate->oClass == 0xEE1) {
+                && candidate == preferred && candidate->oClass == 0xEE1 /* Receiver Bot */) {
                 vars = candidate->vars;
                 if ((vars->flags3B1 & 0x80) && vars->f20 > 0.0f) {
                     if (vars->maxDistance == 0.0f
-                        || func_00282E80(origin, candidate->position) < vars->maxDistance)
+                        || vec_distance_xy(origin, candidate->position) < vars->maxDistance)
                         return candidate;
                 }
             }
@@ -296,11 +300,11 @@ Moby *func_L00_003B8E58(void *origin, void *direction, Moby *preferred,
     for (j = 0; j < count; ++j) {
         fallback = candidates[j];
         if (fallback && fallback->state != 0xFE && fallback->state != 0xFD
-            && fallback->oClass == 0xEE1) {
+            && fallback->oClass == 0xEE1 /* Receiver Bot */) {
             fallbackVars = fallback->vars;
             if ((fallbackVars->flags3B1 & 0x80) && fallbackVars->f20 > 0.0f) {
                 if (fallbackVars->maxDistance == 0.0f
-                    || func_00282E80(origin, fallback->position) < fallbackVars->maxDistance)
+                    || vec_distance_xy(origin, fallback->position) < fallbackVars->maxDistance)
                     return fallback;
             }
         }

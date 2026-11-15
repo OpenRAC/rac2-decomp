@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef struct Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner {
@@ -25,14 +26,15 @@ extern int func_2EDD48(void *);
 extern void func_31A658(void *, int, int);
 extern void func_L00_003F9570(void);
 
+/* Update step for an effect object: it keeps ticking a timer, registers its draw routine, and finishes the object when the timer runs out. */
 void func_L00_003F94F8(char *self)
 {
-    char *s0 = *(char **)(self + 0x68);
+    char *vars = *(char **)(self + 0x68);
 
     if (*(unsigned char *)(self + 0x20) == 1) {
-        func_31D8A0(s0, 1.0f, *(float *)(s0 + 4));
-        func_2E6CF0((void *)func_L00_003F9570, self);
-        if (func_2EDD48(s0 + 8) != 0) {
+        func_31D8A0(vars, 1.0f, *(float *)(vars + 4));
+        func_2E6CF0((void *)EmitColoredParticleBurst, self);
+        if (func_2EDD48(vars + 8) != 0) {
             func_31A658(self, 0, -1);
         }
     }
@@ -45,6 +47,7 @@ void func_L00_003F94F8(char *self)
 
 
 
+/* Does nothing (an empty handler). */
 void func_L00_003FC100(void)
 {
 }
@@ -68,6 +71,7 @@ extern void func_002C16C0(float *, float *, int, int, unsigned int, int,
    build a direction from a random step and a random magnitude, jitter the point by a random
    small amount on each axis and hand the result to the spawn helper with 210000.0f, 500.0f,
    1.0f, 0.0f and 0.0f; the original game role is unknown. */
+/* Sprays fifteen small sparks outward from a point. */
 void func_L00_003FC820(float *pos)
 {
     float v[4];
@@ -81,22 +85,22 @@ void func_L00_003FC820(float *pos)
     int id;
     int i;
 
-    func_00282CF0((char *)v, D_L00_001B8DC0, (char *)pos);
-    ang = func_00283248(v[0], v[1]);
+    FastVecSub((char *)v, gCameraPosition_L00, (char *)pos);
+    ang = FastMatrixHelperA(v[0], v[1]);
 
     for (i = 14; i >= 0; i--) {
-        scale = func_002A7878(0.5f, 1.0f);
-        id = func_00283CF0(func_002A78D8(1.0f, 2.0f));
-        func_002A7878(0.05f, 0.2f);
+        scale = RandomFloatRange(0.5f, 1.0f);
+        id = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
+        RandomFloatRange(0.05f, 0.2f);
         speed = 210000.0f;
-        mag = func_002A7878(0.0f, 1.396263599395752f);
-        angle = func_00283B98(ang, func_002A78D8(0.0f, 1.396263599395752f));
-        func_002AF000(dir, scale * 0.01666666753590107f, angle, mag);
-        out[0] = pos[0] + func_002A78D8(0.0f, 0.1f);
-        out[1] = pos[1] + func_002A78D8(0.0f, 0.1f);
-        out[2] = pos[2] + func_002A78D8(0.0f, 0.1f);
-        func_002C16C0(out, dir, 30, 127, 0x007F7F7F, id,
-                      func_002A7878(0.05f, 0.2f) * speed, 500.0f, 1.0f, 0.0f, 0.0f);
+        mag = RandomFloatRange(0.0f, 1.396263599395752f);
+        angle = FastAddRotations(ang, RandomSignedFloatRange(0.0f, 1.396263599395752f));
+        BuildSphericalOffset(dir, scale * 0.01666666753590107f, angle, mag);
+        out[0] = pos[0] + RandomSignedFloatRange(0.0f, 0.1f);
+        out[1] = pos[1] + RandomSignedFloatRange(0.0f, 0.1f);
+        out[2] = pos[2] + RandomSignedFloatRange(0.0f, 0.1f);
+        SpawnBurstParticle_002C16C0(out, dir, 30, 127, 0x007F7F7F, id,
+                      RandomFloatRange(0.05f, 0.2f) * speed, 500.0f, 1.0f, 0.0f, 0.0f);
     }
 }
 
@@ -108,12 +112,13 @@ extern void func_310440(void *);
 extern void func_2E6EF8(void *, void *);
 extern void func_L00_003FD700(void);
 
+/* Update step: when the timer runs out the object finishes, otherwise it registers its draw routine. */
 void func_L00_003FD6B0(char *self)
 {
     if (func_2EDD48(*(void **)(self + 0x68)) != 0) {
         func_310440(self);
     } else {
-        func_2E6EF8((void *)func_L00_003FD700, self);
+        func_2E6EF8((void *)DrawSparkTrailRibbonWide, self);
     }
 }
 
@@ -155,6 +160,7 @@ extern unsigned char *D_L00_001B2514 __attribute__((sda));
    +0x96 counts up. The state-2 test is written as "no trigger holds": that is retail's block
    order (clearing loop first, setting loop last), which also keeps the two `sb` of the state from
    being cross-jumped into one. */
+/* Turns a group of linked records on and off depending on whether one of two triggers is active. */
 void func_L00_003FDB20(unsigned char *self)
 {
     unsigned char *priv = *(unsigned char **)(self + 0x68);
@@ -166,22 +172,22 @@ void func_L00_003FDB20(unsigned char *self)
     switch (self[0x20]) {
     case 0:
         if (*(int *)(priv + 0x38) == -1 && *(int *)(priv + 0x3C) == -1) {
-            func_0029F338(self);
+            MarkMobySpawned(self);
             return;
         }
         self[0x30] = 0xFF;
         self[0x20] = 1;
         break;
     case 1:
-        if ((*(int *)(priv + 0x38) != -1 && func_002ACBC8(D_L00_001B8DC0, *(int *)(priv + 0x38))) ||
-            (*(int *)(priv + 0x3C) != -1 && func_L00_00329520(D_L00_001B8DC0, *(int *)(priv + 0x3C)))) {
+        if ((*(int *)(priv + 0x38) != -1 && IsPointInCuboid(gCameraPosition_L00, *(int *)(priv + 0x38))) ||
+            (*(int *)(priv + 0x3C) != -1 && IsPointInsideRegion(gCameraPosition_L00, *(int *)(priv + 0x3C)))) {
             MARK_LISTS(|= 4)
             self[0x20] = 2;
         }
         break;
     case 2:
-        if ((*(int *)(priv + 0x38) == -1 || func_002ACBC8(D_L00_001B8DC0, *(int *)(priv + 0x38)) == 0) &&
-            (*(int *)(priv + 0x3C) == -1 || func_L00_00329520(D_L00_001B8DC0, *(int *)(priv + 0x3C)) == 0)) {
+        if ((*(int *)(priv + 0x38) == -1 || IsPointInCuboid(gCameraPosition_L00, *(int *)(priv + 0x38)) == 0) &&
+            (*(int *)(priv + 0x3C) == -1 || IsPointInsideRegion(gCameraPosition_L00, *(int *)(priv + 0x3C)) == 0)) {
             MARK_LISTS(&= 0xFB)
             self[0x20] = 1;
         } else {
@@ -195,14 +201,15 @@ void func_L00_003FDB20(unsigned char *self)
 
 extern int func_L00_003FED60(int, int, int);
 
-int func_L00_003FE2D0(int a0, int a1, int a2)
+/* Spawns a piece of debris and remembers which object launched it. */
+int func_L00_003FE2D0(int owner, int position, int velocity)
 {
-    int r = func_L00_003FED60(a1, a2, *(short *)(a0 + 0xAA) == 0xE9E);
+    int debris = SpawnBouncerDebrisObject(position, velocity, *(short *)(owner + 0xAA) == 0xE9E /* Heavy Bouncer */);
 
-    if (r != 0) {
-        *(int *)(r + 0xB8) = a0;
+    if (debris != 0) {
+        *(int *)(debris + 0xB8) = owner;
     }
-    return r;
+    return debris;
 }
 
 extern float func_002A7878(float, float);
@@ -219,41 +226,43 @@ extern char ref_L00_003FE310_00[];
    fills the new record's short and byte fields; the level's own data address is then
    handed to the vector routine with the third argument and a scale of 1.5, and to the
    level-object starter with the second argument. */
-void func_L00_003FE310(void *a0, void *a1, void *a2)
+/* Throws out twenty glowing sparks from a point as a muzzle burst. */
+void func_L00_003FE310(void *shooter, void *position, void *direction)
 {
     char local[16];
-    float f;
+    float radius;
     int i;
-    unsigned int v;
-    unsigned int w;
-    unsigned int x;
-    char *r;
+    unsigned int shade;
+    unsigned int shadeMid;
+    unsigned int shadeHigh;
+    char *particle;
 
     for (i = 19; i >= 0; i--) {
         func_002A77E0_3(2);
         func_002A77E0_3(2);
-        f = func_002A7878(70000.0f, 150000.0f);
-        v = func_002A7820(10, 127);
-        w = (v << 8) | 0x7f000000U;
-        x = (v << 16) | w;
-        v = x | v;
-        func_002A7A00(local, 1.6666668670950457453728e-05f,
+        radius = RandomFloatRange(70000.0f, 150000.0f);
+        shade = RandomIntRange(10, 127);
+        shadeMid = (shade << 8) | 0x7f000000U;
+        shadeHigh = (shade << 16) | shadeMid;
+        shade = shadeHigh | shade;
+        RandomDirectionVector(local, 1.6666668670950457453728e-05f,
                 6.6666672937572002410889e-03f);
-        r = func_002BDCE8(0.3f, 1.0f, 1.01f, f, a1, 0, local, v, 1);
-        if (r != 0) {
-            char *q = r + 32;
+        particle = SpawnSpinningSparkParticle(0.3f, 1.0f, 1.01f, radius, position, 0, local, shade, 1);
+        if (particle != 0) {
+            char *extra = particle + 32;
 
-            *(short *)(r + 10) = 120;
-            *(int *)(q + 4) = 2;
-            *(char *)(q + 10) = 127;
-            *(char *)(q + 11) = *(unsigned char *)(r + 10);
+            *(short *)(particle + 10) = 120;
+            *(int *)(extra + 4) = 2;
+            *(char *)(extra + 10) = 127;
+            *(char *)(extra + 11) = *(unsigned char *)(particle + 10);
         }
     }
-    func_00282F20(ref_L00_003FE310_00, a2, 1.5f);
-    func_00312B70(ref_L00_003FE310_00, a1, 0, 0);
+    vec_scale_to_length(ref_L00_003FE310_00, direction, 1.5f);
+    SpawnTemplateEffectMoby(ref_L00_003FE310_00, position, 0, 0);
 }
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
+/* Draws the object's attached effect when its flag is set. */
 void func_L00_003FE490(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
@@ -273,39 +282,40 @@ void func_L00_003FE490(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 
 
 /* takes the float array at +104 and writes four values returned by a call with argument 255, then four float constants (-1.0, -2.25, 1.25, 2.5) at +16..+28, a descending count 255/191/127/63 into the ints at +44..+32 and 2.5/3.0 pairs at +48..+60 */
+/* Sets the starting values of a glowing effect: four random phases, fixed sizes and fading brightness steps. */
 void func_L00_003FF7B8(char *self)
 {
-    float *p = *(float **)(self + 104);
-    float *q = p;
-    int *w;
-    int c;
+    float *vars = *(float **)(self + 104);
+    float *writePtr = vars;
+    int *intPtr;
+    int value;
     int i;
     int j;
 
     for (i = 3; i >= 0; i--)
     {
-        *q = (float)func_002A77E0_3(255);
-        q++;
+        *writePtr = (float)func_002A77E0_3(255);
+        writePtr++;
     }
 
-    p[4] = -1.0000000000000000000000e+00f;
-    p[5] = -2.2500000000000000000000e+00f;
-    p[6] = 1.2500000000000000000000e+00f;
-    p[7] = 2.5000000000000000000000e+00f;
+    vars[4] = -1.0000000000000000000000e+00f;
+    vars[5] = -2.2500000000000000000000e+00f;
+    vars[6] = 1.2500000000000000000000e+00f;
+    vars[7] = 2.5000000000000000000000e+00f;
 
     j = 3;
-    w = (int *)(p + 11);
-    c = 255;
+    intPtr = (int *)(vars + 11);
+    value = 255;
     for (; j >= 0; j--)
     {
-        *w = c;
-        w--;
-        c -= 64;
+        *intPtr = value;
+        intPtr--;
+        value -= 64;
     }
 
-    p[12] = 2.5000000000000000000000e+00f;
-    p[13] = 3.0000000000000000000000e+00f;
-    p[15] = 2.5000000000000000000000e+00f;
-    p[14] = 3.0000000000000000000000e+00f;
+    vars[12] = 2.5000000000000000000000e+00f;
+    vars[13] = 3.0000000000000000000000e+00f;
+    vars[15] = 2.5000000000000000000000e+00f;
+    vars[14] = 3.0000000000000000000000e+00f;
 }
 

@@ -1,3 +1,4 @@
+#include "names.h"
 /* Menu selection stepping: up or down moves through the entries, wrapping at both ends and
    skipping empty ones. Its own unit: the low wrap goes through a pointer, so its branch only
    becomes a conditional move after the loop pass, which leaves retail's -1 inside the loop. That
@@ -21,6 +22,7 @@ static inline void WrapLow(int *index, int last)
         *index = last;
 }
 
+/* Moves the menu selection up or down, wrapping around and skipping empty entries. */
 int func_00347F80(SelectionMenu *object, int flags)
 {
     int direction = 0;
@@ -37,7 +39,7 @@ int func_00347F80(SelectionMenu *object, int flags)
     }
     if (direction != 0) {
         original = object->selection;
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         last = object->count - 1;
         do {
             int index = object->selection + direction;

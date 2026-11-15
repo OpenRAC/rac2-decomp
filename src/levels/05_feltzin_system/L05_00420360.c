@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef signed int s32;
 typedef signed short s16;
@@ -76,73 +77,75 @@ extern s32 D_001B1350 __attribute__((sda));
 /* State 0 waits for func_00379860, then enters state 1. State 1 calls func_0037B538 and, when the
    +0x26C timer of its state expires, picks an entry of the object's id list and passes that object
    (this one when the list has fewer than two entries) to func_L05_00422540. */
-void func_L05_00422380(u8 *arg0)
+void func_L05_00422380(u8 *moby)
 {
-    u8 *s1 = *(u8 **)(arg0 + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     u8 *target;
     s32 i;
     s32 n;
 
-    if (arg0[0x20] == 0) {
-        arg0[0x30] = 0xFF;
-        if (func_00379860(arg0) == 0)
+    if (moby[0x20] == 0) {
+        moby[0x30] = 0xFF;
+        if (func_00379860(moby) == 0)
             return;
-        func_L05_004224C8(arg0);
-        if (*(s32 *)(s1 + 0x264) == 0)
+        InitFeltzinTargetSpawner(moby);
+        if (*(s32 *)(vars + 0x264) == 0)
             return;
-        func_00379E60(arg0, 0, 0, 0);
+        func_00379E60(moby, 0, 0, 0);
         return;
     }
 
-    func_0037B538(arg0, 0, 1, 1);
-    if (*(s32 *)(s1 + 0x264) == 0)
+    func_0037B538(moby, 0, 1, 1);
+    if (*(s32 *)(vars + 0x264) == 0)
         return;
-    if (func_003062A0(s1 + 0x26C) == 0)
+    if (func_003062A0(vars + 0x26C) == 0)
         return;
     target = 0;
-    n = func_0037B3A0(arg0);
+    n = func_0037B3A0(moby);
 
     if (n >= 2) {
         s32 count = func_00332AF8(0, n - 1);
-        u16 *p = (u16 *)D_L05_001FB220[arg0[0x21]];
-        u16 v;
+        u16 *idPtr = (u16 *)D_L05_001FB220[moby[0x21]];
+        u16 idWord;
         i = 0;
         do {
-            v = *p;
-            n = v & 0x7FFF;
+            idWord = *idPtr;
+            n = idWord & 0x7FFF;
             if (i == count)
                 goto found;
             i++;
-            p++;
-        } while ((s16)v >= 0);
+            idPtr++;
+        } while ((s16)idWord >= 0);
         goto done;
 found:
         target = D_L05_001B251C[0] + (n << 8);
     } else {
-        target = arg0;
+        target = moby;
     }
 done:
     if (target != 0)
-        func_L05_00422540(target);
-    *(s32 *)(s1 + 0x26C) = 0x78;
+        SpawnFeltzinTargetAtRandomPoint(target);
+    *(s32 *)(vars + 0x26C) = 0x78;
 }
 
-void func_L05_004224C8(u8 *arg0) {
-    u8 *s1 = *(u8 **)(arg0 + 0x68);
+/* Puts the spawner object into its active state and clears its timers. */
+void func_L05_004224C8(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    *(u16 *)(arg0 + 0x34) |= 0x100;
-    arg0[0x20] = 1;
-    *(s32 *)((u8 *)func_00379CA0(arg0) + 0x148) = 0xA;
-    func_0037AEC0(arg0, 1);
-    *(s32 *)(s1 + 0x26C) = 0;
-    *(s32 *)(s1 + 0x268) = 0;
-    *(f32 *)(s1 + 0x230) = 10.0f;
-    func_00379C68(arg0, 0xFFFF);
+    *(u16 *)(moby + 0x34) |= 0x100;
+    moby[0x20] = 1;
+    *(s32 *)((u8 *)func_00379CA0(moby) + 0x148) = 0xA;
+    func_0037AEC0(moby, 1);
+    *(s32 *)(vars + 0x26C) = 0;
+    *(s32 *)(vars + 0x268) = 0;
+    *(f32 *)(vars + 0x230) = 10.0f;
+    func_00379C68(moby, 0xFFFF);
 }
 
 /* func_L05_00422540 lives in L05_00422540-qcopy.c. */
 
 /* shared native body of family 5a97ab89858c */
+/* Fills a block with default values: corner coordinates of -1 and 1, zeroed fields. */
 void func_L05_00433400(char *p)
 {
     *(long long *)(p + 112) = 0;

@@ -30,42 +30,42 @@ extern void func_00282C88(void *), func_00283098(void *, void *, void *), func_0
    declare (void *, void *, float)); this order copies pos last, as retail's $s3 shows. */
 void func_003290D0(char *self, float size, float *pos)
 {
-    float v[4];
-    Particle290 *base = D_0022C9A0;
+    float offset[4];
+    Particle290 *base = gObjectParticles;
     char *state = *(char **)(self + 0x68);
     Particle290 *p;
     Particle290 *record;
-    int i, c;
+    int i, grey;
 
     for (i = 0; i < 300; i++) {
         p = &base[i];
         if (p->owner)
             continue;
-        p->timer2 = p->timer = func_002A7820(80, 200);
+        p->timer2 = p->timer = RandomIntRange(80, 200);
         record = p;
-        c = func_002A7820(96, 128);
-        p->color2 = p->color = c + ((c << 7) & 0xFF00) + ((c << 14) & 0xFF0000);
+        grey = RandomIntRange(96, 128);
+        p->color2 = p->color = grey + ((grey << 7) & 0xFF00) + ((grey << 14) & 0xFF0000);
         p->kind = *(int *)(state + 0x50) % 2 + 1;
-        p->life = p->duration = func_002A7820(50, 60);
+        p->life = p->duration = RandomIntRange(50, 60);
         p->size = size;
-        p->spin = func_002A78D8(180.0f, 720.0f) * 0.0002908882452175021f;
-        p->angle = func_002A7940();
+        p->spin = RandomSignedFloatRange(180.0f, 720.0f) * 0.0002908882452175021f;
+        p->angle = RandomAngle();
         p->owner = self;
         ++*(int *)(state + 0x4C);
         if (pos[3] == -1.0f) {
-            func_00282C88(v);
-            v[3] = 1.0f;
-            v[0] = -0.3f;
-            func_00283098(v, v, self + 0xC0);
-            func_00282CC0(p, v, self + 0x10);
+            ClearVector128(offset);
+            offset[3] = 1.0f;
+            offset[0] = -0.3f;
+            matrix_mul_vec3(offset, offset, self + 0xC0);
+            FastVecAdd(p, offset, self + 0x10);
         } else {
             qcopy(record->pos, pos);
         }
-        p->pos[0] += func_002A7878(-0.015f, 0.015f);
-        p->pos[1] += func_002A7878(-0.015f, 0.015f);
-        p->pos[2] += func_002A7878(-0.015f, 0.015f);
-        func_00282C88(p->velocity);
-        p->velocity[2] = func_002A7878(0.01f, 0.015f);
+        p->pos[0] += RandomFloatRange(-0.015f, 0.015f);
+        p->pos[1] += RandomFloatRange(-0.015f, 0.015f);
+        p->pos[2] += RandomFloatRange(-0.015f, 0.015f);
+        ClearVector128(p->velocity);
+        p->velocity[2] = RandomFloatRange(0.01f, 0.015f);
         ++*(int *)(state + 0x50);
         break;
     }

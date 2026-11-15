@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The first table column uses a GP address; the other columns use absolute
  * addresses. Keep the compiler at -G8 and assemble with -G64 for this table. */
@@ -21,20 +22,20 @@ extern int func_003005A0(void);
 int func_L00_00308538(void)
 {
     IndexMap map = D_L00_001A9A50;
-    if (D_001A79F0 == 2 && D_L00_001A9010 && ((D_001395B8.bits ^ 1) & 1)) {
-        func_L00_00308408(D_L00_001A99F0[0], D_L00_001A99F0[1],
+    if (gCurrentMapIndex == 2 && D_L00_001A9010 && ((D_001395B8.bits ^ 1) & 1)) {
+        ClearGridBitsInRect(D_L00_001A99F0[0], D_L00_001A99F0[1],
                             D_L00_001A99F0[2], D_L00_001A99F0[3]);
         D_001395B8.bits |= 1;
-    } else if (D_001A79F0 == 11 && D_L00_001A9010 && !(D_001395B8.bits & 2)) {
-        func_L00_00308408(D_L00_001A9A00[0], D_L00_001A9A00[1],
+    } else if (gCurrentMapIndex == 11 && D_L00_001A9010 && !(D_001395B8.bits & 2)) {
+        ClearGridBitsInRect(D_L00_001A9A00[0], D_L00_001A9A00[1],
                             D_L00_001A9A00[2], D_L00_001A9A00[3]);
         D_001395B8.bits |= 2;
-    } else if (D_001A79F0 == 7 && func_003005A0() >= 0) {
-        int i = func_003005A0();
+    } else if (gCurrentMapIndex == 7 && GetCurrentVariantIndex() >= 0) {
+        int i = GetCurrentVariantIndex();
         int bit = map.x[i];
         if ((unsigned)bit >= 8 || (((D_001395B8.bits >> bit) ^ 1) & 1)) {
             if ((unsigned)bit < 8) D_001395B8.bits |= 1 << bit;
-            func_L00_00308408(D_L00_001A9A10[i * 4], D_L00_001A9A14[i * 4],
+            ClearGridBitsInRect(D_L00_001A9A10[i * 4], D_L00_001A9A14[i * 4],
                                 D_L00_001A9A18[i * 4], D_L00_001A9A1C[i * 4]);
         }
     }

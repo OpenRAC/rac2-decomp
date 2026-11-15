@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L00_002A9600 in its own unit for the grouped lq/sq profile. Its first two
    callees differ by level (ref_ names). */
@@ -36,29 +37,29 @@ extern void func_L00_00310748(void *, int, void *, float, float);
    updates its two foot contacts. */
 void func_L00_002A9600(void)
 {
-    float v[4] __attribute__((aligned(16)));
-    float t;
-    unsigned char *m;
+    float footPos[4] __attribute__((aligned(16)));
+    float footHeight;
+    unsigned char *mobyPtr;
 
-    if (((HeroView_L00_002A9600 *)D_00189E20)->unk22B5 != 0)
+    if (((HeroView_L00_002A9600 *)gHeroState)->unk22B5 != 0)
         ref_L00_002A9600_00();
     else
         ref_L00_002A9600_01();
-    if (((HeroView_L00_002A9600 *)D_00189E20)->unk22B4 != 4)
-        func_L00_002D2E68();
-    ((HeroView_L00_002A9600 *)D_00189E20)->moby[0xA8] = 0xFF;
-    m = ((HeroView_L00_002A9600 *)D_00189E20)->moby;
-    *(TI128 *)(m + 0x10) = ((HeroView_L00_002A9600 *)D_00189E20)->position;
-    *(TI128 *)(m + 0xF0) = ((HeroView_L00_002A9600 *)D_00189E20)->unk90;
-    func_00282AB0(m + 0xC0, D_00189E20, 0x30);
-    func_002A0F48(((HeroView_L00_002A9600 *)D_00189E20)->moby);
-    if (((HeroView_L00_002A9600 *)D_00189E20)->unk1F0 != 0 || *(int *)(((HeroView_L00_002A9600 *)D_00189E20)->moby + 0x98) == 0)
+    if (((HeroView_L00_002A9600 *)gHeroState)->unk22B4 != 4)
+        SetHeroObjectsFlagBit();
+    ((HeroView_L00_002A9600 *)gHeroState)->moby[0xA8] = 0xFF;
+    mobyPtr = ((HeroView_L00_002A9600 *)gHeroState)->moby;
+    *(TI128 *)(mobyPtr + 0x10) = ((HeroView_L00_002A9600 *)gHeroState)->position;
+    *(TI128 *)(mobyPtr + 0xF0) = ((HeroView_L00_002A9600 *)gHeroState)->unk90;
+    CopyMemoryAligned(mobyPtr + 0xC0, gHeroState, 0x30);
+    func_002A0F48(((HeroView_L00_002A9600 *)gHeroState)->moby);
+    if (((HeroView_L00_002A9600 *)gHeroState)->unk1F0 != 0 || *(int *)(((HeroView_L00_002A9600 *)gHeroState)->moby + 0x98) == 0)
         return;
-    *(TI128 *)v = ((HeroView_L00_002A9600 *)D_00189E20)->position;
-    func_L00_002D3778(v, v, ((HeroView_L00_002A9600 *)D_00189E20)->unk254);
-    func_L00_00310748(((HeroView_L00_002A9600 *)D_00189E20)->moby, 0, v, ((HeroView_L00_002A9600 *)D_00189E20)->unk264, ((HeroView_L00_002A9600 *)D_00189E20)->unk250 - ((HeroView_L00_002A9600 *)D_00189E20)->unk254);
-    t = ((HeroView_L00_002A9600 *)D_00189E20)->unk264 + 0.05f;
-    *(TI128 *)v = ((HeroView_L00_002A9600 *)D_00189E20)->position;
-    func_L00_002D3778(v, v, t);
-    func_L00_00310748(((HeroView_L00_002A9600 *)D_00189E20)->moby, 1, v, ((HeroView_L00_002A9600 *)D_00189E20)->unk264, ((HeroView_L00_002A9600 *)D_00189E20)->unk250 - t);
+    *(TI128 *)footPos = ((HeroView_L00_002A9600 *)gHeroState)->position;
+    ApplyHeroModeTransformReversed(footPos, footPos, ((HeroView_L00_002A9600 *)gHeroState)->unk254);
+    StoreTransformedTableEntry(((HeroView_L00_002A9600 *)gHeroState)->moby, 0, footPos, ((HeroView_L00_002A9600 *)gHeroState)->unk264, ((HeroView_L00_002A9600 *)gHeroState)->unk250 - ((HeroView_L00_002A9600 *)gHeroState)->unk254);
+    footHeight = ((HeroView_L00_002A9600 *)gHeroState)->unk264 + 0.05f;
+    *(TI128 *)footPos = ((HeroView_L00_002A9600 *)gHeroState)->position;
+    ApplyHeroModeTransformReversed(footPos, footPos, footHeight);
+    StoreTransformedTableEntry(((HeroView_L00_002A9600 *)gHeroState)->moby, 1, footPos, ((HeroView_L00_002A9600 *)gHeroState)->unk264, ((HeroView_L00_002A9600 *)gHeroState)->unk250 - footHeight);
 }

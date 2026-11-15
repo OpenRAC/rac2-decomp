@@ -20,86 +20,86 @@ extern void func_002E59F8(int),func_L00_002E6CF0(void *,void *),func_L03_003D0AE
 
 /* Interpolates the emitter position, keeps it relative to its attachment,
  * emits particles while active, and releases its sound and object after fading. */
-void func_L03_003D04E0(char *m) {
-    float tmp[4], a[4], b[4], hit[12], pos[4], vel[4];
-    char *v = P(m, 0x68), *p, *e;
+void func_L03_003D04E0(char *moby) {
+    float offsetStep[4], rayStart[4], rayEnd[4], hit[12], spawnVec[4], spawnVel[4];
+    char *vars = P(moby, 0x68), *position, *soundSlot;
     float angle, speed;
 
     if (D_L03_001A8F00 == 2) {
-        func_0029F338(m);
+        MarkMobySpawned(moby);
         return;
     }
-    p = m + 0x10;
-    if (P(v, 0x40)) {
-        func_002AD0E0(m, P(v, 0x40), p, m + 0xF0, p, m + 0xF0);
-        func_00282CF0(p, p, P(v, 0x40) + 0x10);
-        func_002AFDD8(P(v, 0x40), p, p, 0);
+    position = moby + 0x10;
+    if (P(vars, 0x40)) {
+        TransformPointAndRotationByParent(moby, P(vars, 0x40), position, moby + 0xF0, position, moby + 0xF0);
+        FastVecSub(position, position, P(vars, 0x40) + 0x10);
+        TransformVectorByObjectOrGiven(P(vars, 0x40), position, position, 0);
     }
-    func_00282D08(tmp, v, v + 0x10, F(v, 0x20));
-    func_00282CC0(p, p, tmp);
-    func_002AA2E8(v + 0x20, 1.0f, F(v, 0x24));
-    if (P(v, 0x40)) {
-        func_00283098(p, p, P(v, 0x40) + 0xC0);
-        func_00282CC0(p, p, P(v, 0x40) + 0x10);
+    lerp_vector(offsetStep, vars, vars + 0x10, F(vars, 0x20));
+    FastVecAdd(position, position, offsetStep);
+    ApproachValue(vars + 0x20, 1.0f, F(vars, 0x24));
+    if (P(vars, 0x40)) {
+        matrix_mul_vec3(position, position, P(vars, 0x40) + 0xC0);
+        FastVecAdd(position, position, P(vars, 0x40) + 0x10);
     }
-    switch ((unsigned char)m[0x20]) {
+    switch ((unsigned char)moby[0x20]) {
     case 0:
-        I(v, 0x3C) = -1;
-        if (F(v, 0x20) > 0.5f)
-            func_002A7750(m, 1, -1);
+        I(vars, 0x3C) = -1;
+        if (F(vars, 0x20) > 0.5f)
+            SetMobyState(moby, 1, -1);
         break;
     case 1:
-        qcopy(a, p);
-        qcopy(b, p);
-        b[2] -= F(v, 0x20) * 5.0f;
-        func_002A8C00(hit, m, 0x10001, D_L03_001A8F20, (float)I(v, 0x38));
-        if (func_002761F8(a, b, 0, m, hit) && !P(v, 0x40)) {
-            angle = func_002A7940();
-            speed = func_002A7878(0, 0.5f) * (1.0f / 60.0f);
-            pos[0] = func_00283180(angle) * speed;
-            pos[1] = func_00283198(angle) * speed;
-            pos[2] = 0;
-            pos[2] = func_002A7878(1, 2) * (1.0f / 60.0f);
-            func_L03_003D0FC8(m, D_L03_001BFDE0, pos);
+        qcopy(rayStart, position);
+        qcopy(rayEnd, position);
+        rayEnd[2] -= F(vars, 0x20) * 5.0f;
+        make_hit_descriptor(hit, moby, 0x10001, D_L03_001A8F20, (float)I(vars, 0x38));
+        if (CollLine(rayStart, rayEnd, 0, moby, hit) && !P(vars, 0x40)) {
+            angle = RandomAngle();
+            speed = RandomFloatRange(0, 0.5f) * (1.0f / 60.0f);
+            spawnVec[0] = FastSinOrCosA(angle) * speed;
+            spawnVec[1] = FastSinOrCosB(angle) * speed;
+            spawnVec[2] = 0;
+            spawnVec[2] = RandomFloatRange(1, 2) * (1.0f / 60.0f);
+            SpawnEmitterParticlePair(moby, D_L03_001BFDE0, spawnVec);
         }
-        if (!P(v, 0x40) && !func_002A77E0(2)) {
-            qcopy(pos, p);
-            pos[2] -= func_002A7878(0, 5);
-            func_002A7A00(vel, 0, 1.0f / 30.0f);
-            func_L03_003D0FC8(m, pos, vel);
+        if (!P(vars, 0x40) && !RandomIntBelow(2)) {
+            qcopy(spawnVec, position);
+            spawnVec[2] -= RandomFloatRange(0, 5);
+            RandomDirectionVector(spawnVel, 0, 1.0f / 30.0f);
+            SpawnEmitterParticlePair(moby, spawnVec, spawnVel);
         }
-        e = (char *)(I(v, 0x3C) * 0x70);
-        e = (char *)((int)e + (int)D_00188660);
-        if (P(e, 0x88) != m || !((unsigned char *)e)[0x74])
-            I(v, 0x3C) = func_002E5CF8(0, 4, m);
-        if (F(v, 0x34) < 1)
-            func_002AA2E8(v + 0x34, 1, 1.0f / 15.0f);
-        if (func_00282948(v + 0x28))
-            func_002A7750(m, 2, -1);
+        soundSlot = (char *)(I(vars, 0x3C) * 0x70);
+        soundSlot = (char *)((int)soundSlot + (int)gSoundState);
+        if (P(soundSlot, 0x88) != moby || !((unsigned char *)soundSlot)[0x74])
+            I(vars, 0x3C) = PlayMobySound(0, 4, moby);
+        if (F(vars, 0x34) < 1)
+            ApproachValue(vars + 0x34, 1, 1.0f / 15.0f);
+        if (FastFloatHelperD(vars + 0x28))
+            SetMobyState(moby, 2, -1);
         break;
     case 2:
-        func_002AA2E8(v + 0x34, 0, 1.0f / 30.0f);
-        if (F(v, 0x34) <= 0) {
-            int handle = I(v, 0x3C);
+        ApproachValue(vars + 0x34, 0, 1.0f / 30.0f);
+        if (F(vars, 0x34) <= 0) {
+            int handle = I(vars, 0x3C);
             if (handle != -1) {
                 int offset = handle * 0x70;
-                char *slot = D_00188660 + offset;
-                if (P(slot, 0x88) == m && ((unsigned char *)slot)[0x74])
-                    func_002E59F8(handle);
+                char *slot = gSoundState + offset;
+                if (P(slot, 0x88) == moby && ((unsigned char *)slot)[0x74])
+                    StopSoundVoice(handle);
             }
-            I(v, 0x3C) = -1;
-            func_0029F338(m);
+            I(vars, 0x3C) = -1;
+            MarkMobySpawned(moby);
             return;
         }
         break;
     }
-    F(v, 0x2C) += D_L03_001B0590 * (1.0f / 60.0f);
-    if (F(v, 0x2C) > 1)
-        F(v, 0x2C) -= 1;
-    else if (F(v, 0x2C) < 1)
-        F(v, 0x2C) += 1;
-    F(v, 0x30) += D_L03_001B0594 * (1.0f / 60.0f);
-    if (F(v, 0x30) > 1)
-        F(v, 0x30) -= 1;
-    func_L00_002E6CF0(func_L03_003D0AE0, m);
+    F(vars, 0x2C) += D_L03_001B0590 * (1.0f / 60.0f);
+    if (F(vars, 0x2C) > 1)
+        F(vars, 0x2C) -= 1;
+    else if (F(vars, 0x2C) < 1)
+        F(vars, 0x2C) += 1;
+    F(vars, 0x30) += D_L03_001B0594 * (1.0f / 60.0f);
+    if (F(vars, 0x30) > 1)
+        F(vars, 0x30) -= 1;
+    AddDrawCallbackToList1(DrawGlowingBeamEffect, moby);
 }

@@ -8,19 +8,20 @@ extern unsigned char *func_0029EFD0(int size);
 
 extern unsigned char *D_L00_001B0A20 __attribute__((sda));
 
+/* Creates the health drain slots object and remembers it in a level global. */
 unsigned char *func_L00_003F8DC8(int unused)
 {
-    unsigned char *p = func_0029EFD0(0xD04);
+    unsigned char *moby = CreateMoby(0xD04 /* moby class 3332 */);
 
-    if (p != 0) {
-        unsigned int v = 0xFF;
+    if (moby != 0) {
+        unsigned int initValue = 0xFF;
 
-        D_L00_001B0A20 = p;
-        *(unsigned short *)(p + 0x32) = v;
-        p[0x20] = 1;
-        p[0x30] = v;
+        D_L00_001B0A20 = moby;
+        *(unsigned short *)(moby + 0x32) = initValue;
+        moby[0x20] = 1;
+        moby[0x30] = initValue;
     }
-    return p;
+    return moby;
 }
 
 /* Per-frame update of the player's gadget table: it walks the records of one table
@@ -39,7 +40,8 @@ extern void func_L00_003F5870(char *rec, int index);
 
 extern int func_00282978(char *a0);
 
-int func_L00_003F59F0(char *a0)
+/* Updates the Vaporizer joint chain each frame: it fires each joint, eases a shared offset back toward zero, and returns 1 when the chain timer has run out. */
+int func_L00_003F59F0(char *moby)
 {
     char *state;
     char *table;
@@ -50,16 +52,16 @@ int func_L00_003F59F0(char *a0)
     int i = 0;
     float value;
 
-    state = *(char **)(a0 + 0x68);
-    table = func_L00_0032A088(0xC04, *(short *)(state + 0x1A));
+    state = *(char **)(moby + 0x68);
+    table = GetSlotBody(0xC04 /* Vaporizer */, *(short *)(state + 0x1A));
     index = *(short *)(state + 0x18);
     base = *(char **)(table + index * 4);
     count = *(short *)(state + 0x20);
     if (count > 0) {
         rec = base;
         do {
-            *(float *)(rec + 0x20) = func_00283B98(*(float *)(rec + 0x20), *(float *)(rec + 0x28));
-            func_L00_003F5870(base, i);
+            *(float *)(rec + 0x20) = FastAddRotations(*(float *)(rec + 0x20), *(float *)(rec + 0x28));
+            SetChainJointOffset(base, i);
             rec += 0x30;
             i++;
         } while (i < count);
@@ -74,7 +76,7 @@ int func_L00_003F59F0(char *a0)
     if (D_L00_001B096C <= -4.0f) {
         D_L00_001B096C = D_L00_001B096C + 4.0f;
     }
-    return func_00282978(state + 0x22) == 0;
+    return FastDecTimer(state + 0x22) == 0;
 }
 
 /* func_L00_003EFA98 and func_L00_003EFD00: two 64-face quad renderers. Each builds a textured
@@ -110,6 +112,7 @@ extern void func_00283098(void *, void *, void *);
 extern void func_002AFFD8(char *, char *, int);
 extern void func_00280B90(void *packet, void *frame, int mode);
 
+/* Draws a ball made of 64 textured quads around the object, a larger and flatter version than the next function. */
 void func_L00_003EFA98(char *object)
 {
     RenderPacket packet;
@@ -123,7 +126,7 @@ void func_L00_003EFA98(char *object)
     long flags;
     float quarter;
 
-    packet.f78 = func_0027C878(D_L00_001B0884);
+    packet.f78 = GetEffectTextureDescriptor(D_L00_001B0884);
     flags = (long)D_L00_001B0870;
     flags |= (long)D_L00_001B0874 << 2;
     flags |= (long)D_L00_001B0878 << 4;
@@ -133,9 +136,9 @@ void func_L00_003EFA98(char *object)
     packet.flags = flags;
     packet.f70 = 0;
     quarter = 0.25f;
-    func_00282C88(&matrix[0]);
-    func_00282C88(&matrix[1]);
-    func_00282C88(&matrix[2]);
+    ClearVector128(&matrix[0]);
+    ClearVector128(&matrix[1]);
+    ClearVector128(&matrix[2]);
     matrix[0].v[0] = *(float *)(state + 0x10) + *(float *)(state + 0x10);
     matrix[1].v[1] = *(float *)(state + 0x10) + *(float *)(state + 0x10);
     matrix[2].v[2] = *(float *)(state + 0x10) * quarter;
@@ -144,8 +147,8 @@ void func_L00_003EFA98(char *object)
     packet.color[2] = color;
     packet.color[1] = color;
     packet.color[0] = color;
-    func_002AFFD8(object + 0x10, (char *)&offset, 1);
-    func_00282D30(&offset, &offset, quarter);
+    ComputeViewDirection(object + 0x10, (char *)&offset, 1);
+    FastVecScale(&offset, &offset, quarter);
     u_base = &packet.uv[0][0];
     v_base = &packet.uv[0][1];
     for (face = 0; face < 64; face++) {
@@ -154,18 +157,19 @@ void func_L00_003EFA98(char *object)
             Vector *position = &D_L00_0029AF40[D_L00_0029B440[face][corner][0]];
             int uv = D_L00_0029B440[face][corner][1];
 
-            func_00282D30(&packet.vertex[corner], position, D_L00_001B088C);
+            FastVecScale(&packet.vertex[corner], position, D_L00_001B088C);
             u_base[corner * 2] = D_L00_0029B840[uv][0];
             v_base[corner * 2] = D_L00_0029B840[uv][1];
-            func_00283098(&packet.vertex[corner], &packet.vertex[corner], matrix);
-            func_00283098(&packet.vertex[corner], &packet.vertex[corner], object + 0xC0);
-            func_00282CC0(&packet.vertex[corner], &packet.vertex[corner], origin);
-            func_00282CC0(&packet.vertex[corner], &packet.vertex[corner], &offset);
+            matrix_mul_vec3(&packet.vertex[corner], &packet.vertex[corner], matrix);
+            matrix_mul_vec3(&packet.vertex[corner], &packet.vertex[corner], object + 0xC0);
+            FastVecAdd(&packet.vertex[corner], &packet.vertex[corner], origin);
+            FastVecAdd(&packet.vertex[corner], &packet.vertex[corner], &offset);
         }
-        func_00280B90(&packet, 0, 0);
+        draw_world_quad(&packet, 0, 0);
     }
 }
 
+/* Draws a ball made of 64 textured quads around the object, a smaller version of the previous function. */
 void func_L00_003EFD00(char *object)
 {
     RenderPacket packet;
@@ -178,7 +182,7 @@ void func_L00_003EFD00(char *object)
     unsigned int color;
     long flags;
 
-    packet.f78 = func_0027C878(D_L00_001B0884);
+    packet.f78 = GetEffectTextureDescriptor(D_L00_001B0884);
     flags = (long)D_L00_001B0870;
     flags |= (long)D_L00_001B0874 << 2;
     flags |= (long)D_L00_001B0878 << 4;
@@ -187,9 +191,9 @@ void func_L00_003EFD00(char *object)
     packet.f80 = 0xFF9000000260L;
     packet.flags = flags;
     packet.f70 = 0;
-    func_00282C88(&matrix[0]);
-    func_00282C88(&matrix[1]);
-    func_00282C88(&matrix[2]);
+    ClearVector128(&matrix[0]);
+    ClearVector128(&matrix[1]);
+    ClearVector128(&matrix[2]);
     matrix[0].v[0] = *(float *)(state + 0x10);
     matrix[1].v[1] = *(float *)(state + 0x10);
     matrix[2].v[2] = *(float *)(state + 0x10) * 0.125f;
@@ -198,8 +202,8 @@ void func_L00_003EFD00(char *object)
     packet.color[2] = color;
     packet.color[1] = color;
     packet.color[0] = color;
-    func_002AFFD8(object + 0x10, (char *)&offset, 1);
-    func_00282D30(&offset, &offset, 0.25f);
+    ComputeViewDirection(object + 0x10, (char *)&offset, 1);
+    FastVecScale(&offset, &offset, 0.25f);
     u_base = &packet.uv[0][0];
     v_base = &packet.uv[0][1];
     for (face = 0; face < 64; face++) {
@@ -208,15 +212,15 @@ void func_L00_003EFD00(char *object)
             Vector *position = &D_L00_0029AF40[D_L00_0029B440[face][corner][0]];
             int uv = D_L00_0029B440[face][corner][1];
 
-            func_00282D30(&packet.vertex[corner], position, D_L00_001B088C);
+            FastVecScale(&packet.vertex[corner], position, D_L00_001B088C);
             u_base[corner * 2] = D_L00_0029B840[uv][0];
             v_base[corner * 2] = D_L00_0029B840[uv][1];
-            func_00283098(&packet.vertex[corner], &packet.vertex[corner], matrix);
-            func_00283098(&packet.vertex[corner], &packet.vertex[corner], object + 0xC0);
-            func_00282CC0(&packet.vertex[corner], &packet.vertex[corner], origin);
-            func_00282CC0(&packet.vertex[corner], &packet.vertex[corner], &offset);
+            matrix_mul_vec3(&packet.vertex[corner], &packet.vertex[corner], matrix);
+            matrix_mul_vec3(&packet.vertex[corner], &packet.vertex[corner], object + 0xC0);
+            FastVecAdd(&packet.vertex[corner], &packet.vertex[corner], origin);
+            FastVecAdd(&packet.vertex[corner], &packet.vertex[corner], &offset);
         }
-        func_00280B90(&packet, 0, 0);
+        draw_world_quad(&packet, 0, 0);
     }
 }
 
@@ -245,20 +249,21 @@ typedef struct {
    rates come from level tuning values, then func_L00_003F5870 lays out its offset and
    the entry's joint count advances. The record offset is computed once and added to the
    reloaded chain pointer at every store, as retail's addu order shows. */
+/* Adds one new joint to the Vaporizer chain at the given position with random-looking angle and speed values. */
 void func_L00_003F5750(char *object, char *position)
 {
     char *state = *(char **)(object + 0x68);
-    char **table = (char **)func_L00_0032A088(0xc04, *(short *)(state + 0x1a));
+    char **table = (char **)GetSlotBody(0xc04, *(short *)(state + 0x1a));
     short index = *(short *)(state + 0x20);
     char **entry;
     int offset = index * 0x30;
     entry = (char **)((*(short *)(state + 0x18) << 2) + (int)table);
     qcopy(((L00Joint *)(offset + (int)*entry))->position, position);
-    ((L00Joint *)(offset + (int)*entry))->angle = func_002ABB18(func_00283CE0(index) * 0.017453294f * D_L00_001B0948);
-    ((L00Joint *)(offset + (int)*entry))->f28 = func_002A7878(D_L00_001B0940, D_L00_001B0944) * 0.017453294f;
+    ((L00Joint *)(offset + (int)*entry))->angle = WrapAngleToPi(IntToFloat(index) * 0.017453294f * D_L00_001B0948);
+    ((L00Joint *)(offset + (int)*entry))->f28 = RandomFloatRange(D_L00_001B0940, D_L00_001B0944) * 0.017453294f;
     ((L00Joint *)(offset + (int)*entry))->length = D_L00_001B094C;
-    ((L00Joint *)(offset + (int)*entry))->f2c = func_002A78D8(D_L00_001B0950, D_L00_001B0954) * 0.016666668f;
-    func_L00_003F5870(*entry, index);
+    ((L00Joint *)(offset + (int)*entry))->f2c = RandomSignedFloatRange(D_L00_001B0950, D_L00_001B0954) * 0.016666668f;
+    SetChainJointOffset(*entry, index);
     (*(unsigned short *)(state + 0x20))++;
 }
 
@@ -324,6 +329,7 @@ extern void func_0032B7D0(char *);
 extern void ref_L00_003F0CC8_00(void (*)(void *), void *);
 extern void func_0032B190(void *);
 
+/* Updates the lightning burst around the hero: sparks fly out, then nearby enemies are hurt and pushed away, then the glow fades and the object removes itself. */
 void func_L00_003F0CC8(char *object)
 {
     Vector point;
@@ -336,118 +342,118 @@ void func_L00_003F0CC8(char *object)
     int count, remaining, i;
     float progress, first_angle, second_angle;
 
-    qcopy(object + 0x10, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0x10);
+    qcopy(object + 0x10, ((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x10);
     switch (*(unsigned char *)(object + 0x20)) {
     case 0:
         *(unsigned char *)(object + 0x20) = 1;
         state->timer = 60;
         state->radius = 0.0f;
         for (i = 0; i < 137; i++) {
-            D_L00_00252F60[i][0] = func_002A7940();
-            D_L00_00252F60[i][1] = func_002A7940();
+            D_L00_00252F60[i][0] = RandomAngle();
+            D_L00_00252F60[i][1] = RandomAngle();
         }
     case 1:
         *(unsigned char *)(object + 0x20) = 2;
     case 2:
-        progress = func_00283CE0(state->timer);
-        progress /= func_00283CE0(60);
-        state->radius = func_002A7790(1.0f - progress) * 15.0f;
+        progress = IntToFloat(state->timer);
+        progress /= IntToFloat(60);
+        state->radius = Square(1.0f - progress) * 15.0f;
         if (state->timer % 3 == 0) {
-            first_angle = func_002A7940();
-            second_angle = func_002A7940();
-            func_002AF000(point.v, state->radius, first_angle, second_angle);
-            func_00282CC0(&point, &point, (Vector *)&((Hero *)D_00189E20)->b[0xE0]);
-            if (func_002761F8((Vector *)&((Hero *)D_00189E20)->b[0xE0], &point, 0, ((Hero *)D_00189E20)->ptr[0x2290 / 4], 0) != 0)
+            first_angle = RandomAngle();
+            second_angle = RandomAngle();
+            BuildSphericalOffset(point.v, state->radius, first_angle, second_angle);
+            FastVecAdd(&point, &point, (Vector *)&((Hero *)gHeroState)->b[0xE0]);
+            if (CollLine((Vector *)&((Hero *)gHeroState)->b[0xE0], &point, 0, ((Hero *)gHeroState)->ptr[0x2290 / 4], 0) != 0)
                 qcopy(&point, &D_L00_001BF220);
-            func_0032B598(object, &point, 10);
+            ClaimRingPiece(object, &point, 10);
         }
         if (state->timer < 10 && (state->timer & 7) == 0)
-            func_0032ABC0(object);
-        if (func_00282948(&state->timer) != 0) {
+            ClaimDebrisPiece(object);
+        if (FastFloatHelperD(&state->timer) != 0) {
             state->timer = 120;
             *(unsigned char *)(object + 0x20) = 3;
-            count = func_00277F48((Vector *)&((Hero *)D_00189E20)->b[0xE0], 0, object, 0, 15.0f);
+            count = ProcessCollisionHit((Vector *)&((Hero *)gHeroState)->b[0xE0], 0, object, 0, 15.0f);
             if (count > 0) {
-                hit = D_L00_001C3280;
+                hit = gAreaHitTargets;
                 remaining = count;
                 do {
                     req = &request;
                     if ((*(unsigned long long *)(*hit + 0x30) & 0x500000000000ULL) != 0 &&
-                        *hit != ((Hero *)D_00189E20)->ptr[0x2290 / 4] && *(short *)(*hit + 0xaa) != 0xce7 &&
-                        *(short *)(*hit + 0xaa) != 0xbb8) {
-                        func_00282CF0(&point, (Vector *)(*hit + 0x10), (Vector *)&((Hero *)D_00189E20)->b[0xE0]);
-                        func_00282F20(&point, &point, 1.0f);
+                        *hit != ((Hero *)gHeroState)->ptr[0x2290 / 4] && *(short *)(*hit + 0xaa) != 0xce7 /* moby class 3303 */ &&
+                        *(short *)(*hit + 0xaa) != 0xbb8 /* Space Tourist */) {
+                        FastVecSub(&point, (Vector *)(*hit + 0x10), (Vector *)&((Hero *)gHeroState)->b[0xE0]);
+                        vec_scale_to_length(&point, &point, 1.0f);
                         /* The incoming request impulse is not initialized in retail. */
-                        func_00282F20(&req->impulse, &req->impulse, 1.0f);
-                        func_002A8C00((char *)req, (int)object, 0x830000, 30.0f, (Quad16 *)&point);
+                        vec_scale_to_length(&req->impulse, &req->impulse, 1.0f);
+                        make_hit_descriptor((char *)req, (int)object, 0x830000, 30.0f, (Quad16 *)&point);
                         request.impulse.word = point.word;
                         request.active = 1;
                         request.impulse.v[3] = 5627.9248f;
                         request.enabled = 5;
                         request.kind = 3;
                         request.object_class = *(unsigned short *)(*hit + 0xaa);
-                        func_002A8E20(*hit, req);
+                        QueueMobyImpact(*hit, req);
                     }
                     ++hit;
                 } while (--remaining != 0);
             }
-            func_0032A978(object);
+            InitRandomDirectionTable(object);
         }
         break;
     case 3:
-        if ((state->timer & 7) == 0) func_0032ABC0(object);
-        func_00282948(&state->timer);
-        func_0032AA30(object);
+        if ((state->timer & 7) == 0) ClaimDebrisPiece(object);
+        FastFloatHelperD(&state->timer);
+        InitTrailSparklePairs(object);
         if (state->timer == 40) *(unsigned char *)(object + 0x20) = 4;
         break;
     case 4:
-        if (func_00282948(&state->timer) != 0 && state->pending == 0) {
-            if (state->first != 0) func_0029F338(state->first);
-            if (state->second != 0) func_0029F338(state->second);
-            if (state->light != -1) func_00291450(state->light);
+        if (FastFloatHelperD(&state->timer) != 0 && state->pending == 0) {
+            if (state->first != 0) MarkMobySpawned(state->first);
+            if (state->second != 0) MarkMobySpawned(state->second);
+            if (state->light != -1) FreePointLight(state->light);
             D_L00_001B08D0 = 0;
-            func_0029F338(object);
+            MarkMobySpawned(object);
             return;
         }
         break;
     }
-    progress = func_00283CE0(state->timer) / func_00283CE0(120);
+    progress = IntToFloat(state->timer) / IntToFloat(120);
     progress = 1.0f - progress;
     progress *= 6.2831855f;
     progress -= 3.1415927f;
-    progress = func_00283180(progress);
+    progress = FastSinOrCosA(progress);
     progress = (progress + 1.0f) * 0.5f;
     if (state->first != 0) {
-        **(int **)(state->first + 0x68) = func_00283CF0(progress * 32.0f);
-        *(float *)(state->first + 0xf8) = func_00283B98(*(float *)(state->first + 0xf8), 0.052359887f);
+        **(int **)(state->first + 0x68) = FloatToInt(progress * 32.0f);
+        *(float *)(state->first + 0xf8) = FastAddRotations(*(float *)(state->first + 0xf8), 0.052359887f);
         satellite = state->first;
-        func_002833F0((Vector *)(satellite + 0xc0), (Vector *)(satellite + 0xf0));
+        euler_rotation_basis((Vector *)(satellite + 0xc0), (Vector *)(satellite + 0xf0));
         *(float *)(state->first + 0xc0) *= 0.5f;
         *(float *)(state->first + 0xd4) *= 0.5f;
         *(float *)(state->first + 0xe8) = progress * 1.5f;
-        qcopy(state->first + 0x10, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0x10);
+        qcopy(state->first + 0x10, ((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x10);
     }
     if (state->second != 0) {
-        **(int **)(state->second + 0x68) = func_00283CF0(progress * 32.0f);
-        *(float *)(state->second + 0xf8) = func_00283BE0(*(float *)(state->second + 0xf8), 0.052359887f);
+        **(int **)(state->second + 0x68) = FloatToInt(progress * 32.0f);
+        *(float *)(state->second + 0xf8) = fast_subtract_rotations(*(float *)(state->second + 0xf8), 0.052359887f);
         satellite = state->second;
-        func_002833F0((Vector *)(satellite + 0xc0), (Vector *)(satellite + 0xf0));
+        euler_rotation_basis((Vector *)(satellite + 0xc0), (Vector *)(satellite + 0xf0));
         *(float *)(state->second + 0xe8) = progress;
-        qcopy(state->second + 0x10, ((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0x10);
+        qcopy(state->second + 0x10, ((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x10);
     }
     if (state->light != -1) {
         light = &D_L00_001C6F40[state->light];
-        func_00282F20(&point, (Vector *)&((Hero *)D_00189E20)->b[0x2A0], 0.5f);
-        func_00282CC0(&light->position, (Vector *)(((Hero *)D_00189E20)->ptr[0x2290 / 4] + 0x10), &point);
-        func_00282CF0(&point, &D_L00_001B8DC0, &light->position);
-        func_00282F20(&point, &point, 0.15f);
-        func_00282CC0(&light->position, &light->position, &point);
+        vec_scale_to_length(&point, (Vector *)&((Hero *)gHeroState)->b[0x2A0], 0.5f);
+        FastVecAdd(&light->position, (Vector *)(((Hero *)gHeroState)->ptr[0x2290 / 4] + 0x10), &point);
+        FastVecSub(&point, &gCameraPosition_L00, &light->position);
+        vec_scale_to_length(&point, &point, 0.15f);
+        FastVecAdd(&light->position, &light->position, &point);
         light->intensity = progress;
         light->position.v[3] = 5.0f;
         light->flags = 0;
     }
-    func_0032ACF0((int)object);
-    func_0032AF50((s8 *)object);
-    func_0032B7D0(object);
-    ref_L00_003F0CC8_00(func_0032B190, object);
+    UpdateDebrisPieces((int)object);
+    UpdateTrailNodes((s8 *)object);
+    UpdateRingPieces(object);
+    ref_L00_003F0CC8_00(UpdateScreenFade_0032B190, object);
 }

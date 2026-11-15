@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_003EB648 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give retail's grouped `lq`/`sq`
@@ -59,52 +60,54 @@ extern float D_L02_001B0DB8 __attribute__((sda));
 
 extern float D_L02_001B0DBC __attribute__((sda));
 
-void func_L02_003EB648(Actor *arg0) {
-    State *state = arg0->state;
-    float pos[4];
-    float vel[4];
-    float tmp[4];
-    float tmp2[4];
-    char *rec;
-    TI128 t;
+/* Attaches the actor to a moving surface, then makes it bob up and down on it
+   and passes its movement on. */
+void func_L02_003EB648(Actor *actor) {
+    State *state = actor->state;
+    float prevPos[4];
+    float prevVel[4];
+    float offset[4];
+    float localPoint[4];
+    char *soundSlot;
+    TI128 quad;
 
-    *(TI128 *)pos = *(TI128 *)arg0->pos;
-    *(TI128 *)vel = *(TI128 *)arg0->vel;
-    switch (arg0->kind) {
+    *(TI128 *)prevPos = *(TI128 *)actor->pos;
+    *(TI128 *)prevVel = *(TI128 *)actor->vel;
+    switch (actor->kind) {
     case 0:
         if (state->index == -1) {
-            func_002A7750(arg0, 3, -1);
+            SetMobyState(actor, 3, -1);
             return;
         }
-        if (func_00282C48(*(float *)((char *)((state->index << 7) + (int)D_L02_001B368C) + 0x28) - 2.0f) < 0.01f) {
-            arg0->update = (int)func_L02_003EB8F8;
+        if (FloatAbs(*(float *)((char *)((state->index << 7) + (int)D_L02_001B368C) + 0x28) - 2.0f) < 0.01f) {
+            actor->update = (int)UpdateElevatorMoby_L02;
             return;
         }
         state->flags |= 0x10;
-        func_00282CF0(tmp, arg0->pos, D_L02_001B368C + (state->index << 7) + 0x30);
-        func_00283098(tmp, tmp, D_L02_001B368C + (state->index << 7) + 0x40);
+        FastVecSub(offset, actor->pos, D_L02_001B368C + (state->index << 7) + 0x30);
+        matrix_mul_vec3(offset, offset, D_L02_001B368C + (state->index << 7) + 0x40);
         state->angle = state->t * 6.2831855f - 3.1415927f;
-        state->lx = tmp[0];
-        state->lz = tmp[2];
+        state->lx = offset[0];
+        state->lz = offset[2];
         state->slot = -1;
-        func_002A7750(arg0, 2, -1);
+        SetMobyState(actor, 2, -1);
         break;
     case 2:
-        state->angle = func_00283B98(state->angle, D_L02_001B0DBC * 0.0002908882452175021f);
-        state->ly = D_L02_001B0DB8 * func_00283198(state->angle);
-        rec = D_00188660 + state->slot * 0x70;
-        if (*(int *)(rec + 0x88) != (int)arg0 || *(unsigned char *)(rec + 0x74) == 0)
-            state->slot = func_002E5CF8(0, 4, arg0);
-        *(TI128 *)tmp2 = 0;
-        tmp2[0] = state->lx;
-        tmp2[1] = state->ly;
-        tmp2[2] = state->lz;
-        tmp2[3] = 1.0f;
-        t = *(TI128 *)tmp2;
-        *(TI128 *)tmp = t;
-        func_002830C0(arg0->pos, tmp, D_L02_001B368C + (state->index << 7));
+        state->angle = FastAddRotations(state->angle, D_L02_001B0DBC * 0.0002908882452175021f);
+        state->ly = D_L02_001B0DB8 * FastSinOrCosB(state->angle);
+        soundSlot = gSoundState + state->slot * 0x70;
+        if (*(int *)(soundSlot + 0x88) != (int)actor || *(unsigned char *)(soundSlot + 0x74) == 0)
+            state->slot = PlayMobySound(0, 4, actor);
+        *(TI128 *)localPoint = 0;
+        localPoint[0] = state->lx;
+        localPoint[1] = state->ly;
+        localPoint[2] = state->lz;
+        localPoint[3] = 1.0f;
+        quad = *(TI128 *)localPoint;
+        *(TI128 *)offset = quad;
+        transform_vector(actor->pos, offset, D_L02_001B368C + (state->index << 7));
         break;
     }
-    func_00282CF0(tmp, arg0->pos, pos);
-    func_002AD6F0(state->x20, tmp, vel, arg0->vel);
+    FastVecSub(offset, actor->pos, prevPos);
+    CombineTransformsAndStore(state->x20, offset, prevVel, actor->vel);
 }

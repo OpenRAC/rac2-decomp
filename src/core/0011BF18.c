@@ -60,6 +60,7 @@ void func_0011BFC8(int c) {
 }
 
 /* rac1-decomp src/core/00119D88.c: func_00119EA8 (kprintf float helper). */
+/* Turns the raw bits of a double into a whole number for printing, using only its top digits. */
 int func_0011C000(unsigned long bits) {
     long exponent = (long)((bits << 1) >> 53);
     exponent -= 1075;
@@ -86,170 +87,171 @@ extern void printfloat_A0A0(double) __asm__("r1_func_00119F38");
 extern void (*r1_D_0012FD00_A0A0[])(s32) __asm__("r1_D_0012FD00");
 
 /* rac1-decomp src/core/00119D88.c: func_0011C1F8 */
+/* Prints text with %d %u %x %o %c %s %f style codes, one character at a time, through the output hook. */
 int func_0011C1F8(const char *fmt, va_list ap) {
     char buf[32];
-    char *pad;
-    char *p;
-    s32 mod;
-    s32 n;
-    unsigned long d;
+    char *padStart;
+    char *cursor;
+    s32 lengthMod;
+    s32 width;
+    unsigned long digit;
     u8 ch;
-    char second;
-    s64 v;
-    s32 ie;
+    char nextChar;
+    s64 value;
+    s32 wasEnabled;
 
-    ie = DIntr_A0A0();
+    wasEnabled = DIntr_A0A0();
     for (; *fmt != 0; fmt++) {
-        p = (char *)fmt;
-        pad = 0;
-        mod = 0;
+        cursor = (char *)fmt;
+        padStart = 0;
+        lengthMod = 0;
         if (*fmt == '%') {
         again:
             fmt++;
             switch ((char)(*fmt - '0')) {
             case 0:
-                n = fmt[1] - '0';
-                second = fmt[2];
-                if ((u8)n < 10) {
-                    if ((u32)(second - '0') < 10) {
-                        n = n * 10 + (second - '0');
+                width = fmt[1] - '0';
+                nextChar = fmt[2];
+                if ((u8)width < 10) {
+                    if ((u32)(nextChar - '0') < 10) {
+                        width = width * 10 + (nextChar - '0');
                         fmt += 2;
-                        if (n >= 32) {
-                            n = 31;
+                        if (width >= 32) {
+                            width = 31;
                         }
                     } else {
                         fmt += 1;
                     }
-                    pad = &buf[31 - n];
-                    while (n > 0) {
-                        buf[31 - n] = '0';
-                        n--;
+                    padStart = &buf[31 - width];
+                    while (width > 0) {
+                        buf[31 - width] = '0';
+                        width--;
                     }
                     goto again;
                 }
                 goto again;
             case 'l' - '0':
-                mod = 'l';
+                lengthMod = 'l';
                 goto again;
             case 'h' - '0':
-                mod = 'h';
+                lengthMod = 'h';
                 goto again;
             case 'o' - '0':
-                if (mod == 'l') {
-                    v = (ap += 8, *(s64 *)(ap - 8));
-                } else if (mod == 'h') {
-                    v = (ap += 8, *(u16 *)(ap - 8));
+                if (lengthMod == 'l') {
+                    value = (ap += 8, *(s64 *)(ap - 8));
+                } else if (lengthMod == 'h') {
+                    value = (ap += 8, *(u16 *)(ap - 8));
                 } else {
-                    v = (ap += 8, *(u32 *)(ap - 8));
+                    value = (ap += 8, *(u32 *)(ap - 8));
                 }
-                p = &buf[31];
-                *p = 0;
-                if (v == 0) {
-                    *--p = '0';
+                cursor = &buf[31];
+                *cursor = 0;
+                if (value == 0) {
+                    *--cursor = '0';
                 } else {
                     do {
-                        *--p = (v & 7) + '0';
-                        v = (u64)v >> 3;
-                    } while (v != 0);
+                        *--cursor = (value & 7) + '0';
+                        value = (u64)value >> 3;
+                    } while (value != 0);
                 }
-                if (pad != 0 && pad < p) {
-                    p = pad;
+                if (padStart != 0 && padStart < cursor) {
+                    cursor = padStart;
                 }
-                while (*p != 0) {
-                    r1_D_0012FD00_A0A0[0](*p++);
+                while (*cursor != 0) {
+                    r1_D_0012FD00_A0A0[0](*cursor++);
                 }
                 break;
             case 'x' - '0':
-                if (mod == 'l') {
-                    v = (ap += 8, *(s64 *)(ap - 8));
-                } else if (mod == 'h') {
-                    v = (ap += 8, *(u16 *)(ap - 8));
+                if (lengthMod == 'l') {
+                    value = (ap += 8, *(s64 *)(ap - 8));
+                } else if (lengthMod == 'h') {
+                    value = (ap += 8, *(u16 *)(ap - 8));
                 } else {
-                    v = (ap += 8, *(u32 *)(ap - 8));
+                    value = (ap += 8, *(u32 *)(ap - 8));
                 }
-                p = &buf[31];
-                *p = 0;
-                if (v == 0) {
-                    *--p = '0';
+                cursor = &buf[31];
+                *cursor = 0;
+                if (value == 0) {
+                    *--cursor = '0';
                 } else {
                     do {
-                        d = v & 0xF;
-                        if (d < 10) {
-                            *--p = d + '0';
+                        digit = value & 0xF;
+                        if (digit < 10) {
+                            *--cursor = digit + '0';
                         } else {
-                            *--p = d + 'a' - 10;
+                            *--cursor = digit + 'a' - 10;
                         }
-                        v = (u64)v >> 4;
-                    } while (v != 0);
+                        value = (u64)value >> 4;
+                    } while (value != 0);
                 }
-                if (pad != 0 && pad < p) {
-                    p = pad;
+                if (padStart != 0 && padStart < cursor) {
+                    cursor = padStart;
                 }
-                while (*p != 0) {
-                    r1_D_0012FD00_A0A0[0](*p++);
+                while (*cursor != 0) {
+                    r1_D_0012FD00_A0A0[0](*cursor++);
                 }
                 break;
             case 'd' - '0':
-                if (mod == 'l') {
-                    v = (ap += 8, *(s64 *)(ap - 8));
-                } else if (mod == 'h') {
-                    v = (ap += 8, *(s16 *)(ap - 8));
+                if (lengthMod == 'l') {
+                    value = (ap += 8, *(s64 *)(ap - 8));
+                } else if (lengthMod == 'h') {
+                    value = (ap += 8, *(s16 *)(ap - 8));
                 } else {
-                    v = (ap += 8, *(s32 *)(ap - 8));
+                    value = (ap += 8, *(s32 *)(ap - 8));
                 }
-                p = &buf[31];
-                *p = 0;
-                if (v == 0) {
-                    *--p = '0';
+                cursor = &buf[31];
+                *cursor = 0;
+                if (value == 0) {
+                    *--cursor = '0';
                 } else {
-                    if (v < 0) {
-                        v = -v;
+                    if (value < 0) {
+                        value = -value;
                         r1_D_0012FD00_A0A0[0]('-');
                     }
-                    while (v != 0) {
-                        *--p = v % 10 + '0';
-                        v = v / 10;
+                    while (value != 0) {
+                        *--cursor = value % 10 + '0';
+                        value = value / 10;
                     }
                 }
-                if (pad != 0 && pad < p) {
-                    p = pad;
+                if (padStart != 0 && padStart < cursor) {
+                    cursor = padStart;
                 }
-                while (*p != 0) {
-                    r1_D_0012FD00_A0A0[0](*p++);
+                while (*cursor != 0) {
+                    r1_D_0012FD00_A0A0[0](*cursor++);
                 }
                 break;
             case 'u' - '0':
-                if (mod == 'l') {
-                    v = (ap += 8, *(s64 *)(ap - 8));
-                } else if (mod == 'h') {
-                    v = (ap += 8, *(u16 *)(ap - 8));
+                if (lengthMod == 'l') {
+                    value = (ap += 8, *(s64 *)(ap - 8));
+                } else if (lengthMod == 'h') {
+                    value = (ap += 8, *(u16 *)(ap - 8));
                 } else {
-                    v = (ap += 8, *(u32 *)(ap - 8));
+                    value = (ap += 8, *(u32 *)(ap - 8));
                 }
-                p = &buf[31];
-                *p = 0;
-                if (v == 0) {
-                    *--p = '0';
+                cursor = &buf[31];
+                *cursor = 0;
+                if (value == 0) {
+                    *--cursor = '0';
                 } else {
                     do {
-                        *--p = (u64)v % 10 + '0';
-                        v = (u64)v / 10;
-                    } while (v != 0);
+                        *--cursor = (u64)value % 10 + '0';
+                        value = (u64)value / 10;
+                    } while (value != 0);
                 }
-                if (pad != 0 && pad < p) {
-                    p = pad;
+                if (padStart != 0 && padStart < cursor) {
+                    cursor = padStart;
                 }
-                while (*p != 0) {
-                    r1_D_0012FD00_A0A0[0](*p++);
+                while (*cursor != 0) {
+                    r1_D_0012FD00_A0A0[0](*cursor++);
                 }
                 break;
             case 'e' - '0':
             case 'f' - '0': {
-                f32 f = (ap += 8, *(f32 *)(ap - 8));
-                if (f == 0.0f) {
+                f32 floatValue = (ap += 8, *(f32 *)(ap - 8));
+                if (floatValue == 0.0f) {
                     r1_D_0012FD00_A0A0[0]('0');
                 } else {
-                    printfloat_A0A0(f);
+                    printfloat_A0A0(floatValue);
                 }
             } break;
             case 's' - '0': {
@@ -262,18 +264,18 @@ int func_0011C1F8(const char *fmt, va_list ap) {
                     r1_D_0012FD00_A0A0[0]('l');
                     r1_D_0012FD00_A0A0[0](')');
                 } else {
-                    p = string;
-                    if (*p != 0) {
+                    cursor = string;
+                    if (*cursor != 0) {
                         do {
-                            r1_D_0012FD00_A0A0[0](*p++);
-                        } while (*p != 0);
+                            r1_D_0012FD00_A0A0[0](*cursor++);
+                        } while (*cursor != 0);
                     }
                 }
                 break;
             }
             case 'c' - '0':
-                v = (ap += 8, *(char *)(ap - 8));
-                r1_D_0012FD00_A0A0[0](v);
+                value = (ap += 8, *(char *)(ap - 8));
+                r1_D_0012FD00_A0A0[0](value);
                 break;
             default:
                 break;
@@ -282,7 +284,7 @@ int func_0011C1F8(const char *fmt, va_list ap) {
             r1_D_0012FD00_A0A0[0](*fmt);
         }
     }
-    if (ie != 0) {
+    if (wasEnabled != 0) {
         EnableInterrupts_A0A0();
     }
 }

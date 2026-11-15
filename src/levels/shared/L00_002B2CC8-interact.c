@@ -2,9 +2,9 @@
 
 typedef struct {
     unsigned char pad0[476];
-    short f1dc;
+    short timer;
     unsigned char pad1de[62];
-    short f21c;
+    short soundTimer;
     unsigned char pad21e[1136];
     short f68e;
     unsigned char pad690[52];
@@ -12,18 +12,18 @@ typedef struct {
     unsigned char pad6c8[3535];
     unsigned char f1497;
     unsigned char pad1498[104];
-    int f1500;
+    int interrupted;
     unsigned char pad1504[3468];
-    char *f2290;
-    int f2294;
+    char *moby;
+    int moveState;
     unsigned char pad2298[4];
-    int f229c;
+    int controlMode;
     unsigned char pad22a0[20];
-    unsigned char f22b4;
+    unsigned char vehicleMode;
     unsigned char pad22b5[487];
-    char *f249c;
+    char *contact;
     unsigned char pad24a0[44];
-    int f24cc;
+    int health;
 } Root;
 
 extern Root D_00189E20;
@@ -48,106 +48,107 @@ extern void func_00282CC0(void *, void *, void *);
 #define SI(o) (*(int *)(slot + (o)))
 #define SF(o) (*(float *)(slot + (o)))
 
+/* Checks whether the hero can grab the object it is next to and, if asked, starts the grab and pushes the hero toward it. Returns 1 when a grab is possible. */
 int func_L00_002B2CC8(int apply)
 {
-    float v[4] __attribute__((aligned(16)));
-    char *obj, *slot, *p;
+    float pushVec[4] __attribute__((aligned(16)));
+    char *targetMoby, *slot, *other;
     int special;
     float scale;
 
-    if (D_00189E20.f229c == 20)
+    if (gHeroState.controlMode == 20)
         return 0;
-    if (D_00189E20.f229c == 7)
+    if (gHeroState.controlMode == 7)
         return 0;
-    if (D_00189E20.f2294 == 49)
+    if (gHeroState.moveState == 49)
         return 0;
-    if (D_00189E20.f1dc)
+    if (gHeroState.timer)
         return 0;
     if (D_L00_001A8F00)
         return 0;
-    D_00189E20.f249c = 0;
-    obj = D_00189E20.f2290;
-    if ((unsigned char)obj[0xa8] == 255)
+    gHeroState.contact = 0;
+    targetMoby = gHeroState.moby;
+    if ((unsigned char)targetMoby[0xa8] == 255)
         return 0;
-    slot = D_L00_001C3480 + (unsigned char)obj[0xa8] * 64;
-    if (*(char **)(slot + 0x38) != obj || !(SI(0x24) & 9))
+    slot = D_L00_001C3480 + (unsigned char)targetMoby[0xa8] * 64;
+    if (*(char **)(slot + 0x38) != targetMoby || !(SI(0x24) & 9))
         return 0;
     if (SF(0x2c) != 0.0f) {
         D_001A7A33 = 0;
-        D_001A7A32 = 1;
+        gBoltMultiplier = 1;
     }
-    if (func_L00_0037E668() != 0.0f && !D_00189E20.f22b4) {
-        SF(0x2c) = func_L00_0037E5F0(SF(0x2c));
+    if (GetFadeValue() != 0.0f && !gHeroState.vehicleMode) {
+        SF(0x2c) = ReduceFadeValue(SF(0x2c));
         if (SF(0x2c) == 0.0f)
             return 0;
     }
-    D_00189E20.f249c = SI(0x20);
-    if (D_00189E20.f229c == 15) {
-        D_00189E20.f6c4 = (int)slot;
-        D_00189E20.f68e = 1;
+    gHeroState.contact = SI(0x20);
+    if (gHeroState.controlMode == 15) {
+        gHeroState.f6c4 = (int)slot;
+        gHeroState.f68e = 1;
         return 0;
     }
     if (!apply)
         return 1;
-    func_L00_002A6708();
+    ClearTrackedSlots();
     special = 0;
     if (SI(0x30) & 1) {
-        qcopy(v, slot + 0x10);
+        qcopy(pushVec, slot + 0x10);
         if (SF(0x1c) == 5627.925f)
             special = 1;
     } else if (SI(0x20)) {
-        func_00282CF0(v, (char *)&D_00189E20 + 0x80,
+        FastVecSub(pushVec, (char *)&gHeroState + 0x80,
                      *(char **)(slot + 0x20) + 0x10);
     } else {
-        func_L00_002D36E0(v, 0, -1.0f, 0.0f, 0.0f);
+        BuildHeroRelativePoint(pushVec, 0, -1.0f, 0.0f, 0.0f);
     }
-    switch (D_00189E20.f22b4) {
+    switch (gHeroState.vehicleMode) {
     case 0: {
-        p = D_00189E20.f249c;
-        if (p && (*(short *)(p + 0xaa) == 1259 || *(short *)(p + 0xaa) == 1368)) {
+        other = gHeroState.contact;
+        if (other && (*(short *)(other + 0xaa) == 1259 /* moby class 1259 */ || *(short *)(other + 0xaa) == 1368 /* moby class 1368 */)) {
             ref_L00_002B2CC8_0(125, 1);
             return 1;
         }
-        if ((D_00189E20.f2294 == 1 || D_00189E20.f2294 == 29 || D_00189E20.f1500) &&
+        if ((gHeroState.moveState == 1 || gHeroState.moveState == 29 || gHeroState.interrupted) &&
             !(SI(0x24) & 8)) {
-            p = func_002A9640(D_00189E20.f2290, 1, 0);
-            if (p)
-                func_L00_002A4EF8(func_00283CF0(*(float *)(p + 0x2c)));
-            if (!D_00189E20.f24cc)
+            other = FindOwnedEffectSlot(gHeroState.moby, 1, 0);
+            if (other)
+                AdjustPlayerHealth(FloatToInt(*(float *)(other + 0x2c)));
+            if (!gHeroState.health)
                 ref_L00_002B2CC8_0(22, 1);
-            D_00189E20.f1dc = 77;
-            if (!D_00189E20.f21c)
-                D_00189E20.f21c = 18;
-            func_L00_002B9B88(20, 0);
+            gHeroState.timer = 77;
+            if (!gHeroState.soundTimer)
+                gHeroState.soundTimer = 18;
+            PlayHeroSound(20, 0);
             return 0;
         }
-        if (D_00189E20.f229c == 18)
+        if (gHeroState.controlMode == 18)
             ref_L00_002B2CC8_0(114, 1);
-        else if (D_00189E20.f229c == 17)
+        else if (gHeroState.controlMode == 17)
             ref_L00_002B2CC8_0(115, 1);
         else if (SI(0x24) & 8)
             ref_L00_002B2CC8_0(140, 1);
         else
             ref_L00_002B2CC8_0(22, 1);
-        if (D_00189E20.f2294 == 140) {
-            qzero(v);
+        if (gHeroState.moveState == 140) {
+            qzero(pushVec);
         } else {
             scale = 0.055000003f;
-            if (D_00189E20.f1497)
+            if (gHeroState.f1497)
                 scale = 0.0f;
-            func_L00_002B2C58(v, special, scale, 0.028333336f);
+            FlattenPushVectorAndSetStrength(pushVec, special, scale, 0.028333336f);
             if (special && (unsigned char)slot[0x28] == 4)
-                func_L00_002D3C68(v, v, 2.0f);
+                ScaleViewSpaceHeight(pushVec, pushVec, 2.0f);
         }
         break;
     }
     case 1: {
         ref_L00_002B2CC8_0(66, 1);
-        func_L00_002B2C58(v, special, 0.083333336f, 0.050000004f);
+        FlattenPushVectorAndSetStrength(pushVec, special, 0.083333336f, 0.050000004f);
         break;
     }
     }
-    func_00282CC0((char *)&D_00189E20 + 0xf0, (char *)&D_00189E20 + 0xf0, v);
-    func_00282CC0((char *)&D_00189E20 + 0x110, (char *)&D_00189E20 + 0x110, v);
+    FastVecAdd((char *)&gHeroState + 0xf0, (char *)&gHeroState + 0xf0, pushVec);
+    FastVecAdd((char *)&gHeroState + 0x110, (char *)&gHeroState + 0x110, pushVec);
     return 1;
 }

@@ -26,5 +26,5 @@ void func_L00_003B0CE8(int idx)
         }
     }
     if (c == D_L00_001AF811)
-        func_L00_003B0A28();
+        AdvanceNodeRingCursor();
 }

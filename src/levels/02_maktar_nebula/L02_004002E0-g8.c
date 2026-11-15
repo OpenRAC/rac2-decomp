@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -27,49 +28,50 @@ extern void func_0027E018(int, int, int, int, int, int, int, int, unsigned long 
    D_L02_001B1508 wider on each side and at most D_L02_001B1500 tall. Built with -g
    (config/cflags.txt): retail has two nops in front of the division, which the assembler puts after
    a line label, so the division is a statement of its own. */
-void func_L02_004002E0(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
+/* Draws a screen-wipe transition that fades the screen and slides a band down it. */
+void func_L02_004002E0(char *actor) {
+    char *state = *(char **)(actor + 0x68);
     s32 color;
-    float f20;
+    float ratio;
     float height;
-    long long id;
+    long long spriteId;
     s32 i;
-    s32 h;
-    s32 n;
-    s32 m;
+    s32 wipeHeight;
+    s32 bandHeight;
+    s32 margin;
     short *screen;
 
     color = D_L02_001B14F0;
     *(u16 *)(state + 0x124) -= D_L02_001B14F8;
-    f20 = func_00283CE0(*(u16 *)(state + 0x124));
-    height = (float)D_001A6480[0xA9];
-    f20 = f20 / height;
-    f20 = f20 * f20;
+    ratio = IntToFloat(*(u16 *)(state + 0x124));
+    height = (float)gScreenAdjustOffsets[0xA9];
+    ratio = ratio / height;
+    ratio = ratio * ratio;
     {
         float scale = (float)(s32)((u32)color >> 24);
 
         color &= 0xFFFFFF;
-        color |= (s32)(f20 * scale) << 24;
+        color |= (s32)(ratio * scale) << 24;
     }
-    func_002FC560(0x42, 0x8000000049LL);
+    VU1_addGSregister(0x42, 0x8000000049LL);
     for (i = 0; i < D_L02_001B14F4; i++)
-        func_0028FC48(0, 0, D_001A6480[0xA8], D_001A6480[0xA9], color, 0);
-    func_002FC560(0x42, 0x8000000044LL);
-    screen = D_001A6480;
-    func_0028FC48(0, 0, screen[0xA8], *(s16 *)(state + 0x124), D_L02_001B14EC, 0);
-    id = func_0027C878(0x10);
+        AppendScreenRectPacket(0, 0, gScreenAdjustOffsets[0xA8], gScreenAdjustOffsets[0xA9], color, 0);
+    VU1_addGSregister(0x42, 0x8000000044LL);
+    screen = gScreenAdjustOffsets;
+    AppendScreenRectPacket(0, 0, screen[0xA8], *(s16 *)(state + 0x124), D_L02_001B14EC, 0);
+    spriteId = GetEffectTextureDescriptor(0x10);
     color = D_L02_001B1504;
     {
         float scale = (float)(s32)((u32)color >> 24);
 
         color &= 0xFFFFFF;
-        color |= (s32)(f20 * scale) << 24;
+        color |= (s32)(ratio * scale) << 24;
     }
-    func_002FC560(0x42, 0x8000000048LL);
-    h = *(s16 *)(state + 0x124);
-    n = screen[0xA9] - h;
-    if (D_L02_001B1500 < n)
-        n = D_L02_001B1500;
-    m = D_L02_001B1508;
-    func_0027E018(-m, h - (n >> 1), screen[0xA8] + m * 2, n, 0, 0, 0x20, 0x20, color, id);
+    VU1_addGSregister(0x42, 0x8000000048LL);
+    wipeHeight = *(s16 *)(state + 0x124);
+    bandHeight = screen[0xA9] - wipeHeight;
+    if (D_L02_001B1500 < bandHeight)
+        bandHeight = D_L02_001B1500;
+    margin = D_L02_001B1508;
+    DrawTexturedQuad(-margin, wipeHeight - (bandHeight >> 1), screen[0xA8] + margin * 2, bandHeight, 0, 0, 0x20, 0x20, color, spriteId);
 }

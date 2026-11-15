@@ -20,29 +20,30 @@ static __inline__ void swap16(void *x, void *y) {
     __asm__ __volatile__("lq $2,0x0(%0)\n\tlq $3,0x0(%1)\n\tsq $2,0x0(%1)\n\tsq $3,0x0(%0)"
                          : : "r"(x), "r"(y) : "$2", "$3", "memory");
 }
-void func_L00_003ADCD8(char *a, char *b)
+/* Throws sparks from one moby to another moby of the same kind. */
+void func_L00_003ADCD8(char *first, char *second)
 {
  float offset[4], position[4], delta[4];
  int i, count;
  unsigned char color;
  float distance;
- if(!b || *(short *)(b+0xAA)!=*(short *)(a+0xAA)) return;
- if((unsigned char)b[0x20]!=0xFE) { if((unsigned char)b[0x20]!=0xFD) {
+ if(!second || *(short *)(second+0xAA)!=*(short *)(first+0xAA)) return;
+ if((unsigned char)second[0x20]!=0xFE) { if((unsigned char)second[0x20]!=0xFD) {
  for(i=0;i<ref_L00_003ADCD8_0;) {
    if(func_1163B0()&1)
-     swap16(&a, &b);
+     swap16(&first, &second);
    i++;
-   *(TI128 *)position=*(TI128 *)(a+0x10);
-   count=func_00283CF0(func_002A7878(ref_L00_003ADCD8_1*0.5f,ref_L00_003ADCD8_1));
+   *(TI128 *)position=*(TI128 *)(first+0x10);
+   count=FloatToInt(RandomFloatRange(ref_L00_003ADCD8_1*0.5f,ref_L00_003ADCD8_1));
    color=count;
-   func_00282CF0(delta,b+0x10,position);
+   FastVecSub(delta,second+0x10,position);
    *(TI128 *)offset=*(TI128 *)delta;
-   distance=func_00282DF0(offset);
-   func_00282D30(offset,offset,func_002A7878(0,0.9f));
-   func_00282CD8(delta,position,offset);
-   func_00282F20(offset,offset,func_002A7878(1.0f/6.0f,distance/func_00283CE0(count*4)));
-   { int c=func_002A77E0(255);
-   func_002C3150(position,offset,0x604040FF,color,(unsigned char)c,0,ref_L00_003ADCD8_2); }
+   distance=FastVecLength(offset);
+   FastVecScale(offset,offset,RandomFloatRange(0,0.9f));
+   add_vectors(delta,position,offset);
+   vec_scale_to_length(offset,offset,RandomFloatRange(1.0f/6.0f,distance/IntToFloat(count*4)));
+   { int c=RandomIntBelow(255);
+   SpawnHeroRelativeParticle(position,offset,0x604040FF,color,(unsigned char)c,0,ref_L00_003ADCD8_2); }
  }
 }
 }

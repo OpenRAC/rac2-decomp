@@ -26,6 +26,7 @@ extern void func_00282DD8(void *, void *, void *);
 extern void func_002830C0(void *, void *, void *);
 extern void func_00280B90(void *, int, int);
 
+/* Draws a flat tiled textured quad facing the camera at the object's position. */
 void func_L05_0042BB10(char *object)
 {
     DrawVector position, offset;
@@ -33,7 +34,7 @@ void func_L05_0042BB10(char *object)
     DrawFrame frame;
     int i;
 
-    func_002FC560(0x47, 0x53001UL);
+    VU1_addGSregister(0x47, 0x53001UL);
     {
         float x = *(float *)(object + 0x10), y = *(float *)(object + 0x14), z = *(float *)(object + 0x18);
         position.v[2] = z;
@@ -41,9 +42,9 @@ void func_L05_0042BB10(char *object)
         position.v[1] = y;
     }
     position.v[3] = 1.0f;
-    func_00282D30(&offset, object + 0xC0, D_L05_001B1734);
-    func_00282CC0(&position, &position, &offset);
-    func_00281DE8(&packet, D_L05_001B172C, 2, 0x80);
+    FastVecScale(&offset, object + 0xC0, D_L05_001B1734);
+    FastVecAdd(&position, &position, &offset);
+    InitQuadPacketState(&packet, D_L05_001B172C, 2, 0x80);
     packet.extra.q = 0;
     packet.color[3] = 0x80808080;
     packet.color[2] = 0x80808080;
@@ -60,14 +61,14 @@ void func_L05_0042BB10(char *object)
     packet.extra.v[2] = 1.0f;
     packet.extra.v[3] = 1.0f;
     qcopy(&frame.position, &position);
-    func_00282CF0(&frame.row[0], D_L05_001B96C0, &frame.position);
-    func_00282F20(&frame.row[0], &frame.row[0], 1.0f);
-    func_00282DD8(&frame.row[1], &frame.row[0], &packet.extra);
-    func_00282F20(&frame.row[1], &frame.row[1], 1.0f);
-    func_00282DD8(&frame.row[2], &frame.row[1], &frame.row[0]);
+    FastVecSub(&frame.row[0], D_L05_001B96C0, &frame.position);
+    vec_scale_to_length(&frame.row[0], &frame.row[0], 1.0f);
+    FastVecCross(&frame.row[1], &frame.row[0], &packet.extra);
+    vec_scale_to_length(&frame.row[1], &frame.row[1], 1.0f);
+    FastVecCross(&frame.row[2], &frame.row[1], &frame.row[0]);
     for (i = 0; i < 4; i++) {
-        func_00282D30(&packet.vertex[i], &D_L05_001AA250[i], D_L05_001B1730);
-        func_002830C0(&packet.vertex[i], &packet.vertex[i], &frame);
+        FastVecScale(&packet.vertex[i], &D_L05_001AA250[i], D_L05_001B1730);
+        transform_vector(&packet.vertex[i], &packet.vertex[i], &frame);
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
 }

@@ -27,25 +27,26 @@ extern Vec D_002299E0[];
 extern int D_00229990[];
 extern int D_00229B20[];
 /* Same family as func_0030A188 (RAC1 initialize_electric_water_bolt_effect). */
-void func_0030CAD0(char *obj) {
+/* Resets the twenty beam chain points to a straight line when the beam starts (level-specific version). */
+void func_0030CAD0(char *moby) {
     Vec delta, step;
-    Vec *state = *(Vec **)(obj + 0x68);
+    Vec *vars = *(Vec **)(moby + 0x68);
     int i;
     Vec *points;
-    if (D_001A79F0 == 1 && D_001A8BB0 == 2) state = D_001C1490;
-    if (D_001A79F0 == 20 && D_001A8BB0 == 2) state = D_001C14E0;
+    if (gCurrentMapIndex == 1 && gCurrentGameMode == 2) vars = D_001C1490;
+    if (gCurrentMapIndex == 20 && gCurrentGameMode == 2) vars = D_001C14E0;
     if (D_001AEFA0) {
         D_001B24A0 = D_001AF040;
         D_001AEFA0 = 0;
         D_001B24A4 = 0;
-        func_00282CF0(&delta, state + 1, state);
-        func_00282F20(&step, &delta, D_001AEFA4 * 0.05f);
+        FastVecSub(&delta, vars + 1, vars);
+        vec_scale_to_length(&step, &delta, D_001AEFA4 * 0.05f);
         points = D_00229710;
-        qcopy(points, state);
+        qcopy(points, vars);
         for (i = 1; i < 20; i++) {
-            func_00282CC0(&points[i], &points[i - 1], &step);
+            FastVecAdd(&points[i], &points[i - 1], &step);
             D_00229990[i] = 0;
-            func_00282C88(&D_002299E0[i]);
+            ClearVector128(&D_002299E0[i]);
             D_00229B20[i] = 0;
         }
         { short empty = -1; int j; for (j = 3; j >= 0; j--) D_001B2480[j] = empty; }

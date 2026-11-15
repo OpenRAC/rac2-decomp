@@ -70,6 +70,7 @@ extern void func_L00_0038E880(void *, void *, void *);
 extern void func_L00_0038F3D8(void *);
 
 
+/* Moves a thrown shell one step, checks what it hits, and on impact makes it bounce or burst. */
 void func_L23_00394630(char *obj) {
     struct {
         Vec velocity, normal, old, surface;
@@ -93,10 +94,10 @@ void func_L23_00394630(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
-    func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
-    func_L00_0038F3D8(obj);
+    FastVecAdd(position, position, ctx);
+    ComputeViewDirection(position, &frame.surface, 0);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
+    SpawnSparkPuff(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0x122)
@@ -104,24 +105,24 @@ void func_L23_00394630(char *obj) {
     frame.packet.enabled = 1;
     frame.packet.material = (D_00139574 + D_L23_00266A70)->material;
     qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        collision = &D_L23_001C0A80;
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
+        collision = &gLastRayHit;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
-            reread = &D_L23_001C0A80;
+            reread = &gLastRayHit;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L23_001AC790 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == D_L23_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -129,30 +130,30 @@ void func_L23_00394630(char *obj) {
                 void *dest = obj + 0x10;
                 qcopy(dest, source);
             }
-            func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            FastVectorNormalize(&frame.velocity, ctx, &reread->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            collision = &D_L23_001C0A80;
+            collision = &gLastRayHit;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
-            func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            FastVectorNormalize(&frame.velocity, ctx, &collision->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (func_00282948(ctx + 0x18)) {
+    } else if (FastFloatHelperD(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
+        ClearEntryFlag(*(int *)(ctx + 0x1C));
         if (*(int *)(ctx + 0x14) < 20)
-            func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+            SpawnBigExplosionEffect(obj, &frame.velocity, &frame.normal);
         else
-            func_L00_0038E880(obj, &frame.velocity, &frame.normal);
+            SpawnImpactBurst(obj, &frame.velocity, &frame.normal);
     }
 }
 
@@ -169,42 +170,45 @@ extern void func_2F7DD0(char *);
 
 extern void func_2F7E00(char *);
 
-void func_L23_003BFE38(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Updates two timers of an object and counts its frame age up (stopping at the limit). */
+void func_L23_003BFE38(char *moby) {
+    char *state = *(char **)(moby + 0x68);
 
     func_2F7DD0(state + 0x250);
     func_2F7E00(state + 0x254);
-    if (*(unsigned short *)(arg0 + 0x96) <= 0xFFFE)
-        *(unsigned short *)(arg0 + 0x96) += 1;
+    if (*(unsigned short *)(moby + 0x96) <= 0xFFFE)
+        *(unsigned short *)(moby + 0x96) += 1;
 }
 
 /* func_L23_003BFE90 is matched in L23_003BFE90.c (built with -frac2-zero-ti-barrier). */
 
 extern void func_323FF0(char *, int, int, int);
 
-void func_L23_003BFFC0(char *arg0, int arg1, int arg2, int arg3, int arg4, float arg5) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Plays an animation on an object and/or on the object it is linked to, chosen by the bits of a flag. */
+void func_L23_003BFFC0(char *moby, int animId, int arg2, int arg3, int targetBits, float arg5) {
+    char *state = *(char **)(moby + 0x68);
 
-    if (arg4 & 1)
-        func_323FF0(arg0, arg1, 0, 4);
-    if (arg4 & 2)
-        func_323FF0(*(char **)(state + 0x2A0), arg1, 0, 4);
+    if (targetBits & 1)
+        func_323FF0(moby, animId, 0, 4);
+    if (targetBits & 2)
+        func_323FF0(*(char **)(state + 0x2A0), animId, 0, 4);
 }
 
 extern void func_367150(int);
 
-void func_L23_003C0028(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Puts an object back to its idle look: clears its links and effects and starts the idle animation. */
+void func_L23_003C0028(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     int none = -1;
 
-    func_L23_003C1988(arg0);
+    StopObjectEffects(moby);
     *(short *)(state + 0x178) = 0;
     *(unsigned short *)(*(char **)(state + 0x2A0) + 0x34) |= 0x41;
     *(unsigned short *)(*(char **)(state + 0x2A0) + 0x34) &= 0xEFFF;
     *(int *)(*(char **)(state + 0x2A0) + 0x98) = 0;
-    *(int *)(arg0 + 0x98) = 0;
-    *(unsigned short *)(arg0 + 0x34) = (*(unsigned short *)(arg0 + 0x34) | 0x41) & 0xEFFF;
-    func_3242D0(arg0, 0xD, 4);
+    *(int *)(moby + 0x98) = 0;
+    *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
+    func_3242D0(moby, 0xD, 4);
     *(int *)(state + 0x25C) = 0;
     if (*(int *)(state + 0x3B4) != none) {
         func_367150(*(int *)(state + 0x3B4));
@@ -233,23 +237,23 @@ void func_L23_003C0C78(char *arg0, int arg1) {
 
     state = *(char **)(arg0 + 0x68);
     qcopy(&loc.a, src);
-    func_00282CF0(loc.b, src, D_00189EA0);
+    FastVecSub(loc.b, src, gHeroPosition);
     best = 30000.0f;
-    func_00282F20(loc.b, loc.b, 4.0f);
-    func_00282CC0((char *)&loc.a, (char *)&loc.a, (char *)loc.b);
+    vec_scale_to_length(loc.b, loc.b, 4.0f);
+    FastVecAdd((char *)&loc.a, (char *)&loc.a, (char *)loc.b);
     for (i = 0; i < D_L23_001B1684; i++) {
         int *obj;
         int k;
 
         if (arg1 != 0 && func_419CA0(i) == 0)
             continue;
-        obj = D_L23_001FF300[D_L23_001B36A8[i]];
+        obj = gPathLists[D_L23_001B36A8[i]];
         for (k = 0; k < *obj; k++) {
-            float d = func_00282E48((char *)obj + 0x10 + k * 0x10, &loc.a);
+            float d = fast_vec_dist((char *)obj + 0x10 + k * 0x10, &loc.a);
 
             if (d < best) {
                 best = d;
-                func_L23_003C0F48(arg0, i);
+                PushPathPieceHistory(arg0, i);
                 *(short *)(state + 0x2B6) = k;
             }
         }
@@ -258,23 +262,24 @@ void func_L23_003C0C78(char *arg0, int arg1) {
 
 extern int func_419CA0(int);
 
-int func_L23_003C0DF8(int arg0, unsigned long long v, int *arg2, int arg3) {
-    int *out = arg2;
+/* Lists the numbers of all bits that are set in a 64-bit mask, optionally skipping the ones that are not allowed. Returns how many were found. */
+int func_L23_003C0DF8(int arg0, unsigned long long mask, int *outIds, int onlyAllowed) {
+    int *dest = outIds;
     int i = 0;
-    int n = 0;
+    int count = 0;
 
     while (i < 0x40) {
-        if (v & 1) {
-            if (arg3 == 0 || func_419CA0(i) != 0) {
-                *out = i;
-                n++;
-                out++;
+        if (mask & 1) {
+            if (onlyAllowed == 0 || func_419CA0(i) != 0) {
+                *dest = i;
+                count++;
+                dest++;
             }
         }
         i++;
-        v >>= 1;
+        mask >>= 1;
     }
-    return n;
+    return count;
 }
 
 extern int *D_L23_001B36A8 __attribute__((sda));
@@ -285,32 +290,34 @@ extern char D_L23_002595C8[];
 
 extern int func_419070(long long v, char *arg);
 
+/* Tells which end of a path piece the object is at. Returns 0 for the start, or the last point number for the other end. */
 int func_L23_003C0E98(int arg0, int index, char *arg) {
-    int v;
-    int w;
-    int n;
+    int pieceA;
+    int pieceB;
+    int lastPoint;
 
-    v = D_L23_001B36A8[index];
-    if (func_419070(*(long long *)(D_L23_002595C8 + (v << 4)), arg) != 0)
+    pieceA = D_L23_001B36A8[index];
+    if (func_419070(*(long long *)(gPathEndMasks + (pieceA << 4)), arg) != 0)
         return 0;
-    w = D_L23_001B36A8[index];
-    n = *D_L23_001FF300[w] - 1;
-    func_419070(*(long long *)(D_L23_002595C8 + (w << 4) + 8), arg);
-    return n;
+    pieceB = D_L23_001B36A8[index];
+    lastPoint = *gPathLists[pieceB] - 1;
+    func_419070(*(long long *)(gPathEndMasks + (pieceB << 4) + 8), arg);
+    return lastPoint;
 }
 
-void func_L23_003C0F48(char *arg0, int arg1) {
-    char *p = *(char **)(arg0 + 0x68);
-    short n = *(short *)(p + 0x2BE);
-    unsigned short old = *(unsigned short *)(p + 0x2B4);
-    int off;
-    int r;
+/* Remembers a new path piece as the current one and pushes the three earlier ones down a short history list. */
+void func_L23_003C0F48(char *moby, int newPiece) {
+    char *state = *(char **)(moby + 0x68);
+    short slot = *(short *)(state + 0x2BE);
+    unsigned short oldPiece = *(unsigned short *)(state + 0x2B4);
+    int offset;
+    int nextSlot;
 
-    r = (n + 1) % 3;
-    off = r * 2;
-    *(short *)(p + 0x2BE) = r;
-    *(short *)(p + off + 0x2B8) = old;
-    *(short *)(p + 0x2B4) = arg1;
+    nextSlot = (slot + 1) % 3;
+    offset = nextSlot * 2;
+    *(short *)(state + 0x2BE) = nextSlot;
+    *(short *)(state + offset + 0x2B8) = oldPiece;
+    *(short *)(state + 0x2B4) = newPiece;
 }
 
 extern const int D_L23_001B1688 __attribute__((sda));
@@ -339,6 +346,7 @@ extern void func_00282CF0(void *, void *, void *);
 
 extern float func_00282DB0(void *, void *);
 
+/* Chooses the next path piece to travel to from a set of allowed ones, either at random or by nearest or farthest distance. */
 void func_L23_003C0F88(char *arg0, unsigned long long mask, int mode, int check)
 {
     char *state = *(char **)(arg0 + 0x68);
@@ -349,7 +357,7 @@ void func_L23_003C0F88(char *arg0, unsigned long long mask, int mode, int check)
     float va[4];
     float vb[4];
 
-    n = func_L23_003C0DF8((int)arg0, mask, ids, check);
+    n = ListSetBitIndices((int)arg0, mask, ids, check);
     if (n == 0) {
         int d = *(short *)(state + 0x2B2);
 
@@ -359,11 +367,11 @@ void func_L23_003C0F88(char *arg0, unsigned long long mask, int mode, int check)
     if (mode == 0) {
         int res;
 
-        id = ids[func_002A77E0(n)];
-        res = func_L23_003C0E98((int)arg0, id, (char *)(int)*(short *)(state + 0x2B4));
+        id = ids[RandomIntBelow(n)];
+        res = GetPathPieceEnd((int)arg0, id, (char *)(int)*(short *)(state + 0x2B4));
         *(short *)(state + 0x2B2) = res == 0 ? 1 : -1;
         *(short *)(state + 0x2B6) = res;
-        func_L23_003C0F48(arg0, id);
+        PushPathPieceHistory(arg0, id);
         return;
     } else {
         char *pos[count];
@@ -376,14 +384,14 @@ void func_L23_003C0F88(char *arg0, unsigned long long mask, int mode, int check)
             int *q;
 
             id = ids[i];
-            res[i] = func_L23_003C0E98((int)arg0, id, (char *)(int)*(short *)(state + 0x2B4));
-            q = D_L23_001FF300[D_L23_001B36A8[id]];
+            res[i] = GetPathPieceEnd((int)arg0, id, (char *)(int)*(short *)(state + 0x2B4));
+            q = gPathLists[D_L23_001B36A8[id]];
             if (res[i] == 0) {
                 pos[i] = (char *)(q + *q * 4);
-                bits[i] = (long long *)(D_L23_002595C8 + 8 + (D_L23_001B36A8[id] << 4));
+                bits[i] = (long long *)(gPathEndMasks + 8 + (D_L23_001B36A8[id] << 4));
             } else {
                 pos[i] = (char *)(q + 4);
-                bits[i] = (long long *)(D_L23_002595C8 + (D_L23_001B36A8[id] << 4));
+                bits[i] = (long long *)(gPathEndMasks + (D_L23_001B36A8[id] << 4));
             }
         }
         best = 0;
@@ -397,8 +405,8 @@ void func_L23_003C0F88(char *arg0, unsigned long long mask, int mode, int check)
                 float d;
 
                 if (check)
-                    blocked = func_L23_00419CE0(*bits[j]);
-                d = func_00282E48(pos[j], *(void **)(state + 0x320));
+                    blocked = IsSingleRejectedBit(*bits[j]);
+                d = fast_vec_dist(pos[j], *(void **)(state + 0x320));
                 if ((d < bestDist && !blocked) || n == 1) {
                     best = j;
                     bestDist = d;
@@ -415,10 +423,10 @@ void func_L23_003C0F88(char *arg0, unsigned long long mask, int mode, int check)
                 float d;
 
                 if (check)
-                    blocked = func_L23_00419CE0(*bits[j]);
-                func_00282CF0(va, D_00189EA0, arg0 + 0x10);
-                func_00282CF0(vb, pos[j], arg0 + 0x10);
-                d = func_00282DB0(va, vb);
+                    blocked = IsSingleRejectedBit(*bits[j]);
+                FastVecSub(va, gHeroPosition, arg0 + 0x10);
+                FastVecSub(vb, pos[j], arg0 + 0x10);
+                d = FastVecDot(va, vb);
                 if ((bestDot < d && !blocked) || n == 1) {
                     best = j;
                     bestDot = d;
@@ -436,10 +444,10 @@ void func_L23_003C0F88(char *arg0, unsigned long long mask, int mode, int check)
                 float d;
 
                 if (check)
-                    blocked = func_L23_00419CE0(*bits[j]);
-                func_00282CF0(va, D_00189EA0, arg0 + 0x10);
-                func_00282CF0(vb, pos[j], arg0 + 0x10);
-                d = func_00282DB0(va, vb);
+                    blocked = IsSingleRejectedBit(*bits[j]);
+                FastVecSub(va, gHeroPosition, arg0 + 0x10);
+                FastVecSub(vb, pos[j], arg0 + 0x10);
+                d = FastVecDot(va, vb);
                 if ((d < bestDot && !blocked) || n == 1) {
                     best = j;
                     bestDot = d;
@@ -456,39 +464,42 @@ void func_L23_003C0F88(char *arg0, unsigned long long mask, int mode, int check)
             *(short *)(state + 0x2B2) = -1;
         }
         *(short *)(state + 0x2B6) = res[best];
-        func_L23_003C0F48(arg0, id);
+        PushPathPieceHistory(arg0, id);
     }
 }
 
 
 
-void func_L23_003C1960(char *arg0) {
+/* Clears the selected-object flag and releases the object's two effects. */
+void func_L23_003C1960(char *moby) {
     D_L23_001B36B0 = 0;
-    func_L23_003C1988(arg0);
+    StopObjectEffects(moby);
 }
 
 extern void func_31A108(int);
 
-void func_L23_003C1988(char *arg0) {
-    int *p = (int *)(*(int *)(arg0 + 0x68) + 0x328);
+/* Stops the two effects held by an object and empties their slots. */
+void func_L23_003C1988(char *moby) {
+    int *effectSlot = (int *)(*(int *)(moby + 0x68) + 0x328);
     int i;
 
     for (i = 1; i >= 0; i--) {
-        int v = *p;
+        int effect = *effectSlot;
 
-        if (v != 0) {
-            func_31A108(v);
-            *p = 0;
+        if (effect != 0) {
+            func_31A108(effect);
+            *effectSlot = 0;
         }
-        p++;
+        effectSlot++;
     }
 }
 
 /* func_L23_003C19E0 is defined in L23_0035CE90-g8.c (this unit has no $gp access for it). */
 
-void func_L23_003C1AB0(int arg0) {
-    func_3242D0(arg0, 9, 2);
-    D_L23_001B36B0 = arg0;
+/* Starts an animation on an object and marks it as the selected object. */
+void func_L23_003C1AB0(int moby) {
+    func_3242D0(moby, 9, 2);
+    D_L23_001B36B0 = moby;
 }
 
 
@@ -501,9 +512,10 @@ void func_L23_003C1AB0(int arg0) {
 /* func_L23_00415988 is in L23_0035CE90-f7-g8.c. */
 
 
-void func_L23_00416090(char *arg0) {
-    if (*(unsigned short *)(arg0 + 0x96) <= 0xFFFE)
-        *(unsigned short *)(arg0 + 0x96) += 1;
+/* Counts the frame age of an object up by one (stopping at the limit). */
+void func_L23_00416090(char *moby) {
+    if (*(unsigned short *)(moby + 0x96) <= 0xFFFE)
+        *(unsigned short *)(moby + 0x96) += 1;
 }
 
 /* func_L23_004160B0 is matched in L23_004160B0-g8.c (built with -g). */

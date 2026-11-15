@@ -14,16 +14,17 @@ extern f32 func_00283248(f32, f32);
 extern f32 func_00282E20(void *);
 extern f32 D_L03_001B08D8 __attribute__((sda));
 
+/* Creates a shot (moby class 2674) at a position, aimed along a direction, owned by another object. */
 u8 *func_L03_003D9820(u8 *owner, void *position, f32 *velocity, s32 value)
 {
-    u8 *object = func_0029EFD0(0xA72);
+    u8 *object = CreateMoby(0xA72 /* moby class 2674 */);
     SpawnVars *vars;
     if (object != 0) {
         vars = *(SpawnVars **)(object + 0x68);
-        func_002B37E8(object, owner);
+        InitChildObjectFromParent(object, owner);
         qcopy(object + 0x10, position);
-        *(f32 *)(object + 0xF8) = func_00283248(velocity[0], velocity[1]);
-        *(f32 *)(object + 0xF4) = -func_00283248(func_00282E20(velocity), velocity[2]);
+        *(f32 *)(object + 0xF8) = FastMatrixHelperA(velocity[0], velocity[1]);
+        *(f32 *)(object + 0xF4) = -FastMatrixHelperA(vec_length_xy(velocity), velocity[2]);
         qcopy(vars, velocity);
         vars->value = value;
         vars->timer = 0x5A;

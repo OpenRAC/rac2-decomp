@@ -151,11 +151,11 @@ void func_L05_0042E4E8(char *a0)
     char *context = a0;
     char *node = *(char **)(context + 0x68);
 
-    if (func_00282978(node) == 0) {
-        func_00282978(node + 4);
+    if (FastDecTimer(node) == 0) {
+        FastDecTimer(node + 4);
         ref_L05_0042E4E8_01(&ref_L05_0042E4E8_00, context);
     } else {
-        func_0029F338(context);
+        MarkMobySpawned(context);
     }
 }
 
@@ -176,7 +176,7 @@ void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
     } scratch;
     Vector *corner;
 
-    func_00281DE8(&packet, texture, 1, 0x80);
+    InitQuadPacketState(&packet, texture, 1, 0x80);
     packet.flags = 0x800000004aULL;
     packet.color[3] = 0x80808080;
     packet.color[2] = 0x80808080;
@@ -191,34 +191,34 @@ void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
     packet.uv[3][0] = 1.0f;
     packet.uv[3][1] = 1.0f;
     qcopy(&frame.position, position);
-    func_00282CF0((char *)&frame.row[0], (char *)(ref_L05_0042F4E8_00 + 0x140), (char *)&frame.position);
-    func_00282F20((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
-    func_00282DD8((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
-    func_00282F20((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
-    func_00282DD8((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
+    FastVecSub((char *)&frame.row[0], (char *)(ref_L05_0042F4E8_00 + 0x140), (char *)&frame.position);
+    vec_scale_to_length((char *)&frame.row[0], (char *)&frame.row[0], 1.0f);
+    FastVecCross((char *)&frame.row[1], (char *)&frame.row[0], (char *)&D_0018A0E0);
+    vec_scale_to_length((char *)&frame.row[1], (char *)&frame.row[1], 1.0f);
+    FastVecCross((char *)&frame.row[2], (char *)&frame.row[1], (char *)&frame.row[0]);
     if (roll != 0.0f) {
         scratch.angles.word = 0;
         scratch.angles.v[0] = roll;
-        func_002833F0(scratch.u.rotation, &scratch.angles);
-        func_00283738(frame.row, frame.row, scratch.u.rotation);
+        euler_rotation_basis(scratch.u.rotation, &scratch.angles);
+        multiply_matrix3x3(frame.row, frame.row, scratch.u.rotation);
     }
-    func_00282D30(&scratch.angles, &frame.row[0], offset);
-    func_00282CC0(&frame.position, &frame.position, &scratch.angles);
+    FastVecScale(&scratch.angles, &frame.row[0], offset);
+    FastVecAdd(&frame.position, &frame.position, &scratch.angles);
     {
         Vector *vertex = packet.vertex;
         int count;
         corner = ref_L05_0042F4E8_01;
         count = 3;
         do {
-            func_00282D30(vertex, corner, size);
+            FastVecScale(vertex, corner, size);
             ++corner;
             --count;
-            func_002830C0(vertex, vertex, &frame);
+            transform_vector(vertex, vertex, &frame);
             ++vertex;
         } while (count >= 0);
     }
-    func_002FC560(0x47, 0x31001ULL);
-    func_00280B90((char *)&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x31001ULL);
+    draw_world_quad((char *)&packet, 0, 0);
     if (mode != 0) {
         int i;
 
@@ -228,23 +228,23 @@ void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
             int count;
             count = 2;
             do {
-                func_00282CC0(&scratch.u.projection.center, &scratch.u.projection.center,
+                FastVecAdd(&scratch.u.projection.center, &scratch.u.projection.center,
                               vertex);
                 ++vertex;
                 --count;
             } while (count >= 0);
         }
-        func_00282D30(&scratch.u.projection.center, &scratch.u.projection.center, 0.25f);
+        FastVecScale(&scratch.u.projection.center, &scratch.u.projection.center, 0.25f);
         for (i = 0; i < 4; ++i) {
-            func_00282CF0((char *)&scratch.u.projection.point, (char *)&packet.vertex[i],
+            FastVecSub((char *)&scratch.u.projection.point, (char *)&packet.vertex[i],
                           (char *)&scratch.u.projection.center);
-            func_00282D30(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
-            func_00282CC0(&scratch.u.projection.point, &scratch.u.projection.center,
+            FastVecScale(&scratch.u.projection.point, &scratch.u.projection.point, 0.8f);
+            FastVecAdd(&scratch.u.projection.point, &scratch.u.projection.center,
                           &scratch.u.projection.point);
-            func_0027C768((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
-            if (func_002A77E0(1) == 0) {
-                packet.uv[i][0] += func_002A7878(-jitter, jitter);
-                packet.uv[i][1] += func_002A7878(-jitter, jitter);
+            ProjectWorldToScreen((int)&scratch.u.projection.point, &packet.uv[i][0], &packet.uv[i][1]);
+            if (RandomIntBelow(1) == 0) {
+                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
+                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -255,10 +255,10 @@ void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
         int i;
 
         for (i = 0; i < 4; ++i) {
-            func_0027C768((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
-            if (func_002A77E0(1) == 0) {
-                packet.uv[i][0] += func_002A7878(-jitter, jitter);
-                packet.uv[i][1] += func_002A7878(-jitter, jitter);
+            ProjectWorldToScreen((int)&packet.vertex[i], &packet.uv[i][0], &packet.uv[i][1]);
+            if (RandomIntBelow(1) == 0) {
+                packet.uv[i][0] += RandomFloatRange(-jitter, jitter);
+                packet.uv[i][1] += RandomFloatRange(-jitter, jitter);
             }
             if (packet.uv[i][0] > 1.0f) packet.uv[i][0] = 1.0f;
             else if (packet.uv[i][0] < 0.0f) packet.uv[i][0] = 0.0f;
@@ -266,11 +266,11 @@ void func_L05_0042F4E8(Vector *position, float size, float offset, float roll,
             else if (packet.uv[i][1] < 0.0f) packet.uv[i][1] = 0.0f;
         }
     }
-    func_00281DE8(&packet, -1, 1, 0x80);
+    InitQuadPacketState(&packet, -1, 1, 0x80);
     packet.flags = 0x8000000054ULL;
-    func_002FC560(0x47, 0x33001ULL);
-    func_00280B90((char *)&packet, 0, 0);
-    func_002FC560(0x47, 0x5360bULL);
+    VU1_addGSregister(0x47, 0x33001ULL);
+    draw_world_quad((char *)&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x5360bULL);
 }
 
 
@@ -330,9 +330,9 @@ void func_L05_00444D60(char *a0, int *a1, int *a2, int a3)
     float bias;
 
     func_2FC560((char *)local, a0);
-    bias = (float)D_001A7350;
+    bias = (float)gScreenOffsetX;
     *a1 = func_307778((local[0] - bias) * 0.0625f);
-    bias = (float)D_001A7354;
+    bias = (float)gScreenOffsetY;
     *a2 = func_307778((local[1] - bias) * 0.0625f) + a3;
 }
 
@@ -361,6 +361,7 @@ extern ModelRecord_4459B0 *D_L05_001B251C MACRO_ADDR;
 extern InstanceRecord_4459B0 *D_L05_001B260C MACRO_ADDR;
 extern int func_002ACBC8(void *, int);
 extern float func_00282DB0(char *, char *);
+/* Tells whether the object is close enough to any of its twelve linked points to count as touching one. */
 int func_L05_004459B0(void *arg)
 {
     char *self = arg;
@@ -377,8 +378,8 @@ int func_L05_004459B0(void *arg)
     for (count = 0; count < 12; count++, p += 4) {
         if (*(int *)p < 0)
             continue;
-        if (func_002ACBC8(self + 0x30, *(int *)p) || func_002ACBC8(tbl + 0x10, *(int *)p)) {
-            if (func_00282DB0(D_L05_001B260C[*(int *)p].data, self) > best)
+        if (IsPointInCuboid(self + 0x30, *(int *)p) || IsPointInCuboid(tbl + 0x10, *(int *)p)) {
+            if (FastVecDot(D_L05_001B260C[*(int *)p].data, self) > best)
                 return 1;
         }
     }

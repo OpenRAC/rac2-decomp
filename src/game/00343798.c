@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 #ifndef RAC2_T_F32_F7036EF03
 #define RAC2_T_F32_F7036EF03
@@ -35,24 +36,25 @@ extern void func_003435C8(void *a0);
 
 extern int func_00342978(void *a0, int a1);
 
-void func_00343798(char *self, int arg)
+/* Moves every part of the item menu to its place, refreshes the labels and updates the list. */
+void func_00343798(char *self, int buttons)
 {
-    f32_F7036ef03 *v;
-    char *sub = self + 664;
+    f32_F7036ef03 *position;
+    char *list = self + 664;
 
-    v = *(f32_F7036ef03 **)(self + 648);
-    func_00335E38_2(self, D_L04_001AE4A8 + v[0], D_L04_001AE4AC + v[1], 0.0f, 0.0f);
-    v = *(f32_F7036ef03 **)(self + 648);
-    func_00335E38_2(self + 76, D_L04_001AE4B0 + v[0], D_L04_001AE4B4 + v[1], 0.0f, 0.0f);
-    v = *(f32_F7036ef03 **)(self + 648);
-    func_00335E38_2(self + 152, D_L04_001AE4B8 + v[0], D_L04_001AE4BC + v[1], 0.0f, 0.0f);
-    v = *(f32_F7036ef03 **)(self + 648);
-    func_00335E38_2(self + 576, D_L04_001AE4C0 + v[0], D_L04_001AE4C4 + v[1], 0.0f, 0.0f);
-    v = *(f32_F7036ef03 **)(self + 648);
-    func_L00_00438970(sub, D_L04_001AE4C8 + v[0], D_L04_001AE4CC + v[1]);
-    func_00343638(self);
-    func_003435C8(self);
-    *(int *)(self + 416) = func_00342978(sub, arg);
+    position = *(f32_F7036ef03 **)(self + 648);
+    func_00335E38_2(self, D_L04_001AE4A8 + position[0], D_L04_001AE4AC + position[1], 0.0f, 0.0f);
+    position = *(f32_F7036ef03 **)(self + 648);
+    func_00335E38_2(self + 76, D_L04_001AE4B0 + position[0], D_L04_001AE4B4 + position[1], 0.0f, 0.0f);
+    position = *(f32_F7036ef03 **)(self + 648);
+    func_00335E38_2(self + 152, D_L04_001AE4B8 + position[0], D_L04_001AE4BC + position[1], 0.0f, 0.0f);
+    position = *(f32_F7036ef03 **)(self + 648);
+    func_00335E38_2(self + 576, D_L04_001AE4C0 + position[0], D_L04_001AE4C4 + position[1], 0.0f, 0.0f);
+    position = *(f32_F7036ef03 **)(self + 648);
+    StoreTwoFloats(list, D_L04_001AE4C8 + position[0], D_L04_001AE4CC + position[1]);
+    UpdateMenuTitleText(self);
+    UpdateMenuEmptyLabel(self);
+    *(int *)(self + 416) = UpdateListSelection(list, buttons);
 }
 
 
@@ -65,21 +67,22 @@ extern void func_00336A38(void *a0, int a1);
 extern unsigned char D_00139568[];
 extern char D_00239BA0[];
 
+/* Draws the item menu: its frame, list, and the description of the selected item. */
 void func_003438E8(char *self)
 {
-    int r;
-    char *rec;
+    int itemId;
+    char *itemRecord;
 
     if (*(int *)(self + 0x290) != 0) {
-        func_00336320(self);
-        func_00336320(self + 0x4C);
-        func_00336320(self + 0x98);
-        func_00336A78(self + 0x1B0);
-        func_00342BE8(self + 0x298);
-        r = func_00342BC0(self + 0x298);
-        rec = D_00239BA0 + D_00139568[r] * 224;
-        func_00336A38(self + 0x1F8, func_00288FB8(*(int *)(rec + 8)));
-        func_00336A78(self + 0x1F8);
-        func_00336A78(self + 0x240);
+        DrawScreenElementAtStoredPosition(self);
+        DrawScreenElementAtStoredPosition(self + 0x4C);
+        DrawScreenElementAtStoredPosition(self + 0x98);
+        DrawAlignedTextLabel(self + 0x1B0);
+        DrawMenuListEntries(self + 0x298);
+        itemId = GetSelectedMenuListId(self + 0x298);
+        itemRecord = gWeaponTable_00239BA0 + gItemSlotToRecord[itemId] * 224;
+        SetWidgetField40(self + 0x1F8, GetLocalizedString(*(int *)(itemRecord + 8)));
+        DrawAlignedTextLabel(self + 0x1F8);
+        DrawAlignedTextLabel(self + 0x240);
     }
 }

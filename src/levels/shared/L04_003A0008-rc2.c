@@ -24,36 +24,37 @@
 #include "common.h"
 
 extern s32 ref_L04_003A0008_literal_0;
-extern void ref_L04_003A0008_00(void *arg0, void *arg1, void *arg2, f32 arg3);
+extern void ref_L04_003A0008_00(void *patches, void *count, void *arg2, f32 arg3);
 extern void ref_L04_003A0008_01(void);
 extern s32 ref_L04_003A0008_02;
 extern s32 ref_L04_003A0008_03;
 extern s32 ref_L04_003A0008_04;
 extern f32 ref_L04_003A0008_05 __attribute__((sda));
 
-void func_L04_003A0008(void *arg0, s32 arg1) {
-    f32 temp_f2 = *(f32*)(&ref_L04_003A0008_literal_0);
+/* Advances the water ripple animation by one step and blends the patches. */
+void func_L04_003A0008(void *patches, s32 count) {
+    f32 step = *(f32*)(&ref_L04_003A0008_literal_0);
 
-    if ((1.0f - temp_f2) <= ref_L04_003A0008_05) {
-        ref_L04_003A0008_05 = temp_f2;
+    if ((1.0f - step) <= ref_L04_003A0008_05) {
+        ref_L04_003A0008_05 = step;
         ref_L04_003A0008_01();
         ref_L04_003A0008_04 = ref_L04_003A0008_03;
     } else {
         ref_L04_003A0008_04 = 2;
-        if (arg1 > 0) {
-            u8 *var_s0 = (u8 *)arg0;
-            s32 var_s1 = arg1;
+        if (count > 0) {
+            u8 *patch = (u8 *)patches;
+            s32 remaining = count;
             do {
-                if (*(u16 *)(var_s0 + 0x1E) != 0) {
+                if (*(u16 *)(patch + 0x1E) != 0) {
                     ref_L04_003A0008_00(
-                        var_s0 + (ref_L04_003A0008_04 * 0x5C0 + 0x50),
-                        var_s0 + (ref_L04_003A0008_03 * 0x5C0 + 0x50),
-                        var_s0 + (ref_L04_003A0008_02 * 0x5C0 + 0x50),
+                        patch + (ref_L04_003A0008_04 * 0x5C0 + 0x50),
+                        patch + (ref_L04_003A0008_03 * 0x5C0 + 0x50),
+                        patch + (ref_L04_003A0008_02 * 0x5C0 + 0x50),
                         ref_L04_003A0008_05);
                 }
-                var_s1 -= 1;
-                var_s0 += 0x1190;
-            } while (var_s1 != 0);
+                remaining -= 1;
+                patch += 0x1190;
+            } while (remaining != 0);
         }
     }
     ref_L04_003A0008_05 += *(f32*)(&ref_L04_003A0008_literal_0);

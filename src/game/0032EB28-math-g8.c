@@ -38,8 +38,8 @@ void func_00336548(Bar_336548 *bar) {
     colors[1] = colors[0] = bar->back;
     right = x + (float)bar->limit;
     bottom = (int)(y + height);
-    func_0027EAE8(x0, y0, (int)right, bottom, context, colors);
+    DrawScreenRectangle(x0, y0, (int)right, bottom, context, colors);
     colors[0] = bar->fill[0];
     colors[1] = bar->fill[1];
-    func_0027EAE8((int)x, (int)y, (int)(x + width), bottom, context, colors);
+    DrawScreenRectangle((int)x, (int)y, (int)(x + width), bottom, context, colors);
 }

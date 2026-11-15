@@ -26,28 +26,29 @@
 
 extern void ref_L16_00424B48_00(s32, s32, s8 *, s32);
 
-void func_L16_00424B48(s8 *arg0) {
-    s32 temp_v0;
-    s32 m;
-    s32 lt;
-    f32 fv;
+/* After being triggered, slowly sinks the object for a short time and then stops. */
+void func_L16_00424B48(s8 *moby) {
+    s32 frame;
+    s32 frameLow;
+    s32 stillRunning;
+    f32 newHeight;
 
-    if ((*(u8 *)((char *)(arg0) + (0x20))) == 0) {
-        if ((*(u8 *)((char *)(arg0) + (0xBC))) != 0) {
-            (*(u8 *)((char *)(arg0) + (0x20))) = 1;
-            ref_L16_00424B48_00(0, 0, arg0, 0xE71);
+    if ((*(u8 *)((char *)(moby) + (0x20))) == 0) {
+        if ((*(u8 *)((char *)(moby) + (0xBC))) != 0) {
+            (*(u8 *)((char *)(moby) + (0x20))) = 1;
+            ref_L16_00424B48_00(0, 0, moby, 0xE71);
         }
-        (*(s16 *)((char *)(arg0) + (0x32))) = 0x80;
+        (*(s16 *)((char *)(moby) + (0x32))) = 0x80;
     }
-    if ((*(u8 *)((char *)(arg0) + (0x20))) == 1) {
-        fv = (*(f32 *)((char *)(arg0) + (0x18))) - 0.13333334028720855712890625f;
-        temp_v0 = (*(u16 *)((char *)(arg0) + (0x96))) + 1;
-        m = temp_v0 & 0xFFFF;
-        (*(u16 *)((char *)(arg0) + (0x96))) = temp_v0;
-        lt = (u32) m < 0x3CU;
-        (*(f32 *)((char *)(arg0) + (0x18))) = fv;
-        if (lt == 0) {
-            (*(u8 *)((char *)(arg0) + (0x20))) = 2;
+    if ((*(u8 *)((char *)(moby) + (0x20))) == 1) {
+        newHeight = (*(f32 *)((char *)(moby) + (0x18))) - 0.13333334028720855712890625f;
+        frame = (*(u16 *)((char *)(moby) + (0x96))) + 1;
+        frameLow = frame & 0xFFFF;
+        (*(u16 *)((char *)(moby) + (0x96))) = frame;
+        stillRunning = (u32) frameLow < 0x3CU;
+        (*(f32 *)((char *)(moby) + (0x18))) = newHeight;
+        if (stillRunning == 0) {
+            (*(u8 *)((char *)(moby) + (0x20))) = 2;
         }
     }
 }

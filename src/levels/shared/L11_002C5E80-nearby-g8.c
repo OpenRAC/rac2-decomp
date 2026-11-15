@@ -34,9 +34,9 @@ int func_L11_002C5E80(void *position, int **owner, float *target, int *contact, 
         if (excluded && D_L11_001B2DC0[i].owner == excluded) continue;
         if (required && D_L11_001B2DC0[i].owner != required) continue;
         if (!*D_L11_001B2DC0[i].owner) continue;
-        if (func_00282E48(&D_L11_001B2DC0[i], here) > D_L11_001B2DC0[i].radius) continue;
-        if (func_L00_00341FA8(D_L11_001B2DC0[i].owner, here, target, &hit, &distance, D_L11_001B2DC0[i].kind, 12.0f, 10.0f, 0.0f)) {
-            if (func_00282E80(here, target) < 1.7f && func_00282C48(here[2] - target[2]) < 1.5f) {
+        if (fast_vec_dist(&D_L11_001B2DC0[i], here) > D_L11_001B2DC0[i].radius) continue;
+        if (find_nearest_path_point(D_L11_001B2DC0[i].owner, here, target, &hit, &distance, D_L11_001B2DC0[i].kind, 12.0f, 10.0f, 0.0f)) {
+            if (vec_distance_xy(here, target) < 1.7f && FloatAbs(here[2] - target[2]) < 1.5f) {
                 *owner = D_L11_001B2DC0[i].owner;
                 *contact = hit;
                 *height = distance;

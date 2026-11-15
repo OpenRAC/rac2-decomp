@@ -11,11 +11,12 @@ extern int D_L05_001B1B0C __attribute__((sda)),D_L05_001B1B08 __attribute__((sda
 extern float D_L05_001B1B14 __attribute__((sda));
 extern int D_L05_001B2048;
 extern char D_L05_001B96C0[];
+/* Keeps the ship's target lock. It looks for a new enemy to lock onto and drops the lock when the enemy dies, drifts off to the side or is hidden. */
 void func_L05_004445E8(char *object)
 {
     float delta[4];
     char *state=*(char **)(object+0x68);
- int index=func_L05_0037AA88(1);
+ int index=FindActiveSlotInChain(1);
     char *table;
     int limit;
     char *target;
@@ -30,7 +31,7 @@ void func_L05_004445E8(char *object)
     if(!target) {
         char *nextTarget;
         *(int *)(object+0x98)=0;
-        nextTarget=func_L05_00444840(state+0x20,0,*(void **)(state+0x14));
+        nextTarget=FindShipLockTarget(state+0x20,0,*(void **)(state+0x14));
         *(int *)(object+0x98)=*(int *)(*(char **)(object+0x24)+0x10);
         if(nextTarget==*(char **)(state+0x14)) {
             if(++*(int *)(state+0x1c)<=limit) return;
@@ -42,19 +43,19 @@ void func_L05_004445E8(char *object)
     {
         if ((u8)target[0x20] == 0xfe) goto invalid;
         if ((u8)target[0x20] == 0xfd) goto invalid;
-        health=func_002AB1F0(target);
+        health=GetMobyPrivateValue0(target);
         if(health && *health<=0.0f) {
             invalid:
             *(int *)(state+0x1c)=*(int *)(state+0x18)=0; return;
         }
-        func_00282CF0(delta,*(char **)(state+0x18)+0x10,object+0x10);
-        length=func_00282DF0(delta);
-        dot=func_00282DB0(object+0xc0,delta);
+        FastVecSub(delta,*(char **)(state+0x18)+0x10,object+0x10);
+        length=FastVecLength(delta);
+        dot=FastVecDot(object+0xc0,delta);
         if(length==0.0f) goto zeroLength;
         {
             *(int *)(object+0x98)=0;
-            if(func_00282C48(1.5707964f-func_002831B0(dot/length))>D_L05_001B1B14*0.017453294f ||
-               (D_L05_001B2048%5==0 && func_002761F8(D_L05_001B96C0,*(char **)(state+0x18)+0x10,16,*(void **)(state+0x18),0))) {
+            if(FloatAbs(1.5707964f-FastAngleHelper(dot/length))>D_L05_001B1B14*0.017453294f ||
+               (D_L05_001B2048%5==0 && CollLine(D_L05_001B96C0,*(char **)(state+0x18)+0x10,16,*(void **)(state+0x18),0))) {
                 *(int *)(state+0x18)=0; *(int *)(state+0x14)=0; *(int *)(state+0x1c)=0;
             } else { if(++*(int *)(state+0x1c)>limit) *(int *)(state+0x1c)=limit; }
             *(int *)(object+0x98)=*(int *)(*(char **)(object+0x24)+0x10);

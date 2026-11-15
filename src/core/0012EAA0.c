@@ -111,6 +111,7 @@ extern s32 r1_func_0012B2C0_2AD10(MpegSys *sys, SysBit *bs, PesHdr *pes) __asm__
 
 /* rac1-decomp src/core/0012AC80.c: func_0012EB28 */
 /* Adapted from Lombyte's project (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/sdk/dma/sce_mpeg_demux_pss_ring.c, sceMpegDemuxPssRing. */
+/* Walks through a PSS movie stream in a ring buffer and calls the registered handler for each packet. Returns how many bytes it used. */
 int func_0012EB28(sceMpeg *mp, u8 *start, int size, u8 *bufstart, int bufsize) {
     SysBit bs;
     PssHdr hdr;
@@ -203,26 +204,27 @@ int func_0012EB28(sceMpeg *mp, u8 *start, int size, u8 *bufstart, int bufsize) {
  * r1_D_00132FD8[arg1], and bump the stored count unconditionally. Returns
  * the previous callback.
  */
-int func_0012EE28(void *arg0, int arg1, int arg2, int arg3, int arg4) {
+/* Registers a handler for one kind of movie stream and returns the previous handler. */
+int func_0012EE28(void *mpeg, int streamType, int streamIndex, int callback, int userData) {
     int old = 0;
-    char *obj = *(char **)((char *)arg0 + 0x40);
-    StrCbEnt *tbl = *(StrCbEnt **)(obj + 0x44);
-    long key = r1_func_0012AC80(arg1, arg2);
-    int count = *(int *)(obj + 0x48);
+    char *sys = *(char **)((char *)mpeg + 0x40);
+    StrCbEnt *handlers = *(StrCbEnt **)(sys + 0x44);
+    long key = r1_func_0012AC80(streamType, streamIndex);
+    int handlerCount = *(int *)(sys + 0x48);
     int i;
 
-    for (i = 0; i < count; i++) {
-        if (key == tbl[i].key) {
-            old = tbl[i].cb;
+    for (i = 0; i < handlerCount; i++) {
+        if (key == handlers[i].key) {
+            old = handlers[i].cb;
             break;
         }
     }
     if (i < 0x40) {
-        *(int *)(obj + 0x48) = count + 1;
-        tbl[i].key = key;
-        tbl[i].data = arg4;
-        tbl[i].cb = arg3;
-        tbl[i].extra = r1_D_00132FD8[arg1].extra;
+        *(int *)(sys + 0x48) = handlerCount + 1;
+        handlers[i].key = key;
+        handlers[i].data = userData;
+        handlers[i].cb = callback;
+        handlers[i].extra = r1_D_00132FD8[streamType].extra;
     }
     return old;
 }
@@ -243,34 +245,35 @@ int func_0012EE28(void *arg0, int arg1, int arg2, int arg3, int arg4) {
  * it a second, unused argument, the same K&R situation as r1_func_00129F40
  * elsewhere in this file), otherwise clears +0xC. Always returns 1.
  */
-int func_0012EF20(void *arg0, void *arg1) {
-    char *p = (char *)arg1;
-    unsigned int first, second, third, stuffing;
+/* Reads a movie stream pack header and stores the timing values. Returns 1. */
+int func_0012EF20(void *stream, void *header) {
+    char *hdr = (char *)header;
+    unsigned int timeHigh, timeMid, timeLow, stuffing;
     unsigned int i;
 
-    r1_func_0012AB60(arg0, 0x22);
-    first = r1_func_0012AB60(arg0, 3);
-    r1_func_0012ABB0(arg0);
-    second = r1_func_0012AB60(arg0, 0xF);
-    r1_func_0012ABB0(arg0);
-    third = r1_func_0012AB60(arg0, 0xF);
-    r1_func_0012ABB0(arg0);
-    *(int *)(p + 0x0) = r1_func_0012AB60(arg0, 9);
-    r1_func_0012AB60(arg0, 0x1E);
-    stuffing = r1_func_0012AB60(arg0, 3);
+    r1_func_0012AB60(stream, 0x22);
+    timeHigh = r1_func_0012AB60(stream, 3);
+    r1_func_0012ABB0(stream);
+    timeMid = r1_func_0012AB60(stream, 0xF);
+    r1_func_0012ABB0(stream);
+    timeLow = r1_func_0012AB60(stream, 0xF);
+    r1_func_0012ABB0(stream);
+    *(int *)(hdr + 0x0) = r1_func_0012AB60(stream, 9);
+    r1_func_0012AB60(stream, 0x1E);
+    stuffing = r1_func_0012AB60(stream, 3);
 
-    *(unsigned int *)(p + 0x8) = (first >> 2) & 1;
-    *(unsigned int *)(p + 0x4) = (first << 30) | (second << 15) | third;
+    *(unsigned int *)(hdr + 0x8) = (timeHigh >> 2) & 1;
+    *(unsigned int *)(hdr + 0x4) = (timeHigh << 30) | (timeMid << 15) | timeLow;
 
     for (i = 0; i < stuffing; i++) {
-        r1_func_0012AB60(arg0, 8);
+        r1_func_0012AB60(stream, 8);
     }
 
-    if (r1_func_0012AAA8(arg0, 0x20) == 0x1BB) {
-        *(int *)(p + 0xC) = 1;
-        func_0012F070(arg0, p);
+    if (r1_func_0012AAA8(stream, 0x20) == 0x1BB) {
+        *(int *)(hdr + 0xC) = 1;
+        SkipMpegSystemHeader(stream, hdr);
     } else {
-        *(int *)(p + 0xC) = 0;
+        *(int *)(hdr + 0xC) = 0;
     }
     return 1;
 }

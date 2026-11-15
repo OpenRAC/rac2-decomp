@@ -26,6 +26,7 @@ ASM_FUNC("asm/core", func_0011F5E0);
 ASM_FUNC("asm/core", func_0011F628);
 
 /* rac1-decomp src/core/0011D960.c: func_0011D9C0 */
+/* Sets up two small start-up records and stores the results the boot code uses later. */
 void func_0011F640(void) {
     int a[8];
     int b[8];
@@ -47,6 +48,7 @@ void func_0011F640(void) {
  * Under 2.95.3 reorg fills the slot with the `addiu $4,$4,4` bump, 52
  * bytes against 56, which is what kept this a stub.
  */
+/* Copies a block of words from one place to another and returns zero. */
 int func_0011F688(int *dst, int *src, unsigned int nbytes) {
     unsigned int i;
     for (i = 0; i < nbytes >> 2; i++) {
@@ -59,6 +61,7 @@ int func_0011F688(int *dst, int *src, unsigned int nbytes) {
 /* kFindAddress (libkernl.a:initsys.o): scan the words from p up to, not
  * including, end for val; returns the matching address, or 0 if the scan
  * reaches end. */
+/* Searches memory for a given word and returns where it was found, or zero if it was not. */
 int *func_0011F6C0(int *p, int *end, int val) {
     while (*p != val && p < end)
         p++;
@@ -81,6 +84,7 @@ ASM_FUNC("asm/core", func_0011F700);
    bytes -- whichever trails -- until they land on the same address) in
    r1_D_00130408. `a`/`b` have to be unsigned: retail's convergence test is
    `sltu`. */
+/* Finds the system call table in kernel memory and installs the kernel entries during start-up. */
 void func_0011F718(void) {
     unsigned int a, b;
     int p1, p2;
@@ -88,13 +92,13 @@ void func_0011F718(void) {
     r1_func_0011DB98(r1_D_00130410[0], r1_D_00130410[1]);
     r1_func_0011DB98(r1_D_00130410[2], r1_D_00130410[3]);
 
-    p1 = r1_func_0011DA80(0x80000000, 0x80080000, (void *)func_0011F6C0);
+    p1 = r1_func_0011DA80(0x80000000, 0x80080000, (void *)FindWordInMemory);
     p2 = r1_func_0011DA80(0x80000000, 0x80080000, (void *)r1_func_0011DA08);
     a = p1 - 0x20C;
     b = p2 - 0x168;
     while (a != b) {
         if (a < b) {
-            p1 = r1_func_0011DA80(p1 + 4, 0x80080000, (void *)func_0011F6C0);
+            p1 = r1_func_0011DA80(p1 + 4, 0x80080000, (void *)FindWordInMemory);
             a = p1 - 0x20C;
         } else {
             p2 = r1_func_0011DA80(p2 + 4, 0x80080000, (void *)r1_func_0011DA08);

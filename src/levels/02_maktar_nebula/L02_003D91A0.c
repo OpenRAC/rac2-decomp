@@ -28,98 +28,99 @@ struct InitPrefix {
     u8 reserved8C[0x98]; float blend; u8 reserved128[0x11]; u8 active;
 };
 
-void func_L02_003D91A0(char *self) {
-    char *state = *(char **)(self + 0x68);
-    char *entry;
-    char *part;
-    char *owner;
-    char *attacker;
-    char *damage;
-    char *source;
-    float amount;
-    if (*(unsigned char *)(self + 0x20) == 0) {
-        struct InitPrefix *initial = (struct InitPrefix *)state;
-        initial->flag = func_00283CF0(15.0f);
-        initial->limit = func_00283CF0(24.0f);
-        initial->active = 1;
-        initial->mode = 3;
-        initial->blend = 0.5f;
-        initial->gain = 1.0f;
-        initial->weight = 1.0f;
-        initial->scale = 1.0f;
-        initial->phase = 2;
-        initial->turn = 1.1344641f;
-        initial->maximum = 0.52359885f;
-        initial->epsilon = 0.01f;
-        initial->rate = 0.013888889f;
-        initial->radius = 11.0f;
-        initial->ready = 0;
-        initial->enabled = 0;
-        entry = (char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C_1[0]);
-        *(unsigned short *)(entry + 0x34) |= 6;
-        *(short *)(state + 0x286) = 60;
-        func_002A04B8(self, state + 0x270, state + 0x274, state + 0x278);
-        func_00282A60(state + 0x170, 0, 0x40);
-        func_00282A60(state + 0x1B0, 0, 0x40);
-        func_L02_003DB6D8(self);
-        *(char **)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C[0] + 0xB8) = self;
-        *(int *)(state + 0x250) = 0x40FF00EA;
-        *(int *)(state + 0x258) = 0x40FF00EA;
-        *(int *)(state + 0x264) = 0;
-        *(short *)(state + 0x280) = 0;
-        *(int *)(state + 0x254) = 0x40FF00EA;
-        *(short *)(state + 0x282) = 0;
+/* Sets up a Maktar walker boss on its first frame, then handles damage taken, its health, and hit reactions every frame. */
+void func_L02_003D91A0(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    char *ownerMoby;
+    char *bodyPart;
+    char *legsMoby;
+    char *legsMoby2;
+    char *hitInfo;
+    char *hitSource;
+    float damageAmount;
+    if (*(unsigned char *)(moby + 0x20) == 0) {
+        struct InitPrefix *initVars = (struct InitPrefix *)vars;
+        initVars->flag = FloatToInt(15.0f);
+        initVars->limit = FloatToInt(24.0f);
+        initVars->active = 1;
+        initVars->mode = 3;
+        initVars->blend = 0.5f;
+        initVars->gain = 1.0f;
+        initVars->weight = 1.0f;
+        initVars->scale = 1.0f;
+        initVars->phase = 2;
+        initVars->turn = 1.1344641f;
+        initVars->maximum = 0.52359885f;
+        initVars->epsilon = 0.01f;
+        initVars->rate = 0.013888889f;
+        initVars->radius = 11.0f;
+        initVars->ready = 0;
+        initVars->enabled = 0;
+        ownerMoby = (char *)((*(int *)(*(char **)(moby + 0x68) + 0x244) << 8) + D_L02_001B359C_1[0]);
+        *(unsigned short *)(ownerMoby + 0x34) |= 6;
+        *(short *)(vars + 0x286) = 60;
+        get_moby_color(moby, vars + 0x270, vars + 0x274, vars + 0x278);
+        ClearMemory(vars + 0x170, 0, 0x40);
+        ClearMemory(vars + 0x1B0, 0, 0x40);
+        SwitchOffActorAndChild(moby);
+        *(char **)((*(int *)(*(char **)(moby + 0x68) + 0x244) << 8) + gMobyPool_L02[0] + 0xB8) = moby;
+        *(int *)(vars + 0x250) = 0x40FF00EA;
+        *(int *)(vars + 0x258) = 0x40FF00EA;
+        *(int *)(vars + 0x264) = 0;
+        *(short *)(vars + 0x280) = 0;
+        *(int *)(vars + 0x254) = 0x40FF00EA;
+        *(short *)(vars + 0x282) = 0;
         return;
     }
-    damage = func_002A9640(self, 0x10000, 0);
-    amount = func_002A96A0(self, damage);
-    if (damage && *(char **)(damage + 0x20)) {
-        source = *(char **)(damage + 0x20);
-        if (*(short *)(source + 0xAA) == 0xC89 || *(short *)(source + 0xAA) == 0xBFE)
-            amount *= 0.35f;
+    hitInfo = FindOwnedEffectSlot(moby, 0x10000, 0);
+    damageAmount = UpdateAimTargetStrength(moby, hitInfo);
+    if (hitInfo && *(char **)(hitInfo + 0x20)) {
+        hitSource = *(char **)(hitInfo + 0x20);
+        if (*(short *)(hitSource + 0xAA) == 0xC89 /* moby class 3209 */ || *(short *)(hitSource + 0xAA) == 0xBFE /* moby class 3070 */)
+            damageAmount *= 0.35f;
     }
-    if (amount > 0.0f) {
-        if (*(unsigned char *)(self + 0x20) >= 5 && *(unsigned char *)(self + 0x20) != 10 &&
-            *(unsigned char *)(self + 0x20) != 11) {
-            *(float *)(state + 0x20) -= amount;
-            { int at = *(unsigned char *)(state + 0x37) * 4 + 0xE0; *(int *)((char *)D_L02_001FF6B8 + at) += (int)(amount * 32.0f); }
-            if (*(short *)(state + 0x140) == 0)
-                func_002AB800((int)self, state + 0x140);
-            if (amount > 3.0f && *(unsigned char *)(self + 0x20) == 6 && *(unsigned char *)(self + 0x42) == 7) {
-                *(short *)(state + 0x28A) = *(unsigned char *)(self + 0x20);
-                attacker = (char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C_1[0]);
-                *(short *)(state + 0x28C) =
-                    *(unsigned char *)(attacker + 0x43) != 255 ? *(unsigned char *)(attacker + 0x43)
-                                                               : *(unsigned char *)(attacker + 0x42);
-                *(short *)(state + 0x28E) = *(unsigned char *)(self + 0xBC);
-                func_002A7750(self, 9, -1);
-                *(float *)(state + 0x24C) = 0.1939255f;
+    if (damageAmount > 0.0f) {
+        if (*(unsigned char *)(moby + 0x20) >= 5 && *(unsigned char *)(moby + 0x20) != 10 &&
+            *(unsigned char *)(moby + 0x20) != 11) {
+            *(float *)(vars + 0x20) -= damageAmount;
+            { int at = *(unsigned char *)(vars + 0x37) * 4 + 0xE0; *(int *)((char *)D_L02_001FF6B8 + at) += (int)(damageAmount * 32.0f); }
+            if (*(short *)(vars + 0x140) == 0)
+                StartColorFade((int)moby, vars + 0x140);
+            if (damageAmount > 3.0f && *(unsigned char *)(moby + 0x20) == 6 && *(unsigned char *)(moby + 0x42) == 7) {
+                *(short *)(vars + 0x28A) = *(unsigned char *)(moby + 0x20);
+                legsMoby2 = (char *)((*(int *)(*(char **)(moby + 0x68) + 0x244) << 8) + D_L02_001B359C_1[0]);
+                *(short *)(vars + 0x28C) =
+                    *(unsigned char *)(legsMoby2 + 0x43) != 255 ? *(unsigned char *)(legsMoby2 + 0x43)
+                                                               : *(unsigned char *)(legsMoby2 + 0x42);
+                *(short *)(vars + 0x28E) = *(unsigned char *)(moby + 0xBC);
+                SetMobyState(moby, 9, -1);
+                *(float *)(vars + 0x24C) = 0.1939255f;
             }
-            if (*(float *)(state + 0x20) <= 0.0f) {
-                *(float *)(state + 0x24C) = 0.387851f;
-                func_002A7750(self, 10, -1);
+            if (*(float *)(vars + 0x20) <= 0.0f) {
+                *(float *)(vars + 0x24C) = 0.387851f;
+                SetMobyState(moby, 10, -1);
             }
         }
     }
-    *(unsigned char *)(self + 0xA8) = 255;
-    *(unsigned char *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + D_L02_001B359C[0] + 0xA8) = 255;
-    owner = (char *)(D_L02_001B359C[0] + (*(int *)(*(char **)(self + 0x68) + 0x244) << 8));
-    if (owner && *(char **)(*(char **)(self + 0x68) + 0x260))
-        func_002AF1D0(owner, *(char **)(*(char **)(self + 0x68) + 0x260), 4, 0);
-    *(short *)(state + 0x284) = func_002B3BA8(self, *(int *)(state + 0x268), 0, 0, 100.0f, 100.0f);
-    part = *(char **)(state + 0x160);
-    *(char **)(state + 0x240) = part;
-    if (*(unsigned char *)(self + 0x20) != 3)
-        qcopy(state + 0x230, part + 0x10);
-    if (*(unsigned char *)(state + 0x2E) == 2) {
-        source = *(char **)(state + 0x264);
-        if (source && *(unsigned char *)(source + 0x20) != 254 && *(unsigned char *)(source + 0x20) != 253 &&
-            *(unsigned char *)(source + 0x20) >= 3) {
-            func_L02_003D4990(*(char **)(state + 0x264));
-            func_L02_003FC020(*(void **)(self + 0xB8), *(void **)(state + 0x264));
+    *(unsigned char *)(moby + 0xA8) = 255;
+    *(unsigned char *)((*(int *)(*(char **)(moby + 0x68) + 0x244) << 8) + gMobyPool_L02[0] + 0xA8) = 255;
+    legsMoby = (char *)(gMobyPool_L02[0] + (*(int *)(*(char **)(moby + 0x68) + 0x244) << 8));
+    if (legsMoby && *(char **)(*(char **)(moby + 0x68) + 0x260))
+        CopyJointTransformToObject(legsMoby, *(char **)(*(char **)(moby + 0x68) + 0x260), 4, 0);
+    *(short *)(vars + 0x284) = SelectAimTarget_002B3BA8(moby, *(int *)(vars + 0x268), 0, 0, 100.0f, 100.0f);
+    bodyPart = *(char **)(vars + 0x160);
+    *(char **)(vars + 0x240) = bodyPart;
+    if (*(unsigned char *)(moby + 0x20) != 3)
+        qcopy(vars + 0x230, bodyPart + 0x10);
+    if (*(unsigned char *)(vars + 0x2E) == 2) {
+        hitSource = *(char **)(vars + 0x264);
+        if (hitSource && *(unsigned char *)(hitSource + 0x20) != 254 && *(unsigned char *)(hitSource + 0x20) != 253 &&
+            *(unsigned char *)(hitSource + 0x20) >= 3) {
+            AdvanceChainbladeHealthPhase(*(char **)(vars + 0x264));
+            SetCurrentArenaBoss(*(void **)(moby + 0xB8), *(void **)(vars + 0x264));
         }
-        func_L02_003DB6D8(self);
+        SwitchOffActorAndChild(moby);
     }
-    func_L02_003D9728(self);
-    func_L02_003D9E68(self);
+    UpdateWalkerMovementAndShake(moby);
+    UpdateTwinMuzzleTurret(moby);
 }

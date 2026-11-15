@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The 128-bit integer mode is what reaches retail's lq/sq copies. */
 typedef int TI128 __attribute__((mode(TI)));
@@ -20,7 +21,7 @@ extern Obj_3353C8 *func_00270280(int id);
 void func_003353C8(TI128 *position)
 {
     Obj_3353C8 *obj = D_001B5390;
-    Obj_3353C8 *target = (obj->f86_353C8 == 5) ? obj : func_00270280(5);
+    Obj_3353C8 *target = (obj->f86_353C8 == 5) ? obj : FindRecordByHandleId(5);
     TI128 *dst = (TI128 *)(target->f70_353C8 + 0x90);
 
     *dst = *position;

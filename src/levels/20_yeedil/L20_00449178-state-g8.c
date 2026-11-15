@@ -17,29 +17,30 @@ extern void func_L00_00326620(char *, s32, s32);
 extern void func_0029F338(char *);
 
 /* Three-state effect object: arms its emitter, waits for the trigger, then plays the burst and retires. */
-void func_L20_00449178(char *obj)
+/* Update handler for moby class 4713: it arms itself, waits for a trigger, then plays a burst effect and removes itself. */
+void func_L20_00449178(char *moby)
 {
-    V4_F449178 v;
-    s32 *rec = *(s32 **)(obj + 0x68);
+    V4_F449178 burstPos;
+    s32 *vars = *(s32 **)(moby + 0x68);
 
-    switch (*(u8 *)(obj + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        v.q = 0;
-        v.f[2] = 2.0f;
-        func_L00_0033E220(&v, obj, 0x40204080, -1, 420000.0f, 1.0f, 1, -1, 0, -1);
-        func_002A7750(obj, 1, -1);
+        burstPos.q = 0;
+        burstPos.f[2] = 2.0f;
+        SpawnObjectFollowingEffect(&burstPos, moby, 0x40204080, -1, 420000.0f, 1.0f, 1, -1, 0, -1);
+        SetMobyState(moby, 1, -1);
         return;
     case 1:
-        if (func_002A9640(obj, 0x04010000, 0) != 0 && *rec == 0)
-            func_002A7750(obj, 2, -1);
-        *(u8 *)(obj + 0xA8) = 0xFF;
+        if (FindOwnedEffectSlot(moby, 0x04010000, 0) != 0 && *vars == 0)
+            SetMobyState(moby, 2, -1);
+        *(u8 *)(moby + 0xA8) = 0xFF;
         return;
     case 2:
-        func_L00_0032A258(obj, &D_L20_001B23B0, &D_L20_001B23A8, &D_L20_001B23A0, 0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
-        func_L01_0031A278(obj, &v, 0.0f, 0.0f, 2.0f);
-        func_0032C700(&v, 0, 0x19, 0x14, 0.5f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0);
-        func_L00_00326620(obj, 0x126A, 0);
-        func_0029F338(obj);
+        ExplodeObjectIntoPieces(moby, &D_L20_001B23B0, &D_L20_001B23A8, &D_L20_001B23A0, 0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
+        ComputeMobyLocalPoint(moby, &burstPos, 0.0f, 0.0f, 2.0f);
+        SpawnExplosion(&burstPos, 0, 0x19, 0x14, 0.5f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0);
+        SpawnChildMoby_L00(moby, 0x126A, 0);
+        MarkMobySpawned(moby);
         return;
     }
 }

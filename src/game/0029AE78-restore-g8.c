@@ -1,3 +1,4 @@
+#include "names.h"
 /* Restores a memory card save packet into the registered blocks (rac1's
    memcard_restore_data): after the CRC check, copies each saved block into the matching
    entry's slot, marking it exact (1), short (-1) or long (-2); counts changed blocks,
@@ -44,7 +45,7 @@ int func_0029B168(unsigned char *save_packet, int slot, RestoreEntry29B168 *rest
     int copySize;
     unsigned char *slot_destination;
 
-    if (func_0029AF58((char *)save_packet) == 0) {
+    if (VerifySaveBlockChecksum((char *)save_packet) == 0) {
         return 1;
     }
     save_packet += 8;
@@ -81,11 +82,11 @@ int func_0029B168(unsigned char *save_packet, int slot, RestoreEntry29B168 *rest
                 copySize = entrySize;
                 matched_entry->status = -2;
             }
-            if (func_00115340(slot_destination, ((RestoreBlock29B168 *)save_packet)->data, copySize) != 0) {
+            if (memcmp(slot_destination, ((RestoreBlock29B168 *)save_packet)->data, copySize) != 0) {
                 D_001A9968++;
             }
             if (((RestoreEntry29B168 *)(((unsigned int)i << 4) + (unsigned int)restore_entries))->id != 6000) {
-                func_00282AB0(slot_destination, ((RestoreBlock29B168 *)save_packet)->data, copySize);
+                CopyMemoryAligned(slot_destination, ((RestoreBlock29B168 *)save_packet)->data, copySize);
                 total += ((copySize + 3) & ~3) + 8;
             } else {
                 total += ((((RestoreBlock29B168 *)save_packet)->size + 3) & ~3) + 8;
@@ -97,7 +98,7 @@ int func_0029B168(unsigned char *save_packet, int slot, RestoreEntry29B168 *rest
         save_packet += ((((RestoreBlock29B168 *)save_packet)->size + 3) & ~3) + 8;
     }
     total += 8;
-    if (total != func_0029AE78((int *)restore_entries)) {
+    if (total != memcard_GetDataSize((int *)restore_entries)) {
         errors++;
     }
     save_packet += 8;
@@ -106,6 +107,6 @@ int func_0029B168(unsigned char *save_packet, int slot, RestoreEntry29B168 *rest
             errors++;
         }
     }
-    D_001393E0.slot[D_001393E0.cur].errors = errors;
+    gMemcardState.slot[gMemcardState.cur].errors = errors;
     return errors;
 }

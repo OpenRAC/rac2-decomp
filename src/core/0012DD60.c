@@ -77,6 +77,7 @@ extern void func_0012D808(struct MpegFieldTransferState *, struct MpegPictureBuf
 extern void func_0012E608(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
 extern void func_0012DA98(struct MpegFieldTransferState *);
 
+/* Sends a pair of MPEG field pictures to the video output, with timestamps and flags for each. */
 void func_0012DD60(struct MpegFieldTransferState *state, struct MpegPictureBuffer *first,
                    struct MpegPictureBuffer *second) {
     s64 first_flags, second_flags;
@@ -99,13 +100,13 @@ void func_0012DD60(struct MpegFieldTransferState *state, struct MpegPictureBuffe
         secondary = first;
     }
     transfer = state->transfer;
-    func_0012DAC0(state, primary, &transfer->first_timestamp.value,
+    GetMpegPtsDtsFlags(state, primary, &transfer->first_timestamp.value,
                   &transfer->first_decode_timestamp, &transfer->first_flags);
     second_transfer = state->transfer;
     timestamp = second_transfer->first_timestamp.words.low;
     state->timestamp_step = 1;
     state->last_timestamp = timestamp;
-    func_0012DAC0(state, secondary, &second_transfer->second_timestamp.value,
+    GetMpegPtsDtsFlags(state, secondary, &second_transfer->second_timestamp.value,
                   &second_transfer->second_decode_timestamp, &second_transfer->second_flags);
     final_transfer = state->transfer;
     second_timestamp = final_transfer->second_timestamp.words.low;
@@ -123,13 +124,13 @@ void func_0012DD60(struct MpegFieldTransferState *state, struct MpegPictureBuffe
     state->horizontal_offset1 = secondary->horizontal_offset1;
     state->vertical_offset0 = primary->vertical_offset0;
     state->vertical_offset1 = secondary->vertical_offset1;
-    if (func_0012D768(state, first) && first->status == 1 && second->status == 1) {
+    if (CheckMpegPictureFitsHeap(state, first) && first->status == 1 && second->status == 1) {
         first->macroblock_height *= 2;
         if (state->decoder_initialized)
-            func_0012E608(state, first);
+            StoreMpegReferenceImage(state, first);
         else
-            func_0012D808(state, first);
+            CopyMpegPictureToScreen(state, first);
         first->macroblock_height >>= 1;
-        func_0012DA98(state);
+        FinishMpegReferenceImage(state);
     }
 }

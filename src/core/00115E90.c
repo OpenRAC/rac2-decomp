@@ -28,6 +28,7 @@ struct ExitReent {
     struct ExitProc *exitprocs;
 };
 
+/* Runs every function registered to run at exit, then ends the program. */
 void func_00115E90(int status) {
     struct ExitReent *reent;
     struct ExitProc *proc;
@@ -47,5 +48,5 @@ void func_00115E90(int status) {
         reent->unk3C(reent);
     }
 
-    func_00131CA8(status);
+    ExitIgnoringStatus(status);
 }

@@ -20,43 +20,44 @@ extern VisibilityCollision D_L23_001C0A80;
 typedef struct { u8 pad[0x2290]; char *hero; } VisibilityHero;
 extern VisibilityHero D_00189E20;
 
-int func_L23_003C0A60(char *obj, TI128 *p1, TI128 *p2) {
-    char *state = *(char **)(obj + 0x68);
+/* Checks that nothing solid blocks the straight route from the enemy to its target, stepping along it. */
+int func_L23_003C0A60(char *moby, TI128 *startPos, TI128 *targetPos) {
+    char *vars = *(char **)(moby + 0x68);
     TI128 loc[6];
     int found;
     char *hit;
 
-    if (D_L23_001AFA70 < func_00282E48(p1, p2))
+    if (D_L23_001AFA70 < fast_vec_dist(startPos, targetPos))
         return 0;
-    qcopy(&loc[0], p2);
-    func_L23_00418650(&loc[0], *(float *)(state + 0x54) + *(float *)(state + 0x50));
-    func_00282CF0(&loc[1], &loc[0], p1);
-    func_00282F20(&loc[1], &loc[1], D_L23_001AFAB0);
-    qcopy(&loc[4], p1);
-    qcopy(&loc[2], p1);
-    func_L23_00418650(&loc[2], *(float *)(state + 0x54) + *(float *)(state + 0x50));
+    qcopy(&loc[0], targetPos);
+    ProjectPointOntoPlanetSurface(&loc[0], *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
+    FastVecSub(&loc[1], &loc[0], startPos);
+    vec_scale_to_length(&loc[1], &loc[1], D_L23_001AFAB0);
+    qcopy(&loc[4], startPos);
+    qcopy(&loc[2], startPos);
+    ProjectPointOntoPlanetSurface(&loc[2], *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
     found = 0;
     do {
-        float d = func_00282E48(&loc[4], &loc[0]);
+        float distance = fast_vec_dist(&loc[4], &loc[0]);
 
-        if (d < D_L23_001AFAB0) {
-            if (d < 0.0f)
+        if (distance < D_L23_001AFAB0) {
+            if (distance < 0.0f)
                 return 1;
-            func_00282F20(&loc[5], &loc[1], d);
+            vec_scale_to_length(&loc[5], &loc[1], distance);
             found = 1;
-            func_00282CC0(&loc[3], &loc[4], &loc[5]);
-            func_L23_00418650(&loc[3], *(float *)(state + 0x54) + *(float *)(state + 0x50));
+            FastVecAdd(&loc[3], &loc[4], &loc[5]);
+            ProjectPointOntoPlanetSurface(&loc[3], *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
         } else {
-            func_00282CC0(&loc[3], &loc[4], &loc[1]);
-            func_L23_00418650(&loc[3], *(float *)(state + 0x54) + *(float *)(state + 0x50));
+            FastVecAdd(&loc[3], &loc[4], &loc[1]);
+            ProjectPointOntoPlanetSurface(&loc[3], *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
         }
-        if (func_002761F8(&loc[2], &loc[3], 0x10, 0, 0)) {
-            hit = D_L23_001C0A80.hit;
-            if (hit != obj && hit != D_00189E20.hero)
+        if (CollLine(&loc[2], &loc[3], 0x10, 0, 0)) {
+            hit = gLastRayHit.hit;
+            if (hit != moby && hit != gHeroState.hero)
                 return 0;
         }
         qcopy(&loc[2], &loc[3]);
-        func_00282CC0(&loc[4], &loc[4], &loc[1]);
+        FastVecAdd(&loc[4], &loc[4], &loc[1]);
     } while (found == 0);
     return 1;
 }

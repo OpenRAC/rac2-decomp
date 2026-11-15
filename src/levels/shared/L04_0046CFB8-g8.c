@@ -41,7 +41,7 @@ extern void func_L04_0046D250(void *);
 void func_L04_0046CFB8(char *obj)
 {
     char *definition = D_L04_001B1E84[*(short *)(obj + 0x84)].definition;
-    char *moby = D_L04_001B24DC + (*(int *)(definition + 0x60) << 8);
+    char *moby = gMobyPool_L04 + (*(int *)(definition + 0x60) << 8);
     int follow = 0;
     int i;
     float sine;
@@ -50,26 +50,26 @@ void func_L04_0046CFB8(char *obj)
         D_L04_001B1CB8 = -1;
         for (i = 0; i < 16; i++) {
             if (*(int *)(definition + 0x20 + i * 4) != -1
-                && func_002ACBC8(moby + 0x10, *(int *)(definition + 0x20 + i * 4)))
+                && IsPointInCuboid(moby + 0x10, *(int *)(definition + 0x20 + i * 4)))
                 D_L04_001B1CB8 = i;
         }
         if (D_L04_001B1CB8 == -1) {
             if (D_L04_001B1CBC != -1) {
                 if (D_L04_001B1CC4) D_L04_001B1CC4 = 0;
                 else D_L04_001B1CC4 = 1;
-                func_L04_0046CD68(obj, 1);
-                sine = func_00283198(0.562170565f);
-                D_L04_001BDC30[0] = sine / func_00283180(0.562170565f);
-                func_0027AB40();
+                InitFollowCameraOffset(obj, 1);
+                sine = FastSinOrCosB(0.562170565f);
+                D_L04_001BDC30[0] = sine / FastSinOrCosA(0.562170565f);
+                UpdateViewContext();
                 D_L04_001B1CC8 = 0;
                 D_L04_001B1CBC = D_L04_001B1CB8;
             }
             follow = 1;
         } else {
             if (D_L04_001B1CB8 != D_L04_001B1CBC) {
-                if (func_002A7878(0, 1) < .65f) {
+                if (RandomFloatRange(0, 1) < .65f) {
                     D_L04_001B1CC8 = 1;
-                    if (D_001A79F0 == 4 || (int)ref_L04_0046CFB8_00 == 40) {
+                    if (gCurrentMapIndex == 4 || (int)ref_L04_0046CFB8_00 == 40) {
                         CameraPreset *preset = &D_L04_002C6F00[D_L04_001B1CB8];
                         qcopy(obj + 0x30, preset);
                         D_L04_001B1CC0 = preset->fov;
@@ -81,17 +81,17 @@ void func_L04_0046CFB8(char *obj)
                 } else {
                     if (D_L04_001B1CC4) D_L04_001B1CC4 = 0;
                     else D_L04_001B1CC4 = 1;
-                    func_L04_0046CD68(obj, 1);
+                    InitFollowCameraOffset(obj, 1);
                     D_L04_001B1CC8 = 0;
                 }
                 D_L04_001B1CBC = D_L04_001B1CB8;
             }
             if (D_L04_001B1CC8) {
                 float half = D_L04_001B1CC0 * .5f;
-                float sine2 = func_00283198(half);
-                D_L04_001BDC30[0] = sine2 / func_00283180(half);
-                func_0027AB40();
-                func_L04_0046D6A8(obj);
+                float sine2 = FastSinOrCosB(half);
+                D_L04_001BDC30[0] = sine2 / FastSinOrCosA(half);
+                UpdateViewContext();
+                ApplyCameraLookAtPlayer(obj);
             } else {
                 follow = 1;
             }
@@ -100,7 +100,7 @@ void func_L04_0046CFB8(char *obj)
         follow = *(unsigned char *)(moby + 0xBC) != 0;
     }
     if (follow) {
-        func_L04_0046D250(obj);
-        func_L04_0046D6A8(obj);
+        UpdatePlayerRelativeCameraPosition(obj);
+        ApplyCameraLookAtPlayer(obj);
     }
 }

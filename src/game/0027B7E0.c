@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef unsigned int Rac2Native_967caba148c0b35c_u32;
@@ -35,6 +36,7 @@ extern Rac2Native_967caba148c0b35c_u32 ref_L00_002E56B0_14 __attribute__((sda));
 
 extern Rac2Native_967caba148c0b35c_u32 ref_L00_002E56B0_15;
 
+/* Sets a group of counters and flags to zero. */
 void func_0027B7E0(void)
 {
     ref_L00_002E56B0_00 = 0;
@@ -62,6 +64,7 @@ extern char D_00139120[];
 extern char D_001B9040[];
 extern void func_002FC560(unsigned int, unsigned long);
 
+/* Writes two drawing packets and sends the current color to the graphics chip. */
 void func_0027B858(void)
 {
     unsigned long packed;
@@ -84,6 +87,6 @@ void func_0027B858(void)
         int w2 = *(int *)(base + 0x238);
         packed = (unsigned long)w0 | ((unsigned long)w1 << 8) | ((unsigned long)w2 << 16);
     }
-    D_001B22A8 = ref_L00_0027B858_00 + 16;
-    func_002FC560(0x3D, packed);
+    gDmaPacketCursor = ref_L00_0027B858_00 + 16;
+    VU1_addGSregister(0x3D, packed);
 }

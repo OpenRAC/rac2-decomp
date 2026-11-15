@@ -38,6 +38,7 @@ typedef struct {
     u16 uid;
 } ScriptMoby;
 
+/* Updates moby class 1352: a scripted pickup. It waits for a linked moby to reach a state, records it in the save data, plays a sound, and finishes after two seconds. */
 void func_L20_003C0048(ScriptMoby *self) {
     ScriptState *state = self->script;
 
@@ -47,7 +48,7 @@ void func_L20_003C0048(ScriptMoby *self) {
         int bits;
 
         if (state->target < 0 || state->group < 0 || state->parameter < 0) {
-            func_0029F338(self);
+            MarkMobySpawned(self);
             break;
         }
         uid = self->uid;
@@ -55,13 +56,13 @@ void func_L20_003C0048(ScriptMoby *self) {
             self->mode = 3;
             break;
         }
-        bits = D_0019B4A8[((s16)uid >> 1) + (D_001A79F0[0] << 10)];
+        bits = D_0019B4A8[((s16)uid >> 1) + (gCurrentMapIndex[0] << 10)];
         if ((uid & 1) ? (bits >> 4) & 7 : bits & 7) {
             self->mode = 3;
             break;
         }
         self->mode = 1;
-        func_L20_003C02D0(self);
+        LowerGroupAndSaveHeights(self);
         break;
     }
     case 1: {
@@ -70,44 +71,44 @@ void func_L20_003C0048(ScriptMoby *self) {
         if (*(u8 *)((state->target << 8) + (s32)D_L20_001B2F9C + 0x20) == state->expectedState) {
             uid = self->uid;
         } else {
-            if (!state->flag15 || !func_002B38B8(self))
+            if (!state->flag15 || !IsThirdPendingFlagSet(self))
                 break;
             uid = self->uid;
         }
         if (uid & 1) {
-            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (D_001A79F0[0] << 10));
+            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (gCurrentMapIndex[0] << 10));
 
             if (((*entry >> 4) & 7) != 7)
                 *entry += 0x10;
         } else {
-            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (D_001A79F0[0] << 10));
+            u8 *entry = D_0019B4A8 + (((s16)uid >> 1) + (gCurrentMapIndex[0] << 10));
 
             if ((*entry & 7) != 7)
                 ++*entry;
         }
         if (state->flag17)
-            func_002A0430(self->channel);
+            MarkTableEntryFlagged(self->channel);
         self->mode = 2;
         state->timer = 120;
         {
-            float duration = func_00283CE0(120);
+            float duration = IntToFloat(120);
             state->inverseDuration = 1.0f / duration;
         }
-        func_L00_00429020(state->parameter);
+        LockCameraEntry(state->parameter);
         break;
     }
     case 2:
-        func_00282948(&state->timer);
-        func_L20_003C0350(self);
+        FastFloatHelperD(&state->timer);
+        RaiseGroupFromSavedHeights(self);
         if (state->timer == 0) {
-            char *hero = D_00189E20;
+            char *hero = gHeroState;
 
             if (*(s32 *)(hero + 0x2294) == 0x6F)
                 break;
             if (state->exitVehicle)
-                func_L20_002C5A48(0);
+                ExitYeedilHeroVehicleMode(0);
             if (state->flag17)
-                func_002DF3F8(hero + 0x80, hero + 0x90);
+                CaptureCheckpointState(hero + 0x80, hero + 0x90);
             self->mode = 3;
         }
         break;

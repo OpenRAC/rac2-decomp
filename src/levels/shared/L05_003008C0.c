@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern unsigned int D_001A7AF0 __attribute__((sda));
 extern int D_L05_002A1800[];
@@ -21,17 +22,18 @@ int func_L05_00303000(int x, int y, int width, int height, unsigned long long co
 {
     int step = func_002FEF40(2);
 
-    return func_L05_00302CE8(x, y, width, height, color, text, count, step, D_L05_002A2DB0);
+    return FontPrintWrapped(x, y, width, height, color, text, count, step, D_L05_002A2DB0);
 }
 
 
 extern int D_L05_00293D48[];
 
 /* Stores the pair and steps the second half of the counter. */
-void func_L05_0030C930(int a0, int a1) {
-    int *p = D_L05_00293D48;
-    p[0x11] = a1 + 1;
-    p[0x10] = a0;
+/* Stores a pair of numbers in a shared block, adding one to the second. */
+void func_L05_0030C930(int first, int second) {
+    int *pair = D_L05_00293D48;
+    pair[0x11] = second + 1;
+    pair[0x10] = first;
 }
 
 /* func_L05_00324DB8 is defined in L05_003008C0-g8.c (this unit has no $gp access for it). */
@@ -56,7 +58,7 @@ void func_L05_0030C930(int a0, int a1) {
  * words of a few entries; bits 7-8, 10-11 and 14-15 are read as two-bit fields. */
 void func_L05_00379968(void)
 {
-    if (D_001A7AF0 & 0x40) {
+    if (gEquipmentBits & 0x40) {
         D_L05_002A1800[0x158/4] = 1;
         D_L05_002A1800[0x140/4] = 1;
         D_L05_002A1800[0] = 0;
@@ -68,7 +70,7 @@ void func_L05_00379968(void)
         int *state = D_L05_002A1800;
         int flags;
         state[0x18/4] = 1;
-        flags = D_001A7AF0;
+        flags = gEquipmentBits;
         if (flags & 0x100) {
             state[0x1D0/4] = 1;
             state[0x90/4] = 1;
@@ -82,7 +84,7 @@ void func_L05_00379968(void)
     }
     {
         int *state = D_L05_002A1800;
-        int flags = D_001A7AF0;
+        int flags = gEquipmentBits;
         state[0x78/4] = 0;
         state[0x1B8/4] = 0;
         if (flags & 0x200) {
@@ -98,7 +100,7 @@ void func_L05_00379968(void)
         int *state = D_L05_002A1800;
         int flags;
         state[0x40/4] = 1;
-        flags = D_001A7AF0;
+        flags = gEquipmentBits;
         if (flags & 0x800) {
             state[0x1A8/4] = 1;
             state[0x68/4] = 1;
@@ -112,7 +114,7 @@ void func_L05_00379968(void)
     }
     {
         int *state = D_L05_002A1800;
-        int flags = D_001A7AF0;
+        int flags = gEquipmentBits;
         state[0x50/4] = 0;
         state[0x190/4] = 0;
         if (flags & 0x1000) state[0xB8/4] = 1;
@@ -120,14 +122,14 @@ void func_L05_00379968(void)
     }
     {
         int *state = D_L05_002A1800;
-        int flags = D_001A7AF0;
+        int flags = gEquipmentBits;
         state[0xA0/4] = 0;
         if (flags & 0x2000) state[0xE0/4] = 1;
         else state[0xE0/4] = 0;
     }
     {
         int *state = D_L05_002A1800;
-        int flags = D_001A7AF0;
+        int flags = gEquipmentBits;
         state[0xC8/4] = 0;
         if (flags & 0x8000) {
             state[0x1E0/4] = 0;
@@ -153,7 +155,7 @@ void func_L05_00379968(void)
         int *state = D_L05_002A1800;
         int flags;
         state[0x108/4] = 1;
-        flags = D_001A7AF0;
+        flags = gEquipmentBits;
         if (flags & 0x10) {
             state[0x118/4] = 0;
             state[0x220/4] = 1;
@@ -170,14 +172,16 @@ void func_L05_00379968(void)
 
 extern char *func_002ED688(int, int);
 
-void func_L05_00379C68(int arg0, int value) {
-    char *object = func_002ED688(arg0, value);
-    if (object != 0)
-        *(int *)(object + 0x150) = value;
+/* Finds an object's state and stores a value in it. */
+void func_L05_00379C68(int objectId, int value) {
+    char *state = GetMobyMotionData(objectId, value);
+    if (state != 0)
+        *(int *)(state + 0x150) = value;
 }
 
 extern int D_L05_00225DD0[];
 
+/* Returns the live object list. */
 int *func_L05_00379EB8(void) {
     return D_L05_00225DD0;
 }
@@ -186,33 +190,39 @@ int *func_L05_00379EB8(void) {
 
 extern int D_L05_00221D10[];
 
+/* Stores a value in the shared player state. */
 void func_L05_00379F18(int value) {
     D_L05_00221D10[13] = value;
 }
 
+/* Stores a value in the shared player state. */
 void func_L05_00379F28(int value) {
     D_L05_00221D10[15] = value;
 }
 
+/* Returns a value from the shared player state. */
 int func_L05_00379F38(void) {
     return D_L05_00221D10[15];
 }
 
+/* Stores a value in the shared player state. */
 void func_L05_00379F48(int value) {
     D_L05_00221D10[18] = value;
 }
 
+/* Returns a value from the shared player state. */
 int func_L05_00379F58(void) {
     return D_L05_00221D10[18];
 }
 
+/* Clears a field in each of 128 records of the shared state. */
 void func_L05_00379F68(void) {
     char *base = (char *)D_L05_00221D10 + 0xC0;
-    int *p = (int *)(base + 0x3FD0);
+    int *entry = (int *)(base + 0x3FD0);
     int i = 0x7F;
     do {
-        *p = 0;
-        p -= 0x20;
+        *entry = 0;
+        entry -= 0x20;
         i--;
     } while (i >= 0);
 }
@@ -239,7 +249,7 @@ extern int func_L05_0037AAC8(int index);
 /* Takes a step off the stored value, never below zero. */
 void func_L05_0037AB18(int index, int step)
 {
-    int slot = func_L05_0037AA88(index);
+    int slot = FindActiveSlotInChain(index);
 
     if (slot < 0)
         slot = func_L05_0037AAC8(index);
@@ -251,7 +261,7 @@ void func_L05_0037AB18(int index, int step)
 /* Adds a step to the stored value, never above the stored limit. */
 void func_L05_0037AB88(int index, int step)
 {
-    int slot = func_L05_0037AA88(index);
+    int slot = FindActiveSlotInChain(index);
 
     if (slot < 0)
         slot = func_L05_0037AAC8(index);
@@ -268,22 +278,24 @@ void func_L05_0037AB88(int index, int step)
    its state and damage flow are kept in a separate unit. */
 
 /* Add an argument to the stored value and clamp it into [8, 15]. */
-void func_L05_0037ADD8(float arg)
+/* Adds to the stored value and keeps it between 8 and 15. */
+void func_L05_0037ADD8(float amount)
 {
-    float *p = (float *)D_L05_00221D10;
-    float v = p[12] + arg;
-    float lim = 15.0f;
+    float *values = (float *)D_L05_00221D10;
+    float total = values[12] + amount;
+    float limit = 15.0f;
 
-    p[12] = v;
-    if (v > lim) {
-        p[12] = lim;
+    values[12] = total;
+    if (total > limit) {
+        values[12] = limit;
     } else {
-        lim = 8.0f;
-        if (v < lim)
-            p[12] = lim;
+        limit = 8.0f;
+        if (total < limit)
+            values[12] = limit;
     }
 }
 
+/* Returns the stored value that is kept between 8 and 15. */
 float func_L05_0037AE28(void) {
     return ((float *)D_L05_00221D10)[12];
 }
@@ -294,18 +306,18 @@ extern char *func_L05_00379CA0(char *);
 extern void func_L05_0037B838(char *);
 
 /* Hand the object over, then clear its action state and step the shared counter. */
-void func_L05_0037AE40(char *arg)
+void func_L05_0037AE40(char *moby)
 {
-    char *o = func_L05_00379CA0(arg);
+    char *state = func_L05_00379CA0(moby);
 
-    if (o == 0)
+    if (state == 0)
         return;
-    func_L05_0037B838(arg);
-    *(unsigned short *)(arg + 0x32) = 0;
-    *(unsigned short *)(arg + 0x34) = *(unsigned short *)(arg + 0x34) | 3;
-    *(unsigned char *)(arg + 0x30) = 0;
-    *(int *)(arg + 0x98) = 0;
-    *(int *)(o + 0x110) = 0;
+    func_L05_0037B838(moby);
+    *(unsigned short *)(moby + 0x32) = 0;
+    *(unsigned short *)(moby + 0x34) = *(unsigned short *)(moby + 0x34) | 3;
+    *(unsigned char *)(moby + 0x30) = 0;
+    *(int *)(moby + 0x98) = 0;
+    *(int *)(state + 0x110) = 0;
     if (D_L05_00221D10[4] != 0)
         D_L05_00221D10[4] = D_L05_00221D10[4] - 1;
 }

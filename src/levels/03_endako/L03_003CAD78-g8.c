@@ -17,18 +17,18 @@ extern TI128 D_L03_001B0390[] SDATA(D_L03_001B0390);
 extern s32 D_L03_001B03D0[] SDATA(D_L03_001B03D0);
 extern f32 D_L03_001B9840[];
 
-extern void func_00282C88(TI128 *a0);
-extern f32  func_00283248(f32 a0, f32 a1);
-extern void func_00283410(void *a0, void *a1);
-extern s32  func_0027C878(s32 a0);
-extern void func_00280B90(void *a0, void *a1, s32 a2);
+extern void func_00282C88(TI128 *moby);
+extern f32  func_00283248(f32 moby, f32 a1);
+extern void func_00283410(void *moby, void *a1);
+extern s32  func_0027C878(s32 moby);
+extern void func_00280B90(void *moby, void *a1, s32 a2);
 
 /* Builds the actor's effect track: the aim, the four corners of the level's
    tables, and the two packed words the level keeps. */
-void func_L03_003CAD78(char *a0)
+void func_L03_003CAD78(char *moby)
 {
-    u8 work[0xE0];
-    f32 *moby;
+    u8 packet[0xE0];
+    f32 *vars;
     u64 mode_bits;
     s32 *pi;
     L03_Pair *pd;
@@ -38,32 +38,32 @@ void func_L03_003CAD78(char *a0)
     L03_Pair *sourcex;
     int i;
 
-    moby = *(f32 **)(a0 + 0x68);
-    func_00282C88((TI128 *)(work + 0xD0));
-    *(f32 *)(work + 0xD8) = func_00283248(D_L03_001B9840[0x140 / 4] - *(f32 *)(a0 + 0x10),
-                                          D_L03_001B9840[0x144 / 4] - *(f32 *)(a0 + 0x14));
-    func_00283410(work + 0x90, work + 0xD0);
-    qcopy(work + 0xC0, a0 + 0x10);
-    *(f32 *)(work + 0xCC) = 1.0f;
+    vars = *(f32 **)(moby + 0x68);
+    ClearVector128((TI128 *)(packet + 0xD0));
+    *(f32 *)(packet + 0xD8) = FastMatrixHelperA(D_L03_001B9840[0x140 / 4] - *(f32 *)(moby + 0x10),
+                                          D_L03_001B9840[0x144 / 4] - *(f32 *)(moby + 0x14));
+    euler_to_matrix(packet + 0x90, packet + 0xD0);
+    qcopy(packet + 0xC0, moby + 0x10);
+    *(f32 *)(packet + 0xCC) = 1.0f;
 
     sourceq = D_L03_001B0390;
-    pq = (TI128 *)work;
-    px = (L03_Pair *)(work + 0x54);
+    pq = (TI128 *)packet;
+    px = (L03_Pair *)(packet + 0x54);
     sourcex = D_L03_001B036C;
-    pd = (L03_Pair *)(work + 0x50);
-    pi = (s32 *)(work + 0x40);
+    pd = (L03_Pair *)(packet + 0x50);
+    pi = (s32 *)(packet + 0x40);
     for (i = 0; i < 4; i++) {
         pi[i] = D_L03_001B03D0[i];
-        pd[i].v = D_L03_001B0368[i].v + *moby;
+        pd[i].v = D_L03_001B0368[i].v + *vars;
         px[i].v = sourcex[i].v;
         qcopy(&pq[i], &sourceq[i]);
     }
 
-    *(u64 *)(work + 0x78) = func_0027C878(D_L03_001B035C);
+    *(u64 *)(packet + 0x78) = GetEffectTextureDescriptor(D_L03_001B035C);
     mode_bits = ((u64)D_L03_001B0360 << 2) | ((u64)D_L03_001B0364 << 6)
                | ((u64)0x8000 << 24);
-    *(u64 *)(work + 0x88) = mode_bits;
-    *(u64 *)(work + 0x80) = 0x0000FF9000000260ULL;
-    *(u64 *)(work + 0x70) = 0;
-    func_00280B90(work, work + 0x90, 1);
+    *(u64 *)(packet + 0x88) = mode_bits;
+    *(u64 *)(packet + 0x80) = 0x0000FF9000000260ULL;
+    *(u64 *)(packet + 0x70) = 0;
+    draw_world_quad(packet, packet + 0x90, 1);
 }

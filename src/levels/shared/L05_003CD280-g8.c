@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_001A79F0;
 extern float func_00282E48(void *, void *);
@@ -24,16 +25,18 @@ extern int D_L05_001AFAA0 __attribute__((sda));
 
 extern void func_L05_003CD598(char *);
 
+/* Flies the pickup toward the player, shrinking as it nears, and heals the player when it is
+   collected. */
 void func_L05_003CD280(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float scale;
 
     if (D_L05_001AFAA0 != 0) {
-        scale = func_00282E48((void *)(D_L05_001AFAA0 + 0x10), object + 0x10);
+        scale = fast_vec_dist((void *)(D_L05_001AFAA0 + 0x10), object + 0x10);
 
-        if (D_001A79F0 == 0x14) {
-            func_002AA458(object + 0x10, (void *)(D_L05_001AFAA0 + 0x10), state + 0x40,
+        if (gCurrentMapIndex == 0x14) {
+            SpringVectorToTarget(object + 0x10, (void *)(D_L05_001AFAA0 + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -48,7 +51,7 @@ void func_L05_003CD280(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            func_002AA458(object + 0x10, (void *)(D_L05_001AFAA0 + 0x10), state + 0x40,
+            SpringVectorToTarget(object + 0x10, (void *)(D_L05_001AFAA0 + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
     check_scale:
@@ -56,21 +59,21 @@ void func_L05_003CD280(char *object)
             int slot = func_L05_0037AAC8(6);
             int add = D_002A1800[slot].limit;
 
-            if (func_002A77E0(4) != 0) {
-                func_00326198(func_0030CBA8(0x1283), -1);
+            if (RandomIntBelow(4) != 0) {
+                UpdateThrownObject(func_0030CBA8(0x1283), -1);
                 add = 0x21;
             } else {
-                func_00326198(func_0030CBA8(0x1284), -1);
+                UpdateThrownObject(func_0030CBA8(0x1284), -1);
             }
-            func_002E5DA0(0xC, 0, object, 0xFBF);
+            PlaySoundFromClassBank(0xC, 0, object, 0xFBF);
             D_002A1800[slot].value += add;
             if (D_002A1800[slot].limit < D_002A1800[slot].value)
                 D_002A1800[slot].value = D_002A1800[slot].limit;
-            func_0029F338(object);
+            MarkMobySpawned(object);
             return;
         }
     }
-    *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), 0.03f);
+    *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), 0.03f);
     func_L05_003CD598(object);
 }
 

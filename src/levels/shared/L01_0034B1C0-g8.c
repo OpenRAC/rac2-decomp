@@ -12,6 +12,7 @@ extern InitEntry12 D_L01_0021D5F0[];
 extern int * volatile D_L01_001AA7F0 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L01_001C9AA0;
 
+/* Fills a menu list from a table of item ids and marks which entry is currently selected. */
 int func_L01_0034B1C0(char *obj) {
     int i, entry;
     int *list;

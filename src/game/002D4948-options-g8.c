@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002D4948 (1,220 bytes, 28 places): builds the options menu from the settings word
  * D_001A7AF0, then finds the matching preset. Own unit: -O2 -G8 -ffunction-sections
  * -frac2-loop-exit-dup-first-pass -frac2-sched-defer-const-after-death (config/cflags.txt;
@@ -79,7 +80,7 @@ int func_002D4948(void)
 {
     int kind3 = 3;
     int kind4 = 4;
-    unsigned int settings = D_001A7AF0;
+    unsigned int settings = gEquipmentBits;
     int a = (settings >> 2) & 3;
     int b = (settings >> 4) & 1;
     int c = (settings >> 6) & 1;
@@ -88,70 +89,70 @@ int func_002D4948(void)
     int f = (settings >> 10) & 3;
     int g = (settings >> 14) & 3;
     MenuLine_002D4948 *line;
-    int n;
+    int lineCount;
     int i;
 
-    D_001F2840.items = func_002DE550(1);
-    line = (MenuLine_002D4948 *)D_001F2840.items;
-    func_0029F0C8(line, 0xD54);
+    gPauseMenuState.items = ClaimFreeStreamChunk(1);
+    line = (MenuLine_002D4948 *)gPauseMenuState.items;
+    InitMobyInstance(line, 0xD54);
     line->kind = 9;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + 0x100);
-    func_0029F0C8(line, D_001A8C28[a]);
+    line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x100);
+    InitMobyInstance(line, D_001A8C28[a]);
     line->kind = 8;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + 0x200);
-    func_0029F0C8(line, D_001A8C28[a]);
+    line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x200);
+    InitMobyInstance(line, D_001A8C28[a]);
     line->kind = 8;
     line->style |= 0x8000;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + 0x300);
-    func_0029F0C8(line, D_001A8C30[b]);
+    line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x300);
+    InitMobyInstance(line, D_001A8C30[b]);
     line->kind = 0;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + 0x400);
-    func_0029F0C8(line, D_001A8C38[c]);
+    line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x400);
+    InitMobyInstance(line, D_001A8C38[c]);
     line->kind = 1;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + 0x500);
-    func_0029F0C8(line, D_001A8C38[c]);
+    line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x500);
+    InitMobyInstance(line, D_001A8C38[c]);
     line->kind = 1;
     line->style |= 0x8000;
-    n = 6;
+    lineCount = 6;
     if (D_001A8C40[d] != 0) {
-        line = (MenuLine_002D4948 *)(D_001F2840.items + 0x600);
-        n = 7;
-        func_0029F0C8(line, D_001A8C40[d]);
+        line = (MenuLine_002D4948 *)(gPauseMenuState.items + 0x600);
+        lineCount = 7;
+        InitMobyInstance(line, D_001A8C40[d]);
         line->kind = 2;
     }
-    line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-    func_0029F0C8(line, D_001A8C48[e]);
+    line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
+    InitMobyInstance(line, D_001A8C48[e]);
     line->kind = kind3;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-    func_0029F0C8(line, D_001A8C48[e]);
+    line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
+    InitMobyInstance(line, D_001A8C48[e]);
     line->kind = kind3;
     line->style |= 0x8000;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-    func_0029F0C8(line, D_001A8C50[f]);
+    line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
+    InitMobyInstance(line, D_001A8C50[f]);
     line->kind = kind4;
-    line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-    func_0029F0C8(line, D_001A8C50[f]);
+    line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
+    InitMobyInstance(line, D_001A8C50[f]);
     line->kind = kind4;
     line->style |= 0x8000;
-    if ((D_001A7AF0 >> 12) & 1) {
-        line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-        func_0029F0C8(line, 0x10E2);
+    if ((gEquipmentBits >> 12) & 1) {
+        line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
+        InitMobyInstance(line, 0x10E2);
         line->kind = 5;
     }
-    if ((D_001A7AF0 >> 13) & 1) {
-        line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-        func_0029F0C8(line, 0x10E4);
+    if ((gEquipmentBits >> 13) & 1) {
+        line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
+        InitMobyInstance(line, 0x10E4);
         line->kind = 6;
     }
     if (g != 0) {
-        line = (MenuLine_002D4948 *)(D_001F2840.items + n++ * 0x100);
-        func_0029F0C8(line, D_001A8C58[g]);
+        line = (MenuLine_002D4948 *)(gPauseMenuState.items + lineCount++ * 0x100);
+        InitMobyInstance(line, D_001A8C58[g]);
         line->kind = 7;
     }
-    for (i = 0; i < n; i++) {
-        line = (MenuLine_002D4948 *)(D_001F2840.items + i * 0x100);
+    for (i = 0; i < lineCount; i++) {
+        line = (MenuLine_002D4948 *)(gPauseMenuState.items + i * 0x100);
         line->width = 0x1FF;
-        func_002A0468(line, 0x202020, 14, 14, 0);
+        PackRenderCommandFields(line, 0x202020, 14, 14, 0);
         line->width = 0xFF;
         line->b31 = 1;
         line->b30 = 0xFF;
@@ -166,10 +167,10 @@ int func_002D4948(void)
         line->colour[2] = -2.782353f;
         func_002A0F48(line);
     }
-    D_001F2840.count = n;
-    D_001F2840.timer = 300;
+    gPauseMenuState.count = lineCount;
+    gPauseMenuState.timer = 300;
     for (D_001ABA74 = 0; D_001ABA74 < 21; D_001ABA74++) {
-        if ((D_001A7AF0 & D_0026CFD0[D_001ABA74].mask) == D_0026CFD0[D_001ABA74].value) {
+        if ((gEquipmentBits & D_0026CFD0[D_001ABA74].mask) == D_0026CFD0[D_001ABA74].value) {
             break;
         }
     }

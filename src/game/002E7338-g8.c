@@ -23,6 +23,7 @@ extern void func_00282CC0(void *, void *, void *);
 extern void func_00283098(void *, void *, void *);
 extern void func_00280B90(void *, int, int);
 
+/* Draws glowing quads around an object, fading in with its effect strength. */
 void func_002E7338(unsigned char *object)
 {
     EffectQuad quad;
@@ -31,10 +32,10 @@ void func_002E7338(unsigned char *object)
     int count;
     int i, j;
     unsigned int baseColor;
-    int variant = (D_001A7AF0 >> 4) & 1;
+    int variant = (gEquipmentBits >> 4) & 1;
     table = D_001AC048[variant];
     count = D_001AC040[variant];
-    quad.texture = func_0027C878(5);
+    quad.texture = GetEffectTextureDescriptor(5);
     quad.state = 0xFF9000000260ULL;
     quad.primitive = 0x8000000048ULL;
     quad.reserved = 0;
@@ -51,22 +52,22 @@ void func_002E7338(unsigned char *object)
             vDest += 8;
         }
     }
-    func_00282D30(&position, object, 0.0009765625f);
+    FastVecScale(&position, object, 0.0009765625f);
     for (i = 0; i < count; i++) {
-        int c = object[0xBC];
+        int alpha = object[0xBC];
         unsigned int color;
         float scale;
-        if (*(short *)(object + 0xB2)) c += func_002A77E0(*(short *)(object + 0xB2));
+        if (*(short *)(object + 0xB2)) alpha += RandomIntBelow(*(short *)(object + 0xB2));
         baseColor = 0x2058B0;
-        scale = func_00283CE0(c) * 0.025f * table[i].f[3];
-        color = ((unsigned int)c << 24) | baseColor;
+        scale = IntToFloat(alpha) * 0.025f * table[i].f[3];
+        color = ((unsigned int)alpha << 24) | baseColor;
         for (j = 0; j < 4; j++) {
             quad.colors[j] = color;
-            func_00282D30(quad.positions[j], &corner_template[j], scale);
-            func_00282CC0(quad.positions[j], quad.positions[j], &table[i]);
-            func_00283098(quad.positions[j], quad.positions[j], object + 0xC0);
-            func_00282CC0(quad.positions[j], quad.positions[j], &position);
+            FastVecScale(quad.positions[j], &corner_template[j], scale);
+            FastVecAdd(quad.positions[j], quad.positions[j], &table[i]);
+            matrix_mul_vec3(quad.positions[j], quad.positions[j], object + 0xC0);
+            FastVecAdd(quad.positions[j], quad.positions[j], &position);
         }
-        func_00280B90(&quad, 0, 0);
+        draw_world_quad(&quad, 0, 0);
     }
 }

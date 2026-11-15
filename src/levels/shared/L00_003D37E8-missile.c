@@ -44,131 +44,132 @@ extern unsigned char *D_L00_001FE9F4;
 extern int D_L00_001B19C8 __attribute__((sda));
 extern char func_L00_003E2BD0[];
 
-void func_L00_003E2510(char *obj)
+/* Per-frame update of the homing missile. It steers toward its target, flies forward, damages what it hits, leaves a smoke trail, then explodes and removes itself. */
+void func_L00_003E2510(char *missile)
 {
     float scratch[4], previous[4], delta[4], temp[4];
-    unsigned char hit[48];
+    unsigned char damageInfo[48];
     float particle[4];
-    char *state = *(char **)(obj + 0x68);
+    char *vars = *(char **)(missile + 0x68);
     char *target;
     char *info;
-    char *p;
+    char *effect;
     float *tracking_delta;
     float length, speed, scale;
-    int work, i;
+    int randomValue, i;
 
-    if (!func_002B4038(*(int *)(state + 0x18), *(int *)(state + 0x14))) {
-        func_002FEE50(*(int *)(state + 0x34));
-        func_0029F338(obj);
+    if (!IsSavedRecordValue(*(int *)(vars + 0x18), *(int *)(vars + 0x14))) {
+        ClearEntryFlag(*(int *)(vars + 0x34));
+        MarkMobySpawned(missile);
         return;
     }
-    func_002AFFD8(obj + 0x10, scratch, 1);
-    qcopy(previous, obj + 0x10);
-    target = *(char **)(state + 0x1C);
+    ComputeViewDirection(missile + 0x10, scratch, 1);
+    qcopy(previous, missile + 0x10);
+    target = *(char **)(vars + 0x1C);
     if (target) {
         if (*(unsigned char *)(target + 0x20) == 0xFE) goto clear_target;
         if (*(unsigned char *)(target + 0x20) == 0xFD) goto clear_target;
-        if (func_L00_003E39B8(target)) goto clear_target;
+        if (IsLivingHittableTarget(target)) goto clear_target;
         {
             { float *t = delta;
-            func_00282CF0(t, *(char **)(state + 0x1C) + 0x10, obj + 0x10);
+            FastVecSub(t, *(char **)(vars + 0x1C) + 0x10, missile + 0x10);
             tracking_delta = t;
-            info = func_002AB1F0(*(char **)(state + 0x1C));
+            info = GetMobyPrivateValue0(*(char **)(vars + 0x1C));
             if (info) {
-                func_00282D30((char *)temp, (char *)scratch, *(float *)(info + 0x10));
-                func_00282CC0(tracking_delta, tracking_delta, temp);
-                length = func_00282DF0(tracking_delta);
+                FastVecScale((char *)temp, (char *)scratch, *(float *)(info + 0x10));
+                FastVecAdd(tracking_delta, tracking_delta, temp);
+                length = FastVecLength(tracking_delta);
             } else {
                 t = 0;
-                length = func_00282DF0(tracking_delta);
+                length = FastVecLength(tracking_delta);
             } }
             if (length == 0.0f) goto clear_target;
             {
-                speed = *(float *)(state + 0x2C);
-                func_00282D30(state + 0x20, (char *)tracking_delta, speed / length);
-                *(float *)(state + 0x2C) = speed;
+                speed = *(float *)(vars + 0x2C);
+                FastVecScale(vars + 0x20, (char *)tracking_delta, speed / length);
+                *(float *)(vars + 0x2C) = speed;
             }
         }
     }
     goto target_done;
 clear_target:
-    *(char **)(state + 0x1C) = 0;
+    *(char **)(vars + 0x1C) = 0;
 target_done:
-    switch (*(unsigned char *)(obj + 0x20)) {
+    switch (*(unsigned char *)(missile + 0x20)) {
     case 0:
-        func_002FEE70(*(int *)(state + 0x34), state + 0x20, 0);
-        func_00282CC0(obj + 0x10, obj + 0x10, state + 0x20);
-        func_00300190(obj + 0x10, obj + 0x10);
-        *(float *)(obj + 0xF0) = func_00283B98(*(float *)(obj + 0xF0), *(float *)(state + 0x44));
-        *(float *)(obj + 0xF4) = func_00283B98(*(float *)(obj + 0xF4), *(float *)(state + 0x48));
-        *(float *)(obj + 0xF8) = func_00283B98(*(float *)(obj + 0xF8), *(float *)(state + 0x4C));
-        func_L00_003E3890(obj);
-        *(char **)(hit + 0x10) = obj;
-        *(int *)(hit + 0x14) = 0x10000;
-        *(float *)(hit + 0x1C) = ((B2510Entry *)((unsigned char)D_00139568[0x1E] * 0xE0 + (char *)D_L00_00262570))->value;
-        *(int *)(hit + 0x20) = 1;
-        qcopy(hit, state + 0x20);
-        func_00282F20(hit, hit, 1.0f);
-        *(float *)(hit + 0xC) = 5627.925f;
-        *(short *)(hit + 0x1A) = *(unsigned short *)(obj + 0xAA);
-        hit[0x18] = 1;
-        hit[0x19] = 1;
-        if (func_002761F8(previous, obj + 0x10, 0, D_0018C0B0, hit)) {
-            if (!D_L00_001BF200.target) func_L00_003E3258(D_L00_001BF200.position, 15, 0);
-            else if (*(int *)(D_L00_001BF200.target + 0x98)) {
-                func_L00_003E3258(D_L00_001BF200.position, 10, 1);
-                func_00334160(D_L00_001BF200.target, 0x1E, *(int *)(obj + 0xB8));
+        SteerEffectDirection(*(int *)(vars + 0x34), vars + 0x20, 0);
+        FastVecAdd(missile + 0x10, missile + 0x10, vars + 0x20);
+        TransformVectorOrCopy(missile + 0x10, missile + 0x10);
+        *(float *)(missile + 0xF0) = FastAddRotations(*(float *)(missile + 0xF0), *(float *)(vars + 0x44));
+        *(float *)(missile + 0xF4) = FastAddRotations(*(float *)(missile + 0xF4), *(float *)(vars + 0x48));
+        *(float *)(missile + 0xF8) = FastAddRotations(*(float *)(missile + 0xF8), *(float *)(vars + 0x4C));
+        UpdateMobyColorScaleFromVars(missile);
+        *(char **)(damageInfo + 0x10) = missile;
+        *(int *)(damageInfo + 0x14) = 0x10000;
+        *(float *)(damageInfo + 0x1C) = ((B2510Entry *)((unsigned char)gItemSlotToRecord[0x1E] * 0xE0 + (char *)gWeaponTable_L00))->value;
+        *(int *)(damageInfo + 0x20) = 1;
+        qcopy(damageInfo, vars + 0x20);
+        vec_scale_to_length(damageInfo, damageInfo, 1.0f);
+        *(float *)(damageInfo + 0xC) = 5627.925f;
+        *(short *)(damageInfo + 0x1A) = *(unsigned short *)(missile + 0xAA);
+        damageInfo[0x18] = 1;
+        damageInfo[0x19] = 1;
+        if (CollLine(previous, missile + 0x10, 0, gHeroMoby_0018C0B0, damageInfo)) {
+            if (!gCollisionResult.target) SpawnSparkBurstAtPosition(gCollisionResult.position, 15, 0);
+            else if (*(int *)(gCollisionResult.target + 0x98)) {
+                SpawnSparkBurstAtPosition(gCollisionResult.position, 10, 1);
+                StartHealthDrainOnTarget(gCollisionResult.target, 0x1E, *(int *)(missile + 0xB8));
             }
-            func_002E5CF8(0, 0, obj);
-            *(unsigned char *)(obj + 0x20) = 1;
-            *(char **)(state + 0x1C) = 0;
-            *(unsigned short *)(obj + 0x34) |= 0x41;
-            *(int *)(state + 0x38) = 6;
-        } else if (func_00282948(state + 0x38)) {
-            func_L00_003E3668(obj + 0x10);
-            *(unsigned char *)(obj + 0x20) = 1;
-            *(char **)(state + 0x1C) = 0;
-            *(unsigned short *)(obj + 0x34) |= 0x41;
-            *(int *)(state + 0x38) = 6;
+            PlayMobySound(0, 0, missile);
+            *(unsigned char *)(missile + 0x20) = 1;
+            *(char **)(vars + 0x1C) = 0;
+            *(unsigned short *)(missile + 0x34) |= 0x41;
+            *(int *)(vars + 0x38) = 6;
+        } else if (FastFloatHelperD(vars + 0x38)) {
+            SpawnSmallSparkSpray(missile + 0x10);
+            *(unsigned char *)(missile + 0x20) = 1;
+            *(char **)(vars + 0x1C) = 0;
+            *(unsigned short *)(missile + 0x34) |= 0x41;
+            *(int *)(vars + 0x38) = 6;
         }
-        work = func_002A77E0(255);
-        p = func_002C65A0(obj + 0x10, D_L00_001A8F20, 2, 0x202080, work, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (p) p[2] = *D_L00_001FEA14;
-        p = func_002C65A0(obj + 0x10, D_L00_001A8F20, 2, 0x202080, (work + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
-        if (p) p[2] = *D_L00_001FEA14;
-        work = (int)delta;
-        func_00282CF0((void *)work, obj + 0x10, previous);
-        func_00282D30((char *)work, (char *)work, 0.2f);
+        randomValue = RandomIntBelow(255);
+        effect = SpawnGravityFadeParticle(missile + 0x10, D_L00_001A8F20, 2, 0x202080, randomValue, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (effect) effect[2] = *D_L00_001FEA14;
+        effect = SpawnGravityFadeParticle(missile + 0x10, D_L00_001A8F20, 2, 0x202080, (randomValue + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        if (effect) effect[2] = *D_L00_001FEA14;
+        randomValue = (int)delta;
+        FastVecSub((void *)randomValue, missile + 0x10, previous);
+        FastVecScale((char *)randomValue, (char *)randomValue, 0.2f);
         qcopy(temp, previous);
-        tracking_delta = (float *)work;
+        tracking_delta = (float *)randomValue;
         for (i = 4; i >= 0; i--) {
-            work = func_002A77E0(255);
-            scale = func_002A7878(0.1f, 0.3f);
-            particle[0] = temp[0] + func_002A78D8(0.0f, 0.1f);
-            particle[1] = temp[1] + func_002A78D8(0.0f, 0.1f);
-            particle[2] = temp[2] + func_002A78D8(0.0f, 0.1f);
-            func_002C65A0(particle, D_L00_001A8F20, 15, 0x808080, work, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
-            func_00282CC0(temp, temp, tracking_delta);
+            randomValue = RandomIntBelow(255);
+            scale = RandomFloatRange(0.1f, 0.3f);
+            particle[0] = temp[0] + RandomSignedFloatRange(0.0f, 0.1f);
+            particle[1] = temp[1] + RandomSignedFloatRange(0.0f, 0.1f);
+            particle[2] = temp[2] + RandomSignedFloatRange(0.0f, 0.1f);
+            SpawnGravityFadeParticle(particle, D_L00_001A8F20, 15, 0x808080, randomValue, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
+            FastVecAdd(temp, temp, tracking_delta);
         }
-        if (D_L00_001B19C8 % 10 == 0) {
-            p = func_002C65A0(obj + 0x10, D_L00_001A8F20, 30, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
-            if (p) p[2] = *D_L00_001FE9F4;
+        if (gFrameCounter_L00 % 10 == 0) {
+            effect = SpawnGravityFadeParticle(missile + 0x10, D_L00_001A8F20, 30, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);
+            if (effect) effect[2] = *D_L00_001FE9F4;
         }
-        ref_L00_003E2510_00(func_L00_003E2BD0, obj);
+        ref_L00_003E2510_00(UpdateGlowingTrailMoby, missile);
         break;
     case 1:
-        if (func_00282948(state + 0x38)) {
-            func_002FEE50(*(int *)(state + 0x34));
-            func_0029F338(obj);
+        if (FastFloatHelperD(vars + 0x38)) {
+            ClearEntryFlag(*(int *)(vars + 0x34));
+            MarkMobySpawned(missile);
             return;
         }
-        ref_L00_003E2510_00(func_L00_003E2BD0, obj);
+        ref_L00_003E2510_00(UpdateGlowingTrailMoby, missile);
         break;
     }
-    if (*(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||
-        *(float *)(obj + 0x14) < 2.0f || *(float *)(obj + 0x14) > 1021.0f ||
-        *(float *)(obj + 0x18) < 2.0f || *(float *)(obj + 0x18) > 1021.0f) {
-        func_002FEE50(*(int *)(state + 0x34));
-        func_0029F338(obj);
+    if (*(float *)(missile + 0x10) < 2.0f || *(float *)(missile + 0x10) > 1021.0f ||
+        *(float *)(missile + 0x14) < 2.0f || *(float *)(missile + 0x14) > 1021.0f ||
+        *(float *)(missile + 0x18) < 2.0f || *(float *)(missile + 0x18) > 1021.0f) {
+        ClearEntryFlag(*(int *)(vars + 0x34));
+        MarkMobySpawned(missile);
     }
 }

@@ -130,34 +130,34 @@ void func_0031FC28(PickupObject *object)
         }
         break;
     case 1:
-        if (data->f5C == 3 && (D_001B1688 & 15) == (((int)object >> 8) & 15)) {
+        if (data->f5C == 3 && (gGameTime & 15) == (((int)object >> 8) & 15)) {
             qzero(data);
-            func_00282C90(data->f10);
+            StoreVectorHelper(data->f10);
             data->f5C = 0;
         }
 
         qcopy(old, data);
-        func_00273B70(object);
+        UpdateCameraMoby(object);
         changed = 0;
-        if (func_00282E48(old, data) > data->speedLimit * 2.0f)
+        if (fast_vec_dist(old, data) > data->speedLimit * 2.0f)
             changed = 1;
         allow = 1;
         if (data->f5C || changed) {
-            if (func_00282948(&data->f7C)) {
-                if (func_00282C48(object->pos[2] - HERO->pos[2]) > HERO->pickupHeight ||
-                    func_00282E80(object->pos, HERO->pos) > HERO->pickupRadius)
+            if (FastFloatHelperD(&data->f7C)) {
+                if (FloatAbs(object->pos[2] - HERO->pos[2]) > HERO->pickupHeight ||
+                    vec_distance_xy(object->pos, HERO->pos) > HERO->pickupRadius)
                     allow = 0;
             }
         } else {
             allow = 0;
-            if (func_00282C48(object->pos[2] - HERO->pos[2]) < HERO->pickupHeight &&
-                func_00282E80(object->pos, HERO->pos) < HERO->pickupRadius)
+            if (FloatAbs(object->pos[2] - HERO->pos[2]) < HERO->pickupHeight &&
+                vec_distance_xy(object->pos, HERO->pos) < HERO->pickupRadius)
                 data->f7C = 3;
         }
-        if (D_00139688[data->weapon] >= WEAPON(data->weapon)->capacity)
+        if (gItemAmmoCounts[data->weapon] >= WEAPON(data->weapon)->capacity)
             allow = 0;
         if (D_001A8CA0) {
-            if (func_002B0360(object->pos) < data->groundZ - 2.0f)
+            if (GetDistanceFromGravityCenter(object->pos) < data->groundZ - 2.0f)
                 goto permit;
         } else if (object->pos[2] < data->groundZ - 2.0f) {
             goto permit;
@@ -170,62 +170,62 @@ void func_0031FC28(PickupObject *object)
             allow = 0;
         if (allow) {
             item = data->weapon;
-            previous = D_00139688[item];
-            func_0026F740(item, data->amount);
-            if (D_00139688[item] > previous) {
-                count = D_00139688[item] - previous;
-                func_002B0A48(count == 1 ?
+            previous = gItemAmmoCounts[item];
+            EmptyStubF740(item, data->amount);
+            if (gItemAmmoCounts[item] > previous) {
+                count = gItemAmmoCounts[item] - previous;
+                ForwardThreeArgumentCall(count == 1 ?
                     WEAPON(item)->messageOne :
                     WEAPON(item)->messageMany,
                     count, -1);
             }
-            func_002A7750(object, 2, -1);
+            SetMobyState(object, 2, -1);
             data->pull = 1.0f / 7.5f;
-            func_00282C88(data);
-            if (func_00282C30(D_001B1688 - D_001B275C) >= 11) {
-                func_002E5CF8(0, 0, object);
-                D_001B275C = D_001B1688;
+            ClearVector128(data);
+            if (subtract_integer_with_clamp(gGameTime - D_001B275C) >= 11) {
+                PlayMobySound(0, 0, object);
+                D_001B275C = gGameTime;
             }
         }
         break;
     case 2:
         /* The hero's basis vectors lie at fixed offsets around its position. */
-        heroPos = D_00189E20 + 0x80;
-        func_00282CF0(old, object->pos, heroPos);
-        func_00283098(old, old, heroPos - 0x40);
+        heroPos = gHeroState + 0x80;
+        FastVecSub(old, object->pos, heroPos);
+        matrix_mul_vec3(old, old, heroPos - 0x40);
         target = 8.0f;
         if (old[2] > 0.0f)
             target = 0.0f;
-        func_002AA2E8(&data->pull, target, 0.0066666668f);
-        func_00282F20(move, heroPos - 0x60, data->pull);
-        func_00282CC0(object->pos, object->pos, move);
-        func_00282CC0(object->pos, object->pos, heroPos + 0xD0);
-        speed = func_00282DF0(data);
-        func_002AA2E8(&speed, 1.0666667f, 0.0066666668f);
-        func_00282CF0(delta, heroPos + 0x60, object->pos);
-        time = func_00282DF0(delta) / speed;
+        ApproachValue(&data->pull, target, 0.0066666668f);
+        vec_scale_to_length(move, heroPos - 0x60, data->pull);
+        FastVecAdd(object->pos, object->pos, move);
+        FastVecAdd(object->pos, object->pos, heroPos + 0xD0);
+        speed = FastVecLength(data);
+        ApproachValue(&speed, 1.0666667f, 0.0066666668f);
+        FastVecSub(delta, heroPos + 0x60, object->pos);
+        time = FastVecLength(delta) / speed;
         if (time < 30.0f)
-            func_002AA2E8(&object->lifetime, 0.0f, object->def->fadeRate * (1.0f / 30.0f));
+            ApproachValue(&object->lifetime, 0.0f, object->def->fadeRate * (1.0f / 30.0f));
         if (object->lifetime == 0.0f || time <= 1.0f) {
-            func_0029F338(object);
+            MarkMobySpawned(object);
             return;
         }
-        func_00282F20(data, delta, speed);
-        func_00282CC0(object->pos, object->pos, data);
-        func_00282DD8(angle, heroPos - 0x60, data);
-        func_002ACE78(angle, angle, 0.087266475f);
+        vec_scale_to_length(data, delta, speed);
+        FastVecAdd(object->pos, object->pos, data);
+        FastVecCross(angle, heroPos - 0x60, data);
+        SetDirectionWithComplement(angle, angle, 0.087266475f);
         *(PickupVectorBits *)pivot = 0;
         pivot[2] = 0.3f;
-        func_00283098(before, pivot, object->basis);
-        func_00283958(angle, rotation);
-        func_00283738(object->basis, rotation, object->basis);
-        func_00283098(after, pivot, object->basis);
-        func_00282CF0(offset, after, before);
-        func_00282CF0(object->pos, object->pos, offset);
+        matrix_mul_vec3(before, pivot, object->basis);
+        quaternion_to_rotation_basis(angle, rotation);
+        multiply_matrix3x3(object->basis, rotation, object->basis);
+        matrix_mul_vec3(after, pivot, object->basis);
+        FastVecSub(offset, after, before);
+        FastVecSub(object->pos, object->pos, offset);
         break;
     }
 
-    if (object->state == 1 && func_00282ED8(object, D_0018C0B0)) {
+    if (object->state == 1 && FastVectorHelperD(object, gHeroMoby_0018C0B0)) {
         if (object->alpha > 36)
             object->alpha -= 4;
         else

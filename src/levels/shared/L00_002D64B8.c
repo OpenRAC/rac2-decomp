@@ -6,21 +6,22 @@ extern float D_L00_001A7FA4 __attribute__((sda));
 
 extern float D_L00_001A7F9C __attribute__((sda));
 
-int func_L00_002D64B8(float *a0, float *a1, float *a2)
+/* Gives the camera values for hero states 98 to 100 and 17. Returns 1 if it filled them in, otherwise 0. */
+int func_L00_002D64B8(float *heightOut, float *pitchOut, float *yawOut)
 {
-    char *p = D_00189E20;
-    int v = *(int *)(p + 8852);
+    char *heroBase = gHeroState;
+    int heroState = *(int *)(heroBase + 8852);
 
-    if (v >= 98 && v <= 100) {
-        if (a0) *a0 = *(float *)(p + 6316);
-        if (a1) *a1 = D_L00_001A7FA4 * 4.8481374506081920117140e-06f;
-        if (a2) *a2 = D_L00_001A7F9C * 2.9088824521750211715698e-04f;
+    if (heroState >= 98 && heroState <= 100) {
+        if (heightOut) *heightOut = *(float *)(heroBase + 6316);
+        if (pitchOut) *pitchOut = D_L00_001A7FA4 * 4.8481374506081920117140e-06f;
+        if (yawOut) *yawOut = D_L00_001A7F9C * 2.9088824521750211715698e-04f;
         return 1;
     }
-    if (v == 17) {
-        if (a0) *a0 = *(float *)(p + 152);
-        if (a1) *a1 = D_L00_001A7FA4 * 1.4544411897077225148678e-05f;
-        if (a2) *a2 = D_L00_001A7F9C * 8.7266473565250635147095e-04f;
+    if (heroState == 17) {
+        if (heightOut) *heightOut = *(float *)(heroBase + 152);
+        if (pitchOut) *pitchOut = D_L00_001A7FA4 * 1.4544411897077225148678e-05f;
+        if (yawOut) *yawOut = D_L00_001A7F9C * 8.7266473565250635147095e-04f;
         return 1;
     }
     return 0;
@@ -32,25 +33,26 @@ extern void func_L00_002EE108(void *, void *, void *);
 extern void func_L00_002EE220(void *, void *, void *);
 extern char D_L00_001B8DC0[];
 extern char D_0018B2F0[];
+/* Eases the camera height behind the hero and copies the hero camera data into the level camera block. */
 void func_L00_002D6588(void) {
-    char *player = D_00189E20;
-    char *camera;
-    float target;
-    if (*(float *)(player + 0x151C) == 0.0f) *(float *)(player + 0x151C) = 1.5f;
-    target = 1.5f;
-    if (*(int *)(player + 0x2294) == 4) target = 0.75f;
-    func_0031DB00(player + 0x151C, player + 0x1520, target, 0.004444444552063942f, 0.004444444552063942f, 0.5333333611488342f);
-    func_L00_002EE3D0(player + 0x14D0, player + 0x20, *(float *)(player + 0x151C));
-    func_L00_002EE108(player + 0x14D0, player + 0x14D0, player + 0x80);
-    if (*(int *)(player + 0x229C) == 25 || *(int *)(player + 0x2294) == 102) {
-        float height = *(float *)(player + 0x334) + 0.75f;
-        if (*(float *)(player + 0x14D8) < height) *(float *)(player + 0x14D8) = height;
+    char *hero = gHeroState;
+    char *cameraBlock;
+    float targetHeight;
+    if (*(float *)(hero + 0x151C) == 0.0f) *(float *)(hero + 0x151C) = 1.5f;
+    targetHeight = 1.5f;
+    if (*(int *)(hero + 0x2294) == 4) targetHeight = 0.75f;
+    func_0031DB00(hero + 0x151C, hero + 0x1520, targetHeight, 0.004444444552063942f, 0.004444444552063942f, 0.5333333611488342f);
+    func_L00_002EE3D0(hero + 0x14D0, hero + 0x20, *(float *)(hero + 0x151C));
+    func_L00_002EE108(hero + 0x14D0, hero + 0x14D0, hero + 0x80);
+    if (*(int *)(hero + 0x229C) == 25 || *(int *)(hero + 0x2294) == 102) {
+        float minHeight = *(float *)(hero + 0x334) + 0.75f;
+        if (*(float *)(hero + 0x14D8) < minHeight) *(float *)(hero + 0x14D8) = minHeight;
     }
-    camera = D_L00_001B8DC0;
-    qcopy(camera, D_0018B2F0);
-    qcopy(camera + 0x230, D_0018B2F0 + 0x10);
-    func_L00_002EE220(camera + 0x240, camera + 0x230, D_0018B2F0 - 0x14B0);
-    func_L00_002EE3D0(camera + 0x240, camera + 0x240, 1.0f);
-    func_L00_002EE220(camera + 0x250, camera + 0x240, camera + 0x230);
-    func_L00_002EE3D0(camera + 0x250, camera + 0x250, 1.0f);
+    cameraBlock = gCameraPosition_L00;
+    qcopy(cameraBlock, D_0018B2F0);
+    qcopy(cameraBlock + 0x230, D_0018B2F0 + 0x10);
+    func_L00_002EE220(cameraBlock + 0x240, cameraBlock + 0x230, D_0018B2F0 - 0x14B0);
+    func_L00_002EE3D0(cameraBlock + 0x240, cameraBlock + 0x240, 1.0f);
+    func_L00_002EE220(cameraBlock + 0x250, cameraBlock + 0x240, cameraBlock + 0x230);
+    func_L00_002EE3D0(cameraBlock + 0x250, cameraBlock + 0x250, 1.0f);
 }

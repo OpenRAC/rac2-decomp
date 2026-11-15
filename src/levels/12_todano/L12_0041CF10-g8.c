@@ -18,6 +18,7 @@ extern void *func_0032C700(void *, int, int, int, int, int, int, int,
                          int, int, int, int, float, float);
 extern void func_0029F338(void *);
 
+/* Waits for three linked mobys to be ready, lifts them all, then blows them up together and counts the break as saved progress. */
 void func_L12_0041CF10(u8 *self)
 {
     u8 *state = *(u8 **)(self + 0x68);
@@ -34,7 +35,7 @@ void func_L12_0041CF10(u8 *self)
         if (D_L12_0021EDF0.flags[(s16)id])
             goto Destroy0;
         {
-            int packed = D_0019B4A8[((s16)id >> 1) + (D_001A79F0 << 10)];
+            int packed = D_0019B4A8[((s16)id >> 1) + (gCurrentMapIndex << 10)];
 
             if (id & 1) {
                 if ((packed >> 4) & 7)
@@ -45,7 +46,7 @@ void func_L12_0041CF10(u8 *self)
             }
         }
 Destroy0:
-        func_0029F338(self);
+        MarkMobySpawned(self);
         break;
     }
     case 1: {
@@ -54,7 +55,7 @@ Destroy0:
         ready = 1;
         for (i = 0; i < 3; i++, state += 4) {
             if (*(int *)state != -1) {
-                if (!func_L12_0041E8E8(D_L12_001B2E9C_gp + (*(int *)state << 8)))
+                if (!IsLinkedMobyFinished(D_L12_001B2E9C_gp + (*(int *)state << 8)))
                     ready = 0;
             }
         }
@@ -64,69 +65,69 @@ Destroy0:
     }
     case 4: {
         int i;
-        int *p;
+        int *childIds;
         u8 *base = D_L12_001B2E9C;
 
         *(float *)(state + 0xC) += 0.0013888889225199819f;
         *(float *)(self + 0x18) += *(float *)(state + 0xC);
-        p = (int *)state;
+        childIds = (int *)state;
         for (i = 0; i < 3; i++) {
-            if (p[i] != -1)
-                *(float *)((p[i] << 8) + (u32)base + 0x18) += *(float *)(state + 0xC);
+            if (childIds[i] != -1)
+                *(float *)((childIds[i] << 8) + (u32)base + 0x18) += *(float *)(state + 0xC);
         }
         if (*(float *)(state + 0x10) + 8.0f < *(float *)(self + 0x18))
             self[0x20] = 5;
         break;
     }
     case 2:
-        func_002A7750(self, 3, -1);
+        SetMobyState(self, 3, -1);
         *(int *)(state + 0x14) = D_L12_001B1DA0;
         break;
     case 3: {
         int i;
-        int *p;
+        int *childIds;
         u8 *child;
         u16 id;
 
-        if (func_00282948(state + 0x14)) {
+        if (FastFloatHelperD(state + 0x14)) {
             *(int *)(self + 0x98) = 0;
             *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
-            func_00282F20(vec, self + 0xC0, -0.10000000894f);
-            func_002B0A68(self, 63, vec, 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            p = (int *)state;
-            for (i = 0; i < 3; i++, p++) {
-                if (*p != -1) {
-                    child = D_L12_001B2E9C_gp + (*p << 8);
-                    func_L12_0041E8F8(child);
-                    func_0032C700(child + 0x10, 1, 14, 10, 15, 10, 20, 1,
+            vec_scale_to_length(vec, self + 0xC0, -0.10000000894f);
+            SpawnDebrisForMaskedParts(self, 63, vec, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            childIds = (int *)state;
+            for (i = 0; i < 3; i++, childIds++) {
+                if (*childIds != -1) {
+                    child = D_L12_001B2E9C_gp + (*childIds << 8);
+                    TriggerLinkedMobyBurst(child);
+                    SpawnExplosion(child + 0x10, 1, 14, 10, 15, 10, 20, 1,
                                   1, 1, 0, 0, 2.0f, 20.0f);
-                    func_0029F338(D_L12_001B2E9C + (*p << 8));
+                    MarkMobySpawned(D_L12_001B2E9C + (*childIds << 8));
                 }
             }
             id = *(u16 *)(self + 0xB2);
             if (id & 1) {
-                u8 *counter = (u8 *)(((s16)id >> 1) + (D_001A79F0 << 10)) + (int)D_0019B4A8;
+                u8 *counter = (u8 *)(((s16)id >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
                 u8 packed = *counter;
 
                 if (((packed >> 4) & 7) != 7)
                     *counter = packed + 16;
             } else {
-                u8 *counter = (u8 *)(((s16)id >> 1) + (D_001A79F0 << 10)) + (int)D_0019B4A8;
+                u8 *counter = (u8 *)(((s16)id >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
                 u8 packed = *counter;
 
                 if ((packed & 7) != 7)
                     *counter = packed + 1;
             }
-            func_0029F338(self);
+            MarkMobySpawned(self);
             break;
         }
         if (*(int *)(state + 0x14) == D_L12_001B1DA0 / 2) {
-            int *p2 = (int *)state;
-            int i2;
+            int *childIds2 = (int *)state;
+            int j;
 
-            for (i2 = 0; i2 < 3; i2++, p2++) {
-                if (*p2 != -1)
-                    ((u8 *)((*p2 << 8) + (u32)D_L12_001B2E9C_gp))[0x20] = 4;
+            for (j = 0; j < 3; j++, childIds2++) {
+                if (*childIds2 != -1)
+                    ((u8 *)((*childIds2 << 8) + (u32)D_L12_001B2E9C_gp))[0x20] = 4;
             }
         }
         break;
@@ -142,24 +143,24 @@ Destroy0:
 
                 child = (u8 *)((*(int *)state << 8) + (u32)base);
                 *(u16 *)(child + 0x34) &= 0xEFFF;
-                func_0029F338(base + (*(int *)state << 8));
+                MarkMobySpawned(base + (*(int *)state << 8));
             }
         }
         id = *(u16 *)(self + 0xB2);
         if (id & 1) {
-            u8 *counter = (u8 *)(((s16)id >> 1) + (D_001A79F0 << 10)) + (int)D_0019B4A8;
+            u8 *counter = (u8 *)(((s16)id >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
             u8 packed = *counter;
 
             if (((packed >> 4) & 7) != 7)
                 *counter = packed + 16;
         } else {
-            u8 *counter = (u8 *)(((s16)id >> 1) + (D_001A79F0 << 10)) + (int)D_0019B4A8;
+            u8 *counter = (u8 *)(((s16)id >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
             u8 packed = *counter;
 
             if ((packed & 7) != 7)
                 *counter = packed + 1;
         }
-        func_0029F338(self);
+        MarkMobySpawned(self);
         break;
     }
     }

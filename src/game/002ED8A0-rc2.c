@@ -25,31 +25,32 @@
 
 extern s8 D_00262958[];
 
-s32 func_002ED8A0(s32 arg0) {
-    s32 b;
-    s32 p;
-    s8 *t1;
-    s32 k ;
-    s32 var_a0;
-    s32 var_a2 ;
+/* Follows a chain of 0x28-byte table entries starting at the given index and returns the last used entry, or -1 if there is none. */
+s32 func_002ED8A0(s32 index) {
+    s32 table;
+    s32 offset;
+    s8 *nextBase;
+    s32 stride ;
+    s32 cur;
+    s32 last ;
 
-    var_a0 = arg0;
-    var_a2 = -1;
-    b = (s32)D_00262958;
-    k = 0x28;
-    t1 = (s8 *)(b - 0x14);
+    cur = index;
+    last = -1;
+    table = (s32)D_00262958;
+    stride = 0x28;
+    nextBase = (s8 *)(table - 0x14);
     for (;;) {
-        if (var_a0 < 0) {
+        if (cur < 0) {
             goto done;
         }
-        p = var_a0 * k;
+        offset = cur * stride;
 
-        if (*(s32 *)(p + b) == 0) {
-            return var_a2;
+        if (*(s32 *)(offset + table) == 0) {
+            return last;
         }
-        var_a2 = var_a0;
-        var_a0 = *(s32 *)(p + (s32)t1);
+        last = cur;
+        cur = *(s32 *)(offset + (s32)nextBase);
     }
 done:
-    return var_a2;
+    return last;
 }

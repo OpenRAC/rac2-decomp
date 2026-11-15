@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* A -G0 unit of its own, as 002FC468.c: retail reads D_001B22A8, D_001A7340 and D_001A7344
    absolutely (lui/lw) and only the last store, in the return's delay slot, through $gp. */
@@ -10,10 +11,11 @@ extern int D_001A7344 __attribute__((sda));
    it to GS register 0x40 (the packet func_002FC560 builds for any register). The value is
    built one field at a time: a single four-way | expression is regrouped by the compiler and
    computes the halves in another order. */
+/* Limits a drawing rectangle to the screen size and queues it for the graphics chip. */
 void func_002FC620(int x0, int x1, int y0, int y1)
 {
-    int w = D_001A7340 - 1;
-    int h = D_001A7344 - 1;
+    int w = gScreenWidth - 1;
+    int h = gScreenHeight - 1;
     unsigned long v;
 
     if (x0 < 0) x0 = 0;
@@ -25,16 +27,16 @@ void func_002FC620(int x0, int x1, int y0, int y1)
     v |= (unsigned long)y0 << 32;
     v |= (unsigned long)y1 << 48;
 
-    *(unsigned int *)(D_001B22A8 + 0) = 0x10000002;
-    *(unsigned int *)(D_001B22A8 + 4) = 0;
-    *(unsigned int *)(D_001B22A8 + 8) = 0;
-    *(unsigned int *)(D_001B22A8 + 12) = 0x50000002;
-    *(unsigned int *)(D_001B22A8 + 16) = 0x8001;
-    *(unsigned int *)(D_001B22A8 + 20) = 0x10000000;
-    *(unsigned int *)(D_001B22A8 + 24) = 0xE;
-    *(unsigned int *)(D_001B22A8 + 28) = 0;
-    *(unsigned long *)(D_001B22A8 + 32) = v;
-    *(unsigned int *)(D_001B22A8 + 40) = 0x40;
-    *(unsigned int *)(D_001B22A8 + 44) = 0;
-    D_001B22A8 += 0x30;
+    *(unsigned int *)(gDmaPacketCursor + 0) = 0x10000002;
+    *(unsigned int *)(gDmaPacketCursor + 4) = 0;
+    *(unsigned int *)(gDmaPacketCursor + 8) = 0;
+    *(unsigned int *)(gDmaPacketCursor + 12) = 0x50000002;
+    *(unsigned int *)(gDmaPacketCursor + 16) = 0x8001;
+    *(unsigned int *)(gDmaPacketCursor + 20) = 0x10000000;
+    *(unsigned int *)(gDmaPacketCursor + 24) = 0xE;
+    *(unsigned int *)(gDmaPacketCursor + 28) = 0;
+    *(unsigned long *)(gDmaPacketCursor + 32) = v;
+    *(unsigned int *)(gDmaPacketCursor + 40) = 0x40;
+    *(unsigned int *)(gDmaPacketCursor + 44) = 0;
+    gDmaPacketCursor += 0x30;
 }

@@ -168,156 +168,156 @@ void func_00286738(void)
     ModalState *loadDialog, *saveDialog, *phaseDialog;
     ModalInput *saveInput;
 
-    func_002E4AC8();
-    D_001B170C = D_001BAC80.gameState;
-    if (D_001BAC80.countdown)
-        --D_001BAC80.countdown;
-    if (D_001BAC80.timer)
-        --D_001BAC80.timer;
-    switch (D_001BAC80.mode) {
+    UpdateSoundVoices();
+    D_001B170C = gModalState.gameState;
+    if (gModalState.countdown)
+        --gModalState.countdown;
+    if (gModalState.timer)
+        --gModalState.timer;
+    switch (gModalState.mode) {
     case 2:
-        ++D_001BAC80.elapsed;
-        if (D_001BAC80.elapsed > 90 && D_001BAC80.inputDelay)
-            --D_001BAC80.inputDelay;
-        if (D_001A7420 == 2) {
-            func_002B49E0(4, 2, 1, 0, 0);
+        ++gModalState.elapsed;
+        if (gModalState.elapsed > 90 && gModalState.inputDelay)
+            --gModalState.inputDelay;
+        if (gSaveMenuScreen == 2) {
+            BeginSlotRequest(4, 2, 1, 0, 0);
             break;
         }
-        if (D_001BAC80.elapsed >= 121 && (D_00138180.buttons & 0x40)) {
-            if (!D_0018C958[0x84 / 2])
-                D_0018C958[0x84 / 2] = 1;
-            { func_002B4B70(0, 0); break; }
+        if (gModalState.elapsed >= 121 && (gPadState.buttons & 0x40)) {
+            if (!gSubtitleHistory[0x84 / 2])
+                gSubtitleHistory[0x84 / 2] = 1;
+            { EndSlotRequest(0, 0); break; }
         }
         break;
     case 5:
-        ++D_001BAC80.elapsed;
-        if (D_001BAC80.elapsed > 30 && D_001BAC80.inputDelay)
-            --D_001BAC80.inputDelay;
-        if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x40)) {
-            D_001A7424 &= ~0x40;
+        ++gModalState.elapsed;
+        if (gModalState.elapsed > 30 && gModalState.inputDelay)
+            --gModalState.inputDelay;
+        if (!gModalState.inputDelay && (gPadState.buttons & 0x40)) {
+            gSaveMenuFlags &= ~0x40;
             D_0013955C[0] = 0;
-            { func_002DE990(-1); func_002F64A8(); break; }
+            { RestartGameKeepingProgress(-1); LoadDataAndSetupCallback(); break; }
         }
         break;
     case 4:
-        ++D_001BAC80.elapsed;
-        if (D_001BAC80.elapsed > 30 && D_001BAC80.inputDelay)
-            --D_001BAC80.inputDelay;
-        if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x40)) {
+        ++gModalState.elapsed;
+        if (gModalState.elapsed > 30 && gModalState.inputDelay)
+            --gModalState.inputDelay;
+        if (!gModalState.inputDelay && (gPadState.buttons & 0x40)) {
             D_0013955C[0] = 0;
-            { func_002DE990(-1); func_002F64A8(); break; }
+            { RestartGameKeepingProgress(-1); LoadDataAndSetupCallback(); break; }
         }
         break;
     case 3:
-        switch (D_001BAC80.phase) {
+        switch (gModalState.phase) {
         case 0:
-            if (!D_001BAC80.countdown)
-                D_001BAC80.phase = 1;
+            if (!gModalState.countdown)
+                gModalState.phase = 1;
             break;
         case 1:
-            if (D_00138180.buttons & 0x10)
-                { func_002B4B70(0, 0); break; }
-            if (D_00138180.buttons & 0x40) {
-                func_0027D330(4);
+            if (gPadState.buttons & 0x10)
+                { EndSlotRequest(0, 0); break; }
+            if (gPadState.buttons & 0x40) {
+                FadeToBlack(4);
                 D_001B1F10 = 0;
-                D_001BAC80.phase = 2;
-                D_001BAC80.elapsed = 600;
+                gModalState.phase = 2;
+                gModalState.elapsed = 600;
             }
             break;
         case 2:
-            if (!D_001BAC80.elapsed || --D_001BAC80.elapsed == 0) {
+            if (!gModalState.elapsed || --gModalState.elapsed == 0) {
                 D_001B1F10 = 1;
-                D_001BAC80.phase = 3;
+                gModalState.phase = 3;
                 break;
             }
-            if (D_00138180.buttons & 0x10) {
-                func_0027D330(4);
+            if (gPadState.buttons & 0x10) {
+                FadeToBlack(4);
                 D_001B1F10 = 1;
-                { func_002B4B70(0, 0); break; }
-            } else if (D_00138180.buttons & 0x40) {
+                { EndSlotRequest(0, 0); break; }
+            } else if (gPadState.buttons & 0x40) {
                 D_001B1F10 = 0;
-                { func_002B4B70(0, 0); break; }
+                { EndSlotRequest(0, 0); break; }
             }
             break;
         case 3:
-            if (!(D_00138180.buttons & 0x40))
+            if (!(gPadState.buttons & 0x40))
                 break;
         default:
-            { func_002B4B70(0, 0); break; }
+            { EndSlotRequest(0, 0); break; }
         }
         break;
     case 1:
-        ++D_001BAC80.elapsed;
-        if (D_001BAC80.elapsed > 30 && D_001BAC80.inputDelay)
-            --D_001BAC80.inputDelay;
-        if (func_00288D80()) {
-            if (!(D_00138180.buttons & 0x40))
+        ++gModalState.elapsed;
+        if (gModalState.elapsed > 30 && gModalState.inputDelay)
+            --gModalState.inputDelay;
+        if (GetFlagWord()) {
+            if (!(gPadState.buttons & 0x40))
                 break;
-            func_00288D68();
-            func_00287E80();
-            { func_002B4B70(0, 0); break; }
+            ClearFlagWord();
+            ClearMenuCounter_00287E80();
+            { EndSlotRequest(0, 0); break; }
         }
-        switch (D_001A7420) {
+        switch (gSaveMenuScreen) {
         case 2:
-            if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x40)) {
-                D_001BAC80.result = 2;
-                D_001A7424 &= ~1;
-                { func_002B4B70(0, 0); break; }
+            if (!gModalState.inputDelay && (gPadState.buttons & 0x40)) {
+                gModalState.result = 2;
+                gSaveMenuFlags &= ~1;
+                { EndSlotRequest(0, 0); break; }
             }
             break;
         case 6:
-            if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x20)) {
-                D_001A7424 |= 8;
-                D_001BAC80.result = 2;
+            if (!gModalState.inputDelay && (gPadState.buttons & 0x20)) {
+                gSaveMenuFlags |= 8;
+                gModalState.result = 2;
                 break;
             }
-            if (D_001BAC80.countdown || !(D_00138180.buttons & 0x10))
+            if (gModalState.countdown || !(gPadState.buttons & 0x10))
                 break;
             if (D_001A8C8C) {
-                D_001BAC80.result = 2;
-                { func_002DE990(-1); func_002F64A8(); break; }
+                gModalState.result = 2;
+                { RestartGameKeepingProgress(-1); LoadDataAndSetupCallback(); break; }
             }
-            D_001A7424 |= 0x20;
-            if (!func_002DF1D0())
-                D_001A7424 &= ~2;
-            D_001A7424 &= ~4;
-            D_001BAC80.result = 1;
+            gSaveMenuFlags |= 0x20;
+            if (!IsKnownMenuScreenActive())
+                gSaveMenuFlags &= ~2;
+            gSaveMenuFlags &= ~4;
+            gModalState.result = 1;
             if (!D_001A8C88) {
-                func_002B4B70(0, 0);
+                EndSlotRequest(0, 0);
                 break;
             }
             break;
         case 13:
-            if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x20)) {
-                D_001A7424 |= 0x10;
-                D_001BAC80.result = 2;
+            if (!gModalState.inputDelay && (gPadState.buttons & 0x20)) {
+                gSaveMenuFlags |= 0x10;
+                gModalState.result = 2;
                 break;
             }
-            if (D_001BAC80.countdown || !(D_00138180.buttons & 0x10))
+            if (gModalState.countdown || !(gPadState.buttons & 0x10))
                 break;
             if (D_001A8C8C) {
-                D_001BAC80.result = 2;
-                { func_002DE990(-1); func_002F64A8(); break; }
+                gModalState.result = 2;
+                { RestartGameKeepingProgress(-1); LoadDataAndSetupCallback(); break; }
             }
-            D_001A7424 |= 0x20;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-            D_001BAC80.result = 1;
+            gSaveMenuFlags |= 0x20;
+                gSaveMenuFlags &= ~2;
+                gSaveMenuFlags &= ~4;
+            gModalState.result = 1;
             if (!D_001A8C88)
-                { func_002B4B70(0, 0); break; }
+                { EndSlotRequest(0, 0); break; }
             break;
         case 20:
-            if (D_001BAC80.inputDelay || !(D_00138180.buttons & 0x40))
+            if (gModalState.inputDelay || !(gPadState.buttons & 0x40))
                 break;
-            D_001A7424 &= ~0x40;
-                D_001A7424 &= ~0x400;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-            D_001BAC80.result = 2;
+            gSaveMenuFlags &= ~0x40;
+                gSaveMenuFlags &= ~0x400;
+                gSaveMenuFlags &= ~2;
+                gSaveMenuFlags &= ~4;
+            gModalState.result = 2;
             if (!D_001A8C88) {
-                if (func_002C9A50()) {
-                    func_00298D28(D_001F2930);
-                    func_002B4B70(0, 0);
+                if (GetMenuSavedValue()) {
+                    LoadSavePacket(D_001F2930);
+                    EndSlotRequest(0, 0);
                 } else {
                     D_0013955C[0] = 0;
                     D_001B1680[0] = -1;
@@ -325,65 +325,65 @@ void func_00286738(void)
                 }
                 break;
             }
-            func_002B4B70(0, 0);
+            EndSlotRequest(0, 0);
             break;
         case 17:
         case 18:
         case 21:
-            if (D_001BAC80.pending > 0) {
-                if (--D_001BAC80.pending <= 0) {
-                    if (D_001393E0.status == 2) {
-                        if (!D_001393E0.result) {
-                            D_001A7420 = 9;
-                        } else if (D_001393E0.result == -1) {
-                            D_001A7420 = 9;
-                            D_001393E0.result = 0;
-                        } else if (D_001393E0.result == -2) {
-                            D_001A7420 = 5;
+            if (gModalState.pending > 0) {
+                if (--gModalState.pending <= 0) {
+                    if (gMemcardState.status == 2) {
+                        if (!gMemcardState.result) {
+                            gSaveMenuScreen = 9;
+                        } else if (gMemcardState.result == -1) {
+                            gSaveMenuScreen = 9;
+                            gMemcardState.result = 0;
+                        } else if (gMemcardState.result == -2) {
+                            gSaveMenuScreen = 5;
                         } else {
-                            D_001A7420 = 12;
+                            gSaveMenuScreen = 12;
                         }
-                        func_002B4B70(0, 0);
+                        EndSlotRequest(0, 0);
                     } else {
-                        D_001BAC80.result = 2;
-                        func_00287EA8();
-                        func_002DE990(-1);
-                        func_002F64A8();
+                        gModalState.result = 2;
+                        ClearConfirmPending();
+                        RestartGameKeepingProgress(-1);
+                        LoadDataAndSetupCallback();
                     }
                     break;
                 }
             } else {
-                if (D_001BAC80.inputDelay || !(D_00138180.buttons & 0x40))
+                if (gModalState.inputDelay || !(gPadState.buttons & 0x40))
                     break;
-                func_00287EA8();
+                ClearConfirmPending();
                 if (D_001A8C8C) {
-                    D_001BAC80.pending = 15;
+                    gModalState.pending = 15;
                 } else {
-                    D_001BAC80.result = 2;
-                    D_001A7424 &= ~0x40;
-                    D_001A7424 &= ~0x400;
-                    D_001A7424 &= ~2;
-                    D_001A7424 &= ~4;
-                    func_002B4B70(0, 0);
+                    gModalState.result = 2;
+                    gSaveMenuFlags &= ~0x40;
+                    gSaveMenuFlags &= ~0x400;
+                    gSaveMenuFlags &= ~2;
+                    gSaveMenuFlags &= ~4;
+                    EndSlotRequest(0, 0);
                 }
             }
             break;
         case 1:
         case 16:
-            func_002B4B70(0, 0);
-            D_001F2840.selection = D_001BAC80.selection;
-            D_001F2840.savedSelection = D_001BAC80.selection;
+            EndSlotRequest(0, 0);
+            gPauseMenuState.selection = gModalState.selection;
+            gPauseMenuState.savedSelection = gModalState.selection;
             break;
         case 12:
             if (!D_001F29A0)
                 break;
         case 3:
         case 5:
-            if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x10)) {
-                D_001BAC80.result = 1;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-                { func_002B4B70(0, 0); break; }
+            if (!gModalState.inputDelay && (gPadState.buttons & 0x10)) {
+                gModalState.result = 1;
+                gSaveMenuFlags &= ~2;
+                gSaveMenuFlags &= ~4;
+                { EndSlotRequest(0, 0); break; }
             }
             break;
         case 19:
@@ -391,199 +391,199 @@ void func_00286738(void)
                 /* Set once, unlike a shared pointer, so alias analysis knows its
                  * base and the cancel arm's store has no tie to D_001A7424. The
                  * accept body below merges with case 23's copy at jump2. */
-                ModalState *pickDialog = &D_001BAC80;
+                ModalState *pickDialog = &gModalState;
                 if (pickDialog->inputDelay)
                     break;
-                if (D_00138180.buttons & 0x40) {
-                    func_00298E08();
+                if (gPadState.buttons & 0x40) {
+                    LoadGameDataAndResetSaveMenu();
                     pickDialog->result = 2;
-                    D_001A7424 &= ~2;
-                    D_001A7424 &= ~4;
-                    D_001A7424 |= 0x20;
-                    func_002F64A8();
+                    gSaveMenuFlags &= ~2;
+                    gSaveMenuFlags &= ~4;
+                    gSaveMenuFlags |= 0x20;
+                    LoadDataAndSetupCallback();
                     break;
                 }
-                if (!(D_00138180.buttons & 0x10))
+                if (!(gPadState.buttons & 0x10))
                     break;
                 pickDialog->result = 1;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-                { func_002B4B70(0, 0); break; }
+                gSaveMenuFlags &= ~2;
+                gSaveMenuFlags &= ~4;
+                { EndSlotRequest(0, 0); break; }
             }
             if (D_001A8C8C)
                 goto acceptReload;
             {
-                if (D_001BAC80.inputDelay)
+                if (gModalState.inputDelay)
                     break;
-                if (!(D_00138180.buttons & 0x40) || D_001F29A0) {
-                    if (!(D_00138180.buttons & 0x10) || !D_001F29A0)
+                if (!(gPadState.buttons & 0x40) || D_001F29A0) {
+                    if (!(gPadState.buttons & 0x10) || !D_001F29A0)
                         break;
                 }
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-                D_001BAC80.result = 1;
-                { func_002B4B70(0, 0); break; }
+                gSaveMenuFlags &= ~2;
+                gSaveMenuFlags &= ~4;
+                gModalState.result = 1;
+                { EndSlotRequest(0, 0); break; }
             }
         case 23:
         case 24:
-            loadDialog = &D_001BAC80;
+            loadDialog = &gModalState;
             if (loadDialog->inputDelay)
                 break;
-            if (D_00138180.buttons & 0x40) {
-                func_00298E08();
+            if (gPadState.buttons & 0x40) {
+                LoadGameDataAndResetSaveMenu();
                 loadDialog->result = 2;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-                D_001A7424 |= 0x20;
-                func_002F64A8();
+                gSaveMenuFlags &= ~2;
+                gSaveMenuFlags &= ~4;
+                gSaveMenuFlags |= 0x20;
+                LoadDataAndSetupCallback();
                 break;
             }
-            if (D_00138180.buttons & 0x10) {
+            if (gPadState.buttons & 0x10) {
                 loadDialog->result = 1;
-                D_001A7424 |= 0x20;
-                { func_002B4B70(0, 0); break; }
+                gSaveMenuFlags |= 0x20;
+                { EndSlotRequest(0, 0); break; }
             }
             break;
         case 4:
             if (D_001A8C88) {
                 if (!D_001F29A0) {
-                    saveDialog = &D_001BAC80;
+                    saveDialog = &gModalState;
                     if (saveDialog->inputDelay)
                         break;
-                    saveInput = &D_00138180;
+                    saveInput = &gPadState;
                     if (saveInput->buttons & 0x40) {
-                        func_00298E08();
+                        LoadGameDataAndResetSaveMenu();
                         saveDialog->result = 2;
-                        D_001A7424 &= ~2;
-                        D_001A7424 &= ~4;
-                        func_002F64A8();
+                        gSaveMenuFlags &= ~2;
+                        gSaveMenuFlags &= ~4;
+                        LoadDataAndSetupCallback();
                     }
                     if (!saveDialog->inputDelay && (saveInput->buttons & 0x10)) {
                         saveDialog->result = 1;
-                        D_001A7424 |= 0x20;
-                        D_001A7424 &= ~2;
-                        D_001A7424 &= ~4;
-                        func_002B4B70(0, 0);
+                        gSaveMenuFlags |= 0x20;
+                        gSaveMenuFlags &= ~2;
+                        gSaveMenuFlags &= ~4;
+                        EndSlotRequest(0, 0);
                     }
                     break;
                 }
             } else if (D_001A8C8C) {
 acceptReload:
-                if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x40)) {
-                    D_001BAC80.result = 2;
-                    func_002DE990(-1);
-                    func_002F64A8();
+                if (!gModalState.inputDelay && (gPadState.buttons & 0x40)) {
+                    gModalState.result = 2;
+                    RestartGameKeepingProgress(-1);
+                    LoadDataAndSetupCallback();
                 }
                 break;
             }
-            if (!D_001BAC80.inputDelay && (D_00138180.buttons & 0x10)) {
-                D_001BAC80.result = 1;
-                D_001A7424 |= 0x20;
-                D_001A7424 &= ~2;
-                D_001A7424 &= ~4;
-                func_002B4B70(0, 0);
+            if (!gModalState.inputDelay && (gPadState.buttons & 0x10)) {
+                gModalState.result = 1;
+                gSaveMenuFlags |= 0x20;
+                gSaveMenuFlags &= ~2;
+                gSaveMenuFlags &= ~4;
+                EndSlotRequest(0, 0);
             }
             break;
         case 9:
-            if (!(D_001A7424 & 6))
-                { func_002B4B70(0, 0); break; }
+            if (!(gSaveMenuFlags & 6))
+                { EndSlotRequest(0, 0); break; }
             break;
         }
         break;
     case 6:
-        switch (D_001BAC80.phase) {
+        switch (gModalState.phase) {
         case 0:
-            qcopy(D_001BAC80.cameraPosition, D_001B5340.position);
-            qcopy(D_001BAC80.cameraAngles, D_001B5340.angles);
-            D_001BAC80.phase = 1;
+            qcopy(gModalState.cameraPosition, gCameraState_001B5340.position);
+            qcopy(gModalState.cameraAngles, gCameraState_001B5340.angles);
+            gModalState.phase = 1;
             break;
         case 1:
             D_001B170C = 3;
-            func_00282CF0(delta, D_001B5340.position, D_001B17D0);
-            distance = func_00282DF0(delta);
-            func_002AA548(&distance, &D_001BAC80.fraction, (float)D_001A8A78,
+            FastVecSub(delta, gCameraState_001B5340.position, D_001B17D0);
+            distance = FastVecLength(delta);
+            StepValueTowardTarget(&distance, &gModalState.fraction, (float)D_001A8A78,
                     0.041666668f, 0.041666668f, 5.0000005f);
-            func_00282F20(delta, delta, distance);
-            func_00282CC0(D_001B5340.position, delta, D_001B17D0);
-            func_00287BD8((char *)&D_001BAC80.angle, 0);
+            vec_scale_to_length(delta, delta, distance);
+            FastVecAdd(gCameraState_001B5340.position, delta, D_001B17D0);
+            UpdateCameraFollowRotation((char *)&gModalState.angle, 0);
             if ((float)D_001A8A78 <= distance)
-                D_001BAC80.phase = 2;
+                gModalState.phase = 2;
             break;
         case 2:
             D_001B170C = 3;
-            if (D_00138180.horizontal != 0.0f || D_00138180.vertical != 0.0f) {
+            if (gPadState.horizontal != 0.0f || gPadState.vertical != 0.0f) {
                 *(Quadword *)target = 0;
-                target[1] = D_00138180.horizontal;
-                target[2] = D_00138180.vertical;
+                target[1] = gPadState.horizontal;
+                target[2] = gPadState.vertical;
                 *(Quadword *)delta = *(Quadword *)target;
-                func_00283098(delta, delta, D_001B5340.matrix);
-                func_002AC9F8(delta, 1.0f);
-                func_00282D30(delta, delta,
+                matrix_mul_vec3(delta, delta, gCameraState_001B5340.matrix);
+                ClampVectorLength(delta, 1.0f);
+                FastVecScale(delta, delta,
                         (float)-D_001A8A78 * 0.00029088825f * D_001A8A7C);
-                func_00287D98((char *)delta);
+                OffsetCameraDirection((char *)delta);
             }
-            func_00287BD8((char *)&D_001BAC80.angle, 1);
-            func_00287D20(&D_00138180.roll);
+            UpdateCameraFollowRotation((char *)&gModalState.angle, 1);
+            ApplyCameraRoll(&gPadState.roll);
             break;
         case 3: {
             float speed;
             D_001B170C = 3;
             speed = (float)D_001A8A78 * 0.00029088825f * D_001A8A7C;
-            func_00282CF0(target, D_001BAC80.cameraPosition, D_001B17D0);
-            func_00282F20(target, target, (float)D_001A8A78);
-            func_00282CC0(target, target, D_001B17D0);
-            func_00282CF0(delta, target, D_001B5340.position);
-            func_00283698(transform, D_001B5340.matrix);
-            func_00283098(delta, delta, transform);
+            FastVecSub(target, gModalState.cameraPosition, D_001B17D0);
+            vec_scale_to_length(target, target, (float)D_001A8A78);
+            FastVecAdd(target, target, D_001B17D0);
+            FastVecSub(delta, target, gCameraState_001B5340.position);
+            matrix_from_basis_rows(transform, gCameraState_001B5340.matrix);
+            matrix_mul_vec3(delta, delta, transform);
             delta[0] = 0.0f;
             if (delta[1] == 0.0f && delta[2] == 0.0f)
                 delta[1] = 1.0f;
-            func_002AC9F8(delta, speed);
-            func_00283098(delta, delta, D_001B5340.matrix);
-            func_00287D98((char *)delta);
-            func_00287BD8((char *)&D_001BAC80.angle, 1);
-            if (func_00282DF0(delta) < speed - 0.01f) {
+            ClampVectorLength(delta, speed);
+            matrix_mul_vec3(delta, delta, gCameraState_001B5340.matrix);
+            OffsetCameraDirection((char *)delta);
+            UpdateCameraFollowRotation((char *)&gModalState.angle, 1);
+            if (FastVecLength(delta) < speed - 0.01f) {
                 /* The transition publishes its separate state word before capturing the return pose. */
                 { extern int D_001B1710; D_001B1710 = 2; }
-                qcopy(D_001BAC80.returnPosition, D_001B5340.position);
+                qcopy(gModalState.returnPosition, gCameraState_001B5340.position);
                 if (D_001A7A44) {
-                    func_00282D30(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
-                    func_002AB6D8(D_001B5340.matrix, D_001BAC80.returnAngles);
-                    func_00282D30(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
+                    FastVecScale(gCameraState_001B5340.matrix + 4, gCameraState_001B5340.matrix + 4, -1.0f);
+                    GetEulerAnglesFromMatrix(gCameraState_001B5340.matrix, gModalState.returnAngles);
+                    FastVecScale(gCameraState_001B5340.matrix + 4, gCameraState_001B5340.matrix + 4, -1.0f);
                 } else {
-                    func_002AB6D8(D_001B5340.matrix, D_001BAC80.returnAngles);
+                    GetEulerAnglesFromMatrix(gCameraState_001B5340.matrix, gModalState.returnAngles);
                 }
-                D_001BAC80.phase = 4;
+                gModalState.phase = 4;
             }
             break;
         }
         case 4:
             D_001B170C = 3;
-            func_002AA548(&D_001BAC80.fraction, &D_001BAC80.angle,
+            StepValueTowardTarget(&gModalState.fraction, &gModalState.angle,
                     1.0f, 0.00055555557f, 0.00055555557f, 0.025000002f);
-            func_00282D08(D_001B5340.position, D_001BAC80.returnPosition,
-                    D_001BAC80.cameraPosition, D_001BAC80.fraction);
-            func_002A91F0(delta, D_001BAC80.returnAngles);
-            func_002A91F0(target, D_001BAC80.cameraAngles);
-            func_00283810(transform, delta, target, D_001BAC80.fraction);
-            func_00283958(transform, D_001B5340.matrix);
+            lerp_vector(gCameraState_001B5340.position, gModalState.returnPosition,
+                    gModalState.cameraPosition, gModalState.fraction);
+            BuildRotationFromAngles(delta, gModalState.returnAngles);
+            BuildRotationFromAngles(target, gModalState.cameraAngles);
+            FastVectorNormalize3(transform, delta, target, gModalState.fraction);
+            quaternion_to_rotation_basis(transform, gCameraState_001B5340.matrix);
             if (D_001A7A44)
-                func_00282D30(D_001B5340.matrix + 4, D_001B5340.matrix + 4, -1.0f);
-            if (D_001BAC80.fraction >= 1.0f)
-                func_002B4B70(0, 0);
+                FastVecScale(gCameraState_001B5340.matrix + 4, gCameraState_001B5340.matrix + 4, -1.0f);
+            if (gModalState.fraction >= 1.0f)
+                EndSlotRequest(0, 0);
             break;
         }
-        D_001BAC80.cameraActive = 1;
-        if ((D_00138180.buttons & 0x500) && D_001BAC80.phase == 2) {
-            D_001BAC80.fraction = 0.0f;
-            D_001BAC80.phase = 3;
-            D_001BAC80.angle = 0.0f;
+        gModalState.cameraActive = 1;
+        if ((gPadState.buttons & 0x500) && gModalState.phase == 2) {
+            gModalState.fraction = 0.0f;
+            gModalState.phase = 3;
+            gModalState.angle = 0.0f;
         }
-        if ((unsigned)(D_001A79F0 - 22) < 2) {
+        if ((unsigned)(gCurrentMapIndex - 22) < 2) {
             CameraObject *object = D_001B1B5C;
             if (object < D_001B1B60) {
                 do {
-                    if (object->kind == 0xD3D && object->update)
+                    if (object->kind == 0xD3D /* moby class 3389 */ && object->update)
                         object->update(object);
                     ++object;
                 } while (object < D_001B1B60);
@@ -591,28 +591,28 @@ acceptReload:
         }
         break;
     case 7:
-        switch (D_001BAC80.phase) {
+        switch (gModalState.phase) {
         case 0:
-            D_001BAC80.cameraActive = 1;
-            D_001BAC80.phase = 1;
+            gModalState.cameraActive = 1;
+            gModalState.phase = 1;
             if (D_0018C0D4 != 1)
-                func_0026F7B0();
+                EmptyStubF7B0();
             D_001A8A48 = 0;
             D_001A8A40 = ref_00286738_00;
-            func_00290670();
-            func_00287E60();
+            RequestLetterboxBars();
+            SetStateWordToThree();
             break;
         case 1:
             if (D_0018C0D4 != 1) {
-                func_0026F7B0();
-                func_0028B3D0(0x23, 0, func_0028BDB0, func_0028BE00, func_0028C6D0, 0, 0);
+                EmptyStubF7B0();
+                SetHudSlotContents(0x23, 0, InitMenuPanelLayout, UpdateRadialWeaponSelect, DrawWeaponWheel, 0, 0);
             } else {
-                func_0028B3D0(0x23, 0, func_0028CC98, func_0028CCE0, func_0028D1E8, 0, 0);
+                SetHudSlotContents(0x23, 0, InitRadialWeaponMenu, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
             }
             func_0029CE38();
-            func_0029B720(360);
-            func_0029B698(180);
-            func_00290670();
+            ForwardValueToLevelObjectB(360);
+            ForwardValueToLevelObject(180);
+            RequestLetterboxBars();
             {
                 int remaining = D_001A8A40;
                 if (remaining > 0) {
@@ -625,19 +625,19 @@ acceptReload:
             if (D_001A8A60 < 0)
                 D_001A8A60 = 0;
             if (!D_001A8A60)
-                ++D_001BAC80.phase;
+                ++gModalState.phase;
             break;
         case 2:
             if (D_0018C0D4 != 1) {
-                func_0026F7B0();
-                func_0028B3D0(0x23, 0, func_0028BDB0, func_0028BE00, func_0028C6D0, 0, 0);
+                EmptyStubF7B0();
+                SetHudSlotContents(0x23, 0, InitMenuPanelLayout, UpdateRadialWeaponSelect, DrawWeaponWheel, 0, 0);
             } else {
-                func_0028B3D0(0x23, 0, func_0028CC98, func_0028CCE0, func_0028D1E8, 0, 0);
+                SetHudSlotContents(0x23, 0, InitRadialWeaponMenu, UpdateRadialMenuSelection, DrawRadialSelectorPanel, 0, 0);
             }
             func_0029CE38();
-            func_0029B720(360);
-            func_0029B698(180);
-            func_00290670();
+            ForwardValueToLevelObjectB(360);
+            ForwardValueToLevelObject(180);
+            RequestLetterboxBars();
             {
                 int remaining = D_001A8A40;
                 if (remaining > 0) {
@@ -648,19 +648,19 @@ acceptReload:
             }
             if (D_001A8A40 <= 0) {
                 D_001A8A40 = 0;
-                ++D_001BAC80.phase;
+                ++gModalState.phase;
             }
             break;
         case 3:
             if (D_0018C0D4 != 1)
-                func_0026F7B0();
-            func_00290728();
-            func_00290720();
-            { func_002B4B70(0, 0); break; }
+                EmptyStubF7B0();
+            ClearHudFlagB();
+            ClearHudFlagA();
+            { EndSlotRequest(0, 0); break; }
         }
         break;
     case 8:
-        phaseDialog = &D_001BAC80;
+        phaseDialog = &gModalState;
         if (phaseDialog->phase != 2) {
             if (phaseDialog->phase >= 3)
                 break;
@@ -669,19 +669,19 @@ acceptReload:
             ++phaseDialog->phase;
             break;
         }
-        func_002B49E0(3, 2, phaseDialog->selection, 0, 0);
-        func_002B49C0(3);
+        BeginSlotRequest(3, 2, phaseDialog->selection, 0, 0);
+        SetRequestSettingB(3);
         goto advanceModalPhase;
     case 9:
-        phaseDialog = &D_001BAC80;
+        phaseDialog = &gModalState;
         switch (phaseDialog->phase) {
         case 1:
-            if (D_00138180.pressed & phaseDialog->acceptMask) {
+            if (gPadState.pressed & phaseDialog->acceptMask) {
                 phaseDialog->result = 2;
-                func_002B4B70(0, 0);
-            } else if (D_00138180.held & phaseDialog->cancelMask) {
+                EndSlotRequest(0, 0);
+            } else if (gPadState.held & phaseDialog->cancelMask) {
                 phaseDialog->result = 1;
-                func_002B4B70(0, 0);
+                EndSlotRequest(0, 0);
             }
             break;
         case 0:
@@ -689,19 +689,19 @@ acceptReload:
         }
         break;
     case 10:
-        phaseDialog = &D_001BAC80;
+        phaseDialog = &gModalState;
         switch (phaseDialog->phase) {
         case 0:
 initializeDialog:
-            func_00287E80();
+            ClearMenuCounter_00287E80();
 advanceModalPhase:
             ++phaseDialog->phase;
             break;
         case 1:
-            if (D_00138180.pressed & phaseDialog->acceptMask) {
+            if (gPadState.pressed & phaseDialog->acceptMask) {
                 phaseDialog->result = 2;
-                func_002E5E58(0x12, 0, 0);
-                func_002B4B70(0, 0);
+                PlaySoundFromGlobalBank(0x12, 0, 0);
+                EndSlotRequest(0, 0);
             }
             break;
         default:
@@ -709,56 +709,56 @@ advanceModalPhase:
         }
         break;
     case 11:
-        switch (D_001BAC80.phase) {
+        switch (gModalState.phase) {
         case 0:
-            func_00287E80();
-            ++D_001BAC80.phase;
-            if (D_001A7BB8) {
-                D_001A7BB8 = !D_001A7BB8;
-                func_002857B8();
-                { func_002B4B70(0, 0); break; }
+            ClearMenuCounter_00287E80();
+            ++gModalState.phase;
+            if (gWidescreenFlag) {
+                gWidescreenFlag = !gWidescreenFlag;
+                ApplyScreenAspectMode();
+                { EndSlotRequest(0, 0); break; }
             }
             break;
         case 1:
-            if (D_00138180.pressed & 0x40) {
-                D_001BAC80.result = 2;
-                ++D_001BAC80.phase;
-            } else if (D_00138180.held & 0x10) {
-                D_001BAC80.result = 1;
-                { func_002B4B70(0, 0); break; }
+            if (gPadState.pressed & 0x40) {
+                gModalState.result = 2;
+                ++gModalState.phase;
+            } else if (gPadState.held & 0x10) {
+                gModalState.result = 1;
+                { EndSlotRequest(0, 0); break; }
             }
             break;
         case 2:
-            D_001BAC80.elapsed = 900;
-            D_001BAC80.inputDelay = 0;
-            ++D_001BAC80.phase;
-            D_001BAC80.result = 0;
-            D_001A7BB8 = !D_001A7BB8;
-            func_002857B8();
+            gModalState.elapsed = 900;
+            gModalState.inputDelay = 0;
+            ++gModalState.phase;
+            gModalState.result = 0;
+            gWidescreenFlag = !gWidescreenFlag;
+            ApplyScreenAspectMode();
             break;
         case 3:
-            if (D_00138180.pressed & 0x40)
-                D_001BAC80.result = 2;
-            else if (D_00138180.pressed & 0x10)
-                D_001BAC80.result = 1;
-            --D_001BAC80.elapsed;
-            if (D_001BAC80.elapsed <= 0)
+            if (gPadState.pressed & 0x40)
+                gModalState.result = 2;
+            else if (gPadState.pressed & 0x10)
+                gModalState.result = 1;
+            --gModalState.elapsed;
+            if (gModalState.elapsed <= 0)
                 goto advanceConfirmation;
-            if (!D_001BAC80.result)
+            if (!gModalState.result)
                 break;
             goto advanceConfirmation;
         case 4:
-            if (D_001BAC80.result < 0)
+            if (gModalState.result < 0)
                 goto advanceConfirmation;
-            if (D_001BAC80.result < 2) {
-                D_001A7BB8 = !D_001A7BB8;
-                func_002857B8();
+            if (gModalState.result < 2) {
+                gWidescreenFlag = !gWidescreenFlag;
+                ApplyScreenAspectMode();
             }
 advanceConfirmation:
-            ++D_001BAC80.phase;
+            ++gModalState.phase;
             break;
         case 5:
-            func_002B4B70(0, 0);
+            EndSlotRequest(0, 0);
             break;
         }
         break;

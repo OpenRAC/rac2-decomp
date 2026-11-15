@@ -21,35 +21,36 @@ extern float func_00283180(float);
 extern float func_00283198(float);
 extern void *func_L00_00338AE0(float, float, float *, float *, float *);
 
-void func_L00_002AA570(char *self, int arg1)
+/* Every so often, puffs out two small particles to the sides of the hero. */
+void func_L00_002AA570(char *emitInterval, int threshold)
 {
-    float v[4] __attribute__((aligned(16)));
-    float w[4] __attribute__((aligned(16)));
-    float f;
-    float r;
-    int n;
+    float velocity[4] __attribute__((aligned(16)));
+    float position[4] __attribute__((aligned(16)));
+    float turn;
+    float size;
+    int count;
     int i;
 
 
-    n = D_00189E20_20.counter + 1;
-    D_00189E20_20.counter = n;
-    if (arg1 < (short)n) {
+    count = D_00189E20_20.counter + 1;
+    D_00189E20_20.counter = count;
+    if (threshold < (short)count) {
         for (i = 0; i < 2; i++) {
             if (i == 0)
-                f = func_00283B98(D_00189E20_20.angle, 0.785398006f);
+                turn = FastAddRotations(D_00189E20_20.angle, 0.785398006f);
             else
-                f = func_00283BE0(D_00189E20_20.angle, 0.785398006f);
-            v[0] = func_00283180(f) * 0.0100000007f;
-            v[1] = func_00283198(f) * 0.0100000007f;
-            w[0] = D_00189E20_20.x + v[0] * 18.0f;
-            w[1] = D_00189E20_20.y + v[1] * 18.0f;
-            w[2] = D_00189E20_20.z;
-            v[2] = 0.0f;
-            v[0] = v[0] - func_00283180(D_00189E20_20.angle) * 0.0250000022f;
-            v[1] = v[1] - func_00283198(D_00189E20_20.angle) * 0.0250000022f;
-            r = func_002A7878(0.4f, 0.5f);
-            func_L00_00338AE0(r, i == 0 ? 2.0f : -2.0f, w, v, &D_00189E20_20.z);
-            D_00189E20_20.counter = self == 0 ? 0 : func_002A77E0((int)self);
+                turn = fast_subtract_rotations(D_00189E20_20.angle, 0.785398006f);
+            velocity[0] = FastSinOrCosA(turn) * 0.0100000007f;
+            velocity[1] = FastSinOrCosB(turn) * 0.0100000007f;
+            position[0] = D_00189E20_20.x + velocity[0] * 18.0f;
+            position[1] = D_00189E20_20.y + velocity[1] * 18.0f;
+            position[2] = D_00189E20_20.z;
+            velocity[2] = 0.0f;
+            velocity[0] = velocity[0] - FastSinOrCosA(D_00189E20_20.angle) * 0.0250000022f;
+            velocity[1] = velocity[1] - FastSinOrCosB(D_00189E20_20.angle) * 0.0250000022f;
+            size = RandomFloatRange(0.4f, 0.5f);
+            SpawnRandomTintedEffect(size, i == 0 ? 2.0f : -2.0f, position, velocity, &D_00189E20_20.z);
+            D_00189E20_20.counter = emitInterval == 0 ? 0 : RandomIntBelow((int)emitInterval);
         }
     }
 }

@@ -39,26 +39,27 @@ extern volatile s8 D_001A7B36;
 extern volatile s8 D_001A7B68;
 extern volatile s8 D_001A7B69;
 
+/* Gives the starting items when the player does not have them yet, then checks the item list. */
 void func_00290978(void) {
     if (D_001A7B16 == 0) {
-        func_00288308(0x1E);
-        func_002AD860(0x1E);
+        UnlockHelpEntry(0x1E);
+        HandleRequestSlotState(0x1E);
         D_001A7B68 = 0x5E;
         D_001A7398 = 0x1E;
     }
     if (D_001A7B22 == 0) {
-        func_00288308(0x2A);
-        func_002AD860(0x2A);
+        UnlockHelpEntry(0x2A);
+        HandleRequestSlotState(0x2A);
         D_001A7B69 = 0x6A;
     }
     if (D_001A7B27 == 0) {
-        func_00288308(0x2F);
+        UnlockHelpEntry(0x2F);
         D_001A73A0 = 0x2F;
     }
     if (D_001A7AFE == 0) {
         D_001A7B36 = 1;
         D_001A7AFE = 1;
     }
-    func_002908D0();
-    func_00290A40(D_001A79F0);
+    ValidateItemList();
+    RunFilterOverAllSlots(gCurrentMapIndex);
 }

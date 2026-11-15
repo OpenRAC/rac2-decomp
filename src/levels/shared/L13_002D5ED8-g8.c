@@ -13,6 +13,7 @@ extern void func_31A718(unsigned char *);
 extern void func_333240(void *, void *, void *, void *, int, int, int, int, int, int, int);
 extern void func_3F8C68(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
+/* Updates a simple object that waits, then fades in and out while it is active. */
 void func_L13_0038C718(unsigned char *a0) {
     unsigned char *s1 = *(unsigned char **)(a0 + 0x68);
 
@@ -33,6 +34,7 @@ void func_L13_0038C718(unsigned char *a0) {
     }
 }
 
+/* Updates a simple object like the one before it, and also throws sparks while it is active. */
 void func_L13_0038CA20(unsigned char *a0) {
     unsigned char *s1 = *(unsigned char **)(a0 + 0x68);
 

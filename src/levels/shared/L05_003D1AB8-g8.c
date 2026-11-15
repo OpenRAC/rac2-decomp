@@ -13,6 +13,7 @@ extern float D_L05_001AFC80[] SDATA(D_L05_001AFC80);
 
 /* For each of two points in the object's frame, either side of it in Y, makes three copies of the
    point and passes each to func_L00_0033C0D0 with a random speed. */
+/* Leaves exhaust trail marks at two points on either side of the object. */
 void func_L05_003D1AB8(char *obj)
 {
     float a[4] __attribute__((aligned(16)));
@@ -31,43 +32,43 @@ void func_L05_003D1AB8(char *obj)
     *(TI128 *)speed = 0;
     a[2] = 0.045f;
     a[3] = 1.0f;
-    func_00283098(p, a, obj + 0xC0);
+    matrix_mul_vec3(p, a, obj + 0xC0);
     factor = 0.4f;
-    func_00282CC0(p, p, obj + 0x10);
+    FastVecAdd(p, p, obj + 0x10);
     p[3] = 0;
     qcopy(p1, p);
     qcopy(p2, p);
     qcopy(p3, p);
-    func_002ACB48(p, 0.1f);
-    func_002ACB48(p1, 0.1f);
-    func_002ACB48(p2, 0.1f);
-    func_002ACB48(p3, 0.1f);
-    speed[0] = -(func_002A7878(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    func_L00_0033C0D0(obj, p1, speed, D_L05_001AFC60, 1);
-    speed[0] = -(func_002A7878(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    func_L00_0033C0D0(obj, p2, speed, D_L05_001AFC70, 1);
-    speed[0] = -(func_002A7878(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    func_L00_0033C0D0(obj, p3, speed, D_L05_001AFC80, 1);
+    AddRandomOffsetToVector(p, 0.1f);
+    AddRandomOffsetToVector(p1, 0.1f);
+    AddRandomOffsetToVector(p2, 0.1f);
+    AddRandomOffsetToVector(p3, 0.1f);
+    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    SpawnObjectRelativeParticle(obj, p1, speed, D_L05_001AFC60, 1);
+    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    SpawnObjectRelativeParticle(obj, p2, speed, D_L05_001AFC70, 1);
+    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    SpawnObjectRelativeParticle(obj, p3, speed, D_L05_001AFC80, 1);
     y = -0.061f;
     *(TI128 *)b = 0;
     b[0] = -0.21f;
     b[1] = y;
     b[2] = 0.045f;
     b[3] = 1.0f;
-    func_00283098(p, b, obj + 0xC0);
-    func_00282CC0(p, p, obj + 0x10);
+    matrix_mul_vec3(p, b, obj + 0xC0);
+    FastVecAdd(p, p, obj + 0x10);
     p[3] = 0;
     qcopy(p1, p);
     qcopy(p2, p);
     qcopy(p3, p);
-    func_002ACB48(p, 0.1f);
-    func_002ACB48(p1, 0.1f);
-    func_002ACB48(p2, 0.1f);
-    func_002ACB48(p3, 0.1f);
-    speed[0] = -(func_002A7878(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    func_L00_0033C0D0(obj, p1, speed, D_L05_001AFC60, 1);
-    speed[0] = -(func_002A7878(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    func_L00_0033C0D0(obj, p2, speed, D_L05_001AFC70, 1);
-    speed[0] = -(func_002A7878(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
-    func_L00_0033C0D0(obj, p3, speed, D_L05_001AFC80, 1);
+    AddRandomOffsetToVector(p, 0.1f);
+    AddRandomOffsetToVector(p1, 0.1f);
+    AddRandomOffsetToVector(p2, 0.1f);
+    AddRandomOffsetToVector(p3, 0.1f);
+    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    SpawnObjectRelativeParticle(obj, p1, speed, D_L05_001AFC60, 1);
+    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    SpawnObjectRelativeParticle(obj, p2, speed, D_L05_001AFC70, 1);
+    speed[0] = -(RandomFloatRange(30.0f, 40.0f) * (1.0f / 60.0f)) * factor;
+    SpawnObjectRelativeParticle(obj, p3, speed, D_L05_001AFC80, 1);
 }

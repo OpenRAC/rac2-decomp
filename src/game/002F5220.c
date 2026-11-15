@@ -90,6 +90,8 @@ extern s32_F2144bf3d D_L06_001B2900;
 
 extern s32_F2144bf3d D_L06_001AA0F0;
 
+/* Clears a group of counters and, in one game mode while nothing else is going on, also clears
+   five saved values. */
 void func_002F5220(void)
 {
     unsigned char mode;
@@ -118,15 +120,17 @@ void func_002F5220(void)
     }
 }
 
+/* Counts how many frames in a row the controller has had no input, and counts every frame played.
+   While the pause is shorter than 900 frames it also adds the frame to the current slot's total. */
 void func_002F52B8(void)
 {
-    Resident138180_F2144bf3d *p = (Resident138180_F2144bf3d *)D_00138180;
+    Resident138180_F2144bf3d *pad = (Resident138180_F2144bf3d *)gPadState;
 
-    if (p->i1A0 != 0) goto mismatch;
-    if (p->f108 != 0.0f) goto mismatch;
-    if (p->f10C != 0.0f) goto mismatch;
-    if (p->f100 != 0.0f) goto mismatch;
-    if (p->f104 == 0.0f) goto match;
+    if (pad->i1A0 != 0) goto mismatch;
+    if (pad->f108 != 0.0f) goto mismatch;
+    if (pad->f10C != 0.0f) goto mismatch;
+    if (pad->f100 != 0.0f) goto mismatch;
+    if (pad->f104 == 0.0f) goto match;
 mismatch:
     D_L06_001AD3A0 = 0;
     goto gated;
@@ -138,7 +142,7 @@ gated:
 
     if (D_L06_001A8FC0 != 0) {
         if (D_L06_001AD3A0 < 900) {
-            D_0018D198[D_001A79F0] = D_0018D198[D_001A79F0] + 1;
+            D_0018D198[gCurrentMapIndex] = D_0018D198[gCurrentMapIndex] + 1;
         }
     }
 
@@ -181,6 +185,7 @@ extern void func_00282F20(f32 *, f32 *, f32);
 extern void func_00282CF0(f32 *, f32 *, f32 *);
 extern void func_00271958(f32 *, int);
 
+/* Sets the camera to the current cutscene camera key: position, turn and zoom. */
 u8 func_002F5AF8(void)
 {
     f32 m[16] __attribute__((aligned(16)));
@@ -191,42 +196,43 @@ u8 func_002F5AF8(void)
     f32 k;
     u8 kind;
 
-    rec = &D_001B8840.recs[D_001B8840.index];
+    rec = &gScenePlaybackState.recs[gScenePlaybackState.index];
     w = rec->w0;
     kind = rec->kind;
     scale = w[3];
     D_001B9040.scale = scale;
     if (D_001A7A40 != 0)
         D_001B9040.scale = scale * D_001A8C74;
-    func_0027AB40();
-    qcopy(D_001B5200.pos, rec);
+    UpdateViewContext();
+    qcopy(gActiveCamera.pos, rec);
     func_00129178(m);
-    func_001292C0(m, m, w[0]);
-    func_00129368(m, m, w[1]);
-    func_00129218(m, m, w[2]);
-    D_001B5200.row0[0] = -m[8];
-    D_001B5200.row1[0] = -m[0];
-    D_001B5200.row2[0] = m[4];
-    D_001B5200.row0[1] = -m[9];
-    D_001B5200.row1[1] = -m[1];
-    D_001B5200.row2[1] = m[5];
-    D_001B5200.row0[2] = -m[10];
-    D_001B5200.row1[2] = -m[2];
-    D_001B5200.row2[2] = m[6];
+    SceVibRoutine1292C0(m, m, w[0]);
+    SceVibRoutine129368(m, m, w[1]);
+    SceVibRoutine129218(m, m, w[2]);
+    gActiveCamera.row0[0] = -m[8];
+    gActiveCamera.row1[0] = -m[0];
+    gActiveCamera.row2[0] = m[4];
+    gActiveCamera.row0[1] = -m[9];
+    gActiveCamera.row1[1] = -m[1];
+    gActiveCamera.row2[1] = m[5];
+    gActiveCamera.row0[2] = -m[10];
+    gActiveCamera.row1[2] = -m[2];
+    gActiveCamera.row2[2] = m[6];
     if (D_001A7A40 != 0 && (k = D_001A8C78) != 0.0f) {
-        qcopy(t, D_001B5200.row0);
-        func_00282F20(t, t, k);
-        func_00282CF0(D_001B5200.pos, D_001B5200.pos, t);
+        qcopy(t, gActiveCamera.row0);
+        vec_scale_to_length(t, t, k);
+        FastVecSub(gActiveCamera.pos, gActiveCamera.pos, t);
     }
-    func_00271958(&D_001B5360[0], 0);
-    func_00271958(&D_001B5360[4], 1);
-    func_00271958(&D_001B5360[8], 2);
+    UpdateCameraShake(&D_001B5360[0], 0);
+    UpdateCameraShake(&D_001B5360[4], 1);
+    UpdateCameraShake(&D_001B5360[8], 2);
     return kind;
 }
 
 extern int D_001A8C80[] __attribute__((sda));
 extern int D_001A8C84 __attribute__((sda));
 
+/* Stores two values for later use. */
 void func_002F5CB8(int first, int second) {
     D_001A8C80[0] = first;
     D_001A8C84 = second;
@@ -241,10 +247,11 @@ extern void func_0027D330(int);
 void func_002F5CC8(void)
 {
     D_001A8C7C = 1.2f;
-    if (D_001B15A0 < 1.0f)
-        func_0027D330(6);
+    if (gScreenFade < 1.0f)
+        FadeToBlack(6);
 }
 
+/* Returns true when either of the two mode variables is 2. */
 int func_002F5D10(void)
 {
     return D_L05_001A8F08 == 2 || D_L05_001A8F00 == 2;
@@ -282,7 +289,7 @@ void func_002F5D40(int n)
         D_001B220C = 0;
         return;
     }
-    index = func_002EF010(n);
+    index = MapCutsceneIdToIndex(n);
     flag = 0;
     if (n == 0xBF)
         flag = 1;
@@ -290,8 +297,8 @@ void func_002F5D40(int n)
         int mask = 1 << (n & 31);
         D_00139768[(unsigned)n >> 2] |= mask;
     }
-    func_00288B38(D_001BAD40);
-    func_002F5E20(TOC_002F5D40->files[index * 2 + 1].sector + TOC_002F5D40->base,
+    MarkQueuedRequestsInFlagTable(D_001BAD40);
+    BeginMoviePlayback(TOC_002F5D40->files[index * 2 + 1].sector + TOC_002F5D40->base,
                   TOC_002F5D40->files[index * 2 + 1].size,
                   (int)&TOC_002F5D40->files[index * 2],
                   D_001BAD40[0] ? 0 : D_001A7BB4[0], flag);
@@ -310,19 +317,20 @@ extern void func_002B6E78(int, int, int);
 extern void func_002B7320(void);
 extern void func_002FC1D8(void);
 
+/* Runs when a movie ends: brings back the music and screen, then calls the waiting callback. */
 void func_002F5EF8(void)
 {
     if (D_001A7478 == 2)
         *(volatile int *)&D_001A7478 = 0;
-    func_0027D330(4);
-    func_002B6E78(D_001B221C, 1, 0x400);
-    func_002B7320();
-    D_00188660[0x6B] |= 0x10;
-    func_002FC1D8();
+    FadeToBlack(4);
+    StartMusicStreamNoLoop(D_001B221C, 1, 0x400);
+    music_Unpause();
+    gSoundState[0x6B] |= 0x10;
+    ResetPacketBuffer();
     if (ref_L00_002F5EF8_00 != 0 && D_001BAD78[0] == 0) {
-        if (D_001A8BB8 == 2)
+        if (gRequestedGameMode == 2)
             goto done;
-        if (D_001A8BB8 == 1)
+        if (gRequestedGameMode == 1)
             goto done;
         {
             ref_L00_002F5EF8_00(D_001A8C84);
@@ -390,26 +398,26 @@ void func_002F5FB8(void)
     Display_5FB8 *slot;
     if (ref_L00_002F5FB8_00 == 0) {
         func_0029CC98((int)ref_L00_002F5FB8_04,-1);
-        func_00288BB8(ref_L00_002F5FB8_05);
-        func_002B4B70(0,0);
+        FlushRequestQueue(ref_L00_002F5FB8_05);
+        EndSlotRequest(0,0);
         return;
     }
     first = ref_L00_002F5FB8_06[3];
     second = ref_L00_002F5FB8_06[5];
     destination = (char *)(second + 0xE0000);
-    func_002FC3C0(1);
+    WaitForDmaStatusBits(1);
     textureIndex = 2;
     displays = ref_L00_002F5FB8_07;
     display = &displays[textureIndex];
     base = 0x3F70;
     func_00126288(packet,(short)base,(short)((1 << display->width) >> 6),0x13,0,0,(short)(1 << display->width),(short)(1 << display->height));
-    func_0011AEA0(0);
-    func_001265B0(packet,ref_L00_002F5FB8_08 + display->tex0 * 16);
-    func_001244B8(0,0);
+    FlushCache(0);
+    ExecGsLoadImage(packet,ref_L00_002F5FB8_08 + display->tex0 * 16);
+    WaitGsPathsIdle(0,0);
     func_00126288(packet,0x3F6C,1,0,0,0,16,16);
-    func_0011AEA0(0);
-    func_001265B0(packet,ref_L00_002F5FB8_08 + display->tex1 * 16);
-    func_001244B8(0,0);
+    FlushCache(0);
+    ExecGsLoadImage(packet,ref_L00_002F5FB8_08 + display->tex1 * 16);
+    WaitGsPathsIdle(0,0);
     highFlags = 0x7ED8400000000L;
     low = ((long)((1 << display->width) >> 6) << 14) | (long)base;
     dimensions = ((long)display->width << 26) | 0x1300000L;
@@ -417,11 +425,11 @@ void func_002F5FB8(void)
     low = low | ((long)display->height << 30);
     high = low | highFlags;
     displays[textureIndex].packet = high | 0x8000000000000000ULL;
-    func_0011AEA0(0);
-    func_002E5FE0();
-    func_002B7170();
-    func_00133580(0);
-    while (D_001393E0[0x15C/4] >= 3 || D_001393E0[0x164/4] >= 0) func_00298F00();
+    FlushCache(0);
+    ClearAllSoundVoices();
+    WaitForMusicIdle();
+    snd_CheckLoadInProgress(0);
+    while (gMemcardState[0x15C/4] >= 3 || gMemcardState[0x164/4] >= 0) UpdateMemoryCardState();
     frame = 0;
     status = -1;
     done = 0;
@@ -429,7 +437,7 @@ void func_002F5FB8(void)
         int *descriptor;
         descriptor = ref_L00_002F5FB8_10;
         if (descriptor != 0 && descriptor[0] != 0) {
-            func_002B7C80(destination,descriptor[0] + ((Toc_002F5D40 *)D_0014B540)->base,(descriptor[1] + 2047)/2048);
+            ReadDiscWithPause(destination,descriptor[0] + ((Toc_002F5D40 *)gCopySetupData)->base,(descriptor[1] + 2047)/2048);
             ref_L00_002F5FB8_16[0x4C/4] = (int)destination;
             ref_L00_002F5FB8_16[0x34/4] = 0;
         } else {
@@ -437,45 +445,46 @@ void func_002F5FB8(void)
             ref_L00_002F5FB8_16[0x34/4] = 0;
         }
         stream = (Stream_5FB8 *)ref_L00_002F5FB8_05;
-        result = func_0034EF58((void *)ref_L00_002F5FB8_01,(void *)ref_L00_002F5FB8_00,(char *)((first + 63) & -64),(char *)((second + 63) & -64),ref_L00_002F5FB8_13,ref_L00_002F5FB8_12 != 0);
+        result = PlayMovie_0034EF58((void *)ref_L00_002F5FB8_01,(void *)ref_L00_002F5FB8_00,(char *)((first + 63) & -64),(char *)((second + 63) & -64),ref_L00_002F5FB8_13,ref_L00_002F5FB8_12 != 0);
         stream->mode = (result ^ 1) == 0 ? 1 : stream->mode;
-        if (result != 0) { stream->mode = 1; func_00288BB8(stream); }
+        if (result != 0) { stream->mode = 1; FlushRequestQueue(stream); }
         if (ref_L00_002F5FB8_05[0] != 0) {
             ref_L00_002F5FB8_05[0]++;
             if (ref_L00_002F5FB8_05[0] >= 25) ref_L00_002F5FB8_05[0] = 1;
-            index = func_002EF010(stream->frames[ref_L00_002F5FB8_05[0]]);
-            ref_L00_002F5FB8_01 = ((Toc_002F5D40 *)D_0014B540)->files[index * 2 + 1].sector + ((Toc_002F5D40 *)D_0014B540)->base;
-            ref_L00_002F5FB8_14 = ((Toc_002F5D40 *)D_0014B540)->files[index * 2 + 1].size;
+            index = MapCutsceneIdToIndex(stream->frames[ref_L00_002F5FB8_05[0]]);
+            ref_L00_002F5FB8_01 = ((Toc_002F5D40 *)gCopySetupData)->files[index * 2 + 1].sector + ((Toc_002F5D40 *)gCopySetupData)->base;
+            ref_L00_002F5FB8_14 = ((Toc_002F5D40 *)gCopySetupData)->files[index * 2 + 1].size;
         } else if (stream->active == 0) {
             done = 1;
         } else {
-            func_00288A00(stream,&frame,&status);
+            PopRequestQueue(stream,&frame,&status);
             if (status == 0) {
-                index = func_002EF010(frame);
-                ref_L00_002F5FB8_01 = ((Toc_002F5D40 *)D_0014B540)->files[index * 2 + 1].sector + ((Toc_002F5D40 *)D_0014B540)->base;
-                ref_L00_002F5FB8_14 = ((Toc_002F5D40 *)D_0014B540)->files[index * 2 + 1].size;
+                index = MapCutsceneIdToIndex(frame);
+                ref_L00_002F5FB8_01 = ((Toc_002F5D40 *)gCopySetupData)->files[index * 2 + 1].sector + ((Toc_002F5D40 *)gCopySetupData)->base;
+                ref_L00_002F5FB8_14 = ((Toc_002F5D40 *)gCopySetupData)->files[index * 2 + 1].size;
             } else if (status == 1) {
                 done = 1;
             }
         }
         if (done) break;
     }
-    func_00133580(0);
+    snd_CheckLoadInProgress(0);
     func_00126DC0(D_001339B0);
-    func_001244B8(0,0);
+    WaitGsPathsIdle(0,0);
     slot = &ref_L00_002F5FB8_07[textureIndex];
-    func_001265B0(packet,ref_L00_002F5FB8_08 + slot->tex1 * 16);
-    func_001244B8(0,0);
-    func_002F0FA0();
+    ExecGsLoadImage(packet,ref_L00_002F5FB8_08 + slot->tex1 * 16);
+    WaitGsPathsIdle(0,0);
+    ResetRecordList();
     slot->packet = 0;
-    func_002FC1D8();
-    if (result == 0 && status == 1) func_002B49E0(2,2,frame,0,0);
-    else func_002B4B70(0,0);
+    ResetPacketBuffer();
+    if (result == 0 && status == 1) BeginSlotRequest(2,2,frame,0,0);
+    else EndSlotRequest(0,0);
 }
 
 
 extern void func_288CB0(int, int);
-void func_002F6458(void) { char *base = D_00138180 + 0x1260; int index = *(int *)(base + 0x148); if (index != -1) { if (*(short *)(base + index * 0xA0 + 0x18) >= 0) *(int *)(base + 0x17C) = 1; } func_288CB0(0, 0); }
+/* Flags the current menu entry when it is valid, then calls a follow-up routine. */
+void func_002F6458(void) { char *base = gPadState + 0x1260; int index = *(int *)(base + 0x148); if (index != -1) { if (*(short *)(base + index * 0xA0 + 0x18) >= 0) *(int *)(base + 0x17C) = 1; } func_288CB0(0, 0); }
 
 
 
@@ -492,34 +501,35 @@ extern unsigned char D_00139568[];
 extern F6510Record D_L00_00262570[];
 extern int func_00288870(void *, int, int);
 
+/* Returns the price of the selected shop entry: a weapon upgrade's cost, or a table price. */
 int func_002F6510(void)
 {
     F6510Record local;
-    int offset = D_L00_0022F7C0.selected * 24;
+    int offset = gPurchaseMenuModel.selected * 24;
     int result = 0;
 
-    if (*(int *)((char *)&D_L00_0022F7C0 + offset + 0x154) != 0) {
-        int first = 0;
-        switch (*(int *)((char *)&D_L00_0022F7C0 + offset + 0x140)) {
+    if (*(int *)((char *)&gPurchaseMenuModel + offset + 0x154) != 0) {
+        int isSpecial = 0;
+        switch (*(int *)((char *)&gPurchaseMenuModel + offset + 0x140)) {
         case 12:
         case 14:
         case 17:
         case 18:
         case 53:
-            first = 1;
+            isSpecial = 1;
             break;
         default:
             break;
         }
-        if (first) {
-            if (func_00288870(&local, *(int *)((char *)&D_L00_0022F7C0 + D_L00_0022F7C0.selected * 24 + 0x140), 1))
+        if (isSpecial) {
+            if (CopyHelpRecordAtDepth(&local, *(int *)((char *)&gPurchaseMenuModel + gPurchaseMenuModel.selected * 24 + 0x140), 1))
                 result = local.fields.value;
         } else {
-            if (func_00288870(&local, *(int *)((char *)&D_L00_0022F7C0 + D_L00_0022F7C0.selected * 24 + 0x140), 2))
+            if (CopyHelpRecordAtDepth(&local, *(int *)((char *)&gPurchaseMenuModel + gPurchaseMenuModel.selected * 24 + 0x140), 2))
                 result = local.fields.value;
         }
-    } else if (*(int *)((char *)&D_L00_0022F7C0 + offset + 0x150) == 0) {
-        result = D_L00_00262570[D_00139568[*(int *)((char *)&D_L00_0022F7C0 + offset + 0x140)]].fields.value;
+    } else if (*(int *)((char *)&gPurchaseMenuModel + offset + 0x150) == 0) {
+        result = gWeaponTable_L00[gItemSlotToRecord[*(int *)((char *)&gPurchaseMenuModel + offset + 0x140)]].fields.value;
     }
     return result;
 }
@@ -536,25 +546,26 @@ extern int func_002F7320(int owner, int key, int channel);
 extern int func_00288D58(void);
 extern int D_L00_0022FF00[];
 
+/* Works out which weapon upgrades can be bought and adds a row to the shop list for each one. */
 void func_002F73A8(void)
 {
     D_L00_0022FF00[0] = 0;
     {
         int key, channel, available;
         for (key = 0; key < 56; key++) {
-            int offset = D_00139568[key] * 224;
-            if (((F73Record *)((char *)D_00239BA0 + offset))->active != 0) {
+            int offset = gItemSlotToRecord[key] * 224;
+            if (((F73Record *)((char *)gWeaponTable_00239BA0 + offset))->active != 0) {
                 for (channel = 0; channel < 3; channel++) {
-                    if (func_002F7320(D_001A79F0, key, channel) != 0)
+                    if (RowFieldMatchesValue(gCurrentMapIndex, key, channel) != 0)
                         goto mark_available;
                     switch (channel) {
-                    case 0: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[0]; break;
-                    case 1: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[1]; break;
-                    case 2: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[2]; break;
+                    case 0: available = ((F73Record *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[key] * 224))->channels[0]; break;
+                    case 1: available = ((F73Record *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[key] * 224))->channels[1]; break;
+                    case 2: available = ((F73Record *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[key] * 224))->channels[2]; break;
                     default: available = 0; break;
                     }
                     if (!available) continue;
-                    if (!func_00288D58()) continue;
+                    if (!IsFlagByteSet()) continue;
 mark_available:
                     D_001A7AB8[key] |= 1 << channel;
                 }
@@ -566,17 +577,17 @@ mark_available:
         char *entry;
         for (key = 0; key < 56; key++) {
             if (key == 0) continue;
-            if (D_00239BA0[D_00139568[key]].active == 0) continue;
-            if (D_001A7AF8[key] == 0) continue;
+            if (gWeaponTable_00239BA0[gItemSlotToRecord[key]].active == 0) continue;
+            if (gItemOwnedFlags[key] == 0) continue;
             for (channel = 0; channel < 3; channel++) {
                 {
                     unsigned int mask = 1U << channel;
                     if (!(D_001A7AB8[key] & mask)) continue;
                 }
                 switch (channel) {
-                case 0: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[0]; break;
-                case 1: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[1]; break;
-                case 2: available = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[2]; break;
+                case 0: available = ((F73Record *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[key] * 224))->channels[0]; break;
+                case 1: available = ((F73Record *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[key] * 224))->channels[1]; break;
+                case 2: available = ((F73Record *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[key] * 224))->channels[2]; break;
                 default: available = 0; break;
                 }
                 if (!available) continue;
@@ -588,14 +599,14 @@ mark_available:
                 {
                     int stored_value;
                     switch (channel) {
-                    case 0: stored_value = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[0]; break;
-                    case 1: stored_value = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[1]; break;
-                    case 2: stored_value = ((F73Record *)((char *)D_00239BA0 + D_00139568[key] * 224))->channels[2]; break;
+                    case 0: stored_value = ((F73Record *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[key] * 224))->channels[0]; break;
+                    case 1: stored_value = ((F73Record *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[key] * 224))->channels[1]; break;
+                    case 2: stored_value = ((F73Record *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[key] * 224))->channels[2]; break;
                     default: stored_value = 0; break;
                     }
                     D_0021F240_rows.rows[D_0021F240_rows.count][2] = stored_value;
                 }
-                entry = (char *)D_00239BA0 + D_00139568[key] * 224;
+                entry = (char *)gWeaponTable_00239BA0 + gItemSlotToRecord[key] * 224;
                 D_0021F240_rows.rows[D_0021F240_rows.count][1] = key;
                 D_0021F240_rows.rows[D_0021F240_rows.count][3] = *(int *)(entry + 0x14);
                 ++D_0021F240_rows.count;
@@ -608,7 +619,8 @@ extern Func_002F88D8State ref_L00_002F88D8_00;
 extern void func_00115DA8(char *, const char *, ...);
 extern const char D_001AD2B8[];
 
-void func_002F88D8(void *arg) { func_00115DA8(ref_L00_002F88D8_00.destination, D_001AD2B8, arg); ref_L00_002F88D8_00.clear = 0; }
+/* Puts a line of text into the shop's message box. */
+void func_002F88D8(void *text) { Sprintf(ref_L00_002F88D8_00.destination, D_001AD2B8, text); ref_L00_002F88D8_00.clear = 0; }
 
 
 typedef unsigned int Quad_002F9198 __attribute__((mode(TI), aligned(16)));
@@ -643,12 +655,14 @@ extern void func_002925F0(int);
 extern void func_002926B8(int);
 extern void func_002E6178(int);
 
+/* Closes the current shop screen: plays a sound, restores the saved camera and resets the preview
+   for armor or equipment. */
 void func_002F9198(void)
 {
-    Shop_002F9198 *s = &D_0021F240;
+    Shop_002F9198 *s = &gVendorMenuState;
     Five_002F9198 table;
-    func_002FC138();
-    func_002E5CF8(5, 17, s->moby);
+    SelectPacketBufferSetup();
+    PlayMobySound(5, 17, s->moby);
     if (s->restore) {
         qcopy(D_001B5350, &s->saved);
         { Quad_002F9198 *dst = (Quad_002F9198 *)(D_001B5350 + 0x220);
@@ -656,7 +670,7 @@ void func_002F9198(void)
           dst[0] = src->a; dst[1] = src->b; dst[2] = src->c; }
     }
     *(unsigned short *)(s->moby + 0x34) |= 0x100;
-    D_0021F240.state = 2;
+    gVendorMenuState.state = 2;
     D_001AD234 = 1.0f;
     D_001AD238 = 1.1f;
     D_001AD230 = 0;
@@ -664,21 +678,21 @@ void func_002F9198(void)
     D_001B2284 = 96;
     D_001B2288 = 96;
     D_001B228C = 85;
-    if (D_0021F240.mode == 3) {
-        if (D_001AD1B8) D_001A79F8.level = D_001AD1BC; else D_001A79F8.level = D_001AD1C0;
-        func_002923C0(D_001A79F8.level);
+    if (gVendorMenuState.mode == 3) {
+        if (D_001AD1B8) gPlayerBolts.level = D_001AD1BC; else gPlayerBolts.level = D_001AD1C0;
+        LoadLevelTexturePack(gPlayerBolts.level);
         table = D_001AD308;
-        if (D_001AD1B8) func_0029CC98(func_00288FB8(table.words[D_001A79F8.level]), -1);
+        if (D_001AD1B8) func_0029CC98(GetLocalizedString(table.words[gPlayerBolts.level]), -1);
     }
-    if (D_0021F240.mode == 2) {
-        if (D_00152C00.a != D_001A7AF0) {
+    if (gVendorMenuState.mode == 2) {
+        if (gHeroMoby_00152C00.a != gEquipmentBits) {
             char *m;
-            func_002925F0(D_001A7AF0 & 3);
-            m = D_00152C00.moby;
+            LoadDiscTableEntryForDraw(gEquipmentBits & 3);
+            m = gHeroMoby_00152C00.moby;
             if (m && *(int *)(m + 0x98)) *(int *)(m + 0x98) = *(int *)(*(char **)(m + 0x24) + 0x10);
         }
-        if (D_00152C00.b != (D_001A7AF2 & 31)) func_002926B8(D_001A7AF2 & 31);
-        func_002E6178(0);
+        if (gHeroMoby_00152C00.b != (D_001A7AF2 & 31)) LoadDiscTableTexture(D_001A7AF2 & 31);
+        SpawnEquipmentPieces(0);
     }
 }
 
@@ -700,6 +714,7 @@ typedef struct {
 } ShopInput_93;
 extern ShopInput_93 F93State __asm__("D_0021F240");
 typedef struct { char pad[0x1C4]; int buttons; } Input_93;
+/* Handles the shop menu buttons: scroll up and down, buy or select, and leave. */
 void func_002F93B0(void)
 {
     ShopInput_93 *state = &F93State;
@@ -707,7 +722,7 @@ void func_002F93B0(void)
     char *record;
     if (state->busy) return;
     {
-        Input_93 *input = (Input_93 *)D_00138180;
+        Input_93 *input = (Input_93 *)gPadState;
         if ((input->buttons & 0x2000) ||
                 (D_001B2240 >= 16 && D_001B2240 % 10 == 1)) {
             if (state->scroll < 57) {
@@ -723,10 +738,10 @@ void func_002F93B0(void)
                         state->animation = animation;
                     }
                     state->scroll += 56;
-                    func_002E5CF8(1, 17, state->moby);
+                    PlayMobySound(1, 17, state->moby);
                     if (state->handle != -1) {
                         if (state->mode == 0)
-                            func_0028B6C8(state->handle, 0);
+                            set_animation_parameter(state->handle, 0);
                     }
                     F93State.handle = -1;
                 }
@@ -734,7 +749,7 @@ void func_002F93B0(void)
         }
     }
     {
-        Input_93 *input = (Input_93 *)D_00138180;
+        Input_93 *input = (Input_93 *)gPadState;
         ShopInput_93 *state;
         if ((input->buttons & 0x8000) ||
                 (D_001B223C >= 16 && D_001B223C % 10 == 1)) {
@@ -752,10 +767,10 @@ void func_002F93B0(void)
                         state->animation = animation;
                     }
                     state->scroll -= 56;
-                    func_002E5CF8(1, 17, state->moby);
+                    PlayMobySound(1, 17, state->moby);
                     if (state->handle != -1) {
                         if (state->mode == 0)
-                            func_0028B6C8(state->handle, 0);
+                            set_animation_parameter(state->handle, 0);
                     }
                     F93State.handle = -1;
                 }
@@ -763,7 +778,7 @@ void func_002F93B0(void)
         }
     }
     {
-        Input_93 *input = (Input_93 *)D_00138180;
+        Input_93 *input = (Input_93 *)gPadState;
         ShopInput_93 *state;
         if (((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode != 3) ||
             ((input->buttons & 0x40) && !(D_001B2244 & 0x40) && F93State.mode == 3 &&
@@ -773,39 +788,40 @@ void func_002F93B0(void)
                     int stride = sizeof(ShopRow_93);
                     int *kinds = &state->rows[0].kind;
                     if (*(int *)((char *)kinds + state->selected * stride) == 0) {
-                        cost = func_002F6510();
-                        if ((*(int *)&D_001A79F8) >= cost) goto activate;
+                        cost = GetSelectedShopItemPrice();
+                        if ((*(int *)&gPlayerBolts) >= cost) goto activate;
                     }
                     if (*(int *)((char *)kinds + state->selected * stride) != 1) goto rejected;
                     {
                         int id = state->rows[state->selected].id;
-                        int owned = D_00139688[id];
-                        record = (char *)D_00239BA0 + D_00139568[id] * 224;
+                        int owned = gItemAmmoCounts[id];
+                        record = (char *)gWeaponTable_00239BA0 + gItemSlotToRecord[id] * 224;
                         if (owned >= *(unsigned short *)(record + 0x8E)) goto rejected;
                     }
-                    if ((*(int *)&D_001A79F8) < *(unsigned short *)(record + 0x88)) goto rejected;
+                    if ((*(int *)&gPlayerBolts) < *(unsigned short *)(record + 0x88)) goto rejected;
                 }
 activate:
                 {
                     ShopInput_93 *active = &F93State;
                     if (active->animated) active->animation = 1;
                     active->busy = 1;
-                    func_002E5CF8(0, 17, active->moby);
+                    PlayMobySound(0, 17, active->moby);
                     goto finish;
                 }
 rejected:
-                func_002E5CF8(2, 17, F93State.moby);
+                PlayMobySound(2, 17, F93State.moby);
         }
     }
 finish:
-    if (((Input_93 *)D_00138180)->buttons & 0x10) func_002F9198();
+    if (((Input_93 *)gPadState)->buttons & 0x10) CloseShopSubMenu();
 }
 
 extern void func_002F93B0(void);
 
+/* Runs the shop menu input handler. */
 void func_002F9778(void)
 {
-    func_002F93B0();
+    UpdateShopMenuInput();
 }
 
 
@@ -826,7 +842,7 @@ void func_002F97A0(u64 color, u8 *text, int limit, float x, float y, float scale
     u32 colors[4];
     u32 gray[4];
     Glyph_002F97A0 *glyphs;
-    Shop_002F9198 *shop = &D_0021F240;
+    Shop_002F9198 *shop = &gVendorMenuState;
     Glyph_002F97A0 *g;
     u64 texture;
     int count = 0;
@@ -834,15 +850,15 @@ void func_002F97A0(u64 color, u8 *text, int limit, float x, float y, float scale
     float top;
     float dx;
     float dy;
-    double d;
+    double distance;
     int left;
     int right;
     int shade;
     int tint;
     u8 *cursor;
-    u32 c;
+    u32 argb;
 
-    texture = func_0027C878(2);
+    texture = GetEffectTextureDescriptor(2);
     size = scale * 16.0f;
     glyphs = D_00263EF0;
     color &= 0xFFFFFF;
@@ -851,42 +867,42 @@ void func_002F97A0(u64 color, u8 *text, int limit, float x, float y, float scale
     cursor = text;
     do {
         if (glyphs[*cursor].adv != 0) {
-            top = func_00283CE0(glyphs[*cursor].top) * scale;
+            top = IntToFloat(glyphs[*cursor].top) * scale;
             if (shop->mode == 2) {
-                d = 215.0f - x;
-                if (d < 0)
-                    d = -d;
-                left = 0x80 - (int)d;
-                d = 215.0f - (x + size);
-                if (d < 0)
-                    d = -d;
-                right = 0x80 - (int)d;
+                distance = 215.0f - x;
+                if (distance < 0)
+                    distance = -distance;
+                left = 0x80 - (int)distance;
+                distance = 215.0f - (x + size);
+                if (distance < 0)
+                    distance = -distance;
+                right = 0x80 - (int)distance;
             } else {
-                d = 256.0f - x;
-                if (d < 0)
-                    d = -d;
-                left = 0x80 - (int)(d * 0.75);
-                d = 256.0f - (x + size);
-                if (d < 0)
-                    d = -d;
-                right = 0x80 - (int)(d * 0.75);
+                distance = 256.0f - x;
+                if (distance < 0)
+                    distance = -distance;
+                left = 0x80 - (int)(distance * 0.75);
+                distance = 256.0f - (x + size);
+                if (distance < 0)
+                    distance = -distance;
+                right = 0x80 - (int)(distance * 0.75);
             }
             if (left < 0)
                 left = 0;
-            c = color;
+            argb = color;
             if (right < 0)
                 right = 0;
             left <<= 24;
             right <<= 24;
-            colors[0] = left | c;
-            colors[1] = right | c;
-            colors[2] = left | c;
-            colors[3] = right | c;
+            colors[0] = left | argb;
+            colors[1] = right | argb;
+            colors[2] = left | argb;
+            colors[3] = right | argb;
             if (*cursor < 0x20) {
-                c = colors[0];
-                shade = (c & 0xFF) + ((c >> 8) & 0xFF) + ((c >> 16) & 0xFF);
+                argb = colors[0];
+                shade = (argb & 0xFF) + ((argb >> 8) & 0xFF) + ((argb >> 16) & 0xFF);
                 shade /= 3;
-                tint = (int)(c & 0xFF000000);
+                tint = (int)(argb & 0xFF000000);
                 tint += shade << 16;
                 tint += shade << 8;
                 shade += tint;
@@ -894,19 +910,19 @@ void func_002F97A0(u64 color, u8 *text, int limit, float x, float y, float scale
                 gray[1] = shade;
                 gray[2] = shade;
                 gray[3] = shade;
-                func_0027E1A0(x, y + top, scale * 24.0f, scale * 16.0f, glyphs[*cursor].u,
+                EmitTexturedRectangle(x, y + top, scale * 24.0f, scale * 16.0f, glyphs[*cursor].u,
                               glyphs[*cursor].v, 24, 16, gray, texture);
             }
             if ((u8)(*cursor + 0x80) < 0x28) {
                 g = (Glyph_002F97A0 *)((((u8)*cursor + 0x40) << 2) + (int)glyphs);
-                dx = func_00283CE0(g->adv) * scale;
-                dy = func_00283CE0(g->top) * scale;
-                func_0027E1A0(x + dx, y + dy, size, size, g->u, g->v, 16, 16, colors, texture);
+                dx = IntToFloat(g->adv) * scale;
+                dy = IntToFloat(g->top) * scale;
+                EmitTexturedRectangle(x + dx, y + dy, size, size, g->u, g->v, 16, 16, colors, texture);
             } else if ((u8)*cursor > 0x20) {
-                func_0027E1A0(x, y + top, size, size, glyphs[*cursor].u, glyphs[*cursor].v, 16, 16,
+                EmitTexturedRectangle(x, y + top, size, size, glyphs[*cursor].u, glyphs[*cursor].v, 16, 16,
                               colors, texture);
             }
-            x += func_00283CE0(glyphs[*cursor].adv) * scale;
+            x += IntToFloat(glyphs[*cursor].adv) * scale;
         }
         count++;
         if (count == limit)

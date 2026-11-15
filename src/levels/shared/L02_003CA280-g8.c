@@ -47,22 +47,22 @@ void func_L02_003CA280(char *obj)
     temp[2] = D_L02_001BA518[0];
     data = *(char **)(obj + 0x68);
     *(TI128 *)angles = *(TI128 *)temp;
-    func_00283410(matrix, angles);
+    euler_to_matrix(matrix, angles);
     a = *(float *)(data + 8);
     b = (1.0f - a) * D_L02_001B006C + 1.0f;
     c = D_L02_001B0070 * *(float *)(data + 12);
     a += c;
     b += c;
-    func_00282D30(matrix, matrix, a);
-    func_00282D30(matrix + 4, matrix + 4, a);
-    func_00282D30(matrix + 8, matrix + 8, b);
+    FastVecScale(matrix, matrix, a);
+    FastVecScale(matrix + 4, matrix + 4, a);
+    FastVecScale(matrix + 8, matrix + 8, b);
     qcopy(matrix + 12, obj + 0x10);
     matrix[14] -= D_L02_001B0070 * *(float *)(data + 12) * 0.5f;
     matrix[15] = 1.0f;
     if (*(float *)(data + 8) < 1.0f)
-        color = func_00283D38(D_L02_001B0060, D_L02_001AFFB8[0].fade[1], *(float *)(data + 8));
+        color = FastTweenColor(D_L02_001B0060, D_L02_001AFFB8[0].fade[1], *(float *)(data + 8));
     else
-        color = func_00283D38(D_L02_001AFFB8[0].fade[1], D_L02_001AFFB8[0].fade[2], *(float *)(data + 12));
+        color = FastTweenColor(D_L02_001AFFB8[0].fade[1], D_L02_001AFFB8[0].fade[2], *(float *)(data + 12));
     us = packet.uv;
     vs = packet.uv + 1;
     for (i = 0; i < 4; i++) {
@@ -71,10 +71,10 @@ void func_L02_003CA280(char *obj)
         vs[i * 2] = D_L02_001AFFFC[i * 2];
         qcopy(&packet.vertices[i], &D_L02_001B0020[i]);
     }
-    packet.texture = func_0027C878(D_L02_001AFFE8);
+    packet.texture = GetEffectTextureDescriptor(D_L02_001AFFE8);
     packet.mode = 0xFF9000000260ULL;
     packet.tag = 5;
     packet.state = ((U64)D_L02_001AFFEC << 2) | ((U64)D_L02_001AFFF0 << 6) | 0x8000000000ULL;
-    func_00280B90(&packet, matrix, 1);
-    func_00280B90(&packet, matrix, 1);
+    draw_world_quad(&packet, matrix, 1);
+    draw_world_quad(&packet, matrix, 1);
 }

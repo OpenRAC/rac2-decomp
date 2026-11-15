@@ -21,12 +21,13 @@ typedef struct {
 /* _sysbitJump (libmpeg bit.c): skip n bytes, then refill through
    _sysbitFlush. Clearing acc and bits before the total update is the
    one statement order that matches. */
-void func_0012EA18(void *arg0, int n) {
-    BitStream *p = arg0;
-    p->acc = 0;
-    p->bits = 0;
-    p->total += n * 8;
-    p->cur = p->start0 + (p->total >> 3);
-    if (p->cur >= p->end) p->cur -= p->len;
-    r1_func_0012AAC8(p, 0);
+/* Skips forward in the bit stream by a number of bytes and refills it. */
+void func_0012EA18(void *stream, int byteCount) {
+    BitStream *bs = stream;
+    bs->acc = 0;
+    bs->bits = 0;
+    bs->total += byteCount * 8;
+    bs->cur = bs->start0 + (bs->total >> 3);
+    if (bs->cur >= bs->end) bs->cur -= bs->len;
+    r1_func_0012AAC8(bs, 0);
 }

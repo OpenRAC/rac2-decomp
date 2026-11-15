@@ -24,5 +24,6 @@
  */
 #include "common.h"
 
+/* Does nothing. An empty update function. */
 void func_L02_003F0788(void) {
 }

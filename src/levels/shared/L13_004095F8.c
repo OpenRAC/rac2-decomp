@@ -20,6 +20,7 @@ extern char D_L13_001BFD00[];
  * to the extents read/written by the current helper implementations. The two
  * reserved vector arguments are forwarded but never dereferenced by either
  * helper; they are not read before initialization or cleared artificially. */
+/* Moves a creature toward a target point, keeping it on the ground and away from walls, and returns what it bumped into. */
 int func_L13_004095F8(char *object, char *target)
 {
     float difference[4];
@@ -33,31 +34,31 @@ int func_L13_004095F8(char *object, char *target)
     char *data = (char *)ref_L13_004095F8_00((unsigned int)object);
     if (!data) return 8;
     if (D_L13_001B2448 == *(int *)(data + 0xbc)) return *(int *)(data + 0x94);
-    func_00282CF0(difference, target, object + 0x10);
+    FastVecSub(difference, target, object + 0x10);
     transform = (char *)inverse;
-    func_00283698(transform, object + 0xc0);
+    matrix_from_basis_rows(transform, object + 0xc0);
     ref_L13_004095F8_01(object, (char *)normal, 0);
-    func_L13_004095A8(object + 0xc0, normal, rotation);
-    func_00283098(data + 0xa0, data + 0xa0, rotation);
+    RotateAwayFromDirection(object + 0xc0, normal, rotation);
+    matrix_mul_vec3(data + 0xa0, data + 0xa0, rotation);
     *(int *)(data + 0x98) = *(int *)(data + 0x94);
     *(int *)(data + 0x94) = 0;
-    func_L13_00409AB8(object, data);
+    FollowMovingPlatform(object, data);
     qcopy(previous, object + 0x10);
     if (D_L13_001B2448 - *(int *)(data + 0xbc) >= 2 || !*(int *)(data + 0xbc)) {
-        func_L13_00409B08(object, data);
+        ProbeGroundBelowMoby(object, data);
         *(int *)(data + 0xb4) = 0;
         *(int *)(data + 0x9c) |= -3;
         ((unsigned char *)data)[0xea] = 255;
         qzero(data + 0xa0);
     }
     *(int *)(data + 0xbc) = D_L13_001B2448;
-    func_L13_00409C40(object, data, target, (ControllerQuad *)difference, reserved0, reserved1, transform);
-    func_L13_00409EE8(object, data, previous, reserved1, transform);
-    func_L13_0040A0A0(object, data, target, (char *)previous, transform);
-    func_00282F20(start, object + 0xe0, 0.1f);
-    func_00282F20(end, object + 0xe0, -3.0f);
-    func_00282CC0(start, start, object + 0x10);
-    func_00282CC0(end, end, object + 0x10);
-    if (func_002761F8(start, end, 2, object, 0)) qcopy(object + 0x10, D_L13_001BFD00 + 0x20);
+    ComputeCreatureMotion(object, data, target, (ControllerQuad *)difference, reserved0, reserved1, transform);
+    PushCreatureAwayFromWalls(object, data, previous, reserved1, transform);
+    ResolveCreatureGroundCollision(object, data, target, (char *)previous, transform);
+    vec_scale_to_length(start, object + 0xe0, 0.1f);
+    vec_scale_to_length(end, object + 0xe0, -3.0f);
+    FastVecAdd(start, start, object + 0x10);
+    FastVecAdd(end, end, object + 0x10);
+    if (CollLine(start, end, 2, object, 0)) qcopy(object + 0x10, D_L13_001BFD00 + 0x20);
     return *(int *)(data + 0x94);
 }

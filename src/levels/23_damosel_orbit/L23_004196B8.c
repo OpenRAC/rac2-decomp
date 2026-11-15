@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L23_004196B8 is a unit of its own: it copies 16 bytes through register addresses with
    lq/sq (-frac2-qcopy), and the copy is a scheduling barrier (-frac2-qcopy-barrier), as
@@ -31,29 +32,29 @@ extern float func_00282E48(char *, char *);
  * other list's end point. Retail's register order needs a counter of its own for the second
  * loop, and the other list's first point written out at each use: given a name, that pointer
  * lands in the third callee-saved register where retail has it in the first. */
-void func_L23_004196B8(char *arg0) {
-    State_004196B8 *st = *(State_004196B8 **)(arg0 + 0x68);
+void func_L23_004196B8(char *moby) {
+    State_004196B8 *st = *(State_004196B8 **)(moby + 0x68);
     float d[4];
     s32 i, j, k, m;
 
     for (i = 0; i < 0x2F; i++) {
         s32 si = st->slot[i];
-        int *a = D_L23_001FF300[si];
+        int *a = gPathLists[si];
 
-        *(u64 *)(D_L23_002595C8 + (si << 4) + 8) = 0;
-        *(u64 *)(D_L23_002595C8 + (si << 4)) = 0;
+        *(u64 *)(gPathEndMasks + (si << 4) + 8) = 0;
+        *(u64 *)(gPathEndMasks + (si << 4)) = 0;
         for (j = 0; j < 0x2F; j++) {
-            int *b = D_L23_001FF300[st->slot[j]];
+            int *b = gPathLists[st->slot[j]];
 
             if (a == b)
                 continue;
-            d[0] = func_00282E48((char *)a + 0x10, (char *)b + 0x10);
-            d[1] = func_00282E48((char *)a + 0x10, (char *)b + (b[0] << 4));
-            d[2] = func_00282E48((char *)a + (a[0] << 4), (char *)b + 0x10);
-            d[3] = func_00282E48((char *)a + (a[0] << 4), (char *)b + (b[0] << 4));
+            d[0] = fast_vec_dist((char *)a + 0x10, (char *)b + 0x10);
+            d[1] = fast_vec_dist((char *)a + 0x10, (char *)b + (b[0] << 4));
+            d[2] = fast_vec_dist((char *)a + (a[0] << 4), (char *)b + 0x10);
+            d[3] = fast_vec_dist((char *)a + (a[0] << 4), (char *)b + (b[0] << 4));
             for (k = 0; k < 2; k++) {
                 if (d[k] < 1.0f) {
-                    *(u64 *)(D_L23_002595C8 + (st->slot[i] << 4)) |= (u64)1 << j;
+                    *(u64 *)(gPathEndMasks + (st->slot[i] << 4)) |= (u64)1 << j;
                     if (k == 0)
                         *(TI128 *)((char *)a + 0x10) = *(TI128 *)((char *)b + 0x10);
                     else
@@ -62,7 +63,7 @@ void func_L23_004196B8(char *arg0) {
             }
             for (m = 2; m < 4; m++) {
                 if (d[m] < 1.0f) {
-                    *(u64 *)(D_L23_002595C8 + (st->slot[i] << 4) + 8) |= (u64)1 << j;
+                    *(u64 *)(gPathEndMasks + (st->slot[i] << 4) + 8) |= (u64)1 << j;
                     if (m == 2)
                         *((TI128 *)a + a[0]) = *(TI128 *)((char *)b + 0x10);
                     else

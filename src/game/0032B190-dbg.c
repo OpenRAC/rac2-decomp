@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_0032B190 in its own -g unit: the second fade's division carries the
    statement-boundary padding. */
@@ -25,23 +26,23 @@ void func_0032B190(unsigned char *object)
     float t;
     int v;
 
-    D_001B2810[0] = func_0027C878(-1);
+    D_001B2810[0] = GetEffectTextureDescriptor(-1);
     state = object[0x20];
     if (state == 2) {
-        func_0032C2E8(object);
+        DrawQuadFaces(object);
         if (object[0x20] == state) {
-            t = func_00283CE0(*(int *)(vars + 4)) / func_00283CE0(0x3C);
-            v = func_00283CF0(func_002A7790(1.0f - t) * 128.0f);
-            func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], (v << 24) | 0xFFFFFF);
-            func_0032BA88(object);
+            t = IntToFloat(*(int *)(vars + 4)) / IntToFloat(0x3C);
+            v = FloatToInt(Square(1.0f - t) * 128.0f);
+            DrawColoredRectangle(0, gScreenAdjustOffsets[0xA9], 0, gScreenAdjustOffsets[0xA8], (v << 24) | 0xFFFFFF);
+            DrawRingPieceFlashes(object);
             goto done;
         }
     }
     if (*(int *)(vars + 4) >= 0x6A) {
-        t = func_00283CE0(*(int *)(vars + 4) - 0x69) / func_00283CE0(0xF);
-        v = func_00283CF0(func_002A7798(t) * 128.0f);
-        func_0027DE50(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], (v << 24) | 0xFFFFFF);
+        t = IntToFloat(*(int *)(vars + 4) - 0x69) / IntToFloat(0xF);
+        v = FloatToInt(EaseOutQuad(t) * 128.0f);
+        DrawColoredRectangle(0, gScreenAdjustOffsets[0xA9], 0, gScreenAdjustOffsets[0xA8], (v << 24) | 0xFFFFFF);
     }
 done:
-    func_0032B0A8(object);
+    DrawTrailNodes(object);
 }

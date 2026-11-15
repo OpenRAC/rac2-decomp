@@ -30,28 +30,29 @@ extern void *ref_L01_003D9830_00(void *, s32, s32);
 extern void ref_L01_003D9830_01(void *, s32, s32);
 extern s32 ref_L01_003D9830_02 __attribute__((sda));
 
-void func_L01_003D9830(void *arg0) {
-    s16 temp_v1;
-    u8 temp_v1_2;
-    void *temp_s1;
-    void *temp_v0;
-    void *temp_v0_2;
-    void *temp_v0_3;
+/* Checks whether a swamp monster has touched the platform, and if so starts the platform sinking. */
+void func_L01_003D9830(void *moby) {
+    s16 classId;
+    u8 attachedState;
+    void *vars;
+    void *hitSource;
+    void *hitClassData;
+    void *attached;
 
-    temp_s1 = (*(void **)((s8 *)(arg0) + (0x68)));
-    temp_v0 = ref_L01_003D9830_00(arg0, 1, 0);
-    if ((temp_v0 != NULL) && (temp_v0_2 = (*(void **)((s8 *)(temp_v0) + (0x20))), (temp_v0_2 != NULL))) {
-        temp_v1 = (*(s16 *)((s8 *)(temp_v0_2) + (0xAA)));
-        if ((temp_v1 == 0xB24) || (temp_v1 == 0xA54)) {
-            temp_v0_3 = (*(void **)((s8 *)(temp_s1) + (0xC8)));
-            if (temp_v0_3 != NULL) {
-                temp_v1_2 = (*(u8 *)((s8 *)(temp_v0_3) + (0x20)));
-                if ((temp_v1_2 != 1) && (temp_v1_2 != 4) && (temp_v1_2 != 5)) {
-                    (*(s32 *)((s8 *)(temp_s1) + (0xC4))) = ref_L01_003D9830_02;
-                    ref_L01_003D9830_01(arg0, 2, -1);
+    vars = (*(void **)((s8 *)(moby) + (0x68)));
+    hitSource = ref_L01_003D9830_00(moby, 1, 0);
+    if ((hitSource != NULL) && (hitClassData = (*(void **)((s8 *)(hitSource) + (0x20))), (hitClassData != NULL))) {
+        classId = (*(s16 *)((s8 *)(hitClassData) + (0xAA)));
+        if ((classId == 0xB24 /* moby class 2852 */) || (classId == 0xA54 /* Swamp Monster II */)) {
+            attached = (*(void **)((s8 *)(vars) + (0xC8)));
+            if (attached != NULL) {
+                attachedState = (*(u8 *)((s8 *)(attached) + (0x20)));
+                if ((attachedState != 1) && (attachedState != 4) && (attachedState != 5)) {
+                    (*(s32 *)((s8 *)(vars) + (0xC4))) = ref_L01_003D9830_02;
+                    ref_L01_003D9830_01(moby, 2, -1);
                 }
             }
         }
     }
-    (*(u8 *)((s8 *)(arg0) + (0xA8))) = 0xFF;
+    (*(u8 *)((s8 *)(moby) + (0xA8))) = 0xFF;
 }

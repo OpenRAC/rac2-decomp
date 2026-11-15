@@ -11,34 +11,35 @@ extern void func_L00_002E6EF8(void);
 extern int func_L00_00329520(void *, int);
 extern void func_L04_003A1A78(void *), func_L04_003A1C98(void *), func_L04_003A1FA0(void *), func_L04_003A1FE0(void *);
 extern void func_L04_003A5C08(void *, float);
-void func_L18_00435B10(u8 *o) {
-    u8 *s;
-    u8 *hero = D_00189E20.hero;
-    int f[13], n;
-    if (hero && *(short *)(hero + 0xAA) == 0x45 && hero[0x20] != 0xFE && hero[0x20] != 0xFD && D_00189E20.mode == 0x31) return;
-    s = *(u8 **)(o + 0x68);
-    if (!s) return;
-    if (*(int *)(s + 0x10) && o[0x20] && *(int *)(s + 0x28) != -1 && !func_L00_00329520(D_L18_001B97C0, *(int *)(s + 0x28))) return;
-    n = 1;
-    if (*(int *)(s + 0x18) != -1) n = (&D_L18_001B1698)[*(int *)(s + 0x18)];
-    n += *(int *)(s+0x10);
-    f[0]=0x12;
-    f[1]=n;
-    f[8]=(int)&D_L18_001B16D4;
-    f[9]=(int)&D_L18_001B16D8;
-    f[2]=(int)D_L18_002A9C40;
-    f[3]=(int)D_L18_00257C80;
-    f[4]=(int)&D_L18_001B16B0;
-    f[5]=(int)&D_L18_001B1698;
-    f[6]=(int)D_L18_00257DA0;
-    f[7]=(int)D_L18_002BD860;
-    f[10]=(int)o;
-    f[11]=(int)func_L18_00435CC8;
-    f[12]=(int)func_L00_002E6EF8;
-    switch(o[0x20]) {
-    case 0: func_L04_003A1A78(f); func_L04_003A5C08(o, *(float *)(s+0x2C));
-    case 1: func_L04_003A1C98(f); break;
-    case 2: func_L04_003A1FA0(f); break;
+/* Updates a ring of linked effects (moby class 3929) by calling the shared effect code for the current state. It does nothing while the hero is in a special mode. */
+void func_L18_00435B10(u8 *moby) {
+    u8 *vars;
+    u8 *hero = gHeroState.hero;
+    int effectArgs[13], count;
+    if (hero && *(short *)(hero + 0xAA) == 0x45 /* moby class 69 */ && hero[0x20] != 0xFE && hero[0x20] != 0xFD && gHeroState.mode == 0x31) return;
+    vars = *(u8 **)(moby + 0x68);
+    if (!vars) return;
+    if (*(int *)(vars + 0x10) && moby[0x20] && *(int *)(vars + 0x28) != -1 && !IsPointInsideRegion(gCameraPosition_L18, *(int *)(vars + 0x28))) return;
+    count = 1;
+    if (*(int *)(vars + 0x18) != -1) count = (&D_L18_001B1698)[*(int *)(vars + 0x18)];
+    count += *(int *)(vars+0x10);
+    effectArgs[0]=0x12;
+    effectArgs[1]=count;
+    effectArgs[8]=(int)&D_L18_001B16D4;
+    effectArgs[9]=(int)&D_L18_001B16D8;
+    effectArgs[2]=(int)D_L18_002A9C40;
+    effectArgs[3]=(int)D_L18_00257C80;
+    effectArgs[4]=(int)&D_L18_001B16B0;
+    effectArgs[5]=(int)&D_L18_001B1698;
+    effectArgs[6]=(int)D_L18_00257DA0;
+    effectArgs[7]=(int)D_L18_002BD860;
+    effectArgs[10]=(int)moby;
+    effectArgs[11]=(int)RunDamoselEffectCallback;
+    effectArgs[12]=(int)AddDrawCallbackToList3;
+    switch(moby[0x20]) {
+    case 0: InitWaterObject(effectArgs); AddWaterSplashEntry(moby, *(float *)(vars+0x2C));
+    case 1: UpdateWaterController(effectArgs); break;
+    case 2: AdvanceWaterControllerState(effectArgs); break;
     }
-    func_L04_003A1FE0(f);
+    UpdateWaterRipplePatches_L04(effectArgs);
 }

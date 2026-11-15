@@ -1,10 +1,11 @@
-typedef struct { char pad0[0x268]; float f268; float f26C; int f270; } S;
+typedef struct { char pad0[0x268]; float rate; float progress; int mode; } S;
 extern S ref_L02_002DCEA0_00;
-void func_L02_002DCEA0(int a0, float f) {
-    S *s = &ref_L02_002DCEA0_00;
-    if (s->f26C == 0.0f) {
-        s->f270 = a0;
-        s->f26C = 1.0f;
-        s->f268 = 1.0f / f;
+/* Starts a timer that runs for the given time, unless one is already running. */
+void func_L02_002DCEA0(int newMode, float duration) {
+    S *state = &ref_L02_002DCEA0_00;
+    if (state->progress == 0.0f) {
+        state->mode = newMode;
+        state->progress = 1.0f;
+        state->rate = 1.0f / duration;
     }
 }

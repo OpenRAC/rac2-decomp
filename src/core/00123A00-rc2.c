@@ -28,48 +28,49 @@ extern s32 *func_001236C8(void *, s32);
 extern s32 func_00123930(s32);
 extern void func_00123978(s32, void *, void *, void *);
 
-void func_00123A00(void *arg0) {
-    u32 loc[6];
-    s32 *s0;
-    s32 *temp1;
-    s32 *temp2;
-    s32 s4;
-    s32 t;
+/* Gathers and sorts the frame records of a code module the first time they are needed. */
+void func_00123A00(void *module) {
+    u32 builder[6];
+    s32 *listCursor;
+    s32 *fdeLists;
+    s32 *fdeLists2;
+    s32 total;
+    s32 byteCount;
 
-    temp1 = (*(s32 **)((s8 *)(arg0) + (0xC)));
-    if (temp1 != 0) {
-        s0 = temp1;
-        s4 = 0;
-        if (*s0 != 0) {
+    fdeLists = (*(s32 **)((s8 *)(module) + (0xC)));
+    if (fdeLists != 0) {
+        listCursor = fdeLists;
+        total = 0;
+        if (*listCursor != 0) {
             do {
-                s4 += func_00123930(*s0);
-                s0++;
-            } while (*s0 != 0);
+                total += CountUsableFdeRecords(*listCursor);
+                listCursor++;
+            } while (*listCursor != 0);
         }
     } else {
-        s4 = func_00123930((*(s32 *)((s8 *)(arg0) + (8))));
+        total = CountUsableFdeRecords((*(s32 *)((s8 *)(module) + (8))));
     }
-    t = s4 * 4;
-    (*(s32 *)((s8 *)(arg0) + (0x10))) = s4;
-    loc[0] = func_00115F28(t);
-    loc[2] = func_00115F28(t);
-    loc[4] = 0xFFFFFFFF;
-    loc[1] = 0;
-    loc[3] = 0;
-    loc[5] = 0;
-    temp2 = (*(s32 **)((s8 *)(arg0) + (0xC)));
-    if (temp2 != 0) {
-        s0 = temp2;
-        if (*s0 != 0) {
+    byteCount = total * 4;
+    (*(s32 *)((s8 *)(module) + (0x10))) = total;
+    builder[0] = Malloc(byteCount);
+    builder[2] = Malloc(byteCount);
+    builder[4] = 0xFFFFFFFF;
+    builder[1] = 0;
+    builder[3] = 0;
+    builder[5] = 0;
+    fdeLists2 = (*(s32 **)((s8 *)(module) + (0xC)));
+    if (fdeLists2 != 0) {
+        listCursor = fdeLists2;
+        if (*listCursor != 0) {
             do {
-                func_00123978(*s0, loc, &loc[4], &loc[5]);
-                s0++;
-            } while (*s0 != 0);
+                CollectFdeRecords(*listCursor, builder, &builder[4], &builder[5]);
+                listCursor++;
+            } while (*listCursor != 0);
         }
     } else {
-        func_00123978((*(s32 *)((s8 *)(arg0) + (8))), loc, &loc[4], &loc[5]);
+        CollectFdeRecords((*(s32 *)((s8 *)(module) + (8))), builder, &builder[4], &builder[5]);
     }
-    (*(s32 **)((s8 *)(arg0) + (0xC))) = func_001236C8(loc, s4);
-    (*(s32 *)((s8 *)(arg0) + (0))) = loc[4];
-    (*(s32 *)((s8 *)(arg0) + (4))) = loc[5];
+    (*(s32 **)((s8 *)(module) + (0xC))) = SortFdeVector(builder, total);
+    (*(s32 *)((s8 *)(module) + (0))) = builder[4];
+    (*(s32 *)((s8 *)(module) + (4))) = builder[5];
 }

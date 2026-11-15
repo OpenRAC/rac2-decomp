@@ -28,168 +28,169 @@ extern void func_002E59F8(int);
 /* Fires the ship's weapons for one frame: a pair of shots on input bit 0x40, four weapons on
    input bit 0x20, each behind its own timer, and a held weapon on 0x80, whose ammunition
    recharges every third frame while it is released. */
-void func_L05_00443D08(char *m, char *driver)
+/* Fires the ship's guns when the player presses fire. This covers the twin shots, the four special weapons and the held beam with its ammo recharge. */
+void func_L05_00443D08(char *moby, char *driver)
 {
-    ShotVector a, b, c, d, e, f;
+    ShotVector aim, base, muzzleLeft, shotDir, muzzleRight, kick;
     char *driverState = P(driver, 0x70);
-    char *s = P(m, 0x68);
+    char *vars = P(moby, 0x68);
     char *shot;
     int mode, index;
 
     if (H(driverState, 0xd8) && (D_L05_001B2048 & 1))
         return;
 
-    if (func_00282978(s + 8) && (D_00138320[0] & 0x40)) {
-        H(s, 8) = D_L05_001B1AA0;
-        func_00282CF0(&a, s + 0x20, driver + 0x30);
-        func_00282F20(&a, &a, D_L05_001B1A9C);
-        func_00282CC0(&b, &a, driver + 0x30);
+    if (FastDecTimer(vars + 8) && (D_00138320[0] & 0x40)) {
+        H(vars, 8) = D_L05_001B1AA0;
+        FastVecSub(&aim, vars + 0x20, driver + 0x30);
+        vec_scale_to_length(&aim, &aim, D_L05_001B1A9C);
+        FastVecAdd(&base, &aim, driver + 0x30);
         mode = D_L05_002A1940[0];
         if (mode)
-            func_00283098(&c, &D_L05_001B1B50, m + 0xc0);
+            matrix_mul_vec3(&muzzleLeft, &D_L05_001B1B50, moby + 0xc0);
         else
-            func_00283098(&c, &D_L05_001B1B30, m + 0xc0);
-        func_00282CC0(&c, &c, m + 0x10);
-        func_00282CF0(&d, &b, &c);
-        func_002E5CF8(3, 0, m);
-        shot = func_L05_00419CC8(m, &c, -1.0f, &d, 0x2020ff, 0x20207f, 0, mode, 0);
+            matrix_mul_vec3(&muzzleLeft, &D_L05_001B1B30, moby + 0xc0);
+        FastVecAdd(&muzzleLeft, &muzzleLeft, moby + 0x10);
+        FastVecSub(&shotDir, &base, &muzzleLeft);
+        PlayMobySound(3, 0, moby);
+        shot = SpawnShotEffectMoby(moby, &muzzleLeft, -1.0f, &shotDir, 0x2020ff, 0x20207f, 0, mode, 0);
         if (shot) {
-            char *v = P(shot, 0x68);
-            I(v, 0x28) = 0;
-            F(v, 0x10) += F(driverState, 0x30);
-            F(v, 0x14) += F(driverState, 0x34);
-            F(v, 0x18) += F(driverState, 0x38);
+            char *shotVars = P(shot, 0x68);
+            I(shotVars, 0x28) = 0;
+            F(shotVars, 0x10) += F(driverState, 0x30);
+            F(shotVars, 0x14) += F(driverState, 0x34);
+            F(shotVars, 0x18) += F(driverState, 0x38);
             if (mode) {
-                func_00282D30(&e, m + 0xd0, D_L05_001B1B70 * 0.01666666753590107f);
-                func_00282CC0(v + 0x10, v + 0x10, &e);
+                FastVecScale(&muzzleRight, moby + 0xd0, D_L05_001B1B70 * 0.01666666753590107f);
+                FastVecAdd(shotVars + 0x10, shotVars + 0x10, &muzzleRight);
             }
         }
         if (mode)
-            func_00283098(&e, &D_L05_001B1B60, m + 0xc0);
+            matrix_mul_vec3(&muzzleRight, &D_L05_001B1B60, moby + 0xc0);
         else
-            func_00283098(&e, &D_L05_001B1B40, m + 0xc0);
-        func_00282CC0(&e, &e, m + 0x10);
-        func_00282CF0(&d, &b, &e);
-        shot = func_L05_00419CC8(m, &e, 1.0f, &d, 0x2020ff, 0x20207f, 0, mode, 0);
+            matrix_mul_vec3(&muzzleRight, &D_L05_001B1B40, moby + 0xc0);
+        FastVecAdd(&muzzleRight, &muzzleRight, moby + 0x10);
+        FastVecSub(&shotDir, &base, &muzzleRight);
+        shot = SpawnShotEffectMoby(moby, &muzzleRight, 1.0f, &shotDir, 0x2020ff, 0x20207f, 0, mode, 0);
         if (shot) {
-            char *v = P(shot, 0x68);
-            I(v, 0x28) = 0;
-            F(v, 0x10) += F(driverState, 0x30);
-            F(v, 0x14) += F(driverState, 0x34);
-            F(v, 0x18) += F(driverState, 0x38);
+            char *shotVars = P(shot, 0x68);
+            I(shotVars, 0x28) = 0;
+            F(shotVars, 0x10) += F(driverState, 0x30);
+            F(shotVars, 0x14) += F(driverState, 0x34);
+            F(shotVars, 0x18) += F(driverState, 0x38);
             if (mode) {
-                func_00282D30(&f, m + 0xd0, -(D_L05_001B1B70 * 0.01666666753590107f));
-                func_00282CC0(v + 0x10, v + 0x10, &f);
+                FastVecScale(&kick, moby + 0xd0, -(D_L05_001B1B70 * 0.01666666753590107f));
+                FastVecAdd(shotVars + 0x10, shotVars + 0x10, &kick);
             }
         }
     }
 
     {
-        int slot = func_L05_0037AA88(1);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && func_00282978(s + 0xa)
+        int slot = FindActiveSlotInChain(1);
+        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && FastDecTimer(vars + 0xa)
             && (D_00138320[0] & 0x20)) {
-            func_L05_0037AB18(1, 1);
-            a.q = 0;
-            a.f[2] = -0.1f;
-            a.f[3] = 1.0f;
-            func_00283098(&b, &a, m + 0xc0);
-            func_00282CC0(&b, &b, m + 0x10);
-            func_002E5CF8(2, 0, m);
-            func_L05_003D0960(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[9].upgrade);
-            H(s, 0xa) = D_L05_001B1AA4;
-            I(s, 0x218) = 5;
+            SubtractSlotValueClamped(1, 1);
+            aim.q = 0;
+            aim.f[2] = -0.1f;
+            aim.f[3] = 1.0f;
+            matrix_mul_vec3(&base, &aim, moby + 0xc0);
+            FastVecAdd(&base, &base, moby + 0x10);
+            PlayMobySound(2, 0, moby);
+            func_L05_003D0960(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[9].upgrade);
+            H(vars, 0xa) = D_L05_001B1AA4;
+            I(vars, 0x218) = 5;
         }
     }
 
     {
-        int slot = func_L05_0037AA88(3);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && func_00282978(s + 0xa8)
+        int slot = FindActiveSlotInChain(3);
+        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && FastDecTimer(vars + 0xa8)
             && (D_00138320[0] & 0x20)) {
-            func_L05_0037AB18(3, 1);
-            a.q = 0;
-            a.f[2] = -0.1f;
-            a.f[3] = 1.0f;
-            func_00283098(&b, &a, m + 0xc0);
-            func_00282CC0(&b, &b, m + 0x10);
-            func_002E5CF8(2, 0, m);
-            func_L05_003979B0(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[11].upgrade);
-            H(s, 0xa8) = D_L05_001B1AA8;
-            I(s, 0x218) = 5;
+            SubtractSlotValueClamped(3, 1);
+            aim.q = 0;
+            aim.f[2] = -0.1f;
+            aim.f[3] = 1.0f;
+            matrix_mul_vec3(&base, &aim, moby + 0xc0);
+            FastVecAdd(&base, &base, moby + 0x10);
+            PlayMobySound(2, 0, moby);
+            func_L05_003979B0(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[11].upgrade);
+            H(vars, 0xa8) = D_L05_001B1AA8;
+            I(vars, 0x218) = 5;
         }
     }
 
     {
-        int slot = func_L05_0037AA88(2);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && func_00282948(s + 0x20c)
+        int slot = FindActiveSlotInChain(2);
+        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && FastFloatHelperD(vars + 0x20c)
             && (D_00138320[0] & 0x20)) {
-            func_L05_0037AB18(2, 1);
-            a.q = 0;
-            a.f[2] = -0.2f;
-            a.f[3] = 1.0f;
-            func_00283098(&b, &a, m + 0xc0);
-            func_00282CC0(&b, &b, m + 0x10);
-            func_002E5CF8(2, 0, m);
-            func_L05_00427090(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[10].upgrade, 1);
+            SubtractSlotValueClamped(2, 1);
+            aim.q = 0;
+            aim.f[2] = -0.2f;
+            aim.f[3] = 1.0f;
+            matrix_mul_vec3(&base, &aim, moby + 0xc0);
+            FastVecAdd(&base, &base, moby + 0x10);
+            PlayMobySound(2, 0, moby);
+            SpawnProjectileWithTarget(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[10].upgrade, 1);
             if (D_L05_002A1800[10].upgrade) {
-                c.q = 0;
-                c.f[1] = -0.275f;
-                c.f[3] = 1.0f;
-                func_00283098(&b, &c, m + 0xc0);
-                func_00282CC0(&b, &b, m + 0x10);
-                func_L05_00427090(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[10].upgrade, 0);
-                d.q = 0;
-                d.f[1] = 0.275f;
-                d.f[3] = 1.0f;
-                func_00283098(&b, &d, m + 0xc0);
-                func_00282CC0(&b, &b, m + 0x10);
-                func_L05_00427090(&b, m + 0xc0, I(s, 0x18), m, D_L05_002A1800[10].upgrade, 0);
+                muzzleLeft.q = 0;
+                muzzleLeft.f[1] = -0.275f;
+                muzzleLeft.f[3] = 1.0f;
+                matrix_mul_vec3(&base, &muzzleLeft, moby + 0xc0);
+                FastVecAdd(&base, &base, moby + 0x10);
+                SpawnProjectileWithTarget(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[10].upgrade, 0);
+                shotDir.q = 0;
+                shotDir.f[1] = 0.275f;
+                shotDir.f[3] = 1.0f;
+                matrix_mul_vec3(&base, &shotDir, moby + 0xc0);
+                FastVecAdd(&base, &base, moby + 0x10);
+                SpawnProjectileWithTarget(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[10].upgrade, 0);
             }
-            I(s, 0x20c) = D_L05_001B1AAC;
-            I(s, 0x218) = 7;
+            I(vars, 0x20c) = D_L05_001B1AAC;
+            I(vars, 0x218) = 7;
         }
     }
 
     {
-        int slot = func_L05_0037AA88(4);
-        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && func_00282948(s + 0x210)
+        int slot = FindActiveSlotInChain(4);
+        if (slot >= 0 && D_L05_002A1800[slot].ammo != 0 && FastFloatHelperD(vars + 0x210)
             && (D_00138320[0] & 0x20)) {
-            func_L05_0037AB18(4, 1);
-            a.q = 0;
-            a.f[2] = -0.1f;
-            a.f[3] = 1.0f;
-            func_00283098(&b, &a, m + 0xc0);
-            func_00282CC0(&b, &b, m + 0x10);
-            func_002E5CF8(2, 0, m);
-            func_L05_00427988(&b, m + 0xc0, I(s, 0x18), m, 0);
-            I(s, 0x210) = D_L05_001B1AB0;
-            I(s, 0x218) = 10;
+            SubtractSlotValueClamped(4, 1);
+            aim.q = 0;
+            aim.f[2] = -0.1f;
+            aim.f[3] = 1.0f;
+            matrix_mul_vec3(&base, &aim, moby + 0xc0);
+            FastVecAdd(&base, &base, moby + 0x10);
+            PlayMobySound(2, 0, moby);
+            SpawnProjectile_L05(&base, moby + 0xc0, I(vars, 0x18), moby, 0);
+            I(vars, 0x210) = D_L05_001B1AB0;
+            I(vars, 0x218) = 10;
         }
     }
 
-    index = func_L05_0037AA88(7);
+    index = FindActiveSlotInChain(7);
     if (index >= 0 && D_L05_002A1800[index].ammo != 0 && (D_00138320[0] & 0x80)) {
-        char *v = (char *)(D_L05_001B1AFC * 112 + (int)D_00188660);
-        if (P(v, 0x88) != m || !B(v, 0x74))
-            D_L05_001B1AFC = func_002E5DA0(0x11, 4, m, 0xfbf);
-        if (++I(s, 0x34) >= 8) {
-            I(s, 0x34) = 8;
-            func_00282948(&D_L05_002A1800[index].ammo);
+        char *shotVars = (char *)(D_L05_001B1AFC * 112 + (int)gSoundState);
+        if (P(shotVars, 0x88) != moby || !B(shotVars, 0x74))
+            D_L05_001B1AFC = PlaySoundFromClassBank(0x11, 4, moby, 0xfbf);
+        if (++I(vars, 0x34) >= 8) {
+            I(vars, 0x34) = 8;
+            FastFloatHelperD(&D_L05_002A1800[index].ammo);
         }
     } else {
         if (D_L05_001B1AFC != -1) {
-            char *v = (char *)(D_L05_001B1AFC * 112 + (int)D_00188660);
-            if (P(v, 0x88) == m && B(v, 0x74))
-                func_002E59F8(D_L05_001B1AFC);
+            char *shotVars = (char *)(D_L05_001B1AFC * 112 + (int)gSoundState);
+            if (P(shotVars, 0x88) == moby && B(shotVars, 0x74))
+                StopSoundVoice(D_L05_001B1AFC);
         }
         D_L05_001B1AFC = -1;
-        func_00282948(s + 0x34);
-        if (I(s, 0x34) == 0 && D_L05_001B2048 % 3 == 0 && !(D_00138320[0] & 0x80)) {
+        FastFloatHelperD(vars + 0x34);
+        if (I(vars, 0x34) == 0 && D_L05_001B2048 % 3 == 0 && !(D_00138320[0] & 0x80)) {
             ++D_L05_002A1800[index].ammo;
             if (D_L05_002A1800[index].ammo > D_L05_002A1800[index].maximum)
                 D_L05_002A1800[index].ammo = D_L05_002A1800[index].maximum;
         }
     }
 
-    if (!func_00282948(s + 0x218))
-        I(s, 0x214) = func_L00_002D6998(D_L05_002B8770);
+    if (!FastFloatHelperD(vars + 0x218))
+        I(vars, 0x214) = CopyRecordsToFreeSlots(D_L05_002B8770);
 }

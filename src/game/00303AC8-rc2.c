@@ -26,39 +26,40 @@
 extern s8 D_00222AE0[];
 extern s8 D_002222E0[];
 extern s8 D_00189EA0[];
-extern s32 func_002ACBC8(s32 a0, s32 a1);
+extern s32 func_002ACBC8(s32 noisePtr, s32 index);
 
-void func_00303AC8(void *arg0) {
-    void *s0;
-    s32 a1;
-    s32 a2;
-    s32 q;
-    s32 sh;
-    s8 *a0;
-    s8 *a3;
-    s8 *tmp;
+/* Sets the height of each surface grid point from its base height plus the wave noise. */
+void func_00303AC8(void *object) {
+    void *state;
+    s32 index;
+    s32 flags;
+    s32 row;
+    s32 tableOffset;
+    s8 *noisePtr;
+    s8 *heightPtr;
+    s8 *tablePtr;
 
-    s0 = (*(void **)((s8 *)(arg0) + (0x68)));
-    a1 = (*(s32 *)((s8 *)(s0) + (0x44)));
-    if (a1 != -1 && func_002ACBC8((s32)D_00189EA0, a1) != 0 && !((*(u32 *)((s8 *)(s0) + (0x4C))) & 4)) {
-        sh = (*(s32 *)((s8 *)(s0) + (0x40))) << 10;
-        tmp = (s8 *)D_00222AE0;
-        tmp += 8;
-        a3 = tmp + sh;
-        a0 = D_002222E0;
-        for (a1 = 0; a1 < 0x40; a1++) {
-            *(f32 *)a3 = (*(f32 *)((s8 *)(s0) + (0x70))) + (*(f32 *)((s8 *)(s0) + (4)));
-            a2 = (*(s32 *)((s8 *)(s0) + (0x4C)));
-            if (~a2 & 0x10) {
-                if ((a1 % 8 != 0 && a1 % 8 != 7) || ((a2 ^ 1) & 1)) {
-                    q = a1 / 8;
-                    if ((q != 0 && q != 7) || !((*(s32 *)((s8 *)(s0) + (0x4C))) & 2)) {
-                        *(f32 *)a3 += *(f32 *)a0 * (*(f32 *)((s8 *)(s0) + (0x34)));
+    state = (*(void **)((s8 *)(object) + (0x68)));
+    index = (*(s32 *)((s8 *)(state) + (0x44)));
+    if (index != -1 && IsPointInCuboid((s32)gHeroPosition, index) != 0 && !((*(u32 *)((s8 *)(state) + (0x4C))) & 4)) {
+        tableOffset = (*(s32 *)((s8 *)(state) + (0x40))) << 10;
+        tablePtr = (s8 *)D_00222AE0;
+        tablePtr += 8;
+        heightPtr = tablePtr + tableOffset;
+        noisePtr = D_002222E0;
+        for (index = 0; index < 0x40; index++) {
+            *(f32 *)heightPtr = (*(f32 *)((s8 *)(state) + (0x70))) + (*(f32 *)((s8 *)(state) + (4)));
+            flags = (*(s32 *)((s8 *)(state) + (0x4C)));
+            if (~flags & 0x10) {
+                if ((index % 8 != 0 && index % 8 != 7) || ((flags ^ 1) & 1)) {
+                    row = index / 8;
+                    if ((row != 0 && row != 7) || !((*(s32 *)((s8 *)(state) + (0x4C))) & 2)) {
+                        *(f32 *)heightPtr += *(f32 *)noisePtr * (*(f32 *)((s8 *)(state) + (0x34)));
                     }
                 }
             }
-            a0 += 0x20;
-            a3 += 0x10;
+            noisePtr += 0x20;
+            heightPtr += 0x10;
         }
     }
 }

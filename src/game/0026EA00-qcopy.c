@@ -21,9 +21,9 @@ void func_002718B8(char *object)
     int ok;
 
     if (state[2] == 0)
-        ok = func_00271130(object, state + 0x10);
+        ok = AdvanceCameraBlend(object, state + 0x10);
     else
-        ok = func_002712D8(object, state + 0x70);
+        ok = AdvanceCameraOrbitTransition(object, state + 0x70);
     if (ok == 0)
         return;
 
@@ -59,7 +59,7 @@ void func_00270E30(void)
     if (object[2] == 0) {
         *(TI128 *)(object + 0xC0) = *(TI128 *)(object + 0x50);
         if (object[3] == 2)
-            func_00282CC0((char *)(object + 0xC0), D_00189F70, (char *)(object + 0xC0));
+            FastVecAdd((char *)(object + 0xC0), D_00189F70, (char *)(object + 0xC0));
         *(TI128 *)(object + 0xD0) = *(TI128 *)(object + 0x60);
     }
 }
@@ -84,6 +84,7 @@ extern void func_00279BD8(void *, void *);
 extern void func_002729A0(void *, float, float);
 extern float func_00283CE0(int);
 
+/* Draws the reticle, then draws each marker on the screen at its projected spot. */
 void func_00273418(void) {
     float base[4] __attribute__((aligned(16)));
     float vec[4] __attribute__((aligned(16)));
@@ -94,21 +95,21 @@ void func_00273418(void) {
         D_001B7600.count = 0;
         return;
     }
-    func_00272CB0();
+    DrawTargetReticle();
     if (D_001B7600.count != 0) {
-        base[0] = func_00283CE0(D_001A7348[0]);
-        base[1] = func_00283CE0(D_001A7348[1]);
+        base[0] = IntToFloat(D_001A7348[0]);
+        base[1] = IntToFloat(D_001A7348[1]);
         for (i = 0; i < D_001B7600.count; i++) {
             m = &D_001B7600.e[i];
             if (m->obj != 0 && m->obj[0x20] != 0xFE && m->obj[0x20] != 0xFD) {
                 if (m->flag != 0) {
-                    func_00279BD8(vec, m);
-                    vec[0] = (vec[0] - func_00283CE0(D_001A7348[2])) * 0.0625f;
-                    vec[1] = (vec[1] - func_00283CE0(D_001A7348[3])) * 0.0625f;
+                    ProjectWorldPointToScreen(vec, m);
+                    vec[0] = (vec[0] - IntToFloat(D_001A7348[2])) * 0.0625f;
+                    vec[1] = (vec[1] - IntToFloat(D_001A7348[3])) * 0.0625f;
                 } else {
                     qcopy(vec, base);
                 }
-                func_002729A0(m, vec[0], vec[1]);
+                DrawScreenSprite(m, vec[0], vec[1]);
             }
         }
         D_001B7600.count = 0;
@@ -133,48 +134,49 @@ extern void func_00271E88(void);
 extern void func_002735A0(void *);
 extern void func_00270018(void);
 
+/* Updates the camera state each frame: copies the target object's vectors into it and rebuilds its derived vectors. */
 void func_00272368(void) {
-    char *d = D_001B5200;
-    char *obj;
-    char *p;
-    char *q;
-    char *r;
+    char *camera = gActiveCamera;
+    char *target;
+    char *vectors;
+    char *tail;
+    char *unused;
 
-    *(int *)(d + 0x404) = *(int *)(d + 0x404) + 1;
-    func_002721C8();
-    func_00272280();
-    func_00271FD8();
-    func_00271B90();
-    func_00270A48();
-    obj = *(char **)(d + 0x190);
-    if ((unsigned)(*(unsigned short *)(d + 0x290) - 1) < 2)
-        func_00270EE0(*(void **)(d + 0x194));
-    if (*(short *)(d + 0x290) == 3) {
-        func_002718B8(obj);
+    *(int *)(camera + 0x404) = *(int *)(camera + 0x404) + 1;
+    UpdateScalarTransition();
+    UpdateSecondScalarTransition();
+    SelectCameraCollisionMasks();
+    UpdateCameraFollowHero();
+    UpdateActiveCamera();
+    target = *(char **)(camera + 0x190);
+    if ((unsigned)(*(unsigned short *)(camera + 0x290) - 1) < 2)
+        BeginCameraModeChange(*(void **)(camera + 0x194));
+    if (*(short *)(camera + 0x290) == 3) {
+        TestAndSnapshotObject(target);
     } else {
-        qcopy(d + 0x140, obj + 0x30);
-        qcopy(d + 0x370, obj);
-        qcopy(d + 0x380, obj + 0x10);
-        qcopy(d + 0x390, obj + 0x20);
+        qcopy(camera + 0x140, target + 0x30);
+        qcopy(camera + 0x370, target);
+        qcopy(camera + 0x380, target + 0x10);
+        qcopy(camera + 0x390, target + 0x20);
     }
-    if (func_0026F7B8()) {
-        p = D_001B5200 + 0x140;
-        qcopy(p, D_0018B2F0);
-        qcopy(p + 0x230, D_0018B2F0 + 0x10);
-        func_00282DD8(p + 0x240, p + 0x230, D_0018B2F0 - 0x14B0);
-        func_00282F20(p + 0x240, p + 0x240, 1.0f);
-        func_00282DD8(p + 0x250, p + 0x240, p + 0x230);
-        func_00282F20(p + 0x250, p + 0x250, 1.0f);
+    if (EmptyStubF7B8()) {
+        vectors = gActiveCamera + 0x140;
+        qcopy(vectors, D_0018B2F0);
+        qcopy(vectors + 0x230, D_0018B2F0 + 0x10);
+        FastVecCross(vectors + 0x240, vectors + 0x230, D_0018B2F0 - 0x14B0);
+        vec_scale_to_length(vectors + 0x240, vectors + 0x240, 1.0f);
+        FastVecCross(vectors + 0x250, vectors + 0x240, vectors + 0x230);
+        vec_scale_to_length(vectors + 0x250, vectors + 0x250, 1.0f);
     }
-    q = D_001B5200 + 0x370;
-    func_002AB6D8(q, q - 0x220);
-    func_00271958(q - 0x210, 0);
-    func_00271958(q - 0x200, 1);
-    func_00271958(q - 0x1F0, 2);
-    func_00271E88();
-    func_002735A0(q - 0x230);
+    tail = gActiveCamera + 0x370;
+    GetEulerAnglesFromMatrix(tail, tail - 0x220);
+    UpdateCameraShake(tail - 0x210, 0);
+    UpdateCameraShake(tail - 0x200, 1);
+    UpdateCameraShake(tail - 0x1F0, 2);
+    UpdateCameraGrounded();
+    BlendFogFromCameraRegion(tail - 0x230);
     if (D_001A7A44[0])
-        func_00282DD8(q + 0x10, q + 0x20, q);
-    func_00270018();
-    qzero(q + 0x50);
+        FastVecCross(tail + 0x10, tail + 0x20, tail);
+    UpdateCameraFovTransition();
+    qzero(tail + 0x50);
 }

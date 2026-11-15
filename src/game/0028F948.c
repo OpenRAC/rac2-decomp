@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Family 435a49e62f53b8db - 368 bytes, 2 members.
    Placements: levels/3_endako @0x002FC368, levels/19_grelbin @0x002F8AF8.
@@ -60,19 +61,20 @@ extern int D_001A7354 __attribute__((sda));
 extern int *D_L02_001B3D08 __attribute__((sda));
 
 /* shared native body of family 435a49e62f53b8db (default profile) */
-void func_0028F948(int a0, int a1, int a2, int a3, int a4, int a5)
+/* Copies an image into video memory, either straight into the draw list or through a temporary buffer. */
+void func_0028F948(int source, int vramBase, int format, int widthLog2, int heightLog2, int immediate)
 {
     char buf[96];
     void *work;
-    int t4;
-    int s2;
+    int bufferWidth;
+    int quadCount;
 
-    s2 = 1 << (a3 + a4 - 4);
-    t4 = (1 << a3) >> 6;
-    if (t4 <= 0)
-        t4 = 1;
+    quadCount = 1 << (widthLog2 + heightLog2 - 4);
+    bufferWidth = (1 << widthLog2) >> 6;
+    if (bufferWidth <= 0)
+        bufferWidth = 1;
 
-    if (a5 == 0) {
+    if (immediate == 0) {
         *(int *)D_L03_001B3188 = 0x10000006;
         *(int *)((char *)D_L03_001B3188 + 4) = 0;
         *(int *)((char *)D_L03_001B3188 + 8) = 0;
@@ -83,23 +85,24 @@ void func_0028F948(int a0, int a1, int a2, int a3, int a4, int a5)
         work = buf;
     }
 
-    D_00126288(work, (short)a1, (short)t4, (short)a2, 0, 0,
-            (short)(1 << a3), (short)(1 << a4));
+    D_00126288(work, (short)vramBase, (short)bufferWidth, (short)format, 0, 0,
+            (short)(1 << widthLog2), (short)(1 << heightLog2));
 
-    if (a5 == 0) {
-        *(int *)D_L03_001B3188 = 0x30000000 | s2;
-        *(int *)((char *)D_L03_001B3188 + 4) = a0;
+    if (immediate == 0) {
+        *(int *)D_L03_001B3188 = 0x30000000 | quadCount;
+        *(int *)((char *)D_L03_001B3188 + 4) = source;
         *(int *)((char *)D_L03_001B3188 + 8) = 0;
-        *(int *)((char *)D_L03_001B3188 + 12) = 0x50000000 | s2;
+        *(int *)((char *)D_L03_001B3188 + 12) = 0x50000000 | quadCount;
         D_L03_001B3188 = (int *)((char *)D_L03_001B3188 + 16);
     } else {
-        func_0011AEA0(0);
-        func_001265B0(work, a0);
+        FlushCache(0);
+        ExecGsLoadImage(work, source);
     }
 }
 
 /* shared native body of family a6a1a427e2388f5f */
-void func_0028FAB8(int a0, int a1, int a2, int a3, int p4, int p5)
+/* Draws a plain coloured line on the screen between two points. */
+void func_0028FAB8(int x0, int y0, int x1, int y1, int color, int isSubpixel)
 {
     long long *q;
 
@@ -112,30 +115,31 @@ void func_0028FAB8(int a0, int a1, int a2, int a3, int p4, int p5)
     q[2] = 0x4400000000008001LL;
     q[3] = 17424;
     q[4] = 65;
-    q[5] = p4;
+    q[5] = color;
 #define LO_D0 (*(int *)((char *)&D_001A7350_1 + 0))
 #define HI_D4 (*(int *)((char *)&D_001A7354_1 + 0))
 
-    if (p5 != 0) {
-        q[6] = (a0 + LO_D0 - 8)
-             | ((long long)(a1 + HI_D4 - 8) << 16)
+    if (isSubpixel != 0) {
+        q[6] = (x0 + LO_D0 - 8)
+             | ((long long)(y0 + HI_D4 - 8) << 16)
              | 0xFFFFF000000000LL;
-        q[7] = (a2 + LO_D0 - 8)
-             | ((long long)(a3 + HI_D4 - 8) << 16)
+        q[7] = (x1 + LO_D0 - 8)
+             | ((long long)(y1 + HI_D4 - 8) << 16)
              | 0xFFFFF000000000LL;
     } else {
-        q[6] = ((a0 << 4) + LO_D0 - 16)
-             | ((long long)((a1 << 4) + HI_D4 - 16) << 16)
+        q[6] = ((x0 << 4) + LO_D0 - 16)
+             | ((long long)((y0 << 4) + HI_D4 - 16) << 16)
              | 0xFFFFF000000000LL;
-        q[7] = ((a2 << 4) + LO_D0 - 16)
-             | ((long long)((a3 << 4) + HI_D4 - 16) << 16)
+        q[7] = ((x1 << 4) + LO_D0 - 16)
+             | ((long long)((y1 << 4) + HI_D4 - 16) << 16)
              | 0xFFFFF000000000LL;
     }
     D_L05_001B2C88_5 = (int *)((char *)D_L05_001B2C88_5 + 48);
 }
 
 /* shared native body of family 5e27257c03e3aebd */
-void func_0028FC48(int a0, int a1, int a2, int a3, unsigned long p4, int p5)
+/* Draws a plain coloured rectangle on the screen between two corners. */
+void func_0028FC48(int x0, int y0, int x1, int y1, unsigned long color, int isSubpixel)
 {
     long long *q;
 
@@ -148,57 +152,58 @@ void func_0028FC48(int a0, int a1, int a2, int a3, unsigned long p4, int p5)
     q[2] = 0x4400000000008001LL;
     q[3] = 17424;
     q[4] = 70;
-    q[5] = p4;
+    q[5] = color;
 #define LO_D0 (*(int *)((char *)&D_001A7350 + 0))
 #define HI_D4 (*(int *)((char *)&D_001A7354 + 0))
 
-    if (p5 != 0) {
-        q[6] = (a0 + LO_D0 - 8)
-             | ((long long)(a1 + HI_D4 - 8) << 16)
+    if (isSubpixel != 0) {
+        q[6] = (x0 + LO_D0 - 8)
+             | ((long long)(y0 + HI_D4 - 8) << 16)
              | 0xFFFFF000000000LL;
-        q[7] = (a2 + LO_D0 - 8)
-             | ((long long)(a3 + HI_D4 - 8) << 16)
+        q[7] = (x1 + LO_D0 - 8)
+             | ((long long)(y1 + HI_D4 - 8) << 16)
              | 0xFFFFF000000000LL;
     } else {
-        q[6] = ((a0 << 4) + LO_D0 - 16)
-             | ((long long)((a1 << 4) + HI_D4 - 16) << 16)
+        q[6] = ((x0 << 4) + LO_D0 - 16)
+             | ((long long)((y0 << 4) + HI_D4 - 16) << 16)
              | 0xFFFFF000000000LL;
-        q[7] = ((a2 << 4) + LO_D0 - 16)
-             | ((long long)((a3 << 4) + HI_D4 - 16) << 16)
+        q[7] = ((x1 << 4) + LO_D0 - 16)
+             | ((long long)((y1 << 4) + HI_D4 - 16) << 16)
              | 0xFFFFF000000000LL;
     }
     D_L03_001B3188_1 = (int *)((char *)D_L03_001B3188_1 + 48);
 }
 
 /* shared native body of family 9b94f3cd1f5fac83 */
-void func_0028FDD8(int a0, int a1, int a2, int a3, long long a4, int a5, int a6)
+/* Draws a plain coloured rectangle on the screen between two corners, at a chosen depth. */
+void func_0028FDD8(int x0, int y0, int x1, int y1, long long color, int depth, int isSubpixel)
 {
-    int *p;
+    int *packet;
 
     *(int *)D_L02_001B3D08 = 0x10000003;
     *(int *)((char *)D_L02_001B3D08 + 4) = 0;
     *(int *)((char *)D_L02_001B3D08 + 8) = 0;
     *(int *)((char *)D_L02_001B3D08 + 12) = 0x50000003;
-    p = D_L02_001B3D08;
-    D_L02_001B3D08 = p + 4;
-    *(long long *)(p + 4) = 0x4400000000008001LL;
-    *(long long *)(p + 6) = 17424;
-    *(long long *)(p + 8) = 70;
-    *(long long *)(p + 10) = a4;
-    if (a6) {
-        *(long long *)(p + 12) = (a0 + D_001A7350 - 8)
-                               | ((long long)(a1 + D_001A7354 - 8) << 16)
-                               | ((long long)a5 << 32);
-        *(long long *)(p + 14) = (a2 + D_001A7350 - 8)
-                               | ((long long)(a3 + D_001A7354 - 8) << 16)
-                               | ((long long)a5 << 32);
+    packet = D_L02_001B3D08;
+    D_L02_001B3D08 = packet + 4;
+    *(long long *)(packet + 4) = 0x4400000000008001LL;
+    *(long long *)(packet + 6) = 17424;
+    *(long long *)(packet + 8) = 70;
+    *(long long *)(packet + 10) = color;
+    if (isSubpixel) {
+        *(long long *)(packet + 12) = (x0 + gScreenOffsetX - 8)
+                               | ((long long)(y0 + gScreenOffsetY - 8) << 16)
+                               | ((long long)depth << 32);
+        *(long long *)(packet + 14) = (x1 + gScreenOffsetX - 8)
+                               | ((long long)(y1 + gScreenOffsetY - 8) << 16)
+                               | ((long long)depth << 32);
     } else {
-        *(long long *)(p + 12) = ((a0 << 4) + D_001A7350 - 16)
-                               | ((long long)((a1 << 4) + D_001A7354 - 16) << 16)
-                               | ((long long)a5 << 32);
-        *(long long *)(p + 14) = ((a2 << 4) + D_001A7350 - 16)
-                               | ((long long)((a3 << 4) + D_001A7354 - 16) << 16)
-                               | ((long long)a5 << 32);
+        *(long long *)(packet + 12) = ((x0 << 4) + gScreenOffsetX - 16)
+                               | ((long long)((y0 << 4) + gScreenOffsetY - 16) << 16)
+                               | ((long long)depth << 32);
+        *(long long *)(packet + 14) = ((x1 << 4) + gScreenOffsetX - 16)
+                               | ((long long)((y1 << 4) + gScreenOffsetY - 16) << 16)
+                               | ((long long)depth << 32);
     }
     D_L02_001B3D08 = (int *)((char *)D_L02_001B3D08 + 48);
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned char u8;
 typedef signed char s8;
 typedef float f32;
@@ -21,6 +22,7 @@ extern float func_00283180(float);
 extern float func_00283198(float);
 extern float func_00283CE0(int);
 
+/* Pulls the object toward the hero while it shrinks. Returns 1 when the hero is gone or can no longer be followed. */
 int func_L04_0044D860(u8 *object) {
     float delta[4];
     u8 *data = *(u8 **)(object + 0x68);
@@ -28,31 +30,31 @@ int func_L04_0044D860(u8 *object) {
     u8 *target;
     int result;
     if (object[0x43] != D_L04_001B1883)
-        func_002A7470(object, D_L04_001B1883, 0, 10);
+        StartAnimationBlended(object, D_L04_001B1883, 0, 10);
     if (D_L04_001AF90C) {
-        heading = func_00283248(*(float *)(object + 0x10) - *(float *)(D_L04_001AF90C + 0x10),
+        heading = FastMatrixHelperA(*(float *)(object + 0x10) - *(float *)(D_L04_001AF90C + 0x10),
                                *(float *)(object + 0x14) - *(float *)(D_L04_001AF90C + 0x14));
-        angle = func_00283B98(*(float *)(object + 0xF8),
-            func_00283BE0(heading, *(float *)(object + 0xF8)) * 0.1f);
+        angle = FastAddRotations(*(float *)(object + 0xF8),
+            fast_subtract_rotations(heading, *(float *)(object + 0xF8)) * 0.1f);
         target = D_L04_001AF90C + 0x10;
         *(float *)(object + 0xF8) = angle;
-        func_00282CF0((char *)delta, (char *)target, (char *)object + 0x10);
+        FastVecSub((char *)delta, (char *)target, (char *)object + 0x10);
         delta[2] -= *(float *)(data + 0x220);
-        length = func_00282DF0(delta);
+        length = FastVecLength(delta);
         if (length != 0.0f) {
             float fraction;
             step = D_L04_001B188C * 0.01666666753590107f;
             if (length < step)
                 step = length;
             fraction = step / length;
-            func_00282D30(delta, delta, fraction);
-            func_00282CC0(object + 0x10, object + 0x10, delta);
-            delta[0] = func_00283180(func_00283B98(heading, 1.5707964897155762f)) * 0.01666666753590107f * D_L04_001B1890;
-            delta[1] = func_00283198(func_00283B98(heading, 1.5707964897155762f)) * 0.01666666753590107f * D_L04_001B1890;
+            FastVecScale(delta, delta, fraction);
+            FastVecAdd(object + 0x10, object + 0x10, delta);
+            delta[0] = FastSinOrCosA(FastAddRotations(heading, 1.5707964897155762f)) * 0.01666666753590107f * D_L04_001B1890;
+            delta[1] = FastSinOrCosB(FastAddRotations(heading, 1.5707964897155762f)) * 0.01666666753590107f * D_L04_001B1890;
             delta[2] = 0.0f;
-            func_00282CC0(object + 0x10, object + 0x10, delta);
+            FastVecAdd(object + 0x10, object + 0x10, delta);
         }
-        decay = func_00283CE0(D_L04_001B1898);
+        decay = IntToFloat(D_L04_001B1898);
         minimum = D_L04_001B189C;
         *(float *)(object + 0x2C) -= *(float *)(data + 0x230) / decay;
         if (*(float *)(object + 0x2C) < minimum)

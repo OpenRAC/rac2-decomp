@@ -29,47 +29,48 @@ typedef struct { u8 pad[0x140]; f32 pos[6]; f32 angle; } Target;
 extern Target D_L07_001B90C0;
 typedef struct {u8 pad[0x38];f32 value;u8 rest[0x80-0x3c];} Record;
 extern Record *D_L07_001B23CC;
-void func_L07_003F8430(u8 *obj)
+/* Works out where a flying enemy should drift next. In one mode it follows its parent; in the other it picks a new circling direction around the player every so often and bobs up and down. */
+void func_L07_003F8430(u8 *moby)
 {
- f32 v[4];
- u8 *p=*(u8 **)(obj+0x68);
- s32 change;
- f32 dist,angle,step;
- if (!obj[0x95]) {
-  func_2E4340(v,p+0x140,*(u8 **)(p+0x418)+0x10);
-  func_31B090(*(u8 **)(p+0x418),v,v,0);
-  if (*(s32 *)(p+0x420)) func_313DD8(p+0x3e0,v[0]-D_L07_001B1090,1.0f/6.0f);
-  else func_313DD8(p+0x3e0,v[0]+D_L07_001B1090,1.0f/6.0f);
-  if (*(f32 *)(p+0x3e0)>D_L07_001B1030) *(f32 *)(p+0x3e0)=D_L07_001B1030;
-  else if (*(f32 *)(p+0x3e0)<D_L07_001B1020) *(f32 *)(p+0x3e0)=D_L07_001B1020;
-  func_313DD8(p+0x3e4,v[1],1.0f/6.0f);
-  if (*(f32 *)(p+0x3e4)>5.0f) *(f32 *)(p+0x3e4)=5.0f;
-  else if (*(f32 *)(p+0x3e4)<-5.0f) *(f32 *)(p+0x3e4)=-5.0f;
+ f32 offset[4];
+ u8 *vars=*(u8 **)(moby+0x68);
+ s32 needsNewHeading;
+ f32 distance,angle,turnStep;
+ if (!moby[0x95]) {
+  func_2E4340(offset,vars+0x140,*(u8 **)(vars+0x418)+0x10);
+  func_31B090(*(u8 **)(vars+0x418),offset,offset,0);
+  if (*(s32 *)(vars+0x420)) func_313DD8(vars+0x3e0,offset[0]-D_L07_001B1090,1.0f/6.0f);
+  else func_313DD8(vars+0x3e0,offset[0]+D_L07_001B1090,1.0f/6.0f);
+  if (*(f32 *)(vars+0x3e0)>D_L07_001B1030) *(f32 *)(vars+0x3e0)=D_L07_001B1030;
+  else if (*(f32 *)(vars+0x3e0)<D_L07_001B1020) *(f32 *)(vars+0x3e0)=D_L07_001B1020;
+  func_313DD8(vars+0x3e4,offset[1],1.0f/6.0f);
+  if (*(f32 *)(vars+0x3e4)>5.0f) *(f32 *)(vars+0x3e4)=5.0f;
+  else if (*(f32 *)(vars+0x3e4)<-5.0f) *(f32 *)(vars+0x3e4)=-5.0f;
  } else {
-  if (*(s32 *)(p+0x440)<0) *(s32 *)(p+0x440)=-*(s32 *)(p+0x440);
-  else if (func_2E4508(obj+0x10,p+0x3e0)<2.0f) {
-   change=0;
-   dist=func_2E4508(p+0x140,obj+0x10);
-   if(dist<D_L07_001B1094) change=1;
-   else if(dist>D_L07_001B1098) change=1;
-   if(func_2E3F80((s32 *)(p+0x440))) {
-    change=1;
-    *(s32 *)(p+0x440)=func_2E5470(func_L07_003F90E8(5,15,(f32)D_L07_001B10A8,(f32)D_L07_001B10AC));
-    *(s32 *)(p+0x440)+=func_310AD8(0,60);
+  if (*(s32 *)(vars+0x440)<0) *(s32 *)(vars+0x440)=-*(s32 *)(vars+0x440);
+  else if (func_2E4508(moby+0x10,vars+0x3e0)<2.0f) {
+   needsNewHeading=0;
+   distance=func_2E4508(vars+0x140,moby+0x10);
+   if(distance<D_L07_001B1094) needsNewHeading=1;
+   else if(distance>D_L07_001B1098) needsNewHeading=1;
+   if(func_2E3F80((s32 *)(vars+0x440))) {
+    needsNewHeading=1;
+    *(s32 *)(vars+0x440)=func_2E5470(InterpolateBetweenLimits(5,15,(f32)D_L07_001B10A8,(f32)D_L07_001B10AC));
+    *(s32 *)(vars+0x440)+=func_310AD8(0,60);
    }
-   if(change) {
-    step=func_310B30(10.0f,40.0f)*0.017453294f;
-    angle=func_2E49C8(*(f32 *)(obj+0x10)-D_L07_001B90C0.pos[0],*(f32 *)(obj+0x14)-D_L07_001B90C0.pos[1]);
-    if(func_2E5360(angle,D_L07_001B90C0.angle)*step>0.0f) step=-step;
-    angle=func_2E5318(D_L07_001B90C0.angle,step);
-    *(f32 *)(p+0x3e0)=func_2E4900(angle)*D_L07_001B109C;
-    *(f32 *)(p+0x3e4)=func_2E4918(angle)*D_L07_001B109C;
-    *(f32 *)(p+0x3e8)=0.0f;
-    func_2E4310(p+0x3e0,p+0x3e0,p+0x140);
+   if(needsNewHeading) {
+    turnStep=func_310B30(10.0f,40.0f)*0.017453294f;
+    angle=func_2E49C8(*(f32 *)(moby+0x10)-D_L07_001B90C0.pos[0],*(f32 *)(moby+0x14)-D_L07_001B90C0.pos[1]);
+    if(func_2E5360(angle,D_L07_001B90C0.angle)*turnStep>0.0f) turnStep=-turnStep;
+    angle=func_2E5318(D_L07_001B90C0.angle,turnStep);
+    *(f32 *)(vars+0x3e0)=func_2E4900(angle)*D_L07_001B109C;
+    *(f32 *)(vars+0x3e4)=func_2E4918(angle)*D_L07_001B109C;
+    *(f32 *)(vars+0x3e8)=0.0f;
+    func_2E4310(vars+0x3e0,vars+0x3e0,vars+0x140);
    }
   }
-  *(f32 *)(p+0x454)=func_2E5318(*(f32 *)(p+0x454),D_L07_001B10B4*0.000290888245f);
-  angle=func_2E4918(*(f32 *)(p+0x454));
-  *(f32 *)(p+0x3e8)=D_L07_001B23CC[*(s32 *)(p+0x174)].value+D_L07_001B10A4+D_L07_001B10B0*angle;
+  *(f32 *)(vars+0x454)=func_2E5318(*(f32 *)(vars+0x454),D_L07_001B10B4*0.000290888245f);
+  angle=func_2E4918(*(f32 *)(vars+0x454));
+  *(f32 *)(vars+0x3e8)=D_L07_001B23CC[*(s32 *)(vars+0x174)].value+D_L07_001B10A4+D_L07_001B10B0*angle;
  }
 }

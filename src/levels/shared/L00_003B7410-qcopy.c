@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -33,20 +34,20 @@ extern void func_002A7750(NODE *, unsigned char, int);
 /* Allocates the record, copies the two sixteen-byte blocks into it (the first at
    +0x10, the second in the sub-object its +0x68 field points to), fills its
    three fields and calls the level's helper. */
-void *func_L00_003B7410(char *a0, void *a1, void *a2, void *a3)
+void *func_L00_003B7410(char *owner, void *position, void *velocity, void *player)
 {
-    NODE *o = func_0029EFD0(0x88D);
+    NODE *record = CreateMoby(0x88D /* moby class 2189 */);
 
-    if (o != 0) {
-        TI128 *d = (TI128 *)((char *)o + 0x10);
-        TI128 *s = (TI128 *)o->f68;
+    if (record != 0) {
+        TI128 *dest = (TI128 *)((char *)record + 0x10);
+        TI128 *src = (TI128 *)record->f68;
 
-        o->fB8 = (int)a0;
-        o->f30 = 0xFF;
-        o->fBC = (unsigned char)a3;
-        *d = *(TI128 *)a1;
-        *s = *(TI128 *)a2;
-        func_002A7750(o, 2, -1);
+        record->fB8 = (int)owner;
+        record->f30 = 0xFF;
+        record->fBC = (unsigned char)player;
+        *dest = *(TI128 *)position;
+        *src = *(TI128 *)velocity;
+        SetMobyState(record, 2, -1);
     }
-    return o;
+    return record;
 }

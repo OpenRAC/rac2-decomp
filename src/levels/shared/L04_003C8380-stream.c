@@ -70,16 +70,16 @@ void func_L04_003C8380(Moby *moby)
     int i;
     Quad shift;
 
-    if (moby->oClass == 0xCEF) {
+    if (moby->oClass == 0xCEF /* moby class 3311 */) {
         first = -2;
         spacing = 0.85f;
         start = -2;
         end = 1.4f;
         minScale = 0.14f;
-        id = 0xF10;
+        id = 0xF10 /* moby class 3856 */;
     } else {
         first = -1.5f;
-        id = 0xF0F;
+        id = 0xF0F /* moby class 3855 */;
         maxScale = 0.21f;
         spacing = 0.75f;
         start = -1.5f;
@@ -93,9 +93,9 @@ void func_L04_003C8380(Moby *moby)
 
     if (moby->state == 0) {
         for (i = 0; i < 5; i++) {
-            child = func_0029EFD0(id);
+            child = CreateMoby(id);
             if (child) {
-                func_002B37E8(child, 0);
+                InitChildObjectFromParent(child, 0);
                 child->rotation = moby->rotation;
                 children[i] = child;
                 offsets[i] = first;
@@ -114,10 +114,10 @@ void func_L04_003C8380(Moby *moby)
             offset = start;
         offsets[i] = offset;
 
-        func_00282D30(&shift, moby->forward, offset);
-        func_00282CC0(children[i]->position, moby->position, &shift);
-        func_00282D30(&shift, moby->up, 0.15f);
-        func_00282CC0(children[i]->position, children[i]->position, &shift);
+        FastVecScale(&shift, moby->forward, offset);
+        FastVecAdd(children[i]->position, moby->position, &shift);
+        FastVecScale(&shift, moby->up, 0.15f);
+        FastVecAdd(children[i]->position, children[i]->position, &shift);
 
         t = (offset - start) / length;
         children[i]->scale = children[i]->mclass->scale * (minScale + (1 - t) * scaleRange);
@@ -132,6 +132,6 @@ void func_L04_003C8380(Moby *moby)
         alpha = 1 - t;              /* now the colour fade g */
         alpha *= alpha;
         alpha *= alpha;
-        func_002A0488(children[i], 252 + (int)(alpha * 2), (int)(alpha * 224), (int)(alpha * 6));
+        set_moby_color(children[i], 252 + (int)(alpha * 2), (int)(alpha * 224), (int)(alpha * 6));
     }
 }

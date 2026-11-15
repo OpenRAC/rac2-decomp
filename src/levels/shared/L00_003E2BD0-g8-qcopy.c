@@ -11,6 +11,7 @@ extern float func_00283CE0(int);
 extern int func_00283CF0(float);
 extern void func_L00_003E2E80(Quad128 *,int,int,int,unsigned int,unsigned int,float,float,float);
 extern float D_L00_001B05B4 __attribute__((sda));
+/* Updates a glowing trail behind a moving object. It remembers recent positions, draws them fading out and removes the trail when its data is gone. */
 void func_L00_003E2BD0(void *self)
 {
     char *object=self,*state=*(char **)(object+0x68);
@@ -18,9 +19,9 @@ void func_L00_003E2BD0(void *self)
     int bank=*(int *)state,index,count,n,firstCount,alpha,glow;
     unsigned int color,edge;
     float fraction;
-    table=(Quad128 **)func_L00_0032A088(*(int *)(state+0x18),*(int *)(state+0x14));
-    if(!table) { func_002FEE50(*(int *)(state+0x34)); func_0029F338(object); return; }
-    for(index=0;index<*(int *)(state+0x10);index++) func_00300190(table[bank]+index,table[bank]+index);
+    table=(Quad128 **)GetSlotBody(*(int *)(state+0x18),*(int *)(state+0x14));
+    if(!table) { ClearEntryFlag(*(int *)(state+0x34)); MarkMobySpawned(object); return; }
+    for(index=0;index<*(int *)(state+0x10);index++) TransformVectorOrCopy(table[bank]+index,table[bank]+index);
     if(*(unsigned char *)(object+0x20)==0) {
         *(int *)(state+0x10)+=1;
         if(*(int *)(state+0x10)>=40) *(int *)(state+0x10)=40;
@@ -34,11 +35,11 @@ void func_L00_003E2BD0(void *self)
     firstCount=20; if(count<=19) firstCount=count;
     alpha=255; glow=64;
     if(*(unsigned char *)(object+0x20)==1) {
-        fraction=func_00283CE0(*(int *)(state+0x38)); fraction/=func_00283CE0(6);
-        alpha=func_00283CF0(func_00283CE0(255)*fraction);
-        glow=func_00283CF0(func_00283CE0(64)*fraction);
+        fraction=IntToFloat(*(int *)(state+0x38)); fraction/=IntToFloat(6);
+        alpha=FloatToInt(IntToFloat(255)*fraction);
+        glow=FloatToInt(IntToFloat(64)*fraction);
     }
     color=((unsigned int)alpha<<24)|0xffffff; edge=((unsigned int)glow<<24)|0x204080;
-    func_L00_003E2E80(table[bank],23,14,firstCount,color,edge,0.0f,4.0f,D_L00_001B05B4);
-    if(*(int *)(state+0x10)>20) func_L00_003E2E80(table[bank],23,14,*(int *)(state+0x10),color,edge,0.0f,4.0f,D_L00_001B05B4);
+    DrawFadingTwoPassRibbon(table[bank],23,14,firstCount,color,edge,0.0f,4.0f,D_L00_001B05B4);
+    if(*(int *)(state+0x10)>20) DrawFadingTwoPassRibbon(table[bank],23,14,*(int *)(state+0x10),color,edge,0.0f,4.0f,D_L00_001B05B4);
 }

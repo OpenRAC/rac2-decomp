@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L00_00403D58 and func_L00_00404DD8 are a unit of their own: both need the opt-in
    quadword-copy profile and its scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier,
@@ -18,6 +19,7 @@ extern void func_L00_00403F90(char *arg, void *p);
 extern void func_002FEE50(int a);
 extern void func_0029F338(char *arg);
 
+/* Per-frame update of a flying shot: it moves along its velocity until a timer ends, then removes itself. */
 void func_L00_00403D58(char *arg)
 {
     int *o = *(int **)(arg + 104);
@@ -31,21 +33,21 @@ void func_L00_00403D58(char *arg)
     case 1:
         p = arg + 16;
         *(TI128 *)&tmp = *(TI128 *)p;
-        func_00282CC0(p, o, p);
-        func_00300190(p, p);
-        func_002FEE70(o[7], o, 0);
-        func_L00_00403F90(arg, &tmp);
-        if (func_00282948((char *)o + 16) != 0)
+        FastVecAdd(p, o, p);
+        TransformVectorOrCopy(p, p);
+        SteerEffectDirection(o[7], o, 0);
+        ResolveSheepShotHit(arg, &tmp);
+        if (FastFloatHelperD((char *)o + 16) != 0)
             arg[32] = 2;
         break;
     case 2:
-        func_002FEE50(o[7]);
-        func_0029F338(arg);
+        ClearEntryFlag(o[7]);
+        MarkMobySpawned(arg);
         return;
     default:
         break;
     }
-    ref_L00_00403D58_00(func_L00_00404168, arg);
+    ref_L00_00403D58_00(UpdateSmokySparkEffect, arg);
 }
 
 extern void func_002E5DA0(int a, int b, void *c, int d);
@@ -53,6 +55,7 @@ extern int func_002761F8(void *a, void *b, int c, void *d, int e);
 extern void func_0029F338(char *arg);
 extern TI128 D_L00_001BF220;
 
+/* Removes the object if it leaves the map; if it hits something it snaps to a saved spot, plays a sound and enters its end state. */
 void func_L00_00404DD8(char *arg, void *a1)
 {
     char *p;
@@ -60,13 +63,13 @@ void func_L00_00404DD8(char *arg, void *a1)
     if (*(float *)(arg + 16) < 2.0f || *(float *)(arg + 16) > 1021.0f ||
         *(float *)(arg + 20) < 2.0f || *(float *)(arg + 20) > 1021.0f ||
         *(float *)(arg + 24) < 2.0f || *(float *)(arg + 24) > 1021.0f) {
-        func_0029F338(arg);
+        MarkMobySpawned(arg);
         return;
     }
     p = arg + 16;
-    if (func_002761F8(a1, p, 0, arg, 0) != 0) {
+    if (CollLine(a1, p, 0, arg, 0) != 0) {
         *(TI128 *)p = D_L00_001BF220;
         arg[32] = 2;
-        func_002E5DA0(5, 0, arg, 3705);
+        PlaySoundFromClassBank(5, 0, arg, 3705);
     }
 }

@@ -33,41 +33,41 @@ extern void r1_func_00114438(void *, void *);
  * `horizontal_size = (horizontal_size_extension<<12) | (horizontal_size&0xfff)`
  * et al.
  */
-void func_00130890(void *arg0) {
-    char *s = (char *)arg0;
-    unsigned int v1, v2;
+void func_00130890(void *decoder) {
+    char *bytes = (char *)decoder;
+    unsigned int bits1, bits2;
     unsigned int chroma_format, h_ext, v_ext, bitrate_ext;
     unsigned int progressive, profile, vbv_ext;
 
-    *(int *)(s + 0x848) = 1;
+    *(int *)(bytes + 0x848) = 1;
     r1_func_00127378(0);
 
-    v1 = r1_func_00128A58(s, 0x1C);
-    bitrate_ext = (v1 >> 1) & 0xFFF;
-    chroma_format = (v1 >> 17) & 3;
-    v_ext = (v1 >> 13) & 3;
-    h_ext = (v1 >> 15) & 3;
+    bits1 = r1_func_00128A58(bytes, 0x1C);
+    bitrate_ext = (bits1 >> 1) & 0xFFF;
+    chroma_format = (bits1 >> 17) & 3;
+    v_ext = (bits1 >> 13) & 3;
+    h_ext = (bits1 >> 15) & 3;
 
-    *(unsigned int *)(s + 0x140) = chroma_format;
+    *(unsigned int *)(bytes + 0x140) = chroma_format;
     if (chroma_format != 1) {
-        func_00130288(s, r1_D_00153C00);
+        ReportMpegError(bytes, r1_D_00153C00);
     }
 
-    progressive = (v1 >> 19) & 1;
-    *(unsigned int *)(s + 0x13C) = progressive;
-    profile = v1 >> 20;
+    progressive = (bits1 >> 19) & 1;
+    *(unsigned int *)(bytes + 0x13C) = progressive;
+    profile = bits1 >> 20;
 
-    v2 = r1_func_00128A58(s, 0x10);
-    vbv_ext = v2 >> 8;
+    bits2 = r1_func_00128A58(bytes, 0x10);
+    vbv_ext = bits2 >> 8;
 
     if (profile != 0x48 && profile != 0x58 && profile != 0x44) {
-        func_00130288(s, r1_D_00153C28);
+        ReportMpegError(bytes, r1_D_00153C28);
     }
 
-    *(int *)(s + 0x124) = (h_ext << 12) | (*(int *)(s + 0x124) & 0xFFF);
-    *(int *)(s + 0x128) = (v_ext << 12) | (*(int *)(s + 0x128) & 0xFFF);
-    *(int *)(s + 0x134) += bitrate_ext << 18;
-    *(int *)(s + 0x138) += vbv_ext << 10;
+    *(int *)(bytes + 0x124) = (h_ext << 12) | (*(int *)(bytes + 0x124) & 0xFFF);
+    *(int *)(bytes + 0x128) = (v_ext << 12) | (*(int *)(bytes + 0x128) & 0xFFF);
+    *(int *)(bytes + 0x134) += bitrate_ext << 18;
+    *(int *)(bytes + 0x138) += vbv_ext << 10;
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012CBA0 */
@@ -83,51 +83,56 @@ void func_00130890(void *arg0) {
  * value call it reset $v0's readers and the +0x148 store lost the
  * scheduler tie to the next call's argument setup, 8/140.)
  */
-void func_001309C0(void *arg0) {
-    char *s = (char *)arg0;
+void func_001309C0(void *decoder) {
+    char *bytes = (char *)decoder;
 
-    r1_func_00128A58(s, 3);
-    if (r1_func_00128A58(s, 1) != 0) {
-        r1_func_00128A58(s, 8);
-        r1_func_00128A58(s, 8);
-        *(int *)(s + 0x144) = r1_func_00128A58(s, 8);
+    r1_func_00128A58(bytes, 3);
+    if (r1_func_00128A58(bytes, 1) != 0) {
+        r1_func_00128A58(bytes, 8);
+        r1_func_00128A58(bytes, 8);
+        *(int *)(bytes + 0x144) = r1_func_00128A58(bytes, 8);
     }
-    *(int *)(s + 0x148) = r1_func_00128A58(s, 0xE);
-    r1_func_00128A58(s, 1);
-    *(int *)(s + 0x14C) = r1_func_00128A58(s, 0xE);
+    *(int *)(bytes + 0x148) = r1_func_00128A58(bytes, 0xE);
+    r1_func_00128A58(bytes, 1);
+    *(int *)(bytes + 0x14C) = r1_func_00128A58(bytes, 0xE);
 }
 
 /* rac1-decomp src/core/00113A70.c: func_00113AC8 */
 /* Retail is a bare tail jump: Sony's 2.9-ee, which builds this SDK object,
    emits it for a void function that ends in a call. */
-void func_00130A50(void *arg0) {
-    r1_func_00114438(arg0, r1_func_00113968);
+/* Hands the object on to a handler together with a fixed callback. */
+void func_00130A50(void *mpeg) {
+    r1_func_00114438(mpeg, r1_func_00113968);
 }
 extern void func_00130A60(void *arg0);
 extern char D_0013BE88[];
 
-void func_00130A60(void *object) {
-    func_00130288(object, D_0013BE88);
+/* Reports a fixed video error message. */
+void func_00130A60(void *decoder) {
+    ReportMpegError(decoder, D_0013BE88);
 }
 
 extern void func_00130A70(void *arg0);
 extern char D_0013BEA0[];
 
-void func_00130A70(void *object) {
-    func_00130288(object, D_0013BEA0);
+/* Reports a fixed video error message. */
+void func_00130A70(void *decoder) {
+    ReportMpegError(decoder, D_0013BEA0);
 }
 
 extern void func_00130A80(void *arg0);
 extern char D_0013BED8[];
 
-void func_00130A80(void *object) {
-    func_00130288(object, D_0013BED8);
+/* Reports a fixed video error message. */
+void func_00130A80(void *decoder) {
+    ReportMpegError(decoder, D_0013BED8);
 }
 
 
 /* Its entry is four bytes into the catalogued row, after one word of 0xCDCDCDCD fill. */
 extern void func_00130B80(void *arg0);
 
-void func_00130A8C(void *object) {
-    func_00130B80(*(char **)((char *)object + 0x40) + 0x4C);
+/* Stops the picture DMA for this decoder and saves its state. */
+void func_00130A8C(void *mpeg) {
+    StopIpuDma(*(char **)((char *)mpeg + 0x40) + 0x4C);
 }

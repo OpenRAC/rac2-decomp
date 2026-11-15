@@ -74,19 +74,19 @@ BoltSpawnObject *func_00302470(BoltSpawnObject *source, void *position, void *ve
     ParticleVector crossed, difference;
     u32 red, green, blue;
     float scale, spin, angle;
-    if (func_00282E48(position,&ref_00302470_02)>=64.0f) {
+    if (fast_vec_dist(position,&ref_00302470_02)>=64.0f) {
         D_001A7A10[1]+=value;
         return 0;
     }
     switch (value) {
     default:
-    case 1: object=(BoltSpawnObject *)func_0029EFD0(13); scale=ref_00302470_03; break;
-    case 5: object=(BoltSpawnObject *)func_0029EFD0(14); scale=ref_00302470_04; break;
-    case 20: object=(BoltSpawnObject *)func_0029EFD0(15); scale=ref_00302470_05; break;
-    case 50: object=(BoltSpawnObject *)func_0029EFD0(16); scale=ref_00302470_06; break;
-    case 100: object=(BoltSpawnObject *)func_0029EFD0(17); scale=ref_00302470_07; break;
-    case 500: object=(BoltSpawnObject *)func_0029EFD0(18); scale=ref_00302470_08; break;
-    case 1000: object=(BoltSpawnObject *)func_0029EFD0(19); scale=ref_00302470_09; break;
+    case 1: object=(BoltSpawnObject *)CreateMoby(13 /* Bolt */); scale=ref_00302470_03; break;
+    case 5: object=(BoltSpawnObject *)CreateMoby(14 /* Bolt */); scale=ref_00302470_04; break;
+    case 20: object=(BoltSpawnObject *)CreateMoby(15 /* Bolt */); scale=ref_00302470_05; break;
+    case 50: object=(BoltSpawnObject *)CreateMoby(16 /* Bolt */); scale=ref_00302470_06; break;
+    case 100: object=(BoltSpawnObject *)CreateMoby(17 /* Bolt */); scale=ref_00302470_07; break;
+    case 500: object=(BoltSpawnObject *)CreateMoby(18 /* Bolt */); scale=ref_00302470_08; break;
+    case 1000: object=(BoltSpawnObject *)CreateMoby(19 /* Bolt */); scale=ref_00302470_09; break;
     }
     if (object) {
     state=object->vars;
@@ -102,26 +102,26 @@ BoltSpawnObject *func_00302470(BoltSpawnObject *source, void *position, void *ve
     object->visible=1;
     object->state=1;
     object->scale=object->objectClass->scale*scale;
-    func_002833F0(orientation,&object->rotation);
-    func_002AEC18(object,ref_00302470_01);
-    func_002A04B8(object,&red,&green,&blue);
-    func_002A0468((unsigned long long *)object,0,13,0,0);
-    func_002A0488(object,red,green,blue);
+    euler_rotation_basis(orientation,&object->rotation);
+    SetMobyLightColor(object,ref_00302470_01);
+    get_moby_color(object,&red,&green,&blue);
+    PackRenderCommandFields((unsigned long long *)object,0,13,0,0);
+    set_moby_color(object,red,green,blue);
     qcopy(&object->position,position);
     qcopy(&state->velocity,velocity);
-    if (func_002A77E0(2)) state->flags|=1;
-    state->angle=func_002A7940();
-    state->phase=func_002A7940();
+    if (RandomIntBelow(2)) state->flags|=1;
+    state->angle=RandomAngle();
+    state->phase=RandomAngle();
     state->startZ=object->position.f[2];
-    spin=func_002A7878(0.0f,720.0f)*0.00029088825f;
-    func_00282CF0(&difference,&source->position,&object->position);
-    func_00282DD8(&crossed,&state->velocity,&difference);
-    func_00282F20(&state->spin,&crossed,1.0f);
-    func_002AB668(&state->spin,(int)(&state->spin),spin);
+    spin=RandomFloatRange(0.0f,720.0f)*0.00029088825f;
+    FastVecSub(&difference,&source->position,&object->position);
+    FastVecCross(&crossed,&state->velocity,&difference);
+    vec_scale_to_length(&state->spin,&crossed,1.0f);
+    BuildAxisAngleQuaternion(&state->spin,(int)(&state->spin),spin);
     if (flags&2) {
         angle=0.0f;
-        if (flags&0x10) angle=func_002A7878(-30.0f,30.0f)*0.017453294f;
-        func_003022A0((char *)object,D_0018C0B0,angle,0.0f);
+        if (flags&0x10) angle=RandomFloatRange(-30.0f,30.0f)*0.017453294f;
+        StartPickupFlyToTarget((char *)object,gHeroMoby_0018C0B0,angle,0.0f);
     }
     func_002A0F48(object);
     }

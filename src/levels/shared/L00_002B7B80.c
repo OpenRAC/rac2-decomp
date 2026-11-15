@@ -40,82 +40,82 @@ void func_L00_002B7B80(void)
     int mode;
     int left, right;
 
-    if (((Hero *)D_00189E20)->h[0x1454 / 2] != 0 && ((Hero *)D_00189E20)->f[0x24B8 / 4] > 0.15f && ((Hero *)D_00189E20)->i[0x2294 / 4] != 11
-        && ((Hero *)D_00189E20)->b[0x1456] == 0) {
+    if (((Hero *)gHeroState)->h[0x1454 / 2] != 0 && ((Hero *)gHeroState)->f[0x24B8 / 4] > 0.15f && ((Hero *)gHeroState)->i[0x2294 / 4] != 11
+        && ((Hero *)gHeroState)->b[0x1456] == 0) {
         ((Pose *)D_L00_0025BE10)->f[0xA8 / 4] = 0.27f;
         ((Pose *)D_L00_0025BE10)->f[0xA4 / 4] = 0.037f;
         ((Pose *)D_L00_0025BE10)->f[0x154 / 4] = 0.025f;
         ((Pose *)D_L00_0025BE10)->f[0x158 / 4] = 0.27f;
-        if (((Hero *)D_00189E20)->b[0x22C3] != 0) {
-            yaw = func_L00_002B9B38(((Hero *)D_00189E20)->b + 0x1440, 0);
+        if (((Hero *)gHeroState)->b[0x22C3] != 0) {
+            yaw = GetDirectionAngleDelta(((Hero *)gHeroState)->b + 0x1440, 0);
         } else {
-            yaw = func_00283BE0(((Hero *)D_00189E20)->f[0x1458 / 4], ((Hero *)D_00189E20)->f[0x98 / 4]);
+            yaw = fast_subtract_rotations(((Hero *)gHeroState)->f[0x1458 / 4], ((Hero *)gHeroState)->f[0x98 / 4]);
         }
         ((Pose *)D_L00_0025BE10)->f[0x68 / 4] = yaw;
         ((Pose *)D_L00_0025BE10)->f[0x118 / 4] = -yaw;
         return;
     }
-    mode = ((Hero *)D_00189E20)->i[0x2294 / 4];
+    mode = ((Hero *)gHeroState)->i[0x2294 / 4];
     if (mode == 2) {
-        func_L00_002AB0A8(0.04f, 0.2f);
-        func_L00_002AB0C0(0.04f, 0.2f);
-        func_L00_002AB0D8(0.04f, 0.2f);
-        func_L00_002AB0F0(0.02f, 0.2f);
-        if (((Hero *)D_00189E20)->i[0x2298 / 4] == 1) {
-            x = ((Hero *)D_00189E20)->f[0x1A4 / 4] * 17.0f;
+        SetCameraLimitsSlot0(0.04f, 0.2f);
+        SetCameraLimitsSlot1(0.04f, 0.2f);
+        SetCameraLimitsSlot2(0.04f, 0.2f);
+        SetCameraLimitsSlot3(0.02f, 0.2f);
+        if (((Hero *)gHeroState)->i[0x2298 / 4] == 1) {
+            x = ((Hero *)gHeroState)->f[0x1A4 / 4] * 17.0f;
             if (x > 1.4f) x = 1.4f;
             else if (x < -1.4f) x = -1.4f;
-            if (func_00282C48(((Hero *)D_00189E20)->f[0x1A8 / 4]) * 3.0f < x) x = func_00282C48(((Hero *)D_00189E20)->f[0x1A8 / 4]) * 3.0f;
-            else if (x < -func_00282C48(((Hero *)D_00189E20)->f[0x1A8 / 4]) * 3.0f) x = -func_00282C48(((Hero *)D_00189E20)->f[0x1A8 / 4]) * 3.0f;
-            if (((Hero *)D_00189E20)->b[0x40F] != 0) {
+            if (FloatAbs(((Hero *)gHeroState)->f[0x1A8 / 4]) * 3.0f < x) x = FloatAbs(((Hero *)gHeroState)->f[0x1A8 / 4]) * 3.0f;
+            else if (x < -FloatAbs(((Hero *)gHeroState)->f[0x1A8 / 4]) * 3.0f) x = -FloatAbs(((Hero *)gHeroState)->f[0x1A8 / 4]) * 3.0f;
+            if (((Hero *)gHeroState)->b[0x40F] != 0) {
                 if (x > 1.1f) x = 1.1f;
                 else if (x < -1.1f) x = -1.1f;
-                func_L00_002AB0C0(0.055f, 0.3f);
-                func_L00_002AB0F0(0.07f, 0.3f);
-                if (func_00282C48(((Hero *)D_00189E20)->f[0x1A8 / 4]) < x) x = func_00282C48(((Hero *)D_00189E20)->f[0x1A8 / 4]);
-                else if (x < -func_00282C48(((Hero *)D_00189E20)->f[0x1A8 / 4])) x = -func_00282C48(((Hero *)D_00189E20)->f[0x1A8 / 4]);
+                SetCameraLimitsSlot1(0.055f, 0.3f);
+                SetCameraLimitsSlot3(0.07f, 0.3f);
+                if (FloatAbs(((Hero *)gHeroState)->f[0x1A8 / 4]) < x) x = FloatAbs(((Hero *)gHeroState)->f[0x1A8 / 4]);
+                else if (x < -FloatAbs(((Hero *)gHeroState)->f[0x1A8 / 4])) x = -FloatAbs(((Hero *)gHeroState)->f[0x1A8 / 4]);
             }
             nx = -x;
             ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = nx * 0.11f;
-            if (((Hero *)D_00189E20)->b[0x40F] != 0) ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = ((Pose *)D_L00_0025BE10)->f[0x60 / 4] * 0.25f;
-            s = ((Hero *)D_00189E20)->f[0x174 / 4] * 10.526316f;
+            if (((Hero *)gHeroState)->b[0x40F] != 0) ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = ((Pose *)D_L00_0025BE10)->f[0x60 / 4] * 0.25f;
+            s = ((Hero *)gHeroState)->f[0x174 / 4] * 10.526316f;
             if (s > 1.0f) s = 1.0f;
             if (s < 0.0f) s = 0.0f;
             ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = ((Pose *)D_L00_0025BE10)->f[0x60 / 4] * s;
             ((Pose *)D_L00_0025BE10)->f[0x118 / 4] = x * 0.31f;
-            if (((Hero *)D_00189E20)->b[0x40F] != 0) ((Pose *)D_L00_0025BE10)->f[0x118 / 4] = 0.0f;
+            if (((Hero *)gHeroState)->b[0x40F] != 0) ((Pose *)D_L00_0025BE10)->f[0x118 / 4] = 0.0f;
             ((Pose *)D_L00_0025BE10)->f[0x1C0 / 4] = x * -0.15f;
             ((Pose *)D_L00_0025BE10)->f[0x278 / 4] = x * 0.7f;
-            ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = func_00282C48(x) * -0.15f;
-            ((Pose *)D_L00_0025BE10)->f[0x270 / 4] = func_00282C48(x) * 0.16f;
+            ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = FloatAbs(x) * -0.15f;
+            ((Pose *)D_L00_0025BE10)->f[0x270 / 4] = FloatAbs(x) * 0.16f;
             ((Pose *)D_L00_0025BE10)->f[0x958 / 4] = nx * 0.35f;
             ((Pose *)D_L00_0025BE10)->f[0xB68 / 4] = ((Pose *)D_L00_0025BE10)->f[0xAB8 / 4] = ((Pose *)D_L00_0025BE10)->f[0xA08 / 4] = nx * 0.3f;
-            ((Pose *)D_L00_0025BE10)->f[0x954 / 4] = func_00282C48(x) * 0.35f;
-            ((Pose *)D_L00_0025BE10)->f[0xA04 / 4] = func_00282C48(x) * 0.2f;
+            ((Pose *)D_L00_0025BE10)->f[0x954 / 4] = FloatAbs(x) * 0.35f;
+            ((Pose *)D_L00_0025BE10)->f[0xA04 / 4] = FloatAbs(x) * 0.2f;
         } else {
-            float v = ((Hero *)D_00189E20)->f[0x1A8 / 4];
+            float v = ((Hero *)gHeroState)->f[0x1A8 / 4];
             float y, ny, d, e;
-            if (((Hero *)D_00189E20)->f[0x24B8 / 4] < 0.8f && ((Hero *)D_00189E20)->i[0x1B8 / 4] < 40) {
-                func_002AA2E8(&v, 0.0f, (float)(40 - ((Hero *)D_00189E20)->i[0x1B8 / 4]) * 0.087266475f);
+            if (((Hero *)gHeroState)->f[0x24B8 / 4] < 0.8f && ((Hero *)gHeroState)->i[0x1B8 / 4] < 40) {
+                ApproachValue(&v, 0.0f, (float)(40 - ((Hero *)gHeroState)->i[0x1B8 / 4]) * 0.087266475f);
             }
             y = v * 0.5f;
             if (y > 0.8f) y = 0.8f;
             else if (y < -0.8f) y = -0.8f;
-            y = y * func_00282C48(y) * 1.25f;
+            y = y * FloatAbs(y) * 1.25f;
             ((Pose *)D_L00_0025BE10)->f[0x118 / 4] = y;
             ((Pose *)D_L00_0025BE10)->f[0x278 / 4] = y;
-            d = func_00282C48(y);
+            d = FloatAbs(y);
             ny = -y;
             ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = d * 0.25f;
             ((Pose *)D_L00_0025BE10)->f[0x958 / 4] = ny * 0.35f;
             ((Pose *)D_L00_0025BE10)->f[0xB68 / 4] = ((Pose *)D_L00_0025BE10)->f[0xAB8 / 4] = ((Pose *)D_L00_0025BE10)->f[0xA08 / 4] = ny * 0.3f;
         }
     } else if (mode == 8) {
-        func_L00_002AB0A8(0.008f, 0.08f);
-        func_L00_002AB0C0(0.015f, 0.08f);
-        func_L00_002AB0D8(0.015f, 0.08f);
-        func_L00_002AB0F0(0.008f, 0.1f);
-        x8 = ((Hero *)D_00189E20)->f[0x1A8 / 4] * 1.6f;
+        SetCameraLimitsSlot0(0.008f, 0.08f);
+        SetCameraLimitsSlot1(0.015f, 0.08f);
+        SetCameraLimitsSlot2(0.015f, 0.08f);
+        SetCameraLimitsSlot3(0.008f, 0.1f);
+        x8 = ((Hero *)gHeroState)->f[0x1A8 / 4] * 1.6f;
         if (x8 > 1.25f) x8 = 1.25f;
         else if (x8 < -1.25f) x8 = -1.25f;
         ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = -x8 * 0.52f;
@@ -126,18 +126,18 @@ void func_L00_002B7B80(void)
         ((Pose *)D_L00_0025BE10)->f[0x1C0 / 4] = x8 * -0.28f;
         if (((Pose *)D_L00_0025BE10)->f[0x278 / 4] > 0.6f) ((Pose *)D_L00_0025BE10)->f[0x278 / 4] = 0.6f;
         else if (((Pose *)D_L00_0025BE10)->f[0x278 / 4] < -0.6f) ((Pose *)D_L00_0025BE10)->f[0x278 / 4] = -0.6f;
-        ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = func_00282C48(x8) * 0.2f;
+        ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = FloatAbs(x8) * 0.2f;
         if (((Pose *)D_L00_0025BE10)->f[0x274 / 4] > 0.2f) ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = 0.2f;
         else if (((Pose *)D_L00_0025BE10)->f[0x274 / 4] < -0.2f) ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = -0.2f;
-        ((Pose *)D_L00_0025BE10)->f[0x270 / 4] = func_00282C48(x8) * 0.16f;
+        ((Pose *)D_L00_0025BE10)->f[0x270 / 4] = FloatAbs(x8) * 0.16f;
         ((Pose *)D_L00_0025BE10)->f[0x958 / 4] = -x8 * 0.35f;
         ((Pose *)D_L00_0025BE10)->f[0xB68 / 4] = ((Pose *)D_L00_0025BE10)->f[0xAB8 / 4] = ((Pose *)D_L00_0025BE10)->f[0xA08 / 4] = -x8 * 0.3f;
     } else if (mode == 0x82) {
-        func_L00_002AB0A8(0.017f, 0.33f);
-        func_L00_002AB0C0(0.015f, 0.25f);
-        func_L00_002AB0D8(0.015f, 0.25f);
-        func_L00_002AB0F0(0.008f, 0.25f);
-        x82 = ((Hero *)D_00189E20)->f[0x1A8 / 4] * 0.7f;
+        SetCameraLimitsSlot0(0.017f, 0.33f);
+        SetCameraLimitsSlot1(0.015f, 0.25f);
+        SetCameraLimitsSlot2(0.015f, 0.25f);
+        SetCameraLimitsSlot3(0.008f, 0.25f);
+        x82 = ((Hero *)gHeroState)->f[0x1A8 / 4] * 0.7f;
         if (x82 > 1.2f) x82 = 1.2f;
         else if (x82 < -1.2f) x82 = -1.2f;
         ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = -x82 * 0.52f;
@@ -148,13 +148,13 @@ void func_L00_002B7B80(void)
         ((Pose *)D_L00_0025BE10)->f[0x1C0 / 4] = x82 * -0.28f;
         if (((Pose *)D_L00_0025BE10)->f[0x278 / 4] > 0.6f) ((Pose *)D_L00_0025BE10)->f[0x278 / 4] = 0.6f;
         else if (((Pose *)D_L00_0025BE10)->f[0x278 / 4] < -0.6f) ((Pose *)D_L00_0025BE10)->f[0x278 / 4] = -0.6f;
-        ((Pose *)D_L00_0025BE10)->f[0x270 / 4] = func_00282C48(x82) * 0.16f;
-        ((Pose *)D_L00_0025BE10)->f[0x64 / 4] = func_00283B98(((Pose *)D_L00_0025BE10)->f[0x64 / 4], -0.122173056f);
-        if (((Hero *)D_00189E20)->f[0x24B8 / 4] > 0.1f) {
-            ang = func_00283BE0(((Hero *)D_00189E20)->f[0x1A0 / 4], ((Hero *)D_00189E20)->f[0x98 / 4]);
-            mag = ((Hero *)D_00189E20)->f[0x24B8 / 4] * 0.6108653f;
-            ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = -func_00283198(ang) * mag;
-            ((Pose *)D_L00_0025BE10)->f[0x64 / 4] = func_00283B98(((Pose *)D_L00_0025BE10)->f[0x64 / 4], func_00283180(ang) * mag);
+        ((Pose *)D_L00_0025BE10)->f[0x270 / 4] = FloatAbs(x82) * 0.16f;
+        ((Pose *)D_L00_0025BE10)->f[0x64 / 4] = FastAddRotations(((Pose *)D_L00_0025BE10)->f[0x64 / 4], -0.122173056f);
+        if (((Hero *)gHeroState)->f[0x24B8 / 4] > 0.1f) {
+            ang = fast_subtract_rotations(((Hero *)gHeroState)->f[0x1A0 / 4], ((Hero *)gHeroState)->f[0x98 / 4]);
+            mag = ((Hero *)gHeroState)->f[0x24B8 / 4] * 0.6108653f;
+            ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = -FastSinOrCosB(ang) * mag;
+            ((Pose *)D_L00_0025BE10)->f[0x64 / 4] = FastAddRotations(((Pose *)D_L00_0025BE10)->f[0x64 / 4], FastSinOrCosA(ang) * mag);
             if (((Pose *)D_L00_0025BE10)->f[0x60 / 4] > 0.47123894f) ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = 0.47123894f;
             else if (((Pose *)D_L00_0025BE10)->f[0x60 / 4] < -0.47123894f) ((Pose *)D_L00_0025BE10)->f[0x60 / 4] = -0.47123894f;
             if (((Pose *)D_L00_0025BE10)->f[0x64 / 4] > 0.47123894f) ((Pose *)D_L00_0025BE10)->f[0x64 / 4] = 0.47123894f;
@@ -164,13 +164,13 @@ void func_L00_002B7B80(void)
         ((Pose *)D_L00_0025BE10)->f[0x6D8 / 4] = ((Pose *)D_L00_0025BE10)->f[0x628 / 4] = 0.37f;
         left = 1;
         right = 1;
-        if (((Hero *)D_00189E20)->b[0x22BB] == 1) {
+        if (((Hero *)gHeroState)->b[0x22BB] == 1) {
             right = 0;
-        } else if (((Hero *)D_00189E20)->b[0x22BB] == 2) {
+        } else if (((Hero *)gHeroState)->b[0x22BB] == 2) {
             left = 0;
             right = 0;
         }
-        a = func_00283B98(((Hero *)D_00189E20)->f[0x118 / 4] * 5.0f, 0.296706f);
+        a = FastAddRotations(((Hero *)gHeroState)->f[0x118 / 4] * 5.0f, 0.296706f);
         if (left) {
             ((Pose *)D_L00_0025BE10)->f[0x5E8 / 4] = -0.3490659f;
             ((Pose *)D_L00_0025BE10)->f[0x5E0 / 4] = -a;
@@ -183,17 +183,17 @@ void func_L00_002B7B80(void)
             if (((Pose *)D_L00_0025BE10)->f[0x690 / 4] > 0.6108653f) ((Pose *)D_L00_0025BE10)->f[0x690 / 4] = 0.6108653f;
             else if (((Pose *)D_L00_0025BE10)->f[0x690 / 4] < -0.6108653f) ((Pose *)D_L00_0025BE10)->f[0x690 / 4] = -0.6108653f;
         }
-        ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = -((Hero *)D_00189E20)->f[0x118 / 4] * 7.7f;
+        ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = -((Hero *)gHeroState)->f[0x118 / 4] * 7.7f;
         if (((Pose *)D_L00_0025BE10)->f[0x274 / 4] > 0.64577186f) ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = 0.64577186f;
         else if (((Pose *)D_L00_0025BE10)->f[0x274 / 4] < -0.64577186f) ((Pose *)D_L00_0025BE10)->f[0x274 / 4] = -0.64577186f;
         ((Pose *)D_L00_0025BE10)->f[0x958 / 4] = -x82 * 0.35f;
         ((Pose *)D_L00_0025BE10)->f[0xB68 / 4] = ((Pose *)D_L00_0025BE10)->f[0xAB8 / 4] = ((Pose *)D_L00_0025BE10)->f[0xA08 / 4] = -x82 * 0.3f;
-    } else if (((Hero *)D_00189E20)->i[0x229C / 4] == 2 || ((Hero *)D_00189E20)->i[0x229C / 4] == 4) {
-        func_L00_002AB0A8(0.04f, 0.2f);
-        func_L00_002AB0C0(0.04f, 0.2f);
-        func_L00_002AB0D8(0.04f, 0.2f);
-        func_L00_002AB0F0(0.02f, 0.2f);
-        xs = ((Hero *)D_00189E20)->f[0x1A8 / 4];
+    } else if (((Hero *)gHeroState)->i[0x229C / 4] == 2 || ((Hero *)gHeroState)->i[0x229C / 4] == 4) {
+        SetCameraLimitsSlot0(0.04f, 0.2f);
+        SetCameraLimitsSlot1(0.04f, 0.2f);
+        SetCameraLimitsSlot2(0.04f, 0.2f);
+        SetCameraLimitsSlot3(0.02f, 0.2f);
+        xs = ((Hero *)gHeroState)->f[0x1A8 / 4];
         if (xs > 1.4f) xs = 1.4f;
         else if (xs < -1.4f) xs = -1.4f;
         ((Pose *)D_L00_0025BE10)->f[0x118 / 4] = xs * 0.29f;
@@ -221,30 +221,30 @@ void func_L00_002B8F00(V_c *v, M_c *m, void *p, float a, float b, float c) {
     float d, pitch, yaw, roll;
     t = 0.0f;
     {
-        QM_c *d = (QM_c *)m, *s = (QM_c *)(D_00189E20);
+        QM_c *d = (QM_c *)m, *s = (QM_c *)(gHeroState);
         d->q[0] = s->q[0];
         d->q[1] = s->q[1];
         d->q[2] = s->q[2];
         d->q[3] = s->q[3];
     }
-    d = func_00282DB0(v, &m->r[2]);
-    pitch = func_00283248(d, func_00282C10(1.0f - d * d));
-    func_00282DD8(&x, v, &m->r[2]);
+    d = FastVecDot(v, &m->r[2]);
+    pitch = FastMatrixHelperA(d, square_root(1.0f - d * d));
+    FastVecCross(&x, v, &m->r[2]);
     if (x.f[2] < 0.99f) {
-        roll = func_00283248(x.f[0], x.f[1]);
+        roll = FastMatrixHelperA(x.f[0], x.f[1]);
         r.f[0] = 0.0f;
         r.f[1] = 0.0f;
         r.f[2] = -roll;
-        func_00283430(&m1, &r);
-        func_00283788(m, &m1, m);
-        func_002830C0(&x, &x, &m1);
-        yaw = func_00283248(x.f[2], x.f[0]);
+        FastMatrixHelperB(&m1, &r);
+        multiply_matrix(m, &m1, m);
+        transform_vector(&x, &x, &m1);
+        yaw = FastMatrixHelperA(x.f[2], x.f[0]);
         r.f[0] = 0.0f;
         r.f[2] = 0.0f;
         r.f[1] = -yaw;
-        func_00283430(&m0, &r);
-        func_00283788(m, &m0, m);
-        func_002830C0(&x, &x, &m0);
+        FastMatrixHelperB(&m0, &r);
+        multiply_matrix(m, &m0, m);
+        transform_vector(&x, &x, &m0);
     } else {
         roll = 0.0f;
         yaw = roll;
@@ -253,21 +253,21 @@ void func_L00_002B8F00(V_c *v, M_c *m, void *p, float a, float b, float c) {
         r.f[2] = pitch;
         r.f[0] = 0.0f;
     } else {
-        func_002AA898(&t, pitch, (float *)(D_00189E20 + 0xA4), a, b, c, 0);
+        ApproachWithVelocity(&t, pitch, (float *)(gHeroState + 0xA4), a, b, c, 0);
         r.f[0] = 0.0f;
         r.f[2] = t;
     }
     r.f[1] = 0.0f;
-    func_00283430(&m1, &r);
-    func_00283788(m, &m1, m);
+    FastMatrixHelperB(&m1, &r);
+    multiply_matrix(m, &m1, m);
     r.f[1] = yaw;
     r.f[2] = 0.0f;
-    func_00283430(&m0, &r);
-    func_00283788(m, &m0, m);
+    FastMatrixHelperB(&m0, &r);
+    multiply_matrix(m, &m0, m);
     r.f[2] = roll;
     r.f[1] = 0.0f;
-    func_00283430(&m1, &r);
-    func_00283788(m, &m1, m);
-    if (p) func_002AB6D8(m, p);
-    else func_002AB6D8(m, D_00189E20 + 0x90);
+    FastMatrixHelperB(&m1, &r);
+    multiply_matrix(m, &m1, m);
+    if (p) GetEulerAnglesFromMatrix(m, p);
+    else GetEulerAnglesFromMatrix(m, gHeroState + 0x90);
 }

@@ -30,14 +30,15 @@ extern void ref_L07_003F8BB0_01(s8 *, s32, TI *);
 extern void ref_L07_003F8BB0_02(s8 *, TI *);
 extern void ref_L07_003F8BB0_03(s8 *, s32, TI *, TI *, f32);
 
-void func_L07_003F8BB0(s8 *arg0) {
-    TI loc;
-    TI sp10;
-    s8 *s2;
+/* Looks up a joint position and direction on the object and passes them, with the target and a power value, to an effect routine. */
+void func_L07_003F8BB0(s8 *moby) {
+    TI jointPos;
+    TI jointDir;
+    s8 *vars;
 
-    s2 = *(s8 **)(arg0 + 0x68);
-    ref_L07_003F8BB0_00(3, 0, arg0);
-    ref_L07_003F8BB0_01(arg0, 0, &loc);
-    ref_L07_003F8BB0_02(arg0, &sp10);
-    ref_L07_003F8BB0_03(arg0, *(s32 *)(s2 + 0x418), &loc, &sp10, (f32)*(u8 *)(s2 + 0x35));
+    vars = *(s8 **)(moby + 0x68);
+    ref_L07_003F8BB0_00(3, 0, moby);
+    ref_L07_003F8BB0_01(moby, 0, &jointPos);
+    ref_L07_003F8BB0_02(moby, &jointDir);
+    ref_L07_003F8BB0_03(moby, *(s32 *)(vars + 0x418), &jointPos, &jointDir, (f32)*(u8 *)(vars + 0x35));
 }

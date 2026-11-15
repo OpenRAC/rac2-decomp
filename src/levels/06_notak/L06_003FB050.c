@@ -41,78 +41,78 @@ void func_L06_003FB050(char *moby)
     case 1:
     handle = *(int *)(state + 0xB0);
     if (handle != -1) {
-        char *sound = D_00188660 + handle * 0x70;
+        char *sound = gSoundState + handle * 0x70;
         if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74))
-            func_002E59F8(handle);
+            StopSoundVoice(handle);
     }
     *(int *)(state + 0xB0) = -1;
-    if (func_L00_00324120(moby)) {
+    if (IsCurrentSelectedId(moby)) {
         if (*(float *)(moby + 0x18) == *(float *)(state + 0x98))
-            func_002A7750(moby, 2, -1);
+            SetMobyState(moby, 2, -1);
         else
-            func_002A7750(moby, 3, -1);
+            SetMobyState(moby, 3, -1);
     }
-    if (*(float *)(moby + 0x18) - D_00189E20.position[2] > 3.0f &&
+    if (*(float *)(moby + 0x18) - gHeroState.position[2] > 3.0f &&
         *(float *)(moby + 0x18) == *(float *)(state + 0x98))
-        func_002A7750(moby, 2, -1);
-    else if (*(float *)(moby + 0x18) - D_00189E20.position[2] < -3.0f &&
+        SetMobyState(moby, 2, -1);
+    else if (*(float *)(moby + 0x18) - gHeroState.position[2] < -3.0f &&
              *(float *)(moby + 0x18) == *(float *)(state + 0x88))
-        func_002A7750(moby, 3, -1);
+        SetMobyState(moby, 3, -1);
     goto done;
     case 2:
     if (*(float *)(moby + 0x18) <= *(float *)(state + 0x88)) {
     handle = *(int *)(state + 0xB0);
     if (handle != -1) {
-        char *sound = D_00188660 + handle * 0x70;
+        char *sound = gSoundState + handle * 0x70;
         if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74))
-            func_002E59F8(handle);
+            StopSoundVoice(handle);
     }
     *(int *)(state + 0xB0) = -1;
-        if (!func_L00_00324120(moby))
+        if (!IsCurrentSelectedId(moby))
             *(unsigned char *)(moby + 0x20) = 1;
         goto done;
     }
-    if (func_00277258(moby + 0x10, 1, moby, 2.1f) &&
-        !(*(float *)(moby + 0x18) <= D_00189E20.position[2]) &&
-        (!D_L06_001BFC98 || *(short *)(D_L06_001BFC98 + 0xAA) != 0xEA3))
+    if (TestPointAgainstCollision(moby + 0x10, 1, moby, 2.1f) &&
+        !(*(float *)(moby + 0x18) <= gHeroState.position[2]) &&
+        (!D_L06_001BFC98 || *(short *)(D_L06_001BFC98 + 0xAA) != 0xEA3 /* moby class 3747 */))
         goto stop;
     {
-        char *sound = D_00188660 + *(int *)(state + 0xB0) * 0x70;
+        char *sound = gSoundState + *(int *)(state + 0xB0) * 0x70;
     if (*(char **)(sound + 0x88) != moby || !*(unsigned char *)(sound + 0x74))
-        *(int *)(state + 0xB0) = func_002E5CF8(0, 4, moby);
+        *(int *)(state + 0xB0) = PlayMobySound(0, 4, moby);
     }
-    func_002AA548(moby + 0x18, state + 0x64, *(float *)(state + 0x88),
+    StepValueTowardTarget(moby + 0x18, state + 0x64, *(float *)(state + 0x88),
                   0.001944444492f, 0.001666666707f, 0.1000000089f);
     goto done;
     case 3:
-    func_002AA548(moby + 0x18, state + 0x64, *(float *)(state + 0x98),
+    StepValueTowardTarget(moby + 0x18, state + 0x64, *(float *)(state + 0x98),
                   0.001944444492f, 0.001666666707f, 0.1000000089f);
     if (*(float *)(moby + 0x18) >= *(float *)(state + 0x98)) {
     handle = *(int *)(state + 0xB0);
     if (handle != -1) {
-        char *sound = D_00188660 + handle * 0x70;
+        char *sound = gSoundState + handle * 0x70;
         if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74))
-            func_002E59F8(handle);
+            StopSoundVoice(handle);
     }
     *(int *)(state + 0xB0) = -1;
-        if (!func_L00_00324120(moby)) {
+        if (!IsCurrentSelectedId(moby)) {
             *(int *)(state + 0x60) = *(int *)(state + 0x74);
             (*(int *)(state + 0x78))--;
             *(unsigned char *)(moby + 0x20) = 1;
         }
     } else {
-        char *sound = D_00188660 + *(int *)(state + 0xB0) * 0x70;
+        char *sound = gSoundState + *(int *)(state + 0xB0) * 0x70;
         if (*(char **)(sound + 0x88) != moby || !*(unsigned char *)(sound + 0x74))
-            *(int *)(state + 0xB0) = func_002E5CF8(0, 4, moby);
+            *(int *)(state + 0xB0) = PlayMobySound(0, 4, moby);
     }
     goto done;
 stop:
     case 4:
     handle = *(int *)(state + 0xB0);
     if (handle != -1) {
-        char *sound = D_00188660 + handle * 0x70;
+        char *sound = gSoundState + handle * 0x70;
         if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74))
-            func_002E59F8(handle);
+            StopSoundVoice(handle);
     }
     *(int *)(state + 0xB0) = -1;
     }
@@ -128,6 +128,6 @@ done:
         int mid = (brightness << 16) | hi;
         *(int *)(moby + 0x78) = mid | brightness;
     }
-    func_00282CF0(delta, moby + 0x10, oldPosition);
-    func_002AD6F0(state + 0x20, delta, oldRotation, moby + 0xF0);
+    FastVecSub(delta, moby + 0x10, oldPosition);
+    CombineTransformsAndStore(state + 0x20, delta, oldRotation, moby + 0xF0);
 }

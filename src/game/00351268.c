@@ -1,3 +1,4 @@
+#include "names.h"
 
 
 typedef int s32;
@@ -16,10 +17,11 @@ extern s32 func_0011AC40(s32 a0);
 
 extern int func_00351268(unsigned char *owner);
 
-s32 func_00351268(u8 *a0) {
-    s32 x;
-    func_0011AC60(*(s32 *)(a0 + 0x40));
-    x = (*(s32 *)(a0 + 0x10) << 11) + *(s32 *)(a0 + 0x14);
-    func_0011AC40(*(s32 *)(a0 + 0x40));
-    return x;
+/* Returns how many bytes are waiting in the video buffer. */
+s32 func_00351268(u8 *buf) {
+    s32 bytes;
+    WaitSema(*(s32 *)(buf + 0x40));
+    bytes = (*(s32 *)(buf + 0x10) << 11) + *(s32 *)(buf + 0x14);
+    SignalSema(*(s32 *)(buf + 0x40));
+    return bytes;
 }

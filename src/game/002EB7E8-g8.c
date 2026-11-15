@@ -30,45 +30,46 @@ extern int func_002EB158(int), func_001261F0(int);
    around the two calls leaves loop notes in the block, which the
    scheduler treats as a barrier: the scene address is then computed
    ahead of the -3, as in retail (compare func_00124818). */
+/* Starts a scripted scene: clears its buffers, loads the first data and waits for the stream to be ready. */
 void func_002EB7E8(unsigned int id) {
  int index, count, dest, start;
 
 
  if (id < 0xB1) *(unsigned int *)((id >> 2) * 4 + (int)D_00139768) |= 1 << (id & 31);
- index = func_002EF010(id);
+ index = MapCutsceneIdToIndex(id);
  if (index < 0) return;
- func_00282A60(D_0018B020,0,0x230);
- func_00282A60(&D_001B8840,0,0x1D0);
- func_00282A60(D_001B1450,0,0x40);
- func_00282A60(D_001B1390,0,0x40);
- func_00282A60(D_001B2980,0,0x40);
- func_00282A60(D_001B2980+0x40,0,0x40);
- func_00282A60(D_001B13D0,0,0x40);
- func_00282A60(D_001B1410,0,0x40);
+ ClearMemory(D_0018B020,0,0x230);
+ ClearMemory(&gScenePlaybackState,0,0x1D0);
+ ClearMemory(D_001B1450,0,0x40);
+ ClearMemory(D_001B1390,0,0x40);
+ ClearMemory(D_001B2980,0,0x40);
+ ClearMemory(D_001B2980+0x40,0,0x40);
+ ClearMemory(D_001B13D0,0,0x40);
+ ClearMemory(D_001B1410,0,0x40);
  start=D_001BAEC0.arena - 0x80000;
  dest=D_001BAEC0.arena - 0x100000;
  D_001A8C74=1.0f;
  D_001A8C78=0.0f;
- D_001B8840.frame=0;
- D_001B8840.chunk=0;
- D_001B8840.selected=index;
- D_001B8840.start=start;
- D_001B8840.dest=dest;
- D_001B15A0=1.0f;
- D_001A8BB0=2;
+ gScenePlaybackState.frame=0;
+ gScenePlaybackState.chunk=0;
+ gScenePlaybackState.selected=index;
+ gScenePlaybackState.start=start;
+ gScenePlaybackState.dest=dest;
+ gScreenFade=1.0f;
+ gCurrentGameMode=2;
  D_001B15A8=1;
  D_001B15AC=0x34;
  D_001B15A4=0;
  if(D_001A63A8_3.mode) {
-  func_0027D330(6); func_002B7CE0(1); func_002EB158(0);
- } else { func_002EB158(0); func_0027D330(6); }
- if(D_001A63A8_3.mode) func_002B7CE0(1);
- func_002EB598(); func_002ED058();
+  FadeToBlack(6); PumpMusicAndDiscRead(1); LoadSceneChunkData(0);
+ } else { LoadSceneChunkData(0); FadeToBlack(6); }
+ if(D_001A63A8_3.mode) PumpMusicAndDiscRead(1);
+ SpawnModelPartMobys(); SelectLevelDataBank();
  D_001A63A8_3.count=0;
- D_001A63A8_3.destination=D_001B8840.selected+4000;
- while(!(D_001A63A8_3.state==3 && D_001A63A8_3.progress<6000)) { func_002E4AC8(); func_001261F0(0); }
- D_001B8840.wait=-3;
+ D_001A63A8_3.destination=gScenePlaybackState.selected+4000;
+ while(!(D_001A63A8_3.state==3 && D_001A63A8_3.progress<6000)) { UpdateSoundVoices(); GetGsCurrentField(0); }
+ gScenePlaybackState.wait=-3;
  count=0;
- do { func_002B6D28(); func_002EB158(1); } while (0);
- while(D_001B8840.wait<count) { func_001261F0(0); count--; }
+ do { ResumeMusicStream(); LoadSceneChunkData(1); } while (0);
+ while(gScenePlaybackState.wait<count) { GetGsCurrentField(0); count--; }
 }

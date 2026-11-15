@@ -26,6 +26,7 @@ extern void func_0027C768(s32, float *, float *);
 
 /* Draws a quad facing DIRECTION at POSITION, then redraws it textured, with the caller's four
    UV pairs or, without them, the projected corners pushed apart by SPREAD; UVs clamp to [0, 1]. */
+/* Draws a flat shiny quad facing a direction, first plain and then textured, for a lens flare. */
 void func_L18_00307C60(LensVector *position, LensVector *direction, s32 opacity, float **customUV,
                        float size, float spread, float distance)
 {
@@ -35,17 +36,17 @@ void func_L18_00307C60(LensVector *position, LensVector *direction, s32 opacity,
 
     basis[3].bits = position->bits;
     basis[0].bits = direction->bits;
-    func_00282DD8(&basis[1], &basis[0], D_0018A0E0);
-    func_00282F20(&basis[1], &basis[1], 1.0f);
-    func_00282DD8(&basis[2], &basis[1], &basis[0]);
-    func_00282D30(&offset, &basis[0], distance);
-    func_00282CC0(&basis[3], &basis[3], &offset);
+    FastVecCross(&basis[1], &basis[0], D_0018A0E0);
+    vec_scale_to_length(&basis[1], &basis[1], 1.0f);
+    FastVecCross(&basis[2], &basis[1], &basis[0]);
+    FastVecScale(&offset, &basis[0], distance);
+    FastVecAdd(&basis[3], &basis[3], &offset);
     for (i = 3; i >= 0; i--) {
         int index = 3 - i;
-        func_00282D30(&packet.vertex[index], D_L18_001AA250[index], size);
-        func_002830C0(&packet.vertex[index], &packet.vertex[index], basis);
+        FastVecScale(&packet.vertex[index], D_L18_001AA250[index], size);
+        transform_vector(&packet.vertex[index], &packet.vertex[index], basis);
     }
-    func_00281DE8(&packet, 60, 5, 128);
+    InitQuadPacketState(&packet, 60, 5, 128);
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] =
         ((u32)opacity << 24) | 0x808080;
     packet.uv[0].u = 0.0f;
@@ -56,9 +57,9 @@ void func_L18_00307C60(LensVector *position, LensVector *direction, s32 opacity,
     packet.uv[2].v = 0.0f;
     packet.uv[3].u = 1.0f;
     packet.uv[3].v = 1.0f;
-    func_00280B90(&packet, 0, 0);
-    func_00281DE8(&packet, -1, 6, 128);
-    func_00282D30(&offset, &basis[0], distance + 0.01f);
+    draw_world_quad(&packet, 0, 0);
+    InitQuadPacketState(&packet, -1, 6, 128);
+    FastVecScale(&offset, &basis[0], distance + 0.01f);
     if (customUV) {
         for (i = 3; i >= 0; i--) {
             int index = 3 - i;
@@ -75,7 +76,7 @@ void func_L18_00307C60(LensVector *position, LensVector *direction, s32 opacity,
         }
     } else {
         for (i = 0; i < 4; i++) {
-            func_0027C768((s32)&packet.vertex[i], &packet.uv[i].u, &packet.uv[i].v);
+            ProjectWorldToScreen((s32)&packet.vertex[i], &packet.uv[i].u, &packet.uv[i].v);
             if (i >> 1)
                 packet.uv[i].u -= spread;
             else
@@ -96,5 +97,5 @@ void func_L18_00307C60(LensVector *position, LensVector *direction, s32 opacity,
                 packet.uv[i].v = 0.0f;
         }
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
 }

@@ -15,45 +15,46 @@ extern unsigned int D_00139768[];
 
 extern unsigned char D_001A7A0A;
 
+/* Marks each movie in the list as available if the player has seen it, or all of them when everything is unlocked. */
 int func_002D0F00(void)
 {
-    unsigned int *mask;
-    unsigned char flag;
-    char *table;
-    char *end;
-    int clr;
-    char *src;
-    char *dst;
-    int off;
+    unsigned int *seenMask;
+    unsigned char allUnlocked;
+    char *entryTable;
+    char *tableEnd;
+    int clearBase;
+    char *idPtr;
+    char *enabledPtr;
+    int clearOffset;
     int one;
 
     if (D_001A8CFC == 0)
         goto done;
     D_001F2848[0] = 1;
-    table = (char *)D_0026185A;
-    mask = D_00139768;
-    flag = D_001A7A0A;
-    clr = (int)table + 2;
+    entryTable = (char *)D_0026185A;
+    seenMask = D_00139768;
+    allUnlocked = D_001A7A0A;
+    clearBase = (int)entryTable + 2;
     one = 1;
-    dst = table + 8;
-    src = table + 6;
-    end = table + 0xC6;
-    off = 6;
+    enabledPtr = entryTable + 8;
+    idPtr = entryTable + 6;
+    tableEnd = entryTable + 0xC6;
+    clearOffset = 6;
     do {
-        int v;
-        if (flag != 0) {
-            *(short *)dst = one;
+        int entryId;
+        if (allUnlocked != 0) {
+            *(short *)enabledPtr = one;
         } else {
-            v = *(short *)src;
-            if (mask[(unsigned int)v >> 2] & (one << (v & 31)))
-                *(short *)dst = one;
+            entryId = *(short *)idPtr;
+            if (seenMask[(unsigned int)entryId >> 2] & (one << (entryId & 31)))
+                *(short *)enabledPtr = one;
             else
-                *(short *)(off + clr) = 0;
+                *(short *)(clearOffset + clearBase) = 0;
         }
-        src += 6;
-        dst += 6;
-        off += 6;
-    } while ((int)src < (int)end);
+        idPtr += 6;
+        enabledPtr += 6;
+        clearOffset += 6;
+    } while ((int)idPtr < (int)tableEnd);
 done:
     return 0;
 }

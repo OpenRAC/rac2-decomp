@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_0031E560 in its own -g unit: the angle division carries the
    statement-boundary padding. */
@@ -38,13 +39,13 @@ void func_0031E560(char *object)
         e = (Ring_0031E560 *)(i * 0x30 + (int)D_001B2754[0]);
         if (e->owner != object)
             continue;
-        e->angle = 6.2831855f - func_00283CE0(e->step) * 6.2831855f / func_00283CE0(e->steps - 1);
-        func_00282F20(v, e, e->scale);
-        k = func_00283CE0(func_002A7820(0x30, 0x50));
-        n = func_00283CF0(func_00283180(e->angle - 3.1415927f) * (k * 0.5f) + k * 0.5f);
+        e->angle = 6.2831855f - IntToFloat(e->step) * 6.2831855f / IntToFloat(e->steps - 1);
+        vec_scale_to_length(v, e, e->scale);
+        k = IntToFloat(RandomIntRange(0x30, 0x50));
+        n = FloatToInt(FastSinOrCosA(e->angle - 3.1415927f) * (k * 0.5f) + k * 0.5f);
         vars = *(char **)(object + 0x68);
-        func_00282CC0(v, v, object + 0x10);
-        func_0031EC68(object + 0x10, v, 0x800000, n, 0x2F, 2, *(float *)(vars + 0x18) * 0.25f, 0.0f,
+        FastVecAdd(v, v, object + 0x10);
+        DrawTwoStripBeam(object + 0x10, v, 0x800000, n, 0x2F, 2, *(float *)(vars + 0x18) * 0.25f, 0.0f,
                       e->size);
     }
 }

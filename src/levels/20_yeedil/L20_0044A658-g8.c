@@ -19,47 +19,48 @@ extern float func_002AA2E8(float *, float, float);
 
 extern void func_L20_0044AB68(char *);
 
-void func_L20_0044A658(char *arg0) {
+/* Handles the turret's health and aim target: sets it up on the first frame, takes damage from hits, and blows up when its health reaches zero. */
+void func_L20_0044A658(char *moby) {
     char *state;
-    char *p;
-    u32 *q;
-    short t;
-    float f;
+    char *hit;
+    u32 *hitter;
+    short hitClass;
+    float damage;
 
-    state = *(char **)(arg0 + 0x68);
-    if (*(u8 *)(arg0 + 0x20) == 0) {
-        func_002A7750(arg0, 1, -1);
-        *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
-        *(int *)(arg0 + 0x98) = 0;
-        qcopy((state + 0x180), (arg0 + 0x10));
-        *(float *)(arg0 + 0x2C) =
-            *(float *)(*(u32 *)(arg0 + 0x24) + 0x24) * D_L20_001B2418;
+    state = *(char **)(moby + 0x68);
+    if (*(u8 *)(moby + 0x20) == 0) {
+        SetMobyState(moby, 1, -1);
+        *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
+        *(int *)(moby + 0x98) = 0;
+        qcopy((state + 0x180), (moby + 0x10));
+        *(float *)(moby + 0x2C) =
+            *(float *)(*(u32 *)(moby + 0x24) + 0x24) * D_L20_001B2418;
         *(int *)(state + 0x1B8) = -1;
     }
-    if (*(u8 *)(arg0 + 0x20) == 1) {
+    if (*(u8 *)(moby + 0x20) == 1) {
         return;
     }
-    p = func_002A9640(arg0, 0x10000, 0);
-    if (p != 0) {
-        q = *(u32 **)(p + 0x20);
-        if (q != 0) {
-            t = *(short *)((char *)q + 0xAA);
-            if (t == 0x12F2 || t == 0x12EF) {
-                p = 0;
+    hit = FindOwnedEffectSlot(moby, 0x10000, 0);
+    if (hit != 0) {
+        hitter = *(u32 **)(hit + 0x20);
+        if (hitter != 0) {
+            hitClass = *(short *)((char *)hitter + 0xAA);
+            if (hitClass == 0x12F2 /* moby class 4850 */ || hitClass == 0x12EF /* moby class 4847 */) {
+                hit = 0;
             }
         }
     }
-    f = func_002A96A0(arg0, p);
-    func_002AA2E8((float *)(state + 0x20), 0.0f, f);
-    *(u8 *)(arg0 + 0xA8) = 0xFF;
+    damage = UpdateAimTargetStrength(moby, hit);
+    ApproachValue((float *)(state + 0x20), 0.0f, damage);
+    *(u8 *)(moby + 0xA8) = 0xFF;
     if (*(float *)(state + 0x20) == 0.0f) {
-        func_L20_0044AB68(arg0);
-        *(u8 *)(arg0 + 0xA8) = 0xFF;
-        func_002A7750(arg0, 1, -1);
-        *(int *)(arg0 + 0x98) = 0;
-        *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
+        PlayTurretDeathBurst(moby);
+        *(u8 *)(moby + 0xA8) = 0xFF;
+        SetMobyState(moby, 1, -1);
+        *(int *)(moby + 0x98) = 0;
+        *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
     }
-    if (*(u8 *)(arg0 + 0x20) == 5) {
+    if (*(u8 *)(moby + 0x20) == 5) {
         return;
     }
     {
@@ -71,12 +72,12 @@ void func_L20_0044A658(char *arg0) {
         return;
     }
     }
-    func_002B3BA8(arg0, *(int *)(state + 0x160), 0, 0, 1024.0f, 37.0f);
+    SelectAimTarget_002B3BA8(moby, *(int *)(state + 0x160), 0, 0, 1024.0f, 37.0f);
     if (*(u32 *)(state + 0x150) != 0) {
         return;
     }
     {
-        u32 *base = (u32 *)D_00189E20;
+        u32 *base = (u32 *)gHeroState;
         *(u32 *)(state + 0x150) = base[0x8A4];
         qcopy((state + 0x140), ((char *)base + 0xD0));
     }

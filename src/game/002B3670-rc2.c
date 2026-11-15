@@ -31,41 +31,42 @@ extern s32 *D_001F1700[];
 
 typedef int TI __attribute__((mode(TI)));
 
-s32 func_002B3670(void *arg0, s32 *arg1, s32 arg2, s32 arg3, void *arg4, f32 fparg0, f32 fparg1) {
-    TI buf;
-    f32 temp_f20;
-    s32 temp_a1;
-    s32 *temp_a1_2;
-    s32 *temp_a1_3;
+/* Checks how close a spot is to the hero and returns 2 for the near zone, 1 for the far zone or 0 for neither. */
+s32 func_002B3670(void *object, s32 *outHero, s32 nearIndex, s32 farIndex, void *posOverride, f32 nearDistance, f32 farDistance) {
+    TI position;
+    f32 distance;
+    s32 hero;
+    s32 *nearZone;
+    s32 *farZone;
 
-    if (arg4 != 0) {
-        buf = *(TI *)arg4;
+    if (posOverride != 0) {
+        position = *(TI *)posOverride;
     } else {
-        buf = *(TI *)((s8 *)arg0 + 0x10);
+        position = *(TI *)((s8 *)object + 0x10);
     }
-    temp_a1 = D_0018C0B0.w0;
-    *arg1 = temp_a1;
-    if (D_001A8BB0 != 0) {
+    hero = gHeroMoby_0018C0B0.w0;
+    *outHero = hero;
+    if (gCurrentGameMode != 0) {
         return 0;
     }
-    temp_f20 = func_00282E80(&buf, temp_a1 + 0x10);
-    if (arg2 != -1) {
-        temp_a1_2 = D_001F1700[arg2];
-        if (func_002A8AF0(*arg1 + 0x10, (s8 *)temp_a1_2 + 0x10, *temp_a1_2) != 0) {
+    distance = vec_distance_xy(&position, hero + 0x10);
+    if (nearIndex != -1) {
+        nearZone = gPathTable_001F1700[nearIndex];
+        if (point_in_path_xy(*outHero + 0x10, (s8 *)nearZone + 0x10, *nearZone) != 0) {
             return 2;
         }
     } else {
-        if (temp_f20 < fparg0) {
+        if (distance < nearDistance) {
             return 2;
         }
     }
-    if (arg3 != -1) {
-        temp_a1_3 = D_001F1700[arg3];
-        if (func_002A8AF0(*arg1 + 0x10, (s8 *)temp_a1_3 + 0x10, *temp_a1_3) != 0) {
+    if (farIndex != -1) {
+        farZone = gPathTable_001F1700[farIndex];
+        if (point_in_path_xy(*outHero + 0x10, (s8 *)farZone + 0x10, *farZone) != 0) {
             return 1;
         }
     } else {
-        if (temp_f20 < fparg1) {
+        if (distance < farDistance) {
             return 1;
         }
     }

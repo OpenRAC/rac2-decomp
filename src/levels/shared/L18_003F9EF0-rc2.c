@@ -33,31 +33,32 @@ extern void ref_L18_003F9EF0_06(void *);
 extern void ref_L18_003F9EF0_07(s32, s32);
 extern void ref_L18_003F9EF0_08(s32, s16);
 
-void func_L18_003F9EF0(void *arg0) {
-    s16 temp_a1;
-    s32 index4;
-    s32 temp_v0;
-    s32 temp_v1;
-    s32 temp_v1_2;
-    void *temp_s0;
+/* Advances the timed effect sequence by one frame and stops it when its time is up. */
+void func_L18_003F9EF0(void *moby) {
+    s16 frame;
+    s32 entryOffset;
+    s32 phaseLength;
+    s32 unusedValue;
+    s32 phaseStart;
+    void *vars;
 
-    temp_s0 = (*(void **)((s8 *)(arg0) + (0x68)));
-    temp_a1 = (*(s16 *)((s8 *)(temp_s0) + (0xAC)));
-    index4 = (s32)(*(s16 *)((s8 *)(temp_s0) + (0xAE))) * 4;
-    temp_v1_2 = *(s32 *)((s8 *)&ref_L18_003F9EF0_02 + index4);
-    temp_v0 = *(s32 *)((s8 *)&ref_L18_003F9EF0_03 + index4);
+    vars = (*(void **)((s8 *)(moby) + (0x68)));
+    frame = (*(s16 *)((s8 *)(vars) + (0xAC)));
+    entryOffset = (s32)(*(s16 *)((s8 *)(vars) + (0xAE))) * 4;
+    phaseStart = *(s32 *)((s8 *)&ref_L18_003F9EF0_02 + entryOffset);
+    phaseLength = *(s32 *)((s8 *)&ref_L18_003F9EF0_03 + entryOffset);
 
-    if ((temp_v1_2 + temp_v0) < temp_a1) {
-        (*(s16 *)((s8 *)(temp_s0) + (0xAC))) = 0;
-        ref_L18_003F9EF0_08(0, temp_a1);
+    if ((phaseStart + phaseLength) < frame) {
+        (*(s16 *)((s8 *)(vars) + (0xAC))) = 0;
+        ref_L18_003F9EF0_08(0, frame);
         ref_L18_003F9EF0_04(0);
-        (*(s16 *)((s8 *)(temp_s0) + (0xAE))) = -1;
+        (*(s16 *)((s8 *)(vars) + (0xAE))) = -1;
         return;
     }
-    if (temp_v1_2 < temp_a1) {
+    if (phaseStart < frame) {
         ref_L18_003F9EF0_07(1, 0);
     }
-    ref_L18_003F9EF0_05((s8 *)&ref_L18_003F9EF0_00 + (s32)(*(s16 *)((s8 *)(temp_s0) + (0xAE))) * 16);
-    ref_L18_003F9EF0_06((s8 *)&ref_L18_003F9EF0_01 + (s32)(*(s16 *)((s8 *)(temp_s0) + (0xAE))) * 16);
-    (*(s16 *)((s8 *)(temp_s0) + (0xAC))) = (s16)((u16)(*(s16 *)((s8 *)(temp_s0) + (0xAC))) + 1);
+    ref_L18_003F9EF0_05((s8 *)&ref_L18_003F9EF0_00 + (s32)(*(s16 *)((s8 *)(vars) + (0xAE))) * 16);
+    ref_L18_003F9EF0_06((s8 *)&ref_L18_003F9EF0_01 + (s32)(*(s16 *)((s8 *)(vars) + (0xAE))) * 16);
+    (*(s16 *)((s8 *)(vars) + (0xAC))) = (s16)((u16)(*(s16 *)((s8 *)(vars) + (0xAC))) + 1);
 }

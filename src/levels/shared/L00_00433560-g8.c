@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_0033ABD8(char *p, void *argument, void *table);
 extern int func_00288FB8(int);
@@ -23,7 +24,7 @@ void func_L00_004336E8(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ReturnSecondArgument(16, AllocPoolCell(argument));
         *(int **)(object + 0x2AC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -33,17 +34,18 @@ void func_L00_004336E8(char *object, void *argument)
     **(float **)(object + 0x2AC) = 255.0f;
     (*(float **)(object + 0x2AC))[1] = 195.0f;
     child = object + 8;
-    func_0033ABD8(child, argument, D_L00_001AE1E8);
-    text = func_00288FB8(0x2D61);
-    second = func_00288FB8(0x2D4E);
-    func_0033B050(child, text, second, func_00288FB8(0x2D4F));
-    func_0033B030(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_0033B0A8(child, 0.4f);
+    InitButtonPromptBar(child, argument, D_L00_001AE1E8);
+    text = GetLocalizedString(0x2D61);
+    second = GetLocalizedString(0x2D4E);
+    SetButtonPromptTexts(child, text, second, GetLocalizedString(0x2D4F));
+    SetButtonPromptTextOffsets(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    SetButtonPromptSpacing(child, 0.4f);
     *(int *)(object + 0x2A8) = 0;
-    func_L00_00433810(object, 0);
+    UpdateTwoPartObjectFlagsB(object, 0);
 }
 
 /* Same construction as func_L00_004336E8 with its own label table and lower layer. */
+/* Builds a second menu page the same way as the first one. */
 void func_L00_004338E0(char *object, void *argument)
 {
     int *allocation;
@@ -51,7 +53,7 @@ void func_L00_004338E0(char *object, void *argument)
     int text, second;
     *(void **)object = argument;
     if (argument) {
-        allocation = func_00336DA8(16, func_00336E40(argument));
+        allocation = ReturnSecondArgument(16, AllocPoolCell(argument));
         *(int **)(object + 0x2AC) = allocation;
         allocation[1] = 0;
         allocation[2] = 0;
@@ -61,12 +63,12 @@ void func_L00_004338E0(char *object, void *argument)
     **(float **)(object + 0x2AC) = 255.0f;
     (*(float **)(object + 0x2AC))[1] = 195.0f;
     child = object + 8;
-    func_0033ABD8(child, argument, D_L00_001AE1F8);
-    text = func_00288FB8(0x2D61);
-    second = func_00288FB8(0x2D4E);
-    func_0033B050(child, text, second, func_00288FB8(0x2D4F));
-    func_0033B030(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
-    func_0033B0A8(child, 0.4f);
+    InitButtonPromptBar(child, argument, D_L00_001AE1F8);
+    text = GetLocalizedString(0x2D61);
+    second = GetLocalizedString(0x2D4E);
+    SetButtonPromptTexts(child, text, second, GetLocalizedString(0x2D4F));
+    SetButtonPromptTextOffsets(child, 0.0f, -143.0f, 0.0f, 114.0f, 0.0f, 140.0f);
+    SetButtonPromptSpacing(child, 0.4f);
     *(int *)(object + 0x2A8) = 0;
-    func_L00_00433A08(object, 0);
+    UpdateTwoPartObjectFlagsC(object, 0);
 }

@@ -36,11 +36,12 @@ extern char *func_0032C700(char *, int, int, int, int, int, int, int, float, flo
 
 extern void func_L23_0041BF18(char *, float, float);
 
-int func_L23_0041A3B8(char *arg0, char *arg1) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Fires the encounter weapon when it is ready: spawns the burst or the explosion shot and plays its sound. Returns 1 if the object was handled. */
+int func_L23_0041A3B8(char *moby, char *targetPos) {
+    char *state = *(char **)(moby + 0x68);
     float tmp;
     float vec[4];
-    int kind = *(unsigned char *)(arg0 + 0x20);
+    int kind = *(unsigned char *)(moby + 0x20);
 
     if (kind != 0xF) {
         if (kind == 0x10 || kind == 0xC) {
@@ -49,36 +50,36 @@ int func_L23_0041A3B8(char *arg0, char *arg1) {
         } else
             return 0;
     } else {
-        if ((*(unsigned short *)(arg0 + 0x96) & 3) != 2)
+        if ((*(unsigned short *)(moby + 0x96) & 3) != 2)
             return 1;
         do {
-            func_00282F20((char *)vec, D_L23_001B3870, *(short *)(state + 0x33A) * 0.016666668f);
+            vec_scale_to_length((char *)vec, D_L23_001B3870, *(short *)(state + 0x33A) * 0.016666668f);
             tmp = *(float *)(state + 0x300) * 1.5f;
-            func_L23_00422540(D_L23_001B3850, (char *)vec, &tmp);
+            CreateDirectedShot(D_L23_001B3850, (char *)vec, &tmp);
         } while (0);
-        func_L00_0035F5A0(0x21, 0, 0);
+        StartEffectInSlot(0x21, 0, 0);
         return 1;
     }
     if (!(D_L23_001B3728 >= D_L23_001B1454))
         return 1;
-    func_L23_0041BF18(arg0, 2.0f, 2.0f);
-    if (*(unsigned char *)(arg0 + 0x20) == 0x10) {
+    TurnBossJoints(moby, 2.0f, 2.0f);
+    if (*(unsigned char *)(moby + 0x20) == 0x10) {
         int m = *(short *)(state + 0x336);
-        if ((*(unsigned short *)(arg0 + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
+        if ((*(unsigned short *)(moby + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
             return 1;
-        func_00282CF0((char *)vec, arg1, D_L23_001B3850);
-        func_00282F20((char *)vec, (char *)vec, *(short *)(state + 0x33C) * 0.016666668f);
-        func_L23_004280D8(arg0, (char *)vec, D_L23_001B3850, 0, *(float *)(state + 0x304));
-        func_0032C700(D_L23_001B3850, 0, 2, 3, 2, 2, 0xA, 0, 0.5f, 20.0f, 1, 1, 0, 0);
-        func_L00_0035F5A0(0x1A, 0, 0);
+        FastVecSub((char *)vec, targetPos, D_L23_001B3850);
+        vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33C) * 0.016666668f);
+        CreateChildShot(moby, (char *)vec, D_L23_001B3850, 0, *(float *)(state + 0x304));
+        SpawnExplosion(D_L23_001B3850, 0, 2, 3, 2, 2, 0xA, 0, 0.5f, 20.0f, 1, 1, 0, 0);
+        StartEffectInSlot(0x1A, 0, 0);
     } else {
         int m = *(short *)(state + 0x334);
-        if ((*(unsigned short *)(arg0 + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
+        if ((*(unsigned short *)(moby + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
             return 1;
-        func_00282CF0((char *)vec, arg1, D_L23_001B3870);
-        func_00282F20((char *)vec, (char *)vec, *(short *)(state + 0x33A) * 0.016666668f);
-        func_L23_00422540(D_L23_001B3850, (char *)vec, (float *)(state + 0x300));
-        func_L00_0035F5A0(0x21, 0, 0);
+        FastVecSub((char *)vec, targetPos, D_L23_001B3870);
+        vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33A) * 0.016666668f);
+        CreateDirectedShot(D_L23_001B3850, (char *)vec, (float *)(state + 0x300));
+        StartEffectInSlot(0x21, 0, 0);
     }
     return 1;
 }

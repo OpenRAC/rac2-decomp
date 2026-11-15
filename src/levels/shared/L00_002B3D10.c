@@ -10,9 +10,10 @@ extern void func_L00_002B39F0(int, float);
 
 #define H ((Hero *)D_00189E20)
 
+/* Sets the hero wanted speed from the stick, slowing it down in one special state. */
 void func_L00_002B3D10(void)
 {
-    func_L00_002B39F0(0, 1.0f);
+    ResolveStickInputToDirection(0, 1.0f);
     if (0.0f < H->f[0x1B0 / 4]) {
         H->f[0x1B0 / 4] = D_001A7DB0[4] * (H->f[0x24B8 / 4] * 0.016666668f);
     }

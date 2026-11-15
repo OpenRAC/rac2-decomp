@@ -53,14 +53,14 @@ void func_0029B910(void) {
     if (D_001A8CFC != 0) {
         ids = D_001A9AC8;
         for (i = 0; i < 4; i++) {
-            int idx = func_002ED8A0(ids[i]);
+            int idx = FindLastUsedChainEntry(ids[i]);
             if (idx >= 0) {
-                D_00256418[i].second = D_00262940[idx].count;
-                D_00256418[i].id = D_00262940[idx].level;
-                D_00256418[i].color = D_00262940[idx].flag >= 1 ? 0x6029A1FF : 0x60F0F0B0;
-                func_0033A9D0(D_001A8CFC + 0x3F138, i, 0);
+                gMissionMenuItems[i].second = gMissionRecords[idx].count;
+                gMissionMenuItems[i].id = gMissionRecords[idx].level;
+                gMissionMenuItems[i].color = gMissionRecords[idx].flag >= 1 ? 0x6029A1FF : 0x60F0F0B0;
+                SetCircleMenuEntryMode(D_001A8CFC + 0x3F138, i, 0);
             } else {
-                func_0033A9D0(D_001A8CFC + 0x3F138, i, 2);
+                SetCircleMenuEntryMode(D_001A8CFC + 0x3F138, i, 2);
             }
         }
     }
@@ -68,37 +68,37 @@ void func_0029B910(void) {
 int func_0029BB30(void) {
  int result, changed;
  if (D_001A9A50 == 0) return -1;
- if (D_001A8C64 != 0) return -1;
+ if (gNoticeOwner != 0) return -1;
  if (D_001A8CFC_gp != 0) {
-  func_0029BA58();
+  UpdateMissionSelectMenuEnable();
   {
    int enabled = 0;
    switch (D_001A9A54) {
     case 0: return -1;
     case 1:
      changed = 0;
-     func_0029B910();
-     if (D_00138180.flags & 0x10) {
+     RefreshMissionMenuItems();
+     if (gPadState.flags & 0x10) {
       D_001A9AD8 = 1;
-      D_00138180.state = 2;
+      gPadState.state = 2;
      } else if (D_001A9AD8 != 0) {
       D_001A9AD8 = 0;
       changed = 1;
      }
-     func_0033A688(D_001A8CFC + 0x3F138);
+     PositionCircleMenuLabel(D_001A8CFC + 0x3F138);
      enabled = D_001A9AD8;
      break;
     default: changed = 0; break;
    }
-   func_0033A9F8(D_001A8CFC + 0x3F138, enabled);
+   SetCircleMenuEnabled(D_001A8CFC + 0x3F138, enabled);
   }
-  result = func_00349190(D_001A8CFC + 0x3C950, &D_00138180);
-  if (result >= 0 && func_002ED8A0(D_001A9AC8[result]) < 0) result = -1;
+  result = UpdateDirectionSelection(D_001A8CFC + 0x3C950, &gPadState);
+  if (result >= 0 && FindLastUsedChainEntry(D_001A9AC8[result]) < 0) result = -1;
   if (changed) {
-   func_00349488(D_001A8CFC_gp + 0x3C950);
+   ClearMenuField0x150(D_001A8CFC_gp + 0x3C950);
    if (D_001A9A58 < 0) D_001A9A58 = result;
   }
-  func_0033A9E0(D_001A8CFC + 0x3F138, result);
+  SetCircleMenuSelection(D_001A8CFC + 0x3F138, result);
   return changed ? result : -1;
  }
  D_001A9A50--;

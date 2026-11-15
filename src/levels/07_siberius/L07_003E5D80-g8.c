@@ -17,53 +17,55 @@ extern u8 D_00188660[];
 extern u8 D_00189EA0[];
 extern float D_L07_001B0AAC __attribute__((sda));
 
+/* Handles the entity's death: stops its sound, spawns an explosion and flying pickups, then
+   respawns it with one life fewer or removes it. */
 void func_L07_003E5D80(u8 *obj) {
-    u8 *st = *(u8 **)(obj + 0x68);
+    u8 *vars = *(u8 **)(obj + 0x68);
     int slot;
     u8 *rec;
     u8 *pos;
-    u8 *toward;
-    union { Quad q; f32 f[4]; } a;
-    f32 b[4] __attribute__((aligned(16)));
-    f32 c[4] __attribute__((aligned(16)));
-    int count;
+    u8 *platform;
+    union { Quad q; f32 f[4]; } burstPos;
+    f32 impulse[4] __attribute__((aligned(16)));
+    f32 carry[4] __attribute__((aligned(16)));
+    int livesLeft;
 
-    if (st[0x2E] != 2) {
-        func_002A6C58(obj, 0, 1);
+    if (vars[0x2E] != 2) {
+        SetDeathBits(obj, 0, 1);
     }
-    slot = *(s32 *)(st + 0x264);
+    slot = *(s32 *)(vars + 0x264);
     if (slot != -1) {
-        rec = D_00188660 + slot * 0x70;
+        rec = gSoundState + slot * 0x70;
         if (*(u8 **)(rec + 0x88) == obj && rec[0x74] != 0) {
-            func_002E59F8(slot);
+            StopSoundVoice(slot);
         }
     }
-    *(s32 *)(st + 0x264) = -1;
-    func_002E5CF8(0, 0, obj);
+    *(s32 *)(vars + 0x264) = -1;
+    PlayMobySound(0, 0, obj);
     pos = obj + 0x10;
-    a.q = 0;
-    a.f[2] = 0.5f;
-    func_00282CC0(&a, &a, pos);
-    func_0032C700(&a, 0, 0, 0, 0, 0x14, 0x2D, 1, D_L07_001B0AAC, 20.0f, 1, 0, 0, *(s32 *)(st + 0x260));
-    func_00282CF0(b, pos, D_00189EA0);
-    b[2] = 0.0f;
-    func_00282F70(b, b, 0.06666667f);
-    toward = *(u8 **)(st + 0x260);
-    if (toward != 0) {
-        func_002AD330(obj, toward, pos, c);
-        func_00282CC0(b, b, c);
+    burstPos.q = 0;
+    burstPos.f[2] = 0.5f;
+    FastVecAdd(&burstPos, &burstPos, pos);
+    SpawnExplosion(&burstPos, 0, 0, 0, 0, 0x14, 0x2D, 1, D_L07_001B0AAC, 20.0f, 1, 0, 0, *(s32 *)(vars + 0x260));
+    FastVecSub(impulse, pos, gHeroPosition);
+    impulse[2] = 0.0f;
+    FastVectorNormalizeHelper(impulse, impulse, 0.06666667f);
+    platform = *(u8 **)(vars + 0x260);
+    if (platform != 0) {
+        TransformPointByMobyAttachment(obj, platform, pos, carry);
+        FastVecAdd(impulse, impulse, carry);
     }
-    func_002B0A68(obj, 3, b, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
-    count = *(u16 *)(st + 0x21A) - 1;
-    *(u16 *)(st + 0x21A) = count;
-    if ((s16)count != -1) {
-        *(s16 *)(st + 0x88) = 0;
+    SpawnDebrisForMaskedParts(obj, 3, impulse, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+    livesLeft = *(u16 *)(vars + 0x21A) - 1;
+    *(u16 *)(vars + 0x21A) = livesLeft;
+    if ((s16)livesLeft != -1) {
+        *(s16 *)(vars + 0x88) = 0;
         *(s32 *)(obj + 0x98) = 0;
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) | 0x41) & 0xEFFF;
-        func_002A7750(obj, 8, 4);
-        st[0x2E] = 1;
-        *(f32 *)(st + 0x20) = *(s16 *)(st + 0x24);
+        SetMobyState(obj, 8, 4);
+        vars[0x2E] = 1;
+        *(f32 *)(vars + 0x20) = *(s16 *)(vars + 0x24);
     } else {
-        func_0029F338(obj);
+        MarkMobySpawned(obj);
     }
 }

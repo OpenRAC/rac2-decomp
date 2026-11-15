@@ -132,20 +132,20 @@ int func_L00_002C9448(void)
     u32 mask;
 
 
-    if (D_00189E20.special_control) {
-        if (D_00189E20.action != 10)
+    if (gHeroState.special_control) {
+        if (gHeroState.action != 10)
             return 0;
-        if (D_00189E20.special_ready != 1)
+        if (gHeroState.special_ready != 1)
             return 0;
     }
-    if (D_00189E20.disabled) return 0;
-    if (!D_00189E20.object) return 0;
-    if (D_00189E20.input_locked) return 0;
-    if (D_00189E20.control_mode != 2) return 0;
+    if (gHeroState.disabled) return 0;
+    if (!gHeroState.object) return 0;
+    if (gHeroState.input_locked) return 0;
+    if (gHeroState.control_mode != 2) return 0;
 
-    previous_frame = D_00189E20.frame;
-    mask = D_00189E20.buttons;
-    state = D_00189E20.action;
+    previous_frame = gHeroState.frame;
+    mask = gHeroState.buttons;
+    state = gHeroState.action;
     switch (state) {
     case 10: {
     int action, difference;
@@ -153,127 +153,127 @@ int func_L00_002C9448(void)
     char *object;
     AnimationRange *range;
     float threshold, movement;
-    if (D_00189E20.action_locked) break;
-    if (D_00189E20.state < 2 || (D_00189E20.state == 4 && D_00189E20.grounded)) {
-        if (func_L00_0032EF10(mask, 10, &scratch.input_age)) {
-            object = D_00189E20.object;
+    if (gHeroState.action_locked) break;
+    if (gHeroState.state < 2 || (gHeroState.state == 4 && gHeroState.grounded)) {
+        if (PadPressedWithin(mask, 10, &scratch.input_age)) {
+            object = gHeroState.object;
             if (!object) goto clear_action;
-            if (!func_L00_002B3248((unsigned char *)object) || *(unsigned char *)(object + 0x20))
+            if (!IsMobyClass71((unsigned char *)object) || *(unsigned char *)(object + 0x20))
                 goto clear_action;
-            if ((D_00138180.buttons.word.held & 8) ||
-                ((D_00189E20.mode == 1 || D_00189E20.mode == 29) && D_00189E20.frame >= 21)) {
-                if ((D_00189E20.mode == 1 || D_00189E20.mode == 29) && D_00189E20.frame >= 21)
-                    func_L00_002BA508();
+            if ((gPadState.buttons.word.held & 8) ||
+                ((gHeroState.mode == 1 || gHeroState.mode == 29) && gHeroState.frame >= 21)) {
+                if ((gHeroState.mode == 1 || gHeroState.mode == 29) && gHeroState.frame >= 21)
+                    SetupHeroAttachedObjectTransform();
                 else
-                    func_L00_002C42E0(21, 1);
+                    SetHeroAction_L00(21, 1);
             } else {
-                func_L00_002C42E0(19, 1);
+                SetHeroAction_L00(19, 1);
             }
             goto clear_action;
         }
         goto clear_action;
     }
-    if (D_00189E20.mode == 7 || D_00189E20.mode == 9 || D_00189E20.mode == 137 ||
-        D_00189E20.mode == 8 || D_00189E20.mode == 6 ||
-        (D_00189E20.mode == 14 && D_00189E20.animation_frame > 32.0f))
+    if (gHeroState.mode == 7 || gHeroState.mode == 9 || gHeroState.mode == 137 ||
+        gHeroState.mode == 8 || gHeroState.mode == 6 ||
+        (gHeroState.mode == 14 && gHeroState.animation_frame > 32.0f))
         goto buffered_attack;
-    if ((D_00189E20.mode == 11 && D_00189E20.attack_mode != 3 && D_00189E20.animation_frame > 18.0f) ||
-        (D_00189E20.mode == 11 && D_00189E20.attack_mode == 3 && D_00189E20.animation_frame > 20.0f))
+    if ((gHeroState.mode == 11 && gHeroState.attack_mode != 3 && gHeroState.animation_frame > 18.0f) ||
+        (gHeroState.mode == 11 && gHeroState.attack_mode == 3 && gHeroState.animation_frame > 20.0f))
         goto buffered_attack;
-    if (D_00189E20.mode == 44 || D_00189E20.mode == 17)
+    if (gHeroState.mode == 44 || gHeroState.mode == 17)
         goto buffered_attack;
     goto ranged_attack;
 
 buffered_attack:
-    if (D_00189E20.frame < 11) goto ranged_attack;
+    if (gHeroState.frame < 11) goto ranged_attack;
     buffered_window = 14;
-    if (D_00189E20.mode == 11 || D_00189E20.mode == 14)
+    if (gHeroState.mode == 11 || gHeroState.mode == 14)
         buffered_window = 18;
-    if (!func_L00_0032EF10(mask, buffered_window, 0)) goto clear_action;
-    if ((!D_00189E20.fast_attack && D_00189E20.movement > 0.1f) ||
-        (D_00189E20.fast_attack && D_00189E20.movement > 0.57f) ||
-        (D_00189E20.mode == 8 && D_00189E20.movement > 0.57f)) {
-        if (D_00189E20.attack_blocked || D_00189E20.attack_pending) goto clear_action;
-        func_L00_002C42E0(20, 1);
+    if (!PadPressedWithin(mask, buffered_window, 0)) goto clear_action;
+    if ((!gHeroState.fast_attack && gHeroState.movement > 0.1f) ||
+        (gHeroState.fast_attack && gHeroState.movement > 0.57f) ||
+        (gHeroState.mode == 8 && gHeroState.movement > 0.57f)) {
+        if (gHeroState.attack_blocked || gHeroState.attack_pending) goto clear_action;
+        SetHeroAction_L00(20, 1);
     } else {
-        func_L00_002C42E0(19, 1);
+        SetHeroAction_L00(19, 1);
     }
     goto clear_action;
 
 ranged_attack:
-    if (D_00189E20.state == 6) {
-        range = &D_L00_0025D990[D_00189E20.animation_index];
-        if (D_00189E20.mode == 21 && D_00189E20.frame >= 31) {
-            if (D_00189E20.input_locked) goto check_attack_delay;
-            if (D_00189E20.attack_delay) goto clear_action;
-            if ((float)range->trigger_frame <= D_00189E20.animation_frame && (D_00138180.buttons.word.held & 8) &&
-                func_L00_0032EF10(mask, 15, 0)) {
-                func_L00_002C42E0(21, 1);
+    if (gHeroState.state == 6) {
+        range = &D_L00_0025D990[gHeroState.animation_index];
+        if (gHeroState.mode == 21 && gHeroState.frame >= 31) {
+            if (gHeroState.input_locked) goto check_attack_delay;
+            if (gHeroState.attack_delay) goto clear_action;
+            if ((float)range->trigger_frame <= gHeroState.animation_frame && (gPadState.buttons.word.held & 8) &&
+                PadPressedWithin(mask, 15, 0)) {
+                SetHeroAction_L00(21, 1);
                 break;
             }
         }
 check_attack_delay:
-        if (!D_00189E20.attack_delay) {
-            if (!D_00189E20.input_locked) {
-                float frame = D_00189E20.animation_frame;
+        if (!gHeroState.attack_delay) {
+            if (!gHeroState.input_locked) {
+                float frame = gHeroState.animation_frame;
                 if (!((float)range->trigger_frame <= frame)) goto clear_action;
-                difference = (func_00283CF0(frame) - range->first_frame) * 2;
+                difference = (FloatToInt(frame) - range->first_frame) * 2;
                 action = difference > 0 ? difference : 1;
                 action = action < 16 ? action : 15;
-                if (func_L00_0032EF10(mask, action, 0)) {
-                    if (D_00138180.buttons.word.held & 8) {
-                        func_L00_002C42E0(21, 1);
+                if (PadPressedWithin(mask, action, 0)) {
+                    if (gPadState.buttons.word.held & 8) {
+                        SetHeroAction_L00(21, 1);
                         goto clear_action;
                     }
-                    func_L00_002C42E0(19, 1);
+                    SetHeroAction_L00(19, 1);
                 }
             }
         }
     }
 clear_action:
-    D_00189E20.attack_pending = 0;
+    gHeroState.attack_pending = 0;
     break;
 
     }
     case 22:
     case 65:
-    if (D_00189E20.mode == 1 || D_00189E20.mode == 29) break;
-    if (!(D_00189E20.state < 2 || D_00189E20.state == 12 ||
-          (D_00189E20.state == 4 && D_00189E20.grounded))) break;
-    if (D_00189E20.pending_action && D_00189E20.pending_action != 22 && D_00189E20.pending_action != 65)
+    if (gHeroState.mode == 1 || gHeroState.mode == 29) break;
+    if (!(gHeroState.state < 2 || gHeroState.state == 12 ||
+          (gHeroState.state == 4 && gHeroState.grounded))) break;
+    if (gHeroState.pending_action && gHeroState.pending_action != 22 && gHeroState.pending_action != 65)
         break;
-    if (!(D_00138180.buttons.word.held & 32) || D_00189E20.input_window < 23) break;
-    if (func_L00_002D4040(state)) {
-        func_L00_002C42E0(131, 1);
+    if (!(gPadState.buttons.word.held & 32) || gHeroState.input_window < 23) break;
+    if (get_ammo(state)) {
+        SetHeroAction_L00(131, 1);
         break;
     }
-    if (D_00138180.buttons.word.pressed & 32) {
-        EffectDefinition *effect = &D_L00_00262570[D_00139568[state]];
-        func_002E5DA0(0, 0, D_00189E20.owner, effect->sound);
+    if (gPadState.buttons.word.pressed & 32) {
+        EffectDefinition *effect = &gWeaponTable_L00[gItemSlotToRecord[state]];
+        PlaySoundFromClassBank(0, 0, gHeroState.owner, effect->sound);
     }
     break;
 
     case 46: {
     char *target;
     float direction;
-    if (!(D_00138180.buttons.word.pressed & mask)) break;
-    if (D_00189E20.aim_target) {
-        D_00189E20.aim_target = 0;
+    if (!(gPadState.buttons.word.pressed & mask)) break;
+    if (gHeroState.aim_target) {
+        gHeroState.aim_target = 0;
         break;
     }
-    target = func_L00_002AE888(&D_00189E20, 21, 0, 20.0f, D_00189E20.heading,
+    target = SelectBestEligibleTarget(&gHeroState, 21, 0, 20.0f, gHeroState.heading,
                               0.5235988497734069824f, 0.6981317996978759766f);
-    D_00189E20.aim_target = target;
+    gHeroState.aim_target = target;
     if (target) {
         qcopy(&scratch.point, target + 16);
         ((float *)&scratch.point)[2] += 0.5f;
-        if (func_002761F8(&scratch.point, (char *)&D_00189E20 + 0xE0, 2, target, 0))
-            D_00189E20.aim_target = 0;
+        if (CollLine(&scratch.point, (char *)&gHeroState + 0xE0, 2, target, 0))
+            gHeroState.aim_target = 0;
         else {
-            char *aim_target = D_00189E20.aim_target;
-            direction = func_00283248(D_00189E20.position[0] - *(float *)(aim_target + 16),
-                                     D_00189E20.position[1] - *(float *)(aim_target + 20));
-            D_00189E20.target_angle = func_00283BE0(*(float *)(D_00189E20.aim_target + 0xF8), direction);
+            char *aim_target = gHeroState.aim_target;
+            direction = FastMatrixHelperA(gHeroState.position[0] - *(float *)(aim_target + 16),
+                                     gHeroState.position[1] - *(float *)(aim_target + 20));
+            gHeroState.target_angle = fast_subtract_rotations(*(float *)(gHeroState.aim_target + 0xF8), direction);
         }
     }
     break;
@@ -281,40 +281,40 @@ clear_action:
     }
     case 13: {
     int action;
-    func_L00_002C3BB0();
-    func_L00_002C3E18();
-    func_L00_002C40C0();
-    action = D_00189E20.extended_range ? 8 : 5;
-    if (D_00189E20.mode == 40) action = 11;
-    if (D_00189E20.mode == 39 && (D_00189E20.alternate_target_ready || D_00189E20.nearby_ready)) {
-        if (func_L00_0032EF10(mask, action, 0) ||
-            ((D_00138180.buttons.word.held & mask) && D_00189E20.input_window >= 16)) {
-            func_L00_002C42E0(40, 1);
+    FindSwingshotNodeInFront();
+    FindActiveSwingshotNode();
+    FindBlueSwingshotTarget();
+    action = gHeroState.extended_range ? 8 : 5;
+    if (gHeroState.mode == 40) action = 11;
+    if (gHeroState.mode == 39 && (gHeroState.alternate_target_ready || gHeroState.nearby_ready)) {
+        if (PadPressedWithin(mask, action, 0) ||
+            ((gPadState.buttons.word.held & mask) && gHeroState.input_window >= 16)) {
+            SetHeroAction_L00(40, 1);
             break;
         }
     }
-    if (!(D_00189E20.state < 2 || D_00189E20.state == 12 || D_00189E20.state == 4 ||
-          D_00189E20.state == 2 || D_00189E20.state == 30 || D_00189E20.state == 5 ||
-          (D_00189E20.mode == 40 && D_00189E20.frame >= 6) || D_00189E20.mode == 29))
+    if (!(gHeroState.state < 2 || gHeroState.state == 12 || gHeroState.state == 4 ||
+          gHeroState.state == 2 || gHeroState.state == 30 || gHeroState.state == 5 ||
+          (gHeroState.mode == 40 && gHeroState.frame >= 6) || gHeroState.mode == 29))
         break;
-    if (!func_L00_0032EF10(mask, action, 0) &&
-        (!(D_00138180.buttons.word.held & mask) || D_00189E20.input_window < 16)) break;
-    if (D_00189E20.alternate_target_ready) {
-        if (D_00189E20.nearby_ready) {
-            if (D_00189E20.alternate_distance < D_00189E20.nearby_distance) D_00189E20.nearby_ready = 0;
-            else D_00189E20.alternate_target_ready = 0;
+    if (!PadPressedWithin(mask, action, 0) &&
+        (!(gPadState.buttons.word.held & mask) || gHeroState.input_window < 16)) break;
+    if (gHeroState.alternate_target_ready) {
+        if (gHeroState.nearby_ready) {
+            if (gHeroState.alternate_distance < gHeroState.nearby_distance) gHeroState.nearby_ready = 0;
+            else gHeroState.alternate_target_ready = 0;
         }
-        if (D_00189E20.alternate_target_ready && !D_00189E20.control_lock && D_00189E20.mode != 43) {
-            func_L00_002C42E0(43, 1);
+        if (gHeroState.alternate_target_ready && !gHeroState.control_lock && gHeroState.mode != 43) {
+            SetHeroAction_L00(43, 1);
             break;
         }
     }
-    if (D_00189E20.nearby_ready && !D_00189E20.control_lock) {
-        func_L00_002C42E0(35, 1);
+    if (gHeroState.nearby_ready && !gHeroState.control_lock) {
+        SetHeroAction_L00(35, 1);
         break;
     }
-    if (D_00189E20.second_target_ready) {
-        func_L00_002C42E0(138, 1);
+    if (gHeroState.second_target_ready) {
+        SetHeroAction_L00(138, 1);
         break;
     }
     break;
@@ -325,56 +325,56 @@ clear_action:
     case 17:
     case 31: {
     int action, frame_window;
-    if (!((D_00189E20.state == 0 && D_00189E20.mode != 29) || D_00189E20.state == 1 ||
-          D_00189E20.state == 12 || D_00189E20.state == 5 || D_00189E20.state == 15 ||
-          (D_00189E20.state == 4 && D_00189E20.alternate_ready) ||
-          (D_00189E20.mode == 34 && D_00189E20.animation_frame > 55.0f))) break;
-    if (D_00189E20.changing_weapon) break;
-    frame_window = D_00189E20.input_window;
+    if (!((gHeroState.state == 0 && gHeroState.mode != 29) || gHeroState.state == 1 ||
+          gHeroState.state == 12 || gHeroState.state == 5 || gHeroState.state == 15 ||
+          (gHeroState.state == 4 && gHeroState.alternate_ready) ||
+          (gHeroState.mode == 34 && gHeroState.animation_frame > 55.0f))) break;
+    if (gHeroState.changing_weapon) break;
+    frame_window = gHeroState.input_window;
     action = 7;
     if (frame_window < action) action = frame_window;
-    if (!func_L00_0032EF10(mask, action, &scratch.action_age) && !(D_00138180.buttons.word.held & 32)) break;
+    if (!PadPressedWithin(mask, action, &scratch.action_age) && !(gPadState.buttons.word.held & 32)) break;
     if (frame_window < 23) break;
-    if (func_L00_002D4040(-1)) {
-        if (D_00189E20.state == 12 || D_00189E20.state == 0 || D_00189E20.mode == 3 ||
-            (D_00189E20.state == 1 && D_00189E20.transition_progress < 0.7f)) {
-            func_L00_002C42E0(34, 1);
+    if (get_ammo(-1)) {
+        if (gHeroState.state == 12 || gHeroState.state == 0 || gHeroState.mode == 3 ||
+            (gHeroState.state == 1 && gHeroState.transition_progress < 0.7f)) {
+            SetHeroAction_L00(34, 1);
             break;
         }
-        func_L00_002AF568();
-    } else if (D_00189E20.object && (D_00138180.buttons.word.pressed & 32))
-        func_002E5CF8(0, 0, D_00189E20.object);
+        start_equipped_item_animation();
+    } else if (gHeroState.object && (gPadState.buttons.word.pressed & 32))
+        PlayMobySound(0, 0, gHeroState.object);
     break;
 
     }
     case 53: {
     int action, frame_window;
-    if (!(D_00189E20.state < 2 || (D_00189E20.state == 4 && D_00189E20.grounded)))
+    if (!(gHeroState.state < 2 || (gHeroState.state == 4 && gHeroState.grounded)))
         break;
-    if (D_00189E20.mode != 1) {
-        frame_window = D_00189E20.input_window;
+    if (gHeroState.mode != 1) {
+        frame_window = gHeroState.input_window;
         action = 9;
         action = action < frame_window ? 10 : frame_window;
-        if (!func_L00_0032EF10(mask, action, &scratch.detach_age)) break;
-        if (D_00189E20.object) {
-            func_L00_002C42E0(31, 1);
-            if (D_00189E20.object) func_002E5CF8(0, 0, D_00189E20.object);
+        if (!PadPressedWithin(mask, action, &scratch.detach_age)) break;
+        if (gHeroState.object) {
+            SetHeroAction_L00(31, 1);
+            if (gHeroState.object) PlayMobySound(0, 0, gHeroState.object);
         }
     }
     break;
     }
     }
 
-    if (D_00189E20.frame == previous_frame && D_001A7B08[0x26] && D_001A7390[3] == 54 &&
-        D_00189E20.mode != 29 && D_00189E20.mode != 1 &&
-        (D_00189E20.motion_flags & 0xffffffff00000000ULL) == 0) {
-        func_00282948(&D_L00_001A7CC4);
+    if (gHeroState.frame == previous_frame && D_001A7B08[0x26] && D_001A7390[3] == 54 &&
+        gHeroState.mode != 29 && gHeroState.mode != 1 &&
+        (gHeroState.motion_flags & 0xffffffff00000000ULL) == 0) {
+        FastFloatHelperD(&D_L00_001A7CC4);
         if (D_L00_001A7CC4 &&
-            (D_00189E20.state < 2 || D_00189E20.state == 12 ||
-             ((D_00189E20.state == 2 || D_00189E20.state == 4) && D_00189E20.action_ready)) &&
-            (D_00138180.buttons.both & 0x800000008ULL) == 0x800000008ULL)
-            func_L00_002C42E0(123, 1);
-        if (D_00138180.buttons.word.pressed & 8) D_L00_001A7CC4 = 30;
+            (gHeroState.state < 2 || gHeroState.state == 12 ||
+             ((gHeroState.state == 2 || gHeroState.state == 4) && gHeroState.action_ready)) &&
+            (gPadState.buttons.both & 0x800000008ULL) == 0x800000008ULL)
+            SetHeroAction_L00(123, 1);
+        if (gPadState.buttons.word.pressed & 8) D_L00_001A7CC4 = 30;
     }
-    return D_00189E20.frame < previous_frame;
+    return gHeroState.frame < previous_frame;
 }

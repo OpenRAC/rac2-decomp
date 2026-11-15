@@ -125,6 +125,7 @@ extern L00AimVector D_L00_001B8C80;
 
 
 /* shared native body of family a04928c6 */
+/* Sets up a large square sprite packet with default corners, colors and texture coordinates. */
 void func_L00_003D6FB8(char *p)
 {
     *(long long *)(p + 112) = 0LL;
@@ -155,6 +156,7 @@ void func_L00_003D6FB8(char *p)
     *(float *)(p + 60) = 1.0f;
 }
 
+/* Draws a two-layer glow sprite at a point, turned to face the camera. */
 void func_L00_003D7250(int unused, char *pos, int color, int first, int second, float scale)
 {
     char pkt[144];
@@ -213,6 +215,7 @@ void func_L00_003D7250(int unused, char *pos, int color, int first, int second, 
 }
 
 /* shared native body of family a04928c6 */
+/* Sets up a large square sprite packet with default corners, colors and texture coordinates. */
 void func_L00_003DA2B0(char *p)
 {
     *(long long *)(p + 112) = 0LL;
@@ -250,6 +253,7 @@ void func_L00_003DA2B0(char *p)
 
 
 
+/* Starts a burst of particles and sparks in a direction from a point. */
 void func_L00_003DC3E0(char *object, int unused, char *pos, char *direction)
 {
     float a[4], b[4], c[4], d[4];
@@ -298,7 +302,7 @@ extern void func_L00_003DCAC8(char *pos, int a1, int a2, float f12, float f13, c
 /* Effect update by state: 1 starts the burst (one random-angle puff), 2 counts the timer down and draws the two fade rings. */
 void func_L00_003DC640(char *obj)
 {
-    char *s = *(char **)(obj + 0x68);
+    char *vars = *(char **)(obj + 0x68);
     Quad640 pos;
     float zero, scale;
     int n;
@@ -306,22 +310,22 @@ void func_L00_003DC640(char *obj)
     switch (*(unsigned char *)(obj + 0x20)) {
     case 1:
         pos = *(Quad640 *)(obj + 0x10);
-        func_L00_003DCC48(0.0f, 0.85f, 0.25f, &pos, s + 0x10, 0x103080, 4);
+        DrawTaperedRibbon(0.0f, 0.85f, 0.25f, &pos, vars + 0x10, 0x103080, 4);
         scale = *(float *)(obj + 0x2C) * 95.0f;
         n = func_0031A768_1(0x5F, 0x6F) >> 2;
-        func_L00_003DC910(obj + 0x10, 0x103080, scale, n, func_0031A888_1(), (char *)0xB, 2, -1.0f);
+        DrawCameraFacingSprite_L00(obj + 0x10, 0x103080, scale, n, func_0031A888_1(), (char *)0xB, 2, -1.0f);
         break;
     case 2:
-        if (--*(int *)(s + 0x6C) <= 0)
-            *(int *)(s + 0x6C) = 0;
+        if (--*(int *)(vars + 0x6C) <= 0)
+            *(int *)(vars + 0x6C) = 0;
         zero = 0.0f;
         pos = *(Quad640 *)(obj + 0x10);
-        func_L00_003DCC48(zero, 0.85f, 0.25f, &pos, s + 0x10, 0x103080, 4);
-        if (*(int *)(s + 0x7C) == 0) {
-            func_L00_003DCAC8(obj + 0x10, 0x103080, *(int *)(s + 0x6C),
-                              *(float *)(obj + 0x2C) * 45.0f, zero, (char *)0xB, 2, s + 0x50);
-            func_L00_003DCAC8(obj + 0x10, 0x3F3F3F, *(int *)(s + 0x6C),
-                              *(float *)(obj + 0x2C) * 33.75f, zero, (char *)0xB, 2, s + 0x50);
+        DrawTaperedRibbon(zero, 0.85f, 0.25f, &pos, vars + 0x10, 0x103080, 4);
+        if (*(int *)(vars + 0x7C) == 0) {
+            DrawDirectionalSprite(obj + 0x10, 0x103080, *(int *)(vars + 0x6C),
+                              *(float *)(obj + 0x2C) * 45.0f, zero, (char *)0xB, 2, vars + 0x50);
+            DrawDirectionalSprite(obj + 0x10, 0x3F3F3F, *(int *)(vars + 0x6C),
+                              *(float *)(obj + 0x2C) * 33.75f, zero, (char *)0xB, 2, vars + 0x50);
         }
         break;
     }
@@ -368,83 +372,83 @@ void func_L00_003DC8A8(char *p, float scale)
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void func_L00_003DC910(char *pos, int a1, float fA, int a2, float fB, char *a3, int t0, float fC)
+void func_L00_003DC910(char *pos, int colorRgb, float scale, int alpha, float roll, char *textureId, int blendFlags, float offsetScale)
 {
-    char pkt[144];
+    char packet[144];
     float m[16];
     float quat[4];
     float off[4];
-    long long r;
+    long long texture;
 
-    func_L00_003DC820_1(pkt);
-    r = func_002E67A0_1(a3);
+    func_L00_003DC820_1(packet);
+    texture = func_002E67A0_1(textureId);
 
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
+    *(long long *)(packet + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(int *)(packet + 76) = colorRgb + (alpha << 24);
+    *(int *)(packet + 72) = colorRgb + (alpha << 24);
+    *(int *)(packet + 68) = colorRgb + (alpha << 24);
+    *(int *)(packet + 64) = colorRgb + (alpha << 24);
+    *(long long *)(packet + 112) = 0LL;
+    *(long long *)(packet + 120) = texture;
 
     quat[3] = 0.0f;
     quat[2] = func_802EE7A8_1(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
                               D_L00_001B8C80.y_144 - *(float *)(pos + 4));
     quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &D_L00_001B8C80.x_140),
                                D_L00_001B8C80.z_148 - *(float *)(pos + 8));
-    quat[0] = fB;
+    quat[0] = roll;
 
     func_802EE970_1(m, quat);
     func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
-    func_802EE3D0_1(off, off, fC);
+    func_802EE3D0_1(off, off, offsetScale);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
     m[14] = *(float *)(pos + 8) + off[2];
     m[15] = 1.0f;
 
-    func_L00_003DC8A8_1(pkt, fA);
-    func_802EAC30_1(pkt, m, 0);
+    func_L00_003DC8A8_1(packet, scale);
+    func_802EAC30_1(packet, m, 0);
 }
 
 /* Builds a 144-byte packet, derives a quaternion from source floats through four float helpers, writes the last matrix row from a source point plus a computed offset, then dispatches the packet. */
-void func_L00_003DCAC8(char *pos, int a1, int a2, float f12, float f13, char *a3, int t0,
-                       char *src)
+void func_L00_003DCAC8(char *pos, int colorRgb, int alpha, float scale, float roll, char *textureId, int blendFlags,
+                       char *direction)
 {
-    char pkt[144];
+    char packet[144];
     float m[16];
     float quat[4];
     float off[4];
-    long long r;
+    long long texture;
 
-    func_L00_003DC820_1(pkt);
-    r = func_0027C878_1(a3);
+    func_L00_003DC820_1(packet);
+    texture = func_0027C878_1(textureId);
 
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
+    *(int *)(packet + 76) = colorRgb + (alpha << 24);
+    *(int *)(packet + 72) = colorRgb + (alpha << 24);
+    *(int *)(packet + 68) = colorRgb + (alpha << 24);
+    *(int *)(packet + 64) = colorRgb + (alpha << 24);
+    *(long long *)(packet + 112) = 0LL;
+    *(long long *)(packet + 120) = texture;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(long long *)(packet + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
 
     quat[3] = 0.0f;
-    quat[2] = func_00283248_3(*(float *)(src + 0), *(float *)(src + 4));
-    quat[1] = -func_00283248_3(func_00282E20_2(src), *(float *)(src + 8));
-    quat[0] = f13;
+    quat[2] = func_00283248_3(*(float *)(direction + 0), *(float *)(direction + 4));
+    quat[1] = -func_00283248_3(func_00282E20_2(direction), *(float *)(direction + 8));
+    quat[0] = roll;
 
     func_00283410_3(m, quat);
-    func_00282F20_3(off, src, 0.025f);
+    func_00282F20_3(off, direction, 0.025f);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
     m[14] = *(float *)(pos + 8) + off[2];
     m[15] = 1.0f;
 
-    func_L00_003DC8A8_1(pkt, f12);
-    func_00280B90_1(pkt, m, 0);
+    func_L00_003DC8A8_1(packet, scale);
+    func_00280B90_1(packet, m, 0);
 }
 
 
@@ -543,6 +547,7 @@ void func_L00_003DD2B8(BounceObject *object)
     }
 }
 
+/* Switches a moby on the first time it runs. */
 void func_L00_003DD680(char *p)
 {
     if (*(unsigned char *)(p + 0x20) == 0) {
@@ -606,45 +611,45 @@ void func_L00_003E0020(char *p, float scale)
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void func_L00_003E0088(char *pos, int a1, int a2, char *a3, int t0,
-                       float fA, float fB, float fC)
+void func_L00_003E0088(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
+                       float scale, float roll, float offsetScale)
 {
-    char pkt[144];
+    char packet[144];
     float m[16];
     float quat[4];
     float off[4];
-    long long r;
+    long long texture;
 
-    func_L00_003DFF98_1(pkt);
-    r = func_002E67A0_1(a3);
+    func_L00_003DFF98_1(packet);
+    texture = func_002E67A0_1(textureId);
 
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
+    *(long long *)(packet + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(int *)(packet + 76) = colorRgb + (alpha << 24);
+    *(int *)(packet + 72) = colorRgb + (alpha << 24);
+    *(int *)(packet + 68) = colorRgb + (alpha << 24);
+    *(int *)(packet + 64) = colorRgb + (alpha << 24);
+    *(long long *)(packet + 112) = 0LL;
+    *(long long *)(packet + 120) = texture;
 
     quat[3] = 0.0f;
     quat[2] = func_802EE7A8_1(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
                               D_L00_001B8C80.y_144 - *(float *)(pos + 4));
     quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &D_L00_001B8C80.x_140),
                                D_L00_001B8C80.z_148 - *(float *)(pos + 8));
-    quat[0] = fB;
+    quat[0] = roll;
 
     func_802EE970_1(m, quat);
     func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
-    func_802EE3D0_1(off, off, fC);
+    func_802EE3D0_1(off, off, offsetScale);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
     m[14] = *(float *)(pos + 8) + off[2];
     m[15] = 1.0f;
 
-    func_L00_003E0020_1(pkt, fA);
-    func_802EAC30_1(pkt, m, 0);
+    func_L00_003E0020_1(packet, scale);
+    func_802EAC30_1(packet, m, 0);
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
@@ -688,84 +693,84 @@ void func_L00_003E0D70(char *p, float scale)
 }
 
 /* Builds a 144-byte packet, derives a quaternion from source floats through four float helpers, writes the last matrix row from a source point plus a computed offset, then dispatches the packet. */
-void func_L00_003E0DD8(char *pos, int a1, int a2, char *a3, int t0,
-                                        char *src, float f12, float f13)
+void func_L00_003E0DD8(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
+                                        char *direction, float scale, float roll)
 {
-    char pkt[144];
+    char packet[144];
     float m[16];
     float quat[4];
     float off[4];
-    long long r;
+    long long texture;
 
-    func_L00_003E0CE8_1(pkt);
-    r = func_0027C878_1(a3);
+    func_L00_003E0CE8_1(packet);
+    texture = func_0027C878_1(textureId);
 
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
+    *(int *)(packet + 76) = colorRgb + (alpha << 24);
+    *(int *)(packet + 72) = colorRgb + (alpha << 24);
+    *(int *)(packet + 68) = colorRgb + (alpha << 24);
+    *(int *)(packet + 64) = colorRgb + (alpha << 24);
+    *(long long *)(packet + 112) = 0LL;
+    *(long long *)(packet + 120) = texture;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(long long *)(packet + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
 
     quat[3] = 0.0f;
-    quat[2] = func_00283248_3(*(float *)(src + 0), *(float *)(src + 4));
-    quat[1] = -func_00283248_3(func_00282E20_2(src), *(float *)(src + 8));
-    quat[0] = f13;
+    quat[2] = func_00283248_3(*(float *)(direction + 0), *(float *)(direction + 4));
+    quat[1] = -func_00283248_3(func_00282E20_2(direction), *(float *)(direction + 8));
+    quat[0] = roll;
 
     func_00283410_3(m, quat);
-    func_00282F20_3(off, src, 0.025f);
+    func_00282F20_3(off, direction, 0.025f);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
     m[14] = *(float *)(pos + 8) + off[2];
     m[15] = 1.0f;
 
-    func_L00_003E0D70_1(pkt, f12);
-    func_00280B90_1(pkt, m, 0);
+    func_L00_003E0D70_1(packet, scale);
+    func_00280B90_1(packet, m, 0);
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void func_L00_003E0F58(char *pos, int a1, int a2, char *a3, int t0,
-                       float fA, float fB, float fC)
+void func_L00_003E0F58(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
+                       float scale, float roll, float offsetScale)
 {
-    char pkt[144];
+    char packet[144];
     float m[16];
     float quat[4];
     float off[4];
-    long long r;
+    long long texture;
 
-    ref_L00_003E0F58_00(pkt);
-    r = func_002E67A0_1(a3);
+    ref_L00_003E0F58_00(packet);
+    texture = func_002E67A0_1(textureId);
 
-    *(long long *)(pkt + 136) = ((long long)t0 << 2) | 0x8000000040LL;
-    *(long long *)(pkt + 128) = 280993940374112LL;
-    *(int *)(pkt + 76) = a1 + (a2 << 24);
-    *(int *)(pkt + 72) = a1 + (a2 << 24);
-    *(int *)(pkt + 68) = a1 + (a2 << 24);
-    *(int *)(pkt + 64) = a1 + (a2 << 24);
-    *(long long *)(pkt + 112) = 0LL;
-    *(long long *)(pkt + 120) = r;
+    *(long long *)(packet + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
+    *(long long *)(packet + 128) = 280993940374112LL;
+    *(int *)(packet + 76) = colorRgb + (alpha << 24);
+    *(int *)(packet + 72) = colorRgb + (alpha << 24);
+    *(int *)(packet + 68) = colorRgb + (alpha << 24);
+    *(int *)(packet + 64) = colorRgb + (alpha << 24);
+    *(long long *)(packet + 112) = 0LL;
+    *(long long *)(packet + 120) = texture;
 
     quat[3] = 0.0f;
     quat[2] = func_802EE7A8_1(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
                               D_L00_001B8C80.y_144 - *(float *)(pos + 4));
     quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &D_L00_001B8C80.x_140),
                                D_L00_001B8C80.z_148 - *(float *)(pos + 8));
-    quat[0] = fB;
+    quat[0] = roll;
 
     func_802EE970_1(m, quat);
     func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
-    func_802EE3D0_1(off, off, fC);
+    func_802EE3D0_1(off, off, offsetScale);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
     m[14] = *(float *)(pos + 8) + off[2];
     m[15] = 1.0f;
 
-    ref_L00_003E0F58_01(pkt, fA);
-    func_802EAC30_1(pkt, m, 0);
+    ref_L00_003E0F58_01(packet, scale);
+    func_802EAC30_1(packet, m, 0);
 }
 
 
@@ -828,7 +833,7 @@ void func_L00_003E2E80(float *points, int tex1, int tex2, int count,
     outer.uv[0] = scroll;
     outer.uv[4] = scroll + 1;
 
-    ref_L00_003E2E80_01(ray, points, D_L00_001B8DC0);
+    ref_L00_003E2E80_01(ray, points, gCameraPosition_L00);
     ref_L00_003E2E80_01(tangent, next, points);
     ref_L00_003E2E80_02(cross, tangent, ray);
     ref_L00_003E2E80_03(offset, cross, points[3]);
@@ -841,7 +846,7 @@ void func_L00_003E2E80(float *points, int tex1, int tex2, int count,
     for (i = 1; i < count; i++) {
         float *point = points + i * 4;
 
-        ref_L00_003E2E80_01(ray, point, D_L00_001B8DC0);
+        ref_L00_003E2E80_01(ray, point, gCameraPosition_L00);
         ref_L00_003E2E80_01(tangent, point, points + (i - 1) * 4);
         ref_L00_003E2E80_02(cross, tangent, ray);
         ref_L00_003E2E80_03(offset, cross, point[3]);

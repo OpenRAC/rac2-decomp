@@ -25,20 +25,21 @@
 
 extern s8 D_001A63A8[];
 
-s32 func_L12_0041A6D0(s8 *arg0, u32 arg1) {
-    s8 *d;
-    s8 *b;
-    s32 x;
+/* Tries to claim the single attack turn: if nobody has it, records this enemy and starts a delay taken from its table. Returns 1 on success. */
+s32 func_L12_0041A6D0(s8 *moby, u32 slot) {
+    s8 *turnState;
+    s8 *vars;
+    s32 delay;
 
-    d = D_001A63A8;
-    if ((*(s32 *)(d + 0x68) == 0) && (*(s32 *)(d + 0x24) == -1)) {
-        b = *(s8 **)(arg0 + 0x68);
-        if (arg1 >= 10) {
+    turnState = gMusicState;
+    if ((*(s32 *)(turnState + 0x68) == 0) && (*(s32 *)(turnState + 0x24) == -1)) {
+        vars = *(s8 **)(moby + 0x68);
+        if (slot >= 10) {
             return 0;
         }
-        x = *(s32 *)(b + (arg1 << 2) + 0x230);
-        *(s8 **)(d + 0x28) = arg0;
-        *(s32 *)(d + 0x24) = x + 0x7D0;
+        delay = *(s32 *)(vars + (slot << 2) + 0x230);
+        *(s8 **)(turnState + 0x28) = moby;
+        *(s32 *)(turnState + 0x24) = delay + 0x7D0;
         return 1;
     }
     return 0;

@@ -27,8 +27,8 @@ extern int r1_D_0012FDA8;
 extern int r1_func_0011CDE0();
 
 struct SifLoadCmd {
-    int unk0;
-    int unk4;
+    int moduleAddr;
+    int argLen;
 };
 
 #define SIFCMD ((struct SifLoadCmd *) r1_D_00158300)
@@ -46,6 +46,7 @@ extern int func_0011EB00(int arg0, int arg1, int arg2, void *arg3);
  * The success path has its own `return 0`: its $v0 = 0 is scheduled
  * ahead of the inlined memcpy, which moves the copy's registers up by
  * one as in retail. The already-bound test jumps to the shared one. */
+/* Connects to the IOP file loader server once and reads its start-up reply. */
 int func_0011E938(void) {
     int i;
 
@@ -79,13 +80,14 @@ extern char D_00140528[];
 extern char *D_0013474C;
 extern int func_00115340(void *, void *, int);
 
+/* Compares three small buffers to see whether they all agree. Returns 1 only if they do. */
 int func_0011EA38(void) {
     char *reference = D_00134684;
     char *state = D_00140528;
     int result = 0;
-    if (func_00115340(state, reference, 4) != 0) {
-        if (func_00115340(state, D_0013474C, 4) != 0)
-            result = func_00115340(reference, D_0013474C, 4) != 0;
+    if (memcmp(state, reference, 4) != 0) {
+        if (memcmp(state, D_0013474C, 4) != 0)
+            result = memcmp(reference, D_0013474C, 4) != 0;
     }
     return result;
 }
@@ -95,42 +97,44 @@ extern int D_00134748;
 extern char D_00140528[];
 extern void func_00115484(void *, int, int);
 
+/* Marks the module loader as not ready and clears its saved buffer. */
 int func_0011EAC8(void) {
     D_00134748 = -1;
-    func_00115484(D_00140528, 0, 4);
+    memset(D_00140528, 0, 4);
     return 0;
 }
 
 /* rac1-decomp src/core/0011CCE0.c: func_0011CE70 */
 /* _sceSifLoadModuleBuffer. Adapted from Lombyte (GPL-3.0) for PAL. */
-int func_0011EB00(int arg0, int arg1, int arg2, void *out) {
-    int *arg3 = out;
-    int var_2_18;
-    int temp;
+/* Asks the IOP to load a module from a buffer and returns the module result. */
+int func_0011EB00(int moduleAddr, int argLen, int args, void *outArg) {
+    int *resultOut = outArg;
+    int errorCode;
+    int moduleResult;
 
-    var_2_18 = 0xFFFF0000;
-    if (func_0011E938() < 0) {
-        return var_2_18;
+    errorCode = 0xFFFF0000;
+    if (BindLoadFileServer() < 0) {
+        return errorCode;
     }
     if (r1_func_0011CDE0() != 0) {
         return 0xFFFEFFFC;
     }
-    SIFCMD->unk0 = arg0;
-    if (arg2 != 0) {
-        if (arg1 >= 0xFD) {
-            memcpy(r1_D_00158300 + 0x104, (void *) arg2, 0xFC);
-            SIFCMD->unk4 = 0xFC;
+    SIFCMD->moduleAddr = moduleAddr;
+    if (args != 0) {
+        if (argLen >= 0xFD) {
+            memcpy(r1_D_00158300 + 0x104, (void *) args, 0xFC);
+            SIFCMD->argLen = 0xFC;
         } else {
-            memcpy(r1_D_00158300 + 0x104, (void *) arg2, arg1);
-            SIFCMD->unk4 = arg1;
+            memcpy(r1_D_00158300 + 0x104, (void *) args, argLen);
+            SIFCMD->argLen = argLen;
         }
     } else {
-        SIFCMD->unk4 = 0;
+        SIFCMD->argLen = 0;
     }
     if (r1_func_0011B4C8(r1_D_00158500, 6, 0, r1_D_00158300, 0x200, r1_D_00158300, 8, 0, 0) < 0) {
         return 0xFFFEFFFF;
     }
-    temp = SIFCMD->unk0;
-    *arg3 = SIFCMD->unk4;
-    return temp;
+    moduleResult = SIFCMD->moduleAddr;
+    *resultOut = SIFCMD->argLen;
+    return moduleResult;
 }

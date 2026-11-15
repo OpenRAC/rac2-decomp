@@ -149,7 +149,7 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     if (ctl == 0) {
         return;
     }
-    pkt.q78 = func_0027C878(D_L00_001AFD14);
+    pkt.q78 = GetEffectTextureDescriptor(D_L00_001AFD14);
     {
         /* Two ALPHA register values: alpha1 swaps the A and B fields of alpha0. The order of
            these steps, and building each value in a local of its own, decides sched1's order
@@ -173,7 +173,7 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     pkt.col[3] = D_L00_001AFD10;
     pkt.col[2] = D_L00_001AFD10;
     pkt.col[1] = D_L00_001AFD10;
-    on = (D_00138180[0x1A0 / 4] & D_00189E20.f1230) != 0;
+    on = (gPadState[0x1A0 / 4] & gHeroState.f1230) != 0;
     pkt.col[0] = D_L00_001AFD10;
     pkt.q88 = alpha0;
     pkt.uv[0] = D_L00_001AFD34;
@@ -188,11 +188,11 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     pkt.uv[7] = inv;
 
     dist = D_L00_001AFCF4;
-    if (D_00189E20.f340 == 0 || D_00189E20.f34E != 0 || D_L00_001AFCE0 != 0 || D_00189E20.f1E0 != 0) {
+    if (gHeroState.f340 == 0 || gHeroState.f34E != 0 || D_L00_001AFCE0 != 0 || gHeroState.f1E0 != 0) {
         on = 0;
     }
     if (ctl->moby != 0 && ctl->moby->f31 != 0) {
-        dist = func_00282E80(&obj->pos, &ctl->moby->pos);
+        dist = vec_distance_xy(&obj->pos, &ctl->moby->pos);
     }
     if (ctl->f44 < dist - D_L00_001AFD1C * 0.016666668f && on != 0) {
         ctl->f44 = ctl->f44 + D_L00_001AFD1C * 0.016666668f;
@@ -204,13 +204,13 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     } else {
         ctl->f44 = dist;
     }
-    if (on != 0 && D_L00_001AFCE0 == 0 && D_00189E20.f1E0 == 0 && ctl->f44 > dist - 0.5f && ctl->moby != 0) {
+    if (on != 0 && D_L00_001AFCE0 == 0 && gHeroState.f1E0 == 0 && ctl->f44 > dist - 0.5f && ctl->moby != 0) {
         ctl->f44 = 0.0f;
         ctl->f40 = 0.0f;
-        D_00189E20.f1E0 = 30;
-        func_L00_003294F0(ctl->moby, 1);
-        if (D_00189E20.f22B4 == 0) {
-            func_002DF3F8(&D_00189E20.v80, &D_00189E20.v90);
+        gHeroState.f1E0 = 30;
+        SetObjectFlagBit(ctl->moby, 1);
+        if (gHeroState.f22B4 == 0) {
+            CaptureCheckpointState(&gHeroState.v80, &gHeroState.v90);
         }
     }
     if (ctl->f44 > dist) {
@@ -222,13 +222,13 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
     }
     a.bits = 0;
     a.f[0] = 1.0f;
-    func_00282F20(&b, &ctl->dir, -1.0f);
+    vec_scale_to_length(&b, &ctl->dir, -1.0f);
     b.f[2] = -b.f[2];
     flag = 0;
-    func_00282DD8(&c, &b, &a);
-    func_00282F20(&c, &c, 1.0f);
-    func_00282DD8(&a, &b, &c);
-    func_00282F20(&a, &a, 1.0f);
+    FastVecCross(&c, &b, &a);
+    vec_scale_to_length(&c, &c, 1.0f);
+    FastVecCross(&a, &b, &c);
+    vec_scale_to_length(&a, &a, 1.0f);
     range = D_L00_001AFD70 - D_L00_001AFD74;
     for (x = ctl->f40; x < ctl->f44; x += D_L00_001AFCF8) {
         if (x <= ctl->f44) {
@@ -245,13 +245,13 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
                     t = 0.0f;
                 }
                 phase = x * D_L00_001AFD68;
-                u = (func_00283198(func_002ABB18(phase + func_00283CE0(D_L00_001B19C8) * D_L00_001AFD6C)) + 1.0f) * 0.5f;
+                u = (FastSinOrCosB(WrapAngleToPi(phase + IntToFloat(gFrameCounter_L00) * D_L00_001AFD6C)) + 1.0f) * 0.5f;
                 if (u > 0.99999f) {
                     u = 0.99999f;
                 } else if (u < 0.01f) {
                     u = 0.01f;
                 }
-                w = D_L00_001AFD74 + range * func_002A7798(u);
+                w = D_L00_001AFD74 + range * EaseOutQuad(u);
             } else {
                 t = x / ctl->f44;
                 if (t > 1.0f) {
@@ -259,22 +259,22 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
                 } else if (t < 0.0f) {
                     t = 0.0f;
                 }
-                w = D_L00_001AFD70 * func_00283198(t * 3.1415927f);
+                w = D_L00_001AFD70 * FastSinOrCosB(t * 3.1415927f);
                 if (t > D_L00_001AFD70) {
                     t = D_L00_001AFD70;
                 } else if (t < 0.01f) {
                     t = 0.01f;
                 }
             }
-            s = func_L00_0031A6C8(func_00283198(t * 3.1415927f), 2);
-            alpha = func_00283CF0((flag ? D_L00_001AFD28 : D_L00_001AFD24) * s);
-            r = func_00283CF0(D_L00_001AFD5C * (func_00283198(func_00283B98(func_002ABB18(D_L00_001AFD38 * func_00283CE0(D_L00_001B19C8) + x * D_L00_001AFD44), D_L00_001AFD50 * 0.017453294f)) + 1.0f));
-            g = func_00283CF0(D_L00_001AFD60 * (func_00283198(func_00283B98(func_002ABB18(D_L00_001AFD3C * func_00283CE0(D_L00_001B19C8) + x * D_L00_001AFD48), D_L00_001AFD54 * 0.017453294f)) + 1.0f));
-            bl = func_00283CF0(D_L00_001AFD64 * (func_00283198(func_00283B98(func_002ABB18(D_L00_001AFD40 * func_00283CE0(D_L00_001B19C8) + x * D_L00_001AFD4C), D_L00_001AFD58 * 0.017453294f)) + 1.0f));
-            if ((D_00138180[0x1A0 / 4] & 8) || D_00189E20.f2294 == 0x1D) {
-                alpha = func_00283CF0((flag ? D_L00_001AFD30 : D_L00_001AFD2C) * func_L00_0031A6C8(func_00283198(t * 3.1415927f), 2));
+            s = ComputeComplementPower(FastSinOrCosB(t * 3.1415927f), 2);
+            alpha = FloatToInt((flag ? D_L00_001AFD28 : D_L00_001AFD24) * s);
+            r = FloatToInt(D_L00_001AFD5C * (FastSinOrCosB(FastAddRotations(WrapAngleToPi(D_L00_001AFD38 * IntToFloat(gFrameCounter_L00) + x * D_L00_001AFD44), D_L00_001AFD50 * 0.017453294f)) + 1.0f));
+            g = FloatToInt(D_L00_001AFD60 * (FastSinOrCosB(FastAddRotations(WrapAngleToPi(D_L00_001AFD3C * IntToFloat(gFrameCounter_L00) + x * D_L00_001AFD48), D_L00_001AFD54 * 0.017453294f)) + 1.0f));
+            bl = FloatToInt(D_L00_001AFD64 * (FastSinOrCosB(FastAddRotations(WrapAngleToPi(D_L00_001AFD40 * IntToFloat(gFrameCounter_L00) + x * D_L00_001AFD4C), D_L00_001AFD58 * 0.017453294f)) + 1.0f));
+            if ((gPadState[0x1A0 / 4] & 8) || gHeroState.f2294 == 0x1D) {
+                alpha = FloatToInt((flag ? D_L00_001AFD30 : D_L00_001AFD2C) * ComputeComplementPower(FastSinOrCosB(t * 3.1415927f), 2));
                 if (x < ctl->f44 * 0.5f) {
-                    alpha = func_00283CF0(flag ? D_L00_001AFD30 : D_L00_001AFD2C);
+                    alpha = FloatToInt(flag ? D_L00_001AFD30 : D_L00_001AFD2C);
                 }
                 col = r | (g << 8);
                 col = col | (bl << 16);
@@ -294,33 +294,33 @@ void func_L00_003B84F0(Moby_L00_003B84F0 *obj)
             }
             flag ^= 1;
 
-            func_00282F20(&vx, &b, x);
-            func_00282F20(&vy, &a, w);
-            func_00282F20(&vz, &c, w);
-            func_00282CF0(&p, &ctl->pos, &vx);
+            vec_scale_to_length(&vx, &b, x);
+            vec_scale_to_length(&vy, &a, w);
+            vec_scale_to_length(&vz, &c, w);
+            FastVecSub(&p, &ctl->pos, &vx);
             pkt.m[3].bits = p.bits;
-            func_00282CC0(&p, &pkt.m[3], &vz);
+            FastVecAdd(&p, &pkt.m[3], &vz);
             pkt.m[1].bits = p.bits;
-            func_00282CF0(&p, &pkt.m[1], &vy);
+            FastVecSub(&p, &pkt.m[1], &vy);
             pkt.m[0].bits = p.bits;
-            func_00282CF0(&p, &pkt.m[3], &vy);
+            FastVecSub(&p, &pkt.m[3], &vy);
             pkt.m[2].bits = p.bits;
-            func_00280B90(&pkt, 0, 1);
-            func_00282CC0(&p, &pkt.m[1], &vy);
+            draw_world_quad(&pkt, 0, 1);
+            FastVecAdd(&p, &pkt.m[1], &vy);
             pkt.m[0].bits = p.bits;
-            func_00282CC0(&p, &pkt.m[3], &vy);
+            FastVecAdd(&p, &pkt.m[3], &vy);
             pkt.m[2].bits = p.bits;
-            func_00280B90(&pkt, 0, 1);
-            func_00282CF0(&p, &pkt.m[3], &vz);
+            draw_world_quad(&pkt, 0, 1);
+            FastVecSub(&p, &pkt.m[3], &vz);
             pkt.m[1].bits = p.bits;
-            func_00282CF0(&p, &pkt.m[2], &vz);
+            FastVecSub(&p, &pkt.m[2], &vz);
             pkt.m[0].bits = p.bits;
-            func_00280B90(&pkt, 0, 1);
-            func_00282CF0(&p, &pkt.m[1], &vy);
+            draw_world_quad(&pkt, 0, 1);
+            FastVecSub(&p, &pkt.m[1], &vy);
             pkt.m[0].bits = p.bits;
-            func_00282CF0(&p, &pkt.m[3], &vy);
+            FastVecSub(&p, &pkt.m[3], &vy);
             pkt.m[2].bits = p.bits;
-            func_00280B90(&pkt, 0, 1);
+            draw_world_quad(&pkt, 0, 1);
             if (flag) {
                 pkt.q88 = alpha1;
             } else {

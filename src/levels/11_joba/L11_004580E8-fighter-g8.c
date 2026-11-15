@@ -49,104 +49,105 @@ extern int D_L11_001B1F90 SDATA(D_L11_001B1F90);
 extern int D_L11_001B1FA4 SDATA(D_L11_001B1FA4);
 typedef struct { float x,y,z; } FadeColor;
 extern FadeColor D_L11_001B1FB0;
-void func_L11_004580E8(char *p) {
- char *q=*(char **)(p+0x68),*other,*entry;
+/* Per-frame update of a flying shot (moby class 3616): it bounces off walls, fades its colour, explodes with damage when done, and drops out if it falls below the floor. */
+void func_L11_004580E8(char *moby) {
+ char *vars=*(char **)(moby+0x68),*other,*entry;
  union { struct { float a[4],b[4],c[4]; } v; char damage[48]; } scratch;
  float f; int i,n; unsigned int r,g,blue;
- switch(*(u8 *)(p+0x20)) {
+ switch(*(u8 *)(moby+0x20)) {
  case 0: {
-  *(u8 *)(q+0x148)=func_00283CF0(15);*(u8 *)(q+0x14A)=func_00283CF0(4);
+  *(u8 *)(vars+0x148)=FloatToInt(15);*(u8 *)(vars+0x14A)=FloatToInt(4);
   {float speed, max, damping, turn, gravity, limit;
-  *(float *)(q+0x160)=func_002A7878(-*(float *)(q+0x160),*(float *)(q+0x160))*0.017453294f;
-  *(u8 *)(p+0x30)=128;*(int *)(q+0x24)=0;
+  *(float *)(vars+0x160)=RandomFloatRange(-*(float *)(vars+0x160),*(float *)(vars+0x160))*0.017453294f;
+  *(u8 *)(moby+0x30)=128;*(int *)(vars+0x24)=0;
   speed=0.3f;max=0.75f;damping=0.5f;turn=1.134464144706726f;gravity=0.0027777778450399637f;limit=0.523598849773407f;
-  *(u8 *)(q+0x128)=3;*(int *)(q+0x130)=0;
-  *(float *)(q+0x4C)=gravity;
-  *(float *)(q+0x20)=speed;*(float *)(q+0x28)=max;*(float *)(q+0x2C)=damping;*(float *)(q+0x30)=turn;*(float *)(q+0x50)=limit;*(float *)(q+0x54)=0.1f;
-  *(int *)(q+0x58)|=0x14;*(float *)(p+0x2C)*=D_L11_001B1F88;*(int *)(q+0x170)=-1;
-  *(u16 *)(p+0x34)=(*(u16 *)(p+0x34)&0xEFFF)|0x41;*(int *)(p+0x98)=0;
+  *(u8 *)(vars+0x128)=3;*(int *)(vars+0x130)=0;
+  *(float *)(vars+0x4C)=gravity;
+  *(float *)(vars+0x20)=speed;*(float *)(vars+0x28)=max;*(float *)(vars+0x2C)=damping;*(float *)(vars+0x30)=turn;*(float *)(vars+0x50)=limit;*(float *)(vars+0x54)=0.1f;
+  *(int *)(vars+0x58)|=0x14;*(float *)(moby+0x2C)*=D_L11_001B1F88;*(int *)(vars+0x170)=-1;
+  *(u16 *)(moby+0x34)=(*(u16 *)(moby+0x34)&0xEFFF)|0x41;*(int *)(moby+0x98)=0;
   }
-  func_002A7750(p,1,-1);return;
+  SetMobyState(moby,1,-1);return;
  }
  case 2:case 3:
-  func_00282CC0(scratch.v.a,p+0x10,q+0xC0);
-  *(float *)(q+0xC8)-=*(float *)(q+0x4C);
-  if(*(u8 *)(p+0x20)==3 && *(float *)(q+0xC8)<0) *(u8 *)(p+0x20)=2;
-  func_00282978(q+0x16C);
-  if(*(s16 *)(q+0x16C)) {
+  FastVecAdd(scratch.v.a,moby+0x10,vars+0xC0);
+  *(float *)(vars+0xC8)-=*(float *)(vars+0x4C);
+  if(*(u8 *)(moby+0x20)==3 && *(float *)(vars+0xC8)<0) *(u8 *)(moby+0x20)=2;
+  FastDecTimer(vars+0x16C);
+  if(*(s16 *)(vars+0x16C)) {
    Quad *axis=&D_L11_001A8F20;
    for(i=0;i<3;i++) {
-    *(Quad *)scratch.v.c=*(Quad *)(p+0x10);func_L00_0031D670(scratch.v.b,scratch.v.c,scratch.v.a,(float)i*0.3333f);
-    n=func_002A77E0(6);if(func_002A77E0(2))n=-n;
-    f=func_00283CE0(D_L11_001B1F84);
+    *(Quad *)scratch.v.c=*(Quad *)(moby+0x10);LerpVector4(scratch.v.b,scratch.v.c,scratch.v.a,(float)i*0.3333f);
+    n=RandomIntBelow(6);if(RandomIntBelow(2))n=-n;
+    f=IntToFloat(D_L11_001B1F84);
     {
     int life=120,mode=2,alpha=127;
     float scale=45000;
-    Particle *particle=func_002BDCE8(scratch.v.b,n,0.025f,1,1,axis,0x80808080,0,
-      ({float lifetime=(float)*(s16 *)(q+0x16C)/f;
+    Particle *particle=SpawnSpinningSparkParticle(scratch.v.b,n,0.025f,1,1,axis,0x80808080,0,
+      ({float lifetime=(float)*(s16 *)(vars+0x16C)/f;
         lifetime*scale+5000;}));
     if(particle) {ParticleAttributes *attributes;particle->lifetime=life;attributes=&particle->attributes;attributes->mode=mode;attributes->alpha=alpha;attributes->duration=(u8)particle->lifetime;}
     }
    }
   }
-  if(func_002761F8(p+0x10,scratch.v.a,0,p,0) && !func_IsOwnerClass(D_L11_001C0D00.hit,q)) qcopy(p+0x10,D_L11_001C0D00.point);
-  else qcopy(p+0x10,scratch.v.a);
-  if(!func_00277258(p+0x10,0,p,D_L11_001B1F80))break;
-  if(*(u8 *)(p+0x20)!=2) {Collision *col=&D_L11_001C0D00;if(!(*(float *)(p+0x18)-col->point[2]<0))break;}
+  if(CollLine(moby+0x10,scratch.v.a,0,moby,0) && !func_IsOwnerClass(D_L11_001C0D00.hit,vars)) qcopy(moby+0x10,D_L11_001C0D00.point);
+  else qcopy(moby+0x10,scratch.v.a);
+  if(!TestPointAgainstCollision(moby+0x10,0,moby,D_L11_001B1F80))break;
+  if(*(u8 *)(moby+0x20)!=2) {Collision *col=&D_L11_001C0D00;if(!(*(float *)(moby+0x18)-col->point[2]<0))break;}
   {Collision *col=&D_L11_001C0D00;
-  if(func_IsOwnerClass(col->hit,q))break;}
-  func_00282F20(scratch.v.b,D_L11_001C0D00.normal,D_L11_001B1F80);
-  func_00282CC0(p+0x10,D_L11_001C0D00.point,scratch.v.b);
-  func_00283028(q+0xC0,q+0xC0,D_L11_001C0D00.normal);
-  func_002E5CF8(1,0,p);
-  if(*(u8 *)(p+0x20)==2) {float bounce;*(u8 *)(p+0x20)=3;bounce=D_L11_001B1F8C;(*(u16 *)(q+0x16E))++;func_00282D30(q+0xC0,q+0xC0,bounce);}
-  if(*(s16 *)(q+0x16E)>=D_L11_001B1F90) *(u8 *)(p+0x20)=5;
+  if(func_IsOwnerClass(col->hit,vars))break;}
+  vec_scale_to_length(scratch.v.b,D_L11_001C0D00.normal,D_L11_001B1F80);
+  FastVecAdd(moby+0x10,D_L11_001C0D00.point,scratch.v.b);
+  FastVectorNormalize(vars+0xC0,vars+0xC0,D_L11_001C0D00.normal);
+  PlayMobySound(1,0,moby);
+  if(*(u8 *)(moby+0x20)==2) {float bounce;*(u8 *)(moby+0x20)=3;bounce=D_L11_001B1F8C;(*(u16 *)(vars+0x16E))++;FastVecScale(vars+0xC0,vars+0xC0,bounce);}
+  if(*(s16 *)(vars+0x16E)>=D_L11_001B1F90) *(u8 *)(moby+0x20)=5;
   break;
  case 4: {
   float f;
-  if(func_002B3868(p)){int duration=D_L11_001B1FA4;*(int *)(q+0x150)=duration;*(float *)(q+0x154)=1/func_00283CE0(duration);}
+  if(SetFirstPendingFlag(moby)){int duration=D_L11_001B1FA4;*(int *)(vars+0x150)=duration;*(float *)(vars+0x154)=1/IntToFloat(duration);}
   *(FadeColor *)scratch.v.a=D_L11_001B1FB0;
-  f=(float)*(int *)(q+0x150)**(float *)(q+0x154);
-  r=func_00283CF0((scratch.v.a[0]-255)*f+255);g=func_00283CF0(scratch.v.a[1]*f);blue=func_00283CF0(scratch.v.a[2]*f);
+  f=(float)*(int *)(vars+0x150)**(float *)(vars+0x154);
+  r=FloatToInt((scratch.v.a[0]-255)*f+255);g=FloatToInt(scratch.v.a[1]*f);blue=FloatToInt(scratch.v.a[2]*f);
   {unsigned int color=blue<<16;
   color|=0xFF000000;
   color|=g<<8;
   color|=r;
-  *(unsigned int *)(p+0x78)=color;}
-  if(func_00282948(q+0x150))func_002A7750(p,6,-1);
+  *(unsigned int *)(moby+0x78)=color;}
+  if(FastFloatHelperD(vars+0x150))SetMobyState(moby,6,-1);
   break;
  }
  case 5: {
   float f,t;
-  if(func_002B3868(p)) {
-   p[0xBC]=0;f=func_002A7878(15,40)*0.017453294f;if(func_002A77E0(2))f=-f;
+  if(SetFirstPendingFlag(moby)) {
+   moby[0xBC]=0;f=RandomFloatRange(15,40)*0.017453294f;if(RandomIntBelow(2))f=-f;
    t=D_L11_001B1F98;
-   *(float *)(q+0x160)=f;func_002B60B0(p,(t+t)*0.00027777778450399637f,t*0.01666666753590107f,0.0011635529808700085f,0.10471977293491364f);
-  } else if(!*(u8 *)(p+0xBC)) {
-   other=func_L11_004417E8(*(void **)(p+0xB8));
-   if(*(float *)(p+0x18)<*(float *)(other+8)+D_L11_001B1F94) {
-    float *height=(float *)(p+0x18);
-    other=func_L11_004417E8(*(void **)(p+0xB8));
-    func_002AA548(height,q+0xC8,*(float *)(other+8)+D_L11_001B1F94,*(float *)(q+0x40),*(float *)(q+0x40),*(float *)(q+0x48));
-   }else p[0xBC]=1;
-  }else if(*(u8 *)(p+0xBC)==1) {
-   if(*(u8 *)(p+0x31))func_002B4FF0(p,*(char **)(q+0x164)+16,*(float *)(q+0x160));
-   other=func_L11_004417E8(*(void **)(p+0xB8));*(float *)(p+0x18)=*(float *)(other+8)+D_L11_001B1F94;
-   if(*(u8 *)(p+0x31)) {f=func_L02_002F21C0(p+0x10,*(char **)(q+0x164)+16);if(f<D_L11_001B1F9C*D_L11_001B1F9C)func_002A7750(p,4,-1);}
+   *(float *)(vars+0x160)=f;SetControllerSpeedLimits(moby,(t+t)*0.00027777778450399637f,t*0.01666666753590107f,0.0011635529808700085f,0.10471977293491364f);
+  } else if(!*(u8 *)(moby+0xBC)) {
+   other=GetArenaCenterPoint(*(void **)(moby+0xB8));
+   if(*(float *)(moby+0x18)<*(float *)(other+8)+D_L11_001B1F94) {
+    float *height=(float *)(moby+0x18);
+    other=GetArenaCenterPoint(*(void **)(moby+0xB8));
+    StepValueTowardTarget(height,vars+0xC8,*(float *)(other+8)+D_L11_001B1F94,*(float *)(vars+0x40),*(float *)(vars+0x40),*(float *)(vars+0x48));
+   }else moby[0xBC]=1;
+  }else if(*(u8 *)(moby+0xBC)==1) {
+   if(*(u8 *)(moby+0x31))TurnTowardTargetAndStepMovement(moby,*(char **)(vars+0x164)+16,*(float *)(vars+0x160));
+   other=GetArenaCenterPoint(*(void **)(moby+0xB8));*(float *)(moby+0x18)=*(float *)(other+8)+D_L11_001B1F94;
+   if(*(u8 *)(moby+0x31)) {f=DistanceSquaredXY(moby+0x10,*(char **)(vars+0x164)+16);if(f<D_L11_001B1F9C*D_L11_001B1F9C)SetMobyState(moby,4,-1);}
   }
-  if(!func_002E59B0(p,*(int *)(q+0x170))) *(int *)(q+0x170)=func_002E5CF8(2,4,p);
+  if(!IsVoicePlayingForOwner(moby,*(int *)(vars+0x170))) *(int *)(vars+0x170)=PlayMobySound(2,4,moby);
   break;
  }
  case 6:
-  if(func_002B3868(p)) {
-   func_0032C700(p+16,1,10,10,2,20,60,1,D_L11_001B1FA8,0,1,1,0,0);
-   func_002E5CF8(0,0,p);func_002A8BD0(scratch.damage,p,0x810001,*(float *)(q+0x158));
-   scratch.damage[24]=2;scratch.damage[25]=1;*(u16 *)(scratch.damage+26)=*(u16 *)(p+0xAA);
-   func_00277F48(D_L11_001B1FAC,p+16,16,p,scratch.damage);
-   *(int *)(p+0x98)=0;*(u16 *)(p+0x34)=(*(u16 *)(p+0x34)|0x41)&0xEFFF;func_002A7750(p,1,-1);
-  if(func_002E59B0(p,*(int *)(q+0x170))) {
-   int sound=*(int *)(q+0x170);if(sound!=-1){entry=D_00188660+sound*0x70;if(*(char **)(entry+0x88)==p&&*(u8 *)(entry+0x74))func_002E59F8(sound);}
-   *(int *)(q+0x170)=-1;
+  if(SetFirstPendingFlag(moby)) {
+   SpawnExplosion(moby+16,1,10,10,2,20,60,1,D_L11_001B1FA8,0,1,1,0,0);
+   PlayMobySound(0,0,moby);InitEffectRecord_002A8BD0(scratch.damage,moby,0x810001,*(float *)(vars+0x158));
+   scratch.damage[24]=2;scratch.damage[25]=1;*(u16 *)(scratch.damage+26)=*(u16 *)(moby+0xAA);
+   ProcessCollisionHit(D_L11_001B1FAC,moby+16,16,moby,scratch.damage);
+   *(int *)(moby+0x98)=0;*(u16 *)(moby+0x34)=(*(u16 *)(moby+0x34)|0x41)&0xEFFF;SetMobyState(moby,1,-1);
+  if(IsVoicePlayingForOwner(moby,*(int *)(vars+0x170))) {
+   int sound=*(int *)(vars+0x170);if(sound!=-1){entry=gSoundState+sound*0x70;if(*(char **)(entry+0x88)==moby&&*(u8 *)(entry+0x74))StopSoundVoice(sound);}
+   *(int *)(vars+0x170)=-1;
   }return;
   }
   break;
@@ -155,15 +156,15 @@ void func_L11_004580E8(char *p) {
  {
   float f;
   float min,max;
-  f=func_00282E20(q+0xC0);min=0.0033333336468786f;max=0.10000000894069672f;
+  f=vec_length_xy(vars+0xC0);min=0.0033333336468786f;max=0.10000000894069672f;
   if(f<min)f=min;if(f>max)f=max;
   f=f-min;
-  *(float *)(p+0xF4)=func_00283B98(
+  *(float *)(moby+0xF4)=FastAddRotations(
     ({float fraction=f/0.09666667878627777f;
-      (fraction*7+1)*0.017453294f;}),*(float *)(p+0xF4));
+      (fraction*7+1)*0.017453294f;}),*(float *)(moby+0xF4));
  }
- if(*(u8 *)(p+0x20)>=2)func_L00_002E6EF8(func_L11_00458C38,p);
- if(*(void **)(p+0xB8)) {other=func_L11_004417E8(*(void **)(p+0xB8));if(*(float *)(p+0x18)<*(float *)(other+8)-1){*(int *)(p+0x98)=0;*(u16 *)(p+0x34)=(*(u16 *)(p+0x34)|0x41)&0xEFFF;func_002A7750(p,1,-1);}}
- if(func_002A9640(p,0x10000,0))func_002A7750(p,6,-1);
- *(u8 *)(p+0xA8)=255;if(*(u16 *)(p+0x96)<0xFFFF)(*(u16 *)(p+0x96))++;
+ if(*(u8 *)(moby+0x20)>=2)AddDrawCallbackToList3(SpawnJobaShotSmoke,moby);
+ if(*(void **)(moby+0xB8)) {other=GetArenaCenterPoint(*(void **)(moby+0xB8));if(*(float *)(moby+0x18)<*(float *)(other+8)-1){*(int *)(moby+0x98)=0;*(u16 *)(moby+0x34)=(*(u16 *)(moby+0x34)|0x41)&0xEFFF;SetMobyState(moby,1,-1);}}
+ if(FindOwnedEffectSlot(moby,0x10000,0))SetMobyState(moby,6,-1);
+ *(u8 *)(moby+0xA8)=255;if(*(u16 *)(moby+0x96)<0xFFFF)(*(u16 *)(moby+0x96))++;
 }

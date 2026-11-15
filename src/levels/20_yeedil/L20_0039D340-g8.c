@@ -75,6 +75,7 @@ typedef struct {
     unsigned char bA8;
 } Object0039D340;
 
+/* Sets up the trooper stats and hit settings on its first frame, then handles damage and picks where to aim. */
 void func_L20_0039D340(Object0039D340 *object) {
     State0039D340 *st = object->state;
     unsigned char *event;
@@ -111,7 +112,7 @@ void func_L20_0039D340(Object0039D340 *object) {
         st->f80 = 0.52359884977340698f;
         st->f84 = 0.10000000149011612f;
         object->h7C = 15;
-        func_002B60B0(object, D_L20_001AECF4 * 0.00027777778f,
+        SetControllerSpeedLimits(object, D_L20_001AECF4 * 0.00027777778f,
                      D_L20_001AECF0 * 0.016666668f,
                      D_L20_001AECFC * 4.8481375e-06f,
                      D_L20_001AECF8 * 0.00029088825f);
@@ -119,28 +120,28 @@ void func_L20_0039D340(Object0039D340 *object) {
             st->s24 = 10;
             st->f20 = 10.0f;
         }
-        func_L20_00330A68(object, 0xD0F);
-        func_002A7750(object, 6, 2);
-        if (object->b43) func_002A7470(object, 0, 0, 0);
+        ChangeMobyClassFromTables(object, 0xD0F);
+        SetMobyState(object, 6, 2);
+        if (object->b43) StartAnimationBlended(object, 0, 0, 0);
         object->h34 = (object->h34 | 0x4000) & 0xFFFB;
     }
-    event = func_002A9640(object, 0x10000, 0);
-    if (event && *(unsigned char **)(event + 0x20) && *(short *)(*(unsigned char **)(event + 0x20) + 0xAA) == 0xD0F)
+    event = FindOwnedEffectSlot(object, 0x10000, 0);
+    if (event && *(unsigned char **)(event + 0x20) && *(short *)(*(unsigned char **)(event + 0x20) + 0xAA) == 0xD0F /* Megacorp Trooper Legs */)
         object->bA8 = 255;
-    func_002B0ED8(object, &st->damage, 0);
+    ApplyDamageToObject(object, &st->damage, 0);
     if (st->b2E == 2) {
-        func_002A7750(object, 6, 2);
+        SetMobyState(object, 6, 2);
         object->i98 = 0;
         object->h34 = (object->h34 | 0x41) & 0xEFFF;
         child = st->children;
         for (count = 0; count < 2; count++) {
             if (*child) {
-                func_0029F338(*child);
+                MarkMobySpawned(*child);
                 *child = 0;
             }
             ++child;
         }
-        if (st->p254) func_0029F338(st->p254);
+        if (st->p254) MarkMobySpawned(st->p254);
         st->p254 = 0;
     }
     st->b2E = 1;
@@ -150,6 +151,6 @@ void func_L20_0039D340(Object0039D340 *object) {
         qcopy(&st->f1F0, target + 0x10);
         st->f1F0[2] += 0.5f;
     } else {
-        func_002B3BA8(object, st->i230, 0, 0, 128.0f, 0.0f);
+        SelectAimTarget_002B3BA8(object, st->i230, 0, 0, 128.0f, 0.0f);
     }
 }

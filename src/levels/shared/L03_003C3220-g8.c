@@ -135,6 +135,7 @@ extern void func_L03_003C5EE8(void *);
 #define ANIM_COUNT(p, offset) (*(u8 *)(*(u8 **)(*(u8 **)((p) + 0x24) + (offset)) + 0x10))
 
 
+/* Updates a bot moby (Bridgebot, Gadgebot and similar) that follows the hero's commands: sets it up, counts it for challenges and switches its state. */
 void func_L03_003C3220(u8 *object)
 {
     StateVector point, first, second;
@@ -146,22 +147,22 @@ void func_L03_003C3220(u8 *object)
     float distance;
     int permitted;
     if (mob->state == 0) {
-        if (func_002A77E0(2)) mob->flags |= 0x8000;
+        if (RandomIntBelow(2)) mob->flags |= 0x8000;
         else mob->flags &= 0x7FFF;
         mob->flags_7E |= 1;
-        mob->position[2] = func_002A89A8((u8 *)mob->position, 0, 0.5f);
+        mob->position[2] = ProbeGroundHeightBelow((u8 *)mob->position, 0, 0.5f);
         vars->initial_height = mob->position[2];
         type = mob->type;
-        if (type == 0x964) {
-            vars->child = func_0029EFD0(0x972);
+        if (type == 0x964 /* Gadgebot */) {
+            vars->child = CreateMoby(0x972);
             if (vars->child) {
-                func_002B37E8(vars->child, object);
+                InitChildObjectFromParent(vars->child, object);
                 *(u16 *)(vars->child + 0x32) = 0x30;
             }
         } else {
-            vars->child = func_0029EFD0(0xD75);
+            vars->child = CreateMoby(0xD75);
             if (vars->child) {
-                func_002B37E8(vars->child, object);
+                InitChildObjectFromParent(vars->child, object);
                 *(u16 *)(vars->child + 0x7C) = D_L03_001AFF00;
                 *(u16 *)(vars->child + 0x32) = 0x30;
                 if (mob->type == 0x93C) {
@@ -179,11 +180,11 @@ void func_L03_003C3220(u8 *object)
             vars->collision_radius = 0.42f;
             mob->position[2] += 0.089f;
             break;
-        case 0x940:
+        case 0x940 /* Bridgebot */:
             vars->collision_radius = 0.39f;
             mob->position[2] += 0.089f;
-            func_00282F20(&point, &mob->forward, -0.2f);
-            func_00282CC0(mob->position, &point, mob->position);
+            vec_scale_to_length(&point, &mob->forward, -0.2f);
+            FastVecAdd(mob->position, &point, mob->position);
             break;
         case 0xA59:
             vars->collision_radius = 0.42f;
@@ -201,10 +202,10 @@ void func_L03_003C3220(u8 *object)
         vars->movement_data = state + 0x240;
         vars->path_data = state + 0x2C0;
         vars->turn_step = 0.0055555557f;
-        func_002A7750(object, 1, 0);
+        SetMobyState(object, 1, 0);
         if (mob->animation)
-            func_002A7470(object, 0, func_002A77E0(ANIM_COUNT(object, 0x48)), 0);
-        if (mob->type == 0x940) {
+            StartAnimationBlended(object, 0, RandomIntBelow(ANIM_COUNT(object, 0x48)), 0);
+        if (mob->type == 0x940 /* Bridgebot */) {
             for (i = 0; i < 8; i++) {
                 u16 *ids;
                 if (vars->groups[i] == -1) continue;
@@ -215,197 +216,197 @@ void func_L03_003C3220(u8 *object)
                     u8 *member = D_L03_001B2A1C[0] + ((*ids & 0x7FFF) << 8);
                     if (member == 0) break;
                     if (*(s16 *)(member + 0xAA) == 0x97A)
-                        func_L03_00419A60(vars->area_id, member + 0x10, 0);
+                        SetRouteNodeEnabledFlag(vars->area_id, member + 0x10, 0);
                 }
             }
         } else if (mob->type == 0xA59 && mob->animation != 6) {
-            func_002A7470(object, 6, 0, 0);
+            StartAnimationBlended(object, 6, 0, 0);
         }
     }
-    if (mob->active && func_00282E48(mob->position, D_L03_001B9980) < 24.0f) {
-        func_002A93B0(object);
+    if (mob->active && fast_vec_dist(mob->position, D_L03_001B9980) < 24.0f) {
+        UpdateMobyGroundCheck(object);
         mob->event = 0x16;
     }
-    if (mob->state > 1 && mob->mode != 4) func_L03_0032AD10((int)object);
-    if (func_002A9640(object, 1, 0) ||
+    if (mob->state > 1 && mob->mode != 4) AddIdToFrameList((int)object);
+    if (FindOwnedEffectSlot(object, 1, 0) ||
         (mob->position[2] < vars->initial_height - 10.0f &&
          mob->position[2] - 10.0f < vars->floor_height)) {
-        if (func_00282C30(D_L03_001AFEF8 - D_L03_001B2548) > D_L03_001AFEFC) {
+        if (subtract_integer_with_clamp(D_L03_001AFEF8 - gFrameCounter_L03) > D_L03_001AFEFC) {
             point.q = 0;
             point.f[2] = 0.5f;
-            D_L03_001AFEF8 = D_L03_001B2548;
-            func_00282CC0(&point, &point, mob->position);
-            func_0032C700(mob->position,0,5,5,5,10,20,0,0.25f,20.0f,1,0,0,0);
-            if (mob->type == 0x964)
-                func_002B0A68((char *)object, 15, (float *)(state + 0x1B0), 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            func_002A7750(object, 4, 1);
+            D_L03_001AFEF8 = gFrameCounter_L03;
+            FastVecAdd(&point, &point, mob->position);
+            SpawnExplosion(mob->position,0,5,5,5,10,20,0,0.25f,20.0f,1,0,0,0);
+            if (mob->type == 0x964 /* Gadgebot */)
+                SpawnDebrisForMaskedParts((char *)object, 15, (float *)(state + 0x1B0), 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            SetMobyState(object, 4, 1);
             qzero(state + 0x1B0);
             vars->path_index = -1;
-            func_L03_003C5668(object, first.f, second.f);
-            func_L02_002EF388(object, &first, &second, 0, 0);
+            ChooseVisibleGroupTarget(object, first.f, second.f);
+            FuseObjectWithLinkedObjects(object, &first, &second, 0, 0);
         }
         mob->flags_A8 = 255;
     }
     if (mob->mode == 4) D_L03_001B2750.active++;
-    if (D_0018C958[39].count < 65535 && mob->type == 0x940 && mob->state != 1 && func_L03_003C5128(object)) {
-        if (D_0018C958[39].count != 0) {
-            if (D_001A7390 - D_0018C958[39].tick > 1080 || D_0018C958[39].tick == 0)
-                func_00288E18(0x9D0, 0x27);
-            else if (D_0018C958[39].tick < D_001A7390) D_0018C958[39].tick = D_001A7390;
+    if (gSubtitleHistory[39].count < 65535 && mob->type == 0x940 /* Bridgebot */ && mob->state != 1 && FindClass2426EntityNearby(object)) {
+        if (gSubtitleHistory[39].count != 0) {
+            if (D_001A7390 - gSubtitleHistory[39].tick > 1080 || gSubtitleHistory[39].tick == 0)
+                RequestSubtitleVoiceLine(0x9D0, 0x27);
+            else if (gSubtitleHistory[39].tick < D_001A7390) gSubtitleHistory[39].tick = D_001A7390;
         } else {
-            D_0018C958[39].count++;
-            if (D_0018C958[39].tick < D_001A7390) D_0018C958[39].tick = D_001A7390;
-            D_0018C958[39].flags = (D_0018C958[39].flags | (1U << D_001A79F0)) | 0x80000000U;
+            gSubtitleHistory[39].count++;
+            if (gSubtitleHistory[39].tick < D_001A7390) gSubtitleHistory[39].tick = D_001A7390;
+            gSubtitleHistory[39].flags = (gSubtitleHistory[39].flags | (1U << gCurrentMapIndex)) | 0x80000000U;
         }
     }
-    if (D_0018C958[128].count < 65535 && mob->type == 0x93C && mob->state != 1 && func_L03_003C52D0(object)) {
-        if (D_0018C958[128].count != 0) {
-            if (D_001A7390 - D_0018C958[128].tick > 1080 || D_0018C958[128].tick == 0)
-                func_00288E18(0xA29, 0x80);
-            else if (D_0018C958[128].tick < D_001A7390) D_0018C958[128].tick = D_001A7390;
+    if (gSubtitleHistory[128].count < 65535 && mob->type == 0x93C && mob->state != 1 && FindNearestClass3719Entity(object)) {
+        if (gSubtitleHistory[128].count != 0) {
+            if (D_001A7390 - gSubtitleHistory[128].tick > 1080 || gSubtitleHistory[128].tick == 0)
+                RequestSubtitleVoiceLine(0xA29, 0x80);
+            else if (gSubtitleHistory[128].tick < D_001A7390) gSubtitleHistory[128].tick = D_001A7390;
         } else {
-            D_0018C958[128].count++;
-            if (D_0018C958[128].tick < D_001A7390) D_0018C958[128].tick = D_001A7390;
-            D_0018C958[128].flags = (D_0018C958[128].flags | (1U << D_001A79F0)) | 0x80000000U;
+            gSubtitleHistory[128].count++;
+            if (gSubtitleHistory[128].tick < D_001A7390) gSubtitleHistory[128].tick = D_001A7390;
+            gSubtitleHistory[128].flags = (gSubtitleHistory[128].flags | (1U << gCurrentMapIndex)) | 0x80000000U;
         }
     }
-    if (D_0018C958[97].count < 65535 && mob->type == 0xA59 && mob->state != 1 && func_L03_003C5488(object)) {
-        if (D_0018C958[97].count != 0) {
-            if (D_001A7390 - D_0018C958[97].tick > 1080 || D_0018C958[97].tick == 0)
-                func_00288E18(0xA0A, 0x61);
-            else if (D_0018C958[97].tick < D_001A7390) D_0018C958[97].tick = D_001A7390;
+    if (gSubtitleHistory[97].count < 65535 && mob->type == 0xA59 && mob->state != 1 && FindNearestPickupTarget(object)) {
+        if (gSubtitleHistory[97].count != 0) {
+            if (D_001A7390 - gSubtitleHistory[97].tick > 1080 || gSubtitleHistory[97].tick == 0)
+                RequestSubtitleVoiceLine(0xA0A, 0x61);
+            else if (gSubtitleHistory[97].tick < D_001A7390) gSubtitleHistory[97].tick = D_001A7390;
         } else {
-            D_0018C958[97].count++;
-            if (D_0018C958[97].tick < D_001A7390) D_0018C958[97].tick = D_001A7390;
-            D_0018C958[97].flags = (D_0018C958[97].flags | (1U << D_001A79F0)) | 0x80000000U;
+            gSubtitleHistory[97].count++;
+            if (gSubtitleHistory[97].tick < D_001A7390) gSubtitleHistory[97].tick = D_001A7390;
+            gSubtitleHistory[97].flags = (gSubtitleHistory[97].flags | (1U << gCurrentMapIndex)) | 0x80000000U;
         }
     }
-    if (mob->state != 1 && func_00282E80(mob->position, D_00189E20.position) < 16.0f) {
+    if (mob->state != 1 && vec_distance_xy(mob->position, gHeroState.position) < 16.0f) {
         D_L03_001B2750.near_player++;
         switch (mob->type) {
-        case 0x940: D_L03_001B2750.near_940++; break;
+        case 0x940 /* Bridgebot */: D_L03_001B2750.near_940++; break;
         case 0x93C: D_L03_001B2750.near_93C++; break;
         case 0xA59: D_L03_001B2750.near_A59++; break;
         }
     }
     permitted = 1;
-    if (D_00189E20.command == 0 || mob->state == 1 || mob->state == 13 || mob->mode == 7)
+    if (gHeroState.command == 0 || mob->state == 1 || mob->state == 13 || mob->mode == 7)
         permitted = 0;
     else if (vars->command_cooldown) permitted = 0;
-    else if (mob->mode == 4 && D_00189E20.command != 6) permitted = 0;
-    else if (mob->mode == 5 && D_00189E20.command != 5) permitted = 0;
+    else if (mob->mode == 4 && gHeroState.command != 6) permitted = 0;
+    else if (mob->mode == 5 && gHeroState.command != 5) permitted = 0;
     if (!permitted) return;
-    switch (D_00189E20.command) {
+    switch (gHeroState.command) {
     case 1:
         if (mob->mode == 1) return;
-        distance = func_00282E80(mob->position, D_00189E20.position);
+        distance = vec_distance_xy(mob->position, gHeroState.position);
         if (distance > D_L03_001AFEE4) {
-            func_002A7750(object, 3, 1);
+            SetMobyState(object, 3, 1);
             if (mob->animation == 2) return;
-            func_002A7470(object, 2, func_002A77E0(ANIM_COUNT(object, 0x50)), 10);
+            StartAnimationBlended(object, 2, RandomIntBelow(ANIM_COUNT(object, 0x50)), 10);
         } else {
-            func_002A7750(object, 4, 1);
+            SetMobyState(object, 4, 1);
             if (mob->animation == 0) return;
-            func_002A7470(object, 0, func_002A77E0(ANIM_COUNT(object, 0x48)), 10);
+            StartAnimationBlended(object, 0, RandomIntBelow(ANIM_COUNT(object, 0x48)), 10);
         }
         break;
     case 3:
-        if (mob->mode == 2 || mob->type != 0x964) return;
-        vars->target = func_L03_003C4D40(object);
+        if (mob->mode == 2 || mob->type != 0x964 /* Gadgebot */) return;
+        vars->target = FindNearestTiltTarget(object);
         if (vars->target) {
-            func_002A7750(object, 9, 2);
+            SetMobyState(object, 9, 2);
             if (mob->animation != 3)
-                func_002A7470(object, 3, func_002A77E0(ANIM_COUNT(object, 0x54)), 10);
+                StartAnimationBlended(object, 3, RandomIntBelow(ANIM_COUNT(object, 0x54)), 10);
         } else {
-            func_002A7750(object, 11, 2);
+            SetMobyState(object, 11, 2);
             if (mob->animation != 0)
-                func_002A7470(object, 0, func_002A77E0(ANIM_COUNT(object, 0x48)), 10);
+                StartAnimationBlended(object, 0, RandomIntBelow(ANIM_COUNT(object, 0x48)), 10);
         }
         break;
     case 2:
         if (mob->mode != 0) {
-            func_002A7750(object, 2, 0);
-            if (mob->animation) func_002A7470(object, 0, func_002A77E0(ANIM_COUNT(object, 0x48)), 10);
-            vars->tilt_timer = func_002A7820(60, 120);
+            SetMobyState(object, 2, 0);
+            if (mob->animation) StartAnimationBlended(object, 0, RandomIntBelow(ANIM_COUNT(object, 0x48)), 10);
+            vars->tilt_timer = RandomIntRange(60, 120);
             vars->tilt_pitch = 0;
             vars->tilt_yaw = 0;
         }
         break;
     case 4:
-        if (mob->type != 0x964) return;
+        if (mob->type != 0x964 /* Gadgebot */) return;
         vars->command_cooldown = 30;
         if (mob->mode != 3) {
-            vars->target = func_L03_003C4F58(object);
+            vars->target = FindNearestClass3833Entity(object);
             if (!vars->target) return;
-            func_L03_004197C8(vars->target, &point);
-            if (func_L03_00419BD8(vars->area_id, mob->position, &point)) {
+            ComputePointAheadUnit(vars->target, &point);
+            if (CheckPointsOnRouteGraph(vars->area_id, mob->position, &point)) {
                 qcopy(state + 0x340, &point);
-                func_002A7750(object, 12, 3);
-                if (mob->animation != 2) func_002A7470(object, 2, 0, 10);
+                SetMobyState(object, 12, 3);
+                if (mob->animation != 2) StartAnimationBlended(object, 2, 0, 10);
             } else vars->target = 0;
         } else if (mob->state != 13) {
-            func_002A7750(object, 4, 1);
-            if (mob->animation != 0) func_002A7470(object, 0, 0, 10);
+            SetMobyState(object, 4, 1);
+            if (mob->animation != 0) StartAnimationBlended(object, 0, 0, 10);
         }
         break;
     case 6:
-        if (mob->type != 0x940) return;
+        if (mob->type != 0x940 /* Bridgebot */) return;
         vars->command_cooldown = 30;
         if (mob->mode != 4) {
-            vars->target = func_L03_003C5128(object);
+            vars->target = FindClass2426EntityNearby(object);
             if (!vars->target) return;
-            func_002A7750(object, 14, 4);
-            if (mob->animation != 2) func_002A7470(object, 2, 0, 10);
-            func_L03_003CAAF0(vars->target, &point, &first);
-            if (func_L03_00419BD8(vars->area_id, mob->position, &point))
+            SetMobyState(object, 14, 4);
+            if (mob->animation != 2) StartAnimationBlended(object, 2, 0, 10);
+            ComputeOppositePoints(vars->target, &point, &first);
+            if (CheckPointsOnRouteGraph(vars->area_id, mob->position, &point))
                 qcopy(state + 0x340, &point);
             else qcopy(state + 0x340, &first);
         } else if (mob->state == 14) {
-            func_002A7750(object, 4, 1);
-            if (mob->animation) func_002A7470(object, 0, 0, 20);
-        } else if (mob->state == 16 && !func_L03_003C5CE8(object)) func_L03_003C5EE8(object);
+            SetMobyState(object, 4, 1);
+            if (mob->animation) StartAnimationBlended(object, 0, 0, 20);
+        } else if (mob->state == 16 && !IsGroupStateWordMatching(object)) PlaceHeldObjectAtSafeSpot(object);
         break;
     case 5:
         if (mob->type != 0x93C) return;
         if (mob->mode != 5) {
-            vars->target = func_L03_003C52D0(object);
+            vars->target = FindNearestClass3719Entity(object);
             if (!vars->target) return;
-            func_002A7750(object, 18, 5);
-            if (mob->animation != 2) func_002A7470(object, 2, 0, 10);
+            SetMobyState(object, 18, 5);
+            if (mob->animation != 2) StartAnimationBlended(object, 2, 0, 10);
             vars->command_cooldown = 30;
-            func_L03_003CA148(vars->target, mob->position, state + 0x340);
+            ComputeSideStepOffset(vars->target, mob->position, state + 0x340);
             return;
         }
         if (mob->state != 19) {
-            func_L00_003294F0(vars->target, 0);
+            SetObjectFlagBit(vars->target, 0);
             vars->target = 0; vars->command_cooldown = 30;
-            func_002A7750(object, 4, 1);
-            if (mob->animation) func_002A7470(object, 0, 0, 20);
+            SetMobyState(object, 4, 1);
+            if (mob->animation) StartAnimationBlended(object, 0, 0, 20);
         }
         break;
     case 7:
         if (mob->type != 0xA59) return;
         if (mob->mode != 6) {
-            vars->target = func_L03_003C5488(object);
+            vars->target = FindNearestPickupTarget(object);
             if (!vars->target) return;
-            func_002A7750(object, 20, 6);
-            if (mob->animation != 2) func_002A7470(object, 2, 0, 10);
+            SetMobyState(object, 20, 6);
+            if (mob->animation != 2) StartAnimationBlended(object, 2, 0, 10);
             target = vars->target; vars->command_cooldown = 30;
             switch (*(s16 *)(target + 0xAA)) {
-            case 0xB10: func_L03_0038A9D0(target, state + 0x340); break;
-            case 0xF4D: func_L03_003CA230(target, state + 0x340); break;
+            case 0xB10: ComputePointAheadOfObject(target, state + 0x340); break;
+            case 0xF4D: ComputePointAheadScaled(target, state + 0x340); break;
             }
         } else if (mob->state != 21) {
-            func_L00_003294F0(vars->target, 0);
+            SetObjectFlagBit(vars->target, 0);
             vars->target = 0; vars->command_cooldown = 30;
-            func_002A7750(object, 4, 1);
-            if (mob->animation) func_002A7470(object, 0, 0, 20);
+            SetMobyState(object, 4, 1);
+            if (mob->animation) StartAnimationBlended(object, 0, 0, 20);
         }
         break;
     case 8:
-        if (mob->type == 0x964) {
-            if (mob->mode != 1) func_002A7750(object, 4, 1);
-        } else func_002A7750(object, 6, 1);
+        if (mob->type == 0x964 /* Gadgebot */) {
+            if (mob->mode != 1) SetMobyState(object, 4, 1);
+        } else SetMobyState(object, 6, 1);
         break;
     }
 }

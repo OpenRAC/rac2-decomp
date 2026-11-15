@@ -62,9 +62,10 @@ extern unsigned char D_L11_00189EA0[];
 
 /* func_L11_002CDE10 lives in L11_002CDE10-motion.c. */
 
-void func_L11_003404E0(char *a0)
+/* Passes the object and two data blocks inside it (at +0x10 and +0xC0) to a shared helper. */
+void func_L11_003404E0(char *moby)
 {
-    func_L02_00333480(a0, a0 + 0x10, a0 + 0xC0);
+    UpdateObjectController(moby, moby + 0x10, moby + 0xC0);
 }
 
 /* func_L11_00397C08 lives in L11_00397C08-helpers.c. */
@@ -109,105 +110,106 @@ void func_L11_00414660(float *out, float *b, float *c, float *a, float *d, float
 }
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L11_0041E460(char *p, float scale)
+void func_L11_0041E460(char *vectors, float scale)
 {
-    func_00282D30_2(p, p, scale);
-    func_00282D30_2(p + 16, p + 16, scale);
-    func_00282D30_2(p + 32, p + 32, scale);
-    func_00282D30_2(p + 48, p + 48, scale);
+    func_00282D30_2(vectors, vectors, scale);
+    func_00282D30_2(vectors + 16, vectors + 16, scale);
+    func_00282D30_2(vectors + 32, vectors + 32, scale);
+    func_00282D30_2(vectors + 48, vectors + 48, scale);
 }
 
-void func_L11_00439D78(float a, float b, float c, float d)
+/* Works out how long a thrown object takes to land, from the height gap, its launch speed and gravity. */
+void func_L11_00439D78(float startHeight, float endHeight, float launchSpeed, float gravity)
 {
-    float v = (d + d) * (a - b);
+    float heightTerm = (gravity + gravity) * (startHeight - endHeight);
 
-    func_00283CF0((c + func_00282C10(c * c + v)) / d);
+    FloatToInt((launchSpeed + square_root(launchSpeed * launchSpeed + heightTerm)) / gravity);
 }
 
 /* func_L11_0044FFA0 lives in L11_0044FFA0-g8.c. */
 
 /* Draws the record's two markers, the scaled radius and the two colours, for each of the
    two record kinds the byte at 0x20 selects. */
-void func_L11_00450508(unsigned char *p)
+void func_L11_00450508(unsigned char *moby)
 {
-    switch (p[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        func_L11_004507B0(p + 0x10, 0x103080, *(float *)(p + 0x2C) * 45.0f,
-                         func_002A7820(95, 111), func_002A7940(), 11, 2, 1.0f, p);
-        func_L11_004507B0(p + 0x10, 0x3F3F3F, *(float *)(p + 0x2C) * 22.5f,
-                         func_002A7820(111, 127), func_002A7940(), 11, 2, 1.0f, p);
+        DrawGlowSpriteWithFlares(moby + 0x10, 0x103080, *(float *)(moby + 0x2C) * 45.0f,
+                         RandomIntRange(95, 111), RandomAngle(), 11, 2, 1.0f, moby);
+        DrawGlowSpriteWithFlares(moby + 0x10, 0x3F3F3F, *(float *)(moby + 0x2C) * 22.5f,
+                         RandomIntRange(111, 127), RandomAngle(), 11, 2, 1.0f, moby);
         break;
     case 1:
-        func_L11_004507B0(p + 0x10, 0x103080, *(float *)(p + 0x2C) * 45.0f,
-                         func_002A7820(95, 111), func_002A7940(), 11, 2, 1.0f, p);
-        func_L11_004507B0(p + 0x10, 0x3F3F3F, *(float *)(p + 0x2C) * 22.5f,
-                         func_002A7820(111, 127), func_002A7940(), 11, 2, 1.0f, p);
+        DrawGlowSpriteWithFlares(moby + 0x10, 0x103080, *(float *)(moby + 0x2C) * 45.0f,
+                         RandomIntRange(95, 111), RandomAngle(), 11, 2, 1.0f, moby);
+        DrawGlowSpriteWithFlares(moby + 0x10, 0x3F3F3F, *(float *)(moby + 0x2C) * 22.5f,
+                         RandomIntRange(111, 127), RandomAngle(), 11, 2, 1.0f, moby);
         break;
     }
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L11_004506C0(char *p)
+void func_L11_004506C0(char *record)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(record + 112) = 0LL;
+    *(int *)(record + 80) = 0;
+    *(int *)(record + 84) = 0;
+    *(float *)(record + 88) = 1.0f;
+    *(int *)(record + 92) = 0;
+    *(int *)(record + 96) = 0;
+    *(float *)(record + 100) = 1.0f;
+    *(float *)(record + 104) = 1.0f;
+    *(float *)(record + 108) = 1.0f;
+    *(float *)(record + 8) = -1.0f;
+    *(float *)(record + 24) = 1.0f;
+    *(float *)(record + 40) = -1.0f;
+    *(float *)(record + 56) = 1.0f;
+    *(float *)(record + 4) = -1.0f;
+    *(float *)(record + 36) = 1.0f;
+    *(float *)(record + 52) = 1.0f;
+    *(int *)(record + 0) = 0;
+    *(int *)(record + 16) = 0;
+    *(int *)(record + 32) = 0;
+    *(int *)(record + 48) = 0;
+    *(float *)(record + 12) = 1.0f;
+    *(float *)(record + 28) = 1.0f;
+    *(float *)(record + 44) = 1.0f;
+    *(long long *)(record + 128) = 280993940374112LL;
+    *(float *)(record + 20) = -1.0f;
+    *(float *)(record + 60) = 1.0f;
 }
 
 /* func_L11_004507B0 lives in L11_004507B0-g8.c. */
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L11_00458D00(char *p)
+void func_L11_00458D00(char *record)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(record + 112) = 0LL;
+    *(int *)(record + 80) = 0;
+    *(int *)(record + 84) = 0;
+    *(float *)(record + 88) = 1.0f;
+    *(int *)(record + 92) = 0;
+    *(int *)(record + 96) = 0;
+    *(float *)(record + 100) = 1.0f;
+    *(float *)(record + 104) = 1.0f;
+    *(float *)(record + 108) = 1.0f;
+    *(float *)(record + 8) = -1.0f;
+    *(float *)(record + 24) = 1.0f;
+    *(float *)(record + 40) = -1.0f;
+    *(float *)(record + 56) = 1.0f;
+    *(float *)(record + 4) = -1.0f;
+    *(float *)(record + 36) = 1.0f;
+    *(float *)(record + 52) = 1.0f;
+    *(int *)(record + 0) = 0;
+    *(int *)(record + 16) = 0;
+    *(int *)(record + 32) = 0;
+    *(int *)(record + 48) = 0;
+    *(float *)(record + 12) = 1.0f;
+    *(float *)(record + 28) = 1.0f;
+    *(float *)(record + 44) = 1.0f;
+    *(long long *)(record + 128) = 280993940374112LL;
+    *(float *)(record + 20) = -1.0f;
+    *(float *)(record + 60) = 1.0f;
 }
 
 /* The 224-byte local record the level's camera update fills in. */
@@ -219,34 +221,34 @@ void func_L11_00458D00(char *p)
 
 /* Fills a local record: the level's handle, the four blocks it scales, and the
  * two vectors the level's own table gives against the object's position. */
-void func_L11_00458DF0(char *a0, void *a1, void *a2, int a3, int t0, float f12, float f13)
+void func_L11_00458DF0(char *position, void *color, void *alpha, int textureId, int flags, float scale, float roll)
 {
     LOC_L11_458DF0 local;
-    float x;
+    float pitch;
 
     ref_L11_00458DF0_00((char *)&local);
-    local.v120 = func_0027C878(a3);
+    local.v120 = GetEffectTextureDescriptor(textureId);
     local.v128 = 0xFF9000000260LL;
-    local.v136 = ((long long)t0 << 2) | 0x0000008000000040LL;
-    local.k3 = (int)a1 + ((int)a2 << 24);
-    local.k2 = (int)a1 + ((int)a2 << 24);
-    local.k1 = (int)a1 + ((int)a2 << 24);
-    local.k0 = (int)a1 + ((int)a2 << 24);
+    local.v136 = ((long long)flags << 2) | 0x0000008000000040LL;
+    local.k3 = (int)color + ((int)alpha << 24);
+    local.k2 = (int)color + ((int)alpha << 24);
+    local.k1 = (int)color + ((int)alpha << 24);
+    local.k0 = (int)color + ((int)alpha << 24);
     local.v112 = 0;
     local.v220 = 0.0f;
-    local.f216 = func_00283248(D_L11_001BA780[0x50] - *(float *)a0,
-                                D_L11_001BA780[0x51] - *(float *)(a0 + 4));
-    x = func_00283248(func_00282E80(a0, D_L11_001BA780 + 0x50),
-                      D_L11_001BA780[0x52] - *(float *)(a0 + 8));
-    local.f212 = -x;
-    local.v208 = f13;
-    func_00283410(&local.m00, &local.v208);
-    local.v192 = *(float *)a0;
-    local.v196 = *(float *)(a0 + 4);
-    local.v200 = *(float *)(a0 + 8);
+    local.f216 = FastMatrixHelperA(D_L11_001BA780[0x50] - *(float *)position,
+                                D_L11_001BA780[0x51] - *(float *)(position + 4));
+    pitch = FastMatrixHelperA(vec_distance_xy(position, D_L11_001BA780 + 0x50),
+                      D_L11_001BA780[0x52] - *(float *)(position + 8));
+    local.f212 = -pitch;
+    local.v208 = roll;
+    euler_to_matrix(&local.m00, &local.v208);
+    local.v192 = *(float *)position;
+    local.v196 = *(float *)(position + 4);
+    local.v200 = *(float *)(position + 8);
     local.v204 = 1.0f;
-    ref_L11_00458DF0_01((char *)&local, f12);
-    func_00280B90(&local, &local.m00, 0);
+    ref_L11_00458DF0_01((char *)&local, scale);
+    draw_world_quad(&local, &local.m00, 0);
 }
 
 /* Emits two effects at the object's position with independently sampled
@@ -257,51 +259,51 @@ extern float func_002A7940(void);
 
 extern void func_L11_004600A0(void *, int, int, int, int, float, float, float);
 
-void func_L11_0045FEF8(void *a0)
+void func_L11_0045FEF8(void *moby)
 {
   float new_var;
-  char *p = ((char *) a0) + 0x10;
-  int v = func_002A7820(0x2F, 0x3F);
+  char *position = ((char *) moby) + 0x10;
+  int amount = RandomIntRange(0x2F, 0x3F);
   int new_var2;
-  float f;
-  func_L11_004600A0(p, (float) 0x103080, v, 0xB, 2, 2.0f, func_002A7940(), 1.0f);
+  float random;
+  DrawAimedPacket(position, (float) 0x103080, amount, 0xB, 2, 2.0f, RandomAngle(), 1.0f);
   new_var = 1.0f;
-  new_var2 = func_002A7820(0x1F, 0x3F);
-  v = new_var2;
-  f = func_002A7940();
-  func_L11_004600A0(p, 0x606060, v, 0xB, 2, new_var, f, new_var);
+  new_var2 = RandomIntRange(0x1F, 0x3F);
+  amount = new_var2;
+  random = RandomAngle();
+  DrawAimedPacket(position, 0x606060, amount, 0xB, 2, new_var, random, new_var);
 }
 
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L11_0045FFB0(char *p)
+void func_L11_0045FFB0(char *record)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(record + 112) = 0LL;
+    *(int *)(record + 80) = 0;
+    *(int *)(record + 84) = 0;
+    *(float *)(record + 88) = 1.0f;
+    *(int *)(record + 92) = 0;
+    *(int *)(record + 96) = 0;
+    *(float *)(record + 100) = 1.0f;
+    *(float *)(record + 104) = 1.0f;
+    *(float *)(record + 108) = 1.0f;
+    *(float *)(record + 8) = -1.0f;
+    *(float *)(record + 24) = 1.0f;
+    *(float *)(record + 40) = -1.0f;
+    *(float *)(record + 56) = 1.0f;
+    *(float *)(record + 4) = -1.0f;
+    *(float *)(record + 36) = 1.0f;
+    *(float *)(record + 52) = 1.0f;
+    *(int *)(record + 0) = 0;
+    *(int *)(record + 16) = 0;
+    *(int *)(record + 32) = 0;
+    *(int *)(record + 48) = 0;
+    *(float *)(record + 12) = 1.0f;
+    *(float *)(record + 28) = 1.0f;
+    *(float *)(record + 44) = 1.0f;
+    *(long long *)(record + 128) = 280993940374112LL;
+    *(float *)(record + 20) = -1.0f;
+    *(float *)(record + 60) = 1.0f;
 }
 
 /* func_L11_00460258 is defined in L11_00460258-g32.c. */
@@ -315,80 +317,81 @@ void func_L11_0045FFB0(char *p)
 /* func_L11_0046C1E0 lives in L11_002C5E80-trail-g8.c. */
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L11_00472008(char *p)
+void func_L11_00472008(char *record)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(record + 112) = 0LL;
+    *(int *)(record + 80) = 0;
+    *(int *)(record + 84) = 0;
+    *(float *)(record + 88) = 1.0f;
+    *(int *)(record + 92) = 0;
+    *(int *)(record + 96) = 0;
+    *(float *)(record + 100) = 1.0f;
+    *(float *)(record + 104) = 1.0f;
+    *(float *)(record + 108) = 1.0f;
+    *(float *)(record + 8) = -1.0f;
+    *(float *)(record + 24) = 1.0f;
+    *(float *)(record + 40) = -1.0f;
+    *(float *)(record + 56) = 1.0f;
+    *(float *)(record + 4) = -1.0f;
+    *(float *)(record + 36) = 1.0f;
+    *(float *)(record + 52) = 1.0f;
+    *(int *)(record + 0) = 0;
+    *(int *)(record + 16) = 0;
+    *(int *)(record + 32) = 0;
+    *(int *)(record + 48) = 0;
+    *(float *)(record + 12) = 1.0f;
+    *(float *)(record + 28) = 1.0f;
+    *(float *)(record + 44) = 1.0f;
+    *(long long *)(record + 128) = 280993940374112LL;
+    *(float *)(record + 20) = -1.0f;
+    *(float *)(record + 60) = 1.0f;
 }
 
 /* func_L11_00472090 is defined in L11_00472090-curve.c. */
 
-void func_L11_00474888(char *a0)
+/* Checks that the hero is in state 0x82 on this object, then repeats one hero helper call nine times. */
+void func_L11_00474888(char *moby)
 {
-    if (func_002ACBC8(D_L11_00189EA0, *(int *)(*(char **)(a0 + 0x68))) == 0) return;
+    if (IsPointInCuboid(D_L11_00189EA0, *(int *)(*(char **)(moby + 0x68))) == 0) return;
     if (*(int *)(D_L11_00189EA0 + 0x2214) != 0x82) return;
-    func_002829D8(D_L11_00189EA0 + 0x530);
-    func_002829D8(D_L11_00189EA0 + 0x530);
-    func_002829D8(D_L11_00189EA0 + 0x530);
-    func_002829D8(D_L11_00189EA0 + 0x530);
-    func_002829D8(D_L11_00189EA0 + 0x530);
-    func_002829D8(D_L11_00189EA0 + 0x530);
-    func_002829D8(D_L11_00189EA0 + 0x530);
-    func_002829D8(D_L11_00189EA0 + 0x530);
-    func_002829D8(D_L11_00189EA0 + 0x530);
+    FastVectorHelperB(D_L11_00189EA0 + 0x530);
+    FastVectorHelperB(D_L11_00189EA0 + 0x530);
+    FastVectorHelperB(D_L11_00189EA0 + 0x530);
+    FastVectorHelperB(D_L11_00189EA0 + 0x530);
+    FastVectorHelperB(D_L11_00189EA0 + 0x530);
+    FastVectorHelperB(D_L11_00189EA0 + 0x530);
+    FastVectorHelperB(D_L11_00189EA0 + 0x530);
+    FastVectorHelperB(D_L11_00189EA0 + 0x530);
+    FastVectorHelperB(D_L11_00189EA0 + 0x530);
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L11_00478EF0(char *p)
+void func_L11_00478EF0(char *record)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(record + 112) = 0LL;
+    *(int *)(record + 80) = 0;
+    *(int *)(record + 84) = 0;
+    *(float *)(record + 88) = 1.0f;
+    *(int *)(record + 92) = 0;
+    *(int *)(record + 96) = 0;
+    *(float *)(record + 100) = 1.0f;
+    *(float *)(record + 104) = 1.0f;
+    *(float *)(record + 108) = 1.0f;
+    *(float *)(record + 8) = -1.0f;
+    *(float *)(record + 24) = 1.0f;
+    *(float *)(record + 40) = -1.0f;
+    *(float *)(record + 56) = 1.0f;
+    *(float *)(record + 4) = -1.0f;
+    *(float *)(record + 36) = 1.0f;
+    *(float *)(record + 52) = 1.0f;
+    *(int *)(record + 0) = 0;
+    *(int *)(record + 16) = 0;
+    *(int *)(record + 32) = 0;
+    *(int *)(record + 48) = 0;
+    *(float *)(record + 12) = 1.0f;
+    *(float *)(record + 28) = 1.0f;
+    *(float *)(record + 44) = 1.0f;
+    *(long long *)(record + 128) = 280993940374112LL;
+    *(float *)(record + 20) = -1.0f;
+    *(float *)(record + 60) = 1.0f;
 }

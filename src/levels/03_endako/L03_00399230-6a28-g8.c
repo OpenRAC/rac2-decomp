@@ -6,8 +6,8 @@ typedef unsigned int Quad __attribute__((mode(TI)));
 
 typedef struct {
     char pad0[0x80];
-    float pos[4];      /* 0x80 */
-    float rot[4];      /* 0x90 */
+    float position[4];      /* 0x80 */
+    float rotation[4];      /* 0x90 */
     char padA0[0x13C];
     short mode;        /* 0x1DC */
     char pad1DE[0x1652];
@@ -58,83 +58,84 @@ extern int D_00138324 NOT_SDA;
 extern AimState6A28 D_L03_001B9840;
 extern char D_L03_003C7010[];
 
+/* Updates a camera console. When the player stands in front of it and presses the button, the view switches to a remote camera, and it switches back on the next press. */
 void func_L03_003C6A28(char *obj)
 {
     char mat[0x40] __attribute__((aligned(16)));
-    float local[4] __attribute__((aligned(16)));
-    float rot[4] __attribute__((aligned(16)));
-    float pos[4] __attribute__((aligned(16)));
-    float cam1[4] __attribute__((aligned(16)));
-    float cam2[4] __attribute__((aligned(16)));
+    float localPos[4] __attribute__((aligned(16)));
+    float rotation[4] __attribute__((aligned(16)));
+    float position[4] __attribute__((aligned(16)));
+    float cameraPos[4] __attribute__((aligned(16)));
+    float cameraRot[4] __attribute__((aligned(16)));
     char *vars = *(char **)(obj + 0x68);
 
     switch (*(u8 *)(obj + 0x20)) {
     case 0:
         if (*(int *)vars == -1) {
-            func_0029F338(obj);
+            MarkMobySpawned(obj);
             break;
         }
         *(int *)(vars + 0x30) = -1;
         *(int *)(obj + 0x98) = 0;
         *(unsigned short *)(obj + 0x34) |= 1;
         obj[0x31] = 0;
-        func_002A7750(obj, 1, -1);
+        SetMobyState(obj, 1, -1);
         break;
 
     case 1:
     case 2:
-        if (func_00282E80(obj + 0x10, D_00189EA0) < 6.0f && *(int *)(D_00189EA0 + 0x2C0)) {
-            func_00283698(mat, obj + 0xC0);
-            func_00282CF0(local, D_00189EA0, obj + 0x10);
-            func_00283098(local, local, mat);
-            if (*(u8 *)(obj + 0x20) == 1 && func_002B38B8(obj))
-                func_002A7750(obj, 2, -1);
-            if (local[0] < 4.0f && local[0] > 0.0f && local[1] < 2.5f && local[1] > -2.5f) {
+        if (vec_distance_xy(obj + 0x10, gHeroPosition) < 6.0f && *(int *)(gHeroPosition + 0x2C0)) {
+            matrix_from_basis_rows(mat, obj + 0xC0);
+            FastVecSub(localPos, gHeroPosition, obj + 0x10);
+            matrix_mul_vec3(localPos, localPos, mat);
+            if (*(u8 *)(obj + 0x20) == 1 && IsThirdPendingFlagSet(obj))
+                SetMobyState(obj, 2, -1);
+            if (localPos[0] < 4.0f && localPos[0] > 0.0f && localPos[1] < 2.5f && localPos[1] > -2.5f) {
                 if (*(u8 *)(obj + 0x20) == 1) {
-                    func_002B0C28(8, 0x27BE, 1);
+                    TryClaimNotice(8, 0x27BE, 1);
                     break;
                 }
-                func_002B0C28(8, 0x27A8, 1);
-                if (func_L03_0032AB20(8) && (D_00138324 & 0x10)) {
-                    func_002A7750(obj, 3, -1);
-                    *(Quad *)pos = 0;
-                    pos[0] = 2.0f;
-                    func_00283098(pos, pos, obj + 0xC0);
-                    func_00282CC0(pos, pos, obj + 0x10);
-                    func_00282C88(rot);
-                    rot[2] = func_00283B98(*(float *)(obj + 0xF8), 3.14159f);
-                    func_L00_002B9D60(pos, rot, 0x31, 1);
+                TryClaimNotice(8, 0x27A8, 1);
+                if (IsHeroAllowedForMode(8) && (D_00138324 & 0x10)) {
+                    SetMobyState(obj, 3, -1);
+                    *(Quad *)position = 0;
+                    position[0] = 2.0f;
+                    matrix_mul_vec3(position, position, obj + 0xC0);
+                    FastVecAdd(position, position, obj + 0x10);
+                    ClearVector128(rotation);
+                    rotation[2] = FastAddRotations(*(float *)(obj + 0xF8), 3.14159f);
+                    ResetHeroPositionAndDirection(position, rotation, 0x31, 1);
                     D_0018B650 = D_L03_001B2A1C + (*(int *)vars << 8);
-                    func_L03_003C6E50(obj, cam1, cam2);
-                    func_00335438(cam1, cam2, 1, 0, 0);
-                    func_L03_003C7A40(D_L03_001B2A1C + (*(int *)vars << 8));
+                    SelectRemoteCameraView(obj, cameraPos, cameraRot);
+                    SetCamera5Pose(cameraPos, cameraRot, 1, 0, 0);
+                    StartConsoleRemoteView(D_L03_001B2A1C + (*(int *)vars << 8));
                 }
             }
         }
         break;
 
     case 3:
-        D_00189E20.mode = 5;
+        gHeroState.mode = 5;
         if (D_00138324 & 0x10) {
-            func_003355A8(0);
-            func_L00_002B9D60(D_00189E20.pos, D_00189E20.rot, 0, 1);
-            D_00189E20.field1830 = 0;
-            func_L03_003C7A88(D_L03_001B2A1C + (*(int *)vars << 8));
+            SetCameraModeState(0);
+            ResetHeroPositionAndDirection(gHeroState.position, gHeroState.rotation, 0, 1);
+            gHeroState.field1830 = 0;
+            EndConsoleRemoteView(D_L03_001B2A1C + (*(int *)vars << 8));
             D_L03_001B9840.f = 64.42f;
             D_L03_001B9840.b1 = 1;
             D_L03_001B9840.b0 = 0;
-            func_002A7750(obj, 2, -1);
-            func_0029B810(0);
+            SetMobyState(obj, 2, -1);
+            ClearLevelObjectTableEntry(0);
         } else {
-            func_L03_003C6E50(obj, mat, mat + 0x10);
-            func_00335370(mat);
-            func_003353C8(mat + 0x10);
+            SelectRemoteCameraView(obj, mat, mat + 0x10);
+            CopyVectorToSelectedObject(mat);
+            SetCameraStateRotation(mat + 0x10);
             if (*(int *)(vars + 0x1C) != -1
-                && func_L03_0041F090(D_L03_001B2A1C_GP + (*(int *)(vars + 0x1C) << 8))) {
+                && PrepareEntityForShot(D_L03_001B2A1C_GP + (*(int *)(vars + 0x1C) << 8))) {
                 if (*(int *)(vars + 0x20) != -1)
-                    func_L00_003294F0(D_L03_001B2A1C_GP + (*(int *)(vars + 0x20) << 8), 1);
+                    SetObjectFlagBit(D_L03_001B2A1C_GP + (*(int *)(vars + 0x20) << 8), 1);
             }
-            func_0029B7C0(D_L03_003C7010, func_L03_003C7018, 0);
+            SetLevelObjectTableEntry(D_L03_003C7010, DrawTwoLineMenuPanel, 0);
         }
         break;
     }

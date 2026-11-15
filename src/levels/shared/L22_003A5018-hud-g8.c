@@ -115,6 +115,7 @@ static __inline__ int screen_coord(int mode, float value, float offset)
     return (int)scaled;
 }
 
+/* Draws the space combat HUD: the side gauges, health and shield bars, the two counters with their icons, and the hint box. */
 int func_L22_003A5018(void) {
     char textBuffer[64];
     char *text;
@@ -128,40 +129,40 @@ int func_L22_003A5018(void) {
     char *label, *hint;
 
     {
-        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC3);
+        void *sprite = (void *)(u32)FindTableEntryById(D_L22_001A904C + 0x8710, 0xC3);
         float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
-        func_00300A00(sprite, 0x60442D00, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
+        DrawScaledObjectTwoAxes(sprite, 0x60442D00, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC4);
+        void *sprite = (void *)(u32)FindTableEntryById(D_L22_001A904C + 0x8710, 0xC4);
         float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
-        func_00300A00(sprite, 0x60241700, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
+        DrawScaledObjectTwoAxes(sprite, 0x60241700, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC5);
+        void *sprite = (void *)(u32)FindTableEntryById(D_L22_001A904C + 0x8710, 0xC5);
         float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
-        func_00300A00(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
+        DrawScaledObjectTwoAxes(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, 1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC3);
+        void *sprite = (void *)(u32)FindTableEntryById(D_L22_001A904C + 0x8710, 0xC3);
         float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
-        func_00300A00(sprite, 0x60442D00, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
+        DrawScaledObjectTwoAxes(sprite, 0x60442D00, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC4);
+        void *sprite = (void *)(u32)FindTableEntryById(D_L22_001A904C + 0x8710, 0xC4);
         float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
-        func_00300A00(sprite, 0x60241700, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
+        DrawScaledObjectTwoAxes(sprite, 0x60241700, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     {
-        void *sprite = (void *)(u32)func_00336D50(D_L22_001A904C + 0x8710, 0xC5);
+        void *sprite = (void *)(u32)FindTableEntryById(D_L22_001A904C + 0x8710, 0xC5);
         float sy = (float)screen_coord(D_L22_001B2980, ref_L22_003A5018_02, 3.0f);
-        func_00300A00(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
+        DrawScaledObjectTwoAxes(sprite, 0x55F0C070, ref_L22_003A5018_01, sy, -1.0f, 1.0f, 0.0f);
     }
     one = 1;
-    { void *sprite = (void *)(u32)func_0028E588(0xEAA4, one);
-    func_0028EA58(sprite, ref_L22_003A5018_14, label_y(sprite, (float)ref_L22_003A5018_15, D_L22_001B2984, 0.5f, 1), ref_L22_003A5018_16, ref_L22_003A5018_17, ref_L22_003A5018_42); }
-    { void *sprite = (void *)(u32)func_0028E588(0xEAA4, 0);
-    func_0028EA58(sprite, ref_L22_003A5018_18, label_y(sprite, (float)ref_L22_003A5018_19, D_L22_001B2984, 0.5f, 1), ref_L22_003A5018_20, ref_L22_003A5018_21, ref_L22_003A5018_42); }
+    { void *sprite = (void *)(u32)GetIconFrame(0xEAA4, one);
+    DrawHudSpriteGradient(sprite, ref_L22_003A5018_14, label_y(sprite, (float)ref_L22_003A5018_15, D_L22_001B2984, 0.5f, 1), ref_L22_003A5018_16, ref_L22_003A5018_17, ref_L22_003A5018_42); }
+    { void *sprite = (void *)(u32)GetIconFrame(0xEAA4, 0);
+    DrawHudSpriteGradient(sprite, ref_L22_003A5018_18, label_y(sprite, (float)ref_L22_003A5018_19, D_L22_001B2984, 0.5f, 1), ref_L22_003A5018_20, ref_L22_003A5018_21, ref_L22_003A5018_42); }
 
     {
         float ratio = (float)D_0018B694 / (float)*(short *)(ctl + 0x324);
@@ -173,76 +174,76 @@ int func_L22_003A5018(void) {
         ref_L22_003A5018_43++;
         colours.d[1] = D_L22_001AF418;
         colours.w[1] = (colours.w[1] & 0xFFFF00FF) | ((int)(ratio * 255.0f) << 8);
-        func_0027EAE8(x, y, x + (int)(ratio * (float)width), y + ref_L22_003A5018_11, 0xFFFFF1, &colours);
+        DrawScreenRectangle(x, y, x + (int)(ratio * (float)width), y + ref_L22_003A5018_11, 0xFFFFF1, &colours);
     }
     {
         float ratio = *(float *)(ctl + 0x20) / (float)D_L22_001B2AA8;
         int right, width, height;
         colours.d[0] = ref_L22_003A5018_04;
         width = ref_L22_003A5018_12;
-        right = D_001A7340 - ref_L22_003A5018_09 - ref_L22_003A5018_07 - 4;
+        right = gScreenWidth - ref_L22_003A5018_09 - ref_L22_003A5018_07 - 4;
         colours.w[0] = (colours.w[1] & 0xFFFF00FF) | ((int)(ratio * 255.0f) << 8);
         height = ref_L22_003A5018_11;
         colours.d[1] = D_L22_001AF428;
-        func_0027EAE8(right - (int)(ratio * (float)width), y, right, y + height, 0xFFFFF1, &colours);
+        DrawScreenRectangle(right - (int)(ratio * (float)width), y, right, y + height, 0xFFFFF1, &colours);
     }
 
     {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 0);
-        func_0028EA58(sprite, ref_L22_003A5018_22, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_23, 1.0f), ref_L22_003A5018_24, ref_L22_003A5018_25, ref_L22_003A5018_42);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 0);
+        DrawHudSpriteGradient(sprite, ref_L22_003A5018_22, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_23, 1.0f), ref_L22_003A5018_24, ref_L22_003A5018_25, ref_L22_003A5018_42);
     }
     {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 0);
-        func_0028EA58(sprite, ref_L22_003A5018_26, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_27, 1.0f), ref_L22_003A5018_28, ref_L22_003A5018_29, ref_L22_003A5018_42);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 0);
+        DrawHudSpriteGradient(sprite, ref_L22_003A5018_26, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_27, 1.0f), ref_L22_003A5018_28, ref_L22_003A5018_29, ref_L22_003A5018_42);
     }
     one2 = 1;
-    func_00115DA8(textBuffer, D_L22_001AF4D8, D_L22_001B1910.leftCount);
+    Sprintf(textBuffer, D_L22_001AF4D8, D_L22_001B1910.leftCount);
     text = textBuffer;
     {
     int value = label_y(obj, (float)ref_L22_003A5018_33, D_L22_001B2984, 0.5f, 1);
     colour = ref_L22_003A5018_30;
-    func_0027FB40(ref_L22_003A5018_32, value, colour, text, func_001157AC(text));
+    DrawTextCenteredMediumFont(ref_L22_003A5018_32, value, colour, text, strlen_001157AC(text));
     }
-    func_00115DA8(text, D_L22_001AF4D8, D_L22_001B1910.rightCount);
+    Sprintf(text, D_L22_001AF4D8, D_L22_001B1910.rightCount);
     {
     int value = label_y((void *)colour, (float)ref_L22_003A5018_35, D_L22_001B2984, 0.5f, 1);
     colour = ref_L22_003A5018_30;
-    func_0027FB40(ref_L22_003A5018_34, value, colour, text, func_001157AC(text));
+    DrawTextCenteredMediumFont(ref_L22_003A5018_34, value, colour, text, strlen_001157AC(text));
     }
     if (D_L22_001B1910.leftIcons) {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, one2);
-        func_0028EA58(sprite, ref_L22_003A5018_36, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, one2);
+        DrawHudSpriteGradient(sprite, ref_L22_003A5018_36, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.leftIcons >= 2) {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
         int x = ref_L22_003A5018_36 + ref_L22_003A5018_44;
-        func_0028EA58(sprite, x, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        DrawHudSpriteGradient(sprite, x, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_37, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.rightIcons) {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
-        func_0028EA58(sprite, ref_L22_003A5018_38, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
+        DrawHudSpriteGradient(sprite, ref_L22_003A5018_38, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B1910.rightIcons >= 2) {
-        void *sprite = (void *)(u32)func_0028E588(0xEAA5, 1);
+        void *sprite = (void *)(u32)GetIconFrame(0xEAA5, 1);
         int x = ref_L22_003A5018_38 - ref_L22_003A5018_44;
-        func_0028EA58(sprite, x, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
+        DrawHudSpriteGradient(sprite, x, screen_coord(D_L22_001B2980, (float)ref_L22_003A5018_39, 1.0f), ref_L22_003A5018_40, ref_L22_003A5018_41, ref_L22_003A5018_42);
     }
     if (D_L22_001B2AC8 != -1 && obj[0x95] != 10) {
         switch (D_L22_001B2AC8) {
-        case 0: func_L00_0030DD70((int)func_00288FB8(0x2FA3), -1); break;
-        case 2: func_00288FB8(0x1241); func_0029CC50(0x1241, *(short *)(ctl + 0x32C), -1); break;
-        case 1: func_00288FB8(0x1240); func_0029CC50(0x1240, D_L22_001B2ACC, -1); break;
+        case 0: CallLoadedModuleHandlerWithArg_003387A0_1((int)GetLocalizedString(0x2FA3), -1); break;
+        case 2: GetLocalizedString(0x1241); func_0029CC50(0x1241, *(short *)(ctl + 0x32C), -1); break;
+        case 1: GetLocalizedString(0x1240); func_0029CC50(0x1240, D_L22_001B2ACC, -1); break;
         }
         ref_L22_003A5018_05 = 0;
-        func_00282948(&D_L22_001B2AD0);
+        FastFloatHelperD(&D_L22_001B2AD0);
         if (D_L22_001B2AD0 <= 0) D_L22_001B2AC8 = -1;
     }
     if (ref_L22_003A5018_31) {
-        func_002802E0(box, 240, 480, 44, 468, 256, label_y(ctl, 320.0f, ref_L22_003A5018_06, 0.5f, 1), 16, 3);
-        label = func_00288FB8(0x9FC);
-        hint = func_00288FB8(0x2F2C);
-        func_0029B888(box, 0x80F0F0F0, label, 0, 0, -1, 0, hint, 0, 0);
+        FontSetWindow(box, 240, 480, 44, 468, 256, label_y(ctl, 320.0f, ref_L22_003A5018_06, 0.5f, 1), 16, 3);
+        label = GetLocalizedString(0x9FC);
+        hint = GetLocalizedString(0x2F2C);
+        ForwardArgsToLevelObjectDraw(box, 0x80F0F0F0, label, 0, 0, -1, 0, hint, 0, 0);
     }
-    func_L00_0030CF60();
+    CallLoadedModuleHandler_L00443E18();
     return 1;
 }

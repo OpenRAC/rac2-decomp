@@ -59,25 +59,25 @@ void func_L00_002B36E0(void)
     int bits;
 
     qcopy(D_0018BE50, D_0018BE50 - 0x1fb0);
-    if (D_00138180.flags & 3) {
+    if (gPadState.flags & 3) {
         if (((TimerState *)(D_0018BE50 - 0x2030))->timer <= 0)
             ((TimerState *)(D_0018BE50 - 0x2030))->timer = 1;
     } else {
         func_L00_002EDD78(D_0018BE50 - 0xbdc);
     }
-    p = &D_00189E20;
+    p = &gHeroState;
     if (p->state == 16)
         p->timer = 0;
     {
-        int active = func_L00_002D3400();
-        p->stick_x = D_00138180.x;
+        int active = GetHeroMovementMode();
+        p->stick_x = gPadState.x;
         p->gravity_mode = active;
-        p->stick_y = D_00138180.y;
+        p->stick_y = gPadState.y;
     }
     p->field270 = 0;
-    p->raw_speed = func_L00_002B3900();
+    p->raw_speed = GetHeroStickMagnitude();
     if (func_L00_002EE268(&p->stick_x) < 0.25f) {
-        bits = D_00138180.buttons;
+        bits = gPadState.buttons;
         {
             int right = (bits >> 13) & 1;
             int left = (bits >> 15) & 1;
@@ -89,8 +89,8 @@ void func_L00_002B36E0(void)
             p->stick_y = up;
         }
     }
-    p->speed = func_L00_002B3900();
-    func_L00_002BA7D8();
+    p->speed = GetHeroStickMagnitude();
+    UpdateHeroStateMachine_L00();
     p->yaws[p->yaw_index] = p->yaw;
     p->yaw_index = (p->yaw_index + 1) % 32;
     if (++p->yaw_count > 32)
@@ -106,7 +106,7 @@ void func_L00_002B36E0(void)
     func_L00_002EE970(p, (char *)p + 0x90);
     func_L00_002EE8E8((char *)p + 0x40);
     func_L00_002EEBF8((char *)p + 0x40, p);
-    func_L00_002B32F8();
-    func_L00_002C2DE8();
-    func_L00_002C30B0();
+    UpdateHeroCollisionCapsule();
+    ProbeHeroGroundAndLedge();
+    UpdateHeroTimers();
 }

@@ -7,13 +7,13 @@ s32 func_L18_003F8EA8(char *self, char *point, s32 route, s16 *index, s32 revers
     char *path = D_L18_001FE480[route];
     qcopy(point, path + 16 + (*index << 4));
     if (reverse) {
-        if (func_L02_002F21C0(self + 16, point) < radius * radius) --*index;
+        if (DistanceSquaredXY(self + 16, point) < radius * radius) --*index;
         if (*index < 0) {
             *index = *(u16 *)path - 1;
             return 0;
         }
     } else {
-        if (func_L02_002F21C0(self + 16, point) < radius * radius) ++*index;
+        if (DistanceSquaredXY(self + 16, point) < radius * radius) ++*index;
         if (*index >= *(s32 *)path) {
             *index = 0;
             return 0;

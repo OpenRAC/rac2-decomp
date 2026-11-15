@@ -6,6 +6,7 @@ typedef unsigned short u16;
 
 extern u16 *D_001B188C __attribute__((sda));
 
+/* Finds the position of the entry with this id in the 8-byte entry table and returns it. */
 int func_0028AB20(int value)
 {
     u16 *table = D_001B188C;

@@ -230,37 +230,40 @@ extern ScreenExtent D_001A7340 __attribute__((sda));
 typedef struct { char pad[0x150]; short width, height; } ScreenDimensions;
 extern ScreenDimensions D_001A6480;
 
+/* Moves a game object toward its target using the saved path data, then turns it to match. */
 void func_00274128(Obj_F4778f810 *obj)
 {
     V4_F4778f810 tmp[6];
-    Sub_F4778f810 *p = (Sub_F4778f810 *)obj->p068;
+    Sub_F4778f810 *vars = (Sub_F4778f810 *)obj->p068;
 
-    F4778f810_FUN_002B00D8((char *)obj + 0x10, (char *)p, (char *)p, p->f048);
-    F4778f810_FUN_00282CC0((char *)obj + 0x10, (char *)obj + 0x10, (char *)p);
-    F4778f810_FUN_00283098((char *)&tmp[0], (char *)p + 0x20, (char *)obj + 0xC0);
-    F4778f810_FUN_00283958((char *)p + 0x10, (char *)&tmp[3]);
+    F4778f810_FUN_002B00D8((char *)obj + 0x10, (char *)vars, (char *)vars, vars->f048);
+    F4778f810_FUN_00282CC0((char *)obj + 0x10, (char *)obj + 0x10, (char *)vars);
+    F4778f810_FUN_00283098((char *)&tmp[0], (char *)vars + 0x20, (char *)obj + 0xC0);
+    F4778f810_FUN_00283958((char *)vars + 0x10, (char *)&tmp[3]);
     F4778f810_FUN_00283738((char *)obj + 0xC0, (char *)&tmp[3], (char *)obj + 0xC0);
-    F4778f810_FUN_00283098((char *)&tmp[1], (char *)p + 0x20, (char *)obj + 0xC0);
+    F4778f810_FUN_00283098((char *)&tmp[1], (char *)vars + 0x20, (char *)obj + 0xC0);
     F4778f810_FUN_00282CF0((char *)&tmp[2], (char *)&tmp[1], (char *)&tmp[0]);
     F4778f810_FUN_00282CF0((char *)obj + 0x10, (char *)obj + 0x10, (char *)&tmp[2]);
 }
 
+/* Same movement step as the one before it, kept as a separate copy for another group of objects. */
 void func_00274208(Obj_F4778f810 *obj)
 {
     V4_F4778f810 tmp[6];
-    Sub_F4778f810 *p = (Sub_F4778f810 *)obj->p068;
+    Sub_F4778f810 *vars = (Sub_F4778f810 *)obj->p068;
 
-    F4778f810_FUN_002B00D8((char *)obj + 0x10, (char *)p, (char *)p, p->f048);
-    F4778f810_FUN_00282CC0((char *)obj + 0x10, (char *)obj + 0x10, (char *)p);
-    F4778f810_FUN_00283098((char *)&tmp[0], (char *)p + 0x20, (char *)obj + 0xC0);
-    F4778f810_FUN_00283958((char *)p + 0x10, (char *)&tmp[3]);
+    F4778f810_FUN_002B00D8((char *)obj + 0x10, (char *)vars, (char *)vars, vars->f048);
+    F4778f810_FUN_00282CC0((char *)obj + 0x10, (char *)obj + 0x10, (char *)vars);
+    F4778f810_FUN_00283098((char *)&tmp[0], (char *)vars + 0x20, (char *)obj + 0xC0);
+    F4778f810_FUN_00283958((char *)vars + 0x10, (char *)&tmp[3]);
     F4778f810_FUN_00283738((char *)obj + 0xC0, (char *)&tmp[3], (char *)obj + 0xC0);
-    F4778f810_FUN_00283098((char *)&tmp[1], (char *)p + 0x20, (char *)obj + 0xC0);
+    F4778f810_FUN_00283098((char *)&tmp[1], (char *)vars + 0x20, (char *)obj + 0xC0);
     F4778f810_FUN_00282CF0((char *)&tmp[2], (char *)&tmp[1], (char *)&tmp[0]);
     F4778f810_FUN_00282CF0((char *)obj + 0x10, (char *)obj + 0x10, (char *)&tmp[2]);
 }
 
-void func_002742E8(char *o)
+/* Slides an object along the one or two touched points, then nudges it back out of the wall it hit. */
+void func_002742E8(char *moby)
 {
     float a[4] __attribute__((aligned(16)));
     float c[4] __attribute__((aligned(16)));
@@ -271,91 +274,93 @@ void func_002742E8(char *o)
     float e[4] __attribute__((aligned(16)));
     float f[4] __attribute__((aligned(16)));
     float g[3][4] __attribute__((aligned(16)));
-    unsigned char *m = *(unsigned char **)(o + 0x68);
-    float *w;
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
+    float *xform;
 
-    if (m[0x5C] >= 2) {
-        func_00282D08(a, (float *)(*(char **)(m + 0x30) + m[0x59] * 16), (float *)(*(char **)(m + 0x30) + m[0x5A] * 16), 0.5f);
-        func_00282CF0(b, (float *)(*(char **)(m + 0x30) + m[0x59] * 16), (float *)(*(char **)(m + 0x30) + m[0x5A] * 16));
-        func_00283098(b, b, (float *)(o + 0xC0));
-        w = (float *)(o + 0xC0);
+    if (vars[0x5C] >= 2) {
+        lerp_vector(a, (float *)(*(char **)(vars + 0x30) + vars[0x59] * 16), (float *)(*(char **)(vars + 0x30) + vars[0x5A] * 16), 0.5f);
+        FastVecSub(b, (float *)(*(char **)(vars + 0x30) + vars[0x59] * 16), (float *)(*(char **)(vars + 0x30) + vars[0x5A] * 16));
+        matrix_mul_vec3(b, b, (float *)(moby + 0xC0));
+        xform = (float *)(moby + 0xC0);
     } else {
-        qcopy(a, *(char **)(m + 0x30) + m[0x59] * 16);
-        w = (float *)(o + 0xC0);
+        qcopy(a, *(char **)(vars + 0x30) + vars[0x59] * 16);
+        xform = (float *)(moby + 0xC0);
     }
-    func_00283098(c, a, w);
-    func_002AFFD8((float *)(o + 0x10), d, 1);
-    func_00282CF0(e, a, (float *)(m + 0x20));
-    func_00283098(e, e, w);
-    func_00282F20(e, e, 1.0f);
-    func_00282DD8(f, e, d);
-    func_00282F20(f, f, *(float *)(m + 0x4C));
-    func_00274A88(o, (float *)(m + 0x10), f);
-    if (m[0x5C] >= 2)
-        func_00274B58(o, (float *)(m + 0x10), b);
-    func_00283958((float *)(m + 0x10), g[0]);
-    func_00283738(w, g[0], w);
-    func_00283098(h, a, w);
-    func_00282CF0(i, h, c);
-    func_00282CF0((float *)(o + 0x10), (float *)(o + 0x10), i);
+    matrix_mul_vec3(c, a, xform);
+    ComputeViewDirection((float *)(moby + 0x10), d, 1);
+    FastVecSub(e, a, (float *)(vars + 0x20));
+    matrix_mul_vec3(e, e, xform);
+    vec_scale_to_length(e, e, 1.0f);
+    FastVecCross(f, e, d);
+    vec_scale_to_length(f, f, *(float *)(vars + 0x4C));
+    ClampMovementVector(moby, (float *)(vars + 0x10), f);
+    if (vars[0x5C] >= 2)
+        ScaleVectorByDirection(moby, (float *)(vars + 0x10), b);
+    quaternion_to_rotation_basis((float *)(vars + 0x10), g[0]);
+    multiply_matrix3x3(xform, g[0], xform);
+    matrix_mul_vec3(h, a, xform);
+    FastVecSub(i, h, c);
+    FastVecSub((float *)(moby + 0x10), (float *)(moby + 0x10), i);
 }
 
+/* Checks the object against nearby points that have not been used yet and pushes it out of the first one that is touching. Returns that point number, or -1 if none. */
 int func_00274500(Obj_F4778f810 *obj)
 {
     float tmp0[4];
     float tmp1[4];
     float tmp2[4];
     float tmp3[4];
-    float *v;
-    HitIndex_00274500 *p = (HitIndex_00274500 *)obj->p068;
+    float *hitInfo;
+    HitIndex_00274500 *vars = (HitIndex_00274500 *)obj->p068;
     int i;
     int j;
     int used;
     int hit;
     float scale;
 
-    func_00283098(tmp0, p->vec020, (float *)((char *)obj + 0xC0));
+    matrix_mul_vec3(tmp0, vars->vec020, (float *)((char *)obj + 0xC0));
     F4778f810_FUN_00282CC0((char *)tmp0, (char *)tmp0, (char *)obj + 0x10);
-    hit = func_00277258(tmp0, 0x62, p->vec020[3], p->p054);
+    hit = TestPointAgainstCollision(tmp0, 0x62, vars->vec020[3], vars->p054);
     if (hit != 0) {
-        for (i = 0; i < p->count058; i++) {
+        for (i = 0; i < vars->count058; i++) {
             used = 0;
-            for (j = 0; j < p->count05C; j++) {
-                if (p->indices059[j] == i) {
+            for (j = 0; j < vars->count05C; j++) {
+                if (vars->indices059[j] == i) {
                     used = 1;
                     break;
                 }
             }
             if (used)
                 continue;
-            func_00283098(tmp1, p->points030[i], (float *)((char *)obj + 0xC0));
+            matrix_mul_vec3(tmp1, vars->points030[i], (float *)((char *)obj + 0xC0));
             F4778f810_FUN_00282CC0((char *)tmp1, (char *)tmp1, (char *)obj + 0x10);
-            if (func_00278CE0(tmp0, tmp1, hit, 0) != 0) {
-                v = D_001BAFA0;
-                F4778f810_FUN_00282CF0((char *)tmp2, (char *)tmp1, (char *)v);
-                func_00282F20_16(v + 8, v + 8, 1.0f);
-                scale = func_00282DB0_3(tmp2, v + 8);
-                func_00282F20_16(tmp3, v + 8, -scale);
+            if (TestSegmentAgainstHit(tmp0, tmp1, hit, 0) != 0) {
+                hitInfo = D_001BAFA0;
+                F4778f810_FUN_00282CF0((char *)tmp2, (char *)tmp1, (char *)hitInfo);
+                func_00282F20_16(hitInfo + 8, hitInfo + 8, 1.0f);
+                scale = func_00282DB0_3(tmp2, hitInfo + 8);
+                func_00282F20_16(tmp3, hitInfo + 8, -scale);
                 F4778f810_FUN_00282CC0((char *)obj + 0x10, (char *)obj + 0x10, (char *)tmp3);
                 return i;
             }
         }
         return -1;
     }
-    p->count05C = 0;
+    vars->count05C = 0;
     return -1;
 }
 
+/* Tests one touch point of the object and pushes the object away from the hit surface. Returns 1 if there was a hit. */
 int func_002746C8(Obj_F4778f810 *obj)
 {
     V4_F4778f810 tmp[2];
-    HitNudge_002746C8 *p = (HitNudge_002746C8 *)obj->p068;
+    HitNudge_002746C8 *vars = (HitNudge_002746C8 *)obj->p068;
 
-    func_00283098((char *)&tmp[0], (char *)p + 0x20, (char *)obj + 0xC0);
-    func_00282CC0((char *)&tmp[0], (char *)&tmp[0], (char *)obj + 0x10);
-    if (func_00277258((float *)&tmp[0], 2, p->f02C, p->p054) != 0) {
-        func_00282CF0((char *)&tmp[1], (char *)D_001BAFB0, (char *)&tmp[0]);
-        func_00282CC0((char *)obj + 0x10, (char *)obj + 0x10, (char *)&tmp[1]);
+    matrix_mul_vec3((char *)&tmp[0], (char *)vars + 0x20, (char *)obj + 0xC0);
+    FastVecAdd((char *)&tmp[0], (char *)&tmp[0], (char *)obj + 0x10);
+    if (TestPointAgainstCollision((float *)&tmp[0], 2, vars->f02C, vars->p054) != 0) {
+        FastVecSub((char *)&tmp[1], (char *)D_001BAFB0, (char *)&tmp[0]);
+        FastVecAdd((char *)obj + 0x10, (char *)obj + 0x10, (char *)&tmp[1]);
         return 1;
     }
     return 0;
@@ -368,43 +373,46 @@ unsigned int func_00274768(OozlaAppendObject164 *object, unsigned int index, con
     OozlaAppendDescriptor164 *descriptor = object->descriptor;
     descriptor->indices[descriptor->count] = index;
     ++descriptor->count;
-    func_00274810(object, (int)descriptor->count - 1, direction);
+    PruneIndexSetByProjection(object, (int)descriptor->count - 1, direction);
     if (descriptor->count != 1) {
-        func_00282CF0(difference, descriptor->points[descriptor->indices[0]], descriptor->points[descriptor->indices[1]]);
-        func_00283098(difference, difference, &object->transform[0][0]);
-        func_00274B58(object, descriptor->plane, difference);
+        FastVecSub(difference, descriptor->points[descriptor->indices[0]], descriptor->points[descriptor->indices[1]]);
+        matrix_mul_vec3(difference, difference, &object->transform[0][0]);
+        ScaleVectorByDirection(object, descriptor->plane, difference);
     }
     return descriptor->count;
 }
 
-void func_00274B58(OozlaAppendObject164 *a0, float *a1, const float *a2) {
+/* Turns a direction into a unit length and uses it to move the given vector. */
+void func_00274B58(OozlaAppendObject164 *a0, float *vec, const float *direction) {
     float tmp[4];
     float value;
-    func_00282F20_16(tmp, (void *)a2, 1.0f);
-    value = func_00282DB0_3(tmp, a1);
-    func_002ACE78(a1, tmp, value);
+    func_00282F20_16(tmp, (void *)direction, 1.0f);
+    value = func_00282DB0_3(tmp, vec);
+    SetDirectionWithComplement(vec, tmp, value);
 }
 
 /* Keeps the float one helper returns, and when a later helper reports a ratio above 0.7 scales it by a factor with a floor, hands it to a setter through a local, then reports whether the kept value is non-zero. */
-int func_00274BA8(void *p, void *q, void *r, float f12, float f13)
+/* Shortens a vector and then scales it again if it points mostly in the same direction as another one. Returns 1 if some length is left. */
+int func_00274BA8(void *vec, void *other, void *compare, float scale, float minimum)
 {
     float saved;
-    float t;
-    float v;
+    float scaled;
+    float dot;
 
-    func_00283028(p, p, q);
-    saved = func_00282DF0_5(p);
-    v = func_00282DB0_3(r, q);
-    if (v > 0.7f) {
-        t = saved * f12;
-        if (t < f13) t = f13;
-        func_002AA2E8_2(&saved, 0.0f, t);
-        func_00282F20_16(p, p, saved);
+    FastVectorNormalize(vec, vec, other);
+    saved = func_00282DF0_5(vec);
+    dot = func_00282DB0_3(compare, other);
+    if (dot > 0.7f) {
+        scaled = saved * scale;
+        if (scaled < minimum) scaled = minimum;
+        func_002AA2E8_2(&saved, 0.0f, scaled);
+        func_00282F20_16(vec, vec, saved);
     }
     if (saved != 0.0f) return 1;
     return 0;
 }
 
+/* Copies up to a limit of stored points into a list of vectors, converting them to real numbers and scaling them. Returns how many were copied. */
 int func_00274C90(char *object, float *output, int limit)
 {
     char *data = *(char **)(*(char **)(object + 0x24) + 0x10);
@@ -425,11 +433,11 @@ int func_00274C90(char *object, float *output, int limit)
     remaining = count;
     do {
         remaining--;
-        cursor[0] = func_00283CE0(*(short *)entry);
-        cursor[1] = func_00283CE0(*(short *)(entry + 2));
-        cursor[2] = func_00283CE0(*(short *)(entry + 4));
+        cursor[0] = IntToFloat(*(short *)entry);
+        cursor[1] = IntToFloat(*(short *)(entry + 2));
+        cursor[2] = IntToFloat(*(short *)(entry + 4));
         entry += 8;
-        func_00282D30(cursor, cursor, scale);
+        FastVecScale(cursor, cursor, scale);
         cursor[3] = 1.0f;
         cursor += 4;
     } while (remaining);
@@ -443,6 +451,7 @@ ASM_FUNC("asm/game", func_00276158);
 
 ASM_FUNC("asm/game", func_002761F8);
 
+/* Tests a point against the collision data. Returns a hit handle or 0. */
 ASM_FUNC("asm/game", func_00277258);
 
 ASM_FUNC("asm/game", func_00277F48);
@@ -455,15 +464,17 @@ ASM_FUNC("asm/game", func_00278CE0);
 
 ASM_FUNC("asm/game", func_00278E78);
 
+/* Resets the graphics state and restores the saved drawing position. */
 void func_00278F80(void) {
-    func_002FC3C0(1);
-    func_002FC138();
-    func_002FC1D8();
+    WaitForDmaStatusBits(1);
+    SelectPacketBufferSetup();
+    ResetPacketBuffer();
     D_001A72D4 = D_001B7F98;
-    func_0027D330(30);
+    FadeToBlack(30);
 }
 
 /* Store ten integer arguments in the indexed record when the unsigned index is below 32; otherwise leave the table unchanged. */
+/* Saves ten numbers into one slot of a table of 32 slots. Does nothing if the slot number is too large. */
 void func_00279790(int p0, int p1, int p2, int p3, int p4, int p5,
                                       int p6, int p7, int p8, int p9, unsigned idx)
 {
@@ -517,10 +528,12 @@ int func_002798A0(int value, int *out_index, int *out_offset)
     return 0;
 }
 
+/* Asks a helper about the shared data block and returns the answer. */
 int func_00279988(void) {
-    return func_00282948(D_001B7FA8);
+    return FastFloatHelperD(D_001B7FA8);
 }
 
+/* Moves the current item index to the next group of items in the table. Returns whether it moved on. */
 int func_002799A8(void)
 {
     int t1, t2;
@@ -537,7 +550,7 @@ int func_002799A8(void)
         }
         return 1;
     }
-    if (func_002798A0(D_001B8308.e[(short)g->idx].ptr, &t1, &t2)) {
+    if (AdvanceGroupedTableOffset(D_001B8308.e[(short)g->idx].ptr, &t1, &t2)) {
         if (D_001B8308.e[(short)g->idx].ptr != 0) {
             g->idx = (unsigned short)t1;
             g->idx2 = (unsigned short)t2;
@@ -570,18 +583,19 @@ int func_002799A8(void)
     return !found;
 }
 
+/* Looks up a cell in the lookup table, trying the nearer of two cells first and the other one if it is empty. */
 int func_0027A1D0(float x, int a, int b, int c, int d, int e, int g)
 {
-    int r, p, q, s;
+    int found, p, q, s;
     if (x < 0.5f) {
-        r = Fcdb4d905_FUN_0027A0F8(a, b, c);
-        if (r) return r;
+        found = Fcdb4d905_FUN_0027A0F8(a, b, c);
+        if (found) return found;
         p = d;
         q = e;
         s = g;
     } else {
-        r = Fcdb4d905_FUN_0027A0F8(d, e, g);
-        if (r) return r;
+        found = Fcdb4d905_FUN_0027A0F8(d, e, g);
+        if (found) return found;
         p = a;
         q = b;
         s = c;
@@ -604,62 +618,62 @@ void func_0027A288(void)
     unsigned char *vis, *gx, *gy, *gz, *previous;
     float *p;
 
-    x = func_00283CF0(D_001B5200.position[0] * scale);
-    y = func_00283CF0(D_001B5200.position[1] * scale);
-    z = func_00283CF0(D_001B5200.position[2] * scale);
+    x = FloatToInt(gActiveCamera.position[0] * scale);
+    y = FloatToInt(gActiveCamera.position[1] * scale);
+    z = FloatToInt(gActiveCamera.position[2] * scale);
     vis = (unsigned char *)Fcdb4d905_FUN_0027A0F8(x, y, z);
     if (vis) {
         D_001B1714 = 0;
-        func_00282B50(D_001BADC0, vis, 128);
+        FastMemoryHelperC(D_001BADC0, vis, 128);
         D_001B1718 = vis;
     } else {
         D_001B1714 = 1;
         if (D_001B170C == 0) {
             xm = x - 1;
             xp = x + 1;
-            fraction = func_00283CE0(x);
+            fraction = IntToFloat(x);
             yp = y + 1;
             zp = z + 1;
             ym = y - 1;
             zm = z - 1;
-            gx = (unsigned char *)func_0027A1D0(D_001B5200.position[0] * scale - fraction, xm, y, z, xp, y, z);
-            fraction = func_00283CE0(y);
-            gy = (unsigned char *)func_0027A1D0(D_001B5200.position[1] * scale - fraction, x, ym, z, x, yp, z);
-            fraction = func_00283CE0(z);
-            gz = (unsigned char *)func_0027A1D0(D_001B5200.position[2] * scale - fraction, x, y, zm, x, y, zp);
+            gx = (unsigned char *)FindNearerVisibilityCell(gActiveCamera.position[0] * scale - fraction, xm, y, z, xp, y, z);
+            fraction = IntToFloat(y);
+            gy = (unsigned char *)FindNearerVisibilityCell(gActiveCamera.position[1] * scale - fraction, x, ym, z, x, yp, z);
+            fraction = IntToFloat(z);
+            gz = (unsigned char *)FindNearerVisibilityCell(gActiveCamera.position[2] * scale - fraction, x, y, zm, x, y, zp);
             if (gx || gy || gz) {
-                func_00282A88(D_001BAE40, 128);
-                if (gx) func_00282B78(D_001BAE40, D_001BAE40, gx, 128);
-                if (gy) func_00282B78(D_001BAE40, D_001BAE40, gy, 128);
-                if (gz) func_00282B78(D_001BAE40, D_001BAE40, gz, 128);
+                FastMemoryHelperB(D_001BAE40, 128);
+                if (gx) FastMemoryHelperD(D_001BAE40, D_001BAE40, gx, 128);
+                if (gy) FastMemoryHelperD(D_001BAE40, D_001BAE40, gy, 128);
+                if (gz) FastMemoryHelperD(D_001BAE40, D_001BAE40, gz, 128);
                 vis = D_001BAE40;
                 D_001B1718 = vis;
-                func_00282B50(D_001BADC0, vis, 128);
+                FastMemoryHelperC(D_001BADC0, vis, 128);
             }
         }
         if (!vis) {
             switch (D_001B170C) {
             case 0:
                 previous = D_001B1718;
-                if (previous) func_00282B50(D_001BADC0, previous, 128);
-                else func_00282A60(D_001BADC0, -1, 128);
+                if (previous) FastMemoryHelperC(D_001BADC0, previous, 128);
+                else ClearMemory(D_001BADC0, -1, 128);
                 break;
             case 2:
                 p = D_001B1704;
                 if (p) {
-                    bx = 0.0f < D_001B5200.position[0] - p[0];
-                    by = 0.0f < D_001B5200.position[1] - p[1];
-                    bz = 0.0f < D_001B5200.position[2] - p[2];
-                    func_00282B50(D_001BADC0, (char *)p + ((bz + by * 2 + bx * 4) * 128 + 16), 128);
+                    bx = 0.0f < gActiveCamera.position[0] - p[0];
+                    by = 0.0f < gActiveCamera.position[1] - p[1];
+                    bz = 0.0f < gActiveCamera.position[2] - p[2];
+                    FastMemoryHelperC(D_001BADC0, (char *)p + ((bz + by * 2 + bx * 4) * 128 + 16), 128);
                     break;
                 }
                 if (D_001B1718) {
-                    func_00282B50(D_001BADC0, D_001B1718, 128);
+                    FastMemoryHelperC(D_001BADC0, D_001B1718, 128);
                     break;
                 }
                 /* fall through */
             case 1:
-                func_00282A60(D_001BADC0, -1, 128);
+                ClearMemory(D_001BADC0, -1, 128);
                 break;
             case 3: {
                 float *directional = D_001B1708;
@@ -668,53 +682,53 @@ void func_0027A288(void)
                     origin[1] = directional[1];
                     origin[2] = directional[2];
                     origin[3] = 0;
-                    delta[0] = D_001B5200.position[0] - origin[0];
-                    delta[1] = D_001B5200.position[1] - origin[1];
-                    delta[2] = D_001B5200.position[2] - origin[2];
+                    delta[0] = gActiveCamera.position[0] - origin[0];
+                    delta[1] = gActiveCamera.position[1] - origin[1];
+                    delta[2] = gActiveCamera.position[2] - origin[2];
                     delta[3] = 0;
                     index = 0;
                     if (delta[0] > 0 && delta[1] > 0) {
-                        index = func_00283CF0(func_00283248(delta[0], delta[1]) * 10.185916f) << 6;
-                        delta[0] = func_00282E80(D_001B5200.position, origin);
+                        index = FloatToInt(FastMatrixHelperA(delta[0], delta[1]) * 10.185916f) << 6;
+                        delta[0] = vec_distance_xy(gActiveCamera.position, origin);
                     } else if (delta[0] <= 0 && delta[1] > 0) {
                         index = 1024;
                         if (delta[0] == 0) {
                             delta[0] = delta[1];
                         } else {
-                            index += func_00283CF0(func_00283248(delta[1], -delta[0]) * 10.185916f) << 6;
-                            delta[0] = func_00282E80(D_001B5200.position, origin);
+                            index += FloatToInt(FastMatrixHelperA(delta[1], -delta[0]) * 10.185916f) << 6;
+                            delta[0] = vec_distance_xy(gActiveCamera.position, origin);
                         }
                     } else if (delta[0] < 0 && delta[1] < 0) {
-                        index = func_00283CF0(func_00283248(-delta[0], -delta[1]) * 10.185916f) << 6;
-                        delta[0] = -func_00282E80(D_001B5200.position, origin);
+                        index = FloatToInt(FastMatrixHelperA(-delta[0], -delta[1]) * 10.185916f) << 6;
+                        delta[0] = -vec_distance_xy(gActiveCamera.position, origin);
                     } else if (delta[0] >= 0 && delta[1] < 0) {
                         index = 1024;
                         if (delta[0] == 0) {
                             delta[0] = delta[1];
                         } else {
-                            index += func_00283CF0(func_00283248(-delta[1], delta[0]) * 10.185916f) << 6;
-                            delta[0] = -func_00282E80(D_001B5200.position, origin);
+                            index += FloatToInt(FastMatrixHelperA(-delta[1], delta[0]) * 10.185916f) << 6;
+                            delta[0] = -vec_distance_xy(gActiveCamera.position, origin);
                         }
                     }
                     if (delta[2] > 0 && delta[0] > 0) {
-                        index += func_00283CF0(func_00283248(delta[2], delta[0]) * 10.185916f);
+                        index += FloatToInt(FastMatrixHelperA(delta[2], delta[0]) * 10.185916f);
                     } else if (delta[2] <= 0 && delta[0] > 0) {
                         index += 16;
-                        if (delta[2] != 0) index += func_00283CF0(func_00283248(delta[0], -delta[2]) * 10.185916f);
+                        if (delta[2] != 0) index += FloatToInt(FastMatrixHelperA(delta[0], -delta[2]) * 10.185916f);
                     } else if (delta[2] < 0 && delta[0] <= 0) {
                         index += 32;
-                        if (delta[0] != 0) index += func_00283CF0(func_00283248(-delta[2], -delta[0]) * 10.185916f);
+                        if (delta[0] != 0) index += FloatToInt(FastMatrixHelperA(-delta[2], -delta[0]) * 10.185916f);
                     } else if (delta[2] >= 0 && delta[0] < 0) {
                         index += 48;
-                        if (delta[2] != 0) index += func_00283CF0(func_00283248(-delta[0], delta[2]) * 10.185916f);
+                        if (delta[2] != 0) index += FloatToInt(FastMatrixHelperA(-delta[0], delta[2]) * 10.185916f);
                     }
-                    func_00282B50(D_001BADC0, ((OcclDirectional *)D_001B1708)->visibility[index], 128);
+                    FastMemoryHelperC(D_001BADC0, ((OcclDirectional *)D_001B1708)->visibility[index], 128);
                 } else {
                     previous = D_001B1718;
                     if (previous) {
-                        func_00282B50(D_001BADC0, previous, 128);
+                        FastMemoryHelperC(D_001BADC0, previous, 128);
                     } else {
-                        func_00282A60(D_001BADC0, -1, 128);
+                        ClearMemory(D_001BADC0, -1, 128);
                     }
                 }
                 break;
@@ -726,18 +740,20 @@ void func_0027A288(void)
 }
 
 
+/* Updates the visibility data depending on the visibility mode setting. */
 void func_0027A9A0(void)
 {
     if (D_001B1710 == 0)
-        func_00282A60(D_001BADC0, -1, 0x80);
+        ClearMemory(D_001BADC0, -1, 0x80);
     else if (D_001B1710 == 2)
-        func_0027A288();
+        UpdateVisibilityBitmap();
 }
 
 /* InitViewContext: set the screen extent from the display size and the view's fixed scales. */
+/* Sets up the screen size, edges and view limits from the display size. */
 void func_0027A9F0(void)
 {
-    ScreenDimensions *dimensions = &D_001A6480;
+    ScreenDimensions *dimensions = &gScreenAdjustOffsets;
     ScreenState *view = &D_001B9040;
     short width = dimensions->width;
     short height = dimensions->height;
@@ -745,20 +761,20 @@ void func_0027A9F0(void)
     int half_height = height >> 1;
     float half_height_f;
 
-    D_001A7340.width = width;
-    D_001A7340.height = height;
-    D_001A7340.half_width = half_width;
-    D_001A7340.half_height = half_height;
-    D_001A7340.left = (2048 - half_width) << 4;
-    D_001A7340.top = (2048 - half_height) << 4;
-    D_001A7340.right = (half_width + 2048) << 4;
-    D_001A7340.bottom = (half_height + 2048) << 4;
+    gScreenWidth.width = width;
+    gScreenWidth.height = height;
+    gScreenWidth.half_width = half_width;
+    gScreenWidth.half_height = half_height;
+    gScreenWidth.left = (2048 - half_width) << 4;
+    gScreenWidth.top = (2048 - half_height) << 4;
+    gScreenWidth.right = (half_width + 2048) << 4;
+    gScreenWidth.bottom = (half_height + 2048) << 4;
 
     view->fA0 = 32.0f;
     view->fA4 = 1048576.0f;
     view->fB0 = 0.62f;
-    view->f200 = func_00283CE0(width) * 0.5f;
-    half_height_f = func_00283CE0(dimensions->height) * 0.5f;
+    view->f200 = IntToFloat(width) * 0.5f;
+    half_height_f = IntToFloat(dimensions->height) * 0.5f;
     view->f204 = half_height_f;
     view->f208 = view->f200 * 4.0f;
     view->f20C = half_height_f * 4.0f;
@@ -770,25 +786,26 @@ void func_0027A9F0(void)
 
 /* ConfigureGraphicsProjection: InitViewContext for a given size and scale, with the four
    context values from the arguments, then func_0027AB40. */
+/* Sets up the screen size and view limits from the given values, then applies them. */
 void func_0027B2F8(int width, int height, float scale, float a, float b, float c, float d)
 {
     ScreenState *context = &D_001B9040;
     int halfW = width >> 1;
     int halfH = height >> 1;
     float halfHeight;
-    D_001A7340.width = width;
-    D_001A7340.height = height;
-    D_001A7340.half_width = halfW;
-    D_001A7340.half_height = halfH;
-    D_001A7340.left = (2048 - halfW) << 4;
-    D_001A7340.top = (2048 - halfH) << 4;
-    D_001A7340.right = (halfW + 2048) << 4;
-    D_001A7340.bottom = (halfH + 2048) << 4;
+    gScreenWidth.width = width;
+    gScreenWidth.height = height;
+    gScreenWidth.half_width = halfW;
+    gScreenWidth.half_height = halfH;
+    gScreenWidth.left = (2048 - halfW) << 4;
+    gScreenWidth.top = (2048 - halfH) << 4;
+    gScreenWidth.right = (halfW + 2048) << 4;
+    gScreenWidth.bottom = (halfH + 2048) << 4;
     context->fB0 = scale;
     context->fA0 = 32.0f;
     context->fA4 = 1048576.0f;
-    context->f200 = func_00283CE0(width) * 0.5f;
-    halfHeight = func_00283CE0(height) * 0.5f;
+    context->f200 = IntToFloat(width) * 0.5f;
+    halfHeight = IntToFloat(height) * 0.5f;
     context->f204 = halfHeight;
     context->f208 = context->f200 * 4.0f;
     context->f20C = halfHeight * 4.0f;
@@ -796,7 +813,7 @@ void func_0027B2F8(int width, int height, float scale, float a, float b, float c
     context->f21C = b;
     context->f228 = c;
     context->f22C = d;
-    func_0027AB40();
+    UpdateViewContext();
 }
 
 /* The full-screen anti-aliasing buffer record behind the screen dimensions above: the
@@ -872,48 +889,48 @@ void func_0027B440(int clear) {
     u64 scissor;
     s16 w;
 
-    func_0011AEA0(0);
-    if (D_001A7B90 != 0) {
+    FlushCache(0);
+    if (gIsPalVideo != 0) {
         D_001A72E0 = 0x100000;
         D_001A72DC = 0x1E0000;
         D_001A72D8 = 0;
         D_001A72E4 = 0x2C0000;
-        func_00284268(0x200, 0x1C0, 0x200, 0x200, 4, 0);
-    } else if (D_001A7BB8 != 0) {
+        SetupFS_AA_buffer(0x200, 0x1C0, 0x200, 0x200, 4, 0);
+    } else if (gWidescreenFlag != 0) {
         D_001A72E0 = 0x118000;
         D_001A72DC = 0x1E8000;
         D_001A72D8 = 0;
         D_001A72E4 = 0x2C0000;
-        func_00284268(0x200, 0x1A0, 0x280, 0x1C0, 0, 0);
+        SetupFS_AA_buffer(0x200, 0x1A0, 0x280, 0x1C0, 0, 0);
     } else {
         D_001A72E0 = 0x118000;
         D_001A72DC = 0x1E8000;
         D_001A72D8 = 0;
         D_001A72E4 = 0x2C0000;
-        func_00284268(0x200, 0x1A0, 0x200, 0x1C0, 0, 0);
+        SetupFS_AA_buffer(0x200, 0x1A0, 0x200, 0x1C0, 0, 0);
     }
     D_001A72E8 = D_001A72E4;
     D_001A72EC = D_001A72E4 + 0x1000;
     D_001A72F0 = D_001A72E4 + 0x1400;
     D_001A72F4 = D_001A72E4 + 0x1800;
     w = FsAaBuffer.display_width;
-    D_001A7340.width = w;
-    D_001A7340.height = FsAaBuffer.display_height;
-    D_001A7340.half_width = w >> 1;
-    D_001A7340.half_height = D_001A7340.height >> 1;
-    D_001A7340.left = (0x800 - D_001A7340.half_width) << 4;
-    D_001A7340.top = (0x800 - D_001A7340.half_height) << 4;
-    D_001A7340.right = (D_001A7340.half_width + 0x800) << 4;
-    D_001A7340.bottom = (D_001A7340.half_height + 0x800) << 4;
-    frame = (D_001A72DC >> 13) | ((u64)(D_001A7340.width >> 6) << 16);
+    gScreenWidth.width = w;
+    gScreenWidth.height = FsAaBuffer.display_height;
+    gScreenWidth.half_width = w >> 1;
+    gScreenWidth.half_height = gScreenWidth.height >> 1;
+    gScreenWidth.left = (0x800 - gScreenWidth.half_width) << 4;
+    gScreenWidth.top = (0x800 - gScreenWidth.half_height) << 4;
+    gScreenWidth.right = (gScreenWidth.half_width + 0x800) << 4;
+    gScreenWidth.bottom = (gScreenWidth.half_height + 0x800) << 4;
+    frame = (D_001A72DC >> 13) | ((u64)(gScreenWidth.width >> 6) << 16);
     D_00139120.frame1 = frame;
     zbuf = (D_001A72E0 >> 13) | 0x1000000;
     D_00139120.frame2 = frame;
-    D_00139120.xyoffset1 = D_001A7340.left | ((u64)D_001A7340.top << 32);
+    D_00139120.xyoffset1 = gScreenWidth.left | ((u64)gScreenWidth.top << 32);
     D_00139120.zbuf1 = zbuf;
     D_00139120.zbuf2 = zbuf;
-    D_00139120.xyoffset2 = D_001A7340.left | ((u64)D_001A7340.top << 32);
-    scissor = ((u64)(D_001A7340.width - 1) << 16) | ((u64)(D_001A7340.height - 1) << 48);
+    D_00139120.xyoffset2 = gScreenWidth.left | ((u64)gScreenWidth.top << 32);
+    scissor = ((u64)(gScreenWidth.width - 1) << 16) | ((u64)(gScreenWidth.height - 1) << 48);
     D_00139310 = zbuf;
     D_00139120.scissor1 = scissor;
     D_00139120.scissor2 = scissor;
@@ -921,21 +938,21 @@ void func_0027B440(int clear) {
     if (clear) {
         D_001A72D0 = D_001A72E4;
         D_001A72D4 = D_001A72E4;
-        func_0011AEA0(0);
-        func_001244B8(0, 0);
-        func_0011AEA0(0);
-        func_00284EA8();
-        func_00284F40(0);
-        func_0011AEA0(0);
-        func_001244B8(0, 0);
-        func_00284E80();
-        func_00282A60(D_001BB000, 0, 0x1000);
+        FlushCache(0);
+        WaitGsPathsIdle(0, 0);
+        FlushCache(0);
+        AppendDrawListHeader();
+        AppendDrawListBufferTag(0);
+        FlushCache(0);
+        WaitGsPathsIdle(0, 0);
+        QueryDisplayBuffer();
+        ClearMemory(D_001BB000, 0, 0x1000);
         n = (FsAaBuffer.storage_width * FsAaBuffer.storage_height) >> 10;
         for (i = 0; i < n; i++) {
             func_00126288(&image, i << 4, 1, 0, 0, 0, 32, 32);
-            func_0011AEA0(0);
-            func_001265B0(&image, D_001BB000);
-            func_001244B8(0, 0);
+            FlushCache(0);
+            ExecGsLoadImage(&image, D_001BB000);
+            WaitGsPathsIdle(0, 0);
         }
     }
 }

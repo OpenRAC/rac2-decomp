@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef short s16;
@@ -48,6 +49,7 @@ extern void func_002A677C(void *a0);
    a timestamp in step with the resident one. The closing half always runs: the
    sub-updates are gated twice more by the state byte, and the last of them hands
    the hero's record to a helper. */
+/* Runs one frame of the player update for this level. */
 void func_L18_002C41F0(void)
 {
     char *base;
@@ -56,24 +58,24 @@ void func_L18_002C41F0(void)
     unsigned int now;
     unsigned int then;
 
-    func_L00_002D24E8();
-    func_L18_002D0C00();
+    AdvanceHeroAnimation();
+    UpdateHeroFrameInput();
     ref_L18_002C41F0_00();
 
-    base = D_00189E20;
+    base = gHeroState;
     if (*(u8 *)(base + 0x22B4) == 4) {
         if (D_L18_001AFBB0 == 0) {
             if (*(s16 *)(base + 0x1E0) == 0) {
                 if (*(int *)(base + 0x2294) != 0x6F) {
-                    if (func_00282978(*(int *)(*(int *)(base + 0x2290) + 0x68) + 0x3BC) != 0) {
+                    if (FastDecTimer(*(int *)(*(int *)(base + 0x2290) + 0x68) + 0x3BC) != 0) {
                         *(int *)(base + 0x24CC) = 0;
                         ref_L18_002C41F0_01(0x91, 1);
                     }
-                    if (D_001A79F0 == 0x14) {
+                    if (gCurrentMapIndex == 0x14) {
                         if (D_0013965E == 0) {
-                            blk = D_0018C958;
+                            blk = gSubtitleHistory;
                             if (D_001A7390 - *(unsigned int *)(blk + 0x7900) >= 0xB5) {
-                                if (func_00288E18(0xA15, 0x6C) != 0) {
+                                if (RequestSubtitleVoiceLine(0xA15, 0x6C) != 0) {
                                     now = D_001A7390_sda;
                                     then = *(unsigned int *)(blk + 0x7900);
                                     if (then < now) {
@@ -90,24 +92,24 @@ void func_L18_002C41F0(void)
 
     ref_L18_002C41F0_02();
 
-    base = D_00189E20;
-    func_L00_002AE0C8();
+    base = gHeroState;
+    RebuildRegionObjectMembership();
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
-    func_L00_002B9CA8();
-    func_L00_002A5368();
+    UpdateDelayedSounds();
+    UpdateAllAttachmentRecords();
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
-    func_L00_002A9600();
-    func_L00_002A7958();
-    func_L00_002A7748();
-    func_L00_003080D0(base + 0x80);
+    UpdateHeroMobyFromHero();
+    FadeScreenEffect();
+    ApplyHeroAxisScales();
+    ClearMapBitsAroundPosition(base + 0x80);
     if (*(u8 *)(base + 0x22B4) == 4 && D_L18_001AFBB0_sda == 0 && *(s16 *)(base + 0x1E0) == 0 &&
         *(int *)(base + 0x2294) != 0x6F) {
-        func_L18_00428100(*(int *)(base + 0x2290));
+        StartReceiverBotSequence(*(int *)(base + 0x2290));
     }
-    func_L00_002A9760();
-    hero = D_00189E20;
+    UpdateHeroMobyProbedHeightBounds();
+    hero = gHeroState;
     func_002A677C(*(int *)(hero + 0x2290));
 }
 
@@ -121,20 +123,21 @@ extern void func_L18_003F7A88(unsigned char *a0);
 /* Walks the id list of the object's group and hands every entity it names to
    func_L18_003F7A88. Retail's loop is not rotated (the test sits below the body); the second
    `q != 0` in the condition keeps the test from being copied in front of the loop. */
-void func_L18_003F7AB8(unsigned char *arg0)
+/* Goes through every object in the same group as this one and updates each of them. */
+void func_L18_003F7AB8(unsigned char *object)
 {
-    unsigned short *q;
-    unsigned char *e;
+    unsigned short *idList;
+    unsigned char *member;
 
-    if (arg0[0x21] == 0xFF)
+    if (object[0x21] == 0xFF)
         return;
-    q = (unsigned short *)D_L18_001FB320[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L18_001B2838 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L18_001FB320[arg0[0x21]])) {
-        e = (unsigned char *)(D_L18_001B281C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    idList = (unsigned short *)D_L18_001FB320[object[0x21]];
+    while (object[0x21] != 0xFF && object[0x21] <= D_L18_001B2838 && idList != 0 &&
+           ((idList != 0 && (short)idList[-1] >= 0) || idList == (unsigned short *)D_L18_001FB320[object[0x21]])) {
+        member = (unsigned char *)(gMobyTable_L18 + ((*idList & 0x7FFF) << 8));
+        if (member == 0)
             break;
-        func_L18_003F7A88(e);
-        q++;
+        ChooseAnimationIfActive(member);
+        idList++;
     }
 }

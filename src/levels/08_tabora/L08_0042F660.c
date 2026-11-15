@@ -20,66 +20,68 @@ extern void func_0029F338(char *a0);
 
 extern void func_L00_00324F18(char *,void *,float,float,float);
 extern void func_002ABBB8(char *,float,float,float,float,float,float,float,char *,void *,int,int,int,int,int,int,int,int,int);
-void func_L08_0042F660(char *a0) {
-    char *s1 = *(char **)(a0 + 0x68);
-    u8 state = *(u8 *)(a0 + 0x20);
-    char *p;
-    s32 n;
-    u8 st;
+/* Waits for the player, then fires its burst of particles and counts itself in the level counter
+   until its timer runs out. */
+void func_L08_0042F660(char *spawner) {
+    char *vars = *(char **)(spawner + 0x68);
+    u8 state = *(u8 *)(spawner + 0x20);
+    char *hit;
+    s32 childIndex;
+    u8 childState;
 
     switch (state) {
     case 0:
-        D_L08_001B3AA0 = 0;
-        func_002A7750(a0, 1, -1);
+        gActiveEmitterCount = 0;
+        SetMobyState(spawner, 1, -1);
         return;
     case 1:
-        p = func_002A9640((s32)a0, 0x04010000, 0);
-        if (p != 0 && *(s32 *)s1 == 0) {
-            func_002A7750(a0, 2, -1);
+        hit = FindOwnedEffectSlot((s32)spawner, 0x04010000, 0);
+        if (hit != 0 && *(s32 *)vars == 0) {
+            SetMobyState(spawner, 2, -1);
             return;
         }
-        *(u8 *)(a0 + 0xA8) = 0xFF;
-        n = *(s32 *)(s1 + 4);
-        if (n > 0) {
-            char *e = (char *)(D_L08_001B29DC + (n << 8));
+        *(u8 *)(spawner + 0xA8) = 0xFF;
+        childIndex = *(s32 *)(vars + 4);
+        if (childIndex > 0) {
+            char *child = (char *)(D_L08_001B29DC + (childIndex << 8));
 
-            if (e == 0) {
+            if (child == 0) {
                 return;
             }
-            st = *(u8 *)(e + 0x20);
-            if (st == 0xFE || (st == 0xFD || st == 3)) {
-                func_002A7750(a0, 2, -1);
+            childState = *(u8 *)(child + 0x20);
+            if (childState == 0xFE || (childState == 0xFD || childState == 3)) {
+                SetMobyState(spawner, 2, -1);
             }
         }
         return;
     case 2:
         { float v[4];
-        func_L00_00324F18(a0,v,0.0f,0.0f,3.0f);
-        if (*(u8 *)(a0 + 0x31) != 0 && D_L08_001B250C < 0.9f &&
-            D_L08_001B3AA0 < 10) {
-            func_002ABBB8(a0,0.0f,0.0f,1.0f,0.5f,9.0f,*(float *)(a0+0x2C)*1.3f,15.0f,
+        LocalOffsetToWorld(spawner,v,0.0f,0.0f,3.0f);
+        if (*(u8 *)(spawner + 0x31) != 0 && D_L08_001B250C < 0.9f &&
+            gActiveEmitterCount < 10) {
+            SpawnExplosionEffects(spawner,0.0f,0.0f,1.0f,0.5f,9.0f,*(float *)(spawner+0x2C)*1.3f,15.0f,
                          D_L08_001A8F20,v,10,3,16,-1,0,1,-1,0,0);
-            func_002B0A68(a0, 3.0f, 6.0f, 15, D_L08_001A8F20, 3.0f, 6.0f, 0xFF);
+            SpawnDebrisForMaskedParts(spawner, 3.0f, 6.0f, 15, D_L08_001A8F20, 3.0f, 6.0f, 0xFF);
         } else {
-            func_002B0A68(a0, 3.0f, 6.0f, 1, D_L08_001A8F20, 3.0f, 6.0f, 0xFF);
+            SpawnDebrisForMaskedParts(spawner, 3.0f, 6.0f, 1, D_L08_001A8F20, 3.0f, 6.0f, 0xFF);
         }
-        func_L00_00326110(a0, 1, 0.0f);
-        func_002E5CF8(0, 0, a0);
-        func_002A7750(a0, 3, -1);
+        SpawnScaledBolts(spawner, 1, 0.0f);
+        PlayMobySound(0, 0, spawner);
+        SetMobyState(spawner, 3, -1);
         return; }
     case 3:
-        if (func_002B3868(a0) != 0) {
-            s32 c;
-            *(u8 *)(a0 + 0x31) = 0;
-            c = D_L08_001B3AA0;
-            *(u16 *)(a0 + 0x34) |= 1;
-            *(s32 *)(a0 + 0x98) = 0;
-            D_L08_001B3AA0 = c + 1;
-            *(s32 *)(s1 + 8) = 0x78;
+        if (SetFirstPendingFlag(spawner) != 0) {
+            s32 count;
+            *(u8 *)(spawner + 0x31) = 0;
+            count = gActiveEmitterCount;
+            *(u16 *)(spawner + 0x34) |= 1;
+            *(s32 *)(spawner + 0x98) = 0;
+            gActiveEmitterCount = count + 1;
+            *(s32 *)(vars + 8) = 0x78;
         }
-        if (func_00282948(s1 + 8) != 0) {
-            D_L08_001B3AA0 = D_L08_001B3AA0 - 1;
-            func_0029F338(a0);
+        if (FastFloatHelperD(vars + 8) != 0) {
+            gActiveEmitterCount = gActiveEmitterCount - 1;
+            MarkMobySpawned(spawner);
         }
         return;
     }

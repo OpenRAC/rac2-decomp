@@ -43,161 +43,162 @@ typedef struct { u8 pad[0x30]; u8 pos[0x10]; u8 rest[0x40]; } TargetRecord;
 #define FLOAT(p,o) (*(float *)((p)+(o)))
 #define PTR(p,o) (*(u8 **)((p)+(o)))
 
+/* Per-frame behaviour of the robot enemy by state: idle, hovering, picking a target, flying toward it and crashing into it, and falling apart when hit. */
 void func_L18_003F80A0(u8 *object)
 {
     u8 temp[16] __attribute__((aligned(16)));
     u8 position[16] __attribute__((aligned(16)));
     u8 *state = PTR(object, 0x68);
     u8 *entity;
-    u16 *p;
+    u16 *targetId;
     float best, distance;
     int hit;
     switch (object[0x20]) {
     case 0: break;
     case 1:
-        if (func_002B3868(object)) {
-            if (object[0x43] != func_002A77E0(2))
-                func_002A7470(object, func_002A77E0(2), 0, 10);
+        if (SetFirstPendingFlag(object)) {
+            if (object[0x43] != RandomIntBelow(2))
+                StartAnimationBlended(object, RandomIntBelow(2), 0, 10);
         }
         break;
     case 2:
-        if (func_002B3868(object)) {
-            func_002B60B0(object, 0.0022222223f, 0.06666667f, 0.006981317885220051f, 0.20943955f);
-            if (object[0x43] != func_002A77E0(2))
-                func_002A7470(object, func_002A77E0(2), 0, 10);
+        if (SetFirstPendingFlag(object)) {
+            SetControllerSpeedLimits(object, 0.0022222223f, 0.06666667f, 0.006981317885220051f, 0.20943955f);
+            if (object[0x43] != RandomIntBelow(2))
+                StartAnimationBlended(object, RandomIntBelow(2), 0, 10);
         } else if (HALF(state, 0x768)) {
-            func_002A7750(object, 5, 2);
-            func_002A7750(object, 4, -1);
+            SetMobyState(object, 5, 2);
+            SetMobyState(object, 4, -1);
         }
         break;
     case 3:
-        if (func_002B3868(object)) {
-            if (object[0x43] != func_002A77E0(2) + 4)
-                func_002A7470(object, func_002A77E0(2) + 4, 0, 10);
-            object[0xBC] = func_002A77E0(180) + 120;
+        if (SetFirstPendingFlag(object)) {
+            if (object[0x43] != RandomIntBelow(2) + 4)
+                StartAnimationBlended(object, RandomIntBelow(2) + 4, 0, 10);
+            object[0xBC] = RandomIntBelow(180) + 120;
         } else if (UHALF(object, 0x96) > object[0xBC])
-            func_002A7750(object, object[0x94], -1);
+            SetMobyState(object, object[0x94], -1);
         break;
     case 4:
-        if (func_002B3868(object)) {
-            if (object[0x43] != func_002A77E0(2) + 2)
-                func_002A7470(object, func_002A77E0(2) + 2, 0, 10);
+        if (SetFirstPendingFlag(object)) {
+            if (object[0x43] != RandomIntBelow(2) + 2)
+                StartAnimationBlended(object, RandomIntBelow(2) + 2, 0, 10);
         } else if (object[0x60] & 2)
-            func_002A7750(object, object[0x94], -1);
+            SetMobyState(object, object[0x94], -1);
         break;
     case 5:
-        if (func_002B3868(object)) {
+        if (SetFirstPendingFlag(object)) {
             if (WORD(state, 0x714) == -1 || D_0018C0B4 == 0x6F) {
                 goto enter_pause;
             }
             object[0xBC] = 0;
-            func_002B60B0(object, 0.004166667f, 0.125f, 0.006981317885220051f, 0.20943955f);
-            if (object[0x43] != func_002A77E0(2) + 6)
-                func_002A7470(object, func_002A77E0(2) + 6, 0, 10);
-            HALF(state, 0x760) = func_L09_0033E690(object+0x10, WORD(state, 0x714), 0.0f);
+            SetControllerSpeedLimits(object, 0.004166667f, 0.125f, 0.006981317885220051f, 0.20943955f);
+            if (object[0x43] != RandomIntBelow(2) + 6)
+                StartAnimationBlended(object, RandomIntBelow(2) + 6, 0, 10);
+            HALF(state, 0x760) = MeasureMobyAgainstPathEntry(object+0x10, WORD(state, 0x714), 0.0f);
         } else if (object[0xBC] == 0) {
-            func_L18_003F8EA8(object, state+0x700, WORD(state, 0x714), 4.0f, (s16 *)(state+0x760), HALF(state, 0x76C));
-            if (D_0018C0B4 == 0x6F || (UHALF(object, 0x96) % 180 == 0 && func_002A77E0(4) == 0)) {
+            AdvanceWaypointIndex(object, state+0x700, WORD(state, 0x714), 4.0f, (s16 *)(state+0x760), HALF(state, 0x76C));
+            if (D_0018C0B4 == 0x6F || (UHALF(object, 0x96) % 180 == 0 && RandomIntBelow(4) == 0)) {
 enter_pause:
                 object[0xBC] = 1;
-                if (object[0x43] != func_002A77E0(2) + 4)
-                    func_002A7470(object, func_002A77E0(2)+4, 0, 10);
+                if (object[0x43] != RandomIntBelow(2) + 4)
+                    StartAnimationBlended(object, RandomIntBelow(2)+4, 0, 10);
             }
         } else if (object[0xBC] == 1 && (object[0x60] & 2)) {
-            func_002A7750(object, 5, -1);
-            func_002A7750(object, 4, -1);
+            SetMobyState(object, 5, -1);
+            SetMobyState(object, 4, -1);
         }
         if (!HALF(state, 0x768)) {
-            if (WORD(state, 0x750)) func_002A7750(object, 7, -1);
-            else if (WORD(state, 0x744) != -1) func_002A7750(object, 8, -1);
-            else func_002A7750(object, 2, -1);
+            if (WORD(state, 0x750)) SetMobyState(object, 7, -1);
+            else if (WORD(state, 0x744) != -1) SetMobyState(object, 8, -1);
+            else SetMobyState(object, 2, -1);
         } else if (WORD(state, 0x754) != -1) {
-            if (func_L18_0033B628(object+0x10, WORD(state, 0x754), 0) &&
-                func_L18_0033B628(D_00189EA0, WORD(state, 0x754), 0) &&
-                func_L18_003FA8E0(WORD(object, 0xB8)))
-                func_002A7750(object, 6, -1);
-        } else if (func_L18_003FA8E0(WORD(object, 0xB8)))
-            func_002A7750(object, 6, -1);
+            if (RunSlotHandler(object+0x10, WORD(state, 0x754), 0) &&
+                RunSlotHandler(gHeroPosition, WORD(state, 0x754), 0) &&
+                TryUseCounter(WORD(object, 0xB8)))
+                SetMobyState(object, 6, -1);
+        } else if (TryUseCounter(WORD(object, 0xB8)))
+            SetMobyState(object, 6, -1);
         break;
     case 6:
-        if (func_002B3868(object)) {
+        if (SetFirstPendingFlag(object)) {
             object[0xBC] = 0;
-            if (object[0x43] != func_002A77E0(2)+2)
-                func_002A7470(object, func_002A77E0(2)+2, 0, 10);
+            if (object[0x43] != RandomIntBelow(2)+2)
+                StartAnimationBlended(object, RandomIntBelow(2)+2, 0, 10);
         } else if (object[0xBC] == 0 && (object[0x60] & 2)) {
             object[0xBC] = 1;
-            func_002B60B0(object, 0.004166667f, 0.125f, 0.006981317885220051f, 0.20943955f);
-            if (object[0x43] != func_002A77E0(2)+6)
-                func_002A7470(object, func_002A77E0(2)+6, 0, 10);
+            SetControllerSpeedLimits(object, 0.004166667f, 0.125f, 0.006981317885220051f, 0.20943955f);
+            if (object[0x43] != RandomIntBelow(2)+6)
+                StartAnimationBlended(object, RandomIntBelow(2)+6, 0, 10);
         } else if (object[0xBC] == 1) {
-            qcopy(state+0x700, D_00189EA0);
+            qcopy(state+0x700, gHeroPosition);
             HALF(state, 0x76A) = 1;
             if (WORD(state, 0x754) != -1 &&
-                (!func_L18_0033B628(object+0x10, WORD(state, 0x754), 0) ||
-                 !func_L18_0033B628(D_00189EA0, WORD(state, 0x754), 0))) {
-                func_L18_003FA908(WORD(object, 0xB8));
-                func_002A7750(object, 5, -1);
-            } else if (func_L02_002F21C0(object+0x10, state+0x700) < FLOAT(state, 0x72C)*FLOAT(state, 0x72C)) {
+                (!RunSlotHandler(object+0x10, WORD(state, 0x754), 0) ||
+                 !RunSlotHandler(gHeroPosition, WORD(state, 0x754), 0))) {
+                IncrementCounter(WORD(object, 0xB8));
+                SetMobyState(object, 5, -1);
+            } else if (DistanceSquaredXY(object+0x10, state+0x700) < FLOAT(state, 0x72C)*FLOAT(state, 0x72C)) {
                 object[0xBC] = 2;
-                if (object[0x43] != func_002A77E0(2)+4)
-                    func_002A7470(object, func_002A77E0(2)+4, 0, 10);
+                if (object[0x43] != RandomIntBelow(2)+4)
+                    StartAnimationBlended(object, RandomIntBelow(2)+4, 0, 10);
             }
         } else if (object[0xBC] == 2 && (object[0x60] & 2))
-            func_002A7750(object, 6, -1);
+            SetMobyState(object, 6, -1);
         if (!HALF(state, 0x768)) {
-            func_L18_003FA908(WORD(object, 0xB8));
-            if (WORD(state, 0x750)) func_002A7750(object, 7, -1);
-            else if (WORD(state, 0x744) != -1) func_002A7750(object, 8, -1);
-            else func_002A7750(object, 2, -1);
+            IncrementCounter(WORD(object, 0xB8));
+            if (WORD(state, 0x750)) SetMobyState(object, 7, -1);
+            else if (WORD(state, 0x744) != -1) SetMobyState(object, 8, -1);
+            else SetMobyState(object, 2, -1);
         }
         break;
     case 7:
-        if (func_002B3868(object)) {
-            if (object[0x43] != func_002A77E0(2)+6)
-                func_002A7470(object, func_002A77E0(2)+6, 0, 10);
+        if (SetFirstPendingFlag(object)) {
+            if (object[0x43] != RandomIntBelow(2)+6)
+                StartAnimationBlended(object, RandomIntBelow(2)+6, 0, 10);
             best = 1000.0f;
-            for (p=D_L18_001FB320[WORD(state, 0x74C)];
-                 (WORD(state, 0x74C)&255)!=255 && WORD(state, 0x74C)<=D_L18_001B2838 && p &&
-                 ((p != 0 && (s16)p[-1]>=0) || p==D_L18_001FB320[WORD(state, 0x74C)]); p++) {
-                entity=D_L18_001B281C[0]+((*p&0x7FFF)<<8);
+            for (targetId=D_L18_001FB320[WORD(state, 0x74C)];
+                 (WORD(state, 0x74C)&255)!=255 && WORD(state, 0x74C)<=D_L18_001B2838 && targetId &&
+                 ((targetId != 0 && (s16)targetId[-1]>=0) || targetId==D_L18_001FB320[WORD(state, 0x74C)]); targetId++) {
+                entity=gMobyTable_L18[0]+((*targetId&0x7FFF)<<8);
                 if (!entity) break;
-                distance=func_L02_002F21C0(object+0x10, entity+0x10);
+                distance=DistanceSquaredXY(object+0x10, entity+0x10);
                 if (distance<best) { PTR(state, 0x750)=entity; best=distance; }
             }
-            func_L18_003FB5E8(PTR(state, 0x750), position);
-            func_00282F20(temp, PTR(state, 0x750)+0xD0, -1.0f);
-            func_00282CC0(state+0x700, position, temp);
+            CopySavedPointBelow(PTR(state, 0x750), position);
+            vec_scale_to_length(temp, PTR(state, 0x750)+0xD0, -1.0f);
+            FastVecAdd(state+0x700, position, temp);
         }
         HALF(state, 0x76A)=1;
-        if (func_L02_002F21C0(object+0x10, state+0x700)<0.25f) {
-            if (HALF(state, 0x76E)>=5) func_0029F338(object);
-            else { HALF(state, 0x76E)++; func_L18_003F8FA8(object); }
-        } else if (!func_L02_004127F8(PTR(state, 0x750))) {
-            func_L18_003FB5E8(PTR(state, 0x750), temp);
-            if (func_L02_002F21C0(object+0x10, temp)<4.0f)
-                func_L18_003FB500(PTR(state, 0x750), 0);
+        if (DistanceSquaredXY(object+0x10, state+0x700)<0.25f) {
+            if (HALF(state, 0x76E)>=5) MarkMobySpawned(object);
+            else { HALF(state, 0x76E)++; ResetToStartAnimation(object); }
+        } else if (!IsMobyInStateTwo(PTR(state, 0x750))) {
+            CopySavedPointBelow(PTR(state, 0x750), temp);
+            if (DistanceSquaredXY(object+0x10, temp)<4.0f)
+                EnterHitState(PTR(state, 0x750), 0);
         }
         break;
     case 8:
-        if (func_002B3868(object)) {
-            if (object[0x43] != func_002A77E0(2)+6)
-                func_002A7470(object, func_002A77E0(2)+6, 0, 10);
-            qcopy(state+0x700, ((TargetRecord *)D_L18_001B290C[0])[WORD(state, 0x744)].pos);
+        if (SetFirstPendingFlag(object)) {
+            if (object[0x43] != RandomIntBelow(2)+6)
+                StartAnimationBlended(object, RandomIntBelow(2)+6, 0, 10);
+            qcopy(state+0x700, ((TargetRecord *)gWaypointTable[0])[WORD(state, 0x744)].pos);
         }
         HALF(state, 0x76A)=1;
-        if (func_L02_002F21C0(object+0x10, state+0x700)<0.25f)
-            func_002A7750(object, 2, -1);
+        if (DistanceSquaredXY(object+0x10, state+0x700)<0.25f)
+            SetMobyState(object, 2, -1);
         break;
     case 9:
-        hit=func_002B1C20(object, state+0x60);
-        if ((object[0x42]==9 && func_002A77E0(30)==0) || (hit&1)) {
-                if (object[0x94]==6) func_L18_003FA908(WORD(object, 0xB8));
-                func_002A6C58(object, 0, 3);
-                func_002ABBB8(object, D_L18_001A8F20, object+0x10, 0.0f, 0.0f, 20, 0, 10,
+        hit=DispatchActionByKind(object, state+0x60);
+        if ((object[0x42]==9 && RandomIntBelow(30)==0) || (hit&1)) {
+                if (object[0x94]==6) IncrementCounter(WORD(object, 0xB8));
+                SetDeathBits(object, 0, 3);
+                SpawnExplosionEffects(object, D_L18_001A8F20, object+0x10, 0.0f, 0.0f, 20, 0, 10,
                              0.0f, 0.0f, 9.0f, 1.0f, -1, 3.0f, 1, 5, -1, 0, 0x810001);
-                if (HALF(state, 0x76E)>=4) func_0029F338(object);
-                else { HALF(state, 0x76E)++; func_L18_003F8FA8(object); }
-        } else if (hit&2) func_002A7750(object, object[0x94], 2);
+                if (HALF(state, 0x76E)>=4) MarkMobySpawned(object);
+                else { HALF(state, 0x76E)++; ResetToStartAnimation(object); }
+        } else if (hit&2) SetMobyState(object, object[0x94], 2);
         break;
     }
 }

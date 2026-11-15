@@ -19,19 +19,20 @@ typedef struct SpawnedObjectPrefix {
     u16 unk7C;
 } SpawnedObjectPrefix;
 
-void *func_L08_003D3D80(SpawnedObjectPrefix *source)
+/* Creates a new object of class 2439 at the parent's position and links it back to the parent. */
+void *func_L08_003D3D80(SpawnedObjectPrefix *parent)
 {
-    SpawnedObjectPrefix *object = func_0029EFD0(0x987);
-    if (object != 0) {
-        SpawnedObjectPrefix **payload = object->payload;
-        object->unk30 = source->unk30;
-        object->unk32 = source->unk32;
-        object->unk31 = 1;
-        object->unk7C = 0x7F;
-        object->state = 0;
-        *payload = source;
-        object->position = source->position;
-        func_002A0F48(object);
+    SpawnedObjectPrefix *child = CreateMoby(0x987 /* moby class 2439 */);
+    if (child != 0) {
+        SpawnedObjectPrefix **childVars = child->payload;
+        child->unk30 = parent->unk30;
+        child->unk32 = parent->unk32;
+        child->unk31 = 1;
+        child->unk7C = 0x7F;
+        child->state = 0;
+        *childVars = parent;
+        child->position = parent->position;
+        func_002A0F48(child);
     }
-    return object;
+    return child;
 }

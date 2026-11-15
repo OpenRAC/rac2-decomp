@@ -21,15 +21,16 @@ extern void func_002A7A00(void *, float, float);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00282D30(void *, void *, float);
 
+/* Updates the ripple grid moby (class 1073): starts the waves in each column on a timer and moves the grid points. */
 void func_L06_003E5D30(u8 *moby)
 {
-    L06Grid *st = *(L06Grid **)(moby + 0x68);
+    L06Grid *grid = *(L06Grid **)(moby + 0x68);
     L06GridVector temporary[20][10];
 
     switch (moby[0x20]) {
     case 0:
-        if (D_001A79F0 == 10 && D_0018C0D4[0] == 1) {
-            func_0029F338(moby);
+        if (gCurrentMapIndex == 10 && D_0018C0D4[0] == 1) {
+            MarkMobySpawned(moby);
             break;
         }
         D_L06_001B31B4 = 22;
@@ -38,10 +39,10 @@ void func_L06_003E5D30(u8 *moby)
             int i;
             for (i = 0; i < 10; i++) {
                 int delay = i * D_L06_001B31B0 / 10;
-                st->timer[0][i] = delay;
-                st->timer[1][i] = delay + 11;
-                st->timer[2][i] = delay + 23;
-                st->timer[3][i] = delay + 34;
+                grid->timer[0][i] = delay;
+                grid->timer[1][i] = delay + 11;
+                grid->timer[2][i] = delay + 23;
+                grid->timer[3][i] = delay + 34;
             }
         }
         moby[0x20] = 1;
@@ -49,20 +50,20 @@ void func_L06_003E5D30(u8 *moby)
     case 1: {
         int group, col, row;
 
-        st->phase += D_L06_001AF718 * (0.016666668f);
-        if (st->phase > 1.0f) st->phase -= 1.0f;
+        grid->phase += D_L06_001AF718 * (0.016666668f);
+        if (grid->phase > 1.0f) grid->phase -= 1.0f;
         for (group = 0; group < 4; group++) {
             for (col = 0; col < 10; col++) {
-                int hit = func_00282948(&st->timer[group][col]);
+                int hit = FastFloatHelperD(&grid->timer[group][col]);
                 int base = group * 0x2580;
-                L06GridVector (*points)[20] = (L06GridVector (*)[20])((char *)st + base);
-                L06GridVector (*velocities)[20] = (L06GridVector (*)[20])((char *)st + (base + 0x9600));
+                L06GridVector (*points)[20] = (L06GridVector (*)[20])((char *)grid + base);
+                L06GridVector (*velocities)[20] = (L06GridVector (*)[20])((char *)grid + (base + 0x9600));
                 if (hit) {
                     for (row = 0; row < 20; row++) {
-                        func_00282C88(&points[row][col]);
-                        ((L06GridVector *)((char *)st + (row * 0x140 + (col * 16 + base))))->f[1] = row * 0.05f * D_L06_001AF714 - D_L06_001AF714 * 0.5f;
-                        ((L06GridVector *)((char *)st + (row * 0x140 + (col * 16 + base))))->f[3] = 1.0f;
-                        func_002A7A00(&temporary[row][col], 0.0f, D_L06_001AF710 * (0.016666668f));
+                        ClearVector128(&points[row][col]);
+                        ((L06GridVector *)((char *)grid + (row * 0x140 + (col * 16 + base))))->f[1] = row * 0.05f * D_L06_001AF714 - D_L06_001AF714 * 0.5f;
+                        ((L06GridVector *)((char *)grid + (row * 0x140 + (col * 16 + base))))->f[3] = 1.0f;
+                        RandomDirectionVector(&temporary[row][col], 0.0f, D_L06_001AF710 * (0.016666668f));
                     }
                     {
                         int k;
@@ -75,16 +76,16 @@ void func_L06_003E5D30(u8 *moby)
                         int first = (int)temporary - mirror;
                         int before = offset + (int)temporary;
                         for (k = 1; k < 19; k++) {
-                            func_00282CC0(&velocities[k][col], (L06GridVector *)(before + k * 160), (L06GridVector *)(first + k * 160));
-                            func_00282CC0(&velocities[k][col], &velocities[k][col], column[k + 1]);
-                            func_00282D30(&velocities[k][col], &velocities[k][col], 0.333f);
+                            FastVecAdd(&velocities[k][col], (L06GridVector *)(before + k * 160), (L06GridVector *)(first + k * 160));
+                            FastVecAdd(&velocities[k][col], &velocities[k][col], column[k + 1]);
+                            FastVecScale(&velocities[k][col], &velocities[k][col], 0.333f);
                         }
                     }
-                    st->timer[group][col] = D_L06_001B31B0;
+                    grid->timer[group][col] = D_L06_001B31B0;
                 } else {
                     int k;
                     for (k = 1; k < 19; k++) {
-                        func_00282CC0(&points[k][col], &points[k][col], &velocities[k][col]);
+                        FastVecAdd(&points[k][col], &points[k][col], &velocities[k][col]);
                     }
                 }
             }

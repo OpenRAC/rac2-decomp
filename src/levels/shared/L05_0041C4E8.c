@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 /* Glow ring: four pulsing sprites along the actor's facing, each faded in. */
 typedef int V4_L05_0041C4E8 __attribute__((mode(TI)));
 extern unsigned char ref_L05_0041C4E8_00[];
@@ -15,37 +16,38 @@ typedef struct { unsigned char pad[9]; unsigned char fade; } Sprite_L05_0041C4E8
 extern Sprite_L05_0041C4E8 *func_002C2FD8(void *, void *, int, int, int, int, int, float);
 
 typedef struct { float phase[4]; float rate[4]; int alpha[4]; float size[4]; } GlowState_L05_0041C4E8;
-void func_L05_0041C4E8(unsigned char *a0)
+/* Draws four pulsing blue glow sprites in a short line in front of the object, each fading in. */
+void func_L05_0041C4E8(unsigned char *object)
 {
-    GlowState_L05_0041C4E8 *st = *(GlowState_L05_0041C4E8 **)(a0 + 0x68);
+    GlowState_L05_0041C4E8 *glow = *(GlowState_L05_0041C4E8 **)(object + 0x68);
     float m[4];
     float q[4];
     float src[4];
     int i;
 
-    *(V4_L05_0041C4E8 *)src = *(V4_L05_0041C4E8 *)(a0 + 0x10);
+    *(V4_L05_0041C4E8 *)src = *(V4_L05_0041C4E8 *)(object + 0x10);
     src[2] += 0.25f;
-    func_00282CF0(m, ref_L05_0041C4E8_00, src);
-    func_00282F20(m, m, -0.3f);
-    func_00282F20(q, m, 0.1f);
-    func_00282CC0(m, m, src);
+    FastVecSub(m, ref_L05_0041C4E8_00, src);
+    vec_scale_to_length(m, m, -0.3f);
+    vec_scale_to_length(q, m, 0.1f);
+    FastVecAdd(m, m, src);
 
     for (i = 0; i < 4; i++) {
-        float v = st->phase[i] + st->rate[i];
+        float v = glow->phase[i] + glow->rate[i];
         void *color;
-        Sprite_L05_0041C4E8 *s;
-        st->phase[i] = v;
+        Sprite_L05_0041C4E8 *sprite;
+        glow->phase[i] = v;
         if (v >= 255.0f)
-            st->phase[i] = v - 255.0f;
+            glow->phase[i] = v - 255.0f;
         else if (v <= 0.0f)
-            st->phase[i] = v + 255.0f;
-        if (func_00282948(&st->alpha[i]))
-            st->alpha[i] = 0xFF;
-        v = func_00282C48(0.5f - func_00283CE0(0xFF - st->alpha[i]) * 0.0039215689f);
-        color = func_00283D38(0x40405FFF, 0x10405FFF, v);
-        s = func_002C2FD8(m, color, func_00283CF0(st->phase[i]) & 0xFF, 0x35, 1, 2, 0, st->size[i]);
-        if (s)
-            s->fade = func_00283CF0(1.0f) + 0x60;
-        func_00282CC0(m, m, q);
+            glow->phase[i] = v + 255.0f;
+        if (FastFloatHelperD(&glow->alpha[i]))
+            glow->alpha[i] = 0xFF;
+        v = FloatAbs(0.5f - IntToFloat(0xFF - glow->alpha[i]) * 0.0039215689f);
+        color = FastTweenColor(0x40405FFF, 0x10405FFF, v);
+        sprite = SpawnFadingParticle_002C2FD8(m, color, FloatToInt(glow->phase[i]) & 0xFF, 0x35, 1, 2, 0, glow->size[i]);
+        if (sprite)
+            sprite->fade = FloatToInt(1.0f) + 0x60;
+        FastVecAdd(m, m, q);
     }
 }

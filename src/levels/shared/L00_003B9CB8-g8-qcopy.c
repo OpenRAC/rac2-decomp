@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The grouped quadword copy: the R5900 lq/sq pair with both addresses in registers. */
 typedef int Rac2TI128 __attribute__((mode(TI)));
@@ -20,42 +21,42 @@ extern unsigned int D_L00_001AFDA0 __attribute__((sda));
 /* Creates the level's own object, fills the header the object carries, copies the two
    16-byte records it is given into it, and lets the shared helpers set the rest up.
    The object is returned; a null one is returned unchanged. */
-void *func_L00_003BB080(char *a0, char *a1, char *a2, char *a3)
+void *func_L00_003BB080(char *owner, char *param, char *position, char *vector)
 {
-    char *node;
-    char *sub;
-    char *p1;
-    unsigned short v0;
+    char *newMoby;
+    char *vars;
+    char *posPtr;
+    unsigned short flags;
 
-    node = (char *)func_0029EFD0(0x9A9);
-    if (node != 0) {
-        v0 = *(unsigned short *)(node + 0x34);
-        *(unsigned char *)(node + 0x30) = 0xFF;
-        *(unsigned short *)(node + 0x32) = 0x1FF;
-        *(unsigned short *)(node + 0x34) = v0 | 0x100;
+    newMoby = (char *)CreateMoby(0x9A9 /* moby class 2473 */);
+    if (newMoby != 0) {
+        flags = *(unsigned short *)(newMoby + 0x34);
+        *(unsigned char *)(newMoby + 0x30) = 0xFF;
+        *(unsigned short *)(newMoby + 0x32) = 0x1FF;
+        *(unsigned short *)(newMoby + 0x34) = flags | 0x100;
 
-        sub = *(char **)(node + 0x68);
-        p1 = node + 0x10;
-        *(int *)(sub + 0x44) = *(short *)(a0 + 0xAA);
-        *(int *)(sub + 0x34) = 0x78;
-        *(float *)(sub + 0x4C) = 0.01f;
-        *(int *)(sub + 0x40) = (int)a1;
+        vars = *(char **)(newMoby + 0x68);
+        posPtr = newMoby + 0x10;
+        *(int *)(vars + 0x44) = *(short *)(owner + 0xAA);
+        *(int *)(vars + 0x34) = 0x78;
+        *(float *)(vars + 0x4C) = 0.01f;
+        *(int *)(vars + 0x40) = (int)param;
 
-        *(Rac2TI128 *)p1 = *(Rac2TI128 *)a2;
-        *(Rac2TI128 *)sub = *(Rac2TI128 *)a3;
-        *(Rac2TI128 *)(sub + 0x20) = *(Rac2TI128 *)a3;
+        *(Rac2TI128 *)posPtr = *(Rac2TI128 *)position;
+        *(Rac2TI128 *)vars = *(Rac2TI128 *)vector;
+        *(Rac2TI128 *)(vars + 0x20) = *(Rac2TI128 *)vector;
 
-        *(int *)(sub + 0x50) = func_002FED90(node, 0, 1.0f, 1.0f, 1.0f);
-        *(int *)(sub + 0x54) = 0;
-        *(int *)(sub + 0x58) = 0;
-        *(unsigned char *)(node + 0x20) = 0;
+        *(int *)(vars + 0x50) = AllocEffectSlot_002FED90(newMoby, 0, 1.0f, 1.0f, 1.0f);
+        *(int *)(vars + 0x54) = 0;
+        *(int *)(vars + 0x58) = 0;
+        *(unsigned char *)(newMoby + 0x20) = 0;
         D_L00_001AFDA0 = D_L00_001AFDA0 + 1;
-        *(int *)(sub + 0x5C) = func_L00_002FCF18(p1, 0.0f, 0.0f, 0.25f, 0.14f, 1.0f);
-        *(float *)(node + 0xF0) = func_002A7940();
-        *(float *)(node + 0xF4) = func_002A7940();
-        *(float *)(node + 0xF8) = func_002A7940();
-        *(float *)(node + 0xFC) = 0.0f;
-        func_002833F0(node + 0xC0, node + 0xF0);
+        *(int *)(vars + 0x5C) = AllocateEffectSlot_L00_2(posPtr, 0.0f, 0.0f, 0.25f, 0.14f, 1.0f);
+        *(float *)(newMoby + 0xF0) = RandomAngle();
+        *(float *)(newMoby + 0xF4) = RandomAngle();
+        *(float *)(newMoby + 0xF8) = RandomAngle();
+        *(float *)(newMoby + 0xFC) = 0.0f;
+        euler_rotation_basis(newMoby + 0xC0, newMoby + 0xF0);
     }
-    return node;
+    return newMoby;
 }

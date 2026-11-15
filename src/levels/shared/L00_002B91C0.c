@@ -156,7 +156,7 @@ void func_L00_002B91C0(void)
         hi = lo;
     }
 
-    func_L00_002B8F00(&A, scratch, 0, hi, lo, 0.0f);
+    ApplyHeroReferenceTiltRotation(&A, scratch, 0, hi, lo, 0.0f);
 
     if (D_00189E20_5.b22C3 == 1 && D_00189E20_5.h34E != 0) {
         func_002830C0_2(&C, &C, scratch);
@@ -186,6 +186,7 @@ void func_L00_002B94D8(float a0)
     }
 }
 
+/* Moves the hero's reference point toward where the stick points, correcting it so it stays on the ground and not in walls. */
 void func_L00_002B9598(void)
 {
     float desired[4] __attribute__((aligned(16)));
@@ -194,18 +195,18 @@ void func_L00_002B9598(void)
     float delta[4] __attribute__((aligned(16)));
     float correction[4] __attribute__((aligned(16)));
     float x, limit, t, angle, scale, step, length, adjustment;
-    func_L00_002B39F0(0, 1.0f);
-    func_L00_002B3EF8(0, 0.02f, 0.2f, 0.061086535f);
+    ResolveStickInputToDirection(0, 1.0f);
+    SteerHeroHeading(0, 0.02f, 0.2f, 0.061086535f);
     if (D_00189E20_9598.f2294 == 19) {
         if (D_00189E20_9598.f24b8 < 0.2f) D_00189E20_9598.f1a0 = D_00189E20_9598.f98;
         D_00189E20_9598.f1b0 = 0.4f;
     } else if (D_00189E20_9598.f2294 == 21) D_00189E20_9598.f1b0 = 0.0f;
-    desired[0] = func_00283180(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.09833333641290665f;
-    desired[1] = func_00283198(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.09833333641290665f;
+    desired[0] = FastSinOrCosA(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.09833333641290665f;
+    desired[1] = FastSinOrCosB(D_00189E20_9598.f1a0) * D_00189E20_9598.f1b0 * 0.09833333641290665f;
     desired[2] = 0.0f;
     qcopy_nc(original, desired);
     if (D_00189E20_9598.fa70 > 0.0f) {
-        func_L00_002B54F8(0.7f, 0.0f);
+        BuildHeroMoveImpulse(0.7f, 0.0f);
         qcopy_nc(previous, D_00189E20_9598.va60);
         func_00282CC0_3(desired, desired, D_00189E20_9598.va60);
         func_00282C88_5(D_00189E20_9598.va60);
@@ -224,8 +225,8 @@ void func_L00_002B9598(void)
         limit = 0.0030555557f;
     if (D_00189E20_9598.f170 > 0.09833333641290665f) limit = 0.0036111111f;
     if (D_00189E20_9598.fa70 > 0.0f) {
-        x = -func_00282DB0(original, previous);
-        length = func_00282DF0(original);
+        x = -FastVecDot(original, previous);
+        length = FastVecLength(original);
         if (length > 0.0f) x /= length;
         length = func_00282E20_3(previous);
         adjustment = (length - x) / length * 0.00083333335f;
@@ -234,30 +235,30 @@ void func_L00_002B9598(void)
     }
     func_00282CF0_3(delta, desired, D_00189E20_9598.v140);
     delta[2] = 0.0f;
-    if (func_00282DF0(delta) > limit) func_00282F20(delta, delta, limit);
+    if (FastVecLength(delta) > limit) vec_scale_to_length(delta, delta, limit);
     func_00282CC0_3(D_00189E20_9598.vf0, D_00189E20_9598.v140, delta);
     if (D_00189E20_9598.f320 > 0.087266475f) {
         angle = func_00283248_5(D_00189E20_9598.v2a0[0], D_00189E20_9598.v2a0[1]);
         scale = D_00189E20_9598.f320 * 0.16976526f;
         step = D_00189E20_9598.f320 * 0.0030062596779316664f;
-        delta[0] = func_00283180(angle) * scale;
-        delta[1] = func_00283198(angle) * scale;
+        delta[0] = FastSinOrCosA(angle) * scale;
+        delta[1] = FastSinOrCosB(angle) * scale;
         delta[2] = 0.0f;
         func_00282CF0_3(correction, delta, D_00189E20_9598.vf0);
         correction[2] = 0.0f;
-        if (func_00282DF0(correction) > step) func_00282F20(correction, correction, step);
+        if (FastVecLength(correction) > step) vec_scale_to_length(correction, correction, step);
         func_00282CC0_3(D_00189E20_9598.vf0, D_00189E20_9598.vf0, correction);
     }
     qcopy_nc(delta, D_00189E20_9598.vf0);
     delta[2] = 0.0f;
-    D_00189E20_9598.f400 = func_00282DB0(delta, desired);
-    t = func_00282DF0(desired);
+    D_00189E20_9598.f400 = FastVecDot(delta, desired);
+    t = FastVecLength(desired);
     if (t > 0.0f) D_00189E20_9598.f400 /= t * 0.09833333641290665f;
     ref_L00_002B9598_0(0);
     if (D_00189E20_9598.f404 < 0.017453294f && D_00189E20_9598.f324 > 0.087266475f)
-        func_00282D30_4(D_00189E20_9598.vf0, D_00189E20_9598.vf0, func_00283180(D_00189E20_9598.f324));
+        func_00282D30_4(D_00189E20_9598.vf0, D_00189E20_9598.vf0, FastSinOrCosA(D_00189E20_9598.f324));
     D_00189E20_9598.f404 = D_00189E20_9598.f324;
-    if (func_00282C48(D_00189E20_9598.f88 - D_00189E20_9598.f318) < 0.15f) D_00189E20_9598.f88 = D_00189E20_9598.f318;
+    if (FloatAbs(D_00189E20_9598.f88 - D_00189E20_9598.f318) < 0.15f) D_00189E20_9598.f88 = D_00189E20_9598.f318;
 }
 
 
@@ -277,8 +278,8 @@ float func_L00_002B9B38(void *a0, int selector)
 {
     float v[4];
 
-    func_002830C0(v, a0, D_00189E60);
-    return func_002AA738(func_00283248(v[0], v[1]), selector, 0.0f);
+    transform_vector(v, a0, D_00189E60);
+    return GetShortestAngleDelta(FastMatrixHelperA(v[0], v[1]), selector, 0.0f);
 }
 
 /* The resident id this forwards, and the helper it calls. */
@@ -289,7 +290,7 @@ extern int func_002E5CF8(int index, int flags, char *object);
 /* Forward the sound index, flags and resident object pointer; return the result. */
 int func_L00_002B9B88(int index, int flags)
 {
-    return func_002E5CF8(index, flags, (char *)D_0018C0B0);
+    return PlayMobySound(index, flags, (char *)gHeroMoby_0018C0B0);
 }
 
 
@@ -344,9 +345,9 @@ void func_L00_002B9CA8(void)
             id = D_00189E20_9CA8.slots[i].id;
             D_00189E20_9CA8.slots[i].pending = 0;
             if (id == 0x16)
-                func_L00_002A61C8(D_00189E20_9CA8.b149D, 1, 1, 0x32);
+                PlayFootstepSoundAndDust(D_00189E20_9CA8.b149D, 1, 1, 0x32);
             else
-                func_L00_002B9B88(id, D_00189E20_9CA8.slots[i].arg);
+                PlayHeroSound(id, D_00189E20_9CA8.slots[i].arg);
         }
     }
 }
@@ -402,7 +403,7 @@ typedef struct {
 void func_L00_002B9D60(void *position, void *direction, int sound, int refresh)
 {
     ResidentState_9D60 *res;
-    char *hero = D_00189EA0;
+    char *hero = gHeroPosition;
 
     qcopy(hero, position);
     res = (ResidentState_9D60 *)(hero - 0x80);
@@ -411,9 +412,9 @@ void func_L00_002B9D60(void *position, void *direction, int sound, int refresh)
 
     func_00283410_1(res, hero + 0x10);
     func_002833F0_1(res->object + 0xC0, hero + 0x10);
-    func_L00_002B2BD0();
-    func_L00_00322EC8(hero + 0x1860);
-    func_L00_00322EC8(hero + 0x19B0);
+    ResetHeroSpeedsAndVectors();
+    ReleaseSlotList(hero + 0x1860);
+    ReleaseSlotList(hero + 0x19B0);
 
     res->flags3A4 &= ~1;
     res->flags3A4 &= ~2;
@@ -421,34 +422,35 @@ void func_L00_002B9D60(void *position, void *direction, int sound, int refresh)
     res->i3A0 = 0;
     res->b24EF = 0;
 
-    func_L00_002AF7D0();
-    func_L00_002A53B8();
+    cancel_hero_item_animation();
+    ResetAllAttachmentRecords();
 
     if (sound != -1)
-        func_L00_002C42E0(sound, 2);
+        SetHeroAction_L00(sound, 2);
 
-    func_L00_002D23C0(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
+    StartObjectAnimationAtFrame(*(u8 *)(res->object + 0x43), *(u8 *)(res->object + 0x41));
 
     if (res->i229C == 0x11)
         D_L00_001B9080 = 1;
     else
         D_L00_001B9080 = 0;
 
-    func_L00_002B4900();
+    UpdateHeroGroundContact_L00();
 
-    if (func_00282E48_1(D_00189EA0, D_00189EA0 + 0x250) < 1.0f)
-        qcopy(D_00189EA0, D_00189EA0 + 0x250);
+    if (func_00282E48_1(gHeroPosition, gHeroPosition + 0x250) < 1.0f)
+        qcopy(gHeroPosition, gHeroPosition + 0x250);
 
-    func_L00_003DF6B0(0, 0);
-    func_L00_004028C0(0, 0);
+    SetTrackedObjectState(0, 0);
+    StartGlobalObject(0, 0);
 
     if (refresh != 0)
-        func_L00_002D9D98();
+        ResetDefaultCamera();
 
-    func_L00_00311DC0(*(void **)(D_00189EA0 + 0x2210));
+    ApplyNearestEnvironmentPreset(*(void **)(gHeroPosition + 0x2210));
 }
 
 /* queries a resident table with a stack request and blends a vector back into the resident record */
+/* Probes the ground in front of the hero and stores the slope angle of what it finds. */
 int func_L00_002BA410(void)
 {
     char buf[48];
@@ -541,17 +543,17 @@ void func_L00_002BA508(void)
             special = 1;
     }
 
-    if (special && !func_L00_002BA410()) {
+    if (special && !ProbeGroundSlopeAhead()) {
         D_00189E20_A508.fC04 = D_L00_001B8C80_A508.z;
-        D_00189E20_A508.fC08 = func_00283B98(-D_L00_001B8C80_A508.y, 0.12217305600643158f);
+        D_00189E20_A508.fC08 = FastAddRotations(-D_L00_001B8C80_A508.y, 0.12217305600643158f);
     }
 
     object = D_00189E20_A508.p1220;
-    if (!func_L00_002B3248(object))
+    if (!IsMobyClass71(object))
         return;
     D_00189E20_A508.b123A = 1;
     if (special)
-        func_L00_002B9B88(17, 0);
+        PlayHeroSound(17, 0);
 
     *(u8 *)(object + 0x20) = 10;
     record = *(char **)(object + 0x68);
@@ -560,32 +562,32 @@ void func_L00_002BA508(void)
         *(short *)(record + 0x76) = 1;
 
     matrix = record + 0x40;
-    func_00282C88(matrix);
+    ClearVector128(matrix);
     if (!special)
-        func_L00_002D3798(matrix, matrix, 1.0f);
+        OffsetPointBySideDirection(matrix, matrix, 1.0f);
     else
-        func_002AF000(matrix, 1.0f, D_00189E20_A508.fC04, D_00189E20_A508.fC08);
+        BuildSphericalOffset(matrix, 1.0f, D_00189E20_A508.fC04, D_00189E20_A508.fC08);
 
-    func_00282C88(scratch);
-    func_002833F0(transform, scratch);
+    ClearVector128(scratch);
+    euler_rotation_basis(transform, scratch);
     if (special) {
         scratch[0] = D_L00_001B8C80_A508.x;
         scratch[1] = D_L00_001B8C80_A508.y;
         scratch[2] = D_L00_001B8C80_A508.z;
-        func_002833F0(level_transform, scratch);
-        func_00283738(transform, level_transform, transform);
+        euler_rotation_basis(level_transform, scratch);
+        multiply_matrix3x3(transform, level_transform, transform);
     } else {
-        func_00283738(transform, D_00189E20_A508.p2290 + 0xC0, transform);
+        multiply_matrix3x3(transform, D_00189E20_A508.p2290 + 0xC0, transform);
     }
-    func_00283658(composed, transform);
-    func_002AB6D8(composed, object + 0xF0);
+    copy_matrix_rotation(composed, transform);
+    GetEulerAnglesFromMatrix(composed, object + 0xF0);
 
     *(int *)(record + 0x64) = 0;
     *(float *)(record + 0x60) = 0.38333335518836975f;
     if (D_00189E20_A508.f184 < 0.3333333432674408f) {
-        func_L00_00322A98(object, D_00189E20_A508.area1A30);
-        func_L00_00322AC0(D_00189E20_A508.area1A30, 48, 3, 0.0f);
-        func_L00_00322AC0(D_00189E20_A508.area1A30, 23, 5, 0.0f);
+        InitPendingSlot(object, D_00189E20_A508.area1A30);
+        AppendRecordToFourEntryTable(D_00189E20_A508.area1A30, 48, 3, 0.0f);
+        AppendRecordToFourEntryTable(D_00189E20_A508.area1A30, 23, 5, 0.0f);
     }
-    func_002A7470(object, 6, 0, 5);
+    StartAnimationBlended(object, 6, 0, 5);
 }

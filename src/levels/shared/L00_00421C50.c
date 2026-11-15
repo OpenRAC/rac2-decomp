@@ -47,104 +47,105 @@ extern char *D_L00_001B8E10[];
 extern char D_L00_001B8E20[];
 extern char D_L00_001BF220[];
 #define HERO ((Hero *)D_00189E20)
+/* Updates the follow camera each frame: eases its eye position and look-at point toward the target and pulls the camera in when a wall is in the way. */
 void func_L00_00421C50(char *moby)
 {
     float out[4], a[4], b[4], c[4], d[4], e[4], f[4], g[4], h[4], i[4];
-    float v0[4];
-    char *p = *(char **)(moby + 0x70);
-    char *s = p + 0x60;
-    char *q = p + 0x160;
-    char *t = p + 0x70;
-    char *u;
+    float midpoint[4];
+    char *camData = *(char **)(moby + 0x70);
+    char *settings = camData + 0x60;
+    char *motion = camData + 0x160;
+    char *outVec = camData + 0x70;
+    char *eyeOffset;
     char *cam = D_L00_001B8E20;
     char *pi;
     char *vp;
     float dist, scale, r, r2, dd;
-    func_00334710(moby, a);
-    func_L00_00420C38(moby);
-    func_L00_004212B8(moby, out);
-    qcopy(p + 0x70, out);
-    qcopy(b, s);
-    u = p + 0xC0;
-    dist = func_00282DB0(cam + 0x30, u);
-    func_00282D30(c, cam + 0x30, dist);
-    func_00282CF0(d, u, c);
-    *(float *)(s + 0xF0) = func_00282E48(c, t);
-    c[0] = func_002702C8(p + 0xE0, c[0], *(float *)(s + 0x10), *(float *)(s + 0xE4), *(float *)(s + 0xE8), 0.0f);
-    c[1] = func_002702C8(p + 0xE4, c[1], *(float *)(s + 0x14), *(float *)(s + 0xE4), *(float *)(s + 0xE8), 0.0f);
-    c[2] = func_002702C8(p + 0xE8, c[2], *(float *)(s + 0x18), *(float *)(s + 0xE4), *(float *)(s + 0xE8), 0.0f);
-    d[0] = func_002702C8(p + 0xD0, d[0], *(float *)(s + 0x0), *(float *)(s + 0xDC), *(float *)(s + 0xE0), 0.0f);
-    d[1] = func_002702C8(p + 0xD4, d[1], *(float *)(s + 0x4), *(float *)(s + 0xDC), *(float *)(s + 0xE0), 0.0f);
-    d[2] = func_002702C8(p + 0xD8, d[2], *(float *)(s + 0x8), *(float *)(s + 0xDC), *(float *)(s + 0xE0), 0.0f);
-    func_00282CC0(s, s, t);
-    func_00282CC0(u, d, c);
-    func_00282D30(e, cam + 0x20, *(float *)(s + 0xB0));
-    if (*(u8 *)(s + 0xD6)) {
-        *(short *)(s + 0xD8) += 1;
-        if (*(short *)(s + 0xEC) < *(short *)(s + 0xD8))
-            *(short *)(s + 0xD8) = *(short *)(s + 0xEC);
-        r = func_00283CE0(*(short *)(s + 0xD8));
-        r = r / func_00283CE0(*(short *)(s + 0xEC));
-        func_00282D08(f, s, u, r);
-        func_00282CC0(p + 0xA0, e, f);
+    CopyHeroVectorToOut(moby, a);
+    UpdateHeldWeaponAnimState(moby);
+    ComputeFollowCameraPosition(moby, out);
+    qcopy(camData + 0x70, out);
+    qcopy(b, settings);
+    eyeOffset = camData + 0xC0;
+    dist = FastVecDot(cam + 0x30, eyeOffset);
+    FastVecScale(c, cam + 0x30, dist);
+    FastVecSub(d, eyeOffset, c);
+    *(float *)(settings + 0xF0) = fast_vec_dist(c, outVec);
+    c[0] = StepSpringDamperClamped(camData + 0xE0, c[0], *(float *)(settings + 0x10), *(float *)(settings + 0xE4), *(float *)(settings + 0xE8), 0.0f);
+    c[1] = StepSpringDamperClamped(camData + 0xE4, c[1], *(float *)(settings + 0x14), *(float *)(settings + 0xE4), *(float *)(settings + 0xE8), 0.0f);
+    c[2] = StepSpringDamperClamped(camData + 0xE8, c[2], *(float *)(settings + 0x18), *(float *)(settings + 0xE4), *(float *)(settings + 0xE8), 0.0f);
+    d[0] = StepSpringDamperClamped(camData + 0xD0, d[0], *(float *)(settings + 0x0), *(float *)(settings + 0xDC), *(float *)(settings + 0xE0), 0.0f);
+    d[1] = StepSpringDamperClamped(camData + 0xD4, d[1], *(float *)(settings + 0x4), *(float *)(settings + 0xDC), *(float *)(settings + 0xE0), 0.0f);
+    d[2] = StepSpringDamperClamped(camData + 0xD8, d[2], *(float *)(settings + 0x8), *(float *)(settings + 0xDC), *(float *)(settings + 0xE0), 0.0f);
+    FastVecAdd(settings, settings, outVec);
+    FastVecAdd(eyeOffset, d, c);
+    FastVecScale(e, cam + 0x20, *(float *)(settings + 0xB0));
+    if (*(u8 *)(settings + 0xD6)) {
+        *(short *)(settings + 0xD8) += 1;
+        if (*(short *)(settings + 0xEC) < *(short *)(settings + 0xD8))
+            *(short *)(settings + 0xD8) = *(short *)(settings + 0xEC);
+        r = IntToFloat(*(short *)(settings + 0xD8));
+        r = r / IntToFloat(*(short *)(settings + 0xEC));
+        lerp_vector(f, settings, eyeOffset, r);
+        FastVecAdd(camData + 0xA0, e, f);
     } else {
-        func_00282978(p + 0x138);
-        if (*(short *)(s + 0xD8) < 0)
-            *(short *)(s + 0xD8) = 0;
-        r = func_00283CE0(*(short *)(s + 0xD8));
-        r = r / func_00283CE0(*(short *)(s + 0xEC));
-        func_00282D08(f, s, u, r);
-        func_00282CC0(p + 0xA0, e, f);
+        FastDecTimer(camData + 0x138);
+        if (*(short *)(settings + 0xD8) < 0)
+            *(short *)(settings + 0xD8) = 0;
+        r = IntToFloat(*(short *)(settings + 0xD8));
+        r = r / IntToFloat(*(short *)(settings + 0xEC));
+        lerp_vector(f, settings, eyeOffset, r);
+        FastVecAdd(camData + 0xA0, e, f);
     }
-    func_L00_00421B50(moby, e);
+    UpdateWeaponAnimBlend(moby, e);
     if (HERO->b[0x22B4] == 2)
-        func_00282D30(e, cam + 0x20, 3.0f);
+        FastVecScale(e, cam + 0x20, 3.0f);
     else if (HERO->b[0x22B4] == 1)
-        func_00282D30(e, cam + 0x20, 0.4f);
+        FastVecScale(e, cam + 0x20, 0.4f);
     else if (HERO->i[0x8A7] == 0x11)
         qzero(e);
     else
-        func_00282D30(e, cam + 0x20, 0.5f);
-    func_00282CC0(f, a, e);
-    func_00282D30(e, cam + 0x20, *(float *)(q + 0x30));
-    func_00282CC0(s + 0x50, e, s);
+        FastVecScale(e, cam + 0x20, 0.5f);
+    FastVecAdd(f, a, e);
+    FastVecScale(e, cam + 0x20, *(float *)(motion + 0x30));
+    FastVecAdd(settings + 0x50, e, settings);
     {
-        char *o = *(char **)(D_L00_001B8E10[0] + 0x70);
+        char *o = *(char **)(gFollowCameraObject[0] + 0x70);
         scale = D_L00_001B14D0 + *(float *)(o + 0x234) * *(float *)(o + 0x22C) * (*(float *)(o + 0x230) - 1.0f);
     }
-    func_00282D30(g, cam + 0x20, 20.0f);
-    func_00282CC0(g, f, g);
-    if (func_002761F8(f, g, D_L00_001B184C, HERO->i[0x8A4], 0))
+    FastVecScale(g, cam + 0x20, 20.0f);
+    FastVecAdd(g, f, g);
+    if (CollLine(f, g, D_L00_001B184C, HERO->i[0x8A4], 0))
         qcopy(h, D_L00_001BF220);
     else
         qcopy(h, g);
-    func_00282D30(g, cam + 0x20, 20.0f);
-    func_00282CF0(g, f, g);
-    if (func_002761F8(f, g, D_L00_001B184C, HERO->i[0x8A4], 0))
+    FastVecScale(g, cam + 0x20, 20.0f);
+    FastVecSub(g, f, g);
+    if (CollLine(f, g, D_L00_001B184C, HERO->i[0x8A4], 0))
         qcopy(g, D_L00_001BF220);
-        func_00282CF0(i, g, h);
-    if (func_00282DF0(i) < 2.0f * scale) {
-        func_00282CC0(v0, h, g);
-        func_00282D30(v0, v0, 0.5f);
-        qcopy(s + 0x50, v0);
-        func_00282CF0(i, v0, s);
-        func_L00_00424A50(func_00282DB0(i, cam + 0x20), 0.006f);
+        FastVecSub(i, g, h);
+    if (FastVecLength(i) < 2.0f * scale) {
+        FastVecAdd(midpoint, h, g);
+        FastVecScale(midpoint, midpoint, 0.5f);
+        qcopy(settings + 0x50, midpoint);
+        FastVecSub(i, midpoint, settings);
+        follow_camera_set_height(FastVecDot(i, cam + 0x20), 0.006f);
         return;
     }
-    func_00282CF0(i, h, s);
-    dd = func_00282DF0(i);
-    r2 = *(float *)(q + 0x30);
+    FastVecSub(i, h, settings);
+    dd = FastVecLength(i);
+    r2 = *(float *)(motion + 0x30);
     if (dd <= r2 + scale) {
-        func_00282D30(v0, cam + 0x20, scale);
-        func_00282CF0(v0, h, v0);
-        qcopy(s + 0x50, v0);
-        func_00282CF0(i, v0, s);
-        func_L00_00424A50(func_00282DB0(i, cam + 0x20), 0.006f);
+        FastVecScale(midpoint, cam + 0x20, scale);
+        FastVecSub(midpoint, h, midpoint);
+        qcopy(settings + 0x50, midpoint);
+        FastVecSub(i, midpoint, settings);
+        follow_camera_set_height(FastVecDot(i, cam + 0x20), 0.006f);
         return;
     }
-    dd = func_00282DB0(s, cam + 0x30);
-    if (func_00282DB0(g, cam + 0x30) < dd)
-        qcopy(g, s);
-    func_00282D30(e, cam + 0x20, r2);
-    func_00282CC0(s + 0x50, e, g);
+    dd = FastVecDot(settings, cam + 0x30);
+    if (FastVecDot(g, cam + 0x30) < dd)
+        qcopy(g, settings);
+    FastVecScale(e, cam + 0x20, r2);
+    FastVecAdd(settings + 0x50, e, g);
 }

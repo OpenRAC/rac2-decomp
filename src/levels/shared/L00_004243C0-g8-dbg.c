@@ -36,6 +36,7 @@ extern void func_L00_002D9D98(void);
 typedef struct { char pad[16]; float pos[4]; char pad20[4]; struct { char pad[16]; int value; } *info; char pad28[112]; int visible; char pad9C[14]; short type; } Moby243;
 typedef struct { char pad[44]; float distance; } Move243;
 typedef struct { char pad[48]; float offset; short timer; char gap[4]; short flag; char gap2[16]; short counter, locked; } State243;
+/* Runs the follow camera each frame. It hides objects that block the view, pushes the camera away from walls, and slowly pulls it back out. */
 void func_L00_004243C0(char *obj)
 {
     char *base=P(obj,112);
@@ -43,49 +44,49 @@ void func_L00_004243C0(char *obj)
     Move243 *move=(Move243 *)(base+352);
     State243 *state=(State243 *)(base+496);
     char *camera=D_L00_001B8E20;
-    char a[16],b[16],c[16],d[16],e[16];
-    Moby243 *m;
+    char probe[16],toMoby[16],alongAxis[16],perpendicular[16],side[16];
+    Moby243 *moby;
     char *axis;
-    int count,n,blocked=0,numhidden=0,type,camera_type,i;
+    int count,n,blocked=0,numhidden=0,type,cameraType,i;
     float distance=move->distance-state->offset+1.5f;
-    float dot,t;
+    float dot,angle;
     unsigned short timer;
     Moby243 *entry;
     char *goal;
-    func_00282D08(a,base+176,camera-96,0.5f);
-    count=func_00277F48(a,1,D_L00_00189E20.owner,0,distance*0.5f);
+    lerp_vector(probe,base+176,camera-96,0.5f);
+    count=ProcessCollisionHit(probe,1,D_L00_00189E20.owner,0,distance*0.5f);
     if(count>0) {
         char **scan,**hidden;
-        scan=D_L00_001C3280;
+        scan=gAreaHitTargets;
         hidden=D_L00_0025B9A0;
         for(i=0;i<count;i++) {
             goal=base+176;
-            m=(Moby243 *)*scan;
-            if(m->visible && (!func_L00_0031BE88(m)||m->type==2923)) {
-                type=m->type;
-                if(type!=2234 && type!=3335 && type!=4304 && type!=1143 && type!=11) {
-                    *hidden++=(char *)m;
+            moby=(Moby243 *)*scan;
+            if(moby->visible && (!HasPendingInnerFlag(moby)||moby->type==2923 /* moby class 2923 */)) {
+                type=moby->type;
+                if(type!=2234 /* moby class 2234 */ && type!=3335 /* Jobian Saur-Beast */ && type!=4304 /* Y.E.T.I. */ && type!=1143 /* Megacorp Vendor Logo */ && type!=11 /* Megacorp Vendor */) {
+                    *hidden++=(char *)moby;
                     numhidden++;
-                    m->visible=0;
+                    moby->visible=0;
                 } else {
-                    func_00282CF0(b,m->pos,goal);
+                    FastVecSub(toMoby,moby->pos,goal);
                     axis=camera+48;
-                    dot=func_00282DB0(axis,b);
-                    func_00282D30(c,axis,dot);
-                    func_00282CF0(d,b,c);
-                    func_00282F20(d,d,1.0f);
-                    dot=func_00282DB0(d,move);
+                    dot=FastVecDot(axis,toMoby);
+                    FastVecScale(alongAxis,axis,dot);
+                    FastVecSub(perpendicular,toMoby,alongAxis);
+                    vec_scale_to_length(perpendicular,perpendicular,1.0f);
+                    dot=FastVecDot(perpendicular,move);
                     {
                     float span=move->distance-state->offset;
                     span=dot/span;
-                    t=func_002831B0(span);
+                    angle=FastAngleHelper(span);
                     }
-                    t=func_00282C48(1.5707963705062866f-t);
-                    if(t<0.4363323450088501f) {
-                        func_00282DD8(e,move,axis);
-                        func_00282F20(e,e,1.0f);
-                        if(func_00282DB0(e,b)>0.0f)func_002ACEC0(move,move,camera+32,-0.01745329424738884f);
-                        else func_002ACEC0(move,move,camera+32,0.01745329424738884f);
+                    angle=FloatAbs(1.5707963705062866f-angle);
+                    if(angle<0.4363323450088501f) {
+                        FastVecCross(side,move,axis);
+                        vec_scale_to_length(side,side,1.0f);
+                        if(FastVecDot(side,toMoby)>0.0f)ApplyAxisRotationToQuaternion(move,move,camera+32,-0.01745329424738884f);
+                        else ApplyAxisRotationToQuaternion(move,move,camera+32,0.01745329424738884f);
                     }
                 }
             }
@@ -93,46 +94,46 @@ void func_L00_004243C0(char *obj)
         }
     }
     if(!state->locked) {
-        if(func_L00_004240D8(obj)) blocked=1;
-        if(func_L00_00423BB0(obj)) blocked=1;
+        if(SweepFollowCameraProbe(obj)) blocked=1;
+        if(CheckCameraNoop(obj)) blocked=1;
     }
-    if(func_L00_004239A8(obj))blocked=1;
+    if(ProbeFollowCameraCollision(obj))blocked=1;
     {
-    float current_distance=move->distance;
+    float currentDistance=move->distance;
     float minimum=D_L00_001B14CC;
-    if(current_distance-state->offset<minimum) {
+    if(currentDistance-state->offset<minimum) {
         state->timer=2000;
-        state->offset=current_distance-minimum;
+        state->offset=currentDistance-minimum;
     }
     }
     {
-    char *active_camera=D_L00_001B8C80.active;
-    if(active_camera && ((camera_type=S(active_camera,134))==4 || camera_type==81) && D_L00_001B8C80.counter<10) state->timer=1700;
+    char *activeCamera=D_L00_001B8C80.active;
+    if(activeCamera && ((cameraType=S(activeCamera,134))==4 || cameraType==81) && D_L00_001B8C80.counter<10) state->timer=1700;
     }
     if(!state->flag) {
         timer=(unsigned short)state->timer;
         if(blocked || !(((unsigned)(timer-1)<1999) ||
-            (D_00138180.x<0.3f && D_00138180.y<0.3f))) goto hold;
+            (gPadState.x<0.3f && gPadState.y<0.3f))) goto hold;
     }
-    if(func_00282978(&state->timer))state->flag=0;
+    if(FastDecTimer(&state->timer))state->flag=0;
     if(state->flag) {
-        if(func_00282978(&state->timer))state->flag=0;
+        if(FastDecTimer(&state->timer))state->flag=0;
     }
-    t=func_00283CE0(state->timer);
-    t=t/func_00283CE0(2000);
-    state->offset=func_002A7C00(0.0f,state->offset,t);
+    angle=IntToFloat(state->timer);
+    angle=angle/IntToFloat(2000);
+    state->offset=CosineBlend(0.0f,state->offset,angle);
     goto scaled;
 hold:
-    if((short)timer>2000)func_00282978(&state->timer);
+    if((short)timer>2000)FastDecTimer(&state->timer);
     else state->timer=2000;
 scaled:
-    func_00282F20(move,move,move->distance-state->offset);
-    func_00282CC0(b,move,pos+80);
+    vec_scale_to_length(move,move,move->distance-state->offset);
+    FastVecAdd(toMoby,move,pos+80);
     if(D_L00_00189E20.mode!=49 && !state->locked &&
-       func_002761F8(pos+80,b,D_L00_001B184C,D_L00_00189E20.owner,0) &&
-       !func_L00_004204A0(D_L00_001BF220)) {
+       CollLine(pos+80,toMoby,D_L00_001B184C,D_L00_00189E20.owner,0) &&
+       !IsPointInCollisionGrid(D_L00_001BF220)) {
         state->counter++;
-        if(state->counter>=30)func_L00_002D9D98();
+        if(state->counter>=30)ResetDefaultCamera();
     } else state->counter=0;
     if(numhidden>0) {
         char **restore=D_L00_0025B9A0;

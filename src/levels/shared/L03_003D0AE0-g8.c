@@ -27,40 +27,41 @@ extern int D_L03_001B05E0[] __attribute__((sda));
 extern int D_L03_001B05E0_gp[] SDATA(D_L03_001B05E0);
 /* Emits four particles at the actor, then builds two quads and draws them once per D_L03_001B05D0
    step, fading between the state's two phase colours. `alpha` also supplies the w of both end vectors. */
-void func_L03_003D0AE0(char *o)
+/* Draws a glowing beam: puffs of sparks at the object, then two scrolling strips that fade out along their length. */
+void func_L03_003D0AE0(char *moby)
 {
     float matrix[4][4] __attribute__((aligned(16)));
     BeamPacket0AE0 beam[2] __attribute__((aligned(16)));
     float phase[2];
     float ends[2][4] __attribute__((aligned(16)));
     float temp[2][4] __attribute__((aligned(16)));
-    char *p=*(char **)(o+0x68);
-    char *pos=o+0x10;
+    char *vars=*(char **)(moby+0x68);
+    char *pos=moby+0x10;
     int color;
     float rotation,step,alpha;
-    color=func_00283D38(0x50103080,0x60103080,func_002A7878(0,1));
-    rotation=func_002A7940();
-    func_00281EB8(pos,0x31,color,1,1,0,rotation);
-    color=func_00283D38(0x50FFFFFF,0x60FFFFFF,func_002A7878(0,1));
-    rotation=func_002A7940();
-    func_00281EB8(pos,0x31,color,1,0.6f,0,rotation);
-    color=func_00283D38(0x08803010,0x18803010,func_002A7878(0,1));
-    rotation=func_002A7940();
-    func_00281EB8(pos,0xB,color,1,1.4f,0,rotation);
-    color=func_00283D38(0x20803010,0x40803010,func_002A7878(0,1));
-    rotation=func_002A7940();
-    func_00281EB8(pos,0xB,color,1,0.9f,0,rotation);
+    color=FastTweenColor(0x50103080,0x60103080,RandomFloatRange(0,1));
+    rotation=RandomAngle();
+    DrawBillboardQuad_00281EB8(pos,0x31,color,1,1,0,rotation);
+    color=FastTweenColor(0x50FFFFFF,0x60FFFFFF,RandomFloatRange(0,1));
+    rotation=RandomAngle();
+    DrawBillboardQuad_00281EB8(pos,0x31,color,1,0.6f,0,rotation);
+    color=FastTweenColor(0x08803010,0x18803010,RandomFloatRange(0,1));
+    rotation=RandomAngle();
+    DrawBillboardQuad_00281EB8(pos,0xB,color,1,1.4f,0,rotation);
+    color=FastTweenColor(0x20803010,0x40803010,RandomFloatRange(0,1));
+    rotation=RandomAngle();
+    DrawBillboardQuad_00281EB8(pos,0xB,color,1,0.9f,0,rotation);
     qcopy(matrix[3],pos);
     matrix[3][3]=1;
-    func_00282C98(matrix[2]);
-    func_00282CF0(matrix[1],D_L03_001B9980,pos);
+    VectorCopyHelperA(matrix[2]);
+    FastVecSub(matrix[1],D_L03_001B9980,pos);
     matrix[1][2]=0;
-    func_00282F20(matrix[1],matrix[1],1);
-    func_00282DD8(matrix[0],matrix[1],matrix[2]);
-    func_00281DE8(&beam[0],0x2F,1,0x80);
-    func_00281DE8(&beam[1],0x2F,1,0x80);
-    phase[0]=*(float *)(p+0x30);
-    phase[1]=*(float *)(p+0x30)+0.5f;
+    vec_scale_to_length(matrix[1],matrix[1],1);
+    FastVecCross(matrix[0],matrix[1],matrix[2]);
+    InitQuadPacketState(&beam[0],0x2F,1,0x80);
+    InitQuadPacketState(&beam[1],0x2F,1,0x80);
+    phase[0]=*(float *)(vars+0x30);
+    phase[1]=*(float *)(vars+0x30)+0.5f;
     if(phase[1]>1) phase[1]-=1;
     *(u128 *)temp[0]=0;
     *(u128 *)temp[1]=0;
@@ -76,18 +77,18 @@ void func_L03_003D0AE0(char *o)
         for(j=0;j<2;j++) {
             qcopy(beam[j].pos[i],ends[j]);
             if(i&1) beam[j].pos[i][0]=-beam[j].pos[i][0];
-            beam[j].uv[i][0]=D_L03_001B05B0[i][0]+(*(float *)(p+0x2C)+j*0.5f);
+            beam[j].uv[i][0]=D_L03_001B05B0[i][0]+(*(float *)(vars+0x2C)+j*0.5f);
             beam[j].uv[i][1]=D_L03_001B05B4[i][0];
         }
     }
     }
     alpha=1;
-    step=alpha/func_00283CE0(D_L03_001B05D0);
-    ((int *)temp)[0]=func_00283D38(D_L03_001B05E0_gp[0],D_L03_001B05E0[1],phase[0]);
-    ((int *)temp)[1]=func_00283D38(D_L03_001B05E0_gp[0],D_L03_001B05E0[1],phase[1]);
-    if(*(float *)(p+0x34)<alpha) {
-        ((int *)temp)[0]=func_00283D38(((int *)temp)[0]&0xFFFFFF,((int *)temp)[0],*(float *)(p+0x34));
-        ((int *)temp)[1]=func_00283D38(((int *)temp)[1]&0xFFFFFF,((int *)temp)[1],*(float *)(p+0x34));
+    step=alpha/IntToFloat(D_L03_001B05D0);
+    ((int *)temp)[0]=FastTweenColor(D_L03_001B05E0_gp[0],D_L03_001B05E0[1],phase[0]);
+    ((int *)temp)[1]=FastTweenColor(D_L03_001B05E0_gp[0],D_L03_001B05E0[1],phase[1]);
+    if(*(float *)(vars+0x34)<alpha) {
+        ((int *)temp)[0]=FastTweenColor(((int *)temp)[0]&0xFFFFFF,((int *)temp)[0],*(float *)(vars+0x34));
+        ((int *)temp)[1]=FastTweenColor(((int *)temp)[1]&0xFFFFFF,((int *)temp)[1],*(float *)(vars+0x34));
     }
     { int i,j;
     for(i=0;i<D_L03_001B05D0;i++) {
@@ -97,13 +98,13 @@ void func_L03_003D0AE0(char *o)
             int col;
             beam[j].pos[2][2]-=D_L03_001B05D4;
             beam[j].pos[3][2]-=D_L03_001B05D4;
-            col=func_00283D38(colors[j]&0xFFFFFF,colors[j],alpha);
+            col=FastTweenColor(colors[j]&0xFFFFFF,colors[j],alpha);
             beam[j].color[1]=col;
             beam[j].color[0]=col;
-            col=func_00283D38(colors[j]&0xFFFFFF,colors[j],next);
+            col=FastTweenColor(colors[j]&0xFFFFFF,colors[j],next);
             beam[j].color[3]=col;
             beam[j].color[2]=col;
-            func_00280B90(&beam[j],matrix,0);
+            draw_world_quad(&beam[j],matrix,0);
             beam[j].pos[0][2]-=D_L03_001B05D4;
             beam[j].pos[1][2]-=D_L03_001B05D4;
         }

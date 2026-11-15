@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef int V4_002AE8C0 __attribute__((mode(TI)));
@@ -20,48 +21,49 @@ typedef struct {
 extern GameState_189E20 D_00189E20;
 
 /* Hand-adapted from func_002AE8C0. */
-void func_L01_00318638(char *obj, char *st, char *ctx)
+/* Moves a wandering enemy: picks a new heading when its timer runs out, turns away from walls and edges, and turns away from the hero when close. */
+void func_L01_00318638(char *obj, char *wander, char *context)
 {
-    char *pos;
-    float v[4];
-    float f;
+    char *selfPos;
+    float probePoint[4];
+    float amount;
 
-    int r;
+    int blocked;
 
-    if (*(short *)(st + 0x28) == 0) {
-        *(float *)(st + 0x24) = *(float *)(st + 0x24) + func_002A78D8(0.78539824f, 2.6179941f);
-        *(short *)(st + 0x2A) = func_002A7820(*(short *)(st + 0x2C), *(short *)(st + 0x2E));
-        *(short *)(st + 0x28) = 1;
+    if (*(short *)(wander + 0x28) == 0) {
+        *(float *)(wander + 0x24) = *(float *)(wander + 0x24) + RandomSignedFloatRange(0.78539824f, 2.6179941f);
+        *(short *)(wander + 0x2A) = RandomIntRange(*(short *)(wander + 0x2C), *(short *)(wander + 0x2E));
+        *(short *)(wander + 0x28) = 1;
     } else {
-        func_002AA800((float *)(obj + 0xF8), 0, *(float *)(st + 0x24), *(float *)(st + 0x18));
-        if (func_00282978(st + 0x2A) != 0)
-            *(short *)(st + 0x28) = 0;
+        StepAngleTowardTarget((float *)(obj + 0xF8), 0, *(float *)(wander + 0x24), *(float *)(wander + 0x18));
+        if (FastDecTimer(wander + 0x2A) != 0)
+            *(short *)(wander + 0x28) = 0;
     }
-    pos = obj + 0x10;
-    *(V4_002AE8C0 *)v = *(V4_002AE8C0 *)pos;
-    f = *(float *)(ctx + 0x28);
-    *(float *)(ctx + 0x28) = *(float *)(st + 0x14);
-    v[0] = v[0] + func_00283180(*(float *)(obj + 0xF8)) * 2.0f;
-    v[1] = v[1] + func_00283198(*(float *)(obj + 0xF8)) * 2.0f;
-    *(float *)(ctx + 0x28) = f;
-    r = func_L01_00321178(obj, v);
-    *(float *)(obj + 0x18) = func_002A89A8(pos, 0, 0.5f);
-    f = func_00282E80(pos, st);
-    if (r != 0 || *(float *)(st + 0x1C) < f) {
-        *(float *)(st + 0x24) = func_00283248(*(float *)(st + 0x0) - *(float *)(obj + 0x10),
-                                              *(float *)(st + 0x4) - *(float *)(obj + 0x14));
-        *(short *)(st + 0x2A) = func_002A7820(30, 90);
-        *(short *)(st + 0x28) = 1;
+    selfPos = obj + 0x10;
+    *(V4_002AE8C0 *)probePoint = *(V4_002AE8C0 *)selfPos;
+    amount = *(float *)(context + 0x28);
+    *(float *)(context + 0x28) = *(float *)(wander + 0x14);
+    probePoint[0] = probePoint[0] + FastSinOrCosA(*(float *)(obj + 0xF8)) * 2.0f;
+    probePoint[1] = probePoint[1] + FastSinOrCosB(*(float *)(obj + 0xF8)) * 2.0f;
+    *(float *)(context + 0x28) = amount;
+    blocked = TurnMobyTowardTarget(obj, probePoint);
+    *(float *)(obj + 0x18) = ProbeGroundHeightBelow(selfPos, 0, 0.5f);
+    amount = vec_distance_xy(selfPos, wander);
+    if (blocked != 0 || *(float *)(wander + 0x1C) < amount) {
+        *(float *)(wander + 0x24) = FastMatrixHelperA(*(float *)(wander + 0x0) - *(float *)(obj + 0x10),
+                                              *(float *)(wander + 0x4) - *(float *)(obj + 0x14));
+        *(short *)(wander + 0x2A) = RandomIntRange(30, 90);
+        *(short *)(wander + 0x28) = 1;
     } else {
         float limit;
 
-        f = func_00282E80(pos, D_00189E20.pos);
-        limit = *(float *)(st + 0x20);
-        if (f < limit) {
-            f = f / limit;
-            *(float *)(st + 0x24) = func_002AA150(*(float *)(st + 0x24),
-                    func_00283248(*(float *)(obj + 0x10) - D_00189E20.pos[0],
-                                  *(float *)(obj + 0x14) - D_00189E20.pos[1]), f);
+        amount = vec_distance_xy(selfPos, gHeroState.pos);
+        limit = *(float *)(wander + 0x20);
+        if (amount < limit) {
+            amount = amount / limit;
+            *(float *)(wander + 0x24) = MoveAngleTowardTarget(*(float *)(wander + 0x24),
+                    FastMatrixHelperA(*(float *)(obj + 0x10) - gHeroState.pos[0],
+                                  *(float *)(obj + 0x14) - gHeroState.pos[1]), amount);
         }
     }
 }

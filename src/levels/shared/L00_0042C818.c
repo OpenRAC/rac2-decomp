@@ -2,6 +2,7 @@
 
 extern int ref_L01_0042F820_00;
 
+/* Returns a value stored by another level. */
 int func_L00_0042C818(void)
 {
     return ref_L01_0042F820_00;

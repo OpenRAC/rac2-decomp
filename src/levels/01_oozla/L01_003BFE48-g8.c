@@ -93,71 +93,72 @@ extern float D_L01_001AFE78 __attribute__((sda));
 extern float D_L01_001AFE7C __attribute__((sda));
 extern float D_L01_001AFE80 __attribute__((sda));
 
-void func_L01_003BFE48(L01_003BFE48_OBJ *obj)
+/* Sets up a Swamp Monster II when it first appears: its speeds, health and sizes, and its starting animation. */
+void func_L01_003BFE48(L01_003BFE48_OBJ *moby)
 {
-    L01_003BFE48_STATE *s = *(L01_003BFE48_STATE **)((char *)obj + 0x68);
+    L01_003BFE48_STATE *vars = *(L01_003BFE48_STATE **)((char *)moby + 0x68);
 
-    s->fd7 = 1;
-    s->f70 = 255;
-    s->fa8 = 6;
-    s->f71 = 19;
-    s->f72 = 19;
-    s->f76 = 20;
-    s->f77 = 255;
-    s->f7c = 0.22916667f;
-    s->f80 = 0.15f;
-    s->f84 = 0.01375f;
-    s->f88 = 0.0013194445f;
-    s->f8c = 0.004166667f;
-    s->f90 = 0.5f;
-    s->f94 = 0.5f;
-    s->f9c = 0.15f;
-    s->fcc = 6;
-    s->fcd = 25;
-    s->fdc = s->f2c0;
-    s->fce = -1;
-    s->fcf = -1;
-    s->fd2 = -1;
-    s->fd3 = -1;
-    s->f48 = func_00283CF0(40.0f);
-    s->f4a = func_00283CF0(28.0f);
-    s->f2a = 48;
-    s->f28 = 4;
-    s->f29 = 1;
-    s->f2e = 1;
-    s->f40 = 6.0f;
-    s->f44 = 3.3f;
-    s->f30 = 2.0f;
-    obj->f34 |= 0x1000;
-    s->f16c = s->f2c4;
-    s->f130 = 4.0f;
-    s->f134 = 0.35f;
-    s->f138 = 0.1f;
-    s->f13c = 0.1f;
-    s->f140 = 0.3490659f;
-    s->f160 = 0.52359885f;
-    s->f15c = D_L01_001AFE50 * 0.00027777778f;
-    func_002B60B0(obj, D_L01_001AFE74 * 0.00027777778f,
+    vars->fd7 = 1;
+    vars->f70 = 255;
+    vars->fa8 = 6;
+    vars->f71 = 19;
+    vars->f72 = 19;
+    vars->f76 = 20;
+    vars->f77 = 255;
+    vars->f7c = 0.22916667f;
+    vars->f80 = 0.15f;
+    vars->f84 = 0.01375f;
+    vars->f88 = 0.0013194445f;
+    vars->f8c = 0.004166667f;
+    vars->f90 = 0.5f;
+    vars->f94 = 0.5f;
+    vars->f9c = 0.15f;
+    vars->fcc = 6;
+    vars->fcd = 25;
+    vars->fdc = vars->f2c0;
+    vars->fce = -1;
+    vars->fcf = -1;
+    vars->fd2 = -1;
+    vars->fd3 = -1;
+    vars->f48 = FloatToInt(40.0f);
+    vars->f4a = FloatToInt(28.0f);
+    vars->f2a = 48;
+    vars->f28 = 4;
+    vars->f29 = 1;
+    vars->f2e = 1;
+    vars->f40 = 6.0f;
+    vars->f44 = 3.3f;
+    vars->f30 = 2.0f;
+    moby->f34 |= 0x1000;
+    vars->f16c = vars->f2c4;
+    vars->f130 = 4.0f;
+    vars->f134 = 0.35f;
+    vars->f138 = 0.1f;
+    vars->f13c = 0.1f;
+    vars->f140 = 0.3490659f;
+    vars->f160 = 0.52359885f;
+    vars->f15c = D_L01_001AFE50 * 0.00027777778f;
+    SetControllerSpeedLimits(moby, D_L01_001AFE74 * 0.00027777778f,
                  D_L01_001AFE80 * 0.016666668f,
                  D_L01_001AFE78 * 0.0000048481375f,
                  D_L01_001AFE7C * 0.00029088825f);
-    s->f28 = 3;
-    obj->fbc = 0;
-    if (s->f2c8 != -1) {
-        func_L01_003377C8(D_L01_001FE180[s->f2c8]);
+    vars->f28 = 3;
+    moby->fbc = 0;
+    if (vars->f2c8 != -1) {
+        ComputePathSegmentLengths_L01(D_L01_001FE180[vars->f2c8]);
     }
-    if (s->f2c4 != -1) {
-        func_L01_003377C8(D_L01_001FE180[s->f2c4]);
+    if (vars->f2c4 != -1) {
+        ComputePathSegmentLengths_L01(D_L01_001FE180[vars->f2c4]);
     }
-    if (s->f2c0 != -1) {
-        func_L01_003377C8(D_L01_001FE180[s->f2c0]);
+    if (vars->f2c0 != -1) {
+        ComputePathSegmentLengths_L01(D_L01_001FE180[vars->f2c0]);
     }
-    func_L01_003A6280(obj, (char *)obj + 0x10, 11, 1.2f, 2.0f);
-    s->f2e1 = 1;
-    s->f2e0 = 0;
-    s->f2e2 = 0;
-    s->f2e8 = obj->f18;
-    s->f2ec = D_L01_001AFE5C;
-    func_002A7750(obj, 0, 1);
-    func_L01_003BFDC8(obj, 0, 0, 2);
+    SpawnLinkedHelperMoby(moby, (char *)moby + 0x10, 11, 1.2f, 2.0f);
+    vars->f2e1 = 1;
+    vars->f2e0 = 0;
+    vars->f2e2 = 0;
+    vars->f2e8 = moby->f18;
+    vars->f2ec = D_L01_001AFE5C;
+    SetMobyState(moby, 0, 1);
+    SetMobyAnimationAndSpeed(moby, 0, 0, 2);
 }

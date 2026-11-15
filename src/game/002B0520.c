@@ -15,27 +15,28 @@ extern void func_00282CF0(void *, void *, void *);
 extern float func_00283CE0(int);
 extern int func_00283CF0(float);
 
-float func_002B0520(TI *pos) {
-    float p[4] __attribute__((aligned(16)));
+/* Looks up the terrain height under a position from a height map, giving a large default when the position is off the map. */
+float func_002B0520(TI *position) {
+    float worldPos[4] __attribute__((aligned(16)));
     float rel[4] __attribute__((aligned(16)));
-    s32 idx;
-    u8 h;
+    s32 cellIndex;
+    u8 heightByte;
 
-    *(TI *)p = *pos;
+    *(TI *)worldPos = *position;
     if (D_001B1A20 == 0) {
         return 0.0f;
     }
-    func_00282CF0(rel, p, D_001B19E0);
+    FastVecSub(rel, worldPos, D_001B19E0);
     rel[0] = rel[0] / D_001B1A10;
     rel[1] = rel[1] / D_001B1A14;
     if (rel[0] < 0.0f || 256.0f < rel[0] || rel[1] < 0.0f || 256.0f < rel[1] || D_001A91C0 != D_001C4F40) {
         return 1023.0f;
     }
-    idx = func_00283CF0(rel[1]) << 8;
-    idx += func_00283CF0(rel[0]);
-    h = D_001B1A20[idx];
-    if (h == 0xFF) {
+    cellIndex = FloatToInt(rel[1]) << 8;
+    cellIndex += FloatToInt(rel[0]);
+    heightByte = D_001B1A20[cellIndex];
+    if (heightByte == 0xFF) {
         return 1023.0f;
     }
-    return func_00283CE0(h) * D_001B1A18 + D_001B19E0[2];
+    return IntToFloat(heightByte) * D_001B1A18 + D_001B19E0[2];
 }

@@ -24,102 +24,102 @@ extern int func_002E5CF8(int,int,void *);
 extern void func_002AA548(float *,float *,float,float,float,float);
 extern void func_00282CF0(void *,void *,void *);
 extern void func_002AD6F0(void *,void *,void *,void *);
-void func_L13_004230B0(u8 *m) {
-    u8 *d=P(m,0x68);
+void func_L13_004230B0(u8 *moby) {
+    u8 *vars=P(moby,0x68);
     u8 oldpos[16] __attribute__((aligned(16)));
     u8 oldrot[16] __attribute__((aligned(16)));
     u8 delta[16] __attribute__((aligned(16)));
-    int n;
-    unsigned int c, color;
+    int soundId;
+    unsigned int pulse, color;
     int tickPhase;
-    float f;
-    if(D_00189E20.mode==0x82) return;
-    qcopy_nc(oldpos,m+0x10);
-    qcopy_nc(oldrot,m+0xF0);
-    switch(m[0x20]) {
+    float phase;
+    if(gHeroState.mode==0x82) return;
+    qcopy_nc(oldpos,moby+0x10);
+    qcopy_nc(oldrot,moby+0xF0);
+    switch(moby[0x20]) {
     case 0:
-        m[0x30]=255;
-        I(d,0x7C)=I(d,0x78);
-        I(d,0x5C)|=1;
-        qcopy_nc(d+0x90,m+0x10);
-        qcopy_nc(d+0x80,d+0x90);
-        F(d,0x88)=F(d,0x98)-F(d,0x68);
-        I(d,0x60)=I(d,0x74);
-        m[0x20]=1;
-        I(d,0xB0)=-1;
-        I(d,0x64)=0;
+        moby[0x30]=255;
+        I(vars,0x7C)=I(vars,0x78);
+        I(vars,0x5C)|=1;
+        qcopy_nc(vars+0x90,moby+0x10);
+        qcopy_nc(vars+0x80,vars+0x90);
+        F(vars,0x88)=F(vars,0x98)-F(vars,0x68);
+        I(vars,0x60)=I(vars,0x74);
+        moby[0x20]=1;
+        I(vars,0xB0)=-1;
+        I(vars,0x64)=0;
         break;
     case 1:
-        n=I(d,0xB0);
-        if(n!=-1) {
-            u8 *sound=D_00188660+n*0x70; if(P(sound,0x88)==m && sound[0x74]) func_002E59F8(n);
+        soundId=I(vars,0xB0);
+        if(soundId!=-1) {
+            u8 *sound=gSoundState+soundId*0x70; if(P(sound,0x88)==moby && sound[0x74]) StopSoundVoice(soundId);
         }
-        I(d,0xB0)=-1;
-        if(func_L00_00324120(m)) {
-            if(F(m,0x18)==F(d,0x98)) {
-                if(I(d,0xB4)) {
-                    P(d,0xB8)=func_L00_002D70A0(5);
-                    F(P(d,0xB8),0)=1.0f;
-                    F(P(d,0xB8),4)=4.5f;
-                    I(d,0xBC)=1;
+        I(vars,0xB0)=-1;
+        if(IsCurrentSelectedId(moby)) {
+            if(F(moby,0x18)==F(vars,0x98)) {
+                if(I(vars,0xB4)) {
+                    P(vars,0xB8)=AllocCameraOverrideSlot(5);
+                    F(P(vars,0xB8),0)=1.0f;
+                    F(P(vars,0xB8),4)=4.5f;
+                    I(vars,0xBC)=1;
                 }
-                func_002A7750(m,2,-1);
+                SetMobyState(moby,2,-1);
             } else {
-                if(I(d,0xB4)) {
-                    P(d,0xB8)=func_L00_002D70A0(5);
-                    F(P(d,0xB8),0)=1.0f;
-                    F(P(d,0xB8),4)=4.5f;
-                    I(d,0xBC)=1;
+                if(I(vars,0xB4)) {
+                    P(vars,0xB8)=AllocCameraOverrideSlot(5);
+                    F(P(vars,0xB8),0)=1.0f;
+                    F(P(vars,0xB8),4)=4.5f;
+                    I(vars,0xBC)=1;
                 }
-                func_002A7750(m,3,-1);
+                SetMobyState(moby,3,-1);
             }
         }
         {
-            if(F(m,0x18)-D_00189E20.height>F(d,0x68)*0.5f && F(m,0x18)==F(d,0x98)) func_002A7750(m,2,-1);
-            else if(F(m,0x18)-D_00189E20.height<-F(d,0x68)*0.5f && F(m,0x18)==F(d,0x88) && D_00189E20.mode!=0x82) func_002A7750(m,3,-1);
+            if(F(moby,0x18)-gHeroState.height>F(vars,0x68)*0.5f && F(moby,0x18)==F(vars,0x98)) SetMobyState(moby,2,-1);
+            else if(F(moby,0x18)-gHeroState.height<-F(vars,0x68)*0.5f && F(moby,0x18)==F(vars,0x88) && gHeroState.mode!=0x82) SetMobyState(moby,3,-1);
         }
         break;
     case 2:
-        if(F(m,0x18)<=F(d,0x88)) {
-            if(I(d,0xBC)) { func_L00_002D7140(P(d,0xB8)); I(d,0xBC)=0; }
-            n=I(d,0xB0);
-            if(n!=-1) { u8 *sound=D_00188660+n*0x70; if(P(sound,0x88)==m && sound[0x74]) func_002E59F8(n); }
-            I(d,0xB0)=-1;
-            if(!func_L00_00324120(m)) m[0x20]=1;
-        } else if(!func_00277258(m+0x10,1,m,2.8f) ||
-            (F(m,0x18)<=D_00189E20.height || (D_00189E20.platform!=0 && D_00189E20.platform==m) || (D_L13_001BFD18 && *(short *)(D_L13_001BFD18+0xAA)==0xEA3))) {
-            { u8 *sound=D_00188660+I(d,0xB0)*0x70; if(P(sound,0x88)!=m || !sound[0x74]) I(d,0xB0)=func_002E5CF8(0,4,m); }
-            func_002AA548((float *)(m+0x18),(float *)(d+0x64),F(d,0x88),0.00194444449f,0.00166666671f,0.100000009f);
+        if(F(moby,0x18)<=F(vars,0x88)) {
+            if(I(vars,0xBC)) { EndCameraOverride(P(vars,0xB8)); I(vars,0xBC)=0; }
+            soundId=I(vars,0xB0);
+            if(soundId!=-1) { u8 *sound=gSoundState+soundId*0x70; if(P(sound,0x88)==moby && sound[0x74]) StopSoundVoice(soundId); }
+            I(vars,0xB0)=-1;
+            if(!IsCurrentSelectedId(moby)) moby[0x20]=1;
+        } else if(!TestPointAgainstCollision(moby+0x10,1,moby,2.8f) ||
+            (F(moby,0x18)<=gHeroState.height || (gHeroState.platform!=0 && gHeroState.platform==moby) || (D_L13_001BFD18 && *(short *)(D_L13_001BFD18+0xAA)==0xEA3))) {
+            { u8 *sound=gSoundState+I(vars,0xB0)*0x70; if(P(sound,0x88)!=moby || !sound[0x74]) I(vars,0xB0)=PlayMobySound(0,4,moby); }
+            StepValueTowardTarget((float *)(moby+0x18),(float *)(vars+0x64),F(vars,0x88),0.00194444449f,0.00166666671f,0.100000009f);
         } else {
-            n=I(d,0xB0);
-            if(n!=-1) { u8 *sound=D_00188660+n*0x70; if(P(sound,0x88)==m && sound[0x74]) func_002E59F8(n); }
-            I(d,0xB0)=-1;
+            soundId=I(vars,0xB0);
+            if(soundId!=-1) { u8 *sound=gSoundState+soundId*0x70; if(P(sound,0x88)==moby && sound[0x74]) StopSoundVoice(soundId); }
+            I(vars,0xB0)=-1;
         }
         break;
     case 3:
-        func_002AA548((float *)(m+0x18),(float *)(d+0x64),F(d,0x98),0.00194444449f,0.00166666671f,0.100000009f);
-        if(F(m,0x18)>=F(d,0x98)) {
-            if(I(d,0xBC)) { func_L00_002D7140(P(d,0xB8)); I(d,0xBC)=0; }
-            n=I(d,0xB0);
-            if(n!=-1) { u8 *sound=D_00188660+n*0x70; if(P(sound,0x88)==m && sound[0x74]) func_002E59F8(n); }
-            I(d,0xB0)=-1;
-            if(!func_L00_00324120(m)) { I(d,0x60)=I(d,0x74); --I(d,0x78); m[0x20]=1; }
+        StepValueTowardTarget((float *)(moby+0x18),(float *)(vars+0x64),F(vars,0x98),0.00194444449f,0.00166666671f,0.100000009f);
+        if(F(moby,0x18)>=F(vars,0x98)) {
+            if(I(vars,0xBC)) { EndCameraOverride(P(vars,0xB8)); I(vars,0xBC)=0; }
+            soundId=I(vars,0xB0);
+            if(soundId!=-1) { u8 *sound=gSoundState+soundId*0x70; if(P(sound,0x88)==moby && sound[0x74]) StopSoundVoice(soundId); }
+            I(vars,0xB0)=-1;
+            if(!IsCurrentSelectedId(moby)) { I(vars,0x60)=I(vars,0x74); --I(vars,0x78); moby[0x20]=1; }
         } else {
-            { u8 *sound=D_00188660+I(d,0xB0)*0x70; if(P(sound,0x88)!=m || !sound[0x74]) I(d,0xB0)=func_002E5CF8(0,4,m); }
+            { u8 *sound=gSoundState+I(vars,0xB0)*0x70; if(P(sound,0x88)!=moby || !sound[0x74]) I(vars,0xB0)=PlayMobySound(0,4,moby); }
         }
         break;
     case 4:
-        n=I(d,0xB0);
-        if(n!=-1) { u8 *sound=D_00188660+n*0x70; if(P(sound,0x88)==m && sound[0x74]) func_002E59F8(n); }
-        I(d,0xB0)=-1; break;
+        soundId=I(vars,0xB0);
+        if(soundId!=-1) { u8 *sound=gSoundState+soundId*0x70; if(P(sound,0x88)==moby && sound[0x74]) StopSoundVoice(soundId); }
+        I(vars,0xB0)=-1; break;
     }
-    f=(float)D_L13_001B2448*(1.0f/60.0f);
-    tickPhase=(int)f;
-    f-=(float)tickPhase;
-    if(!(tickPhase&1)) f=1.0f-f;
-    c=(int)(f*255.0f);
-    color=(c<<8)|0x7F000000;
-    I(m,0x78)=(c<<16)|color|c;
-    func_00282CF0(delta,m+0x10,oldpos);
-    func_002AD6F0(d+0x20,delta,oldrot,m+0xF0);
+    phase=(float)D_L13_001B2448*(1.0f/60.0f);
+    tickPhase=(int)phase;
+    phase-=(float)tickPhase;
+    if(!(tickPhase&1)) phase=1.0f-phase;
+    pulse=(int)(phase*255.0f);
+    color=(pulse<<8)|0x7F000000;
+    I(moby,0x78)=(pulse<<16)|color|pulse;
+    FastVecSub(delta,moby+0x10,oldpos);
+    CombineTransformsAndStore(vars+0x20,delta,oldrot,moby+0xF0);
 }

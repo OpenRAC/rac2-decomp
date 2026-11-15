@@ -130,6 +130,7 @@ s32 func_0011ED60(const char *arg, s32 mode) {
 }
 
 /* rac1-decomp src/core/0011D0D0.c: func_0011D210 */
+/* Checks whether the IOP has finished resetting and returns 1 if so. */
 int func_0011EEA0(void) {
     if (r1_func_00118E70(0x4) & 0x40000) {
         r1_func_00118EC0();
@@ -165,7 +166,7 @@ int func_0011EED8(char *img) {
         *d++ = *img++;
     }
     *d = 0;
-    return func_0011ED60(param, 0);
+    return ResetIop(param, 0);
 }
 
 
@@ -181,6 +182,7 @@ ASM_FUNC("asm/core", func_0011EFF0);
  * Under 2.95.3 reorg fills the slot with the `addiu $4,$4,4` bump, 52
  * bytes against 56, which is what kept this a stub.
  */
+/* Copies a block of memory one word at a time. Returns 0. */
 int func_0011F000(int *dst, int *src, unsigned int nbytes) {
     unsigned int i;
     for (i = 0; i < nbytes >> 2; i++) {
@@ -196,30 +198,31 @@ ASM_FUNC("asm/core", func_0011F048);
 /* rac1-decomp src/core/0011D0D0.c: func_0011D3C8 */
 /* r1_func_0011D3B8 returns nothing: declared int, its result register
    pushed the loop test to $v1. */
+/* Sets up the console hardware tables at start-up and copies a small boot block into place. */
 int func_0011F058(void) {
-    int *t = r1_D_00130138;
-    r1_D_00130138_pair *p;
+    int *initTable = r1_D_00130138;
+    r1_D_00130138_pair *entry;
     unsigned int i;
     int old;
-    int r;
+    int value;
 
-    r1_func_0011D3B8_v(t[0], t[1]);
+    r1_func_0011D3B8_v(initTable[0], initTable[1]);
     r1_func_0011D360((void *)0x80075000, r1_D_0012FDB8, 0x330);
     r1_func_00118D80(0);
     r1_func_00118D80(2);
-    r1_func_0011D3B8_v(t[2], t[3]);
-    r1_func_0011D3B8_v(t[4], t[5]);
+    r1_func_0011D3B8_v(initTable[2], initTable[3]);
+    r1_func_0011D3B8_v(initTable[4], initTable[5]);
 
-    p = (r1_D_00130138_pair *)(t + 6);
+    entry = (r1_D_00130138_pair *)(initTable + 6);
     for (i = 3; i < 8; i++) {
-        old = r1_func_0011D3A8(p->a);
-        r1_func_0011D3B8_v(p->a, old);
-        p++;
+        old = r1_func_0011D3A8(entry->a);
+        r1_func_0011D3B8_v(entry->a, old);
+        entry++;
     }
 
-    r = r1_func_0011D3A8(3);
-    r1_D_00130130 = r;
-    return r;
+    value = r1_func_0011D3A8(3);
+    r1_D_00130130 = value;
+    return value;
 }
 
 ASM_FUNC("asm/core", func_0011F120);
@@ -230,6 +233,7 @@ ASM_FUNC("asm/core", func_0011F120);
    routine (r1_func_00118EB0) otherwise. Returns its callees' values: retail
    keeps the frame and calls both, and 2.9-ee turns both arms into tail
    jumps (44 bytes against 64) when it is void. */
+/* Picks the memory map setup that matches the console memory size. */
 int func_0011F130(void) {
     if (r1_func_00118EA0() == 0x2000000) {
         return r1_func_0011D4E0();

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef float f32;
@@ -57,26 +58,27 @@ extern u8 D_001A63A8_4[];
 
 extern int func_L22_003A48F8(int);
 
-int func_L22_003A6128(f32 f12) {
-    union { f32 f; unsigned int u; } c;
-    int n = 0;
+/* Checks that exactly one bit is set in the given value and that the matching entry passes its test; returns 1 if so, otherwise 0. */
+int func_L22_003A6128(f32 maskValue) {
+    union { f32 f; unsigned int u; } bits;
+    int bitCount = 0;
     int i;
-    int idx = 0;
+    int bitIndex = 0;
 
-    c.f = f12;
+    bits.f = maskValue;
     for (i = 0; i < 32; i++) {
-        if (c.u & 1) {
-            n++;
-            if (n >= 2)
+        if (bits.u & 1) {
+            bitCount++;
+            if (bitCount >= 2)
                 return 0;
-            idx = i;
+            bitIndex = i;
         }
-        c.u >>= 1;
+        bits.u >>= 1;
     }
-    if (n == 0)
+    if (bitCount == 0)
         return 0;
-    if (n == 1) {
-        if (func_L22_003A48F8(idx) == 0)
+    if (bitCount == 1) {
+        if (IsKeyMissingFromList(bitIndex) == 0)
             return 1;
     }
     return 0;
@@ -85,19 +87,20 @@ int func_L22_003A6128(f32 f12) {
 /* func_L22_003A6230 is defined in L22_003A6230-g8.c. */
 
 /* shared native body of family cbc1388ebe801e68 */
-void func_L22_003A6470(u8 *a0, int a1) {
-    u8 *g = D_001A63A8_4;
-    u8 *p = *(u8 **)(a0 + 104);
+/* Starts the animation in the given slot on an object, unless another one is already running, and sets its timer. */
+void func_L22_003A6470(u8 *moby, int slot) {
+    u8 *animState = D_001A63A8_4;
+    u8 *vars = *(u8 **)(moby + 104);
     int bit;
-    if (*(int *)(g + 104) != 0) return;
-    if (*(int *)(g + 36) != -1) return;
-    if (a1 == *(int *)(p + 1256)) return;
-    bit = 1 << a1;
-    { u8 *w = p + a1 * 4; *(int *)(g + 36) = (*(int *)(w + 1152) & 0x3fff) + 2000; }
-    *(int *)(g + 40) = 0;
-    *(int *)(p + 1256) = a1;
-    *(int *)(p + 1252) = 1800;
-    *(int *)(p + 1248) |= bit;
+    if (*(int *)(animState + 104) != 0) return;
+    if (*(int *)(animState + 36) != -1) return;
+    if (slot == *(int *)(vars + 1256)) return;
+    bit = 1 << slot;
+    { u8 *entry = vars + slot * 4; *(int *)(animState + 36) = (*(int *)(entry + 1152) & 0x3fff) + 2000; }
+    *(int *)(animState + 40) = 0;
+    *(int *)(vars + 1256) = slot;
+    *(int *)(vars + 1252) = 1800;
+    *(int *)(vars + 1248) |= bit;
 }
 
 extern int func_002A77E0(int a0);
@@ -111,44 +114,45 @@ extern void func_L22_003A64E8(u8 *a0, int a1, int a2);
  *
  * The mask lives in the controller at +0x4E0 of the object at +0x68.
  */
-void func_L22_003A64E8(u8 *a0, int a1, int a2) {
-    u8 *ctl = *(u8 **)(a0 + 0x68);
+void func_L22_003A64E8(u8 *moby, int first, int last) {
+    u8 *ctl = *(u8 **)(moby + 0x68);
     int count;
-    int rem;
+    int offset;
     int i;
 
-    if (a2 < a1)
+    if (last < first)
         return;
-    count = a2 - a1 + 1;
-    rem = func_002A77E0(count);
+    count = last - first + 1;
+    offset = RandomIntBelow(count);
     for (i = 0; i < count; i++) {
-        int idx = a1 + rem;
-        if (((*(int *)(ctl + 0x4E0) >> idx) ^ 1) & 1) {
-            func_L22_003A6470(a0, idx);
+        int slot = first + offset;
+        if (((*(int *)(ctl + 0x4E0) >> slot) ^ 1) & 1) {
+            StartAnimationSlot(moby, slot);
             return;
         }
-        rem = (rem + 1) % count;
+        offset = (offset + 1) % count;
     }
     i = 0;
     if (count > 0) {
-        int m = *(int *)(ctl + 0x4E0);
+        int mask = *(int *)(ctl + 0x4E0);
         for (; i < count; i++) {
-            m &= ~(1 << (a1 + i));
+            mask &= ~(1 << (first + i));
         }
-        *(int *)(ctl + 0x4E0) = m;
+        *(int *)(ctl + 0x4E0) = mask;
     }
-    func_L22_003A6470(a0, a1 + rem);
+    StartAnimationSlot(moby, first + offset);
 }
 
 /* A three-label switch, the third one sharing the default's body: with only two cases cc1
  * emits a comparison chain, and the third label is what makes it build the decision tree
  * (`beq` on the high case, then an `slti` guard on the range, then `bne` on the low one). */
-f32 func_L22_003A65E0(u8 *a0) {
-    switch (*(short *)(a0 + 0xAA)) {
-    case 0xE3A: return *(f32 *)(*(u8 **)(a0 + 0x68) + 0x2C);
-    case 0xE3B: return *(f32 *)(*(u8 **)(a0 + 0x68) + 0x44);
-    case 0xE3C:
-    default: return *(f32 *)(*(u8 **)(a0 + 0x68) + 0x44);
+/* Returns a float setting from the object's private data, picked by the object's class. */
+f32 func_L22_003A65E0(u8 *moby) {
+    switch (*(short *)(moby + 0xAA)) {
+    case 0xE3A /* moby class 3642 */: return *(f32 *)(*(u8 **)(moby + 0x68) + 0x2C);
+    case 0xE3B /* moby class 3643 */: return *(f32 *)(*(u8 **)(moby + 0x68) + 0x44);
+    case 0xE3C /* moby class 3644 */:
+    default: return *(f32 *)(*(u8 **)(moby + 0x68) + 0x44);
     }
 }
 
@@ -158,10 +162,11 @@ extern u8 D_00189E20[];
 extern f32 func_00282E48(void *a0, void *a1);
 extern void func_L22_002B70F8(int a0, int a1, void *a2);
 
-void func_L22_003A8BA0(u8 *a0) {
-    if (D_00189E20[0x22B4] != 0) return;
-    if (func_00282E48(D_00189E20 + 0x80, a0 + 0x10) < 4.0f) {
-        func_L22_002B70F8(2, 0x56, a0);
+/* Per-frame update for moby class 637: when the player is close, it starts an effect on this object. */
+void func_L22_003A8BA0(u8 *moby) {
+    if (gHeroState[0x22B4] != 0) return;
+    if (fast_vec_dist(gHeroState + 0x80, moby + 0x10) < 4.0f) {
+        RestartHeroInMode(2, 0x56, moby);
     }
 }
 
@@ -173,8 +178,9 @@ extern void func_002A8C28(void *, void *, int, f32, f32, f32, int, int, int);
 /* Halves whatever the two floats say, doubles it back, rescales it by the
  * controller's rate, then hands the result to the placement call as the alpha;
  * the controller's counter also drives the byte at +0x23 (a 127/40 ramp). */
-void func_L22_003AD090(u8 *a0) {
-    u8 *obj = a0;
+/* Per-frame update for moby class 1427: rescales the object, fades it in with a timer, places an effect on it and removes it when the timer ends. */
+void func_L22_003AD090(u8 *moby) {
+    u8 *obj = moby;
     u8 *sub = *(u8 **)(obj + 0x24);
     u8 *ctl = *(u8 **)(obj + 0x68);
     u8 *resident;
@@ -187,11 +193,11 @@ void func_L22_003AD090(u8 *a0) {
     *(f32 *)(obj + 0x2C) = *(f32 *)(obj + 0x2C) * *(f32 *)(sub + 0x24);
     n = *(int *)(ctl + 0x8);
     if (n < 0x28) *(u8 *)(obj + 0x23) = n * 127 / 40;
-    resident = D_00189E20;
-    func_002A8C28(*(void **)(resident + 0x2290), obj + 0x10, 0x30000, v,
-                  (f32)func_00283CF0(*(f32 *)(ctl + 0xC)), 1.0f, 0, 1, 0);
-    if (func_00282948(ctl + 0x8))
-        func_0029F338(obj);
+    resident = gHeroState;
+    SweepCollisionFromObject(*(void **)(resident + 0x2290), obj + 0x10, 0x30000, v,
+                  (f32)FloatToInt(*(f32 *)(ctl + 0xC)), 1.0f, 0, 1, 0);
+    if (FastFloatHelperD(ctl + 0x8))
+        MarkMobySpawned(obj);
 }
 
 /* State 0 seeds four lanes (phase offsets, random rates and values); state 1
@@ -200,6 +206,7 @@ void func_L22_003AD090(u8 *a0) {
  * phase advances and drives the packed colour at +0x78.  Reading the player through pointer locals
  * lets cse derive the first one from the position address the distance call
  * took (`addiu $a0,$s1,-0x80`) and rebuild the second, as retail does. */
+/* Per-frame update for moby class 2489: sets up four flickering lanes, reacts to the player being near, throws sparks and pulses its colour. */
 void func_L22_003C9880(u8 *obj)
 {
     u8 *ctl = *(u8 **)(obj + 0x68);
@@ -208,7 +215,7 @@ void func_L22_003C9880(u8 *obj)
 
     switch (state) {
     case 0:
-        func_002A7750(obj, 1, -1);
+        SetMobyState(obj, 1, -1);
         *(short *)(obj + 0x32) = 255;
         {
             float *offset, *rate, *radius;
@@ -218,8 +225,8 @@ void func_L22_003C9880(u8 *obj)
             offset = (float *)(ctl + 0x20);
             for (; i < 4; i++) {
                 *offset++ = (float)i * 0.25f;
-                *rate++ = func_002A7878(D_L22_001AFF08[0], D_L22_001AFF08[1]) * (1.0f / 60.0f);
-                *radius++ = func_002A7878(D_L22_001AFF10[0], D_L22_001AFF10[1]);
+                *rate++ = RandomFloatRange(D_L22_001AFF08[0], D_L22_001AFF08[1]) * (1.0f / 60.0f);
+                *radius++ = RandomFloatRange(D_L22_001AFF10[0], D_L22_001AFF10[1]);
             }
         }
         break;
@@ -227,18 +234,18 @@ void func_L22_003C9880(u8 *obj)
         u8 *player;
         SubtitleHistory *history;
 
-        if (func_00282E48(D_00189E20 + 0x80, obj + 0x10) < 3.0f)
+        if (fast_vec_dist(gHeroState + 0x80, obj + 0x10) < 3.0f)
             D_L22_001A7CD8[0] = *(float *)ctl;
-        player = D_00189E20;
+        player = gHeroState;
         if (*(int *)(player + 0x2294) == 0x81 && *(int *)(player + 0x1B8) == state)
-            func_002E5CF8(0, 0, (char *)obj);
-        history = D_0018C958;
+            PlayMobySound(0, 0, (char *)obj);
+        history = gSubtitleHistory;
         {
             /* unsigned int snapshot: retail tests the u16 with an andi and
              * increments the unmasked value */
             unsigned int count = history[31].count;
             if ((unsigned short)count <= 65534) {
-                u8 *player2 = D_00189E20;
+                u8 *player2 = gHeroState;
                 if (*(int *)(player2 + 0x2294) == 0x81)
                     history[31].count = 65535;
                 else if (*(u8 **)(player2 + 0x33C) == obj) {
@@ -247,7 +254,7 @@ void func_L22_003C9880(u8 *obj)
                     if ((unsigned short)count != 0) {
                         unsigned int last = history[31].time;
                         if (D_001A7390[0] - last > 1080 || last == 0)
-                            func_00288E18(2504, 31);
+                            RequestSubtitleVoiceLine(2504, 31);
                         else if (last < D_001A7390[0])
                             history[31].time = D_001A7390[0];
                     } else {
@@ -255,26 +262,26 @@ void func_L22_003C9880(u8 *obj)
                         if (history[31].time < D_001A7390[0])
                             history[31].time = D_001A7390[0];
                         history[31].levels =
-                            (history[31].levels | (1 << D_001A79F0[0])) | 0x80000000;
+                            (history[31].levels | (1 << gCurrentMapIndex[0])) | 0x80000000;
                     }
                 }
             }
         }
-        if (func_00282DB0(obj + 0xE0, D_00189E20 + 0x2C0) < -0.6f) {
-            func_L22_003C9B60((char *)obj);
-            func_L00_002E6CF0(func_L22_003C9D48, obj);
+        if (FastVecDot(obj + 0xE0, gHeroState + 0x2C0) < -0.6f) {
+            EmitRandomSpark((char *)obj);
+            AddDrawCallbackToList1(DrawSparkLanes, obj);
         }
         break;
     }
     }
     if (obj[0x31]) {
         float f;
-        *(float *)(ctl + 4) = func_00283B98(*(float *)(ctl + 4),
+        *(float *)(ctl + 4) = FastAddRotations(*(float *)(ctl + 4),
                                             D_L22_001AFF20[0] * 0.0002908882452175021f);
-        f = func_00283198(*(float *)(ctl + 4));
+        f = FastSinOrCosB(*(float *)(ctl + 4));
         f = f * f;
         f = f * f;
-        *(int *)(obj + 0x78) = func_00283D38(D_L22_001AFF18_gp[0], D_L22_001AFF18[1], f * f);
+        *(int *)(obj + 0x78) = FastTweenColor(D_L22_001AFF18_gp[0], D_L22_001AFF18[1], f * f);
     }
 }
 
@@ -299,37 +306,39 @@ extern void func_002B0A68(void *a0, int a1, void *a2, unsigned char a3,
 
 extern void func_0029F338(void *object);
 
-void func_L22_003D4320(u8 *a0, int a1, int a2) {
-    u8 *s0 = a0;
-    void *s3;
-    int s2;
-    int s1;
-    float buf[4];
+/* Blows the object up: plays a random sound, adds an effect and a burst of sparks, then removes it. */
+void func_L22_003D4320(u8 *moby, int a1, int a2) {
+    u8 *obj = moby;
+    void *target;
+    int soundBase;
+    int soundId;
+    float offset[4];
 
-    s3 = func_002A9640(a0, -1, 0);
-    if (s3 == 0)
+    target = FindOwnedEffectSlot(moby, -1, 0);
+    if (target == 0)
         return;
-    if (*(short *)(s0 + 0xAA) == 0x1213) {
-        s2 = 0xB;
-        s1 = 0xF7F;
+    if (*(short *)(obj + 0xAA) == 0x1213 /* moby class 4627 */) {
+        soundBase = 0xB;
+        soundId = 0xF7F;
     } else {
-        s2 = 0xC;
-        s1 = 0xE0B;
+        soundBase = 0xC;
+        soundId = 0xE0B;
     }
-    func_002E5DA0(s2 + func_002A77E0(3), 0, s0, s1);
-    func_002AC728(s0, s0 + 0x10, -1, 2.0f, 13.0f);
-    func_002E5CF8(0, 0, s0);
-    func_00282F20(buf, s3 + 0x10, 0.23333335f);
-    func_002B0A68(s0, 3, buf, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-    func_0029F338(s0);
+    PlaySoundFromClassBank(soundBase + RandomIntBelow(3), 0, obj, soundId);
+    SpawnExplosionWithSparks(obj, obj + 0x10, -1, 2.0f, 13.0f);
+    PlayMobySound(0, 0, obj);
+    vec_scale_to_length(offset, target + 0x10, 0.23333335f);
+    SpawnDebrisForMaskedParts(obj, 3, offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+    MarkMobySpawned(obj);
 }
 
 extern void func_L22_003D4320(u8 *a0, int a1, int a2);
 
-void func_L22_003D4428(u8 *a0) {
-    int v = *(int *)(a0 + 0x68);
-    func_L22_003D4320(a0, v, v);
-    *(u8 *)(a0 + 0x30) = 0xFF;
+/* Runs the explosion routine for the object and makes it fully visible. */
+void func_L22_003D4428(u8 *moby) {
+    int vars = *(int *)(moby + 0x68);
+    ExplodeObject(moby, vars, vars);
+    *(u8 *)(moby + 0x30) = 0xFF;
 }
 
 /* func_L22_003F45D8 is in L22_003F45D8-g8.c. */
@@ -379,7 +388,8 @@ extern f32 func_002A7878(f32 low, f32 high);
 extern void func_0032C700(void *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
                           int a8, int a9, int a10, int a11, f32 f12, f32 f13);
 
-void func_L22_0040E2B0(u8 *a0) {
-    f32 f = func_002A7878(0.8f, 1.2f);
-    func_0032C700(a0, 0, 5, 4, 4, 4, 4, 0, 0, 0, 0, 0, f, 20.0f);
+/* Starts an effect on the object with a random size between 0.8 and 1.2. */
+void func_L22_0040E2B0(u8 *moby) {
+    f32 scale = RandomFloatRange(0.8f, 1.2f);
+    SpawnExplosion(moby, 0, 5, 4, 4, 4, 4, 0, 0, 0, 0, 0, scale, 20.0f);
 }

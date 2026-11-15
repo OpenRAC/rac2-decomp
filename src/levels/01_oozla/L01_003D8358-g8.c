@@ -47,7 +47,8 @@ extern void func_002AEF28(void *,void *,void *,f32,f32,f32);
 extern f32 func_00283B98(f32,f32);
 extern void func_00282CC0(void *,void *,void *);
 extern void func_002AD6F0(void *,void *,void *,void *);
-void func_L01_003D8358(u8 *m)
+/* Raft on the water. It bobs up and down, and tilts when the hero stands on it. */
+void func_L01_003D8358(u8 *moby)
 {
     f32 delta[4] __attribute__((aligned(16)));
     f32 rotation[4] __attribute__((aligned(16)));
@@ -55,70 +56,70 @@ void func_L01_003D8358(u8 *m)
     f32 oldAngle[4] __attribute__((aligned(16)));
     f32 oldPos[4] __attribute__((aligned(16)));
     f32 move[4] __attribute__((aligned(16)));
-    u8 *s = *(u8 **)(m+0x68);
-    f32 k, height, previous, x, y, pitch, scale, speed, step;
-    u8 *other;
-    func_00282D30(delta,m+0x10,-1.0f);
-    qcopy(rotation,m+0xF0);
-    previous=F(m,0x18);
-    height=func_L01_003BAFB0();
-    F(s,0x84)=height+0.2f;
-    switch(m[0x20]) {
+    u8 *vars = *(u8 **)(moby+0x68);
+    f32 tiltScale, height, previous, slopeX, slopeY, pitch, scale, speed, step;
+    u8 *linkedMoby;
+    FastVecScale(delta,moby+0x10,-1.0f);
+    qcopy(rotation,moby+0xF0);
+    previous=F(moby,0x18);
+    height=GetWaterHeight();
+    F(vars,0x84)=height+0.2f;
+    switch(moby[0x20]) {
     case 0:
         if(height>0.0f) {
-            I(s,0x80)=1;
-            qcopy(s+0x60,m+0xF0);
-            qzero_nc(s+0x70);
-            if(I(s,0x8C)!=-1) {
-                F(m,0x18)=F(s,0x84)-5.0f;
-                F(m,0xF0)=func_002A7878(-1.57079637f,1.57079637f);
-                F(m,0xF4)=func_002A7878(-1.57079637f,1.57079637f);
-                m[0x20]=1;
+            I(vars,0x80)=1;
+            qcopy(vars+0x60,moby+0xF0);
+            qzero_nc(vars+0x70);
+            if(I(vars,0x8C)!=-1) {
+                F(moby,0x18)=F(vars,0x84)-5.0f;
+                F(moby,0xF0)=RandomFloatRange(-1.57079637f,1.57079637f);
+                F(moby,0xF4)=RandomFloatRange(-1.57079637f,1.57079637f);
+                moby[0x20]=1;
             } else {
-                func_0026FEB8(D_L01_002A4E20,H(m,0xB2),H(m,0xAA));
-                m[0x20]=2;
+                STUB_printf(D_L01_002A4E20,H(moby,0xB2),H(moby,0xAA));
+                moby[0x20]=2;
             }
         }
         break;
     case 1:
-        other=D_L01_001B255C+(I(s,0x8C)<<8);
-        if(!other || other[0x20]==0xFE || other[0x20]==0xFD) m[0x20]=2;
+        linkedMoby=gMobyTable_L01+(I(vars,0x8C)<<8);
+        if(!linkedMoby || linkedMoby[0x20]==0xFE || linkedMoby[0x20]==0xFD) moby[0x20]=2;
         break;
     case 2:
-        if(D_00189E20.mode==0 && *(u8 **)(HERO+0x33C)==m) {
-            func_00282CF0(relative,HERO+0x80,m+0x10);
-            x=func_00282DB0(relative,m+0xC0);
-            y=func_00282DB0(relative,m+0xD0);
-            k=D_L01_001B076C;
-            pitch=-k*y;
-            *(Quad *)oldAngle=*(Quad *)(s+0x60);
-            *(Quad *)oldPos=*(Quad *)(m+0x10);
-            scale=k*x;
-            func_002AA898(s+0x60,pitch,s+0x70,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
-            func_002AA898(s+0x64,scale,s+0x74,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
-            func_L01_00316C48(HERO+0x80,move,m+0x10,oldAngle,s+0x60);
-            func_00282CF0(HERO+0x100,move,HERO+0x80);
-            F(HERO,0x108)+=F(m,0x18)-oldPos[2];
+        if(gHeroState.mode==0 && *(u8 **)(HERO+0x33C)==moby) {
+            FastVecSub(relative,HERO+0x80,moby+0x10);
+            slopeX=FastVecDot(relative,moby+0xC0);
+            slopeY=FastVecDot(relative,moby+0xD0);
+            tiltScale=D_L01_001B076C;
+            pitch=-tiltScale*slopeY;
+            *(Quad *)oldAngle=*(Quad *)(vars+0x60);
+            *(Quad *)oldPos=*(Quad *)(moby+0x10);
+            scale=tiltScale*slopeX;
+            ApproachWithVelocity(vars+0x60,pitch,vars+0x70,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
+            ApproachWithVelocity(vars+0x64,scale,vars+0x74,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
+            TransformOffsetByTwoMatrices(HERO+0x80,move,moby+0x10,oldAngle,vars+0x60);
+            FastVecSub(HERO+0x100,move,HERO+0x80);
+            F(HERO,0x108)+=F(moby,0x18)-oldPos[2];
         } else {
             speed=D_L01_001B0774;
-            step=(F(s,0x84)-F(m,0x18))*0.016666668f;
-            F(m,0x18)=F(m,0x18)+speed*step;
-            if(F(m,0x18)<F(s,0x84)-2.0f) F(m,0x18)+=speed*0.016666668f;
+            step=(F(vars,0x84)-F(moby,0x18))*0.016666668f;
+            F(moby,0x18)=F(moby,0x18)+speed*step;
+            if(F(moby,0x18)<F(vars,0x84)-2.0f) F(moby,0x18)+=speed*0.016666668f;
             else {
-                func_002AA898(s+0x60,0.0f,s+0x70,D_L01_001B0788,D_L01_001B078C,D_L01_001B0790,0);
-                func_002AA898(s+0x64,0.0f,s+0x74,D_L01_001B0788,D_L01_001B078C,D_L01_001B0790,0);
+                ApproachWithVelocity(vars+0x60,0.0f,vars+0x70,D_L01_001B0788,D_L01_001B078C,D_L01_001B0790,0);
+                ApproachWithVelocity(vars+0x64,0.0f,vars+0x74,D_L01_001B0788,D_L01_001B078C,D_L01_001B0790,0);
             }
-            if(F(m,0x18)>F(s,0x84)) F(m,0x18)=F(s,0x84);
-            if(previous<height-D_L01_001B0768 && F(m,0x18)>=height-D_L01_001B0768 && !I(s,0xA0)) {
-                func_002E5CF8(0,0,m);
-                I(s,0xA0)=1;
+            if(F(moby,0x18)>F(vars,0x84)) F(moby,0x18)=F(vars,0x84);
+            if(previous<height-D_L01_001B0768 && F(moby,0x18)>=height-D_L01_001B0768 && !I(vars,0xA0)) {
+                PlayMobySound(0,0,moby);
+                I(vars,0xA0)=1;
             }
         }
-        func_002AEF28(m,s+0x90,s+0x94,0.0200712885708f,0.00727220624685f,0.00901753548533f);
-        F(m,0xF0)=func_00283B98(F(s,0x60),F(m,0xF0));
-        F(m,0xF4)=func_00283B98(F(s,0x64),F(m,0xF4));
-        func_00282CC0(delta,delta,m+0x10);
-        func_002AD6F0(s+0x20,delta,rotation,m+0xF0);
+        ScaleOwnerWordsByAngles(moby,vars+0x90,vars+0x94,0.0200712885708f,0.00727220624685f,0.00901753548533f);
+        F(moby,0xF0)=FastAddRotations(F(vars,0x60),F(moby,0xF0));
+        F(moby,0xF4)=FastAddRotations(F(vars,0x64),F(moby,0xF4));
+        FastVecAdd(delta,delta,moby+0x10);
+        CombineTransformsAndStore(vars+0x20,delta,rotation,moby+0xF0);
         break;
     }
 }

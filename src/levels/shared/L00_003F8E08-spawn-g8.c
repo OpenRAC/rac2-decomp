@@ -38,42 +38,42 @@ void func_L00_003F9040(char *object)
     int index;
 
     for (i = 0; i < 30; i++) {
-        if (D_L00_002533B0[i].object != 0) {
-            Slot *slot = &D_L00_002533B0[i];
+        if (gHealthDrainSlots_L00[i].object != 0) {
+            Slot *slot = &gHealthDrainSlots_L00[i];
 
-            func_002AFFD8(slot->object + 0x10, (char *)reference, 1);
-            func_00282D30(reference, reference, *(float *)(slot->object + 0xC) * 0.0007812f);
+            ComputeViewDirection(slot->object + 0x10, (char *)reference, 1);
+            FastVecScale(reference, reference, *(float *)(slot->object + 0xC) * 0.0007812f);
             owner = slot->object;
             reference[0] += *(float *)(owner + 0) * 0.0009765f;
             reference[1] += *(float *)(owner + 4) * 0.0009765f;
             reference[2] += *(float *)(owner + 8) * 0.0009765f;
             for (j = 0; j < 2; j++) {
-                func_00282C88((SpawnVectorWord *)direction);
-                direction[2] = func_002A7878(0.016666668f, 0.025000002f);
-                magnitude = func_002A7878(0.5f, 0.75f);
+                ClearVector128((SpawnVectorWord *)direction);
+                direction[2] = RandomFloatRange(0.016666668f, 0.025000002f);
+                magnitude = RandomFloatRange(0.5f, 0.75f);
                 magnitude = *(float *)(slot->object + 0xC) * (magnitude * 0.0009765f);
-                angle = func_002A7940();
-                elevation = func_002A7940();
-                func_002AF000(position, magnitude, angle, elevation);
+                angle = RandomAngle();
+                elevation = RandomAngle();
+                BuildSphericalOffset(position, magnitude, angle, elevation);
                 owner = slot->object;
                 position[0] += *(float *)(owner + 0) * 0.0009765f;
                 position[1] += *(float *)(owner + 4) * 0.0009765f;
                 position[2] += *(float *)(owner + 8) * 0.0009765f;
-                kind = func_002A7820(1, 5);
-                particle = func_002BDCE8(0.0f, 1.0f, 1.01f,
-                                         func_002A7878(0.25f, 1.0f) * 210000.0f,
+                kind = RandomIntRange(1, 5);
+                particle = SpawnSpinningSparkParticle(0.0f, 1.0f, 1.01f,
+                                         RandomFloatRange(0.25f, 1.0f) * 210000.0f,
                                          (char *)position, kind, (char *)direction, 0x5A182, 1);
                 palette = D_L00_001B0A48[0];
                 if (particle != 0) {
                     char *properties = particle + 0x20;
 
-                    index = func_001163B0() % 2;
+                    index = Rand() % 2;
                     particle[3] = palette.color[index];
                     *(u16 *)(particle + 10) = 35;
-                    particle[9] = func_00283CF0(4.0f) + 64;
-                    *(float *)(properties + 0x1C) = func_00283CE0(5);
+                    particle[9] = FloatToInt(4.0f) + 64;
+                    *(float *)(properties + 0x1C) = IntToFloat(5);
                     *(int *)(properties + 4) = 3;
-                    properties[0xA] = func_002A7820(64, 128);
+                    properties[0xA] = RandomIntRange(64, 128);
                     properties[0xB] = particle[10];
                 }
             }

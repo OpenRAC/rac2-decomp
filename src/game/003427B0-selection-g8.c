@@ -16,6 +16,7 @@ typedef struct {
 extern const int D_001AE1CC __attribute__((sda));
 extern int func_002E5E58(int, int, void *);
 
+/* Moves the menu list cursor up or down when the player presses the direction buttons, scrolls smoothly, and works out which entries are on screen. */
 int func_00342978(MenuList *self, int flags)
 {
     int row;
@@ -25,11 +26,11 @@ int func_00342978(MenuList *self, int flags)
     switch (self->state) {
     case 0:
         if ((flags & 0x1000) && self->selected > 0) {
-            func_002E5E58(3, 0, 0);
+            PlaySoundFromGlobalBank(3, 0, 0);
             self->backward = 1;
             self->state = 1;
         } else if ((flags & 0x4000) && self->selected < self->count - 1) {
-            func_002E5E58(3, 0, 0);
+            PlaySoundFromGlobalBank(3, 0, 0);
             self->backward = 0;
             self->state = 1;
         }
@@ -88,35 +89,36 @@ extern void func_002FC620(int, int, int, int);
 extern int func_0028E588(int, int);
 extern void func_0028EA58(int, int, int, int, int, int *);
 
+/* Draws the visible entries of a menu list with their icons, fading them out toward the top and bottom edges. */
 void func_00342BE8(MenuList *object)
 {
     float high, low, current;
-    int index, first, second, texture;
+    int index, topAlpha, bottomAlpha, texture;
     MenuColourQuad normal, alternate;
     char *colours;
     MenuClipRectangle clip;
     unsigned char *entry;
-    func_00343068(&object->position);
+    DrawMenuPanelFrame(&object->position);
     low = object->position->y + object->rowHeight * -4.0f;
     high = object->position->y + object->iconSize * 0.5f;
     for (index = object->firstVisible;
             index <= object->lastVisible && object->count; index++) {
         normal = D_001AE1D8;
         alternate = D_001AE1E8;
-        entry = D_00239BA0 + D_00139568[object->ids[object->selected + index]] * 224;
+        entry = gWeaponTable_00239BA0 + gItemSlotToRecord[object->ids[object->selected + index]] * 224;
         colours = (char *)&normal;
         if (*(int *)entry && entry[4]) colours = (char *)&alternate;
         current = (float)index;
-        first = func_003427C0((char *)object, low,
+        topAlpha = ComputeListEntryAlpha((char *)object, low,
                 object->position->y + object->rowHeight * current + (float)object->scrollOffset,
                 high, D_001AE1D0, D_001AE1D4);
-        second = func_003427C0((char *)object, low,
+        bottomAlpha = ComputeListEntryAlpha((char *)object, low,
                 object->position->y + object->rowHeight * current + object->iconSize + (float)object->scrollOffset,
                 high, D_001AE1D0, D_001AE1D4);
-        *(unsigned int *)(colours + 0) = (*(unsigned int *)(colours + 0) & 0xFFFFFF) | ((unsigned int)first << 24);
-        *(unsigned int *)(colours + 4) = (*(unsigned int *)(colours + 4) & 0xFFFFFF) | ((unsigned int)first << 24);
-        *(unsigned int *)(colours + 8) = (*(unsigned int *)(colours + 8) & 0xFFFFFF) | ((unsigned int)second << 24);
-        *(unsigned int *)(colours + 12) = (*(unsigned int *)(colours + 12) & 0xFFFFFF) | ((unsigned int)second << 24);
+        *(unsigned int *)(colours + 0) = (*(unsigned int *)(colours + 0) & 0xFFFFFF) | ((unsigned int)topAlpha << 24);
+        *(unsigned int *)(colours + 4) = (*(unsigned int *)(colours + 4) & 0xFFFFFF) | ((unsigned int)topAlpha << 24);
+        *(unsigned int *)(colours + 8) = (*(unsigned int *)(colours + 8) & 0xFFFFFF) | ((unsigned int)bottomAlpha << 24);
+        *(unsigned int *)(colours + 12) = (*(unsigned int *)(colours + 12) & 0xFFFFFF) | ((unsigned int)bottomAlpha << 24);
         if (D_001B23C0 == 0) {
             clip.y0 = 63;
             clip.y1 = 340;
@@ -125,12 +127,12 @@ void func_00342BE8(MenuList *object)
             D_001B23C0 = 1;
             menuClipGP = clip;
         }
-        func_002FC620(D_001B23B0.x0, D_001B23B0.x1, D_001B23B0.y0, D_001B23B0.y1);
-        entry = D_00239BA0 + D_00139568[object->ids[object->selected + index]] * 224;
-        texture = func_0028E588(*(unsigned short *)(entry + 0x3C), 0);
-        func_0028EA58(texture, (int)object->position->x,
+        SetGsScissorClamped(D_001B23B0.x0, D_001B23B0.x1, D_001B23B0.y0, D_001B23B0.y1);
+        entry = gWeaponTable_00239BA0 + gItemSlotToRecord[object->ids[object->selected + index]] * 224;
+        texture = GetIconFrame(*(unsigned short *)(entry + 0x3C), 0);
+        DrawHudSpriteGradient(texture, (int)object->position->x,
                 (int)(object->position->y + object->rowHeight * current + (float)object->scrollOffset),
                 (int)object->iconSize, (int)object->iconSize, (int *)colours);
-        func_002FC620(0, D_001A7340 - 1, 0, D_001A7344 - 1);
+        SetGsScissorClamped(0, gScreenWidth - 1, 0, gScreenHeight - 1);
     }
 }

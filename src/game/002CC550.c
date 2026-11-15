@@ -25,6 +25,7 @@ extern char D_001A7A40[] __attribute__((sda));
 extern unsigned char D_001A7A50[] __attribute__((sda));
 extern CheatEntry_25FC90 D_0025FC90[];
 
+/* Builds the list of cheats the player has unlocked from two small lookup tables, and ends the list with a blank entry. */
 int func_002CC550(void)
 {
     IdTable_1AB938 ids = D_001AB938;

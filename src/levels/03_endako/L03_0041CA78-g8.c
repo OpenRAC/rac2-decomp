@@ -36,44 +36,45 @@ extern float func_00282E48(void *,void *);
 extern void func_002A93B0(void *);
 extern int func_002B3BA8(void *,int,void *,int,float,float);
 
-void func_L03_0041CA78(u8 *e) {
-    u8 *s=*(u8 **)(e+0x68);
+/* Sets up the sweeper bot on its first frame and handles its death when it is hit. */
+void func_L03_0041CA78(u8 *moby) {
+    u8 *vars=*(u8 **)(moby+0x68);
     float scale;
     Vec a,b;
-    if(e[0x20]==0) {
-        if(*(int *)(s+0x29c)) {
+    if(moby[0x20]==0) {
+        if(*(int *)(vars+0x29c)) {
             scale=D_L03_001B1BA4;
-            *(float *)(s+0x20)=1;
-            *(short *)(s+0x24)=1;
+            *(float *)(vars+0x20)=1;
+            *(short *)(vars+0x24)=1;
         } else scale=D_L03_001B1BA0;
-        *(float *)(e+0x2c)=*(float *)(*(u8 **)(e+0x24)+0x24)*scale;
-        s[0x48]=func_00283CF0(20);
-        s[0x4a]=func_00283CF0(6);
-        if(*(int *)(s+0x290)==-1) {
-            func_0029F338(e);
+        *(float *)(moby+0x2c)=*(float *)(*(u8 **)(moby+0x24)+0x24)*scale;
+        vars[0x48]=FloatToInt(20);
+        vars[0x4a]=FloatToInt(6);
+        if(*(int *)(vars+0x290)==-1) {
+            MarkMobySpawned(moby);
             return;
         }
         { s32 initialMode = 3;
-        *(int *)(s+0x2ac)=0; *(int *)(s+0x188)=initialMode;
-        *(float *)(s+0x174)=*(float *)(s+0x170)=0.5f;
-        *(float *)(s+0x17c)=0.4f; *(float *)(s+0x64)=0.20943955f; *(float *)(s+0x58)=0.4f;
-        s[0x150]=7; s[0x28]=initialMode;
-        *(float *)(s+0x68)=0.20943955f;
-        *(float *)(s+0x84)=scale*0.05f;
-        *(float *)(s+0x54)=scale*0.25f;
-        *(float *)(s+0x50)=scale*0.5f;
-        *(float *)(s+0x5c)=0.4f;
-        *(float *)(s+0x60)=0.78539824f;
-        *(float *)(s+0x80)=0.52359885f;
-        *(int *)(s+0x8c)=*(int *)(s+0x290);
-        qcopy(s+0x2b0,e+0x10); }
-        if(*(u64 *)(s+0x2a0)!=0xffffffffULL) {
-            func_002A7750(e,8,4);
-            *(int *)(e+0x98)=0;
-            *(u16 *)(e+0x34)=(*(u16 *)(e+0x34)|0x41)&0xefff;
+        *(int *)(vars+0x2ac)=0; *(int *)(vars+0x188)=initialMode;
+        *(float *)(vars+0x174)=*(float *)(vars+0x170)=0.5f;
+        *(float *)(vars+0x17c)=0.4f; *(float *)(vars+0x64)=0.20943955f; *(float *)(vars+0x58)=0.4f;
+        vars[0x150]=7; vars[0x28]=initialMode;
+        *(float *)(vars+0x68)=0.20943955f;
+        *(float *)(vars+0x84)=scale*0.05f;
+        *(float *)(vars+0x54)=scale*0.25f;
+        *(float *)(vars+0x50)=scale*0.5f;
+        *(float *)(vars+0x5c)=0.4f;
+        *(float *)(vars+0x60)=0.78539824f;
+        *(float *)(vars+0x80)=0.52359885f;
+        *(int *)(vars+0x8c)=*(int *)(vars+0x290);
+        qcopy(vars+0x2b0,moby+0x10); }
+        if(*(u64 *)(vars+0x2a0)!=0xffffffffULL) {
+            SetMobyState(moby,8,4);
+            *(int *)(moby+0x98)=0;
+            *(u16 *)(moby+0x34)=(*(u16 *)(moby+0x34)|0x41)&0xefff;
         } else {
-            func_002A7750(e,1,0);
-            if(e[0x43]) func_002A7470(e,0,0,0);
+            SetMobyState(moby,1,0);
+            if(moby[0x43]) StartAnimationBlended(moby,0,0,0);
         }
         {
             float v0 = scale*0.00027777778f;
@@ -82,41 +83,41 @@ void func_L03_0041CA78(u8 *e) {
             float v3 = D_L03_001B1B84*v1;
             float v4 = D_L03_001B1B88*0.000004848137343f;
             float v5 = D_L03_001B1B8C*0.00029088825f;
-            *(float *)(s+0x70)=v2;
-            *(float *)(s+0x74)=v2;
-            *(float *)(s+0x78)=v3;
-            *(float *)(s+0x64)=v4;
-            *(float *)(s+0x6c)=v5;
-            *(float *)(s+0x68)=v4;
+            *(float *)(vars+0x70)=v2;
+            *(float *)(vars+0x74)=v2;
+            *(float *)(vars+0x78)=v3;
+            *(float *)(vars+0x64)=v4;
+            *(float *)(vars+0x6c)=v5;
+            *(float *)(vars+0x68)=v4;
         }
     }
-    if(func_002B0ED8(e,s+0x140,0) && *(float *)(s+0x20)<=0) {
-        func_00283098(&a,D_L03_001B1BB0,e+0xc0);
-        func_00282CC0(&a,&a,e+0x10);
-        func_002E5CF8(2,0,e);
-        func_002AC728(e,&a,-1,0.333f,0);
-        func_00282CF0(&b,e+0x10,D_00189EA0);
+    if(ApplyDamageToObject(moby,vars+0x140,0) && *(float *)(vars+0x20)<=0) {
+        matrix_mul_vec3(&a,D_L03_001B1BB0,moby+0xc0);
+        FastVecAdd(&a,&a,moby+0x10);
+        PlayMobySound(2,0,moby);
+        SpawnExplosionWithSparks(moby,&a,-1,0.333f,0);
+        FastVecSub(&b,moby+0x10,gHeroPosition);
         b.f[2]=0;
-        func_00282F20(&b,&b,0.10000001f);
-        func_002B0A68(e,31,D_L03_001A8F20,3,6,3,6,255);
-        if(*(int *)(D_00189EA0+0x2214)==49) {
+        vec_scale_to_length(&b,&b,0.10000001f);
+        SpawnDebrisForMaskedParts(moby,31,D_L03_001A8F20,3,6,3,6,255);
+        if(*(int *)(gHeroPosition+0x2214)==49) {
             D_L03_001A9044++;
             if(D_L03_001A9044>=10 && !D_001A7A60[0x1C]) {
                 D_001A7A60[0x1C]=1;
-                func_002E5E58(1,0,0);
-                func_002B0A18(0x1233,-1);
+                PlaySoundFromGlobalBank(1,0,0);
+                SetEntryValueByIndex(0x1233,-1);
                 D_L03_001A903C=1;
             }
         }
-        func_002E5CF8(2,0,e);
-        func_L03_0041D0A8(e);
-        func_002A6C58(e,0,3);
-        func_0029F338(e);
+        PlayMobySound(2,0,moby);
+        MarkSweeperBotsInStream(moby);
+        SetDeathBits(moby,0,3);
+        MarkMobySpawned(moby);
         return;
     }
-    if(e[0x31] && func_00282E48(e+0x10,D_L03_001B9980)<24) {
-        func_002A93B0(e);
-        e[0x6f]=22;
+    if(moby[0x31] && fast_vec_dist(moby+0x10,D_L03_001B9980)<24) {
+        UpdateMobyGroundCheck(moby);
+        moby[0x6f]=22;
     }
-    if(e[0x95]<3) func_002B3BA8(e,*(int *)(s+0x294),0,0,16,0);
+    if(moby[0x95]<3) SelectAimTarget_002B3BA8(moby,*(int *)(vars+0x294),0,0,16,0);
 }

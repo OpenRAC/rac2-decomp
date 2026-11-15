@@ -39,42 +39,43 @@ extern f32 *func_L11_004417E8(s32 a0);
 extern f32 D_L11_001B0558 __attribute__((sda));
 extern f32 D_L11_001B0540 __attribute__((sda));
 
-void func_L11_003F2F38(u8 *arg0) {
-    L11Moby *m = (L11Moby *)arg0;
-    u8 *s1 = *(u8 **)(arg0 + 0x68);
-    f32 *p;
-    f32 f20;
-    f32 y;
-    u32 w;
+/* Puts the Joba rail object back on its rail at angle zero and resets its state. */
+void func_L11_003F2F38(u8 *mobyBytes) {
+    L11Moby *moby = (L11Moby *)mobyBytes;
+    u8 *vars = *(u8 **)(mobyBytes + 0x68);
+    f32 *railPoint;
+    f32 trig;
+    f32 newY;
+    u32 modelWord;
 
-    *(f32 *)(s1 + 0x20) = (f32)*(s16 *)(s1 + 0x24);
-    w = *(u32 *)(m->model + 0x10);
-    m->flags &= 0xFFFE;
-    m->b31 = 1;
-    m->w98 = w;
-    *(u8 *)(s1 + 0x2E) = 1;
-    m->b7F = 0;
-    m->flags = (m->flags & 0xFFB9) | 0x1000;
-    *(s32 *)(s1 + 0x60) = 0;
-    func_002B3380((char *)m, (char *)(s1 + 0x50), (char *)(s1 + 0x20));
-    if (*(s16 *)(s1 + 0x70) != 0) {
-        *(s16 *)(s1 + 0x70) = 0;
-        func_002A0488(m, *(u32 *)(s1 + 0x280), *(u32 *)(s1 + 0x284),
-                      *(u32 *)(s1 + 0x288));
-        *(s16 *)(s1 + 0x72) = 1;
+    *(f32 *)(vars + 0x20) = (f32)*(s16 *)(vars + 0x24);
+    modelWord = *(u32 *)(moby->model + 0x10);
+    moby->flags &= 0xFFFE;
+    moby->b31 = 1;
+    moby->w98 = modelWord;
+    *(u8 *)(vars + 0x2E) = 1;
+    moby->b7F = 0;
+    moby->flags = (moby->flags & 0xFFB9) | 0x1000;
+    *(s32 *)(vars + 0x60) = 0;
+    SpawnDamageDebrisOnHealthLoss((char *)moby, (char *)(vars + 0x50), (char *)(vars + 0x20));
+    if (*(s16 *)(vars + 0x70) != 0) {
+        *(s16 *)(vars + 0x70) = 0;
+        set_moby_color(moby, *(u32 *)(vars + 0x280), *(u32 *)(vars + 0x284),
+                      *(u32 *)(vars + 0x288));
+        *(s16 *)(vars + 0x72) = 1;
     }
-    func_002A7750(arg0, 2, 2);
-    *(s32 *)(s1 + 0x250) = 0;
-    f20 = func_00283180(*(f32 *)(s1 + 0x250));
-    p = func_L11_004417E8(m->slot);
-    m->x = D_L11_001B0558 * f20 + p[0];
-    f20 = func_00283198(*(f32 *)(s1 + 0x250));
-    p = func_L11_004417E8(m->slot);
-    y = D_L11_001B0558 * f20 + p[1];
-    m->z = D_L11_001B0540;
-    m->rotX = -1.5707965f;
-    m->rotW = 0;
-    m->y = y;
-    m->rotZ = func_00283B98(3.1415927f, *(f32 *)(s1 + 0x250));
-    func_002833F0(m->mtx, &m->rotW);
+    SetMobyState(mobyBytes, 2, 2);
+    *(s32 *)(vars + 0x250) = 0;
+    trig = FastSinOrCosA(*(f32 *)(vars + 0x250));
+    railPoint = GetArenaCenterPoint(moby->slot);
+    moby->x = D_L11_001B0558 * trig + railPoint[0];
+    trig = FastSinOrCosB(*(f32 *)(vars + 0x250));
+    railPoint = GetArenaCenterPoint(moby->slot);
+    newY = D_L11_001B0558 * trig + railPoint[1];
+    moby->z = D_L11_001B0540;
+    moby->rotX = -1.5707965f;
+    moby->rotW = 0;
+    moby->y = newY;
+    moby->rotZ = FastAddRotations(3.1415927f, *(f32 *)(vars + 0x250));
+    euler_rotation_basis(moby->mtx, &moby->rotW);
 }

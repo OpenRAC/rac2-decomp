@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Big level-side array: keep the absolute materialisation (`lui+addiu`), never $gp. */
 extern unsigned char D_L03_00189E20[] __attribute__((nosda));
@@ -14,12 +15,13 @@ extern void func_2EF020(unsigned char *, unsigned char *, float);
 
 extern void func_2EEFB0(unsigned char *, unsigned char *, unsigned char *);
 
-void func_L03_0038A9D0(unsigned char *a0, unsigned char *a1) {
-    unsigned char *q = a1;
-    unsigned char *p = a0;
+/* Finds a point in front of an object: its facing direction scaled by a level constant, added to its position. */
+void func_L03_0038A9D0(unsigned char *object, unsigned char *outPoint) {
+    unsigned char *point = outPoint;
+    unsigned char *self = object;
 
-    func_2EF020(q, p + 0xC0, D_L03_001AEF64);
-    func_2EEFB0(q, q, p + 0x10);
+    func_2EF020(point, self + 0xC0, D_L03_001AEF64);
+    func_2EEFB0(point, point, self + 0x10);
 }
 
 extern int D_L03_001AEF60 __attribute__((sda));
@@ -28,30 +30,32 @@ extern float D_L03_00237F40[] __attribute__((nosda));
 
 extern float func_31BAE8(float, float);
 
+/* Once per frame, refills a table of 16 random vectors. */
 void func_L03_0038B238(void) {
-    float *p;
+    float *vectors;
     int i;
 
-    if (D_L03_001AEF60 >= D_L03_001B2548)
+    if (D_L03_001AEF60 >= gFrameCounter_L03)
         return;
-    p = D_L03_00237F40;
+    vectors = D_L03_00237F40;
     for (i = 15; i >= 0; i--) {
-        p[0] = func_31BAE8(0.0f, 1.0f);
-        p[1] = func_31BAE8(0.0f, 1.0f);
-        p[2] = func_31BAE8(0.0f, 1.0f);
-        p[3] = 1.0f;
-        p += 4;
+        vectors[0] = func_31BAE8(0.0f, 1.0f);
+        vectors[1] = func_31BAE8(0.0f, 1.0f);
+        vectors[2] = func_31BAE8(0.0f, 1.0f);
+        vectors[3] = 1.0f;
+        vectors += 4;
     }
-    D_L03_001AEF60 = D_L03_001B2548;
+    D_L03_001AEF60 = gFrameCounter_L03;
 }
 
-void func_L03_0032AD10(int a0) {
-    if (D_L03_001B2548 != D_L03_001A9028) {
-        D_L03_001A9028 = D_L03_001B2548;
+/* Remembers an id in a list of up to 32 entries. The list starts over when the frame number changes. */
+void func_L03_0032AD10(int value) {
+    if (gFrameCounter_L03 != D_L03_001A9028) {
+        D_L03_001A9028 = gFrameCounter_L03;
         D_L03_001A9024 = 0;
     }
     if (D_L03_001A9024 < 0x20) {
-        D_L03_001C63A8[D_L03_001A9024] = a0;
+        D_L03_001C63A8[D_L03_001A9024] = value;
         D_L03_001A9024 = D_L03_001A9024 + 1;
     }
 }
@@ -77,58 +81,58 @@ extern float D_L03_001B004C __attribute__((sda));
 
 /* Builds a vector with the engine's VU0 helpers, trims its z by the constant the state at
    0xAA names, and stores the two clamped, halved angles in the moby at 0x68. */
-void func_L03_003C4A10(unsigned char *a0, void *a1) {
-    Vec4 v;
-    Vec4 buf[4];
-    float f1;
-    float f20;
-    void *s2;
+void func_L03_003C4A10(unsigned char *object, void *target) {
+    Vec4 toTarget;
+    Vec4 inverseFrame[4];
+    float pitch;
+    float yaw;
+    void *vars;
 
-    if (*(short *)(a0 + 0xAA) == 0x93C) {
-        if (a0[0x43] == 1)
+    if (*(short *)(object + 0xAA) == 0x93C /* moby class 2364 */) {
+        if (object[0x43] == 1)
             return;
     }
 
-    s2 = *(void **)(a0 + 0x68);
+    vars = *(void **)(object + 0x68);
 
-    func_00282CF0(&v, a1, a0 + 0x10);
-    func_00283698(buf, a0 + 0xC0);
-    func_00283098(&v, &v, buf);
+    FastVecSub(&toTarget, target, object + 0x10);
+    matrix_from_basis_rows(inverseFrame, object + 0xC0);
+    matrix_mul_vec3(&toTarget, &toTarget, inverseFrame);
 
-    switch (*(short *)(a0 + 0xAA)) {
-    case 0x964:
-        v.z -= D_L03_001B0040;
+    switch (*(short *)(object + 0xAA)) {
+    case 0x964 /* Gadgebot */:
+        toTarget.z -= D_L03_001B0040;
         break;
-    case 0x93C:
-        v.z -= D_L03_001B0044;
+    case 0x93C /* moby class 2364 */:
+        toTarget.z -= D_L03_001B0044;
         break;
-    case 0x940:
-        v.z -= D_L03_001B0048;
+    case 0x940 /* Bridgebot */:
+        toTarget.z -= D_L03_001B0048;
         break;
-    case 0xA59:
-        v.z -= D_L03_001B004C;
+    case 0xA59 /* moby class 2649 */:
+        toTarget.z -= D_L03_001B004C;
         break;
     }
 
-    f20 = func_00283248(v.x, v.y);
-    f1 = -func_00283248(func_00282E20(&v), v.z);
+    yaw = FastMatrixHelperA(toTarget.x, toTarget.y);
+    pitch = -FastMatrixHelperA(vec_length_xy(&toTarget), toTarget.z);
 
-    if (f20 > 1.5707964f)
-        f20 = 1.5707964f;
-    else if (f20 < -1.5707964f)
-        f20 = -1.5707964f;
-    if (f1 > 0.7853982f)
-        f1 = 0.7853982f;
-    else if (f1 < -0.7853982f)
-        f1 = -0.7853982f;
+    if (yaw > 1.5707964f)
+        yaw = 1.5707964f;
+    else if (yaw < -1.5707964f)
+        yaw = -1.5707964f;
+    if (pitch > 0.7853982f)
+        pitch = 0.7853982f;
+    else if (pitch < -0.7853982f)
+        pitch = -0.7853982f;
 
-    f20 = f20 * 0.5f;
-    f1 = f1 * 0.5f;
+    yaw = yaw * 0.5f;
+    pitch = pitch * 0.5f;
 
-    *(float *)(s2 + 0x2A8) = f20;
-    *(float *)(s2 + 0x2A4) = f1;
-    *(float *)(s2 + 0x324) = f1;
-    *(float *)(s2 + 0x328) = f20;
+    *(float *)(vars + 0x2A8) = yaw;
+    *(float *)(vars + 0x2A4) = pitch;
+    *(float *)(vars + 0x324) = pitch;
+    *(float *)(vars + 0x328) = yaw;
 }
 
 /* The group count is read through $gp here; the group table is absolute and the entity base is
@@ -146,48 +150,48 @@ extern void func_00283410(void *, void *);
 /* Walks the entities of the object's group (the others of its team at +0x95, not in state 0xFE or
    0xFD), puts each one's offset from the object into the frame that faces the point a1, and
    counts -1 when its y is then positive, +1 otherwise; returns the sum clamped to -5..5. */
-int func_L03_003C58F0(unsigned char *a0, float *a1) {
-    float v[4];
-    float t[4];
-    float m[16];
-    int n;
-    unsigned short *q;
-    unsigned char *e;
+int func_L03_003C58F0(unsigned char *object, float *point) {
+    float angles[4];
+    float offset[4];
+    float frame[16];
+    int score;
+    unsigned short *entryList;
+    unsigned char *other;
 
-    if (a0[0x21] == 0xFF)
+    if (object[0x21] == 0xFF)
         return 0;
-    func_00282C88(v);
-    n = 0;
-    v[2] = func_00283248(a1[0] - *(float *)(a0 + 0x10), a1[1] - *(float *)(a0 + 0x14));
-    func_00283410(m, v);
-    func_00283698(m, m);
-    for (q = D_L03_001FB5A0[a0[0x21]];
-         a0[0x21] != 0xFF && a0[0x21] <= D_L03_001B2A38 && q != 0 &&
-         ((q != 0 && (short)q[-1] >= 0) || q == D_L03_001FB5A0[a0[0x21]]);
-         q++) {
-        e = D_L03_001B2A1C[0] + ((*q & 0x7FFF) << 8);
-        if (e == 0)
+    ClearVector128(angles);
+    score = 0;
+    angles[2] = FastMatrixHelperA(point[0] - *(float *)(object + 0x10), point[1] - *(float *)(object + 0x14));
+    euler_to_matrix(frame, angles);
+    matrix_from_basis_rows(frame, frame);
+    for (entryList = D_L03_001FB5A0[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= D_L03_001B2A38 && entryList != 0 &&
+         ((entryList != 0 && (short)entryList[-1] >= 0) || entryList == D_L03_001FB5A0[object[0x21]]);
+         entryList++) {
+        other = D_L03_001B2A1C[0] + ((*entryList & 0x7FFF) << 8);
+        if (other == 0)
             break;
-        if (e[0x20] == 0xFE)
+        if (other[0x20] == 0xFE)
             continue;
-        if (e[0x20] == 0xFD)
+        if (other[0x20] == 0xFD)
             continue;
-        if (e == a0)
+        if (other == object)
             continue;
-        if (e[0x95] != a0[0x95])
+        if (other[0x95] != object[0x95])
             continue;
-        func_00282CF0(t, e + 0x10, a0 + 0x10);
-        func_00283098(t, t, m);
-        if (t[1] > 0.0f)
-            n--;
+        FastVecSub(offset, other + 0x10, object + 0x10);
+        matrix_mul_vec3(offset, offset, frame);
+        if (offset[1] > 0.0f)
+            score--;
         else
-            n++;
+            score++;
     }
-    if (n >= 6)
-        n = 5;
-    else if (n <= -6)
-        n = -5;
-    return n;
+    if (score >= 6)
+        score = 5;
+    else if (score <= -6)
+        score = -5;
+    return score;
 }
 
 extern float func_00283B98(float, float);
@@ -252,19 +256,19 @@ typedef struct {
    func_L03_003C4800 for the object with func_L00_002E6CF0. The kind selects its arm through the
    level's jump table; `cases` only keeps the labels alive, and the labels are named after the
    kind that reaches them. */
-void func_L03_003C4578(L03Obj *a0) {
+void func_L03_003C4578(L03Obj *object) {
     static void *cases[9] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c1, &&c8};
-    L03State *s1 = a0->state;
+    L03State *vars = object->state;
     int pair[2];
     float scale;
-    float t;
-    float r;
-    unsigned short *q;
-    L03Obj *e;
+    float newPhase;
+    float wave;
+    unsigned short *entryList;
+    L03Obj *other;
     unsigned int kind;
 
-    if (a0->live != 0) {
-        kind = a0->kind;
+    if (object->live != 0) {
+        kind = object->kind;
         if (kind < 9)
             goto *ref_L03_003C4578_00[kind];
         goto c0;
@@ -308,21 +312,21 @@ c0:
         pair[1] = ref_L03_003C4578_17[0];
         scale = ref_L03_003C4578_18 * 0.00029088825f;
 join:
-        t = func_00283B98(s1->phase, scale);
-        s1->phase = t;
-        r = func_00283198(t);
-        a0->tint = func_00283D38(pair[0], pair[1], r * 0.5f + 0.5f);
-        if (s1->stamp != ref_L03_003C4578_19) {
-            for (q = ref_L03_003C4578_20[a0->group];
-                 a0->group != 0xFF && a0->group <= ref_L03_003C4578_21 && q != 0 &&
-                 ((q != 0 && (short)q[-1] >= 0) || q == ref_L03_003C4578_20[a0->group]);
-                 q++) {
-                e = (L03Obj *)(ref_L03_003C4578_22[0] + ((*q & 0x7FFF) << 8));
-                if (e == 0)
+        newPhase = FastAddRotations(vars->phase, scale);
+        vars->phase = newPhase;
+        wave = FastSinOrCosB(newPhase);
+        object->tint = FastTweenColor(pair[0], pair[1], wave * 0.5f + 0.5f);
+        if (vars->stamp != ref_L03_003C4578_19) {
+            for (entryList = ref_L03_003C4578_20[object->group];
+                 object->group != 0xFF && object->group <= ref_L03_003C4578_21 && entryList != 0 &&
+                 ((entryList != 0 && (short)entryList[-1] >= 0) || entryList == ref_L03_003C4578_20[object->group]);
+                 entryList++) {
+                other = (L03Obj *)(ref_L03_003C4578_22[0] + ((*entryList & 0x7FFF) << 8));
+                if (other == 0)
                     break;
-                e->state->stamp = ref_L03_003C4578_19;
+                other->state->stamp = ref_L03_003C4578_19;
             }
-            func_L00_002E6CF0(func_L03_003C4800, a0);
+            AddDrawCallbackToList1(SpawnEffectsAtAttachmentPoints, object);
         }
     }
 }
@@ -351,29 +355,29 @@ extern float ref_L03_003C4240_05 __attribute__((sda));
 
 /* Turns the object with its state: it stops when the state has no time left, otherwise it
    spreads the turn over the frame and lets the state and the object react to it. */
-void func_L03_003C4240(unsigned char *a0) {
-    unsigned char *s1 = *(unsigned char **)(a0 + 0x68);
-    unsigned char *v;
-    float f;
-    float g;
+void func_L03_003C4240(unsigned char *object) {
+    unsigned char *vars = *(unsigned char **)(object + 0x68);
+    unsigned char *target;
+    float turnValue;
+    float turnSize;
 
-    f = func_00282DF0((float *)(s1 + 0x1B0));
-    if (f <= 0.0f)
+    turnValue = FastVecLength((float *)(vars + 0x1B0));
+    if (turnValue <= 0.0f)
         return;
-    g = func_00282DF0((float *)(s1 + 0x1B0));
-    if (g > 0.016666668f) {
-        f = func_00283248(*(float *)(s1 + 0x1B0), *(float *)(s1 + 0x1B4));
-        f = func_00283B98(f, 3.14159274f);
-        ref_L03_003C4240_00(a0, f);
+    turnSize = FastVecLength((float *)(vars + 0x1B0));
+    if (turnSize > 0.016666668f) {
+        turnValue = FastMatrixHelperA(*(float *)(vars + 0x1B0), *(float *)(vars + 0x1B4));
+        turnValue = FastAddRotations(turnValue, 3.14159274f);
+        ref_L03_003C4240_00(object, turnValue);
     }
-    ref_L03_003C4240_01(a0, a0 + 0x10, 0x10, *(float *)(a0 + 0xF8),
+    ref_L03_003C4240_01(object, object + 0x10, 0x10, *(float *)(object + 0xF8),
                         ref_L03_003C4240_05 * 0.016666668f,
                         ref_L03_003C4240_04 * 0.00027777778f);
-    ref_L03_003C4240_02(*(void **)(s1 + 0x220), a0 + 0x10, s1 + 0x368);
-    v = *(unsigned char **)(s1 + 0x194);
-    if (v != 0) {
-        if (*(short *)(v + 0xAA) == 0x940 || *(short *)(v + 0xAA) == 0x93C ||
-            *(short *)(v + 0xAA) == 0x964)
-            ref_L03_003C4240_03(*(unsigned char **)(s1 + 0x194), a0 + 0x10);
+    ref_L03_003C4240_02(*(void **)(vars + 0x220), object + 0x10, vars + 0x368);
+    target = *(unsigned char **)(vars + 0x194);
+    if (target != 0) {
+        if (*(short *)(target + 0xAA) == 0x940 /* Bridgebot */ || *(short *)(target + 0xAA) == 0x93C /* moby class 2364 */ ||
+            *(short *)(target + 0xAA) == 0x964)
+            ref_L03_003C4240_03(*(unsigned char **)(vars + 0x194), object + 0x10);
     }
 }

@@ -1,25 +1,26 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     char pad_000[0xBF8];
-    int field_BF8;
+    int heldWeapon;
     char pad_BFC[0x1230 - 0xBFC];
-    int field_1230;
+    int buttonMask;
     char pad_1234[0x1240 - 0x1234];
-    int field_1240;
+    int frameCount;
     char pad_1244[0x1450 - 0x1244];
-    int field_1450;
+    int selectedWeapon;
     char pad_1454[0x2294 - 0x1454];
-    int field_2294;
+    int mode;
     char pad_2298[0x22BC - 0x2298];
-    unsigned char field_22BC;
+    unsigned char locked;
     char pad_22BD[0x2534 - 0x22BD];
-    int field_2534;
+    int cooldown;
 } HeroState;
 
 typedef struct {
     char pad[0x1A0];
-    int field_1A0, field_1A4;
+    int pressed, released;
 } InputState;
 
 typedef struct {
@@ -50,58 +51,59 @@ extern void func_0029FCC0(char *, int, void *);
 extern char *func_L00_003DBF50(char *, int, void *, void *);
 extern void ref_L00_003EA540_00(void *, char *);
 
+/* Updates the Meteor Gun weapon: fires a shot when the player presses the button and the gun is ready. */
 void func_L00_003EA540(char *self)
 {
     float v[4];
     int tmp[4];
-    char *st = *(char **)(self + 0x68);
+    char *vars = *(char **)(self + 0x68);
     int ready = 1;
     char *shot;
 
-    if (D_00189E20.field_2294 == 0x1D) {
-        if (!func_00282948(&D_00189E20.field_2534))
+    if (gHeroState.mode == 0x1D) {
+        if (!FastFloatHelperD(&gHeroState.cooldown))
             ready = 0;
     } else {
-        D_00189E20.field_2534 = 40;
+        gHeroState.cooldown = 40;
     }
     if (*(unsigned char *)(self + 0x42) == *(unsigned char *)(self + 0x43) &&
         (*(unsigned char *)(self + 0x60) & 2))
-        func_002A75E0(self, 1, 0, 2, 0);
-    if (D_00189E20.field_1450)
-        D_00189E20.field_BF8 = D_00189E20.field_1450;
+        StartAnimationBlendedWithFlags(self, 1, 0, 2, 0);
+    if (gHeroState.selectedWeapon)
+        gHeroState.heldWeapon = gHeroState.selectedWeapon;
 
     switch (*(unsigned char *)(self + 0x20)) {
     case 0:
         self[0x20] = 1;
-        *(int *)(st + 0xC) = 0;
-        *(int *)st = 0;
-        *(int *)(st + 4) = func_L00_00329E90(self, 0, tmp);
-        *(int *)(st + 8) = func_L00_0032A088(*(short *)(self + 0xAA), *(int *)(st + 4));
+        *(int *)(vars + 0xC) = 0;
+        *(int *)vars = 0;
+        *(int *)(vars + 4) = AcquireEntitySlot(self, 0, tmp);
+        *(int *)(vars + 8) = GetSlotBody(*(short *)(self + 0xAA), *(int *)(vars + 4));
         /* Fall through. */
     case 1:
-        if (func_002829D8(st) && ready && D_00189E20.field_1240 >= 23 &&
-            (D_00138180.field_1A0 & D_00189E20.field_1230) &&
-            !D_00189E20.field_22BC && func_L00_002D3F30(-1, 1)) {
-            func_00282C88(v);
+        if (FastVectorHelperB(vars) && ready && gHeroState.frameCount >= 23 &&
+            (gPadState.pressed & gHeroState.buttonMask) &&
+            !gHeroState.locked && SpendWeaponAmmo(-1, 1)) {
+            ClearVector128(v);
             v[1] = -1.0f;
-            func_00283098(v, v, self + 0xC0);
-            func_0029FCC0(self, 0, D_L00_001B2B90);
-            shot = func_L00_003DBF50(self, *(int *)(st + 4), D_L00_001B2B90, v);
-            func_002E5CF8(0, 0, self);
+            matrix_mul_vec3(v, v, self + 0xC0);
+            TransformMobyJointToWorld(self, 0, D_L00_001B2B90);
+            shot = SpawnSmallProjectile(self, *(int *)(vars + 4), D_L00_001B2B90, v);
+            PlayMobySound(0, 0, self);
             if (*(unsigned char *)(self + 0x43) != 2)
-                func_002A7470(self, 2, 0, 0);
+                StartAnimationBlended(self, 2, 0, 0);
             *(float *)(self + 0x48) = 2.0f;
             if (shot)
                 *(char **)(shot + 0xB8) = self;
             {
-                int selected = D_00139568.selected;
-                Entry *entry = &D_L00_00262570[selected];
-                *(float *)st = 1.0f / entry->rate;
+                int selected = gItemSlotToRecord.selected;
+                Entry *entry = &gWeaponTable_L00[selected];
+                *(float *)vars = 1.0f / entry->rate;
             }
-        } else if ((D_00138180.field_1A4 & D_00189E20.field_1230) &&
-                   !func_L00_002D4040(-1) && !D_00189E20.field_22BC) {
-            func_002E5CF8(2, 0, self);
+        } else if ((gPadState.released & gHeroState.buttonMask) &&
+                   !get_ammo(-1) && !gHeroState.locked) {
+            PlayMobySound(2, 0, self);
         }
     }
-    ref_L00_003EA540_00(func_L00_003EA7D0, self);
+    ref_L00_003EA540_00(DrawMeteorGunGlow, self);
 }

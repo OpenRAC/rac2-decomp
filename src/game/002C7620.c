@@ -12,28 +12,29 @@ extern void func_00282CF0(void *, void *, void *);
 extern float func_00283CE0(int);
 extern int func_00283CF0(float);
 
+/* Updates a streak particle that stretches along its movement and fades out. */
 void func_002C7620(char *self) {
-    Vec4 buf, offset;
-    char *s0;
-    char *s2 = self + 0x30;
+    Vec4 prevPos, offset;
+    char *pos;
+    char *motion = self + 0x30;
     float t;
     int color;
 
-    if (func_00282978(self + 0xA) != 0) {
-        func_002B9180(self);
+    if (FastDecTimer(self + 0xA) != 0) {
+        KillParticle(self);
         return;
     }
-    s0 = self + 0x10;
-    buf.word = *(TI128 *)s0;
-    func_00282CC0(s0, s0, s2);
-    *(float *)(s2 + 8) = *(float *)(s2 + 8) - *(float *)(s2 + 0xC);
-    t = func_00282DF0(s2);
-    func_00282F20(&offset, s2, t * 0.4f);
-    func_00282CF0(self + 0x20, s0, &offset);
+    pos = self + 0x10;
+    prevPos.word = *(TI128 *)pos;
+    FastVecAdd(pos, pos, motion);
+    *(float *)(motion + 8) = *(float *)(motion + 8) - *(float *)(motion + 0xC);
+    t = FastVecLength(motion);
+    vec_scale_to_length(&offset, motion, t * 0.4f);
+    FastVecSub(self + 0x20, pos, &offset);
     *(float *)(self + 0x2C) = 1.0f;
     if (*(short *)(self + 0xA) < *(unsigned char *)(self + 8)) {
-        t = func_00283CE0(*(short *)(self + 0xA)) / func_00283CE0(*(unsigned char *)(self + 8));
-        color = (func_00283CF0(t * 127.0f) << 24) | 0x00FFFFFF;
+        t = IntToFloat(*(short *)(self + 0xA)) / IntToFloat(*(unsigned char *)(self + 8));
+        color = (FloatToInt(t * 127.0f) << 24) | 0x00FFFFFF;
         *(int *)(self + 0xC) = color;
         *(int *)(self + 4) = color;
     }

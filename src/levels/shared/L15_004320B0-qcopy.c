@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef unsigned char u8;
 extern char *func_0029EFD0(int);
@@ -6,8 +7,9 @@ extern int func_00283CF0(float);
 extern short D_L15_001B36A8[] __attribute__((sda));
 extern short D_L15_001B36B8[] __attribute__((sda));
 
-char *func_L15_004320B0(char *a0, char *a1) {
-    char *o = func_0029EFD0(0x11AA);
+/* Creates a timed effect moby of class 4522 between two points with a random timer. */
+char *func_L15_004320B0(char *origin, char *endPoint) {
+    char *o = CreateMoby(0x11AA /* moby class 4522 */);
     int i;
 
     if (o != 0) {
@@ -18,10 +20,10 @@ char *func_L15_004320B0(char *a0, char *a1) {
         *(short *)(o + 0x32) = 0xFF;
         *(u8 *)(o + 0x31) = 1;
         *(u8 *)(o + 0x20) = 1;
-        *(TI128 *)(st + 0x10) = *(TI128 *)a1;
-        *(TI128 *)st = *(TI128 *)a0;
-        *(TI128 *)(o + 0x10) = *(TI128 *)a0;
-        r = func_00283CF0(func_002A7878(6.0f, 10.0f));
+        *(TI128 *)(st + 0x10) = *(TI128 *)endPoint;
+        *(TI128 *)st = *(TI128 *)origin;
+        *(TI128 *)(o + 0x10) = *(TI128 *)origin;
+        r = FloatToInt(RandomFloatRange(6.0f, 10.0f));
         *(int *)(st + 0x50) = r;
         *(int *)(st + 0x54) = r * 2;
         for (i = 0; i < 3; i++) {

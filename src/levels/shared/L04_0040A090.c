@@ -4,29 +4,30 @@ extern void func_00282CF0(void *, void *, void *);
 extern float func_00282DF0(void *);
 extern void func_00282D30(void *, void *, float);
 
+/* Measures a path of 2D points: for each segment it stores the length, the direction and where the segment starts, and it gives the total length. */
 void func_L04_0040A090(int n, int (*pts)[2], float (*dirs)[4], float *lens, float *starts, float *total)
 {
-    float d[4] __attribute__((aligned(16)));
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float len;
+    float delta[4] __attribute__((aligned(16)));
+    float from[4] __attribute__((aligned(16)));
+    float to[4] __attribute__((aligned(16)));
+    float segLength;
     int i;
-    int j;
+    int next;
 
     *total = 0.0f;
-    for (i = 0; i < n - 1; i = j) {
-        j = i + 1;
-        a[0] = pts[i][0];
-        a[1] = pts[i][1];
-        a[2] = 0.0f;
-        b[0] = pts[j][0];
-        b[1] = pts[j][1];
-        b[2] = 0.0f;
-        func_00282CF0(d, b, a);
-        len = func_00282DF0(d);
-        lens[i] = len;
+    for (i = 0; i < n - 1; i = next) {
+        next = i + 1;
+        from[0] = pts[i][0];
+        from[1] = pts[i][1];
+        from[2] = 0.0f;
+        to[0] = pts[next][0];
+        to[1] = pts[next][1];
+        to[2] = 0.0f;
+        FastVecSub(delta, to, from);
+        segLength = FastVecLength(delta);
+        lens[i] = segLength;
         starts[i] = *total;
-        *total = *total + len;
-        func_00282D30(dirs[i], d, 1.0f / len);
+        *total = *total + segLength;
+        FastVecScale(dirs[i], delta, 1.0f / segLength);
     }
 }

@@ -11,33 +11,34 @@ extern void func_00282DD8(void *, void *, void *);
 extern void func_002ACEC0(void *, void *, void *, float);
 extern char ref_L00_00428CE0_00[];
 
-void func_L00_00428CE0(char *obj) {
-    char *aux = *(char **)(obj + 0x70);
-    char *a30 = aux + 0x30;
-    char *a40 = aux + 0x40;
-    float v[4] __attribute__((aligned(16)));
-    float w[4] __attribute__((aligned(16)));
-    float t[4] __attribute__((aligned(16)));
-    float scale, ang;
+/* Turns the camera smoothly to look at the hero's position, then rebuilds the camera's other two direction vectors. */
+void func_L00_00428CE0(char *camera) {
+    char *vars = *(char **)(camera + 0x70);
+    char *a30 = vars + 0x30;
+    char *a40 = vars + 0x40;
+    float aimPoint[4] __attribute__((aligned(16)));
+    float aimDir[4] __attribute__((aligned(16)));
+    float turnAxis[4] __attribute__((aligned(16)));
+    float scale, aimAngle;
 
-    qcopy(v, D_00189EA0);
-    v[2] += *(float *)(a40 + 0x4C);
-    func_00282CF0(w, v, obj + 0x30);
-    func_00282F20(w, w, 1.0f);
-    ang = 1.5707964f - func_002831B0(func_00282DB0(w, obj));
-    if (*(int *)(D_00189EA0 + 0x2214) == 0x24) {
+    qcopy(aimPoint, gHeroPosition);
+    aimPoint[2] += *(float *)(a40 + 0x4C);
+    FastVecSub(aimDir, aimPoint, camera + 0x30);
+    vec_scale_to_length(aimDir, aimDir, 1.0f);
+    aimAngle = 1.5707964f - FastAngleHelper(FastVecDot(aimDir, camera));
+    if (*(int *)(gHeroPosition + 0x2214) == 0x24) {
         *(float *)a30 = *(float *)a30 + 0.017f;
         if (1.0f < *(float *)a30)
             *(float *)a30 = 1.0f;
-        scale = ang * *(float *)a30;
+        scale = aimAngle * *(float *)a30;
     } else {
-        scale = func_002703B0(a30, 0.0f, ang, 0.02f, 0.175f, 0.0f);
+        scale = StepSpringDamperStored(a30, 0.0f, aimAngle, 0.02f, 0.175f, 0.0f);
     }
-    func_00282DD8(t, w, obj + 0x40);
-    func_002ACEC0(obj, obj + 0x40, t, scale);
-    func_00282F20(obj + 0x40, obj, 1.0f);
-    qcopy(obj, obj + 0x40);
-    func_00282DD8(obj + 0x10, obj, ref_L00_00428CE0_00);
-    func_00282F20(obj + 0x10, obj + 0x10, 1.0f);
-    func_00282DD8(obj + 0x20, obj + 0x10, obj);
+    FastVecCross(turnAxis, aimDir, camera + 0x40);
+    ApplyAxisRotationToQuaternion(camera, camera + 0x40, turnAxis, scale);
+    vec_scale_to_length(camera + 0x40, camera, 1.0f);
+    qcopy(camera, camera + 0x40);
+    FastVecCross(camera + 0x10, camera, ref_L00_00428CE0_00);
+    vec_scale_to_length(camera + 0x10, camera + 0x10, 1.0f);
+    FastVecCross(camera + 0x20, camera + 0x10, camera);
 }

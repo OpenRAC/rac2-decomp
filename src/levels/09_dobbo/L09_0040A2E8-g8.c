@@ -63,14 +63,15 @@ extern void func_002AEC48(char *, void *, int, float, float);
 #define F32(p, o) (*(float *)((p) + (o)))
 
 static inline float yawToHero(char *obj) {
-    char *hero = D_00189E20;
-    return func_00283248(F32(hero, 0xE0) - F32(obj, 0x10), F32(hero, 0xE4) - F32(obj, 0x14));
+    char *hero = gHeroState;
+    return FastMatrixHelperA(F32(hero, 0xE0) - F32(obj, 0x10), F32(hero, 0xE4) - F32(obj, 0x14));
 }
 
 static inline void updateJoint(char *obj, char *joint, int index, float speed, float rate) {
-    func_002AEC48(obj, joint, index, speed, rate);
+    UpdateEasedNode(obj, joint, index, speed, rate);
 }
 
+/* Per-frame update of the talking character (moby class 3678): it offers dialogue and rewards, then watches the hero with its head and eyes. */
 void func_L09_0040A2E8(char *obj) {
     float target[4], pos[4], delta[4];
     char *data = *(char **)(obj + 0x68);
@@ -79,7 +80,7 @@ void func_L09_0040A2E8(char *obj) {
     int active;
     u64 status;
 
-    func_L04_00423178(obj);
+    ResetMatchingMobyEffects(obj);
     switch (U8(obj, 0x20)) {
     case 0:
         if (D_001A7BD3) {
@@ -88,25 +89,25 @@ void func_L09_0040A2E8(char *obj) {
         }
         status = D_00139768.status;
         if (status >> 7) {
-            func_002A7750(obj, 6, -1);
+            SetMobyState(obj, 6, -1);
         } else if (D_001395B8.unlocked || (D_00139768.flags & 8)) {
-            func_002A7750(obj, 3, -1);
+            SetMobyState(obj, 3, -1);
         } else {
-            func_002A7750(obj, 1, -1);
+            SetMobyState(obj, 1, -1);
         }
         if (U8(obj, 0x20) == 3) {
-            if (!func_002ACBC8(HERO_POS, I32(data, 0x118)) || !D_001395B8.unlocked) {
+            if (!IsPointInCuboid(HERO_POS, I32(data, 0x118)) || !D_001395B8.unlocked) {
                 D_L09_001B15A0 = 1;
             }
         }
-        func_L01_003128C0(obj);
+        ResetMobyVarsDefaults(obj);
         break;
     case 1:
-        if (func_002ACBC8(HERO_POS, I32(data, 0x118))) {
-            if (func_00288AA0(D_L09_001BFC00, 99)) {
-                func_L01_003246D0(obj);
-                func_00288BE8(D_L09_001BFC00);
-                func_002A7750(obj, 2, -1);
+        if (IsPointInCuboid(HERO_POS, I32(data, 0x118))) {
+            if (PushRequestQueue(D_L09_001BFC00, 99)) {
+                ApplyIndexForKey(obj);
+                LaunchQueuedRequest(D_L09_001BFC00);
+                SetMobyState(obj, 2, -1);
             }
         }
         break;
@@ -116,33 +117,33 @@ void func_L09_0040A2E8(char *obj) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
-        if (!func_002F5D10()) {
+        if (!IsEitherModeTwo()) {
             D_L09_001B25A0[2] = 0;
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
-            func_002A7750(obj, 3, -1);
+            SetMobyState(obj, 3, -1);
             D_001395B8.unlocked = 1;
             D_001395B8.started = 1;
-            func_00288CB0(22, 1);
+            SetSmallDataValueAndRefresh(22, 1);
         }
         break;
     case 3:
-        if (func_002ACBC8(HERO_POS, I32(data, 0x118))) {
+        if (IsPointInCuboid(HERO_POS, I32(data, 0x118))) {
             if (D_001395B8.completed) {
-                if (func_00288AA0(D_L09_001BFC00, 103)) {
-                    func_00288AA0(D_L09_001BFC00, 11);
-                    func_L01_003246D0(obj);
-                    func_00288BE8(D_L09_001BFC00);
-                    func_002F5CC8();
+                if (PushRequestQueue(D_L09_001BFC00, 103)) {
+                    PushRequestQueue(D_L09_001BFC00, 11);
+                    ApplyIndexForKey(obj);
+                    LaunchQueuedRequest(D_L09_001BFC00);
+                    SetSlowdownFactorAndLowFpsFade();
                     D_L09_001B15A0 = 1;
-                    func_002A7750(obj, 5, -1);
+                    SetMobyState(obj, 5, -1);
                 }
             } else if (D_L09_001B2388 < 10 && D_001395B8.unlocked && !D_L09_001B15A0) {
-                if (func_00288AA0(D_L09_001BFC00, 102)) {
-                    func_00288BE8(D_L09_001BFC00);
-                    func_002F5CC8();
+                if (PushRequestQueue(D_L09_001BFC00, 102)) {
+                    LaunchQueuedRequest(D_L09_001BFC00);
+                    SetSlowdownFactorAndLowFpsFade();
                     D_L09_001B15A0 = 1;
-                    func_002A7750(obj, 4, -1);
+                    SetMobyState(obj, 4, -1);
                 }
             }
         }
@@ -153,13 +154,13 @@ void func_L09_0040A2E8(char *obj) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
-        if (!func_002F5D10()) {
-            func_002DF3F8(HERO_POS, HERO_ROT);
+        if (!IsEitherModeTwo()) {
+            CaptureCheckpointState(HERO_POS, HERO_ROT);
             D_L09_001B25A0[2] = 0;
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
-            func_0029B3E0(0, -1);
-            func_002A7750(obj, 3, -1);
+            MemcardSave(0, -1);
+            SetMobyState(obj, 3, -1);
         }
         break;
     case 5:
@@ -168,29 +169,29 @@ void func_L09_0040A2E8(char *obj) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
-        if (!func_002F5D10()) {
+        if (!IsEitherModeTwo()) {
             D_L09_001B25A0[2] = 0;
-            func_002AD7B8(11);
-            func_002AF0A8(11);
-            if (U8(obj, 0xB0) != 255 && !(U8(D_0019B2E8, U8(obj, 0xB0) + (D_001A79F0 << 4)) & 0x80)) {
-                func_002A0430(U8(obj, 0xB0));
+            MarkFlagAndAppendToList(11);
+            PlayIndexedSound(11);
+            if (U8(obj, 0xB0) != 255 && !(U8(D_0019B2E8, U8(obj, 0xB0) + (gCurrentMapIndex << 4)) & 0x80)) {
+                MarkTableEntryFlagged(U8(obj, 0xB0));
             }
-            func_002DF3F8(HERO_POS, HERO_ROT);
-            func_0029B3E0(0, -1);
+            CaptureCheckpointState(HERO_POS, HERO_ROT);
+            MemcardSave(0, -1);
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
-            func_0029F338(obj);
+            MarkMobySpawned(obj);
             return;
         }
         break;
     case 6:
-        if (func_002ACBC8(HERO_POS, I32(data, 0x118)) && D_L09_001B2388 < 10 && D_001395B8.unlocked
+        if (IsPointInCuboid(HERO_POS, I32(data, 0x118)) && D_L09_001B2388 < 10 && D_001395B8.unlocked
             && !D_L09_001B15A0) {
-            if (func_00288AA0(D_L09_001BFC00, 102)) {
-                func_00288BE8(D_L09_001BFC00);
-                func_002F5CC8();
+            if (PushRequestQueue(D_L09_001BFC00, 102)) {
+                LaunchQueuedRequest(D_L09_001BFC00);
+                SetSlowdownFactorAndLowFpsFade();
                 D_L09_001B15A0 = 1;
-                func_002A7750(obj, 7, -1);
+                SetMobyState(obj, 7, -1);
             }
         }
         break;
@@ -200,27 +201,27 @@ void func_L09_0040A2E8(char *obj) {
             U8(obj, 0x31) = 0;
             U16(obj, 0x34) |= 1;
         }
-        if (!func_002F5D10()) {
+        if (!IsEitherModeTwo()) {
             U8(obj, 0x31) = 1;
             U16(obj, 0x34) &= 0xFFFE;
             D_L09_001B25A0[2] = 0;
-            func_002A7750(obj, 8, -1);
-            func_002DF3F8(HERO_POS, HERO_ROT);
-            func_0029B3E0(0, -1);
-            func_0029F338(obj);
+            SetMobyState(obj, 8, -1);
+            CaptureCheckpointState(HERO_POS, HERO_ROT);
+            MemcardSave(0, -1);
+            MarkMobySpawned(obj);
             return;
         }
         break;
     }
 
     if (U8(obj, 0x20)) {
-        if (U8(obj, 0x43) == 1 && func_00282978(data + 0x114)) {
-            S16(data, 0x114) = func_00283CF0(func_002A7878(1200.0f, 2400.0f));
+        if (U8(obj, 0x43) == 1 && FastDecTimer(data + 0x114)) {
+            S16(data, 0x114) = FloatToInt(RandomFloatRange(1200.0f, 2400.0f));
             if (U8(obj, 0x43) != 2) {
-                func_002A7470(obj, 2, 0, 10);
+                StartAnimationBlended(obj, 2, 0, 10);
             }
         } else if ((U8(obj, 0x60) & 2) && U8(obj, 0x43) != 1) {
-            func_002A7470(obj, 1, 0, 10);
+            StartAnimationBlended(obj, 1, 0, 10);
         }
     }
 
@@ -229,23 +230,23 @@ void func_L09_0040A2E8(char *obj) {
     if (U8(obj, 0x43) == 1) {
         player = HERO_POS;
         active = 1;
-        if (func_00282E80(obj + 0x10, player) < 8.0f
-            && func_00283C80(F32(obj, 0xF8), yawToHero(obj)) < 1.57079649f) {
-            if (func_00282DF0(player + 0x90) > 0.01f) {
+        if (vec_distance_xy(obj + 0x10, player) < 8.0f
+            && FastDiffRots(F32(obj, 0xF8), yawToHero(obj)) < 1.57079649f) {
+            if (FastVecLength(player + 0x90) > 0.01f) {
                 S16(data, 0x110) = 120;
             } else {
-                func_00282978(data + 0x110);
+                FastDecTimer(data + 0x110);
             }
         } else if (S16(data, 0x110)) {
             S16(data, 0x110) = 0;
             qcopy(data + 0x100, HERO_AIM);
         }
-        if (func_00282978(data + 0x112)) {
-            S16(data, 0x112) = func_00283CF0(func_002A7878(180.0f, 300.0f));
-            randomYaw = func_00283B98(F32(obj, 0xF8), func_002A7878(-90.0f, 90.0f) * 0.017453294f);
-            pitch = func_002A7878(0.0f, 30.0f) * 0.017453294f;
-            func_002AF000(data + 0x100, 6.0f, randomYaw, pitch);
-            func_00282CC0(data + 0x100, data + 0x100, obj + 0x10);
+        if (FastDecTimer(data + 0x112)) {
+            S16(data, 0x112) = FloatToInt(RandomFloatRange(180.0f, 300.0f));
+            randomYaw = FastAddRotations(F32(obj, 0xF8), RandomFloatRange(-90.0f, 90.0f) * 0.017453294f);
+            pitch = RandomFloatRange(0.0f, 30.0f) * 0.017453294f;
+            BuildSphericalOffset(data + 0x100, 6.0f, randomYaw, pitch);
+            FastVecAdd(data + 0x100, data + 0x100, obj + 0x10);
         }
         if (S16(data, 0x110)) {
             qcopy(target, HERO_AIM);
@@ -257,9 +258,9 @@ void func_L09_0040A2E8(char *obj) {
     if (active) {
         qcopy(pos, obj + 0x10);
         pos[2] += 2.0f;
-        func_00282CF0(delta, target, pos);
-        yaw = func_00283BE0(func_00283248(delta[0], delta[1]), F32(obj, 0xF8));
-        pitch = -func_00283248(func_00282E20(delta), delta[2]);
+        FastVecSub(delta, target, pos);
+        yaw = fast_subtract_rotations(FastMatrixHelperA(delta[0], delta[1]), F32(obj, 0xF8));
+        pitch = -FastMatrixHelperA(vec_length_xy(delta), delta[2]);
         if (yaw > 1.57079649f) {
             yaw = 1.57079649f;
         } else if (yaw < -1.57079649f) {

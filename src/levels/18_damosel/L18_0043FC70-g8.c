@@ -14,6 +14,7 @@ extern void *func_002C2210(void *, int, int, int, int, void *, float, float, flo
  * within 1.5 units of D_00189EA0, set the collected flag and signal the linked
  * moby (or delete itself). Otherwise, once the linked moby is in state 0xFE/0xFD
  * (or there is none), wait 41 frames, make the two closing calls and delete itself. */
+/* Updates the ship part pickup (moby class 4682): it spins and sparkles, is collected when the hero gets close, then shows a message and removes itself. */
 void func_L18_0043FC70(u8 *obj) {
     float velocity[4] __attribute__((aligned(16)));
     float point[4] __attribute__((aligned(16)));
@@ -21,48 +22,48 @@ void func_L18_0043FC70(u8 *obj) {
     int i, sign, n;
     float size, angle, pitch;
     if (obj[0x20] == 0) {
-        if (D_001395B8[0x86] || D_001A7AF8[0x37]) {
-            func_0029F338(obj);
+        if (D_001395B8[0x86] || gItemOwnedFlags[0x37]) {
+            MarkMobySpawned(obj);
         } else {
-            *(float *)(obj + 0xf8) = func_00283B98(*(float *)(obj + 0xf8), 0.087266475f);
+            *(float *)(obj + 0xf8) = FastAddRotations(*(float *)(obj + 0xf8), 0.087266475f);
             for (i = 0; i < 2; i++) {
-                size = func_002A7878(2.0f, 5.0f);
-                sign = func_002A77E0(2);
+                size = RandomFloatRange(2.0f, 5.0f);
+                sign = RandomIntBelow(2);
                 if (!sign) sign--;
-                angle = func_002A7940();
-                pitch = func_002A7878(0.3490659f, 1.5358898639678955f);
-                func_002AF000(velocity, func_002A7878(0.05f, 0.1f), angle, pitch);
+                angle = RandomAngle();
+                pitch = RandomFloatRange(0.3490659f, 1.5358898639678955f);
+                BuildSphericalOffset(velocity, RandomFloatRange(0.05f, 0.1f), angle, pitch);
                 qcopy(point, obj + 0x10);
-                point[0] += func_002A78D8(0.0f, 0.15f);
-                point[1] += func_002A78D8(0.0f, 0.15f);
-                point[2] += func_002A78D8(0.0f, 0.15f);
-                func_002C2210(point, 3, 0x208020ff, 0, sign, velocity, size * 0.1f, size, 0.006f, 0);
-                func_002C2210(point, 3, 0x20ffffff, 1, -sign, velocity, size * 0.03f, size * 0.3f, 0.006f, 0);
+                point[0] += RandomSignedFloatRange(0.0f, 0.15f);
+                point[1] += RandomSignedFloatRange(0.0f, 0.15f);
+                point[2] += RandomSignedFloatRange(0.0f, 0.15f);
+                SpawnGroundEffectParticle(point, 3, 0x208020ff, 0, sign, velocity, size * 0.1f, size, 0.006f, 0);
+                SpawnGroundEffectParticle(point, 3, 0x20ffffff, 1, -sign, velocity, size * 0.03f, size * 0.3f, 0.006f, 0);
             }
-            if (func_00282E80(obj + 0x10, D_00189EA0) < 1.5f) {
+            if (vec_distance_xy(obj + 0x10, gHeroPosition) < 1.5f) {
                 D_001395B8[0x86] = 1;
                 if (*(int *)state != -1) {
-                    D_L18_001B281C[(*(int *)state << 8) + 0xbc] = 1;
+                    gMobyTable_L18[(*(int *)state << 8) + 0xbc] = 1;
                     obj[0x31] = 0;
                     *(u16 *)(obj + 0x34) |= 1;
-                    func_002A7750(obj, 1, -1);
+                    SetMobyState(obj, 1, -1);
                 } else {
-                    func_0029F338(obj);
+                    MarkMobySpawned(obj);
                 }
             }
         }
-    } else if (*(int *)state == -1 || D_L18_001B281C[(*(int *)state << 8) + 0x20] == 0xfe ||
-               D_L18_001B281C[(*(int *)state << 8) + 0x20] == 0xfd) {
+    } else if (*(int *)state == -1 || gMobyTable_L18[(*(int *)state << 8) + 0x20] == 0xfe ||
+               gMobyTable_L18[(*(int *)state << 8) + 0x20] == 0xfd) {
         u32 timer = *(u16 *)(obj + 0x96);
         u32 old = timer++;
         *(u16 *)(obj + 0x96) = timer;
         if (old > 40) {
-            func_002B0A18(0x1293, 120);
+            SetEntryValueByIndex(0x1293, 120);
             n = D_001395B8[0x86] ? 1 : 2;
             if (D_001395B8[0x89]) n--;
-            if (n > 0) func_00288E18(0xa0f, 0x66);
-            else func_00288E18(0xa10, 0x67);
-            func_0029F338(obj);
+            if (n > 0) RequestSubtitleVoiceLine(0xa0f, 0x66);
+            else RequestSubtitleVoiceLine(0xa10, 0x67);
+            MarkMobySpawned(obj);
         }
     }
 }

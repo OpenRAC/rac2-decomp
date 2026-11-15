@@ -26,6 +26,7 @@ extern int func_001163B0(void);
 extern char *func_002BDCE8(void *, int, float, float, float, float, void *, int, int);
 /* Spawns three particle bursts at obj when func_002A9640 returns a record, unless the record is
    type 1 and obj is class 0x956. Returns 1 if it spawned them. */
+/* Spawns flying pieces and sparks when the object is hit, and tells if a hit happened. */
 int func_L05_003CF350(char *obj)
 {
     float pos[4], base[4], offset[4], center[4], vel[4];
@@ -35,14 +36,14 @@ int func_L05_003CF350(char *obj)
     float radius, speed, angle, count, spread, size, a, b;
     int full;
 
-    r = func_002A9640(obj, 0x230000, 0);
+    r = FindOwnedEffectSlot(obj, 0x230000, 0);
     full = 255;
     *(unsigned char *)(obj + 0xa8) = full;
     if (r) {
         unsigned short id = *(unsigned short *)(obj + 0xaa);
 
         if ((unsigned char)r[0x28] != 1 || (short)id != 0x956) {
-            index = func_L05_003CFC28((short)id);
+            index = ClassIdToTableIndex((short)id);
             {
                 int kind = D_L05_001AFB80[index];
 
@@ -50,29 +51,29 @@ int func_L05_003CF350(char *obj)
                 speed = D_L05_001AFBDC * 0.01666666753590107f;
                 if ((unsigned char)r[0x28] == 0)
                     speed *= 3.0f;
-                func_00282F20(base, r + 0x10, speed);
-                if ((unsigned char)r[0x28] != 0 && func_002A77E0(4) == 0) {
-                    func_00282CF0(offset, obj + 0x10, D_L05_001B96C0);
-                    func_00282DD8(center, offset, D_L05_001B96C0 + 0x250);
-                    func_002ACEC0(offset, center, offset, func_002A7940());
-                    func_00282F20(offset, offset, D_L05_001AFBE0 * 0.01666666753590107f);
-                    func_00282CC0(base, base, offset);
+                vec_scale_to_length(base, r + 0x10, speed);
+                if ((unsigned char)r[0x28] != 0 && RandomIntBelow(4) == 0) {
+                    FastVecSub(offset, obj + 0x10, D_L05_001B96C0);
+                    FastVecCross(center, offset, D_L05_001B96C0 + 0x250);
+                    ApplyAxisRotationToQuaternion(offset, center, offset, RandomAngle());
+                    vec_scale_to_length(offset, offset, D_L05_001AFBE0 * 0.01666666753590107f);
+                    FastVecAdd(base, base, offset);
                 }
                 for (i = 0; i < D_L05_001AFBC8[index]; i++) {
                     char *p, *s;
                     float size, a, b;
 
-                    pos[0] = *(float *)(obj + 0x10) + func_002A78D8(0.0f, radius);
-                    pos[1] = *(float *)(obj + 0x14) + func_002A78D8(0.0f, radius);
-                    pos[2] = *(float *)(obj + 0x18) + func_002A78D8(0.0f, radius);
+                    pos[0] = *(float *)(obj + 0x10) + RandomSignedFloatRange(0.0f, radius);
+                    pos[1] = *(float *)(obj + 0x14) + RandomSignedFloatRange(0.0f, radius);
+                    pos[2] = *(float *)(obj + 0x18) + RandomSignedFloatRange(0.0f, radius);
                     p = func_L05_003CEFA0(obj, pos, kind);
                     if (p) {
                         s = *(char **)(p + 0x68);
                         size = D_L05_001AFBDC * 0.008333333767950535f;
-                        a = func_002A7940();
-                        b = func_002A7940();
-                        func_002AF000(center, size, a, b);
-                        func_00282CC0(s + 0x10, base, center);
+                        a = RandomAngle();
+                        b = RandomAngle();
+                        BuildSphericalOffset(center, size, a, b);
+                        FastVecAdd(s + 0x10, base, center);
                         p[0x20] = 2;
                     }
                 }
@@ -86,22 +87,22 @@ int func_L05_003CF350(char *obj)
                     kind = 0x971;
                 }
                 for (j = 0; j < D_L05_001AFB98[index]; j++) {
-                    pos[0] = *(float *)(obj + 0x10) + func_002A78D8(0.0f, radius);
-                    pos[1] = *(float *)(obj + 0x14) + func_002A78D8(0.0f, radius);
-                    pos[2] = *(float *)(obj + 0x18) + func_002A78D8(0.0f, radius);
+                    pos[0] = *(float *)(obj + 0x10) + RandomSignedFloatRange(0.0f, radius);
+                    pos[1] = *(float *)(obj + 0x14) + RandomSignedFloatRange(0.0f, radius);
+                    pos[2] = *(float *)(obj + 0x18) + RandomSignedFloatRange(0.0f, radius);
                     p = func_L05_003CEFA0(obj, pos, kind);
                     big = 0x956;
                     if (p) {
                         s = *(char **)(p + 0x68);
                         if (*(short *)(obj + 0xaa) == big) {
-                            func_00282CF0(center, pos, obj + 0x10);
-                            func_00282F20(center, center, size);
+                            FastVecSub(center, pos, obj + 0x10);
+                            vec_scale_to_length(center, center, size);
                         } else {
-                            a = func_002A7940();
-                            b = func_002A7940();
-                            func_002AF000(center, size, a, b);
+                            a = RandomAngle();
+                            b = RandomAngle();
+                            BuildSphericalOffset(center, size, a, b);
                         }
-                        func_00282CC0(s + 0x10, base, center);
+                        FastVecAdd(s + 0x10, base, center);
                         p[0x20] = 3;
                     }
                 }
@@ -111,9 +112,9 @@ int func_L05_003CF350(char *obj)
             count = (float)D_L05_001AFBB0[index];
             qcopy(center, obj + 0x10);
             if ((unsigned char)r[0x28] == 0) {
-                func_00282F20(base, D_L05_001B96C0 + 0x230, speed * 0.5f);
-                func_00282F20(vel, D_L05_001B96C0 + 0x230, 0.5f);
-                func_00282CC0(center, center, vel);
+                vec_scale_to_length(base, D_L05_001B96C0 + 0x230, speed * 0.5f);
+                vec_scale_to_length(vel, D_L05_001B96C0 + 0x230, 0.5f);
+                FastVecAdd(center, center, vel);
                 angle = 0.05000000447034836f;
                 if (*(short *)(obj + 0xaa) == 0x955) {
                     count = 40.0f;
@@ -129,21 +130,21 @@ int func_L05_003CF350(char *obj)
                 for (k = 0; (float)k < count; k++) {
                     int spin;
 
-                    pos[0] = center[0] + func_002A78D8(0.0f, radius);
-                    pos[1] = center[1] + func_002A78D8(0.0f, radius);
-                    pos[2] = center[2] + func_002A78D8(0.0f, radius);
-                    a = func_002A7940();
-                    b = func_002A7940();
-                    func_002AF000(vel, angle, a, b);
-                    func_00282CC0(vel, vel, base);
-                    spin = func_002A7820(-3, 3);
-                    p = func_002BDCE8(pos, spin, 0.0f, 1.0f, 1.0f, spread * 210000.0f, vel, color, 0);
+                    pos[0] = center[0] + RandomSignedFloatRange(0.0f, radius);
+                    pos[1] = center[1] + RandomSignedFloatRange(0.0f, radius);
+                    pos[2] = center[2] + RandomSignedFloatRange(0.0f, radius);
+                    a = RandomAngle();
+                    b = RandomAngle();
+                    BuildSphericalOffset(vel, angle, a, b);
+                    FastVecAdd(vel, vel, base);
+                    spin = RandomIntRange(-3, 3);
+                    p = SpawnSpinningSparkParticle(pos, spin, 0.0f, 1.0f, 1.0f, spread * 210000.0f, vel, color, 0);
                     if (p) {
                         *(short *)(p + 0xa) = 120;
                         s = p + 0x20;
-                        p[8] = func_002A77E0(255);
+                        p[8] = RandomIntBelow(255);
                         if ((unsigned short)(*(unsigned short *)(obj + 0xaa) - 0x953) < 3)
-                            p[3] = (func_001163B0() & 1) ? 0x44 : 0x48;
+                            p[3] = (Rand() & 1) ? 0x44 : 0x48;
                         else
                             p[3] = 0x44;
                         *(int *)(s + 4) = 2;

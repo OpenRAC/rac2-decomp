@@ -71,11 +71,12 @@ extern void func_L00_003DF6B0(s32, s32);
 extern void func_L00_002E6CF0(void *, void *);
 extern void func_L12_00418418(void);
 
+/* Updates a barrier field. It checks how deep the hero has pushed into it, knocks the hero back, and counts progress when the end is reached. */
 void func_L12_00417CA8(Moby7CA8 *self)
 {
-    V v, direction, rotation[3], matrix[4], hit, a, b, c, point, normal, tmp;
+    V offset, direction, rotation[3], matrix[4], hit, rayStart, rayEnd, pushDir, point, normal, tmp;
     u8 impulse[0x30] __attribute__((aligned(16)));
-    Vars7CA8 *s = self->vars;
+    Vars7CA8 *vars = self->vars;
     f32 length;
     s32 index;
     u16 rawIndex;
@@ -88,17 +89,17 @@ void func_L12_00417CA8(Moby7CA8 *self)
             goto active;
         {
             /* One 3-bit count per nibble; the low bit of the id picks the nibble. */
-            s32 bits = D_0019B4A8[(index >> 1) + (D_001A79F0[0] << 10)];
+            s32 bits = D_0019B4A8[(index >> 1) + (gCurrentMapIndex[0] << 10)];
             if (rawIndex & 1) {
                 if ((bits >> 4) & 7)
                     goto active;
-                func_002A7750(self, 1, -1);
+                SetMobyState(self, 1, -1);
             } else {
                 if (bits & 7) {
 active:
-                    func_002A7750(self, 2, -1);
+                    SetMobyState(self, 2, -1);
                 } else {
-                    func_002A7750(self, 1, -1);
+                    SetMobyState(self, 1, -1);
                 }
             }
         }
@@ -107,78 +108,78 @@ active:
         direction.q = 0;
         direction.f.z = 1;
         direction.f.w = 1;
-        func_00283098(&direction, &direction, &D_L12_001B2F8C[0][s->transform]);
-        length = func_00282DF0(&direction);
+        matrix_mul_vec3(&direction, &direction, &D_L12_001B2F8C[0][vars->transform]);
+        length = FastVecLength(&direction);
         {
-            V *transform = &D_L12_001B2F8C[0][s->transform].rows[7];
-            s->depth = 1;
-            func_002833F0(rotation, transform);
+            V *transform = &D_L12_001B2F8C[0][vars->transform].rows[7];
+            vars->depth = 1;
+            euler_rotation_basis(rotation, transform);
         }
-        func_00283698(matrix, rotation);
-        func_00283098(&hit, &D_L12_001B1BD0, &D_L12_001B2F8C[0][s->base].rows[4]);
-        a.q = 0;
-        b.q = 0;
-        a.f.x = 1;
-        a.f.w = 1;
-        b.f.x = 1;
-        b.f.w = 1;
-        func_00282CC0(&a, &a, &hit);
-        func_00283098(&a, &a, &D_L12_001B2F8C[0][s->base]);
-        func_00282CF0(&b, &D_L12_001B2F8C[0][s->base].rows[3], &a);
-        func_00282CC0(&a, &D_L12_001B2F8C[0][s->base].rows[3], &a);
-        a.f.z += 2.5f;
-        b.f.z += 2.5f;
-        s->hit = 0;
-        c.q = 0;
-        if (func_002761F8(&a, &b, 0x12, 0, 0)) {
+        matrix_from_basis_rows(matrix, rotation);
+        matrix_mul_vec3(&hit, &D_L12_001B1BD0, &D_L12_001B2F8C[0][vars->base].rows[4]);
+        rayStart.q = 0;
+        rayEnd.q = 0;
+        rayStart.f.x = 1;
+        rayStart.f.w = 1;
+        rayEnd.f.x = 1;
+        rayEnd.f.w = 1;
+        FastVecAdd(&rayStart, &rayStart, &hit);
+        matrix_mul_vec3(&rayStart, &rayStart, &D_L12_001B2F8C[0][vars->base]);
+        FastVecSub(&rayEnd, &D_L12_001B2F8C[0][vars->base].rows[3], &rayStart);
+        FastVecAdd(&rayStart, &D_L12_001B2F8C[0][vars->base].rows[3], &rayStart);
+        rayStart.f.z += 2.5f;
+        rayEnd.f.z += 2.5f;
+        vars->hit = 0;
+        pushDir.q = 0;
+        if (CollLine(&rayStart, &rayEnd, 0x12, 0, 0)) {
             V *collision = &D_L12_001C0240.point;
-            V *transform = &D_L12_001B2F8C[0][s->transform].rows[3];
-            s->hit = 1;
-            func_00282CF0(&v, collision, transform);
-            func_002830C0(&v, &v, matrix);
+            V *transform = &D_L12_001B2F8C[0][vars->transform].rows[3];
+            vars->hit = 1;
+            FastVecSub(&offset, collision, transform);
+            transform_vector(&offset, &offset, matrix);
             {
-                f32 numerator = -v.f.z;
+                f32 numerator = -offset.f.z;
                 f32 denominator = -length;
-                s->depth = numerator / denominator;
+                vars->depth = numerator / denominator;
             }
-            if (*(s16 *)(D_L12_001C0240.hit + 0xAA) == 0xFC4) {
-                func_002AD0E0(self, D_L12_001C0240.hit, &self->position, &self->rotation, &point, &normal);
+            if (*(s16 *)(D_L12_001C0240.hit + 0xAA) == 0xFC4 /* moby class 4036 */) {
+                TransformPointAndRotationByParent(self, D_L12_001C0240.hit, &self->position, &self->rotation, &point, &normal);
                 point.f.z = 0;
-                func_00282CF0(&tmp, &point, &self->position);
+                FastVecSub(&tmp, &point, &self->position);
                 point.q = tmp.q;
                 point.f.z = 0;
-                qcopy(&c, &point);
-                func_00282D30(&c, &c, D_L12_001B1BC4);
+                qcopy(&pushDir, &point);
+                FastVecScale(&pushDir, &pushDir, D_L12_001B1BC4);
             }
         }
-        qcopy(&point, &D_00189EA0);
+        qcopy(&point, &gHeroPosition);
         point.f.z += D_L12_001B1BC0;
-        if (func_002ACBC8(&point, s->transform)) {
-            func_00282CF0(&v, &D_00189EA0, &D_L12_001B2F8C[0][s->transform].rows[3]);
-            func_002830C0(&v, &v, matrix);
-            v.f.z = -v.f.z / -length;
-            if (v.f.z < s->depth - (D_L12_001B1BB0 / length) * 1.5f ||
-                v.f.z >= s->depth + (D_L12_001B1BB4 / length) * 0.5f ||
-                !s->hit || s->mode == 1) {
+        if (IsPointInCuboid(&point, vars->transform)) {
+            FastVecSub(&offset, &gHeroPosition, &D_L12_001B2F8C[0][vars->transform].rows[3]);
+            transform_vector(&offset, &offset, matrix);
+            offset.f.z = -offset.f.z / -length;
+            if (offset.f.z < vars->depth - (D_L12_001B1BB0 / length) * 1.5f ||
+                offset.f.z >= vars->depth + (D_L12_001B1BB4 / length) * 0.5f ||
+                !vars->hit || vars->mode == 1) {
                 normal.q = 0;
                 normal.f.z = -3;
-                func_00282CF0(&normal, &normal, &c);
-                func_002A8C00(&impulse, self, 0x10001, &normal, (f32)(D_001A7A00[0] / 2));
-                func_002A8E20(D_0018C0B0, &impulse);
+                FastVecSub(&normal, &normal, &pushDir);
+                make_hit_descriptor(&impulse, self, 0x10001, &normal, (f32)(D_001A7A00[0] / 2));
+                QueueMobyImpact(gHeroMoby_0018C0B0, &impulse);
             }
         }
-        point.f.z = D_L12_001B2F8C[0][s->transform].rows[3].f.z;
-        if (func_002ACBC8(&point, s->transform)) {
-            func_00282CF0(&v, &point, &D_L12_001B2F8C[0][s->transform].rows[3]);
-            func_002830C0(&v, &v, matrix);
+        point.f.z = D_L12_001B2F8C[0][vars->transform].rows[3].f.z;
+        if (IsPointInCuboid(&point, vars->transform)) {
+            FastVecSub(&offset, &point, &D_L12_001B2F8C[0][vars->transform].rows[3]);
+            transform_vector(&offset, &offset, matrix);
             {
-                f32 numerator = -v.f.z;
+                f32 numerator = -offset.f.z;
                 f32 denominator = -length;
-                v.f.z = numerator / denominator;
+                offset.f.z = numerator / denominator;
             }
-            if (func_00282C48(v.f.z + 1) < 0.01f && !s->done) {
+            if (FloatAbs(offset.f.z + 1) < 0.01f && !vars->done) {
                 u16 uid;
-                s->done = 1;
+                vars->done = 1;
                 uid = self->uid;
                 if (uid & 1) {
                     s32 tableIndex = ((s16)uid >> 1) + (D_001A79F0_gp << 10);
@@ -191,9 +192,9 @@ active:
                 }
             }
         }
-        if (s->other != -1 && func_002ACBC8(&point, s->other) && !s->done) {
+        if (vars->other != -1 && IsPointInCuboid(&point, vars->other) && !vars->done) {
             u16 uid;
-            s->done = 1;
+            vars->done = 1;
             uid = self->uid;
             if (uid & 1) {
                 s32 tableIndex = ((s16)uid >> 1) + (D_001A79F0_gp << 10);
@@ -205,15 +206,15 @@ active:
                     ++D_0019B4A8[tableIndex];
             }
         }
-        if (func_L12_003DE4B0() && !func_L00_003DE260()) {
+        if (IsTrackedObjectOpen() && !IsTrackedObjectActive()) {
             u8 *player = D_L12_001B090C[0];
             qcopy_nc(&normal, player + 0x10);
-            if (func_00282C48(*(f32 *)(player + 0x18) - D_L12_001B2F8C[0][s->transform].rows[3].f.z) < 2)
-                normal.f.z = D_L12_001B2F8C_gp[s->transform].rows[3].f.z;
-            if (func_002ACBC8(&normal, s->transform))
-                func_L00_003DF6B0(1, -1);
+            if (FloatAbs(*(f32 *)(player + 0x18) - D_L12_001B2F8C[0][vars->transform].rows[3].f.z) < 2)
+                normal.f.z = D_L12_001B2F8C_gp[vars->transform].rows[3].f.z;
+            if (IsPointInCuboid(&normal, vars->transform))
+                SetTrackedObjectState(1, -1);
         }
-        func_L00_002E6CF0(func_L12_00418418, self);
+        AddDrawCallbackToList1(DrawBarrierFieldStrips, self);
         break;
     }
 }

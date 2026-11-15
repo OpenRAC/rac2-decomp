@@ -24,34 +24,34 @@ extern void func_L00_002E6CF0(void *, void *);
 
 /* Same shape as func_L02_003FF9A0: the selection moves to the next usable table entry (this
    table has 13 entries and only the record of entry 8 is checked). */
-void func_L11_00445990(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
+void func_L11_00445990(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     s32 i;
-    L11_00445990_Rec *r;
+    L11_00445990_Rec *record;
 
     if (D_0018C0B4 != 0x6F)
-        func_L11_002D8EF8(0x6F, 1);
-    if (func_L00_0032EF10(0x40, 0x3C, 0) != 0) {
-        func_002A7750(a0, 7, -1);
+        EnterHeroState_L11(0x6F, 1);
+    if (PadPressedWithin(0x40, 0x3C, 0) != 0) {
+        SetMobyState(moby, 7, -1);
         *(s16 *)(state + 0x1E8) = *(u16 *)(state + 0x1F0);
         D_001395B8[0x49] = *(u8 *)(state + 0x1E8);
         for (i = *(s16 *)(state + 0x1E8) + 1; i < 0xD; i++) {
-            if (D_001395B8[func_L11_0043E108(*(s32 *)(ref_L11_00445990_00[i] + 8))] == 0)
+            if (D_001395B8[GetChallengeFlagIndex(*(s32 *)(ref_L11_00445990_00[i] + 8))] == 0)
                 continue;
-            if (i >= 0xB && func_00288D58() == 0)
+            if (i >= 0xB && IsFlagByteSet() == 0)
                 continue;
             if (i == 8) {
-                r = &D_L11_00279BA0[D_00139568[0x1E]];
-                if (r->f4 == 0)
+                record = &D_L11_00279BA0[gItemSlotToRecord[0x1E]];
+                if (record->f4 == 0)
                     continue;
             }
             *(s16 *)(state + 0x1E8) = i;
             D_001395B8[0x49] = *(u8 *)(state + 0x1E8);
             return;
         }
-    } else if (func_L00_0032EF10(0x10, 0x3C, 0) != 0) {
-        func_L11_004425C8(a0);
+    } else if (PadPressedWithin(0x10, 0x3C, 0) != 0) {
+        ResetArenaEncounter(moby);
     } else {
-        func_L00_002E6CF0(func_L11_004456A0, a0);
+        AddDrawCallbackToList1(DrawJobaMenuHeaderAndCountBox, moby);
     }
 }

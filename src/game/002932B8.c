@@ -9,26 +9,26 @@
 extern void func_00292B88();
 extern void func_00292EB0();
 
-void func_002932B8(s32 *a0, u8 *b, u8 *c, s32 n) {
-    s32 i, j, cnt, lo, idx;
-    s32 *e, *nx;
-    s32 *p = a0;
-    for (i = 0; i < n; i++) {
-        nx = p + 4;
-        cnt = p[1] >> 16;
-        lo = p[1] & 0xFFFF;
-        p[1] = lo;
-        e = (s32 *)((u8 *)p[0] + ((lo - cnt) << 4));
-        for (j = 0; j < cnt; j += 4) {
-            idx = e[8];
-            if (idx >= 0) idx = c[idx];
-            if (b) {
-                func_00292B88(e, b + (idx << 4), e[0], e[1], e[4], e[5], idx);
+void func_002932B8(s32 *batches, u8 *textureTable, u8 *indexMap, s32 batchCount) {
+    s32 i, j, entryCount, lastIndex, textureIndex;
+    s32 *entry, *nextBatch;
+    s32 *batch = batches;
+    for (i = 0; i < batchCount; i++) {
+        nextBatch = batch + 4;
+        entryCount = batch[1] >> 16;
+        lastIndex = batch[1] & 0xFFFF;
+        batch[1] = lastIndex;
+        entry = (s32 *)((u8 *)batch[0] + ((lastIndex - entryCount) << 4));
+        for (j = 0; j < entryCount; j += 4) {
+            textureIndex = entry[8];
+            if (textureIndex >= 0) textureIndex = indexMap[textureIndex];
+            if (textureTable) {
+                build_indexed_resident_render_packet(entry, textureTable + (textureIndex << 4), entry[0], entry[1], entry[4], entry[5], textureIndex);
             } else {
-                func_00292EB0((unsigned long *)e, e[0], e[1], e[4], e[5], idx);
+                BuildTexturePacketWords((unsigned long *)entry, entry[0], entry[1], entry[4], entry[5], textureIndex);
             }
-            e += 16;
+            entry += 16;
         }
-        p = nx;
+        batch = nextBatch;
     }
 }

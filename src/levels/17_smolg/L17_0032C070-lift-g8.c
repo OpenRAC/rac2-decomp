@@ -110,37 +110,37 @@ void func_L17_003C3330(Moby *moby)
     Vec *velocity;
 
     qcopy(&old, &moby->position);
-    path = D_L17_001FE880[vars->path];
+    path = gPathTable_L17[vars->path];
     switch (moby->state) {
     case 0:
         /* Waiting at one end. */
         vars->sound = -1;
-        if (D_00189E20.groundMoby == moby && D_00189E20.groundedFrames) {
-            if (vars->needsTrigger && !func_002B38B8(moby))
+        if (gHeroState.groundMoby == moby && gHeroState.groundedFrames) {
+            if (vars->needsTrigger && !IsThirdPendingFlagSet(moby))
                 goto finish;
-            func_002B0C28(8, 0x279A, 1);
+            TryClaimNotice(8, 0x279A, 1);
             if (D_00138324[0] & 0x10) {
                 if (!vars->atLast) {
-                    func_002A7750(moby, 4, -1);
+                    SetMobyState(moby, 4, -1);
                     velocity = &vars->velocity;
                     vars->point = 1;
-                    func_00282CF0(velocity, &path->points[1], &path->points[0]);
-                    func_00282F20(velocity, velocity, D_L17_001B0220 * 0.016666668f);
+                    FastVecSub(velocity, &path->points[1], &path->points[0]);
+                    vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.016666668f);
                 } else {
-                    func_002A7750(moby, 5, -1);
+                    SetMobyState(moby, 5, -1);
                     velocity = &vars->velocity;
                     point = path->count - 2;
                     vars->point = point;
-                    func_00282CF0(velocity, &path->points[point], &path->points[point + 1]);
-                    func_00282F20(velocity, velocity, D_L17_001B0220 * 0.016666668f);
+                    FastVecSub(velocity, &path->points[point], &path->points[point + 1]);
+                    vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.016666668f);
                 }
                 break;
             }
         }
-        if (moby->position.f[2] + 10.0f < D_00189E20.moby->position.f[2] && vars->atLast) {
+        if (moby->position.f[2] + 10.0f < gHeroState.moby->position.f[2] && vars->atLast) {
             qcopy(&moby->position, &path->points[0]);
             vars->atLast = 0;
-        } else if (D_00189E20.moby->position.f[2] < moby->position.f[2] - 10.0f && !vars->atLast) {
+        } else if (gHeroState.moby->position.f[2] < moby->position.f[2] - 10.0f && !vars->atLast) {
             qcopy(&moby->position, &path->points[path->count - 1]);
             vars->atLast = 1;
             moby->position.f[2] += 0.2f;
@@ -149,38 +149,38 @@ void func_L17_003C3330(Moby *moby)
 
     case 4:
         /* Leaving the first point. */
-        if (func_002B3868(moby))
-            func_L00_002D40A0(&moby->position, 0, moby->rotation.f[2]);
-        if (func_L00_002D40F0() == 1)
+        if (SetFirstPendingFlag(moby))
+            StartHeroTargetState(&moby->position, 0, moby->rotation.f[2]);
+        if (GetHeroTargetStateKind() == 1)
             goto finish;
-        func_002A7750(moby, 1, -1);
+        SetMobyState(moby, 1, -1);
         break;
 
     case 5:
         /* Leaving the last point. */
-        if (func_002B3868(moby))
-            func_L00_002D40A0(&moby->position, 0, moby->rotation.f[2]);
-        if (func_L00_002D40F0() == 1)
+        if (SetFirstPendingFlag(moby))
+            StartHeroTargetState(&moby->position, 0, moby->rotation.f[2]);
+        if (GetHeroTargetStateKind() == 1)
             goto finish;
-        func_002A7750(moby, 3, -1);
+        SetMobyState(moby, 3, -1);
         break;
 
     case 1:
         /* Travelling to the last point. */
-        if (func_002B3868(moby))
+        if (SetFirstPendingFlag(moby))
             vars->verticalSpeed = 0.0f;
         {
-            SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
+            SoundVoice *voice = (SoundVoice *)&gSoundState[vars->sound];
 
             if (voice->owner != moby || !voice->active)
-                vars->sound = func_002E5CF8(0, 4, moby);
+                vars->sound = PlayMobySound(0, 4, moby);
         }
-        if (func_L06_003E3ED0(moby)) {
-            D_00189E20.f212 = 4;
-            D_00189E20.f214 = 4;
-            func_L17_003C3250(moby);
+        if (IsHeroOnMoby(moby)) {
+            gHeroState.f212 = 4;
+            gHeroState.f214 = 4;
+            AttachPathToLiftTransform(moby);
             if (!vars->hasRecord) {
-                float *record = func_L00_002D70A0(5);
+                float *record = AllocCameraOverrideSlot(5);
                 float value;
 
                 vars->record = record;
@@ -193,20 +193,20 @@ void func_L17_003C3330(Moby *moby)
                 }
             }
         }
-        func_002AA548(&moby->position.f[2], &vars->verticalSpeed,
+        StepValueTowardTarget(&moby->position.f[2], &vars->verticalSpeed,
                       path->points[path->count - 1].f[2], 0.0019444445f, 0.003888889f, 0.5f);
-        if (func_00282C48(moby->position.f[2] - path->points[path->count - 1].f[2]) < 0.2f) {
-            func_002A7750(moby, 0, -1);
+        if (FloatAbs(moby->position.f[2] - path->points[path->count - 1].f[2]) < 0.2f) {
+            SetMobyState(moby, 0, -1);
             sound = vars->sound;
             if (sound != -1) {
-                SoundVoice *voice = (SoundVoice *)&D_00188660[sound];
+                SoundVoice *voice = (SoundVoice *)&gSoundState[sound];
 
                 if (voice->owner == moby && voice->active)
-                    func_002E59F8(sound);
+                    StopSoundVoice(sound);
             }
             vars->sound = -1;
             if (vars->hasRecord) {
-                func_L00_002D7140(vars->record);
+                EndCameraOverride(vars->record);
                 vars->hasRecord = 0;
             }
             vars->atLast = !vars->atLast;
@@ -217,38 +217,38 @@ void func_L17_003C3330(Moby *moby)
         /* Stopped: when the count runs out, head back to the first point. */
         sound = vars->sound;
         if (sound != -1) {
-            SoundVoice *voice = (SoundVoice *)&D_00188660[sound];
+            SoundVoice *voice = (SoundVoice *)&gSoundState[sound];
 
             if (voice->owner == moby && voice->active)
-                func_002E59F8(sound);
+                StopSoundVoice(sound);
         }
         vars->sound = -1;
-        if (func_00282978(&vars->atLast)) {
-            func_002A7750(moby, 5, -1);
+        if (FastDecTimer(&vars->atLast)) {
+            SetMobyState(moby, 5, -1);
             velocity = &vars->velocity;
             point = vars->point - 1;
             vars->point = point;
-            func_00282CF0(velocity, &path->points[point], &path->points[point + 1]);
-            func_00282F20(velocity, velocity, D_L17_001B0220 * 0.016666668f);
+            FastVecSub(velocity, &path->points[point], &path->points[point + 1]);
+            vec_scale_to_length(velocity, velocity, D_L17_001B0220 * 0.016666668f);
         }
         break;
 
     case 3:
         /* Travelling to the first point. */
-        if (func_002B3868(moby))
+        if (SetFirstPendingFlag(moby))
             vars->verticalSpeed = 0.0f;
         {
-            SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
+            SoundVoice *voice = (SoundVoice *)&gSoundState[vars->sound];
 
             if (voice->owner != moby || !voice->active)
-                vars->sound = func_002E5CF8(0, 4, moby);
+                vars->sound = PlayMobySound(0, 4, moby);
         }
-        if (func_L06_003E3ED0(moby)) {
-            D_00189E20.f212 = 4;
-            D_00189E20.f214 = 4;
-            func_L17_003C3250(moby);
+        if (IsHeroOnMoby(moby)) {
+            gHeroState.f212 = 4;
+            gHeroState.f214 = 4;
+            AttachPathToLiftTransform(moby);
             if (!vars->hasRecord) {
-                float *record = func_L00_002D70A0(5);
+                float *record = AllocCameraOverrideSlot(5);
                 float value;
 
                 vars->record = record;
@@ -261,21 +261,21 @@ void func_L17_003C3330(Moby *moby)
                 }
             }
         }
-        func_002AA548(&moby->position.f[2], &vars->verticalSpeed,
+        StepValueTowardTarget(&moby->position.f[2], &vars->verticalSpeed,
                       path->points[0].f[2], 0.0019444445f, 0.003888889f, 0.5f);
-        if (func_00282C48(moby->position.f[2] - path->points[0].f[2]) < 0.2f) {
+        if (FloatAbs(moby->position.f[2] - path->points[0].f[2]) < 0.2f) {
             vars->atLast = 0;
-            func_002A7750(moby, 0, -1);
+            SetMobyState(moby, 0, -1);
             if (vars->hasRecord) {
-                func_L00_002D7140(vars->record);
+                EndCameraOverride(vars->record);
                 vars->hasRecord = 0;
             }
             sound = vars->sound;
             if (sound != -1) {
-                SoundVoice *voice = (SoundVoice *)&D_00188660[sound];
+                SoundVoice *voice = (SoundVoice *)&gSoundState[sound];
 
                 if (voice->owner == moby && voice->active)
-                    func_002E59F8(sound);
+                    StopSoundVoice(sound);
             }
             vars->sound = -1;
         }
@@ -283,10 +283,10 @@ void func_L17_003C3330(Moby *moby)
     }
 
 finish:
-    if (!func_L06_003E3ED0(moby) && vars->hasRecord) {
-        func_L00_002D7140(vars->record);
+    if (!IsHeroOnMoby(moby) && vars->hasRecord) {
+        EndCameraOverride(vars->record);
         vars->hasRecord = 0;
     }
-    func_00282CF0(&delta, &moby->position, &old);
-    func_002AD6F0(vars->motion, &delta, &moby->rotation, &moby->rotation);
+    FastVecSub(&delta, &moby->position, &old);
+    CombineTransformsAndStore(vars->motion, &delta, &moby->rotation, &moby->rotation);
 }

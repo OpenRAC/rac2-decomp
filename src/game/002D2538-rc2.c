@@ -38,34 +38,35 @@ s32 func_002A9588(s32, s32, s32, s32, s32);
 void func_00300A00(s32, s32, f32, f32, f32, f32, f32);
 s32 func_00336D50(s32, s32);
 
+/* Draws a paged menu screen with a title, left and right page arrows (shown only when there is a page to go to) and the back and select hints. */
 s32 func_002D2538(void) {
-    s32 s0;
-    s32 s1;
-    f32 zf;
+    s32 arrowColor;
+    s32 highlightColor;
+    f32 depth;
 
-    func_0027C540(0);
-    zf = 0.0f;
-    func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xE5), 0x60442D00, (f32) (D_001A7340 / 2), (f32) D_001ABA6C, 1.0f, D_001B23A8, zf);
-    func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xE4), 0x55F0C070, (f32) (D_001A7340 / 2), (f32) D_001ABA6C, 1.0f, D_001B23A8, zf);
-    s1 = func_002A9588(0x60241700, 0x55F0C070, 0x19, 0, 0);
+    SetupGifPaging(0);
+    depth = 0.0f;
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC + 0x8710, 0xE5), 0x60442D00, (f32) (gScreenWidth / 2), (f32) D_001ABA6C, 1.0f, D_001B23A8, depth);
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC + 0x8710, 0xE4), 0x55F0C070, (f32) (gScreenWidth / 2), (f32) D_001ABA6C, 1.0f, D_001B23A8, depth);
+    highlightColor = PingPongBlendValues(0x60241700, 0x55F0C070, 0x19, 0, 0);
     if (D_001ABA68 > 0) {
-        s0 = 0x80F0F0F0;
+        arrowColor = 0x80F0F0F0;
         if (!(D_00138340.w0 & 0x8000)) {
-            s0 = s1;
+            arrowColor = highlightColor;
         }
-        func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0x4B), s0, 216.0f, 373.0f, 1.0f, D_001B23A8 * 0.8f, zf);
-        func_0027FAA8(0x53, 0x171, 0x80F0F0F0, func_00288FB8(0x2F40), -1);
+        DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC + 0x8710, 0x4B), arrowColor, 216.0f, 373.0f, 1.0f, D_001B23A8 * 0.8f, depth);
+        DrawTextCenteredSmallFont(0x53, 0x171, 0x80F0F0F0, GetLocalizedString(0x2F40), -1);
     }
     if (D_001ABA68 < 6) {
-        s0 = 0x80F0F0F0;
+        arrowColor = 0x80F0F0F0;
         if (!(D_00138340.w0 & 0x2000)) {
-            s0 = s1;
+            arrowColor = highlightColor;
         }
-        func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0x4A), s0, 295.0f, 373.0f, 1.0f, D_001B23A8 * 0.8f, zf);
-        func_0027F980(0x1C1, 0x171, 0x80F0F0F0, func_00288FB8(0x2F41), -1);
+        DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC + 0x8710, 0x4A), arrowColor, 295.0f, 373.0f, 1.0f, D_001B23A8 * 0.8f, depth);
+        DrawTextRightAlignedSmallFont(0x1C1, 0x171, 0x80F0F0F0, GetLocalizedString(0x2F41), -1);
     }
-    func_0027FAA8(D_001A7340 / 2, 0x1D, 0x80F0F0F0, func_00288FB8(0x3294), -1);
-    func_0027FAA8(D_001A7340 / 2, 0x173, 0x80F0F0F0, func_00288FB8(0x2D4F), -1);
-    func_0027C660();
+    DrawTextCenteredSmallFont(gScreenWidth / 2, 0x1D, 0x80F0F0F0, GetLocalizedString(0x3294), -1);
+    DrawTextCenteredSmallFont(gScreenWidth / 2, 0x173, 0x80F0F0F0, GetLocalizedString(0x2D4F), -1);
+    DoGifPaging();
     return 0;
 }

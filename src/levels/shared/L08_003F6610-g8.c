@@ -37,127 +37,129 @@ extern u8 *func_L08_003F6018(void *,void *,void *);
 extern int func_L06_0035EA68(void *,void *);
 extern void func_002ABBB8(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 typedef struct { u8 pad[0x120]; float speed; int path,object; u16 delay, timer; u8 limit,count,nearest,pad2; int children[2]; int pad3; int targets[4]; } FVars;
-void func_L08_003F6610(u8 *m)
+/* Updates a Spawner (moby class 3098): it fires off child objects (each aimed at a target or
+   random spot) while it has some left, and removes itself when destroyed. */
+void func_L08_003F6610(u8 *moby)
 {
-    void *found;
+    void *foundChild;
     struct { TI128 target, direction, velocity, step; } frame;
-    u8 *p=*(u8 **)(m+0x68);
+    u8 *vars=*(u8 **)(moby+0x68);
     int index;
 
-    void *a2,*t0;
-    int a3,t1;
-    func_L08_003F6348(m,p);
-    if(m[0x31] && func_00282E48(m+0x10,D_L08_001B9B00)<24.0f) {
-        func_002A93B0(m);m[0x6f]=0x16;
+    void *pathArg,*targetPos;
+    int pathFlag,targetId;
+    UpdateDestructibleObject(moby,vars);
+    if(moby[0x31] && fast_vec_dist(moby+0x10,D_L08_001B9B00)<24.0f) {
+        UpdateMobyGroundCheck(moby);moby[0x6f]=0x16;
     }
-    switch(m[0x20]) {
+    switch(moby[0x20]) {
     case 0:
         if(D_L08_001B2508) {
             int i;
-            found=0;
+            foundChild=0;
             for(i=0;i<2;i++) {
-                while(!func_002A8600(&found,((FVars *)p)->children[i],0,0)) func_0029F338(found);
+                while(!GetFirstMobyInGroup(&foundChild,((FVars *)vars)->children[i],0,0)) MarkMobySpawned(foundChild);
             }
-            m[0x20]=1;
+            moby[0x20]=1;
         }
-        p[0x29]=1;
+        vars[0x29]=1;
         break;
     case 1:
-        if(!func_00282978(p+0x12e)) break;
-        if(!func_002A77E0(7)) {
-            a2=0;a3=0;t0=0;t1=0;
-            if(E_I(p,0x124)!=-1) {a2=p+0x124;a3=1;}
-            if(E_I(p,0x128)!=-1) {u8 *obj=D_L08_001FE7C0[E_I(p,0x128)];t1=E_I(obj,0);t0=obj+0x10;}
-            func_L04_003429F8(m,p+0xc0,a2,a3,t0,t1,E_F(p,0x120));
+        if(!FastDecTimer(vars+0x12e)) break;
+        if(!RandomIntBelow(7)) {
+            pathArg=0;pathFlag=0;targetPos=0;targetId=0;
+            if(E_I(vars,0x124)!=-1) {pathArg=vars+0x124;pathFlag=1;}
+            if(E_I(vars,0x128)!=-1) {u8 *target=D_L08_001FE7C0[E_I(vars,0x128)];targetId=E_I(target,0);targetPos=target+0x10;}
+            FindHeroOrMobyTarget(moby,vars+0xc0,pathArg,pathFlag,targetPos,targetId,E_F(vars,0x120));
         } else {
-            u8 *obj=*(u8 **)(p+0x100);
-            if(obj && obj[0x20]!=0xfe && obj[0x20]!=0xfd) qcopy(p+0xc0,obj+0x10);
-            else {E_I(p,0x100)=0;E_I(p,0x104)=2;}
+            u8 *target=*(u8 **)(vars+0x100);
+            if(target && target[0x20]!=0xfe && target[0x20]!=0xfd) qcopy(vars+0xc0,target+0x10);
+            else {E_I(vars,0x100)=0;E_I(vars,0x104)=2;}
         }
-        if(E_I(p,0x104)==2) break;
-        index=func_L08_003F6568(m,p);
-        if(p[0x130]>p[0x131] && index!=-1) {
-            m[0x20]=2;
-            if(m[0x43]!=1) func_002A7470(m,1,0,10);
+        if(E_I(vars,0x104)==2) break;
+        index=CountListEntries(moby,vars);
+        if(vars[0x130]>vars[0x131] && index!=-1) {
+            moby[0x20]=2;
+            if(moby[0x43]!=1) StartAnimationBlended(moby,1,0,10);
         }
         break;
     case 2: {
-        u8 *chosen;
-        float f;
-        if(m[0x60]&2) {
-            m[0x20]=1;
-            if(m[0x43]) func_002A7470(m,0,0,10);
+        u8 *chosenTarget;
+        float speed;
+        if(moby[0x60]&2) {
+            moby[0x20]=1;
+            if(moby[0x43]) StartAnimationBlended(moby,0,0,10);
             break;
         }
-        if(func_0029F530(m)!=12.0f) break;
-        chosen=0;
-        if(p[0x132]) {
+        if(GetMobyAnimationValue(moby)!=12.0f) break;
+        chosenTarget=0;
+        if(vars[0x132]) {
             int i;
-            float best, d;
+            float best, distance;
             best=100000.0f;
             for(i=0;i<4;i++) {
-                if(((FVars *)p)->targets[i]!=-1) {
-                    u8 *obj=D_L08_001B2ACC+((FVars *)p)->targets[i]*128;
-                    d=func_00282E48(D_00189EA0,obj+0x30);
-                    if(d<best) {chosen=obj;best=d;}
+                if(((FVars *)vars)->targets[i]!=-1) {
+                    u8 *target=D_L08_001B2ACC+((FVars *)vars)->targets[i]*128;
+                    distance=fast_vec_dist(gHeroPosition,target+0x30);
+                    if(distance<best) {chosenTarget=target;best=distance;}
                 }
             }
-            if(!chosen) {
-                func_00282CF0(&frame.target,p+0xc0,(m+0x10));
-                func_00282D30(&frame.target,&frame.target,0.5f);
-                if(E_F(p,0x120)>3.0f) func_00282FB8(&frame.target,&frame.target,3.0f);
-                if(func_00282DF0(&frame.target)<3.0f) func_00282F20(&frame.target,&frame.target,3.0f);
-                func_00282CC0(&frame.target,&frame.target,(m+0x10));
-            } else qcopy(&frame.target,chosen+0x30);
+            if(!chosenTarget) {
+                FastVecSub(&frame.target,vars+0xc0,(moby+0x10));
+                FastVecScale(&frame.target,&frame.target,0.5f);
+                if(E_F(vars,0x120)>3.0f) FastVectorDivideHelper(&frame.target,&frame.target,3.0f);
+                if(FastVecLength(&frame.target)<3.0f) vec_scale_to_length(&frame.target,&frame.target,3.0f);
+                FastVecAdd(&frame.target,&frame.target,(moby+0x10));
+            } else qcopy(&frame.target,chosenTarget+0x30);
         } else {
-            int k=func_002A7820(0,3);
+            int startSlot=RandomIntRange(0,3);
             int i;
             for(i=0;i<4;i++) {
-                int slot=(i+k)%4;
-                if(((FVars *)p)->targets[slot]!=-1) {
-                    chosen=D_L08_001B2ACC+((FVars *)p)->targets[slot]*128;
+                int slot=(i+startSlot)%4;
+                if(((FVars *)vars)->targets[slot]!=-1) {
+                    chosenTarget=D_L08_001B2ACC+((FVars *)vars)->targets[slot]*128;
                     break;
                 }
             }
-            if(!chosen) {
-                float radius=E_F(p,0x120);if(radius<3.0f) radius=3.0f;
-                func_L02_0031E9E8(&frame.target,radius);
-                func_00282CC0(&frame.target,&frame.target,(m+0x10));
-            } else qcopy(&frame.target,chosen+0x30);
+            if(!chosenTarget) {
+                float radius=E_F(vars,0x120);if(radius<3.0f) radius=3.0f;
+                RandomPlanarOffset(&frame.target,radius);
+                FastVecAdd(&frame.target,&frame.target,(moby+0x10));
+            } else qcopy(&frame.target,chosenTarget+0x30);
         }
-        if(chosen) {
-            func_00282D30(&frame.direction,chosen,func_002A7878(-1.0f,1.0f));
-            func_00282CC0(&frame.target,&frame.target,&frame.direction);
-            func_00282D30(&frame.direction,chosen+0x10,func_002A7878(-1.0f,1.0f));
-            func_00282CC0(&frame.target,&frame.target,&frame.direction);
+        if(chosenTarget) {
+            FastVecScale(&frame.direction,chosenTarget,RandomFloatRange(-1.0f,1.0f));
+            FastVecAdd(&frame.target,&frame.target,&frame.direction);
+            FastVecScale(&frame.direction,chosenTarget+0x10,RandomFloatRange(-1.0f,1.0f));
+            FastVecAdd(&frame.target,&frame.target,&frame.direction);
         }
-        {float height=func_002A89A8(&frame.target,0,0.5f);
+        {float height=ProbeGroundHeightBelow(&frame.target,0,0.5f);
         if(height!=0.0f) E_F(&frame.target,8)=height;}
-        func_00282CF0(&frame.direction,&frame.target,(m+0x10));
-        f=func_00282DF0(&frame.direction)/D_L08_001B0B5C<0.08000000566f ? func_00282DF0(&frame.direction)/D_L08_001B0B5C : 0.08000000566f;
-        func_00282F20(&frame.direction,&frame.direction,f);
-        func_0029FCC0(m,0,&frame.velocity);
-        func_00282F20(&frame.step,&frame.direction,0.05f);
-        func_002ACB48(&frame.step,0.025f);
-        func_00282CC0(&frame.velocity,&frame.velocity,&frame.step);
-        E_F(&frame.direction,8)=func_L00_0031CDD0(&frame.velocity,&frame.target,0,f,-0.002722222358f);
-        func_L08_003F6018(m,&frame.velocity,&frame.direction);
-        ((FVars *)p)->timer=((FVars *)p)->delay;
-        ((FVars *)p)->count++;
+        FastVecSub(&frame.direction,&frame.target,(moby+0x10));
+        speed=FastVecLength(&frame.direction)/D_L08_001B0B5C<0.08000000566f ? FastVecLength(&frame.direction)/D_L08_001B0B5C : 0.08000000566f;
+        vec_scale_to_length(&frame.direction,&frame.direction,speed);
+        TransformMobyJointToWorld(moby,0,&frame.velocity);
+        vec_scale_to_length(&frame.step,&frame.direction,0.05f);
+        AddRandomOffsetToVector(&frame.step,0.025f);
+        FastVecAdd(&frame.velocity,&frame.velocity,&frame.step);
+        E_F(&frame.direction,8)=ComputeShotLaunchSpeed(&frame.velocity,&frame.target,0,speed,-0.002722222358f);
+        AllocateOwnedPoolObject(moby,&frame.velocity,&frame.direction);
+        ((FVars *)vars)->timer=((FVars *)vars)->delay;
+        ((FVars *)vars)->count++;
         break;
     }
     case 3:
-        func_L06_0035EA68(m,p+0x60);
-        if(m[0x60]&2) {
-            m[0x20]=1;
-            if(m[0x43]) func_002A7470(m,0,0,20);
+        mine_fall(moby,vars+0x60);
+        if(moby[0x60]&2) {
+            moby[0x20]=1;
+            if(moby[0x43]) StartAnimationBlended(moby,0,0,20);
         }
         break;
     case 4:
-        if(func_L06_0035EA68(m,p+0x60)&0x40) {
-            func_00282F20(&frame.target,D_L08_001AC5E0,0.1666666716f);
-            func_002ABBB8(m,&frame.target,0,0.0f,0.0f,30,8,20,8.0f,4.0f,18.0f,1.0f,1,15.0f,1,1,-1,0,0x810001);
-            func_0029F338(m);
+        if(mine_fall(moby,vars+0x60)&0x40) {
+            vec_scale_to_length(&frame.target,D_L08_001AC5E0,0.1666666716f);
+            SpawnExplosionEffects(moby,&frame.target,0,0.0f,0.0f,30,8,20,8.0f,4.0f,18.0f,1.0f,1,15.0f,1,1,-1,0,0x810001);
+            MarkMobySpawned(moby);
         }
         break;
     }

@@ -14,38 +14,39 @@ extern char D_001B5340[];
 extern char *func_002BCF18(void *,void *,int,int,float,int,int);
 typedef struct { float v[4]; } GravityTable;
 extern GravityTable D_001AA350;
-void func_002BD0D0(char *p)
+/* Updates a falling drop. It falls, fades near the end and near the camera, and splashes into a small drop when it lands. */
+void func_002BD0D0(char *particle)
 {
- char *q=p+32,*pos;
+ char *motion=particle+32,*pos;
  struct { Quad saved; GravityTable gravity; } local;
- float f,d,size;
- int color,alpha,other,kind;
+ float lifeRatio,cameraDistance,size;
+ int color,alpha,endColor,dropType;
  local.gravity=D_001AA350;
- if(*(short *)(q+26)==3 && D_001B168C>0.95f) func_00282978(p+10);
- if(func_00282978(p+10)) {func_002B9180(p);return;}
- pos=p+16;
- f=func_00283CE0(*(short *)(p+10));
- *(int *)(p+4)=func_002A9568(*(int *)(q+20),*(int *)(q+16),f/func_00283CE0(*(short *)(q+24)));
- alpha=*(int *)(p+4)>>24;
- d=func_00282E48(pos,D_001B5340);
- if(*(short *)(p+10)<6) alpha=alpha* *(short *)(p+10)/6;
- if(d<4.0f) {func_002B9180(p);return;}
- if(d<8.0f) alpha=func_00283CF0(func_00283CE0(alpha)*(d-4.0f)*0.25f);
- *(int *)(p+4)=(alpha<<24)|(*(int *)(p+4)&0xffffff);
- func_00282CC0(pos,pos,q);
- kind=*(short *)(q+26);
- *(float *)(q+8)-=local.gravity.v[kind];
+ if(*(short *)(motion+26)==3 && D_001B168C>0.95f) FastDecTimer(particle+10);
+ if(FastDecTimer(particle+10)) {KillParticle(particle);return;}
+ pos=particle+16;
+ lifeRatio=IntToFloat(*(short *)(particle+10));
+ *(int *)(particle+4)=ForwardTwoValuesAndAmount(*(int *)(motion+20),*(int *)(motion+16),lifeRatio/IntToFloat(*(short *)(motion+24)));
+ alpha=*(int *)(particle+4)>>24;
+ cameraDistance=fast_vec_dist(pos,gCameraState_001B5340);
+ if(*(short *)(particle+10)<6) alpha=alpha* *(short *)(particle+10)/6;
+ if(cameraDistance<4.0f) {KillParticle(particle);return;}
+ if(cameraDistance<8.0f) alpha=FloatToInt(IntToFloat(alpha)*(cameraDistance-4.0f)*0.25f);
+ *(int *)(particle+4)=(alpha<<24)|(*(int *)(particle+4)&0xffffff);
+ FastVecAdd(pos,pos,motion);
+ dropType=*(short *)(motion+26);
+ *(float *)(motion+8)-=local.gravity.v[dropType];
  qcopy(&local.saved,pos);
- if(*(float *)(p+24)<*(float *)(q+12)) {
-  if(kind==1) {
-   f=func_002A7878(0.25f,1.0f);
-   color=func_002A9568(0x7f000000,0x7f182030,f);
-   f=func_002A7878(0.5f,1.0f);
-   other=func_002A9568(0,0x5f5f5f,f);
-   *(float *)(q+8)=0.0f;
-   size=func_002A7878(200000.0f,300000.0f);
-   func_002BCF18(pos,q,color,other,size,func_002A7820(90,150),3);
+ if(*(float *)(particle+24)<*(float *)(motion+12)) {
+  if(dropType==1) {
+   lifeRatio=RandomFloatRange(0.25f,1.0f);
+   color=ForwardTwoValuesAndAmount(0x7f000000,0x7f182030,lifeRatio);
+   lifeRatio=RandomFloatRange(0.5f,1.0f);
+   endColor=ForwardTwoValuesAndAmount(0,0x5f5f5f,lifeRatio);
+   *(float *)(motion+8)=0.0f;
+   size=RandomFloatRange(200000.0f,300000.0f);
+   SpawnFallingDropParticle(pos,motion,color,endColor,size,RandomIntRange(90,150),3);
   }
-  func_002B9180(p);
- } else p[8]=(unsigned char)p[8]+1;
+  KillParticle(particle);
+ } else particle[8]=(unsigned char)particle[8]+1;
 }

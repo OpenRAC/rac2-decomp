@@ -5,6 +5,7 @@
  * label floor after a call). The size window is written as retail's negated tests. */
 
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -38,43 +39,44 @@ typedef struct {
 /* Keeps the camera target on the object the slot holds: measures the object against the
    reference axis, refuses anything outside the size window, turns the angle to the slot's
    facing into a normalised elevation and folds it into the slot's level. */
-void func_L03_0043AD30(u8 *a0) {
+/* Checks whether this object is close enough and in front of the camera to become its aim target, and builds up the camera slot value. */
+void func_L03_0043AD30(u8 *moby) {
     u8 *base = D_L03_001B9840;
     u8 *cur = *(u8 **)(base + 0x190);
     AimSlot *slot;
-    f32 v[4];
+    f32 offset[4];
     f32 size;
     f32 dot;
     f32 angle;
 
     if (*(short *)(cur + 0x86) != 0)
         return;
-    if (func_00282C48(D_00138284[0]) > 0.05f)
+    if (FloatAbs(D_00138284[0]) > 0.05f)
         return;
-    func_00282CF0(v, (float *)(a0 + 0x10), (float *)D_L03_00189EA0);
+    FastVecSub(offset, (float *)(moby + 0x10), (float *)D_L03_00189EA0);
     slot = (AimSlot *)(base + 0x3A0);
-    size = func_00282DF0(v);
+    size = FastVecLength(offset);
     if (!(size < 22.0f))
         return;
     if (!(0.0f < size))
         return;
     if (!(size < slot->size))
         return;
-    if (!(0.0f < v[2]))
+    if (!(0.0f < offset[2]))
         return;
-    dot = func_00282DB0((float *)cur, v);
-    angle = 1.5707964f - func_002831B0(dot / size);
+    dot = FastVecDot((float *)cur, offset);
+    angle = 1.5707964f - FastAngleHelper(dot / size);
     if (angle < 1.1170108f) {
-        func_00282CF0(v, (float *)(a0 + 0x10), (float *)(cur + 0x30));
-        size = func_00282DF0(v);
+        FastVecSub(offset, (float *)(moby + 0x10), (float *)(cur + 0x30));
+        size = FastVecLength(offset);
         if (size == 0.0f)
             size = 0.0001f;
-        dot = func_00282DB0((float *)cur, v);
-        angle = 1.5707964f - func_002831B0(dot / size);
+        dot = FastVecDot((float *)cur, offset);
+        angle = 1.5707964f - FastAngleHelper(dot / size);
         if (angle < 0.6283186f) {
             slot->occupant = (u32)cur;
             slot->size = size;
-            slot->owner = (u32)a0;
+            slot->owner = (u32)moby;
             slot->level += D_L03_001B21B8;
             if (slot->level > 1.0f)
                 slot->level = 1.0f;

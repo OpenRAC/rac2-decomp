@@ -25,28 +25,29 @@
 
 extern s8 ref_L05_0037AA88_00[];
 
-s32 func_L05_0037AA88(s32 arg0) {
-    s32 k ;
-    s32 val ;
-    s8 *a2;
-    s8 *a3;
-    s32 var_a0;
-    s32 temp_a1;
+/* Follows the chain of slots from the given one and returns the first active slot, or -1. */
+s32 func_L05_0037AA88(s32 index) {
+    s32 stride ;
+    s32 active ;
+    s8 *nextField;
+    s8 *activeField;
+    s32 current;
+    s32 offset;
 
-    k = 0x28;
-    a2 = ref_L05_0037AA88_00;
-    a3 = a2 - 4;
-    var_a0 = arg0;
+    stride = 0x28;
+    nextField = ref_L05_0037AA88_00;
+    activeField = nextField - 4;
+    current = index;
 loop_1:
-    if (var_a0 < 0) {
+    if (current < 0) {
         goto end_1;
     }
-    temp_a1 = var_a0 * k;
-    val = *(s32 *)(temp_a1 + (s32)a3);
-    if (val != 0) {
-        return var_a0;
+    offset = current * stride;
+    active = *(s32 *)(offset + (s32)activeField);
+    if (active != 0) {
+        return current;
     }
-    var_a0 = *(s32 *)(temp_a1 + (s32)a2);
+    current = *(s32 *)(offset + (s32)nextField);
     goto loop_1;
 end_1:
     return -1;

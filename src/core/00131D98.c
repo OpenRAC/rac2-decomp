@@ -8,17 +8,18 @@ extern void func_0011AEA0(int);
 extern void ref_00131D98_00(void);
 
 /* Run each overlay entry, install the next binary, and synchronize its caches. */
+/* Runs each boot program in turn, loading the next one after each, forever. */
 void func_00131D98(void)
 {
     OverlayEntry entry;
 
-    func_0011FC48();
+    RunShutdownCallbacksOnce();
     entry = ref_00131D98_00;
     do {
         entry();
-        entry = func_00131CB8();
-        func_0011AEA0(0);
-        func_0011AEA0(2);
+        entry = LoadBootBinChunks();
+        FlushCache(0);
+        FlushCache(2);
     } while (1);
 }
 

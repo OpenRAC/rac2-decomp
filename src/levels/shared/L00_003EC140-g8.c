@@ -131,6 +131,7 @@ extern void func_002C2210(void *, int, int,int, int, void *, int,float, float,fl
 
 /* Update the three object states, emit fading particles, and orient the object
  * from the camera basis and its three stored angles. */
+/* Updates the Synthenoid flying robot: it follows the player, shoots at targets and fades away when done. */
 void func_L00_003EC140(Object *object)
 {
     Vec vector, matrix;
@@ -151,17 +152,17 @@ void func_L00_003EC140(Object *object)
     }
     if (state->disabled == 1)
         object->flags &= 0xFFBE;
-    if (((Material *)(D_00139587[0] * 224 + (char *)D_L00_00262570))->active &&
-        object->mode != 2 && func_L00_003D3DE0(D_0018C0B0, &object->position)) {
+    if (((Material *)(D_00139587[0] * 224 + (char *)gWeaponTable_L00))->active &&
+        object->mode != 2 && SpawnKilonoidMoby(gHeroMoby_0018C0B0, &object->position)) {
         qzero(&state->velocity);
         state->timer = D_L00_001B0768;
         if (state->slot != -1) {
-            entry = (Slot *)(D_00188660 + state->slot * 112);
+            entry = (Slot *)(gSoundState + state->slot * 112);
             if (entry->owner == object && entry->active)
-                func_002E59F8(state->slot);
+                StopSoundVoice(state->slot);
         }
         state->slot = -1;
-        func_002E5CF8(2, 0, object);
+        PlayMobySound(2, 0, object);
         object->mode = 2;
         return;
     }
@@ -176,24 +177,24 @@ void func_L00_003EC140(Object *object)
         state->flag = 0;
         state->timer = 0;
         if (object->anim_id)
-            func_002A7470(object, 0, 0, 10);
+            StartAnimationBlended(object, 0, 0, 10);
         object->color = 255;
         object->color2 = 255;
         state->count = 0;
         state->value30 = 0;
         state->value2c = D_L00_001B075C;
-        qcopy(&state->last_position, &D_00189E20.player);
-        entry = (Slot *)(D_00188660 + state->slot * 112);
+        qcopy(&state->last_position, &gHeroState.player);
+        entry = (Slot *)(gSoundState + state->slot * 112);
         if (entry->owner != object || !entry->active) {
             state->slot = -1;
-            if (((Slot *)(D_00188660 - 0x70))->owner != object ||
-                !((Slot *)(D_00188660 - 0x70))->active)
-                state->slot = func_002E5CF8(1, 4, object);
+            if (((Slot *)(gSoundState - 0x70))->owner != object ||
+                !((Slot *)(gSoundState - 0x70))->active)
+                state->slot = PlayMobySound(1, 4, object);
         }
         qzero(&state->velocity);
-        state->random0 = func_002A7940();
-        state->random1 = func_002A7940();
-        state->random2 = func_002A7940();
+        state->random0 = RandomAngle();
+        state->random1 = RandomAngle();
+        state->random2 = RandomAngle();
         state->value50 = 0;
         object->mode = 1;
         break;
@@ -202,25 +203,25 @@ void func_L00_003EC140(Object *object)
         Slot *entry;
 
         if ((object->status & 2) && object->anim_id != 1)
-            func_002A7470(object, 1, 0, 10);
-        entry = (Slot *)(D_00188660 + state->slot * 112);
+            StartAnimationBlended(object, 1, 0, 10);
+        entry = (Slot *)(gSoundState + state->slot * 112);
         if (entry->owner != object || !entry->active) {
             state->slot = -1;
-            if (((Slot *)(D_00188660 - 0x70))->owner != object ||
-                !((Slot *)(D_00188660 - 0x70))->active)
-                state->slot = func_002E5CF8(1, 4, object);
+            if (((Slot *)(gSoundState - 0x70))->owner != object ||
+                !((Slot *)(gSoundState - 0x70))->active)
+                state->slot = PlayMobySound(1, 4, object);
         }
-        if (D_00189E20.mode != 129 &&
-            func_00282EB0(&state->last_position, &D_00189E20.player) > 400.0f) {
-            if (D_001A79F0 == 7 && D_00189E20.object &&
-                D_00189E20.object->class_id == 0x11D9) {
-                func_00282CF0(&vector, &D_00189E20.player, &state->last_position);
-                func_00282CC0(&object->position, &object->position, &vector);
+        if (gHeroState.mode != 129 &&
+            FastVectorHelperC(&state->last_position, &gHeroState.player) > 400.0f) {
+            if (gCurrentMapIndex == 7 && gHeroState.object &&
+                gHeroState.object->class_id == 0x11D9 /* moby class 4569 */) {
+                FastVecSub(&vector, &gHeroState.player, &state->last_position);
+                FastVecAdd(&object->position, &object->position, &vector);
             } else {
                 if (state->slot != -1) {
-                    Slot *entry = (Slot *)(D_00188660 + state->slot * 112);
+                    Slot *entry = (Slot *)(gSoundState + state->slot * 112);
                     if (entry->owner == object && entry->active)
-                        func_002E59F8(state->slot);
+                        StopSoundVoice(state->slot);
                 }
                 state->slot = -1;
                 object->alpha = 128;
@@ -228,65 +229,65 @@ void func_L00_003EC140(Object *object)
                 qzero_nc(&state->velocity);
                 object->flags &= 0xFDFF;
                 if (state->index != -1)
-                    D_L00_001B0798[state->index] = 0;
-                func_0029F338(object);
+                    gSynthenoidSlots[state->index] = 0;
+                MarkMobySpawned(object);
                 return;
             }
         }
-        qcopy(&state->last_position, &D_00189E20.player);
+        qcopy(&state->last_position, &gHeroState.player);
         if (state->timer >= 21 && (object->status & 2)) {
             if (object->anim_id != 1)
-                func_002A7470(object, 1, 0, func_002A7820(7, 12));
-            object->anim_speed = func_002A7878(0.95f, 1.05f);
+                StartAnimationBlended(object, 1, 0, RandomIntRange(7, 12));
+            object->anim_speed = RandomFloatRange(0.95f, 1.05f);
         }
-        if (state->count < state->limit && D_00189E20.phase != 22 &&
-            D_00189E20.phase != 20 && !D_00189E20.flag) {
-            func_L00_003EB7C0(object, state);
-            func_L00_003EBC68(object, state);
+        if (state->count < state->limit && gHeroState.phase != 22 &&
+            gHeroState.phase != 20 && !gHeroState.flag) {
+            ComputeSynthenoidOrbitPoint(object, state);
+            UpdateSynthenoidMovement(object, state);
         } else {
             qzero(&state->velocity);
             state->timer = D_L00_001B0768;
             if (state->slot != -1) {
-                Slot *entry = (Slot *)(D_00188660 + state->slot * 112);
+                Slot *entry = (Slot *)(gSoundState + state->slot * 112);
                 if (entry->owner == object && entry->active)
-                    func_002E59F8(state->slot);
+                    StopSoundVoice(state->slot);
             }
             state->slot = -1;
-            func_002E5CF8(2, 0, object);
+            PlayMobySound(2, 0, object);
             object->mode = 2;
         }
-        func_L00_003EB8E8(object, state);
+        UpdateAutoTargetFire(object, state);
         break;
     }
     case 2:
         if (state->slot != -1) {
-            Slot *entry = (Slot *)(D_00188660 + state->slot * 112);
+            Slot *entry = (Slot *)(gSoundState + state->slot * 112);
             if (entry->owner == object && entry->active)
-                func_002E59F8(state->slot);
+                StopSoundVoice(state->slot);
         }
         state->slot = -1;
-        if (func_00282948(&state->timer)) {
+        if (FastFloatHelperD(&state->timer)) {
             if (state->slot != -1) {
-                Slot *entry = (Slot *)(D_00188660 + state->slot * 112);
+                Slot *entry = (Slot *)(gSoundState + state->slot * 112);
                 if (entry->owner == object && entry->active)
-                    func_002E59F8(state->slot);
+                    StopSoundVoice(state->slot);
             }
             state->slot = -1;
             object->alpha = 128;
             qzero(&state->velocity);
             object->flags &= 0xFDFF;
             if (state->index != -1)
-                D_L00_001B0798[state->index] = 0;
-            func_0029F338(object);
+                gSynthenoidSlots[state->index] = 0;
+            MarkMobySpawned(object);
             return;
         }
         matrix.q = 0;
         qcopy(&vector, &object->position);
-        func_002ACB48(&vector, D_L00_001B0774);
+        AddRandomOffsetToVector(&vector, D_L00_001B0774);
         {
-            int red = (func_001163B0() + 0x30) & 0x3F;
-            int green = (func_001163B0() + 0x20) & 0x3F;
-            int blue = func_001163B0() & 0x2F;
+            int red = (Rand() + 0x30) & 0x3F;
+            int green = (Rand() + 0x20) & 0x3F;
+            int blue = Rand() & 0x2F;
             int color;
             int direction;
             int id;
@@ -295,59 +296,59 @@ void func_L00_003EC140(Object *object)
             red |= green << 8;
             red |= blue << 16;
             color = red | (D_L00_001B0780 << 24);
-            direction = func_001163B0() % 2;
+            direction = Rand() % 2;
             if (state->timer & 1)
                 direction = -direction;
-            id = func_002A7820(D_L00_001B076C, D_L00_001B0770);
-            scale = func_002A7878(D_L00_001B0778, D_L00_001B077C);
-            func_002C2210(&vector, id, color, 2, direction, &matrix, 0,
+            id = RandomIntRange(D_L00_001B076C, D_L00_001B0770);
+            scale = RandomFloatRange(D_L00_001B0778, D_L00_001B077C);
+            SpawnGroundEffectParticle(&vector, id, color, 2, direction, &matrix, 0,
                           scale, 0.001f, D_L00_001B0784 * 0.0002777777845f);
         }
         object->flags |= 0x200;
         object->alpha -= 128 / D_L00_001B0768;
-        object->angle_z = func_00283B98(object->angle_z, 0.41887909f);
+        object->angle_z = FastAddRotations(object->angle_z, 0.41887909f);
         break;
     }
     if (object->mode) {
         if (!D_L00_001ADB2C) {
-            if (D_00189E20.mode == 39) {
-                func_00282CC0(&object->position, &object->position, &D_00189E20.movement);
+            if (gHeroState.mode == 39) {
+                FastVecAdd(&object->position, &object->position, &gHeroState.movement);
             } else {
-                func_00282CC0(&vector, &object->position, &D_00189E20.drift);
-                func_L00_0031AC60(&object->position, &object->position, &vector, 0.4f);
-                func_00282D08(&object->position, &object->position, &vector, 0.625f);
+                FastVecAdd(&vector, &object->position, &gHeroState.drift);
+                BlendVectorSineEase(&object->position, &object->position, &vector, 0.4f);
+                lerp_vector(&object->position, &object->position, &vector, 0.625f);
             }
         }
-        func_00300190(&object->position, &object->position);
+        TransformVectorOrCopy(&object->position, &object->position);
         if (!D_L00_001A8FF0[0])
-            func_002A9288(object, 0.3f);
-        func_L00_003EC078(object, state);
+            QueueGroundShadow(object, 0.3f);
+        EmitSynthenoidExhaust(object, state);
     }
-    camera = D_00189E20.camera;
+    camera = gHeroState.camera;
     qcopy(&object->axis_x, &camera->axis_x);
     qcopy(&object->axis_y, &camera->axis_y);
     qcopy(&object->axis_z, &camera->axis_z);
-    if (D_00189E20.phase == 15) {
+    if (gHeroState.phase == 15) {
         qcopy(&object->axis_x, &camera->axis_y);
-        func_00282D30(&object->axis_y, &camera->axis_x, -1.0f);
+        FastVecScale(&object->axis_y, &camera->axis_x, -1.0f);
     }
     angle = object->angle_z;
-    if (func_00282C48(angle) > 0.00001f) {
-        func_002AB668(&vector, &object->axis_z, angle);
-        func_002ACDE8(&object->axis_x, &object->axis_x, &vector);
-        func_002ACDE8(&object->axis_y, &object->axis_y, &vector);
+    if (FloatAbs(angle) > 0.00001f) {
+        BuildAxisAngleQuaternion(&vector, &object->axis_z, angle);
+        RotateVectorByQuaternion(&object->axis_x, &object->axis_x, &vector);
+        RotateVectorByQuaternion(&object->axis_y, &object->axis_y, &vector);
     }
     angle = object->angle_y;
-    if (func_00282C48(angle) > 0.00001f) {
-        func_002AB668(&vector, &object->axis_y, angle);
-        func_002ACDE8(&object->axis_x, &object->axis_x, &vector);
-        func_002ACDE8(&object->axis_z, &object->axis_z, &vector);
+    if (FloatAbs(angle) > 0.00001f) {
+        BuildAxisAngleQuaternion(&vector, &object->axis_y, angle);
+        RotateVectorByQuaternion(&object->axis_x, &object->axis_x, &vector);
+        RotateVectorByQuaternion(&object->axis_z, &object->axis_z, &vector);
     }
     angle = object->angle_x;
-    if (func_00282C48(angle) > 0.00001f) {
-        func_002AB668(&vector, &object->axis_x, angle);
-        func_002ACDE8(&object->axis_y, &object->axis_y, &vector);
-        func_002ACDE8(&object->axis_z, &object->axis_z, &vector);
+    if (FloatAbs(angle) > 0.00001f) {
+        BuildAxisAngleQuaternion(&vector, &object->axis_x, angle);
+        RotateVectorByQuaternion(&object->axis_y, &object->axis_y, &vector);
+        RotateVectorByQuaternion(&object->axis_z, &object->axis_z, &vector);
     }
     object->axis_x.f[3] = object->axis_y.f[3] = object->axis_z.f[3] = 0.0f;
 }

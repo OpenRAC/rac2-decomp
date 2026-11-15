@@ -26,9 +26,10 @@
 
 extern s32 func_00132DF0();
 
-void func_00132968(s32 arg0, s32 arg1) {
-    s32 sp[2];
-    sp[0] = arg0;
-    sp[1] = arg1;
-    func_00132DF0(0xD, 8, sp, 0, 0);
+/* Sends sound command 0xD with two values. */
+void func_00132968(s32 first, s32 second) {
+    s32 payload[2];
+    payload[0] = first;
+    payload[1] = second;
+    QueueSoundCommand(0xD, 8, payload, 0, 0);
 }

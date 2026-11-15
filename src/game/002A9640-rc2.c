@@ -25,24 +25,25 @@
 
 extern s8 D_001BF200;
 
-void *func_002A9640(void *arg0, u32 arg1, s32 arg2) {
-    u8 idx;
-    s8 *e;
+/* Finds the effect slot owned by this object. Returns it if it matches the flag mask, otherwise releases the slot when allowed. */
+void *func_002A9640(void *object, u32 flagMask, s32 keepSlot) {
+    u8 slotIndex;
+    s8 *entry;
     void *owner;
 
-    idx = *(u8 *)((s8 *)arg0 + 0xA8);
-    if (idx == 0xFF) {
+    slotIndex = *(u8 *)((s8 *)object + 0xA8);
+    if (slotIndex == 0xFF) {
         return 0;
     }
-    e = (s8 *)&D_001BF200 + (idx << 6);
-    owner = *(void **)(e + 0x38);
-    if (owner != arg0) {
+    entry = (s8 *)&D_001BF200 + (slotIndex << 6);
+    owner = *(void **)(entry + 0x38);
+    if (owner != object) {
         return 0;
     }
-    if (*(u32 *)(e + 0x24) & arg1) {
-        return e;
+    if (*(u32 *)(entry + 0x24) & flagMask) {
+        return entry;
     }
-    if (arg2 == 0) {
+    if (keepSlot == 0) {
         *(u8 *)((s8 *)owner + 0xA8) = 0xFF;
     }
     return 0;

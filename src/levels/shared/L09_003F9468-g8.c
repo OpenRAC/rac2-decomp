@@ -7,18 +7,19 @@ extern f32 D_L09_001B1838 __attribute__((sda));
 extern f32 D_L09_001B183C __attribute__((sda));
 extern f32 D_L09_001B1840 __attribute__((sda));
 
-extern void func_31F728(char *a0, f32 *a1, f32 *a2, f32 f12, f32 f13, f32 f14);
+extern void func_31F728(char *moby, f32 *a1, f32 *a2, f32 f12, f32 f13, f32 f14);
 
-extern void func_31F7E0(char *a0, f32 *a1, f32 *a2, f32 f12, f32 f13, f32 f14);
+extern void func_31F7E0(char *moby, f32 *a1, f32 *a2, f32 f12, f32 f13, f32 f14);
 
 /* Drives the two angle pairs of the state, in degrees converted to radians. */
-void func_L09_00410B40(char *a0)
+/* Turns the object's parts to follow their target angles. */
+void func_L09_00410B40(char *moby)
 {
-    char *s1 = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    func_31F728(a0, (f32 *)(s1 + 0x74), (f32 *)(s1 + 0x70), D_L09_001B1830,
+    func_31F728(moby, (f32 *)(vars + 0x74), (f32 *)(vars + 0x70), D_L09_001B1830,
                 D_L09_001B1834 * 0.000290888245f, -1.0f);
-    func_31F7E0(a0, (f32 *)(s1 + 0x78), (f32 *)(s1 + 0x7C), D_L09_001B1838,
+    func_31F7E0(moby, (f32 *)(vars + 0x78), (f32 *)(vars + 0x7C), D_L09_001B1838,
                 D_L09_001B183C * 0.000290888245f, D_L09_001B1840 * 0.000290888245f);
 }
 
@@ -62,6 +63,7 @@ typedef struct {
     u8 activated;
 } TriggerObject;
 
+/* Update for moby class 3836, a glowing floor switch. It pulses in colour and turns off once the hero steps on it. */
 void func_L09_0041A700(TriggerObject *obj)
 {
     TriggerState *s = obj->state;
@@ -72,22 +74,22 @@ void func_L09_0041A700(TriggerObject *obj)
 
     switch (obj->status) {
     case 0:
-        s->angle = func_002A7940();
+        s->angle = RandomAngle();
         obj->status = 1;
         obj->position[2] -= 0.35f;
         break;
     case 1:
         /* Pulse the colour: the angle advances 6 degrees per update. */
-        s->angle = func_00283B98(s->angle, 0.10471977f);
-        shade = func_00283CF0((func_00283198(s->angle) * 4.0f - 3.0f) * 128.0f);
+        s->angle = FastAddRotations(s->angle, 0.10471977f);
+        shade = FloatToInt((FastSinOrCosB(s->angle) * 4.0f - 3.0f) * 128.0f);
         if (shade > 128) shade = 128;
         else if (shade < 32) shade = 32;
         green = (shade << 8) | (int)0x80000000;
         red = shade << 16;
         obj->color = (red | green) | shade;
-        if (D_00189E20.standing != (char *)obj || D_00189E20.busy) {
+        if (gHeroState.standing != (char *)obj || gHeroState.busy) {
             /* Loaded only on this path: reorg moves it into the bne delay slot. */
-            level = D_001A79F0;
+            level = gCurrentMapIndex;
             if (!(D_0019B2E8[obj->owner + level * 16] & 0x80) || s->enabled) {
                 int id;
                 if (!s->enabled) return;
@@ -107,13 +109,13 @@ activate:
             obj->status = 2;
             obj->activated = 1;
             obj->color = 0x80208020;
-            func_002E5CF8(0, 0, obj);
+            PlayMobySound(0, 0, obj);
             id = obj->id;
             if (id & 1) {
-                u8 *counts = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
+                u8 *counts = &D_0019B4A8[((short)id >> 1) + (gCurrentMapIndex << 10)];
                 if (((*counts >> 4) & 7) != 7) *counts += 16;
             } else {
-                u8 *counts = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
+                u8 *counts = &D_0019B4A8[((short)id >> 1) + (gCurrentMapIndex << 10)];
                 if ((*counts & 7) != 7) ++*counts;
             }
         }
@@ -127,19 +129,19 @@ proximity:
             /* Retail fills this raised copy but measures from the position itself. */
             qcopy(pos, obj->position);
             pos[2] += 0.35f;
-            if (func_00282E80(obj->position, player + 0x10) < 0.5f) {
+            if (vec_distance_xy(obj->position, player + 0x10) < 0.5f) {
                 int id = obj->id;
                 if (id & 1) {
-                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
+                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (gCurrentMapIndex << 10)];
                     if (((*counts >> 4) & 7) != 7) *counts += 16;
                 } else {
-                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (D_001A79F0 << 10)];
+                    u8 *counts = &D_0019B4A8[((short)id >> 1) + (gCurrentMapIndex << 10)];
                     if ((*counts & 7) != 7) ++*counts;
                 }
                 obj->status = 2;
                 obj->activated = 1;
                 obj->color = 0x80208020;
-                func_002E5CF8(0, 0, obj);
+                PlayMobySound(0, 0, obj);
             }
         }
         break;

@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002DD400 in its own unit, a sibling of func_002DCB58 (002DCB58-g32.c): the save-slot
    menu's handler. -O2 -G32 -Wa,-G32 like its siblings (config/cflags.txt). The screen for the
    cross button is one store of a conditional value, so its base address is formed once before
@@ -44,83 +45,84 @@ extern int func_00287E70(void);
 extern int func_002857B0(void);
 extern void func_002DF190(int, int);
 
+/* Handles the slot menu with a cancel button and confirmation screens: moves the cursor, starts a save into the chosen slot, and finishes or reports the result. */
 int func_002DD400(SaveMenu *menu)
 {
-    int old;
+    int oldCursor;
     int buttons;
 
-    if (*(SaveMenu **)(D_001F2840.owner + 0xE8) != menu)
+    if (*(SaveMenu **)(gPauseMenuState.owner + 0xE8) != menu)
         return 0;
-    old = menu->cursor;
+    oldCursor = menu->cursor;
     if (D_001A8CFC != 0)
-        func_00339790(D_001A8CFC + 0x3CAA8, old);
-    if (menu->stage == 0 && D_001F2840.screen == (char *)&D_00261108 && ((SaveScreen *)D_001F2840.screen)->f12c != 0)
+        SetPopupRow(D_001A8CFC + 0x3CAA8, oldCursor);
+    if (menu->stage == 0 && gPauseMenuState.screen == (char *)&D_00261108 && ((SaveScreen *)gPauseMenuState.screen)->f12c != 0)
         menu->stage = 1;
-    if (menu->stage == 0 && D_001F2840.screen == (char *)&D_002613B8 && ((SaveScreen *)D_001F2840.screen)->f12c != 0)
+    if (menu->stage == 0 && gPauseMenuState.screen == (char *)&D_002613B8 && ((SaveScreen *)gPauseMenuState.screen)->f12c != 0)
         menu->stage = 1;
     if (menu->stage == 1) {
         if (menu->flags & 0x2000)
-            func_002DE990(menu->cursor);
+            RestartGameKeepingProgress(menu->cursor);
         else
-            func_002DE900(menu->f48, menu->cursor);
-        D_001393E0.f17c = 1;
-        D_001F2840.busy = 1;
+            ClearSlotAndStartSave(menu->f48, menu->cursor);
+        gMemcardState.f17c = 1;
+        gPauseMenuState.busy = 1;
         D_001B1A3C = 0;
-        D_001F2840.ready = 0;
-        D_001F2840.delay = 0x2DFC;
+        gPauseMenuState.ready = 0;
+        gPauseMenuState.delay = 0x2DFC;
     }
     menu->stage = 2;
-    if (D_001F2840.busy != 0) {
-        SaveState *save = &D_001393E0;
+    if (gPauseMenuState.busy != 0) {
+        SaveState *save = &gMemcardState;
         if (save->f15c >= 3)
             return 0;
         if (save->f164 >= 0)
             return 0;
-        if (D_001F2840.ready < 11)
+        if (gPauseMenuState.ready < 11)
             return 0;
-        D_001F2840.busy = 0;
+        gPauseMenuState.busy = 0;
         if (save->f16c != 0 || save->f10 != 0 || D_001B1A3C != 0) {
             if (D_001A8C8C != 0) {
-                D_001A7424 |= 0x80;
-                func_002B49E0(4, 1, 5, (int)D_001F2840.owner, 0);
-                D_001393E0.f17c = 0;
+                gSaveMenuFlags |= 0x80;
+                BeginSlotRequest(4, 1, 5, (int)gPauseMenuState.owner, 0);
+                gMemcardState.f17c = 0;
                 return 0;
             }
-            D_001393E0.f17c = 0;
-            D_001A7424 |= 0x80;
-            func_002B49E0(4, 1, 1, (int)D_001F2840.owner, 0);
+            gMemcardState.f17c = 0;
+            gSaveMenuFlags |= 0x80;
+            BeginSlotRequest(4, 1, 1, (int)gPauseMenuState.owner, 0);
             return 0;
         }
         save->f17c = 1;
-        D_001393E0.slots[D_001393E0.slot].balance = D_001A79F8;
-        D_001393E0.slots[D_001393E0.slot].status = D_001A79F0;
-        D_001393E0.slots[D_001393E0.slot].ticks = D_001A7BC0;
+        gMemcardState.slots[gMemcardState.slot].balance = gPlayerBolts;
+        gMemcardState.slots[gMemcardState.slot].status = gCurrentMapIndex;
+        gMemcardState.slots[gMemcardState.slot].ticks = D_001A7BC0;
         {
-            Stamp *stamp = &D_001393E0.slots[D_001393E0.slot].stamp;
+            Stamp *stamp = &gMemcardState.slots[gMemcardState.slot].stamp;
             *stamp = D_001A7360;
         }
-        D_001393E0.slots[D_001393E0.slot].level = D_001A7A0A;
-        func_002F64A8();
+        gMemcardState.slots[gMemcardState.slot].level = D_001A7A0A;
+        LoadDataAndSetupCallback();
         save->f17c = 1;
         D_001A8C88 = 0;
         return 0;
     }
-    if ((D_00138180.flags & 0x900) && D_001F2840.fallback == 0 && D_001A8C8C == 0)
+    if ((gPadState.flags & 0x900) && gPauseMenuState.fallback == 0 && D_001A8C8C == 0)
         return 1;
-    if ((D_00138180.flags & 0x10) && D_001A8C8C == 0) {
-        int value = *(int *)(D_001F2840.owner + 0xE0);
-        int status;
-        if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
-            status = -1;
+    if ((gPadState.flags & 0x10) && D_001A8C8C == 0) {
+        int parentScreen = *(int *)(gPauseMenuState.owner + 0xE0);
+        int result;
+        if (parentScreen != 0)
+            gPauseMenuState.value = parentScreen;
+        else if (gPauseMenuState.fallback == 0) {
+            result = -1;
             goto finish;
         }
-        status = 0;
+        result = 0;
 finish:
-        return status;
+        return result;
     }
-    if (D_001A7420 == 9)
+    if (gSaveMenuScreen == 9)
     {
         char *screen;
         if (D_001A8C8C != 0)
@@ -129,63 +131,63 @@ finish:
             screen = D_00260EE8;
         else
             screen = D_0025DA38;
-        func_002D5B38(4, screen);
+        SendMenuRequest(4, screen);
     }
-    else if (D_001A7420 != 16 && D_001A7420 != 1) {
-        if (func_00287E70() == 0 && func_002857B0() == 1)
-            func_002B49E0(4, 1, 1, (int)D_001F2840.owner, 0);
+    else if (gSaveMenuScreen != 16 && gSaveMenuScreen != 1) {
+        if (GetMenuCounter() == 0 && GetMenuMode() == 1)
+            BeginSlotRequest(4, 1, 1, (int)gPauseMenuState.owner, 0);
         else if (D_001A8C8C == 0) {
-            int value = *(int *)(D_001F2840.owner + 0xE0);
-            int status;
-            if (value != 0)
-                D_001F2840.value = value;
-            else if (D_001F2840.fallback == 0) {
-                status = -1;
+            int parentScreen = *(int *)(gPauseMenuState.owner + 0xE0);
+            int result;
+            if (parentScreen != 0)
+                gPauseMenuState.value = parentScreen;
+            else if (gPauseMenuState.fallback == 0) {
+                result = -1;
                 goto done;
             }
-            status = 0;
+            result = 0;
 done:
-            return status;
+            return result;
         }
     }
-    if (D_001393E0.f15c >= 3)
+    if (gMemcardState.f15c >= 3)
         return 0;
-    if (D_001393E0.f164 >= 0)
+    if (gMemcardState.f164 >= 0)
         return 0;
-    if (D_001F2840.ready < 11)
+    if (gPauseMenuState.ready < 11)
         return 0;
-    if (D_001393E0.mode != 2)
+    if (gMemcardState.mode != 2)
         return 0;
     if (menu->flags & 1)
-        buttons = D_00138180.alt;
+        buttons = gPadState.alt;
     else
-        buttons = D_00138180.flags;
+        buttons = gPadState.flags;
     menu->cursor = D_001A7C08;
     if ((buttons & 0x1000) && D_001A7C08 != 0)
         menu->cursor = D_001A7C08 - 1;
     if ((buttons & 0x4000) && menu->cursor < 3)
         menu->cursor = menu->cursor + 1;
     D_001A7C08 = menu->cursor;
-    if ((buttons & 0x20) && D_001393E0.mode == 2) {
+    if ((buttons & 0x20) && gMemcardState.mode == 2) {
         if (menu->flags & 0x2000) {
-            D_001393E0.f17c = 0;
-            func_002DE990(-1);
-            func_002F64A8();
+            gMemcardState.f17c = 0;
+            RestartGameKeepingProgress(-1);
+            LoadDataAndSetupCallback();
             return 0;
         }
-        func_00298E08();
+        LoadGameDataAndResetSaveMenu();
         {
-            int mode = D_001A7424 & ~2;
+            int mode = gSaveMenuFlags & ~2;
             mode &= ~4;
-            D_001A7424 = mode | 0x20;
+            gSaveMenuFlags = mode | 0x20;
         }
-        func_002F64A8();
+        LoadDataAndSetupCallback();
         return 0;
     }
     if (buttons & 0x40) {
-        if (D_001393E0.slots[menu->cursor].status != -1) {
-            D_001F2840.value = (menu->flags & 0x2000) ? (int)&D_002613B8 : (int)&D_00261108;
-            D_001F2840.fe4 = (menu->flags & 0x2000) ? 2 : 1;
+        if (gMemcardState.slots[menu->cursor].status != -1) {
+            gPauseMenuState.value = (menu->flags & 0x2000) ? (int)&D_002613B8 : (int)&D_00261108;
+            gPauseMenuState.fe4 = (menu->flags & 0x2000) ? 2 : 1;
             D_0025E9E0[0] = menu->cursor;
         } else {
             if (menu->flags & 0x2000) {
@@ -196,7 +198,7 @@ done:
             return 0;
         }
     }
-    if (menu->cursor != old)
-        func_002DF190(1, 0x11);
+    if (menu->cursor != oldCursor)
+        PlayMenuSoundIfEnabled(1, 0x11);
     return 0;
 }

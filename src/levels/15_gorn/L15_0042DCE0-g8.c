@@ -171,12 +171,12 @@ void func_L15_0042DCE0(Moby *moby)
         D_L15_00221E10.reset = func_L15_0042FDD8;
         D_L15_00221E10.resetAll = func_L15_0042FED0;
         D_L15_001B15B8 = 0;
-        D_L15_00221E10.onHit = func_L15_0042FFB8;
+        D_L15_00221E10.onHit = ApplyHitDamageToMoby;
         D_L15_00221E10.controller = moby;
-        func_L05_00379F18(1);
-        func_L05_00379F28(0);
-        while (!D_L15_0029FD80[func_L05_0037AA88(D_L15_001B15B0)].f00
-               || !D_L15_0029FD80[func_L05_0037AA88(D_L15_001B15B0)].f1E)
+        SetPlayerStateField13(1);
+        SetPlayerStateField15(0);
+        while (!D_L15_0029FD80[FindActiveSlotInChain(D_L15_001B15B0)].f00
+               || !D_L15_0029FD80[FindActiveSlotInChain(D_L15_001B15B0)].f1E)
             ++D_L15_001B15B0;
         completed0 = D_001395B8.completions[0];
         completed1 = D_001395B8.completions[1];
@@ -192,63 +192,63 @@ void func_L15_0042DCE0(Moby *moby)
             D_L15_001B15D0 = 1;
         else
             D_L15_001B15D0 = 0;
-        if (D_00189E20.moby != 0)
-            D_00189E20.moby->flags |= 0x41;
+        if (gHeroState.moby != 0)
+            gHeroState.moby->flags |= 0x41;
         /* fall through */
     case 1: {
         /* One 1 for the stores and the test below: literal 1s compile differently. */
         s32 on = 1;
 
-        func_L05_00379B60();
-        func_L05_0030C930((s32)(D_L15_001B2E84 * -230.0f + 0.5f), 2);
+        SelectRandomLevelObject();
+        StorePairWithIncrement((s32)(D_L15_001B2E84 * -230.0f + 0.5f), 2);
         if (!D_L15_001B15A8) {
-            func_L00_003294F0(&D_L15_001B261C[vars->moby], 1);
+            SetObjectFlagBit(&D_L15_001B261C[vars->moby], 1);
             D_L15_001B15A8 = on;
             D_L15_001B15AC = 0;
         }
         if (D_L15_001B15AC++ < 5 || D_L15_001A8F00 == 2)
             break;
 
-        func_L00_002C42E0(0x31, 0);
+        SetHeroAction_L00(0x31, 0);
         if (D_L15_001B15C4) {
-            func_L05_00379F48(on);
-            D_L15_001B1530 = func_L05_0041ED18();
+            SetPlayerStateField18(on);
+            D_L15_001B1530 = LockedEntryMenuInput();
             if (D_L15_001B1530 != -2)
-                func_L05_00445A98();
+                SaveShipTransformState();
             break;
         }
         if (!D_L15_001B15B4) {
-            func_00288E18(0xA17, 0x6E);
+            RequestSubtitleVoiceLine(0xA17, 0x6E);
             D_L15_001B15B4 = on;
         }
         if ((D_0013A170[5] == on || D_0013A170[5] == 5 || D_0013A170[5] == 10)
-            && !func_L10_0037F510() && !D_L15_001B15B8) {
-            func_00288E18(0xA18, 0x6F);
+            && !AnyStatusRecordNonzero() && !D_L15_001B15B8) {
+            RequestSubtitleVoiceLine(0xA18, 0x6F);
             D_L15_001B15B8 = 1;
         }
-        if (func_00282948(&vars->timer))
+        if (FastFloatHelperD(&vars->timer))
             D_L15_00221E10.waiting = 0;
         else
             D_L15_00221E10.waiting = 1;
-        func_L05_00379F48(0);
+        SetPlayerStateField18(0);
         if (D_L15_001B1530 != -2 && D_L15_001B2148 >= 3) {
             switch (D_L15_001B1530) {
             case 0:
-                func_L15_004307E0(moby);
+                UpdateGornCutsceneController(moby);
                 break;
             case 1:
-                func_L15_00430B30(moby);
+                ApplyGornStageMaterials(moby);
                 break;
             case 2:
-                func_L15_00430C80(moby);
+                UpdateSceneTriggerObject(moby);
                 break;
             case 3:
-                func_L15_00430DF0(moby);
+                UpdateGornPathMarkerCourse(moby);
                 break;
             }
         }
         if (D_L15_001A904C && !D_L15_001B1578 && !D_L15_001B15CC) {
-            func_0029B758(0, func_L15_0042E1B0);
+            StoreLevelObjectValuePair(0, DrawGornStageHud);
             D_L15_001B157C = 0;
             D_L15_001B1578 = 1;
         }
@@ -257,7 +257,7 @@ void func_L15_0042DCE0(Moby *moby)
     case 2:
         break;
     case 3:
-        if (!func_L05_00442860()) {
+        if (!IsCameraModeActive()) {
             D_L15_00221E10.waiting = 0;
             D_L15_00221E10.rounds++;
             moby->state = 1;

@@ -91,15 +91,15 @@ void func_L09_00402D50(char *obj) {
     DobboInitData *data = *(DobboInitData **)(obj + 0x68);
     float value;
     int one;
-    data->field_288 = func_002A89A8(obj + 0x10, 0, 0.5f);
+    data->field_288 = ProbeGroundHeightBelow(obj + 0x10, 0, 0.5f);
     value = data->field_288 + D_L09_001B13BC;
     data->field_294 = value;
     if (value < data->field_264) data->field_294 = data->field_264;
     data->field_274 = -1;
-    if (data->field_260 == -1.0f) data->field_260 = 0.0174532942f * func_002A78D8(25.0f, 100.0f);
+    if (data->field_260 == -1.0f) data->field_260 = 0.0174532942f * RandomSignedFloatRange(25.0f, 100.0f);
     else data->field_260 *= 0.0174532942f;
-    data->field_48 = func_00283CF0(15.0f);
-    data->field_4A = func_00283CF0(2.4f);
+    data->field_48 = FloatToInt(15.0f);
+    data->field_4A = FloatToInt(2.4f);
     data->field_60 = 9;
     data->field_61 = 0;
     data->field_62 = 0;
@@ -128,7 +128,7 @@ void func_L09_00402D50(char *obj) {
     data->field_138 |= 0x10;
     data->field_1DC = data->field_260 * 0.0174532942f;
     data->field_1E2 = 120;
-    func_002B60B0(obj, 0.00666666683f, 0.0666666701f, 0.837758183f, 0.837758183f);
+    SetControllerSpeedLimits(obj, 0.00666666683f, 0.0666666701f, 0.837758183f, 0.837758183f);
     qcopy((char *)data+0x1F0, obj+0x10);
     data->field_200 = 1.0f;
     data->field_20C = 5.0f;
@@ -138,7 +138,7 @@ void func_L09_00402D50(char *obj) {
     data->field_30 = 0;
     if (data->field_250 != -1) {
         qcopy(obj+0x10, D_L09_001FE6C0[data->field_250] + 0x10);
-        func_002A7750(obj, 1, 0);
-    } else func_002A7750(obj, 2, 2);
-    if (*(unsigned char *)(obj+0x43)) func_002A7470(obj, 0, 0, 1);
+        SetMobyState(obj, 1, 0);
+    } else SetMobyState(obj, 2, 2);
+    if (*(unsigned char *)(obj+0x43)) StartAnimationBlended(obj, 0, 0, 1);
 }

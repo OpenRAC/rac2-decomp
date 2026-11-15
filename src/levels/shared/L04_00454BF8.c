@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -129,7 +130,7 @@ void func_L04_00454BF8(u8 *self)
     case 0:
         group = st->group;
         if (group >= D_L04_001A9018 || group == -1 || D_L04_001A9014[group] == 0) {
-            func_0029F338(self);
+            MarkMobySpawned(self);
             return;
         }
         st->time = 0.0f;
@@ -158,42 +159,42 @@ void func_L04_00454BF8(u8 *self)
         if (st->dir[0] == 0.0f && st->dir[1] == 0.0f && st->dir[2] == 0.0f)
             st->mode = 0;
         else
-            func_00282F20(st->dir, st->dir, 1.0f);
+            vec_scale_to_length(st->dir, st->dir, 1.0f);
         st->off[0] = st->off_in[0];
         st->off[1] = st->off_in[1];
         st->off[2] = st->off_in[2];
         st->off[3] = 0.0f;
-        func_00282F20(st->off, st->off, 1.0f);
+        vec_scale_to_length(st->off, st->off, 1.0f);
         st->off2[0] = st->off2_in[0];
         st->off2[1] = st->off2_in[1];
         st->off2[2] = st->off2_in[2];
         st->off2[3] = 0.0f;
-        func_002A7750(self, 1, -1);
+        SetMobyState(self, 1, -1);
     case 1:
         st->time += st->step;
-        if (st->trigger != -1 && func_002ACBC8(D_L04_001B9680, st->trigger) == 0)
+        if (st->trigger != -1 && IsPointInCuboid(D_L04_001B9680, st->trigger) == 0)
             return;
         for (p = D_L04_001A9014[st->group];
              p != 0 && ((s16)p[-1] >= 0 || p == D_L04_001A9014[st->group]); p++) {
             e = &D_L04_001B2B5C[*p & 0x7FFF];
             if (e == 0)
                 break;
-            func_L02_002F1FB8(to_cam, D_L04_001B9680, e->pos);
+            SubtractVec4(to_cam, D_L04_001B9680, e->pos);
             blend = 0.0f;
             light = D_L04_001B2B54 + ((*p & 0x7FFF) << 5);
-            if (func_00282DF0(to_cam) > 32.0f)
+            if (FastVecLength(to_cam) > 32.0f)
                 continue;
             switch (st->mode) {
             case 1:
-                along = func_00282DB0(e->pos, st->dir) * st->gain / func_00282DF0(st->dir);
-                blend = func_L04_00455418(st, st->time + along);
+                along = FastVecDot(e->pos, st->dir) * st->gain / FastVecLength(st->dir);
+                blend = ComputePeriodicLightBlend(st, st->time + along);
                 break;
             case 2:
-                blend = func_L04_00455418(st, st->time + func_00282E48(self + 0x10, e->pos));
+                blend = ComputePeriodicLightBlend(st, st->time + fast_vec_dist(self + 0x10, e->pos));
                 break;
             case 3:
-                blend = func_L04_00455418(st, st->time + st->period *
-                                                     func_00283CC8(&whole, e->pos[0] + e->pos[1] + e->pos[2]));
+                blend = ComputePeriodicLightBlend(st, st->time + st->period *
+                                                     SplitFloatFraction(&whole, e->pos[0] + e->pos[1] + e->pos[2]));
                 break;
             case 4:
                 half = 0.5f;
@@ -205,25 +206,25 @@ void func_L04_00454BF8(u8 *self)
                 time = st->time;
                 theta = time * half * 3.1415927f;
                 phi = time * quarter;
-                sin_theta = func_00283198(theta);
-                axis[0] = sin_theta * func_00283180(phi);
-                axis[1] = sin_theta * func_00283198(phi);
-                axis[2] = func_00283180(theta);
-                func_00283098(axis, axis, self + 0xC0);
-                func_L02_002F1FB8(probe, e->pos, self + 0x10);
-                func_00282F20(probe, probe, 1.0f);
-                elev = 1.5707964f - func_002831B0(func_00282DB0(probe, axis));
+                sin_theta = FastSinOrCosB(theta);
+                axis[0] = sin_theta * FastSinOrCosA(phi);
+                axis[1] = sin_theta * FastSinOrCosB(phi);
+                axis[2] = FastSinOrCosA(theta);
+                matrix_mul_vec3(axis, axis, self + 0xC0);
+                SubtractVec4(probe, e->pos, self + 0x10);
+                vec_scale_to_length(probe, probe, 1.0f);
+                elev = 1.5707964f - FastAngleHelper(FastVecDot(probe, axis));
                 if (elev > rise) {
                     if (elev <= full)
-                        blend = func_L04_004554F8((elev - rise) / (full - rise));
+                        blend = SmoothStep((elev - rise) / (full - rise));
                     else if (elev <= fall)
                         blend = 1.0f;
                     else if (elev <= gone)
-                        blend = 1.0f - func_L04_004554F8((elev - fall) / (gone - fall));
+                        blend = 1.0f - SmoothStep((elev - fall) / (gone - fall));
                 }
                 break;
             }
-            color = func_00283D38(st->color_b, st->color_a, blend);
+            color = FastTweenColor(st->color_b, st->color_a, blend);
             if (st->flags & 1) {
                 blue = (color >> 16) & 0xFF;
                 green = (color >> 8) & 0xFF;
@@ -232,13 +233,13 @@ void func_L04_00454BF8(u8 *self)
             }
             if (st->flags & 2) {
                 fade = 1.0f;
-                func_00282F20(axis, to_cam, 1.0f);
-                func_00283098(probe, st->off, e);
-                angle = 1.5707964f - func_002831B0(func_00282DB0(probe, axis));
+                vec_scale_to_length(axis, to_cam, 1.0f);
+                matrix_mul_vec3(probe, st->off, e);
+                angle = 1.5707964f - FastAngleHelper(FastVecDot(probe, axis));
                 if (angle >= st->fade_end)
                     fade = 0.0f;
                 else if (angle > st->fade_start)
-                    fade = func_L04_004554F8((angle - st->fade_end) / (st->fade_start - st->fade_end));
+                    fade = SmoothStep((angle - st->fade_end) / (st->fade_start - st->fade_end));
                 alpha = (u32)color >> 24;
                 if (alpha == 0)
                     continue;
@@ -247,13 +248,13 @@ void func_L04_00454BF8(u8 *self)
                 if (fade != 1.0f)
                     alpha = (s32)((f32)alpha * fade);
                 glow = (color & 0xFFFFFF) | (alpha << 24);
-                size = func_00282DF0(e);
-                func_00283098(spot, st->off2, e);
-                func_00282CC0(spot, spot, e->pos);
-                func_00282CF0(pull, D_L04_001B9680, spot);
-                func_00282F20(pull, pull, st->reach * size);
-                func_00282CC0(spot, spot, pull);
-                func_L04_00363CA0(spot, glow, st->radius * size * 210000.0f);
+                size = FastVecLength(e);
+                matrix_mul_vec3(spot, st->off2, e);
+                FastVecAdd(spot, spot, e->pos);
+                FastVecSub(pull, D_L04_001B9680, spot);
+                vec_scale_to_length(pull, pull, st->reach * size);
+                FastVecAdd(spot, spot, pull);
+                SpawnEffectRecord(spot, glow, st->radius * size * 210000.0f);
             }
         }
         break;

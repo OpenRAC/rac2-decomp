@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_L02_001B01E0 __attribute__((sda));
 extern int D_L02_001FF6B8[];
@@ -14,14 +15,15 @@ extern void func_L02_003FC020(void *, void *);
 extern void func_L02_003D4900(char *);
 extern int func_002B3BA8(char *, int, int, int, float, float);
 
+/* Sets up the Chainblade's starting values on its first frame, then handles the hits it takes and the hurt animations. */
 void func_L02_003D4308(char *self) {
     char *state = *(char **)(self + 0x68);
     char *damage;
 
     if (*(unsigned char *)(self + 0x20) == 0) {
         D_L02_001B01E0 = 1;
-        *(unsigned char *)(state + 0x48) = func_00283CF0(15.0f);
-        *(unsigned char *)(state + 0x4A) = func_00283CF0(24.0f);
+        *(unsigned char *)(state + 0x48) = FloatToInt(15.0f);
+        *(unsigned char *)(state + 0x4A) = FloatToInt(24.0f);
         *(unsigned char *)(state + 0xD7) = 1;
         *(unsigned char *)(state + 0x29) = 1;
         *(unsigned char *)(state + 0x1F9) = 1;
@@ -43,16 +45,16 @@ void func_L02_003D4308(char *self) {
         *(float *)(state + 0x140) = 0.52359885f;
         *(float *)(state + 0x144) = 0.01f;
         *(float *)(state + 0x13C) = 0.0055555557f;
-        func_L02_003D4900(self);
+        ResetChainbladeToIdle(self);
     }
     if (*(unsigned char *)(self + 0x31)) {
-        if (func_00282E48(self + 0x10, D_L02_001BA500) < 60.0f) {
-            func_002A93B0(self);
+        if (fast_vec_dist(self + 0x10, gCameraPosition_L02) < 60.0f) {
+            UpdateMobyGroundCheck(self);
             *(unsigned char *)(self + 0x6F) = 0x38;
         }
     }
     if (*(short *)(state + 0x330) == 0) {
-        damage = func_002A9640(self, 0x10000, 0);
+        damage = FindOwnedEffectSlot(self, 0x10000, 0);
         if (damage) {
             if (*(unsigned char *)(self + 0x20) < 5 ||
                 (*(unsigned char *)(self + 0x20) == 10 && *(short *)(state + 0x324) < 5))
@@ -60,39 +62,39 @@ void func_L02_003D4308(char *self) {
             {
                 char *source = *(char **)(damage + 0x20);
                 if (source) {
-                    if (*(short *)(source + 0xAA) == 0xC89 || *(short *)(source + 0xAA) == 0xBFE)
+                    if (*(short *)(source + 0xAA) == 0xC89 /* moby class 3209 */ || *(short *)(source + 0xAA) == 0xBFE /* moby class 3070 */)
                         *(float *)(damage + 0x2C) *= 0.3f;
                 }
             }
             D_L02_001FF6B8[*(unsigned char *)(state + 0x37)] += (int)(*(float *)(damage + 0x2C) * 32.0f);
         }
-        if (func_002B0ED8(self, state + 0x60, 0)) {
+        if (ApplyDamageToObject(self, state + 0x60, 0)) {
             if (*(int *)(self + 0x98) == 0)
                 *(int *)(self + 0x98) = *(int *)(*(char **)(self + 0x24) + 0x10);
             {
                 char *source = *(char **)(state + 0x38);
-                if (source && *(short *)(source + 0xAA) != 0x47 && *(short *)(source + 0xAA) != 0)
+                if (source && *(short *)(source + 0xAA) != 0x47 /* moby class 71 */ && *(short *)(source + 0xAA) != 0)
                     D_L02_001B01E0 = 0;
             }
             if (*(unsigned char *)(self + 0x95) == 4) {
                 if (*(unsigned char *)(self + 0x43) != 16)
-                    func_002A7470(self, 16, 0, 3);
+                    StartAnimationBlended(self, 16, 0, 3);
             }
             if (*(unsigned char *)(self + 0x95) == 3 && *(float *)(state + 0x20) <= 0.0f) {
                 if (*(unsigned char *)(self + 0x43) != 4)
-                    func_002A7470(self, 4, 0, 3);
+                    StartAnimationBlended(self, 4, 0, 3);
             }
         }
         if (*(unsigned char *)(self + 0x20) != 0 && *(unsigned char *)(state + 0x2E) == 2) {
             char *source = *(char **)(state + 0x310);
             if (source && *(unsigned char *)(source + 0x20) != 0xFE &&
                 *(unsigned char *)(source + 0x20) != 0xFD && *(unsigned char *)(source + 0x20) >= 3) {
-                func_L02_003DB880(source);
-                func_L02_003FC020(*(void **)(self + 0xB8), *(void **)(state + 0x310));
+                AdvanceDamageStage(source);
+                SetCurrentArenaBoss(*(void **)(self + 0xB8), *(void **)(state + 0x310));
             }
-            func_L02_003D4900(self);
+            ResetChainbladeToIdle(self);
         }
     }
-    *(short *)(state + 0x322) = func_002B3BA8(self, *(int *)(state + 0x314), 0, 0, 100.0f, 100.0f);
+    *(short *)(state + 0x322) = SelectAimTarget_002B3BA8(self, *(int *)(state + 0x314), 0, 0, 100.0f, 100.0f);
     *(int *)(state + 0x30C) = *(int *)(state + 0x210);
 }

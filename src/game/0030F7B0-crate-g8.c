@@ -102,7 +102,7 @@ void func_00312600(Moby *moby)
     if (moby->state == 0)
         return;
     vars = moby->vars;
-    if (vars->frame == D_001B1688)
+    if (vars->frame == gGameTime)
         return;
 
     next = moby;
@@ -119,18 +119,18 @@ void func_00312600(Moby *moby)
         if (!(vars->flags & 4))
             vars->flags &= ~0x10;
         vars->flags &= ~4;
-        if (!func_002ABB78(moby) || (vars->flags & 2))
+        if (!IsMobyInSpecialClassRange(moby) || (vars->flags & 2))
             return;
-        vars->frame = D_001B1688;
+        vars->frame = gGameTime;
         if (moby->state != 0) {
             /* A crate the hero touches from below breaks and drops its loot. */
-            func_00282CF0(delta, D_00189E20.position, moby->position);
-            func_00283098(delta, delta, moby->matrix);
-            if (func_00282C48(delta[0]) < 0.55f && func_00282C48(delta[1]) < 0.55f &&
-                delta[2] < 0.0f && delta[2] > -(D_00189E20.f250 + D_00189E20.f264) &&
+            FastVecSub(delta, gHeroState.position, moby->position);
+            matrix_mul_vec3(delta, delta, moby->matrix);
+            if (FloatAbs(delta[0]) < 0.55f && FloatAbs(delta[1]) < 0.55f &&
+                delta[2] < 0.0f && delta[2] > -(gHeroState.f250 + gHeroState.f264) &&
                 (moby->state == 1 || moby->state == 5)) {
-                func_003120C8(moby, moby->oClass == 0x1F9, 0);
-                func_00311F70(moby);
+                DestroyCrate(moby, moby->oClass == 0x1F9 /* Explosive Crate */, 0);
+                DropCrateLoot(moby);
             }
 
             {
@@ -145,15 +145,15 @@ void func_00312600(Moby *moby)
                 /* Ride the attachment, the lift easing towards its target. */
                 if (vars->below == 0) {
                     vars->velocity[3] -= 0.0027777778f;
-                    if (func_002AA2E8(&vars->lift, 0.0f, func_00282C48(vars->velocity[3])) == 0.0f)
+                    if (ApproachValue(&vars->lift, 0.0f, FloatAbs(vars->velocity[3])) == 0.0f)
                         vars->velocity[3] = 0.0f;
                 } else {
                     float target;
 
                     vars->velocity[3] -= 0.0027777778f;
                     target = vars->below->vars->lift + 1.0f;
-                    if (func_002AA2E8(&vars->lift, target,
-                                      func_00282C48(vars->velocity[3])) == 0.0f)
+                    if (ApproachValue(&vars->lift, target,
+                                      FloatAbs(vars->velocity[3])) == 0.0f)
                         vars->velocity[3] = 0.0f;
                 }
                 qcopy(attachPosition, vars->attachOffset);
@@ -162,16 +162,16 @@ void func_00312600(Moby *moby)
                     moby->f36 = 0x7F80;
                 qcopy(previousPosition, moby->position);
                 qcopy(previousRotation, moby->rotation);
-                func_002AD470(moby, vars->attachment, attachPosition, vars->attachRotation,
+                ApplyCollisionPushToObject(moby, vars->attachment, attachPosition, vars->attachRotation,
                               moby->position, moby->rotation);
-                if (func_002AD0B0(vars->attachment)->flags & 4) {
+                if (GetMobyPrivateValue2(vars->attachment)->flags & 4) {
                     qcopy(vars->attachOffset, attachPosition);
                     vars->attachOffset[2] -= vars->lift;
                 }
-                func_00282CF0(movement, moby->position, previousPosition);
+                FastVecSub(movement, moby->position, previousPosition);
                 movement[3] = vars->velocity[3];
                 qcopy(vars->velocity, movement);
-                func_002AD6F0(vars->f50, vars->velocity, previousRotation, moby->rotation);
+                CombineTransformsAndStore(vars->f50, vars->velocity, previousRotation, moby->rotation);
             } else {
                 /* Fall until the line down from the crate hits the ground, or onto the crate
                  * below. */
@@ -180,8 +180,8 @@ void func_00312600(Moby *moby)
                     qcopy(end, moby->position);
                     start[2] += vars->height * 0.75f;
                     end[2] += vars->velocity[2];
-                    landed = func_002761F8(start, end, 2, 0, 0);
-                    qcopy(hit, D_001BAF80.point);
+                    landed = CollLine(start, end, 2, 0, 0);
+                    qcopy(hit, gCollisionHit.point);
                 } else {
                     qcopy(hit, vars->below->position);
                     hit[2] += 1.0f;
@@ -190,15 +190,15 @@ void func_00312600(Moby *moby)
                         landed = 1;
                 }
                 if (landed) {
-                    /* A fast landing sets off a class 0x1F9 crate in state 1: this one, or the
+                    /* A fast landing sets off a Explosive Crate (class 0x1F9) in state 1: this one, or the
                      * one below. */
-                    if ((vars->flags & 0x20) && func_00282DF0(vars->velocity) > 0.008333334f) {
-                        if (moby->oClass == 0x1F9 && moby->state == 1) {
+                    if ((vars->flags & 0x20) && FastVecLength(vars->velocity) > 0.008333334f) {
+                        if (moby->oClass == 0x1F9 /* Explosive Crate */ && moby->state == 1) {
                             moby->fBC = 0;
                             moby->state = 5;
                         } else {
                             below = vars->below;
-                            if (below != 0 && below->oClass == 0x1F9 && below->state == 1) {
+                            if (below != 0 && below->oClass == 0x1F9 /* Explosive Crate */ && below->state == 1) {
                                 below->state = 5;
                                 vars->below->fBC = 0;
                             }
@@ -208,7 +208,7 @@ void func_00312600(Moby *moby)
                     vars->velocity[2] = 0.0f;
                 } else {
                     vars->flags |= 4;
-                    func_00282CC0(moby->position, moby->position, vars->velocity);
+                    FastVecAdd(moby->position, moby->position, vars->velocity);
                 }
             }
         }

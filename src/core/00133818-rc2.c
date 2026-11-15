@@ -26,6 +26,7 @@
 
 extern s32 func_00132C48();
 
+/* Sends sound command 0x4B, which has no data. */
 void func_00133818(void) {
-    func_00132C48(0x4B, 0, 0);
+    snd_SendCommandSync(0x4B, 0, 0);
 }

@@ -52,30 +52,30 @@ extern float func_L00_002B5590(void *);
 /* Moves the hero's velocity toward the requested one, accelerating harder when reversing. */
 void func_L00_002B6198(float rate)
 {
-    float v[4] __attribute__((aligned(16)));
-    float t[4] __attribute__((aligned(16)));
-    float u[4] __attribute__((aligned(16)));
-    float angle, speed, dot, len, velLen;
+    float wantedVel[4] __attribute__((aligned(16)));
+    float targetCopy[4] __attribute__((aligned(16)));
+    float flatVel[4] __attribute__((aligned(16)));
+    float angle, speed, dot, wantedLen, currentLen;
 
-    switch (D_00189E20.moveMode) {
+    switch (gHeroState.moveMode) {
     case 0:
-        angle = D_00189E20.inputAngle;
-        speed = D_00189E20.inputSpeed;
-        if (D_00189E20.f229C == 4 && D_00189E20.f524 && D_00189E20.f287)
+        angle = gHeroState.inputAngle;
+        speed = gHeroState.inputSpeed;
+        if (gHeroState.f229C == 4 && gHeroState.f524 && gHeroState.f287)
             speed = 0.0833333358f;
-        if (D_00189E20.f34A && D_00189E20.f2294 == 14 && speed > 0.0166666675f)
+        if (gHeroState.f34A && gHeroState.f2294 == 14 && speed > 0.0166666675f)
             speed = 0.0166666675f;
-        v[0] = func_00283180(angle) * speed;
-        v[1] = func_00283198(angle) * speed;
-        v[2] = D_00189E20.velocity[2];
-        dot = -(D_00189E20.velocity[0] * v[0] + D_00189E20.velocity[1] * v[1]);
-        len = func_00282E20(v);
-        velLen = func_00282E20(D_00189E20.velocity);
-        if (len == 0.0f || velLen == 0.0f) {
+        wantedVel[0] = FastSinOrCosA(angle) * speed;
+        wantedVel[1] = FastSinOrCosB(angle) * speed;
+        wantedVel[2] = gHeroState.velocity[2];
+        dot = -(gHeroState.velocity[0] * wantedVel[0] + gHeroState.velocity[1] * wantedVel[1]);
+        wantedLen = vec_length_xy(wantedVel);
+        currentLen = vec_length_xy(gHeroState.velocity);
+        if (wantedLen == 0.0f || currentLen == 0.0f) {
             dot = 0.0f;
         } else {
-            dot /= len;
-            dot /= velLen;
+            dot /= wantedLen;
+            dot /= currentLen;
         }
         dot += 1.0f;
         dot *= 1.5f;
@@ -84,31 +84,31 @@ void func_L00_002B6198(float rate)
         if (dot < 1.0f)
             dot = 1.0f;
         rate *= dot;
-        func_00282CF0(v, v, D_00189E20.velocity);
-        if (func_00282E20(v) > rate)
-            func_00282F70(v, v, rate);
-        func_00282CC0(D_00189E20.velocity, D_00189E20.velocity, v);
-        qcopy(D_00189E20.lastVelocity, D_00189E20.velocity);
-        *(Quad *)t = *(Quad *)D_00189E20.vecA60;
-        D_00189E20.f1B4 = D_00189E20.f178 - func_L00_002B5590(t);
-        if (D_00189E20.f1454)
-            D_00189E20.f1B4 = D_00189E20.f174;
+        FastVecSub(wantedVel, wantedVel, gHeroState.velocity);
+        if (vec_length_xy(wantedVel) > rate)
+            FastVectorNormalizeHelper(wantedVel, wantedVel, rate);
+        FastVecAdd(gHeroState.velocity, gHeroState.velocity, wantedVel);
+        qcopy(gHeroState.lastVelocity, gHeroState.velocity);
+        *(Quad *)targetCopy = *(Quad *)gHeroState.vecA60;
+        gHeroState.f1B4 = gHeroState.f178 - GetSpeedAlongHeroForward(targetCopy);
+        if (gHeroState.f1454)
+            gHeroState.f1B4 = gHeroState.f174;
         break;
     case 1:
     case 2:
-        *(Quad *)t = *(Quad *)D_00189E20.targetDir;
-        speed = D_00189E20.inputSpeed;
-        func_L00_002D3B58(v, t, 0.0f);
-        func_00282F20(v, v, speed);
-        func_L00_002D3B58(u, D_00189E20.velocity, 0.0f);
-        dot = -func_00282DB0(u, v);
-        len = func_L00_002D3A58(v);
-        velLen = func_L00_002D3A58(D_00189E20.velocity);
-        if (len == 0.0f || velLen == 0.0f) {
+        *(Quad *)targetCopy = *(Quad *)gHeroState.targetDir;
+        speed = gHeroState.inputSpeed;
+        SetViewSpaceHeight(wantedVel, targetCopy, 0.0f);
+        vec_scale_to_length(wantedVel, wantedVel, speed);
+        SetViewSpaceHeight(flatVel, gHeroState.velocity, 0.0f);
+        dot = -FastVecDot(flatVel, wantedVel);
+        wantedLen = GetViewSpaceVectorLength(wantedVel);
+        currentLen = GetViewSpaceVectorLength(gHeroState.velocity);
+        if (wantedLen == 0.0f || currentLen == 0.0f) {
             dot = 0.0f;
         } else {
-            dot /= len;
-            dot /= velLen;
+            dot /= wantedLen;
+            dot /= currentLen;
         }
         dot += 1.0f;
         dot *= 1.5f;
@@ -117,14 +117,14 @@ void func_L00_002B6198(float rate)
         if (dot < 1.0f)
             dot = 1.0f;
         rate *= dot;
-        func_00282CF0(v, v, D_00189E20.velocity);
-        func_L00_002D3B58(v, v, 0.0f);
-        if (func_L00_002D3A58(v) > rate)
-            func_L00_002D3BD8(v, v, rate);
-        func_00282CC0(D_00189E20.velocity, D_00189E20.velocity, v);
-        D_00189E20.f1B4 = D_00189E20.f178;
-        if (D_00189E20.f1454)
-            D_00189E20.f1B4 = D_00189E20.f174;
+        FastVecSub(wantedVel, wantedVel, gHeroState.velocity);
+        SetViewSpaceHeight(wantedVel, wantedVel, 0.0f);
+        if (GetViewSpaceVectorLength(wantedVel) > rate)
+            SetViewSpaceVectorLength(wantedVel, wantedVel, rate);
+        FastVecAdd(gHeroState.velocity, gHeroState.velocity, wantedVel);
+        gHeroState.f1B4 = gHeroState.f178;
+        if (gHeroState.f1454)
+            gHeroState.f1B4 = gHeroState.f174;
         break;
     }
 }

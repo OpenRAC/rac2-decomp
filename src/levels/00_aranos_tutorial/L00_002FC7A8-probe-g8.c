@@ -34,7 +34,7 @@ void func_L00_002FC7A8(void) {
     char *found;
     char *out;
 
-    if (D_001A79F0[0] != 0)
+    if (gCurrentMapIndex[0] != 0)
         return;
 
     low = -1;
@@ -55,7 +55,7 @@ void func_L00_002FC7A8(void) {
         for (i = 0; i < D_L00_001BCAC0.count; i++) {
             char *obj = D_L00_001BCAC0.objects[i];
 
-            if (*(short *)(obj + 0xAA) == 0xD54) {
+            if (*(short *)(obj + 0xAA) == 0xD54 /* moby class 3412 */) {
                 found = obj;
                 break;
             }
@@ -67,11 +67,11 @@ void func_L00_002FC7A8(void) {
             out = D_L00_0027E620;
             matrix = found + 0xC0;
             for (n = 0; n < 4; n++) {
-                func_00283098(out, D_L00_001A93E0 + n * 16, matrix);
-                func_00282CC0(out, out, found + 0x10);
-                func_00282CF0(temp, D_L00_001B8DC0, out);
-                func_00282F20(temp, temp, 0.15f);
-                func_00282CC0(out, out, temp);
+                matrix_mul_vec3(out, D_L00_001A93E0 + n * 16, matrix);
+                FastVecAdd(out, out, found + 0x10);
+                FastVecSub(temp, gCameraPosition_L00, out);
+                vec_scale_to_length(temp, temp, 0.15f);
+                FastVecAdd(out, out, temp);
                 out += 16;
             }
         }

@@ -27,29 +27,29 @@ void func_L12_003A0F00(u8 *object) {
         case 2: return;
         default: break;
         case 3:
-            func_00282CC0(object+0x10,object+0x10,data+0x10);
-            func_00282D30(data+0x10,data+0x10,0.995f);
-            if(func_00277258(object+0x10,0,object,2.0f)) {
+            FastVecAdd(object+0x10,object+0x10,data+0x10);
+            FastVecScale(data+0x10,data+0x10,0.995f);
+            if(TestPointAgainstCollision(object+0x10,0,object,2.0f)) {
                 u8 *hit=D_L12_001C0240.hit;
                 if(hit) {
                     int type=*(short *)(hit+0xAA);
                     if(type==0x191 || type==0x184 || type==0x185 || type==0x186 || type==0x187 || type==0x188 || type==0x189 || type==0x18A || type==0x18B || type==0x18C || type==0x18F || type==0x190) goto rotate;
                 }
-                func_00283028(data+0x10,data+0x10,D_L12_001C0240.normal.f);object[0x20]=4;
+                FastVectorNormalize(data+0x10,data+0x10,D_L12_001C0240.normal.f);object[0x20]=4;
             }
 rotate:
-            *(float *)(object+0xF0)=func_00283B98(*(float *)(object+0xF0),*(float *)(data+0x30));
-            *(float *)(object+0xF4)=func_00283B98(*(float *)(object+0xF4),*(float *)(data+0x34));
-            *(float *)(object+0xF8)=func_00283B98(*(float *)(object+0xF8),*(float *)(data+0x38));
+            *(float *)(object+0xF0)=FastAddRotations(*(float *)(object+0xF0),*(float *)(data+0x30));
+            *(float *)(object+0xF4)=FastAddRotations(*(float *)(object+0xF4),*(float *)(data+0x34));
+            *(float *)(object+0xF8)=FastAddRotations(*(float *)(object+0xF8),*(float *)(data+0x38));
             *(float *)(data+0x30)*=0.999f;*(float *)(data+0x34)*=0.999f;*(float *)(data+0x38)*=0.999f;
-            if(*(float *)(object+0x10)<10 || *(float *)(object+0x10)>1013 || *(float *)(object+0x14)<10 || *(float *)(object+0x14)>1013 || *(float *)(object+0x18)<10 || *(float *)(object+0x18)>1013 || (func_00282948(data+0x40) && !object[0x31])) {
+            if(*(float *)(object+0x10)<10 || *(float *)(object+0x10)>1013 || *(float *)(object+0x14)<10 || *(float *)(object+0x14)>1013 || *(float *)(object+0x18)<10 || *(float *)(object+0x18)>1013 || (FastFloatHelperD(data+0x40) && !object[0x31])) {
 destroy:
-                func_0029F338(object);
+                MarkMobySpawned(object);
             }
             break;
         case 4:
-            func_002ABBB8(object,data+0x10,0,2,4,10,3,16,4,2,9,1,-1,15,1,1,-1,0,0x810001);
-            func_0029F338(object);break;
+            SpawnExplosionEffects(object,data+0x10,0,2,4,10,3,16,4,2,9,1,-1,15,1,1,-1,0,0x810001);
+            MarkMobySpawned(object);break;
         }
     } else goto destroy;
 }

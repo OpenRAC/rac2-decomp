@@ -13,6 +13,7 @@ extern void func_32B2C8(int, int, int, int, int);
 extern short D_L00_001B2678;
 extern short D_L00_001B267A;
 
+/* Returns the current fade value. */
 float func_L00_0037E668(void)
 {
     return ref_L02_00385E18_00;
@@ -21,12 +22,12 @@ float func_L00_0037E668(void)
 /* sets the fade value to its default (0) or its raised value (otherwise) and clears the flag */
 void func_L00_0037E670(int raised)
 {
-    float v = 40.0f;
+    float level = 40.0f;
     if (raised) {
-        v = 100.0f;
-        D_L00_001B26B0 = v;
+        level = 100.0f;
+        D_L00_001B26B0 = level;
     } else {
-        ref_L02_00385E18_00 = v;
+        ref_L02_00385E18_00 = level;
     }
     ref_L00_0037E670_01 = 0;
 }

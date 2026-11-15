@@ -16,36 +16,37 @@ extern char *func_L09_003AE8C8(float *a0, char *a1, float *a2, s32 a3, s32 t0, f
 extern s32 func_002E5CF8(s32 a0, s32 a1, char *a2);
 extern s32 func_002829A8(char *a0);
 
-void func_L09_003FEAE8(char *a0) {
-    char *s2 = *(char **)(a0 + 0x68);
+/* Shoots at the hero when he is close: picks a muzzle, fires a shot, plays a sound and then waits to reload. */
+void func_L09_003FEAE8(char *obj) {
+    char *vars = *(char **)(obj + 0x68);
     float matrix[16];
     float va[4];
 
     {
-        if (*(u8 *)(s2 + 0x42B) != 0 && func_00282E80(s2 + 0x390, *(char **)(s2 + 0x150) + 0x10) < 3.0f) {
-            *(s16 *)(s2 + 0x412) = 600;
-            if (*(s16 *)(s2 + 0x426) == 0 && *(u8 *)(s2 + 0x428) == 0) {
-                func_0029FC20(a0, *(u8 *)(s2 + 0x429) + 4, matrix);
-                if (*(u8 *)(s2 + 0x441) && func_00282E80(s2 + 0x140, s2 + 0x390) < 3.0f) {
-                    func_00282CF0(va, s2 + 0x140, matrix + 12);
+        if (*(u8 *)(vars + 0x42B) != 0 && vec_distance_xy(vars + 0x390, *(char **)(vars + 0x150) + 0x10) < 3.0f) {
+            *(s16 *)(vars + 0x412) = 600;
+            if (*(s16 *)(vars + 0x426) == 0 && *(u8 *)(vars + 0x428) == 0) {
+                TransformMobyJointPoint(obj, *(u8 *)(vars + 0x429) + 4, matrix);
+                if (*(u8 *)(vars + 0x441) && vec_distance_xy(vars + 0x140, vars + 0x390) < 3.0f) {
+                    FastVecSub(va, vars + 0x140, matrix + 12);
                 } else {
-                    func_00282CF0(va, s2 + 0x390, matrix + 12);
+                    FastVecSub(va, vars + 0x390, matrix + 12);
                 }
-                func_00282F20(D_L09_001B11C0 * 0.016666668f, va, va);
-                func_L09_003AE8C8(matrix + 12, a0, va, 1, 1, (float)*(u8 *)(s2 + 0x34), D_L09_001B11D0, 1.0f, 0.5f);
-                if (*(u8 *)(s2 + 0x42A) % D_L09_001B1280 == 0)
-                    func_002E5CF8(D_L09_001B11B8, 0, a0);
-                *(u8 *)(s2 + 0x429) ^= 1;
-                *(u8 *)(s2 + 0x42A) += 1;
-                *(u8 *)(s2 + 0x428) = D_L09_001B11C8;
-                if (D_L09_001B11C4 < *(u8 *)(s2 + 0x42A)) {
-                    *(u8 *)(s2 + 0x42A) = 0;
-                    *(u16 *)(s2 + 0x426) = D_L09_001B11CC;
+                vec_scale_to_length(D_L09_001B11C0 * 0.016666668f, va, va);
+                SpawnProjectileMoby_L09(matrix + 12, obj, va, 1, 1, (float)*(u8 *)(vars + 0x34), D_L09_001B11D0, 1.0f, 0.5f);
+                if (*(u8 *)(vars + 0x42A) % D_L09_001B1280 == 0)
+                    PlayMobySound(D_L09_001B11B8, 0, obj);
+                *(u8 *)(vars + 0x429) ^= 1;
+                *(u8 *)(vars + 0x42A) += 1;
+                *(u8 *)(vars + 0x428) = D_L09_001B11C8;
+                if (D_L09_001B11C4 < *(u8 *)(vars + 0x42A)) {
+                    *(u8 *)(vars + 0x42A) = 0;
+                    *(u16 *)(vars + 0x426) = D_L09_001B11CC;
                 }
             }
-        } else if (*(u8 *)(s2 + 0x428) == 0) {
-            if (func_002829A8(s2 + 0x42A) == 0)
-                *(u8 *)(s2 + 0x428) = D_L09_001B11C8;
+        } else if (*(u8 *)(vars + 0x428) == 0) {
+            if (FastVectorHelperA(vars + 0x42A) == 0)
+                *(u8 *)(vars + 0x428) = D_L09_001B11C8;
         }
     }
 }

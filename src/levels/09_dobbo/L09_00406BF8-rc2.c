@@ -27,20 +27,21 @@ extern s8 D_00189EA0[];
 extern s32 ref_L09_00406BF8_00(s8 *, s32);
 extern void ref_L09_00406BF8_01(s32, s32);
 
-s32 func_L09_00406BF8(s32 arg0, s32 arg1) {
-    s32 var_a1;
-    s32 var_s0;
+/* Checks whether the hero has hit the given trigger, records the result for a slot, and returns 1 if it was hit. */
+s32 func_L09_00406BF8(s32 triggerId, s32 slot) {
+    s32 resultCode;
+    s32 triggered;
 
-    var_a1 = 0;
-    var_s0 = 0;
-    if (arg0 != -1) {
-        if (ref_L09_00406BF8_00(D_00189EA0, arg0) != 0) {
-            var_a1 = var_s0;
-            var_s0 = 1;
+    resultCode = 0;
+    triggered = 0;
+    if (triggerId != -1) {
+        if (ref_L09_00406BF8_00(gHeroPosition, triggerId) != 0) {
+            resultCode = triggered;
+            triggered = 1;
         } else {
-            var_a1 = 2;
+            resultCode = 2;
         }
     }
-    ref_L09_00406BF8_01(arg1, var_a1);
-    return var_s0;
+    ref_L09_00406BF8_01(slot, resultCode);
+    return triggered;
 }

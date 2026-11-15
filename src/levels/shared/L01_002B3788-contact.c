@@ -75,103 +75,104 @@ extern void func_L00_002B2C58(void *, s32, float, float);
 extern void func_L00_002D3C68(void *, void *, float);
 extern void func_00282CC0(void *, void *, void *);
 
-s32 func_L01_002B3788(s32 arg0) {
-    TI16 vec;
-    PlayerContactEntry *e;
-    u8 *moby;
-    u8 *other;
-    s32 flag;
+/* Handles the hero being touched by a hazard. It checks the hero can be hurt and, if asked, pushes the hero away and starts the hurt reaction. Returns 1 when the hit counts. */
+s32 func_L01_002B3788(s32 applyImpulse) {
+    TI16 pushVec;
+    PlayerContactEntry *contactEntry;
+    u8 *heroMoby;
+    u8 *otherMoby;
+    s32 fromAbove;
 
-    if (D_00189E20.f229C == 20 || D_00189E20.f229C == 7) {
+    if (gHeroState.f229C == 20 || gHeroState.f229C == 7) {
         return 0;
     }
-    if (D_00189E20.f2294 == 0x31) {
+    if (gHeroState.f2294 == 0x31) {
         return 0;
     }
-    if (D_00189E20.f1DC != 0) {
+    if (gHeroState.f1DC != 0) {
         return 0;
     }
     if (D_L01_001A8F40 != 0) {
         return 0;
     }
-    D_00189E20.f249C = 0;
-    moby = D_00189E20.f2290;
-    if (moby[0xA8] == 0xFF) {
+    gHeroState.f249C = 0;
+    heroMoby = gHeroState.f2290;
+    if (heroMoby[0xA8] == 0xFF) {
         return 0;
     }
-    e = &D_L01_001C3B80[moby[0xA8]];
-    if (e->f38 != moby) {
+    contactEntry = &D_L01_001C3B80[heroMoby[0xA8]];
+    if (contactEntry->f38 != heroMoby) {
         return 0;
     }
-    if ((e->f24 & 9) == 0) {
+    if ((contactEntry->f24 & 9) == 0) {
         return 0;
     }
-    if (e->f2C != 0.0f) {
+    if (contactEntry->f2C != 0.0f) {
         D_001A7A33 = 0;
-        D_001A7A32 = 1;
+        gBoltMultiplier = 1;
     }
-    if (func_L00_0037E668() != 0.0f && D_00189E20.f22B4 == 0) {
-        e->f2C = func_L00_0037E5F0(e->f2C);
-        if (e->f2C == 0.0f) {
+    if (GetFadeValue() != 0.0f && gHeroState.f22B4 == 0) {
+        contactEntry->f2C = ReduceFadeValue(contactEntry->f2C);
+        if (contactEntry->f2C == 0.0f) {
             return 0;
         }
     }
-    D_00189E20.f249C = e->f20;
-    if (arg0 == 0) {
+    gHeroState.f249C = contactEntry->f20;
+    if (applyImpulse == 0) {
         return 1;
     }
-    flag = 0;
-    func_L00_002A6708();
-    if (e->f30 & 1) {
-        qcopy(&vec, &e->f10);
-        if (e->f1C == 5627.9248046875f) {
-            flag = 1;
+    fromAbove = 0;
+    ClearTrackedSlots();
+    if (contactEntry->f30 & 1) {
+        qcopy(&pushVec, &contactEntry->f10);
+        if (contactEntry->f1C == 5627.9248046875f) {
+            fromAbove = 1;
         }
-    } else if (e->f20 != 0) {
-        func_00282CF0(&vec, &D_00189E20.f80, e->f20 + 0x10);
+    } else if (contactEntry->f20 != 0) {
+        FastVecSub(&pushVec, &gHeroState.f80, contactEntry->f20 + 0x10);
     } else {
-        func_L00_002D36E0(&vec, 0, -1.0f, 0.0f, 0.0f);
+        BuildHeroRelativePoint(&pushVec, 0, -1.0f, 0.0f, 0.0f);
     }
-    switch (D_00189E20.f22B4) {
+    switch (gHeroState.f22B4) {
     case 0:
-        other = D_00189E20.f249C;
-        if (other != 0 && (*(s16 *)(other + 0xAA) == 0x4EB || *(s16 *)(other + 0xAA) == 0x558)) {
+        otherMoby = gHeroState.f249C;
+        if (otherMoby != 0 && (*(s16 *)(otherMoby + 0xAA) == 0x4EB /* moby class 1259 */ || *(s16 *)(otherMoby + 0xAA) == 0x558 /* moby class 1368 */)) {
             func_002BEB90(0x7D, 1);
             return 1;
         }
-        if ((D_00189E20.f2294 == 1 || D_00189E20.f2294 == 0x1D || D_00189E20.f1500 != 0)
-            && !(e->f24 & 8)) {
-            u8 *r = func_002A9640(D_00189E20.f2290, 1, 0);
+        if ((gHeroState.f2294 == 1 || gHeroState.f2294 == 0x1D || gHeroState.f1500 != 0)
+            && !(contactEntry->f24 & 8)) {
+            u8 *hitInfo = FindOwnedEffectSlot(gHeroState.f2290, 1, 0);
 
-            if (r != 0) {
-                func_L00_002A4EF8(func_002E45B8(*(float *)(r + 0x2C)));
+            if (hitInfo != 0) {
+                AdjustPlayerHealth(func_002E45B8(*(float *)(hitInfo + 0x2C)));
             }
-            if (D_00189E20.f24CC == 0) {
+            if (gHeroState.f24CC == 0) {
                 func_002BEB90(0x16, 1);
             }
-            D_00189E20.f1DC = 0x4D;
-            if (D_00189E20.f21C == 0) {
-                D_00189E20.f21C = 0x12;
+            gHeroState.f1DC = 0x4D;
+            if (gHeroState.f21C == 0) {
+                gHeroState.f21C = 0x12;
             }
-            func_L00_002B9B88(0x14, 0);
+            PlayHeroSound(0x14, 0);
             return 0;
         }
-        if (e->f24 & 8) {
+        if (contactEntry->f24 & 8) {
             func_002BEB90(0x8C, 1);
         } else {
             func_002BEB90(0x16, 1);
         }
-        if (D_00189E20.f2294 == 0x8C) {
-            qzero(&vec);
+        if (gHeroState.f2294 == 0x8C) {
+            qzero(&pushVec);
         } else {
-            func_L00_002B2C58(&vec, flag, D_00189E20.f1497 ? 0.0f : 0.055000003f, 0.028333336f);
-            if (flag != 0 && e->f28 == 4) {
-                func_L00_002D3C68(&vec, &vec, 2.0f);
+            FlattenPushVectorAndSetStrength(&pushVec, fromAbove, gHeroState.f1497 ? 0.0f : 0.055000003f, 0.028333336f);
+            if (fromAbove != 0 && contactEntry->f28 == 4) {
+                ScaleViewSpaceHeight(&pushVec, &pushVec, 2.0f);
             }
         }
         break;
     }
-    func_00282CC0(&D_00189E20.fF0, &D_00189E20.fF0, &vec);
-    func_00282CC0(&D_00189E20.f110, &D_00189E20.f110, &vec);
+    FastVecAdd(&gHeroState.fF0, &gHeroState.fF0, &pushVec);
+    FastVecAdd(&gHeroState.f110, &gHeroState.f110, &pushVec);
     return 1;
 }

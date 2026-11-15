@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     int first, second, third, fourth;
@@ -30,22 +31,24 @@ extern int D_L00_001A904C_6 __attribute__((sda));
 
 extern void func_003380B0(int *p, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10);
 
-s32 func_0029AE78(s32 *a0) {
- s32 n=8;
- while(a0[0]!=0) {
-  n+=8; n+=a0[1]; n=(n+3)&-4;
-  a0+=4;
+/* Works out how many bytes the save data needs by walking a list of records, with each one padded to 4 bytes. */
+s32 func_0029AE78(s32 *records) {
+ s32 size=8;
+ while(records[0]!=0) {
+  size+=8; size+=records[1]; size=(size+3)&-4;
+  records+=4;
  }
- return n+8;
+ return size+8;
 }
 
 extern int D_00256138[];
 
+/* Makes a 16-bit checksum of a block of save data. Returns 0 if the block is too long. */
 int func_0029AEB0(char *data, int length)
 {
     char *end;
     unsigned int crc;
-    if (func_0029AE78(D_00256138) < length)
+    if (memcard_GetDataSize(D_00256138) < length)
         return 0;
     end = data + length;
     crc = 0xEDB88320;
@@ -64,66 +67,69 @@ int func_0029AEB0(char *data, int length)
     return crc & 0xFFFF;
 }
 
-int func_0029AF58(char *a0)
+/* Checks that a save block matches the checksum stored in its header. */
+int func_0029AF58(char *block)
 {
     extern int func_0029AEB0(char *, int);
-    int expected = *(int *)(a0 + 4);
-    int first = *(int *)a0;
+    int storedChecksum = *(int *)(block + 4);
+    int length = *(int *)block;
     int result = 0;
-    if (expected != 0)
-        result = func_0029AEB0(a0 + 8, first) == expected;
+    if (storedChecksum != 0)
+        result = ComputeSaveChecksum(block + 8, length) == storedChecksum;
     return result;
 }
 
-int func_0029AF98(char *out, int mult, int *recs)
+/* Packs all the save records into one buffer and adds the end marker and checksum. Returns the total size. */
+int func_0029AF98(char *saveBuf, int slotIndex, int *records)
 {
-    int off = 0;
-    char *p = out + 8;
-    char *r;
-    int v;
-    int w;
+    int size = 0;
+    char *dst = saveBuf + 8;
+    char *rec;
+    int srcOffset;
+    int recSize;
 
-    if (*(int *)recs != 0) {
-        r = (char *)recs;
+    if (*(int *)records != 0) {
+        rec = (char *)records;
         do {
-            off += 8;
-            v = *(int *)(r + 0) + mult * *(int *)(r + 4);
-            *(int *)(p + 0) = *(int *)(r + 8);
-            *(int *)(p + 4) = *(int *)(r + 4);
-            p += 8;
-            if (*(int *)(r + 8) == 6000)
-                F2d5993bb_FUN_00282A60(p, 0, *(int *)(r + 4));
+            size += 8;
+            srcOffset = *(int *)(rec + 0) + slotIndex * *(int *)(rec + 4);
+            *(int *)(dst + 0) = *(int *)(rec + 8);
+            *(int *)(dst + 4) = *(int *)(rec + 4);
+            dst += 8;
+            if (*(int *)(rec + 8) == 6000)
+                F2d5993bb_FUN_00282A60(dst, 0, *(int *)(rec + 4));
             else
-                F2d5993bb_FUN_00282AB0(p, v, *(int *)(r + 4));
-            w = *(int *)(r + 4);
-            r += 16;
-            p += w;
-            off += w;
-            p = (char *)(((int)p + 3) & ~3);
-            off = (off + 3) & ~3;
-        } while (*(int *)r != 0);
+                F2d5993bb_FUN_00282AB0(dst, srcOffset, *(int *)(rec + 4));
+            recSize = *(int *)(rec + 4);
+            rec += 16;
+            dst += recSize;
+            size += recSize;
+            dst = (char *)(((int)dst + 3) & ~3);
+            size = (size + 3) & ~3;
+        } while (*(int *)rec != 0);
     }
-    off += 8;
-    *(int *)(p + 4) = 0;
-    *(int *)(p + 0) = -1;
-    v = F2d5993bb_FUN_0029AEB0(out + 8, off);
-    *(int *)(out + 4) = v;
-    *(int *)(out + 0) = off;
-    return off + 8;
+    size += 8;
+    *(int *)(dst + 4) = 0;
+    *(int *)(dst + 0) = -1;
+    srcOffset = F2d5993bb_FUN_0029AEB0(saveBuf + 8, size);
+    *(int *)(saveBuf + 4) = srcOffset;
+    *(int *)(saveBuf + 0) = size;
+    return size + 8;
 }
 
+/* Reads one save-slot header from memory-card data into the slot info table and marks it bad if the checksum fails. */
 /* Slot indexing follows RAC1 memcard_RestoreInfo (src/game/memcard.c). */
 void func_0029B0B0(char *src, int slot, int entry)
 {
-    D_001393E0[slot].entries[entry].invalid = func_0029AF58(src) == 0;
+    gMemcardState[slot].entries[entry].invalid = VerifySaveBlockChecksum(src) == 0;
     src += 0x10;
-    D_001393E0[slot].entries[entry].first = *(int *)src;
+    gMemcardState[slot].entries[entry].first = *(int *)src;
     src += 0xC;
-    D_001393E0[slot].entries[entry].second = *(int *)src;
-    D_001393E0[slot].entries[entry].third = *(unsigned char *)(src + 0x12);
+    gMemcardState[slot].entries[entry].second = *(int *)src;
+    gMemcardState[slot].entries[entry].third = *(unsigned char *)(src + 0x12);
     src += 0x48;
-    D_001393E0[slot].entries[entry].fourth = *(int *)src;
-    memcpy(D_001393E0[slot].entries[entry].stamp, src + 0xC, 8);
+    gMemcardState[slot].entries[entry].fourth = *(int *)src;
+    memcpy(gMemcardState[slot].entries[entry].stamp, src + 0xC, 8);
 }
 
 
@@ -136,36 +142,41 @@ void func_0029B0B0(char *src, int slot, int entry)
 extern char *D_001A8CFC[] __attribute__((sda));
 extern void func_0034CE28(void *, int);
 
+/* Passes a value on to the level object, if one is loaded. */
 void func_0029B698(int value) {
     if (D_001A8CFC[0] != 0)
-        func_0034CE28(D_001A8CFC[0] + 0x376C8, value);
+        SetScreenValueAndRestartFourFades(D_001A8CFC[0] + 0x376C8, value);
 }
 
 extern void func_0034CAE8(void *, int, int);
 
+/* Passes two values on to the level object, if one is loaded. */
 void func_0029B6D0(int first, int second) {
     if (D_001A8CFC[0] != 0)
-        func_0034CAE8(D_001A8CFC[0] + 0x376C8, first, second);
+        SetScreenValueAndRestartFades(D_001A8CFC[0] + 0x376C8, first, second);
 }
 
 
 extern void func_0034B000(void *, int);
 
+/* Passes a value on to another part of the level object, if one is loaded. */
 void func_0029B720(int value) {
     if (D_001A8CFC[0] != 0)
-        func_0034B000(D_001A8CFC[0] + 0x37EB0, value);
+        SetMenuFlagAndRestartFades(D_001A8CFC[0] + 0x37EB0, value);
 }
 
 /* A08-sda-offset-40 freshly exact-verified under family reservation */
-void func_0029B758(BatchA_A08_s32 a0, BatchA_A08_s32 a1) {
+/* Stores two values in the level object, if one is loaded. */
+void func_0029B758(BatchA_A08_s32 first, BatchA_A08_s32 second) {
     BatchA_A08_s32 base = D_L00_001A904C[0];
-    BatchA_A08_s32 *p;
+    BatchA_A08_s32 *values;
     if (base == 0) return;
-    p = (BatchA_A08_s32 *)(base + 0x38000);
-    p[0x7368/4] = a0;
-    p[0x736C/4] = a1;
+    values = (BatchA_A08_s32 *)(base + 0x38000);
+    values[0x7368/4] = first;
+    values[0x736C/4] = second;
 }
 
+/* Returns 1 if either of the two stored level values is non-zero. */
 int func_0029B780(void) {
     int base = D_L00_001A904C[0];
     if (base != 0) {
@@ -180,9 +191,10 @@ int func_0029B780(void) {
 
 extern void func_0034E4B8(void *);
 
+/* Runs the level object update routine, if a level object is loaded. */
 void func_0029B858(void) {
     if (D_001A8CFC[0] != 0)
-        func_0034E4B8(D_001A8CFC[0] + 0x36F28);
+        UpdateHudSubobjectAt1D6C(D_001A8CFC[0] + 0x36F28);
 }
 
 /* Loads a 32-bit global pointer from a fixed data address; if non-null, tail-forwards it (offset by 0x36F28) plus ten incoming arguments to an overlay-local callee. */
@@ -191,6 +203,6 @@ void func_0029B888(int a0, int a1, int a2, int a3, int a4, int a5, int a6, int a
     int value = D_L00_001A904C_6;
 
     if (value != 0)
-        func_003380B0((int *)(value + 0x36F28), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+        DrawTextInFramedBox((int *)(value + 0x36F28), a0, a1, a2, a3, a4, a5, a6, a7, a8, a9);
 }
 

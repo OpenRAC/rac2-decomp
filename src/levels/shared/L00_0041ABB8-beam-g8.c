@@ -48,7 +48,7 @@ static inline int BeamAlpha(EffectSlot *slot)
 
     if (slot->fading == 1) {
         float scale = slot->scale * 64.0f;
-        alpha = func_00283CF0(scale + scale);
+        alpha = FloatToInt(scale + scale);
     } else {
         alpha = 64;
     }
@@ -71,14 +71,14 @@ void func_L00_0041BCC8(void *unused)
     int index;
 
     for (index = 0; index < 10; index++) {
-        slot = (EffectSlot *)(index * 0x530 + (int)D_L00_001B1450);
+        slot = (EffectSlot *)(index * 0x530 + (int)gLavaGunBeamSlots);
         if (slot->inUse != 1)
             continue;
         alpha = BeamAlpha(slot);
-        func_L00_0041C160(unused, slot->point, slot, (alpha << 24) | 0x103080, 0.35f);
-        func_L00_0041C160(unused, slot->point, slot, (alpha << 24) | 0xFFFFFF, 0.075f);
+        DrawDirectionalGlowSprite(unused, slot->point, slot, (alpha << 24) | 0x103080, 0.35f);
+        DrawDirectionalGlowSprite(unused, slot->point, slot, (alpha << 24) | 0xFFFFFF, 0.075f);
         for (part = 0; part < 2; part++) {
-            slot->packet[part].header[1] = func_0027C878(23);
+            slot->packet[part].header[1] = GetEffectTextureDescriptor(23);
             tag = 0xFF9000000260LL;
             slot->packet[part].header[2] = tag;
             slot->packet[part].header[0] = 0;
@@ -110,28 +110,28 @@ void func_L00_0041BCC8(void *unused)
                 slot->packet[part].uv[3][1] = 0.0f;
             }
             point = &slot->point[part];
-            func_00282CF0(&eye, D_L00_001B8DC0, point);
-            func_002AFFD8(point, &normal, 1);
-            func_00282F20(&matrix[0], &eye, 1.0f);
-            func_00282DD8(&matrix[1], &matrix[0], &normal);
-            func_00282F20(&matrix[1], &matrix[1], 1.0f);
-            func_00282DD8(&matrix[2], &matrix[1], &matrix[0]);
+            FastVecSub(&eye, gCameraPosition_L00, point);
+            ComputeViewDirection(point, &normal, 1);
+            vec_scale_to_length(&matrix[0], &eye, 1.0f);
+            FastVecCross(&matrix[1], &matrix[0], &normal);
+            vec_scale_to_length(&matrix[1], &matrix[1], 1.0f);
+            FastVecCross(&matrix[2], &matrix[1], &matrix[0]);
             ((float *)&matrix[3])[0] = ((float *)point)[0];
             ((float *)&matrix[3])[1] = ((float *)point)[1];
             ((float *)&matrix[3])[2] = ((float *)point)[2];
             ((float *)&matrix[3])[3] = 1.0f;
             if (slot->fading == 1) {
-                func_00282D30(&slot->packet[part].vertex[0], &slot->source[part].vertex[0], 0.5f);
-                func_00282D30(&slot->packet[part].vertex[1], &slot->source[part].vertex[1], 0.5f);
-                func_00282D30(&slot->packet[part].vertex[2], &slot->source[part].vertex[2], 0.5f);
-                func_00282D30(&slot->packet[part].vertex[3], &slot->source[part].vertex[3], 0.5f);
+                FastVecScale(&slot->packet[part].vertex[0], &slot->source[part].vertex[0], 0.5f);
+                FastVecScale(&slot->packet[part].vertex[1], &slot->source[part].vertex[1], 0.5f);
+                FastVecScale(&slot->packet[part].vertex[2], &slot->source[part].vertex[2], 0.5f);
+                FastVecScale(&slot->packet[part].vertex[3], &slot->source[part].vertex[3], 0.5f);
             } else {
-                func_00282D30(&slot->packet[part].vertex[0], &slot->source[part].vertex[0], slot->scale);
-                func_00282D30(&slot->packet[part].vertex[1], &slot->source[part].vertex[1], slot->scale);
-                func_00282D30(&slot->packet[part].vertex[2], &slot->source[part].vertex[2], slot->scale);
-                func_00282D30(&slot->packet[part].vertex[3], &slot->source[part].vertex[3], slot->scale);
+                FastVecScale(&slot->packet[part].vertex[0], &slot->source[part].vertex[0], slot->scale);
+                FastVecScale(&slot->packet[part].vertex[1], &slot->source[part].vertex[1], slot->scale);
+                FastVecScale(&slot->packet[part].vertex[2], &slot->source[part].vertex[2], slot->scale);
+                FastVecScale(&slot->packet[part].vertex[3], &slot->source[part].vertex[3], slot->scale);
             }
-            func_00280B90(&slot->packet[part], matrix, 0);
+            draw_world_quad(&slot->packet[part], matrix, 0);
         }
     }
 }

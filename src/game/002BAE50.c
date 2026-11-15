@@ -6,30 +6,31 @@ extern int func_00283CF0(float);
 extern int func_001163B0(void);
 extern unsigned char **D_001F2550[];
 
-char *func_002BAE50(void *a0, void *a1, unsigned int a2, int a3, int a4, int a5, int a6, int a7)
+/* Creates a moving particle with its own colour and life, starting at a point with a velocity. */
+char *func_002BAE50(void *position, void *velocity, unsigned int color, int endColor, int life, int scale, int type, int additive)
 {
-    char *o = func_002B9030(4);
+    char *particle = AllocParticle(4);
     char *p;
-    char *q;
+    char *motion;
 
-    if (o != 0) {
-        qcopy(o + 0x10, a0);
-        *(unsigned int *)(o + 4) = a2;
-        *(char *)(o + 9) = func_00283CF0(4.0f) - 0x60;
-        *(char *)(o + 3) = a7 ? 0x48 : 0x44;
-        *(char *)(o + 1) = 0;
-        *(char *)(o + 2) = **(unsigned char **)D_001F2550;
-        *(char *)(o + 8) = func_001163B0();
-        *(int *)(o + 0xC) = 0;
-        q = o + 0x20;
-        qcopy(o + 0x10, a0);
-        qcopy(q, a1);
-        *(short *)(o + 0xA) = a4;
-        *(int *)(q + 0x1C) = a4;
-        *(int *)(q + 0x10) = a2;
-        *(int *)(q + 0x14) = a3;
-        *(short *)(q + 0x18) = a6;
-        *(short *)(q + 0x1A) = a5;
+    if (particle != 0) {
+        qcopy(particle + 0x10, position);
+        *(unsigned int *)(particle + 4) = color;
+        *(char *)(particle + 9) = FloatToInt(4.0f) - 0x60;
+        *(char *)(particle + 3) = additive ? 0x48 : 0x44;
+        *(char *)(particle + 1) = 0;
+        *(char *)(particle + 2) = **(unsigned char **)D_001F2550;
+        *(char *)(particle + 8) = Rand();
+        *(int *)(particle + 0xC) = 0;
+        motion = particle + 0x20;
+        qcopy(particle + 0x10, position);
+        qcopy(motion, velocity);
+        *(short *)(particle + 0xA) = life;
+        *(int *)(motion + 0x1C) = life;
+        *(int *)(motion + 0x10) = color;
+        *(int *)(motion + 0x14) = endColor;
+        *(short *)(motion + 0x18) = type;
+        *(short *)(motion + 0x1A) = scale;
     }
-    return o;
+    return particle;
 }

@@ -14,20 +14,21 @@ typedef struct {
 extern Obj_35370 *ref_L00_00335370_00;
 extern char *func_00270280(s32 a0);
 
-void func_00335370(void *a0)
+/* Copies a vector into the data of the selected object. */
+void func_00335370(void *vec)
 {
-    Obj_35370 *obj;
+    Obj_35370 *current;
     Obj_35370 *selected;
     void *dst;
-    char *p;
+    char *dstPtr;
 
-    obj = ref_L00_00335370_00;
-    if (obj->f86_35370 != 5) {
-        selected = (Obj_35370 *)func_00270280(5);
+    current = ref_L00_00335370_00;
+    if (current->f86_35370 != 5) {
+        selected = (Obj_35370 *)FindRecordByHandleId(5);
     } else {
-        selected = obj;
+        selected = current;
     }
     dst = selected->f70_35370;
-    p = (char *)dst + 0x80;
-    qcopy(p, a0);
+    dstPtr = (char *)dst + 0x80;
+    qcopy(dstPtr, vec);
 }

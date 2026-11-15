@@ -21,6 +21,7 @@ extern int func_002E5CF8(int, int, char *);
 extern void func_L20_004450D8(char *);
 extern void *jtbl_002B5940[];
 
+/* Runs the swinging arm (moby class 4584). It goes through its raise, drop and settle steps and keeps its linked object attached to it. */
 void func_L20_00444CA8(char *obj) {
     /* Keep all eight destinations represented by the level's dispatch table. */
     static void *volatile states[] = {
@@ -37,51 +38,51 @@ void func_L20_00444CA8(char *obj) {
     c0:
         if (*(int *)(state + 8)>=0) *(char **)(state + 0x10)=(char *)(D_L20_001B2F9C+(*(int *)(state + 8)<<8));
         else *(char **)(state + 0x10)=0;
-        func_002A7750(obj, 1, -1); goto c7;
+        SetMobyState(obj, 1, -1); goto c7;
     c1:
-        if (func_002B38B8(target)) {
-            func_002E5CF8(0, 0, obj);
-            func_002A7750(obj, 2, -1);
+        if (IsThirdPendingFlagSet(target)) {
+            PlayMobySound(0, 0, obj);
+            SetMobyState(obj, 2, -1);
         }
-        if (D_0019B2E8[(unsigned char)obj[0xB0]+D_001A79F0*16]&0x80) {
-            *(float *)(obj + 0xF0)=func_00283BE0(*(float *)(obj + 0xF0), 1.57079649f);
-            func_002A7750(obj, 6, -1);
+        if (D_0019B2E8[(unsigned char)obj[0xB0]+gCurrentMapIndex*16]&0x80) {
+            *(float *)(obj + 0xF0)=fast_subtract_rotations(*(float *)(obj + 0xF0), 1.57079649f);
+            SetMobyState(obj, 6, -1);
         }
         goto c7;
     c2:
-        func_002AA548(obj + 0xF0, state + 4, -1.57079649f, 0.000533295097f, 174.532944f, 290.888275f);
+        StepValueTowardTarget(obj + 0xF0, state + 4, -1.57079649f, 0.000533295097f, 174.532944f, 290.888275f);
         if (*(float *)(obj + 0xF0)<=-0.785398245f) {
             char *other=*(char **)(state + 0x10);
-            if (other && *(short *)(other + 0xAA)==0xCBC && (unsigned char)other[0x20]!=0xFE && (unsigned char)other[0x20]!=0xFD)
-                func_L09_003EAF60(other);
+            if (other && *(short *)(other + 0xAA)==0xCBC /* Megacorp Hover Tank */ && (unsigned char)other[0x20]!=0xFE && (unsigned char)other[0x20]!=0xFD)
+                DestroyMobyWithExplosion(other);
         }
-        if (*(float *)(obj + 0xF0)<=-1.57079649f) { *(int *)(state + 4)=0; func_002A7750(obj, 3, -1); func_002E5CF8(1, 0, obj); }
+        if (*(float *)(obj + 0xF0)<=-1.57079649f) { *(int *)(state + 4)=0; SetMobyState(obj, 3, -1); PlayMobySound(1, 0, obj); }
         goto c7;
     c3:
-        func_002AA548(obj + 0xF0, state + 4, -1.30899704f, 0.0174532942f, 0.000436332368f, 0.87266475f);
-        if (*(float *)(obj + 0xF0)>=-1.30899704f) { *(int *)(state + 4)=0; func_002A7750(obj, 4, -1); }
+        StepValueTowardTarget(obj + 0xF0, state + 4, -1.30899704f, 0.0174532942f, 0.000436332368f, 0.87266475f);
+        if (*(float *)(obj + 0xF0)>=-1.30899704f) { *(int *)(state + 4)=0; SetMobyState(obj, 4, -1); }
         goto c7;
     c4:
-        func_002AA548(obj + 0xF0, state + 4, -1.57079649f, 0.000436332368f, 0.17453295f, 2.90888262f);
-        if (*(float *)(obj + 0xF0)<=-1.57079649f) { *(int *)(state + 4)=0; func_002A7750(obj, 5, -1); func_002E5CF8(1, 0, obj); }
+        StepValueTowardTarget(obj + 0xF0, state + 4, -1.57079649f, 0.000436332368f, 0.17453295f, 2.90888262f);
+        if (*(float *)(obj + 0xF0)<=-1.57079649f) { *(int *)(state + 4)=0; SetMobyState(obj, 5, -1); PlayMobySound(1, 0, obj); }
         goto c7;
     c5:
-        func_002AA548(obj + 0xF0, state + 4, -1.48353004f, 0.0174532942f, 0.000436332368f, 0.87266475f);
-        if (*(float *)(obj + 0xF0)>=-1.48353004f) { *(int *)(state + 4)=0; func_002A7750(obj, 6, -1); }
+        StepValueTowardTarget(obj + 0xF0, state + 4, -1.48353004f, 0.0174532942f, 0.000436332368f, 0.87266475f);
+        if (*(float *)(obj + 0xF0)>=-1.48353004f) { *(int *)(state + 4)=0; SetMobyState(obj, 6, -1); }
         goto c7;
     c6:
-        if (func_002B3868(obj)) func_L20_004450D8(obj);
-        func_002AA548(obj + 0xF0, state + 4, -1.57079649f, 0.000436332368f, 0.17453295f, 2.90888262f);
-        if (*(float *)(obj + 0xF0)<=-1.57079649f) { *(int *)(state + 4)=0; func_002A7750(obj, 7, -1); func_002E5CF8(1, 0, obj); }
+        if (SetFirstPendingFlag(obj)) WakeGroupTroopers(obj);
+        StepValueTowardTarget(obj + 0xF0, state + 4, -1.57079649f, 0.000436332368f, 0.17453295f, 2.90888262f);
+        if (*(float *)(obj + 0xF0)<=-1.57079649f) { *(int *)(state + 4)=0; SetMobyState(obj, 7, -1); PlayMobySound(1, 0, obj); }
         goto c7;
     c7:
     {
         char *pos = target + 0x10;
 
         qcopy(pos, obj + 0x10);
-        func_00282F20(&v, obj + 0xE0, 5.7f);
-        func_00282CC0(pos, pos, (char *)&v);
-        func_00282F20(&w, obj + 0xD0, 0.35f);
-        func_00282CC0(pos, pos, (char *)&w);
+        vec_scale_to_length(&v, obj + 0xE0, 5.7f);
+        FastVecAdd(pos, pos, (char *)&v);
+        vec_scale_to_length(&w, obj + 0xD0, 0.35f);
+        FastVecAdd(pos, pos, (char *)&w);
     }
 }

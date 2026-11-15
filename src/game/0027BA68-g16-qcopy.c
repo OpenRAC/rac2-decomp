@@ -47,9 +47,10 @@ extern void func_0027AB40(void), func_002FC748(void), func_002A0220(void), func_
 extern int func_002A0380(void);
 extern void func_00280B90(void *, int, int);
 
+/* Draws the selected object into a small texture, then shows that texture as a flat picture on screen. */
 void func_0027BA68(void)
 {
-    CaptureObject *object = D_001B8840.capture;
+    CaptureObject *object = gScenePlaybackState.capture;
     QuadPoint saved_matrix[4], saved_position, matrix[4];
     CaptureQuad quad;
     if (object) {
@@ -60,39 +61,39 @@ void func_0027BA68(void)
         float saved_scale;
         void *scene;
         int i;
-        func_002A0250();
-        func_002A01C8();
-        func_002A01F0();
+        DrawMobysSetup();
+        FillScratchArea();
+        SaveScratchArea();
         scene = (void *)D_001B1B58[1];
         moby->flags |= 1;
-        func_002A0300(scene, -1);
+        UploadObjectTextures(scene, -1);
         moby->flags &= ~1;
-        view_matrix = (char *)&D_001B5200 + 0x370;
-        func_00282B50(saved_matrix, view_matrix, 0x40);
+        view_matrix = (char *)&gActiveCamera + 0x370;
+        FastMemoryHelperC(saved_matrix, view_matrix, 0x40);
         do { view_position = view_matrix - 0x230; } while (0);
         qcopy(&saved_position, view_position);
         saved_scale = D_001B9040.scale;
-        func_0027B9C0(8, 8, 1.0f);
+        SetupOffscreenRenderTarget(8, 8, 1.0f);
         func_00129178(matrix);
-        func_001292C0(matrix, matrix, object->angles[0]);
-        func_00129368(matrix, matrix, object->angles[1]);
-        func_00129218(matrix, matrix, object->angles[2]);
-        func_00282B50(view_matrix, matrix, 0x40);
+        SceVibRoutine1292C0(matrix, matrix, object->angles[0]);
+        SceVibRoutine129368(matrix, matrix, object->angles[1]);
+        SceVibRoutine129218(matrix, matrix, object->angles[2]);
+        FastMemoryHelperC(view_matrix, matrix, 0x40);
         qcopy(view_position, position);
-        func_00279D18();
-        func_002A0468(moby, 0x404040, 0xE, 0, 0);
+        BuildViewMatrices();
+        PackRenderCommandFields(moby, 0x404040, 0xE, 0, 0);
         qcopy(D_001C2AC0, &D_001A8820);
         qcopy(D_001C2AC0 + 0x20, &D_001A8830);
         qcopy(D_001C2AC0 + 0x10, &D_001A8840);
         qcopy(D_001C2AC0 + 0x30, &D_001A8850);
-        func_002A0300(moby, 1); func_0027BA48();
+        UploadObjectTextures(moby, 1); CallGraphicsSyncHelper();
         D_001B9040.scale = saved_scale;
-        func_0027AB40();
-        func_00282B50(view_matrix, saved_matrix, 0x40);
+        UpdateViewContext();
+        FastMemoryHelperC(view_matrix, saved_matrix, 0x40);
         qcopy(view_position, &saved_position);
-        func_00279D18();
-        func_002FC560(0x42, 0x8000000044UL); func_002FC560(8, 5);
-        func_002FC748(); func_002A0220(); func_002A0380();
+        BuildViewMatrices();
+        VU1_addGSregister(0x42, 0x8000000044UL); VU1_addGSregister(8, 5);
+        AppendVu1DmaChainTable1(); RestoreScratchArea(); RunTextureUploadAndSetup();
         quad.state[1] = D_001A7470[0];
         quad.state[2] = 0xFF9000000260UL;
         quad.state[0] = 5;
@@ -103,6 +104,6 @@ void func_0027BA68(void)
             quad.uv[i][1] = object->height * D_001A8808[i] + 0.5f;
             qcopy(&quad.vertices[i], &object->vertices[i]);
         }
-        func_00280B90(&quad, 0, 0);
-    } else func_002A03C0();
+        draw_world_quad(&quad, 0, 0);
+    } else UploadMainTextures();
 }

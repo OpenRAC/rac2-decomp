@@ -330,6 +330,7 @@ static inline UDItype __udivmoddi4 (UDItype n, UDItype d, UDItype *rp) {
     return ww.ll;
 }
 
+/* Gives the remainder of dividing one signed 64-bit number by another. */
 DItype func_00121450 (DItype u, DItype v) {
     word_type c = 0;
     DIunion uu, vv;

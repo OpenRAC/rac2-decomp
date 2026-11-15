@@ -33,6 +33,7 @@ extern void func_L02_00392C70(void *);
 extern void func_L02_003948D0(void *);
 extern void func_002C9218(void *, void *, void *, float);
 
+/* Runs one step of the enemy grab move. It turns toward the hero, keeps the hero held close, throws effects around, and wakes up a nearby turret. */
 void func_L20_004421A8(char *obj) {
     char *state = *(char **)(obj + 0x68);
     char *basis;
@@ -42,47 +43,47 @@ void func_L20_004421A8(char *obj) {
     float angle;
     float rate;
 
-    angle = func_00283248(D_00189E20.pos[0] - *(float *)(obj + 0x10),
-                          D_00189E20.pos[1] - *(float *)(obj + 0x14));
-    if (func_00283C80(*(float *)(obj + 0xF8), angle) < 1.57079637f) {
-        angle = func_00283248(D_00189E20.pos[0] - *(float *)(obj + 0x10),
-                              D_00189E20.pos[1] - *(float *)(obj + 0x14));
-        func_L01_00322288(obj, angle);
+    angle = FastMatrixHelperA(gHeroState.pos[0] - *(float *)(obj + 0x10),
+                          gHeroState.pos[1] - *(float *)(obj + 0x14));
+    if (FastDiffRots(*(float *)(obj + 0xF8), angle) < 1.57079637f) {
+        angle = FastMatrixHelperA(gHeroState.pos[0] - *(float *)(obj + 0x10),
+                              gHeroState.pos[1] - *(float *)(obj + 0x14));
+        StartMobyEffectFromEntry(obj, angle);
     }
-    *(int *)(D_00189E20.hero + 0x98) = 0;
+    *(int *)(gHeroState.hero + 0x98) = 0;
     basis = state + 0xF0;
-    func_L02_00331440(obj, D_L20_001A8F20, 0x10, *(float *)(obj + 0xF8), -1.0f, -1.0f);
-    hero = D_00189E20.hero;
+    MoveToTargetWithTempLimits(obj, D_L20_001A8F20, 0x10, *(float *)(obj + 0xF8), -1.0f, -1.0f);
+    hero = gHeroState.hero;
     *(int *)(hero + 0x98) = *(int *)(*(char **)(hero + 0x24) + 0x10);
-    func_002AFDD8(obj, basis, basis, 0);
+    TransformVectorByObjectOrGiven(obj, basis, basis, 0);
     *(int *)(state + 0xF4) = 0;
-    func_00283098(basis, basis, obj + 0xC0);
+    matrix_mul_vec3(basis, basis, obj + 0xC0);
     rate = (*(float *)(state + 0x100) + *(float *)(state + 0x100)) / *(float *)(state + 0x78);
     if (rate < 0.5f) {
         rate = 0.5f;
     }
     *(float *)(state + 0x1804) =
-        func_00283B98(*(float *)(state + 0x1804), D_L20_001B2124 * (rate * 0.000290888245f));
-    func_00282CC0(&pos, obj + 0xC0, obj + 0x10);
-    func_002A8C28(obj, &pos, 0x10008, 3.0f, (float)*(u8 *)(state + 0x34), 2.0f, 0, 1, 0);
+        FastAddRotations(*(float *)(state + 0x1804), D_L20_001B2124 * (rate * 0.000290888245f));
+    FastVecAdd(&pos, obj + 0xC0, obj + 0x10);
+    SweepCollisionFromObject(obj, &pos, 0x10008, 3.0f, (float)*(u8 *)(state + 0x34), 2.0f, 0, 1, 0);
     qcopy(&pos, obj + 0x10);
     pos.f[2] += 5.0f;
-    func_002A8C28(obj, &pos, 0x10000, 5.5f, 50.0f, 2.0f, 0, 1, 0);
+    SweepCollisionFromObject(obj, &pos, 0x10000, 5.5f, 50.0f, 2.0f, 0, 1, 0);
     other = *(char **)(state + 0xD4);
     if (other) {
-        if (*(short *)(other + 0xAA) == 0x1366) {
-            func_L02_00392C70(other);
-        } else if (*(short *)(other + 0xAA) == 0x1367) {
-            func_L02_003948D0(other);
+        if (*(short *)(other + 0xAA) == 0x1366 /* Miniturret */) {
+            RaiseStateToEight(other);
+        } else if (*(short *)(other + 0xAA) == 0x1367 /* Megaturret */) {
+            RaiseStateToEightCopy(other);
         }
     }
-    if (D_00189E20.mode == 0x8C) {
-        if (func_00282E80(D_00189E20.pos, obj + 0x10) <= 4.0f) {
-            D_00189E20.pos[2] += 5.0f;
-            D_00189E20.pos[2] = func_002A89A8(D_00189E20.pos, 0, 0.5f);
-            *(short *)((char *)&D_00189E20 + 0x1E0) = 5;
-            *(short *)((char *)&D_00189E20 + 0x1F0) = 5;
+    if (gHeroState.mode == 0x8C) {
+        if (vec_distance_xy(gHeroState.pos, obj + 0x10) <= 4.0f) {
+            gHeroState.pos[2] += 5.0f;
+            gHeroState.pos[2] = ProbeGroundHeightBelow(gHeroState.pos, 0, 0.5f);
+            *(short *)((char *)&gHeroState + 0x1E0) = 5;
+            *(short *)((char *)&gHeroState + 0x1F0) = 5;
         }
     }
-    func_002C9218(*(void **)(state + 0x210), obj + 0x10, obj + 0x10, *(float *)(state + 0x50));
+    PushPointAwayFromPath(*(void **)(state + 0x210), obj + 0x10, obj + 0x10, *(float *)(state + 0x50));
 }

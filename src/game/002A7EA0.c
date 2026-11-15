@@ -15,6 +15,7 @@ extern void func_001290E0(void *, void *);
 extern void func_00282D30(void *, void *, float);
 
 /* Keeps a proposed movement over ground and resolves steep walls and spheres. */
+/* Keeps a proposed movement over ground and resolves steep walls and spheres. */
 int func_002A7EA0(void *o, float *old, float *pos, int flags,
                   float height, float radius, float maxstep, float slope)
 {
@@ -32,35 +33,35 @@ int func_002A7EA0(void *o, float *old, float *pos, int flags,
     int result = 1, i;
 
     pos[2] += height;
-    z = func_002A8A20(pos);
+    z = GetGroundHeightUnderObject(pos);
     pos[2] -= height;
-    if (maxstep < func_00282C48(z - old[2])) {
+    if (maxstep < FloatAbs(z - old[2])) {
         if ((((flags ^ 1) & 1) && z < old[2]) || old[2] < z) {
             qcopy(pos, old);
             result = 0;
         }
     }
-    func_00282CF0(delta, pos, old);
-    func_00282F20(scaled, delta, radius * 1.2f);
+    FastVecSub(delta, pos, old);
+    vec_scale_to_length(scaled, delta, radius * 1.2f);
     up.q = 0;
     up.f[2] = height;
-    func_00282CC0(start, old, &up);
-    func_00282CC0(end, start, scaled);
-    if (result && func_002761F8(start, end, mask | 0x24, o, 0)) {
-        float *hit = D_001BAF80;
+    FastVecAdd(start, old, &up);
+    FastVecAdd(end, start, scaled);
+    if (result && CollLine(start, end, mask | 0x24, o, 0)) {
+        float *hit = gCollisionHit;
         if (((int *)hit)[7] > 0) {
-            angle = func_00283248(hit[18], func_00282E20(hit + 16));
+            angle = FastMatrixHelperA(hit[18], vec_length_xy(hit + 16));
             if (slope <= angle) {
                 hit[18] = 0;
                 func_001290E0(hit + 16, hit + 16);
                 dot = (-delta[0]) * hit[16] - delta[1] * hit[17];
                 if (dot > 0) {
-                    func_00282D30(hit + 16, hit + 16, dot);
+                    FastVecScale(hit + 16, hit + 16, dot);
                     result = 0;
-                    func_00282CC0(delta, delta, hit + 16);
+                    FastVecAdd(delta, delta, hit + 16);
                 }
             }
-            func_00282CC0(pos, old, delta);
+            FastVecAdd(pos, old, delta);
         }
     }
     if (!(flags & 2)) {
@@ -71,9 +72,9 @@ int func_002A7EA0(void *o, float *old, float *pos, int flags,
         do {
             qcopy(probe, pos);
             probe[2] += offset;
-            if (!func_00277258(probe, radius, 0x24, o))
+            if (!TestPointAgainstCollision(probe, radius, 0x24, o))
                 break;
-            angle = func_00283248(func_00282E80(pos, point), hit[10] - pos[2]);
+            angle = FastMatrixHelperA(vec_distance_xy(pos, point), hit[10] - pos[2]);
             if (((int *)hit)[6] != 0 || slope < angle) {
                 qcopy(pos, D_001BAFB0);
                 pos[2] -= offset;
@@ -83,9 +84,9 @@ int func_002A7EA0(void *o, float *old, float *pos, int flags,
         } while (i < 6);
     }
     pos[2] += height;
-    z = func_002A8A20(pos);
+    z = GetGroundHeightUnderObject(pos);
     pos[2] -= height;
-    if (maxstep < func_00282C48(z - old[2])) {
+    if (maxstep < FloatAbs(z - old[2])) {
         if ((((flags ^ 1) & 1) && z < old[2]) || old[2] < z) {
             qcopy(pos, old);
             result = 0;

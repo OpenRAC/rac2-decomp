@@ -16,6 +16,7 @@ extern void func_00282CC0(void *, void *, void *);
 extern void func_002830C0(void *, void *, void *);
 extern u64 func_0027C878(s32);
 extern void func_00280B90(void *, void *, s32);
+/* Draws a glowing flat square that always faces the camera at the object effect point. */
 void func_L18_003FCA38(u8 *object)
 {
     float basis[4][4], up[4], offset[4];
@@ -28,16 +29,16 @@ void func_L18_003FCA38(u8 *object)
     up[2] = 1.0f;
     up[3] = 1.0f;
     *(VectorBits *)basis[3] = *(VectorBits *)(state + 0x90);
-    func_00282CF0(basis[0], D_L18_001B97C0, basis[3]);
-    func_00282F20(basis[0], basis[0], 1.0f);
-    func_00282DD8(basis[1], basis[0], up);
-    func_00282F20(basis[1], basis[1], 1.0f);
-    func_00282DD8(basis[2], basis[1], basis[0]);
-    func_00282F20(basis[0], basis[0], D_L18_001B06C8);
-    func_00282F20(basis[1], basis[1], D_L18_001B06CC[0]);
-    func_00282F20(basis[2], basis[2], D_L18_001B06D0[0]);
-    func_00282D30(offset, basis[0], D_L18_001B06A0);
-    func_00282CC0(basis[3], basis[3], offset);
+    FastVecSub(basis[0], gCameraPosition_L18, basis[3]);
+    vec_scale_to_length(basis[0], basis[0], 1.0f);
+    FastVecCross(basis[1], basis[0], up);
+    vec_scale_to_length(basis[1], basis[1], 1.0f);
+    FastVecCross(basis[2], basis[1], basis[0]);
+    vec_scale_to_length(basis[0], basis[0], D_L18_001B06C8);
+    vec_scale_to_length(basis[1], basis[1], D_L18_001B06CC[0]);
+    vec_scale_to_length(basis[2], basis[2], D_L18_001B06D0[0]);
+    FastVecScale(offset, basis[0], D_L18_001B06A0);
+    FastVecAdd(basis[3], basis[3], offset);
     packet.flags = 0x8000000048ULL;
     packet.mode = 0xFF9000000260ULL;
     packet.primitive = 5;
@@ -52,13 +53,13 @@ void func_L18_003FCA38(u8 *object)
     packet.color[0] = packet.color[1] = packet.color[2] = packet.color[3] = *(u32 *)(state + 0xC4);
     source = D_L18_001AA250[0];
     for (i = 3, vertex = packet.vertex[0]; i >= 0; i--) {
-        func_00282D30(vertex, source, *(float *)(state + 0xC0));
+        FastVecScale(vertex, source, *(float *)(state + 0xC0));
         source += 4;
-        func_002830C0(vertex, vertex, basis);
+        transform_vector(vertex, vertex, basis);
         vertex += 4;
     }
-    packet.texture = func_0027C878(11);
-    func_00280B90(&packet, 0, 0);
-    packet.texture = func_0027C878(6);
-    func_00280B90(&packet, 0, 0);
+    packet.texture = GetEffectTextureDescriptor(11);
+    draw_world_quad(&packet, 0, 0);
+    packet.texture = GetEffectTextureDescriptor(6);
+    draw_world_quad(&packet, 0, 0);
 }

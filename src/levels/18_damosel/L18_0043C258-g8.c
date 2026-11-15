@@ -58,94 +58,95 @@ typedef struct {
     float rotation[4];
 } LauncherObject;
 
+/* Updates a launcher (moby class 4440) that hops up and down and shoots out child objects when the player triggers it. It breaks when its health runs out. */
 void func_L18_0043C258(LauncherObject *obj) {
-    LauncherState *s = obj->state;
+    LauncherState *vars = obj->state;
     u8 *child;
     float damage, z;
-    float v[4] __attribute__((aligned(16)));
-    float p[4] __attribute__((aligned(16)));
+    float velocity[4] __attribute__((aligned(16)));
+    float muzzlePos[4] __attribute__((aligned(16)));
     int zero;
 
-    damage = func_002A96A0(obj, func_002A9640(obj, 0x10000, 0));
-    s->health -= damage;
+    damage = UpdateAimTargetStrength(obj, FindOwnedEffectSlot(obj, 0x10000, 0));
+    vars->health -= damage;
     if (damage > 0.0f) {
-        func_002AB800(obj, s->transform);
-        if (s->health <= 0.0f) {
-            func_0032C700(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
-            func_002B0A68(obj, 0x3a, D_L18_001A8F20, 3, 6, 3, 6, 255);
-            func_002E5CF8(1, 0, obj);
-            func_0029F338(obj);
+        StartColorFade(obj, vars->transform);
+        if (vars->health <= 0.0f) {
+            SpawnExplosion(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+            SpawnDebrisForMaskedParts(obj, 0x3a, D_L18_001A8F20, 3, 6, 3, 6, 255);
+            PlayMobySound(1, 0, obj);
+            MarkMobySpawned(obj);
             return;
         }
     }
     obj->opacity = 255;
-    func_002AB8C0(obj, s->transform);
+    UpdateColorFade(obj, vars->transform);
     switch (obj->mode) {
     case 0:
-        s->baseZ = obj->position[2];
-        if (!s->initialized) {
-            s->initialized = 1;
-            s->health = 1;
+        vars->baseZ = obj->position[2];
+        if (!vars->initialized) {
+            vars->initialized = 1;
+            vars->health = 1;
         }
-        s->fireTimer = -1;
-        s->scale = 1;
-        func_002A7750(obj, 1, -1);
+        vars->fireTimer = -1;
+        vars->scale = 1;
+        SetMobyState(obj, 1, -1);
         break;
     case 1:
-        if (s->startRegion != -1 && func_002ACBC8(D_00189EA0, s->startRegion))
-            func_002A7750(obj, 2, -1);
+        if (vars->startRegion != -1 && IsPointInCuboid(gHeroPosition, vars->startRegion))
+            SetMobyState(obj, 2, -1);
         break;
     case 2:
-        if (func_002B3868(obj)) {
+        if (SetFirstPendingFlag(obj)) {
             obj->rotation[0] = 0;
             obj->rotation[1] = 0;
             z = obj->rotation[0];
-            obj->position[2] = s->baseZ;
-            s->velocityZ += func_002A7878(z, D_L18_001B1AB0 * (1.0f / 60.0f));
-            s->turnX = func_002A7878(z, D_L18_001B1AB4 * 0.0002908882452175021f);
-            s->turnY = func_002A7878(z, D_L18_001B1AB8 * 0.0002908882452175021f);
-            obj->position[2] = s->baseZ;
-            func_002E5CF8(0, 0, obj);
+            obj->position[2] = vars->baseZ;
+            vars->velocityZ += RandomFloatRange(z, D_L18_001B1AB0 * (1.0f / 60.0f));
+            vars->turnX = RandomFloatRange(z, D_L18_001B1AB4 * 0.0002908882452175021f);
+            vars->turnY = RandomFloatRange(z, D_L18_001B1AB8 * 0.0002908882452175021f);
+            obj->position[2] = vars->baseZ;
+            PlayMobySound(0, 0, obj);
         }
-        if (obj->position[2] >= s->baseZ) {
-            obj->position[2] += s->velocityZ;
-            s->velocityZ -= D_L18_001B1ACC * 0.00027777778450399637f;
-            if (s->velocityZ > 0) {
-                obj->rotation[0] = func_00283B98(s->turnX, obj->rotation[0]);
-                obj->rotation[1] = func_00283B98(s->turnY, obj->rotation[1]);
+        if (obj->position[2] >= vars->baseZ) {
+            obj->position[2] += vars->velocityZ;
+            vars->velocityZ -= D_L18_001B1ACC * 0.00027777778450399637f;
+            if (vars->velocityZ > 0) {
+                obj->rotation[0] = FastAddRotations(vars->turnX, obj->rotation[0]);
+                obj->rotation[1] = FastAddRotations(vars->turnY, obj->rotation[1]);
             } else {
-                obj->rotation[0] = func_00283B98(-s->turnX, obj->rotation[0]);
-                obj->rotation[1] = func_00283B98(-s->turnY, obj->rotation[1]);
+                obj->rotation[0] = FastAddRotations(-vars->turnX, obj->rotation[0]);
+                obj->rotation[1] = FastAddRotations(-vars->turnY, obj->rotation[1]);
             }
         } else {
-            func_002A7750(obj, 2, -1);
+            SetMobyState(obj, 2, -1);
         }
-        if (s->fireTimer == 0) {
+        if (vars->fireTimer == 0) {
             zero = 0;
-            child = func_L18_003F75E8(s->childId, &zero);
+            child = CountGroupProtopets(vars->childId, &zero);
             if (child) {
-                func_00282F20(v, D_L18_001B1AF0, D_L18_001B1AC0 * (1.0f / 60.0f));
-                func_00283098(v, v, obj->matrix);
-                func_002ACB48(v, D_L18_001B1ABC * (1.0f / 60.0f));
-                func_00283098(p, D_L18_001B1AE0, obj->matrix);
-                func_00282CC0(p, p, obj->position);
-                func_L18_003F76F0(child, p, v);
+                vec_scale_to_length(velocity, D_L18_001B1AF0, D_L18_001B1AC0 * (1.0f / 60.0f));
+                matrix_mul_vec3(velocity, velocity, obj->matrix);
+                AddRandomOffsetToVector(velocity, D_L18_001B1ABC * (1.0f / 60.0f));
+                matrix_mul_vec3(muzzlePos, D_L18_001B1AE0, obj->matrix);
+                FastVecAdd(muzzlePos, muzzlePos, obj->position);
+                LaunchProtopetShot(child, muzzlePos, velocity);
                 *(s32 *)(child + 0xB8) = (s32)obj;
-                s->fireTimer = func_002A7820(D_L18_001B1AD0, D_L18_001B1AD4);
+                vars->fireTimer = RandomIntRange(D_L18_001B1AD0, D_L18_001B1AD4);
             }
-        } else if (s->fireTimer == -1) {
-            if (s->fireRegion != -1 && func_002ACBC8(D_00189EA0, s->fireRegion)) {
-                s->fireTimer++;
-                func_0032C700(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
-                func_002E5CF8(1, 0, obj);
-                func_00282F20(v, D_L18_001B1AF0, D_L18_001B1AC4 * (1.0f / 60.0f));
-                func_00283098(v, v, obj->matrix);
-                func_002ACB48(p, D_L18_001B1ABC * (1.0f / 60.0f));
-                func_00282CC0(v, v, p);
-                func_002B0A68(obj, 5, v, 3, 6, 3, 6, 255);
+        } else if (vars->fireTimer == -1) {
+            if (vars->fireRegion != -1 && IsPointInCuboid(gHeroPosition, vars->fireRegion)) {
+                vars->fireTimer++;
+                SpawnExplosion(obj->position, 1, 25, 20, 20, 20, 45, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+                PlayMobySound(1, 0, obj);
+                vec_scale_to_length(velocity, D_L18_001B1AF0, D_L18_001B1AC4 * (1.0f / 60.0f));
+                matrix_mul_vec3(velocity, velocity, obj->matrix);
+                AddRandomOffsetToVector(muzzlePos, D_L18_001B1ABC * (1.0f / 60.0f));
+                FastVecAdd(velocity, velocity, muzzlePos);
+                SpawnDebrisForMaskedParts(obj, 5, velocity, 3, 6, 3, 6, 255);
             }
         } else {
-            func_00282948(&s->fireTimer);
+            FastFloatHelperD(&vars->fireTimer);
         }
         break;
     }

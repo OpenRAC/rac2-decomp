@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -16,12 +17,13 @@ typedef struct {
     u8 pad74[0x18]; u32 busy2; u8 pad90[6]; short step2;
 } InitState;
 
+/* Sets the music and file-load state to its starting values and registers the load callbacks. */
 void func_002B68C8(void)
 {
     InitState *s;
     int mode;
-    func_0026FEB8(D_001AA198);
-    s = (InitState *)D_001A63A8;
+    STUB_printf(D_001AA198);
+    s = (InitState *)gMusicState;
     mode = -1;
     s->mode = mode;
     s->flags[0] = 0x20;
@@ -35,6 +37,6 @@ void func_002B68C8(void)
     s->busy2 = 0;
     s->step2 = 0;
     s->handle = mode;
-    func_002B66F0();
-    func_002B6938();
+    RunSoundSetupSequence();
+    RegisterDiscReadCallback();
 }

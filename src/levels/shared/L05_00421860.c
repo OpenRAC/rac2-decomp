@@ -21,19 +21,19 @@ extern char *func_L05_0041D498(char *);
    its limit, and counts the spawn in the game's counters (its own one and the total). */
 void func_L05_00421860(char *object)
 {
-    int slot = func_002ED8A0(1);
+    int slot = FindLastUsedChainEntry(1);
 
     if (slot < 0 || D_L05_002A1800[slot].value == D_L05_002A1800[slot].limit) {
         int *counts;
 
-        func_L05_0041C118(object);
+        SpawnHomingPickup(object);
         counts = D_L05_00221D10;
         counts[0x5C / 4]++;
         counts[0x70 / 4]++;
     } else {
         int *counts;
 
-        func_L05_0041D498(object);
+        SpawnHomingPickupVariant(object);
         counts = D_L05_00221D10;
         counts[0x64 / 4]++;
         counts[0x70 / 4]++;

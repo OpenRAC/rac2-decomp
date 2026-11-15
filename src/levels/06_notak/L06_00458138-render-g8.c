@@ -23,34 +23,35 @@ extern void func_00280B90(void *, int, int);
 extern NotakVec D_L06_001B9840;
 extern char D_L06_001B1930 __attribute__((sda));
 
+/* Draws a small glowing sprite that always faces the camera at the object's position. */
 void func_L06_00459620(char *obj) {
-    NotakPacket p;
-    NotakVec matrix[4], temp, up, dir;
+    NotakPacket packet;
+    NotakVec matrix[4], corner, up, dir;
     u32 color;
     int i;
     qcopy(matrix[3], obj + 0x10);
     matrix[3][3] = 1.0f;
     color = 0x307F4040;
-    p.texture = func_0027C878(8);
-    p.flags = 0x8000000048ULL;
-    p.mode = 0xFF9000000260ULL;
-    p.primitive = 0;
-    p.uv[0] = 0; p.uv[1] = 0; p.uv[2] = 0; p.uv[3] = 1;
-    p.uv[4] = 1; p.uv[5] = 0; p.uv[6] = 1; p.uv[7] = 1;
-    if (!func_002A77E0(4)) color = 0x7F7F4040;
-    color = (color & 0xFFFFFF) | ((u32)func_00283CF0(func_00283CE0(color >> 24)) << 24);
+    packet.texture = GetEffectTextureDescriptor(8);
+    packet.flags = 0x8000000048ULL;
+    packet.mode = 0xFF9000000260ULL;
+    packet.primitive = 0;
+    packet.uv[0] = 0; packet.uv[1] = 0; packet.uv[2] = 0; packet.uv[3] = 1;
+    packet.uv[4] = 1; packet.uv[5] = 0; packet.uv[6] = 1; packet.uv[7] = 1;
+    if (!RandomIntBelow(4)) color = 0x7F7F4040;
+    color = (color & 0xFFFFFF) | ((u32)FloatToInt(IntToFloat(color >> 24)) << 24);
     *(NotakTI *)up = 0; up[2] = 1; up[3] = 1;
-    p.color[3] = color; p.color[2] = color; p.color[1] = color; p.color[0] = color;
-    func_00282CF0(dir, D_L06_001B9840, matrix[3]);
-    func_00282F20(matrix[0], dir, 1);
-    func_00282DD8(matrix[1], matrix[0], up);
-    func_00282F20(matrix[1], matrix[1], 1);
-    func_00282DD8(matrix[2], matrix[1], matrix[0]);
-    func_00282D30(dir, matrix[0], 0.2f);
-    func_00282CC0(matrix[3], matrix[3], dir);
+    packet.color[3] = color; packet.color[2] = color; packet.color[1] = color; packet.color[0] = color;
+    FastVecSub(dir, D_L06_001B9840, matrix[3]);
+    vec_scale_to_length(matrix[0], dir, 1);
+    FastVecCross(matrix[1], matrix[0], up);
+    vec_scale_to_length(matrix[1], matrix[1], 1);
+    FastVecCross(matrix[2], matrix[1], matrix[0]);
+    FastVecScale(dir, matrix[0], 0.2f);
+    FastVecAdd(matrix[3], matrix[3], dir);
     for (i = 0; i < 4; i++) {
-        func_00282D30(temp, &D_L06_001B1930 + i * 16, 0.2f);
-        func_002830C0(p.pos[i], temp, matrix);
+        FastVecScale(corner, &D_L06_001B1930 + i * 16, 0.2f);
+        transform_vector(packet.pos[i], corner, matrix);
     }
-    func_00280B90(&p, 0, 0);
+    draw_world_quad(&packet, 0, 0);
 }

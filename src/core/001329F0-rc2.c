@@ -26,14 +26,15 @@
 
 extern s32 func_00132DF0(s32 a, s32 b, void *p, s32 c, s32 d);
 
-void func_001329F0(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
-    s32 blk[6];
+/* Sends sound command 0x11 with six values and a reply callback. */
+void func_001329F0(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4, s32 p5, s32 callback, s32 callbackData) {
+    s32 payload[6];
 
-    blk[0] = a0;
-    blk[4] = a4;
-    blk[1] = a1;
-    blk[2] = a2;
-    blk[3] = a3;
-    blk[5] = a5;
-    func_00132DF0(0x11, 0x18, blk, a6, a7);
+    payload[0] = p0;
+    payload[4] = p4;
+    payload[1] = p1;
+    payload[2] = p2;
+    payload[3] = p3;
+    payload[5] = p5;
+    QueueSoundCommand(0x11, 0x18, payload, callback, callbackData);
 }

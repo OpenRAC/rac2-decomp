@@ -11,6 +11,7 @@ extern float func_002A89A8(float, void *, int);
 extern double func_001234F0(float);
 extern void func_0026FEB8(const char *, ...);
 
+/* Moves the enemy toward its next path point while keeping it above the ground, and turns it toward the target. */
 void func_L12_003E20F0(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -23,16 +24,16 @@ void func_L12_003E20F0(char *object)
     char *position;
 
     *(int *)(state + 0x218) = 0;
-    flags = func_L01_00321178(object, path + ((*(int *)(state + 0x264) << 4) + 0x10));
+    flags = TurnMobyTowardTarget(object, path + ((*(int *)(state + 0x264) << 4) + 0x10));
     if (*(u8 *)(object + 0x95) == 6) {
         char *target = *(char **)(state + 0x270);
-        float angle = func_00283248(*(float *)(target + 0x10) - *(float *)(object + 0x10),
+        float angle = FastMatrixHelperA(*(float *)(target + 0x10) - *(float *)(object + 0x10),
                                    *(float *)(target + 0x14) - *(float *)(object + 0x14));
-        func_002AA800(object + 0xF8, angle, 6.0000005f, 0);
+        StepAngleTowardTarget(object + 0xF8, angle, 6.0000005f, 0);
     }
     probeRadius = 0.5f;
     position = object + 0x10;
-    ground = func_002A89A8(probeRadius, position, 0);
+    ground = ProbeGroundHeightBelow(probeRadius, position, 0);
     if (flags & 0x20) {
         if (*(int *)(state + 0x248) == 0 || *(float *)(object + 0x18) - ground > D_L12_001B0B14) {
             *(float *)(object + 0x18) = oldHeight;
@@ -40,9 +41,9 @@ void func_L12_003E20F0(char *object)
             *(float *)(object + 0x18) = *(float *)(state + 0x2A8);
         } else {
             char *sink = D_L12_001B0B18;
-            float floor = func_002A89A8(probeRadius, position, 0);
-            double heightDifference = func_001234F0(*(float *)(object + 0x18) - floor);
-            func_0026FEB8(sink, heightDifference, *(short *)(object + 0xB2));
+            float floor = ProbeGroundHeightBelow(probeRadius, position, 0);
+            double heightDifference = FloatToDouble(*(float *)(object + 0x18) - floor);
+            STUB_printf(sink, heightDifference, *(short *)(object + 0xB2));
         }
     }
     targetHeight = *(float *)(path + (*(int *)(state + 0x264) << 4) + 0x18);

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int func_L00_002D1DA0_1(int, void *, void *);
 
@@ -29,6 +30,7 @@ extern char *func_L00_002AE888(void *, float, float, float, float, int, int);
 
 
 /* keeps the hero's held target (0x1450) while both low pad bits are set: clears it on an ineligible screen, beyond 30 units or on release, records a statistic when the target stops being eligible; with no target and both bits set plus either in the next pad word, picks one from the camera's view and then from the hero's */
+/* Handles the lock-on target for the hero: keeps it while the buttons are held and it is close, drops it otherwise, and looks for a new one. */
 void func_L00_002CB038(void)
 {
     char *hero = D_00189E20_36;
@@ -41,31 +43,31 @@ void func_L00_002CB038(void)
     }
     object = *(char **)(hero + 0x1450);
     if (object) {
-        if (30.0f < func_00282E48(hero + 0x80, object + 0x10))
+        if (30.0f < fast_vec_dist(hero + 0x80, object + 0x10))
             *(int *)(hero + 0x1450) = 0;
         if ((D_00138320 & 3) != 3)
             *(int *)(hero + 0x1450) = 0;
         if (!*(char **)(hero + 0x1450) || (*(unsigned short *)(*(char **)(hero + 0x1450) + 0x34) & 0x1000))
             return;
         *(int *)(hero + 0x1450) = 0;
-        if (D_0018C750[36].count < 0xFFFF)
-            D_0018C750[36].count++;
-        if (D_001A7390 > D_0018C750[36].best)
-            D_0018C750[36].best = D_001A7390;
-        D_0018C750[36].levels = (D_0018C750[36].levels | (1u << D_001A79F0)) | 0x80000000u;
+        if (gProgressStatistics[36].count < 0xFFFF)
+            gProgressStatistics[36].count++;
+        if (D_001A7390 > gProgressStatistics[36].best)
+            gProgressStatistics[36].best = D_001A7390;
+        gProgressStatistics[36].levels = (gProgressStatistics[36].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
         return;
     }
     {
-        unsigned char *pad = D_00138180;
+        unsigned char *pad = gPadState;
         if ((*(unsigned int *)(pad + 0x1A0) & 3) == 3 && (*(unsigned int *)(pad + 0x1A4) & 3) != 0) {
             float radius = 25.0f;
             unsigned char *camera = D_L00_001B8C80;
             float nearAngle = 0.6108652949333191f;
             float farAngle = 1.2217305898666382f;
-            char *found = func_L00_002AE888(camera + 0x370, radius, *(float *)(camera + 0x158), nearAngle, farAngle, 5, 1);
+            char *found = SelectBestEligibleTarget(camera + 0x370, radius, *(float *)(camera + 0x158), nearAngle, farAngle, 5, 1);
             *(char **)(hero + 0x1450) = found;
             if (!found)
-                *(char **)(hero + 0x1450) = func_L00_002AE888(hero, radius, *(float *)(hero + 0x98), nearAngle, farAngle, 5, 1);
+                *(char **)(hero + 0x1450) = SelectBestEligibleTarget(hero, radius, *(float *)(hero + 0x98), nearAngle, farAngle, 5, 1);
         }
     }
 }
@@ -75,29 +77,30 @@ void func_L00_002CB038(void)
 /* func_L00_002CB3A8 is in the sibling file L00_002CB3A8-decider.c (its own profile). */
 
 /* loads two object pointers from fixed data, bails out when either is null or when the first object's byte 67 differs from 1, fills two stack ints through a helper, then applies a four-argument operation to each object with those ints */
+/* Switches the hero's two linked objects to the animation chosen for the current move. */
 void func_L00_002D1AE8(void)
 {
-    char *p = D_00189E20_36;
-    void *s0;
-    void *s1;
-    int buf[2];
+    char *hero = D_00189E20_36;
+    void *firstObj;
+    void *secondObj;
+    int animIds[2];
 
-    s0 = *(void **)(p + 4880);
-    s1 = *(void **)(p + 4884);
+    firstObj = *(void **)(hero + 4880);
+    secondObj = *(void **)(hero + 4884);
 
-    if (s0 == 0)
+    if (firstObj == 0)
         return;
-    if (s1 == 0)
-        return;
-
-    if (*(unsigned char *)((char *)s0 + 67) != 1)
+    if (secondObj == 0)
         return;
 
-    if (func_L00_002D1DA0_1(0, buf, buf + 1) == 0)
+    if (*(unsigned char *)((char *)firstObj + 67) != 1)
         return;
 
-    func_002A7470(s0, buf[0], 0, 7);
-    func_002A7470(s1, buf[1], 0, 7);
+    if (func_L00_002D1DA0_1(0, animIds, animIds + 1) == 0)
+        return;
+
+    StartAnimationBlended(firstObj, animIds[0], 0, 7);
+    StartAnimationBlended(secondObj, animIds[1], 0, 7);
 }
 
 /* func_L00_002D1B70 is in the sibling file L00_002CAD90-g8.c (-G8). */

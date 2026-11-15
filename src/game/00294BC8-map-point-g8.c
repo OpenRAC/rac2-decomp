@@ -1,3 +1,4 @@
+#include "names.h"
 /* Special map coordinates for the current level. The absolute aliases name
  * the same adjoining float blocks as the GP scalars; offset accesses retain
  * retail's absolute loads. The four coordinate pairs occupy 32 bytes, hence
@@ -28,34 +29,35 @@ extern void func_00297FE8(float, float, float *, float *, int);
 /* Callers pass (x, y, &u, &v, level): the player's coordinates in $f12/$f13, the two result
  * pointers in $a2/$a3 and the level number on the stack. This body keys on the global level
  * and the player view, so the coordinates and the level are unused. */
+/* Finds where the player's marker goes on the map in special levels and says whether it found one. */
 int func_00297218(float unused_x, float unused_y, float *x, float *y, int unused_level)
 {
     int found = 0;
     if (D_001A8CC0) {
-        if (D_001A79F0 == 2) {
+        if (gCurrentMapIndex == 2) {
             *x = D_001A9670;
             *y = absolute_D_001A9670[1];
             found = 1;
-        } else if (D_001A79F0 == 11) {
+        } else if (gCurrentMapIndex == 11) {
             *x = D_001A9678;
             *y = absolute_D_001A9678[1];
             found = 1;
         }
     }
-    if (D_001A79F0 == 7 && func_003005A0() >= 0 && func_003005A0() < 4) {
+    if (gCurrentMapIndex == 7 && GetCurrentVariantIndex() >= 0 && GetCurrentVariantIndex() < 4) {
         found = 1;
-        *x = D_001A9688[func_003005A0() * 2];
-        *y = D_001A968C[func_003005A0() * 2];
-    } else if (D_001A79F0 == 20) {
+        *x = D_001A9688[GetCurrentVariantIndex() * 2];
+        *y = D_001A968C[GetCurrentVariantIndex() * 2];
+    } else if (gCurrentMapIndex == 20) {
         if (D_001C4F40 == 2) {
             found = 1;
             *x = D_001A9680;
             *y = absolute_D_001A9680[1];
         } else if (D_001C4F40 == 0) {
-            if (D_00189E20.x >= D_001A9410 && D_00189E20.y <= absolute_D_001A9410[1] &&
-                D_00189E20.x <= absolute_D_001A9410[2] && D_00189E20.y >= absolute_D_001A9410[3]) {
+            if (gHeroState.x >= D_001A9410 && gHeroState.y <= absolute_D_001A9410[1] &&
+                gHeroState.x <= absolute_D_001A9410[2] && gHeroState.y >= absolute_D_001A9410[3]) {
                 found = 1;
-                func_00297FE8(D_00189E20.x, D_00189E20.y, x, y, 20);
+                ConvertWorldToMapPosition(gHeroState.x, gHeroState.y, x, y, 20);
                 *x += D_L00_001A9760;
                 *y += absolute_D_001A9410[5];
             }

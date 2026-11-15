@@ -1,3 +1,4 @@
+#include "names.h"
 typedef struct { char pad[0x17a0]; unsigned int status[1]; } BankStatuses;
 typedef struct { int offset, size; } SoundEntry;
 typedef struct {
@@ -15,20 +16,20 @@ extern void func_002B6770(int, long);
 /* Load a table entry and write its completion result to the next bank status slot. */
 void func_002B6828(int index)
 {
-    int *d = D_0014B540;
+    int *d = gCopySetupData;
     int offset = ((BankLoadTable *)d)->entries[index].offset;
     BankStatuses *b;
 
     if (offset) {
         unsigned int out;
 
-        b = (BankStatuses *)D_00188660;
+        b = (BankStatuses *)gSoundState;
         b->status[index + 1] = -1;
         out = (unsigned int)((unsigned long)(unsigned int)((BankCallbackStatuses *)b)->status
                              + index * 4);
-        func_00132498((void *)(offset + d[0x14a7]), 0, func_002B6770,
+        StartSoundBankRead((void *)(offset + d[0x14a7]), 0, StoreCallbackResult,
                       (unsigned long)(unsigned int)out);
     } else {
-        ((BankStatuses *)D_00188660)->status[index + 1] = 0;
+        ((BankStatuses *)gSoundState)->status[index + 1] = 0;
     }
 }

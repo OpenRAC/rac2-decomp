@@ -93,9 +93,9 @@ typedef struct {
    minus two, is below two as an unsigned value. */
 int func_L05_00442860(void)
 {
-    if (D_L05_001B1B24 != 0)
+    if (gShipTransitionTimer != 0)
         return 1;
-    return (unsigned int)(D_L05_001B1B20 - 2) < 2;
+    return (unsigned int)(gShipState - 2) < 2;
 }
 
 /* On the first pass seeds the slot's speed and timer, then picks the state's +0x40 rate from
@@ -109,22 +109,22 @@ void func_L05_00428350(char *object)
         D_L05_001B3580[*(int *)(state + 0x3C)] = 0.01f;
         D_L05_001B3598[*(int *)(state + 0x3C)] = 0x80;
         *(unsigned char *)(object + 0x20) = 1;
-        if (func_00282E48(object + 0x10, D_L05_001B96C0) > 200.0f)
+        if (fast_vec_dist(object + 0x10, D_L05_001B96C0) > 200.0f)
             *(float *)(state + 0x40) = 4.0f;
-        else if (func_00282E48(object + 0x10, D_L05_001B96C0) > 100.0f)
+        else if (fast_vec_dist(object + 0x10, D_L05_001B96C0) > 100.0f)
             *(float *)(state + 0x40) = 2.0f;
-        else if (func_00282E48(object + 0x10, D_L05_001B96C0) > 25.0f)
+        else if (fast_vec_dist(object + 0x10, D_L05_001B96C0) > 25.0f)
             *(float *)(state + 0x40) = 1.0f;
-        else if (func_00282E48(object + 0x10, D_L05_001B96C0) > 0.0f)
+        else if (fast_vec_dist(object + 0x10, D_L05_001B96C0) > 0.0f)
             *(float *)(state + 0x40) = 0.5f;
     }
-    if (!func_00282978(state)) {
-        func_00282978(state + 4);
-        func_L00_002E6DB8(func_L05_00428518, object);
+    if (!FastDecTimer(state)) {
+        FastDecTimer(state + 4);
+        AddDrawCallbackToList2(DrawExpandingBillboardEffect, object);
     } else {
         D_L05_001B35B0[*(int *)(state + 0x3C)] = 0;
         D_L05_001B157C -= 1.0f;
-        func_0029F338(object);
+        MarkMobySpawned(object);
     }
 }
 
@@ -148,8 +148,8 @@ void func_L05_00442880(char *object)
     look->b[0] = D_L05_001B1A88;
     look->c = D_L05_001B1A94;
     look->d = D_L05_001B1A98;
-    if (func_L05_00379F38()) {
-        if (D_001A79F0 == 15) {
+    if (GetPlayerStateField15()) {
+        if (gCurrentMapIndex == 15) {
             params->b[0] = D_L05_001B1A34;
             params->b[1] = D_L05_001B1A38;
             params->b[2] = D_L05_001B1A3C;
@@ -163,7 +163,7 @@ void func_L05_00442880(char *object)
         params->a[2] = D_L05_001B1A24;
         params->c = D_L05_001B1A78;
         params->d = D_L05_001B1A74;
-    } else if (D_001A79F0 == 15) {
+    } else if (gCurrentMapIndex == 15) {
         params->b[0] = D_L05_001B1B84;
         params->b[1] = D_L05_001B1B88;
         params->b[2] = D_L05_001B1B8C;
@@ -212,6 +212,7 @@ extern float func_002A7940(void);
 extern void func_L01_00397950(char *a0);
 extern void func_002A0488(char *a0, s32 a1, s32 a2, s32 a3);
 
+/* Creates a collectible of class 0x126C at a position, unless that one has already been collected. */
 char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
 {
     char *moby;
@@ -221,12 +222,12 @@ char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
 
     if (kind >= 4 || collected[kind + (D_001A79F0_1 << 2)] != 0)
         return 0;
-    moby = func_0029EFD0(0x126C);
+    moby = CreateMoby(0x126C);
     if (moby != 0) {
         float x, y, z, r;
 
         vars = *(char **)(moby + 0x68);
-        *(long *)(moby + 0x38) = *(long *)(D_0018C0B0 + 0x38);
+        *(long *)(moby + 0x38) = *(long *)(gHeroMoby_0018C0B0 + 0x38);
         qcopy(moby + 0x10, pos);
         *(s16 *)(moby + 0x32) = 0x40;
         *(u8 *)(moby + 0x30) = 0x40;
@@ -234,10 +235,10 @@ char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
         *(u32 *)vars = kind;
         qcopy(vars + 0x10, moby + 0x10);
         *(float *)(vars + 0x1C) = *(float *)(moby + 0xF8);
-        *(float *)(moby + 0xF0) = func_002A7940();
-        *(float *)(moby + 0xF4) = func_002A7940();
-        *(float *)(moby + 0xF8) = func_002A7940();
-        r = func_002A7940();
+        *(float *)(moby + 0xF0) = RandomAngle();
+        *(float *)(moby + 0xF4) = RandomAngle();
+        *(float *)(moby + 0xF8) = RandomAngle();
+        r = RandomAngle();
         x = D_L05_001B1748;
         y = D_L05_001B174C;
         z = D_L05_001B1750;
@@ -251,8 +252,8 @@ char *func_L05_0042C928(float *pos, u32 kind, s32 a2, s32 a3)
         *(float *)(vars + 0x68) = x;
         *(float *)(vars + 0x64) = y;
         *(u8 *)(moby + 0x20) = 1;
-        func_L01_00397950(moby);
-        func_002A0488(moby, 0x82, 0x82, 0x82);
+        InitRandomizedMobyVars(moby);
+        set_moby_color(moby, 0x82, 0x82, 0x82);
         if (D_L05_001B1780 == 0) {
             for (p = D_L05_001B2528; p != 0; p = p->next) {
                 if (p->oclass == 0xFBF)
@@ -346,6 +347,7 @@ typedef struct Object_00441D40 {
     short f84;
 } Object_00441D40;
 
+/* Sets up the starting state of the level's camera object: default position, blocks and rates. */
 void func_L05_00441D40(Object_00441D40 *object)
 {
     State_00441D40 *state;
@@ -362,7 +364,7 @@ void func_L05_00441D40(Object_00441D40 *object)
     state->pos[0] = D_L05_001B1A10;
     state->pos[1] = D_L05_001B1A14;
     state->pos[2] = D_L05_001B1A18;
-    func_00282C88(state->v10);
+    ClearVector128(state->v10);
     state->f40 = 0;
     state->f44 = 0;
 
@@ -382,10 +384,10 @@ void func_L05_00441D40(Object_00441D40 *object)
     blk->f24 = 0;
     blk->f1E = 0;
     blk->f1F = 0;
-    func_00282C88(state2->blk.v50);
-    func_00282C88(state2->blk.v60);
-    func_L05_00441EA0(object);
-    func_L00_002E54E0(4096.0f);
+    ClearVector128(state2->blk.v50);
+    ClearVector128(state2->blk.v60);
+    LoadCameraEntryVectors(object);
+    SetClampedViewDistance(4096.0f);
 
     table = (Slot_00441D40 *)D_L05_001B1EC4;
     actors = D_L05_001B251C;
@@ -401,11 +403,11 @@ void func_L05_00441D40(Object_00441D40 *object)
     vars->rate = rate;
     vars->f214 = -1;
     object->f7E = 0;
-    D_L05_001B1B20 = 0;
+    gShipState = 0;
     func_L05_003D1E20();
     D_L05_001B1B74 = 0;
     D_L05_001B1B78 = 0;
-    func_L05_00442720();
+    SaveShipSettings();
 }
 
 extern float D_L05_001B1680 __attribute__((sda));
@@ -462,20 +464,20 @@ void func_L05_0042AFE0(u8 *actor)
     D_L05_001B170C += D_L05_001B1710;
     if (D_L05_001B170C > 7.0f) D_L05_001B170C -= 7.0f;
     else if (D_L05_001B170C < -7.0f) D_L05_001B170C += 7.0f;
-    direction[0] = func_00283180(*(float *)(actor + 0xF8));
-    direction[1] = func_00283198(*(float *)(actor + 0xF8));
+    direction[0] = FastSinOrCosA(*(float *)(actor + 0xF8));
+    direction[1] = FastSinOrCosB(*(float *)(actor + 0xF8));
     direction[2] = 0.0f;
-    func_L05_0042BB10(actor);
-    func_L05_0042B2C0(actor + 0x10, direction, D_L05_001B16A0, D_L05_001B1684, D_L05_001B1718, D_L05_001B16A8,
+    DrawTiledGroundQuad(actor);
+    BuildTexturedRingStrip(actor + 0x10, direction, D_L05_001B16A0, D_L05_001B1684, D_L05_001B1718, D_L05_001B16A8,
                      D_L05_001B16D0 * 0.03225806355f,
                      D_L05_001B16CC * 0.2f, 0.0f, D_L05_001B16D4);
-    func_L05_0042B2C0(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B1714, D_L05_001B16A4,
+    BuildTexturedRingStrip(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B1714, D_L05_001B16A4,
                      D_L05_001B16B8 * 0.03225806355f,
                      D_L05_001B16B4 * 0.2f, D_L05_001B16FC, D_L05_001B16D4);
-    func_L05_0042B2C0(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B1720, D_L05_001B16B0,
+    BuildTexturedRingStrip(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B1720, D_L05_001B16B0,
                      D_L05_001B16C8 * 0.03225806355f,
                      D_L05_001B16C4 * 0.2f, D_L05_001B1704, D_L05_001B16E8);
-    func_L05_0042B2C0(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B171C, D_L05_001B16AC,
+    BuildTexturedRingStrip(actor + 0x10, direction, D_L05_001B169C, D_L05_001B1680, D_L05_001B171C, D_L05_001B16AC,
                      D_L05_001B16C0 * 0.03225806355f,
                      D_L05_001B16BC * 0.2f, D_L05_001B170C, D_L05_001B16D4);
 }

@@ -25,33 +25,33 @@ extern void func_002A0F48(Moby_38D530 *object);
 
 /* Spawns object 0x79 at A1 with the state vector A2 (the func_L00_003E7650 spawner): a random
    spin on all three axes, a 30..300 frame timer and its effect handle. */
-Moby_38D530 *func_L00_0038D530(TI128 *a1, TI128 *a2)
+Moby_38D530 *func_L00_0038D530(TI128 *position, TI128 *velocity)
 {
-    Moby_38D530 *p;
-    char *s0;
-    float lo;
-    float hi;
+    Moby_38D530 *moby;
+    char *vars;
+    float minAngle;
+    float maxAngle;
 
-    p = func_0029EFD0(0x79);
-    if (p != 0) {
-        p->alpha = 0xFF;
-        p->timer = 0x1FF;
-        p->visible = 1;
-        s0 = p->vars;
-        p->state20 = 0;
-        qcopy(&p->position, a1);
-        *(TI128 *)s0 = *a2;
-        lo = -3.1415927f;
-        hi = 3.1415927f;
-        *(int *)(s0 + 0x14) = 0;
-        *(int *)(s0 + 0x10) = 0x1E;
-        *(int *)(s0 + 0x18) = 0x12C;
-        p->spin[0] = func_002A7878(lo, hi);
-        p->spin[1] = func_002A7878(lo, hi);
-        p->spin[2] = func_002A7878(lo, hi);
-        p->spinTime = 0;
-        func_002A0F48(p);
-        *(int *)(s0 + 0x1C) = func_002FED90(p, 0, 1.0f, 1.0f, 1.0f);
+    moby = CreateMoby(0x79 /* moby class 121 */);
+    if (moby != 0) {
+        moby->alpha = 0xFF;
+        moby->timer = 0x1FF;
+        moby->visible = 1;
+        vars = moby->vars;
+        moby->state20 = 0;
+        qcopy(&moby->position, position);
+        *(TI128 *)vars = *velocity;
+        minAngle = -3.1415927f;
+        maxAngle = 3.1415927f;
+        *(int *)(vars + 0x14) = 0;
+        *(int *)(vars + 0x10) = 0x1E;
+        *(int *)(vars + 0x18) = 0x12C;
+        moby->spin[0] = RandomFloatRange(minAngle, maxAngle);
+        moby->spin[1] = RandomFloatRange(minAngle, maxAngle);
+        moby->spin[2] = RandomFloatRange(minAngle, maxAngle);
+        moby->spinTime = 0;
+        func_002A0F48(moby);
+        *(int *)(vars + 0x1C) = AllocEffectSlot_002FED90(moby, 0, 1.0f, 1.0f, 1.0f);
     }
-    return p;
+    return moby;
 }

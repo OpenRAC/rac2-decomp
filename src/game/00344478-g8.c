@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 struct vec2 {
     float x;
@@ -54,55 +55,55 @@ extern void func_00344848(char *);
 
 /* menu update: clears the index at +0x444, dispatches on the mode at +0x448 (0 to 3), stores the id of the
    selected entry in D_001ADB10, then repositions ten widgets from the position pointer at +0x430; returns 0 */
-int func_00344478(char *self, unsigned int buttons)
+int func_00344478(char *menu, unsigned int buttons)
 {
-    *(int *)(self + 0x444) = 0;
-    D_001ADB10 = -1;
-    func_00287FF8(6, D_001A7A10[4]);
-    switch (*(int *)(self + 0x448)) {
+    *(int *)(menu + 0x444) = 0;
+    gSelectedItemMaterial = -1;
+    SeekChainEntry(6, D_001A7A10[4]);
+    switch (*(int *)(menu + 0x448)) {
     case 0:
-        func_00343EE8(self, buttons);
+        HandleGridMenuInputGroup0(menu, buttons);
         break;
     case 1:
-        func_00344298(self, buttons);
+        HandleGridMenuInputGroup1(menu, buttons);
         break;
     case 2:
-        func_00343FF8(self, buttons);
+        HandleGridMenuInputGroup2(menu, buttons);
         break;
     case 3:
-        func_00344160(self, buttons);
+        HandleGridMenuInputGroup3(menu, buttons);
         break;
     }
-    if (*(int *)(self + 0x448) == 3) {
+    if (*(int *)(menu + 0x448) == 3) {
         struct quad table = D_001AE270;
-        int idx = *(int *)(self + 0x444);
+        int idx = *(int *)(menu + 0x444);
 
-        D_001ADB10 = table.v[idx];
+        gSelectedItemMaterial = table.v[idx];
     } else {
-        int idx = *(int *)(self + 0x444);
+        int idx = *(int *)(menu + 0x444);
 
-        if (D_001A7AF8[idx])
-            D_001ADB10 = (D_00239BA0 + D_00139568[idx])->id;
+        if (gItemOwnedFlags[idx])
+            gSelectedItemMaterial = (gWeaponTable_00239BA0 + gItemSlotToRecord[idx])->id;
     }
     {
         float zero = 0.0f;
         struct vec2 offset = D_001AE2A8[0];
-        struct vec2 **pos = (struct vec2 **)(self + 0x430);
+        struct vec2 **pos = (struct vec2 **)(menu + 0x430);
 
-        func_00335E38(self, D_001AE280 + (*pos)->x, D_001AE284 + (*pos)->y, zero, zero);
-        func_00335E38(self + 0x4C, D_001AE2A0 + (*pos)->x, D_001AE2A4 + (*pos)->y, zero, zero);
-        func_00335E38(self + 0x98, D_001AE288 + (*pos)->x, D_001AE28C + (*pos)->y, zero, zero);
-        func_00335E38(self + 0xE4, D_001AE290 + (*pos)->x, D_001AE294 + (*pos)->y, zero, zero);
-        func_00335E38(self + 0x130, D_001AE298 + (*pos)->x, D_001AE29C + (*pos)->y, zero, zero);
-        func_00335E38(self + 0x1C8, offset.x + (*pos)->x, offset.y + (*pos)->y, zero, zero);
-        func_00335E38(self + 0x298, D_001AE2B0 + (*pos)->x, D_001AE2B4 + (*pos)->y, zero, zero);
-        func_00335E38(self + 0x210, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
-        func_00335E38(self + 0x130, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
-        func_00335E38(self + 0x17C, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
+        SetFirstFloat4(menu, D_001AE280 + (*pos)->x, D_001AE284 + (*pos)->y, zero, zero);
+        SetFirstFloat4(menu + 0x4C, D_001AE2A0 + (*pos)->x, D_001AE2A4 + (*pos)->y, zero, zero);
+        SetFirstFloat4(menu + 0x98, D_001AE288 + (*pos)->x, D_001AE28C + (*pos)->y, zero, zero);
+        SetFirstFloat4(menu + 0xE4, D_001AE290 + (*pos)->x, D_001AE294 + (*pos)->y, zero, zero);
+        SetFirstFloat4(menu + 0x130, D_001AE298 + (*pos)->x, D_001AE29C + (*pos)->y, zero, zero);
+        SetFirstFloat4(menu + 0x1C8, offset.x + (*pos)->x, offset.y + (*pos)->y, zero, zero);
+        SetFirstFloat4(menu + 0x298, D_001AE2B0 + (*pos)->x, D_001AE2B4 + (*pos)->y, zero, zero);
+        SetFirstFloat4(menu + 0x210, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
+        SetFirstFloat4(menu + 0x130, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
+        SetFirstFloat4(menu + 0x17C, D_001AE2B8 + (*pos)->x, D_001AE2BC + (*pos)->y, zero, zero);
     }
     if (D_00138344[0] & 0xF000)
-        func_002A9588(0, 0, 1, 0, 1);
-    *func_00335E20(self + 0x17C) = func_002A9588(0x60442D00, 0x70FFFEED, 20, 0, 0);
-    func_00344848(self);
+        PingPongBlendValues(0, 0, 1, 0, 1);
+    *GetFieldC(menu + 0x17C) = PingPongBlendValues(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    RepositionGridMenuWidgets(menu);
     return 0;
 }

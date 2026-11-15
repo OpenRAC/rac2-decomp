@@ -12,8 +12,8 @@ void func_L13_0040A0A0(char *object, char *state, char *target,
     int blocked = 0;
     char *position;
     float height;
-    func_L13_00409B08(object, state);
-    height = func_00282E48(object + 0x10, D_L13_001B2590);
+    ProbeGroundBelowMoby(object, state);
+    height = fast_vec_dist(object + 0x10, D_L13_001B2590);
     if (height < *(float *)(state + 0x90) - *(float *)(state + 8)) {
         *(int *)(state + 0x94) |= 2;
         blocked = 1;
@@ -25,7 +25,7 @@ void func_L13_0040A0A0(char *object, char *state, char *target,
         }
     }
     if (*(short *)(state + 0xc0) != 0) {
-        if (*(float *)(state + 0x10) < func_L02_00329410(object, (float *)(state + 0x50), 0)) {
+        if (*(float *)(state + 0x10) < ComputeFacingAngleFromVector(object, (float *)(state + 0x50), 0)) {
             *(int *)(state + 0x94) |= 4;
             blocked = 1;
         }
@@ -33,13 +33,13 @@ void func_L13_0040A0A0(char *object, char *state, char *target,
     position = object + 0x10;
     if (blocked) {
         qcopy(position, old_position);
-        func_L13_00409B08(object, state);
-        height = func_00282E48(position, D_L13_001B2590);
+        ProbeGroundBelowMoby(object, state);
+        height = fast_vec_dist(position, D_L13_001B2590);
     }
     if (height <= *(float *)(state + 0x90) + 0.005f) {
-        func_002AFF38(object, state + 0xa0, 0);
+        GetVerticalOffset(object, state + 0xa0, 0);
         if (transform != 0)
-            func_002AFD88(0.0f, 0.0f, *(float *)(state + 0x90) - height, object, position);
+            AddTransformedPointToVector(0.0f, 0.0f, *(float *)(state + 0x90) - height, object, position);
         *(short *)(state + 0xc2) = 0;
         *(short *)(state + 0xc0) += 1;
     } else if (*(float *)(state + 0x90) + *(float *)(state + 0xc) <= height) {
@@ -47,7 +47,7 @@ void func_L13_0040A0A0(char *object, char *state, char *target,
         *(short *)(state + 0xc2) += 1;
     }
     {
-        float distance = func_00282E48(position, target);
+        float distance = fast_vec_dist(position, target);
         *(float *)(state + 0xcc) = distance;
         if (distance <= *(float *)(state + 0x34))
             *(int *)(state + 0x94) |= 0x80;

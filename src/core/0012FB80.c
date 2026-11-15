@@ -34,18 +34,19 @@ extern void r1_func_00129600();
    of the fall-through `b`, as retail. Written overflow-first, as 2.95.3
    needed, 2.9-ee inverts the test and puts the store in a beql slot,
    one instruction short (SIZE 104/108). */
-unsigned int func_0012FB80(void *arg0, char *r, unsigned int size,
+/* Hands out an aligned chunk of memory from a region and reports an error if it is full. */
+unsigned int func_0012FB80(void *mpeg, char *region, unsigned int size,
                            unsigned int align) {
     unsigned int aligned;
     unsigned int end;
 
-    aligned = ((*(unsigned int *)(r + 0x8) + align - 1) / align) * align;
+    aligned = ((*(unsigned int *)(region + 0x8) + align - 1) / align) * align;
     end = aligned + size;
-    if (*(unsigned int *)(r + 0x0) + *(unsigned int *)(r + 0x4) >= end) {
-        *(unsigned int *)(r + 0x8) = end;
+    if (*(unsigned int *)(region + 0x0) + *(unsigned int *)(region + 0x4) >= end) {
+        *(unsigned int *)(region + 0x8) = end;
         return aligned;
     }
-    func_00130288(arg0, r1_D_00153B38);
+    ReportMpegError(mpeg, r1_D_00153B38);
     return 0;
 }
 
@@ -74,56 +75,57 @@ extern char r1_D_00153B58[];
  * pictureType's initializer and lastResult declared first put both in
  * retail's saved registers and hoist lastResult's 0 into the prologue.
  */
-int func_0012FBF0(void *arg0) {
+/* Reads the video stream and starts decoding pictures until one is ready or the stream ends. */
+int func_0012FBF0(void *mpeg) {
     int pictureType = 1;
     int lastResult = 0;
-    char *w = (char *)arg0;
-    char *inner = *(char **)(w + 0x40);
+    char *wrapper = (char *)mpeg;
+    char *decoder = *(char **)(wrapper + 0x40);
 
-    *(int *)inner = 0;
-    if ((*(int *)(inner + 0xD8) & 0x3F) != 0) {
-        r1_func_0012C430(inner, r1_D_00153B58, *(int *)(inner + 0xD8));
+    *(int *)decoder = 0;
+    if ((*(int *)(decoder + 0xD8) & 0x3F) != 0) {
+        r1_func_0012C430(decoder, r1_D_00153B58, *(int *)(decoder + 0xD8));
         return -1;
     }
-    *(int *)(inner + 0x820) = 0;
+    *(int *)(decoder + 0x820) = 0;
 
     do {
         if (lastResult != -1) {
             for (;;) {
-                pictureType = r1_func_00128C90(inner);
+                pictureType = r1_func_00128C90(decoder);
                 if (pictureType == 0) break;
-                if (*(int *)(inner + 0x174) == *(int *)(inner + 0xD4)) break;
-                if (*(int *)(inner + 0x848) == 0) break;
+                if (*(int *)(decoder + 0x174) == *(int *)(decoder + 0xD4)) break;
+                if (*(int *)(decoder + 0x848) == 0) break;
             }
         }
 
         switch (pictureType) {
         case 0:
-            r1_func_0012C200(w);
-            *(int *)inner = 1;
+            r1_func_0012C200(wrapper);
+            *(int *)decoder = 1;
             break;
         case 1:
-            *(int *)(inner + 0xA8) = 0;
-            *(int *)(inner + 0xA4) = 0;
-            *(int *)(inner + 0xA0) = 0;
-            lastResult = r1_func_0012C058(w, 0, *(int *)(inner + 0x94));
-            *(int *)(inner + 0xA0) = *(int *)(inner + 0xA0) + 1;
+            *(int *)(decoder + 0xA8) = 0;
+            *(int *)(decoder + 0xA4) = 0;
+            *(int *)(decoder + 0xA0) = 0;
+            lastResult = r1_func_0012C058(wrapper, 0, *(int *)(decoder + 0x94));
+            *(int *)(decoder + 0xA0) = *(int *)(decoder + 0xA0) + 1;
             break;
         case 2:
-            lastResult = r1_func_0012C058(w, *(int *)(inner + 0xA4), *(int *)(inner + 0x98));
-            *(int *)(inner + 0xA4) = *(int *)(inner + 0xA4) + 1;
+            lastResult = r1_func_0012C058(wrapper, *(int *)(decoder + 0xA4), *(int *)(decoder + 0x98));
+            *(int *)(decoder + 0xA4) = *(int *)(decoder + 0xA4) + 1;
             break;
         case 3:
         case 4:
-            lastResult = r1_func_0012C058(w, *(int *)(inner + 0xA8), *(int *)(inner + 0x9C));
-            *(int *)(inner + 0xA8) = *(int *)(inner + 0xA8) + 1;
+            lastResult = r1_func_0012C058(wrapper, *(int *)(decoder + 0xA8), *(int *)(decoder + 0x9C));
+            *(int *)(decoder + 0xA8) = *(int *)(decoder + 0xA8) + 1;
             break;
         }
 
-        if (*(int *)(inner + 0x820) != 0) {
+        if (*(int *)(decoder + 0x820) != 0) {
             return 1;
         }
-    } while (*(int *)inner == 0);
+    } while (*(int *)decoder == 0);
 
     return 1;
 }
@@ -132,38 +134,39 @@ int func_0012FBF0(void *arg0) {
 /* _decodeOrSkipFrame (libmpeg): sibling of func_0012FEC0
    (_decodeOrSkipField), for the frame-picture path. Adapted from
    Lombyte (GPL-3.0) for PAL. */
-int func_0012FD60(void *arg0, int arg1, int arg2) {
-    Wrapper *w = (Wrapper *)arg0;
-    Obj40 *p = w->obj;
-    int flag = 0;
-    int t;
-    int ret;
+/* Decodes or skips one full video frame and moves the frame counters forward. */
+int func_0012FD60(void *mpeg, int frameIndex, int frameLimit) {
+    Wrapper *wrapper = (Wrapper *)mpeg;
+    Obj40 *decoder = wrapper->obj;
+    int skipped = 0;
+    int decodedOk;
+    int result;
 
-    if (arg2 == -1 || arg1 < arg2) {
-        if (p->unk008 == 0) {
-            w->unk08 = 0;
-            p->unk008 = 1;
+    if (frameLimit == -1 || frameIndex < frameLimit) {
+        if (decoder->unk008 == 0) {
+            wrapper->unk08 = 0;
+            decoder->unk008 = 1;
         }
-        if (r1_func_00129690(p, 0) == 0) {
-            t = 0;
+        if (r1_func_00129690(decoder, 0) == 0) {
+            decodedOk = 0;
         } else {
-            t = 0;
-            t = r1_func_00129530(p) != t;
+            decodedOk = 0;
+            decodedOk = r1_func_00129530(decoder) != decodedOk;
         }
-        ret = t;
+        result = decodedOk;
     } else {
-        flag = 1;
-        ret = r1_func_00129690(p, 0);
-        func_0012FAE8((int)w);
+        skipped = 1;
+        result = r1_func_00129690(decoder, 0);
+        SendMpegEventOne((int)wrapper);
     }
-    r1_func_00129600(p, p->unk118, p->unk004);
-    if (p->unk174 != 3 && flag == 0) {
-        p->unk120 = (p->unk120 == 0);
+    r1_func_00129600(decoder, decoder->unk118, decoder->unk004);
+    if (decoder->unk174 != 3 && skipped == 0) {
+        decoder->unk120 = (decoder->unk120 == 0);
     }
-    w->unk08 = p->unk118 - p->unk0AC;
-    if (p->unk120 == 0) {
-        p->unk118 = p->unk118 + 1;
-        p->unk004 = p->unk004 + 1;
+    wrapper->unk08 = decoder->unk118 - decoder->unk0AC;
+    if (decoder->unk120 == 0) {
+        decoder->unk118 = decoder->unk118 + 1;
+        decoder->unk004 = decoder->unk004 + 1;
     }
-    return ret;
+    return result;
 }

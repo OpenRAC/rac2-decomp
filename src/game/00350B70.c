@@ -1,4 +1,5 @@
 #include "ps2_hw.h"
+#include "names.h"
 #include "include_asm.h"
 
 typedef int s32;
@@ -34,59 +35,61 @@ extern void func_00350808(unsigned int);
 extern int func_00350750(ViBuf *, unsigned int);
 extern void func_00350878(unsigned long *, unsigned long, unsigned long, unsigned long);
 
-void func_00350B70(u8 *a0, s32 a1) {
-    func_0011AC60(*(s32 *)(a0+0x40));
-    *(s32 *)(a0+0x14) += (s32)a1;
-    *(long *)(a0+0x48) = (long)a1 + *(long *)(a0+0x48);
-    func_0011AC40(*(s32 *)(a0+0x40));
+/* Adds a number of bytes to the amount of data waiting in the video buffer. */
+void func_00350B70(u8 *buf, s32 byteCount) {
+    WaitSema(*(s32 *)(buf+0x40));
+    *(s32 *)(buf+0x14) += (s32)byteCount;
+    *(long *)(buf+0x48) = (long)byteCount + *(long *)(buf+0x48);
+    SignalSema(*(s32 *)(buf+0x40));
 }
+/* Refills the video buffer's DMA tags after the decoder has used up some data, then restarts the transfer. */
 int func_00350BC8(ViBuf *vb) {
-    int ok = 0;
+    int linkPrev = 0;
     unsigned int chcr;
     int idx;
-    int done;
-    int n;
+    int usedSlots;
+    int newCount;
     int i;
-    int rd;
-    int pos;
+    int readSlot;
+    int writeSlot;
 
-    func_0011AC60(vb->sema);
+    WaitSema(vb->sema);
     if (vb->f44 == 0) {
-        func_0034F780(D_001AE848);
+        SetMovieDebugValue(D_001AE848);
         return 0;
     }
-    func_00350808(5);
+    StartDmaChannel4(5);
     chcr = D4_CHCR;
-    rd = func_00350750(vb, D4_MADR);
-    done = (rd + vb->count - vb->fC) % vb->count;
-    vb->fC = (vb->fC + done) % vb->count;
-    vb->f10 -= done;
-    pos = (vb->fC + vb->f10) % vb->count;
+    readSlot = ViBufAddressToSlot(vb, D4_MADR);
+    usedSlots = (readSlot + vb->count - vb->fC) % vb->count;
+    vb->fC = (vb->fC + usedSlots) % vb->count;
+    vb->f10 -= usedSlots;
+    writeSlot = (vb->fC + vb->f10) % vb->count;
 
-    n = vb->f14 / 0x800;
-    vb->f14 -= n << 11;
-    if (n > 0) {
+    newCount = vb->f14 / 0x800;
+    vb->f14 -= newCount << 11;
+    if (newCount > 0) {
         int last = vb->count - 1;
         int prev = (vb->fC + vb->f10 + last) % vb->count;
-        func_00350878((unsigned long *)(vb->tags + prev * 16), vb->base + (prev << 11), 3, 0x80);
-        ok = 1;
+        scTag2((unsigned long *)(vb->tags + prev * 16), vb->base + (prev << 11), 3, 0x80);
+        linkPrev = 1;
     }
-    idx = pos;
-    for (i = 0; i < n; i++) {
-        int t = 0;
-        if (i != n - 1) {
-            t = 3;
+    idx = writeSlot;
+    for (i = 0; i < newCount; i++) {
+        int tagBits = 0;
+        if (i != newCount - 1) {
+            tagBits = 3;
         }
-        func_00350878((unsigned long *)(vb->tags + idx * 16), vb->base + (idx << 11), t, 0x80);
+        scTag2((unsigned long *)(vb->tags + idx * 16), vb->base + (idx << 11), tagBits, 0x80);
         idx = (idx + 1) % vb->count;
     }
-    vb->f10 += n;
+    vb->f10 += newCount;
     if (vb->f10 != 0) {
-        if (ok) {
+        if (linkPrev) {
             chcr = (chcr & 0x0FFFFFFF) | 0x30000000;
         }
-        func_00350808(chcr | 0x100);
+        StartDmaChannel4(chcr | 0x100);
     }
-    func_0011AC40(vb->sema);
+    SignalSema(vb->sema);
     return 1;
 }

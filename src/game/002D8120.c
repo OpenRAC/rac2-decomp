@@ -11,6 +11,7 @@ extern unsigned char D_0018D0E8[];
 extern short D_00254EC8[][2];
 extern Func002D8120Slot D_0025ADB0[];
 
+/* Fills the slot list from a saved order and ends the list with an id of 0. */
 int func_002D8120(void)
 {
     int i;

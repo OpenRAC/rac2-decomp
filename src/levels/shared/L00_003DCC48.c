@@ -12,75 +12,76 @@ extern float func_00283CE0_7(int);
 extern void func_00280B90_7(void *, void *, int);
 
 extern float D_L00_001B8DC0[];
+/* Draws a tapering two-layer ribbon along a list of points, with a fading end. */
 void func_L00_003DCC48(float tex, float width, float step, void *start, char *points, int color, int count)
 {
     char origin[16] __attribute__((aligned(16)));
-    char p[144] __attribute__((aligned(16)));
-    char q[144] __attribute__((aligned(16)));
-    float m[16];
+    char corePacket[144] __attribute__((aligned(16)));
+    char outerPacket[144] __attribute__((aligned(16)));
+    float matrix[16];
     TrailVector offsets[2];
     int i;
-    int c1, c2;
+    int coreColor, outerColor;
     char *basis = origin;
-    float v, u, a, b;
+    float texEnd, texStart, lastStart, lastEnd;
     *(TrailQuad *)origin = *(TrailQuad *)start;
-    func_00281DE8_7(p,43,1,128);
-    func_00281DE8_7(q,43,1,128);
+    func_00281DE8_7(corePacket,43,1,128);
+    func_00281DE8_7(outerPacket,43,1,128);
     offsets[0].quad=0; offsets[1].quad=0;
     width *= .25f;
-    *(int *)(p+64)=*(int *)(p+68)=color;
-    *(int *)(q+64)=*(int *)(q+68)=color;
-    *(int *)(p+72)=*(int *)(p+76)=color;
-    *(int *)(q+72)=*(int *)(q+76)=color;
+    *(int *)(corePacket+64)=*(int *)(corePacket+68)=color;
+    *(int *)(outerPacket+64)=*(int *)(outerPacket+68)=color;
+    *(int *)(corePacket+72)=*(int *)(corePacket+76)=color;
+    *(int *)(outerPacket+72)=*(int *)(outerPacket+76)=color;
     offsets[0].f[3]=1;
     offsets[1].f[3]=1;
     offsets[0].f[2]=width;
     offsets[1].f[2]=width+width;
-    if (!(func_001163B0()&1)) {
-        *(float *)(p+80)=tex; *(float *)(p+84)=0; *(float *)(p+88)=tex; *(float *)(p+92)=1;
-        *(float *)(p+96)=step+tex; *(float *)(p+100)=0; *(float *)(p+104)=step+tex; *(float *)(p+108)=1;
-        *(float *)(q+80)=tex; *(float *)(q+84)=0; *(float *)(q+88)=tex; *(float *)(q+92)=1;
-        *(float *)(q+96)=step+tex; *(float *)(q+100)=0; *(float *)(q+104)=step+tex; *(float *)(q+108)=1;
+    if (!(Rand()&1)) {
+        *(float *)(corePacket+80)=tex; *(float *)(corePacket+84)=0; *(float *)(corePacket+88)=tex; *(float *)(corePacket+92)=1;
+        *(float *)(corePacket+96)=step+tex; *(float *)(corePacket+100)=0; *(float *)(corePacket+104)=step+tex; *(float *)(corePacket+108)=1;
+        *(float *)(outerPacket+80)=tex; *(float *)(outerPacket+84)=0; *(float *)(outerPacket+88)=tex; *(float *)(outerPacket+92)=1;
+        *(float *)(outerPacket+96)=step+tex; *(float *)(outerPacket+100)=0; *(float *)(outerPacket+104)=step+tex; *(float *)(outerPacket+108)=1;
     } else {
-        *(float *)(p+80)=tex; *(float *)(p+84)=1; *(float *)(p+88)=tex; *(float *)(p+92)=0;
-        *(float *)(p+96)=step+tex; *(float *)(p+100)=1; *(float *)(p+104)=step+tex; *(float *)(p+108)=0;
-        *(float *)(q+80)=tex; *(float *)(q+84)=1; *(float *)(q+88)=tex; *(float *)(q+92)=0;
-        *(float *)(q+96)=step+tex; *(float *)(q+100)=1; *(float *)(q+104)=step+tex; *(float *)(q+108)=0;
+        *(float *)(corePacket+80)=tex; *(float *)(corePacket+84)=1; *(float *)(corePacket+88)=tex; *(float *)(corePacket+92)=0;
+        *(float *)(corePacket+96)=step+tex; *(float *)(corePacket+100)=1; *(float *)(corePacket+104)=step+tex; *(float *)(corePacket+108)=0;
+        *(float *)(outerPacket+80)=tex; *(float *)(outerPacket+84)=1; *(float *)(outerPacket+88)=tex; *(float *)(outerPacket+92)=0;
+        *(float *)(outerPacket+96)=step+tex; *(float *)(outerPacket+100)=1; *(float *)(outerPacket+104)=step+tex; *(float *)(outerPacket+108)=0;
     }
-    func_00282CF0_7(m,points,basis); func_00282F20_7(m,m,1);
-    func_00282CF0_7(m+4,D_L00_001B8DC0,basis);
-    func_00282DD8_7(m+8,m+4,m); func_00282F20_7(m+8,m+8,1); func_00282DD8_7(m+4,m,m+8);
-    qcopy(m+12,basis);
-    qcopy(p,offsets); qcopy(q,offsets+1);
-    func_00282D30_7(p+16,p,-1); func_00282D30_7(q+16,q,-1);
-    func_002830C0_7(p,p,m); func_002830C0_7(p+16,p+16,m); func_002830C0_7(q,q,m); func_002830C0_7(q+16,q+16,m);
+    func_00282CF0_7(matrix,points,basis); func_00282F20_7(matrix,matrix,1);
+    func_00282CF0_7(matrix+4,gCameraPosition_L00,basis);
+    func_00282DD8_7(matrix+8,matrix+4,matrix); func_00282F20_7(matrix+8,matrix+8,1); func_00282DD8_7(matrix+4,matrix,matrix+8);
+    qcopy(matrix+12,basis);
+    qcopy(corePacket,offsets); qcopy(outerPacket,offsets+1);
+    func_00282D30_7(corePacket+16,corePacket,-1); func_00282D30_7(outerPacket+16,outerPacket,-1);
+    func_002830C0_7(corePacket,corePacket,matrix); func_002830C0_7(corePacket+16,corePacket+16,matrix); func_002830C0_7(outerPacket,outerPacket,matrix); func_002830C0_7(outerPacket+16,outerPacket+16,matrix);
     for(i=0;i<count-1;i++) {
-        c1=color|0x7f000000; c2=color|0x3f000000;
-basis = (char *)m;
+        coreColor=color|0x7f000000; outerColor=color|0x3f000000;
+basis = (char *)matrix;
         func_00282CF0_7(basis,points+(i*16+16),points+i*16); func_00282F20_7(basis,basis,1);
-        func_00282CF0_7(basis+16,D_L00_001B8DC0,points+i*16);
+        func_00282CF0_7(basis+16,gCameraPosition_L00,points+i*16);
         func_00282DD8_7(basis+32,basis+16,basis); func_00282F20_7(basis+32,basis+32,1); func_00282DD8_7(basis+16,basis,basis+32);
         qcopy(basis+48,points+i*16);
         offsets[0].f[2]*=.7f; offsets[1].f[2]=offsets[0].f[2]+offsets[0].f[2];
-        qcopy(p+32,offsets); qcopy(q+32,offsets+1);
-        func_00282D30_7(p+48,p+32,-1); func_00282D30_7(q+48,q+32,-1);
-        func_002830C0_7(p+32,p+32,basis); func_002830C0_7(p+48,p+48,basis); func_002830C0_7(q+32,q+32,basis); func_002830C0_7(q+48,q+48,basis);
-        u=step*func_00283CE0_7(i+1); v=u+step; if(u>=1) {u-=1;v-=1;}
-*(float *)(p+80)=u+tex; *(float *)(p+88)=u+tex; *(float *)(p+96)=v+tex; *(float *)(p+104)=v+tex;
-*(float *)(q+80)=u+tex; *(float *)(q+88)=u+tex; *(float *)(q+96)=v+tex; *(float *)(q+104)=v+tex;
-        func_00280B90_7(p,0,0); func_00280B90_7(q,0,0);
-         if(i) { *(int *)(p+68)=c1; *(int *)(p+64)=c1; *(int *)(q+68)=c2; *(int *)(q+64)=c2; }
-        *(int *)(p+76)=c1; *(int *)(p+72)=c1; *(int *)(q+76)=c2; *(int *)(q+72)=c2;
-        qcopy(p,p+32);qcopy(p+16,p+48);qcopy(q,q+32);qcopy(q+16,q+48);
+        qcopy(corePacket+32,offsets); qcopy(outerPacket+32,offsets+1);
+        func_00282D30_7(corePacket+48,corePacket+32,-1); func_00282D30_7(outerPacket+48,outerPacket+32,-1);
+        func_002830C0_7(corePacket+32,corePacket+32,basis); func_002830C0_7(corePacket+48,corePacket+48,basis); func_002830C0_7(outerPacket+32,outerPacket+32,basis); func_002830C0_7(outerPacket+48,outerPacket+48,basis);
+        texStart=step*func_00283CE0_7(i+1); texEnd=texStart+step; if(texStart>=1) {texStart-=1;texEnd-=1;}
+*(float *)(corePacket+80)=texStart+tex; *(float *)(corePacket+88)=texStart+tex; *(float *)(corePacket+96)=texEnd+tex; *(float *)(corePacket+104)=texEnd+tex;
+*(float *)(outerPacket+80)=texStart+tex; *(float *)(outerPacket+88)=texStart+tex; *(float *)(outerPacket+96)=texEnd+tex; *(float *)(outerPacket+104)=texEnd+tex;
+        func_00280B90_7(corePacket,0,0); func_00280B90_7(outerPacket,0,0);
+         if(i) { *(int *)(corePacket+68)=coreColor; *(int *)(corePacket+64)=coreColor; *(int *)(outerPacket+68)=outerColor; *(int *)(outerPacket+64)=outerColor; }
+        *(int *)(corePacket+76)=coreColor; *(int *)(corePacket+72)=coreColor; *(int *)(outerPacket+76)=outerColor; *(int *)(outerPacket+72)=outerColor;
+        qcopy(corePacket,corePacket+32);qcopy(corePacket+16,corePacket+48);qcopy(outerPacket,outerPacket+32);qcopy(outerPacket+16,outerPacket+48);
     }
-    qcopy(m+12,points+(count-1)*16);
+    qcopy(matrix+12,points+(count-1)*16);
     offsets[0].f[2]*=.7f; offsets[1].f[2]=offsets[0].f[2]+offsets[0].f[2];
-    qcopy(p+32,offsets);qcopy(q+32,offsets+1);
-    func_00282D30_7(p+48,p+32,-1);func_00282D30_7(q+48,q+32,-1);
-    func_002830C0_7(p+32,p+32,m);func_002830C0_7(p+48,p+48,m);func_002830C0_7(q+32,q+32,m);func_002830C0_7(q+48,q+48,m);
-    *(int *)(p+76)=color; *(int *)(p+72)=color; *(int *)(q+76)=color; *(int *)(q+72)=color;
-    a=step*func_00283CE0_7(i+1); b=a+step; if(a>=1) {a-=1;b-=1;}
-*(float *)(p+80)=a+tex; *(float *)(p+88)=a+tex; *(float *)(p+96)=b+tex; *(float *)(p+104)=b+tex;
-*(float *)(q+80)=a+tex; *(float *)(q+88)=a+tex; *(float *)(q+96)=b+tex; *(float *)(q+104)=b+tex;
-    func_00280B90_7(p,0,0);func_00280B90_7(q,0,0);
+    qcopy(corePacket+32,offsets);qcopy(outerPacket+32,offsets+1);
+    func_00282D30_7(corePacket+48,corePacket+32,-1);func_00282D30_7(outerPacket+48,outerPacket+32,-1);
+    func_002830C0_7(corePacket+32,corePacket+32,matrix);func_002830C0_7(corePacket+48,corePacket+48,matrix);func_002830C0_7(outerPacket+32,outerPacket+32,matrix);func_002830C0_7(outerPacket+48,outerPacket+48,matrix);
+    *(int *)(corePacket+76)=color; *(int *)(corePacket+72)=color; *(int *)(outerPacket+76)=color; *(int *)(outerPacket+72)=color;
+    lastStart=step*func_00283CE0_7(i+1); lastEnd=lastStart+step; if(lastStart>=1) {lastStart-=1;lastEnd-=1;}
+*(float *)(corePacket+80)=lastStart+tex; *(float *)(corePacket+88)=lastStart+tex; *(float *)(corePacket+96)=lastEnd+tex; *(float *)(corePacket+104)=lastEnd+tex;
+*(float *)(outerPacket+80)=lastStart+tex; *(float *)(outerPacket+88)=lastStart+tex; *(float *)(outerPacket+96)=lastEnd+tex; *(float *)(outerPacket+104)=lastEnd+tex;
+    func_00280B90_7(corePacket,0,0);func_00280B90_7(outerPacket,0,0);
 }

@@ -31,6 +31,7 @@ extern void func_L20_0039D7B0(char *);
 extern int D_L20_001A8F00[] __attribute__((sda));
 extern int D_L20_001BDCF0;
 
+/* Per-frame update of the Megacorp trooper: it picks a target, walks, turns and shoots, and breaks apart when it is hit. */
 void func_L20_0039CF58(unsigned char *object) {
     Vector position, velocity;
     unsigned char *state = *(unsigned char **)(object + 0x68);
@@ -43,30 +44,30 @@ void func_L20_0039CF58(unsigned char *object) {
         unsigned char *initial = *(unsigned char **)(state + 0x254);
         if (initial) *(int *)(initial + 0x98) = 0;
     }
-    func_L20_0039D340(object);
+    SetupTrooperStatsAndTarget(object);
     if (D_L20_001A8F00[0] == 2) {
         if (D_L20_001BDCF0 < 5) return;
         child = *(unsigned char **)(state + 0x258);
-        if (child) func_0029F338(child);
+        if (child) MarkMobySpawned(child);
         child = *(unsigned char **)(state + 0x25C);
-        if (child) func_0029F338(child);
+        if (child) MarkMobySpawned(child);
         child = *(unsigned char **)(state + 0x254);
-        if (child) func_0029F338(child);
-        func_0029F338(object);
+        if (child) MarkMobySpawned(child);
+        MarkMobySpawned(object);
         return;
     }
     mode = object[0x95];
     if (mode == 1) {
-        flags = func_002B1C20(object, (DispatchContext *)(state + 0x140));
+        flags = DispatchActionByKind(object, (DispatchContext *)(state + 0x140));
         if ((flags & 1UL) == 1UL) {
             position.q = *(Quadword *)(object + 0x10);
             position.f[2] += 0.5f;
-            func_0032C700(&position, 0, 25, 20, 20, 20, 45, 0, mode, 0, 0, 0, 0.5f, 20.0f);
-            func_002A6C58(object, 0, 3);
-            func_L20_0039DE88((char *)object);
+            SpawnExplosion(&position, 0, 25, 20, 20, 20, 45, 0, mode, 0, 0, 0, 0.5f, 20.0f);
+            SetDeathBits(object, 0, 3);
+            DestroyTrooperParts((char *)object);
         } else if ((flags & 2UL) == 2UL) {
-            func_002A7750(object, 3, 0);
-            func_L20_0039DB50((char *)object, 0, 20, 0.0f);
+            SetMobyState(object, 3, 0);
+            PlayAnimOnTrooperAndTorso((char *)object, 0, 20, 0.0f);
         }
     }
     code = object[0x20];
@@ -74,43 +75,43 @@ void func_L20_0039CF58(unsigned char *object) {
     case 6:
         goto finished;
     case 2:
-        if (object[0x60] & 2) func_002A7750(object, 3, -1);
+        if (object[0x60] & 2) SetMobyState(object, 3, -1);
         break;
     case 3:
-        if (func_002B3868(object)) {
-            func_L20_0039E158((char *)object);
-            func_L20_0039E1E8(object);
-            func_L20_0039DB50((char *)object, 11, 20, 0.0f);
+        if (SetFirstPendingFlag(object)) {
+            ChooseTrooperTarget((char *)object);
+            ChooseTrooperStandPoint(object);
+            PlayAnimOnTrooperAndTorso((char *)object, 11, 20, 0.0f);
         }
         if (*(float *)(state + 0x11C) <= *(float *)(state + 0x84)) {
             unsigned char *aimTarget = *(unsigned char **)(state + 0x200);
-            angle = func_00283248(*(float *)(aimTarget + 0x10) - *(float *)(object + 0x10),
+            angle = FastMatrixHelperA(*(float *)(aimTarget + 0x10) - *(float *)(object + 0x10),
                                   *(float *)(aimTarget + 0x14) - *(float *)(object + 0x14));
-            func_L01_00322288((int)object, angle);
-            if (func_00283C80(*(float *)(object + 0xF8), angle) < 0.05235988274216652f)
-                func_002A7750(object, 4, -1);
+            StartMobyEffectFromEntry((int)object, angle);
+            if (FastDiffRots(*(float *)(object + 0xF8), angle) < 0.05235988274216652f)
+                SetMobyState(object, 4, -1);
         } else {
-            func_L01_00321178((char *)object, (char *)state + 0x260);
+            TurnMobyTowardTarget((char *)object, (char *)state + 0x260);
         }
         break;
     case 4:
-        if (func_002B3868(object)) func_L20_0039DB50((char *)object, 10, 20, 0.0f);
-        *(float *)(state + 0x284) = func_00283248(*(float *)(state + 0x1F0) - *(float *)(object + 0x10),
+        if (SetFirstPendingFlag(object)) PlayAnimOnTrooperAndTorso((char *)object, 10, 20, 0.0f);
+        *(float *)(state + 0x284) = FastMatrixHelperA(*(float *)(state + 0x1F0) - *(float *)(object + 0x10),
                                                 *(float *)(state + 0x1F4) - *(float *)(object + 0x14));
         tick = *(unsigned short *)(object + 0x96) % 20;
         if (tick == 0 || tick == 10) {
             hand = tick == 0 ? 4 : 0;
-            func_0029FCC0(*(char **)(hand + state + 0x258), 0, (char *)&position);
-            func_00282CF0(&velocity, state + 0x1F0, &position);
-            func_00282F20(&velocity, &velocity, 0.25f);
-            func_002E5CF8(1, 0, *(char **)(state + 0x254));
-            func_L09_003A06B0(object, &velocity, &position, (float)state[0x34]);
+            TransformMobyJointToWorld(*(char **)(hand + state + 0x258), 0, (char *)&position);
+            FastVecSub(&velocity, state + 0x1F0, &position);
+            vec_scale_to_length(&velocity, &velocity, 0.25f);
+            PlayMobySound(1, 0, *(char **)(state + 0x254));
+            SpawnAimedEffectMoby(object, &velocity, &position, (float)state[0x34]);
         }
         if (*(unsigned short *)(object + 0x96) > 120 || ((target = *(unsigned char **)(state + 0x280)) && (*(unsigned short *)(target + 0x34) & 1)))
-            func_002A7750(object, 3, -1);
+            SetMobyState(object, 3, -1);
         break;
     }
-    func_L20_0039D7B0((char *)object);
+    UpdateTrooperBody((char *)object);
     child = *(unsigned char **)(state + 0x254);
     if (child) *(int *)(child + 0x98) = *(int *)(*(unsigned char **)(child + 0x24) + 0x10);
 finished:

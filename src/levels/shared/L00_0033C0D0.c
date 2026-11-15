@@ -19,26 +19,27 @@ extern void func_00283698(void *,void *);
 extern void func_002830C0(float *,float *,void *);
 extern unsigned char *ref_L00_0033C0D0_00;
 
+/* Creates a particle that is tied to an object. It remembers where it sits relative to that object. */
 Particle *func_L00_0033C0D0(char *object,Quad *position,float *velocity,int *config,int flag)
 {
     float relative[4];
     Quad matrix[4];
-    Particle *p=func_002B9030(0x4a);
+    Particle *p=AllocParticle(0x4a);
     if(p) {
         float *out;
-        p->alpha=func_00283CF0(0.04f)-96;
+        p->alpha=FloatToInt(0.04f)-96;
         p->b3=flag?0x48:0x44;
         p->b1=0;
         out=p->payload;
         p->b2=*ref_L00_0033C0D0_00;
-        p->seed=func_001163B0();
+        p->seed=Rand();
         p->life=0;
         qcopy(&p->position, position);
         out[0]=velocity[0];out[1]=velocity[1];out[2]=velocity[2];
-        func_00282CF0(relative,position,object+0x10);
+        FastVecSub(relative,position,object+0x10);
         qzero_nc(&matrix[0]);qzero_nc(&matrix[1]);qzero_nc(&matrix[2]);qzero_nc(&matrix[3]);
-        func_00283698(matrix,object+0xc0);
-        func_002830C0(relative,relative,matrix);
+        matrix_from_basis_rows(matrix,object+0xc0);
+        transform_vector(relative,relative,matrix);
         out[4]=relative[0];out[5]=relative[1];out[6]=relative[2];
         *(char **)(out+3)=object;
         *(int **)(out+7)=config;

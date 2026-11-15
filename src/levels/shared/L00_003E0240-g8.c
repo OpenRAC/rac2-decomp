@@ -23,6 +23,7 @@ extern int func_00282948(int *);
 extern void func_0029F338(void *), func_00328918(void *), func_00329328(void *);
 extern void ref_L00_003E0240_00(void *, void *);
 extern void func_00328A20(void);
+/* Updates a thrown projectile: it flies, bursts into sparks when it hits something, then fades away and is removed. */
 void func_L00_003E0240(char *self)
 {
     float previous[4], velocity[4];
@@ -43,7 +44,7 @@ void func_L00_003E0240(char *self)
             }
         }
         {
-            OwnerContext *context = &D_001A63A8;
+            OwnerContext *context = &gMusicState;
             if (!context->active && context->kind == -1) {
                 context->owner = self;
                 context->kind = 0xDB9;
@@ -53,41 +54,41 @@ void func_L00_003E0240(char *self)
     /* Fall through to move the object on its first update. */
     case 1:
         *(Quad *)previous = *(Quad *)(self + 0x10);
-        func_00282CC0(self + 0x10, self + 0x10, state);
+        FastVecAdd(self + 0x10, self + 0x10, state);
         *(float *)(state + 8) -= 0.00305555575f;
-        *(float *)(self + 0xF4) = func_00283B98(*(float *)(self + 0xF4), *(float *)(state + 0x14));
-        *(float *)(self + 0xF8) = func_00283B98(*(float *)(self + 0xF8), *(float *)(state + 0x18));
-        func_00328848(self);
-        func_003290D0(self, self + 0x10, func_00282E48(previous, self + 0x10) * 0.5f);
-        if (func_003286D0(self, previous)) {
+        *(float *)(self + 0xF4) = FastAddRotations(*(float *)(self + 0xF4), *(float *)(state + 0x14));
+        *(float *)(self + 0xF8) = FastAddRotations(*(float *)(self + 0xF8), *(float *)(state + 0x18));
+        ClaimSparkRecord_00328848(self);
+        SpawnObjectParticle(self, self + 0x10, fast_vec_dist(previous, self + 0x10) * 0.5f);
+        if (PlaceObjectAtCollisionPoint(self, previous)) {
             *(unsigned char *)(self + 0x20) = 2;
             *(int *)(state + 0x44) = 20;
             *(int *)(state + 0x58) = 128;
             *(unsigned short *)(self + 0x34) |= 8;
-            func_00282C88(state);
-            func_00328758(self);
-            func_002E5CF8(0, 0, self);
-            func_00282D30(state + 0x20, D_L00_001BF220 + 0x20, 0.0009765625f);
-            func_00282F20(state + 0x20, state + 0x20, 1.0f);
+            ClearVector128(state);
+            CheckPlayerHitByObject(self);
+            PlayMobySound(0, 0, self);
+            FastVecScale(state + 0x20, D_L00_001BF220 + 0x20, 0.0009765625f);
+            vec_scale_to_length(state + 0x20, state + 0x20, 1.0f);
             *(Quad *)(state + 0x30) = *(Quad *)D_L00_001BF220;
             if (!*(int *)(state + 0x54)) {
                 float *v = velocity;
                 int i;
                 for (i = 7; i >= 0; i--) {
-                    angle = func_002A7940();
-                    elevation = func_002A7878(0.392699093f, 3.14159274f);
-                    func_002AF000(v, 0.13333334f, angle, elevation);
-                    func_002BE278(self + 0x10, v, 0, -1.0f);
+                    angle = RandomAngle();
+                    elevation = RandomFloatRange(0.392699093f, 3.14159274f);
+                    BuildSphericalOffset(v, 0.13333334f, angle, elevation);
+                    SpawnWhiteFlashParticle(self + 0x10, v, 0, -1.0f);
                 }
             }
         }
         break;
     case 2:
-        func_003290D0(self, self + 0x10, 0.1f);
-        func_00282CC0(self + 0x10, self + 0x10, state);
+        SpawnObjectParticle(self, self + 0x10, 0.1f);
+        FastVecAdd(self + 0x10, self + 0x10, state);
         *(float *)(state + 8) -= 0.00152777787f;
         *(unsigned char *)(self + 0x23) -= 4;
-        func_00282948((int *)(state + 0x44));
+        FastFloatHelperD((int *)(state + 0x44));
         if (*(unsigned char *)(self + 0x23) > 4) *(unsigned char *)(self + 0x23) -= 4;
         if (!*(int *)(state + 0x44) && *(unsigned char *)(self + 0x23) < 4) *(unsigned char *)(self + 0x20) = 3;
         break;
@@ -102,13 +103,13 @@ void func_L00_003E0240(char *self)
         }
         break;
     case 4:
-        if (func_00282948((int *)(state + 0x5C))) {
-            func_0029F338(self);
+        if (FastFloatHelperD((int *)(state + 0x5C))) {
+            MarkMobySpawned(self);
             return;
         }
         break;
     }
-    func_00328918(self);
-    func_00329328(self);
-    ref_L00_003E0240_00(func_00328A20, self);
+    UpdateOrbitingSparks(self);
+    UpdateObjectParticles(self);
+    ref_L00_003E0240_00(DrawObjectSpriteEffects, self);
 }

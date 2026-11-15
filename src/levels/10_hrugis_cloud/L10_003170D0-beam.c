@@ -67,15 +67,15 @@ void func_L10_003F61C8(Moby *moby)
     f32 size1;
     f32 size2;
 
-    func_0029FC20(&mobies[vars->target], vars->joint, matrix);
+    TransformMobyJointPoint(&mobies[vars->target], vars->joint, matrix);
     qcopy(end, matrix[3]);
 
     /* First layer. */
-    if (func_001163B0() & 1)
-        func_00281DE8(&q, 0x17, 0, 0x80);
+    if (Rand() & 1)
+        InitQuadPacketState(&q, 0x17, 0, 0x80);
     else
-        func_00281DE8(&q, 0x30, 0, 0x80);
-    layer1Color = ((u32)func_002A7820(0x20, 0x80) << 24) | 0xFFFFFF;
+        InitQuadPacketState(&q, 0x30, 0, 0x80);
+    layer1Color = ((u32)RandomIntRange(0x20, 0x80) << 24) | 0xFFFFFF;
     position = moby->position;
     uv = q.uv;
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = layer1Color;
@@ -92,25 +92,25 @@ void func_L10_003F61C8(Moby *moby)
         if (uv[i * 2] <= -8.0f)
             uv[i * 2] += 8.0f;
     }
-    vars->scroll[0] += func_002A7878(0.1f, 0.25f);
+    vars->scroll[0] += RandomFloatRange(0.1f, 0.25f);
     if (vars->scroll[0] >= 8.0f)
         vars->scroll[0] -= 8.0f;
-    func_00282CF0(view, position, D_L10_001B9680);
-    func_00282CF0(direction, end, position);
-    func_00282DD8(side, view, direction);
-    func_00282F20(side, side, 2.0f);
-    func_00282CC0(q.corners[0], position, side);
-    func_00282CF0(q.corners[1], position, side);
-    func_00282CC0(q.corners[2], end, side);
-    func_00282CF0(q.corners[3], end, side);
-    func_00280B90(&q, 0, 0);
+    FastVecSub(view, position, D_L10_001B9680);
+    FastVecSub(direction, end, position);
+    FastVecCross(side, view, direction);
+    vec_scale_to_length(side, side, 2.0f);
+    FastVecAdd(q.corners[0], position, side);
+    FastVecSub(q.corners[1], position, side);
+    FastVecAdd(q.corners[2], end, side);
+    FastVecSub(q.corners[3], end, side);
+    draw_world_quad(&q, 0, 0);
 
     /* Second layer. */
-    if (func_001163B0() & 1)
-        func_00281DE8(&q, 0x17, 0, 0x80);
+    if (Rand() & 1)
+        InitQuadPacketState(&q, 0x17, 0, 0x80);
     else
-        func_00281DE8(&q, 0x2F, 0, 0x80);
-    layer2Color = ((u32)func_002A7820(0x20, 0x80) << 24) | 0xFFFFFF;
+        InitQuadPacketState(&q, 0x2F, 0, 0x80);
+    layer2Color = ((u32)RandomIntRange(0x20, 0x80) << 24) | 0xFFFFFF;
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = layer2Color;
     q.uv[0] = 0;
     q.uv[1] = 0;
@@ -125,21 +125,21 @@ void func_L10_003F61C8(Moby *moby)
         if (uv[i * 2] <= -8.0f)
             uv[i * 2] += 8.0f;
     }
-    vars->scroll[1] += func_002A7878(0.08f, 0.1f);
+    vars->scroll[1] += RandomFloatRange(0.08f, 0.1f);
     if (vars->scroll[1] >= 8.0f)
         vars->scroll[1] -= 8.0f;
-    func_00282CF0(view, position, D_L10_001B9680);
-    func_00282CF0(direction, end, position);
-    func_00282DD8(side, view, direction);
-    func_00282F20(side, side, 2.0f);
-    func_00282CC0(q.corners[0], position, side);
-    func_00282CF0(q.corners[1], position, side);
-    func_00282CC0(q.corners[2], end, side);
-    func_00282CF0(q.corners[3], end, side);
-    func_00280B90(&q, 0, 0);
+    FastVecSub(view, position, D_L10_001B9680);
+    FastVecSub(direction, end, position);
+    FastVecCross(side, view, direction);
+    vec_scale_to_length(side, side, 2.0f);
+    FastVecAdd(q.corners[0], position, side);
+    FastVecSub(q.corners[1], position, side);
+    FastVecAdd(q.corners[2], end, side);
+    FastVecSub(q.corners[3], end, side);
+    draw_world_quad(&q, 0, 0);
 
     /* The glow: four units either side at the moby, three at the far end. */
-    func_00281DE8(&q, 0xE, 1, 0x80);
+    InitQuadPacketState(&q, 0xE, 1, 0x80);
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = 0x40FF0020;
     q.uv[0] = 0;
     q.uv[1] = 0;
@@ -149,18 +149,18 @@ void func_L10_003F61C8(Moby *moby)
     q.uv[5] = 0;
     q.uv[6] = 1;
     q.uv[7] = 1;
-    func_00282F20(side, side, 4.0f);
-    func_00282CC0(q.corners[0], position, side);
-    func_00282CF0(q.corners[1], position, side);
-    func_00282F20(side, side, 3.0f);
-    func_00282CC0(q.corners[2], end, side);
-    func_00282CF0(q.corners[3], end, side);
-    func_00280B90(&q, 0, 0);
+    vec_scale_to_length(side, side, 4.0f);
+    FastVecAdd(q.corners[0], position, side);
+    FastVecSub(q.corners[1], position, side);
+    vec_scale_to_length(side, side, 3.0f);
+    FastVecAdd(q.corners[2], end, side);
+    FastVecSub(q.corners[3], end, side);
+    draw_world_quad(&q, 0, 0);
 
     /* Two sprites of random size and angle at the far end. */
-    size1 = func_002A7878(3.5f, 4.5f);
-    func_00281EB8(end, 0x31, 0x40800000, 1, size1, 2.5f, func_002A7940());
-    spriteColor = ((u32)func_002A7820(0x40, 0x80) << 24) | 0x7F7F7F;
-    size2 = func_002A7878(2.5f, 3.5f);
-    func_00281EB8(end, 0x31, spriteColor, 1, size2, 2.5f, func_002A7940());
+    size1 = RandomFloatRange(3.5f, 4.5f);
+    DrawBillboardQuad_00281EB8(end, 0x31, 0x40800000, 1, size1, 2.5f, RandomAngle());
+    spriteColor = ((u32)RandomIntRange(0x40, 0x80) << 24) | 0x7F7F7F;
+    size2 = RandomFloatRange(2.5f, 3.5f);
+    DrawBillboardQuad_00281EB8(end, 0x31, spriteColor, 1, size2, 2.5f, RandomAngle());
 }

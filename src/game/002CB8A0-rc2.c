@@ -38,54 +38,55 @@ extern s32 D_001AA748 __attribute__((sda));
 extern s8 D_00189E20[];
 extern s32 func_002D5E70(void *, void *);
 
-s32 func_002CB8A0(u32 arg0) {
-    void *p;
-    void *q;
+/* Runs one of seven menu actions chosen by number. Each one passes a different settings block to a shared handler. */
+s32 func_002CB8A0(u32 action) {
+    void *target;
+    void *result;
     s32 local = 0;
-    s8 *t;
+    s8 *table;
 
-    q = 0;
-    if (arg0 < 7) {
+    result = 0;
+    if (action < 7) {
         {
     static void *volatile rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
-    u32 rc2_selector = (u32)(arg0);
+    u32 rc2_selector = (u32)(action);
     if (rc2_selector > 6U) goto rc2_switch_end;
 goto *D_0026CCC0[rc2_selector];
 
         rc2_case_0:
-            q = &local;
-            t = D_00189E20;
-            (*(s32 *)((char *)(t) + (0x22C8))) = (*(s32 *)((char *)(t) + (0x1248)));
-            p = &D_001AA6B8;
+            result = &local;
+            table = gHeroState;
+            (*(s32 *)((char *)(table) + (0x22C8))) = (*(s32 *)((char *)(table) + (0x1248)));
+            target = &D_001AA6B8;
             goto rc2_switch_end;
         rc2_case_1:
-            q = &local;
-            p = &D_001AA6D0;
+            result = &local;
+            target = &D_001AA6D0;
             goto rc2_switch_end;
         rc2_case_2:
-            q = &local;
-            p = &D_001AA6E8;
+            result = &local;
+            target = &D_001AA6E8;
             goto rc2_switch_end;
         rc2_case_3:
-            q = &local;
-            p = &D_001AA700;
+            result = &local;
+            target = &D_001AA700;
             goto rc2_switch_end;
         rc2_case_4:
-            q = &local;
-            p = &D_001AA718;
+            result = &local;
+            target = &D_001AA718;
             goto rc2_switch_end;
         rc2_case_5:
-            q = &local;
-            p = &D_001AA730;
+            result = &local;
+            target = &D_001AA730;
             goto rc2_switch_end;
         rc2_case_6:
-            q = &local;
-            p = &D_001AA748;
+            result = &local;
+            target = &D_001AA748;
             goto rc2_switch_end;
         
 rc2_switch_end: ;
 }
-        q = (void *) func_002D5E70(p, q);
+        result = (void *) ProcessEntryRequest(target, result);
     }
-    return (s32) q;
+    return (s32) result;
 }

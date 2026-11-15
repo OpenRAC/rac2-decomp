@@ -10,15 +10,15 @@ typedef struct {
     s32 extra;
 } Entry;
 
-/* caches the table slot the object's state selects, then clears the flag at the head of its
-   sub-object */
-void func_L04_003A1578(u8 *object, Entry *entries, s32 *table)
+/* caches the table slot the moby's vars selects, then clears the flag at the head of its
+   sub-moby */
+void func_L04_003A1578(u8 *moby, Entry *entries, s32 *table)
 {
-    u8 *state = *(u8 **)(object + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (state[0x14] == 0)
-        *(s32 **)(object + 0x98) = &table[entries[*(s32 *)(state + 0x1C)].first];
+    if (vars[0x14] == 0)
+        *(s32 **)(moby + 0x98) = &table[entries[*(s32 *)(vars + 0x1C)].first];
     else
-        *(s32 **)(object + 0x98) = &table[entries[*(s32 *)(state + 0x1C)].second];
-    *(s32 *)(*(u8 **)(object + 0x24) + 0x10) = 0;
+        *(s32 **)(moby + 0x98) = &table[entries[*(s32 *)(vars + 0x1C)].second];
+    *(s32 *)(*(u8 **)(moby + 0x24) + 0x10) = 0;
 }

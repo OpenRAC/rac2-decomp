@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 extern float D_L00_001B0464 __attribute__((sda));
 extern float func_00282C48(float);
 extern void func_00282F20(void *, void *, float);
@@ -7,6 +8,7 @@ extern void func_00326EC0(void *);
 extern void func_00327038(void *);
 extern void func_00327380(void *);
 
+/* Moves the object forward by its speed, slowing it down when it is not driven. Then it rebuilds the object's corner points. */
 void func_00326D90(char *object)
 {
     float vector[4];
@@ -16,7 +18,7 @@ void func_00326D90(char *object)
         float magnitude;
         float step;
         *(float *)(data + 0x18) += speed * (1.0f / 120.0f);
-        magnitude = func_00282C48(*(float *)(data + 0x18));
+        magnitude = FloatAbs(*(float *)(data + 0x18));
         step = D_L00_001B0464;
         if (step * (1.0f / 60.0f) < magnitude)
             *(float *)(data + 0x18) = step * *(float *)(data + 0x30) * (1.0f / 60.0f);
@@ -26,11 +28,11 @@ void func_00326D90(char *object)
     *(float *)(object + 0x48) = *(float *)(data + 0x18) * 25.0f;
     if (*(int *)(data + 0x34) == 0)
         *(float *)(object + 0x48) += *(float *)(data + 0x38) * 2.0f;
-    func_00282F20(vector, object + 0xC0, *(float *)(data + 0x18));
-    func_00282CC0(object + 0x10, object + 0x10, vector);
-    func_00326EC0(object);
-    func_00327038(object);
-    func_00327380(object);
+    vec_scale_to_length(vector, object + 0xC0, *(float *)(data + 0x18));
+    FastVecAdd(object + 0x10, object + 0x10, vector);
+    BuildEightDirectionOffsets(object);
+    ProbeSurfaceAndMoveObject(object);
+    UpdateGroundVehicleSurfaceAlignment(object);
 }
 extern char *D_L00_001B043C __attribute__((sda));
 /* These scalar symbols anchor eight adjacent small-data words in each table. */
@@ -39,19 +41,20 @@ extern int D_L00_001B0410 __attribute__((sda));
 extern float func_0029F530(void *);
 extern int func_002E5CF8(int, int, void *);
 
+/* Plays a sound each time the tracked object's value crosses one of eight set levels. */
 void func_00326BD8(void)
 {
-    char *object = D_L00_001B043C;
+    char *object = gSpiderBotMoby;
     if (object) {
         char *data = *(char **)(object + 0x68);
-        float current = func_0029F530(object);
+        float current = GetMobyAnimationValue(object);
         int i;
         for (i = 0; i < 8; i++) {
             float threshold = (&D_L00_001B03F0)[i];
             float delta = current - threshold;
             if ((0.0f < delta || 0.0f < *(float *)(data + 0x2C) - threshold) &&
                 (delta < 0.0f || *(float *)(data + 0x2C) - threshold < 0.0f)) {
-                func_002E5CF8((&D_L00_001B0410)[i], 0, D_L00_001B043C);
+                PlayMobySound((&D_L00_001B0410)[i], 0, gSpiderBotMoby);
                 break;
             }
         }
@@ -63,12 +66,13 @@ extern char ref_L00_00325B28_01 __attribute__((sda));
 extern int ref_L00_00325B28_02;
 extern void func_00281A08(void *, int, void *, void *, int, int, int, int, float);
 
+/* Draws the object's two trails from its saved trail points. */
 void func_00325B28(char *object)
 {
     int count = ref_L00_00325B28_00;
     int state = ref_L00_00325B28_02;
     char *data = *(char **)(object + 0x68);
-    func_00281A08(&ref_L00_00325B28_01, 4, data + 0x320, data + 0x420,
+    DrawTrailRibbon_00281A08(&ref_L00_00325B28_01, 4, data + 0x320, data + 0x420,
         *(int *)(data + 0x2B4), *(int *)(data + 0x2B0),
         count, state, *(float *)(data + 0x2B8));
 }
@@ -77,15 +81,16 @@ extern volatile int D_001AFFF0 __attribute__((sda));
 extern volatile int D_001AFFF4 __attribute__((sda));
 extern void func_00322138(char *);
 extern void func_00322340(char *, char *, float, int, int, int);
+/* Draws three glowing effects on the object. In some states it also draws the beam between its two points. */
 void func_00321FE0(char *object)
 {
     char *data = *(char **)(object + 0x68);
     unsigned int state = *(unsigned char *)(object + 0x20);
     if (state == 4 || state == 5 || *(unsigned char *)(object + 0x95) == 2 || state == 10)
-        func_00322138(object);
-    func_00322340(object, data + 0x3A0, 0.125f, D_001AFFF0, 0x20000000, 0x20000000);
-    func_00322340(object, data + 0x3B0, 0.15f, D_001AFFF4, 0x30000000, 0x20000000);
-    func_00322340(object, data + 0x3C0, 0.15f, D_001AFFF4, 0x10000000, 0x30000000);
+        DrawBeamQuadBetweenPointsB(object);
+    DrawCameraFacingFlash_00322340(object, data + 0x3A0, 0.125f, D_001AFFF0, 0x20000000, 0x20000000);
+    DrawCameraFacingFlash_00322340(object, data + 0x3B0, 0.15f, D_001AFFF4, 0x30000000, 0x20000000);
+    DrawCameraFacingFlash_00322340(object, data + 0x3C0, 0.15f, D_001AFFF4, 0x10000000, 0x30000000);
 }
 
 extern unsigned short *D_001EE5A0[];
@@ -111,6 +116,7 @@ void func_00321F60(char *self)
     }
 }
 
+/* Tells every other member of the object's group that is the matching kind to raise its alert flag. */
 void func_00325320(char *self)
 {
     if (*(unsigned char *)(self + 0x21) != 0xFF) {
@@ -183,33 +189,33 @@ char *func_003202E8(float *position, int weapon, int amount, int extra)
     AmmoSpawnData *data;
     float spread, speed;
 
-    func_0026F7A0(weapon);
-    slots = D_00139568;
-    weapons = D_00239BA0;
+    EmptyStubF7A0(weapon);
+    slots = gItemSlotToRecord;
+    weapons = gWeaponTable_00239BA0;
     stride = sizeof(AmmoSpawnWeapon);
     *(AmmoSpawnQuad *)velocity = 0;
-    velocity[2] = func_002A7940();
+    velocity[2] = RandomAngle();
     *(AmmoSpawnQuad *)rotation = *(AmmoSpawnQuad *)velocity;
     if (D_001A8CA0) {
-        func_002AFFD8(position, velocity, 1);
-        rotation[1] = func_00283248(velocity[2], func_00282E20(velocity));
-        rotation[2] = func_00283248(velocity[0], velocity[1]);
+        ComputeViewDirection(position, velocity, 1);
+        rotation[1] = FastMatrixHelperA(velocity[2], vec_length_xy(velocity));
+        rotation[2] = FastMatrixHelperA(velocity[0], velocity[1]);
     }
-    func_002A7A00(velocity, 1.0f / 30.0f, 1.0f / 15.0f);
+    RandomDirectionVector(velocity, 1.0f / 30.0f, 1.0f / 15.0f);
     hero = D_00189E20_9;
-    func_002AFEB8(*(char **)(hero + 0x2290), velocity, velocity, 0,
-                  func_002A7878(4.0f, 8.0f) * (1.0f / 60.0f));
-    spread = func_002A7878(180.0f, 360.0f);
-    speed = func_002A7878(10.0f, 15.0f);
-    spawn = func_00273730(*(char **)(hero + 0x2290), 2, 0xCDB, 0, position, rotation, velocity,
+    TransformAndSetHeight(*(char **)(hero + 0x2290), velocity, velocity, 0,
+                  RandomFloatRange(4.0f, 8.0f) * (1.0f / 60.0f));
+    spread = RandomFloatRange(180.0f, 360.0f);
+    speed = RandomFloatRange(10.0f, 15.0f);
+    spawn = CreateCameraMoby(*(char **)(hero + 0x2290), 2, 0xCDB, 0, position, rotation, velocity,
                           255, spread, speed);
     if (spawn) {
         spawn[0x20] = 1;
-        *(void (**)(void *))(spawn + 0x64) = func_0031FC28;
+        *(void (**)(void *))(spawn + 0x64) = UpdateWeaponAmmoPickup;
         data = *(AmmoSpawnData **)(spawn + 0x68);
         if (amount == -1)
             data->amount = ((AmmoSpawnWeapon *)((char *)weapons
-                + slots[func_0026F7A0(weapon)] * stride))->pickupAmount;
+                + slots[EmptyStubF7A0(weapon)] * stride))->pickupAmount;
         else
             data->amount = amount;
         if (D_001A7A0A)
@@ -218,11 +224,11 @@ char *func_003202E8(float *position, int weapon, int amount, int extra)
         data->f6C = (float)extra;
         data->f70 = 16;
         if (D_001A8CA0)
-            data->groundZ = func_002B0360((float *)(spawn + 0x10));
+            data->groundZ = GetDistanceFromGravityCenter((float *)(spawn + 0x10));
         else
             data->groundZ = *(float *)(spawn + 0x18);
         func_002A0F48(spawn);
-        func_002AB650(spawn);
+        CopyHeroField38ToMoby(spawn);
     }
     return spawn;
 }

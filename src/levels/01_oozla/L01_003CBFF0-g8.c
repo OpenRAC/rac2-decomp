@@ -27,52 +27,53 @@ extern int D_L01_001B2088[] __attribute__((sda));
 extern u32 D_L01_001FE180[];
 extern u8 *D_L01_001B255C MACRO_ADDR;
 
-void func_L01_003CBFF0(u8 *a0)
+/* Sets up the swamp monster arm when it appears, then starts its idle or attack animation. */
+void func_L01_003CBFF0(u8 *moby)
 {
-    OozlaSpawnState *p = *(OozlaSpawnState **)(a0 + 0x68);
+    OozlaSpawnState *vars = *(OozlaSpawnState **)(moby + 0x68);
 
-    p->field48 = func_00283CF0(5.0f);
-    p->field4a = func_00283CF0(32.0f);
-    p->field29 = 1;
-    *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * 2.5f;
-    qcopy(p->field80, a0 + 0x10);
-    if (!D_L01_001B2088[0] && a0[0x21] != 255)
-        *p->fieldd8 = 0;
-    p->field30 = 2.0f;
-    p->field2a = 8;
-    p->field28 = 3;
-    p->field2e = 3;
-    p->fieldbc = 0;
-    if (p->fieldb8 != -1)
-        func_L01_003377C8(D_L01_001FE180[p->fieldb8]);
-    p->fieldf0 = p->fielde8;
-    if (p->fielddd)
-        *(u16 *)(a0 + 0x34) |= 0x8000;
-    if (p->fieldb4 != -1) {
-        p->fieldf0 = p->fielde0;
-        if ((D_L01_001B255C + (p->fieldb4 << 8)) &&
-            (D_L01_001B255C + (p->fieldb4 << 8))[0x20] != 254 &&
-            (D_L01_001B255C + (p->fieldb4 << 8))[0x20] != 253) {
-            *(u16 *)(a0 + 0x32) = 0x3FF;
-            a0[0x30] = 255;
-            if (p->fieldd0 > 0.0f)
-                *(float *)(a0 + 0x18) = p->fieldd0;
-            if (p->fieldc8)
-                func_002A7398(a0, 8, 0);
+    vars->field48 = FloatToInt(5.0f);
+    vars->field4a = FloatToInt(32.0f);
+    vars->field29 = 1;
+    *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * 2.5f;
+    qcopy(vars->field80, moby + 0x10);
+    if (!D_L01_001B2088[0] && moby[0x21] != 255)
+        *vars->fieldd8 = 0;
+    vars->field30 = 2.0f;
+    vars->field2a = 8;
+    vars->field28 = 3;
+    vars->field2e = 3;
+    vars->fieldbc = 0;
+    if (vars->fieldb8 != -1)
+        ComputePathSegmentLengths_L01(D_L01_001FE180[vars->fieldb8]);
+    vars->fieldf0 = vars->fielde8;
+    if (vars->fielddd)
+        *(u16 *)(moby + 0x34) |= 0x8000;
+    if (vars->fieldb4 != -1) {
+        vars->fieldf0 = vars->fielde0;
+        if ((gMobyTable_L01 + (vars->fieldb4 << 8)) &&
+            (gMobyTable_L01 + (vars->fieldb4 << 8))[0x20] != 254 &&
+            (gMobyTable_L01 + (vars->fieldb4 << 8))[0x20] != 253) {
+            *(u16 *)(moby + 0x32) = 0x3FF;
+            moby[0x30] = 255;
+            if (vars->fieldd0 > 0.0f)
+                *(float *)(moby + 0x18) = vars->fieldd0;
+            if (vars->fieldc8)
+                StartAnimationImmediate(moby, 8, 0);
             else
-                func_002A7398(a0, 5, 0);
-            func_002A7750(a0, 0, 1);
+                StartAnimationImmediate(moby, 5, 0);
+            SetMobyState(moby, 0, 1);
         } else {
-            p->fieldb4 = -1;
+            vars->fieldb4 = -1;
         }
     }
-    if (p->fieldb4 == -1) {
-        if (p->fieldd4 > 0.0f)
-            *(float *)(a0 + 0x18) = p->fieldd4;
-        p->fieldbc = 120;
-        func_002A7398(a0, 0, 0);
-        *(float *)(a0 + 0x48) = 0.0f;
-        *(u16 *)(a0 + 0x34) &= 0xEFFF;
-        func_002A7750(a0, 0, 4);
+    if (vars->fieldb4 == -1) {
+        if (vars->fieldd4 > 0.0f)
+            *(float *)(moby + 0x18) = vars->fieldd4;
+        vars->fieldbc = 120;
+        StartAnimationImmediate(moby, 0, 0);
+        *(float *)(moby + 0x48) = 0.0f;
+        *(u16 *)(moby + 0x34) &= 0xEFFF;
+        SetMobyState(moby, 0, 4);
     }
 }

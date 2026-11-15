@@ -27,22 +27,23 @@ extern Vec D_00229170[];
 extern Vec D_00229440[];
 extern int D_002293F0[];
 extern int D_00229580[];
-void func_0030A188(char *obj) {
+/* Resets the twenty beam chain points to a straight line when the beam starts. */
+void func_0030A188(char *moby) {
     Vec delta, step;
-    Vec *state = *(Vec **)(obj + 0x68);
+    Vec *vars = *(Vec **)(moby + 0x68);
     int i;
     if (D_001AEDF0) {
         D_001B2408 = D_001AEE84;
         D_001AEE58 = 0x7F2020;
         D_001AEDF0 = 0;
         D_001B240C = 0;
-        func_00282CF0(&delta, state + 1, state);
-        func_00282F20(&step, &delta, D_001AEDF4 * 0.05f);
-        qcopy(&D_00229170[0], state);
+        FastVecSub(&delta, vars + 1, vars);
+        vec_scale_to_length(&step, &delta, D_001AEDF4 * 0.05f);
+        qcopy(&D_00229170[0], vars);
         for (i = 1; i < 20; i++) {
-            func_00282CC0(&D_00229170[i], &D_00229160[i], &step);
+            FastVecAdd(&D_00229170[i], &D_00229160[i], &step);
             D_002293F0[i] = 0;
-            func_00282C88(&D_00229440[i]);
+            ClearVector128(&D_00229440[i]);
             D_00229580[i] = 0;
         }
         { int j; for (j = 0; j < 4; j++) D_001B23E8[j] = -1; }

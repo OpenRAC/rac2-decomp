@@ -98,9 +98,9 @@ void func_L00_003ABEC0(char *object)
     state = *(char **)(object + 0x68);
     target = *(char **)(state + 0x10);
     qcopy(start, object + 0x10);
-    func_002AFFD8(object + 0x10, forward, 1);
+    ComputeViewDirection(object + 0x10, forward, 1);
     if (target != 0) {
-        info = func_002AB1F0(target);
+        info = GetMobyPrivateValue0(target);
         kind = *(unsigned char *)(target + 0x20);
         if (kind == 0xFE || (kind == 0xFD || (info != 0 && *(float *)info <= 0.0f))) {
             *(char **)(state + 0x10) = 0;
@@ -108,8 +108,8 @@ void func_L00_003ABEC0(char *object)
         } else {
             qcopy(aim, target + 0x10);
             if (info != 0) {
-                func_00282D30(step, target + 0xE0, *(float *)(info + 0x10));
-                func_00282CC0(aim, aim, step);
+                FastVecScale(step, target + 0xE0, *(float *)(info + 0x10));
+                FastVecAdd(aim, aim, step);
             }
         }
     }
@@ -120,22 +120,22 @@ void func_L00_003ABEC0(char *object)
         step[1] = *(float *)(state + 0x4);
         step[2] = *(float *)(state + 0x8);
         step[3] = 0.0f;
-        func_00282CF0(delta, aim, step);
-        distance = func_00282DF0(delta);
-        func_00282CC0(lead, aim, state + 0x40);
-        func_00282CF0(offset, object + 0x10, lead);
-        length = func_00282DF0(offset);
+        FastVecSub(delta, aim, step);
+        distance = FastVecLength(delta);
+        FastVecAdd(lead, aim, state + 0x40);
+        FastVecSub(offset, object + 0x10, lead);
+        length = FastVecLength(offset);
         if (length != 0.0f && distance != 0.0f) {
-            angle = func_00282DB0(offset, delta);
-            angle = 1.5707964f - func_002831B0(angle / (length * distance));
-            func_00282DD8(u.t.axis, delta, offset);
-            func_00282DD8(u.t.side, delta, u.t.axis);
-            if (func_00282DB0(offset, u.t.side) < 0.0f) {
+            angle = FastVecDot(offset, delta);
+            angle = 1.5707964f - FastAngleHelper(angle / (length * distance));
+            FastVecCross(u.t.axis, delta, offset);
+            FastVecCross(u.t.side, delta, u.t.axis);
+            if (FastVecDot(offset, u.t.side) < 0.0f) {
                 angle = -angle;
             }
             length = distance / *(float *)(state + 0x18);
-            angle = length * func_00283198(angle);
-            if (func_00282C48(angle) > 100.0f) {
+            angle = length * FastSinOrCosB(angle);
+            if (FloatAbs(angle) > 100.0f) {
                 angle = 0.0f;
             }
             while (angle > 1.0f) {
@@ -144,32 +144,32 @@ void func_L00_003ABEC0(char *object)
             while (angle < -1.0f) {
                 angle += 1.0f;
             }
-            angle = func_002831B0(angle);
-            func_00282D30(offset, offset, -1.0f);
-            func_00282F20(offset, offset, 1.0f);
-            if (func_00282C48(angle) > 1e-05f) {
-                func_00282F20(u.t.turn, u.t.axis, 1.0f);
-                func_002AB668(u.t.turn, u.t.turn, angle);
-                func_002ACDE8(object + 0xC0, offset, u.t.turn);
-                func_00282DD8(object + 0xD0, object + 0xC0, forward);
-                func_00282F20(object + 0xD0, object + 0xD0, 1.0f);
-                func_00282DD8(object + 0xE0, object + 0xD0, object + 0xC0);
+            angle = FastAngleHelper(angle);
+            FastVecScale(offset, offset, -1.0f);
+            vec_scale_to_length(offset, offset, 1.0f);
+            if (FloatAbs(angle) > 1e-05f) {
+                vec_scale_to_length(u.t.turn, u.t.axis, 1.0f);
+                BuildAxisAngleQuaternion(u.t.turn, u.t.turn, angle);
+                RotateVectorByQuaternion(object + 0xC0, offset, u.t.turn);
+                FastVecCross(object + 0xD0, object + 0xC0, forward);
+                vec_scale_to_length(object + 0xD0, object + 0xD0, 1.0f);
+                FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
                 qcopy(state + 0x30, object + 0xC0);
             }
-            if (func_00282E48(aim, object + 0x10) <= *(float *)(state + 0x18)
-                && func_002761F8(object + 0x10, aim, 0x12, D_0018C0B0, 0) == 0) {
+            if (fast_vec_dist(aim, object + 0x10) <= *(float *)(state + 0x18)
+                && CollLine(object + 0x10, aim, 0x12, gHeroMoby_0018C0B0, 0) == 0) {
                 locked = 1;
-                qcopy(D_L00_001BF200.point, aim);
-                D_L00_001BF200.count = -1;
-                D_L00_001BF200.hit = target;
+                qcopy(gCollisionResult.point, aim);
+                gCollisionResult.count = -1;
+                gCollisionResult.hit = target;
             }
         }
     } else {
-        func_002FEE70(*(int *)(state + 0x50), state + 0x30, 0);
+        SteerEffectDirection(*(int *)(state + 0x50), state + 0x30, 0);
         qcopy(object + 0xC0, state + 0x30);
-        func_00282DD8(object + 0xD0, object + 0xC0, forward);
-        func_00282F20(object + 0xD0, object + 0xD0, 1.0f);
-        func_00282DD8(object + 0xE0, object + 0xD0, object + 0xC0);
+        FastVecCross(object + 0xD0, object + 0xC0, forward);
+        vec_scale_to_length(object + 0xD0, object + 0xD0, 1.0f);
+        FastVecCross(object + 0xE0, object + 0xD0, object + 0xC0);
     }
 
     if (target != 0) {
@@ -178,12 +178,12 @@ void func_L00_003ABEC0(char *object)
         *(float *)(state + 0x8) = aim[2];
     }
     *(float *)(object + 0xCC) = *(float *)(object + 0xDC) = *(float *)(object + 0xEC) = 0.0f;
-    func_00282D30(step, object + 0xC0, *(float *)(state + 0x18));
-    func_00282CC0(object + 0x10, object + 0x10, step);
-    func_00300190(object + 0x10, object + 0x10);
+    FastVecScale(step, object + 0xC0, *(float *)(state + 0x18));
+    FastVecAdd(object + 0x10, object + 0x10, step);
+    TransformVectorOrCopy(object + 0x10, object + 0x10);
     if (target != 0 && *(short *)(target + 0xAA) == 0xCEA) {
-        func_00282CF0(delta, aim, object + 0x10);
-        if (func_00282DB0(delta, object + 0xC0) < 0.0f) {
+        FastVecSub(delta, aim, object + 0x10);
+        if (FastVecDot(delta, object + 0xC0) < 0.0f) {
             *(char **)(state + 0x10) = 0;
             target = 0;
             locked = 0;
@@ -192,12 +192,12 @@ void func_L00_003ABEC0(char *object)
     if (*(float *)(object + 0x10) < 2.0f || *(float *)(object + 0x10) > 1021.0f
         || *(float *)(object + 0x14) < 2.0f || *(float *)(object + 0x14) > 1021.0f
         || *(float *)(object + 0x18) < 2.0f || *(float *)(object + 0x18) > 1021.0f) {
-        func_002ACAD0(object, D_L00_001B1FB0);
-        func_002FEE50(*(int *)(state + 0x50));
-        func_0029F338(object);
+        RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+        ClearEntryFlag(*(int *)(state + 0x50));
+        MarkMobySpawned(object);
         return;
     }
-    func_L00_003ACC88(object, delta);
+    TransformOffsetToWorld(object, delta);
     {
         Vector *trail = D_L00_0023B710[*(int *)(state + 0x2C)];
         int k;
@@ -208,48 +208,48 @@ void func_L00_003ABEC0(char *object)
         qcopy(trail[0], delta);
     }
     if (++*(unsigned char *)(state + 0x27) >= 4) {
-        ref_L00_003ABEC0_00(func_L00_003ACCF8, object);
+        ref_L00_003ABEC0_00(SaveShotTrailTransform, object);
     }
-    func_L00_003ACA60(object, start);
+    EmitShotTrailParticles(object, start);
     qcopy(lead, object + 0x10);
-    func_00282D30(offset, forward, -0.25f);
-    func_00282CC0(offset, object + 0x10, offset);
-    if (func_002761F8(lead, offset, 2, 0, 0) != 0) {
-        func_00282D30(lead, forward, 0.25f);
-        func_00282CC0(object + 0x10, D_L00_001BF200.point, lead);
+    FastVecScale(offset, forward, -0.25f);
+    FastVecAdd(offset, object + 0x10, offset);
+    if (CollLine(lead, offset, 2, 0, 0) != 0) {
+        FastVecScale(lead, forward, 0.25f);
+        FastVecAdd(object + 0x10, gCollisionResult.point, lead);
     }
     u.shot.owner = object;
     u.shot.count = 1;
     u.shot.flags = 0x830000;
     {
-        Material *material = &D_L00_00262570[D_00139568[0x1B]];
+        Material *material = &gWeaponTable_L00[gItemSlotToRecord[0x1B]];
 
         u.shot.damage = material->damage;
     }
     qcopy_nc(u.shot.direction, step);
-    func_00282F20(u.shot.direction, u.shot.direction, 1.5f);
+    vec_scale_to_length(u.shot.direction, u.shot.direction, 1.5f);
     u.shot.direction[3] = 5627.9248f;
     u.shot.kind = 3;
     u.shot.one = 1;
     u.shot.id = *(unsigned short *)(object + 0xAA);
     if (locked == 0) {
-        if (func_002761F8(start, object + 0x10, 0, D_0018C0B0, &u.shot) == 0) {
+        if (CollLine(start, object + 0x10, 0, gHeroMoby_0018C0B0, &u.shot) == 0) {
             goto checked;
         }
     } else if (target != 0) {
-        func_002A8E20(target, &u.shot);
+        QueueMobyImpact(target, &u.shot);
     }
-    hit = &D_L00_001BF200;
+    hit = &gCollisionResult;
     if (hit->hit != 0) {
-        if (hit->hit != D_0018C0B0) {
+        if (hit->hit != gHeroMoby_0018C0B0) {
             if (hit->hit != *(char **)(state + 0xC)) {
                 *(unsigned char *)(object + 0xBC) = 2;
                 qcopy(object + 0x10, hit->point);
                 owner = object;
-                if (D_L00_00262570[D_00139568[0x1B]].piercing != 0) {
-                    func_0032D758(hit->hit, 0x45, *(int *)(object + 0xB8));
+                if (gWeaponTable_L00[gItemSlotToRecord[0x1B]].piercing != 0) {
+                    StartAttachedEffect(hit->hit, 0x45, *(int *)(object + 0xB8));
                 } else {
-                    func_0032D758(hit->hit, 0x1B, *(int *)(object + 0xB8));
+                    StartAttachedEffect(hit->hit, 0x1B, *(int *)(object + 0xB8));
                 }
             }
         }
@@ -264,33 +264,33 @@ checked:
     {
         float spin;
 
-        func_002E5CF8(0, 0, object);
+        PlayMobySound(0, 0, object);
         bounce = 1;
-        func_002AFFD8(object + 0x10, up, 1);
-        if (D_L00_001BF200.hit != 0 && D_L00_001BF200.count <= 0) {
-            func_00282CF0(normal, D_L00_001B8DC0, object + 0x10);
-            func_00282F20(normal, normal, 1.0f);
+        ComputeViewDirection(object + 0x10, up, 1);
+        if (gCollisionResult.hit != 0 && gCollisionResult.count <= 0) {
+            FastVecSub(normal, gCameraPosition_L00, object + 0x10);
+            vec_scale_to_length(normal, normal, 1.0f);
         } else {
-            func_00282F20(normal, D_L00_001BF200.normal, 1.0f);
-            if (func_00282C48(func_00282DB0(normal, up)) >= 0.1f) {
+            vec_scale_to_length(normal, gCollisionResult.normal, 1.0f);
+            if (FloatAbs(FastVecDot(normal, up)) >= 0.1f) {
                 bounce = 0;
             }
         }
         spin = 0.0f;
         if (bounce) {
-            spin = func_002A89A8(object + 0x10, 0, 0.5f);
+            spin = ProbeGroundHeightBelow(object + 0x10, 0, 0.5f);
         }
-        func_0032DA58(object, object + 0x10, normal, spin);
-        func_L00_003AC8E8(object, up, owner);
+        SpawnBlastEffectMoby(object, object + 0x10, normal, spin);
+        SpawnHomingShotExplosion(object, up, owner);
     }
-    func_002ACAD0(object, D_L00_001B1FB0);
-    func_002FEE50(*(int *)(state + 0x50));
-    func_0029F338(object);
+    RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+    ClearEntryFlag(*(int *)(state + 0x50));
+    MarkMobySpawned(object);
     return;
 far:
-    if (func_00282978(state + 0x24) != 0 || func_00282E80(object + 0x10, D_00189EA0) > 75.0f) {
-        func_002ACAD0(object, D_L00_001B1FB0);
-        func_002FEE50(*(int *)(state + 0x50));
-        func_0029F338(object);
+    if (FastDecTimer(state + 0x24) != 0 || vec_distance_xy(object + 0x10, gHeroPosition) > 75.0f) {
+        RemoveMobyFromIndexList(object, D_L00_001B1FB0);
+        ClearEntryFlag(*(int *)(state + 0x50));
+        MarkMobySpawned(object);
     }
 }

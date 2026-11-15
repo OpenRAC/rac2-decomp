@@ -13,9 +13,10 @@ typedef float f32;
 extern s32 D_L22_001AF314 __attribute__((sda));
 extern u8 D_L22_0018B694[];
 
+/* Tells whether a stored counter is below a limit read from the owner object. */
 s32 func_L22_003A6620(void) {
-    s32 a0 = D_L22_001AF314;
-    s32 a1 = *(s32 *)D_L22_0018B694;
+    s32 owner = D_L22_001AF314;
+    s32 limit = *(s32 *)D_L22_0018B694;
 
-    return a1 < *(s16 *)(*(u32 *)(a0 + 0x68) + 0x324);
+    return limit < *(s16 *)(*(u32 *)(owner + 0x68) + 0x324);
 }

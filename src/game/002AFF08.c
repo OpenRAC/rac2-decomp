@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Qwen draft (branch qwen/autonomy, 9650d156), checked by tools/check.py */
 // Helper function declarations, using exact symbol names from externals
@@ -7,17 +8,19 @@ void func_002AFDD8(char *, char *, char *, char *);
 float func_00282E20(unsigned char (*)[16]);
 
 // Implementation of func_002AFF08
-float func_002AFF08(char *arg1, char *arg2, char *arg3) {
-    unsigned char stack_buffer[16];
+/* Returns the horizontal length of the offset between the object and a point. */
+float func_002AFF08(char *object, char *point, char *flag) {
+    unsigned char offset[16];
 
-    func_002AFDD8(arg1, (char *)stack_buffer, arg2, arg3);
-    return func_00282E20((unsigned char (*)[16])stack_buffer);
+    TransformVectorByObjectOrGiven(object, (char *)offset, point, flag);
+    return vec_length_xy((unsigned char (*)[16])offset);
 }
 
+/* Returns the height part of the offset between the object and a point. */
 float func_002AFF38(char *first, char *second, char *third) {
-    float result[4];
-    func_002AFDD8(first, (char *)result, second, third);
-    return result[2];
+    float offset[4];
+    TransformVectorByObjectOrGiven(first, (char *)offset, second, third);
+    return offset[2];
 }
 
 /* D_001A8CB0 is `sda`: cc1 emits its address as one `la` insn, which changes the schedule so
@@ -28,11 +31,11 @@ extern void func_00282F20(void *, void *, float);
 extern void func_00282D30(void *, void *, float);
 extern char D_001A8CB0[] __attribute__((sda));
 
-void func_002AFF60(char *a, char *b, int c)
+void func_002AFF60(char *point, char *outDir, int flag)
 {
-    func_00282CF0(b, D_001A8CB0, a);
-    *(int *)(b + 8) = 0;
-    func_00282F20(b, b, 1.0f);
-    if (c == 0)
-        func_00282D30(b, b, -1.0f);
+    FastVecSub(outDir, D_001A8CB0, point);
+    *(int *)(outDir + 8) = 0;
+    vec_scale_to_length(outDir, outDir, 1.0f);
+    if (flag == 0)
+        FastVecScale(outDir, outDir, -1.0f);
 }

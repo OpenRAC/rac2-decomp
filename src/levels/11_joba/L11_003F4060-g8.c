@@ -14,36 +14,37 @@ extern f32 D_L11_001B05DC __attribute__((sda));
 
 typedef int TI128 __attribute__((mode(TI)));
 
-void func_L11_003F4060(u8 *arg0) {
-    u8 *s4 = arg0;
-    u8 *s3 = *(u8 **)(s4 + 0x68);
-    f32 vec[4];
-    u8 *rec;
-    u8 *p;
-    s32 i, next;
+/* Swings the points of each of the two beam arms around toward their target angles, around the object. */
+void func_L11_003F4060(u8 *mobyArg) {
+    u8 *moby = mobyArg;
+    u8 *vars = *(u8 **)(moby + 0x68);
+    f32 center[4];
+    u8 *arm;
+    u8 *joint;
+    s32 i, nextIndex;
 
-    for (i = 0; i < 2; i = next) {
+    for (i = 0; i < 2; i = nextIndex) {
         s32 j;
 
-        rec = s3 + 0xA0 + i * 0xA0;
-        func_00282C88((TI128 *)vec);
+        arm = vars + 0xA0 + i * 0xA0;
+        ClearVector128((TI128 *)center);
         {
-            u8 *flagRecord = s3 + i * 2;
+            u8 *flagRecord = vars + i * 2;
             if (*(s16 *)(flagRecord + 0x278) != 1) {
-                func_00282F20(vec, (f32 *)(s4 + 0xE0), D_L11_001B05DC);
+                vec_scale_to_length(center, (f32 *)(moby + 0xE0), D_L11_001B05DC);
             }
         }
-        next = i + 1;
-        i = (s32)rec;
-        p = (u8 *)i;
+        nextIndex = i + 1;
+        i = (s32)arm;
+        joint = (u8 *)i;
         for (j = 1; j >= 0; j--) {
-            *(f32 *)(p + 0x40) = func_00283B98(*(f32 *)(p + 0x40), *(f32 *)(p + 0x60));
-            *(f32 *)(p + 0x44) = func_00283B98(*(f32 *)(p + 0x44), *(f32 *)(p + 0x64));
-            *(f32 *)(p + 0x48) = func_00283B98(*(f32 *)(p + 0x48), *(f32 *)(p + 0x68));
-            *(f32 *)(p + 0x20) = vec[0] + func_00283180(*(f32 *)(p + 0x40)) * *(f32 *)(p + 0x80);
-            *(f32 *)(p + 0x24) = vec[1] + func_00283198(*(f32 *)(p + 0x44)) * *(f32 *)(p + 0x84);
-            *(f32 *)(p + 0x28) = vec[2] - func_00283198(*(f32 *)(p + 0x48)) * *(f32 *)(p + 0x88);
-            p += 0x10;
+            *(f32 *)(joint + 0x40) = FastAddRotations(*(f32 *)(joint + 0x40), *(f32 *)(joint + 0x60));
+            *(f32 *)(joint + 0x44) = FastAddRotations(*(f32 *)(joint + 0x44), *(f32 *)(joint + 0x64));
+            *(f32 *)(joint + 0x48) = FastAddRotations(*(f32 *)(joint + 0x48), *(f32 *)(joint + 0x68));
+            *(f32 *)(joint + 0x20) = center[0] + FastSinOrCosA(*(f32 *)(joint + 0x40)) * *(f32 *)(joint + 0x80);
+            *(f32 *)(joint + 0x24) = center[1] + FastSinOrCosB(*(f32 *)(joint + 0x44)) * *(f32 *)(joint + 0x84);
+            *(f32 *)(joint + 0x28) = center[2] - FastSinOrCosB(*(f32 *)(joint + 0x48)) * *(f32 *)(joint + 0x88);
+            joint += 0x10;
         }
     }
 }

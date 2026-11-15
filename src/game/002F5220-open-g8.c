@@ -88,82 +88,83 @@ extern void func_00335370(void *);
 extern void func_003353C8(void *);
 extern void func_00272368(void);
 
+/* Opens the vendor screen: clears its state, picks the menu type from the vendor or how it was called, builds the item list, and moves the camera to the vendor. */
 void func_002F8178(char *moby)
 {
-    int mode, v, visible, count;
-    float vec[4];
+    int openArg, npcAction, visible, count;
+    float tempVec[4];
 
-    func_00282A60(&D_0021F240, 0, 0x760);
-    if (D_001A7B90) D_001B2280 = 1.076923f;
+    ClearMemory(&gVendorMenuState, 0, 0x760);
+    if (gIsPalVideo) D_001B2280 = 1.076923f;
     else D_001B2280 = 1.0f;
-    D_0021F240.restore = 0;
-    D_001AD1C0 = D_001A79F8.level;
-    mode = (int)moby;
+    gVendorMenuState.restore = 0;
+    D_001AD1C0 = gPlayerBolts.level;
+    openArg = (int)moby;
     if ((unsigned)moby < 4) {
-        D_0021F240.restore = 1;
-        moby = func_0029EFD0(11);
+        gVendorMenuState.restore = 1;
+        moby = CreateMoby(11 /* Megacorp Vendor */);
         *(short *)(moby + 0x32) = 64;
-        if (D_001A7BB1) qcopy(vec, D_001AD1F0);
-        else qcopy(vec, D_001AD1E0);
-        vec[2] = -vec[2];
-        func_00282CC0(moby + 0x10, D_001B5340, vec);
-        func_00282C88(moby + 0xF0);
+        if (D_001A7BB1) qcopy(tempVec, D_001AD1F0);
+        else qcopy(tempVec, D_001AD1E0);
+        tempVec[2] = -tempVec[2];
+        FastVecAdd(moby + 0x10, gCameraState_001B5340, tempVec);
+        ClearVector128(moby + 0xF0);
         *(float *)(moby + 0xF8) = 3.1415927f;
         func_002A0F48(moby);
-        D_0021F240.restore = 1;
-        D_0021F240.field744 = 0;
+        gVendorMenuState.restore = 1;
+        gVendorMenuState.field744 = 0;
         moby[0x20] = 3;
-        if (mode == 0) {
-            D_0021F240.field744 = 0;
-            D_0021F240.mode = 0;
-        } else if (mode == 1) {
-            D_0021F240.mode = 1;
-        } else if (mode == 2) {
-            D_0021F240.mode = 2;
-            D_0021F240.fieldBC = -1.5707964f;
-            D_0021F240.fieldB4 = 0;
-            D_0021F240.fieldB8 = 0;
-            D_0021F240.fieldA4 = 0;
+        if (openArg == 0) {
+            gVendorMenuState.field744 = 0;
+            gVendorMenuState.mode = 0;
+        } else if (openArg == 1) {
+            gVendorMenuState.mode = 1;
+        } else if (openArg == 2) {
+            gVendorMenuState.mode = 2;
+            gVendorMenuState.fieldBC = -1.5707964f;
+            gVendorMenuState.fieldB4 = 0;
+            gVendorMenuState.fieldB8 = 0;
+            gVendorMenuState.fieldA4 = 0;
         } else {
-            D_0021F240.mode = 3;
+            gVendorMenuState.mode = 3;
         }
-    } else if (*(short *)(moby + 0xAA) == 11) {
-        D_0021F240.field744 = 0;
-        v = *(int *)(*(char **)(moby + 0x68) + 0x94);
-        if (v == 0) {
-            D_0021F240.mode = 0;
-        } else if (v == 1) {
-            D_0021F240.mode = 1;
-            func_002F9778();
-        } else if (v == 4) {
-            D_0021F240.mode = 2;
-        } else if (v == 2) {
-            D_0021F240.mode = 3;
-        } else if (v == 3) {
-            D_0021F240.field744 = 1;
-            D_0021F240.mode = 0;
+    } else if (*(short *)(moby + 0xAA) == 11 /* Megacorp Vendor */) {
+        gVendorMenuState.field744 = 0;
+        npcAction = *(int *)(*(char **)(moby + 0x68) + 0x94);
+        if (npcAction == 0) {
+            gVendorMenuState.mode = 0;
+        } else if (npcAction == 1) {
+            gVendorMenuState.mode = 1;
+            RunShopMenuInput();
+        } else if (npcAction == 4) {
+            gVendorMenuState.mode = 2;
+        } else if (npcAction == 2) {
+            gVendorMenuState.mode = 3;
+        } else if (npcAction == 3) {
+            gVendorMenuState.field744 = 1;
+            gVendorMenuState.mode = 0;
         }
-    } else if (*(short *)(moby + 0xAA) == 0x1309) {
-        D_0021F240.moby = moby;
-        D_0021F240.mode = 2;
-    } else if (*(short *)(moby + 0xAA) == 0xDDC) {
-        D_0021F240.moby = moby;
-        D_0021F240.mode = 1;
-        func_002F9778();
+    } else if (*(short *)(moby + 0xAA) == 0x1309 /* moby class 4873 */) {
+        gVendorMenuState.moby = moby;
+        gVendorMenuState.mode = 2;
+    } else if (*(short *)(moby + 0xAA) == 0xDDC /* Slim Cognito Button */) {
+        gVendorMenuState.moby = moby;
+        gVendorMenuState.mode = 1;
+        RunShopMenuInput();
     }
-    if (D_001AD1C4 != -1) D_0021F240.mode = D_001AD1C4;
-    D_0021F240.field88 = 0;
-    D_0021F240.field8C = 0;
-    D_0021F240.field38 = 0;
-    D_0021F240.field44 = D_001A7BB4[0] - 1;
-    if (D_0021F240.field44 < 0) D_0021F240.field44 = 0;
-    D_0021F240.field78 = -1;
-    D_0021F240.field7C = -1;
-    D_0021F240.field64 = 0;
-    D_0021F240.index = 0;
+    if (D_001AD1C4 != -1) gVendorMenuState.mode = D_001AD1C4;
+    gVendorMenuState.field88 = 0;
+    gVendorMenuState.field8C = 0;
+    gVendorMenuState.field38 = 0;
+    gVendorMenuState.field44 = D_001A7BB4[0] - 1;
+    if (gVendorMenuState.field44 < 0) gVendorMenuState.field44 = 0;
+    gVendorMenuState.field78 = -1;
+    gVendorMenuState.field7C = -1;
+    gVendorMenuState.field64 = 0;
+    gVendorMenuState.index = 0;
     D_001B2244 = 0;
-    D_0021F240.field84 = 0;
-    D_0021F240.field68 = -1;
+    gVendorMenuState.field84 = 0;
+    gVendorMenuState.field68 = -1;
     D_001AD234 = 0.8f;
     D_001AD238 = 1.0f;
     D_001B2290 = 96;
@@ -175,53 +176,53 @@ void func_002F8178(char *moby)
     D_001B2288 = 0;
     D_001B2298 = 85;
     D_001B228C = 0;
-    func_00132AF8(93);
-    func_002B72E8(0);
-    func_00132028();
-    if (D_0021F240.mode == 0) func_002F6608(0);
-    else if (D_0021F240.mode == 3) func_002F71B8();
-    else if (D_0021F240.mode == 1) func_002F73A8();
-    else if (D_0021F240.mode == 2) func_002F7738();
-    count = D_0021F240.count;
+    SendSoundCommand22(93);
+    music_Pause(0);
+    snd_Pump();
+    if (gVendorMenuState.mode == 0) BuildVendorWeaponList(0);
+    else if (gVendorMenuState.mode == 3) RebuildUnlockedSlotList();
+    else if (gVendorMenuState.mode == 1) BuildShopChannelList();
+    else if (gVendorMenuState.mode == 2) BuildFlagGatedVendorList();
+    count = gVendorMenuState.count;
     visible = count / 2;
     if (count < 3) visible = 1;
-    D_0021F240.index = count / 2;
-    D_0021F240.field6C = (visible - count / 2) * 40;
-    func_0028E408();
-    if (D_0021F240.mode != 2) func_0029B698(0x112A880);
-    if (D_0021F240.mode == 0 && D_0021F240.slots[D_0021F240.index].kind == 1 && D_00189E20.mode != 10)
-        func_0029B6D0(D_0021F240.slots[D_0021F240.index].id, 0x112A880);
-    D_0021F240.state = 0;
-    D_0021F240.base10 = D_001BAEC0.base10 + 0x60000;
-    D_0021F240.base1C = D_0021F240.base10 + D_001A7340.w * D_001A7340.h * 4;
-    D_0021F240.field8 = 0;
-    D_0021F240.fieldC = 1;
-    D_0021F240.moby = moby;
-    D_0021F240.base14 = D_001BAEC0.baseC + 0x60000;
-    func_002E5CF8(3, 17, moby);
-    D_0021F240.field4C = D_001A7AF0;
-    D_0021F240.fieldA0 = *(short *)D_00152CE4;
-    func_00288EA0();
-    D_001A8BB0 = 5;
-    D_001B15A0 = 0.0f;
+    gVendorMenuState.index = count / 2;
+    gVendorMenuState.field6C = (visible - count / 2) * 40;
+    ResetWeaponMenu();
+    if (gVendorMenuState.mode != 2) ForwardValueToLevelObject(0x112A880);
+    if (gVendorMenuState.mode == 0 && gVendorMenuState.slots[gVendorMenuState.index].kind == 1 && gHeroState.mode != 10)
+        ForwardPairToLevelObject(gVendorMenuState.slots[gVendorMenuState.index].id, 0x112A880);
+    gVendorMenuState.state = 0;
+    gVendorMenuState.base10 = D_001BAEC0.base10 + 0x60000;
+    gVendorMenuState.base1C = gVendorMenuState.base10 + gScreenWidth.w * gScreenWidth.h * 4;
+    gVendorMenuState.field8 = 0;
+    gVendorMenuState.fieldC = 1;
+    gVendorMenuState.moby = moby;
+    gVendorMenuState.base14 = D_001BAEC0.baseC + 0x60000;
+    PlayMobySound(3, 17, moby);
+    gVendorMenuState.field4C = gEquipmentBits;
+    gVendorMenuState.fieldA0 = *(short *)D_00152CE4;
+    ClearSubtitleState();
+    gCurrentGameMode = 5;
+    gScreenFade = 0.0f;
     D_001B15A4 = 0;
-    func_0026F748(97, 1);
-    D_00189E20.flag22BC = 1;
-    D_00189E20.flag22B5 = 1;
-    func_0026F720();
-    if (!D_0021F240.restore) {
-        if (D_001A7BB1) func_00283098(D_0021F240.position, D_001AD1F0, D_0021F240.moby + 0xC0);
-        else func_00283098(D_0021F240.position, D_001AD1E0, D_0021F240.moby + 0xC0);
-        func_00282CC0(D_0021F240.position, D_0021F240.position, D_0021F240.moby + 0x10);
-        D_0021F240.rotation[2] = func_00283B98(*(float *)(D_0021F240.moby + 0xF8), 3.1415927f);
-        func_00335438(D_0021F240.position, D_0021F240.rotation, 1, 0, 0);
-        qcopy(vec, D_0021F240.position);
-        if (D_0021F240.mode == 2) vec[1] += 5.0f;
-        func_00335370(vec);
-        func_003353C8(D_0021F240.rotation);
-        func_00272368();
+    EmptyStubF748(97, 1);
+    gHeroState.flag22BC = 1;
+    gHeroState.flag22B5 = 1;
+    EmptyStubF720();
+    if (!gVendorMenuState.restore) {
+        if (D_001A7BB1) matrix_mul_vec3(gVendorMenuState.position, D_001AD1F0, gVendorMenuState.moby + 0xC0);
+        else matrix_mul_vec3(gVendorMenuState.position, D_001AD1E0, gVendorMenuState.moby + 0xC0);
+        FastVecAdd(gVendorMenuState.position, gVendorMenuState.position, gVendorMenuState.moby + 0x10);
+        gVendorMenuState.rotation[2] = FastAddRotations(*(float *)(gVendorMenuState.moby + 0xF8), 3.1415927f);
+        SetCamera5Pose(gVendorMenuState.position, gVendorMenuState.rotation, 1, 0, 0);
+        qcopy(tempVec, gVendorMenuState.position);
+        if (gVendorMenuState.mode == 2) tempVec[1] += 5.0f;
+        CopyVectorToSelectedObject(tempVec);
+        SetCameraStateRotation(gVendorMenuState.rotation);
+        UpdateCameraState();
     }
-    func_00283098(D_001C2AC0 + 0x10, D_001AD210, D_0021F240.moby + 0xC0);
+    matrix_mul_vec3(D_001C2AC0 + 0x10, D_001AD210, gVendorMenuState.moby + 0xC0);
     qcopy(D_001C2AC0, D_001AD220);
     qzero_nc(D_001C2AC0 + 0x30);
     qzero_nc(D_001C2AC0 + 0x20);

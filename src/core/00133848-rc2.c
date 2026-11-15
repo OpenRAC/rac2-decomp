@@ -26,13 +26,14 @@
 
 extern s32 func_00132C48();
 
-void func_00133848(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
-    s32 sp[6];
-    sp[0] = arg0;
-    sp[1] = arg1;
-    sp[2] = arg2;
-    sp[3] = arg3;
-    sp[4] = arg4;
-    sp[5] = arg5;
-    func_00132C48(0x3B, 0x18, sp);
+/* Sends sound command 0x3B with six values. */
+void func_00133848(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4, s32 p5) {
+    s32 payload[6];
+    payload[0] = p0;
+    payload[1] = p1;
+    payload[2] = p2;
+    payload[3] = p3;
+    payload[4] = p4;
+    payload[5] = p5;
+    snd_SendCommandSync(0x3B, 0x18, payload);
 }

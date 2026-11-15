@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 
@@ -65,11 +66,12 @@ extern u32 D_L11_001B14F8 __attribute__((sda));
 
 /* Checks the state's six counters against the class record and reports whether the
    class may still be used. */
+/* Tells whether the current wave is finished: all fighters of the wave were used and none are left alive. */
 s32 func_L11_00442710(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     s32 index = *(s16 *)(state + 0x1F0);
     s32 cls = *(s16 *)(state + 0x1F2);
-    JobaClassTableView *entry = ((JobaClassTableView **)&D_L11_001B14F8)[index];
+    JobaClassTableView *entry = ((JobaClassTableView **)&gArenaChallengeTable)[index];
     JobaClassRecordView *rec = &entry->records[cls];
     u32 *counters = (u32 *)(state + 0x100);
     s32 same = 1;
@@ -116,19 +118,20 @@ extern float func_00282E80(void *, void *);
    when the slot is still empty after that walk, the first entity that func_L02_003D77B8 accepts
    and that lies more than 30.0 from D_00189EA0 takes it. The table address is formed at each use
    (retail does), which lets GCSE hoist it ahead of the first walk. */
+/* Picks the next fighter that will lead the current squad. */
 void func_L11_00440E18(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
-    JobaClassTableView *entry = ((JobaClassTableView **)&D_L11_001B14F8)[*(s16 *)(state + 0x1F0)];
+    JobaClassTableView *entry = ((JobaClassTableView **)&gArenaChallengeTable)[*(s16 *)(state + 0x1F0)];
     JobaClassRecordView *rec = &entry->records[*(s16 *)(state + 0x1F2)];
     u8 *slot = *(u8 **)(state + (*(s32 *)(state + 0x18C) << 2) + 0x120);
     s32 ok = 0;
-    u16 *q;
+    u16 *listStart;
     u8 **slots;
-    u16 *p;
-    u8 *e;
+    u16 *cursor;
+    u8 *member;
 
     if (slot != 0) {
-        if (func_L02_003D77B8(slot) == 0 && *(s32 *)(state + 0x18C) < *((u8 *)rec + 0x16) - 1) {
+        if (HasFreeChildSlotInState2(slot) == 0 && *(s32 *)(state + 0x18C) < *((u8 *)rec + 0x16) - 1) {
             ok = 1;
             *(s32 *)(state + 0x18C) = *(s32 *)(state + 0x18C) + 1;
         }
@@ -138,36 +141,36 @@ void func_L11_00440E18(u8 *obj) {
     if (ok) {
         if (GROUP(0xC4) == 0xFF)
             return;
-        q = (u16 *)D_L11_001FC420[GROUP(0xC4)];
-        if (q == 0)
+        listStart = (u16 *)gGroupIdLists[GROUP(0xC4)];
+        if (listStart == 0)
             return;
-        for (p = q; (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= D_L11_001B35B8 && p != 0 &&
-                    ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)D_L11_001FC420[GROUP(0xC4)]);
-             p++) {
-            e = D_L11_001B359C_abs[0] + ((*p & 0x7FFF) << 8);
-            if (e == 0)
+        for (cursor = listStart; (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= D_L11_001B35B8 && cursor != 0 &&
+                    ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)gGroupIdLists[GROUP(0xC4)]);
+             cursor++) {
+            member = D_L11_001B359C_abs[0] + ((*cursor & 0x7FFF) << 8);
+            if (member == 0)
                 break;
-            if (func_L11_00442B60(e)) {
-                if (func_L02_003D77B8(e)) {
+            if (IsEntityFarAndInDirection(member)) {
+                if (HasFreeChildSlotInState2(member)) {
                     slots = (u8 **)(state + 0x120);
-                    *(u8 **)((u8 *)slots + (GROUP(0x18C) << 2)) = e;
+                    *(u8 **)((u8 *)slots + (GROUP(0x18C) << 2)) = member;
                     break;
                 }
             }
         }
         slots = (u8 **)(state + 0x120);
         if (*(u8 **)((u8 *)slots + (GROUP(0x18C) << 2)) == 0) {
-            for (p = (u16 *)D_L11_001FC420[GROUP(0xC4)];
-                 (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= D_L11_001B35B8 && p != 0 &&
-                 ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)D_L11_001FC420[GROUP(0xC4)]);
-                 p++) {
-                e = D_L11_001B359C_abs[0] + ((*p & 0x7FFF) << 8);
-                if (e == 0)
+            for (cursor = (u16 *)gGroupIdLists[GROUP(0xC4)];
+                 (GROUP(0xC4) & 0xFF) != 0xFF && GROUP(0xC4) <= D_L11_001B35B8 && cursor != 0 &&
+                 ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)gGroupIdLists[GROUP(0xC4)]);
+                 cursor++) {
+                member = D_L11_001B359C_abs[0] + ((*cursor & 0x7FFF) << 8);
+                if (member == 0)
                     break;
-                if (func_L02_003D77B8(e)) {
-                    if (func_00282E80(e + 0x10, D_00189EA0) > 30.0f) {
+                if (HasFreeChildSlotInState2(member)) {
+                    if (vec_distance_xy(member + 0x10, gHeroPosition) > 30.0f) {
                         slots = (u8 **)(state + 0x120);
-                        *(u8 **)((u8 *)slots + (GROUP(0x18C) << 2)) = e;
+                        *(u8 **)((u8 *)slots + (GROUP(0x18C) << 2)) = member;
                         return;
                     }
                 }
@@ -210,6 +213,7 @@ extern void func_L11_00452C58(char *, int, int);
 extern void func_L11_00454C78(char *, int, int);
 
 /* arms the script bridge over the measured buffers and starts it on the shared slot */
+/* Starts the short intro script that moves the camera. */
 void func_L11_00443380(void) {
     s32 buffer[4];
     func_3004A8(buffer);
@@ -221,15 +225,16 @@ void func_L11_00443380(void) {
 
 /* Turns the script's angle around the actor and hands the result to the level's
    helpers when the angle is small enough. */
+/* Keeps the intro script going and changes the arena state once the camera has turned far enough. */
 void func_L11_004433D8(u8 *obj) {
-    s32 state;
+    s32 objState;
 
     D_L11_001B32E8[0] = 1;
     if (func_282E48(D_L11_001BA8C0, &D_L11_001B1530) < 0.01f) {
-        state = obj[0x20];
-        if (state == 4) {
+        objState = obj[0x20];
+        if (objState == 4) {
             func_32C9E0(obj, 7, -1);
-        } else if (state == 5) {
+        } else if (objState == 5) {
             func_32C9E0(obj, 6, -1);
         }
         func_488268(1, 0);
@@ -240,42 +245,43 @@ void func_L11_004433D8(u8 *obj) {
 
 /* Turns the script's angle around the actor, hands the result to the level's helpers
    and counts the class the script's identifier names. */
-s32 func_L11_00440970(u8 *object, u8 *arg) {
+/* Places a fighter in the arena, turns it toward the middle and starts it. It also counts the fighter as used. */
+s32 func_L11_00440970(u8 *object, u8 *fighter) {
     u8 *state = *(u8 **)(object + 0x68);
-    f32 step = D_L11_001B15B4;
-    f32 v;
+    f32 turnStep = D_L11_001B15B4;
+    f32 value;
 
-    v = func_00283B98(*(f32 *)(state + 0x19C), step);
-    *(f32 *)(state + 0x19C) = v;
-    v = func_00283180(v);
-    *(f32 *)(arg + 0x10) = D_L11_001B15B8 * v;
-    v = func_00283198(*(f32 *)(state + 0x19C));
-    *(f32 *)(arg + 0x14) = D_L11_001B15B8 * v;
-    func_00282CC0(arg + 0x10, arg + 0x10, func_L11_004417E8(object));
-    *(f32 *)(arg + 0x18) = func_002A7878(D_L11_001B15AC, D_L11_001B15B0);
-    *(f32 *)(arg + 0xF4) = -1.570796489715576171875f;
-    *(s32 *)(arg + 0xF0) = 0;
-    *(f32 *)(arg + 0xF8) = *(f32 *)(state + 0x19C);
-    func_002833F0(arg + 0xC0, arg + 0xF0);
-    switch (*(s16 *)(arg + 0xAA)) {
-    case 0xD98:
-        func_L11_004496A0(arg, 0, 1);
+    value = FastAddRotations(*(f32 *)(state + 0x19C), turnStep);
+    *(f32 *)(state + 0x19C) = value;
+    value = FastSinOrCosA(value);
+    *(f32 *)(fighter + 0x10) = D_L11_001B15B8 * value;
+    value = FastSinOrCosB(*(f32 *)(state + 0x19C));
+    *(f32 *)(fighter + 0x14) = D_L11_001B15B8 * value;
+    FastVecAdd(fighter + 0x10, fighter + 0x10, GetArenaCenterPoint(object));
+    *(f32 *)(fighter + 0x18) = RandomFloatRange(D_L11_001B15AC, D_L11_001B15B0);
+    *(f32 *)(fighter + 0xF4) = -1.570796489715576171875f;
+    *(s32 *)(fighter + 0xF0) = 0;
+    *(f32 *)(fighter + 0xF8) = *(f32 *)(state + 0x19C);
+    euler_rotation_basis(fighter + 0xC0, fighter + 0xF0);
+    switch (*(s16 *)(fighter + 0xAA)) {
+    case 0xD98 /* Joba security robot */:
+        InitSecurityRobot(fighter, 0, 1);
         *(s32 *)(state + 0x100) += 1;
         break;
-    case 0xDCF:
-        func_L11_0044C328(arg, 0, 1);
+    case 0xDCF /* Joba smasher robot */:
+        InitSmasherRobot(fighter, 0, 1);
         *(s32 *)(state + 0x104) += 1;
         break;
-    case 0xDF4:
-        func_L11_00452C58(arg, 0, 1);
+    case 0xDF4 /* moby class 3572 */:
+        InitFlamethrowerRobot(fighter, 0, 1);
         *(s32 *)(state + 0x108) += 1;
         break;
-    case 0xDF7:
-        func_L11_00454C78(arg, 0, 1);
+    case 0xDF7 /* moby class 3575 */:
+        InitJobaDroneState(fighter, 0, 1);
         *(s32 *)(state + 0x10C) += 1;
         break;
-    case 0xD37:
-        func_L11_00436910(arg, 0, 1);
+    case 0xD37 /* moby class 3383 */:
+        InitEnemyState(fighter, 0, 1);
         *(s32 *)(state + 0x114) += 1;
         break;
     }
@@ -296,11 +302,11 @@ extern void func_L02_00416720(u8 *, u8 *, f32, f32);
 #define FOR_EACH_ID(p, off) \
     if (GROUP(off) == 0xFF) \
         return; \
-    { u16 *q = (u16 *)D_L11_001FC420[GROUP(off)]; \
+    { u16 *q = (u16 *)gGroupIdLists[GROUP(off)]; \
     if (q == 0) \
         return; \
     for (p = q; (GROUP(off) & 0xFF) != 0xFF && GROUP(off) <= D_L11_001B35B8_1[0] && p != 0 && \
-         ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)D_L11_001FC420[GROUP(off)]); \
+         ((p != 0 && (s16)p[-1] >= 0) || p == (u16 *)gGroupIdLists[GROUP(off)]); \
          p++)
 #define END_IDS }
 /* One half: collect the entities of group OFF for which func_00312B58 holds (counting the
@@ -316,10 +322,10 @@ extern void func_L02_00416720(u8 *, u8 *, f32, f32);
             for (k = 15; k >= 0; k--) \
                 buf[k] = 0; \
             FOR_EACH_ID(p, off) { \
-                e = D_L11_001B359C[0] + ((*p & 0x7FFF) << 8); \
+                e = gMobyTable_L11[0] + ((*p & 0x7FFF) << 8); \
                 if (e == 0) \
                     break; \
-                if (func_00312B58(e) == 0) { \
+                if (IsMobyInState6(e) == 0) { \
                     m++; \
                 } else { \
                     buf[n] = e; \
@@ -329,14 +335,14 @@ extern void func_L02_00416720(u8 *, u8 *, f32, f32);
             if (n != 0) { \
                 for (i = 0; i < 1000 && m < *(s16 *)(rec + (limit)); i++) { \
                     FOR_EACH_ID(p, 0x17C) { \
-                        e = D_L11_001B359C[0] + ((*p & 0x7FFF) << 8); \
+                        e = gMobyTable_L11[0] + ((*p & 0x7FFF) << 8); \
                         if (e == 0) \
                             break; \
                         if (n <= 0) \
                             break; \
-                        if (func_L02_00416800(e) != 0 && func_002A77E0(6) == 0) { \
+                        if (IsStateOneWithClearedVars(e) != 0 && RandomIntBelow(6) == 0) { \
                             n--; \
-                            func_L02_00416720(e, buf[n], D_L11_001B1614 * 0.016666668f, \
+                            BindCapturedObjectToMoby(e, buf[n], D_L11_001B1614 * 0.016666668f, \
                                               D_L11_001B1618 * 2.908882452175021e-4f); \
                             m++; \
                             break; \
@@ -352,10 +358,11 @@ extern void func_L02_00416720(u8 *, u8 *, f32, f32);
    limit of the class record the state names (the halfword at 0x10, at 0x12 for the second
    group), hands the gathered entities, last first, to func_L02_00416720 together with entities
    of the group at state word 0x17C. */
+/* Hands waiting fighters to their spawn points until enough of each group are in the arena. */
 void func_L11_00442E38(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     JobaClassTableView *entry =
-        ((JobaClassTableView **)&D_L11_001B14F8)[*(s16 *)(state + 0x1F0)];
+        ((JobaClassTableView **)&gArenaChallengeTable)[*(s16 *)(state + 0x1F0)];
     u8 *rec = (u8 *)&entry->records[*(s16 *)(state + 0x1F2)];
     u8 *buf[16];
     u16 *p;
@@ -390,37 +397,38 @@ extern void func_L00_00424F58(void *, f32, f32);
 #define GUIDE (*(f32 **)(s + 0x170))
 #define SET_GUIDE(x, y, z) (GUIDE[0] = (x), GUIDE[1] = (y), GUIDE[2] = (z))
 
+/* Sets the point the camera guide follows, depending on which kind of boss is fighting. */
 void func_L11_004423F8(u8 *obj) {
     u8 *s = *(u8 **)(obj + 0x68);
 
     if (obj[0x20] == 8 || obj[0x20] == 9) {
         if (GUIDE == 0) {
-            GUIDE = func_L00_002D70A0(5);
+            GUIDE = AllocCameraOverrideSlot(5);
         } else if (*(void **)(s + 0x180) != 0) {
             if (*(u8 **)(s + 0x184) == 0) {
                 SET_GUIDE(D_L11_001B15BC, D_L11_001B15C0, D_L11_001B15C4);
                 return;
             }
-            if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == 0xD4A)
+            if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == 0xD4A /* moby class 3402 */)
                 SET_GUIDE(D_L11_001B15D4, D_L11_001B15D8, D_L11_001B15DC);
-            if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == 0xD4B)
+            if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == 0xD4B /* moby class 3403 */)
                 SET_GUIDE(D_L11_001B15EC, D_L11_001B15F0, D_L11_001B15F4);
-            else if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == 0xB3A)
+            else if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == 0xB3A /* Arachnoid */)
                 SET_GUIDE(D_L11_001B15E0, D_L11_001B15E4, D_L11_001B15E8);
         } else if (obj[0x20] == 9) {
-            u8 *player = D_00189E20;
+            u8 *player = gHeroState;
             SET_GUIDE(D_L11_001B15C8, D_L11_001B15CC, D_L11_001B15D0);
-            if (*(f32 *)(player + 0x88) > ((f32 *)func_L11_004417E8(obj))[2] + 16.0f) {
+            if (*(f32 *)(player + 0x88) > ((f32 *)GetArenaCenterPoint(obj))[2] + 16.0f) {
                 if (*(u16 *)(obj + 0x96) < 500)
-                    func_L00_00424F58(func_L11_004417E8(obj), 0.17453295f, 0.0f);
+                    SetCameraStrengthAndSteerToTarget(GetArenaCenterPoint(obj), 0.17453295f, 0.0f);
                 else
-                    func_L00_00424F58(func_L11_004417E8(obj), 0.008726647f, 0.0f);
+                    SetCameraStrengthAndSteerToTarget(GetArenaCenterPoint(obj), 0.008726647f, 0.0f);
             }
         } else {
             SET_GUIDE(D_L11_001B15BC, D_L11_001B15C0, D_L11_001B15C4);
         }
     } else {
-        func_L00_002D7140(GUIDE);
+        EndCameraOverride(GUIDE);
         GUIDE = 0;
     }
 }

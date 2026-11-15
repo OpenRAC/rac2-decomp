@@ -26,6 +26,7 @@
 
 extern s32 func_00335870();
 
+/* Runs the shared base cleanup. */
 void func_00335D30(void) {
-    func_00335870();
+    ResetObjectTypeAndFree();
 }

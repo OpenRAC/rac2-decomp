@@ -26,6 +26,7 @@
 
 extern void ref_L07_003791E8_00();
 
+/* Per-frame update for moby class 4853; it just calls the level's own update code. */
 void func_L07_003791E8(void) {
     ref_L07_003791E8_00();
 }

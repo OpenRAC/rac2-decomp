@@ -1,3 +1,4 @@
+#include "names.h"
 /* Stick or d-pad selection among direction ranges: the stick's angle is looked up in the
    [start, end) table at +0x144 (a range may wrap through +/-pi or through zero), the d-pad picks
    entries 3, 1, 2 or 0. +0x14C is the selection, +0x150 keeps it while the stick is released and
@@ -20,15 +21,15 @@ int func_00349190(char *object)
     if (--*(int *)(object + 0x154) < 0)
         *(int *)(object + 0x154) = 0;
     if (*(int *)(object + 0x154) == 0) {
-        pad = D_00138180;
+        pad = gPadState;
         x = *(float *)(pad + 0x148);
         y = *(float *)(pad + 0x14C);
-        magnitude = func_00282C10(x*x + y*y);
+        magnitude = square_root(x*x + y*y);
         if (magnitude != 0.0f) {
             x /= magnitude;
             y /= magnitude;
         }
-        angle = func_00283248(x, y);
+        angle = FastMatrixHelperA(x, y);
         i = 0;
         if (*(int *)(object + 0x150) == 0)
             *(int *)(object + 0x14C) = -1;

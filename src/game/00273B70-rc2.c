@@ -33,66 +33,67 @@ extern s32 func_00274120(void *);
 extern s32 func_00282978(void *);
 extern s32 D_001B1688;
 
+/* Updates one camera object each frame; returns 1 when it should be removed (for example when it leaves the world). */
 s32 func_00273B70(void *arg0) {
-    s8 loc[0x210];
-    s8 *s0;
-    s32 s2;
-    u32 sel;
-    f32 f;
+    s8 buffer[0x210];
+    s8 *vars;
+    s32 result;
+    u32 camMode;
+    f32 coord;
 
     static void *tgt[] = {&&case02, &&case02, &&case4, &&case5, &&case13, &&case13};
 
-    s0 = (*(s8 **)((s8 *)(arg0) + (0x68)));
-    s2 = 0;
-    sel = (*(u8 *)((s8 *)(s0) + (0x5D)));
-    if (sel >= 6) {
+    vars = (*(s8 **)((s8 *)(arg0) + (0x68)));
+    result = 0;
+    camMode = (*(u8 *)((s8 *)(vars) + (0x5D)));
+    if (camMode >= 6) {
         goto done;
     }
     {
-        s8 *tb = D_0026C550;
+        s8 *table = D_0026C550;
 
-        goto *(void *)*(s32 *)(tb + sel * 4);
+        goto *(void *)*(s32 *)(table + camMode * 4);
     }
 
 case02:
-    if ((*(u8 *)((s8 *)(s0) + (0x5D))) == 0) {
-        (*(s8 *)((s8 *)(s0) + (0x58))) = func_00274C90(arg0, loc, 0x20);
+    if ((*(u8 *)((s8 *)(vars) + (0x5D))) == 0) {
+        (*(s8 *)((s8 *)(vars) + (0x58))) = ConvertPackedPointsToVectors(arg0, buffer, 0x20);
     } else {
-        func_0029F840(arg0, loc + 0x200, loc, (*(s16 *)((s8 *)(s0) + (0x36))));
+        GetMobyJointMatrix(arg0, buffer + 0x200, buffer, (*(s16 *)((s8 *)(vars) + (0x36))));
     }
-    (*(s8 **)((s8 *)(s0) + (0x30))) = loc;
-    s2 = func_00273D10(arg0);
-    if (!((*(u8 *)((s8 *)(s0) + (0x5C))) == 0 && (D_001B1688 & 3) != 0)) {
-        s2 = (func_00282978(s0 + 0x34) != 0) ? 1 : s2;
+    (*(s8 **)((s8 *)(vars) + (0x30))) = buffer;
+    result = UpdateTargetSeekingMoby(arg0);
+    if (!((*(u8 *)((s8 *)(vars) + (0x5C))) == 0 && (gGameTime & 3) != 0)) {
+        result = (FastDecTimer(vars + 0x34) != 0) ? 1 : result;
     }
-    (*(s8 **)((s8 *)(s0) + (0x30))) = 0;
+    (*(s8 **)((s8 *)(vars) + (0x30))) = 0;
     goto done;
 
 case4:
-    s2 = func_00274118(arg0);
+    result = ReturnOneStubA(arg0);
     goto done;
 
 case5:
-    s2 = func_00274120(arg0);
+    result = ReturnOneStubB(arg0);
     goto done;
 
 case13:
-    s2 = func_00273E98(arg0);
-    s2 = (func_00282978(s0 + 0x34) != 0) ? 1 : s2;
+    result = UpdateCollidingCameraMoby(arg0);
+    result = (FastDecTimer(vars + 0x34) != 0) ? 1 : result;
     goto done;
 
 done:
-    f = (*(f32 *)((s8 *)(arg0) + (0x10)));
-    if (f < 2.0f || f > 1021.0f) {
+    coord = (*(f32 *)((s8 *)(arg0) + (0x10)));
+    if (coord < 2.0f || coord > 1021.0f) {
         return 1;
     }
-    f = (*(f32 *)((s8 *)(arg0) + (0x14)));
-    if (f < 2.0f || f > 1021.0f) {
+    coord = (*(f32 *)((s8 *)(arg0) + (0x14)));
+    if (coord < 2.0f || coord > 1021.0f) {
         return 1;
     }
-    f = (*(f32 *)((s8 *)(arg0) + (0x18)));
-    if (f < 2.0f || f > 1021.0f) {
+    coord = (*(f32 *)((s8 *)(arg0) + (0x18)));
+    if (coord < 2.0f || coord > 1021.0f) {
         return 1;
     }
-    return s2;
+    return result;
 }

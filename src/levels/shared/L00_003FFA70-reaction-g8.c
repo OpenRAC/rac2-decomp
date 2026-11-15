@@ -64,9 +64,10 @@ extern char D_L00_001B8FF0[];
 #define F(p, n) (*(float *)((char *)(p) + (n)))
 #define B(p, n) (*(unsigned char *)((char *)(p) + (n)))
 
-void func_L00_00408E58(char *o)
+/* Per-frame update of a charging weapon: it charges, fires a pulse that damages everything in range and plays a sound for the hits. */
+void func_L00_00408E58(char *object)
 {
-    char *q = *(char **)(o + 104);
+    char *vars = *(char **)(object + 104);
     int base[4] __attribute__((aligned(16)));
     int v[4] __attribute__((aligned(16)));
     int out[4] __attribute__((aligned(16)));
@@ -77,80 +78,80 @@ void func_L00_00408E58(char *o)
     } hits;
     int i;
 
-    func_L00_00409420(o);
-    if (D_00189E20.state == 1) {
+    InitMobyOnFirstFrame(object);
+    if (gHeroState.state == 1) {
         ref_L00_00408E58_00(29, 1);
     }
-    if (B(o, 0x31)) {
+    if (B(object, 0x31)) {
         D_L00_0025C64C = 0.1f;
     }
-    if (B(o, 0x42) == B(o, 0x43) && (B(o, 0x60) & 2)) {
-        func_002A75E0(o, 1, 0, 2, 0);
+    if (B(object, 0x42) == B(object, 0x43) && (B(object, 0x60) & 2)) {
+        StartAnimationBlendedWithFlags(object, 1, 0, 2, 0);
     }
-    func_00282CC0(base, base, o + 16);
-    func_002829D8(q);
-    if (B(o, 32) == 1) {
-        if (D_L00_001A8F00 || D_00189E20.disabled || !(D_00138324 & D_00189E20.mask) || D_00189E20.level < 23) {
+    FastVecAdd(base, base, object + 16);
+    FastVectorHelperB(vars);
+    if (B(object, 32) == 1) {
+        if (D_L00_001A8F00 || gHeroState.disabled || !(D_00138324 & gHeroState.mask) || gHeroState.level < 23) {
             return;
         }
-        if (func_L00_002D4040(-1)) {
-            func_L00_002AF568();
-            I(q, 24) = func_L00_002D6998(D_L00_0029FBE0);
-            B(o, 32) = 2;
-            I(q, 4) = D_L00_001B0F90;
+        if (get_ammo(-1)) {
+            start_equipped_item_animation();
+            I(vars, 24) = CopyRecordsToFreeSlots(D_L00_0029FBE0);
+            B(object, 32) = 2;
+            I(vars, 4) = D_L00_001B0F90;
         } else {
-            func_002E5CF8(4, 0, o);
+            PlayMobySound(4, 0, object);
         }
         {
-            RateEntry *entry = &D_L00_00262570[D_00139593];
-            F(q, 0) = 1.0f / entry->rate;
+            RateEntry *entry = &gWeaponTable_L00[D_00139593];
+            F(vars, 0) = 1.0f / entry->rate;
         }
-    } else if (B(o, 32) == 2) {
-        if (func_00282948(q + 16)) {
-            B(o, 32) = 4;
-            I(q, 16) = 30;
-            I(q, 20) = 0;
+    } else if (B(object, 32) == 2) {
+        if (FastFloatHelperD(vars + 16)) {
+            B(object, 32) = 4;
+            I(vars, 16) = 30;
+            I(vars, 20) = 0;
         }
-        if (I(q, 16) == 10) {
-            func_002A75E0(o, 2, 0, 3, 0);
-            func_002E5CF8(1, 0, o);
+        if (I(vars, 16) == 10) {
+            StartAnimationBlendedWithFlags(object, 2, 0, 3, 0);
+            PlayMobySound(1, 0, object);
         }
-    } else if (B(o, 32) == 4) {
-        if (func_00282948(q + 16)) {
-            B(o, 32) = 5;
-            I(q, 20) = 0;
-            I(q, 16) = 30;
-            func_002A75E0(o, 3, 0, 3, 0);
-        } else if (!I(q, 20)) {
-            qcopy(v, D_00189E20.object + 0xc0);
-            func_00282F20(v, v, 1.0f);
-            func_00282CC0(out, base, v);
-            func_L00_00416F68(out, 1, o);
-            I(q, 20) = 1;
+    } else if (B(object, 32) == 4) {
+        if (FastFloatHelperD(vars + 16)) {
+            B(object, 32) = 5;
+            I(vars, 20) = 0;
+            I(vars, 16) = 30;
+            StartAnimationBlendedWithFlags(object, 3, 0, 3, 0);
+        } else if (!I(vars, 20)) {
+            qcopy(v, gHeroState.object + 0xc0);
+            vec_scale_to_length(v, v, 1.0f);
+            FastVecAdd(out, base, v);
+            SpawnSparkEffectMoby(out, 1, object);
+            I(vars, 20) = 1;
         }
-    } else if (B(o, 32) == 5) {
-        if (func_00282948(q + 8)) {
-            B(o, 32) = 3;
-            I(q, 8) = 64;
-            func_002A75E0(o, 4, 0, 3, 0);
+    } else if (B(object, 32) == 5) {
+        if (FastFloatHelperD(vars + 8)) {
+            B(object, 32) = 3;
+            I(vars, 8) = 64;
+            StartAnimationBlendedWithFlags(object, 4, 0, 3, 0);
         } else {
-            func_002E6EF8(func_L00_00409480, o);
+            func_002E6EF8(DrawScreenFlashFade, object);
         }
-    } else if (B(o, 32) == 3) {
+    } else if (B(object, 32) == 3) {
         int done = 0;
 
         qcopy(v, D_L00_001B8FF0);
-        hits.timer = (int *)(q + 4);
-        func_00282A88(list, 128);
-        func_L00_0037E000(o);
-        func_002AF580(o + 16, v, &hits.count, list, 32, 0, 3.1415929794311523f, 1.047197699546814f, 40.0f, 0.0f,
+        hits.timer = (int *)(vars + 4);
+        FastMemoryHelperB(list, 128);
+        ReleaseDeadOrExpiredSlots(object);
+        SelectBestTargetInCone(object + 16, v, &hits.count, list, 32, 0, 3.1415929794311523f, 1.047197699546814f, 40.0f, 0.0f,
                       0.0f, 0, 0);
         for (i = 0; i < hits.count; i++) {
             char *p;
             int active;
 
             qcopy_nc(out, list[i] + 16);
-            p = func_002AB1F0(list[i]);
+            p = GetMobyPrivateValue0(list[i]);
             active = 1;
             if (p) {
                 F(out, 8) += F(p, 16) * 1.5f;
@@ -159,26 +160,26 @@ void func_L00_00408E58(char *o)
                 }
             }
             if (list[i] && B(list[i], 32) != 254 && B(list[i], 32) != 253) {
-                if (*(short *)(list[i] + 0xaa) == 0xa8d) {
+                if (*(short *)(list[i] + 0xaa) == 0xa8d /* Swamp Monster I Arm */) {
                     B(list[i], 0x95) = 9;
                 }
-                if (*(short *)(list[i] + 0xaa) == 0xa8e) {
+                if (*(short *)(list[i] + 0xaa) == 0xa8e /* Swamp Monster I Eye */) {
                     B(list[i], 0x95) = 7;
                 }
-                if (*(short *)(list[i] + 0xaa) == 0x1002) {
+                if (*(short *)(list[i] + 0xaa) == 0x1002 /* Desert Dune Monster */) {
                     B(list[i], 32) = 7;
                 }
             }
             if (active) {
                 if ((p && B(p, 14) == 1) || B(p, 14) == 2) {
-                    func_L00_00416F68(out, 0, 0);
-                    I(q, 28)++;
-                    func_002A6C58(list[i], 0, 3);
+                    SpawnSparkEffectMoby(out, 0, 0);
+                    I(vars, 28)++;
+                    SetDeathBits(list[i], 0, 3);
                     B(p, 14) = 2;
                 } else if (p && B(p, 14) != 3) {
-                    func_L00_00416F68(out, 0, 0);
-                    I(q, 28)++;
-                    func_002A6C58(list[i], 0, 3);
+                    SpawnSparkEffectMoby(out, 0, 0);
+                    I(vars, 28)++;
+                    SetDeathBits(list[i], 0, 3);
                     func_00310440(list[i]);
                 }
             } else {
@@ -188,16 +189,16 @@ void func_L00_00408E58(char *o)
                 }
             }
         }
-        done = func_00282948(hits.timer);
+        done = FastFloatHelperD(hits.timer);
         if (done) {
-            if (I(q, 28)) {
-                func_002E5CF8(2, 0, o);
+            if (I(vars, 28)) {
+                PlayMobySound(2, 0, object);
             } else {
-                func_002E5CF8(3, 0, o);
+                PlayMobySound(3, 0, object);
             }
-            I(q, 28) = 0;
-            B(o, 32) = 0;
-            func_L00_002D3F30(-1, 1);
+            I(vars, 28) = 0;
+            B(object, 32) = 0;
+            SpendWeaponAmmo(-1, 1);
         }
     }
 }

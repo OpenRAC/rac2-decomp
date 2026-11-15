@@ -7,6 +7,7 @@
    first operand and copies it into $f0, which gives 12 bytes instead of 8.
    The profile of this unit is therefore -O1 -ffast-math
    (config/cflags.txt); the other bodies of L00_002E5918.c need -O2. */
+/* Returns the larger of two numbers. */
 float func_L00_002EE050(float a, float b) {
     return b > a ? b : a;
 }

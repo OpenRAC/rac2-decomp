@@ -1,3 +1,4 @@
+#include "names.h"
 /* Moves an object using its controller; vector fields cover complete quadwords.
  * The two volatile reads at controller +0x90 reproduce distinct retail accesses.
  * AAA00 returns float even though this caller ignores it. Its declaration keeps
@@ -55,6 +56,7 @@ extern void func_00282CC0(void *, void *, void *);
 extern float func_00282E20(void *);
 extern void func_002AAC80(void *, float, float, float, float);
 
+/* Works out the speed of an object from its controller: it speeds up toward the target or slows down, and rises or falls with gravity. */
 void func_002B52A0(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, float x)
 {
     float local[4] __attribute__((aligned(16)));
@@ -62,46 +64,46 @@ void func_002B52A0(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, float x
     float h, scale, dist, dot, len, len2, diff, g90;
 
     if (!(ctl->flags38 & 0x10))
-        func_002AAA00(&self->heading, x, &ctl->fB4, 0, ctl->f14, ctl->f18, ctl->f1C);
-    h = func_00283C80(self->heading, x);
+        ApproachTargetWithDirectionMode(&self->heading, x, &ctl->fB4, 0, ctl->f14, ctl->f18, ctl->f1C);
+    h = FastDiffRots(self->heading, x);
     if (!(ctl->flags38 & 0x10) && ctl->f30 < h) {
-        func_00282C88(local);
+        ClearVector128(local);
         if (h - ctl->f30 > ctl->fB4 * 30.0f)
             ctl->flags9C |= 2;
     } else {
         ctl->flags9C &= ~2;
-        dist = func_00282E80(self->pos, target);
+        dist = vec_distance_xy(self->pos, target);
         ctl->fCC = dist;
         if (dist <= ctl->f34) {
-            func_00282C88(local);
+            ClearVector128(local);
         } else {
-            scale = func_00282C10(2.0f * (dist - ctl->f34) * ctl->f24);
+            scale = square_root(2.0f * (dist - ctl->f34) * ctl->f24);
             if (ctl->f28 < scale)
                 scale = ctl->f28;
             h = x;
             if (ctl->w80 != 0) {
-                x = func_00283B98(func_00283248(ctl->f60 - self->pos[0], ctl->f64 - self->pos[1]), 3.14159f);
-                h = func_00283BE0(h, x);
+                x = FastAddRotations(FastMatrixHelperA(ctl->f60 - self->pos[0], ctl->f64 - self->pos[1]), 3.14159f);
+                h = fast_subtract_rotations(h, x);
                 if (D_001AA108 < h)
                     h = D_001AA108;
                 else if (h < -D_001AA108)
                     h = -D_001AA108;
-                h = func_00283B98(h, x);
+                h = FastAddRotations(h, x);
             }
-            local[0] = func_00283180(h) * scale;
-            local[1] = func_00283198(h) * scale;
+            local[0] = FastSinOrCosA(h) * scale;
+            local[1] = FastSinOrCosB(h) * scale;
             local[2] = 0;
         }
     }
-    func_00282CF0(local2, local, ctl->vel);
+    FastVecSub(local2, local, ctl->vel);
     local2[2] = 0;
-    dot = func_00282DB0(local, ctl->vel);
+    dot = FastVecDot(local, ctl->vel);
     if (0.0f < dot)
-        func_002AC9F8(local2, ctl->f20);
+        ClampVectorLength(local2, ctl->f20);
     else
-        func_002AC9F8(local2, ctl->f24);
-    func_00282CC0(ctl->vel, ctl->vel, local2);
-    len = func_00282E20(ctl->vel);
+        ClampVectorLength(local2, ctl->f24);
+    FastVecAdd(ctl->vel, ctl->vel, local2);
+    len = vec_length_xy(ctl->vel);
     ctl->speed = len;
     if (ctl->flags38 & 4)
         return;
@@ -109,10 +111,10 @@ void func_002B52A0(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, float x
     if (g90 < self->pos[2]) {
         if (ctl->hC2 < 2) {
             if (self->pos[2] - g90 < 0.15f) {
-                len2 = func_00282E20(ctl->v50);
-                if (0.087266475f < func_00283248(ctl->v50[2], len2)) {
-                    if (-func_00282DB0(ctl->vel, ctl->v50) < ctl->vel[2])
-                        ctl->vel[2] = -func_00282DB0(ctl->vel, ctl->v50);
+                len2 = vec_length_xy(ctl->v50);
+                if (0.087266475f < FastMatrixHelperA(ctl->v50[2], len2)) {
+                    if (-FastVecDot(ctl->vel, ctl->v50) < ctl->vel[2])
+                        ctl->vel[2] = -FastVecDot(ctl->vel, ctl->v50);
                 }
             }
         }
@@ -125,6 +127,6 @@ void func_002B52A0(Self_002B52A0 *self, Ctl_002B52A0 *ctl, void *target, float x
             ctl->vel[2] = diff;
         else if (ctl->vel[2] < 0.0f)
             ctl->vel[2] = 0.0f;
-        func_002AAC80(&ctl->vel[2], ctl->f90 - self->pos[2], 0.011111111f, 0.011111111f, 1.0f);
+        ApproachTargetWithBraking(&ctl->vel[2], ctl->f90 - self->pos[2], 0.011111111f, 0.011111111f, 1.0f);
     }
 }

@@ -83,6 +83,7 @@ typedef struct {
 /* The sound slots: 0x70 bytes apart, the owner at +0x88 and the active byte at +0x74. */
 extern u8 D_00188660[];
 
+/* Runs the launch platform (moby class 4588). It shakes and bounces while the hero is on it, then fires out its cargo and blows up. */
 void func_L20_004451C0(PlatformObject *self) {
     PlatformState *s = self->vars;
     float dt;
@@ -94,16 +95,16 @@ void func_L20_004451C0(PlatformObject *self) {
     float offset[4];
     float tip[4];
 
-    dt = func_002A96A0(self, func_002A9640(self, 0x10000, 0));
+    dt = UpdateAimTargetStrength(self, FindOwnedEffectSlot(self, 0x10000, 0));
     s->timer -= dt;
     if (dt > 0.0f) {
-        func_002AB800(self, s->effect);
+        StartColorFade(self, s->effect);
         if (s->timer <= 0.0f) {
-            func_002A7750(self, 3, -1);
+            SetMobyState(self, 3, -1);
         }
     }
     self->flagA8 = 0xFF;
-    func_002AB8C0(self, s->effect);
+    UpdateColorFade(self, s->effect);
 
     switch (self->state) {
     case 0:
@@ -114,80 +115,80 @@ void func_L20_004451C0(PlatformObject *self) {
         }
         s->spawnTimer = -1;
         s->scale = 1.0f;
-        func_002A7750(self, 1, -1);
+        SetMobyState(self, 1, -1);
         s->sound = -1;
         break;
     case 1:
-        if (func_002A77E0(2) == 0 && s->startId != -1) {
-            if (func_002ACBC8(D_00189EA0, s->stopId)) {
-                func_002A7750(self, 3, -1);
-            } else if (func_002ACBC8(D_00189EA0, s->startId)) {
-                func_002A7750(self, 2, -1);
+        if (RandomIntBelow(2) == 0 && s->startId != -1) {
+            if (IsPointInCuboid(gHeroPosition, s->stopId)) {
+                SetMobyState(self, 3, -1);
+            } else if (IsPointInCuboid(gHeroPosition, s->startId)) {
+                SetMobyState(self, 2, -1);
             }
         }
         break;
     case 2:
-        if (func_002A77E0(2) == 0 && func_002ACBC8(D_00189EA0, s->stopId)) {
-            func_002A7750(self, 3, -1);
+        if (RandomIntBelow(2) == 0 && IsPointInCuboid(gHeroPosition, s->stopId)) {
+            SetMobyState(self, 3, -1);
             if (s->sound != -1) {
-                u8 *slot = D_00188660 + s->sound * 0x70;
+                u8 *slot = gSoundState + s->sound * 0x70;
 
                 if (*(PlatformObject **)(slot + 0x88) == self && slot[0x74] != 0) {
-                    func_002E59F8(s->sound);
+                    StopSoundVoice(s->sound);
                 }
             }
             s->sound = -1;
         }
-        if (func_002B3868(self)) {
+        if (SetFirstPendingFlag(self)) {
             self->rotation[0] = 0;
             self->rotation[1] = 0;
             zero = self->rotation[0];
             self->position[2] = s->restHeight;
-            s->verticalSpeed += func_002A7878(zero, D_L20_001B2260 * 0.016666668f);
-            s->spinX = func_002A7878(zero, D_L20_001B2264 * 0.00029088825f);
-            s->spinY = func_002A7878(zero, D_L20_001B2268 * 0.00029088825f);
+            s->verticalSpeed += RandomFloatRange(zero, D_L20_001B2260 * 0.016666668f);
+            s->spinX = RandomFloatRange(zero, D_L20_001B2264 * 0.00029088825f);
+            s->spinY = RandomFloatRange(zero, D_L20_001B2268 * 0.00029088825f);
             self->position[2] = s->restHeight;
         }
         {
-            u8 *slot = D_00188660 + s->sound * 0x70;
+            u8 *slot = gSoundState + s->sound * 0x70;
 
             if (*(PlatformObject **)(slot + 0x88) != self || slot[0x74] == 0) {
-                s->sound = func_002E5CF8(0, 4, self);
+                s->sound = PlayMobySound(0, 4, self);
             }
         }
         if (self->position[2] >= s->restHeight) {
             self->position[2] += s->verticalSpeed;
             s->verticalSpeed -= D_L20_001B227C * 0.00027777778f;
             if (s->verticalSpeed > 0.0f) {
-                self->rotation[0] = func_00283B98(s->spinX, self->rotation[0]);
-                self->rotation[1] = func_00283B98(s->spinY, self->rotation[1]);
+                self->rotation[0] = FastAddRotations(s->spinX, self->rotation[0]);
+                self->rotation[1] = FastAddRotations(s->spinY, self->rotation[1]);
             } else {
-                self->rotation[0] = func_00283B98(-s->spinX, self->rotation[0]);
-                self->rotation[1] = func_00283B98(-s->spinY, self->rotation[1]);
+                self->rotation[0] = FastAddRotations(-s->spinX, self->rotation[0]);
+                self->rotation[1] = FastAddRotations(-s->spinY, self->rotation[1]);
             }
         } else {
-            func_002A7750(self, 2, -1);
+            SetMobyState(self, 2, -1);
         }
         break;
     case 3:
         count = 0;
-        for (p = func_L18_003F75E8(s->group, &count); p != 0; p = func_L18_003F75E8(s->group, &count)) {
-            func_00282F20(velocity, D_L20_001B22A0, D_L20_001B2270 * 0.016666668f);
-            func_00283098(velocity, velocity, self->matrix);
-            func_002ACB48(velocity, D_L20_001B226C * 0.016666668f);
-            func_00283098(position, D_L20_001B2290, self->matrix);
-            func_00282CC0(position, position, self->position);
-            func_00282F20(offset, velocity, 0.3f);
-            func_00282CD8(tip, position, offset);
-            func_L18_003F76F0(p, position, velocity);
+        for (p = CountGroupProtopets(s->group, &count); p != 0; p = CountGroupProtopets(s->group, &count)) {
+            vec_scale_to_length(velocity, D_L20_001B22A0, D_L20_001B2270 * 0.016666668f);
+            matrix_mul_vec3(velocity, velocity, self->matrix);
+            AddRandomOffsetToVector(velocity, D_L20_001B226C * 0.016666668f);
+            matrix_mul_vec3(position, D_L20_001B2290, self->matrix);
+            FastVecAdd(position, position, self->position);
+            vec_scale_to_length(offset, velocity, 0.3f);
+            add_vectors(tip, position, offset);
+            LaunchProtopetShot(p, position, velocity);
             *(PlatformObject **)(p + 0xB8) = self;
-            s->spawnTimer = func_002A7820(D_L20_001B2280, D_L20_001B2284);
+            s->spawnTimer = RandomIntRange(D_L20_001B2280, D_L20_001B2284);
         }
-        func_0032C700(self->position, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
-        func_002B0A68(self, 0x1FF, D_L20_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
-        func_002E5CF8(1, 0, self);
-        func_002A6C58(self, 0, 3);
-        func_0029F338(self);
+        SpawnExplosion(self->position, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1.0f, 20.0f, 1, 1, 0, 0);
+        SpawnDebrisForMaskedParts(self, 0x1FF, D_L20_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+        PlayMobySound(1, 0, self);
+        SetDeathBits(self, 0, 3);
+        MarkMobySpawned(self);
         return;
     }
     if (self->frames <= 0xFFFE) {

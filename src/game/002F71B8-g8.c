@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Rebuilds the list of the slots after the current one that are unlocked (the bit in
    the save byte, or the fallback check), each with its id and table value. */
@@ -31,17 +32,17 @@ void func_002F71B8(void)
     Func002F71B8Table values = D_001AD268;
     int i;
 
-    D_0021F240.count = 0;
+    gVendorMenuState.count = 0;
     D_001AD1B8 = 0;
     for (i = D_001AD1C0 != 0 ? D_001AD1C0 + 1 : 1; i < 5; i++) {
         if ((unsigned int)i >= 8 ||
             ((D_001395B8[0x8D] >> i) & 1) == 0) {
-            if (func_00288D58() == 0)
+            if (IsFlagByteSet() == 0)
                 continue;
         }
-        D_0021F240.entry[D_0021F240.count].slot = i;
-        D_0021F240.entry[D_0021F240.count].value = values.value[i];
-        D_0021F240.entry[D_0021F240.count].id = i + 0xEA92;
-        D_0021F240.count = D_0021F240.count + 1;
+        gVendorMenuState.entry[gVendorMenuState.count].slot = i;
+        gVendorMenuState.entry[gVendorMenuState.count].value = values.value[i];
+        gVendorMenuState.entry[gVendorMenuState.count].id = i + 0xEA92;
+        gVendorMenuState.count = gVendorMenuState.count + 1;
     }
 }

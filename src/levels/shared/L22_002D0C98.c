@@ -27,27 +27,27 @@ ASM_FUNC("asm/levels", func_L22_002F3B38);
 /* Early-outs when the third float argument is positive; otherwise bends the first angle
    through one helper, feeds the second angle and the angle at the fourth pointer through
    the two placement calls, scales it by the first float argument and stores it back. */
-void func_L22_00328220(u8 *a0, u8 *a1, u8 *a2, u8 *a3, f32 f12, f32 f13, f32 f14)
+void func_L22_00328220(u8 *position, u8 *angleRef, u8 *speedRef, u8 *directionRef, f32 factor, f32 unusedFactor, f32 limit)
 {
-    u8 *s0 = a0;
-    u8 *s1 = a1;
-    u8 *s2 = a3;
-    u8 *s3 = a2;
+    u8 *posPtr = position;
+    u8 *angle = angleRef;
+    u8 *dirPtr = directionRef;
+    u8 *speed = speedRef;
     TI128 buf;
     f32 keep;
     f32 q;
 
-    if (f14 > 0.0f)
+    if (limit > 0.0f)
         return;
-    keep = f12;
-    *(f32 *)(s1 + 0) = func_2F4A88(*(f32 *)(s1 + 0));
-    func_2F3AF0(&buf, s2, *(f32 *)(s3 + 0));
-    s0 += 0x10;
-    func_2F3AB0(s0, s0, &buf);
-    q = func_2F4088(*(f32 *)(s1 + 0)) * keep;
-    *(f32 *)(s3 + 0) = q;
-    func_2F3AF0(&buf, s2, q);
-    func_2F3A80(s0, s0, &buf);
+    keep = factor;
+    *(f32 *)(angle + 0) = func_2F4A88(*(f32 *)(angle + 0));
+    func_2F3AF0(&buf, dirPtr, *(f32 *)(speed + 0));
+    posPtr += 0x10;
+    func_2F3AB0(posPtr, posPtr, &buf);
+    q = func_2F4088(*(f32 *)(angle + 0)) * keep;
+    *(f32 *)(speed + 0) = q;
+    func_2F3AF0(&buf, dirPtr, q);
+    func_2F3A80(posPtr, posPtr, &buf);
 }
 
 
@@ -86,24 +86,24 @@ void func_L22_00334F78(TI128 *source, u8 red, u8 green, u8 blue, s32 handle, f32
 
 /* Defined in L22_00334F78.c. */
 
-void func_L22_00335078(u8 *a0)
+void func_L22_00335078(u8 *object)
 {
-    u8 *s0 = a0;
-    u8 *s1 = a0 + 0x20;
+    u8 *rec = object;
+    u8 *extra = object + 0x20;
 
-    if (func_2F36F0(s1) != 0) {
-        func_3330A8(s0);
+    if (func_2F36F0(extra) != 0) {
+        func_3330A8(rec);
         return;
     }
     {
-        u8 *p = s0 + 0x10;
+        u8 *vecPtr = rec + 0x10;
 
-        func_383120(p, p);
+        func_383120(vecPtr, vecPtr);
     }
-    *(f32 *)(s0 + 0xC) = *(f32 *)(s0 + 0xC) + *(f32 *)(s1 + 4);
-    if (*(s32 *)(s1) < 6) {
-        *(u32 *)(s0 + 4) = (*(u32 *)(s0 + 4) & 0xFFFFFF)
-            | ((u32)(*(s32 *)(s1) * 127 / 6) << 24);
+    *(f32 *)(rec + 0xC) = *(f32 *)(rec + 0xC) + *(f32 *)(extra + 4);
+    if (*(s32 *)(extra) < 6) {
+        *(u32 *)(rec + 4) = (*(u32 *)(rec + 4) & 0xFFFFFF)
+            | ((u32)(*(s32 *)(extra) * 127 / 6) << 24);
     }
 }
 

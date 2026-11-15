@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -12,35 +13,35 @@ extern char D_00189EA0[];
 extern s32 func_00319BE8(char *, s32);
 
 /* runs the object's start-up state once and marks the four sub-objects it carries as alive */
-void func_L16_00418D28(char *arg0) {
-    char *st = *(char **)(arg0 + 0x68);
-    char *p;
-    u8 x;
+void func_L16_00418D28(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
+    char *entry;
+    u8 entryState;
 
-    if (*(u8 *)(arg0 + 0x20) == 0)
-        *(u8 *)(arg0 + 0x20) = 1;
-    if (*(u8 *)(arg0 + 0x20) != 1)
+    if (*(u8 *)(moby + 0x20) == 0)
+        *(u8 *)(moby + 0x20) = 1;
+    if (*(u8 *)(moby + 0x20) != 1)
         return;
 
-    p = (*(s32 *)st << 8) + D_L16_001B2B1C_2;
-    if (p != 0) {
-        x = *(u8 *)(p + 0x20);
-        if (x != 0xFE) {
-            if (x != 0xFD)
+    entry = (*(s32 *)vars << 8) + D_L16_001B2B1C_2;
+    if (entry != 0) {
+        entryState = *(u8 *)(entry + 0x20);
+        if (entryState != 0xFE) {
+            if (entryState != 0xFD)
                 return;
         }
     }
-    if (func_00319BE8(D_00189EA0, *(s32 *)(st + 4)) == 0)
+    if (func_00319BE8(gHeroPosition, *(s32 *)(vars + 4)) == 0)
         return;
-    if (*(s32 *)(st + 0x10) != -1)
-        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(st + 0x10) << 8) + 0xBC) = 1;
-    if (*(s32 *)(st + 0x14) != -1)
-        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(st + 0x14) << 8) + 0xBC) = 1;
-    if (*(s32 *)(st + 0x18) != -1)
-        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(st + 0x18) << 8) + 0xBC) = 1;
-    if (*(s32 *)(st + 0x1C) != -1)
-        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(st + 0x1C) << 8) + 0xBC) = 1;
-    *(u8 *)(arg0 + 0x20) = 2;
+    if (*(s32 *)(vars + 0x10) != -1)
+        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(vars + 0x10) << 8) + 0xBC) = 1;
+    if (*(s32 *)(vars + 0x14) != -1)
+        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(vars + 0x14) << 8) + 0xBC) = 1;
+    if (*(s32 *)(vars + 0x18) != -1)
+        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(vars + 0x18) << 8) + 0xBC) = 1;
+    if (*(s32 *)(vars + 0x1C) != -1)
+        *(u8 *)(D_L16_001B2B1C + (*(s32 *)(vars + 0x1C) << 8) + 0xBC) = 1;
+    *(u8 *)(moby + 0x20) = 2;
 }
 
 extern s32 D_L16_001B1FCC __attribute__((sda));
@@ -93,11 +94,11 @@ extern f32 D_L16_001B1E94 __attribute__((sda));
 extern void func_0031C698(char *, char *, char *, f32, f32, f32);
 
 /* submits the sub-object at 0x68 with the level's angle scale */
-void func_L16_0041C948(char *arg0) {
-    char *p = arg0;
-    char *st = *(char **)(p + 0x68);
+void func_L16_0041C948(char *moby) {
+    char *self = moby;
+    char *st = *(char **)(self + 0x68);
 
-    func_0031C698(p, st + 4, st, D_L16_001B1E90, D_L16_001B1E94 * 0.000290888245f, -1.0f);
+    func_0031C698(self, st + 4, st, D_L16_001B1E90, D_L16_001B1E94 * 0.000290888245f, -1.0f);
 }
 
 extern char D_00189EA0[];
@@ -106,12 +107,12 @@ extern void func_002E7968(char *, s32 *, char *);
 extern void func_002E7488(char *, char *, char *);
 
 /* installs the two level matrices on the shared render object */
-void func_L16_00416E30(char *arg0) {
-    char *obj = D_00189EA0;
+void func_L16_00416E30(char *moby) {
+    char *obj = gHeroPosition;
 
-    func_002E7968(obj, &D_L16_001B1A80, arg0 + 0xC0);
-    func_002E7488(obj, obj, arg0 + 0x10);
-    *(f32 *)(obj + 0x18) = *(f32 *)(arg0 + 0xF8);
+    func_002E7968(obj, &D_L16_001B1A80, moby + 0xC0);
+    func_002E7488(obj, obj, moby + 0x10);
+    *(f32 *)(obj + 0x18) = *(f32 *)(moby + 0xF8);
 }
 
 extern f32 D_L16_001B1C28 __attribute__((sda));
@@ -120,38 +121,38 @@ extern f32 D_L16_001B1C30 __attribute__((sda));
 extern f32 D_L16_001B1C34 __attribute__((sda));
 
 /* initialises the level object's scale/limit table */
-void func_L16_00418218(char *p) {
-    f32 a = D_L16_001B1C28;
-    f32 b = D_L16_001B1C2C;
-    f32 c = D_L16_001B1C30;
-    f32 d = D_L16_001B1C34;
+void func_L16_00418218(char *table) {
+    f32 first = D_L16_001B1C28;
+    f32 second = D_L16_001B1C2C;
+    f32 third = D_L16_001B1C30;
+    f32 fourth = D_L16_001B1C34;
 
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = a;
-    *(float *)(p + 24) = b;
-    *(long long *)(p + 128) = 0x0000FF9000000260LL;
-    *(float *)(p + 40) = a;
-    *(float *)(p + 4) = c;
-    *(float *)(p + 36) = d;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(float *)(p + 56) = b;
-    *(float *)(p + 20) = c;
-    *(float *)(p + 52) = d;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(table + 112) = 0LL;
+    *(int *)(table + 80) = 0;
+    *(int *)(table + 84) = 0;
+    *(float *)(table + 88) = 1.0f;
+    *(int *)(table + 92) = 0;
+    *(int *)(table + 96) = 0;
+    *(float *)(table + 100) = 1.0f;
+    *(float *)(table + 104) = 1.0f;
+    *(float *)(table + 108) = 1.0f;
+    *(float *)(table + 8) = first;
+    *(float *)(table + 24) = second;
+    *(long long *)(table + 128) = 0x0000FF9000000260LL;
+    *(float *)(table + 40) = first;
+    *(float *)(table + 4) = third;
+    *(float *)(table + 36) = fourth;
+    *(int *)(table + 0) = 0;
+    *(int *)(table + 16) = 0;
+    *(int *)(table + 32) = 0;
+    *(int *)(table + 48) = 0;
+    *(float *)(table + 12) = 1.0f;
+    *(float *)(table + 28) = 1.0f;
+    *(float *)(table + 44) = 1.0f;
+    *(float *)(table + 56) = second;
+    *(float *)(table + 20) = third;
+    *(float *)(table + 52) = fourth;
+    *(float *)(table + 60) = 1.0f;
 }
 
 /* The id-list walk below reads D_L16_001B2B1C as a bare symbol (a second name for the 4-byte
@@ -177,29 +178,29 @@ void func_L16_0041ECF8(char *self, f32 spin) {
     char buf1[0x10];
     char buf2[0x10];
     char buf3[0x10];
-    unsigned short *p;
-    char *e;
-    f32 v;
+    unsigned short *idList;
+    char *entity;
+    f32 spinValue;
 
-    func_00283098(buf0, (char *)&D_L16_001B1FE0, self + 0xC0);
-    func_00282CC0(buf0, buf0, self + 0x10);
-    for (p = D_L16_001FB660[*(u8 *)(self + 0x21)];
-         *(u8 *)(self + 0x21) != 0xFF && *(u8 *)(self + 0x21) <= D_L16_001B2B38 && p != 0 &&
-         ((p != 0 && (short)p[-1] >= 0) || p == D_L16_001FB660[*(u8 *)(self + 0x21)]);
-         p++) {
-        e = (char *)D_L16_001B2B1C_base[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    matrix_mul_vec3(buf0, (char *)&D_L16_001B1FE0, self + 0xC0);
+    FastVecAdd(buf0, buf0, self + 0x10);
+    for (idList = D_L16_001FB660[*(u8 *)(self + 0x21)];
+         *(u8 *)(self + 0x21) != 0xFF && *(u8 *)(self + 0x21) <= D_L16_001B2B38 && idList != 0 &&
+         ((idList != 0 && (short)idList[-1] >= 0) || idList == D_L16_001FB660[*(u8 *)(self + 0x21)]);
+         idList++) {
+        entity = (char *)D_L16_001B2B1C_base[0] + ((*idList & 0x7FFF) << 8);
+        if (entity == 0)
             break;
-        func_00282CF0(buf1, buf0, e + 0x10);
-        func_002AFDD8(e, buf2, buf1, 0);
-        v = spin;
-        if (*(short *)(e + 0xAA) == 0x125D)
-            v = -v;
-        *(f32 *)(e + 0xF4) = v;
-        func_002833F0(e + 0xC0, e + 0xF0);
-        func_00283098(buf2, buf2, e + 0xC0);
-        func_00282CF0(buf3, buf2, buf1);
-        func_00282CF0(e + 0x10, e + 0x10, buf3);
+        FastVecSub(buf1, buf0, entity + 0x10);
+        TransformVectorByObjectOrGiven(entity, buf2, buf1, 0);
+        spinValue = spin;
+        if (*(short *)(entity + 0xAA) == 0x125D)
+            spinValue = -spinValue;
+        *(f32 *)(entity + 0xF4) = spinValue;
+        euler_rotation_basis(entity + 0xC0, entity + 0xF0);
+        matrix_mul_vec3(buf2, buf2, entity + 0xC0);
+        FastVecSub(buf3, buf2, buf1);
+        FastVecSub(entity + 0x10, entity + 0x10, buf3);
     }
 }
 
@@ -210,31 +211,31 @@ extern void func_00315728(char *, char *, s32, char *, f32);
 extern void func_00315948(char *, char *);
 
 /* next frame: arms the object once the shared render state names it, then hands its box to the collision pass */
-void func_L16_0041C6A0(char *arg0) {
+void func_L16_0041C6A0(char *moby) {
     char buf[0x30];
-    char v[0x10];
-    char *q;
-    char *p;
+    char extent[0x10];
+    char *hero;
+    char *lockedTarget;
 
-    if (*(u8 *)(arg0 + 0x20) == 0) {
-        *(u8 *)(arg0 + 0x20) = 1;
-        *(u8 *)(arg0 + 0x31) = 0;
-        *(u16 *)(arg0 + 0x34) |= 1;
+    if (*(u8 *)(moby + 0x20) == 0) {
+        *(u8 *)(moby + 0x20) = 1;
+        *(u8 *)(moby + 0x31) = 0;
+        *(u16 *)(moby + 0x34) |= 1;
     }
-    if (*(u8 *)(arg0 + 0x20) != 1)
+    if (*(u8 *)(moby + 0x20) != 1)
         return;
-    q = D_00189E20;
-    p = *(char **)(q + 0x33C);
-    if (p == 0 || p != arg0)
+    hero = gHeroState;
+    lockedTarget = *(char **)(hero + 0x33C);
+    if (lockedTarget == 0 || lockedTarget != moby)
         return;
-    if (*(s32 *)(q + 0x340) == 0)
+    if (*(s32 *)(hero + 0x340) == 0)
         return;
-    *(s32 *)(v + 0) = 0;
-    *(f32 *)(v + 4) = 1.0f;
-    *(s32 *)(v + 8) = 0;
-    *(f32 *)(v + 0xC) = 1.0f;
-    func_002E7788(v, v, 10.0f);
-    func_00315728(buf, arg0, 1, v, (f32)(D_001A7A00 * 200));
-    *(u16 *)(buf + 0x1A) = *(u16 *)(arg0 + 0xAA);
-    func_00315948(*(char **)(q + 0x2290), buf);
+    *(s32 *)(extent + 0) = 0;
+    *(f32 *)(extent + 4) = 1.0f;
+    *(s32 *)(extent + 8) = 0;
+    *(f32 *)(extent + 0xC) = 1.0f;
+    func_002E7788(extent, extent, 10.0f);
+    func_00315728(buf, moby, 1, extent, (f32)(D_001A7A00 * 200));
+    *(u16 *)(buf + 0x1A) = *(u16 *)(moby + 0xAA);
+    func_00315948(*(char **)(hero + 0x2290), buf);
 }

@@ -14,22 +14,23 @@ extern InitEntry12 D_L24_0021C7F0[];
 extern int * volatile D_L24_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L24_001C8CA0;
 
-int func_L24_0034C450(char *obj) {
-    int i, entry;
-    int *list;
+/* Fills the menu rows from the level list and selects the entry that matches the current owner. */
+int func_L24_0034C450(char *menu) {
+    int i, currentEntry;
+    int *ownerList;
     for (i = 0; i < 28 && D_00139948[i]; i++) {
         D_L24_0021C7F0[i].kind = 3;
         D_L24_0021C7F0[i].payload = D_L24_002868E0;
         D_L24_0021C7F0[i].id = D_L24_0028AE20[D_00139948[i]].id;
         D_L24_0021C7F0[i].value = D_L24_0028AE20[D_00139948[i]].value;
     }
-    list = D_L24_001AA770;
+    ownerList = D_L24_001AA770;
     D_L24_0021C7F0[i].id = 0;
-    *(int *)(obj + 0x40) = 0;
-    *(unsigned int *)(obj + 0x30) |= 0x8000;
-    for (i = 0, entry = list[0]; entry; entry = D_L24_001AA770[++i]) {
-        if (D_L24_001C8CA0.selected == entry) {
-            *(int *)(obj + 0x40) = i;
+    *(int *)(menu + 0x40) = 0;
+    *(unsigned int *)(menu + 0x30) |= 0x8000;
+    for (i = 0, currentEntry = ownerList[0]; currentEntry; currentEntry = D_L24_001AA770[++i]) {
+        if (D_L24_001C8CA0.selected == currentEntry) {
+            *(int *)(menu + 0x40) = i;
             break;
         }
     }

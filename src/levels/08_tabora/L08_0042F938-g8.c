@@ -27,25 +27,25 @@ void func_L08_0042F938(char *obj)
 
     switch (*(unsigned char *)(obj + 0x20)) {
     case 0:
-        func_002A7750(obj, 1, -1);
+        SetMobyState(obj, 1, -1);
         break;
     case 1:
-        if (func_002A9640(obj, 0x4010000, 0) != 0) {
+        if (FindOwnedEffectSlot(obj, 0x4010000, 0) != 0) {
             if (*(int *)vars == 0)
-                func_002A7750(obj, 2, -1);
+                SetMobyState(obj, 2, -1);
         }
         *(unsigned char *)(obj + 0xA8) = 0xFF;
         break;
     case 2:
         *(TI128 *)vec = 0;
         vec[2] = 7.0f;
-        func_00282CC0(vec, obj + 0x10, vec);
-        func_0032C700(vec, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 1, 0, 0);
-        func_L00_0032A258(obj, &D_L08_001B1EF0, &D_L08_001B1EE8, &D_L08_001B1EE0,
+        FastVecAdd(vec, obj + 0x10, vec);
+        SpawnExplosion(vec, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 0.75f, 20.0f, 1, 1, 0, 0);
+        ExplodeObjectIntoPieces(obj, &D_L08_001B1EF0, &D_L08_001B1EE8, &D_L08_001B1EE0,
                           0xFFFF, 0, -1, 7, 0xFFFF, 0xFF, 0);
-        func_L00_00326110(obj, 5, 4.0f);
-        func_L00_00326620(obj, 0x12A0, 0);
-        func_0029F338(obj);
+        SpawnScaledBolts(obj, 5, 4.0f);
+        SpawnChildMoby_L00(obj, 0x12A0, 0);
+        MarkMobySpawned(obj);
         break;
     }
 }

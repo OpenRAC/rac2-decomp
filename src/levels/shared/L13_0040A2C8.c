@@ -16,6 +16,7 @@ typedef struct {
 } Collision;
 extern Collision D_L13_001BFD00;
 
+/* Tests whether a creature would hit something and, if so, moves it to the contact point. */
 int func_L13_0040A2C8(char *object, char *record) {
     int result;
     Vec4 position;
@@ -25,16 +26,16 @@ int func_L13_0040A2C8(char *object, char *record) {
     initial.q = 0;
     initial.f[2] = *(float *)(record + 4) + *(float *)record;
     offset.q = initial.q;
-    func_00283098((float *)&offset, (float *)&offset, (float *)(object + 0xC0));
-    func_00282CC0(&position, origin, &offset);
-    if (!func_00277258(&position, *(int *)(record + 0x38) & 2, object, *(float *)record)) {
+    matrix_mul_vec3((float *)&offset, (float *)&offset, (float *)(object + 0xC0));
+    FastVecAdd(&position, origin, &offset);
+    if (!TestPointAgainstCollision(&position, *(int *)(record + 0x38) & 2, object, *(float *)record)) {
         result = 0;
         goto done;
     }
     *(char **)(record + 0x84) = D_L13_001BFD00.hit;
     qcopy(record + 0x60, &D_L13_001BFD00.point);
     qcopy(&position, D_L13_001BFD00.gap);
-    func_00282CF0((float *)origin, (float *)&position, (float *)&offset);
+    FastVecSub((float *)origin, (float *)&position, (float *)&offset);
     result = 1;
 done:
     return result;

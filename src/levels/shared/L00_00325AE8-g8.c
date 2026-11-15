@@ -13,6 +13,7 @@ extern void func_00280B90(char *, char *, int);
 extern char D_001B8DC0[];
 extern float D_001AA310[16] SDATA(D_001AA310);
 
+/* Draws a single camera-facing quad of the given color near a position. */
 void func_L00_00325AE8(char *source, int color, float alpha, float distance)
 {
     char work[0x90];
@@ -27,7 +28,7 @@ void func_L00_00325AE8(char *source, int color, float alpha, float distance)
     *(V4_325AE8 *)up = 0;
     up[2] = 1.0f;
     up[3] = 1.0f;
-    *(long long *)(work + 0x78) = func_0027C878(0xB);
+    *(long long *)(work + 0x78) = GetEffectTextureDescriptor(0xB);
     *(long long *)(work + 0x88) = 0x0000008000000048LL;
     *(long long *)(work + 0x80) = 0x0000FF9000000260LL;
     *(long long *)(work + 0x70) = 5;
@@ -40,13 +41,13 @@ void func_L00_00325AE8(char *source, int color, float alpha, float distance)
     *(float *)(work + 0x68) = 1.0f;
     *(float *)(work + 0x6C) = 1.0f;
     qcopy(position, source);
-    func_00282CF0(basis, D_001B8DC0, position);
-    func_00282F20(1.0f, basis, basis);
-    func_00282DD8(basis + 0x10, basis, (char *)up);
-    func_00282F20(1.0f, basis + 0x10, basis + 0x10);
-    func_00282DD8(basis + 0x20, basis + 0x10, basis);
-    func_00282D30(scaled, basis, distance);
-    func_00282CC0(position, position, scaled);
+    FastVecSub(basis, D_001B8DC0, position);
+    vec_scale_to_length(1.0f, basis, basis);
+    FastVecCross(basis + 0x10, basis, (char *)up);
+    vec_scale_to_length(1.0f, basis + 0x10, basis + 0x10);
+    FastVecCross(basis + 0x20, basis + 0x10, basis);
+    FastVecScale(scaled, basis, distance);
+    FastVecAdd(position, position, scaled);
     *(int *)(work + 0x4C) = color;
     *(int *)(work + 0x48) = color;
     *(int *)(work + 0x44) = color;
@@ -54,10 +55,10 @@ void func_L00_00325AE8(char *source, int color, float alpha, float distance)
     table = (char *)D_001AA310;
     p = work;
     for (i = 3; i >= 0; i--) {
-        func_00282D30(p, table, alpha);
+        FastVecScale(p, table, alpha);
         table += 0x10;
-        func_002830C0(p, p, basis);
+        transform_vector(p, p, basis);
         p += 0x10;
     }
-    func_00280B90(work, 0, 0);
+    draw_world_quad(work, 0, 0);
 }

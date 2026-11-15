@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_002A05A8(char *);
 
@@ -75,52 +76,56 @@ extern char *D_0018C2BC;
 
 /* func_L02_003D4308 is defined in L02_003D4308-g8.c. */
 
-void func_L02_003D46B8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Per-frame upkeep for the Chainblade: jet puffs while flying, glow drawing, timers, and a timer reset when it is the target. */
+void func_L02_003D46B8(char *self) {
+    char *state = *(char **)(self + 0x68);
 
-    if (*(unsigned char *)(arg0 + 0x95) == 2 ||
-        *(unsigned char *)(arg0 + 0x20) == 0x12) {
-        func_L02_003D5F50(arg0, 2, 0);
-        func_L02_003D5F50(arg0, 3, 1);
+    if (*(unsigned char *)(self + 0x95) == 2 ||
+        *(unsigned char *)(self + 0x20) == 0x12) {
+        SpawnJointParticleBursts(self, 2, 0);
+        SpawnJointParticleBursts(self, 3, 1);
     }
-    func_L00_002E6EF8(func_L02_003D62F0, arg0);
-    if (*(unsigned short *)(arg0 + 0x96) < 0xFFFF) {
-        (*(unsigned short *)(arg0 + 0x96))++;
+    AddDrawCallbackToList3(DrawChainbladeGlows, self);
+    if (*(unsigned short *)(self + 0x96) < 0xFFFF) {
+        (*(unsigned short *)(self + 0x96))++;
     }
-    if (D_0018C2BC != 0 &&
-        (D_0018C2BC == arg0 || *(short *)(D_0018C2BC + 0xAA) == 0x9F8)) {
+    if (gActiveAttackerRobot != 0 &&
+        (gActiveAttackerRobot == self || *(short *)(gActiveAttackerRobot + 0xAA) == 0x9F8 /* Chainblade */)) {
         *(short *)(state + 0x32A) = -1;
     }
     *(unsigned short *)(state + 0x32A) = *(unsigned short *)(state + 0x32A) + 1;
     *(unsigned short *)(state + 0x32E) = *(unsigned short *)(state + 0x32E) + 1;
-    func_002B0990(arg0, state + 0x340, 6, 1, 2.5f);
+    SetValueAndStartSmoothChange(self, state + 0x340, 6, 1, 2.5f);
 }
 
 /* func_L02_003D47B0 is matched in L02_003D47B0-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
-void func_L02_003D4900(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Puts the Chainblade back to its idle pose: frees its chain links, plays the idle animation and clears the hit flags. */
+void func_L02_003D4900(char *self) {
+    char *state = *(char **)(self + 0x68);
 
     if (*(int *)(state + 0x2A0) != 0) {
-        func_L02_003D5C20(arg0);
+        FreeChainLinks(self);
     }
-    func_002A7470(arg0, 0, 0, 3);
-    func_002A05A8(arg0);
-    func_002A7750(arg0, 1, 0);
-    *(unsigned short *)(arg0 + 0x34) =
-        (*(unsigned short *)(arg0 + 0x34) & 0xEFFF) | 3;
-    *(int *)(arg0 + 0x98) = 0;
-    *(unsigned char *)(arg0 + 0x31) = 0;
+    StartAnimationBlended(self, 0, 0, 3);
+    func_002A05A8(self);
+    SetMobyState(self, 1, 0);
+    *(unsigned short *)(self + 0x34) =
+        (*(unsigned short *)(self + 0x34) & 0xEFFF) | 3;
+    *(int *)(self + 0x98) = 0;
+    *(unsigned char *)(self + 0x31) = 0;
 }
 
-void func_L02_003D4980(char *arg0, int arg1) {
-    *(int *)(*(char **)(arg0 + 0x68) + 0x310) = arg1;
+/* Remembers which helper unit the Chainblade is working with. */
+void func_L02_003D4980(char *self, int helper) {
+    *(int *)(*(char **)(self + 0x68) + 0x310) = helper;
 }
 
 /* Advances the actor's step counter until the float at +0x20 no longer lies below the share
    (3 - step) / 3 of the count at +0x24, then latches the done flag; once only. */
-void func_L02_003D4990(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Moves the boss to its next health phase once its health has dropped far enough, and flags the change. */
+void func_L02_003D4990(char *self) {
+    char *state = *(char **)(self + 0x68);
 
     if (*(short *)(state + 0x318) != 0)
         return;
@@ -131,25 +136,27 @@ void func_L02_003D4990(char *arg0) {
     *(short *)(state + 0x318) = 1;
 }
 
-void func_L02_003D4A48(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Clears the flag that says a health phase change just happened. */
+void func_L02_003D4A48(char *self) {
+    char *state = *(char **)(self + 0x68);
 
     if (*(short *)(state + 0x318) != 0) {
         *(short *)(state + 0x318) = 0;
     }
 }
 
-int func_L02_003D4A60(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    char *holder = *(char **)(state + 0x310);
-    unsigned char mode;
+/* Tells if the helper unit is active and the boss health has dropped below the current phase limit. */
+int func_L02_003D4A60(char *self) {
+    char *state = *(char **)(self + 0x68);
+    char *helper = *(char **)(state + 0x310);
+    unsigned char helperState;
     int hit = 0;
 
-    if (holder != 0) {
-        mode = *(unsigned char *)(holder + 0x20);
-        if (mode != 0xFE) {
-            if (mode != 0xFD) {
-                if (mode >= 3) {
+    if (helper != 0) {
+        helperState = *(unsigned char *)(helper + 0x20);
+        if (helperState != 0xFE) {
+            if (helperState != 0xFD) {
+                if (helperState >= 3) {
                     if (*(float *)(state + 0x20) <
                         (float)*(short *)(state + 0x24) *
                             (3.0f - (float)*(short *)(state + 0x31A)) * 0.33333334f) {
@@ -162,8 +169,9 @@ int func_L02_003D4A60(char *arg0) {
     return hit;
 }
 
-int func_L02_003D4D00(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Decides if the boss should take off: after a wait, with rising odds the longer it waits. */
+int func_L02_003D4D00(char *self) {
+    char *state = *(char **)(self + 0x68);
     short timer = *(short *)(state + 0x32E);
     int delta;
 
@@ -173,7 +181,7 @@ int func_L02_003D4D00(char *arg0) {
     if (timer < 0x1F5) {
         delta = 0x1F4 - *(short *)(state + 0x32A);
         if (delta > 0) {
-            if (func_002A77E0(delta) != 0) {
+            if (RandomIntBelow(delta) != 0) {
                 return 0;
             }
         }
@@ -195,41 +203,43 @@ extern void func_322330(char *, char *, float, float, float, float, int);
 
 extern void func_327620(char *, char *, char *, float, float, float);
 
-void func_L02_003D4FD0(char *arg0, TI128 *arg1, float arg2, float arg3) {
-    char *state = *(char **)(arg0 + 0x68);
-    TI128 vec = *arg1;
+/* Steers the Chainblade smoothly towards a goal position, a heading and a tilt. */
+void func_L02_003D4FD0(char *self, TI128 *goal, float heading, float tilt) {
+    char *state = *(char **)(self + 0x68);
+    TI128 vec = *goal;
     float *v = (float *)&vec;
 
-    func_321E78(arg0 + 0x10, state + 0x1B0, v[0], 0.025f, 0.025f, 1.5000001f);
-    func_321E78(arg0 + 0x14, state + 0x1B4, v[1], 0.025f, 0.025f, 1.5000001f);
-    func_321E78(arg0 + 0x18, state + 0x1B8, v[2], 0.025f, 0.025f, 1.5000001f);
-    func_322330(arg0 + 0xF8, state + 0x1C4, arg2, 0.003490659f, 0.003490659f,
+    func_321E78(self + 0x10, state + 0x1B0, v[0], 0.025f, 0.025f, 1.5000001f);
+    func_321E78(self + 0x14, state + 0x1B4, v[1], 0.025f, 0.025f, 1.5000001f);
+    func_321E78(self + 0x18, state + 0x1B8, v[2], 0.025f, 0.025f, 1.5000001f);
+    func_322330(self + 0xF8, state + 0x1C4, heading, 0.003490659f, 0.003490659f,
                 0.22107507f, 0);
-    func_322330(arg0 + 0xF4, state + 0x2F0, arg3, *(float *)(state + 0x124),
+    func_322330(self + 0xF4, state + 0x2F0, tilt, *(float *)(state + 0x124),
                 *(float *)(state + 0x128), *(float *)(state + 0x12C), 0);
-    func_327620(arg0, state + 0x2F4, state + 0x304, 0.5f, 0.087266475f, -1.0f);
+    func_327620(self, state + 0x2F4, state + 0x304, 0.5f, 0.087266475f, -1.0f);
 }
 
 /* func_L02_003D5118 is matched in L02_003D5118.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
-void func_L02_003D5570(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Creates the five chain link objects and prepares the two joint blocks they hang from. */
+void func_L02_003D5570(char *self) {
+    char *state = *(char **)(self + 0x68);
     char **slots = (char **)(state + 0x2A0);
     int i;
 
-    func_00282A60(state + 0x260, 0, 0x40);
-    func_0029F978(arg0, 1, state + 0x260);
-    func_00282A60(state + 0x220, 0, 0x40);
-    func_0029F978(arg0, 0, state + 0x220);
+    ClearMemory(state + 0x260, 0, 0x40);
+    AttachManipulator(self, 1, state + 0x260);
+    ClearMemory(state + 0x220, 0, 0x40);
+    AttachManipulator(self, 0, state + 0x220);
     for (i = 0; i < 5; i++) {
-        char *node = func_0029EFD0(i + 0xA19);
+        char *link = CreateMoby(i + 0xA19 /* moby class 2585 + i */);
 
-        *slots = node;
-        if (node != 0) {
+        *slots = link;
+        if (link != 0) {
             *(unsigned char *)(*slots + 0x30) = 0;
-            *(unsigned short *)(*slots + 0x32) = *(unsigned short *)(arg0 + 0x32);
+            *(unsigned short *)(*slots + 0x32) = *(unsigned short *)(self + 0x32);
             *(unsigned long long *)(*slots + 0x38) =
-                *(unsigned long long *)(arg0 + 0x38);
+                *(unsigned long long *)(self + 0x38);
             *(unsigned short *)(*slots + 0x34) |= 1;
             *(unsigned char *)(*slots + 0x31) = 0;
         }
@@ -237,13 +247,14 @@ void func_L02_003D5570(char *arg0) {
     }
 }
 
-void func_L02_003D5660(char *arg0, int arg1) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Starts a chain throw on one side: shows the five chain links and resets the throw counters. */
+void func_L02_003D5660(char *self, int side) {
+    char *state = *(char **)(self + 0x68);
     char **slots;
     int i;
 
-    if (arg1 == 1) {
-        *(unsigned char *)(state + 0x262) = arg1;
+    if (side == 1) {
+        *(unsigned char *)(state + 0x262) = side;
         *(float *)(state + 0x288) = 0.0001f;
         *(float *)(state + 0x284) = 0.0001f;
         *(float *)(state + 0x280) = 0.0001f;
@@ -263,7 +274,7 @@ void func_L02_003D5660(char *arg0, int arg1) {
                 *(unsigned short *)(slots[0] + 0x34) =
                     *(unsigned short *)(slots[0] + 0x34) & 0xFFFE;
                 *(unsigned char *)(slots[0] + 0x31) = one;
-                func_002AF1D0(arg0, slots[0], arg1, 0);
+                CopyJointTransformToObject(self, slots[0], side, 0);
             }
             slots++;
         }
@@ -273,15 +284,16 @@ void func_L02_003D5660(char *arg0, int arg1) {
 
 /* func_L02_003D5748 is defined in L02_003D5748-g8-dbg.c. */
 
-void func_L02_003D5B90(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    char *holder = *(char **)(state + 0x300);
+/* Ends the chain throw: frees the effect trail, hides the chain links and restores the joint settings. */
+void func_L02_003D5B90(char *self) {
+    char *state = *(char **)(self + 0x68);
+    char *trail = *(char **)(state + 0x300);
     char **slots;
     char *node;
     int i;
 
-    if (holder != 0) {
-        func_L02_003D5DF8(holder);
+    if (trail != 0) {
+        FreeEffectTrail(trail);
         *(int *)(state + 0x300) = 0;
     }
     *(unsigned char *)(state + 0x222) = 0;
@@ -303,47 +315,49 @@ void func_L02_003D5B90(char *arg0) {
     }
 }
 
-void func_L02_003D5C20(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    char *holder = *(char **)(state + 0x300);
+/* Frees the chain links and the effect trail and releases the joint blocks they used. */
+void func_L02_003D5C20(char *self) {
+    char *state = *(char **)(self + 0x68);
+    char *trail = *(char **)(state + 0x300);
     char **slots;
-    char *s4;
+    char *leftBlock;
     int i;
 
-    if (holder != 0) {
-        func_L02_003D5DF8(holder);
+    if (trail != 0) {
+        FreeEffectTrail(trail);
         *(int *)(state + 0x300) = 0;
     }
-    s4 = state + 0x220;
+    leftBlock = state + 0x220;
     slots = (char **)(state + 0x2A0);
     for (i = 4; i >= 0; i--) {
         if (slots[0] != 0) {
-            func_0029F338(slots[0]);
+            MarkMobySpawned(slots[0]);
             slots[0] = 0;
         }
         slots++;
     }
     if (*(unsigned char *)(state + 0x261) != 0) {
-        func_0029F9F0(arg0, state + 0x260);
+        DetachManipulator(self, state + 0x260);
     }
     if (*(unsigned char *)(state + 0x221) != 0) {
-        func_0029F9F0(arg0, s4);
+        DetachManipulator(self, leftBlock);
     }
-    func_00282A60(s4, 0, 0x40);
-    func_00282A60(s4, 0, 0x40);
+    ClearMemory(leftBlock, 0, 0x40);
+    ClearMemory(leftBlock, 0, 0x40);
 }
 
 /* func_L02_003D5CF0 is matched in L02_003D5CF0.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
 extern void func_3366A8(char *);
 
-void func_L02_003D5DF8(char *arg0) {
-    char *cur;
+/* Frees every node of a linked effect trail, one after another. */
+void func_L02_003D5DF8(char *node) {
+    char *current;
 
-    while (arg0 != 0) {
-        cur = arg0;
-        arg0 = *(char **)(arg0 + 0x34);
-        func_3366A8(cur);
+    while (node != 0) {
+        current = node;
+        node = *(char **)(node + 0x34);
+        func_3366A8(current);
     }
 }
 
@@ -351,31 +365,34 @@ void func_L02_003D5DF8(char *arg0) {
 
 /* func_L02_003D5F50 is defined in L02_003D26B0-g8.c. */
 
-void func_L02_003D62F0(char *arg0) {
-    char *state = arg0;
+/* Draws all the glow effects of the Chainblade for the current phase and animation. */
+void func_L02_003D62F0(char *self) {
+    char *state = self;
     unsigned char mode;
 
-    func_L02_003D6538(state);
+    DrawBladeJointFlares(state);
     mode = *(unsigned char *)(state + 0x95);
     if (mode == 2) {
-        func_L02_003D6348(state);
+        DrawArmJointGlows(state);
     }
     mode = *(unsigned char *)(state + 0x42);
     if (mode == 2) {
-        func_L02_003D6A20(state);
+        DrawCurvedPathSegments(state);
     }
 }
 
-void func_L02_003D6348(char *arg0) {
-    func_L02_003D6388(arg0, 2, 0);
-    func_L02_003D6388(arg0, 3, 1);
+/* Draws the glows at the two arm joints, the second one mirrored. */
+void func_L02_003D6348(char *self) {
+    DrawJointGlowFlares(self, 2, 0);
+    DrawJointGlowFlares(self, 3, 1);
 }
 
 /* func_L02_003D6388 is matched in L02_003D6388-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
 
-void func_L02_003D6538(char *arg0) {
-    func_L02_003D6570(arg0, 4);
-    func_L02_003D6570(arg0, 5);
+/* Draws the glow flares at both blade joints. */
+void func_L02_003D6538(char *self) {
+    DrawJointGlowFlare(self, 4);
+    DrawJointGlowFlare(self, 5);
 }
 
 /* func_L02_003D6570 is matched in L02_003D6570-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
@@ -385,8 +402,9 @@ void func_L02_003D6538(char *arg0) {
 /* func_L02_003D6A20 is matched in L02_003D6A20-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier -g). */
 
 /* Whether the object's variant byte is one of the later ones. */
-int func_L02_003D6BB0(char *arg0) {
-    return *(unsigned char *)(arg0 + 0x20) >= 3;
+/* Tells if the Chainblade's state number is 3 or higher. */
+int func_L02_003D6BB0(char *self) {
+    return *(unsigned char *)(self + 0x20) >= 3;
 }
 
 /* func_L02_003D7330 is defined in L02_003D7330-g8.c. */
@@ -418,69 +436,70 @@ extern L02_003D7900_Hero D_00189E20;
 /* Builds a four-float vector and hands it to the two vector helpers, tints the three colour
    records of the actor's state from it, then walks the three actors the state points at:
    each gets the angle to the hero written at 0xF8 and the behaviour its type selects. */
-void func_L02_003D7900(char *arg0) {
-    float v[4];
-    char *state = *(char **)(arg0 + 0x68);
-    char *obj;
+/* Places the three actors the Chainblade was holding around its body, turns each towards the hero, resets each by its type, then lets go of them. */
+void func_L02_003D7900(char *self) {
+    float anchor[4];
+    char *state = *(char **)(self + 0x68);
+    char *actor;
     int i;
     int count;
 
-    v[0] = 0.0f;
-    v[1] = -9.0f;
-    v[2] = -3.3f;
-    v[3] = 0.0f;
-    func_00283098(v, v, arg0 + 0xC0);
-    func_00282CC0(v, v, arg0 + 0x10);
+    anchor[0] = 0.0f;
+    anchor[1] = -9.0f;
+    anchor[2] = -3.3f;
+    anchor[3] = 0.0f;
+    matrix_mul_vec3(anchor, anchor, self + 0xC0);
+    FastVecAdd(anchor, anchor, self + 0x10);
     if (*(char **)(state + 0x10) != 0) {
-        *(float *)(*(char **)(state + 0x10) + 0x10) = v[0] - 2.0f;
-        *(float *)(*(char **)(state + 0x10) + 0x14) = v[1];
-        *(float *)(*(char **)(state + 0x10) + 0x18) = v[2];
-        *(float *)(*(char **)(state + 0x10) + 0x1C) = v[3];
+        *(float *)(*(char **)(state + 0x10) + 0x10) = anchor[0] - 2.0f;
+        *(float *)(*(char **)(state + 0x10) + 0x14) = anchor[1];
+        *(float *)(*(char **)(state + 0x10) + 0x18) = anchor[2];
+        *(float *)(*(char **)(state + 0x10) + 0x1C) = anchor[3];
     }
     if (*(char **)(state + 0x14) != 0) {
-        *(float *)(*(char **)(state + 0x14) + 0x10) = v[0];
-        *(float *)(*(char **)(state + 0x14) + 0x14) = v[1] + 1.0f;
-        *(float *)(*(char **)(state + 0x14) + 0x18) = v[2];
-        *(float *)(*(char **)(state + 0x14) + 0x1C) = v[3];
+        *(float *)(*(char **)(state + 0x14) + 0x10) = anchor[0];
+        *(float *)(*(char **)(state + 0x14) + 0x14) = anchor[1] + 1.0f;
+        *(float *)(*(char **)(state + 0x14) + 0x18) = anchor[2];
+        *(float *)(*(char **)(state + 0x14) + 0x1C) = anchor[3];
     }
     if (*(char **)(state + 0x18) != 0) {
-        *(float *)(*(char **)(state + 0x18) + 0x10) = v[0];
-        *(float *)(*(char **)(state + 0x18) + 0x14) = v[1] - 1.0f;
-        *(float *)(*(char **)(state + 0x18) + 0x18) = v[2];
-        *(float *)(*(char **)(state + 0x18) + 0x1C) = v[3];
+        *(float *)(*(char **)(state + 0x18) + 0x10) = anchor[0];
+        *(float *)(*(char **)(state + 0x18) + 0x14) = anchor[1] - 1.0f;
+        *(float *)(*(char **)(state + 0x18) + 0x18) = anchor[2];
+        *(float *)(*(char **)(state + 0x18) + 0x1C) = anchor[3];
     }
-    obj = *(char **)(state + 0x10);
+    actor = *(char **)(state + 0x10);
     for (count = 0, i = 0; i < 3; i++) {
-        L02_003D7900_Hero *hero = &D_00189E20;
+        L02_003D7900_Hero *hero = &gHeroState;
 
         if (i == 1) {
-            obj = *(char **)(state + 0x14);
+            actor = *(char **)(state + 0x14);
         }
         if (i == 2) {
-            obj = *(char **)(state + 0x18);
+            actor = *(char **)(state + 0x18);
         }
-        if (obj == 0) {
+        if (actor == 0) {
             continue;
         }
-        *(int *)(obj + 0xF0) = 0;
-        *(int *)(obj + 0xF4) = 0;
-        *(float *)(obj + 0xF8) =
-            func_00283248(hero->x - *(float *)(obj + 0x10),
-                          hero->y - *(float *)(obj + 0x14));
-        *(int *)(obj + 0xFC) = 0;
-        switch (*(short *)(obj + 0xAA)) {
-        case 0x9CA:
-            func_L02_003D2248(obj, 0);
+        *(int *)(actor + 0xF0) = 0;
+        *(int *)(actor + 0xF4) = 0;
+        *(float *)(actor + 0xF8) =
+            FastMatrixHelperA(hero->x - *(float *)(actor + 0x10),
+                          hero->y - *(float *)(actor + 0x14));
+        *(int *)(actor + 0xFC) = 0;
+        switch (*(short *)(actor + 0xAA)) {
+        case 0x9CA: /* moby class 2506 */
+            SetupArmedEnemy(actor, 0);
             break;
-        case 0xB22:
-            func_L02_003F17B0(obj, 0);
+        case 0xB22: /* moby class 2850 */
+            ReviveActor(actor, 0);
             break;
-        case 0xC3B:
-            func_L02_0040B868(obj, 0);
+        case 0xC3B: /* Megacorp Security Robot - Flamethrower */
+            WakeFlamethrowerRobot(actor, 0);
             break;
-        case 0xC3E:
-            *(float *)(obj + 0x18) = *(float *)(obj + 0x18) + 0.5f;
-            func_L02_0040D080(obj, func_00283CF0((float)count * 0.16666667f));
+        case 0xC3E: /* PX6 BladeBall */
+            *(float *)(actor + 0x18) = *(float *)(actor + 0x18) + 0.5f;
+            WakeBladeBall(actor, FloatToInt((float)count * 0.16666667f));
             break;
         }
     }
@@ -491,35 +510,36 @@ void func_L02_003D7900(char *arg0) {
 
 /* func_L02_003D91A0 is defined in L02_003D91A0.c. */
 
-void func_L02_003D9608(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    int a, b, c;
+/* Updates the turret's linked object each frame: animates it, copies its tint, draws effects and hides it when the camera is very close. */
+void func_L02_003D9608(char *self) {
+    char *state = *(char **)(self + 0x68);
+    int red, green, blue;
 
-    func_002AB8C0(arg0, state + 0x140);
+    UpdateColorFade(self, state + 0x140);
     if (*(short *)(state + 0x140) == 0) {
         if (*(short *)(state + 0x27E) == 0) {
-            func_002A0488(arg0, *(int *)(state + 0x270),
+            set_moby_color(self, *(int *)(state + 0x270),
                           *(int *)(state + 0x274), *(int *)(state + 0x278));
             *(short *)(state + 0x27E) = 1;
         }
     } else {
         *(short *)(state + 0x27E) = 0;
     }
-    func_002A04B8(arg0, &a, &b, &c);
-    func_002A0488(
-        (char *)(D_L02_001B359C +
-                 (*(int *)(*(char **)(arg0 + 0x68) + 0x244) << 8)),
-        a, b, c);
-    func_L00_002E6EF8(func_L00_003BAAD0, arg0);
-    if (*(unsigned char *)(arg0 + 0x31) != 0) {
-        if (func_00282E48(arg0 + 0x10, &D_L02_001BA500) < 64.0f) {
-            func_002A93B0(arg0);
-            *(unsigned char *)(arg0 + 0x6F) = 0x3C;
+    get_moby_color(self, &red, &green, &blue);
+    set_moby_color(
+        (char *)(gMobyPool_L02 +
+                 (*(int *)(*(char **)(self + 0x68) + 0x244) << 8)),
+        red, green, blue);
+    AddDrawCallbackToList3(UpdateHeavyLancerMoby, self);
+    if (*(unsigned char *)(self + 0x31) != 0) {
+        if (fast_vec_dist(self + 0x10, &gCameraPosition_L02) < 64.0f) {
+            UpdateMobyGroundCheck(self);
+            *(unsigned char *)(self + 0x6F) = 0x3C;
         }
     }
-    *(float *)(arg0 + 0x74) = 1.0f;
-    if (*(unsigned short *)(arg0 + 0x96) <= 0xFFFE) {
-        *(unsigned short *)(arg0 + 0x96) += 1;
+    *(float *)(self + 0x74) = 1.0f;
+    if (*(unsigned short *)(self + 0x96) <= 0xFFFE) {
+        *(unsigned short *)(self + 0x96) += 1;
     }
 }
 
@@ -552,73 +572,75 @@ typedef struct {
    quarter turn, scaled by func_00282D30 (2.0) and completed with 1.0 and 5627.925, an effect
    record started from it (func_002A8C00), and two func_00277F48 calls on that record (0.65 and
    0.95). */
-void func_L02_003DAB68(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    float v0[4];
-    float v1[4];
+/* Fires four beam hits from pairs of joints at the target, each leaving a hit effect. */
+void func_L02_003DAB68(char *self) {
+    char *state = *(char **)(self + 0x68);
+    float jointStart[4];
+    float jointEnd[4];
     float hit[4];
     float diff[4];
     float perp[4];
     L02_003DAB68_Rec rec;
     char *obj;
     int saved;
-    char *pos;
+    char *selfPos;
     float *offset;
     int i;
-    int a;
-    int b;
+    int startJoint;
+    int endJoint;
     float one;
 
     if (*(int *)(state + 0x240) != 0) {
-        obj = (char *)((*(int *)(state + 0x244) << 8) + D_L02_001B359C);
+        obj = (char *)((*(int *)(state + 0x244) << 8) + gMobyPool_L02);
         one = 1.0f;
         saved = *(int *)(obj + 0x98);
         *(int *)(obj + 0x98) = 0;
         offset = diff;
-        pos = arg0 + 0x10;
+        selfPos = self + 0x10;
         for (i = 0; i < 4; i++) {
-            a = i * 2 + 1;
-            b = i * 2 + 2;
-            func_0029FCC0(arg0, a, v0);
-            func_0029FCC0(arg0, b, v1);
-            func_L00_0031BDC0(hit, v0, v1, *(char **)(state + 0x240) + 0x10);
-            func_00282CF0(offset, hit, pos);
+            startJoint = i * 2 + 1;
+            endJoint = i * 2 + 2;
+            TransformMobyJointToWorld(self, startJoint, jointStart);
+            TransformMobyJointToWorld(self, endJoint, jointEnd);
+            ProjectPointOnSegment(hit, jointStart, jointEnd, *(char **)(state + 0x240) + 0x10);
+            FastVecSub(offset, hit, selfPos);
             perp[0] = -diff[1];
             perp[1] = diff[0];
             perp[2] = 0.0f;
-            func_00282D30(perp, perp, 2.0f);
+            FastVecScale(perp, perp, 2.0f);
             perp[2] = one;
             perp[3] = 5627.925f;
-            func_002A8C00(&rec, arg0, 0x10001, perp, (float)*(unsigned char *)(state + 0x35));
+            make_hit_descriptor(&rec, self, 0x10001, perp, (float)*(unsigned char *)(state + 0x35));
             rec.b18 = 0;
             rec.b19 = 1;
-            rec.h1a = *(unsigned short *)(arg0 + 0xAA);
-            func_00277F48(0.65f, hit, 0, arg0, &rec);
-            func_00277F48(0.95f, v1, 0, arg0, &rec);
+            rec.h1a = *(unsigned short *)(self + 0xAA);
+            ProcessCollisionHit(0.65f, hit, 0, self, &rec);
+            ProcessCollisionHit(0.95f, jointEnd, 0, self, &rec);
         }
-        *(int *)((*(int *)(*(char **)(arg0 + 0x68) + 0x244) << 8) + D_L02_001B359C + 0x98) = saved;
+        *(int *)((*(int *)(*(char **)(self + 0x68) + 0x244) << 8) + gMobyPool_L02 + 0x98) = saved;
     }
 }
 
-void func_L02_003DAD88(char *arg0) {
-    func_L02_003DAE60(
-        (char *)(D_L02_001B359C +
-                 (*(int *)(*(char **)(arg0 + 0x68) + 0x244) << 8)), 0);
-    func_L02_003DAE60(
-        (char *)(D_L02_001B359C +
-                 (*(int *)(*(char **)(arg0 + 0x68) + 0x244) << 8)), 1);
-    func_L02_003DB158(
-        (char *)(D_L02_001B359C +
-                 (*(int *)(*(char **)(arg0 + 0x68) + 0x244) << 8)), 5);
-    func_L02_003DB158(
-        (char *)(D_L02_001B359C +
-                 (*(int *)(*(char **)(arg0 + 0x68) + 0x244) << 8)), 6);
-    func_L02_003DAF90(
-        (char *)(D_L02_001B359C +
-                 (*(int *)(*(char **)(arg0 + 0x68) + 0x244) << 8)));
-    func_L02_003DB030(
-        (char *)(D_L02_001B359C +
-                 (*(int *)(*(char **)(arg0 + 0x68) + 0x244) << 8)));
+/* Updates the joints and effects of the linked object one by one. */
+void func_L02_003DAD88(char *self) {
+    DrawJointGlowFacingCamera(
+        (char *)(gMobyPool_L02 +
+                 (*(int *)(*(char **)(self + 0x68) + 0x244) << 8)), 0);
+    DrawJointGlowFacingCamera(
+        (char *)(gMobyPool_L02 +
+                 (*(int *)(*(char **)(self + 0x68) + 0x244) << 8)), 1);
+    DrawJointGlow(
+        (char *)(gMobyPool_L02 +
+                 (*(int *)(*(char **)(self + 0x68) + 0x244) << 8)), 5);
+    DrawJointGlow(
+        (char *)(gMobyPool_L02 +
+                 (*(int *)(*(char **)(self + 0x68) + 0x244) << 8)), 6);
+    DrawJointFourGlow(
+        (char *)(gMobyPool_L02 +
+                 (*(int *)(*(char **)(self + 0x68) + 0x244) << 8)));
+    DrawJointFourGlowFacingCamera(
+        (char *)(gMobyPool_L02 +
+                 (*(int *)(*(char **)(self + 0x68) + 0x244) << 8)));
 }
 
 /* func_L02_003DAE60 is matched in L02_003DAE60-g8.c (built with -frac2-qcopy -frac2-qcopy-barrier). */
@@ -635,6 +657,7 @@ void func_L02_003DAD88(char *arg0) {
 
 /* func_L02_003DB200 is matched in L02_003DB200-g8.c (built with -frac2-zero-ti-por). */
 
-void func_L02_003DB2F0(char *arg0) {
-    func_002A7750(arg0, 7, -1);
+/* Switches the object to state 7. */
+void func_L02_003DB2F0(char *self) {
+    SetMobyState(self, 7, -1);
 }

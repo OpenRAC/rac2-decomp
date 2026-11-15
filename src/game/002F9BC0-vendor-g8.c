@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     int id;
@@ -49,24 +50,24 @@ void func_002FA880(void)
     int available = 1;
     VendorState *v;
     int color = 0x80F0F0F0;
-    v = &D_0021F240;
+    v = &gVendorMenuState;
     if (v->slots[v->index].kind == available) {
         int id = v->slots[v->index].id;
         char *copied;
         char *fmt = D_001AD3D0;
-        if (D_00139688[id] >=
-            ((VendorItem *)(D_00239BA0 + D_00139568[id] * 224))->max)
+        if (gItemAmmoCounts[id] >=
+            ((VendorItem *)(gWeaponTable_00239BA0 + gItemSlotToRecord[id] * 224))->max)
             available = 0;
-        copied = func_00115690(text, func_00288FB8(((VendorItem *)(D_00239BA0 + D_00139568[id] * 224))->text));
-        func_00115DA8(text, fmt, copied, func_00288FB8(0x2DC9));
-        func_0027FB40(D_001A7340 >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, text, -1);
-        func_002F9BC0(text, ((VendorItem *)(D_00239BA0 + D_00139568[v->slots[v->index].id] * 224))->price);
-        if (D_001A79F8 < ((VendorItem *)(D_00239BA0 + D_00139568[v->slots[v->index].id] * 224))->price)
+        copied = strcpy(text, GetLocalizedString(((VendorItem *)(gWeaponTable_00239BA0 + gItemSlotToRecord[id] * 224))->text));
+        Sprintf(text, fmt, copied, GetLocalizedString(0x2DC9));
+        DrawTextCenteredMediumFont(gScreenWidth >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, text, -1);
+        FormatNumberWithSeparators_002F9BC0(text, ((VendorItem *)(gWeaponTable_00239BA0 + gItemSlotToRecord[v->slots[v->index].id] * 224))->price);
+        if (gPlayerBolts < ((VendorItem *)(gWeaponTable_00239BA0 + gItemSlotToRecord[v->slots[v->index].id] * 224))->price)
             color = (int)0x802020F0;
     } else {
-        if (D_0021F240.slots[D_0021F240.index].owned) {
+        if (gVendorMenuState.slots[gVendorMenuState.index].owned) {
             int special = 0;
-            switch (D_0021F240.slots[D_0021F240.index].id) {
+            switch (gVendorMenuState.slots[gVendorMenuState.index].id) {
             case 12:
             case 14:
             case 17:
@@ -74,26 +75,26 @@ void func_002FA880(void)
             case 53:
                 special = 1;
             }
-            func_00288870(info, D_0021F240.slots[D_0021F240.index].id, special ? 1 : 2);
-            func_0027FB40(D_001A7340 >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, func_00288FB8(*(int *)(info + 8)), -1);
+            CopyHelpRecordAtDepth(info, gVendorMenuState.slots[gVendorMenuState.index].id, special ? 1 : 2);
+            DrawTextCenteredMediumFont(gScreenWidth >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(*(int *)(info + 8)), -1);
         } else {
-            func_0027FB40(D_001A7340 >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, func_00288FB8(((VendorItem *)(D_00239BA0 + D_00139568[D_0021F240.slots[D_0021F240.index].id] * 224))->text), -1);
+            DrawTextCenteredMediumFont(gScreenWidth >> 1, (int)(D_001B2280 * 274.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(((VendorItem *)(gWeaponTable_00239BA0 + gItemSlotToRecord[gVendorMenuState.slots[gVendorMenuState.index].id] * 224))->text), -1);
         }
-        func_002F9BC0(text, func_002F6510());
-        if (D_001A79F8 < func_002F6510())
+        FormatNumberWithSeparators_002F9BC0(text, GetSelectedShopItemPrice());
+        if (gPlayerBolts < GetSelectedShopItemPrice())
             color = (int)0x802020F0;
     }
     if (available) {
         int tex;
-        func_0027FA10(220, (int)(D_001B2280 * 210.0f + 0.5f), 0x80F0F0F0L, func_00288FB8(0x114E), -1);
+        DrawTextRightAlignedMediumFont(220, (int)(D_001B2280 * 210.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(0x114E), -1);
         ((int *)info)[0] = 0x60F0F0B0;
         ((int *)info)[1] = 0x60F0F0B0;
         ((int *)info)[2] = 0x60F0F0B0;
         ((int *)info)[3] = 0x60F0F0B0;
-        tex = func_0028E588(0x7567, 0);
-        func_0028EA58(tex, 236, (int)(D_001B2280 * 210.0f + 0.5f), 16, (int)(D_001B2280 * 16.0f + 0.5f), info);
-        func_0027F5B8(256, (int)(D_001B2280 * 210.0f + 0.5f), color, text, -1);
+        tex = GetIconFrame(0x7567, 0);
+        DrawHudSpriteGradient(tex, 236, (int)(D_001B2280 * 210.0f + 0.5f), 16, (int)(D_001B2280 * 16.0f + 0.5f), info);
+        DrawTextMediumFont(256, (int)(D_001B2280 * 210.0f + 0.5f), color, text, -1);
     } else {
-        func_0027FB40(259, (int)(D_001B2280 * 210.0f + 0.5f), 0x80F0F0F0L, func_00288FB8(0x1126), -1);
+        DrawTextCenteredMediumFont(259, (int)(D_001B2280 * 210.0f + 0.5f), 0x80F0F0F0L, GetLocalizedString(0x1126), -1);
     }
 }

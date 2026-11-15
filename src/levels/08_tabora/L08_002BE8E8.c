@@ -17,11 +17,11 @@ extern s32 func_L08_002D2ED8(s32, s32);
 /* Preserve the selected action while refreshing its transient trigger flags. */
 void func_L08_002BE8E8(void)
 {
-    u8 *player = D_00189E20;
+    u8 *player = gHeroState;
     s16 action = *(s16 *)(player + 0x1490);
     u8 saved = player[0x149D];
 
-    func_00282A88(player + 0x1490, 16);
+    FastMemoryHelperB(player + 0x1490, 16);
     *(s16 *)(player + 0x1490) = action;
     player[0x149D] = saved;
     player[0x22B9] = 0;
@@ -37,7 +37,7 @@ void func_L08_002BE8E8(void)
     }
     {
         if (action == 2) {
-            u8 *m = D_00189E20;
+            u8 *m = gHeroState;
             if (*(s16 *)(m + 0x1DE) == 0 && (*(s16 *)(m + 0x34C) == 0 || *(float *)(m + 0x31C) < 2.5f)) {
                 m[0x1497] = 1;
                 if (m[0x22B4] == 0 && D_001A7B0B != 0)
@@ -45,70 +45,70 @@ void func_L08_002BE8E8(void)
             }
         }
         if (action == 14) {
-            u8 *h = D_00189E20;
+            u8 *h = gHeroState;
             h[0x1494] = 1;
             *(float *)(h + 0x24C4) = 0.2f;
             *(float *)(h + 0x330) = *(float *)(h + 0x318) + 0.2f;
         }
         if (action == 0) {
             float d;
-            u8 *h = D_00189E20;
+            u8 *h = gHeroState;
             d = *(float *)(h + 0x330) - *(float *)(h + 0x318);
             *(float *)(h + 0x24C4) = d;
             if (d < 0.85f && d > 0.25f)
                 h[0x22B9] = 1;
-            h = D_00189E20;
+            h = gHeroState;
             h[0x1494] = 1;
         }
         if (action == 3) {
-            u8 *h = D_00189E20;
+            u8 *h = gHeroState;
             h[0x1496] = 1;
         }
         if (action == 11) {
-            u8 *h = D_00189E20;
+            u8 *h = gHeroState;
             h[0x149B] = 1;
         }
         if (action == 7) {
-            u8 *h = D_00189E20;
+            u8 *h = gHeroState;
             h[0x1492] = 1;
         }
         if (action == 13) {
-            u8 *h = D_00189E20;
+            u8 *h = gHeroState;
             h[0x149C] = 1;
         }
         if (action == 8) {
-            u8 *h = D_00189E20;
+            u8 *h = gHeroState;
             h[0x149A] = 1;
         }
         if (action == 12) {
-            u8 *h = D_00189E20;
+            u8 *h = gHeroState;
             h[0x149A] = 1;
         }
     }
 
-    if (D_00189E20[0x149C] && *(s32 *)(D_00189E20 + 0x2294) != 0x7C &&
-        func_00282C48(*(float *)(D_00189E20 + 0x330) - (*(float *)(D_00189E20 + 0x88) + 0.25f)) < 1.0f &&
-        *(float *)(D_00189E20 + 0x330) - *(float *)(D_00189E20 + 0x88) > 0.0f &&
-        (*(float *)(D_00189E20 + 0x118) < 0.0f || *(s32 *)(D_00189E20 + 0x2294) == 0x7B)) {
-        func_L08_002D2ED8(0x7C, 1);
-    } else if (D_00189E20[0x1496] && *(s32 *)(D_00189E20 + 0x2294) != 0x65 &&
-        *(s32 *)(D_00189E20 + 0x2294) != 0x78 &&
-        func_00282C48(*(float *)(D_00189E20 + 0x334) - (*(float *)(D_00189E20 + 0x88) + 0.25f)) < 1.0f &&
-        *(float *)(D_00189E20 + 0x334) - *(float *)(D_00189E20 + 0x88) > 0.0f &&
-        (*(s32 *)(D_00189E20 + 0x2294) != 0x66 || D_00189E20[0x49E]) &&
-        (*(float *)(D_00189E20 + 0x118) < 0.0f || *(s32 *)(D_00189E20 + 0x2294) == 0x7B)) {
-        if (!*(s32 *)(D_00189E20 + 0x24CC))
-            func_L08_002D2ED8(0x78, 1);
+    if (gHeroState[0x149C] && *(s32 *)(gHeroState + 0x2294) != 0x7C &&
+        FloatAbs(*(float *)(gHeroState + 0x330) - (*(float *)(gHeroState + 0x88) + 0.25f)) < 1.0f &&
+        *(float *)(gHeroState + 0x330) - *(float *)(gHeroState + 0x88) > 0.0f &&
+        (*(float *)(gHeroState + 0x118) < 0.0f || *(s32 *)(gHeroState + 0x2294) == 0x7B)) {
+        EnterHeroState_L08(0x7C, 1);
+    } else if (gHeroState[0x1496] && *(s32 *)(gHeroState + 0x2294) != 0x65 &&
+        *(s32 *)(gHeroState + 0x2294) != 0x78 &&
+        FloatAbs(*(float *)(gHeroState + 0x334) - (*(float *)(gHeroState + 0x88) + 0.25f)) < 1.0f &&
+        *(float *)(gHeroState + 0x334) - *(float *)(gHeroState + 0x88) > 0.0f &&
+        (*(s32 *)(gHeroState + 0x2294) != 0x66 || gHeroState[0x49E]) &&
+        (*(float *)(gHeroState + 0x118) < 0.0f || *(s32 *)(gHeroState + 0x2294) == 0x7B)) {
+        if (!*(s32 *)(gHeroState + 0x24CC))
+            EnterHeroState_L08(0x78, 1);
         else
-            func_L08_002D2ED8(0x65, 1);
-    } else if (D_00189E20[0x149B] && *(s32 *)(D_00189E20 + 0x2294) != 0x78 &&
-        *(s32 *)(D_00189E20 + 0x2294) != 0x74 &&
-        func_00282C48(*(float *)(D_00189E20 + 0x334) - (*(float *)(D_00189E20 + 0x88) + 0.25f)) < 1.0f &&
-        *(float *)(D_00189E20 + 0x334) - *(float *)(D_00189E20 + 0x88) > 0.0f &&
-        (*(float *)(D_00189E20 + 0x118) < 0.0f || *(s32 *)(D_00189E20 + 0x2294) == 0x7B)) {
-        if (D_001A79F0 == 13)
-            func_L08_002D2ED8(0x74, 1);
+            EnterHeroState_L08(0x65, 1);
+    } else if (gHeroState[0x149B] && *(s32 *)(gHeroState + 0x2294) != 0x78 &&
+        *(s32 *)(gHeroState + 0x2294) != 0x74 &&
+        FloatAbs(*(float *)(gHeroState + 0x334) - (*(float *)(gHeroState + 0x88) + 0.25f)) < 1.0f &&
+        *(float *)(gHeroState + 0x334) - *(float *)(gHeroState + 0x88) > 0.0f &&
+        (*(float *)(gHeroState + 0x118) < 0.0f || *(s32 *)(gHeroState + 0x2294) == 0x7B)) {
+        if (gCurrentMapIndex == 13)
+            EnterHeroState_L08(0x74, 1);
         else
-            func_L08_002D2ED8(0x78, 1);
+            EnterHeroState_L08(0x78, 1);
     }
 }

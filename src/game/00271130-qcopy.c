@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -14,34 +15,34 @@ extern float func_002A7C00(float, float, float);
 
 /* Advances the two blend weights of a transition and refreshes its eased
    position; returns 1 when both are already complete. */
-int func_00271130(char *a0, char *a1)
+int func_00271130(char *target, char *blend)
 {
-    float *w = (float *)a1;
-    float t, e;
+    float *weights = (float *)blend;
+    float posEase, rotEase;
     float x, y, z;
-    struct { TI128 vec; TI128 mat[4]; } f;
+    struct { TI128 vec; TI128 mat[4]; } scratch;
 
-    if (w[3] == 1.0f && w[0] == 1.0f)
+    if (weights[3] == 1.0f && weights[0] == 1.0f)
         return 1;
-    t = func_002A7C00(0.0f, 1.0f, w[3]);
-    func_00282CC0(a1 + 0x30, D_00189F70, a1 + 0x30);
-    x = *(float *)(a1 + 0x30);
-    y = *(float *)(a1 + 0x34);
-    z = *(float *)(a1 + 0x38);
-    *(float *)(a1 + 0x40) = x + (*(float *)(a0 + 0x30) - x) * t;
-    *(float *)(a1 + 0x44) = y + (*(float *)(a0 + 0x34) - y) * t;
-    *(float *)(a1 + 0x48) = z + (*(float *)(a0 + 0x38) - z) * t;
-    *(TI128 *)D_001B5340 = *(TI128 *)(a1 + 0x40);
-    func_002AB600(&f.vec, a0);
-    e = func_002A7C00(0.0f, 1.0f, w[0]);
-    func_00283810(a1 + 0x50, a1 + 0x20, &f.vec, e);
-    func_002839D0(a1 + 0x50, f.mat);
-    func_00283678(D_001B5340 + 0x230, f.mat);
-    w[3] = w[3] + w[4];
-    if (w[3] > 1.0f)
-        w[3] = 1.0f;
-    w[0] = w[0] + w[1];
-    if (w[0] > 1.0f)
-        w[0] = 1.0f;
+    posEase = CosineBlend(0.0f, 1.0f, weights[3]);
+    FastVecAdd(blend + 0x30, D_00189F70, blend + 0x30);
+    x = *(float *)(blend + 0x30);
+    y = *(float *)(blend + 0x34);
+    z = *(float *)(blend + 0x38);
+    *(float *)(blend + 0x40) = x + (*(float *)(target + 0x30) - x) * posEase;
+    *(float *)(blend + 0x44) = y + (*(float *)(target + 0x34) - y) * posEase;
+    *(float *)(blend + 0x48) = z + (*(float *)(target + 0x38) - z) * posEase;
+    *(TI128 *)gCameraState_001B5340 = *(TI128 *)(blend + 0x40);
+    TransformMatrixViaCopy(&scratch.vec, target);
+    rotEase = CosineBlend(0.0f, 1.0f, weights[0]);
+    FastVectorNormalize3(blend + 0x50, blend + 0x20, &scratch.vec, rotEase);
+    RotationToMatrix(blend + 0x50, scratch.mat);
+    copy_matrix3x4(gCameraState_001B5340 + 0x230, scratch.mat);
+    weights[3] = weights[3] + weights[4];
+    if (weights[3] > 1.0f)
+        weights[3] = 1.0f;
+    weights[0] = weights[0] + weights[1];
+    if (weights[0] > 1.0f)
+        weights[0] = 1.0f;
     return 0;
 }

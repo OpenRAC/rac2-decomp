@@ -39,61 +39,61 @@ void func_L00_00425560(char *cam)
     settings = target + 0x60;
     state = target + 0x20;
     if (*(unsigned char *)(settings + 0xC4) == 0xB) {
-        func_00282CF0(cam, D_00189F00, cam + 0x30);
+        FastVecSub(cam, D_00189F00, cam + 0x30);
         right = cam + 0x10;
-        func_00282F20(cam, cam, 1.0f);
+        vec_scale_to_length(cam, cam, 1.0f);
         up = cam + 0x20;
-        func_00282978(state);
+        FastDecTimer(state);
     } else {
-        g = func_00282DB0(target + 0xA0, view + 0x20);
-        func_00282D30(v0, view + 0x20, g);
-        func_00282CF0(v1, target + 0xA0, v0);
+        g = FastVecDot(target + 0xA0, view + 0x20);
+        FastVecScale(v0, view + 0x20, g);
+        FastVecSub(v1, target + 0xA0, v0);
         owner = *(char **)(cam + 0x70);
         motion = owner + 0x160;
-        g = func_00282DB0(cam + 0x30, view + 0x20);
-        func_00282D30(v0, view + 0x20, g);
-        func_00282CF0(v2, cam + 0x30, v0);
-        func_00282CF0(v3, v1, v2);
+        g = FastVecDot(cam + 0x30, view + 0x20);
+        FastVecScale(v0, view + 0x20, g);
+        FastVecSub(v2, cam + 0x30, v0);
+        FastVecSub(v3, v1, v2);
         if (F(state, 0x28) != 0.0f) {
-            func_002ACEC0(v3, v3, view + 0x20, F(state, 0x28));
+            ApplyAxisRotationToQuaternion(v3, v3, view + 0x20, F(state, 0x28));
         }
-        r0 = func_00282DF0(v3);
+        r0 = FastVecLength(v3);
         if (0.05f <= r0) {
-            func_00282D30(cam, v3, 1.0f / r0);
+            FastVecScale(cam, v3, 1.0f / r0);
         } else {
-            g = func_00282DB0(cam, view + 0x20);
-            func_00282D30(v4, view + 0x20, g);
-            func_00282CF0(cam, cam, v4);
+            g = FastVecDot(cam, view + 0x20);
+            FastVecScale(v4, view + 0x20, g);
+            FastVecSub(cam, cam, v4);
         }
         w = cam + 0x10;
-        func_00282DD8(w, cam, view + 0x20);
-        func_00282F20(w, w, 1.0f);
+        FastVecCross(w, cam, view + 0x20);
+        vec_scale_to_length(w, w, 1.0f);
         right = w;
         t = 0.0f;
-        F(state, 0x8) = func_002702C8(state + 0x10, F(state, 0x8), F(motion, 0x30), 0.004f, 0.2f, 0.0f);
+        F(state, 0x8) = StepSpringDamperClamped(state + 0x10, F(state, 0x8), F(motion, 0x30), 0.004f, 0.2f, 0.0f);
         up = cam + 0x20;
-        g2 = func_002702C8(state + 0xC, F(state, 0x4), F(settings, 0xB0), 0.004f, 0.2f, 0.0f);
+        g2 = StepSpringDamperClamped(state + 0xC, F(state, 0x4), F(settings, 0xB0), 0.004f, 0.2f, 0.0f);
         d = F(state, 0x8) - g2;
         F(state, 0x4) = g2;
-        func_00282D30(v0, view + 0x20, -func_00282DB0(motion + 0x10, view + 0x20));
-        func_00282CF0(v0, v0, v3);
+        FastVecScale(v0, view + 0x20, -FastVecDot(motion + 0x10, view + 0x20));
+        FastVecSub(v0, v0, v3);
         w = (char *)v4;
-        func_00282CF0(w, cam + 0x30, v0);
-        func_00282D30(v0, view + 0x20, -d);
-        func_00282CF0(w, w, v0);
-        func_00282CF0(v3, w, cam + 0x30);
-        r = func_00282DF0(v3);
+        FastVecSub(w, cam + 0x30, v0);
+        FastVecScale(v0, view + 0x20, -d);
+        FastVecSub(w, w, v0);
+        FastVecSub(v3, w, cam + 0x30);
+        r = FastVecLength(v3);
         if (r != 0.0f) {
-            e = func_00282DB0(cam, v3);
-            e = 1.5707964f - func_002831B0(e / r);
-            func_00282DD8(up, right, cam);
-            if (func_00282DB0(up, v3) < 0.0f) {
+            e = FastVecDot(cam, v3);
+            e = 1.5707964f - FastAngleHelper(e / r);
+            FastVecCross(up, right, cam);
+            if (FastVecDot(up, v3) < 0.0f) {
                 e = -e;
             }
-            g3 = func_00282DB0(motion, view + 0x20);
-            l = func_00282DF0(motion);
+            g3 = FastVecDot(motion, view + 0x20);
+            l = FastVecLength(motion);
             if (D_0018A160) {
-                x = func_00283248(l, g3) / D_L00_001B14C4;
+                x = FastMatrixHelperA(l, g3) / D_L00_001B14C4;
                 if (x < -0.1f) {
                     x = -x;
                     if (0.5f < x) {
@@ -103,25 +103,25 @@ void func_L00_00425560(char *cam)
                     t = x * 0.2617994248867035f;
                 }
             }
-            h = func_002703B0(state + 0x18, F(state, 0x14), t, F(state, 0x1C), F(state, 0x20), 0.0f);
+            h = StepSpringDamperStored(state + 0x18, F(state, 0x14), t, F(state, 0x1C), F(state, 0x20), 0.0f);
             F(state, 0x14) = h;
-            e = func_00283BE0(e, h);
+            e = fast_subtract_rotations(e, h);
             if (1.2217305898666382f < e) {
                 e = 1.2217305898666382f;
             } else if (e < -1.2217305898666382f) {
                 e = -1.2217305898666382f;
             }
-            func_002ACEC0(cam, cam, right, e);
-            func_00282F20(cam, cam, 1.0f);
+            ApplyAxisRotationToQuaternion(cam, cam, right, e);
+            vec_scale_to_length(cam, cam, 1.0f);
         }
     }
     if (*(short *)state != 0) {
-        func_00282978(state);
-        x = func_00283CE0(*(short *)state);
-        func_00282D08(cam, cam, cam + 0x40, x * F(state, 0x24));
-        func_00282F20(cam, cam, 1.0f);
+        FastDecTimer(state);
+        x = IntToFloat(*(short *)state);
+        lerp_vector(cam, cam, cam + 0x40, x * F(state, 0x24));
+        vec_scale_to_length(cam, cam, 1.0f);
     }
-    func_00282DD8(right, cam, view + 0x20);
-    func_00282F20(right, right, 1.0f);
-    func_00282DD8(up, right, cam);
+    FastVecCross(right, cam, view + 0x20);
+    vec_scale_to_length(right, right, 1.0f);
+    FastVecCross(up, right, cam);
 }

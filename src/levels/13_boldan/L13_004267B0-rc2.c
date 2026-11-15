@@ -28,12 +28,13 @@ extern s32 ref_L13_004267B0_00;
 extern u8 D_0019B2E8[];
 extern void ref_L13_004267B0_01();
 
-void func_L13_004267B0(s8 *arg0) {
-    s32 *temp_a1;
+/* If this object's switch is set for the current level, it runs two setup steps for the object. */
+void func_L13_004267B0(s8 *moby) {
+    s32 *vars;
 
-    temp_a1 = (*(s32 **)((s8 *)(arg0) + (0x68)));
-    if (D_0019B2E8[(*(u8 *)((s8 *)(arg0) + (0xB0))) + (D_001A79F0 << 4)] & 0x80) {
-        ref_L13_004267B0_01(ref_L13_004267B0_00 + (*temp_a1 << 8), temp_a1);
-        ref_L13_004267B0_01(arg0);
+    vars = (*(s32 **)((s8 *)(moby) + (0x68)));
+    if (D_0019B2E8[(*(u8 *)((s8 *)(moby) + (0xB0))) + (gCurrentMapIndex << 4)] & 0x80) {
+        ref_L13_004267B0_01(ref_L13_004267B0_00 + (*vars << 8), vars);
+        ref_L13_004267B0_01(moby);
     }
 }

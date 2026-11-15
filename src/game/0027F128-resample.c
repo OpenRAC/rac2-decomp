@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef struct {
@@ -19,7 +20,7 @@ extern u8 D_001A7BB1 __attribute__((sda));
 
 /* Rebuilds the 16-strip resample packet of RAC1's framebuf.c, squeezing the height by
    115/160 unless flagged. The four-term OR is split because fold rebalances a chain of four. */
-void func_00284088(int a, int b)
+void func_00284088(int useGivenFlag, int fullHeight)
 {
     unsigned long *q;
     int height;
@@ -35,14 +36,14 @@ void func_00284088(int a, int b)
     q[7] = 6;
     q[8] = 0x4400000000008010UL;
     q[9] = 0x5353;
-    if (!a) b = D_001A7BB1 != 0;
-    if (b) height = D_001A742C[0]->storage_height;
+    if (!useGivenFlag) fullHeight = D_001A7BB1 != 0;
+    if (fullHeight) height = D_001A742C[0]->storage_height;
     else height = D_001A742C[0]->storage_height * 115 / 160;
     {
         unsigned long *p = q + 10;
         int i;
         for (i = 0; i < 16; i++) {
-            if (D_001A7BB8) {
+            if (gWidescreenFlag) {
                 *p++ = i * D_001A742C[0]->display_width;
                 *p++ = (i * 640 + 0x6BF8) | ((long)(0x7FF8 - height * 8) << 16);
                 *p++ = (i + 1) * D_001A742C[0]->display_width | 0x1A000000;

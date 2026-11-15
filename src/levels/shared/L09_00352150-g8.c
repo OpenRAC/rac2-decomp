@@ -12,6 +12,7 @@ extern InitEntry12 D_L09_0021DB30[];
 extern int * volatile D_L09_001AA7F0 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L09_001C9FE0;
 
+/* Fills the menu entry list from the saved item table and picks the entry that is currently selected. */
 int func_L09_00352150(char *obj) {
     int i, entry;
     int *list;

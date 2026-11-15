@@ -2,6 +2,7 @@
 
 extern int ref_L00_002A3B80_00;
 
+/* Returns a stored level setting value. */
 int func_L00_002A3B80(void)
 {
     return ref_L00_002A3B80_00;
@@ -77,6 +78,7 @@ extern void func_L00_002D5EB8(void);
 extern int func_002A7820(int, int);
 
 
+/* Sets up the hero at level start: clears its state, finds the hero object and resets its aim, health and timers. */
 void func_L00_002A4928(void)
 {
     int saved[7];
@@ -85,67 +87,67 @@ void func_L00_002A4928(void)
     int i;
 
     for (i = 0; i < 7; i++)
-        saved[i] = ((HeroState *)D_00189E20)->i[0x1248 / 4 + i * 0x14];
-    func_00282A60(D_00189E20, 0, 0x2540);
+        saved[i] = ((HeroState *)gHeroState)->i[0x1248 / 4 + i * 0x14];
+    ClearMemory(gHeroState, 0, 0x2540);
     for (i = 0; i < 7; i++)
-        saved[i] = ((HeroState *)D_00189E20)->i[0x1248 / 4 + i * 0x14];
+        saved[i] = ((HeroState *)gHeroState)->i[0x1248 / 4 + i * 0x14];
 
     for (i = 0; &D_L00_001B1E9C[0][i] < D_L00_001B1EA0[0]; i++) {
         actor = &D_L00_001B1E9C[0][i];
         if (actor->oclass == 0) {
-            (((HeroState *)D_00189E20)->m[0x2290 / 4]) = actor;
-            func_002833F0(&actor->basis, &actor->axis);
-            func_00282F20(&far, &(((HeroState *)D_00189E20)->m[0x2290 / 4])->fwd, -3.0f);
-            func_00282F20(&near, &(((HeroState *)D_00189E20)->m[0x2290 / 4])->fwd, 1.0f);
-            func_00282CC0(&near, &near, &((HeroState *)D_00189E20)->q[8]);
-            func_00282CC0(&far, &far, &((HeroState *)D_00189E20)->q[8]);
-            if (func_002761F8(&near, &far, 2, (((HeroState *)D_00189E20)->m[0x2290 / 4]), 0) != 0)
-                qcopy(&((HeroState *)D_00189E20)->q[8], &D_L00_001BF220);
-            (((HeroState *)D_00189E20)->m[0x2290 / 4])->flags |= 2;
-            ((HeroState *)D_00189E20)->m[0xC18 / 4] = (((HeroState *)D_00189E20)->m[0x2290 / 4]);
-            ((HeroState *)D_00189E20)->f[0x98 / 4] = (((HeroState *)D_00189E20)->m[0x2290 / 4])->axis.f[2];
-            qcopy(&((HeroState *)D_00189E20)->q[8], &(((HeroState *)D_00189E20)->m[0x2290 / 4])->pos);
-            func_L00_002B4900();
-            func_L00_002A9460();
-            func_L00_002D23C0(0, 0);
-            qcopy(&((Placement *)D_00152C70)->pos, &((HeroState *)D_00189E20)->q[8]);
-            qcopy(&((Placement *)D_00152C70)->rot, &((HeroState *)D_00189E20)->q[9]);
+            (((HeroState *)gHeroState)->m[0x2290 / 4]) = actor;
+            euler_rotation_basis(&actor->basis, &actor->axis);
+            vec_scale_to_length(&far, &(((HeroState *)gHeroState)->m[0x2290 / 4])->fwd, -3.0f);
+            vec_scale_to_length(&near, &(((HeroState *)gHeroState)->m[0x2290 / 4])->fwd, 1.0f);
+            FastVecAdd(&near, &near, &((HeroState *)gHeroState)->q[8]);
+            FastVecAdd(&far, &far, &((HeroState *)gHeroState)->q[8]);
+            if (CollLine(&near, &far, 2, (((HeroState *)gHeroState)->m[0x2290 / 4]), 0) != 0)
+                qcopy(&((HeroState *)gHeroState)->q[8], &D_L00_001BF220);
+            (((HeroState *)gHeroState)->m[0x2290 / 4])->flags |= 2;
+            ((HeroState *)gHeroState)->m[0xC18 / 4] = (((HeroState *)gHeroState)->m[0x2290 / 4]);
+            ((HeroState *)gHeroState)->f[0x98 / 4] = (((HeroState *)gHeroState)->m[0x2290 / 4])->axis.f[2];
+            qcopy(&((HeroState *)gHeroState)->q[8], &(((HeroState *)gHeroState)->m[0x2290 / 4])->pos);
+            UpdateHeroGroundContact_L00();
+            update_hero_moby();
+            StartObjectAnimationAtFrame(0, 0);
+            qcopy(&((Placement *)D_00152C70)->pos, &((HeroState *)gHeroState)->q[8]);
+            qcopy(&((Placement *)D_00152C70)->rot, &((HeroState *)gHeroState)->q[9]);
             break;
         }
     }
     if (D_001A79F0_1[0] == 1 || D_001A79F0_1[0] == 8)
-        (((HeroState *)D_00189E20)->m[0x2290 / 4])->b7E |= 1;
-    (((HeroState *)D_00189E20)->m[0x2290 / 4])->b62 = 0xFF;
+        (((HeroState *)gHeroState)->m[0x2290 / 4])->b7E |= 1;
+    (((HeroState *)gHeroState)->m[0x2290 / 4])->b62 = 0xFF;
     if (D_001A7398[0] == 0)
         D_001A7398[0] = 30;
 
     for (i = 0; i < 40; i++) {
         D_L00_0025BE10[i].attached = 0;
-        func_00282C88(&D_L00_0025BE10[i].rot_target);
-        func_00282C88(&D_L00_0025BE10[i].rot);
-        func_00282C88(&D_L00_0025BE10[i].rot_vel);
-        func_00282C88(&D_L00_0025BE10[i].pos_target);
-        func_00282C88(&D_L00_0025BE10[i].pos);
-        func_00282C88(&D_L00_0025BE10[i].pos_vel);
+        ClearVector128(&D_L00_0025BE10[i].rot_target);
+        ClearVector128(&D_L00_0025BE10[i].rot);
+        ClearVector128(&D_L00_0025BE10[i].rot_vel);
+        ClearVector128(&D_L00_0025BE10[i].pos_target);
+        ClearVector128(&D_L00_0025BE10[i].pos);
+        ClearVector128(&D_L00_0025BE10[i].pos_vel);
     }
     for (i = 0; i < 9; i++)
-        ((HeroState *)D_00189E20)->i[0x242C / 4 + i] = -1;
-    ((HeroState *)D_00189E20)->f[0x24A4 / 4] = 2.125f;
-    ((HeroState *)D_00189E20)->f[0x24A8 / 4] = 1.25f;
+        ((HeroState *)gHeroState)->i[0x242C / 4 + i] = -1;
+    ((HeroState *)gHeroState)->f[0x24A4 / 4] = 2.125f;
+    ((HeroState *)gHeroState)->f[0x24A8 / 4] = 1.25f;
     if (D_001A7A00[0] == 0)
-        func_L00_002D5EB8();
-    ((HeroState *)D_00189E20)->i[0x24D0 / 4] = 4;
-    ((HeroState *)D_00189E20)->i[0x24CC / 4] = D_001A7A00[0];
-    ((HeroState *)D_00189E20)->h[0x24D4 / 2] = ((HeroState *)D_00189E20)->h[0x24CC / 2];
-    ((HeroState *)D_00189E20)->i[0x11A0 / 4] = func_002A7820(180, 300);
-    ((HeroState *)D_00189E20)->f[0x11A4 / 4] = 0.007f;
-    ((HeroState *)D_00189E20)->f[0x11A8 / 4] = 0.3f;
-    ((HeroState *)D_00189E20)->f[0xEB0 / 4] = 0.97f;
+        UpdateCollectionProgress();
+    ((HeroState *)gHeroState)->i[0x24D0 / 4] = 4;
+    ((HeroState *)gHeroState)->i[0x24CC / 4] = D_001A7A00[0];
+    ((HeroState *)gHeroState)->h[0x24D4 / 2] = ((HeroState *)gHeroState)->h[0x24CC / 2];
+    ((HeroState *)gHeroState)->i[0x11A0 / 4] = RandomIntRange(180, 300);
+    ((HeroState *)gHeroState)->f[0x11A4 / 4] = 0.007f;
+    ((HeroState *)gHeroState)->f[0x11A8 / 4] = 0.3f;
+    ((HeroState *)gHeroState)->f[0xEB0 / 4] = 0.97f;
     if (D_L00_001A8FF0[0] != 0)
-        qcopy(&((HeroState *)D_00189E20)->q[0xB0 / 16], D_L00_001B1B10);
-    ((HeroState *)D_00189E20)->i[0x18D4 / 4] = 0;
+        qcopy(&((HeroState *)gHeroState)->q[0xB0 / 16], D_L00_001B1B10);
+    ((HeroState *)gHeroState)->i[0x18D4 / 4] = 0;
     if (D_001A7AFA[0] == 0)
-        ((HeroState *)D_00189E20)->h[0x24FC / 2] = 1;
+        ((HeroState *)gHeroState)->h[0x24FC / 2] = 1;
 }
 
 extern char D_00189E20[];
@@ -156,22 +158,23 @@ extern void func_L00_003B09F8(void);
 /* Incomplete sda array: retail clears this word as `lui $at; sw` (compiler-notes.md). */
 extern int D_001A73A0[] __attribute__((sda));
 
+/* Sets the hero's starting aim, speed and camera values when a level begins. */
 void func_L00_002A4D18(void)
 {
-    char *base = D_00189E20;
+    char *base = gHeroState;
 
     *(float *)(base + 0x264) = 0.45f;
     *(float *)(base + 0x250) = 0.8f;
     *(float *)(base + 0x254) = 0.7f;
     *(float *)(base + 0x258) = 0.8f;
     *(float *)(base + 0x25C) = 0.7f;
-    *(unsigned char *)(base + 0x24F0) = D_001A79F0 == 0x1A;
+    *(unsigned char *)(base + 0x24F0) = gCurrentMapIndex == 0x1A;
     D_001A73A0[0] = 0;
     *(int *)(base + 0x2294) = 0;
     *(float *)(base + 0xC24) = 1.0f;
-    func_L00_002D24B8();
-    func_L00_002C42E0(0, 1);
-    func_L00_003B09F8();
+    ClearHeroQueuedAnimation();
+    SetHeroAction_L00(0, 1);
+    ResetTrailSlots();
 }
 
 extern void func_002A1130(void *a0, int a1, int a2, int a3);
@@ -183,18 +186,18 @@ extern void func_0011AEA0(int a0);
 /* walks one loaded entry of an owner's list and hands it to the vector routine when the
    tag bits are set, else to the count-driven copy, then polls and returns the caller's
    handle */
-int func_L00_002A4DB0(char *a0, int a1, int a2, int a3)
+int func_L00_002A4DB0(char *source, int rowIndex, int entryIndex, int dest)
 {
-    char *owner = *(char **)(a0 + 0x24);
+    char *owner = *(char **)(source + 0x24);
     char **rows = (char **)(owner + 0x48);
-    char *row = rows[a1];
+    char *row = rows[rowIndex];
     int *words = (int *)(row + 0x1C);
-    int entry = words[a2];
+    int entry = words[entryIndex];
 
     if (entry & 0xF0000000)
-        func_002A1130(row + 0x1C + (*(unsigned char *)(row + 0x10) << 2) - -(*(unsigned char *)(row + 0x13) << 2), entry, a3, *(unsigned char *)(owner + 8));
+        func_002A1130(row + 0x1C + (*(unsigned char *)(row + 0x10) << 2) - -(*(unsigned char *)(row + 0x13) << 2), entry, dest, *(unsigned char *)(owner + 8));
     else
-        func_00282B50(a3, entry, (*(short *)(entry + 6) + 1) << 4);
-    func_0011AEA0(0);
-    return a3;
+        FastMemoryHelperC(dest, entry, (*(short *)(entry + 6) + 1) << 4);
+    FlushCache(0);
+    return dest;
 }

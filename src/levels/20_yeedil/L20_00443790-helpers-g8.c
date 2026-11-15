@@ -18,37 +18,38 @@ extern float func_L00_0031CDD0(char *, char *, float *, float, float);
 extern int func_00283CF0(float);
 extern void func_L20_00443908(char *);
 
-char *func_L20_00443790(char *arg0, int arg1, char *arg2) {
-    char *obj = (char *)func_0029EFD0(arg1);
+/* Creates an object of the given class at the owner and throws it in an arc toward the target. Returns the new object. */
+char *func_L20_00443790(char *owner, int classId, char *aimTarget) {
+    char *obj = (char *)CreateMoby(classId);
     char *state;
-    char *p;
-    float f20;
-    float f21;
-    float local;
+    char *velocity;
+    float speed;
+    float acceleration;
+    float flightTime;
     unsigned short flags;
 
     if (obj != 0) {
-        func_002B37E8(obj, arg0);
-        qcopy(obj + 0xF0, arg0 + 0xF0);
-        func_002833F0(obj + 0xC0, obj + 0xF0);
+        InitChildObjectFromParent(obj, owner);
+        qcopy(obj + 0xF0, owner + 0xF0);
+        euler_rotation_basis(obj + 0xC0, obj + 0xF0);
         flags = *(unsigned short *)(obj + 0x34);
         flags |= 0x100;
         flags &= 0xEFDF;
         state = *(char **)(obj + 0x68);
-        f20 = D_L20_001B2168 * 0.0166666675f;
-        f21 = D_L20_001B216C * 0.000277777785f;
-        p = state + 0x10;
+        speed = D_L20_001B2168 * 0.0166666675f;
+        acceleration = D_L20_001B216C * 0.000277777785f;
+        velocity = state + 0x10;
         *(unsigned short *)(obj + 0x34) = flags;
-        local = 0.0f;
-        func_00282CF0(state, arg2, obj + 0x10);
+        flightTime = 0.0f;
+        FastVecSub(state, aimTarget, obj + 0x10);
         *(float *)(state + 8) = 0.0f;
-        func_00282F20(state, state, f20);
-        func_00282DD8(p, state, obj + 0xE0);
-        func_002ACE78((float *)p, (float *)p, func_00283198(D_L20_001B2170 * 0.000290888245f));
-        *(float *)(state + 8) = func_L00_0031CDD0(obj + 0x10, arg2, &local, f20, -f21);
-        *(float *)(state + 0x20) = f21;
-        *(int *)(state + 0x24) = func_00283CF0(local);
-        *(void (**)(char *))(obj + 0x64) = func_L20_00443908;
+        vec_scale_to_length(state, state, speed);
+        FastVecCross(velocity, state, obj + 0xE0);
+        SetDirectionWithComplement((float *)velocity, (float *)velocity, FastSinOrCosB(D_L20_001B2170 * 0.000290888245f));
+        *(float *)(state + 8) = ComputeShotLaunchSpeed(obj + 0x10, aimTarget, &flightTime, speed, -acceleration);
+        *(float *)(state + 0x20) = acceleration;
+        *(int *)(state + 0x24) = FloatToInt(flightTime);
+        *(void (**)(char *))(obj + 0x64) = UpdateTumblingDebrisMoby;
     }
     return obj;
 }

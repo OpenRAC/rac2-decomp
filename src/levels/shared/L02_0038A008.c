@@ -14,6 +14,7 @@ extern void func_002A7750(void *, int, int);
 extern void func_002E5E58(int, int, int);
 extern void func_002B0A18(int, int);
 
+/* Update for the moby class 4815 trigger. It counts certain enemies in the level, then fires a one-time event when the count drops low enough. */
 void func_L02_0038A008(unsigned char *object) {
     int state = object[0x20];
     switch (state) {
@@ -21,46 +22,46 @@ void func_L02_0038A008(unsigned char *object) {
         break;
     case 0:
         object[0x30] = 0xFF;
-        if (D_001A79F0[0] == 2) {
+        if (gCurrentMapIndex[0] == 2) {
             char *entry;
             int kind;
             for (entry = D_L02_001B35A8[0]; entry; entry = *(char **)(entry + 0x28)) {
                 kind = *(short *)(entry + 0xAA);
-                if ((kind == 0xA9C || kind == 0xD0D || kind == 0xAA4 || kind == 0xE93 || kind == 0x1259) && *(float *)(entry + 0x18) < 400.0f)
-                    ++D_L02_001AEC78;
+                if ((kind == 0xA9C /* Slot Machine */ || kind == 0xD0D /* moby class 3341 */ || kind == 0xAA4 /* moby class 2724 */ || kind == 0xE93 /* moby class 3731 */ || kind == 0x1259 /* moby class 4697 */) && *(float *)(entry + 0x18) < 400.0f)
+                    ++gHoveringObjectCount;
             }
-        } else if (D_001A79F0[0] == 3) {
+        } else if (gCurrentMapIndex[0] == 3) {
             char *entry;
             int kind;
-            int n;
+            int remaining;
             entry = D_L02_001B35A8[0];
             if (entry) {
-                n = D_L02_001AEC78;
+                remaining = gHoveringObjectCount;
                 do {
                     kind = *(unsigned short *)(entry + 0xAA);
-                    if ((unsigned)(kind - 0xF37) < 2 || (short)kind == 0xF3E)
-                        ++n;
+                    if ((unsigned)(kind - 0xF37 /* moby class 3895 */) < 2 || (short)kind == 0xF3E /* moby class 3902 */)
+                        ++remaining;
                     entry = *(char **)(entry + 0x28);
                 } while (entry);
-                D_L02_001AEC78 = n;
+                gHoveringObjectCount = remaining;
             }
         }
-        func_002A7750(object, 1, -1);
+        SetMobyState(object, 1, -1);
         break;
     case 1:
-        if (D_001A79F0[0] == 2) {
-            if (D_L02_001B30C8[0] == 2) D_L02_001AEC78 = 0x71;
-            if (D_L02_001AEC78 >= 11 || D_001A7A6E) return;
+        if (gCurrentMapIndex[0] == 2) {
+            if (gFrameCounter_L02[0] == 2) gHoveringObjectCount = 0x71;
+            if (gHoveringObjectCount >= 11 || D_001A7A6E) return;
             D_001A7A6E = state;
-            func_002E5E58(1, 0, 0);
-            func_002B0A18(0x1233, -1);
+            PlaySoundFromGlobalBank(1, 0, 0);
+            SetEntryValueByIndex(0x1233, -1);
             D_L02_001A903C = state;
-        } else if (D_001A79F0[0] == 3) {
-            if (D_L02_001B30C8[0] == 2) D_L02_001AEC78 = 0x70;
-            if (D_L02_001AEC78 >= 12 || D_001A7A75) return;
+        } else if (gCurrentMapIndex[0] == 3) {
+            if (gFrameCounter_L02[0] == 2) gHoveringObjectCount = 0x70;
+            if (gHoveringObjectCount >= 12 || D_001A7A75) return;
             D_001A7A75 = state;
-            func_002E5E58(1, 0, 0);
-            func_002B0A18(0x1233, -1);
+            PlaySoundFromGlobalBank(1, 0, 0);
+            SetEntryValueByIndex(0x1233, -1);
             D_L02_001A903C = state;
         }
         break;

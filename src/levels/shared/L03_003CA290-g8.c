@@ -23,38 +23,39 @@ extern void func_00282CC0(void *, void *, void *);
 extern void func_L00_003263D0(void *, void *, float, float, float, float, int, int, void *, int, int);
 extern void func_002B0A68(void *, int, void *, int, float, float, float, float);
 extern int func_002E5CF8(int, int, void *);
-void func_L03_003CA290(u8 *m) {
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    switch (m[0x20]) {
+/* Updates a breakable object (moby class 2418). It waits to be hit, then bursts into effects and sound and switches to its broken state. */
+void func_L03_003CA290(u8 *moby) {
+    float burstPos[4] __attribute__((aligned(16)));
+    float burstVel[4] __attribute__((aligned(16)));
+    switch (moby[0x20]) {
     case 0:
-        if ((int)m < (int)D_L03_001B2A20[0]) {
-            *(int *)(m+0x9c) = 15;
-            func_002A7750(m, 3, -1);
+        if ((int)moby < (int)D_L03_001B2A20[0]) {
+            *(int *)(moby+0x9c) = 15;
+            SetMobyState(moby, 3, -1);
         } else {
-            *(unsigned short *)(m+0x7c) = D_L03_001B0300;
-            func_002A7750(m, 1, -1);
+            *(unsigned short *)(moby+0x7c) = D_L03_001B0300;
+            SetMobyState(moby, 1, -1);
         }
         break;
     case 1:
-        if (m[0x31]) {
-            func_L00_002E6CF0(func_L03_003CA4B0, m);
-            *(int *)(m+0x78) = func_00283D38(D_L03_001B02F8, D_L03_001B02FC[0],
-                (func_00283198((D_L03_001B2548[0] % 150) * 0.04188786819577217f - 3.14159f) + 1.0f) * 0.5f);
+        if (moby[0x31]) {
+            AddDrawCallbackToList1(DrawGadgebotSpawnContainer, moby);
+            *(int *)(moby+0x78) = FastTweenColor(D_L03_001B02F8, D_L03_001B02FC[0],
+                (FastSinOrCosB((gFrameCounter_L03[0] % 150) * 0.04188786819577217f - 3.14159f) + 1.0f) * 0.5f);
         }
-        if (func_002A9640(m, 0x10000, 0)) {
-            *(quadword *)a = 0; *(quadword *)b = 0;
-            b[2] = 0.050000004f;
-            a[2] = 0.5f;
-            func_00282CC0(a, a, m+0x10);
-            func_L00_003263D0(m,a,0.333000004f,3.0f,0.5f,1.0f,5,1,b,0x504040c0,0);
-            func_002B0A68(m,D_L03_001B0308,D_L03_001A8F20,255,D_L03_001B030C,D_L03_001B0310,D_L03_001B0314,D_L03_001B0318);
-            func_002E5CF8(0,0,m);
-            *(unsigned short *)(m+0x7c) = D_L03_001B0304;
-            func_L00_003294F0(m,1);
-            *(int *)(m+0x9c) = 15;
-            *(unsigned short *)(m+0x34) |= 2;
-            func_002A7750(m,2,-1);
+        if (FindOwnedEffectSlot(moby, 0x10000, 0)) {
+            *(quadword *)burstPos = 0; *(quadword *)burstVel = 0;
+            burstVel[2] = 0.050000004f;
+            burstPos[2] = 0.5f;
+            FastVecAdd(burstPos, burstPos, moby+0x10);
+            SpawnTintedEffects(moby,burstPos,0.333000004f,3.0f,0.5f,1.0f,5,1,burstVel,0x504040c0,0);
+            SpawnDebrisForMaskedParts(moby,D_L03_001B0308,D_L03_001A8F20,255,D_L03_001B030C,D_L03_001B0310,D_L03_001B0314,D_L03_001B0318);
+            PlayMobySound(0,0,moby);
+            *(unsigned short *)(moby+0x7c) = D_L03_001B0304;
+            SetObjectFlagBit(moby,1);
+            *(int *)(moby+0x9c) = 15;
+            *(unsigned short *)(moby+0x34) |= 2;
+            SetMobyState(moby,2,-1);
         }
         break;
     }

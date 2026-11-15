@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_003D6570 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give retail's grouped `lq`/`sq`
@@ -22,29 +23,30 @@ extern void func_00282F20(void *, void *, float);
 extern float func_00282DB0(void *, void *);
 extern void func_L00_00325AE8(void *, int, float, float);
 
-void func_L02_003D6570(char *arg0, int arg1) {
-    float a[4];
-    float b[4];
-    float c[16];
-    float d[4];
-    float e[4];
-    float f[4];
-    float len;
+/* Draws one glow flare at a joint, fading it out when the joint faces away from the camera. */
+void func_L02_003D6570(char *self, int joint) {
+    float origin[4];
+    float originCopy[4];
+    float matrix[16];
+    float offset[4];
+    float toCamera[4];
+    float facing[4];
+    float facingDot;
     unsigned int color;
 
-    func_0029FCC0(arg0, arg1, a);
-    *(TI128 *)b = *(TI128 *)a;
-    func_0029FC20(arg0, arg1, c);
-    func_002830C0(d, &D_L02_001B0320, c);
-    func_00282CC0(a, a, d);
-    func_00282CF0(e, D_L02_001BA500, a);
-    func_00282F20(e, e, 1.0f);
-    *(TI128 *)f = *(TI128 *)c;
-    len = func_00282DB0(e, f);
-    if (D_L02_001B0334 < len) {
+    TransformMobyJointToWorld(self, joint, origin);
+    *(TI128 *)originCopy = *(TI128 *)origin;
+    TransformMobyJointPoint(self, joint, matrix);
+    transform_vector(offset, &D_L02_001B0320, matrix);
+    FastVecAdd(origin, origin, offset);
+    FastVecSub(toCamera, gCameraPosition_L02, origin);
+    vec_scale_to_length(toCamera, toCamera, 1.0f);
+    *(TI128 *)facing = *(TI128 *)matrix;
+    facingDot = FastVecDot(toCamera, facing);
+    if (D_L02_001B0334 < facingDot) {
         color = D_L02_001B0330;
-        len = len * len;
-        func_L00_00325AE8(a, (color & 0xFFFFFF) | ((int)(len * (float)(int)(color >> 24)) << 24),
+        facingDot = facingDot * facingDot;
+        DrawBillboardQuad_L00(origin, (color & 0xFFFFFF) | ((int)(facingDot * (float)(int)(color >> 24)) << 24),
                           D_L02_001B031C, D_L02_001B0318);
     }
 }

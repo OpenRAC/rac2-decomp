@@ -83,25 +83,26 @@ extern void func_L01_0032EF38(void *, int, int, float, float, int);
 
 extern void func_002A7470();
 
-void func_L01_003BDF28(char *a0)
+/* Picks a random spot near the moby's home position as its next move target. */
+void func_L01_003BDF28(char *moby)
 {
-    char *s2 = a0;
-    char *s0 = *(char **)(s2 + 0x68);
-    char *s1 = s0 + 0x1E0;
-    L01_003BDF28_BUF buf;
+    char *mobyPtr = moby;
+    char *vars = *(char **)(mobyPtr + 0x68);
+    char *targetPos = vars + 0x1E0;
+    L01_003BDF28_BUF offset;
 
-    *(float *)(s0 + 0x1E0) = func_00283180(func_002A7878(-3.1415927f, 3.1415927f)) * (float)*(unsigned char *)(s0 + 0x201);
-    *(float *)(s0 + 0x1E4) = func_00283198(func_002A7878(-3.1415927f, 3.1415927f)) * (float)*(unsigned char *)(s0 + 0x201);
-    *(int *)(s0 + 0x1E8) = 0;
-    func_00282CC0(s1, s1, s0 + 0x1D0);
-    *(float *)(s0 + 0x1E8) = *(float *)(s0 + 0x1E8) + 1.7f;
-    if (*(int *)(s0 + 0x23C) != 0) {
-        func_00282CF0(&buf, s1, D_00189EA0);
-        buf.z = 0;
-        func_00282F20(&buf, &buf, 8.0f);
-        func_00282CC0(s1, s1, &buf);
+    *(float *)(vars + 0x1E0) = FastSinOrCosA(RandomFloatRange(-3.1415927f, 3.1415927f)) * (float)*(unsigned char *)(vars + 0x201);
+    *(float *)(vars + 0x1E4) = FastSinOrCosB(RandomFloatRange(-3.1415927f, 3.1415927f)) * (float)*(unsigned char *)(vars + 0x201);
+    *(int *)(vars + 0x1E8) = 0;
+    FastVecAdd(targetPos, targetPos, vars + 0x1D0);
+    *(float *)(vars + 0x1E8) = *(float *)(vars + 0x1E8) + 1.7f;
+    if (*(int *)(vars + 0x23C) != 0) {
+        FastVecSub(&offset, targetPos, gHeroPosition);
+        offset.z = 0;
+        vec_scale_to_length(&offset, &offset, 8.0f);
+        FastVecAdd(targetPos, targetPos, &offset);
     }
-    func_L01_003BDBE8(s2);
+    ChooseWanderDestination(mobyPtr);
 }
 
 /* func_L01_003BB9D0 is in L01_003BB9D0-ocean-g8.c. */
@@ -117,26 +118,27 @@ void func_L01_003BDF28(char *a0)
 
 
 /* func_L01_003BD410 */
-void func_L01_003BD410(char *object)
+/* Spawns five small splash particles near the water surface under the moby. */
+void func_L01_003BD410(char *moby)
 {
     float position[4];
     float angle, radius, first, second;
     char *state;
     int life, i;
 
-    state = *(char **)(object + 0x68);
+    state = *(char **)(moby + 0x68);
     for (i = 0; i < 5; i++) {
-        angle = func_002A7940();
-        radius = func_002A7878(0.0f, 0.8f);
-        first = func_002A7878(0.0f, 1.5f);
-        second = func_002A7878(1.5f, 5.7f);
-        life = func_002A7820(100, 180);
-        position[0] = func_00283180(angle) * radius;
-        position[1] = func_00283198(angle) * radius;
+        angle = RandomAngle();
+        radius = RandomFloatRange(0.0f, 0.8f);
+        first = RandomFloatRange(0.0f, 1.5f);
+        second = RandomFloatRange(1.5f, 5.7f);
+        life = RandomIntRange(100, 180);
+        position[0] = FastSinOrCosA(angle) * radius;
+        position[1] = FastSinOrCosB(angle) * radius;
         position[2] = 0.0f;
-        func_00282CC0(position, position, object + 0x10);
+        FastVecAdd(position, position, moby + 0x10);
         position[2] = *(float *)(state + 0x224) + 0.025f;
-        func_L01_0032EF38(position, 0x38002028, 0x2020, first, second, life);
+        SpawnGlowParticle_L01(position, 0x38002028, 0x2020, first, second, life);
     }
 }
 
@@ -152,75 +154,78 @@ typedef struct {
 
 extern void func_002A8598(int, int);
 
-void func_L01_003BDB28(char *obj)
+/* Switches on the linked trigger groups of the moby and flags it as triggered. */
+void func_L01_003BDB28(char *moby)
 {
-    L01_003BDB28_STATE *s0 = *(L01_003BDB28_STATE **)(obj + 0x68);
+    L01_003BDB28_STATE *vars = *(L01_003BDB28_STATE **)(moby + 0x68);
 
-    if (*(unsigned char *)(obj + 0x21) != 0xFF) {
-        func_002A8598(*(unsigned char *)(obj + 0x21), 1);
+    if (*(unsigned char *)(moby + 0x21) != 0xFF) {
+        SetByteOnGroupMobys(*(unsigned char *)(moby + 0x21), 1);
     }
-    if (s0->f280 != -1) {
-        func_002A8598(s0->f280, 1);
+    if (vars->f280 != -1) {
+        SetByteOnGroupMobys(vars->f280, 1);
     }
-    if (s0->f284 != -1) {
-        func_002A8598(s0->f280, 1);
+    if (vars->f284 != -1) {
+        SetByteOnGroupMobys(vars->f280, 1);
     }
-    *(unsigned char *)(obj + 0xBC) = 1;
+    *(unsigned char *)(moby + 0xBC) = 1;
 }
 
 /* func_L01_003BDBB0 */
 
-void func_L01_003BDBB0(L01_003BDBB0_OBJ *a0)
+/* Gives back the attack slot the moby was using, so another enemy can attack. */
+void func_L01_003BDBB0(L01_003BDBB0_OBJ *moby)
 {
-    L01_003BDBB0_OWNED *p = a0->f68;
+    L01_003BDBB0_OWNED *vars = moby->f68;
 
-    if (p->f254 != 0) {
-        func_00282948(p->f250);
-        p->f254 = 0;
+    if (vars->f254 != 0) {
+        FastFloatHelperD(vars->f250);
+        vars->f254 = 0;
     }
 }
 
+/* Chooses where the moby should fly next, keeping the spot clear of walls and away from the moby's own position. */
 void func_L01_003BDBE8(void *object)
 {
-    char *obj = object;
-    char *s = *(char **)(obj + 0x68);
+    char *moby = object;
+    char *vars = *(char **)(moby + 0x68);
     int index = -1;
     float offset, coordinate;
 
-    if (*(unsigned char *)(obj + 0x20) < 7) {
-        index = (*(int *)(s + 0x214) != -1) ? *(int *)(s + 0x214) : *(int *)(s + 0x210);
+    if (*(unsigned char *)(moby + 0x20) < 7) {
+        index = (*(int *)(vars + 0x214) != -1) ? *(int *)(vars + 0x214) : *(int *)(vars + 0x210);
     } else {
-        index = *(int *)(s + 0x210);
+        index = *(int *)(vars + 0x210);
     }
-    *(int *)(s + 0xCC) = index;
-    if (!func_L01_003165E8(s + 0x1E0, index, *(int *)(s + 0x218), *(int *)(s + 0x21C), -1)) {
-        if ((func_001163B0() & 1) || *(int *)(s + 0x114) != 1 || *(int *)(s + 0x23C)) {
-            if (func_00282E80(s + 0x1E0, obj + 0x10) < 0.5f || !func_002A77E0(1)) {
-                qcopy(s + 0x1E0, s + 0x1D0);
-                *(float *)(s + 0x1E8) += 1.7f;
+    *(int *)(vars + 0xCC) = index;
+    if (!TestPointAgainstShapes(vars + 0x1E0, index, *(int *)(vars + 0x218), *(int *)(vars + 0x21C), -1)) {
+        if ((Rand() & 1) || *(int *)(vars + 0x114) != 1 || *(int *)(vars + 0x23C)) {
+            if (vec_distance_xy(vars + 0x1E0, moby + 0x10) < 0.5f || !RandomIntBelow(1)) {
+                qcopy(vars + 0x1E0, vars + 0x1D0);
+                *(float *)(vars + 0x1E8) += 1.7f;
             }
-            func_L01_00337A60(s + 0x1E0, s + 0x1E0, D_L01_001FE180[index] + 0x10, *(int *)D_L01_001FE180[index]);
+            ClosestPointOnPolygonEdge(vars + 0x1E0, vars + 0x1E0, D_L01_001FE180[index] + 0x10, *(int *)D_L01_001FE180[index]);
         } else {
-            *(float *)(s + 0x1E0) = func_00283180(func_002A7878(-3.1415927f, 3.1415927f)) * 1.2f;
-            *(float *)(s + 0x1E4) = func_00283198(func_002A7878(-3.1415927f, 3.1415927f)) * 1.2f;
-            *(int *)(s + 0x1E8) = 0;
-            func_00282CC0(s + 0x1E0, s + 0x1E0, D_00189EA0);
-            *(float *)(s + 0x1E8) += 1.7f;
-            func_L01_00337A60(s + 0x1E0, s + 0x1E0, D_L01_001FE180[index] + 0x10, *(int *)D_L01_001FE180[index]);
+            *(float *)(vars + 0x1E0) = FastSinOrCosA(RandomFloatRange(-3.1415927f, 3.1415927f)) * 1.2f;
+            *(float *)(vars + 0x1E4) = FastSinOrCosB(RandomFloatRange(-3.1415927f, 3.1415927f)) * 1.2f;
+            *(int *)(vars + 0x1E8) = 0;
+            FastVecAdd(vars + 0x1E0, vars + 0x1E0, gHeroPosition);
+            *(float *)(vars + 0x1E8) += 1.7f;
+            ClosestPointOnPolygonEdge(vars + 0x1E0, vars + 0x1E0, D_L01_001FE180[index] + 0x10, *(int *)D_L01_001FE180[index]);
         }
-        if ((*(int *)(s + 0x23C) && func_00282E80(s + 0x1E0, D_00189EA0) < 3.0f) || func_00282E80(s + 0x1E0, obj + 0x10) < 0.5f) {
-            offset = func_002A7878(3.0f, 5.0f);
-            coordinate = *(float *)(s + 0x1E0);
-            *(float *)(s + 0x1E0) = (func_001163B0() & 1) ? coordinate - offset : coordinate + offset;
-            offset = func_002A7878(3.0f, 5.0f);
-            coordinate = *(float *)(s + 0x1E4);
-            *(float *)(s + 0x1E4) = (func_001163B0() & 1) ? coordinate - offset : coordinate + offset;
+        if ((*(int *)(vars + 0x23C) && vec_distance_xy(vars + 0x1E0, gHeroPosition) < 3.0f) || vec_distance_xy(vars + 0x1E0, moby + 0x10) < 0.5f) {
+            offset = RandomFloatRange(3.0f, 5.0f);
+            coordinate = *(float *)(vars + 0x1E0);
+            *(float *)(vars + 0x1E0) = (Rand() & 1) ? coordinate - offset : coordinate + offset;
+            offset = RandomFloatRange(3.0f, 5.0f);
+            coordinate = *(float *)(vars + 0x1E4);
+            *(float *)(vars + 0x1E4) = (Rand() & 1) ? coordinate - offset : coordinate + offset;
         }
     }
-    if (func_002761F8(obj + 0x10, s + 0x1E0, 2, obj, 0)) {
-        func_00282CF0(s + 0x1E0, D_L01_001BF920, s + 0x1E0);
-        func_00282F20(s + 0x1E0, s + 0x1E0, 2.0f);
-        func_00282CC0(s + 0x1E0, s + 0x1E0, D_L01_001BF920);
+    if (CollLine(moby + 0x10, vars + 0x1E0, 2, moby, 0)) {
+        FastVecSub(vars + 0x1E0, gCollLineHitPoint, vars + 0x1E0);
+        vec_scale_to_length(vars + 0x1E0, vars + 0x1E0, 2.0f);
+        FastVecAdd(vars + 0x1E0, vars + 0x1E0, gCollLineHitPoint);
     }
 }
 
@@ -228,14 +233,15 @@ void func_L01_003BDBE8(void *object)
 
 /* func_L01_003BE488 */
 
-void func_L01_003BE488(L01_003BE488_OBJ *a0)
+/* Turns off the moby's glow light and clears its light slot. */
+void func_L01_003BE488(L01_003BE488_OBJ *moby)
 {
-    L01_003BE488_OWNED *p = a0->f68;
+    L01_003BE488_OWNED *vars = moby->f68;
 
-    if (p->f202 != -1) {
-        p->f204 = 0;
-        func_00291450(p->f202);
-        p->f202 = -1;
+    if (vars->f202 != -1) {
+        vars->f204 = 0;
+        FreePointLight(vars->f202);
+        vars->f202 = -1;
     }
 }
 
@@ -266,35 +272,36 @@ extern void func_002A04B8(void *, int *, int *, int *);
 extern void func_002A0488(void *, int, int, int);
 extern int func_002E4600(unsigned int, unsigned int, float);
 
-void func_L01_003BE4D0(L01_003BE4D0_OBJ *obj)
+/* Counts down the moby's timers and fades its colour towards the glow colour or back to dark. */
+void func_L01_003BE4D0(L01_003BE4D0_OBJ *moby)
 {
-    L01_003BE4D0_STATE *s = obj->f68;
+    L01_003BE4D0_STATE *vars = moby->f68;
     int red, green, blue;
     unsigned int target;
     int color;
 
-    if (obj->fBC != 0) {
-        obj->fBC = 0;
-        if (s->timer238 < 200) {
-            s->timer238 = func_002A7820(300, 360);
+    if (moby->fBC != 0) {
+        moby->fBC = 0;
+        if (vars->timer238 < 200) {
+            vars->timer238 = RandomIntRange(300, 360);
         }
     }
-    if (s->f114 != 1) {
-        func_00282948(&s->timer238);
+    if (vars->f114 != 1) {
+        FastFloatHelperD(&vars->timer238);
     }
-    if (obj->f96 <= 0xFFFD) {
-        obj->f96 = obj->f96 + 1;
+    if (moby->f96 <= 0xFFFD) {
+        moby->f96 = moby->f96 + 1;
     }
-    func_00282948(&s->timer230);
-    func_00282948(&s->timer23C);
+    FastFloatHelperD(&vars->timer230);
+    FastFloatHelperD(&vars->timer23C);
     /* Pack the current colour as 0x80BBGGRR, then blend it towards the target. */
-    func_002A04B8(obj, &red, &green, &blue);
+    get_moby_color(moby, &red, &green, &blue);
     {
         unsigned int alpha_green = (green << 8) | 0x80000000u;
         unsigned int alpha_blue_green = (blue << 16) | alpha_green;
         color = alpha_blue_green | red;
     }
-    if (s->f290 != 0 && obj->f20 < 9) {
+    if (vars->f290 != 0 && moby->f20 < 9) {
         target = 0x8040E0F0;
         color = func_002E4600(color, target, 0.05f);
     } else {
@@ -304,25 +311,26 @@ void func_L01_003BE4D0(L01_003BE4D0_OBJ *obj)
     red = color & 0xFF;
     green = (color >> 8) & 0xFF;
     blue = (color >> 16) & 0xFF;
-    func_002A0488(obj, red, green, blue);
+    set_moby_color(moby, red, green, blue);
 }
 
 /* func_L01_003BE628 is in L01_003BE628.c. */
 
 /* func_L01_003BFDC8 */
 
-void func_L01_003BFDC8(L01_003BFDC8_OBJ *a0, int a1, int a2, int a3)
+/* Switches the moby to a new animation when it is not already playing it and sets its animation speed. */
+void func_L01_003BFDC8(L01_003BFDC8_OBJ *moby, int animIndex, int unusedParam, int blendFrames)
 {
-    L01_003BFDC8_OBJ *p = a0;
+    L01_003BFDC8_OBJ *obj = moby;
 
-    if (p->f43 != a1) {
-        func_002A7470(a0);
+    if (obj->f43 != animIndex) {
+        StartAnimationBlended(moby);
     }
-    if (a1 != 12) {
-        p->f48 = 0.6666667f;
+    if (animIndex != 12) {
+        obj->f48 = 0.6666667f;
     }
-    if ((unsigned int)(a1 - 6) < 3) {
-        p->f48 = p->f48 * 1.25f;
+    if ((unsigned int)(animIndex - 6) < 3) {
+        obj->f48 = obj->f48 * 1.25f;
     }
 }
 

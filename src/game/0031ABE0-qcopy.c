@@ -101,6 +101,7 @@ extern void func_0031C7A0(Object *);
 extern void func_0031D268(Object *);
 extern void func_0031D308(Object *);
 
+/* Updates the hovering enemy each frame: waits, flies to the hero, attacks with its beam and drops back when hurt. */
 void func_0031ABE0(Object *self)
 {
     Vars *vars = self->vars;
@@ -108,77 +109,77 @@ void func_0031ABE0(Object *self)
     float ground, frame, drop;
     int result;
 
-    func_0031BCC8(self);
+    InitAndUpdateThreePartTurret(self);
     switch (self->mode) {
     case 0:
-        if (func_002B3890(self))
-            func_002B60B0(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+        if (SetSecondPendingFlag(self))
+            SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
         if (vars->mode == 2 && vars->active) {
-            func_002A7750(self, 11, 4);
-            if (self->animNext != 1) func_002A7470(self, 1, 0, 4);
+            SetMobyState(self, 11, 4);
+            if (self->animNext != 1) StartAnimationBlended(self, 1, 0, 4);
             if (vars->path != -1) {
-                func_002A7750(self, 10, 1);
-                if (self->animNext != 26) func_002A7470(self, 26, 0, 4);
+                SetMobyState(self, 10, 1);
+                if (self->animNext != 26) StartAnimationBlended(self, 26, 0, 4);
             }
         } else if (vars->alerted) {
-            func_002A7750(self, 9, 3);
+            SetMobyState(self, 9, 3);
             vars->alerted = 0;
-            if (vars->timer < 300) vars->timer = func_002A7820(480, 600);
+            if (vars->timer < 300) vars->timer = RandomIntRange(480, 600);
         }
         break;
     case 2:
-        if (func_002B3890(self))
-            func_002B60B0(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+        if (SetSecondPendingFlag(self))
+            SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
         if (vars->mode == 2 && vars->active) {
-            func_002A7750(self, 5, 4);
-            if (self->animNext != 25) func_002A7470(self, 25, 0, 4);
+            SetMobyState(self, 5, 4);
+            if (self->animNext != 25) StartAnimationBlended(self, 25, 0, 4);
         } else if (vars->alerted && vars->active) {
             vars->alerted = 0;
-            func_002A7750(self, 5, 4);
-            if (self->animNext != 25) func_002A7470(self, 25, 0, 4);
+            SetMobyState(self, 5, 4);
+            if (self->animNext != 25) StartAnimationBlended(self, 25, 0, 4);
         }
         break;
     case 3:
-        if (func_002B3890(self))
-            func_002B60B0(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+        if (SetSecondPendingFlag(self))
+            SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
         if (vars->mode == 2 && vars->active) {
-            func_002A7750(self, 11, 4);
-            if (self->animNext != 1) func_002A7470(self, 1, 0, 4);
+            SetMobyState(self, 11, 4);
+            if (self->animNext != 1) StartAnimationBlended(self, 1, 0, 4);
         } else if (vars->timer == 0) {
-            func_002A7750(self, 2, 0);
-            if (self->animNext != 4) func_002A7470(self, 4, 0, 10);
+            SetMobyState(self, 2, 0);
+            if (self->animNext != 4) StartAnimationBlended(self, 4, 0, 10);
         }
         break;
     case 4:
-        if (func_002B3890(self))
-            func_002B60B0(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+        if (SetSecondPendingFlag(self))
+            SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
         if (vars->mode != 1 && vars->mode != 2) {
             if (self->state != 5) {
                 if (self->state != 4) {
-                    func_002A7750(self, 9, 3);
-                    if (self->animNext != 7) func_002A7470(self, 7, 0, 10);
-                    vars->timer = func_002A7820(580, 600);
+                    SetMobyState(self, 9, 3);
+                    if (self->animNext != 7) StartAnimationBlended(self, 7, 0, 10);
+                    vars->timer = RandomIntRange(580, 600);
                 }
             }
         }
         break;
     case 5:
-        result = func_002B1C20(self, vars->dispatch);
+        result = DispatchActionByKind(self, vars->dispatch);
         if (result & 1) {
-            func_0029F338(vars->parts[0]);
-            func_0029F338(vars->parts[1]);
-            func_0029F338(vars->parts[2]);
-            func_0029F338(self);
+            MarkMobySpawned(vars->parts[0]);
+            MarkMobySpawned(vars->parts[1]);
+            MarkMobySpawned(vars->parts[2]);
+            MarkMobySpawned(self);
             return;
         }
         if (result & 2) {
             if (vars->mode == 1 || vars->mode == 2) {
-                func_002A7750(self, 12, 4);
-                if (self->animNext != 11) func_002A7470(self, 11, 0, 10);
+                SetMobyState(self, 12, 4);
+                if (self->animNext != 11) StartAnimationBlended(self, 11, 0, 10);
             } else {
-                func_002A7750(self, 9, 3);
-                if (self->animNext != 7) func_002A7470(self, 7, 0, 10);
-                vars->timer = func_002A7820(580, 600);
+                SetMobyState(self, 9, 3);
+                if (self->animNext != 7) StartAnimationBlended(self, 7, 0, 10);
+                vars->timer = RandomIntRange(580, 600);
             }
             if (vars->active != 1) vars->active = 1;
         }
@@ -189,147 +190,147 @@ void func_0031ABE0(Object *self)
     case 2:
         break;
     case 3:
-        func_002AEF28(self, vars->sway, vars->tilt, 0.06981318f, 0.052359886f, 0.013089972f);
+        ScaleOwnerWordsByAngles(self, vars->sway, vars->tilt, 0.06981318f, 0.052359886f, 0.013089972f);
         break;
     case 5:
         vars->ticks++;
-        func_002A7E08(self, D_00189E20.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
-        func_002AA3A8((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
-        func_002AA3A8((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
+        TurnTowardPosition(self, gHeroState.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
+        SpringFloatToGoal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
+        SpringFloatToGoal((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
         {
-        float level = func_002A89A8(self->pos, 0, 0.5f);
+        float level = ProbeGroundHeightBelow(self->pos, 0, 0.5f);
         if (self->pos[2] - level > 0.05f) {
             self->pos[2] = self->pos[2] - level * 0.00025f;
         } else {
-            func_002A7750(self, 8, -1);
-            if (self->animNext != 15) func_002A7470(self, 15, 0, 3);
+            SetMobyState(self, 8, -1);
+            if (self->animNext != 15) StartAnimationBlended(self, 15, 0, 3);
         }
         }
         if (self->flags & 2) {
-            func_002A7750(self, 4, -1);
-            if (self->animNext != 26) func_002A7470(self, 26, 0, 15);
+            SetMobyState(self, 4, -1);
+            if (self->animNext != 26) StartAnimationBlended(self, 26, 0, 15);
         }
         break;
     case 4:
         vars->ticks++;
-        func_002A7E08(self, D_00189E20.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
-        func_002AA3A8((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
-        func_002AA3A8((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
-        ground = func_002A89A8(self->pos, 0, 0.5f);
+        TurnTowardPosition(self, gHeroState.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
+        SpringFloatToGoal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
+        SpringFloatToGoal((s32)&self->rot[0], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
+        ground = ProbeGroundHeightBelow(self->pos, 0, 0.5f);
         drop = ground - 3.0f;
         if (self->pos[2] - ground > 0.05f) {
-            func_002AA548(&self->pos[2], vars->height, drop, 0.016666668f, 0.16333334f, 0.16666667f);
+            StepValueTowardTarget(&self->pos[2], vars->height, drop, 0.016666668f, 0.16333334f, 0.16666667f);
         } else {
-            func_0026FEB8(D_001AFAE0, vars->ticks);
-            func_002A7750(self, 8, -1);
-            if (self->animNext != 15) func_002A7470(self, 15, 0, 3);
+            STUB_printf(D_001AFAE0, vars->ticks);
+            SetMobyState(self, 8, -1);
+            if (self->animNext != 15) StartAnimationBlended(self, 15, 0, 3);
         }
         break;
     case 6:
         if (self->flags & 2) {
-            func_002A7750(self, 7, -1);
-            if (self->animNext != 14) func_002A7470(self, 14, 0, 15);
+            SetMobyState(self, 7, -1);
+            if (self->animNext != 14) StartAnimationBlended(self, 14, 0, 15);
         }
         break;
     case 7:
-        func_002AA3A8((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
-        func_002833F0(self->basis, self->rot);
-        func_002A7E08(self, D_00189E20.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
-        ground = func_002A89A8(self->pos, 0, 0.5f);
+        SpringFloatToGoal((s32)&self->rot[1], 0.0f, (s32)vars->pitch, 0.016666668f, 0.0f, 0.06666667f);
+        euler_rotation_basis(self->basis, self->rot);
+        TurnTowardPosition(self, gHeroState.f2290, vars->turn, 0.001f, 0.01f, 0.1f);
+        ground = ProbeGroundHeightBelow(self->pos, 0, 0.5f);
         drop = ground - 3.0f;
         if (self->pos[2] - ground > 0.05f) {
-            func_002AA548(&self->pos[2], vars->height, drop, 0.025000002f, 0.16333334f, 0.25f);
+            StepValueTowardTarget(&self->pos[2], vars->height, drop, 0.025000002f, 0.16333334f, 0.25f);
         } else {
-            func_002A7750(self, 8, -1);
-            if (self->animNext != 15) func_002A7470(self, 15, 0, 3);
+            SetMobyState(self, 8, -1);
+            if (self->animNext != 15) StartAnimationBlended(self, 15, 0, 3);
         }
         break;
     case 8:
         if (self->flags & 2) {
-            func_002A7750(self, 12, 4);
-            if (self->animNext != 8) func_002A7470(self, 8, 0, 15);
-            self->pos[2] = func_002A89A8(self->pos, 0, 0.5f);
+            SetMobyState(self, 12, 4);
+            if (self->animNext != 8) StartAnimationBlended(self, 8, 0, 15);
+            self->pos[2] = ProbeGroundHeightBelow(self->pos, 0, 0.5f);
         }
         break;
     case 10:
         target.q = vars->home.q;
         target.v[2] -= 3.0f;
-        func_00282CF0(&delta, &target, self->pos);
-        self->rot[2] = func_00283248(delta.v[0], delta.v[1]);
-        self->rot[1] = func_00283248(func_00282E20(&delta), delta.v[2]);
-        func_002833F0(self->basis, self->rot);
-        func_002AA458((s32)self->pos, (s32)&target, (s32)vars->height, 0.016666668f, 0.0f, 0.33333334f);
-        if (func_00282E48(self->pos, &target) < 0.4f) {
-            if (self->animNext != 14) func_002A7470(self, 14, 0, 10);
-            func_002A7750(self, 7, -1);
+        FastVecSub(&delta, &target, self->pos);
+        self->rot[2] = FastMatrixHelperA(delta.v[0], delta.v[1]);
+        self->rot[1] = FastMatrixHelperA(vec_length_xy(&delta), delta.v[2]);
+        euler_rotation_basis(self->basis, self->rot);
+        SpringVectorToTarget((s32)self->pos, (s32)&target, (s32)vars->height, 0.016666668f, 0.0f, 0.33333334f);
+        if (fast_vec_dist(self->pos, &target) < 0.4f) {
+            if (self->animNext != 14) StartAnimationBlended(self, 14, 0, 10);
+            SetMobyState(self, 7, -1);
         }
         break;
     case 11:
         if (self->flags & 2) {
-            func_002B60B0(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
-            func_002A7750(self, 12, -1);
-            if (self->animNext != 11) func_002A7470(self, 11, 0, 15);
+            SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+            SetMobyState(self, 12, -1);
+            if (self->animNext != 11) StartAnimationBlended(self, 11, 0, 15);
         }
         break;
     case 12:
-        if (func_00282E80(self->pos, D_00189E20.pos) < 2.8f
-            && func_00283C80(self->rot[2], func_00283248(D_00189E20.pos[0] - self->pos[0], D_00189E20.pos[1] - self->pos[1])) < 0.38397247f) {
-            func_002A7750(self, 13, -1);
-            if (self->animNext != 16) func_002A7470(self, 16, 4, 3);
+        if (vec_distance_xy(self->pos, gHeroState.pos) < 2.8f
+            && FastDiffRots(self->rot[2], FastMatrixHelperA(gHeroState.pos[0] - self->pos[0], gHeroState.pos[1] - self->pos[1])) < 0.38397247f) {
+            SetMobyState(self, 13, -1);
+            if (self->animNext != 16) StartAnimationBlended(self, 16, 4, 3);
             vars->hold = 0;
-        } else if (func_00282E80(self->pos, D_00189E20.pos) > 2.8f) {
-            func_002B4FF0(self, D_00189E20.pos, vars->range);
+        } else if (vec_distance_xy(self->pos, gHeroState.pos) > 2.8f) {
+            TurnTowardTargetAndStepMovement(self, gHeroState.pos, vars->range);
         } else {
-            func_002B50E0(self, self->pos, func_00283248(D_00189E20.pos[0] - self->pos[0], D_00189E20.pos[1] - self->pos[1]));
+            StepMovementController(self, self->pos, FastMatrixHelperA(gHeroState.pos[0] - self->pos[0], gHeroState.pos[1] - self->pos[1]));
         }
-        if (func_00282E80(self->pos, D_00189E20.pos) > 5.0f && self->anim == 8) {
-            if (self->animNext != 11) func_002A7470(self, 11, 0, 4);
-            func_002B60B0(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+        if (vec_distance_xy(self->pos, gHeroState.pos) > 5.0f && self->anim == 8) {
+            if (self->animNext != 11) StartAnimationBlended(self, 11, 0, 4);
+            SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
         }
         break;
     case 13:
         if (self->flags & 2) {
-            if (D_00189E20.target == self) {
-                func_002A7750(self, 14, -1);
-                if (self->animNext != 17) func_002A7470(self, 17, 0, 7);
-            } else if (func_00282E80(self->pos, D_00189E20.pos) > 4.0f) {
-                func_002B60B0(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
-                func_002A7750(self, 12, -1);
-                if (self->animNext != 11) func_002A7470(self, 11, 0, 10);
+            if (gHeroState.target == self) {
+                SetMobyState(self, 14, -1);
+                if (self->animNext != 17) StartAnimationBlended(self, 17, 0, 7);
+            } else if (vec_distance_xy(self->pos, gHeroState.pos) > 4.0f) {
+                SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+                SetMobyState(self, 12, -1);
+                if (self->animNext != 11) StartAnimationBlended(self, 11, 0, 10);
             } else {
-                func_002B60B0(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
-                func_002A7750(self, 12, -1);
-                if (self->animNext != 8) func_002A7470(self, 8, 0, 10);
+                SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+                SetMobyState(self, 12, -1);
+                if (self->animNext != 8) StartAnimationBlended(self, 8, 0, 10);
             }
         }
-        frame = func_0029F530(self);
+        frame = GetMobyAnimationValue(self);
         if (self->anim == 16) {
             if (frame >= 19.0f && frame <= 25.0f) {
-                func_002A8D70(self, 0, 0.35f, vars->fade, 1, 1.0f, 0, 1, 0);
-                func_002A8D70(self, 1, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
-                func_002A8D70(self, 2, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
+                TestHitAtBone(self, 0, 0.35f, vars->fade, 1, 1.0f, 0, 1, 0);
+                TestHitAtBone(self, 1, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
+                TestHitAtBone(self, 2, 0.15f, vars->fade, 1, 1.0f, 0, 1, 0);
             }
             if (self->anim == 16 && frame >= 17.0f && frame <= 25.0f) {
-                func_0027CDC8(func_0031D308, self);
-                func_0031D268(self);
+                RegisterWorldDrawCallback(DrawTrailRibbon_0031D308, self);
+                RecordTrailPoint(self);
             }
         }
-        func_002B50E0(self, self->pos, func_00283248(D_00189E20.pos[0] - self->pos[0], D_00189E20.pos[1] - self->pos[1]));
+        StepMovementController(self, self->pos, FastMatrixHelperA(gHeroState.pos[0] - self->pos[0], gHeroState.pos[1] - self->pos[1]));
         break;
     case 14:
         if (self->flags & 2) {
-            if (func_00282E80(self->pos, D_00189E20.pos) > 4.0f) {
-                func_002B60B0(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
-                func_002A7750(self, 12, -1);
-                if (self->animNext != 11) func_002A7470(self, 11, 0, 10);
+            if (vec_distance_xy(self->pos, gHeroState.pos) > 4.0f) {
+                SetControllerSpeedLimits(self, 0.0044444446f, 0.13333334f, 0.001163553f, 0.10471977f);
+                SetMobyState(self, 12, -1);
+                if (self->animNext != 11) StartAnimationBlended(self, 11, 0, 10);
             } else {
-                func_002B60B0(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
-                func_002A7750(self, 12, -1);
-                if (self->animNext != 8) func_002A7470(self, 8, 0, 10);
+                SetControllerSpeedLimits(self, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
+                SetMobyState(self, 12, -1);
+                if (self->animNext != 8) StartAnimationBlended(self, 8, 0, 10);
             }
         }
         {
-            float at = func_0029F530(self);
+            float at = GetMobyAnimationValue(self);
             if (self->anim == 17 && (at <= 5.0f || (at >= 12.0f && at <= 15.0f)))
                 vars->open = 1;
             else
@@ -337,6 +338,6 @@ void func_0031ABE0(Object *self)
         }
         break;
     }
-    func_0031C498(self);
-    func_0027CFD0(func_0031C7A0, self);
+    UpdateTurretPartsAndSparks(self);
+    RegisterOverlayDrawCallback(DrawClass2485Effects, self);
 }

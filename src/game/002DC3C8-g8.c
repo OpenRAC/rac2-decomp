@@ -25,23 +25,24 @@ extern u8 D_001ABBA0[] SDATA(D_001ABBA0);
 extern u8 D_001ABBB8[] SDATA(D_001ABBB8);
 extern int D_0025ED8C[];
 
+/* Runs the timed text pages (such as the credits): each page shows a text for a while, scrolls it, then moves to the next. Holding buttons speeds it up and the player can leave early. */
 int func_002DC3C8(PageC3 *menu)
 {
     int fast, previous, value, result;
-    u8 *pad = D_00138180;
-    u8 *ctx = D_001F2840;
+    u8 *pad = gPadState;
+    u8 *ctx = gPauseMenuState;
     u8 *owner;
     fast = (((InputC3 *)pad)->held & 15) == 15;
     if (!((CtxC3 *)ctx)->mode || (fast && ((u32)((InputC3 *)pad)->held & 16))) {
         if ((((u32 *)&((InputC3 *)pad)->held)[1] & 0x900) && !((CtxC3 *)ctx)->active) return 1;
         {
-            u8 *pad2 = D_00138180;
+            u8 *pad2 = gPadState;
             if (*(int *)(pad2 + 0x1c4) & 16) {
-                owner = ((CtxC3 *)D_001F2840)->owner;
+                owner = ((CtxC3 *)gPauseMenuState)->owner;
                 value = *(int *)(owner + 0xe0);
                 if (value) {
-                    ((CtxC3 *)D_001F2840)->next = value;
-                } else if (!((CtxC3 *)D_001F2840)->active) {
+                    ((CtxC3 *)gPauseMenuState)->next = value;
+                } else if (!((CtxC3 *)gPauseMenuState)->active) {
                     result = -1;
                     goto back_done;
                 }
@@ -150,7 +151,7 @@ back_done:
         break;
     case 19:
         if (menu->timer) break;
-        if (((CtxC3 *)D_001F2840)->mode) return 1;
+        if (((CtxC3 *)gPauseMenuState)->mode) return 1;
     }
     return 0;
 }

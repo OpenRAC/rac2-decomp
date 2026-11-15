@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002C02F0 in its own unit for the grouped lq/sq profile. */
 
@@ -38,36 +39,37 @@ extern unsigned char *D_001F2570;
 
 /* Spawns a grey smoke particle like func_002C0CC0, sized by scale; kinds below 5
    get a random size and a shorter random life. */
-Particle_002C02F0 *func_002C02F0(TI128 *position, TI128 *velocity, unsigned char kind, int arg3,
+/* Creates a grey smoke puff whose size depends on the given scale. */
+Particle_002C02F0 *func_002C02F0(TI128 *position, TI128 *velocity, unsigned char kind, int extra,
                                  unsigned char scale, int shade)
 {
-    Particle_002C02F0 *p = func_002B9030(0x28);
+    Particle_002C02F0 *p = AllocParticle(0x28);
     typeof(p->motion) *m = &p->motion;
-    float f;
+    float turn;
 
     if (p != 0) {
         p->position = *position;
         m->velocity = *velocity;
-        p->colour = func_002AAE98(0.7f, 0.7f, 0.7f, 0.08f);
-        p->unk09 = (shade >> 5 << 4) + func_00283CF0(4.0f);
+        p->colour = PackColorFloatsToWord(0.7f, 0.7f, 0.7f, 0.08f);
+        p->unk09 = (shade >> 5 << 4) + FloatToInt(4.0f);
         p->unk01 = 0;
         p->unk03 = 0x44;
-        f = func_002A7940();
-        m->unk10 = f;
-        p->unk08 = (int)(f * 256.0f);
-        p->unk02 = D_001F2570[func_001163B0() & 7];
+        turn = RandomAngle();
+        m->unk10 = turn;
+        p->unk08 = (int)(turn * 256.0f);
+        p->unk02 = D_001F2570[Rand() & 7];
         m->scale = scale;
         m->kind = kind;
         m->unk14 = 0;
         m->unk16 = 0;
         if (kind < 5) {
-            p->unk0C = func_002A7878(func_00283CE0(m->scale) * 656.25f, func_00283CE0(m->scale) * 937.5f);
-            p->life = 0x12 - func_001163B0() % 15;
+            p->unk0C = RandomFloatRange(IntToFloat(m->scale) * 656.25f, IntToFloat(m->scale) * 937.5f);
+            p->life = 0x12 - Rand() % 15;
         } else {
-            p->unk0C = func_00283CE0(m->scale) * 937.5f;
+            p->unk0C = IntToFloat(m->scale) * 937.5f;
             p->life = 0x12;
         }
-        m->unk1C = arg3;
+        m->unk1C = extra;
     }
     return p;
 }

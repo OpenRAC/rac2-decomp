@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002B8548: the two-word request block at 0x1B1D70 is an sda array (assembler
  * macro stores through $at) whose address is held in a local, as retail keeps it in $s3;
  * the callees are func_001282A8, func_001288C0 and func_00128900(void *, char *), whose
@@ -17,21 +18,22 @@ extern int func_001282A8(void *);
 extern int func_001288C0(int);
 extern int func_00128900(void *, char *);
 
-void func_002B8548(void *a0)
+/* Sets up both controller ports at start-up. */
+void func_002B8548(void *padInfo)
 {
-    int *p = D_001B1D70;
-    int two = 2;
+    int *requestBlock = D_001B1D70;
+    int portMode = 2;
 
-    func_001282A8(a0);
-    func_001288C0(0);
-    D_001B1D70[0] = two;
+    SceDbcInit(padInfo);
+    InitPad2SocketTable(0);
+    D_001B1D70[0] = portMode;
     D_001B1D70[1] = 0;
-    D_00138180.f194 = func_00128900(p, (char *)&D_00138180);
-    D_00138180.f198 = 0;
-    D_00138180.f19C = 0;
-    D_001B1D70[0] = two;
+    gPadState.f194 = ScePad2CreateSocket(requestBlock, (char *)&gPadState);
+    gPadState.f198 = 0;
+    gPadState.f19C = 0;
+    D_001B1D70[0] = portMode;
     D_001B1D70[1] = 1;
-    D_00138500.f194 = func_00128900(p, (char *)&D_00138500);
+    D_00138500.f194 = ScePad2CreateSocket(requestBlock, (char *)&D_00138500);
     D_00138500.f198 = 0;
     D_00138500.f19C = 0;
 }

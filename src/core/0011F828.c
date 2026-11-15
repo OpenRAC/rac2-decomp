@@ -18,9 +18,10 @@ extern void r1_func_0011D3C8(void);
    run once from the crt0 supplement. Chains six sub-system initialisers;
    the last (InitTLBFunctions, r1_func_0011D3C8) is a tail call since this is
    void and it is the final statement. */
+/* Runs the start-up steps of the low-level system code, one after another. */
 void func_0011F828(void) {
-    func_0011F640();
-    func_0011F718();
+    InitSystemTimerRecords();
+    InitSystemCallTable();
     r1_func_0011DE38();
     r1_func_001195A0();
     r1_func_0011DCB8();

@@ -1,3 +1,4 @@
+#include "names.h"
 typedef signed short s16;
 typedef unsigned char u8;
 typedef signed int s32;
@@ -26,32 +27,32 @@ extern s32 D_L15_001B2148;
 extern u8 *D_L15_001B2714;
 
 /* Applies both material passes to matching objects once, then advances the stage. */
-void func_L15_00430B30(u8 *arg0) {
-    s32 n;
+void func_L15_00430B30(u8 *moby) {
+    s32 remaining;
     s32 count;
-    u8 **p;
+    u8 **listPtr;
 
     if (D_L15_001B1534 == 0) {
         D_L15_00221E10.timer = 0;
         D_L15_001B1534 = 1;
-        func_002B7320();
-        func_L05_0037B210();
-        func_L05_00379F18(0);
-        p = func_L05_00379EB8();
-        count = func_L00_004272A0();
+        music_Unpause();
+        InitAllRegisteredEntries();
+        SetPlayerStateField13(0);
+        listPtr = GetLevelObjectList();
+        count = GetLevelSavedValue();
         if (count > 0) {
-            n = count;
+            remaining = count;
             do {
-                if (*(s16 *)(*p + 0xAA) == 0xF93) {
-                    func_L05_0037B280(*p, 1);
-                    func_L05_0037CEE0(*p, (u8 *)D_L15_001B2714 + (D_L15_00221E10.initial << 7) + 0x30, 64.0f);
-                    func_L05_0037D608(*p, (u8 *)D_L15_001B2714 + (D_L15_00221E10.initial << 7) + 0x30, 64.0f);
+                if (*(s16 *)(*listPtr + 0xAA) == 0xF93 /* moby class 3987 */) {
+                    SpawnEntryListObjectsWithFlag(*listPtr, 1);
+                    func_L05_0037CEE0(*listPtr, (u8 *)D_L15_001B2714 + (D_L15_00221E10.initial << 7) + 0x30, 64.0f);
+                    func_L05_0037D608(*listPtr, (u8 *)D_L15_001B2714 + (D_L15_00221E10.initial << 7) + 0x30, 64.0f);
                 }
-                n--;
-                p++;
-            } while (n);
+                remaining--;
+                listPtr++;
+            } while (remaining);
         }
     }
     if (D_L15_00221E10.active == 0 && D_L15_001B2148 >= 6)
-        func_L15_00430590(arg0, 1);
+        FinishGornChallengeStage(moby, 1);
 }

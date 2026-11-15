@@ -26,7 +26,8 @@
 typedef int TI __attribute__((mode(TI)));
 extern void ref_L22_0040DD20_00(void *a, void *b);
 
-void func_L22_0040DD20(void *arg0) {
-    TI buf = 0;
-    ref_L22_0040DD20_00(arg0, &buf);
+/* Calls a helper on the object with a zeroed 16-byte vector. */
+void func_L22_0040DD20(void *moby) {
+    TI zeroVec = 0;
+    ref_L22_0040DD20_00(moby, &zeroVec);
 }

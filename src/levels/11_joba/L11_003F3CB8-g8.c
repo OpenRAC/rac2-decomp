@@ -50,6 +50,7 @@ extern f32 D_L11_001B05C4 __attribute__((sda));
 extern s32 D_L11_001B05D0 __attribute__((sda));
 
 /* Emits the two articulated effect paths and their joint effects. */
+/* Draws the two Joba beams as glowing strips along their points, with extra branches and spark flashes at the ends. */
 void func_L11_003F3CB8(u8 *object)
 {
     u8 frame[0xA0] __attribute__((aligned(16)));
@@ -63,32 +64,32 @@ void func_L11_003F3CB8(u8 *object)
             f32 amplitude = group ? D_L11_001B0610 : D_L11_001B05E8;
             s32 count = group ? D_L11_001B060C : D_L11_001B05E4;
             f32 points[count][4];
-            s32 duration = small ? func_002A7820(0x30, 0x80) : func_002A7820(0x30, 0x50);
-            f32 width = small ? func_002A7878(D_L11_001B0624, D_L11_001B0628) : func_002A7878(D_L11_001B05FC, D_L11_001B0600);
-            f32 scale = small ? func_002A7878(D_L11_001B062C, D_L11_001B0630) : func_002A7878(D_L11_001B0604, D_L11_001B0608);
+            s32 duration = small ? RandomIntRange(0x30, 0x80) : RandomIntRange(0x30, 0x50);
+            f32 width = small ? RandomFloatRange(D_L11_001B0624, D_L11_001B0628) : RandomFloatRange(D_L11_001B05FC, D_L11_001B0600);
+            f32 scale = small ? RandomFloatRange(D_L11_001B062C, D_L11_001B0630) : RandomFloatRange(D_L11_001B0604, D_L11_001B0608);
             u8 *path = data + 0xA0 + i * 0xA0;
-            func_L11_003F4198(points, count, path, amplitude);
-            func_L11_003F4490(points, count, duration, D_L11_001B05B4, D_L11_001B05B8, width, scale);
+            BuildJitteredCurvePointsAlt(points, count, path, amplitude);
+            DrawDualQuadStrip(points, count, duration, D_L11_001B05B4, D_L11_001B05B8, width, scale);
             if ((u16)(*(u16 *)state - 3) < 2) {
                 f32 extra[D_L11_001B0634][4];
-                s32 pick = func_002A7820(count - 6, count - 3);
+                s32 pick = RandomIntRange(count - 6, count - 3);
                 qcopy_nc(frame, points[pick]);
                 qcopy_nc(frame + 0x10, points[count - 2]);
-                func_002ACB48(frame + 0x10, 1.0f);
-                func_002A7A00(frame + 0x20, D_L11_001B063C, D_L11_001B0640);
-                func_002A7A00(frame + 0x30, D_L11_001B063C, D_L11_001B0640);
-                duration = func_002A7820(0x30, 0x60);
-                width = func_002A7878(D_L11_001B0644, D_L11_001B0648);
-                scale = func_002A7878(D_L11_001B064C, D_L11_001B0650);
-                func_L11_003F4198(extra, D_L11_001B0634, frame, D_L11_001B0638);
-                func_L11_003F4490(extra, D_L11_001B0634, duration, D_L11_001B05BC, D_L11_001B05C0, width, scale);
+                AddRandomOffsetToVector(frame + 0x10, 1.0f);
+                RandomDirectionVector(frame + 0x20, D_L11_001B063C, D_L11_001B0640);
+                RandomDirectionVector(frame + 0x30, D_L11_001B063C, D_L11_001B0640);
+                duration = RandomIntRange(0x30, 0x60);
+                width = RandomFloatRange(D_L11_001B0644, D_L11_001B0648);
+                scale = RandomFloatRange(D_L11_001B064C, D_L11_001B0650);
+                BuildJitteredCurvePointsAlt(extra, D_L11_001B0634, frame, D_L11_001B0638);
+                DrawDualQuadStrip(extra, D_L11_001B0634, duration, D_L11_001B05BC, D_L11_001B05C0, width, scale);
             }
             if (group) {
-                f32 jitter = func_002A7878(-D_L11_001B05D8, D_L11_001B05D8);
+                f32 jitter = RandomFloatRange(-D_L11_001B05D8, D_L11_001B05D8);
                 f32 size = D_L11_001B05D4 + jitter;
-                s32 life = func_002A7820(0x50, 0x60);
-                f32 angle = func_002A7940();
-                func_L02_003FFC48(path, D_L11_001B05CC, size, life, angle, 0x31, 2);
+                s32 life = RandomIntRange(0x50, 0x60);
+                f32 angle = RandomAngle();
+                DrawAimedEffectPacket(path, D_L11_001B05CC, size, life, angle, 0x31, 2);
             }
         }
         {
@@ -96,15 +97,15 @@ void func_L11_003F3CB8(u8 *object)
             f32 half;
             s32 life;
             f32 angle;
-            func_0029FCC0(object, i, frame);
+            TransformMobyJointToWorld(object, i, frame);
             half = size * 0.5f;
-            life = func_002A7820(0x50, 0x60);
-            angle = func_002A7940();
-            func_L02_003FFC48(frame, D_L11_001B05CC, half, life, angle, 0x31, 2);
+            life = RandomIntRange(0x50, 0x60);
+            angle = RandomAngle();
+            DrawAimedEffectPacket(frame, D_L11_001B05CC, half, life, angle, 0x31, 2);
             size *= 0.7f;
-            life = func_002A7820(8, 0x16);
-            angle = func_002A7940();
-            func_L02_003FFC48(frame, D_L11_001B05D0, size, life, angle, 0xB, 2);
+            life = RandomIntRange(8, 0x16);
+            angle = RandomAngle();
+            DrawAimedEffectPacket(frame, D_L11_001B05D0, size, life, angle, 0xB, 2);
         }
     }
 }

@@ -16,45 +16,46 @@ extern void *func_002BCB00(void *,void *,int,int,float,int,int,int,int,int);
 extern int D_001A8CA0;
 extern void func_002AFFD8(void *,void *,int);
 extern void func_00300190(void *,void *);
-void func_002BCC58(char *p) {
- char *q=p+32,*pos,*vel;
- float f,speed,denom;
+/* Updates a spark. It falls, fades, and sometimes throws off small sparks of its own. */
+void func_002BCC58(char *particle) {
+ char *motion=particle+32,*pos,*vel;
+ float lifeRatio,speed,maxLife;
  float saved[4] __attribute__((aligned(16)));
  float accel[4] __attribute__((aligned(16)));
  float velocity[4] __attribute__((aligned(16)));
- float random[4] __attribute__((aligned(16)));
- int life;
- if (func_00282978(p+10)) { func_002B9180(p); return; }
-  f=func_00283CE0(*(short *)(p+10));
- denom=func_00283CE0(*(short *)(q+24));
- f=f* *(float *)(q+28); f=f/denom;
- *(float *)(p+12)=f;
- *(int *)(p+4)=func_002A9568(*(int *)(q+20),*(int *)(q+16),func_00283CE0(*(short *)(p+10))/func_00283CE0(*(short *)(q+24)));
- func_00282CC0(p+16,p+16,q);
- pos=p+16;
+ float randomDir[4] __attribute__((aligned(16)));
+ int childLife;
+ if (FastDecTimer(particle+10)) { KillParticle(particle); return; }
+  lifeRatio=IntToFloat(*(short *)(particle+10));
+ maxLife=IntToFloat(*(short *)(motion+24));
+ lifeRatio=lifeRatio* *(float *)(motion+28); lifeRatio=lifeRatio/maxLife;
+ *(float *)(particle+12)=lifeRatio;
+ *(int *)(particle+4)=ForwardTwoValuesAndAmount(*(int *)(motion+20),*(int *)(motion+16),IntToFloat(*(short *)(particle+10))/IntToFloat(*(short *)(motion+24)));
+ FastVecAdd(particle+16,particle+16,motion);
+ pos=particle+16;
  if (D_001A8CA0) {
-  func_002AFFD8(pos,accel,0);
-  func_00282D30(accel,accel,*(float *)(q+12));
-  func_00282CC0(q,q,accel);
- } else *(float *)(q+8)-=*(float *)(q+12);
+  ComputeViewDirection(pos,accel,0);
+  FastVecScale(accel,accel,*(float *)(motion+12));
+  FastVecAdd(motion,motion,accel);
+ } else *(float *)(motion+8)-=*(float *)(motion+12);
  qcopy(saved,pos);
- if (*(float *)(p+28)!=0.0f) {
-  if (*(float *)(p+28)==2.0f) func_00300190(pos,pos);
-  *(float *)(p+28)=2.0f;
+ if (*(float *)(particle+28)!=0.0f) {
+  if (*(float *)(particle+28)==2.0f) TransformVectorOrCopy(pos,pos);
+  *(float *)(particle+28)=2.0f;
  }
- if (*(short *)(q+26) && (D_001B1688&1)) {
-  *(Quad *)random=0;
-  random[0]=func_002A7878(-1.0f,1.0f);
-  random[1]=func_002A7878(-1.0f,1.0f);
-  random[2]=func_002A7878(-1.0f,1.0f);
-  *(Quad *)velocity=*(Quad *)random;
-  speed=func_00282DF0(q);
+ if (*(short *)(motion+26) && (gGameTime&1)) {
+  *(Quad *)randomDir=0;
+  randomDir[0]=RandomFloatRange(-1.0f,1.0f);
+  randomDir[1]=RandomFloatRange(-1.0f,1.0f);
+  randomDir[2]=RandomFloatRange(-1.0f,1.0f);
+  *(Quad *)velocity=*(Quad *)randomDir;
+  speed=FastVecLength(motion);
   vel=(char *)velocity;
-  speed*=func_002A7878(0.15f,0.25f);
-  func_00282F20(vel,vel,speed);
-  func_00282CC0(vel,vel,q);
-  func_00282D30(vel,vel,func_002A7878(0.75f,0.95f));
-  life=func_002A7820(15,30);
-  func_002BCB00(pos,vel,*(int *)(p+4),*(int *)(q+20),*(float *)(p+12),life,0,(unsigned char)p[2],(unsigned char)p[3],func_00283CF0(*(float *)(p+28)));
- } else func_00282D30(q,q,0.96f);
+  speed*=RandomFloatRange(0.15f,0.25f);
+  vec_scale_to_length(vel,vel,speed);
+  FastVecAdd(vel,vel,motion);
+  FastVecScale(vel,vel,RandomFloatRange(0.75f,0.95f));
+  childLife=RandomIntRange(15,30);
+  SpawnSparkParticle_002BCB00(pos,vel,*(int *)(particle+4),*(int *)(motion+20),*(float *)(particle+12),childLife,0,(unsigned char)particle[2],(unsigned char)particle[3],FloatToInt(*(float *)(particle+28)));
+ } else FastVecScale(motion,motion,0.96f);
 }

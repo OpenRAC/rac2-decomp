@@ -49,9 +49,9 @@ void func_L00_003A8940(char *object)
     *(Quadword *)normal = 0;
     normal[2] = 1.0f;
     normal[3] = 1.0f;
-    base = func_L00_0032A088(1483, *(short *)(*(char **)(object + 104) + 26));
-    func_00281DE8(&first, 54, 0, 128);
-    func_00281DE8(&second, 54, 1, 128);
+    base = GetSlotBody(1483 /* Pulse Rifle */, *(short *)(*(char **)(object + 104) + 26));
+    InitQuadPacketState(&first, 54, 0, 128);
+    InitQuadPacketState(&second, 54, 1, 128);
     if (D_0018C0B4[0] == 29)
         alphaScale = 32.0f;
     {
@@ -69,11 +69,11 @@ void func_L00_003A8940(char *object)
             if (*(short *)(record + 18)) {
                 age = (float)*(short *)(record + 16) * *(float *)(record + 32);
                 scale = alphaScale * age;
-                color = (unsigned int)func_00283CF0(scale) << 24;
+                color = (unsigned int)FloatToInt(scale) << 24;
                 angle = age * 3.1415927f * D_L00_001AF750;
-                wave = func_00283198(func_002ABB18(angle));
-                blend = func_00282C48(wave);
-                color |= func_00283D38(D_L00_001AF74C, D_L00_001AF748, blend);
+                wave = FastSinOrCosB(WrapAngleToPi(angle));
+                blend = FloatAbs(wave);
+                color |= FastTweenColor(D_L00_001AF74C, D_L00_001AF748, blend);
                 first.color[3] = color;
                 first.color[2] = color;
                 first.color[1] = color;
@@ -86,17 +86,17 @@ void func_L00_003A8940(char *object)
                 growth = D_L00_001AF720 - distance;
                 radius = distance + growth * age;
                 qcopy(position, record);
-                func_00282CF0(forward, D_L00_001B8DC0, position);
-                func_00282F20(forward, forward, 1.0f);
+                FastVecSub(forward, gCameraPosition_L00, position);
+                vec_scale_to_length(forward, forward, 1.0f);
                 if (D_L00_001A8FF0[0])
-                    func_002AFFD8(position, normal, 1);
-                func_00282DD8(right, forward, normal);
-                func_00282F20(right, right, 1.0f);
-                func_00282DD8(up, right, forward);
+                    ComputeViewDirection(position, normal, 1);
+                FastVecCross(right, forward, normal);
+                vec_scale_to_length(right, right, 1.0f);
+                FastVecCross(up, right, forward);
                 forward[3] = right[3] = up[3] = 0.0f;
                 position[3] = 1.0f;
-                sine = func_00283180(*(float *)(record + 20));
-                cosine = func_00283198(*(float *)(record + 20));
+                sine = FastSinOrCosA(*(float *)(record + 20));
+                cosine = FastSinOrCosB(*(float *)(record + 20));
                 {
                     float *weights = (float *)(record + 40);
                     for (side = 0; side < 4; ++side) {
@@ -107,27 +107,27 @@ void func_L00_003A8940(char *object)
                             texture = uvRow[corner][0];
                             weight = weights + index;
                             if (*weight != 0.0f)
-                                func_00282F20(scaled, D_L00_00294A80[index], *weight);
+                                vec_scale_to_length(scaled, D_L00_00294A80[index], *weight);
                             else
                                 qcopy(scaled, D_L00_001A8F20);
-                            func_00282CC0(local, D_L00_00294A80[index], scaled);
+                            FastVecAdd(local, D_L00_00294A80[index], scaled);
                             rotated[0] = local[0];
                             rotated[3] = 1.0f;
                             rotated[1] = local[1] * sine - local[2] * cosine;
                             rotated[2] = local[1] * cosine + local[2] * sine;
-                            func_00282D30(first.vertex[corner], rotated, radius);
+                            FastVecScale(first.vertex[corner], rotated, radius);
                             first.uv[corner][0] = D_L00_00294B10[texture][0];
                             first.uv[corner][1] = D_L00_00294B10[texture][1];
                             width = (1.0f - age) * 0.075f;
-                            func_00282D30(scaled, right, width);
-                            func_00282CC0(second.vertex[corner], first.vertex[corner], scaled);
-                            func_00282D30(scaled, up, width);
-                            func_00282CC0(second.vertex[corner], first.vertex[corner], scaled);
+                            FastVecScale(scaled, right, width);
+                            FastVecAdd(second.vertex[corner], first.vertex[corner], scaled);
+                            FastVecScale(scaled, up, width);
+                            FastVecAdd(second.vertex[corner], first.vertex[corner], scaled);
                             second.uv[corner][0] = D_L00_00294B10[texture][0];
                             second.uv[corner][1] = D_L00_00294B10[texture][1];
                         }
-                        func_00280B90(&first, forward, 0);
-                        func_00280B90(&second, forward, 0);
+                        draw_world_quad(&first, forward, 0);
+                        draw_world_quad(&second, forward, 0);
                     }
                 }
             }

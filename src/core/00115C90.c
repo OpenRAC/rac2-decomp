@@ -7,14 +7,15 @@ extern int D_00133E78;
 
 extern u32 func_0011B270(int arg0);
 
-u32 func_00115C90(int *arg0, u32 arg1) {
+/* Asks the system for more heap memory. If that fails, it hands back the error code. */
+u32 func_00115C90(int *errnoOut, u32 increment) {
     u32 result;
 
     D_00133E78 = 0;
-    result = func_0011B270(arg1);
+    result = ProcessKernelRequestA(increment);
     if (result == 0xFFFFFFFF) {
         if (D_00133E78 != 0)
-            *arg0 = D_00133E78;
+            *errnoOut = D_00133E78;
     }
     return result;
 }

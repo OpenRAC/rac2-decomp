@@ -23,22 +23,22 @@ char *func_00273730(char *parent, int mode, int type, int index,
     char *obj;
     unsigned char *color;
     unsigned int packed = 0;
-    obj = func_0029EFD0(type);
-    color = func_002AB220(parent);
+    obj = CreateMoby(type);
+    color = GetMobyPrivateValue4(parent);
     if (color) {
         int green = (color[5] << 8) | (-2147483647 - 1);
         int blue = color[6] << 16;
         packed = blue | green | color[4];
     }
     if (obj) {
-        func_002B37E8(obj, parent);
+        InitChildObjectFromParent(obj, parent);
         if (packed)
-            func_002AEC18(obj, packed);
+            SetMobyLightColor(obj, packed);
         *(Quad *)(obj + 0x10) = *(Quad *)position;
         {
             void *orientation = obj + 0xf0;
             qcopy(orientation, rotation);
-            func_002833F0(obj + 0xc0, orientation);
+            euler_rotation_basis(obj + 0xc0, orientation);
         }
         if (parent) {
             *(float *)(obj + 0x2c) =
@@ -52,26 +52,26 @@ char *func_00273730(char *parent, int mode, int type, int index,
             *(unsigned short *)(obj + 0x34) |= 0x800;
         *(int *)(obj + 0x98) = 0;
         *(char **)(*(char **)(obj + 0x68) + 0x54) = parent;
-        spread = func_00283198(spread * 0.00014544412260875106f);
-        func_002A7A00(vector, spread, spread);
+        spread = FastSinOrCosB(spread * 0.00014544412260875106f);
+        RandomDirectionVector(vector, spread, spread);
         spread = spread * spread;
-        vector[3] = func_00282C10(1.0f - spread);
+        vector[3] = square_root(1.0f - spread);
         if (mode == 1) {
             if (parent) {
                 obj[0x42] = parent[0x43];
                 obj[0x43] = parent[0x43];
             }
-            func_0029F390(obj);
+            update_moby_animation_state(obj);
             *(int *)(obj + 0x48) = 0;
             *(int *)(obj + 0x44) = 0;
             func_002A05A8(obj);
         }
-        func_00273978(obj, mode, index, target, vector, speed, tag);
+        InitCameraTracking(obj, mode, index, target, vector, speed, tag);
         if (*(unsigned short *)(obj + 0x7c) & 0x8000) {
             if (*(unsigned short *)(obj + 0x34) & 0x10)
                 *(unsigned short *)(obj + 0x34) &= ~0x10;
         }
-        *(void (**)(void))(obj + 0x64) = func_00310C88;
+        *(void (**)(void))(obj + 0x64) = UpdateFadeOutMoby;
     }
     return obj;
 }

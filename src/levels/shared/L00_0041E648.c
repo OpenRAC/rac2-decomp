@@ -26,31 +26,31 @@ void func_L00_0041E648(void *self,int color,int alpha)
     Quad128 **table;
     int index;
     float fraction,uvStep,width;
-    table=(Quad128 **)func_L00_0032A088(*(int *)(state+0x50),*(int *)(state+0x3c));
-    if(!table) { func_002FEE50(*(int *)(state+0x6c)); func_0029F338(object); return; }
+    table=(Quad128 **)GetSlotBody(*(int *)(state+0x50),*(int *)(state+0x3c));
+    if(!table) { ClearEntryFlag(*(int *)(state+0x6c)); MarkMobySpawned(object); return; }
     if(*(int *)(state+0x54)<3) return;
-    func_002FC560(0x47,0x5360bULL);
-    func_00281DE8(&packet.raw,11,1,128);
+    VU1_addGSregister(0x47,0x5360bULL);
+    InitQuadPacketState(&packet.raw,11,1,128);
     packet.view.uv[0][0]=0; packet.view.uv[0][1]=0;
     packet.view.uv[1][0]=0; packet.view.uv[1][1]=1;
     packet.view.uv[2][0]=0.5f; packet.view.uv[2][1]=0;
     packet.view.uv[3][0]=0.5f; packet.view.uv[3][1]=1;
     if(*(short *)(state+0x10)>280) {
-        fraction=func_00283CE0(300-*(short *)(state+0x10)); fraction/=func_00283CE0(20);
-        alpha=func_00283CF0(func_00283CE0(alpha)*fraction);
+        fraction=IntToFloat(300-*(short *)(state+0x10)); fraction/=IntToFloat(20);
+        alpha=FloatToInt(IntToFloat(alpha)*fraction);
     }
     packet.view.colors[3]=color|alpha<<24; packet.view.colors[2]=color|alpha<<24; packet.view.colors[1]=color|alpha<<24; packet.view.colors[0]=color|alpha<<24;
     width=0.5f; if(!*(int *)(state+0x68)) width=0.25f;
-    func_00282CF0(&direction,object+0x10,table[*(int *)(state+0x30)]);
-    func_00282DD8(&side,&direction,object+0xe0); func_00282F20(&side,&side,width);
-    func_00282CC0(&packet.view.vertices[0],object+0x10,&side); func_00282CF0(&packet.view.vertices[1],object+0x10,&side);
-    uvStep=0.5f/func_00283CE0(*(int *)(state+0x54)-2);
+    FastVecSub(&direction,object+0x10,table[*(int *)(state+0x30)]);
+    FastVecCross(&side,&direction,object+0xe0); vec_scale_to_length(&side,&side,width);
+    FastVecAdd(&packet.view.vertices[0],object+0x10,&side); FastVecSub(&packet.view.vertices[1],object+0x10,&side);
+    uvStep=0.5f/IntToFloat(*(int *)(state+0x54)-2);
     for(index=0;index<*(int *)(state+0x54);index++) {
-        if(index>0) func_00282CF0(&direction,&table[*(int *)(state+0x30)][index-1],table[*(int *)(state+0x30)]+index);
-        func_00282DD8(&side,&direction,object+0xe0); func_00282F20(&side,&side,width);
-        func_00282CC0(&packet.view.vertices[2],table[*(int *)(state+0x30)]+index,&side);
-        func_00282CF0(&packet.view.vertices[3],table[*(int *)(state+0x30)]+index,&side);
-        func_00280B90(&packet,0,0);
+        if(index>0) FastVecSub(&direction,&table[*(int *)(state+0x30)][index-1],table[*(int *)(state+0x30)]+index);
+        FastVecCross(&side,&direction,object+0xe0); vec_scale_to_length(&side,&side,width);
+        FastVecAdd(&packet.view.vertices[2],table[*(int *)(state+0x30)]+index,&side);
+        FastVecSub(&packet.view.vertices[3],table[*(int *)(state+0x30)]+index,&side);
+        draw_world_quad(&packet,0,0);
         packet.view.vertices[0]=packet.view.vertices[2]; packet.view.vertices[1]=packet.view.vertices[3];
         packet.view.uv[0][0]=packet.view.uv[2][0]; packet.view.uv[1][0]=packet.view.uv[3][0];
         packet.view.uv[2][0]+=uvStep; packet.view.uv[3][0]+=uvStep;

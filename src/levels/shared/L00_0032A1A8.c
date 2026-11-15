@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 typedef float f32;
@@ -20,18 +21,19 @@ extern void func_00282F20(void *, void *, f32);
 /* Fetches the record the caller names, then either builds a vector from the
    object's own fields or copies the object's second vector, and hands the
    result to the transform and the closing helper. */
-void func_L00_0032A1A8(char *a0, char *a1, char *a2, f32 t)
+/* Works out the vector from a point on the object to a target, scaled by a factor. */
+void func_L00_0032A1A8(char *object, char *target, char *result, f32 scale)
 {
     char buf[32];
-    float *r;
+    float *record;
 
-    r = func_002AB1F0(a0);
-    if (r != 0) {
-        func_00282D30(buf + 0x10, a0 + 0xE0, *(f32 *)((char *)r + 0x10));
-        func_00282CC0(buf, a0 + 0x10, buf + 0x10);
+    record = GetMobyPrivateValue0(object);
+    if (record != 0) {
+        FastVecScale(buf + 0x10, object + 0xE0, *(f32 *)((char *)record + 0x10));
+        FastVecAdd(buf, object + 0x10, buf + 0x10);
     } else {
-        *(V4TI *)buf = *(V4TI *)(a0 + 0x10);
+        *(V4TI *)buf = *(V4TI *)(object + 0x10);
     }
-    func_00282CF0(a2, buf, a1);
-    func_00282F20(a2, a2, t);
+    FastVecSub(result, buf, target);
+    vec_scale_to_length(result, result, scale);
 }

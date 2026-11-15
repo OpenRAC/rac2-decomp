@@ -11,15 +11,16 @@ extern void func_00130B18(unsigned int);
 extern void func_00130AB0(unsigned int);
 
 /* rac1-decomp src/core/0012CC90.c: func_0012CD60 */
+/* Stops both picture DMA channels and saves their registers into a block. */
 void func_00130B80(unsigned int *env) {
-    func_00130B18(1);
+    WriteIpuInDmaControl(1);
     env[0] = D4_MADR;
     env[1] = D4_TADR;
     env[2] = D4_QWC;
     env[3] = D4_CHCR;
     while ((IPU_CTRL & 0xF0) != 0) {
     }
-    func_00130AB0(0);
+    WriteIpuOutDmaControl(0);
     env[4] = D3_MADR;
     env[5] = D3_QWC;
     env[6] = D3_CHCR;

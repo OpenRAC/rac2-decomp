@@ -28,9 +28,10 @@ extern int func_0027FB40(int x, int y, unsigned long style, u8 *text, int length
     func_0027FB40((X), row, 0x80f0f0f0UL, (u8 *)func_00288FB8((ID)), -1); \
 }
 
+/* Draws the buy and back prompts, showing buy only when the player can afford it and is not at the cap. */
 void func_L00_00377C50(void)
 {
-    if (D_L00_0022F7C0.active) {
+    if (gPurchaseMenuModel.active) {
         if (KIND == 1 && CAPPED) {
             DRAW(420, 0x1124);
         } else if (KIND == 1) {
@@ -39,7 +40,7 @@ void func_L00_00377C50(void)
             } else {
                 DRAW(420, 0x1124);
             }
-        } else if (D_001A79F8 >= func_002F6510()) {
+        } else if (gPlayerBolts >= GetSelectedShopItemPrice()) {
             DRAW(80, 0x113b);
         } else {
             DRAW(420, 0x1124);
@@ -51,15 +52,15 @@ void func_L00_00377C50(void)
                 return;
             DRAW(420, 0x1124);
         } else {
-            if (D_001A79F8 < func_002F6510())
+            if (gPlayerBolts < GetSelectedShopItemPrice())
                 return;
             DRAW(420, 0x1138);
         }
     } else {
         int stride = 24;
         u8 *kindBase = MODEL + 0x144;
-        if ((*(int *)(kindBase + D_L00_0022F7C0.index * stride) == 0 && D_001A79F8 >= func_002F6510()) ||
-            (*(int *)(kindBase + D_L00_0022F7C0.index * stride) == 1 && !CAPPED && AFFORDABLE)) {
+        if ((*(int *)(kindBase + gPurchaseMenuModel.index * stride) == 0 && gPlayerBolts >= GetSelectedShopItemPrice()) ||
+            (*(int *)(kindBase + gPurchaseMenuModel.index * stride) == 1 && !CAPPED && AFFORDABLE)) {
             DRAW(80, 0x1125);
         }
         DRAW(420, 0x2d4f);

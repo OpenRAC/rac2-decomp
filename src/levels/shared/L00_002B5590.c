@@ -7,16 +7,17 @@ typedef int TI128 __attribute__((mode(TI)));
 extern void func_L00_002D3798(TI128 *, TI128 *, float);
 extern void func_00282DB0(TI128 *, TI128 *);
 
-void func_L00_002B5590(TI128 *p)
+/* Compares a vector with the hero forward direction and returns how much it points that way. */
+void func_L00_002B5590(TI128 *vec)
 {
     TI128 buf[2];
-    TI128 *a;
-    TI128 *b;
+    TI128 *copy;
+    TI128 *result;
 
-    a = &buf[0];
-    buf[0] = *p;
+    copy = &buf[0];
+    buf[0] = *vec;
     qzero_nc(&buf[1]);
-    b = &buf[1];
-    func_L00_002D3798(b, b, 1.0f);
-    func_00282DB0(a, b);
+    result = &buf[1];
+    OffsetPointBySideDirection(result, result, 1.0f);
+    FastVecDot(copy, result);
 }

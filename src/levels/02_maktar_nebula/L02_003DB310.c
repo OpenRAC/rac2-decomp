@@ -40,15 +40,15 @@ void func_L02_003DB6D8(char *arg0) {
     int slot;
     char *rec;
 
-    func_002A7750(arg0, 1, 0);
+    SetMobyState(arg0, 1, 0);
     slot = *(int *)(state + 0x26C);
     if (slot != -1) {
-        rec = D_00188660 + slot * 0x70;
+        rec = gSoundState + slot * 0x70;
         if (*(char **)(rec + 0x88) == arg0 && *(unsigned char *)(rec + 0x74) != 0)
-            func_002E59F8(slot);
+            StopSoundVoice(slot);
     }
     *(int *)(state + 0x26C) = -1;
-    func_002A7470(arg0, 0, 0, 3);
+    StartAnimationBlended(arg0, 0, 0, 3);
     func_002A05A8(arg0);
     *(unsigned char *)(arg0 + 0x31) = 0;
     *(int *)(arg0 + 0x98) = 0;
@@ -57,24 +57,27 @@ void func_L02_003DB6D8(char *arg0) {
     *(unsigned char *)(CHILD003DB6D8 + 0x31) = 0;
     *(int *)(CHILD003DB6D8 + 0x98) = 0;
     if (*(char **)(*(char **)(arg0 + 0x68) + 0x260) != 0)
-        func_0029F338(*(char **)(*(char **)(arg0 + 0x68) + 0x260));
+        MarkMobySpawned(*(char **)(*(char **)(arg0 + 0x68) + 0x260));
     if (*(unsigned char *)(state + 0x171) != 0)
-        func_0029F9F0(CHILD003DB6D8, state + 0x170);
+        DetachManipulator(CHILD003DB6D8, state + 0x170);
     if (*(unsigned char *)(state + 0x1B1) != 0)
-        func_0029F9F0(CHILD003DB6D8, state + 0x1B0);
+        DetachManipulator(CHILD003DB6D8, state + 0x1B0);
     if (*(unsigned char *)(state + 0x1F1) != 0)
-        func_0029F9F0(CHILD003DB6D8, state + 0x1F0);
+        DetachManipulator(CHILD003DB6D8, state + 0x1F0);
 }
 
 #undef CHILD003DB6D8
 
-void func_L02_003DB870(char *arg0, int arg1) {
-    *(int *)(*(char **)(arg0 + 0x68) + 0x264) = arg1;
+/* Stores the entity this actor is watching. */
+void func_L02_003DB870(char *actor, int watched) {
+    *(int *)(*(char **)(actor + 0x68) + 0x264) = watched;
 }
 
 /* Same body as func_L02_003D4990, with this function's own callees. */
-void func_L02_003DB880(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Moves the actor to its next damage stage the first time it runs, skipping
+   stages its health has already passed. */
+void func_L02_003DB880(char *actor) {
+    char *state = *(char **)(actor + 0x68);
 
     if (*(short *)(state + 0x280) != 0)
         return;
@@ -85,8 +88,9 @@ void func_L02_003DB880(char *arg0) {
     *(short *)(state + 0x280) = 1;
 }
 
-void func_L02_003DB938(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Clears the flag that stops the damage stage from advancing again. */
+void func_L02_003DB938(char *actor) {
+    char *state = *(char **)(actor + 0x68);
 
     if (*(short *)(state + 0x280) != 0)
         *(short *)(state + 0x280) = 0;
@@ -94,15 +98,17 @@ void func_L02_003DB938(char *arg0) {
 
 extern void func_002A7750();
 
-int func_L02_003DB950(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    char *other = *(char **)(state + 0x264);
+/* Tells whether the watched entity is awake and the actor's health has dropped
+   below the limit for its current damage stage. */
+int func_L02_003DB950(char *actor) {
+    char *state = *(char **)(actor + 0x68);
+    char *watched = *(char **)(state + 0x264);
     unsigned char kind;
     int result = 0;
 
-    if (other == 0)
+    if (watched == 0)
         goto done;
-    kind = *(unsigned char *)(other + 0x20);
+    kind = *(unsigned char *)(watched + 0x20);
     if (kind == 0xFE)
         goto done;
     if (kind == 0xFD)
@@ -127,11 +133,12 @@ extern float func_00282E48();
 
 extern void func_002A93B0();
 
-void func_L02_003DBE60(char *arg0) {
-    if (*(unsigned char *)(arg0 + 0x31) != 0) {
-        if (func_00282E48(arg0 + 0x10, &D_L02_001BA500) < 64.0f) {
-            func_002A93B0(arg0);
-            *(unsigned char *)(arg0 + 0x6F) = 60;
+/* Makes the actor react when the hero comes within 64 units of it. */
+void func_L02_003DBE60(char *actor) {
+    if (*(unsigned char *)(actor + 0x31) != 0) {
+        if (fast_vec_dist(actor + 0x10, &gCameraPosition_L02) < 64.0f) {
+            UpdateMobyGroundCheck(actor);
+            *(unsigned char *)(actor + 0x6F) = 60;
         }
     }
 }
@@ -168,15 +175,15 @@ typedef struct {
    entry D_L02_002A53B0[track][(int)(position + 9) % 9] is the wanted one and the position is less
    than 0.2 above a whole number: the mode is then 0. Once all three modes are 0 the actor changes
    state (func_002A7750 with 4). */
-void func_L02_003E75A8(char *arg0) {
-    State003E75A8 *st = *(State003E75A8 **)(arg0 + 0x68);
+void func_L02_003E75A8(char *actor) {
+    State003E75A8 *st = *(State003E75A8 **)(actor + 0x68);
     int i;
 
-    if (func_002B3868(arg0)) {
+    if (SetFirstPendingFlag(actor)) {
         st->timer[1] = 100;
         st->timer[0] = 50;
         st->timer[2] = 180;
-        if (*(u16 *)(arg0 + 0x34) & 0x8000) {
+        if (*(u16 *)(actor + 0x34) & 0x8000) {
             st->timer[0] = 180;
             st->timer[2] = 50;
         }
@@ -192,21 +199,21 @@ void func_L02_003E75A8(char *arg0) {
             st->pos[i] = st->pos[i] - st->speed[i];
             if (st->pos[i] < 0.0f)
                 st->pos[i] += 9.0f;
-            if (func_00282948(&st->timer[i]))
+            if (FastFloatHelperD(&st->timer[i]))
                 st->mode[i] = 2;
             break;
         case 2:
             st->pos[i] = st->pos[i] - st->speed[i];
             if (st->pos[i] < 0.0f)
                 st->pos[i] += 9.0f;
-            if (D_L02_002A53B0[i][func_00283CF0(st->pos[i] + 9.0f) % 9] == st->want[i]) {
-                if (st->pos[i] - (float)func_00283CF0(st->pos[i]) < 0.2f)
+            if (D_L02_002A53B0[i][FloatToInt(st->pos[i] + 9.0f) % 9] == st->want[i]) {
+                if (st->pos[i] - (float)FloatToInt(st->pos[i]) < 0.2f)
                     st->mode[i] = 0;
             }
             break;
         }
         if (st->mode[0] == 0 && st->mode[1] == 0 && st->mode[2] == 0)
-            func_002A7750(arg0, 4, -1);
+            SetMobyState(actor, 4, -1);
     }
 }
 
@@ -250,55 +257,55 @@ extern Global001A7A00 D_001A7A00 __attribute__((sda));
    one-shot (the flag at D_001A7A00 + 0x79, func_002E5E58, func_002B0A18 and D_L02_001A903C) and
    adds 300 to D_001A79F8. Modes 1, 3, 4 and 5 call func_002E5CF8 with 2 first, any other mode
    with 3. */
-void func_L02_003E77E0(char *arg0) {
+void func_L02_003E77E0(char *actor) {
     static void *tab[] = { &&c1, &&c2, &&c3, &&c4, &&c5 };
-    char *state = *(char **)(arg0 + 0x68);
-    float a[4];
-    float b[4];
-    int out;
-    char *p;
-    unsigned int sel;
+    char *state = *(char **)(actor + 0x68);
+    float point[4];
+    float offset[4];
+    int outValue;
+    char *created;
+    unsigned int prizeMode;
 
-    func_002A7750(arg0, 1, -1);
-    func_L02_0031E9E8(b, 1.0f);
-    func_L01_0031A278(arg0, a, 3.0f, 0.0f, 2.0f);
-    func_00282CC0(a, b, a);
-    sel = *(int *)(state + 0x5C) - 1;
-    if (sel < 5)
-        goto *D_L02_002A52D0[sel];
+    SetMobyState(actor, 1, -1);
+    RandomPlanarOffset(offset, 1.0f);
+    ComputeMobyLocalPoint(actor, point, 3.0f, 0.0f, 2.0f);
+    FastVecAdd(point, offset, point);
+    prizeMode = *(int *)(state + 0x5C) - 1;
+    if (prizeMode < 5)
+        goto *D_L02_002A52D0[prizeMode];
     goto other;
 c1:
-    func_002E5CF8(2, 0x20, arg0);
-    func_L00_00321878(arg0, 0xF, 0x41, 3, -1, 4, 0.0f);
+    PlayMobySound(2, 0x20, actor);
+    SpawnBoltPickups_L00(actor, 0xF, 0x41, 3, -1, 4, 0.0f);
     goto done;
 c2:
     ((State003E77E0 *)state)->flag = 1;
-    D_L02_001AEC78--;
-    func_002A7750(arg0, 5, -1);
+    gHoveringObjectCount--;
+    SetMobyState(actor, 5, -1);
     goto done;
 c3:
-    func_002E5CF8(2, 0x20, arg0);
-    func_002A68A8(arg0, &out);
-    p = *(char **)(func_003202E8(a, out, -1, 0) + 0x68);
-    func_00282D30(p, p, 0.35f);
+    PlayMobySound(2, 0x20, actor);
+    PickAmmoDropItem(actor, &outValue);
+    created = *(char **)(SpawnWeaponAmmoPickup(point, outValue, -1, 0) + 0x68);
+    FastVecScale(created, created, 0.35f);
     goto done;
 c4:
-    func_002E5CF8(2, 0x20, arg0);
-    func_L02_003A8770(a, 0);
-    func_0026FEB8(D_L02_001B09C8);
+    PlayMobySound(2, 0x20, actor);
+    CreateEffectMobyAtPosition(point, 0);
+    STUB_printf(D_L02_001B09C8);
     goto done;
 c5:
-    func_002E5CF8(2, 0x20, arg0);
+    PlayMobySound(2, 0x20, actor);
     if (D_001A7A00.once == 0) {
         D_001A7A00.once = 1;
-        func_002E5E58(1, 0, 0);
-        func_002B0A18(0x1233, -1);
+        PlaySoundFromGlobalBank(1, 0, 0);
+        SetEntryValueByIndex(0x1233, -1);
         D_L02_001A903C = 1;
     }
-    D_001A79F8 += 300;
+    gPlayerBolts += 300;
     goto done;
 other:
-    func_002E5CF8(3, 0x20, arg0);
+    PlayMobySound(3, 0x20, actor);
 done:
     return;
 }
@@ -329,16 +336,16 @@ done:
 extern void func_31E6A0(char *, int, int);
 
 /* Re-arms the actor's sub-object and clears the low bits of its flags. */
-void func_L02_003EA488(char *arg0) {
-    char *p = *(char **)(arg0 + 0x68);
+void func_L02_003EA488(char *actor) {
+    char *vars = *(char **)(actor + 0x68);
 
-    if (*(unsigned char *)(arg0 + 0x20) != 0)
+    if (*(unsigned char *)(actor + 0x20) != 0)
         return;
-    *(int *)(p + 0x5C) |= 4;
-    func_31E6A0(arg0, 1, -1);
-    *(int *)(arg0 + 0x98) = 0;
-    *(unsigned short *)(arg0 + 0x34) =
-        (*(unsigned short *)(arg0 + 0x34) & 0xEFFF) | 0x43;
+    *(int *)(vars + 0x5C) |= 4;
+    func_31E6A0(actor, 1, -1);
+    *(int *)(actor + 0x98) = 0;
+    *(unsigned short *)(actor + 0x34) =
+        (*(unsigned short *)(actor + 0x34) & 0xEFFF) | 0x43;
 }
 
 
@@ -378,33 +385,35 @@ extern char *D_L02_001FF1C0[];
 extern char D_00189EA0[];
 extern float func_00282E80(char *, char *);
 
-float func_L02_003EEC58(char *arg0) {
-    State *state = *(State **)(arg0 + 0x68);
-    Entry *entry = (Entry *)D_L02_001FF1C0[state->id];
-    float cur = func_00282E80(D_00189EA0, (char *)&entry->pts[state->idx]);
-    float d;
+/* Moves the actor along its path when the hero gets closer to the next or the
+   previous path point, and returns the hero's distance to the closest point. */
+float func_L02_003EEC58(char *actor) {
+    State *state = *(State **)(actor + 0x68);
+    Entry *entry = (Entry *)gRoutePolygons[state->id];
+    float currentDistance = vec_distance_xy(gHeroPosition, (char *)&entry->pts[state->idx]);
+    float neighborDistance;
 
     if (state->idx < entry->count - 1) {
-        d = func_00282E80(D_00189EA0, (char *)&entry->pts[state->idx + 1]);
-        if (d < cur) {
+        neighborDistance = vec_distance_xy(gHeroPosition, (char *)&entry->pts[state->idx + 1]);
+        if (neighborDistance < currentDistance) {
             state->t += entry->pts[state->idx].w;
             if (state->t > 14.0f)
                 state->t = 14.0f;
             state->idx += 1;
-            return d;
+            return neighborDistance;
         }
     }
     if (state->idx > 0) {
-        d = func_00282E80(D_00189EA0, (char *)&entry->pts[state->idx - 1]);
-        if (d < cur) {
+        neighborDistance = vec_distance_xy(gHeroPosition, (char *)&entry->pts[state->idx - 1]);
+        if (neighborDistance < currentDistance) {
             state->t -= entry->pts[state->idx].w;
             if (state->t < 0.0f)
                 state->t = 0.0f;
             state->idx -= 1;
-            return d;
+            return neighborDistance;
         }
     }
-    return cur;
+    return currentDistance;
 }
 
 extern float func_00282C48(float);
@@ -427,28 +436,28 @@ extern char *D_L02_001FF1C0[];
    heading towards it, weighted by the progress (+0x34, minus 6, over 8, at least 0). The heading
    is then copied into the hero's state at +0x1D4, +0x1DC gets 1.0 and, from a progress of 0.9, the
    two shared calls run. Nothing happens while the hero's halfword at +0x86 is not 0. */
-void func_L02_003EEDD0(char *arg0) {
-    char *hero = *(char **)(&D_L02_001BA500 + 0x50);
+void func_L02_003EEDD0(char *actor) {
+    char *hero = *(char **)(&gCameraPosition_L02 + 0x50);
     char *state;
-    char *hs;
-    char *cam;
+    char *heroVars;
+    char *camVars;
     float *dir;
     char *path;
     float scale;
-    float a1;
-    float a2;
-    float t;
+    float segmentAngle;
+    float heroAngle;
+    float easing;
     int last;
     int i;
     int j;
 
     if (*(short *)(hero + 0x86) != 0)
         return;
-    state = *(char **)(arg0 + 0x68);
-    hs = *(char **)(hero + 0x70);
-    cam = hs + 0x1C0;
-    dir = (float *)(hs + 0x160);
-    path = D_L02_001FF1C0[*(int *)state];
+    state = *(char **)(actor + 0x68);
+    heroVars = *(char **)(hero + 0x70);
+    camVars = heroVars + 0x1C0;
+    dir = (float *)(heroVars + 0x160);
+    path = gRoutePolygons[*(int *)state];
     scale = (*(float *)(state + 0x34) - 6.0f) * 0.125f;
     if (scale < 0.0f)
         scale = 0.0f;
@@ -463,24 +472,24 @@ void func_L02_003EEDD0(char *arg0) {
         char *p0 = path + i * 16;
         char *p1 = path + j * 16;
 
-        a1 = func_00283248(*(float *)(p1 + 0x10) - *(float *)(p0 + 0x10),
+        segmentAngle = FastMatrixHelperA(*(float *)(p1 + 0x10) - *(float *)(p0 + 0x10),
                            *(float *)(p1 + 0x14) - *(float *)(p0 + 0x14));
     }
-    a2 = func_00283248(dir[0], dir[1]);
-    a2 = func_00283B98(a2, 3.1415927f);
-    a1 = func_00283BE0(a1, a2);
-    if (func_00282C48(a1) < 0.0017453294713050127f) {
+    heroAngle = FastMatrixHelperA(dir[0], dir[1]);
+    heroAngle = FastAddRotations(heroAngle, 3.1415927f);
+    segmentAngle = fast_subtract_rotations(segmentAngle, heroAngle);
+    if (FloatAbs(segmentAngle) < 0.0017453294713050127f) {
         *(float *)(state + 0x38) = 0.0f;
     } else {
-        t = scale * D_L02_001B0E90;
-        func_002AAC80(state + 0x38, a1, (t + 0.5f) * 0.00027777778450399637f,
-                      (t + 0.5f) * 0.00027777778450399637f, t * 0.01666666753590107f);
+        easing = scale * D_L02_001B0E90;
+        ApproachTargetWithBraking(state + 0x38, segmentAngle, (easing + 0.5f) * 0.00027777778450399637f,
+                      (easing + 0.5f) * 0.00027777778450399637f, easing * 0.01666666753590107f);
     }
-    *(float *)(cam + 0x1C) = 1.0f;
-    *(float *)(cam + 0x14) = *(float *)(state + 0x38);
+    *(float *)(camVars + 0x1C) = 1.0f;
+    *(float *)(camVars + 0x14) = *(float *)(state + 0x38);
     if (scale >= 0.9f) {
-        func_L00_00424B48(0);
-        func_L00_00424C28();
+        set_follow_camera_orbit_clamp_mode(0);
+        SetCameraLockFlag();
     }
 }
 
@@ -492,18 +501,18 @@ extern int func_L02_00348420(void *, char *);
 /* True when D_00189EA0 is within the radius at +0x2C of the actor's position (+0x20) and also
    of one of the 16-byte points of the actor's table entry (taking every +0x40 of them); the
    point is then copied to a local vector that goes to func_L02_00348420 with the entry. */
-int func_L02_003EEFB8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    char *entry = D_L02_001FF1C0[*(int *)state];
+int func_L02_003EEFB8(char *actor) {
+    char *state = *(char **)(actor + 0x68);
+    char *entry = gRoutePolygons[*(int *)state];
     TI128 buf;
     int i;
 
-    if (*(float *)(state + 0x2C) < func_00282E48(D_00189EA0, state + 0x20))
+    if (*(float *)(state + 0x2C) < fast_vec_dist(gHeroPosition, state + 0x20))
         return 0;
     for (i = 0; i < *(int *)entry; i += *(int *)(state + 0x40)) {
-        if (func_00282E48(D_00189EA0, entry + (i * 16 + 0x10)) < *(float *)(state + 0x2C)) {
-            buf = *(TI128 *)D_00189EA0;
-            *(int *)(state + 0x30) = func_L02_00348420(&buf, entry);
+        if (fast_vec_dist(gHeroPosition, entry + (i * 16 + 0x10)) < *(float *)(state + 0x2C)) {
+            buf = *(TI128 *)gHeroPosition;
+            *(int *)(state + 0x30) = FindNearestPointIndex(&buf, entry);
             return 1;
         }
     }
@@ -575,61 +584,61 @@ typedef struct {
    the player is within 24 units, turns the angle by the rate at +0x4CC, updates the effect,
    and for a visible actor of state 3 or more looks for the object of class 0xA03 / 0xB89 that
    it is attached to and releases it. */
-void func_L02_003F1298(char *arg0) {
-    St003F1298 *s = *(St003F1298 **)(arg0 + 0x68);
-    float f;
+void func_L02_003F1298(char *actor) {
+    St003F1298 *vars = *(St003F1298 **)(actor + 0x68);
+    float swayAngle;
 
-    if (*(u8 *)(arg0 + 0x20) == 0) {
-        s->p18 = (char *)&s->f110;
-        f = func_002A7878(15.0f, 40.0f) * 0.017453294f;
-        s->f4B4 = (func_002A77E0(2) != 0) ? -f : f;
-        s->b48 = func_00283CF0(15.0f);
-        s->b4A = func_00283CF0(12.0f);
-        if (func_002A77E0(2) == 1)
-            *(u16 *)(arg0 + 0x34) |= 0x8000;
-        s->f4CC = 8.0f;
-        s->f90 = 0.8f;
-        s->b70 = 10;
-        s->fA8 = 5;
-        s->f94 = 0.8f;
-        s->f9C = 0.4f;
-        s->f118 = 0.4f;
-        s->f110 = 0.6f;
-        s->f114 = 0.2f;
-        s->f11C = 0.4f;
-        s->f4BC = 0.0f;
-        s->f120 = 1.5707965f;
-        s->f140 = 0.52359885f;
-        s->f13C = 0.0055555557f;
-        s->b28 = 3;
-        s->b2E = 1;
-        func_00325B70(arg0, s->x4C0, 0, 1);
-        s->s4EA = 0;
-        func_L02_003F18E8(arg0);
+    if (*(u8 *)(actor + 0x20) == 0) {
+        vars->p18 = (char *)&vars->f110;
+        swayAngle = RandomFloatRange(15.0f, 40.0f) * 0.017453294f;
+        vars->f4B4 = (RandomIntBelow(2) != 0) ? -swayAngle : swayAngle;
+        vars->b48 = FloatToInt(15.0f);
+        vars->b4A = FloatToInt(12.0f);
+        if (RandomIntBelow(2) == 1)
+            *(u16 *)(actor + 0x34) |= 0x8000;
+        vars->f4CC = 8.0f;
+        vars->f90 = 0.8f;
+        vars->b70 = 10;
+        vars->fA8 = 5;
+        vars->f94 = 0.8f;
+        vars->f9C = 0.4f;
+        vars->f118 = 0.4f;
+        vars->f110 = 0.6f;
+        vars->f114 = 0.2f;
+        vars->f11C = 0.4f;
+        vars->f4BC = 0.0f;
+        vars->f120 = 1.5707965f;
+        vars->f140 = 0.52359885f;
+        vars->f13C = 0.0055555557f;
+        vars->b28 = 3;
+        vars->b2E = 1;
+        SpawnEnemyChildParts(actor, vars->x4C0, 0, 1);
+        vars->s4EA = 0;
+        TearDownActor(actor);
     }
-    if (*(u8 *)(arg0 + 0x31) != 0) {
-        if (func_00282E48(arg0 + 0x10, &D_L02_001BA500) < 24.0f) {
-            func_002A93B0(arg0);
-            *(u8 *)(arg0 + 0x6F) = 0x16;
+    if (*(u8 *)(actor + 0x31) != 0) {
+        if (fast_vec_dist(actor + 0x10, &gCameraPosition_L02) < 24.0f) {
+            UpdateMobyGroundCheck(actor);
+            *(u8 *)(actor + 0x6F) = 0x16;
         }
     }
-    s->f4BC = func_00283B98(s->f4BC, s->f4CC * 0.017453294f);
-    func_00325C50(s->f4BC, arg0, s->x4C0, 1, D_L02_001A8F20);
-    func_00325DA0(arg0, s->x4DC);
-    if (*(u8 *)(arg0 + 0x31) != 0 && *(u8 *)(arg0 + 0x20) >= 3) {
-        char *t = func_002A9640(arg0, 0x10000, 1);
+    vars->f4BC = FastAddRotations(vars->f4BC, vars->f4CC * 0.017453294f);
+    AttachAndTurnChildParts(vars->f4BC, actor, vars->x4C0, 1, D_L02_001A8F20);
+    SyncGroupCounter(actor, vars->x4DC);
+    if (*(u8 *)(actor + 0x31) != 0 && *(u8 *)(actor + 0x20) >= 3) {
+        char *contact = FindOwnedEffectSlot(actor, 0x10000, 1);
 
-        if (t != 0 && *(char **)(t + 0x20) != 0 && *(u8 *)(arg0 + 0x31) == 0 &&
-            (*(short *)(*(char **)(t + 0x20) + 0xAA) == 0xA03 ||
-             *(short *)(*(char **)(t + 0x20) + 0xAA) == 0xB89))
-            *(int *)(t + 0x2C) = 0;
-        if (func_002B0ED8(arg0, s->x60, 0) == 5) {
-            s->fF0 = 0;
-            s->fF4 = 0.8377582f;
+        if (contact != 0 && *(char **)(contact + 0x20) != 0 && *(u8 *)(actor + 0x31) == 0 &&
+            (*(short *)(*(char **)(contact + 0x20) + 0xAA) == 0xA03 /* moby class 2563 */ ||
+             *(short *)(*(char **)(contact + 0x20) + 0xAA) == 0xB89 /* moby class 2953 */))
+            *(int *)(contact + 0x2C) = 0;
+        if (ApplyDamageToObject(actor, vars->x60, 0) == 5) {
+            vars->fF0 = 0;
+            vars->fF4 = 0.8377582f;
         }
-        if (*(u8 *)(arg0 + 0x20) >= 2 && s->b2E == 2)
-            func_L02_003F18E8(arg0);
-        func_L02_003F16F0(arg0);
+        if (*(u8 *)(actor + 0x20) >= 2 && vars->b2E == 2)
+            TearDownActor(actor);
+        UpdateActorLoopEffect(actor);
     }
 }
 
@@ -637,13 +646,14 @@ extern void func_002B0990(char *, char *, float, int, int);
 
 extern void func_002A8C28(char *, char *, int, float, float, float, int, int, int);
 
-void func_L02_003F1578(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Counts up a timer and checks the actor for hits every frame. */
+void func_L02_003F1578(char *actor) {
+    char *state = *(char **)(actor + 0x68);
 
-    if (*(unsigned short *)(arg0 + 0x96) < 0xFFFF)
-        (*(unsigned short *)(arg0 + 0x96))++;
-    func_002B0990(arg0, state + 0x220, 2.5f, 7, 1);
-    func_002A8C28(arg0, arg0 + 0x10, 0x4000000, 1.3f, 1.0f, 1.0f, 0, 1, 0);
+    if (*(unsigned short *)(actor + 0x96) < 0xFFFF)
+        (*(unsigned short *)(actor + 0x96))++;
+    SetValueAndStartSmoothChange(actor, state + 0x220, 2.5f, 7, 1);
+    SweepCollisionFromObject(actor, actor + 0x10, 0x4000000, 1.3f, 1.0f, 1.0f, 0, 1, 0);
 }
 
 extern void func_002A91F0(char *, char *);
@@ -656,24 +666,26 @@ extern int func_L02_003FC0D0(int, short);
 
 extern int func_002B3BA8(char *, int, float, float, int, int);
 
-void func_L02_003F16F0(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Starts and keeps up an effect on the actor once it reaches state 4, and
+   clears the effect flag before that. */
+void func_L02_003F16F0(char *actor) {
+    char *state = *(char **)(actor + 0x68);
 
-    if (*(unsigned char *)(arg0 + 0x20) < 4) {
+    if (*(unsigned char *)(actor + 0x20) < 4) {
         *(int *)(state + 0x4B0) = 0;
         goto done;
     }
 
     if (*(short *)(state + 0x4EA) == 1) {
         *(short *)(state + 0x4E8) =
-            func_002B3BA8(arg0, *(int *)(state + 0x4E4), 100.0f, 100.0f, 0, 0);
+            SelectAimTarget_002B3BA8(actor, *(int *)(state + 0x4E4), 100.0f, 100.0f, 0, 0);
         *(int *)(state + 0x4B0) = *(int *)(state + 0x210);
     } else {
-        if (func_L02_003FC0D0(*(int *)(arg0 + 0xB8), *(short *)(arg0 + 0xAA)) == 0)
+        if (TakeEnemyQuota(*(int *)(actor + 0xB8), *(short *)(actor + 0xAA)) == 0)
             goto done;
         *(short *)(state + 0x4EA) = 1;
         *(short *)(state + 0x4E8) =
-            func_002B3BA8(arg0, *(int *)(state + 0x4E4), 100.0f, 100.0f, 0, 0);
+            SelectAimTarget_002B3BA8(actor, *(int *)(state + 0x4E4), 100.0f, 100.0f, 0, 0);
         *(int *)(state + 0x4B0) = *(int *)(state + 0x210);
     }
     return;
@@ -687,20 +699,20 @@ extern void func_002B60B0(u8 *, float, float, float, float);
 extern void func_002A0488(void *, u8, u8, u8);
 
 /* Sets the actor up: re-registers its sub-objects and arms its effects. */
-void func_L02_003F17B0(char *arg0, int arg1) {
-    char *state = *(char **)(arg0 + 0x68);
+void func_L02_003F17B0(char *actor, int value) {
+    char *state = *(char **)(actor + 0x68);
     int i;
 
     *(float *)(state + 0x20) = (float)*(short *)(state + 0x24);
     *(u16 *)(state + 0x98) = 0;
-    func_002B60B0((u8 *)arg0, 0.004444444552063942f, 0.13333334028720856f,
+    SetControllerSpeedLimits((u8 *)actor, 0.004444444552063942f, 0.13333334028720856f,
                   0.0011635529808700085f, 0.10471977293491364f);
-    func_002A7750(arg0, 3, 0);
-    *(int *)(arg0 + 0x98) = *(int *)(*(char **)(arg0 + 0x24) + 0x10);
+    SetMobyState(actor, 3, 0);
+    *(int *)(actor + 0x98) = *(int *)(*(char **)(actor + 0x24) + 0x10);
     *(u8 *)(state + 0x7A) = 0;
-    *(u8 *)(arg0 + 0x31) = 1;
-    *(u8 *)(arg0 + 0x7F) = 0;
-    *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x1000) & 0xFFB8;
+    *(u8 *)(actor + 0x31) = 1;
+    *(u8 *)(actor + 0x7F) = 0;
+    *(u16 *)(actor + 0x34) = (*(u16 *)(actor + 0x34) | 0x1000) & 0xFFB8;
     {
         char **slot = (char **)(state + 0x4C0);
 
@@ -716,11 +728,11 @@ void func_L02_003F17B0(char *arg0, int arg1) {
     {
         short flag = *(short *)(state + 0x60);
 
-        *(u16 *)(state + 0x4F0) = arg1;
+        *(u16 *)(state + 0x4F0) = value;
         *(u16 *)(state + 0x4EA) = 0;
         if (flag != 0) {
             *(short *)(state + 0x60) = 0;
-            func_002A0488(arg0, *(u8 *)(state + 0x64), *(u8 *)(state + 0x65),
+            set_moby_color(actor, *(u8 *)(state + 0x64), *(u8 *)(state + 0x65),
                           *(u8 *)(state + 0x66));
             *(short *)(state + 0x62) = 1;
         }
@@ -744,23 +756,23 @@ extern void func_41F230(char *, int, int, int, int, int, int, int, float, float,
 extern void func_366BD8(int, int, char *, int);
 
 /* Tears the actor down: stops its effect, clears its sub-objects, resets flags. */
-void func_L02_003F18E8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+void func_L02_003F18E8(char *actor) {
+    char *state = *(char **)(actor + 0x68);
     char buffer[0x10];
     int i;
 
     if (*(short *)(state + 0x4EA) == 1)
-        func_3FC1B0(*(int *)(arg0 + 0xB8), 0xB22);
+        func_3FC1B0(*(int *)(actor + 0xB8), 0xB22);
     *(short *)(state + 0x4EA) = 0;
     *(int *)(state + 0x4B0) = 0;
     *(unsigned char *)(state + 0x7A) = 0;
     *(unsigned char *)(state + 0x2E) = 1;
-    if (*(unsigned char *)(arg0 + 0x31) != 0) {
-        func_41F230(arg0 + 0x10, 0, 0x1E, 5, 5, 5, 0x2D, 1, 0.5f, 0.0f, 1, 0, 0, 0);
-        func_366BD8(0, 0, arg0, 0xC3E);
+    if (*(unsigned char *)(actor + 0x31) != 0) {
+        func_41F230(actor + 0x10, 0, 0x1E, 5, 5, 5, 0x2D, 1, 0.5f, 0.0f, 1, 0, 0, 0);
+        func_366BD8(0, 0, actor, 0xC3E);
         func_31EA58(buffer, 0.033333335071802139f, 0.083333335816860199f);
         func_2F1F70(buffer, buffer, state + 0xE0);
-        func_32B068(arg0, 0x7F, buffer, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+        func_32B068(actor, 0x7F, buffer, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     }
     {
         char **slot = (char **)(state + 0x4C0);
@@ -774,23 +786,25 @@ void func_L02_003F18E8(char *arg0) {
             slot++;
         }
     }
-    func_31E3C0(arg0, 0, 0, 3);
-    func_316220(arg0);
-    func_31E6A0(arg0, 1, 0);
-    *(unsigned char *)(arg0 + 0x31) = 0;
-    *(int *)(arg0 + 0x98) = 0;
-    *(unsigned short *)(arg0 + 0x34) =
-        (*(unsigned short *)(arg0 + 0x34) & 0xEFFF) | 0x47;
+    func_31E3C0(actor, 0, 0, 3);
+    func_316220(actor);
+    func_31E6A0(actor, 1, 0);
+    *(unsigned char *)(actor + 0x31) = 0;
+    *(int *)(actor + 0x98) = 0;
+    *(unsigned short *)(actor + 0x34) =
+        (*(unsigned short *)(actor + 0x34) & 0xEFFF) | 0x47;
 }
 
 /* func_L02_003F1A88 is defined in L02_003F1A88.c. */
 
-void func_L02_003F1B70(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Remembers the actor's current state and a byte of its data, then switches it
+   to state 6. */
+void func_L02_003F1B70(char *actor) {
+    char *state = *(char **)(actor + 0x68);
 
-    *(short *)(state + 0x4EC) = *(unsigned char *)(arg0 + 0x20);
-    *(short *)(state + 0x4EE) = *(unsigned char *)(arg0 + 0x95);
-    func_002A7750(arg0, 6, 4);
+    *(short *)(state + 0x4EC) = *(unsigned char *)(actor + 0x20);
+    *(short *)(state + 0x4EE) = *(unsigned char *)(actor + 0x95);
+    SetMobyState(actor, 6, 4);
 }
 
 /* func_L02_003F52B0 is defined in L02_003F52B0.c. */
@@ -801,8 +815,8 @@ extern u8 D_L02_00220730;
 
 /* Appends to the actor's list of 16-bit indices (at +0x40, count at +0x80, at most 0x20) the
    index of every 0x20-byte record of the table whose byte at +0x1A equals the current key. */
-void func_L02_003F5390(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+void func_L02_003F5390(char *actor) {
+    char *state = *(char **)(actor + 0x68);
     s16 *tbl = (s16 *)(state + 0x40);
     u8 key = D_L02_00220730;
     char *end = D_L02_001B3AFC;

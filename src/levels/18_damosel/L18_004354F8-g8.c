@@ -46,76 +46,77 @@ typedef struct DamoselObject {
 } DamoselObject;
 #define CHILD(n) (s->child[(n)/4]+((DamoselObject *)D_L18_001B281C))
 #define ACTIVE(n) (((u8 *)CHILD(n)->data)[0x14])
-void func_L18_004354F8(DamoselObject *o) {
-    DamoselController *s=o->data;
-    float t;
-    switch(o->state) {
+/* Updates a controller (moby class 3924) for two linked child objects: it fades its effect in while either child is active and fades it out again when one stops, with a sound while it changes. */
+void func_L18_004354F8(DamoselObject *moby) {
+    DamoselController *s=moby->data;
+    float progress;
+    switch(moby->state) {
     case 0:
-        qcopy(D_L18_001B3720,o->position);
+        qcopy(D_L18_001B3720,moby->position);
         D_L18_001B3730=D_L18_001B1658;
-        o->animation=0;
-        func_002A7750(o,1,-1);
-        o->flags|=0x200;
-        s->sound=func_L00_0035F5A0(16,4,o);
+        moby->animation=0;
+        SetMobyState(moby,1,-1);
+        moby->flags|=0x200;
+        s->sound=StartEffectInSlot(16,4,moby);
         break;
     case 1:
-        if(func_002B3868(o)) {
-            o->enabled=0; o->flags|=1;
-            o->angle=D_L18_001B1634;
-            o->alpha=D_L18_001B163C;
+        if(SetFirstPendingFlag(moby)) {
+            moby->enabled=0; moby->flags|=1;
+            moby->angle=D_L18_001B1634;
+            moby->alpha=D_L18_001B163C;
             if(ACTIVE(4)) CHILD(4)->command=25;
             if(ACTIVE(0)) CHILD(0)->command=25;
             s->color[0]=D_L18_001B1668_GP; s->color[1]=D_L18_001B1668[1];
-        } else if(ACTIVE(0)||ACTIVE(4)) func_002A7750(o,2,-1);
-        func_L18_004359A8(o);
+        } else if(ACTIVE(0)||ACTIVE(4)) SetMobyState(moby,2,-1);
+        SpawnRandomEffectBurst(moby);
         break;
     case 2:
-        if(func_002B3868(o)) {
-            o->enabled=1; o->flags&=0xFFFE;
-            s->step=func_00283C80(D_L18_001B1638,D_L18_001B1634);
+        if(SetFirstPendingFlag(moby)) {
+            moby->enabled=1; moby->flags&=0xFFFE;
+            s->step=FastDiffRots(D_L18_001B1638,D_L18_001B1634);
             s->step /= (float)D_L18_001B1630;
         }
-        t=func_00283CE0(o->timer);
-        t /= (float)D_L18_001B1630;
-        o->angle=func_00283B98(o->angle,s->step);
-        o->alpha=func_L00_0031C998(D_L18_001B163C,D_L18_001B163D,t);
-        s->color[0]=func_L00_0031C998(D_L18_001B1668_GP,D_L18_001B1670_GP,t);
-        s->color[1]=func_L00_0031C998(D_L18_001B1668[1],D_L18_001B1670[1],t);
-        func_L18_004359A8(o);
-        if(o->timer>D_L18_001B1630) func_002A7750(o,3,-1);
+        progress=IntToFloat(moby->timer);
+        progress /= (float)D_L18_001B1630;
+        moby->angle=FastAddRotations(moby->angle,s->step);
+        moby->alpha=LerpIntegerFraction(D_L18_001B163C,D_L18_001B163D,progress);
+        s->color[0]=LerpIntegerFraction(D_L18_001B1668_GP,D_L18_001B1670_GP,progress);
+        s->color[1]=LerpIntegerFraction(D_L18_001B1668[1],D_L18_001B1670[1],progress);
+        SpawnRandomEffectBurst(moby);
+        if(moby->timer>D_L18_001B1630) SetMobyState(moby,3,-1);
         break;
     case 3:
-        if(func_002B3868(o)) {
-            int n;
-            o->angle=D_L18_001B1638; o->alpha=D_L18_001B163D;
+        if(SetFirstPendingFlag(moby)) {
+            int soundId;
+            moby->angle=D_L18_001B1638; moby->alpha=D_L18_001B163D;
             s->color[0]=D_L18_001B1670_GP; s->color[1]=D_L18_001B1670[1];
-            o->animation=(*(int *)(o->config+16));
+            moby->animation=(*(int *)(moby->config+16));
             if(!ACTIVE(4)) CHILD(4)->command=25;
             if(!ACTIVE(0)) CHILD(0)->command=25;
-            n=s->sound;
-            if(n!=-1) {
-                DamoselSound *sound = (DamoselSound *)(D_00188660+n*0x70);
-                if(sound->owner==o && sound->active) func_002E59F8(n);
+            soundId=s->sound;
+            if(soundId!=-1) {
+                DamoselSound *sound = (DamoselSound *)(gSoundState+soundId*0x70);
+                if(sound->owner==moby && sound->active) StopSoundVoice(soundId);
             }
             s->sound=-1;
-        } else if(!ACTIVE(0)||!ACTIVE(4)) func_002A7750(o,4,-1);
+        } else if(!ACTIVE(0)||!ACTIVE(4)) SetMobyState(moby,4,-1);
         break;
     case 4:
-        if(func_002B3868(o)) {
-            o->animation=0;
-            s->step=-func_00283C80(D_L18_001B1638,D_L18_001B1634);
+        if(SetFirstPendingFlag(moby)) {
+            moby->animation=0;
+            s->step=-FastDiffRots(D_L18_001B1638,D_L18_001B1634);
             s->step /= (float)D_L18_001B1630;
-            s->sound=func_L00_0035F5A0(16,4,o);
+            s->sound=StartEffectInSlot(16,4,moby);
         }
-        t=func_00283CE0(o->timer);
-        t /= (float)D_L18_001B1630;
-        o->angle=func_00283B98(o->angle,s->step);
-        o->alpha=func_L00_0031C998(D_L18_001B163D,D_L18_001B163C,t);
-        s->color[0]=func_L00_0031C998(D_L18_001B1670_GP,D_L18_001B1668_GP,t);
-        s->color[1]=func_L00_0031C998(D_L18_001B1670[1],D_L18_001B1668[1],t);
-        func_L18_004359A8(o);
-        if(o->timer>D_L18_001B1630) func_002A7750(o,1,-1);
+        progress=IntToFloat(moby->timer);
+        progress /= (float)D_L18_001B1630;
+        moby->angle=FastAddRotations(moby->angle,s->step);
+        moby->alpha=LerpIntegerFraction(D_L18_001B163D,D_L18_001B163C,progress);
+        s->color[0]=LerpIntegerFraction(D_L18_001B1670_GP,D_L18_001B1668_GP,progress);
+        s->color[1]=LerpIntegerFraction(D_L18_001B1670[1],D_L18_001B1668[1],progress);
+        SpawnRandomEffectBurst(moby);
+        if(moby->timer>D_L18_001B1630) SetMobyState(moby,1,-1);
         break;
     }
-    if(o->timer<65535) o->timer++;
+    if(moby->timer<65535) moby->timer++;
 }

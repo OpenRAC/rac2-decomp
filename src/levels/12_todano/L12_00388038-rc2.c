@@ -30,6 +30,8 @@ extern s32 ref_L12_00388038_00;
 extern struct { s32 w0; s32 w1; s32 w2; } ref_L12_00388038_01;
 extern void *ref_L12_00388038_02 __attribute__((sda));
 
+/* Moby class 3871 update. Resets and re-flags every object in a linked chain, but only in the
+   one level state where that is wanted. */
 void func_L12_00388038(void) {
     s8 *p ;
 

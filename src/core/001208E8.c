@@ -76,6 +76,7 @@ typedef struct __eh_info
    RETHROW - 1 if this is a rethrow. (see incoming value of PC).
    CLEANUP - returned flag indicating whether this is a cleanup handler.
 */
+/* Looks up the exception handler that covers a code address and says whether it is only a cleanup. */
 void * func_001208E8 (void *pc, exception_descriptor *table, 
                         __eh_info *eh_info, int rethrow, int *cleanup)
 {

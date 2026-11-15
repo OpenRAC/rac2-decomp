@@ -27,6 +27,7 @@ typedef int TI __attribute__((mode(TI)));
 
 extern TI D_00189EA0;
 
-TI func_00334710(s32 arg0, TI *arg1) {
-    return *arg1 = D_00189EA0;
+/* Copies a fixed vector from the hero data into the output. */
+TI func_00334710(s32 moby, TI *out) {
+    return *out = gHeroPosition;
 }

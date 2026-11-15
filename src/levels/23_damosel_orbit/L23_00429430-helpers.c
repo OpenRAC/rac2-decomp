@@ -78,14 +78,15 @@ extern float func_00283B98(float, float);
 extern float func_002A7940(void);
 extern void func_00281EB8(u8 *, s32, u32, s32, float, float, float);
 
-void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
+/* Draws a fading glowing beam with scrolling texture and a bright spot at its end. */
+void func_L23_00429430(s32 unused0, s32 unused1, s32 unused2, s32 unused3, s32 unused4, u8 *obj) {
     L23Quad q;
     float vrel[4];
     float vaxis[4];
     float vtip[4];
     float vside[4];
     float vbase[4];
-    float t[2];
+    float uvOffset[2];
     float *rel;
     float *axis;
     float *tip;
@@ -93,26 +94,26 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     float *base;
     L23BeamVars *vars;
     u8 *pos;
-    s32 n;
+    s32 fadeValue;
     float angle;
-    float s;
-    float c;
+    float sinAngle;
+    float cosAngle;
     int i;
     int j;
 
     vars = *(L23BeamVars **)(obj + 0x68);
-    n = vars->fade;
-    D_L23_001B1B40 = n * 4;
+    fadeValue = vars->fade;
+    D_L23_001B1B40 = fadeValue * 4;
     if (D_L23_001B1B40 != 0) {
         D_L23_001B1B40--;
     }
-    D_L23_001B1B50 = n * 2;
-    D_L23_001B1B60 = n;
-    D_L23_001B1B70 = n;
-    D_L23_001B1B80 = n;
-    func_L00_004181A8(&q);
+    D_L23_001B1B50 = fadeValue * 2;
+    D_L23_001B1B60 = fadeValue;
+    D_L23_001B1B70 = fadeValue;
+    D_L23_001B1B80 = fadeValue;
+    InitTransformRecord(&q);
     pos = obj + 0x10;
-    func_00281DE8(&q, D_L23_001B1B24, 1, 0x80);
+    InitQuadPacketState(&q, D_L23_001B1B24, 1, 0x80);
     q.rgba[1] = (u32)D_L23_001B1B40 << 24;
     q.rgba[1] |= (u32)D_L23_001B1B3C << 16;
     q.rgba[1] |= (u32)D_L23_001B1B38 << 8;
@@ -146,18 +147,18 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     if (vars->scroll >= 4.0f) {
         vars->scroll -= 4.0f;
     }
-    func_00282CF0(rel, (float *)pos, D_L23_001BA640);
-    func_00282F20(axis, vars->dir, -D_L23_001B1B1C);
-    func_00282CC0(tip, (float *)pos, axis);
-    func_00282DD8(side, rel, axis);
-    func_00282F20(side, side, D_L23_001B1AFC);
-    func_00282F20(base, vars->dir, D_L23_001B1B90);
-    func_00282CC0(base, (float *)pos, base);
-    func_00282CC0((float *)&q.corner[0], base, side);
-    func_00282CF0(((float *)&q.corner[1]), base, side);
-    func_00282CC0(((float *)&q.corner[2]), tip, side);
-    func_00282CF0(((float *)&q.corner[3]), tip, side);
-    func_00280B90(&q, 0, 0);
+    FastVecSub(rel, (float *)pos, gCameraPosition_L23);
+    vec_scale_to_length(axis, vars->dir, -D_L23_001B1B1C);
+    FastVecAdd(tip, (float *)pos, axis);
+    FastVecCross(side, rel, axis);
+    vec_scale_to_length(side, side, D_L23_001B1AFC);
+    vec_scale_to_length(base, vars->dir, D_L23_001B1B90);
+    FastVecAdd(base, (float *)pos, base);
+    FastVecAdd((float *)&q.corner[0], base, side);
+    FastVecSub(((float *)&q.corner[1]), base, side);
+    FastVecAdd(((float *)&q.corner[2]), tip, side);
+    FastVecSub(((float *)&q.corner[3]), tip, side);
+    draw_world_quad(&q, 0, 0);
 
     q.rgba[0] = q.rgba[2];
     q.rgba[1] = q.rgba[3];
@@ -165,11 +166,11 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.rgba[2] = 0x801010;
     qcopy(&q.corner[0],&q.corner[2]);
     qcopy(&q.corner[1],&q.corner[3]);
-    func_00282CC0(((float *)&q.corner[2]), ((float *)&q.corner[2]), axis);
-    func_00282CC0(((float *)&q.corner[3]), ((float *)&q.corner[3]), axis);
-    func_00280B90(&q, 0, 0);
+    FastVecAdd(((float *)&q.corner[2]), ((float *)&q.corner[2]), axis);
+    FastVecAdd(((float *)&q.corner[3]), ((float *)&q.corner[3]), axis);
+    draw_world_quad(&q, 0, 0);
 
-    func_00282F20(axis, vars->dir, -D_L23_001B1B20);
+    vec_scale_to_length(axis, vars->dir, -D_L23_001B1B20);
     q.uv[0][0] = 0.0f;
     q.uv[0][1] = 0.0f;
     q.uv[1][0] = 0.0f;
@@ -179,18 +180,18 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.uv[3][0] = 1.0f;
     q.uv[3][1] = 1.0f;
     angle = vars->spin;
-    s = func_00283180(angle);
-    c = func_00283198(angle);
+    sinAngle = FastSinOrCosA(angle);
+    cosAngle = FastSinOrCosB(angle);
     for (j = 0; j < 4; j++) {
-        t[0] = q.uv[j][0] - 0.5f;
-        t[1] = q.uv[j][1] - 0.5f;
-        q.uv[j][0] = t[0] * s - t[1] * c;
-        q.uv[j][1] = t[0] * c + t[1] * s;
+        uvOffset[0] = q.uv[j][0] - 0.5f;
+        uvOffset[1] = q.uv[j][1] - 0.5f;
+        q.uv[j][0] = uvOffset[0] * sinAngle - uvOffset[1] * cosAngle;
+        q.uv[j][1] = uvOffset[0] * cosAngle + uvOffset[1] * sinAngle;
         q.uv[j][0] += 0.5f;
         q.uv[j][1] += 0.5f;
     }
-    vars->spin = func_00283B98(vars->spin, D_L23_001B1B18 * 0.017453294f);
-    func_00281DE8(&q, D_L23_001B1B28, 1, 0x80);
+    vars->spin = FastAddRotations(vars->spin, D_L23_001B1B18 * 0.017453294f);
+    InitQuadPacketState(&q, D_L23_001B1B28, 1, 0x80);
     q.d70 = 5;
 
     q.rgba[1] = (u32)D_L23_001B1B0C << 24;
@@ -202,16 +203,16 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.rgba[3] |= D_L23_001B1B64;
     q.rgba[0] = q.rgba[1];
     q.rgba[2] = q.rgba[3];
-    func_00282F20(side, side, D_L23_001B1AF0);
-    func_00282F20(base, vars->dir, D_L23_001B1B90);
-    func_00282CC0(base, (float *)pos, base);
-    func_00282CC0((float *)&q.corner[0], base, side);
-    func_00282CF0(((float *)&q.corner[1]), base, side);
-    func_00282CC0(tip, base, axis);
-    func_00282CC0(tip, tip, axis);
-    func_00282CC0(((float *)&q.corner[2]), tip, side);
-    func_00282CF0(((float *)&q.corner[3]), tip, side);
-    func_00280B90(&q, 0, 0);
+    vec_scale_to_length(side, side, D_L23_001B1AF0);
+    vec_scale_to_length(base, vars->dir, D_L23_001B1B90);
+    FastVecAdd(base, (float *)pos, base);
+    FastVecAdd((float *)&q.corner[0], base, side);
+    FastVecSub(((float *)&q.corner[1]), base, side);
+    FastVecAdd(tip, base, axis);
+    FastVecAdd(tip, tip, axis);
+    FastVecAdd(((float *)&q.corner[2]), tip, side);
+    FastVecSub(((float *)&q.corner[3]), tip, side);
+    draw_world_quad(&q, 0, 0);
 
     q.rgba[1] = (u32)D_L23_001B1B0C << 24;
     q.rgba[1] |= (u32)D_L23_001B1B5C << 16;
@@ -222,16 +223,16 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.rgba[3] |= D_L23_001B1B64;
     q.rgba[0] = q.rgba[1];
     q.rgba[2] = q.rgba[3];
-    func_00282F20(side, side, D_L23_001B1AF4);
-    func_00282F20(base, vars->dir, D_L23_001B1B84);
-    func_00282CC0(base, (float *)pos, base);
-    func_00282CC0((float *)&q.corner[0], base, side);
-    func_00282CF0(((float *)&q.corner[1]), base, side);
-    func_00282CC0(tip, base, axis);
-    func_00282CC0(tip, tip, axis);
-    func_00282CC0(((float *)&q.corner[2]), tip, side);
-    func_00282CF0(((float *)&q.corner[3]), tip, side);
-    func_00280B90(&q, 0, 0);
+    vec_scale_to_length(side, side, D_L23_001B1AF4);
+    vec_scale_to_length(base, vars->dir, D_L23_001B1B84);
+    FastVecAdd(base, (float *)pos, base);
+    FastVecAdd((float *)&q.corner[0], base, side);
+    FastVecSub(((float *)&q.corner[1]), base, side);
+    FastVecAdd(tip, base, axis);
+    FastVecAdd(tip, tip, axis);
+    FastVecAdd(((float *)&q.corner[2]), tip, side);
+    FastVecSub(((float *)&q.corner[3]), tip, side);
+    draw_world_quad(&q, 0, 0);
 
     q.rgba[1] = (u32)D_L23_001B1B14 << 24;
     q.rgba[1] |= (u32)D_L23_001B1B5C << 16;
@@ -242,16 +243,16 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.rgba[3] |= D_L23_001B1B64;
     q.rgba[0] = q.rgba[1];
     q.rgba[2] = q.rgba[3];
-    func_00282F20(side, side, D_L23_001B1AF8);
-    func_00282F20(base, vars->dir, D_L23_001B1B84);
-    func_00282CC0(base, (float *)pos, base);
-    func_00282CC0((float *)&q.corner[0], base, side);
-    func_00282CF0(((float *)&q.corner[1]), base, side);
-    func_00282CC0(tip, base, axis);
-    func_00282CC0(tip, tip, axis);
-    func_00282CC0(((float *)&q.corner[2]), tip, side);
-    func_00282CF0(((float *)&q.corner[3]), tip, side);
-    func_00280B90(&q, 0, 0);
+    vec_scale_to_length(side, side, D_L23_001B1AF8);
+    vec_scale_to_length(base, vars->dir, D_L23_001B1B84);
+    FastVecAdd(base, (float *)pos, base);
+    FastVecAdd((float *)&q.corner[0], base, side);
+    FastVecSub(((float *)&q.corner[1]), base, side);
+    FastVecAdd(tip, base, axis);
+    FastVecAdd(tip, tip, axis);
+    FastVecAdd(((float *)&q.corner[2]), tip, side);
+    FastVecSub(((float *)&q.corner[3]), tip, side);
+    draw_world_quad(&q, 0, 0);
 
     q.rgba[1] = (u32)D_L23_001B1B10 << 24;
     q.rgba[1] |= (u32)D_L23_001B1B7C << 16;
@@ -262,18 +263,18 @@ void func_L23_00429430(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4, u8 *obj) {
     q.rgba[3] |= D_L23_001B1B64;
     q.rgba[0] = q.rgba[1];
     q.rgba[2] = q.rgba[3];
-    func_00282F20(side, side, D_L23_001B1AF0);
-    func_00282F20(base, vars->dir, D_L23_001B1B88);
-    func_00282CC0(base, (float *)pos, base);
-    func_00282CC0((float *)&q.corner[0], base, side);
-    func_00282CF0(((float *)&q.corner[1]), base, side);
-    func_00282F20(axis, vars->dir, -0.6f);
-    func_00282CC0(tip, base, axis);
-    func_00282CC0(tip, tip, axis);
-    func_00282CC0(((float *)&q.corner[2]), tip, side);
-    func_00282CF0(((float *)&q.corner[3]), tip, side);
-    func_00280B90(&q, 0, 0);
+    vec_scale_to_length(side, side, D_L23_001B1AF0);
+    vec_scale_to_length(base, vars->dir, D_L23_001B1B88);
+    FastVecAdd(base, (float *)pos, base);
+    FastVecAdd((float *)&q.corner[0], base, side);
+    FastVecSub(((float *)&q.corner[1]), base, side);
+    vec_scale_to_length(axis, vars->dir, -0.6f);
+    FastVecAdd(tip, base, axis);
+    FastVecAdd(tip, tip, axis);
+    FastVecAdd(((float *)&q.corner[2]), tip, side);
+    FastVecSub(((float *)&q.corner[3]), tip, side);
+    draw_world_quad(&q, 0, 0);
 
-    func_00281EB8(pos, D_L23_001B1B00, D_L23_001B1B08, 1, D_L23_001B1B04, 0.08f, func_002A7940());
-    func_00281EB8(pos, D_L23_001B1B00, 0x80808080, 1, D_L23_001B1B04 * 0.4f, 0.08f, func_002A7940());
+    DrawBillboardQuad_00281EB8(pos, D_L23_001B1B00, D_L23_001B1B08, 1, D_L23_001B1B04, 0.08f, RandomAngle());
+    DrawBillboardQuad_00281EB8(pos, D_L23_001B1B00, 0x80808080, 1, D_L23_001B1B04 * 0.4f, 0.08f, RandomAngle());
 }

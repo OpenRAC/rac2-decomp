@@ -13,43 +13,45 @@ extern int D_001B1D48_1 MACRO_ADDR;
 extern int func_00288FB8(int);
 extern void func_0029CCD8(int, int);
 
-int func_002B0C28(int a0, int a1, int a2)
+/* Tries to take the notice slot for an owner and show a text. */
+int func_002B0C28(int owner, int textId, int style)
 {
-    int current = D_001A8C64;
+    int current = gNoticeOwner;
 
-    if (current == a0) {
-        if (a1 != 0)
-            func_0029CCD8(func_00288FB8(a1), a2);
-        D_001B1D48 = a1;
+    if (current == owner) {
+        if (textId != 0)
+            func_0029CCD8(GetLocalizedString(textId), style);
+        gNoticeTextId = textId;
         D_001A8C60_1 = 2;
         return 2;
     }
     if (current == 0) {
-        if (a1 != 0)
-            func_0029CCD8(func_00288FB8(a1), a2);
-        D_001A8C64_1 = a0;
+        if (textId != 0)
+            func_0029CCD8(GetLocalizedString(textId), style);
+        D_001A8C64_1 = owner;
         D_001A8C60 = 2;
-        D_001B1D48_1 = a1;
+        D_001B1D48_1 = textId;
         return 1;
     }
     return 0;
 }
 
-int func_002B0CE0(int a0, int a1, int a2)
+/* Like TryClaimNotice but takes over the slot when it is already used. */
+int func_002B0CE0(int owner, int textId, int style)
 {
-    int result = func_002B0C28(a0, a1, a2);
+    int result = TryClaimNotice(owner, textId, style);
 
     if (result == 0) {
-        if (a1 != 0) {
-            func_0029CCD8(func_00288FB8(a1), a2);
-            D_001A8C60 = a2;
+        if (textId != 0) {
+            func_0029CCD8(GetLocalizedString(textId), style);
+            D_001A8C60 = style;
             result = 3;
         } else {
-            D_001A8C60_1 = a2;
+            D_001A8C60_1 = style;
             result = 3;
         }
-        D_001A8C64_1 = a0;
-        D_001B1D48_1 = a1;
+        D_001A8C64_1 = owner;
+        D_001B1D48_1 = textId;
     }
     return result;
 }

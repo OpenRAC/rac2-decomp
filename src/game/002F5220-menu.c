@@ -46,7 +46,7 @@ static __inline__ int menu6608Special(int id)
 #define MENU6608_TYPE_OK(type, id) ((type) >= 2 || ((type) == 1 && menu6608Special(id)))
 static __inline__ int menu6608TypeOk(int id)
 {
-    int n = func_00287F60(id);
+    int n = CountChainEntriesAfterHead(id);
     if (MENU6608_TYPE_OK(n, id)) return 1;
     return 0;
 }
@@ -54,7 +54,7 @@ static __inline__ int menu6608CanUpgrade(int id)
 {
     int eligible = 0;
     int result;
-    if (MENU_ITEMS[D_00139568[id]].active) {
+    if (MENU_ITEMS[gItemSlotToRecord[id]].active) {
         result = menu6608TypeOk(id);
     } else {
         result = 0;
@@ -64,33 +64,34 @@ static __inline__ int menu6608CanUpgrade(int id)
 }
 static __inline__ int menu6608HasType(int id)
 {
-    Menu6608Item *item = &MENU_ITEMS[D_00139568[id]];
+    Menu6608Item *item = &MENU_ITEMS[gItemSlotToRecord[id]];
     if (item->active && MENU6608_TYPE_OK(item->type, id)) return 1;
     return 0;
 }
 
+/* Builds the vendor's weapon and upgrade list: which weapons can be bought, upgraded or refilled with ammo. Removes duplicate entries at the end. */
 void func_002F6608(int hideUnowned)
 {
-    int n, id;
+    int listLen, id;
 
-    if (func_00288D58()) {
+    if (IsFlagByteSet()) {
         int i;
         for (i = 0; i < 56; i++) {
-            if (i != 10 && MENU_ITEMS[D_00139568[i]].active)
-                func_002883E8(i);
+            if (i != 10 && MENU_ITEMS[gItemSlotToRecord[i]].active)
+                StoreHelpIdInSlotList(i);
         }
     }
-    for (n = 0; n < 32; n++) {
-        if (D_001A7B68[n] == 255) break;
+    for (listLen = 0; listLen < 32; listLen++) {
+        if (D_001A7B68[listLen] == 255) break;
     }
     MENU_STATE->count = 0;
     if (!MENU_STATE->locked) {
         int i;
-        for (i = 0; i < n; i++) {
+        for (i = 0; i < listLen; i++) {
             if (D_001A7B68[i] == 255) continue;
             id = D_001A7B68[i] & 63;
-            if (D_001A7AF8[id] && menu6608CanUpgrade(id) && !menu6608HasType(id) && MENU_ITEMS[D_00139568[id]].cost <= 0 && func_00288D58()) {
-                int classId = MENU_ITEMS[D_00139568[id]].classId;
+            if (gItemOwnedFlags[id] && menu6608CanUpgrade(id) && !menu6608HasType(id) && MENU_ITEMS[gItemSlotToRecord[id]].cost <= 0 && IsFlagByteSet()) {
+                int classId = MENU_ITEMS[gItemSlotToRecord[id]].classId;
                 MENU_STATE->entries[MENU_STATE->count].id = id;
                 MENU_STATE->entries[MENU_STATE->count].kind = 0;
                 MENU_STATE->entries[MENU_STATE->count].marked = 0;
@@ -100,10 +101,10 @@ void func_002F6608(int hideUnowned)
                 MENU_STATE->count++;
             }
             if (D_001A7B68[i] & 64) {
-                if (MENU_ITEMS[D_00139568[id]].ammo) {
+                if (MENU_ITEMS[gItemSlotToRecord[id]].ammo) {
                     int classId;
                     MENU_STATE->entries[MENU_STATE->count].id = id;
-                    classId = MENU_ITEMS[D_00139568[id]].classId;
+                    classId = MENU_ITEMS[gItemSlotToRecord[id]].classId;
                     MENU_STATE->entries[MENU_STATE->count].kind = 1;
                     MENU_STATE->entries[MENU_STATE->count].price = 0xCDB;
                     MENU_STATE->entries[MENU_STATE->count].marked = 0;
@@ -111,12 +112,12 @@ void func_002F6608(int hideUnowned)
                     MENU_STATE->entries[MENU_STATE->count].upgrade = 0;
                     MENU_STATE->count++;
                 }
-            } else if (!hideUnowned && !D_001A7AF8[id]) {
+            } else if (!hideUnowned && !gItemOwnedFlags[id]) {
                 MENU_STATE->entries[MENU_STATE->count].id = id;
                 MENU_STATE->entries[MENU_STATE->count].kind = 0;
                 MENU_STATE->entries[MENU_STATE->count].marked = 0;
                 MENU_STATE->entries[MENU_STATE->count].price = 0xCDB;
-                MENU_STATE->entries[MENU_STATE->count].classId = (id == 9 || id == 73) ? 601 : MENU_ITEMS[D_00139568[id]].classId;
+                MENU_STATE->entries[MENU_STATE->count].classId = (id == 9 || id == 73) ? 601 : MENU_ITEMS[gItemSlotToRecord[id]].classId;
                 MENU_STATE->entries[MENU_STATE->count].upgrade = 0;
                 MENU_STATE->count++;
             }
@@ -125,18 +126,18 @@ void func_002F6608(int hideUnowned)
             int id;
             for (id = 0; id < 56; id++) {
                 int eligible;
-                if (!MENU_ITEMS[D_00139568[id]].active || !D_001A7AF8[id]) continue;
+                if (!MENU_ITEMS[gItemSlotToRecord[id]].active || !gItemOwnedFlags[id]) continue;
                 eligible = 0;
                 if (menu6608TypeOk(id)) eligible = id != 16;
                 if (eligible) {
                     if (!menu6608HasType(id)) {
-                        if (MENU_ITEMS[D_00139568[id]].cost <= 0 && func_00288D58()) {
+                        if (MENU_ITEMS[gItemSlotToRecord[id]].cost <= 0 && IsFlagByteSet()) {
                             int j;
                             for (j = 0; j < MENU_STATE->count; j++)
                                 if (MENU_STATE->entries[j].id == id) break;
                             if (j < MENU_STATE->count && MENU_STATE->entries[j].upgrade) continue;
                             {
-                                int classId = MENU_ITEMS[D_00139568[id]].classId;
+                                int classId = MENU_ITEMS[gItemSlotToRecord[id]].classId;
                                 MENU_STATE->entries[MENU_STATE->count].id = id;
                                 MENU_STATE->entries[MENU_STATE->count].kind = 0;
                                 MENU_STATE->entries[MENU_STATE->count].marked = 0;
@@ -148,14 +149,14 @@ void func_002F6608(int hideUnowned)
                         }
                     }
                 }
-                if (D_001A7AF8[id] && MENU_ITEMS[D_00139568[id]].ammo) {
+                if (gItemOwnedFlags[id] && MENU_ITEMS[gItemSlotToRecord[id]].ammo) {
                     int j;
                     for (j = 0; j < MENU_STATE->count; j++)
                         if (MENU_STATE->entries[j].id == id) break;
                     if (j < MENU_STATE->count && !MENU_STATE->entries[j].upgrade) continue;
                     {
                         int price = D_00262E40[id][0];
-                        int classId = MENU_ITEMS[D_00139568[id]].classId;
+                        int classId = MENU_ITEMS[gItemSlotToRecord[id]].classId;
                         MENU_STATE->entries[MENU_STATE->count].id = id;
                         MENU_STATE->entries[MENU_STATE->count].kind = 1;
                         MENU_STATE->entries[MENU_STATE->count].marked = 0;
@@ -172,11 +173,11 @@ void func_002F6608(int hideUnowned)
         for (id = 0; id < 56; id++) {
             if (id != 12 && id != 18 && id != 14 && id != 17 && id != 53 && id != 44) continue;
             {
-                int owned = D_001A7AF8[id];
+                int owned = gItemOwnedFlags[id];
                 int price, classId;
-                if (owned && !MENU_ITEMS[D_00139568[id]].ammo) continue;
+                if (owned && !MENU_ITEMS[gItemSlotToRecord[id]].ammo) continue;
                 price = D_00262E40[id][0];
-                classId = MENU_ITEMS[D_00139568[id]].classId;
+                classId = MENU_ITEMS[gItemSlotToRecord[id]].classId;
                 MENU_STATE->entries[MENU_STATE->count].id = id;
                 MENU_STATE->entries[MENU_STATE->count].marked = 0;
                 MENU_STATE->entries[MENU_STATE->count].price = price;
@@ -187,7 +188,7 @@ void func_002F6608(int hideUnowned)
                 MENU_STATE->count++;
             }
         }
-        func_002FADB0();
+        MarkBoughtSpecialItemsOwned();
     }
     {
         int i, j, k, changed;

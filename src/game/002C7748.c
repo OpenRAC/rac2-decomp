@@ -319,151 +319,157 @@ extern int func_00336EF0(void);
 
 /* func_002C7748 is defined in 002C7748-create-g8.c. */
 
-void func_002C7AE8(char *a0)
+/* Updates a particle that fades in or out while it drifts and falls. It is removed when its life runs out. */
+void func_002C7AE8(char *particle)
 {
-    char local[16];
-    char *s1 = a0;
-    char *s0;
-    int a1;
-    int v1;
-    char *p;
+    char velocity[16];
+    char *self = particle;
+    char *motion;
+    int colorWord;
+    int newAlpha;
+    char *position;
 
-    if (F250fbfa4_FUN_00282978(a0 + 10) != 0) {
-        F250fbfa4_FUN_002B9180(a0);
+    if (F250fbfa4_FUN_00282978(particle + 10) != 0) {
+        F250fbfa4_FUN_002B9180(particle);
         return;
     }
-    s0 = a0 + 32;
-    a1 = *(int *)(s1 + 4);
-    v1 = (a1 >> 24) + *(unsigned char *)(s0 + 20);
-    *(int *)(s1 + 4) = (a1 & 0x00ffffff) | (v1 << 24);
-    p = s1 + 16;
-    *(float *)(local + 0) = *(float *)(s1 + 32);
-    *(float *)(local + 4) = *(float *)(s0 + 4);
-    *(float *)(local + 8) = *(float *)(s0 + 8);
-    *(int *)(local + 12) = 0;
-    F250fbfa4_FUN_00282CC0(p, p, local);
-    *(float *)(s0 + 8) = *(float *)(s0 + 8) - *(float *)(s0 + 12);
-    *(unsigned char *)(s1 + 8) = *(unsigned char *)(s1 + 8) + *(unsigned char *)(s0 + 21);
-    *(float *)(s1 + 12) = *(float *)(s1 + 12) + *(float *)(s0 + 16);
+    motion = particle + 32;
+    colorWord = *(int *)(self + 4);
+    newAlpha = (colorWord >> 24) + *(unsigned char *)(motion + 20);
+    *(int *)(self + 4) = (colorWord & 0x00ffffff) | (newAlpha << 24);
+    position = self + 16;
+    *(float *)(velocity + 0) = *(float *)(self + 32);
+    *(float *)(velocity + 4) = *(float *)(motion + 4);
+    *(float *)(velocity + 8) = *(float *)(motion + 8);
+    *(int *)(velocity + 12) = 0;
+    F250fbfa4_FUN_00282CC0(position, position, velocity);
+    *(float *)(motion + 8) = *(float *)(motion + 8) - *(float *)(motion + 12);
+    *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + *(unsigned char *)(motion + 21);
+    *(float *)(self + 12) = *(float *)(self + 12) + *(float *)(motion + 16);
 }
 
 /* func_002C7BB8 is defined in 002C7BB8.c. */
 
-void func_002C7D58(char *self)
+/* Updates a particle that fades while it drifts, falls and changes size. It is removed when its life runs out. */
+void func_002C7D58(char *particle)
 {
-    char *p = self + 32;
-    float v[4];
-    int a1;
+    char *motion = particle + 32;
+    float velocity[4];
+    int colorWord;
 
-    if (Ff4dd22f3_FUN_00282978(self + 10) != 0)
+    if (Ff4dd22f3_FUN_00282978(particle + 10) != 0)
     {
-        Ff4dd22f3_FUN_002B9180(self);
+        Ff4dd22f3_FUN_002B9180(particle);
         return;
     }
 
-    a1 = *(int *)(self + 4);
-    *(int *)(self + 4) = (a1 & 0xffffff) | (((a1 >> 24) + (int)*(unsigned char *)(p + 20)) << 24);
-    v[0] = *(float *)(self + 32);
-    v[1] = *(float *)(p + 4);
-    v[2] = *(float *)(p + 8);
-    v[3] = 0.0f;
-    Ff4dd22f3_FUN_00282CC0(self + 16, self + 16, v);
-    *(unsigned char *)(self + 8) += *(unsigned char *)(p + 21);
-    *(float *)(self + 12) += *(float *)(p + 16);
-    *(float *)(p + 8) -= *(float *)(p + 12);
+    colorWord = *(int *)(particle + 4);
+    *(int *)(particle + 4) = (colorWord & 0xffffff) | (((colorWord >> 24) + (int)*(unsigned char *)(motion + 20)) << 24);
+    velocity[0] = *(float *)(particle + 32);
+    velocity[1] = *(float *)(motion + 4);
+    velocity[2] = *(float *)(motion + 8);
+    velocity[3] = 0.0f;
+    Ff4dd22f3_FUN_00282CC0(particle + 16, particle + 16, velocity);
+    *(unsigned char *)(particle + 8) += *(unsigned char *)(motion + 21);
+    *(float *)(particle + 12) += *(float *)(motion + 16);
+    *(float *)(motion + 8) -= *(float *)(motion + 12);
 }
 
-void func_002C8348(char *a0)
+/* Spins a particle around a centre point and removes it when it has gone round far enough. */
+void func_002C8348(char *particle)
 {
-    char *s1 = a0;
-    char *s0 = s1 + 0x20;
-    float t;
+    char *self = particle;
+    char *motion = self + 0x20;
+    float angleDiff;
 
-    *(u8 *)(s1 + 8) = *(u8 *)(s1 + 8) + *(u8 *)(s0 + 0x14);
-    *(float *)(s0 + 8) = func_00283B98(*(float *)(s0 + 8), *(float *)(s0 + 0xC));
-    *(float *)(s1 + 0xC) = *(float *)(s1 + 0xC) + *(float *)(s0 + 0x10);
-    *(float *)(s1 + 0x10) = *(float *)(*(char **)(s1 + 0x20)) +
-                            *(float *)(s0 + 4) * func_00283180(*(float *)(s0 + 8));
-    *(float *)(s1 + 0x18) = *(float *)(*(char **)(s1 + 0x20) + 8) +
-                            *(float *)(s0 + 4) * func_00283198(*(float *)(s0 + 8));
-    t = func_00283C80(*(float *)(s0 + 8), *(float *)(*(char **)(s1 + 0x20) + 0x10));
-    if (t < func_00282C48(*(float *)(s0 + 0xC) + *(float *)(s0 + 0xC)))
-        func_002B9180(s1);
+    *(u8 *)(self + 8) = *(u8 *)(self + 8) + *(u8 *)(motion + 0x14);
+    *(float *)(motion + 8) = FastAddRotations(*(float *)(motion + 8), *(float *)(motion + 0xC));
+    *(float *)(self + 0xC) = *(float *)(self + 0xC) + *(float *)(motion + 0x10);
+    *(float *)(self + 0x10) = *(float *)(*(char **)(self + 0x20)) +
+                            *(float *)(motion + 4) * FastSinOrCosA(*(float *)(motion + 8));
+    *(float *)(self + 0x18) = *(float *)(*(char **)(self + 0x20) + 8) +
+                            *(float *)(motion + 4) * FastSinOrCosB(*(float *)(motion + 8));
+    angleDiff = FastDiffRots(*(float *)(motion + 8), *(float *)(*(char **)(self + 0x20) + 0x10));
+    if (angleDiff < FloatAbs(*(float *)(motion + 0xC) + *(float *)(motion + 0xC)))
+        KillParticle(self);
 }
 
-void func_002C8428(char *obj)
+/* Updates a smoke-like particle that falls, drifts sideways and fades, and is removed when its life ends. */
+void func_002C8428(char *particle)
 {
-    char *s1 = obj;
-    char *s0 = obj + 0x20;
-    char *s2;
-    char local[16];
-    float f20;
-    float f1;
-    float f2;
+    char *self = particle;
+    char *motion = particle + 0x20;
+    char *position;
+    char drift[16];
+    float groundHeight;
+    float lifeNow;
+    float lifeTotal;
 
-    Fbdd4a4aa_FUN_00282D30(s0, s0, 0.9f);
-    s2 = obj + 0x10;
-    f20 = Fbdd4a4aa_FUN_002A89A8(s2, 0, 0.5f) + 0.25f;
-    if (f20 < *(float *)(s1 + 0x18)) {
-        *(float *)(s0 + 8) = *(float *)(s0 + 8) - *(float *)(s0 + 12);
-        *(unsigned char *)(s1 + 8) = *(unsigned char *)(s1 + 8) + *(unsigned char *)(s0 + 22);
+    Fbdd4a4aa_FUN_00282D30(motion, motion, 0.9f);
+    position = particle + 0x10;
+    groundHeight = Fbdd4a4aa_FUN_002A89A8(position, 0, 0.5f) + 0.25f;
+    if (groundHeight < *(float *)(self + 0x18)) {
+        *(float *)(motion + 8) = *(float *)(motion + 8) - *(float *)(motion + 12);
+        *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + *(unsigned char *)(motion + 22);
     }
-    Fbdd4a4aa_FUN_00282CC0(s2, s2, s0);
-    if (D_001B1688 % 10 == 0) {
-        if (f20 < *(float *)(s1 + 0x18)) {
-            *(float *)(s0 + 0x1C) = Fbdd4a4aa_FUN_00283B98(*(float *)(s0 + 0x1C), 1.0f);
-            f2 = Fbdd4a4aa_FUN_00283198(*(float *)(s0 + 0x1C));
-            Fbdd4a4aa_FUN_00282F20(local, D_001B5200, f2 * 0.0075f);
-            Fbdd4a4aa_FUN_00282CC0(s0, s0, local);
+    Fbdd4a4aa_FUN_00282CC0(position, position, motion);
+    if (gGameTime % 10 == 0) {
+        if (groundHeight < *(float *)(self + 0x18)) {
+            *(float *)(motion + 0x1C) = Fbdd4a4aa_FUN_00283B98(*(float *)(motion + 0x1C), 1.0f);
+            lifeTotal = Fbdd4a4aa_FUN_00283198(*(float *)(motion + 0x1C));
+            Fbdd4a4aa_FUN_00282F20(drift, gActiveCamera, lifeTotal * 0.0075f);
+            Fbdd4a4aa_FUN_00282CC0(motion, motion, drift);
         }
     }
-    if (*(short *)(s1 + 0xA) < *(short *)(s0 + 0x14)) {
-        f1 = Fbdd4a4aa_FUN_00283CE0(*(short *)(s1 + 0xA));
-        f2 = Fbdd4a4aa_FUN_00283CE0(*(short *)(s0 + 0x14));
-        *(int *)(s1 + 4) = (Fbdd4a4aa_FUN_00283CF0(f1 / f2 * 128.0f) << 24) | 0x00050505;
+    if (*(short *)(self + 0xA) < *(short *)(motion + 0x14)) {
+        lifeNow = Fbdd4a4aa_FUN_00283CE0(*(short *)(self + 0xA));
+        lifeTotal = Fbdd4a4aa_FUN_00283CE0(*(short *)(motion + 0x14));
+        *(int *)(self + 4) = (Fbdd4a4aa_FUN_00283CF0(lifeNow / lifeTotal * 128.0f) << 24) | 0x00050505;
     } else {
-        *(int *)(s1 + 4) = 0x9F050505;
+        *(int *)(self + 4) = 0x9F050505;
     }
-    if (F250fbfa4_FUN_00282978(s1 + 0xA)) {
-        Fbdd4a4aa_FUN_002B9180(s1);
+    if (F250fbfa4_FUN_00282978(self + 0xA)) {
+        Fbdd4a4aa_FUN_002B9180(self);
     }
 }
 
-void func_002C85D8(char *p)
+/* Removes a particle once its life runs out. */
+void func_002C85D8(char *particle)
 {
-    if (Fc40b1162_FUN_00282978(p + 10)) {
-        Fc40b1162_FUN_002B9180(p);
+    if (Fc40b1162_FUN_00282978(particle + 10)) {
+        Fc40b1162_FUN_002B9180(particle);
     }
 }
 
 /* func_002C8610 is in 002C8610.c. */
 
-void func_002C87B0(char *a0)
+/* Updates a particle that fades while it drifts and falls. It is removed when its life runs out. */
+void func_002C87B0(char *particle)
 {
-    char local[16];
-    char *s1 = a0;
-    char *s0;
-    int a1;
-    int v1;
-    char *p;
+    char velocity[16];
+    char *self = particle;
+    char *motion;
+    int colorWord;
+    int newAlpha;
+    char *position;
 
-    if (F250fbfa4_FUN_00282978(a0 + 10) != 0) {
-        F250fbfa4_FUN_002B9180(a0);
+    if (F250fbfa4_FUN_00282978(particle + 10) != 0) {
+        F250fbfa4_FUN_002B9180(particle);
         return;
     }
-    s0 = a0 + 32;
-    a1 = *(int *)(s1 + 4);
-    v1 = (a1 >> 24) + *(unsigned char *)(s0 + 20);
-    *(int *)(s1 + 4) = (a1 & 0x00ffffff) | (v1 << 24);
-    p = s1 + 16;
-    *(float *)(local + 0) = *(float *)(s1 + 32);
-    *(float *)(local + 4) = *(float *)(s0 + 4);
-    *(float *)(local + 8) = *(float *)(s0 + 8);
-    *(int *)(local + 12) = 0;
-    F250fbfa4_FUN_00282CC0(p, p, local);
-    *(float *)(s0 + 8) = *(float *)(s0 + 8) - *(float *)(s0 + 12);
-    *(unsigned char *)(s1 + 8) = *(unsigned char *)(s1 + 8) + *(unsigned char *)(s0 + 21);
-    *(float *)(s1 + 12) = *(float *)(s1 + 12) + *(float *)(s0 + 16);
+    motion = particle + 32;
+    colorWord = *(int *)(self + 4);
+    newAlpha = (colorWord >> 24) + *(unsigned char *)(motion + 20);
+    *(int *)(self + 4) = (colorWord & 0x00ffffff) | (newAlpha << 24);
+    position = self + 16;
+    *(float *)(velocity + 0) = *(float *)(self + 32);
+    *(float *)(velocity + 4) = *(float *)(motion + 4);
+    *(float *)(velocity + 8) = *(float *)(motion + 8);
+    *(int *)(velocity + 12) = 0;
+    F250fbfa4_FUN_00282CC0(position, position, velocity);
+    *(float *)(motion + 8) = *(float *)(motion + 8) - *(float *)(motion + 12);
+    *(unsigned char *)(self + 8) = *(unsigned char *)(self + 8) + *(unsigned char *)(motion + 21);
+    *(float *)(self + 12) = *(float *)(self + 12) + *(float *)(motion + 16);
 }
 
 /* func_002C8A38 is defined in 002C8A38.c. */
@@ -471,105 +477,108 @@ void func_002C87B0(char *a0)
 /* Like func_002C8A38 with a second vector at +0x30 scaled into the motion. Its
  * address e is an integer: retail loads that vector's last two words only after
  * the first vector is stored, the order alias analysis gives an untraced base. */
-void func_002C8CA0(char *p)
+/* Updates a particle that changes colour, size and speed over its life, and may restart for a short time before it goes away. */
+void func_002C8CA0(char *particle)
 {
-    char *d = p + 32;
-    int e = (int)p + 48;
+    char *motion = particle + 32;
+    int extraAddr = (int)particle + 48;
     float scaled[4], v[4], w[4], tmp[4];
     int color, alpha, fading, spin;
-    float size0, size1, speed0, speed1, scale, t, inverse, a, b;
+    float size0, size1, speed0, speed1, scale, t, inverse, lifeNow, lifeTotal;
     v[3] = 0;
-    v[0] = *(float *)(d + 0); v[1] = *(float *)(d + 4); v[2] = *(float *)(d + 8);
-    w[0] = *(float *)(e + 0); w[1] = *(float *)(e + 4); w[2] = *(float *)(e + 8); w[3] = 0;
-    color = *(unsigned char *)(d + 12) & 15;
-    alpha = (*(unsigned char *)(d + 12) >> 4) | 0x70;
+    v[0] = *(float *)(motion + 0); v[1] = *(float *)(motion + 4); v[2] = *(float *)(motion + 8);
+    w[0] = *(float *)(extraAddr + 0); w[1] = *(float *)(extraAddr + 4); w[2] = *(float *)(extraAddr + 8); w[3] = 0;
+    color = *(unsigned char *)(motion + 12) & 15;
+    alpha = (*(unsigned char *)(motion + 12) >> 4) | 0x70;
     color |= (color << 16) | (color << 8);
-    spin = *(unsigned char *)(d + 13) >> 4;
-    fading = *(unsigned char *)(d + 13) & 15;
-    size0 = func_00283CE0(*(unsigned char *)(d + 30)) * 1640.625f;
-    size1 = func_00283CE0(*(unsigned char *)(d + 31)) * 1640.625f;
-    speed0 = func_00283CE0(*(unsigned char *)(d + 28)) * (1.0f / 128);
-    speed1 = func_00283CE0(*(unsigned char *)(d + 29)) * (1.0f / 128);
-    scale = func_00283CE0(*(unsigned char *)(d + 15)) * (1.0f / 128);
-    func_00300190(p + 16, p + 16);
-    t = func_00283CE0(*(short *)(p + 10));
-    t /= func_00283CE0(*(unsigned char *)(d + 14)); inverse = 1.0f - t;
+    spin = *(unsigned char *)(motion + 13) >> 4;
+    fading = *(unsigned char *)(motion + 13) & 15;
+    size0 = IntToFloat(*(unsigned char *)(motion + 30)) * 1640.625f;
+    size1 = IntToFloat(*(unsigned char *)(motion + 31)) * 1640.625f;
+    speed0 = IntToFloat(*(unsigned char *)(motion + 28)) * (1.0f / 128);
+    speed1 = IntToFloat(*(unsigned char *)(motion + 29)) * (1.0f / 128);
+    scale = IntToFloat(*(unsigned char *)(motion + 15)) * (1.0f / 128);
+    TransformVectorOrCopy(particle + 16, particle + 16);
+    t = IntToFloat(*(short *)(particle + 10));
+    t /= IntToFloat(*(unsigned char *)(motion + 14)); inverse = 1.0f - t;
     if (!fading) {
-        *(int *)(p + 4) = func_00283D38(0x103080, color, inverse) | (alpha << 24);
-        *(float *)(p + 12) = size0 + (size1 - size0) * inverse;
+        *(int *)(particle + 4) = FastTweenColor(0x103080, color, inverse) | (alpha << 24);
+        *(float *)(particle + 12) = size0 + (size1 - size0) * inverse;
         speed0 += (speed1 - speed0) * inverse;
-        func_00282D30((char *)scaled, (char *)w, scale * func_002A7790(inverse));
+        FastVecScale((char *)scaled, (char *)w, scale * Square(inverse));
     } else {
         speed0 = speed1;
-        a = func_00283CE0(alpha); b = func_00283CE0(alpha);
-        b *= func_002A7790(inverse);
-        *(int *)(p + 4) = color | (func_00283CF0(a - b) << 24);
-        func_00282D30((char *)scaled, (char *)w, scale);
+        lifeNow = IntToFloat(alpha); lifeTotal = IntToFloat(alpha);
+        lifeTotal *= Square(inverse);
+        *(int *)(particle + 4) = color | (FloatToInt(lifeNow - lifeTotal) << 24);
+        FastVecScale((char *)scaled, (char *)w, scale);
     }
-    func_00282F20(tmp, v, speed0);
-    func_00282CC0(p + 16, p + 16, (char *)tmp);
-    func_00282CC0(p + 16, (char *)scaled, p + 16);
-    *(unsigned char *)(p + 8) += spin;
-    if (func_00282978(p + 10)) {
+    vec_scale_to_length(tmp, v, speed0);
+    FastVecAdd(particle + 16, particle + 16, (char *)tmp);
+    FastVecAdd(particle + 16, (char *)scaled, particle + 16);
+    *(unsigned char *)(particle + 8) += spin;
+    if (FastDecTimer(particle + 10)) {
         if (!fading) {
-            *(unsigned char *)(d + 14) = 20;
-            *(unsigned char *)(d + 13) |= 1;
-            *(short *)(p + 10) = 20;
-        } else func_002B9180(p);
+            *(unsigned char *)(motion + 14) = 20;
+            *(unsigned char *)(motion + 13) |= 1;
+            *(short *)(particle + 10) = 20;
+        } else KillParticle(particle);
     }
 }
 
-void func_002C8F40(int *obj)
+/* Updates a swirling particle that slows down, slowly fades out and is removed when it is fully faded. */
+void func_002C8F40(int *particle)
 {
-    char *a = (char *)obj + 16;
-    char *b = (char *)obj + 32;
-    char tmp[16];
+    char *position = (char *)particle + 16;
+    char *motion = (char *)particle + 32;
+    char swirl[16];
 
-    Fbdd4a4aa_FUN_00300190(a, a);
-    *(int *)(b + 16) = *(int *)(b + 16) - 1;
-    if (*(int *)(b + 16) < 0)
-        *(int *)(b + 16) = 0;
-    *(unsigned char *)((char *)obj + 8) = *(unsigned char *)((char *)obj + 8) + 1;
-    Fbdd4a4aa_FUN_00282CC0(a, b, a);
-    *(float *)((char *)obj + 12) = *(float *)((char *)obj + 12) + 1.5750000000000000000000e+03f;
-    Fbdd4a4aa_FUN_00282D30(b, b, 9.9000000953674316406250e-01f);
-    Fbdd4a4aa_FUN_002FE8D8(a, tmp);
-    if ((*(int *)((char *)obj + 4) & 0xFF) < 32) {
-        Fbdd4a4aa_FUN_00282D30(tmp, tmp, 1.5000000130385160446167e-03f);
-        Fbdd4a4aa_FUN_00282CC0(b, b, tmp);
+    Fbdd4a4aa_FUN_00300190(position, position);
+    *(int *)(motion + 16) = *(int *)(motion + 16) - 1;
+    if (*(int *)(motion + 16) < 0)
+        *(int *)(motion + 16) = 0;
+    *(unsigned char *)((char *)particle + 8) = *(unsigned char *)((char *)particle + 8) + 1;
+    Fbdd4a4aa_FUN_00282CC0(position, motion, position);
+    *(float *)((char *)particle + 12) = *(float *)((char *)particle + 12) + 1.5750000000000000000000e+03f;
+    Fbdd4a4aa_FUN_00282D30(motion, motion, 9.9000000953674316406250e-01f);
+    Fbdd4a4aa_FUN_002FE8D8(position, swirl);
+    if ((*(int *)((char *)particle + 4) & 0xFF) < 32) {
+        Fbdd4a4aa_FUN_00282D30(swirl, swirl, 1.5000000130385160446167e-03f);
+        Fbdd4a4aa_FUN_00282CC0(motion, motion, swirl);
     } else {
-        Fbdd4a4aa_FUN_00282D30(tmp, tmp, -7.5000000651925802230835e-04f);
-        Fbdd4a4aa_FUN_00282CC0(b, b, tmp);
+        Fbdd4a4aa_FUN_00282D30(swirl, swirl, -7.5000000651925802230835e-04f);
+        Fbdd4a4aa_FUN_00282CC0(motion, motion, swirl);
     }
-    *(int *)((char *)obj + 4) = Fbdd4a4aa_FUN_00283D38(*(unsigned int *)((char *)obj + 4) & 0x00FFFFFF, 0, 2.5000000372529029846191e-02f)
-        | (*(int *)(b + 16) << 24);
-    if (*(int *)(b + 16) == 0)
-        Fbdd4a4aa_FUN_002B9180((char *)obj);
+    *(int *)((char *)particle + 4) = Fbdd4a4aa_FUN_00283D38(*(unsigned int *)((char *)particle + 4) & 0x00FFFFFF, 0, 2.5000000372529029846191e-02f)
+        | (*(int *)(motion + 16) << 24);
+    if (*(int *)(motion + 16) == 0)
+        Fbdd4a4aa_FUN_002B9180((char *)particle);
 }
 
-void func_002C9098(char *p)
+/* Updates a particle that grows, drifts and slows down while it fades out, and is removed when its life ends. */
+void func_002C9098(char *particle)
 {
-    char *s0 = p + 32;
-    char *s3 = p + 16;
-    float r1, r2, r3, r4;
-    int x, y;
+    char *motion = particle + 32;
+    char *position = particle + 16;
+    float progress, lifeTotal, fadeAmount, growth;
+    int alphaByte, colorWord;
 
-    r1 = func_00283CE0(*(short *)(p + 10));
-    r2 = func_00283CE0(*(int *)(s0 + 24));
-    r1 = r1 / r2;
-    r3 = func_00283CE0(*(int *)(s0 + 16));
-    x = func_00283CF0(r3 * r1);
-    y = func_00283D38(0, *(int *)(s0 + 20), r1 * 0.5f);
-    *(char *)(p + 8) = *(unsigned char *)(p + 8) + 1;
-    r4 = func_002A7878(0.004f, 0.012f);
-    *(float *)(p + 12) = *(float *)(p + 12) + r4 * 210000.0f;
-    func_00282CC0(s3, s3, s0);
-    func_00282D30(s0, s0, 0.99f);
-    func_00300190(s3, s3);
-    func_00300248(s0, s0);
-    *(int *)(p + 4) = y | (x << 24);
-    if (func_00282978(p + 10) != 0) {
-        func_002B9180(p);
+    progress = IntToFloat(*(short *)(particle + 10));
+    lifeTotal = IntToFloat(*(int *)(motion + 24));
+    progress = progress / lifeTotal;
+    fadeAmount = IntToFloat(*(int *)(motion + 16));
+    alphaByte = FloatToInt(fadeAmount * progress);
+    colorWord = FastTweenColor(0, *(int *)(motion + 20), progress * 0.5f);
+    *(char *)(particle + 8) = *(unsigned char *)(particle + 8) + 1;
+    growth = RandomFloatRange(0.004f, 0.012f);
+    *(float *)(particle + 12) = *(float *)(particle + 12) + growth * 210000.0f;
+    FastVecAdd(position, position, motion);
+    FastVecScale(motion, motion, 0.99f);
+    TransformVectorOrCopy(position, position);
+    TriggerCurrentStateEffect(motion, motion);
+    *(int *)(particle + 4) = colorWord | (alphaByte << 24);
+    if (FastDecTimer(particle + 10) != 0) {
+        KillParticle(particle);
     }
 }
 
@@ -577,64 +586,67 @@ void func_002C9098(char *p)
 
 /* func_002C94C8 is defined in 002C94C8.c. */
 
+/* Finds a point along a looping path at position t. It can also give the direction the path is facing there. */
 void func_002C9828(char *path, int clamp, float *out, float *angles, int flags, float t)
 {
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float c[4] __attribute__((aligned(16)));
-    float f[4] __attribute__((aligned(16)));
-    float d[4] __attribute__((aligned(16)));
-    float e[4] __attribute__((aligned(16)));
-    int idx = func_00283CF0(t);
-    int hit = 0;
-    int i0;
-    int i1;
-    int i2;
-    int n;
+    float point0[4] __attribute__((aligned(16)));
+    float point1[4] __attribute__((aligned(16)));
+    float point2[4] __attribute__((aligned(16)));
+    float direction[4] __attribute__((aligned(16)));
+    float dir01[4] __attribute__((aligned(16)));
+    float dir12[4] __attribute__((aligned(16)));
+    int segment = FloatToInt(t);
+    int atEnd = 0;
+    int index0;
+    int index1;
+    int index2;
+    int count;
 
     if (clamp == 0) {
-        if (idx >= *(int *)path - 2) {
-            idx = *(int *)path - 2;
-            hit = 1;
+        if (segment >= *(int *)path - 2) {
+            segment = *(int *)path - 2;
+            atEnd = 1;
         }
     }
-    t -= idx;
-    if (hit) {
+    t -= segment;
+    if (atEnd) {
         if (t > 1.0f)
             t = 1.0f;
     }
-    n = *(int *)path;
-    i0 = idx;
-    i1 = idx + 1;
-    i2 = idx + 2;
-    if (i2 >= n) {
-        i0 = i0 % n;
-        i1 = i1 % n;
-        i2 = i2 % n;
+    count = *(int *)path;
+    index0 = segment;
+    index1 = segment + 1;
+    index2 = segment + 2;
+    if (index2 >= count) {
+        index0 = index0 % count;
+        index1 = index1 % count;
+        index2 = index2 % count;
     }
-    qcopy(a, path + 0x10 + i0 * 16);
-    qcopy(b, path + 0x10 + i1 * 16);
-    func_00282D08(out, a, b, t);
+    qcopy(point0, path + 0x10 + index0 * 16);
+    qcopy(point1, path + 0x10 + index1 * 16);
+    lerp_vector(out, point0, point1, t);
     if (flags & 1)
         return;
-    if (hit) {
-        func_00282CF0(f, b, a);
+    if (atEnd) {
+        FastVecSub(direction, point1, point0);
     } else {
-        qcopy(c, path + 0x10 + i2 * 16);
-        func_00282CF0(d, b, a);
-        func_00282CF0(e, c, b);
-        func_00282D08(f, d, e, t);
+        qcopy(point2, path + 0x10 + index2 * 16);
+        FastVecSub(dir01, point1, point0);
+        FastVecSub(dir12, point2, point1);
+        lerp_vector(direction, dir01, dir12, t);
     }
-    angles[1] = -func_00283248(func_00282E20(f), f[2]);
-    angles[2] = func_00283248(f[0], f[1]);
-    angles[3] = a[3] * (1.0f - t) + b[3] * t;
+    angles[1] = -FastMatrixHelperA(vec_length_xy(direction), direction[2]);
+    angles[2] = FastMatrixHelperA(direction[0], direction[1]);
+    angles[3] = point0[3] * (1.0f - t) + point1[3] * t;
 }
 
+/* Returns a saved value that other menu code reads. */
 int func_002C9A50(void) {
     return D_001F2A30;
 }
 
 /* A15-struct-pad-20 freshly exact-verified under family reservation */
+/* Clears two fields in a fixed data block. */
 void func_002C9A60(void) {
     BatchA_A15_u8 *p = D_L15_001FF640;
     *(BatchA_A15_u32 *)(p + 0xF0) = 0;
@@ -642,123 +654,132 @@ void func_002C9A60(void) {
 }
 
 /* A10-twin-base-32 freshly exact-verified under family reservation */
+/* Sets two fields in a fixed data block. */
 void func_002C9A78(void) {
     BatchA_A10_u8 *p = D_L03_001FF8C0;
     *(BatchA_A10_u32 *)(p + 0xF0) = (BatchA_A10_u32)D_L03_001FFAC0;
     *(BatchA_A10_u32 *)(p + 0x1F0) = 1;
 }
 
-void func_002C9A98(s32 *a0) {
- s32 *base=a0+3; s32 v;
+/* Steps a ring-shaped list back to the previous filled entry. */
+void func_002C9A98(s32 *ring) {
+ s32 *entries=ring+3; s32 index;
  do {
-  v=--a0[1];
-  if(v<=0) v=a0[0];
-  a0[1]=v;
- } while(*(s32 *)((u32)base+(v<<2))==0);
+  index=--ring[1];
+  if(index<=0) index=ring[0];
+  ring[1]=index;
+ } while(*(s32 *)((u32)entries+(index<<2))==0);
 }
 
-void func_002C9AD8(s32 *a0) {
- s32 limit=a0[0]; s32 *base=a0+3; s32 v;
+/* Steps a ring-shaped list forward to the next filled entry. */
+void func_002C9AD8(s32 *ring) {
+ s32 lastIndex=ring[0]; s32 *entries=ring+3; s32 index;
  do {
-  v=a0[1]+1;
-  if(limit<v) v=0;
-  a0[1]=v;
- } while(*(s32 *)((u32)base+(v<<2))==0);
+  index=ring[1]+1;
+  if(lastIndex<index) index=0;
+  ring[1]=index;
+ } while(*(s32 *)((u32)entries+(index<<2))==0);
 }
 
+/* Tells the sound or menu system to turn off, then returns 0. */
 int func_002C9B18(void) {
     if (D_001A8CFC[0] != 0)
-        func_00339770(D_001A8CFC[0] + 0x3CAA8, 0);
+        SetPopupBoxValue(D_001A8CFC[0] + 0x3CAA8, 0);
     return 0;
 }
 
+/* Tells the sound or menu system to turn on, then returns 0. */
 int func_002C9B50(void) {
     if (D_001A8CFC[0] != 0)
-        func_00339770(D_001A8CFC[0] + 0x3CAA8, 1);
+        SetPopupBoxValue(D_001A8CFC[0] + 0x3CAA8, 1);
     return 0;
 }
 
 /* reads two object fields, forms centre plus and minus half of a third, and issues two five-argument draw calls taking an id-derived value and a fixed 64-bit attribute */
-int func_002C9B88 (int *p)
+/* Draws two small icons on either side of a menu item. Returns 0. */
+int func_002C9B88 (int *item)
 {
-  int a = p[6];
-  int t = p[8] >> 1;
-  int diff = a - t;
-  int sum = a + t;
-  int r;
+  int center = item[6];
+  int halfWidth = item[8] >> 1;
+  int leftX = center - halfWidth;
+  int rightX = center + halfWidth;
+  int icon;
 
-  r = func_00288FB8_1 (4412);
-  func_0027F5B8 (diff, p[7], (long) 0x80f0f0f0, r, -1);
-  r = func_00288FB8_1 (4408);
-  func_0027FA10 (sum, p[7], (long) 0x80f0f0f0, r, -1);
+  icon = func_00288FB8_1 (4412);
+  DrawTextMediumFont (leftX, item[7], (long) 0x80f0f0f0, icon, -1);
+  icon = func_00288FB8_1 (4408);
+  DrawTextRightAlignedMediumFont (rightX, item[7], (long) 0x80f0f0f0, icon, -1);
   return 0;
 }
 
+/* Resets the 20 saved menu slots to -1. */
 void func_002C9C20(void)
 {
-    char *b = D_001F2840;
-    int value = -1;
-    int *p = (int *)(b + 0x1BC);
+    char *menuState = gPauseMenuState;
+    int emptyValue = -1;
+    int *slot = (int *)(menuState + 0x1BC);
     int i;
 
     for (i = 0x13; i >= 0; i--)
-        *p-- = value;
+        *slot-- = emptyValue;
 }
 
+/* Sets up the pause menu state when the menu opens, including its screen links and starting values. */
 void func_002C9CF8(int mode)
 {
-    func_00132AF8(0x5D);
-    func_002B72E8(0);
-    ((State_2C9CF8 *)D_001F2840)->byteDB = 0;
-    func_00132028();
-    ((State_2C9CF8 *)D_001F2840)->f0 = 1;
-    if (!D_001A8BB0) func_002CAF18();
-    ((State_2C9CF8 *)D_001F2840)->f144 = 0;
-    ((State_2C9CF8 *)D_001F2840)->f148 = 0;
-    ((State_2C9CF8 *)D_001F2840)->fE8 = (D_001A7A08 & 0xFFFF0000) || ((State_2C9CF8 *)D_001F2840)->f108 ? 1 : 0;
-    ((Links_2C9CF8 *)D_00259918)->next = ((State_2C9CF8 *)D_001F2840)->fE8 ? D_00259AF8 : D_00259AA8;
-    ((Links_2C9CF8 *)D_00259AA8)->previous = ((State_2C9CF8 *)D_001F2840)->fE8 ? D_00259AF8 : D_00259918;
-    ((State_2C9CF8 *)D_001F2840)->f8 = ((State_2C9CF8 *)D_001F2840)->f104 ? (int)((State_2C9CF8 *)D_001F2840)->f104 : mode;
-    ((State_2C9CF8 *)D_001F2840)->f1C = 0;
-    ((State_2C9CF8 *)D_001F2840)->f20 = 0;
-    ((State_2C9CF8 *)D_001F2840)->f120 = 0;
-    ((State_2C9CF8 *)D_001F2840)->f1C0 = 0;
-    ((State_2C9CF8 *)D_001F2840)->f1C4 = 0;
-    ((State_2C9CF8 *)D_001F2840)->f1C8 = 0;
+    SendSoundCommand22(0x5D);
+    music_Pause(0);
+    ((State_2C9CF8 *)gPauseMenuState)->byteDB = 0;
+    snd_Pump();
+    ((State_2C9CF8 *)gPauseMenuState)->f0 = 1;
+    if (!gCurrentGameMode) ConfigureMenuChoiceList();
+    ((State_2C9CF8 *)gPauseMenuState)->f144 = 0;
+    ((State_2C9CF8 *)gPauseMenuState)->f148 = 0;
+    ((State_2C9CF8 *)gPauseMenuState)->fE8 = (D_001A7A08 & 0xFFFF0000) || ((State_2C9CF8 *)gPauseMenuState)->f108 ? 1 : 0;
+    ((Links_2C9CF8 *)D_00259918)->next = ((State_2C9CF8 *)gPauseMenuState)->fE8 ? D_00259AF8 : D_00259AA8;
+    ((Links_2C9CF8 *)D_00259AA8)->previous = ((State_2C9CF8 *)gPauseMenuState)->fE8 ? D_00259AF8 : D_00259918;
+    ((State_2C9CF8 *)gPauseMenuState)->f8 = ((State_2C9CF8 *)gPauseMenuState)->f104 ? (int)((State_2C9CF8 *)gPauseMenuState)->f104 : mode;
+    ((State_2C9CF8 *)gPauseMenuState)->f1C = 0;
+    ((State_2C9CF8 *)gPauseMenuState)->f20 = 0;
+    ((State_2C9CF8 *)gPauseMenuState)->f120 = 0;
+    ((State_2C9CF8 *)gPauseMenuState)->f1C0 = 0;
+    ((State_2C9CF8 *)gPauseMenuState)->f1C4 = 0;
+    ((State_2C9CF8 *)gPauseMenuState)->f1C8 = 0;
     if (mode != 6) {
-        func_00295C50(D_001A79F0);
-        func_0029D830();
+        SetCurrentMapAndRefresh(gCurrentMapIndex);
+        UpdateEntryStates();
         D_0025B5F8 = 0;
-        func_002DF050();
+        UpdateUnlockMenuEntries();
     }
-    ((State_2C9CF8 *)D_001F2840)->f150 = 0;
-    ((State_2C9CF8 *)D_001F2840)->f14C = 1;
+    ((State_2C9CF8 *)gPauseMenuState)->f150 = 0;
+    ((State_2C9CF8 *)gPauseMenuState)->f14C = 1;
 }
 
-void func_002C9E60(int a0)
+/* Puts the saved screen picture back into video memory in strips. */
+void func_002C9E60(int fromEnd)
 {
-    GsLoadImage2C9E60 li;
+    GsLoadImage2C9E60 image;
     int remaining;
-    int dest;
-    char *src;
-    char *state = D_001F2840;
+    int destAddr;
+    char *srcPtr;
+    char *state = gPauseMenuState;
 
-    *(int *)(state + 0xD0) = a0 != 0 ? 2 : 1;
-    func_002FC3C0(1);
-    func_001261F0(0);
+    *(int *)(state + 0xD0) = fromEnd != 0 ? 2 : 1;
+    WaitForDmaStatusBits(1);
+    GetGsCurrentField(0);
     D_001B1598++;
-    remaining = D_001A7344 * 0x600;
-    src = *(char **)(state + 0x20);
-    dest = D_001A72D4;
-    if (a0 != 0)
-        dest = 0x3FB000 - remaining;
+    remaining = gScreenHeight * 0x600;
+    srcPtr = *(char **)(state + 0x20);
+    destAddr = D_001A72D4;
+    if (fromEnd != 0)
+        destAddr = 0x3FB000 - remaining;
     for (; remaining >= 0; remaining -= 0x4000) {
-        func_00126288(&li, dest >> 8, 1, 0, 0, 0, 64, 64);
-        dest += 0x4000;
-        func_0011AEA0(0);
-        func_001265B0(&li, src);
-        src += 0x4000;
-        func_001244B8(0, 0);
+        func_00126288(&image, destAddr >> 8, 1, 0, 0, 0, 64, 64);
+        destAddr += 0x4000;
+        FlushCache(0);
+        ExecGsLoadImage(&image, srcPtr);
+        srcPtr += 0x4000;
+        WaitGsPathsIdle(0, 0);
     }
 }
 
@@ -806,105 +827,111 @@ extern int func_002E4AC8(void);
 extern void func_002B6658(void);
 extern void func_002CA5D0(void);
 
+/* Runs one frame of the pause menu and calls the handler for the current menu mode. */
 void func_002CA8A8(void)
 {
     PAUSE->update_count = PAUSE->update_count > 31999 ? 32000 : PAUSE->update_count + 1;
     PAUSE->clear = 0;
     if (PAUSE->timer) --PAUSE->timer;
-    if (D_001393E0.state < 3 && D_001393E0.err < 0) ++PAUSE->card_error_frames;
+    if (gMemcardState.state < 3 && gMemcardState.err < 0) ++PAUSE->card_error_frames;
     else PAUSE->card_error_frames = 0;
-    func_002DDEC8();
-    if ((D_001A7424 & 1) && PAUSE->mode == 4 && D_001B1684 >= 8) {
-        if (!func_002B49E0(4, 1, 1, PAUSE->arg, 0)) return;
+    process_unlock_code_input();
+    if ((gSaveMenuFlags & 1) && PAUSE->mode == 4 && D_001B1684 >= 8) {
+        if (!BeginSlotRequest(4, 1, 1, PAUSE->arg, 0)) return;
     }
     switch (PAUSE->mode) {
-    case 1: func_002CAA58(); break;
-    case 2: func_002CAA88(); break;
-    case 3: func_002CAAA0(); break;
-    case 4: func_002CAB00(); break;
+    case 1: EnterPauseMenuMode2(); break;
+    case 2: EnterPauseMenuMode3(); break;
+    case 3: EnterPauseMenuMode4(); break;
+    case 4: UpdatePauseMenuWidgets(); break;
     case 5:
-        func_002CADB0();
-        func_002E4AC8();
+        HandlePauseMenuFadeTimer();
+        UpdateSoundVoices();
         D_0018A000[0] = 10;
         D_001B18A4[1] = 0;
         return;
     }
-    func_002B6658();
-    func_002E4AC8();
-    if (PAUSE->pending) func_002CA5D0();
+    UpdateVisibleObjects();
+    UpdateSoundVoices();
+    if (PAUSE->pending) CloseMenuAndSaveChoices();
 }
 #undef PAUSE
 
+/* Switches the pause menu to its second mode after a setup call. */
 void func_002CAA58(void)
 {
-    func_002CA070();
+    EnterPauseMenuState();
     D_L00_001FEC40[0] = 2;
     D_L00_001FEC40[1] = 0;
 }
 
 /* A12-struct-2field-24 freshly exact-verified under family reservation */
+/* Switches the menu to mode 3. */
 void func_002CAA88(void) {
     BatchA_A12_BatchA24 *p = &D_L08_001FF980;
     p->a = 3;
     p->b = 0;
 }
 
+/* Switches the pause menu to mode 4 and remembers the previous choice. */
 void func_002CAAA0(void)
 {
-    int *p;
+    int *menu;
 
-    func_0027DDC0(0, 0, 0, 0x38);
-    p = (int *)D_001F2840;
-    if (p[1] == 0)
-        p[1] = 1;
-    p[0] = 4;
-    p[5] = p[6];
-    p[6] = 0;
-    p[1] = 0;
+    SetClearColorPacket(0, 0, 0, 0x38);
+    menu = (int *)gPauseMenuState;
+    if (menu[1] == 0)
+        menu[1] = 1;
+    menu[0] = 4;
+    menu[5] = menu[6];
+    menu[6] = 0;
+    menu[1] = 0;
 }
 
+/* Counts down a menu timer and, when it ends, starts the screen change for the current menu mode. */
 void func_002CADB0(void)
 {
-    int n = ((GameState_1F2840 *)D_001F2840)->count;
+    int framesLeft = ((GameState_1F2840 *)gPauseMenuState)->count;
 
-    if (n != 0)
-        ((GameState_1F2840 *)D_001F2840)->count = n - 1;
-    if (((GameState_1F2840 *)D_001F2840)->count != 0)
+    if (framesLeft != 0)
+        ((GameState_1F2840 *)gPauseMenuState)->count = framesLeft - 1;
+    if (((GameState_1F2840 *)gPauseMenuState)->count != 0)
         return;
     if (D_001A63AC != 0)
         return;
-    if (((GameState_1F2840 *)D_001F2840)->mode == 2) {
-        func_002B4B70(0, D_001C51D0);
-    } else if (((GameState_1F2840 *)D_001F2840)->mode == 3) {
-        func_002B49E0(1, 1, 0, ((GameState_1F2840 *)D_001F2840)->fieldF4, 0);
-    } else if (((GameState_1F2840 *)D_001F2840)->mode == 4) {
-        func_002B49E0(1, 1, 0, ((GameState_1F2840 *)D_001F2840)->fieldF4, 0);
-    } else if (((GameState_1F2840 *)D_001F2840)->mode == 6) {
-        func_002B49E0(1, 1, 0, ((GameState_1F2840 *)D_001F2840)->fieldF4, 0);
-    } else if (((GameState_1F2840 *)D_001F2840)->mode == 5) {
-        func_002B49E0(2, 1, ((GameState_1F2840 *)D_001F2840)->fieldF4, 0, 0);
+    if (((GameState_1F2840 *)gPauseMenuState)->mode == 2) {
+        EndSlotRequest(0, D_001C51D0);
+    } else if (((GameState_1F2840 *)gPauseMenuState)->mode == 3) {
+        BeginSlotRequest(1, 1, 0, ((GameState_1F2840 *)gPauseMenuState)->fieldF4, 0);
+    } else if (((GameState_1F2840 *)gPauseMenuState)->mode == 4) {
+        BeginSlotRequest(1, 1, 0, ((GameState_1F2840 *)gPauseMenuState)->fieldF4, 0);
+    } else if (((GameState_1F2840 *)gPauseMenuState)->mode == 6) {
+        BeginSlotRequest(1, 1, 0, ((GameState_1F2840 *)gPauseMenuState)->fieldF4, 0);
+    } else if (((GameState_1F2840 *)gPauseMenuState)->mode == 5) {
+        BeginSlotRequest(2, 1, ((GameState_1F2840 *)gPauseMenuState)->fieldF4, 0, 0);
     } else {
-        func_002B4B70(0, 0);
+        EndSlotRequest(0, 0);
     }
-    if (((GameState_1F2840 *)D_001F2840)->field40 != 0 &&
-        ((GameState_1F2840 *)D_001F2840)->field30 != ((GameState_1F2840 *)D_001F2840)->field40) {
-        int id;
+    if (((GameState_1F2840 *)gPauseMenuState)->field40 != 0 &&
+        ((GameState_1F2840 *)gPauseMenuState)->field30 != ((GameState_1F2840 *)gPauseMenuState)->field40) {
+        int entryId;
         int *rec;
-        func_002B7CE0(1);
-        id = ((GameState_1F2840 *)D_001F2840)->field40;
-        rec = (int *)((char *)D_00239BA0 + D_00139568[id] * 0xE0);
-        func_00294420(rec[5]);
-        func_002B7CE0(1);
+        PumpMusicAndDiscRead(1);
+        entryId = ((GameState_1F2840 *)gPauseMenuState)->field40;
+        rec = (int *)((char *)gWeaponTable_00239BA0 + gItemSlotToRecord[entryId] * 0xE0);
+        LoadClassIntoFreeCacheSlot(rec[5]);
+        PumpMusicAndDiscRead(1);
     }
-    func_002B7CE0(1);
+    PumpMusicAndDiscRead(1);
 }
 
 /* func_002CB820 reads $gp slots: it is defined in 002C7748-g8.c. */
 
 
-s32 func_002CB4E8(s32 a0) {
+/* Says whether a menu item number is in the allowed range. Returns 1 if so, else 0. */
+s32 func_002CB4E8(s32 index) {
  s32 result=0;
- if(a0<0x15 || a0==0x18) result=1;
+ if(index<0x15 || index==0x18) result=1;
  return result;
 }
 
@@ -912,23 +939,25 @@ s32 func_002CB4E8(s32 a0) {
 
 /* func_002CB648 is defined in 002CB648-g8.c. */
 
+/* Handles one menu step: step 0 accepts, step 1 asks another menu function. */
 int func_002CB7D0(int mode)
 {
     int result = 0;
     switch (mode) {
     case 0: result = 1; break;
-    case 1: result = func_002D5B38(3, D_0025BA90); break;
+    case 1: result = SendMenuRequest(3, D_0025BA90); break;
     }
     return result;
 }
 
+/* Handles one menu step with three cases: accept, ask another function, or run a reset. */
 int func_002CBA58(int mode)
 {
     int result = 0;
     switch (mode) {
     case 0: D_0018A000[0] = 10; result = 1; break;
-    case 1: result = func_002D5B38(3, D_0025BA90); break;
-    case 2: func_0029CE80(); result = 1; break;
+    case 1: result = SendMenuRequest(3, D_0025BA90); break;
+    case 2: SetLevelDependentValue(); result = 1; break;
     }
     return result;
 }
@@ -937,19 +966,20 @@ int func_002CBA58(int mode)
 
 /* func_002CBC58 is in 002C7748-panels-g8.c. */
 
-int func_002CC490(int a0)
+/* Checks whether a button press belongs to this menu item and says if it was accepted. */
+int func_002CC490(int itemId)
 {
-    if (*(int *)(((CallbackState_2CC490 *)D_001F2840)->source + 0xE8) != a0)
+    if (*(int *)(((CallbackState_2CC490 *)gPauseMenuState)->source + 0xE8) != itemId)
         return 0;
-    if ((((GameState_2CC490 *)D_00138180)->flags & 0x900) != 0 &&
-        ((CallbackState_2CC490 *)D_001F2840)->fallback == 0)
+    if ((((GameState_2CC490 *)gPadState)->flags & 0x900) != 0 &&
+        ((CallbackState_2CC490 *)gPauseMenuState)->fallback == 0)
         return 1;
-    if ((((GameState_2CC490 *)D_00138180)->flags & 0x10) != 0) {
-        int value = *(int *)(((CallbackState_2CC490 *)D_001F2840)->source + 0xE0);
+    if ((((GameState_2CC490 *)gPadState)->flags & 0x10) != 0) {
+        int value = *(int *)(((CallbackState_2CC490 *)gPauseMenuState)->source + 0xE0);
         int result;
         if (value != 0)
-            ((CallbackState_2CC490 *)D_001F2840)->value = value;
-        else if (((CallbackState_2CC490 *)D_001F2840)->fallback == 0) {
+            ((CallbackState_2CC490 *)gPauseMenuState)->value = value;
+        else if (((CallbackState_2CC490 *)gPauseMenuState)->fallback == 0) {
             result = -1;
             goto done;
         }
@@ -965,27 +995,31 @@ done:
 /* Near miss: nonmatching/game/func_002CC550.c (316/316 bytes; the two address
    materialisations in the loop preheader keep a separate %hi temporary). */
 
+/* Does nothing and returns 0. */
 int func_002CC690(void) {
     return 0;
 }
 
+/* Does nothing and returns 0. */
 int func_002CC698(void) {
     return 0;
 }
 
-s32 func_002CC6A0(u8 *p) { *(s32 *)(p + 0x44) = -1; return 0; }
+/* Sets a field in an object to -1 and returns 0. */
+s32 func_002CC6A0(u8 *obj) { *(s32 *)(obj + 0x44) = -1; return 0; }
 
 /* func_002CC6B0 is defined in 002CC6B0-hud-g8.c. */
 
+/* Handles a button press on a menu entry, switching the selected entry and its enabled flag. */
 int func_002CCF68(char *obj)
 {
-    int old;
+    int oldSelection;
     int kind;
     MenuEntry_2CCF68 *entry;
 
-    if (*(char **)(*(char **)(D_001F2840 + 0x14) + 0xE8) != obj) goto fallback;
-    if ((((InputState_2CCF68 *)D_00138180)->flags & ~0x40) != 0 && obj == D_00259148) return 0;
-    old = D_001B1680;
+    if (*(char **)(*(char **)(gPauseMenuState + 0x14) + 0xE8) != obj) goto fallback;
+    if ((((InputState_2CCF68 *)gPadState)->flags & ~0x40) != 0 && obj == D_00259148) return 0;
+    oldSelection = D_001B1680;
     if (D_001A8B84) goto fallback;
     entry = (MenuEntry_2CCF68 *)(*(int *)(obj + 0x40) * 12 + *(int *)(obj + 0x34));
     kind = entry->kind;
@@ -995,7 +1029,7 @@ int func_002CCF68(char *obj)
         D_001B1680 = 1;
         return 0;
     }
-    if (((InputState_2CCF68 *)D_00138180)->flags & 0x40) {
+    if (((InputState_2CCF68 *)gPadState)->flags & 0x40) {
         if (obj == D_00259198) {
             D_001A8B84 = D_001A7BC9.value != 0;
             D_001B1680 = 1;
@@ -1013,69 +1047,72 @@ int func_002CCF68(char *obj)
             D_001B1680 = 6;
         }
         if (!D_001A8B84)
-            D_001B1680 = old;
+            D_001B1680 = oldSelection;
         return 0;
     }
 fallback:
-    return func_002D5EC0(obj);
+    return UpdateMenuListActions(obj);
 }
 
+/* Handles menu button input and picks the right handler for the current screen. Plays a sound if input was used. */
 int func_002CD0E8(void)
 {
     unsigned int flags = D_00138344;
-    int res = 0;
+    int handled = 0;
 
     if (flags & 0x910) {
-        res = 1;
+        handled = 1;
     } else if (flags & 0x40) {
-        res = func_0029C168(flags);
-        if (func_0026F7C8() && func_0026F7D0()) {
-            res = func_002CB950(res);
-        } else if (func_0026F7E0()) {
-            res = func_002CB820(res);
-        } else if (func_0026F7D8()) {
-            res = func_002CBA58(res);
-        } else if (func_0026F7F0() == 0x31) {
-            res = func_002CB7D0(res);
-        } else if (func_0026F7E8()) {
-            res = func_002CB7D0(res);
-        } else if (func_0026F7F0() == 0x1C) {
-            res = func_002CB7D0(res);
+        handled = func_0029C168(flags);
+        if (EmptyStubF7C8() && EmptyStubF7D0()) {
+            handled = HandleMenuCommand(handled);
+        } else if (EmptyStubF7E0()) {
+            handled = HandleMenuModeAction(handled);
+        } else if (EmptyStubF7D8()) {
+            handled = HandleMenuStepWithReset(handled);
+        } else if (EmptyStubF7F0() == 0x31) {
+            handled = HandleMenuStepSimple(handled);
+        } else if (EmptyStubF7E8()) {
+            handled = HandleMenuStepSimple(handled);
+        } else if (EmptyStubF7F0() == 0x1C) {
+            handled = HandleMenuStepSimple(handled);
         } else {
-            res = func_002CB8A0(res);
+            handled = RunMenuActionByIndex(handled);
         }
     } else {
         func_0029C168(flags);
     }
 
-    if (res) {
-        func_002E5E58(0x12, 0, 0);
+    if (handled) {
+        PlaySoundFromGlobalBank(0x12, 0, 0);
     }
-    return res;
+    return handled;
 }
 
+/* Runs three setup calls and returns 0. */
 int func_002CD220(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_0029C138();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 
 /* func_002CD3C0 is defined in 002CD3C0.c. */
 
+/* Handles menu input and keeps the menu flags in step with the current selection. */
 int func_002CD4E0(void)
 {
-    int local[4];
-    int first = func_00336EF0();
+    int scratch[4];
+    int first = GetUiSettingValue();
     int result = 0;
     int flags = D_00138344;
 
     if (flags & 0x10) {
-        int value = *(int *)(((CallbackState_2CC490 *)D_001F2840)->source + 0xE0);
+        int value = *(int *)(((CallbackState_2CC490 *)gPauseMenuState)->source + 0xE0);
         if (value != 0)
-            ((CallbackState_2CC490 *)D_001F2840)->value = value;
-        else if (((CallbackState_2CC490 *)D_001F2840)->fallback == 0) {
+            ((CallbackState_2CC490 *)gPauseMenuState)->value = value;
+        else if (((CallbackState_2CC490 *)gPauseMenuState)->fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -1087,11 +1124,11 @@ return_value:
     if (flags & 0x900) {
         result = 1;
     } else {
-        func_0029C248(flags, local);
+        func_0029C248(flags, scratch);
     }
 
     if (D_001A8CFC[0] != 0) {
-        int second = func_00336EF0();
+        int second = GetUiSettingValue();
         if (first == second && D_001A63AC == 0 &&
             ((D_00259C78.handle == second && D_00259C78.state == 2) ||
              (D_00259C78.last == second && D_00259C78.state == 4))) {

@@ -14,6 +14,7 @@ extern InitEntry12 D_L05_0021D7F0[];
 extern int * volatile D_L05_001AA770 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L05_001C9CA0;
 
+/* Fills the level's menu list from the global item list and sets the highlighted row to the currently selected item. */
 int func_L05_00367340(char *obj) {
     int i, entry;
     int *list;

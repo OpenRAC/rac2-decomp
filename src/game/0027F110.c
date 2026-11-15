@@ -6,11 +6,13 @@ extern short r1_D_0015EDC4;
 extern void func_0027F110(void);
 extern int D_001B1668 __attribute__((sda));
 
+/* Turns a screen flag on. */
 void func_0027F110(void) {
     D_001B1668 = 1;
 }
 
 
+/* Turns the same screen flag off. */
 void func_0027F120(void) {
     D_001B1668 = 0;
 }

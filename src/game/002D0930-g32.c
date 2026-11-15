@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002D0930 in its own unit, a sibling of func_002D01D0: the cursor and the D_001A7478 write
    go through $gp, so the file is compiled at -G32 (config/cflags.txt). */
 
@@ -26,64 +27,65 @@ extern MenuEntry D_00261858[];
 typedef struct { char p00[8]; int f08; char p0c[8]; int f14; int f18; char pad[0xE4]; int f100; int f104; char pad2[0x38]; int f140; } GameObj;
 
 
+/* Handles input on the list of 33 movies: moves the cursor and starts the chosen movie if it is unlocked. */
 int func_002D0930(void)
 {
     int result = 0;
-    int flags = ((CallbackMenuState *)&D_00138180)->flags;
-    int old = D_001ABA20;
+    int flags = ((CallbackMenuState *)&gPadState)->flags;
+    int oldCursor = D_001ABA20;
 
     if (flags & 0x10) {
         int value;
-        int status;
+        int returnCode;
         D_001ABA20 = 0;
-        value = *(int *)(D_001F2840.source + 0xE0);
+        value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
-            status = -1;
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
+            returnCode = -1;
             goto finish;
         }
-        status = 0;
+        returnCode = 0;
 finish:
-        return status;
+        return returnCode;
     }
     if (flags & 0x900) {
         D_001ABA20 = 0;
         result = 1;
     } else {
         if (flags & 0x1000) {
-            func_002E5E58(3, 0, 0);
+            PlaySoundFromGlobalBank(3, 0, 0);
             if (--D_001ABA20 < 0)
                 D_001ABA20 = 0x20;
         } else if (flags & 0x4000) {
-            func_002E5E58(3, 0, 0);
+            PlaySoundFromGlobalBank(3, 0, 0);
             if (++D_001ABA20 >= 0x21)
                 D_001ABA20 = 0;
         }
-        if (((CallbackMenuState *)&D_00138180)->flags & 0x40) {
+        if (((CallbackMenuState *)&gPadState)->flags & 0x40) {
             if (D_00261858[D_001ABA20].enabled != 0) {
                 char *obj;
-                func_002E5E58(4, 0, 0);
-                func_002C9E60(0);
-                ((GameObj *)&D_001F2840)->f100 = ((GameObj *)&D_001F2840)->f14;
-                ((GameObj *)&D_001F2840)->f104 = ((GameObj *)&D_001F2840)->f08;
-                ((GameObj *)&D_001F2840)->f140 = D_001A7478;
+                PlaySoundFromGlobalBank(4, 0, 0);
+                RestoreSavedScreenImage(0);
+                ((GameObj *)&gPauseMenuState)->f100 = ((GameObj *)&gPauseMenuState)->f14;
+                ((GameObj *)&gPauseMenuState)->f104 = ((GameObj *)&gPauseMenuState)->f08;
+                ((GameObj *)&gPauseMenuState)->f140 = D_001A7478;
                 D_001A7478_sda = 2;
                 obj = D_001BAD40;
-                func_00288AA0(obj, D_00261858[D_001ABA20].text);
-                func_00288BE8(obj);
+                PushRequestQueue(obj, D_00261858[D_001ABA20].text);
+                LaunchQueuedRequest(obj);
             } else
-                func_002E5E58(5, 0, 0);
+                PlaySoundFromGlobalBank(5, 0, 0);
         }
         {
             MenuFields *menu = &D_0025C3E8;
             menu->f58 = D_001ABA20;
             if (D_00261858[D_001ABA20].enabled != 0) {
-                if (old == D_001ABA20) {
+                if (oldCursor == D_001ABA20) {
                     if (D_001A63AC[0] == 0) {
-                        if (menu->f50 == old && menu->f44 == 2) {
+                        if (menu->f50 == oldCursor && menu->f44 == 2) {
                             D_0025C3A8[0]->flags &= -5;
-                        } else if (menu->f54 == old && menu->f44 == 4) {
+                        } else if (menu->f54 == oldCursor && menu->f44 == 4) {
                             D_0025C3A8[0]->flags &= -5;
                         }
                     }

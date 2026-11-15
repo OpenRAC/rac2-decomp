@@ -5,11 +5,11 @@
 extern char D_001A8F20[];
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00282D30(void *, void *, float);
-void func_L03_0038B2E8(unsigned char *a0, unsigned char *a1, int a2) {
+void func_L03_0038B2E8(unsigned char *result, unsigned char *points, int count) {
     int i;
-    qcopy(a0, D_001A8F20);
-    if (a1 == 0) return;
-    if (!a2) return;
-    for (i = 0; i < a2; i++) func_00282CC0(a0, a0, a1 + 0x10 + i * 0x10);
-    func_00282D30(a0, a0, 1.0f / (float)a2);
+    qcopy(result, D_001A8F20);
+    if (points == 0) return;
+    if (!count) return;
+    for (i = 0; i < count; i++) FastVecAdd(result, result, points + 0x10 + i * 0x10);
+    FastVecScale(result, result, 1.0f / (float)count);
 }

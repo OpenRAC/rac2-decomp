@@ -18,16 +18,16 @@ extern s32 D_L11_001B0808 __attribute__((sda));
    its own state to 4.
    The two sound lookups are separate values, and the early exits return without stepping the
    shared counter, as retail does. */
-void func_L11_003F7B70(u8 *arg0) {
-    f32 tmp[4];
-    u8 *base = D_L11_001B359C;
-    u8 *self = arg0;
+void func_L11_003F7B70(u8 *mobyArg) {
+    f32 offset[4];
+    u8 *mobyTable = gMobyTable_L11;
+    u8 *self = mobyArg;
     u8 *vars = *(u8 **)(self+0x68);
-    u8 *target = base + *(s32 *)(vars+8)*256;
-    u8 *entry;
-    s16 *list;
-    s16 *start;
-    u8 *obj;
+    u8 *target = mobyTable + *(s32 *)(vars+8)*256;
+    u8 *soundSlot;
+    s16 *victims;
+    s16 *groupList;
+    u8 *victim;
     switch (*(u8 *)(self+0x20)) {
     case 0:
         *(u8 *)(self+0x20) = 1;
@@ -39,7 +39,7 @@ void func_L11_003F7B70(u8 *arg0) {
         /* fall through */
     case 1:
         if (*(s32 *)vars && *(u8 *)(target+0x20) == 2 &&
-            D_L11_001B0808 == func_00283CF0(*(f32 *)(vars+4)*15.0f)) {
+            D_L11_001B0808 == FloatToInt(*(f32 *)(vars+4)*15.0f)) {
             *(u8 *)(self+0x20) = 2;
             *(f32 *)(vars+0xC) = 3.1415927410125732f;
             *(s32 *)(vars+0x10) = 0;
@@ -48,18 +48,18 @@ void func_L11_003F7B70(u8 *arg0) {
     case 2: {
         s32 handle;
         *(f32 *)(vars+0x10) += 0.05235988646745682f;
-        *(f32 *)(vars+0xC) = func_00283B98(*(f32 *)(vars+0xC),0.05235988646745682f);
+        *(f32 *)(vars+0xC) = FastAddRotations(*(f32 *)(vars+0xC),0.05235988646745682f);
         handle = *(s32 *)(vars+0x30);
-        entry = D_L11_00188660 + handle * 0x70;
-        if (*(u8 **)(entry+0x88) != self || !*(u8 *)(entry+0x74))
-            *(s32 *)(vars+0x30) = func_002E5CF8(0,4,self);
+        soundSlot = D_L11_00188660 + handle * 0x70;
+        if (*(u8 **)(soundSlot+0x88) != self || !*(u8 *)(soundSlot+0x74))
+            *(s32 *)(vars+0x30) = PlayMobySound(0,4,self);
         if (*(f32 *)(vars+0x10) >= 6.2831854820251465f) {
             if (*(u8 *)(target+0x20) != 2) {
                 *(u8 *)(self+0x20) = 1;
                 if (*(s32 *)(vars+0x30) != -1) {
                     u8 *sound = D_L11_00188660 + *(s32 *)(vars+0x30)*0x70;
                     if (*(u8 **)(sound+0x88) == self && *(u8 *)(sound+0x74))
-                        func_002E59F8(*(s32 *)(vars+0x30));
+                        StopSoundVoice(*(s32 *)(vars+0x30));
                 }
                 *(s32 *)(vars+0x30) = -1;
             }
@@ -67,8 +67,8 @@ void func_L11_003F7B70(u8 *arg0) {
             *(f32 *)(vars+0xC) = 3.1415927410125732f;
             qcopy(self+0x10,vars+0x20);
         } else {
-            func_00282F20(tmp,self+0xD0,-(func_00283180(*(f32 *)(vars+0xC))+1.0f)*2.2f);
-            func_00282CC0(self+0x10,tmp,vars+0x20);
+            vec_scale_to_length(offset,self+0xD0,-(FastSinOrCosA(*(f32 *)(vars+0xC))+1.0f)*2.2f);
+            FastVecAdd(self+0x10,offset,vars+0x20);
         }
         break;
     }
@@ -77,34 +77,34 @@ void func_L11_003F7B70(u8 *arg0) {
         if (*(u8 *)(target+0x20) == 2) {
             if (*(s32 *)(vars+0x1C) == 0) {
                 *(s32 *)(vars+0x1C) = 1;
-                if (*(s32 *)(vars+0x14) == 255 || (start = D_L11_001FC420[*(s32 *)(vars+0x14)]) == 0) {
+                if (*(s32 *)(vars+0x14) == 255 || (groupList = gGroupIdLists[*(s32 *)(vars+0x14)]) == 0) {
                     *(u8 *)(self+0x20) = 4;
                     return;
                 }
-                list = start;
+                victims = groupList;
                 do {
-                    obj = D_L11_001B359C + ((*list & 0x7FFF) << 8);
-                    if (*(s8 *)(obj+0x20) >= 0) {
-                        s32 kind = *(s16 *)(obj+0xAA);
-                        if (kind == 0xCF5) *(u8 *)(obj+0x95) = 1;
-                        else if (kind == 0xCF6) *(u8 *)(obj+0x95) = 1;
-                        else if (kind == 0xD07) *(u8 *)(obj+0x95) = 1;
+                    victim = gMobyTable_L11 + ((*victims & 0x7FFF) << 8);
+                    if (*(s8 *)(victim+0x20) >= 0) {
+                        s32 kind = *(s16 *)(victim+0xAA);
+                        if (kind == 0xCF5 /* Joba Tribesman */) *(u8 *)(victim+0x95) = 1;
+                        else if (kind == 0xCF6 /* moby class 3318 */) *(u8 *)(victim+0x95) = 1;
+                        else if (kind == 0xD07 /* Jobian Saur-Beast */) *(u8 *)(victim+0x95) = 1;
                     }
-                } while (*list++ >= 0);
-                if (*(s32 *)(vars+0x18) == 255 || (start = D_L11_001FC420[*(s32 *)(vars+0x18)]) == 0) {
+                } while (*victims++ >= 0);
+                if (*(s32 *)(vars+0x18) == 255 || (groupList = gGroupIdLists[*(s32 *)(vars+0x18)]) == 0) {
                     *(u8 *)(self+0x20) = 4;
                     return;
                 }
-                list = start;
+                victims = groupList;
                 do {
-                    obj = D_L11_001B359C + ((*list & 0x7FFF) << 8);
-                    if (*(s8 *)(obj+0x20) >= 0) {
-                        s32 kind = *(s16 *)(obj+0xAA);
-                        if (kind == 0xD07) *(u8 *)(obj+0x95) = 1;
-                        else if (kind == 0xCF6) *(u8 *)(obj+0x95) = 1;
-                        else if (kind == 0xCF5) *(u8 *)(obj+0x95) = 1;
+                    victim = gMobyTable_L11 + ((*victims & 0x7FFF) << 8);
+                    if (*(s8 *)(victim+0x20) >= 0) {
+                        s32 kind = *(s16 *)(victim+0xAA);
+                        if (kind == 0xD07 /* Jobian Saur-Beast */) *(u8 *)(victim+0x95) = 1;
+                        else if (kind == 0xCF6 /* moby class 3318 */) *(u8 *)(victim+0x95) = 1;
+                        else if (kind == 0xCF5 /* Joba Tribesman */) *(u8 *)(victim+0x95) = 1;
                     }
-                } while (*list++ >= 0);
+                } while (*victims++ >= 0);
                 *(u8 *)(self+0x20) = 4;
             }
             if (++D_L11_001B0808 > 104) D_L11_001B0808 = 0;

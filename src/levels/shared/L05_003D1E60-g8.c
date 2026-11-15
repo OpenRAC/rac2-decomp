@@ -12,6 +12,8 @@ extern unsigned char *func_0029EFD0(int type);
 /* Spawns a 0x986 object into the first free one of five slots, passing VALUE and its slot in its
    state. The slot table is reset on first use (count -1); when all five are taken and EVICT is
    set, the slot whose spawn frame is oldest is freed first. */
+/* Spawns an explosion in the first free of five slots and frees the oldest one if all are used
+   and asked to. */
 unsigned char *func_L05_003D1E60(void *position, int value, int evict)
 {
     int i;
@@ -40,7 +42,7 @@ unsigned char *func_L05_003D1E60(void *position, int value, int evict)
                 }
             }
             if (selected >= 0) {
-                func_0029F338(D_L05_001B3018[selected]);
+                MarkMobySpawned(D_L05_001B3018[selected]);
                 D_L05_001B3018[selected] = 0;
                 D_L05_001B2FA0[selected] = 0;
                 D_L05_001AFCB8 -= 1.0f;
@@ -52,7 +54,7 @@ unsigned char *func_L05_003D1E60(void *position, int value, int evict)
         }
     }
     for (i = 0; i < 5 && D_L05_001B3018[i] != 0; i++) {}
-    object = func_0029EFD0(0x986);
+    object = CreateMoby(0x986);
     if (object) {
         state = *(char **)(object + 0x68);
         object[0x30] = 255;

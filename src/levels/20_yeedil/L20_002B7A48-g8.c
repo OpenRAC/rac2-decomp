@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* This unit is built with -G8: every body here reaches a global through $gp.
    The small-data symbols are declared with the sda attribute, which makes the
@@ -68,6 +69,7 @@ extern void func_002A677C(s32);
    in mode 0x6F) the arming check and the resident timestamp catch-up; then the sub-updates,
    gated twice more by the state byte, and the hand-off of the hero's record. Same game code as
    func_L18_002C41F0. */
+/* Runs the hero once per frame: checks for damage, updates timers and hands the hero over to the game. */
 void func_L20_002B93E0(void)
 {
     char *base;
@@ -76,28 +78,28 @@ void func_L20_002B93E0(void)
     unsigned int now;
     unsigned int then;
 
-    func_L00_002D24E8();
-    func_L18_002D0C00();
-    func_L00_002ACA08();
+    AdvanceHeroAnimation();
+    UpdateHeroFrameInput();
+    ProcessHeroActionCommand();
 
-    base = D_00189E20;
+    base = gHeroState;
     if (*(u8 *)(base + 0x22B4) == 1) {
-        func_L00_002ACF88(base + 0x80, base + 0x90, base + 0x550);
-        func_L00_002B8930();
+        FindHeroLedgeGrab(base + 0x80, base + 0x90, base + 0x550);
+        UpdateHeroMotionResponseParameters();
     }
     if (*(u8 *)(base + 0x22B4) == 4) {
         if (D_L20_001AFF00 == 0) {
             if (*(s16 *)(base + 0x1E0) == 0) {
                 if (*(int *)(base + 0x2294) != 0x6F) {
-                    if (func_00282978(*(int *)(*(int *)(base + 0x2290) + 0x68) + 0x3BC) != 0) {
+                    if (FastDecTimer(*(int *)(*(int *)(base + 0x2290) + 0x68) + 0x3BC) != 0) {
                         *(int *)(base + 0x24CC) = 0;
-                        func_L20_002D7730(0x91, 1);
+                        YeedilEnterHeroAction(0x91, 1);
                     }
-                    if (D_001A79F0 == 0x14) {
+                    if (gCurrentMapIndex == 0x14) {
                         if (D_0013965E == 0) {
-                            blk = D_0018C958;
+                            blk = gSubtitleHistory;
                             if (D_001A7390_1 - *(unsigned int *)(blk + 0x7900) >= 0xB5) {
-                                if (func_00288E18(0xA15, 0x6C) != 0) {
+                                if (RequestSubtitleVoiceLine(0xA15, 0x6C) != 0) {
                                     now = D_001A7390;
                                     then = *(unsigned int *)(blk + 0x7900);
                                     if (then < now) {
@@ -112,26 +114,26 @@ void func_L20_002B93E0(void)
         }
     }
 
-    base = D_00189E20;
-    func_L20_002DEBE0();
-    func_L00_002AE0C8();
+    base = gHeroState;
+    YeedilUpdateHeroActionDecider();
+    RebuildRegionObjectMembership();
 
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
-    func_L00_002B9CA8();
-    func_L00_002A5368();
+    UpdateDelayedSounds();
+    UpdateAllAttachmentRecords();
     if (*(u8 *)(base + 0x22B4) == 0)
         return;
-    func_L00_002A9600();
-    func_L00_002A7958();
-    func_L00_002A7748();
+    UpdateHeroMobyFromHero();
+    FadeScreenEffect();
+    ApplyHeroAxisScales();
     if (*(u8 *)(base + 0x22B4) == 1) {
         D_002683EC = D_001A7CF8;
-        func_L00_002A5840();
-        func_L00_002A5CB0();
-        func_L00_002A6008();
+        UpdateHeroGlowAndExtraManipulators();
+        UpdateHeroJointEffect();
+        UpdateHeroHeldObject_L00();
         if (*(u32 *)(base + 0x24E4) != 0) {
-            func_002E5CF8((void *)(*(u32 *)(base + 0x24E4) + 0x10), 0,
+            PlayMobySound((void *)(*(u32 *)(base + 0x24E4) + 0x10), 0,
                           (void *)(*(u32 *)(base + 0x2290)));
             *(u16 *)(base + 0x2520) = 0x39;
             *(u16 *)(base + 0x2522) = *(u16 *)(base + 0x24E4);
@@ -139,16 +141,16 @@ void func_L20_002B93E0(void)
         *(s32 *)(base + 0x24E4) = 0;
     }
     {
-        char *pos = D_00189EA0;
+        char *pos = gHeroPosition;
         char *g;
 
-        func_L00_003080D0(pos);
+        ClearMapBitsAroundPosition(pos);
         g = pos - 0x80;
         if (*(u8 *)(g + 0x22B4) == 4 && D_L20_001AFF00 == 0 && *(s16 *)(g + 0x1E0) == 0 &&
             *(int *)(g + 0x2294) != 0x6F)
-            func_L18_00428100(*(int *)(g + 0x2290));
+            StartReceiverBotSequence(*(int *)(g + 0x2290));
     }
-    func_L00_002A9760();
-    hero = D_00189E20;
+    UpdateHeroMobyProbedHeightBounds();
+    hero = gHeroState;
     func_002A677C(*(int *)(hero + 0x2290));
 }

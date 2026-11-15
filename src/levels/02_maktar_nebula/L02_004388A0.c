@@ -15,68 +15,68 @@ extern float D_L02_001B2640[] MACRO_ADDR;
 extern float func_00282E80(void *, void *);
 extern void func_00283098(void *, void *, void *);
 extern void func_L01_002E2608(void *, int, int, int, int);
+/* Draws a glowing quad on the nearest path record while two timed windows are active, using a fixed target point for each window. */
+void func_L02_004388A0(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    float targetPos[4] __attribute__((aligned(16)));
+    float tempVec[4] __attribute__((aligned(16)));
+    float matrix[16] __attribute__((aligned(16)));
+    unsigned short *entry;
+    u8 *record;
+    u8 *bestRecord;
+    float bestDist;
+    float dist;
+    int effectId;
+    int bestIndex;
+    int window;
+    int row;
 
-void func_L02_004388A0(u8 *a0) {
-    u8 *st = *(u8 **)(a0 + 0x68);
-    float pt[4] __attribute__((aligned(16)));
-    float tmp[4] __attribute__((aligned(16)));
-    float m[16] __attribute__((aligned(16)));
-    unsigned short *q;
-    u8 *e;
-    u8 *rec;
-    float best;
-    float d;
-    int idx;
-    int bestid;
-    int i;
-    int k;
-
-    for (i = 0; i < 2; i++) {
-        idx = -1;
-        if (i == 0) {
+    for (window = 0; window < 2; window++) {
+        effectId = -1;
+        if (window == 0) {
             if (D_L02_001BE200.timer >= 0x3B6) {
                 if (D_L02_001BE200.timer < 0x547) {
-                    *(TI128 *)tmp = 0;
-                    tmp[0] = 495.0f;
-                    tmp[1] = 587.0f;
-                    tmp[2] = 513.0f;
-                    qcopy(pt, tmp);
-                    idx = 0x3F;
+                    *(TI128 *)tempVec = 0;
+                    tempVec[0] = 495.0f;
+                    tempVec[1] = 587.0f;
+                    tempVec[2] = 513.0f;
+                    qcopy(targetPos, tempVec);
+                    effectId = 0x3F;
                 }
             }
         }
-        if (i == 1) {
+        if (window == 1) {
             if (D_L02_001BE200.timer >= 0x4E2) {
                 if (D_L02_001BE200.timer < 0x5DD) {
-                    *(TI128 *)tmp = 0;
-                    tmp[0] = 515.0f;
-                    tmp[1] = 596.0f;
-                    tmp[2] = 512.0f;
-                    qcopy(pt, tmp);
-                    idx = 0x40;
+                    *(TI128 *)tempVec = 0;
+                    tempVec[0] = 515.0f;
+                    tempVec[1] = 596.0f;
+                    tempVec[2] = 512.0f;
+                    qcopy(targetPos, tempVec);
+                    effectId = 0x40;
                 }
             }
         }
-        if (idx != -1) {
-            bestid = -1;
-            best = 99999.0f;
-            for (q = D_L02_001A9014[*(int *)st];
-                 q != 0 && ((short)q[-1] >= 0 || q == D_L02_001A9014[*(int *)st]) &&
-                 (e = D_L02_001B3C1C + ((*q & 0x7FFF) << 6)) != 0;
-                 q++) {
-                d = func_00282E80(e + 0x30, pt);
-                if (d < best) {
-                    best = d;
-                    bestid = *q & 0x7FFF;
+        if (effectId != -1) {
+            bestIndex = -1;
+            bestDist = 99999.0f;
+            for (entry = D_L02_001A9014[*(int *)vars];
+                 entry != 0 && ((short)entry[-1] >= 0 || entry == D_L02_001A9014[*(int *)vars]) &&
+                 (record = D_L02_001B3C1C + ((*entry & 0x7FFF) << 6)) != 0;
+                 entry++) {
+                dist = vec_distance_xy(record + 0x30, targetPos);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestIndex = *entry & 0x7FFF;
                 }
             }
-            if (bestid != -1) {
-                rec = D_L02_001B3C1C + (bestid << 6);
-                for (k = 0; k < 4; k++) {
-                    func_00283098(m + k * 4, D_L02_001B2640 + k * 4, rec);
-                    func_00282CC0(m + k * 4, m + k * 4, rec + 0x30);
+            if (bestIndex != -1) {
+                bestRecord = D_L02_001B3C1C + (bestIndex << 6);
+                for (row = 0; row < 4; row++) {
+                    matrix_mul_vec3(matrix + row * 4, D_L02_001B2640 + row * 4, bestRecord);
+                    FastVecAdd(matrix + row * 4, matrix + row * 4, bestRecord + 0x30);
                 }
-                func_L01_002E2608(m, idx, 2, 0xFF808080, 0);
+                DrawQuadWithRotatedUVs(matrix, effectId, 2, 0xFF808080, 0);
             }
         }
     }

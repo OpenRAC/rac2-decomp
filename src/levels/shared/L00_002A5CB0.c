@@ -41,60 +41,60 @@ void func_L00_002A5CB0(void)
     unsigned int first;
     unsigned int second;
     unsigned int color;
-    if (D_00189E20.object == 0) {
+    if (gHeroState.object == 0) {
         char *created;
-        created = func_0029EFD0(0x4B4);
-        D_00189E20.object = created;
+        created = CreateMoby(0x4B4 /* moby class 1204 */);
+        gHeroState.object = created;
         if (created) {
             *(unsigned int *)(created + 0x78) = 0x801432D7;
-            D_00189E20.color = 0x301432D7;
+            gHeroState.color = 0x301432D7;
             {
-                char *placed = D_00189E20.object;
-                qcopy_nc(placed + 0x10, &D_00189E20.q080);
-                qcopy_nc(placed + 0xF0, &D_00189E20.q090);
+                char *placed = gHeroState.object;
+                qcopy_nc(placed + 0x10, &gHeroState.q080);
+                qcopy_nc(placed + 0xF0, &gHeroState.q090);
                 *(short *)(placed + 0x32) = 0x40;
-                (D_00189E20.object)[0x31] = 1;
-                (D_00189E20.object)[0x30] = 0;
-                *(short *)(D_00189E20.object + 0x34) = 0;
-                *(float *)(D_00189E20.object + 0x2C) *= 1.7f;
-                *(unsigned short *)(D_00189E20.object + 0x34) |= 0x10;
-                func_002A0F48(D_00189E20.object);
+                (gHeroState.object)[0x31] = 1;
+                (gHeroState.object)[0x30] = 0;
+                *(short *)(gHeroState.object + 0x34) = 0;
+                *(float *)(gHeroState.object + 0x2C) *= 1.7f;
+                *(unsigned short *)(gHeroState.object + 0x34) |= 0x10;
+                func_002A0F48(gHeroState.object);
             }
         }
     }
-    if ((*(unsigned short *)(D_00189E20.moby + 0x34) ^ 1) & 1) {
-        func_0029FCC0(D_00189E20.moby, 7, (char *)joint);
-        qcopy(&D_00189E20.joint, joint);
-        func_L00_002A7A10();
-        if (D_00189E20.object) {
-            func_0029FC20(D_00189E20.moby, 7, (char *)matrix);
-            qcopy_nc(D_00189E20.object + 0x10, matrix + 12);
-            func_00283678(D_00189E20.object + 0xC0, matrix);
-            func_002A0F48(D_00189E20.object);
+    if ((*(unsigned short *)(gHeroState.moby + 0x34) ^ 1) & 1) {
+        TransformMobyJointToWorld(gHeroState.moby, 7, (char *)joint);
+        qcopy(&gHeroState.joint, joint);
+        QueueHeroGlowDrawRoutine();
+        if (gHeroState.object) {
+            TransformMobyJointPoint(gHeroState.moby, 7, (char *)matrix);
+            qcopy_nc(gHeroState.object + 0x10, matrix + 12);
+            copy_matrix3x4(gHeroState.object + 0xC0, matrix);
+            func_002A0F48(gHeroState.object);
             scale = 1.7f;
             if (D_001A7A40[3])
                 scale = 3.1f;
-            if (D_00189E20.timer)
+            if (gHeroState.timer)
                 scale *= 1.4f;
-            func_002AA2E8((float *)(D_00189E20.object + 0x2C), *(float *)(*(char **)(D_00189E20.object + 0x24) + 0x24) * scale, 0.02f);
+            ApproachValue((float *)(gHeroState.object + 0x2C), *(float *)(*(char **)(gHeroState.object + 0x24) + 0x24) * scale, 0.02f);
         }
     }
-    D_00189E20.phase = func_00283B98(D_00189E20.phase, 0.049451005f);
+    gHeroState.phase = FastAddRotations(gHeroState.phase, 0.049451005f);
     first = 0x281414C8;
     second = 0x1E00004B;
-    if (!func_00282978(&D_00189E20.timer)) {
-        D_00189E20.phase = func_00283B98(D_00189E20.phase, 0.20362177f);
-        switch (D_00189E20.variant) {
+    if (!FastDecTimer(&gHeroState.timer)) {
+        gHeroState.phase = FastAddRotations(gHeroState.phase, 0.20362177f);
+        switch (gHeroState.variant) {
         case 1: first = 0x2814C814; second = 0x1E004B00; break;
         case 2: first = 0x2814C8C8; second = 0x1E004B4B; break;
         case 3: first = 0x323232FA; second = 0x1E000078; break;
         case 4: first = 0x28F01414; second = 0x1E4B0000; break;
         }
-        if (D_00189E20.timer >= 50 && (D_00189E20.timer & 1))
-            func_002E5CF8(D_00189E20.variant + 16, 0, D_00189E20.moby);
+        if (gHeroState.timer >= 50 && (gHeroState.timer & 1))
+            PlayMobySound(gHeroState.variant + 16, 0, gHeroState.moby);
     }
-    color = func_00283D38(first, second, func_00283198(D_00189E20.phase) * 0.5f + 0.5f);
-    if (D_00189E20.object)
-        *(unsigned int *)(D_00189E20.object + 0x78) = func_00283D38(*(unsigned int *)(D_00189E20.object + 0x78), color, 0.1f);
-    D_00189E20.color = func_00283D38(D_00189E20.color, color, 0.1f);
+    color = FastTweenColor(first, second, FastSinOrCosB(gHeroState.phase) * 0.5f + 0.5f);
+    if (gHeroState.object)
+        *(unsigned int *)(gHeroState.object + 0x78) = FastTweenColor(*(unsigned int *)(gHeroState.object + 0x78), color, 0.1f);
+    gHeroState.color = FastTweenColor(gHeroState.color, color, 0.1f);
 }

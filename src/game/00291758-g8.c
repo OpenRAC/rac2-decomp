@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_001B1B40 __attribute__((section(".sdata")));
 extern int D_001B1B44 __attribute__((section(".sdata")));
@@ -9,10 +10,11 @@ extern int D_001D0E00[];
 extern void func_002B65B8(int, int);
 extern void func_002934F8(char *, int, int, int);
 
-void func_00293890(char *object, int a, int b, int id)
+/* Registers a loaded object in the class cache tables, or only reserves a slot when no object is given. */
+void func_00293890(char *object, int mapBase, int mapEntries, int id)
 {
     if (object == 0) {
-        func_002B65B8(id, 1);
+        QueueMobyClassUpdate(id, 1);
         D_001CE4E0[id] = *(unsigned char *)&D_001B1B44;
         D_001B1B44 = D_001B1B44 + 1;
     } else {
@@ -22,9 +24,9 @@ void func_00293890(char *object, int a, int b, int id)
         D_001D0E00[D_001B1B40] = (unsigned char)object[0x2D] << 10;
         if ((unsigned char)object[0x2D] == 255)
             D_001D0E00[D_001B1B40] = 0x100000;
-        func_002B65B8(id, 0);
+        QueueMobyClassUpdate(id, 0);
         ++D_001B1B40;
-        func_002934F8(object, a, b, id);
+        RelocateTextureBlock(object, mapBase, mapEntries, id);
     }
 }
 
@@ -133,18 +135,18 @@ extern int D_001A933C __attribute__((sda));
 
 /* Release the slot the object holds: remember its entry in the table of the two
    slots, then clear the object's own reference to it. */
-void func_00294130(int *p, int a1)
+void func_00294130(int *entry, int doRelease)
 {
-    if (a1 != 0) {
-        if (p[1] >= 0) {
-            D_00152CD0.slot[p[1]] = p[0];
-            if (p[1] != D_001A933C)
+    if (doRelease != 0) {
+        if (entry[1] >= 0) {
+            D_00152CD0.slot[entry[1]] = entry[0];
+            if (entry[1] != D_001A933C)
                 goto out;
-            D_001A933C = p[1] ^ 1;
+            D_001A933C = entry[1] ^ 1;
         }
     }
 out:
-    *p = -1;
+    *entry = -1;
 }
 
 /* UpdateWorldObjectAnimation: relocate the model record loaded for the current chunk and
@@ -153,80 +155,80 @@ out:
 void func_00293D30(void)
 {
     struct ModelRec *rec;
-    struct Moby *mob;
-    int *cp;
-    int *sp;
+    struct Moby *moby;
+    int *partOffsets;
+    int *partData;
     int i;
     int k;
-    int idx;
-    int id;
-    int off;
-    int endp;
-    int pc;
+    int partIndex;
+    int classId;
+    int partOffset;
+    int modelEnd;
+    int partCount;
 
-    func_0011AEA0(0);
-    func_0029D4D0(D_001B8840.unk70, (int)D_001B8840.rec);
-    func_0011AEA0(0);
+    FlushCache(0);
+    fast_decompress(gScenePlaybackState.unk70, (int)gScenePlaybackState.rec);
+    FlushCache(0);
 
-    rec = D_001B8840.rec;
-    D_001B8840.unk38 = 0;
-    cp = rec->part_off;
-    D_001B8840.unk40 = rec->flags;
-    pc = rec->part_count;
-    D_001B8840.unk48 = rec->pad08;
-    D_001B8840.num_parts = rec->num_parts;
-    D_001B8840.unk68 = (u32)rec + rec->end_off;
-    if (pc < 0x400) {
-        D_001B8840.unk4C = 0;
+    rec = gScenePlaybackState.rec;
+    gScenePlaybackState.unk38 = 0;
+    partOffsets = rec->part_off;
+    gScenePlaybackState.unk40 = rec->flags;
+    partCount = rec->part_count;
+    gScenePlaybackState.unk48 = rec->pad08;
+    gScenePlaybackState.num_parts = rec->num_parts;
+    gScenePlaybackState.unk68 = (u32)rec + rec->end_off;
+    if (partCount < 0x400) {
+        gScenePlaybackState.unk4C = 0;
     } else {
-        D_001B8840.unk4C = (u32)rec + pc;
+        gScenePlaybackState.unk4C = (u32)rec + partCount;
     }
 
-    for (i = 0; i < D_001B8840.num_parts; i++) {
-        off = *cp++;
-        sp = (int *)((u8 *)rec + off);
-        id = sp[0];
-        sp = (int *)((u8 *)sp + 0xC);
-        endp = (int)rec + sp[0];
-        sp = (int *)((u8 *)sp + 4);
-        if (id == 0x215 || id == 0x10D1) {
-            id = 0xD54;
+    for (i = 0; i < gScenePlaybackState.num_parts; i++) {
+        partOffset = *partOffsets++;
+        partData = (int *)((u8 *)rec + partOffset);
+        classId = partData[0];
+        partData = (int *)((u8 *)partData + 0xC);
+        modelEnd = (int)rec + partData[0];
+        partData = (int *)((u8 *)partData + 4);
+        if (classId == 0x215 /* moby class 533 */ || classId == 0x10D1 /* moby class 4305 */) {
+            classId = 0xD54 /* moby class 3412 */;
         }
-        mob = D_001B8840.slots[i];
-        if (mob == 0) {
-            if (id == 0) {
-                mob = D_001B159C;
-                func_0029F0C8(mob, 0);
+        moby = gScenePlaybackState.slots[i];
+        if (moby == 0) {
+            if (classId == 0) {
+                moby = D_001B159C;
+                InitMobyInstance(moby, 0);
             } else {
-                mob = func_0029EFD0(id);
+                moby = CreateMoby(classId);
             }
-            mob->unk32 = 0x1FF;
-            mob->unk34 |= 6;
-            mob->flag72 = 0xFF;
-            mob->unk94 = 0;
-            if (D_00189E20.color_src == 0) {
-                mob->color = 0x38383800000000ULL;
+            moby->unk32 = 0x1FF;
+            moby->unk34 |= 6;
+            moby->flag72 = 0xFF;
+            moby->unk94 = 0;
+            if (gHeroState.color_src == 0) {
+                moby->color = 0x38383800000000ULL;
             } else {
-                mob->color = D_00189E20.color_src->color;
+                moby->color = gHeroState.color_src->color;
             }
-            if (mob->parts->flag) {
-                mob->flag73 = 0x18;
+            if (moby->parts->flag) {
+                moby->flag73 = 0x18;
             }
-            idx = mob->parts->used;
-            mob->parts->used = idx + 1;
-            mob->idx = idx;
-            mob->slot = idx;
-            D_001B8840.slots[i] = mob;
-            if (mob->class_id == 0xD54) {
-                D_001B8840.unk54 = (u32)mob;
+            partIndex = moby->parts->used;
+            moby->parts->used = partIndex + 1;
+            moby->idx = partIndex;
+            moby->slot = partIndex;
+            gScenePlaybackState.slots[i] = moby;
+            if (moby->class_id == 0xD54) {
+                gScenePlaybackState.unk54 = (u32)moby;
             }
         }
-        mob->model = endp;
-        mob->parts->entries[mob->idx] = (u32)sp;
-        for (k = 0; k < ((u8 *)sp)[0x10]; k++) {
-            int *w = (int *)((u8 *)sp + 0x1C);
+        moby->model = modelEnd;
+        moby->parts->entries[moby->idx] = (u32)partData;
+        for (k = 0; k < ((u8 *)partData)[0x10]; k++) {
+            int *w = (int *)((u8 *)partData + 0x1C);
 
-            w[k] = (int)sp + w[k];
+            w[k] = (int)partData + w[k];
         }
     }
 }

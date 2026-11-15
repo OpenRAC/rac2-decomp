@@ -115,16 +115,16 @@ void func_L17_003BD310(Moby *moby)
     moby->color = color;
 
     if (moby->oClass == 0x8D8 || moby->oClass == 0x8AD) {
-        if (moby->state == 2 && func_00282E80(moby->position, D_00189EA0) < 80.0f) {
-            SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
+        if (moby->state == 2 && vec_distance_xy(moby->position, gHeroPosition) < 80.0f) {
+            SoundVoice *voice = (SoundVoice *)&gSoundState[vars->sound];
             if (voice->owner != moby || !voice->active)
-                vars->sound = func_002E5CF8(0, 4, moby);
+                vars->sound = PlayMobySound(0, 4, moby);
         } else {
             int sound = vars->sound;
             if (sound != -1) {
-                SoundVoice *voice = (SoundVoice *)&D_00188660[sound];
+                SoundVoice *voice = (SoundVoice *)&gSoundState[sound];
                 if (voice->owner == moby && voice->active)
-                    func_002E59F8(sound);
+                    StopSoundVoice(sound);
             }
             vars->sound = -1;
         }
@@ -134,10 +134,10 @@ void func_L17_003BD310(Moby *moby)
     case 0:
         vars->sound = -1;
         vars->isLinked = 0;
-        if (vars->path == -1 || D_L17_001FE880[vars->path]->count < 2) {
-            func_0026FEB8(D_L17_001AFCF8, moby->oClass, moby->uid);
-            func_0026FEB8(D_L17_001AFD28);
-            func_0029F338(moby);
+        if (vars->path == -1 || gPathTable_L17[vars->path]->count < 2) {
+            STUB_printf(D_L17_001AFCF8, moby->oClass, moby->uid);
+            STUB_printf(D_L17_001AFD28);
+            MarkMobySpawned(moby);
             break;
         }
         moby->x32 = 0x180;
@@ -149,30 +149,30 @@ void func_L17_003BD310(Moby *moby)
             } else {
                 int count = 0;
                 do {
-                    index = D_L17_001B2C1C[index].vars->next;
+                    index = gMobyPool_L17[index].vars->next;
                     count++;
                 } while (index != -1);
-                vars->chainSpan = func_00283CE0(count);
+                vars->chainSpan = IntToFloat(count);
             }
         }
         vars->chainTime = vars->chainSpan * 4.0f;
         {
-            HazardPath *path = D_L17_001FE880[vars->path];
-            path->length = func_00282E48(path->start, path->end);
+            HazardPath *path = gPathTable_L17[vars->path];
+            path->length = fast_vec_dist(path->start, path->end);
         }
         vars->x14 = 0;
         vars->x18 = 0;
         if (vars->next != -1) {
             D_L17_001B2C1C_1[0][vars->next].vars->parent = moby;
             vars->isLinked = 1;
-            func_002A7750(moby, 3, -1);
+            SetMobyState(moby, 3, -1);
         } else {
-            func_002A7750(moby, 2, -1);
+            SetMobyState(moby, 2, -1);
         }
         moby->state = 1;
         break;
     case 1:
-        func_L17_003BCC30(moby);
+        PlacePathFollowerChainAtStart(moby);
         if (D_L17_001AFCF0 && !vars->isLinked)
             moby->state = 2;
         else
@@ -180,26 +180,26 @@ void func_L17_003BD310(Moby *moby)
         break;
     case 2:
         if (D_L17_001AFCF0)
-            func_L17_003BCEC0(moby);
-        if (func_002A9640(moby, 0x4010000, 1))
-            func_002A7750(moby, 5, -1);
+            UpdatePathFollowerChain(moby);
+        if (FindOwnedEffectSlot(moby, 0x4010000, 1))
+            SetMobyState(moby, 5, -1);
         moby->impactSlot = 0xFF;
         break;
     case 3:
         if (vars->next != -1) {
-            Moby *other = D_L17_001B2C1C + vars->next;
+            Moby *other = gMobyPool_L17 + vars->next;
             if (!other || other->state == 0xFE || other->state == 0xFD)
-                func_002A7750(moby, 4, -1);
+                SetMobyState(moby, 4, -1);
         }
-        if (func_002A9640(moby, 0x4010000, 1))
-            func_002A7750(moby, 5, -1);
+        if (FindOwnedEffectSlot(moby, 0x4010000, 1))
+            SetMobyState(moby, 5, -1);
         moby->impactSlot = 0xFF;
         break;
     case 4:
-        if (func_002B3868(moby))
+        if (SetFirstPendingFlag(moby))
             vars->timer = 5;
-        if (func_00282948(&vars->timer))
-            func_002A7750(moby, 5, -1);
+        if (FastFloatHelperD(&vars->timer))
+            SetMobyState(moby, 5, -1);
         break;
     case 5:
         if (moby->oClass == 0x8AD) {
@@ -208,22 +208,22 @@ void func_L17_003BD310(Moby *moby)
             float a, b;
             Moby *created;
             moby->updateDist = 1000000.0f;
-            func_0032C700(pos, 10.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
+            SpawnExplosion(pos, 10.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
             rot = moby->rotation;
-            func_002B0A68(moby, 11, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            a = func_002A7878(-10.0f, 10.0f);
-            b = func_002A7878(20.0f, 30.0f);
-            created = func_00273730(moby, 2, 0x8AD, 2, pos, rot, D_L17_001A8F20, 255, a, b);
+            SpawnDebrisForMaskedParts(moby, 11, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            a = RandomFloatRange(-10.0f, 10.0f);
+            b = RandomFloatRange(20.0f, 30.0f);
+            created = CreateCameraMoby(moby, 2, 0x8AD, 2, pos, rot, D_L17_001A8F20, 255, a, b);
             if (created)
                 created->vars->sound = 0;
-            func_L00_00326110(moby, 1, 0.0f);
-            func_0029F338(moby);
+            SpawnScaledBolts(moby, 1, 0.0f);
+            MarkMobySpawned(moby);
         } else {
             moby->updateDist = 1000000.0f;
-            func_0032C700(moby->position, 3.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
-            func_002B0A68(moby, 31, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            func_L00_00326110(moby, 1, 0.0f);
-            func_0029F338(moby);
+            SpawnExplosion(moby->position, 3.0f, 0, 10, 10, 10, 10, 20, 0, 1, 0, 0, 0, 20.0f);
+            SpawnDebrisForMaskedParts(moby, 31, D_L17_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+            SpawnScaledBolts(moby, 1, 0.0f);
+            MarkMobySpawned(moby);
         }
         break;
     }

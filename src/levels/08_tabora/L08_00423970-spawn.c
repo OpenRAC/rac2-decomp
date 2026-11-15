@@ -18,49 +18,50 @@ static __inline__ void vzero(float *v) {
 /* The same dust burst as func_L08_00422190, except that a moby in state 5 hands the particles
    part of its own motion: 0.8 of the vector at vars + 0xD0 joins their velocity and 0.4 of
    that becomes their acceleration. */
-void func_L08_00424FF8(char *m, void *position, int count,
+/* Sprays a ring of dust puffs around a point, carrying some of the creature's own motion. */
+void func_L08_00424FF8(char *moby, void *position, int count,
                       float speed, float rise, float maxRadius, float minRadius,
                       float size, float endSize)
 {
     float offset[4], velocity[4], accel[4], motion[4];
-    int a, b, c;
+    int fadeIn, hold, fadeOut;
     char *particle;
-    char *vars = *(char **)(m + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
     {
         int i;
         for (i = 0; i < count; i++) {
             float x, y;
-            x = func_00283180(func_002A7878(-3.1415927410125732f, 3.1415927410125732f));
-            offset[0] = x * func_002A7878(minRadius, maxRadius);
-            y = func_00283198(func_002A7878(-3.1415927410125732f, 3.1415927410125732f));
-            y *= func_002A7878(minRadius, maxRadius);
+            x = FastSinOrCosA(RandomFloatRange(-3.1415927410125732f, 3.1415927410125732f));
+            offset[0] = x * RandomFloatRange(minRadius, maxRadius);
+            y = FastSinOrCosB(RandomFloatRange(-3.1415927410125732f, 3.1415927410125732f));
+            y *= RandomFloatRange(minRadius, maxRadius);
             offset[1] = y;
             offset[2] = 0;
-            func_00283098(offset, offset, m + 0xC0);
+            matrix_mul_vec3(offset, offset, moby + 0xC0);
             {
-                float range = speed * ((maxRadius - func_00282DF0(offset)) * 0.01666666753590107f) / maxRadius;
-                func_00282F20(velocity, offset, func_002A7878(range * 0.25f, range));
+                float range = speed * ((maxRadius - FastVecLength(offset)) * 0.01666666753590107f) / maxRadius;
+                vec_scale_to_length(velocity, offset, RandomFloatRange(range * 0.25f, range));
             }
-            velocity[2] += func_002A7878(rise * 0.25f, rise) * 0.01666666753590107f;
-            if (*(u8 *)(m + 0x20) == 5) {
+            velocity[2] += RandomFloatRange(rise * 0.25f, rise) * 0.01666666753590107f;
+            if (*(u8 *)(moby + 0x20) == 5) {
                 qcopy(motion, vars + 0xD0);
                 motion[2] = 0;
-                func_00282D30(motion, vars + 0xD0, 0.8f);
-                func_00282CC0(velocity, velocity, motion);
-                func_00282D30(accel, motion, 0.4f);
+                FastVecScale(motion, vars + 0xD0, 0.8f);
+                FastVecAdd(velocity, velocity, motion);
+                FastVecScale(accel, motion, 0.4f);
             } else {
                 vzero(accel);
             }
-            func_00282CC0(offset, offset, position);
+            FastVecAdd(offset, offset, position);
             offset[2] += -0.75f;
             velocity[3] = size;
             accel[3] = endSize;
-            a = func_00283CF0(func_002A7878(15.0f, 25.0f));
-            b = func_00283CF0(func_002A7878(20.0f, 40.0f));
-            c = func_00283CF0(func_002A7878(50.0f, 70.0f));
-            particle = func_002BAA28(offset, velocity, accel, 0x70204050, 0x7F7F7F, a, b, c, -1);
-            if (particle && (func_001163B0() & 1))
+            fadeIn = FloatToInt(RandomFloatRange(15.0f, 25.0f));
+            hold = FloatToInt(RandomFloatRange(20.0f, 40.0f));
+            fadeOut = FloatToInt(RandomFloatRange(50.0f, 70.0f));
+            particle = SpawnTrailParticle_002BAA28(offset, velocity, accel, 0x70204050, 0x7F7F7F, fadeIn, hold, fadeOut, -1);
+            if (particle && (Rand() & 1))
                 particle[3] = 0x48;
         }
     }

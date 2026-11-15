@@ -1,5 +1,6 @@
 /* func_L00_00341410 in its own unit (flags in config/cflags.txt: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier). */
 #include "include_asm.h"
+#include "names.h"
 
 typedef int Quadword __attribute__((mode(TI)));
 typedef union { Quadword q; float f[4]; } Vector;
@@ -22,40 +23,41 @@ extern void func_00282CC0(void *, const void *, const void *);
 extern void func_002FE8D8(void *, void *);
 extern void func_00282D30(void *, const void *, float);
 
+/* Spawns a fast particle at a position (or in front of the owner) and sends it forward from the owner. */
 unsigned char *func_L00_00341410(ParticleOwner *owner, Quadword *position,
                               int flags, int minimum, int maximum, float scale) {
     union { Quadword q; float f[4]; } direction;
-    unsigned char *particle = func_002B9030(0x6E);
+    unsigned char *particle = AllocParticle(0x6E);
     unsigned char *motion;
     Vector *origin;
     int shade;
     if (particle) {
         motion = particle + 0x20;
-        particle[9] = func_00283CF0(4.0f) + 0x40;
+        particle[9] = FloatToInt(4.0f) + 0x40;
         particle[3] = flags;
         particle[1] = 0;
-        particle[8] = func_002A77E0(255);
+        particle[8] = RandomIntBelow(255);
         particle[2] = *D_L00_001FEAF8;
-        *(short *)(particle + 0xA) = func_002A7820(minimum, maximum);
+        *(short *)(particle + 0xA) = RandomIntRange(minimum, maximum);
         *(int *)(motion + 0x18) = *(short *)(particle + 0xA);
         *(float *)(particle + 0xC) = scale * 630000.0f;
         if (((float *)position)[3] == -1.0f) {
-            func_00282C88(&direction.q);
+            ClearVector128(&direction.q);
             direction.f[3] = 1.0f;
             direction.f[0] = -0.3f;
-            func_00283098(&direction, &direction, owner->matrix);
-            func_00282CC0(particle + 0x10, &direction, &owner->position);
+            matrix_mul_vec3(&direction, &direction, owner->matrix);
+            FastVecAdd(particle + 0x10, &direction, &owner->position);
         } else {
             *(Quadword *)(particle + 0x10) = *position;
         }
         origin = &owner->position;
-        *(float *)(particle + 0x10) += func_002A7878(-0.015f, 0.015f);
-        *(float *)(particle + 0x14) += func_002A7878(-0.015f, 0.015f);
-        *(float *)(particle + 0x18) += func_002A7878(-0.015f, 0.015f);
-        func_002FE8D8(origin, &direction);
-        func_00282D30(motion, &direction, func_002A7878(0.01f, 0.015f));
-        *(int *)(motion + 0x10) = func_002A7820(80, 200);
-        shade = func_002A7820(96, 128);
+        *(float *)(particle + 0x10) += RandomFloatRange(-0.015f, 0.015f);
+        *(float *)(particle + 0x14) += RandomFloatRange(-0.015f, 0.015f);
+        *(float *)(particle + 0x18) += RandomFloatRange(-0.015f, 0.015f);
+        GetObjectFacingDirection(origin, &direction);
+        FastVecScale(motion, &direction, RandomFloatRange(0.01f, 0.015f));
+        *(int *)(motion + 0x10) = RandomIntRange(80, 200);
+        shade = RandomIntRange(96, 128);
         *(int *)(motion + 0x14) = shade + (shade << 8) + (shade << 16);
         *(unsigned int *)(particle + 4) = *(int *)(motion + 0x14) | (*(unsigned int *)(motion + 0x10) << 24);
     }

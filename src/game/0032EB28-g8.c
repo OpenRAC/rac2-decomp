@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Functions of 0032EB28.c whose retail body reaches its resident object through $gp
    (`addiu $v0,$gp,-0x16C8`). A file named *-g8.c is built with -G8 (config/cflags.txt),
@@ -8,11 +9,13 @@ extern int D_001AD928 __attribute__((sda));
 extern int D_001AD908 __attribute__((sda));
 extern void F7242f0a4_FUN_00335AE0(void *);
 
+/* Sets up an object with the first shared table of actions. */
 void func_00335D80(void *object) {
     *(void **)object = &D_001AD928;
     F7242f0a4_FUN_00335AE0(object);
 }
 
+/* Sets up an object with the second shared table of actions. */
 void func_00335DA0(void *object) {
     *(void **)object = &D_001AD908;
     F7242f0a4_FUN_00335AE0(object);
@@ -21,6 +24,7 @@ void func_00335DA0(void *object) {
 extern float D_L00_001B2708 __attribute__((sda));
 extern void func_00300A00(int, int, float, float, float, float, float);
 
+/* Draws a screen element at its stored place and size, unless it is switched off. */
 void func_00336320(char *object)
 {
     float *first;
@@ -31,7 +35,7 @@ void func_00336320(char *object)
         return;
     first = *(float **)object;
     second = *(float **)(object + 4);
-    func_00300A00(*(int *)(object + 0x40), **(int **)(object + 0xC), first[0], first[1],
+    DrawScaledObjectTwoAxes(*(int *)(object + 0x40), **(int **)(object + 0xC), first[0], first[1],
                  second[0], second[1] * D_L00_001B2708, **(float **)(object + 0x38));
 }
 
@@ -39,15 +43,16 @@ extern void func_002FC808(void);
 extern void func_00330EC0(void *);
 extern void func_002FDBD8(void *, void *, int, float);
 extern float ref_L00_00330E48_00 __attribute__((sda));
+/* Draws the ring effect while it is small and draws its trail while it is active. */
 void func_00330E48(char *owner)
 {
     char *data;
-    func_002FC808();
+    AppendVu1DmaChainTable3();
     data = *(char **)(owner + 0x68);
     if (*(float *)(data + 0x64) < ref_L00_00330E48_00)
-        func_00330EC0(owner);
+        DrawShockwaveRing(owner);
     if (*(int *)(data + 0x78))
-        func_002FDBD8(data + 0x30, data + 0x40, 0, 0.2f);
+        DrawSpinningBillboardPair(data + 0x30, data + 0x40, 0, 0.2f);
 }
 
 extern int D_001B1688;
@@ -56,10 +61,11 @@ extern float ref_L00_00330BC0_00 __attribute__((sda));
 extern float func_00282E48(void *, void *);
 extern void func_00302440(void *, void *);
 
+/* Pushes nearby objects of one kind away from this object while the effect is on. */
 void func_00330BC0(char *object)
 {
     char *cursor;
-    if (D_001B1688 & 1) {
+    if (gGameTime & 1) {
         cursor = D_001B1B68;
         while (cursor) {
             int kind = *(unsigned char *)(cursor + 0x20);
@@ -67,8 +73,8 @@ void func_00330BC0(char *object)
             if (kind == 0xfd) return;
             if (cursor && *(char **)(cursor + 0x24) &&
                 *(short *)(*(char **)(cursor + 0x24) + 0x46) == 0x13) {
-                if (func_00282E48(cursor + 0x10, object + 0x10) < ref_L00_00330BC0_00)
-                    func_00302440(cursor, object);
+                if (fast_vec_dist(cursor + 0x10, object + 0x10) < ref_L00_00330BC0_00)
+                    StartPickupFlyIfIdle(cursor, object);
             }
             cursor = *(char **)(cursor + 0x28);
         }
@@ -89,6 +95,7 @@ extern void func_0032FFD8(void *);
 extern void func_00330150(void *);
 extern void func_003304D8(void *);
 
+/* Speeds up or slows down the vehicle and moves it forward by that speed. It then updates its corners, ground probes and ground contact. */
 void func_0032FEA8(char *object)
 {
     char *data = *(char **)(object + 0x68);
@@ -96,10 +103,10 @@ void func_0032FEA8(char *object)
     int flag;
     char buffer[16];
 
-    if (D_001B284C != 0.0f && D_001B2850 != 0) {
-        value = *(float *)(data + 0x58) + D_001B284C * (1.0f / 120.0f);
+    if (gStickLength != 0.0f && D_001B2850 != 0) {
+        value = *(float *)(data + 0x58) + gStickLength * (1.0f / 120.0f);
         *(float *)(data + 0x58) = value;
-        if (func_00282C48(value) > D_001B09A0 * (1.0f / 60.0f))
+        if (FloatAbs(value) > D_001B09A0 * (1.0f / 60.0f))
             *(float *)(data + 0x58) = D_001B09A0 * ref_L00_0032FEA8_00 * (1.0f / 60.0f);
     } else {
         *(float *)(data + 0x58) = *(float *)(data + 0x58) * 0.85f;
@@ -111,11 +118,11 @@ void func_0032FEA8(char *object)
     if (flag == 0)
         *(float *)(object + 0x48) = value + (D_001B2854 + D_001B2854);
 
-    func_00282F20(buffer, object + 0xC0, *(float *)(data + 0x58));
-    func_00282CC0(object + 0x10, object + 0x10, buffer);
-    func_0032FFD8(object);
-    func_00330150(object);
-    func_003304D8(object);
+    vec_scale_to_length(buffer, object + 0xC0, *(float *)(data + 0x58));
+    FastVecAdd(object + 0x10, object + 0x10, buffer);
+    BuildObjectBasisVectors(object);
+    SweepMobyArcProbe(object);
+    SettleVehicleOnGround(object);
 }
 
 /* func_00335DC0: the retail reaches its three globals through $gp (the int at $gp+0x3710 and
@@ -148,6 +155,7 @@ extern float ref_L00_00331718_04;
 extern float func_0029F530(int *);
 extern void func_002E5CF8(int, int, int *);
 
+/* Plays a sound whenever a tracked value crosses one of eight set levels. */
 void func_00331718(void)
 {
     float value;
@@ -158,7 +166,7 @@ void func_00331718(void)
 
     if (ref_L00_00331718_00 == 0)
         return;
-    value = func_0029F530(ref_L00_00331718_00);
+    value = GetMobyAnimationValue(ref_L00_00331718_00);
     for (i = 0; i < 8; i++) {
         threshold = ref_L00_00331718_02[i];
         diff = value - threshold;
@@ -173,13 +181,13 @@ void func_00331718(void)
             }
         }
         if (diff < 0.0f) {
-            func_002E5CF8(ref_L00_00331718_01[i], 0, ref_L00_00331718_00);
+            PlayMobySound(ref_L00_00331718_01[i], 0, ref_L00_00331718_00);
             ref_L00_00331718_03 = value;
             return;
         }
         old = ref_L00_00331718_04 - threshold;
         if (old < 0.0f) {
-            func_002E5CF8(ref_L00_00331718_01[i], 0, ref_L00_00331718_00);
+            PlayMobySound(ref_L00_00331718_01[i], 0, ref_L00_00331718_00);
             ref_L00_00331718_03 = value;
             return;
         }
@@ -187,6 +195,7 @@ void func_00331718(void)
     ref_L00_00331718_04 = value;
 }
 
+/* Switches two scale values between their normal and changed settings. */
 void func_00335DC0(int a0)
 {
     float value;

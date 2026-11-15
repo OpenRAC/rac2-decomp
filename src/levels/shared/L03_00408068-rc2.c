@@ -39,27 +39,28 @@ extern s32 ref_L03_00408068_11(void *);
 extern void ref_L03_00408068_12(void *, s32);
 extern void ref_L03_00408068_13(s32, s32, void *);
 
-void func_L03_00408068(void *arg0) {
-    u8 temp_v1;
+/* Runs a simple trigger object: waits for the player to come close, then plays an effect and settles. */
+void func_L03_00408068(void *moby) {
+    u8 state;
 
-    temp_v1 = *(u8 *)((u8 *)arg0 + 0x20);
-    switch (temp_v1) {
+    state = *(u8 *)((u8 *)moby + 0x20);
+    switch (state) {
     case 0:
-        *(u16 *)((u8 *)arg0 + 0x7C) = ref_L03_00408068_00;
-        ref_L03_00408068_08(arg0, 1, -1);
+        *(u16 *)((u8 *)moby + 0x7C) = ref_L03_00408068_00;
+        ref_L03_00408068_08(moby, 1, -1);
         return;
     case 1:
-        if (ref_L03_00408068_09(arg0, 0x10000, 0) != 0) {
-            ref_L03_00408068_13(0, 0, arg0);
-            ref_L03_00408068_10(arg0, ref_L03_00408068_02, &ref_L03_00408068_07, 0xFF, ref_L03_00408068_03, ref_L03_00408068_04, ref_L03_00408068_05, ref_L03_00408068_06);
-            ref_L03_00408068_08(arg0, 2, -1);
+        if (ref_L03_00408068_09(moby, 0x10000, 0) != 0) {
+            ref_L03_00408068_13(0, 0, moby);
+            ref_L03_00408068_10(moby, ref_L03_00408068_02, &ref_L03_00408068_07, 0xFF, ref_L03_00408068_03, ref_L03_00408068_04, ref_L03_00408068_05, ref_L03_00408068_06);
+            ref_L03_00408068_08(moby, 2, -1);
         }
         return;
     case 2:
-        if (ref_L03_00408068_11(arg0) != 0) {
-            *(u16 *)((u8 *)arg0 + 0x7C) = ref_L03_00408068_01;
-            ref_L03_00408068_12(arg0, 1);
-            *(s32 *)((u8 *)arg0 + 0x9C) = 0xF;
+        if (ref_L03_00408068_11(moby) != 0) {
+            *(u16 *)((u8 *)moby + 0x7C) = ref_L03_00408068_01;
+            ref_L03_00408068_12(moby, 1);
+            *(s32 *)((u8 *)moby + 0x9C) = 0xF;
         }
         break;
     }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef int TI128 __attribute__((mode(TI)));
@@ -11,7 +12,7 @@ u8 *func_00312E20(u8 *owner, int type) {
     u8 *data;
     if ((signed char)owner[0x20] < 0)
         return 0;
-    object = func_0029EFD0(0x326);
+    object = CreateMoby(0x326 /* moby class 806 */);
     if (object) {
         data = *(u8 **)(object + 0x68);
         object[0x30] = 0x40;

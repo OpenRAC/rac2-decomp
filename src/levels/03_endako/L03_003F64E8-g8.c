@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -21,6 +22,7 @@ typedef struct { u8 pad[0x80]; f32 x, y; } Hero;
 extern Hero D_00189E20;
 extern u8 *D_L03_001B99D0 __attribute__((nosda));
 
+/* Eases a view angle toward the boss relative to the hero while the boss is awake. */
 void func_L03_003F64E8(u8 *entity) {
     u8 *state;
     u8 *obj;
@@ -37,34 +39,34 @@ void func_L03_003F64E8(u8 *entity) {
     if (entity[0x95] < 2)
         return;
     if (*(u8 **)(state + 0x2C8) == 0)
-        *(u8 **)(state + 0x2C8) = func_L00_002D70A0(5);
+        *(u8 **)(state + 0x2C8) = AllocCameraOverrideSlot(5);
     obj = *(u8 **)(state + 0x2C8);
     { f32 x = D_L03_001B1090; f32 y = D_L03_001B1094;
     *(f32 *)obj = x;
     *(f32 *)(*(u8 **)(state + 0x2C8) + 4) = y; }
 
-    f12 = *(f32 *)(entity + 0x10) - D_00189E20.x;
-    f13 = *(f32 *)(entity + 0x14) - D_00189E20.y;
+    f12 = *(f32 *)(entity + 0x10) - gHeroState.x;
+    f13 = *(f32 *)(entity + 0x14) - gHeroState.y;
     s0 = *(u8 **)(D_L03_001B99D0 + 0x70);
-    first = func_00283248(f12, f13);
+    first = FastMatrixHelperA(f12, f13);
     /* The base moves on between the two reads: combine cannot then fold the
      * second read's address, so retail's addiu and based load remain. */
     { f32 *rot = (f32 *)(s0 + 0x160);
     f12 = rot[0];
     s0 += 0x1C0;
     f13 = rot[1]; }
-    f0 = func_00283248(f12, f13);
+    f0 = FastMatrixHelperA(f12, f13);
 
     f13 = 3.14159274f;
-    f0 = func_00283B98(f0, f13);
-    f0 = func_00283BE0(first, f0);
+    f0 = FastAddRotations(f0, f13);
+    f0 = fast_subtract_rotations(first, f0);
 
     f13 = 0.0034906589426100254f;
     f14 = f13;
     f15 = 0.20943954586982727f;
     local = f0;
     f12 = 0.0f;
-    func_002AAA00(&local, state + 0xCC, f12, f13, f14, f15, 0);
+    ApproachTargetWithDirectionMode(&local, state + 0xCC, f12, f13, f14, f15, 0);
 
     *(f32 *)(s0 + 0x1C) = 1.0f;
     *(f32 *)(s0 + 0x14) = -*(f32 *)(state + 0xCC);

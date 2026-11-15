@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The map screen's pan/zoom update. Its unit is -G8 -g: the two screen-size words
    are $gp reads and the divisions carry the statement-boundary padding. */
@@ -18,52 +19,52 @@ extern int D_001A95C4 __attribute__((sda));
    3000000 / zoom and clamps them to [lo, 0x10000000 - lo]. */
 int func_00295D00(void)
 {
-    char *pad;
-    char *m;
+    char *padState;
+    char *mapState;
     float *zoom;
-    int *xs;
-    int *ys;
+    int *panX;
+    int *panY;
 
-    func_00298170();
-    func_00295C70();
-    pad = D_00138180;
-    if (*(int *)(pad + 0x1C4) & 0x510) {
-        func_002E5E58(0x13, 0, 0);
+    EmptyMapStub();
+    RefreshMapReadyFlag();
+    padState = gPadState;
+    if (*(int *)(padState + 0x1C4) & 0x510) {
+        PlaySoundFromGlobalBank(0x13, 0, 0);
         return 1;
     }
-    m = (char *)D_001C4FA0;
-    if (*(int *)(m + 0x24) == 0)
+    mapState = (char *)gMapOverlayState;
+    if (*(int *)(mapState + 0x24) == 0)
         return 0;
-    if (*(int *)(m + 0x234) < 0)
+    if (*(int *)(mapState + 0x234) < 0)
         return 0;
-    zoom = (float *)(m + 0xB4);
-    zoom[*(int *)(m + 0x234)] *= 1.0f - *(float *)(pad + 0x144) * 0.02f;
-    if (zoom[*(int *)(m + 0x234)] > 4.0f)
-        zoom[*(int *)(m + 0x234)] = 4.0f;
-    if (zoom[*(int *)(m + 0x234)] < 0.65f)
-        zoom[*(int *)(m + 0x234)] = 0.65f;
-    xs = (int *)(m + 0x108);
-    ys = (int *)(m + 0x15C);
+    zoom = (float *)(mapState + 0xB4);
+    zoom[*(int *)(mapState + 0x234)] *= 1.0f - *(float *)(padState + 0x144) * 0.02f;
+    if (zoom[*(int *)(mapState + 0x234)] > 4.0f)
+        zoom[*(int *)(mapState + 0x234)] = 4.0f;
+    if (zoom[*(int *)(mapState + 0x234)] < 0.65f)
+        zoom[*(int *)(mapState + 0x234)] = 0.65f;
+    panX = (int *)(mapState + 0x108);
+    panY = (int *)(mapState + 0x15C);
     {
-        float scale = 3000000.0f / zoom[*(int *)(m + 0x234)];
-        xs[*(int *)(m + 0x234)] += (int)(*(float *)(pad + 0x148) * scale);
-        ys[*(int *)(m + 0x234)] += (int)(*(float *)(pad + 0x14C) * scale);
+        float scale = 3000000.0f / zoom[*(int *)(mapState + 0x234)];
+        panX[*(int *)(mapState + 0x234)] += (int)(*(float *)(padState + 0x148) * scale);
+        panY[*(int *)(mapState + 0x234)] += (int)(*(float *)(padState + 0x14C) * scale);
     }
     {
-        float z = zoom[*(int *)(m + 0x234)];
-        int xlo = (int)((float)(0x1000 - D_001A95C0 * 16) / z) << 15;
-        int ylo = (int)((float)(0xD00 - D_001A95C4 * 16) / z) << 15;
-        int xhi = 0x10000000 - xlo;
-        int yhi = 0x10000000 - ylo;
+        float curZoom = zoom[*(int *)(mapState + 0x234)];
+        int minX = (int)((float)(0x1000 - D_001A95C0 * 16) / curZoom) << 15;
+        int minY = (int)((float)(0xD00 - D_001A95C4 * 16) / curZoom) << 15;
+        int maxX = 0x10000000 - minX;
+        int maxY = 0x10000000 - minY;
 
-        if (xs[*(int *)(m + 0x234)] < xlo)
-            xs[*(int *)(m + 0x234)] = xlo;
-        if (xs[*(int *)(m + 0x234)] > xhi)
-            xs[*(int *)(m + 0x234)] = xhi;
-        if (ys[*(int *)(m + 0x234)] < ylo)
-            ys[*(int *)(m + 0x234)] = ylo;
-        if (ys[*(int *)(m + 0x234)] > yhi)
-            ys[*(int *)(m + 0x234)] = yhi;
+        if (panX[*(int *)(mapState + 0x234)] < minX)
+            panX[*(int *)(mapState + 0x234)] = minX;
+        if (panX[*(int *)(mapState + 0x234)] > maxX)
+            panX[*(int *)(mapState + 0x234)] = maxX;
+        if (panY[*(int *)(mapState + 0x234)] < minY)
+            panY[*(int *)(mapState + 0x234)] = minY;
+        if (panY[*(int *)(mapState + 0x234)] > maxY)
+            panY[*(int *)(mapState + 0x234)] = maxY;
     }
     return 0;
 }

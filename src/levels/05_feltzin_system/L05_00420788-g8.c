@@ -40,22 +40,22 @@ void func_L05_00420788(u8 *actor, int mission)
     MissionState *ownerState = *(MissionState **)(owner + 0x68);
     int sound = ownerState->id;
     if (sound != -1) {
-        u8 *record = D_00188660 + sound * 0x70;
+        u8 *record = gSoundState + sound * 0x70;
         if (*(u8 **)(record + 0x88) == owner && record[0x74] != 0)
-            func_002E59F8(sound);
+            StopSoundVoice(sound);
     }
     ownerState->id = -1;
     if (D_L05_001A8F00 == 2)
         return;
-    if (func_00282948(state + 0x58) == 0)
+    if (FastFloatHelperD(state + 0x58) == 0)
         return;
     if (D_L05_001A904C != 0 && D_L05_001B13F0 == 0) {
         int *count;
         int previous;
         int rank;
         int reward;
-        func_0027D330(30);
-        func_0029B758(0, (int)func_L05_00420360);
+        FadeToBlack(30);
+        StoreLevelObjectValuePair(0, (int)DrawFeltzinMissionRewardPanel);
         count = &D_L05_001B1350_gp[mission];
         previous = *count;
         rank = previous < 3 ? previous : 2;
@@ -66,20 +66,20 @@ void func_L05_00420788(u8 *actor, int mission)
         reward = D_L05_001B13F8_gp[mission][rank];
         if (D_001A7A0A != 0)
             reward *= 10;
-        D_001A79F8_gp = D_001A79F8 + reward;
+        D_001A79F8_gp = gPlayerBolts + reward;
         *count = previous + 1;
-        func_L05_004222D8();
-        func_0029B3E0(0, -1);
+        ClampAndSaveFeltzinMissionCounts();
+        MemcardSave(0, -1);
     }
-    func_L05_00379F48(1);
-    if (func_00282948(state + 0x40) == 0) {
+    SetPlayerStateField18(1);
+    if (FastFloatHelperD(state + 0x40) == 0) {
         unsigned int buttons = D_00138324;
         int completed = buttons & 0x40;
         if (completed) {
             D_L05_001B13F0 = 0;
             *(int *)(state + 0x40) = 5400;
-            func_0027D330(30);
-            func_L05_00379F48(0);
+            FadeToBlack(30);
+            SetPlayerStateField18(0);
             *(int *)(state + 0x58) = 120;
             *(int *)(state + 0x44) = 7200;
             if (D_L05_001B1350_gp[0] != 0) {
@@ -93,9 +93,9 @@ void func_L05_00420788(u8 *actor, int mission)
                         D_L05_001B13EC = 1;
                 }
             }
-            func_L05_0041FC60(actor);
+            ResetFeltzinChallengeState(actor);
         } else if (buttons & 0x10) {
-            func_002B49E0(3, 1, 4, 0, 0);
+            BeginSlotRequest(3, 1, 4, 0, 0);
         }
     } else {
         *(int *)(state + 0x40) = 600;

@@ -1,3 +1,4 @@
+#include "names.h"
 extern unsigned char *D_L05_001B2528;
 extern void func_0029F338(void *);
 
@@ -10,7 +11,7 @@ void func_L05_0037B108(void) {
         if (kind == 0x1173 || kind == 0x12D8 || kind == 0x974 || kind == 0x1161 ||
             kind == 0x1182 || kind == 0x1191 || kind == 0x10F9 || kind == 0x946 ||
             kind == 0x10CF || kind == 0x117C || kind == 0x117D || kind == 0x117F)
-            func_0029F338(object);
+            MarkMobySpawned(object);
         object = *(unsigned char **)(object + 0x28);
     }
 }

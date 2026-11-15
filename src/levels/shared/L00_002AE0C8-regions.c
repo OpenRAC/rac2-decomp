@@ -29,30 +29,30 @@ void func_L00_002AE0C8(void) {
         (*members)->firstEntry = 0;
         (*members)->secondEntry = 0;
         (*members)->count = 0;
-        if (func_00282978((short *)(region * 0x30 + (unsigned int)D_L00_001B1B00[0] + 0x3A))) continue;
-        if (func_L00_00329520(D_00189E20 + 0x80, region))
-            func_L00_003296C0(*(unsigned char **)(D_00189E20 + 0x2290), region, 1);
+        if (FastDecTimer((short *)(region * 0x30 + (unsigned int)D_L00_001B1B00[0] + 0x3A))) continue;
+        if (IsPointInsideRegion(gHeroState + 0x80, region))
+            AppendIndexedObjectRecord(*(unsigned char **)(gHeroState + 0x2290), region, 1);
         for (index = 1; index <= D_L00_001B1FF0[0]; ++index) {
             object = D_L00_001B1E9C[0] + (D_L00_001B1FF0[index] << 8);
-            if (object && *(short *)(object + 0xAA) == 0xCB &&
+            if (object && *(short *)(object + 0xAA) == 0xCB /* Decoy */ &&
                 object[0x20] != 0xFE && object[0x20] != 0xFD && object[0x20] == 3) {
-                if (func_L00_00329520(object + 0x10, region))
-                    func_L00_003296C0(object, region, 2);
+                if (IsPointInsideRegion(object + 0x10, region))
+                    AppendIndexedObjectRecord(object, region, 2);
             }
         }
         {
             int dynamicIndex;
             for (dynamicIndex = 0; dynamicIndex < D_L00_001A9024[0]; ++dynamicIndex) {
-                if (func_L00_00329520(D_L00_001C57E8[dynamicIndex] + 0x10, region))
-                    func_L00_003296C0(D_L00_001C57E8[dynamicIndex], region, 3);
+                if (IsPointInsideRegion(D_L00_001C57E8[dynamicIndex] + 0x10, region))
+                    AppendIndexedObjectRecord(D_L00_001C57E8[dynamicIndex], region, 3);
             }
         }
         for (index = 1; index <= D_L00_001B2030[0]; ++index) {
             object = D_L00_001B1E9C[0] + (D_L00_001B2030[index] << 8);
-            if (object && *(short *)(object + 0xAA) == 0xEB0 &&
+            if (object && *(short *)(object + 0xAA) == 0xEB0 /* Dark Sheep */ &&
                 object[0x20] != 0xFE && object[0x20] != 0xFD) {
-                if (func_L00_00329520(object + 0x10, region))
-                    func_L00_003296C0(object, region, 4);
+                if (IsPointInsideRegion(object + 0x10, region))
+                    AppendIndexedObjectRecord(object, region, 4);
             }
         }
     }

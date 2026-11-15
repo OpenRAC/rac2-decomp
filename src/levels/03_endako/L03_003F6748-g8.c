@@ -26,12 +26,12 @@ void func_L03_003F6748(u8 *self)
     s16 *list;
     s32 i;
 
-    if ((D_L03_001B2548 & 0x3F) == 0) {
+    if ((gFrameCounter_L03 & 0x3F) == 0) {
         for (i = 0; i < 0x38; i++) {
-            if (D_001A7AF8[i] != 0) {
-                u8 *e = (u8 *)&D_L03_00266DA0[D_00139568[i]];
+            if (gItemOwnedFlags[i] != 0) {
+                u8 *e = (u8 *)&D_L03_00266DA0[gItemSlotToRecord[i]];
                 s16 limit = *(s16 *)(e + 0x40);
-                if (limit != 0 && (f32)D_00139688[i] < (f32)limit * 0.1f) {
+                if (limit != 0 && (f32)gItemAmmoCounts[i] < (f32)limit * 0.1f) {
                     low = 1;
                 }
             }
@@ -42,10 +42,10 @@ void func_L03_003F6748(u8 *self)
         if (list != 0) {
             do {
                 obj = D_L03_001B2A1C + (((u16)*list & 0x7FFF) << 8);
-                if (func_00312B58(obj) != 0 && *(s32 *)(*(u8 **)(obj + 0x68) + 0x100) >= 0x3D) {
+                if (IsMobyInState6(obj) != 0 && *(s32 *)(*(u8 **)(obj + 0x68) + 0x100) >= 0x3D) {
                     pos = obj + 0x10;
-                    if (func_002EF158(D_00189EA0, pos) > 3.0f) {
-                        func_L02_003A6FE8(obj);
+                    if (func_002EF158(gHeroPosition, pos) > 3.0f) {
+                        InitNanotechCrateMoby(obj);
                         func_002EC510(obj, pos, obj + 0xF0, 0, 0);
                     }
                 }

@@ -13,6 +13,7 @@ extern float func_00282E48(void *,void *);
 extern float func_00282E80(void *,void *);
 extern float func_00282C48(float);
 extern void func_002AD6F0(void *,void *,void *,void *);
+/* Moves an object along a path of points, waits, then walks back along the path in reverse. */
 void func_L16_004189A0(char *object)
 {
     MovingPathWorkspace local;
@@ -29,45 +30,45 @@ void func_L16_004189A0(char *object)
         qcopy((object+0x10),(initialPath+0x10));
         *(int *)(state+0x6c)=0;
         *(float *)(state+0x68)*=0.016666668f;
-        if(index==-1) func_0026FEB8(D_L16_002A4570,*(short *)(object+0xaa),*(short *)(object+0xb2));
-        func_002A7750((unsigned char *)object,1,-1);
+        if(index==-1) STUB_printf(D_L16_002A4570,*(short *)(object+0xaa),*(short *)(object+0xb2));
+        SetMobyState((unsigned char *)object,1,-1);
         break;
     }
     case 1:
-        if(*(unsigned char *)(object+0xbc)!=0) func_002A7750((unsigned char *)object,2,-1);
+        if(*(unsigned char *)(object+0xbc)!=0) SetMobyState((unsigned char *)object,2,-1);
         break;
     case 2:
         path=D_L16_001FE7C0[*(int *)(state+0x60)];
         point=path+0x20+*(int *)(state+0x6c)*0x10;
-        func_00282CF0(&local.delta,point,object+0x10);
-        func_00282F20(&local.delta,&local.delta,*(float *)(state+0x68));
-        func_00282CC0(object+0x10,object+0x10,&local.delta);
-        if(func_00282E48(object+0x10,path+0x20+*(int *)(state+0x6c)*0x10)<=*(float *)(state+0x68)*0.88f) (*(int *)(state+0x6c))++;
-        if(*(int *)(state+0x6c)>=*(int *)path-1) func_002A7750((unsigned char *)object,3,-1);
+        FastVecSub(&local.delta,point,object+0x10);
+        vec_scale_to_length(&local.delta,&local.delta,*(float *)(state+0x68));
+        FastVecAdd(object+0x10,object+0x10,&local.delta);
+        if(fast_vec_dist(object+0x10,path+0x20+*(int *)(state+0x6c)*0x10)<=*(float *)(state+0x68)*0.88f) (*(int *)(state+0x6c))++;
+        if(*(int *)(state+0x6c)>=*(int *)path-1) SetMobyState((unsigned char *)object,3,-1);
         break;
     case 3:
-        if(*(int *)(state+0x64)<=*(unsigned short *)(object+0x96)) func_002A7750((unsigned char *)object,4,-1);
+        if(*(int *)(state+0x64)<=*(unsigned short *)(object+0x96)) SetMobyState((unsigned char *)object,4,-1);
         break;
     case 4:
         path=D_L16_001FE7C0[*(int *)(state+0x60)];
 
-        if(D_00189E20[34]<*(float *)(object+0x18)) {
-            if(func_00282E80(object+0x10,D_00189E20+32)<3.0f && func_00282C48(*(float *)(object+0x18)-D_00189E20[34])<2.5f) goto skipMovement;
+        if(gHeroState[34]<*(float *)(object+0x18)) {
+            if(vec_distance_xy(object+0x10,gHeroState+32)<3.0f && FloatAbs(*(float *)(object+0x18)-gHeroState[34])<2.5f) goto skipMovement;
         }
         {
-            func_00282CF0(&local.delta,path+*(int *)(state+0x6c)*0x10,object+0x10);
-            func_00282F20(&local.delta,&local.delta,*(float *)(state+0x68));
-            func_00282CC0(object+0x10,object+0x10,&local.delta);
+            FastVecSub(&local.delta,path+*(int *)(state+0x6c)*0x10,object+0x10);
+            vec_scale_to_length(&local.delta,&local.delta,*(float *)(state+0x68));
+            FastVecAdd(object+0x10,object+0x10,&local.delta);
         }
         skipMovement:
-        if(func_00282E48(object+0x10,path+*(int *)(state+0x6c)*0x10)<=*(float *)(state+0x68)*0.88f) (*(int *)(state+0x6c))--;
+        if(fast_vec_dist(object+0x10,path+*(int *)(state+0x6c)*0x10)<=*(float *)(state+0x68)*0.88f) (*(int *)(state+0x6c))--;
         if(*(int *)(state+0x6c)<=0) {
             object[0xbc]=0;
-            func_002A7750((unsigned char *)object,1,-1);
+            SetMobyState((unsigned char *)object,1,-1);
         }
         break;
     }
     (*(short *)(object+0x96))++;
-    func_00282CF0(&local.delta,object+0x10,&local.position);
-    func_002AD6F0(state+0x20,&local.delta,&local.angles,object+0xf0);
+    FastVecSub(&local.delta,object+0x10,&local.position);
+    CombineTransformsAndStore(state+0x20,&local.delta,&local.angles,object+0xf0);
 }

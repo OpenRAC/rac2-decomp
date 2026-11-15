@@ -25,7 +25,7 @@ void func_L09_002F8BA0(char *moby)
     int i, id, phase;
     unsigned int color;
 
-    if (D_001A79F0[0] != 9)
+    if (gCurrentMapIndex[0] != 9)
         return;
 
     id = -1;
@@ -36,26 +36,26 @@ void func_L09_002F8BA0(char *moby)
 
     qzero_nc(rot);
     rot[2] = D_L09_001A93E0;
-    func_002833F0(mat, rot);
-    func_00282F20(offset, mat, 0.05f);
+    euler_rotation_basis(mat, rot);
+    vec_scale_to_length(offset, mat, 0.05f);
     first = corners[0];
     dest = first;
     src = D_L09_001A9420[0];
     for (i = 3; i >= 0; --i) {
-        func_00283098(dest, src, mat);
+        matrix_mul_vec3(dest, src, mat);
         src -= 4;
-        func_00282CC0(dest, dest, moby + 0x10);
-        func_00282CC0(dest, dest, offset);
+        FastVecAdd(dest, dest, moby + 0x10);
+        FastVecAdd(dest, dest, offset);
         dest += 4;
     }
 
     phase = D_L09_001BD700.frame % 120;
     {
-        float denom = func_00283CE0(120);
+        float denom = IntToFloat(120);
         float angle = (float)phase * 6.283186f;
         angle /= denom;
-        color = func_00283CF0((func_00283198(angle) * 0.5f + 0.5f) * 48.0f);
+        color = FloatToInt((FastSinOrCosB(angle) * 0.5f + 0.5f) * 48.0f);
     }
     color = ((color + 80) << 24) | 0x808080;
-    func_L01_002E2608(first, id, 0, color, 0);
+    DrawQuadWithRotatedUVs(first, id, 0, color, 0);
 }

@@ -2,6 +2,7 @@
    table (index at +0x84) to its record's +0x20 with w cleared and on into +0x30, then
    hands the entry's second vector, w cleared, to func_002833F0. */
 #include "include_asm.h"
+#include "names.h"
 
 #define MACRO_ADDR __attribute__((section(".sdata")))
 
@@ -38,5 +39,5 @@ void func_L05_00441EA0(char *object)
     sp->y = second->y;
     sp->z = second->z;
     sp->w = 0;
-    func_002833F0(object, buf);
+    euler_rotation_basis(object, buf);
 }

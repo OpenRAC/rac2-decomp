@@ -22,29 +22,29 @@ void func_L16_00417798(char *self) {
     switch (*(u8 *)(self + 0x20)) {
     case 0:
         *(u16 *)(self + 0x34) |= 16;
-        func_002A7750(self, 1, -1);
+        SetMobyState(self, 1, -1);
         break;
     case 1:
-        if (func_00282948(st + 4)) {
+        if (FastFloatHelperD(st + 4)) {
             if (*(u32 *)(self + 0x78) & 1)
                 *(u32 *)(self + 0x78) = 0x7F60800E;
             else *(u32 *)(self + 0x78) = 0x7F4C6C01;
             *(s32 *)(st + 4) = 2;
         }
-        if (func_002A9640(self, 0x04010000, 0) && *(s32 *)st == 0)
-            func_002A7750(self, 2, -1);
+        if (FindOwnedEffectSlot(self, 0x04010000, 0) && *(s32 *)st == 0)
+            SetMobyState(self, 2, -1);
         *(u8 *)(self + 0xA8) = 255;
         break;
     case 2:
-        func_L00_0032A258(self, D_L16_001B1B70, D_L16_001B1B68, D_L16_001B1B60, 65535, 0, D_L16_001B1B90, 0, 65535, 255, 0);
+        ExplodeObjectIntoPieces(self, D_L16_001B1B70, D_L16_001B1B68, D_L16_001B1B60, 65535, 0, D_L16_001B1B90, 0, 65535, 255, 0);
         for (i = 0; i < 3; i++) {
-            func_L00_00324F18(self, pos, D_L16_001B1BB0[i].x, D_L16_001B1BB0[i].y, D_L16_001B1BB0[i].z);
-            func_0032C700(pos, 0, 12, 12, 12, 12, 12, 0, 1, 0, 0, 0, *(f32 *)(self + 0x2C), 20.0f);
+            LocalOffsetToWorld(self, pos, D_L16_001B1BB0[i].x, D_L16_001B1BB0[i].y, D_L16_001B1BB0[i].z);
+            SpawnExplosion(pos, 0, 12, 12, 12, 12, 12, 0, 1, 0, 0, 0, *(f32 *)(self + 0x2C), 20.0f);
         }
         if (D_L16_001B1B90 >= 0) {
             *(u16 *)(self + 0x7C) = (1 << D_L16_001B1B90) | 0x8000;
-            func_002A7750(self, 3, -1);
-        } else func_0029F338(self);
+            SetMobyState(self, 3, -1);
+        } else MarkMobySpawned(self);
         break;
     }
 }

@@ -42,7 +42,7 @@ typedef struct {
 char *func_L11_0045FDB0(char *owner, void *velocity, void *position, float paramA, float paramB,
                         float scale, float paramD)
 {
-    SpawnObject *obj = (SpawnObject *)func_0029EFD0(0xE7B);
+    SpawnObject *obj = (SpawnObject *)CreateMoby(0xE7B /* moby class 3707 */);
 
     if (obj) {
         SpawnState *state;
@@ -60,8 +60,8 @@ char *func_L11_0045FDB0(char *owner, void *velocity, void *position, float param
         state->owner = owner;
         state->parameterA = paramA;
         state->parameterB = paramB;
-        state->heading = func_002A7940();
-        state->turn = func_002A7878(0.0523598865f, 0.104719773f);
+        state->heading = RandomAngle();
+        state->turn = RandomFloatRange(0.0523598865f, 0.104719773f);
         state->parameterD = paramD;
 
         obj->kind = 255;
@@ -69,8 +69,8 @@ char *func_L11_0045FDB0(char *owner, void *velocity, void *position, float param
         arg = D_L11_001B22CC;
         obj->scale = D_L11_001B22C4 * scale;
         obj->flags = 0x1008;
-        func_L11_00460258(obj->position, arg);
-        func_002E5DA0(0, 0, (char *)obj, 0xE7B);
+        SpawnSparkRing_L11(obj->position, arg);
+        PlaySoundFromClassBank(0, 0, (char *)obj, 0xE7B);
     }
     return (char *)obj;
 }

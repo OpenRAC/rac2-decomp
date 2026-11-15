@@ -28,130 +28,131 @@ extern s32 func_00282948(void *);
          ((p != 0 && (s16)p[-1] >= 0) || p == D_L19_001FB5A0[GROUP(off)]); \
          p++)
 
-void func_L19_0041EE60(u8 *object)
+/* Controls a group of Y.E.T.I.s kept at this spot. It lets them out one at a time while fewer than the allowed number are active. */
+void func_L19_0041EE60(u8 *moby)
 {
     u8 *state;
-    s32 c;
+    s32 savedCount;
 
-    if (func_002ACD38(object + 0x10) == 0)
+    if (IsObjectInSelectedZone(moby + 0x10) == 0)
         return;
-    state = *(u8 **)(object + 0x68);
+    state = *(u8 **)(moby + 0x68);
     if (GROUP(0x120) == -1 ||
-        (object[0xB0] != 0xFF &&
-         (D_L19_0021EA30.entries[(s16)*(u16 *)(object + 0xB2)] != 0 ||
-          ((c = *(u8 *)(D_0019B4A8 + (((s16) * (u16 *)(object + 0xB2) >> 1) + (D_001A79F0 << 10)))),
-           (*(u16 *)(object + 0xB2) & 1) ? ((c >> 4) & 7) != 0 : (c & 7) != 0)))) {
-        func_0029F338(object);
+        (moby[0xB0] != 0xFF &&
+         (D_L19_0021EA30.entries[(s16)*(u16 *)(moby + 0xB2)] != 0 ||
+          ((savedCount = *(u8 *)(D_0019B4A8 + (((s16) * (u16 *)(moby + 0xB2) >> 1) + (gCurrentMapIndex << 10)))),
+           (*(u16 *)(moby + 0xB2) & 1) ? ((savedCount >> 4) & 7) != 0 : (savedCount & 7) != 0)))) {
+        MarkMobySpawned(moby);
         return;
     }
-    switch (object[0x20]) {
+    switch (moby[0x20]) {
     case 0: {
         u16 *p;
-        u8 *e;
-        u8 *s;
-        f32 x;
+        u8 *otherMoby;
+        u8 *otherVars;
+        f32 groundHeight;
 
-        x = func_002A89A8(object + 0x10, 0, 0.5f);
-        x -= func_002A7878(0.1f, 0.3f);
-        *(s16 *)(object + 0x7C) = 0x1F;
-        *(s32 *)(object + 0x48) = 0;
-        *(f32 *)(object + 0x18) = x;
+        groundHeight = ProbeGroundHeightBelow(moby + 0x10, 0, 0.5f);
+        groundHeight -= RandomFloatRange(0.1f, 0.3f);
+        *(s16 *)(moby + 0x7C) = 0x1F;
+        *(s32 *)(moby + 0x48) = 0;
+        *(f32 *)(moby + 0x18) = groundHeight;
         FOR_EACH_ID(p, 0x120) {
-            e = D_L19_001B2A1C[0] + ((*p & 0x7FFF) << 8);
-            if (e == 0)
+            otherMoby = gMobyArray_L19[0] + ((*p & 0x7FFF) << 8);
+            if (otherMoby == 0)
                 break;
-            if (*(s16 *)(e + 0xAA) == 0x10D0) {
-                s = *(u8 **)(e + 0x68);
-                *(f32 *)(s + 0x22C) = *(f32 *)(state + 0x128) + 10.0f;
-                *(s32 *)(s + 0x26C) = 1;
-                *(s32 *)(s + 0x274) = 1;
+            if (*(s16 *)(otherMoby + 0xAA) == 0x10D0 /* Y.E.T.I. */) {
+                otherVars = *(u8 **)(otherMoby + 0x68);
+                *(f32 *)(otherVars + 0x22C) = *(f32 *)(state + 0x128) + 10.0f;
+                *(s32 *)(otherVars + 0x26C) = 1;
+                *(s32 *)(otherVars + 0x274) = 1;
             }
         }
-        func_002A7750(object, 1, -1);
+        SetMobyState(moby, 1, -1);
         break;
     }
     case 1: {
-        u8 *e;
-        f32 vec[4];
+        u8 *otherMoby;
+        f32 burstVec[4];
         s32 gone;
 
-        func_002B3BA8(object, -1, *(f32 *)(state + 0x128), *(f32 *)(state + 0x128), 0, 0);
+        SelectAimTarget_002B3BA8(moby, -1, *(f32 *)(state + 0x128), *(f32 *)(state + 0x128), 0, 0);
         gone = 0;
         if (GROUP(0x138) == -1) {
             gone = 1;
         } else {
-            e = D_L19_001B2A1C[0] + (GROUP(0x138) << 8);
-            if (e == 0 || e[0x20] == 0xFE || e[0x20] == 0xFD)
+            otherMoby = gMobyArray_L19[0] + (GROUP(0x138) << 8);
+            if (otherMoby == 0 || otherMoby[0x20] == 0xFE || otherMoby[0x20] == 0xFD)
                 gone = 1;
         }
         if (GROUP(0x64) == 1 && gone) {
-            qzero(vec);
-            vec[2] = 0.15f;
-            *(s16 *)(object + 0x7C) = 0;
-            func_002B0A68(object, 0x1F, vec, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-            func_002E5CF8(0, 0, object);
-            func_002A7750(object, 3, -1);
+            qzero(burstVec);
+            burstVec[2] = 0.15f;
+            *(s16 *)(moby + 0x7C) = 0;
+            SpawnDebrisForMaskedParts(moby, 0x1F, burstVec, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+            PlayMobySound(0, 0, moby);
+            SetMobyState(moby, 3, -1);
         }
         break;
     }
     case 3: {
         u16 *p;
-        u8 *e;
-        u8 *s;
+        u8 *otherMoby;
+        u8 *otherVars;
         s32 found = 0;
 
         FOR_EACH_ID(p, 0x120) {
-            e = D_L19_001B2A1C[0] + ((*p & 0x7FFF) << 8);
-            if (e == 0)
+            otherMoby = gMobyArray_L19[0] + ((*p & 0x7FFF) << 8);
+            if (otherMoby == 0)
                 break;
-            if (*(s16 *)(e + 0xAA) == 0x10D0) {
-                s = *(u8 **)(e + 0x68);
-                if (*(s32 *)(s + 0x26C) == 1) {
-                    qcopy(e + 0x10, object + 0x10);
-                    qcopy(s + 0x210, object + 0x10);
-                    *(f32 *)(e + 0x18) = func_002A89A8(e + 0x10, 0, 1.0f);
+            if (*(s16 *)(otherMoby + 0xAA) == 0x10D0 /* Y.E.T.I. */) {
+                otherVars = *(u8 **)(otherMoby + 0x68);
+                if (*(s32 *)(otherVars + 0x26C) == 1) {
+                    qcopy(otherMoby + 0x10, moby + 0x10);
+                    qcopy(otherVars + 0x210, moby + 0x10);
+                    *(f32 *)(otherMoby + 0x18) = ProbeGroundHeightBelow(otherMoby + 0x10, 0, 1.0f);
                     found = 1;
-                    *(s32 *)(s + 0x26C) = 0;
-                    *(u16 *)(e + 0x34) &= 0xFF7F;
+                    *(s32 *)(otherVars + 0x26C) = 0;
+                    *(u16 *)(otherMoby + 0x34) &= 0xFF7F;
                     break;
                 }
             }
         }
         if (!found) {
-            func_002A7750(object, 4, -1);
+            SetMobyState(moby, 4, -1);
         } else {
             GROUP(0x13C) = 200;
-            func_002A7750(object, 2, -1);
+            SetMobyState(moby, 2, -1);
         }
         break;
     }
     case 2: {
         u16 *p;
-        u8 *e;
-        u8 *s;
-        s32 n;
+        u8 *otherMoby;
+        u8 *otherVars;
+        s32 idleCount;
 
-        func_002B3BA8(object, -1, *(f32 *)(state + 0x128) + 10.0f, *(f32 *)(state + 0x128), 0, 0);
+        SelectAimTarget_002B3BA8(moby, -1, *(f32 *)(state + 0x128) + 10.0f, *(f32 *)(state + 0x128), 0, 0);
         if (GROUP(0x64) == 1) {
-            n = 0;
+            idleCount = 0;
             FOR_EACH_ID(p, 0x120) {
-                e = D_L19_001B2A1C[0] + ((*p & 0x7FFF) << 8);
-                if (e == 0)
+                otherMoby = gMobyArray_L19[0] + ((*p & 0x7FFF) << 8);
+                if (otherMoby == 0)
                     break;
-                if (*(s16 *)(e + 0xAA) == 0x10D0) {
-                    s = *(u8 **)(e + 0x68);
-                    if (*(s32 *)(s + 0x26C) == 0) {
-                        if (e[0x20] != 0xFE) {
-                            if (e[0x20] != 0xFD)
-                                n++;
+                if (*(s16 *)(otherMoby + 0xAA) == 0x10D0 /* Y.E.T.I. */) {
+                    otherVars = *(u8 **)(otherMoby + 0x68);
+                    if (*(s32 *)(otherVars + 0x26C) == 0) {
+                        if (otherMoby[0x20] != 0xFE) {
+                            if (otherMoby[0x20] != 0xFD)
+                                idleCount++;
                         }
                     }
                 }
             }
-            if (D_L19_001B1D20 < D_L19_001B1D24) {
-                if (n < 3) {
-                    if (func_00282948(state + 0x13C))
-                        func_002A7750(object, 3, -1);
+            if (gActiveYetiCount < gMaxActiveYetis) {
+                if (idleCount < 3) {
+                    if (FastFloatHelperD(state + 0x13C))
+                        SetMobyState(moby, 3, -1);
                 }
             }
         }

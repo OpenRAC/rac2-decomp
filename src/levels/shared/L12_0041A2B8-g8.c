@@ -10,20 +10,21 @@ extern void func_002B60B0(char *, float, float, float, float);
 extern float func_00282E48(void *, void *);
 extern void func_002A93B0(char *);
 
-void func_L12_0041A2B8(char *self) {
-    char *state = *(char **)(self + 0x68);
+/* Sets up the path enemy on its first frame and every frame scales it and hides it if the hero is close. */
+void func_L12_0041A2B8(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     float rate;
 
-    if (*(u8 *)(self + 0x20) == 0) {
-        *(u8 *)(self + 0x30) = 0xC8;
-        *(u16 *)(self + 0x32) = 0xC8;
-        qcopy(state + 0x210, self + 0x10);
-        *(float *)(state + 0x21C) = *(float *)(self + 0xF8);
-        *(int *)(self + 0x98) = 0;
-        *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
-        func_002A7750(self, 1, 0);
-        if (*(u8 *)(self + 0x43) != 0) {
-            func_002A7470(self, 0, 0, 0);
+    if (*(u8 *)(moby + 0x20) == 0) {
+        *(u8 *)(moby + 0x30) = 0xC8;
+        *(u16 *)(moby + 0x32) = 0xC8;
+        qcopy(state + 0x210, moby + 0x10);
+        *(float *)(state + 0x21C) = *(float *)(moby + 0xF8);
+        *(int *)(moby + 0x98) = 0;
+        *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
+        SetMobyState(moby, 1, 0);
+        if (*(u8 *)(moby + 0x43) != 0) {
+            StartAnimationBlended(moby, 0, 0, 0);
         }
         {
             float half = 0.5f;
@@ -41,15 +42,15 @@ void func_L12_0041A2B8(char *self) {
             *(int *)(state + 0x15C) = -1;
             *(float *)(state + 0x130) = pi;
         }
-        func_002B60B0(self, 0.0088888891f, rate, 0.00349065894f, 0.209439546f);
+        SetControllerSpeedLimits(moby, 0.0088888891f, rate, 0.00349065894f, 0.209439546f);
         *(int *)(state + 0x11C) = 0;
         *(int *)(state + 0x258) = 0;
     }
-    *(float *)(self + 0x2C) = *(float *)(*(char **)(self + 0x24) + 0x24) * D_L12_001B1C70;
-    if (*(u8 *)(self + 0x31) != 0) {
-        if (func_00282E48(self + 0x10, D_L12_001B9E00) < 24.0f) {
-            func_002A93B0(self);
-            *(u8 *)(self + 0x6F) = 0x16;
+    *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24) * D_L12_001B1C70;
+    if (*(u8 *)(moby + 0x31) != 0) {
+        if (fast_vec_dist(moby + 0x10, D_L12_001B9E00) < 24.0f) {
+            UpdateMobyGroundCheck(moby);
+            *(u8 *)(moby + 0x6F) = 0x16;
         }
     }
 }

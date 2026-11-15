@@ -38,13 +38,13 @@ void func_L11_0046BC08(char *object)
 
     if (D_L11_001B25A4) {
         D_L11_001B25A4 = 0;
-        func_00282CF0(&delta, &state->end, &state->start);
-        func_00282F20(&step, &delta, D_L11_001B25A8 / (float)D_L11_001B25A0);
+        FastVecSub(&delta, &state->end, &state->start);
+        vec_scale_to_length(&step, &delta, D_L11_001B25A8 / (float)D_L11_001B25A0);
         qcopy_nc(&D_L11_00264760[state->row].core[0], &state->start);
         for (i = 1; i < D_L11_001B25A0; i++) {
             /* Previous point: the row's points from index -1. */
             prev = &D_L11_00264760[state->row].core[-1];
-            func_00282CC0(&D_L11_00264760[state->row].core[i], &prev[i], &step);
+            FastVecAdd(&D_L11_00264760[state->row].core[i], &prev[i], &step);
         }
         D_L11_001B25C0 = 0.0f;
         D_L11_001B25C8 = 0.0f;

@@ -14,6 +14,7 @@ extern u32 D_L20_001B2FA0_abs __attribute__((nosda));
 /* The first object of the bank. */
 extern u32 D_L20_001B2F9C_abs __attribute__((nosda));
 
+/* Walks through every object in the level and turns off the ones from four particular classes. */
 void func_L20_00444138(void) {
     u8 *base = (u8 *)D_L20_001B2F9C_abs;
     u32 bound;
@@ -27,13 +28,13 @@ void func_L20_00444138(void) {
     for (;;) {
         u16 id = *(u16 *)(base + 0xAA);
 
-        if ((u16)(id - 0x1233) < 2) {
+        if ((u16)(id - 0x1233 /* moby classes 4659, 4660 */) < 2) {
             goto store;
         }
-        if ((s16)id == 0x1231) {
+        if ((s16)id == 0x1231 /* moby class 4657 */) {
             goto store;
         }
-        if ((s16)id != 0x1232) {
+        if ((s16)id != 0x1232 /* moby class 4658 */) {
             bound = D_L20_001B2FA0;
             goto next;
         }

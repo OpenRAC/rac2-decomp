@@ -109,9 +109,10 @@ extern float func_00283198(float);
 extern void func_00282CC0(void *, void *, void *);
 extern int func_002A8D70(void *, float, float, int, int, float, int, int, int);
 
-void func_L11_00454F18(ActorObject *p)
+/* Per-frame update of the Joba fighter (moby class 3577): it walks toward its goal or the player, charges, and swings at close range. */
+void func_L11_00454F18(ActorObject *actor)
 {
-    ActorState *q = p->data;
+    ActorState *data = actor->data;
     float target[4];
     float scratch[4];
     float hit[4];
@@ -120,210 +121,210 @@ void func_L11_00454F18(ActorObject *p)
     u16 *ids;
     ActorObject *entity;
 
-    if (p->state == 1) return;
-    func_L11_00455DF8(p);
-    if (p->state == 1) return;
-    if (q->attached == 0) {
-        q->target = 0;
-        if (p->secondaryState == 3) func_002A7750(p, 4, 2);
+    if (actor->state == 1) return;
+    UpdateJobaFighterContacts(actor);
+    if (actor->state == 1) return;
+    if (data->attached == 0) {
+        data->target = 0;
+        if (actor->secondaryState == 3) SetMobyState(actor, 4, 2);
     }
-    animationFrame = func_0029F530(p);
-    if (q->target) {
-        *(ActorQuadword *)target = *(ActorQuadword *)(q->target->pos);
-        heading = func_00283248(q->target->pos[0] - p->pos[0],
-                                q->target->pos[1] - p->pos[1]);
+    animationFrame = GetMobyAnimationValue(actor);
+    if (data->target) {
+        *(ActorQuadword *)target = *(ActorQuadword *)(data->target->pos);
+        heading = FastMatrixHelperA(data->target->pos[0] - actor->pos[0],
+                                data->target->pos[1] - actor->pos[1]);
     } else {
-        *(ActorQuadword *)target = *(ActorQuadword *)D_00189E20.position;
-        heading = func_00283248(D_00189E20.position[0] - p->pos[0],
-                                D_00189E20.position[1] - p->pos[1]);
+        *(ActorQuadword *)target = *(ActorQuadword *)gHeroState.position;
+        heading = FastMatrixHelperA(gHeroState.position[0] - actor->pos[0],
+                                gHeroState.position[1] - actor->pos[1]);
     }
-    delta = func_00283C80(p->heading, heading);
-    distance = func_00282E80(p->pos, target);
+    delta = FastDiffRots(actor->heading, heading);
+    distance = vec_distance_xy(actor->pos, target);
     /* The entry substate also selects the initial walking animation. */
-    secondaryState = p->secondaryState;
+    secondaryState = actor->secondaryState;
     switch (secondaryState) {
     case 2:
-        if (func_002B3890(p)) {
-            p->speed = func_002A7878(0.5f, 1.25f);
-            func_002B60B0(p, 0.00222222228f, 0.0666666701f, 0.00116355298f, 0.104719773f);
-            if (p->nextAnimation != secondaryState) func_002A7470(p, 2, 0, 10);
-            p->idleStage = 0;
-            func_L11_004565D8(p, func_L11_004417E8(p->controller));
-            p->timer = 10000;
+        if (SetSecondPendingFlag(actor)) {
+            actor->speed = RandomFloatRange(0.5f, 1.25f);
+            SetControllerSpeedLimits(actor, 0.00222222228f, 0.0666666701f, 0.00116355298f, 0.104719773f);
+            if (actor->nextAnimation != secondaryState) StartAnimationBlended(actor, 2, 0, 10);
+            actor->idleStage = 0;
+            PickJobaFighterGoalNearTarget(actor, GetArenaCenterPoint(actor->controller));
+            actor->timer = 10000;
         }
-        if (p->idleStage == 1 && p->timer >= 301) {
-            if (p->nextAnimation) func_002A7470(p, 0, 0, 10);
-            p->timer = func_002A77E0(100);
+        if (actor->idleStage == 1 && actor->timer >= 301) {
+            if (actor->nextAnimation) StartAnimationBlended(actor, 0, 0, 10);
+            actor->timer = RandomIntBelow(100);
         }
-        if (q->attached) {
-            p->speed = 1.0f;
-            func_002A7750(p, 5, 3);
+        if (data->attached) {
+            actor->speed = 1.0f;
+            SetMobyState(actor, 5, 3);
         }
-        if (p->idleStage == 0 && func_00282E80(p->pos, q->goal) < 0.5f)
-            p->idleStage = 1;
-        else func_L01_00321178(p, q->goal);
+        if (actor->idleStage == 0 && vec_distance_xy(actor->pos, data->goal) < 0.5f)
+            actor->idleStage = 1;
+        else TurnMobyTowardTarget(actor, data->goal);
         break;
     case 3:
         break;
     case 4:
-        flags = func_002B1C20(p, q->contact);
+        flags = DispatchActionByKind(actor, data->contact);
         if (flags & 1) {
-            func_L02_003FC248(p, 0, -1);
-            func_L01_003E9CF8(p, 0, func_L11_00456540);
-        } else if (flags & 2) func_L11_00456938(p);
+            SetMobyAnimTypeThree(actor, 0, -1);
+            QueueMobyForGlowEffect(actor, 0, ResetJobaFighterToIdle);
+        } else if (flags & 2) ChooseJobaFighterAction(actor);
         break;
     }
-    switch (p->state) {
+    switch (actor->state) {
     case 3:
-        if (func_002B3868(p)) {
-            p->idleStage = 0;
-            if (p->nextAnimation != 0) func_002A7470(p, 0, 0, 0);
-            p->timer = 0;
+        if (SetFirstPendingFlag(actor)) {
+            actor->idleStage = 0;
+            if (actor->nextAnimation != 0) StartAnimationBlended(actor, 0, 0, 0);
+            actor->timer = 0;
         }
-        if (p->idleStage == 0 && q->idleDelay < p->timer) {
-            if (p->nextAnimation != 3) func_002A7470(p, 3, 0, 10);
-            p->idleStage = 1;
-        } else if (p->idleStage == 1) {
-            if (func_L11_00441808(p->controller, p->pos))
-                func_002A7750(p, 4, 2);
-            func_L01_00321178(p, func_L11_004417E8(p->controller));
+        if (actor->idleStage == 0 && data->idleDelay < actor->timer) {
+            if (actor->nextAnimation != 3) StartAnimationBlended(actor, 3, 0, 10);
+            actor->idleStage = 1;
+        } else if (actor->idleStage == 1) {
+            if (IsPointInArenaPolygon(actor->controller, actor->pos))
+                SetMobyState(actor, 4, 2);
+            TurnMobyTowardTarget(actor, GetArenaCenterPoint(actor->controller));
         }
         break;
     case 5:
-        if (func_002B3868(p)) {
-            if (p->nextAnimation != func_002A77E0(2) + 1)
-                func_002A7470(p, func_002A77E0(2) + 1, 0, 10);
+        if (SetFirstPendingFlag(actor)) {
+            if (actor->nextAnimation != RandomIntBelow(2) + 1)
+                StartAnimationBlended(actor, RandomIntBelow(2) + 1, 0, 10);
         }
-        func_002A7CA0(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
-        if (p->animationFlags & 2) func_L11_00456938(p);
+        MobySpringTurn(actor, heading, 0.001f, 0.01f, &data->turnRate, 0.1f);
+        if (actor->animationFlags & 2) ChooseJobaFighterAction(actor);
         break;
     case 6:
-        if (func_002B3868(p)) {
-            func_002B60B0(p, 0.00222222228f, 0.0666666701f, 0.00116355298f, 0.104719773f);
-            if (p->nextAnimation != 2) func_002A7470(p, 2, 0, 10);
+        if (SetFirstPendingFlag(actor)) {
+            SetControllerSpeedLimits(actor, 0.00222222228f, 0.0666666701f, 0.00116355298f, 0.104719773f);
+            if (actor->nextAnimation != 2) StartAnimationBlended(actor, 2, 0, 10);
         }
-        func_L01_00321178(p, target);
-        if (D_L11_001B1D60 < distance) func_L11_00456938(p);
-        else if (distance < 2.7f) func_L11_00456938(p);
+        TurnMobyTowardTarget(actor, target);
+        if (D_L11_001B1D60 < distance) ChooseJobaFighterAction(actor);
+        else if (distance < 2.7f) ChooseJobaFighterAction(actor);
         break;
     case 7:
-        if (func_002B3868(p)) {
-            func_002B60B0(p, 0.00333333341f, 0.100000009f, 0.00116355298f, 0.104719773f);
-            if (p->nextAnimation != 3) func_002A7470(p, 3, 0, 10);
-            p->timer = 0;
+        if (SetFirstPendingFlag(actor)) {
+            SetControllerSpeedLimits(actor, 0.00333333341f, 0.100000009f, 0.00116355298f, 0.104719773f);
+            if (actor->nextAnimation != 3) StartAnimationBlended(actor, 3, 0, 10);
+            actor->timer = 0;
         }
-        if (q->aimTarget == 0 && (D_L11_001B30C8[0] & 0x3F) == (((s32)p >> 8) & 0x3F)) {
-            for (ids = D_L11_001FC420[func_L11_00441858(p->controller)];
-                 (func_L11_00441858(p->controller) & 0xFF) != 0xFF &&
-                 func_L11_00441858(p->controller) <= D_L11_001B35B8[0] && ids != 0 &&
-                 ((s16)ids[-1] >= 0 || ids == D_L11_001FC420[func_L11_00441858(p->controller)]); ids++) {
-                entity = D_L11_001B359C[0] + (*ids & 0x7FFF);
+        if (data->aimTarget == 0 && (D_L11_001B30C8[0] & 0x3F) == (((s32)actor >> 8) & 0x3F)) {
+            for (ids = gGroupIdLists[GetArenaGroupIndex(actor->controller)];
+                 (GetArenaGroupIndex(actor->controller) & 0xFF) != 0xFF &&
+                 GetArenaGroupIndex(actor->controller) <= D_L11_001B35B8[0] && ids != 0 &&
+                 ((s16)ids[-1] >= 0 || ids == gGroupIdLists[GetArenaGroupIndex(actor->controller)]); ids++) {
+                entity = gMobyTable_L11[0] + (*ids & 0x7FFF);
                 if (entity == 0) break;
                 if (entity->classId == 0xDF9) continue;
-                if (func_00283C80(p->heading, func_00283248(entity->pos[0] - p->pos[0],
-                                                        entity->pos[1] - p->pos[1])) < 0.52359885f &&
-                    func_L02_002F21C0(p->pos, entity->pos) < 20.0f) {
-                    q->aimTarget = entity;
+                if (FastDiffRots(actor->heading, FastMatrixHelperA(entity->pos[0] - actor->pos[0],
+                                                        entity->pos[1] - actor->pos[1])) < 0.52359885f &&
+                    DistanceSquaredXY(actor->pos, entity->pos) < 20.0f) {
+                    data->aimTarget = entity;
                     break;
                 }
             }
-        } else if (q->aimTarget == 0 || (q->aimTarget->state == 0xFE || (q->aimTarget->state == 0xFD || q->aimTarget->state < 2))) {
-            q->aimTarget = 0;
+        } else if (data->aimTarget == 0 || (data->aimTarget->state == 0xFE || (data->aimTarget->state == 0xFD || data->aimTarget->state < 2))) {
+            data->aimTarget = 0;
         }
-        if (!func_L11_004566C0(p)) {
-            if (q->aimTarget) func_L11_00456070(p, q->aimTarget->pos);
-            else func_L11_00456070(p, target);
+        if (!TurnTowardNearbyGroupEntity(actor)) {
+            if (data->aimTarget) WalkJobaFighterWithDust(actor, data->aimTarget->pos);
+            else WalkJobaFighterWithDust(actor, target);
         }
-        func_0029FCC0(p, 1, scratch);
-        func_L11_00456A48(p, (int)scratch, D_L11_001B1D6C, 0.0f, 100.0f, D_L11_001B1D70,
+        TransformMobyJointToWorld(actor, 1, scratch);
+        DamageObjectsInRadius(actor, (int)scratch, D_L11_001B1D6C, 0.0f, 100.0f, D_L11_001B1D70,
                           D_L11_001B1D78, D_L11_001B1D80, D_L11_001B1D88);
-        if (distance < 2.7f && delta < 0.3490659f) func_002A7750(p, 11, -1);
-        if (D_L11_001B1D64 < p->timer) func_002A7750(p, 6, -1);
+        if (distance < 2.7f && delta < 0.3490659f) SetMobyState(actor, 11, -1);
+        if (D_L11_001B1D64 < actor->timer) SetMobyState(actor, 6, -1);
         break;
     case 9:
-        if (func_002B3868(p)) {
-            if (p->nextAnimation != 4) func_002A7470(p, 4, 0, 10);
-            q->step = 0.0069444445f;
-            func_002B60B0(p, 0.00666666683f, 0.200000018f, 0.000218166184f, 0.00639954163f);
+        if (SetFirstPendingFlag(actor)) {
+            if (actor->nextAnimation != 4) StartAnimationBlended(actor, 4, 0, 10);
+            data->step = 0.0069444445f;
+            SetControllerSpeedLimits(actor, 0.00666666683f, 0.200000018f, 0.000218166184f, 0.00639954163f);
         }
-        if (q->aimTarget == 0 && (D_L11_001B30C8[0] & 0x3F) == (((s32)p >> 8) & 0x3F)) {
-            for (ids = D_L11_001FC420[func_L11_00441858(p->controller)];
-                 (func_L11_00441858(p->controller) & 0xFF) != 0xFF &&
-                 func_L11_00441858(p->controller) <= D_L11_001B35B8[0] && ids != 0 &&
-                 ((s16)ids[-1] >= 0 || ids == D_L11_001FC420[func_L11_00441858(p->controller)]); ids++) {
-                entity = D_L11_001B359C[0] + (*ids & 0x7FFF);
+        if (data->aimTarget == 0 && (D_L11_001B30C8[0] & 0x3F) == (((s32)actor >> 8) & 0x3F)) {
+            for (ids = gGroupIdLists[GetArenaGroupIndex(actor->controller)];
+                 (GetArenaGroupIndex(actor->controller) & 0xFF) != 0xFF &&
+                 GetArenaGroupIndex(actor->controller) <= D_L11_001B35B8[0] && ids != 0 &&
+                 ((s16)ids[-1] >= 0 || ids == gGroupIdLists[GetArenaGroupIndex(actor->controller)]); ids++) {
+                entity = gMobyTable_L11[0] + (*ids & 0x7FFF);
                 if (entity == 0) break;
                 if (entity->classId == 0xDF9) continue;
-                if (func_00283C80(p->heading, func_00283248(entity->pos[0] - p->pos[0],
-                                                        entity->pos[1] - p->pos[1])) < 0.52359885f &&
-                    func_L02_002F21C0(p->pos, entity->pos) < 20.0f) {
-                    q->aimTarget = entity;
+                if (FastDiffRots(actor->heading, FastMatrixHelperA(entity->pos[0] - actor->pos[0],
+                                                        entity->pos[1] - actor->pos[1])) < 0.52359885f &&
+                    DistanceSquaredXY(actor->pos, entity->pos) < 20.0f) {
+                    data->aimTarget = entity;
                     break;
                 }
             }
-        } else if (q->aimTarget == 0 || (q->aimTarget->state == 0xFE || (q->aimTarget->state == 0xFD || q->aimTarget->state < 2))) {
-            q->aimTarget = 0;
+        } else if (data->aimTarget == 0 || (data->aimTarget->state == 0xFE || (data->aimTarget->state == 0xFD || data->aimTarget->state < 2))) {
+            data->aimTarget = 0;
         }
-        if (q->aimTarget) {
-            func_L01_00321178(p, q->aimTarget->pos);
-            func_002A7CA0(p,
-                          func_00283248(q->aimTarget->pos[0] - p->pos[0],
-                                        q->aimTarget->pos[1] - p->pos[1]),
-                          0.001f, 0.01f, &q->turnRate, 0.1f);
+        if (data->aimTarget) {
+            TurnMobyTowardTarget(actor, data->aimTarget->pos);
+            MobySpringTurn(actor,
+                          FastMatrixHelperA(data->aimTarget->pos[0] - actor->pos[0],
+                                        data->aimTarget->pos[1] - actor->pos[1]),
+                          0.001f, 0.01f, &data->turnRate, 0.1f);
         } else {
-            func_L01_00321178(p, target);
-            func_002A7CA0(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
+            TurnMobyTowardTarget(actor, target);
+            MobySpringTurn(actor, heading, 0.001f, 0.01f, &data->turnRate, 0.1f);
         }
-        func_0029FCC0(p, 1, scratch);
-        func_L11_00456A48(p, (int)scratch, D_L11_001B1D6C, (float)q->contactDamage, 100.0f, D_L11_001B1D74,
+        TransformMobyJointToWorld(actor, 1, scratch);
+        DamageObjectsInRadius(actor, (int)scratch, D_L11_001B1D6C, (float)data->contactDamage, 100.0f, D_L11_001B1D74,
                           D_L11_001B1D7C, D_L11_001B1D80, D_L11_001B1D88);
-        if (D_00189E20.attackTarget == p) func_002A7750(p, 10, -1);
-        if (0.38397247f < delta) func_002A7750(p, 8, -1);
+        if (gHeroState.attackTarget == actor) SetMobyState(actor, 10, -1);
+        if (0.38397247f < delta) SetMobyState(actor, 8, -1);
         break;
     case 10:
-        if (func_002B3868(p)) {
-            if (p->nextAnimation != 5) func_002A7470(p, 5, 0, 3);
-            func_002B60B0(p, 0.00416666688f, 0.0333333351f, 0.000436332368f, 0.0130899716f);
+        if (SetFirstPendingFlag(actor)) {
+            if (actor->nextAnimation != 5) StartAnimationBlended(actor, 5, 0, 3);
+            SetControllerSpeedLimits(actor, 0.00416666688f, 0.0333333351f, 0.000436332368f, 0.0130899716f);
         }
-        scratch[0] = 4.0f * func_00283180(p->heading);
-        scratch[1] = 4.0f * func_00283198(p->heading);
+        scratch[0] = 4.0f * FastSinOrCosA(actor->heading);
+        scratch[1] = 4.0f * FastSinOrCosB(actor->heading);
         scratch[2] = 0.0f;
-        func_00282CC0(scratch, p->pos, scratch);
-        func_L01_00321178(p, scratch);
-        func_0029FCC0(p, 1, hit);
-        func_L11_00456A48(p, (int)hit, D_L11_001B1D6C, (float)q->contactDamage, 100.0f, D_L11_001B1D74,
+        FastVecAdd(scratch, actor->pos, scratch);
+        TurnMobyTowardTarget(actor, scratch);
+        TransformMobyJointToWorld(actor, 1, hit);
+        DamageObjectsInRadius(actor, (int)hit, D_L11_001B1D6C, (float)data->contactDamage, 100.0f, D_L11_001B1D74,
                           D_L11_001B1D7C, D_L11_001B1D84, D_L11_001B1D8C);
-        if (p->animationFlags & 2) func_002A7750(p, 8, -1);
+        if (actor->animationFlags & 2) SetMobyState(actor, 8, -1);
         break;
     case 8:
-        if (func_002B3868(p)) {
-            if (p->nextAnimation != 4) func_002A7470(p, 4, 0, 10);
+        if (SetFirstPendingFlag(actor)) {
+            if (actor->nextAnimation != 4) StartAnimationBlended(actor, 4, 0, 10);
         }
-        scratch[0] = 4.0f * func_00283180(p->heading);
-        scratch[1] = 4.0f * func_00283198(p->heading);
+        scratch[0] = 4.0f * FastSinOrCosA(actor->heading);
+        scratch[1] = 4.0f * FastSinOrCosB(actor->heading);
         scratch[2] = 0.0f;
-        func_00282CC0(scratch, p->pos, scratch);
-        func_L01_00321178(p, scratch);
-        func_002A7CA0(p, heading, 0.001f, 0.01f, &q->turnRate, 0.1f);
-        func_0029FCC0(p, 1, hit);
-        func_L11_00456A48(p, (int)hit, D_L11_001B1D6C, 0.0f, 100.0f, D_L11_001B1D70,
+        FastVecAdd(scratch, actor->pos, scratch);
+        TurnMobyTowardTarget(actor, scratch);
+        MobySpringTurn(actor, heading, 0.001f, 0.01f, &data->turnRate, 0.1f);
+        TransformMobyJointToWorld(actor, 1, hit);
+        DamageObjectsInRadius(actor, (int)hit, D_L11_001B1D6C, 0.0f, 100.0f, D_L11_001B1D70,
                           D_L11_001B1D78, D_L11_001B1D80, D_L11_001B1D88);
-        if (p->animationFlags & 2) func_L11_00456938(p);
+        if (actor->animationFlags & 2) ChooseJobaFighterAction(actor);
         break;
     case 11:
-        if (func_002B3868(p)) {
-            if (p->nextAnimation != 6) func_002A7470(p, 6, 0, 5);
+        if (SetFirstPendingFlag(actor)) {
+            if (actor->nextAnimation != 6) StartAnimationBlended(actor, 6, 0, 5);
         }
-        if (p->animation == 6 && animationFrame >= 10.0f && animationFrame <= 15.0f)
-            func_002A8D70(p, 1.0f, (float)q->meleeDamage, 1, 1, 1.0f, 0, 1, 0);
-        if (p->animationFlags & 2) {
-            if (distance < 2.7f && delta < 0.3490659f) func_002A7750(p, 11, -1);
-            else func_L11_00456938(p);
+        if (actor->animation == 6 && animationFrame >= 10.0f && animationFrame <= 15.0f)
+            TestHitAtBone(actor, 1.0f, (float)data->meleeDamage, 1, 1, 1.0f, 0, 1, 0);
+        if (actor->animationFlags & 2) {
+            if (distance < 2.7f && delta < 0.3490659f) SetMobyState(actor, 11, -1);
+            else ChooseJobaFighterAction(actor);
         }
         break;
     case 12:
-        if (p->animationFlags & 2) func_L11_00456938(p);
+        if (actor->animationFlags & 2) ChooseJobaFighterAction(actor);
         break;
     }
-    func_L11_00456010(p);
+    CountFrameAndCheckContact(actor);
 }

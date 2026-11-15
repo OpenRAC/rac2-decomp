@@ -109,12 +109,13 @@ static __inline__ int hud_coord1(float value, float scale, float half, int activ
 #define TEXT(x,y,s) { char *str_ = (s); int row_ = label_y(str_, (float)(y), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); func_0027FAA8(x,row_,0x80f0f0f0UL,str_,len_); }
 #define CENTER(y,s) { char *str_ = (s); int row_ = label_y(str_, (float)(y), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(str_); func_0027FBD8(center,row_,0x80f0f0f0UL,str_,len_); }
 #define ROW(x,id) { int row_ = Y(286); char *str_ = func_00288FB8(id); func_0027F5B8(x,row_,0x80f0f0f0UL,str_,-1); }
+/* Draws the race results panel with the race name, rewards, best time and button prompts. */
 int func_L04_0040AD28(void)
 {
     char buffer[128];
-    unsigned char *m = D_L04_001B0914;
-    unsigned char *p = *(unsigned char **)(m + 0x68);
-    int center = (int)((float)D_001A7340 * 0.5f);
+    unsigned char *controller = D_L04_001B0914;
+    unsigned char *vars = *(unsigned char **)(controller + 0x68);
+    int center = (int)((float)gScreenWidth * 0.5f);
     float angle = 0.56217057f, tangent;
     unsigned int tint;
     unsigned char *input;
@@ -123,97 +124,97 @@ int func_L04_0040AD28(void)
     float scale, centerf, py;
     int one;
     float w, v;
-    tangent = func_00283198(angle);
-    tangent /= func_00283180(angle);
+    tangent = FastSinOrCosB(angle);
+    tangent /= FastSinOrCosA(angle);
     centerf = (float)center;
     D_L04_001BDB80[44] = tangent;
-    func_0027AB40();
-    icon = func_00336D50(D_L04_001A904C + 0x8710,0x45);
+    UpdateViewContext();
+    icon = FindTableEntryById(D_L04_001A904C + 0x8710,0x45);
     py = (float)label_y(icon, 200.0f, D_L04_001B2D44, 0.5f, 1);
     scale = 0.92f;
-    if (D_001A7B90) scale = 0.9f;
+    if (gIsPalVideo) scale = 0.9f;
     w = 1.0f;
-    func_00300A00(icon,centerf,0x60442d00,py,w,scale,(float)0);
-    icon = func_00336D50(D_L04_001A904C + 0x8710,0x44);
+    DrawScaledObjectTwoAxes(icon,centerf,0x60442d00,py,w,scale,(float)0);
+    icon = FindTableEntryById(D_L04_001A904C + 0x8710,0x44);
     w = (float)label_y(icon, 200.0f, D_L04_001B2D44, 0.5f, 1);
     v = 1.0f;
     scale = 0.92f;
-    if (D_001A7B90) scale = 0.9f;
-    func_00300A00(icon,centerf,0x55f0c070,w,v,scale,0.0f);
+    if (gIsPalVideo) scale = 0.9f;
+    DrawScaledObjectTwoAxes(icon,centerf,0x55f0c070,w,v,scale,0.0f);
     x = D_L04_001B2008 % 50;
-    count = func_00283D38(0x80ffde8d,0x60442d00, x >= 25 ? 1.0f-(float)(x-25)*0.04f : (float)x*0.04f);
+    count = FastTweenColor(0x80ffde8d,0x60442d00, x >= 25 ? 1.0f-(float)(x-25)*0.04f : (float)x*0.04f);
     one = 1;
-    input = D_00138180;
+    input = gPadState;
     tint = 0x80f0f0f0;
     if (!(*(int *)(input + 0x1a0) & 0x2000)) tint = count;
-    icon = func_00336D50(D_L04_001A904C+0x8710,0x4a);
-    func_00300A00(icon,259.0f,tint,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, one),1.0f,1.0f,0.0f);
+    icon = FindTableEntryById(D_L04_001A904C+0x8710,0x4a);
+    DrawScaledObjectTwoAxes(icon,259.0f,tint,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, one),1.0f,1.0f,0.0f);
     tint = 0x80f0f0f0;
     if (!(*(int *)(input + 0x1a0) & 0x8000)) tint = count;
-    icon = func_00336D50(D_L04_001A904C+0x8710,0x4b);
-    func_00300A00(icon,251.0f,tint,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, one),1.0f,1.0f,0.0f);
-    if (m[0x20] != 3) {
-        float projection_angle = *(float *)(p+0x28c)*0.008726647f;
-        float sine = func_00283198(projection_angle);
-        D_L04_001BDB80[44] = sine / func_00283180(projection_angle);
-        func_0027AB40();
+    icon = FindTableEntryById(D_L04_001A904C+0x8710,0x4b);
+    DrawScaledObjectTwoAxes(icon,251.0f,tint,(float)label_y(icon, 283.0f, D_L04_001B2D44, 0.5f, one),1.0f,1.0f,0.0f);
+    if (controller[0x20] != 3) {
+        float projection_angle = *(float *)(vars+0x28c)*0.008726647f;
+        float sine = FastSinOrCosB(projection_angle);
+        D_L04_001BDB80[44] = sine / FastSinOrCosA(projection_angle);
+        UpdateViewContext();
     }
-    { int n_ = func_00115DA8(buffer,func_00288FB8(0x2f72),D_L04_001B0904+1); int row_ = label_y3((void *)n_, 60.0f, D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(buffer); func_0027FBD8(center,row_,0x80f0f0f0UL,buffer,len_); }
-    { int row_ = hud_coord1(286.0f, D_L04_001B2D44, 0.5f, one); char *str_ = func_00288FB8(0x2f40); func_0027F5B8(119,row_,0x80f0f0f0UL,str_,-1); }
+    { int n_ = Sprintf(buffer,GetLocalizedString(0x2f72),gSelectedRaceIndex+1); int row_ = label_y3((void *)n_, 60.0f, D_L04_001B2D44, 0.5f, 1); int len_ = strlen_001157AC(buffer); DrawTextCenteredLargeFont(center,row_,0x80f0f0f0UL,buffer,len_); }
+    { int row_ = hud_coord1(286.0f, D_L04_001B2D44, 0.5f, one); char *str_ = GetLocalizedString(0x2f40); DrawTextMediumFont(119,row_,0x80f0f0f0UL,str_,-1); }
     ROW(356,0x2f41);
     ROW(181,0x2f3f);
     ROW(279,0x2f42);
-    TEXT(center,110,func_00288FB8(D_L04_002C63C0[D_L04_001B0904].name));
-    shift = D_001A79F0 == 11 ? 10 : 5;
-    count = func_L04_0040A1D0(D_L04_001B0904);
-    if ((D_L04_002C63C0[D_L04_001B0904].flags & 0x10000000) ||
-        (D_L04_001B0904 > 0 && func_L04_0040A1D0(D_L04_001B0904-1)>0)) {
+    TEXT(center,110,GetLocalizedString(gRaceChallengeTable[gSelectedRaceIndex].name));
+    shift = gCurrentMapIndex == 11 ? 10 : 5;
+    count = GetCourseWinCount(gSelectedRaceIndex);
+    if ((gRaceChallengeTable[gSelectedRaceIndex].flags & 0x10000000) ||
+        (gSelectedRaceIndex > 0 && GetCourseWinCount(gSelectedRaceIndex-1)>0)) {
         int first, second, lang;
-        if (D_L04_002C63C0[D_L04_001B0904].flags & 4) { lang = D_001A79F0_1; first=0x2f7a; second=0x2f9a; }
+        if (gRaceChallengeTable[gSelectedRaceIndex].flags & 4) { lang = D_001A79F0_1; first=0x2f7a; second=0x2f9a; }
         else { lang = D_001A79F0_1; second=0x2f99; first=0x2f79; }
         if (lang != 11) second = first;
-        TEXT(center,150-shift,func_00288FB8(second));
-        { char *label; if (D_L04_002C63C0[D_L04_001B0904].flags&1) label=func_00288FB8(0x2f7c);
-        else label=func_00288FB8(0x2f7b);
+        TEXT(center,150-shift,GetLocalizedString(second));
+        { char *label; if (gRaceChallengeTable[gSelectedRaceIndex].flags&1) label=GetLocalizedString(0x2f7c);
+        else label=GetLocalizedString(0x2f7b);
         TEXT(center,170-shift,label);
-        if (D_001A79F0==11) {
-            if (D_L04_002C63C0[D_L04_001B0904].flags&16) label=func_00288FB8(0x2f9b);
-            else label=func_00288FB8(0x2f9c);
+        if (gCurrentMapIndex==11) {
+            if (gRaceChallengeTable[gSelectedRaceIndex].flags&16) label=GetLocalizedString(0x2f9b);
+            else label=GetLocalizedString(0x2f9c);
             TEXT(center,190-shift,label);
-            if(D_L04_002C63C0[D_L04_001B0904].flags&2) { label=func_00288FB8(0x2fc5); TEXT(center,210-shift,label) }
-        } else if(D_L04_002C63C0[D_L04_001B0904].flags&2) { label=func_00288FB8(0x2fc5); { int row_ = label_y(label, (float)(190-shift), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(label); func_0027FAA8(center,row_,0x80f0f0f0UL,label,len_); } } }
+            if(gRaceChallengeTable[gSelectedRaceIndex].flags&2) { label=GetLocalizedString(0x2fc5); TEXT(center,210-shift,label) }
+        } else if(gRaceChallengeTable[gSelectedRaceIndex].flags&2) { label=GetLocalizedString(0x2fc5); { int row_ = label_y(label, (float)(190-shift), D_L04_001B2D44, 0.5f, 1); int len_ = strlen_001157AC(label); DrawTextCenteredSmallFont(center,row_,0x80f0f0f0UL,label,len_); } } }
         if(count>=3) count=2;
-        if(D_L04_002C63C0[D_L04_001B0904].rewards[count]) {
+        if(gRaceChallengeTable[gSelectedRaceIndex].rewards[count]) {
             char *fmt = D_L04_001B0940;
-            char *str = func_00288FB8(0x2f7d);
+            char *str = GetLocalizedString(0x2f7d);
             { unsigned char boost = D_001A7A0A;
-            reward = D_L04_002C63C0[D_L04_001B0904].rewards[count];
+            reward = gRaceChallengeTable[gSelectedRaceIndex].rewards[count];
             if(boost) reward*=10; }
-            func_00115DA8(buffer,fmt,str,reward,func_00288FB8(0x2f5e));
-        } else { char *fmt = D_L04_001B0950; func_00115DA8(buffer,fmt,func_00288FB8(0x2f7d)); }
+            Sprintf(buffer,fmt,str,reward,GetLocalizedString(0x2f5e));
+        } else { char *fmt = D_L04_001B0950; Sprintf(buffer,fmt,GetLocalizedString(0x2f7d)); }
         TEXT(center,shift+210,buffer);
-        { int *times; if (D_001A79F0==4) { times = D_001A7368; time = times[D_L04_001B0904]; } else { times = D_001A737C; time = times[D_L04_001B0904]; } }
+        { int *times; if (gCurrentMapIndex==4) { times = D_001A7368; time = times[gSelectedRaceIndex]; } else { times = D_001A737C; time = times[gSelectedRaceIndex]; } }
         x = 0;
         if(time) {
             x = 110;
-            if (time / 60 % 60 < 10) func_00115DA8(buffer,D_L04_001B0958,func_00288FB8(0x31c8),time/3600%60,time/60%60,time/6%10);
-            else func_00115DA8(buffer,D_L04_001B0968,func_00288FB8(0x31c8),time/3600%60,time/60%60,time/6%10);
+            if (time / 60 % 60 < 10) Sprintf(buffer,D_L04_001B0958,GetLocalizedString(0x31c8),time/3600%60,time/60%60,time/6%10);
+            else Sprintf(buffer,D_L04_001B0968,GetLocalizedString(0x31c8),time/3600%60,time/60%60,time/6%10);
             { int col = center+46; TEXT(col,shift+230,buffer); }
         }
             { int col = center-x;
-            char *fmt = func_00288FB8(0x2f7e);
-            func_00115DA8(buffer,fmt,func_L04_0040A1D0(D_L04_001B0904));
+            char *fmt = GetLocalizedString(0x2f7e);
+            Sprintf(buffer,fmt,GetCourseWinCount(gSelectedRaceIndex));
             TEXT(col,shift+230,buffer); }
     } else {
             char *fmt;
-            CENTER(150,func_00288FB8(0x2f73));
+            CENTER(150,GetLocalizedString(0x2f73));
             fmt = D_L04_001B0940;
-            { char *str = func_00288FB8(0x2f7d);
-            reward = D_L04_002C63C0[D_L04_001B0904].rewards[count];
+            { char *str = GetLocalizedString(0x2f7d);
+            reward = gRaceChallengeTable[gSelectedRaceIndex].rewards[count];
             if(D_001A7A0A) reward*=10;
-            func_00115DA8(buffer,fmt,str,reward,func_00288FB8(0x2f5e)); }
-            { int row_ = label_y((void *)center, (float)(shift+210), D_L04_001B2D44, 0.5f, 1); int len_ = func_001157AC(buffer); func_0027FAA8(center,row_,0x80f0f0f0UL,buffer,len_); }
+            Sprintf(buffer,fmt,str,reward,GetLocalizedString(0x2f5e)); }
+            { int row_ = label_y((void *)center, (float)(shift+210), D_L04_001B2D44, 0.5f, 1); int len_ = strlen_001157AC(buffer); DrawTextCenteredSmallFont(center,row_,0x80f0f0f0UL,buffer,len_); }
     }
-    func_002FC560(71,0x5360b);
+    VU1_addGSregister(71,0x5360b);
     return 1;
 }

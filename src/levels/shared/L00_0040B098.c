@@ -41,26 +41,26 @@ void func_L00_0040B098(u8 *self, Vector *origin)
 
     start.q = origin->q;
     length = *(float *)(*(u8 **)(self + 0x68) + 0x18);
-    count = func_00283CF0(length * 10.0f) / 4;
+    count = FloatToInt(length * 10.0f) / 4;
     qcopy(position.f, from);
-    func_00282CF0(step.f, self + 0x10, start.f);
-    size = func_00283CE0(count);
-    func_00282F20(step.f, step.f, length / size);
+    FastVecSub(step.f, self + 0x10, start.f);
+    size = IntToFloat(count);
+    vec_scale_to_length(step.f, step.f, length / size);
     for (i = 0; i < count; i++) {
-        spin = func_00283CF0(func_002A78D8(1.0f, 3.0f));
-        speed = -(func_002A7878(0.2f, 1.0f) * 0.016666668f);
-        func_00282D30((float *)&velocity, D_0018A0E0, speed);
-        life = func_002A7820(30, 50);
-        size = func_002A7878(200.0f, 1000.0f);
-        if (func_001163B0() & 2) {
+        spin = FloatToInt(RandomSignedFloatRange(1.0f, 3.0f));
+        speed = -(RandomFloatRange(0.2f, 1.0f) * 0.016666668f);
+        FastVecScale((float *)&velocity, D_0018A0E0, speed);
+        life = RandomIntRange(30, 50);
+        size = RandomFloatRange(200.0f, 1000.0f);
+        if (Rand() & 2) {
             color = 0x404040;
             alpha = 0x50;
         } else {
             color = 0x7F7F7F;
             alpha = 0x50;
         }
-        part = func_002C16C0(position.f, velocity.f, life, alpha, color, spin, 21000.0f, size, 1.0f, 0.0f, 1.0f);
-        func_00282CC0(position.f, position.f, step.f);
+        part = SpawnBurstParticle_002C16C0(position.f, velocity.f, life, alpha, color, spin, 21000.0f, size, 1.0f, 0.0f, 1.0f);
+        FastVecAdd(position.f, position.f, step.f);
         if (part != 0) {
             part[2] = *D_L00_001FE940.texture;
             part[3] = alpha == 0x40 ? 0x48 : 0x44;

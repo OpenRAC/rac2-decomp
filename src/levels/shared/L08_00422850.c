@@ -5,6 +5,7 @@ extern s32 func_002761F8(void *first, void *second, s32 mode, void *object, s32 
 extern float D_L08_001BFF68;
 
 /* func_L01_003BD560 with a zero floor meaning the probe's own height. */
+/* Looks for solid ground below a point and returns its height, or the floor value if nothing is hit. */
 float func_L08_00422850(void *position, float first, float second, float floor, float limit)
 {
     float endpoints[2][4] __attribute__((aligned(16)));
@@ -15,7 +16,7 @@ float func_L08_00422850(void *position, float first, float second, float floor, 
         endpoints[1][2] = first < limit ? first : limit;
     else
         endpoints[1][2] = first;
-    if (func_002761F8(endpoints[1], endpoints[0], 2, 0, 0)) {
+    if (CollLine(endpoints[1], endpoints[0], 2, 0, 0)) {
         return D_L08_001BFF68 > floor ? D_L08_001BFF68 : floor;
     }
     if (floor != 0.0f)

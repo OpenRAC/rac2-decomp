@@ -11,8 +11,9 @@ extern void func_00116E10(void *arg0, int arg1);
 
 extern void func_00116360(void *arg0) __asm__("func_00116360");
 
-void func_00115F78(int arg0) {
-    func_00116300(D_00133E74);
-    func_00116E10(D_00133E74, arg0);
-    func_00116360(D_00133E74);
+/* Gives a block of heap memory back, taking the memory lock while it works. */
+void func_00115F78(int block) {
+    AcquireMallocLock(D_00133E74);
+    FreeReentrant(D_00133E74, block);
+    ReleaseMallocLock(D_00133E74);
 }

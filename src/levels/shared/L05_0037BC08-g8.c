@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -31,22 +32,22 @@ void func_L05_0037BC08(char *obj)
 
     if (D_L05_001FB220[*(unsigned char *)(obj + 0x21)] == 0)
         return;
-    parent = (int *)func_002ED688(obj);
+    parent = (int *)GetMobyMotionData(obj);
     p = D_L05_001FB220[*(unsigned char *)(obj + 0x21)];
     do {
         off = (*p & 0x7FFF) << 8;
-        child = (int *)func_002ED688((char *)(D_L05_001B251C + off));
-        if (func_L05_0037BBB8((char *)(D_L05_001B251C + off)) != 0
-            && func_L05_0037BB90((char *)(D_L05_001B251C + off)) == 0
+        child = (int *)GetMobyMotionData((char *)(D_L05_001B251C + off));
+        if (IsObjectInUse((char *)(D_L05_001B251C + off)) != 0
+            && GetObjectLinkValue((char *)(D_L05_001B251C + off)) == 0
             && child[7] == parent[7]) {
-            func_L05_0037BB28((char *)(D_L05_001B251C + off));
-            func_002EE678((char *)(D_L05_001B251C + off), 1);
+            ClearObjectLinks((char *)(D_L05_001B251C + off));
+            SetFollowerState((char *)(D_L05_001B251C + off), 1);
         }
         t = *(short *)p;
         p++;
     } while (t >= 0);
-    func_L05_0037BB28(obj);
-    func_002EE678(obj, 1);
+    ClearObjectLinks(obj);
+    SetFollowerState(obj, 1);
     D_L05_00221D10[2]--;
 }
 
@@ -65,13 +66,13 @@ void func_L05_0037BD40(char *obj)
     addr = 0;
     if (D_L05_001FB220[*(unsigned char *)(obj + 0x21)] == 0)
         return;
-    parent = (int *)func_002ED688(obj);
+    parent = (int *)GetMobyMotionData(obj);
     p = D_L05_001FB220[*(unsigned char *)(obj + 0x21)];
     do {
         off = (*p & 0x7FFF) << 8;
-        child = (int *)func_002ED688((char *)(D_L05_001B251C + off));
-        if (func_L05_0037BBB8((char *)(D_L05_001B251C + off)) != 0
-            && func_L05_0037BB90((char *)(D_L05_001B251C + off)) == 0
+        child = (int *)GetMobyMotionData((char *)(D_L05_001B251C + off));
+        if (IsObjectInUse((char *)(D_L05_001B251C + off)) != 0
+            && GetObjectLinkValue((char *)(D_L05_001B251C + off)) == 0
             && child[7] == parent[7]
             && child[8] == 1) {
             addr = D_L05_001B251C + off;
@@ -80,9 +81,9 @@ void func_L05_0037BD40(char *obj)
         t = *(short *)p;
         p++;
     } while (t >= 0);
-    found = (int *)func_002ED688((char *)addr);
+    found = (int *)GetMobyMotionData((char *)addr);
     *(TI128 *)parent = *(TI128 *)found;
-    func_00282C88((int)found);
+    ClearVector128((int)found);
     found[8] = 0;
     parent[8] = 1;
     found[4] = 0;
@@ -91,5 +92,5 @@ void func_L05_0037BD40(char *obj)
     parent[5] = 0;
     found[6] = parent[6];
     parent[6] = -1;
-    func_002EE678((char *)addr, 1);
+    SetFollowerState((char *)addr, 1);
 }

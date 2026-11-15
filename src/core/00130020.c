@@ -39,25 +39,27 @@ extern void func_00130250();
 extern void r1_func_00116248(void *);
 
 /* rac1-decomp src/core/0012AC80.c: func_0012C200 */
-int func_00130020(void *arg0) {
-    Wrapper *w = (Wrapper *)arg0;
-    Obj40 *inner = w->obj;
-    int ret = 0;
+/* Stops the current video decoding. Returns 1 if it was running. */
+int func_00130020(void *mpeg) {
+    Wrapper *wrapper = (Wrapper *)mpeg;
+    Obj40 *decoder = wrapper->obj;
+    int result = 0;
 
-    if (inner->unk004 != 0 && inner->unk008 != 0) {
-        r1_func_0012C278((void *)inner);
-        w->unk08 = inner->unk118 - inner->unk0AC;
-        inner->unk004 = 0;
-        ret = 1;
+    if (decoder->unk004 != 0 && decoder->unk008 != 0) {
+        r1_func_0012C278((void *)decoder);
+        wrapper->unk08 = decoder->unk118 - decoder->unk0AC;
+        decoder->unk004 = 0;
+        result = 1;
     }
-    return ret;
+    return result;
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012C268 */
 /* Tail call: the constant argument setup lands in the jump's delay slot,
    so the field store precedes it. r1_func_00127378 is defined above. */
-void func_00130088(void *arg0) {
-    *(int *)((char *)arg0 + 0x848) = 0;
+/* Marks the decoder as not started and restarts the picture hardware. */
+void func_00130088(void *decoder) {
+    *(int *)((char *)decoder + 0x848) = 0;
     r1_func_00127378(1);
 }
 
@@ -66,15 +68,16 @@ extern void func_00130288(void *, void *);
 extern void func_0012DC50(void *, int, int);
 extern void func_0012DD60(void *, int, int, int);
 
-void func_00130098(char *object) {
-    int width = *(int *)(object + 0x118);
-    if (*(int *)(object + 0x120) != 0)
-        func_00130288(object, D_0013BDC8);
-    else if (*(int *)(object + 0x174) == 3)
-        func_0012DC50(object, *(int *)(object + 0x1BC), width - 1);
+/* Finishes the last decoded picture, or reports an error if a decode was still in progress. */
+void func_00130098(char *decoder) {
+    int frameNumber = *(int *)(decoder + 0x118);
+    if (*(int *)(decoder + 0x120) != 0)
+        ReportMpegError(decoder, D_0013BDC8);
+    else if (*(int *)(decoder + 0x174) == 3)
+        OutputMpegPicture(decoder, *(int *)(decoder + 0x1BC), frameNumber - 1);
     else
-        func_0012DD60(object, *(int *)(object + 0x1CC), *(int *)(object + 0x1DC), width - 1);
-    *(int *)(object + 0x120) = 0;
+        OutputMpegFieldPair(decoder, *(int *)(decoder + 0x1CC), *(int *)(decoder + 0x1DC), frameNumber - 1);
+    *(int *)(decoder + 0x120) = 0;
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012C2F8 */
@@ -101,16 +104,17 @@ void func_00130098(char *object) {
  * callee-saved register on something that looks like it needs no
  * register at all, the source defined it before the call.
  */
-void func_00130118(void *arg0) {
-    char *p = (char *)arg0;
-    int a = 0x70000000;
+/* Points the decoder buffers at fast scratchpad memory and clears a flag. */
+void func_00130118(void *decoder) {
+    char *bytes = (char *)decoder;
+    int scratchpadBase = 0x70000000;
 
     r1_func_00127378(1);
-    *(int *)(p + 0x590) = a;
-    *(int *)(p + 0x594) = 0x70001800;
-    *(int *)(p + 0x6D0) = 0x70001B00;
-    *(int *)(p + 0x6D4) = 0x70003300;
-    *(int *)(p + 0x810) = 0;
+    *(int *)(bytes + 0x590) = scratchpadBase;
+    *(int *)(bytes + 0x594) = 0x70001800;
+    *(int *)(bytes + 0x6D0) = 0x70001B00;
+    *(int *)(bytes + 0x6D4) = 0x70003300;
+    *(int *)(bytes + 0x810) = 0;
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012C358 */
@@ -124,13 +128,14 @@ void func_00130118(void *arg0) {
  * zeroed (0x1000B020/B420/D420), IPU_CTRL (0x10002010) set to 0x40000000,
  * and a tail call into r1_func_0012CF98(0, 0).
  */
-void func_00130178(void *arg0) {
-    char *s = (char *)arg0;
-    int r;
+/* Resets the picture decoding hardware: its DMA channels and the picture unit. */
+void func_00130178(void *decoder) {
+    char *bytes = (char *)decoder;
+    int interruptsWereOn;
 
-    *(int *)(s + 0x818) = 1;
-    *(int *)(s + 0x1B0) = 0;
-    r = r1_func_0011D960();
+    *(int *)(bytes + 0x818) = 1;
+    *(int *)(bytes + 0x1B0) = 0;
+    interruptsWereOn = r1_func_0011D960();
 
     D_ENABLEW =
         D_ENABLER | 0x10000;
@@ -140,7 +145,7 @@ void func_00130178(void *arg0) {
     D_ENABLEW =
         D_ENABLER & ~0x10000;
 
-    if (r != 0) {
+    if (interruptsWereOn != 0) {
         r1_func_0011D9A8();
     }
 
@@ -152,13 +157,15 @@ void func_00130178(void *arg0) {
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012C420 */
-void func_00130240(void *arg0) {
-    r1_func_0011A6C8(r1_D_00153BD8, arg0);
+/* Prints a video error message with one value. */
+void func_00130240(void *value) {
+    r1_func_0011A6C8(r1_D_00153BD8, value);
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012C430 */
-void func_00130250(void *arg0) {
-    char buf[0x100];
-    r1_func_00116248(buf);
-    func_00130288(arg0, buf);
+/* Builds a video error message and reports it. */
+void func_00130250(void *mpeg) {
+    char message[0x100];
+    r1_func_00116248(message);
+    ReportMpegError(mpeg, message);
 }

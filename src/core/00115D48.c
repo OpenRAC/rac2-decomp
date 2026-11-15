@@ -9,11 +9,12 @@ extern void *D_00133E74;
 
 extern int func_00118CC8(void *arg0, int arg1, void *arg2);
 
-void func_00115D48(int arg0, ...) {
+/* Prints text to the standard output using a format string and extra values. */
+void func_00115D48(int format, ...) {
     void *obj = D_00133E74;
     void *ctx = *(void **)((char *)obj + 8);
 
     *(void **)((char *)ctx + 0x54) = obj;
-    func_00118CC8(*(void **)((char *)obj + 8), arg0,
-                  (char *)__builtin_next_arg(arg0) - 0x38);
+    VfprintfDispatch(*(void **)((char *)obj + 8), format,
+                  (char *)__builtin_next_arg(format) - 0x38);
 }

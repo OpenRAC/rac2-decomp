@@ -10,10 +10,11 @@ extern int func_00125620(void);
 
 extern void func_00132DF0(int arg0, int arg1, int arg2, int arg3, int arg4);
 
+/* Runs the local handler, or sends sound command 0x37 when the sound server is in use. */
 int func_00133640(void) {
     if (D_001A748C == 0)
-        return func_00125620();
-    func_00132DF0(0x37, 0, 0, 0, 0);
+        return BreakCdCommand();
+    QueueSoundCommand(0x37, 0, 0, 0, 0);
     return 1;
 }
 

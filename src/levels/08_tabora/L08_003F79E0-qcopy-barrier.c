@@ -6,6 +6,7 @@ typedef union { Quad q; float f[4]; } Vector;
 extern int D_L08_001B9E04 __attribute__((nosda));
 
 /* Same body as func_L04_00422D40, with this function's own callees. */
+/* Puts the object's target point at a fixed spot far away and clears a level flag. */
 void func_L08_003F79E0(char *object) {
     char *state=*(char **)(object + 0x68);
     Vector point;

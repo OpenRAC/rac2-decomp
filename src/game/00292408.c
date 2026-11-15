@@ -39,25 +39,25 @@ void func_00292408(int index)
     int width, log;
     char *clut;
 
-    func_002FC3C0(1);
+    WaitForDmaStatusBits(1);
     base = D_001BAF34;
-    func_002B7CE0(1);
+    PumpMusicAndDiscRead(1);
     hdr = base + 0x10;
     clut = base + 0x30;
-    table = &D_0014B540;
-    func_002B7C80(base, table->packs[index].c + table->base, table->packs[index].d);
+    table = &gCopySetupData;
+    ReadDiscWithPause(base, table->packs[index].c + table->base, table->packs[index].d);
     func_00126288(packet, D_001A72EC[0] >> 8, 1, 0, 0, 0, 16, 16);
-    func_0011AEA0(0);
-    func_001265B0(packet, clut);
-    func_001244B8(0, 0);
-    log = func_00282A18(*(int *)(hdr + 8));
+    FlushCache(0);
+    ExecGsLoadImage(packet, clut);
+    WaitGsPathsIdle(0, 0);
+    log = log2dim(*(int *)(hdr + 8));
     width = *(int *)(hdr + 8) >> 6;
     if (width < 1)
         width = 1;
     func_00126288(packet, D_001A72FC[0] >> 8, width, 27, 0, 0, *(short *)(hdr + 8), *(short *)(hdr + 12));
-    func_0011AEA0(0);
-    func_001265B0(packet, base + 0x430);
-    func_001244B8(0, 0);
+    FlushCache(0);
+    ExecGsLoadImage(packet, base + 0x430);
+    WaitGsPathsIdle(0, 0);
     {
         long image, tex, format, clut_base, word;
 
@@ -71,5 +71,5 @@ void func_00292408(int index)
         word |= 0x8000000000000000UL;
         D_001A72A0[5] = word;
     }
-    func_002B7C80(base, table->packs[index].a + table->base, table->packs[index].b);
+    ReadDiscWithPause(base, table->packs[index].a + table->base, table->packs[index].b);
 }

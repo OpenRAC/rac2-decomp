@@ -93,77 +93,78 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
-void func_L25_0040CDA0(char *obj)
+/* Updates the mission object: sets up the level, runs the timer and moves on when the mission is done. */
+void func_L25_0040CDA0(char *missionMoby)
 {
-    char *state = *(char **)(obj+0x68);
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    float c[4] __attribute__((aligned(16)));
-    float d[4] __attribute__((aligned(16)));
-    int delay;
+    char *vars = *(char **)(missionMoby+0x68);
+    float targetPosA[4] __attribute__((aligned(16)));
+    float targetPosB[4] __attribute__((aligned(16)));
+    float camPos[4] __attribute__((aligned(16)));
+    float camLookAt[4] __attribute__((aligned(16)));
+    int waitCounter;
     int active = 1;
     MissionContext *ctx;
-    switch (B(obj,0x20)) {
+    switch (B(missionMoby,0x20)) {
     case 0:
         ctx = &D_L25_00221850;
         
         ctx->scale=8.0f;
-        ctx->deathCallback=func_L25_0040DCD0;
-        D_L25_001B0CE0=obj;
+        ctx->deathCallback=TickDeathTimerAndFinish;
+        D_L25_001B0CE0=missionMoby;
         D_L25_001B0CD0=0; D_L25_001B0CD4=0;
         D_L25_001B0CD8=0; D_L25_001B0CDC=0;
-        H(obj,0x32)=0x1ff; B(obj,0x30)=0xff; B(obj,0x20)=1;
-        I(state,0x2c)=150; I(state,0x30)=300;
-        I(state,0x38)=180; I(state,0x34)=720; I(state,0x24)=0;
-        ctx->health=*(float **)state;
+        H(missionMoby,0x32)=0x1ff; B(missionMoby,0x30)=0xff; B(missionMoby,0x20)=1;
+        I(vars,0x2c)=150; I(vars,0x30)=300;
+        I(vars,0x38)=180; I(vars,0x34)=720; I(vars,0x24)=0;
+        ctx->health=*(float **)vars;
         ctx->enabled=1;
         D_L25_001B3060=540;
-        ctx->owner=obj;
-        if (D_0018C0B0) H(D_0018C0B0,0x34)|=0x41;
+        ctx->owner=missionMoby;
+        if (gHeroMoby_0018C0B0) H(gHeroMoby_0018C0B0,0x34)|=0x41;
     case 1:
         
-        if (!D_0018C958.dialogue) func_00288E18(0xa16,0x6d);
+        if (!gSubtitleHistory.dialogue) RequestSubtitleVoiceLine(0xa16,0x6d);
         
-        if (func_00282948(state+0x34)) D_L25_00221850.timerVisible=0;
+        if (FastFloatHelperD(vars+0x34)) D_L25_00221850.timerVisible=0;
         else D_L25_00221850.timerVisible=1;
         active = 1;
-        func_L05_00379B60();
-        func_L05_0030C930(label_y(obj, -224.0f, D_L25_001B2904, 0.5f, 1),2);
-        qcopy(obj+0x10,(void *)((I(state,0x20)<<8) + D_L25_001B209C + 0x10));
-        if (D_00138324&0x10) func_002E5DA0(0,0,obj,0xeee);
+        SelectRandomLevelObject();
+        StorePairWithIncrement(label_y(missionMoby, -224.0f, D_L25_001B2904, 0.5f, 1),2);
+        qcopy(missionMoby+0x10,(void *)((I(vars,0x20)<<8) + D_L25_001B209C + 0x10));
+        if (D_00138324&0x10) PlaySoundFromClassBank(0,0,missionMoby,0xeee);
         if (D_L25_001A904C && !D_L25_001B0CDC) {
-            func_0029B758(0,func_L25_0040D208);
+            StoreLevelObjectValuePair(0,DrawWupashCombatHud);
             D_L25_001B0CDC=active;
         }
-        /* Retail executes this counted wait before reading the mission state:
-           6, decrement, padded backward bgez, decrement in its delay slot. */
-        for (delay=6; delay>=0; delay--) {}
+        /* Retail executes this counted wait before reading the mission vars:
+           6, decrement, padded backward bgez, decrement in its waitCounter slot. */
+        for (waitCounter=6; waitCounter>=0; waitCounter--) {}
         if (D_L25_00221850.paused || D_L25_001B1BC8<6) break;
         if (D_L25_00221850.completed<=0) {
             D_L25_00221850.timerVisible=1;
-            if (!func_00282948(state+0x2c)) break;
-            I(state,0x2c)=540;
-            func_L05_00442828(&D_L25_001B0CC0,&D_L25_001B0CB0,240);
-            *(Quad *)a=0; *(Quad *)b=0;
-            B(obj,0x20)=3;
-            a[0]=359.0f; a[1]=440.0f; a[2]=524.0f;
-            b[0]=403.0f; b[1]=456.0f; b[2]=524.0f;
-            func_L25_003752D8((u8 *)1);
-            func_L25_00376FE0((u8 *)a,10.0f); func_L25_00377608((u8 *)b,10.0f);
-            *(Quad *)d = *(Quad *)c = 0;
-            c[0]=417.18f; c[1]=454.03f; c[2]=532.6f;
-            d[0]=420.93f; d[1]=413.79f; d[2]=534.54f;
-            func_L05_00445B58(c,d);
+            if (!FastFloatHelperD(vars+0x2c)) break;
+            I(vars,0x2c)=540;
+            StartShipTransition(&D_L25_001B0CC0,&D_L25_001B0CB0,240);
+            *(Quad *)targetPosA=0; *(Quad *)targetPosB=0;
+            B(missionMoby,0x20)=3;
+            targetPosA[0]=359.0f; targetPosA[1]=440.0f; targetPosA[2]=524.0f;
+            targetPosB[0]=403.0f; targetPosB[1]=456.0f; targetPosB[2]=524.0f;
+            OfferEntriesToHandlerPointer((u8 *)1);
+            OfferEntriesToHandlerFloat((u8 *)targetPosA,10.0f); OfferEntriesToHandlerFloatB((u8 *)targetPosB,10.0f);
+            *(Quad *)camLookAt = *(Quad *)camPos = 0;
+            camPos[0]=417.18f; camPos[1]=454.03f; camPos[2]=532.6f;
+            camLookAt[0]=420.93f; camLookAt[1]=413.79f; camLookAt[2]=534.54f;
+            PointShipCameraAtTarget(camPos,camLookAt);
         } else {
-            if (func_00282948(state+0x2c)) {
-                func_L05_0037B210(); func_0029B758(0,0);
-                D_001A7C01=1; func_00288CB0(2,1);
+            if (FastFloatHelperD(vars+0x2c)) {
+                InitAllRegisteredEntries(); StoreLevelObjectValuePair(0,0);
+                D_001A7C01=1; SetSmallDataValueAndRefresh(2,1);
             } else {
                 if (!D_L25_001B0CF8) {
-                    func_L05_0037B108(); D_L25_001B0CF8=1;
+                    RemoveEffectFamilyMobys(); D_L25_001B0CF8=1;
                 }
-                { u32 seen = D_0018C958.completed & (1u << D_001A79F0);
-                if (!seen) func_00288E18(0xa36,0x8d); }
+                { u32 seen = gSubtitleHistory.completed & (1u << gCurrentMapIndex);
+                if (!seen) RequestSubtitleVoiceLine(0xa36,0x8d); }
             }
         }
         break;
@@ -171,10 +172,10 @@ void func_L25_0040CDA0(char *obj)
         break;
     case 3:
         
-        if (!func_L05_00442860()) {
+        if (!IsCameraModeActive()) {
             D_L25_00221850.timerVisible=0;
             D_L25_00221850.completed++;
-            B(obj,0x20)=active;
+            B(missionMoby,0x20)=active;
         }
         break;
     }

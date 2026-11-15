@@ -110,6 +110,7 @@ extern void func_00291DE0(void *, int);
 extern void func_00291CA8(void *, int, void *, int);
 extern void func_002EAAA8(void *, int *);
 
+/* Sets up a level after its archive is read, loading its textures, classes, mobys and sounds. */
 void func_002EAB18(void)
 {
     char *base, *records, *p;
@@ -123,49 +124,49 @@ void func_002EAB18(void)
     loadEngine.time = -1.0f;
     loadState.mode = 2;
     loadState.selected = -1;
-    D_001B15A0 = 1.0f;
+    gScreenFade = 1.0f;
     D_001B22B0 = 0x100000;
     loadEngine.x = 0;
     loadEngine.y = 0;
     loadEngine.flag = 0;
     D_001B15A4 = 0;
-    func_00290B48();
+    InitMemSlots();
     D_001A72D0 = D_001A72F4;
     D_001A72D4 = D_001A72F4;
-    func_00282A60(D_001B1740, 0x87654321, 16);
-    func_00282A60(D_001CE4E0, -1, 0x2000);
-    func_00282A60(D_001D1580, -1, 0xf00);
-    func_00282A60(D_001D0E00, 0, 0xf0);
-    func_0027A9F0();
-    func_0027AB40();
-    func_002FC1D8();
+    ClearMemory(D_001B1740, 0x87654321, 16);
+    ClearMemory(D_001CE4E0, -1, 0x2000);
+    ClearMemory(D_001D1580, -1, 0xf00);
+    ClearMemory(D_001D0E00, 0, 0xf0);
+    InitViewContext();
+    UpdateViewContext();
+    ResetPacketBuffer();
     {
-        char *disc = D_0014B540;
+        char *disc = gCopySetupData;
         int *sector = (int *)(disc + 0x3e58);
         int *length = (int *)(disc + 0x3e5c);
         int index = loadState.b * 8;
 
-        func_002B7C10((int)loadBuffers.header + 0x400000,
+        ReadDiscSectorsBlocking((int)loadBuffers.header + 0x400000,
                       *(int *)(index + (int)sector) + *(int *)(disc + 0x3e24),
                       *(int *)(index + (int)length));
     }
-    func_0027D330(6);
-    func_00133580(0);
-    func_0011AEA0(0);
-    size = func_0029D4D0((int)loadBuffers.header + 0x400000, (int)loadBuffers.header);
-    func_0011AEA0(0);
+    FadeToBlack(6);
+    snd_CheckLoadInProgress(0);
+    FlushCache(0);
+    size = fast_decompress((int)loadBuffers.header + 0x400000, (int)loadBuffers.header);
+    FlushCache(0);
 
     header = loadBuffers.header;
-    func_00293000((char *)header + header->texture, header->textureCount, 0,
+    UploadTextureImages((char *)header + header->texture, header->textureCount, 0,
                   (char *)header + header->textureInfo);
     base = (char *)header + header->data;
     records = base + header->classData;
     textures = (TextureRecord *)((char *)header + header->classes);
     D_001B1B4C = header->classCount;
     for (i = 0; i < D_001B1B4C; i++)
-        D_001D0600[i] = (int)records + textures[i].offset + (func_00282A18(textures[i].dimension) << 28);
+        D_001D0600[i] = (int)records + textures[i].offset + (log2dim(textures[i].dimension) << 28);
 
-    func_00291EC0(base + header->sky);
+    RelocateSkyDefinition(base + header->sky);
     moby = (MobyRecord *)((char *)header + header->mobys);
     D_001B1B40 = 0;
     for (j = 0; j < header->mobyCount; j++, moby++) {
@@ -175,10 +176,10 @@ void func_002EAB18(void)
             D_001C4DC0[0] = loadState.packet;
             D_001C4DC0[1] = 0xFFA0000000E0ULL;
             D_001C4DC0[2] = 0x0040000400004000ULL;
-            func_00293890(object, 0, D_001A91E0, moby->id);
+            RegisterClassCacheObject(object, 0, D_001A91E0, moby->id);
             D_001D0E00[D_001B1B40 - 1] = 0xfffc0000;
         } else
-            func_00293890(object, (char *)header + header->classes, moby->map, moby->id);
+            RegisterClassCacheObject(object, (char *)header + header->classes, moby->map, moby->id);
     }
 
     /* The HUD class (id 0xd54) takes the next class slot. The slot is read back
@@ -190,14 +191,14 @@ void func_002EAB18(void)
         n++;
         D_001B1B40 = n;
         D_001CDB80[loadState.count] = loadBuffers.uiClass;
-        D_001CE300[loadState.count] = 0xd54;
-        D_001CE4E0[0xd54] = loadState.count;
+        D_001CE300[loadState.count] = 0xd54; /* moby class 3412 */
+        D_001CE4E0[0xd54 /* moby class 3412 */] = loadState.count;
         D_001D0E00[loadState.count] = 0xfffc0000;
         loadBuffers.firstClass = D_001CDB80[0];
     }
     if (D_001A7290 != D_001A7A18)
-        func_00292328(D_001A7A18);
-    func_002934B8((void *)D_001CDB80[0], (void *)loadBuffers.uiInfo);
+        BuildTextureDrawPackets(D_001A7A18);
+    CopyHeaderAndRelocatePointers((void *)D_001CDB80[0], (void *)loadBuffers.uiInfo);
     D_001D0E00[0] = 0xfffc0000;
 
     D_001B1604 = base + header->textureData;
@@ -206,21 +207,21 @@ void func_002EAB18(void)
         int partData = (int)base + header->partData;
         char *parts = (char *)header + header->parts;
 
-        func_00291CA8((char *)header + header->partInfo, partData, parts, header->partCount);
+        RebasePackAndFillTextureRanges((char *)header + header->partInfo, partData, parts, header->partCount);
     }
 
     p = (char *)loadBuffers.header + size;
     loadBuffers.end = p;
-    func_00282A88(D_001C2B40, 0x100);
-    func_00282A88(D_001C2C40, 0x180);
-    func_00282A88(D_001C2740, 0x400);
-    func_00282B50(D_001C2740, D_001ABEC0, 0x40);
+    FastMemoryHelperB(D_001C2B40, 0x100);
+    FastMemoryHelperB(D_001C2C40, 0x180);
+    FastMemoryHelperB(D_001C2740, 0x400);
+    FastMemoryHelperC(D_001C2740, D_001ABEC0, 0x40);
     D_001B1B5C = (int)p;
-    func_00282A60(p, 0, 0x4000);
+    ClearMemory(p, 0, 0x4000);
     p += 0x4000;
     entry = (unsigned char *)D_001B1B5C;
     D_001B159C = (int)entry;
-    func_0029F0C8(entry, 0);
+    InitMobyInstance(entry, 0);
     entry[0x20] = 0xfd;
     D_001B1B60 = (unsigned char *)D_001B159C + 0x100;
     D_001B1B60[0x20] = 0xff;
@@ -231,13 +232,13 @@ void func_002EAB18(void)
     D_001B1B64 = D_001B1B60 + 0x3f00;
     D_001B1D94 = 0;
     D_001B1D9C = 0;
-    func_00282A88(D_001F1D40, 0x200);
-    func_0027B7E0();
+    FastMemoryHelperB(D_001F1D40, 0x200);
+    ClearCounterGroup();
     D_001B1B74 = 0x3c0;
     D_001B1DA0 = 0x1f4000;
-    func_002EA968();
+    InitRandomLoadingScene();
     {
-        SoundState *sound = (SoundState *)D_00188660;
+        SoundState *sound = (SoundState *)gSoundState;
 
         sound->soundState = 0xffffffffU;
     }
@@ -257,11 +258,11 @@ void func_002EAB18(void)
     bank = (BankVolume *)(base + header->sound[0] + 0x18);
     bank->left = 0xc000;
     bank->right = 0xc000;
-    func_0011AEA0(0);
-    func_002EAAA8(base + header->sound[4], &D_001B2140[0]);
-    func_002EAAA8(base + header->sound[2], &D_001B2138[0]);
-    func_002EAAA8(base + header->sound[3], &D_001B213C[0]);
-    func_002EAAA8(base + header->sound[1], &D_001B2134[0]);
-    func_002EAAA8(base + header->sound[0], &D_001B2130[0]);
+    FlushCache(0);
+    RunAsyncLoadAndWait(base + header->sound[4], &D_001B2140[0]);
+    RunAsyncLoadAndWait(base + header->sound[2], &D_001B2138[0]);
+    RunAsyncLoadAndWait(base + header->sound[3], &D_001B213C[0]);
+    RunAsyncLoadAndWait(base + header->sound[1], &D_001B2134[0]);
+    RunAsyncLoadAndWait(base + header->sound[0], &D_001B2130[0]);
     func_00132828();
 }

@@ -36,34 +36,35 @@ static __inline__ int shop_item(int index)
     return shop_entry(index)->item;
 }
 
+/* Handles input on the unlockable options menu: moves the cursor and toggles an option if the player has enough skill points. */
 int func_002CF5B0(void)
 {
     int result = 0;
-    int status;
+    int entryCost;
     unsigned char *slot;
-    int limit = func_002B0E90();
-    int flags = D_00138180.flags;
+    int available = CountNonZeroFlags();
+    int flags = gPadState.flags;
 
     if (flags & 0x10) {
-        int value, rc;
+        int value, returnCode;
         D_001AB9EC = 0;
-        value = *(int *)(D_001F2840.source + 0xE0);
+        value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
-            rc = -1;
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
+            returnCode = -1;
             goto finish;
         }
-        rc = 0;
+        returnCode = 0;
 finish:
-        return rc;
+        return returnCode;
     }
     if (flags & 0x900) {
         D_001AB9EC = 0;
         result = 1;
     } else {
         if (flags & 0x1000) {
-            func_002E5E58(3, 0, 0);
+            PlaySoundFromGlobalBank(3, 0, 0);
             do {
                 ShopEntry *table;
                 if (--D_001AB9EC < 0)
@@ -73,23 +74,23 @@ finish:
                     break;
             } while (1);
         } else if (flags & 0x4000) {
-            int cur;
+            int nextIndex;
             ShopEntry *table;
-            func_002E5E58(3, 0, 0);
-            cur = D_001AB9EC;
+            PlaySoundFromGlobalBank(3, 0, 0);
+            nextIndex = D_001AB9EC;
             table = D_001ABCD0;
             do {
-                if (++cur >= 12)
-                    cur = 0;
-            } while (table[cur].cost == 100);
-            D_001AB9EC = cur;
+                if (++nextIndex >= 12)
+                    nextIndex = 0;
+            } while (table[nextIndex].cost == 100);
+            D_001AB9EC = nextIndex;
         }
-        if (D_00138180.flags & 0x40) {
+        if (gPadState.flags & 0x40) {
             slot = (unsigned char *)D_001ABCD0;
-            status = ((ShopEntry *)slot)[D_001AB9EC].cost;
-            if ((status != 0x5A && status <= limit)
+            entryCost = ((ShopEntry *)slot)[D_001AB9EC].cost;
+            if ((entryCost != 0x5A && entryCost <= available)
                 || (shop_cost(D_001AB9EC) == 0x5A && D_001A7A60[0] != 0)) {
-                func_002E5E58(4, 0, 0);
+                PlaySoundFromGlobalBank(4, 0, 0);
                 slot = &D_001A7A40[shop_entry(D_001AB9EC)->item];
                 if (*slot)
                     *slot = 0;
@@ -98,10 +99,10 @@ finish:
                 {
                     flags = shop_item(D_001AB9EC);
                     if (flags == 9 || flags == 10 || (unsigned char)flags == 2 || (unsigned char)flags == 11)
-                        func_002923C0((void *)(s32)D_001A79F8.level);
+                        LoadLevelTexturePack((void *)(s32)gPlayerBolts.level);
                 }
             } else
-                func_002E5E58(5, 0, 0);
+                PlaySoundFromGlobalBank(5, 0, 0);
         }
     }
     return result;

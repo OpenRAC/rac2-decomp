@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef unsigned int Rac2Native_ff971bf89acc2217_u32;
@@ -17,6 +18,7 @@ extern Rac2Native_ff971bf89acc2217_u32 ref_L00_0037B7B0_00;
 
 extern Rac2Native_ff971bf89acc2217_u8 ref_L00_0037B7B0_01[];
 
+/* Adds a small fixed graphics packet to the end of the draw list and moves the list pointer forward. */
 void func_L00_0037B6F0(void)
 {
     *(Rac2Native_ff971bf89acc2217_u32 *)(ref_L00_0037B6F0_00 + 0) = 0x30000003u;
@@ -26,6 +28,7 @@ void func_L00_0037B6F0(void)
     ref_L00_0037B6F0_00 += 16;
 }
 
+/* Adds a small fixed graphics packet to the end of the draw list and moves the list pointer forward. */
 void func_L00_0037B750(void)
 {
     *(Rac2Native_ff971bf89acc2217_u32 *)(ref_L00_0037B750_00 + 0) = 0x30000003u;
@@ -35,6 +38,7 @@ void func_L00_0037B750(void)
     ref_L00_0037B750_00 += 16;
 }
 
+/* Adds a small fixed graphics packet to the end of the draw list and moves the list pointer forward. */
 void func_L00_0037B7B0(void)
 {
     *(Rac2Native_ff971bf89acc2217_u32 *)(ref_L00_0037B7B0_00 + 0) = 0x30000003u;
@@ -53,25 +57,26 @@ typedef struct {
 
 extern Rac2Native_ff971bf89acc2217_Entry D_L00_00231340[32];
 
-void func_L00_0037DD18(int a0, int a1, int a2)
+/* Stores a key, an owner and a value in the first free slot of the 32-entry key table. */
+void func_L00_0037DD18(int key, int owner, int value)
 {
     int i = 0;
-    Rac2Native_ff971bf89acc2217_Entry *e;
+    Rac2Native_ff971bf89acc2217_Entry *slot;
 
-    if (D_L00_00231340[0].field04 == 0) {
-        D_L00_00231340[0].field00 = a1;
-        D_L00_00231340[0].field04 = a0;
-        D_L00_00231340[0].field08 = a2;
+    if (gOwnerKeyTable[0].field04 == 0) {
+        gOwnerKeyTable[0].field00 = owner;
+        gOwnerKeyTable[0].field04 = key;
+        gOwnerKeyTable[0].field08 = value;
         return;
     }
 loop:
     i++;
     if (i >= 32)
         return;
-    if (D_L00_00231340[i].field04 != 0)
+    if (gOwnerKeyTable[i].field04 != 0)
         goto loop;
-    e = &D_L00_00231340[i];
-    e->field04 = a0;
-    e->field00 = a1;
-    e->field08 = a2;
+    slot = &gOwnerKeyTable[i];
+    slot->field04 = key;
+    slot->field00 = owner;
+    slot->field08 = value;
 }

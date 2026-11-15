@@ -32,6 +32,7 @@ extern void ref_L00_003CF438_04(void *, void *, void *);
 extern void ref_L00_003CF438_05(void *);
 
 typedef struct { f32 first; f32 second; s32 flag; s32 pad; } StackArgs;
+/* Waits for a trigger, then pushes the object along its heading for about 100 frames and removes it. */
 void func_L00_003CF438(void *object) {
     s32 *state  = *(s32 **)((s8 *)object + 0x68);
     f32 angle ;
@@ -39,7 +40,7 @@ void func_L00_003CF438(void *object) {
     f32 ratio ;
     StackArgs args;
     s32 count;
-    if (*(volatile u8 *)((s8 *)object + 0x20) == 0 && ref_L00_003CF438_00((s32)D_00189EA0, state[0]) != 0) {
+    if (*(volatile u8 *)((s8 *)object + 0x20) == 0 && ref_L00_003CF438_00((s32)gHeroPosition, state[0]) != 0) {
         *(volatile u8 *)((s8 *)object + 0x20) = 1;
         state[1] = 0;
         ref_L00_003CF438_01(0, 0, object);

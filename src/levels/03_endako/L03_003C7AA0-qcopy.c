@@ -1,8 +1,9 @@
 typedef int TI128 __attribute__((mode(TI)));
 
-void func_L03_003C7AA0(char *a0, char *a1) {
-    char *a2 = *(char **)(a0 + 0x68);
+/* Copies the moby's position and a stored height value into a 3-float output. */
+void func_L03_003C7AA0(char *moby, char *out) {
+    char *vars = *(char **)(moby + 0x68);
 
-    *(TI128 *)a1 = *(TI128 *)(a0 + 0x10);
-    *(float *)(a1 + 8) = *(float *)(a2 + 0xF8);
+    *(TI128 *)out = *(TI128 *)(moby + 0x10);
+    *(float *)(out + 8) = *(float *)(vars + 0xF8);
 }

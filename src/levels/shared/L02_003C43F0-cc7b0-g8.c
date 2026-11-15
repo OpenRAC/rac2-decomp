@@ -105,6 +105,7 @@ struct CC7Data {
     float f388;
     float f38c;
 };
+/* Update for a moby that owns a linked child object. It sets itself up on the first frame, keeps the child on its matrix, and checks hits, timers and when the player may use it. */
 int func_L02_003CC7B0(unsigned char *obj) {
     struct CC7Data *data=(struct CC7Data *)P(obj,0x68);
     unsigned char *hit;
@@ -122,8 +123,8 @@ int func_L02_003CC7B0(unsigned char *obj) {
             data->f84=0.5f; data->b69=0xfe; data->f8c=0.4f;
             data->f90=F(obj,0x18)-6.0f; data->wcc=data->w330;
             data->b65=19; data->kind=3; data->f30=1.25f;
-            if (!data->h310) data->other=ref_L02_003CC7B0_02(0xa20);
-            else data->other=ref_L02_003CC7B0_02(0xa21);
+            if (!data->h310) data->other=ref_L02_003CC7B0_02(0xa20 /* moby class 2592 */);
+            else data->other=ref_L02_003CC7B0_02(0xa21 /* moby class 2593 */);
             child=data->other;
             if (!child) return 1;
             ref_L02_003CC7B0_03(child,obj);
@@ -146,14 +147,14 @@ int func_L02_003CC7B0(unsigned char *obj) {
             else ref_L02_003CC7B0_06(obj,1,0);
         }
     }
-    if (obj[0x31] && ref_L02_003CC7B0_07(obj+0x10,D_L02_001BA500)<24.0f) {
+    if (obj[0x31] && ref_L02_003CC7B0_07(obj+0x10,gCameraPosition_L02)<24.0f) {
         ref_L02_003CC7B0_08(obj); obj[0x6f]=22;
     }
     ref_L02_003CC7B0_09(obj,0,mat);
     ref_L02_003CC7B0_10(data->other+0xc0,mat);
     qcopy(data->other+0x10,mat+12);
     hit=ref_L02_003CC7B0_11(obj,0x10000,0);
-    if (hit && P(hit,0x20) && H(P(hit,0x20),0xaa)==0xb5a) obj[0xa8]=0xff;
+    if (hit && P(hit,0x20) && H(P(hit,0x20),0xaa)==0xb5a /* moby class 2906 */) obj[0xa8]=0xff;
     if (ref_L02_003CC7B0_12(obj,(char *)data+0x50,0)) ref_L02_003CC7B0_13(obj);
     if ((unsigned char)data->mode==2) ref_L02_003CC7B0_14(obj);
     if (data->w314!=-1 && (ref_L02_003CC7B0_00&15)==(((int)obj>>8)&15)) {
@@ -161,17 +162,17 @@ int func_L02_003CC7B0(unsigned char *obj) {
         if (value<data->h37a) data->h386=300;
         data->h37a=value;
     }
-    if (((unsigned char)obj[0x95]!=3 && (unsigned char)obj[0x20]!=23) || !(D_L02_001B30C8&15))
+    if (((unsigned char)obj[0x95]!=3 && (unsigned char)obj[0x20]!=23) || !(gFrameCounter_L02&15))
         ref_L02_003CC7B0_16(obj,data->w31c,0,0,16.0f,0.0f);
     if (data->w204==1) {
         if (data->w33c) {
             allowed=0;
-            if (D_00189E20.obj26c==obj || D_00189E20.obj270==obj || (D_00189E20.active && !D_00189E20.portal)) allowed=1;
+            if (gHeroState.obj26c==obj || gHeroState.obj270==obj || (gHeroState.active && !gHeroState.portal)) allowed=1;
             else if (ref_L02_003CC7B0_18(F(obj,0xf8),ref_L02_003CC7B0_17(F(data,0x1f0)-F(obj,0x10),F(data,0x1f4)-F(obj,0x14)))<1.5707964897155762f) allowed=1;
             if (!allowed) data->w204=0; else data->h386=300;
         } else data->h386=300;
     } else if (data->h386) {
-        data->w200=D_00189E20.target; qcopy((char *)data+0x1f0,D_00189E20.direction); data->w204=1;
+        data->w200=gHeroState.target; qcopy((char *)data+0x1f0,gHeroState.direction); data->w204=1;
     }
     return 0;
 }

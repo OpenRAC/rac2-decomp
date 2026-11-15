@@ -119,25 +119,26 @@ extern double func_001234F0(float);
 extern void func_0026FEB8(char *, ...);
 extern char D_L06_001B18E0[];
 extern void func_L00_003263D0(char *, void *, int, float, int, void *, float, unsigned int, float, float, int);
-void func_L06_00458138(char *a0) {
+/* Throws a burst of sparks out from the object, then removes it. */
+void func_L06_00458138(char *moby) {
     float pos[4], vel[4];
     int count = 13, i;
     if (D_L06_001B234C < 0.9f && D_001B2350 < 0.9f) count = 40;
     for (i = 0; i < count; i++) {
-        pos[0] = func_002A7878(-8.045f, 8.045f);
-        pos[1] = func_00282C48(pos[0] * 0.1243008077f) * 1.745f;
-        pos[2] = func_002A7878(0.0f, 3.99f);
+        pos[0] = RandomFloatRange(-8.045f, 8.045f);
+        pos[1] = FloatAbs(pos[0] * 0.1243008077f) * 1.745f;
+        pos[2] = RandomFloatRange(0.0f, 3.99f);
         vel[0] = pos[0] * 0.0041433605f;
         vel[1] = -0.13333334f;
-        vel[2] = func_002A7878(3.0f, 7.0f) * 0.0166666675f;
-        func_00283098(pos, pos, a0 + 0xC0);
-        func_00282CC0(pos, pos, a0 + 0x10);
-        func_00283098(vel, vel, a0 + 0xC0);
-        func_0026FEB8(D_L06_001B18E0, func_001234F0(pos[0]), func_001234F0(pos[1]), func_001234F0(pos[2]), func_001234F0(vel[0]), func_001234F0(vel[1]), func_001234F0(vel[2]));
-        func_L00_003263D0(a0, pos, 1, 0.0f, 1, vel, 3.0f, 0x50808040, 1.0f, 5.5f, 0);
-        func_003A0948(0, 0, a0);
+        vel[2] = RandomFloatRange(3.0f, 7.0f) * 0.0166666675f;
+        matrix_mul_vec3(pos, pos, moby + 0xC0);
+        FastVecAdd(pos, pos, moby + 0x10);
+        matrix_mul_vec3(vel, vel, moby + 0xC0);
+        STUB_printf(D_L06_001B18E0, FloatToDouble(pos[0]), FloatToDouble(pos[1]), FloatToDouble(pos[2]), FloatToDouble(vel[0]), FloatToDouble(vel[1]), FloatToDouble(vel[2]));
+        SpawnTintedEffects(moby, pos, 1, 0.0f, 1, vel, 3.0f, 0x50808040, 1.0f, 5.5f, 0);
+        func_003A0948(0, 0, moby);
     }
-    func_00350388(a0);
+    func_00350388(moby);
 }
 
 extern char *func_0029EFD0(int);
@@ -146,75 +147,76 @@ extern void func_0029FCC0(void *, int, void *);
 extern void func_002A0F48(char *);
 
 /* Spawns a chained segment from the record at +0x68 and recurses while length remains. */
-char *func_L06_004583A8(char *a0)
+char *func_L06_004583A8(char *moby)
 {
-    char *state = *(char **)(a0 + 0x68);
-    char *obj = 0;
-    char *child;
+    char *vars = *(char **)(moby + 0x68);
+    char *segment = 0;
+    char *segmentVars;
     float angle;
-    float d;
-    float len;
+    float dirTag;
+    float segLength;
 
-    if (*(float *)(state + 4) > 0.0f) {
-        obj = func_0029EFD0(0xFE2);
-        if (obj != 0) {
-            *(unsigned char *)(obj + 0x31) = 1;
-            *(unsigned char *)(obj + 0x30) = 0xFF;
-            *(short *)(obj + 0x32) = 0xFF;
-            *(unsigned char *)(obj + 0x20) = 1;
-            child = *(char **)(obj + 0x68);
-            *(float *)(obj + 0x2C) = *(float *)(a0 + 0x2C);
-            *(long *)(obj + 0x38) = *(long *)(a0 + 0x38);
-            *(char **)(child + 0x10) = a0;
-            *(int *)child = *(int *)state;
-            len = *(float *)(state + 0x1C);
-            *(float *)(child + 0x1C) = len;
-            *(float *)(child + 4) = *(float *)(state + 4) - len;
-            angle = func_00283B98(*(float *)(a0 + 0xF8), 3.1415927f);
-            *(float *)(child + 8) = angle;
-            qcopy(obj + 0xF0, a0 + 0xF0);
-            *(float *)(obj + 0xF8) = angle;
-            d = *(float *)(state + 0xC);
-            if (d == 0.0001f)
-                *(float *)(child + 0xC) = 1.0f;
-            else if (d == -0.0001f)
-                *(float *)(child + 0xC) = -1.0f;
-            else if (d == 1.0f)
-                *(float *)(child + 0xC) = -0.0001f;
-            else if (d == -1.0f)
-                *(float *)(child + 0xC) = 0.0001f;
-            func_0029FCC0(*(char **)(child + 0x10), 0, obj + 0x10);
-            func_002A0F48(obj);
-            if (*(float *)(child + 4) > 0.0f)
-                func_L06_004583A8(obj);
+    if (*(float *)(vars + 4) > 0.0f) {
+        segment = CreateMoby(0xFE2 /* moby class 4066 */);
+        if (segment != 0) {
+            *(unsigned char *)(segment + 0x31) = 1;
+            *(unsigned char *)(segment + 0x30) = 0xFF;
+            *(short *)(segment + 0x32) = 0xFF;
+            *(unsigned char *)(segment + 0x20) = 1;
+            segmentVars = *(char **)(segment + 0x68);
+            *(float *)(segment + 0x2C) = *(float *)(moby + 0x2C);
+            *(long *)(segment + 0x38) = *(long *)(moby + 0x38);
+            *(char **)(segmentVars + 0x10) = moby;
+            *(int *)segmentVars = *(int *)vars;
+            segLength = *(float *)(vars + 0x1C);
+            *(float *)(segmentVars + 0x1C) = segLength;
+            *(float *)(segmentVars + 4) = *(float *)(vars + 4) - segLength;
+            angle = FastAddRotations(*(float *)(moby + 0xF8), 3.1415927f);
+            *(float *)(segmentVars + 8) = angle;
+            qcopy(segment + 0xF0, moby + 0xF0);
+            *(float *)(segment + 0xF8) = angle;
+            dirTag = *(float *)(vars + 0xC);
+            if (dirTag == 0.0001f)
+                *(float *)(segmentVars + 0xC) = 1.0f;
+            else if (dirTag == -0.0001f)
+                *(float *)(segmentVars + 0xC) = -1.0f;
+            else if (dirTag == 1.0f)
+                *(float *)(segmentVars + 0xC) = -0.0001f;
+            else if (dirTag == -1.0f)
+                *(float *)(segmentVars + 0xC) = 0.0001f;
+            TransformMobyJointToWorld(*(char **)(segmentVars + 0x10), 0, segment + 0x10);
+            func_002A0F48(segment);
+            if (*(float *)(segmentVars + 4) > 0.0f)
+                SpawnChainedSegment(segment);
         }
     }
-    return obj;
+    return segment;
 }
 
 /* func_L06_004587E8 is defined in L06_004587E8-axis-g8.c. */
 
 
-void func_L06_00458F30(char *a0)
+/* Draws every active ribbon trail of the projectile, then its glowing sprite. */
+void func_L06_00458F30(char *moby)
 {
-    char *obj = *(char **)(a0 + 0x68);
-    char *p = D_L06_0025FFC0;
-    short *t2 = D_L06_001B37A0;
-    short *t1 = D_L06_001B3790;
+    char *vars = *(char **)(moby + 0x68);
+    char *trail = D_L06_0025FFC0;
+    short *alphaTimers = D_L06_001B37A0;
+    short *activeTimers = D_L06_001B3790;
     int i;
 
     for (i = 5; i >= 0; i--) {
-        if (*t1 != 0) {
-            float f = func_00283CE0(*t2);
-            int r = func_00283CF0(f);
+        if (*activeTimers != 0) {
+            float alphaFloat = IntToFloat(*alphaTimers);
+            int alpha = FloatToInt(alphaFloat);
 
-            func_L06_00459020(p + *(int *)(obj + 0x48) * 0x180, r, r, 4, 0.025f, 0.5f, 0.2f);
+            DrawNotakRibbonWithHalo(trail + *(int *)(vars + 0x48) * 0x180, alpha, alpha, 4, 0.025f, 0.5f, 0.2f);
         }
-        p += 0x40;
-        t2++;
-        t1++;
+        trail += 0x40;
+        alphaTimers++;
+        activeTimers++;
     }
-    func_L06_00459620(a0);
+    DrawFacingGlowSprite_L06(moby);
 }
 
 /* func_L06_00459020 is defined in L06_00458138-ribbon-g8.c. */
@@ -228,92 +230,95 @@ void func_L06_00459828(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    func_00282CF0(direction, (float *)D_L06_001B9840, pos);
-    func_00282F20((char *)offset, (char *)direction, 0.3f);
+    FastVecSub(direction, (float *)D_L06_001B9840, pos);
+    vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
     axis[1] = 0;
     axis[2] = 1.0f;
     axis[3] = 1.0f;
     for (i = 0; i < count; i++) {
-        size = func_002A7878(0.5f, 2.0f);
-        sign = func_002A77E0(2);
+        size = RandomFloatRange(0.5f, 2.0f);
+        sign = RandomIntBelow(2);
         if (!sign) sign--;
-        angle = func_002A7878(-1.0471977f, 1.0471977f);
-        func_002ACEC0(velocity, direction, axis, angle);
-        func_00282F20((char *)velocity, (char *)velocity, func_002A7878(0.05f, 3.0f) * 0.0166666675f);
-        velocity[2] = func_002A7878(1.0f, 5.0f) * 0.0166666675f;
-        func_00282CC0(origin, pos, offset);
-        pos[0] += func_002A78D8(0, 0.15f);
-        pos[1] += func_002A78D8(0, 0.15f);
-        pos[2] += func_002A78D8(0, 0.15f);
-        particle = func_002C2210(origin, 60, size * 0.1f, size, 0x7F801010, 0, sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
-        particle = func_002C2210(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        angle = RandomFloatRange(-1.0471977f, 1.0471977f);
+        ApplyAxisRotationToQuaternion(velocity, direction, axis, angle);
+        vec_scale_to_length((char *)velocity, (char *)velocity, RandomFloatRange(0.05f, 3.0f) * 0.0166666675f);
+        velocity[2] = RandomFloatRange(1.0f, 5.0f) * 0.0166666675f;
+        FastVecAdd(origin, pos, offset);
+        pos[0] += RandomSignedFloatRange(0, 0.15f);
+        pos[1] += RandomSignedFloatRange(0, 0.15f);
+        pos[2] += RandomSignedFloatRange(0, 0.15f);
+        particle = SpawnGroundEffectParticle(origin, 60, size * 0.1f, size, 0x7F801010, 0, sign, velocity, 0, 0.002f);
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
+        particle = SpawnGroundEffectParticle(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 
 
 extern float func_0032D788(void *, void *);
 
-void func_L06_00459B18(char *a0) {
+/* Fills in the length of each segment of a closed path of points. */
+void func_L06_00459B18(char *path) {
     int count;
     int i;
-    float f;
+    float length;
 
-    if (a0 == 0) {
+    if (path == 0) {
         return;
     }
-    count = *(int *)a0;
+    count = *(int *)path;
     i = 0;
     while (i < count) {
-        int off = i * 16;
+        int byteOffset = i * 16;
 
-        f = func_0032D788(a0 + (off + 16), a0 + (((i + 1) % count) * 16 + 0x10));
-        *(float *)(a0 + off + 0x1C) = f;
+        length = func_0032D788(path + (byteOffset + 16), path + (((i + 1) % count) * 16 + 0x10));
+        *(float *)(path + byteOffset + 0x1C) = length;
         i++;
-        count = *(int *)a0;
+        count = *(int *)path;
     }
 }
 
-int func_L06_00459BA8(char *a0, char *a1)
+/* Works out how much room there is above the object and returns a size class (0, 1 or 2). */
+int func_L06_00459BA8(char *moby, char *vars)
 {
-    float f = func_002A8A20(a0 + 0x10);
-    float t;
+    float height = GetGroundHeightUnderObject(moby + 0x10);
+    float gap;
 
-    *(float *)(a1 + 0x120) = f;
-    t = *(float *)(*(char **)(a1 + 0x11C)) - f;
-    *(float *)(a1 + 0x128) = f + t * 0.5f;
-    if (t < 0.41f) {
+    *(float *)(vars + 0x120) = height;
+    gap = *(float *)(*(char **)(vars + 0x11C)) - height;
+    *(float *)(vars + 0x128) = height + gap * 0.5f;
+    if (gap < 0.41f) {
         return 2;
     }
-    if (0.68f < t) {
+    if (0.68f < gap) {
         return 0;
     }
     return 1;
 }
 
-void func_L06_00459C38(unsigned char *a0)
+/* Starts the animation and state that match the object's size class. */
+void func_L06_00459C38(unsigned char *moby)
 {
-    switch (a0[0xBC]) {
+    switch (moby[0xBC]) {
     case 0:
-        if (a0[0x43] != 0) {
-            func_002A7470((char *)a0, 0, 0, 0xA);
+        if (moby[0x43] != 0) {
+            StartAnimationBlended((char *)moby, 0, 0, 0xA);
         }
-        a0[0x20] = 1;
+        moby[0x20] = 1;
         break;
     case 1:
-        if (a0[0x43] != 3) {
-            func_002A7470((char *)a0, 3, 0, 0xA);
+        if (moby[0x43] != 3) {
+            StartAnimationBlended((char *)moby, 3, 0, 0xA);
         }
-        a0[0x20] = 7;
+        moby[0x20] = 7;
         break;
     case 2:
-        if (a0[0x43] != 9) {
-            func_002A7470((char *)a0, 9, 0, 0xA);
+        if (moby[0x43] != 9) {
+            StartAnimationBlended((char *)moby, 9, 0, 0xA);
         }
-        a0[0x20] = 0xF;
+        moby[0x20] = 0xF;
         break;
     }
 }
@@ -343,74 +348,76 @@ found:
     *(float *)(st + 0x12C) = ang;
     return;
 search:
-    dir[0] = func_00283180(*(float *)(obj + 0xF8)) * 5.2f;
-    dir[1] = func_00283198(*(float *)(obj + 0xF8)) * 5.2f;
+    dir[0] = FastSinOrCosA(*(float *)(obj + 0xF8)) * 5.2f;
+    dir[1] = FastSinOrCosB(*(float *)(obj + 0xF8)) * 5.2f;
     dir[2] = 0.0f;
-    func_00282CC0(dir, dir, obj + 0x10);
+    FastVecAdd(dir, dir, obj + 0x10);
     p = *(char **)(st + 0x118);
-    if (func_002A8AF0(dir, p + 0x10, *(int *)p) != 0 &&
-        func_002761F8(obj + 0x10, dir, 0x24, obj, 0) == 0 &&
-        func_00277258(dir, 0x24, obj, 1.5f) == 0)
+    if (point_in_path_xy(dir, p + 0x10, *(int *)p) != 0 &&
+        CollLine(obj + 0x10, dir, 0x24, obj, 0) == 0 &&
+        TestPointAgainstCollision(dir, 0x24, obj, 1.5f) == 0)
         return;
-    step = func_00282C48(*(float *)(st + 0x130));
+    step = FloatAbs(*(float *)(st + 0x130));
     ang = *(float *)(obj + 0xF8);
     total = 0.0f;
     do {
-        ang = func_00283B98(ang, *(float *)(st + 0x130));
-        dir[0] = func_00283180(ang) * 5.2f;
-        dir[1] = func_00283198(ang) * 5.2f;
+        ang = FastAddRotations(ang, *(float *)(st + 0x130));
+        dir[0] = FastSinOrCosA(ang) * 5.2f;
+        dir[1] = FastSinOrCosB(ang) * 5.2f;
         dir[2] = 0.0f;
-        func_00282CC0(dir, dir, obj + 0x10);
+        FastVecAdd(dir, dir, obj + 0x10);
         p = *(char **)(st + 0x118);
-        if (func_002A8AF0(dir, p + 0x10, *(int *)p) == 0 ||
-            func_002761F8(obj + 0x10, dir, 0x24, obj, 0) != 0 ||
-            func_00277258(dir, 0x24, obj, 1.5f) != 0) {
+        if (point_in_path_xy(dir, p + 0x10, *(int *)p) == 0 ||
+            CollLine(obj + 0x10, dir, 0x24, obj, 0) != 0 ||
+            TestPointAgainstCollision(dir, 0x24, obj, 1.5f) != 0) {
             total += step;
             continue;
         }
         goto found;
     } while (total < 6.283186f);
 fallback:
-    *(float *)(st + 0x12C) = func_00283248(*(float *)(st + 0xE0) - *(float *)(obj + 0x10),
+    *(float *)(st + 0x12C) = FastMatrixHelperA(*(float *)(st + 0xE0) - *(float *)(obj + 0x10),
                                          *(float *)(st + 0xE4) - *(float *)(obj + 0x14));
 }
 
-void func_L06_0045A0D0(char *a0, char *a1, float f, float g, float h)
+/* Moves the object using its stored speed, pulls it down when it is high, and slows it after a bump. */
+void func_L06_0045A0D0(char *moby, char *vars, float f, float g, float h)
 {
-    char buf[16];
-    char *q = a1;
+    char position[16];
+    char *varsAlias = vars;
 
-    if (*(float *)(*(char **)(a1 + 0x11C)) - 0.3f < *(float *)(a0 + 0x18)) {
-        *(float *)(a1 + 0xC8) -= 0.163333335f;
+    if (*(float *)(*(char **)(vars + 0x11C)) - 0.3f < *(float *)(moby + 0x18)) {
+        *(float *)(vars + 0xC8) -= 0.163333335f;
     }
-    qcopy(buf, a0 + 0x10);
-    func_002AA548(buf + 8, q + 0xC8, *(float *)(q + 0x128), f, g, h);
-    if (func_L04_0033CB08(a0, q + 0xC0, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-        func_00282D30(q + 0xC0, q + 0xC0, 0.5f);
+    qcopy(position, moby + 0x10);
+    StepValueTowardTarget(position + 8, varsAlias + 0xC8, *(float *)(varsAlias + 0x128), f, g, h);
+    if (BlendWithScaledCount(moby, varsAlias + 0xC0, 0x400, 0x10, 1.0f, 0.0f) != 0) {
+        FastVecScale(varsAlias + 0xC0, varsAlias + 0xC0, 0.5f);
     }
 }
 
-int func_L06_0045A1B0(char *a0, char *a1, float p1, float p2, float p3, float p4, float p5,
+/* Speeds up or slows down the object depending on how closely it faces a direction; returns 1 when speeding up. */
+int func_L06_0045A1B0(char *moby, char *vars, float p1, float p2, float p3, float p4, float p5,
                       float p6, float p7)
 {
-    float x = func_00282E20(a1 + 0xC0);
-    float y = func_00283C80(*(float *)(a0 + 0xF8), p1);
-    int r = 0;
+    float speed = vec_length_xy(vars + 0xC0);
+    float angleDiff = FastDiffRots(*(float *)(moby + 0xF8), p1);
+    int speedingUp = 0;
 
-    if (y < p2) {
-        x += p3;
-        r = 1;
-    } else if (p4 < y) {
-        x -= p5;
+    if (angleDiff < p2) {
+        speed += p3;
+        speedingUp = 1;
+    } else if (p4 < angleDiff) {
+        speed -= p5;
     }
-    if (p6 < x) {
-        x = p6;
-    } else if (x < p7) {
-        x = p7;
+    if (p6 < speed) {
+        speed = p6;
+    } else if (speed < p7) {
+        speed = p7;
     }
-    *(float *)(a1 + 0xC0) = func_00283180(*(float *)(a0 + 0xF8)) * x;
-    *(float *)(a1 + 0xC4) = func_00283198(*(float *)(a0 + 0xF8)) * x;
-    return r;
+    *(float *)(vars + 0xC0) = FastSinOrCosA(*(float *)(moby + 0xF8)) * speed;
+    *(float *)(vars + 0xC4) = FastSinOrCosB(*(float *)(moby + 0xF8)) * speed;
+    return speedingUp;
 }
 
 extern float func_0029F530(char *);
@@ -425,20 +432,20 @@ void func_L06_0045A2D8(char *obj, float lo, char *self, float hi, int kind, int 
     float dir[4] __attribute__((aligned(16)));
     char aim[0x30] __attribute__((aligned(16)));
     float probe[4] __attribute__((aligned(16)));
-    float roll = func_0029F530(obj);
+    float roll = GetMobyAnimationValue(obj);
     char *vec;
 
     if (*(u8 *)(obj + 0x20) == kind && *(u8 *)(obj + 0x42) == sub && lo < roll && roll < hi) {
         vec = self + 0xC0;
-        func_00282F20((char *)dir, vec, scale);
+        vec_scale_to_length((char *)dir, vec, scale);
         dir[2] = 1.0f;
-        func_002A8C00(aim, obj, 1, dir, reach);
+        make_hit_descriptor(aim, obj, 1, dir, reach);
         func_003514C8(obj, 0, probe);
-        if (func_00277F48(probe, range, 0x21, obj, aim) != 0 && D_L06_001BFC98 == tag) {
-            func_00282D30(vec, vec, -1.0f);
+        if (ProcessCollisionHit(probe, range, 0x21, obj, aim) != 0 && D_L06_001BFC98 == tag) {
+            FastVecScale(vec, vec, -1.0f);
             *(float *)(self + 0xC8) = -0.05f;
             if (*(u8 *)(obj + 0x43) != anim)
-                func_002A7470(obj, anim, link, 5);
+                StartAnimationBlended(obj, anim, link, 5);
             *(u8 *)(obj + 0x20) = next;
         }
     }
@@ -450,94 +457,98 @@ extern int func_0031EBF8(f32, void *, int, void *);
 
 extern void *D_L06_001BFC98;
 
-int func_L06_0045A490(void *a0, void *a1, f32 f12) {
-    char buf[16];
-    int r;
+/* Checks whether a short probe from the object hits the given thing; returns 1 if it does. */
+int func_L06_0045A490(void *moby, void *expected, f32 reach) {
+    char probe[16];
+    int hitResult;
 
-    func_003514C8(a0, 0, buf);
-    r = func_0031EBF8(f12, buf, 0x21, a0);
-    if (r != 0) {
-        if (D_L06_001BFC98 == a1) {
+    func_003514C8(moby, 0, probe);
+    hitResult = func_0031EBF8(reach, probe, 0x21, moby);
+    if (hitResult != 0) {
+        if (D_L06_001BFC98 == expected) {
             return 1;
         }
     }
     return 0;
 }
 
-int func_L06_0045A500(char *a0, int a1, int a2)
+/* Returns 1 if another object of the same group is in a state between the two given values. */
+int func_L06_0045A500(char *moby, int minState, int maxState)
 {
     char *found = 0;
 
-    if (func_002A8600(&found, *(unsigned char *)(a0 + 0x21), 0, 0) != 0) {
+    if (GetFirstMobyInGroup(&found, *(unsigned char *)(moby + 0x21), 0, 0) != 0) {
         return 0;
     }
     while (found != 0) {
-        if (found != a0) {
-            int v = *(unsigned char *)(found + 0x20);
+        if (found != moby) {
+            int otherState = *(unsigned char *)(found + 0x20);
 
-            if (v >= a1) {
-                if (v <= a2) {
+            if (otherState >= minState) {
+                if (otherState <= maxState) {
                     return 1;
                 }
             }
         }
-        if (func_002A86E8(&found, found, 0, 0) != 0) {
+        if (GetNextMobyInGroup(&found, found, 0, 0) != 0) {
             return 0;
         }
     }
     return 0;
 }
 
-void func_L06_0045BD38(char *a0)
+/* When hit, bursts into a spray of pieces and removes itself. */
+void func_L06_0045BD38(char *moby)
 {
-    char *p;
-    int n;
+    char *hit;
+    int count;
 
-    if (*(unsigned char *)(a0 + 0x20) == 0) {
-        *(unsigned char *)(a0 + 0x20) = 1;
-        *(unsigned short *)(a0 + 0x34) |= 0x800;
+    if (*(unsigned char *)(moby + 0x20) == 0) {
+        *(unsigned char *)(moby + 0x20) = 1;
+        *(unsigned short *)(moby + 0x34) |= 0x800;
     }
 
-    p = (char *)func_0035CBA0(a0, 0x4010000, 0);
-    if (p != 0 && *(short *)(*(char **)(p + 0x20) + 0xAA) != 0xFE5) {
-        n = 3;
+    hit = (char *)func_0035CBA0(moby, 0x4010000, 0);
+    if (hit != 0 && *(short *)(*(char **)(hit + 0x20) + 0xAA) != 0xFE5 /* moby class 4069 */) {
+        count = 3;
         if (D_L06_001B234C < 0.8999999761581421f && D_001B2350 < 0.8999999761581421f)
-            n = 0xE;
+            count = 0xE;
 
-        func_L06_0045BE30(a0, n, 0.0f, 3.263000011444092f, 1.9739999771118164f,
+        func_L06_0045BE30(moby, count, 0.0f, 3.263000011444092f, 1.9739999771118164f,
                           0.11666667461395264f);
-        func_003A0948(0, 0, a0);
-        func_00350388(a0);
+        func_003A0948(0, 0, moby);
+        func_00350388(moby);
     } else {
-        *(unsigned char *)(a0 + 0xA8) = 0xFF;
+        *(unsigned char *)(moby + 0xA8) = 0xFF;
     }
 }
 
-void func_L06_0045BFC0(unsigned char *a0)
+/* Waits until hit, then bursts into fragments and removes itself. */
+void func_L06_0045BFC0(unsigned char *moby)
 {
-    char *o = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        *(unsigned short *)(a0 + 0x34) |= 0x800;
-        func_002A7750((char *)a0, 1, -1);
+        *(unsigned short *)(moby + 0x34) |= 0x800;
+        SetMobyState((char *)moby, 1, -1);
         break;
     case 1:
-        if (func_002A9640((char *)a0, 0x4010000, 0) != 0) {
-            if (*(int *)o == 0) {
-                func_002A7750((char *)a0, 2, -1);
+        if (FindOwnedEffectSlot((char *)moby, 0x4010000, 0) != 0) {
+            if (*(int *)vars == 0) {
+                SetMobyState((char *)moby, 2, -1);
             }
         }
-        a0[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2: {
-        char tmp[16];
+        char offset[16];
 
-        func_00282D30(tmp, (char *)(a0 + 0xD0), -0.033333335f);
-        func_L06_00457C00((char *)a0, 3, tmp, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_002E5CF8(0, 0, (char *)a0);
-        func_L00_00326110((char *)a0, 1, 0.0f);
-        func_0029F338((char *)a0);
+        FastVecScale(offset, (char *)(moby + 0xD0), -0.033333335f);
+        SpawnDebrisParticles((char *)moby, 3, offset, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        PlayMobySound(0, 0, (char *)moby);
+        SpawnScaledBolts((char *)moby, 1, 0.0f);
+        MarkMobySpawned((char *)moby);
         break;
     }
     }
@@ -546,135 +557,138 @@ void func_L06_0045BFC0(unsigned char *a0)
 /* Looks up the object bound to the given flags; unless the hit object's own field says
    0xFE5, it starts a smoke emitter, spawns one particle with the level's own callback
    and six more in a loop, then clears the object's byte at 0xA8. */
-void func_L06_0045C0F0(char *a0)
+void func_L06_0045C0F0(char *moby)
 {
     char *hit;
-    char *p;
-    float local[3];
+    char *piece;
+    float velocity[3];
     int i;
 
-    hit = (char *)func_002A9640(a0, 0x4010001, 0);
-    if (hit != 0 && *(short *)(*(char **)(hit + 0x20) + 0xAA) != 0xFE5) {
-        func_002E5CF8(0, 0, a0);
-        func_002ABBB8(a0, a0 + 0x10, 0, 10, 3, 9, -1, 1, 1, -1, 0, 0x810001,
+    hit = (char *)FindOwnedEffectSlot(moby, 0x4010001, 0);
+    if (hit != 0 && *(short *)(*(char **)(hit + 0x20) + 0xAA) != 0xFE5 /* moby class 4069 */) {
+        PlayMobySound(0, 0, moby);
+        SpawnExplosionEffects(moby, moby + 0x10, 0, 10, 3, 9, -1, 1, 1, -1, 0, 0x810001,
                       0.0f, 0.0f, 4.0f, 2.0f, 9.0f, 0.0f, 15.0f);
-        func_002A7A00(local, 0.0333333350718021392822265625f, 0.066666670143604278564453125f);
-        local[2] = func_00282C48(local[2]);
-        p = func_00273730(a0, 1, *(short *)(a0 + 0xAA), 6, a0 + 0x10, a0 + 0xF0,
-                          local, 1, func_002A78D8(20.0f, 45.0f), 15.0f);
-        if (p != 0) {
-            *(void (**)(void))(p + 0x64) = (void (*)(void))func_L06_0045C350;
+        RandomDirectionVector(velocity, 0.0333333350718021392822265625f, 0.066666670143604278564453125f);
+        velocity[2] = FloatAbs(velocity[2]);
+        piece = CreateCameraMoby(moby, 1, *(short *)(moby + 0xAA), 6, moby + 0x10, moby + 0xF0,
+                          velocity, 1, RandomSignedFloatRange(20.0f, 45.0f), 15.0f);
+        if (piece != 0) {
+            *(void (**)(void))(piece + 0x64) = (void (*)(void))UpdateFlyingFragmentMoby;
         }
         for (i = 0; i < 6; i++) {
-            func_002A7A00(local, 0.10000000894069671630859375f, 0.2000000178813934326171875f);
-            local[2] = func_00282C48(local[2]);
-            func_00273730(a0, 2, *(short *)(a0 + 0xAA), i, a0 + 0x10, a0 + 0xF0,
-                          local, 0xFF, func_002A78D8(20.0f, 45.0f),
-                          func_002A7878(15.0f, 25.0f));
+            RandomDirectionVector(velocity, 0.10000000894069671630859375f, 0.2000000178813934326171875f);
+            velocity[2] = FloatAbs(velocity[2]);
+            CreateCameraMoby(moby, 2, *(short *)(moby + 0xAA), i, moby + 0x10, moby + 0xF0,
+                          velocity, 0xFF, RandomSignedFloatRange(20.0f, 45.0f),
+                          RandomFloatRange(15.0f, 25.0f));
         }
-        func_002E5CF8(1, 0, a0);
-        func_L00_00326110(a0, 1, 0.0f);
-        func_0029F338(a0);
+        PlayMobySound(1, 0, moby);
+        SpawnScaledBolts(moby, 1, 0.0f);
+        MarkMobySpawned(moby);
     }
-    *(unsigned char *)(a0 + 0xA8) = 0xFF;
+    *(unsigned char *)(moby + 0xA8) = 0xFF;
 }
 
-void func_L06_0045C350(unsigned char *a0)
+/* Updates a flying fragment: it flies until it lands, then fades out and disappears. */
+void func_L06_0045C350(unsigned char *moby)
 {
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        if (func_00273B70((char *)a0) != 0) {
-            func_002A7750((char *)a0, 1, -1);
-            *(unsigned short *)(a0 + 0x34) |= 0x2800;
+        if (UpdateCameraMoby((char *)moby) != 0) {
+            SetMobyState((char *)moby, 1, -1);
+            *(unsigned short *)(moby + 0x34) |= 0x2800;
         }
         break;
     case 1:
-        func_00273B70((char *)a0);
-        if (a0[0x23] < 2) {
-            func_0029F338((char *)a0);
+        UpdateCameraMoby((char *)moby);
+        if (moby[0x23] < 2) {
+            MarkMobySpawned((char *)moby);
         } else {
-            a0[0x23] -= 2;
+            moby[0x23] -= 2;
         }
         break;
     }
 }
 
-void func_L06_0045C3E8(char *a0)
+/* Updates an emitter that rests, then spits particles while the hero is near, and bursts when hit. */
+void func_L06_0045C3E8(char *moby)
 {
-    char *state = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     char *hit;
     float pos[4];
-    *(unsigned char *)(a0 + 0x23) = 0x80;
-    if (!state) {
+    *(unsigned char *)(moby + 0x23) = 0x80;
+    if (!vars) {
         return;
     }
-    hit = (char *)func_0035CBA0(a0, 0x4010000, 0);
-    if (hit && *(short *)(*(char **)(hit + 0x20) + 0xAA) != 0xFE5) {
-        if (*(unsigned char *)(a0 + 0x20) == 1) {
-            func_002A8598(*(unsigned char *)(a0 + 0x21), 0);
+    hit = (char *)func_0035CBA0(moby, 0x4010000, 0);
+    if (hit && *(short *)(*(char **)(hit + 0x20) + 0xAA) != 0xFE5 /* moby class 4069 */) {
+        if (*(unsigned char *)(moby + 0x20) == 1) {
+            SetByteOnGroupMobys(*(unsigned char *)(moby + 0x21), 0);
         }
-        func_003A0948(1, 0, a0);
+        func_003A0948(1, 0, moby);
         *(NotakQuad *)pos = 0;
         pos[2] = 1.0f;
-        func_00282CC0(pos, pos, a0 + 0x10);
-        func_0032C700(pos, 1, 25, 20, 20, 20, 45, 1, 1.25f, 20.0f, 1, 1, 0, 0);
-        func_002B0A68(a0, 0x7F, D_L06_001A8F20, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_L00_00326110(a0, 1, 0.0f);
-        func_00350388(a0);
+        FastVecAdd(pos, pos, moby + 0x10);
+        SpawnExplosion(pos, 1, 25, 20, 20, 20, 45, 1, 1.25f, 20.0f, 1, 1, 0, 0);
+        SpawnDebrisForMaskedParts(moby, 0x7F, D_L06_001A8F20, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        SpawnScaledBolts(moby, 1, 0.0f);
+        func_00350388(moby);
     }
-    switch (*(unsigned char *)(a0 + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(unsigned char *)(a0 + 0x23) = 0x80;
-        *(int *)state = func_002A7820(40, 250);
-        a0[0x20] = 2;
-        *(int *)(state + 8) = -1;
+        *(unsigned char *)(moby + 0x23) = 0x80;
+        *(int *)vars = RandomIntRange(40, 250);
+        moby[0x20] = 2;
+        *(int *)(vars + 8) = -1;
         break;
     case 1:
-        if (func_00282E80(a0 + 0x10, D_00189EA0) < 32.0f) {
-            func_L06_0045C6D0(a0);
+        if (vec_distance_xy(moby + 0x10, gHeroPosition) < 32.0f) {
+            EmitFacingParticles(moby);
         }
-        if (func_00282948(state + 4)) {
-            *(int *)state = func_002A7820(200, 250);
-            if (*(int *)(state + 8) != -1) {
-                char *snd = D_00188660 + *(int *)(state + 8) * 0x70;
-                if (*(char **)(snd + 0x88) == a0 && *(unsigned char *)(snd + 0x74)) {
-                    func_002E59F8(*(int *)(state + 8));
+        if (FastFloatHelperD(vars + 4)) {
+            *(int *)vars = RandomIntRange(200, 250);
+            if (*(int *)(vars + 8) != -1) {
+                char *sound = gSoundState + *(int *)(vars + 8) * 0x70;
+                if (*(char **)(sound + 0x88) == moby && *(unsigned char *)(sound + 0x74)) {
+                    StopSoundVoice(*(int *)(vars + 8));
                 }
             }
-            *(int *)(state + 8) = -1;
-            a0[0x20] = 2;
-            func_002A8598(*(unsigned char *)(a0 + 0x21), 0);
+            *(int *)(vars + 8) = -1;
+            moby[0x20] = 2;
+            SetByteOnGroupMobys(*(unsigned char *)(moby + 0x21), 0);
         }
         break;
     case 2:
-        if (func_00282948(state) && *(unsigned char *)(a0 + 0xBC) == 0) {
-            char *snd;
-            *(int *)(state + 4) = func_002A7820(200, 250);
-            snd = D_00188660 + *(int *)(state + 8) * 0x70;
-            if (*(char **)(snd + 0x88) != a0 || !*(unsigned char *)(snd + 0x74)) {
-                *(int *)(state + 8) = func_003A0948(0, 4, a0);
+        if (FastFloatHelperD(vars) && *(unsigned char *)(moby + 0xBC) == 0) {
+            char *sound;
+            *(int *)(vars + 4) = RandomIntRange(200, 250);
+            sound = gSoundState + *(int *)(vars + 8) * 0x70;
+            if (*(char **)(sound + 0x88) != moby || !*(unsigned char *)(sound + 0x74)) {
+                *(int *)(vars + 8) = func_003A0948(0, 4, moby);
             }
-            a0[0x20] = 1;
-            func_002A8598(*(unsigned char *)(a0 + 0x21), 1);
+            moby[0x20] = 1;
+            SetByteOnGroupMobys(*(unsigned char *)(moby + 0x21), 1);
         }
         break;
     }
-    *(unsigned char *)(a0 + 0xA8) = 0xFF;
+    *(unsigned char *)(moby + 0xA8) = 0xFF;
 }
 
 /* func_L06_004621C8 is defined in L06_00458138-effect-g8.c. */
 
-void func_L06_00464900(char *a0)
+/* Waits for a linked object to reach state 2, then fires a trigger and follows that object's state. */
+void func_L06_00464900(char *moby)
 {
-    char *o = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    switch (*(unsigned char *)(a0 + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(unsigned char *)(a0 + 0x30) = 0xFF;
-        *(unsigned char *)(a0 + 0x20) = 1;
+        *(unsigned char *)(moby + 0x30) = 0xFF;
+        *(unsigned char *)(moby + 0x20) = 1;
         break;
     case 1: {
-        int i = *(int *)(o + 4);
+        int i = *(int *)(vars + 4);
         char *base = (char *)D_L06_001B281C;
         char *p = (char *)(base + (i << 8));
         int t = *(unsigned char *)(p + 0x20);
@@ -684,7 +698,7 @@ void func_L06_00464900(char *a0)
         if (t != 2) {
             break;
         }
-        j = *(int *)(o + 8);
+        j = *(int *)(vars + 8);
         q = (char *)(base + (j << 8));
         if (q == 0) {
             break;
@@ -695,16 +709,16 @@ void func_L06_00464900(char *a0)
         if (*(unsigned char *)(q + 0x20) == 0xFD) {
             break;
         }
-        func_L00_00429020(*(int *)o);
-        *(unsigned char *)(a0 + 0x20) = t;
+        LockCameraEntry(*(int *)vars);
+        *(unsigned char *)(moby + 0x20) = t;
         break;
     }
     case 2: {
-        int i = *(int *)(o + 4);
+        int i = *(int *)(vars + 4);
         char *p = (char *)(D_L06_001B281C + (i << 8));
 
         if (*(unsigned char *)(p + 0x20) != 2) {
-            *(unsigned char *)(a0 + 0x20) = 1;
+            *(unsigned char *)(moby + 0x20) = 1;
         }
         break;
     }
@@ -716,19 +730,20 @@ void func_L06_00464900(char *a0)
 /* func_L06_00464F40 is defined in L06_00464F40-g8.c. */
 
 
-void func_L06_00478548(float a, float b)
+/* Stores two values in the settings block of the object of kind 5, finding that object first if needed. */
+void func_L06_00478548(float valueA, float valueB)
 {
-    char *g = D_L06_001B9890[0];
-    char *p;
-    char *v;
+    char *first = D_L06_001B9890[0];
+    char *target;
+    char *settings;
 
-    if (*(short *)(g + 0x86) != 5) {
-        p = func_00270280(5);
+    if (*(short *)(first + 0x86) != 5) {
+        target = FindRecordByHandleId(5);
     } else {
-        p = g;
+        target = first;
     }
-    v = *(char **)(p + 0x70) + 0xE0;
-    *(float *)(v + 0x44) = a;
-    *(float *)(v + 0x48) = b;
+    settings = *(char **)(target + 0x70) + 0xE0;
+    *(float *)(settings + 0x44) = valueA;
+    *(float *)(settings + 0x48) = valueB;
 }
 

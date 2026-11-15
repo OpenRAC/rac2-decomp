@@ -83,190 +83,191 @@ extern void func_L00_002B8E48(void *, void *);
 extern void func_L00_002D3638(void *, float, float, float, int);
 extern float func_00282C48(float);
 
+/* Finds the ground under the hero, and records its slope, height and what it is made of. It also checks the ground at the sides. */
 void func_L00_002B4900(void) {
-    Vec4 v0, v10, v20, v30, v40, v50, v60;
-    s32 r;
+    Vec4 rayEnd, rayStart, scratchVec, sideStart, sideEnd, sideSlope, sideNormal;
+    s32 surfaceType;
     s32 i;
-    f32 a;
-    u8 *p;
+    f32 angle;
+    u8 *data;
     Vec4 *normal;
     HeroGround *hero;
 
-    s32 k;
-    f32 g;
+    s32 probeMode;
+    f32 probeDepth;
 
-    D_00189E20.xF278 = 1.0f;
-    D_00189E20.u30e.U++;
-    D_00189E20.u30c.U++;
-    D_00189E20.xI270 = 0;
-    D_00189E20.xI274 = 0;
-    D_00189E20.u2e0.I = 0;
-    D_00189E20.u2d8.I = 0;
-    func_00282C88((u8 *)&D_00189E20 + 0x2D0);
-    D_00189E20.xH30a = 0;
-    D_00189E20.xF2dc = 32.0f;
-    D_00189E20.xI2fc = 0;
-    if (D_00189E20.xI2f8 != 0) {
-        D_00189E20.xI2f8++;
+    gHeroState.xF278 = 1.0f;
+    gHeroState.u30e.U++;
+    gHeroState.u30c.U++;
+    gHeroState.xI270 = 0;
+    gHeroState.xI274 = 0;
+    gHeroState.u2e0.I = 0;
+    gHeroState.u2d8.I = 0;
+    ClearVector128((u8 *)&gHeroState + 0x2D0);
+    gHeroState.xH30a = 0;
+    gHeroState.xF2dc = 32.0f;
+    gHeroState.xI2fc = 0;
+    if (gHeroState.xI2f8 != 0) {
+        gHeroState.xI2f8++;
     }
-    k = 1;
-    g = D_00189E20.xF234 * 2.2f;
-    if (D_00189E20.xI208c == 2) {
-        g = D_00189E20.xF234 * 2.9f;
+    probeMode = 1;
+    probeDepth = gHeroState.xF234 * 2.2f;
+    if (gHeroState.xI208c == 2) {
+        probeDepth = gHeroState.xF234 * 2.9f;
     }
-    if (func_L00_002ADF80()) g = 0.0f;
-    func_L00_002B47A8(&v10, &v0, k, g, -48.0f);
-    if (func_002761F8(&v10, &v0, 2, D_00189E20.xI2080, 0) == 0) {
+    if (IsHeroInSpecialKindOrMode()) probeDepth = 0.0f;
+    BuildOffsetVectorPair(&rayStart, &rayEnd, probeMode, probeDepth, -48.0f);
+    if (CollLine(&rayStart, &rayEnd, 2, gHeroState.xI2080, 0) == 0) {
         goto tail;
     }
-    r = func_L00_002E2048();
+    surfaceType = func_L00_002E2048();
 
-    D_00189E20.xB12ed = r;
-    if (D_L00_001BF200.i18 != 0) D_00189E20.xB12ed = 0;
-    if (D_001A79F0 == 7 && D_L00_001BF200.i18 != 0) D_00189E20.xB12ed = 1;
-    D_00189E20.xH12e0 = func_00278E78();
-    if (D_00189E20.xH12e0 == 0) {
-        D_00189E20.xF2f0 = func_002A90F8(D_L00_001BF220, (u8 *)&D_00189E20 + 0x2B0);
-        if (D_00189E20.xF88 < D_00189E20.xF2f0 && D_00189E20.xI2f8 <= 0) {
-            D_00189E20.xI2f8 = 1;
+    gHeroState.xB12ed = surfaceType;
+    if (gCollisionResult.i18 != 0) gHeroState.xB12ed = 0;
+    if (gCurrentMapIndex == 7 && gCollisionResult.i18 != 0) gHeroState.xB12ed = 1;
+    gHeroState.xH12e0 = GetCollHitMaterial();
+    if (gHeroState.xH12e0 == 0) {
+        gHeroState.xF2f0 = GetGroundHeightAtPosition(D_L00_001BF220, (u8 *)&gHeroState + 0x2B0);
+        if (gHeroState.xF88 < gHeroState.xF2f0 && gHeroState.xI2f8 <= 0) {
+            gHeroState.xI2f8 = 1;
         }
-        if (func_002761F8(&v10, &v0, 0x24, D_00189E20.xI2080, 0) == 0) {
+        if (CollLine(&rayStart, &rayEnd, 0x24, gHeroState.xI2080, 0) == 0) {
             goto tail;
         }
-        r = func_L00_002E2048();
-        D_00189E20.xB12ed = r;
+        surfaceType = func_L00_002E2048();
+        gHeroState.xB12ed = surfaceType;
     }
-    if (D_00189E20.xH12e0 == 0xD) {
-        D_00189E20.xF2f0 = D_L00_001BF200.v20.f[2];
-        v10.f[2] = D_L00_001BF200.v20.f[2] - 0.01f;
-        if (func_002761F8(&v10, &v0, 4, D_00189E20.xI2080, 0) == 0) {
-            goto tail;
-        }
-    }
-    if (D_00189E20.xH12e0 == 3) {
-        D_00189E20.xF2f4 = D_L00_001BF200.v20.f[2];
-        v10.f[2] = D_L00_001BF200.v20.f[2] - 0.01f;
-        if (func_002761F8(&v10, &v0, 4, D_00189E20.xI2080, 0) == 0) {
+    if (gHeroState.xH12e0 == 0xD) {
+        gHeroState.xF2f0 = gCollisionResult.v20.f[2];
+        rayStart.f[2] = gCollisionResult.v20.f[2] - 0.01f;
+        if (CollLine(&rayStart, &rayEnd, 4, gHeroState.xI2080, 0) == 0) {
             goto tail;
         }
     }
-    if (D_00189E20.xH12e0 == 0xB) {
-        D_00189E20.xF2f4 = D_L00_001BF200.v20.f[2];
+    if (gHeroState.xH12e0 == 3) {
+        gHeroState.xF2f4 = gCollisionResult.v20.f[2];
+        rayStart.f[2] = gCollisionResult.v20.f[2] - 0.01f;
+        if (CollLine(&rayStart, &rayEnd, 4, gHeroState.xI2080, 0) == 0) {
+            goto tail;
+        }
+    }
+    if (gHeroState.xH12e0 == 0xB) {
+        gHeroState.xF2f4 = gCollisionResult.v20.f[2];
         goto tail;
     }
-    if (D_00189E20.xH12e0 == 1 && (u32)(D_00189E20.xI2084 - 0x79) < 2) {
+    if (gHeroState.xH12e0 == 1 && (u32)(gHeroState.xI2084 - 0x79) < 2) {
         goto tail;
     }
-    if (D_L00_001BF200.i18 != 0) {
-        if (func_002ABB78(D_L00_001BF200.i18)) {
-            D_00189E20.xH30a = 1;
+    if (gCollisionResult.i18 != 0) {
+        if (IsMobyInSpecialClassRange(gCollisionResult.i18)) {
+            gHeroState.xH30a = 1;
         }
-        p = func_002AB1F0(D_L00_001BF200.i18);
-        if (p != 0 && (*(u16 *)(p + 0x1E) & 8)) {
-            D_00189E20.xH30a = 1;
+        data = GetMobyPrivateValue0(gCollisionResult.i18);
+        if (data != 0 && (*(u16 *)(data + 0x1E) & 8)) {
+            gHeroState.xH30a = 1;
         }
-        p = func_002AD0B0(D_L00_001BF200.i18);
-        if (p != 0 && (*(int *)(p + 0x3c) & 8)) D_00189E20.xH30a = 1;
+        data = GetMobyPrivateValue2(gCollisionResult.i18);
+        if (data != 0 && (*(int *)(data + 0x3c) & 8)) gHeroState.xH30a = 1;
     }
-    if (D_L00_001BF200.i1C > 0) {
-        qcopy((u8 *)&D_00189E20 + 0x2D0, &D_L00_001BF200.v20);
-        D_00189E20.u2d8.F = D_L00_001BF200.v20.f[2];
-        if (D_001A8FF0) D_00189E20.u2d8.F = func_002B0360(&D_L00_001BF200.v20);
-        D_00189E20.xF2dc = func_00282E48((u8 *)&D_00189E20 + 0x80, ((u8 *)&D_00189E20 + 0x2D0));
-        D_00189E20.xI2fc = D_L00_001BF200.i18;
-        func_001290E0((u8 *)&D_00189E20 + 0x2A0, (u8 *)&D_L00_001BF200.f40);
-        D_00189E20.u2e0.F = func_L00_002D3EA8((u8 *)&D_L00_001BF200.f40);
-        D_00189E20.xF2ec = func_00283248(D_L00_001BF200.f40, D_L00_001BF200.f44);
-        func_00282CF0(&v20, ((u8 *)&D_00189E20 + 0x2D0), (u8 *)&D_00189E20 + 0x80);
-        if (0.0f < func_00282DB0(&v20, (u8 *)&D_00189E20 + 0x2A0)) {
-            D_00189E20.xF2dc = -D_00189E20.xF2dc;
+    if (gCollisionResult.i1C > 0) {
+        qcopy((u8 *)&gHeroState + 0x2D0, &gCollisionResult.v20);
+        gHeroState.u2d8.F = gCollisionResult.v20.f[2];
+        if (D_001A8FF0) gHeroState.u2d8.F = GetDistanceFromGravityCenter(&gCollisionResult.v20);
+        gHeroState.xF2dc = fast_vec_dist((u8 *)&gHeroState + 0x80, ((u8 *)&gHeroState + 0x2D0));
+        gHeroState.xI2fc = gCollisionResult.i18;
+        func_001290E0((u8 *)&gHeroState + 0x2A0, (u8 *)&gCollisionResult.f40);
+        gHeroState.u2e0.F = GetViewSpaceAngle((u8 *)&gCollisionResult.f40);
+        gHeroState.xF2ec = FastMatrixHelperA(gCollisionResult.f40, gCollisionResult.f44);
+        FastVecSub(&scratchVec, ((u8 *)&gHeroState + 0x2D0), (u8 *)&gHeroState + 0x80);
+        if (0.0f < FastVecDot(&scratchVec, (u8 *)&gHeroState + 0x2A0)) {
+            gHeroState.xF2dc = -gHeroState.xF2dc;
         }
-        if (D_00189E20.xF2dc < 0.02f) {
-            D_00189E20.u30c.H = 0;
-            if (D_00189E20.u2e0.F <= 0.87266469f || D_00189E20.xB20b3 != 0) {
-                D_00189E20.u30e.H = 0;
-                D_00189E20.xIa80 = D_L00_001BF200.i18;
+        if (gHeroState.xF2dc < 0.02f) {
+            gHeroState.u30c.H = 0;
+            if (gHeroState.u2e0.F <= 0.87266469f || gHeroState.xB20b3 != 0) {
+                gHeroState.u30e.H = 0;
+                gHeroState.xIa80 = gCollisionResult.i18;
             }
         }
     }
 tail:
-    if (D_00189E20.xF88 > D_00189E20.xF2f0) D_00189E20.xI2f8 = 0;
-    if (D_00189E20.u30e.H != 0) D_00189E20.xI300 = 0;
+    if (gHeroState.xF88 > gHeroState.xF2f0) gHeroState.xI2f8 = 0;
+    if (gHeroState.u30e.H != 0) gHeroState.xI300 = 0;
     else {
-        D_00189E20.xI300++;
-        *(Q *)((u8 *)&D_00189E20 + 0x2E0) = *(Q *)((u8 *)&D_00189E20 + 0x2D0);
-        if (D_00189E20.xI2084 != 0x38) D_00189E20.field18c0 = 0;
+        gHeroState.xI300++;
+        *(Q *)((u8 *)&gHeroState + 0x2E0) = *(Q *)((u8 *)&gHeroState + 0x2D0);
+        if (gHeroState.xI2084 != 0x38) gHeroState.field18c0 = 0;
     }
-    normal = (Vec4 *)((u8 *)&D_00189E20 + 0x2C0);
-    func_00282C88(normal);
+    normal = (Vec4 *)((u8 *)&gHeroState + 0x2C0);
+    ClearVector128(normal);
     hero = (HeroGround *)((u8 *)normal - 0x2C0);
     switch (hero->xB20b3) {
     case 0:
         hero->xF298 = -1.0f;
         break;
     case 1:
-        if (D_001A8FF4) func_002AFF60((u8 *)normal - 0x240, normal, 0);
+        if (D_001A8FF4) ComputeFlatDirectionFromPoint((u8 *)normal - 0x240, normal, 0);
         else if (*(float *)((u8 *)hero + 0x2fc) != 0.0f) {
-            func_002AA2E8((float *)((u8 *)normal + 0x3c), 0.0f, 1.0f);
+            ApproachValue((float *)((u8 *)normal + 0x3c), 0.0f, 1.0f);
             qcopy(normal, (u8 *)normal + 0x30);
         } else {
             qcopy(normal, (u8 *)normal - 0x20);
-            func_00282D30(normal, normal, -1.0f);
+            FastVecScale(normal, normal, -1.0f);
         }
         break;
     case 2:
-        a = -1.0f;
-        if (*(float *)((u8 *)hero + 0xbc) > 0.0f) a = 1.0f;
-        func_00282CF0(normal, (u8 *)normal - 0x210, (u8 *)normal - 0x240);
-        func_00282F20(normal, normal, a);
+        angle = -1.0f;
+        if (*(float *)((u8 *)hero + 0xbc) > 0.0f) angle = 1.0f;
+        FastVecSub(normal, (u8 *)normal - 0x210, (u8 *)normal - 0x240);
+        vec_scale_to_length(normal, normal, angle);
         break;
     }
-    D_00189E20.u2e4.I = 0;
-    D_00189E20.u2e8.I = 0;
-    D_00189E20.a2d0.i[0] = 0;
-    D_00189E20.a2d0.i[1] = 0;
-    D_00189E20.a2c8.i[0] = 0;
-    D_00189E20.a2c8.i[1] = 0;
-    D_00189E20.a2c0.i[0] = 0;
-    D_00189E20.a2c0.i[1] = 0;
-    if (!(D_00189E20.xF2dc < 0.25f)) {
+    gHeroState.u2e4.I = 0;
+    gHeroState.u2e8.I = 0;
+    gHeroState.a2d0.i[0] = 0;
+    gHeroState.a2d0.i[1] = 0;
+    gHeroState.a2c8.i[0] = 0;
+    gHeroState.a2c8.i[1] = 0;
+    gHeroState.a2c0.i[0] = 0;
+    gHeroState.a2c0.i[1] = 0;
+    if (!(gHeroState.xF2dc < 0.25f)) {
         return;
     }
-    if (!(D_00189E20.xI208c == 0 || D_00189E20.xI208c == 12 || D_00189E20.xI208c == 9 || D_00189E20.xI208c == 7 || (D_00189E20.xI208c == 4 && *(u8 *)((u8 *)&D_00189E20 + 0x49c)) || D_00189E20.xI208c == 1)) {
+    if (!(gHeroState.xI208c == 0 || gHeroState.xI208c == 12 || gHeroState.xI208c == 9 || gHeroState.xI208c == 7 || (gHeroState.xI208c == 4 && *(u8 *)((u8 *)&gHeroState + 0x49c)) || gHeroState.xI208c == 1)) {
         return;
     }
-    func_L00_002B8E48((u8 *)&D_00189E20 + 0x2A0, &v20);
-    if (-0.785398244f < v20.f[1] && v20.f[1] < 0.785398244f) {
-        D_00189E20.u2e4.F = v20.f[1];
+    ComputeAnglesToHeroLocalDirection((u8 *)&gHeroState + 0x2A0, &scratchVec);
+    if (-0.785398244f < scratchVec.f[1] && scratchVec.f[1] < 0.785398244f) {
+        gHeroState.u2e4.F = scratchVec.f[1];
     }
-    if (-0.785398244f < v20.f[0] && v20.f[0] < 0.785398244f) {
-        D_00189E20.u2e8.F = v20.f[0];
+    if (-0.785398244f < scratchVec.f[0] && scratchVec.f[0] < 0.785398244f) {
+        gHeroState.u2e8.F = scratchVec.f[0];
     }
     for (i = 0; i < 2; i++) {
-        a = 1.57079649f;
+        angle = 1.57079649f;
         if (i == 1) {
-            a = -a;
+            angle = -angle;
         }
-        func_L00_002D3638(&v30, 0.2f, a, 0.45f, 1);
-        func_L00_002D3638(&v40, 0.2f, a, -0.45f, 1);
-        if (func_002761F8(&v30, &v40, 0x22, D_00189E20.xI2080, 0)) {
-            if (D_001A8FF0) D_00189E20.a2c0.f[i] = func_002B0360(&D_L00_001BF200.v20) - func_002B0360((u8 *)&D_00189E20 + 0x2d0);
-            else D_00189E20.a2c0.f[i] = D_L00_001BF200.v20.f[2] - D_00189E20.u2d8.F;
-            if (0.4f < func_00282C48(D_00189E20.a2c0.f[i])) {
-                D_00189E20.a2c0.f[i] = 0.0f;
+        BuildHeroRelativeOffset(&sideStart, 0.2f, angle, 0.45f, 1);
+        BuildHeroRelativeOffset(&sideEnd, 0.2f, angle, -0.45f, 1);
+        if (CollLine(&sideStart, &sideEnd, 0x22, gHeroState.xI2080, 0)) {
+            if (D_001A8FF0) gHeroState.a2c0.f[i] = GetDistanceFromGravityCenter(&gCollisionResult.v20) - GetDistanceFromGravityCenter((u8 *)&gHeroState + 0x2d0);
+            else gHeroState.a2c0.f[i] = gCollisionResult.v20.f[2] - gHeroState.u2d8.F;
+            if (0.4f < FloatAbs(gHeroState.a2c0.f[i])) {
+                gHeroState.a2c0.f[i] = 0.0f;
             }
-            func_001290E0(&v60, (u8 *)&D_L00_001BF200.f40);
-            func_L00_002B8E48(&v60, &v50);
-            if (-0.785398244f < v50.f[1] && v50.f[1] < 0.785398244f) {
-                D_00189E20.a2c8.f[i] = v50.f[1];
+            func_001290E0(&sideNormal, (u8 *)&gCollisionResult.f40);
+            ComputeAnglesToHeroLocalDirection(&sideNormal, &sideSlope);
+            if (-0.785398244f < sideSlope.f[1] && sideSlope.f[1] < 0.785398244f) {
+                gHeroState.a2c8.f[i] = sideSlope.f[1];
             }
-            if (-0.785398244f < v50.f[0] && v50.f[0] < 0.785398244f) {
-                D_00189E20.a2d0.f[i] = v50.f[0];
+            if (-0.785398244f < sideSlope.f[0] && sideSlope.f[0] < 0.785398244f) {
+                gHeroState.a2d0.f[i] = sideSlope.f[0];
             }
         } else {
-            D_00189E20.a2c0.i[i] = 0;
-            D_00189E20.a2c8.f[i] = D_00189E20.u2e4.F;
-            D_00189E20.a2d0.f[i] = D_00189E20.u2e8.F;
+            gHeroState.a2c0.i[i] = 0;
+            gHeroState.a2c8.f[i] = gHeroState.u2e4.F;
+            gHeroState.a2d0.f[i] = gHeroState.u2e8.F;
         }
     }
 }

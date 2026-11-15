@@ -1,13 +1,14 @@
 #include "include_asm.h"
 
-unsigned int func_0012EA70(unsigned int *param_1, int param_2)
+/* Finds the address of a bit position in the ring buffer, wrapping around at the end. */
+unsigned int func_0012EA70(unsigned int *stream, int bitPos)
 {
-  unsigned int uVar1;
+  unsigned int addr;
   
-  uVar1 = *(param_1 + 2) + (param_2 >> 3);
-  if (*(param_1 + 9) <= uVar1) {
-    uVar1 = uVar1 - *(param_1 + 10);
+  addr = *(stream + 2) + (bitPos >> 3);
+  if (*(stream + 9) <= addr) {
+    addr = addr - *(stream + 10);
   }
-  return uVar1;
+  return addr;
 }
 

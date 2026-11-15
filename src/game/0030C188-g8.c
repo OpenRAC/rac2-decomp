@@ -17,47 +17,48 @@ extern u32 D_001AEF00 __attribute__((sda));
 extern u32 D_001AEE58 __attribute__((sda));
 extern float D_001AEF08 __attribute__((sda));
 extern float D_001AEF0C __attribute__((sda));
-void func_0030C188(char *obj) {
-    Packet p;
-    Vec matrix[4];
-    Vec *state = *(Vec **)(obj + 0x68);
+/* Draws two camera-facing glow squares at the end of the beam. */
+void func_0030C188(char *moby) {
+    Packet quad;
+    Vec basis[4];
+    Vec *vars = *(Vec **)(moby + 0x68);
     float size;
     int i;
-    p.texture = func_0027C878(11);
-    p.flags = 0x8000000048ULL;
-    p.mode = 0xFF9000000260ULL;
-    p.primitive = 0;
-    func_00282CF0(&matrix[3], &D_001B5340, state);
-    func_00282F20(&matrix[3], &matrix[3], 0.3f);
-    func_00282CC0(&matrix[3], &matrix[3], state);
-    matrix[3].f[3] = 1.0f;
-    func_00282CF0(&matrix[0], &D_001B5340, &matrix[3]);
-    func_00282F20(&matrix[0], &matrix[0], 1.0f);
-    func_00282DD8(&matrix[1], &matrix[0], &D_0018A0E0);
-    func_00282F20(&matrix[1], &matrix[1], -1.0f);
-    func_00282DD8(&matrix[2], &matrix[1], &matrix[0]);
-    p.color[3] = D_001AEF00;
-    p.color[2] = D_001AEF00;
-    p.color[1] = D_001AEF00;
-    p.color[0] = D_001AEF00;
-    size = D_001AEF08 + func_002A78D8(0.0f, 0.025f);
+    quad.texture = GetEffectTextureDescriptor(11);
+    quad.flags = 0x8000000048ULL;
+    quad.mode = 0xFF9000000260ULL;
+    quad.primitive = 0;
+    FastVecSub(&basis[3], &gCameraState_001B5340, vars);
+    vec_scale_to_length(&basis[3], &basis[3], 0.3f);
+    FastVecAdd(&basis[3], &basis[3], vars);
+    basis[3].f[3] = 1.0f;
+    FastVecSub(&basis[0], &gCameraState_001B5340, &basis[3]);
+    vec_scale_to_length(&basis[0], &basis[0], 1.0f);
+    FastVecCross(&basis[1], &basis[0], &D_0018A0E0);
+    vec_scale_to_length(&basis[1], &basis[1], -1.0f);
+    FastVecCross(&basis[2], &basis[1], &basis[0]);
+    quad.color[3] = D_001AEF00;
+    quad.color[2] = D_001AEF00;
+    quad.color[1] = D_001AEF00;
+    quad.color[0] = D_001AEF00;
+    size = D_001AEF08 + RandomSignedFloatRange(0.0f, 0.025f);
     for (i = 0; i < 4; i++) {
-        func_00282D30(&p.vertex[i], &D_001AEEA0[i], size);
-        func_002830C0(&p.vertex[i], &p.vertex[i], &matrix[0]);
-        p.uv[i].u = D_001AEEE0[2 * i];
-        p.uv[i].v = D_001AEEE4[2 * i];
+        FastVecScale(&quad.vertex[i], &D_001AEEA0[i], size);
+        transform_vector(&quad.vertex[i], &quad.vertex[i], &basis[0]);
+        quad.uv[i].u = D_001AEEE0[2 * i];
+        quad.uv[i].v = D_001AEEE4[2 * i];
     }
-    func_00280B90(&p, 0, 0);
-    p.color[3] = D_001AEE58;
-    p.color[2] = D_001AEE58;
-    p.color[1] = D_001AEE58;
-    p.color[0] = D_001AEE58;
-    size = D_001AEF0C + func_002A78D8(0.0f, 0.05f);
+    draw_world_quad(&quad, 0, 0);
+    quad.color[3] = D_001AEE58;
+    quad.color[2] = D_001AEE58;
+    quad.color[1] = D_001AEE58;
+    quad.color[0] = D_001AEE58;
+    size = D_001AEF0C + RandomSignedFloatRange(0.0f, 0.05f);
     for (i = 0; i < 4; i++) {
-        func_00282D30(&p.vertex[i], &D_001AEEA0[i], size);
-        func_002830C0(&p.vertex[i], &p.vertex[i], &matrix[0]);
-        p.uv[i].u = D_001AEEE0[2 * i];
-        p.uv[i].v = D_001AEEE4[2 * i];
+        FastVecScale(&quad.vertex[i], &D_001AEEA0[i], size);
+        transform_vector(&quad.vertex[i], &quad.vertex[i], &basis[0]);
+        quad.uv[i].u = D_001AEEE0[2 * i];
+        quad.uv[i].v = D_001AEEE4[2 * i];
     }
-    func_00280B90(&p, 0, 0);
+    draw_world_quad(&quad, 0, 0);
 }

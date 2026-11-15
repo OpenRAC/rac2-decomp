@@ -14,56 +14,57 @@ extern EquipmentState D_001F2840;
 
 #define MATERIAL(id) ((MaterialRecord *)(D_00139568[id]*224 + (char *)D_00239BA0))->material
 
-void func_00345D58(SelectionOwner *o, int buttons)
+/* Handles the pad for the column selection screen and lets the player pick an item they own. */
+void func_00345D58(SelectionOwner *owner, int buttons)
 {
     int id, column;
 
     if (buttons & 0x1000) {
         int next;
 
-        func_002E5E58(3, 0, 0);
-        column = o->column;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        column = owner->column;
         next = column - 1;
-        o->row = 0;
-        o->state = 3;
+        owner->row = 0;
+        owner->state = 3;
         if (next < 0)
             next = 0;
-        o->column = next;
+        owner->column = next;
     } else if (buttons & 0x4000) {
-        func_002E5E58(3, 0, 0);
-        o->row = 0;
-        o->state = 0;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        owner->row = 0;
+        owner->state = 0;
     } else if (buttons & 0x8000) {
-        func_002E5E58(3, 0, 0);
-        column = o->column;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        column = owner->column;
         column--;
-        o->column = column;
+        owner->column = column;
         if (column < 0)
-            o->column = 2;
+            owner->column = 2;
     } else if (buttons & 0x2000) {
-        func_002E5E58(3, 0, 0);
-        column = o->column;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        column = owner->column;
         column++;
-        o->column = column;
+        owner->column = column;
         if (column >= 3)
-            o->column = 0;
+            owner->column = 0;
     } else if (buttons & 0x40) {
-        id = D_001AA898[o->column].v[3];
-        if (id != 0 && D_001A7AF8[id] != 0) {
-            func_002E5E58(4, 0, 0);
-            D_001ADB10 = MATERIAL(o->selected);
-            if (D_001F2840.selected == id)
-                D_001F2840.selected = 0;
+        id = D_001AA898[owner->column].v[3];
+        if (id != 0 && gItemOwnedFlags[id] != 0) {
+            PlaySoundFromGlobalBank(4, 0, 0);
+            gSelectedItemMaterial = MATERIAL(owner->selected);
+            if (gPauseMenuState.selected == id)
+                gPauseMenuState.selected = 0;
             else
-                D_001F2840.selected = id;
+                gPauseMenuState.selected = id;
         } else {
-            func_002E5E58(5, 0, 0);
+            PlaySoundFromGlobalBank(5, 0, 0);
         }
     }
     {
-        int selected = D_001AA898[o->column].v[3];
-        o->selected = selected;
-        if (selected != 0 && D_001A7AF8[selected] != 0)
-            D_001ADB10 = MATERIAL(selected);
+        int selected = D_001AA898[owner->column].v[3];
+        owner->selected = selected;
+        if (selected != 0 && gItemOwnedFlags[selected] != 0)
+            gSelectedItemMaterial = MATERIAL(selected);
     }
 }

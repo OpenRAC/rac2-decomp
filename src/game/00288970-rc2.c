@@ -27,11 +27,12 @@
 extern s32  D_001B22B0[] __attribute__((sda));
 
 extern s8 D_001BAECC[];
-s32 func_00288970(u32 arg0, s32 *arg1) {
-    if (arg0 > 0x40000U) {
-        *arg1 = 0;
+/* Works out a value from a size, or fails with -1 when the size is above 0x40000. */
+s32 func_00288970(u32 size, s32 *outValue) {
+    if (size > 0x40000U) {
+        *outValue = 0;
         return -1;
     }
-    *arg1 = (*(s32 *)((s32)D_001BAECC) + D_001B22B0[0]) - arg0;
+    *outValue = (*(s32 *)((s32)D_001BAECC) + D_001B22B0[0]) - size;
     return 0;
 }

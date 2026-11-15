@@ -37,202 +37,204 @@ extern void func_002A8D70(u8 *,int,int,int,int,int,float,float,float);
 extern void func_002B5258(u8 *);
 extern void func_00283098(void *,void *,void *);
 extern void func_L12_003E0A38(void *,void *,void *,int);
-void func_L12_003E0BF0(u8 *o) {
-    u8 *d=*(u8 **)(o+0x68);
+/* Updates a Mutant Test-Squirrel. It idles and wanders, walks to an object, picks it up and
+   throws it. */
+void func_L12_003E0BF0(u8 *moby) {
+    u8 *vars=*(u8 **)(moby+0x68);
     float temp[4] __attribute__((aligned(16)));
     float angle, speed;
-    func_L12_003E1638(o);
-    switch(o[0x95]) {
+    UpdateGuardCreatureMoby(moby);
+    switch(moby[0x95]) {
     case 5: {
 
-        if(func_002B3890(o)) {
-            *(u16 *)(o+0x34)|=1;
-            *(int *)(o+0x98)=0;
-            o[0x31]=0;
+        if(SetSecondPendingFlag(moby)) {
+            *(u16 *)(moby+0x34)|=1;
+            *(int *)(moby+0x98)=0;
+            moby[0x31]=0;
 
         }
-        if(D_0019B2E8[o[0xB0]+(D_001A79F0<<4)]&0x80) {
-            if(*(int *)(d+0x13C)==-1) {
-                func_002A7750(o,1,0);
-                if(o[0x43]) func_002A7470(o,0,0,0);
+        if(D_0019B2E8[moby[0xB0]+(gCurrentMapIndex<<4)]&0x80) {
+            if(*(int *)(vars+0x13C)==-1) {
+                SetMobyState(moby,1,0);
+                if(moby[0x43]) StartAnimationBlended(moby,0,0,0);
             } else {
-                func_002A7750(o,9,4);
-                if(o[0x43]!=14) func_002A7470(o,14,0,0);
-                *(float *)(o+0x18)+=4.0f;
-                *(int *)(o+0x98)=0;
-                *(u16 *)(o+0x34)=(*(u16 *)(o+0x34)|0x41)&0xEFFF;
+                SetMobyState(moby,9,4);
+                if(moby[0x43]!=14) StartAnimationBlended(moby,14,0,0);
+                *(float *)(moby+0x18)+=4.0f;
+                *(int *)(moby+0x98)=0;
+                *(u16 *)(moby+0x34)=(*(u16 *)(moby+0x34)|0x41)&0xEFFF;
             }
-            *(int *)(o+0x98)=*(int *)(*(u8 **)(o+0x24)+0x10);
-            o[0x31]=1;
-            *(u16 *)(o+0x34)&=0xFFFE;
+            *(int *)(moby+0x98)=*(int *)(*(u8 **)(moby+0x24)+0x10);
+            moby[0x31]=1;
+            *(u16 *)(moby+0x34)&=0xFFFE;
         }
         break; }
     case 0:
-        if(func_002B3890(o)) func_002B60B0(o,0.001111111138f,D_L12_001B0A20*0.0166666675359f,0.0008726647356525064f,0.104719772935f);
-        if(*(short *)(d+0x364)==1) {
-            func_002A7750(o,5,2);
-            if(o[0x43]!=2) func_002A7470(o,2,0,10);
-        } else if(*(short *)(d+0x366)) {
-            func_002A7750(o,3,1);
-            if(o[0x43]!=3) func_002A7470(o,3,0,20);
-            *(short *)(d+0x366)=0;
-            if(*(short *)(d+0x360)<300) *(short *)(d+0x360)=func_002A7820(480,600);
+        if(SetSecondPendingFlag(moby)) SetControllerSpeedLimits(moby,0.001111111138f,D_L12_001B0A20*0.0166666675359f,0.0008726647356525064f,0.104719772935f);
+        if(*(short *)(vars+0x364)==1) {
+            SetMobyState(moby,5,2);
+            if(moby[0x43]!=2) StartAnimationBlended(moby,2,0,10);
+        } else if(*(short *)(vars+0x366)) {
+            SetMobyState(moby,3,1);
+            if(moby[0x43]!=3) StartAnimationBlended(moby,3,0,20);
+            *(short *)(vars+0x366)=0;
+            if(*(short *)(vars+0x360)<300) *(short *)(vars+0x360)=RandomIntRange(480,600);
         }
         break;
     case 1:
-        if(func_002B3890(o)) func_002B60B0(o,0.003333333414f,D_L12_001B0A24*0.0166666675359f,0.0017453294713050127f,0.20943954587f);
-        if(*(short *)(d+0x364)==1) {
-            func_002A7750(o,6,2);
-            if(o[0x43]!=7) func_002A7470(o,7,0,10);
-        } else if(!*(short *)(d+0x360)) {
-            func_002A7750(o,1,0);
-            if(o[0x43]) func_002A7470(o,0,0,20);
+        if(SetSecondPendingFlag(moby)) SetControllerSpeedLimits(moby,0.003333333414f,D_L12_001B0A24*0.0166666675359f,0.0017453294713050127f,0.20943954587f);
+        if(*(short *)(vars+0x364)==1) {
+            SetMobyState(moby,6,2);
+            if(moby[0x43]!=7) StartAnimationBlended(moby,7,0,10);
+        } else if(!*(short *)(vars+0x360)) {
+            SetMobyState(moby,1,0);
+            if(moby[0x43]) StartAnimationBlended(moby,0,0,20);
         }
         break;
     case 2:
-        if(func_002B3890(o)) func_002B60B0(o,0.003333333414f,D_L12_001B0A24*0.0166666675359f,0.0017453294713050127f,0.20943954587f);
-        if(*(short *)(d+0x364)!=1) {
-            func_002A7750(o,3,1);
-            if(o[0x43]!=3) func_002A7470(o,3,0,20);
-            *(short *)(d+0x360)=func_002A7820(580,600);
+        if(SetSecondPendingFlag(moby)) SetControllerSpeedLimits(moby,0.003333333414f,D_L12_001B0A24*0.0166666675359f,0.0017453294713050127f,0.20943954587f);
+        if(*(short *)(vars+0x364)!=1) {
+            SetMobyState(moby,3,1);
+            if(moby[0x43]!=3) StartAnimationBlended(moby,3,0,20);
+            *(short *)(vars+0x360)=RandomIntRange(580,600);
         }
         break;
     case 3: {
         int hit; u8 *target;
-        hit=func_002B1C20(o,d+0x60);
-        target=*(u8 **)(d+0x38);
-        if(target && *(short *)(target+0xAA)==0xFAB) {
-            func_00282CF0(temp,o+0x10,target+0x10);
-            func_00282F20(temp,temp,1.0f);
-            func_002A8F70(o,D_0018C0B0,0x10000,*(u8 **)(d+0x38)+0x10,temp,50.0f);
+        hit=DispatchActionByKind(moby,vars+0x60);
+        target=*(u8 **)(vars+0x38);
+        if(target && *(short *)(target+0xAA)==0xFAB /* moby class 4011 */) {
+            FastVecSub(temp,moby+0x10,target+0x10);
+            vec_scale_to_length(temp,temp,1.0f);
+            QueueImpactEffect(moby,gHeroMoby_0018C0B0,0x10000,*(u8 **)(vars+0x38)+0x10,temp,50.0f);
         }
         if(hit&1) {
-            func_002A6C58(o,0,3);
-            qcopy(temp,o+0x10);
+            SetDeathBits(moby,0,3);
+            qcopy(temp,moby+0x10);
             temp[2]+=0.25f;
-            func_L01_003E9CF8(o,0,0);
-            func_0029F338(o);
+            QueueMobyForGlowEffect(moby,0,0);
+            MarkMobySpawned(moby);
             return;
         }
         if(hit&2) {
-            if(*(short *)(d+0x364)==1) {
-                func_002A7750(o,6,2);
-                if(o[0x43]!=7) func_002A7470(o,7,0,20);
+            if(*(short *)(vars+0x364)==1) {
+                SetMobyState(moby,6,2);
+                if(moby[0x43]!=7) StartAnimationBlended(moby,7,0,20);
             } else {
-                func_002A7750(o,3,1);
-                if(o[0x43]!=3) func_002A7470(o,3,0,20);
-                *(short *)(d+0x360)=func_002A7820(580,600);
+                SetMobyState(moby,3,1);
+                if(moby[0x43]!=3) StartAnimationBlended(moby,3,0,20);
+                *(short *)(vars+0x360)=RandomIntRange(580,600);
             }
         }
         break; }
     case 4:
-        if(func_002B3890(o)) func_002B60B0(o,0.004444444552f,D_L12_001B0A24*0.0166666675359f,0.0034906589426100254f,0.20943954587f);
+        if(SetSecondPendingFlag(moby)) SetControllerSpeedLimits(moby,0.004444444552f,D_L12_001B0A24*0.0166666675359f,0.0034906589426100254f,0.20943954587f);
         break;
     }
-    switch(o[0x20]) {
+    switch(moby[0x20]) {
     case 1:
-        if(!*(short *)(d+0x362)) {
-            func_002A7750(o,2,-1);
-            angle=func_002A7940();
-            speed=func_002A7878(3.0f,5.0f);
-            *(float *)(d+0x350)=func_00283180(angle)*speed;
-            *(float *)(d+0x354)=func_00283198(angle)*speed;
-            *(int *)(d+0x358)=0;
-            func_00282CC0(d+0x350,d+0x350,d+0x340);
-            if(o[0x43]!=15) func_002A7470(o,15,0,10);
+        if(!*(short *)(vars+0x362)) {
+            SetMobyState(moby,2,-1);
+            angle=RandomAngle();
+            speed=RandomFloatRange(3.0f,5.0f);
+            *(float *)(vars+0x350)=FastSinOrCosA(angle)*speed;
+            *(float *)(vars+0x354)=FastSinOrCosB(angle)*speed;
+            *(int *)(vars+0x358)=0;
+            FastVecAdd(vars+0x350,vars+0x350,vars+0x340);
+            if(moby[0x43]!=15) StartAnimationBlended(moby,15,0,10);
         }
-        func_002B5258(o);
+        StepMovementAtOwnPosition(moby);
         break;
     case 2: {
         int hit;
-        hit=func_L01_00321178(o,d+0x350);
-        if((*(u16 *)(o+0x96)>=31 && (hit&0x80)) || *(u16 *)(o+0x96)>=601) {
-            func_002A7750(o,1,-1);
-            *(short *)(d+0x362)=func_002A7820(300,500);
-            if(o[0x43]!=func_002A77E0(2)) func_002A7470(o,func_002A77E0(2),0,20);
+        hit=TurnMobyTowardTarget(moby,vars+0x350);
+        if((*(u16 *)(moby+0x96)>=31 && (hit&0x80)) || *(u16 *)(moby+0x96)>=601) {
+            SetMobyState(moby,1,-1);
+            *(short *)(vars+0x362)=RandomIntRange(300,500);
+            if(moby[0x43]!=RandomIntBelow(2)) StartAnimationBlended(moby,RandomIntBelow(2),0,20);
         }
         break; }
-    case 3: func_002B5258(o); break;
+    case 3: StepMovementAtOwnPosition(moby); break;
     case 5: {
-        u8 *position=o+0x10;
-        u8 *target=*(u8 **)(d+0x368);
-        int v;
-        angle=func_00283248(D_00189E20.position[0]-*(float *)(target+0x10),D_00189E20.position[1]-*(float *)(target+0x14));
-        func_002B50E0(o,position,angle);
-        v=o[0x60];
-        v&=2;
-        if(v) {
-            func_002A7750(o,6,-1);
-            if(o[0x43]!=7) func_002A7470(o,7,0,20);
+        u8 *position=moby+0x10;
+        u8 *target=*(u8 **)(vars+0x368);
+        int animFlags;
+        angle=FastMatrixHelperA(gHeroState.position[0]-*(float *)(target+0x10),gHeroState.position[1]-*(float *)(target+0x14));
+        StepMovementController(moby,position,angle);
+        animFlags=moby[0x60];
+        animFlags&=2;
+        if(animFlags) {
+            SetMobyState(moby,6,-1);
+            if(moby[0x43]!=7) StartAnimationBlended(moby,7,0,20);
         } else {
-            v=*(u16 *)(o+0x96);
-            if(v==20) func_L12_003E1AA8(o);
+            animFlags=*(u16 *)(moby+0x96);
+            if(animFlags==20) AlertSquirrelsInGroup(moby);
         }
         break; }
     case 6:
-        if(func_L01_00321178(o,*(u8 **)(d+0x368)+0x10)&0x80) {
-            func_002A7750(o,7,-1);
-            if(o[0x43]!=8) func_002A7470(o,8,0,20);
+        if(TurnMobyTowardTarget(moby,*(u8 **)(vars+0x368)+0x10)&0x80) {
+            SetMobyState(moby,7,-1);
+            if(moby[0x43]!=8) StartAnimationBlended(moby,8,0,20);
         }
         break;
     case 7:
-        if(o[0x60]&2) {
-            func_002A7750(o,6,-1);
-            if(o[0x43]!=7) func_002A7470(o,7,0,10);
+        if(moby[0x60]&2) {
+            SetMobyState(moby,6,-1);
+            if(moby[0x43]!=7) StartAnimationBlended(moby,7,0,10);
         } else {
-            float time;
-            u8 *yaw=o+0xF8;
-            u8 *target=*(u8 **)(d+0x368);
-            angle=func_00283248(*(float *)(target+0x10)-*(float *)(o+0x10),*(float *)(target+0x14)-*(float *)(o+0x14));
-            func_002AA800(yaw,0,angle,0.058177649974823f);
-            time=func_0029F530(o);
-            if(12.0f<=time && time<=14.0f) func_002A8D70(o,2,1,0,1,0,0.25f,d[0x34],1.0f);
-            func_002B5258(o);
+            float animTime;
+            u8 *yawField=moby+0xF8;
+            u8 *target=*(u8 **)(vars+0x368);
+            angle=FastMatrixHelperA(*(float *)(target+0x10)-*(float *)(moby+0x10),*(float *)(target+0x14)-*(float *)(moby+0x14));
+            StepAngleTowardTarget(yawField,0,angle,0.058177649974823f);
+            animTime=GetMobyAnimationValue(moby);
+            if(12.0f<=animTime && animTime<=14.0f) TestHitAtBone(moby,2,1,0,1,0,0.25f,vars[0x34],1.0f);
+            StepMovementAtOwnPosition(moby);
         }
         break;
     case 10: {
-        u8 *position=o+0x10;
-        u8 *target=*(u8 **)(d+0x374);
-        angle=func_00283248(*(float *)(target+0x10)-*(float *)(o+0x10),*(float *)(target+0x14)-*(float *)(o+0x14));
-        func_002B50E0(o,position,angle);
-        if(o[0x43]==5 && *(float *)(o+0x18)<*(float *)(d+0x348)+*(float *)(d+0x1F8)*10.0f) func_002A7470(o,6,0,10);
-        if(o[0x43]==6 && (o[0x60]&2)) {
-            func_002A7750(o,11,-1);
-            if(o[0x43]!=7) func_002A7470(o,7,0,20);
+        u8 *position=moby+0x10;
+        u8 *target=*(u8 **)(vars+0x374);
+        angle=FastMatrixHelperA(*(float *)(target+0x10)-*(float *)(moby+0x10),*(float *)(target+0x14)-*(float *)(moby+0x14));
+        StepMovementController(moby,position,angle);
+        if(moby[0x43]==5 && *(float *)(moby+0x18)<*(float *)(vars+0x348)+*(float *)(vars+0x1F8)*10.0f) StartAnimationBlended(moby,6,0,10);
+        if(moby[0x43]==6 && (moby[0x60]&2)) {
+            SetMobyState(moby,11,-1);
+            if(moby[0x43]!=7) StartAnimationBlended(moby,7,0,20);
         }
         break; }
     case 11:
-        func_L01_00321178(o,*(u8 **)(d+0x374)+0x10);
-        if(*(float *)(d+0x21C)<2.0f) {
-            func_002A7750(o,12,-1);
-            if(o[0x43]!=8) func_002A7470(o,8,0,20);
+        TurnMobyTowardTarget(moby,*(u8 **)(vars+0x374)+0x10);
+        if(*(float *)(vars+0x21C)<2.0f) {
+            SetMobyState(moby,12,-1);
+            if(moby[0x43]!=8) StartAnimationBlended(moby,8,0,20);
         }
         break;
     case 12: {
-        float time;
-        if(*(u8 **)(d+0x374)) {
-            func_L01_00321178(o,*(u8 **)(d+0x374)+0x10);
-            time=func_0029F530(o);
-            if(11.0f<=time) {
+        float animTime;
+        if(*(u8 **)(vars+0x374)) {
+            TurnMobyTowardTarget(moby,*(u8 **)(vars+0x374)+0x10);
+            animTime=GetMobyAnimationValue(moby);
+            if(11.0f<=animTime) {
                 int release=1;
-                func_00283098(temp,D_L12_001B0A30,o+0xC0);
-                func_00282CC0(temp,temp,o+0x10);
-                if(!(14.0f<=time)) release=0;
-                func_L12_003E0A38(*(u8 **)(d+0x374),temp,o+0xF0,release);
-                if(release) *(int *)(d+0x374)=0;
+                matrix_mul_vec3(temp,D_L12_001B0A30,moby+0xC0);
+                FastVecAdd(temp,temp,moby+0x10);
+                if(!(14.0f<=animTime)) release=0;
+                StartSubObjectMove(*(u8 **)(vars+0x374),temp,moby+0xF0,release);
+                if(release) *(int *)(vars+0x374)=0;
             }
         }
-        if(o[0x60]&2) {
-            func_002A7750(o,13,-1);
-            if(o[0x43]!=9) func_002A7470(o,9,0,10);
+        if(moby[0x60]&2) {
+            SetMobyState(moby,13,-1);
+            if(moby[0x43]!=9) StartAnimationBlended(moby,9,0,10);
         }
         break; }
     case 13:
-        if(o[0x60]&2) {
-            func_002A7750(o,1,0);
-            if(o[0x43]) func_002A7470(o,0,0,10);
+        if(moby[0x60]&2) {
+            SetMobyState(moby,1,0);
+            if(moby[0x43]) StartAnimationBlended(moby,0,0,10);
         }
         break;
     }
-    func_L12_003E19F0(o);
+    ResetJointSlotsAndAdvanceCounter(moby);
 }

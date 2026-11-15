@@ -115,86 +115,88 @@ extern char *func_002BDCE8(float fa, float fb, float fc, float fd, char *p, int 
 extern char D_00189E20_13[];
 
 /* Pass the owner and its pointer at offset 0x68 to the explicitly bound helper; original game role is unknown. */
+/* Updates the Hypnomatic moby by passing it and its private data to a helper. */
 void func_L00_003B9CB8(Rac2Native_86f665335d9cb905_AnalysisOwner *owner)
 {
-    func_L00_003B9310(owner, owner->context_68);
+    UpdateTargetLockOnState(owner, owner->context_68);
 }
 
 extern void func_003182C0(char *);
 
 /* Calls the measured callee with the object it was given. OpenRAC: the decompilation's
    (void) left a0 unset; the console's a0 still held the moby, the host's held anything. */
-void func_L00_003BAAD0(char *self)
+/* Updates the Heavy Lancer moby by running one helper on it. */
+void func_L00_003BAAD0(char *moby)
 {
-    func_003182C0(self);
+    AlertGroupClass2460(moby);
 }
 
 /* Implemented in L00_003B9CB8-state-g8.c. */
 
 /* Integrates motion, reflects a collision, updates the light and emits trail slots. */
-char *func_L00_003BB1F8(char *self)
+char *func_L00_003BB1F8(char *moby)
 {
     float saved[4] __attribute__((aligned(16)));
     float normal[4] __attribute__((aligned(16)));
     float projection[4] __attribute__((aligned(16)));
     float remainder[4] __attribute__((aligned(16)));
-    char *ctx = *(char **)(self + 0x68);
+    char *ctx = *(char **)(moby + 0x68);
     char *hit = 0;
-    char *p;
+    char *hitObject;
     EffectLightRecord *light;
     int light_index;
-    float f;
-    *(float *)(self + 0xF0) = func_00283B98(*(float *)(self + 0xF0), 0.0523598865f);
-    *(float *)(self + 0xF4) = func_00283BE0(*(float *)(self + 0xF4), 0.0130899716f);
-    *(int *)(self + 0xFC) = 0;
-    func_002833F0(self + 0xC0, self + 0xF0);
-    qcopy(saved, self + 0x10);
-    func_00282CC0(self + 0x10, ctx, self + 0x10);
-    func_002FEE70(*(int *)(ctx + 0x50), ctx, 0);
-    func_00300190(self + 0x10, self + 0x10);
-    func_00300248(ctx, ctx);
-    if (func_00282DF0(ctx) != 0.0f && func_00282DF0(ctx + 0x20) != 0.0f)
-        func_002ACF68(ctx, ctx, ctx + 0x20, 0, 0.075f);
-    if (func_00277258(self + 0x10, 0, self, *(float *)(ctx + 0x4C))) {
-        p = D_L00_001BF218;
-        if (p && p != D_0018C0B0 && *(short *)(p + 0xAA) != 0x5CA)
-            hit = (*(unsigned short *)(p + 0x34) & 0x1000) ? p : 0;
-        qcopy(self + 0x10, D_L00_001BF230);
+    float dot;
+    *(float *)(moby + 0xF0) = FastAddRotations(*(float *)(moby + 0xF0), 0.0523598865f);
+    *(float *)(moby + 0xF4) = fast_subtract_rotations(*(float *)(moby + 0xF4), 0.0130899716f);
+    *(int *)(moby + 0xFC) = 0;
+    euler_rotation_basis(moby + 0xC0, moby + 0xF0);
+    qcopy(saved, moby + 0x10);
+    FastVecAdd(moby + 0x10, ctx, moby + 0x10);
+    SteerEffectDirection(*(int *)(ctx + 0x50), ctx, 0);
+    TransformVectorOrCopy(moby + 0x10, moby + 0x10);
+    TriggerCurrentStateEffect(ctx, ctx);
+    if (FastVecLength(ctx) != 0.0f && FastVecLength(ctx + 0x20) != 0.0f)
+        BuildRotationTowardVector(ctx, ctx, ctx + 0x20, 0, 0.075f);
+    if (TestPointAgainstCollision(moby + 0x10, 0, moby, *(float *)(ctx + 0x4C))) {
+        hitObject = D_L00_001BF218;
+        if (hitObject && hitObject != gHeroMoby_0018C0B0 && *(short *)(hitObject + 0xAA) != 0x5CA /* Plasma Storm */)
+            hit = (*(unsigned short *)(hitObject + 0x34) & 0x1000) ? hitObject : 0;
+        qcopy(moby + 0x10, D_L00_001BF230);
         func_002EE178_1((char *)normal, D_L00_001BF230 + 0x10, 0.0009765625f);
         func_802EE3D0_1(normal, normal, 1.0f);
-        func_00283028(ctx, ctx, normal);
-        f = func_00282DB0(ctx, normal);
-        func_002EE178_1((char *)projection, (char *)normal, f);
+        FastVectorNormalize(ctx, ctx, normal);
+        dot = FastVecDot(ctx, normal);
+        func_002EE178_1((char *)projection, (char *)normal, dot);
         func_802EE138_1(remainder, (float *)ctx, (char *)projection);
         func_002EE178_1(ctx, (char *)projection, 0.85f);
-        func_00282CC0(ctx, remainder, ctx);
+        FastVecAdd(ctx, remainder, ctx);
         func_002EE178_1(ctx + 0x20, ctx + 0x20, 0.95f);
-        func_L00_003BD510(D_L00_001BF230 - 0x10, normal, 6, 0x72FF);
-        func_L00_003BD510(D_L00_001BF230 - 0x10, normal, 6, 0xFF0000);
-        func_002E5CF8(1, 0, self);
+        SpawnSparkBurst_L00_3(D_L00_001BF230 - 0x10, normal, 6, 0x72FF);
+        SpawnSparkBurst_L00_3(D_L00_001BF230 - 0x10, normal, 6, 0xFF0000);
+        PlayMobySound(1, 0, moby);
     }
     light_index = *(int *)(ctx + 0x5C);
     if (light_index != -1) {
         light = D_L00_001C6F40 + light_index;
-        qcopy(light->position, self + 0x10);
+        qcopy(light->position, moby + 0x10);
         light->position[3] = 4.0f;
         light->x = 0.25f;
         light->y = 0.14f;
         light->z = 1.0f;
         light->unused = 0;
-        f = func_002A7878_2(-0.1f, 0.1f);
-        light->x += f;
-        light->y += f;
-        light->z += f;
+        dot = func_002A7878_2(-0.1f, 0.1f);
+        light->x += dot;
+        light->y += dot;
+        light->z += dot;
     }
-    if (*(float *)(self + 0x10) < 2.0f || *(float *)(self + 0x10) > 1021.0f ||
-        *(float *)(self + 0x14) < 2.0f || *(float *)(self + 0x14) > 1021.0f ||
-        *(float *)(self + 0x18) < 2.0f || *(float *)(self + 0x18) > 1021.0f) {
-        qcopy(self + 0x10, saved);
-        self[0x20] = 3;
+    if (*(float *)(moby + 0x10) < 2.0f || *(float *)(moby + 0x10) > 1021.0f ||
+        *(float *)(moby + 0x14) < 2.0f || *(float *)(moby + 0x14) > 1021.0f ||
+        *(float *)(moby + 0x18) < 2.0f || *(float *)(moby + 0x18) > 1021.0f) {
+        qcopy(moby + 0x10, saved);
+        moby[0x20] = 3;
     }
     if (*(int *)(ctx + 0x58) < 8)
-        func_L00_003BC998(self, (char *)func_002A7820_1(8, 20));
+        SpawnOrbitSpark(moby, (char *)func_002A7820_1(8, 20));
     return hit;
 }
 
@@ -212,34 +214,34 @@ extern void func_L00_003BCDC0(char *a0);
 
 /* Opens the block, lays seven oriented sprites over it from two helper draws and the shared
    colour word, then runs the two slot-table passes and closes the block. */
-void func_L00_003BB668(char *a0)
+void func_L00_003BB668(char *moby)
 {
     char *ctx;
 
-    ctx = *(char **)(a0 + 0x68);
-    func_002FC560(0x47, 0x00053001);
+    ctx = *(char **)(moby + 0x68);
+    VU1_addGSregister(0x47, 0x00053001);
 
-    func_00281EB8(a0 + 0x10, 0x2C,
+    DrawBillboardQuad_00281EB8(moby + 0x10, 0x2C,
                   (func_002A7820_1(0x80, 0xC8) << 24) | 0x72FF, 1,
                   func_002A7878_2(0.38500002f, 0.415f) * *(float *)(ctx + 0x4C),
-                  -0.01f, func_002A7940());
-    func_00281EB8(a0 + 0x10, 0x2D,
+                  -0.01f, RandomAngle());
+    DrawBillboardQuad_00281EB8(moby + 0x10, 0x2D,
                   (func_002A7820_1(4, 0x28) << 24) | 0x00DDB973, 1,
-                  *(float *)(ctx + 0x4C) * 1.225f, 0.0f, func_002A7940());
-    func_00281EB8(a0 + 0x10, 0x29,
+                  *(float *)(ctx + 0x4C) * 1.225f, 0.0f, RandomAngle());
+    DrawBillboardQuad_00281EB8(moby + 0x10, 0x29,
                   (func_002A7820_1(4, 0x28) << 24) | 0x00DDB973, 1,
-                  *(float *)(ctx + 0x4C) * 0.6f, 0.0f, func_002A7940());
-    func_00281EB8(a0 + 0x10, 0x2A,
+                  *(float *)(ctx + 0x4C) * 0.6f, 0.0f, RandomAngle());
+    DrawBillboardQuad_00281EB8(moby + 0x10, 0x2A,
                   (func_002A7820_1(4, 0x2D) << 24) | 0x00DDB973, 1,
                   func_002A7878_2(0.975f, 1.025f) * *(float *)(ctx + 0x4C),
-                  0.0f, func_002A7940());
-    func_00281EB8(a0 + 0x10, 0x2A,
+                  0.0f, RandomAngle());
+    DrawBillboardQuad_00281EB8(moby + 0x10, 0x2A,
                   (func_002A7820_1(4, 0x2D) << 24) | 0x00DDB973, 1,
                   func_002A7878_2(0.975f, 1.025f) * *(float *)(ctx + 0x4C),
-                  0.0f, func_002A7940());
-    func_L00_003BBF48(a0);
-    func_L00_003BCDC0(a0);
-    func_002FC560(0x47, 0x0005360B);
+                  0.0f, RandomAngle());
+    DrawEffectSlotSprites(moby);
+    ProcessOwnedSparkRecords(moby);
+    VU1_addGSregister(0x47, 0x0005360B);
 }
 
 extern int D_L00_0023DDA0[];
@@ -279,36 +281,36 @@ void func_L00_003BB8B8(char *self, char *target, int count)
             max_scale = 0.005f;
             min_dist = 3.25f;
             max_dist = 4.75f;
-            *(float *)(p + 64) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 68) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 72) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 100) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 104) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 108) = func_002A7878(min_angle, max_angle);
-            *(float *)(p + 76) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 80) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 84) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 112) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 116) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 120) = func_002A78D8(min_scale, max_scale);
-            *(float *)(p + 88) = func_002A7878(min_dist, max_dist);
-            *(float *)(p + 92) = func_002A7878(min_dist, max_dist);
-            *(float *)(p + 96) = func_002A7878(min_dist, max_dist);
-            *(float *)(p + 124) = func_002A7878(min_dist, max_dist);
-            *(float *)(p + 128) = func_002A7878(min_dist, max_dist);
-            *(float *)(p + 132) = func_002A7878(min_dist, max_dist);
-            func_00282C88(p);
-            func_00282C88(p + 0x10);
+            *(float *)(p + 64) = RandomFloatRange(min_angle, max_angle);
+            *(float *)(p + 68) = RandomFloatRange(min_angle, max_angle);
+            *(float *)(p + 72) = RandomFloatRange(min_angle, max_angle);
+            *(float *)(p + 100) = RandomFloatRange(min_angle, max_angle);
+            *(float *)(p + 104) = RandomFloatRange(min_angle, max_angle);
+            *(float *)(p + 108) = RandomFloatRange(min_angle, max_angle);
+            *(float *)(p + 76) = RandomSignedFloatRange(min_scale, max_scale);
+            *(float *)(p + 80) = RandomSignedFloatRange(min_scale, max_scale);
+            *(float *)(p + 84) = RandomSignedFloatRange(min_scale, max_scale);
+            *(float *)(p + 112) = RandomSignedFloatRange(min_scale, max_scale);
+            *(float *)(p + 116) = RandomSignedFloatRange(min_scale, max_scale);
+            *(float *)(p + 120) = RandomSignedFloatRange(min_scale, max_scale);
+            *(float *)(p + 88) = RandomFloatRange(min_dist, max_dist);
+            *(float *)(p + 92) = RandomFloatRange(min_dist, max_dist);
+            *(float *)(p + 96) = RandomFloatRange(min_dist, max_dist);
+            *(float *)(p + 124) = RandomFloatRange(min_dist, max_dist);
+            *(float *)(p + 128) = RandomFloatRange(min_dist, max_dist);
+            *(float *)(p + 132) = RandomFloatRange(min_dist, max_dist);
+            ClearVector128(p);
+            ClearVector128(p + 0x10);
             *(int *)(p + 0x94) = count;
             *(int *)(p + 0x98) = count;
             *(char **)(p + 0x90) = target;
             *(int *)(p + 0x9C) = 0;
             *(int *)(p + 0x88) = 20;
-            info = func_002AB1F0(target);
+            info = GetMobyPrivateValue0(target);
             if (info) {
-                func_L00_003252A8(target, v, 1);
-                func_00282D30(v, v, *(float *)(info + 0x10));
-                func_00282CC0(p + 0x30, v, target + 0x10);
+                ForwardObjectPositionCall(target, v, 1);
+                FastVecScale(v, v, *(float *)(info + 0x10));
+                FastVecAdd(p + 0x30, v, target + 0x10);
             } else {
                 qcopy(p + 0x30, target_position);
             }
@@ -318,34 +320,35 @@ void func_L00_003BB8B8(char *self, char *target, int count)
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
-void func_L00_003BC080(char *p)
+/* Sets a sprite record to its starting values: unit-sized corners and a cleared state. */
+void func_L00_003BC080(char *record)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 280993940374112LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(record + 112) = 0LL;
+    *(int *)(record + 80) = 0;
+    *(int *)(record + 84) = 0;
+    *(float *)(record + 88) = 1.0f;
+    *(int *)(record + 92) = 0;
+    *(int *)(record + 96) = 0;
+    *(float *)(record + 100) = 1.0f;
+    *(float *)(record + 104) = 1.0f;
+    *(float *)(record + 108) = 1.0f;
+    *(float *)(record + 8) = -1.0f;
+    *(float *)(record + 24) = 1.0f;
+    *(float *)(record + 40) = -1.0f;
+    *(float *)(record + 56) = 1.0f;
+    *(float *)(record + 4) = -1.0f;
+    *(float *)(record + 36) = 1.0f;
+    *(float *)(record + 52) = 1.0f;
+    *(int *)(record + 0) = 0;
+    *(int *)(record + 16) = 0;
+    *(int *)(record + 32) = 0;
+    *(int *)(record + 48) = 0;
+    *(float *)(record + 12) = 1.0f;
+    *(float *)(record + 28) = 1.0f;
+    *(float *)(record + 44) = 1.0f;
+    *(long long *)(record + 128) = 280993940374112LL;
+    *(float *)(record + 20) = -1.0f;
+    *(float *)(record + 60) = 1.0f;
 }
 
 /* Derives a 16-byte element at index-1 from its index-2 and index-3 neighbours through two bound helpers; original game role is unknown. */
@@ -399,7 +402,7 @@ extern void func_00282C88_1(void *p);
    in their own variables, and the two owner words are stored in the order 0x9C, 0x98, so that
    cc1 keeps the table base and the output pointer in registers and fills the delay slots the
    way retail does. */
-void func_L00_003BC998(char *owner, char *arg1)
+void func_L00_003BC998(char *moby, char *linkedValue)
 {
     Rac2Native_003BC998_Slot *base = D_L00_0023F060;
     Rac2Native_003BC998_Slot *slot;
@@ -409,12 +412,12 @@ void func_L00_003BC998(char *owner, char *arg1)
     float r1;
     float r2;
 
-    ctx = *(char **)(owner + 0x68);
+    ctx = *(char **)(moby + 0x68);
     for (i = 0; i < 16; i++) {
         slot = base + i;
         if (slot->owner_A0 != 0)
             continue;
-        slot->owner_A0 = owner;
+        slot->owner_A0 = moby;
         out = (float *)((char *)slot + 0x40);
         (*(int *)(ctx + 0x58))++;
         slot->f_50 = func_002A7878_2(-3.14159274f, 3.14159274f);
@@ -437,10 +440,10 @@ void func_L00_003BC998(char *owner, char *arg1)
         slot->f_94 = func_002A7878_2(3.25f, 4.75f) * 0.25f;
         func_00282C88_1(slot);
         func_00282C88_1((char *)slot + 0x10);
-        slot->w_9C = arg1;
-        slot->w_98 = arg1;
-        r1 = func_002A7940();
-        r2 = func_002A7940();
+        slot->w_9C = linkedValue;
+        slot->w_98 = linkedValue;
+        r1 = RandomAngle();
+        r2 = RandomAngle();
         func_002AF000_1(out, *(float *)(ctx + 0x4C), r1, r2);
         break;
     }
@@ -478,43 +481,43 @@ void func_L00_003BD510(float *position, float *direction, int count, int color)
     int i;
 
     for (i = 0; i < count; i++) {
-        scale = func_002A7878(1.75f, 2.0f);
-        spin = func_002A77E0(2);
+        scale = RandomFloatRange(1.75f, 2.0f);
+        spin = RandomIntBelow(2);
         if (!spin)
             spin--;
         angles[3] = 0;
-        angles[1] = func_002A7878(-1.57079637f, 1.57079637f);
-        angles[0] = func_002A7878(-1.57079637f, 1.57079637f);
-        angles[2] = func_002A7878(-1.57079637f, 1.57079637f);
-        func_002833F0(matrix, angles);
-        func_00283098(velocity, direction, matrix);
+        angles[1] = RandomFloatRange(-1.57079637f, 1.57079637f);
+        angles[0] = RandomFloatRange(-1.57079637f, 1.57079637f);
+        angles[2] = RandomFloatRange(-1.57079637f, 1.57079637f);
+        euler_rotation_basis(matrix, angles);
+        matrix_mul_vec3(velocity, direction, matrix);
 
         saved = previous;
-        func_00282F20(velocity, velocity, 0.05f);
+        vec_scale_to_length(velocity, velocity, 0.05f);
         velocity[2] += 0.05f;
         qcopy(saved, position);
-        position[0] += func_002A78D8(0.0f, 0.15f);
-        position[1] += func_002A78D8(0.0f, 0.15f);
-        position[2] += func_002A78D8(0.0f, 0.15f);
+        position[0] += RandomSignedFloatRange(0.0f, 0.15f);
+        position[1] += RandomSignedFloatRange(0.0f, 0.15f);
+        position[2] += RandomSignedFloatRange(0.0f, 0.15f);
 
-        if (func_001163B0() & 1) {
-            particle = func_002C2210(position, 60, scale * 0.1f, scale, color | 0x4F000000, 0,
+        if (Rand() & 1) {
+            particle = SpawnGroundEffectParticle(position, 60, scale * 0.1f, scale, color | 0x4F000000, 0,
                                      spin, velocity, 1, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 112;
-            particle = func_002C2210(position, 60, scale * 0.07f, scale * 0.7f, 0x7FFFFFFF, 1,
+                particle[9] = FloatToInt(4.0f) + 112;
+            particle = SpawnGroundEffectParticle(position, 60, scale * 0.07f, scale * 0.7f, 0x7FFFFFFF, 1,
                                      -spin, velocity, 1, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 112;
+                particle[9] = FloatToInt(4.0f) + 112;
         } else {
-            particle = func_002C2210(position, 60, scale * 0.1f, scale, color | 0x4F000000, 0,
+            particle = SpawnGroundEffectParticle(position, 60, scale * 0.1f, scale, color | 0x4F000000, 0,
                                      spin, velocity, 1, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 112;
-            particle = func_002C2210(position, 60, scale * 0.07f, scale * 0.7f, 0x7FFFFFFF, 1,
+                particle[9] = FloatToInt(4.0f) + 112;
+            particle = SpawnGroundEffectParticle(position, 60, scale * 0.07f, scale * 0.7f, 0x7FFFFFFF, 1,
                                      -spin, velocity, 1, 0.002f);
             if (particle)
-                particle[9] = func_00283CF0(4.0f) + 112;
+                particle[9] = FloatToInt(4.0f) + 112;
         }
     }
 }
@@ -522,34 +525,34 @@ void func_L00_003BD510(float *position, float *direction, int count, int color)
 /* func_L00_003BD7E0 is in L00_003B9CB8-update.c. */
 
 /* Normalises and combines two temporary vectors from a state block, dispatches on the combined result and conditionally scales the output vector. */
-void func_L00_003BFDE8(char *self, char *p1, int p2)
+void func_L00_003BFDE8(char *moby, char *outVector, int keepSign)
 {
     float a[4];
     float b[4];
 
-    func_00282F20_2(a, self + 224, 0.1f);
-    func_00282F20_2(b, self + 224, -3.0f);
-    func_00282CC0_6(a, a, self + 16);
-    func_00282CC0_6(b, b, self + 16);
+    func_00282F20_2(a, moby + 224, 0.1f);
+    func_00282F20_2(b, moby + 224, -3.0f);
+    func_00282CC0_6(a, a, moby + 16);
+    func_00282CC0_6(b, b, moby + 16);
 
-    if (func_002761F8(a, b, 2, self, 0))
-        func_00282F20_2(p1, D_L00_001BF240, 1.0f);
+    if (CollLine(a, b, 2, moby, 0))
+        func_00282F20_2(outVector, D_L00_001BF240, 1.0f);
     else
-        func_00282F20_2(p1, self + 224, -1.0f);
+        func_00282F20_2(outVector, moby + 224, -1.0f);
 
-    if (p2 == 0)
-        func_00282D30_6(p1, p1, -1.0f);
+    if (keepSign == 0)
+        func_00282D30_6(outVector, outVector, -1.0f);
 }
 
 /* Read the word at offset 0x 18 through the pointer stored at owner offset 0x 68. */
-unsigned int func_L00_003BFF58(unsigned int param_1)
+unsigned int func_L00_003BFF58(unsigned int moby)
 {
-    unsigned int inner_ptr;
-    unsigned int result;
+    unsigned int vars;
+    unsigned int value;
 
-    inner_ptr = *(unsigned int *)(param_1 + 0x68);
-    result = *(unsigned int *)(inner_ptr + 0x18);
-    return result;
+    vars = *(unsigned int *)(moby + 0x68);
+    value = *(unsigned int *)(vars + 0x18);
+    return value;
 }
 
 extern float func_002B04E0(char *a0, float *src, char *third);
@@ -570,108 +573,110 @@ extern float func_00282C48(float f);
    `char scratch[0x50]` gives retail's frame. The 16-byte clear is retail's `sq $zero,0($sp)`:
    with the scheduling barrier of zero_ti_store_barrier.py it takes retail's place, and so does
    the prologue's save order. */
-float func_L00_003BFF68(char *a0, char *a1, char *a2, char *a3)
+float func_L00_003BFF68(char *moby, char *state, char *startBlock, char *extra)
 {
     char scratch[0x50];
-    float f;
+    float angle;
 
-    *(Rac2TI128 *)scratch = *(Rac2TI128 *)a2;
-    f = func_002B04E0(a0, (float *)scratch, a3);
+    *(Rac2TI128 *)scratch = *(Rac2TI128 *)startBlock;
+    angle = GetHeadingAngleOfVector(moby, (float *)scratch, extra);
     *(int *)(scratch + 0x40) = 0;
-    func_002AAA00(scratch + 0x40, f, *(float *)(a1 + 0x14), *(float *)(a1 + 0x18), 3.14159274f, a1 + 0xB4, 0);
+    ApproachTargetWithDirectionMode(scratch + 0x40, angle, *(float *)(state + 0x14), *(float *)(state + 0x18), 3.14159274f, state + 0xB4, 0);
     *(Rac2TI128 *)scratch = 0;
-    *(float *)(scratch + 8) = *(float *)(a1 + 0xB4);
-    func_002833F0(scratch + 0x10, scratch);
-    func_00283738(a0 + 0xC0, a0 + 0xC0, scratch + 0x10);
-    return func_00282C48(f) - func_00282C48(*(float *)(a1 + 0xB4));
+    *(float *)(scratch + 8) = *(float *)(state + 0xB4);
+    euler_rotation_basis(scratch + 0x10, scratch);
+    multiply_matrix3x3(moby + 0xC0, moby + 0xC0, scratch + 0x10);
+    return FloatAbs(angle) - FloatAbs(*(float *)(state + 0xB4));
 }
 
 /* shared native body of family a04928c6 */
-void func_L00_003C1D30(char *p)
+/* Sets a bigger sprite record to its starting values: corners twice the size and a cleared state. */
+void func_L00_003C1D30(char *record)
 {
-    *(long long *)(p + 112) = 0LL;
-    *(int *)(p + 80) = 0;
-    *(int *)(p + 84) = 0;
-    *(float *)(p + 88) = 1.0f;
-    *(int *)(p + 92) = 0;
-    *(int *)(p + 96) = 0;
-    *(float *)(p + 100) = 1.0f;
-    *(float *)(p + 104) = 1.0f;
-    *(float *)(p + 108) = 1.0f;
-    *(float *)(p + 8) = -2.0f;
-    *(float *)(p + 24) = 2.0f;
-    *(float *)(p + 40) = -2.0f;
-    *(float *)(p + 56) = 2.0f;
-    *(float *)(p + 4) = -2.0f;
-    *(float *)(p + 36) = 2.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 0x0000FF9000000260LL;
-    *(float *)(p + 20) = -2.0f;
-    *(float *)(p + 52) = 2.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(record + 112) = 0LL;
+    *(int *)(record + 80) = 0;
+    *(int *)(record + 84) = 0;
+    *(float *)(record + 88) = 1.0f;
+    *(int *)(record + 92) = 0;
+    *(int *)(record + 96) = 0;
+    *(float *)(record + 100) = 1.0f;
+    *(float *)(record + 104) = 1.0f;
+    *(float *)(record + 108) = 1.0f;
+    *(float *)(record + 8) = -2.0f;
+    *(float *)(record + 24) = 2.0f;
+    *(float *)(record + 40) = -2.0f;
+    *(float *)(record + 56) = 2.0f;
+    *(float *)(record + 4) = -2.0f;
+    *(float *)(record + 36) = 2.0f;
+    *(int *)(record + 0) = 0;
+    *(int *)(record + 16) = 0;
+    *(int *)(record + 32) = 0;
+    *(int *)(record + 48) = 0;
+    *(float *)(record + 12) = 1.0f;
+    *(float *)(record + 28) = 1.0f;
+    *(float *)(record + 44) = 1.0f;
+    *(long long *)(record + 128) = 0x0000FF9000000260LL;
+    *(float *)(record + 20) = -2.0f;
+    *(float *)(record + 52) = 2.0f;
+    *(float *)(record + 60) = 1.0f;
 }
 
+/* Draws two glowing flat sprites between a point and the camera, one big and one half as big. */
 void func_L00_003C1FC8(int unused, char *pos, int color, int first, int second, float scale)
 {
-    char pkt[144];
-    float m[16];
+    char packet[144];
+    float matrix[16];
     float quat[4];
     float off[4];
-    long long r;
+    long long texture;
     float dx, dy;
 
-    ref_L00_003C1FC8_00(pkt);
-    *(int *)(pkt + 80) = 0;
-    *(float *)(pkt + 92) = 1.0f;
-    *(float *)(pkt + 96) = 1.0f;
-    *(float *)(pkt + 104) = 1.0f;
-    *(float *)(pkt + 108) = 1.0f;
-    *(int *)(pkt + 84) = 0;
-    *(int *)(pkt + 88) = 0;
-    *(int *)(pkt + 100) = 0;
-    r = func_002E67A0_2(11);
-    *(long long *)(pkt + 112) = 0;
-    *(long long *)(pkt + 120) = r;
-    *(long long *)(pkt + 128) = 0xFF9000000260LL;
-    *(long long *)(pkt + 136) = 0x8000000048LL;
+    ref_L00_003C1FC8_00(packet);
+    *(int *)(packet + 80) = 0;
+    *(float *)(packet + 92) = 1.0f;
+    *(float *)(packet + 96) = 1.0f;
+    *(float *)(packet + 104) = 1.0f;
+    *(float *)(packet + 108) = 1.0f;
+    *(int *)(packet + 84) = 0;
+    *(int *)(packet + 88) = 0;
+    *(int *)(packet + 100) = 0;
+    texture = func_002E67A0_2(11);
+    *(long long *)(packet + 112) = 0;
+    *(long long *)(packet + 120) = texture;
+    *(long long *)(packet + 128) = 0xFF9000000260LL;
+    *(long long *)(packet + 136) = 0x8000000048LL;
     dx = D_L00_001B8C80.x_140 - *(float *)pos;
     dy = D_L00_001B8C80.y_144 - *(float *)(pos + 4);
-    *(int *)(pkt + 76) = color + first;
-    *(int *)(pkt + 72) = color + first;
-    *(int *)(pkt + 68) = color + first;
-    *(int *)(pkt + 64) = color + first;
+    *(int *)(packet + 76) = color + first;
+    *(int *)(packet + 72) = color + first;
+    *(int *)(packet + 68) = color + first;
+    *(int *)(packet + 64) = color + first;
     quat[3] = 0;
     quat[2] = func_802EE7A8_1(dx, dy);
     quat[1] = -func_802EE7A8_1(func_802EE2E8_1(pos, &D_L00_001B8C80.x_140),
                               D_L00_001B8C80.z_148 - *(float *)(pos + 8));
     quat[0] = func_0031A888_1();
-    func_802EE970_1(m, quat);
+    func_802EE970_1(matrix, quat);
     func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
     func_802EE3D0_1(off, off, 0.5f);
-    m[12] = *(float *)(pos) + off[0];
-    m[13] = *(float *)(pos + 4) + off[1];
-    m[14] = *(float *)(pos + 8) + off[2];
-    m[15] = 1.0f;
-    func_002EE178_1(pkt, pkt, scale);
-    func_002EE178_1(pkt + 16, pkt + 16, scale);
-    func_002EE178_1(pkt + 32, pkt + 32, scale);
-    func_002EE178_1(pkt + 48, pkt + 48, scale);
-    func_802EAC30_1(pkt, m, 0);
-    *(int *)(pkt + 76) = color + second;
-    *(int *)(pkt + 72) = color + second;
-    *(int *)(pkt + 68) = color + second;
-    *(int *)(pkt + 64) = color + second;
-    func_002EE178_1(pkt, pkt, 0.5f);
-    func_002EE178_1(pkt + 16, pkt + 16, 0.5f);
-    func_002EE178_1(pkt + 32, pkt + 32, 0.5f);
-    func_002EE178_1(pkt + 48, pkt + 48, 0.5f);
-    func_802EAC30_1(pkt, m, 0);
+    matrix[12] = *(float *)(pos) + off[0];
+    matrix[13] = *(float *)(pos + 4) + off[1];
+    matrix[14] = *(float *)(pos + 8) + off[2];
+    matrix[15] = 1.0f;
+    func_002EE178_1(packet, packet, scale);
+    func_002EE178_1(packet + 16, packet + 16, scale);
+    func_002EE178_1(packet + 32, packet + 32, scale);
+    func_002EE178_1(packet + 48, packet + 48, scale);
+    func_802EAC30_1(packet, matrix, 0);
+    *(int *)(packet + 76) = color + second;
+    *(int *)(packet + 72) = color + second;
+    *(int *)(packet + 68) = color + second;
+    *(int *)(packet + 64) = color + second;
+    func_002EE178_1(packet, packet, 0.5f);
+    func_002EE178_1(packet + 16, packet + 16, 0.5f);
+    func_002EE178_1(packet + 32, packet + 32, 0.5f);
+    func_002EE178_1(packet + 48, packet + 48, 0.5f);
+    func_802EAC30_1(packet, matrix, 0);
 }
 
 extern void func_L00_003263D0(char *a, char *b, float h, int c, int d, char *e, float i,
@@ -679,7 +684,7 @@ extern void func_L00_003263D0(char *a, char *b, float h, int c, int d, char *e, 
 
 /* Twenty rounds of four bound helpers on three 16-byte scratch vectors, the first of which
    starts as the second argument's record; each round ends with the eleven-argument emitter. */
-void func_L00_003C2DE8(char *a0, char *a1, float fa, float fb)
+void func_L00_003C2DE8(char *effect, char *source, float fa, float fb)
 {
     char v0[16];
     char v1[16];
@@ -687,13 +692,13 @@ void func_L00_003C2DE8(char *a0, char *a1, float fa, float fb)
     char *pv0 = v0;
     int i;
 
-    *(Rac2TI128 *)pv0 = *(Rac2TI128 *)a1;
+    *(Rac2TI128 *)pv0 = *(Rac2TI128 *)source;
     i = 0x13;
     do {
-        func_002A7A00(v1, fa, fa);
+        RandomDirectionVector(v1, fa, fa);
         func_00282F20_2(v2, v1, func_002A7878_2(fb * 0.75f, fb * 1.25f));
         func_00282CC0_6(v1, v1, pv0);
-        func_L00_003263D0(a0, v1, 0.0f, 1, 0, v2, 0.0f, 0x50804040, 0, 2.0f, 5.0f);
+        SpawnTintedEffects(effect, v1, 0.0f, 1, 0, v2, 0.0f, 0x50804040, 0, 2.0f, 5.0f);
         i--;
     } while (i >= 0);
 }
@@ -708,32 +713,33 @@ extern void func_323448();
 extern void func_323958(unsigned char *, unsigned char *);
 extern float func_2EF0F8(float, float);
 
-void func_L00_003C2F10(unsigned char *a0) {
-    unsigned char *s0 = a0;
-    unsigned char *s1 = *(unsigned char **)(s0 + 0x68);
-    switch (s0[0x20]) {
+void func_L00_003C2F10(unsigned char *moby) {
+    unsigned char *self = moby;
+    unsigned char *vars = *(unsigned char **)(self + 0x68);
+    switch (self[0x20]) {
     case 0:
-        if (*(long long *)s1 == -1) {
+        if (*(long long *)vars == -1) {
             break;
         }
         {
             unsigned char stamp = 0xFF;
-            *(unsigned char *)(s0 + 0x30) = stamp;
+            *(unsigned char *)(self + 0x30) = stamp;
         }
-        func_323448(s0, s1 + 0x30, 0x64, *(int *)(s1 + 4), *(int *)s1, -1, 7, 0);
-        s1[0xC5A] = 1;
-        s0[0x20] = 1;
+        func_323448(self, vars + 0x30, 0x64, *(int *)(vars + 4), *(int *)vars, -1, 7, 0);
+        vars[0xC5A] = 1;
+        self[0x20] = 1;
         break;
     case 1:
-        *(float *)(s0 + 0xF4) = func_2EF0F8(
-            *(float *)(s0 + 0xF4), *(float *)(s1 + 8) * 0.000290888245f);
-        func_323958(s0, s1 + 0x30);
+        *(float *)(self + 0xF4) = func_2EF0F8(
+            *(float *)(self + 0xF4), *(float *)(vars + 8) * 0.000290888245f);
+        func_323958(self, vars + 0x30);
         break;
     }
 }
 
 
 /* When the context flag at offset 0x24 is nonzero, pass scale 1.0, the context, its vector at offset 0x10 and mode zero to the bound helper; original game role is unknown. */
+/* Calls a helper for this moby only when its active flag is set. */
 void func_L00_003C33E0(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 {
     Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context = owner->context_68;
@@ -744,49 +750,51 @@ void func_L00_003C33E0(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 
 
 /* The 0x68 context block starts with two words and a halfword that this body clears. */
-void func_L00_003C37A0(char *p)
+/* On the first frame, clears the moby private data and moves it to state 1. */
+void func_L00_003C37A0(char *moby)
 {
-    char *q = *(char **)(p + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    if (*(unsigned char *)(p + 0x20) == 0) {
-        *(int *)(q + 0x8) = 0;
-        *(short *)(q + 0xE) = 0;
-        *(int *)(q + 0x0) = 0;
-        *(unsigned char *)(p + 0x20) = 1;
+    if (*(unsigned char *)(moby + 0x20) == 0) {
+        *(int *)(vars + 0x8) = 0;
+        *(short *)(vars + 0xE) = 0;
+        *(int *)(vars + 0x0) = 0;
+        *(unsigned char *)(moby + 0x20) = 1;
     }
 }
 
 /* Runs 20 local iterations; the first two calls each pass integer 2 to the same bound target; on each non-null final result, stores a short at +10, an int at +36, and bytes at +42 and +43. */
-void func_L00_003C3920(char *unused, char *arg)
+/* Spawns twenty small sparks at a position, each with a random speed and grey shade. */
+void func_L00_003C3920(char *unused, char *position)
 {
     char local[16];
-    float f;
+    float speed;
     int i;
-    unsigned int v;
-    unsigned int w;
-    unsigned int x;
-    char *r;
+    unsigned int shade;
+    unsigned int shadeHigh;
+    unsigned int colorBits;
+    char *particle;
 
     i = 19;
     do {
         func_002A77E0_1(2);
         i = i - 1;
         func_002A77E0_1(2);
-        f = func_002A7878_2(70000.0f, 150000.0f);
-        v = func_002A7820_1(10, 127);
-        w = (v << 8) | 0x7f000000U;
-        x = (v << 16) | w;
-        v = x | v;
-        func_002A7A00(local, 1.6666668670950457453728e-05f,
+        speed = func_002A7878_2(70000.0f, 150000.0f);
+        shade = func_002A7820_1(10, 127);
+        shadeHigh = (shade << 8) | 0x7f000000U;
+        colorBits = (shade << 16) | shadeHigh;
+        shade = colorBits | shade;
+        RandomDirectionVector(local, 1.6666668670950457453728e-05f,
                 6.6666672937572002410889e-03f);
-        r = func_002BDCE8(0.3f, 1.0f, 1.01f, f, arg, 0, local, v, 1);
-        if (r != 0) {
-            char *q = r + 32;
+        particle = SpawnSpinningSparkParticle(0.3f, 1.0f, 1.01f, speed, position, 0, local, shade, 1);
+        if (particle != 0) {
+            char *extra = particle + 32;
 
-            *(short *)(r + 10) = 120;
-            *(int *)(q + 4) = 2;
-            *(char *)(q + 10) = 127;
-            *(char *)(q + 11) = *(unsigned char *)(r + 10);
+            *(short *)(particle + 10) = 120;
+            *(int *)(extra + 4) = 2;
+            *(char *)(extra + 10) = 127;
+            *(char *)(extra + 11) = *(unsigned char *)(particle + 10);
         }
     } while (i >= 0);
 }
@@ -801,22 +809,23 @@ void func_L00_003C3920(char *unused, char *arg)
 /* Implemented in L00_003C58E8.c. */
 
 /* one float gate followed by five integer gates; every failing gate */
-int func_L00_003C5B18(float f12)
+/* Returns 1 if the player can still use the weapon right now, otherwise 0. */
+int func_L00_003C5B18(float value)
 {
-    char *b;
+    char *hero;
 
-    if (f12 <= 0.0f)
+    if (value <= 0.0f)
         goto fail;
-    b = D_00189E20_13;
-    if (*(short *)(*(int *)(b + 8848) + 170) != 0)
+    hero = D_00189E20_13;
+    if (*(short *)(*(int *)(hero + 8848) + 170) != 0)
         goto fail;
-    if (*(unsigned char *)(b + 8884) != 0)
+    if (*(unsigned char *)(hero + 8884) != 0)
         goto fail;
-    if (*(int *)(b + 8852) == 49)
+    if (*(int *)(hero + 8852) == 49)
         goto fail;
-    if (*(int *)(b + 8860) == 20)
+    if (*(int *)(hero + 8860) == 20)
         goto fail;
-    if (*(int *)(b + 9420) > 0)
+    if (*(int *)(hero + 9420) > 0)
         goto ok;
 fail:
     return 0;

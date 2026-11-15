@@ -112,7 +112,7 @@ extern void func_002B4090(void *, void *, float, float, float);
 /* True once the gadget in slot 10 has been upgraded. */
 static inline int prisonGadgetUpgraded(void)
 {
-    int level = (D_L14_002686F0 + D_00139568[10])->level;
+    int level = (D_L14_002686F0 + gItemSlotToRecord[10])->level;
 
     return level >= 2;
 }
@@ -120,22 +120,22 @@ static inline int prisonGadgetUpgraded(void)
 /* Shows help message MSG unless its history entry IDX says it was shown in the last 18 seconds. */
 static inline void prisonHelpTimed(int msg, int idx)
 {
-    if (D_001A7390 - D_0018C958[idx].time > 1080 || !D_0018C958[idx].time)
-        func_00288E18(msg, idx);
-    else if (D_0018C958[idx].time < D_001A7390)
-        D_0018C958[idx].time = D_001A7390;
+    if (D_001A7390 - gSubtitleHistory[idx].time > 1080 || !gSubtitleHistory[idx].time)
+        RequestSubtitleVoiceLine(msg, idx);
+    else if (gSubtitleHistory[idx].time < D_001A7390)
+        gSubtitleHistory[idx].time = D_001A7390;
 }
 
 /* The first time only records history entry IDX as seen in this level; later times show MSG. */
 static inline void prisonHelp(int msg, int idx)
 {
-    if (D_0018C958[idx].count) {
+    if (gSubtitleHistory[idx].count) {
         prisonHelpTimed(msg, idx);
     } else {
-        D_0018C958[idx].count++;
-        if (D_0018C958[idx].time < D_001A7390)
-            D_0018C958[idx].time = D_001A7390;
-        D_0018C958[idx].levels = (D_0018C958[idx].levels | (1u << D_001A79F0)) | 0x80000000u;
+        gSubtitleHistory[idx].count++;
+        if (gSubtitleHistory[idx].time < D_001A7390)
+            gSubtitleHistory[idx].time = D_001A7390;
+        gSubtitleHistory[idx].levels = (gSubtitleHistory[idx].levels | (1u << gCurrentMapIndex)) | 0x80000000u;
     }
 }
 
@@ -166,68 +166,68 @@ void func_L14_003F4F98(char *obj)
             }
             st->active = 0;
         }
-        func_002A7750(obj, 1, -1);
+        SetMobyState(obj, 1, -1);
         break;
     case 1:
-        if (func_002B3868(obj))
+        if (SetFirstPendingFlag(obj))
             st->count = 0;
-        if (func_002ACBC8(D_00189EA0, st->zone[0])) {
+        if (IsPointInCuboid(gHeroPosition, st->zone[0])) {
             if (!prisonGadgetUpgraded())
-                func_002A7750(obj, 2, -1);
+                SetMobyState(obj, 2, -1);
         }
         if (st->active) {
             qcopy(vel, D_L14_001A8F20);
             vel[1] -= 0.1f;
-            func_002B4090(st->moby, vel, 0.05f, 0.0f, 0.0f);
+            RotateObjectAboutPoint(st->moby, vel, 0.05f, 0.0f, 0.0f);
         }
         break;
     case 2:
-        if (func_002B3868(obj))
+        if (SetFirstPendingFlag(obj))
             st->count = 0;
         if (D_L14_001A8F00 != 2 && st->count >= 6) {
-            if (func_00288D58())
-                func_00287FF8(10, 5);
+            if (IsFlagByteSet())
+                SeekChainEntry(10, 5);
             else
-                func_00287FF8(10, 2);
-            func_L08_0030A8F8(2);
+                SeekChainEntry(10, 2);
+            RunScreenUpdateSteps(2);
             if (st->moby) {
                 *(unsigned short *)(st->moby + 0x34) |= 1;
                 st->moby[0x31] = 0;
             }
             st->active = 0;
-            func_002A7750(obj, 1, -1);
+            SetMobyState(obj, 1, -1);
         }
         break;
     }
 
-    if (func_002ACBC8(D_00189EA0, st->zone[1]) && !(D_00139630 & 2))
+    if (IsPointInCuboid(gHeroPosition, st->zone[1]) && !(D_00139630 & 2))
         prisonHelpTimed(0xA2C, 131);
-    if (func_002ACBC8(D_00189EA0, st->zone[2])) {
+    if (IsPointInCuboid(gHeroPosition, st->zone[2])) {
         prisonHelp(0xA09, 96);
-        D_0018C958[97].count = 0xFFFF;
+        gSubtitleHistory[97].count = 0xFFFF;
     }
-    if (func_002ACBC8(D_00189EA0, st->zone[3]) && D_L14_001B22E0[2])
+    if (IsPointInCuboid(gHeroPosition, st->zone[3]) && D_L14_001B22E0[2])
         prisonHelp(0xA0A, 97);
-    if (func_002ACBC8(D_00189EA0, st->hintZone) && !(D_0019B2E8[st->row + D_001A79F0 * 16] & 0x80) &&
-        D_0018C958[94].count < 2)
+    if (IsPointInCuboid(gHeroPosition, st->hintZone) && !(D_0019B2E8[st->row + gCurrentMapIndex * 16] & 0x80) &&
+        gSubtitleHistory[94].count < 2)
         prisonHelp(0xA07, 94);
     st->count++;
 }
 
 
 /* Read the word at offset 0x 18 through the pointer stored at owner offset 0x 68. */
-unsigned int func_L14_004137F8(unsigned int param_1)
+unsigned int func_L14_004137F8(unsigned int owner)
 {
-    unsigned int inner_ptr;
-    unsigned int result;
+    unsigned int vars;
+    unsigned int value;
 
-    inner_ptr = *(unsigned int *)(param_1 + 0x68);
-    result = *(unsigned int *)(inner_ptr + 0x18);
-    return result;
+    vars = *(unsigned int *)(owner + 0x68);
+    value = *(unsigned int *)(vars + 0x18);
+    return value;
 }
 
 /* Normalises and combines two temporary vectors from a state block, dispatches on the combined result and conditionally scales the output vector. */
-void func_L14_00413CD8(char *self, char *p1, int p2)
+void func_L14_00413CD8(char *self, char *outDir, int keepDirection)
 {
     float a[4];
     float b[4];
@@ -237,13 +237,13 @@ void func_L14_00413CD8(char *self, char *p1, int p2)
     func_00282CC0_6(a, a, self + 16);
     func_00282CC0_6(b, b, self + 16);
 
-    if (func_002761F8(a, b, 2, self, 0))
-        func_00282F20_2(p1, D_L14_001BF980, 1.0f);
+    if (CollLine(a, b, 2, self, 0))
+        func_00282F20_2(outDir, D_L14_001BF980, 1.0f);
     else
-        func_00282F20_2(p1, self + 224, -1.0f);
+        func_00282F20_2(outDir, self + 224, -1.0f);
 
-    if (p2 == 0)
-        func_00282D30_6(p1, p1, -1.0f);
+    if (keepDirection == 0)
+        func_00282D30_6(outDir, outDir, -1.0f);
 }
 
 extern unsigned char *D_L14_001B259C __attribute__((sda));
@@ -266,7 +266,7 @@ typedef struct {
    clears) bit 7 of the link between them in both nodes' four link bytes. The links of node 0
    serve as the base for both scans, and both scans read the two ids from their stack slots. */
 void func_L14_00420B10(int index, void *first, void *second, int clear) {
-    unsigned char *self = D_L14_001B259C + index * 256;
+    unsigned char *self = gMobyPool_L14 + index * 256;
     PrisonGraphState *state = *(PrisonGraphState **)(self + 0x68);
     int id0, id1;
     int i;
@@ -274,10 +274,10 @@ void func_L14_00420B10(int index, void *first, void *second, int clear) {
     unsigned char *entry;
 
     if (!self[0x20])
-        func_L03_004199F0(self);
+        InitRoutePoolRecord(self);
     id0 = id1 = -1;
-    if (func_L02_0032EDD8(first, state->nodes, state->count, &id0)) {
-        if (func_L02_0032EDD8(second, state->nodes, state->count, &id1)) {
+    if (FindRouteNodeContainingPoint(first, state->nodes, state->count, &id0)) {
+        if (FindRouteNodeContainingPoint(second, state->nodes, state->count, &id1)) {
             if (id0 != id1) {
                 links = state->nodes[0].links;
                 i = 0;
@@ -324,15 +324,16 @@ extern void func_423358();
 extern void func_423B30();
 extern void func_423BD8();
 
-void func_L14_00422FA0(char *a0)
+/* Sets the actor up on its first frame, then updates it and its animations every frame. */
+void func_L14_00422FA0(char *self)
 {
-    if (*(unsigned char *)(a0 + 0x20) == 0) {
-        func_423000(a0);
+    if (*(unsigned char *)(self + 0x20) == 0) {
+        func_423000(self);
     } else {
-        func_423240(a0);
-        func_423358(a0);
-        func_423B30(a0);
-        func_423BD8(a0);
+        func_423240(self);
+        func_423358(self);
+        func_423B30(self);
+        func_423BD8(self);
     }
 }
 
@@ -366,16 +367,16 @@ void func_L14_00423B30(char *object)
     goto end;
 cA:
     if (*(short *)(state + 0x776) != 0) {
-        func_002B5278(object, *(float *)(state + 0x744));
+        StepMovementAtOwnPositionWithFactor(object, *(float *)(state + 0x744));
     } else {
-        func_002B5258(object);
+        StepMovementAtOwnPosition(object);
     }
     goto out;
 cC:
     if (*(short *)(state + 0x77A) != 0) {
-        func_002B50E0(object, state + 0x700, *(float *)(state + 0x768));
+        StepMovementController(object, state + 0x700, *(float *)(state + 0x768));
     } else {
-        func_002B4FF0(object, state + 0x700, *(float *)(state + 0x740));
+        TurnTowardTargetAndStepMovement(object, state + 0x700, *(float *)(state + 0x740));
     }
 out:
 end:
@@ -393,27 +394,27 @@ extern float func_802F5DF8(char *a0, void *a1);
 extern void func_803240F8(char *a0);
 
 /* Restarts the owner's animation: two timed fades, the counter, then the panic state. */
-void func_L14_00423BD8(char *a0)
+void func_L14_00423BD8(char *self)
 {
-    char *s1;
-    float f20;
-    float f21;
+    char *vars;
+    float fadeLimit;
+    float fadeSpeed;
 
-    s1 = *(char **)(a0 + 0x68);
-    f21 = 0.03f;
-    f20 = 0.3f;
-    func_80326928(a0, s1 + 0x50);
-    func_8032AA20(a0, s1 + 0x680, 1, f21, f20);
-    func_8032AA20(a0, s1 + 0x600, 0, f21, f20);
-    if (*(unsigned short *)(a0 + 0x96) <= 0xFFFE)
-        *(unsigned short *)(a0 + 0x96) = *(unsigned short *)(a0 + 0x96) + 1;
-    *(unsigned short *)(s1 + 0x776) = 0;
-    *(unsigned short *)(s1 + 0x778) = 0;
-    *(unsigned short *)(s1 + 0x77A) = 0;
-    if (*(unsigned char *)(a0 + 0x31) != 0) {
-        if (func_802F5DF8(a0 + 0x10, D_L14_001B9500) < 24.0f) {
-            func_803240F8(a0);
-            *(unsigned char *)(a0 + 0x6F) = 0x16;
+    vars = *(char **)(self + 0x68);
+    fadeSpeed = 0.03f;
+    fadeLimit = 0.3f;
+    func_80326928(self, vars + 0x50);
+    func_8032AA20(self, vars + 0x680, 1, fadeSpeed, fadeLimit);
+    func_8032AA20(self, vars + 0x600, 0, fadeSpeed, fadeLimit);
+    if (*(unsigned short *)(self + 0x96) <= 0xFFFE)
+        *(unsigned short *)(self + 0x96) = *(unsigned short *)(self + 0x96) + 1;
+    *(unsigned short *)(vars + 0x776) = 0;
+    *(unsigned short *)(vars + 0x778) = 0;
+    *(unsigned short *)(vars + 0x77A) = 0;
+    if (*(unsigned char *)(self + 0x31) != 0) {
+        if (func_802F5DF8(self + 0x10, D_L14_001B9500) < 24.0f) {
+            func_803240F8(self);
+            *(unsigned char *)(self + 0x6F) = 0x16;
         }
     }
 }
@@ -423,22 +424,23 @@ extern void func_2F5C68();
 extern float func_2F62F0(float a, float b);
 extern float func_2F5DB0(float *p);
 
-void func_L14_00423DC0(char *a0, int a1)
+/* Turns the actor to face a target point and works out how far to tilt its head. */
+void func_L14_00423DC0(char *self, int targetPos)
 {
-    float v[4];
-    char *s0;
-    float f;
+    float toTarget[4];
+    char *vars;
+    float angle;
 
-    s0 = *(char **)(a0 + 0x68);
-    *(unsigned short *)(s0 + 0x776) = 1;
-    func_318ED0(a0, 2, v);
-    func_2F5C68(v, a1, v);
-    f = func_2F62F0(v[0], v[1]);
-    *(float *)(s0 + 0x744) = f;
-    f = func_2F5DB0(v);
-    f = -func_2F62F0(f, v[2]) * 0.5f;
-    *(float *)(s0 + 0x6E4) = f;
-    *(float *)(s0 + 0x664) = f;
+    vars = *(char **)(self + 0x68);
+    *(unsigned short *)(vars + 0x776) = 1;
+    func_318ED0(self, 2, toTarget);
+    func_2F5C68(toTarget, targetPos, toTarget);
+    angle = func_2F62F0(toTarget[0], toTarget[1]);
+    *(float *)(vars + 0x744) = angle;
+    angle = func_2F5DB0(toTarget);
+    angle = -func_2F62F0(angle, toTarget[2]) * 0.5f;
+    *(float *)(vars + 0x6E4) = angle;
+    *(float *)(vars + 0x664) = angle;
 }
 
 /* func_L14_00423E50 is defined in L14_00423E50-gu.c (it needs -frac2-gcse-unsplit-edges). */
@@ -522,168 +524,169 @@ extern float func_00283198(float);
 extern void func_L00_002E6EF8(void (*)(void *), void *);
 extern void func_L14_00426DE8(char *);
 
+/* Runs the prison lift scene: waits for the player, rides the lift, shows the guard and panel text, switches the music and opens the door. */
 void func_L14_004265B8(unsigned char *moby) {
     PrisonLiftState *state = *(PrisonLiftState **)(moby + 0x68);
-    unsigned char *lift = D_L14_001B259C + state->lift * 256;
-    unsigned char *panel = D_L14_001B259C + state->panel * 256;
-    unsigned char *guard = D_L14_001B259C + state->guard * 256;
+    unsigned char *lift = gMobyPool_L14 + state->lift * 256;
+    unsigned char *panel = gMobyPool_L14 + state->panel * 256;
+    unsigned char *guard = gMobyPool_L14 + state->guard * 256;
     PrisonQword pos;
 
     switch (moby[0x20]) {
     case 0:
         moby[0x30] = 0xFF;
         state->fadeLength = 0x7D;
-        if (D_0019B2E8[state->text5C + D_001A79F0 * 16] & 0x80) {
-            if (func_002ACBC8(D_00189EA0, state->enterTrigger)) {
-                func_L00_002B9D60(D_L14_001B268C + state->doorCamera * 128 + 0x30,
+        if (D_0019B2E8[state->text5C + gCurrentMapIndex * 16] & 0x80) {
+            if (IsPointInCuboid(gHeroPosition, state->enterTrigger)) {
+                ResetHeroPositionAndDirection(D_L14_001B268C + state->doorCamera * 128 + 0x30,
                                   D_L14_001B268C + state->doorCamera * 128 + 0x70, 0, 1);
-                *(short *)(D_00189EA0 + 0x247C) = 0;
-                D_001A7AF8[2] = 1;
+                *(short *)(gHeroPosition + 0x247C) = 0;
+                gItemOwnedFlags[2] = 1;
                 D_001A7B30[2] = 1;
-                D_001A7AF8[3] = 1;
+                gItemOwnedFlags[3] = 1;
                 D_001A7B30[3] = 1;
             }
-            if (D_0019B2E8[state->zone60 + D_001A79F0 * 16] & 0x80) {
-                func_L14_00426D18(moby);
-                func_L00_003294F0(D_L14_001B259C + state->door * 256, 1);
+            if (D_0019B2E8[state->zone60 + gCurrentMapIndex * 16] & 0x80) {
+                ActivateGroupEntities(moby);
+                SetObjectFlagBit(gMobyPool_L14 + state->door * 256, 1);
             }
-            func_002A7750(moby, 7, -1);
+            SetMobyState(moby, 7, -1);
         } else {
-            *(short *)(D_00189EA0 + 0x247C) = 1;
-            D_001A7AF8[2] = 0;
+            *(short *)(gHeroPosition + 0x247C) = 1;
+            gItemOwnedFlags[2] = 0;
             D_001A7B30[2] = 0;
-            D_001A7AF8[3] = 0;
+            gItemOwnedFlags[3] = 0;
             D_001A7B30[3] = 0;
-            if (D_0019B2E8[state->text58 + D_001A79F0 * 16] & 0x80) {
-                func_L14_00426D18(moby);
-                func_002A7750(moby, 5, -1);
-            } else if (D_0019B2E8[state->text64 + D_001A79F0 * 16] & 0x80) {
-                func_L14_00426D18(moby);
-                func_002A7750(moby, 4, -1);
-            } else if (D_0019B2E8[state->text54 + D_001A79F0 * 16] & 0x80) {
-                func_002A7750(moby, 3, -1);
+            if (D_0019B2E8[state->text58 + gCurrentMapIndex * 16] & 0x80) {
+                ActivateGroupEntities(moby);
+                SetMobyState(moby, 5, -1);
+            } else if (D_0019B2E8[state->text64 + gCurrentMapIndex * 16] & 0x80) {
+                ActivateGroupEntities(moby);
+                SetMobyState(moby, 4, -1);
+            } else if (D_0019B2E8[state->text54 + gCurrentMapIndex * 16] & 0x80) {
+                SetMobyState(moby, 3, -1);
             } else if (D_L14_001FF4A4 != 0) {
-                func_002A7750(moby, 1, -1);
+                SetMobyState(moby, 1, -1);
             } else {
-                func_002A7750(moby, 2, -1);
+                SetMobyState(moby, 2, -1);
             }
         }
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, state->enterTrigger)) {
-            func_L00_0030DDB0((int)D_L14_001B17A0, 1);
+        if (IsPointInCuboid(gHeroPosition, state->enterTrigger)) {
+            CallLoadedModuleHandlerWithArg_00338040_1((int)D_L14_001B17A0, 1);
             D_L14_001A8FB0 = 2;
             D_L14_001A8FB4 = 8;
             if (D_00138324 & 0x10)
-                func_002A7750(moby, 2, -1);
+                SetMobyState(moby, 2, -1);
         }
         break;
     case 2:
-        if (func_002B3868(moby)) {
-            unsigned char *liftNow = D_L14_001B259C + state->lift * 256;
-            func_L00_002B9D60(liftNow + 0x10, liftNow + 0xF0, 0x6F, 1);
-            func_L00_002B2A40(1, 0x3F, liftNow);
+        if (SetFirstPendingFlag(moby)) {
+            unsigned char *liftNow = gMobyPool_L14 + state->lift * 256;
+            ResetHeroPositionAndDirection(liftNow + 0x10, liftNow + 0xF0, 0x6F, 1);
+            SetHeroMode(1, 0x3F, liftNow);
             if (D_001A63F0[0] != state->music7C)
-                func_L01_00323310(state->music7C, state->music88);
+                QueueKeyedRequest(state->music7C, state->music88);
         }
-        func_L14_00426E60(moby);
-        if (func_L14_00427210(guard)) {
+        UpdateSlotTriggeredEffectRecord(moby);
+        if (IsGuardDefeated(guard)) {
             D_001395E1 = 1;
-            func_002A0430(state->text54);
-            func_002DF3F8(moby + 0xF0, moby + 0xF0);
+            MarkTableEntryFlagged(state->text54);
+            CaptureCheckpointState(moby + 0xF0, moby + 0xF0);
             state->nextState = 3;
-            func_002A7750(moby, 6, -1);
+            SetMobyState(moby, 6, -1);
         }
         break;
     case 3:
-        if (func_002B3868(moby)) {
-            func_L02_002B5F50(0);
-            func_L00_002B9D60(moby + 0x10, moby + 0xF0, 0, 1);
-            func_L14_00426D18(moby);
-            *(int *)(D_00189E20 + 0x24CC) = D_001A7A00;
+        if (SetFirstPendingFlag(moby)) {
+            ResetHeroCarriedObjects(0);
+            ResetHeroPositionAndDirection(moby + 0x10, moby + 0xF0, 0, 1);
+            ActivateGroupEntities(moby);
+            *(int *)(gHeroState + 0x24CC) = D_001A7A00;
             if (D_001A63F0[0] != state->music80)
-                func_L01_00323310(state->music80, state->music88);
+                QueueKeyedRequest(state->music80, state->music88);
         }
-        if (func_L14_003DE8E8(D_L14_001B259C + state->panel * 256)) {
-            func_002A0430(state->text64);
-            func_002DF3F8(guard + 0x10, guard + 0xF0);
+        if (IsMobyInState2Or3(gMobyPool_L14 + state->panel * 256)) {
+            MarkTableEntryFlagged(state->text64);
+            CaptureCheckpointState(guard + 0x10, guard + 0xF0);
             state->nextState = 4;
-            func_002A7750(moby, 6, -1);
+            SetMobyState(moby, 6, -1);
         }
         break;
     case 4:
-        if (func_002B3868(moby)) {
+        if (SetFirstPendingFlag(moby)) {
             PrisonLiftEntity *beam;
-            func_L14_003DE8F8(panel);
+            RequestLiftStart(panel);
             if (guard != 0 && guard[0x20] != 0xFE && guard[0x20] != 0xFD)
-                func_0029F338(guard);
-            beam = (PrisonLiftEntity *)(D_L14_001B259C + state->beam * 256);
+                MarkMobySpawned(guard);
+            beam = (PrisonLiftEntity *)(gMobyPool_L14 + state->beam * 256);
             beam->target = 0;
             beam->flags = (beam->flags | 0x41) & ~0x1000;
-            func_L00_002B9D60(guard + 0x10, guard + 0xF0, 0x6F, 1);
-            func_L00_002B2A40(1, 0x3F, lift);
+            ResetHeroPositionAndDirection(guard + 0x10, guard + 0xF0, 0x6F, 1);
+            SetHeroMode(1, 0x3F, lift);
             if (D_001A63F0[0] != state->music7C)
-                func_L01_00323310(state->music7C, state->music88);
+                QueueKeyedRequest(state->music7C, state->music88);
         }
-        func_L14_00426E60(moby);
-        if (func_002ACBC8(D_00189EA0, state->exitTrigger)) {
-            func_002A0430(state->text58);
-            func_002DF3F8(&pos, panel + 0xF0);
+        UpdateSlotTriggeredEffectRecord(moby);
+        if (IsPointInCuboid(gHeroPosition, state->exitTrigger)) {
+            MarkTableEntryFlagged(state->text58);
+            CaptureCheckpointState(&pos, panel + 0xF0);
             state->nextState = 5;
-            func_002A7750(moby, 6, -1);
+            SetMobyState(moby, 6, -1);
         }
         break;
     case 5:
-        if (func_002B3868(moby)) {
+        if (SetFirstPendingFlag(moby)) {
             PrisonLiftEntity *beam;
-            func_0029F338(lift);
-            beam = (PrisonLiftEntity *)(D_L14_001B259C + state->beam * 256);
+            MarkMobySpawned(lift);
+            beam = (PrisonLiftEntity *)(gMobyPool_L14 + state->beam * 256);
             beam->flags = (beam->flags & ~0x41) | 0x1000;
             beam->target = *(int *)(beam->info + 0x10);
             qcopy(&pos, D_L14_001B268C + state->gateCamera * 128 + 0x30);
-            if (D_00189E20[0x22B4] == 1)
-                func_L02_002B5F50(0);
-            func_L00_002B9D60(&pos, D_L14_001B268C + state->gateCamera * 128 + 0x70, 0, 1);
-            func_L14_003DE990(panel);
-            *(int *)(D_00189E20 + 0x24CC) = D_001A7A00;
+            if (gHeroState[0x22B4] == 1)
+                ResetHeroCarriedObjects(0);
+            ResetHeroPositionAndDirection(&pos, D_L14_001B268C + state->gateCamera * 128 + 0x70, 0, 1);
+            SetMobyStateTwo(panel);
+            *(int *)(gHeroState + 0x24CC) = D_001A7A00;
             if (D_001A63F0[0] != state->music80)
-                func_L01_00323310(state->music80, state->music88);
+                QueueKeyedRequest(state->music80, state->music88);
         }
-        if (D_001A8F00 != 2 && D_L14_001B259C[state->switchEntity * 256 + 0x20] > 0x80) {
-            func_002A0430(state->text5C);
-            func_002DF3F8(D_L14_001B268C + state->doorCamera * 128 + 0x30,
+        if (D_001A8F00 != 2 && gMobyPool_L14[state->switchEntity * 256 + 0x20] > 0x80) {
+            MarkTableEntryFlagged(state->text5C);
+            CaptureCheckpointState(D_L14_001B268C + state->doorCamera * 128 + 0x30,
                           D_L14_001B268C + state->doorCamera * 128 + 0x70);
-            D_001A7AF8[2] = 1;
+            gItemOwnedFlags[2] = 1;
             D_001A7B30[2] = 1;
-            D_001A7AF8[3] = 1;
+            gItemOwnedFlags[3] = 1;
             D_001A7B30[3] = 1;
-            *(short *)(D_00189EA0 + 0x247C) = 0;
-            func_002A7750(moby, 7, -1);
+            *(short *)(gHeroPosition + 0x247C) = 0;
+            SetMobyState(moby, 7, -1);
         }
         break;
     case 6:
-        if (func_002B3868(moby)) {
+        if (SetFirstPendingFlag(moby)) {
             state->waitTimer = state->fadeLength;
             state->fadeTimer = state->fadeLength * 2;
-            func_L00_002C42E0(0x6F, 1);
+            SetHeroAction_L00(0x6F, 1);
         }
-        if (func_00282948(&state->waitTimer))
-            func_002A7750(moby, state->nextState, -1);
+        if (FastFloatHelperD(&state->waitTimer))
+            SetMobyState(moby, state->nextState, -1);
         break;
     case 7:
-        if (func_002B3868(moby))
+        if (SetFirstPendingFlag(moby))
             state->frames = 0;
         if (D_001A8F00 != 2 && state->frames >= 6 && D_001A63F0[0] != state->music84)
-            func_L01_00323310(state->music84, state->music88);
+            QueueKeyedRequest(state->music84, state->music88);
         state->frames++;
         break;
     default:
         break;
     }
     if (state->fadeTimer != 0) {
-        func_00282948(&state->fadeTimer);
-        state->volume = func_00283198((float)state->fadeTimer * 1.5707964f / (float)state->fadeLength);
-        func_L00_002E6EF8((void (*)(void *))func_L14_00426DE8, moby);
+        FastFloatHelperD(&state->fadeTimer);
+        state->volume = FastSinOrCosB((float)state->fadeTimer * 1.5707964f / (float)state->fadeLength);
+        AddDrawCallbackToList3((void (*)(void *))QueueLevelJingle, moby);
     }
 }
 
@@ -696,15 +699,15 @@ extern void func_385CB8(unsigned int reg, unsigned long value);
 extern void func_2EF6D8(int, int, int, int, int);
 
 /* Queues the level jingle for the owner with the volume its state block asks for. */
-void func_L14_00426DE8(char *a0)
+void func_L14_00426DE8(char *self)
 {
-    char *v0;
-    int s0;
+    char *vars;
+    int fadeColor;
 
-    v0 = *(char **)(a0 + 0x68);
-    s0 = ((int)((1.0f - *(float *)(v0 + 0x68)) * 128.0f)) << 24;
+    vars = *(char **)(self + 0x68);
+    fadeColor = ((int)((1.0f - *(float *)(vars + 0x68)) * 128.0f)) << 24;
     func_385CB8(0x42, 9);
-    func_2EF6D8(0, D_001A6480[0xA9], 0, D_001A6480[0xA8], s0);
+    func_2EF6D8(0, gScreenAdjustOffsets[0xA9], 0, gScreenAdjustOffsets[0xA8], fadeColor);
 }
 
 
@@ -723,25 +726,25 @@ extern unsigned char *D_L14_001FB060[];
 extern unsigned char *D_L14_001B259C_1 __attribute__((sda));
 
 /* Walks the 0x7FFF-masked id list at table[index] and flags class 0x112B entries. */
-void func_L14_004286F8(unsigned char *a0)
+void func_L14_004286F8(unsigned char *self)
 {
     unsigned char *base;
     unsigned char *p;
     unsigned short *q;
-    char *e;
+    char *entity;
 
-    if (a0[0x21] == 0xFF)
+    if (self[0x21] == 0xFF)
         return;
-    p = D_L14_001FB060[a0[0x21]];
+    p = gGroupEntityLists[self[0x21]];
     if (p == 0)
         return;
     q = (unsigned short *)p;
     base = D_L14_001B259C_1;
     for (;;) {
-        e = (char *)(base + ((*q & 0x7FFF) << 8));
-        if ((signed char)e[0x20] >= 0) {
-            if (*(signed short *)(e + 0xAA) == 0x112B) {
-                *(unsigned short *)(*(unsigned int *)(e + 0x68) + 0x316) = 1;
+        entity = (char *)(base + ((*q & 0x7FFF) << 8));
+        if ((signed char)entity[0x20] >= 0) {
+            if (*(signed short *)(entity + 0xAA) == 0x112B /* moby class 4395 */) {
+                *(unsigned short *)(*(unsigned int *)(entity + 0x68) + 0x316) = 1;
             }
         }
         if ((signed short)*q < 0)
@@ -758,24 +761,25 @@ void func_L14_004286F8(unsigned char *a0)
 
 /* func_L14_004295D0 is defined in L14_004295D0-g8.c (it reaches data through $gp). */
 
+/* Keeps the actor's walking animation in step with how far it moved this frame. */
 void func_L14_004298F0(unsigned char *self) {
     unsigned char *state = *(unsigned char **)(self + 0x68);
     float delta[4] __attribute__((aligned(16)));
-    func_00282948(state + 0x30c);
-    func_00282948(state + 0x310);
+    FastFloatHelperD(state + 0x30c);
+    FastFloatHelperD(state + 0x310);
     if (*(unsigned short *)(self + 0x96) < 65535)
         ++*(unsigned short *)(self + 0x96);
-    func_00325DA0(self, state + 0x308);
-    func_00282CF0(delta, self + 0x10, state + 0x2d0);
+    SyncGroupCounter(self, state + 0x308);
+    FastVecSub(delta, self + 0x10, state + 0x2d0);
     qcopy(state + 0x2d0, self + 0x10);
     if (self[0x95] == 1) {
-        *(float *)(state + 0x2fc) = func_00283B98(*(float *)(state + 0x2fc), 0.2094395459f);
-        func_00325C50(self, state + 0x300, 1, delta, *(float *)(state + 0x2fc));
+        *(float *)(state + 0x2fc) = FastAddRotations(*(float *)(state + 0x2fc), 0.2094395459f);
+        AttachAndTurnChildParts(self, state + 0x300, 1, delta, *(float *)(state + 0x2fc));
     } else {
-        *(float *)(state + 0x2fc) = func_00283B98(*(float *)(state + 0x2fc), 0.01163553074002266f);
-        func_00325C50(self, state + 0x300, 0, delta, *(float *)(state + 0x2fc));
+        *(float *)(state + 0x2fc) = FastAddRotations(*(float *)(state + 0x2fc), 0.01163553074002266f);
+        AttachAndTurnChildParts(self, state + 0x300, 0, delta, *(float *)(state + 0x2fc));
     }
-    func_002B0990(self, state + 0x230, 7, 1, 2.0f);
+    SetValueAndStartSmoothChange(self, state + 0x230, 7, 1, 2.0f);
 }
 
 
@@ -792,21 +796,21 @@ extern float func_80123298(long long a);
 extern void func_80321F58(char *a0, int a1, int a2);
 
 /* Fills the owner's screen slot with the width the display state reports. */
-void func_L14_0042D018(char *a0)
+void func_L14_0042D018(char *self)
 {
-    char *p;
-    void *s0;
-    long long v;
+    char *vars;
+    void *operand;
+    long long result;
 
-    p = *(char **)(a0 + 0x68);
-    if (*(unsigned char *)(a0 + 0x20) != 0)
+    vars = *(char **)(self + 0x68);
+    if (*(unsigned char *)(self + 0x20) != 0)
         return;
-    s0 = func_801234F0(*(float *)(a0 + 0xC));
-    v = func_80131430(0x4000000000000000LL);
-    v = func_80122B00(v, 0x4090000000000000LL);
-    v = func_80122DA8(s0, v);
-    *(float *)(p + 0x10) = func_80123298(v);
-    func_80321F58(a0, 1, -1);
+    operand = func_801234F0(*(float *)(self + 0xC));
+    result = func_80131430(0x4000000000000000LL);
+    result = func_80122B00(result, 0x4090000000000000LL);
+    result = func_80122DA8(operand, result);
+    *(float *)(vars + 0x10) = func_80123298(result);
+    func_80321F58(self, 1, -1);
 }
 
 /* func_L14_0042FB10 is defined in L14_0042FB10-effect-g8.c. */
@@ -866,10 +870,10 @@ void func_L14_0042FDA8(PrisonEntity *self)
 
     if (self->mode == 0) {
         /* Mark the group's members busy. */
-        if (D_L14_001FB060[group = state->group] && func_002A8508(group, -1) >= 2) {
+        if (gGroupEntityLists[group = state->group] && CountMobysInGroupNotInState(group, -1) >= 2) {
             unsigned short *list;
 
-            list = (unsigned short *)D_L14_001FB060[state->group];
+            list = (unsigned short *)gGroupEntityLists[state->group];
             base = D_L14_001B259C_direct;
             do {
                 entry = *list;
@@ -878,20 +882,20 @@ void func_L14_0042FDA8(PrisonEntity *self)
             } while ((group = (short)*list++) >= 0);
         }
 
-        if (func_00282E80(&self->pos, D_00189EA0) < 6.0f && func_002B38B8(self) &&
-            !func_002ACBC8(D_00189EA0, state->f14) &&
-            !func_002ACBC8(D_00189EA0, state->f18)) {
+        if (vec_distance_xy(&self->pos, gHeroPosition) < 6.0f && IsThirdPendingFlagSet(self) &&
+            !IsPointInCuboid(gHeroPosition, state->f14) &&
+            !IsPointInCuboid(gHeroPosition, state->f18)) {
             self->mode = 1;
             self->f78 = 0x24C102;
             if (self->anim != 1)
-                func_002A7470(self, 1, 0, 0);
+                StartAnimationBlended(self, 1, 0, 0);
             self->f98 = 0;
 
             /* Release the group's members. */
-            if (D_L14_001FB060[group = state->group] && func_002A8508(group, -1) >= 2) {
+            if (gGroupEntityLists[group = state->group] && CountMobysInGroupNotInState(group, -1) >= 2) {
                 unsigned short *list;
 
-                list = (unsigned short *)D_L14_001FB060[state->group];
+                list = (unsigned short *)gGroupEntityLists[state->group];
                 base = D_L14_001B259C_direct;
                 do {
                     entry = *list;
@@ -899,7 +903,7 @@ void func_L14_0042FDA8(PrisonEntity *self)
                     other->flags &= 0xFFBC;
                 } while ((group = (short)*list++) >= 0);
             }
-        } else if (func_002ACBC8(D_00189EA0, state->f14)) {
+        } else if (IsPointInCuboid(gHeroPosition, state->f14)) {
             self->mode = 5;
         }
 
@@ -914,13 +918,13 @@ void func_L14_0042FDA8(PrisonEntity *self)
                         qcopy(temp, self->pos);
                         temp[2] += 1.0f;
                         prisonStartSound(2, 0, self);
-                        func_002ABBB8(self, D_L14_001A8F20, temp, 0.0f, 0.0f, 10, 3, 16,
+                        SpawnExplosionEffects(self, D_L14_001A8F20, temp, 0.0f, 0.0f, 10, 3, 16,
                             4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 0, 9, -1, 0, 0x810001);
                         return;
                     }
                     self->mode = 1;
                     if (self->anim != 1)
-                        func_002A7470(self, 1, 0, 0);
+                        StartAnimationBlended(self, 1, 0, 0);
                     self->f98 = 0;
                 }
             }
@@ -931,48 +935,48 @@ void func_L14_0042FDA8(PrisonEntity *self)
         self->mode = 3;
         self->f78 = 0x224C1;
         if (self->anim != 2)
-            func_002A7470(self, 2, 0, 0);
+            StartAnimationBlended(self, 2, 0, 0);
     }
 
     if (self->mode == 2) {
-        temp[0] = func_00283180(self->angle - 1.57079649f) * 0.3f;
-        temp[1] = func_00283198(self->angle - 1.57079649f) * 0.3f;
+        temp[0] = FastSinOrCosA(self->angle - 1.57079649f) * 0.3f;
+        temp[1] = FastSinOrCosB(self->angle - 1.57079649f) * 0.3f;
         temp[2] = 0;
-        func_00282CC0(self->pos, self->pos, temp);
+        FastVecAdd(self->pos, self->pos, temp);
         qcopy(front, self->pos);
         qcopy(left, self->pos);
         qcopy(right, self->pos);
         front[2] += 0.75f;
         left[2] += 0.75f;
         right[2] += 0.75f;
-        temp[0] = func_00283180(self->angle) * 0.8f;
-        temp[1] = func_00283198(self->angle) * 0.8f;
+        temp[0] = FastSinOrCosA(self->angle) * 0.8f;
+        temp[1] = FastSinOrCosB(self->angle) * 0.8f;
         temp[2] = 0;
-        temp[0] = func_00283180(self->angle + 3.14159298f) * 0.8f;
-        temp[1] = func_00283198(self->angle + 3.14159298f) * 0.8f;
+        temp[0] = FastSinOrCosA(self->angle + 3.14159298f) * 0.8f;
+        temp[1] = FastSinOrCosB(self->angle + 3.14159298f) * 0.8f;
         temp[2] = 0;
-        func_00282CC0(left, left, offset1);
-        func_00282CC0(right, right, offset2);
-        if (func_00277258(front, 0.6f, 0, self) || func_00277258(left, 0.68f, 0, self) || func_00277258(right, 0.68f, 0, self)) {
+        FastVecAdd(left, left, offset1);
+        FastVecAdd(right, right, offset2);
+        if (TestPointAgainstCollision(front, 0.6f, 0, self) || TestPointAgainstCollision(left, 0.68f, 0, self) || TestPointAgainstCollision(right, 0.68f, 0, self)) {
             prisonStartSound(2, 0, self);
-            func_002ABBB8(self, D_L14_001A8F20, front, 0.0f, 0.0f, 10, 3, 16,
+            SpawnExplosionEffects(self, D_L14_001A8F20, front, 0.0f, 0.0f, 10, 3, 16,
                 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 0, 9, -1, 0, 0x810001);
-            func_0029F338(self);
+            MarkMobySpawned(self);
             return;
         }
     }
 
-    if (self->mode == 3 && func_002ACBC8(D_00189EA0, state->f14)) {
+    if (self->mode == 3 && IsPointInCuboid(gHeroPosition, state->f14)) {
         self->mode = 4;
         if (self->anim != 3)
-            func_002A7470(self, 3, 0, 0);
+            StartAnimationBlended(self, 3, 0, 0);
     }
 
     if (self->mode == 4 && (self->animFlags & 2)) {
         self->mode = 5;
         self->f98 = self->next[4];
         if (self->anim)
-            func_002A7470(self, 0, 0, 0);
+            StartAnimationBlended(self, 0, 0, 0);
     }
 }
 
@@ -981,6 +985,7 @@ void func_L14_0042FDA8(PrisonEntity *self)
 
 extern float func_2F6DA0(float x);
 
+/* Wraps an angle into the range of one full turn. */
 float func_L14_00430898(float x)
 {
     return func_2F6DA0(x * 0.15915494f) * 6.2831855f;
@@ -999,15 +1004,15 @@ void func_L14_004308D0(void *position, int texture, int color, int mode,
     char *u, *v;
     float (*dst)[4], (*mat)[4];
 
-    func_00281DE8(&q, texture, mode, 128);
+    InitQuadPacketState(&q, texture, mode, 128);
     q.mode = 5;
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = color;
     q.uv[0][0] = 0; q.uv[0][1] = 0;
     q.uv[1][0] = 0; q.uv[1][1] = 1;
     q.uv[2][0] = 1; q.uv[2][1] = 0;
     q.uv[3][0] = 1; q.uv[3][1] = 1;
-    c = func_00283180(angle);
-    s = func_00283198(angle);
+    c = FastSinOrCosA(angle);
+    s = FastSinOrCosB(angle);
     /* Walk the whole packet so the final cursors remain within its storage. */
     v = (char *)&q + 0x54;
     u = (char *)&q + 0x50;
@@ -1022,13 +1027,13 @@ void func_L14_004308D0(void *position, int texture, int color, int mode,
         v += 8;
     }
     qcopy(center, position);
-    func_00282CF0(forward, D_L14_001B9500, center);
-    func_00282F20(forward, forward, 1.0f);
-    func_00282DD8(right, forward, D_0018A0E0);
-    func_00282F20(right, right, 1.0f);
-    func_00282DD8(up, right, forward);
-    func_00282D30(offset, forward, distance);
-    func_00282CC0(center, center, offset);
+    FastVecSub(forward, D_L14_001B9500, center);
+    vec_scale_to_length(forward, forward, 1.0f);
+    FastVecCross(right, forward, D_0018A0E0);
+    vec_scale_to_length(right, right, 1.0f);
+    FastVecCross(up, right, forward);
+    FastVecScale(offset, forward, distance);
+    FastVecAdd(center, center, offset);
     matrix.v[0] = D_L14_001B1A00.v[0];
     matrix.v[1] = D_L14_001B1A00.v[1];
     matrix.v[2] = D_L14_001B1A00.v[2];
@@ -1036,13 +1041,13 @@ void func_L14_004308D0(void *position, int texture, int color, int mode,
     dst = q.pos;
     mat = (float (*)[4])&matrix;
     for (j = 3; j >= 0; j--, dst++) {
-        func_00282D30(*dst, *mat, scale);
+        FastVecScale(*dst, *mat, scale);
         mat++;
-        func_002830C0(*dst, *dst, forward);
+        transform_vector(*dst, *dst, forward);
     }
-    func_002FC560(0x47, 0x53001);
-    func_00280B90(&q, 0, 0);
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x53001);
+    draw_world_quad(&q, 0, 0);
+    VU1_addGSregister(0x47, 0x5360B);
 }
 
 /* func_L14_00430B70 is defined in L14_00430B70-visual.c. */
@@ -1050,10 +1055,12 @@ void func_L14_004308D0(void *position, int texture, int color, int mode,
 /* func_L14_00430E08 is defined in L14_00430B70-visual.c. */
 
 /* Distinct no-op entries: the first is called directly, the second by the moby table. */
+/* Does nothing. Used where a handler is required but no update is needed. */
 void func_L14_004321C0(void *object)
 {
 }
 
+/* Does nothing. A second empty handler, used by the moby table. */
 void func_L14_004321C8(void *object)
 {
 }
@@ -1066,47 +1073,48 @@ extern void func_L00_002E6EF8(void (*)(void *), void *);
 extern char D_00188660[];
 extern void func_L14_00432450(void *);
 
+/* Plays a looping ambient sound with random pauses and draws the moby's surface every frame. */
 void func_L14_004321D0(char *object)
 {
-    int *state = *(int **)(object + 0x68);
+    int *vars = *(int **)(object + 0x68);
     switch ((unsigned char)object[0x20]) {
     case 0:
-        state[10] += 63;
-        state[11] += 63;
-        state[12] += 63;
-        state[13] += 63;
-        state[14] += 63;
-        state[15] = 10;
-        state[16] = -1;
-        func_002A7750(object, 1, -1);
+        vars[10] += 63;
+        vars[11] += 63;
+        vars[12] += 63;
+        vars[13] += 63;
+        vars[14] += 63;
+        vars[15] = 10;
+        vars[16] = -1;
+        SetMobyState(object, 1, -1);
         break;
     case 1:
-        func_002A7750(object, func_002A7820(2, 3), -1);
+        SetMobyState(object, RandomIntRange(2, 3), -1);
         break;
     case 2:
-        if (func_002B3868(object)) {
-            if (state[16] != -1 && ((PrisonSoundAnchor *)(D_00188660 + state[16] * 112))->owner == object && ((PrisonSoundAnchor *)(D_00188660 + state[16] * 112))->active)
-                func_002E59F8(state[16]);
-            state[16] = -1;
-            state[3] = func_002A7820(state[0], state[1]);
+        if (SetFirstPendingFlag(object)) {
+            if (vars[16] != -1 && ((PrisonSoundAnchor *)(gSoundState + vars[16] * 112))->owner == object && ((PrisonSoundAnchor *)(gSoundState + vars[16] * 112))->active)
+                StopSoundVoice(vars[16]);
+            vars[16] = -1;
+            vars[3] = RandomIntRange(vars[0], vars[1]);
         }
-        if (((PrisonSoundAnchor *)(D_00188660 + state[16] * 112))->owner != object || !((PrisonSoundAnchor *)(D_00188660 + state[16] * 112))->active)
-            state[16] = prisonStartSound(0, 4, object);
-        if (func_00282948(state + 3))
-            func_002A7750(object, 1, -1);
+        if (((PrisonSoundAnchor *)(gSoundState + vars[16] * 112))->owner != object || !((PrisonSoundAnchor *)(gSoundState + vars[16] * 112))->active)
+            vars[16] = prisonStartSound(0, 4, object);
+        if (FastFloatHelperD(vars + 3))
+            SetMobyState(object, 1, -1);
         break;
     case 3:
-        if (func_002B3868(object)) {
-            if (state[16] != -1 && ((PrisonSoundAnchor *)(D_00188660 + state[16] * 112))->owner == object && ((PrisonSoundAnchor *)(D_00188660 + state[16] * 112))->active)
-                func_002E59F8(state[16]);
-            state[16] = -1;
-            state[3] = func_002A7820(state[0], state[1]);
+        if (SetFirstPendingFlag(object)) {
+            if (vars[16] != -1 && ((PrisonSoundAnchor *)(gSoundState + vars[16] * 112))->owner == object && ((PrisonSoundAnchor *)(gSoundState + vars[16] * 112))->active)
+                StopSoundVoice(vars[16]);
+            vars[16] = -1;
+            vars[3] = RandomIntRange(vars[0], vars[1]);
         }
-        if (((PrisonSoundAnchor *)(D_00188660 + state[16] * 112))->owner != object || !((PrisonSoundAnchor *)(D_00188660 + state[16] * 112))->active)
-            state[16] = prisonStartSound(1, 4, object);
-        if (func_00282948(state + 3))
-            func_002A7750(object, 1, -1);
+        if (((PrisonSoundAnchor *)(gSoundState + vars[16] * 112))->owner != object || !((PrisonSoundAnchor *)(gSoundState + vars[16] * 112))->active)
+            vars[16] = prisonStartSound(1, 4, object);
+        if (FastFloatHelperD(vars + 3))
+            SetMobyState(object, 1, -1);
         break;
     }
-    func_L00_002E6EF8(func_L14_00432450, object);
+    AddDrawCallbackToList3(DrawScrollingSurfaceQuad, object);
 }

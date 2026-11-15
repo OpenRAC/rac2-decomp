@@ -17,43 +17,44 @@ extern f32 D_L07_001B0FC0 __attribute__((sda));
 extern s32 D_L07_001B1E08 __attribute__((nosda));
 
 /* Advances the dormant entity through initialization and its firing state. */
-void func_L07_003F6328(u8 *object)
+/* Updates the turret: sets itself up, plays its shot animation, then fires a projectile at regular intervals. */
+void func_L07_003F6328(u8 *moby)
 {
     u8 *state;
     Vector position, velocity;
-    if (object[0x20] == 1) return;
-    state = *(u8 **)(object + 0x68);
-    func_L07_003F67B8(object);
-    switch (object[0x20]) {
+    if (moby[0x20] == 1) return;
+    state = *(u8 **)(moby + 0x68);
+    TickFuseAndExplode(moby);
+    switch (moby[0x20]) {
     case 0:
-        *(f32 *)(state + 0x58) = *(f32 *)(object + 0x18);
-        *(f32 *)(state + 0x60) = *(f32 *)(object + 0xF8);
-        *(s32 *)(object + 0x98) = 0;
-        *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) | 0x41) & 0xEFFF;
-        func_002A7750(object, 1, -1);
+        *(f32 *)(state + 0x58) = *(f32 *)(moby + 0x18);
+        *(f32 *)(state + 0x60) = *(f32 *)(moby + 0xF8);
+        *(s32 *)(moby + 0x98) = 0;
+        *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
+        SetMobyState(moby, 1, -1);
         break;
     case 2:
-        if (func_002B3868(object)) {
-            *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) & 0xFFBE) | 0x1000;
-            *(s32 *)(object + 0x98) = *(s32 *)(*(u8 **)(object + 0x24) + 0x10);
-            if (object[0x43]) func_002A7470(object, 0, 0, 1);
+        if (SetFirstPendingFlag(moby)) {
+            *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;
+            *(s32 *)(moby + 0x98) = *(s32 *)(*(u8 **)(moby + 0x24) + 0x10);
+            if (moby[0x43]) StartAnimationBlended(moby, 0, 0, 1);
         }
-        if (object[0x60] & 2) {
-            if (object[0x43] != 1) func_002A7470(object, 1, 0, 1);
-            func_002A7750(object, 3, -1);
+        if (moby[0x60] & 2) {
+            if (moby[0x43] != 1) StartAnimationBlended(moby, 1, 0, 1);
+            SetMobyState(moby, 3, -1);
         }
         break;
     case 3: {
         s32 period, tick;
-        func_L07_003F68F0((s8 *)object, D_L07_001B0FA0 * 0.0002908882452175f);
+        UpdateSwingingYaw((s8 *)moby, D_L07_001B0FA0 * 0.0002908882452175f);
         period = D_L07_001B0FA8;
         tick = D_L07_001B1E08;
         if (tick % period == 0) {
-            func_00283098(position, D_L07_001B0FB0, object + 0xC0);
-            func_00282CC0(position, position, object + 0x10);
-            func_00282F20(velocity, object + 0xC0, D_L07_001B0FC0 * 0.0166666675359f);
-            func_002E5CF8(0, 0, (char *)object);
-            func_L03_003D9820(object, position, velocity, state[0x34]);
+            matrix_mul_vec3(position, D_L07_001B0FB0, moby + 0xC0);
+            FastVecAdd(position, position, moby + 0x10);
+            vec_scale_to_length(velocity, moby + 0xC0, D_L07_001B0FC0 * 0.0166666675359f);
+            PlayMobySound(0, 0, (char *)moby);
+            SpawnSparkShotMoby(moby, position, velocity, state[0x34]);
         }
         break;
     }

@@ -15,17 +15,19 @@ extern int r1_func_0012BDD0(void *);
 
 
 /* rac1-decomp src/core/0012AC80.c: func_0012F948 */
-int func_0012F948(char *p, unsigned int addr, int size) {
-    char *t = *(char **)(p + 0x40);
+/* Gives the movie decoder the address and size of its output buffer. */
+int func_0012F948(char *mpeg, unsigned int addr, int size) {
+    char *decoder = *(char **)(mpeg + 0x40);
 
-    *(int *)(t + 0xB0) = 1;
-    *(int *)(t + 0xD8) = (addr & 0x0FFFFFFF) | 0x20000000;
-    *(int *)(t + 0xE4) = size;
-    *(int *)(t + 0xE0) = 0;
-    *(int *)(t + 0xDC) = 0;
-    return r1_func_0012BDD0(p);
+    *(int *)(decoder + 0xB0) = 1;
+    *(int *)(decoder + 0xD8) = (addr & 0x0FFFFFFF) | 0x20000000;
+    *(int *)(decoder + 0xE4) = size;
+    *(int *)(decoder + 0xE0) = 0;
+    *(int *)(decoder + 0xDC) = 0;
+    return r1_func_0012BDD0(mpeg);
 }
 
+/* Reads the value that a resource points to. */
 unsigned int func_0012F9A8(struct IndirectWord *resource)
 {
     return *resource->value;

@@ -44,6 +44,7 @@ extern void func_L01_003042AC(unsigned char *, unsigned char *, unsigned char *,
 #define CONTEXT_FLOAT(offset) (*(float *)(context + (offset)))
 #define CONTEXT_INT(offset) (*(int *)(context + (offset)))
 #define PACKET_LONG(ptr,offset) (*(u64 *)((ptr) + (offset)))
+/* Builds the draw commands for the animated background water: it blends between two animation frames and adds the camera matrix. */
 void func_L01_003CAFE0(void)
 {
     float matrix[16] __attribute__((aligned(16)));
@@ -60,15 +61,15 @@ void func_L01_003CAFE0(void)
         CONTEXT_FLOAT(0x228) = D_L01_001B0338;
         CONTEXT_FLOAT(0x22c) = D_L01_001B033C;
     }
-    func_0027AB40();
-    func_00279D18();
+    UpdateViewContext();
+    BuildViewMatrices();
     {
         u8 *header = D_L01_001B2CC8[0];
         qcopy(header, &D_L01_001B02E0);
         packet = header + 0x10;
     }
     D_L01_001B2CC8[0] = packet;
-    func_00282AB0(packet, D_L01_00297B50, 0xa0);
+    CopyMemoryAligned(packet, D_L01_00297B50, 0xa0);
     D_L01_001B2CC8[0] += 0xa0;
     PACKET_LONG(packet,0x20) = ((u64)D_L01_001B034C << 32) | 100;
     PACKET_LONG(packet,0x30) = (u64)((D_001A72D0 >> 8) | 0x18100000) | 0x580000000UL;
@@ -101,7 +102,7 @@ void func_L01_003CAFE0(void)
             u8 *src3 = D_L01_001B2004 + idx3 * 16;
             PACKET_LONG(D_L01_001B035C,0) = 0x800000000000400UL;
             PACKET_LONG(D_L01_001B035C,8) = 0;
-            func_L01_003042AC(D_L01_001B035C + 0x10, src0, src1, src2, src3, 4096, fraction);
+            RunOozlaAsmRoutine(D_L01_001B035C + 0x10, src0, src1, src2, src3, 4096, fraction);
         }
     }
     {
@@ -128,7 +129,7 @@ void func_L01_003CAFE0(void)
             u8 *src3 = D_L01_001B2004 + idx3 * 16;
             PACKET_LONG(D_L01_001B035C,0) = 0x800000000000400UL;
             PACKET_LONG(D_L01_001B035C,8) = 0;
-            func_L01_003042AC(D_L01_001B036C, src0, src1, src2, src3, 4096, fraction);
+            RunOozlaAsmRoutine(D_L01_001B036C, src0, src1, src2, src3, 4096, fraction);
         }
     }
     {
@@ -137,34 +138,34 @@ void func_L01_003CAFE0(void)
         *(unsigned char **)(header + 4) = D_L01_001B035C;
     }
     D_L01_001B2CC8[0] += 0x10;
-    func_00282B50(D_L01_001B2CC8[0], D_L01_001B0300, 0x30);
+    FastMemoryHelperC(D_L01_001B2CC8[0], D_L01_001B0300, 0x30);
     D_L01_001B2CC8[0] += 0x30;
     if (D_L01_001B209C != 6) {
-        func_002FC410((unsigned int)D_0010FFC0, D_0010FFB0[0]);
+        VU1_addDataRef((unsigned int)D_0010FFC0, D_0010FFB0[0]);
         D_L01_001B209C = 6;
     }
     packet = D_L01_001B2CC8[0];
     {
         unsigned char *tmpl = D_L01_0026A050;
         *(unsigned char **)(tmpl + 4) = D_L01_001AC740;
-        func_00282B50(packet, tmpl, 0x50);
+        FastMemoryHelperC(packet, tmpl, 0x50);
     }
     D_L01_001B2CC8[0] += 0x50;
     *(unsigned char **)(packet + 0x24) = D_L01_001B2CC8[0];
     *(unsigned char **)(packet + 0x34) = D_L01_001B2CC8[0];
     *(unsigned char **)(packet + 0x44) = D_L01_001B2CC8[0] + 0x60;
-    func_00282B50(D_L01_001B2CC8[0], context, 0x60);
+    FastMemoryHelperC(D_L01_001B2CC8[0], context, 0x60);
     D_L01_001B2CC8[0] += 0x60;
-    func_00283388(matrix);
-    func_00282D30(matrix + 12, D_L01_001B93C0[0].pos, -1024.0f);
+    set_identity_matrix(matrix);
+    FastVecScale(matrix + 12, D_L01_001B93C0[0].pos, -1024.0f);
     matrix[15] = 1.0f;
-    func_00283788(matrix, D_L01_001B93C0[0].matrix, matrix);
-    func_00282B50(D_L01_001B2CC8[0], D_L01_001A8EF0, 0x20);
+    multiply_matrix(matrix, D_L01_001B93C0[0].matrix, matrix);
+    FastMemoryHelperC(D_L01_001B2CC8[0], D_L01_001A8EF0, 0x20);
     *(unsigned char **)(D_L01_001B2CC8[0] + 4) = D_L01_001B2CC8[0] + 0x20;
-    func_00282B50(D_L01_001B2CC8[0] + 0x20, matrix, 0x40);
+    FastMemoryHelperC(D_L01_001B2CC8[0] + 0x20, matrix, 0x40);
     D_L01_001B2CC8[0] += 0x60;
-    func_00282AB0(D_L01_001B2CC8[0], D_L01_001B0270, 0x20);
+    CopyMemoryAligned(D_L01_001B2CC8[0], D_L01_001B0270, 0x20);
     D_L01_001B2CC8[0] += 0x20;
-    func_00282AB0(D_L01_001B2CC8[0], D_L01_001B0240, 0x20);
+    CopyMemoryAligned(D_L01_001B2CC8[0], D_L01_001B0240, 0x20);
     D_L01_001B2CC8[0] += 0x20;
 }

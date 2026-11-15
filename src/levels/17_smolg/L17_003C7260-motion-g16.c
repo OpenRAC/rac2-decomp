@@ -18,6 +18,8 @@ extern void func_00327FF8(void *, int, int, int, int, int, int, void *);
 extern void func_003629B8(int, int, void *);
 extern void func_002EEEE8(void *, void *, void *);
 extern void func_00323370(void *, void *, void *, void *);
+/* Updates the falling object: it drops to the ground, hurts the player if it lands on
+   them, and wakes up when the player stays close for a while. */
 void func_L17_003C7260(char *self) {
     UpdateVec oldpos, delta;
     char collision[0x30];
@@ -38,16 +40,16 @@ void func_L17_003C7260(char *self) {
                 *(int *)(data + 0x98) = 0;
                 *(float *)(self + 0x18) = ground;
             }
-            if (func_L17_003C70E0(self)) {
+            if (IsPlayerInsideObjectFootprint(self)) {
                 func_002EF398(&delta, &D_L17_001B0380, self + 0xC0);
                 func_0031D090(collision, self, 0x10001, &delta, 2.0f);
-                func_0031D2B0(D_0018C0B0, collision);
+                func_0031D2B0(gHeroMoby_0018C0B0, collision);
             }
         }
     }
     if (D_L17_001B2748 >= 31) {
         if (*(int *)(data + 0xA4) == 0 && *(int *)(data + 0xA8) >= 51 &&
-            func_002EF078(position, D_00189EA0) < 15.0f && *(unsigned char *)(self + 0x20) == 0) {
+            func_002EF078(position, gHeroPosition) < 15.0f && *(unsigned char *)(self + 0x20) == 0) {
             func_00327FF8(self, 0x931, 0, 0x931, 4, 6, 0, D_L17_001A8F20);
             func_003629B8(0, 0, self);
             *(unsigned char *)(self + 0x20) = 1;

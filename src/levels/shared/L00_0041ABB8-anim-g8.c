@@ -51,72 +51,73 @@ extern float D_L00_001B153C __attribute__((sda)), D_L00_001B154C __attribute__((
     func_003349E8(snd, fl, lv); \
     qcopy(to, from); return; }
 
+/* Decides which pose the held weapon is in (idle, aiming, firing or putting away), based on what the hero is doing, and starts the blend into it. */
 void func_L00_00420C38(char *moby)
 {
-    char *p = *(char **)(moby + 0x70);
-    Anim *s = (Anim *)(p + 0x60);
+    char *mobyVars = *(char **)(moby + 0x70);
+    Anim *s = (Anim *)(mobyVars + 0x60);
     if (D_L00_001B1588) { D_L00_001B1588 = 0; return; }
     if (s->state == 0) {
-        if (D_00189E20.ctrl == 2 || D_00189E20.ctrl == 30) GO(1, D_L00_001B1530)
-        if (D_00189E20.state == 15) AIM(3, D_L00_001B1540, D_L00_001B1544, D_L00_001B154C, 1, p + 0x90, p + 0x70, p + 0x80)
-        if (D_00189E20.state == 12) GO(8, D_L00_001B1554)
-        if (D_00189E20.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 0, p + 0x90, p + 0x70, p + 0x80)
-        if ((unsigned)(D_00189E20.state - 13) < 2) {
-            AIM(5, D_L00_001B1550, D_L00_001B1554, D_L00_001B155C, 1, p + 0x90, p + 0x70, p + 0x80)
+        if (gHeroState.ctrl == 2 || gHeroState.ctrl == 30) GO(1, D_L00_001B1530)
+        if (gHeroState.state == 15) AIM(3, D_L00_001B1540, D_L00_001B1544, D_L00_001B154C, 1, mobyVars + 0x90, mobyVars + 0x70, mobyVars + 0x80)
+        if (gHeroState.state == 12) GO(8, D_L00_001B1554)
+        if (gHeroState.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 0, mobyVars + 0x90, mobyVars + 0x70, mobyVars + 0x80)
+        if ((unsigned)(gHeroState.state - 13) < 2) {
+            AIM(5, D_L00_001B1550, D_L00_001B1554, D_L00_001B155C, 1, mobyVars + 0x90, mobyVars + 0x70, mobyVars + 0x80)
         }
-        if (D_00189E20.ctrl == 4) GO(2, D_L00_001B152C)
+        if (gHeroState.ctrl == 4) GO(2, D_L00_001B152C)
         return;
     }
-    if (s->state == 2 && (D_00189E20.state == 0x81 || D_00189E20.state == 0x5B)) GO(1, D_L00_001B1530)
-    if (s->state != 9 && s->state != 1 && D_00189E20.state == 0x14) {
+    if (s->state == 2 && (gHeroState.state == 0x81 || gHeroState.state == 0x5B)) GO(1, D_L00_001B1530)
+    if (s->state != 9 && s->state != 1 && gHeroState.state == 0x14) {
         s->prev = s->state; s->state = 9;
         s->timer2 = D_L00_001B1560;
-        s->rate2 = 1.0f / func_00283CE0(s->timer2);
+        s->rate2 = 1.0f / IntToFloat(s->timer2);
         s->timer = 0; s->rate = 1.0f; s->level = D_L00_001B1570; s->flag = 0;
-        func_003349E8(s->sound, 1, D_L00_001B1570);
+        ComputeCameraOffset(s->sound, 1, D_L00_001B1570);
         qcopy(s->b, s->a);
         return;
     }
-    if ((s->state == 1 || s->state == 2) && D_00189E20.ctrl != 4 && D_00189E20.ctrl != 2 && D_00189E20.ctrl != 30 && D_00189E20.state != 0x81) {
+    if ((s->state == 1 || s->state == 2) && gHeroState.ctrl != 4 && gHeroState.ctrl != 2 && gHeroState.ctrl != 30 && gHeroState.state != 0x81) {
         s->timer = 0; s->rate = 1.0f; s->state = 0;
         return;
     }
     if (s->state == 7) {
-        if (!D_00189E20.b49E) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 1, s->sound, s->a, s->b)
-        if (D_00189E20.ctrl == 2) GO(1, D_L00_001B1548)
+        if (!gHeroState.b49E) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 1, s->sound, s->a, s->b)
+        if (gHeroState.ctrl == 2) GO(1, D_L00_001B1548)
     }
-    if (s->state == 4 && D_00189E20.ctrl != 4) {
-        if (D_00189E20.ctrl == 2) {
+    if (s->state == 4 && gHeroState.ctrl != 4) {
+        if (gHeroState.ctrl == 2) {
             s->prev = 4; s->state = 1;
-            s->timer = D_L00_001B1548; s->rate = 1.0f / func_00283CE0(s->timer);
+            s->timer = D_L00_001B1548; s->rate = 1.0f / IntToFloat(s->timer);
             return;
         } else {
             s->prev = 4; s->state = 0;
-            s->timer = D_L00_001B1548; s->rate = 1.0f / func_00283CE0(s->timer);
+            s->timer = D_L00_001B1548; s->rate = 1.0f / IntToFloat(s->timer);
             return;
         }
     }
-    if (s->state == 3 && D_00189E20.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 1, s->sound, s->a, s->b)
-    if (s->state == 5 && D_00189E20.state == 12) GO(8, D_L00_001B1554)
-    if (s->state == 8 && D_00189E20.state != 12) GO(0, D_L00_001B1558)
-    if (s->state == 6 && D_00189E20.state != 11) GO(0, D_L00_001B1548)
-    if ((s->state == 3 || s->state == 5) && D_00189E20.ctrl != 4) GO(0, D_L00_001B1548)
-    if ((s->state == 9 && (D_00189E20.ctrl == 2 || D_00189E20.h34C >= 0x37)) ||
-        (s->state == 10 && (D_00189E20.ctrl == 2 || D_00189E20.h34C >= 0x37))) {
+    if (s->state == 3 && gHeroState.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 1, s->sound, s->a, s->b)
+    if (s->state == 5 && gHeroState.state == 12) GO(8, D_L00_001B1554)
+    if (s->state == 8 && gHeroState.state != 12) GO(0, D_L00_001B1558)
+    if (s->state == 6 && gHeroState.state != 11) GO(0, D_L00_001B1548)
+    if ((s->state == 3 || s->state == 5) && gHeroState.ctrl != 4) GO(0, D_L00_001B1548)
+    if ((s->state == 9 && (gHeroState.ctrl == 2 || gHeroState.h34C >= 0x37)) ||
+        (s->state == 10 && (gHeroState.ctrl == 2 || gHeroState.h34C >= 0x37))) {
         float one = 1.0f;
         char *q;
         s->prev = s->state; s->state = 1;
         s->timer = D_L00_001B1548;
-        s->rate = one / func_00283CE0(s->timer);
+        s->rate = one / IntToFloat(s->timer);
         q = *(char **)(moby + 0x70) + 0x20;
         *(short *)q = D_L00_001B1518;
-        *(float *)(q + 0x24) = one / func_00283CE0(*(short *)q);
+        *(float *)(q + 0x24) = one / IntToFloat(*(short *)q);
         qcopy(moby + 0x40, moby);
         return;
     }
-    if (s->state == 9 && D_00189E20.state != 0x14) GO(10, D_L00_001B156C)
-    if (s->state == 10 && func_00282978(&s->timer2)) {
+    if (s->state == 9 && gHeroState.state != 0x14) GO(10, D_L00_001B156C)
+    if (s->state == 10 && FastDecTimer(&s->timer2)) {
         s->prev = s->state; s->state = 0;
-        s->timer = D_L00_001B1548; s->rate = 1.0f / func_00283CE0(s->timer);
+        s->timer = D_L00_001B1548; s->rate = 1.0f / IntToFloat(s->timer);
     }
 }

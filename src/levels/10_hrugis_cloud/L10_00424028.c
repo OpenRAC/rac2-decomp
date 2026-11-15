@@ -18,22 +18,25 @@ extern float func_309B38(float f12, float f13);
 extern float func_309B80(float f12, float f13);
 
 
-int func_L10_0042E590(int a0) {
-    return func_337518(a0, (char *)0x230000, 0) != 0;
+/* Checks a cloud object against a world test and returns true when it is blocked. */
+int func_L10_0042E590(int object) {
+    return func_337518(object, (char *)0x230000, 0) != 0;
 }
 
-void func_L10_00425410(int a0, void *a1) {
+/* Spawns the given number of cloud objects. */
+void func_L10_00425410(int count, void *arg) {
     int i;
 
-    if (a0 > 0) {
-        i = a0;
+    if (count > 0) {
+        i = count;
         do {
-            func_42DF10(a1);
+            func_42DF10(arg);
             i--;
         } while (i != 0);
     }
 }
 
+/* Returns the pointer kept in a level global. */
 void *func_L10_00449AD0(void) {
     return D_L10_001ADE90;
 }
@@ -83,7 +86,7 @@ void func_L10_0042BCA0(u8 *object)
         *(f32 *)(object + 0x18) = 512.0f;
         *(s32 *)(object + 0x1C) = 0;
         *(f32 *)(object + 0x2C) = *(f32 *)(*(u8 **)(object + 0x24) + 0x24) * 4.0f;
-        L10_PARTNER(state) = func_0029EFD0(0x11CD);
+        L10_PARTNER(state) = CreateMoby(0x11CD /* moby class 4557 */);
         L10_PARTNER(state)[0x30] = 0xFF;
         *(u16 *)(L10_PARTNER(state) + 0x32) = 0x1FF;
         *(f32 *)(L10_PARTNER(state) + 0x2C) =
@@ -96,9 +99,9 @@ void func_L10_0042BCA0(u8 *object)
         }
     case 1:
         if (*(s32 *)state != 0)
-            *(f32 *)(object + 0xF8) = func_00283B98(*(f32 *)(object + 0xF8), 0.0049087391f);
+            *(f32 *)(object + 0xF8) = FastAddRotations(*(f32 *)(object + 0xF8), 0.0049087391f);
         else
-            *(f32 *)(object + 0xF8) = func_00283BE0(*(f32 *)(object + 0xF8), 0.0049087391f);
+            *(f32 *)(object + 0xF8) = fast_subtract_rotations(*(f32 *)(object + 0xF8), 0.0049087391f);
         *(f32 *)(L10_PARTNER(state) + 0xF0) = *(f32 *)(object + 0xF0);
         *(f32 *)(L10_PARTNER(state) + 0xF8) = *(f32 *)(object + 0xF8);
         qcopy(L10_PARTNER(state) + 0x10, object + 0x10);

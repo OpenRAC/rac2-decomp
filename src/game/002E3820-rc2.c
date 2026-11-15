@@ -31,27 +31,28 @@ extern s32 D_001A72D0;
 extern void func_0029D0E0(s8 *);
 extern s32 func_002FC748(void);
 
+/* Links the render packet buffers together into one chain and restores the buffer mark. */
 void func_002E3820(void) {
-    s32 k;
-    s8 *t;
+    s32 tagWord;
+    s8 *firstTag;
 
-    D_001B20E4 = D_001B22A8;
-    k = 0x20000000;
-    D_001B22A8 = D_001B22A8 + 0x10;
-    (*(s32 *)((s8 *)(D_001B20E0) + (0))) = k;
-    t = D_001B20E0;
-    (*(s8 **)((s8 *)(t) + (4))) = D_001B22A8;
+    D_001B20E4 = gDmaPacketCursor;
+    tagWord = 0x20000000;
+    gDmaPacketCursor = gDmaPacketCursor + 0x10;
+    (*(s32 *)((s8 *)(D_001B20E0) + (0))) = tagWord;
+    firstTag = D_001B20E0;
+    (*(s8 **)((s8 *)(firstTag) + (4))) = gDmaPacketCursor;
     (*(s32 *)((s8 *)(D_001B20E0) + (8))) = 0;
     (*(s32 *)((s8 *)(D_001B20E0) + (0xC))) = 0;
-    func_0029D0E0(t);
-    (void) func_002FC748();
-    (*(s32 *)((s8 *)(D_001B22A8) + (0))) = k;
-    (*(s8 **)((s8 *)(D_001B22A8) + (4))) = D_001B20E0 + 0x10;
-    (*(s32 *)((s8 *)(D_001B22A8) + (8))) = 0;
-    (*(s32 *)((s8 *)(D_001B22A8) + (0xC))) = 0;
-    D_001B22A8 = D_001B22A8 + 0x10;
-    (*(s32 *)((s8 *)(D_001B20E4) + (0))) = k;
-    (*(s8 **)((s8 *)(D_001B20E4) + (4))) = D_001B22A8;
+    func_0029D0E0(firstTag);
+    (void) AppendVu1DmaChainTable1();
+    (*(s32 *)((s8 *)(gDmaPacketCursor) + (0))) = tagWord;
+    (*(s8 **)((s8 *)(gDmaPacketCursor) + (4))) = D_001B20E0 + 0x10;
+    (*(s32 *)((s8 *)(gDmaPacketCursor) + (8))) = 0;
+    (*(s32 *)((s8 *)(gDmaPacketCursor) + (0xC))) = 0;
+    gDmaPacketCursor = gDmaPacketCursor + 0x10;
+    (*(s32 *)((s8 *)(D_001B20E4) + (0))) = tagWord;
+    (*(s8 **)((s8 *)(D_001B20E4) + (4))) = gDmaPacketCursor;
     (*(s32 *)((s8 *)(D_001B20E4) + (8))) = 0;
     (*(s32 *)((s8 *)(D_001B20E4) + (0xC))) = 0;
     D_001A72D0 = D_001A72D4;

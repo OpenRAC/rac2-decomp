@@ -31,29 +31,29 @@ typedef struct {
 /* For each of the four channels: a vector (0, 0, level * scale) turned by the matrix at +0xC0 of
    the entity record and moved to its position (+0x10), then handed to func_002820D0 with a count
    that ramps up over the first tenth of the level and down after it. */
-void func_L11_00446EB8(char *obj)
+void func_L11_00446EB8(char *moby)
 {
-    FourChannelState *state = *(FourChannelState **)(obj + 0x68);
-    float v[4];
-    float t[4];
+    FourChannelState *state = *(FourChannelState **)(moby + 0x68);
+    float point[4];
+    float offset[4];
     float angle;
-    float f;
-    s32 n;
+    float levelValue;
+    s32 count;
     int i;
 
-    func_002820A0(obj);
+    SetGsRegisterConstant(moby);
     for (i = 0; i < 4; i++) {
-        *(TI128 *)t = 0;
-        t[2] = state->level[i] * state->scale[i];
-        *(TI128 *)v = *(TI128 *)t;
-        func_00283098(v, v, D_L11_001B359C[0] + (state->entity << 8) + 0xC0);
-        func_00282CC0(v, v, D_L11_001B359C[0] + (state->entity << 8) + 0x10);
-        angle = func_002AA140(D_L11_001B1940, D_L11_001B1944[0], state->level[i]);
-        f = state->level[i];
-        if (f < 0.1f)
-            n = func_00283CF0((float)D_L11_001B1948 * f * 10.0f);
+        *(TI128 *)offset = 0;
+        offset[2] = state->level[i] * state->scale[i];
+        *(TI128 *)point = *(TI128 *)offset;
+        matrix_mul_vec3(point, point, gMobyTable_L11[0] + (state->entity << 8) + 0xC0);
+        FastVecAdd(point, point, gMobyTable_L11[0] + (state->entity << 8) + 0x10);
+        angle = LerpFloat_002AA140(D_L11_001B1940, D_L11_001B1944[0], state->level[i]);
+        levelValue = state->level[i];
+        if (levelValue < 0.1f)
+            count = FloatToInt((float)D_L11_001B1948 * levelValue * 10.0f);
         else
-            n = func_00283CF0((float)D_L11_001B1948 * (1.0f - f));
-        func_002820D0(v, n, 0, angle, D_L11_001B194C, 0.08f);
+            count = FloatToInt((float)D_L11_001B1948 * (1.0f - levelValue));
+        DrawBillboardQuadWithUv(point, count, 0, angle, D_L11_001B194C, 0.08f);
     }
 }

@@ -37,6 +37,7 @@ extern int D_L00_001B0694 __attribute__((sda));
  * overwrites; its RNG calls and actual writes are retained without qualifiers.
  * The second radial lower bound is absolute, including at the RNG call site:
  * NOT_SDA plus the standard no-split-addresses profile retains that access. */
+/* Spawns a spray of short trails along the points of an object's model. */
 void func_L00_003E7E40(unsigned char *object, const unsigned char *info, float opacity)
 {
     MmiPoint points[32] __attribute__((aligned(16)));
@@ -45,31 +46,31 @@ void func_L00_003E7E40(unsigned char *object, const unsigned char *info, float o
     float angle, speed, size;
     u32 original;
     int count, i, color, end_color, duration;
-    model = (const unsigned char *)func_002AB220(object);
+    model = (const unsigned char *)GetMobyPrivateValue4(object);
     if (model == 0)
         return;
-    count = func_002A99A0(D_L00_001B0660_gp, (char *)object, 32, points, model[0x19]);
+    count = ScatterPointsInCollisionShapes(D_L00_001B0660_gp, (char *)object, 32, points, model[0x19]);
     for (i = 0; i < count; i++) {
-        angle = func_002A7940();
-        speed = func_002A7878(D_L00_001B0670_gp, D_L00_001B0674) * 0.01666666753590107f;
-        from[0] = func_00283180(angle) * speed;
-        from[1] = func_00283198(angle) * speed;
+        angle = RandomAngle();
+        speed = RandomFloatRange(D_L00_001B0670_gp, D_L00_001B0674) * 0.01666666753590107f;
+        from[0] = FastSinOrCosA(angle) * speed;
+        from[1] = FastSinOrCosB(angle) * speed;
         from[2] = 0.0f;
-        from[2] = func_002A7878(D_L00_001B0680_gp, D_L00_001B0684) * 0.01666666753590107f;
-        from[3] = func_002A7878(0.1f, 0.2f);
-        angle = func_00283B98(angle, func_002A7878(120.0f, 240.0f) * 0.01745329424738884f);
-        speed = func_002A7878(D_L00_001B0678, D_L00_001B067C) * 0.01666666753590107f;
-        to[0] = func_00283180(angle) * speed;
-        to[1] = func_00283198(angle) * speed;
+        from[2] = RandomFloatRange(D_L00_001B0680_gp, D_L00_001B0684) * 0.01666666753590107f;
+        from[3] = RandomFloatRange(0.1f, 0.2f);
+        angle = FastAddRotations(angle, RandomFloatRange(120.0f, 240.0f) * 0.01745329424738884f);
+        speed = RandomFloatRange(D_L00_001B0678, D_L00_001B067C) * 0.01666666753590107f;
+        to[0] = FastSinOrCosA(angle) * speed;
+        to[1] = FastSinOrCosB(angle) * speed;
         to[2] = 0.0f;
-        to[2] = func_002A7878(D_L00_001B0688, D_L00_001B068C) * 0.01666666753590107f;
-        to[3] = func_002A7878(0.1f, 0.2f);
-        size = func_002A7878(D_L00_001B0668_gp, D_L00_001B066C);
+        to[2] = RandomFloatRange(D_L00_001B0688, D_L00_001B068C) * 0.01666666753590107f;
+        to[3] = RandomFloatRange(0.1f, 0.2f);
+        size = RandomFloatRange(D_L00_001B0668_gp, D_L00_001B066C);
         to[3] = from[3] = size;
         original = *(const u32 *)info;
-        color = (int)func_00283D38((original & 0xFFFFFF) | 0x10000000, original, opacity);
+        color = (int)FastTweenColor((original & 0xFFFFFF) | 0x10000000, original, opacity);
         end_color = *(const int *)(info + 8);
-        duration = func_002A7820(D_L00_001B0690_gp, D_L00_001B0694);
-        func_002BAA28(&points[i], from, to, color, end_color, 5, duration, 10, D_L00_001B0664_gp);
+        duration = RandomIntRange(D_L00_001B0690_gp, D_L00_001B0694);
+        SpawnTrailParticle_002BAA28(&points[i], from, to, color, end_color, 5, duration, 10, D_L00_001B0664_gp);
     }
 }

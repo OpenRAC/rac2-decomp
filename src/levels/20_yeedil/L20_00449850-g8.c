@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* This unit is built with -G8: the body reaches level globals through $gp. */
 
@@ -50,14 +51,15 @@ typedef struct {
     u32 xAC;
 } State;
 
-void func_L20_00449850(char *arg0) {
-    State *state = *(State **)(arg0 + 0x68);
+/* Update handler for moby class 4819: it sets itself up, waits quietly, and pops with an effect when the player targets it or comes close. */
+void func_L20_00449850(char *moby) {
+    State *state = *(State **)(moby + 0x68);
     int mode;
 
-    if (D_L20_001A8F00 == 2 && *(u8 *)(arg0 + 0x20) != 1) {
-        func_L20_00449A78(arg0);
+    if (D_L20_001A8F00 == 2 && *(u8 *)(moby + 0x20) != 1) {
+        ResetMobyToIdle(moby);
     }
-    mode = *(u8 *)(arg0 + 0x20);
+    mode = *(u8 *)(moby + 0x20);
     switch (mode) {
     case 0:
         state->x20 = 1.0f;
@@ -65,23 +67,23 @@ void func_L20_00449850(char *arg0) {
         state->x70 |= 6;
         state->x84 = D_L20_001B23E0;
         state->x88 = D_L20_001B23E4;
-        func_L20_00449A78(arg0);
+        ResetMobyToIdle(moby);
         return;
     case 1:
         return;
     case 2:
-        func_L01_0031AB20(arg0, state->x50, 0.0f, 0.5f, 0.6f, state->xA0);
+        UpdatePushableMoby(moby, state->x50, 0.0f, 0.5f, 0.6f, state->xA0);
         break;
     }
-    if (D_0018A3E0 == arg0) {
+    if (D_0018A3E0 == moby) {
         state->xAC = 1;
     }
-    if (((D_L20_001B2AC8 & 0xF) == (((int)arg0 >> 8) & 0xF)
-         && 5.0f < func_00282C48(*(float *)(arg0 + 0x18)
-                                 - func_002A89A8(arg0 + 0x10, 0, 0.5f)))
-        || (state->xAC != 0 && func_00282948(&state->xA8) != 0)) {
-        func_L20_00449AE8(arg0);
+    if (((D_L20_001B2AC8 & 0xF) == (((int)moby >> 8) & 0xF)
+         && 5.0f < FloatAbs(*(float *)(moby + 0x18)
+                                 - ProbeGroundHeightBelow(moby + 0x10, 0, 0.5f)))
+        || (state->xAC != 0 && FastFloatHelperD(&state->xA8) != 0)) {
+        VanishMobyWithEffect(moby);
     } else {
-        func_L20_00449BB0(arg0);
+        FollowPathAndPopOnTouch(moby);
     }
 }

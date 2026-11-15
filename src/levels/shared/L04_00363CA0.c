@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 
@@ -36,19 +37,20 @@ extern s32 func_002A77E0(s32 limit);
 /* the level's pointer to the byte the record carries in its second flag byte */
 extern u32 ref_L04_00363CA0_00;
 
-void *func_L04_00363CA0(void *a0, void *a1, f32 f0) {
-    L04Spawned *p = (L04Spawned *)(u32)func_002B9030(0x67);
+/* Creates a small effect record, fills it with random values and the caller's data, and returns it. */
+void *func_L04_00363CA0(void *quadSrc, void *owner, f32 scale) {
+    L04Spawned *rec = (L04Spawned *)(u32)AllocParticle(0x67);
 
-    if ((u32)p != 0) {
-        p->field04 = (u32)a1;
-        p->field09 = (u8)(func_00283CF0(2.0f) - 0x10);
-        p->field03 = 0x48;
-        p->field01 = 0;
-        p->field02 = *(u8 *)ref_L04_00363CA0_00;
-        p->field0C = f0;
-        p->field08 = (u8)func_002A77E0(0xFF);
-        p->field0A = 2;
-        p->field10 = *(L04Quad *)a0;
+    if ((u32)rec != 0) {
+        rec->field04 = (u32)owner;
+        rec->field09 = (u8)(FloatToInt(2.0f) - 0x10);
+        rec->field03 = 0x48;
+        rec->field01 = 0;
+        rec->field02 = *(u8 *)ref_L04_00363CA0_00;
+        rec->field0C = scale;
+        rec->field08 = (u8)RandomIntBelow(0xFF);
+        rec->field0A = 2;
+        rec->field10 = *(L04Quad *)quadSrc;
     }
-    return (u32)p;
+    return (u32)rec;
 }

@@ -38,34 +38,35 @@ extern void func_002FE8D8(s32, void *);
 extern void func_00282F20(void *, void *, f32);
 extern void func_00282CC0(void *, void *, void *);
 
+/* Sets up 50 pairs of glowing sprites (one reddish, one red) along a trail that drifts toward the player's aim point. */
 void func_0032AA30(void) {
-    s8 sp0[16];
-    s8 sp10[16];
-    s32 s4;
-    s32 s3;
-    s8 *s1;
-    s8 *s0;
-    s8 *p;
-    f32 t;
+    s8 zeroVec[16];
+    s8 drift[16];
+    s32 index;
+    s32 alpha;
+    s8 *point;
+    s8 *sprite;
+    s8 *hero;
+    f32 redSize;
 
-    s4 = 0;
-    func_00282C88(sp0);
+    index = 0;
+    ClearVector128(zeroVec);
     do {
-        s3 = func_002A7820(0, 0x6F) << 24;
-        s1 = D_002359E0 + s4 * 16;
-        s0 = func_002C2210(s1, 0xC, s3 | 0x7F2020, 0, 1, sp0, 0, D_001B0594 * 0.5f, D_001B0594, 0.0f);
-        if (s0 != NULL) {
-            *(s8 *)(s0 + 9) = (s8)(func_00283CF0(4.0f) + 0x70);
+        alpha = RandomIntRange(0, 0x6F) << 24;
+        point = D_002359E0 + index * 16;
+        sprite = SpawnGroundEffectParticle(point, 0xC, alpha | 0x7F2020, 0, 1, zeroVec, 0, D_001B0594 * 0.5f, D_001B0594, 0.0f);
+        if (sprite != NULL) {
+            *(s8 *)(sprite + 9) = (s8)(FloatToInt(4.0f) + 0x70);
         }
-        t = D_001B0598;
-        s0 = func_002C2210(s1, 0xC, s3 | 0xFF4040, 1, 1, sp0, 0, t * 0.5f, t, 0.0f);
-        if (s0 != NULL) {
-            *(s8 *)(s0 + 9) = (s8)(func_00283CF0(4.0f) + 0x70);
+        redSize = D_001B0598;
+        sprite = SpawnGroundEffectParticle(point, 0xC, alpha | 0xFF4040, 1, 1, zeroVec, 0, redSize * 0.5f, redSize, 0.0f);
+        if (sprite != NULL) {
+            *(s8 *)(sprite + 9) = (s8)(FloatToInt(4.0f) + 0x70);
         }
-        s4 += 1;
-        p = D_00189E20;
-        func_002FE8D8(*(s32 *)(p + 0x2290) + 0x10, sp10);
-        func_00282F20(sp10, sp10, -0.00277777785f);
-        func_00282CC0(s1, s1, sp10);
-    } while (s4 < 0x32);
+        index += 1;
+        hero = gHeroState;
+        GetObjectFacingDirection(*(s32 *)(hero + 0x2290) + 0x10, drift);
+        vec_scale_to_length(drift, drift, -0.00277777785f);
+        FastVecAdd(point, point, drift);
+    } while (index < 0x32);
 }

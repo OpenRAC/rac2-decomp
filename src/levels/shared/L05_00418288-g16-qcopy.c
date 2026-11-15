@@ -20,6 +20,7 @@ extern void func_00282D90(void *, void *, float);
 extern void func_00282CF0(void *, void *, void *);
 extern void func_00282F20(void *, void *, float);
 
+/* Moves a small light next to the object with a wobble. When other objects have added to the shared light spot it also places a brighter, larger light there. */
 void func_L05_00418288(char *object)
 {
     Vector value;
@@ -28,26 +29,26 @@ void func_L05_00418288(char *object)
     char *position = object + 0x10;
     char *output = entry + 0x10;
     D_L05_001B34E0.flags = 0;
-    D_L05_001B34E0_gp.x = func_00283B98(D_L05_001B34E0_gp.x, 0.1f);
-    D_L05_001B34E0.y = func_00283B98(D_L05_001B34E0.y, 0.09f);
-    D_L05_001B34E0.z = func_00283B98(D_L05_001B34E0.z, 0.11f);
-    func_00282C88(&value);
+    D_L05_001B34E0_gp.x = FastAddRotations(D_L05_001B34E0_gp.x, 0.1f);
+    D_L05_001B34E0.y = FastAddRotations(D_L05_001B34E0.y, 0.09f);
+    D_L05_001B34E0.z = FastAddRotations(D_L05_001B34E0.z, 0.11f);
+    ClearVector128(&value);
     value.x = 0.4f;
-    func_002833F0(&rotation, &D_L05_001B34E0_gp);
-    func_00283098(&value, &value, &rotation);
-    func_00282CC0(&value, &value, position);
+    euler_rotation_basis(&rotation, &D_L05_001B34E0_gp);
+    matrix_mul_vec3(&value, &value, &rotation);
+    FastVecAdd(&value, &value, position);
     qcopy(output, &value);
     *(float *)(entry + 0x1C) = 3.0f;
-    if (D_L05_001B3500 > 0.0f) {
-        func_00282D90(&D_L05_001B34F0, &D_L05_001B34F0, D_L05_001B3500);
-        func_00282CF0(&D_L05_001B34F0, &D_L05_001B34F0, position);
-        func_00282F20(&D_L05_001B34F0, &D_L05_001B34F0, 5.0f);
-        func_00282CC0(&D_L05_001B34F0, &D_L05_001B34F0, position);
-        qcopy(output, &D_L05_001B34F0);
+    if (gLightSpotCount > 0.0f) {
+        divide_vector_xyz(&gLightSpotSum, &gLightSpotSum, gLightSpotCount);
+        FastVecSub(&gLightSpotSum, &gLightSpotSum, position);
+        vec_scale_to_length(&gLightSpotSum, &gLightSpotSum, 5.0f);
+        FastVecAdd(&gLightSpotSum, &gLightSpotSum, position);
+        qcopy(output, &gLightSpotSum);
         *(float *)(entry + 0x1C) = 10.0f;
     } else {
         *(float *)(entry + 0x1C) = 0.0f;
     }
-    func_00282C88(&D_L05_001B34F0);
-    D_L05_001B3500 = 0.0f;
+    ClearVector128(&gLightSpotSum);
+    gLightSpotCount = 0.0f;
 }

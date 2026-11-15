@@ -13,33 +13,34 @@ extern int func_00282978(void *);
 extern void func_00283810(void *,void *,void *,float);
 extern void func_00283958(void *,void *);
 extern short D_L05_001B1BC8 __attribute__((sda)), D_L05_001B1BC4 __attribute__((sda));
+/* Smoothly turns the ship toward a new heading over a short time. Returns 1 while the turn is in progress. */
 int func_L05_00442F90(char *object)
 {
  TurnVector up, first, second, third, result;
  char *state = *(char **)(object+0x70)+0x50;
  up.q=0;up.f[2]=1.0f;up.f[3]=1.0f;
  {
- float angle = func_00282DB0(&up,object+0x20);
+ float angle = FastVecDot(&up,object+0x20);
  if ((*(unsigned long *)(state+0x18)&0xFFFFFF00000000UL)==0x2000000000000UL) {
- *(float *)(state+0x24)=1.5707963705062866f-func_002831B0(angle);
+ *(float *)(state+0x24)=1.5707963705062866f-FastAngleHelper(angle);
  if (*(float *)(state+0x24)<1.5707964897155762f) *(short *)(state+0x1c)=D_L05_001B1BC8;
  else *(short *)(state+0x1c)=D_L05_001B1BC4;
- *(float *)(state+0x20)=1.0f/func_00283CE0(*(short *)(state+0x1c));
+ *(float *)(state+0x20)=1.0f/IntToFloat(*(short *)(state+0x1c));
  }
  }
  if (*(short *)(state+0x1c)) {
- func_002AB600(state+0x30,object);
+ TransformMatrixViaCopy(state+0x30,object);
  qcopy(&first,object);
- func_00282DD8(&second,&first,&up);
- func_00282F20(&second,&second,1.0f);
- func_00282DD8(&third,&second,&first);
- func_002AB600(state+0x40,&first);
- if (func_00282978(state+0x1c)) {*(unsigned char *)(state+0x1e)=0;return 1;}
- else if (func_00282C48(func_00282DB0(&up,object))>=0.75f) {*(unsigned char *)(state+0x1e)=0;return 1;}
+ FastVecCross(&second,&first,&up);
+ vec_scale_to_length(&second,&second,1.0f);
+ FastVecCross(&third,&second,&first);
+ TransformMatrixViaCopy(state+0x40,&first);
+ if (FastDecTimer(state+0x1c)) {*(unsigned char *)(state+0x1e)=0;return 1;}
+ else if (FloatAbs(FastVecDot(&up,object))>=0.75f) {*(unsigned char *)(state+0x1e)=0;return 1;}
  else {
- float amount=func_002A7C00(0.0f,1.0f,func_00283CE0(*(short *)(state+0x1c))* *(float *)(state+0x20));
- func_00283810(&result,state+0x40,state+0x30,amount);
- func_00283958(&result,object);
+ float amount=CosineBlend(0.0f,1.0f,IntToFloat(*(short *)(state+0x1c))* *(float *)(state+0x20));
+ FastVectorNormalize3(&result,state+0x40,state+0x30,amount);
+ quaternion_to_rotation_basis(&result,object);
  }
  return 1;
  }

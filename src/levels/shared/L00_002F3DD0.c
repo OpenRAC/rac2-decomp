@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int s32;
 
@@ -20,5 +21,5 @@ u32 func_L00_002F3DD0(s32 index) {
 /* Pass the supplied owner pointer to the measured owner initializer. */
 void func_L00_002F4180(void *owner)
 {
-    func_002889B8(owner);
+    ResetRequestQueue(owner);
 }

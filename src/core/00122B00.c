@@ -47,6 +47,7 @@ Boston, MA 02111-1307, USA.  */
    Wilson, all of Cygnus Support.  */
 
 #include "double_parts.h"
+#include "names.h"
 
 extern void func_00122760(double *, DoubleParts *);
 extern double func_00122630(DoubleParts *);
@@ -64,11 +65,11 @@ static __inline__ DoubleParts *dp_mul_parts(DoubleParts *a, DoubleParts *b,
     if (double_parts_isnan(a)) { a->sign = a->sign != b->sign; return a; }
     if (double_parts_isnan(b)) { b->sign = a->sign != b->sign; return b; }
     if (double_parts_isinf(a)) {
-        if (double_parts_iszero(b)) return &D_00141810;
+        if (double_parts_iszero(b)) return &gDoublePartsNaN;
         a->sign = a->sign != b->sign; return a;
     }
     if (double_parts_isinf(b)) {
-        if (double_parts_iszero(a)) return &D_00141810;
+        if (double_parts_iszero(a)) return &gDoublePartsNaN;
         b->sign = a->sign != b->sign; return b;
     }
     if (double_parts_iszero(a)) { a->sign = a->sign != b->sign; return a; }
@@ -122,12 +123,13 @@ static __inline__ DoubleParts *dp_mul_parts(DoubleParts *a, DoubleParts *b,
     return tmp;
 }
 
+/* Multiplies two doubles using software math. */
 double func_00122B00(double first, double second) {
     DoubleParts a, b, tmp;
     DoubleParts *res;
 
-    func_00122760(&first, &a);
-    func_00122760(&second, &b);
+    UnpackDouble(&first, &a);
+    UnpackDouble(&second, &b);
     res = dp_mul_parts(&a, &b, &tmp);
-    return func_00122630(res);
+    return PackDouble(res);
 }

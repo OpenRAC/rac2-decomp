@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -101,8 +102,8 @@ void func_L00_002D34C0(FamilyC94396F4Vector_Fc94396f4 *destination,
         return;
     case 1:
         func_00282F20_6(first, (u8 *)&D_00189E20_15 + 672, -parameter);
-        func_L00_002D3BD8(second, source, 0.0f);
-        func_L00_002D3B58(destination, destination, 0.0f);
+        SetViewSpaceVectorLength(second, source, 0.0f);
+        SetViewSpaceHeight(destination, destination, 0.0f);
         func_00282CC0_16(destination, destination, second);
         func_00282CC0_16(destination, destination, first);
         return;
@@ -112,8 +113,8 @@ void func_L00_002D34C0(FamilyC94396F4Vector_Fc94396f4 *destination,
         } else {
             func_00282F20_6(first, D_0018A0E0, parameter);
         }
-        func_L00_002D3BD8(second, source, 0.0f);
-        func_L00_002D3B58(destination, destination, 0.0f);
+        SetViewSpaceVectorLength(second, source, 0.0f);
+        SetViewSpaceHeight(destination, destination, 0.0f);
         func_00282CC0_16(destination, destination, second);
         func_00282CC0_16(destination, destination, first);
         return;
@@ -155,5 +156,5 @@ void func_L00_002D36E0(float *p, int flag, float x, float y, float z)
 void func_L00_002D3778(FamilyC94396F4Vector_Fc94396f4 *destination,
                       FamilyC94396F4Vector_Fc94396f4 *source,
                       f32 amount) {
-    func_L00_002D34C0(destination, source, -amount);
+    ApplyHeroModeTransform(destination, source, -amount);
 }

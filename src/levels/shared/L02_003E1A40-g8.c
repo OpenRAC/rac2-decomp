@@ -64,6 +64,7 @@ struct L02E1A40Object {
 typedef struct { char pad[0x5c0]; L02E1A40Object *target; } L02E1A40Hero;
 extern L02E1A40Hero D_00189E20;
 #define I(p,o) (*(int *)((char *)(p)+(o)))
+/* Runs a collectible that glows, reacts when the player reaches it, shows a message and saves its progress when it is done. */
 void func_L02_003E1A40(L02E1A40Object *obj)
 {
     float pos[4], vel[4];
@@ -82,97 +83,97 @@ void func_L02_003E1A40(L02E1A40Object *obj)
         d->f38=0; d->f3c=0; d->count=0;
         index=obj->index;
         if(D_L02_0021F4F0.flags[(short)index] ||
-           ((initialPacked=D_0019B4A8[((short)index>>1)+(D_001A79F0[0]<<10)]),
+           ((initialPacked=D_0019B4A8[((short)index>>1)+(gCurrentMapIndex[0]<<10)]),
             (index&1) ? ((initialPacked>>4)&7) : (initialPacked&7))) {
-            func_L00_003294F0((D_L02_001B359C[0]+d->first),1);
-            func_L00_003294F0((D_L02_001B359C[0]+d->second),1);
-            if(d->auxiliary!=-1) func_0029F338(entityPool_gp+d->auxiliary);
-            func_002A7750(obj,5,-1);
-        } else func_002A7750(obj,1,-1);
+            SetObjectFlagBit((gMobyPool_L02[0]+d->first),1);
+            SetObjectFlagBit((gMobyPool_L02[0]+d->second),1);
+            if(d->auxiliary!=-1) MarkMobySpawned(entityPool_gp+d->auxiliary);
+            SetMobyState(obj,5,-1);
+        } else SetMobyState(obj,1,-1);
         break;
     case 1:
-        d->angle=func_00283B98(d->angle,D_L02_001B0760*0.0002908882452175021f);
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        if(d->fade!=0.0f) func_002AA2E8(&d->fade,0.0f,0.033333335f);
-        if(obj->active && !func_002A77E0(5)) {
-            angle=func_002A7940();
-            pos[0]=func_00283180(angle)*1.15f;
-            pos[1]=func_00283198(angle)*1.15f;
+        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0002908882452175021f);
+        AddDrawCallbackToList1(DrawPulsingRingEffect,obj);
+        if(d->fade!=0.0f) ApproachValue(&d->fade,0.0f,0.033333335f);
+        if(obj->active && !RandomIntBelow(5)) {
+            angle=RandomAngle();
+            pos[0]=FastSinOrCosA(angle)*1.15f;
+            pos[1]=FastSinOrCosB(angle)*1.15f;
             pos[2]=0;
-            func_00282CC0(pos,pos,obj->position);
+            FastVecAdd(pos,pos,obj->position);
             pos[2]+=0.1f;
-            size=func_002A7878(D_L02_001B0768,D_L02_001B0768_abs[1]);
-            color=func_00283D38(D_L02_001B0770,D_L02_001B0770_abs[1],func_002A7878(0,1));
-            speed=func_002A7878(1,2);
-            duration=func_002A7820(60,180);
-            func_00282C88(vel);
-            vel[2]=speed/func_00283CE0(duration);
-            func_002C3150(pos,vel,color,size,(unsigned char)duration,(unsigned char)func_002A77E0(255),0);
+            size=RandomFloatRange(D_L02_001B0768,D_L02_001B0768_abs[1]);
+            color=FastTweenColor(D_L02_001B0770,D_L02_001B0770_abs[1],RandomFloatRange(0,1));
+            speed=RandomFloatRange(1,2);
+            duration=RandomIntRange(60,180);
+            ClearVector128(vel);
+            vel[2]=speed/IntToFloat(duration);
+            SpawnHeroRelativeParticle(pos,vel,color,size,(unsigned char)duration,(unsigned char)RandomIntBelow(255),0);
         }
         if(D_0018A15C[0]==(char *)obj) {
-            func_002A7750(obj,2,-1);
+            SetMobyState(obj,2,-1);
             if(!D_L02_001B0778) {
                 D_L02_001B0778=1;
-                func_L00_002D40A0(obj->position,1,obj->radius);
+                StartHeroTargetState(obj->position,1,obj->radius);
             }
         } else {
-            other=(D_L02_001B359C[0]+d->other);
-            if(func_00282E80(obj->position,other->position)<1.5f && func_00282C48(obj->position[2]-other->position[2])<0.5f)
-                func_002A7750(obj,3,-1);
+            other=(gMobyPool_L02[0]+d->other);
+            if(vec_distance_xy(obj->position,other->position)<1.5f && FloatAbs(obj->position[2]-other->position[2])<0.5f)
+                SetMobyState(obj,3,-1);
         }
         break;
     case 2:
-        if(func_002B3868(obj)) {
-            func_002E5CF8(1,0,(char *)obj);
+        if(SetFirstPendingFlag(obj)) {
+            PlayMobySound(1,0,(char *)obj);
             d->color0=D_L02_001B0780;
             d->color1=D_L02_001B0780_abs[1];
             d->fade=0;d->alpha=0;
-            func_002B0A18(0x27cb,180);
-            if(!D_001A63A8.disabled && D_001A63A8.message==-1) {
+            SetEntryValueByIndex(0x27cb,180);
+            if(!gMusicState.disabled && gMusicState.message==-1) {
                 message0=d->message0;
-                D_001A63A8.timer=0;
-                D_001A63A8.message=(message0&0x3fff)+2000;
+                gMusicState.timer=0;
+                gMusicState.message=(message0&0x3fff)+2000;
             }
         }
-        if(D_0018A15C[0]!=(char *)obj) func_002A7750(obj,1,-1);
-        d->angle=func_00283B98(d->angle,D_L02_001B0760*0.0002908882452175021f);
-        angle=func_00283B98(d->angle2,D_L02_001B0764*0.0002908882452175021f);
-        frame=D_L02_001B30C8[0];
+        if(D_0018A15C[0]!=(char *)obj) SetMobyState(obj,1,-1);
+        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0002908882452175021f);
+        angle=FastAddRotations(d->angle2,D_L02_001B0764*0.0002908882452175021f);
+        frame=gFrameCounter_L02[0];
         d->angle2=angle;
         if((frame&1) && d->alpha<255) d->alpha++;
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        func_002AA2E8(&d->fade,1,0.033333335f);
+        AddDrawCallbackToList1(DrawPulsingRingEffect,obj);
+        ApproachValue(&d->fade,1,0.033333335f);
         break;
     case 3:
-        if(func_002B3868(obj)) {
+        if(SetFirstPendingFlag(obj)) {
             I(d,0x40)++;
             d->color0=D_L02_001B0788;
             d->color1=D_L02_001B0788_abs[1];
             d->fade=0;d->alpha=0;
-            func_002B0A18(0x27cc,180);
+            SetEntryValueByIndex(0x27cc,180);
             message1=d->message1;
-            D_001A63A8.timer=0;
-            D_001A63A8.message=(message1&0x3fff)+2000;
+            gMusicState.timer=0;
+            gMusicState.message=(message1&0x3fff)+2000;
         }
         ticks = obj->ticks;
         obj->ticks = ticks + 1;
-        if(ticks>180) func_002A7750(obj,4,-1);
+        if(ticks>180) SetMobyState(obj,4,-1);
         else if(obj->ticks>60) {
-{ L02E1A40Object *candidate; int i=d->other; candidate=D_L02_001B359C[0]+i; if(D_00189E20.target==candidate) D_00189E20.target=0; }
-            func_L00_003294F0((D_L02_001B359C[0]+d->first),1);
-            func_L00_003294F0((D_L02_001B359C[0]+d->second),1);
+{ L02E1A40Object *candidate; int i=d->other; candidate=gMobyPool_L02[0]+i; if(gHeroState.target==candidate) gHeroState.target=0; }
+            SetObjectFlagBit((gMobyPool_L02[0]+d->first),1);
+            SetObjectFlagBit((gMobyPool_L02[0]+d->second),1);
         }
-        d->angle=func_00283B98(d->angle,D_L02_001B0760*0.0002908882452175021f);
-        angle=func_00283B98(d->angle2,D_L02_001B0764*0.0002908882452175021f);
-        frame=D_L02_001B30C8[0];
+        d->angle=FastAddRotations(d->angle,D_L02_001B0760*0.0002908882452175021f);
+        angle=FastAddRotations(d->angle2,D_L02_001B0764*0.0002908882452175021f);
+        frame=gFrameCounter_L02[0];
         d->angle2=angle;
         if((frame&1) && d->alpha<255) d->alpha++;
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        func_002AA2E8(&d->fade,1,0.033333335f);
+        AddDrawCallbackToList1(DrawPulsingRingEffect,obj);
+        ApproachValue(&d->fade,1,0.033333335f);
         break;
     case 4:
-        func_L00_002E6CF0(func_L02_003E2150,obj);
-        func_002AA2E8(&d->fade,0,0.033333335f);
+        AddDrawCallbackToList1(DrawPulsingRingEffect,obj);
+        ApproachValue(&d->fade,0,0.033333335f);
         if(d->fade<=0) {
             completedIndex=obj->index;
             if(completedIndex&1) {
@@ -184,9 +185,9 @@ void func_L02_003E1A40(L02E1A40Object *obj)
                 savedByte=*save;
                 if((savedByte&7)!=7) *save=savedByte+1;
             }
-            func_002A7750(obj,5,-1);
+            SetMobyState(obj,5,-1);
         }
         break;
     }
-    if(D_001A63A8.f72==3 && D_001A63A8.f6c<6000) func_002B6D28();
+    if(gMusicState.f72==3 && gMusicState.f6c<6000) ResumeMusicStream();
 }

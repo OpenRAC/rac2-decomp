@@ -35,75 +35,77 @@ extern u8 D_L18_002A9BE0[];
 #define F(p, o) (*(float *)((p) + (o)))
 #define W(p, o) (*(int *)((p) + (o)))
 
-void func_L18_0042F308(u8 *a, int turn, int tilt)
+/* Turns and tilts the leader toward its target spot, moves it there, places its
+   attached pieces, and sprays exhaust particles. */
+void func_L18_0042F308(u8 *moby, int turn, int tilt)
 {
-    u8 *s = *(u8 **)(a + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     int i;
 
     if (turn) {
-        if (a[0x20] == 2)
-            func_002AEE70(a, s + 0xC8, s + 0xCC, D_L18_001B1444,
+        if (moby[0x20] == 2)
+            UpdateWrappedAngleOffset(moby, vars + 0xC8, vars + 0xCC, D_L18_001B1444,
                           D_L18_001B1434 * 0.00029088824f, -1.0f);
         else
-            func_002AEE70(a, s + 0xC8, s + 0xCC, D_L18_001B1430,
+            UpdateWrappedAngleOffset(moby, vars + 0xC8, vars + 0xCC, D_L18_001B1430,
                           D_L18_001B1434 * 0.00029088824f, -1.0f);
     }
     if (tilt) {
-        if (a[0x20] == 2)
-            func_002AEF28(a, s + 0xD0, s + 0xD4, D_L18_001B1448,
+        if (moby[0x20] == 2)
+            ScaleOwnerWordsByAngles(moby, vars + 0xD0, vars + 0xD4, D_L18_001B1448,
                           D_L18_001B143C * 0.00029088824f,
                           D_L18_001B1440 * 0.00029088824f);
         else
-            func_002AEF28(a, s + 0xD0, s + 0xD4, D_L18_001B1438,
+            ScaleOwnerWordsByAngles(moby, vars + 0xD0, vars + 0xD4, D_L18_001B1438,
                           D_L18_001B143C * 0.00029088824f,
                           D_L18_001B1440 * 0.00029088824f);
     } else {
-        func_002AA2E8(a + 0xF0, 0.0f, 0.052359886f);
-        func_002AA2E8(a + 0xF4, 0.0f, 0.052359886f);
+        ApproachValue(moby + 0xF0, 0.0f, 0.052359886f);
+        ApproachValue(moby + 0xF4, 0.0f, 0.052359886f);
     }
-    func_002AA548(a + 0x10, s + 0x80, F(s, 0x70),
+    StepValueTowardTarget(moby + 0x10, vars + 0x80, F(vars, 0x70),
                   D_L18_001B1458 * 0.00027777778f,
                   D_L18_001B145C * 0.00027777778f,
                   D_L18_001B1460 * 0.0166666675f);
-    func_002AA548(a + 0x14, s + 0x84, F(s, 0x74),
+    StepValueTowardTarget(moby + 0x14, vars + 0x84, F(vars, 0x74),
                   D_L18_001B1458 * 0.00027777778f,
                   D_L18_001B145C * 0.00027777778f,
                   D_L18_001B1460 * 0.0166666675f);
-    func_002AA548(a + 0x18, s + 0x88, F(s, 0x78),
+    StepValueTowardTarget(moby + 0x18, vars + 0x88, F(vars, 0x78),
                   D_L18_001B1458 * 0.00027777778f,
                   D_L18_001B145C * 0.00027777778f,
                   D_L18_001B1460 * 0.0166666675f);
-    if (func_00282E80(a + 0x10, s + 0x70) > 1.0f) {
-        u8 *heading = a + 0xF8;
-        float angle = func_00283248(F(s, 0x70) - F(a, 0x10),
-                                    F(s, 0x74) - F(a, 0x14));
-        func_002AAA00(heading, s + 0xD8, angle,
+    if (vec_distance_xy(moby + 0x10, vars + 0x70) > 1.0f) {
+        u8 *heading = moby + 0xF8;
+        float angle = FastMatrixHelperA(F(vars, 0x70) - F(moby, 0x10),
+                                    F(vars, 0x74) - F(moby, 0x14));
+        ApproachTargetWithDirectionMode(heading, vars + 0xD8, angle,
                       D_L18_001B144C * 0.0000048481374f,
                       D_L18_001B1450 * 0.0000048481374f,
                       D_L18_001B1454 * 0.00029088824f, 0);
     }
     {
-        int *ids = (int *)(s + 0x90);
+        int *ids = (int *)(vars + 0x90);
         u8 *offset = D_L18_002A9BE0;
 
         for (i = 0; i < 6; i++, offset += 16, ids++) {
             if (*ids != -1) {
-                u8 *e = D_L18_001B281C + (*ids << 8);
-                func_00283098(e + 0x10, offset, a + 0xC0);
-                func_00282CC0(e + 0x10, e + 0x10, a + 0x10);
+                u8 *piece = gMobyTable_L18 + (*ids << 8);
+                matrix_mul_vec3(piece + 0x10, offset, moby + 0xC0);
+                FastVecAdd(piece + 0x10, piece + 0x10, moby + 0x10);
                 if (i < 3) {
-                    F(e, 0xF0) = F(a, 0xF4);
-                    F(e, 0xF4) = -F(a, 0xF0);
-                    F(e, 0xF8) = func_00283B98(F(a, 0xF8), D_L18_001B1468[i]);
+                    F(piece, 0xF0) = F(moby, 0xF4);
+                    F(piece, 0xF4) = -F(moby, 0xF0);
+                    F(piece, 0xF8) = FastAddRotations(F(moby, 0xF8), D_L18_001B1468[i]);
                 } else {
-                    F(e, 0xF0) = -F(a, 0xF4);
-                    F(e, 0xF4) = F(a, 0xF0);
-                    F(e, 0xF8) = func_00283B98(F(a, 0xF8), D_L18_001B1468[i]);
+                    F(piece, 0xF0) = -F(moby, 0xF4);
+                    F(piece, 0xF4) = F(moby, 0xF0);
+                    F(piece, 0xF8) = FastAddRotations(F(moby, 0xF8), D_L18_001B1468[i]);
                 }
             }
         }
     }
-    func_L18_0042F7B8(a, D_L18_001B1480);
-    func_L18_0042F7B8(a, D_L18_001B1490);
-    func_L00_002E6EF8(func_L18_0042FAA8, a);
+    SpawnExhaustParticles_L18(moby, D_L18_001B1480);
+    SpawnExhaustParticles_L18(moby, D_L18_001B1490);
+    AddDrawCallbackToList3(DrawBeamsBothTables, moby);
 }

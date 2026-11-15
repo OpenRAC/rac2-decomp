@@ -60,11 +60,11 @@ void func_L02_00410450(u8 *object)
     switch(object[0x20]) {
     case 0:
         object[0x30]=0xFF;object[0x20]=1;
-        func_L02_00410E58(object);
-        func_L02_00410D00(object);
+        SpawnOrbitingChildren(object);
+        UpdateOrbitingChildPositions(object);
         break;
     case 1:
-        if(state->key>=0 && !(D_0019B2E8[state->key+D_001A79F0*16]&0x80)) {
+        if(state->key>=0 && !(D_0019B2E8[state->key+gCurrentMapIndex*16]&0x80)) {
             *(int *)(object+0x98)=0;
             *(u16 *)(object+0x34)=(*(u16 *)(object+0x34)|0x41)&0xEFFF;
             slot=state->children;left=2;
@@ -85,14 +85,14 @@ void func_L02_00410450(u8 *object)
             *(int *)(*slot+0x98)=*(int *)(*(u8 **)(*slot+0x24)+0x10);
             slot++;
         } while(--left>=0);
-        if(state->primary!=-1 && D_00189E20.selected==object) {
-            if(D_00189E20.busy) goto propagate;
-            func_L02_004114A0(object);
+        if(state->primary!=-1 && gHeroState.selected==object) {
+            if(gHeroState.busy) goto propagate;
+            ShowMessageForState(object);
             if((D_00138324&0x10) && D_L02_001A8FB4==11) {
-                func_002E5CF8(0,0,(char *)object);
+                PlayMobySound(0,0,(char *)object);
                 object[0x20]=2;state->rateA=0;state->rateB=0;
-                func_L00_002D40A0((Quad *)(object+0x10),0,*(float *)(object+0xF8));
-                func_002A8C28(object,1.5f,(float *)(object+0x10),0x10000,20.0f,1.0f,0,1,0);
+                StartHeroTargetState((Quad *)(object+0x10),0,*(float *)(object+0xF8));
+                SweepCollisionFromObject(object,1.5f,(float *)(object+0x10),0x10000,20.0f,1.0f,0,1,0);
             }
         }
         break;
@@ -104,16 +104,16 @@ void func_L02_00410450(u8 *object)
             *(u16 *)(*slot+0x34)&=0xFFBE;*(u16 *)(*slot+0x34)|=0x1000;
             *(int *)(*slot+0x98)=*(int *)(*(u8 **)(*slot+0x24)+0x10);slot++;
         } while(--left>=0);
-        answer=func_L00_002D40F0();
+        answer=GetHeroTargetStateKind();
         if(state->orbitA<1.0f) {
-            func_002AA548(&state->orbitA,&state->rateA,1.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
+            StepValueTowardTarget(&state->orbitA,&state->rateA,1.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
         } else if(state->orbitB<1.0f) {
-            func_002AA548(&state->orbitB,&state->rateB,1.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
+            StepValueTowardTarget(&state->orbitB,&state->rateB,1.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
         } else if(D_L02_001A8FB4!=11 || !(state->orbitA>0.25f)) {
-            if(answer==2) {func_L00_002C42E0(0x6F,1);state->timer=1.95f;object[0x20]=3;}
+            if(answer==2) {SetHeroAction_L00(0x6F,1);state->timer=1.95f;object[0x20]=3;}
             else if(answer==0) object[0x20]=4;
         }
-        func_L02_00410D00(object);
+        UpdateOrbitingChildPositions(object);
         break;
     case 3: {
         u8 *data;
@@ -126,29 +126,29 @@ void func_L02_00410450(u8 *object)
             *(int *)(*slot+0x98)=*(int *)(*(u8 **)(*slot+0x24)+0x10);slot++;
         } while(--left>=0);
         if(state->timer!=0.0f) {
-            func_L00_002E6CF0((DrawCallback)func_L02_00410F68,object);
-            func_002AA2E8(&state->timer,0,0.06666667f);
+            AddDrawCallbackToList1((DrawCallback)DrawAnimatedEffectQuads,object);
+            ApproachValue(&state->timer,0,0.06666667f);
             break;
         }
-            D_00189E20.active=1;
-            if(state->handle>=0) {func_002A7750(object,5,-1);break;}
+            gHeroState.active=1;
+            if(state->handle>=0) {SetMobyState(object,5,-1);break;}
             {
-                actor=D_L02_001B359C+state->primary*0x100;
-                if(state->secondary!=-1 && (D_0019B2E8[state->secondaryKey+D_001A79F0*16]&0x80)) actor=D_L02_001B359C+state->secondary*0x100;
+                actor=gMobyPool_L02+state->primary*0x100;
+                if(state->secondary!=-1 && (D_0019B2E8[state->secondaryKey+gCurrentMapIndex*16]&0x80)) actor=gMobyPool_L02+state->secondary*0x100;
                 data=*(u8 **)(actor+0x68);
                 qcopy(&position,actor+0x10);position.f[2]+=0.2f;
-                func_L00_002B9D60(&position,actor+0xF0,0,1);
+                ResetHeroPositionAndDirection(&position,actor+0xF0,0,1);
                 actor[0x20]=4;
                 *(float *)(data+0x34)=0;*(float *)(data+0x28)=0;*(float *)(data+0x2C)=0;
                 *(float *)(data+0x20)=1;*(float *)(data+0x24)=1;
-                func_002E5CF8(1,0,(char *)actor);
+                PlayMobySound(1,0,(char *)actor);
                 object[0x20]=1;state->orbitA=0;state->orbitB=0;state->rateA=0;state->rateB=0;state->timer=1.95f;
-                func_L02_00410D00(object);
+                UpdateOrbitingChildPositions(object);
             }
         break;
     }
     case 4:
-        func_002B3868(object);
+        SetFirstPendingFlag(object);
         *(u16 *)(object+0x34)=(*(u16 *)(object+0x34)&0xFFBE)|0x1000;
         *(int *)(object+0x98)=*(int *)(*(u8 **)(object+0x24)+0x10);
         slot=state->children;left=2;
@@ -157,45 +157,45 @@ void func_L02_00410450(u8 *object)
             *(int *)(*slot+0x98)=*(int *)(*(u8 **)(*slot+0x24)+0x10);slot++;
         } while(--left>=0);
         if(state->timer<1.95f) {
-            func_L00_002E6CF0((DrawCallback)func_L02_00410F68,object);
-            func_002AA2E8(&state->timer,1.95f,0.06666667f);
+            AddDrawCallbackToList1((DrawCallback)DrawAnimatedEffectQuads,object);
+            ApproachValue(&state->timer,1.95f,0.06666667f);
         } else {
             if(state->orbitB>0.0f) {
-                func_002AA548(&state->orbitB,&state->rateA,0.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
+                StepValueTowardTarget(&state->orbitB,&state->rateA,0.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
             } else if(state->orbitA>0.0f) {
-                func_002AA548(&state->orbitA,&state->rateB,0.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
+                StepValueTowardTarget(&state->orbitA,&state->rateB,0.0f,D_L02_001B1A58*0.00027777778f,D_L02_001B1A5C*0.00027777778f,D_L02_001B1A60*0.016666668f);
             } else object[0x20]=1;
         }
-        func_L02_00410D00(object);
+        UpdateOrbitingChildPositions(object);
         break;
     case 6:
-        if(func_002B3868(object)) {
-            state->orbitB=1;state->orbitA=1;func_L02_00410D00(object);state->opacity=0;
+        if(SetFirstPendingFlag(object)) {
+            state->orbitB=1;state->orbitA=1;UpdateOrbitingChildPositions(object);state->opacity=0;
         }
-        state->opacity+=0.02f;D_00189E20.active=1;
+        state->opacity+=0.02f;gHeroState.active=1;
         if(state->opacity>=1.2f) {
-            func_L00_002C8BA8(0);object[0x20]=4;
+            StartHeroLoaderState(0);object[0x20]=4;
             state->rateA=0;state->rateB=0;state->timer=0;state->orbitA=1;state->orbitB=1;
-            func_002E5CF8(1,0,(char *)object);
+            PlayMobySound(1,0,(char *)object);
         }
-        func_L00_002E6EF8((DrawCallback)func_L02_00411530,object);
+        AddDrawCallbackToList3((DrawCallback)StoreClampedComplementValue,object);
         break;
     case 5: {
         u8 *actor;
-        if(func_002B3868(object)) state->opacity=1;
-        state->opacity-=0.02f;D_00189E20.active=1;
+        if(SetFirstPendingFlag(object)) state->opacity=1;
+        state->opacity-=0.02f;gHeroState.active=1;
         if(state->opacity<=-0.2f) {
-            actor=D_L02_001B359C+state->primary*0x100;
+            actor=gMobyPool_L02+state->primary*0x100;
             actor[0x20]=6;object[0x20]=1;state->timer=1.95f;
             state->orbitA=0;state->orbitB=0;state->rateA=0;state->rateB=0;
-            if(state->variant>=0) func_L00_00303530(state->handle,state->variant);
-            else func_L00_00303530(state->handle,0);
+            if(state->variant>=0) LoadSceneChunk(state->handle,state->variant);
+            else LoadSceneChunk(state->handle,0);
             qcopy(&position,actor+0x10);position.f[2]+=0.2f;
-            func_L00_002B9D60(&position,actor+0xF0,0x6F,1);
-            func_L02_00410D00(object);
-            func_002A7750(object,1,-1);
+            ResetHeroPositionAndDirection(&position,actor+0xF0,0x6F,1);
+            UpdateOrbitingChildPositions(object);
+            SetMobyState(object,1,-1);
         }
-        func_L00_002E6EF8((DrawCallback)func_L02_00411530,object);
+        AddDrawCallbackToList3((DrawCallback)StoreClampedComplementValue,object);
         break;
     }
     }

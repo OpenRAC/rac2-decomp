@@ -18,6 +18,8 @@ extern void func_306660(void *, void *, void *);
 extern void func_306AD8(void *, void *, void *);
 extern void func_3068F8(void *, void *, float);
 extern int func_338168(void *, int);
+/* Moves the object's cached pieces by a random nudge and pushes them away from any list
+   entries they touch. */
 void func_L05_0037CEE0(char *obj, void *matrix, float scale)
 {
     float a[4], b[4], c[4];

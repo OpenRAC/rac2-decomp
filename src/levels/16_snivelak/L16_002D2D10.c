@@ -14,11 +14,12 @@ typedef struct {
 
 extern T_001B99C0 D_L16_001B99C0;
 
-void func_L16_002D2D10(s32 a0, f32 f12, f32 f13) {
+/* Starts the shared transition once, storing how fast it should step. */
+void func_L16_002D2D10(s32 mode, f32 firstDuration, f32 secondDuration) {
     if (D_L16_001B99C0.f27C == 0.0f) {
-        D_L16_001B99C0.i280 = a0;
+        D_L16_001B99C0.i280 = mode;
         D_L16_001B99C0.f27C = 1.0f;
-        D_L16_001B99C0.f274 = 1.0f / f12;
-        D_L16_001B99C0.f278 = 1.0f / f13;
+        D_L16_001B99C0.f274 = 1.0f / firstDuration;
+        D_L16_001B99C0.f278 = 1.0f / secondDuration;
     }
 }

@@ -20,6 +20,7 @@ extern s32 func_L00_002D6418(void);
    guard state is 0 or 3) and of the trailing objects; then clears bits 0x41 of the first slot
    object when the word at +0x1248 is 10, the mode is 0 and the object's +0x20 byte is set.
    func_L00_002D3068 clears bit 0 of the same objects. */
+/* Turns on the same flag bit for the hero and all the objects attached to it, with a few exceptions for some modes. */
 void func_L00_002D2E68(void)
 {
     u8 *base;
@@ -35,10 +36,10 @@ void func_L00_002D2E68(void)
 
     hero = H->ptr[0xC18 / 4];
     *(u16 *)(hero + 0x34) |= 1;
-    guard = D_00152C00;
+    guard = gHeroMoby_00152C00;
     for (i = 0; i < 7; i++) {
-        base = D_00189E20;
-        if (i == 0 && func_L00_002D6418())
+        base = gHeroState;
+        if (i == 0 && IsHeroActionAllowed())
             continue;
         mode = D_L00_001A8F00;
         if (mode == 2) {

@@ -30,53 +30,56 @@
 extern struct Gl { s32 w0; s32 w1; s32 w2; } D_0018A160;
 extern s32 ref_L17_003C5B68_00 __attribute__((sda));
 
-s32 func_L17_003C5B68(void *arg0) {
-    void *temp_a0;
-    void *temp_v0;
-    s32 temp_a1;
-    s32 temp_v1;
-    s32 temp_a0_2;
-    s32 temp_v1_2;
-    void *temp_v0_2;
+/* Tells whether a ride platform can start moving now. Returns 1 for a class 0x920 platform, or
+   for a class 0x929 platform that is empty, stopped and whose trigger is finished. Returns 0
+   otherwise. */
+s32 func_L17_003C5B68(void *moby) {
+    void *vars;
+    void *carried;
+    s32 classId;
+    s32 carriedClass;
+    s32 triggerIndex;
+    s32 triggerState;
+    void *trigger;
 
     if (D_0018A160.w0 == 0) {
         return 0;
     }
-    temp_a1 = (*(s16 *)((char *)(arg0) + (0xAA)));
-    if (temp_a1 == 0x920) {
+    classId = (*(s16 *)((char *)(moby) + (0xAA)));
+    if (classId == 0x920) {
 success:
         return 1;
     }
-    if (temp_a1 != 0x929) {
+    if (classId != 0x929) {
         goto fail;
     }
-    temp_a0 = (*(void **)((char *)(arg0) + (0x68)));
-    temp_v0 = (*(void **)((char *)(temp_a0) + (0x9C)));
-    if (temp_v0 != NULL) {
-        temp_v1 = (*(u16 *)((char *)(temp_v0) + (0xAA)));
-        if ((u32) (temp_v1 - 0x920) < 2U) {
+    vars = (*(void **)((char *)(moby) + (0x68)));
+    carried = (*(void **)((char *)(vars) + (0x9C)));
+    if (carried != NULL) {
+        carriedClass = (*(u16 *)((char *)(carried) + (0xAA)));
+        if ((u32) (carriedClass - 0x920) < 2U) {
             goto fail;
         }
-        if ((s16) temp_v1 == temp_a1) {
+        if ((s16) carriedClass == classId) {
             goto fail;
         }
     }
-    if ((*(f32 *)((char *)(temp_a0) + (0x98))) != 0.0f) {
+    if ((*(f32 *)((char *)(vars) + (0x98))) != 0.0f) {
         goto fail;
     }
-    temp_a0_2 = (*(s32 *)((char *)(temp_a0) + (0xA0)));
-    if (temp_a0_2 == -1) {
+    triggerIndex = (*(s32 *)((char *)(vars) + (0xA0)));
+    if (triggerIndex == -1) {
         goto success;
     }
-    temp_v0_2 = (void *) (ref_L17_003C5B68_00 + (temp_a0_2 << 8));
-    if (temp_v0_2 == NULL) {
+    trigger = (void *) (ref_L17_003C5B68_00 + (triggerIndex << 8));
+    if (trigger == NULL) {
         goto success;
     }
-    temp_v1_2 = (*(u8 *)((char *)(temp_v0_2) + (0x20)));
-    if (temp_v1_2 == 0xFE) {
+    triggerState = (*(u8 *)((char *)(trigger) + (0x20)));
+    if (triggerState == 0xFE) {
         goto success;
     }
-    if (temp_v1_2 == 0xFD) {
+    if (triggerState == 0xFD) {
         goto success;
     }
 fail:

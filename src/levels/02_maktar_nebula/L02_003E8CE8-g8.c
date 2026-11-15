@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_003E8CE8 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give retail's grouped `lq`/`sq`
@@ -32,39 +33,39 @@ extern float func_002AA2E8(float *, float, float);
    func_002AA2E8; the entity's position then gets a spring term (distance times 1/3600 times
    D_L02_001B0C08) and a damping term (the speed over D_L02_001B0C0C) added to the velocity at
    state+0x10, and the velocity added to the position. */
-void func_L02_003E8CE8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    char *target = D_L02_001B359C[0] + (*(int *)state << 8);
+void func_L02_003E8CE8(char *actor) {
+    char *state = *(char **)(actor + 0x68);
+    char *target = gMobyPool_L02[0] + (*(int *)state << 8);
     float pos[4];
     float vec[4];
     float diff[4];
     float spring[4];
     float damp[4];
     float step;
-    float *q;
-    float a;
-    float b;
+    float *goal;
+    float distance;
+    float speed;
 
-    *(TI128 *)pos = *(TI128 *)(arg0 + 0x10);
+    *(TI128 *)pos = *(TI128 *)(actor + 0x10);
     pos[2] += D_L02_001B0C00;
-    if (D_00189E20.target5C0 == target) {
-        func_00282CF0(vec, D_00189E20.vecE0, pos);
-        step = func_00282DF0(vec);
-        func_002AA2E8(&step, 0.1f, D_L02_001B0C04);
-        func_00282F20(vec, vec, step);
-        func_00282CC0(vec, vec, pos);
+    if (gHeroState.target5C0 == target) {
+        FastVecSub(vec, gHeroState.vecE0, pos);
+        step = FastVecLength(vec);
+        ApproachValue(&step, 0.1f, D_L02_001B0C04);
+        vec_scale_to_length(vec, vec, step);
+        FastVecAdd(vec, vec, pos);
     } else {
         *(TI128 *)vec = *(TI128 *)pos;
     }
-    q = vec;
-    func_00282CF0(diff, target + 0x10, q);
-    a = func_00282DF0(diff);
-    b = func_00282DF0(state + 0x10);
-    a = a * 0.00027777778f;
-    b = b / D_L02_001B0C0C;
-    func_00282F20(spring, diff, -(D_L02_001B0C08 * a));
-    func_00282F20(damp, state + 0x10, -b);
-    func_00282CC0(state + 0x10, state + 0x10, spring);
-    func_00282CC0(state + 0x10, state + 0x10, damp);
-    func_00282CC0(target + 0x10, target + 0x10, state + 0x10);
+    goal = vec;
+    FastVecSub(diff, target + 0x10, goal);
+    distance = FastVecLength(diff);
+    speed = FastVecLength(state + 0x10);
+    distance = distance * 0.00027777778f;
+    speed = speed / D_L02_001B0C0C;
+    vec_scale_to_length(spring, diff, -(D_L02_001B0C08 * distance));
+    vec_scale_to_length(damp, state + 0x10, -speed);
+    FastVecAdd(state + 0x10, state + 0x10, spring);
+    FastVecAdd(state + 0x10, state + 0x10, damp);
+    FastVecAdd(target + 0x10, target + 0x10, state + 0x10);
 }

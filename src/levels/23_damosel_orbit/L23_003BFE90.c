@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI16 __attribute__((mode(TI)));
 
@@ -36,24 +37,25 @@ extern void func_002E5DA0(int, int, char *, int);
    The clear of v.c is retail's `sq $zero,0($reg)`, a scheduling barrier (-frac2-zero-ti-barrier): the 1.0f
    is made before it, as retail does, and the table base is one local, so that the `lw 0x2290` and the
    `addiu 0x80` share its register. */
-void func_L23_003BFE90(char *arg0, float arg1, int unused1, int arg2) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Works out a push direction from the hero's position and facing, then launches a hit effect that way and plays its sound. */
+void func_L23_003BFE90(char *moby, float strength, int unused1, int mirror) {
+    char *vars = *(char **)(moby + 0x68);
     struct Vecs v;
-    char *base = D_00189E20;
+    char *base = gHeroState;
     float one;
 
-    func_00282D30((char *)&v.a, *(char **)(base + 0x2290) + 0xE0, 3.0f);
-    func_00282CC0((char *)&v.a, (char *)&v.a, base + 0x80);
+    FastVecScale((char *)&v.a, *(char **)(base + 0x2290) + 0xE0, 3.0f);
+    FastVecAdd((char *)&v.a, (char *)&v.a, base + 0x80);
     one = 1.0f;
     v.c = 0;
     ((float *)&v.c)[1] = one;
     ((float *)&v.c)[3] = one;
-    if (arg2 != 0)
+    if (mirror != 0)
         ((float *)&v.c)[1] = -((float *)&v.c)[1];
-    func_0029FC20(*(char **)(state + 0x2A0), arg2, (char *)&v.b);
-    func_002830C0((char *)&v.c, (char *)&v.c, (char *)&v.b);
-    func_00282CF0((char *)&v.d, (char *)&v.a, (char *)&v.c);
-    func_00282F20((char *)&v.d, (char *)&v.d, D_L23_001B370C * 0.016666668f);
-    func_L23_00429098(arg0, (char *)&v.d, (char *)&v.c, 0, arg1);
-    func_002E5DA0(3, 0, arg0, 0x7E5);
+    TransformMobyJointPoint(*(char **)(vars + 0x2A0), mirror, (char *)&v.b);
+    transform_vector((char *)&v.c, (char *)&v.c, (char *)&v.b);
+    FastVecSub((char *)&v.d, (char *)&v.a, (char *)&v.c);
+    vec_scale_to_length((char *)&v.d, (char *)&v.d, D_L23_001B370C * 0.016666668f);
+    CreateChildShotB(moby, (char *)&v.d, (char *)&v.c, 0, strength);
+    PlaySoundFromClassBank(3, 0, moby, 0x7E5);
 }

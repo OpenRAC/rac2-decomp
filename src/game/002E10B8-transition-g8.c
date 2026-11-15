@@ -77,6 +77,7 @@ extern int func_002E4AC8(void);
 extern int func_001261F0(int);
 extern int func_002B6D28(void);
 
+/* Sets up the scene for a screen transition: clears work areas, hides some objects, chooses the music and starting state, then waits until the scene is ready. */
 void func_002E6D88(int mode)
 {
     TransitionMoby *p;
@@ -86,54 +87,54 @@ void func_002E6D88(int mode)
     int music;
     int channel;
 
-    D_00152C00.field6C = 0;
-    D_00152C00.mode = mode;
-    D_00152C00.field8 = 0;
-    D_00152C00.slot = -1;
-    func_00282A60(&D_001B8840, 0, 0x1D0);
-    func_00282A60(&D_001B1390, 0, 0x40);
-    func_00282A60(D_001B2980, 0, 0x40);
-    func_00282A60(D_001B2980 + 0x40, 0, 0x40);
-    func_00282A60(&D_001B13D0, 0, 0x40);
-    func_002FC138();
+    gHeroMoby_00152C00.field6C = 0;
+    gHeroMoby_00152C00.mode = mode;
+    gHeroMoby_00152C00.field8 = 0;
+    gHeroMoby_00152C00.slot = -1;
+    ClearMemory(&gScenePlaybackState, 0, 0x1D0);
+    ClearMemory(&D_001B1390, 0, 0x40);
+    ClearMemory(D_001B2980, 0, 0x40);
+    ClearMemory(D_001B2980 + 0x40, 0, 0x40);
+    ClearMemory(&D_001B13D0, 0, 0x40);
+    SelectPacketBufferSetup();
 
     offset = D_001B22B0 - 0x60000;
-    D_001B8840.start = D_001BAEC0.start + offset;
-    D_001B8840.end = D_001BAEC0.end + offset;
-    D_001B15A0 = 1.0f;
+    gScenePlaybackState.start = D_001BAEC0.start + offset;
+    gScenePlaybackState.end = D_001BAEC0.end + offset;
+    gScreenFade = 1.0f;
     D_001B22B0 = offset;
     D_001B15A4 = 0;
-    func_0026F748(0x61, 2);
-    D_00189E20.flag = 1;
-    func_0026F720();
+    EmptyStubF748(0x61, 2);
+    gHeroState.flag = 1;
+    EmptyStubF720();
 
-    object = D_00152C00.object;
+    object = gHeroMoby_00152C00.object;
     p = D_001B1B60;
     object->flags |= 1;
     for (; p->status != 255; p++) {
-        if (!(p->status & 0x80) && (p->type == 0x4A || p->type == 0xCB))
+        if (!(p->status & 0x80) && (p->type == 0x4A /* moby class 74 */ || p->type == 0xCB /* Decoy */))
             p->flags |= 0x80;
     }
 
     if (mode == 0) {
-        state = D_00189E20.mode ? 5 : 2;
-        music = D_00189E20.mode ? 3 : 1;
-        func_00293F98(music, 6);
+        state = gHeroState.mode ? 5 : 2;
+        music = gHeroState.mode ? 3 : 1;
+        LoadPartsSetFromDisc(music, 6);
     } else {
-        state = D_00189E20.mode ? 3 : 0;
-        music = D_00189E20.mode ? 2 : 0;
-        if (!D_00152C00.active)
+        state = gHeroState.mode ? 3 : 0;
+        music = gHeroState.mode ? 2 : 0;
+        if (!gHeroMoby_00152C00.active)
             state++;
-        channel = D_00152C00.active ? 0 : 2;
-        func_00293F98(music, channel);
+        channel = gHeroMoby_00152C00.active ? 0 : 2;
+        LoadPartsSetFromDisc(music, channel);
     }
 
-    D_001A63A8.state = state + 5000;
-    D_001A63A8.next = 0;
-    func_00294070(0);
-    while (D_001A63A8.phase != 3 || D_001A63A8.limit >= 6000) {
-        func_002E4AC8();
-        func_001261F0(0);
+    gMusicState.state = state + 5000;
+    gMusicState.next = 0;
+    SelectSegmentAndUpdateWorld(0);
+    while (gMusicState.phase != 3 || gMusicState.limit >= 6000) {
+        UpdateSoundVoices();
+        GetGsCurrentField(0);
     }
-    func_002B6D28();
+    ResumeMusicStream();
 }

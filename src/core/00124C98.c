@@ -79,18 +79,19 @@ extern char r1_D_00137DC8[];
    record the command, bind the 0x80000593 server once and retry until it
    answers. The two wait loops are written out separately, as retail keeps
    both copies. */
-int func_00124C98(int arg0) {
-    int i;
+/* Checks that a CD read command can start. Takes the lock and connects to the CD server, retrying until it answers. */
+int func_00124C98(int cmdId) {
+    int spin;
     volatile int *sem = &r1_D_001363AC;
 
     r1_func_00124780();
     if (*sem != r1_func_0011AC70(*sem)) {
         if (r1_D_00136390 > 0) {
-            r1_func_0011C820(r1_D_0013B228, arg0, r1_D_00136398);
+            r1_func_0011C820(r1_D_0013B228, cmdId, r1_D_00136398);
         }
         return 0;
     }
-    r1_D_00136398 = arg0;
+    r1_D_00136398 = cmdId;
     r1_func_0011AB20(r1_D_00141850, r1_D_00141858);
     if (r1_func_00124C28(1) != 0) {
         r1_func_0011AC40(*sem);
@@ -105,13 +106,13 @@ int func_00124C98(int arg0) {
             if (r1_D_00136390 > 0) {
                 r1_func_0011C820(r1_D_0013B250);
             }
-            for (i = 0x100000; i != -1; i--)
+            for (spin = 0x100000; spin != -1; spin--)
                 ;
         } else {
             if (((SifRpcClientData *)r1_D_00137DC8)->serve != 0) {
                 break;
             }
-            for (i = 0x100000; i != -1; i--)
+            for (spin = 0x100000; spin != -1; spin--)
                 ;
         }
     }
@@ -169,23 +170,24 @@ extern char r1_D_0013B288[];
    store, sched1 leaves retail's register allocation in the init block.
    Making any one other init store volatile instead (e.g. 63C8) gives the
    same bytes. */
-int func_00124E08(int init_mode) {
-    int ret;
-    int r;
-    int i;
-    int stat;
-    int a;
-    int b;
-    int owner;
-    char *rbuf;
+/* Starts up the CD system. Connects to the CD server, sends the start mode and reads back the drive version. */
+int func_00124E08(int initMode) {
+    int result;
+    int rpcResult;
+    int spin;
+    int status;
+    int ver1;
+    int ver2;
+    int threadId;
+    char *replyBuf;
 
     if (r1_func_00124C28(1) != 0) {
         return 0;
     }
     r1_func_0011CF78(0);
-    owner = r1_func_0011AB10();
+    threadId = r1_func_0011AB10();
     r1_D_001363A4 = 1;
-    r1_D_00141850 = owner;
+    r1_D_00141850 = threadId;
     r1_D_001363C0 = -1;
     r1_D_001363B8 = -1;
     r1_D_001363C8 = -1;
@@ -195,43 +197,43 @@ int func_00124E08(int init_mode) {
     r1_D_001363B4 = 0;
     r1_D_001363D0++;
     while (1) {
-        r = r1_func_0011D450(&r1_D_00141A68, 0x80000592, 0);
-        if (r < 0) {
+        rpcResult = r1_func_0011D450(&r1_D_00141A68, 0x80000592, 0);
+        if (rpcResult < 0) {
             if (r1_D_00136390 > 0) {
-                r1_func_0011C820(r1_D_0013B268, r, r1_D_001363D0);
+                r1_func_0011C820(r1_D_0013B268, rpcResult, r1_D_001363D0);
             }
-            for (i = 0x100000; i != -1; i--) {
+            for (spin = 0x100000; spin != -1; spin--) {
             }
             continue;
         }
         if (((SifRpcClientData *)&r1_D_00141A68)->serve != 0) {
-            r1_D_00141AC0 = init_mode;
+            r1_D_00141AC0 = initMode;
             r1_D_001363CC = 0;
             r1_func_0011CEC8(&r1_D_00141AC0, 4);
-            rbuf = r1_D_00137580;
-            if (r1_func_0011D620(&r1_D_00141A68, 0, 0, &r1_D_00141AC0, 4, rbuf, 0x10, 0, 0) < 0) {
+            replyBuf = r1_D_00137580;
+            if (r1_func_0011D620(&r1_D_00141A68, 0, 0, &r1_D_00141AC0, 4, replyBuf, 0x10, 0, 0) < 0) {
                 r1_D_001363A4 = 0;
                 return 0;
             }
             break;
         }
-        for (i = 0x100000; i != -1; i--) {
+        for (spin = 0x100000; spin != -1; spin--) {
         }
     }
-    a = *(int *)((unsigned int)(rbuf + 4) | 0x20000000);
-    b = *(int *)((unsigned int)(rbuf + 8) | 0x20000000);
-    stat = *(int *)((unsigned int)(rbuf + 0xC) | 0x20000000);
-    ret = 1;
-    if (stat == 0xFF) {
-    } else if (stat == 0xFE) {
-        r1_D_00136390 = ret;
+    ver1 = *(int *)((unsigned int)(replyBuf + 4) | 0x20000000);
+    ver2 = *(int *)((unsigned int)(replyBuf + 8) | 0x20000000);
+    status = *(int *)((unsigned int)(replyBuf + 0xC) | 0x20000000);
+    result = 1;
+    if (status == 0xFF) {
+    } else if (status == 0xFE) {
+        r1_D_00136390 = result;
     } else {
-        if (a / 256 < 2 || b / 256 < 2) {
-            ret = 2;
+        if (ver1 / 256 < 2 || ver2 / 256 < 2) {
+            result = 2;
         }
     }
     r1_D_001363A4 = 0;
-    switch (init_mode) {
+    switch (initMode) {
     case 5:
         if (r1_D_00136390 > 0) {
             r1_func_0011C820(r1_D_0013B288);
@@ -248,7 +250,7 @@ int func_00124E08(int init_mode) {
         r1_func_001248F8();
         break;
     }
-    return ret;
+    return result;
 }
 
 
@@ -316,6 +318,7 @@ extern int r1_func_00120FD0();
 /* rac1-decomp src/core/001208E8.c: func_00121490 */
 /* libcdvd disk-ready query (the sceCdDiskReady pattern): take the S-command semaphore, bind the 0x8000059A server once, send mode and return the server's status word. Mode 8 reports -1 on failure, every other mode 6.
    Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/textbin/fun_00121190.c, FUN_00121190. */
+/* Asks the CD drive if the disc is ready for the given mode and returns the status. */
 s32 func_001250E8(s32 mode) {
     s32 response;
     s32 spin;
@@ -397,21 +400,22 @@ extern char r1_D_00132E08[];
 
 /* rac1-decomp src/core/001208E8.c: func_00121688 */
 /* sceCdMmode */
-int func_001252E0(int arg0) {
-    int *p = &r1_D_00132A00;
-    int r;
+/* Sets the CD media mode and returns the drive reply. */
+int func_001252E0(int mediaMode) {
+    int *modeBuf = &r1_D_00132A00;
+    int result;
 
     if (r1_func_00121040(0x22) == 0) {
         return 0;
     }
-    r1_D_00132A00 = arg0;
-    r1_func_0011AD70(p, 4);
-    if (r1_func_0011B4C8(r1_D_00132E08, 0x22, 0, p, 4, &r1_D_001325C0, 4, 0, 0) < 0) {
+    r1_D_00132A00 = mediaMode;
+    r1_func_0011AD70(modeBuf, 4);
+    if (r1_func_0011B4C8(r1_D_00132E08, 0x22, 0, modeBuf, 4, &r1_D_001325C0, 4, 0, 0) < 0) {
         r1_func_00118C90(r1_D_001313EC);
         return 0;
     }
-    r = *(int *)((unsigned int)&r1_D_001325C0 | 0x20000000);
+    result = *(int *)((unsigned int)&r1_D_001325C0 | 0x20000000);
     r1_func_00118C90(r1_D_001313EC);
-    return r;
+    return result;
 }
 

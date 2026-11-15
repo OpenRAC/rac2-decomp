@@ -52,67 +52,68 @@ typedef struct {
    vectors by a growing factor and raises the target's alpha; then, for D_L11_001AEC6C
    frames, scales back toward 1 before restoring the mode bits and freeing itself. Every
    frame it queues func_L11_003982F0 and func_L11_00397820 with itself. */
-void func_L11_003974A8(u8 *obj) {
-    Grow_003974A8 *ctx = *(Grow_003974A8 **)(obj + 0x68);
-    f32 t;
+/* Makes a target object swell and glow, then fade back to normal, as a short effect. */
+void func_L11_003974A8(u8 *moby) {
+    Grow_003974A8 *vars = *(Grow_003974A8 **)(moby + 0x68);
+    f32 progress;
 
-    switch (obj[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        ctx->savedModeBits = ctx->target->modeBits;
-        ctx->target->modeBits |= 0x100;
-        ctx->target->modeBits |= 8;
-        ctx->target->modeBits |= 2;
-        ctx->curExtent = 0;
-        func_L11_00397A30(obj);
-        func_002A7750(obj, 1, -1);
+        vars->savedModeBits = vars->target->modeBits;
+        vars->target->modeBits |= 0x100;
+        vars->target->modeBits |= 8;
+        vars->target->modeBits |= 2;
+        vars->curExtent = 0;
+        SpawnParticleBurst_L11(moby);
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        if (func_002B3868(obj)) {
-            func_00282F20(ctx, ctx->target->points[ctx->point], ctx->speed * 0.016666668f);
+        if (SetFirstPendingFlag(moby)) {
+            vec_scale_to_length(vars, vars->target->points[vars->point], vars->speed * 0.016666668f);
             {
                 f32 delta = D_L11_001AEC64 - D_L11_001AEC60;
                 f32 step = delta / (f32)D_L11_001AEC68;
-                ctx->scale = D_L11_001AEC60;
-                ctx->scaleStep = step;
+                vars->scale = D_L11_001AEC60;
+                vars->scaleStep = step;
             }
-            ctx->target->modeBits &= 0xFFFE;
-            ctx->target->drawn = 1;
+            vars->target->modeBits &= 0xFFFE;
+            vars->target->drawn = 1;
         }
-        func_00282CC0(ctx->target->pos, ctx->target->pos, ctx);
-        func_00282F20(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
-        ctx->scale += ctx->scaleStep;
-        t = func_00283CE0(*(u16 *)(obj + 0x96)) / (f32)D_L11_001AEC68;
-        ctx->target->alpha = func_00283CF0(t * 128.0f);
-        ctx->curExtent = ctx->extent * t;
-        ctx->color = func_00283D38(D_L11_001AEC78[0], D_L11_001AEC78[1], t);
-        if (*(u16 *)(obj + 0x96) > D_L11_001AEC68)
-            func_002A7750(obj, 2, -1);
+        FastVecAdd(vars->target->pos, vars->target->pos, vars);
+        vec_scale_to_length(vars->target->points[vars->point], vars->target->points[vars->point], vars->scale);
+        vars->scale += vars->scaleStep;
+        progress = IntToFloat(*(u16 *)(moby + 0x96)) / (f32)D_L11_001AEC68;
+        vars->target->alpha = FloatToInt(progress * 128.0f);
+        vars->curExtent = vars->extent * progress;
+        vars->color = FastTweenColor(D_L11_001AEC78[0], D_L11_001AEC78[1], progress);
+        if (*(u16 *)(moby + 0x96) > D_L11_001AEC68)
+            SetMobyState(moby, 2, -1);
         break;
     case 2: {
         f32 fade;
-        if (func_002B3868(obj)) {
-            ctx->scaleStep = (ctx->scale - 1.0f) / (f32)D_L11_001AEC6C;
-            ctx->target->alpha = 0x80;
-            ctx->target->modeBits &= 0xFFF7;
+        if (SetFirstPendingFlag(moby)) {
+            vars->scaleStep = (vars->scale - 1.0f) / (f32)D_L11_001AEC6C;
+            vars->target->alpha = 0x80;
+            vars->target->modeBits &= 0xFFF7;
         }
-        func_00282F20(ctx->target->points[ctx->point], ctx->target->points[ctx->point], ctx->scale);
-        ctx->scale += ctx->scaleStep;
-        fade = func_00283CE0(*(u16 *)(obj + 0x96)) / (f32)D_L11_001AEC6C;
-        ctx->curExtent = ctx->extent + -ctx->extent * fade;
-        ctx->color = func_00283D38(D_L11_001AEC78[1], D_L11_001AEC78[2], fade);
-        if (*(u16 *)(obj + 0x96) > D_L11_001AEC6C) {
-            ctx->target->modeBits = ctx->savedModeBits;
-            ctx->target->modeBits &= 0xFFFE;
-            ctx->target->drawn = 1;
-            func_00282F20(ctx->target->points[ctx->point], ctx->target->points[ctx->point], 1.0f);
-            func_0029F338(obj);
+        vec_scale_to_length(vars->target->points[vars->point], vars->target->points[vars->point], vars->scale);
+        vars->scale += vars->scaleStep;
+        fade = IntToFloat(*(u16 *)(moby + 0x96)) / (f32)D_L11_001AEC6C;
+        vars->curExtent = vars->extent + -vars->extent * fade;
+        vars->color = FastTweenColor(D_L11_001AEC78[1], D_L11_001AEC78[2], fade);
+        if (*(u16 *)(moby + 0x96) > D_L11_001AEC6C) {
+            vars->target->modeBits = vars->savedModeBits;
+            vars->target->modeBits &= 0xFFFE;
+            vars->target->drawn = 1;
+            vec_scale_to_length(vars->target->points[vars->point], vars->target->points[vars->point], 1.0f);
+            MarkMobySpawned(moby);
             return;
         }
         break;
     }
     }
-    func_L00_002E6EF8(func_L11_003982F0, obj);
-    func_L00_002E6EF8(func_L11_00397820, obj);
-    if (*(u16 *)(obj + 0x96) < 0xFFFF)
-        ++*(u16 *)(obj + 0x96);
+    AddDrawCallbackToList3(DrawRandomRibbon, moby);
+    AddDrawCallbackToList3(DrawFacingQuad, moby);
+    if (*(u16 *)(moby + 0x96) < 0xFFFF)
+        ++*(u16 *)(moby + 0x96);
 }

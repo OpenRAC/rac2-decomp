@@ -64,136 +64,137 @@ extern int func_00288F48(int);
     (D_0018C958[D_00254E78.selection].levels = \
         (D_0018C958[D_00254E78.selection].levels | (1u << D_001A79F0[0])) | 0x80000000u)
 
+/* Per-frame update of the subtitle box. It steps through waiting, fading in, showing and fading out, and records which lines the player has seen. */
 void func_00289178(void)
 {
-    if (!D_00254E78.enabled) {
-        if (D_001A79F0[0] >= 0) {
-            D_00254E78.enabled = 1;
-            D_00254E78.wait = 120;
+    if (!gSubtitleState.enabled) {
+        if (gCurrentMapIndex[0] >= 0) {
+            gSubtitleState.enabled = 1;
+            gSubtitleState.wait = 120;
         } else {
-            if (!D_00254E78.wait && (D_00138320 & 0xF000))
-                D_00254E78.wait = 1;
-            if (D_00254E78.wait) {
-                D_00254E78.wait++;
-                if (D_00254E78.wait >= 120)
-                    D_00254E78.enabled = 1;
+            if (!gSubtitleState.wait && (D_00138320 & 0xF000))
+                gSubtitleState.wait = 1;
+            if (gSubtitleState.wait) {
+                gSubtitleState.wait++;
+                if (gSubtitleState.wait >= 120)
+                    gSubtitleState.enabled = 1;
             }
         }
     }
-    if ((D_001A8BB0[0] != 0 && D_001A8BB0[0] != 7) || !D_00254E78.enabled) {
-        D_00254E78.pending = -1;
-        D_00254E78.state = 0;
-        D_00254E78.timer = 0;
+    if ((gCurrentGameMode[0] != 0 && gCurrentGameMode[0] != 7) || !gSubtitleState.enabled) {
+        gSubtitleState.pending = -1;
+        gSubtitleState.state = 0;
+        gSubtitleState.timer = 0;
         return;
     }
-    D_00254E78.timer++;
+    gSubtitleState.timer++;
     if (!SUBTITLES_OPTION) {
-        if (SUBTITLE_VOICE_ID == D_001A63A8.id - 6000 &&
-            (unsigned short)(D_001A63A8.state - 6) > 1)
-            D_001A63A8.state = 5;
+        if (SUBTITLE_VOICE_ID == gMusicState.id - 6000 &&
+            (unsigned short)(gMusicState.state - 6) > 1)
+            gMusicState.state = 5;
     }
-    switch (D_00254E78.state) {
+    switch (gSubtitleState.state) {
     case 8:
-        if (D_00254E78.flag38)
+        if (gSubtitleState.flag38)
             return;
-        if (D_00254E78.entry >= 0) {
-            if (!D_00254E78.flag3A) {
-                if (!func_00282948(&D_00254E78.countdown))
+        if (gSubtitleState.entry >= 0) {
+            if (!gSubtitleState.flag3A) {
+                if (!FastFloatHelperD(&gSubtitleState.countdown))
                     return;
-                func_00289020();
-                D_00254E78.flag3A++;
+                InitSubtitleBoxState();
+                gSubtitleState.flag3A++;
                 return;
             }
-            if (D_0018C958[D_00254E78.selection].count < 65535)
-                D_0018C958[D_00254E78.selection].count++;
+            if (gSubtitleHistory[gSubtitleState.selection].count < 65535)
+                gSubtitleHistory[gSubtitleState.selection].count++;
         }
-        if (D_0018C958[D_00254E78.selection].time < D_001A7390[0])
-            D_0018C958[D_00254E78.selection].time = D_001A7390[0];
-        D_00254E78.entry = -1;
-        D_00254E78.state = 0;
-        D_00254E78.flag3A = 0;
+        if (gSubtitleHistory[gSubtitleState.selection].time < D_001A7390[0])
+            gSubtitleHistory[gSubtitleState.selection].time = D_001A7390[0];
+        gSubtitleState.entry = -1;
+        gSubtitleState.state = 0;
+        gSubtitleState.flag3A = 0;
         RECORD_SUBTITLE_LEVEL();
         break;
     case 0:
-        if (D_00254E78.pending < 0)
+        if (gSubtitleState.pending < 0)
             return;
-        D_00254E78.entry = func_00288F48(D_00254E78.pending);
-        func_0028A030(D_00254E78.pending);
-        D_00254E78.pending = -1;
-        if (D_00254E78.entry >= 0)
-            func_00289020();
+        gSubtitleState.entry = Help_FindIndex(gSubtitleState.pending);
+        MarkTextEntryRecent(gSubtitleState.pending);
+        gSubtitleState.pending = -1;
+        if (gSubtitleState.entry >= 0)
+            InitSubtitleBoxState();
         break;
     case 1:
     case 2:
         if (SUBTITLES_OPTION) {
             if (SUBTITLE_VOICE_ID != -1 && HAS_AUDIO(SUBTITLE_VOICE_ID) &&
-                !D_001A63A8.active && D_001A63A8.key == -1) {
-                D_001A63A8.selection = 0;
-                D_001A63A8.key = D_00254E78.selection + 6000;
+                !gMusicState.active && gMusicState.key == -1) {
+                gMusicState.selection = 0;
+                gMusicState.key = gSubtitleState.selection + 6000;
             }
         }
         if (D_00138324 & 16) {
             RECORD_SUBTITLE_TIME();
-            D_00254E78.state = 7;
-            D_00254E78.timer = 0;
+            gSubtitleState.state = 7;
+            gSubtitleState.timer = 0;
             RECORD_SUBTITLE_LEVEL();
             return;
         }
-        if (D_00254E78.timer <= 0)
+        if (gSubtitleState.timer <= 0)
             return;
-        if ((D_001A63A8.state == 3 && D_001A63A8.id >= 6000) ||
+        if ((gMusicState.state == 3 && gMusicState.id >= 6000) ||
             SUBTITLE_VOICE_ID == -1 || !HAS_AUDIO(SUBTITLE_VOICE_ID) ||
-            SUBTITLE_VOICE_ID != D_001A63A8.id - 6000) {
-            D_00254E78.state = 3;
-            D_00254E78.timer = 0;
+            SUBTITLE_VOICE_ID != gMusicState.id - 6000) {
+            gSubtitleState.state = 3;
+            gSubtitleState.timer = 0;
         }
         break;
     case 3:
-        func_002B0CE0(5, 0, 1);
+        ForceClaimNotice(5, 0, 1);
         if (D_00138324 & 16) {
             RECORD_SUBTITLE_TIME();
-            D_00254E78.state = 7;
-            D_00254E78.timer = 0;
+            gSubtitleState.state = 7;
+            gSubtitleState.timer = 0;
             RECORD_SUBTITLE_LEVEL();
             return;
         }
-        if (D_00254E78.timer >= 8) {
-            D_00254E78.timer = 0;
-            D_00254E78.state = 4;
+        if (gSubtitleState.timer >= 8) {
+            gSubtitleState.timer = 0;
+            gSubtitleState.state = 4;
         }
         break;
     case 4: {
         int subtitles;
-        func_002B0CE0(5, 0, 1);
+        ForceClaimNotice(5, 0, 1);
         if (D_00138324 & 16) {
             RECORD_SUBTITLE_TIME();
             RECORD_SUBTITLE_LEVEL();
-            D_00254E78.state = 6;
-            D_00254E78.timer = 4 - D_00254E78.timer;
+            gSubtitleState.state = 6;
+            gSubtitleState.timer = 4 - gSubtitleState.timer;
             return;
         }
-        if (D_00254E78.timer < 4)
+        if (gSubtitleState.timer < 4)
             return;
         subtitles = SUBTITLES_OPTION;
         if (SUBTITLE_VOICE_ID != -1 && HAS_AUDIO(SUBTITLE_VOICE_ID) &&
-            SUBTITLE_VOICE_ID != D_001A63A8.id - 6000 && subtitles)
+            SUBTITLE_VOICE_ID != gMusicState.id - 6000 && subtitles)
             goto next_phase;
         if (SUBTITLE_VOICE_ID != -1 && HAS_AUDIO(SUBTITLE_VOICE_ID) &&
-            (D_001A63A8.state != 3 || D_001A63A8.id < 6000) && subtitles)
+            (gMusicState.state != 3 || gMusicState.id < 6000) && subtitles)
             return;
-        if (subtitles && SUBTITLE_VOICE_ID == D_001A63A8.id - 6000)
-            func_002B6D28();
-        D_00254E78.state = 5;
-        D_00254E78.timer = 0;
+        if (subtitles && SUBTITLE_VOICE_ID == gMusicState.id - 6000)
+            ResumeMusicStream();
+        gSubtitleState.state = 5;
+        gSubtitleState.timer = 0;
         break;
     next_phase:
-        D_00254E78.timer = 0;
-        D_00254E78.state = 5;
+        gSubtitleState.timer = 0;
+        gSubtitleState.state = 5;
         break;
     }
     case 5:
-        func_002B0CE0(5, 0, 1);
-        if (D_00254E78.timer >= D_00254E78.duration) {
+        ForceClaimNotice(5, 0, 1);
+        if (gSubtitleState.timer >= gSubtitleState.duration) {
             /* Retail reloads this option again below, without an intervening store. */
             if (SUBTITLE_VOICE_ID == -1 || !HAS_AUDIO(SUBTITLE_VOICE_ID) ||
                 !*(volatile unsigned char *)&D_001A7B94)
@@ -201,37 +202,37 @@ void func_00289178(void)
         }
         if (*(volatile unsigned char *)&D_001A7B94) {
             if (SUBTITLE_VOICE_ID != -1 && HAS_AUDIO(SUBTITLE_VOICE_ID) &&
-                SUBTITLE_VOICE_ID != D_001A63A8.id - 6000)
+                SUBTITLE_VOICE_ID != gMusicState.id - 6000)
                 goto close;
         }
         if (!(D_00138324 & 16))
             return;
     close:
         RECORD_SUBTITLE_TIME();
-        D_00254E78.state = 6;
-        D_00254E78.timer = 0;
+        gSubtitleState.state = 6;
+        gSubtitleState.timer = 0;
         RECORD_SUBTITLE_LEVEL();
         break;
     case 6:
-        if (D_001A7B94 && D_00254E78.timer < 4 && !(D_00138324 & 16))
+        if (D_001A7B94 && gSubtitleState.timer < 4 && !(D_00138324 & 16))
             return;
-        D_00254E78.state = 7;
-        D_00254E78.timer = 0;
+        gSubtitleState.state = 7;
+        gSubtitleState.timer = 0;
         break;
     case 7:
-        func_002B0CE0(5, 0, 1);
-        if (SUBTITLE_VOICE_ID == D_001A63A8.id - 6000 &&
-            (unsigned short)(D_001A63A8.state - 6) > 1)
-            D_001A63A8.state = 5;
-        if (D_00254E78.timer < 8)
+        ForceClaimNotice(5, 0, 1);
+        if (SUBTITLE_VOICE_ID == gMusicState.id - 6000 &&
+            (unsigned short)(gMusicState.state - 6) > 1)
+            gMusicState.state = 5;
+        if (gSubtitleState.timer < 8)
             return;
-        if (D_00254E78.flag38) {
-            D_00254E78.state = 8;
+        if (gSubtitleState.flag38) {
+            gSubtitleState.state = 8;
         } else {
-            D_00254E78.state = 0;
-            D_00254E78.entry = -1;
+            gSubtitleState.state = 0;
+            gSubtitleState.entry = -1;
         }
-        D_00254E78.timer = 0;
+        gSubtitleState.timer = 0;
         break;
     }
 }

@@ -1,3 +1,4 @@
+#include "names.h"
 typedef struct StageSetup {
     int initial;
     char pad04[0x10];
@@ -26,7 +27,7 @@ extern void func_L05_00379F68(void);
 void func_L15_0042FD40(void)
 {
     StageSetup *stage = &D_L15_00221E10;
-    int n;
+    int recordIndex;
 
     D_L15_001B1530 = -2;
     D_L15_001B15C4 = 1;
@@ -34,11 +35,11 @@ void func_L15_0042FD40(void)
     stage->limit = 100;
     D_L15_001B1534 = 0;
     stage->count = 0;
-    n = func_002ED8A0(6);
+    recordIndex = FindLastUsedChainEntry(6);
     stage->scale = 8.0f;
-    D_L15_0029FD80[n].words[5] = D_L15_0029FD80[n].words[4];
-    func_L05_00379F28(0);
-    func_L05_0037D6E8();
-    func_L05_00379F68();
+    D_L15_0029FD80[recordIndex].words[5] = D_L15_0029FD80[recordIndex].words[4];
+    SetPlayerStateField15(0);
+    ResetTableWorkingValues();
+    ClearLevelObjectRecords();
 }
 

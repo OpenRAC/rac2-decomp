@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002BB838 (236 bytes, 28 places).
  *
@@ -14,33 +15,33 @@ extern unsigned char *D_001F2560;
 
 typedef int TI128_002BB838 __attribute__((mode(TI)));
 
-void func_002BB838(void *a0, void *a1, int a2, int a3, int a4, float f)
+void func_002BB838(void *position, void *velocity, int color, int endColor, int life, float f)
 {
-    void *p;
-    char *q;
-    int v;
-    float w;
+    void *particle;
+    char *motion;
+    int alphaRand;
+    float sizeStep;
 
-    if (a4 == 0)
+    if (life == 0)
         return;
-    p = func_002B9030(8);
-    if (p == 0)
+    particle = AllocParticle(8);
+    if (particle == 0)
         return;
-    *(TI128_002BB838 *)((char *)p + 0x10) = *(TI128_002BB838 *)a0;
-    *(int *)((char *)p + 4) = a2;
-    v = func_00283CF0(4.0f);
-    q = (char *)p + 0x20;
-    *(unsigned char *)((char *)p + 9) = (unsigned char)(v - 0x60);
-    *(unsigned char *)((char *)p + 3) = 0x48;
-    *(unsigned char *)((char *)p + 1) = 0;
-    *(int *)((char *)p + 0xC) = 0;
-    *(unsigned char *)((char *)p + 8) = 0;
-    *(unsigned char *)((char *)p + 2) = *D_001F2560;
-    *(TI128_002BB838 *)q = *(TI128_002BB838 *)a1;
-    *(short *)((char *)p + 0xA) = a4;
-    *(int *)(q + 0x18) = a4;
-    w = f / func_00283CE0(a4);
-    *(int *)(q + 0x14) = a3;
-    *(int *)(q + 0x10) = a2;
-    *(float *)(q + 0x1C) = w;
+    *(TI128_002BB838 *)((char *)particle + 0x10) = *(TI128_002BB838 *)position;
+    *(int *)((char *)particle + 4) = color;
+    alphaRand = FloatToInt(4.0f);
+    motion = (char *)particle + 0x20;
+    *(unsigned char *)((char *)particle + 9) = (unsigned char)(alphaRand - 0x60);
+    *(unsigned char *)((char *)particle + 3) = 0x48;
+    *(unsigned char *)((char *)particle + 1) = 0;
+    *(int *)((char *)particle + 0xC) = 0;
+    *(unsigned char *)((char *)particle + 8) = 0;
+    *(unsigned char *)((char *)particle + 2) = *D_001F2560;
+    *(TI128_002BB838 *)motion = *(TI128_002BB838 *)velocity;
+    *(short *)((char *)particle + 0xA) = life;
+    *(int *)(motion + 0x18) = life;
+    sizeStep = f / IntToFloat(life);
+    *(int *)(motion + 0x14) = endColor;
+    *(int *)(motion + 0x10) = color;
+    *(float *)(motion + 0x1C) = sizeStep;
 }

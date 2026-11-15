@@ -9,30 +9,31 @@ extern void func_00282CC0(void *, void *, void *);
 
 typedef int TI128 __attribute__((mode(TI)));
 
-void func_L05_00418D68(void *a0, void *a1, int a2, int a3, float f12, float f13, float f14)
+/* Places a row of sprites along a direction, changing size from the first one to the last. */
+void func_L05_00418D68(void *position, void *direction, int count, int color, float sizeStart, float sizeEnd, float pushOut)
 {
-    TI128 buf[2];
+    TI128 points[2];
     float step;
-    float p;
-    float q;
+    float progress;
+    float spin;
     float scale;
-    float angle;
-    float dir;
-    float len;
+    float lastSize;
+    float firstSize;
+    float pushDistance;
     int i;
 
-    dir = f12;
-    angle = f13;
-    len = f14;
-    qcopy(&buf[0], a0);
-    step = 1.0f / func_00283CE0(a2);
-    for (i = 0; i < a2; i++) {
-        p = func_00283CE0(i) * step;
-        scale = dir + (angle - dir) * p;
-        q = func_002A7940();
-        qcopy(&buf[1], &buf[0]);
-        func_002ACB48(&buf[1], len);
-        func_00281EB8(&buf[1], D_L05_001B0FBC, a3, 1, scale, 0.0f, q);
-        func_00282CC0(&buf[0], &buf[0], a1);
+    firstSize = sizeStart;
+    lastSize = sizeEnd;
+    pushDistance = pushOut;
+    qcopy(&points[0], position);
+    step = 1.0f / IntToFloat(count);
+    for (i = 0; i < count; i++) {
+        progress = IntToFloat(i) * step;
+        scale = firstSize + (lastSize - firstSize) * progress;
+        spin = RandomAngle();
+        qcopy(&points[1], &points[0]);
+        AddRandomOffsetToVector(&points[1], pushDistance);
+        DrawBillboardQuad_00281EB8(&points[1], D_L05_001B0FBC, color, 1, scale, 0.0f, spin);
+        FastVecAdd(&points[0], &points[0], direction);
     }
 }

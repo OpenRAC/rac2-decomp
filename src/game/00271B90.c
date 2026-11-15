@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vec;
 typedef struct {
@@ -16,47 +17,48 @@ extern void func_00282CF0(void *, void *, void *);
 extern float func_00282DF0(void *);
 extern void func_00282D30(void *, void *, float);
 extern float func_002702C8(float *, float, float, float, float, float);
+/* Tracks the hero position and up direction smoothly so the camera can follow. */
 void func_00271B90(void)
 {
     Vec dir, projection;
-    Follow *f = &D_001B53A0;
+    Follow *follow = &D_001B53A0;
     char *hero = D_0018A0E0;
     float d;
     int i;
-    func_00282F20(&dir, hero, -1.0f);
-    f->prev_target.q = f->target.q;
-    f->target.q = dir.q;
-    if (func_00282DB0(&f->up, &dir) < -0.98f) {
+    vec_scale_to_length(&dir, hero, -1.0f);
+    follow->prev_target.q = follow->target.q;
+    follow->target.q = dir.q;
+    if (FastVecDot(&follow->up, &dir) < -0.98f) {
         dir.f[0] += 0.2f;
         dir.f[1] += 0.2f;
         dir.f[2] += 0.2f;
     }
-    f->up.f[0] = func_002702C8(&f->velocity[0], f->up.f[0], dir.f[0], 0.015f, 0.2f, 0.0f);
-    f->up.f[1] = func_002702C8(&f->velocity[1], f->up.f[1], dir.f[1], 0.015f, 0.2f, 0.0f);
-    f->up.f[2] = func_002702C8(&f->velocity[2], f->up.f[2], dir.f[2], 0.015f, 0.2f, 0.0f);
-    func_00282F20(&f->up, &f->up, 1.0f);
-    func_00282CF0(&f->delta, hero - 0x240, &f->prev_pos);
-    f->distance = func_00282DF0(&f->delta);
-    d = func_00282DB0(&f->delta, &dir);
-    f->up_distance = d;
-    func_00282F20(&projection, &dir, d);
-    f->projection.q = projection.q;
-    func_00282CF0(&f->side, &f->delta, &projection);
-    f->side_distance = func_00282DF0(&f->side);
-    d = 1.0f / f->side_distance;
-    func_00282D30(&f->side, &f->side, d);
-    f->prev_pos.q = *(Quad *)(hero - 0x240);
-    { Hero *g = (Hero *)(hero - 0x2c0);
-    if (g->mode != 0x50 || g->state == 0x11) {
-        f->pos.f[0] = g->pos.f[0];
-        f->pos.f[1] = g->pos.f[1];
-        f->pos.f[2] = func_002702C8(&f->z_vel, f->pos.f[2], g->pos.f[2], 0.0075f, 0.175f, 0.0f);
-        f->pos.f[3] = g->pos.f[2];
+    follow->up.f[0] = StepSpringDamperClamped(&follow->velocity[0], follow->up.f[0], dir.f[0], 0.015f, 0.2f, 0.0f);
+    follow->up.f[1] = StepSpringDamperClamped(&follow->velocity[1], follow->up.f[1], dir.f[1], 0.015f, 0.2f, 0.0f);
+    follow->up.f[2] = StepSpringDamperClamped(&follow->velocity[2], follow->up.f[2], dir.f[2], 0.015f, 0.2f, 0.0f);
+    vec_scale_to_length(&follow->up, &follow->up, 1.0f);
+    FastVecSub(&follow->delta, hero - 0x240, &follow->prev_pos);
+    follow->distance = FastVecLength(&follow->delta);
+    d = FastVecDot(&follow->delta, &dir);
+    follow->up_distance = d;
+    vec_scale_to_length(&projection, &dir, d);
+    follow->projection.q = projection.q;
+    FastVecSub(&follow->side, &follow->delta, &projection);
+    follow->side_distance = FastVecLength(&follow->side);
+    d = 1.0f / follow->side_distance;
+    FastVecScale(&follow->side, &follow->side, d);
+    follow->prev_pos.q = *(Quad *)(hero - 0x240);
+    { Hero *heroState = (Hero *)(hero - 0x2c0);
+    if (heroState->mode != 0x50 || heroState->state == 0x11) {
+        follow->pos.f[0] = heroState->pos.f[0];
+        follow->pos.f[1] = heroState->pos.f[1];
+        follow->pos.f[2] = StepSpringDamperClamped(&follow->z_vel, follow->pos.f[2], heroState->pos.f[2], 0.0075f, 0.175f, 0.0f);
+        follow->pos.f[3] = heroState->pos.f[2];
     } else {
-        f->pos.f[0] = g->pos.f[0];
-        f->pos.f[1] = g->pos.f[1];
+        follow->pos.f[0] = heroState->pos.f[0];
+        follow->pos.f[1] = heroState->pos.f[1];
     }
     }
-    for (i = 0; i < 4; i++) f->yaw[i] = f->yaw[i + 1];
-    f->yaw[i] = ((Hero *)D_00189E20)->rot.f[2];
+    for (i = 0; i < 4; i++) follow->yaw[i] = follow->yaw[i + 1];
+    follow->yaw[i] = ((Hero *)gHeroState)->rot.f[2];
 }

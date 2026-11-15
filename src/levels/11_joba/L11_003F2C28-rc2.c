@@ -32,47 +32,49 @@ extern f32 ref_L11_003F2C28_05 __attribute__((sda));
 extern u8 ref_L11_003F2C28_06[];
 extern u8 ref_L11_003F2C28_07[];
 
-void func_L11_003F2C28(void *arg0) {
-    void *temp_s0 = *(void **)((s8 *)arg0 + 0x68);
-    s32 *state = (s32 *)((s8 *)temp_s0 + 0x28C);
-    s8 *cursor;
-    void *call_buffer;
-    s32 remaining;
-    u16 count;
+/* Runs the enemy's effect and sound helpers each frame, sets them up once, and counts up
+   its small frame counters. */
+void func_L11_003F2C28(void *moby) {
+    void *vars = *(void **)((s8 *)moby + 0x68);
+    s32 *state = (s32 *)((s8 *)vars + 0x28C);
+    s8 *counter;
+    void *callBuffer;
+    s32 countdown;
+    u16 frameCount;
 
     ref_L11_003F2C28_04();
-    ref_L11_003F2C28_00(ref_L11_003F2C28_06, arg0);
-    ref_L11_003F2C28_00(ref_L11_003F2C28_07, arg0);
-    ref_L11_003F2C28_02(arg0, (s8 *)temp_s0 + 0x70);
+    ref_L11_003F2C28_00(ref_L11_003F2C28_06, moby);
+    ref_L11_003F2C28_00(ref_L11_003F2C28_07, moby);
+    ref_L11_003F2C28_02(moby, (s8 *)vars + 0x70);
 
-    if (*(s16 *)((s8 *)temp_s0 + 0x70) == 0) {
+    if (*(s16 *)((s8 *)vars + 0x70) == 0) {
         if (*state != 0) {
-            cursor = (s8 *)temp_s0 + 0x274;
+            counter = (s8 *)vars + 0x274;
             goto loop_setup;
         }
-        ref_L11_003F2C28_01(arg0,
-                      *(s32 *)((s8 *)temp_s0 + 0x280),
-                      *(s32 *)((s8 *)temp_s0 + 0x284),
-                      *(s32 *)((s8 *)temp_s0 + 0x288));
+        ref_L11_003F2C28_01(moby,
+                      *(s32 *)((s8 *)vars + 0x280),
+                      *(s32 *)((s8 *)vars + 0x284),
+                      *(s32 *)((s8 *)vars + 0x288));
         *state = 1;
     } else {
         *state = 0;
     }
-    cursor = (s8 *)temp_s0 + 0x274;
+    counter = (s8 *)vars + 0x274;
 loop_setup:
-    call_buffer = (s8 *)temp_s0 + 0x2A0;
-    remaining = 1;
+    callBuffer = (s8 *)vars + 0x2A0;
+    countdown = 1;
     do {
-        if (*(s16 *)cursor < 0x7FFF) {
-            *(s16 *)cursor = (u16)*(s16 *)cursor + 1;
+        if (*(s16 *)counter < 0x7FFF) {
+            *(s16 *)counter = (u16)*(s16 *)counter + 1;
         }
-        remaining--;
-        cursor += 2;
-    } while (remaining >= 0);
+        countdown--;
+        counter += 2;
+    } while (countdown >= 0);
 
-    count = *(u16 *)((s8 *)arg0 + 0x96);
-    if (count <= 0xFFFEU) {
-        *(u16 *)((s8 *)arg0 + 0x96) = count + 1;
+    frameCount = *(u16 *)((s8 *)moby + 0x96);
+    if (frameCount <= 0xFFFEU) {
+        *(u16 *)((s8 *)moby + 0x96) = frameCount + 1;
     }
-    ref_L11_003F2C28_03(arg0, call_buffer, 0xC, 1, ref_L11_003F2C28_05);
+    ref_L11_003F2C28_03(moby, callBuffer, 0xC, 1, ref_L11_003F2C28_05);
 }

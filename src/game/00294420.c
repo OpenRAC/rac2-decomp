@@ -18,65 +18,66 @@ extern short D_001A63AC;
 extern int D_001A7398 __attribute__((sda));
 extern int D_001A7A04 __attribute__((sda));
 
+/* Loads the given item into a cache slot that the hero is not using right now. */
 void func_00294420(int value)
 {
-    int a, b, i, sa, sb;
+    int primaryValue, secondValue, i, slotA, slotB;
 
-    if (func_00294630(value))
+    if (IsClassCached(value))
         return;
     if (D_001A63AC)
         return;
     i = 0;
     {
-        CacheHero *hero = &D_00189E20;
-        int p = hero->primary;
-        int q = D_001A7398;
-        CacheRecord *rec = &D_00239BA0[D_00139568[p]];
-        CacheRecord *rec2 = &D_00239BA0[D_00139568[q]];
+        CacheHero *hero = &gHeroState;
+        int primaryIndex = hero->primary;
+        int secondIndex = D_001A7398;
+        CacheRecord *rec = &gWeaponTable_00239BA0[gItemSlotToRecord[primaryIndex]];
+        CacheRecord *rec2 = &gWeaponTable_00239BA0[gItemSlotToRecord[secondIndex]];
 
-        a = rec->value;
-        b = rec2->value;
+        primaryValue = rec->value;
+        secondValue = rec2->value;
     }
-    if (b == a) {
-        CacheRecord *rec = &D_00239BA0[D_00139568[D_001A7A04]];
+    if (secondValue == primaryValue) {
+        CacheRecord *rec = &gWeaponTable_00239BA0[gItemSlotToRecord[D_001A7A04]];
 
-        b = rec->value;
+        secondValue = rec->value;
     }
-    sb = -1;
-    if (a == value)
-        a = -1;
-    if (b == value)
-        b = -1;
-    sa = -1;
+    slotB = -1;
+    if (primaryValue == value)
+        primaryValue = -1;
+    if (secondValue == value)
+        secondValue = -1;
+    slotA = -1;
     for (; i < 3; i++) {
         struct Table2 *cache = &D_00152CD0;
         /* A cache slot may be -1. Its word belongs to the preceding part of
            the complete table owner, not to slots[-1]. */
-        int v = *(int *)((char *)&D_0014B540 + (0x4B40 + cache->slots[i] * 20));
+        int slotValue = *(int *)((char *)&gCopySetupData + (0x4B40 + cache->slots[i] * 20));
 
-        if (a == v)
-            sa = i;
-        if (b == v)
-            sb = i;
+        if (primaryValue == slotValue)
+            slotA = i;
+        if (secondValue == slotValue)
+            slotB = i;
     }
-    for (i = 0; i == sa || i == sb; i++)
+    for (i = 0; i == slotA || i == slotB; i++)
         ;
     {
-        CacheHero *hero = &D_00189E20;
+        CacheHero *hero = &gHeroState;
         int cur = hero->cur;
 
         if (cur) {
             struct Table2 *cache = &D_00152CD0;
-            int k = cache->slots[i];
+            int slotId = cache->slots[i];
 
-            if (k != -1) {
-                struct Table1 *toc = &D_0014B540;
-                CacheRecord *rec = &D_00239BA0[D_00139568[cur]];
+            if (slotId != -1) {
+                struct Table1 *toc = &gCopySetupData;
+                CacheRecord *rec = &gWeaponTable_00239BA0[gItemSlotToRecord[cur]];
 
-                if (rec->value == toc->slots[k].w)
+                if (rec->value == toc->slots[slotId].w)
                     hero->cur = 0;
             }
         }
     }
-    func_00294398(value, i);
+    LoadClassIntoCacheSlot(value, i);
 }

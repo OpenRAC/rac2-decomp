@@ -46,22 +46,22 @@ void func_0029DEA8(int selector,int update)
     float x,y,fallbackX,fallbackY;
     MapEntry *entry,*cursor;
     int offset,index,mapSelector;
-    if (selector<21 && D_001A7BE8[selector]) D_001C4FA0.entries=D_00258C10[selector];
-    else D_001C4FA0.entries=0;
-    if (D_00189E20.z!=0.0f && selector==D_001A79F0 && update) {
+    if (selector<21 && D_001A7BE8[selector]) gMapOverlayState.entries=D_00258C10[selector];
+    else gMapOverlayState.entries=0;
+    if (gHeroState.z!=0.0f && selector==gCurrentMapIndex && update) {
         mapSelector=selector+100;
         if (!D_001A9598) mapSelector=selector;
-        func_00297FE8(D_00189E20.x,D_00189E20.y,&x,&y,mapSelector);
-        D_001C4FA0.cachedX[selector]=(int)(x*4096.0f)<<16;
-        D_001C4FA0.cachedY[selector]=(int)(y*4096.0f)<<16;
-    } else if ((int)D_001C4FA0.cachedX==0) {
-        D_001C4FA0.cachedX[selector]=0x08000000;
-        D_001C4FA0.cachedY[selector]=0x08000000;
+        ConvertWorldToMapPosition(gHeroState.x,gHeroState.y,&x,&y,mapSelector);
+        gMapOverlayState.cachedX[selector]=(int)(x*4096.0f)<<16;
+        gMapOverlayState.cachedY[selector]=(int)(y*4096.0f)<<16;
+    } else if ((int)gMapOverlayState.cachedX==0) {
+        gMapOverlayState.cachedX[selector]=0x08000000;
+        gMapOverlayState.cachedY[selector]=0x08000000;
     }
-    if (!D_001C4FA0.entries) return;
+    if (!gMapOverlayState.entries) return;
     offset=0;
-    while (!(D_001C4FA0.entries[offset].flags&4)) {
-        entry=&D_001C4FA0.entries[offset];
+    while (!(gMapOverlayState.entries[offset].flags&4)) {
+        entry=&gMapOverlayState.entries[offset];
         if (D_001A9DB0) {
             fallbackX=D_001A9B20;
             fallbackY=D_001A9B24;
@@ -155,31 +155,31 @@ void func_0029DEA8(int selector,int update)
             else if (entry->key==-0x3E4) { entry->x=0.422f; entry->y=0.1f; }
             else if (entry->key==-0x3DE) { entry->x=0.486f; entry->y=0.865f; }
             else if (entry->key==-0x3E3) { entry->x=0.405f; entry->y=0.081f; }
-            else if (selector==D_001A79F0) {
+            else if (selector==gCurrentMapIndex) {
                 if (D_001C1220[entry->key]) {
-                    func_00297FE8(D_001C1220[entry->key]->x,D_001C1220[entry->key]->y,
-                        &D_001C4FA0.entries[offset].x,&D_001C4FA0.entries[offset].y,selector);
-                    D_001C4FA0.entries[offset].scale=D_001C1220[entry->key]->scale;
+                    ConvertWorldToMapPosition(D_001C1220[entry->key]->x,D_001C1220[entry->key]->y,
+                        &gMapOverlayState.entries[offset].x,&gMapOverlayState.entries[offset].y,selector);
+                    gMapOverlayState.entries[offset].scale=D_001C1220[entry->key]->scale;
                 }
             } else {
-                func_00297FE8(D_00139A28[entry->key].x,D_00139A28[entry->key].y,
-                    &D_001C4FA0.entries[offset].x,&D_001C4FA0.entries[offset].y,selector);
-                D_001C4FA0.entries[offset].scale=D_00139A28[entry->key].z;
+                ConvertWorldToMapPosition(D_00139A28[entry->key].x,D_00139A28[entry->key].y,
+                    &gMapOverlayState.entries[offset].x,&gMapOverlayState.entries[offset].y,selector);
+                gMapOverlayState.entries[offset].scale=D_00139A28[entry->key].z;
             }
         }
         offset++;
     }
     index=0;
-    if (!(D_001C4FA0.entries[0].flags&4)) {
+    if (!(gMapOverlayState.entries[0].flags&4)) {
         do {
-        cursor=&D_001C4FA0.entries[index];
+        cursor=&gMapOverlayState.entries[index];
         (*(int *)((u8 *)cursor+0x24))=0;
         (*(short *)((u8 *)cursor+4))&=~0x10;
         if ((*(short *)((u8 *)cursor+2))==-1) (*(int *)((u8 *)cursor+0x24))=1;
         else (*(int *)((u8 *)cursor+0x24))=D_001B1A58[(*(short *)((u8 *)cursor+2))].enabled==1;
         if (((*(short *)((u8 *)cursor+4))&0x1000) && ((D_00139A28[(*(short *)cursor)].flags^1)&1)) (*(int *)((u8 *)cursor+0x24))=0;
-        if (D_001C4FA0.entries[index].state) D_001C4FA0.entries[index].flags|=0x10;
+        if (gMapOverlayState.entries[index].state) gMapOverlayState.entries[index].flags|=0x10;
         index++;
-        } while (!(D_001C4FA0.entries[index].flags&4));
+        } while (!(gMapOverlayState.entries[index].flags&4));
     }
 }

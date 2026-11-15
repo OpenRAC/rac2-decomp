@@ -26,39 +26,39 @@ extern int func_00283CF0(float);
 void func_L00_003A2C60(void *position, int count, float brightness)
 {
     float velocity[4], lateral[4], axis[4], projected[4];
-    func_00282CF0(lateral, D_L00_001B8DC0, position);
+    FastVecSub(lateral, gCameraPosition_L00, position);
     if (D_L00_001A8FF0[0] == 0) {
         lateral[2] = 0.0f;
         axis[0] = 0.0f;
         axis[1] = 0.0f;
         axis[3] = axis[2] = 1.0f;
     } else {
-        func_00282CF0(projected, position, D_00189ED0);
-        func_00282F20(axis, projected, 1.0f);
-        func_00282D30(projected, axis, func_00282DB0(axis, lateral));
-        func_00282CF0(lateral, lateral, projected);
+        FastVecSub(projected, position, D_00189ED0);
+        vec_scale_to_length(axis, projected, 1.0f);
+        FastVecScale(projected, axis, FastVecDot(axis, lateral));
+        FastVecSub(lateral, lateral, projected);
     }
     if (count > 0) {
         do {
             char *particle;
             float angle;
-            float size = func_002A7878(D_L00_001AF60C, D_L00_001AF610);
-            int spin = func_002A77E0(2);
+            float size = RandomFloatRange(D_L00_001AF60C, D_L00_001AF610);
+            int spin = RandomIntBelow(2);
             if (!spin)
                 spin--;
-            angle = func_002A7878(-1.0471977f, 1.0471977f);
-            func_002ACEC0(velocity, lateral, axis, angle);
-            func_00282F20(velocity, velocity, func_002A7878(D_L00_001AF5F8, D_L00_001AF5FC) * (1.0f / 60.0f));
-            velocity[2] = func_002A7878(D_L00_001AF600, D_L00_001AF604) * (1.0f / 60.0f);
-            func_00282C88((VectorBits *)velocity);
-            particle = func_002C2210(position, 60, size * 0.1f, size,
+            angle = RandomFloatRange(-1.0471977f, 1.0471977f);
+            ApplyAxisRotationToQuaternion(velocity, lateral, axis, angle);
+            vec_scale_to_length(velocity, velocity, RandomFloatRange(D_L00_001AF5F8, D_L00_001AF5FC) * (1.0f / 60.0f));
+            velocity[2] = RandomFloatRange(D_L00_001AF600, D_L00_001AF604) * (1.0f / 60.0f);
+            ClearVector128((VectorBits *)velocity);
+            particle = SpawnGroundEffectParticle(position, 60, size * 0.1f, size,
                                      0x7F7F2020, 0, spin, velocity, brightness, 1);
             if (particle)
-                *(unsigned char *)(particle + 9) = func_00283CF0(4.0f) + 0x70;
-            particle = func_002C2210(position, 60, size * 0.07f, size * 0.7f,
+                *(unsigned char *)(particle + 9) = FloatToInt(4.0f) + 0x70;
+            particle = SpawnGroundEffectParticle(position, 60, size * 0.07f, size * 0.7f,
                                      0x7FFF4040, 1, -spin, velocity, brightness, 1);
             if (particle)
-                *(unsigned char *)(particle + 9) = func_00283CF0(4.0f) + 0x70;
+                *(unsigned char *)(particle + 9) = FloatToInt(4.0f) + 0x70;
         } while (--count);
     }
 }

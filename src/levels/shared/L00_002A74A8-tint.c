@@ -2,6 +2,7 @@
  * src/overlays/shared/hero_idle_and_animation.c. */
 /* Blinks the hero tint, then updates an active equipped-item effect. */
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -24,38 +25,39 @@ extern void func_002A0488(void *owner, int a1, int a2, int a3);
 extern void func_L00_002A7070(void);
 extern void func_L00_002A70F0(int first, void *second);
 
+/* Flashes the hero a dark and light blue tint for the first half second of certain states. Then, if an item is equipped and ready, updates its effect. */
 void func_L00_002A74A8(void)
 {
-    int r, g, b;
+    int red, green, blue;
     int active = 0;
     if (D_00189E20_2.mode == 125 || D_00189E20_2.mode == 127)
         active = D_00189E20_2.frame < 30;
     if (active) {
-        func_002A04B8(D_00189E20_2.owner, &r, &g, &b);
+        get_moby_color(D_00189E20_2.owner, &red, &green, &blue);
 
         if (D_00189E20_2.frame % 4 < 3) {
-            r = 0;
-            g = 0;
-            b = 0;
+            red = 0;
+            green = 0;
+            blue = 0;
         } else {
-            r = 0x90;
-            g = 0x90;
-            b = 0xF0;
+            red = 0x90;
+            green = 0x90;
+            blue = 0xF0;
         }
 
-        func_002A0488(D_00189E20_2.owner, r, g, b);
-        func_L00_002A7070();
+        set_moby_color(D_00189E20_2.owner, red, green, blue);
+        CopyHeroColorToSlotObjects();
     }
 
     if (D_00189E20_2.index >= 0) {
-        unsigned char index = D_00139568[D_00189E20_2.index];
-        char *record = D_L00_00262570 + index * 0xE0;
+        unsigned char index = gItemSlotToRecord[D_00189E20_2.index];
+        char *record = gWeaponTable_L00 + index * 0xE0;
 
         if (*(u8 *)(record + 4) != 0) {
             int state = D_00189E20_2.state;
 
             if (state != 0)
-                func_L00_002A70F0(state, D_00189E20_2.owner);
+                EmptyHeroHook(state, D_00189E20_2.owner);
         }
     }
 }

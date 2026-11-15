@@ -94,6 +94,7 @@ extern void func_00282F20(void *, void *, float);
 extern void func_L00_002B8E48(void *, void *);
 extern void func_L00_002D3638(void *, float, float, float, int);
 
+/* Looks for the ground under the hero each frame, records its slope and type, and sets the gravity direction. */
 void func_L04_002DAD10(void)
 {
     float end[4] __attribute__((aligned(16)));
@@ -107,182 +108,182 @@ void func_L04_002DAD10(void)
     int i;
     unsigned char *flags;
 
-    D_00189E20.groundNormal[2] = 1.0f;
-    D_00189E20.airFrames++;
-    D_00189E20.framesOffGround++;
-    D_00189E20.groundNormal[0] = 0;
-    D_00189E20.groundNormal[1] = 0;
-    D_00189E20.groundSlope = 0;
-    D_00189E20.groundZ = 0;
-    func_00282C88(D_00189E20.groundPoint);
-    D_00189E20.onFlaggedGroundMoby = 0;
-    D_00189E20.groundDistance = 32.0f;
-    D_00189E20.groundMoby = 0;
+    gHeroState.groundNormal[2] = 1.0f;
+    gHeroState.airFrames++;
+    gHeroState.framesOffGround++;
+    gHeroState.groundNormal[0] = 0;
+    gHeroState.groundNormal[1] = 0;
+    gHeroState.groundSlope = 0;
+    gHeroState.groundZ = 0;
+    ClearVector128(gHeroState.groundPoint);
+    gHeroState.onFlaggedGroundMoby = 0;
+    gHeroState.groundDistance = 32.0f;
+    gHeroState.groundMoby = 0;
     /* A constant set once and used once in a later block: update_equiv_regs
      * sinks it after sched1, which gives the mode test's constant and load
      * retail's registers (local-alloc's three-qty sort). */
     scale = 2.2f;
-    if (D_00189E20.inWaterFrames) {
-        D_00189E20.inWaterFrames++;
+    if (gHeroState.inWaterFrames) {
+        gHeroState.inWaterFrames++;
     }
-    distance = D_00189E20.capsuleRadius * scale;
-    if (2 == D_00189E20.controlMode) {
-        distance = D_00189E20.capsuleRadius * 2.9f;
+    distance = gHeroState.capsuleRadius * scale;
+    if (2 == gHeroState.controlMode) {
+        distance = gHeroState.capsuleRadius * 2.9f;
     }
-    if (func_L00_002ADF80()) {
+    if (IsHeroInSpecialKindOrMode()) {
         distance = 0;
     }
-    func_L00_002B47A8(start, end, 1, distance, -48.0f);
-    if (!func_002761F8(start, end, 2, D_00189E20.moby, 0)) {
+    BuildOffsetVectorPair(start, end, 1, distance, -48.0f);
+    if (!CollLine(start, end, 2, gHeroState.moby, 0)) {
         goto tail;
     }
-    D_00189E20.groundSoundClass = func_L00_002E2048();
+    gHeroState.groundSoundClass = func_L00_002E2048();
     if (hit->moby) {
-        D_00189E20.groundSoundClass = 0;
+        gHeroState.groundSoundClass = 0;
     }
-    if (D_001A79F0 == 7 && hit->moby) {
-        D_00189E20.groundSoundClass = 1;
+    if (gCurrentMapIndex == 7 && hit->moby) {
+        gHeroState.groundSoundClass = 1;
     }
-    D_00189E20.groundType = func_00278E78();
-    if (D_00189E20.groundType == 0) {
-        D_00189E20.waterSurfaceZ = func_002A90F8(hit->point, D_00189E20.waterSurfaceNormal);
-        if (D_00189E20.position[2] < D_00189E20.waterSurfaceZ && D_00189E20.inWaterFrames <= 0) {
-            D_00189E20.inWaterFrames = 1;
+    gHeroState.groundType = GetCollHitMaterial();
+    if (gHeroState.groundType == 0) {
+        gHeroState.waterSurfaceZ = GetGroundHeightAtPosition(hit->point, gHeroState.waterSurfaceNormal);
+        if (gHeroState.position[2] < gHeroState.waterSurfaceZ && gHeroState.inWaterFrames <= 0) {
+            gHeroState.inWaterFrames = 1;
         }
-        if (!func_002761F8(start, end, 0x24, D_00189E20.moby, 0)) {
+        if (!CollLine(start, end, 0x24, gHeroState.moby, 0)) {
             goto tail;
         }
-        D_00189E20.groundSoundClass = func_L00_002E2048();
+        gHeroState.groundSoundClass = func_L00_002E2048();
     }
-    if (D_00189E20.groundType == 13) {
-        D_00189E20.waterSurfaceZ = hit->point[2];
+    if (gHeroState.groundType == 13) {
+        gHeroState.waterSurfaceZ = hit->point[2];
         start[2] = hit->point[2] - 0.01f;
-        if (!func_002761F8(start, end, 4, D_00189E20.moby, 0)) {
+        if (!CollLine(start, end, 4, gHeroState.moby, 0)) {
             goto tail;
         }
     }
     if (hit->moby) {
-        if (func_002ABB78(hit->moby)) {
-            D_00189E20.onFlaggedGroundMoby = 1;
+        if (IsMobyInSpecialClassRange(hit->moby)) {
+            gHeroState.onFlaggedGroundMoby = 1;
         }
-        flags = func_002AB1F0(hit->moby);
+        flags = GetMobyPrivateValue0(hit->moby);
         if (flags && (*(unsigned short *)(flags + 0x1E) & 8)) {
-            D_00189E20.onFlaggedGroundMoby = 1;
+            gHeroState.onFlaggedGroundMoby = 1;
         }
-        flags = func_002AD0B0(hit->moby);
+        flags = GetMobyPrivateValue2(hit->moby);
         if (flags && (*(int *)(flags + 0x3C) & 8)) {
-            D_00189E20.onFlaggedGroundMoby = 1;
+            gHeroState.onFlaggedGroundMoby = 1;
         }
     }
     if (hit->count > 0) {
-        qcopy(D_00189E20.groundPoint, hit->point);
-        D_00189E20.groundZ = hit->point[2];
+        qcopy(gHeroState.groundPoint, hit->point);
+        gHeroState.groundZ = hit->point[2];
         if (D_L04_001A8FF0) {
-            D_00189E20.groundZ = func_002B0360(hit->point);
+            gHeroState.groundZ = GetDistanceFromGravityCenter(hit->point);
         }
-        D_00189E20.groundDistance = func_00282E48(D_00189E20.position, D_00189E20.groundPoint);
-        D_00189E20.groundMoby = (int)hit->moby;
-        func_001290E0(D_00189E20.groundNormal, hit->normal);
-        D_00189E20.groundSlope = func_L00_002D3EA8(hit->normal);
-        D_00189E20.downhillYaw = func_00283248(hit->normal[0], hit->normal[1]);
-        func_00282CF0(geom, D_00189E20.groundPoint, D_00189E20.position);
-        if (func_00282DB0(geom, D_00189E20.groundNormal) > 0.0f) {
-            D_00189E20.groundDistance = -D_00189E20.groundDistance;
+        gHeroState.groundDistance = fast_vec_dist(gHeroState.position, gHeroState.groundPoint);
+        gHeroState.groundMoby = (int)hit->moby;
+        func_001290E0(gHeroState.groundNormal, hit->normal);
+        gHeroState.groundSlope = GetViewSpaceAngle(hit->normal);
+        gHeroState.downhillYaw = FastMatrixHelperA(hit->normal[0], hit->normal[1]);
+        FastVecSub(geom, gHeroState.groundPoint, gHeroState.position);
+        if (FastVecDot(geom, gHeroState.groundNormal) > 0.0f) {
+            gHeroState.groundDistance = -gHeroState.groundDistance;
         }
-        if (D_00189E20.groundDistance < 0.02f) {
-            D_00189E20.framesOffGround = 0;
-            if (D_00189E20.groundSlope <= 0.87266469f || D_00189E20.gravityMode) {
-                D_00189E20.airFrames = 0;
-                D_00189E20.lastLandedMoby = (int)hit->moby;
+        if (gHeroState.groundDistance < 0.02f) {
+            gHeroState.framesOffGround = 0;
+            if (gHeroState.groundSlope <= 0.87266469f || gHeroState.gravityMode) {
+                gHeroState.airFrames = 0;
+                gHeroState.lastLandedMoby = (int)hit->moby;
             }
         }
     }
 tail:
-    if (D_00189E20.position[2] > D_00189E20.waterSurfaceZ) {
-        D_00189E20.inWaterFrames = 0;
+    if (gHeroState.position[2] > gHeroState.waterSurfaceZ) {
+        gHeroState.inWaterFrames = 0;
     }
-    if (D_00189E20.airFrames) {
-        D_00189E20.groundedFrames = 0;
+    if (gHeroState.airFrames) {
+        gHeroState.groundedFrames = 0;
     } else {
-        D_00189E20.groundedFrames++;
-        qcopy(D_00189E20.lastGroundPoint, D_00189E20.groundPoint);
+        gHeroState.groundedFrames++;
+        qcopy(gHeroState.lastGroundPoint, gHeroState.groundPoint);
     }
-    func_00282C88(D_00189E20.gravityDir);
-    switch (D_00189E20.gravityMode) {
+    ClearVector128(gHeroState.gravityDir);
+    switch (gHeroState.gravityMode) {
     case 0:
-        D_00189E20.gravityDir[2] = -1;
+        gHeroState.gravityDir[2] = -1;
         break;
     case 1:
         if (D_L04_001A8FF4) {
-            func_002AFF60(D_00189E20.position, D_00189E20.gravityDir, 0);
-        } else if (D_00189E20.f2fc != 0.0f) {
-            func_002AA2E8(&D_00189E20.f2fc, 0.0f, 1.0f);
-            qcopy(D_00189E20.gravityDir, D_00189E20.f2f0);
+            ComputeFlatDirectionFromPoint(gHeroState.position, gHeroState.gravityDir, 0);
+        } else if (gHeroState.f2fc != 0.0f) {
+            ApproachValue(&gHeroState.f2fc, 0.0f, 1.0f);
+            qcopy(gHeroState.gravityDir, gHeroState.f2f0);
         } else {
-            qcopy(D_00189E20.gravityDir, D_00189E20.groundNormal);
-            func_00282D30(D_00189E20.gravityDir, D_00189E20.gravityDir, -1.0f);
+            qcopy(gHeroState.gravityDir, gHeroState.groundNormal);
+            FastVecScale(gHeroState.gravityDir, gHeroState.gravityDir, -1.0f);
         }
         break;
     case 2:
         sign = -1.0f;
-        if (D_00189E20.referencePoint[3] > 0) {
+        if (gHeroState.referencePoint[3] > 0) {
             sign = 1.0f;
         }
-        func_00282CF0(D_00189E20.gravityDir, D_00189E20.referencePoint, D_00189E20.position);
-        func_00282F20(D_00189E20.gravityDir, D_00189E20.gravityDir, sign);
+        FastVecSub(gHeroState.gravityDir, gHeroState.referencePoint, gHeroState.position);
+        vec_scale_to_length(gHeroState.gravityDir, gHeroState.gravityDir, sign);
         break;
     }
-    D_00189E20.groundPitch = 0;
-    D_00189E20.groundRoll = 0;
-    D_00189E20.sideRoll.i[0] = 0;
-    D_00189E20.sideRoll.i[1] = 0;
-    D_00189E20.sidePitch.i[0] = 0;
-    D_00189E20.sidePitch.i[1] = 0;
-    D_00189E20.sideHeight.i[0] = 0;
-    D_00189E20.sideHeight.i[1] = 0;
-    if (!(D_00189E20.groundDistance < 0.25f)) {
+    gHeroState.groundPitch = 0;
+    gHeroState.groundRoll = 0;
+    gHeroState.sideRoll.i[0] = 0;
+    gHeroState.sideRoll.i[1] = 0;
+    gHeroState.sidePitch.i[0] = 0;
+    gHeroState.sidePitch.i[1] = 0;
+    gHeroState.sideHeight.i[0] = 0;
+    gHeroState.sideHeight.i[1] = 0;
+    if (!(gHeroState.groundDistance < 0.25f)) {
         return;
     }
-    if (D_00189E20.controlMode != 0 && D_00189E20.controlMode != 12 && D_00189E20.controlMode != 9 &&
-        D_00189E20.controlMode != 7 && !(D_00189E20.controlMode == 4 && D_00189E20.f49c) &&
-        D_00189E20.controlMode != 1) {
+    if (gHeroState.controlMode != 0 && gHeroState.controlMode != 12 && gHeroState.controlMode != 9 &&
+        gHeroState.controlMode != 7 && !(gHeroState.controlMode == 4 && gHeroState.f49c) &&
+        gHeroState.controlMode != 1) {
         return;
     }
-    func_L00_002B8E48(D_00189E20.groundNormal, geom);
+    ComputeAnglesToHeroLocalDirection(gHeroState.groundNormal, geom);
     if (-0.78539824f < geom[1] && geom[1] < 0.78539824f) {
-        D_00189E20.groundPitch = geom[1];
+        gHeroState.groundPitch = geom[1];
     }
     if (-0.78539824f < geom[0] && geom[0] < 0.78539824f) {
-        D_00189E20.groundRoll = geom[0];
+        gHeroState.groundRoll = geom[0];
     }
     for (i = 0; i < 2; i++) {
         angle = 1.57079649f;
         if (i == 1) {
             angle = -angle;
         }
-        func_L00_002D3638(probe1, 0.2f, angle, 0.45f, 1);
-        func_L00_002D3638(probe2, 0.2f, angle, -0.45f, 1);
-        if (func_002761F8(probe1, probe2, 0x22, D_00189E20.moby, 0)) {
+        BuildHeroRelativeOffset(probe1, 0.2f, angle, 0.45f, 1);
+        BuildHeroRelativeOffset(probe2, 0.2f, angle, -0.45f, 1);
+        if (CollLine(probe1, probe2, 0x22, gHeroState.moby, 0)) {
             if (D_L04_001A8FF0_gp) {
-                D_00189E20.sideHeight.f[i] = func_002B0360(hit->point) - func_002B0360(D_00189E20.groundPoint);
+                gHeroState.sideHeight.f[i] = GetDistanceFromGravityCenter(hit->point) - GetDistanceFromGravityCenter(gHeroState.groundPoint);
             } else {
-                D_00189E20.sideHeight.f[i] = hit->point[2] - D_00189E20.groundZ;
+                gHeroState.sideHeight.f[i] = hit->point[2] - gHeroState.groundZ;
             }
-            if (func_00282C48(D_00189E20.sideHeight.f[i]) > 0.4f) {
-                D_00189E20.sideHeight.i[i] = 0;
+            if (FloatAbs(gHeroState.sideHeight.f[i]) > 0.4f) {
+                gHeroState.sideHeight.i[i] = 0;
             }
             func_001290E0(normal, hit->normal);
-            func_L00_002B8E48(normal, angles);
+            ComputeAnglesToHeroLocalDirection(normal, angles);
             if (-0.78539824f < angles[1] && angles[1] < 0.78539824f) {
-                D_00189E20.sidePitch.f[i] = angles[1];
+                gHeroState.sidePitch.f[i] = angles[1];
             }
             if (-0.78539824f < angles[0] && angles[0] < 0.78539824f) {
-                D_00189E20.sideRoll.f[i] = angles[0];
+                gHeroState.sideRoll.f[i] = angles[0];
             }
         } else {
-            D_00189E20.sideHeight.i[i] = 0;
-            D_00189E20.sidePitch.f[i] = D_00189E20.groundPitch;
-            D_00189E20.sideRoll.f[i] = D_00189E20.groundRoll;
+            gHeroState.sideHeight.i[i] = 0;
+            gHeroState.sidePitch.f[i] = gHeroState.groundPitch;
+            gHeroState.sideRoll.f[i] = gHeroState.groundRoll;
         }
     }
 }

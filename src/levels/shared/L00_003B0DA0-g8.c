@@ -32,6 +32,7 @@ extern float func_00282E48(void *, void *);
 extern void func_L00_003B0AB0(int);
 extern int func_L00_003B0B20(unsigned char, unsigned char, unsigned char *);
 extern void func_L00_003B14D0(float, float, float);
+/* Adds a trail point at the hero's position when the hero has moved far enough, links nearby points and merges close groups. */
 char *func_L00_003B0DA0(void *unused)
 {
     u8 joined[32];
@@ -48,14 +49,14 @@ char *func_L00_003B0DA0(void *unused)
         previous[0] = last->xyz[0];
         previous[1] = last->xyz[1];
         previous[2] = last->xyz[2];
-        gap = func_00282E48(D_00189E20.position, previous);
+        gap = fast_vec_dist(gHeroState.position, previous);
         if (gap < D_L00_001AF81C) return 0;
     }
     node = &D_L00_0023BB78[D_L00_001AF810];
-    node->used = D_L00_001B19C8;
-    node->xyz[0] = D_00189E20.position[0];
-    node->xyz[1] = D_00189E20.position[1];
-    node->xyz[2] = D_00189E20.position[2];
+    node->used = gFrameCounter_L00;
+    node->xyz[0] = gHeroState.position[0];
+    node->xyz[1] = gHeroState.position[1];
+    node->xyz[2] = gHeroState.position[2];
     {
         int l;
         u8 *link = &node->links[7];
@@ -78,8 +79,8 @@ char *func_L00_003B0DA0(void *unused)
                     if (D_L00_0023BB78[entry].links[b] == cursor)
                         D_L00_0023BB78[entry].links[b] = D_L00_001AF810;
             }
-            func_L00_003B0AB0(cursor);
-            func_L00_003B0CE8(cursor);
+            FreeNodeEffectObject(cursor);
+            FreeNodeSlot(cursor);
         } else {
             float limit;
             /* cse1 ends its block at this group's loop-end note, so row's multiply below
@@ -111,23 +112,23 @@ char *func_L00_003B0DA0(void *unused)
             }
         }
     }
-    if (++D_L00_001AF810 == D_L00_001AF811) func_L00_003B0CE8(D_L00_001AF811);
+    if (++D_L00_001AF810 == D_L00_001AF811) FreeNodeSlot(D_L00_001AF811);
     for (i = 0; i < count; ++i) {
         for (j = i + 1; j < count; ++j) {
-            n = func_L00_003B0B20(joined[j], joined[i], D_L00_0023BA78);
+            n = FindNodePathBetweenNodes(joined[j], joined[i], D_L00_0023BA78);
             D_L00_0023BA78[n++] = D_L00_001AF810 - 1;
             if (n > D_L00_001AF824) {
                 D_L00_001AF818 = n;
                 z = x = y = 0.0f;
                 divisor = n;
                 for (k = 0; k < n; ++k) {
-                    func_L00_003B0AB0(D_L00_0023BA78[k]);
+                    FreeNodeEffectObject(D_L00_0023BA78[k]);
                     x += D_L00_0023BB78[D_L00_0023BA78[k]].xyz[0];
                     y += D_L00_0023BB78[D_L00_0023BA78[k]].xyz[1];
                     z += D_L00_0023BB78[D_L00_0023BA78[k]].xyz[2];
-                    func_L00_003B0CE8(D_L00_0023BA78[k]);
+                    FreeNodeSlot(D_L00_0023BA78[k]);
                 }
-                func_L00_003B14D0(x / divisor, y / divisor, z / divisor);
+                SpawnTrailGroupBurst(x / divisor, y / divisor, z / divisor);
             }
         }
     }

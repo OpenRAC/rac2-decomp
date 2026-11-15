@@ -17,92 +17,93 @@ extern int func_002761F8(float *, float *, int, int, int);
 extern float func_002AA3A8(void *, float, void *, float, float, float);
 extern void func_002A8240(char *, float *, float, float, float, int);
 
+/* Pushes a springy object down when the player stands on it and lets it bounce back up. Keeps it above the floor. */
 void func_0030E8A8(char *obj)
 {
-    char *e = *(char **)(obj + 0x68);
-    char *d = D_00189E20;
-    short flag = *(short *)(d + 0x202);
-    float v0[4] __attribute__((aligned(16)));
-    float v1[4] __attribute__((aligned(16)));
-    float v2[4] __attribute__((aligned(16)));
-    float v3[4] __attribute__((aligned(16)));
-    float v4[4] __attribute__((aligned(16)));
-    float v5[4] __attribute__((aligned(16)));
-    float v6[4] __attribute__((aligned(16)));
-    float v7[4] __attribute__((aligned(16)));
-    float v8[4] __attribute__((aligned(16)));
-    float v9[4] __attribute__((aligned(16)));
-    float f;
+    char *vars = *(char **)(obj + 0x68);
+    char *hero = gHeroState;
+    short flag = *(short *)(hero + 0x202);
+    float up[4] __attribute__((aligned(16)));
+    float toObject[4] __attribute__((aligned(16)));
+    float sideOffset[4] __attribute__((aligned(16)));
+    float alongUp[4] __attribute__((aligned(16)));
+    float probeBelow[4] __attribute__((aligned(16)));
+    float probeAbove[4] __attribute__((aligned(16)));
+    float groundPoint[4] __attribute__((aligned(16)));
+    float groundAlong[4] __attribute__((aligned(16)));
+    float push[4] __attribute__((aligned(16)));
+    float groundToObject[4] __attribute__((aligned(16)));
+    float pushAmount;
     float projection;
     int mode;
-    float l3, l2, step, acc, x;
+    float heightAlong, sideDistance, step, groundGap, newSpeed;
 
-    if (*(int *)(e + 0x44) == 0 && flag == 0)
+    if (*(int *)(vars + 0x44) == 0 && flag == 0)
         return;
-    func_002FE8D8(obj + 0x10, v0);
-    acc = 0.0f;
-    func_00282CF0(v1, obj + 0x10, d + 0x80);
-    projection = func_00282DB0(v1, v0);
-    func_00282D30(v3, v0, projection);
-    func_00282CF0(v2, v1, v3);
-    l3 = func_00282DF0(v3);
-    l2 = func_00282DF0(v2);
-    func_00282D30(v4, v0, -2.5f);
-    func_00282CC0(v4, obj + 0x10, v4);
-    func_00282D30(v5, v0, 0.5f);
-    func_00282CC0(v5, obj + 0x10, v5);
-    if (func_002761F8(v5, v4, 2, 0, 0)) {
-        qcopy(v6, ref_0030E8A8_00);
+    GetObjectFacingDirection(obj + 0x10, up);
+    groundGap = 0.0f;
+    FastVecSub(toObject, obj + 0x10, hero + 0x80);
+    projection = FastVecDot(toObject, up);
+    FastVecScale(alongUp, up, projection);
+    FastVecSub(sideOffset, toObject, alongUp);
+    heightAlong = FastVecLength(alongUp);
+    sideDistance = FastVecLength(sideOffset);
+    FastVecScale(probeBelow, up, -2.5f);
+    FastVecAdd(probeBelow, obj + 0x10, probeBelow);
+    FastVecScale(probeAbove, up, 0.5f);
+    FastVecAdd(probeAbove, obj + 0x10, probeAbove);
+    if (CollLine(probeAbove, probeBelow, 2, 0, 0)) {
+        qcopy(groundPoint, ref_0030E8A8_00);
         mode = 0;
     } else {
         mode = 1;
     }
     if (mode == 0) {
-        func_00282CF0(v8, v6, obj + 0x10);
-        projection = func_00282DB0(v8, v0);
-        func_00282D30(v7, v0, projection);
-        acc = func_00282DF0(v7);
+        FastVecSub(push, groundPoint, obj + 0x10);
+        projection = FastVecDot(push, up);
+        FastVecScale(groundAlong, up, projection);
+        groundGap = FastVecLength(groundAlong);
     }
-    if (*(int *)(e + 0x44) == 0) {
-        if (!(l2 < 1.0f))
+    if (*(int *)(vars + 0x44) == 0) {
+        if (!(sideDistance < 1.0f))
             return;
-        if (!(l3 < 1.3f))
+        if (!(heightAlong < 1.3f))
             return;
-        *(int *)(e + 0x44) = 1;
+        *(int *)(vars + 0x44) = 1;
     }
-    qcopy(v8, v2);
-    f = l2 - 1.4f;
-    if (f > 0.0f)
-        f = 0.0f;
+    qcopy(push, sideOffset);
+    pushAmount = sideDistance - 1.4f;
+    if (pushAmount > 0.0f)
+        pushAmount = 0.0f;
     if (flag == 0)
-        f = 0.0f;
+        pushAmount = 0.0f;
     step = 0.02f;
-    func_002AA3A8(&f, 0.0f, (float *)(e + 0x48), step, 0.3f, 0.06666667f);
-    if (f == 0.0f && *(float *)(e + 0x48) == 0.0f && acc < step)
-        *(int *)(e + 0x44) = 0;
-    if (l2 < *(float *)(e + 0x48))
-        *(float *)(e + 0x48) = l2;
-    if (*(float *)(e + 0x48) < l2)
-        func_00282F20(v8, v8, *(float *)(e + 0x48));
-    func_002A8240(obj, v8, 0.5f, 0.4f, 0.0f, 0);
+    SpringFloatToGoal(&pushAmount, 0.0f, (float *)(vars + 0x48), step, 0.3f, 0.06666667f);
+    if (pushAmount == 0.0f && *(float *)(vars + 0x48) == 0.0f && groundGap < step)
+        *(int *)(vars + 0x44) = 0;
+    if (sideDistance < *(float *)(vars + 0x48))
+        *(float *)(vars + 0x48) = sideDistance;
+    if (*(float *)(vars + 0x48) < sideDistance)
+        vec_scale_to_length(push, push, *(float *)(vars + 0x48));
+    MoveAndCollideObject(obj, push, 0.5f, 0.4f, 0.0f, 0);
     if (mode == 0) {
-        if (func_00282DB0(v7, v0) > 0.0f) {
-            qcopy(obj + 0x10, v6);
-            *(float *)(e + 0x4C) = 0.0f;
+        if (FastVecDot(groundAlong, up) > 0.0f) {
+            qcopy(obj + 0x10, groundPoint);
+            *(float *)(vars + 0x4C) = 0.0f;
         } else {
-            x = *(float *)(e + 0x4C) - 0.0066666668f;
-            *(float *)(e + 0x4C) = x;
-            func_00282D30(v8, v0, x);
-            func_00282CC0(obj + 0x10, v8, obj + 0x10);
-            func_00282CF0(v9, v6, obj + 0x10);
-            if (func_00282DB0(v9, v0) > 0.0f) {
-                qcopy(obj + 0x10, v6);
-                *(float *)(e + 0x4C) = 0.0f;
+            newSpeed = *(float *)(vars + 0x4C) - 0.0066666668f;
+            *(float *)(vars + 0x4C) = newSpeed;
+            FastVecScale(push, up, newSpeed);
+            FastVecAdd(obj + 0x10, push, obj + 0x10);
+            FastVecSub(groundToObject, groundPoint, obj + 0x10);
+            if (FastVecDot(groundToObject, up) > 0.0f) {
+                qcopy(obj + 0x10, groundPoint);
+                *(float *)(vars + 0x4C) = 0.0f;
             }
         }
     } else {
-        *(float *)(e + 0x4C) -= 0.0066666668f;
-        func_00282D30(v8, v0, *(float *)(e + 0x4C));
-        func_00282CC0(obj + 0x10, v8, obj + 0x10);
+        *(float *)(vars + 0x4C) -= 0.0066666668f;
+        FastVecScale(push, up, *(float *)(vars + 0x4C));
+        FastVecAdd(obj + 0x10, push, obj + 0x10);
     }
 }

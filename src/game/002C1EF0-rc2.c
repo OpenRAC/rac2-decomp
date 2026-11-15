@@ -28,31 +28,33 @@ typedef int TI __attribute__((mode(TI)));
 extern TI D_001BAFA0;
 extern s32 func_002761F8(s8 *a0, s8 *a1, s32 a2, s32 a3, s32 a4);
 extern s32 func_00282978(s8 *p);
-extern void func_00282CC0(s8 *a0, s8 *a1, struct V4 *v);
+extern void func_00282CC0(s8 *a0, s8 *a1, struct V4 *saved);
 extern void func_002B9180(s8 *p);
 
-void func_002C1EF0(s8 *arg0) {
-    struct V4 tmp;
-    s8 *s1;
-    s8 *s2;
-    s8 *s3;
+/* Updates a particle that moves along a line. It is removed when its timer ends,
+   and it is reset if it hits something. */
+void func_002C1EF0(s8 *particle) {
+    struct V4 step;
+    s8 *trail;
+    s8 *motion;
+    s8 *position;
 
-    s3 = arg0 + 0x10;
-    s2 = arg0 + 0x30;
-    s1 = arg0 + 0x20;
-    tmp.x = *(f32 *)(arg0 + 0x30);
-    tmp.y = *(f32 *)(s2 + 4);
-    tmp.z = *(f32 *)(s2 + 8);
-    tmp.w = 0;
-    func_00282CC0(s3, s3, &tmp);
-    func_00282CC0(s1, s1, &tmp);
-    if (func_00282978(arg0 + 0xA) != 0) {
-        func_002B9180(arg0);
+    position = particle + 0x10;
+    motion = particle + 0x30;
+    trail = particle + 0x20;
+    step.x = *(f32 *)(particle + 0x30);
+    step.y = *(f32 *)(motion + 4);
+    step.z = *(f32 *)(motion + 8);
+    step.w = 0;
+    FastVecAdd(position, position, &step);
+    FastVecAdd(trail, trail, &step);
+    if (FastDecTimer(particle + 0xA) != 0) {
+        KillParticle(particle);
         return;
     }
-    if (func_002761F8(s1, s3, 0x10, *(s32 *)(s2 + 0xC), 0) != 0) {
-        TI v = D_001BAFA0;
-        *(s16 *)(arg0 + 0xA) = 0;
-        *(volatile TI *)(arg0 + 0x10) = v;
+    if (CollLine(trail, position, 0x10, *(s32 *)(motion + 0xC), 0) != 0) {
+        TI saved = D_001BAFA0;
+        *(s16 *)(particle + 0xA) = 0;
+        *(volatile TI *)(particle + 0x10) = saved;
     }
 }

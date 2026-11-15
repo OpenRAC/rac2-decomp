@@ -18,6 +18,7 @@ extern void func_002830C0(void *, void *, void *);
 extern void func_002FC560(int, unsigned long long);
 extern void func_00280B90(void *, int, int);
 extern char D_L04_001B9680[], D_0018A0E0[];
+/* Draws a flat glowing sprite that faces the camera at a position. It can be turned by an angle and squashed. */
 void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags, float scale, float size, float angle, float skew)
 {
     B971Packet packet;
@@ -26,37 +27,37 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     /* scratch type shared with func_L30_0041B848, allowed by owner ruling */
     struct { float angles[4]; float rotation[3][4]; } scratch;
     Corner corners[4];
-    float c, sn;
+    float cosAngle, sinAngle;
     float *out;
-    u8 *u;
+    u8 *uPtr;
     int i;
-    func_00281DE8(&packet, texture, flags, 128);
+    InitQuadPacketState(&packet, texture, flags, 128);
     packet.state[0] = 5;
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = color;
     packet.uv[0].u = 0; packet.uv[0].v = 0; packet.uv[1].u = 0; packet.uv[1].v = 1;
     packet.uv[2].u = 1; packet.uv[2].v = 0; packet.uv[3].u = 1; packet.uv[3].v = 1;
-    c = func_00283180(angle);
-    sn = func_00283198(angle);
+    cosAngle = FastSinOrCosA(angle);
+    sinAngle = FastSinOrCosB(angle);
     {
         int k;
-        u8 *v = (u8 *)&packet + 0x54;
-        for (u = (u8 *)&packet + 0x50, k = 3; k >= 0; k--, u += 8, v += 8) {
-            tmp[0] = *(float *)u - 0.5f;
-            tmp[1] = *(float *)v - 0.5f;
-            *(float *)u = tmp[0] * c - tmp[1] * sn;
-            *(float *)v = tmp[0] * sn + tmp[1] * c;
-            *(float *)u += 0.5f;
-            *(float *)v += 0.5f;
+        u8 *vPtr = (u8 *)&packet + 0x54;
+        for (uPtr = (u8 *)&packet + 0x50, k = 3; k >= 0; k--, uPtr += 8, vPtr += 8) {
+            tmp[0] = *(float *)uPtr - 0.5f;
+            tmp[1] = *(float *)vPtr - 0.5f;
+            *(float *)uPtr = tmp[0] * cosAngle - tmp[1] * sinAngle;
+            *(float *)vPtr = tmp[0] * sinAngle + tmp[1] * cosAngle;
+            *(float *)uPtr += 0.5f;
+            *(float *)vPtr += 0.5f;
         }
     }
     qcopy(transform[3], position);
-    func_00282CF0(transform[0], D_L04_001B9680, transform[3]);
-    func_00282F20(transform[0], transform[0], 1.0f);
-    func_00282DD8(transform[1], transform[0], D_0018A0E0);
-    func_00282F20(transform[1], transform[1], 1.0f);
-    func_00282DD8(transform[2], transform[1], transform[0]);
-    func_00282D30(scratch.angles, transform[0], size);
-    func_00282CC0(transform[3], transform[3], scratch.angles);
+    FastVecSub(transform[0], D_L04_001B9680, transform[3]);
+    vec_scale_to_length(transform[0], transform[0], 1.0f);
+    FastVecCross(transform[1], transform[0], D_0018A0E0);
+    vec_scale_to_length(transform[1], transform[1], 1.0f);
+    FastVecCross(transform[2], transform[1], transform[0]);
+    FastVecScale(scratch.angles, transform[0], size);
+    FastVecAdd(transform[3], transform[3], scratch.angles);
     corners[0].bits = 0; corners[1].bits = 0; corners[2].bits = 0; corners[3].bits = 0;
     corners[0].f[1] = -1; corners[0].f[2] = 1 - skew * 0.3f; corners[0].f[3] = 1;
     corners[1].f[1] = -1; corners[1].f[2] = -(1 - skew * 0.3f); corners[1].f[3] = 1;
@@ -64,10 +65,10 @@ void func_L04_0040DCA8(B781AimQuad *position, int texture, int color, int flags,
     corners[3].f[1] = 1; corners[3].f[2] = -(1 - skew * 0.3f); corners[3].f[3] = 1;
     for (i = 0; i < 4; i++) {
         out = packet.vertices[i];
-        func_00282D30(out, corners[i].f, scale);
-        func_002830C0(out, out, transform);
+        FastVecScale(out, corners[i].f, scale);
+        transform_vector(out, out, transform);
     }
-    func_002FC560(0x47, 0x33001);
-    func_00280B90(&packet, 0, 0);
-    func_002FC560(0x47, 0x5360b);
+    VU1_addGSregister(0x47, 0x33001);
+    draw_world_quad(&packet, 0, 0);
+    VU1_addGSregister(0x47, 0x5360b);
 }

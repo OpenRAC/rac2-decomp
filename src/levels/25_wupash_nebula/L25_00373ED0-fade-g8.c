@@ -72,11 +72,12 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 /* One sprite of a pair at (x, y): its y scaled for the display. */
 #define HUD_SPRITE(id, color, x, y, scale, alpha, angle)                                       \
     {                                                                                          \
-        sprite = func_00336D50(D_L25_001A904C + 0x8710, id);                                   \
-        func_00300A00(sprite, color, (f32)(x),                                                 \
+        sprite = FindTableEntryById(D_L25_001A904C + 0x8710, id);                                   \
+        DrawScaledObjectTwoAxes(sprite, color, (f32)(x),                                                 \
                       (f32)label_y(sprite, (f32)(y), D_L25_001B2904, 0.5f, 1), scale, alpha, angle); \
     }
 
+/* Draws the HUD icon pairs for this level. The middle pair fades in and out while its timer runs and shows a count. */
 void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
 {
     u8 *state = *(u8 **)(D_L25_001B0CE0 + 0x68);
@@ -86,7 +87,7 @@ void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
     Block color;
 
     if (D_L25_001B305C == 0) {
-        D_L25_001B3058 = D_001A79F0[3];
+        D_L25_001B3058 = gCurrentMapIndex[3];
         D_L25_001B305C = 1;
     }
     if (D_L25_001A904C == 0)
@@ -95,10 +96,10 @@ void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
         HUD_SPRITE(0xBD, 0x60442D00, D_L25_001B0D00, D_L25_001B0D04, -1.0f, 1.0f, 0.0f);
         HUD_SPRITE(0xBE, 0x55F0C070, D_L25_001B0D00, D_L25_001B0D04, -1.0f, 1.0f, 0.0f);
     }
-    if (second && D_L25_001B3058 < D_001A79F0[3]) {
-        if (func_00282948(state + 0x30) == 0) {
+    if (second && D_L25_001B3058 < gCurrentMapIndex[3]) {
+        if (FastFloatHelperD(state + 0x30) == 0) {
             if (*(s32 *)(state + 0x30) >= 291) {
-                fade = func_00283CE0(300 - *(s32 *)(state + 0x30)) * 0.1f;
+                fade = IntToFloat(300 - *(s32 *)(state + 0x30)) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
@@ -106,7 +107,7 @@ void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
                 HUD_SPRITE(0xBF, 0x60442D00, D_L25_001B0D08, D_L25_001B0D0C, fade, fade, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, D_L25_001B0D08, D_L25_001B0D0C, fade, fade, 0.0f);
             } else if (*(s32 *)(state + 0x30) < 10) {
-                fade = func_00283CE0(*(s32 *)(state + 0x30)) * 0.1f;
+                fade = IntToFloat(*(s32 *)(state + 0x30)) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
@@ -119,15 +120,15 @@ void func_L25_0040DE40(s32 first, s32 second, s32 third, s32 fourth)
                 HUD_SPRITE(0xBF, 0x60442D00, D_L25_001B0D08, D_L25_001B0D0C, 1.0f, 1.0f, 0.0f);
                 HUD_SPRITE(0xC0, 0x55F0C070, D_L25_001B0D08, D_L25_001B0D0C, 1.0f, 1.0f, 0.0f);
                 color = D_L25_001B0D60;
-                func_0028EA58(func_0028E588(0xEAA2, 3), D_L25_001B0D08 - 51,
+                DrawHudSpriteGradient(GetIconFrame(0xEAA2, 3), D_L25_001B0D08 - 51,
                               screen_coord(D_L25_001B2900, (f32)(D_L25_001B0D0C - 13), 1.0f), 28, 28, &color);
-                func_00115DA8(text, D_L25_001B0D70, D_001A79F0[3]);
+                Sprintf(text, D_L25_001B0D70, gCurrentMapIndex[3]);
                 textX = D_L25_001B0D08 + 5;
-                func_0027F5B8(textX, label_y((void *)textX, (f32)(D_L25_001B0D0C + 2), D_L25_001B2904, 0.5f, 1),
+                DrawTextMediumFont(textX, label_y((void *)textX, (f32)(D_L25_001B0D0C + 2), D_L25_001B2904, 0.5f, 1),
                               0x80808080, text, 128);
             }
         } else {
-            D_L25_001B3058 = D_001A79F0[3];
+            D_L25_001B3058 = gCurrentMapIndex[3];
             *(s32 *)(state + 0x30) = 300;
         }
     }

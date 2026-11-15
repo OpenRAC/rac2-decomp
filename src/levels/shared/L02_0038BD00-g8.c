@@ -68,6 +68,7 @@ extern float func_002A78D8(float, float);
 extern int func_002A7820(int, int);
 extern void func_00282D30(void *, void *, float);
 
+/* Sets up a group of objects that ride along a rail. It shuffles the group, spaces the members out along the rail with random speeds, and sets their attachment points by model type. */
 void func_L02_0038BD00(struct Object *owner, int group) {
     float vectors[6][4];
     struct PrivateData *data;
@@ -81,25 +82,25 @@ void func_L02_0038BD00(struct Object *owner, int group) {
     float (*scaled)[4];
     float segmentLength, endDistance, spacing, speed, railCount, numerator;
 
-    cursor = D_L02_001FC060[group];
+    cursor = gEntityGroupLists[group];
     if (!cursor)
         return;
     data = owner->data;
     owner->flags30 = 0xFF;
-    rail = D_L02_001FF1C0[data->railIndex];
-    segmentLength = 1.0f / func_00282E48(rail->point[0], rail->point[1]);
+    rail = gRoutePolygons[data->railIndex];
+    segmentLength = 1.0f / fast_vec_dist(rail->point[0], rail->point[1]);
     railCount = (float)rail->count;
-    endDistance = func_00282E48(rail->point[0], rail->point[rail->count - 1]);
+    endDistance = fast_vec_dist(rail->point[0], rail->point[rail->count - 1]);
     data->closed = endDistance < 5.0f;
     data->rail = rail;
     data->step = data->f08 * (segmentLength * 0.01666666753590107f);
-    cursor = D_L02_001FC060[group];
+    cursor = gEntityGroupLists[group];
     i = 0;
     total = 1;
     while (!(cursor[i] & 0x8000)) {
         if (i > 0) {
             short temporary;
-            j = func_002A77E0(i);
+            j = RandomIntBelow(i);
             temporary = cursor[j];
             cursor[j] = cursor[i];
             cursor[i] = temporary;
@@ -109,30 +110,30 @@ void func_L02_0038BD00(struct Object *owner, int group) {
     }
     spacing = ((float)rail->count * 0.4f) / (float)total;
     speed = (data->step * 0.25f) / spacing;
-    cursor = D_L02_001FC060[group];
+    cursor = gEntityGroupLists[group];
     index = total - 1;
     do {
-        object = (struct Object *)((char *)D_L02_001B359C + (*cursor & 0x7FFF) * 256);
+        object = (struct Object *)((char *)gMobyPool_L02 + (*cursor & 0x7FFF) * 256);
         data = object->data;
         if (object != owner)
             object->flags34 |= 2;
-        numerator = func_00283CE0(index);
-        data->position = numerator / func_00283CE0(total) * railCount;
+        numerator = IntToFloat(index);
+        data->position = numerator / IntToFloat(total) * railCount;
         data->spacing = spacing;
-        data->speed = speed * func_002A7878(0.75f, 1.25f);
-        data->phase = func_002A7940();
+        data->speed = speed * RandomFloatRange(0.75f, 1.25f);
+        data->phase = RandomAngle();
         data->enabled = 1;
-        func_00282C88(data->vector20);
-        data->vector20[2] = data->f04 * func_002A78D8(0.5f, 1.0f);
-        data->u76 = func_002A7820(D_L02_001AEE30[0], D_L02_001AEE30[1]);
-        data->f68 = func_002A7940();
-        data->f6c = func_002A78D8(D_L02_001AEE38[0], D_L02_001AEE38[1]) * 0.0002908882452175021f;
+        ClearVector128(data->vector20);
+        data->vector20[2] = data->f04 * RandomSignedFloatRange(0.5f, 1.0f);
+        data->u76 = RandomIntRange(D_L02_001AEE30[0], D_L02_001AEE30[1]);
+        data->f68 = RandomAngle();
+        data->f6c = RandomSignedFloatRange(D_L02_001AEE38[0], D_L02_001AEE38[1]) * 0.0002908882452175021f;
         scale = object->scale / *(float *)(object->model + 0x24);
         data->i18 = -1;
         data->i1c = 0;
         data->i88 = 0;
         data->scale = scale;
-        if (object->kind == 0x9B0) {
+        if (object->kind == 0x9B0 /* moby class 2480 */) {
             int k;
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
@@ -145,11 +146,11 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             vectors[1][2] = 0.8600000143051147f;
             vectors[2][0] = -3.0f;
             vectors[2][2] = -0.6700000166893005f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
-            func_00282D30(vectors[2], vectors[2], data->scale);
+            FastVecScale(vectors[2], vectors[2], data->scale);
             qcopy(data->primary[2], vectors[2]);
             {
                 TI128 copy0, copy1, copy2;
@@ -163,12 +164,12 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             source = &vectors[3];
             destination = data->secondary;
             for (k = 2; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
         }
-        if (object->kind == 0x9B7) {
+        if (object->kind == 0x9B7 /* Scenery Ship */) {
             int k;
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
@@ -176,9 +177,9 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             vectors[0][2] = 0.7770000100135803f;
             vectors[1][0] = -3.7179999351501465f;
             vectors[1][2] = -0.8989999890327454f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
                 TI128 copy0 = *(TI128 *)D_L02_001AEEB0[0];
@@ -189,12 +190,12 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             source = &vectors[2];
             destination = data->secondary;
             for (k = 1; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
         }
-        if (object->kind == 0xB15) {
+        if (object->kind == 0xB15 /* moby class 2837 */) {
             int k;
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
@@ -206,9 +207,9 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             vectors[1][1] = -3.005000114440918f;
             vectors[1][2] = 0.9300000071525574f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
                 TI128 copy0 = *(TI128 *)D_L02_001AEED0[0];
@@ -219,12 +220,12 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             source = &vectors[2];
             destination = data->secondary;
             for (k = 1; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
         }
-        if (object->kind == 0x134B) {
+        if (object->kind == 0x134B /* moby class 4939 */) {
             int k;
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
@@ -236,9 +237,9 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             vectors[1][1] = -0.22200000286102295f;
             vectors[1][2] = -0.14900000393390656f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
                 TI128 copy0 = *(TI128 *)D_L02_001AEEF0[0];
@@ -249,12 +250,12 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             source = &vectors[2];
             destination = data->secondary;
             for (k = 1; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
         }
-        if (object->kind == 0xB13) {
+        if (object->kind == 0xB13 /* moby class 2835 */) {
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
             vectors[0][0] = -3.677999973297119f;
@@ -265,12 +266,12 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             vectors[1][1] = -0.8080000281333923f;
             vectors[1][2] = 0.10000000149011612f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
         }
-        if (object->kind == 0xD5C) {
+        if (object->kind == 0xD5C /* Train with Rail */) {
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
             vectors[0][0] = -3.677999973297119f;
@@ -281,12 +282,12 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             vectors[1][1] = -0.8080000281333923f;
             vectors[1][2] = 0.10000000149011612f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
         }
-        if (object->kind == 0x127D) {
+        if (object->kind == 0x127D /* moby class 4733 */) {
             int k;
             float (*walker)[4];
             *(TI128 *)vectors[0] = 0;
@@ -299,9 +300,9 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             vectors[1][1] = -0.699999988079071f;
             vectors[1][2] = -0.16099999845027924f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             scaled = &vectors[2];
             walker = scaled;
@@ -309,12 +310,12 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             destination = data->secondary;
             for (; k < 2; k++) {
                 qcopy(vectors[k + 2], data->primary[k]);
-                func_00282D30(destination, walker, data->scale);
+                FastVecScale(destination, walker, data->scale);
                 walker++;
                 destination++;
             }
         }
-        if (object->kind == 0x128B) {
+        if (object->kind == 0x128B /* moby class 4747 */) {
             int k;
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
@@ -326,9 +327,9 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             vectors[1][1] = -0.8429999947547913f;
             vectors[1][2] = -0.30300000309944153f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
                 TI128 copy0 = *(TI128 *)D_L02_001AEF10[0];
@@ -339,12 +340,12 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             source = &vectors[2];
             destination = data->secondary;
             for (k = 1; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
         }
-        if (object->kind == 0x1290) {
+        if (object->kind == 0x1290 /* moby class 4752 */) {
             int k;
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
@@ -360,11 +361,11 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             vectors[2][0] = -1.3760000467300415f;
             vectors[2][2] = 0.20800000429153442f;
             vectors[2][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
-            func_00282D30(vectors[2], vectors[2], data->scale);
+            FastVecScale(vectors[2], vectors[2], data->scale);
             qcopy(data->primary[2], vectors[2]);
             scaled = &vectors[3];
             source = scaled;
@@ -372,12 +373,12 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             destination = data->secondary;
             for (; k < 3; k++) {
                 qcopy(vectors[k + 3], data->primary[k]);
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 source++;
                 destination++;
             }
         }
-        if (object->kind == 0x1340) {
+        if (object->kind == 0x1340 /* moby class 4928 */) {
             int k;
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
@@ -389,9 +390,9 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             vectors[1][1] = -2.131999969482422f;
             vectors[1][2] = -0.3190000057220459f;
             vectors[1][3] = 1.0f;
-            func_00282D30(vectors[0], vectors[0], data->scale);
+            FastVecScale(vectors[0], vectors[0], data->scale);
             qcopy(data->primary[0], vectors[0]);
-            func_00282D30(vectors[1], vectors[1], data->scale);
+            FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
             {
                 TI128 copy0 = *(TI128 *)D_L02_001AEF30[0];
@@ -402,13 +403,13 @@ void func_L02_0038BD00(struct Object *owner, int group) {
             source = &vectors[2];
             destination = data->secondary;
             for (k = 1; k >= 0; k--) {
-                func_00282D30(destination, source, data->scale);
+                FastVecScale(destination, source, data->scale);
                 destination++;
                 source++;
             }
         }
         object->state = 1;
-        if (D_001A79F0 != 3)
+        if (gCurrentMapIndex != 3)
             object->flags32 = 0xBE;
         index--;
     } while ((short)*cursor++ >= 0);

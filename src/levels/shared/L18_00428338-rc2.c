@@ -27,16 +27,17 @@ extern void ref_L18_00428338_00(s8 *, s32, s8 *);
 extern s32 ref_L18_00428338_01(s8 *, s8 *, s8 *, s32, s32, s32, s32, f32, f32);
 extern f32 ref_L18_00428338_02 __attribute__((sda));
 
-s32 func_L18_00428338(s8 *arg0) {
-    s8 b0[0x10];
-    s8 b1[0x10];
-    s8 *s2;
+/* Lets the enemy aim at a target using two attachment points while in one state. Returns 0 in other states. */
+s32 func_L18_00428338(s8 *moby) {
+    s8 attachPointA[0x10];
+    s8 attachPointB[0x10];
+    s8 *vars;
 
-    s2 = *(s8 **)(arg0 + 0x68);
-    if (*(u8 *)(arg0 + 0x42) == 0xA) {
-        ref_L18_00428338_00(arg0, 2, b0);
-        ref_L18_00428338_00(arg0, 3, b1);
-        return ref_L18_00428338_01(arg0, b0, b1, (*(u8 *)(arg0 + 0xBC) ^ 1) == 0 ? 0x4010000 : 0x4000001, 2, 3, 0, (f32) *(u8 *)(s2 + 0x34), ref_L18_00428338_02);
+    vars = *(s8 **)(moby + 0x68);
+    if (*(u8 *)(moby + 0x42) == 0xA) {
+        ref_L18_00428338_00(moby, 2, attachPointA);
+        ref_L18_00428338_00(moby, 3, attachPointB);
+        return ref_L18_00428338_01(moby, attachPointA, attachPointB, (*(u8 *)(moby + 0xBC) ^ 1) == 0 ? 0x4010000 : 0x4000001, 2, 3, 0, (f32) *(u8 *)(vars + 0x34), ref_L18_00428338_02);
     }
     return 0;
 }

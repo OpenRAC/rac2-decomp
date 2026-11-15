@@ -1,4 +1,5 @@
 #include "ps2_hw.h"
+#include "names.h"
 #include "include_asm.h"
 
 extern void *func_00115484(void *, int, int);
@@ -26,15 +27,15 @@ extern void func_002883E8(int a);
 void func_00278EB0(void);
 
 /* loops 56 times calling a two-argument helper and, unless the current index is zero, a second one-argument helper with that index. */
-void func_00290A40(char *a0)
+void func_00290A40(char *query)
 {
     int i;
 
     for (i = 0; i < 56; i++) {
-        if (func_002886C8(i, a0) == 0)
+        if (IsHelpIdValueInMappingRange(i, query) == 0)
             continue;
         if (i != 0)
-            func_002883E8(i);
+            StoreHelpIdInSlotList(i);
     }
 }
 
@@ -44,6 +45,7 @@ extern int func_0011AFE0(Request_290AB0 *, int);
 extern int func_0011AFC0(int);
 extern int func_0011ED08(int, int, int);
 
+/* Sends a block of memory to the IOP with a DMA request and waits until it is done. Returns 1 on success, 0 on failure. */
 int func_00290AB0(int source, int destination, int length)
 {
     Request_290AB0 request;
@@ -53,21 +55,22 @@ int func_00290AB0(int source, int destination, int length)
     request.destination = destination;
     request.length = length;
     request.flags = 0;
-    handle = func_0011AFE0(&request, 1);
+    handle = sceSifSetDma(&request, 1);
     if (handle) {
-        while (func_0011AFC0(handle) >= 0) {}
-        if (func_0011ED08(length, 0, 0) < 0)
+        while (sceSifDmaStat(handle) >= 0) {}
+        if (LoadModuleBufferNoResult(length, 0, 0) < 0)
             result = 0;
     }
     return result;
 }
 
+/* Works out where each big memory area starts and stores the addresses in one table. */
 void func_00290B48(void)
 {
     int *state = (int *)D_001BAEC0;
     unsigned int start, size;
 
-    func_00115484(state, 0, 0x9C);
+    memset(state, 0, 0x9C);
     state[0] = 0;
     state[1] = 0x100000;
     start = ((unsigned int)ref_L00_00290B48_00 + 0x3FFF) & ~0x3FFF;
@@ -177,64 +180,64 @@ void func_00290C60(void)
     int mode;
 
     func_00124418();
-    func_00126F60(1);
-    D_001A7BB8[0] = 0;
+    ResetDma(1);
+    gWidescreenFlag[0] = 0;
     D_001A7BB0[1] = 0;
-    func_00284000();
+    UpdateDisplayModeFromScreenType();
     func_0029D050();
-    func_0027B440(1);
-    func_0011AE70(3);
-    func_00126DC0(func_001339B0);
-    func_002FC138();
-    func_00290B48();
-    func_002FC138();
-    func_002FC1D8();
-    func_002FCD18();
-    func_0027B858();
-    func_00124E08(0);
-    func_001250E8(0);
-    while (!func_0011EED8(D_001A9048)) {
+    SetPalMode(1);
+    EnableCache(3);
+    func_00126DC0(UpdateVsyncTimerCounters);
+    SelectPacketBufferSetup();
+    InitMemSlots();
+    SelectPacketBufferSetup();
+    ResetPacketBuffer();
+    InstallDmaHandlers();
+    WriteClearColorPackets();
+    InitCdSystem(0);
+    sce_cd_disk_ready(0);
+    while (!RebootIop(D_001A9048)) {
     }
-    while (!func_0011EEA0()) {
+    while (!IsIopResetDone()) {
     }
-    func_0026FEB8(D_001A9060);
-    func_0011CF78(0);
-    func_0011F5E0();
+    STUB_printf(D_001A9060);
+    InitSifRpc(0);
+    DIntr();
     func_0011E7A0();
     func_0011F628();
-    func_0011EAC8();
-    func_00124E08(0);
-    func_001250E8(0);
-    func_001252E0(2);
-    func_0011E0A0();
-    func_00133A28(1000, 1, buffer);
-    func_0011AEA0(0);
-    D_001A7B90 = 0;
-    func_00298BB8(buffer);
-    func_002FC070(D_0010E9E0);
-    func_00133A78(D_02000000 - 0xFE8C);
+    ResetLoadFileState();
+    InitCdSystem(0);
+    sce_cd_disk_ready(0);
+    SetCdMediaMode(2);
+    ResetFileIoState();
+    StartLoadRequest(1000, 1, buffer);
+    FlushCache(0);
+    gIsPalVideo = 0;
+    BuildSaveFileNames(buffer);
+    StartDmaChannel0AndWait(D_0010E9E0);
+    LoadDefaultCopySetup(D_02000000 - 0xFE8C);
     image = (char *)((((unsigned int)ref_L00_00290B48_00 + 0x3FFF) & ~0x3FFF) + 0x2C0000);
-    scratch = D_02000000 - 0x8000 - (D_0014B540.count << 11);
-    func_00133A28(D_0014B540.offset + D_0014B540.base, D_0014B540.count, scratch);
-    func_0011AEA0(0);
-    func_0029D4D0(scratch, image);
-    func_0011AEA0(0);
-    handle = func_0011E828(1, 0x55730, 0);
-    func_00290AB0(*(int *)(image + 0x50) + (int)image, *(int *)(image + 0x54), handle);
-    func_00290AB0(*(int *)(image + 0x48) + (int)image, *(int *)(image + 0x4C), handle);
-    func_00290AB0(*(int *)(image + 0x18) + (int)image, *(int *)(image + 0x1C), handle);
-    func_00290AB0(*(int *)(image + 0x20) + (int)image, *(int *)(image + 0x24), handle);
-    func_00290AB0(*(int *)(image + 0x28) + (int)image, *(int *)(image + 0x2C), handle);
-    func_00290AB0(*(int *)(image + 0x30) + (int)image, *(int *)(image + 0x34), handle);
-    func_00290AB0(*(int *)(image + 0x38) + (int)image, *(int *)(image + 0x3C), handle);
-    func_00290AB0(*(int *)(image + 0x40) + (int)image, *(int *)(image + 0x44), handle);
-    func_00290AB0(*(int *)(image + 0x40) + (int)image, *(int *)(image + 0x44), handle);
-    func_00290AB0(*(int *)(image + 0x58) + (int)image, *(int *)(image + 0x5C), handle);
-    func_0011E8A8(handle);
-    func_0026FEB8(D_001A9070);
-    func_002EEBC8();
-    func_001250E8(0);
-    func_002B8548();
+    scratch = D_02000000 - 0x8000 - (gCopySetupData.count << 11);
+    StartLoadRequest(gCopySetupData.offset + gCopySetupData.base, gCopySetupData.count, scratch);
+    FlushCache(0);
+    fast_decompress(scratch, image);
+    FlushCache(0);
+    handle = SendRemoteCommand3(1, 0x55730, 0);
+    SendBlockToIop(*(int *)(image + 0x50) + (int)image, *(int *)(image + 0x54), handle);
+    SendBlockToIop(*(int *)(image + 0x48) + (int)image, *(int *)(image + 0x4C), handle);
+    SendBlockToIop(*(int *)(image + 0x18) + (int)image, *(int *)(image + 0x1C), handle);
+    SendBlockToIop(*(int *)(image + 0x20) + (int)image, *(int *)(image + 0x24), handle);
+    SendBlockToIop(*(int *)(image + 0x28) + (int)image, *(int *)(image + 0x2C), handle);
+    SendBlockToIop(*(int *)(image + 0x30) + (int)image, *(int *)(image + 0x34), handle);
+    SendBlockToIop(*(int *)(image + 0x38) + (int)image, *(int *)(image + 0x3C), handle);
+    SendBlockToIop(*(int *)(image + 0x40) + (int)image, *(int *)(image + 0x44), handle);
+    SendBlockToIop(*(int *)(image + 0x40) + (int)image, *(int *)(image + 0x44), handle);
+    SendBlockToIop(*(int *)(image + 0x58) + (int)image, *(int *)(image + 0x5C), handle);
+    SendRemoteCommand1(handle);
+    STUB_printf(D_001A9070);
+    InitRemoteBufferServer();
+    sce_cd_disk_ready(0);
+    InitPadPorts();
     state = (int *)D_001BAEC0;
     D_001A7290[0] = -1;
     D_001A7290[12] = -1;
@@ -246,17 +249,17 @@ void func_00290C60(void)
     D_001A7290[31] = 0x1D0000;
     D_001A7290[32] = 0x1E0000;
     D_001A7290[1] = state[0x78 / 4];
-    D_00152C00[12] = -1;
-    D_00152C00[6] = -1;
-    func_001250E8(0);
-    func_0029AE48();
-    func_0027A9F0();
-    func_0027AB40();
-    func_002FC1D8();
-    func_001250E8(0);
-    func_002E48E8();
-    func_002B68C8();
-    func_002940C0();
+    gHeroMoby_00152C00[12] = -1;
+    gHeroMoby_00152C00[6] = -1;
+    sce_cd_disk_ready(0);
+    ShowMemoryCardMessageOnProblem();
+    InitViewContext();
+    UpdateViewContext();
+    ResetPacketBuffer();
+    sce_cd_disk_ready(0);
+    ResetSoundState();
+    InitFileLoadSystem();
+    ClearClassCacheTable();
     mode = func_00131628();
     switch (mode) {
     case 1:
@@ -267,27 +270,29 @@ void func_00290C60(void)
         D_001A7BB0[1] = 0;
         break;
     }
-    func_00282A60(D_001BB000, 0x80808080, 0x100);
+    ClearMemory(D_001BB000, 0x80808080, 0x100);
     func_00126288(buffer, 0x3FFB, 1, 0, 0, 0, 8, 8);
-    func_0011AEA0(0);
-    func_001265B0(buffer, D_001BB000);
-    func_001244B8(0, 0);
-    func_0026FE48();
+    FlushCache(0);
+    ExecGsLoadImage(buffer, D_001BB000);
+    WaitGsPathsIdle(0, 0);
+    LoadPifTextureFromDiscTable();
     T1_MODE = 0x82;
     T1_COUNT = 0;
-    func_002889B8(D_001BAD40);
+    ResetRequestQueue(D_001BAD40);
 }
 
+/* Calls func_00278EB0, which fills the lighting data block. */
 void func_00291108(void)
 {
-  func_00278EB0();
+  InitSceneCameraState();
   return;
 }
 
 extern void func_00278F80(void);
 
+/* Calls func_00278F80. */
 void func_00291128(void) {
-    func_00278F80();
+    RestoreGraphicsDrawPosition();
 }
 
 
@@ -296,6 +301,7 @@ void func_00291128(void) {
 /* func_00291268 is in 00290A40-g8.c. */
 
 
+/* Does nothing. */
 void func_002912F0(void)
 {
 }
@@ -326,6 +332,7 @@ extern char D_001C2B40[];
 extern char D_001C2C40[];
 extern void func_00282A88(void *, int);
 
+/* Adds a point light with the given position, range, radius and color. Returns its slot number, or -1 if all 8 slots are used. */
 int func_00291308(float *position, float range, float radius, int color)
 {
     LightDef *def;
@@ -344,11 +351,11 @@ int func_00291308(float *position, float range, float radius, int color)
     slot = (LightSlot *)(D_001C2C40 + i * 0x30);
     qcopy(def->position, position);
     def->range = range;
-    def->color[0] = func_00283CE0(color & 0xFF) * 0.0078125f;
-    def->color[1] = func_00283CE0((color >> 8) & 0xFF) * 0.0078125f;
-    def->color[2] = func_00283CE0((color >> 16) & 0xFF) * 0.0078125f;
+    def->color[0] = IntToFloat(color & 0xFF) * 0.0078125f;
+    def->color[1] = IntToFloat((color >> 8) & 0xFF) * 0.0078125f;
+    def->color[2] = IntToFloat((color >> 16) & 0xFF) * 0.0078125f;
     def->radius = radius;
-    func_00282A88(slot, 0x30);
+    FastMemoryHelperB(slot, 0x30);
     slot->active = 1;
     slot->buffer = D_001C2DC0 + (i << 10);
     return i;
@@ -360,16 +367,18 @@ extern void func_00282A88(void *, int);
 extern char D_001C2B40[];
 extern char D_001C2C40[];
 
+/* Frees a point light slot and clears its data. */
 void func_00291450(int index) {
     if ((unsigned int)index >= 8)
         return;
-    func_00291788(index);
-    func_00282A88((void *)(D_001C2B40 + (index << 5)), 0x20);
-    func_00282A88((void *)(D_001C2C40 + index * 0x30), 0x30);
+    FlushLightPartIndices(index);
+    FastMemoryHelperB((void *)(D_001C2B40 + (index << 5)), 0x20);
+    FastMemoryHelperB((void *)(D_001C2C40 + index * 0x30), 0x30);
 }
 
 /* func_002914B8 is in 00290A40-g16.c. */
 
+/* Splits the light's data into its three sections and records where each one starts and how long it is. */
 void func_00291640(int index)
 {
     unsigned char *record = ref_L00_00291640_01 + index * 0x30;
@@ -386,7 +395,7 @@ void func_00291640(int index)
         *(short *)(record + 2) = (position - *(unsigned short **)(record + 0xC));
         if (position < end) {
             *(short *)(record + 4) = (position - *(unsigned short **)(record + 0xC));
-            position = func_002E31E8(position, end, index, scratch);
+            position = TransformVectorsVu0(position, end, index, scratch);
             *(short *)(record + 6) = (position - *(unsigned short **)(record + 0xC)) - *(unsigned short *)(record + 4);
             if (position < end) {
                 *(short *)(record + 8) = (position - *(unsigned short **)(record + 0xC));

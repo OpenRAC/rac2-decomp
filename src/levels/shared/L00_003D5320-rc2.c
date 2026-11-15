@@ -25,15 +25,16 @@
 
 extern s32 ref_L00_003D5320_00[];
 
+/* Sets a small table of four words back to zero. */
 void func_L00_003D5320(void) {
-    s32 *var_v0;
-    s32 var_v1;
+    s32 *cursor;
+    s32 remaining;
 
-    var_v1 = 3;
-    var_v0 = (s32 *)ref_L00_003D5320_00;
+    remaining = 3;
+    cursor = (s32 *)ref_L00_003D5320_00;
     do {
-        *var_v0 = 0;
-        var_v1 -= 1;
-        var_v0 -= 1;
-    } while (var_v1 >= 0);
+        *cursor = 0;
+        remaining -= 1;
+        cursor -= 1;
+    } while (remaining >= 0);
 }

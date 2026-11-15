@@ -48,110 +48,111 @@ extern char D_L03_001B0B00_GP[] SDATA(D_L03_001B0B00);
 extern char D_L03_001A8F20[] __attribute__((sda));
 extern int D_L03_001B0B40 __attribute__((sda));
 
+/* Updates a floating object that sways in the air, drifts toward something that touches it, then flies off, plays an effect and disappears. */
 void func_L03_003E1C88(char *obj)
 {
-    float v[4] __attribute__((aligned(16)));
+    float tmpVec[4] __attribute__((aligned(16)));
     float angles[4] __attribute__((aligned(16)));
-    char mat[0x30] __attribute__((aligned(16)));
+    char matrix[0x30] __attribute__((aligned(16)));
     char *vars = *(char **)(obj + 0x68);
-    float a;
-    int n;
+    float angle;
+    int stateId;
 
-    n = *(u8 *)(obj + 0x20);
-    switch (n) {
+    stateId = *(u8 *)(obj + 0x20);
+    switch (stateId) {
     case 0:
         qcopy(vars, obj + 0x10);
         *(int *)(obj + 0x48) = 0;
         obj[0x42] = 0;
         *(int *)(obj + 0x44) = 0;
         obj[0x43] = 1;
-        *(float *)(vars + 0x10) = func_002A7940();
-        *(float *)(vars + 0x14) = func_002A7940();
+        *(float *)(vars + 0x10) = RandomAngle();
+        *(float *)(vars + 0x14) = RandomAngle();
         *(float *)(vars + 0x18) =
-            func_002A78D8(D_L03_001B0AE0, D_L03_001B0AE0_1[1]) * 0.0002908882452175021f;
+            RandomSignedFloatRange(D_L03_001B0AE0, D_L03_001B0AE0_1[1]) * 0.0002908882452175021f;
         *(float *)(vars + 0x1C) =
-            func_002A78D8(D_L03_001B0AE8, D_L03_001B0AE8_1[1]) * 0.0002908882452175021f;
+            RandomSignedFloatRange(D_L03_001B0AE8, D_L03_001B0AE8_1[1]) * 0.0002908882452175021f;
         *(float *)(vars + 0x3C) = 0.10471977f;
         *(float *)(vars + 0x38) = 0.0017453294713050127f;
-        func_002A7750(obj, 1, -1);
+        SetMobyState(obj, 1, -1);
         break;
 
     case 1:
         if (!*(u8 *)(obj + 0x31))
             break;
-        *(float *)(vars + 0x10) = func_00283B98(*(float *)(vars + 0x10), *(float *)(vars + 0x18));
-        *(float *)(vars + 0x14) = func_00283B98(*(float *)(vars + 0x14), *(float *)(vars + 0x1C));
-        *(float *)(obj + 0xF0) = D_L03_001B0AF0 * func_00283198(*(float *)(vars + 0x10));
-        *(float *)(obj + 0xF4) = D_L03_001B0AF4 * func_00283198(*(float *)(vars + 0x14));
+        *(float *)(vars + 0x10) = FastAddRotations(*(float *)(vars + 0x10), *(float *)(vars + 0x18));
+        *(float *)(vars + 0x14) = FastAddRotations(*(float *)(vars + 0x14), *(float *)(vars + 0x1C));
+        *(float *)(obj + 0xF0) = D_L03_001B0AF0 * FastSinOrCosB(*(float *)(vars + 0x10));
+        *(float *)(obj + 0xF4) = D_L03_001B0AF4 * FastSinOrCosB(*(float *)(vars + 0x14));
         *(Quad *)angles = 0;
         angles[0] = *(float *)(vars + 0x10);
         angles[2] = *(float *)(vars + 0x14);
-        *(Quad *)v = *(Quad *)angles;
-        func_002833F0(mat, v);
-        func_00282D30(obj + 0x10, mat + 0x10, D_L03_001B0AF8);
-        func_00282CC0(obj + 0x10, obj + 0x10, vars);
+        *(Quad *)tmpVec = *(Quad *)angles;
+        euler_rotation_basis(matrix, tmpVec);
+        FastVecScale(obj + 0x10, matrix + 0x10, D_L03_001B0AF8);
+        FastVecAdd(obj + 0x10, obj + 0x10, vars);
         if (!*(int *)(vars + 0x30)) {
-            char *p = func_002A9640(obj, 0x4010000, 0);
-            if (p) {
-                qcopy(vars + 0x20, p + 0x10);
-                func_002A7750(obj, 2, -1);
+            char *hit = FindOwnedEffectSlot(obj, 0x4010000, 0);
+            if (hit) {
+                qcopy(vars + 0x20, hit + 0x10);
+                SetMobyState(obj, 2, -1);
             }
         }
-        if (func_L02_002F21C0(obj + 0x10, D_00189EA0) < 200.0f) {
-            char *hero = D_00189EA0 - 0x80;
-            a = func_00283B98(func_00283248(*(float *)(hero + 0x80) - *(float *)(obj + 0x10),
+        if (DistanceSquaredXY(obj + 0x10, gHeroPosition) < 200.0f) {
+            char *hero = gHeroPosition - 0x80;
+            angle = FastAddRotations(FastMatrixHelperA(*(float *)(hero + 0x80) - *(float *)(obj + 0x10),
                                             *(float *)(hero + 0x84) - *(float *)(obj + 0x14)),
                               1.5707964f);
-            func_002AAA00(obj + 0xF8, vars + 0x34, 0, a, *(float *)(vars + 0x38),
+            ApproachTargetWithDirectionMode(obj + 0xF8, vars + 0x34, 0, angle, *(float *)(vars + 0x38),
                           *(float *)(vars + 0x38), *(float *)(vars + 0x3C));
-            a = func_00283248(func_00282E80(D_00189EA0, obj + 0x10),
+            angle = FastMatrixHelperA(vec_distance_xy(gHeroPosition, obj + 0x10),
                               *(float *)(obj + 0x18) - *(float *)(hero + 0x88)) * 0.63661975f;
-            if (a > 1.0f)
-                a = 1.0f;
-            else if (a < 0.0f)
-                a = 0.0f;
-            *(float *)(obj + 0x44) = 1.0f - a;
-            func_0029F390(obj);
+            if (angle > 1.0f)
+                angle = 1.0f;
+            else if (angle < 0.0f)
+                angle = 0.0f;
+            *(float *)(obj + 0x44) = 1.0f - angle;
+            update_moby_animation_state(obj);
         }
         break;
 
     case 2:
-        if (func_002B3868(obj)) {
-            *(unsigned short *)(obj + 0x96) = func_002A7820(20, 30);
+        if (SetFirstPendingFlag(obj)) {
+            *(unsigned short *)(obj + 0x96) = RandomIntRange(20, 30);
             *(float *)(obj + 0xF0) *= 4.0f;
             *(float *)(obj + 0xF4) *= 4.0f;
-            func_00282F20(vars + 0x20, vars + 0x20, 1.0f / 6.0f);
+            vec_scale_to_length(vars + 0x20, vars + 0x20, 1.0f / 6.0f);
         }
-        *(Quad *)v = 0;
-        v[2] = 1.0f / 15.0f;
-        if (!func_002A77E0(2))
-            func_L01_002E1680(obj + 0x10, v, 1, 0x40202020, 1, 0.0066666672937572f, 0.9f, 1.02f);
-        *(float *)(obj + 0xF8) = func_00283B98(*(float *)(obj + 0xF8), 0.20943954586982727f);
-        func_00282CC0(obj + 0x10, obj + 0x10, vars + 0x20);
+        *(Quad *)tmpVec = 0;
+        tmpVec[2] = 1.0f / 15.0f;
+        if (!RandomIntBelow(2))
+            SpawnSparkBurst_L01(obj + 0x10, tmpVec, 1, 0x40202020, 1, 0.0066666672937572f, 0.9f, 1.02f);
+        *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 0.20943954586982727f);
+        FastVecAdd(obj + 0x10, obj + 0x10, vars + 0x20);
         {
             int timer = *(unsigned short *)(obj + 0x96);
 
-            n = timer - 1;
-            *(unsigned short *)(obj + 0x96) = n;
+            stateId = timer - 1;
+            *(unsigned short *)(obj + 0x96) = stateId;
             if (!timer)
-                func_002A7750(obj, 3, -1);
+                SetMobyState(obj, 3, -1);
         }
         break;
 
     case 3: {
-        char *p;
+        char *effect;
 
-        func_002E5CF8(0, 0, obj);
-        p = func_L00_00326620(obj, 0x113D, *(u8 *)(obj + 0x30));
-        if (p) {
-            func_L00_0032A258(p, D_L03_001B0B10_GP, D_L03_001B0B08_GP, D_L03_001B0B00_GP, 65535, 1,
+        PlayMobySound(0, 0, obj);
+        effect = SpawnChildMoby_L00(obj, 0x113D, *(u8 *)(obj + 0x30));
+        if (effect) {
+            ExplodeObjectIntoPieces(effect, D_L03_001B0B10_GP, D_L03_001B0B08_GP, D_L03_001B0B00_GP, 65535, 1,
                               D_L03_001B0B40, 6, 65535, 255, 0);
-            func_0029F338(p);
+            MarkMobySpawned(effect);
         }
-        func_L00_00324F18(obj, v, D_L03_001B0B30, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
-        func_002ABBB8(obj, D_L03_001A8F20, v, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
+        LocalOffsetToWorld(obj, tmpVec, D_L03_001B0B30, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
+        SpawnExplosionEffects(obj, D_L03_001A8F20, tmpVec, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
                       *(float *)(obj + 0x2C) * 30.0f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
-        func_0029F338(obj);
+        MarkMobySpawned(obj);
         break;
     }
     }

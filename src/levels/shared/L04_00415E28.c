@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     char pad[0x138];
     int f138;
@@ -10,11 +11,12 @@ typedef struct {
 extern Ent D_L04_00254E10[];
 extern void func_0030C948(Ent *a0, int a1, int a2, int a3, int a4, int a5);
 
+/* Goes through all 140 table entries and starts the effect call for each entry that is active. */
 void func_L04_00415E28(void)
 {
     int i;
     for (i = 0; i < 140; i++) {
-        Ent *e = &D_L04_00254E10[i];
+        Ent *e = &gRacerTrailPool[i];
         if (e->f144 != 0 && e->f138 >= 2)
             func_0030C948(e, 0x43, 0x44, 0x45, e->f138, e->f140);
     }

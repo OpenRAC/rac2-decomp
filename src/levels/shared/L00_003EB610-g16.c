@@ -25,9 +25,9 @@ char *func_L00_003EB610(char *owner, Quad *position)
     int i, j;
     i = 0;
     do {
-        char *m = D_L00_001B0798[i];
-        if (m == 0 || *(short *)(m + 0xAA) != 0xCB2 || (unsigned char)m[0x20] == 0xFE
-            || (unsigned char)m[0x20] == 0xFD) {
+        char *slotMoby = gSynthenoidSlots[i];
+        if (slotMoby == 0 || *(short *)(slotMoby + 0xAA) != 0xCB2 /* Synthenoid */ || (unsigned char)slotMoby[0x20] == 0xFE
+            || (unsigned char)slotMoby[0x20] == 0xFD) {
             slot = i;
             break;
         }
@@ -35,9 +35,9 @@ char *func_L00_003EB610(char *owner, Quad *position)
     } while (i < 4);
     if (slot < 0)
         return 0;
-    if (func_L00_002D3F30(0x1F, 1) == 0)
+    if (SpendWeaponAmmo(0x1F, 1) == 0)
         return 0;
-    moby = func_0029EFD0(0xCB2);
+    moby = CreateMoby(0xCB2 /* Synthenoid */);
     if (moby != 0) {
         state = *(char **)(moby + 0x68);
         *(char **)(state + 0x34) = owner;
@@ -45,7 +45,7 @@ char *func_L00_003EB610(char *owner, Quad *position)
         *(short *)(moby + 0x32) = 0x7F;
         moby[0x31] = 1;
         *(long long *)(moby + 0x38) = *(long long *)(owner + 0x38);
-        src = D_0018C0B0 + 0xC0;
+        src = gHeroMoby_0018C0B0 + 0xC0;
         dst = moby + 0xC0; /* the moby's 3x4 rotation matrix takes the hero's */
         for (j = 0; j < 3; j++) {
             qcopy(dst + j * 16, src);
@@ -57,9 +57,9 @@ char *func_L00_003EB610(char *owner, Quad *position)
         *(float *)(moby + 0x2C) *= 0.1f;
         *(int *)(state + 0x38) = -1;
         *(int *)(state + 0x3C) = 0;
-        *(int *)(state + 0x40) = ((ClassEntry *)((unsigned int)D_L00_00262570
-                                   + D_00139568[0x1F] * sizeof(ClassEntry)))->value;
-        D_L00_001B0798[slot] = moby;
+        *(int *)(state + 0x40) = ((ClassEntry *)((unsigned int)gWeaponTable_L00
+                                   + gItemSlotToRecord[0x1F] * sizeof(ClassEntry)))->value;
+        gSynthenoidSlots[slot] = moby;
         *(int *)(state + 0x38) = slot;
         moby[0x20] = 0;
     }

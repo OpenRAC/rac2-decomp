@@ -11,13 +11,13 @@ extern char *D_0018C0B0;
    level's current object is excluded (its +0xAA id is 0xFB0, or it is the object at
    D_0018C0B0), copy the resident vector there and answer 1. */
 
-int func_003286D0(char *self, void *a1)
+int func_003286D0(char *self, void *previousPos)
 {
-    char *o;
+    char *currentObject;
 
-    if (func_002761F8(a1, self + 0x10, 0, self, 0) != 0) {
-        o = ref_L00_003286D0_00;
-        if (o != 0 && (*(short *)(o + 0xAA) == 0xFB0 || o == D_0018C0B0))
+    if (CollLine(previousPos, self + 0x10, 0, self, 0) != 0) {
+        currentObject = ref_L00_003286D0_00;
+        if (currentObject != 0 && (*(short *)(currentObject + 0xAA) == 0xFB0 /* Thermanator */ || currentObject == gHeroMoby_0018C0B0))
             return 0;
         qcopy(self + 0x10, ref_L00_003286D0_01);
         return 1;

@@ -33,54 +33,55 @@ extern s32 ref_L22_003A4490_03(void *, void *, s32, s32);
 extern s32 ref_L22_003A4490_04 __attribute__((sda));
 
 
-void func_L22_003A4490(void *arg0) {
-    void *obj_a1 ;
+/* Keeps the three parts attached to the ship lined up with it while it is being shown at the end. */
+void func_L22_003A4490(void *obj) {
+    void *part ;
     u8 stack_buffer[0x10];
-    u8 temp_v1;
-    u8 temp_v1_2;
-    u8 temp_v1_3;
-    void *temp_a0;
-    void *temp_s0;
+    u8 state1;
+    u8 state2;
+    u8 state3;
+    void *rotated;
+    void *vars;
 
-    temp_s0 = (*(void **)((s8 *)(arg0) + (0x68)));
-    obj_a1 = (*(void **)((s8 *)(temp_s0) + (0x440)));
-    if ((obj_a1 != NULL) && ((*(s16 *)((s8 *)(obj_a1) + (0xAA))) == 0xE0A)) {
-        temp_v1 = (*(u8 *)((s8 *)(obj_a1) + (0x20)));
-        if (temp_v1 != 0xFE) {
-            if (temp_v1 != 0xFD) {
-                if (((u32)((*(u8 *)((s8 *)(obj_a1) + (0x43))) - 1) < 3U) ||
-                    ((*(s16 *)((s8 *)(temp_s0) + (0x460))) != 0)) {
-                    ref_L22_003A4490_02(arg0, 1, obj_a1 + 0x10);
+    vars = (*(void **)((s8 *)(obj) + (0x68)));
+    part = (*(void **)((s8 *)(vars) + (0x440)));
+    if ((part != NULL) && ((*(s16 *)((s8 *)(part) + (0xAA))) == 0xE0A /* moby class 3594 */)) {
+        state1 = (*(u8 *)((s8 *)(part) + (0x20)));
+        if (state1 != 0xFE) {
+            if (state1 != 0xFD) {
+                if (((u32)((*(u8 *)((s8 *)(part) + (0x43))) - 1) < 3U) ||
+                    ((*(s16 *)((s8 *)(vars) + (0x460))) != 0)) {
+                    ref_L22_003A4490_02(obj, 1, part + 0x10);
                 } else {
-                    ref_L22_003A4490_03(arg0, obj_a1, 1, 0);
+                    ref_L22_003A4490_03(obj, part, 1, 0);
                 }
-                (*(f32 *)((s8 *)((*(void **)((s8 *)(temp_s0) + (0x440)))) + (0x48))) =
-                    (f32)(*(f32 *)((s8 *)(arg0) + (0x48)));
+                (*(f32 *)((s8 *)((*(void **)((s8 *)(vars) + (0x440)))) + (0x48))) =
+                    (f32)(*(f32 *)((s8 *)(obj) + (0x48)));
             }
         }
     }
 
-    obj_a1 = (*(void **)((s8 *)(temp_s0) + (0x444)));
-    if ((obj_a1 != NULL) && ((*(s16 *)((s8 *)(obj_a1) + (0xAA))) == 0xE0C)) {
-        temp_v1_2 = (*(u8 *)((s8 *)(obj_a1) + (0x20)));
-        if (temp_v1_2 != 0xFE) {
-            if (temp_v1_2 != 0xFD) {
-                ref_L22_003A4490_03((*(void **)((s8 *)(temp_s0) + (0x440))), obj_a1, 5, 0);
+    part = (*(void **)((s8 *)(vars) + (0x444)));
+    if ((part != NULL) && ((*(s16 *)((s8 *)(part) + (0xAA))) == 0xE0C /* moby class 3596 */)) {
+        state2 = (*(u8 *)((s8 *)(part) + (0x20)));
+        if (state2 != 0xFE) {
+            if (state2 != 0xFD) {
+                ref_L22_003A4490_03((*(void **)((s8 *)(vars) + (0x440))), part, 5, 0);
             }
         }
     }
 
-    obj_a1 = (*(void **)((s8 *)(temp_s0) + (0x448)));
-    if ((obj_a1 != NULL) && ((*(s16 *)((s8 *)(obj_a1) + (0xAA))) == 0xF8F)) {
-        temp_v1_3 = (*(u8 *)((s8 *)(obj_a1) + (0x20)));
-        if (temp_v1_3 != 0xFE) {
-            if (temp_v1_3 != 0xFD) {
-                if (((*(u16 *)((s8 *)(arg0) + (0x34))) ^ 1) & 1) {
-                    ref_L22_003A4490_03((*(void **)((s8 *)(temp_s0) + (0x440))), obj_a1, 5, 0);
+    part = (*(void **)((s8 *)(vars) + (0x448)));
+    if ((part != NULL) && ((*(s16 *)((s8 *)(part) + (0xAA))) == 0xF8F /* moby class 3983 */)) {
+        state3 = (*(u8 *)((s8 *)(part) + (0x20)));
+        if (state3 != 0xFE) {
+            if (state3 != 0xFD) {
+                if (((*(u16 *)((s8 *)(obj) + (0x34))) ^ 1) & 1) {
+                    ref_L22_003A4490_03((*(void **)((s8 *)(vars) + (0x440))), part, 5, 0);
                     ref_L22_003A4490_01(stack_buffer, &ref_L22_003A4490_04,
-                                  (*(void **)((s8 *)(temp_s0) + (0x448))) + 0xC0);
-                    temp_a0 = (*(void **)((s8 *)(temp_s0) + (0x448))) + 0x10;
-                    ref_L22_003A4490_00(temp_a0, temp_a0, stack_buffer);
+                                  (*(void **)((s8 *)(vars) + (0x448))) + 0xC0);
+                    rotated = (*(void **)((s8 *)(vars) + (0x448))) + 0x10;
+                    ref_L22_003A4490_00(rotated, rotated, stack_buffer);
                 }
             }
         }

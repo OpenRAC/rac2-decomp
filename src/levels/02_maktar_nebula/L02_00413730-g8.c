@@ -21,14 +21,14 @@ void func_L02_00413730(u8 *object)
     *(TI128 *)(object + 0x10) = *(TI128 *)(state + 0x90);
     *(TI128 *)(object + 0xF0) = *(TI128 *)(state + 0xA0);
     step = 0.00029088825f;
-    *(float *)(state + 0xB8) = func_00283B98(*(float *)(state + 0xB8), D_L02_001B1C74 * step);
-    wave = func_00283198(*(float *)(state + 0xB8));
+    *(float *)(state + 0xB8) = FastAddRotations(*(float *)(state + 0xB8), D_L02_001B1C74 * step);
+    wave = FastSinOrCosB(*(float *)(state + 0xB8));
     next = D_L02_001B1C7C * step;
     *(float *)(object + 0xF0) += D_L02_001B1C78 * wave;
-    *(float *)(state + 0xB4) = func_00283B98(*(float *)(state + 0xB4), next);
-    wave = func_00283198(*(float *)(state + 0xB4));
+    *(float *)(state + 0xB4) = FastAddRotations(*(float *)(state + 0xB4), next);
+    wave = FastSinOrCosB(*(float *)(state + 0xB4));
     next = D_L02_001B1C84 * step;
     *(float *)(object + 0xF4) += D_L02_001B1C80 * wave;
-    *(float *)(state + 0xB0) = func_00283B98(*(float *)(state + 0xB0), next);
-    *(float *)(object + 0x18) += D_L02_001B1C88 * func_00283198(*(float *)(state + 0xB0));
+    *(float *)(state + 0xB0) = FastAddRotations(*(float *)(state + 0xB0), next);
+    *(float *)(object + 0x18) += D_L02_001B1C88 * FastSinOrCosB(*(float *)(state + 0xB0));
 }

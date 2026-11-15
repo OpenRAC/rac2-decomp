@@ -93,25 +93,26 @@ typedef struct EffectWorkspace {
     EffectVector offset, step;
 } EffectWorkspace;
 
+/* Per-frame update of a bouncing weapon shot: it flies, bounces off walls, hurts what it hits and bursts into fragments. */
 void func_L00_003FEEA0(char *self)
 {
-    EffectState *p = *(EffectState **)(self + 0x68);
+    EffectState *shot = *(EffectState **)(self + 0x68);
     EffectWorkspace work;
     int i, result, kind, swept;
     float radius, extra, speed, scale;
     float fadeRadius;
     int remaining;
     void **targets;
-    func_002AFFD8(self + 0x10, work.normal.f, 1);
-    func_00300190(self + 0x10, self + 0x10);
+    ComputeViewDirection(self + 0x10, work.normal.f, 1);
+    TransformVectorOrCopy(self + 0x10, self + 0x10);
     switch ((unsigned char)self[0x20]) {
     case 0:
         qcopy(work.old.f, self + 0x10);
-        func_00282CC0(self + 0x10, self + 0x10, p);
-        func_002FEE70(p->rotation, p, 0);
-        func_002FE880(self + 0x10, p, 0.004055555909872055f);
-        func_00282948(&p->trail);
-        if (p->trail) {
+        FastVecAdd(self + 0x10, self + 0x10, shot);
+        SteerEffectDirection(shot->rotation, shot, 0);
+        AddObjectDirectionScaled(self + 0x10, shot, 0.004055555909872055f);
+        FastFloatHelperD(&shot->trail);
+        if (shot->trail) {
             for (i = 0; i < 3; i++) {
                 int id;
                 EffectParticle *r;
@@ -120,13 +121,13 @@ void func_L00_003FEEA0(char *self)
                 float third = 0.33329999446868896f;
                 float one = 1.0f;
                 *(EffectQuad *)work.tmp.f = *(EffectQuad *)(self + 0x10);
-                func_L00_0031D670(work.params.point.f, work.old.f, work.tmp.f, func_00283CE0(i) * third);
-                id = func_002A77E0(6);
-                if (func_002A77E0(2)) {
+                LerpVector4(work.params.point.f, work.old.f, work.tmp.f, IntToFloat(i) * third);
+                id = RandomIntBelow(6);
+                if (RandomIntBelow(2)) {
                     id = -id;
                 }
-                x = (float)p->trail / func_00283CE0(50) * 65000.0f + 10000.0f;
-                r = func_002BDCE8(work.params.point.f, 0.025f, one, one, id, D_L00_001A8F20, x, 0x80808080, 1);
+                x = (float)shot->trail / IntToFloat(50) * 65000.0f + 10000.0f;
+                r = SpawnSpinningSparkParticle(work.params.point.f, 0.025f, one, one, id, D_L00_001A8F20, x, 0x80808080, 1);
                 if (r) {
                     short life = 50;
                     EffectParticleExtension *extension = (EffectParticleExtension *)(r + 1);
@@ -139,16 +140,16 @@ void func_L00_003FEEA0(char *self)
         }
         __builtin_memcpy(work.params.excluded, D_L00_001B0C48, 8);
         extra = 1.5f;
-        if ((float)p->bounces == 3.0f) {
+        if ((float)shot->bounces == 3.0f) {
             extra = 0.0f;
         }
         radius = D_L00_001B0C30;
-        if (p->charged) {
+        if (shot->charged) {
             radius = D_L00_001B0C3C;
         }
         qcopy(work.query.start.f, work.old.f);
         qcopy(work.query.end.f, self + 0x10);
-        qcopy(work.query.delta.f, p);
+        qcopy(work.query.delta.f, shot);
         work.query.params = work.params.excluded;
         work.query.owner = self;
         work.query.mode = 2;
@@ -158,100 +159,100 @@ void func_L00_003FEEA0(char *self)
         work.query.field48 = 0;
         work.query.field4c = 0;
         work.query.field58 = 0;
-        swept = func_002FE9D0(&work.query);
-        kind = func_00300540(work.query.hit);
+        swept = CollideSweptSphere(&work.query);
+        kind = GetWeaponGroup(work.query.hit);
         if (swept > 0 && (unsigned)(kind - 1) < 2) {
-            func_L00_003FF530(self);
-            func_0029F338(self);
+            SpawnShotFragments(self);
+            MarkMobySpawned(self);
             return;
         }
         qcopy(self + 0x10, work.query.end.f);
-        qcopy(p, work.query.delta.f);
-        func_002ACDE8(self + 0xC0, self + 0xC0, p->axis.f);
-        func_002ACDE8(self + 0xD0, self + 0xD0, p->axis.f);
-        func_002ACDE8(self + 0xE0, self + 0xE0, p->axis.f);
+        qcopy(shot, work.query.delta.f);
+        RotateVectorByQuaternion(self + 0xC0, self + 0xC0, shot->axis.f);
+        RotateVectorByQuaternion(self + 0xD0, self + 0xD0, shot->axis.f);
+        RotateVectorByQuaternion(self + 0xE0, self + 0xE0, shot->axis.f);
         work.hit.owner = self;
         work.hit.flags = 0x830000;
-        { EffectPlayer *pl = &D_L00_00262570[D_0013958D[0]]; work.hit.scale = pl->scale; }
+        { EffectPlayer *pl = &gWeaponTable_L00[D_0013958D[0]]; work.hit.scale = pl->scale; }
         work.hit.enabled = 1;
-        qcopy(work.hit.pos, p);
-        func_00282F20(work.hit.pos, work.hit.pos, 1.0f);
+        qcopy(work.hit.pos, shot);
+        vec_scale_to_length(work.hit.pos, work.hit.pos, 1.0f);
         work.hit.type = 3;
         work.hit.radius = 5627.9248046875f;
         work.hit.classId = *(unsigned short *)(self + 0xAA);
         work.hit.active = 1;
-        result = func_00277F48(self + 0x10, 1, D_0018C0B0[0], &work.hit, radius + 0.1f);
+        result = ProcessCollisionHit(self + 0x10, 1, gHeroMoby_0018C0B0[0], &work.hit, radius + 0.1f);
         if (result) {
-            if (p->charged) {
+            if (shot->charged) {
                 if (result > 0) {
-                    targets = D_L00_001C3280;
+                    targets = gAreaHitTargets;
                     remaining = result;
                     do {
-                        func_0032D758(*targets, 0x4C, *(void **)(self + 0xB8));
+                        StartAttachedEffect(*targets, 0x4C, *(void **)(self + 0xB8));
                         targets++;
                     } while (--remaining);
                 }
             } else {
                 if (result > 0) {
-                    targets = D_L00_001C3280;
+                    targets = gAreaHitTargets;
                     remaining = result;
                     do {
-                        func_0032D758(*targets, 0x25, *(void **)(self + 0xB8));
+                        StartAttachedEffect(*targets, 0x25, *(void **)(self + 0xB8));
                         targets++;
                     } while (--remaining);
                 }
             }
-            func_L00_003FF530(self);
-            func_0029F338(self);
+            SpawnShotFragments(self);
+            MarkMobySpawned(self);
             return;
         }
         if (swept > 0) {
-            qcopy(work.tmp.f, p);
+            qcopy(work.tmp.f, shot);
             work.tmp.f[2] = 0;
-            func_00282DD8(work.tmp.f, work.tmp.f, work.normal.f);
-            func_00282F20(work.tmp.f, work.tmp.f, 1.0f);
-            func_002AB668(p->axis.f, work.tmp.f, func_002A7878(0.05235988646745682f, 0.10471977293491364f));
-            func_002E5CF8(1, 0, self);
-            p->bounces += 1;
-            if (p->bounces >= 4) {
+            FastVecCross(work.tmp.f, work.tmp.f, work.normal.f);
+            vec_scale_to_length(work.tmp.f, work.tmp.f, 1.0f);
+            BuildAxisAngleQuaternion(shot->axis.f, work.tmp.f, RandomFloatRange(0.05235988646745682f, 0.10471977293491364f));
+            PlayMobySound(1, 0, self);
+            shot->bounces += 1;
+            if (shot->bounces >= 4) {
                 qcopy(self + 0x10, D_L00_001BF230);
                 self[0x20] = 1;
-                p->timer = D_L00_001B0C44;
+                shot->timer = D_L00_001B0C44;
                 speed = D_L00_001B0C28 * 0.05235988646745682f;
-                if (p->charged) {
+                if (shot->charged) {
                     speed *= D_L00_001B0C34;
                 }
-                func_L00_003252A8(self, work.offset.f, 1);
-                scale = func_00282DB0(work.offset.f, p);
-                func_00282D30(work.step.f, work.offset.f, scale);
-                func_00282CF0(p, p, work.step.f);
-                func_00282F20(p, p, speed);
-                qcopy(p->axis.f, work.tmp.f);
-                p->axis.f[3] = 0.05235988646745682f;
+                ForwardObjectPositionCall(self, work.offset.f, 1);
+                scale = FastVecDot(work.offset.f, shot);
+                FastVecScale(work.step.f, work.offset.f, scale);
+                FastVecSub(shot, shot, work.step.f);
+                vec_scale_to_length(shot, shot, speed);
+                qcopy(shot->axis.f, work.tmp.f);
+                shot->axis.f[3] = 0.05235988646745682f;
             }
         }
         break;
     case 1:
-        func_00282CC0(self + 0x10, self + 0x10, p);
-        func_002AB668(work.old.f, p->axis.f, p->axis.f[3]);
-        func_002ACDE8(self + 0xC0, self + 0xC0, work.old.f);
-        func_002ACDE8(self + 0xD0, self + 0xD0, work.old.f);
-        func_002ACDE8(self + 0xE0, self + 0xE0, work.old.f);
+        FastVecAdd(self + 0x10, self + 0x10, shot);
+        BuildAxisAngleQuaternion(work.old.f, shot->axis.f, shot->axis.f[3]);
+        RotateVectorByQuaternion(self + 0xC0, self + 0xC0, work.old.f);
+        RotateVectorByQuaternion(self + 0xD0, self + 0xD0, work.old.f);
+        RotateVectorByQuaternion(self + 0xE0, self + 0xE0, work.old.f);
         scale = (D_L00_001B0C40 - 1.0f) + 1.0f;
-        p->axis.f[3] *= scale;
-        func_00282D30(p, p, scale);
-        if (func_00282948(&p->timer)) {
-            func_L00_003FF530(self);
-            func_0029F338(self);
+        shot->axis.f[3] *= scale;
+        FastVecScale(shot, shot, scale);
+        if (FastFloatHelperD(&shot->timer)) {
+            SpawnShotFragments(self);
+            MarkMobySpawned(self);
             return;
         }
         break;
     }
     fadeRadius = D_L00_001B0C28;
-    if (p->charged) {
+    if (shot->charged) {
         fadeRadius *= D_L00_001B0C34;
     }
     if (D_L00_001A8FF0[0] == 0 && D_L00_001A8FF4[0] == 0) {
-        func_002A9288(self, fadeRadius);
+        QueueGroundShadow(self, fadeRadius);
     }
 }

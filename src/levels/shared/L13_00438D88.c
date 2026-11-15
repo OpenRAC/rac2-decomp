@@ -51,6 +51,7 @@ extern void func_002ACEC0(void *, void *, void *, float);
 
 typedef struct { char pad0[0x38]; float sample_distance; } CameraSettings;
 
+/* Moves the camera along its route while following the player, and turns it smoothly to look at the point ahead. */
 void func_L13_00438D88(char *settings) {
     Vector desired;
     Vector eye_offset;
@@ -108,23 +109,23 @@ void func_L13_00438D88(char *settings) {
     path_index = *(int *)(settings + 0x20);
     mode = *(int *)(settings + 0x30);
     if (mode == 0) {
-        cursor_index = D_00189E20.cursor.index;
-        cursor_distance = D_00189E20.cursor.distance;
+        cursor_index = gHeroState.cursor.index;
+        cursor_distance = gHeroState.cursor.distance;
         path_slot = &D_L13_001FE580[path_index];
         run->cursor.distance = cursor_distance;
         run->cursor.index = cursor_index;
-        func_L00_00341820(*path_slot, &desired, &run->cursor.index, &run->cursor.distance, 0, 1.0f);
+        Spline_AdvanceByDistance(*path_slot, &desired, &run->cursor.index, &run->cursor.distance, 0, 1.0f);
         qcopy(&motion->saved, &desired);
         path0 = *path_slot;
-        fraction = cursor_distance / D_00189E20.path->point[cursor_index].f[3];
+        fraction = cursor_distance / gHeroState.path->point[cursor_index].f[3];
         interpolation_distance = path0->point[cursor_index].f[3];
         interpolation_distance *= fraction;
-        func_00282CF0(&tangent, &path0->point[cursor_index + 1], &path0->point[cursor_index]);
-        func_00282F20(&point, &tangent, interpolation_distance);
-        func_00282CC0(&interpolated, &path0->point[cursor_index], &point);
-        *(float *)(camera + 0x30) = func_002702C8((float *)private, *(float *)(camera + 0x30), interpolated.f[0], position_rate, 0.175f, 0.0f);
-        *(float *)(camera + 0x34) = func_002702C8((float *)(private + 4), *(float *)(camera + 0x34), interpolated.f[1], position_rate, 0.175f, 0.0f);
-        *(float *)(camera + 0x38) = func_002702C8((float *)(private + 8), *(float *)(camera + 0x38), interpolated.f[2], position_rate, 0.175f, 0.0f);
+        FastVecSub(&tangent, &path0->point[cursor_index + 1], &path0->point[cursor_index]);
+        vec_scale_to_length(&point, &tangent, interpolation_distance);
+        FastVecAdd(&interpolated, &path0->point[cursor_index], &point);
+        *(float *)(camera + 0x30) = StepSpringDamperClamped((float *)private, *(float *)(camera + 0x30), interpolated.f[0], position_rate, 0.175f, 0.0f);
+        *(float *)(camera + 0x34) = StepSpringDamperClamped((float *)(private + 4), *(float *)(camera + 0x34), interpolated.f[1], position_rate, 0.175f, 0.0f);
+        *(float *)(camera + 0x38) = StepSpringDamperClamped((float *)(private + 8), *(float *)(camera + 0x38), interpolated.f[2], position_rate, 0.175f, 0.0f);
     } else if (mode == 2) {
         CameraPath *path2;
         CameraPath *route;
@@ -135,11 +136,11 @@ void func_L13_00438D88(char *settings) {
         markers = D_L13_001FE580[*(int *)(settings + 0x2C)];
         previous = markers->count - 1;
         for (i = 0; i < markers->count; i++) {
-            begin = func_00283CF0(markers->point[previous].f[3]);
-            end = func_00283CF0(markers->point[i].f[3]);
+            begin = FloatToInt(markers->point[previous].f[3]);
+            end = FloatToInt(markers->point[i].f[3]);
             if (end < begin) {
-                if (D_00189E20.cursor.index >= begin || D_00189E20.cursor.index < end) break;
-            } else if (D_00189E20.cursor.index >= begin && D_00189E20.cursor.index < end) break;
+                if (gHeroState.cursor.index >= begin || gHeroState.cursor.index < end) break;
+            } else if (gHeroState.cursor.index >= begin && gHeroState.cursor.index < end) break;
             previous = i;
         }
         run->marker = i;
@@ -150,17 +151,17 @@ void func_L13_00438D88(char *settings) {
         segment_length = positions->point[i].f[1];
         marker_look_ahead = markers->point[previous].f[0];
         if (marker_look_ahead != 0.0f) look_ahead = marker_look_ahead;
-        start = func_00283CF0(markers->point[previous].f[3]);
-        steps = D_00189E20.cursor.index - start;
+        start = FloatToInt(markers->point[previous].f[3]);
+        steps = gHeroState.cursor.index - start;
         if (steps < 0) steps += route->count;
         for (i = 0; i < steps; i++)
             path_distance += route->point[(start + i) % route->count].f[3];
-        path_distance += D_00189E20.cursor.distance;
+        path_distance += gHeroState.cursor.distance;
         travelled = path_distance / duration;
         target_distance = segment_length * travelled;
-        selection_index = func_00283CF0(positions->point[previous].f[3]);
+        selection_index = FloatToInt(positions->point[previous].f[3]);
         selection_distance = 0.0f;
-        func_L00_00341820(path2, &point, &selection_index, &selection_distance, 1,
+        Spline_AdvanceByDistance(path2, &point, &selection_index, &selection_distance, 1,
                          target_distance);
         path_distance = positions->point[previous].f[0];
         if (path_distance <= 0.0f) path_distance = 0.01f;
@@ -168,70 +169,70 @@ void func_L13_00438D88(char *settings) {
             angular_rate *= path_distance;
             path_distance *= 0.01f;
         }
-        if (func_00282C48(*(float *)(private + 0x10) - path_distance) < 0.00015f)
+        if (FloatAbs(*(float *)(private + 0x10) - path_distance) < 0.00015f)
             *(float *)(private + 0x10) = path_distance;
         else if (*(float *)(private + 0x10) < path_distance)
             *(float *)(private + 0x10) += 0.00015f;
         else
             *(float *)(private + 0x10) -= 0.00015f;
-        *(float *)(camera + 0x30) = func_002702C8((float *)private, *(float *)(camera + 0x30), point.f[0], *(float *)(private + 0x10), 0.175f, 0.0f);
-        *(float *)(camera + 0x34) = func_002702C8((float *)(private + 4), *(float *)(camera + 0x34), point.f[1], *(float *)(private + 0x10), 0.175f, 0.0f);
-        *(float *)(camera + 0x38) = func_002702C8((float *)(private + 8), *(float *)(camera + 0x38), point.f[2], *(float *)(private + 0x10), 0.175f, 0.0f);
+        *(float *)(camera + 0x30) = StepSpringDamperClamped((float *)private, *(float *)(camera + 0x30), point.f[0], *(float *)(private + 0x10), 0.175f, 0.0f);
+        *(float *)(camera + 0x34) = StepSpringDamperClamped((float *)(private + 4), *(float *)(camera + 0x34), point.f[1], *(float *)(private + 0x10), 0.175f, 0.0f);
+        *(float *)(camera + 0x38) = StepSpringDamperClamped((float *)(private + 8), *(float *)(camera + 0x38), point.f[2], *(float *)(private + 0x10), 0.175f, 0.0f);
     } else {
         other_path = D_L13_001FE580[path_index];
         if (*(int *)(settings + 0x24) < 0) {
-            func_L00_00341FA8(other_path, &D_00189E20.position, &sampled, &cursor_index, &cursor_distance, 0, 20.0f, 1.0f, 0.0f);
+            find_nearest_path_point(other_path, &gHeroState.position, &sampled, &cursor_index, &cursor_distance, 0, 20.0f, 1.0f, 0.0f);
             sample_distance = *(short *)(settings + 0x36) == 1 ? -(((CameraSettings *)settings)->sample_distance * 4.0f) : ((CameraSettings *)settings)->sample_distance;
-            func_L00_00341820(other_path, &sampled, &cursor_index, &cursor_distance, 1, sample_distance);
+            Spline_AdvanceByDistance(other_path, &sampled, &cursor_index, &cursor_distance, 1, sample_distance);
             qcopy(&desired, &sampled);
         } else {
-            advance_index = D_00189E20.cursor.index;
-            advance_distance = D_00189E20.cursor.distance;
-            func_L00_00341820(D_00189E20.path, &sampled, &advance_index, &advance_distance, 1, ((CameraSettings *)settings)->sample_distance);
-            func_L00_00341FA8(other_path, &sampled, &desired, &cursor_index, &cursor_distance, 0, 20.0f, 1.0f, 0.0f);
+            advance_index = gHeroState.cursor.index;
+            advance_distance = gHeroState.cursor.distance;
+            Spline_AdvanceByDistance(gHeroState.path, &sampled, &advance_index, &advance_distance, 1, ((CameraSettings *)settings)->sample_distance);
+            find_nearest_path_point(other_path, &sampled, &desired, &cursor_index, &cursor_distance, 0, 20.0f, 1.0f, 0.0f);
         }
-        *(float *)(camera + 0x30) = func_002702C8((float *)private, *(float *)(camera + 0x30), desired.f[0], position_rate, 0.175f, 0.0f);
-        *(float *)(camera + 0x34) = func_002702C8((float *)(private + 4), *(float *)(camera + 0x34), desired.f[1], position_rate, 0.175f, 0.0f);
-        *(float *)(camera + 0x38) = func_002702C8((float *)(private + 8), *(float *)(camera + 0x38), desired.f[2], position_rate, 0.175f, 0.0f);
+        *(float *)(camera + 0x30) = StepSpringDamperClamped((float *)private, *(float *)(camera + 0x30), desired.f[0], position_rate, 0.175f, 0.0f);
+        *(float *)(camera + 0x34) = StepSpringDamperClamped((float *)(private + 4), *(float *)(camera + 0x34), desired.f[1], position_rate, 0.175f, 0.0f);
+        *(float *)(camera + 0x38) = StepSpringDamperClamped((float *)(private + 8), *(float *)(camera + 0x38), desired.f[2], position_rate, 0.175f, 0.0f);
     }
     if (*(int *)(settings + 0x24) < 0) {
         look_path = D_L13_001FE580[*(int *)(settings + 0x20)];
-        func_L00_00341FA8(look_path, &D_00189E20.position, &point, &cursor_index, &cursor_distance, 0, 20.0f, 1.0f, 0.0f);
-        if (D_001A79F0 == 14 && *(int *)(settings + 0x30) == 0)
-            func_L00_00341820(look_path, &tangent, &cursor_index, &cursor_distance, 0, look_ahead);
+        find_nearest_path_point(look_path, &gHeroState.position, &point, &cursor_index, &cursor_distance, 0, 20.0f, 1.0f, 0.0f);
+        if (gCurrentMapIndex == 14 && *(int *)(settings + 0x30) == 0)
+            Spline_AdvanceByDistance(look_path, &tangent, &cursor_index, &cursor_distance, 0, look_ahead);
         else
-            func_L00_00341820(look_path, &tangent, &cursor_index, &cursor_distance, 1, look_ahead);
-        func_00282CF0(&tangent, &tangent, &point);
-        func_00282CC0(&point, &D_00189E20.position, &tangent);
+            Spline_AdvanceByDistance(look_path, &tangent, &cursor_index, &cursor_distance, 1, look_ahead);
+        FastVecSub(&tangent, &tangent, &point);
+        FastVecAdd(&point, &gHeroState.position, &tangent);
     } else {
-        final_advance_index = D_00189E20.cursor.index;
-        final_advance_distance = D_00189E20.cursor.distance;
-        func_L00_00341820(D_00189E20.path, &point, &final_advance_index, &final_advance_distance, 1, look_ahead);
+        final_advance_index = gHeroState.cursor.index;
+        final_advance_distance = gHeroState.cursor.distance;
+        Spline_AdvanceByDistance(gHeroState.path, &point, &final_advance_index, &final_advance_distance, 1, look_ahead);
     }
-    func_00282F20(&eye_offset, D_L13_001B9940, motion->elevation);
-    func_00282CC0(&sampled, &eye_offset, &point);
-    func_00282CF0(&direction, &sampled, camera + 0x30);
+    vec_scale_to_length(&eye_offset, D_L13_001B9940, motion->elevation);
+    FastVecAdd(&sampled, &eye_offset, &point);
+    FastVecSub(&direction, &sampled, camera + 0x30);
     {
-        direction_length = func_00282DF0(&direction);
+        direction_length = FastVecLength(&direction);
         if (direction_length != 0.0f) {
-            func_00282D30(&direction, &direction, 1.0f / direction_length);
-            angle = 1.5707964f - func_002831B0(func_00282DB0(&direction, camera));
+            FastVecScale(&direction, &direction, 1.0f / direction_length);
+            angle = 1.5707964f - FastAngleHelper(FastVecDot(&direction, camera));
         } else {
             angle = 0.0f;
         }
-        if (func_00282C48(turn->rate - angular_rate) < 0.00015f)
+        if (FloatAbs(turn->rate - angular_rate) < 0.00015f)
             turn->rate = angular_rate;
         else if (turn->rate < angular_rate)
             turn->rate += 0.00015f;
         else
             turn->rate -= 0.00015f;
-        smoothed_angle = func_002703B0((char *)&turn->velocity, 0.0f, angle, turn->rate, 0.175f, 0.0f);
+        smoothed_angle = StepSpringDamperStored((char *)&turn->velocity, 0.0f, angle, turn->rate, 0.175f, 0.0f);
     }
-    func_00282DD8(&tangent, &direction, camera + 0x40);
-    func_002ACEC0(camera, camera + 0x40, &tangent, smoothed_angle);
-    func_00282F20(camera + 0x40, camera, 1.0f);
-    func_00282F20(camera, camera, 1.0f);
-    func_00282DD8(camera + 0x10, camera, D_L13_001B9940);
-    func_00282F20(camera + 0x10, camera + 0x10, 1.0f);
-    func_00282DD8(camera + 0x20, camera + 0x10, camera);
+    FastVecCross(&tangent, &direction, camera + 0x40);
+    ApplyAxisRotationToQuaternion(camera, camera + 0x40, &tangent, smoothed_angle);
+    vec_scale_to_length(camera + 0x40, camera, 1.0f);
+    vec_scale_to_length(camera, camera, 1.0f);
+    FastVecCross(camera + 0x10, camera, D_L13_001B9940);
+    vec_scale_to_length(camera + 0x10, camera + 0x10, 1.0f);
+    FastVecCross(camera + 0x20, camera + 0x10, camera);
 }

@@ -80,18 +80,18 @@ void func_0011CF78(int mode) {
     r1_D_00156900_d.client_table_len = 32;
     r1_D_00156900_d.rdata_table_idx = 0;
     r1_D_00156900_d.pid = 1;
-    func_0011CB90(0x80000008, (int)func_0011D238, (int)&r1_D_00156900_d);
-    func_0011CB90(0x80000009, (int)func_0011D3A0, (int)&r1_D_00156900_d);
-    func_0011CB90(0x8000000A, (int)func_0011D590, (int)&r1_D_00156900_d);
-    func_0011CB90(0x8000000C, (int)func_0011D2F0, (int)&r1_D_00156900_d);
+    SetSifCmdHandler(0x80000008, (int)FinishRpcRequest, (int)&r1_D_00156900_d);
+    SetSifCmdHandler(0x80000009, (int)HandleRpcBindRequest, (int)&r1_D_00156900_d);
+    SetSifCmdHandler(0x8000000A, (int)HandleRpcCallRequest, (int)&r1_D_00156900_d);
+    SetSifCmdHandler(0x8000000C, (int)HandleRpcReadDataRequest, (int)&r1_D_00156900_d);
     r1_func_0011D9A8();
     if (r1_func_00118E70(0x80000002)) {
         return;
     }
     packet = (int *)(r1_D_00155100 + 64);
     packet[3] = 1;
-    func_0011CD20(0x80000002, (int)packet, 16, 0, 0, 0);
-    while (func_0011C8B0(0) == 0) {
+    SendSifCmd(0x80000002, (int)packet, 16, 0, 0, 0);
+    while (GetSifCmdSlotValue(0) == 0) {
     }
     r1_func_00118E60(0x80000002, 1);
 }

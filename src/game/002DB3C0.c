@@ -1,3 +1,4 @@
+#include "names.h"
 /* Adapted from RAC1 src/game/pause.c, DrawCheatsMenu (GPL-3.0),
  * which credits Lombyte src/textbin/ui/menus/draw_cheats_menu.c. */
 typedef struct { short s[12]; } FontWindow;
@@ -11,6 +12,7 @@ extern char *func_00288FB8(int);
 extern void func_00280190(FontWindow *,unsigned long,char *,int);
 extern void func_0027F538(int,int,unsigned long,char *,int);
 extern void func_0027F980(int,int,unsigned long,char *,int);
+/* Draws the cheats menu: each cheat name on the left and its on or off text on the right. */
 int func_002DB3C0(struct CheatsMenu *menu) {
     FontWindow text_window;
     short window_fields[12];
@@ -23,10 +25,10 @@ int func_002DB3C0(struct CheatsMenu *menu) {
     int color;
     int enabled;
 
-    func_002FC560(0x47, 0x2004B);
-    func_0027C540(0);
+    VU1_addGSregister(0x47, 0x2004B);
+    SetupGifPaging(0);
     if ((menu->flags & 1) && menu->entries->text_id == 0) {
-        func_00115484(window_fields, 0, sizeof(window_fields));
+        memset(window_fields, 0, sizeof(window_fields));
         window_fields[1] = menu->height + 1;
         window_fields[3] = menu->width + 1;
         window_fields[4] = menu->width >> 1;
@@ -37,7 +39,7 @@ int func_002DB3C0(struct CheatsMenu *menu) {
         window_fields[9] = 1;
 
         text_window = *(FontWindow *)window_fields;
-        func_00280190(&text_window, 0x80FFA888, func_00288FB8(0x2E0C), -1);
+        DrawTextWindowSmallFont(&text_window, 0x80FFA888, GetLocalizedString(0x2E0C), -1);
     }
     /* Entries end at a zero text ID; each retail entry occupies 0x14 bytes. */
     entry_count = 0;
@@ -56,16 +58,16 @@ int func_002DB3C0(struct CheatsMenu *menu) {
             if (entry->enabled_flag != 0) {
                 enabled = *entry->enabled_flag;
             }
-            func_0027F538(0xC, draw_y, color, func_00288FB8(entry->text_id), -1);
-            func_0027F980(
+            DrawTextSmallFont(0xC, draw_y, color, GetLocalizedString(entry->text_id), -1);
+            DrawTextRightAlignedSmallFont(
                 menu->width - 0xC, draw_y, 0x80FFA888,
-                func_00288FB8(enabled ? entry->enabled_text_id : entry->disabled_text_id),
+                GetLocalizedString(enabled ? entry->enabled_text_id : entry->disabled_text_id),
                 -1);
             draw_y += line_spacing;
             draw_index++;
             entry_index++;
         } while (menu->entries[entry_index].text_id != 0);
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }

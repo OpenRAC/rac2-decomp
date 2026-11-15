@@ -40,6 +40,7 @@ extern Vec D_0018A0E0 __attribute__((nosda));
    D_L00_001B2C90[i], corners D_L00_001B0F20 scaled by D_L00_001B2D20[i], alpha from
    D_L00_001B2D00[i] and colour D_L00_001B0EC0 or D_L00_001B0EBC by the current record's
    active byte. */
+/* Draws the three bright sparks that run along the Sheepinator beam. */
 void func_L00_004079C8(void)
 {
     DrawPacket79C8 packet;
@@ -48,29 +49,29 @@ void func_L00_004079C8(void)
     unsigned int color, c;
     int i, j;
 
-    packet.regs[1] = func_0027C878(8);
+    packet.regs[1] = GetEffectTextureDescriptor(8);
     packet.regs[3] = 0x8000000048ULL;
     packet.regs[2] = 0xFF9000000260ULL;
     packet.regs[0] = 0;
     packet.params[0] = 0; packet.params[1] = 0; packet.params[2] = 0; packet.params[3] = 1;
     packet.params[4] = 1; packet.params[5] = 0; packet.params[6] = 1; packet.params[7] = 1;
-    color = (D_L00_00262570 + D_001395B0)->active ? D_L00_001B0EC0 : D_L00_001B0EBC;
+    color = (gWeaponTable_L00 + D_001395B0)->active ? D_L00_001B0EC0 : D_L00_001B0EBC;
     for (i = 0; i < 3; i++) {
         if (D_L00_001B2D30[i]) {
-            c = (color & 0xFFFFFF) | (func_00283CF0(D_L00_001B2D00[i]) << 24);
+            c = (color & 0xFFFFFF) | (FloatToInt(D_L00_001B2D00[i]) << 24);
             packet.colours[0] = packet.colours[1] = packet.colours[2] = packet.colours[3] = c;
             qcopy(&basis[3], &D_L00_001B2C90[i]);
             qcopy(&basis[0], &D_L00_001B2CC0[i]);
-            func_00282D30(&basis[2], &D_0018A0E0, -1.0f);
-            func_00282DD8(&basis[1], &basis[0], &basis[2]);
-            func_00282F20(&basis[1], &basis[1], 1.0f);
-            func_00282DD8(&basis[2], &basis[1], &basis[0]);
+            FastVecScale(&basis[2], &D_0018A0E0, -1.0f);
+            FastVecCross(&basis[1], &basis[0], &basis[2]);
+            vec_scale_to_length(&basis[1], &basis[1], 1.0f);
+            FastVecCross(&basis[2], &basis[1], &basis[0]);
             corner = D_L00_001B0F20;
             for (j = 3; j >= 0; corner++, j--) {
-                func_00282D30(&vertex, corner, D_L00_001B2D20[i]);
-                func_002830C0(&packet.points[3 - j], &vertex, basis);
+                FastVecScale(&vertex, corner, D_L00_001B2D20[i]);
+                transform_vector(&packet.points[3 - j], &vertex, basis);
             }
-            func_00280B90(&packet, 0, 0);
+            draw_world_quad(&packet, 0, 0);
         }
     }
 }

@@ -9,6 +9,7 @@ extern void func_00283738(void *, void *, void *);
 extern int D_L02_001A9018 MACRO_ADDR;
 extern unsigned short **D_L02_001A9014 MACRO_ADDR;
 extern char *D_L02_001B3C1C[] __attribute__((sda));
+/* Looks through the nearby records for one very close to the object and, if found, remembers it and its position relative to the object. */
 void func_L02_003D6EE0(char *object)
 {
     struct {
@@ -20,9 +21,9 @@ void func_L02_003D6EE0(char *object)
     int index;
     unsigned short *entry;
     unsigned short *list;
-    func_002833F0(frame.rotation, object + 0xf0);
-    func_00283698(frame.transposed, frame.rotation);
-    func_00283678(frame.inverse, frame.transposed);
+    euler_rotation_basis(frame.rotation, object + 0xf0);
+    matrix_from_basis_rows(frame.transposed, frame.rotation);
+    copy_matrix3x4(frame.inverse, frame.transposed);
     index = *(int *)(state + 0xb0);
     if (index != -1 && index < D_L02_001A9018) {
         list = D_L02_001A9014[index];
@@ -31,14 +32,14 @@ void func_L02_003D6EE0(char *object)
             do {
                 int key = *entry & 0x7fff;
                 char *record = D_L02_001B3C1C[0] + key * 64;
-                if (func_00282E48(object + 0x10, record + 0x30) < 1.0f) {
+                if (fast_vec_dist(object + 0x10, record + 0x30) < 1.0f) {
                     *(short *)(state + 0x78) = key;
                     state[0x7c] = 1;
                     state[0x7a] = 1;
                     *(int *)(state + 0x70) = 0;
-                    func_00282CF0(state + 0x60, record + 0x30, object + 0x10);
-                    func_00283098(state + 0x60, state + 0x60, frame.inverse);
-                    func_00283738(state + 0x30, frame.inverse, record);
+                    FastVecSub(state + 0x60, record + 0x30, object + 0x10);
+                    matrix_mul_vec3(state + 0x60, state + 0x60, frame.inverse);
+                    multiply_matrix3x3(state + 0x30, frame.inverse, record);
                     break;
                 }
             } while (*(short *)entry++ >= 0);

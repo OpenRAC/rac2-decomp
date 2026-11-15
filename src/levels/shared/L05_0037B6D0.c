@@ -44,7 +44,8 @@ extern int D_L05_00221D10[];
 
 extern int D_L05_00221D28;
 
-extern void func_L05_0037BB28(char *);
+extern /* Clears all the link fields of an object so it is free again. */
+void func_L05_0037BB28(char *);
 
 extern void func_L05_0037BD40(char *);
 
@@ -100,44 +101,44 @@ extern int func_00283CF0(float);
 /* looks up an object, then sets flags, arms a stored value and calls one of two helper pairs before building a timer */
 void func_L05_0037B6D0(char *obj)
 {
-    char *s;
+    char *vars;
 
-    s = (char *)func_002ED688(obj);
-    if (s == 0)
+    vars = (char *)GetMobyMotionData(obj);
+    if (vars == 0)
         return;
-    if (*(int *)(s + 288) == 0)
+    if (*(int *)(vars + 288) == 0)
         return;
-    if (*(int *)(s + 284) != 0) {
-        int *p = D_L05_00221D10;
+    if (*(int *)(vars + 284) != 0) {
+        int *counters = D_L05_00221D10;
         int one = 1;
 
-        *(int *)(s + 280) = one;
-        p[3] += one;
-        if (func_L05_0037CEB8(obj) != 5) {
-            func_002EE678(obj, 4);
-            *(float *)(s + 120) = (func_001163B0() & 1) ? -1.0f : 1.0f;
-            if (func_001163B0() & 1)
-                *(float *)(s + 116) = -1.0f;
+        *(int *)(vars + 280) = one;
+        counters[3] += one;
+        if (GetObjectStateValue(obj) != 5) {
+            SetFollowerState(obj, 4);
+            *(float *)(vars + 120) = (Rand() & 1) ? -1.0f : 1.0f;
+            if (Rand() & 1)
+                *(float *)(vars + 116) = -1.0f;
             else
-                *(float *)(s + 116) = 1.0f;
-            *(int *)(s + 252) = one;
-            *(int *)(s + 112) = 0;
-            *(int *)(s + 124) = 0;
+                *(float *)(vars + 116) = 1.0f;
+            *(int *)(vars + 252) = one;
+            *(int *)(vars + 112) = 0;
+            *(int *)(vars + 124) = 0;
         } else {
-            func_002EE678(obj, 7);
+            SetFollowerState(obj, 7);
         }
-        *(int *)(s + 304) = func_002A7820_1(120, 500);
+        *(int *)(vars + 304) = func_002A7820_1(120, 500);
     } else {
-        int *p = D_L05_00221D10;
+        int *counters = D_L05_00221D10;
 
-        *(int *)(s + 280) = 1;
-        p[3] += 1;
-        if (func_L05_0037CEB8(obj) != 5)
-            func_002EE678(obj, 4);
+        *(int *)(vars + 280) = 1;
+        counters[3] += 1;
+        if (GetObjectStateValue(obj) != 5)
+            SetFollowerState(obj, 4);
         else
-            func_002EE678(obj, 7);
-        *(int *)(s + 304) = func_002A7820_1(120, 500);
-        *(int *)(s + 252) = 0;
+            SetFollowerState(obj, 7);
+        *(int *)(vars + 304) = func_002A7820_1(120, 500);
+        *(int *)(vars + 252) = 0;
     }
 }
 
@@ -145,49 +146,50 @@ void func_L05_0037B6D0(char *obj)
 
 
 
+/* Checks if the player is close enough, in front of the object and visible, and sets two flags for it. */
 void func_L05_0037B948(char *obj, int check, float range)
 {
     float angles[4];
     float matrix[16];
     float sphere[4];
-    char *s = (char *)func_002ED688(obj);
+    char *vars = (char *)GetMobyMotionData(obj);
     float angle;
     float elevation;
     float limit;
-    if (!s)
+    if (!vars)
         return;
-    if (!*(char **)(s + 0x120))
+    if (!*(char **)(vars + 0x120))
         return;
-    *(int *)(s + 0x104) = 0;
-    *(int *)(s + 0x108) = 0;
+    *(int *)(vars + 0x104) = 0;
+    *(int *)(vars + 0x108) = 0;
     limit = 0.7068582773f;
     if (D_L05_00221D3C == 1)
         return;
-    if (func_00282E48(*(char **)(s + 0x120) + 0x10, obj + 0x10) > range)
+    if (fast_vec_dist(*(char **)(vars + 0x120) + 0x10, obj + 0x10) > range)
         return;
-    if (func_002761F8(obj + 0x10, *(char **)(s + 0x120) + 0x10, 0, obj, 0)) {
+    if (CollLine(obj + 0x10, *(char **)(vars + 0x120) + 0x10, 0, obj, 0)) {
         if (!D_L05_001BFB18)
             return;
-        if (*(short *)(D_L05_001BFB18 + 0xAA) != *(short *)(*(char **)(s + 0x120) + 0xAA))
+        if (*(short *)(D_L05_001BFB18 + 0xAA) != *(short *)(*(char **)(vars + 0x120) + 0xAA))
             return;
     }
-    func_00283658(matrix, obj + 0xC0);
-    func_002AB6D8(matrix, angles);
-    angle = func_00283C80(func_00283248(
-        *(float *)(*(char **)(s + 0x120) + 0x10) - *(float *)(obj + 0x10),
-        *(float *)(*(char **)(s + 0x120) + 0x14) - *(float *)(obj + 0x14)), angles[2]);
-    elevation = func_00282E80(*(char **)(s + 0x120) + 0x10, obj + 0x10);
-    elevation = func_00283C80(func_00283248(elevation,
-        *(float *)(*(char **)(s + 0x120) + 0x18) - *(float *)(obj + 0x18)), 0.0f);
+    copy_matrix_rotation(matrix, obj + 0xC0);
+    GetEulerAnglesFromMatrix(matrix, angles);
+    angle = FastDiffRots(FastMatrixHelperA(
+        *(float *)(*(char **)(vars + 0x120) + 0x10) - *(float *)(obj + 0x10),
+        *(float *)(*(char **)(vars + 0x120) + 0x14) - *(float *)(obj + 0x14)), angles[2]);
+    elevation = vec_distance_xy(*(char **)(vars + 0x120) + 0x10, obj + 0x10);
+    elevation = FastDiffRots(FastMatrixHelperA(elevation,
+        *(float *)(*(char **)(vars + 0x120) + 0x18) - *(float *)(obj + 0x18)), 0.0f);
     if (angle <= limit && elevation <= limit)
-        *(int *)(s + 0x104) = 1;
+        *(int *)(vars + 0x104) = 1;
     if (check) {
         qcopy(sphere, obj + 0x10);
         sphere[3] = 0.1f;
-        if (func_00283DB8(sphere, 256.0f) == -1)
+        if (FastMathHelperA(sphere, 256.0f) == -1)
             return;
     }
-    *(int *)(s + 0x108) = 1;
+    *(int *)(vars + 0x108) = 1;
 }
 
 extern void func_3065F8(int);
@@ -215,62 +217,67 @@ void func_L05_0037BB28(char *object)
     p->f10 = 0;
 }
 
+/* Returns the object's link value, or zero. */
 int func_L05_0037BB90(char *obj)
 {
-    int *p = (int *)func_002ED688(obj);
+    int *vars = (int *)GetMobyMotionData(obj);
 
-    if (p == 0)
+    if (vars == 0)
         return 0;
-    return p[5];
+    return vars[5];
 }
 
+/* Returns 1 if the object is in use, else 0. */
 int func_L05_0037BBB8(char *obj)
 {
-    int *p = (int *)func_002ED688(obj);
+    int *vars = (int *)GetMobyMotionData(obj);
 
-    if (p == 0)
+    if (vars == 0)
         return 0;
-    if (p[5] == 0 && p[4] == 0)
+    if (vars[5] == 0 && vars[4] == 0)
         return 0;
     return 1;
 }
 
+/* Frees an object from its parent and rearranges the remaining group members. */
 void func_L05_0037BE98(char *obj)
 {
-    int *p = (int *)func_002ED688(obj);
+    int *parentVars = (int *)GetMobyMotionData(obj);
     char *child;
-    int *q;
+    int *groupVars;
 
-    if (p == 0)
+    if (parentVars == 0)
         return;
-    if (func_L05_0037BB90(obj) != 0)
-        func_L05_0037BD40(obj);
-    child = (char *)p[4];
-    q = (int *)func_002ED688(child);
-    q[6] = q[6] - 1;
-    func_L05_0037BB28(obj);
-    if (q[6] < D_L05_00221D28)
-        func_L05_0037BC08(child);
+    if (GetObjectLinkValue(obj) != 0)
+        SwapObjectWithFreeGroupMember(obj);
+    child = (char *)parentVars[4];
+    groupVars = (int *)GetMobyMotionData(child);
+    groupVars[6] = groupVars[6] - 1;
+    ClearObjectLinks(obj);
+    if (groupVars[6] < D_L05_00221D28)
+        FreeGroupMembersAndSelf(child);
     else
-        func_L05_0037BF48(child);
+        LayoutGroupMembersInGrid(child);
 }
 
 /* func_L05_0037BF48 is in L05_0037BF48.c. */
 
 /* func_L05_0037C160 is in L05_0037C160.c. */
 
+/* Stores a value on the object. */
 void func_L05_0037CDD8(char *obj, int value)
 {
-    int *p = (int *)func_002ED688(obj);
+    int *vars = (int *)GetMobyMotionData(obj);
 
-    if (p != 0)
-        *(int *)((char *)p + 0x114) = value;
+    if (vars != 0)
+        *(int *)((char *)vars + 0x114) = value;
 }
 
 
+/* Returns the value stored on the object, or zero. */
 int func_L05_0037CEB8(char *obj)
 {
-    int *p = (int *)func_002ED688(obj);
+    int *p = (int *)GetMobyMotionData(obj);
 
     if (p == 0)
         return 0;
@@ -292,6 +299,7 @@ extern struct S_L05_002A1800 D_L05_002A1800[];
 
 extern int func_002ED8A0(int);
 
+/* Copies the default values into the working values of 15 table entries and picks one entry from a lookup. */
 void func_L05_0037D6E8(void)
 {
     int i;
@@ -300,7 +308,7 @@ void func_L05_0037D6E8(void)
         D_L05_002A1800[i].f14 = D_L05_002A1800[i].f0C;
     D_L05_002A1800[7].f14 = D_L05_002A1800[7].f0C;
     D_L05_002A1800[13].f14 = D_L05_002A1800[13].f0C;
-    i = func_002ED8A0(6);
+    i = FindLastUsedChainEntry(6);
     D_L05_002A1800[i].f14 = D_L05_002A1800[i].f10;
 }
 
@@ -317,30 +325,30 @@ void func_L05_0037DA58(float *position, int count, int color, int duration)
     *(Quad37DA58 *)axis = 0;
     axis[2] = 1.0f;
     axis[3] = 1.0f;
-    func_00282CF0(direction, D_L05_001B96C0, position);
-    func_00282F20(half, direction, 0.5f);
+    FastVecSub(direction, D_L05_001B96C0, position);
+    vec_scale_to_length(half, direction, 0.5f);
     direction[2] = 0;
     for (i = 0; i < count; i++) {
-        size = func_002A7878(0.5f, 2.0f);
-        sign = func_002A77E0(2);
+        size = RandomFloatRange(0.5f, 2.0f);
+        sign = RandomIntBelow(2);
         if (!sign) --sign;
-        angle = func_002A7878(-1.0471977f, 1.0471977f);
-        func_002ACEC0(velocity, direction, axis, angle);
-        func_00282F20(velocity, velocity, func_002A7878(0.05f, 3.0f) * (1.0f/60.0f));
-        velocity[2] = func_002A7878(1.0f, 5.0f) * (1.0f/60.0f);
-        func_00282CC0(point, position, half);
-        position[0] += func_002A78D8(0, 0.15f);
-        position[1] += func_002A78D8(0, 0.15f);
-        position[2] += func_002A78D8(0, 0.15f);
-        particle = func_002C2210(position, duration, size * 0.1f, size, color, 0, sign, velocity, 0, 0.002f);
+        angle = RandomFloatRange(-1.0471977f, 1.0471977f);
+        ApplyAxisRotationToQuaternion(velocity, direction, axis, angle);
+        vec_scale_to_length(velocity, velocity, RandomFloatRange(0.05f, 3.0f) * (1.0f/60.0f));
+        velocity[2] = RandomFloatRange(1.0f, 5.0f) * (1.0f/60.0f);
+        FastVecAdd(point, position, half);
+        position[0] += RandomSignedFloatRange(0, 0.15f);
+        position[1] += RandomSignedFloatRange(0, 0.15f);
+        position[2] += RandomSignedFloatRange(0, 0.15f);
+        particle = SpawnGroundEffectParticle(position, duration, size * 0.1f, size, color, 0, sign, velocity, 0, 0.002f);
         if (particle) {
             particle[2] = D_L05_001FF240[0x61][6];
-            particle[9] = func_00283CF0(4.0f) + 0x70;
+            particle[9] = FloatToInt(4.0f) + 0x70;
         }
-        particle = func_002C2210(position, duration, size * 0.07f, size * 0.7f, 0x7f7f7f7f, 1, -sign, velocity, 0, 0.002f);
+        particle = SpawnGroundEffectParticle(position, duration, size * 0.07f, size * 0.7f, 0x7f7f7f7f, 1, -sign, velocity, 0, 0.002f);
         if (particle) {
             particle[2] = D_L05_001FF240[0x61][6];
-            particle[9] = func_00283CF0(4.0f) + 0x70;
+            particle[9] = FloatToInt(4.0f) + 0x70;
         }
     }
 }
@@ -353,18 +361,18 @@ void func_L05_0037DA58(float *position, int count, int color, int duration)
 
 /* Walks the twenty-four records, and for each one the object owns updates it and, while it is
    not active, lays the three colours over its vector. */
-void func_L05_00398018(char *arg0)
+void func_L05_00398018(char *owner)
 {
     int i;
     for (i = 0; i < 24; i++) {
-        Record233560 *rec = &D_L05_00233560[i];
-        float *pos = &rec->f[12];
-        if (rec->owner == arg0) {
-            func_L00_003F26C8(arg0, (char *)rec);
-            if (rec->active == 0) {
-                func_00281EB8(pos, 0x31, 0x3F0000FF, 1, func_002A7878(0.065f, 0.1f) * 5.0f, 1.25f, 0.0f);
-                func_00281EB8(pos, 0x31, 0x5F7F7F7F, 1, func_002A7878(0.0325f, 0.06f) * 5.0f, 1.24f, 0.0f);
-                func_00281EB8(pos, 0xB, 0x1000003F, 1, func_002A7878(0.07f, 0.15f) * 5.0f, 1.23f, 0.0f);
+        Record233560 *record = &D_L05_00233560[i];
+        float *position = &record->f[12];
+        if (record->owner == owner) {
+            DrawJitteredCurve(owner, (char *)record);
+            if (record->active == 0) {
+                DrawBillboardQuad_00281EB8(position, 0x31, 0x3F0000FF, 1, RandomFloatRange(0.065f, 0.1f) * 5.0f, 1.25f, 0.0f);
+                DrawBillboardQuad_00281EB8(position, 0x31, 0x5F7F7F7F, 1, RandomFloatRange(0.0325f, 0.06f) * 5.0f, 1.24f, 0.0f);
+                DrawBillboardQuad_00281EB8(position, 0xB, 0x1000003F, 1, RandomFloatRange(0.07f, 0.15f) * 5.0f, 1.23f, 0.0f);
             }
         }
     }
@@ -385,40 +393,40 @@ void func_L05_00398618(char *obj)
             Record233560 *p = r;
             float *end = &p->f[16];
             float *pos = &p->f[8];
-            p->f[8] += func_002A7878(-0.1f, 0.1f);
-            p->f[9] += func_002A7878(-0.1f, 0.1f);
-            p->f[10] += func_002A7878(-0.1f, 0.1f);
-            func_00282CF0(delta, end, pos);
+            p->f[8] += RandomFloatRange(-0.1f, 0.1f);
+            p->f[9] += RandomFloatRange(-0.1f, 0.1f);
+            p->f[10] += RandomFloatRange(-0.1f, 0.1f);
+            FastVecSub(delta, end, pos);
             qcopy(pos, obj + 0x10);
-            func_00282CC0(end, pos, delta);
+            FastVecAdd(end, pos, delta);
             if (p->active) {
-                p->f[20] = func_00283B98(p->f[20], p->f[23] * 100.0f);
-                p->f[21] = func_00283B98(p->f[21], p->f[24] * 100.0f);
-                p->f[22] = func_00283B98(p->f[22], p->f[25] * 100.0f);
-                p->f[29] = func_00283B98(p->f[29], p->f[32] * 100.0f);
-                p->f[30] = func_00283B98(p->f[30], p->f[33] * 100.0f);
-                p->f[31] = func_00283B98(p->f[31], p->f[34] * 100.0f);
+                p->f[20] = FastAddRotations(p->f[20], p->f[23] * 100.0f);
+                p->f[21] = FastAddRotations(p->f[21], p->f[24] * 100.0f);
+                p->f[22] = FastAddRotations(p->f[22], p->f[25] * 100.0f);
+                p->f[29] = FastAddRotations(p->f[29], p->f[32] * 100.0f);
+                p->f[30] = FastAddRotations(p->f[30], p->f[33] * 100.0f);
+                p->f[31] = FastAddRotations(p->f[31], p->f[34] * 100.0f);
             } else {
-                p->f[20] = func_00283B98(p->f[20], p->f[23] * 50.0f);
-                p->f[21] = func_00283B98(p->f[21], p->f[24] * 50.0f);
-                p->f[22] = func_00283B98(p->f[22], p->f[25] * 50.0f);
-                p->f[29] = func_00283B98(p->f[29], p->f[32] * 50.0f);
-                p->f[30] = func_00283B98(p->f[30], p->f[33] * 50.0f);
-                p->f[31] = func_00283B98(p->f[31], p->f[34] * 50.0f);
+                p->f[20] = FastAddRotations(p->f[20], p->f[23] * 50.0f);
+                p->f[21] = FastAddRotations(p->f[21], p->f[24] * 50.0f);
+                p->f[22] = FastAddRotations(p->f[22], p->f[25] * 50.0f);
+                p->f[29] = FastAddRotations(p->f[29], p->f[32] * 50.0f);
+                p->f[30] = FastAddRotations(p->f[30], p->f[33] * 50.0f);
+                p->f[31] = FastAddRotations(p->f[31], p->f[34] * 50.0f);
             }
-            p->f[0] = func_00283180(p->f[20]) * p->f[26];
-            p->f[1] = func_00283198(p->f[21]) * p->f[27];
-            p->f[2] = -func_00283198(p->f[22]) * p->f[28];
-            p->f[4] = func_00283180(p->f[29]) * p->f[35];
-            p->f[5] = func_00283198(p->f[30]) * p->f[36];
-            p->f[6] = -func_00283198(p->f[31]) * p->f[37];
+            p->f[0] = FastSinOrCosA(p->f[20]) * p->f[26];
+            p->f[1] = FastSinOrCosB(p->f[21]) * p->f[27];
+            p->f[2] = -FastSinOrCosB(p->f[22]) * p->f[28];
+            p->f[4] = FastSinOrCosA(p->f[29]) * p->f[35];
+            p->f[5] = FastSinOrCosB(p->f[30]) * p->f[36];
+            p->f[6] = -FastSinOrCosB(p->f[31]) * p->f[37];
             if (*(int *)(state + 0x24))
-                func_00282D08(&p->f[12], &p->f[8], &p->f[16], 0.55f);
+                lerp_vector(&p->f[12], &p->f[8], &p->f[16], 0.55f);
             else
-                func_00282D08(&p->f[12], &p->f[8], &p->f[16], 0.4f);
-            if (func_00282948(&p->active)) {
+                lerp_vector(&p->f[12], &p->f[8], &p->f[16], 0.4f);
+            if (FastFloatHelperD(&p->active)) {
                 if (p->dying == 0) p->dying = 1;
-                if (func_00282948(&p->timer)) p->owner = 0;
+                if (FastFloatHelperD(&p->timer)) p->owner = 0;
             }
         }
     }
@@ -428,6 +436,7 @@ void func_L05_00398618(char *obj)
 
 /* func_L05_00398F18 is in L05_00398F18.c. */
 
+/* Spawns a burst of particles around the object: debris, smoke and sparks. */
 void func_L05_00399268(char *obj)
 {
     float pos[4];
@@ -484,7 +493,7 @@ void func_L05_00399268(char *obj)
         if (p) {
             d = p + 0x20;
             {
-                int index = func_001163B0() % 2;
+                int index = Rand() % 2;
                 p[3] = colors.v[index];
             }
             if (*(int *)(s + 0x3C))
@@ -507,6 +516,7 @@ void func_L05_00399268(char *obj)
 /* func_L05_003CD1A8 is in L05_003CD1A8-g8.c. */
 
 
+/* Fills in the starting values of the object's private variables. */
 void func_L05_003CD4C0(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -545,11 +555,12 @@ void func_L05_003CD4C0(char *object)
 
 /* func_L05_003CFAB8 is in L05_0037B6D0-g8.c. */
 
-int func_L05_003CFC28(int a0)
+/* Converts an object id into a table index. */
+int func_L05_003CFC28(int classId)
 {
-    if (a0 == 0x971)
+    if (classId == 0x971)
         return 4;
-    return a0 - 0x953;
+    return classId - 0x953;
 }
 
 /* func_L05_003CFC48 is in L05_003CFC48-g8.c. */
@@ -596,14 +607,15 @@ void func_L05_003D0320(char *obj)
 
 /* func_L05_003D0728 is in the sibling unit L05_003D0728-g8.c. */
 
-void func_L05_003D08C0(float *a0, char *a1)
+/* Picks a random point inside a box and moves it by a matrix. */
+void func_L05_003D08C0(float *out, char *matrix)
 {
-    a0[0] = func_332B50(-1.0f, 1.0f);
-    a0[1] = func_332B50(-1.0f, 1.0f);
-    a0[2] = func_332B50(-1.0f, 1.0f);
-    a0[3] = 1.0f;
-    func_306AD8(a0, a0, a1);
-    func_306630(a0, a0, a1 + 0x30);
+    out[0] = func_332B50(-1.0f, 1.0f);
+    out[1] = func_332B50(-1.0f, 1.0f);
+    out[2] = func_332B50(-1.0f, 1.0f);
+    out[3] = 1.0f;
+    func_306AD8(out, out, matrix);
+    func_306630(out, out, matrix + 0x30);
 }
 
 /* func_L05_003D0960 is in L05_003D0960-g8.c. */
@@ -636,11 +648,11 @@ void func_L05_003D1058(char *a0, char *a1, char *a2, char *a3, float f0, float f
         return;
     if (*(unsigned char *)(a2 + 0x20) == 0xFD)
         return;
-    func_002AFFD8(a0, (char *)v0, 1);
-    p = func_002AB1F0(a2);
-    func_00282D30(v1, v0, *(float *)((char *)p + 0x10));
-    func_00282CC0(v2, (float *)(a2 + 0x10), v1);
-    func_L05_003D1148(a0, a1, v2, a3, f0, f1, f2, v0);
+    ComputeViewDirection(a0, (char *)v0, 1);
+    p = GetMobyPrivateValue0(a2);
+    FastVecScale(v1, v0, *(float *)((char *)p + 0x10));
+    FastVecAdd(v2, (float *)(a2 + 0x10), v1);
+    RotateObjectTowardVector(a0, a1, v2, a3, f0, f1, f2, v0);
 }
 
 extern void func_00282CF0(void *out, void *a, void *b);
@@ -684,36 +696,37 @@ void func_L05_003D1148(void *a0, void *a1, void *a2, void *a3,
     float diff;
     float r;
 
-    func_00282CF0(v0, a2, a0);
-    len = func_00282DF0(v0);
+    FastVecSub(v0, a2, a0);
+    len = FastVecLength(v0);
     if (len == 0.0f)
         return;
     if (len < 1.5f) {
-        func_002ACF68(a1, a1, v0, 0, 0.5f);
+        BuildRotationTowardVector(a1, a1, v0, 0, 0.5f);
         return;
     }
-    func_00282DD8(v1, v0, a1);
-    dot = func_00282DB0(a1, v0);
-    prod = func_00282DF0(a1) * func_00282DF0(v0);
+    FastVecCross(v1, v0, a1);
+    dot = FastVecDot(a1, v0);
+    prod = FastVecLength(a1) * FastVecLength(v0);
     if (prod == 0.0f)
         return;
-    ang = func_002831B0(dot / prod);
+    ang = FastAngleHelper(dot / prod);
     diff = 1.5707964f - ang;
-    if (func_00282C48(diff) > 2.879793643951416f) {
-        func_00282DD8(v2, a1, a4);
-        func_00282DD8(v1, v2, a1);
+    if (FloatAbs(diff) > 2.879793643951416f) {
+        FastVecCross(v2, a1, a4);
+        FastVecCross(v1, v2, a1);
     }
-    func_00282F20(v1, v1, 1.0f);
-    r = func_002703B0(a3, 0.0f, diff * 0.5f, f0, f1, f2);
-    func_00282D30(v1, v1, func_00283198(r));
-    v1[3] = func_00283180(r);
-    func_002ACDE8(a1, a1, v1);
+    vec_scale_to_length(v1, v1, 1.0f);
+    r = StepSpringDamperStored(a3, 0.0f, diff * 0.5f, f0, f1, f2);
+    FastVecScale(v1, v1, FastSinOrCosB(r));
+    v1[3] = FastSinOrCosA(r);
+    RotateVectorByQuaternion(a1, a1, v1);
 }
 
 /* func_L05_003D1368 is in L05_003D1368-g8.c. */
 
 /* func_L05_003D15E8 is in L05_003D15E8.c. */
 
+/* Starts the object: sets its state, a flag and a random starting position. */
 void func_L05_003D18E0(char *obj)
 {
     char *sub = *(char **)(obj + 0x68);

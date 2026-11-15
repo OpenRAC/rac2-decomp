@@ -11,21 +11,22 @@ typedef union {
     float f[4];
 } Quad __attribute__((aligned(16)));
 
+/* Rebuilds the camera's three axes so it looks from its position toward the player. */
 void func_L04_0046D6A8(char *obj) {
-    Quad v;
-    Quad u;
-    char *s1;
-    char *p = *(char **)(obj + 0x70);
+    Quad offset;
+    Quad upVector;
+    char *axisY;
+    char *cameraData = *(char **)(obj + 0x70);
 
-    qcopy(&v, D_00189EA0);
-    v.f[2] = v.f[2] + *(float *)(p + 0x90);
-    u.q = 0;
-    u.f[2] = 1.0f;
-    u.f[3] = 1.0f;
-    func_00282CF0(obj, &v, obj + 0x30);
-    func_00282F20(obj, obj, 1.0f);
-    s1 = obj + 0x10;
-    func_00282DD8(s1, obj, &u);
-    func_00282F20(s1, s1, 1.0f);
-    func_00282DD8(obj + 0x20, s1, obj);
+    qcopy(&offset, gHeroPosition);
+    offset.f[2] = offset.f[2] + *(float *)(cameraData + 0x90);
+    upVector.q = 0;
+    upVector.f[2] = 1.0f;
+    upVector.f[3] = 1.0f;
+    FastVecSub(obj, &offset, obj + 0x30);
+    vec_scale_to_length(obj, obj, 1.0f);
+    axisY = obj + 0x10;
+    FastVecCross(axisY, obj, &upVector);
+    vec_scale_to_length(axisY, axisY, 1.0f);
+    FastVecCross(obj + 0x20, axisY, obj);
 }

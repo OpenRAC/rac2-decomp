@@ -20,36 +20,37 @@ extern void func_00282F20(void *, void *, float);
 extern void func_L11_00460258(char *, int);
 extern int func_002E5DA0(int, int, char *, int);
 
-char *func_L20_0044B100(char *arg0, char *arg1, char *arg2, char *arg3, int arg4,
-                        float f12) {
-    char *obj;
+/* Creates a homing shot (moby class 4855) at a position, aimed at a target, and returns it. */
+char *func_L20_0044B100(char *template, char *position, char *direction, char *targetPos, int travelFrames,
+                        float power) {
+    char *shot;
     char *state;
-    char *dst;
-    TI128 buf;
-    float r;
+    char *pos;
+    TI128 predicted;
+    float value;
 
-    obj = func_0029EFD0(0x12F7);
-    if (obj != 0) {
-        func_002B37E8((u8 *)obj, (u8 *)arg0);
-        dst = obj + 0x10;
-        qcopy(dst, arg1);
-        *(float *)(obj + 0x2C) =
-            *(float *)(*(u32 *)(obj + 0x24) + 0x24) * D_L20_001B2470;
-        state = *(char **)(obj + 0x68);
-        qcopy(state, arg2);
-        *(float *)(state + 0x20) = f12;
-        *(float *)(state + 0x24) = func_002A7940();
-        *(float *)(state + 0x28) = func_002A7878(0.052359886f, 0.10471977f);
+    shot = CreateMoby(0x12F7 /* moby class 4855 */);
+    if (shot != 0) {
+        InitChildObjectFromParent((u8 *)shot, (u8 *)template);
+        pos = shot + 0x10;
+        qcopy(pos, position);
+        *(float *)(shot + 0x2C) =
+            *(float *)(*(u32 *)(shot + 0x24) + 0x24) * D_L20_001B2470;
+        state = *(char **)(shot + 0x68);
+        qcopy(state, direction);
+        *(float *)(state + 0x20) = power;
+        *(float *)(state + 0x24) = RandomAngle();
+        *(float *)(state + 0x28) = RandomFloatRange(0.052359886f, 0.10471977f);
         *(int *)(state + 0x30) = 0;
-        r = func_00283CE0(arg4);
-        *(float *)(state + 0x34) = 1.0f / r;
-        func_00282D30(&buf, arg2, (float)(arg4 >> 1));
-        func_00282CC0(&buf, &buf, arg1);
-        func_00282CF0(state + 0x10, arg3, &buf);
-        r = func_00282DF0(state);
-        func_00282F20(state + 0x10, state + 0x10, r);
-        func_L11_00460258(dst, D_L20_001B246C);
-        func_002E5DA0(0, 0, obj, 0x12F7);
+        value = IntToFloat(travelFrames);
+        *(float *)(state + 0x34) = 1.0f / value;
+        FastVecScale(&predicted, direction, (float)(travelFrames >> 1));
+        FastVecAdd(&predicted, &predicted, position);
+        FastVecSub(state + 0x10, targetPos, &predicted);
+        value = FastVecLength(state);
+        vec_scale_to_length(state + 0x10, state + 0x10, value);
+        SpawnSparkRing_L11(pos, D_L20_001B246C);
+        PlaySoundFromClassBank(0, 0, shot, 0x12F7);
     }
-    return obj;
+    return shot;
 }

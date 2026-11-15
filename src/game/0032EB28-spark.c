@@ -26,6 +26,7 @@ extern Gparticle *func_002C65A0(void *, void *, int, unsigned int, int, int, int
 
 /* The size is set once ahead of the loop, so gcse's constant propagation writes it directly
  * into both calls and it is not hoisted into a callee-saved register. */
+/* Throws a burst of eight small sparks from a point, moving along the given speed. */
 void func_00331238(TI128 *a0, void *velocity)
 {
     EffectVector base;
@@ -37,19 +38,19 @@ void func_00331238(TI128 *a0, void *velocity)
     float size = 35700.0f;
 
     qcopy(&base, a0);
-    func_00282D30(vel, velocity, 0.5f);
-    func_00282CC0(&base, &base, vel);
+    FastVecScale(vel, velocity, 0.5f);
+    FastVecAdd(&base, &base, vel);
     i = 8;
     do {
         i--;
-        pos[0] = base.v[0] + func_002A78D8(0.005f, 0.035f);
-        pos[1] = base.v[1] + func_002A78D8(0.005f, 0.035f);
-        pos[2] = base.v[2] + func_002A78D8(0.005f, 0.035f);
-        rnd = func_002A77E0(0xFF);
-        p = func_002C65A0(pos, D_001A8BD0, 4, 0x808080, rnd, 0x7F, 0x3F, size, size, 0.0f, 1);
+        pos[0] = base.v[0] + RandomSignedFloatRange(0.005f, 0.035f);
+        pos[1] = base.v[1] + RandomSignedFloatRange(0.005f, 0.035f);
+        pos[2] = base.v[2] + RandomSignedFloatRange(0.005f, 0.035f);
+        rnd = RandomIntBelow(0xFF);
+        p = SpawnGravityFadeParticle(pos, D_001A8BD0, 4, 0x808080, rnd, 0x7F, 0x3F, size, size, 0.0f, 1);
         if (p != 0)
             p->f2 = D_001F2540.f16C[1];
-        p = func_002C65A0(pos, D_001A8BD0, 4, 0x406080, rnd, 0x10, 8, size, size, 0.0f, 1);
+        p = SpawnGravityFadeParticle(pos, D_001A8BD0, 4, 0x406080, rnd, 0x10, 8, size, size, 0.0f, 1);
         if (p != 0)
             p->f2 = *D_001F2540.fD4;
     } while (i >= 0);

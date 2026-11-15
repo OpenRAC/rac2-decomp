@@ -34,21 +34,21 @@ extern s32 func_002B7BC0();
 extern void func_00294130();
 extern void func_00294180();
 
-s32 func_002942A0(s32 a0, s32 a1, s32 a2, s32 a3) {
-    s32 t;
-    if (D_0014B540.el[a0].f8 != 0) {
-        t = D_001A9330;
-        if (t == -1) {
-            D_001A9330 = a0;
-            D_001A9334[0] = a1;
-            D_001A9334[1] = a2;
-            if (a1 >= 0) {
-                D_00152CD0.f34[a1] = t;
+s32 func_002942A0(s32 entryIndex, s32 owner, s32 dest, s32 firstPartOnly) {
+    s32 oldSlot;
+    if (gCopySetupData.el[entryIndex].f8 != 0) {
+        oldSlot = D_001A9330;
+        if (oldSlot == -1) {
+            D_001A9330 = entryIndex;
+            D_001A9334[0] = owner;
+            D_001A9334[1] = dest;
+            if (owner >= 0) {
+                D_00152CD0.f34[owner] = oldSlot;
             }
-            if (D_0014B540.el[a0].f10 != 0 && a3 == 0) {
-                return func_002B7BC0(a2, D_0014B540.el[a0].fC + D_0014B540.base, D_0014B540.el[a0].f10, func_00294180, &D_001A9330);
+            if (gCopySetupData.el[entryIndex].f10 != 0 && firstPartOnly == 0) {
+                return StartDiscReadWithCallback(dest, gCopySetupData.el[entryIndex].fC + gCopySetupData.base, gCopySetupData.el[entryIndex].f10, ContinueStreamLoad, &D_001A9330);
             }
-            return func_002B7BC0(a2, D_0014B540.el[a0].f4 + D_0014B540.base, D_0014B540.el[a0].f8, func_00294130, &D_001A9330);
+            return StartDiscReadWithCallback(dest, gCopySetupData.el[entryIndex].f4 + gCopySetupData.base, gCopySetupData.el[entryIndex].f8, ReleaseClassCacheSlot, &D_001A9330);
         }
         return 0;
     }

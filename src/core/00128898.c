@@ -44,10 +44,10 @@ extern int r1_D_00132ED0;
 
 typedef struct {
     char unk_00[4];
-    int  unk_04;
-    int  unk_08;
-    char *unk_0C;
-    char unk_10[0x320];
+    int  isLinked;
+    int  linkHandle;
+    char *dmaBuffer;
+    char buttonSlots[0x320];
 } Ent330;
 
 extern Ent330 r1_D_0015B640[];
@@ -106,10 +106,12 @@ typedef struct {
    Only Sony's 2.9-ee gives retail's shape, spilling $5-$11 and no FP
    argument registers; the game's 2.95.3 also saves $f12-$f18. That is
    how this file was found to be built with 2.9-ee (Makefile.sn). */
+/* Debug print that does nothing in the final game. */
 void func_00128898(void *fmt, ...) {
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00124B88 */
+/* Clears the table of controller ports and marks it ready. */
 int func_001288C0(void) {
     int p;
     int end;
@@ -130,11 +132,12 @@ int func_001288C0(void) {
 /* scePad2CreateSocket(param, buf). c5: `desc.w0 = 0` moved inside the
    else (null) block instead of shared before the if, probing the last
    1-byte beqz/beql (branch-likely) difference from c4. */
+/* Creates a controller socket and sets up its two data buffers. Returns the socket number or a negative error. */
 int func_00128900(void *param, char *buf) {
     Pad2SockParam desc;
-    int r;
+    int socketId;
     int i;
-    char *p;
+    char *slotBuf;
 
     if (((int)buf & 0x3F) != 0) {
         return -1;
@@ -155,24 +158,24 @@ int func_00128900(void *param, char *buf) {
     }
     desc.w0 |= 1;
     desc.mode = 1;
-    r = func_001284B0(&desc, (int)buf, (int)buf + 0x80);
-    if (r < 0) {
-        return r;
+    socketId = SceDbcCreateSocket(&desc, (int)buf, (int)buf + 0x80);
+    if (socketId < 0) {
+        return socketId;
     }
-    *(int *)(r1_D_0015B640_b + r * 0x330) = 1;
-    *(char **)(r1_D_0015B640_b + r * 0x330 + 0xC) = buf;
-    p = buf;
+    *(int *)(r1_D_0015B640_b + socketId * 0x330) = 1;
+    *(char **)(r1_D_0015B640_b + socketId * 0x330 + 0xC) = buf;
+    slotBuf = buf;
     for (i = 1; i >= 0; i--) {
-        p[0] = 0;
-        *(int *)(p + 0x7C) = 0;
-        p[1] = 0;
-        p[3] = 0;
-        p[2] = 0;
-        *(int *)(p + 4) = 0;
-        r1_func_001153FC(p + 0x1C, 0xFF, 0x20);
-        p += 0x80;
+        slotBuf[0] = 0;
+        *(int *)(slotBuf + 0x7C) = 0;
+        slotBuf[1] = 0;
+        slotBuf[3] = 0;
+        slotBuf[2] = 0;
+        *(int *)(slotBuf + 4) = 0;
+        r1_func_001153FC(slotBuf + 0x1C, 0xFF, 0x20);
+        slotBuf += 0x80;
     }
-    return r;
+    return socketId;
 }
 
 extern char r1_D_0015B650[];
@@ -189,30 +192,31 @@ extern void *func_001153D4(void *, const void *, unsigned int);
    (func_00128D58), fetch the record (func_00128DB0), copy its p[2]-byte
    payload from +0x1C and hand the bytes after it to func_00128E98 with
    the entry's slot array. Returns the length, or -1. */
+/* Reads the latest data record for a controller port into a buffer. Returns the length, or -1. */
 int func_00128A48(int id, void *dst) {
-    unsigned char *p;
+    unsigned char *record;
 
     if (*(int *)((char *)r1_D_0015B640 + id * 0x330) == 0) {
         return -1;
     }
-    if (r1_D_0015B640[id].unk_04 == 0) {
-        if (func_00128D58(id) < 0) {
+    if (r1_D_0015B640[id].isLinked == 0) {
+        if (ScePad2LinkDriver(id) < 0) {
             return -1;
         }
     }
-    p = (unsigned char *)func_00128DB0(id);
-    if (p[2] != 0) {
-        unsigned char *src = p + 0x1C;
+    record = (unsigned char *)SelectNewerPad2Buffer(id);
+    if (record[2] != 0) {
+        unsigned char *src = record + 0x1C;
 
         if (src != 0) {
-            func_001153D4(dst, src, p[2]);
-            func_00128E98(p + 0x1C + p[2], (int *)(r1_D_0015B650 + id * 0x330));
+            memcpy_001153D4(dst, src, record[2]);
+            ExpandPad2ButtonMask(record + 0x1C + record[2], (int *)(r1_D_0015B650 + id * 0x330));
         }
     }
-    if (*(int *)(p + 4) == 0) {
+    if (*(int *)(record + 4) == 0) {
         return -1;
     }
-    return p[2];
+    return record[2];
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00124DF0 */
@@ -220,13 +224,14 @@ int func_00128A48(int id, void *dst) {
    command {2, 3, 2, 1} through func_001287A8, expands the 40-bit mask it
    returns into the entry's slots (func_00128E98) and returns the result
    word func_001287A8 filled in. */
-int func_00128B28(int port, void *arg1) {
+/* Reads which buttons a controller has and fills in the port's button slots. */
+int func_00128B28(int port, void *replyBytes) {
     McCmd cmd;
     int result;
-    int r;
+    int status;
 
-    if (r1_D_0015B640[port].unk_04 == 0) {
-        if (func_00128D58(port) < 0) {
+    if (r1_D_0015B640[port].isLinked == 0) {
+        if (ScePad2LinkDriver(port) < 0) {
             return -1;
         }
     }
@@ -234,11 +239,11 @@ int func_00128B28(int port, void *arg1) {
     cmd.b.f1 = 3;
     cmd.b.f2 = 2;
     cmd.b.f3 = 1;
-    r = func_001287A8(port, cmd.i, &result, arg1);
-    if (r < 0) {
-        return r;
+    status = SendDbcCommand(port, cmd.i, &result, replyBytes);
+    if (status < 0) {
+        return status;
     }
-    func_00128E98(arg1, (int *)r1_D_0015B640[port].unk_10);
+    ExpandPad2ButtonMask(replyBytes, (int *)r1_D_0015B640[port].buttonSlots);
     return result;
 }
 
@@ -253,24 +258,25 @@ int func_00128B28(int port, void *arg1) {
    func_00128B28's {2,3,2,1}, here {0xC,2,1,1}) and round-trip it
    through func_001287A8; return its state byte on success, 0 on
    failure. */
+/* Gets the current state of the controller on a port, and returns 0 if it is not available. */
 int func_00128C18(int port) {
     Pad2Buf buf;
     char *side;
     McCmd cmd;
 
-    if (r1_D_0015B640[port].unk_04 == 0) {
-        if (func_00128D58(port) < 0) {
+    if (r1_D_0015B640[port].isLinked == 0) {
+        if (ScePad2LinkDriver(port) < 0) {
             return 0;
         }
     }
-    if (func_00128E18(port) != 0) {
-        side = func_00128DB0(port);
+    if (HasPad2DataChanged(port) != 0) {
+        side = SelectNewerPad2Buffer(port);
         if (*(int *)(side + 0x4) != 0) {
             buf.state = side[0];
-        } else if (func_00128D58(port) >= 0) {
+        } else if (ScePad2LinkDriver(port) >= 0) {
             buf.state = side[0];
         } else {
-            r1_D_0015B640[port].unk_04 = 0;
+            r1_D_0015B640[port].isLinked = 0;
             return 0;
         }
         return buf.state;
@@ -279,7 +285,7 @@ int func_00128C18(int port) {
     cmd.b.f1 = 2;
     cmd.b.f2 = 1;
     cmd.b.f3 = 1;
-    if (func_001287A8(port, cmd.i, &buf.result, (char *)&buf) < 0) {
+    if (SendDbcCommand(port, cmd.i, &buf.result, (char *)&buf) < 0) {
         return 0;
     }
     return buf.state;

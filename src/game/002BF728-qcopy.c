@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002BF728 in its own unit for the grouped lq/sq profile. */
 
@@ -44,23 +45,24 @@ extern char D_00189E20[];
 
 /* Spawns a bubble particle at position with velocity; a floor of -1 follows
    the hero (just above it while swimming, else the water level). */
+/* Creates a bubble that floats up through the water. */
 Particle_002BF728 *func_002BF728(TI128 *position, float *velocity, float scale, float floor)
 {
-    Particle_002BF728 *p = func_002B9030(0x22);
+    Particle_002BF728 *p = AllocParticle(0x22);
     typeof(p->motion) *m = &p->motion;
 
     if (p != 0) {
         p->colour = 0x88A0A0A0;
-        p->unk09 = func_00283CF0(4.0f) + 0x40;
+        p->unk09 = FloatToInt(4.0f) + 0x40;
         p->unk01 = 0;
         p->unk03 = 0x44;
-        m->scale = func_002A7878(0.75f, 1.25f) * scale;
+        m->scale = RandomFloatRange(0.75f, 1.25f) * scale;
         p->size = 5250.0f;
-        p->unk08 = func_002A7820(-10, 10) - 0x80;
+        p->unk08 = RandomIntRange(-10, 10) - 0x80;
         p->unk02 = *D_001F25C8;
-        p->life = func_002A7820(0x46, 0x8C);
+        p->life = RandomIntRange(0x46, 0x8C);
         if (floor == -1.0f) {
-            HeroView_002BF728 *hero = (HeroView_002BF728 *)D_00189E20;
+            HeroView_002BF728 *hero = (HeroView_002BF728 *)gHeroState;
 
             if (hero->state == 0x30)
                 m->floor = hero->z + 0.4f;
@@ -69,9 +71,9 @@ Particle_002BF728 *func_002BF728(TI128 *position, float *velocity, float scale, 
         } else {
             m->floor = floor;
         }
-        m->angle = func_002A7940();
-        m->spin = func_002A7878(0.0290888250f, 0.1163553f);
-        m->drift = func_002A7878(0.008333334f, 0.023333334f);
+        m->angle = RandomAngle();
+        m->spin = RandomFloatRange(0.0290888250f, 0.1163553f);
+        m->drift = RandomFloatRange(0.008333334f, 0.023333334f);
         m->velocity[0] = velocity[0];
         m->velocity[1] = velocity[1];
         m->velocity[2] = velocity[2];

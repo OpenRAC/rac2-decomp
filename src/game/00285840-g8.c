@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* -G8 sibling for src/game/00285840.c: func_002858C0 stores through $gp into the
    small-data word D_001A8A5C, which only comes out gp-relative in a file built
@@ -9,9 +10,9 @@ typedef short s16;
 
 typedef struct {
     char reserved00[0x40];
-    s32 field40;
+    s32 mode;
     char reserved44[0x10];
-    s32 field54;
+    s32 modeArg;
     s32 field58;
     s32 field5C[4];
     s32 field6C[4];
@@ -33,33 +34,34 @@ extern s32 func_00287E48(void);
 extern void func_002B72E8(s32);
 extern int func_002E5E58(int, unsigned int, void *);
 
-void func_002858C0(s32 p0, s32 p1)
+/* Switches the menu to a new mode. It clears the menu counters, plays the menu sound and may start a pause. */
+void func_002858C0(s32 newMode, s32 modeArg)
 {
     s32 i;
 
-    D_001A8A5C = p0;
-    if (p0 == 5) {
-        D_001BAC80.field80 = D_0013955C[0];
+    D_001A8A5C = newMode;
+    if (newMode == 5) {
+        gModalState.field80 = D_0013955C[0];
     } else {
-        D_001BAC80.field80 = 0;
+        gModalState.field80 = 0;
     }
-    D_001BAC80.field54 = p1;
-    D_001BAC80.field40 = p0;
-    D_001BAC80.field7C = 0;
-    D_001BAC80.field7E = 0;
-    D_001BAC80.field58 = 0;
-    D_001BAC80.field88 = (func_002B4BE8() != 3);
-    if (D_001A8BB0 != 3) {
-        func_00132AF8(0x5D);
-        if (func_00287E48() == 0) {
-            func_002B72E8(0);
+    gModalState.modeArg = modeArg;
+    gModalState.mode = newMode;
+    gModalState.field7C = 0;
+    gModalState.field7E = 0;
+    gModalState.field58 = 0;
+    gModalState.field88 = (GetTopOfModeStack() != 3);
+    if (gCurrentGameMode != 3) {
+        SendSoundCommand22(0x5D);
+        if (IsMenuStateSeven() == 0) {
+            music_Pause(0);
         }
     }
     for (i = 0; i < 4; i++) {
-        D_001BAC80.field5C[i] = 0;
-        D_001BAC80.field6C[i] = 0;
+        gModalState.field5C[i] = 0;
+        gModalState.field6C[i] = 0;
     }
-    if (p0 == 10) {
-        func_002E5E58(0x12, 0, 0);
+    if (newMode == 10) {
+        PlaySoundFromGlobalBank(0x12, 0, 0);
     }
 }

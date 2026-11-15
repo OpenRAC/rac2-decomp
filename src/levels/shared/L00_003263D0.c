@@ -25,31 +25,31 @@ void func_L00_003263D0(char *owner, void *origin, int count, int mode,
     int i;
     float life;
     for (i = 0; i < count; i++) {
-        func_002A7A00(&velocity, 0.0f, speed * 0.016666668f);
-        func_00282CC0(&velocity, &velocity, velocity_origin);
-        func_002A7A00(&position, 0.0f, radius);
-        func_00282CC0(&position, &position, origin);
+        RandomDirectionVector(&velocity, 0.0f, speed * 0.016666668f);
+        FastVecAdd(&velocity, &velocity, velocity_origin);
+        RandomDirectionVector(&position, 0.0f, radius);
+        FastVecAdd(&position, &position, origin);
         random_rotation.q = 0;
-        random_rotation.f[0] = func_002A7940();
-        random_rotation.f[2] = func_002A7940();
+        random_rotation.f[0] = RandomAngle();
+        random_rotation.f[2] = RandomAngle();
         rotation.q = random_rotation.q;
         if (fixed_rotation != 0)
             qcopy(&rotation, fixed_rotation);
         kind = mode ? 2 : 1;
-        variant = func_002A77E0(4);
-        life = func_002A7878(10.0f, 20.0f);
-        effect = func_00273730(owner, kind, 0x43e, variant, &position, &rotation, &velocity,
+        variant = RandomIntBelow(4);
+        life = RandomFloatRange(10.0f, 20.0f);
+        effect = CreateCameraMoby(owner, kind, 0x43e /* moby class 1086 */, variant, &position, &rotation, &velocity,
                                0xff, 180.0f, life);
         if (effect != 0) {
-            *(void (**)(char *))(effect + 0x64) = func_L00_0039B288;
+            *(void (**)(char *))(effect + 0x64) = UpdateGlowFadeMoby;
             r = color & 0xff;
             t = (unsigned int)color >> 24;
             *(float *)(effect + 0x2c) = *(float *)(*(char **)(effect + 0x24) + 0x24)
-                                        * func_002A7878(low_scale, high_scale);
+                                        * RandomFloatRange(low_scale, high_scale);
             b = (color >> 16) & 0xff;
             g = (color >> 8) & 0xff;
             payload = *(char **)(effect + 0x68);
-            func_002A0488(effect, r, g, b);
+            set_moby_color(effect, r, g, b);
             ((unsigned char *)effect)[0x23] = t;
             if (r != g || r != b)
                 t = 1;

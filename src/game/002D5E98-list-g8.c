@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* An entry of a text list: its label, the action it runs, the action's value and the
  * timer of its highlight fade. */
@@ -78,7 +79,7 @@ static inline unsigned short decrementTimer(unsigned short timer)
 /* Text list input: highlight fades, then close, back, the entry's action and up/down. */
 int func_002D5EC0(ListMenu *menu)
 {
-    int focused = D_001F2840.current->focus == menu;
+    int focused = gPauseMenuState.current->focus == menu;
     int i;
     int count;
     int previous;
@@ -102,10 +103,10 @@ int func_002D5EC0(ListMenu *menu)
     if (!focused)
         return 0;
 
-    pressed = D_00138180.pressed;
+    pressed = gPadState.pressed;
     if (pressed & 0x900) {
         if (menu->flags & 0x20)
-            func_00295C50(D_001A79F0);
+            SetCurrentMapAndRefresh(gCurrentMapIndex);
         return -1;
     }
     if (pressed & 0x10) {
@@ -113,12 +114,12 @@ int func_002D5EC0(ListMenu *menu)
         int result;
 
         if (menu->flags & 0x20)
-            func_00295C50(D_001A79F0);
-        back = D_001F2840.current->back;
+            SetCurrentMapAndRefresh(gCurrentMapIndex);
+        back = gPauseMenuState.current->back;
         /* The shared exit keeps the 0/-1 choice a branch rather than a conditional move. */
         if (back != 0) {
-            D_001F2840.next = back;
-        } else if (D_001F2840.closeLocked == 0) {
+            gPauseMenuState.next = back;
+        } else if (gPauseMenuState.closeLocked == 0) {
             result = -1;
             goto finish;
         }
@@ -126,15 +127,15 @@ int func_002D5EC0(ListMenu *menu)
 finish:
         return result;
     }
-    if ((pressed & 0x40) && ((D_001A7424 ^ 1) & 1)) {
+    if ((pressed & 0x40) && ((gSaveMenuFlags ^ 1) & 1)) {
         int result;
 
         if (menu->flags & 0x20) {
-            func_0027D330(4);
-            func_002C9C60(4.0f);
+            FadeToBlack(4);
+            SetPauseScaleInverse(4.0f);
         }
         result = 0;
-        if (func_002D5E38(menu, menu->entries[menu->selected].action, &result) != 0)
+        if (ProcessSelectedRowRequest(menu, menu->entries[menu->selected].action, &result) != 0)
             return result;
     }
 
@@ -143,16 +144,16 @@ finish:
         count++;
     previous = menu->selected;
     if (menu->flags & 1)
-        buttons = D_00138180.rawPressed;
+        buttons = gPadState.rawPressed;
     else
-        buttons = D_00138180.pressed;
+        buttons = gPadState.pressed;
     if ((buttons & 0x1000) || ((menu->flags & 0x100) && (buttons & 4))) {
         if (menu->selected != 0)
             menu->selected--;
         else if (menu->flags & 0x1000)
             menu->selected = count - 1;
         else
-            D_001F2840.current->pendingFocus = menu->up;
+            gPauseMenuState.current->pendingFocus = menu->up;
     }
     if ((buttons & 0x4000) || ((menu->flags & 0x100) && (buttons & 8))) {
         int selected = menu->selected;
@@ -162,12 +163,12 @@ finish:
         else if (menu->flags & 0x1000)
             menu->selected = 0;
         else
-            D_001F2840.current->pendingFocus = menu->down;
+            gPauseMenuState.current->pendingFocus = menu->down;
     }
-    if (menu->selected != previous || D_001F2840.current->pendingFocus != 0) {
-        func_002E5E58(3, 0, 0);
+    if (menu->selected != previous || gPauseMenuState.current->pendingFocus != 0) {
+        PlaySoundFromGlobalBank(3, 0, 0);
         if (menu->flags & 0x20)
-            func_00295C50(D_001AA4F0[menu->selected]);
+            SetCurrentMapAndRefresh(D_001AA4F0[menu->selected]);
     }
     return 0;
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002A9288 needs the grouped lq/sq profile (-frac2-qcopy -frac2-qcopy-barrier):
    retail forms each copy's addresses in registers before the lq/sq pair. */
@@ -33,12 +34,12 @@ void func_002A9288(unsigned char *object, float scale)
     if (D_001B163C[0] >= 32)
         return;
     *(TI128 *)&D_001BA640[D_001B163C[0]] = *(TI128 *)(object + 0x10);
-    ground = func_002A89A8(object + 0x10, 0, 0.5f);
-    if (func_00278E78() == 0)
+    ground = ProbeGroundHeightBelow(object + 0x10, 0, 0.5f);
+    if (GetCollHitMaterial() == 0)
         return;
     D_001BA640[D_001B163C[0]].z = ground + 0.025f;
     D_001BA640[D_001B163C[0]].colour = D_001BAFC0;
-    size = (8.0f - func_00282C48(*(float *)(object + 0x18) - ground)) * 0.125f;
+    size = (8.0f - FloatAbs(*(float *)(object + 0x18) - ground)) * 0.125f;
     if (size < 0.25f)
         size = 0.25f;
     D_001BA640[D_001B163C[0]].size = scale * size;

@@ -26,6 +26,7 @@ extern void func_0029FCC0(void *,int,void *),func_L04_00451150(void *,int),func_
 extern void func_002AB800(void *,void *),func_L04_004510C8(void *),func_002A6C58(void *,int,int);
 extern int func_002A8508(int,int),func_002B3670(void *,void *,int,int,int,float,float);
 extern int func_002B3BA8(void *,void *,float,float,int,int);
+/* Shared enemy update for the Tribesman: sets up its stats and linked parts on the first frame, then handles hits, targeting and falling. Returns 1 when the object should be removed. */
 int func_L04_004502D0(u8 *object) {
     u8 *data = P(object,0x68);
     int result;
@@ -33,18 +34,18 @@ int func_L04_004502D0(u8 *object) {
     u8 position[16] __attribute__((aligned(16)));
     if (object[0x20] == 0) {
         P(data,0x18) = data+0x140;
-        F(object,0x18) = func_002A89A8(object+0x10,0,0.5f);
+        F(object,0x18) = ProbeGroundHeightBelow(object+0x10,0,0.5f);
         if (I(data,0x560)) { H(object,0x34) |= 0x41; I(object,0x98)=0; }
         if (I(data,0x548)) {
-            I(data,0x540) = func_L02_0032E508(object,I(data,0x544),data+0x340,16);
-            func_0026FEB8(D_L04_001B18A0,I(data,0x540));
+            I(data,0x540) = BuildRouteNodes(object,I(data,0x544),data+0x340,16);
+            STUB_printf(D_L04_001B18A0,I(data,0x540));
         }
-        if (F(data,0x2A8)==0.0f) F(data,0x2A8)=0.01745329424738884f*func_002A78D8(15.0f,25.0f);
+        if (F(data,0x2A8)==0.0f) F(data,0x2A8)=0.01745329424738884f*RandomSignedFloatRange(15.0f,25.0f);
         else F(data,0x2A8)*=0.01745329424738884f;
-        if (I(data,0x2B4)) F(data,0x2A8)=func_002A78D8(5.0f,30.0f)*0.01745329424738884f;
-        if (func_002A77E0(2)==1) { H(object,0x34)|=0x8000; func_L00_003294F0(object,1); }
-        data[0x48]=func_00283CF0(20.0f);
-        data[0x4A]=func_00283CF0(14.0f);
+        if (I(data,0x2B4)) F(data,0x2A8)=RandomSignedFloatRange(5.0f,30.0f)*0.01745329424738884f;
+        if (RandomIntBelow(2)==1) { H(object,0x34)|=0x8000; SetObjectFlagBit(object,1); }
+        data[0x48]=FloatToInt(20.0f);
+        data[0x4A]=FloatToInt(14.0f);
         data[0x70]=25; I(data,0xA8)=4;
         data[0x71]=21; data[0x72]=16; data[0x76]=18; data[0x77]=19;
         F(data,0x7C)=0.20000001788139343f; F(data,0x80)=0.125f;
@@ -57,105 +58,105 @@ int func_L04_004502D0(u8 *object) {
         if (I(data,0x2B8)!=-1) I(data,0x17C)=I(data,0x2B8);
         F(data,0x150)=0.9599311947822571f; F(data,0x170)=1.4835299849510193f;
         F(data,0x16C)=0.0013888889225199819f; F(data,0x174)=1.5f;
-        func_002B60B0(object,0.0016666667060926557f,0.05000000447034836f,0.0011635529808693528f,0.10471977293491364f);
+        SetControllerSpeedLimits(object,0.0016666667060926557f,0.05000000447034836f,0.0011635529808693528f,0.10471977293491364f);
         if (I(data,0x560)) { F(data,0x148)=0.7f; F(data,0x150)=1.3089970350265503f; F(data,0x14C)=0.7f; }
         data[0x28]=3; data[0x29]=1; F(data,0x30)=0.75f; F(data,0x2BC)=data[0x34]; data[0x2E]=1;
         if (I(data,0x27C)) {
-            func_002A7750(object,1,5);
+            SetMobyState(object,1,5);
             if (I(data,0x280)!=-1) {
-                u8 *other=D_L04_001B24DC+(I(data,0x280)<<8);
+                u8 *other=gMobyPool_L04+(I(data,0x280)<<8);
                 P(data,0x284)=other;
                 qcopy(object+0x10,other+0x10); qcopy(object+0xF0,other+0xF0);
                 I(object,0x98)=0; H(object,0x34)&=0xAFFF;
                 P(P(P(data,0x284),0x68),0x2AC)=object;
-                P(data,0x290)=func_0029EFD0(0x911);
+                P(data,0x290)=CreateMoby(0x911 /* moby class 2321 */);
                 if (!P(data,0x290)) return 1;
                 P(data,0x290)[0x30]=object[0x30]; P(data,0x290)[0x31]=0;
                 func_002A0F48(P(data,0x290));
                 { u8 *child=P(data,0x290); qcopy(child+0x10,object+0x10); F(child,0x18)+=0.75f; }
-                P(data,0x288)=func_0029EFD0(0xFF9);
+                P(data,0x288)=CreateMoby(0xFF9 /* moby class 4089 */);
                 if (!P(data,0x288)) return 1;
                 P(data,0x288)[0x30]=object[0x30]; H(P(data,0x288),0x32)=H(object,0x32);
                 P(data,0x288)[0x31]=1; *(u64 *)(P(data,0x288)+0x38)=*(u64 *)(object+0x38);
-                func_002A0F48(P(data,0x288)); func_002AF1D0(object,P(data,0x288),1,0);
+                func_002A0F48(P(data,0x288)); CopyJointTransformToObject(object,P(data,0x288),1,0);
                 I(data,0x2A0)=0;
             } else {
-                func_0026FEB8(D_L04_002CA650); I(data,0x27C)=0; func_002A7750(object,4,0); return 1;
+                STUB_printf(D_L04_002CA650); I(data,0x27C)=0; SetMobyState(object,4,0); return 1;
             }
         } else {
-            func_002A7750(object,4,0);
-            if (object[0x43]!=10) func_002A7470(object,10,0,0);
+            SetMobyState(object,4,0);
+            if (object[0x43]!=10) StartAnimationBlended(object,10,0,0);
             if (I(data,0x564)==1) {
-                P(data,0x56C)=D_L04_001B24DC+(I(data,0x568)<<8); func_002A7750(object,5,0);
-                if (object[0x43]!=28) func_002A7470(object,28,0,0);
+                P(data,0x56C)=gMobyPool_L04+(I(data,0x568)<<8); SetMobyState(object,5,0);
+                if (object[0x43]!=28) StartAnimationBlended(object,28,0,0);
             } else if (I(data,0x564)==2) {
-                P(data,0x56C)=D_L04_001B24DC+(I(data,0x568)<<8); func_002A7750(object,5,0);
-                if (object[0x43]!=30) func_002A7470(object,30,5,0);
+                P(data,0x56C)=gMobyPool_L04+(I(data,0x568)<<8); SetMobyState(object,5,0);
+                if (object[0x43]!=30) StartAnimationBlended(object,30,5,0);
             } else if (I(data,0x564)==3) {
-                P(data,0x56C)=D_L04_001B24DC+(I(data,0x568)<<8); func_002A7750(object,5,0);
-                if (object[0x43]!=30) func_002A7470(object,30,0,0);
+                P(data,0x56C)=gMobyPool_L04+(I(data,0x568)<<8); SetMobyState(object,5,0);
+                if (object[0x43]!=30) StartAnimationBlended(object,30,0,0);
             }
-            P(data,0x2AC)=func_0029EFD0(0x9AC);
+            P(data,0x2AC)=CreateMoby(0x9AC /* moby class 2476 */);
             if (!P(data,0x2AC)) return 1;
             P(data,0x2AC)[0x30]=object[0x30]; H(P(data,0x2AC),0x32)=H(object,0x32);
             P(data,0x2AC)[0x31]=1; *(u64 *)(P(data,0x2AC)+0x38)=*(u64 *)(object+0x38);
             func_002A0F48(P(data,0x2AC)); I(P(data,0x2AC),0x98)=0;
-            func_002AF1D0(object,P(data,0x2AC),3,0);
+            CopyJointTransformToObject(object,P(data,0x2AC),3,0);
         }
         qcopy(data+0x110,object+0x10);
         F(data,0x120)=1.0f; F(data,0x12C)=F(data,0x298); F(data,0x130)=10.0f;
-        I(data,0x294)=func_002A7820(120,700);
+        I(data,0x294)=RandomIntRange(120,700);
     }
-        if (object[0x31] && func_00282E48(object+0x10,D_L04_001B9680)<24.0f) { func_002A93B0(object); object[0x6F]=22; }
-    if (data[0x2E]==2) { func_L04_00450268(object); return 1; }
-    if (P(data,0x2AC)) func_002AF1D0(object,P(data,0x2AC),3,0);
+        if (object[0x31] && fast_vec_dist(object+0x10,D_L04_001B9680)<24.0f) { UpdateMobyGroundCheck(object); object[0x6F]=22; }
+    if (data[0x2E]==2) { FreeLinkedChildObjects(object); return 1; }
+    if (P(data,0x2AC)) CopyJointTransformToObject(object,P(data,0x2AC),3,0);
     if (F(data,0x20)<=1.0f) {
         if (P(data,0x2AC)) {
-            func_002AC728(object,P(data,0x2AC)+0x10,-1,0.5f,3.0f);
-            func_0029F338(P(data,0x2AC)); P(data,0x2AC)=0;
+            SpawnExplosionWithSparks(object,P(data,0x2AC)+0x10,-1,0.5f,3.0f);
+            MarkMobySpawned(P(data,0x2AC)); P(data,0x2AC)=0;
         }
         I(data,0x2A0)=0;
     }
     if (I(data,0x1C0)>=16 && object[0x95]==2) {
-        F(data,0x2A8)=func_002A78D8(15.0f,25.0f)*0.01745329424738884f; I(data,0x1C0)=0;
-        if (object[0x43]!=11) func_002A7470(object,11,0,10);
-        func_002A7750(object,17,-1);
+        F(data,0x2A8)=RandomSignedFloatRange(15.0f,25.0f)*0.01745329424738884f; I(data,0x1C0)=0;
+        if (object[0x43]!=11) StartAnimationBlended(object,11,0,10);
+        SetMobyState(object,17,-1);
     }
-    result=func_002B0ED8(object,data+0x60,I(data,0x2A0));
+    result=ApplyDamageToObject(object,data+0x60,I(data,0x2A0));
     if (result) {
 
         if (F(object,0x48)!=1.0f) F(object,0x48)=1.0f;
-        if (I(data,0x2A0)) { func_0029FCC0(object,3,position); func_L04_00451150(position,8); }
-        if (result==4) func_002E5CF8(24,0,object);
-        I(data,0x2A0)=0; data[0x57]=210; func_002AB800(object,data+0x50); func_L04_004510C8(object);
-        if ((unsigned)(result-4)<2 && D_L04_001B24F8>=object[0x21] && func_002A8508(object[0x21],-1)>=2) {
-            u16 *ids=D_L04_001FB1E0[object[0x21]];
+        if (I(data,0x2A0)) { TransformMobyJointToWorld(object,3,position); SpawnSpinningParticlePairs_L04(position,8); }
+        if (result==4) PlayMobySound(24,0,object);
+        I(data,0x2A0)=0; data[0x57]=210; StartColorFade(object,data+0x50); FlagTribesmenInGroup(object);
+        if ((unsigned)(result-4)<2 && D_L04_001B24F8>=object[0x21] && CountMobysInGroupNotInState(object[0x21],-1)>=2) {
+            u16 *ids=gMobyGroupLists_L04[object[0x21]];
             do {
-                u8 *other=P(D_L04_001B24DC+((*ids&0x7FFF)<<8),0x68);
+                u8 *other=P(gMobyPool_L04+((*ids&0x7FFF)<<8),0x68);
                 if (!I(other,0x2A4)) { I(other,0x2A4)=1; break; }
             } while ((s16)*ids++>=0);
         }
     }
     { u8 *oldTarget; u8 *stateTimer=data+0x278;
-        H(data,0x274)=func_002B3670(object,stateTimer,I(data,0x260),I(data,0x264),0,F(data,0x268),F(data,0x26C));
-        I(data,0x258)=func_002B3BA8(object,P(data,0x250),F(data,0x268),10.0f,0,0);
+        H(data,0x274)=CheckHeroDistanceZones(object,stateTimer,I(data,0x260),I(data,0x264),0,F(data,0x268),F(data,0x26C));
+        I(data,0x258)=SelectAimTarget_002B3BA8(object,P(data,0x250),F(data,0x268),10.0f,0,0);
         oldTarget=P(data,0x240);
-        I(data,0x25C)=func_002B3BA8(object,P(data,0x254),F(data,0x26C),10.0f,0,0);
-        if (oldTarget!=D_00189E20.target && P(data,0x240)==D_00189E20.target) {
+        I(data,0x25C)=SelectAimTarget_002B3BA8(object,P(data,0x254),F(data,0x26C),10.0f,0,0);
+        if (oldTarget!=gHeroState.target && P(data,0x240)==gHeroState.target) {
             P(data,0x240)=oldTarget; *(Quad *)(data+0x230)=*(Quad *)(oldTarget+0x10);
         }
     }
     if (object[0x95]!=4) {
-        float floor=func_002A89A8(object+0x10,0,0.5f);
+        float floor=ProbeGroundHeightBelow(object+0x10,0,0.5f);
         F(object,0x18)-=0.31333333253860474f;
         if (F(object,0x18)<floor) F(object,0x18)=floor;
     }
     if (F(object,0x18)<40.0f) {
-        func_002A6C58(object,0,3);
-        if (P(data,0x288)) { func_0029F338(P(data,0x288)); P(data,0x288)=0; }
+        SetDeathBits(object,0,3);
+        if (P(data,0x288)) { MarkMobySpawned(P(data,0x288)); P(data,0x288)=0; }
         if (P(data,0x2AC)) {
-            func_002AC728(object,P(data,0x2AC)+0x10,-1,0.5f,3.0f);
-            func_0029F338(P(data,0x2AC)); P(data,0x2AC)=0;
+            SpawnExplosionWithSparks(object,P(data,0x2AC)+0x10,-1,0.5f,3.0f);
+            MarkMobySpawned(P(data,0x2AC)); P(data,0x2AC)=0;
         }
         return 1;
     }

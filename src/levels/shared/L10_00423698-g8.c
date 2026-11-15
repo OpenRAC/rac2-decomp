@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef struct GornConfig { int words[10]; } GornConfig;
 extern char D_L10_00221CD0[];
@@ -22,8 +23,8 @@ extern void func_0029F338(void *);
 void func_L10_00423698(void) {
     char *state;
     int i;
-    func_L05_0037B210();
-    func_L05_00379F18(1);
+    InitAllRegisteredEntries();
+    SetPlayerStateField13(1);
     state = D_L10_00221CD0;
     D_L10_001B13A0 = -2;
     *(int *)(state + 0x10) = 0;
@@ -31,16 +32,16 @@ void func_L10_00423698(void) {
     D_L10_001B1438 = 1;
     *(int *)(state + 0x2C) = 1;
     *(int *)(state + 0x28) = 100;
-    D_L10_001B13A4 = 0;
+    gMissionInitialized = 0;
     *(int *)(state + 0x14) = 0;
-    i = func_002ED8A0(6);
+    i = FindLastUsedChainEntry(6);
     D_L10_001B1440 = 0;
     *(float *)(state + 0x30) = 8.0f;
     D_L10_002A3C70[i].words[5] = D_L10_002A3C70[i].words[4];
-    func_L05_00379F28(0);
-    func_L05_0037D6E8();
-    func_L05_00379F68();
-    func_L05_00445A98();
-    if (D_L10_001B1400) { func_0029F338(D_L10_001B1400); D_L10_001B1400 = 0; }
-    if (D_L10_001B1404) { func_0029F338(D_L10_001B1404); D_L10_001B1404 = 0; }
+    SetPlayerStateField15(0);
+    ResetTableWorkingValues();
+    ClearLevelObjectRecords();
+    SaveShipTransformState();
+    if (D_L10_001B1400) { MarkMobySpawned(D_L10_001B1400); D_L10_001B1400 = 0; }
+    if (D_L10_001B1404) { MarkMobySpawned(D_L10_001B1404); D_L10_001B1404 = 0; }
 }

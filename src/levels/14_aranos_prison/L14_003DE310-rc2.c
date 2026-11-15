@@ -24,27 +24,28 @@
  */
 #include "common.h"
 
-void func_L14_003DE310(s8 *arg0) {
-    s32 var_a1;
-    s8 **var_a0;
-    s8 *temp_v1;
-    s8 *t2;
+/* Forgets any of the four linked mobys that have died or run out of health. */
+void func_L14_003DE310(s8 *moby) {
+    s32 remaining;
+    s8 **slot;
+    s8 *linked;
+    s8 *linkedVars;
 
-    var_a1 = 3;
-    var_a0 = (s8 **)((*(s8 **)((char *)(arg0) + (0x68))) + 0xE0);
+    remaining = 3;
+    slot = (s8 **)((*(s8 **)((char *)(moby) + (0x68))) + 0xE0);
     do {
-        temp_v1 = *var_a0;
-        var_a1 -= 1;
-        if (temp_v1 != 0) {
-            t2 = (*(s8 **)((char *)(temp_v1) + (0x68)));
-            if ((*(s8 *)((char *)(temp_v1) + (0x20))) < 0) {
+        linked = *slot;
+        remaining -= 1;
+        if (linked != 0) {
+            linkedVars = (*(s8 **)((char *)(linked) + (0x68)));
+            if ((*(s8 *)((char *)(linked) + (0x20))) < 0) {
                 goto store;
             }
-            if ((*(f32 *)((char *)(t2) + (0x40))) <= 0.0f) {
+            if ((*(f32 *)((char *)(linkedVars) + (0x40))) <= 0.0f) {
             store:
-                *var_a0 = 0;
+                *slot = 0;
             }
         }
-        var_a0 = var_a0 + 1;
-    } while (var_a1 >= 0);
+        slot = slot + 1;
+    } while (remaining >= 0);
 }

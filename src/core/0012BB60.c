@@ -26,26 +26,26 @@ extern void func_0012C380(char *, unsigned int);
 
 typedef struct {
     char pad000[0x11C];
-    int unk11C;
+    int errorFlag;
     char pad120[0x30];
-    int unk150;
-    int unk154;
-    int unk158;
-    int unk15C;
-    int unk160;
-    int unk164;
-    int unk168;
-    int unk16C;
-    int unk170;
-    int unk174;
+    int pictureCodingType;
+    int fullPelForward;
+    int forwardFCode;
+    int fullPelBackward;
+    int backwardFCode;
+    int fCode00;
+    int fCode01;
+    int fCode10;
+    int fCode11;
+    int pictureStructure;
     char pad178[4];
-    int unk17C;
-    int unk180;
+    int framePredFrameDct;
+    int concealmentMvs;
     char pad184[0x2C];
     int unk1B0;
-    int unk1B4;
+    int quantScale;
     char pad1B8[0x810 - 0x1B8];
-    int unk810;
+    int curSlot;
     char pad814[0x848 - 0x814];
     int unk848;
 } MbDec;
@@ -54,105 +54,105 @@ extern void func_0012C008(int *, int, int, int, int);
 
 /* rac1-decomp src/core/00125630.c: func_00127D40 */
 /* Decodes one macroblock's modes and motion vectors through the IPU VLC engine (libmpeg _decMB0). Adapted from Lombyte (GPL-3.0) for PAL: sdk/library/_decMB0.c, _decMB0. */
-int func_0012BB60(void *arg0, int *arg1, int *arg2, int *arg3, void *arg4, void *arg5, void *arg6) {
-    MbDec *d = arg0;
-    int *mb = arg4;
-    int *sp20;
-    int *sp24;
-    int v;
-    int var19;
-    int var20;
-    int var23;
-    int motion_flag;
-    int t7;
-    int t7b;
-    int t4;
-    int var103;
-    int new_var;
+int func_0012BB60(void *decoderPtr, int *mbTypeOut, int *motionTypeOut, int *dctTypeOut, void *pmvArg, void *mvfsOut, void *dmvectorOut) {
+    MbDec *d = decoderPtr;
+    int *mb = pmvArg;
+    int *dctTypePtr;
+    int *mvfsPtr;
+    int mbTypeBits;
+    int motionVectorCount;
+    int mvFormat;
+    int mvScale;
+    int dualPrime;
+    int fCodeFwd;
+    int fCodeBwd;
+    int codingType;
+    int dctTypeValue;
+    int two;
     unsigned int g1;
     unsigned int g2;
 
-    IPU_CTRL = (IPU_CTRL & 0xF8FFFFFF) | (d->unk150 << 24);
-    sp20 = arg3;
-    sp24 = arg5;
-    v = func_0012C508((int)d, 1);
-    *arg1 = v;
-    if (v == 0) {
+    IPU_CTRL = (IPU_CTRL & 0xF8FFFFFF) | (d->pictureCodingType << 24);
+    dctTypePtr = dctTypeOut;
+    mvfsPtr = mvfsOut;
+    mbTypeBits = ReadIpuVlcCode((int)d, 1);
+    *mbTypeOut = mbTypeBits;
+    if (mbTypeBits == 0) {
         r1_func_0012C468(d, r1_D_00153998);
-        d->unk11C = 1;
+        d->errorFlag = 1;
         return 0;
     }
-    if (v & 0xC) {
-        if (d->unk174 == 3 && d->unk17C != 0) {
-            *arg2 = 2;
+    if (mbTypeBits & 0xC) {
+        if (d->pictureStructure == 3 && d->framePredFrameDct != 0) {
+            *motionTypeOut = 2;
         } else {
-            *arg2 = func_0012C878(d, 2);
+            *motionTypeOut = ReadMpegBits(d, 2);
         }
-    } else if ((v & 1) && d->unk180 != 0) {
-        *arg2 = ((d->unk174 ^ 3) == 0) ? 2 : 1;
+    } else if ((mbTypeBits & 1) && d->concealmentMvs != 0) {
+        *motionTypeOut = ((d->pictureStructure ^ 3) == 0) ? 2 : 1;
     }
-    if (d->unk174 == 3) {
-        var19 = ((*arg2 ^ 1) == 0) ? 2 : 1;
-        var20 = *arg2 == 2;
+    if (d->pictureStructure == 3) {
+        motionVectorCount = ((*motionTypeOut ^ 1) == 0) ? 2 : 1;
+        mvFormat = *motionTypeOut == 2;
     } else {
-        new_var = 2;
-        var20 = 0;
-        var19 = ((*arg2 ^ new_var) == 0) ? 2 : 1;
+        two = 2;
+        mvFormat = 0;
+        motionVectorCount = ((*motionTypeOut ^ two) == 0) ? 2 : 1;
     }
-    var23 = 0;
-    motion_flag = *arg2 == 3;
-    if (var20 == 0) {
-        var23 = d->unk174 == 3;
+    mvScale = 0;
+    dualPrime = *motionTypeOut == 3;
+    if (mvFormat == 0) {
+        mvScale = d->pictureStructure == 3;
     }
-    var103 = 0;
-    if (d->unk174 == 3 && d->unk17C == 0 && (*arg1 & 3) != 0) {
-        var103 = func_0012C878(d, 1);
+    dctTypeValue = 0;
+    if (d->pictureStructure == 3 && d->framePredFrameDct == 0 && (*mbTypeOut & 3) != 0) {
+        dctTypeValue = ReadMpegBits(d, 1);
     } else {
-        var103 = 0;
+        dctTypeValue = 0;
     }
-    *sp20 = var103;
-    if (*arg1 & 0x10) {
-        d->unk1B4 = func_0012C878(d, 5);
+    *dctTypePtr = dctTypeValue;
+    if (*mbTypeOut & 0x10) {
+        d->quantScale = ReadMpegBits(d, 5);
     }
-    if ((*arg1 & 8) || ((*arg1 & 1) && d->unk180 != 0)) {
+    if ((*mbTypeOut & 8) || ((*mbTypeOut & 1) && d->concealmentMvs != 0)) {
         if (d->unk848 != 0) {
-            r1_func_00128270_x(d, mb, arg6, sp24, 0, var19, var20, d->unk164 - 1, d->unk168 - 1, motion_flag, var23);
+            r1_func_00128270_x(d, mb, dmvectorOut, mvfsPtr, 0, motionVectorCount, mvFormat, d->fCode00 - 1, d->fCode01 - 1, dualPrime, mvScale);
         } else {
-            t7 = d->unk158 - 1;
-            func_0012C230(d, mb, arg6, t7, t7, 0, 0, d->unk154);
+            fCodeFwd = d->forwardFCode - 1;
+            ReadMpegMotionVector(d, mb, dmvectorOut, fCodeFwd, fCodeFwd, 0, 0, d->fullPelForward);
         }
     }
-    if (d->unk11C != 0) {
+    if (d->errorFlag != 0) {
         return 0;
     }
-    if (*arg1 & 4) {
+    if (*mbTypeOut & 4) {
         if (d->unk848 != 0) {
-            r1_func_00128270_x(d, mb, arg6, sp24, 1, var19, var20, d->unk16C - 1, d->unk170 - 1, 0, var23);
+            r1_func_00128270_x(d, mb, dmvectorOut, mvfsPtr, 1, motionVectorCount, mvFormat, d->fCode10 - 1, d->fCode11 - 1, 0, mvScale);
         } else {
-            t7b = d->unk160 - 1;
-            func_0012C230(d, mb + 2, arg6, t7b, t7b, 0, 0, d->unk15C);
+            fCodeBwd = d->backwardFCode - 1;
+            ReadMpegMotionVector(d, mb + 2, dmvectorOut, fCodeBwd, fCodeBwd, 0, 0, d->fullPelBackward);
         }
     }
-    if (d->unk11C != 0) {
+    if (d->errorFlag != 0) {
         return 0;
     }
-    if ((*arg1 & 1) && d->unk180 != 0) {
-        func_0012C788(d, 1);
+    if ((*mbTypeOut & 1) && d->concealmentMvs != 0) {
+        SkipMpegBits(d, 1);
     }
-    if ((*arg1 & 3) != 0) {
-        func_0012E088(*(void **)((char *)d + d->unk810 * 0x140 + 0x594), 0x300);
-        func_0012C3B0(d);
-        g1 = ((*arg1 & 1) << 27) | (d->unk1B4 << 16);
+    if ((*mbTypeOut & 3) != 0) {
+        StartIpuToMemoryDma(*(void **)((char *)d + d->curSlot * 0x140 + 0x594), 0x300);
+        WaitIpuIdle(d);
+        g1 = ((*mbTypeOut & 1) << 27) | (d->quantScale << 16);
         g2 = (d->unk1B0 << 26) | 0x20000000;
-        func_0012C380((char *)d, (g1 | g2) | (*sp20 << 25));
+        SendIpuCommand((char *)d, (g1 | g2) | (*dctTypePtr << 25));
     } else {
-        *(int *)((char *)d + d->unk810 * 0x140 + 0x6CC) = 1;
+        *(int *)((char *)d + d->curSlot * 0x140 + 0x6CC) = 1;
     }
     d->unk1B0 = 0;
-    if (d->unk11C != 0) {
+    if (d->errorFlag != 0) {
         return 0;
     }
-    if (((*arg1 & 1) || (d->unk1B0 = 1, (*arg1 & 1) != 0)) && d->unk180 == 0) {
+    if (((*mbTypeOut & 1) || (d->unk1B0 = 1, (*mbTypeOut & 1) != 0)) && d->concealmentMvs == 0) {
         mb[5] = 0;
         mb[4] = 0;
         mb[1] = 0;
@@ -162,15 +162,15 @@ int func_0012BB60(void *arg0, int *arg1, int *arg2, int *arg3, void *arg4, void 
         mb[3] = 0;
         mb[2] = 0;
     }
-    t4 = d->unk150;
-    if (t4 == 2) {
-        if (!(*arg1 & 9)) {
+    codingType = d->pictureCodingType;
+    if (codingType == 2) {
+        if (!(*mbTypeOut & 9)) {
             mb[0] = (mb[1] = (mb[4] = (mb[5] = 0)));
-            if (d->unk174 == 3) {
-                *arg2 = t4;
+            if (d->pictureStructure == 3) {
+                *motionTypeOut = codingType;
             } else {
-                *arg2 = 1;
-                *sp24 = d->unk174 == 2;
+                *motionTypeOut = 1;
+                *mvfsPtr = d->pictureStructure == 2;
             }
         }
     }
@@ -184,6 +184,7 @@ int func_0012BB60(void *arg0, int *arg1, int *arg2, int *arg3, void *arg4, void 
  * MPEG-1 (ISO/IEC 11172-1) support; called from func_0012C230
  * (motionVector, already matched in this file).
  */
+/* Adds a motion vector change read from the stream to the previous vector, wrapping it around when it goes out of range. */
 void func_0012C008(int *pred, int r_size, int motion_code, int motion_residual, int full_pel_vector) {
     int lim, vec;
 
@@ -210,20 +211,21 @@ void func_0012C008(int *pred, int r_size, int motion_code, int motion_residual, 
  * of read from a global. func_0012C230 is motionVector (already matched
  * in this file); func_0012C878 is Get_Bits.
  */
-void func_0012C090(void *arg0, int PMV[][2][2], int *dmvector, int mvfs[][2],
+/* Reads the motion vectors of one macroblock for forward or backward prediction and stores them in the vector table. */
+void func_0012C090(void *decoderPtr, int PMV[][2][2], int *dmvector, int mvfs[][2],
                     int s_idx, int motion_vector_count, int mv_format,
                     int h_r_size, int v_r_size, int dmv, int mvscale) {
     if (motion_vector_count == 1) {
         if (mv_format == 0 && dmv == 0) {
-            mvfs[1][s_idx] = mvfs[0][s_idx] = func_0012C878(arg0, 1);
+            mvfs[1][s_idx] = mvfs[0][s_idx] = ReadMpegBits(decoderPtr, 1);
         }
-        func_0012C230(arg0, PMV[0][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
+        ReadMpegMotionVector(decoderPtr, PMV[0][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
         PMV[1][s_idx][0] = PMV[0][s_idx][0];
         PMV[1][s_idx][1] = PMV[0][s_idx][1];
     } else {
-        mvfs[0][s_idx] = func_0012C878(arg0, 1);
-        func_0012C230(arg0, PMV[0][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
-        mvfs[1][s_idx] = func_0012C878(arg0, 1);
-        func_0012C230(arg0, PMV[1][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
+        mvfs[0][s_idx] = ReadMpegBits(decoderPtr, 1);
+        ReadMpegMotionVector(decoderPtr, PMV[0][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
+        mvfs[1][s_idx] = ReadMpegBits(decoderPtr, 1);
+        ReadMpegMotionVector(decoderPtr, PMV[1][s_idx], dmvector, h_r_size, v_r_size, dmv, mvscale, 0);
     }
 }

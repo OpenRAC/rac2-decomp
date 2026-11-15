@@ -29,73 +29,74 @@ extern int func_00282948(char *);
 
 extern void func_0029F338(char *);
 
-void func_L20_003A0320(char *arg0) {
-    char *s0 = arg0;
-    char *s1;
-    f32 buf[4];
-    f32 f20;
-    f32 f21;
-    int v0;
+/* Updates moby class 4890: waits for its trigger, puts out a burst of effects and a sound, then removes itself after a short timer. */
+void func_L20_003A0320(char *mobyArg) {
+    char *moby = mobyArg;
+    char *vars;
+    f32 effectPos[4];
+    f32 zero;
+    f32 size;
+    int value;
 
-    s1 = *(char **)(s0 + 0x68);
+    vars = *(char **)(moby + 0x68);
 
-    switch (*(u8 *)(s0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        func_0032F5B0(s0, 1, -1);
+        func_0032F5B0(moby, 1, -1);
         break;
     case 1:
-        v0 = func_002A9640(s0, 0x04010000, 0);
-        if (v0 == 0) {
-            v0 = 0xFF;
-        } else if (*(int *)s1 != 0) {
-            v0 = 0xFF;
+        value = FindOwnedEffectSlot(moby, 0x04010000, 0);
+        if (value == 0) {
+            value = 0xFF;
+        } else if (*(int *)vars != 0) {
+            value = 0xFF;
         } else {
-            func_0032F5B0(s0, 2, -1);
+            func_0032F5B0(moby, 2, -1);
             break;
         }
-        *(u8 *)(s0 + 0xA8) = v0;
-        v0 = *(int *)(s1 + 4);
-        if (v0 <= 0) {
+        *(u8 *)(moby + 0xA8) = value;
+        value = *(int *)(vars + 4);
+        if (value <= 0) {
             break;
         }
-        v0 = (int)((char *)D_L20_001B2F9C_1 + (v0 << 8));
-        if (v0 == 0) {
+        value = (int)((char *)D_L20_001B2F9C_1 + (value << 8));
+        if (value == 0) {
             break;
         }
         {
-            s32 mode = *(u8 *)(v0 + 0x20);
+            s32 mode = *(u8 *)(value + 0x20);
             if (mode == 0xFE) goto changeState;
             if (mode == 0xFD) goto changeState;
             if (mode != 3) break;
         changeState:
-            func_0032F5B0(s0, 2, -1);
+            func_0032F5B0(moby, 2, -1);
         }
         break;
     case 2:
-        f20 = 0.0f;
-        f21 = 3.0f;
-        func_L00_00324F18(s0, (char *)buf, f20, f20, f21);
-        if (*(u8 *)(s0 + 0x31) != 0 && D_L20_001B2ACC < 0.9f) {
-            func_002ABBB8(s0, D_L20_001A8F20, buf, f20, f20, 10, 3, 16,
-                          1.0f, 0.5f, 9.0f, *(f32 *)(s0 + 0x2C) * 1.3f, -1, 15.0f,
+        zero = 0.0f;
+        size = 3.0f;
+        LocalOffsetToWorld(moby, (char *)effectPos, zero, zero, size);
+        if (*(u8 *)(moby + 0x31) != 0 && D_L20_001B2ACC < 0.9f) {
+            SpawnExplosionEffects(moby, D_L20_001A8F20, effectPos, zero, zero, 10, 3, 16,
+                          1.0f, 0.5f, 9.0f, *(f32 *)(moby + 0x2C) * 1.3f, -1, 15.0f,
                           0, 1, -1, 0, 0);
-            func_002B0A68(s0, 1, (float *)D_L20_001A8F20_1, f21, 6.0f, f21, 6.0f, 0xFF);
+            SpawnDebrisForMaskedParts(moby, 1, (float *)D_L20_001A8F20_1, size, 6.0f, size, 6.0f, 0xFF);
         } else {
-            func_002B0A68(s0, 1, (float *)D_L20_001A8F20_1, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+            SpawnDebrisForMaskedParts(moby, 1, (float *)D_L20_001A8F20_1, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
         }
-        func_L00_00326110(s0, 1, 0.0f);
-        func_002E5CF8(0, 0, s0);
-        func_0032F5B0(s0, 3, -1);
+        SpawnScaledBolts(moby, 1, 0.0f);
+        PlayMobySound(0, 0, moby);
+        func_0032F5B0(moby, 3, -1);
         break;
     case 3:
-        if (func_002B3868(s0) != 0) {
-            *(u16 *)(s0 + 0x34) |= 1;
-            *(u32 *)(s0 + 0x98) = 0;
-            *(u8 *)(s0 + 0x31) = 0;
-            *(u32 *)(s1 + 8) = 0x78;
+        if (SetFirstPendingFlag(moby) != 0) {
+            *(u16 *)(moby + 0x34) |= 1;
+            *(u32 *)(moby + 0x98) = 0;
+            *(u8 *)(moby + 0x31) = 0;
+            *(u32 *)(vars + 8) = 0x78;
         }
-        if (func_00282948(s1 + 8) != 0) {
-            func_0029F338(s0);
+        if (FastFloatHelperD(vars + 8) != 0) {
+            MarkMobySpawned(moby);
         }
         break;
     }

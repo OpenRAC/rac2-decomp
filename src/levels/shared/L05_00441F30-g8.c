@@ -49,68 +49,69 @@ extern int func_00282948(void *);
 #define U(p, o) (*(unsigned short *)((char *)(p) + (o)))
 
 /* Dispatches the flight controller and its timed transform transitions. */
+/* Runs the player's ship each frame. It steers normally and handles the screen fades and resets between ship states. */
 void func_L05_00441F30(char *obj)
 {
-    int first, second;
+    int yawRate, pitchRate;
     char *input = P(obj, 0x70) + 0x50;
-    float a = D_L05_001B1A4C, b = D_L05_001B1A50, c = D_L05_001B1A54;
-    float d = D_L05_001B1A58, e = D_L05_001B1A5C, f = D_L05_001B1A64;
+    float yawParam0 = D_L05_001B1A4C, yawParam1 = D_L05_001B1A50, yawParam2 = D_L05_001B1A54;
+    float pitchParam0 = D_L05_001B1A58, pitchParam1 = D_L05_001B1A5C, pitchParam2 = D_L05_001B1A64;
 
-    F(input, 0) = a;
-    F(input, 4) = b;
-    F(input, 8) = c;
-    F(input, 12) = d;
-    F(input, 16) = e;
-    F(input, 20) = f;
+    F(input, 0) = yawParam0;
+    F(input, 4) = yawParam1;
+    F(input, 8) = yawParam2;
+    F(input, 12) = pitchParam0;
+    F(input, 16) = pitchParam1;
+    F(input, 20) = pitchParam2;
     D_L05_001B20CC = 2;
-    if (!D_00189E20[0x22B5]) {
-        I(P(D_00189E20, 0x2290), 0x98) = 0;
-        func_L00_002D2E68();
-        D_00189E20[0x22B5] = 1;
+    if (!gHeroState[0x22B5]) {
+        I(P(gHeroState, 0x2290), 0x98) = 0;
+        SetHeroObjectsFlagBit();
+        gHeroState[0x22B5] = 1;
     }
     if (!D_L05_001B1AF8) {
-        U(D_00152C00, 0x34) |= 0x41;
-        U(D_00152C00, 0x34) &= 0xEFFF;
-        I(D_00152C00, 0x98) = 0;
+        U(gHeroMoby_00152C00, 0x34) |= 0x41;
+        U(gHeroMoby_00152C00, 0x34) &= 0xEFFF;
+        I(gHeroMoby_00152C00, 0x98) = 0;
     }
-    D_L05_001B1AC0 = func_L05_0037AE28();
-    if (func_L05_00379F58()) return;
+    D_L05_001B1AC0 = GetClampedStatValue();
+    if (GetPlayerStateField18()) return;
 
-    switch (D_L05_001B1B20) {
+    switch (gShipState) {
     case 0:
-        func_L05_00442A58(obj, &first, &second);
-        func_L05_004431A0(obj, &first, &second);
-        func_L05_004432E0(obj);
-        func_L05_00443740(obj);
+        UpdateSteeringInput(obj, &yawRate, &pitchRate);
+        ApplyShipSteeringRotation(obj, &yawRate, &pitchRate);
+        UpdateChaseCameraPosition(obj);
+        UpdateDrivenMobyTransform(obj);
         break;
     case 1:
-        func_L05_00442A58(obj, &first, &second);
-        func_L05_004431A0(obj, &first, &second);
-        func_L05_004432E0(obj);
-        func_L05_00443740(obj);
+        UpdateSteeringInput(obj, &yawRate, &pitchRate);
+        ApplyShipSteeringRotation(obj, &yawRate, &pitchRate);
+        UpdateChaseCameraPosition(obj);
+        UpdateDrivenMobyTransform(obj);
         D_L05_001B1F60_sda = D_L05_001B1F60 + 0.05f;
         if (D_L05_001B1F60_sda >= 1.0f) {
             D_L05_001B1F60 = 1.0f;
-            D_L05_001B1B20 = 4;
+            gShipState = 4;
             qcopy(obj + 0x30, D_L05_001B3620);
-            func_002833F0(obj, D_L05_001B3610);
+            euler_rotation_basis(obj, D_L05_001B3610);
         }
         break;
     case 4:
         D_L05_001B1F60_sda = D_L05_001B1F60 - 0.05f;
         if (D_L05_001B1F60_sda <= 0.0f) {
             D_L05_001B1F60 = 0.0f;
-            D_L05_001B1B20 = 5;
+            gShipState = 5;
         }
         break;
     case 5:
-        if (func_00282948(&D_L05_001B1B24)) D_L05_001B1B20 = 3;
+        if (FastFloatHelperD(&gShipTransitionTimer)) gShipState = 3;
         break;
     case 3:
         D_L05_001B1F60_sda = D_L05_001B1F60 + 0.05f;
         if (D_L05_001B1F60_sda >= 1.0f) {
             D_L05_001B1F60 = 1.0f;
-            D_L05_001B1B20 = 2;
+            gShipState = 2;
             qcopy(obj + 0x30, D_L05_001B3600);
             qcopy(obj, D_L05_001B35D0);
             qcopy(obj + 0x10, D_L05_001B35E0);
@@ -118,27 +119,27 @@ void func_L05_00441F30(char *obj)
         }
         break;
     case 2:
-        func_L05_00442A58(obj, &first, &second);
-        func_L05_004431A0(obj, &first, &second);
-        func_L05_004432E0(obj);
-        func_L05_00443740(obj);
+        UpdateSteeringInput(obj, &yawRate, &pitchRate);
+        ApplyShipSteeringRotation(obj, &yawRate, &pitchRate);
+        UpdateChaseCameraPosition(obj);
+        UpdateDrivenMobyTransform(obj);
         D_L05_001B1F60_sda = D_L05_001B1F60 - 0.05f;
         if (D_L05_001B1F60_sda <= 0.0f) {
             D_L05_001B1F60_sda = 0.0f;
-            D_L05_001B1B20 = 0;
+            gShipState = 0;
         }
         break;
     case 6:
         qcopy(obj + 0x30, D_L05_001B3620);
-        func_002833F0(obj, D_L05_001B3610);
-        if (func_00282948(&D_L05_001B1B24)) {
-            func_L00_002B30E8();
+        euler_rotation_basis(obj, D_L05_001B3610);
+        if (FastFloatHelperD(&gShipTransitionTimer)) {
+            RecordHeroPlayCounters();
         } else {
-            float t = 0.13333334f;
-            if (D_001A79F0 == 20) t = 0.26666668f;
-            func_L05_004424B8(obj, t);
-            if (D_L05_001B1ADC - 20 < D_L05_001B1B24) {
-                func_L00_002D6998(D_L05_002B8770);
+            float resetSpeed = 0.13333334f;
+            if (gCurrentMapIndex == 20) resetSpeed = 0.26666668f;
+            UpdateShipRecordTransform(obj, resetSpeed);
+            if (D_L05_001B1ADC - 20 < gShipTransitionTimer) {
+                CopyRecordsToFreeSlots(D_L05_002B8770);
             }
         }
         break;
@@ -146,15 +147,15 @@ void func_L05_00441F30(char *obj)
         D_L05_001B1F64_sda = D_L05_001B1F64 + 0.05f;
         if (D_L05_001B1F64_sda >= 1.0f) {
             D_L05_001B1F64 = 1.0f;
-            D_L05_001B1B20 = 8;
-            func_L05_00442560(obj);
+            gShipState = 8;
+            RespawnShipAtBestSavedSlot(obj);
         }
         break;
     case 8:
         D_L05_001B1F64_sda = D_L05_001B1F64 - 0.05f;
         if (D_L05_001B1F64_sda <= 0.0f) {
             D_L05_001B1F64 = 0.0f;
-            D_L05_001B1B20 = 0;
+            gShipState = 0;
         }
         break;
     }

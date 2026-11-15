@@ -15,63 +15,65 @@ extern int func_002B4FF0(void *, void *, f32);
    and clamps the 0x1B8 rate to an eighth; the speeds are put back afterwards.
    The clamp needs -ffast-math (the retail's min.s): it is in a file of its own
    because the flag changes the other bodies of a shared unit. */
-void func_L01_003B49D8(u8 *arg0, void *arg1) {
-    u8 *s0 = *(u8 **)(arg0 + 0x68);
+/* Moves a swimming creature for one frame. It moves faster while it is touching other objects, and limits how fast it can turn. */
+void func_L01_003B49D8(u8 *object, void *input) {
+    u8 *vars = *(u8 **)(object + 0x68);
     void *list[16];
     int count = 0;
-    f32 f20, f21;
+    f32 savedSpeedA, savedSpeedB;
 
-    if (s0[0x35D] != 0) {
-        func_L01_003B45D8(arg0, list, &count);
+    if (vars[0x35D] != 0) {
+        CollectNearbyCreatures(object, list, &count);
     }
-    f20 = *(f32 *)(s0 + 0x130);
-    f21 = *(f32 *)(s0 + 0x138);
+    savedSpeedA = *(f32 *)(vars + 0x130);
+    savedSpeedB = *(f32 *)(vars + 0x138);
     if (count > 0) {
-        *(f32 *)(s0 + 0x138) = f21 + f21;
-        *(f32 *)(s0 + 0x130) = f20 + f20;
+        *(f32 *)(vars + 0x138) = savedSpeedB + savedSpeedB;
+        *(f32 *)(vars + 0x130) = savedSpeedA + savedSpeedA;
     }
-    func_L01_00318638(arg0, arg1, s0 + 0x110);
-    func_L01_003B4700(arg0);
-    if (*(f32 *)(s0 + 0x1B8) > 0.083333336f) {
-        f32 v = *(f32 *)(s0 + 0x1B8) * 0.9f;
+    UpdateWanderHeading(object, input, vars + 0x110);
+    FollowAttachedTarget(object);
+    if (*(f32 *)(vars + 0x1B8) > 0.083333336f) {
+        f32 scaled = *(f32 *)(vars + 0x1B8) * 0.9f;
 
-        *(f32 *)(s0 + 0x1B8) = (v < 0.083333336f) ? v : 0.083333336f;
+        *(f32 *)(vars + 0x1B8) = (scaled < 0.083333336f) ? scaled : 0.083333336f;
     }
-    *(f32 *)(s0 + 0x130) = f20;
-    *(f32 *)(s0 + 0x138) = f21;
-    if (s0[0x35D] != 0) {
-        func_L01_003B46C8(list, &count);
+    *(f32 *)(vars + 0x130) = savedSpeedA;
+    *(f32 *)(vars + 0x138) = savedSpeedB;
+    if (vars[0x35D] != 0) {
+        ClearCollectedCreatureMarks(list, &count);
     }
 }
 
 /* The same as func_L01_003B49D8, with the extra helper call the object asks for. */
-int func_L01_003B4AD0(u8 *arg0, void *arg1, f32 *arg2) {
-    u8 *s0 = *(u8 **)(arg0 + 0x68);
+/* Same as the function above but uses a different move helper and returns its result. */
+int func_L01_003B4AD0(u8 *object, void *input, f32 *speed) {
+    u8 *vars = *(u8 **)(object + 0x68);
     void *list[16];
     int count = 0;
-    f32 f20, f21;
-    int r;
+    f32 savedSpeedA, savedSpeedB;
+    int result;
 
-    if (s0[0x35D] != 0) {
-        func_L01_003B45D8(arg0, list, &count);
+    if (vars[0x35D] != 0) {
+        CollectNearbyCreatures(object, list, &count);
     }
-    f20 = *(f32 *)(s0 + 0x130);
-    f21 = *(f32 *)(s0 + 0x138);
+    savedSpeedA = *(f32 *)(vars + 0x130);
+    savedSpeedB = *(f32 *)(vars + 0x138);
     if (count > 0) {
-        *(f32 *)(s0 + 0x138) = f21 + f21;
-        *(f32 *)(s0 + 0x130) = f20 + f20;
+        *(f32 *)(vars + 0x138) = savedSpeedB + savedSpeedB;
+        *(f32 *)(vars + 0x130) = savedSpeedA + savedSpeedA;
     }
-    r = func_002B4FF0(arg0, arg1, *arg2);
-    func_L01_003B4700(arg0);
-    if (*(f32 *)(s0 + 0x1B8) > 0.083333336f) {
-        f32 v = *(f32 *)(s0 + 0x1B8) * 0.9f;
+    result = TurnTowardTargetAndStepMovement(object, input, *speed);
+    FollowAttachedTarget(object);
+    if (*(f32 *)(vars + 0x1B8) > 0.083333336f) {
+        f32 scaled = *(f32 *)(vars + 0x1B8) * 0.9f;
 
-        *(f32 *)(s0 + 0x1B8) = (v < 0.083333336f) ? v : 0.083333336f;
+        *(f32 *)(vars + 0x1B8) = (scaled < 0.083333336f) ? scaled : 0.083333336f;
     }
-    *(f32 *)(s0 + 0x130) = f20;
-    *(f32 *)(s0 + 0x138) = f21;
-    if (s0[0x35D] != 0) {
-        func_L01_003B46C8(list, &count);
+    *(f32 *)(vars + 0x130) = savedSpeedA;
+    *(f32 *)(vars + 0x138) = savedSpeedB;
+    if (vars[0x35D] != 0) {
+        ClearCollectedCreatureMarks(list, &count);
     }
-    return r;
+    return result;
 }

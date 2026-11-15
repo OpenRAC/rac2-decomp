@@ -1,3 +1,4 @@
+#include "names.h"
 typedef struct { unsigned char prefix[0x1C]; int active; unsigned char suffix[0x10]; } EffectSlot48;
 typedef struct { unsigned char prefix[0x44]; int active; unsigned char suffix[0x08]; } EffectSlot80;
 typedef struct { unsigned char prefix[0x2290]; unsigned char *object; } EffectPlayer;
@@ -8,13 +9,16 @@ extern unsigned char D_00189E20[] __attribute__((nosda));
 extern unsigned char *func_0029EFD0(int);
 extern int func_L00_002FCF18(void *, float, float, float, float, float);
 
+/* Creates the single effect controller moby (class 3303) and its two helper mobys (classes
+   3307 and 3308), and clears the effect slot tables. Does nothing if the controller already
+   exists. */
 void func_L00_003F1300(void) {
     unsigned char *object;
     unsigned char *state;
     int i;
     if (D_L00_001B08D0)
         return;
-    object = func_0029EFD0(0xCE7);
+    object = CreateMoby(0xCE7 /* moby class 3303 */);
     if (!object)
         return;
     object[0x30] = 0xFF;
@@ -25,9 +29,9 @@ void func_L00_003F1300(void) {
         D_L00_0024F9C0[i].active = 0;
     for (i = 127; i >= 0; i--)
         D_L00_0024FC00[i].active = 0;
-    *(int *)(state + 0x10) = func_L00_002FCF18(((EffectPlayer *)D_00189E20)->object + 0x10, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-    *(unsigned char **)(state + 8) = func_0029EFD0(0xCEB);
-    *(unsigned char **)(state + 12) = func_0029EFD0(0xCEC);
+    *(int *)(state + 0x10) = AllocateEffectSlot_L00_2(((EffectPlayer *)gHeroState)->object + 0x10, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+    *(unsigned char **)(state + 8) = CreateMoby(0xCEB);
+    *(unsigned char **)(state + 12) = CreateMoby(0xCEC);
     if (*(unsigned char **)(state + 8)) {
         **(int **)(*(unsigned char **)(state + 8) + 0x68) = 0;
         (*(unsigned char **)(state + 8))[0x30] = 0xFF;

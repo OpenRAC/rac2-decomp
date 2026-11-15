@@ -45,7 +45,7 @@ void *func_L05_00427FC8(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 
     }
     D_L05_001B157C += 1.0f;
     D_L05_001B35B0[i] = 1;
-    obj = func_0029EFD0(0x1193);
+    obj = CreateMoby(0x1193);
     if (obj != 0) {
         vars = *(u8 **)(obj + 0x68);
         obj[0x30] = 0xFF;
@@ -73,22 +73,22 @@ void *func_L05_00427FC8(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 
         *(s32 *)(vars + 0x1C) = a10;
         *(s32 *)(vars + 0x38) = a11;
         *(s32 *)(vars + 0x18) = a8;
-        *(float *)(vars + 0x44) = func_002A78D8(65.0f, 80.0f);
+        *(float *)(vars + 0x44) = RandomSignedFloatRange(65.0f, 80.0f);
         qcopy(&sphere, obj + 0x10);
         ((float *)&sphere)[3] = scale * 3.0f;
-        if (func_00283DB8(&sphere, 128.0f) == 1) {
+        if (FastMathHelperA(&sphere, 128.0f) == 1) {
             *(s16 *)(vars + 4) = 0x19;
             *(float *)(vars + 0x10) = 0.04f;
-            if (func_00282E48(pos, D_L05_001B9580 + 0x140) < 48.0f && flag != 0) {
+            if (fast_vec_dist(pos, D_L05_001B9580 + 0x140) < 48.0f && flag != 0) {
                 u8 *ref = D_L05_001B9580;
                 *(s32 *)(ref + 0x16C) = 0;
                 *(s32 *)(ref + 0x168) = 0x28;
                 *(float *)(ref + 0x160) = 0.075f;
             }
             if (*(s32 *)(vars + 0x18) != 0) {
-                func_00282CF0(&dir, obj + 0x10, D_L05_001B9580 + 0x140);
-                func_00282F20(&dir, &dir, 1.0f);
-                angle = func_002831B0(func_00282DB0(&dir, D_L05_001B9580 + 0x370));
+                FastVecSub(&dir, obj + 0x10, D_L05_001B9580 + 0x140);
+                vec_scale_to_length(&dir, &dir, 1.0f);
+                angle = FastAngleHelper(FastVecDot(&dir, D_L05_001B9580 + 0x370));
                 if (1.5707964f - angle < 0.45378566f) {
                     *(s32 *)(vars + 0x18) = 1;
                 } else {
@@ -99,7 +99,7 @@ void *func_L05_00427FC8(u8 *pos, u8 *parent, s32 flag, float scale, s32 a3, s32 
             *(s16 *)(vars + 4) = 0;
             *(s32 *)(vars + 0x18) = 0;
         }
-        func_L05_00428AC8(obj);
+        SpawnFireExplosionEffect(obj);
     }
     return obj;
 }

@@ -8,20 +8,21 @@ extern double func_00123078(int);
 extern double func_00122B00(double, double);
 extern double func_00122A40(double, double);
 
+/* Converts a 64-bit whole number to a double. */
 double func_001213B8(long value) {
     double high;
     double low;
     unsigned long lower;
     int word;
-    high = func_00123078((int)(value >> 32));
-    high = func_00122B00(high, 65536.0);
-    high = func_00122B00(high, 65536.0);
+    high = IntToDouble((int)(value >> 32));
+    high = MultiplyDoubles(high, 65536.0);
+    high = MultiplyDoubles(high, 65536.0);
     lower = (unsigned long)value & 0xFFFFFFFFUL;
     word = (int)lower;
-    low = func_00123078(word);
+    low = IntToDouble(word);
     if (word < 0)
-        low = func_00122A40(low, 4294967296.0);
-    return func_00122A40(high, low);
+        low = AddDoubles(low, 4294967296.0);
+    return AddDoubles(high, low);
 }
 
 /* func_00121450 is in 00121450.c, its own public libgcc module. */
@@ -33,6 +34,7 @@ extern void r1_func_0011D4A0_00121B18(void);
 /* rac1-decomp src/core/0011DD68.c: func_0011DD98 */
 /* Tail call: retail is `j r1_func_0011D4A0_00121B18` + nop, with no frame at all.
    2.9-ee emits it natively for a void function that ends in a call. */
+/* Jumps straight to another runtime helper without doing any work itself. */
 void func_00121B18(void) {
     r1_func_0011D4A0_00121B18();
 }
@@ -53,6 +55,7 @@ void func_00121B18(void) {
    aligned to 8 bytes (retail's standalone `nop` at +0x34), and the normal
    path assigns the exponent, the kind and the fraction in that order, which
    is where retail puts the three stores. */
+/* Takes a double apart into its sign, kind, exponent and fraction. */
 void func_00122760(double *value, DoubleParts *parts) {
     unsigned long bits = *(unsigned long *) value;
     unsigned int exponent = (unsigned int) (bits >> 52) & 0x7FF;
@@ -88,19 +91,21 @@ extern DoubleParts *func_00122800(DoubleParts *, DoubleParts *, DoubleParts *);
 extern double func_00122630(DoubleParts *);
 extern int func_00122F10(DoubleParts *, DoubleParts *);
 
+/* Adds two doubles using software math. */
 double func_00122A40(double first, double second) {
     DoubleParts a, b, result;
-    func_00122760(&first, &a);
-    func_00122760(&second, &b);
-    return func_00122630(func_00122800(&a, &b, &result));
+    UnpackDouble(&first, &a);
+    UnpackDouble(&second, &b);
+    return PackDouble(AddDoubleParts(&a, &b, &result));
 }
 
+/* Subtracts the second double from the first using software math. */
 double func_00122A98(double first, double second) {
     DoubleParts a, b, result;
-    func_00122760(&first, &a);
-    func_00122760(&second, &b);
+    UnpackDouble(&first, &a);
+    UnpackDouble(&second, &b);
     b.sign ^= 1;
-    return func_00122630(func_00122800(&a, &b, &result));
+    return PackDouble(AddDoubleParts(&a, &b, &result));
 }
 
 /* func_00122B00 is in 00122B00.c with its SDK assembler profile. */
@@ -205,16 +210,17 @@ static __inline__ DoubleParts *dp_div_parts(DoubleParts *a, DoubleParts *b) {
     return a;
 }
 
+/* Divides the first double by the second using software math. */
 double func_00122DA8(double first, double second) {
     DoubleParts a, b;
     DoubleParts *res;
 
-    func_00122760(&first, &a);
-    func_00122760(&second, &b);
+    UnpackDouble(&first, &a);
+    UnpackDouble(&second, &b);
 
     res = dp_div_parts(&a, &b);
 
-    return func_00122630(res);
+    return PackDouble(res);
 }
 
 static __inline__ int double_parts_iszero(DoubleParts *parts) {
@@ -227,13 +233,15 @@ static __inline__ int double_parts_isinf(DoubleParts *parts) {
     return parts->kind == 4;
 }
 
+/* Compares two doubles. Gives -1, 0 or 1 for less, equal or greater. */
 int func_00123028(double first, double second) {
     DoubleParts a, b;
-    func_00122760(&first, &a);
-    func_00122760(&second, &b);
-    return func_00122F10(&a, &b);
+    UnpackDouble(&first, &a);
+    UnpackDouble(&second, &b);
+    return CompareDoubleParts(&a, &b);
 }
 
+/* Converts a signed 32-bit whole number to a double. */
 double func_00123078(int value) {
     DoubleParts parts;
     parts.kind = 3;
@@ -253,13 +261,14 @@ double func_00123078(int value) {
             --parts.exponent;
         }
     }
-    return func_00122630(&parts);
+    return PackDouble(&parts);
 }
 
+/* Converts a double to a signed 32-bit whole number, clamping when it is too big. */
 int func_00123130(double value) {
     DoubleParts parts;
     int result;
-    func_00122760(&value, &parts);
+    UnpackDouble(&value, &parts);
     if (double_parts_iszero(&parts))
         return 0;
     if (double_parts_isnan(&parts))
@@ -274,9 +283,10 @@ int func_00123130(double value) {
     return parts.sign != 0 ? -result : result;
 }
 
+/* Converts a double to an unsigned 32-bit whole number, clamping when it is out of range. */
 unsigned int func_001231C8(double value) {
     DoubleParts parts;
-    func_00122760(&value, &parts);
+    UnpackDouble(&value, &parts);
     if (double_parts_iszero(&parts))
         return 0;
     if (double_parts_isnan(&parts))

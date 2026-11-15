@@ -34,16 +34,18 @@ extern float func_00283CE0(int);
 extern float func_00282C48(float);
 extern int func_00283D38(int, int, float);
 
-float func_L08_003CCD58(int index) {
-    if (index != -1)
-        return *(float *)(D_L08_001B29DC + ((unsigned int)index << 8) + 0x18);
+/* Returns the height of the object with the given index, or 0 when there is none. */
+float func_L08_003CCD58(int mobyIndex) {
+    if (mobyIndex != -1)
+        return *(float *)(D_L08_001B29DC + ((unsigned int)mobyIndex << 8) + 0x18);
     return 0.0f;
 }
 
-int func_L08_003CCD28(int index) {
-    if (index != -1) {
+/* Tells whether the linked object is switched on. */
+int func_L08_003CCD28(int mobyIndex) {
+    if (mobyIndex != -1) {
         if (*(unsigned char *)(*(unsigned char **)(D_L08_001B29DC
-                                                  + ((unsigned int)index << 8) + 0x68)
+                                                  + ((unsigned int)mobyIndex << 8) + 0x68)
                               + 0x14) != 0)
             return 1;
     }
@@ -89,56 +91,58 @@ extern void func_L04_003A1FE0(L08SpawnBlock *);
    D_00189E20+0x1830, kind 0x45) is alive while the mode word at +0x2294 is 0x31. The count
    is the state's +0x10 plus an entry of D_L08_001B01B8 picked by +0x18 (1 when -1); state
    0 sets the object up first and then shares state 1's step, state 2 has its own. */
-void func_L08_003CFE68(char *object)
+/* Water object: runs the shared spawn routines that make the water splash and ripple effects. */
+void func_L08_003CFE68(char *owner)
 {
-    L08SpawnBlock block;
-    char *level = D_00189E20;
-    char *player = *(char **)(level + 0x1830);
-    char *state;
-    int count;
+    L08SpawnBlock spawnBlock;
+    char *world = gHeroState;
+    char *hero = *(char **)(world + 0x1830);
+    char *vars;
+    int spawnCount;
 
-    if (player != 0 && *(short *)(player + 0xAA) == 0x45 &&
-        *(unsigned char *)(player + 0x20) != 0xFE && *(unsigned char *)(player + 0x20) != 0xFD &&
-        *(int *)(level + 0x2294) == 0x31)
+    if (hero != 0 && *(short *)(hero + 0xAA) == 0x45 &&
+        *(unsigned char *)(hero + 0x20) != 0xFE && *(unsigned char *)(hero + 0x20) != 0xFD &&
+        *(int *)(world + 0x2294) == 0x31)
         return;
-    state = *(char **)(object + 0x68);
-    if (state == 0)
+    vars = *(char **)(owner + 0x68);
+    if (vars == 0)
         return;
-    count = 1;
-    if (*(int *)(state + 0x18) != -1)
-        count = D_L08_001B01B8[*(int *)(state + 0x18)];
-    count += *(int *)(state + 0x10);
-    block.kind = 7;
-    block.count = count;
-    block.small1 = &D_L08_001B01D8;
-    block.small2 = &D_L08_001B01DC;
-    block.table0 = D_L08_002A0D00;
-    block.table1 = D_L08_0023EC80;
-    block.small0 = D_L08_001B01C8;
-    block.counts = D_L08_001B01B8;
-    block.table2 = D_L08_0023ECF0;
-    block.table3 = D_L08_002A87F0;
-    block.owner = object;
-    block.callback = func_L08_003CFFE8;
-    block.callback2 = func_L00_002E6CF0;
-    switch (*(unsigned char *)(object + 0x20)) {
+    spawnCount = 1;
+    if (*(int *)(vars + 0x18) != -1)
+        spawnCount = D_L08_001B01B8[*(int *)(vars + 0x18)];
+    spawnCount += *(int *)(vars + 0x10);
+    spawnBlock.kind = 7;
+    spawnBlock.count = spawnCount;
+    spawnBlock.small1 = &D_L08_001B01D8;
+    spawnBlock.small2 = &D_L08_001B01DC;
+    spawnBlock.table0 = D_L08_002A0D00;
+    spawnBlock.table1 = D_L08_0023EC80;
+    spawnBlock.small0 = D_L08_001B01C8;
+    spawnBlock.counts = D_L08_001B01B8;
+    spawnBlock.table2 = D_L08_0023ECF0;
+    spawnBlock.table3 = D_L08_002A87F0;
+    spawnBlock.owner = owner;
+    spawnBlock.callback = StartSharedWaterEffect;
+    spawnBlock.callback2 = AddDrawCallbackToList1;
+    switch (*(unsigned char *)(owner + 0x20)) {
     case 0:
-        func_L04_003A1A78(&block);
-        func_L04_003A5C08(object, *(float *)(state + 0x28));
+        InitWaterObject(&spawnBlock);
+        AddWaterSplashEntry(owner, *(float *)(vars + 0x28));
     case 1:
-        func_L04_003A1C98(&block);
+        UpdateWaterController(&spawnBlock);
         break;
     case 2:
-        func_L04_003A1FA0(&block);
+        AdvanceWaterControllerState(&spawnBlock);
         break;
     }
-    func_L04_003A1FE0(&block);
+    UpdateWaterRipplePatches_L04(&spawnBlock);
 }
 
-int func_L08_003D0098(int index) {
-    if (index != -1) {
+/* Tells whether the linked object is switched on. */
+int func_L08_003D0098(int mobyIndex) {
+    if (mobyIndex != -1) {
         if (*(unsigned char *)(*(unsigned char **)(D_L08_001B29DC
-                                                  + ((unsigned int)index << 8) + 0x68)
+                                                  + ((unsigned int)mobyIndex << 8) + 0x68)
                               + 0x14) != 0)
             return 1;
     }
@@ -150,46 +154,47 @@ int func_L08_003D0098(int index) {
    D_L08_001B9B00, laid out as RAC1's update_gold_bolt_glow_rings lays out its rings: each
    ring's colour follows the frame counter, and its byte argument (the ring angle in RAC1)
    is the counter's low byte, doubled and/or inverted by the ring index. */
-void func_L08_003D3EF8(char *obj)
+/* Spawns sparks and draws four glowing rings around the object that pulse with the frame counter. */
+void func_L08_003D3EF8(char *moby)
 {
-    TI128 joint, velocity, step, ring, ring_step;
-    int count;
-    int k;
-    int b;
-    float t;
+    TI128 jointPos, sparkVelocity, velocityStep, ringPos, ringStep;
+    int sparkIndex;
+    int ringIndex;
+    int angleByte;
+    float phase;
     float reciprocal, half, size;
-    int color;
+    int ringColor;
 
-    func_0029FCC0(obj, 0, &joint);
-    if (func_002A77E0(4) == 0) {
-        func_002A7A00(&velocity, D_L08_001B0338 * 0.016666668f, D_L08_001B033C * 0.016666668f);
-        b = D_L08_001B0348;
-        func_002C3150(&joint, &velocity, D_L08_001B034C, b, func_002A77E0(255), 0, D_L08_001B0354);
-        for (count = 2; count >= 0; count--) {
-            func_002A7A00(&step, D_L08_001B0340 * 0.016666668f, D_L08_001B0344 * 0.016666668f);
-            func_00282CC0(&velocity, &velocity, &step);
-            b = D_L08_001B0348;
-            func_002C3150(&joint, &velocity, D_L08_001B0350, b, func_002A77E0(255), 0, D_L08_001B0358);
+    TransformMobyJointToWorld(moby, 0, &jointPos);
+    if (RandomIntBelow(4) == 0) {
+        RandomDirectionVector(&sparkVelocity, D_L08_001B0338 * 0.016666668f, D_L08_001B033C * 0.016666668f);
+        angleByte = D_L08_001B0348;
+        SpawnHeroRelativeParticle(&jointPos, &sparkVelocity, D_L08_001B034C, angleByte, RandomIntBelow(255), 0, D_L08_001B0354);
+        for (sparkIndex = 2; sparkIndex >= 0; sparkIndex--) {
+            RandomDirectionVector(&velocityStep, D_L08_001B0340 * 0.016666668f, D_L08_001B0344 * 0.016666668f);
+            FastVecAdd(&sparkVelocity, &sparkVelocity, &velocityStep);
+            angleByte = D_L08_001B0348;
+            SpawnHeroRelativeParticle(&jointPos, &sparkVelocity, D_L08_001B0350, angleByte, RandomIntBelow(255), 0, D_L08_001B0358);
         }
     }
-    func_00282CF0(&ring, D_L08_001B9B00, &joint);
-    func_00282F20(&ring, &ring, -0.3f);
-    func_00282F20(&ring_step, &ring, 0.1f);
-    func_00282CC0(&ring, &ring, &joint);
+    FastVecSub(&ringPos, D_L08_001B9B00, &jointPos);
+    vec_scale_to_length(&ringPos, &ringPos, -0.3f);
+    vec_scale_to_length(&ringStep, &ringPos, 0.1f);
+    FastVecAdd(&ringPos, &ringPos, &jointPos);
     reciprocal = 0.003921569f;
     half = 0.5f;
     size = 3.0f;
-    for (k = 0; k < 4; k++) {
-        t = func_00283CE0(0xFF - ((D_L08_001B2508 + k * 20) & 0xFF));
-        color = func_00283D38(D_L08_001B035C, D_L08_001B0360, func_00282C48(half - t * reciprocal));
-        b = D_L08_001B2508 & 0xFF;
-        if (k & 2)
-            b = b * 2;
-        if (k & 1)
-            b = 0xFF - b;
-        func_002C2FD8(&ring, color, b, D_L08_001B036C, D_L08_001B0368, 2, 0,
-                      (func_00283CE0(k) + size)
-                          * (*(float *)(obj + 0x2C) / *(float *)(*(char **)(obj + 0x24) + 0x24)));
-        func_00282CC0(&ring, &ring, &ring_step);
+    for (ringIndex = 0; ringIndex < 4; ringIndex++) {
+        phase = IntToFloat(0xFF - ((D_L08_001B2508 + ringIndex * 20) & 0xFF));
+        ringColor = FastTweenColor(D_L08_001B035C, D_L08_001B0360, FloatAbs(half - phase * reciprocal));
+        angleByte = D_L08_001B2508 & 0xFF;
+        if (ringIndex & 2)
+            angleByte = angleByte * 2;
+        if (ringIndex & 1)
+            angleByte = 0xFF - angleByte;
+        SpawnFadingParticle_002C2FD8(&ringPos, ringColor, angleByte, D_L08_001B036C, D_L08_001B0368, 2, 0,
+                      (IntToFloat(ringIndex) + size)
+                          * (*(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24)));
+        FastVecAdd(&ringPos, &ringPos, &ringStep);
     }
 }

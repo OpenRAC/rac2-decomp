@@ -37,14 +37,15 @@ extern s32 ref_L08_00398A90_05 __attribute__((sda));
 extern void ref_L08_00398A90_06(s32, s32, s32);
 
 extern s32 D_001A79F0;
-void func_L01_00398A90(s8 *arg0) {
-    s8 *p;
+/* Picks a per-level table from the level number and uses the moby's setting to choose the entry to apply. */
+void func_L01_00398A90(s8 *moby) {
+    s8 *vars;
     s32 *tab;
     s32 idx;
     s32 k;
 
-    p = *(s8 **)(0x68 + arg0);
-    idx = D_001A79F0;
+    vars = *(s8 **)(0x68 + moby);
+    idx = gCurrentMapIndex;
     idx -= 1;
     {
     static void *volatile rc2_labels[] = {&&rc2_case_0, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_case_7, &&rc2_case_8, &&rc2_default, &&rc2_default, &&rc2_case_11, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_default, &&rc2_case_16, &&rc2_default, &&rc2_default, &&rc2_case_19};
@@ -53,22 +54,22 @@ void func_L01_00398A90(s8 *arg0) {
 goto *D_L01_002A4420[rc2_selector];
 
     rc2_case_0:
-        ref_L08_00398A90_06(4, (&ref_L08_00398A90_00)[*(s32 *)(p + 0x10)], 1);
+        ref_L08_00398A90_06(4, (&ref_L08_00398A90_00)[*(s32 *)(vars + 0x10)], 1);
         return;
     rc2_case_7:
-        ref_L08_00398A90_06(4, (&ref_L08_00398A90_01)[*(s32 *)(p + 0x10)], 1);
+        ref_L08_00398A90_06(4, (&ref_L08_00398A90_01)[*(s32 *)(vars + 0x10)], 1);
         return;
     rc2_case_8:
-        ref_L08_00398A90_06(4, (&ref_L08_00398A90_02)[*(s32 *)(p + 0x10)], 1);
+        ref_L08_00398A90_06(4, (&ref_L08_00398A90_02)[*(s32 *)(vars + 0x10)], 1);
         return;
     rc2_case_11:
-        ref_L08_00398A90_06(4, (&ref_L08_00398A90_03)[*(s32 *)(p + 0x10)], 1);
+        ref_L08_00398A90_06(4, (&ref_L08_00398A90_03)[*(s32 *)(vars + 0x10)], 1);
         return;
     rc2_case_16:
-        ref_L08_00398A90_06(4, (&ref_L08_00398A90_04)[*(s32 *)(p + 0x10)], 1);
+        ref_L08_00398A90_06(4, (&ref_L08_00398A90_04)[*(s32 *)(vars + 0x10)], 1);
         return;
     rc2_case_19:
-        ref_L08_00398A90_06(4, (&ref_L08_00398A90_05)[*(s32 *)(p + 0x10)], 1);
+        ref_L08_00398A90_06(4, (&ref_L08_00398A90_05)[*(s32 *)(vars + 0x10)], 1);
         return;
     rc2_default:
         return;

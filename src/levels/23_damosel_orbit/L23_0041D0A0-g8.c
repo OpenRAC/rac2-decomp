@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L23_0041D0A0 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give
@@ -21,24 +22,25 @@ extern int func_L23_00419CA0(int);
 
 extern void func_L23_00418650(char *, float);
 
-int func_L23_0041D0A0(char *arg0, int arg1, float arg2) {
-    char *state = *(char **)(D_L23_001B1484 + 0x68);
+/* Picks a random path point that is far enough from the hero and stores it as a spawn position. */
+int func_L23_0041D0A0(char *outPos, int onlyAllowed, float heightOffset) {
+    char *state = *(char **)(gMothershipBossMoby + 0x68);
     char *slots = state + 0x230;
     float best = 45.0f;
     int found;
-    int w;
+    int slotIndex;
     int j;
     int *list;
     char *p;
-    int k;
+    int pointIndex;
 
     for (;;) {
         found = 0;
-        w = func_002A77E0(0x2F);
-        list = D_L23_001FF300[*(int *)(slots + (w << 2))];
+        slotIndex = RandomIntBelow(0x2F);
+        list = gPathLists[*(int *)(slots + (slotIndex << 2))];
         p = (char *)list + 0x10;
         for (j = 0; j < *list; j++) {
-            if (func_00282E48(D_00189EA0, p) < best) {
+            if (fast_vec_dist(gHeroPosition, p) < best) {
                 found = 1;
                 break;
             }
@@ -46,14 +48,14 @@ int func_L23_0041D0A0(char *arg0, int arg1, float arg2) {
         }
         if (found)
             continue;
-        if (arg1 == 0)
+        if (onlyAllowed == 0)
             continue;
-        if (func_L23_00419CA0(w) == 0)
+        if (IsValueNotInSlotTable(slotIndex) == 0)
             continue;
         break;
     }
-    k = func_002A77E0(*list - 1);
-    *(TI128 *)arg0 = *(TI128 *)((char *)list + k * 16 + 0x10);
-    func_L23_00418650(arg0, arg2);
+    pointIndex = RandomIntBelow(*list - 1);
+    *(TI128 *)outPos = *(TI128 *)((char *)list + pointIndex * 16 + 0x10);
+    ProjectPointOntoPlanetSurface(outPos, heightOffset);
     return 1;
 }

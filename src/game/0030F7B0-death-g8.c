@@ -71,23 +71,23 @@ void func_003120C8(CrateMoby *self, int explode, CrateHit *hit)
     CrateMoby *p;
     int i, amount, kind;
 
-    if (func_00282C30(D_001B1688 - D_001B24AC) >= 2) {
+    if (subtract_integer_with_clamp(gGameTime - D_001B24AC) >= 2) {
         switch (self->oClass) {
-        case 0x1FA: func_002E5DA0(0, 0, (char *)self, 0x1F4); break;
-        case 0x1FF: func_002E5DA0(1, 0, (char *)self, 0x1FF); break;
-        default: func_002E5CF8(0, 0, (char *)self); break;
+        case 0x1FA /* moby class 506 */: PlaySoundFromClassBank(0, 0, (char *)self, 0x1F4); break;
+        case 0x1FF /* Ammo Crate */: PlaySoundFromClassBank(1, 0, (char *)self, 0x1FF); break;
+        default: PlayMobySound(0, 0, (char *)self); break;
         }
-        D_001B24AC = D_001B1688;
+        D_001B24AC = gGameTime;
     }
-    if (func_00282C30(D_001B1688 - D_001B24B0) >= 2)
-        D_001B24B0 = D_001B1688;
+    if (subtract_integer_with_clamp(gGameTime - D_001B24B0) >= 2)
+        D_001B24B0 = gGameTime;
     if (vars->above) {
         vars->above->vars->below = vars->below;
         vars->above->vars->flags |= 0x24;
     }
     if (vars->below) {
-        if (!func_002ABB78(vars->below->vars->above))
-            func_00282A28();
+        if (!IsMobyInSpecialClassRange(vars->below->vars->above))
+            TrapAlways();
         vars->below->vars->above = vars->above;
         vars->below->vars->flags |= 0x24;
     }
@@ -99,22 +99,22 @@ void func_003120C8(CrateMoby *self, int explode, CrateHit *hit)
     } while (p);
     qcopy(position, self->position);
     position[2] += 0.3f;
-    func_002BC768((char *)position, 1, 0x40808080, 0.3f, 1.01f, 1.075f, 0.05f, 50000.0f);
+    SpawnFlashParticle_002BC768((char *)position, 1, 0x40808080, 0.3f, 1.01f, 1.075f, 0.05f, 50000.0f);
     i = 4;
     do {
-        func_002BC768((char *)position, 1, 0x40808080, 0.3f, 1.01f, 1.07f, 0.05f, 50000.0f);
+        SpawnFlashParticle_002BC768((char *)position, 1, 0x40808080, 0.3f, 1.01f, 1.07f, 0.05f, 50000.0f);
         --i;
     } while (i >= 0);
     if (hit)
         qcopy(direction, hit->position);
     else
-        func_00282CF0(direction, self->position, D_0018C0B0 + 0x10);
-    if (func_00282C30(D_001B1688 - D_001AF0F8) >= 241) {
+        FastVecSub(direction, self->position, gHeroMoby_0018C0B0 + 0x10);
+    if (subtract_integer_with_clamp(gGameTime - D_001AF0F8) >= 241) {
         D_001AF0FC = 0;
-        D_001AF0F8 = D_001B1688;
-    } else if (D_001B1688 != D_001AF0F8) {
-        func_002AA340(&D_001AF0FC, 0, func_00282C30(D_001B1688 - D_001AF0F8) >> 2);
-        D_001AF0F8 = D_001B1688;
+        D_001AF0F8 = gGameTime;
+    } else if (gGameTime != D_001AF0F8) {
+        StepIntTowardTarget(&D_001AF0FC, 0, subtract_integer_with_clamp(gGameTime - D_001AF0F8) >> 2);
+        D_001AF0F8 = gGameTime;
     }
     if (D_001B1A80 >= 251 && D_001AF0FC < 5)
         amount = 4;
@@ -130,14 +130,14 @@ void func_003120C8(CrateMoby *self, int explode, CrateHit *hit)
         type = self->oClass;
         D_001AF0FC += amount;
         switch (type) {
-        case 0x1F4: case 0x1FF:
+        case 0x1F4 /* Crate */: case 0x1FF /* Ammo Crate */:
             switch (amount) {
             case 1: kind = 1; break;
             case 2: kind = 5; break;
             case 3: default: kind = 37; break;
             }
             break;
-        case 0x1F5: case 0x200:
+        case 0x1F5 /* Nanotech Crate */: case 0x200 /* Purple Nanotech Crate */:
             kind = (1 << (amount - 1)) - 1;
             if (kind > 15)
                 kind = 15;
@@ -146,8 +146,8 @@ void func_003120C8(CrateMoby *self, int explode, CrateHit *hit)
         if (kind) {
             qzero_nc(velocity);
             if (vars->attachment && !D_001AD7EC)
-                func_002AD330((char *)self, vars->attachment, (char *)self->position, (char *)velocity);
-            func_002B0A68((char *)self, kind, velocity, 3.0f, 6.0f, 3.0f, 6.0f, 255);
+                TransformPointByMobyAttachment((char *)self, vars->attachment, (char *)self->position, (char *)velocity);
+            SpawnDebrisForMaskedParts((char *)self, kind, velocity, 3.0f, 6.0f, 3.0f, 6.0f, 255);
         }
     }
     self->state = 3;
@@ -156,8 +156,8 @@ void func_003120C8(CrateMoby *self, int explode, CrateHit *hit)
     self->collision = 0;
     if (explode) {
         vars->burstFrame = 1;
-        func_00282F20(velocity, self->up, 0.5f);
-        func_00282CC0(velocity, velocity, self->position);
-        func_0032C700(velocity, 0, 10, 10, 10, 10, 15, 0, 1.0f, 0.0f, 0, 0, 0, 0);
+        vec_scale_to_length(velocity, self->up, 0.5f);
+        FastVecAdd(velocity, velocity, self->position);
+        SpawnExplosion(velocity, 0, 10, 10, 10, 10, 15, 0, 1.0f, 0.0f, 0, 0, 0, 0);
     }
 }

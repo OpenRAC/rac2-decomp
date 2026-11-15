@@ -158,6 +158,7 @@ extern void func_002E7B48(void *), func_00272368(void), func_002914B8(void);
 extern void func_0029FFB8(void), func_002F52B8(void);
 extern int func_002E8368(void);
 
+/* Runs one frame of a story cutscene: moves the camera and every actor along their paths, handles skipping and fades, and ends the scene. */
 int func_002E9268(void)
 {
     float matrix[16] __attribute__((aligned(16)));
@@ -170,11 +171,11 @@ int func_002E9268(void)
     switch (state->mode) {
     case 0:
     case 3:
-        func_002F5220();
-        func_002B6658();
-        func_002E5F60();
-        func_0026F718();
-        func_002B9390();
+        ResetFrameCounters();
+        UpdateVisibleObjects();
+        RunSoundCallbacks();
+        EmptyStubF718();
+        UpdateParticles();
         scene->streamFrame++;
         scene->frame++;
         {
@@ -182,35 +183,35 @@ int func_002E9268(void)
             for (skipIndex=0; W(D_00261FE0,scene->selected*32 + skipIndex*8)>=0; skipIndex++) {
                 if (scene->frame==W(D_00261FE0,scene->selected*32 + skipIndex*8)) {
                     advance=W(D_00261FE0,scene->selected*32 + skipIndex*8+4);
-                    chunkLength=D_001A7B90 ? 80 : 96;
+                    chunkLength=gIsPalVideo ? 80 : 96;
                     scene->frame+=advance;
                     scene->streamFrame+=advance;
                     if (scene->streamFrame>=chunkLength) {
                         scene->chunk=scene->frame/chunkLength;
-                        func_00294070(scene->chunk);
+                        SelectSegmentAndUpdateWorld(scene->chunk);
                         scene->streamFrame=scene->frame%chunkLength;
                     }
                     break;
                 }
             }
         }
-        D_001B15A0-=0.125f;
-        if (D_001B15A0<0.0f) D_001B15A0=0.0f;
+        gScreenFade-=0.125f;
+        if (gScreenFade<0.0f) gScreenFade=0.0f;
         {
         int limit, skip;
-        limit=D_001A7B90 ? 80 : 96;
+        limit=gIsPalVideo ? 80 : 96;
         skip=state->skip;
-        if ((D_00138180.pressed&0x9FF) && scene->frame>=13 && D_001B15A0==0.0f && scene->frame<scene->endFrame-30) skip=1;
+        if ((gPadState.pressed&0x9FF) && scene->frame>=13 && gScreenFade==0.0f && scene->frame<scene->endFrame-30) skip=1;
         if (skip) {
-            if ((unsigned short)((unsigned short)D_001A63A8.mode-6)>=2) D_001A63A8.mode=5;
+            if ((unsigned short)((unsigned short)gMusicState.mode-6)>=2) gMusicState.mode=5;
             if (state->mode==0) {
                 scene->frame=scene->endFrame-30;
                 scene->chunk=scene->frame/limit;
-                func_00294070(scene->chunk);
+                SelectSegmentAndUpdateWorld(scene->chunk);
                 scene->streamFrame=scene->frame%limit;
                 if (state->skip) state->skip=0;
-                else func_0027D330(4);
-                D_001B15A0=1.0f;
+                else FadeToBlack(4);
+                gScreenFade=1.0f;
             } else {
                 if (state->skip) state->skip=0;
                 if (scene->frame<5) state->fadeStart=-5;
@@ -223,16 +224,16 @@ int func_002E9268(void)
             j=state->fadeStart;
             if (j==0) j=scene->endFrame-6;
             if (scene->frame>=j) {
-                D_001B15A0=(scene->frame-j)*0.2f;
-                if (D_001B15A0>1.0f) scene->frame=scene->endFrame;
-                if (D_001B15A0>1.0f) D_001B15A0=1.0f;
+                gScreenFade=(scene->frame-j)*0.2f;
+                if (gScreenFade>1.0f) scene->frame=scene->endFrame;
+                if (gScreenFade>1.0f) gScreenFade=1.0f;
             }
         }
         if (scene->frame>=scene->endFrame) {
-            if ((unsigned short)((unsigned short)D_001A63A8.mode-6)>=2) D_001A63A8.mode=5;
-            func_002FC138();
+            if ((unsigned short)((unsigned short)gMusicState.mode-6)>=2) gMusicState.mode=5;
+            SelectPacketBufferSetup();
             D_001B9040.fieldOfView=0.62f;
-            func_0027AB40();
+            UpdateViewContext();
             {
                 int cleanupIndex;
                 for (cleanupIndex=0;cleanupIndex<scene->objectCount;cleanupIndex++) {
@@ -240,39 +241,39 @@ int func_002E9268(void)
                     if (object) {
                         object->classData->count--;
                         object->classData->slots[object->classData->count]=0;
-                        func_0029F338(object);
+                        MarkMobySpawned(object);
                     }
-                    if (state->extra) func_0029F338(state->extra);
+                    if (state->extra) MarkMobySpawned(state->extra);
                 }
             }
             state->object->flags&=0xFFFE;
             {
                 int resetIndex;
-                for (resetIndex=0;D_00214920[resetIndex];resetIndex++) if (D_00214920[resetIndex]->mobyState) D_00214920[resetIndex]->mobyState=8;
+                for (resetIndex=0;gEquipmentPieces[resetIndex];resetIndex++) if (gEquipmentPieces[resetIndex]->mobyState) gEquipmentPieces[resetIndex]->mobyState=8;
             }
             {
-                char *p;
-                for (p=D_001B1B60[0];B(p,0x20)!=255;p+=0x100) {
-                    if (!(B(p,0x20)&0x80) && (H(p,0xAA)==0x4A || H(p,0xAA)==0xCB)) UH(p,0x34)&=0xFF7F;
+                char *scanMoby;
+                for (scanMoby=D_001B1B60[0];B(scanMoby,0x20)!=255;scanMoby+=0x100) {
+                    if (!(B(scanMoby,0x20)&0x80) && (H(scanMoby,0xAA)==0x4A /* moby class 74 */ || H(scanMoby,0xAA)==0xCB /* Decoy */)) UH(scanMoby,0x34)&=0xFF7F;
                 }
             }
             if (state->mode==0) {
-                if (!func_002B49E0(3,1,4,0,0)) D_001B1694=1;
-            } else func_002B4B70(0,0);
+                if (!BeginSlotRequest(3,1,4,0,0)) D_001B1694=1;
+            } else EndSlotRequest(0,0);
         } else {
             {
-                int chunkLength=D_001A7B90 ? 80 : 96;
+                int chunkLength=gIsPalVideo ? 80 : 96;
                 if (scene->streamFrame>=chunkLength) {
                     scene->chunk++;
-                    func_00294070(scene->chunk);
+                    SelectSegmentAndUpdateWorld(scene->chunk);
                 }
             }
-            func_002AB6D8(state->object->matrix,state->object->rotation);
+            GetEulerAnglesFromMatrix(state->object->matrix,state->object->rotation);
             state->object->rotation[0]=0;
             state->object->rotation[1]=0;
-            func_00283410(matrix,state->object->rotation);
+            euler_to_matrix(matrix,state->object->rotation);
             qcopy(point,state->object->position);
-            point[2]=func_002A89A8(point,0,0.5f);
+            point[2]=ProbeGroundHeightBelow(point,0,0.5f);
             {
             char *key, *rotation;
             int last, i;
@@ -281,34 +282,34 @@ int func_002E9268(void)
             last=B(key,0xC);
             rotation=key+0x10;
             D_001B9040.fieldOfView=F(rotation,0xC);
-            func_0027AB40();
-            qcopy(D_001B5200.position,key);
-            func_002830C0(D_001B5200.position,D_001B5200.position,matrix);
-            func_00282CC0(D_001B5200.position,D_001B5200.position,point);
-            angle=func_00283B98(F(rotation,8),state->object->rotation[2]);
+            UpdateViewContext();
+            qcopy(gActiveCamera.position,key);
+            transform_vector(gActiveCamera.position,gActiveCamera.position,matrix);
+            FastVecAdd(gActiveCamera.position,gActiveCamera.position,point);
+            angle=FastAddRotations(F(rotation,8),state->object->rotation[2]);
             func_00129178(temp);
-            func_001292C0(temp,temp,F(key,0x10));
-            func_00129368(temp,temp,F(rotation,4));
-            func_00129218(temp,temp,angle);
-            D_001B5200.forward[0]=-temp[8]; D_001B5200.right[0]=-temp[0]; D_001B5200.up[0]=temp[4];
-            D_001B5200.forward[1]=-temp[9]; D_001B5200.right[1]=-temp[1]; D_001B5200.up[1]=temp[5];
-            D_001B5200.forward[2]=-temp[10]; D_001B5200.right[2]=-temp[2]; D_001B5200.up[2]=temp[6];
+            SceVibRoutine1292C0(temp,temp,F(key,0x10));
+            SceVibRoutine129368(temp,temp,F(rotation,4));
+            SceVibRoutine129218(temp,temp,angle);
+            gActiveCamera.forward[0]=-temp[8]; gActiveCamera.right[0]=-temp[0]; gActiveCamera.up[0]=temp[4];
+            gActiveCamera.forward[1]=-temp[9]; gActiveCamera.right[1]=-temp[1]; gActiveCamera.up[1]=temp[5];
+            gActiveCamera.forward[2]=-temp[10]; gActiveCamera.right[2]=-temp[2]; gActiveCamera.up[2]=temp[6];
             {
                 for (i=0;i<scene->objectCount;i++) {
-                    char *p;
+                    char *keyTable;
                     PlaybackMoby *object=scene->objects[i];
                     int half=scene->streamFrame>>1;
                     object->frame=half;
                     object->nextFrame=half+1;
-                    func_0029F390(object);
-                    object->animTime=func_00283CE0(scene->streamFrame&1)*0.5f;
+                    update_moby_animation_state(object);
+                    object->animTime=IntToFloat(scene->streamFrame&1)*0.5f;
                     if (last && (scene->streamFrame&1)) object->animTime=1.0f;
-                    p=object->keys;
-                    func_00282D30(temp,p+object->frame*16,1.0f-object->animTime);
-                    func_00282D30(temp+4,p+object->nextFrame*16,object->animTime);
-                    func_00282CC0(object->position,temp,temp+4);
-                    func_002830C0(object->position,object->position,matrix);
-                    func_00282CC0(object->position,object->position,point);
+                    keyTable=object->keys;
+                    FastVecScale(temp,keyTable+object->frame*16,1.0f-object->animTime);
+                    FastVecScale(temp+4,keyTable+object->nextFrame*16,object->animTime);
+                    FastVecAdd(object->position,temp,temp+4);
+                    transform_vector(object->position,object->position,matrix);
+                    FastVecAdd(object->position,object->position,point);
                     object->rotation[2]=state->object->rotation[2];
                     object->animId=255;
                     func_002A0F48(object);
@@ -324,23 +325,23 @@ int func_002E9268(void)
                         if (state->mode==0) { if (scene->frame<335) object->shadowRange=24; }
                         else if (scene->frame>=209) object->shadowRange=24;
                     }
-                    if (object->shadowRange) func_002A9548(object);
-                    if (object->classId==10) func_0026F790(object);
-                    if (object->classId==0) func_0026F788(object,0);
-                    if (object->classId==0xD54) {
-                        PlaybackMoby *p;
+                    if (object->shadowRange) RunMobyGroundCheck(object);
+                    if (object->classId==10) EmptyStubF790(object);
+                    if (object->classId==0) EmptyStubF788(object,0);
+                    if (object->classId==0xD54 /* moby class 3412 */) {
+                        PlaybackMoby *castMoby;
                         int j, cast;
                         object->mobyState=4;
-                        func_002E64A0(object);
-                        if (!D_001B2148 || H(D_001B2148,0xAA)==0xD54) func_0027CFD0(func_002ECB70,object);
-                        func_0027CDC8(func_002E6B78,object);
-                        p=0;
-                        j=H(D_001A8C30,((D_001A7AF0[0]>>3)&2));
-                        for(cast=0;D_00214920[cast];cast++) {
-                            if(D_00214920[cast]->mobyState>=5) D_00214920[cast]->mobyState=4;
-                            if(j==D_00214920[cast]->classId) {p=D_00214920[cast];break;}
+                        UpdateEquipmentPieces(object);
+                        if (!D_001B2148 || H(D_001B2148,0xAA)==0xD54 /* moby class 3412 */) RegisterOverlayDrawCallback(render_environment_mapped_object,object);
+                        RegisterWorldDrawCallback(DrawGroundShadowQuad,object);
+                        castMoby=0;
+                        j=H(D_001A8C30,((gEquipmentBits[0]>>3)&2));
+                        for(cast=0;gEquipmentPieces[cast];cast++) {
+                            if(gEquipmentPieces[cast]->mobyState>=5) gEquipmentPieces[cast]->mobyState=4;
+                            if(j==gEquipmentPieces[cast]->classId) {castMoby=gEquipmentPieces[cast];break;}
                         }
-                        if(p) {
+                        if(castMoby) {
                             if(state->mode==0) {
                                 int offset,color;
                                 offset=D_0018C31C ? 144 : -18;
@@ -348,28 +349,28 @@ int func_002E9268(void)
                                     color=(int)((scene->frame-(360.0f-offset))*1.5f);
                                     if(color>255) color=255;
                                     if(color<0) color=0;
-                                    p->color=color | (color<<8) | (color<<16);
+                                    castMoby->color=color | (color<<8) | (color<<16);
                                     if(scene->frame>420-offset) {
                                         object->effectScale=(int)((scene->frame-(420.0f-offset))*1.2f);
                                         object->partFlags=0;
-                                        func_0027CDC8(func_002E7338,object);
+                                        RegisterWorldDrawCallback(DrawGlowQuadsAroundObject,object);
                                     }
                                     if(scene->frame>464-offset) {
                                         D_001B15A4+=0.027f;
                                         if(D_001B15A4>1.0f) D_001B15A4=1.0f;
                                     }
                                 } else {
-                                    p->color=0xA0A0A0;
+                                    castMoby->color=0xA0A0A0;
                                     D_001B15A4-=0.027f;
                                     if(D_001B15A4<0.0f) D_001B15A4=0.0f;
                                 }
                             } else {
                                 if(scene->frame<150) {
                                     int color=((150-scene->frame)*255)/150;
-                                    p->color=color|(color<<8)|(color<<16);
+                                    castMoby->color=color|(color<<8)|(color<<16);
                                 } else {
-                                    int color=(int)(func_00283180(func_00283CE0((scene->frame&63)-32)*0.09817477f)*80.0f)+120;
-                                    p->color=color|(color<<8)|(color<<16);
+                                    int color=(int)(FastSinOrCosA(IntToFloat((scene->frame&63)-32)*0.09817477f)*80.0f)+120;
+                                    castMoby->color=color|(color<<8)|(color<<16);
                                 }
                             }
                         }
@@ -377,41 +378,41 @@ int func_002E9268(void)
                 }
             }
             }
-            func_002E4AC8();
-            func_002914B8();
-            func_0029FFB8();
-            func_002F52B8();
+            UpdateSoundVoices();
+            UpdateLightingEnvironment();
+            ComputeLightDirection();
+            UpdateIdleFrameCounters();
         }
         break;
     case 1:
-        func_002F5220();
-        func_002B6658();
-        func_002E5F60();
-        func_0026F718();
-        func_002B9390();
+        ResetFrameCounters();
+        UpdateVisibleObjects();
+        RunSoundCallbacks();
+        EmptyStubF718();
+        UpdateParticles();
         if (state->frame==0) {
-            func_002B72E8(0);
-            func_002B7CE0(0);
-            D_001A63A8.requestedFrame=0x138E;
-            D_001A63A8.requestFlags=0;
-            while (D_001A63A8.mode!=3 || D_001A63A8.streamPosition>=6000) {
-                func_002E4AC8();
-                func_001261F0(0);
+            music_Pause(0);
+            PumpMusicAndDiscRead(0);
+            gMusicState.requestedFrame=0x138E;
+            gMusicState.requestFlags=0;
+            while (gMusicState.mode!=3 || gMusicState.streamPosition>=6000) {
+                UpdateSoundVoices();
+                GetGsCurrentField(0);
             }
-            func_002B6D28();
+            ResumeMusicStream();
             state->object->opacity=255;
             state->object->updateState=0;
             if (state->curveIndex>=0) {
                 char *global;
-                state->hero=func_0029EFD0(0);
-                global=D_00189E20;
+                state->hero=CreateMoby(0);
+                global=gHeroState;
                 state->hero->drawDistance=0x1FF;
                 state->hero->opacity=255;
                 state->hero->updateState=0;
                 state->hero->flags|=6;
                 state->hero->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
                 if (B(D_001CE4EA,0)!=255 && H(global,0x24FC)==0) {
-                    state->companion=func_0029EFD0(10);
+                    state->companion=CreateMoby(10);
                     state->companion->drawDistance=0x1FF;
                     state->companion->opacity=255;
                     state->companion->updateState=0;
@@ -419,13 +420,13 @@ int func_002E9268(void)
                     state->companion->colorData=*(unsigned long long *)(P(global,0x2290)+0x38);
                 } else state->companion=0;
             }
-            func_00335438(D_001B5200.position,D_001B5200.rotation,1,0,0);
+            SetCamera5Pose(gActiveCamera.position,gActiveCamera.rotation,1,0,0);
             state->cameraBlend=0;
             state->cameraVelocity=0;
             if (state->curveIndex>=0) {
                 char *curve;
                 float maximum, angle, factor;
-                curve=(char *)D_001F1700[state->curveIndex];
+                curve=(char *)gPathTable_001F1700[state->curveIndex];
                 maximum=state->cameraBlend;
                 {
                     int pathIndex;
@@ -433,27 +434,27 @@ int func_002E9268(void)
                         char *point=curve+pathIndex*16;
                         {
                             char *previous=curve+(pathIndex-1)*16;
-                            angle=func_00283248(F(point,0x10)-F(previous,0x10),F(point,0x14)-F(previous,0x14));
+                            angle=FastMatrixHelperA(F(point,0x10)-F(previous,0x10),F(point,0x14)-F(previous,0x14));
                         }
                         {
                             char *next=curve+(pathIndex+1)*16;
-                            factor=func_00283248(F(next,0x10)-F(point,0x10),F(next,0x14)-F(point,0x14));
+                            factor=FastMatrixHelperA(F(next,0x10)-F(point,0x10),F(next,0x14)-F(point,0x14));
                         }
-                        F(point,0x1C)=func_00283BE0(angle,factor);
-                        if(maximum<func_00282C48(F(point,0x1C))) maximum=func_00282C48(F(point,0x1C));
+                        F(point,0x1C)=fast_subtract_rotations(angle,factor);
+                        if(maximum<FloatAbs(F(point,0x1C))) maximum=FloatAbs(F(point,0x1C));
                     }
                 }
                 F(curve,0x1C)=F(curve,0x2C);
                 {
                     char *last=curve+(W(curve,0)-1)*16;
                     char *previous=curve+(W(curve,0)-2)*16;
-                    angle=func_00283248(F(last,0x10)-F(previous,0x10),F(last,0x14)-F(previous,0x14));
+                    angle=FastMatrixHelperA(F(last,0x10)-F(previous,0x10),F(last,0x14)-F(previous,0x14));
                 }
                 {
                     char *last=curve+(W(curve,0)-1)*16;
-                    factor=func_00283248(F(curve,0x10)-F(last,0x10),F(curve,0x14)-F(last,0x14));
+                    factor=FastMatrixHelperA(F(curve,0x10)-F(last,0x10),F(curve,0x14)-F(last,0x14));
                 }
-                angle=func_00283BE0(factor,angle);
+                angle=fast_subtract_rotations(factor,angle);
                 factor=0.22689283f/maximum;
                 {
                     char *last=curve+(W(curve,0)-1)*16;
@@ -467,7 +468,7 @@ int func_002E9268(void)
                     int rampIndex;
                     for(rampIndex=0;rampIndex<20;rampIndex++) F(curve+rampIndex*16,0x1C)=F(curve+rampIndex*16,0x1C)*0.05f*rampIndex;
                 }
-                state->length=func_00282E48(curve+0x10,curve+0x20);
+                state->length=fast_vec_dist(curve+0x10,curve+0x20);
                 state->progress=0;
                 state->speed=0;
                 /* These copies do not overlap the state pointer/length fields. */
@@ -475,106 +476,106 @@ int func_002E9268(void)
                 qcopy_nc(state->endPosition,curve+0x10);
                 qcopy_nc(state->startRotation,state->object->rotation);
                 state->endRotation[0]=F(curve,0x1C);
-                angle=func_00282E80(curve+0x20,curve+0x10);
-                state->endRotation[1]=func_00283248(angle,F(curve,0x18)-F(curve,0x28));
-                state->endRotation[2]=func_00283248(F(curve,0x20)-F(curve,0x10),F(curve,0x24)-F(curve,0x14));
+                angle=vec_distance_xy(curve+0x20,curve+0x10);
+                state->endRotation[1]=FastMatrixHelperA(angle,F(curve,0x18)-F(curve,0x28));
+                state->endRotation[2]=FastMatrixHelperA(F(curve,0x20)-F(curve,0x10),F(curve,0x24)-F(curve,0x14));
             }
         }
         if (state->cameraStart>=0 && state->cameraEnd>=0) {
             float angle;
-            func_002AA548(&state->cameraBlend,&state->cameraVelocity,1.0f,0.00018500001f,0.00018500001f,0.008333334f);
-            func_00282D08(matrix,D_001B1C4C[0]+state->cameraStart*128+0x30,D_001B1C4C[0]+state->cameraEnd*128+0x30,state->cameraBlend);
-            func_00282C88(matrix+4);
-            angle=func_00283BE0(F(D_001B1C4C[0]+state->cameraEnd*128,0x74),F(D_001B1C4C[0]+state->cameraStart*128,0x74));
+            StepValueTowardTarget(&state->cameraBlend,&state->cameraVelocity,1.0f,0.00018500001f,0.00018500001f,0.008333334f);
+            lerp_vector(matrix,D_001B1C4C[0]+state->cameraStart*128+0x30,D_001B1C4C[0]+state->cameraEnd*128+0x30,state->cameraBlend);
+            ClearVector128(matrix+4);
+            angle=fast_subtract_rotations(F(D_001B1C4C[0]+state->cameraEnd*128,0x74),F(D_001B1C4C[0]+state->cameraStart*128,0x74));
             matrix[5]=angle*state->cameraBlend;
-            matrix[5]=func_00283B98(F(D_001B1C4C[0]+state->cameraStart*128,0x74),matrix[5]);
-            angle=func_00283BE0(F(D_001B1C4C[0]+state->cameraEnd*128,0x78),F(D_001B1C4C[0]+state->cameraStart*128,0x78));
+            matrix[5]=FastAddRotations(F(D_001B1C4C[0]+state->cameraStart*128,0x74),matrix[5]);
+            angle=fast_subtract_rotations(F(D_001B1C4C[0]+state->cameraEnd*128,0x78),F(D_001B1C4C[0]+state->cameraStart*128,0x78));
             matrix[6]=angle*state->cameraBlend;
-            matrix[6]=func_00283B98(F(D_001B1C4C[0]+state->cameraStart*128,0x78),matrix[6]);
-            func_00335370(matrix);
-            func_003353C8(matrix+4);
+            matrix[6]=FastAddRotations(F(D_001B1C4C[0]+state->cameraStart*128,0x78),matrix[6]);
+            CopyVectorToSelectedObject(matrix);
+            SetCameraStateRotation(matrix+4);
         }
         if (state->curveIndex>=0) {
-            char *p;
+            char *classData;
             PlaybackBones *bones;
             int *table;
             if (state->frame<120) {
                 float angle, factor, blend;
-                angle=func_00283CE0(state->frame);
-                factor=func_00283CE0(90);
-                blend=(1.0f-func_00283180(angle*(3.1415927f/factor)))*0.5f;
+                angle=IntToFloat(state->frame);
+                factor=IntToFloat(90);
+                blend=(1.0f-FastSinOrCosA(angle*(3.1415927f/factor)))*0.5f;
                 if(state->frame>=90) blend=1.0f;
-                func_00282D08(state->object->position,state->startPosition,state->endPosition,blend);
+                lerp_vector(state->object->position,state->startPosition,state->endPosition,blend);
                 state->object->rotation[0]=state->endRotation[0]*blend;
-                angle=func_00283BE0(state->endRotation[1],state->startRotation[1]);
-                state->object->rotation[1]=func_00283B98(state->startRotation[1],angle*blend);
-                angle=func_00283BE0(state->endRotation[2],state->startRotation[2]);
-                state->object->rotation[2]=func_00283B98(state->startRotation[2],angle*blend);
-                func_00283410(matrix,state->object->rotation);
-                func_00283678(state->object->matrix,matrix);
+                angle=fast_subtract_rotations(state->endRotation[1],state->startRotation[1]);
+                state->object->rotation[1]=FastAddRotations(state->startRotation[1],angle*blend);
+                angle=fast_subtract_rotations(state->endRotation[2],state->startRotation[2]);
+                state->object->rotation[2]=FastAddRotations(state->startRotation[2],angle*blend);
+                euler_to_matrix(matrix,state->object->rotation);
+                copy_matrix3x4(state->object->matrix,matrix);
                 func_002A10E8(state->object);
-                if(D_001B15A0>0.0f) {
-                    D_001B15A0-=0.125f;
-                    if(D_001B15A0<0.0f) D_001B15A0=0.0f;
+                if(gScreenFade>0.0f) {
+                    gScreenFade-=0.125f;
+                    if(gScreenFade<0.0f) gScreenFade=0.0f;
                 }
                 state->object->effectOpacity=(unsigned short)state->frame>>2;
-                if(blend<1.0f) func_002E8F80(state->object,-0.0625f);
+                if(blend<1.0f) SpawnObjectSparks(state->object,-0.0625f);
             } else {
                 PlaybackCurve *curve;
                 float step;
-                curve=D_001F1700[state->curveIndex];
+                curve=gPathTable_001F1700[state->curveIndex];
                 state->speed+=0.8f;
                 if(state->speed>100.0f) state->speed=100.0f;
-                if((D_00138180.pressed&0x50) && D_001B15A0<0.1f) D_001B15A0=0.1f;
+                if((gPadState.pressed&0x50) && gScreenFade<0.1f) gScreenFade=0.1f;
                 step=state->speed*(1.0f/60.0f)/state->length;
-                if((float)curve->count-step*12.0f<state->progress && D_001B15A0<0.1f) D_001B15A0=0.1f;
-                if(D_001B15A0>0.0f) {
-                    D_001B15A0+=0.1f;
-                    if(D_001B15A0>1.0f) D_001B15A0=1.0f;
+                if((float)curve->count-step*12.0f<state->progress && gScreenFade<0.1f) gScreenFade=0.1f;
+                if(gScreenFade>0.0f) {
+                    gScreenFade+=0.1f;
+                    if(gScreenFade>1.0f) gScreenFade=1.0f;
                 }
                 if(state->object->effectOpacity<160) state->object->effectOpacity+=8;
                 state->progress+=step;
-                func_002E9110(state->object);
-                if(state->progress>(float)(curve->count-1) || D_001B15A0>=1.0f) D_001A8B84=1;
+                SpawnShipExhaustPuffs(state->object);
+                if(state->progress>(float)(curve->count-1) || gScreenFade>=1.0f) D_001A8B84=1;
                 else {
-                    func_002C9828(curve,1,state->object->position,state->object->rotation,0,state->progress);
+                    SamplePathPosition(curve,1,state->object->position,state->object->rotation,0,state->progress);
                     state->object->rotation[0]=state->object->rotation[3];
-                    func_00283410(matrix,state->object->rotation);
-                    func_00283678(state->object->matrix,matrix);
+                    euler_to_matrix(matrix,state->object->rotation);
+                    copy_matrix3x4(state->object->matrix,matrix);
                     func_002A10E8(state->object);
                 }
             }
             qcopy_nc(state->hero->rotation,state->object->rotation);
-            func_00283098(state->hero->position,D_001AC1B0,state->object->matrix);
-            func_00282CC0(state->hero->position,state->hero->position,state->object->position);
+            matrix_mul_vec3(state->hero->position,D_001AC1B0,state->object->matrix);
+            FastVecAdd(state->hero->position,state->hero->position,state->object->position);
             func_002A0F48(state->hero);
-            p=state->hero->classData;
-            bones=(PlaybackBones *)P(p,0x48);
+            classData=state->hero->classData;
+            bones=(PlaybackBones *)P(classData,0x48);
             table=&bones->a1C[bones->n10];
-            func_002A1130(table+bones->n13,bones->a1C[0],D_001B4580,B(p,8));
+            func_002A1130(table+bones->n13,bones->a1C[0],D_001B4580,B(classData,8));
             state->hero->joints=D_001B4580;
             state->hero->previousJoints=D_001B4580;
             if(state->companion) {
                 qcopy_nc(state->companion->rotation,state->object->rotation);
-                func_00283098(state->companion->position,D_001AC1C0,state->object->matrix);
-                func_00282CC0(state->companion->position,state->companion->position,state->object->position);
+                matrix_mul_vec3(state->companion->position,D_001AC1C0,state->object->matrix);
+                FastVecAdd(state->companion->position,state->companion->position,state->object->position);
                 func_002A0F48(state->companion);
             }
         } else {
             D_001A8B84=1;
-            D_001B15A0=1.0f;
+            gScreenFade=1.0f;
         }
-        func_002E64A0(state->object);
-        func_0027CFD0(func_002E7B48,state->object);
-        func_00272368();
-        func_002E4AC8();
-        func_002914B8();
-        func_0029FFB8();
-        func_002F52B8();
+        UpdateEquipmentPieces(state->object);
+        RegisterOverlayDrawCallback(DrawShipEngineFlames,state->object);
+        UpdateCameraState();
+        UpdateSoundVoices();
+        UpdateLightingEnvironment();
+        ComputeLightDirection();
+        UpdateIdleFrameCounters();
         break;
     case 2:
-        D_001A8BB0=6;
-        result=func_002E8368();
+        gCurrentGameMode=6;
+        result=UpdateTransitionScene();
         break;
     }
     return result;

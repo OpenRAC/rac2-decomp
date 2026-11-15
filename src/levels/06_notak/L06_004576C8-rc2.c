@@ -30,28 +30,29 @@ extern f32 ref_L06_004576C8_03(f32);
 extern void ref_L06_004576C8_04(void *, f32, f32, f32);
 extern s32 ref_L06_004576C8_05(void *, void *, s32, void *, s32, s32);
 
-void func_L06_004576C8(void *arg0) {
-    f32 *var_s2;
-    f32 temp_f12;
-    f32 temp_f20;
-    s32 *var_s0;
-    s8 *var_s1;
-    s8 *temp_v0;
-    s32 var_s4;
+/* Sets up eight effect emitters around the object, each aimed in its own direction. */
+void func_L06_004576C8(void *moby) {
+    f32 *angles;
+    f32 pitchDeg;
+    f32 yaw;
+    s32 *handles;
+    s8 *dirs;
+    s8 *vars;
+    s32 remaining;
 
-    var_s2 = &ref_L06_004576C8_00;
-    var_s4 = 7;
-    temp_v0 = (*(s8 **)((s8 *)(arg0) + (0x68)));
-    var_s0 = (s32 *)(temp_v0 + 0x80);
-    var_s1 = temp_v0 + 0xA0;
+    angles = &ref_L06_004576C8_00;
+    remaining = 7;
+    vars = (*(s8 **)((s8 *)(moby) + (0x68)));
+    handles = (s32 *)(vars + 0x80);
+    dirs = vars + 0xA0;
     do {
-        var_s4 -= 1;
-        temp_f20 = ref_L06_004576C8_03(var_s2[0] * 0.017453294f);
-        temp_f12 = var_s2[1];
-        var_s2 += 2;
-        ref_L06_004576C8_04(var_s1, 1.0f, temp_f20, ref_L06_004576C8_03(temp_f12 * 0.017453294f));
-        var_s1 += 0x10;
-        *var_s0 = ref_L06_004576C8_05(&ref_L06_004576C8_01, &ref_L06_004576C8_02, 0x3C3C3C78, arg0, 0x19, 0);
-        var_s0 += 1;
-    } while (var_s4 >= 0);
+        remaining -= 1;
+        yaw = ref_L06_004576C8_03(angles[0] * 0.017453294f);
+        pitchDeg = angles[1];
+        angles += 2;
+        ref_L06_004576C8_04(dirs, 1.0f, yaw, ref_L06_004576C8_03(pitchDeg * 0.017453294f));
+        dirs += 0x10;
+        *handles = ref_L06_004576C8_05(&ref_L06_004576C8_01, &ref_L06_004576C8_02, 0x3C3C3C78, moby, 0x19, 0);
+        handles += 1;
+    } while (remaining >= 0);
 }

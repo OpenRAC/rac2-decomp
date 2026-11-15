@@ -9,29 +9,30 @@ extern void func_L22_003A64E8(void *,int,int), func_L22_003A6470(void *,int);
 extern int func_00282948(void *),func_002A77E0(int);
 extern float func_00282EB0(void *,void *);
 extern void func_002B6D28(void);
+/* Chooses which animation the object should play next, based on its health, the player's state and a few level flags. */
 void func_L22_003A6230(u8 *obj) {
     u8 *ctl = *(u8 **)(obj + 0x68);
-    float ratio = *(float *)(ctl + 0x20) / *(short *)(ctl + 0x24);
-    float time = D_00189E20.clock * 0.00083333335f;
+    float healthRatio = *(float *)(ctl + 0x20) / *(short *)(ctl + 0x24);
+    float seconds = gHeroState.clock * 0.00083333335f;
     if (ref_L22_003A6230_00) return;
     if (D_L22_001B1C48 && !(*(int *)(ctl + 0x4E0) & 0x1000000)) {
         *(int *)(ctl + 0x4E0) |= 0x1000000;
-        func_L22_003A64E8(obj,0,2);
+        StartFreeAnimationInRange(obj,0,2);
     }
     if (*(int *)(ctl + 0x344) && !(*(int *)(ctl + 0x4E0) & 0x800000))
-        func_L22_003A6470(obj,23);
-    if (D_00189E20.clock == 0)
-        func_L22_003A64E8(obj,20,22);
-    if (ratio < 0.25f && !(*(int *)(ctl + 0x4E0) & 0x80))
-        func_L22_003A6470(obj,7);
-    if (ratio > 0.02f && time > 0.04f) {
-        if (func_00282948(ctl + 0x4E4) && obj[0x31] &&
-            func_00282EB0(obj + 0x10, (u8 *)&D_00189E20 + 0x80) < 1600.0f)
-            func_L22_003A64E8(obj,3,6);
-        if (D_00189E20.mode == 7 &&
-            !*(int *)((u8 *)&D_00189E20 + 0x1B8) && func_002A77E0(2) == 0)
-            func_L22_003A64E8(obj,8,12);
+        StartAnimationSlot(obj,23);
+    if (gHeroState.clock == 0)
+        StartFreeAnimationInRange(obj,20,22);
+    if (healthRatio < 0.25f && !(*(int *)(ctl + 0x4E0) & 0x80))
+        StartAnimationSlot(obj,7);
+    if (healthRatio > 0.02f && seconds > 0.04f) {
+        if (FastFloatHelperD(ctl + 0x4E4) && obj[0x31] &&
+            FastVectorHelperC(obj + 0x10, (u8 *)&gHeroState + 0x80) < 1600.0f)
+            StartFreeAnimationInRange(obj,3,6);
+        if (gHeroState.mode == 7 &&
+            !*(int *)((u8 *)&gHeroState + 0x1B8) && RandomIntBelow(2) == 0)
+            StartFreeAnimationInRange(obj,8,12);
     }
     if (D_001A63A8_4.mode == 3 && D_001A63A8_4.time < 6000)
-        func_002B6D28();
+        ResumeMusicStream();
 }

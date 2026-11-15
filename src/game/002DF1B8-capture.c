@@ -39,16 +39,17 @@ extern unsigned char D_001B1640 MACRO_ADDR, D_001B1641 MACRO_ADDR, D_001B1642 MA
 extern float D_001B1644 MACRO_ADDR, D_001B1648 MACRO_ADDR, D_001B164C MACRO_ADDR, D_001B1650 MACRO_ADDR;
 extern void func_00282AB0(void *, void *, int);
 
-void func_002DF3F8(void *a, void *b) {
+/* Takes a snapshot of the map progress, two positions and several game values so they can be restored later. */
+void func_002DF3F8(void *vecA, void *vecB) {
     unsigned char *dst;
     unsigned char *src;
     int i;
     int level;
     int offset;
-    if (D_00189E20.mode == 4)
+    if (gHeroState.mode == 4)
         return;
-    func_00282AB0(D_00211A10, D_00210DA0, 0x404);
-    level = D_001A79F0;
+    CopyMemoryAligned(D_00211A10, D_00210DA0, 0x404);
+    level = gCurrentMapIndex;
     offset = level * 16 - 2;
     dst = D_00211A10 + 0x404;
     src = D_00210DA0 + 0x404;
@@ -72,20 +73,20 @@ void func_002DF3F8(void *a, void *b) {
         }
     }
     D_002119B0.active = 1;
-    qcopy_nc(D_002119B0.a, a);
-    qcopy_nc(D_002119B0.b, b);
+    qcopy_nc(D_002119B0.a, vecA);
+    qcopy_nc(D_002119B0.b, vecB);
     {
-        ObjectDF3F8 *obj = D_00189E20.object;
+        ObjectDF3F8 *obj = gHeroState.object;
         D_002119B0.obj_a = obj->a;
         D_002119B0.obj_b = obj->b;
-        D_002119B0.mode = D_00189E20.mode;
+        D_002119B0.mode = gHeroState.mode;
         D_002119B0.object = obj;
-        D_002119B0.count = D_00189E20.count;
-        D_002119B0.word = D_00188660.word;
-        D_002119B0.bytes[0] = D_00188660.bytes[0];
-        D_002119B0.bytes[1] = D_00188660.bytes[1];
-        D_002119B0.bytes[2] = D_00188660.bytes[2];
-        D_002119B0.other_count = D_001A63A8.count;
+        D_002119B0.count = gHeroState.count;
+        D_002119B0.word = gSoundState.word;
+        D_002119B0.bytes[0] = gSoundState.bytes[0];
+        D_002119B0.bytes[1] = gSoundState.bytes[1];
+        D_002119B0.bytes[2] = gSoundState.bytes[2];
+        D_002119B0.other_count = gMusicState.count;
         D_002119B0.other_word = D_001C4F40;
         D_002119B0.bytes[3] = D_001B1640;
         D_002119B0.bytes[4] = D_001B1641;

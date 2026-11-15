@@ -27,17 +27,18 @@ extern WatchObject *D_001B1AC0[16];
 extern s32 D_001B1B00[16];
 extern void func_002A05A8();
 
+/* Checks the 16 watched objects each frame, drops the ones that are gone, and acts on those that have been still for 20 frames. */
 void func_0029FB20(void) {
     s32 i = 0;
-    WatchObject *p;
+    WatchObject *watched;
     do {
-        p = D_001B1AC0[i];
-        if (p != 0) {
-            if (p->f20 & 0x80) { D_001B1AC0[i] = 0; goto z; }
-            if (p->f42 != 0xFF) { D_001B1AC0[i] = 0; goto z; }
-            if (p->f31 == 0 && D_001B1B00[i] >= 20) {
-                if (p->f24->arr[p->f43]->f13 == p->f42) {
-                    p->f44 = 1.0f - p->f4C;
+        watched = D_001B1AC0[i];
+        if (watched != 0) {
+            if (watched->f20 & 0x80) { D_001B1AC0[i] = 0; goto z; }
+            if (watched->f42 != 0xFF) { D_001B1AC0[i] = 0; goto z; }
+            if (watched->f31 == 0 && D_001B1B00[i] >= 20) {
+                if (watched->f24->arr[watched->f43]->f13 == watched->f42) {
+                    watched->f44 = 1.0f - watched->f4C;
                     func_002A05A8(D_001B1AC0[i]);
                 }
             } else {

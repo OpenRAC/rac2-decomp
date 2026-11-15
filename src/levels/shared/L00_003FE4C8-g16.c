@@ -54,6 +54,7 @@ extern void func_L00_003FE490(void *);
 
 typedef struct { float timer; s16 delay; s16 repeat; int index; int pad0C; char *list[0]; } BeamState;
 
+/* Per-frame update of the Tetrabomb Gun weapon: aims, fires and runs the reload timer. */
 void func_L00_003FE4C8(unsigned char *object) {
     float origin[4];
     float destination[4];
@@ -69,49 +70,49 @@ void func_L00_003FE4C8(unsigned char *object) {
     int i;
     int phase;
 
-    func_L00_003FE8D0(object);
-    if (H->i[2213] == 1) func_L00_002C42E0(29, 1);
+    InitObjectPrivateData(object);
+    if (H->i[2213] == 1) SetHeroAction_L00(29, 1);
     if (H->ptr[1300] != 0) H->ptr[766] = H->ptr[1300];
     if (object[0x42] == object[0x43] && (object[0x60] & 2))
-        func_002A75E0(object, 1, 0, 6, 0);
-    if (state->repeat != 0 && func_00282978(&state->repeat)) func_L00_002AF7D0();
-    func_00283098(origin, D_L00_001B0BF0, object + 0xC0);
-    func_00282CC0(origin, origin, object + 0x10);
-    func_002829D8(&state->timer);
+        StartAnimationBlendedWithFlags(object, 1, 0, 6, 0);
+    if (state->repeat != 0 && FastDecTimer(&state->repeat)) cancel_hero_item_animation();
+    matrix_mul_vec3(origin, D_L00_001B0BF0, object + 0xC0);
+    FastVecAdd(origin, origin, object + 0x10);
+    FastVectorHelperB(&state->timer);
     allowed = 1;
     if (H->i[2213] == 29) {
-        if (!func_00282948(&H->i[2381])) allowed = 0;
+        if (!FastFloatHelperD(&H->i[2381])) allowed = 0;
         else {
-            if (state->timer > 0.0f || !func_L00_002D4040(-1) || object[0x20] != 1)
+            if (state->timer > 0.0f || !get_ammo(-1) || object[0x20] != 1)
                 color = 0x600000FF;
             else color = 0x600FFF0F;
-            func_00273318(1.0f, 0.0f, 90.0f, object, color, 0, 31, -1, 4);
+            AddMobyMarker(1.0f, 0.0f, 90.0f, object, color, 0, 31, -1, 4);
         }
     } else H->i[2381] = 40;
     phase = (u8)object[0x20];
     if (phase == 1) {
         if (D_L00_001A8F00 != 0 || !allowed || state->timer != 0.0f || H->b[8892] != 0 ||
             (u8)object[0x42] > 1 || !(PAD->u[104] & H->u[1164]) || H->i[1168] < 23) return;
-        if (func_L00_002D4040(-1)) {
-            func_L00_002D3F30(-1, 1);
+        if (get_ammo(-1)) {
+            SpendWeaponAmmo(-1, 1);
             D_L00_001B2BE8 = phase;
-            if (H->i[2213] != 29) func_002A75E0(object, 2, 0, 2, 0);
-            func_002E5CF8(0, 0, object);
-            func_L00_002AF568();
+            if (H->i[2213] != 29) StartAnimationBlendedWithFlags(object, 2, 0, 2, 0);
+            PlayMobySound(0, 0, object);
+            start_equipped_item_animation();
             object[0x20] = 2;
             state->delay = D_L00_001B0C00;
             state->repeat = D_L00_001B0C08;
             state->index = 0;
         } else if ((PAD->u[105] & H->u[1164]) || D_L00_001B2BE8 == 1) {
-            func_002E5CF8(1, 0, object);
+            PlayMobySound(1, 0, object);
             D_L00_001B2BE8 = 0;
         }
-        entry = D_L00_00262570 + D_00139581[0];
+        entry = gWeaponTable_L00 + D_00139581[0];
         state->timer = 1.0f / entry->rate;
     } else if (phase == 2) {
-        if (!func_00282978(&state->delay)) return;
-        func_L00_003FE920(object, destination, state->index, origin);
-        func_L00_003FEAC8(object, origin, destination, state->index);
+        if (!FastDecTimer(&state->delay)) return;
+        ComputeSpreadShotVelocity(object, destination, state->index, origin);
+        SpawnLinkedEffectWithSparks(object, origin, destination, state->index);
         index = state->index + 1;
         state->index = index;
         if (index >= D_L00_001B0C0C) object[0x20] = 3;

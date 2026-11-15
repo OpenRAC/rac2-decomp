@@ -78,12 +78,13 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 #define HUD_SPRITE(id, color, X, Y, a, b, c)                                                        \
     {                                                                                               \
         f32 x;                                                                                      \
-        sprite = func_00336D50(D_L05_001A904C + 0x8710, id);                                       \
+        sprite = FindTableEntryById(D_L05_001A904C + 0x8710, id);                                       \
         x = (f32)(X);                                                                               \
-        func_00300A00(sprite, color, x, (f32)label_y(sprite, (f32)(Y), D_L05_001B2D84, 0.5f, 1), a, \
+        DrawScaledObjectTwoAxes(sprite, color, x, (f32)label_y(sprite, (f32)(Y), D_L05_001B2D84, 0.5f, 1), a, \
                       b, c);                                                                        \
     }
 
+/* Draws the mission HUD sprites, including a fading timed icon with a counter. */
 void func_L05_00421B98(s32 first, s32 timed, s32 third, s32 fourth)
 {
     HudTimerVars *vars = *(HudTimerVars **)(D_L05_001B13B0 + 0x68);
@@ -93,7 +94,7 @@ void func_L05_00421B98(s32 first, s32 timed, s32 third, s32 fourth)
     Block color;
 
     if (!D_L05_001B354C) {
-        D_L05_001B3548 = D_001A79F0[3];
+        D_L05_001B3548 = gCurrentMapIndex[3];
         D_L05_001B354C = 1;
     }
     if (!D_L05_001A904C)
@@ -102,16 +103,16 @@ void func_L05_00421B98(s32 first, s32 timed, s32 third, s32 fourth)
         HUD_SPRITE(0xBD, 0x60442D00, D_L05_001B1428, D_L05_001B142C, -1.0f, 1.0f, 0.0f);
         HUD_SPRITE(0xBE, 0x55F0C070, D_L05_001B1428, D_L05_001B142C, -1.0f, 1.0f, 0.0f);
     }
-    if (timed && D_L05_001B3548 < D_001A79F0[3]) {
-        if (!func_00282948(&vars->timer)) {
+    if (timed && D_L05_001B3548 < gCurrentMapIndex[3]) {
+        if (!FastFloatHelperD(&vars->timer)) {
             if (vars->timer >= 291) {
-                fade = func_00283CE0(300 - vars->timer) * 0.1f;
+                fade = IntToFloat(300 - vars->timer) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
                     fade = 0.0f;
             } else if (vars->timer < 10) {
-                fade = func_00283CE0(vars->timer) * 0.1f;
+                fade = IntToFloat(vars->timer) * 0.1f;
                 if (fade > 1.0f)
                     fade = 1.0f;
                 else if (fade < 0.0f)
@@ -126,24 +127,24 @@ void func_L05_00421B98(s32 first, s32 timed, s32 third, s32 fourth)
             HUD_SPRITE(0xC0, 0x55F0C070, D_L05_001B1430, D_L05_001B1434, 1.0f, 1.0f, 0.0f);
             color = D_L05_001B14A0;
             {
-                s32 icon = func_0028E588(0xEAA2, 3);
+                s32 icon = GetIconFrame(0xEAA2, 3);
                 s32 x = D_L05_001B1430 - 51;
                 s32 y = screen_coord(D_L05_001B2D80, (f32)(D_L05_001B1434 - 13), 1.0f);
 
-                func_0028EA58(icon, x, y, 28, 28, &color);
+                DrawHudSpriteGradient(icon, x, y, 28, 28, &color);
             }
-            func_00115DA8(text, D_L05_001B14B0, D_001A79F0[3]);
+            Sprintf(text, D_L05_001B14B0, gCurrentMapIndex[3]);
             {
                 s32 textX = D_L05_001B1430 + 5;
 
-                func_0027F5B8(textX, label_y((void *)textX, (f32)(D_L05_001B1434 + 2), D_L05_001B2D84, 0.5f, 1),
+                DrawTextMediumFont(textX, label_y((void *)textX, (f32)(D_L05_001B1434 + 2), D_L05_001B2D84, 0.5f, 1),
                               0x80808080, text, 128);
             }
         timed_done:;
         } else {
             s32 reset = 300;
 
-            D_L05_001B3548 = D_001A79F0[3];
+            D_L05_001B3548 = gCurrentMapIndex[3];
             vars->timer = reset;
         }
     }

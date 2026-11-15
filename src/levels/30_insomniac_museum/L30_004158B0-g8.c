@@ -32,141 +32,142 @@ extern void func_002ABBB8(void *, void *, void *, float, float, int, int, int, f
 extern void func_002AF000(void *, float, float, float);
 extern char *func_002BDCE8(void *, float, float, float, int, void *, float, int, int);
 
-void func_L30_004158B0(char *obj) {
-    float p[4] __attribute__((aligned(16)));
-    float v[4] __attribute__((aligned(16)));
-    float t[4] __attribute__((aligned(16)));
-    ExplosionState *st = *(ExplosionState **)(obj + 0x68);
-    float a;
+/* Spawns all the particles of a museum explosion: flash, sparks, smoke, debris and a shock ring. */
+void func_L30_004158B0(char *moby) {
+    float particlePos[4] __attribute__((aligned(16)));
+    float velocity[4] __attribute__((aligned(16)));
+    float temp[4] __attribute__((aligned(16)));
+    ExplosionState *state = *(ExplosionState **)(moby + 0x68);
+    float angle;
     int i, sign;
     {
         float burstSize, burstSpeed;
         int i;
         char *particle;
-        burstSize = D_L30_001B1EF8 * st->scale * 210000.0f;
-        burstSpeed = D_L30_001B1EFC * st->scale * 210000.0f;
-        particle = func_002C65A0(obj + 0x10, D_L30_001A8F20, D_L30_001B1F00, st->color | 0x7F000000, 0, 100, 0, burstSize, burstSpeed, 0.0f, 0);
+        burstSize = D_L30_001B1EF8 * state->scale * 210000.0f;
+        burstSpeed = D_L30_001B1EFC * state->scale * 210000.0f;
+        particle = SpawnGravityFadeParticle(moby + 0x10, D_L30_001A8F20, D_L30_001B1F00, state->color | 0x7F000000, 0, 100, 0, burstSize, burstSpeed, 0.0f, 0);
         if (particle) particle[2] = D_L30_001FFAB0[0][0];
-        particle = func_002C65A0(obj + 0x10, D_L30_001A8F20, D_L30_001B1F00, st->color, 0, 100, 0, burstSize, burstSpeed, 0.0f, 0);
+        particle = SpawnGravityFadeParticle(moby + 0x10, D_L30_001A8F20, D_L30_001B1F00, state->color, 0, 100, 0, burstSize, burstSpeed, 0.0f, 0);
         if (particle) particle[2] = D_L30_001FFAB0[0][0];
         {
             int alpha = 0x7F000000;
             for (i = 1; i >= 0; i--) {
-                particle = func_002C65A0(obj + 0x10, D_L30_001A8F20, D_L30_001B1F00, st->color | alpha, 0, 127, 0, burstSize, burstSpeed, 0.0f, 0);
+                particle = SpawnGravityFadeParticle(moby + 0x10, D_L30_001A8F20, D_L30_001B1F00, state->color | alpha, 0, 127, 0, burstSize, burstSpeed, 0.0f, 0);
                 if (particle) particle[2] = D_L30_001FF940[0x170/4][5];
             }
         }
         {
             int alpha = 0x7F000000;
             for (i = 1; i >= 0; i--) {
-                particle = func_002C65A0(obj + 0x10, D_L30_001A8F20, D_L30_001B1F00, st->color | alpha, 0, 127, 0, burstSize, burstSpeed, 0.0f, 0);
+                particle = SpawnGravityFadeParticle(moby + 0x10, D_L30_001A8F20, D_L30_001B1F00, state->color | alpha, 0, 127, 0, burstSize, burstSpeed, 0.0f, 0);
                 if (particle) particle[2] = D_L30_001FF940[0x170/4][6];
             }
         }
     }
-    for (i = 0; i < st->count0; i++) {
-        float a, direction, size, speed;
+    for (i = 0; i < state->count0; i++) {
+        float angle, direction, size, speed;
         int n, life;
         char *particle;
-        a = func_00283248(D_L30_001B9C80.position[0] - *(float *)(obj+0x10), D_L30_001B9C80.position[1] - *(float *)(obj+0x14));
-        n = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-        life = func_002A7820(30, 50);
-        p[0] = *(float *)(obj+0x10) + func_002A78D8(0.0f, 0.1f)*st->scale;
-        p[1] = *(float *)(obj+0x14) + func_002A78D8(0.0f, 0.1f)*st->scale;
-        p[2] = *(float *)(obj+0x18) + func_002A78D8(0.0f, 0.1f)*st->scale;
-        size = func_002A7878(0.6f, 1.0f)*st->scale;
-        speed = func_002A7878(9.0f, 12.0f)*st->scale;
-        direction = func_00283B98(a, func_002A78D8(0.0f, 1.396263599395752f));
-        v[0] = func_00283180(direction)*(1.0f/60.0f)*speed;
-        v[1] = func_00283198(direction)*(1.0f/60.0f)*speed;
-        v[2] = 0.0f;
-        speed = func_002A7878(0.0f, 12.0f)*st->scale;
-        v[2] = speed*(1.0f/60.0f);
-        func_002C7970(p,v,life,st->color,n,127,127,size*210000.0f,st->scale*2100.0f,0.004055555909872055f,1);
+        angle = FastMatrixHelperA(D_L30_001B9C80.position[0] - *(float *)(moby+0x10), D_L30_001B9C80.position[1] - *(float *)(moby+0x14));
+        n = FloatToInt(RandomSignedFloatRange(2.0f, 5.0f));
+        life = RandomIntRange(30, 50);
+        particlePos[0] = *(float *)(moby+0x10) + RandomSignedFloatRange(0.0f, 0.1f)*state->scale;
+        particlePos[1] = *(float *)(moby+0x14) + RandomSignedFloatRange(0.0f, 0.1f)*state->scale;
+        particlePos[2] = *(float *)(moby+0x18) + RandomSignedFloatRange(0.0f, 0.1f)*state->scale;
+        size = RandomFloatRange(0.6f, 1.0f)*state->scale;
+        speed = RandomFloatRange(9.0f, 12.0f)*state->scale;
+        direction = FastAddRotations(angle, RandomSignedFloatRange(0.0f, 1.396263599395752f));
+        velocity[0] = FastSinOrCosA(direction)*(1.0f/60.0f)*speed;
+        velocity[1] = FastSinOrCosB(direction)*(1.0f/60.0f)*speed;
+        velocity[2] = 0.0f;
+        speed = RandomFloatRange(0.0f, 12.0f)*state->scale;
+        velocity[2] = speed*(1.0f/60.0f);
+        SpawnFadingDriftParticle(particlePos,velocity,life,state->color,n,127,127,size*210000.0f,state->scale*2100.0f,0.004055555909872055f,1);
         n *= 2;
-        particle = func_002C7970(p,v,life,st->color&0xFFFFFF,-n,48,48,size*1260000.0f,st->scale*4200.0f,0.004055555909872055f,0);
+        particle = SpawnFadingDriftParticle(particlePos,velocity,life,state->color&0xFFFFFF,-n,48,48,size*1260000.0f,state->scale*4200.0f,0.004055555909872055f,0);
         if (particle) particle[2] = D_L30_001FF940[0xD4/4][0];
     }
-    for (i = 0; i < st->count1; i++) {
-        float a, direction, size, speed;
+    for (i = 0; i < state->count1; i++) {
+        float angle, direction, size, speed;
         int n, life;
         char *particle;
-        a = func_00283248(D_L30_001B9C80.position[0] - *(float *)(obj+0x10), D_L30_001B9C80.position[1] - *(float *)(obj+0x14));
-        n = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-        life = func_002A7820(30, 50);
-        p[0] = *(float *)(obj+0x10) + func_002A78D8(0.0f, 0.1f)*st->scale;
-        p[1] = *(float *)(obj+0x14) + func_002A78D8(0.0f, 0.1f)*st->scale;
-        p[2] = *(float *)(obj+0x18) + func_002A78D8(0.0f, 0.1f)*st->scale;
-        size = func_002A7878(0.75f, 1.5f)*st->scale;
-        speed = func_002A7878(9.0f, 12.0f)*st->scale;
-        direction = func_00283B98(a, func_002A78D8(0.0f, 1.396263599395752f));
-        v[0] = func_00283180(direction)*(1.0f/60.0f)*speed;
-        v[1] = func_00283198(direction)*(1.0f/60.0f)*speed;
-        v[2] = 0.0f;
-        speed = func_002A7878(0.0f, 12.0f)*st->scale;
-        v[2] = speed*(1.0f/60.0f);
-        func_002C7970(p,v,life,st->color&0xFFFFFF,n,127,127,size*210000.0f,st->scale*2100.0f,0.004055555909872055f,5);
+        angle = FastMatrixHelperA(D_L30_001B9C80.position[0] - *(float *)(moby+0x10), D_L30_001B9C80.position[1] - *(float *)(moby+0x14));
+        n = FloatToInt(RandomSignedFloatRange(2.0f, 5.0f));
+        life = RandomIntRange(30, 50);
+        particlePos[0] = *(float *)(moby+0x10) + RandomSignedFloatRange(0.0f, 0.1f)*state->scale;
+        particlePos[1] = *(float *)(moby+0x14) + RandomSignedFloatRange(0.0f, 0.1f)*state->scale;
+        particlePos[2] = *(float *)(moby+0x18) + RandomSignedFloatRange(0.0f, 0.1f)*state->scale;
+        size = RandomFloatRange(0.75f, 1.5f)*state->scale;
+        speed = RandomFloatRange(9.0f, 12.0f)*state->scale;
+        direction = FastAddRotations(angle, RandomSignedFloatRange(0.0f, 1.396263599395752f));
+        velocity[0] = FastSinOrCosA(direction)*(1.0f/60.0f)*speed;
+        velocity[1] = FastSinOrCosB(direction)*(1.0f/60.0f)*speed;
+        velocity[2] = 0.0f;
+        speed = RandomFloatRange(0.0f, 12.0f)*state->scale;
+        velocity[2] = speed*(1.0f/60.0f);
+        SpawnFadingDriftParticle(particlePos,velocity,life,state->color&0xFFFFFF,n,127,127,size*210000.0f,state->scale*2100.0f,0.004055555909872055f,5);
     }
-    for (i = 0; i < st->count2; i++) {
-        float a, direction, size, speed;
+    for (i = 0; i < state->count2; i++) {
+        float angle, direction, size, speed;
         int n, life;
         char *particle;
-        a = func_00283248(D_L30_001B9C80.position[0] - *(float *)(obj+0x10), D_L30_001B9C80.position[1] - *(float *)(obj+0x14));
-        n = func_00283CF0(func_002A78D8(2.0f, 5.0f));
-        life = func_002A7820(30, 50);
-        p[0] = *(float *)(obj+0x10) + func_002A78D8(0.0f, 0.1f)*st->scale;
-        p[1] = *(float *)(obj+0x14) + func_002A78D8(0.0f, 0.1f)*st->scale;
-        p[2] = *(float *)(obj+0x18) + func_002A78D8(0.0f, 0.1f)*st->scale;
-        size = func_002A7878(0.6f, 1.0f)*st->scale;
-        speed = func_002A7878(9.0f, 12.0f)*st->scale;
-        direction = func_00283B98(a, func_002A78D8(0.0f, 1.396263599395752f));
-        v[0] = func_00283180(direction)*(1.0f/60.0f)*speed;
-        v[1] = func_00283198(direction)*(1.0f/60.0f)*speed;
-        v[2] = 0.0f;
-        speed = func_002A7878(0.0f, 12.0f)*st->scale;
-        v[2] = speed*(1.0f/60.0f);
-        func_002C7970(p,v,life,st->color&0xFFFFFF,n,127,127,size*210000.0f,st->scale*2100.0f,0.004055555909872055f,3);
+        angle = FastMatrixHelperA(D_L30_001B9C80.position[0] - *(float *)(moby+0x10), D_L30_001B9C80.position[1] - *(float *)(moby+0x14));
+        n = FloatToInt(RandomSignedFloatRange(2.0f, 5.0f));
+        life = RandomIntRange(30, 50);
+        particlePos[0] = *(float *)(moby+0x10) + RandomSignedFloatRange(0.0f, 0.1f)*state->scale;
+        particlePos[1] = *(float *)(moby+0x14) + RandomSignedFloatRange(0.0f, 0.1f)*state->scale;
+        particlePos[2] = *(float *)(moby+0x18) + RandomSignedFloatRange(0.0f, 0.1f)*state->scale;
+        size = RandomFloatRange(0.6f, 1.0f)*state->scale;
+        speed = RandomFloatRange(9.0f, 12.0f)*state->scale;
+        direction = FastAddRotations(angle, RandomSignedFloatRange(0.0f, 1.396263599395752f));
+        velocity[0] = FastSinOrCosA(direction)*(1.0f/60.0f)*speed;
+        velocity[1] = FastSinOrCosB(direction)*(1.0f/60.0f)*speed;
+        velocity[2] = 0.0f;
+        speed = RandomFloatRange(0.0f, 12.0f)*state->scale;
+        velocity[2] = speed*(1.0f/60.0f);
+        SpawnFadingDriftParticle(particlePos,velocity,life,state->color&0xFFFFFF,n,127,127,size*210000.0f,state->scale*2100.0f,0.004055555909872055f,3);
     }
-    for (i = 0; i < st->count4; i++) {
+    for (i = 0; i < state->count4; i++) {
         float x, y;
         char *particle;
-        func_00282D30(p,obj+0xC0,func_002A7878(15.0f,20.0f)*st->scale*(1.0f/60.0f));
-        x = func_002A78D8(0.2617994248867035f,1.396263599395752f);
-        y = func_002A78D8(0.2617994248867035f,1.396263599395752f);
-        func_002AB668(t,obj+0xD0,x);
-        func_002ACDE8(v,p,t);
-        func_002AB668(t,obj+0xC0,y);
-        func_002ACDE8(v,v,t);
-        particle = func_002C6DD8(obj+0x10,v,func_002A7820(20,35),0.004055555909872055f);
-        if (particle) *(int *)(particle+12) = *(int *)(particle+4) = st->color|0x7F000000;
+        FastVecScale(particlePos,moby+0xC0,RandomFloatRange(15.0f,20.0f)*state->scale*(1.0f/60.0f));
+        x = RandomSignedFloatRange(0.2617994248867035f,1.396263599395752f);
+        y = RandomSignedFloatRange(0.2617994248867035f,1.396263599395752f);
+        BuildAxisAngleQuaternion(temp,moby+0xD0,x);
+        RotateVectorByQuaternion(velocity,particlePos,temp);
+        BuildAxisAngleQuaternion(temp,moby+0xC0,y);
+        RotateVectorByQuaternion(velocity,velocity,temp);
+        particle = SpawnTrailParticle_002C6DD8(moby+0x10,velocity,RandomIntRange(20,35),0.004055555909872055f);
+        if (particle) *(int *)(particle+12) = *(int *)(particle+4) = state->color|0x7F000000;
     }
-    if (st->count5) {
-        *(Quadword *)v = 0;
-        v[2] = st->scale*(2.0f/15.0f);
-        *(Quadword *)p = *(Quadword *)v;
-        func_00308408(obj,obj+0x10,p,16,st->scale*3.5f,(unsigned char)st->color,(unsigned char)(st->color>>8),(unsigned char)(st->color>>16),45);
+    if (state->count5) {
+        *(Quadword *)velocity = 0;
+        velocity[2] = state->scale*(2.0f/15.0f);
+        *(Quadword *)particlePos = *(Quadword *)velocity;
+        SpawnShockwaveRing(moby,moby+0x10,particlePos,16,state->scale*3.5f,(unsigned char)state->color,(unsigned char)(state->color>>8),(unsigned char)(state->color>>16),45);
     }
-    func_002ABBB8(obj,D_L30_001A8F20,obj+0x10,0.0f,0.0f,0,0,0,0.0f,0.0f,9.0f,0.0f,-1,st->scale*20.0f,0,0,-1,0,0x810001);
+    SpawnExplosionEffects(moby,D_L30_001A8F20,moby+0x10,0.0f,0.0f,0,0,0,0.0f,0.0f,9.0f,0.0f,-1,state->scale*20.0f,0,0,-1,0,0x810001);
     sign = 1;
-    a = func_00283248(D_L30_001B9C80.position[0] - *(float *)(obj+0x10), D_L30_001B9C80.position[1] - *(float *)(obj+0x14));
-    for (i = 0; i < st->count3; i++) {
+    angle = FastMatrixHelperA(D_L30_001B9C80.position[0] - *(float *)(moby+0x10), D_L30_001B9C80.position[1] - *(float *)(moby+0x14));
+    for (i = 0; i < state->count3; i++) {
         float size, x, y;
         char *particle;
-        p[0] = *(float *)(obj+0x10) + func_002A78D8(0.0f,1.0f)*st->scale;
+        particlePos[0] = *(float *)(moby+0x10) + RandomSignedFloatRange(0.0f,1.0f)*state->scale;
         sign = -sign;
-        p[1] = *(float *)(obj+0x14) + func_002A78D8(0.0f,1.0f)*st->scale;
-        p[2] = *(float *)(obj+0x18) + func_002A78D8(0.0f,1.0f)*st->scale;
-        size = func_002A7878(1.0f/60.0f,1.0f/30.0f)*st->scale;
-        x = func_002A78D8(0.0f,1.396263599395752f);
-        y = func_002A78D8(0.0f,1.5707964897155762f);
-        func_002AF000(v,size,func_00283B98(a,y),x);
-        particle = func_002BDCE8(p,0.0f,1.0f,1.01f,sign,v,st->scale*315000.0f,st->color|0x7F0000,0);
+        particlePos[1] = *(float *)(moby+0x14) + RandomSignedFloatRange(0.0f,1.0f)*state->scale;
+        particlePos[2] = *(float *)(moby+0x18) + RandomSignedFloatRange(0.0f,1.0f)*state->scale;
+        size = RandomFloatRange(1.0f/60.0f,1.0f/30.0f)*state->scale;
+        x = RandomSignedFloatRange(0.0f,1.396263599395752f);
+        y = RandomSignedFloatRange(0.0f,1.5707964897155762f);
+        BuildSphericalOffset(velocity,size,FastAddRotations(angle,y),x);
+        particle = SpawnSpinningSparkParticle(particlePos,0.0f,1.0f,1.01f,sign,velocity,state->scale*315000.0f,state->color|0x7F0000,0);
         if (particle) {
             char *sub = particle + 0x20;
-            *(short *)(particle+10) = func_002A7820(40,70);
-            particle[9] = func_00283CF0(4.0f)+64;
+            *(short *)(particle+10) = RandomIntRange(40,70);
+            particle[9] = FloatToInt(4.0f)+64;
             *(int *)(sub+4) = 3;
-            *(float *)(sub+0x1C) = func_00283CE0(func_002A7820(1,10));
+            *(float *)(sub+0x1C) = IntToFloat(RandomIntRange(1,10));
             sub[0xA] = 64;
             sub[0xB] = particle[10];
         }

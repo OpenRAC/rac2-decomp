@@ -23,6 +23,7 @@ extern void func_001328C0(int, int *);
 
 #define SOUND ((SoundState_2E48E8 *)D_00188660)
 
+/* Clears the sound state and sets the volume and channel options again. */
 void func_002E48E8(void)
 {
     int i;
@@ -34,31 +35,31 @@ void func_002E48E8(void)
     SOUND->field40 = 0;
     SOUND->field44 = 0;
     /* 52 slots of 0x70 bytes follow the header. */
-    slot = D_00188660;
+    slot = gSoundState;
     do {
         *(int *)(slot + 0x70) = 0;
         slot[0x74] = 0;
         slot += 0x70;
-    } while ((int)slot < (int)(D_00188660 + 0x16C0));
-    func_00131DE8(2);
-    func_00132938(!D_001A7B98);
+    } while ((int)slot < (int)(gSoundState + 0x16C0));
+    snd_StartSoundSystem(2);
+    SendSoundCommand11_00132938(!D_001A7B98);
     func_00132978(0, 1);
-    func_001329B0(1, 24, 47);
-    func_001329B0(2, 24, 47);
-    func_001329B0(4, 24, 47);
-    func_001329B0(5, 24, 47);
-    func_001329B0(6, 24, 47);
-    func_002E4860();
-    func_00132888(0, SOUND->option[0]);
-    func_00132888(1, SOUND->option[1]);
-    func_00132888(2, SOUND->option[2]);
-    func_00132888(3, SOUND->option[3]);
-    func_00132888(4, SOUND->option[4]);
-    func_00132888(5, SOUND->option[5]);
-    func_00132888(6, SOUND->option[2]);
+    SendSoundCommand78(1, 24, 47);
+    SendSoundCommand78(2, 24, 47);
+    SendSoundCommand78(4, 24, 47);
+    SendSoundCommand78(5, 24, 47);
+    SendSoundCommand78(6, 24, 47);
+    SetDefaultSoundGroupVolumes();
+    SendSoundCommand9(0, SOUND->option[0]);
+    SendSoundCommand9(1, SOUND->option[1]);
+    SendSoundCommand9(2, SOUND->option[2]);
+    SendSoundCommand9(3, SOUND->option[3]);
+    SendSoundCommand9(4, SOUND->option[4]);
+    SendSoundCommand9(5, SOUND->option[5]);
+    SendSoundCommand9(6, SOUND->option[2]);
     settings[0] = 6;
     settings[1] = 59;
     settings[2] = 0x6666;
     settings[4] = settings[3] = 0x8000;
-    func_001328C0(0, settings);
+    SendSoundCommand96(0, settings);
 }

@@ -6,17 +6,18 @@
 extern float func_00283248(float,float),func_002A7878(float,float);
 extern float func_00283180(float),func_00283198(float);
 
-void func_L02_0040BAB8(u8 *a0, float *a1) {
-    float v, t, h, k;
-    u8 *q;
+/* Picks a random spot near the target, a few steps away from the object, and stores it as the place the robot should walk to. */
+void func_L02_0040BAB8(u8 *moby, float *target) {
+    float angle, distance, offsetX, cosAngle;
+    u8 *vars;
 
-    v = func_00283248(*(float *)(a0 + 0x10) - a1[0], *(float *)(a0 + 0x14) - a1[1]);
-    v = v + func_002A7878(-0.7853982448577881f, 0.7853982448577881f);
-    t = func_002A7878(-2.0f, 2.0f) + 8.0f;
-    q = *(u8 **)(a0 + 0x68);
-    qcopy(q + 0x2C0, a1);
-    h = t * func_00283180(v);
-    *(float *)(q + 0x2C0) = *(float *)(q + 0x2C0) + h;
-    k = func_00283198(v);
-    *(float *)(q + 0x2C4) = *(float *)(q + 0x2C4) + t * k;
+    angle = FastMatrixHelperA(*(float *)(moby + 0x10) - target[0], *(float *)(moby + 0x14) - target[1]);
+    angle = angle + RandomFloatRange(-0.7853982448577881f, 0.7853982448577881f);
+    distance = RandomFloatRange(-2.0f, 2.0f) + 8.0f;
+    vars = *(u8 **)(moby + 0x68);
+    qcopy(vars + 0x2C0, target);
+    offsetX = distance * FastSinOrCosA(angle);
+    *(float *)(vars + 0x2C0) = *(float *)(vars + 0x2C0) + offsetX;
+    cosAngle = FastSinOrCosB(angle);
+    *(float *)(vars + 0x2C4) = *(float *)(vars + 0x2C4) + distance * cosAngle;
 }

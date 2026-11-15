@@ -41,28 +41,28 @@ void func_L23_00419D60(char *obj) {
             D_L23_001B3724 = D_L23_001B1440;
         } else if (D_L23_001B1438 != 2) {
             if (*(unsigned char *)(state + 0x471) == 0)
-                func_0029F978(obj, 0x26, state + 0x470);
+                AttachManipulator(obj, 0x26, state + 0x470);
             vec.q = 0;
             vec.f[2] = 1.0f;
             vec.f[3] = 1.0f;
             scale = (float)(D_L23_001B1440 - D_L23_001B3724) * D_L23_001B1448;
-            func_00282D30(state + 0x4A0, (char *)&vec, scale);
+            FastVecScale(state + 0x4A0, (char *)&vec, scale);
             D_L23_001B3724 = D_L23_001B3724 - 1;
             if (D_L23_001B3724 == -1)
                 D_L23_001B1438 = 2;
         } else {
             D_L23_001B3724 = D_L23_001B1440;
             if (*(unsigned char *)(state + 0x471) == 0)
-                func_0029F978(obj, 0x26, state + 0x470);
+                AttachManipulator(obj, 0x26, state + 0x470);
             vec.q = 0;
             vec.f[2] = 1.0f;
             vec.f[3] = 1.0f;
             scale = (float)D_L23_001B1440 * D_L23_001B1448;
-            func_00282D30(state + 0x4A0, (char *)&vec, scale);
+            FastVecScale(state + 0x4A0, (char *)&vec, scale);
             if (*(unsigned char *)(state + 0x4B1) == 0)
-                func_0029F978(obj, 0x27, state + 0x4B0);
+                AttachManipulator(obj, 0x27, state + 0x4B0);
             *(float *)(state + 0x578) = 1.4726216f;
-            func_00283898(state + 0x4C0, 1, 1.4726216f);
+            build_axis_rotation_quaternion(state + 0x4C0, 1, 1.4726216f);
         }
         qzero_nc(state + 0x480);
         active_duration = D_L23_001B1448 * (float)D_L23_001B1440 * 4.0f;
@@ -76,12 +76,12 @@ void func_L23_00419D60(char *obj) {
         *(float *)(state + 0x490) = active_fade;
     } else if (D_L23_001B1438 != 0) {
         if (*(unsigned char *)(state + 0x471) == 0)
-            func_0029F978(obj, 0x26, state + 0x470);
+            AttachManipulator(obj, 0x26, state + 0x470);
         vec.q = 0;
         vec.f[2] = 1.0f;
         vec.f[3] = 1.0f;
         scale = (float)D_L23_001B3724 * D_L23_001B1448;
-        func_00282D30(state + 0x4A0, (char *)&vec, scale);
+        FastVecScale(state + 0x4A0, (char *)&vec, scale);
         D_L23_001B3724 = D_L23_001B3724 - 1;
         if (D_L23_001B3724 == -1) {
             D_L23_001B372C = D_L23_001B1460;

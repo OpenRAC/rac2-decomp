@@ -39,7 +39,7 @@ int func_L02_0032E508(void *unused, int start, L02RegionLink *regions, int capac
     char *polygon;
     float distance;
     unsigned char *vis;
-    func_00282A88(visited, 256);
+    FastMemoryHelperB(visited, 256);
     visited[start] = depth;
     vis = visited;
     for (;;) {
@@ -49,9 +49,9 @@ int func_L02_0032E508(void *unused, int start, L02RegionLink *regions, int capac
                 regions[count++].index = i;
                 for (j = 0; j < D_L02_001B36A4; ++j) {
                     if (i != j && vis[j] == 0) {
-                        char *candidate = D_L02_001FF1C0[j];
-                        if (*(int *)candidate <= 64 && !(0.2f < func_00282E48(candidate + 0x10, candidate + (*(int *)candidate << 4)))) {
-                            if (func_L02_00349BD8(i, j, &scratch.edgeA, &scratch.edgeB)) {
+                        char *candidate = gRoutePolygons[j];
+                        if (*(int *)candidate <= 64 && !(0.2f < fast_vec_dist(candidate + 0x10, candidate + (*(int *)candidate << 4)))) {
+                            if (FindTouchingPolygonCorners(i, j, &scratch.edgeA, &scratch.edgeB)) {
                                 vis[j] = depth + 1;
                                 changed = 1;
                             }
@@ -78,9 +78,9 @@ int func_L02_0032E508(void *unused, int start, L02RegionLink *regions, int capac
         int nodeA, nodeB;
         for (nodeA = 0; nodeA < count; ++nodeA) {
             for (nodeB = nodeA + 1; nodeB < count; ++nodeB) {
-                if (func_L02_00349BD8(regions[nodeA].index, regions[nodeB].index, &scratch.connectionA, &scratch.connectionB)) {
-                    *(int *)(D_L02_001FF1C0[regions[nodeA].index] + (scratch.connectionA << 4) + 0x1C) = 0;
-                    *(int *)(D_L02_001FF1C0[regions[nodeB].index] + (scratch.connectionB << 4) + 0x1C) = 0;
+                if (FindTouchingPolygonCorners(regions[nodeA].index, regions[nodeB].index, &scratch.connectionA, &scratch.connectionB)) {
+                    *(int *)(gRoutePolygons[regions[nodeA].index] + (scratch.connectionA << 4) + 0x1C) = 0;
+                    *(int *)(gRoutePolygons[regions[nodeB].index] + (scratch.connectionB << 4) + 0x1C) = 0;
                     {
                         int slotA = 0;
                         do {
@@ -115,19 +115,19 @@ int func_L02_0032E508(void *unused, int start, L02RegionLink *regions, int capac
     {
         int node;
         for (node = 0; node < count; ++node) {
-            polygon = D_L02_001FF1C0[regions[node].index];
-            func_00282C88(&scratch.center);
+            polygon = gRoutePolygons[regions[node].index];
+            ClearVector128(&scratch.center);
             {
                 int sumVertex;
                 for (sumVertex = 0; sumVertex < *(int *)polygon; ++sumVertex)
-                    func_00282CC0(&scratch.center, &scratch.center, polygon + (sumVertex << 4) + 0x10);
+                    FastVecAdd(&scratch.center, &scratch.center, polygon + (sumVertex << 4) + 0x10);
             }
-            func_00282D30(&scratch.center, &scratch.center, 1.0f / (float)*(int *)polygon);
+            FastVecScale(&scratch.center, &scratch.center, 1.0f / (float)*(int *)polygon);
             ((float *)&scratch.center)[3] = 0.0f;
             {
                 int radiusVertex;
                 for (radiusVertex = 0; radiusVertex < *(int *)polygon; ++radiusVertex) {
-                    distance = func_00282E80(&scratch.center, polygon + (radiusVertex << 4) + 0x10);
+                    distance = vec_distance_xy(&scratch.center, polygon + (radiusVertex << 4) + 0x10);
                     if (((float *)&scratch.center)[3] < distance) ((float *)&scratch.center)[3] = distance;
                 }
             }

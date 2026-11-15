@@ -1,5 +1,6 @@
 /* func_L00_002A5048 in its own unit (flags in config/cflags.txt: -O2 -G0 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier). */
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef int Quad __attribute__((mode(TI)));
@@ -16,7 +17,7 @@ extern void func_00282C88(Quad *);
 /* Update an active attachment's orientation/position and link or retire its record. */
 void func_L00_002A5048(u8 *node)
 {
-    u8 *owner = func_L00_002A4FE8(*(short *)(node + 0xA2));
+    u8 *owner = GetAttachmentOwnerByKind(*(short *)(node + 0xA2));
     float *angles;
     Quad *position;
 
@@ -35,39 +36,39 @@ void func_L00_002A5048(u8 *node)
         *(float *)(node + 0x90) == 0.0f &&
         *(float *)(node + 0x94) == 0.0f &&
         *(float *)(node + 0x98) == 0.0f &&
-        func_00282C48(*(float *)(node + 0x70)) < 0.003f &&
-        func_00282C48(*(float *)(node + 0x74)) < 0.003f &&
-        func_00282C48(*(float *)(node + 0x78)) < 0.003f &&
+        FloatAbs(*(float *)(node + 0x70)) < 0.003f &&
+        FloatAbs(*(float *)(node + 0x74)) < 0.003f &&
+        FloatAbs(*(float *)(node + 0x78)) < 0.003f &&
         *(float *)(node + 0xAC) == 1.0f &&
-        func_00282C48(*(float *)(node + 0x40)) < 0.005f &&
-        func_00282C48(*(float *)(node + 0x44)) < 0.005f &&
-        func_00282C48(*(float *)(node + 0x48)) < 0.005f) {
+        FloatAbs(*(float *)(node + 0x40)) < 0.005f &&
+        FloatAbs(*(float *)(node + 0x44)) < 0.005f &&
+        FloatAbs(*(float *)(node + 0x48)) < 0.005f) {
         if (node[1] != 0)
-            func_0029F9F0((char *)owner, (char *)node);
+            DetachManipulator((char *)owner, (char *)node);
     } else {
         angles = (float *)(node + 0x40);
         position = (Quad *)(node + 0x70);
-        func_002AA898(angles, *(float *)(node + 0x60), (float *)(node + 0x50),
+        ApproachWithVelocity(angles, *(float *)(node + 0x60), (float *)(node + 0x50),
                      *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f, 2);
-        func_002AA898((float *)(node + 0x44), *(float *)(node + 0x64), (float *)(node + 0x54),
+        ApproachWithVelocity((float *)(node + 0x44), *(float *)(node + 0x64), (float *)(node + 0x54),
                      *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f, 2);
-        func_002AA898((float *)(node + 0x48), *(float *)(node + 0x68), (float *)(node + 0x58),
+        ApproachWithVelocity((float *)(node + 0x48), *(float *)(node + 0x68), (float *)(node + 0x58),
                      *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f, 2);
-        func_002AA3A8((float *)position, (float *)(node + 0x80),
+        SpringFloatToGoal((float *)position, (float *)(node + 0x80),
                      *(float *)(node + 0x90), *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f);
-        func_002AA3A8((float *)(node + 0x74), (float *)(node + 0x84),
+        SpringFloatToGoal((float *)(node + 0x74), (float *)(node + 0x84),
                      *(float *)(node + 0x94), *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f);
-        func_002AA3A8((float *)(node + 0x78), (float *)(node + 0x88),
+        SpringFloatToGoal((float *)(node + 0x78), (float *)(node + 0x88),
                      *(float *)(node + 0x98), *(float *)(node + 0xA4), *(float *)(node + 0xA8), 0.0f);
         if (node[1] == 0)
-            func_0029F978(owner, *(short *)(node + 0xA0), node);
-        func_002A91F0(node + 0x10, angles);
+            AttachManipulator(owner, *(short *)(node + 0xA0), node);
+        BuildRotationFromAngles(node + 0x10, angles);
         *(Quad *)(node + 0x30) = *position;
         *(float *)(node + 0x20) = *(float *)(node + 0xAC);
         *(float *)(node + 0x24) = *(float *)(node + 0xAC);
         *(float *)(node + 0x28) = *(float *)(node + 0xAC);
     }
-    func_00282C88((Quad *)(node + 0x90));
-    func_00282C88((Quad *)(node + 0x60));
+    ClearVector128((Quad *)(node + 0x90));
+    ClearVector128((Quad *)(node + 0x60));
     *(float *)(node + 0xAC) = 1.0f;
 }

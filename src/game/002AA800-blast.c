@@ -51,6 +51,7 @@ extern int func_00283DB8(void *, float);
 extern float func_00283CE0(int);
 extern void func_002AF000(void *, float, float, float);
 
+/* Creates an explosion at a position with sparks, flashes, smoke, debris, damage, camera shake and sound. */
 void func_002ABBB8(char *owner, void *direction, float *position,
     float radius, float damage, int sparks, int flashes, int smoke,
     float glow, float white, float cutoff, float scale, int sound, float blast,
@@ -70,11 +71,11 @@ void func_002ABBB8(char *owner, void *direction, float *position,
     if (radius > 0.0f) {
         {
             ExplosionDamage message;
-            func_002A8BD0(&message, owner, flags, damage);
+            InitEffectRecord_002A8BD0(&message, owner, flags, damage);
             message.kind = 2;
             message.enabled = 1;
             message.uid = *(unsigned short *)(owner + 0xAA);
-            func_00277F48(radius, position, 16, owner, &message);
+            ProcessCollisionHit(radius, position, 16, owner, &message);
         }
     }
     {
@@ -84,46 +85,46 @@ void func_002ABBB8(char *owner, void *direction, float *position,
                 float vector[4];
                 float angle, azimuth, speed;
                 int c1, c2, life;
-                angle = func_002A7878(0.2617994248867035f, 1.396263599395752f);
-                azimuth = func_002A7940();
-                speed = func_002A7878(7.0f, 10.5f);
-                func_002AF000(vector, scale * 0.01666666753590107f * speed, azimuth, angle);
+                angle = RandomFloatRange(0.2617994248867035f, 1.396263599395752f);
+                azimuth = RandomAngle();
+                speed = RandomFloatRange(7.0f, 10.5f);
+                BuildSphericalOffset(vector, scale * 0.01666666753590107f * speed, azimuth, angle);
                 vector[2] += 0.05000000447034836f;
-                c1 = func_002AAFA0(0x4F007FFF, channels);
-                c2 = func_002AAFA0(0x1F00007F, channels);
-                life = func_002A7820(60, 120);
-                func_002BCB00(position, vector, c1, c2, scale * 40000.0f, life - quality * 10, 1, -1, -1, 0);
+                c1 = SwapPackedColorChannels(0x4F007FFF, channels);
+                c2 = SwapPackedColorChannels(0x1F00007F, channels);
+                life = RandomIntRange(60, 120);
+                SpawnSparkParticle_002BCB00(position, vector, c1, c2, scale * 40000.0f, life - quality * 10, 1, -1, -1, 0);
             }
         }
     }
-    func_00282CF0(delta, D_001B5340, position);
-    distance = func_00282DF0(delta);
+    FastVecSub(delta, gCameraState_001B5340, position);
+    distance = FastVecLength(delta);
     if (debris) {
         {
             ExplosionVectors v;
             int i;
             *(Quad *)v.random = 0;
-            v.random[0] = func_002A7878(-1.0f, 1.0f);
-            v.random[1] = func_002A7878(-1.0f, 1.0f);
-            v.random[2] = func_002A7878(-1.0f, 1.0f);
+            v.random[0] = RandomFloatRange(-1.0f, 1.0f);
+            v.random[1] = RandomFloatRange(-1.0f, 1.0f);
+            v.random[2] = RandomFloatRange(-1.0f, 1.0f);
             *(Quad *)v.vector = *(Quad *)v.random;
             if (distance < 14.0f) {
                 delta[2] += distance * 0.5f;
-                func_00282F20(v.vector, v.vector, distance * 0.0033333336468786f);
-                func_00282F20(delta, delta, (distance + distance) * 0.01666666753590107f);
-                func_00282CC0(v.vector, v.vector, delta);
-                func_00282FB8(v.vector, v.vector, 0.1666666716337204f);
-                func_00308600(position, v.vector, func_002A7820(60, 90), 0, 0);
+                vec_scale_to_length(v.vector, v.vector, distance * 0.0033333336468786f);
+                vec_scale_to_length(delta, delta, (distance + distance) * 0.01666666753590107f);
+                FastVecAdd(v.vector, v.vector, delta);
+                FastVectorDivideHelper(v.vector, v.vector, 0.1666666716337204f);
+                SpawnSpinningDebrisMoby(position, v.vector, RandomIntRange(60, 90), 0, 0);
             }
             debris--;
             for (i = 0; i < debris; i++) {
                 int special;
                 float angle, azimuth, speed;
                 int life;
-                angle = func_002A7878(0.2617994248867035f, 1.3089970350265503f);
-                azimuth = func_002A7940();
-                speed = func_002A7878(7.0f, 10.5f);
-                func_002AF000(v.random, scale * 0.01666666753590107f * speed, azimuth, angle);
+                angle = RandomFloatRange(0.2617994248867035f, 1.3089970350265503f);
+                azimuth = RandomAngle();
+                speed = RandomFloatRange(7.0f, 10.5f);
+                BuildSphericalOffset(v.random, scale * 0.01666666753590107f * speed, azimuth, angle);
                 v.random[2] += 0.03333333507180214f;
                 {
                     int rem = i % 3;
@@ -132,8 +133,8 @@ void func_002ABBB8(char *owner, void *direction, float *position,
                     special = zero;
                     if (rem == 0) special = one;
                 }
-                life = func_002A7820(60, 90);
-                func_00308600(position, v.random, life, special, 0);
+                life = RandomIntRange(60, 90);
+                SpawnSpinningDebrisMoby(position, v.random, life, special, 0);
             }
         }
     }
@@ -141,8 +142,8 @@ void func_002ABBB8(char *owner, void *direction, float *position,
         int count;
         float under;
         int i;
-        if (distance < func_00283CE0(flashes) * 2.0f)
-        count = func_00283CF0(distance) / 2;
+        if (distance < IntToFloat(flashes) * 2.0f)
+        count = FloatToInt(distance) / 2;
         else
         count = flashes;
         under = 0.0f;
@@ -152,24 +153,24 @@ void func_002ABBB8(char *owner, void *direction, float *position,
                 BurstColors colors1, colors2;
                 float size, big;
                 int c1, c2;
-                size = func_002A7878(8.0f, 10.0f) * 0.01666666753590107f;
+                size = RandomFloatRange(8.0f, 10.0f) * 0.01666666753590107f;
                 colors1 = D_001A9F20;
                 colors2 = D_001A9F38;
                 size = size - under * 0.01666666753590107f;
-                c1 = func_002A77E0(6);
+                c1 = RandomIntBelow(6);
                 size *= scale;
-                c1 = func_002AAFA0(colors1.colors[c1], channels);
-                c2 = func_002AAFA0(colors2.colors[func_002A77E0(6)], channels);
+                c1 = SwapPackedColorChannels(colors1.colors[c1], channels);
+                c2 = SwapPackedColorChannels(colors2.colors[RandomIntBelow(6)], channels);
                 big = scale * 400000.0f;
                 {
-                    int life = func_002A7820(15, 20) - quality * 3;
-                    int life2 = func_002A7820(30, 45) - quality * 5;
-                    func_002BBCB0(position, drift, c1, c2, big, life, life2, size, 0, 0);
+                    int life = RandomIntRange(15, 20) - quality * 3;
+                    int life2 = RandomIntRange(30, 45) - quality * 5;
+                    SpawnFireworkSparkParticle(position, drift, c1, c2, big, life, life2, size, 0, 0);
                 }
                 {
-                    int life = func_002A7820(5, 10) - quality * 2;
-                    int life2 = func_002A7820(15, 20) - quality * 3;
-                    func_002BBCB0(position, drift, 0x7FFFFFFF, 0xFFFFFF, big, life, life2, size * 0.5f, 0, 0);
+                    int life = RandomIntRange(5, 10) - quality * 2;
+                    int life2 = RandomIntRange(15, 20) - quality * 3;
+                    SpawnFireworkSparkParticle(position, drift, 0x7FFFFFFF, 0xFFFFFF, big, life, life2, size * 0.5f, 0, 0);
                 }
             }
         }
@@ -185,16 +186,16 @@ void func_002ABBB8(char *owner, void *direction, float *position,
                 colors1 = D_001A9F20;
                 colors2 = D_001A9F38;
                 *(Quad *)v.random = 0;
-                v.random[0] = func_002A7878(-1.0f, 1.0f);
-                v.random[1] = func_002A7878(-1.0f, 1.0f);
-                v.random[2] = func_002A7878(-1.0f, 1.0f);
+                v.random[0] = RandomFloatRange(-1.0f, 1.0f);
+                v.random[1] = RandomFloatRange(-1.0f, 1.0f);
+                v.random[2] = RandomFloatRange(-1.0f, 1.0f);
                 *(Quad *)v.vector = *(Quad *)v.random;
                 k = 0.01666666753590107f;
-                speed = func_002A7878(0.0f, 3.0f);
-                func_00282F20(v.vector, v.vector, scale * k * speed);
-                c1 = func_002AAFA0(colors1.colors[func_002A77E0(6)], channels);
-                c2 = func_002AAFA0(colors2.colors[func_002A77E0(6)], channels);
-                func_002BB838(position, v.vector, c1, c2, func_002A7820(30, 45) - quality * 5, 200000.0f);
+                speed = RandomFloatRange(0.0f, 3.0f);
+                vec_scale_to_length(v.vector, v.vector, scale * k * speed);
+                c1 = SwapPackedColorChannels(colors1.colors[RandomIntBelow(6)], channels);
+                c2 = SwapPackedColorChannels(colors2.colors[RandomIntBelow(6)], channels);
+                SpawnColorBlendParticle(position, v.vector, c1, c2, RandomIntRange(30, 45) - quality * 5, 200000.0f);
             }
         }
     }
@@ -205,36 +206,36 @@ void func_002ABBB8(char *owner, void *direction, float *position,
             else { r = 35; g = 0; b = 250; r2 = 32; g2 = 0; b2 = 100; }
         }
         if (D_001B168C[0] < 0.949999988079071f && cutoff < distance) {
-            func_00308408(owner, position, drift, glow, 16, r, g, b, 32);
-            func_00308408(owner, position, drift, glow, 22, r2 & 255, g2 & 255, b2 + 80, 32);
+            SpawnShockwaveRing(owner, position, drift, glow, 16, r, g, b, 32);
+            SpawnShockwaveRing(owner, position, drift, glow, 22, r2 & 255, g2 & 255, b2 + 80, 32);
         }
-        func_00308408(owner, position, drift, glow, 30, r2 & 255, g2 & 255, b2, 48);
+        SpawnShockwaveRing(owner, position, drift, glow, 30, r2 & 255, g2 & 255, b2, 48);
     }
-    if (owner && white > 0.0f) func_00308408(owner, position, drift, white, 27, 255, 255, 255, 32);
+    if (owner && white > 0.0f) SpawnShockwaveRing(owner, position, drift, white, 27, 255, 255, 255, 32);
     if (shake) {
         {
             float vector[4];
             *(Quad *)vector = *(Quad *)position;
             vector[3] = 2.0f;
-            if (func_00283DB8(vector, 10.0f) != -1) {
-                ExplosionCamera *camera = &D_001B5200;
+            if (FastMathHelperA(vector, 10.0f) != -1) {
+                ExplosionCamera *camera = &gActiveCamera;
                 if (distance < 20.0f) camera->shake = 0.4f - distance * 0.017500000074505806f;
                 else camera->shake = 0.050000011920928955f;
                 {
-                    ExplosionCamera *state = &D_001B5200;
+                    ExplosionCamera *state = &gActiveCamera;
                     state->timer = 25;
                     state->phase = 0;
                 }
             }
         }
     }
-    if (owner && sound != -1) func_002E5CF8(sound, 0, owner);
+    if (owner && sound != -1) PlayMobySound(sound, 0, owner);
     if (blast != 0.0f && quality == 0) {
         {
             float vector[4];
             qcopy(vector, position);
             vector[3] = blast;
-            if (func_00283DB8(vector, 100.0f) != -1) {
+            if (FastMathHelperA(vector, 100.0f) != -1) {
                 if (blast > 0.0f) {
                     BlastEffect *effect = &D_00258C80;
                     effect->scale[1] = blast;
@@ -246,8 +247,8 @@ void func_002ABBB8(char *owner, void *direction, float *position,
                     effect->scale[2] = 15.0f;
                     effect->scale[0] = 15.0f;
                 }
-                if (channels) func_00312B70(&D_00258CD0, position, 0, 0);
-                else func_00312B70(&D_00258C80, position, 0, 0);
+                if (channels) SpawnTemplateEffectMoby(&D_00258CD0, position, 0, 0);
+                else SpawnTemplateEffectMoby(&D_00258C80, position, 0, 0);
             }
         }
     }

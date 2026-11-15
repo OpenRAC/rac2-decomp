@@ -1,13 +1,15 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int Copy128 __attribute__((mode(TI)));
 
 extern char *func_0029EFD0(int);
 extern void func_002A0F48(void *);
 
+/* Creates a child object of the given kind at the parent's position and rotation, scaled like the parent, and starts it in the given state. */
 char *func_L00_00326620(char *parent, int kind, int state)
 {
-    char *child = func_0029EFD0(kind);
+    char *child = CreateMoby(kind);
     if (child != 0) {
         *(unsigned short *)(child + 0x32) = 255;
         child[0x31] = 1;

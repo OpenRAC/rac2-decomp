@@ -106,24 +106,24 @@ void func_L05_0041DA20(char *object)
         sub->third = 300; sub->fourth = 480;
         sub->fifth = 120; sub->timeout = 108000;
         D_L05_001B3554[0] = 540;
-        D_L05_00221D10.callbacks[0] = func_L05_0041FD48;
-        D_L05_00221D10.callbacks[1] = func_L05_0041FE98;
-        D_L05_00221D10.callbacks[2] = func_L05_0041FFF8;
+        D_L05_00221D10.callbacks[0] = ResetFeltzinChallengeAndFreeRecords;
+        D_L05_00221D10.callbacks[1] = ShutdownFeltzinChallenge;
+        D_L05_00221D10.callbacks[2] = DamageFeltzinTargetMoby;
         D_L05_00221D10.object = object;
-        func_L05_00379F18(1);
-        func_L05_00379F28(0);
-        while (!I(D_L05_002A1800 + func_L05_0037AA88(D_L05_001B13DC)*40,0) ||
-               !*(short *)(D_L05_002A1800 + func_L05_0037AA88(D_L05_001B13DC)*40 + 0x1E))
+        SetPlayerStateField13(1);
+        SetPlayerStateField15(0);
+        while (!I(D_L05_002A1800 + FindActiveSlotInChain(D_L05_001B13DC)*40,0) ||
+               !*(short *)(D_L05_002A1800 + FindActiveSlotInChain(D_L05_001B13DC)*40 + 0x1E))
             D_L05_001B13DC++;
-        D_L05_001AA6A0[0] = (int)func_L05_0041FD48;
-        D_L05_001AA6A8[0] = (int)func_L05_0041FE98;
+        D_L05_001AA6A0[0] = (int)ResetFeltzinChallengeAndFreeRecords;
+        D_L05_001AA6A8[0] = (int)ShutdownFeltzinChallenge;
         D_L05_001B1350 = D_001395B8[0x61];
         D_L05_001B1354[0] = D_001395B8[0x62];
         D_L05_001B1358[0] = D_001395B8[0x63];
         D_L05_001B135C[0] = D_001395B8[0x64];
         if (!D_L05_001B1350) D_L05_001B13F4 = 1;
         else D_L05_001B13F4 = 0;
-        hero = D_00189E20;
+        hero = gHeroState;
         D_L05_001B3558[0] = D_L05_001B2000[0];
         D_L05_001B3559[0] = D_L05_001B2001[0];
         D_L05_001B355A[0] = D_L05_001B2002[0];
@@ -143,45 +143,45 @@ void func_L05_0041DA20(char *object)
         /* fall through */
     case 1:
         one = 1;
-        func_L05_00379B60();
-        func_L05_0030C930((int)(D_L05_001B2D84[0] * -230.0f + 0.5f), 2);
+        SelectRandomLevelObject();
+        StorePairWithIncrement((int)(D_L05_001B2D84[0] * -230.0f + 0.5f), 2);
         if (!D_L05_001B13D4) {
-            func_L00_003294F0(D_L05_001B251C[0] + sub->target*256,1);
+            SetObjectFlagBit(D_L05_001B251C[0] + sub->target*256,1);
             D_L05_001B13D4 = one;
             D_L05_001B13D8 = 0;
         }
         if (D_L05_001B13D8++ < 5 || D_L05_001A8F00[0] == 2) break;
-        func_L00_002C42E0(0x31,0);
+        SetHeroAction_L00(0x31,0);
         if (D_L05_001B13E8) {
-            func_L05_00379F48(1);
-            D_L05_001B1360 = func_L05_0041ED18();
-            if (D_L05_001B1360 != -2) func_L05_00445A98();
+            SetPlayerStateField18(1);
+            D_L05_001B1360 = LockedEntryMenuInput();
+            if (D_L05_001B1360 != -2) SaveShipTransformState();
             break;
         }
         if (!D_L05_001B13E0) {
-            func_00288E18(0xA17,110);
+            RequestSubtitleVoiceLine(0xA17,110);
             D_L05_001B13E0 = one;
         }
-        if (func_00282948((char *)sub+0x54)) D_L05_00221D10.pending = 0;
+        if (FastFloatHelperD((char *)sub+0x54)) D_L05_00221D10.pending = 0;
         else D_L05_00221D10.pending = one;
-        func_L05_00379F48(0);
+        SetPlayerStateField18(0);
         if (D_L05_001B1360 != -2 && D_L05_001B2048 >= 3) {
             switch (D_L05_001B1360) {
-            case 0: func_L05_00420A88(object); break;
-            case 1: func_L05_00420E28(object); break;
-            case 2: func_L05_00420FB0(object); break;
-            case 3: func_L05_00421100(object); break;
+            case 0: UpdateFeltzinMissionOneController(object); break;
+            case 1: UpdateFeltzinMissionTwoController(object); break;
+            case 2: UpdateFeltzinMissionThreeController(object); break;
+            case 3: UpdateFeltzinGateCourse(object); break;
             }
         }
         if (D_L05_001A904C && !D_L05_001B13A8 && !D_L05_001B13F0) {
-            func_0029B758(0,func_L05_0041DF58);
+            StoreLevelObjectValuePair(0,DrawFeltzinCombatHud);
             D_L05_001B13AC = 0;
             D_L05_001B13A8 = 1;
         }
         break;
     case 2: break;
     case 3:
-        if (!func_L05_00442860()) {
+        if (!IsCameraModeActive()) {
             D_L05_00221D10.pending = 0;
             D_L05_00221D10.count++;
             object[0x20] = 1;

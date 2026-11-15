@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 
 typedef unsigned char u8;
@@ -52,58 +53,59 @@ typedef struct {
 extern PlayerInputView D_00189E20;
 
 /* Hand-adapted from func_L01_002ADDC8. */
+/* Reads the newest button command and starts the matching hero action, such as an attack, a hover or a ledge grab. */
 void func_L07_002AC078(void)
 {
-    short command = D_00189E20.command;
-    u8 saved = D_00189E20.saved;
+    short command = gHeroState.command;
+    u8 saved = gHeroState.saved;
     int active;
 
-    func_00282A88(&D_00189E20.command, 16);
-    D_00189E20.command = command;
-    D_00189E20.saved = saved;
-    D_00189E20.request = 0;
-    D_00189E20.pendingJump = 0;
-    if (D_00189E20.disabled) return;
+    FastMemoryHelperB(&gHeroState.command, 16);
+    gHeroState.command = command;
+    gHeroState.saved = saved;
+    gHeroState.request = 0;
+    gHeroState.pendingJump = 0;
+    if (gHeroState.disabled) return;
     active = 0;
-    if (D_00189E20.busy || (D_00189E20.state == 0x7b && D_00189E20.elapsed < 0.4f)) active = 1;
+    if (gHeroState.busy || (gHeroState.state == 0x7b && gHeroState.elapsed < 0.4f)) active = 1;
     if (command == -1) return;
-    if (command == 2 && !D_00189E20.inputLock &&
-        (!D_00189E20.jumpCount || D_00189E20.elapsed < 2.5f)) {
-        D_00189E20.jumpPressed = 1;
-        if (!D_00189E20.mode && D_001A7B0B) D_00189E20.pendingJump = 1;
+    if (command == 2 && !gHeroState.inputLock &&
+        (!gHeroState.jumpCount || gHeroState.elapsed < 2.5f)) {
+        gHeroState.jumpPressed = 1;
+        if (!gHeroState.mode && D_001A7B0B) gHeroState.pendingJump = 1;
     }
-    if (command == 3) D_00189E20.jump = 1;
-    if (command == 11) D_00189E20.cancel = 1;
-    if (command == 4) D_00189E20.attack = 1;
-    if (command == 13) D_00189E20.flag149c = 1;
-    if (command == 8) D_00189E20.hover = 1;
-    if (command == 12) D_00189E20.hover = 1;
-    if (D_00189E20.attack && active && D_00189E20.movement != 16 && D_00189E20.movement != 20 &&
-        D_00189E20.movement != 7) {
-        func_L07_002BE770(0x30, 1);
+    if (command == 3) gHeroState.jump = 1;
+    if (command == 11) gHeroState.cancel = 1;
+    if (command == 4) gHeroState.attack = 1;
+    if (command == 13) gHeroState.flag149c = 1;
+    if (command == 8) gHeroState.hover = 1;
+    if (command == 12) gHeroState.hover = 1;
+    if (gHeroState.attack && active && gHeroState.movement != 16 && gHeroState.movement != 20 &&
+        gHeroState.movement != 7) {
+        EnterHeroState_L07(0x30, 1);
         return;
     }
-    if (D_00189E20.flag149c && D_00189E20.state != 0x7c &&
-        func_00282C48(D_00189E20.jumpTime2-(D_00189E20.position.f[2]+0.25f)) < 1.0f &&
-        D_00189E20.jumpTime2-D_00189E20.position.f[2] > 0.0f &&
-        (D_00189E20.motion.f[2] < 0.0f || D_00189E20.state == 0x7b)) {
-        func_L07_002BE770(0x7c,1); return;
+    if (gHeroState.flag149c && gHeroState.state != 0x7c &&
+        FloatAbs(gHeroState.jumpTime2-(gHeroState.position.f[2]+0.25f)) < 1.0f &&
+        gHeroState.jumpTime2-gHeroState.position.f[2] > 0.0f &&
+        (gHeroState.motion.f[2] < 0.0f || gHeroState.state == 0x7b)) {
+        EnterHeroState_L07(0x7c,1); return;
     }
-    if (D_00189E20.jump && D_00189E20.state != 0x65 && D_00189E20.state != 0x78 &&
-        func_00282C48(D_00189E20.jumpTime-(D_00189E20.position.f[2]+0.25f)) < 1.0f &&
-        D_00189E20.jumpTime-D_00189E20.position.f[2] > 0.0f &&
-        (D_00189E20.state != 0x66 || D_00189E20.animationDone) &&
-        (D_00189E20.motion.f[2] < 0.0f || D_00189E20.state == 0x7b)) {
-        if (!D_00189E20.health) { func_L07_002BE770(0x78,1); return; }
-        func_L07_002BE770(0x65,1); return;
+    if (gHeroState.jump && gHeroState.state != 0x65 && gHeroState.state != 0x78 &&
+        FloatAbs(gHeroState.jumpTime-(gHeroState.position.f[2]+0.25f)) < 1.0f &&
+        gHeroState.jumpTime-gHeroState.position.f[2] > 0.0f &&
+        (gHeroState.state != 0x66 || gHeroState.animationDone) &&
+        (gHeroState.motion.f[2] < 0.0f || gHeroState.state == 0x7b)) {
+        if (!gHeroState.health) { EnterHeroState_L07(0x78,1); return; }
+        EnterHeroState_L07(0x65,1); return;
     }
-    if (!D_00189E20.cancel || D_00189E20.state == 0x78 || D_00189E20.state == 0x74) return;
-    if (!(func_00282C48(D_00189E20.jumpTime-(D_00189E20.position.f[2]+0.25f)) < 1.0f)) return;
-    if (!(D_00189E20.jumpTime-D_00189E20.position.f[2] > 0.0f)) return;
-    if (!(D_00189E20.motion.f[2] < 0.0f) && D_00189E20.state != 0x7b) return;
-    if (D_001A79F0 == 13) {
-        func_L07_002BE770(0x74, 1);
+    if (!gHeroState.cancel || gHeroState.state == 0x78 || gHeroState.state == 0x74) return;
+    if (!(FloatAbs(gHeroState.jumpTime-(gHeroState.position.f[2]+0.25f)) < 1.0f)) return;
+    if (!(gHeroState.jumpTime-gHeroState.position.f[2] > 0.0f)) return;
+    if (!(gHeroState.motion.f[2] < 0.0f) && gHeroState.state != 0x7b) return;
+    if (gCurrentMapIndex == 13) {
+        EnterHeroState_L07(0x74, 1);
         return;
     }
-    func_L07_002BE770(0x78, 1);
+    EnterHeroState_L07(0x78, 1);
 }

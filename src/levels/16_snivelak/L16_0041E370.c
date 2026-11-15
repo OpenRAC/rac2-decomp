@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -21,23 +22,23 @@ void func_L16_0041E370(char *self) {
     char position[16];
     switch (*(u8 *)(self + 0x20)) {
     case 0:
-        func_002A7750(self, 1, -1);
+        SetMobyState(self, 1, -1);
         break;
     case 1:
-        if (func_002A9640(self, 0x04010000, 0))
-            func_002A7750(self, 2, -1);
+        if (FindOwnedEffectSlot(self, 0x04010000, 0))
+            SetMobyState(self, 2, -1);
         *(u8 *)(self + 0xA8) = 255;
         break;
     case 2:
-        func_002B0A68(1.0f, 3.0f, 3.0f, 7.0f, self, 0x5F, D_L16_001A8F20, 255);
-        func_002E5CF8(0, 0, self);
-        func_L00_00326110(self, 1, 0.0f);
+        SpawnDebrisForMaskedParts(1.0f, 3.0f, 3.0f, 7.0f, self, 0x5F, D_L16_001A8F20, 255);
+        PlayMobySound(0, 0, self);
+        SpawnScaledBolts(self, 1, 0.0f);
         *(effect_quad *)direction = 0;
         *(f32 *)(direction + 8) = 0.05000000447034836f;
-        func_L00_00324F18(self, position, 0.0f, 0.0f, *(f32 *)(self + 0x2C) * 20.0f);
-        func_00283098(direction, direction, self + 0xC0);
-        func_L01_002E1680(0.006666667293f, 1.0f, 1.03f, position, direction, 10, 0x3F7FFF3F, 0);
-        func_0029F338(self);
+        LocalOffsetToWorld(self, position, 0.0f, 0.0f, *(f32 *)(self + 0x2C) * 20.0f);
+        matrix_mul_vec3(direction, direction, self + 0xC0);
+        SpawnSparkBurst_L01(0.006666667293f, 1.0f, 1.03f, position, direction, 10, 0x3F7FFF3F, 0);
+        MarkMobySpawned(self);
         break;
     }
 }

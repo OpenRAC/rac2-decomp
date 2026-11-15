@@ -48,6 +48,7 @@ extern void func_0011AEA0(int);
 extern void func_00133108(void);
 extern int func_00133580(int);
 
+/* Runs the sound system once per call: finishes the pending sound requests, runs their callbacks, sends the next batch and handles disc reads. Returns nonzero while work is still going on. */
 int func_00132028(void)
 {
     int i;
@@ -55,7 +56,7 @@ int func_00132028(void)
     SndCallback fn;
     long arg;
 
-    if (D_001A7480 != 0 && func_00132220() != 0) {
+    if (D_001A7480 != 0 && PollSoundRpcDone() != 0) {
         if (D_001A749C != 0) {
             if (D_001A74E0 != 0)
                 D_001A74E0(D_001A7080[1], D_001A74E8);
@@ -70,7 +71,7 @@ int func_00132028(void)
         }
     }
     if (D_001A74C8 != 0) {
-        func_0011AEA0(0);
+        FlushCache(0);
         if (D_001A7180 != -1u) {
             if (D_001A74D0 != 0) {
                 arg = D_001A74D8;
@@ -85,10 +86,10 @@ int func_00132028(void)
     }
     if (D_001A7480 == 0) {
         if (*D_001A74A0[D_001A74C0] != 0 && D_001A74C4 == 0)
-            func_00133108();
+            SubmitSoundDmaBuffer();
     }
     if (D_001A7494 != 0) {
-        func_00133580(1);
+        snd_CheckLoadInProgress(1);
         if (D_001A7498 != 0) {
             D_001A7494 = 0;
             D_001A7498 = 0;

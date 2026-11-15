@@ -24,61 +24,61 @@ extern float D_L14_001AFF04 __attribute__((sda));
 extern float D_L14_001AFF08 __attribute__((sda));
 extern float D_L14_001AFF0C __attribute__((sda));
 void func_L14_003CB258(char *self) {
- char *s = *(char **)(self+0x68);
- char *e;
- float b,delta,velocity,position,restitution;
+ char *vars = *(char **)(self+0x68);
+ char *child;
+ float maxAngle,delta,velocity,angle,restitution;
  switch ((unsigned char)self[0x20]) {
  case 0:
-  func_002A7750(self,1,-1);
-  *(int *)(s+0x5C) |= 1;
-  qcopy(s+0x70,self+0x10);
-  *(float *)(s+0x78) += D_L14_001AFF0C;
-  e=func_0029EFD0(0xF4D);
-  if(e) {
+  SetMobyState(self,1,-1);
+  *(int *)(vars+0x5C) |= 1;
+  qcopy(vars+0x70,self+0x10);
+  *(float *)(vars+0x78) += D_L14_001AFF0C;
+  child=CreateMoby(0xF4D /* moby class 3917 */);
+  if(child) {
    unsigned short flags,link;
-   func_002B37E8(e,self);
-   flags=*(unsigned short *)(e+0x34);
+   InitChildObjectFromParent(child,self);
+   flags=*(unsigned short *)(child+0x34);
    link=*(unsigned short *)(self+0x32);
-   *(unsigned short *)(e+0x32)=link;
-   *(unsigned short *)(e+0x34)=flags|2;
-   *(int *)(e+0x9C)=0x80000001;
-   e[0x30]=0;
-   *(unsigned short *)(e+0x7C)=0x8001;
+   *(unsigned short *)(child+0x32)=link;
+   *(unsigned short *)(child+0x34)=flags|2;
+   *(int *)(child+0x9C)=0x80000001;
+   child[0x30]=0;
+   *(unsigned short *)(child+0x7C)=0x8001;
    *(int *)(self+0x9C)=6;
   }
   break;
  case 1:
-  if(func_002B3868(self))func_002AD6F0(s+0x20,D_L14_001A8F20,self+0xF0,self+0xF0);
-  if(D_0018A15C==self)func_L14_003CB608(self);
-  if(func_002B38B8(self)) {
-   func_002A7750(self,2,-1);
-   func_L00_003294F0(self,0);
-   func_L14_003CB868(self);
+  if(SetFirstPendingFlag(self))CombineTransformsAndStore(vars+0x20,D_L14_001A8F20,self+0xF0,self+0xF0);
+  if(D_0018A15C==self)ClampGroupEntitiesToLiftBoxWide(self);
+  if(IsThirdPendingFlagSet(self)) {
+   SetMobyState(self,2,-1);
+   SetObjectFlagBit(self,0);
+   UpdateLaunchVolume(self);
   }
   break;
  case 2:
-  if(func_002B3868(self))*(float *)(s+0x84)=D_L14_001AFEFC*0.0002908882452175021f;
+  if(SetFirstPendingFlag(self))*(float *)(vars+0x84)=D_L14_001AFEFC*0.0002908882452175021f;
   delta=D_L14_001AFEF8*4.848137450608192e-06f;
-  velocity=*(float *)(s+0x84)-delta;
-  b=D_L14_001AFF04*0.01745329424738884f;
-  position=*(float *)(s+0x80);
-  position+=velocity;
-  *(float *)(s+0x84)=velocity;
-  *(float *)(s+0x80)=position;
-  if(*(float *)(s+0x80)>b) {
+  velocity=*(float *)(vars+0x84)-delta;
+  maxAngle=D_L14_001AFF04*0.01745329424738884f;
+  angle=*(float *)(vars+0x80);
+  angle+=velocity;
+  *(float *)(vars+0x84)=velocity;
+  *(float *)(vars+0x80)=angle;
+  if(*(float *)(vars+0x80)>maxAngle) {
    restitution=D_L14_001AFF00;
-   *(float *)(s+0x80)=b;
-   *(float *)(s+0x84)*=restitution;
-   func_002E5CF8(0,0,self);
-  } else if(*(float *)(s+0x80)<0.0f) {
+   *(float *)(vars+0x80)=maxAngle;
+   *(float *)(vars+0x84)*=restitution;
+   PlayMobySound(0,0,self);
+  } else if(*(float *)(vars+0x80)<0.0f) {
    restitution=D_L14_001AFF00;
-   *(float *)(s+0x80)=0.0f;
-   *(float *)(s+0x84)*=restitution;
-   func_002E5CF8(0,0,self);
-   if(*(float *)(s+0x84)<=D_L14_001AFF08*0.0002908882452175021f)func_002A7750(self,1,-1);
+   *(float *)(vars+0x80)=0.0f;
+   *(float *)(vars+0x84)*=restitution;
+   PlayMobySound(0,0,self);
+   if(*(float *)(vars+0x84)<=D_L14_001AFF08*0.0002908882452175021f)SetMobyState(self,1,-1);
   }
   D_0018CDD8=-1;
-  func_L14_003CB4D8(self);
+  ApplySwingToObject(self);
   break;
  }
 }

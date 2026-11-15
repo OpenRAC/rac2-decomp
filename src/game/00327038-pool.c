@@ -34,36 +34,37 @@ extern void func_002820D0(float, float, float, void *, int, float **);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00329630(char *);
 
+/* Draws every particle that belongs to an object, first as soft glows and then as flat quads. */
 void func_00329488(void *obj) {
     float v[4] __attribute__((aligned(16)));
     float full, scale, s, a, b;
     int i, n;
 
-    func_002820A0();
+    SetGsRegisterConstant();
     full = 128.0f;
     for (i = 0; i < 300; i++) {
-        int base = (int)D_0022C9A0;
+        int base = (int)gObjectParticles;
         F328Particle *p = (F328Particle *)(base + i * 80);
         float *pos = p->m;
         if (p->t.owner != obj)
             continue;
         if (p->t.f30 < (p->t.f34 >> 1))
-            scale = func_00283CE0(p->t.f30) / func_00283CE0((p->t.f34 >> 1));
+            scale = IntToFloat(p->t.f30) / IntToFloat((p->t.f34 >> 1));
         else
             scale = 1.0f;
-        n = func_00283CF0(scale * full);
-        s = func_00283180(p->t.f14);
+        n = FloatToInt(scale * full);
+        s = FastSinOrCosA(p->t.f14);
         a = (s + 1.0f) * 0.5f;
         b = a * (scale * -0.025f);
         v[2] = v[1] = v[0] = s * 0.05f;
-        func_00282CC0(v, v, pos);
-        func_002820D0((p->t.f18 + p->t.f18) * a, b, 0.08f, v, n, 0);
+        FastVecAdd(v, v, pos);
+        DrawBillboardQuadWithUv((p->t.f18 + p->t.f18) * a, b, 0.08f, v, n, 0);
     }
-    func_002820C8();
+    NoOpFunction();
     for (i = 0; i < 300; i++) {
-        F328Particle *base = D_0022C9A0;
+        F328Particle *base = gObjectParticles;
         F328Particle *p = &base[i];
         if (p->t.owner == obj)
-            func_00329630((char *)p);
+            DrawObjectParticle((char *)p);
     }
 }

@@ -33,49 +33,50 @@ extern void func_002FE8D8(s32, s8 *);
 extern s8 D_002329A0[];
 extern s8 D_00189E20[];
 
-void func_0032AF50(s8 *arg0) {
-    s8 *base ;
-    s8 *s0;
-    s8 *s1;
-    s8 *s3;
-    s8 *s6;
-    s32 s2;
-    s32 s5;
-    s32 temp_v0;
-    f32 v[3];
-    f32 t;
-    f32 t20;
+/* Updates the trail nodes of an owner: they fade, spin and drift, and each one is removed when its time is over. */
+void func_0032AF50(s8 *owner) {
+    s8 *table ;
+    s8 *node;
+    s8 *velocity;
+    s8 *timerPtr;
+    s8 *hero;
+    s32 ownerCount;
+    s32 count;
+    s32 fadeLeft;
+    f32 drift[3];
+    f32 lifeNow;
+    f32 lifeRatio;
 
-    s5 = 0;
-    base = D_002329A0;
-    s3 = base + 0x3C;
-    s1 = base + 0x10;
-    s0 = base;
-    s6 = D_00189E20;
-    s2 = *(s32 *)(arg0 + 0x68);
+    count = 0;
+    table = gTrailNodes;
+    timerPtr = table + 0x3C;
+    velocity = table + 0x10;
+    node = table;
+    hero = gHeroState;
+    ownerCount = *(s32 *)(owner + 0x68);
     do {
-        s5++;
-        if ((s8 *)(s64)*(s32 *)(s0 + 0x44) == arg0) {
-            t = func_00283CE0(*(s32 *)(s0 + 0x3C));
-            t20 = t / func_00283CE0(*(s32 *)(s0 + 0x40));
-            *(s32 *)(s0 + 0x34) = func_00283CF0(func_00283CE0(*(s32 *)(s0 + 0x30)) * t20);
-            *(f32 *)(s0 + 0x2C) = func_00283B98(*(f32 *)(s0 + 0x2C), *(f32 *)(s0 + 0x28));
-            func_00282CC0(s0, s0, s1);
-            func_002FE8D8(*(s32 *)(s6 + 0x2290) + 0x10, v);
-            func_00282D30(v, v, -0.00089999998454f);
-            func_00282CC0(s1, s1, v);
-            if (func_00282948(s3) != 0) {
-                temp_v0 = *(s32 *)(s0 + 0x34);
-                if (temp_v0 > 0) {
-                    *(s32 *)(s0 + 0x34) = temp_v0 - 1;
+        count++;
+        if ((s8 *)(s64)*(s32 *)(node + 0x44) == owner) {
+            lifeNow = IntToFloat(*(s32 *)(node + 0x3C));
+            lifeRatio = lifeNow / IntToFloat(*(s32 *)(node + 0x40));
+            *(s32 *)(node + 0x34) = FloatToInt(IntToFloat(*(s32 *)(node + 0x30)) * lifeRatio);
+            *(f32 *)(node + 0x2C) = FastAddRotations(*(f32 *)(node + 0x2C), *(f32 *)(node + 0x28));
+            FastVecAdd(node, node, velocity);
+            GetObjectFacingDirection(*(s32 *)(hero + 0x2290) + 0x10, drift);
+            FastVecScale(drift, drift, -0.00089999998454f);
+            FastVecAdd(velocity, velocity, drift);
+            if (FastFloatHelperD(timerPtr) != 0) {
+                fadeLeft = *(s32 *)(node + 0x34);
+                if (fadeLeft > 0) {
+                    *(s32 *)(node + 0x34) = fadeLeft - 1;
                 } else {
-                    *(s32 *)(s0 + 0x44) = 0;
-                    *(s32 *)s2 -= 1;
+                    *(s32 *)(node + 0x44) = 0;
+                    *(s32 *)ownerCount -= 1;
                 }
             }
         }
-        s3 += 0x50;
-        s1 += 0x50;
-        s0 += 0x50;
-    } while (s5 < 0x80);
+        timerPtr += 0x50;
+        velocity += 0x50;
+        node += 0x50;
+    } while (count < 0x80);
 }

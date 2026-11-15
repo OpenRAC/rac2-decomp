@@ -29,12 +29,13 @@ extern void ref_L00_003ACCF8_02(void *, s32, f32, s32, s32, f32);
 extern s32 ref_L00_003ACCF8_03 __attribute__((sda));
 extern s8 ref_L00_003ACCF8_04[];
 
-void func_L00_003ACCF8(void *arg0) {
-    s8 buf[0x10];
-    s8 *s0;
+/* Saves the shot's current position and direction into its slot of the trail table. */
+void func_L00_003ACCF8(void *moby) {
+    s8 transform[0x10];
+    s8 *vars;
 
-    s0 = *(s8 **)((s8 *)arg0 + 0x68);
-    ref_L00_003ACCF8_00(arg0, buf);
-    ref_L00_003ACCF8_01(buf, ref_L00_003ACCF8_03);
-    ref_L00_003ACCF8_02(buf, (*(s32 *)(s0 + 0x2C) << 6) + (s32)ref_L00_003ACCF8_04, 0.0f, ref_L00_003ACCF8_03, 4, 0.25f);
+    vars = *(s8 **)((s8 *)moby + 0x68);
+    ref_L00_003ACCF8_00(moby, transform);
+    ref_L00_003ACCF8_01(transform, ref_L00_003ACCF8_03);
+    ref_L00_003ACCF8_02(transform, (*(s32 *)(vars + 0x2C) << 6) + (s32)ref_L00_003ACCF8_04, 0.0f, ref_L00_003ACCF8_03, 4, 0.25f);
 }

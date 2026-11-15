@@ -69,23 +69,23 @@ void func_L05_003CF9C8(char *obj)
 
     *(unsigned char *)(s0 + 0x30) = 0xFF;
     *(unsigned short *)(s0 + 0x32) = 0x1FF;
-    idx = func_L05_003CFC28(*(short *)(s0 + 0xAA));
+    idx = ClassIdToTableIndex(*(short *)(s0 + 0xAA));
     f21 = 0.0f;
     f20 = 0.01745329424738884f;
     f22 = 1.0f;
     f1 = *(float *)(s0 + 0x2C) * *(float *)((char *)&D_L05_001AFB68 + 4 * idx);
     *(float *)(s0 + 0x2C) = f1;
-    f0 = func_002A7940();
+    f0 = RandomAngle();
     *(float *)(s0 + 0xF0) = f0;
-    f0 = func_002A7940();
+    f0 = RandomAngle();
     *(float *)(s0 + 0xF4) = f0;
-    f0 = func_002A7940();
+    f0 = RandomAngle();
     *(float *)(s0 + 0xF8) = f0;
-    f0 = func_002A7878(f21, 0.5f) * f20;
+    f0 = RandomFloatRange(f21, 0.5f) * f20;
     *(float *)(s1 + 0x0) = f0;
-    f0 = func_002A7878(f21, f22) * f20;
+    f0 = RandomFloatRange(f21, f22) * f20;
     *(float *)(s1 + 0x4) = f0;
-    f0 = func_002A7878(f21, 2.0f) * f20;
+    f0 = RandomFloatRange(f21, 2.0f) * f20;
     *(float *)(s1 + 0x8) = f0;
     *(float *)(s1 + 0xC) = f22;
 }
@@ -98,7 +98,7 @@ void func_L05_003D0420(char *obj)
     char *s1 = *(char **)(obj + 0x68);
     char *r;
 
-    r = func_002ED688(obj);
+    r = GetMobyMotionData(obj);
     if (r == 0)
         return;
     if (*(int *)(r + 0x120) == 0)
@@ -106,13 +106,13 @@ void func_L05_003D0420(char *obj)
     if (*(int *)(s1 + 0x1B8) != 0)
         return;
     if (*(unsigned char *)(obj + 0x20) == 1) {
-        if (D_001A79F0 == 0xF)
-            func_L05_00379FA0(obj, 0x60008000, 1, 0, 0.6f, 2.0f, 1.0f, 1.0f, 0, -1, 0);
+        if (gCurrentMapIndex == 0xF)
+            SpawnSpaceProjectile(obj, 0x60008000, 1, 0, 0.6f, 2.0f, 1.0f, 1.0f, 0, -1, 0);
         else
-            func_L05_00379FA0(obj, 0x60008000, 1, 0, 1.0f, 2.0f, 1.0f, 1.0f, 0, -1, 0);
+            SpawnSpaceProjectile(obj, 0x60008000, 1, 0, 1.0f, 2.0f, 1.0f, 1.0f, 0, -1, 0);
     }
-    if (func_002A77E0(3) == 0)
-        func_002E5DA0(0, 0, obj, 0x957);
+    if (RandomIntBelow(3) == 0)
+        PlaySoundFromClassBank(0, 0, obj, 0x957);
     *(int *)(s1 + 0x1B8) = 0x14;
 }
 
@@ -136,11 +136,11 @@ extern ShakeCamera_003CFAB8 D_L05_001B9580;
  * shares them after scheduling. */
 void func_L05_003CFAB8(char *obj)
 {
-    float reach = *(float *)((char *)&D_L05_001AFB68 + 4 * func_L05_003CFC28(*(short *)(obj + 0xAA)));
+    float reach = *(float *)((char *)&D_L05_001AFB68 + 4 * ClassIdToTableIndex(*(short *)(obj + 0xAA)));
 
-    if (func_00282E48(obj + 0x10, D_L05_001B9580.f140) <= reach && *(short *)(obj + 0xAA) != 0x956) {
+    if (fast_vec_dist(obj + 0x10, D_L05_001B9580.f140) <= reach && *(short *)(obj + 0xAA) != 0x956) {
         func_L05_003CFB90(obj, (char *)D_L05_001B9580.f140);
-        func_002E5DA0(7, 0, obj, 0xFBF);
+        PlaySoundFromClassBank(7, 0, obj, 0xFBF);
         if (*(short *)(obj + 0xAA) == 0x955) {
             D_L05_001B9580.f160 = 0.05f;
             D_L05_001B9580.f168 = 0x1E;
@@ -218,21 +218,21 @@ void func_L05_00397B30(char *obj)
     int collided;
 
     qcopy(old, obj + 0x10);
-    func_00282CC0(obj + 0x10, obj + 0x10, state);
-    speed = func_00282DF0(state);
+    FastVecAdd(obj + 0x10, obj + 0x10, state);
+    speed = FastVecLength(state);
     if (*(int *)(state + 0x24))
         speed *= 0.986f;
     else
         speed *= 0.982f;
-    func_00282F20(state, state, speed);
-    *(float *)(obj + 0xF8) = func_00283B98(*(float *)(obj + 0xF8), 0.05f);
-    *(float *)(obj + 0xF4) = func_00283B98(*(float *)(obj + 0xF4), 0.03f);
+    vec_scale_to_length(state, state, speed);
+    *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 0.05f);
+    *(float *)(obj + 0xF4) = FastAddRotations(*(float *)(obj + 0xF4), 0.03f);
 
-    if (func_00282948(state + 0x18)) {
+    if (FastFloatHelperD(state + 0x18)) {
         for (i = 0; i < 24; i++)
             D_L05_00233560[i].owner = 0;
         func_L05_003D1E60(obj + 0x10, 0, 0);
-        func_0029F338(obj);
+        MarkMobySpawned(obj);
         return;
     }
     if (*(float *)(obj + 0x10) < 2.0f || *(float *)(obj + 0x10) > 1021.0f ||
@@ -241,18 +241,18 @@ void func_L05_00397B30(char *obj)
         for (i = 0; i < 24; i++)
             D_L05_00233560[i].owner = 0;
         func_L05_003D1E60(obj + 0x10, 0, 0);
-        func_0029F338(obj);
+        MarkMobySpawned(obj);
         return;
     }
 
-    if (func_00282948(state + 0x28)) {
-        func_002AF000(target, 21.0f, func_002A7940(), func_002A7940());
-        func_00282CC0(target, target, obj + 0x10);
-        if (func_002761F8(obj + 0x10, target, 0, obj, 0))
+    if (FastFloatHelperD(state + 0x28)) {
+        BuildSphericalOffset(target, 21.0f, RandomAngle(), RandomAngle());
+        FastVecAdd(target, target, obj + 0x10);
+        if (CollLine(obj + 0x10, target, 0, obj, 0))
             qcopy(target, D_L05_001BFB20);
         func_L05_00398378(obj, target, 1);
-        func_L05_00398618(obj);
-        func_L00_002E6EF8(func_L05_00398018, obj);
+        AnimateOwnedRecords(obj);
+        AddDrawCallbackToList3(UpdateOwnedRecordEffects, obj);
 
         hit.owner = obj;
         hit.flags = 0x810000;
@@ -262,7 +262,7 @@ void func_L05_00397B30(char *obj)
             hit.value = D_L05_001AEBE4;
         hit.one = 1;
         qcopy(hit.v, state);
-        func_00282F20(hit.v, hit.v, 1.0f);
+        vec_scale_to_length(hit.v, hit.v, 1.0f);
         hit.kind = 3;
         hit.v[3] = 5627.925f;
         hit.mode = 2;
@@ -271,22 +271,22 @@ void func_L05_00397B30(char *obj)
             speed = D_L05_001AEBE0;
         else
             speed = D_L05_001AEBDC;
-        func_00277F48(obj + 0x10, speed, 1, *(char **)(state + 0x20), &hit);
+        ProcessCollisionHit(obj + 0x10, speed, 1, *(char **)(state + 0x20), &hit);
     }
 
-    if (func_00278E78() != 6) {
+    if (GetCollHitMaterial() != 6) {
         collided = 0;
-        if (func_00277258(obj + 0x10, 1.0f, 16, *(void **)(state + 0x20))) {
+        if (TestPointAgainstCollision(obj + 0x10, 1.0f, 16, *(void **)(state + 0x20))) {
             collided = 1;
             qcopy(obj + 0x10, D_L05_001BFB30);
         }
-        if (collided || func_002761F8(old, obj + 0x10, 16, *(void **)(state + 0x20), 0)) {
+        if (collided || CollLine(old, obj + 0x10, 16, *(void **)(state + 0x20), 0)) {
             qcopy(obj + 0x10, D_L05_001BFB20);
-            func_L05_00397F48(obj, state, obj + 0x10);
+            SubmitFlightStateHitRecord(obj, state, obj + 0x10);
             if (*(int *)(state + 0x24))
-                func_L05_00424990(obj + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);
+                SpawnShockwaveBurst(obj + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);
             func_L05_003D1E60(obj + 0x10, 0, 0);
-            func_0029F338(obj);
+            MarkMobySpawned(obj);
         }
     }
 }

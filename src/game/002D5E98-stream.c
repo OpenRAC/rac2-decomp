@@ -131,19 +131,19 @@ extern int D_0014B8AC;
 static inline int startRead(MenuStream *stream, int index, int buffer)
 {
     if (stream->flags & 0x20) {
-        int offset = func_002DE6F0(buffer) - stream->entries[index].count * 2048;
+        int offset = GetStreamChunkSize(buffer) - stream->entries[index].count * 2048;
 
         stream->offset = offset;
         buffer += offset;
     }
     if (stream->flags & 0x10000)
-        return func_002B7B18(buffer, stream->entries[index].sector + D_0014D11C,
+        return StartDiscRead(buffer, stream->entries[index].sector + D_0014D11C,
                              stream->entries[index].count);
     /* Flag 0x10 reads from the same base as the default. */
     if (stream->flags & 0x10)
-        return func_002B7B18(buffer, stream->entries[index].sector + D_0014B8AC,
+        return StartDiscRead(buffer, stream->entries[index].sector + D_0014B8AC,
                              stream->entries[index].count);
-    return func_002B7B18(buffer, stream->entries[index].sector + D_0014B8AC,
+    return StartDiscRead(buffer, stream->entries[index].sector + D_0014B8AC,
                          stream->entries[index].count);
 }
 
@@ -153,7 +153,7 @@ static inline void loadEntry(MenuStream *stream, int index, int slot)
     if (D_001A63AC != 0 || stream->entries[index].count == 0)
         return;
     if (startRead(stream, index, stream->buffer[slot])) {
-        func_002DE750(stream->buffer[slot]);
+        SetStreamChunkLatchFlag(stream->buffer[slot]);
         stream->loaded[slot] = index;
         stream->state++;
     } else {
@@ -169,8 +169,8 @@ int func_002DA328(MenuStream *stream)
     int index;
     LanguageOffsets offsets;
 
-    if (func_002B49C8(6)) {
-        func_002B7CE0(1);
+    if (IsCurrentRequestSlot(6)) {
+        PumpMusicAndDiscRead(1);
         return 0;
     }
     stream->frames++;
@@ -184,8 +184,8 @@ int func_002DA328(MenuStream *stream)
     } else if (flags & 4) {
         index = D_001F2854->focus->data.grid.cell;
     } else if (flags & 0x100) {
-        MenuSystem *menus = &D_001F2840;
-        MemoryCardState *card = &D_001393E0;
+        MenuSystem *menus = &gPauseMenuState;
+        MemoryCardState *card = &gMemcardState;
 
         index = menus->current->focus->data.save.slot;
         if (index < 0)
@@ -213,7 +213,7 @@ int func_002DA328(MenuStream *stream)
         index = (stream->frames / 300) % 19;
     } else if (flags & 0x1000) {
         offsets = D_001ABB30;
-        index = *stream->languageBase + offsets.values[D_001A7B90.language];
+        index = *stream->languageBase + offsets.values[gIsPalVideo.language];
     } else {
         MenuScreen *list = D_001F2854->focus;
         ListEntry *entries = list->data.list.entries;
@@ -249,8 +249,8 @@ int func_002DA328(MenuStream *stream)
                 int second = stream->state == 3;
 
                 slot += second;
-                func_002DE7A0(*slot);
-                func_0029D4D0(*slot + stream->offset, *slot);
+                ClearStreamChunkLatchFlag(*slot);
+                fast_decompress(*slot + stream->offset, *slot);
                 stream->offset = 0;
             }
             stream->state++;

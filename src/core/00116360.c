@@ -10,9 +10,10 @@ extern int D_00134DB8;
 
 extern void func_0011AC40(int arg0);
 
+/* Releases the memory lock, and wakes a waiting thread once the last hold is let go. */
 void func_00116360(void) {
     if (--D_001341E4 == 0) {
         D_001341E0 = -1;
-        func_0011AC40(D_00134DB8);
+        SignalSema(D_00134DB8);
     }
 }

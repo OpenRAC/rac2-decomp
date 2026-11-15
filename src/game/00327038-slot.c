@@ -26,7 +26,7 @@ extern void func_002A04B8(void *, int *, int *, int *);
 
 static __inline__ int EffectAlternate(int kind)
 {
-    EffectType *type = &D_00239BA0[D_00139568[kind]];
+    EffectType *type = &gWeaponTable_00239BA0[gItemSlotToRecord[kind]];
     if (type->active) {
         if (type->type == 2) return 1;
         if (type->type == 1) {
@@ -42,15 +42,16 @@ static __inline__ int EffectAlternate(int kind)
 
 static __inline__ int EffectThird(int kind)
 {
-    EffectType *type = &D_00239BA0[D_00139568[kind]];
+    EffectType *type = &gWeaponTable_00239BA0[gItemSlotToRecord[kind]];
     int result = 0;
     if (type->active) result = type->type == 3;
     return result;
 }
 
+/* Starts an effect on a hero-type object in the first free slot. Returns 0 when it started and 1 when nothing was done. */
 int func_0032D758(char *self, int index, int arg)
 {
-    int kind = D_00239BA0[index].kind;
+    int kind = gWeaponTable_00239BA0[index].kind;
     int result = 1, alternate;
     int i, r, g, b;
     char *p;
@@ -63,16 +64,16 @@ int func_0032D758(char *self, int index, int arg)
     if (!(*(unsigned short *)(self + 0x34) & 0x1000)) return 1;
     if (*(signed char *)(self + 0x20) < 0) return 1;
     if (!*(int *)(self + 0x98)) return 1;
-    health = func_002AB1F0(self);
+    health = GetMobyPrivateValue0(self);
     if (!health || *health <= 0.0f) return 1;
-    if (func_0032D700(self) != -1) return 1;
+    if (FindEffectSlotByObject(self) != -1) return 1;
     for (i = 0; i < 30; i++) {
         EffectSlot *slot;
         int found;
         unsigned int flags;
-        if (D_L00_002533B0[i].object)
+        if (gHealthDrainSlots_L00[i].object)
             continue;
-        slot = &D_L00_002533B0[i];
+        slot = &gHealthDrainSlots_L00[i];
         found = 0;
         slot->object = self;
         slot->remaining = D_00236510[alternate][index].ticks * 60;
@@ -87,7 +88,7 @@ int func_0032D758(char *self, int index, int arg)
                 found = 1;
             }
         }
-        if (!found) func_002A04B8(slot->object, &r, &g, &b);
+        if (!found) get_moby_color(slot->object, &r, &g, &b);
         slot->phase.bits = 0;
         slot->flags = 0x8000;
         slot->color = (b << 16) + (g << 8) + r;

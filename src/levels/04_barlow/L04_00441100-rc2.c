@@ -30,17 +30,18 @@ extern s32 ref_L04_00441100_01(s8 *, s32);
 extern void ref_L04_00441100_02(s8 *);
 extern void ref_L04_00441100_03(s8 *, s32, s32);
 
-void func_L04_00441100(s8 *arg0) {
-    s32 *p;
-    s32 a1;
+/* On its first update waits until the hero is at the linked spot, then sets a level flag and moves to the next state. */
+void func_L04_00441100(s8 *object) {
+    s32 *links;
+    s32 linkedId;
 
-    if (*(u8 *)(arg0 + 0x20) == 0) {
-        p = *(s32 **)(arg0 + 0x68);
-        a1 = *p;
-        if (a1 != -1 && ref_L04_00441100_01(D_00189EA0, a1) != 0) {
+    if (*(u8 *)(object + 0x20) == 0) {
+        links = *(s32 **)(object + 0x68);
+        linkedId = *links;
+        if (linkedId != -1 && ref_L04_00441100_01(gHeroPosition, linkedId) != 0) {
             ref_L04_00441100_02(ref_L04_00441100_00);
             D_001395C8 = 1;
-            ref_L04_00441100_03(arg0, 1, -1);
+            ref_L04_00441100_03(object, 1, -1);
         }
     }
 }

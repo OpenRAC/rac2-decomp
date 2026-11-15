@@ -17,53 +17,54 @@ typedef struct {
     float angles[3];
 } RotState;
 
-void func_L07_00378898(unsigned char *a0)
+/* Slowly spins the linked groups of level pieces around their own centers. */
+void func_L07_00378898(unsigned char *moby)
 {
-    RotState *state = *(RotState **)(a0 + 0x68);
+    RotState *groupState = *(RotState **)(moby + 0x68);
     int i;
-    unsigned short *p;
-    unsigned char *e;
-    float v[4];
+    unsigned short *matrixIndexPtr;
+    unsigned char *matrixEntry;
+    float rotation[4];
     float loc[3];
-    float *q;
-    int k;
-    int m;
-    float t;
-    float ang;
+    float *savedPos;
+    int axisIndex;
+    int axisIndex2;
+    float scale;
+    float newAngle;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        a0[0x30] = 0xFF;
-        func_002A7750(a0, 1, -1);
+        moby[0x30] = 0xFF;
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
         if (D_L07_001C9780 != 0)
             return;
         for (i = 0; i < 3; i++) {
-            if (state->groups[i] == -1) {
+            if (groupState->groups[i] == -1) {
                 continue;
             }
             /* The transfer helper also preserves the original address recomputation. */
-            qzero_nc(v);
-            ang = func_00283B98(state->angles[i], D_L07_001AEBF8[i] * 0.00029088824f);
-            state->angles[i] = ang;
-            v[2] = ang;
-            for (p = D_L07_001A9014[state->groups[i]];
-                 p != 0 && ((short)p[-1] >= 0 || p == D_L07_001A9014[state->groups[i]]);
-                 p++) {
-                e = D_L07_001B295C + ((*p & 0x7FFF) << 6);
-                if (e == 0)
+            qzero_nc(rotation);
+            newAngle = FastAddRotations(groupState->angles[i], D_L07_001AEBF8[i] * 0.00029088824f);
+            groupState->angles[i] = newAngle;
+            rotation[2] = newAngle;
+            for (matrixIndexPtr = D_L07_001A9014[groupState->groups[i]];
+                 matrixIndexPtr != 0 && ((short)matrixIndexPtr[-1] >= 0 || matrixIndexPtr == D_L07_001A9014[groupState->groups[i]]);
+                 matrixIndexPtr++) {
+                matrixEntry = D_L07_001B295C + ((*matrixIndexPtr & 0x7FFF) << 6);
+                if (matrixEntry == 0)
                     break;
-                q = loc;
-                for (k = 0; k < 3; k++)
-                    q[k] = *(float *)(e + 0xC + k * 16);
-                t = func_00282DF0(e);
-                func_002833F0(e, v);
-                func_00282F20(e, e, t);
-                func_00282F20(e + 0x10, e + 0x10, t);
-                for (m = 0; m < 3; m++)
-                    *(float *)(e + 0xC + m * 16) = q[m];
-                func_L00_0036AE00(*p & 0x7FFF, 1);
+                savedPos = loc;
+                for (axisIndex = 0; axisIndex < 3; axisIndex++)
+                    savedPos[axisIndex] = *(float *)(matrixEntry + 0xC + axisIndex * 16);
+                scale = FastVecLength(matrixEntry);
+                euler_rotation_basis(matrixEntry, rotation);
+                vec_scale_to_length(matrixEntry, matrixEntry, scale);
+                vec_scale_to_length(matrixEntry + 0x10, matrixEntry + 0x10, scale);
+                for (axisIndex2 = 0; axisIndex2 < 3; axisIndex2++)
+                    *(float *)(matrixEntry + 0xC + axisIndex2 * 16) = savedPos[axisIndex2];
+                SetupScaleRecord(*matrixIndexPtr & 0x7FFF, 1);
             }
         }
         break;

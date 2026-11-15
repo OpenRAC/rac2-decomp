@@ -33,18 +33,19 @@ extern s32 D_001A7340 __attribute__((sda));
 extern f32 ref_L00_00382BF0_04 __attribute__((sda));
 extern s8 ref_L00_00382BF0_05[];
 
-f32 func_L00_00382BF0(void *arg0) {
-    s8 buf[0x10];
-    s32 sp10;
-    s32 sp14;
-    f32 temp_f20;
-    s32 temp_s1;
+/* Returns how visible the sun is on screen, or -1 if it is off screen or hidden behind something. */
+f32 func_L00_00382BF0(void *object) {
+    s8 point[0x10];
+    s32 screenX;
+    s32 screenY;
+    f32 depth;
+    s32 vars;
 
-    temp_s1 = *(s32 *)((s8 *)arg0 + 0x68);
-    ref_L00_00382BF0_00(buf, temp_s1, ref_L00_00382BF0_05);
-    temp_f20 = ref_L00_00382BF0_01(buf, ref_L00_00382BF0_05 + 0x230);
-    ref_L00_00382BF0_02(temp_s1, &sp10, &sp14);
-    if ((sp10 < 0) || (sp10 >= (D_001A7340 - 0x10)) || (sp14 < 0) || (sp14 >= (D_001A7344 - 8)) || !(temp_f20 > 0.0f) || (ref_L00_00382BF0_03(-1, (u16) sp10, (u16) sp14, 0x10, 8, 0, &ref_L00_00382BF0_04) == -1)) {
+    vars = *(s32 *)((s8 *)object + 0x68);
+    ref_L00_00382BF0_00(point, vars, ref_L00_00382BF0_05);
+    depth = ref_L00_00382BF0_01(point, ref_L00_00382BF0_05 + 0x230);
+    ref_L00_00382BF0_02(vars, &screenX, &screenY);
+    if ((screenX < 0) || (screenX >= (gScreenWidth - 0x10)) || (screenY < 0) || (screenY >= (gScreenHeight - 8)) || !(depth > 0.0f) || (ref_L00_00382BF0_03(-1, (u16) screenX, (u16) screenY, 0x10, 8, 0, &ref_L00_00382BF0_04) == -1)) {
         ref_L00_00382BF0_04 = -1.0f;
     }
     return ref_L00_00382BF0_04;

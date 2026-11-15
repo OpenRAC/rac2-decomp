@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /*
  * Disassembled at 0x002cd220
@@ -46,18 +47,21 @@ extern void func_0027C540(long arg0);
 /* External functions declared with exact aliases from task.externals */
 extern void func_0027C540(long param_1);
 
+/* Draws one menu page: sets up the draw state, draws the page contents, and finishes. */
 unsigned long long func_002CD620(void)
 {
-  func_0027C540(0);
+  SetupGifPaging(0);
   func_0029C1D8();
-  func_0027C660();
+  DoGifPaging();
   return 0;
 }
 
+/* Does nothing and returns 0. */
 int func_002CD650(void) {
     return 0;
 }
 
+/* Does nothing and returns 0. */
 int func_002CD658(void) {
     return 0;
 }
@@ -75,16 +79,17 @@ extern int D_00138344;
 extern void func_0028BD68(void);
 extern int func_0029CBE0(int);
 
+/* Handles button input for a menu page: confirm picks the item (or fails if nothing is chosen), back closes the page. */
 int func_002CD660(void) {
     int result = 0;
     int flags = D_00138344;
     if (flags & 0x10) {
         int value;
-        func_0028BD68();
-        value = *(int *)(D_001F2840.source + 0xE0);
+        SyncWeaponMenuSlots();
+        value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
             result = -1;
             goto done;
         }
@@ -92,7 +97,7 @@ int func_002CD660(void) {
 done:
         ;
     } else if (flags & 0x900) {
-        func_0028BD68();
+        SyncWeaponMenuSlots();
         result = 1;
     } else {
         func_0029CBE0(flags);
@@ -102,10 +107,11 @@ done:
 
 extern void func_0029CC20(void);
 
+/* Draws one menu page in a second style: sets up the draw state, draws the page contents, and finishes. */
 int func_002CD6F0(void) {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029CC20();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -131,20 +137,21 @@ extern int func_0029C480(int);
    D_001A63AC is clear and the state at D_0025E2B8 matches one of its two modes, and sets it
    otherwise. The unit is built with -frac2-gcse-unsplit-edges (config/cflags.txt): the high
    half of D_0025E2B8 is computed once before the compare, as in retail. */
+/* Handles button input for a menu page like the one above and also keeps the cursor highlight flag and cursor memory up to date. */
 int func_002CD720(void) {
     int result = 0;
-    int result1;
-    int result2;
+    int cursorBefore;
+    int cursorAfter;
     int flags;
     int value;
 
-    result1 = func_00336EF0();
+    cursorBefore = GetUiSettingValue();
     flags = D_00138344;
     if (flags & 0x10) {
-        value = *(int *)(D_001F2840.source + 0xE0);
+        value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
             result = -1;
             goto after_first;
         }
@@ -157,24 +164,25 @@ int func_002CD720(void) {
 after_first:
     if (D_001A8CFC[0] == 0)
         return result;
-    result2 = func_00336EF0();
-    if (result1 == result2 && D_001A63AC == 0 &&
-        ((D_0025E2B8.f50 == result1 && D_0025E2B8.f44 == 2) ||
-         (D_0025E2B8.f54 == result1 && D_0025E2B8.f44 == 4)))
+    cursorAfter = GetUiSettingValue();
+    if (cursorBefore == cursorAfter && D_001A63AC == 0 &&
+        ((D_0025E2B8.f50 == cursorBefore && D_0025E2B8.f44 == 2) ||
+         (D_0025E2B8.f54 == cursorBefore && D_0025E2B8.f44 == 4)))
         *(int *)(D_0025E284 + 0x10) &= ~4;
     else
         *(int *)(D_0025E284 + 0x10) |= 4;
-    if (result2 != result1)
+    if (cursorAfter != cursorBefore)
         D_0025E464 = -0x22C;
-    D_0025E2B8.f58 = func_00336EF0();
+    D_0025E2B8.f58 = GetUiSettingValue();
     return result;
 }
 
 extern char *D_001A8CFC[] __attribute__((sda));
 extern void *func_00344378(void *);
 
+/* Points the object at the menu panel data, if a panel exists. */
 int func_002CD878(char *object) {
     if (D_001A8CFC[0] != 0)
-        *(void **)(object + 0x34) = func_00344378(D_001A8CFC[0] + 0x39F38);
+        *(void **)(object + 0x34) = GetGridMenuSelectedTextId(D_001A8CFC[0] + 0x39F38);
     return 0;
 }

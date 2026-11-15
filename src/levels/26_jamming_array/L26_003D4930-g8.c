@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L26_003D4930 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give
@@ -46,7 +47,7 @@ void func_L26_003D4930(u8 *a0) {
                 break;
             *(int *)(*(u8 **)(e + 0x68) + 0x19C) = D_L26_001B1748;
         }
-        func_L00_002E6CF0((void *)func_L26_003D4AE8, a0);
+        AddDrawCallbackToList1((void *)SubmitGroupTrailEffects, a0);
     }
     phase = (float)(D_L26_001B1748 % 8) * 0.125f;
     *(float *)(state + 0x198) = phase;
@@ -55,7 +56,7 @@ void func_L26_003D4930(u8 *a0) {
         if (*(int *)(state + 0x190) < 8)
             *(int *)(state + 0x190) = *(int *)(state + 0x190) + 1;
     }
-    func_002AB6D8(a0 + 0xC0, a0 + 0xF0);
-    func_002A91F0(state + 0x100 + *(int *)(state + 0x194) * 16, a0 + 0xF0);
+    GetEulerAnglesFromMatrix(a0 + 0xC0, a0 + 0xF0);
+    BuildRotationFromAngles(state + 0x100 + *(int *)(state + 0x194) * 16, a0 + 0xF0);
     *(TI128 *)(state + 0x80 + *(int *)(state + 0x194) * 16) = *(TI128 *)(a0 + 0x10);
 }

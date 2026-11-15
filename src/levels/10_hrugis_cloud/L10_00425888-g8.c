@@ -14,12 +14,12 @@ extern s32 D_L10_001B1390_4[] MACRO_ADDR;
 extern u8 D_L10_001395B8[];
 
 void func_L10_00425888(void) {
-    if (D_L10_001B1390 > 0x7F) D_L10_001B1390 = 0x7F;
+    if (gMissionCompletionCounts > 0x7F) gMissionCompletionCounts = 0x7F;
     if (D_L10_001B1390_4[1] > 0x7F) D_L10_001B1390_4[1] = 0x7F;
     if (D_L10_001B1390_4[2] > 0x7F) D_L10_001B1390_4[2] = 0x7F;
     if (D_L10_001B1390_4[3] > 0x7F) D_L10_001B1390_4[3] = 0x7F;
 
-    D_L10_001395B8[0x66] = D_L10_001B1390;
+    D_L10_001395B8[0x66] = gMissionCompletionCounts;
     D_L10_001395B8[0x67] = D_L10_001B1390_4[1];
     D_L10_001395B8[0x68] = D_L10_001B1390_4[2];
     D_L10_001395B8[0x69] = D_L10_001B1390_4[3];

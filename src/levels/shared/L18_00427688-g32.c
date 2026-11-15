@@ -17,13 +17,14 @@ extern void func_L18_00427010(unsigned char *);
 extern int func_001163B0(void);
 extern void func_L18_00426F28(unsigned char *,int,int,float);
 extern void func_002A7750(unsigned char *,int,int);
+/* Sets up a new shooter enemy: speeds, turn rates, sight angles and starting state (idle, hidden or active). */
 int func_L18_00427688(unsigned char *object)
 {
     unsigned char *state;
     float randomAngle;
     unsigned int ownerClass;
     if(object[0xb0]!=0xff) {
-        if((D_0019B2E8[object[0xb0]+D_001A79F0*16]&0x80)!=0) {
+        if((D_0019B2E8[object[0xb0]+gCurrentMapIndex*16]&0x80)!=0) {
             if(D_L18_0021E7B0[1][*(short *)(object+0xb2)]!=0) return 1;
         }
     }
@@ -56,29 +57,29 @@ int func_L18_00427688(unsigned char *object)
     *(float *)(state+0x108)=0.5f;
     *(float *)(state+0x10c)=0.5f;
     *(float *)(state+0x110)=1.22173059f;
-    randomAngle=func_002A7878(20.0f,25.0f);
-    { float speed=D_L18_001B1218.f18;
+    randomAngle=RandomFloatRange(20.0f,25.0f);
+    { float turnSpeed=D_L18_001B1218.f18;
     *(float *)(state+0x134)=0.5f;
     state[0x1e8]=0; state[0x1e9]=0;
     *(float *)(state+0x130)=randomAngle*0.017453294f;
-    *(float *)(state+0x12c)=speed*0.0002777777845f; }
-    if(*(short *)(object+0xaa)==0xed4) *(float *)(state+0x100)=1.0f;
-    if(*(short *)(object+0xaa)==0xee1) *(float *)(state+0x100)=1.1f;
+    *(float *)(state+0x12c)=turnSpeed*0.0002777777845f; }
+    if(*(short *)(object+0xaa)==0xed4 /* moby class 3796 */) *(float *)(state+0x100)=1.0f;
+    if(*(short *)(object+0xaa)==0xee1 /* Receiver Bot */) *(float *)(state+0x100)=1.1f;
     if(*(float *)(state+0x3c4)==0.0f && *(float *)(state+0x3c0)==0.0f && *(float *)(state+0x3cc)==0.0f && *(float *)(state+0x3c8)==0.0f) {
-        float a=D_L18_001B1218.f0,b=D_L18_001B1218.f4;
-        float c=D_L18_001B1218.f8,d=D_L18_001B1218.fC;
-        float e=D_L18_001B1218.f10,f=D_L18_001B1218.f14;
-        *(float *)(state+0x3c4)=a;
-        *(float *)(state+0x3c0)=b;
-        *(float *)(state+0x3cc)=c;
-        *(float *)(state+0x3c8)=d;
-        *(float *)(state+0x3d4)=e;
-        *(float *)(state+0x3d0)=f;
-        *(float *)(state+0x3dc)=e;
-        *(float *)(state+0x3d8)=f;
+        float walkSpeed=D_L18_001B1218.f0,runSpeed=D_L18_001B1218.f4;
+        float strafeSpeed=D_L18_001B1218.f8,backSpeed=D_L18_001B1218.fC;
+        float turnRate=D_L18_001B1218.f10,aimRate=D_L18_001B1218.f14;
+        *(float *)(state+0x3c4)=walkSpeed;
+        *(float *)(state+0x3c0)=runSpeed;
+        *(float *)(state+0x3cc)=strafeSpeed;
+        *(float *)(state+0x3c8)=backSpeed;
+        *(float *)(state+0x3d4)=turnRate;
+        *(float *)(state+0x3d0)=aimRate;
+        *(float *)(state+0x3dc)=turnRate;
+        *(float *)(state+0x3d8)=aimRate;
     }
-    func_002B60B0(object,*(float *)(state+0x3c4)*0.0002777777845f,*(float *)(state+0x3c0)*0.016666668f,*(float *)(state+0x3d4)*0.000004848137451f,*(float *)(state+0x3d0)*0.0002908882452f);
-    randomAngle=func_002A7878(20.0f,40.0f);
+    SetControllerSpeedLimits(object,*(float *)(state+0x3c4)*0.0002777777845f,*(float *)(state+0x3c0)*0.016666668f,*(float *)(state+0x3d4)*0.000004848137451f,*(float *)(state+0x3d0)*0.0002908882452f);
+    randomAngle=RandomFloatRange(20.0f,40.0f);
     *(short *)(state+0x1e4)=120; *(short *)(state+0x1e2)=180;
     *(float *)(state+0x1dc)=randomAngle*0.017453294f;
     {
@@ -90,30 +91,30 @@ int func_L18_00427688(unsigned char *object)
     *(float *)(state+0x20c)=5.0f;
     *(float *)(state+0x210)=5.0f;
     *(int *)(state+0x37c)=*(int *)(state+0x360);
-    *(short *)(state+0x392)=func_002A7820(0,45);
-    func_L09_0033E7A0(*(int *)(state+0x368));
-    func_L09_0033E7A0(*(int *)(state+0x13c));
-    func_L09_0033E7A0(*(int *)(state+0xcc));
-    func_L09_0033E7A0(*(int *)(state+0x380));
-    func_L09_0033E7A0(*(int *)(state+0x384));
+    *(short *)(state+0x392)=RandomIntRange(0,45);
+    GetPathTableEntryLength(*(int *)(state+0x368));
+    GetPathTableEntryLength(*(int *)(state+0x13c));
+    GetPathTableEntryLength(*(int *)(state+0xcc));
+    GetPathTableEntryLength(*(int *)(state+0x380));
+    GetPathTableEntryLength(*(int *)(state+0x384));
     *(int *)(state+0x13c)=*(int *)(state+0x380);
-    func_L18_00427130(object,*(int *)(state+0x36c),-1);
+    SetObjectAnimation(object,*(int *)(state+0x36c),-1);
     if(state[0x399]!=0) state[0x399]=1;
-    func_L18_00426F78(object);
-    func_L18_00427010(object);
+    RebuildScaleMatrix(object);
+    ReleaseSharedResource(object);
     switch(*(short *)(object+0xaa)) {
-    case 0xec0: state[0x39b]=0; *(int *)(state+0x1c)=0; break;
-    case 0xed4:
-    case 0xee1: state[0x39b]=2; break;
+    case 0xec0 /* moby class 3776 */: state[0x39b]=0; *(int *)(state+0x1c)=0; break;
+    case 0xed4 /* moby class 3796 */:
+    case 0xee1 /* Receiver Bot */: state[0x39b]=2; break;
     }
-    func_L18_00426F28(object,func_001163B0()&1,0,1.0f);
+    StartOrForwardAnimation(object,Rand()&1,0,1.0f);
     if(state[0x3e8]!=0) {
-        func_002A7750(object,0,1);
+        SetMobyState(object,0,1);
         *(int *)(object+0x48)=0;
     } else if(state[0x39c]!=0) {
         object[0x31]=0;
         *(unsigned short *)(object+0x34)|=1;
-        func_002A7750(object,0,2);
-    } else func_002A7750(object,2,2);
+        SetMobyState(object,0,2);
+    } else SetMobyState(object,2,2);
     return 0;
 }

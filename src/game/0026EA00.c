@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { float x, y, z, w; } MarkerVector;
 typedef struct {
@@ -111,35 +112,37 @@ extern void func_00284EA8(void);
 extern void func_00284F40(int);
 extern void func_002FCDA8(void);
 
+/* Draws one loading or splash screen frame by decompressing the image and sending it to the screen. */
 void func_0026EAC8(int arg)
 {
     char *state = D_001BAEC0;
     int *data;
-    func_0029D4D0(arg, *(void **)(state + 20));
-    func_0011AEA0(0);
-    func_002FC1D8();
-    func_002FCD18();
-    func_00284E18(0, 0, 0);
-    func_00284EA8();
-    func_00284F40(0);
+    fast_decompress(arg, *(void **)(state + 20));
+    FlushCache(0);
+    ResetPacketBuffer();
+    InstallDmaHandlers();
+    SetBackgroundColor(0, 0, 0);
+    AppendDrawListHeader();
+    AppendDrawListBufferTag(0);
     data = *(int **)(state + 20);
-    func_002FCB00(data + 4, D_001A72DC[0], data[0], data[1]);
-    func_0027B858();
-    func_00284FC0();
-    func_00285338();
-    func_0011AEA0(0);
-    func_002FC280();
-    func_002FC3C0(1);
-    func_001244B8(0, 0);
-    func_001261F0(0);
-    func_002FCDA8();
+    UploadTextureBlocksReturnTex0(data + 4, D_001A72DC[0], data[0], data[1]);
+    WriteClearColorPackets();
+    PutDrawBufferSmall();
+    QueueSecondStripPacket();
+    FlushCache(0);
+    SubmitBufferedDmaChain();
+    WaitForDmaStatusBits(1);
+    WaitGsPathsIdle(0, 0);
+    GetGsCurrentField(0);
+    RemoveDmaHandlers();
 }
 
 
 extern int func_002A77E0(int);
 
+/* Picks a random order of the numbers 0, 1 and 2 and stores it in the three outputs. */
 void func_0026EB98(int *first, int *second, int *third) {
-    switch (func_002A77E0(3)) {
+    switch (RandomIntBelow(3)) {
     case 0:
         *first = 0;
         *second = 1;
@@ -156,7 +159,7 @@ void func_0026EB98(int *first, int *second, int *third) {
         *third = 0;
         break;
     }
-    if (func_002A77E0(2) != 0) {
+    if (RandomIntBelow(2) != 0) {
         int value = *second;
         *second = *third;
         *third = value;
@@ -166,31 +169,32 @@ void func_0026EB98(int *first, int *second, int *third) {
 typedef struct { char b[8]; } CdClock;
 extern int func_001256D8(CdClock *);
 extern void func_001163A0(unsigned int);
+/* Seeds the random generator from the disc clock, then fills a table of 24 tile numbers with shuffled values. */
 void func_0026EC58(unsigned short *out)
 {
     CdClock clock;
     int first, second, third;
     int low, high;
     int seed;
-    func_001256D8(&clock);
+    ReadCdClock(&clock);
     seed = (unsigned char)clock.b[1] + 1;
     seed *= (unsigned char)clock.b[3] + 1;
     seed *= (unsigned char)clock.b[2] + 1;
     seed *= (unsigned char)clock.b[5] + 1;
     seed *= (unsigned char)clock.b[6] + 1;
-    func_001163A0(seed);
-    func_0026EB98(&first, &second, &third);
+    Srand(seed);
+    ShuffleThreeIndices(&first, &second, &third);
     out[0x20/2] = out[0x08/2] = (unsigned short)first + 0xb9;
     out[0x28/2] = out[0x10/2] = (unsigned short)second + 0xb9;
     out[0x30/2] = out[0x18/2] = (unsigned short)third + 0xb9;
-    if (func_002A77E0(2)) {
+    if (RandomIntBelow(2)) {
         low = 0xb3;
         high = 0xb6;
     } else {
         low = 0xb6;
         high = 0xb3;
     }
-    func_0026EB98(&first, &second, &third);
+    ShuffleThreeIndices(&first, &second, &third);
     out[0x02/2] = (unsigned short)first + low;
     out[0x06/2] = (unsigned short)second + low;
     out[0x0c/2] = (unsigned short)third + low;
@@ -200,7 +204,7 @@ void func_0026EC58(unsigned short *out)
     out[0x22/2] = out[0x02/2];
     out[0x26/2] = out[0x06/2];
     out[0x2c/2] = out[0x0c/2];
-    func_0026EB98(&first, &second, &third);
+    ShuffleThreeIndices(&first, &second, &third);
     out[0x04/2] = (unsigned short)first + high;
     out[0x0a/2] = (unsigned short)second + high;
     out[0x0e/2] = (unsigned short)third + high;
@@ -214,6 +218,7 @@ void func_0026EC58(unsigned short *out)
 
 /* func_0026EDE8 is in 0026EA00-loader.c. */
 
+/* Empty stub that returns zero. */
 unsigned int func_0026F710(void)
 {
     return 0;
@@ -396,44 +401,44 @@ extern int func_00282A18(int);
 extern int func_00126288(GsLoadImage26FC78 *, short, short, short, short, short, short, short);
 extern int func_001265B0(GsLoadImage26FC78 *, void *);
 
-void func_0026FC78(char *arg0, unsigned long long *out, int tbp, int cbp)
+void func_0026FC78(char *pifData, unsigned long long *out, int tbp, int cbp)
 {
     PifTex26FC78 d;
     GsLoadImage26FC78 li;
-    PifHeader26FC78 *pif = (PifHeader26FC78 *)arg0;
-    int c;
+    PifHeader26FC78 *pif = (PifHeader26FC78 *)pifData;
+    int clutBlock;
 
-    func_00282A60(&d, 0, sizeof(d));
+    ClearMemory(&d, 0, sizeof(d));
     d.clut = (char *)pif + 0x20;
     if (pif->psm == 0) {
         d.clutSize = 0x400;
     } else {
         d.clutSize = 0x200;
     }
-    c = cbp >> 8;
-    d.tw = func_00282A18(pif->w);
-    d.th = func_00282A18(pif->h);
+    clutBlock = cbp >> 8;
+    d.tw = log2dim(pif->w);
+    d.th = log2dim(pif->h);
     d.image = (char *)pif + (d.clutSize + 0x20);
     d.imageSize = pif->w * pif->h;
-    func_00126288(&li, c, 1, pif->psm, 0, 0, 16, 16);
-    func_0011AEA0(0);
-    func_001265B0(&li, d.clut);
-    func_001244B8(0, 0);
+    func_00126288(&li, clutBlock, 1, pif->psm, 0, 0, 16, 16);
+    FlushCache(0);
+    ExecGsLoadImage(&li, d.clut);
+    WaitGsPathsIdle(0, 0);
     d.tbw = pif->w >> 6;
     if (d.tbw <= 0) {
         d.tbw = 1;
     }
     d.tbp = tbp >> 8;
     func_00126288(&li, d.tbp, d.tbw, 0x1B, 0, 0, pif->w, pif->h);
-    func_0011AEA0(0);
-    func_001265B0(&li, d.image);
-    func_001244B8(0, 0);
+    FlushCache(0);
+    ExecGsLoadImage(&li, d.image);
+    WaitGsPathsIdle(0, 0);
     /* The TEX0 layout, with no zero fields. Retail's groups are this flat chain's without
        fold's flattening of four or more operands of one type, which the changes of
        signedness keep it from doing. */
     out[0] = (unsigned long)((long)((unsigned long)d.tbp | ((unsigned long)d.tbw << 14)
            | ((unsigned long)0x1B << 20) | ((unsigned long)d.tw << 26))
-           | ((long)d.th << 30) | ((long)1 << 34) | ((long)c << 37))
+           | ((long)d.th << 30) | ((long)1 << 34) | ((long)clutBlock << 37))
            | ((unsigned long)pif->psm << 51) | ((unsigned long)4 << 61);
     out[1] = 1;
     out[2] = 0;
@@ -447,15 +452,17 @@ extern unsigned long long D_001A7468 __attribute__((sda));
 extern int func_002B7C80(char *, int, int);
 extern void func_0026FC78(char *, unsigned long long *, int, int);
 
+/* Loads the PIF image from the disc table and saves its texture setting for later use. */
 void func_0026FE48(void)
 {
     unsigned long long local[4];
     char *data = D_001C5540;
-    func_002B7C80(data, D_0014B540.offset + D_0014B540.base, D_0014B540.count);
-    func_0026FC78(data, local, D_001A730C, 0x3FFC00);
+    ReadDiscWithPause(data, gCopySetupData.offset + gCopySetupData.base, gCopySetupData.count);
+    LoadPifAsPSMT8H(data, local, D_001A730C, 0x3FFC00);
     *(volatile unsigned long long *)&D_001A7468 = local[0];
 }
 
+/* Empty replacement for printf. */
 void func_0026FEB8(const char *format,...) {
 }
 
@@ -485,36 +492,37 @@ extern float func_00283CE0(int);
 extern int func_00282978(void *);
 extern void func_0027AB40(void);
 
+/* Updates the camera field of view change each frame and recomputes the zoom value. */
 void func_00270018(void) {
     float half;
     float t;
 
-    if (D_001B5200.active == 1) {
-        switch (D_001B5200.mode) {
+    if (gActiveCamera.active == 1) {
+        switch (gActiveCamera.mode) {
         case 0:
-            D_001B5200.f3D8 = D_001B5200.f3D4;
-            D_001B5200.active = 0;
+            gActiveCamera.f3D8 = gActiveCamera.f3D4;
+            gActiveCamera.active = 0;
             break;
         case 3:
-            D_001B5200.f3D8 = func_002703B0((char *)&D_001B5200.f3D0, D_001B5200.f3D8, D_001B5200.f3D4, D_001B5200.f3DC, D_001B5200.f3E0, D_001B5200.f3E4);
-            if (func_00282C48(D_001B5200.f3D0) < 0.0001f)
-                D_001B5200.active = 0;
+            gActiveCamera.f3D8 = StepSpringDamperStored((char *)&gActiveCamera.f3D0, gActiveCamera.f3D8, gActiveCamera.f3D4, gActiveCamera.f3DC, gActiveCamera.f3E0, gActiveCamera.f3E4);
+            if (FloatAbs(gActiveCamera.f3D0) < 0.0001f)
+                gActiveCamera.active = 0;
             break;
         case 1:
-            if (func_00282978(&D_001B5200.s3EA))
-                D_001B5200.active = 0;
-            t = func_00283CE0(D_001B5200.s3EA) * D_001B5200.f3EC;
-            D_001B5200.f3D8 = D_001B5200.f3D4 + (D_001B5200.f3F0 - D_001B5200.f3D4) * t;
+            if (FastDecTimer(&gActiveCamera.s3EA))
+                gActiveCamera.active = 0;
+            t = IntToFloat(gActiveCamera.s3EA) * gActiveCamera.f3EC;
+            gActiveCamera.f3D8 = gActiveCamera.f3D4 + (gActiveCamera.f3F0 - gActiveCamera.f3D4) * t;
             break;
         case 2:
-            if (func_00282978(&D_001B5200.s3EA))
-                D_001B5200.active = 0;
-            D_001B5200.f3D8 = func_002A7C00(D_001B5200.f3D4, D_001B5200.f3F0, func_00283CE0(D_001B5200.s3EA) * D_001B5200.f3EC);
+            if (FastDecTimer(&gActiveCamera.s3EA))
+                gActiveCamera.active = 0;
+            gActiveCamera.f3D8 = CosineBlend(gActiveCamera.f3D4, gActiveCamera.f3F0, IntToFloat(gActiveCamera.s3EA) * gActiveCamera.f3EC);
             break;
         }
-        half = D_001B5200.f3D8 * 0.5f;
-        D_001B90F0[0] = func_00283198(half) / func_00283180(half);
-        func_0027AB40();
+        half = gActiveCamera.f3D8 * 0.5f;
+        D_001B90F0[0] = FastSinOrCosB(half) / FastSinOrCosA(half);
+        UpdateViewContext();
     }
 }
 
@@ -524,14 +532,16 @@ extern char *D_001B5390;
 extern char D_001B7550[];
 extern char D_001B7C30[];
 
+/* Copies the current camera data into the working copy and links the second block to it. */
 void func_002701B0(void)
 {
-    func_00282B50(D_001B7550, D_001B5390, 0xA0);
-    func_00282B50(D_001B7C30, D_001B7C30 - 0x500, 0x280);
+    FastMemoryHelperC(D_001B7550, D_001B5390, 0xA0);
+    FastMemoryHelperC(D_001B7C30, D_001B7C30 - 0x500, 0x280);
     *(char **)(D_001B7550 + 0x70) = D_001B7C30;
 }
 
 /* shared native body of family 34e74db3063e7a24 */
+/* Calls every function waiting in the delayed call list, then empties the list. */
 void func_00270210(void)
 {
     int i;
@@ -549,82 +559,83 @@ extern char D_001B5750[];
    0xA0-byte records that starts at 0x1B5750, and returns it; returns 0 once
    the table is exhausted.  The end of the table is held in an int so that the
    comparison is the signed one the retail does (slt, not sltu). */
-char *func_00270280(int a0)
+char *func_00270280(int recordId)
 {
-    char *p = D_001B5750;
-    int limit = (int)p + 0x1E00;
+    char *record = D_001B5750;
+    int limit = (int)record + 0x1E00;
 
     for (;;) {
-        if (*(short *)(p + 0x86) != a0) {
-            p += 0xA0;
-            if ((int)p >= limit) {
+        if (*(short *)(record + 0x86) != recordId) {
+            record += 0xA0;
+            if ((int)record >= limit) {
                 return 0;
             }
         } else {
-            return p;
+            return record;
         }
     }
 }
 
 /* Integrates one float field with a spring-damper step, clamps it to a symmetric limit, then lets a helper raise or lower it, returning a bias plus the field. */
-float func_002702C8(float *p, float a, float b, float c, float d, float lim)
+float func_002702C8(float *value, float current, float target, float spring, float damping, float limit)
 {
-    float t = b - a;
-    float x = *p;
-    float r;
+    float diff = target - current;
+    float newValue = *value;
+    float maxStep;
 
-    x += c * t - d * x;
-    *p = x;
-    if (lim != 0.0f) {
-        if (x > lim) *p = lim;
-        else if (x < -lim) *p = -lim;
+    newValue += spring * diff - damping * newValue;
+    *value = newValue;
+    if (limit != 0.0f) {
+        if (newValue > limit) *value = limit;
+        else if (newValue < -limit) *value = -limit;
     }
-    r = func_00282C48(t);
-    if (r < *p) {
-        *p = func_00282C48(t);
+    maxStep = FloatAbs(diff);
+    if (maxStep < *value) {
+        *value = FloatAbs(diff);
     } else {
-        float s = -func_00282C48(t);
-        if (*p < s) {
-            *p = -func_00282C48(t);
+        float negStep = -FloatAbs(diff);
+        if (*value < negStep) {
+            *value = -FloatAbs(diff);
         }
     }
-    return a + *p;
+    return current + *value;
 }
 
 /* Advances a stored float by a scaled helper result, then clamps it against a positive limit, then clamps it again with a second helper and finally rescales it through a third helper. */
-float func_002703B0(char *obj, float p1, float p2, float p3, float p4, float p5)
+float func_002703B0(char *obj, float current, float target, float spring, float damping, float limit)
 {
-    float r;
-    float t;
-    float d;
-    float neg;
+    float diff;
+    float newValue;
+    float change;
+    float negLimit;
 
-    r = func_00283BE0_3(p2, p1);
-    t = *(float *)obj;
-    d = p3 * r - p4 * t;
-    t = t + d;
-    *(float *)obj = t;
+    diff = func_00283BE0_3(target, current);
+    newValue = *(float *)obj;
+    change = spring * diff - damping * newValue;
+    newValue = newValue + change;
+    *(float *)obj = newValue;
 
-    if (p5 != 0.0f) {
-        if (t > p5) {
-            *(float *)obj = p5;
+    if (limit != 0.0f) {
+        if (newValue > limit) {
+            *(float *)obj = limit;
         } else {
-            neg = -p5;
-            if (t < neg)
-                *(float *)obj = neg;
+            negLimit = -limit;
+            if (newValue < negLimit)
+                *(float *)obj = negLimit;
         }
     }
 
-    if (func_00282C48_5(r) < *(float *)obj) {
-        *(float *)obj = func_00282C48_5(r);
-    } else if (*(float *)obj < -func_00282C48_5(r)) {
-        *(float *)obj = -func_00282C48_5(r);
+    if (func_00282C48_5(diff) < *(float *)obj) {
+        *(float *)obj = func_00282C48_5(diff);
+    } else if (*(float *)obj < -func_00282C48_5(diff)) {
+        *(float *)obj = -func_00282C48_5(diff);
     }
 
-    return func_00283B98(p1, *(float *)obj);
+    return FastAddRotations(current, *(float *)obj);
 }
 
 /* sets the referenced object halfword at 0x7e and clears its byte at 0x7d */
+/* Marks the current object as hidden by setting one flag and clearing another. */
 void func_002704D0(void) {
  *(u16 *)(D_L24_001B8580.object+0x7e)=1;
  D_L24_001B8580.object[0x7d]=0;
@@ -634,15 +645,16 @@ extern char D_001B53A0[];
 extern void *func_00302A20(void *);
 extern void func_0029F338(void *);
 
+/* Starts or stops an effect on an object depending on whether a value in the object is zero. */
 void func_002704F0(char *p)
 {
     char *base = D_001B53A0;
     if (*(short *)(p + 0x86) == 0) {
         if (*(void **)(base + 0xC4) == 0)
-            *(void **)(base + 0xC4) = func_00302A20(base - 0x60);
+            *(void **)(base + 0xC4) = SpawnClass1007Object(base - 0x60);
     } else {
         if (*(void **)(base + 0xC4) != 0) {
-            func_0029F338(*(void **)(base + 0xC4));
+            MarkMobySpawned(*(void **)(base + 0xC4));
             *(void **)(base + 0xC4) = 0;
         }
     }
@@ -652,6 +664,7 @@ typedef void (*ObjectDispatch)(void *);
 typedef struct { ObjectDispatch entries[5]; } ObjectDispatchRecord;
 extern ObjectDispatchRecord D_0026E900[];
 
+/* Calls the second handler for an object, based on its type. */
 void func_00270550(char *object) {
     ObjectDispatch callback = D_0026E900[*(short *)(object + 0x8C)].entries[2];
     if (callback != 0)
@@ -662,6 +675,7 @@ void func_00270550(char *object) {
 
 /* func_00270838 is in 00270838-g8.c. */
 
+/* Calls the fourth handler for an object, based on its type. */
 void func_00270A00(char *object) {
     ObjectDispatch callback = D_0026E900[*(short *)(object + 0x8C)].entries[4];
     if (callback != 0)
@@ -687,48 +701,48 @@ void func_00270B58(float *out, float *p0, float *p1, float *dir0, float *dir1, f
     float perp[4];
     float unit[4];
     float rotated[4];
-    float d1, d2, d3, d4, d5;
+    float alongAxis, dirDot, sideDot, rotDot, axisDot;
     float lenPerp, lenDiff;
     float angle1, angle2;
     float yaw, pitch;
 
-    func_00282CF0(diff, p0, p1);
-    d1 = func_00282DB0(diff, axis);
-    func_00282F20(proj, axis, d1);
-    func_00282CF0(perp, diff, proj);
+    FastVecSub(diff, p0, p1);
+    alongAxis = FastVecDot(diff, axis);
+    vec_scale_to_length(proj, axis, alongAxis);
+    FastVecSub(perp, diff, proj);
 
-    d2 = func_00282DB0(dir0, perp);
-    lenPerp = func_00282DF0(perp);
+    dirDot = FastVecDot(dir0, perp);
+    lenPerp = FastVecLength(perp);
     if (lenPerp == 0.0f) {
         lenPerp = 0.0001f;
     }
-    angle1 = func_002831B0(d2 / lenPerp);
+    angle1 = FastAngleHelper(dirDot / lenPerp);
     yaw = 1.57079637f - angle1;
 
-    func_00282F20(unit, perp, 1.0f);
-    d3 = func_00282DB0(dir1, unit);
-    if (d3 < 0.0f) {
+    vec_scale_to_length(unit, perp, 1.0f);
+    sideDot = FastVecDot(dir1, unit);
+    if (sideDot < 0.0f) {
         yaw = -yaw;
     }
     out[0] = yaw;
 
-    func_002ACEC0(rotated, dir0, axis, yaw);
-    d4 = func_00282DB0(rotated, diff);
-    lenDiff = func_00282DF0(diff);
+    ApplyAxisRotationToQuaternion(rotated, dir0, axis, yaw);
+    rotDot = FastVecDot(rotated, diff);
+    lenDiff = FastVecLength(diff);
     if (lenDiff == 0.0f) {
         lenDiff = 0.0001f;
     }
-    angle2 = func_002831B0(d4 / lenDiff);
+    angle2 = FastAngleHelper(rotDot / lenDiff);
     pitch = -(1.57079637f - angle2);
 
-    func_00282F20(unit, diff, 1.0f);
-    d5 = func_00282DB0(axis, unit);
-    if (d5 < 0.0f) {
+    vec_scale_to_length(unit, diff, 1.0f);
+    axisDot = FastVecDot(axis, unit);
+    if (axisDot < 0.0f) {
         pitch = 1.57079637f - angle2;
     }
     out[1] = pitch;
 
-    out[2] = func_00282DF0(diff);
+    out[2] = FastVecLength(diff);
 }
 
 /* func_00270D50 is defined separately in 00270D50.c. */
@@ -771,10 +785,10 @@ void func_002721C8(void)
     ScalarTransitionView *state = &D_L00_001B8C80;
 
     if (state->step != 0.0f) {
-        func_002AA2E8(&D_L00_001B18E0,
+        ApproachValue(&D_L00_001B18E0,
                      state->target, state->step);
         if (D_L00_001B18E0 == state->target) {
-            if (func_00282948(&state->timer) == 1)
+            if (FastFloatHelperD(&state->timer) == 1)
                 state->target = 0.0f;
         }
         if (D_L00_001B8C80.target <= 0.0f && D_L00_001B18E0 <= 0.0f)
@@ -789,11 +803,11 @@ void func_00272280(void)
 {
     if (D_L00_001B8C80.step2 != 0.0f) {
         if (D_L00_001B8C80.target2 != 0.0f)
-            func_002AA2E8(&D_L00_001B18E4, D_L00_001B8C80.target2, D_L00_001B8C80.step2);
+            ApproachValue(&D_L00_001B18E4, D_L00_001B8C80.target2, D_L00_001B8C80.step2);
         else
-            func_002AA2E8(&D_L00_001B18E4, D_L00_001B8C80.target2, D_L00_001B8C80.rate2);
+            ApproachValue(&D_L00_001B18E4, D_L00_001B8C80.target2, D_L00_001B8C80.rate2);
         if (D_L00_001B18E4 == D_L00_001B8C80.target2) {
-            if (func_00282948(&D_L00_001B8C80.timer2) == 1)
+            if (FastFloatHelperD(&D_L00_001B8C80.timer2) == 1)
                 D_L00_001B8C80.target2 = 0.0f;
         }
         if (D_L00_001B8C80.target2 <= 0.0f && D_L00_001B18E4 <= 0.0f)
@@ -804,19 +818,19 @@ void func_00272280(void)
 /* func_00272CB0 is in 0026EA00-target.c (-g for its nop pair before div.s). */
 
 /* Fills a three-float local through two setup calls, stores a two-argument float helper result into a field, then stores a second helper result into two more fields and returns zero. */
-int func_00272550(float *a0)
+int func_00272550(float *out)
 {
     float local[3];
-    float t;
+    float angle;
 
     func_00282CF0_9(local);
-    a0[1] = func_00283248_7(func_00282E20_4(local), local[2]);
+    out[1] = func_00283248_7(func_00282E20_4(local), local[2]);
 
-    t = func_00283248_7(local[0], local[1]);
-    func_00283BE0_5(t, a0[0]);
-    a0[0] = t;
+    angle = func_00283248_7(local[0], local[1]);
+    func_00283BE0_5(angle, out[0]);
+    out[0] = angle;
 
-    a0[2] = func_00282DF0_3(local);
+    out[2] = func_00282DF0_3(local);
 
     return 0;
 }
@@ -836,16 +850,16 @@ void func_002725E0(void)
         return;
     }
     if (D_001B5640.timer <= 0.0f) return;
-    distance = func_00282E48(&D_001B5340, (MarkerVector *)(D_001B5640.target + 0x10));
-    centre[0] = func_00283CE0(D_001A7348[0]);
-    centre[1] = func_00283CE0(D_001A7348[1]);
-    func_00279BD8(&projected, (MarkerVector *)(D_001B5640.target + 0x10));
-    projected.x = (projected.x - func_00283CE0(D_001A7348[2])) * 0.0625f;
-    projected.y = (projected.y - func_00283CE0(D_001A7348[3])) * 0.0625f;
+    distance = fast_vec_dist(&gCameraState_001B5340, (MarkerVector *)(D_001B5640.target + 0x10));
+    centre[0] = IntToFloat(D_001A7348[0]);
+    centre[1] = IntToFloat(D_001A7348[1]);
+    ProjectWorldPointToScreen(&projected, (MarkerVector *)(D_001B5640.target + 0x10));
+    projected.x = (projected.x - IntToFloat(D_001A7348[2])) * 0.0625f;
+    projected.y = (projected.y - IntToFloat(D_001A7348[3])) * 0.0625f;
     delta[0] = centre[0] - projected.x;
     delta[1] = centre[1] - projected.y;
     for (i = 0; i < 16; ++i) {
-        long texture = func_0027C878(D_001B5640.texture[i] + 6);
+        long texture = GetEffectTextureDescriptor(D_001B5640.texture[i] + 6);
         int width = i ? 32 : 64;
         int size, x, y;
         float fade = distance - 5.0f;
@@ -857,20 +871,20 @@ void func_002725E0(void)
         point[1] = centre[1] + scaled[1];
         if (fade > 1.0f) fade = 1.0f;
         else if (fade < 0.0f) fade = 0.0f;
-        fade_x = func_00282C48(delta[0]) / centre[0] * -5.0f + 5.5f;
+        fade_x = FloatAbs(delta[0]) / centre[0] * -5.0f + 5.5f;
         if (fade_x > 1.0f) fade_x = 1.0f;
         else if (fade_x < 0.0f) fade_x = 0.0f;
-        fade_y = func_00282C48(delta[1]) / centre[1] * -5.0f + 5.5f;
+        fade_y = FloatAbs(delta[1]) / centre[1] * -5.0f + 5.5f;
         if (fade_y > 1.0f) fade_y = 1.0f;
         else if (fade_y < 0.0f) fade_y = 0.0f;
         fade *= fade_x * fade_y;
-        colour = (func_00283CF0(fade * (float)D_001B5640.alpha[i]) << 24) |
+        colour = (FloatToInt(fade * (float)D_001B5640.alpha[i]) << 24) |
                  (D_001B5640.colour[i] & 0xFFFFFF);
-        size = func_00283CF0((float)width * D_001B5640.scale[i]);
+        size = FloatToInt((float)width * D_001B5640.scale[i]);
         radius = (float)(size >> 1);
-        x = func_00283CF0(point[0] - radius);
-        y = func_00283CF0(point[1] - radius);
-        func_0027E018(x, y, size, size, 0, 0, width, width, (int)colour, texture);
+        x = FloatToInt(point[0] - radius);
+        y = FloatToInt(point[1] - radius);
+        DrawTexturedQuad(x, y, size, size, 0, 0, width, width, (int)colour, texture);
     }
     D_001B5640.timer = 0.0f;
 }
@@ -913,6 +927,7 @@ extern int func_00283CF0(float);
 
 /* Arithmetic follows RAC1's update_camera_environment_from_regions,
    src/game/effects.c (Lombyte/OpenRAC, GPL-3.0). */
+/* Mixes the fog colour and distances from the camera region the position is in. */
 void func_002735A0(void *position)
 {
     float blend;
@@ -931,7 +946,7 @@ void func_002735A0(void *position)
     region = &D_001C1740[region_index];
     if (!(region->flags & 2))
         return;
-    positive_weight = func_00283CF0(blend * 255.0f);
+    positive_weight = FloatToInt(blend * 255.0f);
     negative_weight = 255 - positive_weight;
     inverse_blend = 1.0f - blend;
     positive_color = region->positive_color;
@@ -958,47 +973,48 @@ void func_002735A0(void *position)
 /* func_00273978 is in 00273978.c. */
 
 
+/* Updates a moby that moves toward a target and starts a sound or effect when it hits something. */
 int func_00273D10(char *obj)
 {
     float buf[4];
     float out[4];
-    char *p;
-    char *s1;
-    unsigned char k;
-    int r;
-    int s4;
-    int s5;
+    char *vars;
+    char *scratch;
+    unsigned char mode;
+    int result;
+    int effectHandle;
+    int hitResult;
 
-    p = *(char **)(obj + 104);
-    k = *(unsigned char *)(p + 92);
-    if (k >= 3)
+    vars = *(char **)(obj + 104);
+    mode = *(unsigned char *)(vars + 92);
+    if (mode >= 3)
         return 1;
-    if (k != 0)
+    if (mode != 0)
         Fdb046c5d_FUN_002742E8(obj);
     else
         Fdb046c5d_FUN_00274128(obj);
 
-    s5 = Fdb046c5d_FUN_00274500(obj);
-    if (s5 == -1)
+    hitResult = Fdb046c5d_FUN_00274500(obj);
+    if (hitResult == -1)
         return 0;
 
-    s1 = Fdb046c5d_D_001BAFC0;
-    s4 = -1;
-    Fdb046c5d_FUN_00282F20(1.0f, s1, s1);
-    Fdb046c5d_FUN_00282DD8(buf, s1, p);
-    Fdb046c5d_FUN_00274A88(obj, p + 16, buf);
+    scratch = Fdb046c5d_D_001BAFC0;
+    effectHandle = -1;
+    Fdb046c5d_FUN_00282F20(1.0f, scratch, scratch);
+    Fdb046c5d_FUN_00282DD8(buf, scratch, vars);
+    Fdb046c5d_FUN_00274A88(obj, vars + 16, buf);
     Fdb046c5d_FUN_002AFFD8(obj + 16, out, 1);
-    r = Fdb046c5d_FUN_00274BA8(p, s1, out, *(float *)(p + 56), *(float *)(p + 60));
-    if (r == 0) {
-        if (*(unsigned char *)(p + 94) != 255 && *(unsigned char *)(p + 92) == 0)
-            s4 = Fdb046c5d_FUN_002E5CF8(*(unsigned char *)(p + 94), 0, obj);
-        Fdb046c5d_FUN_00274768(obj, s5, out);
+    result = Fdb046c5d_FUN_00274BA8(vars, scratch, out, *(float *)(vars + 56), *(float *)(vars + 60));
+    if (result == 0) {
+        if (*(unsigned char *)(vars + 94) != 255 && *(unsigned char *)(vars + 92) == 0)
+            effectHandle = Fdb046c5d_FUN_002E5CF8(*(unsigned char *)(vars + 94), 0, obj);
+        Fdb046c5d_FUN_00274768(obj, hitResult, out);
     } else {
-        if (*(unsigned char *)(p + 94) != 255)
-            s4 = Fdb046c5d_FUN_002E5CF8(*(unsigned char *)(p + 94), 0, obj);
+        if (*(unsigned char *)(vars + 94) != 255)
+            effectHandle = Fdb046c5d_FUN_002E5CF8(*(unsigned char *)(vars + 94), 0, obj);
     }
-    if (s4 != -1)
-        Fdb046c5d_FUN_002E5F00(s4, p + 32);
+    if (effectHandle != -1)
+        Fdb046c5d_FUN_002E5F00(effectHandle, vars + 32);
     return 0;
 }
 

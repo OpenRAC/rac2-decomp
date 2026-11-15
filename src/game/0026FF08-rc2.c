@@ -27,44 +27,45 @@
 extern f32 func_00283CE0(s32);
 extern s8 D_001B5200[];
 
-void func_0026FF08(s32 arg0, s32 arg1, f32 fparg0, f32 fparg1, f32 fparg2, f32 fparg3) {
-    f32 temp_f1;
+/* Sets a camera value: snaps it to the target, or eases to it over a number of frames. */
+void func_0026FF08(s32 frames, s32 mode, f32 target, f32 extra1, f32 extra2, f32 extra3) {
+    f32 stepPerFrame;
 
-    switch (arg1) {
+    switch (mode) {
     case 0: {
-        s8 *p = D_001B5200;
-        (*(s8 *)((char *)(p) + (0x3E9))) = 1;
-        (*(f32 *)((char *)(p) + (0x3D4))) = fparg0;
-        (*(s8 *)((char *)(p) + (0x3E8))) = 0;
+        s8 *camera = gActiveCamera;
+        (*(s8 *)((char *)(camera) + (0x3E9))) = 1;
+        (*(f32 *)((char *)(camera) + (0x3D4))) = target;
+        (*(s8 *)((char *)(camera) + (0x3E8))) = 0;
         return;
     }
     case 1:
     case 2:
-        if (arg0 == 0) {
-            s8 *q = D_001B5200;
-            (*(f32 *)((char *)(q) + (0x3D4))) = fparg0;
-            (*(s8 *)((char *)(q) + (0x3E8))) = 0;
+        if (frames == 0) {
+            s8 *camera = gActiveCamera;
+            (*(f32 *)((char *)(camera) + (0x3D4))) = target;
+            (*(s8 *)((char *)(camera) + (0x3E8))) = 0;
         } else {
-            s8 *r = D_001B5200;
-            (*(s16 *)((char *)(r) + (0x3EA))) = arg0;
-            temp_f1 = 1.0f / func_00283CE0(arg0);
-            (*(s8 *)((char *)(r) + (0x3E8))) = arg1;
-            (*(f32 *)((char *)(r) + (0x3F0))) = (*(f32 *)((char *)(r) + (0x3D8)));
-            (*(f32 *)((char *)(r) + (0x3EC))) = temp_f1;
+            s8 *camera = gActiveCamera;
+            (*(s16 *)((char *)(camera) + (0x3EA))) = frames;
+            stepPerFrame = 1.0f / IntToFloat(frames);
+            (*(s8 *)((char *)(camera) + (0x3E8))) = mode;
+            (*(f32 *)((char *)(camera) + (0x3F0))) = (*(f32 *)((char *)(camera) + (0x3D8)));
+            (*(f32 *)((char *)(camera) + (0x3EC))) = stepPerFrame;
         }
         {
-            s8 *t = D_001B5200;
-            (*(s8 *)((char *)(t) + (0x3E9))) = 1;
+            s8 *camera = gActiveCamera;
+            (*(s8 *)((char *)(camera) + (0x3E9))) = 1;
         }
         break;
     case 3: {
-        s8 *u = D_001B5200;
-        (*(s8 *)((char *)(u) + (0x3E8))) = arg1;
-        (*(f32 *)((char *)(u) + (0x3D4))) = fparg0;
-        (*(s8 *)((char *)(u) + (0x3E9))) = 1;
-        (*(f32 *)((char *)(u) + (0x3DC))) = fparg1;
-        (*(f32 *)((char *)(u) + (0x3E0))) = fparg2;
-        (*(f32 *)((char *)(u) + (0x3E4))) = fparg3;
+        s8 *camera = gActiveCamera;
+        (*(s8 *)((char *)(camera) + (0x3E8))) = mode;
+        (*(f32 *)((char *)(camera) + (0x3D4))) = target;
+        (*(s8 *)((char *)(camera) + (0x3E9))) = 1;
+        (*(f32 *)((char *)(camera) + (0x3DC))) = extra1;
+        (*(f32 *)((char *)(camera) + (0x3E0))) = extra2;
+        (*(f32 *)((char *)(camera) + (0x3E4))) = extra3;
         break;
     }
     }

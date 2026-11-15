@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_002889B8(unsigned char *);
 
@@ -24,9 +25,10 @@ typedef struct {
 
 extern u32 D_00139768[];
 
+/* Resets the request queue of the given owner. */
 void func_00288B18(void *owner)
 {
-    func_002889B8(owner);
+    ResetRequestQueue(owner);
 }
 
 /* Walks the ring from its current index to its end index and marks every request below

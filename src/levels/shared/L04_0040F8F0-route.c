@@ -68,82 +68,82 @@ float func_L04_0040F8F0(RouteObject *object, RouteState *state, int link, int po
     float delta1[4] __attribute__((aligned(16)));
     float projected0[4] __attribute__((aligned(16)));
     float projected1[4] __attribute__((aligned(16)));
-    Route *base = D_L04_001FE340[state->route];
+    Route *base = gRoutePathTable[state->route];
     int orient = point >= 2;
     Route *path, *other = 0;
     int next, previous;
     float distance, value;
 
     qcopy_nc(saved, D_L04_001B31A0);
-    if (update && orient) func_00283360(D_L04_001B31A0);
+    if (update && orient) set_identity_rotation_rows(D_L04_001B31A0);
 
     if (link == -1) {
         int before = base->count - 1, after = base->count + 1;
         int wrapPrev = (point + before) % base->count;
         int wrapNext = (point + after) % base->count;
 
-        func_L01_00311C18(projected0, &base->points[wrapPrev], &base->points[point], object->pos);
-        func_L01_00311C18(projected1, &base->points[point], &base->points[wrapNext], object->pos);
-        func_00282CF0(delta0, projected0, object->pos);
-        func_00282CF0(delta1, projected1, object->pos);
+        ClosestPointOnSegment(projected0, &base->points[wrapPrev], &base->points[point], object->pos);
+        ClosestPointOnSegment(projected1, &base->points[point], &base->points[wrapNext], object->pos);
+        FastVecSub(delta0, projected0, object->pos);
+        FastVecSub(delta1, projected1, object->pos);
         distance = func_L00_002EE290(delta0);
         if (distance < func_L00_002EE290(delta1)) {
             if (update && orient) UPDATE_FRAME(projected0, &base->points[point], &base->points[wrapPrev], 1)
-            distance = func_00282E48(projected0, &base->points[wrapPrev]);
-            return func_00283CE0(wrapPrev) * base->points[0].w + distance;
+            distance = fast_vec_dist(projected0, &base->points[wrapPrev]);
+            return IntToFloat(wrapPrev) * base->points[0].w + distance;
         } else {
             if (update && orient) UPDATE_FRAME(projected1, &base->points[wrapNext], &base->points[point], 1)
-            distance = func_00282E48(projected1, &base->points[point]);
-            return func_00283CE0(point) * base->points[0].w + distance;
+            distance = fast_vec_dist(projected1, &base->points[point]);
+            return IntToFloat(point) * base->points[0].w + distance;
         }
     }
 
-    path = D_L04_001FE340[state->links[link]];
+    path = gRoutePathTable[state->links[link]];
     next = point + 1;
     previous = point - 1;
     if (previous == -1) {
         if (state->entries[link] != -1)
-            other = D_L04_001FE340[state->links[state->entries[link]]];
+            other = gRoutePathTable[state->links[state->entries[link]]];
         else other = base;
-        func_L01_00311C18(projected0, &other->points[func_00283CF0(path->points[1].w)], &path->points[point], object->pos);
-        func_L01_00311C18(projected1, &path->points[point], &path->points[next], object->pos);
-        func_00282CF0(delta0, projected0, object->pos);
-        func_00282CF0(delta1, projected1, object->pos);
+        ClosestPointOnSegment(projected0, &other->points[FloatToInt(path->points[1].w)], &path->points[point], object->pos);
+        ClosestPointOnSegment(projected1, &path->points[point], &path->points[next], object->pos);
+        FastVecSub(delta0, projected0, object->pos);
+        FastVecSub(delta1, projected1, object->pos);
         distance = func_L00_002EE290(delta0);
         if (distance < func_L00_002EE290(delta1)) {
-            if (update && orient) UPDATE_FRAME(projected0, &path->points[point], &other->points[func_00283CF0(path->points[1].w)], 0)
-            return path->points[3].w - func_00282E48(projected0, &path->points[point]);
+            if (update && orient) UPDATE_FRAME(projected0, &path->points[point], &other->points[FloatToInt(path->points[1].w)], 0)
+            return path->points[3].w - fast_vec_dist(projected0, &path->points[point]);
         }
         previous = 0;
     } else if (next > path->count - 1) {
         if (state->exits[link] != -1)
-            other = D_L04_001FE340[state->links[state->exits[link]]];
+            other = gRoutePathTable[state->links[state->exits[link]]];
         else other = base;
-        func_L01_00311C18(projected0, &path->points[point], &path->points[previous], object->pos);
-        func_L01_00311C18(projected1, &other->points[func_00283CF0(path->points[2].w)], &path->points[point], object->pos);
-        func_00282CF0(delta0, projected0, object->pos);
-        func_00282CF0(delta1, projected1, object->pos);
+        ClosestPointOnSegment(projected0, &path->points[point], &path->points[previous], object->pos);
+        ClosestPointOnSegment(projected1, &other->points[FloatToInt(path->points[2].w)], &path->points[point], object->pos);
+        FastVecSub(delta0, projected0, object->pos);
+        FastVecSub(delta1, projected1, object->pos);
         distance = func_L00_002EE290(delta0);
         if (func_L00_002EE290(delta1) < distance) {
-            if (update && orient) UPDATE_FRAME(projected1, &path->points[point], &other->points[func_00283CF0(path->points[2].w)], 0)
-            return path->points[4].w + func_00282E48(projected1, &path->points[point]);
+            if (update && orient) UPDATE_FRAME(projected1, &path->points[point], &other->points[FloatToInt(path->points[2].w)], 0)
+            return path->points[4].w + fast_vec_dist(projected1, &path->points[point]);
         }
         next = point;
     }
 
-    func_L01_00311C18(projected0, &path->points[previous], &path->points[point], object->pos);
-    func_L01_00311C18(projected1, &path->points[point], &path->points[next], object->pos);
-    func_00282CF0(delta0, projected0, object->pos);
-    func_00282CF0(delta1, projected1, object->pos);
+    ClosestPointOnSegment(projected0, &path->points[previous], &path->points[point], object->pos);
+    ClosestPointOnSegment(projected1, &path->points[point], &path->points[next], object->pos);
+    FastVecSub(delta0, projected0, object->pos);
+    FastVecSub(delta1, projected1, object->pos);
     distance = func_L00_002EE290(delta0);
     if (distance < func_L00_002EE290(delta1)) {
         if (update && orient) UPDATE_FRAME(projected0, &path->points[point], &path->points[previous], 0)
-        distance = func_00282E48(projected0, &path->points[previous]);
-        value = func_00283CE0(previous) * path->points[0].w + distance;
+        distance = fast_vec_dist(projected0, &path->points[previous]);
+        value = IntToFloat(previous) * path->points[0].w + distance;
     } else {
         if (update && orient) UPDATE_FRAME(projected1, &path->points[next], &path->points[point], 0)
-        distance = func_00282E48(projected1, &path->points[point]);
-        value = func_00283CE0(point) * path->points[0].w + distance;
+        distance = fast_vec_dist(projected1, &path->points[point]);
+        value = IntToFloat(point) * path->points[0].w + distance;
     }
     value /= (float)path->count * path->points[0].w;
     return (path->points[4].w - path->points[3].w) * value + path->points[1].w * base->points[0].w;

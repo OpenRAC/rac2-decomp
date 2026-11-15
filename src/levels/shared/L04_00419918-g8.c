@@ -155,11 +155,11 @@ void func_L04_00419918(u8 *self)
     int id;
     float d;
 
-    if (self[0x31] != 0 && func_00282E48(self + 0x10, D_L04_001B9680) < 24.0f) {
-        func_002A93B0(self);
+    if (self[0x31] != 0 && fast_vec_dist(self + 0x10, D_L04_001B9680) < 24.0f) {
+        UpdateMobyGroundCheck(self);
         self[0x6F] = 22;
     }
-    if ((D_L04_001A8F08 == 2 || D_L04_001A8F00 == 2) && D_L04_001B0BC0 == 0 && D_001A79F0 != 11) {
+    if ((D_L04_001A8F08 == 2 || D_L04_001A8F00 == 2) && D_L04_001B0BC0 == 0 && gCurrentMapIndex != 11) {
         H(self, 0x34) = (H(self, 0x34) | 0x41) & ~0x1000;
         I(self, 0x98) = 0;
         D_L04_001B0BC0 = 1;
@@ -179,23 +179,23 @@ void func_L04_00419918(u8 *self)
         I(s, 0x328) = -1;
         I(s, 0x330) = -1;
         I(s, 0x334) = -1;
-        D_L04_001AA6A0 = func_L04_0040AC80;
+        D_L04_001AA6A0 = SetRaceStateFlagsA;
         D_L04_001AA6A4 = ref_L04_00419918_00;
-        D_L04_001AA6A8 = func_L04_0040ACA8;
+        D_L04_001AA6A8 = SetRaceStateFlagsC;
         D_L04_001AA6AC = ref_L04_00419918_00;
-        func_00283360(D_L04_001B31A0);
+        set_identity_rotation_rows(D_L04_001B31A0);
         D_L04_001B0914 = self;
-        func_L04_0043ABE0();
+        InitBarlowAnimationPaths();
         self[0x30] = 0x40;
         H(self, 0x32) = 0x40;
         self[0x20] = 1;
-        func_L04_0040F5D0(self);
+        RecomputeBranchRouteLinks(self);
         H(self, 0x34) |= 0x400;
         if (D_001A7904 == 3) {
             D_L04_001B08FC = 1;
-            func_L00_002B9D60(NODE(I(s, 0x19C)) + 0x30, NODE(I(s, 0x19C)) + 0x70, 0, 1);
+            ResetHeroPositionAndDirection(NODE(I(s, 0x19C)) + 0x30, NODE(I(s, 0x19C)) + 0x70, 0, 1);
             D_001A7904 = 0;
-            func_L00_003672F8();
+            SetFlagToOne();
         } else {
             D_L04_001B08FC = 0;
         }
@@ -212,7 +212,7 @@ void func_L04_00419918(u8 *self)
         I(s, 0x318) = 0;
         I(s, 0x498) = 0;
         I(s, 0x640) = 0;
-        if (D_001A79F0 == 4) {
+        if (gCurrentMapIndex == 4) {
             I(s, 0x648) = 0x48;
             I(s, 0x644) = 0x4D;
         } else {
@@ -237,30 +237,30 @@ void func_L04_00419918(u8 *self)
         I(s, 0x340) = 0;
         I(s, 0x344) = 0;
         for (k = 0; k < 5; k++) {
-            I(s, 0x344) += func_L04_0040A1D0(k);
-            I(s, 0x340) += func_L04_0040A268(k);
+            I(s, 0x344) += GetCourseWinCount(k);
+            I(s, 0x340) += GetCourseFinishCount(k);
         }
         for (k = 0; k < 6; k++) {
-            fp[k] = func_002A7878(0.0f, 1.0f);
+            fp[k] = RandomFloatRange(0.0f, 1.0f);
         }
-        if (D_001A79F0 == 11 && func_L04_0040A1D0(0) > 0 && D_001A7AF8[0x36] == 0) {
-            func_00288308(0x36);
-        } else if (D_001A79F0 == 4 && func_L04_0040A1D0(0) > 0) {
-            func_002AD7B8(5);
+        if (gCurrentMapIndex == 11 && GetCourseWinCount(0) > 0 && gItemOwnedFlags[0x36] == 0) {
+            UnlockHelpEntry(0x36);
+        } else if (gCurrentMapIndex == 4 && GetCourseWinCount(0) > 0) {
+            MarkFlagAndAppendToList(5);
         }
         if (s[0x441] == 0) {
-            func_0029F978(self, 5, s + 0x440);
+            AttachManipulator(self, 5, s + 0x440);
         }
         return;
     case 1:
         flag = D_L04_001B08FC != 0;
-        if (I(s, 0x238) == -1 || func_002B38B8(MOBY(I(s, 0x238))) != 0) {
-            func_L04_00412E38(self, s, 0.02f, 0.00029f);
+        if (I(s, 0x238) == -1 || IsThirdPendingFlagSet(MOBY(I(s, 0x238))) != 0) {
+            StepAngleOffset(self, s, 0.02f, 0.00029f);
             flag = 1;
-            F(self, 0x18) = F(s, 0x2D8) + func_00283198(F(s, 0x38C)) * 0.04f;
+            F(self, 0x18) = F(s, 0x2D8) + FastSinOrCosB(F(s, 0x38C)) * 0.04f;
             qzero_nc(a);
             a[0] = F(s, 0x38C);
-            func_002A91F0(s + 0x450, a);
+            BuildRotationFromAngles(s + 0x450, a);
             if (I(s, 0x238) != -1) {
                 u8 *m = MOBY(I(s, 0x238));
 
@@ -273,22 +273,22 @@ void func_L04_00419918(u8 *self)
                 }
             }
         }
-        d = func_00282E48(D_00189E20 + 0x80, self + 0x10);
+        d = fast_vec_dist(gHeroState + 0x80, self + 0x10);
         if (D_L04_001B08FC == 0) {
             if (!flag || !(d < 5.5f) || D_L04_001B2008 < 4) {
                 return;
             }
-            if (I(D_00189E20, 0x229C) == 0x1F || I(D_00189E20, 0x2294) == 0x1D
-                || I(D_00189E20, 0x2294) == 0x1C || I(D_00189E20, 0x2294) == 1
+            if (I(gHeroState, 0x229C) == 0x1F || I(gHeroState, 0x2294) == 0x1D
+                || I(gHeroState, 0x2294) == 0x1C || I(gHeroState, 0x2294) == 1
                 || D_L04_001A8F00 == 2 || D_L04_001A8F08 == 2) {
                 return;
             }
-            if (D_L04_001B0924 == 0 && func_002E59B0(self, I(s, 0x330)) == 0) {
-                I(s, 0x330) = func_L00_0035F5A0(D_001A79F0 == 4 ? 0x16 : 0x1A, 5, self);
-                func_L01_00355BA0(I(s, 0x330), func_00283CF0(func_00283CE0(0x400) * 0.75f));
+            if (D_L04_001B0924 == 0 && IsVoicePlayingForOwner(self, I(s, 0x330)) == 0) {
+                I(s, 0x330) = StartEffectInSlot(gCurrentMapIndex == 4 ? 0x16 : 0x1A, 5, self);
+                SetSoundSlotField(I(s, 0x330), FloatToInt(IntToFloat(0x400) * 0.75f));
             }
         }
-        func_002B0C28(4, 0x27A1, 1);
+        TryClaimNotice(4, 0x27A1, 1);
         if (D_L04_001B08FC == 0 && D_L04_001B0924 == 0 && !(D_00138324 & 0x10)) {
             return;
         }
@@ -296,30 +296,30 @@ void func_L04_00419918(u8 *self)
             int sound = I(s, 0x330);
 
             if (sound != -1) {
-                SoundSlot *slot = (SoundSlot *)((char *)D_00188660 + sound * 0x70);
+                SoundSlot *slot = (SoundSlot *)((char *)gSoundState + sound * 0x70);
 
                 if (slot->owner == (char *)self && slot->active) {
-                    func_002E59F8(sound);
+                    StopSoundVoice(sound);
                 }
             }
             I(s, 0x330) = -1;
         }
-        if (D_001A79F0 == 0xCE) {
-            func_L04_002E7C08(0x86, 1);
+        if (gCurrentMapIndex == 0xCE) {
+            EnterHeroState_L04(0x86, 1);
         } else {
             if (I(s, 0x198) != -1) {
                 if (I(s, 0x19C) != -1) {
-                    func_002DF3F8(NODE(I(s, 0x19C)) + 0x30, NODE(I(s, 0x19C)) + 0x70);
+                    CaptureCheckpointState(NODE(I(s, 0x19C)) + 0x30, NODE(I(s, 0x19C)) + 0x70);
                 } else {
-                    func_002DF3F8(self + 0x10, self + 0xF0);
+                    CaptureCheckpointState(self + 0x10, self + 0xF0);
                 }
-                func_0027D330(0x10);
-                func_L00_002B9D60(NODE(I(s, 0x198)) + 0x30, NODE(I(s, 0x198)) + 0x70, 0x31, 1);
+                FadeToBlack(0x10);
+                ResetHeroPositionAndDirection(NODE(I(s, 0x198)) + 0x30, NODE(I(s, 0x198)) + 0x70, 0x31, 1);
                 Q(self, 0x10) = Q(NODE(I(s, 0x198)), 0x30);
                 Q(self, 0xF0) = Q(NODE(I(s, 0x198)), 0x70);
             }
-            func_L04_002E7C08(0x31, 1);
-            func_L00_00303530(1, I(s, 0x488));
+            EnterHeroState_L04(0x31, 1);
+            LoadSceneChunk(1, I(s, 0x488));
             I(s, 0x58) |= 1;
             I(s, 0x340) = 0;
             F(s, 0x28) = 2.0f;
@@ -333,8 +333,8 @@ void func_L04_00419918(u8 *self)
             F(s, 0x48) = 0.5f;
             F(s, 0x4C) = 0.0033333334f;
             I(s, 0x270) = 0;
-            D_L04_001A8FE4 = 0;
-            D_L04_001A8FE8 = 0;
+            gCurrentLap = 0;
+            gRaceTimeTicks = 0;
             D_L04_001B0918 = 0;
             I(s, 0x31C) = 0;
         }
@@ -356,20 +356,20 @@ void func_L04_00419918(u8 *self)
         if (D_L04_001B0924 != 0) {
             self[0xBC] = 2;
         } else {
-            func_0029B758(0, func_L04_0040AD28);
+            StoreLevelObjectValuePair(0, DrawRaceResultsPanel);
             self[0xBC] = 0;
         }
         D_L04_001B08FC = 0;
         I(s, 0x394) = 150;
         self[0x30] = 0xFF;
-        func_L00_003268E8(4);
-        D_00189E20[0x22B5] = 1;
-        I(P(D_00189E20, 0x2290), 0x98) = 0;
-        func_L01_00323310(I(s, 0x488), -1);
+        ReleaseMatchingResource(4);
+        gHeroState[0x22B5] = 1;
+        I(P(gHeroState, 0x2290), 0x98) = 0;
+        QueueKeyedRequest(I(s, 0x488), -1);
         return;
     case 2:
-        if (I(D_00189E20, 0x2294) == 0x86) {
-            u8 *bike = P(D_00189E20, 0x2290);
+        if (I(gHeroState, 0x2294) == 0x86) {
+            u8 *bike = P(gHeroState, 0x2290);
             float ratio = F(bike, 0x2C) / F(P(bike, 0x24), 0x24);
 
             F(self, 0x2C) = F(P(self, 0x24), 0x24) * ratio;
@@ -377,12 +377,12 @@ void func_L04_00419918(u8 *self)
         }
         if (D_L04_001B0908 != 0) {
             D_L04_001A8ED0 = 2;
-            func_002E4AC8();
-            func_0027D330(0x10);
+            UpdateSoundVoices();
+            FadeToBlack(0x10);
             if (D_L04_001B0908 == 2) {
-                func_L04_0040A958(self, 1);
+                ResetRaceController(self, 1);
             } else {
-                func_L04_0040A958(self, 0);
+                ResetRaceController(self, 0);
             }
             D_L04_001B0908 = 0;
             return;
@@ -390,7 +390,7 @@ void func_L04_00419918(u8 *self)
         if (ref_L04_00419918_01 != 0) {
             D_L04_001A8ED0 = 1;
             H(self, 0x34) &= ~0x41;
-            func_L04_0040AC30(self, s);
+            ReleaseRacerLinkState(self, s);
             I(s, 0x320) = -1;
             self[0x20] = 4;
             ref_L04_00419918_01 = 0;
@@ -399,13 +399,13 @@ void func_L04_00419918(u8 *self)
         switch (self[0xBC]) {
         case 0:
             D_L04_001B0BBC = 0;
-            func_L04_0040BA68(self, s);
-            func_0029B758(0, func_L04_0040AD28);
+            UpdateRaceSelectionMenu(self, s);
+            StoreLevelObjectValuePair(0, DrawRaceResultsPanel);
             return;
         case 1:
-            func_L04_00418A58(self, s);
+            UpdateHoverbikeRiderEntryState(self, s);
             if (*(u8 *)&D_00138324 != 0) {
-                func_002E5E58(4, 0, 0);
+                PlaySoundFromGlobalBank(4, 0, 0);
                 self[0xBC] = 3;
             }
             return;
@@ -423,21 +423,21 @@ void func_L04_00419918(u8 *self)
                 Q(o, 0x10) = Q(self, 0x10);
                 Q(o, 0xF0) = Q(self, 0xF0);
                 o[0x30] = 0;
-                func_002A7398(o, 0, 0);
+                StartAnimationImmediate(o, 0, 0);
                 func_002A05A8(o);
                 func_002A0F48(o);
             }
             H(self, 0x34) &= ~0x41;
             D_L04_001B091C = 0;
             D_L04_001B31D4 = 0;
-            func_0029B758(0, func_L04_00417308);
+            StoreLevelObjectValuePair(0, DrawRaceRulerHud);
             D_L04_001B0930 = 0;
             D_L04_001B0938 = 0;
-            func_L04_00415EA8(0);
+            ClearEffectEntriesByOwner(0);
             D_L04_001B08F0 = 0;
-            func_L04_004195E0(self);
-            D_00189E20[0x22B5] = 1;
-            I(P(D_00189E20, 0x2290), 0x98) = 0;
+            InitHoverbikeRaceCourse(self);
+            gHeroState[0x22B5] = 1;
+            I(P(gHeroState, 0x2290), 0x98) = 0;
             if (D_L04_001B0924 != 0) {
                 self[0xBC] = 1;
                 H(self, 0x96) = 120;
@@ -447,29 +447,29 @@ void func_L04_00419918(u8 *self)
             self[0xBC] = 3;
         case 3:
             D_L04_001B092C = 0;
-            func_L04_0040A5C0(self);
-            func_L04_0040A310(self);
+            ActivateLinkedRacers(self);
+            RefreshActiveEffectRecords(self);
             self[0xBC] = 4;
         case 4:
-            func_L04_00418A58(self, s);
+            UpdateHoverbikeRiderEntryState(self, s);
             if (I(s, 0x394) < 120 && D_L04_001B31D4 == 0) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             } else if (I(s, 0x394) < 90 && D_L04_001B31D4 == 1) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             } else if (I(s, 0x394) < 60 && D_L04_001B31D4 == 2) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             } else if (I(s, 0x394) < 30 && D_L04_001B31D4 == 3) {
-                func_002E5CF8(0xD, 0, self);
+                PlayMobySound(0xD, 0, self);
                 D_L04_001B31D4++;
             }
-            func_00282948(s + 0x394);
+            FastFloatHelperD(s + 0x394);
             if (I(s, 0x394) != 0) {
                 return;
             }
-            func_002E5CF8(0xE, 0, self);
+            PlayMobySound(0xE, 0, self);
             self[0xBC] = 5;
             if (D_00138320 & 0x40) {
                 D_L04_001B0930 = 0;
@@ -478,26 +478,26 @@ void func_L04_00419918(u8 *self)
             }
             return;
         case 5:
-            func_L04_00418A58(self, s);
+            UpdateHoverbikeRiderEntryState(self, s);
             if (D_L04_001B0934 != 0) {
-                func_00288E18(0xA26, 0x7D);
+                RequestSubtitleVoiceLine(0xA26, 0x7D);
                 D_L04_001B0934 = 0;
             }
-            if (func_L04_00412308(self, s) != 0) {
+            if (UpdatePlayerRaceProgress(self, s) != 0) {
                 return;
             }
-            func_L04_00418BF0(self, s);
-            func_L00_002E6EF8(func_L04_0040CDD0, self);
-            if (F(self, 0x18) < F(s, 0x26C) || func_L04_00410E48(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
-                func_L04_0040E248(self, s);
+            UpdateHoverbikeRailGrindTrick(self, s);
+            AddDrawCallbackToList3(DrawRacerGlowEffects, self);
+            if (F(self, 0x18) < F(s, 0x26C) || IsRacerInJumpWindow(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
+                ReleaseRacerSoundHandles(self, s);
                 self[0xBC] = 6;
                 H(self, 0x96) = 1;
             }
             if (D_L04_001B0900 == 0) {
                 return;
             }
-            func_0027D330(0x10);
-            func_L04_0040A958(self, 1);
+            FadeToBlack(0x10);
+            ResetRaceController(self, 1);
             I(s, 0x340) = 0;
             D_L04_001B0900 = 0;
             return;
@@ -510,14 +510,14 @@ void func_L04_00419918(u8 *self)
                 I(s, 0x724) = 0;
             }
             I(s, 0x720) = 0;
-            func_L00_002E6EF8(func_L04_0040CDD0, self);
+            AddDrawCallbackToList3(DrawRacerGlowEffects, self);
             o = 0;
             I(s, 0x30C) = 0;
             I(s, 0x27C) = 0;
             if (I(s, 0x1DC) != -1) {
                 o = MOBY(I(s, 0x1DC));
             }
-            func_L04_0040E248(self, s);
+            ReleaseRacerSoundHandles(self, s);
             if (o != 0) {
                 H(o, 0x34) |= 0x41;
                 if (D_L04_001B08F4 != 0) {
@@ -536,29 +536,29 @@ void func_L04_00419918(u8 *self)
             if (--H(self, 0x96) != 0) {
                 return;
             }
-            func_0027D330(0x10);
+            FadeToBlack(0x10);
             ids = (IdList *)(s + 0x110);
             id = ids->v[I(s, 0x270)];
             if (id != -1) {
                 Q(a, 0) = Q(NODE(id), 0x30);
                 Q(b, 0) = Q(NODE(ids->v[I(s, 0x270)]), 0x70);
             } else if (I(s, 0x198) == -1) {
-                func_L00_002B30E8();
+                RecordHeroPlayCounters();
                 return;
             } else {
                 Q(a, 0) = Q(NODE(I(s, 0x198)), 0x30);
                 Q(b, 0) = Q(NODE(I(s, 0x198)), 0x70);
             }
             D_L04_001B1F20 = 1.0f;
-            func_00272198(10.0f);
-            if (func_00277258(a, 4, self, F(s, 0x20)) != 0) {
+            SetCameraTransitionFrames(10.0f);
+            if (TestPointAgainstCollision(a, 4, self, F(s, 0x20)) != 0) {
                 Q(a, 0) = D_L04_001BFAF0;
             }
-            func_L04_0040A3B8(self, 1);
-            func_L04_00415EA8(self);
-            func_L00_002B9D60(a, b, 0x31, 1);
-            D_00189E20[0x22B7] = 1;
-            D_00189E20[0x22B5] = 1;
+            ResetRacerState(self, 1);
+            ClearEffectEntriesByOwner(self);
+            ResetHeroPositionAndDirection(a, b, 0x31, 1);
+            gHeroState[0x22B7] = 1;
+            gHeroState[0x22B5] = 1;
             I(s, 0x49C) = -1;
             I(s, 0x4A0) = -1;
             F(s, 0x4A4) = -1.0f;
@@ -567,12 +567,12 @@ void func_L04_00419918(u8 *self)
             I(s, 0x4AC) = 0;
             Q(self, 0x10) = Q(a, 0);
             Q(self, 0xF0) = Q(b, 0);
-            func_L04_00410518(self, s, s + 0x314, s + 0x318, s + 0x310, D_L04_001A8FE4);
+            FindNearestRoutePoint(self, s, s + 0x314, s + 0x318, s + 0x310, gCurrentLap);
             H(self, 0x34) &= ~0x41;
             if (o != 0) {
                 Q(o, 0x10) = Q(self, 0x10);
                 Q(o, 0xF0) = Q(self, 0xF0);
-                func_002A7398(o, 0, 0);
+                StartAnimationImmediate(o, 0, 0);
                 func_002A05A8(o);
                 func_002A0F48(o);
                 H(o, 0x34) &= ~0x41;
@@ -588,26 +588,26 @@ void func_L04_00419918(u8 *self)
         return;
     case 3:
         D_L04_001A8ED0 = 1;
-        func_L04_00418A58(self, s);
+        UpdateHoverbikeRiderEntryState(self, s);
         D_L04_001B08F8++;
-        if (F(self, 0x18) < F(s, 0x26C) || func_L04_00410E48(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
+        if (F(self, 0x18) < F(s, 0x26C) || IsRacerInJumpWindow(I(s, 0x314), I(s, 0x318), F(self, 0x18)) != 0) {
             float ahead, along;
-            int node = func_L04_00400AB0(self, P(s, 0x6D0), 1);
+            int node = FindNearestRoutePointIndex(self, P(s, 0x6D0), 1);
 
             /* The path's points are 16-byte records from +0x10. */
             Q(self, 0x10) = Q(((Vector *)P(s, 0x6D0))[node], 0x10);
-            along = func_00283CE0(node) * F(P(s, 0x6D0), 0x1C);
+            along = IntToFloat(node) * F(P(s, 0x6D0), 0x1C);
             if (D_L04_001B08F0 != 0) {
                 ahead = along + 15.0f;
             } else {
                 ahead = along + 5.0f;
             }
             F(s, 0x6D8) = ahead;
-            func_002C96F8(ahead, F(P(s, 0x6D0), 0x1C), P(s, 0x6D0), s + 0x654, s + 0x6D4, s + 0x6A0);
-            func_L04_00410518(self, s, s + 0x314, s + 0x318, s + 0x310, D_L04_001A8FE4);
+            SampleKeyTrack(ahead, F(P(s, 0x6D0), 0x1C), P(s, 0x6D0), s + 0x654, s + 0x6D4, s + 0x6A0);
+            FindNearestRoutePoint(self, s, s + 0x314, s + 0x318, s + 0x310, gCurrentLap);
         }
-        func_0029B758(0, func_L04_00411298);
-        func_00282948(s + 0x398);
+        StoreLevelObjectValuePair(0, DrawRaceStandingsHud);
+        FastFloatHelperD(s + 0x398);
         if (D_L04_001A7CD0 == 0) {
             if (I(s, 0x398) > 0 || !(D_00138324 & 0x10)) {
                 return;
@@ -619,12 +619,12 @@ void func_L04_00419918(u8 *self)
         if (D_L04_001A7CD4 != 1) {
             return;
         }
-        func_00132B28(0x5D);
-        func_00132028();
+        SendSoundCommand23(0x5D);
+        snd_Pump();
         D_L04_001A8ED0_flags[5] = 0;
-        func_L04_0040AC30(self, s);
+        ReleaseRacerLinkState(self, s);
         self[0x20] = 4;
-        func_L01_00323310(I(s, 0x488), -1);
+        QueueKeyedRequest(I(s, 0x488), -1);
         return;
     case 4:
         D_L04_001A8ED0 = 1;
@@ -641,35 +641,35 @@ void func_L04_00419918(u8 *self)
         if ((unsigned int)(D_L04_001A7CD4 - 1) >= 2) {
             return;
         }
-        func_L04_0040A310(self);
+        RefreshActiveEffectRecords(self);
         D_L04_001A8ED0 = 0;
         H(self, 0x34) &= ~0x41;
-        func_0029B758(0, 0);
+        StoreLevelObjectValuePair(0, 0);
         if (I(s, 0x19C) != -1) {
-            if (I(s, 0x320) == -1 || (D_L04_001B090C == 0 && func_L04_0040A1D0(0) == 1)) {
+            if (I(s, 0x320) == -1 || (gCurrentRaceIndex == 0 && GetCourseWinCount(0) == 1)) {
                 u8 *bike;
 
                 path = I(s, 0x480);
-                if (D_001A79F0 == 11) {
+                if (gCurrentMapIndex == 11) {
                     path = I(s, 0x484);
                 }
                 Q(a, 0) = Q(NODE(I(s, 0x19C)), 0x70);
                 if (D_L04_001B0BBC != 0) {
                     a[2] = 0.92f;
                 }
-                if (I(s, 0x320) == 1 && D_L04_001B090C == 0) {
-                    D_L04_001B090C = I(s, 0x320);
+                if (I(s, 0x320) == 1 && gCurrentRaceIndex == 0) {
+                    gCurrentRaceIndex = I(s, 0x320);
                 }
                 if (D_L04_001B08F4 != 0) {
-                    func_0029F338(D_L04_001B08F4);
+                    MarkMobySpawned(D_L04_001B08F4);
                     D_L04_001B08F4 = 0;
                 }
-                bike = P(D_00189E20, 0x2290);
-                D_00189E20[0x22B5] = 0;
+                bike = P(gHeroState, 0x2290);
+                gHeroState[0x22B5] = 0;
                 I(bike, 0x98) = I(P(bike, 0x24), 0x10);
-                func_L00_002B9D60(NODE(I(s, 0x19C)) + 0x30, a, 0, 1);
+                ResetHeroPositionAndDirection(NODE(I(s, 0x19C)) + 0x30, a, 0, 1);
                 {
-                    u8 *ride = P(D_00189E20, 0x2290);
+                    u8 *ride = P(gHeroState, 0x2290);
 
                     F(ride, 0x2C) = F(P(ride, 0x24), 0x24);
                 }
@@ -677,13 +677,13 @@ void func_L04_00419918(u8 *self)
                 Q(self, 0xF0) = Q(s, 0x2E0);
                 self[0x20] = 1;
                 F(self, 0x2C) = F(P(self, 0x24), 0x24);
-                func_L00_00303530(0, path);
+                LoadSceneChunk(0, path);
                 {
-                    float q = func_00283198(0.56217057f) / func_00283180(0.56217057f);
+                    float q = FastSinOrCosB(0.56217057f) / FastSinOrCosA(0.56217057f);
 
                     D_L04_001BDC30 = q;
                 }
-                func_0027AB40();
+                UpdateViewContext();
                 for (k = 0; k < 21; k++) {
                     int id = ((int *)(s + 0x1E4))[k];
 
@@ -693,22 +693,22 @@ void func_L04_00419918(u8 *self)
                         I(rider, 0x2C8) = 0;
                         rider[0x251] = 0;
                         if (P(rider, 0x8C) != 0) {
-                            func_0029F338(P(rider, 0x8C));
+                            MarkMobySpawned(P(rider, 0x8C));
                             P(rider, 0x8C) = 0;
                         }
                     }
                 }
                 return;
             }
-            if (func_L04_0040A1D0(D_L04_001B090C) == 1) {
-                D_L04_001B090C++;
-                if (D_L04_001B090C >= 5) {
-                    D_L04_001B090C = 4;
+            if (GetCourseWinCount(gCurrentRaceIndex) == 1) {
+                gCurrentRaceIndex++;
+                if (gCurrentRaceIndex >= 5) {
+                    gCurrentRaceIndex = 4;
                 }
             }
-            func_L04_0040A958(self, 1);
+            ResetRaceController(self, 1);
         } else {
-            func_L04_0040A958(self, 1);
+            ResetRaceController(self, 1);
             D_L04_001B0900 = 0;
         }
         return;

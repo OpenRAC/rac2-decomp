@@ -20,15 +20,16 @@ extern void func_002E3940(int);
 extern void func_002E3820(void);
 extern void func_002FC560(int, unsigned long long);
 
+/* Builds the transform for each view, hands each to the view routine, then finishes the render setup. */
 void func_002E35E0(void)
 {
     float vec[4];
     int i = 0;
 
-    func_002E37B0();
+    ResetResidentTable();
     *(short *)(ref_L00_002E35E0_00 + 4) = 0;
-    func_00283388(ref_L00_002E35E0_01);
-    func_00282C88(vec);
+    set_identity_matrix(ref_L00_002E35E0_01);
+    ClearVector128(vec);
     for (; i < *(short *)(ref_L00_002E35E0_00 + 6); i++) {
         switch (i) {
         case 0:
@@ -36,23 +37,23 @@ void func_002E35E0(void)
             vec[2] = ref_L00_002E35E0_04;
         case 1:
             vec[1] = 0;
-            vec[2] = func_00283B98(ref_L00_002E35E0_04, 0);
+            vec[2] = FastAddRotations(ref_L00_002E35E0_04, 0);
             break;
         case 2:
             vec[1] = -0.075f;
-            vec[2] = func_00283B98(ref_L00_002E35E0_04, -0.15f);
+            vec[2] = FastAddRotations(ref_L00_002E35E0_04, -0.15f);
             break;
         case 3:
             vec[0] = -0.06f;
             vec[1] = 0.05f;
-            vec[2] = func_00283B98(ref_L00_002E35E0_04, 0.125f);
+            vec[2] = FastAddRotations(ref_L00_002E35E0_04, 0.125f);
             break;
         }
-        func_00283430(ref_L00_002E35E0_01, vec);
+        FastMatrixHelperB(ref_L00_002E35E0_01, vec);
         qcopy(ref_L00_002E35E0_03, ref_L00_002E35E0_02);
-        func_002E3940(i);
+        ProcessViewEntry(i);
     }
-    func_002E3820();
-    func_002FC560(0x47, 0x5360B);
-    func_002FC560(0x4E, 0x1000000 | (D_001A72E0 >> 13));
+    LinkRenderPacketChain();
+    VU1_addGSregister(0x47, 0x5360B);
+    VU1_addGSregister(0x4E, 0x1000000 | (D_001A72E0 >> 13));
 }

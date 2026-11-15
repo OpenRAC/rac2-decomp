@@ -2,9 +2,10 @@
 
 extern void func_002A0F48(u8 *p);
 
-void func_L08_003CDB38(u8 *p) {
-    u8 *s = *(u8 **)(p + 0x68);
-    qcopy(p + 0x10, s);
-    qcopy(p + 0xF0, s + 0x10);
-    func_002A0F48(p);
+/* Places the object at the position and rotation stored in its private data. */
+void func_L08_003CDB38(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    qcopy(moby + 0x10, vars);
+    qcopy(moby + 0xF0, vars + 0x10);
+    func_002A0F48(moby);
 }

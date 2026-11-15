@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /*
  * Disassembled at 0x002cd220
@@ -44,11 +45,12 @@ extern void func_0027C540(long arg0);
 /* External functions declared with exact aliases from task.externals */
 extern void func_0027C540(long param_1);
 
+/* Draws one menu page by calling its page-specific draw routine between the common start and end of menu drawing. */
 int func_002D2CB8(void)
 {
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C680();
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }
 
@@ -66,18 +68,19 @@ typedef struct {
 extern Statistics_2D2CE8 D_0018C750;
 extern int func_0029C6F0(int);
 
+/* Handles button input for a menu page: counts the visit in the statistics and either accepts, cancels or passes the button to the page. */
 int func_002D2CE8(void)
 {
     int result = 0;
     unsigned int flags = D_00138344;
     if (flags & 0x10) {
-        Statistics_2D2CE8 *stats = &D_0018C750;
+        Statistics_2D2CE8 *stats = &gProgressStatistics;
         char *root;
         int value, status;
         if (stats->count < 0xffff) stats->count++;
         if (D_001A7390 > stats->maximum) stats->maximum = D_001A7390;
-        stats->levels = (stats->levels | (1u << D_001A79F0)) | 0x80000000u;
-        root = D_001F2840;
+        stats->levels = (stats->levels | (1u << gCurrentMapIndex)) | 0x80000000u;
+        root = gPauseMenuState;
         value = *(int *)(*(char **)(root + 0x14) + 0xe0);
         if (value != 0) *(int *)(root + 0x18) = value;
         else {
@@ -91,10 +94,10 @@ finish:
         return status;
     }
     if (flags & 0x900) {
-        Statistics_2D2CE8 *stats = &D_0018C750;
+        Statistics_2D2CE8 *stats = &gProgressStatistics;
         if (stats->count < 0xffff) stats->count++;
         if (D_001A7390 > stats->maximum) stats->maximum = D_001A7390;
-        stats->levels = (stats->levels | (1u << D_001A79F0)) | 0x80000000u;
+        stats->levels = (stats->levels | (1u << gCurrentMapIndex)) | 0x80000000u;
         result = 1;
     } else func_0029C6F0(flags);
     return result;

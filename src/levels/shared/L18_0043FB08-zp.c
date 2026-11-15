@@ -36,6 +36,7 @@ extern void *func_002A9640(void *, u32, s32);
 extern int func_002E5DA0(int, int, void *, int);
 extern void func_L00_0032A258(void *, void *, void *, void *, int, int, int, int, int, int, int);
 
+/* Waits until it is hit, then bursts into a spray of debris, plays a sound and removes itself. */
 void func_L18_0043FB08(Moby43FB08 *self) {
     f32 lo[4] __attribute__((aligned(16)));
     f32 hi[4] __attribute__((aligned(16)));
@@ -44,21 +45,21 @@ void func_L18_0043FB08(Moby43FB08 *self) {
 
     switch (self->state) {
     case 0:
-        func_002A7750(self, 1, -1);
+        SetMobyState(self, 1, -1);
         break;
     case 1:
-        if (func_002A9640(self, 0x4010000, 0) != 0 && vars->busy == 0) {
+        if (FindOwnedEffectSlot(self, 0x4010000, 0) != 0 && vars->busy == 0) {
             *(TI *)ext = 0;
             ext[0] = 3.0f;
             ext[1] = 3.0f;
-            func_00282D30(lo, self->dir, -func_002A7878(6.0f, 8.0f));
+            FastVecScale(lo, self->dir, -RandomFloatRange(6.0f, 8.0f));
             qcopy(hi, lo);
-            func_00282CF0(lo, lo, ext);
-            func_00282CC0(hi, hi, ext);
-            func_L00_0032A258(self, lo, D_L18_001B1CB8, D_L18_001B1CB0, D_L18_001B1CE4, -1,
+            FastVecSub(lo, lo, ext);
+            FastVecAdd(hi, hi, ext);
+            ExplodeObjectIntoPieces(self, lo, D_L18_001B1CB8, D_L18_001B1CB0, D_L18_001B1CE4, -1,
                               D_L18_001B1CE0, 9, D_L18_001B1CE8, 0xFF, 0);
-            func_002E5DA0(0, 0, self, self->uid);
-            func_0029F338(self);
+            PlaySoundFromClassBank(0, 0, self, self->uid);
+            MarkMobySpawned(self);
         } else {
             self->alpha = 0xFF;
         }

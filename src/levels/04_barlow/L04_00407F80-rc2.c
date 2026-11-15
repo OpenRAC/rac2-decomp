@@ -32,22 +32,23 @@ extern void ref_L04_00407F80_05(void *, void *, void *, void *);
 extern s32 ref_L04_00407F80_06(s8 *, s32);
 extern void ref_L04_00407F80_07(s8 *, void *);
 
-void func_L04_00407F80(void *arg0) {
-    void *p68;
-    s32 temp_a1;
+/* Sets up the object on its first frame, then keeps registering its update routine until the linked trigger fires. */
+void func_L04_00407F80(void *moby) {
+    void *vars;
+    s32 triggerId;
 
-    p68 = (*(void **)((s8 *)(arg0) + (0x68)));
-    if ((*(u8 *)((s8 *)(arg0) + (0x20))) == 0) {
-        ref_L04_00407F80_05(arg0, ref_L04_00407F80_02, ref_L04_00407F80_03, ref_L04_00407F80_04);
-        (*(u8 *)((s8 *)(arg0) + (0x30))) = 0xC4;
-        (*(u8 *)((s8 *)(arg0) + (0x20))) = 1;
-        (*(u16 *)((s8 *)(arg0) + (0x34))) = (u16) ((*(u16 *)((s8 *)(arg0) + (0x34))) | 1);
-        (*(s16 *)((s8 *)(arg0) + (0x32))) = 0;
+    vars = (*(void **)((s8 *)(moby) + (0x68)));
+    if ((*(u8 *)((s8 *)(moby) + (0x20))) == 0) {
+        ref_L04_00407F80_05(moby, ref_L04_00407F80_02, ref_L04_00407F80_03, ref_L04_00407F80_04);
+        (*(u8 *)((s8 *)(moby) + (0x30))) = 0xC4;
+        (*(u8 *)((s8 *)(moby) + (0x20))) = 1;
+        (*(u16 *)((s8 *)(moby) + (0x34))) = (u16) ((*(u16 *)((s8 *)(moby) + (0x34))) | 1);
+        (*(s16 *)((s8 *)(moby) + (0x32))) = 0;
         return;
     }
-    temp_a1 = (*(s32 *)((s8 *)(p68) + (8)));
-    if ((temp_a1 == -1) || (ref_L04_00407F80_06(ref_L04_00407F80_00, temp_a1) != 0)) {
-        ref_L04_00407F80_05(arg0, ref_L04_00407F80_02, ref_L04_00407F80_03, ref_L04_00407F80_04);
-        ref_L04_00407F80_07(ref_L04_00407F80_01, arg0);
+    triggerId = (*(s32 *)((s8 *)(vars) + (8)));
+    if ((triggerId == -1) || (ref_L04_00407F80_06(ref_L04_00407F80_00, triggerId) != 0)) {
+        ref_L04_00407F80_05(moby, ref_L04_00407F80_02, ref_L04_00407F80_03, ref_L04_00407F80_04);
+        ref_L04_00407F80_07(ref_L04_00407F80_01, moby);
     }
 }

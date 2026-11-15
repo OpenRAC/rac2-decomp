@@ -52,53 +52,54 @@ extern void func_002ACEC0(void *, void *, void *, float);
 extern int func_L01_00321178(void *, void *);
 extern int func_L02_003D7300(void *);
 
+/* Finds a nearby target in front of the object and aims at it; returns 1 if one was found. */
 s32 func_L11_00449C70(AimObject *obj)
 {
     AimState *state = *(AimState **)((u8 *)obj + 0x68);
-    float copy[4];
-    float vec[4];
-    u16 *p;
-    EntityPositionPrefix *e;
-    float saved;
-    float a;
-    float b;
+    float posCopy[4];
+    float aimPoint[4];
+    u16 *idPtr;
+    EntityPositionPrefix *entity;
+    float savedValue;
+    float angleToEntity;
+    float turnAngle;
 
-    *(TI128 *)vec = 0;
-    vec[0] = obj->position[0];
-    vec[1] = obj->position[1];
-    vec[2] = obj->position[2];
-    vec[3] = 2.0f;
-    *(TI128 *)copy = *(TI128 *)vec;
-    if (func_00283DB8(copy, 128.0f) <= 0)
+    *(TI128 *)aimPoint = 0;
+    aimPoint[0] = obj->position[0];
+    aimPoint[1] = obj->position[1];
+    aimPoint[2] = obj->position[2];
+    aimPoint[3] = 2.0f;
+    *(TI128 *)posCopy = *(TI128 *)aimPoint;
+    if (FastMathHelperA(posCopy, 128.0f) <= 0)
         return 0;
     if (state->group == -1)
         return 0;
-    for (p = D_L11_001FC420[state->group];
-         (state->group & 0xFF) != 0xFF && state->group <= D_L11_001B35B8 && p != 0 &&
-         ((p != 0 && (s16)p[-1] >= 0) || p == D_L11_001FC420[state->group]);
-         p++) {
-        e = (EntityPositionPrefix *)(D_L11_001B359C[0] + ((*p & 0x7FFF) << 8));
-        if (e == 0)
+    for (idPtr = gGroupIdLists[state->group];
+         (state->group & 0xFF) != 0xFF && state->group <= D_L11_001B35B8 && idPtr != 0 &&
+         ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == gGroupIdLists[state->group]);
+         idPtr++) {
+        entity = (EntityPositionPrefix *)(gMobyTable_L11[0] + ((*idPtr & 0x7FFF) << 8));
+        if (entity == 0)
             return 0;
-        if (!func_L02_003D7300(e))
+        if (!GetMobyBusyFlag(entity))
             continue;
-        if (!(func_00282E80(obj->position, e->position) < D_L11_001B1BD0))
+        if (!(vec_distance_xy(obj->position, entity->position) < D_L11_001B1BD0))
             continue;
-        a = func_00283248(e->position[0] - obj->position[0], e->position[1] - obj->position[1]);
-        if (!(func_00283C80(obj->heading, a) < D_L11_001B1BD4 * 0.017453294f))
+        angleToEntity = FastMatrixHelperA(entity->position[0] - obj->position[0], entity->position[1] - obj->position[1]);
+        if (!(FastDiffRots(obj->heading, angleToEntity) < D_L11_001B1BD4 * 0.017453294f))
             continue;
-        if (p == 0)
+        if (idPtr == 0)
             return 0;
-        func_00282CF0(vec, obj->position, e->position);
-        b = D_L11_001B1BD8 * 0.017453294f;
-        a = func_00283248(e->position[0] - obj->position[0], e->position[1] - obj->position[1]);
-        func_002ACEC0(vec, vec, obj->orientation,
-                      func_00283BE0(obj->heading, a) >= 0.0f ? -b : b);
-        func_00282CC0(vec, vec, e->position);
-        saved = state->f134;
+        FastVecSub(aimPoint, obj->position, entity->position);
+        turnAngle = D_L11_001B1BD8 * 0.017453294f;
+        angleToEntity = FastMatrixHelperA(entity->position[0] - obj->position[0], entity->position[1] - obj->position[1]);
+        ApplyAxisRotationToQuaternion(aimPoint, aimPoint, obj->orientation,
+                      fast_subtract_rotations(obj->heading, angleToEntity) >= 0.0f ? -turnAngle : turnAngle);
+        FastVecAdd(aimPoint, aimPoint, entity->position);
+        savedValue = state->f134;
         state->f134 = 0.0001f;
-        func_L01_00321178(obj, vec);
-        state->f134 = saved;
+        TurnMobyTowardTarget(obj, aimPoint);
+        state->f134 = savedValue;
         return 1;
     }
     return 0;

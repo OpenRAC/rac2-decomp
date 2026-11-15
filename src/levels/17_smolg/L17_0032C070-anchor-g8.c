@@ -36,112 +36,112 @@ extern void func_002AD6F0(void *, void *, void *, void *);
 void func_L17_003C3C50(unsigned char *obj)
 {
     struct { MotionVec old, delta, probe1, probe2; } frame;
-    MotionState *s = *(MotionState **)(obj + 0x68);
+    MotionState *vars = *(MotionState **)(obj + 0x68);
     char *target;
     MotionAnchor *anchor;
 
     frame.old.q = *(MotionQuad *)(obj + 0x10);
-    func_00282948(&s->cooldown);
+    FastFloatHelperD(&vars->cooldown);
     switch (obj[0x20]) {
     case 0:
-        s->speed = 0;
-        s->blocked = 0;
-        s->cooldown = 0;
+        vars->speed = 0;
+        vars->blocked = 0;
+        vars->cooldown = 0;
         obj[0x20] = 1;
-        s->flags |= 9;
-        if (s->destination0 != -1)
-            *(MotionQuad *)(obj + 0x10) = D_L17_001FE880[s->destination0]->position.q;
-        else if (s->destination1 != -1)
-            *(MotionQuad *)(obj + 0x10) = D_L17_001FE880[s->destination1]->position.q;
+        vars->flags |= 9;
+        if (vars->destination0 != -1)
+            *(MotionQuad *)(obj + 0x10) = gPathTable_L17[vars->destination0]->position.q;
+        else if (vars->destination1 != -1)
+            *(MotionQuad *)(obj + 0x10) = gPathTable_L17[vars->destination1]->position.q;
         break;
     case 1:
-        if (s->source0 != -1 && s->destination0 != -1) {
-            target = D_L17_001B2C1C + (s->source0 << 8);
+        if (vars->source0 != -1 && vars->destination0 != -1) {
+            target = gMobyPool_L17 + (vars->source0 << 8);
             if (!target || (unsigned char)target[0x20] == 254 || (unsigned char)target[0x20] == 253
-                || (unsigned char)target[0x20] == s->activeState) {
-                s->timer = 0;
-                s->direction = 0;
+                || (unsigned char)target[0x20] == vars->activeState) {
+                vars->timer = 0;
+                vars->direction = 0;
                 obj[0x20] = 2;
                 break;
             }
         }
-        if (s->destination0 == -1 && s->source1 != -1 && s->destination1 != -1) {
-            target = D_L17_001B2C1C + (s->source1 << 8);
+        if (vars->destination0 == -1 && vars->source1 != -1 && vars->destination1 != -1) {
+            target = gMobyPool_L17 + (vars->source1 << 8);
             if (!target || (unsigned char)target[0x20] == 254 || (unsigned char)target[0x20] == 253
-                || (unsigned char)target[0x20] == s->activeState) {
-                s->timer = 0;
-                s->direction = 1;
+                || (unsigned char)target[0x20] == vars->activeState) {
+                vars->timer = 0;
+                vars->direction = 1;
                 obj[0x20] = 2;
             }
         }
         break;
     case 2:
-        if (!s->blocked)
-            s->timer += 1.0f;
-        if (s->timer >= D_L17_001B0240 * 60.0f)
-            s->timer = D_L17_001B0240 * 60.0f;
-        if (s->direction == 0)
-            anchor = D_L17_001FE880[s->destination0];
+        if (!vars->blocked)
+            vars->timer += 1.0f;
+        if (vars->timer >= D_L17_001B0240 * 60.0f)
+            vars->timer = D_L17_001B0240 * 60.0f;
+        if (vars->direction == 0)
+            anchor = gPathTable_L17[vars->destination0];
         else
-            anchor = D_L17_001FE880[s->destination1];
-        func_L17_003C3AF0(obj, anchor, &frame.old);
-        if (s->timer >= D_L17_001B0240 * 60.0f) {
-            if (s->once0 && !s->direction) {
-                s->destination0 = -1;
+            anchor = gPathTable_L17[vars->destination1];
+        PlaceObjectOnPathByTimer(obj, anchor, &frame.old);
+        if (vars->timer >= D_L17_001B0240 * 60.0f) {
+            if (vars->once0 && !vars->direction) {
+                vars->destination0 = -1;
                 obj[0x20] = 1;
-            } else if (s->once1 && s->direction == 1) {
-                s->destination1 = -1;
+            } else if (vars->once1 && vars->direction == 1) {
+                vars->destination1 = -1;
                 obj[0x20] = 1;
             } else {
                 obj[0x20] = 4;
-                s->delay = 0;
+                vars->delay = 0;
             }
         }
         break;
     case 3:
-        if (!s->blocked)
-            s->timer -= 1.0f;
-        if (s->timer <= 0.0f)
-            s->timer = 0.0f;
-        if (s->direction == 0)
-            anchor = D_L17_001FE880[s->destination0];
+        if (!vars->blocked)
+            vars->timer -= 1.0f;
+        if (vars->timer <= 0.0f)
+            vars->timer = 0.0f;
+        if (vars->direction == 0)
+            anchor = gPathTable_L17[vars->destination0];
         else
-            anchor = D_L17_001FE880[s->destination1];
-        func_L17_003C3AF0(obj, anchor, &frame.old);
-        if (s->timer <= 0.0f)
+            anchor = gPathTable_L17[vars->destination1];
+        PlaceObjectOnPathByTimer(obj, anchor, &frame.old);
+        if (vars->timer <= 0.0f)
             obj[0x20] = 1;
         break;
     case 4:
-        s->delay += 1.0f;
-        if (s->delay >= D_L17_001B0244 * 60.0f) {
-            MotionMoby *m;
+        vars->delay += 1.0f;
+        if (vars->delay >= D_L17_001B0244 * 60.0f) {
+            MotionMoby *sourceMoby;
             obj[0x20] = 3;
-            if (s->direction == 0)
-                m = (MotionMoby *)((s->source0 << 8) + (unsigned int)D_L17_001B2C1C);
-            else if (s->direction == 1)
-                m = (MotionMoby *)((s->source1 << 8) + (unsigned int)D_L17_001B2C1C);
+            if (vars->direction == 0)
+                sourceMoby = (MotionMoby *)((vars->source0 << 8) + (unsigned int)gMobyPool_L17);
+            else if (vars->direction == 1)
+                sourceMoby = (MotionMoby *)((vars->source1 << 8) + (unsigned int)gMobyPool_L17);
             else
                 break;
-            m->marked = 0;
+            sourceMoby->marked = 0;
         }
         break;
     }
-    if (s->cooldown) {
-        s->blocked = 1;
-    } else if (s->speed < 0.0f) {
-        frame.probe1.q = D_00189EA0[0];
-        if (func_L17_003C3A00(obj, &frame.probe1)) {
-            if (!s->cooldown)
-                s->cooldown = 30;
-            s->blocked = 1;
+    if (vars->cooldown) {
+        vars->blocked = 1;
+    } else if (vars->speed < 0.0f) {
+        frame.probe1.q = gHeroPosition[0];
+        if (IsPointJustBelowObject(obj, &frame.probe1)) {
+            if (!vars->cooldown)
+                vars->cooldown = 30;
+            vars->blocked = 1;
         } else
             goto check_clear;
     } else {
 check_clear:
-        frame.probe2.q = D_00189EA0[0];
-        if (!func_L17_003C3A00(obj, &frame.probe2))
-            s->blocked = 0;
+        frame.probe2.q = gHeroPosition[0];
+        if (!IsPointJustBelowObject(obj, &frame.probe2))
+            vars->blocked = 0;
     }
-    func_00282CF0(&frame.delta, obj + 0x10, &frame.old);
-    func_002AD6F0((char *)s + 0x50, &frame.delta, obj + 0xF0, obj + 0xF0);
+    FastVecSub(&frame.delta, obj + 0x10, &frame.old);
+    CombineTransformsAndStore((char *)vars + 0x50, &frame.delta, obj + 0xF0, obj + 0xF0);
 }

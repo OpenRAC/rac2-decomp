@@ -47,8 +47,8 @@ void func_L00_003BC468(int unused, int width, Vec16_Fc936841d *points, int count
     *(Rac2TI128 *)outer = 0;
     inner[3] = 1.0f;
     outer[3] = 1.0f;
-    inner[2] = func_002A7878(0.005f, 0.085f) * 2.0f;
-    outer[2] = func_002A7878(0.1f, 0.25f) * 2.0f;
+    inner[2] = RandomFloatRange(0.005f, 0.085f) * 2.0f;
+    outer[2] = RandomFloatRange(0.1f, 0.25f) * 2.0f;
     ref_L00_003BC468_00(points, count);
     ref_L00_003BC468_01((char *)&a);
     ref_L00_003BC468_01((char *)&b);
@@ -58,19 +58,19 @@ void func_L00_003BC468(int unused, int width, Vec16_Fc936841d *points, int count
     b.uv[4] = 0.33f; b.uv[5] = 0; b.uv[6] = 0.33f; b.uv[7] = 1;
     func_802EE138_1(matrix[0], (float *)&points[1], (char *)points);
     func_802EE3D0_1(matrix[0], matrix[0], 1.0f);
-    func_802EE138_1(matrix[1], (float *)D_L00_001B8DC0, (char *)points);
-    func_00282DD8(matrix[2], matrix[1], matrix[0]);
+    func_802EE138_1(matrix[1], (float *)gCameraPosition_L00, (char *)points);
+    FastVecCross(matrix[2], matrix[1], matrix[0]);
     func_802EE3D0_1(matrix[2], matrix[2], 1.0f);
-    func_00282DD8(matrix[1], matrix[0], matrix[2]);
+    FastVecCross(matrix[1], matrix[0], matrix[2]);
     qcopy(matrix[3], points);
     qcopy(a.corner[0], inner);
     func_002EE178_1((char *)a.corner[1], (char *)a.corner[0], -1.0f);
-    func_002830C0(a.corner[0], a.corner[0], matrix[0]);
-    func_002830C0(a.corner[1], a.corner[1], matrix[0]);
+    transform_vector(a.corner[0], a.corner[0], matrix[0]);
+    transform_vector(a.corner[1], a.corner[1], matrix[0]);
     qcopy(b.corner[0], outer);
     func_002EE178_1((char *)b.corner[1], (char *)b.corner[0], -1.0f);
-    func_002830C0(b.corner[0], b.corner[0], matrix[0]);
-    func_002830C0(b.corner[1], b.corner[1], matrix[0]);
+    transform_vector(b.corner[0], b.corner[0], matrix[0]);
+    transform_vector(b.corner[1], b.corner[1], matrix[0]);
     for (i = 1; i < count - 1; i++) {
         qcopy(a.corner[2], inner);
         func_002EE178_1((char *)a.corner[3], (char *)a.corner[2], -1.0f);
@@ -78,24 +78,24 @@ void func_L00_003BC468(int unused, int width, Vec16_Fc936841d *points, int count
         func_002EE178_1((char *)b.corner[3], (char *)b.corner[2], -1.0f);
         func_802EE138_1(matrix[0], (float *)&points[i + 1], (char *)&points[i]);
         func_802EE3D0_1(matrix[0], matrix[0], 1.0f);
-        func_802EE138_1(matrix[1], (float *)D_L00_001B8DC0, (char *)&points[i]);
-        func_00282DD8(matrix[2], matrix[1], matrix[0]);
+        func_802EE138_1(matrix[1], (float *)gCameraPosition_L00, (char *)&points[i]);
+        FastVecCross(matrix[2], matrix[1], matrix[0]);
         func_802EE3D0_1(matrix[2], matrix[2], 1.0f);
-        func_00282DD8(matrix[1], matrix[0], matrix[2]);
+        FastVecCross(matrix[1], matrix[0], matrix[2]);
         qcopy(matrix[3], &points[i]);
-        func_002830C0(a.corner[2], a.corner[2], matrix[0]);
-        func_002830C0(a.corner[3], a.corner[3], matrix[0]);
-        func_002830C0(b.corner[2], b.corner[2], matrix[0]);
-        func_002830C0(b.corner[3], b.corner[3], matrix[0]);
-        t = func_00283CE0(i);
-        u = func_00283CE0(count);
+        transform_vector(a.corner[2], a.corner[2], matrix[0]);
+        transform_vector(a.corner[3], a.corner[3], matrix[0]);
+        transform_vector(b.corner[2], b.corner[2], matrix[0]);
+        transform_vector(b.corner[3], b.corner[3], matrix[0]);
+        t = IntToFloat(i);
+        u = IntToFloat(count);
         t = t / (u - 2.0f);
-        a.color[2] = a.color[3] = func_00283D38(0x7F0072FF, 0x7FDDB973, t);
-        b.color[2] = b.color[3] = func_00283D38(0x7F0072FF, 0x40FF0000, t);
+        a.color[2] = a.color[3] = FastTweenColor(0x7F0072FF, 0x7FDDB973, t);
+        b.color[2] = b.color[3] = FastTweenColor(0x7F0072FF, 0x40FF0000, t);
 
         func_802EAC30_1((char *)&a, 0, 0);
         func_802EAC30_1((char *)&b, 0, 0);
-        u = func_00283CE0(i) * 0.33f;
+        u = IntToFloat(i) * 0.33f;
         v = u + 0.33f;
         if (u >= 1.0f) { u -= 1.0f; v -= 1.0f; }
         a.color[0] = a.color[1] = a.color[2];
@@ -114,6 +114,7 @@ extern void ref_L00_003BCF88_00(Vec16_Fc936841d *, int);
 extern void ref_L00_003BCF88_01(char *);
 /* The same two ribbons as func_L00_003BC468, an eighth as wide, with the
    last segment's edges drawn together at their midpoint. */
+/* Draws a thinner copy of the two-color ribbon, with the far end pinched to a point. */
 void func_L00_003BCF88(int unused, int width, Vec16_Fc936841d *points, int count)
 {
     RibbonPacket a, b;
@@ -138,8 +139,8 @@ void func_L00_003BCF88(int unused, int width, Vec16_Fc936841d *points, int count
     *(Rac2TI128 *)outer = 0;
     inner[3] = 1.0f;
     outer[3] = 1.0f;
-    inner[2] = func_002A7878(0.005f, 0.085f) * 0.25f;
-    outer[2] = func_002A7878(0.1f, 0.25f) * 0.25f;
+    inner[2] = RandomFloatRange(0.005f, 0.085f) * 0.25f;
+    outer[2] = RandomFloatRange(0.1f, 0.25f) * 0.25f;
     ref_L00_003BCF88_00(points, count);
     ref_L00_003BCF88_01((char *)&a);
     ref_L00_003BCF88_01((char *)&b);
@@ -149,19 +150,19 @@ void func_L00_003BCF88(int unused, int width, Vec16_Fc936841d *points, int count
     b.uv[4] = 0.33f; b.uv[5] = 0; b.uv[6] = 0.33f; b.uv[7] = 1;
     func_802EE138_1(matrix[0], (float *)&points[1], (char *)points);
     func_802EE3D0_1(matrix[0], matrix[0], 1.0f);
-    func_802EE138_1(matrix[1], (float *)D_L00_001B8DC0, (char *)points);
-    func_00282DD8(matrix[2], matrix[1], matrix[0]);
+    func_802EE138_1(matrix[1], (float *)gCameraPosition_L00, (char *)points);
+    FastVecCross(matrix[2], matrix[1], matrix[0]);
     func_802EE3D0_1(matrix[2], matrix[2], 1.0f);
-    func_00282DD8(matrix[1], matrix[0], matrix[2]);
+    FastVecCross(matrix[1], matrix[0], matrix[2]);
     qcopy(matrix[3], points);
     qcopy(a.corner[0], inner);
     func_002EE178_1((char *)a.corner[1], (char *)a.corner[0], -1.0f);
-    func_002830C0(a.corner[0], a.corner[0], matrix[0]);
-    func_002830C0(a.corner[1], a.corner[1], matrix[0]);
+    transform_vector(a.corner[0], a.corner[0], matrix[0]);
+    transform_vector(a.corner[1], a.corner[1], matrix[0]);
     qcopy(b.corner[0], outer);
     func_002EE178_1((char *)b.corner[1], (char *)b.corner[0], -1.0f);
-    func_002830C0(b.corner[0], b.corner[0], matrix[0]);
-    func_002830C0(b.corner[1], b.corner[1], matrix[0]);
+    transform_vector(b.corner[0], b.corner[0], matrix[0]);
+    transform_vector(b.corner[1], b.corner[1], matrix[0]);
     for (i = 1; i < count - 1; i++) {
         qcopy(a.corner[2], inner);
         func_002EE178_1((char *)a.corner[3], (char *)a.corner[2], -1.0f);
@@ -169,23 +170,23 @@ void func_L00_003BCF88(int unused, int width, Vec16_Fc936841d *points, int count
         func_002EE178_1((char *)b.corner[3], (char *)b.corner[2], -1.0f);
         func_802EE138_1(matrix[0], (float *)&points[i + 1], (char *)&points[i]);
         func_802EE3D0_1(matrix[0], matrix[0], 1.0f);
-        func_802EE138_1(matrix[1], (float *)D_L00_001B8DC0, (char *)&points[i]);
-        func_00282DD8(matrix[2], matrix[1], matrix[0]);
+        func_802EE138_1(matrix[1], (float *)gCameraPosition_L00, (char *)&points[i]);
+        FastVecCross(matrix[2], matrix[1], matrix[0]);
         func_802EE3D0_1(matrix[2], matrix[2], 1.0f);
-        func_00282DD8(matrix[1], matrix[0], matrix[2]);
+        FastVecCross(matrix[1], matrix[0], matrix[2]);
         qcopy(matrix[3], &points[i]);
-        func_002830C0(a.corner[2], a.corner[2], matrix[0]);
-        func_002830C0(a.corner[3], a.corner[3], matrix[0]);
-        func_002830C0(b.corner[2], b.corner[2], matrix[0]);
-        func_002830C0(b.corner[3], b.corner[3], matrix[0]);
-        t = func_00283CE0(i);
-        u = func_00283CE0(count);
+        transform_vector(a.corner[2], a.corner[2], matrix[0]);
+        transform_vector(a.corner[3], a.corner[3], matrix[0]);
+        transform_vector(b.corner[2], b.corner[2], matrix[0]);
+        transform_vector(b.corner[3], b.corner[3], matrix[0]);
+        t = IntToFloat(i);
+        u = IntToFloat(count);
         t = t / (u - 2.0f);
-        a.color[2] = a.color[3] = func_00283D38(0x7F0072FF, 0x7FDDB973, t);
-        b.color[2] = b.color[3] = func_00283D38(0x7F0072FF, 0x40FF0000, t);
+        a.color[2] = a.color[3] = FastTweenColor(0x7F0072FF, 0x7FDDB973, t);
+        b.color[2] = b.color[3] = FastTweenColor(0x7F0072FF, 0x40FF0000, t);
         if (i == count - 2) {
-            func_00282D08(a.corner[2], a.corner[2], a.corner[3], 0.5f);
-            func_00282D08(b.corner[2], b.corner[2], b.corner[3], 0.5f);
+            lerp_vector(a.corner[2], a.corner[2], a.corner[3], 0.5f);
+            lerp_vector(b.corner[2], b.corner[2], b.corner[3], 0.5f);
             qcopy(a.corner[3], a.corner[2]);
             qcopy(b.corner[3], b.corner[2]);
         }
@@ -193,7 +194,7 @@ void func_L00_003BCF88(int unused, int width, Vec16_Fc936841d *points, int count
         func_802EAC30_1((char *)&b, 0, 0);
         {
             float step = 0.33f;
-            u = func_00283CE0(i) * step;
+            u = IntToFloat(i) * step;
             v = u + step;
         }
         if (u >= 1.0f) { u -= 1.0f; v -= 1.0f; }

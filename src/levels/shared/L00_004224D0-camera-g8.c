@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 extern char D_L00_001B8E20[];
 typedef struct { char pad[0x2290]; char *owner; int mode; char pad2[0x1c]; unsigned char flag; } CameraPlayer;
 extern CameraPlayer D_L00_00189E20;
@@ -10,26 +11,27 @@ extern void func_L00_00424A08(int, float, float);
 #define F(p,n) (*(float *)((p)+(n)))
 #define S(p,n) (*(short *)((p)+(n)))
 #define P(p,n) (*(char **)((p)+(n)))
+/* Picks the follow camera's easing speeds, slowing the movement when the hero is facing toward the camera. */
 void func_L00_00425A98(char *obj, float *out1, float *out2)
 {
     char *base = P(obj,112);
     char *state = base+576;
     char *movement = base+352;
     char *camera = D_L00_001B8E20;
-    float t, target, value;
+    float blend, target, value;
     if (!S(state,6) && ((S(state,4) && F(camera,164)==0.0f &&
-         func_00282DB0(D_L00_00189E20.owner+192,obj)<=-0.3f) ||
-        (func_00282C48(F(camera,164))>0.0001f &&
-         func_00282DB0(camera+128,obj)<=-0.3f))) {
+         FastVecDot(D_L00_00189E20.owner+192,obj)<=-0.3f) ||
+        (FloatAbs(F(camera,164))>0.0001f &&
+         FastVecDot(camera+128,obj)<=-0.3f))) {
         S(state,4)=120;
-        t=F(camera,164)*14.285699844360352f;
-        if (t>1.0f) t=1.0f;
+        blend=F(camera,164)*14.285699844360352f;
+        if (blend>1.0f) blend=1.0f;
         target = D_L00_00189E20.flag==1 ? 4.0f : F(state,12);
-        value=F(movement,88)+(target-F(movement,88))*t;
+        value=F(movement,88)+(target-F(movement,88))*blend;
         if (value>F(state,8)) F(state,8)=value;
-        func_L00_00424A08(0,F(state,8),0.003000000026077032f);
-        *out1=D_L00_001B14E0+(D_L00_001B1508-D_L00_001B14E0)*t;
-        *out2=D_L00_001B14E4+(D_L00_001B150C-D_L00_001B14E4)*t;
+        follow_camera_set_distance(0,F(state,8),0.003000000026077032f);
+        *out1=D_L00_001B14E0+(D_L00_001B1508-D_L00_001B14E0)*blend;
+        *out2=D_L00_001B14E4+(D_L00_001B150C-D_L00_001B14E4)*blend;
     } else {
         if (S(state,4)) {
             S(state,4)=0;

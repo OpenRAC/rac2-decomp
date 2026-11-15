@@ -8,6 +8,7 @@ extern void *r1_D_0012F86C NOT_SDA;
 /* newlib's rand(), as newlib writes it: one expression that reads
    _REENT (r1_D_0012F86C) twice. +0x58 is _REENT->_next, which srand
    (r1_func_001160C8 above) sets. */
+/* Gives the next random number from the library random number generator. */
 int func_001163B0(void) {
     return (*(unsigned int *)((char *)r1_D_0012F86C + 0x58) =
             *(unsigned int *)((char *)r1_D_0012F86C + 0x58) * 1103515245 + 12345) & 0x7FFFFFFF;
@@ -42,4 +43,5 @@ int func_001163B0(void) {
 
 /* func_00118CC8 is defined in 00118CC8.c with quadword saves. */
 
+/* Calls the system routine that this library step needs (small assembly stub). */
 ASM_FUNC("asm/core", func_0011A7F8);

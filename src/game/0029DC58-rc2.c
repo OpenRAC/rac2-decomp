@@ -25,11 +25,12 @@
 
 extern s8 D_001397E0[];
 extern u8 D_001A7A0A;
+/* Returns 1 when one status bit is set and a flag byte is clear, otherwise 0. */
 s32 func_0029DC58(void) {
-    s32 var_v0;
+    s32 result;
 
-    if ((D_001A7A0A != 0) || (var_v0 = 1, ((*(s32 *)((s32)D_001397E0) & 0x08000000) == 0))) {
-        var_v0 = 0;
+    if ((D_001A7A0A != 0) || (result = 1, ((*(s32 *)((s32)D_001397E0) & 0x08000000) == 0))) {
+        result = 0;
     }
-    return var_v0;
+    return result;
 }

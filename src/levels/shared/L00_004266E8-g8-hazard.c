@@ -29,67 +29,68 @@ float func_00283BE0(float,float);
 int func_00277258(void *,int,void *,float);
 
 /* Adapted from RAC1 update_hero_aligned_camera_from_input, camera_modes_and_scripts.c. */
-void func_L00_004266E8(u8 *o) {
+/* Turns the aligned camera left, right, up and down from the control stick and keeps it from tilting too far. */
+void func_L00_004266E8(u8 *camera) {
     V up;
     V side;
     V d;
-    S_9f38 *st;
-    float t, r, k;
-    char *params = *(char **)(D_L00_001B1844 + *(short *)(o + 0x84) * 0x20 + 0x1C);
-    st = *(S_9f38 **)(o + 0x70);
-    func_L00_00426480(o);
-    func_00282F20(&up, D_00189E20.p2290 + 0xE0, 1.0f);
-    if (D_L00_001B8C80_1.phase == 0 && D_00189E20.b22B5 == 0) D_00189E20.b22B5 = 1;
-    t = -D_00138180.f108;
-    if (t == 0.0f) t = -D_00138180.f100;
-    if (t == 0.0f) t = func_00283CE0((D_00138180.i1A0 >> 15) & 1);
-    if (t == 0.0f) t = -func_00283CE0((D_00138180.i1A0 >> 13) & 1);
-    if (*(short *)(params + 0x26)) t = 0.0f;
-    r = func_00282C48(st->a);
-    k = D_L00_001B15C8 + (D_L00_001B15CC - D_L00_001B15C8) * r;
-    st->a = r = func_002702C8(st->a, t, D_L00_001B15D0, D_L00_001B15D4, D_L00_001B15D8, &st->va);
-    if (r != 0.0f) func_002ACEC0(o, o, &up, k * r);
-    if (D_00189E20.f15C != 0.0f && D_00189E20.s348 == 0 && D_001A8FF0 == 0)
-        func_002ACEC0(o, o, &up, D_00189E20.f15C);
-    t = -D_00138180.f10C;
-    if (t == 0.0f) t = -D_00138180.f104;
-    if (t == 0.0f) t = func_00283CE0((D_00138180.i1A0 >> 12) & 1);
-    if (t == 0.0f) t = -func_00283CE0((D_00138180.i1A0 >> 14) & 1);
-    if (D_L00_001B8C80_1.phase != 0 && D_00189E20.i22A0 == 2) t = 0.0f;
-    if (*(short *)(params + 0x26)) t = 0.0f;
-    if (D_001A7BA0[1] == 0) t = -t;
-    r = func_00282C48(st->b);
-    k = D_L00_001B15C8 + (D_L00_001B15CC - D_L00_001B15C8) * r;
-    st->b = func_002702C8(st->b, t, D_L00_001B15D0, D_L00_001B15D4, D_L00_001B15D8, &st->vb);
-    if (st->b != 0.0f) {
-        float a, n, z;
-        func_00282DD8(&side, o, &up);
-        a = k * st->b;
-        n = func_00282C48(func_00283B98(st->ang, a));
-        if (1.1170108318328857f < n && func_00282C48(st->ang) < n)
-            a += -a * (func_00283BE0(n, 1.1170108318328857f) * 2.86478853225708f);
-        if (n >= 1.1152654886245728f && st->ang > 0.0f)
-            st->z = func_002702C8(st->z, 0.5f, 0.005f, 0.2f, 0.0f, &st->vz);
+    S_9f38 *state;
+    float stick, turn, speed;
+    char *params = *(char **)(D_L00_001B1844 + *(short *)(camera + 0x84) * 0x20 + 0x1C);
+    state = *(S_9f38 **)(camera + 0x70);
+    BuildCameraAimFromHero(camera);
+    vec_scale_to_length(&up, gHeroState.p2290 + 0xE0, 1.0f);
+    if (D_L00_001B8C80_1.phase == 0 && gHeroState.b22B5 == 0) gHeroState.b22B5 = 1;
+    stick = -gPadState.f108;
+    if (stick == 0.0f) stick = -gPadState.f100;
+    if (stick == 0.0f) stick = IntToFloat((gPadState.i1A0 >> 15) & 1);
+    if (stick == 0.0f) stick = -IntToFloat((gPadState.i1A0 >> 13) & 1);
+    if (*(short *)(params + 0x26)) stick = 0.0f;
+    turn = FloatAbs(state->a);
+    speed = D_L00_001B15C8 + (D_L00_001B15CC - D_L00_001B15C8) * turn;
+    state->a = turn = StepSpringDamperClamped(state->a, stick, D_L00_001B15D0, D_L00_001B15D4, D_L00_001B15D8, &state->va);
+    if (turn != 0.0f) ApplyAxisRotationToQuaternion(camera, camera, &up, speed * turn);
+    if (gHeroState.f15C != 0.0f && gHeroState.s348 == 0 && D_001A8FF0 == 0)
+        ApplyAxisRotationToQuaternion(camera, camera, &up, gHeroState.f15C);
+    stick = -gPadState.f10C;
+    if (stick == 0.0f) stick = -gPadState.f104;
+    if (stick == 0.0f) stick = IntToFloat((gPadState.i1A0 >> 12) & 1);
+    if (stick == 0.0f) stick = -IntToFloat((gPadState.i1A0 >> 14) & 1);
+    if (D_L00_001B8C80_1.phase != 0 && gHeroState.i22A0 == 2) stick = 0.0f;
+    if (*(short *)(params + 0x26)) stick = 0.0f;
+    if (D_001A7BA0[1] == 0) stick = -stick;
+    turn = FloatAbs(state->b);
+    speed = D_L00_001B15C8 + (D_L00_001B15CC - D_L00_001B15C8) * turn;
+    state->b = StepSpringDamperClamped(state->b, stick, D_L00_001B15D0, D_L00_001B15D4, D_L00_001B15D8, &state->vb);
+    if (state->b != 0.0f) {
+        float step, tilt, zero;
+        FastVecCross(&side, camera, &up);
+        step = speed * state->b;
+        tilt = FloatAbs(FastAddRotations(state->ang, step));
+        if (1.1170108318328857f < tilt && FloatAbs(state->ang) < tilt)
+            step += -step * (fast_subtract_rotations(tilt, 1.1170108318328857f) * 2.86478853225708f);
+        if (tilt >= 1.1152654886245728f && state->ang > 0.0f)
+            state->z = StepSpringDamperClamped(state->z, 0.5f, 0.005f, 0.2f, 0.0f, &state->vz);
         else
-            st->z = func_002702C8(st->z, 0.0f, 0.005f, 0.2f, 0.0f, &st->vz);
-        z = 0.0f;
-        d.f[0] = *(float *)(o + 0);
-        d.f[1] = *(float *)(o + 4);
-        d.f[3] = z;
-        d.f[2] = z;
-        func_00282F20(&d, &d, st->z);
-        func_00282CC0(o + 0x30, o + 0x30, &d);
-        if (func_00277258(o + 0x30, 0x12, D_00189E20.p2290, 0.3f))
-            st->z = func_002702C8(st->z, z, 0.005f, 0.2f, z, &st->vz);
-        n = func_00283B98(st->ang, a);
-        if (func_00282C48(n) > 1.4660767316818237f)
-            { float m = 1.4660767316818237f; if (!(z < n)) m = -1.4660767316818237f; a = func_00283BE0(m, st->ang); }
-        func_002ACEC0(o, o, &side, a);
-        st->ang = func_00283B98(st->ang, a);
+            state->z = StepSpringDamperClamped(state->z, 0.0f, 0.005f, 0.2f, 0.0f, &state->vz);
+        zero = 0.0f;
+        d.f[0] = *(float *)(camera + 0);
+        d.f[1] = *(float *)(camera + 4);
+        d.f[3] = zero;
+        d.f[2] = zero;
+        vec_scale_to_length(&d, &d, state->z);
+        FastVecAdd(camera + 0x30, camera + 0x30, &d);
+        if (TestPointAgainstCollision(camera + 0x30, 0x12, gHeroState.p2290, 0.3f))
+            state->z = StepSpringDamperClamped(state->z, zero, 0.005f, 0.2f, zero, &state->vz);
+        tilt = FastAddRotations(state->ang, step);
+        if (FloatAbs(tilt) > 1.4660767316818237f)
+            { float limit = 1.4660767316818237f; if (!(zero < tilt)) limit = -1.4660767316818237f; step = fast_subtract_rotations(limit, state->ang); }
+        ApplyAxisRotationToQuaternion(camera, camera, &side, step);
+        state->ang = FastAddRotations(state->ang, step);
     }
-    func_00282F20(o, o, 1.0f);
-    func_00282DD8(o + 0x10, o, &up);
-    func_00282F20(o + 0x10, o + 0x10, 1.0f);
-    func_00282DD8(o + 0x20, o + 0x10, o);
+    vec_scale_to_length(camera, camera, 1.0f);
+    FastVecCross(camera + 0x10, camera, &up);
+    vec_scale_to_length(camera + 0x10, camera + 0x10, 1.0f);
+    FastVecCross(camera + 0x20, camera + 0x10, camera);
     *(short *)(params + 0x26) = 0;
 }

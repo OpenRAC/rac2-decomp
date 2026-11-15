@@ -1,3 +1,4 @@
+#include "names.h"
 extern void func_002FC3C0(int);
 extern int func_00126288(void *, short, short, short, short, short, short, short);
 extern int func_001265B0(void *, void *);
@@ -16,17 +17,18 @@ typedef struct {
     int count;
 } UploadQueue;
 
+/* Sends every waiting texture block to the graphics chip and empties the queue. */
 void func_0034EB20(UploadQueue *queue)
 {
     unsigned char buffer[0x60];
     int i;
 
-    func_002FC3C0(1);
+    WaitForDmaStatusBits(1);
     for (i = 0; i < queue->count; i++) {
         func_00126288(buffer, queue->slots[i].value, 1, 0, 0, 0, 0x10, 0x10);
-        func_0011AEA0(0);
-        func_001265B0(buffer, queue->blocks[i]);
-        func_001244B8(0, 0);
+        FlushCache(0);
+        ExecGsLoadImage(buffer, queue->blocks[i]);
+        WaitGsPathsIdle(0, 0);
     }
     queue->count = 0;
 }

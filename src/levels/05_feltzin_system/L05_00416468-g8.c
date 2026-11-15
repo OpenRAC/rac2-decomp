@@ -24,12 +24,12 @@ void func_L05_00416468(char *obj)
 
     for (i = 0; i < 128; i++) {
         if (*(char **)(origin + 0x10) == obj) {
-            func_L05_00416698(position, next, 0x807F7F7F, 0.025f, D_L05_001B0F48);
-            func_L05_00416698(position, next, 0x60008000, 0.05f, D_L05_001B0F48);
-            func_00281EB8(origin, 0x31, 0x60008000, 1, 1.35f, 0.35f, func_002A7940());
-            func_00281EB8(origin, 0x31, 0x807F7F7F, 1, 1.0f, 0.35f, func_002A7940());
-            func_00281EB8(next, 0x31, 0x60008000, 1, 0.125f, 0.08f, func_002A7940());
-            func_00281EB8(next, 0x31, 0x807F7F7F, 1, 0.08f, 0.08f, func_002A7940());
+            DrawBeamStrip_L05(position, next, 0x807F7F7F, 0.025f, D_L05_001B0F48);
+            DrawBeamStrip_L05(position, next, 0x60008000, 0.05f, D_L05_001B0F48);
+            DrawBillboardQuad_00281EB8(origin, 0x31, 0x60008000, 1, 1.35f, 0.35f, RandomAngle());
+            DrawBillboardQuad_00281EB8(origin, 0x31, 0x807F7F7F, 1, 1.0f, 0.35f, RandomAngle());
+            DrawBillboardQuad_00281EB8(next, 0x31, 0x60008000, 1, 0.125f, 0.08f, RandomAngle());
+            DrawBillboardQuad_00281EB8(next, 0x31, 0x807F7F7F, 1, 0.08f, 0.08f, RandomAngle());
         }
         origin += 0x50;
         next += 0x50;

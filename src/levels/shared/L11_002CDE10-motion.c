@@ -63,106 +63,106 @@ void func_L11_002CDE10(void)
     float limit, magnitude, component, savedW;
     int state;
 
-    qcopy(initial.f, (char *)&D_00189E20.position);
-    func_L00_002D4140(D_00189E20.attachment, (char *)&D_00189E20.impulse, (u8 *)&D_00189E20 + 0x90);
-    state = D_00189E20.state;
+    qcopy(initial.f, (char *)&gHeroState.position);
+    UpdateHeroAttachment(gHeroState.attachment, (char *)&gHeroState.impulse, (u8 *)&gHeroState + 0x90);
+    state = gHeroState.state;
     if (state == 0x14 || state == 0x5B || state == 0x58 || state == 0x81) {
-        if (D_00189E20.collisionOffFrames == 0) {
-            magnitude = func_L00_002D3A58((char *)&D_00189E20.velocity);
-            limit = D_00189E20.radius - 0.02f;
+        if (gHeroState.collisionOffFrames == 0) {
+            magnitude = GetViewSpaceVectorLength((char *)&gHeroState.velocity);
+            limit = gHeroState.radius - 0.02f;
             if (limit < magnitude)
-                func_L00_002D3BD8((char *)&D_00189E20.velocity, (int)(char *)&D_00189E20.velocity, limit);
+                SetViewSpaceVectorLength((char *)&gHeroState.velocity, (int)(char *)&gHeroState.velocity, limit);
         }
-        component = func_L00_002D3B00((char *)&D_00189E20.velocity);
-        if (component < -D_00189E20.downLimit) {
-            limit = -D_00189E20.downLimit - 0.02f;
+        component = GetViewSpaceHeight((char *)&gHeroState.velocity);
+        if (component < -gHeroState.downLimit) {
+            limit = -gHeroState.downLimit - 0.02f;
             if (limit > 0.0f)
                 limit = 0.0f;
-            func_L00_002D3B58((TI128 *)(char *)&D_00189E20.velocity, (TI128 *)(char *)&D_00189E20.velocity, limit);
+            SetViewSpaceHeight((TI128 *)(char *)&gHeroState.velocity, (TI128 *)(char *)&gHeroState.velocity, limit);
         }
-    } else if (D_00189E20.controlMode != 13) {
-        if (D_00189E20.controlMode != 14) {
-            if (state != 0x44 && D_00189E20.collisionOffFrames == 0) {
-                magnitude = func_00282DF0((char *)&D_00189E20.velocity);
-                limit = D_00189E20.radius - 0.02f;
+    } else if (gHeroState.controlMode != 13) {
+        if (gHeroState.controlMode != 14) {
+            if (state != 0x44 && gHeroState.collisionOffFrames == 0) {
+                magnitude = FastVecLength((char *)&gHeroState.velocity);
+                limit = gHeroState.radius - 0.02f;
                 if (limit < magnitude)
-                    func_00282F20((char *)&D_00189E20.velocity, (char *)&D_00189E20.velocity, limit);
+                    vec_scale_to_length((char *)&gHeroState.velocity, (char *)&gHeroState.velocity, limit);
             }
         }
     }
-    func_00282CC0((char *)&D_00189E20.position, (char *)&D_00189E20.position, (char *)&D_00189E20.velocity);
-    func_00282CC0((char *)&D_00189E20.position, (char *)&D_00189E20.position, &D_00189E20.extraStep);
-    func_00282C88((TI128 *)&D_00189E20.extraStep);
-    D_00189E20.collHit = 0;
-    D_00189E20.wallHit = 0;
-    if (func_00282DF0((char *)&D_00189E20.impulse) <= 0.0001f) {
-        func_L00_002B5A88();
-        func_L09_002B7238();
-        func_00282CF0((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
-        func_L00_002B5250();
+    FastVecAdd((char *)&gHeroState.position, (char *)&gHeroState.position, (char *)&gHeroState.velocity);
+    FastVecAdd((char *)&gHeroState.position, (char *)&gHeroState.position, &gHeroState.extraStep);
+    ClearVector128((TI128 *)&gHeroState.extraStep);
+    gHeroState.collHit = 0;
+    gHeroState.wallHit = 0;
+    if (FastVecLength((char *)&gHeroState.impulse) <= 0.0001f) {
+        ResolveHeroCollisionWithRewind();
+        ProbeHeroGround();
+        FastVecSub((char *)&gHeroState.displacement, (char *)&gHeroState.position, initial.f);
+        EaseHeroPositionToGoal();
     } else {
-        func_L09_002B7238();
+        ProbeHeroGround();
     }
 
-    resolved = &D_00189E20.projected;
-    func_00282CF0((char *)resolved, (char *)&D_00189E20.position, initial.f);
-    qcopy((char *)&D_00189E20.flat, (char *)resolved);
-    qcopy((char *)&D_00189E20.up, (char *)resolved);
-    func_00282F20((char *)resolved, (char *)resolved, 1.0f);
-    magnitude = func_00282DB0((char *)resolved, (char *)&D_00189E20.velocity);
+    resolved = &gHeroState.projected;
+    FastVecSub((char *)resolved, (char *)&gHeroState.position, initial.f);
+    qcopy((char *)&gHeroState.flat, (char *)resolved);
+    qcopy((char *)&gHeroState.up, (char *)resolved);
+    vec_scale_to_length((char *)resolved, (char *)resolved, 1.0f);
+    magnitude = FastVecDot((char *)resolved, (char *)&gHeroState.velocity);
     if (magnitude < 0.0f)
         magnitude = 0.0f;
-    func_00282F20((char *)resolved, (char *)&D_00189E20.velocity, magnitude);
-    qcopy(planar.f, (char *)&D_00189E20.velocity);
-    func_L00_002D3960((char *)planar.f, (char *)planar.f);
-    func_L00_002D3960((char *)&D_00189E20.flat, (char *)&D_00189E20.flat);
-    func_00282F20((char *)&D_00189E20.flat, (char *)&D_00189E20.flat, 1.0f);
-    magnitude = func_00282DB0((char *)&D_00189E20.flat, planar.f);
+    vec_scale_to_length((char *)resolved, (char *)&gHeroState.velocity, magnitude);
+    qcopy(planar.f, (char *)&gHeroState.velocity);
+    ProjectVectorOntoViewPlane((char *)planar.f, (char *)planar.f);
+    ProjectVectorOntoViewPlane((char *)&gHeroState.flat, (char *)&gHeroState.flat);
+    vec_scale_to_length((char *)&gHeroState.flat, (char *)&gHeroState.flat, 1.0f);
+    magnitude = FastVecDot((char *)&gHeroState.flat, planar.f);
     if (magnitude < 0.0f)
         magnitude = 0.0f;
-    func_00282F20((char *)&D_00189E20.flat, planar.f, magnitude);
-    qcopy(vertical.f, (char *)&D_00189E20.velocity);
-    func_L00_002D3BD8((char *)vertical.f, (int)vertical.f, 0.0f);
-    func_L00_002D3BD8((char *)&D_00189E20.up, (int)(char *)&D_00189E20.up, 0.0f);
-    func_00282F20((char *)&D_00189E20.up, (char *)&D_00189E20.up, 1.0f);
-    magnitude = func_00282DB0((char *)&D_00189E20.up, vertical.f);
+    vec_scale_to_length((char *)&gHeroState.flat, planar.f, magnitude);
+    qcopy(vertical.f, (char *)&gHeroState.velocity);
+    SetViewSpaceVectorLength((char *)vertical.f, (int)vertical.f, 0.0f);
+    SetViewSpaceVectorLength((char *)&gHeroState.up, (int)(char *)&gHeroState.up, 0.0f);
+    vec_scale_to_length((char *)&gHeroState.up, (char *)&gHeroState.up, 1.0f);
+    magnitude = FastVecDot((char *)&gHeroState.up, vertical.f);
     if (magnitude < 0.0f)
         magnitude = 0.0f;
-    func_00282F20((char *)&D_00189E20.up, vertical.f, magnitude);
-    D_00189E20.speed = func_00282DF0((char *)resolved);
-    magnitude = func_L00_002D3A58((char *)resolved);
+    vec_scale_to_length((char *)&gHeroState.up, vertical.f, magnitude);
+    gHeroState.speed = FastVecLength((char *)resolved);
+    magnitude = GetViewSpaceVectorLength((char *)resolved);
     planar.q = resolved->q;
-    D_00189E20.flatSpeed = magnitude;
-    D_00189E20.forwardSpeed = func_L00_002B5590(planar.f);
-    D_00189E20.verticalSpeed = func_L00_002D3B00((char *)resolved);
-    if (D_00189E20.forwardSpeed < 0.0f)
-        D_00189E20.forwardSpeed = 0.0f;
-    qcopy(planar.f, (char *)&D_00189E20.position);
-    if (func_00282DF0((char *)&D_00189E20.impulse) > 0.0001f) {
-        func_00282CC0((char *)&D_00189E20.position, (char *)&D_00189E20.position, (char *)&D_00189E20.impulse);
-        savedW = D_00189E20.impulse.f[3];
-        func_00282C88((TI128 *)(char *)&D_00189E20.impulse);
-        D_00189E20.impulse.f[3] = savedW;
-        func_L00_002B5A88();
-        func_L09_002B7238();
-        func_00282CF0((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
-        func_L00_002B5250();
+    gHeroState.flatSpeed = magnitude;
+    gHeroState.forwardSpeed = GetSpeedAlongHeroForward(planar.f);
+    gHeroState.verticalSpeed = GetViewSpaceHeight((char *)resolved);
+    if (gHeroState.forwardSpeed < 0.0f)
+        gHeroState.forwardSpeed = 0.0f;
+    qcopy(planar.f, (char *)&gHeroState.position);
+    if (FastVecLength((char *)&gHeroState.impulse) > 0.0001f) {
+        FastVecAdd((char *)&gHeroState.position, (char *)&gHeroState.position, (char *)&gHeroState.impulse);
+        savedW = gHeroState.impulse.f[3];
+        ClearVector128((TI128 *)(char *)&gHeroState.impulse);
+        gHeroState.impulse.f[3] = savedW;
+        ResolveHeroCollisionWithRewind();
+        ProbeHeroGround();
+        FastVecSub((char *)&gHeroState.displacement, (char *)&gHeroState.position, initial.f);
+        EaseHeroPositionToGoal();
     }
-    func_00282CF0((char *)&D_00189E20.impulseMove, (char *)&D_00189E20.position, planar.f);
-    D_00189E20.impulseSpeed = func_00282DF0((char *)&D_00189E20.impulseMove);
-    D_00189E20.impulseMove.f[3] = D_00189E20.impulse.f[3];
-    D_00189E20.impulse.f[3] = 0.0f;
-    func_00282CF0((char *)&D_00189E20.displacement, (char *)&D_00189E20.position, initial.f);
-    D_00189E20.slope = 0.0f;
-    if (D_00189E20.flatSpeed > 0.004f) {
-        D_00189E20.slope = D_00189E20.displacement.f[2] / D_00189E20.flatSpeed;
-        if (D_00189E20.slope > 0.5f)
-            D_00189E20.slope = 0.5f;
-        else if (D_00189E20.slope < -0.5f)
-            D_00189E20.slope = -0.5f;
+    FastVecSub((char *)&gHeroState.impulseMove, (char *)&gHeroState.position, planar.f);
+    gHeroState.impulseSpeed = FastVecLength((char *)&gHeroState.impulseMove);
+    gHeroState.impulseMove.f[3] = gHeroState.impulse.f[3];
+    gHeroState.impulse.f[3] = 0.0f;
+    FastVecSub((char *)&gHeroState.displacement, (char *)&gHeroState.position, initial.f);
+    gHeroState.slope = 0.0f;
+    if (gHeroState.flatSpeed > 0.004f) {
+        gHeroState.slope = gHeroState.displacement.f[2] / gHeroState.flatSpeed;
+        if (gHeroState.slope > 0.5f)
+            gHeroState.slope = 0.5f;
+        else if (gHeroState.slope < -0.5f)
+            gHeroState.slope = -0.5f;
     }
-    if (D_00189E20.speed > 0.86666673f) {
-        func_00282D30((char *)&D_00189E20.displacement, (char *)&D_00189E20.displacement, 0.86666673f / D_00189E20.speed);
-        D_00189E20.speed = 0.86666673f;
+    if (gHeroState.speed > 0.86666673f) {
+        FastVecScale((char *)&gHeroState.displacement, (char *)&gHeroState.displacement, 0.86666673f / gHeroState.speed);
+        gHeroState.speed = 0.86666673f;
     }
 }

@@ -1,6 +1,7 @@
 /* func_L00_0038B888 in its own unit: the saved position is a 16-byte lq/sq copy, and the
    loop count's decrement stays below it (-frac2-qcopy -frac2-qcopy-barrier). */
 #include "include_asm.h"
+#include "names.h"
 
 typedef int Quad __attribute__((mode(TI)));
 
@@ -19,30 +20,30 @@ void func_L00_0038B888(float *position, int count)
 {
     float dir[4];
     float save[4];
-    float f20;
-    float f21;
-    float f22;
+    float pitch;
+    float yaw;
+    float speed;
     int sign;
-    int i;
-    float *sv;
+    int remaining;
+    float *savePos;
 
     if (count > 0) {
-        i = count;
-        sv = save;
+        remaining = count;
+        savePos = save;
         do {
-            f22 = func_002A7878(0.1f, 2.0f);
-            sign = func_002A77E0(2);
+            speed = RandomFloatRange(0.1f, 2.0f);
+            sign = RandomIntBelow(2);
             if (sign == 0)
                 sign = sign - 1;
-            f21 = func_002A7940();
-            f20 = func_002A7878(0.349065899848938f, 1.5358898639678955f);
-            func_002AF000(dir, func_002A7878(0.05f, 0.1f), f21, f20);
-            *(Quad *)sv = *(Quad *)position;
-            position[0] = position[0] + func_002A78D8(0.0f, 0.15f);
-            position[1] = position[1] + func_002A78D8(0.0f, 0.15f);
-            position[2] = position[2] + func_002A78D8(0.0f, 0.15f);
-            func_002C2210(position, 0x1E, 0x7F207F7F, 0, sign, dir, f22 * 0.1f, f22, 0.003f, 0);
-            func_002C2210(position, 0x1E, 0x7F7F7F7F, 1, -sign, dir, f22 * 0.07f, f22 * 0.7f, 0.003f, 0);
-        } while (--i != 0);
+            yaw = RandomAngle();
+            pitch = RandomFloatRange(0.349065899848938f, 1.5358898639678955f);
+            BuildSphericalOffset(dir, RandomFloatRange(0.05f, 0.1f), yaw, pitch);
+            *(Quad *)savePos = *(Quad *)position;
+            position[0] = position[0] + RandomSignedFloatRange(0.0f, 0.15f);
+            position[1] = position[1] + RandomSignedFloatRange(0.0f, 0.15f);
+            position[2] = position[2] + RandomSignedFloatRange(0.0f, 0.15f);
+            SpawnGroundEffectParticle(position, 0x1E, 0x7F207F7F, 0, sign, dir, speed * 0.1f, speed, 0.003f, 0);
+            SpawnGroundEffectParticle(position, 0x1E, 0x7F7F7F7F, 1, -sign, dir, speed * 0.07f, speed * 0.7f, 0.003f, 0);
+        } while (--remaining != 0);
     }
 }

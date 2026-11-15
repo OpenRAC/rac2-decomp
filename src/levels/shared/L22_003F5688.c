@@ -49,30 +49,30 @@ void func_L22_003F5688(u8 *object, int fullDensity)
     if ((float)i < count) {
         zero = (float)i;
         do {
-            float progress = func_00283CE0(i) * step;
+            float progress = IntToFloat(i) * step;
             float spread = baseWidth + progress * 0.1f;
             int firstColor, secondColor, kind, duration;
             float size;
 
             scratch.q = 0;
-            scratch.f[0] = func_002A78D8(zero, spread);
-            scratch.f[1] = func_002A78D8(zero, spread);
+            scratch.f[0] = RandomSignedFloatRange(zero, spread);
+            scratch.f[1] = RandomSignedFloatRange(zero, spread);
             scratch.f[2] = progress;
             position.q = scratch.q;
-            func_00283098(position.f, position.f, object + 0xC0);
-            func_00282CC0(position.f, position.f, object + 0x10);
-            firstColor = func_00283D38(D_L22_001B0A28_gp[0], D_L22_001B0A28[1],
-                                       func_002A7878(zero, 1.0f));
-            secondColor = func_00283D38(D_L22_001B0A28[2], D_L22_001B0A28[3],
-                                        func_002A7878(zero, 1.0f));
-            size = D_L22_001B0A38_gp[func_002A77E0(2)];
-            func_00282C88(scratch.f);
+            matrix_mul_vec3(position.f, position.f, object + 0xC0);
+            FastVecAdd(position.f, position.f, object + 0x10);
+            firstColor = FastTweenColor(D_L22_001B0A28_gp[0], D_L22_001B0A28[1],
+                                       RandomFloatRange(zero, 1.0f));
+            secondColor = FastTweenColor(D_L22_001B0A28[2], D_L22_001B0A28[3],
+                                        RandomFloatRange(zero, 1.0f));
+            size = D_L22_001B0A38_gp[RandomIntBelow(2)];
+            ClearVector128(scratch.f);
             scratch.f[3] = size;
-            func_00282C88(to.f);
+            ClearVector128(to.f);
             to.f[3] = size;
-            kind = func_002A7820(1, D_L22_001B0A48_gp[0]);
-            duration = func_002A7820(D_L22_001B0A4C[0], D_L22_001B0A4C[1]);
-            func_002BAA28(position.f, scratch.f, to.f, firstColor, secondColor, kind, duration,
+            kind = RandomIntRange(1, D_L22_001B0A48_gp[0]);
+            duration = RandomIntRange(D_L22_001B0A4C[0], D_L22_001B0A4C[1]);
+            SpawnTrailParticle_002BAA28(position.f, scratch.f, to.f, firstColor, secondColor, kind, duration,
                           60, D_L22_001B0A44_gp[0]);
             ++i;
         } while ((float)i < count);

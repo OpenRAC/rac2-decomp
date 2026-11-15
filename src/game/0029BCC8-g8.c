@@ -22,6 +22,7 @@ typedef struct {
     Slot slot2[2];
 } Sub;
 
+/* Runs the per-frame level callbacks and draws or updates the level, unless a callback asks to stop. */
 void func_0029BCD8(void)
 {
     int i;
@@ -35,7 +36,7 @@ void func_0029BCD8(void)
 
     if (D_001A8CFC[0] == 0)
         goto states;
-    func_0029BB30();
+    UpdateMissionSelectionMenu();
     fn = (Fn)((Sub *)(D_001A8CFC[0] + 0x38000))->cb2;
     if (fn != 0) {
         if (fn() != 0)
@@ -57,9 +58,9 @@ void func_0029BCD8(void)
     if (result != 0)
         return;
 states:
-    if (D_001A8BB0[0] != 0 && D_001A8BB0[0] != 5) {
-        if (D_001A8BB0[0] == 4) {
-            if (func_00285840() != 7)
+    if (gCurrentGameMode[0] != 0 && gCurrentGameMode[0] != 5) {
+        if (gCurrentGameMode[0] == 4) {
+            if (GetSavedMenuState() != 7)
                 return;
         }
     }
@@ -68,7 +69,7 @@ states:
         char *b = g + 0x38000;
         g = (char *)((Sub *)b)->cb1;
         ((Fn)g)();
-        func_0029B858();
+        RunLevelObjectUpdate();
     }
 }
 
@@ -101,6 +102,7 @@ typedef struct { char pad[0xB0]; float scale; } CamBf;
 /* The camera object: its projection scale is at +0xB0. */
 extern CamBf ref_L00_0030CFE0_01;
 
+/* Like the previous routine, but also draws the level with a temporary camera scale. */
 void func_0029BF08(void)
 {
     int result;
@@ -116,7 +118,7 @@ void func_0029BF08(void)
     if (D_001A8CFC[0] == 0)
         goto states;
 
-    func_00290680();
+    UpdateLetterboxBars();
     result = 0;
     func_0029BEB8();
 
@@ -140,9 +142,9 @@ void func_0029BF08(void)
         return;
 
 states:
-    if (D_001A8BB0[0] != 0 && D_001A8BB0[0] != 5) {
-        if (D_001A8BB0[0] == 4) {
-            if (func_00285840() != 7)
+    if (gCurrentGameMode[0] != 0 && gCurrentGameMode[0] != 5) {
+        if (gCurrentGameMode[0] == 4) {
+            if (GetSavedMenuState() != 7)
                 return;
         }
     }
@@ -154,10 +156,10 @@ states:
         ((Cb)g)();
         saved = ref_L00_0030CFE0_01.scale;
         ref_L00_0030CFE0_01.scale = 0.62f;
-        func_0027AB40();
+        UpdateViewContext();
         func_0029BE88();
         ref_L00_0030CFE0_01.scale = saved;
-        func_0027AB40();
+        UpdateViewContext();
     }
 }
 
@@ -184,16 +186,17 @@ extern State29D830 D_001B1A50[] __attribute__((sda));
 extern unsigned char D_001A7BE8[] MACRO_ADDR;
 extern int func_0029D9D0(int, int);
 
+/* Updates the state of each entry in the current list, runs their checks, and returns 1 when none are still pending. */
 int func_0029D830(void)
 {
     Entry29D830 *e;
 
-    D_001B1A50[0].list = D_00258BA0[D_001C4FA0.index];
+    D_001B1A50[0].list = D_00258BA0[gMapOverlayState.index];
     if (D_001B1A50[0].list == 0)
         return 0;
     e = D_001B1A50[0].list;
     for (; e->id != 0; e++) {
-        if ((e->flags & 4) && D_001A7BE8[D_001C4FA0.index] == 0) {
+        if ((e->flags & 4) && D_001A7BE8[gMapOverlayState.index] == 0) {
             e->state = 0;
             continue;
         }

@@ -29,26 +29,27 @@ extern f32 ref_L14_003C96E0_01(f32);
 extern void ref_L14_003C96E0_02(s8 *, s8 *, s8 *);
 extern void ref_L14_003C96E0_03(s8 *, s8 *, f32);
 
-void func_L14_003C96E0(s8 *arg0, s8 *arg1, f32 fparg0, f32 fparg1, f32 fparg2) {
-    f32 temp_f0;
-    f32 temp_f21;
-    f32 temp_f22;
-    f32 temp_f23;
-    s8 *temp_s1;
-    s8 *temp_s3;
+/* Starts a launch toward a target: works out the aim direction and the speeds from the heights and ranges, and puts the object into state 0x16. */
+void func_L14_003C96E0(s8 *moby, s8 *target, f32 apexZ, f32 rangeA, f32 rangeB) {
+    f32 scaledAngle;
+    f32 heightDelta;
+    f32 totalAngle;
+    f32 targetZ;
+    s8 *vars;
+    s8 *aimVector;
 
-    temp_s1 = *(s8 **)(arg0 + 0x68);
-    ref_L14_003C96E0_00(arg0, 0x16, 7);
-    temp_f21 = fparg0 - *(f32 *)(arg0 + 0x18);
-    temp_f21 = temp_f21 + temp_f21; temp_s3 = temp_s1 + 0x1B0; temp_f22 = ref_L14_003C96E0_01(temp_f21 / fparg1);
-    temp_f22 = temp_f22 + ref_L14_003C96E0_01((2.0f * (fparg0 - *(f32 *)(arg1 + 8))) / fparg2);
-    ref_L14_003C96E0_02(temp_s3, arg1, arg0 + 0x10);
-    ref_L14_003C96E0_03(temp_s3, temp_s3, 1.0f / temp_f22);
-    temp_f0 = ref_L14_003C96E0_01(temp_f21 * fparg1);
-    *(f32 *)(temp_s1 + 0x394) = fparg1;
-    *(f32 *)(temp_s1 + 0x398) = fparg2;
-    *(f32 *)(temp_s1 + 0x1B8) = temp_f0;
-    temp_f23 = *(f32 *)(arg1 + 8) + 0.333f;
-    *(s32 *)(temp_s1 + 0x14C) = -1;
-    *(f32 *)(temp_s1 + 0x3A0) = temp_f23;
+    vars = *(s8 **)(moby + 0x68);
+    ref_L14_003C96E0_00(moby, 0x16, 7);
+    heightDelta = apexZ - *(f32 *)(moby + 0x18);
+    heightDelta = heightDelta + heightDelta; aimVector = vars + 0x1B0; totalAngle = ref_L14_003C96E0_01(heightDelta / rangeA);
+    totalAngle = totalAngle + ref_L14_003C96E0_01((2.0f * (apexZ - *(f32 *)(target + 8))) / rangeB);
+    ref_L14_003C96E0_02(aimVector, target, moby + 0x10);
+    ref_L14_003C96E0_03(aimVector, aimVector, 1.0f / totalAngle);
+    scaledAngle = ref_L14_003C96E0_01(heightDelta * rangeA);
+    *(f32 *)(vars + 0x394) = rangeA;
+    *(f32 *)(vars + 0x398) = rangeB;
+    *(f32 *)(vars + 0x1B8) = scaledAngle;
+    targetZ = *(f32 *)(target + 8) + 0.333f;
+    *(s32 *)(vars + 0x14C) = -1;
+    *(f32 *)(vars + 0x3A0) = targetZ;
 }

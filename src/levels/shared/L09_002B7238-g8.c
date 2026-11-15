@@ -55,43 +55,43 @@ typedef union {
    (two colours by the toggle word, then a third). While neither level weight is above 0.95
    and +0x31 is set, joints 3 and 4 also spawn particles along the +0xC0 vector. */
 void func_L09_003E9AA0(char *object) {
-    char *data = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
     Quad_L09_003E9AA0 pos, vel, zero;
     int i, j, size, life;
 
     for (i = 5; i < 8; i++) {
-        func_0029FCC0(object, i, &pos);
-        if (func_00282E80(&pos, D_00189EA0) < D_L09_001B0C40) {
+        TransformMobyJointToWorld(object, i, &pos);
+        if (vec_distance_xy(&pos, gHeroPosition) < D_L09_001B0C40) {
             qcopy(&vel, &pos);
             vel.f[2] -= D_L09_001B0C44;
-            func_002A8C28(object, &vel, 0x10001, 0, 1, 0, D_L09_001B0C48,
-                          (float)*(unsigned char *)(data + 0x35), 2.0f);
+            SweepCollisionFromObject(object, &vel, 0x10001, 0, 1, 0, D_L09_001B0C48,
+                          (float)*(unsigned char *)(vars + 0x35), 2.0f);
         }
         if ((!(D_L09_001B2390 > 0.95f) && !(D_L09_001B238C > 0.95f) && *(unsigned char *)(object + 0x31))
-            || func_002A77E0(2)) {
+            || RandomIntBelow(2)) {
             zero.q = 0;
-            zero.f[2] = -(func_002A7878(4.5f, 5.5f) * (1.0f / 60.0f));
+            zero.f[2] = -(RandomFloatRange(4.5f, 5.5f) * (1.0f / 60.0f));
             vel.q = zero.q;
             if (D_L09_001B2388 & 1)
-                func_002BAE50(&pos, &vel, 0xCF0000FF, 207, func_002A7820(18, 22), 180, -10, 1);
+                SpawnScalingParticle(&pos, &vel, 0xCF0000FF, 207, RandomIntRange(18, 22), 180, -10, 1);
             else
-                func_002BAE50(&pos, &vel, 0x6000FFFF, 128, func_002A7820(20, 24), 350, -10, 1);
-            life = func_002A7820(20, 90);
-            size = func_002A7820(10, 15);
-            func_002BAE50(&pos, &vel, 0xEFFF7F4F, 0xFF0000, size, life, -life, 1);
+                SpawnScalingParticle(&pos, &vel, 0x6000FFFF, 128, RandomIntRange(20, 24), 350, -10, 1);
+            life = RandomIntRange(20, 90);
+            size = RandomIntRange(10, 15);
+            SpawnScalingParticle(&pos, &vel, 0xEFFF7F4F, 0xFF0000, size, life, -life, 1);
         }
     }
     if (!(D_L09_001B2390 > 0.95f) && !(D_L09_001B238C > 0.95f) && *(unsigned char *)(object + 0x31)) {
         for (j = 3; j < 5; j++) {
-            func_00282F20(&vel, object + 0xC0, -(func_002A7878(4.5f, 5.5f) * (1.0f / 60.0f)));
-            func_0029FCC0(object, j, &pos);
+            vec_scale_to_length(&vel, object + 0xC0, -(RandomFloatRange(4.5f, 5.5f) * (1.0f / 60.0f)));
+            TransformMobyJointToWorld(object, j, &pos);
             if (D_L09_001B2388 & 1)
-                func_002BAE50(&pos, &vel, 0xCF0000FF, 207, func_002A7820(18, 22), 50, -10, 1);
+                SpawnScalingParticle(&pos, &vel, 0xCF0000FF, 207, RandomIntRange(18, 22), 50, -10, 1);
             else
-                func_002BAE50(&pos, &vel, 0x6000FFFF, 128, func_002A7820(20, 24), 100, -10, 1);
-            life = func_002A7820(10, 25);
-            size = func_002A7820(10, 15);
-            func_002BAE50(&pos, &vel, 0xEFFF7F4F, 0xFF0000, size, life, -life, 1);
+                SpawnScalingParticle(&pos, &vel, 0x6000FFFF, 128, RandomIntRange(20, 24), 100, -10, 1);
+            life = RandomIntRange(10, 25);
+            size = RandomIntRange(10, 15);
+            SpawnScalingParticle(&pos, &vel, 0xEFFF7F4F, 0xFF0000, size, life, -life, 1);
         }
     }
 }
@@ -99,33 +99,33 @@ void func_L09_003E9AA0(char *object) {
 /* Steps the run: refreshes the object's frame, drops the record it still points at when
    the resident mode word says 9, and rebuilds the effect. */
 void func_L09_003EAA18(char *object) {
-    char *frame = *(char **)(object + 0x68);
-    short id;
-    int result;
+    char *vars = *(char **)(object + 0x68);
+    short recordId;
+    int animResult;
 
     if (*(unsigned char *)(object + 0x95) == 0)
-        func_L09_003EA798(object);
+        InitWalkingEnemy(object);
 
     if (*(unsigned char *)(object + 0x31) != 0) {
-        if (func_00282E48(object + 0x10, D_L09_001B9A00) < 32.0f) {
-            func_002A93B0(object);
+        if (fast_vec_dist(object + 0x10, D_L09_001B9A00) < 32.0f) {
+            UpdateMobyGroundCheck(object);
             *(unsigned char *)(object + 0x6F) = 0x1E;
         }
     }
 
-    result = func_002B0ED8(object, frame + 0x180, 0);
-    if (result >= 4) {
-        if (D_001A79F0 == 9) {
-            id = *(short *)(frame + 0x1F0);
-            if (id != -1) {
-                if (func_L09_00326E90(D_L09_001B285C + (id << 8)) == 0)
+    animResult = ApplyDamageToObject(object, vars + 0x180, 0);
+    if (animResult >= 4) {
+        if (gCurrentMapIndex == 9) {
+            recordId = *(short *)(vars + 0x1F0);
+            if (recordId != -1) {
+                if (IsHeroOrSpecialStateMoby(D_L09_001B285C + (recordId << 8)) == 0)
                     D_L09_001A9040 = 0;
-                *(short *)(frame + 0x1F0) = -1;
+                *(short *)(vars + 0x1F0) = -1;
             }
         }
-        func_002A7750(object, 6, -1);
+        SetMobyState(object, 6, -1);
     }
-    func_002B3BA8(object, *(int *)(frame + 0x354), 0, 0, 0.0f, 0.0f);
+    SelectAimTarget_002B3BA8(object, *(int *)(vars + 0x354), 0, 0, 0.0f, 0.0f);
 }
 
 /* The walks below read the group count through $gp; the group table of id lists is absolute
@@ -139,77 +139,77 @@ extern unsigned short *D_L09_001FB560[];
 
 /* Counts the class-0xD0F entities of the object's group whose private state has bit 0 of its
    byte at +0x302 clear and the word a1 at +0x420; -1 when a1 is 0. */
-int func_L09_003F71C8(unsigned char *a0, int a1) {
-    unsigned short *p;
-    unsigned char *e;
-    unsigned char *s;
-    int n = 0;
+int func_L09_003F71C8(unsigned char *object, int wantedValue) {
+    unsigned short *idPtr;
+    unsigned char *entity;
+    unsigned char *vars;
+    int count = 0;
 
-    if (a1 == 0)
+    if (wantedValue == 0)
         return -1;
-    for (p = D_L09_001FB560[a0[0x21]];
-         a0[0x21] != 0xFF && a0[0x21] <= D_L09_001B2878 && p != 0 &&
-         ((p != 0 && (short)p[-1] >= 0) || p == D_L09_001FB560[a0[0x21]]);
-         p++) {
-        e = D_L09_001B285C_1[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    for (idPtr = D_L09_001FB560[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= D_L09_001B2878 && idPtr != 0 &&
+         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == D_L09_001FB560[object[0x21]]);
+         idPtr++) {
+        entity = D_L09_001B285C_1[0] + ((*idPtr & 0x7FFF) << 8);
+        if (entity == 0)
             break;
-        s = *(unsigned char **)(e + 0x68);
-        if (*(short *)(e + 0xAA) == 0xD0F) {
-            if (s != 0 && ((s[0x302] ^ 1) & 1)) {
-                if (*(int *)(s + 0x420) == a1)
-                    n++;
+        vars = *(unsigned char **)(entity + 0x68);
+        if (*(short *)(entity + 0xAA) == 0xD0F /* Megacorp Trooper Legs */) {
+            if (vars != 0 && ((vars[0x302] ^ 1) & 1)) {
+                if (*(int *)(vars + 0x420) == wantedValue)
+                    count++;
             }
         }
     }
-    return n;
+    return count;
 }
 
 /* The largest word at +0x420 (0 at least) in the private states, whose byte at +0x302 is 0, of
    the class-0xD0F entities of the object's group. */
-int func_L09_003F72A8(unsigned char *a0) {
-    unsigned short *p;
-    unsigned char *e;
-    unsigned char *s;
-    int best = 0;
-    int v;
+int func_L09_003F72A8(unsigned char *object) {
+    unsigned short *idPtr;
+    unsigned char *entity;
+    unsigned char *vars;
+    int largest = 0;
+    int value;
 
-    for (p = D_L09_001FB560[a0[0x21]];
-         a0[0x21] != 0xFF && a0[0x21] <= D_L09_001B2878 && p != 0 &&
-         ((p != 0 && (short)p[-1] >= 0) || p == D_L09_001FB560[a0[0x21]]);
-         p++) {
-        e = D_L09_001B285C_1[0] + ((*p & 0x7FFF) << 8);
-        if (e == 0)
+    for (idPtr = D_L09_001FB560[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= D_L09_001B2878 && idPtr != 0 &&
+         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == D_L09_001FB560[object[0x21]]);
+         idPtr++) {
+        entity = D_L09_001B285C_1[0] + ((*idPtr & 0x7FFF) << 8);
+        if (entity == 0)
             break;
-        s = *(unsigned char **)(e + 0x68);
-        if (*(short *)(e + 0xAA) == 0xD0F) {
-            if (s != 0 && s[0x302] == 0) {
-                v = *(int *)(s + 0x420);
-                if (v >= best)
-                    best = v;
+        vars = *(unsigned char **)(entity + 0x68);
+        if (*(short *)(entity + 0xAA) == 0xD0F /* Megacorp Trooper Legs */) {
+            if (vars != 0 && vars[0x302] == 0) {
+                value = *(int *)(vars + 0x420);
+                if (value >= largest)
+                    largest = value;
             }
         }
     }
-    return best;
+    return largest;
 }
 
 /* Re-arms the frame's four spawn slots, bumps the object's counter and re-runs the stage. */
 void func_L09_003F8898(char *object) {
-    char *frame = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
 
-    if (*(unsigned char *)(frame + 0x2EA) != 0) {
-        *(unsigned char *)(frame + 0x2EA) = 0;
-        if (*(short *)(frame + 0x2E0) < D_L09_001B0F50)
-            *(short *)(frame + 0x2E0) = func_002A7820(D_L09_001B0F54, D_L09_001B0F58);
+    if (*(unsigned char *)(vars + 0x2EA) != 0) {
+        *(unsigned char *)(vars + 0x2EA) = 0;
+        if (*(short *)(vars + 0x2E0) < D_L09_001B0F50)
+            *(short *)(vars + 0x2E0) = RandomIntRange(D_L09_001B0F54, D_L09_001B0F58);
     }
-    if (func_00282978(frame + 0x2E0) == 0)
-        *(unsigned short *)(frame + 0x2E8) = D_L09_001B0F4C;
-    func_00282978(frame + 0x2E2);
-    func_00282978(frame + 0x2E6);
-    func_00282978(frame + 0x2E8);
+    if (FastDecTimer(vars + 0x2E0) == 0)
+        *(unsigned short *)(vars + 0x2E8) = D_L09_001B0F4C;
+    FastDecTimer(vars + 0x2E2);
+    FastDecTimer(vars + 0x2E6);
+    FastDecTimer(vars + 0x2E8);
     if (*(unsigned short *)(object + 0x96) <= 0xFFFE)
         *(unsigned short *)(object + 0x96) = *(unsigned short *)(object + 0x96) + 1;
-    func_002B0990(*(int *)(frame + 0x2F8), frame + 0x430, 4, 1, 1.9f);
+    SetValueAndStartSmoothChange(*(int *)(vars + 0x2F8), vars + 0x430, 4, 1, 1.9f);
 }
 
 /* func_L09_003A01D8: a 16-byte vector with a whole-quadword view, and the 0x28-byte impact
@@ -290,45 +290,45 @@ void func_L09_003A01D8(u8 *object)
 
     if (object[0x20])
         return;
-    F(object, 0xF0) = func_00283B98(F(object, 0xF0), 0.10471977293491364f);
-    func_00282CC0(f.predicted, object + 0x10, state);
+    F(object, 0xF0) = FastAddRotations(F(object, 0xF0), 0.10471977293491364f);
+    FastVecAdd(f.predicted, object + 0x10, state);
     busy = D_L09_001B238C > 0.9f || D_L09_001B2390 > 0.9f;
     if (!busy || !(D_L09_001B2388 & 1)) {
-        length = func_00282DF0(state);
+        length = FastVecLength(state);
         f.payload.effects.axis.q = 0;
-        f.payload.effects.axis.f[0] = func_002A7878(-1.0f, 1.0f);
-        f.payload.effects.axis.f[1] = func_002A7878(-1.0f, 1.0f);
-        f.payload.effects.axis.f[2] = func_002A7878(-1.0f, 1.0f);
+        f.payload.effects.axis.f[0] = RandomFloatRange(-1.0f, 1.0f);
+        f.payload.effects.axis.f[1] = RandomFloatRange(-1.0f, 1.0f);
+        f.payload.effects.axis.f[2] = RandomFloatRange(-1.0f, 1.0f);
         f.payload.effects.velocity.q = f.payload.effects.axis.q;
-        func_00282F20(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
-                      func_002A7878(0.04f, 0.08f) * 0.016666668f);
-        func_00282D30(f.payload.effects.point.f, state, func_002A7878(0.2f, 0.99f));
-        func_00282CC0(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
+        vec_scale_to_length(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
+                      RandomFloatRange(0.04f, 0.08f) * 0.016666668f);
+        FastVecScale(f.payload.effects.point.f, state, RandomFloatRange(0.2f, 0.99f));
+        FastVecAdd(f.payload.effects.velocity.f, f.payload.effects.velocity.f,
                       f.payload.effects.point.f);
-        func_00282F20(f.payload.effects.point.f, state, func_002A7878(0.0f, 1.0f) * length);
-        func_00282CC0(f.payload.effects.point.f, f.payload.effects.point.f, object + 0x10);
-        func_002C16C0(object + 0x10, f.payload.effects.velocity.f, 7, 127, 0xB0B0B0, 3,
+        vec_scale_to_length(f.payload.effects.point.f, state, RandomFloatRange(0.0f, 1.0f) * length);
+        FastVecAdd(f.payload.effects.point.f, f.payload.effects.point.f, object + 0x10);
+        SpawnBurstParticle_002C16C0(object + 0x10, f.payload.effects.velocity.f, 7, 127, 0xB0B0B0, 3,
                       40000.0f, 1000.0f, 1.0f, -0.00039999998989515007f, 0.0f);
         f.payload.effects.axis.q = 0;
         f.payload.effects.axis.f[2] = 0.01f;
-        func_00283098(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0);
-        func_002ACEC0(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0,
-                      func_002A7940());
-        if (func_001163B0() & 1)
-            func_002BD8B0(f.payload.effects.point.f, f.payload.effects.axis.f, 0x4F007FFF,
+        matrix_mul_vec3(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0);
+        ApplyAxisRotationToQuaternion(f.payload.effects.axis.f, f.payload.effects.axis.f, object + 0xC0,
+                      RandomAngle());
+        if (Rand() & 1)
+            SpawnTrailingSparkParticle(f.payload.effects.point.f, f.payload.effects.axis.f, 0x4F007FFF,
                           0x1FFFFFFF, 13, 1, 25000.0f);
     }
-    func_002A8C00(&f.payload.impact, I(state, 0x3C), 0x10001, F(state, 0x40), state);
+    make_hit_descriptor(&f.payload.impact, I(state, 0x3C), 0x10001, F(state, 0x40), state);
     f.payload.impact.object_class = *(u16 *)(object + 0xAA);
-    func_00282CF0(f.payload.impact.direction, object + 0x10, P(state, 0x3C) + 0x10);
+    FastVecSub(f.payload.impact.direction, object + 0x10, P(state, 0x3C) + 0x10);
     f.payload.impact.direction[2] = 0.0f;
-    func_00282F20(f.payload.impact.direction, f.payload.impact.direction, 1.6666667461395264f);
+    vec_scale_to_length(f.payload.impact.direction, f.payload.impact.direction, 1.6666667461395264f);
     f.payload.impact.direction[3] = 5627.9248046875f;
     f.payload.impact.enabled |= 1;
     f.payload.impact.kind = 4;
-    collision = func_002761F8(object + 0x10, f.predicted, 0, object, &f.payload.impact);
-    if (collision || func_00277258(object + 0x10, 1, object, 0.3f)
-        || func_00282948(state + 0x38)) {
+    collision = CollLine(object + 0x10, f.predicted, 0, object, &f.payload.impact);
+    if (collision || TestPointAgainstCollision(object + 0x10, 1, object, 0.3f)
+        || FastFloatHelperD(state + 0x38)) {
         hit = D_L09_001BFE58;
         if (hit) {
             if (hit == P(state, 0x3C)) {
@@ -336,18 +336,18 @@ void func_L09_003A01D8(u8 *object)
                 return;
             }
             if (*(short *)(hit + 0xAA) != 0x4E)
-                func_00277F48(object + 0x10, 0, P(state, 0x3C), &f.payload.impact, 0.5f);
+                ProcessCollisionHit(object + 0x10, 0, P(state, 0x3C), &f.payload.impact, 0.5f);
             /* The calls are written out per arm: a call ending a block that falls into a label
                gets a (use 0) from flow, which stops jump2 from cross-jumping the tails. */
-            func_002ABBB8(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 10, 0.0f, 0.0f, 9.0f,
+            SpawnExplosionEffects(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 10, 0.0f, 0.0f, 9.0f,
                           0.666f, -1, 0.0f, 0, 1, -1, 0, 0x810001);
-            func_002E5CF8(0, 0, object);
-            func_0029F338(object);
+            PlayMobySound(0, 0, object);
+            MarkMobySpawned(object);
         } else {
-            func_002ABBB8(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 8, 0.0f, 0.0f, 9.0f,
+            SpawnExplosionEffects(object, D_L09_001A8F20, 0, 0.0f, 0.0f, 0, 2, 8, 0.0f, 0.0f, 9.0f,
                           0.5f, -1, 0.0f, 0, 1, -1, 0, 0x810001);
-            func_002E5CF8(0, 0, object);
-            func_0029F338(object);
+            PlayMobySound(0, 0, object);
+            MarkMobySpawned(object);
         }
     } else
         qcopy(object + 0x10, f.predicted);

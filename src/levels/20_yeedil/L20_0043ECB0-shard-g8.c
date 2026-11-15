@@ -38,103 +38,104 @@ extern int func_002E5CF8(int, int, void *);
 extern void func_L00_002E6EF8(void (*)(void *), void *);
 extern void func_L20_0043F460(char *), func_L20_0043F510(void *);
 
-void func_L20_0043ECB0(unsigned char *obj)
+/* Updates moby class 4509: a glowing shard that circles in place, then flies at the player, and breaks with sparks when it hits something. */
+void func_L20_0043ECB0(unsigned char *moby)
 {
     Vec old, delta, target;
     float speed;
-    ShardState *s = *(ShardState **)(obj + 0x68);
+    ShardState *shard = *(ShardState **)(moby + 0x68);
 
     if (D_L20_001A8F00 == 2) {
-        func_0029F338(obj);
+        MarkMobySpawned(moby);
         return;
     }
-    qcopy(old, obj + 0x10);
-    switch (obj[0x20]) {
+    qcopy(old, moby + 0x10);
+    switch (moby[0x20]) {
     case 0:
-        func_002AA548(&s->radius, &s->radiusSpeed, s->targetRadius, D_L20_001B1F9C * 0.00027777778f, D_L20_001B1F9C * 0.00027777778f, D_L20_001B1FA0 * 0.016666668f);
-        ((float *)(obj + 0x10))[0] = func_00283180(s->angle) * s->radius;
-        ((float *)(obj + 0x10))[1] = func_00283198(s->angle) * s->radius;
-        ((float *)(obj + 0x10))[2] = 0.0f;
-        func_00282CC0(obj + 0x10, obj + 0x10, *(char **)(obj + 0xB8) + 0x10);
-        ((float *)(obj + 0x10))[2] = old[2];
-        if (func_00282C48(s->radius - s->targetRadius) < 0.5f) {
+        StepValueTowardTarget(&shard->radius, &shard->radiusSpeed, shard->targetRadius, D_L20_001B1F9C * 0.00027777778f, D_L20_001B1F9C * 0.00027777778f, D_L20_001B1FA0 * 0.016666668f);
+        ((float *)(moby + 0x10))[0] = FastSinOrCosA(shard->angle) * shard->radius;
+        ((float *)(moby + 0x10))[1] = FastSinOrCosB(shard->angle) * shard->radius;
+        ((float *)(moby + 0x10))[2] = 0.0f;
+        FastVecAdd(moby + 0x10, moby + 0x10, *(char **)(moby + 0xB8) + 0x10);
+        ((float *)(moby + 0x10))[2] = old[2];
+        if (FloatAbs(shard->radius - shard->targetRadius) < 0.5f) {
             speed = D_L20_001B1FA4 * 0.00029088825f;
-            if (s->reverse == 0)
+            if (shard->reverse == 0)
                 speed = -speed;
-            func_002AA2E8(&s->spin, speed, D_L20_001B1FA8 * 4.8481376e-06f);
-            s->angle = func_00283B98(s->angle, s->spin);
-            func_002AA548((float *)(obj + 0x18), &s->zSpeed, s->targetZ, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FB0 * 0.016666668f);
-            if (func_00282C48(((float *)(obj + 0x10))[2] - s->targetZ) < 0.1f)
-                s->targetZ = s->baseZ + func_002A7878(3.0f, 8.0f);
+            ApproachValue(&shard->spin, speed, D_L20_001B1FA8 * 4.8481376e-06f);
+            shard->angle = FastAddRotations(shard->angle, shard->spin);
+            StepValueTowardTarget((float *)(moby + 0x18), &shard->zSpeed, shard->targetZ, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FB0 * 0.016666668f);
+            if (FloatAbs(((float *)(moby + 0x10))[2] - shard->targetZ) < 0.1f)
+                shard->targetZ = shard->baseZ + RandomFloatRange(3.0f, 8.0f);
         }
-        if (func_00282948(&s->timer)
-            && func_00283C80(((Moby *)obj)->rot[2], func_00283248(D_00189E20.position[0] - ((float *)(obj + 0x10))[0], D_00189E20.position[1] - ((float *)(obj + 0x10))[1])) < 0.62831855f) {
-            func_00282CF0(s->velocity, obj + 0x10, old);
-            s->velocity[2] = 0.0f;
-            func_002A7750(obj, 1, -1);
-        } else if (func_00282C30(*s->clock - D_L20_001B2AC8) >= 6) {
-            func_00282CF0(s->velocity, obj + 0x10, old);
-            s->velocity[2] = 0.0f;
-            func_002A7750(obj, 2, -1);
+        if (FastFloatHelperD(&shard->timer)
+            && FastDiffRots(((Moby *)moby)->rot[2], FastMatrixHelperA(gHeroState.position[0] - ((float *)(moby + 0x10))[0], gHeroState.position[1] - ((float *)(moby + 0x10))[1])) < 0.62831855f) {
+            FastVecSub(shard->velocity, moby + 0x10, old);
+            shard->velocity[2] = 0.0f;
+            SetMobyState(moby, 1, -1);
+        } else if (subtract_integer_with_clamp(*shard->clock - D_L20_001B2AC8) >= 6) {
+            FastVecSub(shard->velocity, moby + 0x10, old);
+            shard->velocity[2] = 0.0f;
+            SetMobyState(moby, 2, -1);
         }
         break;
     case 1:
         {
             float rate;
 
-            { float b = D_L20_001B1FB0 * 0.016666668f; func_002AA548((float *)(obj + 0x18), &s->zSpeed, s->baseZ + 1.0f, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FAC * 0.00027777778f, b); }
+            { float zRate = D_L20_001B1FB0 * 0.016666668f; StepValueTowardTarget((float *)(moby + 0x18), &shard->zSpeed, shard->baseZ + 1.0f, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FAC * 0.00027777778f, zRate); }
             rate = D_L20_001B1FB8 * 0.016666668f;
-            func_00282CF0(target, D_00189E20.top, obj + 0x10);
+            FastVecSub(target, gHeroState.top, moby + 0x10);
             target[2] = 0.0f;
-            func_00282F20(target, target, rate);
-            func_00282CF0(delta, target, s->velocity);
-            func_00282F20(delta, delta, D_L20_001B1FB4 * 0.00027777778f);
-            func_00282CC0(s->velocity, s->velocity, delta);
-            func_00282F20(s->velocity, s->velocity, rate);
-            func_00282CC0(obj + 0x10, obj + 0x10, s->velocity);
-            if (func_00283C80(((Moby *)obj)->rot[2], func_00283248(D_00189E20.position[0] - ((float *)(obj + 0x10))[0], D_00189E20.position[1] - ((float *)(obj + 0x10))[1])) > 1.5707964f)
-                func_002A7750(obj, 2, -1);
+            vec_scale_to_length(target, target, rate);
+            FastVecSub(delta, target, shard->velocity);
+            vec_scale_to_length(delta, delta, D_L20_001B1FB4 * 0.00027777778f);
+            FastVecAdd(shard->velocity, shard->velocity, delta);
+            vec_scale_to_length(shard->velocity, shard->velocity, rate);
+            FastVecAdd(moby + 0x10, moby + 0x10, shard->velocity);
+            if (FastDiffRots(((Moby *)moby)->rot[2], FastMatrixHelperA(gHeroState.position[0] - ((float *)(moby + 0x10))[0], gHeroState.position[1] - ((float *)(moby + 0x10))[1])) > 1.5707964f)
+                SetMobyState(moby, 2, -1);
         }
         break;
     case 2:
         {
-            float length = func_00282DF0(s->velocity);
+            float length = FastVecLength(shard->velocity);
 
-            func_002AA2E8(&length, D_L20_001B1FB8 * 0.016666668f, 0.0027777778f);
-            func_00282F20(s->velocity, s->velocity, length);
-            func_00282CC0(obj + 0x10, obj + 0x10, s->velocity);
-            if (obj[0x31] == 0) {
-                func_0029F338(obj);
+            ApproachValue(&length, D_L20_001B1FB8 * 0.016666668f, 0.0027777778f);
+            vec_scale_to_length(shard->velocity, shard->velocity, length);
+            FastVecAdd(moby + 0x10, moby + 0x10, shard->velocity);
+            if (moby[0x31] == 0) {
+                MarkMobySpawned(moby);
                 return;
             }
         }
         break;
     }
-    func_00282CF0(delta, obj + 0x10, old);
-    ((Moby *)obj)->rot[2] = func_00283248(delta[0], delta[1]);
-    ((Moby *)obj)->rot[1] = -func_00283248(func_00282E20(delta), delta[2]);
-    ((Moby *)obj)->rot[0] = func_00283B98(((Moby *)obj)->rot[0], 0.052359887f);
-    if ((D_L20_001B2AC8 & 3) == (((int)obj >> 8) & 3)) {
+    FastVecSub(delta, moby + 0x10, old);
+    ((Moby *)moby)->rot[2] = FastMatrixHelperA(delta[0], delta[1]);
+    ((Moby *)moby)->rot[1] = -FastMatrixHelperA(vec_length_xy(delta), delta[2]);
+    ((Moby *)moby)->rot[0] = FastAddRotations(((Moby *)moby)->rot[0], 0.052359887f);
+    if ((D_L20_001B2AC8 & 3) == (((int)moby >> 8) & 3)) {
         int i;
 
         for (i = 2; i > 0; i--)
-            qcopy(s->trail[i], s->trail[i - 1]);
-        qcopy(s->trail[0], obj + 0x10);
+            qcopy(shard->trail[i], shard->trail[i - 1]);
+        qcopy(shard->trail[0], moby + 0x10);
     }
-    if (func_002761F8(old, obj + 0x10, 0, *(void **)(obj + 0xB8), 0)) {
+    if (CollLine(old, moby + 0x10, 0, *(void **)(moby + 0xB8), 0)) {
         if (D_L20_001C0418[0]) {
-            func_00282CF0(target, D_L20_001B9FC0, obj + 0x10);
-            func_00282F20(target, target, 1.0f);
-            func_002A8C28(*(void **)(obj + 0xB8), obj + 0x10, 2.0f, s->scale, 0x10001, 1.0f, 0, 1, 0);
-            func_0032DA58(obj, obj + 0x10, target, 0.0f);
+            FastVecSub(target, D_L20_001B9FC0, moby + 0x10);
+            vec_scale_to_length(target, target, 1.0f);
+            SweepCollisionFromObject(*(void **)(moby + 0xB8), moby + 0x10, 2.0f, shard->scale, 0x10001, 1.0f, 0, 1, 0);
+            SpawnBlastEffectMoby(moby, moby + 0x10, target, 0.0f);
         } else {
-            func_0032C700(obj + 0x10, 0, 10, 20, 20, 20, 45, 0, 0.75f, 20.0f, 1, 0, 0, 0);
+            SpawnExplosion(moby + 0x10, 0, 10, 20, 20, 20, 45, 0, 0.75f, 20.0f, 1, 0, 0, 0);
         }
-        func_002E5CF8(0, 0, obj);
-        func_0029F338(obj);
+        PlayMobySound(0, 0, moby);
+        MarkMobySpawned(moby);
         return;
     }
-    if (obj[0x31])
-        func_L20_0043F460(obj);
-    func_L00_002E6EF8(func_L20_0043F510, obj);
+    if (moby[0x31])
+        SpawnShardParticle(moby);
+    AddDrawCallbackToList3(AddMobyGlowTrail, moby);
 }

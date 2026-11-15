@@ -43,10 +43,11 @@ extern int func_002E5CF8(int, int, void *);
 #define W(o) (*(unsigned short *)((o) + 0xB2))
 #define SLOT(id) ((SoundSlot *)&D_00188660[id])
 
+/* Updates a lift platform: waits for the player, then rides up or down between two heights with sound. */
 void func_L01_003B9798(unsigned char *obj)
 {
     Vec old, oldRot, delta;
-    Lift *s = *(Lift **)(obj + 0x68);
+    Lift *lift = *(Lift **)(obj + 0x68);
     int id;
     unsigned char *p;
     int w;
@@ -59,56 +60,56 @@ void func_L01_003B9798(unsigned char *obj)
     qcopy(oldRot, obj + 0xF0);
     switch (obj[0x20]) {
     case 0:
-        s->active = 0;
-        s->flags |= 1;
-        qcopy(s->home, obj + 0x10);
+        lift->active = 0;
+        lift->flags |= 1;
+        qcopy(lift->home, obj + 0x10);
         obj[0x20] = 1;
-        if (s->startDown == 0) {
-            s->upperZ = s->home[2];
-            s->lowerZ = s->travel;
-            s->down = 0;
+        if (lift->startDown == 0) {
+            lift->upperZ = lift->home[2];
+            lift->lowerZ = lift->travel;
+            lift->down = 0;
         } else {
-            s->down = 1;
-            s->upperZ = s->travel;
-            s->lowerZ = s->home[2];
+            lift->down = 1;
+            lift->upperZ = lift->travel;
+            lift->lowerZ = lift->home[2];
         }
-        s->timer = 0;
-        s->sound = -1;
+        lift->timer = 0;
+        lift->sound = -1;
         break;
     case 1:
-        if (func_L00_00324120(obj)) {
-            s->active = 1;
+        if (IsCurrentSelectedId(obj)) {
+            lift->active = 1;
             w = W(obj);
             if (w & 1) {
-                p = &D_0019B4A8[((short)w >> 1) + (D_001A79F0 << 10)];
+                p = &D_0019B4A8[((short)w >> 1) + (gCurrentMapIndex << 10)];
                 u = *p;
                 if (((u >> 4) & 7) != 7) {
                     *p = u + 0x10;
                 }
             } else {
-                p = &D_0019B4A8[((short)w >> 1) + (D_001A79F0 << 10)];
+                p = &D_0019B4A8[((short)w >> 1) + (gCurrentMapIndex << 10)];
                 u = *p;
                 if ((u & 7) != 7) {
                     *p = u + 1;
                 }
             }
-            if (s->down == 0) {
-                func_002A7750(obj, 3, -1);
-                if (!func_002E59B0(obj, s->sound)) {
-                    s->sound = func_002E5CF8(0, 4, obj);
+            if (lift->down == 0) {
+                SetMobyState(obj, 3, -1);
+                if (!IsVoicePlayingForOwner(obj, lift->sound)) {
+                    lift->sound = PlayMobySound(0, 4, obj);
                 }
             } else {
-                func_002A7750(obj, 2, -1);
-                if (!func_002E59B0(obj, s->sound)) {
-                    s->sound = func_002E5CF8(0, 4, obj);
+                SetMobyState(obj, 2, -1);
+                if (!IsVoicePlayingForOwner(obj, lift->sound)) {
+                    lift->sound = PlayMobySound(0, 4, obj);
                 }
             }
         }
-        if (func_00282C48(Z(obj) - D_00189E20.position[2]) > 3.0f && s->down == 0 && Z(obj) > D_00189E20.position[2]) {
-            if (s->active != 1 && !(D_0019B2E8[obj[0xB0] + (D_001A79F0 << 4)] & 0x80)) {
+        if (FloatAbs(Z(obj) - gHeroState.position[2]) > 3.0f && lift->down == 0 && Z(obj) > gHeroState.position[2]) {
+            if (lift->active != 1 && !(D_0019B2E8[obj[0xB0] + (gCurrentMapIndex << 4)] & 0x80)) {
                 w2 = W(obj);
                 if (D_L01_0021E4B0.locked[(short)w2] == 0) {
-                    v = D_0019B4A8[((short)w2 >> 1) + (D_001A79F0 << 10)];
+                    v = D_0019B4A8[((short)w2 >> 1) + (gCurrentMapIndex << 10)];
                     if (w2 & 1) {
                         if (((v >> 4) & 7) != 0) goto play;
                         goto second;
@@ -117,18 +118,18 @@ void func_L01_003B9798(unsigned char *obj)
                 }
             }
 play:
-            if (!func_002E59B0(obj, s->sound)) {
-                s->sound = func_002E5CF8(0, 4, obj);
+            if (!IsVoicePlayingForOwner(obj, lift->sound)) {
+                lift->sound = PlayMobySound(0, 4, obj);
             }
-            func_002A7750(obj, 3, -1);
+            SetMobyState(obj, 3, -1);
             break;
         }
 second:
-        if (func_00282C48(Z(obj) - D_00189E20.position[2]) > 3.0f && s->down == 1 && D_00189E20.position[2] > Z(obj)) {
-            if (s->active != 1 && !(D_0019B2E8[obj[0xB0] + (D_001A79F0 << 4)] & 0x80)) {
+        if (FloatAbs(Z(obj) - gHeroState.position[2]) > 3.0f && lift->down == 1 && gHeroState.position[2] > Z(obj)) {
+            if (lift->active != 1 && !(D_0019B2E8[obj[0xB0] + (gCurrentMapIndex << 4)] & 0x80)) {
                 w2 = W(obj);
                 if (D_L01_0021E4B0.locked[(short)w2] == 0) {
-                    v2 = D_0019B4A8[((short)w2 >> 1) + (D_001A79F0 << 10)];
+                    v2 = D_0019B4A8[((short)w2 >> 1) + (gCurrentMapIndex << 10)];
                     if (w2 & 1) {
                         if (((v2 >> 4) & 7) != 0) goto play2;
                         break;
@@ -137,66 +138,66 @@ second:
                 }
             }
 play2:
-            if (!func_002E59B0(obj, s->sound)) {
-                s->sound = func_002E5CF8(0, 4, obj);
+            if (!IsVoicePlayingForOwner(obj, lift->sound)) {
+                lift->sound = PlayMobySound(0, 4, obj);
             }
-            func_002A7750(obj, 2, -1);
+            SetMobyState(obj, 2, -1);
         }
         break;
     case 2:
         qcopy(delta, obj + 0x10);
-        delta[2] = s->upperZ;
-        if (func_00282E48(obj + 0x10, delta) > 0.04f) {
-            func_002AA548((float *)(obj + 0x18), (float *)&s->speed, delta[2], 0.00194444449f, 0.00166666671f, 0.100000009f);
-            s->timer++;
-        } else if (!func_L00_00324120(obj)) {
-            id = s->sound;
-            s->down = 0;
+        delta[2] = lift->upperZ;
+        if (fast_vec_dist(obj + 0x10, delta) > 0.04f) {
+            StepValueTowardTarget((float *)(obj + 0x18), (float *)&lift->speed, delta[2], 0.00194444449f, 0.00166666671f, 0.100000009f);
+            lift->timer++;
+        } else if (!IsCurrentSelectedId(obj)) {
+            id = lift->sound;
+            lift->down = 0;
             if (id != -1 && SLOT(id)->owner == obj && SLOT(id)->active) {
-                func_002E59F8(id);
+                StopSoundVoice(id);
             }
-            s->sound = -1;
-            func_002A7750(obj, 1, -1);
+            lift->sound = -1;
+            SetMobyState(obj, 1, -1);
             qcopy(obj + 0x10, delta);
-            s->timer = 0;
+            lift->timer = 0;
         } else {
-            id = s->sound;
+            id = lift->sound;
             if (id != -1 && SLOT(id)->owner == obj && SLOT(id)->active) {
-                func_002E59F8(id);
+                StopSoundVoice(id);
             }
-            s->sound = -1;
+            lift->sound = -1;
         }
         break;
     case 3:
-        func_002B3868(obj);
-        if (s->lowerZ < Z(obj)) {
-            if (Z(obj) - D_00189E20.position[2] < 2.8f && Z(obj) > D_00189E20.position[2]) {
-                if (func_002ACBC8((char *)&D_00189E20 + 0x80, s->contact) == 0) {
-                    func_002AA548((float *)(obj + 0x18), (float *)&s->speed, s->lowerZ, 0.00194444449f, 0.00166666671f, 0.100000009f);
-                    s->timer++;
+        SetFirstPendingFlag(obj);
+        if (lift->lowerZ < Z(obj)) {
+            if (Z(obj) - gHeroState.position[2] < 2.8f && Z(obj) > gHeroState.position[2]) {
+                if (IsPointInCuboid((char *)&gHeroState + 0x80, lift->contact) == 0) {
+                    StepValueTowardTarget((float *)(obj + 0x18), (float *)&lift->speed, lift->lowerZ, 0.00194444449f, 0.00166666671f, 0.100000009f);
+                    lift->timer++;
                 }
             } else {
-                func_002AA548((float *)(obj + 0x18), (float *)&s->speed, s->lowerZ, 0.00194444449f, 0.00166666671f, 0.100000009f);
-                s->timer++;
+                StepValueTowardTarget((float *)(obj + 0x18), (float *)&lift->speed, lift->lowerZ, 0.00194444449f, 0.00166666671f, 0.100000009f);
+                lift->timer++;
             }
-        } else if (!func_L00_00324120(obj) && Z(obj) <= s->lowerZ) {
-            id = s->sound;
-            s->down = 1;
+        } else if (!IsCurrentSelectedId(obj) && Z(obj) <= lift->lowerZ) {
+            id = lift->sound;
+            lift->down = 1;
             if (id != -1 && SLOT(id)->owner == obj && SLOT(id)->active) {
-                func_002E59F8(id);
+                StopSoundVoice(id);
             }
-            s->sound = -1;
-            func_002A7750(obj, 1, -1);
-            s->timer = 0;
+            lift->sound = -1;
+            SetMobyState(obj, 1, -1);
+            lift->timer = 0;
         } else {
-            id = s->sound;
+            id = lift->sound;
             if (id != -1 && SLOT(id)->owner == obj && SLOT(id)->active) {
-                func_002E59F8(id);
+                StopSoundVoice(id);
             }
-            s->sound = -1;
+            lift->sound = -1;
         }
         break;
     }
-    func_00282CF0(delta, obj + 0x10, old);
-    func_002AD6F0(s->body, delta, oldRot, obj + 0xF0);
+    FastVecSub(delta, obj + 0x10, old);
+    CombineTransformsAndStore(lift->body, delta, oldRot, obj + 0xF0);
 }

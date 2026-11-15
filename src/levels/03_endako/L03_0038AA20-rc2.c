@@ -27,19 +27,20 @@
 extern void ref_L03_0038AA20_00(s8 *, s32, s32, s32, s32, s32, s32, f32, f32, f32, f32, f32);
 extern s8 ref_L03_0038AA20_01[];
 
-void func_L03_0038AA20(s8 *arg0) {
-    s8 *s0;
+/* Draws four pairs of beam or ray segments for an object, one pair per step, using values from its private data. */
+void func_L03_0038AA20(s8 *moby) {
+    s8 *vars;
     s32 i;
-    s32 b1;
-    s32 b2;
+    s32 tableLow;
+    s32 tableHigh;
 
     i = 0;
-    b1 = (s32)ref_L03_0038AA20_01;
-    s0 = *(s8 **)(arg0 + 0x68);
-    b2 = b1 + 0x400;
+    tableLow = (s32)ref_L03_0038AA20_01;
+    vars = *(s8 **)(moby + 0x68);
+    tableHigh = tableLow + 0x400;
     do {
-        ref_L03_0038AA20_00(arg0, ((*(s32 *)(s0 + 0xDC) + i) << 8) + b1, *(s32 *)(s0 + 0x38), *(s32 *)(s0 + 0x40), *(s32 *)(s0 + 0x60), *(s32 *)(s0 + 0x44), *(s32 *)(s0 + 0x64), *(f32 *)(s0 + 0x50), *(f32 *)(s0 + 0x70), *(f32 *)(s0 + 0x54), *(f32 *)(s0 + 0x74), 0.89999997615814208984375f);
-        ref_L03_0038AA20_00(arg0, ((*(s32 *)(s0 + 0xDC) + i) << 8) + b2, *(s32 *)(s0 + 0x38), *(s32 *)(s0 + 0x48), *(s32 *)(s0 + 0x68), *(s32 *)(s0 + 0x4C), *(s32 *)(s0 + 0x6C), *(f32 *)(s0 + 0x58), *(f32 *)(s0 + 0x78), *(f32 *)(s0 + 0x5C), *(f32 *)(s0 + 0x7C), 0.100000001490116119384765625f);
+        ref_L03_0038AA20_00(moby, ((*(s32 *)(vars + 0xDC) + i) << 8) + tableLow, *(s32 *)(vars + 0x38), *(s32 *)(vars + 0x40), *(s32 *)(vars + 0x60), *(s32 *)(vars + 0x44), *(s32 *)(vars + 0x64), *(f32 *)(vars + 0x50), *(f32 *)(vars + 0x70), *(f32 *)(vars + 0x54), *(f32 *)(vars + 0x74), 0.89999997615814208984375f);
+        ref_L03_0038AA20_00(moby, ((*(s32 *)(vars + 0xDC) + i) << 8) + tableHigh, *(s32 *)(vars + 0x38), *(s32 *)(vars + 0x48), *(s32 *)(vars + 0x68), *(s32 *)(vars + 0x4C), *(s32 *)(vars + 0x6C), *(f32 *)(vars + 0x58), *(f32 *)(vars + 0x78), *(f32 *)(vars + 0x5C), *(f32 *)(vars + 0x7C), 0.100000001490116119384765625f);
         i += 1;
     } while (i < 4);
 }

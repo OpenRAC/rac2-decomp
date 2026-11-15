@@ -15,33 +15,34 @@ extern int func_31C970(int, int, float);
 extern void func_2E4340(void *, void *, void *);
 extern void func_317618(void *, void *, void *, void *);
 
-void func_L07_003F59C0(u8 *o)
+/* Updates the moving platform: starts it up, moves it along its path and makes it pulse in colour. */
+void func_L07_003F59C0(u8 *moby)
 {
     float pos[4], old[4], delta[4];
-    u8 *m = *(u8 **)(o + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
     float phase;
-    qcopy(pos, o + 0x10);
-    qcopy(old, o + 0xF0);
-    *(float *)(o + 0x2C) = *(float *)(*(u8 **)(o + 0x24) + 0x24) * D_L07_001B0F44;
-    switch (o[0x20]) {
+    qcopy(pos, moby + 0x10);
+    qcopy(old, moby + 0xF0);
+    *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * D_L07_001B0F44;
+    switch (moby[0x20]) {
     case 0:
-        *(u16 *)(o + 0x34) |= 0x1000;
-        *(float *)(m + 0x88) = 9.0f;
-        *(int *)(m + 0xDC) |= 1;
-        func_3109C8(o, 1, -1);
+        *(u16 *)(moby + 0x34) |= 0x1000;
+        *(float *)(vars + 0x88) = 9.0f;
+        *(int *)(vars + 0xDC) |= 1;
+        func_3109C8(moby, 1, -1);
         break;
     case 1:
-        func_31B828(o, D_L07_001B0F38, m + 0x50, D_L07_001B0F3C, D_L07_001B0F40, *(int *)(m + 0xE0));
-        func_L07_003F5B50(o);
+        func_31B828(moby, D_L07_001B0F38, vars + 0x50, D_L07_001B0F3C, D_L07_001B0F40, *(int *)(vars + 0xE0));
+        KeepAtLiftHeight(moby);
         break;
     }
-    if (o[0x31]) {
+    if (moby[0x31]) {
         phase = func_2E5460(D_L07_001B1E08 % 60);
         { float period = func_2E5460(60);
         phase *= 6.2831855f;
         phase /= period; }
-        *(int *)(o + 0x78) = func_31C970(D_L07_001B0F30, D_L07_001B0F34, phase - 3.1415927f);
+        *(int *)(moby + 0x78) = func_31C970(D_L07_001B0F30, D_L07_001B0F34, phase - 3.1415927f);
     }
-    func_2E4340(delta, o + 0x10, pos);
-    func_317618(m + 0xA0, delta, old, o + 0xF0);
+    func_2E4340(delta, moby + 0x10, pos);
+    func_317618(vars + 0xA0, delta, old, moby + 0xF0);
 }

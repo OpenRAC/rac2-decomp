@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef signed short s16;
@@ -26,20 +27,22 @@ extern s16 D_0018A16E[];
 
 extern f32 func_00282C48(f32 f);
 
-s32 func_L22_003B9428(u32 a0) {
-    u32 g = D_0018C0B0[0];
-    int *p = (a0 == g) ? &D_L22_001AFA08 : &D_L22_001AFA0C;
-    return *p != 0;
+/* Says whether the given player has an object in its slot. */
+s32 func_L22_003B9428(u32 owner) {
+    u32 currentOwner = gHeroMoby_0018C0B0[0];
+    int *flag = (owner == currentOwner) ? &D_L22_001AFA08 : &D_L22_001AFA0C;
+    return *flag != 0;
 }
 
-s32 func_L22_003A61A8(u8 *a0) {
-    u8 *s = *(u8 **)(a0 + 0x68);
-    f32 t;
-    if (*(f32 *)(s + 0x3DC) < D_L22_001AF3EC) return 1;
-    t = func_00282C48(*(f32 *)(s + 0x414) - *(f32 *)(s + 0x410));
+/* Says whether the ship is lined up well enough with its target to carry on. */
+s32 func_L22_003A61A8(u8 *obj) {
+    u8 *vars = *(u8 **)(obj + 0x68);
+    f32 turn;
+    if (*(f32 *)(vars + 0x3DC) < D_L22_001AF3EC) return 1;
+    turn = FloatAbs(*(f32 *)(vars + 0x414) - *(f32 *)(vars + 0x410));
     if (D_0018A16E[0] < 0xB) return 0;
-    if (*(f32 *)(s + 0x3E0) < D_L22_001AF3EC) {
-        if (t < D_L22_001AF5C8) return 1;
+    if (*(f32 *)(vars + 0x3E0) < D_L22_001AF3EC) {
+        if (turn < D_L22_001AF5C8) return 1;
     }
     return 0;
 }
@@ -67,43 +70,44 @@ extern int D_L22_001A8AC0;
  * -1, and the object the slot holds is torn down when its id is 0x5F3 and it has not started
  * (the two resident words it owns are cleared first, and its stored index is released when it is
  * not -1). An object with any other id only clears the slot. */
-void func_L22_003B9358(u32 a0)
+/* Removes the object held in a player's slot and cleans up what it was using. */
+void func_L22_003B9358(u32 owner)
 {
-    u32 g = D_0018C0B0[0];
+    u32 currentOwner = gHeroMoby_0018C0B0[0];
     int *slot;
     char *object;
 
-    if (a0 == g) {
+    if (owner == currentOwner) {
         slot = &ref_L22_003B9358_00;
         if (ref_L22_003B9358_01 != -1) {
-            func_002E59F8(ref_L22_003B9358_01);
+            StopSoundVoice(ref_L22_003B9358_01);
             ref_L22_003B9358_01 = -1;
         }
     } else {
         slot = &ref_L22_003B9358_02;
         if (ref_L22_003B9358_03 != -1) {
-            func_002E59F8(ref_L22_003B9358_03);
+            StopSoundVoice(ref_L22_003B9358_03);
             ref_L22_003B9358_03 = -1;
         }
     }
     object = (char *)*slot;
     if (object == 0)
         return;
-    if (*(short *)(object + 0xAA) != 0x5F3) {
+    if (*(short *)(object + 0xAA) != 0x5F3 /* moby class 1523 */) {
         *slot = 0;
         return;
     }
     if (*(unsigned char *)(object + 0x20) != 0)
         return;
     {
-        char *inner = *(char **)(object + 0x68);
+        char *vars = *(char **)(object + 0x68);
         int index;
 
         D_L22_001A8AB0 = 0;
         D_L22_001A8AC0 = 0;
-        index = *(short *)(inner + 0x2C);
+        index = *(short *)(vars + 0x2C);
         if (index != -1)
-            func_00291450(index);
+            FreePointLight(index);
     }
     func_0029F338_22((char *)*slot);
     *slot = 0;
@@ -134,14 +138,15 @@ extern char ref_L22_003F54B8_00[];
 extern f32 ref_L22_003F54B8_01 __attribute__((sda));
 extern f32 ref_L22_003F54B8_02 __attribute__((sda));
 
+/* Starts a swaying motion by choosing a random side and setting the speed and size of the sway. */
 void func_L22_003F54B8(u8 *obj) {
     SwayVars *vars = *(SwayVars **)(obj + 0x68);
     f32 delta[4];
 
-    func_00282CF0(delta, ref_L22_003F54B8_00, obj + 0x10);
-    func_002AFDD8(obj, delta, delta, 0);
-    vars->heading = func_002A77E0(2) ? 1.5707964f : -1.5707964f;
-    vars->heading = func_00283B98(vars->heading, func_00283248(delta[0], delta[1]));
+    FastVecSub(delta, ref_L22_003F54B8_00, obj + 0x10);
+    TransformVectorByObjectOrGiven(obj, delta, delta, 0);
+    vars->heading = RandomIntBelow(2) ? 1.5707964f : -1.5707964f;
+    vars->heading = FastAddRotations(vars->heading, FastMatrixHelperA(delta[0], delta[1]));
     vars->phase_step = ref_L22_003F54B8_01 * 0.000290888245f;
     vars->amplitude = ref_L22_003F54B8_02;
     vars->phase = 0.0f;
@@ -162,6 +167,7 @@ extern float ref_L22_003F5580_00 __attribute__((sda));
 /* Scales the controller of the object: when the controller is idle its position is copied to
  * the object, otherwise the controller's values are scaled and written back.
  */
+/* Moves the object in a sway that gets smaller over time, and stops it when it reaches zero. */
 void func_L22_003F5580(u8 *obj) {
     u8 *ctl = *(u8 **)(obj + 0x68);
     f32 buf[4];
@@ -174,23 +180,23 @@ void func_L22_003F5580(u8 *obj) {
         *(f32 *)(ctl + 0xC0) = 0.0f;
         return;
     }
-    a = func_00283198(*(f32 *)(ctl + 0xC4));
+    a = FastSinOrCosB(*(f32 *)(ctl + 0xC4));
     b = *(f32 *)(ctl + 0xBC);
-    c = func_00283180(*(f32 *)(ctl + 0xB0));
+    c = FastSinOrCosA(*(f32 *)(ctl + 0xB0));
     b = b * a;
     c = c * b;
     buf[0] = c;
-    d = func_00283198(*(f32 *)(ctl + 0xB0));
+    d = FastSinOrCosB(*(f32 *)(ctl + 0xB0));
     d = d * b;
     buf[1] = d;
     buf[2] = 0.0f;
-    func_00283098(buf, buf, obj + 0xC0);
+    matrix_mul_vec3(buf, buf, obj + 0xC0);
     buf[3] = 0.0f;
-    func_00282CC0(obj + 0xE0, buf, ctl);
-    r = func_00283B98(*(f32 *)(ctl + 0xC4), *(f32 *)(ctl + 0xC0));
+    FastVecAdd(obj + 0xE0, buf, ctl);
+    r = FastAddRotations(*(f32 *)(ctl + 0xC4), *(f32 *)(ctl + 0xC0));
     g = ref_L22_003F5580_00;
     *(f32 *)(ctl + 0xC4) = r;
-    func_002AA2E8((f32 *)(ctl + 0xBC), 0.0f, g * (1.0f / 60.0f));
+    ApproachValue((f32 *)(ctl + 0xBC), 0.0f, g * (1.0f / 60.0f));
 }
 
 typedef unsigned short u16;
@@ -234,6 +240,7 @@ extern u8 *D_L22_001B2678;
    anything more: switching off clears bit 2 of byte +0x1E of every record of the id list at
    +0x10 and bit 0 of byte +0x16 of every record of the list at +0x16; switching on sets those
    bits (a list index below zero means no list). */
+/* Switches linked objects on when the player comes near and off again when the player moves away. */
 void func_L22_003F58F8(u8 *self) {
     u8 *state = *(u8 **)(self + 0x68);
     f32 v[4];
@@ -243,13 +250,13 @@ void func_L22_003F58F8(u8 *self) {
     u16 *p;
     u8 *e;
 
-    func_002AFFD8(D_L22_001B9C80, v, 1);
-    dist = func_00282DB0(self + 0xE0, v);
-    f = func_00283CE0(*(s16 *)(state + 0x14)) * 0.071428575f;
+    ComputeViewDirection(D_L22_001B9C80, v, 1);
+    dist = FastVecDot(self + 0xE0, v);
+    f = IntToFloat(*(s16 *)(state + 0x14)) * 0.071428575f;
     if (D_L22_001A8F00 == 4)
-        thr = func_002AA140(D_L22_001B0A08, D_L22_001B0A04, f);
+        thr = LerpFloat_002AA140(D_L22_001B0A08, D_L22_001B0A04, f);
     else
-        thr = func_002AA140(D_L22_001B0A00, D_L22_001B09FC, f);
+        thr = LerpFloat_002AA140(D_L22_001B0A00, D_L22_001B09FC, f);
     if (*(int *)(state + 0xCC) != 0) {
         if (thr < dist)
             *(int *)(state + 0xCC) = 0;
@@ -353,6 +360,7 @@ typedef struct {
     f32 axis[4];
 } RingObject;
 
+/* Draws a pulsing ring around an object, facing the camera. */
 void func_L22_003FC338(RingObject *o) {
     struct {
         f32 verts[4][4];
@@ -369,9 +377,9 @@ void func_L22_003FC338(RingObject *o) {
     f32 sine;
     unsigned long bits;
 
-    ctl->phase = func_00283B98(ctl->phase, D_L22_001B0CA0);
+    ctl->phase = FastAddRotations(ctl->phase, D_L22_001B0CA0);
 
-    packet.state[1] = func_0027C878(D_L22_001B0CDC);
+    packet.state[1] = GetEffectTextureDescriptor(D_L22_001B0CDC);
     packet.state[2] = 0xFF9000000260UL;
     bits = (unsigned long)D_L22_001B0CC8 | ((unsigned long)D_L22_001B0CCC << 2);
     bits |= (unsigned long)D_L22_001B0CD0 << 4;
@@ -379,45 +387,45 @@ void func_L22_003FC338(RingObject *o) {
     bits |= (unsigned long)D_L22_001B0CD8 << 32;
     packet.state[3] = bits;
     packet.state[0] = 0;
-    func_002FC560(0x47, 0x53001);
+    VU1_addGSregister(0x47, 0x53001);
 
     matrix[3][0] = o->x;
     matrix[3][1] = o->y;
     matrix[3][2] = o->z;
     matrix[3][3] = 1.0f;
-    sine = func_00283198(ctl->phase);
-    func_00282D30(offset, o->axis, D_L22_001B0C50 + D_L22_001B0CA4 * sine);
-    func_00282CC0((char *)matrix[3], (char *)matrix[3], (char *)offset);
-    func_00282CF0(dir, D_L22_001B9C80, matrix[3]);
-    func_00282F20(matrix[0], dir, 1.0f);
-    func_00282DD8(matrix[1], matrix[0], o->axis);
-    func_00282F20(matrix[1], matrix[1], 1.0f);
-    func_00282DD8(matrix[2], matrix[1], matrix[0]);
+    sine = FastSinOrCosB(ctl->phase);
+    FastVecScale(offset, o->axis, D_L22_001B0C50 + D_L22_001B0CA4 * sine);
+    FastVecAdd((char *)matrix[3], (char *)matrix[3], (char *)offset);
+    FastVecSub(dir, D_L22_001B9C80, matrix[3]);
+    vec_scale_to_length(matrix[0], dir, 1.0f);
+    FastVecCross(matrix[1], matrix[0], o->axis);
+    vec_scale_to_length(matrix[1], matrix[1], 1.0f);
+    FastVecCross(matrix[2], matrix[1], matrix[0]);
 
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = D_L22_001B0CE4;
-    func_002FC560(6, func_0027C878(D_L22_001B0CDC));
-    func_002FC560(0x42, 0x8000000044UL);
-    func_002FC560(8, 0);
-    func_002FC560(0x14, 0xFF9000000260UL);
-    func_002FC560(0x4A, 0);
-    func_00280328();
+    VU1_addGSregister(6, GetEffectTextureDescriptor(D_L22_001B0CDC));
+    VU1_addGSregister(0x42, 0x8000000044UL);
+    VU1_addGSregister(8, 0);
+    VU1_addGSregister(0x14, 0xFF9000000260UL);
+    VU1_addGSregister(0x4A, 0);
+    font_queue_vu_state();
 
     for (i = 0; i < 290; i++) {
-        func_00282D30(scaled, D_L22_002A1260[i], D_L22_001B0CEC);
-        func_002830C0(v, scaled, matrix[0]);
+        FastVecScale(scaled, D_L22_002A1260[i], D_L22_001B0CEC);
+        transform_vector(v, scaled, matrix[0]);
         D_L22_00255920[i].x = v[0];
         D_L22_00255920[i].y = v[1];
         D_L22_00255920[i].z = v[2];
         col[i] = packet.colors[0];
     }
-    func_00281810(148, &D_L22_00255920[0], &col[0], D_L22_002A2480[0], 1);
-    func_00281810(109, &D_L22_00255920[146], &col[146], D_L22_002A2480[146], 1);
-    func_00281810(36, &D_L22_00255920[254], &col[254], D_L22_002A2480[254], 1);
+    DrawGlintEffect(148, &D_L22_00255920[0], &col[0], D_L22_002A2480[0], 1);
+    DrawGlintEffect(109, &D_L22_00255920[146], &col[146], D_L22_002A2480[146], 1);
+    DrawGlintEffect(36, &D_L22_00255920[254], &col[254], D_L22_002A2480[254], 1);
 
-    packet.state[1] = func_0027C878(11);
+    packet.state[1] = GetEffectTextureDescriptor(11);
     packet.state[3] = 0x8000000048UL;
     {
-        int color = (func_00283CF0(alpha * 64.0f + 128.0f) << 24) | D_L22_001B0CF4;
+        int color = (FloatToInt(alpha * 64.0f + 128.0f) << 24) | D_L22_001B0CF4;
         packet.colors[1] = color;
         packet.colors[0] = color;
         packet.colors[3] = 0;
@@ -431,9 +439,9 @@ void func_L22_003FC338(RingObject *o) {
                 int idx = D_L22_002A33A0[ring][i];
 
                 if (i >= 2) {
-                    func_00282D30(packet.verts[i], D_L22_002A2DA0[idx], D_L22_001B0CE8 * D_L22_001B0D00);
+                    FastVecScale(packet.verts[i], D_L22_002A2DA0[idx], D_L22_001B0CE8 * D_L22_001B0D00);
                 } else {
-                    func_00282D30(packet.verts[i], D_L22_002A2DA0[idx], D_L22_001B0CE8);
+                    FastVecScale(packet.verts[i], D_L22_002A2DA0[idx], D_L22_001B0CE8);
                 }
             }
             packet.uv[0] = 0.5f;
@@ -444,8 +452,8 @@ void func_L22_003FC338(RingObject *o) {
             packet.uv[5] = 1.0f;
             packet.uv[6] = 0.5f;
             packet.uv[7] = 1.0f;
-            func_00280B90(packet.verts, matrix[0], 0);
+            draw_world_quad(packet.verts, matrix[0], 0);
         }
     }
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x5360B);
 }

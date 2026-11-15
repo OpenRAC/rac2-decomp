@@ -10,26 +10,26 @@ extern int func_00132028(void);
 
 /* snd_CheckLoadInProgress: poll the shared loader status, pumping when asked
  * to wait. The fallback preserves the caller's sceCdSync mode argument. */
-int func_00133580(int arg0) {
-    char *end;
-    int busy;
+int func_00133580(int waitMode) {
+    char *statusEnd;
+    int notReady;
 
     if (D_001A748C == 0)
-        return func_00124B88(arg0);
+        return WaitSCommandDone(waitMode);
 
-    end = &D_001A713F;
-    func_0011B500(&D_001A7100, end);
-    busy = D_001A7100 < 1;
-    D_001A7498 = busy;
-    if (busy == 1)
+    statusEnd = &D_001A713F;
+    ProcessKernelRequestD(&D_001A7100, statusEnd);
+    notReady = D_001A7100 < 1;
+    D_001A7498 = notReady;
+    if (notReady == 1)
         return 0;
-    if (arg0 == 1)
+    if (waitMode == 1)
         return 1;
     while (D_001A7498 == 0) {
-        func_00132028();
-        func_0011B500(&D_001A7100, end);
-        busy = D_001A7100 < 1;
-        D_001A7498 = busy;
+        snd_Pump();
+        ProcessKernelRequestD(&D_001A7100, statusEnd);
+        notReady = D_001A7100 < 1;
+        D_001A7498 = notReady;
     }
     return 0;
 }

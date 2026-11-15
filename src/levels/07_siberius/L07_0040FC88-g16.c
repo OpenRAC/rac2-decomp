@@ -58,70 +58,71 @@ extern void func_002A7750(void *,int,int);
 #define W(p,o) (*(int *)((u8 *)(p)+(o)))
 #define P(p,o) (*(u8 **)((u8 *)(p)+(o)))
 #define F(p,o) (*(float *)((u8 *)(p)+(o)))
-void func_L07_0040FC88(u8 *self)
+/* Runs the 16 scripted events of the Siberius ship sequence. Each event waits for its trigger, then moves from waiting to started to finished. */
+void func_L07_0040FC88(u8 *moby)
 {
     Vec pos, rot;
     int i,j;
-    u8 *state=P(self,0x68), *p, *e;
+    u8 *vars=P(moby,0x68), *partVars, *target;
     float *cursor;
     int *path;
-    float d;
+    float remaining;
     for(i=0;i<16;i++) {
         if(D_L07_001B31A0[i]==2) continue;
         switch(i) {
         case 0:
             if(D_L07_001B31A0[i]==0) {
-                if(func_002A8508(W(P(P(state,0xf4),0x68),0x94),-1)==0) {
-                    func_002E5DA0(1,0,P(state,0xf4),0x11d9);
+                if(CountMobysInGroupNotInState(W(P(P(vars,0xf4),0x68),0x94),-1)==0) {
+                    PlaySoundFromClassBank(1,0,P(vars,0xf4),0x11d9);
                     D_L07_001B31A0[i]=1;
-                } else if((D_L07_001B1E08[0]&7)==(((int)P(state,0xf4)>>8)&7)) {
-                    func_00282CF0(&pos,D_L07_00189EA0,P(state,0xf4)+0x10);
-                    func_002AFDD8(P(state,0xf4),&pos,&pos,0);
+                } else if((D_L07_001B1E08[0]&7)==(((int)P(vars,0xf4)>>8)&7)) {
+                    FastVecSub(&pos,D_L07_00189EA0,P(vars,0xf4)+0x10);
+                    TransformVectorByObjectOrGiven(P(vars,0xf4),&pos,&pos,0);
                     if(pos.f[0]<-14.0f) {
-                        func_002E5DA0(1,0,P(state,0xf4),0x11d9);
+                        PlaySoundFromClassBank(1,0,P(vars,0xf4),0x11d9);
                         D_L07_001B31A0[i]=1;
                     }
                 }
             } else {
-                p=P(P(state,0xf4),0x68);
-                func_002AAA00(p+0x114,0.0f,p+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
-                if(F(p,0x114)<=0) D_L07_001B31A0[i]=2;
+                partVars=P(P(vars,0xf4),0x68);
+                ApproachTargetWithDirectionMode(partVars+0x114,0.0f,partVars+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
+                if(F(partVars,0x114)<=0) D_L07_001B31A0[i]=2;
             }
             break;
         case 2:
-            if(D_L07_001B31A0[i]==0 && D_L07_0018A1C0==P(state,0xf8)) {
-                u8 *q=P(D_L07_0018A1C0,0x68);
+            if(D_L07_001B31A0[i]==0 && D_L07_0018A1C0==P(vars,0xf8)) {
+                u8 *riderVars=P(D_L07_0018A1C0,0x68);
                 int idx;
-                func_L02_0031F858(W(q,0x94),1);
-                idx=W(q,0xb8);
+                SetGroupObjectsEnabled(W(riderVars,0x94),1);
+                idx=W(riderVars,0xb8);
                 pos.q=D_L07_001B1710;
                 rot.q=D_L07_001B1720;
-                func_L07_003EEBF8(D_L07_001B22DC[0]+(idx<<8),P(state,0xf8),&pos,&rot);
+                AttachMobyToParentAtOffset(gMobyArray_L07[0]+(idx<<8),P(vars,0xf8),&pos,&rot);
                 D_L07_001B31A0[i]=2;
             }
             break;
         case 1:
             if(D_L07_001B31A0[i]==0) {
-                p=P(P(state,0xf8),0x68);
-                if(func_002A8508(W(p,0x94),-1)<3) {
-                    func_L00_003294F0(D_L07_001B22DC[0]+(W(p,0xb8)<<8),1);
+                partVars=P(P(vars,0xf8),0x68);
+                if(CountMobysInGroupNotInState(W(partVars,0x94),-1)<3) {
+                    SetObjectFlagBit(gMobyArray_L07[0]+(W(partVars,0xb8)<<8),1);
                     D_L07_001B31A0[i]=2;
                 }
             }
             break;
         case 3:
             if(D_L07_001B31A0[i]==0) {
-                p=P(P(state,0xf8),0x68);
-                if(func_002A8508(W(p,0x98),-1)==0 && func_002A8508(W(p,0x9c),-1)==0) {
-                    func_L07_003EEE08(D_L07_001B22DC[0]+(W(P(P(state,0xf8),0x68),0xb8)<<8));
-                    func_L07_003F7968(D_L07_001B22DC[0]+(W(state,0xc4)<<8),P(state,0xf8),0);
+                partVars=P(P(vars,0xf8),0x68);
+                if(CountMobysInGroupNotInState(W(partVars,0x98),-1)==0 && CountMobysInGroupNotInState(W(partVars,0x9c),-1)==0) {
+                    SwitchToState5(gMobyArray_L07[0]+(W(P(P(vars,0xf8),0x68),0xb8)<<8));
+                    StartBossMoveTier(gMobyArray_L07[0]+(W(vars,0xc4)<<8),P(vars,0xf8),0);
                     D_L07_001B31A0[i]=2;
-                } else if((D_L07_001B1E08[0]&7)==(((int)P(state,0xf8)>>8)&7)) {
-                    func_00282CF0(&pos,D_L07_00189EA0,P(state,0xf8)+0x10);
-                    func_002AFDD8(P(state,0xf8),&pos,&pos,0);
+                } else if((D_L07_001B1E08[0]&7)==(((int)P(vars,0xf8)>>8)&7)) {
+                    FastVecSub(&pos,D_L07_00189EA0,P(vars,0xf8)+0x10);
+                    TransformVectorByObjectOrGiven(P(vars,0xf8),&pos,&pos,0);
                     if(pos.f[0]<-12.0f) {
-                        func_L07_003EEE08(sibEntities+(W(P(P(state,0xf8),0x68),0xb8)<<8));
-                        func_L07_003F7968(D_L07_001B22DC[0]+(W(state,0xc4)<<8),P(state,0xf8),0);
+                        SwitchToState5(sibEntities+(W(P(P(vars,0xf8),0x68),0xb8)<<8));
+                        StartBossMoveTier(gMobyArray_L07[0]+(W(vars,0xc4)<<8),P(vars,0xf8),0);
                         D_L07_001B31A0[i]=2;
                     }
                 }
@@ -129,103 +130,103 @@ void func_L07_0040FC88(u8 *self)
             break;
         case 4:
             if(D_L07_001B31A0[i]==0) {
-                if(func_L07_003F7BE0(D_L07_001B22DC[0]+(W(state,0xc4)<<8))==1) {
+                if(GetBossAttackMode(gMobyArray_L07[0]+(W(vars,0xc4)<<8))==1) {
                     D_L07_001B31A0[i]=1;
                     break;
                 }
-                if(D_L07_001B31A0[3]==2) func_L07_0040F468(self);
+                if(D_L07_001B31A0[3]==2) SteerMobyAimYaw(moby);
             } else {
-                Motion *motion=(Motion *)P(P(state,0xf4),0x68);
+                Motion *motion=(Motion *)P(P(vars,0xf4),0x68);
                 path=D_L07_001FDEC0[motion->path];
                 cursor=motion->distance;
                 for(j=0;j<3;j++,cursor++) {
                     *cursor-=motion->speed*0.1f;
                     if(*cursor<0) *cursor+=(float)*path;
                 }
-                d=motion->distance[0]-motion->start;
-                if(d<0) d+=(float)*path;
-                if(d<=32.5f) {
+                remaining=motion->distance[0]-motion->start;
+                if(remaining<0) remaining+=(float)*path;
+                if(remaining<=32.5f) {
                     D_L07_001B31A0[i]=2;
                     D_L07_001B31A0[5]=1;
-                    func_002E5DA0(1,0,P(state,0xf8),0x11d9);
+                    PlaySoundFromClassBank(1,0,P(vars,0xf8),0x11d9);
                 }
             }
             break;
         case 5:
             if(D_L07_001B31A0[i]!=0) {
-                p=P(P(state,0xfc),0x68);
-                func_002AAA00(p+0x110,0.0f,p+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
-                if(F(p,0x110)>=0) D_L07_001B31A0[i]=2;
+                partVars=P(P(vars,0xfc),0x68);
+                ApproachTargetWithDirectionMode(partVars+0x110,0.0f,partVars+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
+                if(F(partVars,0x110)>=0) D_L07_001B31A0[i]=2;
             }
             break;
         case 6:
-            if(D_L07_001B31A0[i]==0 && D_L07_00189E20.riding==P(state,0xfc) && D_L07_00189E20.ridingFlag) {
-                func_L02_0031F858(W(P(P(state,0xfc),0x68),0x94),1);
+            if(D_L07_001B31A0[i]==0 && D_L07_00189E20.riding==P(vars,0xfc) && D_L07_00189E20.ridingFlag) {
+                SetGroupObjectsEnabled(W(P(P(vars,0xfc),0x68),0x94),1);
                 D_L07_001B31A0[i]=2;
             }
             break;
         case 7:
             if(D_L07_001B31A0[i]==0) {
-                p=P(P(state,0xfc),0x68);
-                if(func_002A8508(W(p,0xa0),-1)==0) {
-                    W(p,0x16cc)=func_002E5DA0(2,4,P(state,0xfc),0x11d9);
-                    D_L07_001B31A0[i]=2; F(p,0x16c8)=6.0f;
+                partVars=P(P(vars,0xfc),0x68);
+                if(CountMobysInGroupNotInState(W(partVars,0xa0),-1)==0) {
+                    W(partVars,0x16cc)=PlaySoundFromClassBank(2,4,P(vars,0xfc),0x11d9);
+                    D_L07_001B31A0[i]=2; F(partVars,0x16c8)=6.0f;
                 }
             }
             break;
         case 8:
             if(D_L07_001B31A0[i]==0) {
-                p=P(P(state,0xfc),0x68);
-                if(func_002A8508(W(p,0x98),-1)==0 && func_002A8508(W(p,0x9c),-1)==0) {
+                partVars=P(P(vars,0xfc),0x68);
+                if(CountMobysInGroupNotInState(W(partVars,0x98),-1)==0 && CountMobysInGroupNotInState(W(partVars,0x9c),-1)==0) {
                     D_L07_001B31A0[i]=1;
-                    func_002E5DA0(1,0,P(state,0xfc),0x11d9);
-                } else if((D_L07_001B1E08[0]&7)==(((int)P(state,0xfc)>>8)&7)) {
-                    func_00282CF0(&pos,D_L07_00189EA0,P(state,0xfc)+0x10);
-                    func_002AFDD8(P(state,0xfc),&pos,&pos,0);
+                    PlaySoundFromClassBank(1,0,P(vars,0xfc),0x11d9);
+                } else if((D_L07_001B1E08[0]&7)==(((int)P(vars,0xfc)>>8)&7)) {
+                    FastVecSub(&pos,D_L07_00189EA0,P(vars,0xfc)+0x10);
+                    TransformVectorByObjectOrGiven(P(vars,0xfc),&pos,&pos,0);
                     if(pos.f[0]<-14.0f) {
                         D_L07_001B31A0[i]=1;
-                        func_002E5DA0(1,0,P(state,0xfc),0x11d9);
+                        PlaySoundFromClassBank(1,0,P(vars,0xfc),0x11d9);
                     }
                 }
             } else {
-                p=P(P(state,0xfc),0x68);
-                func_002AAA00(p+0x114,0.0f,p+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
-                if(F(p,0x114)<=0) D_L07_001B31A0[i]=2;
+                partVars=P(P(vars,0xfc),0x68);
+                ApproachTargetWithDirectionMode(partVars+0x114,0.0f,partVars+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
+                if(F(partVars,0x114)<=0) D_L07_001B31A0[i]=2;
             }
             break;
         case 9:
-            if(D_L07_001B31A0[i]==0 && D_L07_00189E20.ridingFlag && D_L07_00189E20.riding==P(state,0x100)) {
-                func_00282CF0(&pos,&D_L07_00189E20.position,P(state,0x100)+0x10);
-                func_002AFDD8(P(state,0x100),&pos,&pos,0);
+            if(D_L07_001B31A0[i]==0 && D_L07_00189E20.ridingFlag && D_L07_00189E20.riding==P(vars,0x100)) {
+                FastVecSub(&pos,&D_L07_00189E20.position,P(vars,0x100)+0x10);
+                TransformVectorByObjectOrGiven(P(vars,0x100),&pos,&pos,0);
                 if(pos.f[2]>5.8f) {
-                    func_L07_003F7968(sibEntities+(W(state,0xc4)<<8),P(state,0x100),1);
+                    StartBossMoveTier(sibEntities+(W(vars,0xc4)<<8),P(vars,0x100),1);
                     D_L07_001B31A0[i]=2;
                 }
             }
             break;
         case 10:
             if(D_L07_001B31A0[i]==0) {
-                e=D_L07_001B22DC[0]+(W(state,0xc4)<<8);
-                if(func_L07_003F7BE0(e)==2 && *(u16 *)(e+0x96)>=121 && D_0018C0BC!=20 && D_0018C0BC!=7) D_L07_001B31A0[i]=1;
-                else if(D_L07_001B31A0[9]==2) func_L07_0040F468(self);
+                target=gMobyArray_L07[0]+(W(vars,0xc4)<<8);
+                if(GetBossAttackMode(target)==2 && *(u16 *)(target+0x96)>=121 && D_0018C0BC!=20 && D_0018C0BC!=7) D_L07_001B31A0[i]=1;
+                else if(D_L07_001B31A0[9]==2) SteerMobyAimYaw(moby);
             } else if(D_L07_001B31A0[i]==1) {
-                func_L02_002DCEA0(5,10.0f);
+                StartTimedCountdown(5,10.0f);
                 if(D_L07_001B1D20[0]>=1.0f && D_L07_001B90C0.phase==1) {
                     D_L07_001B90C0.phase=60;
                     D_L07_001B31A0[i]=2;
-                    func_L00_00303530(0,0);
+                    LoadSceneChunk(0,0);
                     rot.q=0; rot.f[2]=D_L07_001B173C[0]; pos.q=rot.q;
-                    func_L00_002B9D60(&D_L07_001B1730,&pos,0,1);
-                    func_002DF3F8(D_L07_00189EA0,&D_L07_00189EA0[1]);
-                    func_L00_0042A500(P(state,0xd8));
+                    ResetHeroPositionAndDirection(&D_L07_001B1730,&pos,0,1);
+                    CaptureCheckpointState(D_L07_00189EA0,&D_L07_00189EA0[1]);
+                    ResetCameraEntry(P(vars,0xd8));
                     {
-                        u8 *child=P(state,0x100);
-                        int mode=W(state,0xd0);
+                        u8 *child=P(vars,0x100);
+                        int mode=W(vars,0xd0);
                         D_L07_001ADAAC=0;
-                        func_L07_00410700(child,mode);
+                        StartShipSecondPhase(child,mode);
                     }
-                    func_002A0430(self[0xb0]);
-                    func_002A7750(self,2,-1);
+                    MarkTableEntryFlagged(moby[0xb0]);
+                    SetMobyState(moby,2,-1);
                 }
             }
             break;

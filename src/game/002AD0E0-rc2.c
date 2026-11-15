@@ -4,6 +4,7 @@
    this function alone. */
 
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -20,30 +21,30 @@ extern void func_002AB6D8(char *a, char *b);
 
 /* Places the position a2 into a4 relative to the object a1 and its matrix
    target, and a3 into a5; without the object's target both are plain copies. */
-int func_002AD0E0(void *unused, void *a1, void *a2, void *a3, void *a4, void *a5)
+int func_002AD0E0(void *unused, void *object, void *position, void *rotation, void *outPosition, void *outRotation)
 {
-    Matrix64_002AD0E0 m0, m1, m2;
-    char *p = (char *)func_002AD0B0((unsigned char *)a1);
+    Matrix64_002AD0E0 targetMatrix, tempMatrix, sourceMatrix;
+    char *target = (char *)GetMobyPrivateValue2((unsigned char *)object);
 
-    if (p == 0) {
-        *(TI128 *)a4 = *(TI128 *)a2;
-        *(TI128 *)a5 = *(TI128 *)a3;
+    if (target == 0) {
+        *(TI128 *)outPosition = *(TI128 *)position;
+        *(TI128 *)outRotation = *(TI128 *)rotation;
         return 0;
     }
-    func_00283410((char *)&m0, p);
-    func_00282CC0((char *)a4, (char *)a2, p + 0x10);
-    func_00282CF0((char *)a4, (char *)a4, (char *)a1 + 0x10);
-    if (*(int *)(p + 0x3C) & 2) {
-        func_00283410((char *)&m2, p + 0x20);
-        func_00283698((char *)&m1, (char *)&m2);
-        func_00283098((char *)a4, (char *)a4, (char *)&m1);
-        func_00283098((char *)a4, (char *)a4, (char *)a1 + 0xC0);
+    euler_to_matrix((char *)&targetMatrix, target);
+    FastVecAdd((char *)outPosition, (char *)position, target + 0x10);
+    FastVecSub((char *)outPosition, (char *)outPosition, (char *)object + 0x10);
+    if (*(int *)(target + 0x3C) & 2) {
+        euler_to_matrix((char *)&sourceMatrix, target + 0x20);
+        matrix_from_basis_rows((char *)&tempMatrix, (char *)&sourceMatrix);
+        matrix_mul_vec3((char *)outPosition, (char *)outPosition, (char *)&tempMatrix);
+        matrix_mul_vec3((char *)outPosition, (char *)outPosition, (char *)object + 0xC0);
     } else {
-        func_00283098((char *)a4, (char *)a4, (char *)&m0);
+        matrix_mul_vec3((char *)outPosition, (char *)outPosition, (char *)&targetMatrix);
     }
-    func_00282CC0((char *)a4, (char *)a4, (char *)a1 + 0x10);
-    func_00283410((char *)&m1, (char *)a3);
-    func_00283788((char *)&m1, (char *)&m0, (char *)&m1);
-    func_002AB6D8((char *)&m1, (char *)a5);
+    FastVecAdd((char *)outPosition, (char *)outPosition, (char *)object + 0x10);
+    euler_to_matrix((char *)&tempMatrix, (char *)rotation);
+    multiply_matrix((char *)&tempMatrix, (char *)&targetMatrix, (char *)&tempMatrix);
+    GetEulerAnglesFromMatrix((char *)&tempMatrix, (char *)outRotation);
     return 1;
 }

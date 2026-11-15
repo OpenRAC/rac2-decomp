@@ -142,6 +142,7 @@ extern u32 D_001341E8[];
 #define malloc_trim(pad) func_00117108(reent_ptr, (pad))
 #define RCALL reent_ptr,
 
+/* Gives a heap block back and joins it with free blocks next to it. */
 void func_00116E10(struct _reent *reent_ptr, Void_t *mem) {
   mchunkptr p;         /* chunk corresponding to mem */
   INTERNAL_SIZE_T hd;  /* its head field */

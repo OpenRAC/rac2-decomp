@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L23_00425568 is a unit of its own: it needs the opt-in quadword-copy profile
    (-frac2-qcopy, #262), which gives retail's grouped `lq`/`sq` with register addresses. */
@@ -23,6 +24,8 @@ extern void func_L23_004260F0(u8 *obj, float *dst, TI16 *src1, TI16 *src2, float
    weighted references than the object pointer keep the two in retail's $s3/$s4); each control
    point is copied through a local of its own, so only the sample copies are grouped `lq`/`sq`
    pairs; and the sample is stored once after the if/else, which leaves the `b` slot empty. */
+/* Builds the curved path a trail follows from the object to its target, stored as five
+   points. */
 void func_L23_00425568(u8 *obj) {
     TI16 loc[5];
     TI16 va;
@@ -31,43 +34,43 @@ void func_L23_00425568(u8 *obj) {
     TI16 vd;
     TI16 *out;
     TI16 *p;
-    u8 *s0;
-    float f20;
+    u8 *vars;
+    float spread;
     s32 i;
     s32 j;
-    s32 n;
+    s32 next;
 
     i = 0;
-    s0 = *(u8 **)(obj + 0x68);
+    vars = *(u8 **)(obj + 0x68);
     out = &loc[3];
     do {
-        func_00282CF0((float *)&loc[0], *(float **)(s0 + 0x20), (float *)(obj + 0x10));
-        n = i + 1;
+        FastVecSub((float *)&loc[0], *(float **)(vars + 0x20), (float *)(obj + 0x10));
+        next = i + 1;
         j = 0;
-        p = (TI16 *)(s0 + 0x30);
-        f20 = func_00282DF0((float *)&loc[0]) * *(float *)(s0 + 0x1C);
+        p = (TI16 *)(vars + 0x30);
+        spread = FastVecLength((float *)&loc[0]) * *(float *)(vars + 0x1C);
         vb = *(TI16 *)(obj + 0x10);
-        va = **(TI16 **)(s0 + 0x20);
+        va = **(TI16 **)(vars + 0x20);
         loc[4] = vb;
         loc[3] = va;
-        func_L23_004260F0(obj, (float *)&loc[1], &loc[3], &loc[4], f20);
+        ComputeCurveControlPoint(obj, (float *)&loc[1], &loc[3], &loc[4], spread);
         vc = *(TI16 *)(obj + 0x10);
         loc[3] = vc;
-        vd = **(TI16 **)(s0 + 0x20);
+        vd = **(TI16 **)(vars + 0x20);
         loc[4] = vd;
-        func_L23_004260F0(obj, (float *)&loc[2], &loc[3], &loc[4], f20);
+        ComputeCurveControlPoint(obj, (float *)&loc[2], &loc[3], &loc[4], spread);
         do {
             float f = (float)j * 0.2f;
 
             if (j == 4) {
-                *out = **(TI16 **)(s0 + 0x20);
+                *out = **(TI16 **)(vars + 0x20);
             } else {
-                func_L00_0031AA28(out, (float *)(obj + 0x10), *(float **)(s0 + 0x20), &loc[1], &loc[2], f);
+                InterpolateCubicVector_L00(out, (float *)(obj + 0x10), *(float **)(vars + 0x20), &loc[1], &loc[2], f);
             }
             *p = *out;
             j++;
             p++;
         } while (j < 5);
-        i = n;
+        i = next;
     } while (i <= 0);
 }

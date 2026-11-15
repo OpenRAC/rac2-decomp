@@ -46,60 +46,60 @@ extern float func_L00_002B5590(void *);
 
 /* Approach the requested velocity, increasing acceleration when reversing direction. */
 void func_L01_002B6948(float rate) {
-    float v[4] __attribute__((aligned(16)));
-    float t[4] __attribute__((aligned(16)));
-    float u[4] __attribute__((aligned(16)));
-    float angle,speed,dot,l1,l2;
-    switch(D_00189E20.x22c3) {
+    float targetVelocity[4] __attribute__((aligned(16)));
+    float sourceVec[4] __attribute__((aligned(16)));
+    float currentDir[4] __attribute__((aligned(16)));
+    float angle,speed,alignment,targetLength,currentLength;
+    switch(gHeroState.x22c3) {
     case 0:
-        angle=D_00189E20.x1a0;speed=D_00189E20.x1b0;
-        if(D_00189E20.x229c==4 && D_00189E20.x524 && D_00189E20.x287) speed=0.0833333358f;
-        if(D_00189E20.x34a && D_00189E20.x2294==14 && speed>0.0166666675f) speed=0.0166666675f;
-        v[0]=func_00283180(angle)*speed;
-        v[1]=func_00283198(angle)*speed;
-        v[2]=D_00189E20.xf8;
-        dot=-(D_00189E20.xf0*v[0]+D_00189E20.xf4*v[1]);
-        l1=func_00282E20(v);l2=func_00282E20((char *)&D_00189E20+0xf0);
-        if(l1==0.0f || l2==0.0f) dot=0.0f;
+        angle=gHeroState.x1a0;speed=gHeroState.x1b0;
+        if(gHeroState.x229c==4 && gHeroState.x524 && gHeroState.x287) speed=0.0833333358f;
+        if(gHeroState.x34a && gHeroState.x2294==14 && speed>0.0166666675f) speed=0.0166666675f;
+        targetVelocity[0]=FastSinOrCosA(angle)*speed;
+        targetVelocity[1]=FastSinOrCosB(angle)*speed;
+        targetVelocity[2]=gHeroState.xf8;
+        alignment=-(gHeroState.xf0*targetVelocity[0]+gHeroState.xf4*targetVelocity[1]);
+        targetLength=vec_length_xy(targetVelocity);currentLength=vec_length_xy((char *)&gHeroState+0xf0);
+        if(targetLength==0.0f || currentLength==0.0f) alignment=0.0f;
         else {
-            dot/=l1;
-            dot/=l2;
+            alignment/=targetLength;
+            alignment/=currentLength;
         }
-        dot+=1.0f;
-        dot*=1.5f;
-        if(dot>3.0f) dot=3.0f;
-        if(dot<1.0f) dot=1.0f;
-        rate*=dot;
-        func_00282CF0(v,v,(char *)&D_00189E20+0xf0);
-        if(func_00282E20(v)>rate) func_00282F70(v,v,rate);
-        func_00282CC0((char *)&D_00189E20+0xf0,(char *)&D_00189E20+0xf0,v);
-        *(VelocityQuad *)t=*(VelocityQuad *)((char *)&D_00189E20+0xa60);
-        D_00189E20.x1b4=D_00189E20.x178-func_L00_002B5590(t);
-        if(D_00189E20.x1454) D_00189E20.x1b4=D_00189E20.x174;
+        alignment+=1.0f;
+        alignment*=1.5f;
+        if(alignment>3.0f) alignment=3.0f;
+        if(alignment<1.0f) alignment=1.0f;
+        rate*=alignment;
+        FastVecSub(targetVelocity,targetVelocity,(char *)&gHeroState+0xf0);
+        if(vec_length_xy(targetVelocity)>rate) FastVectorNormalizeHelper(targetVelocity,targetVelocity,rate);
+        FastVecAdd((char *)&gHeroState+0xf0,(char *)&gHeroState+0xf0,targetVelocity);
+        *(VelocityQuad *)sourceVec=*(VelocityQuad *)((char *)&gHeroState+0xa60);
+        gHeroState.x1b4=gHeroState.x178-GetSpeedAlongHeroForward(sourceVec);
+        if(gHeroState.x1454) gHeroState.x1b4=gHeroState.x174;
         break;
     case 1:case 2:
-        *(VelocityQuad *)t=*(VelocityQuad *)((char *)&D_00189E20+0x190);speed=D_00189E20.x1b0;
-        func_L00_002D3B58(v,t,0.0f);
-        func_00282F20(v,v,speed);
-        func_L00_002D3B58(u,(char *)&D_00189E20+0xf0,0.0f);
-        dot=-func_00282DB0(u,v);
-        l1=func_L00_002D3A58(v);l2=func_L00_002D3A58((char *)&D_00189E20+0xf0);
-        if(l1==0.0f || l2==0.0f) dot=0.0f;
+        *(VelocityQuad *)sourceVec=*(VelocityQuad *)((char *)&gHeroState+0x190);speed=gHeroState.x1b0;
+        SetViewSpaceHeight(targetVelocity,sourceVec,0.0f);
+        vec_scale_to_length(targetVelocity,targetVelocity,speed);
+        SetViewSpaceHeight(currentDir,(char *)&gHeroState+0xf0,0.0f);
+        alignment=-FastVecDot(currentDir,targetVelocity);
+        targetLength=GetViewSpaceVectorLength(targetVelocity);currentLength=GetViewSpaceVectorLength((char *)&gHeroState+0xf0);
+        if(targetLength==0.0f || currentLength==0.0f) alignment=0.0f;
         else {
-            dot/=l1;
-            dot/=l2;
+            alignment/=targetLength;
+            alignment/=currentLength;
         }
-        dot+=1.0f;
-        dot*=1.5f;
-        if(dot>3.0f) dot=3.0f;
-        if(dot<1.0f) dot=1.0f;
-        rate*=dot;
-        func_00282CF0(v,v,(char *)&D_00189E20+0xf0);
-        func_L00_002D3B58(v,v,0.0f);
-        if(func_L00_002D3A58(v)>rate) func_L00_002D3BD8(v,v,rate);
-        func_00282CC0((char *)&D_00189E20+0xf0,(char *)&D_00189E20+0xf0,v);
-        D_00189E20.x1b4=D_00189E20.x178;
-        if(D_00189E20.x1454) D_00189E20.x1b4=D_00189E20.x174;
+        alignment+=1.0f;
+        alignment*=1.5f;
+        if(alignment>3.0f) alignment=3.0f;
+        if(alignment<1.0f) alignment=1.0f;
+        rate*=alignment;
+        FastVecSub(targetVelocity,targetVelocity,(char *)&gHeroState+0xf0);
+        SetViewSpaceHeight(targetVelocity,targetVelocity,0.0f);
+        if(GetViewSpaceVectorLength(targetVelocity)>rate) SetViewSpaceVectorLength(targetVelocity,targetVelocity,rate);
+        FastVecAdd((char *)&gHeroState+0xf0,(char *)&gHeroState+0xf0,targetVelocity);
+        gHeroState.x1b4=gHeroState.x178;
+        if(gHeroState.x1454) gHeroState.x1b4=gHeroState.x174;
         break;
     }
 }

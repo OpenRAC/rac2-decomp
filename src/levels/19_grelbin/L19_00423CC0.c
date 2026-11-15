@@ -19,60 +19,61 @@ extern struct {
     unsigned char state[0];
 } D_L19_0021EA30;
 
-void func_L19_00423CC0(char *a0)
+/* Waits for the player to come near, then marks the object as used in the level's saved data and moves to its finished state. */
+void func_L19_00423CC0(char *moby)
 {
-    char *q1, *q2;
-    int obj = *(int *)(a0 + 0x68);
+    char *classInfoA, *classInfoB;
+    int vars = *(int *)(moby + 0x68);
 
-    if (obj == 0) {
-        func_0029F338(a0);
+    if (vars == 0) {
+        MarkMobySpawned(moby);
         return;
     }
-    switch (*(unsigned char *)(a0 + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(int *)(a0 + 0x98) = 0;
-        *(unsigned short *)(a0 + 0x34) = (*(unsigned short *)(a0 + 0x34) | 0x41) & 0xEFFF;
-        func_002A7750(a0, 1, -1);
-        *(unsigned char *)(a0 + 0x30) = 0xFF;
+        *(int *)(moby + 0x98) = 0;
+        *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
+        SetMobyState(moby, 1, -1);
+        *(unsigned char *)(moby + 0x30) = 0xFF;
         break;
     case 2:
     default:
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0, *(int *)obj) != 0) {
-            int h = *(unsigned short *)(a0 + 0xB2);
-            if (h & 1) {
-                unsigned char *e = &D_0019B4A8[((short)h >> 1) + (D_001A79F0_gp << 10)];
-                if (((*e >> 4) & 7) != 7) {
-                    *e += 0x10;
+        if (IsPointInCuboid(gHeroPosition, *(int *)vars) != 0) {
+            int uid = *(unsigned short *)(moby + 0xB2);
+            if (uid & 1) {
+                unsigned char *counterByte = &D_0019B4A8[((short)uid >> 1) + (D_001A79F0_gp << 10)];
+                if (((*counterByte >> 4) & 7) != 7) {
+                    *counterByte += 0x10;
                 }
             } else {
-                unsigned char *e = &D_0019B4A8[((short)h >> 1) + (D_001A79F0_gp << 10)];
-                if ((*e & 7) != 7) {
-                    *e += 1;
+                unsigned char *counterByte = &D_0019B4A8[((short)uid >> 1) + (D_001A79F0_gp << 10)];
+                if ((*counterByte & 7) != 7) {
+                    *counterByte += 1;
                 }
             }
-            *(unsigned short *)(a0 + 0x34) = (*(unsigned short *)(a0 + 0x34) & 0xFFBE) | 0x1000;
-            q1 = *(char **)(a0 + 0x24);
-            *(int *)(a0 + 0x98) = *(int *)(q1 + 0x10);
-            *(int *)(a0 + 0x98) = *(int *)(q1 + 0x10);
-            func_002A7750(a0, 2, -1);
+            *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
+            classInfoA = *(char **)(moby + 0x24);
+            *(int *)(moby + 0x98) = *(int *)(classInfoA + 0x10);
+            *(int *)(moby + 0x98) = *(int *)(classInfoA + 0x10);
+            SetMobyState(moby, 2, -1);
         }
         {
-            int h = *(unsigned short *)(a0 + 0xB2);
+            int uid = *(unsigned short *)(moby + 0xB2);
 
-            if (D_L19_0021EA30.state[(short)h] == 0) {
-                int c = D_0019B4A8[((short)h >> 1) + (D_001A79F0[0] << 10)];
+            if (D_L19_0021EA30.state[(short)uid] == 0) {
+                int savedCount = D_0019B4A8[((short)uid >> 1) + (gCurrentMapIndex[0] << 10)];
 
-                if (!((h & 1) ? ((c >> 4) & 7) : (c & 7)))
+                if (!((uid & 1) ? ((savedCount >> 4) & 7) : (savedCount & 7)))
                     return;
             }
         }
-        *(unsigned short *)(a0 + 0x34) = (*(unsigned short *)(a0 + 0x34) & 0xFFBE) | 0x1000;
-        q2 = *(char **)(a0 + 0x24);
-        *(int *)(a0 + 0x98) = *(int *)(q2 + 0x10);
-        *(int *)(a0 + 0x98) = *(int *)(q2 + 0x10);
-        func_002A7750(a0, 2, -1);
+        *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
+        classInfoB = *(char **)(moby + 0x24);
+        *(int *)(moby + 0x98) = *(int *)(classInfoB + 0x10);
+        *(int *)(moby + 0x98) = *(int *)(classInfoB + 0x10);
+        SetMobyState(moby, 2, -1);
         break;
     }
 }

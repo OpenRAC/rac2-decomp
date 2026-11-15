@@ -27,10 +27,11 @@ extern s32 func_00132028();
 extern s32 D_001A74A0 __attribute__((sda));
 extern s32 D_001A74C0 __attribute__((sda));
 
+/* Counts one more queued sound command and then runs the sound update. */
 void func_001330D0(void) {
-    s32 *temp_a0;
+    s32 *countPtr;
 
-    temp_a0 = *(s32 *)((s32) ((s8 *) ((D_001A74C0 * 4)) + (s32) (&D_001A74A0)));
-    *temp_a0 += 1;
-    func_00132028();
+    countPtr = *(s32 *)((s32) ((s8 *) ((D_001A74C0 * 4)) + (s32) (&D_001A74A0)));
+    *countPtr += 1;
+    snd_Pump();
 }

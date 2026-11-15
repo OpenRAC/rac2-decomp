@@ -40,29 +40,30 @@ extern u8 *D_L06_001FF50C;
 
 /* The func_L04_00362768 spawner with a colour word, a second size and a random
    spin halfword. */
-void func_L06_0037E6B0(void *a0, void *a1, u32 a2, f32 f3, f32 f4) {
-    L06Record *p = (L06Record *)(u32)func_002B9030(0x53);
-    L06RecordTail *q;
-    L06Quad t;
+/* Spawns a spinning effect record at a position, with a colour, a size and a random spin speed. */
+void func_L06_0037E6B0(void *position, void *direction, u32 angle, f32 size, f32 secondSize) {
+    L06Record *record = (L06Record *)(u32)AllocParticle(0x53);
+    L06RecordTail *tail;
+    L06Quad temp;
 
-    if ((u32)p != 0) {
-        p->field10 = *(L06Quad *)a0;
-        q = (L06RecordTail *)((u8 *)p + 0x20);
-        p->field04 = 0x50502010;
-        p->field09 = (u8)(func_00283CF0(2.0f) + 0x40);
-        p->field03 = 0x48;
-        p->field01 = 0;
-        p->field02 = *D_L06_001FF50C;
-        p->field0C = f3 * 105000.0f;
-        p->field08 = (u8)func_002A77E0(0xFF);
-        p->field0A = (u16)a2;
-        t = *(L06Quad *)a1;
-        p->field20 = t;
-        q->field0C = func_00283CE0((s16)a2);
-        q->field10 = 0.5f;
-        q->field14 = f3;
-        q->field18 = 0;
-        q->field1C = f4;
-        q->field1A = (s16)(func_002A77E0(6) - 3);
+    if ((u32)record != 0) {
+        record->field10 = *(L06Quad *)position;
+        tail = (L06RecordTail *)((u8 *)record + 0x20);
+        record->field04 = 0x50502010;
+        record->field09 = (u8)(FloatToInt(2.0f) + 0x40);
+        record->field03 = 0x48;
+        record->field01 = 0;
+        record->field02 = *D_L06_001FF50C;
+        record->field0C = size * 105000.0f;
+        record->field08 = (u8)RandomIntBelow(0xFF);
+        record->field0A = (u16)angle;
+        temp = *(L06Quad *)direction;
+        record->field20 = temp;
+        tail->field0C = IntToFloat((s16)angle);
+        tail->field10 = 0.5f;
+        tail->field14 = size;
+        tail->field18 = 0;
+        tail->field1C = secondSize;
+        tail->field1A = (s16)(RandomIntBelow(6) - 3);
     }
 }

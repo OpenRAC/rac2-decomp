@@ -17,30 +17,31 @@ extern s32 D_001A7248 MACRO_ADDR;
 extern s32 func_002EEFE0(u32);
 extern s32 func_0011D620(void *, s32, s32, u8 **, s32, u8 *, s32, s32, s32);
 
-s32 func_002EEED0(u8 *buf, u32 idx, s32 start, s32 n, s32 arg) {
-    u8 *dst;
-    s32 c;
-    s32 sz;
-    if (n == -1) {
-        n = func_002EEFE0(idx);
+/* Copies records into one of the 64 buffer slots, in pieces of at most 0xFFFF records. Returns 0 on success or a negative error code. */
+s32 func_002EEED0(u8 *src, u32 slot, s32 firstRecord, s32 count, s32 mode) {
+    u8 *dest;
+    s32 chunk;
+    s32 bytes;
+    if (count == -1) {
+        count = GetBufferSlotRecordCount(slot);
     }
-    if (idx >= 64 || D_00215050[idx].count == 0) {
+    if (slot >= 64 || D_00215050[slot].count == 0) {
         return -3;
     }
-    if (D_00215050[idx].count < start + n) {
+    if (D_00215050[slot].count < firstRecord + count) {
         return -1;
     }
-    dst = D_00215050[idx].base + start * 16;
-    while (n != 0) {
-        c = n;
-        if (c > 0xFFFF) {
-            c = 0xFFFF;
+    dest = D_00215050[slot].base + firstRecord * 16;
+    while (count != 0) {
+        chunk = count;
+        if (chunk > 0xFFFF) {
+            chunk = 0xFFFF;
         }
-        sz = c * 16;
-        func_0011D620(&D_001A7248, 1, arg, &dst, 16, buf, sz, 0, 0);
-        n -= c;
-        buf += sz;
-        dst += sz;
+        bytes = chunk * 16;
+        CallRpcServer(&D_001A7248, 1, mode, &dest, 16, src, bytes, 0, 0);
+        count -= chunk;
+        src += bytes;
+        dest += bytes;
     }
     return 0;
 }

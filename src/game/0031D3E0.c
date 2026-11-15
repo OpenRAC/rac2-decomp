@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int Quad_0031D3E0 __attribute__((mode(TI)));
 
 extern int D_L00_001B1DC0 __attribute__((sda));
@@ -19,11 +20,11 @@ char *func_0031D3E0(void *position, void *direction,
 
     if (D_L00_001B1DC0 < 17)
         return 0;
-    object = func_0029EFD0(0xA82);
+    object = CreateMoby(0xA82);
     if (object != 0) {
         data = *(char **)(object + 0x68);
         *(Quad_0031D3E0 *)(object + 0x10) = *(Quad_0031D3E0 *)position;
-        func_00282F20(data, direction, value60 * 0.016666668f);
+        vec_scale_to_length(data, direction, value60 * 0.016666668f);
         initial = 255;
         object[0x20] = 0;
         *(short *)(object + 0x32) = initial;
@@ -47,7 +48,7 @@ char *func_0031D3E0(void *position, void *direction,
             data[0x7C] = 1;
         else
             data[0x7C] = 0;
-        *(short *)(data + 0x6E) = func_002FED90(object, 0, 1.0f, 1.0f, 1.0f);
+        *(short *)(data + 0x6E) = AllocEffectSlot_002FED90(object, 0, 1.0f, 1.0f, 1.0f);
         func_002A0F48(object);
     }
     return object;

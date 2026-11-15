@@ -26,6 +26,7 @@ extern void func_002830C0(void *, void *, void *);
 typedef struct { TI128 row[4]; } Matrix64 __attribute__((aligned(16)));
 extern const Matrix64 D_L14_001AEE10;
 
+/* Sets up the level's table of ten records from a template and refreshes each active entry. */
 void func_L14_00304190(void) {
     Vector axis;
     Record *dst = D_L14_00284708;
@@ -34,7 +35,7 @@ void func_L14_00304190(void) {
     axis.q = 0;
     axis.f[0] = 1.0f;
     D_L14_001B23D0 = dst;
-    scale = func_00282DB0(D_L14_001B9730, &axis);
+    scale = FastVecDot(D_L14_001B9730, &axis);
     {
         Record *src = D_L14_00284690;
         int copyIndex;
@@ -43,13 +44,14 @@ void func_L14_00304190(void) {
     }
     for (i = 0; i < *(short *)(D_L14_001B2B20 + 6); i++) {
         if (i >= 10)
-            func_00283388(D_L14_001B2B50);
+            set_identity_matrix(D_L14_001B2B50);
         else
-            func_002E3478(i);
-        func_002E3940(i);
+            UpdateViewRotation(i);
+        ProcessViewEntry(i);
     }
 }
 
+/* Builds four scaled and rotated rows and moves them by the given transform. */
 void func_L14_00390EC0(Vector *output, char *transform, float yScale, float zScale, float angle) {
     Vector axis;
     Matrix64 rows;
@@ -66,9 +68,9 @@ void func_L14_00390EC0(Vector *output, char *transform, float yScale, float zSca
         output[i].f[1] *= yScale;
         output[i].f[2] *= zScale;
         if (angle != 0.0f) {
-            func_002ACEC0(&output[i], &output[i], &axis, angle);
+            ApplyAxisRotationToQuaternion(&output[i], &output[i], &axis, angle);
             output[i].f[3] = 1.0f;
         }
-        func_002830C0(&output[i], &output[i], transform);
+        transform_vector(&output[i], &output[i], transform);
     }
 }

@@ -39,17 +39,18 @@ extern MenuCounter D_0025ABC0;
 extern MenuSelection D_0025AC28;
 extern int func_002E5E58(int, unsigned int, void *);
 
+/* Handles the left and right buttons on the item list menu and picks the nearest rows that have items. */
 int func_002CDB30(void)
 {
     int flags = D_00138344;
-    int old = D_001AB9B0;
+    int previousRow = D_001AB9B0;
     int result = 0;
 
     if (flags & 0x10) {
-        int value = *(int *)(D_001F2840.source + 0xE0);
+        int value = *(int *)(gPauseMenuState.source + 0xE0);
         if (value != 0)
-            D_001F2840.value = value;
-        else if (D_001F2840.fallback == 0) {
+            gPauseMenuState.value = value;
+        else if (gPauseMenuState.fallback == 0) {
             value = -1;
             goto return_value;
         }
@@ -60,18 +61,18 @@ return_value:
     if (flags & 0x900) {
         result = 1;
     } else if (flags & 0x8000) {
-        if (old != D_001AB9B4)
-            func_002E5E58(3, 0, 0);
+        if (previousRow != D_001AB9B4)
+            PlaySoundFromGlobalBank(3, 0, 0);
         else
-            func_002E5E58(5, 0, 0);
+            PlaySoundFromGlobalBank(5, 0, 0);
         D_001AB9B0 = D_001AB9B4;
         if (D_001AB9B0 <= 0)
             D_001AB9B0 = 1;
     } else if (flags & 0x2000) {
-        if (old != D_001AB9B8)
-            func_002E5E58(3, 0, 0);
+        if (previousRow != D_001AB9B8)
+            PlaySoundFromGlobalBank(3, 0, 0);
         else
-            func_002E5E58(5, 0, 0);
+            PlaySoundFromGlobalBank(5, 0, 0);
         D_001AB9B0 = D_001AB9B8;
         if (D_001AB9B0 >= 64)
             D_001AB9B0 = 63;
@@ -90,12 +91,12 @@ return_value:
         }
     }
     {
-        int current = D_001AB9B0;
+        int currentRow = D_001AB9B0;
         for (;;) {
             if (D_00188510[D_001AB9B8][0] != 0 || D_00188510[D_001AB9B8][1] != 0)
                 break;
             if (++D_001AB9B8 >= 64) {
-                D_001AB9B8 = current;
+                D_001AB9B8 = currentRow;
                 break;
             }
         }
@@ -108,7 +109,7 @@ return_value:
         D_0025ABC0.value = D_001AB9B0 - 1;
         D_0025AC28.value = D_00264630[D_001AB9B0].value;
     }
-    if (D_001AB9B0 != old)
+    if (D_001AB9B0 != previousRow)
         D_0025AC28.motion = -576;
     return result;
 }

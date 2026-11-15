@@ -12,6 +12,7 @@ extern UV12 D_L12_001AEE9C[] __attribute__((sda));
 extern void func_00281DE8(void *, int, int, int);
 extern void func_00280B90(void *, int, int);
 
+/* Draws the two water-wave strips using the wave offsets kept by the wave moby. */
 void func_L12_00389988(char *obj) {
     struct {
         Q12 vertices[4];
@@ -25,7 +26,7 @@ void func_L12_00389988(char *obj) {
     Q12 *vertices = D_L12_001AEE40;
     UV12 *texX = D_L12_001AEE98;
     UV12 *texY = D_L12_001AEE9C;
-    func_00281DE8(&frame, D_L12_001AEF48, 2, 128);
+    InitQuadPacketState(&frame, D_L12_001AEF48, 2, 128);
     frame.colors[0] = frame.colors[1] = frame.colors[2] = frame.colors[3] = D_L12_001AEE34;
     for (i = 0; i < 1; i++) {
         for (j = 0; j < 4; j++) {
@@ -35,9 +36,9 @@ void func_L12_00389988(char *obj) {
             frame.uv[j].x = texX[uv].x + *(float *)(ctx + 0x10);
             frame.uv[j].y = texY[uv].x;
         }
-        func_00280B90(&frame, 0, 0);
+        draw_world_quad(&frame, 0, 0);
     }
-    func_00281DE8(&frame, D_L12_001AEF48 + 1, 0, 128);
+    InitQuadPacketState(&frame, D_L12_001AEF48 + 1, 0, 128);
     frame.colors[0] = frame.colors[1] = frame.colors[2] = frame.colors[3] = D_L12_001AEE38;
     for (i = 0; i < 1; i++) {
         for (j = 0; j < 4; j++) {
@@ -47,6 +48,6 @@ void func_L12_00389988(char *obj) {
             frame.uv[j].x = D_L12_001AEE98[uv].x + *(float *)(ctx + 0x10);
             frame.uv[j].y = D_L12_001AEE9C[uv].x;
         }
-        func_00280B90(&frame, 0, 0);
+        draw_world_quad(&frame, 0, 0);
     }
 }

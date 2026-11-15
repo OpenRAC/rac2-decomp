@@ -71,6 +71,7 @@ typedef struct {
     u8 route;
 } RouteMoby;
 #define M ((RouteMoby *)moby)
+/* Updates the Taxi moby (class 816). It waits at a stop, flies along a path to the next stop when called, and flies back when it is done. */
 void func_L06_003E3F28(char *moby)
 {
     float oldpos[4] __attribute__((aligned(16)));
@@ -79,21 +80,21 @@ void func_L06_003E3F28(char *moby)
     float rot[4] __attribute__((aligned(16)));
     Routes *st = *(Routes **)(moby+0x68);
     char *node;
-    if (D_001A79F0 == 11) {
+    if (gCurrentMapIndex == 11) {
       if (!st->persistent && D_001A7B00) {
-        func_0029F338(moby);
+        MarkMobySpawned(moby);
         return;
       }
     }
-    func_L06_0036F728(moby,func_L06_003E3CC8(moby));
+    SetTableEntryField(moby,IsTaxiFlying(moby));
     if (D_L06_001AF524) {
         int i;
-        for(i=0;i<I(D_L06_001FE500[st->approach[0]],0);i++)
-            func_L03_00339128(D_L06_001FE500[st->approach[0]]+16+i*16,moby,4,0x800000FF,127,2,255,0.333f);
-        for(i=0;i<I(D_L06_001FE500[st->depart[0]],0);i++)
-            func_L03_00339128(D_L06_001FE500[st->depart[0]]+16+i*16,moby,4,0x8000FF00,127,2,255,0.333f);
-        for(i=0;i<I(D_L06_001FE500[st->back[0]],0);i++)
-            func_L03_00339128(D_L06_001FE500[st->back[0]]+16+i*16,moby,4,0x80FF0000,127,2,255,0.333f);
+        for(i=0;i<I(gPathList[st->approach[0]],0);i++)
+            CreateTimedEffectEntry(gPathList[st->approach[0]]+16+i*16,moby,4,0x800000FF,127,2,255,0.333f);
+        for(i=0;i<I(gPathList[st->depart[0]],0);i++)
+            CreateTimedEffectEntry(gPathList[st->depart[0]]+16+i*16,moby,4,0x8000FF00,127,2,255,0.333f);
+        for(i=0;i<I(gPathList[st->back[0]],0);i++)
+            CreateTimedEffectEntry(gPathList[st->back[0]]+16+i*16,moby,4,0x80FF0000,127,2,255,0.333f);
     }
     qcopy(oldpos,moby+0x10);
     qcopy(oldrot,moby+0xF0);
@@ -101,26 +102,26 @@ void func_L06_003E3F28(char *moby)
     case 0:
         st->baseHeight=F(moby,0x18);
         if(st->approach[0]!=-1) {
-            rot[2]=func_00283248(F(D_L06_001FE500[st->approach[0]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->approach[0]],0x24)-F(moby,0x14));
+            rot[2]=FastMatrixHelperA(F(gPathList[st->approach[0]],0x20)-F(moby,0x10),F(gPathList[st->approach[0]],0x24)-F(moby,0x14));
             if ((H(moby,0x34)^1)&1) {
-                node=D_L06_001FE500[st->approach[0]];
+                node=gPathList[st->approach[0]];
                 qcopy(moby+0x10,node+0x10);
                 qcopy(moby+0xF0,rot);
                 st->baseHeight=F(node,0x18);
             } else {
-                func_L02_002EF388(moby,D_L06_001FE500[st->approach[0]]+16,rot,0,0);
-                st->baseHeight=F(D_L06_001FE500[st->approach[0]],0x18);
+                FuseObjectWithLinkedObjects(moby,gPathList[st->approach[0]]+16,rot,0,0);
+                st->baseHeight=F(gPathList[st->approach[0]],0x18);
             }
         } else if(st->depart[0]!=-1) {
-            rot[2]=func_00283248(F(D_L06_001FE500[st->depart[0]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[0]],0x24)-F(moby,0x14));
+            rot[2]=FastMatrixHelperA(F(gPathList[st->depart[0]],0x20)-F(moby,0x10),F(gPathList[st->depart[0]],0x24)-F(moby,0x14));
             if ((H(moby,0x34)^1)&1) {
-                node=D_L06_001FE500[st->depart[0]];
+                node=gPathList[st->depart[0]];
                 qcopy(moby+0x10,node+0x10);
                 qcopy(moby+0xF0,rot);
                 st->baseHeight=F(node,0x18);
             } else {
-                func_L02_002EF388(moby,D_L06_001FE500[st->depart[0]]+16,rot,0,0);
-                st->baseHeight=F(D_L06_001FE500[st->depart[0]],0x18);
+                FuseObjectWithLinkedObjects(moby,gPathList[st->depart[0]]+16,rot,0,0);
+                st->baseHeight=F(gPathList[st->depart[0]],0x18);
             }
         }
         M->flags32=0x80; B(moby,0x30)=255; st->forcedRoute=-1;
@@ -131,7 +132,7 @@ void func_L06_003E3F28(char *moby)
                 int bits=D_0019B4A8[((s16)id>>1)+(currentLevelGp<<10)];
                 if (!((id & 1) ? ((bits >> 4) & 7) != 0 : (bits & 7) != 0)) break;
             }
-            func_0029F338(moby); return;
+            MarkMobySpawned(moby); return;
         }
     case 1: {
         int i;
@@ -139,19 +140,19 @@ void func_L06_003E3F28(char *moby)
         if (!(D_0019B2E8[B(moby,0xB0)+(currentLevelGp<<4)]&0x80)) break;
         for(i=0;i<5;i++) {
             if(st->trigger[i]==-1 && st->forcedRoute!=i) continue;
-            if(!func_002ACBC8(D_00189EA0,st->trigger[i]) && st->forcedRoute!=i) continue;
+            if(!IsPointInCuboid(gHeroPosition,st->trigger[i]) && st->forcedRoute!=i) continue;
             I(moby,0x98)=I(*(char **)(moby+0x24),0x10);
             if(st->approach[i]!=-1) {
-                rot[2]=func_00283248(F(D_L06_001FE500[st->approach[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->approach[i]],0x24)-F(moby,0x14));
-                func_L02_002EF388(moby,D_L06_001FE500[st->approach[i]]+16,rot,0,0);
-                st->baseHeight=F(D_L06_001FE500[st->approach[i]],0x18);
+                rot[2]=FastMatrixHelperA(F(gPathList[st->approach[i]],0x20)-F(moby,0x10),F(gPathList[st->approach[i]],0x24)-F(moby,0x14));
+                FuseObjectWithLinkedObjects(moby,gPathList[st->approach[i]]+16,rot,0,0);
+                st->baseHeight=F(gPathList[st->approach[i]],0x18);
             } else if (st->depart[i]!=-1) {
-                if(func_00282E48(moby+0x10,D_L06_001FE500[st->depart[i]]+16)>4) {
-                    rot[2]=func_00283248(F(D_L06_001FE500[st->depart[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[i]],0x24)-F(moby,0x14));
-                    func_L02_002EF388(moby,D_L06_001FE500[st->depart[i]]+16,rot,0,0);
-                    st->baseHeight=F(D_L06_001FE500[st->depart[i]],0x18);
+                if(fast_vec_dist(moby+0x10,gPathList[st->depart[i]]+16)>4) {
+                    rot[2]=FastMatrixHelperA(F(gPathList[st->depart[i]],0x20)-F(moby,0x10),F(gPathList[st->depart[i]],0x24)-F(moby,0x14));
+                    FuseObjectWithLinkedObjects(moby,gPathList[st->depart[i]]+16,rot,0,0);
+                    st->baseHeight=F(gPathList[st->depart[i]],0x18);
                 }
-                func_002A7CA0(moby,&st->yawRate,func_00283248(F(D_L06_001FE500[st->depart[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[i]],0x24)-F(moby,0x14)),0.00116355298087f,0.00116355298087f,0.104719772935f);
+                MobySpringTurn(moby,&st->yawRate,FastMatrixHelperA(F(gPathList[st->depart[i]],0x20)-F(moby,0x10),F(gPathList[st->depart[i]],0x24)-F(moby,0x14)),0.00116355298087f,0.00116355298087f,0.104719772935f);
             }
             M->route=i; M->state=2; M->flags32=0x80;
             st->timer=D_L06_001AF528*(1.0f/60); st->moving=1; st->forcedRoute=-1;
@@ -160,17 +161,17 @@ void func_L06_003E3F28(char *moby)
         break;
     }
     case 2:
-        if(st->approach[M->route]==-1 || func_L06_003E4BE0(moby,st->approach[M->route],&st->pointIndex)) {
+        if(st->approach[M->route]==-1 || MoveMobyAlongPath(moby,st->approach[M->route],&st->pointIndex)) {
             M->state=3; I((char *)st,0xE4)=-1;
         }
         break;
     case 3: {
         int i;
-        func_002A7CA0(moby,&st->yawRate,func_00283248(F(D_L06_001FE500[st->depart[M->route]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[M->route]],0x24)-F(moby,0x14)),0.000581776490435f,0.000581776490435f,0.0203621778637f);
-        func_002AAA00(moby+0xF4,0,&st->pitchRate,D_L06_001AF530*0.000004848137291264255f,D_L06_001AF530*0.000004848137291264255f,0.20943954586982727f,0);
-        func_002AAA00(moby+0xF0,0,&st->rollRate,D_L06_001AF53C*0.000004848137291264255f,D_L06_001AF53C*0.000004848137291264255f,0.20943954586982727f,0);
-        if(D_00189E20.attached==moby && !D_00189E20.animation) {
-            func_L06_003E3CF0(moby,M->route);
+        MobySpringTurn(moby,&st->yawRate,FastMatrixHelperA(F(gPathList[st->depart[M->route]],0x20)-F(moby,0x10),F(gPathList[st->depart[M->route]],0x24)-F(moby,0x14)),0.000581776490435f,0.000581776490435f,0.0203621778637f);
+        ApproachTargetWithDirectionMode(moby+0xF4,0,&st->pitchRate,D_L06_001AF530*0.000004848137291264255f,D_L06_001AF530*0.000004848137291264255f,0.20943954586982727f,0);
+        ApproachTargetWithDirectionMode(moby+0xF0,0,&st->rollRate,D_L06_001AF53C*0.000004848137291264255f,D_L06_001AF53C*0.000004848137291264255f,0.20943954586982727f,0);
+        if(gHeroState.attached==moby && !gHeroState.animation) {
+            ShowEventNotice(moby,M->route);
             if((D_00138324&16) && D_L06_001A8FB4==8) {
                 st->timer=0; M->state=5; st->moving=1;
             }
@@ -178,19 +179,19 @@ void func_L06_003E3F28(char *moby)
         for(i=0;i<5;i++) {
             if(st->trigger[i]==-1 && st->forcedRoute!=i) continue;
             if(i==M->route) continue;
-            if(!func_002ACBC8(D_00189EA0,st->trigger[i]) && st->forcedRoute!=i) continue;
+            if(!IsPointInCuboid(gHeroPosition,st->trigger[i]) && st->forcedRoute!=i) continue;
             I(moby,0x98)=I(*(char **)(moby+0x24),0x10);
             if(st->approach[i]!=-1) {
-                rot[2]=func_00283248(F(D_L06_001FE500[st->approach[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->approach[i]],0x24)-F(moby,0x14));
-                func_L02_002EF388(moby,D_L06_001FE500[st->approach[i]]+16,rot,0,0);
-                st->baseHeight=F(D_L06_001FE500[st->approach[i]],0x18);
+                rot[2]=FastMatrixHelperA(F(gPathList[st->approach[i]],0x20)-F(moby,0x10),F(gPathList[st->approach[i]],0x24)-F(moby,0x14));
+                FuseObjectWithLinkedObjects(moby,gPathList[st->approach[i]]+16,rot,0,0);
+                st->baseHeight=F(gPathList[st->approach[i]],0x18);
             } else if (st->depart[i]!=-1) {
-                if(func_00282E48(moby+0x10,D_L06_001FE500[st->depart[i]]+16)>4) {
-                    rot[2]=func_00283248(F(D_L06_001FE500[st->depart[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[i]],0x24)-F(moby,0x14));
-                    func_L02_002EF388(moby,D_L06_001FE500[st->depart[i]]+16,rot,0,0);
-                    st->baseHeight=F(D_L06_001FE500[st->depart[i]],0x18);
+                if(fast_vec_dist(moby+0x10,gPathList[st->depart[i]]+16)>4) {
+                    rot[2]=FastMatrixHelperA(F(gPathList[st->depart[i]],0x20)-F(moby,0x10),F(gPathList[st->depart[i]],0x24)-F(moby,0x14));
+                    FuseObjectWithLinkedObjects(moby,gPathList[st->depart[i]]+16,rot,0,0);
+                    st->baseHeight=F(gPathList[st->depart[i]],0x18);
                 }
-                func_002A7CA0(moby,&st->yawRate,func_00283248(F(D_L06_001FE500[st->depart[i]],0x20)-F(moby,0x10),F(D_L06_001FE500[st->depart[i]],0x24)-F(moby,0x14)),0.00116355298087f,0.00116355298087f,0.104719772935f);
+                MobySpringTurn(moby,&st->yawRate,FastMatrixHelperA(F(gPathList[st->depart[i]],0x20)-F(moby,0x10),F(gPathList[st->depart[i]],0x24)-F(moby,0x14)),0.00116355298087f,0.00116355298087f,0.104719772935f);
             }
             M->route=i; M->state=2; M->flags32=0x80;
             st->timer=D_L06_001AF528*(1.0f/60); st->moving=1; st->forcedRoute=-1;
@@ -200,28 +201,28 @@ void func_L06_003E3F28(char *moby)
     }
     case 4: M->state=5; break;
     case 5:
-        if(func_L06_003E3ED0(moby)) {
-            D_00189E20.action=4; D_00189E20.mode=8;
-            func_L06_003E4FA0(moby);
+        if(IsHeroOnMoby(moby)) {
+            gHeroState.action=4; gHeroState.mode=8;
+            UpdateAttachedPointTable(moby);
         }
-        if(func_L06_003E4BE0(moby,st->depart[M->route],&st->pointIndex)) {
+        if(MoveMobyAlongPath(moby,st->depart[M->route],&st->pointIndex)) {
             M->state=6; st->returnTimer=120;
         }
         break;
     case 6:
-        func_002AAA00(moby+0xF4,0,&st->pitchRate,D_L06_001AF530*0.000004848137291264255f,D_L06_001AF530*0.000004848137291264255f,0.20943954586982727f,0);
-        func_002AAA00(moby+0xF0,0,&st->rollRate,D_L06_001AF53C*0.000004848137291264255f,D_L06_001AF53C*0.000004848137291264255f,0.20943954586982727f,0);
-        if(st->back[M->route]!=-1 && func_00282E48(moby+0x10,D_00189EA0)>15) {
+        ApproachTargetWithDirectionMode(moby+0xF4,0,&st->pitchRate,D_L06_001AF530*0.000004848137291264255f,D_L06_001AF530*0.000004848137291264255f,0.20943954586982727f,0);
+        ApproachTargetWithDirectionMode(moby+0xF0,0,&st->rollRate,D_L06_001AF53C*0.000004848137291264255f,D_L06_001AF53C*0.000004848137291264255f,0.20943954586982727f,0);
+        if(st->back[M->route]!=-1 && fast_vec_dist(moby+0x10,gHeroPosition)>15) {
             M->state=7; st->moving=1;
-        } else if(st->back[M->route]==-1 && func_00282E80(moby+0x10,D_00189EA0)>5) M->state=1;
+        } else if(st->back[M->route]==-1 && vec_distance_xy(moby+0x10,gHeroPosition)>5) M->state=1;
         break;
     case 7:
-        if(func_L06_003E4BE0(moby,st->back[M->route],&st->pointIndex)) {
+        if(MoveMobyAlongPath(moby,st->back[M->route],&st->pointIndex)) {
             M->flags32=0; M->state=1; I(moby,0x98)=0;
         }
         break;
     }
-    func_L06_003E4F08(moby);
-    func_00282CF0(delta,moby+0x10,oldpos);
-    func_002AD6F0((char *)st+0x20,delta,oldrot,moby+0xF0);
+    TurnPartsTowardTargets(moby);
+    FastVecSub(delta,moby+0x10,oldpos);
+    CombineTransformsAndStore((char *)st+0x20,delta,oldrot,moby+0xF0);
 }

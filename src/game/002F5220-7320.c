@@ -8,6 +8,7 @@ typedef struct {
 
 extern Func_002F7320Row ref_L00_002F7320_00[];
 
+/* Looks up a row by its key in a table of up to 56 rows and says if one of its three values equals the given value. Returns 1 for a match, else 0. */
 int func_002F7320(int value, int key, int field)
 {
     int result = 0;

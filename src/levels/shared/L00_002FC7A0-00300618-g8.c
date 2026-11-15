@@ -332,6 +332,7 @@ extern void func_L00_00403BF8(void);
 extern void func_00272198(float);
 extern void func_L00_003603C0(unsigned char *);
 
+/* Loads the level gameplay data (ties, shrubs, mobys, paths) into the level heap and returns the next free heap address. */
 char *func_L00_00300618(int reload)
 {
     char *hdr = D_L00_001BF140.data;
@@ -342,31 +343,31 @@ char *func_L00_00300618(int reload)
     char *p;
 
     if (!reload) {
-        func_002B7C80(heap, D_0014B540.i52B8 + D_0014B540.i529C, D_0014B540.i52BC);
+        ReadDiscWithPause(heap, gCopySetupData.i52B8 + gCopySetupData.i529C, gCopySetupData.i52BC);
         D_001A7280.archive1 = (int)heap;
     }
-    func_0011AEA0(0);
-    func_0029D4D0((void *)D_001A7280.archive1, hdr);
-    func_0011AEA0(0);
-    func_00282A60(D_00189E20, 0, 0x2540);
-    func_00282A60(D_L00_001B8C80, 0, 0x410);
-    func_00282A60(D_L00_001D1740, 0, 0x180);
-    func_0029FAE0();
-    func_001163A0(1234);
-    if (D_001A7B90) {
+    FlushCache(0);
+    fast_decompress((void *)D_001A7280.archive1, hdr);
+    FlushCache(0);
+    ClearMemory(gHeroState, 0, 0x2540);
+    ClearMemory(D_L00_001B8C80, 0, 0x410);
+    ClearMemory(D_L00_001D1740, 0, 0x180);
+    ClearObjectSlots();
+    Srand(1234);
+    if (gIsPalVideo) {
         if (D_001A790C == 1.0f)
-            func_L00_00322428(1);
+            SetFrameTimingMode(1);
     } else {
         if (D_001A790C != 1.0f)
-            func_L00_00322428(0);
+            SetFrameTimingMode(0);
     }
-    D_L00_001BF200.p4 = D_L00_001BF280;
-    D_L00_001BF200.p8 = D_L00_001B1A80;
-    D_L00_001BF200.iC = 0;
-    D_L00_001BF200.i10 = 0;
-    D_L00_001BF200.i14 = 0;
-    func_00282A88(D_L00_001DE860, 0x1C000);
-    func_00282A88(D_L00_001FA860, 0xC0);
+    gCollisionResult.p4 = D_L00_001BF280;
+    gCollisionResult.p8 = D_L00_001B1A80;
+    gCollisionResult.iC = 0;
+    gCollisionResult.i10 = 0;
+    gCollisionResult.i14 = 0;
+    FastMemoryHelperB(D_L00_001DE860, 0x1C000);
+    FastMemoryHelperB(D_L00_001FA860, 0xC0);
 
     /* section 0: the level header */
     p = SECTION_00618(0);
@@ -398,9 +399,9 @@ char *func_L00_00300618(int reload)
     }
     startPos = (float *)(p + 0x10);
     p += 0x20;
-    D_00152C00.i40 = *(int *)p;
-    D_00152C00.i44 = *(int *)(p + 4);
-    D_00152C00.i48 = *(int *)(p + 8);
+    gHeroMoby_00152C00.i40 = *(int *)p;
+    gHeroMoby_00152C00.i44 = *(int *)(p + 4);
+    gHeroMoby_00152C00.i48 = *(int *)(p + 8);
     D_L00_001C9340.count = 0;
     p += 0x10;
     if (*(int *)(p + 0xC)) {
@@ -422,17 +423,17 @@ char *func_L00_00300618(int reload)
         p += 0x20;
     }
     D_L00_001A8F0C = *(int *)p;
-    func_00279FF0();
+    ApplyDisplayConfiguration();
     D_L00_001B2500 = 983040.0f;
     D_L00_001B2408 = 500.0f;
     D_L00_001B255C = 0x3C0;
     D_L00_001B1EB4 = 0x3C0;
     D_L00_001B20C0 = 0x1F4000;
-    func_00284E18(D_L00_001BD2C0.i23C, D_L00_001BD2C0.i240, D_L00_001BD2C0.i244);
-    func_002FC070(D_00100AE0);
-    func_00282A88(D_L00_001C6F40, 0x100);
-    func_00282A88(D_L00_001C7040, 0x180);
-    func_00282A88(D_L00_001C6B40, 0x400);
+    SetBackgroundColor(D_L00_001BD2C0.i23C, D_L00_001BD2C0.i240, D_L00_001BD2C0.i244);
+    StartDmaChannel0AndWait(D_00100AE0);
+    FastMemoryHelperB(D_L00_001C6F40, 0x100);
+    FastMemoryHelperB(D_L00_001C7040, 0x180);
+    FastMemoryHelperB(D_L00_001C6B40, 0x400);
 
     /* section 4: up to twelve 64-byte records */
     {
@@ -441,11 +442,11 @@ char *func_L00_00300618(int reload)
 
         s += 0x10;
         if (n >= 12) {
-            func_0026FEB8(D_L00_002A0ED0);
+            STUB_printf(D_L00_002A0ED0);
             n = 12;
         }
         if (n)
-            func_00282AB0(D_L00_001C6B40, s, n << 6);
+            CopyMemoryAligned(D_L00_001C6B40, s, n << 6);
     }
 
     /* section 0x84 */
@@ -458,9 +459,9 @@ char *func_L00_00300618(int reload)
         if (n) {
             char *entries;
 
-            func_00282AB0(D_L00_001C5940, s, n << 4);
+            CopyMemoryAligned(D_L00_001C5940, s, n << 4);
             entries = D_L00_001C5B40;
-            func_00282AB0(entries, s + (D_L00_001B1CDC << 4), D_L00_001B1CDC << 7);
+            CopyMemoryAligned(entries, s + (D_L00_001B1CDC << 4), D_L00_001B1CDC << 7);
             if (D_L00_001B1CDC > 0) {
                 char *e = entries;
                 int left = D_L00_001B1CDC;
@@ -519,7 +520,7 @@ char *func_L00_00300618(int reload)
         size += 3;
         size &= ~3;
         size -= 8;
-        func_00282AB0(heap, s, size);
+        CopyMemoryAligned(heap, s, size);
         for (i = 0; i < D_L00_0027D848.count; i++) {
             int delta = (int)D_L00_001B1B80 - 8;
 
@@ -548,12 +549,12 @@ char *func_L00_00300618(int reload)
         D_L00_001B2544 = 0;
         D_L00_001B2548 = 0;
         if (D_L00_001B2520)
-            func_00282A60(D_L00_001B2514, 0, D_L00_001B2520 << 5);
+            ClearMemory(D_L00_001B2514, 0, D_L00_001B2520 << 5);
         heap = ALIGN64_00618(heap);
         D_L00_001B251C = (Matrix00618 *)heap;
         heap += D_L00_001B2520 << 6;
         if (D_L00_001B2520)
-            func_00282A60(D_L00_001B251C, 0, D_L00_001B2520 << 6);
+            ClearMemory(D_L00_001B251C, 0, D_L00_001B2520 << 6);
         mark = heap;
         last = -1;
         D_L00_001B2518 = D_L00_001B2514 + D_L00_001B2520;
@@ -591,15 +592,15 @@ char *func_L00_00300618(int reload)
             s += 0x50;
             tie->h12 = i;
             m->row[3].f[3] = D_L00_00226700[tie->b1D]->f40;
-            func_00283098(tie, &D_L00_00226700[tie->b1D]->sphere, m);
-            scale = func_00282DF0(&m->row[0]);
-            scale = func_L00_002EE050(scale, func_00282DF0(&m->row[1]));
-            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->sphere.f[3] * func_L00_002EE050(scale, func_00282DF0(&m->row[2]));
-            func_00282D60(tie, tie, m->row[3].f[3]);
-            func_00282CC0(tie, tie, &m->row[3]);
-            (D_L00_001B251C + i)->row[0].f[3] = 1.0f / func_00282DF0(&(D_L00_001B251C + i)->row[0]);
-            (D_L00_001B251C + i)->row[1].f[3] = 1.0f / func_00282DF0(&(D_L00_001B251C + i)->row[1]);
-            (D_L00_001B251C + i)->row[2].f[3] = 1.0f / func_00282DF0(&(D_L00_001B251C + i)->row[2]);
+            matrix_mul_vec3(tie, &D_L00_00226700[tie->b1D]->sphere, m);
+            scale = FastVecLength(&m->row[0]);
+            scale = MaxFloat(scale, FastVecLength(&m->row[1]));
+            tie->bounds.f[3] = D_L00_00226700[tie->b1D]->sphere.f[3] * MaxFloat(scale, FastVecLength(&m->row[2]));
+            scale_vector(tie, tie, m->row[3].f[3]);
+            FastVecAdd(tie, tie, &m->row[3]);
+            (D_L00_001B251C + i)->row[0].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[0]);
+            (D_L00_001B251C + i)->row[1].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[1]);
+            (D_L00_001B251C + i)->row[2].f[3] = 1.0f / FastVecLength(&(D_L00_001B251C + i)->row[2]);
             tie->h18 = *(unsigned short *)s;
             s += 0x10;
         }
@@ -618,7 +619,7 @@ char *func_L00_00300618(int reload)
                 Tie00618 *tie = D_L00_001B2514 + idx;
                 TieClass00618 *cls = D_L00_00226700[tie->b1D];
 
-                func_00282AB0(cls->table + ((((cls->h38 + 3) >> 1) * (tie - cls->first)) << 2), s + 1, *s << 1);
+                CopyMemoryAligned(cls->table + ((((cls->h38 + 3) >> 1) * (tie - cls->first)) << 2), s + 1, *s << 1);
             }
             s += *s + 1;
             idx = *s++;
@@ -655,7 +656,7 @@ char *func_L00_00300618(int reload)
             }
         }
         if (size)
-            func_00282B50(base, (char *)(((int)s + 0xF) & ~0xF), size);
+            FastMemoryHelperC(base, (char *)(((int)s + 0xF) & ~0xF), size);
     }
     D_L00_001BF140.mark54 = heap;
 
@@ -671,17 +672,17 @@ char *func_L00_00300618(int reload)
         D_L00_001B23F4 = n;
         heap += n << 5;
         if (n)
-            func_00282A60(D_L00_001B23F8, 0, n << 5);
+            ClearMemory(D_L00_001B23F8, 0, n << 5);
         heap = ALIGN64_00618(heap);
         D_L00_001B2400 = (Matrix00618 *)heap;
         heap += D_L00_001B23F4 << 6;
         if (D_L00_001B23F4)
-            func_00282A60(D_L00_001B2400, 0, D_L00_001B23F4 << 6);
+            ClearMemory(D_L00_001B2400, 0, D_L00_001B23F4 << 6);
         D_L00_001B2404 = (unsigned char *)heap;
         heap += D_L00_001B23F4 * 0x60;
         heap = ALIGN64_00618(heap);
         if (D_L00_001B23F4)
-            func_00282A60(D_L00_001B2404, 0, D_L00_001B23F4 * 0x60);
+            ClearMemory(D_L00_001B2404, 0, D_L00_001B23F4 * 0x60);
         last = -1;
         D_L00_001ACE90[1] = (int)D_L00_001B2404;
         D_L00_001B23FC = D_L00_001B23F8 + D_L00_001B23F4;
@@ -709,8 +710,8 @@ char *func_L00_00300618(int reload)
             if (D_L00_0021EA20[cls]->p1C) {
                 float t;
 
-                shrub->b17 = func_00283CF0(*D_L00_0021EA20[cls]->p1C);
-                t = func_00283CE0(shrub->b17) + 24.0f;
+                shrub->b17 = FloatToInt(*D_L00_0021EA20[cls]->p1C);
+                t = IntToFloat(shrub->b17) + 24.0f;
                 if (shrub->f10 < t)
                     shrub->f10 = t;
             }
@@ -720,10 +721,10 @@ char *func_L00_00300618(int reload)
             qcopy(&m->row[3], s + 0x40);
             s += 0x50;
             m->row[3].f[3] = D_L00_0021EA20[cls]->f20;
-            a = (func_00282DF0(&m->row[0]) + func_00282DF0(&m->row[1])) * 0.5f;
-            b = func_00282DF0(&m->row[2]);
-            w = func_00283CF0(a * 4096.0f);
-            h = func_00283CF0(b * 4096.0f);
+            a = (FastVecLength(&m->row[0]) + FastVecLength(&m->row[1])) * 0.5f;
+            b = FastVecLength(&m->row[2]);
+            w = FloatToInt(a * 4096.0f);
+            h = FloatToInt(b * 4096.0f);
             if (h > 0x10000)
                 h = 0x10000;
             if (w > 0x10000)
@@ -739,12 +740,12 @@ char *func_L00_00300618(int reload)
             m->row[0].i[3] = (bl << 16) | g | r;
             shrub->h1C = *(unsigned short *)s;
             s += 0x10;
-            func_00283098(shrub, D_L00_0021EA20[cls], m);
-            scale = func_00282DF0(&m->row[0]);
-            scale = func_L00_002EE050(scale, func_00282DF0(&m->row[1]));
-            shrub->bounds.f[3] = D_L00_0021EA20[cls]->fC * func_L00_002EE050(scale, func_00282DF0(&m->row[2]));
-            func_00282D60(shrub, shrub, m->row[3].f[3]);
-            func_00282CC0(shrub, shrub, &m->row[3]);
+            matrix_mul_vec3(shrub, D_L00_0021EA20[cls], m);
+            scale = FastVecLength(&m->row[0]);
+            scale = MaxFloat(scale, FastVecLength(&m->row[1]));
+            shrub->bounds.f[3] = D_L00_0021EA20[cls]->fC * MaxFloat(scale, FastVecLength(&m->row[2]));
+            scale_vector(shrub, shrub, m->row[3].f[3]);
+            FastVecAdd(shrub, shrub, &m->row[3]);
         }
     }
     {
@@ -754,7 +755,7 @@ char *func_L00_00300618(int reload)
         for (i = 0; i < D_L00_001B23F4; i++)
             *q++ = i;
         *q = 0xFFFF;
-        func_002E2C38((void *)0x70000000);
+        ProcessShrubRenderData((void *)0x70000000);
     }
     {
         int i;
@@ -809,7 +810,7 @@ char *func_L00_00300618(int reload)
             }
         }
         if (size)
-            func_00282B50((char *)tmp, (char *)(((int)s + 0xF) & ~0xF), size);
+            FastMemoryHelperC((char *)tmp, (char *)(((int)s + 0xF) & ~0xF), size);
     }
 
     /* section 8: 32-byte records */
@@ -822,7 +823,7 @@ char *func_L00_00300618(int reload)
         D_L00_001B1848 = n;
         heap += n << 5;
         if (n)
-            func_00282A60(D_L00_001B1844, 0, n << 5);
+            ClearMemory(D_L00_001B1844, 0, n << 5);
         heap = ALIGN64_00618(heap);
         if (D_L00_001B1848 > 0) {
             Cam00618 *e = D_L00_001B1844;
@@ -853,24 +854,24 @@ char *func_L00_00300618(int reload)
         int n = *(int *)s;
 
         s += 0x10;
-        D_00188660.count = n;
+        gSoundState.count = n;
         if (n) {
             int size = n * 0x90;
             int i;
 
-            D_00188660.table = (Sound00618 *)heap;
+            gSoundState.table = (Sound00618 *)heap;
             heap += size;
             heap = ALIGN64_00618(heap);
-            func_00282A60(D_00188660.table, 0, size);
-            for (i = 0; i < D_00188660.count; i++) {
-                Sound00618 *e = D_00188660.table + i;
+            ClearMemory(gSoundState.table, 0, size);
+            for (i = 0; i < gSoundState.count; i++) {
+                Sound00618 *e = gSoundState.table + i;
 
-                func_00282AB0(e, s, 0x90);
+                CopyMemoryAligned(e, s, 0x90);
                 s += 0x90;
-                func_L00_0035F7E8(e);
+                resolve_lookup_record(e);
             }
         } else {
-            D_00188660.table = 0;
+            gSoundState.table = 0;
         }
     }
 
@@ -890,9 +891,9 @@ char *func_L00_00300618(int reload)
         n2 = *(int *)p;
         p += 0xC;
         D_L00_001B1E9C[0] = (Moby00618 *)heap;
-        func_00282A60(heap, 0, (n + n2) << 8);
-        func_00282A60(D_L00_001C5480, 0, 0xC0);
-        func_00282A60(D_L00_001C5540, 0, 0xC0);
+        ClearMemory(heap, 0, (n + n2) << 8);
+        ClearMemory(D_L00_001C5480, 0, 0xC0);
+        ClearMemory(D_L00_001C5540, 0, 0xC0);
         for (i = 0; i < n; i++) {
             int cls;
             int w2;
@@ -930,11 +931,11 @@ char *func_L00_00300618(int reload)
             b1 = bolts;
             x1 = xp;
             if (cls >= 0 && w9 > 0) {
-                int k = cls + D_001A79F0 * 16;
+                int k = cls + gCurrentMapIndex * 16;
                 int lvl = (*(unsigned char *)(k + levels) >> (w2 * 2)) & 3;
 
                 if (lvl == 0)
-                    lvl = func_L00_002E3B38(cls);
+                    lvl = GetDifficultyScaledLevel(cls);
                 if (*(int *)p == 0x1F5 || *(int *)p == 0x200) {
                     skip = w9 < lvl;
                 } else if (lvl < w9) {
@@ -1009,7 +1010,7 @@ char *func_L00_00300618(int reload)
 
                 idx[i] = count;
                 m = D_L00_001B1E9C[0] + count;
-                func_0029F0C8(m, *(int *)p);
+                InitMobyInstance(m, *(int *)p);
                 p += 4;
                 m->hB2 = uid;
                 m->bB0 = cls;
@@ -1040,7 +1041,7 @@ char *func_L00_00300618(int reload)
                 lift = *(float *)p;
                 p += 4;
                 if (snap) {
-                    float h = func_002A89A8(&m->pos, 0, 0.5f);
+                    float h = ProbeGroundHeightBelow(&m->pos, 0, 0.5f);
 
                     if (0.0f < h)
                         m->pos.f[2] = h + lift;
@@ -1067,11 +1068,11 @@ char *func_L00_00300618(int reload)
                 p += 4;
                 upd = *(int *)p;
                 p += 4;
-                func_002A0468(m, (b << 16) + (g << 8) + r, 0, 0, 0);
+                PackRenderCommandFields(m, (b << 16) + (g << 8) + r, 0, 0, 0);
                 m->i38 = upd;
                 m->b7E &= 0xFE;
-                if (D_001A79F0 >= 0 && *(int *)p != -1)
-                    func_L00_00309140(m, *(int *)p);
+                if (gCurrentMapIndex >= 0 && *(int *)p != -1)
+                    StoreValueInTableSlot(m, *(int *)p);
                 count++;
             }
             p = next;
@@ -1081,7 +1082,7 @@ char *func_L00_00300618(int reload)
             int total = (count + n2) << 8;
 
             D_L00_001B18DC = tail;
-            func_0029F0C8(tail, 0);
+            InitMobyInstance(tail, 0);
             heap += total;
             tail->state = 0xFD;
             D_L00_001B1EA0 = D_L00_001B18DC + 1;
@@ -1111,22 +1112,22 @@ char *func_L00_00300618(int reload)
                 char *src = pv + tbl[k].offset;
 
                 D_L00_001B1844[i].i1C = (int)heap;
-                func_00282B50(heap, src, size);
+                FastMemoryHelperC(heap, src, size);
                 tbl[k].offset = (int)heap;
                 heap += size;
             }
         }
-        for (i = 0; i < D_00188660.count; i++) {
-            int k = D_00188660.table[i].i8;
+        for (i = 0; i < gSoundState.count; i++) {
+            int k = gSoundState.table[i].i8;
 
             if (k < 0) {
-                D_00188660.table[i].i8 = 0;
+                gSoundState.table[i].i8 = 0;
             } else {
                 int size = tbl[k].size;
                 char *src = pv + tbl[k].offset;
 
-                D_00188660.table[i].i8 = (int)heap;
-                func_00282B50(heap, src, size);
+                gSoundState.table[i].i8 = (int)heap;
+                FastMemoryHelperC(heap, src, size);
                 tbl[k].offset = (int)heap;
                 heap += size;
             }
@@ -1144,7 +1145,7 @@ char *func_L00_00300618(int reload)
                     char *src = pv + tbl[k].offset;
 
                     m->i68 = (int)heap;
-                    func_00282B50(heap, src, size);
+                    FastMemoryHelperC(heap, src, size);
                     tbl[k].offset = (int)heap;
                     heap += size;
                 }
@@ -1208,8 +1209,8 @@ char *func_L00_00300618(int reload)
         q = (char *)offs + (n << 2);
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(base, q, size);
-        func_00282A60(D_L00_001FA920, 0, 0x3C0);
+            FastMemoryHelperC(base, q, size);
+        ClearMemory(D_L00_001FA920, 0, 0x3C0);
         for (i = 0; i < n; i++, offs++) {
             tmp = *offs;
             if (tmp >= 0) {
@@ -1261,7 +1262,7 @@ char *func_L00_00300618(int reload)
         heap += size;
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(base, q, size);
+            FastMemoryHelperC(base, q, size);
         q += size;
         tbl = (Blob00618 *)SECTION_00618(0x5C);
         for (i = 0; i < n; i++) {
@@ -1290,7 +1291,7 @@ char *func_L00_00300618(int reload)
         q += 0x10;
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(D_L00_001B1FA8, src, size);
+            FastMemoryHelperC(D_L00_001B1FA8, src, size);
         for (i = 0; i < D_L00_001B1FA4; i++) {
             D_L00_001FDA80[i] = D_L00_001B1FA8 + *(int *)q;
             q += 4;
@@ -1330,7 +1331,7 @@ char *func_L00_00300618(int reload)
         heap += size;
         heap = ALIGN64_00618(heap);
         if (size)
-            func_00282B50(copy, src, size);
+            FastMemoryHelperC(copy, src, size);
         for (i = 0; i < D_L00_001B16C4; i++) {
             D_L00_001B16C0[i].data = copy + *(int *)q;
             q += 4;
@@ -1349,9 +1350,9 @@ char *func_L00_00300618(int reload)
         heap += n * 0x90;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F84, 0, n * 0x90);
+            ClearMemory(D_L00_001B1F84, 0, n * 0x90);
         for (i = 0; i < D_L00_001B1F88; i++) {
-            func_00282AB0(D_L00_001B1F84 + i * 0x90, q, 0x90);
+            CopyMemoryAligned(D_L00_001B1F84 + i * 0x90, q, 0x90);
             q += 0x80;
         }
     }
@@ -1368,9 +1369,9 @@ char *func_L00_00300618(int reload)
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F8C, 0, n << 7);
+            ClearMemory(D_L00_001B1F8C, 0, n << 7);
         for (i = 0; i < D_L00_001B1F90; i++) {
-            func_00282AB0(D_L00_001B1F8C + (i << 7), q, 0x80);
+            CopyMemoryAligned(D_L00_001B1F8C + (i << 7), q, 0x80);
             q += 0x80;
         }
     }
@@ -1385,9 +1386,9 @@ char *func_L00_00300618(int reload)
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F94, 0, n << 7);
+            ClearMemory(D_L00_001B1F94, 0, n << 7);
         for (i = 0; i < D_L00_001B1F98; i++) {
-            func_00282AB0(D_L00_001B1F94 + (i << 7), q, 0x80);
+            CopyMemoryAligned(D_L00_001B1F94 + (i << 7), q, 0x80);
             q += 0x80;
         }
     }
@@ -1402,9 +1403,9 @@ char *func_L00_00300618(int reload)
         heap += n << 7;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282A60(D_L00_001B1F9C, 0, n << 7);
+            ClearMemory(D_L00_001B1F9C, 0, n << 7);
         for (i = 0; i < D_L00_001B1FA0; i++) {
-            func_00282AB0(D_L00_001B1F9C + (i << 7), q, 0x80);
+            CopyMemoryAligned(D_L00_001B1F9C + (i << 7), q, 0x80);
             q += 0x80;
         }
     }
@@ -1418,7 +1419,7 @@ char *func_L00_00300618(int reload)
         s += 0x10;
         size += 0x4000;
         heap += size;
-        func_00282AB0(D_L00_001B1880, s, size);
+        CopyMemoryAligned(D_L00_001B1880, s, size);
         heap = ALIGN64_00618(heap);
     }
 
@@ -1432,9 +1433,9 @@ char *func_L00_00300618(int reload)
         D_L00_001B1CD4 = n;
         heap = (char *)(((int)heap + (n << 4) + 0x83F) & 0xFFFFFFC0u);
         if (n)
-            func_00282AB0(D_L00_001B1CD8, s, (n << 4) + 0x800);
+            CopyMemoryAligned(D_L00_001B1CD8, s, (n << 4) + 0x800);
         else
-            func_00282AB0(D_L00_001B1CD8, s, 0x800);
+            CopyMemoryAligned(D_L00_001B1CD8, s, 0x800);
     }
 
     /* section 0x8C */
@@ -1448,7 +1449,7 @@ char *func_L00_00300618(int reload)
         heap += n << 5;
         heap = ALIGN64_00618(heap);
         if (n)
-            func_00282AB0(D_L00_001B1F40, s, n << 5);
+            CopyMemoryAligned(D_L00_001B1F40, s, n << 5);
     }
     D_L00_001B20B0 = heap;
     D_L00_001BF140.mark64 = heap;
@@ -1456,12 +1457,12 @@ char *func_L00_00300618(int reload)
     D_L00_001B20B8 = -1;
     D_L00_001B20B4 = 0;
     D_L00_001B20BC = 0;
-    func_00282A88(D_L00_001FE140, 0x200);
+    FastMemoryHelperB(D_L00_001FE140, 0x200);
 
-    if (D_001A79F0 >= 0) {
-        D_00152C00.hero = 0;
+    if (gCurrentMapIndex >= 0) {
+        gHeroMoby_00152C00.hero = 0;
         if (0.0f < startPos[0]) {
-            Moby00618 *m = func_0029EFD0(0xD54);
+            Moby00618 *m = CreateMoby(0xD54);
 
             m->pos.f[0] = startPos[0];
             m->pos.f[1] = startPos[1];
@@ -1469,13 +1470,13 @@ char *func_L00_00300618(int reload)
             m->rot[2] = startPos[3];
             m->h32 = 0xFF;
             m->b30 = 0x10;
-            m->i64 = (int)func_L00_003603C0;
+            m->i64 = (int)UpdateInteractivePickup;
             m->h34 &= 0xFFFD;
             if (m->b63)
                 m->b63 = 8;
             func_002A0F48(m);
-            D_00152C00.hero = m;
-            func_L00_00309140(m, 0);
+            gHeroMoby_00152C00.hero = m;
+            StoreValueInTableSlot(m, 0);
         }
     }
     heap = (char *)(((int)heap + 0xF) & ~0xF);
@@ -1490,7 +1491,7 @@ char *func_L00_00300618(int reload)
         D_L00_001B1B00 = (Groups00618 *)heap;
         size = *(int *)s;
         heap += size;
-        func_00282AB0(D_L00_001B1B00, s + 4, size);
+        CopyMemoryAligned(D_L00_001B1B00, s + 4, size);
         if (D_L00_001B1B00->p4)
             D_L00_001B1B00->p4 += (int)D_L00_001B1B00;
         else
@@ -1546,7 +1547,7 @@ char *func_L00_00300618(int reload)
             D_L00_001B1AFC = (int)heap;
             bytes = D_L00_001B1B00->count * 0x1C;
             heap += bytes;
-            func_00282A60((void *)D_L00_001B1AFC, 0, bytes);
+            ClearMemory((void *)D_L00_001B1AFC, 0, bytes);
         }
         {
             int j;
@@ -1608,7 +1609,7 @@ char *func_L00_00300618(int reload)
             int i;
 
             table = D_L00_001B19F0;
-            func_00282A60(table, -1, 0x10000);
+            ClearMemory(table, -1, 0x10000);
             for (i = 0; i < n3; i++) {
                 if ((unsigned)(q[i * 2 + 1] + 0x4000) < 0x8000)
                     table[q[i * 2 + 1] + 0x4000] = q[i * 2];
@@ -1665,7 +1666,7 @@ char *func_L00_00300618(int reload)
 
             table = D_L00_001B19F0;
             q = &q0[n1 * 2 + 4];
-            func_00282A60(table, 0xFFFEFFFE, 0x8000);
+            ClearMemory(table, 0xFFFEFFFE, 0x8000);
             for (i = 0; i < n2; i++) {
                 if ((unsigned)q[i * 2 + 1] < 0x4000)
                     table[q[i * 2 + 1]] = q[i * 2];
@@ -1716,42 +1717,42 @@ char *func_L00_00300618(int reload)
         D_L00_001B1A50 = 0;
         D_L00_001C9340.i1C = 0;
     }
-    func_0027B7E0();
-    func_L00_002A4928();
-    func_L00_002A4D18();
-    func_L00_002D9E80();
-    func_00272368();
-    func_002B8518();
-    func_L00_0037E418();
-    func_L00_00367308();
-    func_L00_0032A0E8();
-    func_L00_0032A138();
-    func_L00_0032A170();
-    func_L00_003E8150();
-    func_L00_002E9098();
+    ClearCounterGroup();
+    InitializeHero();
+    ResetHeroStartingAimAndSpeed();
+    SetupLevelCameras();
+    UpdateCameraState();
+    ClearPadPortState();
+    InitLevelObjectTables();
+    ResetMenuState();
+    ClearSlotTable();
+    ClearCounterListA();
+    ClearCounterListB();
+    ClearFadingMobyList();
+    EnableDrawFlag();
     D_L00_001FDE78 = 0;
     D_L00_001FDEF8 = 0;
     D_L00_001B1FB0 = 0;
     D_L00_001B1FF0 = 0;
     D_L00_001B2030 = 0;
-    func_L00_00403BF8();
+    ClearActiveSheepList();
     {
         int i;
 
         for (i = 0x13; i >= 0; i--)
             D_L00_00220DA0[i] = 0;
     }
-    D_L00_001B19C8 = 0;
+    gFrameCounter_L00 = 0;
     D_L00_001B1AEC = 0;
     D_L00_001AA0F8 = 0xE0;
-    if (D_00152C00.hero) {
-        Moby00618 *m = D_00152C00.hero;
-        char *hero = D_00189E20;
+    if (gHeroMoby_00152C00.hero) {
+        Moby00618 *m = gHeroMoby_00152C00.hero;
+        char *hero = gHeroState;
 
         *(long long *)((char *)m + 0x38) = *(long long *)(*(char **)(hero + 0x2290) + 0x38);
     }
-    func_00272198(8.0f);
-    switch (D_001A79F0) {
+    SetCameraTransitionFrames(8.0f);
+    switch (gCurrentMapIndex) {
     case 2:
     case 5:
     case 6:

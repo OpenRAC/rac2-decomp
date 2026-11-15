@@ -12,90 +12,92 @@ extern void func_002B60B0(u8 *,float,float,float,float);
 extern float func_L01_003377C8(u8 *);
 extern int func_002B3380(void *,void *,void *),func_L09_003F7C50(void *,int,int);
 extern void func_0029FCC0(void *,int,void *),func_00282CF0(void *,void *,void *),func_L09_003F73E8(void *),func_002A7750(void *,int,int),func_L12_00412E50(void *,int,int,int);
-void func_L12_004135A8(u8 *o) {
-    u8 *d=*(u8 **)(o+0x68), *p,*pd; InitBytes bytes=D_L12_001B1848; float pos[4]; int i,j; u8 *parameters; float acceleration; int animation=9; float slow=0.004166666883975267f;
-    *(float *)(o+0x2C)*=D_L12_001B17F0;
-    d[0x60]=14;
-    *(int *)(d+0x98)=animation;
-    d[0x61]=18;
-    d[0x62]=17;
-    d[0x66]=20;
-    d[0x67]=255;
-    *(float *)(d+0x6C)=0.36666667461395264f;
-    *(float *)(d+0x70)=0.11666667461395264f;
-    *(float *)(d+0x74)=slow;
-    *(float *)(d+0x78)=0.008333333767950535f;
-    *(float *)(d+0x7C)=slow;
-    *(float *)(d+0x8C)=0.4f;
-    d[0xBC]=5;
-    d[0xBD]=animation;
-    d[0xBE]=4;
-    d[0xBF]=7;
-    d[0xC2]=10;
-    d[0xC3]=17;
-    *(float *)(d+0x90)=*(float *)(d+0x310);
-    *(float *)(d+0xF8)=0.45f;
-    d[0x28]=3;
-    *(u8 **)(d+0x2F8)=0;
-    *(u8 **)(d+0x2F0)=0;
-    *(u8 **)(d+0x2F4)=0;
-    *(float *)(d+0x80)=0.7f;
-    *(float *)(d+0x84)=0.7f;
-    *(float *)(d+0x30)=1.7f;
-    d[0x2A]=2;
-    d[0x2E]=1;
-    d[0x4D]=0;
-    d[0x2F]=8;
-    d[0x48]=func_00283CF0(25.0f);d[0x4A]=func_00283CF0(16.0f);
-    { float first,second,third,fourth;
+/* Sets up a creature moby on creation: its stats and animations, then it spawns a helper moby
+   (moby class 4427) with two small child mobies attached to it. */
+void func_L12_004135A8(u8 *creature) {
+    u8 *vars=*(u8 **)(creature+0x68), *spawned,*spawnedVars; InitBytes initBytes=D_L12_001B1848; float attachPos[4]; int childIndex,byteIndex; u8 *parameters; float acceleration; int animation=9; float slow=0.004166666883975267f;
+    *(float *)(creature+0x2C)*=D_L12_001B17F0;
+    vars[0x60]=14;
+    *(int *)(vars+0x98)=animation;
+    vars[0x61]=18;
+    vars[0x62]=17;
+    vars[0x66]=20;
+    vars[0x67]=255;
+    *(float *)(vars+0x6C)=0.36666667461395264f;
+    *(float *)(vars+0x70)=0.11666667461395264f;
+    *(float *)(vars+0x74)=slow;
+    *(float *)(vars+0x78)=0.008333333767950535f;
+    *(float *)(vars+0x7C)=slow;
+    *(float *)(vars+0x8C)=0.4f;
+    vars[0xBC]=5;
+    vars[0xBD]=animation;
+    vars[0xBE]=4;
+    vars[0xBF]=7;
+    vars[0xC2]=10;
+    vars[0xC3]=17;
+    *(float *)(vars+0x90)=*(float *)(vars+0x310);
+    *(float *)(vars+0xF8)=0.45f;
+    vars[0x28]=3;
+    *(u8 **)(vars+0x2F8)=0;
+    *(u8 **)(vars+0x2F0)=0;
+    *(u8 **)(vars+0x2F4)=0;
+    *(float *)(vars+0x80)=0.7f;
+    *(float *)(vars+0x84)=0.7f;
+    *(float *)(vars+0x30)=1.7f;
+    vars[0x2A]=2;
+    vars[0x2E]=1;
+    vars[0x4D]=0;
+    vars[0x2F]=8;
+    vars[0x48]=FloatToInt(25.0f);vars[0x4A]=FloatToInt(16.0f);
+    { float valueA,valueB,valueC,valueD;
     acceleration=D_L12_001B180C*0.00027777778450399637f;
-    d[0x1E8]=12;d[0x1E9]=11;
-    second=D_L12_001B17F8*0.01666666753590107f;third=D_L12_001B1804*0.000004848137454391923f;
-    fourth=D_L12_001B1808*0.0002908882452175021f;first=D_L12_001B17F4*0.00027777778450399637f;
-    *(float *)(d+0x100)=0.7f;*(float *)(d+0x104)=0.5f;*(float *)(d+0x108)=0.5f;*(float *)(d+0x10C)=0.5f;
-    *(float *)(d+0x110)=0.7853982448577881f;*(float *)(d+0x130)=0.349065899848938f;
-    *(float *)(d+0x12C)=acceleration;
-    func_002B60B0(o,first,second,third,fourth); }
-    *(int *)(d+0x138)|=0x80;*(int *)(d+0x1DC)=0;*(float *)(d+0x1D4)=3.0f;
-    *(u16 *)(d+0x1E4)=0;*(u16 *)(d+0x1E2)=0;*(int *)(d+0x1D0)=0;
-    if(*(int *)(d+0x2BC)!=-1)func_L01_003377C8(D_L12_001FEAC0[*(int *)(d+0x2BC)]);
-    if(*(int *)(d+0x2B4)!=-1)func_L01_003377C8(D_L12_001FEAC0[*(int *)(d+0x2B4)]);
-    if(*(int *)(d+0x2B8)!=-1)func_L01_003377C8(D_L12_001FEAC0[*(int *)(d+0x2B8)]);
-    p=func_0029EFD0(0x114B);
-    if(p) {
-        *(u8 **)(d+0x2F8)=p;*(u16 *)(p+0x32)=*(u16 *)(o+0x32);p[0x30]=o[0x30];
-        *(u64 *)(p+0x38)=*(u64 *)(o+0x38);*(int *)(p+0x78)=*(int *)(o+0x78);p[0x31]=1;
-        *(float *)(p+0x2C)*=D_L12_001B17F0;
-        func_0029FCC0(o,0,p+0x10);qcopy(p+0xF0,o+0xF0);
-        pd=*(u8 **)(p+0x68);*(InitBlock *)(pd+0x20)=*(InitBlock *)(d+0x20);
-        *(float *)(pd+0x20)=*(float *)(d+0x20);*(u16 *)(pd+0x24)=*(u16 *)(d+0x24);pd[0x28]=d[0x28];
-        *(float *)(pd+0x30)=0.7f;pd[0x2F]=4;pd[0x2A]=2;pd[0x4A]=3;pd[0x4D]=1;*(u8 **)(pd+0x70)=o;
-        for(i=0;i<2;i++) {
+    vars[0x1E8]=12;vars[0x1E9]=11;
+    valueB=D_L12_001B17F8*0.01666666753590107f;valueC=D_L12_001B1804*0.000004848137454391923f;
+    valueD=D_L12_001B1808*0.0002908882452175021f;valueA=D_L12_001B17F4*0.00027777778450399637f;
+    *(float *)(vars+0x100)=0.7f;*(float *)(vars+0x104)=0.5f;*(float *)(vars+0x108)=0.5f;*(float *)(vars+0x10C)=0.5f;
+    *(float *)(vars+0x110)=0.7853982448577881f;*(float *)(vars+0x130)=0.349065899848938f;
+    *(float *)(vars+0x12C)=acceleration;
+    SetControllerSpeedLimits(creature,valueA,valueB,valueC,valueD); }
+    *(int *)(vars+0x138)|=0x80;*(int *)(vars+0x1DC)=0;*(float *)(vars+0x1D4)=3.0f;
+    *(u16 *)(vars+0x1E4)=0;*(u16 *)(vars+0x1E2)=0;*(int *)(vars+0x1D0)=0;
+    if(*(int *)(vars+0x2BC)!=-1)ComputePathSegmentLengths_L01(D_L12_001FEAC0[*(int *)(vars+0x2BC)]);
+    if(*(int *)(vars+0x2B4)!=-1)ComputePathSegmentLengths_L01(D_L12_001FEAC0[*(int *)(vars+0x2B4)]);
+    if(*(int *)(vars+0x2B8)!=-1)ComputePathSegmentLengths_L01(D_L12_001FEAC0[*(int *)(vars+0x2B8)]);
+    spawned=CreateMoby(0x114B /* moby class 4427 */);
+    if(spawned) {
+        *(u8 **)(vars+0x2F8)=spawned;*(u16 *)(spawned+0x32)=*(u16 *)(creature+0x32);spawned[0x30]=creature[0x30];
+        *(u64 *)(spawned+0x38)=*(u64 *)(creature+0x38);*(int *)(spawned+0x78)=*(int *)(creature+0x78);spawned[0x31]=1;
+        *(float *)(spawned+0x2C)*=D_L12_001B17F0;
+        TransformMobyJointToWorld(creature,0,spawned+0x10);qcopy(spawned+0xF0,creature+0xF0);
+        spawnedVars=*(u8 **)(spawned+0x68);*(InitBlock *)(spawnedVars+0x20)=*(InitBlock *)(vars+0x20);
+        *(float *)(spawnedVars+0x20)=*(float *)(vars+0x20);*(u16 *)(spawnedVars+0x24)=*(u16 *)(vars+0x24);spawnedVars[0x28]=vars[0x28];
+        *(float *)(spawnedVars+0x30)=0.7f;spawnedVars[0x2F]=4;spawnedVars[0x2A]=2;spawnedVars[0x4A]=3;spawnedVars[0x4D]=1;*(u8 **)(spawnedVars+0x70)=creature;
+        for(childIndex=0;childIndex<2;childIndex++) {
             u8 *child;
-            func_0029FCC0(*(u8 **)(d+0x2F8),i,pos);func_00282CF0(pos,pos,*(u8 **)(d+0x2F8)+0x10);
-            child=func_L02_0032B468(*(u8 **)(d+0x2F8),0xD66,pos,D_L12_001A8F20,0,0,D_L12_001A8F20,D_L12_001A8F20,D_L12_001A8F20,0);
+            TransformMobyJointToWorld(*(u8 **)(vars+0x2F8),childIndex,attachPos);FastVecSub(attachPos,attachPos,*(u8 **)(vars+0x2F8)+0x10);
+            child=SpawnFlyingFragment(*(u8 **)(vars+0x2F8),0xD66,attachPos,D_L12_001A8F20,0,0,D_L12_001A8F20,D_L12_001A8F20,D_L12_001A8F20,0);
             if(child && *(s16 *)(child+0xAA)==0xD66 && child[0x20]!=254 && child[0x20]!=253) {
-                *(u16 *)(child+0x32)=*(u16 *)(o+0x32);*(u8 **)(d+0x2F0+i*4)=child;*(u16 *)(child+0x34)|=2;
+                *(u16 *)(child+0x32)=*(u16 *)(creature+0x32);*(u8 **)(vars+0x2F0+childIndex*4)=child;*(u16 *)(child+0x34)|=2;
             }
         }
-        parameters=pd+0x50;
-        for(j=0;j<10;j++)parameters[j]=bytes.bytes[j];
-        switch(func_001163B0()%3) {
-        case 0:parameters[4]=func_00283CF0((2.0f/ *(s16 *)(d+0x24))*255.0f);parameters[8]=func_00283CF0((1.0f/ *(s16 *)(d+0x24))*255.0f);break;
-        case 1:parameters[5]=func_00283CF0((2.0f/ *(s16 *)(d+0x24))*255.0f);parameters[9]=func_00283CF0((1.0f/ *(s16 *)(d+0x24))*255.0f);break;
-        case 2:parameters[7]=func_00283CF0((2.0f/ *(s16 *)(d+0x24))*255.0f);break;
+        parameters=spawnedVars+0x50;
+        for(byteIndex=0;byteIndex<10;byteIndex++)parameters[byteIndex]=initBytes.bytes[byteIndex];
+        switch(Rand()%3) {
+        case 0:parameters[4]=FloatToInt((2.0f/ *(s16 *)(vars+0x24))*255.0f);parameters[8]=FloatToInt((1.0f/ *(s16 *)(vars+0x24))*255.0f);break;
+        case 1:parameters[5]=FloatToInt((2.0f/ *(s16 *)(vars+0x24))*255.0f);parameters[9]=FloatToInt((1.0f/ *(s16 *)(vars+0x24))*255.0f);break;
+        case 2:parameters[7]=FloatToInt((2.0f/ *(s16 *)(vars+0x24))*255.0f);break;
         }
-        func_002B3380(*(u8 **)(d+0x2F8),pd+0x50,pd+0x20);{ u8 *partner=*(u8 **)(d+0x2F8);*(u16 *)(partner+0x7C)&=0xFCFF; }
+        SpawnDamageDebrisOnHealthLoss(*(u8 **)(vars+0x2F8),spawnedVars+0x50,spawnedVars+0x20);{ u8 *partner=*(u8 **)(vars+0x2F8);*(u16 *)(partner+0x7C)&=0xFCFF; }
     }
-    if(d[0x302] && !(d[0x302]&2))d[0x302]=1;
-    func_L09_003F7C50(o,*(int *)(d+0x2B4),-1);func_L09_003F73E8(o);**(int **)(d+0x304)=0;
-    if(*(int *)(d+0x2B0)!=-1) {
-        *(int *)(d+0x2DC)=*(int *)(d+0x2B0);*(int *)(d+0x138)|=4;func_002A7750(o,1,1);
-        func_L12_00412E50(o,13,0,func_002A7820(10,20));
-        *(int *)(d+0x2D8)=*(int *)(d+0x2D0);
+    if(vars[0x302] && !(vars[0x302]&2))vars[0x302]=1;
+    SelectEnemyPath(creature,*(int *)(vars+0x2B4),-1);ReleaseSharedCounter(creature);**(int **)(vars+0x304)=0;
+    if(*(int *)(vars+0x2B0)!=-1) {
+        *(int *)(vars+0x2DC)=*(int *)(vars+0x2B0);*(int *)(vars+0x138)|=4;SetMobyState(creature,1,1);
+        SwitchGuardAnimation(creature,13,0,RandomIntRange(10,20));
+        *(int *)(vars+0x2D8)=*(int *)(vars+0x2D0);
     } else {
-        int state;func_002A7750(o,5,1);state=func_001163B0()&1;
-        func_L12_00412E50(o,state,0,func_002A7820(10,20));
-        *(int *)(d+0x2D8)=*(int *)(d+0x2D0);
+        int state;SetMobyState(creature,5,1);state=Rand()&1;
+        SwitchGuardAnimation(creature,state,0,RandomIntRange(10,20));
+        *(int *)(vars+0x2D8)=*(int *)(vars+0x2D0);
     }
 }

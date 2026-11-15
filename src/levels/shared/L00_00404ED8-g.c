@@ -31,7 +31,7 @@ extern char D_L00_001FE940[];
    1.0f is loaded at each use). */
 static inline void pickSegmentAlpha(int *alpha)
 {
-    if (func_001163B0() & 2)
+    if (Rand() & 2)
         *alpha = 64;
     else
         *alpha = 96;
@@ -50,22 +50,22 @@ void func_L00_00404ED8(char *obj, Vec *a, Vec *b)
 
     from->q = a->q;
     to->q = b->q;
-    length = func_00282DF0(ctx);
-    count = func_00283CF0(length * 10.0f);
+    length = FastVecLength(ctx);
+    count = FloatToInt(length * 10.0f);
     qcopy(&point, to);
-    func_00282CF0(&step, from, to);
-    scale = func_00283CE0(count);
-    func_00282F20(&step, &step, length / scale);
+    FastVecSub(&step, from, to);
+    scale = IntToFloat(count);
+    vec_scale_to_length(&step, &step, length / scale);
     tbl = D_L00_001FE940;
     if (count > 0) do {
-        n = func_00283CF0(func_002A78D8(1.0f, 3.0f));
-        drift = -(func_002A7878(0.1f, 0.2f) * 0.016666668f);
-        func_00282D30(&vel, &D_0018A0E0, drift);
-        life = func_002A7820(30, 45);
-        speed = -func_002A7878(500.0f, 1000.0f);
+        n = FloatToInt(RandomSignedFloatRange(1.0f, 3.0f));
+        drift = -(RandomFloatRange(0.1f, 0.2f) * 0.016666668f);
+        FastVecScale(&vel, &D_0018A0E0, drift);
+        life = RandomIntRange(30, 45);
+        speed = -RandomFloatRange(500.0f, 1000.0f);
         pickSegmentAlpha(&alpha);
-        particle = func_002C16C0(&point, &vel, life, alpha, 0x407fff, n, 42000.0f, speed, 1.0f, 0.0f, 0.0f);
-        func_00282CC0(&point, &point, &step);
+        particle = SpawnBurstParticle_002C16C0(&point, &vel, life, alpha, 0x407fff, n, 42000.0f, speed, 1.0f, 0.0f, 0.0f);
+        FastVecAdd(&point, &point, &step);
         if (particle) {
             particle[2] = **(unsigned char **)(tbl + 92);
             if (alpha == 64)
@@ -74,14 +74,14 @@ void func_L00_00404ED8(char *obj, Vec *a, Vec *b)
                 particle[3] = 68;
         }
     } while (--count);
-    if (func_002A77E0(4) == 0) {
+    if (RandomIntBelow(4) == 0) {
         char *puff;
 
-        func_00282D30(&extra, ctx, -0.033333335f);
-        func_002ACB48(&extra, 0.016666668f);
+        FastVecScale(&extra, ctx, -0.033333335f);
+        AddRandomOffsetToVector(&extra, 0.016666668f);
         extra.f[2] += 0.025000002f;
-        life = func_002A7820(30, 45);
-        puff = func_002BCB00(obj + 16, &extra, 0x7f407fff, 255, life, 0, -1, -1, 0, 31500.002f);
+        life = RandomIntRange(30, 45);
+        puff = SpawnSparkParticle_002BCB00(obj + 16, &extra, 0x7f407fff, 255, life, 0, -1, -1, 0, 31500.002f);
         if (puff) {
             *(float *)(puff + 44) = 0.0016666667f;
             puff[2] = **(unsigned char **)(D_L00_001FE940 + 212);

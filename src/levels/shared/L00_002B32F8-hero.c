@@ -43,43 +43,43 @@ extern float func_002AA3A8(float *, float *, float, float, float, float);
 /* Selects and eases the hero collision capsule dimensions for the movement mode. */
 void func_L00_002B32F8(void)
 {
-    switch (D_00189E20.vehicle_mode) {
+    switch (gHeroState.vehicle_mode) {
     case 0:
-        D_00189E20.top_target = 0.8f;
-        D_00189E20.bottom_target = 0.7f;
-        D_00189E20.radius_target = 0.44999998807907104f;
+        gHeroState.top_target = 0.8f;
+        gHeroState.bottom_target = 0.7f;
+        gHeroState.radius_target = 0.44999998807907104f;
         break;
     case 1:
-        D_00189E20.top_target = 0.5999999642372131f;
-        D_00189E20.bottom_target = 0.45000001788139343f;
-        D_00189E20.radius_target = 0.3f;
+        gHeroState.top_target = 0.5999999642372131f;
+        gHeroState.bottom_target = 0.45000001788139343f;
+        gHeroState.radius_target = 0.3f;
         break;
     }
-    if (D_00189E20.control_mode == 4) {
-        if (D_00189E20.takeoff_frame < D_00189E20.state_timer && !D_00189E20.past_jump_apex)
-            D_00189E20.bottom_target = D_00189E20.field4b8;
-    } else if (D_00189E20.move_state == 6) {
-        D_00189E20.bottom_target = 0.5f;
-    } else if (D_00189E20.move_state == 4) {
-        D_00189E20.top_target = 0.3500000238418579f;
-    } else if ((unsigned)(D_00189E20.control_mode - 17) < 2) {
-        D_00189E20.top_target = 0.0f;
-        D_00189E20.bottom_target = 0.0f;
-    } else if (D_00189E20.field1492 && D_00189E20.field340) {
-        D_00189E20.top_target = 0.8f;
-        D_00189E20.bottom_target = 0.9f;
-    } else if (D_00189E20.move_state == 124) {
-        D_00189E20.radius_target = 0.8f;
+    if (gHeroState.control_mode == 4) {
+        if (gHeroState.takeoff_frame < gHeroState.state_timer && !gHeroState.past_jump_apex)
+            gHeroState.bottom_target = gHeroState.field4b8;
+    } else if (gHeroState.move_state == 6) {
+        gHeroState.bottom_target = 0.5f;
+    } else if (gHeroState.move_state == 4) {
+        gHeroState.top_target = 0.3500000238418579f;
+    } else if ((unsigned)(gHeroState.control_mode - 17) < 2) {
+        gHeroState.top_target = 0.0f;
+        gHeroState.bottom_target = 0.0f;
+    } else if (gHeroState.field1492 && gHeroState.field340) {
+        gHeroState.top_target = 0.8f;
+        gHeroState.bottom_target = 0.9f;
+    } else if (gHeroState.move_state == 124) {
+        gHeroState.radius_target = 0.8f;
     }
-    if (!D_00189E20.wall_hit || D_00189E20.previous_control_mode == 18 ||
-        D_00189E20.field22b0 == 18 ||
-        (D_00189E20.vehicle_mode == 0 && D_00189E20.capsule_bottom < 0.53f) ||
-        D_00189E20.control_mode == 17 || D_00189E20.base_condition ||
-        func_00282E80((char *)&D_00189E20 + 0x240, (char *)&D_00189E20 + 0x80) >
-            D_00189E20.radius * 0.5f) {
-        func_002AA2E8(&D_00189E20.capsule_top, D_00189E20.top_target, 0.02f);
-        func_002AA2E8(&D_00189E20.capsule_bottom, D_00189E20.bottom_target, 0.02f);
-        func_002AA3A8(&D_00189E20.radius, &D_00189E20.radius_velocity,
-                     D_00189E20.radius_target, 0.02f, 0.3f, 0.0666666701f);
+    if (!gHeroState.wall_hit || gHeroState.previous_control_mode == 18 ||
+        gHeroState.field22b0 == 18 ||
+        (gHeroState.vehicle_mode == 0 && gHeroState.capsule_bottom < 0.53f) ||
+        gHeroState.control_mode == 17 || gHeroState.base_condition ||
+        vec_distance_xy((char *)&gHeroState + 0x240, (char *)&gHeroState + 0x80) >
+            gHeroState.radius * 0.5f) {
+        ApproachValue(&gHeroState.capsule_top, gHeroState.top_target, 0.02f);
+        ApproachValue(&gHeroState.capsule_bottom, gHeroState.bottom_target, 0.02f);
+        SpringFloatToGoal(&gHeroState.radius, &gHeroState.radius_velocity,
+                     gHeroState.radius_target, 0.02f, 0.3f, 0.0666666701f);
     }
 }

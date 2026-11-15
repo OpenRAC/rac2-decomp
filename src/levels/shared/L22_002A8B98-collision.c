@@ -17,64 +17,65 @@ typedef struct {
 } CollisionResult;
 extern CollisionResult D_L22_001C00C0;
 
+/* Checks ahead of the hero for walls and slides the hero's speed along them so it does not run into the wall. */
 void func_L22_002B8E10(int force) {
     float start[4], end[4], extended_start[4], extended_end[4];
     float reach, scale, zero, angle;
     int hit;
-    char *velocity = D_00189E20 + 0xF0;
-    if (func_L00_002D3A58(velocity) < 0.0016666668f) return;
+    char *velocity = gHeroState + 0xF0;
+    if (GetViewSpaceVectorLength(velocity) < 0.0016666668f) return;
     {
-        char *g = velocity - 0xF0;
+        char *hero = velocity - 0xF0;
         reach = 0.37f;
         scale = 0.5f;
-        if ((unsigned)(*(int *)(g + 0x229C) - 17) < 2) {
+        if ((unsigned)(*(int *)(hero + 0x229C) - 17) < 2) {
             reach = 0;
             scale = 0.7f;
-        } else if (*(u8 *)(g + 0x22B4) == 1) {
+        } else if (*(u8 *)(hero + 0x22B4) == 1) {
             reach = 0.35f;
             scale = 0.27f;
-        } else if (*(u8 *)(g + 0x22B4) == 2) {
+        } else if (*(u8 *)(hero + 0x22B4) == 2) {
             reach = 1;
             scale = 5;
         }
         zero = 0;
-        func_L00_002D36E0(start, zero, zero, reach, 1);
-        func_L00_002D36E0(extended_start, zero, zero, reach * 0.3f, 1);
+        BuildHeroRelativePoint(start, zero, zero, reach, 1);
+        BuildHeroRelativePoint(extended_start, zero, zero, reach * 0.3f, 1);
     }
-    if (force != 0 || func_00282E20(D_00189E20 + 0xF0) < 0.01f) {
-        func_00282F20(end, D_00189E20, scale);
-        func_00282F20(extended_end, D_00189E20, scale * 1.4f);
+    if (force != 0 || vec_length_xy(gHeroState + 0xF0) < 0.01f) {
+        vec_scale_to_length(end, gHeroState, scale);
+        vec_scale_to_length(extended_end, gHeroState, scale * 1.4f);
     } else {
-        func_L00_002D3B58(end, D_00189E20 + 0xF0, 0);
-        func_00282F20(end, end, scale);
-        func_00282D30(extended_end, end, 1.4f);
+        SetViewSpaceHeight(end, gHeroState + 0xF0, 0);
+        vec_scale_to_length(end, end, scale);
+        FastVecScale(extended_end, end, 1.4f);
     }
-    func_00282CC0(end, end, start);
+    FastVecAdd(end, end, start);
     hit = -1;
-    func_00282CC0(extended_end, extended_end, extended_start);
+    FastVecAdd(extended_end, extended_end, extended_start);
     {
-        char *g = D_00189E20;
-        if (func_002761F8(extended_start, extended_end, 2, *(void **)(g + 0x2290), 0) && D_L22_001C00C0.count > 0)
-            hit = func_00278E78();
+        char *hero = gHeroState;
+        if (CollLine(extended_start, extended_end, 2, *(void **)(hero + 0x2290), 0) && D_L22_001C00C0.count > 0)
+            hit = GetCollHitMaterial();
     }
     angle = 0;
     {
-        char *g = D_00189E20;
-        if (func_002761F8(start, end, 2, *(void **)(g + 0x2290), 0) && D_L22_001C00C0.count > 0)
-            angle = func_L00_002D3EA8(D_L22_001C00C0.normal);
+        char *hero = gHeroState;
+        if (CollLine(start, end, 2, *(void **)(hero + 0x2290), 0) && D_L22_001C00C0.count > 0)
+            angle = GetViewSpaceAngle(D_L22_001C00C0.normal);
     }
     if (angle >= 0.8726647f || hit == 8 || hit == 12) {
-        char *g = D_00189E20;
+        char *hero = gHeroState;
         CollisionResult *contact = &D_L22_001C00C0;
         float *normal = contact->normal;
         float dot;
-        *(void **)(g + 0x270) = contact->object;
-        func_L00_002D3B58(normal, normal, 0);
-        func_00282F20(normal, normal, 1);
-        dot = func_00282DB0(normal, g + 0xF0);
+        *(void **)(hero + 0x270) = contact->object;
+        SetViewSpaceHeight(normal, normal, 0);
+        vec_scale_to_length(normal, normal, 1);
+        dot = FastVecDot(normal, hero + 0xF0);
         if (dot < 0) {
-            func_00282D30(normal, normal, -dot);
-            func_00282CC0(g + 0xF0, g + 0xF0, normal);
+            FastVecScale(normal, normal, -dot);
+            FastVecAdd(hero + 0xF0, hero + 0xF0, normal);
         }
     }
 }

@@ -53,6 +53,7 @@ extern int func_00287FF8(int, int);
 extern int func_00288870(RecordDE990 *, int, int);
 extern void func_0029ADA0(char *);
 
+/* Resets the game for a fresh run but keeps the collected items, weapon records and unlocks. Then it can start saving into a slot. */
 void func_002DE990(int selected)
 {
     struct {
@@ -73,19 +74,19 @@ void func_002DE990(int selected)
     unsigned char *card, *block, *slots;
     int *words;
     unsigned char *state, *hud;
-    card = D_0018C958;
-    D_001A79F8.f12++;
-    D_001A79F8.f3a = 1;
-    D_001A79F8.f3b = 0;
-    resident = D_001A7AF0;
+    card = gSubtitleHistory;
+    gPlayerBolts.f12++;
+    gPlayerBolts.f3a = 1;
+    gPlayerBolts.f3b = 0;
+    resident = gEquipmentBits;
     hadCard = *(unsigned short *)(card + 0x84);
-    gameState = &D_001A79F8;
+    gameState = &gPlayerBolts;
     savedState = *gameState;
     for (j = 0; j < 56; j++) {
-        saved.flags[j] = D_001A7AF8[j];
+        saved.flags[j] = gItemOwnedFlags[j];
         saved.words[j] = D_00139868[j];
-        *(saved.records + j) = D_00239BA0[j];
-        saved.slots[j] = D_00139568[j];
+        *(saved.records + j) = gWeaponTable_00239BA0[j];
+        saved.slots[j] = gItemSlotToRecord[j];
     }
     for (i = 0; i < 32; i++) saved32[i] = D_001A7A60[i];
     for (i = 0; i < 12; i++) saved12[i] = D_001A7A40[i];
@@ -104,63 +105,63 @@ void func_002DE990(int selected)
     saved.flags[4] = 0;
     saved.flags[19] = 0;
     saved.flags[8] = 0;
-    func_00282AB0(savedBlock, D_0019B278, 112);
+    CopyMemoryAligned(savedBlock, D_0019B278, 112);
     block = D_001395B8;
     control = block[0x90];
     for (i = 0; i < 56; i++) saved56[i] = D_001A7A80[i];
-    func_00298E08();
-    func_00282AB0(D_0019B278, savedBlock, 112);
+    LoadGameDataAndResetSaveMenu();
+    CopyMemoryAligned(D_0019B278, savedBlock, 112);
     block = D_001395B8;
     block[0x90] = control;
-    func_00282A60(D_001A7AB8, 0, 56);
+    ClearMemory(D_001A7AB8, 0, 56);
     for (i = 0; i < 56; i++) D_001A7A80[i] = saved56[i];
-    { int m; for (m = 7; m >= 0; m--) D_001A73B8[m] = 0; }
-    D_001A79F8 = savedState;
-    D_001A73B8[0] = 30;
-    D_001A73B8[1] = 42;
-    D_001A79F8.f22 = 0;
-    D_001A79F8.f24 = 0;
-    D_001A79F8.f18 = 0;
-    D_001A79F8.f1c = 0;
+    { int m; for (m = 7; m >= 0; m--) gWeaponMenuSlots[m] = 0; }
+    gPlayerBolts = savedState;
+    gWeaponMenuSlots[0] = 30;
+    gWeaponMenuSlots[1] = 42;
+    gPlayerBolts.f22 = 0;
+    gPlayerBolts.f24 = 0;
+    gPlayerBolts.f18 = 0;
+    gPlayerBolts.f1c = 0;
     D_001A7B94[0] = 0;
     D_001A7B94[1] = 0;
     if (hadCard) {
-        card = D_0018C958;
+        card = gSubtitleHistory;
         if (*(unsigned short *)(card + 0x84) == 0)
             *(unsigned short *)(card + 0x84) = 1;
     }
     for (k = 0; k < 56; k++) {
-        D_001A7AF8[k] = saved.flags[k];
+        gItemOwnedFlags[k] = saved.flags[k];
         D_00139868[k] = saved.words[k];
-        D_00239BA0[k] = *(saved.records + k);
-        D_00139568[k] = saved.slots[k];
-        D_00139688[k] = D_00239BA0[D_00139568[k]].f.cost;
+        gWeaponTable_00239BA0[k] = *(saved.records + k);
+        gItemSlotToRecord[k] = saved.slots[k];
+        gItemAmmoCounts[k] = gWeaponTable_00239BA0[gItemSlotToRecord[k]].f.cost;
     }
     for (i = 0; i < 32; i++) D_001A7A60[i] = saved32[i];
     for (i = 0; i < 12; i++) D_001A7A40[i] = saved12[i];
     D_001A7B94[1] = 0;
     D_001A7B94[0] = 0;
-    func_00287FF8(10, 3);
+    SeekChainEntry(10, 3);
     if (D_001A7B08) {
-        if (D_00239BA0[D_00139568[0x10]].f.kind == 0)
-            func_00287FF8(16, 2);
+        if (gWeaponTable_00239BA0[gItemSlotToRecord[0x10]].f.kind == 0)
+            SeekChainEntry(16, 2);
         else
-            func_00287FF8(16, 3);
-        if (D_00239BA0[D_00139568[0x10]].f.kind == 0) {
-            func_00288870(&first, 16, 2);
-            func_00288870(&second, 16, 0);
+            SeekChainEntry(16, 3);
+        if (gWeaponTable_00239BA0[gItemSlotToRecord[0x10]].f.kind == 0) {
+            CopyHelpRecordAtDepth(&first, 16, 2);
+            CopyHelpRecordAtDepth(&second, 16, 0);
             words = D_00139868;
             words[16] = (float)first.f.value * (float)words[16] / (float)second.f.value;
         }
     }
-    hud = D_00189E20;
+    hud = gHeroState;
     *(short *)(hud + 0x24fc) = 1;
     D_001A7AF0_gp = resident;
     if (selected >= 0) {
-        state = D_001393E0;
+        state = gMemcardState;
         *(short *)(state + 0x18) = selected;
         *(int *)(state + selected * 28 + 0x30) = 0;
-        func_0029ADA0(D_001F2A40);
+        BuildSavePacket(D_001F2A40);
         *(char **)(state + 0x174) = D_001F2A40;
         *(int *)(state + 0x148) = 0;
         if (*(int *)(state + 0x164) < 0) {

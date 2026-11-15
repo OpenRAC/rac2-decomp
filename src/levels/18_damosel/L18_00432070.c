@@ -15,54 +15,55 @@ extern int func_002B4FF0(u8 *, void *, float);
 #define P(p, o) (*(u8 **)((p) + (o)))
 
 /* A unit of its own: the switch's jump table is this unit's only .rodata. */
-void func_L18_00432070(u8 *a) {
-    u8 *s = P(a, 0x68);
-    int animation = a[0x42];
+/* Turns the Extermibot's body and torso part toward its target, depending on which animation it is playing. */
+void func_L18_00432070(u8 *moby) {
+    u8 *vars = P(moby, 0x68);
+    int animation = moby[0x42];
 
     /* The byte is widened before the test, so it never equals -1; retail keeps
        the lbu, li -1, bne and the fallback load all the same. */
-    if (animation == -1) animation = a[0x43];
+    if (animation == -1) animation = moby[0x43];
     switch (animation) {
     case 1:
-        if (P(s, 0x7C0)) qcopy(P(s, 0x7C0) + 0xF0, a + 0xF0);
+        if (P(vars, 0x7C0)) qcopy(P(vars, 0x7C0) + 0xF0, moby + 0xF0);
         break;
     case 3: case 4: case 5: case 6: case 7:
     case 10: case 11: case 12: case 13: case 14: case 15:
-        if (H(s, 0x808) == 1) {
-            if (func_00283C80(F(s, 0x7A4), F(a, 0xF8)) > 0.6108652949333191f) {
-                func_002B5278(a, F(s, 0x7A4));
+        if (H(vars, 0x808) == 1) {
+            if (FastDiffRots(F(vars, 0x7A4), F(moby, 0xF8)) > 0.6108652949333191f) {
+                StepMovementAtOwnPositionWithFactor(moby, F(vars, 0x7A4));
             } else {
-                if (P(s, 0x7C0))
-                    func_002AAA00(P(s, 0x7C0) + 0xF8, F(s, 0x7A4), s + 0x7CC,
+                if (P(vars, 0x7C0))
+                    ApproachTargetWithDirectionMode(P(vars, 0x7C0) + 0xF8, F(vars, 0x7A4), vars + 0x7CC,
                                   0.006981317885220051f, 0.006981317885220051f,
                                   0.20943955f, 0);
-                func_002B5258(a);
+                StepMovementAtOwnPosition(moby);
             }
         } else {
-            if (H(s, 0x808) == 2) func_002B5278(a, F(s, 0x7A4));
-            else func_002B5258(a);
-            if (P(s, 0x7C0))
-                func_002AAA00(P(s, 0x7C0) + 0xF8, F(a, 0xF8), s + 0x7CC,
+            if (H(vars, 0x808) == 2) StepMovementAtOwnPositionWithFactor(moby, F(vars, 0x7A4));
+            else StepMovementAtOwnPosition(moby);
+            if (P(vars, 0x7C0))
+                ApproachTargetWithDirectionMode(P(vars, 0x7C0) + 0xF8, F(moby, 0xF8), vars + 0x7CC,
                               0.006981317885220051f, 0.006981317885220051f,
                               0.20943955f, 0);
         }
         break;
     case 8: case 9:
-        if (W(s, 0x7D4) != -1) {
-            func_L02_0032E998(a + 0x10, s + 0x750, s + 0x7DC, s + 0x210, W(s, 0x780),
-                              s + 0x78C, s + 0x7D8, 0.0f, 0.4f);
-            func_002B50E0(a, s + 0x750, F(s, 0x7DC));
+        if (W(vars, 0x7D4) != -1) {
+            ComputeRegionRouteHeading(moby + 0x10, vars + 0x750, vars + 0x7DC, vars + 0x210, W(vars, 0x780),
+                              vars + 0x78C, vars + 0x7D8, 0.0f, 0.4f);
+            StepMovementController(moby, vars + 0x750, F(vars, 0x7DC));
         } else {
-            func_002B4FF0(a, s + 0x750, F(s, 0x7A0));
+            TurnTowardTargetAndStepMovement(moby, vars + 0x750, F(vars, 0x7A0));
         }
-        if (P(s, 0x7C0)) {
-            if (H(s, 0x808) == 1 &&
-                func_00283C80(F(s, 0x7A4), F(a, 0xF8)) < 0.6108652949333191f) {
-                func_002AAA00(P(s, 0x7C0) + 0xF8, F(s, 0x7A4), s + 0x7CC,
+        if (P(vars, 0x7C0)) {
+            if (H(vars, 0x808) == 1 &&
+                FastDiffRots(F(vars, 0x7A4), F(moby, 0xF8)) < 0.6108652949333191f) {
+                ApproachTargetWithDirectionMode(P(vars, 0x7C0) + 0xF8, F(vars, 0x7A4), vars + 0x7CC,
                               0.006981317885220051f, 0.006981317885220051f,
                               0.20943955f, 0);
             } else {
-                func_002AAA00(P(s, 0x7C0) + 0xF8, F(a, 0xF8), s + 0x7CC,
+                ApproachTargetWithDirectionMode(P(vars, 0x7C0) + 0xF8, F(moby, 0xF8), vars + 0x7CC,
                               0.006981317885220051f, 0.006981317885220051f,
                               0.20943955f, 0);
             }

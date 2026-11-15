@@ -11,6 +11,7 @@ extern char *D_L00_001B1E9C;
 extern void func_002A05A8(void *object);
 extern void func_002A0F48(void *object);
 
+/* Updates every live object in the table each frame. */
 void func_L00_0032CF60(void)
 {
     char *scan, *object, *last = 0;

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The grouped quadword copy: the R5900 lq/sq pair with both addresses in registers. */
 typedef int Rac2TI128 __attribute__((mode(TI)));
@@ -17,37 +18,38 @@ extern void func_L00_003BCF88(void *a0, unsigned int a1, void *a2, int a3);
    to its two moving ones, then the shared helper builds the step's own vector from the
    four of them, scaled by the step's share of the whole. The block's two counts choose
    the range the block is finally emitted with. */
-void func_L00_003BCE28(char *a0, char *a1)
+/* Builds a bendy lightning ribbon from eight points and draws it. The brightness depends on how far along the effect is. */
+void func_L00_003BCE28(char *owner, char *state)
 {
     Rac2TI128 pts[8];
     Rac2TI128 tmp[3];
     Rac2TI128 *t1 = &tmp[1];
     Rac2TI128 *t2 = &tmp[2];
-    Rac2TI128 *p1 = (Rac2TI128 *)(a1 + 0x10);
-    char *c0 = a1 + 0x20;
-    char *c1 = a1 + 0x30;
+    Rac2TI128 *p1 = (Rac2TI128 *)(state + 0x10);
+    char *c0 = state + 0x20;
+    char *c1 = state + 0x30;
     int i;
-    float f;
-    int v0;
-    int v1;
+    float share;
+    int halfCount;
+    int progress;
 
     i = 0;
     do {
-        f = func_00283CE0(i) / func_00283CE0(7);
-        *t1 = *(Rac2TI128 *)a1;
+        share = IntToFloat(i) / IntToFloat(7);
+        *t1 = *(Rac2TI128 *)state;
         *t2 = *p1;
-        func_00282CC0(t1, t1, c0);
-        func_00282CC0(t2, t2, c1);
-        ref_L00_003BCE28_00(&pts[i], c0, c1, t1, t2, f);
+        FastVecAdd(t1, t1, c0);
+        FastVecAdd(t2, t2, c1);
+        ref_L00_003BCE28_00(&pts[i], c0, c1, t1, t2, share);
         i++;
     } while (i < 8);
 
-    v0 = *(int *)(a1 + 0x9C) >> 1;
-    v1 = *(int *)(a1 + 0x98);
-    if (v1 >= v0)
-        func_L00_003BCF88(a0, func_002A7820(0x40, 0x80), pts, 9);
+    halfCount = *(int *)(state + 0x9C) >> 1;
+    progress = *(int *)(state + 0x98);
+    if (progress >= halfCount)
+        DrawTaperedTwoLayerRibbon(owner, RandomIntRange(0x40, 0x80), pts, 9);
     else
-        func_L00_003BCF88(a0, func_002A7820(0, 0x40), pts, 9);
+        DrawTaperedTwoLayerRibbon(owner, RandomIntRange(0, 0x40), pts, 9);
 }
 
 /* One of the thirty 0xA0-byte records at D_L00_0023DDA0 that func_L00_003BBB68 updates for
@@ -103,7 +105,7 @@ extern void func_L00_003BD510(void *pos, void *direction, int count, unsigned in
 
 static inline Class3BBB68 *Class3BBB68At(int index)
 {
-    return &D_L00_00262570[index];
+    return &gWeaponTable_L00[index];
 }
 
 /* Steps every record the owner holds: refreshes its start from the owner, advances the two
@@ -111,6 +113,8 @@ static inline Class3BBB68 *Class3BBB68At(int index)
    position towards it. When the approach timer expires and the target is still live, it
    sends one hit packet (func_002A8C00/func_002A8E20) and marks the record; when the life
    timer expires the record is released and the owner's count drops. */
+/* Updates every spark slot owned by this effect: it spins them, moves them toward the target,
+   deals damage when they arrive, and frees them when their time runs out. */
 void func_L00_003BBB68(char *owner)
 {
     float v[4];
@@ -156,7 +160,7 @@ void func_L00_003BBB68(char *owner)
         if (slot->target) {
             other = func_002AB1F0_8(slot->target);
             if (other) {
-                func_L00_003252A8(slot->target, v, 1);
+                ForwardObjectPositionCall(slot->target, v, 1);
                 func_00282D30_6(v, v, *(float *)(other + 0x10));
                 func_00282CC0_6(&slot->pos, v, slot->target + 0x10);
             } else {
@@ -171,7 +175,7 @@ void func_L00_003BBB68(char *owner)
         if (*(int *)(slot->target + 0x98) && !slot->hit) {
             func_00282CF0_9((char *)v, (char *)&slot->pos, (char *)&slot->start);
             func_00282F20_2(v, v, 0.033333335f);
-            func_002A8C00_8(&packet, owner, 0x210000, v, Class3BBB68At(D_00139568[0x1C])->f74);
+            func_002A8C00_8(&packet, owner, 0x210000, v, Class3BBB68At(gItemSlotToRecord[0x1C])->f74);
             packet.kind = 1;
             packet.mode = 3;
             packet.id = *(short *)(owner + 0xAA);
@@ -179,7 +183,7 @@ void func_L00_003BBB68(char *owner)
             func_0032D758_8(slot->target, 0x3E, *(int *)(owner + 0xB8));
             func_002E5CF8_8(1, 0, owner);
             func_00282F20_2(v, v, -1.0f);
-            func_L00_003BD510(&slot->pos, v, 9, 0xFF0000);
+            SpawnSparkBurst_L00_3(&slot->pos, v, 9, 0xFF0000);
             slot->hit = 1;
         }
         if (func_00282948_8(&slot->life)) {

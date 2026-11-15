@@ -18,6 +18,7 @@ extern void func_00282CF0(void *, void *, void *);
 extern float func_00282E20(void *);
 extern void func_002BA8A0(void *, int, int);
 
+/* Looks for the ground below a position and spawns a splash or impact effect there. */
 void func_002B0668(float *position)
 {
     float start[4] __attribute__((aligned(16)));
@@ -29,8 +30,8 @@ void func_002B0668(float *position)
 
     *(EffectVector *)start = *(EffectVector *)position;
     if (D_001B1A20[0]) {
-        start[2] = func_002B0520(&start) + D_001B1A18[0];
-        if (start[2] < D_001B5340[2] + 5.0f) {
+        start[2] = GetHeightmapHeightAtPosition(&start) + D_001B1A18[0];
+        if (start[2] < gCameraState_001B5340[2] + 5.0f) {
             *(EffectVector *)end = *(EffectVector *)start;
             active = 1.0f;
             end[2] = end[2] - (D_001B1A18[0] + D_001B1A18[0]) - 2.0f;
@@ -38,24 +39,24 @@ void func_002B0668(float *position)
     } else if (start[0] > 0.0f && start[1] > 0.0f &&
                start[0] < 1024.0f && start[1] < 1024.0f) {
         *(EffectVector *)end = *(EffectVector *)position;
-        end[2] = D_001B5340[2] - 20.0f;
+        end[2] = gCameraState_001B5340[2] - 20.0f;
         active = 1.0f;
     }
 
     if (active != 0.0f) {
-        if (func_002761F8(hit, &end, 18, 0, 0)) {
-            kind = func_00278E78();
+        if (CollLine(hit, &end, 18, 0, 0)) {
+            kind = GetCollHitMaterial();
             if (kind == 0 || kind == 4 || kind == 3) {
                 float scale;
 
                 *(EffectVector *)hit = D_001BAFA0;
                 hit[2] += D_001A9FCC;
-                scale = func_002A7878(0.4f, 0.6f);
-                func_002C19D8(hit, scale, D_001A9E74, 5250.0f, -1);
+                scale = RandomFloatRange(0.4f, 0.6f);
+                SpawnDriftingParticle_002C19D8(hit, scale, D_001A9E74, 5250.0f, -1);
             } else {
-                func_00282CF0(&offset, &D_001BAFA0, &D_001B5340);
-                func_002BA8A0(&D_001BAFA0,
-                    (unsigned char)(int)(func_00282E20(&offset) * 3.1833334f + 64.0f), 0);
+                FastVecSub(&offset, &D_001BAFA0, &gCameraState_001B5340);
+                SpawnGlowParticle_002BA8A0(&D_001BAFA0,
+                    (unsigned char)(int)(vec_length_xy(&offset) * 3.1833334f + 64.0f), 0);
             }
         }
     }

@@ -68,6 +68,7 @@ extern void func_002B0C28(int, int, int);
 extern void func_L00_002B9D60(void *, void *, int, int);
 extern void func_L30_003BE678(char *);
 
+/* Updates the museum water pool (moby class 4504). It sets up the water surface, then ripples it, adds drops and draws it every frame. */
 void func_L30_003840E0(char *object) {
     int state = *(unsigned char *)(object + 0x20);
 
@@ -75,13 +76,13 @@ void func_L30_003840E0(char *object) {
     case 0:
         *(unsigned char *)(object + 0x20) = 1;
         *(float *)(object + 0x18) += D_001B35B8;
-        func_L30_00382F10();
+        InitMuseumWaterGrid();
         *(unsigned char *)(object + 0x30) = 0xFF;
         break;
     case 1:
-        if (!(D_00138180.f1A0 & 0x80))
-            func_L30_003830D8();
-        if (D_L30_001AEC24 >= D_L30_001AEC2C && func_002A77E0(200) == 1) {
+        if (!(gPadState.f1A0 & 0x80))
+            StepMuseumWaterShape();
+        if (D_L30_001AEC24 >= D_L30_001AEC2C && RandomIntBelow(200) == 1) {
             D_L30_001AEC24 = 0.0f;
             D_L30_001AEC18 += D_L30_001AEC10;
             D_L30_001AEC1C += D_L30_001AEC14;
@@ -91,17 +92,17 @@ void func_L30_003840E0(char *object) {
                 D_L30_001AEC14 = -D_L30_001AEC14;
             D_00233A60[D_L30_001AEBB8][D_L30_001AEC18][D_L30_001AEC1C] = D_L30_001AEC20;
         } else {
-            func_00283CF0(func_L30_00382EF0(func_00283CE0(D_L30_001AEC18),
-                                            func_00283CE0(D_L30_001AEC18 + D_L30_001AEC10),
+            FloatToInt(LerpFloat_L30(IntToFloat(D_L30_001AEC18),
+                                            IntToFloat(D_L30_001AEC18 + D_L30_001AEC10),
                                             D_L30_001AEC24));
-            func_00283CF0(func_L30_00382EF0(func_00283CE0(D_L30_001AEC1C),
-                                            func_00283CE0(D_L30_001AEC1C + D_L30_001AEC14),
+            FloatToInt(LerpFloat_L30(IntToFloat(D_L30_001AEC1C),
+                                            IntToFloat(D_L30_001AEC1C + D_L30_001AEC14),
                                             D_L30_001AEC24));
         }
         D_L30_001AEC24 += D_L30_001AEC28;
-        if (D_00138180.f1A0 & 0x20)
-            func_L30_003831E8(12, 12, D_L30_001AEC08, D_L30_001AEC0C);
-        func_L00_002E6CF0(func_L30_00383928, object);
+        if (gPadState.f1A0 & 0x20)
+            RaiseMuseumHeightFieldDome(12, 12, D_L30_001AEC08, D_L30_001AEC0C);
+        AddDrawCallbackToList1(DrawMuseumWaterGrid, object);
         break;
     }
 }
@@ -111,41 +112,43 @@ void func_L30_003840E0(char *object) {
    random duration, a timer sample and the state block's new bit mask. With the state byte
    set it folds the shared angle words into the record and the state block instead, and
    counts the frame in the record's halfword at 0x96. */
+/* Updates a museum object (moby class 4942) that picks a random look out of thirteen, turns a little each frame and counts frames. */
 void func_L30_00386300(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
-    u16 v;
+    u16 counter;
 
     if (*(u8 *)(object + 0x20) == 0) {
-        float f = *(float *)(object + 0x18);
-        unsigned int w = *(unsigned int *)state;
+        float height = *(float *)(object + 0x18);
+        unsigned int index = *(unsigned int *)state;
 
-        *(float *)(state + 0xC) = f;
-        if (w >= 13) {
-            short a1 = *(short *)(object + 0xAA);
-            short a2 = *(short *)(object + 0xB2);
+        *(float *)(state + 0xC) = height;
+        if (index >= 13) {
+            short classId = *(short *)(object + 0xAA);
+            short extraId = *(short *)(object + 0xB2);
             unsigned int ticks = T1_COUNT;
 
-            func_0026FEB8(D_L30_001AEE98, a1, a2);
-            func_001163A0(ticks);
-            *(int *)state = func_002A77E0(13);
+            STUB_printf(D_L30_001AEE98, classId, extraId);
+            Srand(ticks);
+            *(int *)state = RandomIntBelow(13);
         }
         *(u16 *)(object + 0x7C) = 1 << *(int *)state;
-        func_002A7750(object, 1, -1);
+        SetMobyState(object, 1, -1);
     } else {
         float f0 = D_L30_001AEE94;
 
-        func_002AEE70(object, state + 4, state + 8, D_L30_001AEE90,
+        UpdateWrappedAngleOffset(object, state + 4, state + 8, D_L30_001AEE90,
                       f0 * 0.000290888245f, *(float *)(state + 0xC));
         *(float *)(object + 0xF8) =
-            func_00283B98(*(float *)(object + 0xF8), 0.01745329424738884f);
+            FastAddRotations(*(float *)(object + 0xF8), 0.01745329424738884f);
         *(u16 *)(object + 0x96) = 0;
     }
-    v = *(u16 *)(object + 0x96);
-    *(u16 *)(object + 0x96) = v + 1;
+    counter = *(u16 *)(object + 0x96);
+    *(u16 *)(object + 0x96) = counter + 1;
 }
 
+/* Updates a museum info stand (moby class 2263). When the player stands at it, it shows a message and lets the player press a button to use it. */
 void func_L30_003BE478(char *object) {
-    char *g;
+    char *hero;
     char *state = *(char **)(object + 0x68);
     int id;
 
@@ -154,11 +157,11 @@ void func_L30_003BE478(char *object) {
         if (*(int *)(state + 4) != 0) {
             *(unsigned char *)(object + 0x20) = 1;
             if (*(unsigned char *)(object + 0x43) != 0)
-                func_002A7470(object, 0, 0, 5);
+                StartAnimationBlended(object, 0, 0, 5);
         } else {
             *(unsigned char *)(object + 0x20) = 3;
             if (*(unsigned char *)(object + 0x43) != 2)
-                func_002A7470(object, 2, 0, 5);
+                StartAnimationBlended(object, 2, 0, 5);
         }
         break;
     case 1:
@@ -167,14 +170,14 @@ void func_L30_003BE478(char *object) {
         if (*(unsigned char *)(object + 0x60) & 2) {
             *(unsigned char *)(object + 0x20) = 5;
             if (*(unsigned char *)(object + 0x43) != 2)
-                func_002A7470(object, 2, 0, 5);
+                StartAnimationBlended(object, 2, 0, 5);
             if (*(int *)(state + 0xC) != -1)
-                func_L00_0042A500(*(int *)(state + 0xC));
+                ResetCameraEntry(*(int *)(state + 0xC));
         }
         break;
     case 3:
         id = -1;
-        if (D_001A79F0 != 0x15 && D_001A79F0 != 0x1E) {
+        if (gCurrentMapIndex != 0x15 && gCurrentMapIndex != 0x1E) {
             switch (*(int *)(state + 8)) {
             case 0:
                 id = 0x279C;
@@ -186,26 +189,26 @@ void func_L30_003BE478(char *object) {
         } else {
             id = 0x27ED;
         }
-        g = D_00189E20;
-        if (*(char **)(g + 0x33C) == object && *(int *)(g + 0x340) != 0) {
-            func_002B0C28(8, id, 1);
-            if (D_00138180.f1A4 & 0x10) {
-                char *s0 = D_001B2D1C + (*(int *)state << 8);
+        hero = gHeroState;
+        if (*(char **)(hero + 0x33C) == object && *(int *)(hero + 0x340) != 0) {
+            TryClaimNotice(8, id, 1);
+            if (gPadState.f1A4 & 0x10) {
+                char *entry = D_001B2D1C + (*(int *)state << 8);
 
-                func_L30_003BE678(s0);
-                func_L00_002B9D60(s0 + 0x10, s0 + 0xF0, 0x6F, 1);
-                *(unsigned char *)(g + 0x22B5) = 1;
+                AdvanceMuseumInfoStandState(entry);
+                ResetHeroPositionAndDirection(entry + 0x10, entry + 0xF0, 0x6F, 1);
+                *(unsigned char *)(hero + 0x22B5) = 1;
             }
         }
         break;
     case 4:
         break;
     case 5: {
-        char *h = D_00189E20;
+        char *heroBlock = gHeroState;
 
-        if (*(int *)(h + 0x2294) == 0x6F) {
-            *(unsigned char *)(h + 0x22B5) = 0;
-            func_L00_002B9D60(h + 0x80, h + 0x90, 0, 0);
+        if (*(int *)(heroBlock + 0x2294) == 0x6F) {
+            *(unsigned char *)(heroBlock + 0x22B5) = 0;
+            ResetHeroPositionAndDirection(heroBlock + 0x80, heroBlock + 0x90, 0, 0);
         }
         *(unsigned char *)(object + 0x20) = 3;
         break;
@@ -213,6 +216,7 @@ void func_L30_003BE478(char *object) {
     }
 }
 
+/* Spawns two puffs of dust at the object's position, each with a random size. */
 void func_L30_00404608(char *object) {
     int value;
     int value2;
@@ -221,15 +225,15 @@ void func_L30_00404608(char *object) {
     float random;
     scale = D_L30_001B15AC;
     scale *= *(float *)(object + 0x2C);
-    value = func_002A7820(95, 111);
-    random = func_002A7940();
-    func_L16_00405818(object + 0x10, D_L30_001B156C, scale, value, random, 1.0f, D_L30_001B15A4, 2, object);
+    value = RandomIntRange(95, 111);
+    random = RandomAngle();
+    DrawBeamQuadsAndGlows(object + 0x10, D_L30_001B156C, scale, value, random, 1.0f, D_L30_001B15A4, 2, object);
     scale2 = D_L30_001B15AC;
     scale2 *= *(float *)(object + 0x2C);
     scale2 *= D_L30_001B15B0;
-    value2 = func_002A7820(111, 127);
-    random = func_002A7940();
-    func_L16_00405818(object + 0x10, D_L30_001B1570, scale2, value2, random, 1.0f, D_L30_001B15A8, 2, object);
+    value2 = RandomIntRange(111, 127);
+    random = RandomAngle();
+    DrawBeamQuadsAndGlows(object + 0x10, D_L30_001B1570, scale2, value2, random, 1.0f, D_L30_001B15A8, 2, object);
 }
 
 extern float D_L30_001AEBC8 __attribute__((sda));
@@ -240,10 +244,11 @@ extern int D_L30_001AEBBC __attribute__((sda));
 
 extern void func_L30_00382FB8(void);
 
+/* Moves the water surface toward its next shape; when that is done it runs one step of the ripple simulation instead. */
 void func_L30_003830D8(void) {
     if (0.95f <= D_L30_001AEBC8) {
         D_L30_001AEBC8 = D_L30_001AEBCC;
-        func_L30_00382FB8();
+        StepMuseumHeightField();
         D_L30_001AEBC0 = D_L30_001AEBBC;
         D_L30_001AEBC4 = D_L30_001AEBB8;
     } else {
@@ -255,7 +260,7 @@ void func_L30_003830D8(void) {
         for (x = 0; x < 24; x++) {
             for (y = 0; y < 24; y++) {
                 D_00233A60[D_L30_001AEBC0][y][x] =
-                    func_L30_00382EF0(D_00233A60[D_L30_001AEBBC][y][x],
+                    LerpFloat_L30(D_00233A60[D_L30_001AEBBC][y][x],
                                       D_00233A60[D_L30_001AEBB8][y][x], D_L30_001AEBC8);
             }
         }

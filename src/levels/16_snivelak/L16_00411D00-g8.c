@@ -19,25 +19,25 @@ extern s32 func_0032C700(void *, s32, s32, s32, float, float, s32, s32, s32, s32
 extern void func_L16_0041F1F0(s32, void *, void *, s32, float, float);
 
 /* Fires the object's spark: builds a short ray from its frame, tilts it by the resident angle and hands it to the effect spawner. */
-void func_L16_00411D00(char *obj)
+void func_L16_00411D00(char *moby)
 {
-    V4_F411d00 a, b, c, d;
-    char *rec = *(char **)(obj + 0x68);
+    V4_F411d00 offset, start, goal, velocity;
+    char *vars = *(char **)(moby + 0x68);
     float rate, angle;
 
-    func_002A7A00(a, 0.0f, 1.0f);
-    func_00283098(b, &D_L16_001B17A0, obj + 0xC0);
-    func_00282CC0(b, b, obj + 0x10);
-    func_00282CC0(b, b, a);
-    func_00282D30(c, a, 3.0f);
-    c[2] = 0.0f;
-    func_00282CC0(c, c, *(char **)(rec + 0x24C) + 0x10);
+    RandomDirectionVector(offset, 0.0f, 1.0f);
+    matrix_mul_vec3(start, &D_L16_001B17A0, moby + 0xC0);
+    FastVecAdd(start, start, moby + 0x10);
+    FastVecAdd(start, start, offset);
+    FastVecScale(goal, offset, 3.0f);
+    goal[2] = 0.0f;
+    FastVecAdd(goal, goal, *(char **)(vars + 0x24C) + 0x10);
     rate = D_L16_001B17B0 * 0.016666668f;
-    angle = func_002A7878(D_L16_001B17B8, D_L16_001B17BC[0]) * 0.00027777778f;
-    func_00282CF0(d, c, b);
-    d[2] = 0.0f;
-    func_00282F20(d, d, rate);
-    d[2] = func_L00_0031CDD0(b, c, 0, D_L16_001B17B0 * 0.016666668f, -angle);
-    func_0032C700(b, 0, 0x19, 0x14, 1.0f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 0, 0, 0);
-    func_L16_0041F1F0(*(s32 *)(rec + 0x1F0), b, d, 0, angle, (float)*(u8 *)(rec + 0x36));
+    angle = RandomFloatRange(D_L16_001B17B8, D_L16_001B17BC[0]) * 0.00027777778f;
+    FastVecSub(velocity, goal, start);
+    velocity[2] = 0.0f;
+    vec_scale_to_length(velocity, velocity, rate);
+    velocity[2] = ComputeShotLaunchSpeed(start, goal, 0, D_L16_001B17B0 * 0.016666668f, -angle);
+    SpawnExplosion(start, 0, 0x19, 0x14, 1.0f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 0, 0, 0);
+    SpawnSpinningFragment(*(s32 *)(vars + 0x1F0), start, velocity, 0, angle, (float)*(u8 *)(vars + 0x36));
 }

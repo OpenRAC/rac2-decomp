@@ -75,13 +75,14 @@ static __inline__ int hud_coord(int mode, float value, float half, float offset,
     return (int)scaled;
 }
 
+/* Draws the whole HUD: counters, health and ammo bars, the selected item icons and the corner sprites. */
 int func_L25_0040D208(void)
 {
     char text[128];
-    int colors[2], colors2[2];
+    int healthColors[2], ammoColors[2];
     char *state=*(char **)(D_L25_001B0CE0+0x68);
     char *row;
-    float x,y,a,fill;
+    float iconX,iconY,fillRatio,fill;
     int selection=1, color, result;
     char *message;
     float edge, ammoCount, ammoStart, ammoWidth;
@@ -89,121 +90,121 @@ int func_L25_0040D208(void)
     HudState *hud=(HudState *)D_L25_00221850;
     char *fmt;
     int textX, textX2;
-    func_L25_0040DE40(0,selection,selection,selection);
+    DrawFadingHudIconPairs_L25(0,selection,selection,selection);
     half=0.5f;
-    message=func_00288FB8(0x31d1);
-    func_00115DA8(text,fmt=D_L25_001B0D20,message,hud->count1);
+    message=GetLocalizedString(0x31d1);
+    Sprintf(text,fmt=D_L25_001B0D20,message,hud->count1);
     textX=D_L25_001B0D10-60;
-    func_0027F5B8(textX,label_y((void *)textX,D_L25_001B0D14-8,D_L25_001B2904,half,1),0x80808080,text,128);
-    message=func_00288FB8(0x31d2);
-    func_00115DA8(text,fmt,message,hud->count2+1);
+    DrawTextMediumFont(textX,label_y((void *)textX,D_L25_001B0D14-8,D_L25_001B2904,half,1),0x80808080,text,128);
+    message=GetLocalizedString(0x31d2);
+    Sprintf(text,fmt,message,hud->count2+1);
     textX2=D_L25_001B0D18-60;
-    func_0027F5B8(textX2,label_y((void *)textX2,D_L25_001B0D1C-8,D_L25_001B2904,half,1),0x80808080,text,128);
+    DrawTextMediumFont(textX2,label_y((void *)textX2,D_L25_001B0D1C-8,D_L25_001B2904,half,1),0x80808080,text,128);
     if (D_L25_001A904C) {
-        D_L25_001B0CD0=func_00336D50(D_L25_001A904C+0x8710,128);
-        D_L25_001B0CD4=func_00336D50(D_L25_001A904C+0x8710,129);
-        D_L25_001B0CD8=func_00336D50(D_L25_001A904C+0x8710,130);
-        D_L25_001B0CE4=func_00336D50(D_L25_001A904C+0x8710,131);
-        D_L25_001B0CE8=func_00336D50(D_L25_001A904C+0x8710,132);
-        D_L25_001B0CEC=func_00336D50(D_L25_001A904C+0x8710,133);
-        x=func_00283CE0(D_001A7340)*half;
-        y=(float)hud_coord(D_L25_001B2900,200.0f,half,4.0f,selection);
-        func_00300968(D_L25_001B0CD0,x,y,0x60442d00,1.0f,0.0f);
-        func_00300968(D_L25_001B0CD4,x,y,0x55f0c070,1.0f,0.0f);
-        selection=func_002ED8A0(6);
-        a=func_00283CE0(D_L25_0029C320[selection].count);
-        a/=func_00283CE0(D_L25_0029C320[selection].capacity);
+        D_L25_001B0CD0=FindTableEntryById(D_L25_001A904C+0x8710,128);
+        D_L25_001B0CD4=FindTableEntryById(D_L25_001A904C+0x8710,129);
+        D_L25_001B0CD8=FindTableEntryById(D_L25_001A904C+0x8710,130);
+        D_L25_001B0CE4=FindTableEntryById(D_L25_001A904C+0x8710,131);
+        D_L25_001B0CE8=FindTableEntryById(D_L25_001A904C+0x8710,132);
+        D_L25_001B0CEC=FindTableEntryById(D_L25_001A904C+0x8710,133);
+        iconX=IntToFloat(gScreenWidth)*half;
+        iconY=(float)hud_coord(D_L25_001B2900,200.0f,half,4.0f,selection);
+        DrawScaledObjectUniform(D_L25_001B0CD0,iconX,iconY,0x60442d00,1.0f,0.0f);
+        DrawScaledObjectUniform(D_L25_001B0CD4,iconX,iconY,0x55f0c070,1.0f,0.0f);
+        selection=FindLastUsedChainEntry(6);
+        fillRatio=IntToFloat(D_L25_0029C320[selection].count);
+        fillRatio/=IntToFloat(D_L25_0029C320[selection].capacity);
         switch(selection) {
         case 6:
-            if(a>0.0f) func_00300968(D_L25_001B0CE4,x,y,(int)(float)func_00283D38(0x800000ff,0x8000ff00,a),1.0f,0.0f);
+            if(fillRatio>0.0f) DrawScaledObjectUniform(D_L25_001B0CE4,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio),1.0f,0.0f);
             break;
         case 12:
-            if(a>0.5f) {
-                a-=0.5f;
-                func_00300968(D_L25_001B0CE8,x,y,(int)(float)func_00283D38(0x800000ff,0x8000ff00,a+a),1.0f,0.0f);
-                func_00300968(D_L25_001B0CE4,x,y,0x8000ff00,1.0f,0.0f);
-            } else if(a>0.0f) {
-                func_00300968(D_L25_001B0CE4,x,y,(int)(float)func_00283D38(0x800000ff,0x8000ff00,a+a),1.0f,0.0f);
+            if(fillRatio>0.5f) {
+                fillRatio-=0.5f;
+                DrawScaledObjectUniform(D_L25_001B0CE8,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio+fillRatio),1.0f,0.0f);
+                DrawScaledObjectUniform(D_L25_001B0CE4,iconX,iconY,0x8000ff00,1.0f,0.0f);
+            } else if(fillRatio>0.0f) {
+                DrawScaledObjectUniform(D_L25_001B0CE4,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio+fillRatio),1.0f,0.0f);
             }
             break;
         case 14:
-            if(a>0.666666687f) {
-                a-=0.666666687f;
-                func_00300968(D_L25_001B0CEC,x,y,(int)(float)func_00283D38(0x800000ff,0x8000ff00,a*3.0f),1.0f,0.0f);
-                func_00300968(D_L25_001B0CE8,x,y,0x8000ff00,1.0f,0.0f);
-                func_00300968(D_L25_001B0CE4,x,y,0x8000ff00,1.0f,0.0f);
-            } else if(a>0.333333343f) {
-                a-=0.333333343f;
-                func_00300968(D_L25_001B0CE8,x,y,(int)(float)func_00283D38(0x800000ff,0x8000ff00,a*3.0f),1.0f,0.0f);
-                func_00300968(D_L25_001B0CE4,x,y,0x8000ff00,1.0f,0.0f);
-            } else if(a>0.0f) {
-                func_00300968(D_L25_001B0CE4,x,y,(int)(float)func_00283D38(0x800000ff,0x8000ff00,a*3.0f),1.0f,0.0f);
+            if(fillRatio>0.666666687f) {
+                fillRatio-=0.666666687f;
+                DrawScaledObjectUniform(D_L25_001B0CEC,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio*3.0f),1.0f,0.0f);
+                DrawScaledObjectUniform(D_L25_001B0CE8,iconX,iconY,0x8000ff00,1.0f,0.0f);
+                DrawScaledObjectUniform(D_L25_001B0CE4,iconX,iconY,0x8000ff00,1.0f,0.0f);
+            } else if(fillRatio>0.333333343f) {
+                fillRatio-=0.333333343f;
+                DrawScaledObjectUniform(D_L25_001B0CE8,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio*3.0f),1.0f,0.0f);
+                DrawScaledObjectUniform(D_L25_001B0CE4,iconX,iconY,0x8000ff00,1.0f,0.0f);
+            } else if(fillRatio>0.0f) {
+                DrawScaledObjectUniform(D_L25_001B0CE4,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio*3.0f),1.0f,0.0f);
             }
             break;
         }
         fill=(float)((HudState *)D_L25_00221850)->health*0.01f;
         if(fill>0.3f) {
             I(state,0x28)=1;
-        } else if(func_00282948(state+0x24)) {
+        } else if(FastFloatHelperD(state+0x24)) {
             I(state,0x24)=5; I(state,0x28)^=1;
         }
-        colors[1]=func_00283D38(0x800000ff,0x8000ff00,fill);
-        colors[0]=0x800000ff;
+        healthColors[1]=FastTweenColor(0x800000ff,0x8000ff00,fill);
+        healthColors[0]=0x800000ff;
         edge=fill*200.0f+156.0f;
-        if(I(state,0x28)) func_0027EAE8(156,14,(int)edge,27,1,colors);
-        selection=func_002ED8A0(7);
-        ammoCount=func_00283CE0(D_L25_0029C320[selection].count);
-        fill=ammoCount/func_00283CE0(D_L25_0029C320[selection].maximum);
-        color=func_00283D38(0x800000ff,0x8000ff00,fill);
-        ammoStart=func_00283CE0(450);
-        ammoWidth=func_00283CE0(386);
-        ammoWidth-=func_00283CE0(450);
-        colors2[0]=0x800000ff; colors2[1]=color;
+        if(I(state,0x28)) DrawScreenRectangle(156,14,(int)edge,27,1,healthColors);
+        selection=FindLastUsedChainEntry(7);
+        ammoCount=IntToFloat(D_L25_0029C320[selection].count);
+        fill=ammoCount/IntToFloat(D_L25_0029C320[selection].maximum);
+        color=FastTweenColor(0x800000ff,0x8000ff00,fill);
+        ammoStart=IntToFloat(450);
+        ammoWidth=IntToFloat(386);
+        ammoWidth-=IntToFloat(450);
+        ammoColors[0]=0x800000ff; ammoColors[1]=color;
         ammoWidth*=fill;
         edge=ammoStart+ammoWidth;
-        if(fill>0.0f) func_0027EAE8(450,8,(int)edge,19,1,colors2);
+        if(fill>0.0f) DrawScreenRectangle(450,8,(int)edge,19,1,ammoColors);
         {
         Rgba rect[4]={{0x70,0xc0,0xf0,0x55},{0x70,0xc0,0xf0,0x55},{0x70,0xc0,0xf0,0x55},{0x70,0xc0,0xf0,0x55}};
         Rgba rect1[4]={{0x00,0x2d,0x44,0x60},{0x00,0x2d,0x44,0x60},{0x00,0x2d,0x44,0x60},{0x00,0x2d,0x44,0x60}};
         Rgba rect2[4]={{0x80,0x80,0x80,0x80},{0x80,0x80,0x80,0x80},{0x80,0x80,0x80,0x80},{0x80,0x80,0x80,0x80}};
-        func_0028EA58(func_0028E588(0xea97,1),21,7,30,30,rect1);
-        func_0028EA58(func_0028E588(0xea97,0),21,7,30,30,rect);
-        row=(char *)&D_L25_0029C320[func_002ED8A0(D_L25_001B0CF0)];
-        func_0028EA58(func_0028E588(0xea97,*(short *)(row+0x1c)),21,7,30,30,rect2);
-        func_0028EA58(func_0028E588(0xea97,1),462,9,30,30,rect1);
-        row=(char *)&D_L25_0029C320[func_002ED8A0(7)];
-        func_0028EA58(func_0028E588(0xea97,*(short *)(row+0x1c)),462,9,30,30,rect2);
+        DrawHudSpriteGradient(GetIconFrame(0xea97,1),21,7,30,30,rect1);
+        DrawHudSpriteGradient(GetIconFrame(0xea97,0),21,7,30,30,rect);
+        row=(char *)&D_L25_0029C320[FindLastUsedChainEntry(D_L25_001B0CF0)];
+        DrawHudSpriteGradient(GetIconFrame(0xea97,*(short *)(row+0x1c)),21,7,30,30,rect2);
+        DrawHudSpriteGradient(GetIconFrame(0xea97,1),462,9,30,30,rect1);
+        row=(char *)&D_L25_0029C320[FindLastUsedChainEntry(7)];
+        DrawHudSpriteGradient(GetIconFrame(0xea97,*(short *)(row+0x1c)),462,9,30,30,rect2);
         }
-        func_00115DA8(text,D_L25_001B0D58,D_L25_0029C320[func_002ED8A0(D_L25_001B0CF0)].count,D_L25_0029C320[func_002ED8A0(D_L25_001B0CF0)].maximum);
-        func_0027F538(67,5,0x80808080,text,128);
-        func_L05_003263F8(2);
-        result=func_L05_00324DB8();
+        Sprintf(text,D_L25_001B0D58,D_L25_0029C320[FindLastUsedChainEntry(D_L25_001B0CF0)].count,D_L25_0029C320[FindLastUsedChainEntry(D_L25_001B0CF0)].maximum);
+        DrawTextSmallFont(67,5,0x80808080,text,128);
+        SetCounterPlusOne(2);
+        result=LookUpStepTable();
         if(result>=0) {
-            D_L25_0029C320[func_002ED8A0(D_L25_001B0CF0)].active=0;
+            D_L25_0029C320[FindLastUsedChainEntry(D_L25_001B0CF0)].active=0;
             D_L25_001B0CF0=result;
-            D_L25_0029C320[func_002ED8A0(result)].active=1;
+            D_L25_0029C320[FindLastUsedChainEntry(result)].active=1;
         }
-        func_00300968(D_L25_001B0CD8,x,y,0x80f0f0f0,1.0f,0.0f);
+        DrawScaledObjectUniform(D_L25_001B0CD8,iconX,iconY,0x80f0f0f0,1.0f,0.0f);
     }
-    func_L00_0030CF60();
+    CallLoadedModuleHandler_L00443E18();
     {
     float four=4.0f, half2=0.5f;
-    char *tex0, *tex2;
-    int iy;
-    float px;
-    tex0=func_00336D50(D_L25_001A904C+0x8710,186);
-    state=func_00336D50(D_L25_001A904C+0x8710,187);   /* the second texture reuses state */
-    tex2=func_00336D50(D_L25_001A904C+0x8710,188);
-    px=D_L25_001AC4E0+four;
-    iy=label_y(tex0,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
-    func_00300968(tex0,px,(float)iy,0x60442d00,0.8f,0.0f);
-    px=D_L25_001AC4E0+four;
-    iy=label_y(state,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
-    func_00300968(state,px,(float)iy,0x60241700,0.8f,0.0f);
-    px=D_L25_001AC4E0+four;
-    iy=label_y(tex2,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
-    func_00300968(tex2,px,(float)iy,0x55f0c070,0.8f,0.0f);
+    char *darkSprite, *lightSprite;
+    int spriteY;
+    float spriteX;
+    darkSprite=FindTableEntryById(D_L25_001A904C+0x8710,186);
+    state=FindTableEntryById(D_L25_001A904C+0x8710,187);   /* the second texture reuses state */
+    lightSprite=FindTableEntryById(D_L25_001A904C+0x8710,188);
+    spriteX=D_L25_001AC4E0+four;
+    spriteY=label_y(darkSprite,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
+    DrawScaledObjectUniform(darkSprite,spriteX,(float)spriteY,0x60442d00,0.8f,0.0f);
+    spriteX=D_L25_001AC4E0+four;
+    spriteY=label_y(state,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
+    DrawScaledObjectUniform(state,spriteX,(float)spriteY,0x60241700,0.8f,0.0f);
+    spriteX=D_L25_001AC4E0+four;
+    spriteY=label_y(lightSprite,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
+    DrawScaledObjectUniform(lightSprite,spriteX,(float)spriteY,0x55f0c070,0.8f,0.0f);
     }
-    func_L05_0037A5F8();
+    DrawObjectHudMarkers();
     return 1;
 }

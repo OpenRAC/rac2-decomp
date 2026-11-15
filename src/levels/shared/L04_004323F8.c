@@ -1,3 +1,4 @@
+/* Turns a hue angle, saturation, brightness and alpha into a packed colour. */
 unsigned int func_L04_004323F8(float angle, float saturation, float value, int alpha)
 {
     float sector = angle * 0.1591549367f * 6.0f;

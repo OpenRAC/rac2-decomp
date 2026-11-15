@@ -12,34 +12,35 @@ extern int func_00277258(void *, int, void *, float);
 extern char D_001BAF80[];
 extern char D_001BAFB0[];
 
-int func_002B5D38(char *obj, char *moby)
+/* Pushes the object out of a wall or floor it has moved into and returns 1 if it had to move it. */
+int func_002B5D38(char *self, char *ctl)
 {
     Vec4Q_002B5D38 V;
     Vec4Q_002B5D38 B;
     Vec4Q_002B5D38 Z;
-    int mode;
-    int r;
+    int probeKind;
+    int hit;
     TI128_002B5D38 zero = 0;
     char *dst;
 
     Z.q = zero;
-    Z.f[2] = *(float *)(moby + 4) + *(float *)moby;
+    Z.f[2] = *(float *)(ctl + 4) + *(float *)ctl;
     B.q = Z.q;
-    func_00282CC0(&V, obj + 0x10, &B);
-    mode = (*(unsigned int *)(moby + 0x38) & 2) ? 6 : 4;
-    r = func_00277258(&V, mode, obj, *(float *)moby);
-    if (r != 0) {
-        char *g = D_001BAF80;
+    FastVecAdd(&V, self + 0x10, &B);
+    probeKind = (*(unsigned int *)(ctl + 0x38) & 2) ? 6 : 4;
+    hit = TestPointAgainstCollision(&V, probeKind, self, *(float *)ctl);
+    if (hit != 0) {
+        char *g = gCollisionHit;
 
-        dst = moby + 0x60;
-        *(int *)(moby + 0x84) = *(int *)(g + 0x18);
+        dst = ctl + 0x60;
+        *(int *)(ctl + 0x84) = *(int *)(g + 0x18);
         qcopy(dst, g + 0x20);
         if (*(int *)(g + 0x18) != 0 && *(int *)(g + 0x1C) < 0) {
             if (*(float *)(g + 0x38) > V.f[2])
                 *(float *)(g + 0x38) = V.f[2];
         }
         qcopy(&V, D_001BAFB0);
-        func_00282CF0(obj + 0x10, &V, &B);
+        FastVecSub(self + 0x10, &V, &B);
         return 1;
     }
     return 0;

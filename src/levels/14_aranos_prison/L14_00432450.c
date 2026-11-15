@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned int u32;
 typedef unsigned long long u64;
 typedef unsigned int TI128 __attribute__((mode(TI)));
@@ -14,6 +15,7 @@ extern void func_L03_0038B390(unsigned char *,int,int,int);
 extern void func_002FC560(u32,u64),func_00280B90(void *,void *,int);
 #define F(p,o) (*(float *)((char *)(p)+(o)))
 #define I(p,o) (*(int *)((char *)(p)+(o)))
+/* Draws a small textured quad at the object, picking a random texture scroll each frame. */
 void func_L14_00432450(void *argument)
 {
     unsigned char *object=argument;
@@ -25,18 +27,18 @@ void func_L14_00432450(void *argument)
     source.q=0;
     source.v[0]=F(state,0x10);source.v[1]=F(state,0x14);source.v[2]=F(state,0x18);source.v[3]=1.0f;
     transformed.q=source.q;
-    func_00283098(&transformed,&transformed,object+0xC0);
-    func_L14_00390DF8(matrix,object+0x10,&transformed);
-    func_L14_00391B58((char *)matrix,F(state,0x1C));
-    func_L14_00390EC0(&packet,matrix,F(state,0x20),F(state,0x24),0.0f);
+    matrix_mul_vec3(&transformed,&transformed,object+0xC0);
+    BuildRotationBasisFromVectors(matrix,object+0x10,&transformed);
+    AddScaledVectorToOffset((char *)matrix,F(state,0x1C));
+    BuildTransformedRows(&packet,matrix,F(state,0x20),F(state,0x24),0.0f);
     switch(object[0x20]) {
     case 0:
     case 1:
     case 2:
-        texture=func_002A7820(0,1);
-        func_L03_0038B390((unsigned char *)&packet,I(state,0x28+texture*4),2,(int)0x80808080);
-        packet.uv[0].v[0]=func_002A7878(0.0f,1.0f-F(state,8));
-        packet.uv[0].v[1]=func_002A7878(0.0f,1.0f-F(state,8));
+        texture=RandomIntRange(0,1);
+        InitEffectRecord_L03((unsigned char *)&packet,I(state,0x28+texture*4),2,(int)0x80808080);
+        packet.uv[0].v[0]=RandomFloatRange(0.0f,1.0f-F(state,8));
+        packet.uv[0].v[1]=RandomFloatRange(0.0f,1.0f-F(state,8));
         packet.uv[0].v[2]=packet.uv[0].v[0];
         packet.uv[0].v[3]=packet.uv[0].v[1]+F(state,8);
         packet.uv[1].v[0]=packet.uv[0].v[0]+F(state,8);
@@ -46,10 +48,10 @@ void func_L14_00432450(void *argument)
         break;
     case 3:
         texture=(I(state,0x0C)/I(state,0x3C))%3;
-        func_L03_0038B390((unsigned char *)&packet,I(state,0x30+texture*4),2,(int)0x80808080);
+        InitEffectRecord_L03((unsigned char *)&packet,I(state,0x30+texture*4),2,(int)0x80808080);
         break;
     }
-    func_002FC560(0x47,0x53001);
-    func_00280B90(&packet,0,0);
-    func_002FC560(0x47,0x5360B);
+    VU1_addGSregister(0x47,0x53001);
+    draw_world_quad(&packet,0,0);
+    VU1_addGSregister(0x47,0x5360B);
 }

@@ -65,6 +65,7 @@ typedef struct {
     float scroll;
 } BeamState;
 
+/* Draws a glowing laser beam from flat strips with a scrolling texture and a spinning glow at its end. */
 void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
                       int unused4, char *obj)
 {
@@ -77,7 +78,7 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
     float angle, cosine, sine, glow;
     int i, j;
     ref_L12_00429ED8_00(&quad);
-    func_00281DE8(&quad, D_L12_001B2320, 1, 0x80);
+    InitQuadPacketState(&quad, D_L12_001B2320, 1, 0x80);
     vertices = quad.vertices[1];
     u = quad.tex.uv;
     v = quad.tex.uv + 1;
@@ -111,27 +112,27 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
     state->scroll += 0.1f;
     if (state->scroll >= 4.0f)
         state->scroll -= 4.0f;
-    func_00282CF0(delta, obj + 0x10, D_L12_001B9E00);
-    func_00282F20(offset, state, -D_L12_001B2318);
-    func_00282CC0(center, obj + 0x10, offset);
-    func_00282DD8(width, delta, offset);
-    func_00282F20(width, width, D_L12_001B22F8);
-    func_00282F20(base, state, D_L12_001B238C[0]);
-    func_00282CC0(base, obj + 0x10, base);
-    func_00282CC0(quad.vertices[0], base, width);
-    func_00282CF0(vertices, base, width);
-    func_00282CC0(quad.vertices[2], center, width);
-    func_00282CF0(quad.vertices[3], center, width);
-    func_00280B90(&quad, 0, 0);
+    FastVecSub(delta, obj + 0x10, D_L12_001B9E00);
+    vec_scale_to_length(offset, state, -D_L12_001B2318);
+    FastVecAdd(center, obj + 0x10, offset);
+    FastVecCross(width, delta, offset);
+    vec_scale_to_length(width, width, D_L12_001B22F8);
+    vec_scale_to_length(base, state, D_L12_001B238C[0]);
+    FastVecAdd(base, obj + 0x10, base);
+    FastVecAdd(quad.vertices[0], base, width);
+    FastVecSub(vertices, base, width);
+    FastVecAdd(quad.vertices[2], center, width);
+    FastVecSub(quad.vertices[3], center, width);
+    draw_world_quad(&quad, 0, 0);
     quad.colors[0] = quad.colors[2];
     quad.colors[1] = quad.colors[3];
     quad.colors[2] = quad.colors[3] = 0x202020;
     qcopy(quad.vertices[0], quad.vertices[2]);
     qcopy(vertices, quad.vertices[3]);
-    func_00282CC0(quad.vertices[2], quad.vertices[2], offset);
-    func_00282CC0(quad.vertices[3], quad.vertices[3], offset);
-    func_00280B90(&quad, 0, 0);
-    func_00282F20(offset, state, -D_L12_001B231C);
+    FastVecAdd(quad.vertices[2], quad.vertices[2], offset);
+    FastVecAdd(quad.vertices[3], quad.vertices[3], offset);
+    draw_world_quad(&quad, 0, 0);
+    vec_scale_to_length(offset, state, -D_L12_001B231C);
     quad.tex.bits[0] = 0;
     quad.tex.bits[1] = 0;
     quad.tex.bits[2] = 0;
@@ -141,8 +142,8 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
     quad.tex.uv[6] = 1;
     quad.tex.uv[7] = 1;
     angle = state->angle;
-    cosine = func_00283180(angle);
-    sine = func_00283198(angle);
+    cosine = FastSinOrCosA(angle);
+    sine = FastSinOrCosB(angle);
     {
         float *q = v;
         float *p = u;
@@ -157,8 +158,8 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
             q += 2;
         }
     }
-    state->angle = func_00283B98(state->angle, D_L12_001B2314 * 0.017453294f);
-    func_00281DE8(&quad, D_L12_001B2324, 1, 0x80);
+    state->angle = FastAddRotations(state->angle, D_L12_001B2314 * 0.017453294f);
+    InitQuadPacketState(&quad, D_L12_001B2324, 1, 0x80);
     quad.colors[1] = D_L12_001B2308 << 24;
     quad.colors[1] |= D_L12_001B2358 << 16;
     quad.colors[1] |= D_L12_001B2354 << 8;
@@ -169,16 +170,16 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
     quad.flags = 5;
     quad.colors[0] = quad.colors[1];
     quad.colors[2] = quad.colors[3];
-    func_00282F20(width, width, D_L12_001B22EC);
-    func_00282F20(base, state, D_L12_001B238C[0]);
-    func_00282CC0(base, obj + 0x10, base);
-    func_00282CC0(quad.vertices[0], base, width);
-    func_00282CF0(vertices, base, width);
-    func_00282CC0(center, base, offset);
-    func_00282CC0(center, center, offset);
-    func_00282CC0(quad.vertices[2], center, width);
-    func_00282CF0(quad.vertices[3], center, width);
-    func_00280B90(&quad, 0, 0);
+    vec_scale_to_length(width, width, D_L12_001B22EC);
+    vec_scale_to_length(base, state, D_L12_001B238C[0]);
+    FastVecAdd(base, obj + 0x10, base);
+    FastVecAdd(quad.vertices[0], base, width);
+    FastVecSub(vertices, base, width);
+    FastVecAdd(center, base, offset);
+    FastVecAdd(center, center, offset);
+    FastVecAdd(quad.vertices[2], center, width);
+    FastVecSub(quad.vertices[3], center, width);
+    draw_world_quad(&quad, 0, 0);
     quad.colors[1] = D_L12_001B2308 << 24;
     quad.colors[1] |= D_L12_001B2358 << 16;
     quad.colors[1] |= D_L12_001B2354 << 8;
@@ -188,16 +189,16 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
     quad.colors[3] |= D_L12_001B2360;
     quad.colors[0] = quad.colors[1];
     quad.colors[2] = quad.colors[3];
-    func_00282F20(width, width, D_L12_001B22F0);
-    func_00282F20(base, state, D_L12_001B2380);
-    func_00282CC0(base, obj + 0x10, base);
-    func_00282CC0(quad.vertices[0], base, width);
-    func_00282CF0(vertices, base, width);
-    func_00282CC0(center, base, offset);
-    func_00282CC0(center, center, offset);
-    func_00282CC0(quad.vertices[2], center, width);
-    func_00282CF0(quad.vertices[3], center, width);
-    func_00280B90(&quad, 0, 0);
+    vec_scale_to_length(width, width, D_L12_001B22F0);
+    vec_scale_to_length(base, state, D_L12_001B2380);
+    FastVecAdd(base, obj + 0x10, base);
+    FastVecAdd(quad.vertices[0], base, width);
+    FastVecSub(vertices, base, width);
+    FastVecAdd(center, base, offset);
+    FastVecAdd(center, center, offset);
+    FastVecAdd(quad.vertices[2], center, width);
+    FastVecSub(quad.vertices[3], center, width);
+    draw_world_quad(&quad, 0, 0);
     quad.colors[1] = D_L12_001B2310 << 24;
     quad.colors[1] |= D_L12_001B2358 << 16;
     quad.colors[1] |= D_L12_001B2354 << 8;
@@ -207,16 +208,16 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
     quad.colors[3] |= D_L12_001B2360;
     quad.colors[0] = quad.colors[1];
     quad.colors[2] = quad.colors[3];
-    func_00282F20(width, width, D_L12_001B22F4);
-    func_00282F20(base, state, D_L12_001B2380);
-    func_00282CC0(base, obj + 0x10, base);
-    func_00282CC0(quad.vertices[0], base, width);
-    func_00282CF0(vertices, base, width);
-    func_00282CC0(center, base, offset);
-    func_00282CC0(center, center, offset);
-    func_00282CC0(quad.vertices[2], center, width);
-    func_00282CF0(quad.vertices[3], center, width);
-    func_00280B90(&quad, 0, 0);
+    vec_scale_to_length(width, width, D_L12_001B22F4);
+    vec_scale_to_length(base, state, D_L12_001B2380);
+    FastVecAdd(base, obj + 0x10, base);
+    FastVecAdd(quad.vertices[0], base, width);
+    FastVecSub(vertices, base, width);
+    FastVecAdd(center, base, offset);
+    FastVecAdd(center, center, offset);
+    FastVecAdd(quad.vertices[2], center, width);
+    FastVecSub(quad.vertices[3], center, width);
+    draw_world_quad(&quad, 0, 0);
     quad.colors[1] = D_L12_001B230C << 24;
     quad.colors[1] |= D_L12_001B2378 << 16;
     quad.colors[1] |= D_L12_001B2374 << 8;
@@ -226,21 +227,21 @@ void func_L12_00429ED8(int unused0, int unused1, int unused2, int unused3,
     quad.colors[3] |= D_L12_001B2360;
     quad.colors[0] = quad.colors[1];
     quad.colors[2] = quad.colors[3];
-    func_00282F20(width, width, D_L12_001B22EC);
-    func_00282F20(base, state, D_L12_001B2384);
-    func_00282CC0(base, obj + 0x10, base);
-    func_00282CC0(quad.vertices[0], base, width);
-    func_00282CF0(vertices, base, width);
-    func_00282F20(offset, state, -0.6f);
-    func_00282CC0(center, base, offset);
-    func_00282CC0(center, center, offset);
-    func_00282CC0(quad.vertices[2], center, width);
-    func_00282CF0(quad.vertices[3], center, width);
-    func_00280B90(&quad, 0, 0);
-    func_00281EB8(obj + 0x10, D_L12_001B22FC, D_L12_001B2304, 1,
-                   D_L12_001B2300, 0.08f, func_002A7940());
+    vec_scale_to_length(width, width, D_L12_001B22EC);
+    vec_scale_to_length(base, state, D_L12_001B2384);
+    FastVecAdd(base, obj + 0x10, base);
+    FastVecAdd(quad.vertices[0], base, width);
+    FastVecSub(vertices, base, width);
+    vec_scale_to_length(offset, state, -0.6f);
+    FastVecAdd(center, base, offset);
+    FastVecAdd(center, center, offset);
+    FastVecAdd(quad.vertices[2], center, width);
+    FastVecSub(quad.vertices[3], center, width);
+    draw_world_quad(&quad, 0, 0);
+    DrawBillboardQuad_00281EB8(obj + 0x10, D_L12_001B22FC, D_L12_001B2304, 1,
+                   D_L12_001B2300, 0.08f, RandomAngle());
     glow = D_L12_001B2300;
     glow *= 0.4f;
-    func_00281EB8(obj + 0x10, D_L12_001B22FC, 0x80808080, 1,
-                   glow, 0.08f, func_002A7940());
+    DrawBillboardQuad_00281EB8(obj + 0x10, D_L12_001B22FC, 0x80808080, 1,
+                   glow, 0.08f, RandomAngle());
 }

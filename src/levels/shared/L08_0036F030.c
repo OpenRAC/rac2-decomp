@@ -6,6 +6,7 @@
 extern u8 *D_L08_00152C00;
 extern u8 *D_L08_00221AE0[];
 
+/* Turns off the two low flag bits for the current object and every object in its list, and restores their class word. */
 void func_L08_0036F030(void)
 {
     s32 i;

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L00_0037FA90 is a unit of its own: the 16-byte constant the level copies into
    the local vector needs the opt-in grouped quadword-copy profile (-frac2-qcopy,
@@ -35,26 +36,27 @@ typedef struct {
 
 extern L00_0037FA90_Data D_00189E20;
 
-void func_L00_0037FA90(char *a0, char *a1, float f12, float f13, float f14)
+/* Works out a smooth aim direction from the level's stored vectors, bending it toward a fixed direction when it is close, or straight to it otherwise. */
+void func_L00_0037FA90(char *result, char *target, float blend, float lookAhead, float maxAngle)
 {
-    char *p = D_L00_001B8DC0 + 0x230;
-    char local[16];
-    char local2[16];
-    float reach;
+    char *origin = gCameraPosition_L00 + 0x230;
+    char probe[16];
+    char axis[16];
+    float alignment;
 
-    func_00282F20(local, p, f13);
-    p -= 0x230;
-    func_00282CC0(local, local, p);
-    if (func_002761F8(p, local, 0, D_00189E20.f2290, 0) != 0)
-        *(L00_0037FA90_TI128 *)local = D_L00_001BF220;
-    func_00282CF0(a0, local, a1);
-    func_00282F20(a0, a0, 1.0f);
-    reach = func_00282DB0(a0, D_00189E20.f760);
-    if (reach < func_00283180(f14)) {
-        func_00282DD8(local2, a0, D_00189E20.f760);
-        func_002ACEC0(a0, D_00189E20.f760, local2, f14);
-        func_00282F20(a0, a0, f12);
+    vec_scale_to_length(probe, origin, lookAhead);
+    origin -= 0x230;
+    FastVecAdd(probe, probe, origin);
+    if (CollLine(origin, probe, 0, gHeroState.f2290, 0) != 0)
+        *(L00_0037FA90_TI128 *)probe = D_L00_001BF220;
+    FastVecSub(result, probe, target);
+    vec_scale_to_length(result, result, 1.0f);
+    alignment = FastVecDot(result, gHeroState.f760);
+    if (alignment < FastSinOrCosA(maxAngle)) {
+        FastVecCross(axis, result, gHeroState.f760);
+        ApplyAxisRotationToQuaternion(result, gHeroState.f760, axis, maxAngle);
+        vec_scale_to_length(result, result, blend);
     } else {
-        func_00282D30(a0, a0, f12);
+        FastVecScale(result, result, blend);
     }
 }

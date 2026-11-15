@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* 0xE0-byte class records indexed through D_00139568. */
 typedef struct {
@@ -36,6 +37,7 @@ extern char D_0025C450[], D_0025C5E8[], D_0025CCF8[];
 extern void func_00341540(char *, char *, char *, char *);
 extern void func_00341610(char *, int);
 
+/* Works out which Extras sections are unlocked from game progress and fills in the three-entry Extras menu. */
 int func_002CF340(void)
 {
     int i, j;
@@ -45,8 +47,8 @@ int func_002CF340(void)
         D_001AA434 = 1;
         D_001AA438 = 1;
         for (i = 0; i < 56; i++) {
-            if (((ClassRecord *)(D_00139568[i] * 0xE0 + (int)D_00239BA0))->active && i != 9 && i != 10) {
-                if (!D_001A7AF8[i]) {
+            if (((ClassRecord *)(gItemSlotToRecord[i] * 0xE0 + (int)gWeaponTable_00239BA0))->active && i != 9 && i != 10) {
+                if (!gItemOwnedFlags[i]) {
                     D_001AA430 = 0;
                     D_001AA434 = 0;
                     D_001AA438 = 0;
@@ -56,15 +58,15 @@ int func_002CF340(void)
                         ClassRecord *record;
                         switch (j) {
                         case 0:
-                            record = (ClassRecord *)(D_00139568[i] * 0xE0 + (int)D_00239BA0);
+                            record = (ClassRecord *)(gItemSlotToRecord[i] * 0xE0 + (int)gWeaponTable_00239BA0);
                             value = record->requirement[0];
                             break;
                         case 1:
-                            record = (ClassRecord *)(D_00139568[i] * 0xE0 + (int)D_00239BA0);
+                            record = (ClassRecord *)(gItemSlotToRecord[i] * 0xE0 + (int)gWeaponTable_00239BA0);
                             value = record->requirement[1];
                             break;
                         case 2:
-                            record = (ClassRecord *)(D_00139568[i] * 0xE0 + (int)D_00239BA0);
+                            record = (ClassRecord *)(gItemSlotToRecord[i] * 0xE0 + (int)gWeaponTable_00239BA0);
                             value = record->requirement[2];
                             break;
                         default:
@@ -96,8 +98,8 @@ int func_002CF340(void)
             menu->entries[2].text_id = 0x323F;
             menu->entries[2].data = D_0025CCF8;
         }
-        func_00341540(D_001A8CFC + 0x3BE08, D_002615F8, D_00261698, (char *)&D_00261750);
-        func_00341610(D_001A8CFC + 0x3BE08, 2);
+        SetTabbedMenuTables(D_001A8CFC + 0x3BE08, D_002615F8, D_00261698, (char *)&D_00261750);
+        SwitchTabbedMenuTab(D_001A8CFC + 0x3BE08, 2);
     }
     return 0;
 }

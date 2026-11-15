@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 extern void func_002AB6D8(void *, void *);
@@ -50,31 +51,32 @@ extern float func_00282E80(void *, void *);
 extern int func_002761F8(void *, void *, int, int, int);
 extern float func_L02_002F21C0(void *, void *);
 
-void func_L12_003E1CB0(s32 a0) {
-    u8 *state = *(u8 **)(a0 + 0x68);
-    u8 *list = *(u8 **)(D_L12_001FEAC0 + (*(s32 *)(state + 0x158) << 2));
+/* Picks which path point the enemy should walk to next: the one it is on, the nearest one, or the nearest one it can see. */
+void func_L12_003E1CB0(s32 moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
+    u8 *path = *(u8 **)(D_L12_001FEAC0 + (*(s32 *)(state + 0x158) << 2));
     s32 i;
     s32 bestIdx;
     f32 best;
-    f32 d;
+    f32 dist;
 
-    best = func_00282E80(a0 + 0x10, list + 0x10 + (*(s32 *)(state + 0x264) << 4));
+    best = vec_distance_xy(moby + 0x10, path + 0x10 + (*(s32 *)(state + 0x264) << 4));
     if (best < 0.5f) {
         *(s32 *)(state + 0x16C) = 0;
         return;
     }
     if (best < 5.0f) {
-        if (func_002761F8(a0 + 0x10, list + 0x10 + (*(s32 *)(state + 0x264) << 4), 2, 0, 0) == 0) {
+        if (CollLine(moby + 0x10, path + 0x10 + (*(s32 *)(state + 0x264) << 4), 2, 0, 0) == 0) {
             *(s32 *)(state + 0x16C) = 1;
             return;
         }
     }
     bestIdx = -1;
     best = 1000.0f;
-    for (i = 0; i < *(s32 *)list; i++) {
-        d = func_L02_002F21C0(a0 + 0x10, list + 0x10 + i * 16);
-        if (d < best) {
-            best = d;
+    for (i = 0; i < *(s32 *)path; i++) {
+        dist = DistanceSquaredXY(moby + 0x10, path + 0x10 + i * 16);
+        if (dist < best) {
+            best = dist;
             bestIdx = i;
         }
     }
@@ -83,19 +85,19 @@ void func_L12_003E1CB0(s32 a0) {
         *(s32 *)(state + 0x16C) = 0;
         return;
     }
-    if (func_002761F8(a0 + 0x10, list + 0x10 + i * 16, 2, 0, 0) == 0) {
+    if (CollLine(moby + 0x10, path + 0x10 + i * 16, 2, 0, 0) == 0) {
         *(s32 *)(state + 0x264) = bestIdx;
         *(s32 *)(state + 0x16C) = 1;
         return;
     }
     bestIdx = -1;
     best = 1000.0f;
-    for (i = 0; i < *(s32 *)list; i++) {
-        if (func_002761F8(a0 + 0x10, list + 0x10 + i * 16, 2, 0, 0) != 0)
+    for (i = 0; i < *(s32 *)path; i++) {
+        if (CollLine(moby + 0x10, path + 0x10 + i * 16, 2, 0, 0) != 0)
             continue;
-        d = func_L02_002F21C0(a0 + 0x10, list + 0x10 + i * 16);
-        if (d < best) {
-            best = d;
+        dist = DistanceSquaredXY(moby + 0x10, path + 0x10 + i * 16);
+        if (dist < best) {
+            best = dist;
             bestIdx = i;
         }
     }
@@ -112,39 +114,41 @@ void func_L12_003E1CB0(s32 a0) {
 
 /* func_L12_003E20F0 is defined in L12_003E20F0-g8.c. */
 
-void func_L12_003E2370(s32 a0) {
-    s32 s0 = a0;
-    s32 s1 = *(u32 *)(s0 + 0x68);
-    s32 v = *(s32 *)(*(u32 *)(s1 + 0x294));
+/* Tries to take the shared attack slot for this group so only one member attacks at a time. */
+void func_L12_003E2370(s32 moby) {
+    s32 mobyAlias = moby;
+    s32 vars = *(u32 *)(mobyAlias + 0x68);
+    s32 ownerIndex = *(s32 *)(*(u32 *)(vars + 0x294));
 
-    if (v != -1) {
-        s32 base = D_L12_001B2E9C;
-        u8 *p = (u8 *)((u32)base + (v << 8));
+    if (ownerIndex != -1) {
+        s32 mobyBase = D_L12_001B2E9C;
+        u8 *owner = (u8 *)((u32)mobyBase + (ownerIndex << 8));
 
-        if (p != 0) {
-            u8 t = *(u8 *)(p + 0x20);
+        if (owner != 0) {
+            u8 ownerState = *(u8 *)(owner + 0x20);
 
-            if (t != 0xFE) {
-                if (t != 0xFD) {
-                    if (v != ((s0 - base) >> 8))
+            if (ownerState != 0xFE) {
+                if (ownerState != 0xFD) {
+                    if (ownerIndex != ((mobyAlias - mobyBase) >> 8))
                         return;
                 }
             }
         }
     }
-    func_L12_0031E1D0(s0, 0xF, 5);
+    func_L12_0031E1D0(mobyAlias, 0xF, 5);
     {
-        s32 i = (s0 - D_L12_001B2E9C) >> 8;
+        s32 selfIndex = (mobyAlias - D_L12_001B2E9C) >> 8;
 
-        *(u16 *)(s1 + 0x29C) = 0x12C;
-        *(s32 *)(*(u32 *)(s1 + 0x294)) = i;
+        *(u16 *)(vars + 0x29C) = 0x12C;
+        *(s32 *)(*(u32 *)(vars + 0x294)) = selfIndex;
     }
 }
 
-void func_L12_003E2418(s32 a0) {
-    s32 *slot = *(s32 **)(*(u32 *)(a0 + 0x68) + 0x294);
+/* Gives the shared group attack slot back if this enemy is holding it. */
+void func_L12_003E2418(s32 moby) {
+    s32 *slot = *(s32 **)(*(u32 *)(moby + 0x68) + 0x294);
 
-    if (*slot == ((a0 - D_L12_001B2E9C) >> 8))
+    if (*slot == ((moby - D_L12_001B2E9C) >> 8))
         *slot = -1;
 }
 
@@ -152,6 +156,7 @@ void func_L12_003E2418(s32 a0) {
 
 /* func_L12_003E3A88 is defined in L12_003E3A88-g8.c. */
 
+/* Turns two of the object's flags on or off, and sets its colour/direction bytes, from the settings given by a trigger. */
 void func_L12_00400900(int index, struct L12Settings *settings, int enable) {
     u8 *obj = (u8 *)(D_L12_001B2E9C + (index << 8));
 
@@ -198,13 +203,14 @@ void func_L12_00400900(int index, struct L12Settings *settings, int enable) {
     }
 }
 
-void func_L12_00400B28(s32 a0, s32 a1, s32 a2, s32 a3) {
-    s16 *p = D_L12_001FB960[a2];
+/* Applies a trigger's settings to every object in one group list. */
+void func_L12_00400B28(s32 a0, s32 settings, s32 groupId, s32 enable) {
+    s16 *ids = D_L12_001FB960[groupId];
 
-    if (p != 0) {
+    if (ids != 0) {
         do {
-            func_L12_00400900(*(u16 *)p & 0x7FFF, a1, a3);
-        } while (*p++ >= 0);
+            ApplyTriggerSettingsToObject(*(u16 *)ids & 0x7FFF, settings, enable);
+        } while (*ids++ >= 0);
     }
 }
 
@@ -220,10 +226,11 @@ void func_L12_00400B28(s32 a0, s32 a1, s32 a2, s32 a3) {
 
 /* func_L12_0041A460 is defined in L12_0041A460.c. */
 
-void func_L12_0041A530(s32 a0) {
-    func_L12_00322AF8(a0, *(u32 *)(a0 + 0x68) + 0x50);
-    if (*(u16 *)(a0 + 0x96) <= 0xFFFE)
-        *(u16 *)(a0 + 0x96) = *(u16 *)(a0 + 0x96) + 1;
+/* Updates the enemy's timers and counts up its age, stopping at the maximum. */
+void func_L12_0041A530(s32 moby) {
+    func_L12_00322AF8(moby, *(u32 *)(moby + 0x68) + 0x50);
+    if (*(u16 *)(moby + 0x96) <= 0xFFFE)
+        *(u16 *)(moby + 0x96) = *(u16 *)(moby + 0x96) + 1;
 }
 
 /* Near miss: nonmatching/levels/func_L12_0041A578.c - the scan and the returns are right,
@@ -231,22 +238,23 @@ void func_L12_0041A530(s32 a0) {
    folds the loop back into the float test (`bc1fl`) where retail keeps `bc1t` + `b`. */
 
 
-void func_L12_0041A730(s32 a0) {
-    s16 *p = D_L12_001FB960[a0];
-    s32 base;
+/* Adds one to a counter on every Space Tourist in the group. */
+void func_L12_0041A730(s32 groupId) {
+    s16 *ids = D_L12_001FB960[groupId];
+    s32 mobyBase;
 
-    if (p == 0)
+    if (ids == 0)
         return;
-    base = D_L12_001B2E9C;
+    mobyBase = D_L12_001B2E9C;
     do {
-        u32 v = (*(u16 *)p & 0x7FFF) << 8;
+        u32 offset = (*(u16 *)ids & 0x7FFF) << 8;
 
-        if (*(s16 *)(base + v + 0xAA) == 0xBB8) {
-            u8 *r = (u8 *)*(u32 *)(base + v + 0x68);
+        if (*(s16 *)(mobyBase + offset + 0xAA) == 0xBB8 /* Space Tourist */) {
+            u8 *vars = (u8 *)*(u32 *)(mobyBase + offset + 0x68);
 
-            *(u32 *)(r + 0x798) = *(u32 *)(r + 0x798) + 1;
+            *(u32 *)(vars + 0x798) = *(u32 *)(vars + 0x798) + 1;
         }
-    } while (*p++ >= 0);
+    } while (*ids++ >= 0);
 }
 
 /* func_L12_00424078 is defined in L12_00424078-g8.c. */
@@ -256,61 +264,64 @@ void func_L12_0041A730(s32 a0) {
 /* func_L12_004277F0 is defined in L12_004277F0-g8.c. */
 
 
-void func_L12_00427CB0(s32 a0) {
-    s32 s1 = a0;
-    s32 s0 = *(u32 *)(s1 + 0x68);
+/* Counts down the enemy's timers, ages it, and updates its glow effects. */
+void func_L12_00427CB0(s32 moby) {
+    s32 mobyAlias = moby;
+    s32 vars = *(u32 *)(mobyAlias + 0x68);
 
-    func_L12_002F15C8(s0 + 0x330);
-    func_L12_002F15C8(s0 + 0x332);
-    if (*(u16 *)(s1 + 0x96) <= 0xFFFE)
-        *(u16 *)(s1 + 0x96) = *(u16 *)(s1 + 0x96) + 1;
-    s0 = s0 + 0x280;
-    func_L12_00326948(s1, s0, 0, 0.03f, 0.3f);
-    func_L12_003296A8(s1, s0, 0, 1, 1.8f);
+    func_L12_002F15C8(vars + 0x330);
+    func_L12_002F15C8(vars + 0x332);
+    if (*(u16 *)(mobyAlias + 0x96) <= 0xFFFE)
+        *(u16 *)(mobyAlias + 0x96) = *(u16 *)(mobyAlias + 0x96) + 1;
+    vars = vars + 0x280;
+    func_L12_00326948(mobyAlias, vars, 0, 0.03f, 0.3f);
+    func_L12_003296A8(mobyAlias, vars, 0, 1, 1.8f);
 }
 
-void func_L12_00427D50(s32 a0) {
-    s32 base;
-    s16 *p;
-    s16 *q;
+/* Wakes up every hopping enemy in the object's group by setting its alert flag. */
+void func_L12_00427D50(s32 moby) {
+    s32 mobyBase;
+    s16 *ids;
+    s16 *idList;
 
-    if (*(u8 *)(a0 + 0x21) == 0xFF)
+    if (*(u8 *)(moby + 0x21) == 0xFF)
         return;
-    q = D_L12_001FB960[*(u8 *)(a0 + 0x21)];
-    if (q == 0)
+    idList = D_L12_001FB960[*(u8 *)(moby + 0x21)];
+    if (idList == 0)
         return;
-    p = q;
-    base = D_L12_001B2E9C;
+    ids = idList;
+    mobyBase = D_L12_001B2E9C;
     do {
-        u32 v = (*(u16 *)p & 0x7FFF) << 8;
+        u32 offset = (*(u16 *)ids & 0x7FFF) << 8;
 
-        if (*(s8 *)(base + v + 0x20) >= 0) {
-            if (*(s16 *)(base + v + 0xAA) == 0x11EB)
-                *(u16 *)(*(u32 *)(base + v + 0x68) + 0x336) = 1;
+        if (*(s8 *)(mobyBase + offset + 0x20) >= 0) {
+            if (*(s16 *)(mobyBase + offset + 0xAA) == 0x11EB /* moby class 4587 */)
+                *(u16 *)(*(u32 *)(mobyBase + offset + 0x68) + 0x336) = 1;
         }
-    } while (*p++ >= 0);
+    } while (*ids++ >= 0);
 }
 
+/* Plays the death blast of the hopping enemy: sound, sparks and a puff of smoke, then removes it. */
 void func_L12_00427DD0(char *obj) {
     char pos[16];
     union { TI128 q; float f[4]; } offset;
     char dir[16];
     int color;
     if (*(short *)(*(char **)(obj + 0x68) + 0x358))
-        func_002AB6D8(obj + 0xC0, obj + 0xF0);
-    func_002A6C58(obj, 0, 3);
-    func_002E5CF8(1, 0, obj);
+        GetEulerAnglesFromMatrix(obj + 0xC0, obj + 0xF0);
+    SetDeathBits(obj, 0, 3);
+    PlayMobySound(1, 0, obj);
     offset.q = 0;
     offset.f[2] = 0.75f;
-    func_00283098(pos, &offset, obj + 0xC0);
-    func_00282CC0(pos, pos, obj + 0x10);
-    func_002AC728(obj, pos, -1, 0.3330000042915344f, 0.0f);
-    func_00282CF0(dir, obj + 0x10, D_00189EA0);
-    func_002AFEB8(obj, dir, dir, 0, 0.0f);
-    func_00282F20(dir, dir, 0.10000000894069672f);
-    color = D_L12_001A8FF0 ? func_002A77E0(0xFF) : 0xFF;
-    func_002B0A68(obj, color & 0x1F, dir, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-    func_0029F338(obj);
+    matrix_mul_vec3(pos, &offset, obj + 0xC0);
+    FastVecAdd(pos, pos, obj + 0x10);
+    SpawnExplosionWithSparks(obj, pos, -1, 0.3330000042915344f, 0.0f);
+    FastVecSub(dir, obj + 0x10, gHeroPosition);
+    TransformAndSetHeight(obj, dir, dir, 0, 0.0f);
+    vec_scale_to_length(dir, dir, 0.10000000894069672f);
+    color = D_L12_001A8FF0 ? RandomIntBelow(0xFF) : 0xFF;
+    SpawnDebrisForMaskedParts(obj, color & 0x1F, dir, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+    MarkMobySpawned(obj);
 }
 
 /* func_L12_00428040 is defined in L12_003E1CB0-g8.c (it reads the group count through $gp). */

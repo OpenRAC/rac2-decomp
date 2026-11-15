@@ -62,7 +62,7 @@ void func_L02_003CEFD8(struct L02PushObject *a0)
 
     if (a0->group == 0xFF)
         return;
-    q = (unsigned short *)D_L02_001FC060[a0->group];
+    q = (unsigned short *)gEntityGroupLists[a0->group];
     if (q == 0)
         return;
     *(TI128 *)&vec = 0;
@@ -70,18 +70,18 @@ void func_L02_003CEFD8(struct L02PushObject *a0)
     vec.z = 0.1f;
     vec.w = 1.0f;
     k = D_L02_001B00C8;
-    p = (unsigned short *)D_L02_001FC060[a0->group];
+    p = (unsigned short *)gEntityGroupLists[a0->group];
     while (a0->group != 0xFF && a0->group <= D_L02_001B35B8 && p != 0 &&
-           ((p != 0 && (short)p[-1] >= 0) || p == (unsigned short *)D_L02_001FC060[a0->group])) {
-        e = (struct L02PushEntity *)(D_L02_001B359C + ((*p & 0x7FFF) << 8));
+           ((p != 0 && (short)p[-1] >= 0) || p == (unsigned short *)gEntityGroupLists[a0->group])) {
+        e = (struct L02PushEntity *)(gMobyPool_L02 + ((*p & 0x7FFF) << 8));
         if (e == 0)
             break;
-        if (e->f31 != 0 && e->type == 0xA4E && e->state != 0xFE && e->state != 0xFD) {
+        if (e->f31 != 0 && e->type == 0xA4E /* Megacorp Chickenbot */ && e->state != 0xFE && e->state != 0xFD) {
             o = e->obj;
-            func_00282D30(tmp, &vec, o->f324);
-            func_002830C0(tmp, tmp, (char *)o + 0x220);
-            r = func_00283D38(k.a, k.b, o->f32C);
-            func_L00_00325AE8(tmp, r, o->f324 * 0.2f, 0.08f);
+            FastVecScale(tmp, &vec, o->f324);
+            transform_vector(tmp, tmp, (char *)o + 0x220);
+            r = FastTweenColor(k.a, k.b, o->f32C);
+            DrawBillboardQuad_L00(tmp, r, o->f324 * 0.2f, 0.08f);
         }
         p++;
     }

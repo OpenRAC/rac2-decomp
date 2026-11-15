@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -73,6 +74,7 @@ typedef struct {
 extern ConditionalResetSlot D_L00_001B8C00[8];
 
 /* Filter primary or fallback object's class identifier by mode and signed selection */
+/* Checks if the tracked object is a certain kind of object, picked by the selection number. */
 s32 func_L00_002D67A8(s32 selection) {
     s32 found = 0;
     ClassFilterObject *primary = ((ClassFilterRoot *)D_00189E20_1)->primary;
@@ -80,28 +82,31 @@ s32 func_L00_002D67A8(s32 selection) {
     if (((ClassFilterRoot *)D_00189E20_1)->mode == 0x31) {
         if (primary) {
             switch (selection) {
-                case 0: found = primary->class_id == 0xfbf; break;
-                case 1: found = primary->class_id == 0x905; break;
-                case 2: found = primary->class_id == 0xeef; break;
+                case 0: found = primary->class_id == 0xfbf /* moby class 4031 */; break;
+                case 1: found = primary->class_id == 0x905 /* Glider */; break;
+                case 2: found = primary->class_id == 0xeef /* Mining Vehicle */; break;
             }
         } else if (fallback && selection == 3) {
-            found = fallback->class_id == 0xc20;
+            found = fallback->class_id == 0xc20 /* Turret */;
         }
     }
     return found;
 }
 
 /* A07-sda-multi-eq-44 freshly exact-verified under family reservation */
+/* Tells whether a global value is one of three known numbers (0x16, 0x17 or 0x2CE). */
 BatchA_A07_s32 func_L00_002D6848(void) {
-    BatchA_A07_s32 v = D_001A79F0[0];
-    return (v == 0x16) | (v == 0x2CE) | (v == 0x17);
+    BatchA_A07_s32 value = gCurrentMapIndex[0];
+    return (value == 0x16) | (value == 0x2CE) | (value == 0x17);
 }
 
+/* Always answers 0 (a placeholder check that never passes). */
 unsigned int func_L00_002D6878(void)
 {
     return 0;
 }
 
+/* Reads one global number and returns it. */
 /* returns the resident 32-bit field at core address 0x0018c0b4 */
 u32 func_L00_002D68E8(void) {
     return D_0018C0B4;
@@ -116,7 +121,7 @@ int func_L00_002D6998(struct Rac2Native_5f824a0e369ccf7b_src_record *src);
 int func_L00_002D6900(unsigned int index)
 {
     if (index < 0x62)
-        return func_L00_002D6998(D_L00_0025E120[index]);
+        return CopyRecordsToFreeSlots(D_L00_0025E120[index]);
     return -1;
 }
 

@@ -1,4 +1,5 @@
 #include "ps2_hw.h"
+#include "names.h"
 #include "include_asm.h"
 
 extern void func_0011AC60(int value);
@@ -10,25 +11,26 @@ extern void func_00350798(int value);
 extern void func_0011AC40(int value);
 
 /* snapshots five hardware registers into a structure, spins while one register's nibble stays set, snapshots five more and returns 1 */
-int func_00350DC8(int *p)
+/* Saves the video decoder and DMA channel registers into the buffer, waiting for the decoder to finish first. */
+int func_00350DC8(int *buf)
 {
-    func_0011AC60(p[16]);
-    p[17] = 0;
+    WaitSema(buf[16]);
+    buf[17] = 0;
     func_00350808_1(5);
-    p[7] = ((int)D4_MADR);
-    p[8] = ((int)D4_TADR);
-    p[9] = ((int)D4_QWC);
-    p[10] = ((int)D4_CHCR);
+    buf[7] = ((int)D4_MADR);
+    buf[8] = ((int)D4_TADR);
+    buf[9] = ((int)D4_QWC);
+    buf[10] = ((int)D4_CHCR);
     if (((int)IPU_CTRL) & 0xF0)
         while (((int)IPU_CTRL) & 0xF0)
             ;
-    func_00350798(0);
-    p[11] = ((int)D3_MADR);
-    p[12] = ((int)D3_QWC);
-    p[13] = ((int)D3_CHCR);
-    p[14] = ((int)IPU_BP);
-    p[15] = ((int)IPU_CTRL);
-    func_0011AC40(p[16]);
+    StartDmaChannel3(0);
+    buf[11] = ((int)D3_MADR);
+    buf[12] = ((int)D3_QWC);
+    buf[13] = ((int)D3_CHCR);
+    buf[14] = ((int)IPU_BP);
+    buf[15] = ((int)IPU_CTRL);
+    SignalSema(buf[16]);
     return 1;
 }
 
@@ -59,6 +61,7 @@ struct ipu_fifo {
    the channel 4 address past the bytes the IPU still holds, wrapping inside the ring buffer; each of the
    two ring-index tests is written with its % twice because retail keeps one divide but a zero check
    per use */
+/* Puts back the saved video decoder and DMA state after a pause. */
 int func_00350ED8(struct ipu_fifo *p)
 {
     unsigned bp = p->ipu_bp;
@@ -72,7 +75,7 @@ int func_00350ED8(struct ipu_fifo *p)
     unsigned tadr;
 
     tadr = p->tadr;
-    func_0011AC60(p->intr);
+    WaitSema(p->intr);
     if (madr < p->base) {
         int units = p->units;
         int size = units << 11;
@@ -88,8 +91,8 @@ int func_00350ED8(struct ipu_fifo *p)
             p->count++;
         }
     } else {
-        int r1 = func_00350750(p, p->madr);
-        int r2 = func_00350750(p, madr);
+        int r1 = ViBufAddressToSlot(p, p->madr);
+        int r2 = ViBufAddressToSlot(p, madr);
 
         if (r1 != r2) {
             int units = p->units;
@@ -114,7 +117,7 @@ int func_00350ED8(struct ipu_fifo *p)
         if (p->d3_qwc != 0) {
             D3_MADR = p->d3_madr;
             D3_QWC = p->d3_qwc;
-            func_00350798(p->d3_chcr | 0x100);
+            StartDmaChannel3(p->d3_chcr | 0x100);
         }
     }
     if (p->count != 0) {
@@ -133,17 +136,18 @@ int func_00350ED8(struct ipu_fifo *p)
         func_00350808_1(chcr);
     IPU_CTRL = p->ipu_ctrl;
     p->saved = 1;
-    func_0011AC40(p->intr);
+    SignalSema(p->intr);
     return 1;
 }
 
 extern void func_0011AC30(int value);
-int func_00351210(int *p)
+/* Stops DMA channel 4, clears its addresses and releases the buffer's semaphore. */
+int func_00351210(int *buf)
 {
     func_00350808_1(5);
     D4_QWC = 0;
     D4_MADR = 0;
     D4_TADR = 0;
-    func_0011AC30(p[16]);
+    DeleteSema(buf[16]);
     return 1;
 }

@@ -28,43 +28,44 @@ extern void func_00283098(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_00283130(void *, unsigned long long);
 extern void func_00282D30(void *, void *, float);
+/* Builds a joint's position matrix and optional point list from the moby's animation data. Returns how many points it wrote. */
 int func_0029F840(char *obj, char *m, char *out, int index) {
-    char *p = *(char **)(obj + 0x24);
-    int cnt = *(short *)(p + 0x2E);
+    char *classData = *(char **)(obj + 0x24);
+    int cnt = *(short *)(classData + 0x2E);
     int tab;
     char *rec;
     int n;
     int i;
-    int e;
+    int recordOffset;
     char *dst;
-    float k;
-    float s;
+    float unitScale;
+    float scale;
 
     if (cnt == 0) {
         goto fail;
     }
-    tab = (int)p + cnt * 16;
+    tab = (int)classData + cnt * 16;
     index += tab;
-    e = ((unsigned char *)index)[1];
-    p = m;
-    if (e == 0xFF) {
+    recordOffset = ((unsigned char *)index)[1];
+    classData = m;
+    if (recordOffset == 0xFF) {
         do {
 fail:
             return 0;
         } while (0);
     }
     do {
-        s = *(float *)(obj + 0x2C);
+        scale = *(float *)(obj + 0x2C);
     } while (0);
-    k = 0.0009765625f;
+    unitScale = 0.0009765625f;
     do {
-        e *= 16;
+        recordOffset *= 16;
     } while (0);
-    rec = (char *)tab + e;
-    func_00282D60(p, rec, s * k);
+    rec = (char *)tab + recordOffset;
+    scale_vector(classData, rec, scale * unitScale);
     rec += 0x10;
-    func_00283098(m, m, obj + 0xC0);
-    func_00282CC0(m, m, obj + 0x10);
+    matrix_mul_vec3(m, m, obj + 0xC0);
+    FastVecAdd(m, m, obj + 0x10);
     do {
         n = *(short *)(rec + 6);
     } while (0);
@@ -72,9 +73,9 @@ fail:
         dst = out;
         for (i = n; i != 0;) {
             i--;
-            func_00283130(dst, *(unsigned long long *)rec);
+            FastVectorHelperE(dst, *(unsigned long long *)rec);
             rec += 8;
-            func_00282D30(dst, dst, *(float *)(obj + 0x2C) * k);
+            FastVecScale(dst, dst, *(float *)(obj + 0x2C) * unitScale);
             *(float *)(dst + 0xC) = 1.0f;
             dst += 0x10;
         }

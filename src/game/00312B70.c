@@ -11,7 +11,7 @@ extern void func_002AB650(char *);
 /* Spawns object 0x27F at the given position and fills its descriptor from a template record. */
 char *func_00312B70(char *tmpl, void *pos, int value, void *origin)
 {
-    char *obj = func_0029EFD0(0x27F);
+    char *obj = CreateMoby(0x27F /* moby class 639 */);
     char *d;
 
     if (obj != 0) {
@@ -62,7 +62,7 @@ char *func_00312B70(char *tmpl, void *pos, int value, void *origin)
         *(unsigned char *)(d + 0x1C) = *(unsigned char *)(tmpl + 0x49);
         *(int *)(d + 0x64) = -1;
         func_002A0F48(obj);
-        func_002AB650(obj);
+        CopyHeroField38ToMoby(obj);
     }
     return obj;
 }

@@ -63,6 +63,7 @@ extern int func_00133350(int, int, int, int, int, int, int, int, int, int,
 
 #define STATE ((StreamState *)D_001A63A8)
 
+/* Starts a sound on the second stream channel by id, picking the right language, and attaches it to an object if given. */
 void func_002B6958(int id, int mode, void *object, int volume)
 {
     int first, second, flags = 2, slot, bits;
@@ -75,38 +76,38 @@ void func_002B6958(int id, int mode, void *object, int volume)
         int lang, offset;
         lang = D_001A7BB4[0];
         if (lang) lang--;
-        offset = ((int (*)[256])D_0014B540.ids6000)[lang][id - 6000];
-        if (offset) first = offset + D_0014B540.base1;
+        offset = ((int (*)[256])gCopySetupData.ids6000)[lang][id - 6000];
+        if (offset) first = offset + gCopySetupData.base1;
         flags = 6;
     } else if (id >= 5000) {
-        int offset = D_0014B540.ids5000[id - 5000].offset;
-        if (offset) first = D_0014B540.base4 + offset;
+        int offset = gCopySetupData.ids5000[id - 5000].offset;
+        if (offset) first = gCopySetupData.base4 + offset;
     } else if (id >= 4000) {
-        if (((int (*)[83])D_0014B540.ids4000)[id - 4000][D_001A7BB4[0] * 2]) {
+        if (((int (*)[83])gCopySetupData.ids4000)[id - 4000][D_001A7BB4[0] * 2]) {
             int offset2;
             /* base4 through the struct puts the table's own address in a register before the
                second entry is read, so cse builds that entry's address in full, as retail does,
                instead of as the first entry's address plus 4. */
-            first = D_0014B540.base4
-                + ((int (*)[83])D_0014B540.ids4000)[id - 4000][D_001A7BB4[0] * 2];
-            offset2 = ((int (*)[83])D_0014B540.ids4000)[id - 4000][D_001A7BB4[0] * 2 + 1];
-            second = offset2 ? D_0014B540.base4 + offset2 : 0;
+            first = gCopySetupData.base4
+                + ((int (*)[83])gCopySetupData.ids4000)[id - 4000][D_001A7BB4[0] * 2];
+            offset2 = ((int (*)[83])gCopySetupData.ids4000)[id - 4000][D_001A7BB4[0] * 2 + 1];
+            second = offset2 ? gCopySetupData.base4 + offset2 : 0;
         }
     } else if (id >= 3000) {
-        int offset = D_0014B540.ids2000[id - 3000].offset;
-        if (offset) first = D_0014B540.base2 + offset;
+        int offset = gCopySetupData.ids2000[id - 3000].offset;
+        if (offset) first = gCopySetupData.base2 + offset;
     } else if (id >= 2000) {
         int lang, offset;
         lang = D_001A7BB4[0];
         if (lang) lang--;
-        offset = D_0014B540.ids2000[id - 2000 + lang].offset;
-        if (offset) first = D_0014B540.base2 + offset;
+        offset = gCopySetupData.ids2000[id - 2000 + lang].offset;
+        if (offset) first = gCopySetupData.base2 + offset;
     } else if (id >= 1000) {
         int lang, offset;
         lang = D_001A7BB4[0];
         if (lang) lang--;
-        offset = D_0014B540.ids1000[id - 1000 + lang];
-        if (offset) first = D_0014B540.base1 + offset;
+        offset = gCopySetupData.ids1000[id - 1000 + lang];
+        if (offset) first = gCopySetupData.base1 + offset;
     } else {
         if (((int (*)[83])D_00151858)[id][D_001A7BB4[0] * 2]) {
             int offset2 = ((int (*)[83])D_00151858)[id][D_001A7BB4[0] * 2 + 1];
@@ -124,7 +125,7 @@ void func_002B6958(int id, int mode, void *object, int volume)
     STATE->channel[1].volume = volume;
     STATE->channel[1].crossfade = 0;
     STATE->channel[1].object = object;
-    STATE->channel[1].slot = func_002E5A50(object);
+    STATE->channel[1].slot = FindFreeSoundVoice(object);
 #ifdef OPENRAC_HOSTGEN
     /* OpenRAC: func_002E5A50 returns 52 when no slot is free; retail then writes past the
        52 rows. The port takes it as no slot. */
@@ -133,7 +134,7 @@ void func_002B6958(int id, int mode, void *object, int volume)
 #endif
     if (STATE->channel[1].slot >= 0) {
         slot = STATE->channel[1].slot;
-        sound = (SoundAnchor *)(D_00188660 + slot * 0x70);
+        sound = (SoundAnchor *)(gSoundState + slot * 0x70);
         sound->def = D_001AA170;
         sound->defFlags = ((StreamSoundDef *)D_001AA170)->flags;
         sound->sentinel = -1;
@@ -141,16 +142,16 @@ void func_002B6958(int id, int mode, void *object, int volume)
         sound->object = object;
         sound->zero3 = 0;
         bits = 0;
-        qzero_nc(D_00188660 + slot * 0x70 + 0xA0);
+        qzero_nc(gSoundState + slot * 0x70 + 0xA0);
         if (object) {
-            qcopy_nc(D_00188660 + slot * 0x70 + 0x90, (u8 *)object + 0x10);
-            ((SoundAnchor *)(D_00188660 + slot * 0x70))->position[2] += 1.0f;
+            qcopy_nc(gSoundState + slot * 0x70 + 0x90, (u8 *)object + 0x10);
+            ((SoundAnchor *)(gSoundState + slot * 0x70))->position[2] += 1.0f;
         } else {
             bits = 0x11;
-            func_00282C88(D_00188660 + slot * 0x70 + 0x90);
+            ClearVector128(gSoundState + slot * 0x70 + 0x90);
         }
         {
-            SoundAnchor *anchor = (SoundAnchor *)(D_00188660 + slot * 0x70);
+            SoundAnchor *anchor = (SoundAnchor *)(gSoundState + slot * 0x70);
             anchor->handle = 0xffffffff;
             anchor->bits = bits;
             anchor->active = 8;
@@ -159,5 +160,5 @@ void func_002B6958(int id, int mode, void *object, int volume)
         }
     }
     func_00133350(first, second, 0, 0, STATE->channel[1].volume, 0, flags, 0, 0, 1,
-                  func_002B7E28, (unsigned int)&STATE->channel[1]);
+                  StoreRequestResultAndAdvance, (unsigned int)&STATE->channel[1]);
 }

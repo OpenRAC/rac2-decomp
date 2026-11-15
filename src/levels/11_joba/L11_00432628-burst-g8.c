@@ -37,7 +37,7 @@ extern void func_002E5DA0(int, int, char *, int);
 static __inline__ void spawn_ring(char *obj, char *pos, char *velocity, float radius, int type,
                                   u8 r, u8 g, u8 b, u8 a)
 {
-    func_00308408(obj, pos, velocity, type, radius, r, g, b, a);
+    SpawnShockwaveRing(obj, pos, velocity, type, radius, r, g, b, a);
 }
 
 /* Bursts at pos: twelve sparks, three coloured rings, a damage ring for an owner, then the
@@ -56,13 +56,13 @@ void func_L11_00439640(char *obj, char *pos)
     size = 5.0f;
     scale = 2.0f;
     for (i = 11; i >= 0; i--) {
-        speed = func_002A7878(8.0f, 10.0f) * (1.0f / 60.0f);
-        index = func_002A77E0(6);
+        speed = RandomFloatRange(8.0f, 10.0f) * (1.0f / 60.0f);
+        index = RandomIntBelow(6);
         first = D_L11_001B12D0[index];
         last = D_L11_001B12E0[index];
-        life = func_002A7820(15, 20);
-        spark = func_002BBCB0(pos, velocity, first, last, scale * 400000.0f, life,
-                              func_002A7820(30, 45), 0, 0, speed * scale);
+        life = RandomIntRange(15, 20);
+        spark = SpawnFireworkSparkParticle(pos, velocity, first, last, scale * 400000.0f, life,
+                              RandomIntRange(30, 45), 0, 0, speed * scale);
         if (spark)
             spark[3] = 0x44;
     }
@@ -77,13 +77,13 @@ void func_L11_00439640(char *obj, char *pos)
     if (size != 0.0f) {
         qcopy(sphere, pos);
         sphere[3] = size;
-        if (func_00283DB8(sphere, 100.0f) != -1) {
+        if (FastMathHelperA(sphere, 100.0f) != -1) {
             if (size > 0.0f)
                 D_L11_002B6BC0.scale[0] = D_L11_002B6BC0.scale[2] = D_L11_002B6BC0.scale[1] = size;
             else
                 D_L11_002B6BC0.scale[0] = D_L11_002B6BC0.scale[2] = D_L11_002B6BC0.scale[1] = 15;
-            func_00312B70(&D_L11_002B6BC0, pos, 0, 0);
+            SpawnTemplateEffectMoby(&D_L11_002B6BC0, pos, 0, 0);
         }
     }
-    func_002E5DA0(0, 0, obj, 0xDF7);
+    PlaySoundFromClassBank(0, 0, obj, 0xDF7);
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -19,44 +20,45 @@ extern int func_361728(char *, void *, float);
 extern float func_32D7C0(void *, void *);
 extern void func_36A798(char *, int, int, int, float, float);
 
-int func_L06_00420080(char *a0)
+/* Chooses where the actor should walk next and returns 0 if it has arrived, 1 if it must walk, or 2 if it is close. */
+int func_L06_00420080(char *moby)
 {
-    char *state = *(char **)(a0 + 0x68);
-    int *entry;
+    char *vars = *(char **)(moby + 0x68);
+    int *pathData;
 
-    if (*(unsigned char *)(a0 + 0x20) == 0 || func_35A620(7) == 0) {
-        if (*(int *)(state + 0x260) != -1) {
-            char *target;
+    if (*(unsigned char *)(moby + 0x20) == 0 || func_35A620(7) == 0) {
+        if (*(int *)(vars + 0x260) != -1) {
+            char *goalPoint;
 
-            if (*(unsigned char *)(a0 + 0x20) < 3)
-                entry = D_L06_001FE500[*(int *)(state + 0x260)];
+            if (*(unsigned char *)(moby + 0x20) < 3)
+                pathData = gPathList[*(int *)(vars + 0x260)];
             else
-                entry = D_L06_001FE500[*(int *)(state + 0x264)];
-            target = state + 0x1C0;
-            if (func_361930(a0, target, 0, 0, (char *)entry + 0x10, *entry, *(float *)(state + 0x290)) != 2) {
-                if (func_32D7C0(a0 + 0x10, target) < 8.0f)
-                    *(int *)(state + 0x258) = 2;
+                pathData = gPathList[*(int *)(vars + 0x264)];
+            goalPoint = vars + 0x1C0;
+            if (func_361930(moby, goalPoint, 0, 0, (char *)pathData + 0x10, *pathData, *(float *)(vars + 0x290)) != 2) {
+                if (func_32D7C0(moby + 0x10, goalPoint) < 8.0f)
+                    *(int *)(vars + 0x258) = 2;
                 else
-                    *(int *)(state + 0x258) = 1;
+                    *(int *)(vars + 0x258) = 1;
             } else {
-                *(TI128 *)target = *(TI128 *)D_00189EA0;
-                *(int *)(state + 0x258) = 0;
+                *(TI128 *)goalPoint = *(TI128 *)gHeroPosition;
+                *(int *)(vars + 0x258) = 0;
             }
         } else {
-            char *target = state + 0x1C0;
+            char *goalPoint = vars + 0x1C0;
 
-            if (func_361728(a0, target, *(float *)(state + 0x290)) == 2) {
-                *(TI128 *)target = *(TI128 *)D_00189EA0;
-                *(int *)(state + 0x258) = 0;
-            } else if (func_32D7C0(a0 + 0x10, target) < 8.0f) {
-                *(int *)(state + 0x258) = 2;
+            if (func_361728(moby, goalPoint, *(float *)(vars + 0x290)) == 2) {
+                *(TI128 *)goalPoint = *(TI128 *)gHeroPosition;
+                *(int *)(vars + 0x258) = 0;
+            } else if (func_32D7C0(moby + 0x10, goalPoint) < 8.0f) {
+                *(int *)(vars + 0x258) = 2;
             } else {
-                *(int *)(state + 0x258) = 1;
+                *(int *)(vars + 0x258) = 1;
             }
         }
-    } else if (*(char **)(state + 0x200) == D_00189E20.f2290) {
-        *(TI128 *)(state + 0x1C0) = D_00189E20.f80;
+    } else if (*(char **)(vars + 0x200) == gHeroState.f2290) {
+        *(TI128 *)(vars + 0x1C0) = gHeroState.f80;
     }
-    func_36A798(a0, -1, 0, 0, *(float *)(state + 0x338) * 20.0f, 10.0f);
-    return *(int *)(state + 0x258);
+    func_36A798(moby, -1, 0, 0, *(float *)(vars + 0x338) * 20.0f, 10.0f);
+    return *(int *)(vars + 0x258);
 }

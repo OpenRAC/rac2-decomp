@@ -8,9 +8,10 @@
 extern u8 D_0019B4A8[][0x400];
 extern int D_001A79F0 __attribute__((sda));
 
-int func_00279B70(u8 *a0, int a1, int a2)
+/* Looks up a stat byte for a nibble and scales it by a percentage. */
+int func_00279B70(u8 *table, int scale, int index)
 {
-    int c = D_0019B4A8[D_001A79F0][a2 >> 1];
+    int packed = D_0019B4A8[gCurrentMapIndex][index >> 1];
 
-    return (a0[(a2 & 1) ? ((c >> 4) & 7) : (c & 7)] * a1) / 100;
+    return (table[(index & 1) ? ((packed >> 4) & 7) : (packed & 7)] * scale) / 100;
 }

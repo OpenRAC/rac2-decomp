@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 #define RAC2_T_V4_F36D8A248
 #define RAC2_T_M4_F36D8A248
@@ -187,56 +188,56 @@ extern float func_00282C48(float);
 ASM_FUNC("asm/levels", func_L00_00316F60);
 
 /* computes a scalar complement-power curve by repeated multiplication */
-f32 func_L00_0031A6C8(f32 value, s32 count) {
-    f32 factor = 1.0f - value;
-    f32 product = factor;
-    for (; count > 1; --count)
-        product = product * factor;
-    return 1.0f - product;
+f32 func_L00_0031A6C8(f32 amount, s32 steps) {
+    f32 remaining = 1.0f - amount;
+    f32 power = remaining;
+    for (; steps > 1; --steps)
+        power = power * remaining;
+    return 1.0f - power;
 }
 
 /* func_L00_0031AA28 is defined in L00_0031AA28-curve.c. */
 
 /* Blends a value toward a target: helper(second,first) halved, scaled by (1 - helper(third*pi)); the first argument and that product go to a two-float helper whose float result is returned. */
-float func_L00_0031ABE0(float a, float b, float c)
+float func_L00_0031ABE0(float from, float to, float phase)
 {
-    float t;
-    float u;
+    float diff;
+    float wave;
 
-    t = func_00283BE0_4(b, a);
-    u = func_00283180_7(c * 3.1415927f);
-    t = t * 0.5f;
-    return func_00283B98_7(a, t * (1.0f - u));
+    diff = func_00283BE0_4(to, from);
+    wave = func_00283180_7(phase * 3.1415927f);
+    diff = diff * 0.5f;
+    return func_00283B98_7(from, diff * (1.0f - wave));
 }
 
 /* Blends between two vectors: at a phase of zero the first vector is copied, at one the
    second, and in between a sine-shaped weight scales the difference between them. */
-void func_L00_0031AC60(V4TI_F36d8a248 *a0, V4TI_F36d8a248 *a1, V4TI_F36d8a248 *a2, float t)
+void func_L00_0031AC60(V4TI_F36d8a248 *result, V4TI_F36d8a248 *from, V4TI_F36d8a248 *to, float phase)
 {
-    char local[16];
-    float k;
+    char delta[16];
+    float weight;
 
-    if (t == 0.0f) {
-        *(volatile V4TI_F36d8a248 *)a0 = *(V4TI_F36d8a248 *)a1;
-    } else if (t == 1.0f) {
-        *(volatile V4TI_F36d8a248 *)a0 = *(V4TI_F36d8a248 *)a2;
+    if (phase == 0.0f) {
+        *(volatile V4TI_F36d8a248 *)result = *(V4TI_F36d8a248 *)from;
+    } else if (phase == 1.0f) {
+        *(volatile V4TI_F36d8a248 *)result = *(V4TI_F36d8a248 *)to;
     } else {
-        k = (1.0f - func_00283180_5(t * 3.1415927f)) * 0.5f;
-        func_00282CF0(local, a2, a1);
-        func_00282D30(local, local, k);
-        func_00282CC0(a0, a1, local);
+        weight = (1.0f - func_00283180_5(phase * 3.1415927f)) * 0.5f;
+        FastVecSub(delta, to, from);
+        FastVecScale(delta, delta, weight);
+        FastVecAdd(result, from, delta);
     }
 }
 
 /* converts a normalised phase to radians, derives a blend factor of half the complement of a phase helper's result, and applies it to a two-argument helper over three consecutive float components written back over the first vector. */
-void func_L00_0031AD40(float *a0, float *a1, float *a2, float t)
+void func_L00_0031AD40(float *result, float *from, float *to, float phase)
 {
-    float k;
+    float weight;
 
-    k = (1.0f - func_00283180_5(t * 3.1415927f)) * 0.5f;
-    a0[0] = func_00283B98_5(a1[0], func_00283BE0_2(a2[0], a1[0]) * k);
-    a0[1] = func_00283B98_5(a1[1], func_00283BE0_2(a2[1], a1[1]) * k);
-    a0[2] = func_00283B98_5(a1[2], func_00283BE0_2(a2[2], a1[2]) * k);
+    weight = (1.0f - func_00283180_5(phase * 3.1415927f)) * 0.5f;
+    result[0] = func_00283B98_5(from[0], func_00283BE0_2(to[0], from[0]) * weight);
+    result[1] = func_00283B98_5(from[1], func_00283BE0_2(to[1], from[1]) * weight);
+    result[2] = func_00283B98_5(from[2], func_00283BE0_2(to[2], from[2]) * weight);
 }
 
 
@@ -248,8 +249,8 @@ void func_L00_0031AD40(float *a0, float *a1, float *a2, float t)
 /* func_L00_0031BDC0 is defined in L00_0031BDC0.c. */
 
 /* True only when the pending object exists and its inner flag is set. */
-s32 func_L00_0031BE88(char *a0) {
-    if (*(s32 **)(a0 + 0x98) != 0 && *(s32 *)(*(char **)(a0 + 0x98) + 8) != 0)
+s32 func_L00_0031BE88(char *object) {
+    if (*(s32 **)(object + 0x98) != 0 && *(s32 *)(*(char **)(object + 0x98) + 8) != 0)
         return 1;
     return 0;
 }
@@ -257,21 +258,24 @@ s32 func_L00_0031BE88(char *a0) {
 
 /* func_L00_0031C3D0 is built in its own unit. */
 
+/* Calls the engine routine that resets the shared effect state. */
 void func_L00_0031C978(void)
 {
-    func_002A93B0();
+    UpdateMobyGroundCheck();
 }
 
+/* Blends between two integer values by a fraction. */
 int func_L00_0031C998(int from, int to, float fraction)
 {
-    return func_00283D38(from, to, fraction);
+    return FastTweenColor(from, to, fraction);
 }
 
 
 
 
-int func_L00_0031D620(int a0, int a1, float x) {
-    return a0 + func_002EF250((float)(a1 - a0) * x);
+/* Moves a whole number part of the way toward another one. */
+int func_L00_0031D620(int from, int to, float fraction) {
+    return from + func_002EF250((float)(to - from) * fraction);
 }
 
 /* func_L00_0031D670 is defined in L00_0031D670.c. */
@@ -280,44 +284,46 @@ int func_L00_0031D620(int a0, int a1, float x) {
 /* Blends three components of a vector into a second one: for every component that is
    negative the two vectors are mixed through a helper, scaled by the angle between them
    and added back into the second vector. */
-void func_L00_0031EC88(V4TI_F36d8a248 *a0, V4TI_F36d8a248 *a1)
+void func_L00_0031EC88(V4TI_F36d8a248 *basis, V4TI_F36d8a248 *vec)
 {
-    V4_F36d8a248 localA;
-    V4_F36d8a248 localB;
-    V4_F36d8a248 *va = a1;
-    V4_F36d8a248 *fa = &localA;
-    V4_F36d8a248 *fb = &localB;
-    float *q = (float *)&localA;
-    float *p = (float *)a1;
-    float *r = (float *)&localB;
-    int i;
+    V4_F36d8a248 saved;
+    V4_F36d8a248 push;
+    V4_F36d8a248 *vecPtr = vec;
+    V4_F36d8a248 *savedPtr = &saved;
+    V4_F36d8a248 *pushPtr = &push;
+    float *savedComp = (float *)&saved;
+    float *vecComp = (float *)vec;
+    float *pushComp = (float *)&push;
+    int axis;
 
-    *(V4TI_F36d8a248 *)&localA = *(V4TI_F36d8a248 *)a0;
-    for (i = 0; i < 3; i++) {
-        if (*p < 0.0f) {
-            func_00282CF0(fb, va, fa);
-            func_00282D30(fb, fb, func_00282C48((*q - 0.1f) / *r));
-            func_00282CC0(va, fa, fb);
+    *(V4TI_F36d8a248 *)&saved = *(V4TI_F36d8a248 *)basis;
+    for (axis = 0; axis < 3; axis++) {
+        if (*vecComp < 0.0f) {
+            FastVecSub(pushPtr, vecPtr, savedPtr);
+            FastVecScale(pushPtr, pushPtr, FloatAbs((*savedComp - 0.1f) / *pushComp));
+            FastVecAdd(vecPtr, savedPtr, pushPtr);
         }
-        p++;
-        r++;
-        q++;
+        vecComp++;
+        pushComp++;
+        savedComp++;
     }
 }
 
 
-int func_L00_0031F220(const unsigned char *entity) {
-    if (entity == 0)
+/* Tells if an object is missing or has the class 502 identity; objects that fail the engine check count as true. */
+int func_L00_0031F220(const unsigned char *moby) {
+    if (moby == 0)
         return 0;
-    if (func_002ABB78((char *)entity) != 0)
-        return *(const signed short *)(entity + 0xAA) == 0x1F6;
+    if (IsMobyInSpecialClassRange((char *)moby) != 0)
+        return *(const signed short *)(moby + 0xAA) == 0x1F6 /* moby class 502 */;
     return 1;
 }
 
 /* One fixed ordinary scalar query. Signed halfword width, offset and
    equality constant are measured; no original class or field-name claim. */
-int func_L00_0031F2B0(const unsigned char *entity) {
-    return *(const signed short *)(entity + 0xAA) == 0x0CDB;
+/* Tells if an object is an Ammo pickup. */
+int func_L00_0031F2B0(const unsigned char *moby) {
+    return *(const signed short *)(moby + 0xAA) == 0x0CDB /* Ammo */;
 }
 
 /* func_L00_003200F8 is defined in L00_003200F8.c. */
@@ -333,64 +339,65 @@ int func_L00_0031F2B0(const unsigned char *entity) {
 
 
 /* builds two 64-byte blocks from a 3-float vector and from a vector inside the caller object, combines them, then scales one block again from the same source vector */
-void func_L00_00322A18(u8 *a0, f32 a1, f32 a2, f32 a3) {
-    V4_F36d8a248 in;
-    M4_F36d8a248 m1;
-    M4_F36d8a248 m2;
-    in.x = a1;
-    in.y = a2;
-    in.z = a3;
-    func_00283410_3(&m1, &in);
-    func_00283410_3(&m2, (V4_F36d8a248 *)(a0 + 240));
-    func_00283788_2(&m2, &m2, &m1);
-    func_002AB6D8_2(&m2, (V4_F36d8a248 *)(a0 + 240));
+void func_L00_00322A18(u8 *object, f32 x, f32 y, f32 z) {
+    V4_F36d8a248 offset;
+    M4_F36d8a248 offsetMatrix;
+    M4_F36d8a248 objectMatrix;
+    offset.x = x;
+    offset.y = y;
+    offset.z = z;
+    func_00283410_3(&offsetMatrix, &offset);
+    func_00283410_3(&objectMatrix, (V4_F36d8a248 *)(object + 240));
+    func_00283788_2(&objectMatrix, &objectMatrix, &offsetMatrix);
+    func_002AB6D8_2(&objectMatrix, (V4_F36d8a248 *)(object + 240));
 }
 
 /* A06-inline-init-40 freshly exact-verified under family reservation */
-void func_L00_00322A98(void *a0, char *a1){
-    if (*(BatchA_A06_s32 *)(a1 + 0x14C) == 0) {
-        *(void **)(a1 + 0x144) = a0;
-        *(BatchA_A06_s32 *)(a1 + 0x14C) = 1;
-        *(BatchA_A06_BatchAs16 *)(a1 + 0x142) = 0;
-        *(BatchA_A06_s32 *)(a1 + 0x148) = 0;
-        *(BatchA_A06_BatchAs16 *)(a1 + 0x140) = 0;
+/* Sets up an object's pending slot once, storing a target and clearing its counters. */
+void func_L00_00322A98(void *target, char *object){
+    if (*(BatchA_A06_s32 *)(object + 0x14C) == 0) {
+        *(void **)(object + 0x144) = target;
+        *(BatchA_A06_s32 *)(object + 0x14C) = 1;
+        *(BatchA_A06_BatchAs16 *)(object + 0x142) = 0;
+        *(BatchA_A06_s32 *)(object + 0x148) = 0;
+        *(BatchA_A06_BatchAs16 *)(object + 0x140) = 0;
     }
 }
 
 /* Appends a record to a fixed four-entry table: aborts when the table is full or an index argument is out of range, copies selected fields from one linked record into a helper-allocated record, then stores the three inputs and that record into four parallel tables and bumps the count. */
-void func_L00_00322AC0(List_F66766f2b *obj, int a1, int a2, float v)
+void func_L00_00322AC0(List_F66766f2b *list, int color, int slot, float weight)
 {
-    Src_F66766f2b *q;
-    short n;
+    Src_F66766f2b *newItem;
+    short itemKind;
 
-    if (obj->count == 4)
+    if (list->count == 4)
         return;
-    if (a2 >= 9)
-        return;
-
-    q = func_0029EFD0(obj->src->f170);
-    if (q == 0)
+    if (slot >= 9)
         return;
 
-    n = q->f170;
-    q->f124 = obj->src->f124;
-    q->f50 = obj->src->f50;
-    q->f56 = obj->src->f56;
-    q->f44 = obj->src->f44;
-    q->f120 = obj->src->f120;
-    q->f49 = 1;
-    q->f52 = 2058;
-    q->f48 = 0;
-    q->f152 = 0;
-    if (n == 0)
-        q->f98 = 0;
-    q->f35 = a1;
+    newItem = CreateMoby(list->src->f170);
+    if (newItem == 0)
+        return;
 
-    obj->b[obj->count] = a2;
-    obj->a[obj->count] = a1;
-    obj->d[obj->count] = v;
-    obj->c[obj->count] = q;
-    obj->count = obj->count + 1;
+    itemKind = newItem->f170;
+    newItem->f124 = list->src->f124;
+    newItem->f50 = list->src->f50;
+    newItem->f56 = list->src->f56;
+    newItem->f44 = list->src->f44;
+    newItem->f120 = list->src->f120;
+    newItem->f49 = 1;
+    newItem->f52 = 2058;
+    newItem->f48 = 0;
+    newItem->f152 = 0;
+    if (itemKind == 0)
+        newItem->f98 = 0;
+    newItem->f35 = color;
+
+    list->b[list->count] = slot;
+    list->a[list->count] = color;
+    list->d[list->count] = weight;
+    list->c[list->count] = newItem;
+    list->count = list->count + 1;
 }
 
 /* func_L00_00322428 is defined in L00_00322428-g8.c. */
@@ -400,12 +407,12 @@ void func_L00_00322AC0(List_F66766f2b *obj, int a1, int a2, float v)
 /* When active field 0x14C is nonzero, iterate the slots beginning at 0x120 using count 0x148, call the bound helper for each non-null slot, clear each processed slot, and reset the active field. Original game role is unknown. */
 void func_L00_00322EC8(Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *owner)
 {
-    int index;
+    int i;
     if (owner->active_14c != 0) {
-        for (index = 0; index < owner->count_148; ++index) {
-            if (owner->slots_120[index] != 0) {
-                func_0029F338_3(owner->slots_120[index]);
-                owner->slots_120[index] = 0;
+        for (i = 0; i < owner->count_148; ++i) {
+            if (owner->slots_120[i] != 0) {
+                func_0029F338_3(owner->slots_120[i]);
+                owner->slots_120[i] = 0;
             }
         }
         owner->active_14c = 0;
@@ -418,48 +425,51 @@ void func_L00_00322EC8(Rac2Native_5b4b17178a13f443_SmallSlotReset128Owner *owner
 /* func_L00_00323958 is defined in L00_00316F60-g8.c. */
 
 /* Write a payload pointer in the first selector/key record before the list terminator */
-void func_L00_00323E48(GornRecordWrite64 *record, u32 selector,
-                            int key, void *payload)
+void func_L00_00323E48(GornRecordWrite64 *entry, u32 wantedSelector,
+                            int wantedKey, void *newPayload)
 {
-    if (record->marker != 0) {
-        u8 marker;
+    if (entry->marker != 0) {
+        u8 markerByte;
         do {
-            if (record->selector == selector && record->key == key) {
-                record->payload = payload;
+            if (entry->selector == wantedSelector && entry->key == wantedKey) {
+                entry->payload = newPayload;
                 return;
             }
-            marker = record->marker;
-            ++record;
-        } while (marker != 1);
+            markerByte = entry->marker;
+            ++entry;
+        } while (markerByte != 1);
     }
 }
 
-void func_L00_00323F28(void *a0, void *a1, float a, float b, float c) {
-    float buf[4];
-    func_002AF000(buf, a, b, c);
-    func_00282CC0(a0, buf, a1);
+/* Builds a vector from three numbers and adds another vector to it. */
+void func_L00_00323F28(void *result, void *other, float x, float y, float z) {
+    float vec[4];
+    BuildSphericalOffset(vec, x, y, z);
+    FastVecAdd(result, vec, other);
 }
 
-void func_L00_00323F70(void *input, int *out_x, int *out_y) {
-    u8 temporary[8];
+/* Turns a position into a grid cell coordinate pair. */
+void func_L00_00323F70(void *worldPos, int *outX, int *outY) {
+    u8 screenPos[8];
 
-    func_00279BD8(temporary, input);
-    *out_x = func_00283CF0(((*(f32 *)temporary) - (f32)D_001A7350) * 0.0625f);
-    *out_y = func_00283CF0(((*(f32 *)(temporary + 4)) - (f32)D_001A7354) * 0.0625f);
+    ProjectWorldPointToScreen(screenPos, worldPos);
+    *outX = FloatToInt(((*(f32 *)screenPos) - (f32)gScreenOffsetX) * 0.0625f);
+    *outY = FloatToInt(((*(f32 *)(screenPos + 4)) - (f32)gScreenOffsetY) * 0.0625f);
 }
 
 /* func_L00_00324120 (three-way state test) is a near miss:
    nonmatching/levels/func_L00_00324120.c */
-s32 func_L00_00324120(s32 a0) {
-    u8 *b = D_00189E20;
-    if (*(s32 *)(b + 0x229C) == 3 || *(s32 *)(b + 0x2294) == 0x1B) {
-        if (*(s32 *)(b + 0x588) != a0)
+/* Tells if the given id is the current selected one in the player state. */
+s32 func_L00_00324120(s32 id) {
+    u8 *state = gHeroState;
+    if (*(s32 *)(state + 0x229C) == 3 || *(s32 *)(state + 0x2294) == 0x1B) {
+        if (*(s32 *)(state + 0x588) != id)
             goto Lzero;
         return 1;
     }
-    if (*(short *)(b + 0x34E) != 0)
+    if (*(short *)(state + 0x34E) != 0)
         goto Lzero;
-    if (*(s32 *)(b + 0x33C) == a0) {
+    if (*(s32 *)(state + 0x33C) == id) {
         return 1;
     }
 Lzero:
@@ -469,68 +479,76 @@ Lzero:
 
 extern u8 *func_L00_00324D18(void *, void *, f32, f32, f32, f32, f32, int);
 
-u8 *func_L00_00324E48(void *a0, int flag, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5) {
-    u8 *b = D_00189E20;
-    float buf[4];
-    func_00282D30(buf, *(u8 **)(b + 0x2290) + 0xE0, 0.75f);
-    func_00282CC0(buf, b + 0x80, buf);
-    return func_L00_00324D18(buf, a0, f1, f2, f3, f4, f5, flag);
+/* Picks a point in front of the player and starts a helper effect there. */
+u8 *func_L00_00324E48(void *target, int flags, f32 p1, f32 p2, f32 p3, f32 p4, f32 p5) {
+    u8 *hero = gHeroState;
+    float point[4];
+    FastVecScale(point, *(u8 **)(hero + 0x2290) + 0xE0, 0.75f);
+    FastVecAdd(point, hero + 0x80, point);
+    return GetOrFindTargetMoby(point, target, p1, p2, p3, p4, p5, flags);
 }
 
 
-void func_L00_00324F18(char *a0, char *a1, float f12, float f13, float f14) {
-    *(float *)(a1 + 0) = f12;
-    *(float *)(a1 + 4) = f13;
-    *(float *)(a1 + 8) = f14;
-    func_00283098(a1, a1, a0 + 0xC0);
-    func_00282D30(a1, a1, *(float *)(a0 + 0x2C));
-    func_00282CC0(a1, a1, a0 + 0x10);
+/* Turns a local offset into a world position for an object. */
+void func_L00_00324F18(char *object, char *out, float x, float y, float z) {
+    *(float *)(out + 0) = x;
+    *(float *)(out + 4) = y;
+    *(float *)(out + 8) = z;
+    matrix_mul_vec3(out, out, object + 0xC0);
+    FastVecScale(out, out, *(float *)(object + 0x2C));
+    FastVecAdd(out, out, object + 0x10);
 }
 
+/* Passes an object's position area on to an engine routine. */
 void func_L00_003252A8(void *object, void *output, int mode)
 {
-    func_002AFFD8((char *)object + 0x10, (char *)output, mode);
+    ComputeViewDirection((char *)object + 0x10, (char *)output, mode);
 }
 
 /* func_L00_003252C8 (flag-routed handler, reads the caller's a1) is a near miss:
    nonmatching/levels/func_L00_003252C8.c */
 /* func_L00_003252C8 is matched in L00_003252C8.c (built with -mno-split-addresses). */
 
-void func_L00_00325300(u8 *a0)
+/* Calls the flag-routed handler on an object's inner data. */
+void func_L00_00325300(u8 *object)
 {
-    func_L00_003252C8_1(a0 + 0x10);
+    func_L00_003252C8_1(object + 0x10);
 }
 
-void func_L00_003253A0(u8 *a0, float *first, float *second, float amount)
+/* Mixes two things on an object's inner data by a given amount. */
+void func_L00_003253A0(u8 *object, float *first, float *second, float amount)
 {
-    func_002B00D8(a0 + 0x10, first, second, amount);
+    OffsetPositionAlongGravity(object + 0x10, first, second, amount);
 }
 
 
-void func_L00_00325600(void *a0, void *a1, void *a2) {
-    int buf[4];
-    func_00282D30(buf, a1, -1.0f);
-    func_002B0408(a0, buf, a2);
+/* Flips a vector around and passes it on with another one. */
+void func_L00_00325600(void *dest, void *vec, void *other) {
+    int negated[4];
+    FastVecScale(negated, vec, -1.0f);
+    AlignRotationToDirection(dest, negated, other);
 }
 
 
 
 
 /* stores a wrapped angle back into the caller field and forwards its [0,1] rescaled value (x*0.5+0.5) with two pointer arguments to a second callee */
-int func_L00_00325FC8(f32 *a0, s32 a1, s32 a2, f32 a3) {
-    f32 v = func_00283198_4(a0[0]);
-    f32 s = v * 0.5f + 0.5f;
-    a0[0] = func_00283B98_4(a0[0], a3);
-    func_00283D38_2(a1, a2, s);
+int func_L00_00325FC8(f32 *angle, s32 argA, s32 argB, f32 delta) {
+    f32 sineValue = func_00283198_4(angle[0]);
+    f32 ratio = sineValue * 0.5f + 0.5f;
+    angle[0] = func_00283B98_4(angle[0], delta);
+    func_00283D38_2(argA, argB, ratio);
 }
 
-void func_L00_00326048(char *a0, f32 *a1, s32 a2, s32 a3, f32 f) {
-    *(int *)(a0 + 0x78) = func_L00_00325FC8(a1, a2, a3, f);
+/* Updates an angle and stores the result in an object. */
+void func_L00_00326048(char *object, f32 *angle, s32 argA, s32 argB, f32 delta) {
+    *(int *)(object + 0x78) = UpdateAngleAndBlend(angle, argA, argB, delta);
 }
 
 
 
 
+/* Calls the engine routine that resets effects. */
 void func_L00_00326200(void)
 {
     func_0029CC50();
@@ -542,24 +560,25 @@ void func_L00_00326200(void)
 
 /* func_L00_003266D8 is built in its own unit. */
 
-int func_L00_00326950(int a0) {
-    unsigned char *base;
+/* Adds to a counter if enough room is left, and tells if it worked. */
+int func_L00_00326950(int amount) {
+    unsigned char *counters;
 
-    if (func_L00_003269F0() < a0)
+    if (func_L00_003269F0() < amount)
         return 0;
-    base = D_001395B8;
-    base[0x90] = base[0x90] + a0;
+    counters = D_001395B8;
+    counters[0x90] = counters[0x90] + amount;
     return 1;
 }
 
 /* One fixed ordinary scalar source hypothesis. Byte offset and mask are
    measured; no original object/class/field name or allocation claim. The
    observed callers pass scalar one and ignore the result. */
-void func_L00_003294F0(unsigned char *entity, int enabled) {
-    if (enabled)
-        entity[0xBE] |= 4;
+void func_L00_003294F0(unsigned char *object, int enable) {
+    if (enable)
+        object[0xBE] |= 4;
     else
-        entity[0xBE] &= 0xFB;
+        object[0xBE] &= 0xFB;
 }
 
 /* func_L00_00329520 is in L00_00329520.c. */
@@ -571,16 +590,17 @@ void func_L00_003294F0(unsigned char *entity, int enabled) {
 
 
 
+/* Clears every entry in a big table of slots so each one is empty. */
 void func_L00_0032A0E8(void) {
-    u8 *current = &D_L00_00268E20;
-    u8 *end = current + 0x14860;
+    u8 *slot = &D_L00_00268E20;
+    u8 *limit = slot + 0x14860;
 
     D_L00_001A902C = 0;
     do {
-        *(s32 *)(current + 4) = -1;
-        *(s32 *)current = 0;
-        current += 0xA430;
-    } while ((s32)current < (s32)end);
+        *(s32 *)(slot + 4) = -1;
+        *(s32 *)slot = 0;
+        slot += 0xA430;
+    } while ((s32)slot < (s32)limit);
 }
 
 /* func_L00_0032A1A8 is matched in L00_0032A1A8.c (built with -frac2-qcopy). */

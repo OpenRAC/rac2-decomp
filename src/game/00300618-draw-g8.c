@@ -126,17 +126,17 @@ void func_00300AA8(char *object, float x, float y, int flags, float frame, float
             ref_00300AA8_00=queued+1;
         }
     }
-    func_00300910();
-    func_00282D30(transform+12,transform+12,166.66600036621094f);
+    BeginPacketChain();
+    FastVecScale(transform+12,transform+12,166.66600036621094f);
     nativeProjection[0]=ref_00300AA8_03.scale[0]/ref_00300AA8_03.size[0];
     ref_00300AA8_02[9]=-(ref_00300AA8_03.scale[1]/ref_00300AA8_03.size[1]);
     if (D_001A7BB1) ref_00300AA8_02[9]*=0.7500000596046448f;
-    func_00283788(matrix,nativeProjection,transform);
-    matrix[12]+=(float)D_001A7350[0]+x*16.0f;
-    matrix[13]+=(float)D_001A7350[1]+y*16.0f;
+    multiply_matrix(matrix,nativeProjection,transform);
+    matrix[12]+=(float)gScreenOffsetX[0]+x*16.0f;
+    matrix[13]+=(float)gScreenOffsetX[1]+y*16.0f;
     /* PS2 scratchpad identity matrix and expanded skinning records. */
-    func_00283388((float *)0x70001fc0);
-    if (header->frameCount) func_00300748((NativeSpawnHeader *)header,(char *)0x70002000,frame);
+    set_identity_matrix((float *)0x70001fc0);
+    if (header->frameCount) BuildBonePoseFromFrames((NativeSpawnHeader *)header,(char *)0x70002000,frame);
     if (!header->packed) func_0029D258(header->vertices,matrix,header->vertexCount,flags);
     else func_0029D398(header->vertices,matrix,header->vertexCount,header->tint,flags);
     scratch=(ScratchVertex *)0x70000000;
@@ -149,14 +149,14 @@ void func_00300AA8(char *object, float x, float y, int flags, float frame, float
             --quadIndex;
         } else {
             nativeQueue[0]=0x10000008;
-            D_001B22A8[1]=0;
-            D_001B22A8[2]=0;
-            D_001B22A8[3]=0x50000008;
-            tagPacket=D_001B22A8+4;
-            D_001B22A8=tagPacket;
+            gDmaPacketCursor[1]=0;
+            gDmaPacketCursor[2]=0;
+            gDmaPacketCursor[3]=0x50000008;
+            tagPacket=gDmaPacketCursor+4;
+            gDmaPacketCursor=tagPacket;
             qcopy((void *)tagPacket,&ref_00300AA8_06);
             packet=tagPacket+4;
-            D_001B22A8=packet;
+            gDmaPacketCursor=packet;
             payload=(volatile NativeCompactU64 *)packet;
             payload[0]=command;
             payload[1]=0x5c;
@@ -172,7 +172,7 @@ void func_00300AA8(char *object, float x, float y, int flags, float frame, float
             vertex=quad[2];
             source=&scratch[vertex].color;
             payload[11]=*source++; payload[12]=source[0]; payload[13]=source[1];
-            D_001B22A8+=0x1c;
+            gDmaPacketCursor+=0x1c;
         }
     }
 }

@@ -61,6 +61,7 @@ extern int func_002B3868(unsigned char *);
 extern float func_002AA548(float *,float *,float,float,float,float);
 typedef struct { float x,y,a,b; float pad[4]; } Spark;
 extern Spark D_L00_00232AC0[];
+/* Runs the five-step cycle that makes the object rise, hold, fall and rest, then redraws it. */
 void func_L00_00385370(unsigned char *object)
 {
     char *work=FIELD(char *,object,0x68);
@@ -72,39 +73,39 @@ void func_L00_00385370(unsigned char *object)
         FIELD(int,work,4)=0;
         FIELD(float,work,0x14)=(FIELD(float,work,0x18)+FIELD(float,work,0x18))/(float)ticks;
         FIELD(float,work,0)=FIELD(float,work,0x18)*4/(float)(ticks*ticks);
-        func_00303210(object);
+        BuildSurfaceControlGrid(object);
         FIELD(float,work,0x30)=1/FIELD(float,work,0x30);
         FIELD(int,work,0x8C)=FIELD(int,work,0x84);FIELD(int,work,0x98)=-1;
         if(!FIELD(int,work,0x40)) {
             object[0x30]=255;
             for(i=0;i<64;++i) {
-                D_L00_00232AC0[i].a=func_002A7878(0.5f,2);
-                D_L00_00232AC0[i].b=func_002A7878(0.002f,0.006f);
+                D_L00_00232AC0[i].a=RandomFloatRange(0.5f,2);
+                D_L00_00232AC0[i].b=RandomFloatRange(0.002f,0.006f);
             }
         }
-        func_002A7750(object,1,-1);return;
+        SetMobyState(object,1,-1);return;
     case 1:
-        if(func_002B3868(object)){FIELD(int,work,8)=0;FIELD(int,work,0x20)=FIELD(int,work,0x1C);}
-        if(func_00282948((int *)(work+0x20)))func_002A7750(object,2,-1);
-        func_002AA548((float *)(work+4),(float *)(work+8),FIELD(float,work,0x18),FIELD(float,work,0),FIELD(float,work,0),FIELD(float,work,0x14));
+        if(SetFirstPendingFlag(object)){FIELD(int,work,8)=0;FIELD(int,work,0x20)=FIELD(int,work,0x1C);}
+        if(FastFloatHelperD((int *)(work+0x20)))SetMobyState(object,2,-1);
+        StepValueTowardTarget((float *)(work+4),(float *)(work+8),FIELD(float,work,0x18),FIELD(float,work,0),FIELD(float,work,0),FIELD(float,work,0x14));
         break;
     case 2:
-        if(func_002B3868(object)){FIELD(int,work,0x20)=FIELD(int,work,12);FIELD(float,work,4)=FIELD(float,work,0x18);}
-        if(func_00282948((int *)(work+0x20)))func_002A7750(object,3,-1);
+        if(SetFirstPendingFlag(object)){FIELD(int,work,0x20)=FIELD(int,work,12);FIELD(float,work,4)=FIELD(float,work,0x18);}
+        if(FastFloatHelperD((int *)(work+0x20)))SetMobyState(object,3,-1);
         break;
     case 3:
-        if(func_002B3868(object)){FIELD(int,work,8)=0;FIELD(int,work,0x20)=FIELD(int,work,0x1C);}
-        if(func_00282948((int *)(work+0x20)))func_002A7750(object,4,-1);
-        func_002AA548((float *)(work+4),(float *)(work+8),0,FIELD(float,work,0),FIELD(float,work,0),FIELD(float,work,0x14));
+        if(SetFirstPendingFlag(object)){FIELD(int,work,8)=0;FIELD(int,work,0x20)=FIELD(int,work,0x1C);}
+        if(FastFloatHelperD((int *)(work+0x20)))SetMobyState(object,4,-1);
+        StepValueTowardTarget((float *)(work+4),(float *)(work+8),0,FIELD(float,work,0),FIELD(float,work,0),FIELD(float,work,0x14));
         break;
     case 4:
-        if(func_002B3868(object)){FIELD(int,work,4)=0;FIELD(int,work,0x20)=FIELD(int,work,16);}
-        if(func_00282948((int *)(work+0x20)))func_002A7750(object,1,-1);
+        if(SetFirstPendingFlag(object)){FIELD(int,work,4)=0;FIELD(int,work,0x20)=FIELD(int,work,16);}
+        if(FastFloatHelperD((int *)(work+0x20)))SetMobyState(object,1,-1);
         break;
     case 5:break;
     default:break;
     }
-    if(!FIELD(int,work,0x40))func_00303BF8(object);
-    func_00303AC8(object);func_00302DA0(object);func_00304128(object);
-    func_L00_002E6DB8(func_00303070,object);
+    if(!FIELD(int,work,0x40))UpdateSurfaceWaveTables(object);
+    UpdateSurfaceHeights(object);UpdateSurfaceGridMoby(object);SpawnSurfaceEffect(object);
+    AddDrawCallbackToList2(DrawSurfaceGrid,object);
 }

@@ -36,7 +36,7 @@ void func_L00_002B8930(void)
         turn = PLAYER.x * 9.0f;
         if (turn > 0.7f) turn = 0.7f;
         else if (turn < -0.7f) turn = -0.7f;
-        turn = turn * func_00282C48(turn) * 1.25f;
+        turn = turn * FloatAbs(turn) * 1.25f;
         weight = PLAYER.weight * 19.999998f;
         negative = -turn;
         scaled = negative * 0.2f;
@@ -47,7 +47,7 @@ void func_L00_002B8930(void)
         ((MotionPose *)D_L00_0025BE10)->f1240 = scaled * weight;
         ((MotionPose *)D_L00_0025BE10)->f10E0 = negative * 0.35f;
         ((MotionPose *)D_L00_0025BE10)->f1198 = turn * 1.35f;
-        ((MotionPose *)D_L00_0025BE10)->f1194 = func_00282C48(turn) * 0.25f;
+        ((MotionPose *)D_L00_0025BE10)->f1194 = FloatAbs(turn) * 0.25f;
     } else if (PLAYER.mode == 75) {
         float turn, a, b, d, c;
         turn = PLAYER.y * 1.6f;
@@ -62,7 +62,7 @@ void func_L00_002B8930(void)
         ((MotionPose *)D_L00_0025BE10)->f10E8 = turn * 0.58f;
         if (b > 0.7f) ((MotionPose *)D_L00_0025BE10)->f1198 = 0.7f;
         else if (b < -0.7f) ((MotionPose *)D_L00_0025BE10)->f1198 = -0.7f;
-        d = func_00282C48(turn) * 0.2f;
+        d = FloatAbs(turn) * 0.2f;
         ((MotionPose *)D_L00_0025BE10)->f1194 = d;
         c = 0.2f;
         if (c < d) goto store_clamp;
@@ -71,7 +71,7 @@ void func_L00_002B8930(void)
         store_clamp:
             ((MotionPose *)D_L00_0025BE10)->f1194 = c;
         }
-        ((MotionPose *)D_L00_0025BE10)->f1190 = func_00282C48(turn) * 0.16f;
+        ((MotionPose *)D_L00_0025BE10)->f1190 = FloatAbs(turn) * 0.16f;
     } else if (PLAYER.submode == 2 || PLAYER.submode == 4) {
         float turn;
         turn = PLAYER.y;

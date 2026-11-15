@@ -33,98 +33,99 @@ extern int func_001157AC(char *);
 extern void func_0028FC48(int, int, int, int, u64, int);
 extern void func_0027F120(void), func_0027F110(void);
 
+/* Draws the item details page: its name, description, four stat bars and the previous and next buttons. */
 int func_002CDD88(void)
 {
     char text[64];
-    int inactive, color, width, center, count;
-    char *format, *count_format;
+    int dimColor, buttonColor, barWidth, centerX, count;
+    char *lineFormat, *countFormat;
     int active = 1;
     float alpha, zero = 0.0f;
 
-    inactive = func_002A9588(0x60442D00, 0x80FFDE8D, 25, 0, 0);
-    func_0027C540(0);
-    func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xAE), 0x60442D00, (float)(D_001A7340 / 2), (float)D_001AB9BC, 1.0f, D_001B23A8, zero);
-    func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xAF), 0x60241700, (float)(D_001A7340 / 2), (float)D_001AB9BC, 1.0f, D_001B23A8, zero);
-    func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xB0), 0x55F0C070, (float)(D_001A7340 / 2), (float)D_001AB9BC, 1.0f, D_001B23A8, zero);
-    func_00300A00(func_00336D50(D_001A8CFC + 0x8710, 0xB1), 0x55F0C070, (float)(D_001A7340 / 2), (float)D_001AB9BC, 1.0f, D_001B23A8, zero);
-    func_0027F5B8(31, 62, 0x80F0F0F0ULL, func_00288FB8(0x31F3), -1);
-    func_0027F5B8(31, 92, 0x80F0F0F0ULL, func_00288FB8(0x31F4), -1);
-    func_0027F5B8(31, 122, 0x80F0F0F0ULL, func_00288FB8(0x31F2), -1);
-    func_0027F5B8(31, 152, 0x80F0F0F0ULL, func_00288FB8(0x31F5), -1);
+    dimColor = PingPongBlendValues(0x60442D00, 0x80FFDE8D, 25, 0, 0);
+    SetupGifPaging(0);
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC + 0x8710, 0xAE), 0x60442D00, (float)(gScreenWidth / 2), (float)D_001AB9BC, 1.0f, D_001B23A8, zero);
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC + 0x8710, 0xAF), 0x60241700, (float)(gScreenWidth / 2), (float)D_001AB9BC, 1.0f, D_001B23A8, zero);
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC + 0x8710, 0xB0), 0x55F0C070, (float)(gScreenWidth / 2), (float)D_001AB9BC, 1.0f, D_001B23A8, zero);
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC + 0x8710, 0xB1), 0x55F0C070, (float)(gScreenWidth / 2), (float)D_001AB9BC, 1.0f, D_001B23A8, zero);
+    DrawTextMediumFont(31, 62, 0x80F0F0F0ULL, GetLocalizedString(0x31F3), -1);
+    DrawTextMediumFont(31, 92, 0x80F0F0F0ULL, GetLocalizedString(0x31F4), -1);
+    DrawTextMediumFont(31, 122, 0x80F0F0F0ULL, GetLocalizedString(0x31F2), -1);
+    DrawTextMediumFont(31, 152, 0x80F0F0F0ULL, GetLocalizedString(0x31F5), -1);
 
-    format = D_001AB9C0;
-    func_00115DA8(text, format, func_00288FB8(0x31F6));
-    count = func_001157AC(text);
-    func_0027F5B8(31, 184, 0x80F0F0F0ULL, text, count);
-    func_00115DA8(text, format, func_00288FB8(0x31F7));
-    count = func_001157AC(text);
-    func_0027F5B8(31, 201, 0x80F0F0F0ULL, text, count);
-    func_0027F5B8(429, 373, 0x80F0F0F0ULL, func_00288FB8(0x2F42), -1);
-    func_0027FAA8(154, 26, 0x80F0F0F0ULL, func_00288FB8(0x31C6), -1);
+    lineFormat = D_001AB9C0;
+    Sprintf(text, lineFormat, GetLocalizedString(0x31F6));
+    count = strlen_001157AC(text);
+    DrawTextMediumFont(31, 184, 0x80F0F0F0ULL, text, count);
+    Sprintf(text, lineFormat, GetLocalizedString(0x31F7));
+    count = strlen_001157AC(text);
+    DrawTextMediumFont(31, 201, 0x80F0F0F0ULL, text, count);
+    DrawTextMediumFont(429, 373, 0x80F0F0F0ULL, GetLocalizedString(0x2F42), -1);
+    DrawTextCenteredSmallFont(154, 26, 0x80F0F0F0ULL, GetLocalizedString(0x31C6), -1);
 
     if (D_00188510[D_001AB9B0][0] != 0 || D_00188510[D_001AB9B0][1] != 0) {
-        width = (int)((float)D_00264630[D_001AB9B0].stats[0] * 2.44f);
-        if (width > 244)
-            width = 244;
-        func_0028FC48(31, 78, width + 31, 88, 0x55F0C070ULL, 0);
-        width = (int)((float)D_00264630[D_001AB9B0].stats[1] * 2.44f);
-        if (width > 244)
-            width = 244;
-        func_0028FC48(31, 108, width + 31, 118, 0x55F0C070ULL, 0);
-        width = (int)((float)D_00264630[D_001AB9B0].stats[2] * 2.44f);
-        if (width > 244)
-            width = 244;
-        func_0028FC48(31, 139, width + 31, 150, 0x55F0C070ULL, 0);
-        width = (int)((float)D_00264630[D_001AB9B0].stats[3] * 2.44f);
-        if (width > 244)
-            width = 244;
-        func_0028FC48(31, 169, width + 31, 180, 0x55F0C070ULL, 0);
+        barWidth = (int)((float)D_00264630[D_001AB9B0].stats[0] * 2.44f);
+        if (barWidth > 244)
+            barWidth = 244;
+        AppendScreenRectPacket(31, 78, barWidth + 31, 88, 0x55F0C070ULL, 0);
+        barWidth = (int)((float)D_00264630[D_001AB9B0].stats[1] * 2.44f);
+        if (barWidth > 244)
+            barWidth = 244;
+        AppendScreenRectPacket(31, 108, barWidth + 31, 118, 0x55F0C070ULL, 0);
+        barWidth = (int)((float)D_00264630[D_001AB9B0].stats[2] * 2.44f);
+        if (barWidth > 244)
+            barWidth = 244;
+        AppendScreenRectPacket(31, 139, barWidth + 31, 150, 0x55F0C070ULL, 0);
+        barWidth = (int)((float)D_00264630[D_001AB9B0].stats[3] * 2.44f);
+        if (barWidth > 244)
+            barWidth = 244;
+        AppendScreenRectPacket(31, 169, barWidth + 31, 180, 0x55F0C070ULL, 0);
         if (D_001AB9B0 < D_001AB9B8) {
-            color = (D_00138340 & 0x2000) ? 0x80F0F0F0 : inactive;
+            buttonColor = (D_00138340 & 0x2000) ? 0x80F0F0F0 : dimColor;
             {
-                char *sprite = func_00336D50(D_001A8CFC + 0x8710, 0x4A);
+                char *sprite = FindTableEntryById(D_001A8CFC + 0x8710, 0x4A);
                 {
                     float factor = 0.8f;
                     alpha = D_001B23A8 * factor;
                 }
                 if (D_001B23A0 == active)
                     alpha += -0.05f;
-                func_00300A00(sprite, color, 316.0f, 278.0f, 1.0f, alpha, zero);
+                DrawScaledObjectTwoAxes(sprite, buttonColor, 316.0f, 278.0f, 1.0f, alpha, zero);
             }
-            func_0027F5B8(432, 276, 0x80F0F0F0ULL, func_00288FB8(0x2F41), -1);
+            DrawTextMediumFont(432, 276, 0x80F0F0F0ULL, GetLocalizedString(0x2F41), -1);
         }
         if (D_001AB9B0 >= 2) {
-            color = (D_00138340 & 0x8000) ? 0x80F0F0F0 : inactive;
+            buttonColor = (D_00138340 & 0x8000) ? 0x80F0F0F0 : dimColor;
             {
-                char *sprite = func_00336D50(D_001A8CFC + 0x8710, 0x4B);
+                char *sprite = FindTableEntryById(D_001A8CFC + 0x8710, 0x4B);
                 {
                     float factor = 0.8f;
                     alpha = D_001B23A8 * factor;
                 }
                 if (D_001B23A0 == 1)
                     alpha += -0.05f;
-                func_00300A00(sprite, color, 207.0f, 278.0f, 1.0f, alpha, zero);
+                DrawScaledObjectTwoAxes(sprite, buttonColor, 207.0f, 278.0f, 1.0f, alpha, zero);
             }
-            func_0027F5B8(55, 276, 0x80F0F0F0ULL, func_00288FB8(0x2F40), -1);
+            DrawTextMediumFont(55, 276, 0x80F0F0F0ULL, GetLocalizedString(0x2F40), -1);
         }
-        func_0027F120();
-        center = D_001A7340 / 2;
-        func_0027FB40(center, 276, 0x80F0F0F0ULL, func_00288FB8(D_00264630[D_001AB9B0].name), -1);
-        func_0027F110();
-        func_0027F5B8(156, 185, 0x80F0F0F0ULL, func_00288FB8(D_00264630[D_001AB9B0].description), -1);
+        DisableScreenFlag();
+        centerX = gScreenWidth / 2;
+        DrawTextCenteredMediumFont(centerX, 276, 0x80F0F0F0ULL, GetLocalizedString(D_00264630[D_001AB9B0].name), -1);
+        EnableScreenFlag();
+        DrawTextMediumFont(156, 185, 0x80F0F0F0ULL, GetLocalizedString(D_00264630[D_001AB9B0].description), -1);
         if (D_00264630[D_001AB9B0].detail == -1) {
-            func_00115DA8(text, D_001AB9C8);
-            count = func_001157AC(text);
-            func_0027F5B8(156, 202, 0x80F0F0F0ULL, text, count);
+            Sprintf(text, D_001AB9C8);
+            count = strlen_001157AC(text);
+            DrawTextMediumFont(156, 202, 0x80F0F0F0ULL, text, count);
         } else {
-            func_0027F5B8(156, 202, 0x80F0F0F0ULL, func_00288FB8(D_00264630[D_001AB9B0].detail), -1);
+            DrawTextMediumFont(156, 202, 0x80F0F0F0ULL, GetLocalizedString(D_00264630[D_001AB9B0].detail), -1);
         }
         count = D_00188510[D_001AB9B0][0];
-        count_format = D_001AB9D8;
-        func_00115DA8(text, count_format, count, func_00288FB8(0x2F61));
-        count = func_001157AC(text);
-        func_0027FB40(152, 228, 0x80F0F0F0ULL, text, count);
+        countFormat = D_001AB9D8;
+        Sprintf(text, countFormat, count, GetLocalizedString(0x2F61));
+        count = strlen_001157AC(text);
+        DrawTextCenteredMediumFont(152, 228, 0x80F0F0F0ULL, text, count);
     }
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }

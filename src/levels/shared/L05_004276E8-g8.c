@@ -46,12 +46,12 @@ void func_L05_004276E8(char *object, char *state, float *pos)
         p.scale = D_L05_001B1538;
     p.one = 1;
     qcopy(&p.pos, state);
-    func_00282F20(&p, &p, 1.0f);
+    vec_scale_to_length(&p, &p, 1.0f);
     p.pos.f[3] = 5627.925f;
     p.type = 3;
     p.subtype = 2;
     p.id = *(unsigned short *)(object + 0xAA);
-    func_00277F48(pos, *(int *)(state + 0x24) ? D_L05_001B1534 : D_L05_001B1530,
+    ProcessCollisionHit(pos, *(int *)(state + 0x24) ? D_L05_001B1534 : D_L05_001B1530,
                   1, *(char **)(state + 0x20), &p);
     if (D_L05_001BFB18 && *(short *)(D_L05_001BFB18 + 0xAA) == 0x956) {
         count = 20.0f;
@@ -59,19 +59,19 @@ void func_L05_004276E8(char *object, char *state, float *pos)
         spread = 2.0f;
         qcopy(&origin, object + 0x10);
         for (i = 0; (float)i < count; i++) {
-            pos[0] = origin.f[0] + func_002A78D8(0.0f, spread);
-            pos[1] = origin.f[1] + func_002A78D8(0.0f, spread);
-            pos[2] = origin.f[2] + func_002A78D8(0.0f, spread);
-            a = func_002A7940();
-            b = func_002A7940();
-            func_002AF000(&direction, 0.050000004f, a, b);
-            spin = func_002A7820(-3, 3);
-            particle = func_002BDCE8(pos, 0.0f, 1.0f, 1.0f, speed * 210000.0f, spin,
+            pos[0] = origin.f[0] + RandomSignedFloatRange(0.0f, spread);
+            pos[1] = origin.f[1] + RandomSignedFloatRange(0.0f, spread);
+            pos[2] = origin.f[2] + RandomSignedFloatRange(0.0f, spread);
+            a = RandomAngle();
+            b = RandomAngle();
+            BuildSphericalOffset(&direction, 0.050000004f, a, b);
+            spin = RandomIntRange(-3, 3);
+            particle = SpawnSpinningSparkParticle(pos, 0.0f, 1.0f, 1.0f, speed * 210000.0f, spin,
                                      &direction, 0x7fffffff, 0);
             if (particle) {
                 *(short *)(particle + 0xA) = 120;
                 data = particle + 0x20;
-                particle[8] = func_002A77E0(255);
+                particle[8] = RandomIntBelow(255);
                 particle[3] = 0x44;
                 *(int *)(data + 4) = 2;
                 data[0xA] = 127;

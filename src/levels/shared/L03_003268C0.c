@@ -14,6 +14,7 @@ extern int func_002A77E0(int);
 extern int func_002A99A0(void *, int, void *, int, float);
 extern void func_L02_0032B468(void *, int, void *, void *, int, int, void *, void *, void *, float);
 
+/* Launches a burst of small effect objects from an object, some at set places and some at random nearby points. */
 void func_L03_003268C0(unsigned char *object, int first, int count, int randomFirst,
                         int randomCount, int limit, int alternate, void *offset) {
     L03EffectVector velocity;
@@ -24,25 +25,25 @@ void func_L03_003268C0(unsigned char *object, int first, int count, int randomFi
     int i, found;
     if (first > 0 && count > 0) {
         for (i = 0; i < count; i++) {
-            func_002A7A00(&velocity, range.x, range.y);
-            velocity.z = func_00282C48(velocity.z) * 1.5f;
-            func_00282CC0(&velocity, &velocity, offset);
-            func_L02_0032B468(object, first + i, object + 0x10, object + 0xF0,
+            RandomDirectionVector(&velocity, range.x, range.y);
+            velocity.z = FloatAbs(velocity.z) * 1.5f;
+            FastVecAdd(&velocity, &velocity, offset);
+            SpawnFlyingFragment(object, first + i, object + 0x10, object + 0xF0,
                             0, flags, &velocity, D_L03_001A8F20, D_L03_001A8F20, 0.0f);
         }
     }
     if (randomFirst > 0 && randomCount > 0) {
-        found = func_002A99A0(object, limit, points, 0xFFFF, 1000.0f);
+        found = ScatterPointsInCollisionShapes(object, limit, points, 0xFFFF, 1000.0f);
         if (found) {
             for (i = 0; i < limit && i < found; i++) {
-                func_002A7A00(&velocity, range.x, range.y);
-                velocity.z = func_00282C48(velocity.z) * 1.5f;
-                func_00282CC0(&velocity, &velocity, offset);
-                func_00282C88(&rotation);
-                rotation.x = func_002A7940();
-                rotation.y = func_002A7940();
-                rotation.z = func_002A7940();
-                func_L02_0032B468(object, randomFirst + func_002A77E0(randomCount),
+                RandomDirectionVector(&velocity, range.x, range.y);
+                velocity.z = FloatAbs(velocity.z) * 1.5f;
+                FastVecAdd(&velocity, &velocity, offset);
+                ClearVector128(&rotation);
+                rotation.x = RandomAngle();
+                rotation.y = RandomAngle();
+                rotation.z = RandomAngle();
+                SpawnFlyingFragment(object, randomFirst + RandomIntBelow(randomCount),
                                 &points[i], &rotation, 0, flags, &velocity,
                                 D_L03_001A8F20, D_L03_001A8F20, 0.0f);
             }

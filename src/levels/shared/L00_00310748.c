@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int Q128 __attribute__((mode(TI)));
 
 typedef struct {
@@ -29,22 +30,23 @@ extern void func_00282CF0(void *, void *, void *);
 extern void func_002830C0(void *, void *, void *);
 extern void func_00282D30(void *, void *, float);
 
+/* Transforms a point into the object's space and stores it, scaled, in the given table entry. */
 void func_L00_00310748(Obj_310748 *self, int idx, void *p, float x, float y)
 {
-    float m[16];
-    float v[4];
-    char *h = (char *)self->hdr;
-    float k;
+    float matrix[16];
+    float vec[4];
+    char *cursor = (char *)self->hdr;
+    float scale;
 
-    if (idx < (((Hdr_310748 *)h)->count >> 5)) {
-        k = 1024.0f / self->f2C;
-        h += idx * 32 + 0x10;
-        func_00283698(m, self->mC0);
-        func_00282CF0(v, p, self->v10);
-        func_002830C0(v, v, m);
-        func_00282D30(v, v, k);
-        *(Q128 *)((Ent_310748 *)h)->v10 = *(Q128 *)v;
-        ((Ent_310748 *)h)->f4 = y * k;
-        ((Ent_310748 *)h)->v10[3] = x * k;
+    if (idx < (((Hdr_310748 *)cursor)->count >> 5)) {
+        scale = 1024.0f / self->f2C;
+        cursor += idx * 32 + 0x10;
+        matrix_from_basis_rows(matrix, self->mC0);
+        FastVecSub(vec, p, self->v10);
+        transform_vector(vec, vec, matrix);
+        FastVecScale(vec, vec, scale);
+        *(Q128 *)((Ent_310748 *)cursor)->v10 = *(Q128 *)vec;
+        ((Ent_310748 *)cursor)->f4 = y * scale;
+        ((Ent_310748 *)cursor)->v10[3] = x * scale;
     }
 }

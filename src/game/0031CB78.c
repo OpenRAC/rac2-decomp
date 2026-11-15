@@ -17,6 +17,7 @@ extern void func_00282F20(void *dst, void *src, float scale);
 extern void func_00282D30(void *dst, void *src, float scale);
 extern void func_00280B90(void *dst, void *src, int flag);
 
+/* Draws a two-layer glowing flare at a position, turned to face the camera. The second layer is half the size of the first. */
 void func_0031CB78(char *unused, char *pos, int color, int first, int second, float scale)
 {
     char pkt[144];
@@ -26,7 +27,7 @@ void func_0031CB78(char *unused, char *pos, int color, int first, int second, fl
     long long r;
     float dx, dy;
 
-    func_0031C8E0(pkt);
+    InitLargeQuadPacket(pkt);
     *(int *)(pkt + 80) = 0;
     *(float *)(pkt + 92) = 1.0f;
     *(float *)(pkt + 96) = 1.0f;
@@ -40,36 +41,36 @@ void func_0031CB78(char *unused, char *pos, int color, int first, int second, fl
     *(long long *)(pkt + 120) = r;
     *(long long *)(pkt + 128) = 0xFF9000000260LL;
     *(long long *)(pkt + 136) = 0x8000000048LL;
-    dx = D_001B5200.pos[0] - *(float *)pos;
-    dy = D_001B5200.pos[1] - *(float *)(pos + 4);
+    dx = gActiveCamera.pos[0] - *(float *)pos;
+    dy = gActiveCamera.pos[1] - *(float *)(pos + 4);
     *(int *)(pkt + 76) = color + first;
     *(int *)(pkt + 72) = color + first;
     *(int *)(pkt + 68) = color + first;
     *(int *)(pkt + 64) = color + first;
     quat[3] = 0;
-    quat[2] = func_00283248(dx, dy);
-    quat[1] = -func_00283248(func_00282E80(pos, &D_001B5200.pos[0]),
-                              D_001B5200.pos[2] - *(float *)(pos + 8));
-    quat[0] = func_002A7940();
-    func_00283410(m, quat);
-    func_00282CF0(off, &D_001B5200.pos[0], pos);
-    func_00282F20(off, off, 0.5f);
+    quat[2] = FastMatrixHelperA(dx, dy);
+    quat[1] = -FastMatrixHelperA(vec_distance_xy(pos, &gActiveCamera.pos[0]),
+                              gActiveCamera.pos[2] - *(float *)(pos + 8));
+    quat[0] = RandomAngle();
+    euler_to_matrix(m, quat);
+    FastVecSub(off, &gActiveCamera.pos[0], pos);
+    vec_scale_to_length(off, off, 0.5f);
     m[12] = *(float *)(pos) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
     m[14] = *(float *)(pos + 8) + off[2];
     m[15] = 1.0f;
-    func_00282D30(pkt, pkt, scale);
-    func_00282D30(pkt + 16, pkt + 16, scale);
-    func_00282D30(pkt + 32, pkt + 32, scale);
-    func_00282D30(pkt + 48, pkt + 48, scale);
-    func_00280B90(pkt, m, 0);
+    FastVecScale(pkt, pkt, scale);
+    FastVecScale(pkt + 16, pkt + 16, scale);
+    FastVecScale(pkt + 32, pkt + 32, scale);
+    FastVecScale(pkt + 48, pkt + 48, scale);
+    draw_world_quad(pkt, m, 0);
     *(int *)(pkt + 76) = color + second;
     *(int *)(pkt + 72) = color + second;
     *(int *)(pkt + 68) = color + second;
     *(int *)(pkt + 64) = color + second;
-    func_00282D30(pkt, pkt, 0.5f);
-    func_00282D30(pkt + 16, pkt + 16, 0.5f);
-    func_00282D30(pkt + 32, pkt + 32, 0.5f);
-    func_00282D30(pkt + 48, pkt + 48, 0.5f);
-    func_00280B90(pkt, m, 0);
+    FastVecScale(pkt, pkt, 0.5f);
+    FastVecScale(pkt + 16, pkt + 16, 0.5f);
+    FastVecScale(pkt + 32, pkt + 32, 0.5f);
+    FastVecScale(pkt + 48, pkt + 48, 0.5f);
+    draw_world_quad(pkt, m, 0);
 }

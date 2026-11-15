@@ -42,6 +42,7 @@ extern void func_L16_0040C5F0(u8 *);
 extern float func_L02_002F21C0(void *,void *);
 extern int func_00288E18(int,int);
 extern void func_002E59F8(s32);
+/* Updates a launch pad (moby class 3845): it picks up the player, flings them toward a target, fades, and plays its looping sound. */
 void func_L16_0040BED0(u8 *object)
 {
     float difference[4],value,distance,rate,multiplier;
@@ -55,61 +56,61 @@ void func_L16_0040BED0(u8 *object)
         if (level_gp==16) D_L16_001A7CDC[0]=D_L16_001B15B8;
         if (state->targetIndex!=-1) {
             target=(u8 *)((state->targetIndex<<7)+(u32)D_L16_001B2C0C);
-            F(object,0xF8)=func_00283248(F(object,0x10)-F(target,0x30),F(object,0x14)-F(target,0x34));
+            F(object,0xF8)=FastMatrixHelperA(F(object,0x10)-F(target,0x30),F(object,0x14)-F(target,0x34));
         } else {
-            if (state->objectIndex==-1) { func_0029F338(object); return; }
+            if (state->objectIndex==-1) { MarkMobySpawned(object); return; }
             target=(u8 *)((state->objectIndex<<8)+(u32)objects_gp);
-            F(object,0xF8)=func_00283248(F(object,0x10)-F(target,0x10),F(object,0x14)-F(target,0x14));
+            F(object,0xF8)=FastMatrixHelperA(F(object,0x10)-F(target,0x10),F(object,0x14)-F(target,0x14));
         }
         state->sound=-1;
         object[0x30]=255;
         *(u16 *)(object+0x34)|=0x2000;
-        func_002A7750(object,1,-1);
+        SetMobyState(object,1,-1);
         break;
     case 1:
-        if (D_00189E20.owner==object) {
-            func_L16_0040C7E8(object,state->position);
-            launch_gp=(state->position[2]-D_00189E20.height)*2.5f;
+        if (gHeroState.owner==object) {
+            GetLaunchTargetPosition(object,state->position);
+            launch_gp=(state->position[2]-gHeroState.height)*2.5f;
             if (launch_gp<37.0f) D_L16_001A7CD8[0]=37.0f;
         }
-        if (D_00189E20.mode==0x81) {
-            if (D_00189E20.owner==object && D_00189E20.upward>0.0f) {
+        if (gHeroState.mode==0x81) {
+            if (gHeroState.owner==object && gHeroState.upward>0.0f) {
                 multiplier=0.5f;
-                func_002E5CF8(1,0,(char *)object);
-                if (D_001A79F0[0]==16) multiplier=0.3f;
-                distance=func_00282E80((u8 *)&D_00189E20+0x80,state->position);
+                PlayMobySound(1,0,(char *)object);
+                if (gCurrentMapIndex[0]==16) multiplier=0.3f;
+                distance=vec_distance_xy((u8 *)&gHeroState+0x80,state->position);
                 rate=D_L16_001A7CDC[0]*(distance*0.00027777778f)*multiplier/D_L16_001A7CD8[0];
-                value=func_00282C10((rate+rate)*distance);
-                func_00282CF0(difference,state->position,(u8 *)&D_00189E20+0x80);
+                value=square_root((rate+rate)*distance);
+                FastVecSub(difference,state->position,(u8 *)&gHeroState+0x80);
                 difference[2]=0.0f;
-                func_00282F70(state->velocity,difference,value);
-                func_00282F70((u8 *)&D_00189E20+0xF0,(u8 *)&D_00189E20+0xF0,0.0f);
+                FastVectorNormalizeHelper(state->velocity,difference,value);
+                FastVectorNormalizeHelper((u8 *)&gHeroState+0xF0,(u8 *)&gHeroState+0xF0,0.0f);
                 state->rate=rate;
-                func_002A7750(object,2,-1);
+                SetMobyState(object,2,-1);
             }
         } else if ((D_L16_001B2648&15)==(((s32)object>>8)&15)) {
-            if (state->objectIndex!=-1 && (*(u16 *)(objects_gp[state->objectIndex]+0x34)&1)) func_002A7750(object,3,-1);
+            if (state->objectIndex!=-1 && (*(u16 *)(objects_gp[state->objectIndex]+0x34)&1)) SetMobyState(object,3,-1);
         }
         break;
     case 2:
-        if (D_00189E20.mode==0x81) {
-            value=func_00282E20(state->velocity);
-            distance=func_00282E80((u8 *)&D_00189E20+0x80,state->position);
+        if (gHeroState.mode==0x81) {
+            value=vec_length_xy(state->velocity);
+            distance=vec_distance_xy((u8 *)&gHeroState+0x80,state->position);
             if (distance<0.5f) value=0.0f;
             else if (value!=0.0f) {
-                func_00282CF0(difference,state->position,(u8 *)&D_00189E20+0x80);
+                FastVecSub(difference,state->position,(u8 *)&gHeroState+0x80);
                 difference[2]=0.0f;
-                if (func_00282DB0(difference,state->velocity)<0.0f) value=0.0f;
+                if (FastVecDot(difference,state->velocity)<0.0f) value=0.0f;
             }
             value-=state->rate;
-            func_00282F70(state->velocity,state->velocity,value);
-            func_00282F70((u8 *)&D_00189E20+0xF0,(u8 *)&D_00189E20+0xF0,0.0f);
-            qcopy((u8 *)&D_00189E20+0x100,state->velocity);
-            D_00189E20.velocityW=0.0f;
-            if (value!=0.0f) D_00189E20.heading=func_00283248(state->velocity[0],state->velocity[1]);
-            D_00189E20.timer=10;
-            if (D_001A79F0[0]==17 && !state->active) {
-                effect=func_L00_002D70A0(5);
+            FastVectorNormalizeHelper(state->velocity,state->velocity,value);
+            FastVectorNormalizeHelper((u8 *)&gHeroState+0xF0,(u8 *)&gHeroState+0xF0,0.0f);
+            qcopy((u8 *)&gHeroState+0x100,state->velocity);
+            gHeroState.velocityW=0.0f;
+            if (value!=0.0f) gHeroState.heading=FastMatrixHelperA(state->velocity[0],state->velocity[1]);
+            gHeroState.timer=10;
+            if (gCurrentMapIndex[0]==17 && !state->active) {
+                effect=AllocCameraOverrideSlot(5);
                 state->effect=effect;
                 if (effect) {
                     state->active=1;
@@ -124,10 +125,10 @@ void func_L16_0040BED0(u8 *object)
         } else {
             if (state->active) {
                 state->effect->f26=0;
-                func_L00_002D7140((u8 *)state->effect);
+                EndCameraOverride((u8 *)state->effect);
                 state->active=0;
             }
-            func_002A7750(object,1,-1);
+            SetMobyState(object,1,-1);
         }
         break;
     case 3: {
@@ -144,35 +145,35 @@ void func_L16_0040BED0(u8 *object)
             if (object[0x23]<124) object[0x23]+=4;
             else {
                 object[0x23]=128;
-                func_002A7750(object,1,-1);
+                SetMobyState(object,1,-1);
                 I(object,0x98)=I(*(u8 **)(object+0x24),0x10);
             }
         }
         break;
     }
     }
-    if (object[0x31] && object[0x20]!=3) func_L16_0040C5F0(object);
-    if (D_001A79F0[0]==16 && func_L02_002F21C0((u8 *)&D_00189E20+0x80,object+0x10)<9.0f) {
-        if (D_0018C958[99].count!=0) {
-            if (D_001A7390-D_0018C958[99].time>1080 || D_0018C958[99].time==0) func_00288E18(0xA0C,99);
-            else if (D_001A7390>D_0018C958[99].time) D_0018C958[99].time=D_001A7390;
+    if (object[0x31] && object[0x20]!=3) SpawnSparkleInTriangle(object);
+    if (gCurrentMapIndex[0]==16 && DistanceSquaredXY((u8 *)&gHeroState+0x80,object+0x10)<9.0f) {
+        if (gSubtitleHistory[99].count!=0) {
+            if (D_001A7390-gSubtitleHistory[99].time>1080 || gSubtitleHistory[99].time==0) RequestSubtitleVoiceLine(0xA0C,99);
+            else if (D_001A7390>gSubtitleHistory[99].time) gSubtitleHistory[99].time=D_001A7390;
         } else {
-            D_0018C958[99].count++;
-            if (D_0018C958[99].time<D_001A7390) D_0018C958[99].time=D_001A7390;
-            D_0018C958[99].levels=(D_0018C958[99].levels|(1U<<D_001A79F0[0]))|0x80000000U;
+            gSubtitleHistory[99].count++;
+            if (gSubtitleHistory[99].time<D_001A7390) gSubtitleHistory[99].time=D_001A7390;
+            gSubtitleHistory[99].levels=(gSubtitleHistory[99].levels|(1U<<gCurrentMapIndex[0]))|0x80000000U;
         }
     }
-    if (object[0x20]==2) D_0018C958[99].count=-1;
+    if (object[0x20]==2) gSubtitleHistory[99].count=-1;
     if (((*(u16 *)(object+0x34)^1)&1) && I(object,0x98)!=0) {
-        u8 *sound=state->sound*0x70+D_00188660;
+        u8 *sound=state->sound*0x70+gSoundState;
         if (*(u8 **)(sound+0x88)==object && sound[0x74]) return;
-        state->sound=func_002E5CF8(0,4,(char *)object);
+        state->sound=PlayMobySound(0,4,(char *)object);
         return;
     }
     handle=state->sound;
     if (handle!=-1) {
-        u8 *sound=handle*0x70+D_00188660;
-        if (*(u8 **)(sound+0x88)==object && sound[0x74]) func_002E59F8(handle);
+        u8 *sound=handle*0x70+gSoundState;
+        if (*(u8 **)(sound+0x88)==object && sound[0x74]) StopSoundVoice(handle);
     }
     state->sound=-1;
 }

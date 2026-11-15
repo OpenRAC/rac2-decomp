@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int Quadword __attribute__((mode(TI)));
 typedef struct { char pad[23]; unsigned char selected; } Selection;
 extern Selection D_00139568;
@@ -23,20 +24,20 @@ void func_L00_003A8238(char *object, void *point)
     char *state = *(char **)(object + 104);
     int i, effect, sign;
     *(Quadword *)position = *(Quadword *)point;
-    if (D_L00_00262570[D_00139568.selected].enabled) {
-        func_002AFFD8(position, normal, 1);
-        func_002ABBB8(object, normal, position, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
+    if (gWeaponTable_L00[gItemSlotToRecord.selected].enabled) {
+        ComputeViewDirection(position, normal, 1);
+        SpawnExplosionEffects(object, normal, position, 0.0f, 0.0f, 10, 3, 16, 4.0f, 2.0f, 9.0f, 1.0f, -1, 15.0f, 1, 1, -1, 0, 0x810001);
         *(int *)(query + 20) = 0x810000;
         *(int *)(query + 32) = 1;
         *(char **)(query + 16) = object;
-        *(float *)(query + 28) = D_L00_00262570[D_00139568.selected].scale;
+        *(float *)(query + 28) = gWeaponTable_L00[gItemSlotToRecord.selected].scale;
         *(Quadword *)query = *(Quadword *)state;
-        func_00282F20(query, query, 1.0f);
+        vec_scale_to_length(query, query, 1.0f);
         *(float *)(query + 12) = 5627.925f;
         query[24] = 3;
         query[25] = 2;
         *(unsigned short *)(query + 26) = *(unsigned short *)(object + 170);
-        func_00277F48(position, 1, 2.0f, D_0018C0B0, query);
+        ProcessCollisionHit(position, 1, 2.0f, gHeroMoby_0018C0B0, query);
     } else {
         int negative;
         char *spark;
@@ -47,15 +48,15 @@ void func_L00_003A8238(char *object, void *point)
         velocity = normal;
         i = 7;
         do {
-            effect = func_002A7820(6, 16);
+            effect = RandomIntRange(6, 16);
             sign = 1;
-            if (func_002A77E0(2))
+            if (RandomIntBelow(2))
                 sign = negative;
-            *(float *)(query + 0) = position[0] + func_002A78D8(0.0f, 0.5f);
-            *(float *)(query + 4) = position[1] + func_002A78D8(0.0f, 0.5f);
-            *(float *)(query + 8) = position[2] + func_002A78D8(0.0f, 0.5f);
-            func_002C2210(spark, effect, 10.0f, 0.1f, 0x4010ff10, 2, sign, velocity, 0.0f, 1);
-            func_002C2210(spark, effect, 2.0f, 0.1f, 0xc0ffffff, 2, sign, velocity, 0.0f, 1);
+            *(float *)(query + 0) = position[0] + RandomSignedFloatRange(0.0f, 0.5f);
+            *(float *)(query + 4) = position[1] + RandomSignedFloatRange(0.0f, 0.5f);
+            *(float *)(query + 8) = position[2] + RandomSignedFloatRange(0.0f, 0.5f);
+            SpawnGroundEffectParticle(spark, effect, 10.0f, 0.1f, 0x4010ff10, 2, sign, velocity, 0.0f, 1);
+            SpawnGroundEffectParticle(spark, effect, 2.0f, 0.1f, 0xc0ffffff, 2, sign, velocity, 0.0f, 1);
         } while (--i >= 0);
     }
 }

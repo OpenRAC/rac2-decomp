@@ -26,102 +26,102 @@ extern void func_L00_002E6EF8(void (*)(void *), void *);
 extern void func_L20_002DC390(int);
 
 /* The platform controller records switch edges and raises its linked platform. */
-void func_L20_00408D98(u8 *object) {
-    s32 *state = *(s32 **)(object + 0x68);
-    int frame_offset;
+void func_L20_00408D98(u8 *moby) {
+    s32 *state = *(s32 **)(moby + 0x68);
+    int saveOffset;
 
     if (D_L20_001CA540 < 2) D_L20_001B2BE8 = 85.0f;
-    switch (object[0x20]) {
+    switch (moby[0x20]) {
     case 0: {
-        char *record;
-        frame_offset = D_001A79F0 * 16;
+        char *otherMoby;
+        saveOffset = gCurrentMapIndex * 16;
         state[8] = D_L20_001CA540;
         state[5] = 0;
         state[4] = 0;
-        state[0x23] = D_0019B2E8[state[2] + frame_offset] >> 7;
-        if ((D_0019B2E8[state[1] + frame_offset] & 0x80) == 0) {
+        state[0x23] = D_0019B2E8[state[2] + saveOffset] >> 7;
+        if ((D_0019B2E8[state[1] + saveOffset] & 0x80) == 0) {
             state[0x1F] = 0;
-            record = (char *)((state[0x1C] << 8) + (u32)D_L20_001B2F9C);
-            *(float *)(state + 0x1D) = *(float *)(record + 0x18);
-            *(float *)(record + 0x18) += 20.0f;
+            otherMoby = (char *)((state[0x1C] << 8) + (u32)D_L20_001B2F9C);
+            *(float *)(state + 0x1D) = *(float *)(otherMoby + 0x18);
+            *(float *)(otherMoby + 0x18) += 20.0f;
         } else state[0x1F] = 1;
-        func_002A7750(object, 1, -1);
+        SetMobyState(moby, 1, -1);
         break;
     }
     case 1: {
-        char *record;
+        char *otherMoby;
         if (state[0x23] == 0 &&
-            (D_0019B2E8[state[2] + D_001A79F0 * 16] & 0x80) != 0 &&
-            func_002ACBC8(D_00189EA0, state[10]) != 0) {
+            (D_0019B2E8[state[2] + gCurrentMapIndex * 16] & 0x80) != 0 &&
+            IsPointInCuboid(gHeroPosition, state[10]) != 0) {
             state[0x23] = 1;
-            func_0029B3E0(0, -1);
+            MemcardSave(0, -1);
         }
         if (D_L20_001CA540 == 2) {
             if (state[4] == 0) {
-                if (func_002ACBC8(D_00189EA0, state[0x18])) {
+                if (IsPointInCuboid(gHeroPosition, state[0x18])) {
                     state[4] = 1;
-                    func_L01_00323310(state[0x20], -1);
+                    QueueKeyedRequest(state[0x20], -1);
                 }
             }
         }
-        if (func_002ACBC8(D_00189EA0, state[11]) != 0) {
-            if (D_0019B2E8[state[1] + D_001A79F0 * 16] & 0x80) return;
-            func_002A0430(state[1]);
+        if (IsPointInCuboid(gHeroPosition, state[11]) != 0) {
+            if (D_0019B2E8[state[1] + gCurrentMapIndex * 16] & 0x80) return;
+            MarkTableEntryFlagged(state[1]);
             if (state[0x13] >= 0)
-                func_L00_003294F0((u8 *)D_L20_001B2F9C + state[0x13] * 0x100, 1);
-            func_L20_00409480(state[0x14]);
-            func_L20_00409480(state[0x15]);
+                SetObjectFlagBit((u8 *)D_L20_001B2F9C + state[0x13] * 0x100, 1);
+            DestroyGroupTrooperLegs(state[0x14]);
+            DestroyGroupTrooperLegs(state[0x15]);
             state[8] = 2;
             state[15] = 3;
-            func_002A7750(object, 5, -1);
+            SetMobyState(moby, 5, -1);
         }
-        if (D_0019B2E8[state[1] + D_001A79F0 * 16] & 0x80) return;
+        if (D_0019B2E8[state[1] + gCurrentMapIndex * 16] & 0x80) return;
         if (*(u8 *)(D_L20_001B2F9C + state[0x1B] * 0x100 + 0xBC) == 1) return;
         if (state[0x1F] != 0) return;
-        record = D_L20_001B2F9C + state[0x19] * 0x100;
-        if (record != 0 && *(s16 *)(record + 0xAA) == 0xCBC &&
-            *(u8 *)(record + 0x20) != 0xFE && *(u8 *)(record + 0x20) != 0xFD) return;
-        record = D_L20_001B2F9C + state[0x1A] * 0x100;
-        if (record != 0 && *(s16 *)(record + 0xAA) == 0xCBC) {
-            int status = *(u8 *)(record + 0x20);
-            if (status != 0xFE && *(u8 *)(record + 0x20) != 0xFD) return;
+        otherMoby = D_L20_001B2F9C + state[0x19] * 0x100;
+        if (otherMoby != 0 && *(s16 *)(otherMoby + 0xAA) == 0xCBC /* Megacorp Hover Tank */ &&
+            *(u8 *)(otherMoby + 0x20) != 0xFE && *(u8 *)(otherMoby + 0x20) != 0xFD) return;
+        otherMoby = D_L20_001B2F9C + state[0x1A] * 0x100;
+        if (otherMoby != 0 && *(s16 *)(otherMoby + 0xAA) == 0xCBC /* Megacorp Hover Tank */) {
+            int status = *(u8 *)(otherMoby + 0x20);
+            if (status != 0xFE && *(u8 *)(otherMoby + 0x20) != 0xFD) return;
         }
-        func_002A7750(object, 7, -1);
+        SetMobyState(moby, 7, -1);
         break;
     }
     case 2:
     case 3:
-        if (func_002B3868(object)) state[5] = 125;
-        if (func_00282948(state + 5)) goto movement_done;
-        if (object[0x20] == 2) *(float *)(state + 3) = 1.0f - (float)state[5] * 0.008f;
+        if (SetFirstPendingFlag(moby)) state[5] = 125;
+        if (FastFloatHelperD(state + 5)) goto movement_done;
+        if (moby[0x20] == 2) *(float *)(state + 3) = 1.0f - (float)state[5] * 0.008f;
         else *(float *)(state + 3) = (float)state[5] * 0.008f;
         goto movement_callback;
 movement_done:
-        func_002A7750(object, state[7], -1);
+        SetMobyState(moby, state[7], -1);
 movement_callback:
-        func_L00_002E6EF8((void (*)(void *))func_L20_004095D0, object);
+        AddDrawCallbackToList3((void (*)(void *))SetScaledSpeedCapped, moby);
         break;
     case 4: {
-        char *record;
+        char *otherMoby;
         s32 *entry = (s32 *)((u32)state + (state[15] * 4));
-        record = D_L20_001B308C + entry[9] * 0x80;
-        func_L00_00303530(state[8], state[0x21]);
-        func_002A0430(state[0]);
-        func_L00_002B9D60(record + 0x30, record + 0x70, 0x6F, 1);
-        func_L20_002DC390(0);
+        otherMoby = D_L20_001B308C + entry[9] * 0x80;
+        LoadSceneChunk(state[8], state[0x21]);
+        MarkTableEntryFlagged(state[0]);
+        ResetHeroPositionAndDirection(otherMoby + 0x30, otherMoby + 0x70, 0x6F, 1);
+        LoadYeedilHeroStateByGameMode(0);
         state[7] = 1;
         D_L20_001B29E0 = 1.0f;
         *(float *)(state + 3) = 1.0f;
-        func_L00_002E6EF8((void (*)(void *))func_L20_004095D0, object);
-        func_002A7750(object, 6, -1);
+        AddDrawCallbackToList3((void (*)(void *))SetScaledSpeedCapped, moby);
+        SetMobyState(moby, 6, -1);
         break;
     }
     case 5:
         if (D_L20_001A8F08 == -2 && D_L20_001A8F00 != 2) {
             *(float *)(state + 3) = 1.0f;
-            func_L00_002E6EF8((void (*)(void *))func_L20_004095D0, object);
+            AddDrawCallbackToList3((void (*)(void *))SetScaledSpeedCapped, moby);
             if (*(u8 *)(D_L20_001B2F9C + state[0x13] * 0x100 + 0x20) > 0x80)
-                func_002A7750(object, 4, -1);
+                SetMobyState(moby, 4, -1);
         }
         state[6]++;
         break;
@@ -129,7 +129,7 @@ movement_callback:
         if (D_L20_001A8F00 != 2) {
             D_L20_001B29E0 = 1.0f;
             *(float *)(state + 3) = 1.0f;
-            func_L00_002E6EF8((void (*)(void *))func_L20_004095D0, object);
+            AddDrawCallbackToList3((void (*)(void *))SetScaledSpeedCapped, moby);
         } else D_L20_001B29E0 = 0.0f;
         if (D_L20_001A8F00 != 2) {
             char *mobys = D_L20_001B2F9C;
@@ -149,19 +149,19 @@ movement_callback:
                     *(int *)(second + 0x98) = *(int *)(*(char **)(second + 0x24) + 0x10);
                 }
                 D_L20_001B29E0 = 0.0f;
-                func_002A7750(object, 3, -1);
+                SetMobyState(moby, 3, -1);
             }
         }
         state[6]++;
         break;
     }
     case 7: {
-        char *record;
-        if (func_002B3868(object)) {
-            record = D_L20_001B2F9C + state[0x1B] * 0x100;
-            record[0xBC] = 1;
+        char *otherMoby;
+        if (SetFirstPendingFlag(moby)) {
+            otherMoby = D_L20_001B2F9C + state[0x1B] * 0x100;
+            otherMoby[0xBC] = 1;
             {
-                int duration = *(int *)(*(char **)(record + 0x68) + 0x2C);
+                int duration = *(int *)(*(char **)(otherMoby + 0x68) + 0x2C);
                 state[0x1F] = 1;
                 state[6] = duration;
                 state[0x1E] = duration;
@@ -169,7 +169,7 @@ movement_callback:
         }
         *(float *)(D_L20_001B2F9C + state[0x1C] * 0x100 + 0x18) =
             *(float *)(state + 0x1D) + ((float)state[6] * 20.0f) / (float)state[0x1E];
-        if (func_00282948(state + 6)) func_002A7750(object, 1, -1);
+        if (FastFloatHelperD(state + 6)) SetMobyState(moby, 1, -1);
         break;
     }
     }

@@ -46,48 +46,48 @@ int func_002EBC70(int unused)
     int i;
     int value;
 
-    func_002EB7E8();
+    StartScriptedScene();
     prev = D_001B1B5C;
     i = 0;
-    if (i < D_001B8840.count) {
+    if (i < gScenePlaybackState.count) {
         do {
             do {
-                entry = D_001B8840.entries[i];
+                entry = gScenePlaybackState.entries[i];
                 if (entry != 0 && prev != entry) {
                     entry->previous = prev;
                     prev = entry;
                 }
             } while (0);
             i++;
-        } while (i < D_001B8840.count);
+        } while (i < gScenePlaybackState.count);
     }
-    D_001A8BB0 = 2;
+    gCurrentGameMode = 2;
     do {
-        func_002FC280();
-        func_002FC220();
-        func_00284FC0();
-        func_00285338();
-        func_00284EA8();
-        func_00298F00();
-        func_00279D18();
-        func_0029FB20();
-        func_0027B858();
+        SubmitBufferedDmaChain();
+        SwapPacketBuffer();
+        PutDrawBufferSmall();
+        QueueSecondStripPacket();
+        AppendDrawListHeader();
+        UpdateMemoryCardState();
+        BuildViewMatrices();
+        UpdateWatchedObjects();
+        WriteClearColorPackets();
         D_001B169C = -1;
-        func_002B9000();
-        value = func_002EB1E0();
-        func_00284F40(0);
+        PollPadPorts();
+        value = UpdateScriptedSceneActors();
+        AppendDrawListBufferTag(0);
         D_001B1594 = 0x131;
-        func_0027BD70();
-        if (D_001A8BB8 != -2) {
-            D_001A8BB0 = D_001A8BB8;
-            D_001A8BB8 = -2;
+        RenderFrame();
+        if (gRequestedGameMode != -2) {
+            gCurrentGameMode = gRequestedGameMode;
+            gRequestedGameMode = -2;
         }
-        func_002FC3C0(1);
-        func_001261F0(0);
+        WaitForDmaStatusBits(1);
+        GetGsCurrentField(0);
         D_001B1598_GP = D_001B1598 + 1;
-    } while (D_001A8BB0 == 2);
+    } while (gCurrentGameMode == 2);
     D_001A8BB0_GP = 0;
-    func_002EBAA8();
+    EndScriptedScene();
     return value;
 }
 

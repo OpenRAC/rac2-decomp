@@ -23,26 +23,26 @@ void func_L00_003F9570(char *object)
     float position[4];
     float *data = *(float **)(object + 0x68);
 
-    func_00283098(position, D_L00_001B0A80_gp, object + 0xC0);
-    func_00282CC0(position, position, object + 0x10);
+    matrix_mul_vec3(position, D_L00_001B0A80_gp, object + 0xC0);
+    FastVecAdd(position, position, object + 0x10);
     {
-        unsigned int color = func_00283D38(D_L00_001B0A50_gp[0], D_L00_001B0A50[1], func_002A7878(0.0f, 1.0f));
+        unsigned int color = FastTweenColor(D_L00_001B0A50_gp[0], D_L00_001B0A50[1], RandomFloatRange(0.0f, 1.0f));
         float size = D_L00_001B0A70_gp[0] * data[0];
-        func_00281EB8(position, 0x31, color, 1, size, 0.0f, func_002A7940());
+        DrawBillboardQuad_00281EB8(position, 0x31, color, 1, size, 0.0f, RandomAngle());
     }
     {
-        unsigned int color = func_00283D38(D_L00_001B0A50[2], D_L00_001B0A50[3], func_002A7878(0.0f, 1.0f));
+        unsigned int color = FastTweenColor(D_L00_001B0A50[2], D_L00_001B0A50[3], RandomFloatRange(0.0f, 1.0f));
         float size = D_L00_001B0A70[1] * data[0];
-        func_00281EB8(position, 0x31, color, 1, size, 0.0f, func_002A7940());
+        DrawBillboardQuad_00281EB8(position, 0x31, color, 1, size, 0.0f, RandomAngle());
     }
     {
-        unsigned int color = func_00283D38(D_L00_001B0A50[4], D_L00_001B0A50[5], func_002A7878(0.0f, 1.0f));
+        unsigned int color = FastTweenColor(D_L00_001B0A50[4], D_L00_001B0A50[5], RandomFloatRange(0.0f, 1.0f));
         float size = D_L00_001B0A70[2] * data[0];
-        func_00281EB8(position, 0xB, color, 1, size, 0.0f, func_002A7940());
+        DrawBillboardQuad_00281EB8(position, 0xB, color, 1, size, 0.0f, RandomAngle());
     }
     {
-        unsigned int color = func_00283D38(D_L00_001B0A50[5], D_L00_001B0A50[6], func_002A7878(0.0f, 1.0f));
+        unsigned int color = FastTweenColor(D_L00_001B0A50[5], D_L00_001B0A50[6], RandomFloatRange(0.0f, 1.0f));
         float size = D_L00_001B0A70[3] * data[0];
-        func_00281EB8(position, 0xB, color, 1, size, 0.0f, func_002A7940());
+        DrawBillboardQuad_00281EB8(position, 0xB, color, 1, size, 0.0f, RandomAngle());
     }
 }

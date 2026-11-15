@@ -36,6 +36,7 @@ static __inline__ saddr fde_compare (fde *x, fde *y)
   return (saddr)x->pc_begin - (saddr)y->pc_begin;
 }
 
+/* Splits a list of frame records into an already-sorted part and an out-of-order part. */
 void func_001242A0 (fde_vector *linear, fde_vector *erratic)
 {
   u32 count = linear->count;

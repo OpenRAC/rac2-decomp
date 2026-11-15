@@ -124,6 +124,7 @@ extern u8 D_001A7B0B __attribute__((sda));
 
 /* Same body as func_L11_002C51D0, with this function's own callees. */
 
+/* Moves the hero out of any walls or objects it overlaps, trying up to eight times. Returns -1 if the hero had to move too far. */
 int func_L00_002B55F0(int mode)
 {
     Vec previous;
@@ -133,49 +134,49 @@ int func_L00_002B55F0(int mode)
 
     if (PLAYER->collision_off_frames) return 1;
     qcopy(&previous, &PLAYER->position);
-    func_00282C88(&offset);
+    ClearVector128(&offset);
     if (PLAYER->path_constrain_pending) {
-        func_L00_002D49F0();
+        CheckHeroTimedCondition();
         PLAYER->path_constrain_pending = 0;
     }
     facingUp = 0;
-    if (func_00282DB0(&PLAYER->basis, &PLAYER->up) > -0.92f) facingUp = 1;
+    if (FastVecDot(&PLAYER->basis, &PLAYER->up) > -0.92f) facingUp = 1;
     switch (PLAYER->control_mode) {
     case 17:
         break;
     case 15:
-        func_00282C88(&offset);
+        ClearVector128(&offset);
         offset.z = 0.8f;
-        func_00283098(&offset, &offset, PLAYER->moby + 0xc0);
+        matrix_mul_vec3(&offset, &offset, PLAYER->moby + 0xc0);
         break;
     default:
         if (PLAYER->gravity_mode || PLAYER->timer || facingUp) {
             if (PLAYER->state == 2) {
-                func_L00_002D38A0((Quad *)&offset, (Quad *)&offset, 5.0f);
+                OffsetPointInViewSpace((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
-                func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, 0.6f);
+                BuildHeroRelativePoint(&offset.x, 0, 0.0f, 0.0f, 0.6f);
             } else if (D_L16_001A8FF0) {
-                func_L00_002D38A0((Quad *)&offset, (Quad *)&offset, 0.77f);
+                OffsetPointInViewSpace((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
-                func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
+                BuildHeroRelativePoint(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
             }
         } else {
             offset.z = PLAYER->capsule_bottom;
         }
         break;
     }
-    func_00282CC0(&PLAYER->position, &PLAYER->position, &offset);
+    FastVecAdd(&PLAYER->position, &PLAYER->position, &offset);
     for (iteration = 0; iteration < 8; ++iteration) {
         if (PLAYER->control_mode == 17) {
-            if (!func_00277258(0.6f, &PLAYER->position, 0x24, PLAYER->moby)) break;
+            if (!TestPointAgainstCollision(0.6f, &PLAYER->position, 0x24, PLAYER->moby)) break;
         } else if (PLAYER->control_mode == 15) {
-            if (!func_00277258(0.45f, &PLAYER->position, 0x24, PLAYER->moby)) break;
+            if (!TestPointAgainstCollision(0.45f, &PLAYER->position, 0x24, PLAYER->moby)) break;
         } else {
             PlayerView *player = PLAYER;
             if (player->gravity_mode || facingUp) {
-                hit = func_00277258(player->capsule_radius, &player->position, 0x24, player->moby);
+                hit = TestPointAgainstCollision(player->capsule_radius, &player->position, 0x24, player->moby);
                 if (!player->locked)
-                    hit |= func_00278870(&player->position, player->capsule_radius);
+                    hit |= ProcessCollisionTriangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             } else {
                 extent = player->capsule_top - player->capsule_bottom;
@@ -183,7 +184,7 @@ int func_L00_002B55F0(int mode)
                 hit = func_L00_002E0200(player->capsule_radius, &player->position, 0x24,
                                         player->moby, extent);
                 if (!player->locked)
-                    hit |= func_00278870(&player->position, player->capsule_radius);
+                    hit |= ProcessCollisionTriangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             }
         }
@@ -193,9 +194,9 @@ int func_L00_002B55F0(int mode)
         PLAYER->wall_hit = 1;
         PLAYER->coll_hit_moby = HIT->moby;
     }
-    func_00282CF0(&PLAYER->position, &PLAYER->position, &offset);
-    func_00282CF0(&displacement, &PLAYER->position, &previous);
-    if (func_00282DF0(&displacement) > PLAYER->capsule_radius * 1.5f) {
+    FastVecSub(&PLAYER->position, &PLAYER->position, &offset);
+    FastVecSub(&displacement, &PLAYER->position, &previous);
+    if (FastVecLength(&displacement) > PLAYER->capsule_radius * 1.5f) {
         if (mode == 15) {
             if (displacement.x > 512.0f) displacement.x = 512.0f;
             else if (displacement.x < -512.0f) displacement.x = -512.0f;
@@ -203,8 +204,8 @@ int func_L00_002B55F0(int mode)
             else if (displacement.y < -512.0f) displacement.y = -512.0f;
             if (displacement.z > 512.0f) displacement.z = 512.0f;
             else if (displacement.z < -512.0f) displacement.z = -512.0f;
-            func_00282F20(&displacement, &displacement, PLAYER->capsule_radius);
-            func_00282CC0(&PLAYER->position, &previous, &displacement);
+            vec_scale_to_length(&displacement, &displacement, PLAYER->capsule_radius);
+            FastVecAdd(&PLAYER->position, &previous, &displacement);
         }
         return -1;
     }

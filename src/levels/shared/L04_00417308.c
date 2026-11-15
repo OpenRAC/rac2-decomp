@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -47,30 +48,31 @@ extern void func_002A0488(void *a, u8 b, u8 c, u8 d);
 
 extern void func_002A10E8(void *a);
 
-void func_L04_0043BE40(char *a0)
+/* Applies the fade size and colour of a linked object to the object it follows. */
+void func_L04_0043BE40(char *moby)
 {
-    char *s0 = *(char **)(a0 + 0x68);
-    char *p;
-    char *r;
-    char *t;
-    char *u;
-    float f;
-    s32 v;
+    char *vars = *(char **)(moby + 0x68);
+    char *linked;
+    char *linked2;
+    char *linked3;
+    char *linked4;
+    float scale;
+    s32 color;
 
-    p = *(char **)(s0 + 0x48);
-    *(u16 *)(p + 0x34) &= 0xFFFE;
-    *(u8 *)(*(char **)(s0 + 0x48) + 0x31) = 1;
-    r = *(char **)(s0 + 0x48);
-    *(s32 *)(r + 0x98) = *(s32 *)(*(s32 *)(r + 0x24) + 0x10);
-    t = *(char **)(s0 + 0x48);
-    func_002833F0(t + 0xC0, t + 0xF0);
-    u = *(char **)(s0 + 0x48);
-    f = *(float *)(s0 + 0x58);
-    func_00282D30(u + 0xE0, u + 0xE0, f);
-    f = *(float *)(s0 + 0x58);
-    v = func_00283D38(0x800000FF, *(s32 *)(s0 + 0x54), f);
-    func_002A0488(*(char **)(s0 + 0x48), v & 0xFF, (v >> 8) & 0xFF, (v >> 16) & 0xFF);
-    func_002A10E8(*(char **)(s0 + 0x48));
+    linked = *(char **)(vars + 0x48);
+    *(u16 *)(linked + 0x34) &= 0xFFFE;
+    *(u8 *)(*(char **)(vars + 0x48) + 0x31) = 1;
+    linked2 = *(char **)(vars + 0x48);
+    *(s32 *)(linked2 + 0x98) = *(s32 *)(*(s32 *)(linked2 + 0x24) + 0x10);
+    linked3 = *(char **)(vars + 0x48);
+    euler_rotation_basis(linked3 + 0xC0, linked3 + 0xF0);
+    linked4 = *(char **)(vars + 0x48);
+    scale = *(float *)(vars + 0x58);
+    FastVecScale(linked4 + 0xE0, linked4 + 0xE0, scale);
+    scale = *(float *)(vars + 0x58);
+    color = FastTweenColor(0x800000FF, *(s32 *)(vars + 0x54), scale);
+    set_moby_color(*(char **)(vars + 0x48), color & 0xFF, (color >> 8) & 0xFF, (color >> 16) & 0xFF);
+    func_002A10E8(*(char **)(vars + 0x48));
 }
 
 
@@ -94,29 +96,29 @@ void func_L04_00451150(float *pos, int count) {
     int i;
     int sign;
     char *particle;
-    func_00282CF0(direction, (float *)D_L04_001B9680, pos);
-    func_00282F20((char *)offset, (char *)direction, 0.3f);
+    FastVecSub(direction, (float *)D_L04_001B9680, pos);
+    vec_scale_to_length((char *)offset, (char *)direction, 0.3f);
     direction[2] = 0;
     axis[0] = 0;
     axis[1] = 0;
     axis[2] = 1.0f;
     axis[3] = 1.0f;
     for (i = 0; i < count; i++) {
-        size = func_002A7878(0.5f, 2.0f);
-        sign = func_002A77E0(2);
+        size = RandomFloatRange(0.5f, 2.0f);
+        sign = RandomIntBelow(2);
         if (!sign) sign--;
-        angle = func_002A7878(-1.0471977f, 1.0471977f);
-        func_002ACEC0(velocity, direction, axis, angle);
-        func_00282F20((char *)velocity, (char *)velocity, func_002A7878(0.05f, 3.0f) * 0.0166666675f);
-        velocity[2] = func_002A7878(1.0f, 5.0f) * 0.0166666675f;
-        func_00282CC0(origin, pos, offset);
-        pos[0] += func_002A78D8(0, 0.15f);
-        pos[1] += func_002A78D8(0, 0.15f);
-        pos[2] += func_002A78D8(0, 0.15f);
-        particle = func_002C2210(origin, 60, size * 0.1f, size, 0x7F207F7F, 0, sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
-        particle = func_002C2210(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
-        if (particle) particle[9] = func_00283CF0(4.0f) + 0x70;
+        angle = RandomFloatRange(-1.0471977f, 1.0471977f);
+        ApplyAxisRotationToQuaternion(velocity, direction, axis, angle);
+        vec_scale_to_length((char *)velocity, (char *)velocity, RandomFloatRange(0.05f, 3.0f) * 0.0166666675f);
+        velocity[2] = RandomFloatRange(1.0f, 5.0f) * 0.0166666675f;
+        FastVecAdd(origin, pos, offset);
+        pos[0] += RandomSignedFloatRange(0, 0.15f);
+        pos[1] += RandomSignedFloatRange(0, 0.15f);
+        pos[2] += RandomSignedFloatRange(0, 0.15f);
+        particle = SpawnGroundEffectParticle(origin, 60, size * 0.1f, size, 0x7F207F7F, 0, sign, velocity, 0, 0.002f);
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
+        particle = SpawnGroundEffectParticle(origin, 60, size * 0.07f, size * 0.7f, 0x7F7F7F7F, 1, -sign, velocity, 0, 0.002f);
+        if (particle) particle[9] = FloatToInt(4.0f) + 0x70;
     }
 }
 
@@ -124,6 +126,7 @@ void func_L04_00451150(float *pos, int count) {
 
 /* func_L04_00455418 is in L04_00455418.c. */
 
+/* Smooth step: eases a value from 0 to 1 (3x^2 - 2x^3). */
 /* evaluates the ordered scalar cubic value squared times negative two times value plus three */
 f32 func_L04_004554F8(f32 value) {
     f32 squared = value * value;
@@ -144,24 +147,25 @@ extern void func_345860(char *a0, int a1, float f12, float f13, float f14, float
 
 extern void func_3317E8(char *a0);
 
-void func_L04_00456748(char *s0)
+/* Waits for a trigger, then plays a short effect sequence once it has fired. */
+void func_L04_00456748(char *moby)
 {
-    char *s1 = *(char **)(s0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    switch (*(unsigned char *)(s0 + 0x20)) {
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        func_33B9B0(s0, 1, -1);
+        func_33B9B0(moby, 1, -1);
         break;
     case 1:
-        if (func_33E6B0(s0, 0x4010000, 0) != 0 && *(int *)s1 == 0)
-            func_33B9B0(s0, 2, -1);
-        *(unsigned char *)(s0 + 0xA8) = 0xFF;
+        if (func_33E6B0(moby, 0x4010000, 0) != 0 && *(int *)vars == 0)
+            func_33B9B0(moby, 2, -1);
+        *(unsigned char *)(moby + 0xA8) = 0xFF;
         break;
     case 2:
-        func_348788(s0, 1, 0.0f);
-        func_382DF8(0, 0, s0);
-        func_345860(s0, 0x1E, 0.4f, 4.4f, 1.0f, 0.083333333f);
-        func_3317E8(s0);
+        func_348788(moby, 1, 0.0f);
+        func_382DF8(0, 0, moby);
+        func_345860(moby, 0x1E, 0.4f, 4.4f, 1.0f, 0.083333333f);
+        func_3317E8(moby);
         break;
     }
 }
@@ -173,7 +177,7 @@ void func_L04_00456748(char *s0)
 /* rac1-decomp src/game/stub.c: func_001E97C8 */
 /* Takes an argument (callers pass one, e.g. r1_func_001EC210) and ignores
    it -- the unused parameter costs no codegen, still 0/8. */
-int func_L04_0046B740(void *arg0) {
+int func_L04_0046B740(void *unused) {
     return 0;
 }
 
@@ -192,32 +196,38 @@ extern s32 D_L04_001B1E84 __attribute__((sda));
 
 extern s32 D_L04_001B24DC __attribute__((sda));
 
-int func_L04_0046D768(u8 *a0)
+/* Tells whether the object linked to this one is in state 2 or 3. */
+int func_L04_0046D768(u8 *moby)
 {
-    s32 v1 = (*(s16 *)(a0 + 0x84) << 5) + D_L04_001B1E84;
-    u8 *a1 = (u8 *)(D_L04_001B24DC + (*(s32 *)(*(s32 *)(v1 + 0x1C) + 0x60) << 8));
-    return (u32)(*(u8 *)(a1 + 0x20) - 2) < 2;
+    s32 entryAddr = (*(s16 *)(moby + 0x84) << 5) + D_L04_001B1E84;
+    u8 *linked = (u8 *)(gMobyPool_L04 + (*(s32 *)(*(s32 *)(entryAddr + 0x1C) + 0x60) << 8));
+    return (u32)(*(u8 *)(linked + 0x20) - 2) < 2;
 }
 
+/* Empty handler that does nothing. */
 void func_L04_0047A7C8(void)
 {
 }
 
+/* Empty handler that does nothing. */
 void func_L04_0047B420(void)
 {
 }
 
 
 
+/* Empty handler that does nothing. */
 void func_L04_00487228(void)
 {
 }
 
+/* Empty handler that does nothing. */
 void func_L04_004895B8(void)
 {
 }
 
 
+/* Empty handler that does nothing. */
 void func_L04_0048AE50(void)
 {
 }

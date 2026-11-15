@@ -64,6 +64,7 @@ extern int func_0011D450(void *, int, int);
 extern void func_00115D48(const char *, ...);
 extern int func_00132C48(int, int, void *);
 
+/* Starts the sound system: connects to the two sound servers on the IOP, resets the sound buffers and sends the first setup request. */
 int func_00131DE8(int options)
 {
     int bind_result;
@@ -87,12 +88,12 @@ int func_00131DE8(int options)
         D_001A74F8[0] = 1;
     else
         D_001A74F8[0] = 0;
-    func_0011CF78(0);
+    InitSifRpc(0);
 
     for (;;) {
-        bind_result = func_0011D450(&D_001A7040, 0x123456, 0);
+        bind_result = BindRpcServer(&D_001A7040, 0x123456, 0);
         if (bind_result < 0) {
-            func_00115D48(D_001A7500, D_001A7528, 0xB1);
+            Printf(D_001A7500, D_001A7528, 0xB1);
             for (;;) {}
         }
         delay = 9999;
@@ -110,9 +111,9 @@ int func_00131DE8(int options)
     D_001A7180[0] = 0;
 
     do {
-        bind_result = func_0011D450(&D_001A7140, 0x123457, 0);
+        bind_result = BindRpcServer(&D_001A7140, 0x123457, 0);
         if (bind_result < 0) {
-            func_00115D48(D_001A7500, D_001A7528, 0xC6);
+            Printf(D_001A7500, D_001A7528, 0xC6);
             for (;;) {}
         }
         delay = 9999;
@@ -130,5 +131,5 @@ int func_00131DE8(int options)
     init.read_active = D_001A7100;
     init.options = options;
     D_001A7110[0] = 0;
-    return func_00132C48(0, 8, &init);
+    return snd_SendCommandSync(0, 8, &init);
 }

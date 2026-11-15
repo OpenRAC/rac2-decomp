@@ -107,171 +107,172 @@ extern void func_L00_002D36E0(void *, int, float, float, float), func_L00_002D37
    arm, and retail's fresh `lui $a0` in the slot and its `$v0` base in the default arm are lost. */
 /* Corresponds to RAC1 update_hero_timers_and_reach_state in
  * src/overlays/shared/hero_vehicle_and_collision.c. */
+/* Counts up the hero frame timers each frame, ticks down cooldowns and updates the hero reach distance. */
 void func_L20_002D6488(void) {
     unsigned char *m, *pos, *hero;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
-    if (!D_00189E20.tilt_disabled) func_L00_002B9380();
+    if (!gHeroState.tilt_disabled) EaseHeroLeanToUpright();
     {
-        int state = D_00189E20.state_frames+1;
-        int control = D_00189E20.control_mode_frames+1;
-        int step = D_00189E20.step_frames+1;
-        int animation = D_00189E20.animation_frames+1;
-        D_00189E20.state_frames = state;
-        D_00189E20.control_mode_frames = control;
-        D_00189E20.step_frames = step;
-        D_00189E20.animation_frames = animation;
+        int state = gHeroState.state_frames+1;
+        int control = gHeroState.control_mode_frames+1;
+        int step = gHeroState.step_frames+1;
+        int animation = gHeroState.animation_frames+1;
+        gHeroState.state_frames = state;
+        gHeroState.control_mode_frames = control;
+        gHeroState.step_frames = step;
+        gHeroState.animation_frames = animation;
     }
-    func_00282978(((unsigned char *)&D_00189E20)+0x1E0);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1DC);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1D2);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1E4);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F8);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1FE);
-    func_00282948(((unsigned char *)&D_00189E20)+0x1D4);
-    func_00282978(((unsigned char *)&D_00189E20)+0x210);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1D0);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F4);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F6);
-    func_00282978(((unsigned char *)&D_00189E20)+0x204);
-    func_00282978(((unsigned char *)&D_00189E20)+0x206);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F0);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1EC);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1EE);
-    func_00282978(((unsigned char *)&D_00189E20)+0x208);
-    func_00282978(((unsigned char *)&D_00189E20)+0x200);
-    func_00282978(((unsigned char *)&D_00189E20)+0x20E);
-    func_00282978(((unsigned char *)&D_00189E20)+0x20A);
-    func_00282978(((unsigned char *)&D_00189E20)+0x214);
-    func_00282978(((unsigned char *)&D_00189E20)+0x212);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1FC);
-    func_00282978(((unsigned char *)&D_00189E20)+0x216);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1FA);
-    func_00282978(((unsigned char *)&D_00189E20)+0x218);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1F2);
-    func_00282978(((unsigned char *)&D_00189E20)+0x21A);
-    func_00282978(((unsigned char *)&D_00189E20)+0x21C);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1DE);
-    func_00282978(((unsigned char *)&D_00189E20)+0x1E6);
-    func_00282978(((unsigned char *)&D_00189E20)+0x222);
-    func_00282978(((unsigned char *)&D_00189E20)+0x224);
-    func_00282978(((unsigned char *)&D_00189E20)+0x226);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1E0);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1DC);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1D2);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1E4);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1F8);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1FE);
+    FastFloatHelperD(((unsigned char *)&gHeroState)+0x1D4);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x210);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1D0);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1F4);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1F6);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x204);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x206);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1F0);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1EC);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1EE);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x208);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x200);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x20E);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x20A);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x214);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x212);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1FC);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x216);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1FA);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x218);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1F2);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x21A);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x21C);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1DE);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x1E6);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x222);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x224);
+    FastDecTimer(((unsigned char *)&gHeroState)+0x226);
 
-    if (!(D_00138180.held&4)) D_00189E20.field_20C = 0;
-    if (D_00189E20.field_21C) func_L00_002A7A10();
-    if (D_00189E20.item_animation_active) D_00189E20.item_animation_frames++;
-    else D_00189E20.item_animation_frames = 0;
-    if (D_00138180.no_direction) {
-        D_00189E20.stick_held_frames = 0;
-        D_00189E20.stick_idle_frames++;
+    if (!(gPadState.held&4)) gHeroState.field_20C = 0;
+    if (gHeroState.field_21C) QueueHeroGlowDrawRoutine();
+    if (gHeroState.item_animation_active) gHeroState.item_animation_frames++;
+    else gHeroState.item_animation_frames = 0;
+    if (gPadState.no_direction) {
+        gHeroState.stick_held_frames = 0;
+        gHeroState.stick_idle_frames++;
     }
     else {
-        D_00189E20.stick_idle_frames = 0;
-        D_00189E20.stick_held_frames++;
+        gHeroState.stick_idle_frames = 0;
+        gHeroState.stick_held_frames++;
     }
-    if (D_00189E20.field_22C3 && !D_00189E20.field_229C && D_00189E20.field_340 && D_00189E20.field_170<0.0016666668f && D_00189E20.field_184<0.0016666668f) qcopy(((unsigned char *)&D_00189E20)+0x80, ((unsigned char *)&D_00189E20)+0x2030);
-    if (D_00189E20.field_1454) D_00189E20.field_1E8 = 0;
-    else D_00189E20.field_1E8++;
-    if (D_00189E20.field_24CC && !D_L20_001A8F00_abs && D_00189E20.mode == 4 && D_00189E20.field_2294 != 0x6F && (D_00138180.pressed&0x10)) {
-        D_00189E20.field_1E0 = 0;
-        D_00189E20.field_24CC = 0;
-        func_L20_002D7730(0x91, 1);
+    if (gHeroState.field_22C3 && !gHeroState.field_229C && gHeroState.field_340 && gHeroState.field_170<0.0016666668f && gHeroState.field_184<0.0016666668f) qcopy(((unsigned char *)&gHeroState)+0x80, ((unsigned char *)&gHeroState)+0x2030);
+    if (gHeroState.field_1454) gHeroState.field_1E8 = 0;
+    else gHeroState.field_1E8++;
+    if (gHeroState.field_24CC && !D_L20_001A8F00_abs && gHeroState.mode == 4 && gHeroState.field_2294 != 0x6F && (gPadState.pressed&0x10)) {
+        gHeroState.field_1E0 = 0;
+        gHeroState.field_24CC = 0;
+        YeedilEnterHeroAction(0x91, 1);
     }
     if (!D_L20_001A8F00_abs) {
-        if (D_L20_001B29E0>0) D_00189E20.field_22A++;
-        else D_00189E20.field_22A = 0;
-        if (D_00189E20.field_22A>120) {
+        if (D_L20_001B29E0>0) gHeroState.field_22A++;
+        else gHeroState.field_22A = 0;
+        if (gHeroState.field_22A>120) {
             D_L20_001B29E0 = 0;
-            D_00189E20.field_22A = 0;
+            gHeroState.field_22A = 0;
         }
-        if (D_L20_001B29E4>0) D_00189E20.field_228++;
-        else D_00189E20.field_228 = 0;
-        if (D_00189E20.field_228>120) {
-            D_00189E20.field_228 = 0;
+        if (D_L20_001B29E4>0) gHeroState.field_228++;
+        else gHeroState.field_228 = 0;
+        if (gHeroState.field_228>120) {
+            gHeroState.field_228 = 0;
             D_L20_001B29E4 = 0;
         }
     }
-    if (D_00189E20.field_224) {
+    if (gHeroState.field_224) {
         for (i = 0;(m = D_L20_001FBEE0[i]) != 0;i++) {
-            if (func_002ABB78(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
-                if ((D_L20_001B2AC8&7) == (((int)m>>8)&7) || !func_002A77E0(4)) {
-                    hero = (unsigned char *)&D_00189E20+0x80;
+            if (IsMobyInSpecialClassRange(m) || (m && BP(m, 0x24) && BS(BP(m, 0x24), 0x46) == 22)) {
+                if ((D_L20_001B2AC8&7) == (((int)m>>8)&7) || !RandomIntBelow(4)) {
+                    hero = (unsigned char *)&gHeroState+0x80;
                     pos = m+0x10;
-                    if (func_00282E48(hero, pos)<15.37f) {
-                        func_00282CF0(sum, pos, hero);
-                        func_00282F20(sum, sum, 1.7f);
-                        func_002A8F70(m, D_00189E20.field_2290, 0x4000000, hero, sum, 1.0f);
+                    if (fast_vec_dist(hero, pos)<15.37f) {
+                        FastVecSub(sum, pos, hero);
+                        vec_scale_to_length(sum, sum, 1.7f);
+                        QueueImpactEffect(m, gHeroState.field_2290, 0x4000000, hero, sum, 1.0f);
                     }
                 }
             }
         }
     }
-    for (i = 0;i<4;i++) func_00282948(D_L20_00267060+i*0x70);
-    D_00189E20.current_path_dist = 9999.0f;
-    if (D_00189E20.field_34E && func_L00_002D3B00(((unsigned char *)&D_00189E20)+0xF0)<0) {
-        if (D_00189E20.pos_history_count != 32) goto history_done;
-        func_00282C88(sum);
+    for (i = 0;i<4;i++) FastFloatHelperD(D_L20_00267060+i*0x70);
+    gHeroState.current_path_dist = 9999.0f;
+    if (gHeroState.field_34E && GetViewSpaceHeight(((unsigned char *)&gHeroState)+0xF0)<0) {
+        if (gHeroState.pos_history_count != 32) goto history_done;
+        ClearVector128(sum);
         count = 8;
         for (i = 0;i<count;) {
-            history_index = D_00189E20.pos_history_index-i;
+            history_index = gHeroState.pos_history_index-i;
             first_index = (history_index+31)%32;
             second_index = (history_index+30)%32;
-            func_00282CF0(delta, ((unsigned char *)&D_00189E20)+0x1D90+first_index*16, ((unsigned char *)&D_00189E20)+0x1D90+second_index*16);
+            FastVecSub(delta, ((unsigned char *)&gHeroState)+0x1D90+first_index*16, ((unsigned char *)&gHeroState)+0x1D90+second_index*16);
             i++;
-            func_00282CC0(sum, sum, delta);
+            FastVecAdd(sum, sum, delta);
         }
-        func_00282D30(sum, sum, 1.0f/(float)count);
-        if (func_00282DF0(sum)<0.016666668f) {
-            D_00189E20.still_frames++;
+        FastVecScale(sum, sum, 1.0f/(float)count);
+        if (FastVecLength(sum)<0.016666668f) {
+            gHeroState.still_frames++;
             goto history_done;
         }
     }
-    D_00189E20.still_frames = 0;
+    gHeroState.still_frames = 0;
 history_done:
-    func_L00_002C3838();
-    switch (D_00189E20.mode) {
+    UpdateHeroLandingSlide();
+    switch (gHeroState.mode) {
     case 1:
-        func_L00_002D36E0((unsigned char *)&D_00189E20+0xE0, 1, 0, 0, 0.4f);
+        BuildHeroRelativePoint((unsigned char *)&gHeroState+0xE0, 1, 0, 0, 0.4f);
         break;
     case 4:
-        func_L00_002D36E0((unsigned char *)&D_00189E20+0xE0, 1, 0, 0, 0.4f);
+        BuildHeroRelativePoint((unsigned char *)&gHeroState+0xE0, 1, 0, 0, 0.4f);
         break;
     default:
-        func_L00_002D36E0((unsigned char *)&D_00189E20+0xE0, 1, 0, 0, 0.7f);
+        BuildHeroRelativePoint((unsigned char *)&gHeroState+0xE0, 1, 0, 0, 0.7f);
         break;
     }
     if (!(D_L20_001B2AC8&3)) {
-        switch (D_00189E20.mode) {
+        switch (gHeroState.mode) {
         case 1:
-            D_00189E20.reach_distance = 2.125f;
-            D_00189E20.reach_height = 1.25f;
+            gHeroState.reach_distance = 2.125f;
+            gHeroState.reach_height = 1.25f;
             break;
         case 4:
-            D_00189E20.reach_distance = 2.125f;
-            D_00189E20.reach_height = 1.25f;
+            gHeroState.reach_distance = 2.125f;
+            gHeroState.reach_height = 1.25f;
             break;
         default:
             if (D_001A7A70[0x8F]) {
-                D_00189E20.reach_distance = 14;
-                D_00189E20.reach_height = 4.5f;
+                gHeroState.reach_distance = 14;
+                gHeroState.reach_height = 4.5f;
             }
             else {
-                D_00189E20.reach_distance = 4.25f;
-                D_00189E20.reach_height = 2.25f;
+                gHeroState.reach_distance = 4.25f;
+                gHeroState.reach_height = 2.25f;
             }
         }
     }
-    if (D_00189E20.field_31C<4) {
-        qcopy(((unsigned char *)&D_00189E20)+0xD0, ((unsigned char *)&D_00189E20)+0x2D0);
-        func_L00_002D3778(((unsigned char *)&D_00189E20)+0xD0, ((unsigned char *)&D_00189E20)+0xD0, 0.5f);
+    if (gHeroState.field_31C<4) {
+        qcopy(((unsigned char *)&gHeroState)+0xD0, ((unsigned char *)&gHeroState)+0x2D0);
+        ApplyHeroModeTransformReversed(((unsigned char *)&gHeroState)+0xD0, ((unsigned char *)&gHeroState)+0xD0, 0.5f);
     }
-    else qcopy(((unsigned char *)&D_00189E20)+0xD0, ((unsigned char *)&D_00189E20)+0xE0);
+    else qcopy(((unsigned char *)&gHeroState)+0xD0, ((unsigned char *)&gHeroState)+0xE0);
     {
-        unsigned char *heldMoby = D_00189E20.field_5C0;
+        unsigned char *heldMoby = gHeroState.field_5C0;
         if (heldMoby) {
-            if (!(BU(heldMoby, 0x34)&0x1000) || heldMoby == D_00189E20.field_33C) D_00189E20.field_5C0 = 0;
-            if (D_00189E20.field_5C0 && D_00189E20.field_1248 != 46) D_00189E20.field_5C0 = 0;
+            if (!(BU(heldMoby, 0x34)&0x1000) || heldMoby == gHeroState.field_33C) gHeroState.field_5C0 = 0;
+            if (gHeroState.field_5C0 && gHeroState.field_1248 != 46) gHeroState.field_5C0 = 0;
         }
     }
-    if (D_00189E20.field_88<1) func_L00_002B30E8();
+    if (gHeroState.field_88<1) RecordHeroPlayCounters();
 }

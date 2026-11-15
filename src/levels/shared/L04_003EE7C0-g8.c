@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 /* func_L04_003EE7C0: the level-04 copy of func_L00_003C2FC8 (aim-assist target query),
  * over level 04's tuning block and tables. Same -g unit reasons as the twin. */
 typedef int AimWord128 __attribute__((mode(TI)));
@@ -43,72 +44,73 @@ extern int func_002829D8(void *);
 extern void func_L00_003C33E0(void *);
 extern void func_L00_002E6EF8(void (*)(void *), void *);
 
-void func_L04_003EE7C0(unsigned char *object) {
-    unsigned char *state = *(unsigned char **)(object + 0x68);
-    unsigned char *target;
-    char *info;
+/* Updates the player's Mini-Nuke: finds an aim target and, when the fire button is pressed, launches the shot and starts its sound. */
+void func_L04_003EE7C0(unsigned char *moby) {
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
+    unsigned char *aimTarget;
+    char *targetInfo;
     AimVector position;
     AimQueryConfig config;
     AimVector scratch;
     int allowed;
-    func_0029FCC0((char *)object, 0, (char *)&position);
-    if (object[0x42] == object[0x43] && (object[0x60] & 2))
-        func_002A75E0(object, 1, 0, 2, 0);
-    target = 0;
+    TransformMobyJointToWorld((char *)moby, 0, (char *)&position);
+    if (moby[0x42] == moby[0x43] && (moby[0x60] & 2))
+        StartAnimationBlendedWithFlags(moby, 1, 0, 2, 0);
+    aimTarget = 0;
     if (H->ptr[0x1450 / 4] && H->ptr[0x1450 / 4][0x20] != 0xFE && H->ptr[0x1450 / 4][0x20] != 0xFD) {
-        info = (char *)func_002AB1F0(H->ptr[0x1450 / 4]);
-        if (info && *(float *)info > 0.0f)
-            target = H->ptr[0x1450 / 4];
+        targetInfo = (char *)GetMobyPrivateValue0(H->ptr[0x1450 / 4]);
+        if (targetInfo && *(float *)targetInfo > 0.0f)
+            aimTarget = H->ptr[0x1450 / 4];
     }
     allowed = 1;
     if (H->i[0x2294 / 4] == 0x1D || H->i[0x2294 / 4] == 1) {
-        if (func_00282948(&H->i[0x2534 / 4]) == 0)
+        if (FastFloatHelperD(&H->i[0x2534 / 4]) == 0)
             allowed = 0;
     } else {
         H->i[0x2534 / 4] = 0x28;
-        if (!target) {
+        if (!aimTarget) {
             config = D_L04_001B01B0;
-            target = func_002AF580(&position, &H->b[0x760], &scratch, 0.392699093f, 0.785398185f,
+            aimTarget = SelectBestTargetInCone(&position, &H->b[0x760], &scratch, 0.392699093f, 0.785398185f,
                                   0, 0, 0, 11.1f, 0.0f, 0.0f, 0, &config);
         }
     }
-    func_002FDF40(&config, &position, target, 0, D_L04_001B01A4, D_L04_001B01A0,
+    CalculateAimedLaunchVelocity(&config, &position, aimTarget, 0, D_L04_001B01A4, D_L04_001B01A0,
                    D_L04_001B01AC * 0.016666668f, D_L04_001B01A8 * 0.00027777778f);
-    *(int *)(state + 0x24) = func_002FE5A0(&position, &config, state, state + 0x10, object, 0, 0,
+    *(int *)(vars + 0x24) = TraceProjectileToImpact(&position, &config, vars, vars + 0x10, moby, 0, 0,
                                           D_L04_001B01A8 * 0.00027777778f);
-    switch (object[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        object[0x20] = 1;
-        *(int *)(state + 0x2C) = -1;
-        *(float *)(state + 0x20) = 0.0f;
-        *(int *)(state + 0x28) = 0;
+        moby[0x20] = 1;
+        *(int *)(vars + 0x2C) = -1;
+        *(float *)(vars + 0x20) = 0.0f;
+        *(int *)(vars + 0x28) = 0;
     case 1:
         if (H->i[0x1D8 / 4] >= 21)
-            func_L00_002AF7D0();
-        if (allowed && *(float *)(state + 0x20) == 0.0f && !H->b[0x22BC] && (PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) && H->i[0x1240 / 4] >= 23) {
-            if (func_L00_002D3F30(-1, 1)) {
+            cancel_hero_item_animation();
+        if (allowed && *(float *)(vars + 0x20) == 0.0f && !H->b[0x22BC] && (PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) && H->i[0x1240 / 4] >= 23) {
+            if (SpendWeaponAmmo(-1, 1)) {
                 D_L04_001B2F38 = 1;
-                func_L00_002AF568();
-                *(int *)(state + 0x2C) = func_L00_002D6998(D_L04_002BA6C0);
-                func_002A75E0(object, 2, 0, 2, 0);
-                func_L00_003E7650((int)object, (char *)&position, (char *)&config);
-                func_002E5CF8(0, 0, (char *)object);
+                start_equipped_item_animation();
+                *(int *)(vars + 0x2C) = CopyRecordsToFreeSlots(D_L04_002BA6C0);
+                StartAnimationBlendedWithFlags(moby, 2, 0, 2, 0);
+                SpawnMiniNukeProjectile((int)moby, (char *)&position, (char *)&config);
+                PlayMobySound(0, 0, (char *)moby);
                 {
-                AimTuning *tu = &D_L04_0027B470[D_00139592[0]];
-                *(float *)(state + 0x20) = 1.0f / tu->cooldown;
+                AimTuning *tuning = &D_L04_0027B470[D_00139592[0]];
+                *(float *)(vars + 0x20) = 1.0f / tuning->cooldown;
             }
             } else if ((PAD->u[0x1A4 / 4] & H->u[0x1230 / 4]) || D_L04_001B2F38 == 1) {
-                func_002E5CF8(1, 0, (char *)object);
+                PlayMobySound(1, 0, (char *)moby);
                 D_L04_001B2F38 = 0;
             }
-            if (!(PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) || !func_L00_002D4040(-1) || !H->b[0x22B8]) {
-                if (*(int *)(state + 0x2C) >= 0) {
-                    func_L00_002D6B70(*(int *)(state + 0x2C));
-                    *(int *)(state + 0x2C) = -1;
+            if (!(PAD->u[0x1A0 / 4] & H->u[0x1230 / 4]) || !get_ammo(-1) || !H->b[0x22B8]) {
+                if (*(int *)(vars + 0x2C) >= 0) {
+                    ResetActiveSlots(*(int *)(vars + 0x2C));
+                    *(int *)(vars + 0x2C) = -1;
                 }
             }
         }
     }
-    func_002829D8(state + 0x20);
-    func_L00_002E6EF8(func_L00_003C33E0, object);
+    FastVectorHelperB(vars + 0x20);
+    AddDrawCallbackToList3(ApplyActiveEffect, moby);
 }

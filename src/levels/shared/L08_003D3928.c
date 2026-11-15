@@ -130,20 +130,21 @@ extern char D_L08_001B1FB0[];
 /* Measures the resident actor position against POS: a nearer POS replaces record [1]
    (owner, distance, position), and record [0] is refreshed when OWNER is its owner.
    The records are reached as `sda` offsets, so every access is one assembler macro. */
+/* Offers a candidate lock-on target: keeps it if it is the closest one seen so far this frame. */
 void func_L08_003D3928(void *owner, void *pos)
 {
-    float d = func_00282E80(D_00189EA0, pos);
+    float distance = vec_distance_xy(gHeroPosition, pos);
 
-    if (d < D_L08_001B3490[1].dist) {
+    if (distance < D_L08_001B3490[1].dist) {
         D_L08_001B3490[1].unk1C = 0;
         D_L08_001B3490[1].owner = owner;
         D_L08_001B3490[1].unk18 = 0;
-        D_L08_001B3490[1].dist = d;
+        D_L08_001B3490[1].dist = distance;
         qcopy(&D_L08_001B3490[1].pos, pos);
         D_L08_001B3490[1].valid = 1;
     }
     if (D_L08_001B3490[0].owner == owner) {
-        D_L08_001B3490[0].dist = d;
+        D_L08_001B3490[0].dist = distance;
         qcopy(&D_L08_001B3490[0].pos, pos);
         D_L08_001B3490[0].valid = 1;
     }
@@ -153,64 +154,68 @@ void func_L08_003D3928(void *owner, void *pos)
 
 /* One resident word, two states, and a 16-byte table entry: hands the entry to
    func_L00_00326048 with an alpha of 0x3D7A35E0. */
-void func_L08_003D3EB8(u8 *a0)
+/* Updates a Glider Pad (moby class 2440): draws its glow effect once it has its data. */
+void func_L08_003D3EB8(u8 *moby)
 {
-    s32 v = *(s32 *)(a0 + 0x68);
+    s32 effectData = *(s32 *)(moby + 0x68);
 
-    if (v == 0)
+    if (effectData == 0)
         return;
-    func_L00_00326048(a0, v, 0x80AAAAD2, 0x80396464, 0.0610865355f);
+    StoreAngleUpdateResult(moby, effectData, 0x80AAAAD2, 0x80396464, 0.0610865355f);
 }
 
 
-void func_L08_003D4690(u8 *self)
+/* Updates an effect object (moby class 2465): when its target is hit it plays an animation and
+   throws a burst of sparks, and it removes itself when the target is gone. */
+void func_L08_003D4690(u8 *moby)
 {
     float direction[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
-    float random[4] __attribute__((aligned(16)));
-    u8 *target = *(u8 **)*(u32 *)(self + 0x68);
-    int i;
+    float randomDir[4] __attribute__((aligned(16)));
+    u8 *target = *(u8 **)*(u32 *)(moby + 0x68);
+    int sparksLeft;
     if (!target || target[0x20] == 0xFE || target[0x20] == 0xFD) {
-        func_0029F338(self);
+        MarkMobySpawned(moby);
         return;
     }
-    if ((self[0x60] & 2) && self[0x43])
-        func_002A7470(self, 0, 0, 0);
-    if (self[0xBC]) {
-        self[0xBC] = 0;
-        if (self[0x43] != 1) func_002A7470(self, 1, 0, 0);
-        func_002AF000(direction, 1.0f, *(float *)(self+0xF8), -*(float *)(self+0xF4));
-        func_0029FCC0(self, 0, position);
-        func_L08_003B2DB0(self, position, direction, 0x5A);
-        i = 4;
+    if ((moby[0x60] & 2) && moby[0x43])
+        StartAnimationBlended(moby, 0, 0, 0);
+    if (moby[0xBC]) {
+        moby[0xBC] = 0;
+        if (moby[0x43] != 1) StartAnimationBlended(moby, 1, 0, 0);
+        BuildSphericalOffset(direction, 1.0f, *(float *)(moby+0xF8), -*(float *)(moby+0xF4));
+        TransformMobyJointToWorld(moby, 0, position);
+        SpawnDirectedEffectObject(moby, position, direction, 0x5A);
+        sparksLeft = 4;
         do {
-            *(TI128 *)random = 0;
-            random[0] = func_002A7878(-1.0f, 1.0f);
-            random[1] = func_002A7878(-1.0f, 1.0f);
-            random[2] = func_002A7878(-1.0f, 1.0f);
-            *(TI128 *)velocity = *(TI128 *)random;
-            func_00282F20(velocity, velocity, func_00282DF0(direction)*0.65f);
-            func_00282CC0(velocity, direction, velocity);
-            func_00282F20(velocity, velocity, func_002A7878(0.050000004f, 0.10000001f));
-            func_L04_00358AE8(position, velocity, 0x5F2F4F6F, func_002A7820(5,10), 50000.0f);
-        } while (--i >= 0);
-        func_00282F20(direction, direction, 0.008333334f);
-        func_L04_00358AE8(position, direction, 0x2F4F7F7F, func_002A7820(4,7), 500000.0f);
+            *(TI128 *)randomDir = 0;
+            randomDir[0] = RandomFloatRange(-1.0f, 1.0f);
+            randomDir[1] = RandomFloatRange(-1.0f, 1.0f);
+            randomDir[2] = RandomFloatRange(-1.0f, 1.0f);
+            *(TI128 *)velocity = *(TI128 *)randomDir;
+            vec_scale_to_length(velocity, velocity, FastVecLength(direction)*0.65f);
+            FastVecAdd(velocity, direction, velocity);
+            vec_scale_to_length(velocity, velocity, RandomFloatRange(0.050000004f, 0.10000001f));
+            SpawnVelocityParticle(position, velocity, 0x5F2F4F6F, RandomIntRange(5,10), 50000.0f);
+        } while (--sparksLeft >= 0);
+        vec_scale_to_length(direction, direction, 0.008333334f);
+        SpawnVelocityParticle(position, direction, 0x2F4F7F7F, RandomIntRange(4,7), 500000.0f);
     }
 }
 
+/* Returns 2 in one special mode and 1 otherwise. */
 /* The same resident word, but the 8 case falls through to a 1/2 selector. */
 s32 func_L08_003DB4E8(void)
 {
-    s32 v = D_001A79F0;
-    s32 r = 1;
+    s32 mode = gCurrentMapIndex;
+    s32 result = 1;
 
-    if (v == 8)
+    if (mode == 8)
         return 1;
-    if (v == 0x13)
-        r = 2;
-    return r;
+    if (mode == 0x13)
+        result = 2;
+    return result;
 }
 
 
@@ -225,41 +230,42 @@ s32 func_L08_003DB4E8(void)
 
 /* func_L08_0041E4F8 is defined in L08_0041E4F8-flags-g8.c. */
 
+/* Reads the controller and gives back five movement values, each limited to the range -1 to 1. */
 /* shared native body of family c459a266b43242d6 */
-void func_L08_0041E630(float *a0, float *a1, float *a2, float *a3, float *p4)
+void func_L08_0041E630(float *stickX, float *liftAxis, float *stickY, float *throttle, float *turnAxis)
 {
-    float f1;
-    float f2;
-    int v1;
+    float axis;
+    float upDown;
+    int buttons;
 
-    *a0 = -D_00189E20_14[2028];
-    *a2 = -D_00189E20_14[2029];
-    v1 = D_00138180[104];
-    f2 = 0.0f;
-    if (v1 & 0x40)
-        f2 = 1.0f;
-    f1 = (v1 & 0x20) ? (f2 - 1.0f) : f2;
-    *a1 = f1;
-    *a3 = *(float *)&D_00138180[75];
-    v1 = D_00138180[104];
-    f1 = 0.0f;
-    if (v1 & 0x1)
-        f1 = 1.0f;
-    if (v1 & 0x2)
-        f1 = f1 - 1.0f;
-    *p4 = f1;
-    if (*a0 > 1.0f)
-        *a0 = 1.0f;
-    else if (*a0 < -1.0f)
-        *a0 = -1.0f;
-    if (*a1 > 1.0f)
-        *a1 = 1.0f;
-    else if (*a1 < -1.0f)
-        *a1 = -1.0f;
-    if (*p4 > 1.0f)
-        *p4 = 1.0f;
-    else if (*p4 < -1.0f)
-        *p4 = -1.0f;
+    *stickX = -D_00189E20_14[2028];
+    *stickY = -D_00189E20_14[2029];
+    buttons = gPadState[104];
+    upDown = 0.0f;
+    if (buttons & 0x40)
+        upDown = 1.0f;
+    axis = (buttons & 0x20) ? (upDown - 1.0f) : upDown;
+    *liftAxis = axis;
+    *throttle = *(float *)&gPadState[75];
+    buttons = gPadState[104];
+    axis = 0.0f;
+    if (buttons & 0x1)
+        axis = 1.0f;
+    if (buttons & 0x2)
+        axis = axis - 1.0f;
+    *turnAxis = axis;
+    if (*stickX > 1.0f)
+        *stickX = 1.0f;
+    else if (*stickX < -1.0f)
+        *stickX = -1.0f;
+    if (*liftAxis > 1.0f)
+        *liftAxis = 1.0f;
+    else if (*liftAxis < -1.0f)
+        *liftAxis = -1.0f;
+    if (*turnAxis > 1.0f)
+        *turnAxis = 1.0f;
+    else if (*turnAxis < -1.0f)
+        *turnAxis = -1.0f;
 }
 
 /* func_L08_0041E790 is defined in L08_0041E790-g8.c. */
@@ -274,21 +280,23 @@ void func_L08_0041E630(float *a0, float *a1, float *a2, float *a3, float *p4)
 
 /* func_L08_00435600 is defined in L08_00435600-helpers.c. */
 
+/* Copies a position value into the object's private data. */
 /* Stores one 16-byte block through the pointer at 0x68 of the argument. */
-void func_L08_004356A0(u8 *a0, void *a1)
+void func_L08_004356A0(u8 *moby, void *source)
 {
-    *(volatile TI128 *)*(u32 *)(a0 + 0x68) = *(TI128 *)a1;
+    *(volatile TI128 *)*(u32 *)(moby + 0x68) = *(TI128 *)source;
 }
 
 /* func_L08_004356B8 is defined in L08_004356B8-g8.c. */
 
 
+/* Makes every other object of the same kind glow bright when the shop screen is open. */
 /* For every listed entity of A0's kind, while the mode word is 2 and the resident
    flag is set, hands it to func_0029F978 with the level block at 0x001B22E0 unless its
    byte 1 is set, and sets the vector at 0x001B2300 to 2.3. */
-void func_L08_00435990(L08Thing *a0)
+void func_L08_00435990(L08Thing *sample)
 {
-    L08Thing *e;
+    L08Thing *other;
     s32 i;
 
     if (D_L08_001A8F00[0] != 2)
@@ -296,12 +304,12 @@ void func_L08_00435990(L08Thing *a0)
     if (D_001A7A40[0] == 0)
         return;
     for (i = 0; i < D_L08_001BD800.count; i++) {
-        e = D_L08_001BD800.items[i];
-        if (e->kind != a0->kind)
+        other = D_L08_001BD800.items[i];
+        if (other->kind != sample->kind)
             continue;
         if (D_L08_001B22E0[1] != 0)
             continue;
-        func_0029F978((u8 *)e, 0, D_L08_001B22E0);
+        AttachManipulator((u8 *)other, 0, D_L08_001B22E0);
         D_L08_001B2300[0] = 2.3f;
         D_L08_001B2300[1] = 2.3f;
         D_L08_001B2300[2] = 2.3f;
@@ -314,227 +322,229 @@ void func_L08_00435990(L08Thing *a0)
 #define QUANTITY (*(s16 *)(D_001A7A00 + 0x1A))
 #define PRICE (D_L08_001A7C80[0xF] ? D_L08_00295E50[3] : D_L08_00295E50[2])
 
+/* Updates The Mystic (moby class 3646), a shopkeeper that sells an item and buys back the
+   player's collected bolts or Raritanium, and turns its head to watch the hero. */
 /* An interaction state machine at byte 0x20: offers an item for its price while
    the quantity at D_001A7A00+0x1A covers it, then buys the remaining quantity back
    at 1000 (10000 with the flag at D_001A7A00+0xA) each; afterwards aims the head at the hero. */
-void func_L08_00435A78(u8 *self)
+void func_L08_00435A78(u8 *mystic)
 {
-    float dest[4] __attribute__((aligned(16)));
-    float pos[4] __attribute__((aligned(16)));
-    float delta[4] __attribute__((aligned(16)));
-    u8 *data = *(u8 **)(self + 0x68);
-    int n, active;
-    float speed, yaw, pitch, angle;
-    float blend = 0.3f;
+    float lookTarget[4] __attribute__((aligned(16)));
+    float headPos[4] __attribute__((aligned(16)));
+    float toTarget[4] __attribute__((aligned(16)));
+    u8 *vars = *(u8 **)(mystic + 0x68);
+    int payMultiplier, watchingHero;
+    float blendSpeed, yaw, pitch, angle;
+    float blendWeight = 0.3f;
 
-    func_L08_00435990((L08Thing *)self);
+    HandleMysticEntityList((L08Thing *)mystic);
     if (D_L08_001A8F00[0] == 6) {
-        self[0x31] = 0;
-        H(self, 0x34) |= 1;
-        F(self, 0xF4) = -3.14159274f;
+        mystic[0x31] = 0;
+        H(mystic, 0x34) |= 1;
+        F(mystic, 0xF4) = -3.14159274f;
     } else {
-        self[0x31] = 1;
-        F(self, 0xF4) = 0;
-        H(self, 0x34) &= 0xFFFE;
+        mystic[0x31] = 1;
+        F(mystic, 0xF4) = 0;
+        H(mystic, 0x34) &= 0xFFFE;
     }
     if (D_L08_001B2508 == 5)
-        func_L08_00435938();
-    switch (self[0x20]) {
+        GetLevelSavedCount();
+    switch (mystic[0x20]) {
     case 0:
         if (!D_001395B8[0x1C])
-            func_L08_0036EFC8();
-        else if (I(data, 0x124) != -1) {
-            func_0029F338(&D_L08_001B29DC[I(data, 0x124)]);
-            I(data, 0x124) = -1;
+            DisableObjectListFlags();
+        else if (I(vars, 0x124) != -1) {
+            MarkMobySpawned(&D_L08_001B29DC[I(vars, 0x124)]);
+            I(vars, 0x124) = -1;
         }
-        func_L08_00435938();
-        func_L01_003128C0(self);
+        GetLevelSavedCount();
+        ResetMobyVarsDefaults(mystic);
         if (D_001395B8[0x1C]) {
             if (QUANTITY <= 0)
-                func_002A7750(self, 6, -1);
+                SetMobyState(mystic, 6, -1);
             else
-                func_002A7750(self, 7, -1);
+                SetMobyState(mystic, 7, -1);
         } else if (D_001395B8[0x1B]) {
             if (QUANTITY < PRICE)
-                func_002A7750(self, 3, -1);
+                SetMobyState(mystic, 3, -1);
             else
-                func_002A7750(self, 4, -1);
+                SetMobyState(mystic, 4, -1);
         } else
-            func_002A7750(self, 1, -1);
+            SetMobyState(mystic, 1, -1);
         break;
     case 1:
-        if (func_L01_003245E0(self, 10, 2.5f)) {
-            func_L01_003246D0(self);
-            if (func_00288AA0(D_L08_001BFD00, 0x59)) {
+        if (IsHeroReachableForCount(mystic, 10, 2.5f)) {
+            ApplyIndexForKey(mystic);
+            if (PushRequestQueue(D_L08_001BFD00, 0x59)) {
                 D_001395B8[0x1B] = 1;
-                func_00288BE8(D_L08_001BFD00);
-                func_002A7750(self, 2, -1);
+                LaunchQueuedRequest(D_L08_001BFD00);
+                SetMobyState(mystic, 2, -1);
             }
         }
         break;
     case 2:
         if (D_L08_001A8F00[0] == 2) {
-            self[0x31] = 0;
-            H(self, 0x34) |= 1;
+            mystic[0x31] = 0;
+            H(mystic, 0x34) |= 1;
         }
-        if (I(data, 0x124) != -1 && D_L08_001A8F00[0] == 2) {
-            D_L08_001B29DC[I(data, 0x124)].x34 |= 1;
-            D_L08_001B29DC[I(data, 0x124)].x31 = 0;
+        if (I(vars, 0x124) != -1 && D_L08_001A8F00[0] == 2) {
+            D_L08_001B29DC[I(vars, 0x124)].x34 |= 1;
+            D_L08_001B29DC[I(vars, 0x124)].x31 = 0;
         }
         D_L08_001B2724[1] = 1;
-        if (!func_002F5D10()) {
+        if (!IsEitherModeTwo()) {
             D_L08_001B2724[1] = 0;
-            self[0x31] = 1;
-            H(self, 0x34) &= 0xFFFE;
-            if (I(data, 0x124) != -1) {
-                D_L08_001B29DC[I(data, 0x124)].x34 &= 0xFFFE;
-                D_L08_001B29DC[I(data, 0x124)].x31 = 1;
+            mystic[0x31] = 1;
+            H(mystic, 0x34) &= 0xFFFE;
+            if (I(vars, 0x124) != -1) {
+                D_L08_001B29DC[I(vars, 0x124)].x34 &= 0xFFFE;
+                D_L08_001B29DC[I(vars, 0x124)].x31 = 1;
             }
             if (QUANTITY < PRICE)
-                func_002A7750(self, 3, -1);
+                SetMobyState(mystic, 3, -1);
             else
-                func_002A7750(self, 4, -1);
+                SetMobyState(mystic, 4, -1);
         }
         break;
     case 3:
         if (QUANTITY >= PRICE)
-            func_002A7750(self, 4, -1);
-        else if (func_L01_003245E0(self, 10, 2.5f)) {
-            func_L01_00324550(0x27A4, PRICE, -1);
-            func_L01_003246D0(self);
+            SetMobyState(mystic, 4, -1);
+        else if (IsHeroReachableForCount(mystic, 10, 2.5f)) {
+            PrintLocalizedFormatted(0x27A4, PRICE, -1);
+            ApplyIndexForKey(mystic);
         }
         break;
     case 4:
         if (QUANTITY < PRICE)
-            func_002A7750(self, 3, -1);
-        else if (func_L01_003245E0(self, 10, 2.5f)) {
-            func_L01_00324550(0x2796, PRICE, -1);
-            func_L01_003246D0(self);
+            SetMobyState(mystic, 3, -1);
+        else if (IsHeroReachableForCount(mystic, 10, 2.5f)) {
+            PrintLocalizedFormatted(0x2796, PRICE, -1);
+            ApplyIndexForKey(mystic);
             if (D_00138324 & 0x10) {
-                func_00288AA0(D_L08_001BFD00, 0x5A);
+                PushRequestQueue(D_L08_001BFD00, 0x5A);
                 QUANTITY -= PRICE;
-                func_00288BE8(D_L08_001BFD00);
-                func_002A7750(self, 5, -1);
+                LaunchQueuedRequest(D_L08_001BFD00);
+                SetMobyState(mystic, 5, -1);
             }
         }
         break;
     case 5:
         if (D_L08_001A8F00[0] == 2) {
-            self[0x31] = 0;
-            H(self, 0x34) |= 1;
+            mystic[0x31] = 0;
+            H(mystic, 0x34) |= 1;
         }
-        if (I(data, 0x124) != -1 && D_L08_001A8F00[0] == 2) {
-            func_0029F338(&D_L08_001B29DC[I(data, 0x124)]);
-            I(data, 0x124) = -1;
+        if (I(vars, 0x124) != -1 && D_L08_001A8F00[0] == 2) {
+            MarkMobySpawned(&D_L08_001B29DC[I(vars, 0x124)]);
+            I(vars, 0x124) = -1;
         }
         D_L08_001B2724[1] = 1;
-        if (!func_002F5D10()) {
+        if (!IsEitherModeTwo()) {
             D_L08_001B2724[1] = 0;
-            self[0x31] = 1;
-            H(self, 0x34) &= 0xFFFE;
-            if (self[0x21] != 0xFF)
-                func_002A8598(self[0x21], 1);
+            mystic[0x31] = 1;
+            H(mystic, 0x34) &= 0xFFFE;
+            if (mystic[0x21] != 0xFF)
+                SetByteOnGroupMobys(mystic[0x21], 1);
             D_001395B8[0x1C] = 1;
-            func_L08_0036F030();
-            func_0026FEB8(D_L08_001B1FB0);
-            if (I(data, 0x124) != -1) {
-                func_0029F338(&D_L08_001B29DC[I(data, 0x124)]);
-                I(data, 0x124) = -1;
+            RestoreObjectListFlags();
+            STUB_printf(D_L08_001B1FB0);
+            if (I(vars, 0x124) != -1) {
+                MarkMobySpawned(&D_L08_001B29DC[I(vars, 0x124)]);
+                I(vars, 0x124) = -1;
             }
-            if (I(data, 0x120) != -1)
-                D_L08_001B29DC[I(data, 0x120)].xBC = 1;
-            func_0029B3E0(0, -1);
+            if (I(vars, 0x120) != -1)
+                D_L08_001B29DC[I(vars, 0x120)].xBC = 1;
+            MemcardSave(0, -1);
             if (QUANTITY <= 0)
-                func_002A7750(self, 6, -1);
+                SetMobyState(mystic, 6, -1);
             else
-                func_002A7750(self, 7, -1);
+                SetMobyState(mystic, 7, -1);
         }
         break;
     case 6:
         if (QUANTITY > 0)
-            func_002A7750(self, 7, -1);
-        else if (func_L01_003245E0(self, 10, 2.5f)) {
+            SetMobyState(mystic, 7, -1);
+        else if (IsHeroReachableForCount(mystic, 10, 2.5f)) {
             if (!D_L08_001B1FA8)
-                func_L01_00324550(0x27D0, 0, -1);
+                PrintLocalizedFormatted(0x27D0, 0, -1);
             else
-                func_L01_00324550(0x27A7, -1);
-            func_L01_003246D0(self);
+                PrintLocalizedFormatted(0x27A7, -1);
+            ApplyIndexForKey(mystic);
         }
         break;
     case 7:
         if (QUANTITY <= 0)
-            func_002A7750(self, 6, -1);
+            SetMobyState(mystic, 6, -1);
         else {
-            n = D_001A7A00[0xA] ? 10 : 1;
-            if (func_L01_003245E0(self, 10, 2.5f)) {
-                n *= 1000;
-                func_L01_00324550(0x2797, QUANTITY, QUANTITY * n, -1);
-                func_L01_003246D0(self);
+            payMultiplier = D_001A7A00[0xA] ? 10 : 1;
+            if (IsHeroReachableForCount(mystic, 10, 2.5f)) {
+                payMultiplier *= 1000;
+                PrintLocalizedFormatted(0x2797, QUANTITY, QUANTITY * payMultiplier, -1);
+                ApplyIndexForKey(mystic);
                 if (D_00138324 & 0x10) {
-                    func_L08_00435938();
-                    D_001A79F8 += QUANTITY * n;
-                    func_002E5DA0(0, 0, self, func_002A7820(13, 17));
+                    GetLevelSavedCount();
+                    gPlayerBolts += QUANTITY * payMultiplier;
+                    PlaySoundFromClassBank(0, 0, mystic, RandomIntRange(13, 17));
                     QUANTITY = 0;
                     func_L00_0030C710(180);
-                    func_002A7750(self, 8, -1);
+                    SetMobyState(mystic, 8, -1);
                 }
             }
         }
         break;
     case 8:
-        H(self, 0x96)++;
-        if (H(self, 0x96) > 0x7FF8)
-            H(self, 0x96) = 0x7FF8;
-        if (H(self, 0x96) > 40 && H(self, 0x96) < 90 && H(self, 0x96) % 4 == 0)
-            func_002E5DA0(0, 0, self, func_002A7820(13, 17));
-        if (func_L01_003245E0(self, 10, 2.5f))
-            func_L01_00324550(0x27D0, D_L08_001B1FA8, -1);
+        H(mystic, 0x96)++;
+        if (H(mystic, 0x96) > 0x7FF8)
+            H(mystic, 0x96) = 0x7FF8;
+        if (H(mystic, 0x96) > 40 && H(mystic, 0x96) < 90 && H(mystic, 0x96) % 4 == 0)
+            PlaySoundFromClassBank(0, 0, mystic, RandomIntRange(13, 17));
+        if (IsHeroReachableForCount(mystic, 10, 2.5f))
+            PrintLocalizedFormatted(0x27D0, D_L08_001B1FA8, -1);
         else
-            func_002A7750(self, 6, -1);
+            SetMobyState(mystic, 6, -1);
         break;
     }
-    if (self[0x20]) {
-        if (self[0x43] == 1 && func_00282978(data + 0x11E)) {
-            H(data, 0x11E) = func_00283CF0(func_002A7878(1200, 2400));
-            if (self[0x43] != 2)
-                func_002A7470(self, 2, 0, 10);
-        } else if ((self[0x60] & 2) && self[0x43] != 1)
-            func_002A7470(self, 1, 0, 10);
+    if (mystic[0x20]) {
+        if (mystic[0x43] == 1 && FastDecTimer(vars + 0x11E)) {
+            H(vars, 0x11E) = FloatToInt(RandomFloatRange(1200, 2400));
+            if (mystic[0x43] != 2)
+                StartAnimationBlended(mystic, 2, 0, 10);
+        } else if ((mystic[0x60] & 2) && mystic[0x43] != 1)
+            StartAnimationBlended(mystic, 1, 0, 10);
     }
-    speed = 0.02f;
-    active = 0;
-    if (self[0x43] == 1) {
-        active = 1;
-        if (func_00282E80((char *)self + 0x10, D_00189E20.x80) < 8 &&
-            func_00283C80(F(self, 0xF8), func_00283248(D_00189E20.pos[0] - F(self, 0x10),
-                                                       D_00189E20.pos[1] - F(self, 0x14))) < 1.57079649f) {
-            if (func_00282DF0(D_00189E20.x110) > 0.01f)
-                I(data, 0x114) = 120;
+    blendSpeed = 0.02f;
+    watchingHero = 0;
+    if (mystic[0x43] == 1) {
+        watchingHero = 1;
+        if (vec_distance_xy((char *)mystic + 0x10, gHeroState.x80) < 8 &&
+            FastDiffRots(F(mystic, 0xF8), FastMatrixHelperA(gHeroState.pos[0] - F(mystic, 0x10),
+                                                       gHeroState.pos[1] - F(mystic, 0x14))) < 1.57079649f) {
+            if (FastVecLength(gHeroState.x110) > 0.01f)
+                I(vars, 0x114) = 120;
             else
-                func_00282948(data + 0x114);
-        } else if (I(data, 0x114)) {
-            I(data, 0x114) = 0;
-            qcopy(data + 0x100, D_00189E20.pos);
+                FastFloatHelperD(vars + 0x114);
+        } else if (I(vars, 0x114)) {
+            I(vars, 0x114) = 0;
+            qcopy(vars + 0x100, gHeroState.pos);
         }
-        if (func_00282948(data + 0x118)) {
-            I(data, 0x118) = func_00283CF0(func_002A7878(180, 300));
-            angle = func_00283B98(F(self, 0xF8), func_002A7878(-90, 90) * 0.0174532942f);
-            pitch = func_002A7878(0, 30) * 0.0174532942f;
-            func_002AF000(data + 0x100, 6, angle, pitch);
-            func_00282CC0(data + 0x100, data + 0x100, self + 0x10);
+        if (FastFloatHelperD(vars + 0x118)) {
+            I(vars, 0x118) = FloatToInt(RandomFloatRange(180, 300));
+            angle = FastAddRotations(F(mystic, 0xF8), RandomFloatRange(-90, 90) * 0.0174532942f);
+            pitch = RandomFloatRange(0, 30) * 0.0174532942f;
+            BuildSphericalOffset(vars + 0x100, 6, angle, pitch);
+            FastVecAdd(vars + 0x100, vars + 0x100, mystic + 0x10);
         }
-        if (I(data, 0x114)) {
-            qcopy(dest, D_00189E20.pos);
-            speed = 0.04f;
+        if (I(vars, 0x114)) {
+            qcopy(lookTarget, gHeroState.pos);
+            blendSpeed = 0.04f;
         } else
-            qcopy(dest, data + 0x100);
+            qcopy(lookTarget, vars + 0x100);
     }
-    if (active) {
-        qcopy(pos, self + 0x10);
-        pos[2] += 2;
-        func_00282CF0(delta, dest, pos);
-        yaw = func_00283BE0(func_00283248(delta[0], delta[1]), F(self, 0xF8));
-        pitch = -func_00283248(func_00282E20(delta), delta[2]);
+    if (watchingHero) {
+        qcopy(headPos, mystic + 0x10);
+        headPos[2] += 2;
+        FastVecSub(toTarget, lookTarget, headPos);
+        yaw = fast_subtract_rotations(FastMatrixHelperA(toTarget[0], toTarget[1]), F(mystic, 0xF8));
+        pitch = -FastMatrixHelperA(vec_length_xy(toTarget), toTarget[2]);
         if (yaw > 1.57079649f)
             yaw = 1.57079649f;
         else if (yaw < -1.57079649f)
@@ -543,14 +553,14 @@ void func_L08_00435A78(u8 *self)
             pitch = 0.52359885f;
         else if (pitch < -0.52359885f)
             pitch = -0.52359885f;
-        F(data, 0x64) = pitch;
-        F(data, 0x68) = yaw * 0.6f;
-        F(data, 0xE8) = yaw * 0.4f;
+        F(vars, 0x64) = pitch;
+        F(vars, 0x68) = yaw * 0.6f;
+        F(vars, 0xE8) = yaw * 0.4f;
     }
     if (D_001A7A40[0])
-        F(data, 0x70) = 2.75f;
-    func_002AEC48(self, data, 0, speed, blend);
-    func_002AEC48(self, data + 0x80, 1, speed, blend);
+        F(vars, 0x70) = 2.75f;
+    UpdateEasedNode(mystic, vars, 0, blendSpeed, blendWeight);
+    UpdateEasedNode(mystic, vars + 0x80, 1, blendSpeed, blendWeight);
 }
 
 #undef I

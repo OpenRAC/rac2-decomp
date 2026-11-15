@@ -6,28 +6,29 @@ extern void func_002FF290(char *, int);
 extern void func_002A7398(char *, int, int);
 extern void func_002A0F48(char *);
 
-char *func_002FF300(int a0, int a1)
+/* Sets up the shared effect object with default size and position data and starts the chosen variant. */
+char *func_002FF300(int mode, int variant)
 {
-    char *obj;
-    obj = D_001B2348;
-    func_002FF290(obj, a0);
-    *(unsigned short *)(obj + 0x34) &= 0xFFBC;
-    *(unsigned char *)(obj + 0x30) = 0xFF;
-    *(short *)(obj + 0x32) = 0x20;
-    *(unsigned char *)(obj + 0x31) = 1;
-    *(float *)(obj + 0x10) = 5.0f;
-    *(float *)(obj + 0x14) = 5.0f;
-    *(float *)(obj + 0x18) = 900.0f;
-    *(float *)(obj + 0x1C) = 1.0f;
-    qzero(obj + 0xF0);
-    if (a1 >= 0) {
-        func_002A7398(obj, a1, 0);
+    char *object;
+    object = D_001B2348;
+    InitObjectWithPrivateData(object, mode);
+    *(unsigned short *)(object + 0x34) &= 0xFFBC;
+    *(unsigned char *)(object + 0x30) = 0xFF;
+    *(short *)(object + 0x32) = 0x20;
+    *(unsigned char *)(object + 0x31) = 1;
+    *(float *)(object + 0x10) = 5.0f;
+    *(float *)(object + 0x14) = 5.0f;
+    *(float *)(object + 0x18) = 900.0f;
+    *(float *)(object + 0x1C) = 1.0f;
+    qzero(object + 0xF0);
+    if (variant >= 0) {
+        StartAnimationImmediate(object, variant, 0);
     } else {
-        char *p = *(char **)(obj + 0x24);
-        if (p != 0 && *(unsigned char *)(p + 0xC) >= 2)
-            func_002A7398(obj, 1, 0);
+        char *objectClass = *(char **)(object + 0x24);
+        if (objectClass != 0 && *(unsigned char *)(objectClass + 0xC) >= 2)
+            StartAnimationImmediate(object, 1, 0);
     }
-    if ((*(unsigned short *)(obj + 0x34) & 4) == 0)
-        func_002A0F48(obj);
-    return obj;
+    if ((*(unsigned short *)(object + 0x34) & 4) == 0)
+        func_002A0F48(object);
+    return object;
 }

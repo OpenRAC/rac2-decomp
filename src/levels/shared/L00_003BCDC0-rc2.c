@@ -26,16 +26,17 @@
 extern s8 ref_L00_003BCDC0_00[];
 extern void ref_L00_003BCDC0_01(s32, void *);
 
-void func_L00_003BCDC0(s32 arg0) {
-    s8 *s0;
-    s8 *s2;
+/* Finds every sprite record owned by this moby and passes it to a helper. */
+void func_L00_003BCDC0(s32 owner) {
+    s8 *record;
+    s8 *tableEnd;
 
-    s0 = ref_L00_003BCDC0_00;
-    s2 = s0 + 0xB00;
+    record = ref_L00_003BCDC0_00;
+    tableEnd = record + 0xB00;
     do {
-        if (*(s32 *)(s0 + 0xA0) == arg0) {
-            ref_L00_003BCDC0_01(arg0, s0);
+        if (*(s32 *)(record + 0xA0) == owner) {
+            ref_L00_003BCDC0_01(owner, record);
         }
-        s0 += 0xB0;
-    } while ((s32) s0 < (s32) s2);
+        record += 0xB0;
+    } while ((s32) record < (s32) tableEnd);
 }

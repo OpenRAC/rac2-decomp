@@ -26,23 +26,24 @@ extern void func_00282D30(void *,void *,float);
 extern void func_00282CC0(void *,void *,void *);
 extern void func_00282F20(void *,void *,float);
 extern float func_002A7878(float,float);
-void func_L11_004461E8(u8 *object)
+/* Opens, resizes and closes the ribbon effect by easing its scale over time. */
+void func_L11_004461E8(u8 *moby)
 {
-    u8 *state = *(u8 **)(object+0x68);
+    u8 *state = *(u8 **)(moby+0x68);
     float previous = SCALE(state);
     float vector[4] __attribute__((aligned(16)));
     switch (S16(state,0x1fa)) {
     case 1: {
         int i;
         u8 *dst, *src;
-        func_00283360((u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xc0);
+        set_identity_rotation_rows((u8 *)&gMobyTable_L11[I32(state,0x1b8)]+0xc0);
         previous=1.0f;
         dst=D_L11_001FF580[I32(state,0x1c8)];
         src=D_L11_001FF580[I32(state,0x1cc)];
         for(i=0;i<I32(dst,0);i++) qcopy_nc(dst+16+i*16,src+16+i*16);
-        D_L11_001B359C[I32(state,0x1b8)].flags&=0xfffe;
-        D_L11_001B359C[I32(state,0x1b8)].enabled=1;
-        D_L11_001B359C[I32(state,0x1b8)].mask=255;
+        gMobyTable_L11[I32(state,0x1b8)].flags&=0xfffe;
+        gMobyTable_L11[I32(state,0x1b8)].enabled=1;
+        gMobyTable_L11[I32(state,0x1b8)].mask=255;
         SCALE(state)=D_L11_001B187C;
         F32(state,0xd4)=0.5f;
         S16(state,0x1fa)=2;
@@ -50,12 +51,12 @@ void func_L11_004461E8(u8 *object)
         /* Initialization deliberately advances the new animation immediately. */
     }
     case 2:
-        func_002AA2E8(&SCALE(state),D_L11_001B1880,D_L11_001B1884);
-        if (func_00282C48(SCALE(state)-D_L11_001B1880)<0.01f) S16(state,0x1fa)=3;
+        ApproachValue(&SCALE(state),D_L11_001B1880,D_L11_001B1884);
+        if (FloatAbs(SCALE(state)-D_L11_001B1880)<0.01f) S16(state,0x1fa)=3;
         break;
     case 4:
-        func_002AA2E8(&SCALE(state),D_L11_001B187C,D_L11_001B1884);
-        if (func_00282C48(SCALE(state)-D_L11_001B187C)<0.01f) {
+        ApproachValue(&SCALE(state),D_L11_001B187C,D_L11_001B1884);
+        if (FloatAbs(SCALE(state)-D_L11_001B187C)<0.01f) {
             D_L11_001B359C_GP[I32(state,0x1b8)].flags|=1;
             D_L11_001B359C_GP[I32(state,0x1b8)].enabled=0;
             S16(state,0x1fa)=0;
@@ -63,8 +64,8 @@ void func_L11_004461E8(u8 *object)
         break;
     case 5:
         SCALE(state)=D_L11_001B187C;
-        D_L11_001B359C[I32(state,0x1b8)].flags|=1;
-        D_L11_001B359C[I32(state,0x1b8)].enabled=0;
+        gMobyTable_L11[I32(state,0x1b8)].flags|=1;
+        gMobyTable_L11[I32(state,0x1b8)].enabled=0;
         S16(state,0x1fa)=0;
         break;
     }
@@ -74,13 +75,13 @@ void func_L11_004461E8(u8 *object)
         dst=D_L11_001FF580[I32(state,0x1c8)];
         for (i=0;i<I32(dst,0);i++) {
             vertex=dst+16+i*16;
-            func_00282CF0(vector,vertex,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+16);
-            func_00282D30(vector,vector,SCALE(state)/previous);
-            func_00282CC0(vertex,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+16,vector);
-            F32(vertex,8)=F32((u8 *)&D_L11_001B359C[I32(state,0x1b8)],0x18);
+            FastVecSub(vector,vertex,(u8 *)&gMobyTable_L11[I32(state,0x1b8)]+16);
+            FastVecScale(vector,vector,SCALE(state)/previous);
+            FastVecAdd(vertex,(u8 *)&gMobyTable_L11[I32(state,0x1b8)]+16,vector);
+            F32(vertex,8)=F32((u8 *)&gMobyTable_L11[I32(state,0x1b8)],0x18);
         }
-        func_00282F20((u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xc0,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xc0,SCALE(state));
-        func_00282F20((u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xd0,(u8 *)&D_L11_001B359C[I32(state,0x1b8)]+0xd0,SCALE(state));
+        vec_scale_to_length((u8 *)&gMobyTable_L11[I32(state,0x1b8)]+0xc0,(u8 *)&gMobyTable_L11[I32(state,0x1b8)]+0xc0,SCALE(state));
+        vec_scale_to_length((u8 *)&gMobyTable_L11[I32(state,0x1b8)]+0xd0,(u8 *)&gMobyTable_L11[I32(state,0x1b8)]+0xd0,SCALE(state));
     }
     if (S16(state,0x1fa)==2) {
         int i = 0;
@@ -94,7 +95,7 @@ void func_L11_004461E8(u8 *object)
                 float *weight_row;
                 float *opposite;
                 *phase_row-=1.0f;
-                random = func_002A7878(0.3330000042915344f,0.6660000085830688f);
+                random = RandomFloatRange(0.3330000042915344f,0.6660000085830688f);
                 weight_row = weight + i;
                 opposite = weight + ((i+1)&1);
                 *weight_row = *opposite + random;

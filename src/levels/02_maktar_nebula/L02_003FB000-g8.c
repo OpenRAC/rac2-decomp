@@ -6,6 +6,7 @@ extern u16 D_L02_001B1214 __attribute__((sda));
 extern char D_00189E20[];
 
 /* Accumulate the active group entries and reset their current report state. */
+/* Starts a fresh enemy tally for the arena: counts the enemies in the group and remembers their health total. */
 void func_L02_003FB000(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -20,11 +21,11 @@ void func_L02_003FB000(char *object)
     *(float *)(state + 0x64) = 0;
     if (index == 0xFF)
         return;
-    entry = D_L02_001FC060[index];
+    entry = gEntityGroupLists[index];
     if (entry == 0)
         return;
     cursor = (short *)entry;
-    table = D_L02_001B359C;
+    table = gMobyPool_L02;
     do {
         short type;
         record = table + ((*(u16 *)cursor & 0x7FFF) << 8);
@@ -37,12 +38,12 @@ void func_L02_003FB000(char *object)
         if ((u8)record[0x20] == 1)
             continue;
         type = *(short *)(record + 0xAA);
-        if (type == 0x9CA || type == 0xB22 || type == 0xC3B || type == 0xC3E || type == 0x9F8 || type == 0xA44) {
+        if (type == 0x9CA /* moby class 2506 */ || type == 0xB22 /* moby class 2850 */ || type == 0xC3B /* Megacorp Security Robot - Flamethrower */ || type == 0xC3E /* PX6 BladeBall */ || type == 0x9F8 /* Chainblade */ || type == 0xA44 /* B2 Brawler Legs */) {
             *(int *)(state + 0x60) += 1;
             *(float *)(state + 0x64) += *(float *)(*(char **)(record + 0x68) + 0x20);
         }
     } while (*cursor++ >= 0);
-    hero = D_00189E20;
+    hero = gHeroState;
     *(float *)(state + 0x68) = (float)*(int *)(hero + 0x24CC);
     *(short *)(state + 0x11C) = 0;
     do {

@@ -9,52 +9,53 @@ typedef struct {
     u8 path[16];
 } PuzzleState29;
 
-void func_L03_003E2968(u8 *p) {
-    PuzzleState29 *q = *(PuzzleState29 **)(p + 0x68);
+/* Builds a random route through the puzzle nodes, adding one node at a time until it is as long as the puzzle needs. */
+void func_L03_003E2968(u8 *moby) {
+    PuzzleState29 *state = *(PuzzleState29 **)(moby + 0x68);
     int count = 3, start, old, inserted, i, a, b, j, k, n, found, scan, shift;
 
-    q->path[0] = 0;
-    switch (func_002A77E0(4)) {
+    state->path[0] = 0;
+    switch (RandomIntBelow(4)) {
     case 0:
-        q->path[1] = 1;
-        q->path[2] = 2;
+        state->path[1] = 1;
+        state->path[2] = 2;
         break;
     case 1:
-        q->path[2] = 3;
-        q->path[1] = 2;
+        state->path[2] = 3;
+        state->path[1] = 2;
         break;
     case 2:
-        q->path[1] = 3;
-        q->path[2] = 4;
+        state->path[1] = 3;
+        state->path[2] = 4;
         break;
     default:
-        q->path[1] = 4;
-        q->path[2] = 1;
+        state->path[1] = 4;
+        state->path[2] = 1;
         break;
     }
 
     while (count < D_L03_001B0B50) {
-        start = func_002A77E0(count);
+        start = RandomIntBelow(count);
         old = count;
         inserted = 0;
         for (i = 0; i < count; i++) {
             a = (start + i) % count;
             b = (start + i + 1) % count;
             for (j = 0; j < 6; j++) {
-                n = D_0024A7B0[q->path[a]][j];
+                n = D_0024A7B0[state->path[a]][j];
                 if (n == -1)
                     break;
                 found = 0;
                 for (scan = 0; scan < count; scan++)
-                    if (n == q->path[scan])
+                    if (n == state->path[scan])
                         found = 1;
                 if (found)
                     continue;
                 for (k = 0; k < 6; k++) {
-                    if (D_0024A7B0[n][k] == q->path[b]) {
+                    if (D_0024A7B0[n][k] == state->path[b]) {
                         for (shift = count - 1; shift > a; shift--)
-                            q->path[shift + 1] = q->path[shift];
-                        q->path[a + 1] = n;
+                            state->path[shift + 1] = state->path[shift];
+                        state->path[a + 1] = n;
                         count++;
                         inserted = 1;
                         break;

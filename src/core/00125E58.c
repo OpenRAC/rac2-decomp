@@ -20,8 +20,9 @@ extern short func_00125E58(short psm, short w, short h);
  * short field compares fold shorter, SIZE 196). Exact under 2.9-ee with
  * the `== 1` arm first; 2.95.3's best is 8/200, a prologue-order residual.
  */
+/* Works out how many memory pages a picture of the given format and size takes. */
 short func_00125E58(short psm, short w, short h) {
-    unsigned long *g = r1_func_00121D08();
+    unsigned long *gParam = r1_func_00121D08();
     int fbw, fbh;
 
     fbw = (w + 63) / 64;
@@ -30,7 +31,7 @@ short func_00125E58(short psm, short w, short h) {
     } else {
         fbh = (h + 31) / 32;
     }
-    if ((*g & 0x0000FFFF0000FFFFUL) == 1) {
+    if ((*gParam & 0x0000FFFF0000FFFFUL) == 1) {
         return fbw * fbh;
     }
     return fbw * fbh * 2;
@@ -60,6 +61,7 @@ typedef struct {
  * buffer; ztest==0 disables Z (mask writes, ZTE/ZTST forced on).
  * prmodecont/colclamp are read-modify-write: only their AC/CLAMP bit is
  * set, whatever else the caller's memory already held is left alone. */
+/* Fills in a default drawing setup for a picture of the given size and format. */
 int func_00125F20(DrawEnv1_125F20 *draw, short psm, short w, short h,
                   short ztest, short zpsm) {
     short fbw = ((w + 63) >> 6) & 0x3F;
@@ -69,10 +71,10 @@ int func_00125F20(DrawEnv1_125F20 *draw, short psm, short w, short h,
     draw->frame1 = ((unsigned long)fbw << 16) | ((unsigned long)(psm & 0xF) << 24);
     draw->zbuf1addr = 0x4E;
     if (ztest == 0) {
-        zbp = func_00125E58(psm, w, h);
+        zbp = sceGszbufaddr(psm, w, h);
         draw->zbuf1 = (unsigned long)zbp | ((unsigned long)(zpsm & 0xF) << 24) | (1UL << 32);
     } else {
-        zbp = func_00125E58(psm, w, h);
+        zbp = sceGszbufaddr(psm, w, h);
         draw->zbuf1 = (unsigned long)zbp | ((unsigned long)(zpsm & 0xF) << 24);
     }
     draw->xyoffset1addr = 0x18;
@@ -110,22 +112,23 @@ extern char r1_D_00153178[];
 /* rac1-decomp src/core/001224B0.c: func_001224B0 */
 /* Kicks a DMA transfer on the GIF channel (D2 at 0x1000A000), waiting
    for the channel with a timeout. Every register access is volatile. */
-int func_00126104(void *arg0) {
-    int p = (int)arg0;
-    unsigned int i;
+/* Starts a data transfer to the graphics chip and waits if the channel is busy. */
+int func_00126104(void *gifPacket) {
+    int packetAddr = (int)gifPacket;
+    unsigned int spin;
 
-    i = 0;
+    spin = 0;
     while (((int)D2_CHCR) & 0x100) {
-        if (i++ > 0x1000000) {
+        if (spin++ > 0x1000000) {
             r1_func_0011A6C8(r1_D_00153178);
             return -1;
         }
     }
-    D2_QWC = (int)(*(long *)arg0 & 0x7FFF) + 1;
-    if ((p & 0x70000000) == 0x70000000) {
-        D2_MADR = (p & 0x0FFFFFFF) | 0x80000000;
+    D2_QWC = (int)(*(long *)gifPacket & 0x7FFF) + 1;
+    if ((packetAddr & 0x70000000) == 0x70000000) {
+        D2_MADR = (packetAddr & 0x0FFFFFFF) | 0x80000000;
     } else {
-        D2_MADR = p & 0x0FFFFFFF;
+        D2_MADR = packetAddr & 0x0FFFFFFF;
     }
     D2_CHCR = 0x101;
     return 0;

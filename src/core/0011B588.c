@@ -38,8 +38,9 @@ ASM_FUNC("asm/core", func_0011B6C0);
 
 /* rac1-decomp src/core/00119328.c: func_001194C8 */
 /* topThread: kernel service dispatcher. Adapted from Lombyte (GPL-3.0) for PAL. */
-void func_0011B728(void *arg0) {
-    TopThreadContext *ctx = (TopThreadContext *)arg0;
+/* Runs forever as the kernel service thread. It waits for a request, then runs the matching handler. */
+void func_0011B728(void *threadArg) {
+    TopThreadContext *ctx = (TopThreadContext *)threadArg;
     int i;
     unsigned char type;
 

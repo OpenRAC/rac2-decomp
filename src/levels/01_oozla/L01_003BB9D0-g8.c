@@ -33,15 +33,16 @@ typedef struct L01_003C0760_OBJ {
     L01_003C0760_OWNED *f68;
 } L01_003C0760_OBJ;
 
-void func_L01_003C0760(L01_003C0760_OBJ *a0)
+/* Starts one of the Swamp Monster II attacks with a random blend time, then sets its state and timing value. */
+void func_L01_003C0760(L01_003C0760_OBJ *moby)
 {
-    L01_003C0760_OBJ *p = a0;
-    L01_003C0760_OWNED *q = p->f68;
-    int r = func_002A7820(7, 12);
+    L01_003C0760_OBJ *obj = moby;
+    L01_003C0760_OWNED *vars = obj->f68;
+    int blendFrames = RandomIntRange(7, 12);
 
-    func_L01_003BFDC8(p, 8, 0, r);
-    func_002A7750(p, 3, 3);
-    q->f2DC = D_L01_001AFED4;
+    SetMobyAnimationAndSpeed(obj, 8, 0, blendFrames);
+    SetMobyState(obj, 3, 3);
+    vars->f2DC = D_L01_001AFED4;
 }
 
 typedef struct L01_003C07C8_OWNED {
@@ -54,15 +55,16 @@ typedef struct L01_003C07C8_OBJ {
     L01_003C07C8_OWNED *f68;
 } L01_003C07C8_OBJ;
 
-void func_L01_003C07C8(L01_003C07C8_OBJ *a0)
+/* Starts another Swamp Monster II attack with a random blend time, then sets its state and timing value. */
+void func_L01_003C07C8(L01_003C07C8_OBJ *moby)
 {
-    L01_003C07C8_OBJ *p = a0;
-    L01_003C07C8_OWNED *q = p->f68;
-    int r = func_002A7820(9, 11);
+    L01_003C07C8_OBJ *obj = moby;
+    L01_003C07C8_OWNED *vars = obj->f68;
+    int blendFrames = RandomIntRange(9, 11);
 
-    func_L01_003BFDC8(p, 13, 0, r);
-    func_002A7750(p, 2, 3);
-    q->f2DA = D_L01_001AFED8;
+    SetMobyAnimationAndSpeed(obj, 13, 0, blendFrames);
+    SetMobyState(obj, 2, 3);
+    vars->f2DA = D_L01_001AFED8;
 }
 
 typedef struct L01_003C0830_OWNED {
@@ -77,16 +79,17 @@ typedef struct L01_003C0830_OBJ {
     int f9C;
 } L01_003C0830_OBJ;
 
-void func_L01_003C0830(L01_003C0830_OBJ *a0)
+/* Starts the Swamp Monster II grab attack: picks a random blend time, sets the attack flags and the timing value. */
+void func_L01_003C0830(L01_003C0830_OBJ *moby)
 {
-    L01_003C0830_OBJ *p = a0;
-    L01_003C0830_OWNED *q = p->f68;
-    int r = func_002A7820(7, 11);
+    L01_003C0830_OBJ *obj = moby;
+    L01_003C0830_OWNED *vars = obj->f68;
+    int blendFrames = RandomIntRange(7, 11);
 
-    func_L01_003BFDC8(p, 14, 0, r);
-    func_002A7750(p, 4, 3);
-    p->f9C = p->f9C | 0x30;
-    q->f2DE = D_L01_001AFEDC;
+    SetMobyAnimationAndSpeed(obj, 14, 0, blendFrames);
+    SetMobyState(obj, 4, 3);
+    obj->f9C = obj->f9C | 0x30;
+    vars->f2DE = D_L01_001AFEDC;
 }
 
 typedef struct L01_003C06E8_OWNED {
@@ -99,16 +102,17 @@ typedef struct L01_003C06E8_OBJ {
     L01_003C06E8_OWNED *f68;
 } L01_003C06E8_OBJ;
 
-void func_L01_003C06E8(L01_003C06E8_OBJ *a0)
+/* Starts a Swamp Monster II claw attack, choosing one of two animations at random. */
+void func_L01_003C06E8(L01_003C06E8_OBJ *moby)
 {
-    L01_003C06E8_OBJ *p = a0;
-    L01_003C06E8_OWNED *q = p->f68;
-    int v = (func_001163B0() & 1) + 6;
-    int r = func_002A7820(10, 15);
+    L01_003C06E8_OBJ *obj = moby;
+    L01_003C06E8_OWNED *vars = obj->f68;
+    int animIndex = (Rand() & 1) + 6;
+    int blendFrames = RandomIntRange(10, 15);
 
-    func_L01_003BFDC8(p, v, 0, r);
-    func_002A7750(p, 1, 3);
-    q->f2DC = D_L01_001AFED4;
+    SetMobyAnimationAndSpeed(obj, animIndex, 0, blendFrames);
+    SetMobyState(obj, 1, 3);
+    vars->f2DC = D_L01_001AFED4;
 }
 
 typedef struct L01_003C0140_OWNED {
@@ -123,19 +127,20 @@ typedef struct L01_003C0140_OBJ {
     unsigned short f96;
 } L01_003C0140_OBJ;
 
-void func_L01_003C0140(L01_003C0140_OBJ *a0)
+/* Runs the Swamp Monster II's per-frame timers and counts up how long it has been alive. */
+void func_L01_003C0140(L01_003C0140_OBJ *moby)
 {
-    L01_003C0140_OBJ *p = a0;
-    L01_003C0140_OWNED *q = p->f68;
+    L01_003C0140_OBJ *obj = moby;
+    L01_003C0140_OWNED *vars = obj->f68;
 
-    func_002AB8C0(a0, (char *)q + 0x50);
-    if (p->f96 <= 0xFFFE) {
-        p->f96 = p->f96 + 1;
+    UpdateColorFade(moby, (char *)vars + 0x50);
+    if (obj->f96 <= 0xFFFE) {
+        obj->f96 = obj->f96 + 1;
     }
-    func_00282978((char *)q + 0x2DE);
-    func_00282978((char *)q + 0x2DA);
-    func_00282978((char *)q + 0x2DC);
-    func_002B0990(p, (char *)q + 0x220, 10, 1, D_L01_001AFEFC);
+    FastDecTimer((char *)vars + 0x2DE);
+    FastDecTimer((char *)vars + 0x2DA);
+    FastDecTimer((char *)vars + 0x2DC);
+    SetValueAndStartSmoothChange(obj, (char *)vars + 0x220, 10, 1, D_L01_001AFEFC);
 }
 
 /* Oozla debris update. */
@@ -151,64 +156,65 @@ extern int func_002761F8(void *, void *, int, void *, int);
 extern float D_L01_001AFE30 __attribute__((sda));
 extern char D_L01_001BF920[];
 
-void func_L01_003BCEC8(char *obj)
+/* Updates a falling debris piece. It drifts, tilts, bounces off walls, fades out near the end of its life and is then removed. */
+void func_L01_003BCEC8(char *moby)
 {
-    char *s = *(char **)(obj + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     float pos[4] __attribute__((aligned(16)));
-    float saved, scale, tilt;
+    float savedHeight, driftScale, tilt;
 
-    qcopy(pos, obj + 0x10);
-    switch (*(unsigned char *)(obj + 0x20)) {
+    qcopy(pos, moby + 0x10);
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        func_0029F338(obj);
+        MarkMobySpawned(moby);
         return;
     case 1:
-        if (func_00282948(s + 0x30)) {
-            *(unsigned char *)(obj + 0x20) = 2;
-            *(int *)(s + 0x30) = func_00283CF0(10.0f);
-            *(unsigned short *)(obj + 0x34) |= 0x2000;
+        if (FastFloatHelperD(vars + 0x30)) {
+            *(unsigned char *)(moby + 0x20) = 2;
+            *(int *)(vars + 0x30) = FloatToInt(10.0f);
+            *(unsigned short *)(moby + 0x34) |= 0x2000;
             return;
         }
         break;
     case 2:
-        if (func_00282948(s + 0x30)) {
-            func_0029F338(obj);
+        if (FastFloatHelperD(vars + 0x30)) {
+            MarkMobySpawned(moby);
             return;
         }
         /* Fade while the removal timer runs. */
-        *(unsigned char *)(obj + 0x23) = func_00283CF0((float)*(int *)(s + 0x30) * 12.8f);
+        *(unsigned char *)(moby + 0x23) = FloatToInt((float)*(int *)(vars + 0x30) * 12.8f);
         break;
     }
-    *(float *)(s + 0x40) = func_00283B98(*(float *)(s + 0x40), 0.034906592f);
-    *(float *)(obj + 0xF8) = func_00283B98(*(float *)(obj + 0xF8),
-                                           *(float *)(s + 0x18) * func_00283198(*(float *)(s + 0x40)));
-    *(float *)(obj + 0xF0) += (*(float *)(s + 0x44) - *(float *)(obj + 0xF0)) * 0.02f;
-    if (*(unsigned char *)(obj + 0x20) != 2) {
-        tilt = func_00283180(*(float *)(s + 0x40)) * 0.17453295f;
-        scale = D_L01_001AFE30;
-        *(float *)(obj + 0xF4) = tilt;
-        saved = *(float *)(s + 8);
-        *(float *)(s + 8) = 0.0f;
-        func_00282D30(s, s, scale);
-        *(float *)(s + 8) = saved;
-        func_00282CC0(obj + 0x10, obj + 0x10, s);
-        *(float *)(s + 8) -= *(float *)(s + 0x38);
-        if (*(float *)(s + 8) < *(float *)(s + 0x3C))
-            *(float *)(s + 8) = *(float *)(s + 0x3C);
+    *(float *)(vars + 0x40) = FastAddRotations(*(float *)(vars + 0x40), 0.034906592f);
+    *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(moby + 0xF8),
+                                           *(float *)(vars + 0x18) * FastSinOrCosB(*(float *)(vars + 0x40)));
+    *(float *)(moby + 0xF0) += (*(float *)(vars + 0x44) - *(float *)(moby + 0xF0)) * 0.02f;
+    if (*(unsigned char *)(moby + 0x20) != 2) {
+        tilt = FastSinOrCosA(*(float *)(vars + 0x40)) * 0.17453295f;
+        driftScale = D_L01_001AFE30;
+        *(float *)(moby + 0xF4) = tilt;
+        savedHeight = *(float *)(vars + 8);
+        *(float *)(vars + 8) = 0.0f;
+        FastVecScale(vars, vars, driftScale);
+        *(float *)(vars + 8) = savedHeight;
+        FastVecAdd(moby + 0x10, moby + 0x10, vars);
+        *(float *)(vars + 8) -= *(float *)(vars + 0x38);
+        if (*(float *)(vars + 8) < *(float *)(vars + 0x3C))
+            *(float *)(vars + 8) = *(float *)(vars + 0x3C);
     } else {
-        *(float *)(obj + 0xF4) += (0.17453295f - *(float *)(obj + 0xF4)) * 0.1f;
+        *(float *)(moby + 0xF4) += (0.17453295f - *(float *)(moby + 0xF4)) * 0.1f;
     }
     pos[2] += 1.0f;
-    if (func_002761F8(pos, obj + 0x10, 2, obj, 0)) {
-        qcopy(obj + 0x10, D_L01_001BF920);
+    if (CollLine(pos, moby + 0x10, 2, moby, 0)) {
+        qcopy(moby + 0x10, gCollLineHitPoint);
         /* qzero(state + 8): retail passes a misaligned pointer here (original bug; sq ignores the low four address bits). Allowed by owner ruling (2026-11-09). */
-        qzero(s + 8);
-        *(int *)(s + 0x38) = 0;
-        qzero(s + 0x10);
-        if (*(unsigned char *)(obj + 0x20) != 2) {
-            *(unsigned char *)(obj + 0x20) = 2;
-            *(int *)(s + 0x30) = func_00283CF0(10.0f);
-            *(unsigned short *)(obj + 0x34) |= 0x2000;
+        qzero(vars + 8);
+        *(int *)(vars + 0x38) = 0;
+        qzero(vars + 0x10);
+        if (*(unsigned char *)(moby + 0x20) != 2) {
+            *(unsigned char *)(moby + 0x20) = 2;
+            *(int *)(vars + 0x30) = FloatToInt(10.0f);
+            *(unsigned short *)(moby + 0x34) |= 0x2000;
         }
     }
 }

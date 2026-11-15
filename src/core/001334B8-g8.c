@@ -23,23 +23,24 @@ extern int func_001253A8(int, int, void *, unsigned char *);
 extern int func_00133580(int);
 extern void func_00132DF0(int, int, void *, int, long);
 
+/* Starts a disc read through the sound server, or reads directly when it is not in use. Returns 0 if a read is already running. */
 int func_001334B8(int lba, int sectors, void *buf, unsigned char *mode) {
     int payload[4];
 
     if (D_001A748C == 0) {
-        return func_001253A8(lba, sectors, buf, mode);
+        return StartCdSectorRead(lba, sectors, buf, mode);
     }
-    if (func_00133580(1) == 1) {
+    if (snd_CheckLoadInProgress(1) == 1) {
         return 0;
     }
     D_001A7100 = 1;
     D_001A7110 = 0;
-    func_0011B3D0((void *)&D_001A7100, &D_001A713F);
+    ProcessKernelRequestB((void *)&D_001A7100, &D_001A713F);
     payload[0] = lba;
     payload[1] = sectors;
     payload[2] = (int)buf;
     D_001A7494 = 1;
     D_001A7498 = 0;
-    func_00132DF0(0x38, 0xC, payload, 0, 0);
+    QueueSoundCommand(0x38, 0xC, payload, 0, 0);
     return 1;
 }

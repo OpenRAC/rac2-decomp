@@ -2,18 +2,19 @@
 extern float func_00283180(float);
 extern float func_00283198(float);
 extern void func_L04_0033CC00(char *,char *,float *,float *,float);
-void func_L04_0033D0C0(char *a0, char *a1)
+/* Looks at a point 100 units in front of an object and passes it on. */
+void func_L04_0033D0C0(char *srcMoby, char *otherMoby)
 {
-    float v[4];
-    float w[4];
-    float *src = (float *)(a0 + 0x10);
+    float ahead[4];
+    float result[4];
+    float *src = (float *)(srcMoby + 0x10);
 
-    qcopy(v, src);
+    qcopy(ahead, src);
     {
-        float x = v[0] + func_00283180(*(float *)(a0 + 0xF8)) * 100.0f;
-        float angle = *(float *)(a0 + 0xF8);
-        v[0] = x;
-        v[1] += func_00283198(angle) * 100.0f;
+        float x = ahead[0] + FastSinOrCosA(*(float *)(srcMoby + 0xF8)) * 100.0f;
+        float angle = *(float *)(srcMoby + 0xF8);
+        ahead[0] = x;
+        ahead[1] += FastSinOrCosB(angle) * 100.0f;
     }
-    func_L04_0033CC00(a0, a1, v, w, 1.0f);
+    MoveMobyTowardTarget(srcMoby, otherMoby, ahead, result, 1.0f);
 }

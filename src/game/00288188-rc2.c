@@ -26,30 +26,31 @@
 extern s16 D_00259F58[];
 extern s16 D_00259CE0[];
 
-s32 func_00288188(s32 arg0) {
-    s16 *ta;
-    s16 *tb;
-    s16 *p;
+/* Returns 1 when the help id appears in either of the two help id tables, otherwise 0. */
+s32 func_00288188(s32 helpId) {
+    s16 *tableA;
+    s16 *tableB;
+    s16 *idPtr;
 
-    ta = D_00259F58;
-    if (ta[3] != -1) {
-        p = ta + 3;
+    tableA = D_00259F58;
+    if (tableA[3] != -1) {
+        idPtr = tableA + 3;
         do {
-            if (arg0 == *p) {
+            if (helpId == *idPtr) {
                 return 1;
             }
-            p += 5;
-        } while (*p != -1);
+            idPtr += 5;
+        } while (*idPtr != -1);
     }
-    tb = D_00259CE0;
-    if (tb[3] != -1) {
-        p = tb + 3;
+    tableB = D_00259CE0;
+    if (tableB[3] != -1) {
+        idPtr = tableB + 3;
         do {
-            if (arg0 == *p) {
+            if (helpId == *idPtr) {
                 return 1;
             }
-            p += 5;
-        } while (*p != -1);
+            idPtr += 5;
+        } while (*idPtr != -1);
     }
     return 0;
 }

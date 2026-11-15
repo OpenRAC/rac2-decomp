@@ -63,9 +63,9 @@ extern void func_L01_003208D0(void *, void *, int);
 #define CLEAR_SOUND() { \
     int id = state->sound; \
     if (id != -1) { \
-        u8 *slot = D_00188660 + id * 0x70; \
+        u8 *slot = gSoundState + id * 0x70; \
         if (*(MoverObject **)(slot + 0x88) == object && slot[0x74]) \
-            func_002E59F8(id); \
+            StopSoundVoice(id); \
     } \
     state->sound = -1; \
 }
@@ -87,6 +87,7 @@ extern void func_L01_003208D0(void *, void *, int);
     object->rot[0] = func_002AA150(state->homeRot[0], D_L01_001B264C[state->target].rot[0], weight); \
 }
 
+/* Moves a platform between its home spot and a target spot. It waits, glides there, waits again and glides back, with a sound while it moves. */
 void func_L01_003B1F08(MoverObject *object)
 {
     float oldpos[4] __attribute__((aligned(16)));
@@ -103,7 +104,7 @@ void func_L01_003B1F08(MoverObject *object)
         state->sound = -1;
         qcopy(state->homePos, object->pos);
         qcopy(state->homeRot, object->rot);
-        func_002A7750(object, 1, -1);
+        SetMobyState(object, 1, -1);
         object->timer = 0;
         break;
     case 1:
@@ -111,14 +112,14 @@ void func_L01_003B1F08(MoverObject *object)
         if (object->triggered) {
             state->cycleWait = state->cycles;
             state->wait = state->waitDuration;
-            func_002A7750(object, 2, -1);
+            SetMobyState(object, 2, -1);
             object->timer = *(int *)(object->info + 0x10);
         }
         break;
     case 2:
-        if (func_00282948(&state->wait)) {
+        if (FastFloatHelperD(&state->wait)) {
             state->t = 0.0f;
-            func_002A7750(object, 3, -1);
+            SetMobyState(object, 3, -1);
         }
         break;
     case 3:
@@ -128,19 +129,19 @@ void func_L01_003B1F08(MoverObject *object)
         INTERPOLATE()
         if (state->t >= 1.0f) {
             if (state->nextWait == -1) {
-                func_002A7750(object, 5, -1);
+                SetMobyState(object, 5, -1);
             } else {
                 state->wait = state->nextWait;
-                func_002A7750(object, 4, -1);
+                SetMobyState(object, 4, -1);
             }
         }
         KEEP_SOUND()
         break;
     case 4:
         CLEAR_SOUND()
-        if (func_00282948(&state->wait)) {
+        if (FastFloatHelperD(&state->wait)) {
             state->t = 1.0f;
-            func_002A7750(object, 6, -1);
+            SetMobyState(object, 6, -1);
         }
         break;
     case 5:
@@ -148,7 +149,7 @@ void func_L01_003B1F08(MoverObject *object)
         if (object->triggered) {
             state->wait = state->waitDuration;
             object->triggered = 0;
-            func_002A7750(object, 4, -1);
+            SetMobyState(object, 4, -1);
         }
         break;
     case 6:
@@ -159,30 +160,30 @@ void func_L01_003B1F08(MoverObject *object)
         if (state->t <= 0.0f) {
             if (state->cycles == -1) {
                 state->wait = state->returnWait;
-                func_002A7750(object, 7, -1);
-            } else if (func_00282948(&state->cycleWait)) {
-                func_002A8598(object->index, 0);
-                func_002A7750(object, 1, -1);
+                SetMobyState(object, 7, -1);
+            } else if (FastFloatHelperD(&state->cycleWait)) {
+                SetByteOnGroupMobys(object->index, 0);
+                SetMobyState(object, 1, -1);
                 object->timer = 0;
             } else {
                 state->wait = state->returnWait;
-                func_002A7750(object, 7, -1);
+                SetMobyState(object, 7, -1);
             }
         }
         KEEP_SOUND()
         break;
     case 7:
         CLEAR_SOUND()
-        if (func_00282948(&state->wait)) {
+        if (FastFloatHelperD(&state->wait)) {
             state->t = 0.0f;
-            func_002A7750(object, 3, -1);
+            SetMobyState(object, 3, -1);
         }
         break;
     }
     object->triggered = 0;
     if (object->mode < 8) {
-        func_00282CF0(delta, object->pos, oldpos);
-        func_002AD6F0(state->motion, delta, oldrot, object->rot);
+        FastVecSub(delta, object->pos, oldpos);
+        CombineTransformsAndStore(state->motion, delta, oldrot, object->rot);
     }
-    func_L01_003208D0(object, state->tailAC, object->mode >= 2);
+    UpdateFlickeringGlow(object, state->tailAC, object->mode >= 2);
 }

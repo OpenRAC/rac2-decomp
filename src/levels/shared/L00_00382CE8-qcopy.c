@@ -27,6 +27,7 @@ typedef struct {
     float scale[16];
 } Sparkle;
 extern Sparkle D_L00_001B90C0;
+/* Sets up the table of sparkles once: each gets a random colour, lifetime, phase and size. */
 void func_L00_00382CE8(void *owner)
 {
     int i, intensity, mode, component;
@@ -39,22 +40,22 @@ void func_L00_00382CE8(void *owner)
     i = 1;
     grey = 0x202080;
     for (; i < 14; ++i) {
-        intensity = func_002A77E0(63) + 1;
-        mode = func_002A77E0(6);
+        intensity = RandomIntBelow(63) + 1;
+        mode = RandomIntBelow(6);
         switch (mode) {
         case 0: D_L00_001B90C0.color[i] = intensity + grey - (intensity << 16); break;
         case 1: D_L00_001B90C0.color[i] = (intensity << 8) + (intensity + grey); break;
-        case 2: D_L00_001B90C0.color[i] = (func_002A77E0(intensity) << 8) + (intensity + grey); break;
+        case 2: D_L00_001B90C0.color[i] = (RandomIntBelow(intensity) << 8) + (intensity + grey); break;
         case 3:
-            component = func_002A77E0(intensity);
-            green = (func_002A77E0(intensity) << 8) + grey;
+            component = RandomIntBelow(intensity);
+            green = (RandomIntBelow(intensity) << 8) + grey;
             D_L00_001B90C0.color[i] = (component << 16) + green + intensity; break;
         default: D_L00_001B90C0.color[i] = grey; break;
         }
-        D_L00_001B90C0.life[i] = func_002A77E0(30) / 10 + 1;
-        value = func_002A7878(-0.95f, 2.4f);
+        D_L00_001B90C0.life[i] = RandomIntBelow(30) / 10 + 1;
+        value = RandomFloatRange(-0.95f, 2.4f);
         D_L00_001B90C0.phase[i] = value;
-        value = func_00282C48(func_00283180(func_00283C28(value + 1)));
+        value = FloatAbs(FastSinOrCosA(FastFloatHelperG(value + 1)));
         D_L00_001B90C0.scale[i] = value * value * value * 1.4f;
         D_L00_001B90C0.size[i] = 32;
     }

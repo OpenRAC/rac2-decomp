@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct {
     float v[3];
     float scale;
@@ -18,25 +19,26 @@ extern int func_002A7820(int, int);
 extern void func_00282F20(void *, void *, float);
 extern int func_001163B0(void);
 
+/* Starts one new particle in the first free slot, with a random direction, life time and size. */
 void func_L00_003CB538(void *owner)
 {
-    Rec_3CB538 *p;
+    Rec_3CB538 *particle;
     int i;
 
     for (i = 0; i < 64; i++) {
-        p = &D_L00_001B2AD4[i];
-        if (p->owner == 0) {
-            p->v[0] = func_002A7878(-1.0f, 1.0f);
-            p->v[1] = func_002A7878(-1.0f, 1.0f);
-            p->v[2] = func_002A7878(-1.0f, 1.0f);
-            func_00282F20(p, p, p->f14);
-            p->f1C = p->f18 = func_002A7820(0x14, 0x32);
-            p->f20 = func_002A7878(-1.0f, 1.0f);
-            p->owner = owner;
-            p->f24 = 0;
-            p->f28 = (func_001163B0() & 1) ? -1.0f : 1.0f;
-            p->f2C = 1.0f;
-            p->f14 = func_002A7878(0.7f, 0.9f);
+        particle = &D_L00_001B2AD4[i];
+        if (particle->owner == 0) {
+            particle->v[0] = RandomFloatRange(-1.0f, 1.0f);
+            particle->v[1] = RandomFloatRange(-1.0f, 1.0f);
+            particle->v[2] = RandomFloatRange(-1.0f, 1.0f);
+            vec_scale_to_length(particle, particle, particle->f14);
+            particle->f1C = particle->f18 = RandomIntRange(0x14, 0x32);
+            particle->f20 = RandomFloatRange(-1.0f, 1.0f);
+            particle->owner = owner;
+            particle->f24 = 0;
+            particle->f28 = (Rand() & 1) ? -1.0f : 1.0f;
+            particle->f2C = 1.0f;
+            particle->f14 = RandomFloatRange(0.7f, 0.9f);
             return;
         }
     }

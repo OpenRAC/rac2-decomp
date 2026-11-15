@@ -48,7 +48,7 @@ void func_L00_003C8608(char *object)
     float basis[4][4];
     float vertex[4], offset[4];
     int i;
-    packet.regs[1] = func_0027C878(11);
+    packet.regs[1] = GetEffectTextureDescriptor(11);
     packet.regs[3] = 0x8000000048ULL;
     packet.regs[2] = 0xFF9000000260ULL;
     packet.regs[0] = 0;
@@ -56,24 +56,24 @@ void func_L00_003C8608(char *object)
     packet.params[4] = 1; packet.params[5] = 0; packet.params[6] = 1; packet.params[7] = 1;
     packet.colours[0] = packet.colours[1] =
         packet.colours[2] = packet.colours[3] = D_L00_001B00EC;
-    func_00282F20(offset, object + 0xD0, D_L00_001B00E8);
-    func_00282CC0(basis[3], D_L00_002403C0, offset);
-    func_00282CF0(offset, D_L00_001B8DC0, basis[3]);
-    func_00282F20(basis[0], offset, 1.0f);
-    func_00282DD8(basis[1], basis[0], D_0018A0E0);
-    func_00282F20(basis[1], basis[1], -1.0f);
-    func_00282DD8(basis[2], basis[1], basis[0]);
+    vec_scale_to_length(offset, object + 0xD0, D_L00_001B00E8);
+    FastVecAdd(basis[3], D_L00_002403C0, offset);
+    FastVecSub(offset, gCameraPosition_L00, basis[3]);
+    vec_scale_to_length(basis[0], offset, 1.0f);
+    FastVecCross(basis[1], basis[0], D_0018A0E0);
+    vec_scale_to_length(basis[1], basis[1], -1.0f);
+    FastVecCross(basis[2], basis[1], basis[0]);
     for (i = 3; i >= 0; i--) {
-        func_00282D30(vertex, D_L00_001B00A0[3 - i], D_L00_001B00E0);
-        func_002830C0(packet.points[3 - i], vertex, basis);
+        FastVecScale(vertex, D_L00_001B00A0[3 - i], D_L00_001B00E0);
+        transform_vector(packet.points[3 - i], vertex, basis);
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
     packet.colours[3] = -1; packet.colours[2] = -1; packet.colours[1] = -1; packet.colours[0] = -1;
     for (i = 3; i >= 0; i--) {
-        func_00282D30(vertex, D_L00_001B00A0[3 - i], D_L00_001B00E4);
-        func_002830C0(packet.points[3 - i], vertex, basis);
+        FastVecScale(vertex, D_L00_001B00A0[3 - i], D_L00_001B00E4);
+        transform_vector(packet.points[3 - i], vertex, basis);
     }
-    func_00280B90(&packet, 0, 0);
+    draw_world_quad(&packet, 0, 0);
 }
 
 /* Twin of func_L00_004079C8 with this level code's data: a quad for each of the three active
@@ -89,7 +89,7 @@ void func_L00_003C83E0(void)
     unsigned int color, c;
     int i, j;
 
-    packet.regs[1] = func_0027C878(8);
+    packet.regs[1] = GetEffectTextureDescriptor(8);
     packet.regs[3] = 0x8000000048ULL;
     packet.regs[2] = 0xFF9000000260ULL;
     color = D_L00_001B003C & 0xFFFFFF;
@@ -98,20 +98,20 @@ void func_L00_003C83E0(void)
     packet.params[4] = 1; packet.params[5] = 0; packet.params[6] = 1; packet.params[7] = 1;
     for (i = 0; i < 3; i++) {
         if (D_L00_001B2AC0[i]) {
-            c = color | (func_00283CF0(D_L00_001B2A90[i]) << 24);
+            c = color | (FloatToInt(D_L00_001B2A90[i]) << 24);
             packet.colours[0] = packet.colours[1] = packet.colours[2] = packet.colours[3] = c;
             qcopy(&basis[3], &D_L00_001B2A20[i]);
             qcopy(&basis[0], &D_L00_001B2A50[i]);
-            func_00282D30(&basis[2], D_0018A0E0, -1.0f);
-            func_00282DD8(&basis[1], &basis[0], &basis[2]);
-            func_00282F20(&basis[1], &basis[1], 1.0f);
-            func_00282DD8(&basis[2], &basis[1], &basis[0]);
+            FastVecScale(&basis[2], D_0018A0E0, -1.0f);
+            FastVecCross(&basis[1], &basis[0], &basis[2]);
+            vec_scale_to_length(&basis[1], &basis[1], 1.0f);
+            FastVecCross(&basis[2], &basis[1], &basis[0]);
             corner = (Vec83E0 *)D_L00_001B00A0;
             for (j = 3; j >= 0; corner++, j--) {
-                func_00282D30(&vertex, corner, D_L00_001B2AB0[i]);
-                func_002830C0(&packet.points[3 - j], &vertex, basis);
+                FastVecScale(&vertex, corner, D_L00_001B2AB0[i]);
+                transform_vector(&packet.points[3 - j], &vertex, basis);
             }
-            func_00280B90(&packet, 0, 0);
+            draw_world_quad(&packet, 0, 0);
         }
     }
 }

@@ -28,13 +28,14 @@
 
 extern s32 *ref_L09_0033E658_00[];
 
-s32 func_L09_0033E658(s32 arg0) {
-    s32 *temp_v0;
+/* Looks up an entry by index in a table and returns its stored id minus one, or -1 if the index is -1 or the slot is empty. */
+s32 func_L09_0033E658(s32 index) {
+    s32 *entry;
 
-    if (arg0 != -1) {
-        temp_v0 = ref_L09_0033E658_00[arg0];
-        if (temp_v0 != NULL) {
-            return *temp_v0 - 1;
+    if (index != -1) {
+        entry = ref_L09_0033E658_00[index];
+        if (entry != NULL) {
+            return *entry - 1;
         }
     }
     return -1;

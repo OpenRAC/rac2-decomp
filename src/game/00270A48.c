@@ -1,3 +1,4 @@
+#include "names.h"
 typedef void (*ObjectDispatch)(void *);
 typedef struct { ObjectDispatch entries[5]; } ObjectDispatchRecord;
 extern ObjectDispatchRecord D_0026E900[];
@@ -26,17 +27,17 @@ int func_00270A48(void)
     int changed;
     int i;
     ObjectDispatch callback;
-    func_00270A00((char *)best);
+    CallObjectHandler4((char *)best);
     changed = 0;
     for (i = 0; i < 48; i++) {
-        if (D_001B7EB0[i] != 0 && &((Obj_270A48 *)D_001B5750)[i] != best && func_00270838(&((Obj_270A48 *)D_001B5750)[i], best)) {
+        if (D_001B7EB0[i] != 0 && &((Obj_270A48 *)D_001B5750)[i] != best && Camera_ActivationCheckPriority(&((Obj_270A48 *)D_001B5750)[i], best)) {
             best = &((Obj_270A48 *)D_001B5750)[i];
             changed = 1;
         }
     }
-    if (changed) func_00270598(best);
+    if (changed) SwitchActiveCamera(best);
     callback = D_0026E900[best->kind].entries[3];
-    func_002704F0((char *)best);
+    ToggleObjectEffect((char *)best);
     if (callback != 0) callback(best);
     {
         float *src = best->pos;
@@ -45,6 +46,6 @@ int func_00270A48(void)
         dst[1] = src[1];
         dst[2] = src[2];
     }
-    func_00270210();
+    RunDelayedCallList();
     return -1;
 }

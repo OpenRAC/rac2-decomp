@@ -157,41 +157,41 @@ extern s32 func_002B6D28(void);
 /* Each frame: tests the hero's position against the cuboids listed in the moby's pvars (IsPointInCuboid)
    and, from those and the saved counters, starts the numbered messages and scene dialogues. */
 void func_L01_003E8ED8(HintMoby *obj) {
-    OozlaHints *s = obj->pvars;
-    HintMoby *p;
-    s32 t, i, found;
+    OozlaHints *hints = obj->pvars;
+    HintMoby *other;
+    s32 temp, i, found;
 
     if (!obj->state) {
         obj->alpha = 255;
         obj->state = 1;
-        s->messageTimer = 20;
-        s->messageActive = 0;
-        s->counter = 0;
-        s->initialProgress = D_0018C958.fc0 | D_001A7AF8[0x24];
-        s->dialogueIndex = 0;
-        s->departed = 0;
-        s->lastDialogue = -1;
-        s->dialogueTimer = 60;
-        if (!func_002A77E0(1)) {
-            t = s->dialogues[1];
-            s->dialogues[1] = s->dialogues[3];
-            s->dialogues[3] = t;
+        hints->messageTimer = 20;
+        hints->messageActive = 0;
+        hints->counter = 0;
+        hints->initialProgress = gSubtitleHistory.fc0 | gItemOwnedFlags[0x24];
+        hints->dialogueIndex = 0;
+        hints->departed = 0;
+        hints->lastDialogue = -1;
+        hints->dialogueTimer = 60;
+        if (!RandomIntBelow(1)) {
+            temp = hints->dialogues[1];
+            hints->dialogues[1] = hints->dialogues[3];
+            hints->dialogues[3] = temp;
         }
-        if (D_001A7AF8[0x24])
-            s->initialFlag = 1;
+        if (gItemOwnedFlags[0x24])
+            hints->initialFlag = 1;
         else
-            s->initialFlag = 0;
-        if (D_001A7AF8[0x2e] && !D_001395B8.flag9b && s->cameraIndex != -1) {
-            u8 *camera = D_L01_001B264C + (s->cameraIndex << 7);
-            func_L00_002B9D60(camera + 0x30, camera + 0x70, 0, 1);
-            func_L00_003672F8();
+            hints->initialFlag = 0;
+        if (gItemOwnedFlags[0x2e] && !D_001395B8.flag9b && hints->cameraIndex != -1) {
+            u8 *camera = D_L01_001B264C + (hints->cameraIndex << 7);
+            ResetHeroPositionAndDirection(camera + 0x30, camera + 0x70, 0, 1);
+            SetFlagToOne();
         }
     }
-    if (s->objectIndex != -1) {
-        HintMoby *door = (HintMoby *)(D_L01_001B255C + (s->objectIndex << 8));
+    if (hints->objectIndex != -1) {
+        HintMoby *door = (HintMoby *)(gMobyTable_L01 + (hints->objectIndex << 8));
         if (door) {
             HintMoby *child = *(HintMoby **)((u8 *)door->pvars + 0xc);
-            if (!D_001A7AF8[0x13]) {
+            if (!gItemOwnedFlags[0x13]) {
                 door->drawDistance = 0;
                 door->flags |= 0x43;
                 if (child) {
@@ -208,107 +208,107 @@ void func_L01_003E8ED8(HintMoby *obj) {
             }
         }
     }
-    if ((!D_0018C750.f6c || (u32)(D_001A7390 - D_0018C750.f70) > 108000U) &&
-        ((D_0018C958.f98 & (1U << D_001A79F0)) < 1U))
-        func_00288E18(0x9b5, 12);
-    if (!D_0018C958.f9c && func_002ACBC8(D_00189E20.position, s->area[0]) && !D_0018C750.fc)
-        func_00288E18(0x9b6, 13);
-    if (func_002ACBC8(D_00189E20.position, s->area[1]) && !D_0018C958.fa8)
-        func_00288E18(0x9b7, 14);
-    if (func_002ACBC8(D_00189E20.position, s->area[2])) {
-        if (s->messageActive)
-            func_00288D90();
-        s->messageActive = 0;
+    if ((!gProgressStatistics.f6c || (u32)(D_001A7390 - gProgressStatistics.f70) > 108000U) &&
+        ((gSubtitleHistory.f98 & (1U << gCurrentMapIndex)) < 1U))
+        RequestSubtitleVoiceLine(0x9b5, 12);
+    if (!gSubtitleHistory.f9c && IsPointInCuboid(gHeroState.position, hints->area[0]) && !gProgressStatistics.fc)
+        RequestSubtitleVoiceLine(0x9b6, 13);
+    if (IsPointInCuboid(gHeroState.position, hints->area[1]) && !gSubtitleHistory.fa8)
+        RequestSubtitleVoiceLine(0x9b7, 14);
+    if (IsPointInCuboid(gHeroState.position, hints->area[2])) {
+        if (hints->messageActive)
+            BeginSubtitleClose();
+        hints->messageActive = 0;
     }
-    if (func_002ACBC8(D_00189E20.position, s->area[4]))
-        D_0018C958.fc0 = 0xffff;
-    if (D_001A7AF8[0x24] && func_002ACBC8(D_00189E20.position, s->repeatArea) && !D_0018C958.fc0) {
-        if (D_0018C958.fc4 + D_0018C958.fc2 >= D_001A7390 - 2U) {
-            D_0018C958.fc2++;
-            if (D_0018C958.fc2 >= 180) {
-                func_00288E18(0x9b9, 16);
-                D_0018C958.fc2 = 0;
+    if (IsPointInCuboid(gHeroState.position, hints->area[4]))
+        gSubtitleHistory.fc0 = 0xffff;
+    if (gItemOwnedFlags[0x24] && IsPointInCuboid(gHeroState.position, hints->repeatArea) && !gSubtitleHistory.fc0) {
+        if (gSubtitleHistory.fc4 + gSubtitleHistory.fc2 >= D_001A7390 - 2U) {
+            gSubtitleHistory.fc2++;
+            if (gSubtitleHistory.fc2 >= 180) {
+                RequestSubtitleVoiceLine(0x9b9, 16);
+                gSubtitleHistory.fc2 = 0;
             }
         } else {
-            if (D_0018C958.fc4 < D_001A7390)
-                D_0018C958.fc4 = D_001A7390;
-            D_0018C958.fc2 = 0;
+            if (gSubtitleHistory.fc4 < D_001A7390)
+                gSubtitleHistory.fc4 = D_001A7390;
+            gSubtitleHistory.fc2 = 0;
         }
     }
-    if (D_001A7AF8[0x2e] && func_002ACBC8(D_00189E20.position, s->lateArea) &&
-        (u32)(D_001A7390 - D_0018C958.fe8) > 3600U)
-        func_00288E18(0x9bc, 19);
-    if (func_002ACBC8(D_00189E20.position, s->completeArea0) ||
-        func_002ACBC8(D_00189E20.position, s->completeArea1)) {
+    if (gItemOwnedFlags[0x2e] && IsPointInCuboid(gHeroState.position, hints->lateArea) &&
+        (u32)(D_001A7390 - gSubtitleHistory.fe8) > 3600U)
+        RequestSubtitleVoiceLine(0x9bc, 19);
+    if (IsPointInCuboid(gHeroState.position, hints->completeArea0) ||
+        IsPointInCuboid(gHeroState.position, hints->completeArea1)) {
         D_001395B8.flag9b = 1;
-        D_0018C958.fe4 = 0xffff;
+        gSubtitleHistory.fe4 = 0xffff;
     }
-    if (!D_0018C958.fb4 && func_002ACBC8(D_00189E20.position, s->area[3]) && D_0018C750.f18c < 100)
-        func_00288E18(0x9b8, 15);
-    if (!D_0018C958.fcc && func_002ACBC8(D_00189E20.position, s->area[5]) && D_0018C750.f198 < 3)
-        func_00288E18(0x9ba, 17);
-    if (!D_0018C958.fd8 && func_002ACBC8(D_00189E20.position, s->area[6]) && !D_0018C750.f0)
-        func_00288E18(0x9bb, 18);
-    if (D_00189E20.weapon == 0x39 && func_002ACBC8(D_00189E20.position, s->weaponArea) &&
-        !D_0018C958.f2b8 && !D_001395B8.flags7b.bits.bit1)
-        D_0018C750.f1bc = 0;
-    if (func_002ACBC8(D_00189E20.position, s->weaponArea) &&
-        (!D_0018C750.f1bc || (u32)(D_001A7390 - D_0018C750.f1c0) > 72000U) &&
-        D_00189E20.weapon != 0x6f && D_00189E20.weapon != 0x39 &&
-        ((D_001395B8.flags7b.value ^ 1) & 1) && func_00282948(&s->messageTimer) &&
-        D_0018C958.f2c0 >= 0)
-        func_00288E18(0x9e3, 0x3a);
-    if (func_002ACBC8(D_00189E20.position, s->weaponArea) && D_00189E20.field220)
+    if (!gSubtitleHistory.fb4 && IsPointInCuboid(gHeroState.position, hints->area[3]) && gProgressStatistics.f18c < 100)
+        RequestSubtitleVoiceLine(0x9b8, 15);
+    if (!gSubtitleHistory.fcc && IsPointInCuboid(gHeroState.position, hints->area[5]) && gProgressStatistics.f198 < 3)
+        RequestSubtitleVoiceLine(0x9ba, 17);
+    if (!gSubtitleHistory.fd8 && IsPointInCuboid(gHeroState.position, hints->area[6]) && !gProgressStatistics.f0)
+        RequestSubtitleVoiceLine(0x9bb, 18);
+    if (gHeroState.weapon == 0x39 && IsPointInCuboid(gHeroState.position, hints->weaponArea) &&
+        !gSubtitleHistory.f2b8 && !D_001395B8.flags7b.bits.bit1)
+        gProgressStatistics.f1bc = 0;
+    if (IsPointInCuboid(gHeroState.position, hints->weaponArea) &&
+        (!gProgressStatistics.f1bc || (u32)(D_001A7390 - gProgressStatistics.f1c0) > 72000U) &&
+        gHeroState.weapon != 0x6f && gHeroState.weapon != 0x39 &&
+        ((D_001395B8.flags7b.value ^ 1) & 1) && FastFloatHelperD(&hints->messageTimer) &&
+        gSubtitleHistory.f2c0 >= 0)
+        RequestSubtitleVoiceLine(0x9e3, 0x3a);
+    if (IsPointInCuboid(gHeroState.position, hints->weaponArea) && gHeroState.field220)
         D_001395B8.flags7b.bits.bit1 = 1;
-    if (func_002ACBC8(D_00189E20.position, s->exitArea))
+    if (IsPointInCuboid(gHeroState.position, hints->exitArea))
         D_001395B8.flags7b.bits.bit0 = 1;
-    if (!func_002ACBC8(D_00189E20.position, s->departureArea))
-        s->departed = 1;
-    if (!D_001A7BC8[2] && s->departed)
-        func_L01_002EABA8(0x9e4, 0x3b, 1, s->messageArg, -1);
-    if (!D_0018C958.f48) {
-        for (p = D_L01_001B2568; p; p = p->next) {
-            if (p->oClass == 0x326 && func_00282E48(p->position, D_00189E20.position) < 10.0f &&
-                !D_L01_0027EAC8.key0 && D_L01_0027EAC8.key == -1 && !D_0018C958.f48 &&
-                !func_00312E10(p)) {
-                if (D_00189E20.field24cc < D_001A7A00)
-                    func_00288E18(0x9af, 6);
-                else if (func_00282E48(p->position, D_00189E20.position) < 1.0f && !D_0018C958.f2e8)
-                    func_00288E18(0x9e7, 0x3e);
+    if (!IsPointInCuboid(gHeroState.position, hints->departureArea))
+        hints->departed = 1;
+    if (!D_001A7BC8[2] && hints->departed)
+        TriggerSubtitleInCuboid(0x9e4, 0x3b, 1, hints->messageArg, -1);
+    if (!gSubtitleHistory.f48) {
+        for (other = D_L01_001B2568; other; other = other->next) {
+            if (other->oClass == 0x326 && fast_vec_dist(other->position, gHeroState.position) < 10.0f &&
+                !D_L01_0027EAC8.key0 && D_L01_0027EAC8.key == -1 && !gSubtitleHistory.f48 &&
+                !IsMobyInState1_00312E10(other)) {
+                if (gHeroState.field24cc < D_001A7A00)
+                    RequestSubtitleVoiceLine(0x9af, 6);
+                else if (fast_vec_dist(other->position, gHeroState.position) < 1.0f && !gSubtitleHistory.f2e8)
+                    RequestSubtitleVoiceLine(0x9e7, 0x3e);
             }
         }
     }
-    if (func_L01_00305E18(3) == 2 && func_L01_00305E18(1) != 2 && !(D_001395B8.flags75 & 2) &&
-        func_002ACBC8(D_00189E20.position, s->missionArea)) {
+    if (GetTableEntryShort(3) == 2 && GetTableEntryShort(1) != 2 && !(D_001395B8.flags75 & 2) &&
+        IsPointInCuboid(gHeroState.position, hints->missionArea)) {
         D_001395B8.flags75 |= 2;
-        func_0028A180(0xa3c, 0x93);
+        QueueHintMessage(0xa3c, 0x93);
     }
     for (i = 0; i < 11; i++) {
-        if (func_002ACBC8(D_00189E20.position, s->dialogueAreas[i]))
+        if (IsPointInCuboid(gHeroState.position, hints->dialogueAreas[i]))
             break;
     }
     found = i < 11;
-    if (func_002ACBC8(D_00189E20.position, s->specialArea)) {
-        if (s->lastDialogue != 4 && !D_001A63A8.busy && D_001A63A8.key == -1) {
-            s32 key = s->specialDialogue;
-            D_001A63A8.selection = 0;
-            D_001A63A8.key = (key & 0x3fff) + 2000;
-            s->lastDialogue = 4;
-            s->dialogueTimer = 1800;
-            s->dialogueActive = 1;
+    if (IsPointInCuboid(gHeroState.position, hints->specialArea)) {
+        if (hints->lastDialogue != 4 && !gMusicState.busy && gMusicState.key == -1) {
+            s32 key = hints->specialDialogue;
+            gMusicState.selection = 0;
+            gMusicState.key = (key & 0x3fff) + 2000;
+            hints->lastDialogue = 4;
+            hints->dialogueTimer = 1800;
+            hints->dialogueActive = 1;
         }
-    } else if (found && !D_001A63A8.busy && D_001A63A8.key == -1 && D_00189E20.weapon != 0x6f &&
-               func_00282948(&s->dialogueTimer)) {
-        s32 key = s->dialogues[s->dialogueIndex];
-        D_001A63A8.selection = 0;
-        D_001A63A8.key = (key & 0x3fff) + 2000;
-        s->lastDialogue = s->dialogues[s->dialogueIndex];
-        s->dialogueIndex = (s->dialogueIndex + 1) & 3;
-        s->dialogueTimer = 1800;
-        s->dialogueActive = 1;
+    } else if (found && !gMusicState.busy && gMusicState.key == -1 && gHeroState.weapon != 0x6f &&
+               FastFloatHelperD(&hints->dialogueTimer)) {
+        s32 key = hints->dialogues[hints->dialogueIndex];
+        gMusicState.selection = 0;
+        gMusicState.key = (key & 0x3fff) + 2000;
+        hints->lastDialogue = hints->dialogues[hints->dialogueIndex];
+        hints->dialogueIndex = (hints->dialogueIndex + 1) & 3;
+        hints->dialogueTimer = 1800;
+        hints->dialogueActive = 1;
     }
-    if (s->dialogueActive == 1 && D_001A63A8.state == 3 && D_001A63A8.id < 6000) {
-        func_002B6D28();
-        s->dialogueActive = 0;
+    if (hints->dialogueActive == 1 && gMusicState.state == 3 && gMusicState.id < 6000) {
+        ResumeMusicStream();
+        hints->dialogueActive = 0;
     }
 }

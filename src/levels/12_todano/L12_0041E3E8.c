@@ -2,8 +2,9 @@
 
 /* func_L12_0041E3E8 is defined in L12_0041E3E8-update-g8.c. */
 
-s32 func_L12_0041E8E8(u8 *a0) {
-    return *(u8 *)(a0 + 0x20) == 3;
+/* Tells if the given moby has reached its final state. */
+s32 func_L12_0041E8E8(u8 *self) {
+    return *(u8 *)(self + 0x20) == 3;
 }
 extern int D_001A79F0 __attribute__((sda));
 extern char D_0019B4A8[];
@@ -13,31 +14,32 @@ extern void func_002AFEB8(char *, char *, char *, char *, f32);
 extern void func_00282F20(f32 *, f32 *, f32);
 extern void func_002B0A68(void *, s32, void *, f32, f32, f32, f32, s32);
 
-void func_L12_0041E8F8(u8 *a0) {
-    u8 *self = a0;
-    f32 buf[4];
-    u16 f;
+/* Sets off the moby: spawns a small burst, adds one to the saved progress counter and plays a sound. */
+void func_L12_0041E8F8(u8 *moby) {
+    u8 *self = moby;
+    f32 vec[4];
+    u16 rawId;
 
-    func_00282CF0(buf, (f32 *)(self + 0x10), (f32 *)D_00189EA0);
-    func_002AFEB8((char *)self, (char *)buf, (char *)buf, 0, 0.0f);
-    func_00282F20(buf, buf, 0.10000000894069672f);
-    func_002B0A68(self, 31, buf, 6.0f, 12.0f, 6.0f, 12.0f, 255);
+    FastVecSub(vec, (f32 *)(self + 0x10), (f32 *)gHeroPosition);
+    TransformAndSetHeight((char *)self, (char *)vec, (char *)vec, 0, 0.0f);
+    vec_scale_to_length(vec, vec, 0.10000000894069672f);
+    SpawnDebrisForMaskedParts(self, 31, vec, 6.0f, 12.0f, 6.0f, 12.0f, 255);
 
-    f = *(u16 *)(self + 0xB2);
-    if (f & 1) {
-        u8 *p = (u8 *)(((s16)f >> 1) + (D_001A79F0 << 10)) + (int)D_0019B4A8;
-        u8 c = *p;
+    rawId = *(u16 *)(self + 0xB2);
+    if (rawId & 1) {
+        u8 *counter = (u8 *)(((s16)rawId >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
+        u8 packed = *counter;
 
-        if (((c >> 4) & 7) != 7)
-            *p = c + 0x10;
+        if (((packed >> 4) & 7) != 7)
+            *counter = packed + 0x10;
     } else {
-        u8 *p = (u8 *)(((s16)f >> 1) + (D_001A79F0 << 10)) + (int)D_0019B4A8;
-        u8 c = *p;
+        u8 *counter = (u8 *)(((s16)rawId >> 1) + (gCurrentMapIndex << 10)) + (int)D_0019B4A8;
+        u8 packed = *counter;
 
-        if ((c & 7) != 7)
-            *p = c + 1;
+        if ((packed & 7) != 7)
+            *counter = packed + 1;
     }
-    func_002E5CF8(1, 0, self);
+    PlayMobySound(1, 0, self);
 }
 
 /* func_L12_0041EA18 is defined in L12_0041EA18-g8.c. */
@@ -83,7 +85,7 @@ s32 func_L12_00425070(u8 *object)
             continue;
         qcopy(to, (L12_25070Quad *)list + i + 1);
         to[2] += 0.5f;
-        if (func_002761F8(from, to, 2, object, 0) == 0)
+        if (CollLine(from, to, 2, object, 0) == 0)
             return i;
     }
     return *(s32 *)(state + 0x2B0);
@@ -96,14 +98,15 @@ extern char D_00189EA0[];
 extern f32 func_00282C48(f32);
 extern f32 func_00282E80(void *, void *);
 
-void func_L12_00425348(u8 *a0) {
-    u8 *state = *(u8 **)(a0 + 0x68);
+/* Looks along the path for a point at the hero's height that the hero is close to, and remembers it as the target point. */
+void func_L12_00425348(u8 *self) {
+    u8 *state = *(u8 **)(self + 0x68);
     s32 i = *(s32 *)(state + 0x2B4) + 1;
     u32 *entry = D_L12_001FEAC0[*(s32 *)(state + 0x298)];
 
     while (i < *(s32 *)entry) {
-        if (func_00282C48(*(f32 *)((u8 *)entry + (i * 16 + 0x18)) - *(f32 *)((u8 *)entry + 0x18)) < 2.0f) {
-            if (func_00282E80(D_00189EA0, (u8 *)entry + (i * 16 + 0x10)) < 6.0f)
+        if (FloatAbs(*(f32 *)((u8 *)entry + (i * 16 + 0x18)) - *(f32 *)((u8 *)entry + 0x18)) < 2.0f) {
+            if (vec_distance_xy(gHeroPosition, (u8 *)entry + (i * 16 + 0x10)) < 6.0f)
                 *(s32 *)(state + 0x2B4) = i;
         }
         i++;
@@ -119,16 +122,17 @@ extern u8 D_001395DB;
 extern int func_002ACBC8(void *, int);
 extern void func_L12_0031E1D0(u8 *, s32, s32);
 
-void func_L12_004254A8(u8 *arg0) {
-    u8 *s0 = arg0;
-    s32 *v;
+/* Waits for the hero to enter its zone, then marks the level event and moves on. */
+void func_L12_004254A8(u8 *moby) {
+    u8 *self = moby;
+    s32 *vars;
 
-    if (*(u8 *)(s0 + 0x20) == 0) {
-        v = *(s32 **)(s0 + 0x68);
-        if (*v != -1) {
-            if (func_002ACBC8(D_00189EA0, *v) != 0) {
+    if (*(u8 *)(self + 0x20) == 0) {
+        vars = *(s32 **)(self + 0x68);
+        if (*vars != -1) {
+            if (IsPointInCuboid(gHeroPosition, *vars) != 0) {
                 D_001395DB = 1;
-                func_L12_0031E1D0(s0, 1, -1);
+                func_L12_0031E1D0(self, 1, -1);
             }
         }
     }
@@ -143,51 +147,52 @@ extern u8 *func_002BDCE8(void *, f32, f32, f32, s32, void *, f32, u32, s32);
 
 /* Retail tests the first allocation again after its second and third calls;
  * preserve that behavior instead of changing the test to the newer pointer. */
+/* Sprays three small spark particles upward from the object. */
 void func_L12_004293A0(u8 *self)
 {
     u8 *state = *(u8 **)(self + 0x68);
     f32 pos[4];
     f32 velocity[4];
-    u8 *p;
-    u8 *q;
+    u8 *spark1;
+    u8 *spark2;
 
     qcopy(pos, self + 0x10);
     pos[2] = *(f32 *)(state + 0x7C);
-    func_L02_0031E9E8(velocity, 0.5f);
+    RandomPlanarOffset(velocity, 0.5f);
     velocity[2] = 0.083333336f;
-    p = func_002BDCE8(pos, 0.1f, 1.0f, 0.9f, func_002A77E0(16), velocity, 420000.0f, 0xDF202020, 0);
-    if (p) {
-        u8 *d = p + 0x20;
-        *(u16 *)(p + 10) = 10;
-        p[9] = func_00283CF0(4.0f) + 0x70;
-        *(s32 *)(d + 4) = 2;
-        d[10] = 0xDF;
-        d[11] = p[10];
-        p[3] = 0x44;
+    spark1 = SpawnSpinningSparkParticle(pos, 0.1f, 1.0f, 0.9f, RandomIntBelow(16), velocity, 420000.0f, 0xDF202020, 0);
+    if (spark1) {
+        u8 *payload = spark1 + 0x20;
+        *(u16 *)(spark1 + 10) = 10;
+        spark1[9] = FloatToInt(4.0f) + 0x70;
+        *(s32 *)(payload + 4) = 2;
+        payload[10] = 0xDF;
+        payload[11] = spark1[10];
+        spark1[3] = 0x44;
     }
-    func_L02_0031E9E8(velocity, 0.5f);
+    RandomPlanarOffset(velocity, 0.5f);
     velocity[2] = 0.083333336f;
-    q = func_002BDCE8(pos, 0.1f, 1.0f, 0.9f, func_002A77E0(16), velocity, 420000.0f, 0xDF208080, 0);
-    if (p) {
-        u8 *d = q + 0x20;
-        *(u16 *)(q + 10) = 10;
-        q[9] = func_00283CF0(4.0f) + 0x70;
-        *(s32 *)(d + 4) = 2;
-        d[10] = 0xDF;
-        d[11] = q[10];
-        q[3] = 0x48;
+    spark2 = SpawnSpinningSparkParticle(pos, 0.1f, 1.0f, 0.9f, RandomIntBelow(16), velocity, 420000.0f, 0xDF208080, 0);
+    if (spark1) {
+        u8 *payload = spark2 + 0x20;
+        *(u16 *)(spark2 + 10) = 10;
+        spark2[9] = FloatToInt(4.0f) + 0x70;
+        *(s32 *)(payload + 4) = 2;
+        payload[10] = 0xDF;
+        payload[11] = spark2[10];
+        spark2[3] = 0x48;
     }
-    func_L02_0031E9E8(velocity, 0.33333334f);
+    RandomPlanarOffset(velocity, 0.33333334f);
     velocity[2] = 0.083333336f;
-    q = func_002BDCE8(pos, 0.1f, 1.0f, 0.9f, func_002A77E0(16), velocity, 420000.0f, 0xDF808080, 0);
-    if (p) {
-        u8 *d = q + 0x20;
-        *(u16 *)(q + 10) = 10;
-        q[9] = func_00283CF0(4.0f) + 0x70;
-        *(s32 *)(d + 4) = 2;
-        d[10] = 0xDF;
-        d[11] = q[10];
-        q[3] = 0x44;
+    spark2 = SpawnSpinningSparkParticle(pos, 0.1f, 1.0f, 0.9f, RandomIntBelow(16), velocity, 420000.0f, 0xDF808080, 0);
+    if (spark1) {
+        u8 *payload = spark2 + 0x20;
+        *(u16 *)(spark2 + 10) = 10;
+        spark2[9] = FloatToInt(4.0f) + 0x70;
+        *(s32 *)(payload + 4) = 2;
+        payload[10] = 0xDF;
+        payload[11] = spark2[10];
+        spark2[3] = 0x44;
     }
 }
 

@@ -58,25 +58,26 @@ typedef struct {
     float uv[8];
     unsigned long tag, tex, alpha, test;
 } Beam;
+/* Draws two glowing beam ribbons from the object out to a random point in front of it. */
 void func_L00_0038ADD0(char *object)
 {
     Beam first,second;
     Vector4 basis[4],start,end,origin,nearSize,farSize;
     char *work=FIELD(char *,object,0x68);
     float width;
-    func_0029FCC0(object,1,(char *)&origin);
+    TransformMobyJointToWorld(object,1,(char *)&origin);
     start.bits=origin.bits;
-    func_00282F20(&end,work+0x30,func_002A7878(2,4));
-    func_00283098(&end,&end,object+0xC0);
-    func_00282CC0(&end,&end,&origin);
-    func_L00_0038AAD0(object,&start);
-    first.tex=func_0027C878(23);
+    vec_scale_to_length(&end,work+0x30,RandomFloatRange(2,4));
+    matrix_mul_vec3(&end,&end,object+0xC0);
+    FastVecAdd(&end,&end,&origin);
+    DrawCameraFacingFlash_L00_2(object,&start);
+    first.tex=GetEffectTextureDescriptor(23);
     first.tag=0;
     first.alpha=0xFF9000000260UL;
     first.color[0]=first.color[1]=0x7F103080;
     first.test=0x8000000048UL;
     first.color[2]=first.color[3]=0x103080;
-    second.tex=func_0027C878(23);
+    second.tex=GetEffectTextureDescriptor(23);
     nearSize.bits=0;
     farSize.bits=0;
     second.test=0x8000000048UL;
@@ -86,9 +87,9 @@ void func_L00_0038ADD0(char *object)
     nearSize.f[3]=1;
     farSize.f[3]=1;
     second.alpha=0xFF9000000260UL;
-    width=func_002A7878(0.1f,0.3f);nearSize.f[2]=width;farSize.f[2]=width+width;
-    func_L00_0038AA40((char *)&first);func_L00_0038AA40((char *)&second);
-    if(!(func_001163B0()&1)) {
+    width=RandomFloatRange(0.1f,0.3f);nearSize.f[2]=width;farSize.f[2]=width+width;
+    InitDefaultBlockCopy((char *)&first);InitDefaultBlockCopy((char *)&second);
+    if(!(Rand()&1)) {
         first.uv[0]=0;first.uv[1]=0;first.uv[2]=0;first.uv[3]=1;
         first.uv[4]=1;first.uv[5]=0;first.uv[6]=1;first.uv[7]=1;
         second.uv[0]=0;second.uv[1]=0;second.uv[2]=0;second.uv[3]=1;
@@ -99,18 +100,18 @@ void func_L00_0038ADD0(char *object)
         second.uv[0]=0;second.uv[1]=1;second.uv[2]=0;second.uv[3]=0;
         second.uv[4]=1;second.uv[5]=1;second.uv[6]=1;second.uv[7]=0;
     }
-    func_00282CF0(&basis[0],&end,&start);func_00282F20(&basis[0],&basis[0],1);
-    func_00282CF0(&basis[1],&D_001B8DC0,&start);func_00282DD8(&basis[2],&basis[1],&basis[0]);
-    func_00282F20(&basis[2],&basis[2],1);func_00282DD8(&basis[1],&basis[0],&basis[2]);
+    FastVecSub(&basis[0],&end,&start);vec_scale_to_length(&basis[0],&basis[0],1);
+    FastVecSub(&basis[1],&D_001B8DC0,&start);FastVecCross(&basis[2],&basis[1],&basis[0]);
+    vec_scale_to_length(&basis[2],&basis[2],1);FastVecCross(&basis[1],&basis[0],&basis[2]);
     basis[3].bits=start.bits;
     first.point[0].bits=nearSize.bits;second.point[0].bits=farSize.bits;
-    func_00282D30(&first.point[1],&first,-1);func_00282D30(&second.point[1],&second,-1);
-    func_002830C0(&first,&first,basis);func_002830C0(&first.point[1],&first.point[1],basis);
-    func_002830C0(&second,&second,basis);func_002830C0(&second.point[1],&second.point[1],basis);
+    FastVecScale(&first.point[1],&first,-1);FastVecScale(&second.point[1],&second,-1);
+    transform_vector(&first,&first,basis);transform_vector(&first.point[1],&first.point[1],basis);
+    transform_vector(&second,&second,basis);transform_vector(&second.point[1],&second.point[1],basis);
     basis[3].bits=end.bits; nearSize.f[2]*=0.15f;farSize.f[2]=nearSize.f[2]+nearSize.f[2];
     first.point[2].bits=nearSize.bits;second.point[2].bits=farSize.bits;
-    func_00282D30(&first.point[3],&first.point[2],-1);func_00282D30(&second.point[3],&second.point[2],-1);
-    func_002830C0(&first.point[2],&first.point[2],basis);func_002830C0(&first.point[3],&first.point[3],basis);
-    func_002830C0(&second.point[2],&second.point[2],basis);func_002830C0(&second.point[3],&second.point[3],basis);
-    func_00280B90(&first,0,0);func_00280B90(&second,0,0);
+    FastVecScale(&first.point[3],&first.point[2],-1);FastVecScale(&second.point[3],&second.point[2],-1);
+    transform_vector(&first.point[2],&first.point[2],basis);transform_vector(&first.point[3],&first.point[3],basis);
+    transform_vector(&second.point[2],&second.point[2],basis);transform_vector(&second.point[3],&second.point[3],basis);
+    draw_world_quad(&first,0,0);draw_world_quad(&second,0,0);
 }

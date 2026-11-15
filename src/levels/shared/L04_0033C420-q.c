@@ -5,22 +5,23 @@ extern int func_002761F8(void *a, void *b, int mode, void *self, int flag);
 typedef struct { int pad[6]; int f18; int f1C; } L04Flags;
 extern L04Flags ref_L04_0033C420_00;
 
-int func_L04_0033C420(void *a0, void *a1, int a2, float f12, float f13)
+/* Checks for ground just below a point, and returns 0 if the ground is not allowed. */
+int func_L04_0033C420(void *probePos, void *selfMoby, int rejectFlagged, float upOffset, float downOffset)
 {
-    float v1[4];
-    float v2[4];
-    int r;
+    float top[4];
+    float bottom[4];
+    int hit;
 
-    qcopy(v1, a0);
-    v1[2] += f12;
-    qcopy(v2, a0);
-    v2[2] -= f13;
-    if (v2[2] < 0.0f)
-        v2[2] = 0.0f;
-    r = func_002761F8(v1, v2, 0x22, a1, 0);
+    qcopy(top, probePos);
+    top[2] += upOffset;
+    qcopy(bottom, probePos);
+    bottom[2] -= downOffset;
+    if (bottom[2] < 0.0f)
+        bottom[2] = 0.0f;
+    hit = CollLine(top, bottom, 0x22, selfMoby, 0);
     if (ref_L04_0033C420_00.f1C <= -1)
-        r = 0;
-    if (a2 != 0 && ref_L04_0033C420_00.f18 != 0)
-        r = 0;
-    return r;
+        hit = 0;
+    if (rejectFlagged != 0 && ref_L04_0033C420_00.f18 != 0)
+        hit = 0;
+    return hit;
 }

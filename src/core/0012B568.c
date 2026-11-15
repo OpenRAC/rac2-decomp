@@ -29,28 +29,29 @@ extern int r1_func_001263A8(void *, int);
 extern int func_0012B678(void *);
 
 /* rac1-decomp src/core/00125630.c: func_00127748 */
-int func_0012B568(void *arg0) {
-    char *s = (char *)arg0;
+/* Reads how many macroblocks to advance, adding 33 for each escape code in the stream. */
+int func_0012B568(void *decoderPtr) {
+    char *dec = (char *)decoderPtr;
     unsigned int code;
     int val = 0;
     int cont;
     int ret;
 
     do {
-        code = func_0012C508((int)s, 0);
+        code = ReadIpuVlcCode((int)dec, 0);
         switch (code) {
         case 35:
             cont = 1;
             val += 33;
             break;
         case 0:
-            ret = func_0012C680(s, 11);
-            if (*(int *)(s + 0x848) != 0 && ret == 15) {
-                func_0012C788(s, 11);
+            ret = PeekMpegBits(dec, 11);
+            if (*(int *)(dec + 0x848) != 0 && ret == 15) {
+                SkipMpegBits(dec, 11);
                 cont = 1;
             } else {
-                r1_func_0012C430(s, r1_D_001538A8, code);
-                *(int *)(s + 0x11C) = 1;
+                r1_func_0012C430(dec, r1_D_001538A8, code);
+                *(int *)(dec + 0x11C) = 1;
                 return 1;
             }
             break;
@@ -68,25 +69,26 @@ int func_0012B568(void *arg0) {
 }
 
 /* rac1-decomp src/core/00125630.c: func_00127858 */
-int func_0012B678(void *arg0) {
-    char *s = (char *)arg0;
-    int count;
+/* Decodes every macroblock of one picture and returns 1 on success, 0 on a stream error. */
+int func_0012B678(void *decoderPtr) {
+    char *dec = (char *)decoderPtr;
+    int mbCount;
     int ret;
 
-    *(int *)(s + 0x810) = 0;
-    *(int *)(s + 0x814) = 0;
+    *(int *)(dec + 0x810) = 0;
+    *(int *)(dec + 0x814) = 0;
 
-    count = *(int *)(s + 0x12C) * *(int *)(s + 0x130);
-    if (*(int *)(s + 0x174) != 3) {
-        count >>= 1;
+    mbCount = *(int *)(dec + 0x12C) * *(int *)(dec + 0x130);
+    if (*(int *)(dec + 0x174) != 3) {
+        mbCount >>= 1;
     }
 
     do {
-        ret = func_0012B8B0(s, count);
+        ret = DecodeMpegSliceMacroblocks(dec, mbCount);
     } while (ret == 1 || ret == 3);
 
-    func_0012C3B0(s);
-    if (func_0012B1C0(s) == 0) {
+    WaitIpuIdle(dec);
+    if (WaitMpegBlockDecodeDone(dec) == 0) {
         ret = 2;
     }
 
@@ -94,11 +96,11 @@ int func_0012B678(void *arg0) {
         ;
 
     if (ret == 0) {
-        r1_func_001263A8(s, (unsigned int)*(int *)(s + 0x810) < 1);
+        r1_func_001263A8(dec, (unsigned int)*(int *)(dec + 0x810) < 1);
     }
 
     if ((unsigned int)(ret - 1) < 2) {
-        r1_func_0012C468(s, r1_D_001538E0);
+        r1_func_0012C468(dec, r1_D_001538E0);
     }
 
     return (unsigned int)ret < 1;

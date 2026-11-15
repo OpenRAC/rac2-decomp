@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* This unit is built with -G8: every body here reaches a global through $gp. */
 
@@ -75,35 +76,37 @@ extern void func_L20_00444C18(char *arg0, char *arg1);
 
 extern char D_L20_001B9FC0[] __attribute__((nosda));
 
-void func_L20_0044AA88(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    char *p = arg0 + 0xF8;
-    float a = *(float *)(state + 0x140) - *(float *)(arg0 + 0x10);
-    float b = *(float *)(state + 0x144) - *(float *)(arg0 + 0x14);
-    float c = D_L20_001B2450 * 4.84813745e-06f;
-    float d = D_L20_001B2454 * 0.000290888245f;
-    float r;
+/* Turns the turret to face its target and eases its yaw and pitch toward the aimed angles. */
+void func_L20_0044AA88(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    char *angles = moby + 0xF8;
+    float deltaX = *(float *)(state + 0x140) - *(float *)(moby + 0x10);
+    float deltaY = *(float *)(state + 0x144) - *(float *)(moby + 0x14);
+    float smallStep = D_L20_001B2450 * 4.84813745e-06f;
+    float turnStep = D_L20_001B2454 * 0.000290888245f;
+    float heading;
 
-    r = func_00283248(a, b);
-    func_002AAA00(p, state + 0x1A4, 0, r, c, c, d);
-    d = d * 4.0f;
-    func_002AA2E8(arg0 + 0x0F0, *(float *)(state + 0x1A8), d);
+    heading = FastMatrixHelperA(deltaX, deltaY);
+    ApproachTargetWithDirectionMode(angles, state + 0x1A4, 0, heading, smallStep, smallStep, turnStep);
+    turnStep = turnStep * 4.0f;
+    ApproachValue(moby + 0x0F0, *(float *)(state + 0x1A8), turnStep);
     *(float *)(state + 0x1A8) = 0.0f;
-    func_002AA2E8(arg0 + 0x0F4, *(float *)(state + 0x1AC), d);
+    ApproachValue(moby + 0x0F4, *(float *)(state + 0x1AC), turnStep);
     *(float *)(state + 0x1AC) = 0.0f;
 }
 
-void func_L20_00449AE8(char *arg0) {
-    TI128 v;
+/* Makes the object vanish with an impact effect and puts it back into its resting state. */
+void func_L20_00449AE8(char *moby) {
+    TI128 offset;
 
-    func_00282CF0(&v, D_L20_001B9FC0, arg0 + 0x10);
-    func_00282F20(&v, &v, 1.0f);
-    func_0032DA58(arg0, arg0 + 0x10, &v, *(float *)(arg0 + 0x18) - 0.5f);
-    func_002A8C28(arg0, arg0 + 0x10, 0x10000, 0, 6.0f, D_L20_001B23EC, 2.0f,
+    FastVecSub(&offset, D_L20_001B9FC0, moby + 0x10);
+    vec_scale_to_length(&offset, &offset, 1.0f);
+    SpawnBlastEffectMoby(moby, moby + 0x10, &offset, *(float *)(moby + 0x18) - 0.5f);
+    SweepCollisionFromObject(moby, moby + 0x10, 0x10000, 0, 6.0f, D_L20_001B23EC, 2.0f,
                   1, 0);
-    *(int *)(arg0 + 0x98) = 0;
-    *(u16 *)(arg0 + 0x34) = (*(u16 *)(arg0 + 0x34) | 0x41) & 0xEFFF;
-    func_002A7750(arg0, 1, -1);
+    *(int *)(moby + 0x98) = 0;
+    *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
+    SetMobyState(moby, 1, -1);
 }
 
 /* func_L20_0044A838 is defined in L20_0044A838-g8.c. */
@@ -132,31 +135,32 @@ typedef struct {
     char *pVars;     /* 0x68 */
 } Moby449FD0;
 
-char *func_L20_00449FD0(char *arg0, char *arg1, char *arg2, float arg3, int arg4,
-                        float arg5) {
-    char *obj;
+/* Creates a new projectile (moby class 4846) at a position, with a direction, speed and lifetime, and returns it. */
+char *func_L20_00449FD0(char *template, char *position, char *direction, float speed, int lifetime,
+                        float extraValue) {
+    char *projectile;
     char *state;
 
-    obj = func_0029EFD0(0x12EE);
-    if (obj != 0) {
-        func_002B37E8((u8 *)obj, (u8 *)arg0);
-        qcopy(obj + 0x10, arg1);
-        *(float *)(obj + 0xF0) = func_002A7940();
-        *(float *)(obj + 0xF4) = func_002A7940();
-        func_002833F0(obj + 0xC0, obj + 0xF0);
-        ((Moby449FD0 *)obj)->state = 1;
-        ((Moby449FD0 *)obj)->flags |= 0x100;
-        ((Moby449FD0 *)obj)->scale =
-            *(float *)(((Moby449FD0 *)obj)->pClass + 0x24) * D_L20_001B23F8;
-        state = ((Moby449FD0 *)obj)->pVars;
-        qcopy(state, arg2);
-        *(float *)(state + 0x14) = arg3 * 0.016666668f;
-        *(int *)(state + 0x18) = arg4;
-        *(float *)(state + 0x1C) = arg5;
+    projectile = CreateMoby(0x12EE /* moby class 4846 */);
+    if (projectile != 0) {
+        InitChildObjectFromParent((u8 *)projectile, (u8 *)template);
+        qcopy(projectile + 0x10, position);
+        *(float *)(projectile + 0xF0) = RandomAngle();
+        *(float *)(projectile + 0xF4) = RandomAngle();
+        euler_rotation_basis(projectile + 0xC0, projectile + 0xF0);
+        ((Moby449FD0 *)projectile)->state = 1;
+        ((Moby449FD0 *)projectile)->flags |= 0x100;
+        ((Moby449FD0 *)projectile)->scale =
+            *(float *)(((Moby449FD0 *)projectile)->pClass + 0x24) * D_L20_001B23F8;
+        state = ((Moby449FD0 *)projectile)->pVars;
+        qcopy(state, direction);
+        *(float *)(state + 0x14) = speed * 0.016666668f;
+        *(int *)(state + 0x18) = lifetime;
+        *(float *)(state + 0x1C) = extraValue;
         *(int *)(state + 0x20) = 0x3C;
-        *(float *)(state + 0x10) = func_002A7878(10.0f, 20.0f) * 0.00027777778f;
+        *(float *)(state + 0x10) = RandomFloatRange(10.0f, 20.0f) * 0.00027777778f;
     }
-    return obj;
+    return projectile;
 }
 
 /* func_L20_0044B100 is defined in L20_0044B100-g8.c. */

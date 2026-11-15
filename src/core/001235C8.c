@@ -24,6 +24,7 @@ static __inline__ int fde_compare(fde *x, fde *y) {
     return (int)x->pc_begin - (int)y->pc_begin;
 }
 
+/* Merges two sorted lists of frame records into the first list. */
 void func_001235C8(fde_vector *v1, const fde_vector *v2) {
     u32 i1, i2;
     fde *fde2;

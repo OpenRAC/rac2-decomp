@@ -42,6 +42,7 @@ extern f32 func_00283198(f32 a);
 /* Sets the level's lighting values: the light direction comes from the angle
    func_00283248 gives for the table's two floats, scaled by 1/sqrt(3). Stores
    its three arguments in the level's pointer table. */
+/* Sets up the level lighting: one sun direction and its colours. */
 void func_L04_003A1868(void *first, void *second, void *third) {
     L04Table *table = &ref_L04_003A1868_00;
     f32 angle;
@@ -55,10 +56,10 @@ void func_L04_003A1868(void *first, void *second, void *third) {
     ref_L04_003A1868_01.f10 = 1.0f;
     ref_L04_003A1868_01.f14 = 0.9f;
     ref_L04_003A1868_01.f1C = 0.1f;
-    angle = func_00283248(table->field10, table->field14);
+    angle = FastMatrixHelperA(table->field10, table->field14);
     scale = 0.57735f;
-    ref_L04_003A1868_01.dir[0] = func_00283180(angle) * scale;
-    ref_L04_003A1868_01.dir[1] = func_00283198(angle) * scale;
+    ref_L04_003A1868_01.dir[0] = FastSinOrCosA(angle) * scale;
+    ref_L04_003A1868_01.dir[1] = FastSinOrCosB(angle) * scale;
     ref_L04_003A1868_01.dir[2] = -0.57735f;
     ref_L04_003A1868_01.f24 = 63;
     ref_L04_003A1868_01.f28 = 64;

@@ -9,23 +9,24 @@ typedef union {
     float f[4];
 } Quad __attribute__((aligned(16)));
 
-void func_L08_003D3E00(unsigned char *a0) {
-    int v1 = a0[0x20];
-    Quad local;
+/* Waits for a trigger and then keeps puffing out a small burst of effect particles until the object is removed. */
+void func_L08_003D3E00(unsigned char *moby) {
+    int state = moby[0x20];
+    Quad puff;
 
-    switch (v1) {
+    switch (state) {
     case 0:
-        a0[0x20] = 1;
+        moby[0x20] = 1;
         break;
     case 1:
-        if (a0[0xBC] != 0)
-            a0[0x20] = 2;
+        if (moby[0xBC] != 0)
+            moby[0x20] = 2;
         break;
     case 2:
-        qzero(&local);
-        local.f[2] = 0.15f;
-        func_002B0A68(a0, 0x7F, &local, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_0029F338(a0);
+        qzero(&puff);
+        puff.f[2] = 0.15f;
+        SpawnDebrisForMaskedParts(moby, 0x7F, &puff, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+        MarkMobySpawned(moby);
         break;
     }
 }

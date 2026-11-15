@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern void func_0033AE28(char *p);
 
@@ -31,7 +32,7 @@ int func_L00_00433560(char *object, int flags)
 {
     float *vec;
 
-    func_0033AE28(object + 8);
+    UpdateButtonPromptBar(object + 8);
     vec = *(float **)(object + 684);
     func_L00_00430948_1(object + 8, vec[0], vec[1]);
 
@@ -47,7 +48,7 @@ int func_L00_00433560(char *object, int flags)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_L00_004336B0(char *object)
 {
-    func_0033AB50(object + 8);
+    DestroyButtonPromptBar(object + 8);
     return object;
 }
 
@@ -57,7 +58,7 @@ int func_L00_00433810(char *object, int flags)
 {
     float *vec;
 
-    func_0033AE28(object + 8);
+    UpdateButtonPromptBar(object + 8);
     vec = *(float **)(object + 684);
     func_L00_00430948_1(object + 8, vec[0], vec[1]);
 
@@ -73,7 +74,7 @@ int func_L00_00433810(char *object, int flags)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_L00_004338A8(char *object)
 {
-    func_0033AB50(object + 8);
+    DestroyButtonPromptBar(object + 8);
     return object;
 }
 
@@ -83,7 +84,7 @@ int func_L00_00433A08(char *object, int flags)
 {
     float *vec;
 
-    func_0033AE28(object + 8);
+    UpdateButtonPromptBar(object + 8);
     vec = *(float **)(object + 684);
     func_L00_00430948_1(object + 8, vec[0], vec[1]);
 
@@ -118,13 +119,15 @@ char *func_L00_00433DB0(char *a0) {
 
 extern int func_0033AF48(char *p);
 
+/* Asks the sub-object 8 bytes in for a value and passes it back. */
 int func_L00_00433F50(char *p)
 {
-    return func_0033AF48(p + 8);
+    return DrawButtonPromptBar(p + 8);
 }
 
 
 
+/* Does nothing. */
 void func_L00_004370F8(void)
 {
 }
@@ -133,11 +136,13 @@ void func_L00_004370F8(void)
 
 extern int func_00348128(char *p);
 
+/* Asks the sub-object 16 bytes in for a value and passes it back. */
 int func_L00_004377C0(char *p)
 {
-    return func_00348128(p + 16);
+    return GetMenuSelectedIndex(p + 16);
 }
 
+/* Does nothing. */
 void func_L00_00437D50(void)
 {
 }
@@ -163,62 +168,63 @@ void func_L00_00438970(float first, float second, float **cell)
 
 extern int func_00342F70(char *p);
 
+/* Asks a sub-object for a value and passes it back. */
 int func_L00_00438E68(char *p)
 {
-    return func_00342F70(p + 664);
+    return BuildMenuListIds(p + 664);
 }
 
 
 /* Return the measured signed-word getter result for the owner subview at 0x 298. */
 int func_L00_00438E90(unsigned char *owner)
 {
-    return func_00342BC0(owner + 0x298);
+    return GetSelectedMenuListId(owner + 0x298);
 }
 
 /* Invoke the measured cleanup helper on the owner subview at 0x 298. */
 void func_L00_00438EB0(unsigned char *owner)
 {
-    func_00343058(owner + 0x298);
+    ClearMenuListState(owner + 0x298);
 }
 
 
 /* Calls a fixed chain of sub-object initialisers at 76-byte steps and returns the base pointer. */
 char *func_L00_004392D0(char *p)
 {
-    func_L00_0042BAD0(p);
-    func_L00_0042BAD0(p + 76);
-    func_L00_0042BAD0(p + 152);
-    func_L00_0042BAD0(p + 228);
-    func_L00_0042BAD0(p + 304);
-    func_L00_0042BAD0(p + 380);
-    func_L00_0042C290(p + 456);
-    func_L00_0042C290(p + 528);
-    func_L00_0042BFF8(p + 600);
-    func_L00_0042C290(p + 664);
-    func_L00_0042C290(p + 736);
-    func_L00_0042C290(p + 808);
-    func_L00_0042C290(p + 880);
-    func_L00_0042C290(p + 952);
+    InitCameraObjectTableA(p);
+    InitCameraObjectTableA(p + 76);
+    InitCameraObjectTableA(p + 152);
+    InitCameraObjectTableA(p + 228);
+    InitCameraObjectTableA(p + 304);
+    InitCameraObjectTableA(p + 380);
+    InitCameraObjectTableD(p + 456);
+    InitCameraObjectTableD(p + 528);
+    InitCameraObjectTableC(p + 600);
+    InitCameraObjectTableD(p + 664);
+    InitCameraObjectTableD(p + 736);
+    InitCameraObjectTableD(p + 808);
+    InitCameraObjectTableD(p + 880);
+    InitCameraObjectTableD(p + 952);
     return p;
 }
 
 /* Calls a fixed chain of sub-object initialisers at 76-byte steps and returns the base pointer. */
 char *func_L00_0043AD30(char *p)
 {
-    func_L00_0042BAD0(p);
-    func_L00_0042BAD0(p + 76);
-    func_L00_0042BAD0(p + 152);
-    func_L00_0042BAD0(p + 228);
-    func_L00_0042BAD0(p + 304);
-    func_L00_0042BAD0(p + 380);
-    func_L00_0042C290(p + 456);
-    func_L00_0042C290(p + 528);
-    func_L00_0042BFF8(p + 600);
-    func_L00_0042C290(p + 664);
-    func_L00_0042C290(p + 736);
-    func_L00_0042C290(p + 808);
-    func_L00_0042C290(p + 880);
-    func_L00_0042C290(p + 952);
+    InitCameraObjectTableA(p);
+    InitCameraObjectTableA(p + 76);
+    InitCameraObjectTableA(p + 152);
+    InitCameraObjectTableA(p + 228);
+    InitCameraObjectTableA(p + 304);
+    InitCameraObjectTableA(p + 380);
+    InitCameraObjectTableD(p + 456);
+    InitCameraObjectTableD(p + 528);
+    InitCameraObjectTableC(p + 600);
+    InitCameraObjectTableD(p + 664);
+    InitCameraObjectTableD(p + 736);
+    InitCameraObjectTableD(p + 808);
+    InitCameraObjectTableD(p + 880);
+    InitCameraObjectTableD(p + 952);
     return p;
 }
 
@@ -247,31 +253,36 @@ unsigned long func_L00_0043EA78(unsigned long param_1)
 
 
 
+/* Stores a value in one of the object's fields. */
 void func_L00_004427C8(char *object, int value) {
     *(int *)(object + 0x157C) = value;
 }
 
+/* Stores a value in the next field after the one set by the previous function. */
 void func_L00_004427D0(char *object, int value) {
     *(int *)(object + 0x1580) = value;
 }
 
 
+/* Does nothing. */
 void func_L00_00443B58(void)
 {
 }
 
 extern int func_00338A60(char *p);
 
+/* Asks a sub-object for a value and passes it back. */
 int func_L00_00443DF8(char *p)
 {
-    return func_00338A60(p + 0x1D6C);
+    return UpdateTextPanelByMode(p + 0x1D6C);
 }
 
 extern int func_00338F58(char *p);
 
+/* Asks the same sub-object for a different value and passes it back. */
 int func_L00_00443E18(char *p)
 {
-    return func_00338F58(p + 0x1D6C);
+    return DrawTextPanelScaled(p + 0x1D6C);
 }
 
 /* Return the complete supplied unsigned-long 64-bit value unchanged. */
@@ -296,6 +307,7 @@ void func_L00_004450C0(void *arg)
 }
 
 
+/* Does nothing. */
 void func_L00_00445EE8(void)
 {
 }
@@ -309,26 +321,30 @@ int func_L00_00445FE8(void) {
 
 extern int func_00350A78(char *p);
 
+/* Asks a sub-object for a value and passes it back. */
 int func_L00_00447188(char *p)
 {
-    return func_00350A78(p + 0x48);
+    return ViBufGetFreeRegions(p + 0x48);
 }
 
 extern int func_00350B70(char *p);
 
+/* Asks the same sub-object for another value and passes it back. */
 int func_L00_004471A8(char *p)
 {
-    return func_00350B70(p + 0x48);
+    return ViBufAddPendingBytes(p + 0x48);
 }
 
 extern int func_00351268(char *p);
 
+/* Asks the same sub-object for yet another value and passes it back. */
 int func_L00_00447278(char *p)
 {
-    return func_00351268(p + 0x48);
+    return ViBufGetQueuedBytes(p + 0x48);
 }
 
 
+/* Does nothing. */
 void func_L00_00447780(void)
 {
 }

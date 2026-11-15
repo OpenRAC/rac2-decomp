@@ -2,12 +2,13 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-void func_L20_0039F210(char *arg0, char *arg1, int arg2) {
-    char *dst = arg0 + 0x10;
+/* Places the electric orb at a position and sets its mode. */
+void func_L20_0039F210(char *moby, char *position, int mode) {
+    char *dst = moby + 0x10;
     char *state;
 
-    *(TI128 *)dst = *(TI128 *)arg1;
-    state = *(char **)(arg0 + 0x68);
-    *(int *)(state + 0xC) = arg2;
+    *(TI128 *)dst = *(TI128 *)position;
+    state = *(char **)(moby + 0x68);
+    *(int *)(state + 0xC) = mode;
     *(int *)state = 5;
 }

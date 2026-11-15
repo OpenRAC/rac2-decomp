@@ -56,6 +56,7 @@ static __inline__ unsigned long PackGaugeFlag(unsigned long flags,
 }
 
 /* Draws the museum status gauge and updates its swizzled palette. */
+/* Draws the museum status gauge on the screen. */
 void func_L30_0040AE38(char *obj) {
     char *s = *(char **)(obj + 0x68);
     unsigned long tex;
@@ -74,32 +75,32 @@ void func_L30_0040AE38(char *obj) {
     flags = PackGaugeFlag(flags, D_L30_001B181B, 16);
     mode = PackGaugeFlag(mode, D_L30_001B1812, 4);
     mode = PackGaugeFlag(mode, D_L30_001B1813, 6);
-    func_L08_00389B68(2, 0x47, flags | ((unsigned long)D_L30_001B181C << 17),
+    AppendVectorsToPacket(2, 0x47, flags | ((unsigned long)D_L30_001B181C << 17),
             0x42, mode | ((unsigned long)D_L30_001B1814 << 32));
-    tex = func_0027C878(D_L30_001B1764 + *(int *)(s + 0x64));
-    func_0027E018(func_00283CF0(D_L30_001B1798), D_001A7344 - 80,
+    tex = GetEffectTextureDescriptor(D_L30_001B1764 + *(int *)(s + 0x64));
+    DrawTexturedQuad(FloatToInt(D_L30_001B1798), gScreenHeight - 80,
            64, 64, 0, 0, 64, 64, D_L30_001B1760, tex);
-    tex = func_0027C878(D_L30_001B1768 + *(int *)(s + 0x64));
-    func_0027E018(func_00283CF0(D_L30_001B1798) + 64, D_001A7344 - 80,
+    tex = GetEffectTextureDescriptor(D_L30_001B1768 + *(int *)(s + 0x64));
+    DrawTexturedQuad(FloatToInt(D_L30_001B1798) + 64, gScreenHeight - 80,
            64, 64, 0, 0, 64, 64, D_L30_001B1760, tex);
-    tex = func_0027C878(D_L30_001B176C + *(int *)(s + 0x64));
-    angle = D_L30_001B1788 * (func_00282DF0(s) * scale);
+    tex = GetEffectTextureDescriptor(D_L30_001B176C + *(int *)(s + 0x64));
+    angle = D_L30_001B1788 * (FastVecLength(s) * scale);
     angle /= D_L30_001B16F4 * 0.016666668f;
-    angle = func_00283B98(angle, D_L30_001B178C * scale);
-    func_0027E4A8(D_L30_001B1798 + 32.0f, (float)(D_001A7344 - 48),
+    angle = FastAddRotations(angle, D_L30_001B178C * scale);
+    AppendRotatedSpriteQuad(D_L30_001B1798 + 32.0f, (float)(gScreenHeight - 48),
            32.0f, 32.0f, angle, 32, 32, tex, 0xFFFFF3, 0x60808080, 0, 0, 0.5f, 0.35f);
-    absdelta = D_L30_001B1790 * (func_00282C48(*(float *)(s + 0x5C)) * scale);
-    angle = func_00283B98(D_L30_001B1794 * scale, absdelta);
-    func_0027E4A8(D_L30_001B1798 + 64.0f + 32.0f, (float)(D_001A7344 - 48),
+    absdelta = D_L30_001B1790 * (FloatAbs(*(float *)(s + 0x5C)) * scale);
+    angle = FastAddRotations(D_L30_001B1794 * scale, absdelta);
+    AppendRotatedSpriteQuad(D_L30_001B1798 + 64.0f + 32.0f, (float)(gScreenHeight - 48),
            32.0f, 32.0f, angle, 32, 32, tex, 0xFFFFF3, 0x60808080, 0, 0, 0.5f, 0.35f);
-    delta = D_00189E20.current - *(float *)(s + 0x94);
+    delta = gHeroState.current - *(float *)(s + 0x94);
     delta *= 0.2f;
-    absdelta = func_00282C48(delta);
+    absdelta = FloatAbs(delta);
     if (absdelta > 1.0f) {
         delta /= absdelta;
     }
     *(float *)(s + 0x94) += delta;
-    n = func_00283CF0(*(float *)(s + 0x94) * 251.0f / D_00189E20.maximum) + 2;
+    n = FloatToInt(*(float *)(s + 0x94) * 251.0f / gHeroState.maximum) + 2;
     if (n > 253) {
         n = 253;
     }
@@ -116,13 +117,13 @@ void func_L30_0040AE38(char *obj) {
             (*(unsigned **)&D_L30_001B1808)[j] = 0x80000000;
         }
     }
-    tex = func_0027C878(*(int *)(s + 0x64) + D_L30_001B1780);
-    func_0027E018(368, D_001A7344 - 144, 128, 128, 0, 0, 128, 128, 0x70808080, tex);
-    tex = func_0027C878(*(int *)(s + 0x64) + D_L30_001B1784);
-    func_0027E018(368, D_001A7344 - 144, 128, 128, 0, 0, 128, 128, 0x70808080, tex);
+    tex = GetEffectTextureDescriptor(*(int *)(s + 0x64) + D_L30_001B1780);
+    DrawTexturedQuad(368, gScreenHeight - 144, 128, 128, 0, 0, 128, 128, 0x70808080, tex);
+    tex = GetEffectTextureDescriptor(*(int *)(s + 0x64) + D_L30_001B1784);
+    DrawTexturedQuad(368, gScreenHeight - 144, 128, 128, 0, 0, 128, 128, 0x70808080, tex);
     *(int *)(s + 0x98) = n;
-    if (D_00189E20.current < D_00189E20.maximum * 0.1f && ((D_L30_001B2848 / 90) & 1)) {
-        func_0027FB40(256, 370, 0x80000080, func_00288FB8(0x1149), 100);
+    if (gHeroState.current < gHeroState.maximum * 0.1f && ((D_L30_001B2848 / 90) & 1)) {
+        DrawTextCenteredMediumFont(256, 370, 0x80000080, GetLocalizedString(0x1149), 100);
     }
-    func_L08_00389B68(2, 0x47, 0x5340B, 0x42, 0x8000000044UL);
+    AppendVectorsToPacket(2, 0x47, 0x5340B, 0x42, 0x8000000044UL);
 }

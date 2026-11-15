@@ -54,7 +54,7 @@ void func_L01_0042C540(void *arg) {
     }
     factor=D_L01_001BD9C0.value;
     scale=&obj->transform[3]; pos=&obj->transform[1]; angles=&obj->transform[2];
-    marks->factor=func_00283248(1.0f,factor)*2.0f;
+    marks->factor=FastMatrixHelperA(1.0f,factor)*2.0f;
     if(settings->positionPath>=0) {
         s32 i, marked=0; PathRecord *path;
         path=D_L01_001FE180[settings->positionPath];
@@ -64,38 +64,38 @@ void func_L01_0042C540(void *arg) {
                 marks->indices[marked]=i;
                 marked++;
             }
-            distance=func_00282E48(&path->points[i],&path->points[(i+1)%path->count]);
+            distance=fast_vec_dist(&path->points[i],&path->points[(i+1)%path->count]);
             path->points[i].f[3]=distance;
             if(i<path->count-1) motion->distance+=distance;
         }
     }
     if(settings->duration>0)
-        settings->speed=(motion->distance/func_00283CE0(settings->duration))*60.0f;
+        settings->speed=(motion->distance/IntToFloat(settings->duration))*60.0f;
     if(settings->rotationPath>=0) {
         s32 i; PathRecord *path;
         path=D_L01_001FE180[settings->rotationPath];
         for(i=0;i<path->count;i++) {
-            distance=func_00282E48(&path->points[i],&path->points[(i+1)%path->count]);
+            distance=fast_vec_dist(&path->points[i],&path->points[(i+1)%path->count]);
             path->points[i].f[3]=distance;
             if(i<path->count-1) motion->angleDistance+=distance;
         }
     }
     spring=&obj->state->position;
     spring->stiffness=0.03f; spring->damping=0.2f;
-    func_00282C88(&spring->value);
+    ClearVector128(&spring->value);
     spring=&obj->state->rotation;
     spring->stiffness=0.03f; spring->damping=0.2f;
-    func_00282C88(&spring->value);
+    ClearVector128(&spring->value);
     { u8 *template=D_L01_001B9380.transform;
     qcopy(scale,template+0x30);
     qcopy(obj,template);
     qcopy(pos,template+0x10);
     qcopy(angles,template+0x20); }
     { s32 cameraIndex=settings->camera;
-    if(cameraIndex<0) func_L01_002BEB90(111,1);
+    if(cameraIndex<0) SetHeroMoveState(111,1);
     else {
         u8 (*cameras)[128]=(void *)D_L01_001B264C;
         orientation.q=0; orientation.f[3]=1;
-        func_L00_002B9D60(cameras[cameraIndex]+0x30,&orientation,111,0);
+        ResetHeroPositionAndDirection(cameras[cameraIndex]+0x30,&orientation,111,0);
     } }
 }

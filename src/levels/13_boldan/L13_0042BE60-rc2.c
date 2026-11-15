@@ -24,9 +24,10 @@
  */
 #include "common.h"
 
-void func_L13_0042BE60(s8 *arg0) {
-    if ((*(u8 *)((char *)(arg0) + (0x20))) == 0) {
-        (*(u8 *)((char *)(arg0) + (0x20))) = 1;
-        (*(u16 *)((char *)(arg0) + (0x34))) = (u16) ((*(u16 *)((char *)(arg0) + (0x34))) | 0x800);
+/* Sets a flag on the object the first time it runs, then does nothing. */
+void func_L13_0042BE60(s8 *moby) {
+    if ((*(u8 *)((char *)(moby) + (0x20))) == 0) {
+        (*(u8 *)((char *)(moby) + (0x20))) = 1;
+        (*(u16 *)((char *)(moby) + (0x34))) = (u16) ((*(u16 *)((char *)(moby) + (0x34))) | 0x800);
     }
 }

@@ -20,6 +20,7 @@ extern int func_L00_002FCF18(void *,float,float,float,float,float);
 
 /* Moves a projectile, applies its explosion hit to nearby objects, and updates
  * its persistent trail record while active. */
+/* Updates the shot with moby class 3755: it flies forward leaving a spark trail, and when it blows up it hurts enemies nearby. */
 void func_L00_004045E8(char *arg)
 {
     float old[4],delta[4];
@@ -33,67 +34,67 @@ void func_L00_004045E8(char *arg)
     case 0:
         *(int *)(ctx+24)=-1;
         *(unsigned char *)(arg+32)=1;
-        *(float *)(ctx+28)=func_002A7940();
+        *(float *)(ctx+28)=RandomAngle();
         break;
     case 1:
         qcopy(old,arg+16);
-        func_00282CC0(arg+16,(int *)ctx,arg+16);
-        func_00300190(arg+16,arg+16);
-        func_00300248(ctx,ctx);
-        func_002FEE70(*(int *)(ctx+48),(int *)ctx,0);
-        func_002FE880(arg+16,ctx,0.00083333335f);
-        func_L00_00404DD8(arg,old);
+        FastVecAdd(arg+16,(int *)ctx,arg+16);
+        TransformVectorOrCopy(arg+16,arg+16);
+        TriggerCurrentStateEffect(ctx,ctx);
+        SteerEffectDirection(*(int *)(ctx+48),(int *)ctx,0);
+        AddObjectDirectionScaled(arg+16,ctx,0.00083333335f);
+        HandleShotImpact(arg,old);
         if (*(float *)(arg+16)<2.0f || *(float *)(arg+16)>1021.0f ||
             *(float *)(arg+20)<2.0f || *(float *)(arg+20)>1021.0f ||
             *(float *)(arg+24)<2.0f || *(float *)(arg+24)>1021.0f) {
-            func_002FEE50(*(int *)(ctx+48));
-            func_0029F338(arg);
+            ClearEntryFlag(*(int *)(ctx+48));
+            MarkMobySpawned(arg);
             return;
         }
         break;
     case 2:
-        func_L00_00415740(arg+16,0.5f,1,50,40,40,40,90,1,1,1);
-        n=func_00277F48(arg+16,0,arg,0,3.0f);
+        SpawnExplosionMoby(arg+16,0.5f,1,50,40,40,40,90,1,1,1);
+        n=ProcessCollisionHit(arg+16,0,arg,0,3.0f);
         if(n>0) {
-            objects=D_L00_001C3280;
+            objects=gAreaHitTargets;
             count=n;
             do {
                 obj=*objects;
                 if (*(short *)(*(char **)(obj+36)+70)==5 || (*(unsigned short *)(obj+52)&0x4000)) {
-                    func_00282CF0(delta,obj+16,arg+16);
-                    func_00282F20(delta,delta,1.0f);
-                    func_00282F20(hit,hit,1.0f);
+                    FastVecSub(delta,obj+16,arg+16);
+                    vec_scale_to_length(delta,delta,1.0f);
+                    vec_scale_to_length(hit,hit,1.0f);
                     force=10.0f;
-                    power=D_L00_00262570+224*(unsigned char)D_00139568[32];
+                    power=gWeaponTable_L00+224*(unsigned char)gItemSlotToRecord[32];
                     boosted=*(int *)power && (unsigned char)power[4]==3;
                     if(boosted) force=20.0f;
-                    func_002A8C00(hit,arg,force,0x810000,delta);
+                    make_hit_descriptor(hit,arg,force,0x810000,delta);
                     *(TI128 *)(hit)=*(TI128 *)(delta);
                     *(float *)(hit+12)=5627.9248046875f;
                     hit[25]=3; *(int *)(hit+32)=1; hit[24]=5;
                     *(unsigned short *)(hit+26)=*(unsigned short *)(obj+170);
-                    func_002A8E20(obj,hit);
-                    func_0032D758(obj,78,*(int *)(*(char **)(ctx+52)+184));
+                    QueueMobyImpact(obj,hit);
+                    StartAttachedEffect(obj,78,*(int *)(*(char **)(ctx+52)+184));
                 }
                 objects++;
             } while(--count);
         }
-        if (*(int *)(ctx+24)!=-1) func_00291450(*(int *)(ctx+24));
+        if (*(int *)(ctx+24)!=-1) FreePointLight(*(int *)(ctx+24));
         *(int *)(ctx+24)=-1;
         /* Fall through to the shared teardown. */
     case 3:
-        func_002FEE50(*(int *)(ctx+48));
-        func_0029F338(arg);
+        ClearEntryFlag(*(int *)(ctx+48));
+        MarkMobySpawned(arg);
         return;
     }
-    ref_L00_004045E8_00(func_L00_00404B48,arg);
+    ref_L00_004045E8_00(DrawShotGlowSparks,arg);
     *(TI128 *)(delta)=*(TI128 *)(arg+16);
-    func_L00_00404ED8(arg,delta,old);
-    func_00282CC0((char *)delta,arg+16,ctx+32);
-    func_00282CC0(hit,(char *)old,ctx+32);
-    func_L00_00404ED8(arg,delta,hit);
+    SpawnSparkTrailBetweenPoints(arg,delta,old);
+    FastVecAdd((char *)delta,arg+16,ctx+32);
+    FastVecAdd(hit,(char *)old,ctx+32);
+    SpawnSparkTrailBetweenPoints(arg,delta,hit);
     if (*(int *)(ctx+24)==-1)
-        *(int *)(ctx+24)=func_L00_002FCF18(arg+16,5.0f,0.0f,1.0f,0.8f,0.25f);
+        *(int *)(ctx+24)=AllocateEffectSlot_L00_2(arg+16,5.0f,0.0f,1.0f,0.8f,0.25f);
     else {
         entry=D_L00_001C6F40+32**(int *)(ctx+24);
         qcopy(entry+16,arg+16);

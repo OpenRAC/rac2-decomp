@@ -16,14 +16,15 @@ extern int D_001B22B0[] __attribute__((sda));
 extern void func_002FC3C0(int),func_002945E8(int,int),func_0029CFB0(void *,void *,int),func_00132858(int),func_00132828(void);
 extern int func_00132028(void),func_001326D8(char *);
 extern void func_0026FEB8(char *,int),func_002946C0(int,int,void *);
+/* Makes sure the disc asset with this id is in a cache slot, loading it if needed, and switches to it. */
 void func_00294988(int id)
 {
     int index=0,slot;
     char *data;
     int i;
-    if(D_0014B540.slots[0].id==id) goto found;
+    if(gCopySetupData.slots[0].id==id) goto found;
     while(++index<48) {
-        if(D_0014B540.slots[index].id==id) break;
+        if(gCopySetupData.slots[index].id==id) break;
     }
 found:
     if(index==48)return;
@@ -35,11 +36,11 @@ found:
         if(D_00152CD0.slots[slot]==index)break;
     }
 slotfound:
-    func_002FC3C0(1);
+    WaitForDmaStatusBits(1);
     if(slot==3) {
-        func_0026FEB8(D_001A9370,id);
+        STUB_printf(D_001A9370,id);
         slot=0;
-        func_002945E8(id,0);
+        LoadClassIntoCacheSlotSynced(id,0);
     }
     D_00152CD0.active=slot;
     data=(char *)((int)&D_00152CD0+slot*0xc800)+64;
@@ -49,18 +50,18 @@ slotfound:
         data=dst;
     }
     for(i=0;i<52;i++) {
-        char *e=(char *)&D_00188660+i*0x70;
-        int *q=*(int **)(e+0x78);
-        if(q && q[7]==4) *(int **)(e+0x78)=D_001A93B0;
+        char *objectRow=(char *)&gSoundState+i*0x70;
+        int *statePtr=*(int **)(objectRow+0x78);
+        if(statePtr && statePtr[7]==4) *(int **)(objectRow+0x78)=D_001A93B0;
     }
     if(D_00152CD0.sound) {
-        func_00132858(D_00152CD0.sound);
-        while(func_00132028()) {}
+        SendSoundCommand6(D_00152CD0.sound);
+        while(snd_Pump()) {}
     }
-    if(D_0014B540.slots[index].sound) {
-        D_00152CD0.sound=func_001326D8(D_001A7278[0]+slot*0xc800);
-        D_00188660.sound=D_00152CD0.sound;
+    if(gCopySetupData.slots[index].sound) {
+        D_00152CD0.sound=snd_BankLoadFromIOP(D_001A7278[0]+slot*0xc800);
+        gSoundState.sound=D_00152CD0.sound;
     } else D_00152CD0.sound=0;
     func_00132828();
-    func_002946C0(id,index,data);
+    LoadCachedMobyClass(id,index,data);
 }

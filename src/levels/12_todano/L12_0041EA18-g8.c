@@ -23,6 +23,7 @@ extern int func_002E5CF8(int index, int kind, char *object);
 extern void func_00282CF0(void *out, void *a, void *b);
 extern void func_002AD6F0(void *matrix, void *offset, void *a, void *b);
 
+/* Moves a lift between two heights and plays a sound while it moves. It carries the hero standing on it. */
 void func_L12_0041EA18(u8 *object)
 {
     LiftQuad oldPosition;
@@ -37,55 +38,55 @@ void func_L12_0041EA18(u8 *object)
     switch (object[0x20]) {
     case 0:
         qcopy(data + 0x70, object + 0x10);
-        func_002A7750(object, 1, -1);
+        SetMobyState(object, 1, -1);
         break;
     case 1:
-        if (!func_002B38B8(object)) break;
+        if (!IsThirdPendingFlagSet(object)) break;
         if (*(int *)(data + 0x68))
             target = *(float *)(D_L12_001B2F8C + *(int *)(data + 0x60) * 128 + 0x38);
         else
             target = *(float *)(data + 0x78);
-        if (func_00282C48(target - *(float *)(object + 0x18)) < 2.0f) {
+        if (FloatAbs(target - *(float *)(object + 0x18)) < 2.0f) {
             reference = *(float *)(D_L12_001B2F8C + *(int *)(data + 0x60) * 128 + 0x38);
-            if (D_00189E20.standing == object && D_00189E20.flags) {
-                func_002B0C28(8, 0x279a, 1);
+            if (gHeroState.standing == object && gHeroState.flags) {
+                TryClaimNotice(8, 0x279a, 1);
                 if (D_00138324 & 0x10)
                     *(int *)(data + 0x68) = (*(int *)(data + 0x68) + 1) & 1;
             } else if (*(int *)(data + 0x68)) {
-                if (func_00282C48(D_00189E20.position[2] - *(float *)(data + 0x78)) < 4.0f &&
-                    func_00282E80(D_00189E20.position, object + 0x10) < 24.0f)
+                if (FloatAbs(gHeroState.position[2] - *(float *)(data + 0x78)) < 4.0f &&
+                    vec_distance_xy(gHeroState.position, object + 0x10) < 24.0f)
                     *(int *)(data + 0x68) = 0;
             } else {
-                if (func_00282C48(D_00189E20.position[2] - reference) < 4.0f &&
-                    func_00282E80(D_00189E20.position, object + 0x10) < 24.0f)
+                if (FloatAbs(gHeroState.position[2] - reference) < 4.0f &&
+                    vec_distance_xy(gHeroState.position, object + 0x10) < 24.0f)
                     *(int *)(data + 0x68) = 1;
             }
         }
         rate = 0.003888888983055949f;
         if (*(int *)(data + 0x68)) {
-            if (D_00189E20.position[2] < *(float *)(object + 0x18) - 1.0f &&
-                func_002ACBC8(D_00189E20.position, *(int *)(data + 0x60))) {
+            if (gHeroState.position[2] < *(float *)(object + 0x18) - 1.0f &&
+                IsPointInCuboid(gHeroState.position, *(int *)(data + 0x60))) {
                 target += 3.0f;
                 rate = 0.007777777966111898f;
             } else {
                 target += 0.5f;
             }
         }
-        func_002AA548((float *)(object + 0x18), (float *)(data + 0x6c), target, 0.0019444444915279746f, rate, 0.5f);
-        if (func_00282C48(target - *(float *)(object + 0x18)) < 0.8f) {
+        StepValueTowardTarget((float *)(object + 0x18), (float *)(data + 0x6c), target, 0.0019444444915279746f, rate, 0.5f);
+        if (FloatAbs(target - *(float *)(object + 0x18)) < 0.8f) {
             index = *(int *)(data + 0x80);
             if (index != -1) {
-                LiftSound *sound = (LiftSound *)(index * 112 + (s32)D_00188660);
+                LiftSound *sound = (LiftSound *)(index * 112 + (s32)gSoundState);
                 if (sound->owner == object && sound->active)
-                    func_002E59F8(index);
+                    StopSoundVoice(index);
             }
             *(int *)(data + 0x80) = -1;
         } else {
-            LiftSound *sound = (LiftSound *)(*(int *)(data + 0x80) * 112 + (s32)D_00188660);
+            LiftSound *sound = (LiftSound *)(*(int *)(data + 0x80) * 112 + (s32)gSoundState);
             if (sound->owner != object || sound->active == 0)
-                *(int *)(data + 0x80) = func_002E5CF8(0, 4, (char *)object);
+                *(int *)(data + 0x80) = PlayMobySound(0, 4, (char *)object);
         }
     }
-    func_00282CF0(&displacement, object + 0x10, &oldPosition);
-    func_002AD6F0(data + 0x20, &displacement, object + 0xf0, object + 0xf0);
+    FastVecSub(&displacement, object + 0x10, &oldPosition);
+    CombineTransformsAndStore(data + 0x20, &displacement, object + 0xf0, object + 0xf0);
 }

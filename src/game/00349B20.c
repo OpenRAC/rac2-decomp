@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef signed int s32;
@@ -39,36 +40,36 @@ typedef struct {
 
 /* Advances the morph progress by the step, clamps it to its range, lerps the two
    position pairs into the destination vectors and updates the second morph. */
-void func_00349B20(u8 *a0)
+void func_00349B20(u8 *anim)
 {
-    MorphObject *s = (MorphObject *)a0;
-    float t, k;
+    MorphObject *morph = (MorphObject *)anim;
+    float blend, inverse;
     int i;
 
-    if (s->i1C != 0) {
-        if (s->i14 == 1) {
-            float v = s->f10 + s->f18;
-            s->f10 = v;
-            s->i1C = (v <= 1.0f) ? 1 : 0;
-            s->f10 = (v <= 1.0f) ? v : 1.0f;
+    if (morph->i1C != 0) {
+        if (morph->i14 == 1) {
+            float next = morph->f10 + morph->f18;
+            morph->f10 = next;
+            morph->i1C = (next <= 1.0f) ? 1 : 0;
+            morph->f10 = (next <= 1.0f) ? next : 1.0f;
         } else {
-            float v = s->f10 - s->f18;
-            s->f10 = v;
-            s->i1C = (v >= 0.0f) ? 1 : 0;
-            s->f10 = (v >= 0.0f) ? v : 0.0f;
+            float next = morph->f10 - morph->f18;
+            morph->f10 = next;
+            morph->i1C = (next >= 0.0f) ? 1 : 0;
+            morph->f10 = (next >= 0.0f) ? next : 0.0f;
         }
-        t = func_0034EE78(s->f10, 0.0f, s->f0, s->f4, 1.0f);
+        blend = EvaluateCubicHermite(morph->f10, 0.0f, morph->f0, morph->f4, 1.0f);
         for (i = 0; i < 2; i++) {
-            if (s->dst[i] != 0) {
-                k = 1.0f - t;
-                s->dst[i][0] = k * s->from[i].x + t * s->to[i].x;
-                s->dst[i][1] = k * s->from[i].y + t * s->to[i].y;
-                s->dst[i][2] = k * s->from[i].z + t * s->to[i].z;
-                s->dst[i][3] = k * s->from[i].w + t * s->to[i].w;
+            if (morph->dst[i] != 0) {
+                inverse = 1.0f - blend;
+                morph->dst[i][0] = inverse * morph->from[i].x + blend * morph->to[i].x;
+                morph->dst[i][1] = inverse * morph->from[i].y + blend * morph->to[i].y;
+                morph->dst[i][2] = inverse * morph->from[i].z + blend * morph->to[i].z;
+                morph->dst[i][3] = inverse * morph->from[i].w + blend * morph->to[i].w;
             }
         }
-        if (s->p20 != 0) {
-            s->p20[0] = func_00283D38(s->p8C, s->p90, func_0034EE78(s->f10, 0.0f, s->f8, s->fC, 1.0f));
+        if (morph->p20 != 0) {
+            morph->p20[0] = FastTweenColor(morph->p8C, morph->p90, EvaluateCubicHermite(morph->f10, 0.0f, morph->f8, morph->fC, 1.0f));
         }
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_00289AA8, split from 00288D88.c: its jump table is this unit's only .rodata, and its
  * callee func_00289AA0 stays in 00288D88.c. Default -G0 profile, no cflags line. */
@@ -33,138 +34,139 @@ extern void func_002802E0(unsigned short *, int, int, int, int, int, int, int, i
 extern void func_00280200(unsigned short *, unsigned long long, unsigned char *, int);
 extern void func_00289AA0(void);
 
+/* Draws the subtitle box and its text, growing, showing and shrinking it by state. */
 void func_00289AA8(void)
 {
     unsigned short layout[16];
 
-    D_00254E78.offsetTimer--;
-    if (D_00254E78.offsetTimer < 0)
-        D_00254E78.offsetTimer = 0;
-    if (D_00254E78.offsetTimer == 0)
-        D_00254E78.offset = 0;
-    if (!D_00254E78.state || !D_00254E78.enabled || !SUBTITLE_SETTING)
+    gSubtitleState.offsetTimer--;
+    if (gSubtitleState.offsetTimer < 0)
+        gSubtitleState.offsetTimer = 0;
+    if (gSubtitleState.offsetTimer == 0)
+        gSubtitleState.offset = 0;
+    if (!gSubtitleState.state || !gSubtitleState.enabled || !SUBTITLE_SETTING)
         return;
 
-    switch (D_00254E78.state) {
+    switch (gSubtitleState.state) {
     case 1: {
-        int w, h, y, x, offset;
+        int halfW, halfH, posY, posX, offset;
 
         if (SUBTITLE_BOX_SETTING) {
-            h = 8;
-            w = 8;
-            D_00254E78.boxHalfWidth = w;
-            D_00254E78.boxHalfHeight = h;
-            y = D_00254E78.y;
-            x = D_00254E78.x;
-            offset = D_00254E78.offset;
-            func_0027EB88(y - h + offset, y + h + offset, x - w, x + w, 96, 0x60442D00);
-            func_0029B658(96, 0x55F0C070,
-                          D_00254E78.y - D_00254E78.boxHalfHeight + D_00254E78.offset,
-                          D_00254E78.y + D_00254E78.boxHalfHeight + D_00254E78.offset,
-                          D_00254E78.x - D_00254E78.boxHalfWidth,
-                          D_00254E78.x + D_00254E78.boxHalfWidth);
+            halfH = 8;
+            halfW = 8;
+            gSubtitleState.boxHalfWidth = halfW;
+            gSubtitleState.boxHalfHeight = halfH;
+            posY = gSubtitleState.y;
+            posX = gSubtitleState.x;
+            offset = gSubtitleState.offset;
+            DrawRoundedBox(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, 96, 0x60442D00);
+            SetLevelObjectRect(96, 0x55F0C070,
+                          gSubtitleState.y - gSubtitleState.boxHalfHeight + gSubtitleState.offset,
+                          gSubtitleState.y + gSubtitleState.boxHalfHeight + gSubtitleState.offset,
+                          gSubtitleState.x - gSubtitleState.boxHalfWidth,
+                          gSubtitleState.x + gSubtitleState.boxHalfWidth);
         } else {
-            func_00289AA0();
+            EmptySubtitleStubB();
         }
         break;
     }
     case 2:
-        func_00289AA0();
+        EmptySubtitleStubB();
         break;
     case 3: {
-        int t, w, h, y, x, offset;
+        int progress, halfW, halfH, posY, posX, offset;
 
         if (SUBTITLE_BOX_SETTING) {
             /* The box grows from 32 to its full half extents over 8 frames. */
-            t = D_00254E78.timer;
-            if (t > 8)
-                t = 8;
-            if (t < 0)
-                t = 0;
-            w = 32 + (D_00254E78.halfWidth - 32) * t / 8;
-            h = 32 + (D_00254E78.halfHeight - 32) * t / 8;
-            D_00254E78.boxHalfWidth = w;
-            D_00254E78.boxHalfHeight = h;
-            y = D_00254E78.y;
-            x = D_00254E78.x;
-            offset = D_00254E78.offset;
-            func_0027EB88(y - h + offset, y + h + offset, x - w, x + w, 96, 0x60442D00);
-            func_0029B658(96, 0x55F0C070,
-                          D_00254E78.y - D_00254E78.boxHalfHeight + D_00254E78.offset,
-                          D_00254E78.y + D_00254E78.boxHalfHeight + D_00254E78.offset,
-                          D_00254E78.x - D_00254E78.boxHalfWidth,
-                          D_00254E78.x + D_00254E78.boxHalfWidth);
+            progress = gSubtitleState.timer;
+            if (progress > 8)
+                progress = 8;
+            if (progress < 0)
+                progress = 0;
+            halfW = 32 + (gSubtitleState.halfWidth - 32) * progress / 8;
+            halfH = 32 + (gSubtitleState.halfHeight - 32) * progress / 8;
+            gSubtitleState.boxHalfWidth = halfW;
+            gSubtitleState.boxHalfHeight = halfH;
+            posY = gSubtitleState.y;
+            posX = gSubtitleState.x;
+            offset = gSubtitleState.offset;
+            DrawRoundedBox(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, 96, 0x60442D00);
+            SetLevelObjectRect(96, 0x55F0C070,
+                          gSubtitleState.y - gSubtitleState.boxHalfHeight + gSubtitleState.offset,
+                          gSubtitleState.y + gSubtitleState.boxHalfHeight + gSubtitleState.offset,
+                          gSubtitleState.x - gSubtitleState.boxHalfWidth,
+                          gSubtitleState.x + gSubtitleState.boxHalfWidth);
         } else {
-            func_00289AA0();
+            EmptySubtitleStubB();
         }
         break;
     }
     case 4:
     case 5:
     case 6: {
-        int t, w, h, y, x, offset;
+        int progress, halfW, halfH, posY, posX, offset;
         int color;
         unsigned char *text;
 
         if (SUBTITLE_BOX_SETTING) {
-            h = D_00254E78.halfHeight;
-            w = D_00254E78.halfWidth;
-            D_00254E78.boxHalfWidth = w;
-            D_00254E78.boxHalfHeight = h;
-            y = D_00254E78.y;
-            x = D_00254E78.x;
-            offset = D_00254E78.offset;
-            func_0027EB88(y - h + offset, y + h + offset, x - w, x + w, 96, 0x60442D00);
+            halfH = gSubtitleState.halfHeight;
+            halfW = gSubtitleState.halfWidth;
+            gSubtitleState.boxHalfWidth = halfW;
+            gSubtitleState.boxHalfHeight = halfH;
+            posY = gSubtitleState.y;
+            posX = gSubtitleState.x;
+            offset = gSubtitleState.offset;
+            DrawRoundedBox(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, 96, 0x60442D00);
             color = 0x80FFA888;
-            func_0029B658(96, 0x55F0C070,
-                          D_00254E78.y - D_00254E78.boxHalfHeight + D_00254E78.offset,
-                          D_00254E78.y + D_00254E78.boxHalfHeight + D_00254E78.offset,
-                          D_00254E78.x - D_00254E78.boxHalfWidth,
-                          D_00254E78.x + D_00254E78.boxHalfWidth);
+            SetLevelObjectRect(96, 0x55F0C070,
+                          gSubtitleState.y - gSubtitleState.boxHalfHeight + gSubtitleState.offset,
+                          gSubtitleState.y + gSubtitleState.boxHalfHeight + gSubtitleState.offset,
+                          gSubtitleState.x - gSubtitleState.boxHalfWidth,
+                          gSubtitleState.x + gSubtitleState.boxHalfWidth);
             /* The text fades in (state 4) and out (state 6) over 4 frames. */
-            t = D_00254E78.timer;
-            if (t > 4)
-                t = 4;
-            if (t < 0)
-                t = 0;
-            if (D_00254E78.state == 4)
-                color = (t << 29) | 0xFFA888;
-            else if (D_00254E78.state == 6)
-                color = ((4 - t) << 29) | 0xFFA888;
-            text = D_001B1840[0][D_00254E78.entry].text;
-            func_002802E0(layout, D_00254E78.offset + 240, D_00254E78.offset + 480, 44, 468, 256,
-                          D_00254E78.y + D_00254E78.offset, 16, 3);
-            func_00280200(layout, color, text, -1);
+            progress = gSubtitleState.timer;
+            if (progress > 4)
+                progress = 4;
+            if (progress < 0)
+                progress = 0;
+            if (gSubtitleState.state == 4)
+                color = (progress << 29) | 0xFFA888;
+            else if (gSubtitleState.state == 6)
+                color = ((4 - progress) << 29) | 0xFFA888;
+            text = gSubtitleEntries[0][gSubtitleState.entry].text;
+            FontSetWindow(layout, gSubtitleState.offset + 240, gSubtitleState.offset + 480, 44, 468, 256,
+                          gSubtitleState.y + gSubtitleState.offset, 16, 3);
+            DrawTextWindowMediumFont(layout, color, text, -1);
         } else {
-            func_00289AA0();
+            EmptySubtitleStubB();
         }
         break;
     }
     case 7: {
-        int t, w, h, y, x, offset, alpha;
+        int progress, halfW, halfH, posY, posX, offset, alpha;
 
         if (SUBTITLE_BOX_SETTING) {
             /* The box shrinks back to 8 and fades out over 8 frames. */
-            t = D_00254E78.timer;
-            if (t > 8)
-                t = 8;
-            if (t < 0)
-                t = 0;
-            h = D_00254E78.boxHalfHeight;
-            w = D_00254E78.boxHalfWidth;
-            w -= (w - 8) * t / 8;
-            h -= (h - 8) * t / 8;
-            alpha = (8 - t) * 12;
-            y = D_00254E78.y;
-            x = D_00254E78.x;
-            offset = D_00254E78.offset;
-            func_0027EB88(y - h + offset, y + h + offset, x - w, x + w, alpha, 0x60442D00);
-            func_0029B658(alpha, 0x55F0C070,
-                          D_00254E78.y - h + D_00254E78.offset,
-                          D_00254E78.y + h + D_00254E78.offset,
-                          D_00254E78.x - w, D_00254E78.x + w);
+            progress = gSubtitleState.timer;
+            if (progress > 8)
+                progress = 8;
+            if (progress < 0)
+                progress = 0;
+            halfH = gSubtitleState.boxHalfHeight;
+            halfW = gSubtitleState.boxHalfWidth;
+            halfW -= (halfW - 8) * progress / 8;
+            halfH -= (halfH - 8) * progress / 8;
+            alpha = (8 - progress) * 12;
+            posY = gSubtitleState.y;
+            posX = gSubtitleState.x;
+            offset = gSubtitleState.offset;
+            DrawRoundedBox(posY - halfH + offset, posY + halfH + offset, posX - halfW, posX + halfW, alpha, 0x60442D00);
+            SetLevelObjectRect(alpha, 0x55F0C070,
+                          gSubtitleState.y - halfH + gSubtitleState.offset,
+                          gSubtitleState.y + halfH + gSubtitleState.offset,
+                          gSubtitleState.x - halfW, gSubtitleState.x + halfW);
         } else {
-            func_00289AA0();
+            EmptySubtitleStubB();
         }
         break;
     }

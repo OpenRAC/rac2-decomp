@@ -45,18 +45,20 @@ extern int D_L02_001B0350 __attribute__((sda));
 
 extern int D_L02_001B0360 __attribute__((sda));
 
+/* Resets the blade trail counter and clears the two stored trail positions. */
 void func_L02_003D69F0(void) {
-    D_L02_001B0344 = 0;
-    func_00282C88(&D_L02_001B0360);
-    func_00282C88(&D_L02_001B0350);
+    gBladeTrailCount = 0;
+    ClearVector128(&D_L02_001B0360);
+    ClearVector128(&D_L02_001B0350);
 }
 
-int func_L02_003D4D68(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Decides if the boss should land: only near the arena centre, after a long enough wait, with rising odds. */
+int func_L02_003D4D68(char *self) {
+    char *state = *(char **)(self + 0x68);
     short timer;
     int delta;
 
-    if (func_00282E80(arg0 + 0x10, &D_L02_001B01B0) > 18.0f) {
+    if (vec_distance_xy(self + 0x10, &D_L02_001B01B0) > 18.0f) {
         return 0;
     }
     timer = *(short *)(state + 0x32E);
@@ -66,7 +68,7 @@ int func_L02_003D4D68(char *arg0) {
     if (timer < 0x385) {
         delta = 0x384 - *(short *)(state + 0x32A);
         if (delta > 0) {
-            if (func_002A77E0(delta) != 0) {
+            if (RandomIntBelow(delta) != 0) {
                 return 0;
             }
         }
@@ -94,11 +96,11 @@ void func_L02_003D5F50(char *self, int joint, int mirror) {
     float delta[4] __attribute__((aligned(16)));
     float strength;
     int i;
-    func_0029FCC0(self, joint, origin);
-    func_0029FC20(self, joint, matrix);
+    TransformMobyJointToWorld(self, joint, origin);
+    TransformMobyJointPoint(self, joint, matrix);
     qcopy(direction, matrix + 8);
-    strength = func_00282DF0(*(char **)(self + 0x68) + 0x1B0) * 3.333333f +
-               func_002A7878(0.0f, 0.1f);
+    strength = FastVecLength(*(char **)(self + 0x68) + 0x1B0) * 3.333333f +
+               RandomFloatRange(0.0f, 0.1f);
     if (strength > 1.0f) strength = 1.0f;
     else if (strength < 0.0f) strength = 0.0f;
     qcopy(offset_a, D_L02_001B02C0);
@@ -107,31 +109,31 @@ void func_L02_003D5F50(char *self, int joint, int mirror) {
         offset_a[1] = -offset_a[1];
         offset_b[1] = -offset_b[1];
     }
-    func_002830C0(position, offset_a, matrix);
-    func_00282CC0(position, position, origin);
-    func_00282CF0(delta, D_L02_001BA500, position);
+    transform_vector(position, offset_a, matrix);
+    FastVecAdd(position, position, origin);
+    FastVecSub(delta, gCameraPosition_L02, position);
     delta[2] = 0.0f;
-    func_00282F20(delta, delta, D_L02_001B02D0);
-    func_00282CC0(position, position, delta);
+    vec_scale_to_length(delta, delta, D_L02_001B02D0);
+    FastVecAdd(position, position, delta);
     for (i = 0; i < D_L02_001B02B0; i++) {
-        func_00282F20(velocity, direction,
-                      -((D_L02_001B02A8 + func_002A7878(0.0f, strength * D_L02_001B02AC)) *
+        vec_scale_to_length(velocity, direction,
+                      -((D_L02_001B02A8 + RandomFloatRange(0.0f, strength * D_L02_001B02AC)) *
                         0.016666668f));
-        func_002ACB48(position, D_L02_001B02D4);
-        func_L02_003449D8(position, velocity, D_L02_001B0290, func_002A77E0(2), 1);
+        AddRandomOffsetToVector(position, D_L02_001B02D4);
+        SpawnEnemyRecord(position, velocity, D_L02_001B0290, RandomIntBelow(2), 1);
     }
-    func_002830C0(position, offset_b, matrix);
-    func_00282CC0(position, position, origin);
+    transform_vector(position, offset_b, matrix);
+    FastVecAdd(position, position, origin);
     for (i = 0; (float)i < strength * (float)D_L02_001B01F4 + 2.0f; i++) {
-        func_00282F20(velocity, direction,
-                      -((D_L02_001B01EC + func_002A7878(0.0f, strength * D_L02_001B01F0)) *
+        vec_scale_to_length(velocity, direction,
+                      -((D_L02_001B01EC + RandomFloatRange(0.0f, strength * D_L02_001B01F0)) *
                         0.016666668f));
-        func_002ACB48(position, D_L02_001B0214);
-        func_L02_003449D8(position, velocity, D_L02_001B0230, func_002A77E0(2), 1);
-        func_00282F20(velocity, direction,
-                      -((D_L02_001B01EC + func_002A7878(0.0f, strength * D_L02_001B01F0)) *
+        AddRandomOffsetToVector(position, D_L02_001B0214);
+        SpawnEnemyRecord(position, velocity, D_L02_001B0230, RandomIntBelow(2), 1);
+        vec_scale_to_length(velocity, direction,
+                      -((D_L02_001B01EC + RandomFloatRange(0.0f, strength * D_L02_001B01F0)) *
                         0.016666668f));
-        func_002ACB48(position, D_L02_001B0214);
-        func_L02_003449D8(position, velocity, D_L02_001B0260, func_002A77E0(2), 1);
+        AddRandomOffsetToVector(position, D_L02_001B0214);
+        SpawnEnemyRecord(position, velocity, D_L02_001B0260, RandomIntBelow(2), 1);
     }
 }

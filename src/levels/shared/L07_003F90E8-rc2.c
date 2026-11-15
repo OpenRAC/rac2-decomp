@@ -27,25 +27,26 @@
 extern s32 ref_L07_003F90E8_00 __attribute__((sda));
 extern f32 ref_L07_003F90E8_01(s32);
 
-f32 func_L07_003F90E8(s32 arg0, s32 arg1, f32 fparg0, f32 fparg1) {
-    f32 temp_f20;
-    f32 temp_f21;
-    f32 temp_f22;
+/* Blends smoothly between two values depending on where a global value sits between two limits. */
+f32 func_L07_003F90E8(s32 lowLimit, s32 highLimit, f32 lowValue, f32 highValue) {
+    f32 highTerm;
+    f32 currentTerm;
+    f32 lowTerm;
 
-    if (arg0 >= ref_L07_003F90E8_00) {
-        return fparg0;
+    if (lowLimit >= ref_L07_003F90E8_00) {
+        return lowValue;
     }
-    if (ref_L07_003F90E8_00 >= arg1) {
-        return fparg1;
+    if (ref_L07_003F90E8_00 >= highLimit) {
+        return highValue;
     }
-    temp_f21 = ref_L07_003F90E8_01(ref_L07_003F90E8_00);
-    temp_f22 = ref_L07_003F90E8_01(arg0);
-    temp_f20 = ref_L07_003F90E8_01(arg1);
+    currentTerm = ref_L07_003F90E8_01(ref_L07_003F90E8_00);
+    lowTerm = ref_L07_003F90E8_01(lowLimit);
+    highTerm = ref_L07_003F90E8_01(highLimit);
     {
-        f32 den = temp_f20 - ref_L07_003F90E8_01(arg0);
-        f32 num = temp_f21 - temp_f22;
-        f32 dif = fparg1 - fparg0;
+        f32 den = highTerm - ref_L07_003F90E8_01(lowLimit);
+        f32 num = currentTerm - lowTerm;
+        f32 dif = highValue - lowValue;
         num = num / den;
-        return fparg0 + (dif * num);
+        return lowValue + (dif * num);
     }
 }

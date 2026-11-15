@@ -35,19 +35,20 @@ typedef struct {
    body ignores it; callers pass zero. Independent interface witness:
    https://github.com/open-goal/jak-project/blob/master/game/graphics/sceGraphicsInterface.h
    (sceGsSyncV(u32 mode)). Only the signature is used, with no HLE code copied. */
-int func_001261F0(int unused_mode) {
-    GsGParam *gp = r1_func_00121D08();
+/* Returns which screen field is being drawn when the picture is interlaced, otherwise 1. */
+int func_001261F0(int unusedMode) {
+    GsGParam *gParam = r1_func_00121D08();
     long csr;
 
-    if (gp->unk_08 == 0) {
+    if (gParam->unk_08 == 0) {
         r1_func_00118ED0();
-        if (gp->interlace != 1) {
+        if (gParam->interlace != 1) {
             return 1;
         }
         return (GS_CSR >> 13) & 1;
     }
     csr = (r1_func_00118F60() >> 13) & 1;
-    if (gp->interlace != 1) {
+    if (gParam->interlace != 1) {
         return 1;
     }
     return csr;
@@ -65,11 +66,12 @@ ASM_FUNC("asm/core", func_00126284);
  * Returns -1 after 0x1000000 polls in total. The abort is written out in
  * each loop, not shared through a goto: the compiler merges the two copies
  * into retail's single call, where a shared label needs an extra branch. */
+/* Copies an image into the graphics chip with two transfers and waits for the channel each time. */
 int func_001265B0(GsLoadImage *src, void *dst) {
-    unsigned int count = 0;
+    unsigned int pollCount = 0;
 
     while (D2_CHCR & 0x100) {
-        if (count++ > 0x1000000) {
+        if (pollCount++ > 0x1000000) {
             r1_func_0011A6C8(r1_D_001532D0);
             return -1;
         }
@@ -84,7 +86,7 @@ int func_001265B0(GsLoadImage *src, void *dst) {
     D2_CHCR = 0x101;
 
     while (D2_CHCR & 0x100) {
-        if (count++ > 0x1000000) {
+        if (pollCount++ > 0x1000000) {
             r1_func_0011A6C8(r1_D_001532D0);
             return -1;
         }
@@ -112,24 +114,25 @@ extern void r1_func_00119390(int);
    DisableIntc/EnableIntc of INTC 2 (VBLANK start) around the
    AddIntcHandler/RemoveIntcHandler syscalls. Returns the previous
    handler. */
-int func_00126DBC(void *arg0) {
-    char *g = (char *)r1_func_00121D08();
-    int lvl = 2;
-    int prev = *(int *)(g + 8);
+/* Sets or removes the handler that runs on each screen refresh and returns the old one. */
+int func_00126DBC(void *handler) {
+    char *gParam = (char *)r1_func_00121D08();
+    int intcLine = 2;
+    int prevHandler = *(int *)(gParam + 8);
 
-    if (arg0 == 0) {
-        r1_func_00119328(lvl);
-        r1_func_00118AA0(lvl, *(int *)(g + 0xC));
-        *(int *)(g + 0xC) = 0;
-        *(int *)(g + 8) = 0;
+    if (handler == 0) {
+        r1_func_00119328(intcLine);
+        r1_func_00118AA0(intcLine, *(int *)(gParam + 0xC));
+        *(int *)(gParam + 0xC) = 0;
+        *(int *)(gParam + 8) = 0;
     } else {
-        if (prev != 0) {
-            r1_func_00119328(lvl);
-            r1_func_00118AA0(lvl, *(int *)(g + 0xC));
+        if (prevHandler != 0) {
+            r1_func_00119328(intcLine);
+            r1_func_00118AA0(intcLine, *(int *)(gParam + 0xC));
         }
-        *(int *)(g + 8) = (int)arg0;
-        *(int *)(g + 0xC) = r1_func_00118A90(lvl, arg0, -1);
-        r1_func_00119390(lvl);
+        *(int *)(gParam + 8) = (int)handler;
+        *(int *)(gParam + 0xC) = r1_func_00118A90(intcLine, handler, -1);
+        r1_func_00119390(intcLine);
     }
-    return prev;
+    return prevHandler;
 }

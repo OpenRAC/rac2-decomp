@@ -1,3 +1,4 @@
+#include "names.h"
 /* The -G8 sibling of L04_002CC748.c: this body reads the level's small-data angle
    D_L04_001AD840 through $gp, which needs -G8. */
 
@@ -26,49 +27,49 @@ extern void func_3074C8(u8 *a0, u32 a1);
 extern void func_L04_003A0008(u8 *a0, u32 a1);
 
 /* advances every ripple patch of the record the object at +0x28 points to */
-void func_L04_003A1FE0(u8 *p) {
-    u8 *s4 = *(u8 **)(*(u32 *)(p + 0x28) + 0x68);
-    u8 *tab;
-    f32 v[4];
+void func_L04_003A1FE0(u8 *moby) {
+    u8 *vars = *(u8 **)(*(u32 *)(moby + 0x28) + 0x68);
+    u8 *table;
+    f32 pos[4];
     s32 i;
-    s32 off;
-    s32 ok;
+    s32 offset;
+    s32 nearby;
 
-    if (*(s32 *)(s4 + 0x10) < 0)
+    if (*(s32 *)(vars + 0x10) < 0)
         return;
-    if (*(s32 *)(s4 + 0x18) == -1)
+    if (*(s32 *)(vars + 0x18) == -1)
         return;
 
-    i = *(s32 *)(s4 + 0x10);
-    if (i >= *(s32 *)(p + 0x4))
+    i = *(s32 *)(vars + 0x10);
+    if (i >= *(s32 *)(moby + 0x4))
         return;
-    off = i * 0x1190;
-    for (; i < *(s32 *)(p + 0x4); i++, off += 0x1190) {
-        tab = D_L04_001B9540;
-        ok = 1;
-        *(f32 *)((u8 *)(off + *(s32 *)(p + 0x8)) + 0x8) =
-            *(f32 *)(*(u32 *)(p + 0x28) + 0x18);
-        v[0] = *(f32 *)((u8 *)(off + *(s32 *)(p + 0x8)) + 0x0) + D_L04_001AD840 * 0.5f;
-        v[1] = *(f32 *)((u8 *)(off + *(s32 *)(p + 0x8)) + 0x4) + D_L04_001AD844 * 0.5f;
-        v[2] = *(f32 *)((u8 *)(off + *(s32 *)(p + 0x8)) + 0x8);
-        v[3] = 22.6f;
-        if (func_310060(v, 71.5f) == -1 ||
-            func_30EF70(v, D_L04_001B9680) > 71.5f)
-            ok = 0;
-        *(f32 *)((u8 *)(off + *(s32 *)(p + 0x8)) + 0x4C) =
-            1.0f - func_30FF88(*(s16 *)(s4 + 0x16)) / func_30FF88(60);
-        if (ok)
-            *(u16 *)((u8 *)(off + *(s32 *)(p + 0x8)) + 0x1E) =
-                *(u16 *)(*(u8 **)(p + 0x10) + i * 2);
+    offset = i * 0x1190;
+    for (; i < *(s32 *)(moby + 0x4); i++, offset += 0x1190) {
+        table = D_L04_001B9540;
+        nearby = 1;
+        *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x8) =
+            *(f32 *)(*(u32 *)(moby + 0x28) + 0x18);
+        pos[0] = *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x0) + D_L04_001AD840 * 0.5f;
+        pos[1] = *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x4) + D_L04_001AD844 * 0.5f;
+        pos[2] = *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x8);
+        pos[3] = 22.6f;
+        if (func_310060(pos, 71.5f) == -1 ||
+            func_30EF70(pos, D_L04_001B9680) > 71.5f)
+            nearby = 0;
+        *(f32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x4C) =
+            1.0f - func_30FF88(*(s16 *)(vars + 0x16)) / func_30FF88(60);
+        if (nearby)
+            *(u16 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x1E) =
+                *(u16 *)(*(u8 **)(moby + 0x10) + i * 2);
         else
-            *(u16 *)((u8 *)(off + *(s32 *)(p + 0x8)) + 0x1E) = 0;
-        *(u32 *)((u8 *)(off + *(s32 *)(p + 0x8)) + 0x48) = *(u8 *)(s4 + 0x14);
+            *(u16 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x1E) = 0;
+        *(u32 *)((u8 *)(offset + *(s32 *)(moby + 0x8)) + 0x48) = *(u8 *)(vars + 0x14);
         if (i == 0) {
-            func_L04_003A0008(*(u8 **)(p + 0x8), *(u32 *)(p + 0x0));
-            if (*(u32 *)(tab + 0x400) != 0)
-                func_3076D0(*(u32 *)(p + 0x2C), *(u32 *)(p + 0x28));
+            AdvanceWaterRippleStep(*(u8 **)(moby + 0x8), *(u32 *)(moby + 0x0));
+            if (*(u32 *)(table + 0x400) != 0)
+                func_3076D0(*(u32 *)(moby + 0x2C), *(u32 *)(moby + 0x28));
             else
-                func_3074C8(*(u32 *)(p + 0x2C), *(u32 *)(p + 0x28));
+                func_3074C8(*(u32 *)(moby + 0x2C), *(u32 *)(moby + 0x28));
         }
     }
 }

@@ -20,12 +20,14 @@ extern StateTransitionView D_L00_001BEF00;
 extern unsigned int D_001BACC0;
 
 /* Change resident state word from1 to2 only when the mode word equals7 */
+/* Moves the menu state from 1 to 2, but only while the menu mode is 7. */
 void func_00287E18(void) {
     if (D_L00_001BEF00.mode == 7 && D_L00_001BEF00.state == 1) {
         D_L00_001BEF00.state = 2;
     }
 }
 
+/* Returns true while the saved menu state is 7. */
 int func_00287E48(void)
 {
     return D_001BACC0 == 7;

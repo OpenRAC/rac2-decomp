@@ -17,44 +17,45 @@ extern int func_00282978(void *);
 extern float func_00283CE0(int);
 extern void func_L02_003D7900(char *);
 
-void func_L02_003D7330(char *self) {
-    float offset[4] __attribute__((aligned(16)));
+/* Per-frame update for moby class 2581. Updates a lift-like moby that slides along its direction while its animation plays, and keeps a child moby stuck to its joint. */
+void func_L02_003D7330(char *moby) {
+    float startPos[4] __attribute__((aligned(16)));
     /* Separate initial and final query events use four measured local vectors. */
-    float updated[4] __attribute__((aligned(16)));
-    float position[4] __attribute__((aligned(16)));
-    float transformed[4] __attribute__((aligned(16)));
-    char *state = *(char **)(self + 0x68);
-    Vector *source;
-    Vector *destination;
+    float moveDelta[4] __attribute__((aligned(16)));
+    float jointPos[4] __attribute__((aligned(16)));
+    float rotatedOffset[4] __attribute__((aligned(16)));
+    char *vars = *(char **)(moby + 0x68);
+    Vector *sourceRow;
+    Vector *destRow;
     int i;
-    qcopy(offset, self + 0x10);
-    switch (*(unsigned char *)(self + 0x20)) {
+    qcopy(startPos, moby + 0x10);
+    switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
-        *(int *)(state + 0x10) = 0;
-        *(int *)(state + 0x14) = 0;
-        *(int *)(state + 0x18) = 0;
-        func_002A7750(self, 2, -1);
-        if (*(unsigned char *)(self + 0x43) != 0) func_002A7470(self, 0, 0, 0);
-        *(float *)(self + 0x48) = 0.0f;
-        func_00282F20(updated, self + 0xD0, 2.0f);
-        func_00282CC0(self + 0x10, self + 0x10, updated);
-        qcopy(state, self + 0x10);
-        *(char **)(state + 0x1C) = func_0029EFD0(0x1172);
-        if (*(char **)(state + 0x1C) == 0) return;
-        *(unsigned short *)(*(char **)(state + 0x1C) + 0x34) |= 0x41;
-        *(unsigned char *)(*(char **)(state + 0x1C) + 0x30) = *(unsigned char *)(self + 0x30);
-        *(short *)(*(char **)(state + 0x1C) + 0x32) = 0;
-        func_0029FCC0(self, 0, (char *)position);
-        func_00283098(transformed, D_L02_001B03E0, self + 0xC0);
-        func_00282CC0(position, transformed, position);
+        *(int *)(vars + 0x10) = 0;
+        *(int *)(vars + 0x14) = 0;
+        *(int *)(vars + 0x18) = 0;
+        SetMobyState(moby, 2, -1);
+        if (*(unsigned char *)(moby + 0x43) != 0) StartAnimationBlended(moby, 0, 0, 0);
+        *(float *)(moby + 0x48) = 0.0f;
+        vec_scale_to_length(moveDelta, moby + 0xD0, 2.0f);
+        FastVecAdd(moby + 0x10, moby + 0x10, moveDelta);
+        qcopy(vars, moby + 0x10);
+        *(char **)(vars + 0x1C) = CreateMoby(0x1172 /* moby class 4466 */);
+        if (*(char **)(vars + 0x1C) == 0) return;
+        *(unsigned short *)(*(char **)(vars + 0x1C) + 0x34) |= 0x41;
+        *(unsigned char *)(*(char **)(vars + 0x1C) + 0x30) = *(unsigned char *)(moby + 0x30);
+        *(short *)(*(char **)(vars + 0x1C) + 0x32) = 0;
+        TransformMobyJointToWorld(moby, 0, (char *)jointPos);
+        matrix_mul_vec3(rotatedOffset, D_L02_001B03E0, moby + 0xC0);
+        FastVecAdd(jointPos, rotatedOffset, jointPos);
         {
-            char *child = *(char **)(state + 0x1C);
-            qcopy(child + 0x10, position);
+            char *child = *(char **)(vars + 0x1C);
+            qcopy(child + 0x10, jointPos);
             func_002A0F48(child);
         }
         {
-            Vector *row = (Vector *)(self + 0xC0);
-            Vector *out = (Vector *)(*(char **)(state + 0x1C) + 0xC0);
+            Vector *row = (Vector *)(moby + 0xC0);
+            Vector *out = (Vector *)(*(char **)(vars + 0x1C) + 0xC0);
             int count = 0;
             do {
                 qcopy(out, row);
@@ -63,83 +64,83 @@ void func_L02_003D7330(char *self) {
                 out++;
             } while (count < 3);
         }
-        func_002AB028(*(char **)(state + 0x1C) + 0xC0);
-        func_002A10E8(*(char **)(state + 0x1C));
-        *(unsigned short *)(*(char **)(state + 0x1C) + 0x34) |= 6;
+        NormalizeMatrixColumns(*(char **)(vars + 0x1C) + 0xC0);
+        func_002A10E8(*(char **)(vars + 0x1C));
+        *(unsigned short *)(*(char **)(vars + 0x1C) + 0x34) |= 6;
         break;
     case 1:
-        if (func_002B3868(self)) *(short *)(state + 0x22) = 19;
-        if (!func_00282978(state + 0x22)) {
-            func_00282F20(updated, self + 0xD0, 2.0f / func_00283CE0(19));
-            func_00282CC0(self + 0x10, self + 0x10, updated);
+        if (SetFirstPendingFlag(moby)) *(short *)(vars + 0x22) = 19;
+        if (!FastDecTimer(vars + 0x22)) {
+            vec_scale_to_length(moveDelta, moby + 0xD0, 2.0f / IntToFloat(19));
+            FastVecAdd(moby + 0x10, moby + 0x10, moveDelta);
         }
-        if (*(unsigned char *)(self + 0x60) & 2) {
-            qcopy(self + 0x10, state);
-            *(float *)(self + 0x48) = 0.0f;
-            func_002A7750(self, 2, -1);
+        if (*(unsigned char *)(moby + 0x60) & 2) {
+            qcopy(moby + 0x10, vars);
+            *(float *)(moby + 0x48) = 0.0f;
+            SetMobyState(moby, 2, -1);
         }
         break;
     case 3:
-        if (func_002B3868(self)) *(short *)(state + 0x22) = 19;
-        if (!func_00282978(state + 0x22)) {
-            func_00282F20(updated, self + 0xD0, -2.0f / func_00283CE0(19));
-            func_00282CC0(self + 0x10, self + 0x10, updated);
+        if (SetFirstPendingFlag(moby)) *(short *)(vars + 0x22) = 19;
+        if (!FastDecTimer(vars + 0x22)) {
+            vec_scale_to_length(moveDelta, moby + 0xD0, -2.0f / IntToFloat(19));
+            FastVecAdd(moby + 0x10, moby + 0x10, moveDelta);
         }
-        if (*(unsigned char *)(self + 0x60) & 2) {
-            *(float *)(self + 0x48) = 0.0f;
-            func_002A7750(self, 4, -1);
+        if (*(unsigned char *)(moby + 0x60) & 2) {
+            *(float *)(moby + 0x48) = 0.0f;
+            SetMobyState(moby, 4, -1);
         }
         break;
     case 4:
-        func_002A7750(self, 5, -1);
-        *(float *)(self + 0x48) = 1.0f;
-        if (*(unsigned char *)(self + 0x43) != 1) func_002A7470(self, 1, 0, 0);
-        func_L02_003D7900(self);
+        SetMobyState(moby, 5, -1);
+        *(float *)(moby + 0x48) = 1.0f;
+        if (*(unsigned char *)(moby + 0x43) != 1) StartAnimationBlended(moby, 1, 0, 0);
+        ReleaseHeldActors(moby);
         break;
     case 5:
-        if (*(unsigned char *)(self + 0x60) & 2) {
-            *(short *)(state + 0x20) = 90;
-            *(float *)(self + 0x48) = 0.0f;
-            func_002A7750(self, 6, -1);
+        if (*(unsigned char *)(moby + 0x60) & 2) {
+            *(short *)(vars + 0x20) = 90;
+            *(float *)(moby + 0x48) = 0.0f;
+            SetMobyState(moby, 6, -1);
         }
         break;
     case 6:
-        if (!*(short *)(state + 0x20)) {
-        *(float *)(self + 0x48) = 1.0f;
-        if (*(unsigned char *)(self + 0x43) != 2) func_002A7470(self, 2, 0, 0);
-        func_002A7750(self, 7, -1);
+        if (!*(short *)(vars + 0x20)) {
+        *(float *)(moby + 0x48) = 1.0f;
+        if (*(unsigned char *)(moby + 0x43) != 2) StartAnimationBlended(moby, 2, 0, 0);
+        SetMobyState(moby, 7, -1);
         } else {
-            func_00282978(state + 0x20);
+            FastDecTimer(vars + 0x20);
         }
         break;
     case 7:
-        if (*(unsigned char *)(self + 0x60) & 2) {
-            if (*(unsigned char *)(self + 0x43) != 3) func_002A7470(self, 3, 0, 0);
-            func_002A7750(self, 1, -1);
+        if (*(unsigned char *)(moby + 0x60) & 2) {
+            if (*(unsigned char *)(moby + 0x43) != 3) StartAnimationBlended(moby, 3, 0, 0);
+            SetMobyState(moby, 1, -1);
         }
         break;
     }
-    if (*(char **)(state + 0x1C) && *(float *)(self + 0x48) != 0.0f) {
-        func_0029FCC0(self, 0, (char *)updated);
-        func_00283098(position, D_L02_001B03E0, self + 0xC0);
-        func_00282CC0(updated, position, updated);
+    if (*(char **)(vars + 0x1C) && *(float *)(moby + 0x48) != 0.0f) {
+        TransformMobyJointToWorld(moby, 0, (char *)moveDelta);
+        matrix_mul_vec3(jointPos, D_L02_001B03E0, moby + 0xC0);
+        FastVecAdd(moveDelta, jointPos, moveDelta);
         {
-            char *child = *(char **)(state + 0x1C);
-            qcopy(child + 0x10, updated);
+            char *child = *(char **)(vars + 0x1C);
+            qcopy(child + 0x10, moveDelta);
             func_002A0F48(child);
         }
         {
-        char *childMatrix = *(char **)(state + 0x1C);
-        source = (Vector *)(self + 0xC0);
-        destination = (Vector *)(childMatrix + 0xC0);
+        char *childMatrix = *(char **)(vars + 0x1C);
+        sourceRow = (Vector *)(moby + 0xC0);
+        destRow = (Vector *)(childMatrix + 0xC0);
         for (i = 0; i < 3; i++) {
-            *destination = *source;
-            source++;
-            destination++;
+            *destRow = *sourceRow;
+            sourceRow++;
+            destRow++;
         }
-        func_002AB028(childMatrix + 0xC0);
+        NormalizeMatrixColumns(childMatrix + 0xC0);
         }
-        func_002A10E8(*(char **)(state + 0x1C));
-        *(unsigned short *)(*(char **)(state + 0x1C) + 0x34) |= 6;
+        func_002A10E8(*(char **)(vars + 0x1C));
+        *(unsigned short *)(*(char **)(vars + 0x1C) + 0x34) |= 6;
     }
 }

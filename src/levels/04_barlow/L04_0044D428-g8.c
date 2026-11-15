@@ -33,40 +33,41 @@ typedef struct {
     u8 pad96[0xf0-0x96]; union { TI128 q; f32 f[4]; } rotation;
 } D428Object;
 
+/* Turns the enemy toward its target while it walks and keeps it on the ground each frame, riding moving ground if there is any. */
 void func_L04_0044D428(D428Object *object) {
     union { TI128 q; f32 f[4]; } angles;
     TI128 rotation;
     D428Data *data = object->data;
     f32 heading, floor;
     if (object->state == 4) {
-        heading = func_00283248(data->target[0] - object->position[0],
+        heading = FastMatrixHelperA(data->target[0] - object->position[0],
                                data->target[1] - object->position[1]);
-        heading = func_00283B98(heading, data->heading);
-        func_002A7CA0(object, &data->turn, heading, 0.05f, 0.3f, 0.10471977293491364f);
-        data->steps = func_00283CF0(D_L04_001B1870 * 1024.0f);
+        heading = FastAddRotations(heading, data->heading);
+        MobySpringTurn(object, &data->turn, heading, 0.05f, 0.3f, 0.10471977293491364f);
+        data->steps = FloatToInt(D_L04_001B1870 * 1024.0f);
         data->time = D_L04_001B1870;
-        func_L04_0033D0C0(object, &data->steps);
+        ProbeAheadOfObject(object, &data->steps);
         if (data->channel != -1)
-            func_002C9218(data->channel, object->position, object->position, D_L04_001B1870);
+            PushPointAwayFromPath(data->channel, object->position, object->position, D_L04_001B1870);
     } else if (object->state == 5) {
-        heading = func_00283248(data->target[0] - object->position[0],
+        heading = FastMatrixHelperA(data->target[0] - object->position[0],
                                data->target[1] - object->position[1]);
-        heading = func_00283B98(heading, data->heading);
-        func_002A7CA0(object, &data->turn, heading, 0.05f, 0.3f, 0.10471977293491364f);
+        heading = FastAddRotations(heading, data->heading);
+        MobySpringTurn(object, &data->turn, heading, 0.05f, 0.3f, 0.10471977293491364f);
     }
     if (data->ground) {
         angles.q = 0;
-        func_002AD0E0(object, data->ground, object->position, &object->rotation, object->position, &angles);
+        TransformPointAndRotationByParent(object, data->ground, object->position, &object->rotation, object->position, &angles);
         object->rotation.f[2] = angles.f[2];
     }
     if (object->animation != 3) {
         data->velocity += 0.0027222223579883575f;
         object->position[2] -= data->velocity - 2.0f;
-        floor = func_002A89A8(object->position, 0, 0.5f);
+        floor = ProbeGroundHeightBelow(object->position, 0, 0.5f);
         object->position[2] -= 2.0f;
         if (object->position[2] < floor) {
             u8 *controller = D_L04_001BFAC0;
-            if (*(void **)(controller + 0x18) && func_002AD0B0(*(void **)(controller + 0x18))) {
+            if (*(void **)(controller + 0x18) && GetMobyPrivateValue2(*(void **)(controller + 0x18))) {
                 data->ground = *(void **)(controller + 0x18);
             } else if (data->ground) {
                 data->ground = 0;
@@ -76,7 +77,7 @@ void func_L04_0044D428(D428Object *object) {
             if (data->ground) {
                 rotation = object->rotation.q;
                 angles.q = D_L04_001BFB00;
-                func_L04_00344568(&angles, &rotation, object->rotation.f[2]);
+                BuildAxisAngleRotation(&angles, &rotation, object->rotation.f[2]);
             }
         }
     }

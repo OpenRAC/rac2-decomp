@@ -35,46 +35,47 @@ extern void func_L00_003F8280(void *, int, int, float, float, float, float, floa
  * tests fold before gcse, which then hoists the vertex addresses into spill
  * slots. t is one local on purpose: its use in the inner loop, where $f12 is
  * already loaded for the next call, keeps it out of $f12 at the blend calls. */
-void func_L04_0040D148(unsigned char *m, int alpha)
+/* Draws a pulsing glowing sphere around the racer, then adds the light flares on top of it. */
+void func_L04_0040D148(unsigned char *moby, int alpha)
 {
     B1202Packet packet;
     float matrix[4][4] __attribute__((aligned(16)));
-    unsigned char *p = *(unsigned char **)(m + 0x68);
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
     float t, offset, lat0, lat1, lon0, lon1, u0, v0, v1, cos0, cos1;
     unsigned int color, a, c;
     int i, j;
     int rows = 10, cols = 10;
 
-    t = func_00283198(func_00283D00(func_00283CE0(D_L04_001B2008[0]), 180.0f) * 0.0055555557f * 6.283186f);
+    t = FastSinOrCosB(fast_fmod(IntToFloat(D_L04_001B2008[0]), 180.0f) * 0.0055555557f * 6.283186f);
     t = (t + 1.0f) * 0.5f;
     if (alpha == -1) {
-        color = func_00283D38(0x1fb43264, 0x1f502800, t);
+        color = FastTweenColor(0x1fb43264, 0x1f502800, t);
     } else {
         if (alpha < 0) {
             alpha = 0;
         }
-        color = func_00283D38(0x1fb43264, ((unsigned int)alpha << 24) | 0x502800, t);
+        color = FastTweenColor(0x1fb43264, ((unsigned int)alpha << 24) | 0x502800, t);
     }
-    offset = func_00283D00(func_00283CE0(D_L04_001B2008[0]), 30.0f) * 0.033333335f;
-    func_00283410(matrix, m + 0xf0);
-    *(B1202Quad *)(matrix[3]) = *(B1202Quad *)(m + 0x10);
-    func_00282F20(matrix[0], matrix[0], 0.4f);
-    func_00282F20(matrix[1], matrix[1], 0.35f);
-    func_00282F20(matrix[2], matrix[2], 0.35f);
-    packet.texture = func_0027C878(21);
+    offset = fast_fmod(IntToFloat(D_L04_001B2008[0]), 30.0f) * 0.033333335f;
+    euler_to_matrix(matrix, moby + 0xf0);
+    *(B1202Quad *)(matrix[3]) = *(B1202Quad *)(moby + 0x10);
+    vec_scale_to_length(matrix[0], matrix[0], 0.4f);
+    vec_scale_to_length(matrix[1], matrix[1], 0.35f);
+    vec_scale_to_length(matrix[2], matrix[2], 0.35f);
+    packet.texture = GetEffectTextureDescriptor(21);
     packet.mode = 0xff9000000260ULL;
     packet.flags = 0x8000000048ULL;
     packet.primitive = 0;
     for (i = 0; i < rows; i++) {
-        lat0 = func_00283CE0(i) * 3.141593f / func_00283CE0(rows) - 1.5707965f;
-        lat1 = func_00283CE0(i + 1) * 3.141593f / func_00283CE0(rows) - 1.5707965f;
-        v0 = (func_00283198(lat0) + 1.0f) * 0.5f;
-        v1 = (func_00283198(lat1) + 1.0f) * 0.5f;
+        lat0 = IntToFloat(i) * 3.141593f / IntToFloat(rows) - 1.5707965f;
+        lat1 = IntToFloat(i + 1) * 3.141593f / IntToFloat(rows) - 1.5707965f;
+        v0 = (FastSinOrCosB(lat0) + 1.0f) * 0.5f;
+        v1 = (FastSinOrCosB(lat1) + 1.0f) * 0.5f;
         for (j = 0; j < cols; j++) {
-            lon0 = func_00283C28(func_00283CE0(j) * 6.283186f / func_00283CE0(cols));
-            lon1 = func_00283C28(func_00283CE0(j + 1) * 6.283186f / func_00283CE0(cols));
-            cos0 = func_00283180(lon0);
-            cos1 = func_00283180(lon1);
+            lon0 = FastFloatHelperG(IntToFloat(j) * 6.283186f / IntToFloat(cols));
+            lon1 = FastFloatHelperG(IntToFloat(j + 1) * 6.283186f / IntToFloat(cols));
+            cos0 = FastSinOrCosA(lon0);
+            cos1 = FastSinOrCosA(lon1);
             u0 = offset + (cos0 + 1.0f) * 0.5f;
             t = offset + (cos1 + 1.0f) * 0.5f;
             packet.uv[1][1] = v0;
@@ -89,34 +90,34 @@ void func_L04_0040D148(unsigned char *m, int alpha)
             packet.uv[1][0] = t;
             packet.uv[2][0] = u0;
             packet.uv[3][0] = t;
-            func_002AF000(packet.vertex[0].f, 1.0f, lon0, lat0);
-            func_002AF000(packet.vertex[1].f, 1.0f, lon1, lat0);
-            func_002AF000(packet.vertex[2].f, 1.0f, lon0, lat1);
-            func_002AF000(packet.vertex[3].f, 1.0f, lon1, lat1);
+            BuildSphericalOffset(packet.vertex[0].f, 1.0f, lon0, lat0);
+            BuildSphericalOffset(packet.vertex[1].f, 1.0f, lon1, lat0);
+            BuildSphericalOffset(packet.vertex[2].f, 1.0f, lon0, lat1);
+            BuildSphericalOffset(packet.vertex[3].f, 1.0f, lon1, lat1);
             packet.vertex[0].f[3] = 1.0f;
             packet.vertex[1].f[3] = 1.0f;
             packet.vertex[2].f[3] = 1.0f;
             packet.vertex[3].f[3] = 1.0f;
-            func_00280B90(&packet, matrix, 0);
+            draw_world_quad(&packet, matrix, 0);
         }
     }
-    *(float *)(p + 0x4b4) = func_00283B98(*(float *)(p + 0x4b4), 0.01f);
-    *(float *)(p + 0x4b8) = func_00283B98(*(float *)(p + 0x4b8), -0.007f);
-    *(float *)(p + 0x4bc) = func_00283B98(*(float *)(p + 0x4bc), 0.007f);
-    *(float *)(p + 0x4c0) = func_00283B98(*(float *)(p + 0x4c0), *(float *)(p + 0x30c) * 0.1f);
+    *(float *)(vars + 0x4b4) = FastAddRotations(*(float *)(vars + 0x4b4), 0.01f);
+    *(float *)(vars + 0x4b8) = FastAddRotations(*(float *)(vars + 0x4b8), -0.007f);
+    *(float *)(vars + 0x4bc) = FastAddRotations(*(float *)(vars + 0x4bc), 0.007f);
+    *(float *)(vars + 0x4c0) = FastAddRotations(*(float *)(vars + 0x4c0), *(float *)(vars + 0x30c) * 0.1f);
     if (alpha == -1) {
-        func_L04_0040DCA8(m + 0x10, *(int *)(p + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(p + 0x4b4), *(float *)(m + 0xf4));
-        func_L04_0040DCA8(m + 0x10, *(int *)(p + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(p + 0x4b8), *(float *)(m + 0xf4));
-        func_L04_0040DCA8(m + 0x10, 54, 0x28969600, 1, 0.385f, 0.35f, *(float *)(p + 0x4bc), *(float *)(m + 0xf4));
+        DrawBillboardSprite_L04(moby + 0x10, *(int *)(vars + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(vars + 0x4b4), *(float *)(moby + 0xf4));
+        DrawBillboardSprite_L04(moby + 0x10, *(int *)(vars + 0x648), 0x0fc8c8c8, 1, 0.495f, 0.35f, *(float *)(vars + 0x4b8), *(float *)(moby + 0xf4));
+        DrawBillboardSprite_L04(moby + 0x10, 54, 0x28969600, 1, 0.385f, 0.35f, *(float *)(vars + 0x4bc), *(float *)(moby + 0xf4));
     } else {
         if (alpha < 0) {
             alpha = 0;
         }
         a = (unsigned int)alpha << 24;
         c = a | 0xc8c8c8;
-        func_L04_0040DCA8(m + 0x10, *(int *)(p + 0x648), c, 1, 0.495f, 0.35f, *(float *)(p + 0x4b4), *(float *)(m + 0xf4));
-        func_L04_0040DCA8(m + 0x10, *(int *)(p + 0x648), c, 1, 0.495f, 0.35f, *(float *)(p + 0x4b8), *(float *)(m + 0xf4));
-        func_L04_0040DCA8(m + 0x10, 54, a | 0x969600, 1, 0.385f, 0.35f, *(float *)(p + 0x4bc), *(float *)(m + 0xf4));
+        DrawBillboardSprite_L04(moby + 0x10, *(int *)(vars + 0x648), c, 1, 0.495f, 0.35f, *(float *)(vars + 0x4b4), *(float *)(moby + 0xf4));
+        DrawBillboardSprite_L04(moby + 0x10, *(int *)(vars + 0x648), c, 1, 0.495f, 0.35f, *(float *)(vars + 0x4b8), *(float *)(moby + 0xf4));
+        DrawBillboardSprite_L04(moby + 0x10, 54, a | 0x969600, 1, 0.385f, 0.35f, *(float *)(vars + 0x4bc), *(float *)(moby + 0xf4));
     }
-    func_L00_003F8280(m + 0x10, *(int *)(p + 0x644), 0, 0.32f, 0.5f, *(float *)(p + 0x4c0), 0.0f, 0.0f);
+    DrawFlashQuad(moby + 0x10, *(int *)(vars + 0x644), 0, 0.32f, 0.5f, *(float *)(vars + 0x4c0), 0.0f, 0.0f);
 }

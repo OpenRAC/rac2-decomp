@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 
@@ -22,46 +23,49 @@ extern void F8b17817c_FUN_003366D0(char *block);
 extern void Ffb202470_FUN_0033AB50(char *p);
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_0033AE20(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x294) = a1; }
+/* Turns the extra labels of the button prompt bar on or off. */
+void func_0033AE20(u8 *bar, s32 enabled) { *(s32 *)(bar + 0x294) = enabled; }
 
 extern void func_00335E38(void *, float, float, float, float);
 extern void func_003363C0(void *, float);
 
+/* Moves the icons and text of the button prompt bar to the bar position each frame. */
 void func_0033AE28(char *object) {
-    char *r = object + 12;
-    char *q = object + 0x188;
+    char *slotRecord = object + 12;
+    char *slotFlag = object + 0x188;
     int i;
     for (i = 4; i >= 0; i--) {
-        if (*(short *)q != 0) {
+        if (*(short *)slotFlag != 0) {
             float *position = *(float **)object;
-            func_00335E38(r, position[0], position[1], 0.0f, 0.0f);
-            func_003363C0(r, *(float *)(object + 0x274));
+            SetFirstFloat4(slotRecord, position[0], position[1], 0.0f, 0.0f);
+            SetFloatAt38(slotRecord, *(float *)(object + 0x274));
         }
-        r += 76;
-        q += 2;
+        slotRecord += 76;
+        slotFlag += 2;
     }
     if (*(int *)(object + 0x290) != 0) {
-        func_00335E38(object + 0x198, (*(float **)object)[0] + *(float *)(object + 0x278), (*(float **)object)[1] + *(float *)(object + 0x27C), 0.0f, 0.0f);
-        func_00335E38(object + 0x228, (*(float **)object)[0] + *(float *)(object + 0x288), (*(float **)object)[1] + *(float *)(object + 0x28C), 0.0f, 0.0f);
-        func_00335E38(object + 0x1E0, (*(float **)object)[0] + *(float *)(object + 0x280), (*(float **)object)[1] + *(float *)(object + 0x284), 0.0f, 0.0f);
+        SetFirstFloat4(object + 0x198, (*(float **)object)[0] + *(float *)(object + 0x278), (*(float **)object)[1] + *(float *)(object + 0x27C), 0.0f, 0.0f);
+        SetFirstFloat4(object + 0x228, (*(float **)object)[0] + *(float *)(object + 0x288), (*(float **)object)[1] + *(float *)(object + 0x28C), 0.0f, 0.0f);
+        SetFirstFloat4(object + 0x1E0, (*(float **)object)[0] + *(float *)(object + 0x280), (*(float **)object)[1] + *(float *)(object + 0x284), 0.0f, 0.0f);
     }
 }
 
+/* Draws the icons and text of the button prompt bar. */
 void func_0033AF48(char *object)
 {
-    char *r = object + 12;
-    char *q = object + 60;
-    char *p = object + 392;
+    char *slotRecord = object + 12;
+    char *slotVtable = object + 60;
+    char *slotFlag = object + 392;
     int i;
 
     for (i = 4; i >= 0; i--) {
-        if (*(short *)p != 0) {
-            ENTRY_F624a0727 *t = *(ENTRY_F624a0727 **)q;
-            t->fn(r + t->n);
+        if (*(short *)slotFlag != 0) {
+            ENTRY_F624a0727 *vtable = *(ENTRY_F624a0727 **)slotVtable;
+            vtable->fn(slotRecord + vtable->n);
         }
-        r += 76;
-        q += 76;
-        p += 2;
+        slotRecord += 76;
+        slotVtable += 76;
+        slotFlag += 2;
     }
     if (*(int *)(object + 656) != 0) {
         F624a0727_FUN_00336A78(object + 408);
@@ -74,31 +78,36 @@ void func_0033AF48(char *object)
     }
 }
 
+/* Sets the x and y position of a menu. */
 void func_0033B018(float **position, float x, float y) {
     (*position)[0] = x;
     (*position)[1] = y;
 }
 
-void func_0033B030(u8 *a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5, f32 a6) {
-    *(f32 *)(a0 + 0x278) = a1;
-    *(f32 *)(a0 + 0x27C) = a2;
-    *(f32 *)(a0 + 0x288) = a3;
-    *(f32 *)(a0 + 0x28C) = a4;
-    *(f32 *)(a0 + 0x280) = a5;
-    *(f32 *)(a0 + 0x284) = a6;
+/* Sets where the three text labels sit relative to the bar position. */
+void func_0033B030(u8 *bar, f32 textAX, f32 textAY, f32 textBX, f32 textBY, f32 textCX, f32 textCY) {
+    *(f32 *)(bar + 0x278) = textAX;
+    *(f32 *)(bar + 0x27C) = textAY;
+    *(f32 *)(bar + 0x288) = textBX;
+    *(f32 *)(bar + 0x28C) = textBY;
+    *(f32 *)(bar + 0x280) = textCX;
+    *(f32 *)(bar + 0x284) = textCY;
 }
 
-void func_0033B050(int object, unsigned int a1, unsigned int a2, unsigned int a3)
+/* Sets the three text strings shown on the button prompt bar. */
+void func_0033B050(int object, unsigned int textA, unsigned int textB, unsigned int textC)
 {
-    func_00336A38(object + 0x198, a1);
-    func_00336A38(object + 0x228, a2);
-    func_00336A38(object + 0x1E0, a3);
+    SetWidgetField40(object + 0x198, textA);
+    SetWidgetField40(object + 0x228, textB);
+    SetWidgetField40(object + 0x1E0, textC);
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-void func_0033B0A8(u8 *a0, f32 a1) { *(f32 *)(a0 + 0x274) = a1; }
+/* Sets the spacing value used when the button prompt icons are placed. */
+void func_0033B0A8(u8 *bar, f32 spacing) { *(f32 *)(bar + 0x274) = spacing; }
 
 
+/* Cleans up all pictures and texts of the map screen and gives the screen back. */
 char *func_0033B0B8(char *object)
 {
     int index;
@@ -126,6 +135,7 @@ char *func_0033B0B8(char *object)
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
 
+/* Cleans up the button prompt bar inside this menu and gives the menu back. */
 char *func_0033BD38(char *object)
 {
     Ffb202470_FUN_0033AB50(object + 8);

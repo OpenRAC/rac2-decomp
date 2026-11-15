@@ -21,7 +21,7 @@ void func_L02_003D2390(char *self) {
     if (*(char **)(state + 0x2E4) != 0) {
         TI128 pos = *(TI128 *)(*(char **)(state + 0x2E4) + 0x10);
 
-        func_L02_003D1ED0(self, &pos);
+        ReleaseHeldObject(self, &pos);
     }
     if (*(short *)(state + 0x2F6) == 1)
         func_3FC1B0(*(char **)(self + 0xB8), 0x9CA);

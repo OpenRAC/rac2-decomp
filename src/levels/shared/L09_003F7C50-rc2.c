@@ -26,20 +26,21 @@
 extern s32 ref_L09_003F7C50_00(s8 *, s32, s32, s32);
 extern s32 ref_L09_003F7C50_01(s8 *, s32, f32);
 
-s32 func_L09_003F7C50(s8 *arg0, s32 arg1, s32 arg2) {
-    s8 *temp_s2;
-    s32 t;
+/* Chooses a path for the enemy to follow and returns its current point, or -1 if there is no path. */
+s32 func_L09_003F7C50(s8 *moby, s32 pathIndex, s32 mode) {
+    s8 *vars;
+    s32 pathParam;
 
-    temp_s2 = (*(s8 **)((s8 *)(arg0) + (0x68)));
-    (*(s32 *)((s8 *)(temp_s2) + (0x2DC))) = arg1;
-    if (arg1 == -1) {
-        (*(s16 *)((s8 *)(temp_s2) + (0x1C8))) = (s16) arg1;
+    vars = (*(s8 **)((s8 *)(moby) + (0x68)));
+    (*(s32 *)((s8 *)(vars) + (0x2DC))) = pathIndex;
+    if (pathIndex == -1) {
+        (*(s16 *)((s8 *)(vars) + (0x1C8))) = (s16) pathIndex;
         return -1;
     }
-    t = ref_L09_003F7C50_01(arg0 + 0x10, arg1, 0.0f);
-    if (ref_L09_003F7C50_00(arg0, arg1, arg2, t) != 0) {
-        return (*(s16 *)((s8 *)(temp_s2) + (0x1C8)));
+    pathParam = ref_L09_003F7C50_01(moby + 0x10, pathIndex, 0.0f);
+    if (ref_L09_003F7C50_00(moby, pathIndex, mode, pathParam) != 0) {
+        return (*(s16 *)((s8 *)(vars) + (0x1C8)));
     }
-    (*(s16 *)((s8 *)(temp_s2) + (0x1C8))) = 0;
+    (*(s16 *)((s8 *)(vars) + (0x1C8))) = 0;
     return -1;
 }

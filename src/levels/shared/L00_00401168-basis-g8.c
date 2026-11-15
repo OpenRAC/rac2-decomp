@@ -17,6 +17,7 @@ extern void func_00282F20(void *, void *, float);
    moved to the object's position (+0x10) and offset by D_L00_001B2C00. Writing
    the table through `base` before the loop and through `out` in it keeps the
    two pointers apart, as retail's allocation needs. */
+/* Works out the eight points around the Turret Spider Bot that are used to test the ground below it. */
 void func_L00_00401168(char *object)
 {
     char vectors[4][16] __attribute__((aligned(16)));
@@ -29,8 +30,8 @@ void func_L00_00401168(char *object)
 
     qcopy(vectors[0], object + 0xC0);
     qcopy(vectors[3], object + 0xD0);
-    func_00282D30(vectors[1], vectors[0], -1.0f);
-    func_00282D30(vectors[2], vectors[3], -1.0f);
+    FastVecScale(vectors[1], vectors[0], -1.0f);
+    FastVecScale(vectors[2], vectors[3], -1.0f);
     qcopy(base + 0x40, vectors[0]);
     qcopy(base + 0x50, vectors[1]);
     qcopy(base + 0x60, vectors[2]);
@@ -39,12 +40,12 @@ void func_L00_00401168(char *object)
     out = base;
     for (i = 0; i < 8; i++) {
         if (i < 4)
-            func_00282CC0(out, vectors[i >> 1], vectors[2 + (i & 1)]);
-        func_00282F20(out, out, D_L00_001B0CB0);
-        func_00282CC0(out, out, pos);
-        func_00282F20(temp, D_L00_001B2C00, -D_L00_001B0CAC);
-        func_00282CC0(out, out, temp);
+            FastVecAdd(out, vectors[i >> 1], vectors[2 + (i & 1)]);
+        vec_scale_to_length(out, out, D_L00_001B0CB0);
+        FastVecAdd(out, out, pos);
+        vec_scale_to_length(temp, D_L00_001B2C00, -D_L00_001B0CAC);
+        FastVecAdd(out, out, temp);
         out += 16;
-        func_00282CC0(sum, temp, pos);
+        FastVecAdd(sum, temp, pos);
     }
 }

@@ -26,6 +26,7 @@
 extern s32 func_002A8F70(s32 a, s32 b, s32 c, s32 d, s32 e, float duration);
 extern s8 D_001A8BD0[];
 
+/* Calls the general effect starter with a fixed default table and the given duration. */
 s32 func_002A90C8(s32 a, s32 b, s32 c, s32 d, float duration) {
-    return func_002A8F70(a, b, c, d, (s32)D_001A8BD0, duration);
+    return QueueImpactEffect(a, b, c, d, (s32)D_001A8BD0, duration);
 }

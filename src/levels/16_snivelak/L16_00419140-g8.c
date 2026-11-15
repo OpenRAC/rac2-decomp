@@ -29,18 +29,18 @@ void func_L16_00419140(char *self) {
     s32 alpha;
     s32 firstKind;
     char *origin = self + 16;
-    func_002A7A00(velocity, D_L16_001B1C60 * 0.01666666753590107f,
+    RandomDirectionVector(velocity, D_L16_001B1C60 * 0.01666666753590107f,
                   D_L16_001B1C64[0] * 0.01666666753590107f);
-    firstKind = func_002A7820(D_L16_001B1C80, D_L16_001B1C84[0]) & 255;
-    alpha = func_002A77E0(255);
-    func_002C3150(origin, velocity, D_L16_001B1C78, firstKind, D_L16_001B1C70, alpha & 255, 0);
-    func_00282C88(velocity);
+    firstKind = RandomIntRange(D_L16_001B1C80, D_L16_001B1C84[0]) & 255;
+    alpha = RandomIntBelow(255);
+    SpawnHeroRelativeParticle(origin, velocity, D_L16_001B1C78, firstKind, D_L16_001B1C70, alpha & 255, 0);
+    ClearVector128(velocity);
     for (i = 0; i < D_L16_001B1C90; i++) {
-        func_002A7A00(position, 0.0f, 0.25f);
-        func_00282CC0(position, position, self + 16);
-        *(f32 *)(velocity + 8) = -(func_002A7878(D_L16_001B1C68, D_L16_001B1C6C) * 0.01666666753590107f);
-        kind = func_002A7820(D_L16_001B1C88[0], D_L16_001B1C8C[0]) & 255;
-        alpha = func_002A77E0(255);
-        func_002C3150(position, velocity, D_L16_001B1C7C[0], kind, D_L16_001B1C74[0], alpha & 255, 0);
+        RandomDirectionVector(position, 0.0f, 0.25f);
+        FastVecAdd(position, position, self + 16);
+        *(f32 *)(velocity + 8) = -(RandomFloatRange(D_L16_001B1C68, D_L16_001B1C6C) * 0.01666666753590107f);
+        kind = RandomIntRange(D_L16_001B1C88[0], D_L16_001B1C8C[0]) & 255;
+        alpha = RandomIntBelow(255);
+        SpawnHeroRelativeParticle(position, velocity, D_L16_001B1C7C[0], kind, D_L16_001B1C74[0], alpha & 255, 0);
     }
 }

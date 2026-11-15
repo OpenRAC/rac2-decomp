@@ -31,6 +31,7 @@ extern int func_00282978(void *);
    is updated. When the timer has run out, or the resident mode is 3, the light is
    released. Each branch keeps its own reciprocal, which is what lets 1.0f share the
    reciprocal's register. */
+/* Shows a short flash of light near the object that quickly brightens and then fades away. */
 void func_L00_00410178(char *object, void *origin)
 {
     float position[4] __attribute__((aligned(16)));
@@ -39,54 +40,54 @@ void func_L00_00410178(char *object, void *origin)
     float scale[4] __attribute__((aligned(16)));
     FlashState *state;
     float *axis;
-    int disabled = D_00189E20.mode == 3;
-    float a, b, c;
+    int disabled = gHeroState.mode == 3;
+    float red, green, blue;
 
     state = *(FlashState **)(object + 0x68);
     if (!disabled && state->timer > 0) {
         if (state->timer >= 13) {
-            float inverse = 1.0f / func_00283CE0(3);
-            a = func_00283CE0(15 - state->timer) * inverse;
-            b = func_00283CE0(15 - state->timer) * (inverse * 0.8f);
-            c = func_00283CE0(15 - state->timer) * (inverse * 0.5f);
+            float inverse = 1.0f / IntToFloat(3);
+            red = IntToFloat(15 - state->timer) * inverse;
+            green = IntToFloat(15 - state->timer) * (inverse * 0.8f);
+            blue = IntToFloat(15 - state->timer) * (inverse * 0.5f);
         } else {
-            float inverse = 1.0f / func_00283CE0(12);
-            a = func_00283CE0(state->timer) * inverse;
-            b = func_00283CE0(state->timer) * (inverse * 0.8f);
-            c = func_00283CE0(state->timer) * (inverse * 0.5f);
+            float inverse = 1.0f / IntToFloat(12);
+            red = IntToFloat(state->timer) * inverse;
+            green = IntToFloat(state->timer) * (inverse * 0.8f);
+            blue = IntToFloat(state->timer) * (inverse * 0.5f);
         }
-        if (D_00189E20.alternate) {
-            func_00282D30(direction, object + 0xd0, -1.0f);
+        if (gHeroState.alternate) {
+            FastVecScale(direction, object + 0xd0, -1.0f);
             qcopy(position, origin);
             axis = direction;
         } else {
-            qcopy(direction, D_00189E20.axis);
+            qcopy(direction, gHeroState.axis);
             qcopy(position, origin);
             axis = direction;
         }
-        func_00282D30(offset, D_00189E20.object + 0xe0, 0.3f);
-        func_00282CC0(position, position, offset);
-        func_00282D30(scale, axis, 1.75f);
-        func_00282CC0(position, position, scale);
+        FastVecScale(offset, gHeroState.object + 0xe0, 0.3f);
+        FastVecAdd(position, position, offset);
+        FastVecScale(scale, axis, 1.75f);
+        FastVecAdd(position, position, scale);
         if (state->light == -1) {
-            state->light = func_L00_002FCF18(position, 14.0f, 0.0f, a, b, c);
+            state->light = AllocateEffectSlot_L00_2(position, 14.0f, 0.0f, red, green, blue);
         } else {
             LightRecord *light = &D_L00_001C6F40[state->light];
             qcopy(light->position, position);
             light->position[3] = 14.0f;
-            light->color[0] = a;
-            light->color[1] = b;
-            light->color[2] = c;
+            light->color[0] = red;
+            light->color[1] = green;
+            light->color[2] = blue;
         }
-        func_00282978(&state->timer);
+        FastDecTimer(&state->timer);
     } else if (state->light != -1) {
-        func_00291450(state->light);
+        FreePointLight(state->light);
         state->light = -1;
         state->timer = 0;
     }
     if (disabled) {
         if (state->light != -1) {
-            func_00291450(state->light);
+            FreePointLight(state->light);
             state->light = -1;
         }
         state->timer = 0;

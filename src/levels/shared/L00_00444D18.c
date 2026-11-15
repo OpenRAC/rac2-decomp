@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* These four resident thunks need the -mno-split-addresses profile to come out exact:
  * without it this cc1 schedules the constant's `lui` between retail's `lui $v0,%hi` /
@@ -19,25 +20,25 @@ extern void func_00350ED8(char *);
 /* Loads the resident pointer word, adds 0xD9100, and calls the update helper with it. */
 int func_L00_00444D18(void)
 {
-    return func_0034FAE8(D_L00_001B272C[0] + 0xD9100);
+    return IsMovieAudioPrimed(D_L00_001B272C[0] + 0xD9100);
 }
 
 /* The release twin of func_L00_00444D18. */
 void func_L00_004450E8(void)
 {
-    func_0034FAF8((int *)(D_L00_001B272C[0] + 0xD9100));
+    UpdateMovieAudioIfActive((int *)(D_L00_001B272C[0] + 0xD9100));
 }
 
 /* The same thunk with the first sub-object's lookup helper and a constant of 0xD9090. */
 int func_L00_00447678(void)
 {
-    func_00350DC8(D_L00_001B272C[0] + 0xD9090);
+    SaveIpuDmaState(D_L00_001B272C[0] + 0xD9090);
     return 1;
 }
 
 /* The twin of func_L00_00447678 with the second sub-object's lookup helper. */
 int func_L00_004476A8(void)
 {
-    func_00350ED8(D_L00_001B272C[0] + 0xD9090);
+    RestoreIpuDmaState(D_L00_001B272C[0] + 0xD9090);
     return 1;
 }

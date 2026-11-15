@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L02_003E8E90 is a unit of its own: it needs the opt-in quadword-copy profile
    (-frac2-qcopy), which gives retail's `lq`/`sq` with a register address. It reads $gp data,
@@ -38,39 +39,39 @@ extern float func_00282DB0(void *, void *);
    the velocity's difference to it, limited in length, and the entity's own point moves by the
    new one. When the new point and the flat vector from the actor to the entity make a positive
    product, the point is replaced by the velocity and the result is 1. */
-int func_L02_003E8E90(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    unsigned char *ent = D_L02_001B359C[0] + (*(int *)state << 8);
+int func_L02_003E8E90(char *actor) {
+    char *state = *(char **)(actor + 0x68);
+    unsigned char *entity = gMobyPool_L02[0] + (*(int *)state << 8);
     float tilt;
     float heading;
-    float v0[4];
-    float v1[4];
-    float v2[4];
-    char *pos;
-    unsigned char *epos;
-    char *g;
+    float wantedVel[4];
+    float velDelta[4];
+    float flatOffset[4];
+    char *point;
+    unsigned char *entityPos;
+    char *hero;
 
-    if (*(short *)(ent + 0xAA) == 0x9C8)
+    if (*(short *)(entity + 0xAA) == 0x9C8 /* moby class 2504 */)
         tilt = D_L02_001B0C10[1];
     else
         tilt = D_L02_001B0C10[0];
-    heading = *(float *)(arg0 + 0xF8);
-    g = D_00189E20;
-    if (func_00283C80(*(float *)(arg0 + 0xF8),
-                      func_00283248(*(float *)(g + 0x80) - *(float *)(arg0 + 0x10),
-                                    *(float *)(g + 0x84) - *(float *)(arg0 + 0x14))) < 1.5707964f)
-        heading = func_00283B98(heading, 3.1415927f);
-    pos = state + 0x10;
-    func_002AF000(v0, *(float *)(state + 0x44), heading, tilt * 0.01745329424738884f);
-    epos = ent + 0x10;
-    func_00282CF0(v1, v0, pos);
-    func_002AC9F8(v1, D_L02_001B0C18 * 0.00027777778450399637f);
-    func_00282CC0(pos, pos, v1);
-    func_00282CC0(epos, epos, pos);
-    func_00282CF0(v2, epos, arg0 + 0x10);
-    v2[2] = 0;
-    if (0.0f < func_00282DB0(pos, v2)) {
-        *(TI128 *)pos = *(TI128 *)v0;
+    heading = *(float *)(actor + 0xF8);
+    hero = gHeroState;
+    if (FastDiffRots(*(float *)(actor + 0xF8),
+                      FastMatrixHelperA(*(float *)(hero + 0x80) - *(float *)(actor + 0x10),
+                                    *(float *)(hero + 0x84) - *(float *)(actor + 0x14))) < 1.5707964f)
+        heading = FastAddRotations(heading, 3.1415927f);
+    point = state + 0x10;
+    BuildSphericalOffset(wantedVel, *(float *)(state + 0x44), heading, tilt * 0.01745329424738884f);
+    entityPos = entity + 0x10;
+    FastVecSub(velDelta, wantedVel, point);
+    ClampVectorLength(velDelta, D_L02_001B0C18 * 0.00027777778450399637f);
+    FastVecAdd(point, point, velDelta);
+    FastVecAdd(entityPos, entityPos, point);
+    FastVecSub(flatOffset, entityPos, actor + 0x10);
+    flatOffset[2] = 0;
+    if (0.0f < FastVecDot(point, flatOffset)) {
+        *(TI128 *)point = *(TI128 *)wantedVel;
         return 1;
     }
     return 0;

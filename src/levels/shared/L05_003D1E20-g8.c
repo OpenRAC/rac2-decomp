@@ -6,6 +6,7 @@ extern int D_L05_001AFCB8 __attribute__((sda));
 extern int D_L05_001B2FA0[] MACRO_ADDR;
 extern int D_L05_001B3018[] MACRO_ADDR;
 
+/* Clears the explosion counter and both explosion slot tables. */
 void func_L05_003D1E20(void)
 {
     int i;

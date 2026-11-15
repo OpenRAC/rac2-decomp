@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef int Quadword __attribute__((mode(TI)));
@@ -54,60 +55,61 @@ extern void func_00282A88(void *, int);
 extern float func_00282C48(float);
 extern int func_L11_002D8EF8(int, int);
 
+/* Reads the newest button command and sets the hero's attack, jump, cancel and hover flags. It then starts the matching hero state, such as a swing, a jump or a glide. */
 void func_L11_002C51D0(void)
 {
-    short command = D_00189E20.command;
-    u8 saved = D_00189E20.saved;
+    short command = gHeroState.command;
+    u8 saved = gHeroState.saved;
     int active;
 
-    func_00282A88(&D_00189E20.command, 16);
-    D_00189E20.command = command;
-    D_00189E20.saved = saved;
-    D_00189E20.request = 0;
-    D_00189E20.pendingJump = 0;
-    if (D_00189E20.disabled) return;
+    FastMemoryHelperB(&gHeroState.command, 16);
+    gHeroState.command = command;
+    gHeroState.saved = saved;
+    gHeroState.request = 0;
+    gHeroState.pendingJump = 0;
+    if (gHeroState.disabled) return;
     active = 0;
-    if (D_00189E20.busy || (D_00189E20.state == 0x7b && D_00189E20.elapsed < 0.4f)) active = 1;
+    if (gHeroState.busy || (gHeroState.state == 0x7b && gHeroState.elapsed < 0.4f)) active = 1;
     if (command == -1) return;
-    if (command == 2 && !D_00189E20.inputLock &&
-        (!D_00189E20.jumpCount || D_00189E20.elapsed < 2.5f)) {
-        D_00189E20.jumpPressed = 1;
-        if (!D_00189E20.mode && D_001A7B0B) D_00189E20.pendingJump = 1;
+    if (command == 2 && !gHeroState.inputLock &&
+        (!gHeroState.jumpCount || gHeroState.elapsed < 2.5f)) {
+        gHeroState.jumpPressed = 1;
+        if (!gHeroState.mode && D_001A7B0B) gHeroState.pendingJump = 1;
     }
-    if (command == 3) D_00189E20.jump = 1;
-    if (command == 11) D_00189E20.cancel = 1;
-    if (command == 1) D_00189E20.attack = 1;
-    if (command == 8) D_00189E20.hover = 1;
-    if (command == 12) D_00189E20.hover = 1;
-    if (D_00189E20.attack) {
-        if (active && D_00189E20.mode == 1 && D_00189E20.state != 0x7a) {
-            func_L11_002D8EF8(0x7a,1); return;
+    if (command == 3) gHeroState.jump = 1;
+    if (command == 11) gHeroState.cancel = 1;
+    if (command == 1) gHeroState.attack = 1;
+    if (command == 8) gHeroState.hover = 1;
+    if (command == 12) gHeroState.hover = 1;
+    if (gHeroState.attack) {
+        if (active && gHeroState.mode == 1 && gHeroState.state != 0x7a) {
+            EnterHeroState_L11(0x7a,1); return;
         }
-        if (D_00189E20.attack && active &&
-            (D_00189E20.state != 0x38 || D_00189E20.animationDone)) {
-            if (D_00189E20.health) { func_L11_002D8EF8(0x38,1); return; }
-            if (D_001A79F0 == 2 && D_L11_001A9010) { func_L11_002D8EF8(0x7d,1); return; }
-            if (*(int *)(*(u8 **)(D_00189E20.object + 0x24) + 0x1f0)) { func_L11_002D8EF8(0x79,1); return; }
-            func_L11_002D8EF8(0x39,1); return;
+        if (gHeroState.attack && active &&
+            (gHeroState.state != 0x38 || gHeroState.animationDone)) {
+            if (gHeroState.health) { EnterHeroState_L11(0x38,1); return; }
+            if (gCurrentMapIndex == 2 && D_L11_001A9010) { EnterHeroState_L11(0x7d,1); return; }
+            if (*(int *)(*(u8 **)(gHeroState.object + 0x24) + 0x1f0)) { EnterHeroState_L11(0x79,1); return; }
+            EnterHeroState_L11(0x39,1); return;
         }
     }
-    if (D_00189E20.jump && D_00189E20.state != 0x65 && D_00189E20.state != 0x78 &&
-        func_00282C48(D_00189E20.jumpTime-(D_00189E20.position.f[2]+0.25f)) < 1.0f &&
-        D_00189E20.jumpTime-D_00189E20.position.f[2] > 0.0f &&
-        (D_00189E20.state != 0x66 || D_00189E20.animationDone) &&
-        (D_00189E20.motion.f[2] < 0.0f || D_00189E20.state == 0x7b)) {
-        if (!D_00189E20.health) { func_L11_002D8EF8(0x78,1); return; }
-        func_L11_002D8EF8(0x65,1); return;
+    if (gHeroState.jump && gHeroState.state != 0x65 && gHeroState.state != 0x78 &&
+        FloatAbs(gHeroState.jumpTime-(gHeroState.position.f[2]+0.25f)) < 1.0f &&
+        gHeroState.jumpTime-gHeroState.position.f[2] > 0.0f &&
+        (gHeroState.state != 0x66 || gHeroState.animationDone) &&
+        (gHeroState.motion.f[2] < 0.0f || gHeroState.state == 0x7b)) {
+        if (!gHeroState.health) { EnterHeroState_L11(0x78,1); return; }
+        EnterHeroState_L11(0x65,1); return;
     }
-    if (!D_00189E20.cancel || D_00189E20.state == 0x78 || D_00189E20.state == 0x74) return;
-    if (!(func_00282C48(D_00189E20.jumpTime-(D_00189E20.position.f[2]+0.25f)) < 1.0f)) return;
-    if (!(D_00189E20.jumpTime-D_00189E20.position.f[2] > 0.0f)) return;
-    if (!(D_00189E20.motion.f[2] < 0.0f) && D_00189E20.state != 0x7b) return;
-    if (D_001A79F0 == 13) {
-        func_L11_002D8EF8(0x74, 1);
+    if (!gHeroState.cancel || gHeroState.state == 0x78 || gHeroState.state == 0x74) return;
+    if (!(FloatAbs(gHeroState.jumpTime-(gHeroState.position.f[2]+0.25f)) < 1.0f)) return;
+    if (!(gHeroState.jumpTime-gHeroState.position.f[2] > 0.0f)) return;
+    if (!(gHeroState.motion.f[2] < 0.0f) && gHeroState.state != 0x7b) return;
+    if (gCurrentMapIndex == 13) {
+        EnterHeroState_L11(0x74, 1);
         return;
     }
-    func_L11_002D8EF8(0x78, 1);
+    EnterHeroState_L11(0x78, 1);
 }
 
 

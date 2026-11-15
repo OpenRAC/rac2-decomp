@@ -21,13 +21,14 @@ extern int func_001313C8(double) __attribute__((const));
 extern int func_00131400(SqrtException *);
 extern int *func_00115200(void);
 
+/* Square root that also sets the error code when given a negative number. */
 double func_00131424(double x)
 {
     SqrtException exc;
     double z;
 
-    z = func_001310C0(x);
-    if (D_0013BF10 == -1 || func_001313C8(x))
+    z = SqrtDouble(x);
+    if (D_0013BF10 == -1 || IsFiniteDouble(x))
         return z;
     if (x < 0.0) {
         exc.type = 1;
@@ -39,11 +40,11 @@ double func_00131424(double x)
         else
             exc.retval = 0.0 / 0.0;
         if (D_0013BF10 == 2)
-            *func_00115200() = 33;
-        else if (!func_00131400(&exc))
-            *func_00115200() = 33;
+            *GetLibraryStateRecord() = 33;
+        else if (!HandleSqrtError(&exc))
+            *GetLibraryStateRecord() = 33;
         if (exc.err != 0)
-            *func_00115200() = exc.err;
+            *GetLibraryStateRecord() = exc.err;
         return exc.retval;
     }
     return z;

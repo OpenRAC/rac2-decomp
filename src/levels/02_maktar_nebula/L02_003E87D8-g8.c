@@ -54,31 +54,31 @@ extern void func_L02_003E98A8(char *);
 /* Updates a tether actor's capture, release, turning and attached effect. */
 void func_L02_003E87D8(char *actor) {
     char *state = *(char **)(actor + 0x68);
-    char *target = D_L02_001B359C + *(int *)state * 0x100;
-    float local[4] __attribute__((aligned(16)));
+    char *target = gMobyPool_L02 + *(int *)state * 0x100;
+    float effectPoint[4] __attribute__((aligned(16)));
     switch (*(unsigned char *)(actor + 0x20)) {
     case 0:
         *(float *)(state + 0x48) = *(float *)(actor + 0xF8);
         if (*(int *)state != -1) {
-            func_002A7750(actor, 1, -1);
-            if (*(short *)(D_L02_001B359C + *(int *)state * 0x100 + 0xAA) == 0x9BC) {
-                char *effect = func_0029EFD0(0xA61);
+            SetMobyState(actor, 1, -1);
+            if (*(short *)(gMobyPool_L02 + *(int *)state * 0x100 + 0xAA) == 0x9BC /* moby class 2492 */) {
+                char *effect = CreateMoby(0xA61 /* moby class 2657 */);
                 *(char **)(state + 0x54) = effect;
                 if (effect) {
-                    func_002B37E8(effect, actor);
+                    InitChildObjectFromParent(effect, actor);
                     *(unsigned short *)(*(char **)(state + 0x54) + 0x34) |= 2;
                 }
             }
         } else {
-            func_002A7750(actor, 4, -1);
+            SetMobyState(actor, 4, -1);
         }
         break;
     case 1:
-        if ((*(unsigned short *)(target + 0x34) & 0x1000) && ((Hero003E87D8 *)D_00189E20)->captured == target &&
-            func_00282E80(target + 0x10, actor + 0x10) < D_L02_001B0B80) {
-            func_L00_003294F0(target, 1);
-            func_00282C88(state + 0x10);
-            func_002A7750(actor, 2, -1);
+        if ((*(unsigned short *)(target + 0x34) & 0x1000) && ((Hero003E87D8 *)gHeroState)->captured == target &&
+            vec_distance_xy(target + 0x10, actor + 0x10) < D_L02_001B0B80) {
+            SetObjectFlagBit(target, 1);
+            ClearVector128(state + 0x10);
+            SetMobyState(actor, 2, -1);
             break;
         }
         break;
@@ -86,76 +86,76 @@ void func_L02_003E87D8(char *actor) {
         {
             float separation;
             float turnStep, turnLimit;
-            float angle = func_00283B98(func_00283248(
+            float angle = FastAddRotations(FastMatrixHelperA(
                 *(float *)(target + 0x10) - *(float *)(actor + 0x10),
                 *(float *)(target + 0x14) - *(float *)(actor + 0x14)), 3.1415927f);
-            if (func_00283C80(angle, *(float *)(actor + 0xF8)) > 1.5707964f)
-                angle = func_00283B98(angle, 3.1415927f);
+            if (FastDiffRots(angle, *(float *)(actor + 0xF8)) > 1.5707964f)
+                angle = FastAddRotations(angle, 3.1415927f);
             turnStep = D_L02_001B0B88 * 0.0000048481375f;
             turnLimit = D_L02_001B0B8C * 0.00029088825f;
-            func_002AAA00(actor + 0xF8, state + 0x40, 0, angle, turnStep, turnStep * 3.0f, turnLimit);
-            func_L02_003E8CE8(actor);
-            separation = func_00282E80(actor + 0x10, ((Hero003E87D8 *)D_00189E20)->position);
-            if (((Hero003E87D8 *)D_00189E20)->captured != target || separation > D_L02_001B0BA0) {
+            ApproachTargetWithDirectionMode(actor + 0xF8, state + 0x40, 0, angle, turnStep, turnStep * 3.0f, turnLimit);
+            PullTetheredEntityToActor(actor);
+            separation = vec_distance_xy(actor + 0x10, ((Hero003E87D8 *)gHeroState)->position);
+            if (((Hero003E87D8 *)gHeroState)->captured != target || separation > D_L02_001B0BA0) {
                 float distance, scaledDistance;
-                ((Hero003E87D8 *)D_00189E20)->captured = 0;
-                distance = func_00282E48(actor + 0x10, ((Hero003E87D8 *)D_00189E20)->position) - D_L02_001B0B84;
+                ((Hero003E87D8 *)gHeroState)->captured = 0;
+                distance = fast_vec_dist(actor + 0x10, ((Hero003E87D8 *)gHeroState)->position) - D_L02_001B0B84;
                 if (distance < 0.0f)
                     distance = 0.0f;
                 scaledDistance = distance * 0.016666668f;
                 ((Actor003E87D8 *)target)->flags &= 0xEFFF;
                 *(float *)(state + 0x44) = D_L02_001B0B90 * 0.016666668f + D_L02_001B0B94 * scaledDistance;
-                func_002E5CF8(0, 0, actor);
-                func_002A7750(actor, 3, -1);
+                PlayMobySound(0, 0, actor);
+                SetMobyState(actor, 3, -1);
             } else {
-                ((Hero003E87D8 *)D_00189E20)->captureMode = 2;
-                func_L00_00424F58(actor + 0x10, 0.78539824f, 0.0f);
-                func_L00_00424C28();
-                func_L00_00424B70(0.03f, 0.2f);
+                ((Hero003E87D8 *)gHeroState)->captureMode = 2;
+                SetCameraStrengthAndSteerToTarget(actor + 0x10, 0.78539824f, 0.0f);
+                SetCameraLockFlag();
+                SetCameraSpeedsIfNonZero(0.03f, 0.2f);
                 if (*(unsigned short *)(target + 0x34) & 0x1000)
                     break;
-                func_002A7750(actor, 1, -1);
+                SetMobyState(actor, 1, -1);
             }
         }
         break;
     case 3:
-        if (func_002B3868(actor)) {
+        if (SetFirstPendingFlag(actor)) {
             qzero_nc(state + 0x10);
-            func_002E5CF8(0, 0, actor);
+            PlayMobySound(0, 0, actor);
         }
-        if (func_L02_003E8E90(actor)) {
-            func_L00_003294F0(target, 0);
-            if (*(short *)(target + 0xAA) == 0x9BC) {
-                func_L02_003CADA8(target, state + 0x10);
+        if (SwingTetheredEntity(actor)) {
+            SetObjectFlagBit(target, 0);
+            if (*(short *)(target + 0xAA) == 0x9BC /* moby class 2492 */) {
+                StartPathEnemyFall(target, state + 0x10);
                 D_0018CA6C = 0xFFFF;
             } else {
-                func_L02_003D01F0(target, state + 0x10);
+                StartPlatformFall(target, state + 0x10);
             }
-            func_002A7750(actor, 1, -1);
+            SetMobyState(actor, 1, -1);
         }
         break;
     }
-    if (func_00282C48(*(float *)(state + 0x40)) > 0.004363324f) {
-        char *slot = D_00188660 + *(int *)(state + 0x58) * 0x70;
+    if (FloatAbs(*(float *)(state + 0x40)) > 0.004363324f) {
+        char *slot = gSoundState + *(int *)(state + 0x58) * 0x70;
         if (*(char **)(slot + 0x88) != actor || *(unsigned char *)(slot + 0x74) == 0)
-            *(int *)(state + 0x58) = func_002E5CF8(1, 4, actor);
+            *(int *)(state + 0x58) = PlayMobySound(1, 4, actor);
         if (*(unsigned char *)(actor + 0x20) != 2)
             *(float *)(state + 0x40) = 0;
     } else {
         int index = *(int *)(state + 0x58);
         if (index != -1) {
-            char *slot = D_00188660 + index * 0x70;
+            char *slot = gSoundState + index * 0x70;
             if (*(char **)(slot + 0x88) == actor && *(unsigned char *)(slot + 0x74))
-                func_002E59F8(index);
+                StopSoundVoice(index);
         }
         *(int *)(state + 0x58) = -1;
     }
     if (*(char **)(state + 0x54)) {
-        func_00283098(local, effectOffset003E87D8, actor + 0xC0);
-        func_00282CC0(*(char **)(state + 0x54) + 0x10, local, actor + 0x10);
+        matrix_mul_vec3(effectPoint, effectOffset003E87D8, actor + 0xC0);
+        FastVecAdd(*(char **)(state + 0x54) + 0x10, effectPoint, actor + 0x10);
         *(float *)(*(char **)(state + 0x54) + 0xF8) = *(float *)(actor + 0xF8);
         *(float *)(*(char **)(state + 0x54) + 0x2C) = *(float *)(*(char **)(*(char **)(state + 0x54) + 0x24) + 0x24) * D_L02_001B0BF0[3];
     }
-    if (func_002B38B8(target))
-        func_L00_002E6CF0(func_L02_003E98A8, actor);
+    if (IsThirdPendingFlagSet(target))
+        AddDrawCallbackToList1(DrawMirroredRibbons, actor);
 }

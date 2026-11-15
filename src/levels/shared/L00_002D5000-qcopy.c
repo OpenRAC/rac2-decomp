@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 #ifndef RAC2_T_V4_F6A70B950
 #define RAC2_T_V4_F6A70B950
@@ -20,22 +21,23 @@ extern char ref_L00_002D5000_01[];
 /* Fills a 0x40 stack block through the engine, copies its last 16 bytes into the
    record at +0x10, hands the record's +0xC0 and then the record itself to two more
    setters, queues one five-argument request and stamps four resident words. */
-void func_L00_002D5000(char *a0, char *a1)
+/* Sets up a record from an object: copies its position, queues a level request and clears two fields. */
+void func_L00_002D5000(char *object, char *record)
 {
     char block[0x40];
     V4_F6a70b950 *dst;
     V4_F6a70b950 *src;
 
-    func_0029FC20(a0, 4, block);
-    dst = (V4_F6a70b950 *)(a1 + 0x10);
+    TransformMobyJointPoint(object, 4, block);
+    dst = (V4_F6a70b950 *)(record + 0x10);
     src = (V4_F6a70b950 *)(block + 0x30);
     *dst = *src;
-    func_00283678(a1 + 0xC0, block);
-    func_002A10E8(a1);
-    func_L00_002AA200(ref_L00_002D5000_00, ref_L00_002D5000_01,
-                *(int *)(a1 + 0x24), 0, a0);
-    *(void **)(a1 + 0x58) = ref_L00_002D5000_01;
-    *(void **)(a1 + 0x5C) = ref_L00_002D5000_01;
-    *(int *)(a1 + 0x44) = 0;
-    *(int *)(a1 + 0x40) = 0;
+    copy_matrix3x4(record + 0xC0, block);
+    func_002A10E8(record);
+    PackPose(ref_L00_002D5000_00, ref_L00_002D5000_01,
+                *(int *)(record + 0x24), 0, object);
+    *(void **)(record + 0x58) = ref_L00_002D5000_01;
+    *(void **)(record + 0x5C) = ref_L00_002D5000_01;
+    *(int *)(record + 0x44) = 0;
+    *(int *)(record + 0x40) = 0;
 }

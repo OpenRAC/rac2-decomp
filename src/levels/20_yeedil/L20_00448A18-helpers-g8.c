@@ -24,25 +24,26 @@ extern float D_L20_001B2380 __attribute__((sda));
 extern int D_L20_001B2388 __attribute__((sda));
 extern float D_L20_001B2378 __attribute__((sda));
 
-char *func_L20_00448A18(char *arg0, char *arg1, char *arg2, char *arg3) {
-    char *obj = (char *)func_0029EFD0(0x125A);
+/* Creates a small piece of debris (moby class 4698) at the given place with a random size and spin. Returns the new object. */
+char *func_L20_00448A18(char *owner, char *position, char *rotation, char *velocity) {
+    char *obj = (char *)CreateMoby(0x125A /* moby class 4698 */);
     char *state;
     float f;
 
     if (obj != 0) {
         state = *(char **)(obj + 0x68);
-        func_002B37E8(obj, arg0);
-        f = func_002A7878(D_L20_001B2390, D_L20_001B2394);
+        InitChildObjectFromParent(obj, owner);
+        f = RandomFloatRange(D_L20_001B2390, D_L20_001B2394);
         *(float *)(obj + 0x2C) = *(float *)(*(char **)(obj + 0x24) + 0x24) * f;
-        qcopy(obj + 0x10, arg1);
-        qcopy(obj + 0xF0, arg2);
-        qcopy(state, arg3);
+        qcopy(obj + 0x10, position);
+        qcopy(obj + 0xF0, rotation);
+        qcopy(state, velocity);
         func_002A0F48(obj);
-        func_002A7A00((float *)(state + 0x10), D_L20_001B2380 * 0.000290888245f,
+        RandomDirectionVector((float *)(state + 0x10), D_L20_001B2380 * 0.000290888245f,
                       D_L20_001B2384 * 0.000290888245f);
-        f = func_002A7878(D_L20_001B2378, D_L20_001B237C);
+        f = RandomFloatRange(D_L20_001B2378, D_L20_001B237C);
         *(float *)(state + 0x20) = f * 0.00027777778f;
-        *(int *)(state + 0x24) = func_002A7820(D_L20_001B2388, D_L20_001B238C);
+        *(int *)(state + 0x24) = RandomIntRange(D_L20_001B2388, D_L20_001B238C);
     }
     return obj;
 }

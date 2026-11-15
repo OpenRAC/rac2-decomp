@@ -28,25 +28,26 @@ extern s32 func_0011D450(s8 *a0, u32 a1, s32 a2);
 extern s8 D_00140140[];
 extern s32 D_00134744;
 
+/* Connects to an RPC server on the IOP, retrying until the server is ready. Returns 0 on success or -1 on failure. */
 s32 func_0011E740(void) {
-    s32 var_v0;
-    s32 ret;
+    s32 delay;
+    s32 result;
 
     goto loop_3;
 block_1:
-    var_v0 = 0x100000;
+    delay = 0x100000;
     do {
-        var_v0 -= 1;
-    } while (var_v0 != -1);
+        delay -= 1;
+    } while (delay != -1);
 loop_3:
-    if (func_0011D450(D_00140140, 0x80000003, 0) < 0) {
-        ret = -1;
+    if (BindRpcServer(D_00140140, 0x80000003, 0) < 0) {
+        result = -1;
     } else {
         if ((*(s32 *)((char *)(D_00140140) + (0x24))) == 0) {
             goto block_1;
         }
         D_00134744 = 0;
-        ret = 0;
+        result = 0;
     }
-    return ret;
+    return result;
 }

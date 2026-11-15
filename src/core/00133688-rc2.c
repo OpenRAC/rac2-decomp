@@ -28,9 +28,10 @@ extern s32 D_001A748C __attribute__((sda));
 
 extern s32 D_001A7110 __attribute__((nosda));
 
+/* Returns the error code of the last disc read. */
 s32 func_00133688(void) {
     if (D_001A748C == 0) {
-        return func_00125588();
+        return GetCdLastError();
     }
     return D_001A7110;
 }

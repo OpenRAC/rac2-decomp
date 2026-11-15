@@ -31,13 +31,14 @@ extern void *D_00141844;
 extern s32 D_00141848;
 extern s32 D_001363A4;
 
+/* Calls the saved callback function with its saved argument, if one is set and the system is not busy. */
 void func_001248B0(void) {
-    void (*temp_a1)(s32);
+    void (*callback)(s32);
 
-    temp_a1 = (void (*)(s32))D_00141844;
-    if (temp_a1 != NULL) {
+    callback = (void (*)(s32))D_00141844;
+    if (callback != NULL) {
         if (D_001363A4 == 0) {
-            temp_a1(D_00141848);
+            callback(D_00141848);
         }
     }
 }

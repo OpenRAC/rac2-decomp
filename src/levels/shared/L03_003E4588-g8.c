@@ -25,26 +25,27 @@ extern int ref_L01_0031BC68_00(int, int, f32);
 
 /* Eases the record's own rate by the shared factor and hands the state the
    shared lookup asks for. */
-void func_L03_003E4588(u8 *a0) {
-    u8 *rec = *(u8 **)(a0 + 0x68);
-    u32 c[2];
-    f32 f13;
-    f32 r;
+/* Updates the glow colour of the puzzle ball. */
+void func_L03_003E4588(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u32 colors[2];
+    f32 easeStep;
+    f32 blend;
 
-    if (a0[0x20] == 5 || *(short *)(rec + 0x6A) == 0) {
-        c[0] = D_L03_001B0C48;
-        c[1] = D_L03_001B0C4C;
-        f13 = D_L03_001B0C60 * 0.00029088825f;
-    } else if (*(short *)(rec + 0x68) != 0) {
-        c[0] = D_L03_001B0C50;
-        c[1] = D_L03_001B0C54;
-        f13 = D_L03_001B0C64 * 0.00029088825f;
+    if (moby[0x20] == 5 || *(short *)(vars + 0x6A) == 0) {
+        colors[0] = D_L03_001B0C48;
+        colors[1] = D_L03_001B0C4C;
+        easeStep = D_L03_001B0C60 * 0.00029088825f;
+    } else if (*(short *)(vars + 0x68) != 0) {
+        colors[0] = D_L03_001B0C50;
+        colors[1] = D_L03_001B0C54;
+        easeStep = D_L03_001B0C64 * 0.00029088825f;
     } else {
-        c[0] = D_L03_001B0C58;
-        c[1] = D_L03_001B0C5C;
-        f13 = D_L03_001B0C64 * 0.00029088825f;
+        colors[0] = D_L03_001B0C58;
+        colors[1] = D_L03_001B0C5C;
+        easeStep = D_L03_001B0C64 * 0.00029088825f;
     }
-    r = func_00283B98(*(f32 *)(rec + 0x78), f13);
-    *(f32 *)(rec + 0x78) = r;
-    *(u32 *)(a0 + 0x78) = ref_L01_0031BC68_00(c[0], c[1], r);
+    blend = FastAddRotations(*(f32 *)(vars + 0x78), easeStep);
+    *(f32 *)(vars + 0x78) = blend;
+    *(u32 *)(moby + 0x78) = ref_L01_0031BC68_00(colors[0], colors[1], blend);
 }

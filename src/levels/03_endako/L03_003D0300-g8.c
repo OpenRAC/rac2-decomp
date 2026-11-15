@@ -7,46 +7,47 @@ extern void func_311758(void *);
 extern int D_L03_001B2548;
 extern char *D_L03_001C3E40[];
 extern int D_L03_001B0580 __attribute__((sda));
-void func_L03_003D0300(char *a0)
+/* Per-frame update of moby class 2516, a piece of debris thrown from a trash can: it flies, breaks when it hits a Megacorp bot or the hero, then fades away. */
+void func_L03_003D0300(char *moby)
 {
-    switch (*(u8 *)(a0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        if (func_2DC9B0(a0)) {
-            func_31B920(a0, 1, -1);
-            *(u16 *)(a0 + 0x34) |= 0x2000;
+        if (func_2DC9B0(moby)) {
+            func_31B920(moby, 1, -1);
+            *(u16 *)(moby + 0x34) |= 0x2000;
         }
         break;
     case 1:
-        if ((D_L03_001B2548 & 15) == (((int)a0 >> 8) & 15)) {
-            int count = func_2E1C70(0.2f, a0 + 0x10, 0, a0, 0);
+        if ((gFrameCounter_L03 & 15) == (((int)moby >> 8) & 15)) {
+            int count = func_2E1C70(0.2f, moby + 0x10, 0, moby, 0);
             if (count > 0) {
                 int remaining = count;
-                char **p = D_L03_001C3E40;
+                char **nearbyList = D_L03_001C3E40;
                 do {
-                    int type = *(s16 *)(*p + 0xAA);
-                    if (type == 0xFF3 || type == 0xFFD)
-                        func_31B920(a0, 3, -1);
+                    int type = *(s16 *)(*nearbyList + 0xAA);
+                    if (type == 0xFF3 /* Megacorp Sweeper Bot */ || type == 0xFFD /* Megacorp Laser Bot */)
+                        func_31B920(moby, 3, -1);
                     --remaining;
-                    ++p;
+                    ++nearbyList;
                 } while (remaining);
             }
         }
-        if (func_2EF190(a0 + 0x10, &D_L03_001B0580) < 0.3f)
-            func_31B920(a0, 3, -1);
+        if (func_2EF190(moby + 0x10, &D_L03_001B0580) < 0.3f)
+            func_31B920(moby, 3, -1);
         {
-            u32 timer = *(u16 *)(a0 + 0x96);
+            u32 timer = *(u16 *)(moby + 0x96);
             u32 old = timer++;
-            *(u16 *)(a0 + 0x96) = timer;
-            if (old > 600 && !*(u8 *)(a0 + 0x31))
-                func_31B920(a0, 2, -1);
+            *(u16 *)(moby + 0x96) = timer;
+            if (old > 600 && !*(u8 *)(moby + 0x31))
+                func_31B920(moby, 2, -1);
         }
         break;
     case 2:
     case 3: {
-        int amount = *(u8 *)(a0 + 0x20) == 2 ? 2 : 8;
-        int alpha = *(u8 *)(a0 + 0x23);
-        if (alpha < amount) func_311758(a0);
-        else *(u8 *)(a0 + 0x23) = alpha - amount;
+        int amount = *(u8 *)(moby + 0x20) == 2 ? 2 : 8;
+        int alpha = *(u8 *)(moby + 0x23);
+        if (alpha < amount) func_311758(moby);
+        else *(u8 *)(moby + 0x23) = alpha - amount;
         break;
     }
     }

@@ -11,6 +11,7 @@ extern void *D_00133E74;
 struct _reent;
 extern long func_00117278(struct _reent *, const char *, char **, int);
 
-long func_001175F0(int arg0, int arg1, int arg2) {
-    return func_00117278(D_00133E74, (const char *)arg0, (char **)arg1, arg2);
+/* Turns a text string into a whole number, using the library state record. */
+long func_001175F0(int text, int endPtr, int base) {
+    return StrtolReentrant(D_00133E74, (const char *)text, (char **)endPtr, base);
 }

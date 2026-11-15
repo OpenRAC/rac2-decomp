@@ -38,143 +38,144 @@ typedef struct {
     int sound;
 } PathRecord;
 
-void func_L03_003E21B0(u8 *p) {
-    u8 *q = *(u8 **)(p + 0x68);
-    PathRecord *path = (PathRecord *)q;
-    int i, h;
-    float f;
+/* Updates the Infiltrator Ball (moby class 2856): runs the timed path puzzle through its states. */
+void func_L03_003E21B0(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    PathRecord *path = (PathRecord *)vars;
+    int i, soundHandle;
+    float ratio;
     u8 *timeRecord;
 
     if (D_L03_001A8F00 != 7) {
-        if (p[0x20])
-            func_002A7750(p, 0, -1);
+        if (moby[0x20])
+            SetMobyState(moby, 0, -1);
         return;
     }
-    func_002AA2E8(&D_001B2464, 0.0f, 0.16666667f);
+    ApproachValue(&D_001B2464, 0.0f, 0.16666667f);
     D_L03_001B2768 = 1;
-    switch (p[0x20]) {
+    switch (moby[0x20]) {
     case 0:
         for (i = 0; i < 52; i++)
-            func_002E59F8(i);
-        func_L03_003E26C8(p);
-        *(u16 *)(p + 0x34) |= 0x100;
-        func_L03_003E3018(p);
-        func_002A7750(p, D_001A79F0 == 11 ? 1 : 3, -1);
+            StopSoundVoice(i);
+        InitializePathPuzzle(moby);
+        *(u16 *)(moby + 0x34) |= 0x100;
+        ComputePathPuzzleTurn(moby);
+        SetMobyState(moby, gCurrentMapIndex == 11 ? 1 : 3, -1);
         break;
     case 1:
-        timeRecord = D_0018C958;
+        timeRecord = gSubtitleHistory;
         if ((u32)(D_001A7390 - *(u32 *)(timeRecord + 0x73C)) > 1080 ||
             !*(u32 *)(timeRecord + 0x73C))
-            func_00288E18(0xA43, 0x9A);
+            RequestSubtitleVoiceLine(0xA43, 0x9A);
         else if (*(u32 *)(timeRecord + 0x73C) < (u32)D_001A7390)
             *(u32 *)(timeRecord + 0x73C) = D_001A7390;
-        func_002A7750(p, 3, -1);
+        SetMobyState(moby, 3, -1);
         break;
     case 2:
         if (!path->timer) {
-            func_002A7750(p, 4, -1);
+            SetMobyState(moby, 4, -1);
             break;
         }
-        if (func_L03_003E3800(p)) {
+        if (SelectPathPuzzleNodeFromStick(moby)) {
             path->active = 1;
-            func_L03_003E2EC8(p);
-            func_002E5CF8(4, 0, p);
-            func_002A7750(p, 3, -1);
+            UpdateChoicePath(moby);
+            PlayMobySound(4, 0, moby);
+            SetMobyState(moby, 3, -1);
         }
         break;
     case 3:
-        func_L03_003E3678(p);
+        AnimatePathPuzzleTurn(moby);
         if (!path->f56)
             break;
         if (path->pending != -1) {
-            *(u16 *)(q + 0x52) = *(u16 *)(q + 0x66);
+            *(u16 *)(vars + 0x52) = *(u16 *)(vars + 0x66);
             path->pending = -1;
         } else {
-            func_L03_003E3430(p);
+            ChoosePathPuzzleNextNode(moby);
         }
         /* 255 terminates the available-neighbor list. */
         {
             int choice = path->choices[0];
             choice ^= 255;
             if (choice == 0) {
-                func_002E5CF8(0, 0, p);
+                PlayMobySound(0, 0, moby);
             } else {
-                h = func_002E5CF8(1, 0, p);
-                if (h != -1) {
-                    f = func_00283CE0(path->length);
-                    f /= func_00283CE0(D_L03_001B0B50);
-                    func_002E5F40(h, func_00283CF0(f * 1024.0f) + 1024);
+                soundHandle = PlayMobySound(1, 0, moby);
+                if (soundHandle != -1) {
+                    ratio = IntToFloat(path->length);
+                    ratio /= IntToFloat(D_L03_001B0B50);
+                    SetVoicePitchBend(soundHandle, FloatToInt(ratio * 1024.0f) + 1024);
                 }
             }
         }
         if (path->length > path->maximumLength) {
-            path->maximumLength = *(u16 *)(q + 0x5E);
+            path->maximumLength = *(u16 *)(vars + 0x5E);
             path->timer += D_L03_001B0B60;
             if (path->timer > D_L03_001B0B58)
                 path->timer = D_L03_001B0B58;
         }
         if (path->length == D_L03_001B0B50) {
-            func_002E5CF8(5, 0, p);
-            func_002A7750(p, 5, -1);
+            PlayMobySound(5, 0, moby);
+            SetMobyState(moby, 5, -1);
         } else {
-            func_002A7750(p, 2, -1);
+            SetMobyState(moby, 2, -1);
         }
         break;
     case 4:
         if (path->f56) {
             if (path->last != path->current) {
-                *(u16 *)(q + 0x52) = *(u16 *)(q + 0x5C);
-                func_L03_003E2EC8(p);
-                func_002E5CF8(2, 0, p);
+                *(u16 *)(vars + 0x52) = *(u16 *)(vars + 0x5C);
+                UpdateChoicePath(moby);
+                PlayMobySound(2, 0, moby);
             } else {
                 path->active = 0;
                 path->maximumLength = 0;
                 path->timer = D_L03_001B0B5C;
-                func_002A7750(p, 2, -1);
+                SetMobyState(moby, 2, -1);
             }
         } else {
-            func_L03_003E3678(p);
+            AnimatePathPuzzleTurn(moby);
         }
         break;
     case 5:
-        if (func_002B3868(p))
-            *(u16 *)(p + 0x96) = 120;
-        if (!*(u16 *)(p + 0x96)) {
+        if (SetFirstPendingFlag(moby))
+            *(u16 *)(moby + 0x96) = 120;
+        if (!*(u16 *)(moby + 0x96)) {
             D_0018D090[0] = 65535;
-            func_L03_003E5218(D_L03_001AC040);
+            SetMobyFlagOn(D_L03_001AC040);
             goto exit;
         } else {
-            --*(u16 *)(p + 0x96);
+            --*(u16 *)(moby + 0x96);
         }
         break;
     }
     if (D_00138324 & 16) {
-        if (p[0x20] == 5)
-            func_L03_003E5218(D_L03_001AC040);
+        if (moby[0x20] == 5)
+            SetMobyFlagOn(D_L03_001AC040);
     exit:
-        func_002B4B70(0, 0);
-        func_0029F338(p);
+        EndSlotRequest(0, 0);
+        MarkMobySpawned(moby);
         return;
     }
-    if (p[0x20] != 5 && path->active)
-        func_00282978(&path->timer);
+    if (moby[0x20] != 5 && path->active)
+        FastDecTimer(&path->timer);
     if (path->active && path->timer) {
-        u8 *r = D_00188660 + *(int *)(q + 0x7C) * 112;
-        if (*(u8 **)(r + 0x88) != p || !r[0x74])
-            *(int *)(q + 0x7C) = func_002E5CF8(3, 4, p);
+        u8 *soundSlot = gSoundState + *(int *)(vars + 0x7C) * 112;
+        if (*(u8 **)(soundSlot + 0x88) != moby || !soundSlot[0x74])
+            *(int *)(vars + 0x7C) = PlayMobySound(3, 4, moby);
     } else {
-        int handle = *(int *)(q + 0x7C);
+        int handle = *(int *)(vars + 0x7C);
         if (handle != -1) {
             int offset = handle * 112;
-            u8 *r = D_00188660 + offset;
-            if (*(u8 **)(r + 0x88) == p && r[0x74])
-                func_002E59F8(handle);
+            u8 *soundSlot = gSoundState + offset;
+            if (*(u8 **)(soundSlot + 0x88) == moby && soundSlot[0x74])
+                StopSoundVoice(handle);
         }
-        *(int *)(q + 0x7C) = -1;
+        *(int *)(vars + 0x7C) = -1;
     }
-    func_L03_003E4588(p);
-    *(float *)(q + 0x58) -= D_L03_001B0B74 * 0.016666667f;
-    if (*(float *)(q + 0x58) < -1.0f)
-        *(float *)(q + 0x58) += 1.0f;
-    func_L00_002E6CF0(func_L03_003E3A00, p);
+    UpdatePathPuzzleGlowColor(moby);
+    *(float *)(vars + 0x58) -= D_L03_001B0B74 * 0.016666667f;
+    if (*(float *)(vars + 0x58) < -1.0f)
+        *(float *)(vars + 0x58) += 1.0f;
+    AddDrawCallbackToList1(DrawPathPuzzleHud, moby);
 }

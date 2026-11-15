@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002B41A8 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt). The default vectors
@@ -14,7 +15,8 @@ extern const Vec3_2B41A8 D_001AA060, D_001AA070, D_001AA080, D_001AA090, D_001AA
 extern float func_002A7940(void);
 extern void func_00283098(void *, void *, void *);
 
-void func_002B41A8(char *obj, char *dst, char *p2, char *p3, float *p4, float *p5, float *p6, float *p7,
+/* Fills in a movement controller block, using the given values or built-in defaults for each setting. */
+void func_002B41A8(char *obj, char *dst, char *origin, char *rotation, float *p4, float *p5, float *p6, float *p7,
                    float *p8, float *p9, float *p10)
 {
     Vec3_2B41A8 v0, v1, v2, v3, v4, v5, v6;
@@ -29,15 +31,15 @@ void func_002B41A8(char *obj, char *dst, char *p2, char *p3, float *p4, float *p
     v5 = D_001AA090;
     *(unsigned short *)(obj + 0x34) |= 0x100;
     v6 = D_001AA0B0;
-    if (p2 != 0) {
-        func_00283098(dst, p2, obj + 0xC0);
-        func_00282CC0(dst, dst, obj + 0x10);
-        *(TI16_2B41A8 *)(dst + 0x10) = *(TI16_2B41A8 *)p2;
+    if (origin != 0) {
+        matrix_mul_vec3(dst, origin, obj + 0xC0);
+        FastVecAdd(dst, dst, obj + 0x10);
+        *(TI16_2B41A8 *)(dst + 0x10) = *(TI16_2B41A8 *)origin;
     } else {
         *(TI16_2B41A8 *)dst = *(TI16_2B41A8 *)(obj + 0x10);
     }
-    if (p3 != 0) {
-        *(TI16_2B41A8 *)(dst + 0x20) = *(TI16_2B41A8 *)p3;
+    if (rotation != 0) {
+        *(TI16_2B41A8 *)(dst + 0x20) = *(TI16_2B41A8 *)rotation;
     } else {
         *(TI16_2B41A8 *)(dst + 0x20) = *(TI16_2B41A8 *)(obj + 0xF0);
     }
@@ -69,7 +71,7 @@ void func_002B41A8(char *obj, char *dst, char *p2, char *p3, float *p4, float *p
         *o2++ = *e++;
         *o3++ = *b++;
         *o4++ = *c++;
-        *o5++ = func_002A7940();
+        *o5++ = RandomAngle();
         *o6++ = *f++;
         *o7++ = *g++ * 0.00029088825f;
     }

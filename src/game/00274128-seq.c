@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_00278FC0 is kept apart from 00274128.c because it calls func_00279988, which that
    unit defines but which only the boot program places: in the levels the call goes to each
    level's own copy, so it has to stay an external reference here. */
@@ -54,6 +55,7 @@ extern int func_00279988(void);
 extern void func_002AA2E8(float *p, float a, float b);
 extern void func_002E4AC8(void);
 
+/* Runs the disc-streamed picture sequence: loads rows and frames from disc step by step and times each one. */
 void func_00278FC0(void)
 {
     if (D_00138324 & 2) {
@@ -61,33 +63,33 @@ void func_00278FC0(void)
             D_001B7F80.row = 1;
             ref_L00_002E38F0_00 = 1;
         }
-        func_002B4B70(0, 0);
+        EndSlotRequest(0, 0);
     }
     switch (D_001B7F80.state) {
     case 0:
         if (D_001A63AC)
             break;
-        func_00279790(0x33C0, 0x33C1, 0x33EA, 1, 40, 120, 1, 9, 32, 100, 0);
-        func_00279790(0x33C0, 0x33EB, 0x340D, 2, 40, 120, 1, 9, 32, 100, 1);
-        func_00279790(0x340E, 0x340F, 0x340F, 3, 100, 160, 0, 1, 54, 200, 2);
-        func_00279790(0x3488, 0x3489, 0x3489, 4, 100, 160, 0, 1, 36, 200, 3);
-        func_00279790(0x3410, 0x3412, 0x341E, 5, 40, 120, 0, 5, 56, 300, 4);
-        func_00279790(0x3410, 0x3420, 0x3422, 6, 40, 120, 0, 5, 56, 300, 5);
-        func_00279790(0x3410, 0x3424, 0x3426, 7, 40, 120, 0, 5, 56, 300, 6);
-        func_00279790(0x3410, 0x342D, 0x342E, 8, 40, 120, 0, 5, 56, 300, 7);
-        func_00279790(0x342F, 0x3430, 0x3453, 9, 60, 120, 1, 9, 32, 100, 8);
-        func_00279790(0x34B9, 0x34B9, 0x34B9, 10, 200, 512, 0, 0, 36, 200, 9);
-        func_00279790(0x348A, 0x348B, 0x348C, 11, 60, 120, 0, 2, 130, 200, 10);
-        func_00279790(0x348A, 0x348D, 0x348D, 12, 60, 120, 0, 1, 260, 200, 11);
-        func_00279790(0x348A, 0x348E, 0x348F, 13, 60, 120, 0, 2, 130, 200, 12);
-        func_00279790(0x348A, 0x3490, 0x3493, 14, 60, 120, 0, 2, 130, 200, 13);
-        func_00279790(0x348A, 0x3494, 0x3494, 15, 60, 120, 0, 3, 100, 200, 14);
-        func_00279790(0x348A, 0x3495, 0x349A, 16, 60, 120, 0, 2, 130, 200, 15);
-        func_00279790(0x349B, 0x3412, 0x3412, 17, 200, 512, 0, 1, 36, 200, 16);
-        func_00279790(0x34B7, 0x3412, 0x3412, 0, 80, 512, 0, 1, 36, 550, 17);
-        func_00279790(0x349D, 0x349E, 0x34B5, 18, 60, 120, 1, 8, 32, 100, 18);
-        func_00279790(0x349D, 0x34B6, 0x34B6, 19, 60, 120, 0, 1, 128, 350, 19);
-        func_00279790(0x34D0, 0x34D0, 0x34D0, 0, 200, 512, 0, 1, 128, 350, 20);
+        SetTableSlotValues(0x33C0, 0x33C1, 0x33EA, 1, 40, 120, 1, 9, 32, 100, 0);
+        SetTableSlotValues(0x33C0, 0x33EB, 0x340D, 2, 40, 120, 1, 9, 32, 100, 1);
+        SetTableSlotValues(0x340E, 0x340F, 0x340F, 3, 100, 160, 0, 1, 54, 200, 2);
+        SetTableSlotValues(0x3488, 0x3489, 0x3489, 4, 100, 160, 0, 1, 36, 200, 3);
+        SetTableSlotValues(0x3410, 0x3412, 0x341E, 5, 40, 120, 0, 5, 56, 300, 4);
+        SetTableSlotValues(0x3410, 0x3420, 0x3422, 6, 40, 120, 0, 5, 56, 300, 5);
+        SetTableSlotValues(0x3410, 0x3424, 0x3426, 7, 40, 120, 0, 5, 56, 300, 6);
+        SetTableSlotValues(0x3410, 0x342D, 0x342E, 8, 40, 120, 0, 5, 56, 300, 7);
+        SetTableSlotValues(0x342F, 0x3430, 0x3453, 9, 60, 120, 1, 9, 32, 100, 8);
+        SetTableSlotValues(0x34B9, 0x34B9, 0x34B9, 10, 200, 512, 0, 0, 36, 200, 9);
+        SetTableSlotValues(0x348A, 0x348B, 0x348C, 11, 60, 120, 0, 2, 130, 200, 10);
+        SetTableSlotValues(0x348A, 0x348D, 0x348D, 12, 60, 120, 0, 1, 260, 200, 11);
+        SetTableSlotValues(0x348A, 0x348E, 0x348F, 13, 60, 120, 0, 2, 130, 200, 12);
+        SetTableSlotValues(0x348A, 0x3490, 0x3493, 14, 60, 120, 0, 2, 130, 200, 13);
+        SetTableSlotValues(0x348A, 0x3494, 0x3494, 15, 60, 120, 0, 3, 100, 200, 14);
+        SetTableSlotValues(0x348A, 0x3495, 0x349A, 16, 60, 120, 0, 2, 130, 200, 15);
+        SetTableSlotValues(0x349B, 0x3412, 0x3412, 17, 200, 512, 0, 1, 36, 200, 16);
+        SetTableSlotValues(0x34B7, 0x3412, 0x3412, 0, 80, 512, 0, 1, 36, 550, 17);
+        SetTableSlotValues(0x349D, 0x349E, 0x34B5, 18, 60, 120, 1, 8, 32, 100, 18);
+        SetTableSlotValues(0x349D, 0x34B6, 0x34B6, 19, 60, 120, 0, 1, 128, 350, 19);
+        SetTableSlotValues(0x34D0, 0x34D0, 0x34D0, 0, 200, 512, 0, 1, 128, 350, 20);
         D_001B8308.count = 21;
         D_001B7F80.frame = 0;
         D_001B7F80.buffer_index = 0;
@@ -97,20 +99,20 @@ void func_00278FC0(void)
         D_001B7F80.timer = 90;
         D_001B7F80.step = 10;
         D_001B7F80.base = 310;
-        D_001B7F80.duration = (float)D_001A7340 * 2.2f;
+        D_001B7F80.duration = (float)gScreenWidth * 2.2f;
         D_001B7F80.rate = 0.16129032f;
         D_001B7F80.repeats = 5;
         D_001B7F80.speed = 0.03f;
         D_001B7F80.limit = 18;
-        func_002B7B18(D_001B7F80.buffers[2], D_0014B540.intro.offset + D_0014B540.base,
-                      D_0014B540.intro.size);
+        StartDiscRead(D_001B7F80.buffers[2], gCopySetupData.intro.offset + gCopySetupData.base,
+                      gCopySetupData.intro.size);
         D_001B7F80.state = 1;
         break;
     case 1:
         if (D_001A63AC)
             break;
-        if (func_00282948(&D_001B7F80.timer)) {
-            func_00279828();
+        if (FastFloatHelperD(&D_001B7F80.timer)) {
+            RelocateDataTableOffsets();
             D_001B7F80.state = 2;
         }
         break;
@@ -118,9 +120,9 @@ void func_00278FC0(void)
         SeqState278fc0 *s = &D_001B7F80;
         if (s->frame >= 20)
             s->frame %= 20;
-        func_002B7B18(s->buffers[s->buffer_index],
-                      D_0014B540.frames[s->frame].offset + D_0014B540.base,
-                      D_0014B540.frames[s->frame].size);
+        StartDiscRead(s->buffers[s->buffer_index],
+                      gCopySetupData.frames[s->frame].offset + gCopySetupData.base,
+                      gCopySetupData.frames[s->frame].size);
         s->state = 3;
         break;
     }
@@ -131,7 +133,7 @@ void func_00278FC0(void)
         s = &D_001B7F80;
         s->ready = 1;
         s->buffer_index ^= 1;
-        if (func_002799A8()) {
+        if (AdvanceToNextItemGroup()) {
             s->state = 4;
             switch (D_001B8308.rows[s->row].kind) {
             case 0:
@@ -149,8 +151,8 @@ void func_00278FC0(void)
     }
     case 4: {
         SeqState278fc0 *s;
-        func_002AA2E8(&D_001B15A0, 0.0f, 0.06666667f);
-        if (func_00279988()) {
+        ApproachValue(&gScreenFade, 0.0f, 0.06666667f);
+        if (QuerySharedDataBlock()) {
             s = &D_001B7F80;
             s->state = 2;
             s->frame = D_001B8308.rows[s->row].frame;
@@ -158,8 +160,8 @@ void func_00278FC0(void)
         break;
     }
     case 5:
-        func_002B4B70(0, 0);
+        EndSlotRequest(0, 0);
         break;
     }
-    func_002E4AC8();
+    UpdateSoundVoices();
 }

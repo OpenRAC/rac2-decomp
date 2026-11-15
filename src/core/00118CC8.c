@@ -1,3 +1,4 @@
+#include "names.h"
 /* VfprintfDispatch (symbol_addrs/usa-v2 0x00118cc8, size 0xCC): the split
    newlib/SDK printf picks its engine from the format string. It scans for a
    conversion and, when the conversion is one of the floating point set
@@ -10,6 +11,7 @@ extern int func_00118D98(void *arg0, void *arg1, char *arg2, void *arg3);
 
 extern int func_00119BF8(void *arg0, void *arg1, char *arg2, void *arg3);
 
+/* Looks at the format string and picks the float-capable or the integer-only print routine. */
 int func_00118CC8(void *fp, char *fmt, void *ap) {
     char *p;
 
@@ -26,9 +28,9 @@ int func_00118CC8(void *fp, char *fmt, void *ap) {
             case 'e':
             case 'f':
             case 'g':
-                return func_00118D98(*(void **)((char *)fp + 0x54), fp, fmt, ap);
+                return VfprintfFloat(*(void **)((char *)fp + 0x54), fp, fmt, ap);
             }
         }
     }
-    return func_00119BF8(*(void **)((char *)fp + 0x54), fp, fmt, ap);
+    return VfprintfInteger(*(void **)((char *)fp + 0x54), fp, fmt, ap);
 }

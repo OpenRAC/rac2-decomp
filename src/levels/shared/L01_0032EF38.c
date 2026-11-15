@@ -31,29 +31,30 @@ extern int func_002A77E0(int);
 extern float func_00283CE0(int);
 extern unsigned char *D_L01_001FF110;
 
+/* Creates a short-lived glowing particle at a position with a color, size and lifetime, and returns it. */
 L01_EF38Particle *func_L01_0032EF38(L01_EF38Quad *position, int color, int kind, float scale, float second, int life)
 {
-    L01_EF38Particle *p;
-    L01_EF38Payload *out;
+    L01_EF38Particle *particle;
+    L01_EF38Payload *outPayload;
 
-    p = func_002B9030(0x34);
-    if (p) {
-        out = &p->payload;
-        qcopy(&p->position, position);
-        p->color = color;
-        p->b3 = 0x44;
-        p->position.f[2] = p->position.f[2] + 0.05f;
-        p->alpha = func_00283CF0(2.0f) + 32;
-        p->b1 = 1;
-        p->b2 = *D_L01_001FF110;
-        p->size = life;
-        p->life = scale * 210000.0f;
-        p->seed = func_002A77E0(255);
-        out->color = color;
-        out->kind = kind;
-        p->payload.scale = scale;
-        out->second = second;
-        out->rate = 1.0f / func_00283CE0(life);
+    particle = AllocParticle(0x34);
+    if (particle) {
+        outPayload = &particle->payload;
+        qcopy(&particle->position, position);
+        particle->color = color;
+        particle->b3 = 0x44;
+        particle->position.f[2] = particle->position.f[2] + 0.05f;
+        particle->alpha = FloatToInt(2.0f) + 32;
+        particle->b1 = 1;
+        particle->b2 = *D_L01_001FF110;
+        particle->size = life;
+        particle->life = scale * 210000.0f;
+        particle->seed = RandomIntBelow(255);
+        outPayload->color = color;
+        outPayload->kind = kind;
+        particle->payload.scale = scale;
+        outPayload->second = second;
+        outPayload->rate = 1.0f / IntToFloat(life);
     }
-    return p;
+    return particle;
 }

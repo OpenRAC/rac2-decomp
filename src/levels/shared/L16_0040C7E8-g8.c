@@ -9,6 +9,7 @@ extern ObjectPoolRecord256 *D_L16_001B2B1C __attribute__((sda));
 typedef struct { char prefix[0x30]; Quad position; char rest[0x40]; } PointPoolRecord128;
 extern PointPoolRecord128 *D_L16_001B2C0C __attribute__((nosda));
 typedef struct { int pointIndex; int objectIndex; } PositionChoice;
+/* Looks up the position of the launch target, either a point or an object, and copies it out. */
 void func_L16_0040C7E8(char *object, Vector *destination) {
     PositionChoice *choice=*(PositionChoice **)(object+0x68);
     int index=choice->objectIndex;

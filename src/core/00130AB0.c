@@ -26,6 +26,7 @@ extern void func_00130B18(unsigned int);
  * with a frame of its own the last call stayed a `jal` plus a full
  * epilogue, 3 words over (0x70 against 0x64).
  */
+/* Safely writes the control register of the picture output DMA channel. */
 void func_00130AB0(unsigned int chcr) {
     r1_func_0011D960();
     D_ENABLEW = D_ENABLER | 0x10000;
@@ -35,6 +36,7 @@ void func_00130AB0(unsigned int chcr) {
 }
 
 /* rac1-decomp src/core/0012CC90.c: func_0012CCF8 */
+/* Safely writes the control register of the picture input DMA channel. */
 void func_00130B18(unsigned int chcr) {
     r1_func_0011D960();
     D_ENABLEW = D_ENABLER | 0x10000;

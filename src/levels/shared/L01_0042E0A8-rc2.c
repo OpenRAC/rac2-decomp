@@ -36,9 +36,10 @@ void ref_L01_0042E0A8_01(void *, void *, void *);
 void ref_L01_0042E0A8_02(void *, void *, void *);
 void ref_L01_0042E0A8_03(s32, s32);
 
-void func_L01_0042E0A8(void *arg0) {
-    u8 *self  = (u8 *)arg0;
-    s32 *state  = (*(s32 *)((s8 *)(arg0) + (8)));
+/* Checks if the player is inside a box around the moby and calls one of two actions when the player leaves on a side. */
+void func_L01_0042E0A8(void *moby) {
+    u8 *self  = (u8 *)moby;
+    s32 *state  = (*(s32 *)((s8 *)(moby) + (8)));
     f32 limit  = 1.0f;
     vec4_local input;
     vec4_local transformed;

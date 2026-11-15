@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L25_003752D8, func_L25_00376FE0 and func_L25_00377608 live in the sibling
    small-data unit (L25_00373ED0-g8.c): their loop counts are read through $gp. */
@@ -29,40 +30,40 @@ extern void func_L05_0037AE40(char *a0);
 
 /* The moby's death timer: it ticks the stored time down and, once it reaches zero,
    fires the object's effect and takes the moby down, which it reports. */
-int func_L25_0040DCD0(char *obj, int flag)
+int func_L25_0040DCD0(char *objectMoby, int flag)
 {
-    char *s0;
-    float *s2;
-    char *s3;
-    char *v;
+    char *effectLink;
+    float *timerPtr;
+    char *frameInfo;
+    char *vars;
     int ret = 0;
 
-    s3 = func_002A9640(obj, 0x230000, 0);
-    *(unsigned char *)(obj + 0xA8) = 0xFF;
-    v = *(char **)(obj + 0x68);
-    s0 = *(char **)(v + 0x10);
-    s2 = *(float **)(v + 0x0);
-    if (s0 != 0) {
-        func_002AB8C0(obj, s0);
+    frameInfo = FindOwnedEffectSlot(objectMoby, 0x230000, 0);
+    *(unsigned char *)(objectMoby + 0xA8) = 0xFF;
+    vars = *(char **)(objectMoby + 0x68);
+    effectLink = *(char **)(vars + 0x10);
+    timerPtr = *(float **)(vars + 0x0);
+    if (effectLink != 0) {
+        UpdateColorFade(objectMoby, effectLink);
     }
-    if (s3 != 0) {
-        if (s0 != 0) {
-            *(unsigned char *)(s0 + 7) = 0xFF;
-            func_002AB800(obj, s0);
+    if (frameInfo != 0) {
+        if (effectLink != 0) {
+            *(unsigned char *)(effectLink + 7) = 0xFF;
+            StartColorFade(objectMoby, effectLink);
         }
-        *s2 = *s2 - *(float *)(s3 + 0x2C);
-        if (*(short *)(obj + 0xAA) != 0xB73) {
-            func_002E5DA0(2, 0, obj, 0x957);
+        *timerPtr = *timerPtr - *(float *)(frameInfo + 0x2C);
+        if (*(short *)(objectMoby + 0xAA) != 0xB73 /* moby class 2931 */) {
+            PlaySoundFromClassBank(2, 0, objectMoby, 0x957);
         }
-        if (*s2 <= 0.0f) {
-            *s2 = 0.0f;
-            func_L05_00424990(obj + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
-            func_L05_00421908(obj, 1, 0x19);
-            if (func_L05_0037BBB8(obj)) {
-                func_L05_0037BE98(obj);
+        if (*timerPtr <= 0.0f) {
+            *timerPtr = 0.0f;
+            SpawnShockwaveBurst(objectMoby + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.5f);
+            func_L05_00421908(objectMoby, 1, 0x19);
+            if (IsObjectInUse(objectMoby)) {
+                ReleaseObjectFromGroup(objectMoby);
             }
             if (flag == 0) {
-                func_L05_0037AE40(obj);
+                ResetObjectActionState(objectMoby);
             }
             ret = 1;
         }

@@ -16,7 +16,7 @@ void func_L05_00416E08(char *object)
         break;
     case 1:
         qcopy(object + 0xC0, src + 0xC0);
-        func_00282D30(object + 0xD0, src + 0xD0, -1.0f);
+        FastVecScale(object + 0xD0, src + 0xD0, -1.0f);
         break;
     default:
         return;

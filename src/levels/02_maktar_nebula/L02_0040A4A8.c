@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -76,161 +77,167 @@ extern void func_002B60B0_1(void *, float, float, float, float);
    +0x2E0 handle. Retail passes the actor to func_002B60B0 (a0 is reloaded before the call), which
    the four-float declaration at the top of the file leaves out: the second name carries the
    five-argument prototype. */
-void func_L02_0040B0F8(u8 *a0) {
-    u8 *s1 = *(u8 **)(a0 + 0x68);
-    float m[16];
-    float f;
-    u8 *p;
-    u8 *rec;
-    u8 *other;
-    short cls;
+/* Common per-frame work for the flamethrower robot: sets its starting values on the first frame, makes it glow when the player is close and checks what hit it. */
+void func_L02_0040B0F8(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    float matrix[16];
+    float turnRate;
+    u8 *glowPoint;
+    u8 *hitRecord;
+    u8 *hitOwner;
+    short hitClass;
 
-    if (a0[0x20] == 0) {
-        *(u8 **)(s1 + 0x18) = s1 + 0x100;
-        s1[0x48] = func_00283CF0(15.0f);
-        s1[0x4A] = func_00283CF0(12.0f);
-        f = func_002A7878(15.0f, 40.0f) * 0.01745329424738884f;
-        if (func_002A77E0(2) != 0)
-            f = -f;
-        *(float *)(s1 + 0x2D8) = f;
-        if (func_002A77E0(2) == 1)
-            *(u16 *)(a0 + 0x34) = *(u16 *)(a0 + 0x34) | 0x8000;
-        s1[0x60] = 8;
-        *(float *)(s1 + 0x80) = 0.5f;
-        *(float *)(s1 + 0x84) = 0.5f;
-        *(float *)(s1 + 0x8C) = 0.4f;
-        *(int *)(s1 + 0x98) = 4;
-        *(float *)(s1 + 0x100) = 0.8f;
-        *(float *)(s1 + 0x104) = 0.5f;
-        *(float *)(s1 + 0x108) = 0.4f;
-        *(float *)(s1 + 0x10C) = 0.4f;
-        *(float *)(s1 + 0x110) = 1.5707965f;
-        *(float *)(s1 + 0x130) = 0.52359885f;
-        *(float *)(s1 + 0x12C) = 0.0055555557f;
-        func_002B60B0_1(a0, 0.004444444552063942f, 0.13333334028720856f,
+    if (moby[0x20] == 0) {
+        *(u8 **)(vars + 0x18) = vars + 0x100;
+        vars[0x48] = FloatToInt(15.0f);
+        vars[0x4A] = FloatToInt(12.0f);
+        turnRate = RandomFloatRange(15.0f, 40.0f) * 0.01745329424738884f;
+        if (RandomIntBelow(2) != 0)
+            turnRate = -turnRate;
+        *(float *)(vars + 0x2D8) = turnRate;
+        if (RandomIntBelow(2) == 1)
+            *(u16 *)(moby + 0x34) = *(u16 *)(moby + 0x34) | 0x8000;
+        vars[0x60] = 8;
+        *(float *)(vars + 0x80) = 0.5f;
+        *(float *)(vars + 0x84) = 0.5f;
+        *(float *)(vars + 0x8C) = 0.4f;
+        *(int *)(vars + 0x98) = 4;
+        *(float *)(vars + 0x100) = 0.8f;
+        *(float *)(vars + 0x104) = 0.5f;
+        *(float *)(vars + 0x108) = 0.4f;
+        *(float *)(vars + 0x10C) = 0.4f;
+        *(float *)(vars + 0x110) = 1.5707965f;
+        *(float *)(vars + 0x130) = 0.52359885f;
+        *(float *)(vars + 0x12C) = 0.0055555557f;
+        func_002B60B0_1(moby, 0.004444444552063942f, 0.13333334028720856f,
                         0.0011635529808700085f, 0.10471977293491364f);
-        s1[0x28] = 3;
-        func_L02_0040B980(a0);
+        vars[0x28] = 3;
+        KnockOutFlamethrowerRobot(moby);
     }
-    if (a0[0x31] != 0) {
-        if (func_00282E48(a0 + 0x10, D_L02_001BA500) < 24.0f) {
-            func_002A93B0(a0);
-            a0[0x6F] = 0x16;
+    if (moby[0x31] != 0) {
+        if (fast_vec_dist(moby + 0x10, gCameraPosition_L02) < 24.0f) {
+            UpdateMobyGroundCheck(moby);
+            moby[0x6F] = 0x16;
         }
     }
-    func_0029FCC0(a0, 1, s1 + 0x290);
-    p = s1 + 0x2B0;
-    func_0029FCC0(a0, 2, s1 + 0x2A0);
-    func_0029FC20(a0, 3, m);
-    func_00282C88(p);
-    *(float *)(s1 + 0x2B0) = 0.25f;
-    *(int *)(s1 + 0x2B8) = 0;
-    func_002830C0(p, p, m);
-    func_00282CC0(p, p, m + 12);
-    if (a0[0x31] != 0 && a0[0x20] >= 3) {
-        rec = func_002A9640(a0, 0x10000, 1);
-        if (rec != 0) {
-            other = *(u8 **)(rec + 0x20);
-            if (other != 0 && a0[0x31] == 0) {
-                cls = *(short *)(other + 0xAA);
-                if (cls == 0xA03 || cls == 0xB89)
-                    *(int *)(rec + 0x2C) = 0;
+    TransformMobyJointToWorld(moby, 1, vars + 0x290);
+    glowPoint = vars + 0x2B0;
+    TransformMobyJointToWorld(moby, 2, vars + 0x2A0);
+    TransformMobyJointPoint(moby, 3, matrix);
+    ClearVector128(glowPoint);
+    *(float *)(vars + 0x2B0) = 0.25f;
+    *(int *)(vars + 0x2B8) = 0;
+    transform_vector(glowPoint, glowPoint, matrix);
+    FastVecAdd(glowPoint, glowPoint, matrix + 12);
+    if (moby[0x31] != 0 && moby[0x20] >= 3) {
+        hitRecord = FindOwnedEffectSlot(moby, 0x10000, 1);
+        if (hitRecord != 0) {
+            hitOwner = *(u8 **)(hitRecord + 0x20);
+            if (hitOwner != 0 && moby[0x31] == 0) {
+                hitClass = *(short *)(hitOwner + 0xAA);
+                if (hitClass == 0xA03 /* moby class 2563 */ || hitClass == 0xB89 /* moby class 2953 */)
+                    *(int *)(hitRecord + 0x2C) = 0;
             }
         }
-        if (func_002B0ED8(a0, s1 + 0x50, 0) == 5) {
-            *(int *)(s1 + 0xE0) = 0;
-            *(float *)(s1 + 0xE4) = 0.8377582f;
+        if (ApplyDamageToObject(moby, vars + 0x50, 0) == 5) {
+            *(int *)(vars + 0xE0) = 0;
+            *(float *)(vars + 0xE4) = 0.8377582f;
         }
-        if (a0[0x20] >= 2 && s1[0x2E] == 2)
-            func_L02_0040B980(a0);
-        *(s16 *)(s1 + 0x2E0) = func_002B3BA8(a0, *(u32 *)(s1 + 0x2DC), 100.0f, 100.0f, 0, 0);
-        *(int *)(s1 + 0x2D4) = *(int *)(s1 + 0x200);
+        if (moby[0x20] >= 2 && vars[0x2E] == 2)
+            KnockOutFlamethrowerRobot(moby);
+        *(s16 *)(vars + 0x2E0) = SelectAimTarget_002B3BA8(moby, *(u32 *)(vars + 0x2DC), 100.0f, 100.0f, 0, 0);
+        *(int *)(vars + 0x2D4) = *(int *)(vars + 0x200);
     }
 }
 
 /* arms one actor: raises its counter, then two setup calls */
-void func_L02_0040B420(u8 *a0) {
-    u8 *q = *(u8 **)(a0 + 0x68);
+/* Counts up the robot's frame timer and updates its damage and hit effects. */
+void func_L02_0040B420(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (*(u16 *)(a0 + 0x96) <= 0xFFFE)
-        *(u16 *)(a0 + 0x96) = *(u16 *)(a0 + 0x96) + 1;
-    func_002B0990(a0, q + 0x210, 5, 1, 2.5f);
-    func_002A8C28(a0, a0 + 0x10, 0x4000000, 1.3f, 1.0f, 1.0f, 0, 1, 0);
+    if (*(u16 *)(moby + 0x96) <= 0xFFFE)
+        *(u16 *)(moby + 0x96) = *(u16 *)(moby + 0x96) + 1;
+    SetValueAndStartSmoothChange(moby, vars + 0x210, 5, 1, 2.5f);
+    SweepCollisionFromObject(moby, moby + 0x10, 0x4000000, 1.3f, 1.0f, 1.0f, 0, 1, 0);
 }
 
 /* starts the three effect tracks of the actor */
-void func_L02_0040B4B0(u8 *a0) {
-    u8 *s1 = *(u8 **)(a0 + 0x68);
+/* Draws the three glowing trails on the robot once it is awake. */
+void func_L02_0040B4B0(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (a0[0x95] != 0) {
-        func_L00_003D7250(a0, s1 + 0x290, 0.125f, 0x36F6, 0x20000000, 0x20000000);
-        func_L00_003D7250(a0, s1 + 0x2A0, 0.15f, 0x1050B0, 0x30000000, 0x20000000);
-        func_L00_003D7250(a0, s1 + 0x2B0, 0.15f, 0x1050B0, 0x10000000, 0x30000000);
+    if (moby[0x95] != 0) {
+        DrawTwoLayerGlowSprite(moby, vars + 0x290, 0.125f, 0x36F6, 0x20000000, 0x20000000);
+        DrawTwoLayerGlowSprite(moby, vars + 0x2A0, 0.15f, 0x1050B0, 0x30000000, 0x20000000);
+        DrawTwoLayerGlowSprite(moby, vars + 0x2B0, 0.15f, 0x1050B0, 0x10000000, 0x30000000);
     }
 }
 
 /* brings the actor into its armed state */
-void func_L02_0040B868(u8 *a0, int a1) {
-    u8 *s0 = *(u8 **)(a0 + 0x68);
+/* Wakes the robot up: restores its health and puts it in its active state. */
+void func_L02_0040B868(u8 *moby, int alertDelay) {
+    u8 *vars = *(u8 **)(moby + 0x68);
     int one = 1;
-    u32 v;
+    u32 flags;
 
-    *(float *)(s0 + 0x20) = (float)*(s16 *)(s0 + 0x24);
-    *(u16 *)(s0 + 0x2E2) = one;
-    func_002B60B0(a0, 0.004444444552063942f, 0.13333334028720856f,
+    *(float *)(vars + 0x20) = (float)*(s16 *)(vars + 0x24);
+    *(u16 *)(vars + 0x2E2) = one;
+    SetControllerSpeedLimits(moby, 0.004444444552063942f, 0.13333334028720856f,
                   0.0011635529808700085f, 0.10471977293491364f);
-    func_002A7750(a0, 3, 1);
-    if (*(u8 *)(a0 + 0x43) != 2)
-        func_002A7470(a0, 2, 0, 0);
-    *(u32 *)(a0 + 0x98) = *(u32 *)(*(u32 *)(a0 + 0x24) + 0x10);
-    *(u8 *)(s0 + 0x6A) = 0;
-    *(u8 *)(s0 + 0x2E) = one;
-    *(u8 *)(a0 + 0x31) = one;
-    v = *(u16 *)(a0 + 0x34);
-    *(u8 *)(a0 + 0x7F) = 0;
-    *(u16 *)(a0 + 0x34) = (v | 0x1000) & 0xFFB8;
-    *(u16 *)(s0 + 0x2E8) = a1;
-    *(u16 *)(s0 + 0x88) = 0;
-    if (*(s16 *)(s0 + 0x50) != 0) {
-        *(u16 *)(s0 + 0x50) = 0;
-        func_002A0488(a0, *(u8 *)(s0 + 0x54), *(u8 *)(s0 + 0x55), *(u8 *)(s0 + 0x56));
-        *(u16 *)(s0 + 0x52) = one;
+    SetMobyState(moby, 3, 1);
+    if (*(u8 *)(moby + 0x43) != 2)
+        StartAnimationBlended(moby, 2, 0, 0);
+    *(u32 *)(moby + 0x98) = *(u32 *)(*(u32 *)(moby + 0x24) + 0x10);
+    *(u8 *)(vars + 0x6A) = 0;
+    *(u8 *)(vars + 0x2E) = one;
+    *(u8 *)(moby + 0x31) = one;
+    flags = *(u16 *)(moby + 0x34);
+    *(u8 *)(moby + 0x7F) = 0;
+    *(u16 *)(moby + 0x34) = (flags | 0x1000) & 0xFFB8;
+    *(u16 *)(vars + 0x2E8) = alertDelay;
+    *(u16 *)(vars + 0x88) = 0;
+    if (*(s16 *)(vars + 0x50) != 0) {
+        *(u16 *)(vars + 0x50) = 0;
+        set_moby_color(moby, *(u8 *)(vars + 0x54), *(u8 *)(vars + 0x55), *(u8 *)(vars + 0x56));
+        *(u16 *)(vars + 0x52) = one;
     }
 }
 
 /* arms the actor: its two effect tracks, then the shared state resets */
-void func_L02_0040B980(u8 *a0) {
-    u8 *s1 = *(u8 **)(a0 + 0x68);
-    float buf[3];
+/* Knocks the robot out: plays the blast effect and sound, then puts it back in its idle state. */
+void func_L02_0040B980(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    float burstVelocity[3];
 
-    *(u16 *)(s1 + 0x2E2) = 0;
-    *(u32 *)(s1 + 0x2D4) = 0;
-    if (a0[0x31]) {
-        func_0032C700(a0 + 0x10, 0, 5, 5, 0x19, 0x14, 0xA, 1, 0.5f, 0.0f,
+    *(u16 *)(vars + 0x2E2) = 0;
+    *(u32 *)(vars + 0x2D4) = 0;
+    if (moby[0x31]) {
+        SpawnExplosion(moby + 0x10, 0, 5, 5, 0x19, 0x14, 0xA, 1, 0.5f, 0.0f,
                       1, 0, 0, 0);
-        func_002E5DA0(0, 0, a0, 0xC3E);
-        func_002A7A00(buf, 0.083333335816860199f, 0.11666667461395264f);
-        func_00282CC0(buf, buf, s1 + 0xD0);
-        func_002B0A68(a0, 0xFF, buf, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+        PlaySoundFromClassBank(0, 0, moby, 0xC3E);
+        RandomDirectionVector(burstVelocity, 0.083333335816860199f, 0.11666667461395264f);
+        FastVecAdd(burstVelocity, burstVelocity, vars + 0xD0);
+        SpawnDebrisForMaskedParts(moby, 0xFF, burstVelocity, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     }
-    func_002A7470(a0, 0, 0, 3);
-    func_002A05A8(a0);
-    func_002A7750(a0, 1, 0);
-    *(u8 *)(a0 + 0x31) = 0;
-    *(u32 *)(a0 + 0x98) = 0;
-    *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) & 0xEFFF) | 0x47;
+    StartAnimationBlended(moby, 0, 0, 3);
+    func_002A05A8(moby);
+    SetMobyState(moby, 1, 0);
+    *(u8 *)(moby + 0x31) = 0;
+    *(u32 *)(moby + 0x98) = 0;
+    *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xEFFF) | 0x47;
 }
 
 /* sweeps the two effect tracks of the actor relative to a head position */
 /* func_L02_0040BAB8 is defined in L02_0040BAB8.c. */
 
 /* records the actor's two shot counters, then arms it */
-void func_L02_0040BBA0(u8 *a0) {
-    u8 *t = *(u8 **)(a0 + 0x68);
+/* Remembers what the robot was doing, then makes it turn around. */
+void func_L02_0040BBA0(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    *(u16 *)(t + 0x2E4) = *(u8 *)(a0 + 0x20);
-    *(u16 *)(t + 0x2E6) = *(u8 *)(a0 + 0x95);
-    func_31E6A0(a0, 6, 3);
+    *(u16 *)(vars + 0x2E4) = *(u8 *)(moby + 0x20);
+    *(u16 *)(vars + 0x2E6) = *(u8 *)(moby + 0x95);
+    func_31E6A0(moby, 6, 3);
 }
 
 /* func_L02_0040BE08 is defined in L02_0040BE08-g8.c. */
@@ -238,49 +245,51 @@ void func_L02_0040BBA0(u8 *a0) {
 /* func_L02_0040CAF0 is defined in L02_0040CAF0-g8.c. */
 
 /* steps the actor's state machine, then raises its counter */
-void func_L02_0040CEE8(u8 *a0) {
-    u8 *s0 = *(u8 **)(a0 + 0x68);
+/* Updates the blade ball's hit reaction and counts up its frame timer. */
+void func_L02_0040CEE8(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    func_002AB8C0(a0, s0 + 0x50);
-    if (*(s16 *)(s0 + 0x50) == 0) {
-        if (*(u32 *)(s0 + 0x1AC) == 0) {
-            func_002A0488(a0, *(u32 *)(s0 + 0x1A0), *(u32 *)(s0 + 0x1A4),
-                          *(u32 *)(s0 + 0x1A8));
-            *(u32 *)(s0 + 0x1AC) = 1;
+    UpdateColorFade(moby, vars + 0x50);
+    if (*(s16 *)(vars + 0x50) == 0) {
+        if (*(u32 *)(vars + 0x1AC) == 0) {
+            set_moby_color(moby, *(u32 *)(vars + 0x1A0), *(u32 *)(vars + 0x1A4),
+                          *(u32 *)(vars + 0x1A8));
+            *(u32 *)(vars + 0x1AC) = 1;
         }
     } else {
-        *(u32 *)(s0 + 0x1AC) = 0;
+        *(u32 *)(vars + 0x1AC) = 0;
     }
-    if (*(u16 *)(a0 + 0x96) <= 0xFFFE)
-        *(u16 *)(a0 + 0x96) = *(u16 *)(a0 + 0x96) + 1;
+    if (*(u16 *)(moby + 0x96) <= 0xFFFE)
+        *(u16 *)(moby + 0x96) = *(u16 *)(moby + 0x96) + 1;
 }
 
 /* Updates the actor's halfword at +0x1B8: below kind 4 it only clears it and the word at +0x184;
    while it is 1, or when the flag at +0x31 is set and func_L02_003FC0D0 agrees, it keeps it at 1
    and calls func_002B3BA8 on the slot at +0x1B0; otherwise it clears it and, for kinds 8 and 0xB,
    picks one of two states by the word at +0x180. */
-void func_L02_0040CF68(u8 *a0) {
-    u8 *s1 = *(u8 **)(a0 + 0x68);
+/* Checks whether the blade ball may chase its target. If not, it goes back to patrolling. */
+void func_L02_0040CF68(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (a0[0x20] < 4) {
-        *(u16 *)(s1 + 0x1B8) = 0;
-        *(s32 *)(s1 + 0x184) = 0;
+    if (moby[0x20] < 4) {
+        *(u16 *)(vars + 0x1B8) = 0;
+        *(s32 *)(vars + 0x184) = 0;
     } else {
-        if (*(s16 *)(s1 + 0x1B8) == 1) {
-            *(s16 *)(s1 + 0x1B6) = func_002B3BA8(a0, *(u32 *)(s1 + 0x1B0), 100.0f, 100.0f, 0, 0);
-            *(s32 *)(s1 + 0x184) = *(s32 *)(s1 + 0x160);
+        if (*(s16 *)(vars + 0x1B8) == 1) {
+            *(s16 *)(vars + 0x1B6) = SelectAimTarget_002B3BA8(moby, *(u32 *)(vars + 0x1B0), 100.0f, 100.0f, 0, 0);
+            *(s32 *)(vars + 0x184) = *(s32 *)(vars + 0x160);
         } else {
-            if (a0[0x31] != 0 && func_L02_003FC0D0(*(void **)(a0 + 0xB8), *(s16 *)(a0 + 0xAA)) != 0) {
-                *(u16 *)(s1 + 0x1B8) = 1;
-                *(s16 *)(s1 + 0x1B6) = func_002B3BA8(a0, *(u32 *)(s1 + 0x1B0), 100.0f, 100.0f, 0, 0);
-                *(s32 *)(s1 + 0x184) = *(s32 *)(s1 + 0x160);
+            if (moby[0x31] != 0 && TakeEnemyQuota(*(void **)(moby + 0xB8), *(s16 *)(moby + 0xAA)) != 0) {
+                *(u16 *)(vars + 0x1B8) = 1;
+                *(s16 *)(vars + 0x1B6) = SelectAimTarget_002B3BA8(moby, *(u32 *)(vars + 0x1B0), 100.0f, 100.0f, 0, 0);
+                *(s32 *)(vars + 0x184) = *(s32 *)(vars + 0x160);
             } else {
-                *(u16 *)(s1 + 0x1B8) = 0;
-                if (a0[0x20] == 0xB || a0[0x20] == 8) {
-                    if (*(s32 *)(s1 + 0x180) != -1)
-                        func_002A7750(a0, 7, 3);
+                *(u16 *)(vars + 0x1B8) = 0;
+                if (moby[0x20] == 0xB || moby[0x20] == 8) {
+                    if (*(s32 *)(vars + 0x180) != -1)
+                        SetMobyState(moby, 7, 3);
                     else
-                        func_002A7750(a0, 5, 2);
+                        SetMobyState(moby, 5, 2);
                 }
             }
         }
@@ -288,61 +297,63 @@ void func_L02_0040CF68(u8 *a0) {
 }
 
 /* resets the actor's aim: three records and the two shared limits */
-void func_L02_0040D080(u8 *a0, int a1) {
-    u8 *s0 = *(u8 **)(a0 + 0x68);
+/* Wakes the blade ball up: restores its health and puts it in its active state. */
+void func_L02_0040D080(u8 *moby, int alertDelay) {
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    *(u16 *)(s0 + 0x1B8) = 0;
-    *(float *)(s0 + 0x20) = (float)*(s16 *)(s0 + 0x24);
-    func_002A7750(a0, 3, 1);
-    if (*(u8 *)(a0 + 0x43) != 0)
-        func_002A7470(a0, 0, 0, 10);
-    *(u32 *)(a0 + 0x98) = *(u32 *)(*(u32 *)(a0 + 0x24) + 0x10);
-    *(u8 *)(s0 + 0x2E) = 1;
-    *(u8 *)(a0 + 0x7F) = 0;
-    *(u8 *)(a0 + 0x31) = 1;
-    *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) | 0x1000) & 0xFFB8;
-    *(float *)(s0 + 0x18C) = func_002A7878(0.0f, 90.0f) * 0.01745329424738884f;
-    *(u16 *)(s0 + 0x1BA) = a1;
-    *(u16 *)(s0 + 0x3C) = 0;
-    *(u32 *)(s0 + 0x38) = 0;
-    if (*(s16 *)(s0 + 0x50) != 0) {
-        *(u16 *)(s0 + 0x50) = 0;
-        func_002A0488(a0, *(u32 *)(s0 + 0x1A0), *(u32 *)(s0 + 0x1A4),
-                      *(u32 *)(s0 + 0x1A8));
-        *(u16 *)(s0 + 0x52) = 1;
+    *(u16 *)(vars + 0x1B8) = 0;
+    *(float *)(vars + 0x20) = (float)*(s16 *)(vars + 0x24);
+    SetMobyState(moby, 3, 1);
+    if (*(u8 *)(moby + 0x43) != 0)
+        StartAnimationBlended(moby, 0, 0, 10);
+    *(u32 *)(moby + 0x98) = *(u32 *)(*(u32 *)(moby + 0x24) + 0x10);
+    *(u8 *)(vars + 0x2E) = 1;
+    *(u8 *)(moby + 0x7F) = 0;
+    *(u8 *)(moby + 0x31) = 1;
+    *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x1000) & 0xFFB8;
+    *(float *)(vars + 0x18C) = RandomFloatRange(0.0f, 90.0f) * 0.01745329424738884f;
+    *(u16 *)(vars + 0x1BA) = alertDelay;
+    *(u16 *)(vars + 0x3C) = 0;
+    *(u32 *)(vars + 0x38) = 0;
+    if (*(s16 *)(vars + 0x50) != 0) {
+        *(u16 *)(vars + 0x50) = 0;
+        set_moby_color(moby, *(u32 *)(vars + 0x1A0), *(u32 *)(vars + 0x1A4),
+                      *(u32 *)(vars + 0x1A8));
+        *(u16 *)(vars + 0x52) = 1;
     }
 }
 
 /* Lets go of the slot the actor holds (+0x19C) when that slot's record still names it and is live,
    ends the state at +0x1B8 when it is 1 (func_L02_003FC1B0), starts the effect pair when the actor
    is shown (+0x31), then clears the state and the shared fields as func_L02_0040B980 does. */
-void func_L02_0040D180(u8 *a0) {
-    u8 *s1 = *(u8 **)(a0 + 0x68);
-    s32 slot = *(s32 *)(s1 + 0x19C);
+/* Blows up the blade ball: stops its sound, plays the blast effect and puts it back in its idle state. */
+void func_L02_0040D180(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    s32 slot = *(s32 *)(vars + 0x19C);
 
     if (slot != -1) {
-        u8 *rec = (u8 *)D_L02_00188660 + slot * 0x70;
+        u8 *soundRecord = (u8 *)D_L02_00188660 + slot * 0x70;
 
-        if (*(u8 **)(rec + 0x88) == a0 && rec[0x74] != 0)
-            func_002E59F8(slot);
+        if (*(u8 **)(soundRecord + 0x88) == moby && soundRecord[0x74] != 0)
+            StopSoundVoice(slot);
     }
-    *(s32 *)(s1 + 0x19C) = -1;
-    if (*(s16 *)(s1 + 0x1B8) == 1) {
-        *(u16 *)(s1 + 0x1B8) = 0;
-        func_L02_003FC1B0(*(void **)(a0 + 0xB8), *(s16 *)(a0 + 0xAA));
+    *(s32 *)(vars + 0x19C) = -1;
+    if (*(s16 *)(vars + 0x1B8) == 1) {
+        *(u16 *)(vars + 0x1B8) = 0;
+        IncrementMaktarTypeCounter(*(void **)(moby + 0xB8), *(s16 *)(moby + 0xAA));
     }
-    if (a0[0x31] != 0) {
-        func_0032C700(a0 + 0x10, 0, 0xA, 0x1E, 0, 0xA, 0x2D, 1, 0.3f, 0.0f, 0, 0, 0, 0);
-        func_002E5DA0(0, 0, a0, 0xC3E);
+    if (moby[0x31] != 0) {
+        SpawnExplosion(moby + 0x10, 0, 0xA, 0x1E, 0, 0xA, 0x2D, 1, 0.3f, 0.0f, 0, 0, 0, 0);
+        PlaySoundFromClassBank(0, 0, moby, 0xC3E);
     }
-    *(u16 *)(s1 + 0x1B8) = 0;
-    *(s32 *)(s1 + 0x184) = 0;
-    func_002A7470(a0, 0, 0, 3);
-    func_002A05A8(a0);
-    func_002A7750(a0, 1, 0);
-    a0[0x31] = 0;
-    *(u32 *)(a0 + 0x98) = 0;
-    *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) & 0xEFFF) | 0x47;
+    *(u16 *)(vars + 0x1B8) = 0;
+    *(s32 *)(vars + 0x184) = 0;
+    StartAnimationBlended(moby, 0, 0, 3);
+    func_002A05A8(moby);
+    SetMobyState(moby, 1, 0);
+    moby[0x31] = 0;
+    *(u32 *)(moby + 0x98) = 0;
+    *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xEFFF) | 0x47;
 }
 
 /* sda in this -G0 unit gives retail's bare-symbol load (`lui $r` / `lbu $r,%lo($r)`, one register);
@@ -365,32 +376,33 @@ extern void func_0029F338(u8 *);
    record, then queues the messages 0x2D, 3 and 0x2E on D_L02_001C0700, sets the byte and calls
    func_002A7750 with 2. Kind 2 runs func_002AD7B8 and func_002AF0A8 with 3 and calls
    func_002A7750 with 3, unless func_002F5D10 answers yes. */
-void func_L02_0040FB80(u8 *a0) {
-    u8 *state = *(u8 **)(a0 + 0x68);
+/* Waits for the player to reach a certain point, then plays a short series of messages once. */
+void func_L02_0040FB80(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
         if (state == 0)
-            func_0029F338(a0);
+            MarkMobySpawned(moby);
         else
-            func_002A7750(a0, 1, -1);
+            SetMobyState(moby, 1, -1);
         break;
     case 1:
         if (D_001A7BCB == 0 && D_L02_001395B8[4] == 0 &&
-            func_002ACBC8(D_00189EA0, *(s32 *)(state + 0xC)) != 0 &&
-            func_00288AA0(D_L02_001C0700, 0x2D) != 0) {
-            func_00288AA0(D_L02_001C0700, 3);
-            func_00288AA0(D_L02_001C0700, 0x2E);
-            func_00288BE8(D_L02_001C0700);
+            IsPointInCuboid(gHeroPosition, *(s32 *)(state + 0xC)) != 0 &&
+            PushRequestQueue(D_L02_001C0700, 0x2D) != 0) {
+            PushRequestQueue(D_L02_001C0700, 3);
+            PushRequestQueue(D_L02_001C0700, 0x2E);
+            LaunchQueuedRequest(D_L02_001C0700);
             D_L02_001395B8[4] = 1;
-            func_002A7750(a0, 2, -1);
+            SetMobyState(moby, 2, -1);
         }
         break;
     case 2:
-        if (func_002F5D10() == 0) {
-            func_002AD7B8(3);
-            func_002AF0A8(3);
-            func_002A7750(a0, 3, -1);
+        if (IsEitherModeTwo() == 0) {
+            MarkFlagAndAppendToList(3);
+            PlayIndexedSound(3);
+            SetMobyState(moby, 3, -1);
         }
         break;
     }
@@ -427,78 +439,79 @@ extern void func_L02_004129D0(u8 *);
    0.5 * sin(phase) + the base at +8 into the actor's float at +0x18 and runs the counter at +0x10
    down by 1/15, wrapping it into [-1, 1]. The first slot lookup is a separate block-local pointer
    from the one in the state-2 arm (retail keeps them in different registers). */
-void func_L02_004124A0(u8 *a0) {
-    u8 *s1 = *(u8 **)(a0 + 0x68);
-    u8 *p;
-    u8 *q;
+/* A floating object that bobs up and down and draws a wavy beam to another object. It stops when something of a certain kind touches it. */
+void func_L02_004124A0(u8 *moby) {
+    u8 *vars = *(u8 **)(moby + 0x68);
+    u8 *hitRecord;
+    u8 *hitOwner;
     s32 slot;
-    float f;
+    float value;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        if (D_0019B2E8[a0[0xB0] + D_001A79F0 * 16] & 0x80) {
-            func_0029F338(a0);
+        if (D_0019B2E8[moby[0xB0] + gCurrentMapIndex * 16] & 0x80) {
+            MarkMobySpawned(moby);
             return;
         }
-        *(float *)(a0 + 0x2C) = *(float *)(*(u8 **)(a0 + 0x24) + 0x24) * 2.0f;
-        if (func_002A77E0(2))
-            *(u16 *)(a0 + 0x34) |= 0x8000;
+        *(float *)(moby + 0x2C) = *(float *)(*(u8 **)(moby + 0x24) + 0x24) * 2.0f;
+        if (RandomIntBelow(2))
+            *(u16 *)(moby + 0x34) |= 0x8000;
         else
-            *(u16 *)(a0 + 0x34) &= 0x7FFF;
-        func_002A7750(a0, 1, -1);
-        *(float *)(s1 + 8) = *(float *)(a0 + 0x18);
-        *(float *)(s1 + 4) = func_002A7940();
-        *(float *)(s1 + 0x14) = func_002A7940();
+            *(u16 *)(moby + 0x34) &= 0x7FFF;
+        SetMobyState(moby, 1, -1);
+        *(float *)(vars + 8) = *(float *)(moby + 0x18);
+        *(float *)(vars + 4) = RandomAngle();
+        *(float *)(vars + 0x14) = RandomAngle();
         break;
     case 1:
-        if (a0[0x31] != 0)
-            func_L02_00412808(a0);
+        if (moby[0x31] != 0)
+            ThrowFrontSparks(moby);
         {
-            u8 *r = (u8 *)D_L02_00188660 + *(s32 *)(s1 + 0x18) * 0x70;
+            u8 *soundRecord = (u8 *)D_L02_00188660 + *(s32 *)(vars + 0x18) * 0x70;
 
-            if (*(u8 **)(r + 0x88) != a0 || r[0x74] == 0)
-                *(s32 *)(s1 + 0x18) = func_002E5CF8(0, 4, a0);
+            if (*(u8 **)(soundRecord + 0x88) != moby || soundRecord[0x74] == 0)
+                *(s32 *)(vars + 0x18) = PlayMobySound(0, 4, moby);
         }
-        f = func_00282E80(a0 + 0x10, D_L02_001BA500);
-        if (f > 64.0f)
-            func_002AA2E8((float *)(s1 + 0xC), 0.0f, 0.016666668f);
+        value = vec_distance_xy(moby + 0x10, gCameraPosition_L02);
+        if (value > 64.0f)
+            ApproachValue((float *)(vars + 0xC), 0.0f, 0.016666668f);
         else
-            func_002AA2E8((float *)(s1 + 0xC), 1.0f, 0.016666668f);
-        if (*(float *)(s1 + 0xC) != 0.0f)
-            func_L00_002E6CF0((void *)func_L02_004129D0, a0);
-        p = func_002A9640(a0, 0x10000, 0);
-        if (p != 0) {
-            q = *(u8 **)(p + 0x20);
-            if (q != 0 && *(s16 *)(q + 0xAA) == 0x9C8 &&
-                func_00282E48(a0 + 0x10, q + 0x10) < 5.0f) {
+            ApproachValue((float *)(vars + 0xC), 1.0f, 0.016666668f);
+        if (*(float *)(vars + 0xC) != 0.0f)
+            AddDrawCallbackToList1((void *)DrawWavyBeamToTarget, moby);
+        hitRecord = FindOwnedEffectSlot(moby, 0x10000, 0);
+        if (hitRecord != 0) {
+            hitOwner = *(u8 **)(hitRecord + 0x20);
+            if (hitOwner != 0 && *(s16 *)(hitOwner + 0xAA) == 0x9C8 /* moby class 2504 */ &&
+                fast_vec_dist(moby + 0x10, hitOwner + 0x10) < 5.0f) {
                 D_0018CFDC = 0xFFFF;
-                func_002A7750(a0, 2, -1);
-                *(u16 *)(a0 + 0x34) = (*(u16 *)(a0 + 0x34) | 0x41) & 0xEFFF;
-                *(u32 *)(a0 + 0x98) = 0;
-                slot = *(s32 *)(s1 + 0x18);
+                SetMobyState(moby, 2, -1);
+                *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) | 0x41) & 0xEFFF;
+                *(u32 *)(moby + 0x98) = 0;
+                slot = *(s32 *)(vars + 0x18);
                 if (slot != -1) {
-                    u8 *rec = (u8 *)D_L02_00188660 + slot * 0x70;
+                    u8 *heldRecord = (u8 *)D_L02_00188660 + slot * 0x70;
 
-                    if (*(u8 **)(rec + 0x88) == a0 && rec[0x74] != 0)
-                        func_002E59F8(slot);
+                    if (*(u8 **)(heldRecord + 0x88) == moby && heldRecord[0x74] != 0)
+                        StopSoundVoice(slot);
                 }
-                *(s32 *)(s1 + 0x18) = -1;
+                *(s32 *)(vars + 0x18) = -1;
             }
         }
-        a0[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2:
         break;
     }
-    *(float *)(s1 + 4) = func_00283B98(*(float *)(s1 + 4), 0.05817765f);
-    *(float *)(s1 + 0x14) = func_00283B98(*(float *)(s1 + 0x14), -0.10471977f);
-    *(float *)(a0 + 0x18) = func_00283198(*(float *)(s1 + 4)) * 0.5f + *(float *)(s1 + 8);
-    f = *(float *)(s1 + 0x10) + -0.06666667f;
-    *(float *)(s1 + 0x10) = f;
-    if (f > 1.0f)
-        *(float *)(s1 + 0x10) = f - 1.0f;
-    else if (f < -1.0f)
-        *(float *)(s1 + 0x10) = f + 1.0f;
+    *(float *)(vars + 4) = FastAddRotations(*(float *)(vars + 4), 0.05817765f);
+    *(float *)(vars + 0x14) = FastAddRotations(*(float *)(vars + 0x14), -0.10471977f);
+    *(float *)(moby + 0x18) = FastSinOrCosB(*(float *)(vars + 4)) * 0.5f + *(float *)(vars + 8);
+    value = *(float *)(vars + 0x10) + -0.06666667f;
+    *(float *)(vars + 0x10) = value;
+    if (value > 1.0f)
+        *(float *)(vars + 0x10) = value - 1.0f;
+    else if (value < -1.0f)
+        *(float *)(vars + 0x10) = value + 1.0f;
 }
 
 /* The effect's tuning, four resident tables copied onto the stack: the spread and fall speed of
@@ -521,28 +534,29 @@ extern void func_00282C88(void *);
    moved to the position at +0x10): the first with a velocity drawn between the first two range
    words per frame (no spread in this level's table), the second from a random point within 1.5
    of the first, falling at a speed drawn between the last two. */
-void func_L02_00412808(u8 *a0) {
+/* Throws two small sparks from a point in front of the object. */
+void func_L02_00412808(u8 *moby) {
     SparkRange range = D_L02_001B1C10;
     SparkSizes sizes = D_L02_001B1C20;
     SparkColours colours = D_L02_001B1C28;
     SparkKinds kinds = D_L02_001B1C30;
-    float vel[4];
+    float velocity[4];
     float front[4];
     float spot[4];
 
     *(TI128 *)front = 0;
     front[2] = 1.5f;
-    func_00283098(front, front, a0 + 0xC0);
-    func_00282CC0(front, front, a0 + 0x10);
-    func_002A7A00(vel, range.f[0] * 0.016666668f, range.f[1] * 0.016666668f);
-    func_002C3150(front, vel, colours.i[0], (u8)func_002A7820(kinds.b[0], kinds.b[1]),
-                  (u8)func_002A77E0(0xFF), 0, sizes.f[0]);
-    func_00282C88(vel);
-    func_002A7A00(spot, 0.0f, 1.5f);
-    func_00282CC0(spot, spot, front);
-    vel[2] = -(func_002A7878(range.f[2], range.f[3]) * 0.016666668f);
-    func_002C3150(spot, vel, colours.i[1], (u8)func_002A7820(kinds.b[2], kinds.b[3]),
-                  (u8)func_002A77E0(0xFF), 0, sizes.f[1]);
+    matrix_mul_vec3(front, front, moby + 0xC0);
+    FastVecAdd(front, front, moby + 0x10);
+    RandomDirectionVector(velocity, range.f[0] * 0.016666668f, range.f[1] * 0.016666668f);
+    SpawnHeroRelativeParticle(front, velocity, colours.i[0], (u8)RandomIntRange(kinds.b[0], kinds.b[1]),
+                  (u8)RandomIntBelow(0xFF), 0, sizes.f[0]);
+    ClearVector128(velocity);
+    RandomDirectionVector(spot, 0.0f, 1.5f);
+    FastVecAdd(spot, spot, front);
+    velocity[2] = -(RandomFloatRange(range.f[2], range.f[3]) * 0.016666668f);
+    SpawnHeroRelativeParticle(spot, velocity, colours.i[1], (u8)RandomIntRange(kinds.b[2], kinds.b[3]),
+                  (u8)RandomIntBelow(0xFF), 0, sizes.f[1]);
 }
 
 /* func_L02_004129D0 is defined in L02_004129D0.c. */
@@ -566,42 +580,43 @@ extern int D_L02_001B2058[2] __attribute__((sda));
    a speed drawn between lo and hi, with a random size, two colours blended from the level's two
    colour pairs and a small downward pull. Retail negates its constant at run time (neg.s), so k
    stays a variable. */
-void func_L02_00423838(u8 *a0, float lo, float hi) {
-    float v10[4];
-    float v20[4];
-    float v30[4];
-    float v40[4];
-    float v50[4];
-    float v60[4];
+/* Throws a burst of twenty sparks from behind the object, each with its own speed, size and colour. */
+void func_L02_00423838(u8 *moby, float lo, float hi) {
+    float offset[4];
+    float origin[4];
+    float upSpread[4];
+    float sideSpread[4];
+    float velocity[4];
+    float pull[4];
     int i;
-    float r;
-    int a, b, c;
-    int c0, c1;
+    float scale;
+    int partA, partB, partC;
+    int colorA, colorB;
     float k = 0.0013888889f;
 
-    func_00282D30(v10, a0 + 0xE0, 1.75f);
-    func_00282CC0(v20, v10, a0 + 0x10);
-    func_00282D30(v10, a0 + 0xC0, -0.5f);
-    func_00282CC0(v20, v10, v20);
+    FastVecScale(offset, moby + 0xE0, 1.75f);
+    FastVecAdd(origin, offset, moby + 0x10);
+    FastVecScale(offset, moby + 0xC0, -0.5f);
+    FastVecAdd(origin, offset, origin);
     i = 19;
     do {
-        func_00282F20(v40, a0 + 0xD0, func_002A7878(-1.0f, 1.0f));
-        func_00282F20(v30, a0 + 0xE0, func_002A7878(-0.15f, 1.0f));
-        func_00282CC0(v50, a0 + 0xC0, v40);
-        func_00282CC0(v50, v50, v30);
-        func_00282F20(v50, v50, func_002A7878(lo, hi));
-        r = func_002A7878(0.5f, 1.5f);
-        a = func_00283CF0(r * 10.0f);
-        b = func_00283CF0(r * 30.0f);
-        c = func_00283CF0(r * 7.0f);
-        v50[3] = func_002A7878(0.2f, 0.6f);
-        func_00282C88(v60);
-        v60[2] = -k * (float)(a + b + c);
-        func_00282CC0(v60, v60, v50);
-        v60[3] = 0.01f;
-        c0 = func_00283D38(D_L02_001B2050[0], D_L02_001B2050[1], func_002A7878(0.0f, 1.0f));
-        c1 = func_00283D38(D_L02_001B2058[0], D_L02_001B2058[1], func_002A7878(0.0f, 1.0f));
-        func_002BAA28(v20, v50, v60, c0, c1, a, b, c, 0x1003C);
+        vec_scale_to_length(sideSpread, moby + 0xD0, RandomFloatRange(-1.0f, 1.0f));
+        vec_scale_to_length(upSpread, moby + 0xE0, RandomFloatRange(-0.15f, 1.0f));
+        FastVecAdd(velocity, moby + 0xC0, sideSpread);
+        FastVecAdd(velocity, velocity, upSpread);
+        vec_scale_to_length(velocity, velocity, RandomFloatRange(lo, hi));
+        scale = RandomFloatRange(0.5f, 1.5f);
+        partA = FloatToInt(scale * 10.0f);
+        partB = FloatToInt(scale * 30.0f);
+        partC = FloatToInt(scale * 7.0f);
+        velocity[3] = RandomFloatRange(0.2f, 0.6f);
+        ClearVector128(pull);
+        pull[2] = -k * (float)(partA + partB + partC);
+        FastVecAdd(pull, pull, velocity);
+        pull[3] = 0.01f;
+        colorA = FastTweenColor(D_L02_001B2050[0], D_L02_001B2050[1], RandomFloatRange(0.0f, 1.0f));
+        colorB = FastTweenColor(D_L02_001B2058[0], D_L02_001B2058[1], RandomFloatRange(0.0f, 1.0f));
+        SpawnTrailParticle_002BAA28(origin, velocity, pull, colorA, colorB, partA, partB, partC, 0x1003C);
     } while (--i >= 0);
 }
 
@@ -621,54 +636,55 @@ extern void *func_00273730(void *, int, int, int, void *, void *, void *, int, f
 extern void func_L00_003263D0(void *,void *,int,int,void *,u32,void *,float,float,float,float);
 extern void func_L02_0042E680(u8 *, float, float);
 
-void func_L02_0042E2F8(u8 *a0) {
-    u8 *state = *(u8 **)(a0 + 0x68);
-    struct Pair42E2F8 a = D_L02_001B23E0;
-    struct Pair42E2F8 b = D_L02_001B23E8;
-    TI128 c[2];
-    float d[4] __attribute__((aligned(16)));
-    float e[4] __attribute__((aligned(16)));
-    float f[4] __attribute__((aligned(16)));
+/* A small object that waits to be hit. When it is hit it bursts with a flash and sparks, and then goes away. */
+void func_L02_0042E2F8(u8 *moby) {
+    u8 *state = *(u8 **)(moby + 0x68);
+    struct Pair42E2F8 sizesA = D_L02_001B23E0;
+    struct Pair42E2F8 sizesB = D_L02_001B23E8;
+    TI128 colors[2];
+    float localOffset[4] __attribute__((aligned(16)));
+    float flashPoint[4] __attribute__((aligned(16)));
+    float flashStep[4] __attribute__((aligned(16)));
 
-    c[0] = D_L02_001B23F0[0];
-    c[1] = D_L02_001B23F0[1];
-    switch (a0[0x20]) {
+    colors[0] = D_L02_001B23F0[0];
+    colors[1] = D_L02_001B23F0[1];
+    switch (moby[0x20]) {
     case 0:
-        *(TI128 *)d = 0;
-        d[2] = 4.0f;
-        func_L00_0033E220(d, a0, 0x28208080, -1, 0, -1, 0, 0x60, 409500.0f, 0.0f);
-        func_L00_0033E220(d, a0, 0x20208080, -1, 1, -1, 0, 0x60, 367500.0f, 0.75f);
+        *(TI128 *)localOffset = 0;
+        localOffset[2] = 4.0f;
+        SpawnObjectFollowingEffect(localOffset, moby, 0x28208080, -1, 0, -1, 0, 0x60, 409500.0f, 0.0f);
+        SpawnObjectFollowingEffect(localOffset, moby, 0x20208080, -1, 1, -1, 0, 0x60, 367500.0f, 0.75f);
         if (*(s32 *)state != 0)
-            D_L02_001AEC78 = D_L02_001AEC78 - 1;
-        func_002A7750(a0, 1, -1);
+            gHoveringObjectCount = gHoveringObjectCount - 1;
+        SetMobyState(moby, 1, -1);
         break;
     case 1:
-        if (func_002A9640(a0, 0x4010000, 0) != 0 && *(s32 *)state == 0) {
-            D_L02_001AEC78 = D_L02_001AEC78 - 1;
-            func_002A7750(a0, 2, -1);
+        if (FindOwnedEffectSlot(moby, 0x4010000, 0) != 0 && *(s32 *)state == 0) {
+            gHoveringObjectCount = gHoveringObjectCount - 1;
+            SetMobyState(moby, 2, -1);
         }
-        a0[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2:
-        func_L00_0032A258(a0, c, &b, &a, 0xB, 0, 1, 5, 0xFFFF, 0xFF, 0);
-        func_L00_00326110(a0, 1, 4.0f);
-        *(TI128 *)d = 0;
-        d[1] = -0.10000001f;
-        d[2] = 0.050000004f;
-        func_00283098(d, d, a0 + 0xC0);
-        func_00273730(a0, 1, *(s16 *)(a0 + 0xAA), 1, a0 + 0x10, a0 + 0xF0, d, 0xFF, 0.0f, 15.0f);
-        *(TI128 *)e = 0;
-        e[1] = 0.2f;
-        e[2] = 4.3f;
-        func_00283098(e, e, a0 + 0xC0);
-        func_00282CC0(e, e, a0 + 0x10);
-        *(TI128 *)f = 0;
-        f[1] = 0.050000004f;
-        f[2] = 0.025000002f;
-        func_00283098(f, f, a0 + 0xC0);
-        func_L00_003263D0(a0,e,4,1,f,0x50404040,0,0.25f,5.0f,0.5f,1.0f);
-        func_L02_0042E680(a0, 0.016666668f, 0.23333335f);
-        func_0029F338(a0);
+        ExplodeObjectIntoPieces(moby, colors, &sizesB, &sizesA, 0xB, 0, 1, 5, 0xFFFF, 0xFF, 0);
+        SpawnScaledBolts(moby, 1, 4.0f);
+        *(TI128 *)localOffset = 0;
+        localOffset[1] = -0.10000001f;
+        localOffset[2] = 0.050000004f;
+        matrix_mul_vec3(localOffset, localOffset, moby + 0xC0);
+        CreateCameraMoby(moby, 1, *(s16 *)(moby + 0xAA), 1, moby + 0x10, moby + 0xF0, localOffset, 0xFF, 0.0f, 15.0f);
+        *(TI128 *)flashPoint = 0;
+        flashPoint[1] = 0.2f;
+        flashPoint[2] = 4.3f;
+        matrix_mul_vec3(flashPoint, flashPoint, moby + 0xC0);
+        FastVecAdd(flashPoint, flashPoint, moby + 0x10);
+        *(TI128 *)flashStep = 0;
+        flashStep[1] = 0.050000004f;
+        flashStep[2] = 0.025000002f;
+        matrix_mul_vec3(flashStep, flashStep, moby + 0xC0);
+        SpawnTintedEffects(moby,flashPoint,4,1,flashStep,0x50404040,0,0.25f,5.0f,0.5f,1.0f);
+        ThrowSparkFan(moby, 0.016666668f, 0.23333335f);
+        MarkMobySpawned(moby);
         break;
     }
 }
@@ -679,15 +695,16 @@ void func_L02_0042E2F8(u8 *a0) {
 
 
 /* restarts the shared effect object the level keeps at 0x1BE200 */
+/* Resets and re-arms the level's shared effect object so its effect starts again. */
 void func_L02_00438B28(void) {
     char *p = D_L02_001BE200;
 
-    func_L02_003DAE60(*(void **)(p + 0x198), 0);
-    func_L02_003DAE60(*(void **)(p + 0x198), 1);
-    func_L02_003DB158(*(void **)(p + 0x198), 5);
-    func_L02_003DB158(*(void **)(p + 0x198), 6);
-    func_L02_003DAF90(*(void **)(p + 0x198));
-    func_L02_003DB030(*(void **)(p + 0x198));
+    DrawJointGlowFacingCamera(*(void **)(p + 0x198), 0);
+    DrawJointGlowFacingCamera(*(void **)(p + 0x198), 1);
+    DrawJointGlow(*(void **)(p + 0x198), 5);
+    DrawJointGlow(*(void **)(p + 0x198), 6);
+    DrawJointFourGlow(*(void **)(p + 0x198));
+    DrawJointFourGlowFacingCamera(*(void **)(p + 0x198));
 }
 
 extern void func_L02_004388A0(u8 *);
@@ -729,63 +746,64 @@ typedef struct {
    entity's float at +0x6C to 100.0 and its flag 2, writes the colour 0x40FF00EA to three words of
    D_L02_00258800 and to the part at +0x198 of the block, and hands func_L02_00438B28 to itself.
    With D_L02_001A8F00 not 2 it undoes the push (+2 along the axis) and clears the armed word. */
-void func_L02_00438B90(u8 *a0) {
-    L02_CtlState *st = *(L02_CtlState **)(a0 + 0x68);
-    L02_Level *lv;
-    L02_Ent *e;
-    float v[4];
-    int c;
+/* Controller that switches a moving object and a nearby effect on or off depending on the current stage of the level. */
+void func_L02_00438B90(u8 *moby) {
+    L02_CtlState *vars = *(L02_CtlState **)(moby + 0x68);
+    L02_Level *level;
+    L02_Ent *target;
+    float push[4];
+    int color;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        a0[0x30] = 0xFF;
-        a0[0x20] = 1;
-        st->armed = 0;
+        moby[0x30] = 0xFF;
+        moby[0x20] = 1;
+        vars->armed = 0;
         break;
     case 1:
         if (D_L02_001A8F00 != 2) {
-            if (st->armed != 0) {
-                e = (L02_Ent *)(D_L02_001B359C + (st->ent << 8));
-                st->armed = 0;
-                if (e->b43 != 0) {
-                    func_002A7470(e, 0, 0, 0);
-                    e->w48 = 0;
+            if (vars->armed != 0) {
+                target = (L02_Ent *)(gMobyPool_L02 + (vars->ent << 8));
+                vars->armed = 0;
+                if (target->b43 != 0) {
+                    StartAnimationBlended(target, 0, 0, 0);
+                    target->w48 = 0;
                 }
-                func_00282F20(v, e->dir, 2.0f);
-                func_00282CC0(e->pos, e->pos, v);
+                vec_scale_to_length(push, target->dir, 2.0f);
+                FastVecAdd(target->pos, target->pos, push);
             }
         } else {
-            lv = (L02_Level *)D_L02_001BE200;
-            if (lv->mode == 0) {
-                func_L00_002E6CF0(func_L02_003FFDB0, D_L02_001B359C + (st->ent2 << 8));
-                func_L00_002E6CF0(D_L02_004004D8, D_L02_001B359C + (st->ent2 << 8));
-                func_L00_002E6CF0(func_L02_004388A0, a0);
-                if (st->armed == 0) {
-                    e = (L02_Ent *)(D_L02_001B359C + (st->ent << 8));
-                    st->armed = 1;
-                    if (e->b43 != 1) {
-                        func_002A7470(e, 1, 7, 0);
-                        e->w48 = 0;
+            level = (L02_Level *)D_L02_001BE200;
+            if (level->mode == 0) {
+                AddDrawCallbackToList1(DrawRadialQuadEffect, gMobyPool_L02 + (vars->ent2 << 8));
+                AddDrawCallbackToList1(D_L02_004004D8, gMobyPool_L02 + (vars->ent2 << 8));
+                AddDrawCallbackToList1(DrawNearestPathRecordQuad, moby);
+                if (vars->armed == 0) {
+                    target = (L02_Ent *)(gMobyPool_L02 + (vars->ent << 8));
+                    vars->armed = 1;
+                    if (target->b43 != 1) {
+                        StartAnimationBlended(target, 1, 7, 0);
+                        target->w48 = 0;
                     }
-                    func_00282F20(v, e->dir, -2.0f);
-                    func_00282CC0(e->pos, e->pos, v);
+                    vec_scale_to_length(push, target->dir, -2.0f);
+                    FastVecAdd(target->pos, target->pos, push);
                 }
-            } else if (lv->mode == 1) {
-                func_L00_002E6CF0(func_L02_003FFDB0, D_L02_001B359C + (st->ent2 << 8));
-                func_L00_002E6CF0(D_L02_004004D8, D_L02_001B359C + (st->ent2 << 8));
-            } else if (lv->mode == 6) {
-                c = 0x40FF00EA;
-                func_L00_002E6CF0(func_L02_003FFDB0, D_L02_001B359C + (st->ent2 << 8));
-                func_L00_002E6CF0(D_L02_004004D8, D_L02_001B359C + (st->ent2 << 8));
+            } else if (level->mode == 1) {
+                AddDrawCallbackToList1(DrawRadialQuadEffect, gMobyPool_L02 + (vars->ent2 << 8));
+                AddDrawCallbackToList1(D_L02_004004D8, gMobyPool_L02 + (vars->ent2 << 8));
+            } else if (level->mode == 6) {
+                color = 0x40FF00EA;
+                AddDrawCallbackToList1(DrawRadialQuadEffect, gMobyPool_L02 + (vars->ent2 << 8));
+                AddDrawCallbackToList1(D_L02_004004D8, gMobyPool_L02 + (vars->ent2 << 8));
                 /* indexed, not `base + (n << 8)`: retail adds the shifted index first */
-                ((L02_Ent *)D_L02_001B359C)[st->ent2].vars->f6C = 100.0f;
-                ((L02_Ent *)D_L02_001B359C)[st->ent2].flags |= 2;
-                D_L02_00258800[0x250 / 4] = c;
-                D_L02_00258800[0x258 / 4] = c;
-                D_L02_00258800[0x254 / 4] = c;
-                lv->part->wB8 = lv->w19C;
-                func_L00_002E6CF0(func_L02_00438B28, a0);
-                lv->part->w78 = c;
+                ((L02_Ent *)gMobyPool_L02)[vars->ent2].vars->f6C = 100.0f;
+                ((L02_Ent *)gMobyPool_L02)[vars->ent2].flags |= 2;
+                D_L02_00258800[0x250 / 4] = color;
+                D_L02_00258800[0x258 / 4] = color;
+                D_L02_00258800[0x254 / 4] = color;
+                level->part->wB8 = level->w19C;
+                AddDrawCallbackToList1(ResetLevelEffectObject, moby);
+                level->part->w78 = color;
             }
         }
         break;
@@ -812,49 +830,50 @@ extern int func_002E5CF8(int, int, void *);
    says so, otherwise it goes to state 1. State 1 asks func_002A9640 what touches it: an actor of
    kind 0x9C8 breaks it (effect object 0xE43 started on it, the burst and the 0x3FFF ring, the
    count raised up to 7, the object released); with nothing there it only sets byte +0xA8 to 0xFF. */
-void func_L02_00445200(u8 *a0) {
-    u8 *p;
-    u8 *q;
-    void *fx;
+/* A breakable object. A player attack destroys it, and the game remembers how many times it has been broken. */
+void func_L02_00445200(u8 *moby) {
+    u8 *hitRecord;
+    u8 *hitOwner;
+    void *breakEffect;
     int id;
     int id2;    /* state 1 reads the number again into a register of its own, as retail does */
-    int v;
+    int count;
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
-        id = *(u16 *)(a0 + 0xB2);
+        id = *(u16 *)(moby + 0xB2);
         if (D_L02_0021F4F0.spent[(s16)id] == 0) {
-            v = D_0019B4A8[((s16)id >> 1) + (D_001A79F0 << 10)];
+            count = D_0019B4A8[((s16)id >> 1) + (gCurrentMapIndex << 10)];
             if (id & 1)
-                v = (v >> 4) & 7;
+                count = (count >> 4) & 7;
             else
-                v = v & 7;
-            if (v == 0) {
-                func_002A7750(a0, 1, -1);
+                count = count & 7;
+            if (count == 0) {
+                SetMobyState(moby, 1, -1);
                 break;
             }
         }
-        func_0029F338(a0);
+        MarkMobySpawned(moby);
         break;
     case 1:
-        p = func_002A9640(a0, 0x10000, 0);
-        if (p != 0 && (q = *(u8 **)(p + 0x20)) != 0 && *(s16 *)(q + 0xAA) == 0x9C8) {
-            fx = func_0029EFD0(0xE43);
-            if (fx != 0)
-                func_002B37E8(fx, a0);
-            func_002B0A68(a0, 0x3FFF, D_L02_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
-            func_002E5CF8(0, 0, a0);
-            id2 = *(u16 *)(a0 + 0xB2);
+        hitRecord = FindOwnedEffectSlot(moby, 0x10000, 0);
+        if (hitRecord != 0 && (hitOwner = *(u8 **)(hitRecord + 0x20)) != 0 && *(s16 *)(hitOwner + 0xAA) == 0x9C8 /* moby class 2504 */) {
+            breakEffect = CreateMoby(0xE43 /* moby class 3651 */);
+            if (breakEffect != 0)
+                InitChildObjectFromParent(breakEffect, moby);
+            SpawnDebrisForMaskedParts(moby, 0x3FFF, D_L02_001A8F20, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+            PlayMobySound(0, 0, moby);
+            id2 = *(u16 *)(moby + 0xB2);
             if (id2 & 1) {
-                if (((D_0019B4A8[((s16)id2 >> 1) + (D_001A79F0 << 10)] >> 4) & 7) != 7)
-                    D_0019B4A8[((s16)id2 >> 1) + (D_001A79F0 << 10)] += 0x10;
+                if (((D_0019B4A8[((s16)id2 >> 1) + (gCurrentMapIndex << 10)] >> 4) & 7) != 7)
+                    D_0019B4A8[((s16)id2 >> 1) + (gCurrentMapIndex << 10)] += 0x10;
             } else {
-                if ((D_0019B4A8[((s16)id2 >> 1) + (D_001A79F0 << 10)] & 7) != 7)
-                    D_0019B4A8[((s16)id2 >> 1) + (D_001A79F0 << 10)] += 1;
+                if ((D_0019B4A8[((s16)id2 >> 1) + (gCurrentMapIndex << 10)] & 7) != 7)
+                    D_0019B4A8[((s16)id2 >> 1) + (gCurrentMapIndex << 10)] += 1;
             }
-            func_0029F338(a0);
+            MarkMobySpawned(moby);
         } else {
-            a0[0xA8] = 0xFF;
+            moby[0xA8] = 0xFF;
         }
         break;
     }
@@ -863,12 +882,14 @@ void func_L02_00445200(u8 *a0) {
 /* rac1-decomp src/core/00118A40.c: func_00119100 */
 /* Takes an argument its callers pass (e.g. r1_func_00112468) and ignores
    it; an unused parameter costs no codegen. */
-int func_L02_00456258(int arg0) {
+/* Always returns -1, whatever it is given. */
+int func_L02_00456258(int unusedArg) {
     return -1;
 }
 
 extern void func_00335870(void);
 
+/* Runs one engine routine (func_00335870) and does nothing else. */
 void func_L02_00456AC0(void) {
-    func_00335870();
+    ResetObjectTypeAndFree();
 }

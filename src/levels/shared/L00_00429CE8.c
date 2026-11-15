@@ -15,35 +15,35 @@ typedef struct {
  char pad2298[0x22B4-0x2298]; unsigned char flag;
 } Global_b0898;
 extern Global_b0898 D_00189E20_b0898;
-int func_L00_00429CE8(char *a)
+int func_L00_00429CE8(char *trigger)
 {
-    char *owner = D_L00_001B8E10;
+    char *owner = gFollowCameraObject;
     char *sub = *(char **)(owner + 0x70);
     char *move = sub + 0x160;
     char *rot = sub + 0x1C0;
-    char *p = *(char **)(D_L00_001B1844 + *(short *)(a + 0x84) * 32 + 28);
+    char *desc = *(char **)(D_L00_001B1844 + *(short *)(trigger + 0x84) * 32 + 28);
     unsigned int mode;
     if (*(short *)(owner + 0x86) != 0) return 0;
     mode = D_00189E20_b0898.flag - 1U < 2U;
-    if (*(short *)(p + 0x4A) && !mode) return 0;
-    if (*(short *)(p + 0x48) && mode) return 0;
-    if (*(int *)(p + 0x34)) {
-        if (func_00282C48(*(float *)(move + 0x34)) > 0.01f) return 0;
-        if (func_00282C48(*(float *)(rot + 8)) > 0.01f) return 0;
+    if (*(short *)(desc + 0x4A) && !mode) return 0;
+    if (*(short *)(desc + 0x48) && mode) return 0;
+    if (*(int *)(desc + 0x34)) {
+        if (FloatAbs(*(float *)(move + 0x34)) > 0.01f) return 0;
+        if (FloatAbs(*(float *)(rot + 8)) > 0.01f) return 0;
     }
     if ((unsigned int)(D_00189E20_b0898.mode - 0x62) >= 2 && D_00189E20_b0898.speed > 0.016666668f) return 0;
-    if (*(int *)(p + 0xC) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && func_00282E80(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0xC)].pos) < 3.0f) return 1;
-        if (func_002ACBC8(D_00189EA0, *(int *)(p + 0xC))) return 1;
+    if (*(int *)(desc + 0xC) >= 0) {
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(desc + 0xC)].pos) < 3.0f) return 1;
+        if (IsPointInCuboid(gHeroPosition, *(int *)(desc + 0xC))) return 1;
     }
-    if (*(int *)(p + 0x10) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && func_00282E80(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 0x10)].pos) < 3.0f) return 1;
-        if (func_L00_003206B8(D_00189EA0, *(int *)(p + 0x10))) return 1;
+    if (*(int *)(desc + 0x10) >= 0) {
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(desc + 0x10)].pos) < 3.0f) return 1;
+        if (IsPointInsideRecordVolume(gHeroPosition, *(int *)(desc + 0x10))) return 1;
     }
-    if (*(int *)(p + 8) >= 0) {
-        if (D_00189E20_b0898.mode == 0x62 && func_00282E80(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(p + 8)].pos) < 3.0f) return 1;
-        if (func_002ACCA8(D_00189EA0, *(int *)(p + 8))) return 1;
+    if (*(int *)(desc + 8) >= 0) {
+        if (D_00189E20_b0898.mode == 0x62 && vec_distance_xy(D_00189E20_b0898.position, D_L00_001B1F8C[*(int *)(desc + 8)].pos) < 3.0f) return 1;
+        if (IsPointInsideUnitSphereOfRecord(gHeroPosition, *(int *)(desc + 8))) return 1;
     }
-    *(short *)(p + 0x26) = 1;
+    *(short *)(desc + 0x26) = 1;
     return 0;
 }

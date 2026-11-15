@@ -1,3 +1,4 @@
+#include "names.h"
 /* func_002B4B70 returns -1 when D_0018C2EC is zero; otherwise 1 when the stack D_001B1D50 (depth
  * D_001AA100) is empty or D_001A8BB8 is not -2; otherwise it stores its two arguments in
  * D_001AA0F8 and D_001AA0FC, pops the top word of the stack into D_001A8BB8, clears D_001AA104 and
@@ -22,12 +23,13 @@ extern int D_0018C2EC __attribute__((nosda));
 extern int D_001A8BB8;
 extern int D_001B1D50[2];
 
+/* Finishes the current request and brings back the one that was waiting on the stack, if any. */
 int func_002B4B70(int value, int index)
 {
     int count = D_001AA100;
     int status;
 
-    if (D_001A8BB8 != -2)
+    if (gRequestedGameMode != -2)
         status = 1;
     else
         status = 0;
@@ -38,7 +40,7 @@ int func_002B4B70(int value, int index)
     if (status == 0) {
         D_001AA0F8 = value;
         D_001AA0FC = index;
-        D_001A8BB8 = D_001B1D50[--D_001AA100];
+        gRequestedGameMode = D_001B1D50[--D_001AA100];
         D_001AA104 = 0;
     }
     return status;

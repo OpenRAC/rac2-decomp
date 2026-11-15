@@ -15,30 +15,31 @@ extern int func_L00_002ADEA0(int);
 
 extern void func_002A7470(void *, int, int, int);
 
-void func_L00_002D1C40(int a0, int a1, float f12)
+/* Sets the animations of the two linked hero objects to match the hero's new animation. */
+void func_L00_002D1C40(int seq, int frame, float f12)
 {
-    char *p1;
-    char *p2;
-    int out0;
-    int out1;
+    char *upperObj;
+    char *lowerObj;
+    int animA;
+    int animB;
     int flag;
-    int s0;
-    float f20 = f12;
+    int rate;
+    float speed = f12;
 
-    if (D_00189E20.mode != 2)
+    if (gHeroState.mode != 2)
         return;
-    p1 = D_00189E20.p1310;
-    p2 = D_00189E20.p1314;
-    if (p1 == 0)
+    upperObj = gHeroState.p1310;
+    lowerObj = gHeroState.p1314;
+    if (upperObj == 0)
         return;
-    if (p2 == 0)
+    if (lowerObj == 0)
         return;
 
-    if (func_L00_002D1DA0(a0, &out0, &out1) != 0 && a0 != 0) {
-        if ((unsigned char)p1[0x43] != out0) {
-            s0 = (int)f20;
-            func_002A7470(p1, out0, a1, s0);
-            func_002A7470(p2, out1, a1, s0);
+    if (PickLinkedAnimationPair(seq, &animA, &animB) != 0 && seq != 0) {
+        if ((unsigned char)upperObj[0x43] != animA) {
+            rate = (int)speed;
+            StartAnimationBlended(upperObj, animA, frame, rate);
+            StartAnimationBlended(lowerObj, animB, frame, rate);
         }
         return;
     }
@@ -46,21 +47,21 @@ void func_L00_002D1C40(int a0, int a1, float f12)
     flag = 1;
     {
 
-        if (D_00189E20.action == 0) {
-            if (func_L00_002D1B70((unsigned char)p1[0x43], &a0) != 0 && a0 == 0)
+        if (gHeroState.action == 0) {
+            if (FindSlotTableKey((unsigned char)upperObj[0x43], &seq) != 0 && seq == 0)
                 flag = 0;
         }
         if (flag == 0)
             return;
 
-        s0 = 7;
-        if (D_00189E20.state == 8) {
-            if (func_L00_002ADEA0(3) == 2)
-                s0 = 0x13;
+        rate = 7;
+        if (gHeroState.state == 8) {
+            if (hero_slot_item_id(3) == 2)
+                rate = 0x13;
         }
     }
-    if ((unsigned char)p1[0x43] != 1)
-        func_002A7470(p1, 1, 0, s0);
-    if ((unsigned char)p2[0x43] != 1)
-        func_002A7470(p2, 1, 0, s0);
+    if ((unsigned char)upperObj[0x43] != 1)
+        StartAnimationBlended(upperObj, 1, 0, rate);
+    if ((unsigned char)lowerObj[0x43] != 1)
+        StartAnimationBlended(lowerObj, 1, 0, rate);
 }

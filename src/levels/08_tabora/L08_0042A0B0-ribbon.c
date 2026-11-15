@@ -47,10 +47,10 @@ void func_L08_0042A0B0(int texture0, int texture1, TaboraVec *points,
     float width, segments, u, randomRadius, randomAngle, t;
     u32 color0, color1, saved0, saved1;
     int i, corner, corner2;
-    char *p, *settings, *settings2, *visual, *base;
+    char *spark, *settings, *settings2, *visual, *base;
     char **owner;
     int entry = slot, row = slot;
-    float w0;
+    float baseWidth;
     int mode = 0, flags = 0;
     TaboraVec *path = points;
     int segment = particleSegment;
@@ -60,13 +60,13 @@ void func_L08_0042A0B0(int texture0, int texture1, TaboraVec *points,
     int total = 20;
     int last = 19;
 
-    q.texture = func_0027C878(texture0);
+    q.texture = GetEffectTextureDescriptor(texture0);
     color0 = (alpha0 << 24) | 0x7F407F;
     q.flags = 0x8000000048ULL;
     q.mode = 0xFF9000000260ULL;
     q.primitive = 0;
     q.color[0] = q.color[1] = q.color[2] = q.color[3] = color0;
-    glow.texture = func_0027C878(texture1);
+    glow.texture = GetEffectTextureDescriptor(texture1);
     width = 0.6f;
     u = D_L08_001B3A20[slot];
     color1 = (alpha1 << 24) | 0xFF10FF;
@@ -78,114 +78,114 @@ void func_L08_0042A0B0(int texture0, int texture1, TaboraVec *points,
     glow.uv[4] = 0; glow.uv[5] = 0; glow.uv[6] = 0; glow.uv[7] = 1;
     q.uv[0] = u; q.uv[1] = 0; q.uv[2] = u; q.uv[3] = 1;
     q.uv[4] = u + 1; q.uv[5] = 0; q.uv[6] = u + 1; q.uv[7] = 1;
-    if (*(s16 *)(((char **)D_L08_001B3A30)[slot] + 0xAA) == 0x1C) width = 0.3f;
-    w0 = width;
+    if (*(s16 *)(((char **)gBeamSlotKey)[slot] + 0xAA) == 0x1C /* moby class 28 */) width = 0.3f;
+    baseWidth = width;
     *(TaboraTI *)offsets[0] = 0;
     *(TaboraTI *)offsets[1] = 0;
     offsets[0][3] = 1; offsets[0][2] = width;
     offsets[1][2] = width + width; offsets[1][3] = 1;
     qcopy(frame[0], D_L08_002603E0[slot][1]);
-    func_00282CF0(frame[1], D_L08_001B9B00, D_L08_002603E0[slot][3]);
-    func_00282D30(frame[1], frame[1], 1);
-    func_00282DD8(frame[2], frame[1], frame[0]);
-    func_00282F20(frame[2], frame[2], 1);
-    func_00282DD8(frame[0], frame[2], frame[1]);
+    FastVecSub(frame[1], D_L08_001B9B00, D_L08_002603E0[slot][3]);
+    FastVecScale(frame[1], frame[1], 1);
+    FastVecCross(frame[2], frame[1], frame[0]);
+    vec_scale_to_length(frame[2], frame[2], 1);
+    FastVecCross(frame[0], frame[2], frame[1]);
     qcopy(frame[3], D_L08_002603E0[slot][3]);
     qcopy(basis[3], D_L08_002603E0[slot][3]);
-    func_00282CF0(tangent, D_L08_001B3A40[slot], basis[3]);
-    func_00282F20(basis[0], tangent, 1);
-    func_00282DD8(basis[1], basis[0], D_0018A0E0);
-    func_00282F20(basis[1], basis[1], -1);
-    func_00282DD8(basis[2], basis[1], basis[0]);
+    FastVecSub(tangent, D_L08_001B3A40[slot], basis[3]);
+    vec_scale_to_length(basis[0], tangent, 1);
+    FastVecCross(basis[1], basis[0], D_0018A0E0);
+    vec_scale_to_length(basis[1], basis[1], -1);
+    FastVecCross(basis[2], basis[1], basis[0]);
     qcopy(q.pos[0], offsets[0]);
-    func_00282D30(q.pos[1], q.pos[0], -1);
+    FastVecScale(q.pos[1], q.pos[0], -1);
     qcopy(glow.pos[0], offsets[1]);
-    func_00282D30(glow.pos[1], glow.pos[0], -1);
-    func_002830C0(endpoints[0], points[0], basis);
-    func_002830C0(endpoints[1], points[1], basis);
-    func_00282CF0(frame[0], endpoints[1], endpoints[0]);
-    func_00282F20(frame[0], frame[0], 1);
-    func_00282CF0(frame[1], D_L08_001B9B00, endpoints[0]);
-    func_00282DD8(frame[2], frame[1], frame[0]);
-    func_00282F20(frame[2], frame[2], 1);
-    func_00282DD8(frame[1], frame[0], frame[2]);
+    FastVecScale(glow.pos[1], glow.pos[0], -1);
+    transform_vector(endpoints[0], points[0], basis);
+    transform_vector(endpoints[1], points[1], basis);
+    FastVecSub(frame[0], endpoints[1], endpoints[0]);
+    vec_scale_to_length(frame[0], frame[0], 1);
+    FastVecSub(frame[1], D_L08_001B9B00, endpoints[0]);
+    FastVecCross(frame[2], frame[1], frame[0]);
+    vec_scale_to_length(frame[2], frame[2], 1);
+    FastVecCross(frame[1], frame[0], frame[2]);
     qcopy(frame[3], endpoints[0]);
-    func_002830C0(q.pos[0], q.pos[0], frame);
-    func_002830C0(q.pos[1], q.pos[1], frame);
-    func_002830C0(glow.pos[0], glow.pos[0], frame);
-    func_002830C0(glow.pos[1], glow.pos[1], frame);
+    transform_vector(q.pos[0], q.pos[0], frame);
+    transform_vector(q.pos[1], q.pos[1], frame);
+    transform_vector(glow.pos[0], glow.pos[0], frame);
+    transform_vector(glow.pos[1], glow.pos[1], frame);
     for (i = 1; i < last; i++) {
         qcopy(q.pos[2], offsets[0]);
-        func_00282D30(q.pos[3], q.pos[2], -1);
+        FastVecScale(q.pos[3], q.pos[2], -1);
         qcopy(glow.pos[2], offsets[1]);
-        func_00282D30(glow.pos[3], glow.pos[2], -1);
-        func_002830C0(endpoints[0], path[i], basis);
-        func_002830C0(endpoints[1], path[i + 1], basis);
-        func_00282CF0(frame[0], endpoints[1], endpoints[0]);
-        func_00282F20(frame[0], frame[0], 1);
-        func_00282CF0(frame[1], D_L08_001B9B00, endpoints[0]);
-        func_00282DD8(frame[2], frame[1], frame[0]);
-        func_00282F20(frame[2], frame[2], 1);
-        func_00282DD8(frame[1], frame[0], frame[2]);
+        FastVecScale(glow.pos[3], glow.pos[2], -1);
+        transform_vector(endpoints[0], path[i], basis);
+        transform_vector(endpoints[1], path[i + 1], basis);
+        FastVecSub(frame[0], endpoints[1], endpoints[0]);
+        vec_scale_to_length(frame[0], frame[0], 1);
+        FastVecSub(frame[1], D_L08_001B9B00, endpoints[0]);
+        FastVecCross(frame[2], frame[1], frame[0]);
+        vec_scale_to_length(frame[2], frame[2], 1);
+        FastVecCross(frame[1], frame[0], frame[2]);
         qcopy(frame[3], endpoints[0]);
-        func_002830C0(q.pos[2], q.pos[2], frame);
-        func_002830C0(q.pos[3], q.pos[3], frame);
-        func_002830C0(glow.pos[2], glow.pos[2], frame);
-        func_002830C0(glow.pos[3], glow.pos[3], frame);
+        transform_vector(q.pos[2], q.pos[2], frame);
+        transform_vector(q.pos[3], q.pos[3], frame);
+        transform_vector(glow.pos[2], glow.pos[2], frame);
+        transform_vector(glow.pos[3], glow.pos[3], frame);
         if (i == 1) {
             saved0 = q.color[0]; saved1 = glow.color[0];
             q.color[0] = q.color[1] = 0xFFFFFF;
             glow.color[0] = glow.color[1] = 0xFF10FF;
-            func_00280B90(&q, 0, 0);
-            func_00280B90(&glow, 0, 0);
+            draw_world_quad(&q, 0, 0);
+            draw_world_quad(&glow, 0, 0);
             q.color[0] = q.color[1] = q.color[2] = q.color[3] = saved0;
             glow.color[0] = glow.color[1] = glow.color[2] = glow.color[3] = saved1;
         } else {
-            func_00280B90(&q, mode, flags);
-            func_00280B90(&glow, mode, flags);
+            draw_world_quad(&q, mode, flags);
+            draw_world_quad(&glow, mode, flags);
         }
         qcopy(q.pos[0], q.pos[2]); qcopy(q.pos[1], q.pos[3]);
         qcopy(glow.pos[0], glow.pos[2]); qcopy(glow.pos[1], glow.pos[3]);
-        if (i == segment && func_L02_002F1658()) {
-            owner = &((char **)D_L08_001B3A30)[entry];
-            randomRadius = func_002A7878(0.03f, 0.15f);
-            randomAngle = func_002A78D8(0.3490659f, 0.6981318f);
+        if (i == segment && IsResidentFlagClear()) {
+            owner = &((char **)gBeamSlotKey)[entry];
+            randomRadius = RandomFloatRange(0.03f, 0.15f);
+            randomAngle = RandomSignedFloatRange(0.3490659f, 0.6981318f);
             *(TaboraTI *)particle = 0;
             particle[3] = particle[0] = 1;
-            particle[0] = randomRadius * func_00283180(randomAngle);
-            particle[1] = randomRadius * func_00283198(randomAngle);
-            func_00283098(particle, particle, D_L08_002603E0[row]);
-            corner = func_001163B0() & mask;
-            p = func_L08_0034A078(q.pos[corner], particle, sparkCount, *owner);
-            if (p) {
+            particle[0] = randomRadius * FastSinOrCosA(randomAngle);
+            particle[1] = randomRadius * FastSinOrCosB(randomAngle);
+            matrix_mul_vec3(particle, particle, D_L08_002603E0[row]);
+            corner = Rand() & mask;
+            spark = SpawnShortLivedParticle(q.pos[corner], particle, sparkCount, *owner);
+            if (spark) {
                 base = D_L08_001FF680;
-                visual = p + 0x20;
+                visual = spark + 0x20;
                 settings = *(char **)(base + 0xD4);
-                p[2] = settings[0];
-                *(float *)(visual + 0x10) = 1 / func_00283CE0(*(s16 *)(p + 0xA));
+                spark[2] = settings[0];
+                *(float *)(visual + 0x10) = 1 / IntToFloat(*(s16 *)(spark + 0xA));
                 *(u32 *)(visual + 0x18) = 0x7F207F;
-                *(float *)(p + 0xC) = 150000;
-                corner2 = func_001163B0() & mask;
-                p = func_L08_0034A078(q.pos[corner2], particle, flashCount, *owner);
-                if (p) {
-                    visual = p + 0x20;
+                *(float *)(spark + 0xC) = 150000;
+                corner2 = Rand() & mask;
+                spark = SpawnShortLivedParticle(q.pos[corner2], particle, flashCount, *owner);
+                if (spark) {
+                    visual = spark + 0x20;
                     settings2 = *(char **)(base + 0xD4);
-                    p[2] = settings2[0];
-                    *(float *)(visual + 0x10) = 1 / func_00283CE0(*(s16 *)(p + 0xA));
+                    spark[2] = settings2[0];
+                    *(float *)(visual + 0x10) = 1 / IntToFloat(*(s16 *)(spark + 0xA));
                     *(u32 *)(visual + 0x18) = 0xFFFFFF;
-                    *(float *)(p + 0xC) = 30000;
+                    *(float *)(spark + 0xC) = 30000;
                 }
             }
         }
-        t = func_00283CE0(i);
-        segments = func_00283CE0(total);
-        t = func_002A7AA8(-1, 0, 1, 0, t / segments);
+        t = IntToFloat(i);
+        segments = IntToFloat(total);
+        t = cubic_hermite_scalar(-1, 0, 1, 0, t / segments);
         {
             float u2 = D_L08_001B3A20[slot];
             q.uv[0] = u2; q.uv[1] = 0; q.uv[2] = u2; q.uv[3] = 1;
             q.uv[4] = u2 + 1; q.uv[5] = 0; q.uv[6] = u2 + 1; q.uv[7] = 1;
         }
-        offsets[0][2] = w0 + (0.05f - w0) * t;
+        offsets[0][2] = baseWidth + (0.05f - baseWidth) * t;
         offsets[1][2] = offsets[0][2] + offsets[0][2];
     }
 }

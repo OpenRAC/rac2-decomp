@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned short u16;
 
@@ -43,55 +44,59 @@ extern void func_00282A28(void);
 extern int func_002A7820(int, int);
 extern char *D_L04_001B25CC __attribute__((sda));
 
-void func_L04_003E5318(char *a0)
+/* Draws the beam effect from the linked object's attachment point. */
+void func_L04_003E5318(char *mobyArg)
 {
-    char *s0 = a0;
-    char *p = *(char **)(s0 + 0x68);
-    char *q = *(char **)(p + 0x2AC);
-    L04_003E5318_BUF buf;
+    char *moby = mobyArg;
+    char *vars = *(char **)(moby + 0x68);
+    char *linked = *(char **)(vars + 0x2AC);
+    L04_003E5318_BUF start;
 
-    if (q != 0) {
-        char *r = *(char **)(q + 0x68);
+    if (linked != 0) {
+        char *linkedVars = *(char **)(linked + 0x68);
 
-        func_0029FCC0(*(char **)(r + 0x288), 0, &buf);
-        buf.f[4] = func_00283180(*(float *)(s0 + 0xF8)) * 0.1f;
-        buf.f[5] = func_00283198(*(float *)(s0 + 0xF8)) * 0.1f;
-        buf.z = 0;
-        func_00282CC0(&buf, &buf, buf.f + 4);
-        buf.f[2] = buf.f[2] - 0.05f;
-        func_L04_003E53D0(s0, &buf);
-        func_L04_003E55E0(s0, &buf);
+        TransformMobyJointToWorld(*(char **)(linkedVars + 0x288), 0, &start);
+        start.f[4] = FastSinOrCosA(*(float *)(moby + 0xF8)) * 0.1f;
+        start.f[5] = FastSinOrCosB(*(float *)(moby + 0xF8)) * 0.1f;
+        start.z = 0;
+        FastVecAdd(&start, &start, start.f + 4);
+        start.f[2] = start.f[2] - 0.05f;
+        DrawTetherBeamRed(moby, &start);
+        DrawTetherBeamWhite(moby, &start);
     }
 }
 
-void func_L04_003E51F0(char *a0)
+/* Does the per-frame upkeep of the object and counts up its age, stopping at the maximum. */
+void func_L04_003E51F0(char *moby)
 {
-    char *s0 = *(char **)(a0 + 0x68);
-    u16 v;
+    char *vars = *(char **)(moby + 0x68);
+    u16 age;
 
-    func_002AB8C0(a0, s0 + 0x50);
-    func_00282978(s0 + 0x2A0);
-    func_00282978(s0 + 0x2A2);
-    v = *(u16 *)(a0 + 0x96);
-    if (v <= 0xFFFE) {
-        *(u16 *)(a0 + 0x96) = v + 1;
+    UpdateColorFade(moby, vars + 0x50);
+    FastDecTimer(vars + 0x2A0);
+    FastDecTimer(vars + 0x2A2);
+    age = *(u16 *)(moby + 0x96);
+    if (age <= 0xFFFE) {
+        *(u16 *)(moby + 0x96) = age + 1;
     }
 }
 
-void func_L04_003E5250(char *a0)
+/* Releases the linked object and clears the link to it. */
+void func_L04_003E5250(char *moby)
 {
-    char *s0 = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    if (*(char **)(s0 + 0x2AC) != 0) {
-        func_002A7470(*(char **)(s0 + 0x2AC), 9, 0, 3);
-        *(int *)(*(char **)(*(char **)(s0 + 0x2AC) + 0x68) + 0x27C) = 0;
-        *(char **)(s0 + 0x2AC) = 0;
+    if (*(char **)(vars + 0x2AC) != 0) {
+        StartAnimationBlended(*(char **)(vars + 0x2AC), 9, 0, 3);
+        *(int *)(*(char **)(*(char **)(vars + 0x2AC) + 0x68) + 0x27C) = 0;
+        *(char **)(vars + 0x2AC) = 0;
     }
 }
 
+/* Runs the shared level routine on the standard list with a count of 10. */
 void func_L04_003E7FE8(void)
 {
-    func_L04_003A21F8(D_L04_002AF6C0, 10);
+    render_water_grids(D_L04_002AF6C0, 10);
 }
 
 typedef unsigned char u8;
@@ -106,36 +111,37 @@ extern void func_00382AF8(s32);
 extern void func_003317E8(void *);
 extern f32 func_0030EFA8(void *, void *);
 
-void func_L04_003AB458(u8 *a0)
+/* Keeps a sound playing for the object while the player is close, and stops it when the player moves away or the object ends. */
+void func_L04_003AB458(u8 *moby)
 {
-    u8 *s0 = *(u8 **)(a0 + 0x68);
+    u8 *vars = *(u8 **)(moby + 0x68);
 
-    if (func_00342228(D_00189EA0, *(s32 *)s0) != 0) {
-        u8 *p = D_00188660 + *(s32 *)(s0 + 8) * 0x70;
-        if (*(u8 **)(p + 0x88) != a0 || *(u8 *)(p + 0x74) == 0) {
-            *(s32 *)(s0 + 8) = func_00382FF0(0x17, 4, a0);
+    if (func_00342228(gHeroPosition, *(s32 *)vars) != 0) {
+        u8 *sound = gSoundState + *(s32 *)(vars + 8) * 0x70;
+        if (*(u8 **)(sound + 0x88) != moby || *(u8 *)(sound + 0x74) == 0) {
+            *(s32 *)(vars + 8) = func_00382FF0(0x17, 4, moby);
         }
     }
-    if (func_0033D168(*(s32 *)(s0 + 4), -1) < 7) {
-        s32 id = *(s32 *)(s0 + 8);
-        if (id != -1) {
-            u8 *p = D_00188660 + id * 0x70;
-            if (*(u8 **)(p + 0x88) == a0 && *(u8 *)(p + 0x74) != 0)
-                func_00382AF8(id);
+    if (func_0033D168(*(s32 *)(vars + 4), -1) < 7) {
+        s32 soundId = *(s32 *)(vars + 8);
+        if (soundId != -1) {
+            u8 *sound = gSoundState + soundId * 0x70;
+            if (*(u8 **)(sound + 0x88) == moby && *(u8 *)(sound + 0x74) != 0)
+                func_00382AF8(soundId);
         }
-        *(s32 *)(s0 + 8) = -1;
-        func_003317E8(a0);
+        *(s32 *)(vars + 8) = -1;
+        func_003317E8(moby);
     } else {
-        u8 *p = D_00188660 + *(s32 *)(s0 + 8) * 0x70;
-        if (*(u8 **)(p + 0x88) == a0 && *(u8 *)(p + 0x74) != 0) {
-            if (func_0030EFA8(a0 + 0x10, D_00189EA0) > 50.0f) {
-                s32 id = *(s32 *)(s0 + 8);
-                if (id != -1) {
-                    u8 *q = D_00188660 + id * 0x70;
-                    if (*(u8 **)(q + 0x88) == a0 && *(u8 *)(q + 0x74) != 0)
-                        func_00382AF8(id);
+        u8 *sound = gSoundState + *(s32 *)(vars + 8) * 0x70;
+        if (*(u8 **)(sound + 0x88) == moby && *(u8 *)(sound + 0x74) != 0) {
+            if (func_0030EFA8(moby + 0x10, gHeroPosition) > 50.0f) {
+                s32 soundId = *(s32 *)(vars + 8);
+                if (soundId != -1) {
+                    u8 *sound = gSoundState + soundId * 0x70;
+                    if (*(u8 **)(sound + 0x88) == moby && *(u8 *)(sound + 0x74) != 0)
+                        func_00382AF8(soundId);
                 }
-                *(s32 *)(s0 + 8) = -1;
+                *(s32 *)(vars + 8) = -1;
             }
         }
     }
@@ -143,48 +149,50 @@ void func_L04_003AB458(u8 *a0)
 
 
 
-void func_L04_003E22B0(char *a0, int a1, int a2, int a3, int a4)
+/* Switches the object, and its linked object if it has one, to new states. */
+void func_L04_003E22B0(char *moby, int stateA, int stateB, int arg3, int arg4)
 {
-    char *s2 = *(char **)(a0 + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    if (*(char **)(s2 + 0x2AC) != 0) {
-        func_002A7470(a0, a1, a3, a4);
-        func_002A7470(*(char **)(s2 + 0x2AC), a2, a3, a4);
-    } else if (*(unsigned char *)(a0 + 0x43) != a1) {
-        func_002A7470(a0, a1, a3, a4);
+    if (*(char **)(vars + 0x2AC) != 0) {
+        StartAnimationBlended(moby, stateA, arg3, arg4);
+        StartAnimationBlended(*(char **)(vars + 0x2AC), stateB, arg3, arg4);
+    } else if (*(unsigned char *)(moby + 0x43) != stateA) {
+        StartAnimationBlended(moby, stateA, arg3, arg4);
     }
 }
 
-void func_L04_003E2338(char *a0)
+/* Picks a random other slot that is in use and moves the object to that slot's position. */
+void func_L04_003E2338(char *moby)
 {
-    Private2338 *s4 = *(Private2338 **)(a0 + 0x68);
+    Private2338 *vars = *(Private2338 **)(moby + 0x68);
     int values[3];
-    int cur;
+    int slotIndex;
     int count = 0;
-    int *p = s4->slots;
-    int neg = -1;
+    int *slotPtr = vars->slots;
+    int none = -1;
 
-    func_00115484(values, 0, 12);
-    cur = 0;
+    memset(values, 0, 12);
+    slotIndex = 0;
     for (;;) {
-        if (cur != s4->current) {
-            if (*(int *)p != neg) {
+        if (slotIndex != vars->current) {
+            if (*(int *)slotPtr != none) {
                 count++;
                 if (count < 4)
-                    values[count - 1] = cur;
+                    values[count - 1] = slotIndex;
                 else
-                    func_00282A28();
+                    TrapAlways();
             }
         }
-        cur++;
-        if (cur >= 4)
+        slotIndex++;
+        if (slotIndex >= 4)
             break;
-        p++;
+        slotPtr++;
     }
     if (count != 0) {
-        int idx = func_002A7820(0, count - 1);
-        s4->current = (unsigned char)values[idx];
-        s4->position = ((Record2338 *)D_L04_001B25CC)[s4->slots[s4->current]].position;
+        int pick = RandomIntRange(0, count - 1);
+        vars->current = (unsigned char)values[pick];
+        vars->position = ((Record2338 *)D_L04_001B25CC)[vars->slots[vars->current]].position;
     }
 }
 

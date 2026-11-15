@@ -24,25 +24,26 @@ extern NativeContext D_L24_001BC3C0;
 extern u8 D_L24_0028AAC0[];
 
 /* One-shot init: raises an int flag, forces a state word outside {6,7} to 5, runs three calls, then clears a 16-bit global. */
+/* Resets the scene state when a scene starts. */
 void func_002E7018(void)
 {
-    char *p = D_00189E20_9;
-    char *q;
-    unsigned short v;
+    char *gameData = D_00189E20_9;
+    char *transitionData;
+    unsigned short stateValue;
 
-    if (*(int *)(p + 9420) <= 0) {
-        *(int *)(p + 9420) = 1;
+    if (*(int *)(gameData + 9420) <= 0) {
+        *(int *)(gameData + 9420) = 1;
     }
     func_002B72E8_1(0);
 
-    q = D_001A63A8_3;
-    v = *(unsigned short *)(q + 114);
-    if ((unsigned short)(v - 6) >= 2) {
-        *(unsigned short *)(q + 114) = 5;
+    transitionData = D_001A63A8_3;
+    stateValue = *(unsigned short *)(transitionData + 114);
+    if ((unsigned short)(stateValue - 6) >= 2) {
+        *(unsigned short *)(transitionData + 114) = 5;
     }
-    func_002E4AC8();
-    func_00288EA0();
-    func_002E6D88(0);
+    UpdateSoundVoices();
+    ClearSubtitleState();
+    StartTransitionScene(0);
     D_00152C2A = 0;
 }
 
@@ -67,30 +68,31 @@ extern int func_0029B3E0(int, int);
 
 /* Opens the list: rebases its range on the loaded block and, for the current program, lays
    out the first page (80 or 96 rows a page). */
+/* Starts the scene list: sets up its memory block and loads the first page of data. */
 void func_002E7090(int level)
 {
-    Menu2E7090 *menu = &D_00152C00;
+    Menu2E7090 *menu = &gHeroMoby_00152C00;
     short none = -1;
     int base;
 
-    D_001B15A0 = 1.0f;
+    gScreenFade = 1.0f;
     D_001B15A4 = 0;
     menu->active = 0;
     menu->slot = none;
-    func_002FC138();
+    SelectPacketBufferSetup();
     base = D_001B22B0 - 0x60000;
-    D_001B8840.start = D_001BAEC0.start + base;
-    D_001B8840.destination = D_001BAEC0.end + base;
+    gScenePlaybackState.start = D_001BAEC0.start + base;
+    gScenePlaybackState.destination = D_001BAEC0.end + base;
     D_001B22B0 = base;
-    if (D_001A79F0 == level) {
-        func_002E6D88(3);
-        level = D_001A7B90 ? 0x50 : 0x60;
-        D_001B8840.base = 0;
-        D_001B8840.row = D_001B8840.base / level;
-        func_00294070(D_001B8840.row);
-        D_001B8840.page = D_001B8840.base % level;
+    if (gCurrentMapIndex == level) {
+        StartTransitionScene(3);
+        level = gIsPalVideo ? 0x50 : 0x60;
+        gScenePlaybackState.base = 0;
+        gScenePlaybackState.row = gScenePlaybackState.base / level;
+        SelectSegmentAndUpdateWorld(gScenePlaybackState.row);
+        gScenePlaybackState.page = gScenePlaybackState.base % level;
     } else {
-        func_0029B3E0(0, level);
+        MemcardSave(0, level);
         D_001B1680 = level;
         menu->active = 1;
         menu->slot = none;
@@ -108,12 +110,13 @@ void func_002E7090(int level)
 extern unsigned int D_001A7AF0 __attribute__((sda));
 extern void func_002E76C0(void *, int, int);
 
+/* Draws the ship engine flames, three of them or just one depending on a game setting. */
 void func_002E7B48(void *object)
 {
-    int count = ((D_001A7AF0 >> 4) & 1) ? 3 : 1;
+    int count = ((gEquipmentBits >> 4) & 1) ? 3 : 1;
     int index;
     for (index = 0; index < count; index++)
-        func_002E76C0(object, index, 0);
+        SpawnShipEngineFlame(object, index, 0);
 }
 
 
@@ -127,19 +130,20 @@ extern void func_0027E018(int, char *, int, int, int, int, int, int, unsigned lo
 extern char *D_001A7344 __attribute__((sda));
 extern unsigned long long D_001B2168 __attribute__((sda));
 
+/* Draws a fading overlay strip across the screen with the given see-through amount. */
 void func_002E82C8(int alpha)
 {
     unsigned long long color;
     unsigned long long packet;
     char *dst;
 
-    func_002FC560(0x47, 0x31801ULL);
-    func_002FC560(0x42, 0x8000000044ULL);
+    VU1_addGSregister(0x47, 0x31801ULL);
+    VU1_addGSregister(0x42, 0x8000000044ULL);
     color = (alpha << 24) | 0x00808080;
     packet = D_001B2168;
-    dst = D_001A7344;
-    func_0027E018(0x20, dst - 0x58, 0x100, 0x20, 0, 0, 0x100, 0x20, color, packet);
-    func_002FC560(0x47, 0x5360BULL);
+    dst = gScreenHeight;
+    DrawTexturedQuad(0x20, dst - 0x58, 0x100, 0x20, 0, 0, 0x100, 0x20, color, packet);
+    VU1_addGSregister(0x47, 0x5360BULL);
 }
 
 
@@ -157,19 +161,20 @@ extern void func_0027C480(void);
 extern void func_0027BD70(void);
 extern void func_002E8BA8(void);
 
+/* Draws the background of the transition screen for the current transition type. */
 void func_002EA8E8(void)
 {
     switch (D_00152C20) {
     case 0:
     case 3:
-        func_0027C480();
+        RenderFrameAllLayers();
         break;
     case 1:
         D_001B1594 = 127;
-        func_0027BD70();
+        RenderFrame();
         break;
     case 2:
-        func_002E8BA8();
+        RenderTransitionScene();
         break;
     }
 }
@@ -181,15 +186,16 @@ extern int func_001261F0(int);
 extern int func_00132028(void);
 extern void func_002E6088(int, long);
 
+/* Starts a background load and waits until it reports back. */
 void func_002EAAA8(void *arg, int *status) {
     *status = -1;
-    func_001325E8(arg, func_002E6088, (unsigned long long)(unsigned int)status);
+    func_001325E8(arg, StoreSoundResult, (unsigned long long)(unsigned int)status);
     {
         int sentinel = -1;
         do {
-            func_0011AEA0(0);
-            func_001261F0(0);
-            func_00132028();
+            FlushCache(0);
+            GetGsCurrentField(0);
+            snd_Pump();
         } while (*status == sentinel);
     }
 }
@@ -202,17 +208,18 @@ extern char D_0014B540[];
 extern int func_002B7B18(int, int, int);
 extern void func_002B7CE0(int);
 
+/* Loads the data for one chunk of the current scene. */
 int func_002EB158(int index)
 {
-    char *table = D_0014B540;
-    int row = D_001B8840.selected * 0x14C;
-    int destination = D_001B8840.destination;
+    char *table = gCopySetupData;
+    int row = gScenePlaybackState.selected * 0x14C;
+    int destination = gScenePlaybackState.destination;
     int base = (int)(table + 0x3EA8);
     int first = *(int *)((index << 2) + row + base);
     int count = *(int *)(((index + 1) << 2) + row + base) - first;
     if (count > 0) {
-        func_002B7B18(destination, first + *(int *)(table + 0x3E24), count);
-        func_002B7CE0(0);
+        StartDiscRead(destination, first + *(int *)(table + 0x3E24), count);
+        PumpMusicAndDiscRead(0);
     }
     return 1;
 }

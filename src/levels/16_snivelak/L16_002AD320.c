@@ -126,60 +126,62 @@ extern float func_00282C48(float);
 extern int func_L16_002C0BC8(int, int);
 
 /* Same body as func_L11_002C51D0, with this function's own callees. */
+/* Reads the controller command for the player and starts the attack, jump or hover state it asks for. */
 void func_L16_002AD320(void)
 {
-    short command = D_00189E20.command;
-    u8 saved = D_00189E20.saved;
+    short command = gHeroState.command;
+    u8 saved = gHeroState.saved;
     int active;
 
-    func_00282A88(&D_00189E20.command, 16);
-    D_00189E20.command = command;
-    D_00189E20.saved = saved;
-    D_00189E20.request = 0;
-    D_00189E20.pendingJump = 0;
-    if (D_00189E20.disabled) return;
+    FastMemoryHelperB(&gHeroState.command, 16);
+    gHeroState.command = command;
+    gHeroState.saved = saved;
+    gHeroState.request = 0;
+    gHeroState.pendingJump = 0;
+    if (gHeroState.disabled) return;
     active = 0;
-    if (D_00189E20.busy || (D_00189E20.state == 0x7b && D_00189E20.elapsed < 0.4f)) active = 1;
+    if (gHeroState.busy || (gHeroState.state == 0x7b && gHeroState.elapsed < 0.4f)) active = 1;
     if (command == -1) return;
-    if (command == 2 && !D_00189E20.inputLock &&
-        (!D_00189E20.jumpCount || D_00189E20.elapsed < 2.5f)) {
-        D_00189E20.jumpPressed = 1;
-        if (!D_00189E20.mode && D_001A7B0B) D_00189E20.pendingJump = 1;
+    if (command == 2 && !gHeroState.inputLock &&
+        (!gHeroState.jumpCount || gHeroState.elapsed < 2.5f)) {
+        gHeroState.jumpPressed = 1;
+        if (!gHeroState.mode && D_001A7B0B) gHeroState.pendingJump = 1;
     }
-    if (command == 3) D_00189E20.jump = 1;
-    if (command == 11) D_00189E20.cancel = 1;
-    if (command == 1) D_00189E20.attack = 1;
-    if (command == 8) D_00189E20.hover = 1;
-    if (command == 12) D_00189E20.hover = 1;
-    if (D_00189E20.attack) {
-        if (D_00189E20.attack && active &&
-            (D_00189E20.state != 0x38 || D_00189E20.animationDone)) {
-            if (D_00189E20.health) { func_L16_002C0BC8(0x38,1); return; }
-            if (D_001A79F0 == 2 && D_L16_001A9010) { func_L16_002C0BC8(0x7d,1); return; }
-            if (*(int *)(*(u8 **)(D_00189E20.object + 0x24) + 0x1f0)) { func_L16_002C0BC8(0x79,1); return; }
-            func_L16_002C0BC8(0x39,1); return;
+    if (command == 3) gHeroState.jump = 1;
+    if (command == 11) gHeroState.cancel = 1;
+    if (command == 1) gHeroState.attack = 1;
+    if (command == 8) gHeroState.hover = 1;
+    if (command == 12) gHeroState.hover = 1;
+    if (gHeroState.attack) {
+        if (gHeroState.attack && active &&
+            (gHeroState.state != 0x38 || gHeroState.animationDone)) {
+            if (gHeroState.health) { EnterPlayerState(0x38,1); return; }
+            if (gCurrentMapIndex == 2 && D_L16_001A9010) { EnterPlayerState(0x7d,1); return; }
+            if (*(int *)(*(u8 **)(gHeroState.object + 0x24) + 0x1f0)) { EnterPlayerState(0x79,1); return; }
+            EnterPlayerState(0x39,1); return;
         }
     }
-    if (D_00189E20.jump && D_00189E20.state != 0x65 && D_00189E20.state != 0x78 &&
-        func_00282C48(D_00189E20.jumpTime-(D_00189E20.position.f[2]+0.25f)) < 1.0f &&
-        D_00189E20.jumpTime-D_00189E20.position.f[2] > 0.0f &&
-        (D_00189E20.state != 0x66 || D_00189E20.animationDone) &&
-        (D_00189E20.motion.f[2] < 0.0f || D_00189E20.state == 0x7b)) {
-        if (!D_00189E20.health) { func_L16_002C0BC8(0x78,1); return; }
-        func_L16_002C0BC8(0x65,1); return;
+    if (gHeroState.jump && gHeroState.state != 0x65 && gHeroState.state != 0x78 &&
+        FloatAbs(gHeroState.jumpTime-(gHeroState.position.f[2]+0.25f)) < 1.0f &&
+        gHeroState.jumpTime-gHeroState.position.f[2] > 0.0f &&
+        (gHeroState.state != 0x66 || gHeroState.animationDone) &&
+        (gHeroState.motion.f[2] < 0.0f || gHeroState.state == 0x7b)) {
+        if (!gHeroState.health) { EnterPlayerState(0x78,1); return; }
+        EnterPlayerState(0x65,1); return;
     }
-    if (!D_00189E20.cancel || D_00189E20.state == 0x78 || D_00189E20.state == 0x74) return;
-    if (!(func_00282C48(D_00189E20.jumpTime-(D_00189E20.position.f[2]+0.25f)) < 1.0f)) return;
-    if (!(D_00189E20.jumpTime-D_00189E20.position.f[2] > 0.0f)) return;
-    if (!(D_00189E20.motion.f[2] < 0.0f) && D_00189E20.state != 0x7b) return;
-    if (D_001A79F0 == 13) {
-        func_L16_002C0BC8(0x74, 1);
+    if (!gHeroState.cancel || gHeroState.state == 0x78 || gHeroState.state == 0x74) return;
+    if (!(FloatAbs(gHeroState.jumpTime-(gHeroState.position.f[2]+0.25f)) < 1.0f)) return;
+    if (!(gHeroState.jumpTime-gHeroState.position.f[2] > 0.0f)) return;
+    if (!(gHeroState.motion.f[2] < 0.0f) && gHeroState.state != 0x7b) return;
+    if (gCurrentMapIndex == 13) {
+        EnterPlayerState(0x74, 1);
         return;
     }
-    func_L16_002C0BC8(0x78, 1);
+    EnterPlayerState(0x78, 1);
 }
 
 
+/* Moves the player out of walls and floors after a step; returns -1 if it was pushed far, 1 otherwise. */
 int func_L16_002B59A0(int mode)
 {
     Vec previous;
@@ -189,47 +191,47 @@ int func_L16_002B59A0(int mode)
 
     if (PLAYER->collision_off_frames) return 1;
     qcopy(&previous, &PLAYER->position);
-    func_00282C88(&offset);
+    ClearVector128(&offset);
     if (PLAYER->path_constrain_pending) {
-        func_L00_002D49F0();
+        CheckHeroTimedCondition();
         PLAYER->path_constrain_pending = 0;
     }
     facingUp = 0;
-    if (func_00282DB0(&PLAYER->basis, &PLAYER->up) > -0.92f) facingUp = 1;
+    if (FastVecDot(&PLAYER->basis, &PLAYER->up) > -0.92f) facingUp = 1;
     switch (PLAYER->control_mode) {
     case 17:
         break;
     case 15:
-        func_00282C88(&offset);
+        ClearVector128(&offset);
         offset.z = 0.8f;
-        func_00283098(&offset, &offset, PLAYER->moby + 0xc0);
+        matrix_mul_vec3(&offset, &offset, PLAYER->moby + 0xc0);
         break;
     default:
         if (PLAYER->gravity_mode || PLAYER->timer || facingUp) {
             if (PLAYER->state == 2) {
-                func_L00_002D38A0((Quad *)&offset, (Quad *)&offset, 5.0f);
+                OffsetPointInViewSpace((Quad *)&offset, (Quad *)&offset, 5.0f);
             } else if (PLAYER->gravity_mode == 1 || PLAYER->timer) {
-                func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, 0.6f);
+                BuildHeroRelativePoint(&offset.x, 0, 0.0f, 0.0f, 0.6f);
             } else if (D_L16_001A8FF0) {
-                func_L00_002D38A0((Quad *)&offset, (Quad *)&offset, 0.77f);
+                OffsetPointInViewSpace((Quad *)&offset, (Quad *)&offset, 0.77f);
             } else {
-                func_L00_002D36E0(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
+                BuildHeroRelativePoint(&offset.x, 0, 0.0f, 0.0f, PLAYER->capsule_bottom);
             }
         } else {
             offset.z = PLAYER->capsule_bottom;
         }
         break;
     }
-    func_00282CC0(&PLAYER->position, &PLAYER->position, &offset);
+    FastVecAdd(&PLAYER->position, &PLAYER->position, &offset);
     for (iteration = 0; iteration < 8; ++iteration) {
         if (PLAYER->control_mode == 15) {
-            if (!func_00277258(0.45f, &PLAYER->position, 0x324, PLAYER->moby)) break;
+            if (!TestPointAgainstCollision(0.45f, &PLAYER->position, 0x324, PLAYER->moby)) break;
         } else {
             PlayerView *player = PLAYER;
             if (player->gravity_mode || facingUp) {
-                hit = func_00277258(player->capsule_radius, &player->position, 0x324, player->moby);
+                hit = TestPointAgainstCollision(player->capsule_radius, &player->position, 0x324, player->moby);
                 if (!player->locked)
-                    hit |= func_00278870(&player->position, player->capsule_radius);
+                    hit |= ProcessCollisionTriangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             } else {
                 extent = player->capsule_top - player->capsule_bottom;
@@ -237,7 +239,7 @@ int func_L16_002B59A0(int mode)
                 hit = func_L00_002E0200(player->capsule_radius, &player->position, 0x324,
                                         player->moby, extent);
                 if (!player->locked)
-                    hit |= func_00278870(&player->position, player->capsule_radius);
+                    hit |= ProcessCollisionTriangles(&player->position, player->capsule_radius);
                 if (!hit) break;
             }
         }
@@ -247,9 +249,9 @@ int func_L16_002B59A0(int mode)
         PLAYER->wall_hit = 1;
         PLAYER->coll_hit_moby = HIT->moby;
     }
-    func_00282CF0(&PLAYER->position, &PLAYER->position, &offset);
-    func_00282CF0(&displacement, &PLAYER->position, &previous);
-    if (func_00282DF0(&displacement) > PLAYER->capsule_radius * 1.5f) {
+    FastVecSub(&PLAYER->position, &PLAYER->position, &offset);
+    FastVecSub(&displacement, &PLAYER->position, &previous);
+    if (FastVecLength(&displacement) > PLAYER->capsule_radius * 1.5f) {
         if (mode == 15) {
             if (displacement.x > 512.0f) displacement.x = 512.0f;
             else if (displacement.x < -512.0f) displacement.x = -512.0f;
@@ -257,8 +259,8 @@ int func_L16_002B59A0(int mode)
             else if (displacement.y < -512.0f) displacement.y = -512.0f;
             if (displacement.z > 512.0f) displacement.z = 512.0f;
             else if (displacement.z < -512.0f) displacement.z = -512.0f;
-            func_00282F20(&displacement, &displacement, PLAYER->capsule_radius);
-            func_00282CC0(&PLAYER->position, &previous, &displacement);
+            vec_scale_to_length(&displacement, &displacement, PLAYER->capsule_radius);
+            FastVecAdd(&PLAYER->position, &previous, &displacement);
         }
         return -1;
     }

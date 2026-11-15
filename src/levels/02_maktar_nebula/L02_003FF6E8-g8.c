@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef short s16;
@@ -51,51 +52,52 @@ static __inline__ int scaled_coord(int value, float scale, float half, int activ
 
 /* Level 2 copy of func_L11_004456A0 (src/levels/11_joba/L11_004456A0-g8.c), transcribed
    with this level's data. */
-void func_L02_003FF6E8(char *a0) {
-    char buf1[0x20];
-    char buf2[0x70];
+/* Draws the info panel for the selected challenge: a title, a box and a line with the best result so far. */
+void func_L02_003FF6E8(char *actor) {
+    char rect[0x20];
+    char lineBuf[0x70];
     char *state;
     char *text;
     char *msg;
-    float x, s, half;
-    int r0, r1, r2, r3, one;
+    float x, scale, half;
+    int titleY, boxX, boxY, boxHeight, one;
 
-    func_L02_003FDDE8(a0, 0);
+    DrawChallengeMenuHelpPrompts(actor, 0);
     half = 0.5f;
-    state = *(char **)(a0 + 0x68);
-    text = (char *)func_00288FB8(0x2F45);
+    state = *(char **)(actor + 0x68);
+    text = (char *)GetLocalizedString(0x2F45);
     one = 1;
-    s = D_L02_001B3E04;
+    scale = D_L02_001B3E04;
     x = (float)D_L02_001B1440;
-    r0 = scaled_coord(D_L02_001B1444, s, half, one);
-    func_0027F640(x, (float)r0, D_L02_001B143C, text, D_L02_001B1438, -1,
-                  func_0027C878(1), D_L02_0028E990);
-    s = D_L02_001B3E04;
-    r1 = scaled_coord(D_L02_001B1460, s, half, one);
-    r2 = scaled_coord(D_L02_001B1464, s, half, one);
-    r3 = scaled_coord(D_L02_001B1450, s, half, one);
-    func_002802E0(buf1, r1, r2, D_L02_001B1468, D_L02_001B146C, D_L02_001B144C, r3,
+    titleY = scaled_coord(D_L02_001B1444, scale, half, one);
+    FontPrintScaled(x, (float)titleY, D_L02_001B143C, text, D_L02_001B1438, -1,
+                  GetEffectTextureDescriptor(1), D_L02_0028E990);
+    scale = D_L02_001B3E04;
+    boxX = scaled_coord(D_L02_001B1460, scale, half, one);
+    boxY = scaled_coord(D_L02_001B1464, scale, half, one);
+    boxHeight = scaled_coord(D_L02_001B1450, scale, half, one);
+    FontSetWindow(rect, boxX, boxY, D_L02_001B1468, D_L02_001B146C, D_L02_001B144C, boxHeight,
                   D_L02_001B1470, 3);
-    if (*(s16 *)(state + 0x118) == 0 && D_001395B8[func_L02_003F9B70(0)] < 2) {
-        text = (char *)func_00288FB8(0x2F46);
-        func_00280270(buf1, D_L02_001B1448, text, func_001157AC(text));
+    if (*(s16 *)(state + 0x118) == 0 && D_001395B8[GetChallengeSaveIndex(0)] < 2) {
+        text = (char *)GetLocalizedString(0x2F46);
+        DrawTextWindowLargeFont(rect, D_L02_001B1448, text, strlen_001157AC(text));
     } else {
-        text = (char *)func_00288FB8(0x2F62);
-        msg = (char *)func_00288FB8(0x2F5E);
-        func_00115DA8(buf2, D_L02_001B1228, text, *(int *)(state + 0x110), msg);
-        func_00280270(buf1, D_L02_001B1448, buf2, func_001157AC(buf2));
+        text = (char *)GetLocalizedString(0x2F62);
+        msg = (char *)GetLocalizedString(0x2F5E);
+        Sprintf(lineBuf, D_L02_001B1228, text, *(int *)(state + 0x110), msg);
+        DrawTextWindowLargeFont(rect, D_L02_001B1448, lineBuf, strlen_001157AC(lineBuf));
     }
-    text = (char *)func_00288FB8(0x2F47);
+    text = (char *)GetLocalizedString(0x2F47);
     {
         float half = 0.5f;
         int one = 1;
 
-        s = D_L02_001B3E04;
-        r1 = scaled_coord(D_L02_001B1460, s, half, one);
-        r2 = scaled_coord(D_L02_001B1464, s, half, one);
-        r3 = scaled_coord(D_L02_001B145C, s, half, one);
-        func_002802E0(buf1, r1, r2, D_L02_001B1468, D_L02_001B146C, D_L02_001B1458, r3,
+        scale = D_L02_001B3E04;
+        boxX = scaled_coord(D_L02_001B1460, scale, half, one);
+        boxY = scaled_coord(D_L02_001B1464, scale, half, one);
+        boxHeight = scaled_coord(D_L02_001B145C, scale, half, one);
+        FontSetWindow(rect, boxX, boxY, D_L02_001B1468, D_L02_001B146C, D_L02_001B1458, boxHeight,
                       D_L02_001B1470, 3);
     }
-    func_00280190(buf1, D_L02_001B1454, text, func_001157AC(text));
+    DrawTextWindowSmallFont(rect, D_L02_001B1454, text, strlen_001157AC(text));
 }

@@ -50,104 +50,106 @@ extern s32 func_002E5CF8(s32, s32, u8 *);
 /* Creates the follower object for `src` (the effect that tracks `target`, or the hero, or nothing): copies
    the pose rows, fills the state, and when it has a live target works out the direction, the distance and
    the aim test, dropping the target when the aim, the range or the helper says so. */
-u8 *func_L23_00422A30(u8 *src, TI16 *pos, u8 *target, s32 a3, s32 a4) {
+/* Creates a homing shot. It chooses a target (given, the hero, or none), points the shot
+   at it, and drops the target if it is too far, off to the side or blocked. */
+u8 *func_L23_00422A30(u8 *src, TI16 *pos, u8 *target, s32 trackMoby, s32 trackPoint) {
     u8 *obj;
-    u8 *st;
+    u8 *vars;
     TI16 loc[4];
-    float f20;
-    float f21;
-    float f22;
-    float dot;
-    s32 flag;
+    float targetValue;
+    float sourceValue;
+    float distance;
+    float aimDot;
+    s32 tooFarOff;
     u8 *hero;
-    TI16 c0;
-    TI16 c1;
-    TI16 c2;
-    TI16 *reverse;
+    TI16 row0;
+    TI16 row1;
+    TI16 row2;
+    TI16 *backDir;
 
-    obj = func_0029EFD0(0x118F);
+    obj = CreateMoby(0x118F /* moby class 4495 */);
     if (obj != 0) {
-        st = *(u8 **)(obj + 0x68);
-        func_002B37E8(obj, src);
+        vars = *(u8 **)(obj + 0x68);
+        InitChildObjectFromParent(obj, src);
         *(float *)(obj + 0x2C) = *(float *)(obj + 0x2C) * D_L23_001B1910;
         *(u16 *)(obj + 0x34) = *(u16 *)(obj + 0x34) | 0x100;
-        *(float *)(st + 0x1C) = 0.33333334f;
-        c0 = *(TI16 *)(src + 0xC0);
-        *(TI16 *)(obj + 0xC0) = c0;
-        c1 = *(TI16 *)(src + 0xD0);
-        *(TI16 *)(obj + 0xD0) = c1;
-        c2 = *(TI16 *)(src + 0xE0);
-        *(TI16 *)(obj + 0xE0) = c2;
-        *(u8 **)(st + 0x10) = src;
+        *(float *)(vars + 0x1C) = 0.33333334f;
+        row0 = *(TI16 *)(src + 0xC0);
+        *(TI16 *)(obj + 0xC0) = row0;
+        row1 = *(TI16 *)(src + 0xD0);
+        *(TI16 *)(obj + 0xD0) = row1;
+        row2 = *(TI16 *)(src + 0xE0);
+        *(TI16 *)(obj + 0xE0) = row2;
+        *(u8 **)(vars + 0x10) = src;
         qcopy(obj + 0x10, pos);
-        *(s32 *)(st + 0x14) = 0x96;
+        *(s32 *)(vars + 0x14) = 0x96;
         *(float *)(obj + 0x2C) = *(float *)(obj + 0x2C) + *(float *)(obj + 0x2C);
-        st[0x28] = a3;
-        st[0x29] = a4;
-        hero = D_L23_001B1484;
+        vars[0x28] = trackMoby;
+        vars[0x29] = trackPoint;
+        hero = gMothershipBossMoby;
         if (target != 0) {
-            *(u8 **)(st + 0x18) = target;
-            *(s32 *)(st + 0x24) = 0x890000;
+            *(u8 **)(vars + 0x18) = target;
+            *(s32 *)(vars + 0x24) = 0x890000;
         } else {
             if (hero != 0) {
-                *(u8 **)(st + 0x18) = hero;
-                if (*(s16 *)(hero + 0xAA) == 0xF7F) {
-                    *(s32 **)(st + 0x2C) = &D_L23_001B36E0;
+                *(u8 **)(vars + 0x18) = hero;
+                if (*(s16 *)(hero + 0xAA) == 0xF7F /* Mothership Boss Part */) {
+                    *(s32 **)(vars + 0x2C) = &D_L23_001B36E0;
                 } else {
-                    *(u8 **)(st + 0x2C) = hero + 0x10;
+                    *(u8 **)(vars + 0x2C) = hero + 0x10;
                 }
-                *(s32 *)(st + 0x24) = 0x890000;
+                *(s32 *)(vars + 0x24) = 0x890000;
             } else {
-                *(s32 *)(st + 0x18) = 0;
-                *(s32 *)(st + 0x24) = 0x890000;
-                st[0x29] = 0;
-                st[0x28] = 0;
+                *(s32 *)(vars + 0x18) = 0;
+                *(s32 *)(vars + 0x24) = 0x890000;
+                vars[0x29] = 0;
+                vars[0x28] = 0;
             }
         }
-        if (src == D_00189E20.f2290) {
-            st[0x29] = 1;
+        if (src == gHeroState.f2290) {
+            vars[0x29] = 1;
         }
-        if (st[0x28] == 0 && *(s32 *)(st + 0x18) != 0) {
-            qcopy(&loc[0], *(void **)(st + 0x2C));
-            func_L23_00418650(&loc[0], 0.0f);
-            func_00282CF0(st + 0x30, *(u8 **)(st + 0x2C), obj + 0x10);
+        if (vars[0x28] == 0 && *(s32 *)(vars + 0x18) != 0) {
+            qcopy(&loc[0], *(void **)(vars + 0x2C));
+            ProjectPointOntoPlanetSurface(&loc[0], 0.0f);
+            FastVecSub(vars + 0x30, *(u8 **)(vars + 0x2C), obj + 0x10);
             qcopy(&loc[1], obj + 0x10);
-            func_L23_00418650(&loc[1], 0.0f);
-            func_00282CF0(&loc[2], &loc[0], &loc[1]);
-            flag = 0;
-            func_00282F20(&loc[2], &loc[2], 1.0f);
-            func_00282F20(st + 0x30, st + 0x30, 1.0f);
-            f21 = func_002B0360(src + 0x10);
-            f20 = func_002B0360(*(u8 **)(st + 0x2C));
-            f22 = func_00282E48(&loc[0], &loc[1]);
-            if (f22 < 5.0f) {
-                if (func_00282C48(f21 - f20) > 10.0f) {
-                    flag = 1;
+            ProjectPointOntoPlanetSurface(&loc[1], 0.0f);
+            FastVecSub(&loc[2], &loc[0], &loc[1]);
+            tooFarOff = 0;
+            vec_scale_to_length(&loc[2], &loc[2], 1.0f);
+            vec_scale_to_length(vars + 0x30, vars + 0x30, 1.0f);
+            sourceValue = GetDistanceFromGravityCenter(src + 0x10);
+            targetValue = GetDistanceFromGravityCenter(*(u8 **)(vars + 0x2C));
+            distance = fast_vec_dist(&loc[0], &loc[1]);
+            if (distance < 5.0f) {
+                if (FloatAbs(sourceValue - targetValue) > 10.0f) {
+                    tooFarOff = 1;
                 }
             }
             qcopy(&loc[3], obj + 0xC0);
-            dot = func_00282DB0(&loc[2], &loc[3]);
-            if ((src == D_00189E20.f2290 && *(*(u8 **)(st + 0x18) + 0x31) == 0) ||
-                dot < D_L23_001B1928 || 50.0f < f22 || flag != 0 || func_L23_0041B948() != 0) {
-                *(s32 *)(st + 0x18) = 0;
+            aimDot = FastVecDot(&loc[2], &loc[3]);
+            if ((src == gHeroState.f2290 && *(*(u8 **)(vars + 0x18) + 0x31) == 0) ||
+                aimDot < D_L23_001B1928 || 50.0f < distance || tooFarOff != 0 || IsBossHeldFlagSet() != 0) {
+                *(s32 *)(vars + 0x18) = 0;
             }
-            if (src == D_00189E20.f2290) {
-                if (*(s32 *)(st + 0x18) != 0) {
-                    D_00189E20.f188C = st + 0x30;
-                } else if (D_00189E20.f2294 == 0x5B) {
-                    reverse = (TI16 *)(src + 0xE0);
-                    qcopy(&D_L23_001B1FB0, reverse);
-                    func_00282D30(&D_L23_001B1FB0, &D_L23_001B1FB0, -1.0f);
-                    D_00189E20.f188C = (u8 *)&D_L23_001B1FB0;
-                    qcopy(st + 0x30, &D_L23_001B1FB0);
-                    st[0x28] = 0;
-                    *(s32 *)(st + 0x18) = 1;
-                    st[0x29] = 0;
+            if (src == gHeroState.f2290) {
+                if (*(s32 *)(vars + 0x18) != 0) {
+                    gHeroState.f188C = vars + 0x30;
+                } else if (gHeroState.f2294 == 0x5B) {
+                    backDir = (TI16 *)(src + 0xE0);
+                    qcopy(&D_L23_001B1FB0, backDir);
+                    FastVecScale(&D_L23_001B1FB0, &D_L23_001B1FB0, -1.0f);
+                    gHeroState.f188C = (u8 *)&D_L23_001B1FB0;
+                    qcopy(vars + 0x30, &D_L23_001B1FB0);
+                    vars[0x28] = 0;
+                    *(s32 *)(vars + 0x18) = 1;
+                    vars[0x29] = 0;
                 }
             }
         }
-        *(s32 *)(st + 0x20) = 0;
-        func_002E5CF8(1, 0, obj);
+        *(s32 *)(vars + 0x20) = 0;
+        PlayMobySound(1, 0, obj);
         *(u16 *)(obj + 0x34) = *(u16 *)(obj + 0x34) | 0x41;
         obj[0xBC] = 0;
     }

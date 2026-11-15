@@ -24,9 +24,10 @@ extern void func_L00_002D4C28(char *);
    0.97 of the first scale and the first scale itself) unless object kind 0xF6B, then either
    runs the one-shot spawn or attaches manipulators 22 and 23 at scale 0.01 and runs
    func_L00_002D4C28. */
+/* Sets up the glow effects on a level object, either spawning the glow object or attaching the glow records and running the level update. */
 void func_L00_002D4E58(char *object, int spawn)
 {
-    Manipulator4E58 *record;
+    Manipulator4E58 *glowRecord;
     int i;
 
     if (D_001A7A40[1])
@@ -38,8 +39,8 @@ void func_L00_002D4E58(char *object, int spawn)
     else
         D_L00_001A7CF8 = 1.0f;
     if (D_L00_001B16D0.initialized == 0) {
-        func_0029F978(object, 24, &D_L00_001B16D0);
-        if (*(short *)(object + 0xAA) == 0xF6B) {
+        AttachManipulator(object, 24, &D_L00_001B16D0);
+        if (*(short *)(object + 0xAA) == 0xF6B /* moby class 3947 */) {
             D_L00_001B16D0.scale[0] = 0.92f;
             D_L00_001B16D0.scale[1] = 0.92f;
             D_L00_001B16D0.scale[2] = 0.92f;
@@ -49,22 +50,22 @@ void func_L00_002D4E58(char *object, int spawn)
             D_L00_001B16D0.scale[2] = D_L00_001A7CF4;
         }
     }
-    if (*(short *)(object + 0xAA) == 0xF6B)
+    if (*(short *)(object + 0xAA) == 0xF6B /* moby class 3947 */)
         return;
     if (spawn) {
-        func_L00_002D4D98(object);
+        SpawnLevelGlowObject(object);
         return;
     }
     if (D_0018B090[0]) {
-        record = D_L00_001B2D80;
-        for (i = 0; i < 2; i++, record++) {
-            if (record->initialized == 0) {
-                func_0029F978(object, i + 22, record);
-                record->scale[0] = 0.01f;
-                record->scale[1] = 0.01f;
-                record->scale[2] = 0.01f;
+        glowRecord = D_L00_001B2D80;
+        for (i = 0; i < 2; i++, glowRecord++) {
+            if (glowRecord->initialized == 0) {
+                AttachManipulator(object, i + 22, glowRecord);
+                glowRecord->scale[0] = 0.01f;
+                glowRecord->scale[1] = 0.01f;
+                glowRecord->scale[2] = 0.01f;
             }
         }
     }
-    func_L00_002D4C28(object);
+    UpdateLevelGlowObjects(object);
 }

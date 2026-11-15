@@ -10,16 +10,16 @@ extern void func_0027C660(void);
 /* Draw centered text in scaled screen coordinates. */
 int func_002CF2B8(void)
 {
-    float position;
-    int y;
+    float unscaledY;
+    int screenY;
 
-    func_0027C540(0);
+    SetupGifPaging(0);
     func_0029C530();
-    position = 256.0f;
-    y = (int)(D_001B23A4[0] * position + 0.5f);
+    unscaledY = 256.0f;
+    screenY = (int)(D_001B23A4[0] * unscaledY + 0.5f);
     do {
-        func_0027FAA8(0x1A5, y, 0x80F0F0F0ULL, (u8 *)func_00288FB8(0x2D4F), -1);
+        DrawTextCenteredSmallFont(0x1A5, screenY, 0x80F0F0F0ULL, (u8 *)GetLocalizedString(0x2D4F), -1);
     } while (0);
-    func_0027C660();
+    DoGifPaging();
     return 0;
 }

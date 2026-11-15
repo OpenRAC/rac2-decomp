@@ -66,6 +66,7 @@ extern void func_L00_003FE490(void *);
 
 /* Coordinate the multi-object interaction and its repeat/cooldown timers. */
 
+/* Per-frame update of the Bouncer weapon (also used by the Heavy Bouncer): aims, fires and runs the reload timer. */
 void func_L00_003FDE48(unsigned char *object) {
     float origin[4];
     float aim[4];
@@ -84,50 +85,50 @@ void func_L00_003FDE48(unsigned char *object) {
         *(int *)(state + 0x2C) = 0;
         D_L00_001B2BE4 = 20;
     }
-    if (D_00189E20.level == 1) func_L00_002C42E0(29, 1);
-    if (object[0x42] == object[0x43] && (object[0x60] & 2)) func_002A75E0(object, 1, 0, 2, 0);
-    func_L00_003FE280(object, (char *)origin);
+    if (gHeroState.level == 1) SetHeroAction_L00(29, 1);
+    if (object[0x42] == object[0x43] && (object[0x60] & 2)) StartAnimationBlendedWithFlags(object, 1, 0, 2, 0);
+    ComputeMobyOffsetPoint(object, (char *)origin);
     target = 0;
-    if (D_00189E20.target != 0 && (u8)D_00189E20.target[0x20] != 0xFE && (u8)D_00189E20.target[0x20] != 0xFD) {
-        target_data = func_002AB1F0((u8 *)D_00189E20.target);
-        if (target_data != 0 && *(float *)target_data > 0.0f) target = D_00189E20.target;
+    if (gHeroState.target != 0 && (u8)gHeroState.target[0x20] != 0xFE && (u8)gHeroState.target[0x20] != 0xFD) {
+        target_data = GetMobyPrivateValue0((u8 *)gHeroState.target);
+        if (target_data != 0 && *(float *)target_data > 0.0f) target = gHeroState.target;
     }
     allowed = 1;
-    if (D_00189E20.level == 29) {
-        if (!func_00282948(&D_00189E20.cooldown)) allowed = 0;
+    if (gHeroState.level == 29) {
+        if (!FastFloatHelperD(&gHeroState.cooldown)) allowed = 0;
     }
-    else D_00189E20.cooldown = 40;
-    func_002FDF40(1.6f, 10.0f, 0.25f, 0.004055555909872055f, aim, origin, target, 0);
-    *(int *)(state + 0x24) = func_002FE5A0(0.004055555909872055f, origin, aim, state, state + 0x10, object, 0, 0);
+    else gHeroState.cooldown = 40;
+    CalculateAimedLaunchVelocity(1.6f, 10.0f, 0.25f, 0.004055555909872055f, aim, origin, target, 0);
+    *(int *)(state + 0x24) = TraceProjectileToImpact(0.004055555909872055f, origin, aim, state, state + 0x10, object, 0, 0);
     was_running = *(float *)(state + 0x20) > 0.0f;
-    func_002829D8((float *)(state + 0x20));
-    if (was_running && *(float *)(state + 0x20) <= 0.0f && func_L00_002D4040(-1)) func_002E5CF8(3, 0, object);
-    if (*(int *)(state + 0x2C) != 0 && func_00282948((int *)(state + 0x2C))) func_L00_002AF7D0();
-    if ((D_00138180.pressed & D_00189E20.buttons) && !func_L00_002D4040(-1)) {
-        func_002E5CF8(1, 0, object);
+    FastVectorHelperB((float *)(state + 0x20));
+    if (was_running && *(float *)(state + 0x20) <= 0.0f && get_ammo(-1)) PlayMobySound(3, 0, object);
+    if (*(int *)(state + 0x2C) != 0 && FastFloatHelperD((int *)(state + 0x2C))) cancel_hero_item_animation();
+    if ((gPadState.pressed & gHeroState.buttons) && !get_ammo(-1)) {
+        PlayMobySound(1, 0, object);
         D_L00_001B2BE4 = 20;
     }
-    if (D_L00_001A8F00 == 0 && *(float *)(state + 0x20) == 0.0f && D_00189E20.busy == 0 &&
-        (u8)object[0x42] <= 1 && (D_00138180.held & D_00189E20.buttons) && D_00189E20.resource >= 23 && allowed) {
-        if (func_L00_002D4040(-1)) {
-            func_002E5CF8(0, 0, object);
-            func_L00_002D3F30(-1, 1);
-            func_L00_003FE310(object, origin, aim);
-            func_002A75E0(object, 2, 0, 2, 0);
-            func_L00_003FE2D0((int)object, (int)origin, (int)aim);
-            func_L00_002AF568();
+    if (D_L00_001A8F00 == 0 && *(float *)(state + 0x20) == 0.0f && gHeroState.busy == 0 &&
+        (u8)object[0x42] <= 1 && (gPadState.held & gHeroState.buttons) && gHeroState.resource >= 23 && allowed) {
+        if (get_ammo(-1)) {
+            PlayMobySound(0, 0, object);
+            SpendWeaponAmmo(-1, 1);
+            SpawnMuzzleSparkBurst(object, origin, aim);
+            StartAnimationBlendedWithFlags(object, 2, 0, 2, 0);
+            SpawnBouncerDebris((int)object, (int)origin, (int)aim);
+            start_equipped_item_animation();
             *(int *)(state + 0x2C) = 16;
-            *(int *)(state + 0x28) = func_L00_002D6998(&D_L00_0029F210);
+            *(int *)(state + 0x28) = CopyRecordsToFreeSlots(&D_L00_0029F210);
         }
-        if (!(D_00138180.held & D_00189E20.buttons) || !func_L00_002D4040(-1) || D_00189E20.f22B8 == 0) {
+        if (!(gPadState.held & gHeroState.buttons) || !get_ammo(-1) || gHeroState.f22B8 == 0) {
             handle = *(int *)(state + 0x28);
             if (handle >= 0) {
-                func_L00_002D6B70(handle);
+                ResetActiveSlots(handle);
                 *(int *)(state + 0x28) = -1;
             }
         }
-        entry = D_L00_00262570 + D_0013958D[0];
+        entry = gWeaponTable_L00 + D_0013958D[0];
         *(float *)(state + 0x20) = 1.0f / entry->rate;
     }
-    ref_L00_003FDE48_00(func_L00_003FE490, object);
+    ref_L00_003FDE48_00(DrawAttachedEffect, object);
 }

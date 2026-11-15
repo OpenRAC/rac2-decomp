@@ -18,94 +18,95 @@ extern void func_002A7750(void *, int, int);
 extern void func_L18_00428138(void *);
 extern int func_001163B0(void);
 extern void func_002A6C58(void *, int, int);
-void func_L18_00428AE8(u8 *o) {
-    float a[4] __attribute__((aligned(16)));
-    float b[4] __attribute__((aligned(16)));
-    u8 *s = *(u8 **)(o + 0x68);
-    float old1, old2;
-    int n = *(int *)(s + 0x3B4);
-    if (n != -1) {
-        u8 *m = (u8 *)((n << 8) + ref_L18_00428AE8_00);
-        if (((Obj *)m)->h[0xAA/2] == 0x114D && ((Obj *)m)->b[0x20] != 0xFE && ((Obj *)m)->b[0x20] != 0xFD)
-            ((Obj *)m)->i[0x98/4] = 0;
+/* Moves the enemy each frame: it heads for its target or wanders when it has none, and drops into its fall state if it sinks too low. It also holds a linked helper object still while it does this. */
+void func_L18_00428AE8(u8 *moby) {
+    float scaledVec[4] __attribute__((aligned(16)));
+    float aimVec[4] __attribute__((aligned(16)));
+    u8 *vars = *(u8 **)(moby + 0x68);
+    float savedLimit, savedRate;
+    int helperIndex = *(int *)(vars + 0x3B4);
+    if (helperIndex != -1) {
+        u8 *helper = (u8 *)((helperIndex << 8) + ref_L18_00428AE8_00);
+        if (((Obj *)helper)->h[0xAA/2] == 0x114D /* moby class 4429 */ && ((Obj *)helper)->b[0x20] != 0xFE && ((Obj *)helper)->b[0x20] != 0xFD)
+            ((Obj *)helper)->i[0x98/4] = 0;
     }
-    if (o[0x95] == 13) {
-        func_00282F20(a, D_L18_001B281C + (*(int *)(s+0x3B4)<<8) + 0xC0, 5.0f);
-        func_00282CD8(b, a, D_L18_001B281C + (*(int *)(s+0x3B4)<<8) + 0x10);
-        a[2] = *(float *)(o+0x18);
-        *(float *)(s+0x128) *= 10.0f;
-        *(float *)(s+0x120) *= 10.0f;
-        old1 = *(float *)(s+0x110);
-        old2 = *(float *)(s+0x10C);
-        *(float *)(s+0x110) = 3.1415927f;
-        *(float *)(s+0x10C) = 0.5f;
-        func_L01_00321178(o,a);
-        *(float *)(s+0x128) *= 0.1f;
-        *(float *)(s+0x120) *= 0.1f;
-        *(float *)(s+0x110) = old1;
-        *(float *)(s+0x10C) = old2;
+    if (moby[0x95] == 13) {
+        vec_scale_to_length(scaledVec, gMobyTable_L18 + (*(int *)(vars+0x3B4)<<8) + 0xC0, 5.0f);
+        add_vectors(aimVec, scaledVec, gMobyTable_L18 + (*(int *)(vars+0x3B4)<<8) + 0x10);
+        scaledVec[2] = *(float *)(moby+0x18);
+        *(float *)(vars+0x128) *= 10.0f;
+        *(float *)(vars+0x120) *= 10.0f;
+        savedLimit = *(float *)(vars+0x110);
+        savedRate = *(float *)(vars+0x10C);
+        *(float *)(vars+0x110) = 3.1415927f;
+        *(float *)(vars+0x10C) = 0.5f;
+        TurnMobyTowardTarget(moby,scaledVec);
+        *(float *)(vars+0x128) *= 0.1f;
+        *(float *)(vars+0x120) *= 0.1f;
+        *(float *)(vars+0x110) = savedLimit;
+        *(float *)(vars+0x10C) = savedRate;
         goto restore;
     } else {
-        if (*(int *)(s+0x38C) != -1) {
-            if (ref_L18_00428AE8_01(o, *(int *)(s+0x38C))) {
-                switch (o[0x95]) {
+        if (*(int *)(vars+0x38C) != -1) {
+            if (ref_L18_00428AE8_01(moby, *(int *)(vars+0x38C))) {
+                switch (moby[0x95]) {
                 case 5:
-                    if (s[0x399] & 2) s[0x399] = 0;
-                    func_L18_00427130(o, *(int *)(s+0x374), -1);
-                    *(u16 *)(s+0x392) = D_L18_001B1240;
-                    func_L18_00426F28(o,2,0,10.0f);
-                    func_002A7750(o,4,6);
+                    if (vars[0x399] & 2) vars[0x399] = 0;
+                    SetObjectAnimation(moby, *(int *)(vars+0x374), -1);
+                    *(u16 *)(vars+0x392) = D_L18_001B1240;
+                    StartOrForwardAnimation(moby,2,0,10.0f);
+                    SetMobyState(moby,4,6);
                     break;
                 case 6:
-                    if (func_L18_004271C0(o)) {
-                        *(u16 *)(s+0x392) = D_L18_001B1240;
-                        func_L18_00426F28(o,2,0,10.0f);
-                        func_002A7750(o,4,6);
+                    if (ToggleAnimationHelper(moby)) {
+                        *(u16 *)(vars+0x392) = D_L18_001B1240;
+                        StartOrForwardAnimation(moby,2,0,10.0f);
+                        SetMobyState(moby,4,6);
                     }
-                    if (*(s16 *)(o+0xAA) != 0xEC0) func_L18_00428138(o);
+                    if (*(s16 *)(moby+0xAA) != 0xEC0 /* moby class 3776 */) TryNoticePlayerAndAlert(moby);
                     break;
                 case 2:
-                    func_L18_004271C0(o);
-                    if (o[0x60] & 2) {
-                        func_L18_00426F28(o,func_001163B0() & 1,0,10.0f);
-                        func_002A7750(o,2,-1);
+                    ToggleAnimationHelper(moby);
+                    if (moby[0x60] & 2) {
+                        StartOrForwardAnimation(moby,Rand() & 1,0,10.0f);
+                        SetMobyState(moby,2,-1);
                     }
                     break;
                 }
             }
-                if (*(s16 *)(o+0xAA) == 0xEC0 && (unsigned)(o[0x95]-5) < 2) {
-                    if (func_00282E80(o+0x10, *(u8 **)(s+0x230)+0x10) < *(float *)(s+0x3A0)) {
-                        *(int *)(s+0x38C) = -1;
-                        func_002A7750(o,4,6);
+                if (*(s16 *)(moby+0xAA) == 0xEC0 /* moby class 3776 */ && (unsigned)(moby[0x95]-5) < 2) {
+                    if (vec_distance_xy(moby+0x10, *(u8 **)(vars+0x230)+0x10) < *(float *)(vars+0x3A0)) {
+                        *(int *)(vars+0x38C) = -1;
+                        SetMobyState(moby,4,6);
                     }
                 }
                 goto restore;
 
-        } else if (o[0x95] == 6) {
-            if (o[0x20] == o[0x95]) func_L01_00321178(o,s+0x220);
+        } else if (moby[0x95] == 6) {
+            if (moby[0x20] == moby[0x95]) TurnMobyTowardTarget(moby,vars+0x220);
             else {
-                func_002B4FF0(o,s+0x220,0.0f);
-                func_L18_00428138(o);
+                TurnTowardTargetAndStepMovement(moby,vars+0x220,0.0f);
+                TryNoticePlayerAndAlert(moby);
             }
         } else {
 wander:
-            func_L01_00318638(o,s+0x1F0,s+0x100);
-            if (*(s16 *)(s+0x392) == 0) {
-                *(u16 *)(s+0x392) = D_L18_001B1264;
-                func_L18_00426F28(o,func_001163B0() & 1,0,10.0f);
-                func_002A7750(o,2,-1);
+            UpdateWanderHeading(moby,vars+0x1F0,vars+0x100);
+            if (*(s16 *)(vars+0x392) == 0) {
+                *(u16 *)(vars+0x392) = D_L18_001B1264;
+                StartOrForwardAnimation(moby,Rand() & 1,0,10.0f);
+                SetMobyState(moby,2,-1);
             }
         }
-        if (*(float *)(o+0x18) < *(float *)(s+0x90)) {
-            func_002A6C58(o,0,3);
-            func_002A7750(o,12,10);
+        if (*(float *)(moby+0x18) < *(float *)(vars+0x90)) {
+            SetDeathBits(moby,0,3);
+            SetMobyState(moby,12,10);
         }
 restore:
-        { int k = *(int *)(s+0x3B4);
-        if (k != -1) {
-            u8 *m = (u8 *)((k << 8) + ref_L18_00428AE8_00);
-            if (((Obj *)m)->h[0xAA/2] == 0x114D && ((Obj *)m)->b[0x20] != 0xFE && ((Obj *)m)->b[0x20] != 0xFD)
-                ((Obj *)m)->i[0x98/4] = *(int *)(((Obj *)m)->i[0x24/4]+0x10);
+        { int helperIndex2 = *(int *)(vars+0x3B4);
+        if (helperIndex2 != -1) {
+            u8 *helper = (u8 *)((helperIndex2 << 8) + ref_L18_00428AE8_00);
+            if (((Obj *)helper)->h[0xAA/2] == 0x114D /* moby class 4429 */ && ((Obj *)helper)->b[0x20] != 0xFE && ((Obj *)helper)->b[0x20] != 0xFD)
+                ((Obj *)helper)->i[0x98/4] = *(int *)(((Obj *)helper)->i[0x24/4]+0x10);
         } }
     }
 }

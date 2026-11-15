@@ -25,14 +25,15 @@
 #include "common.h"
 
 extern s8 D_00189E20[];
-s32 func_L06_003E3ED0(s32 arg0) {
-    s8 *p = D_00189E20;
-    if (*(s32 *)(p + 0x229C) == 3 || *(s32 *)(p + 0x2294) == 0x1B) {
-        if (*(s32 *)(p + 0x588) != arg0) goto failure;
+/* Returns 1 if the given object is the one the hero is standing on (or holding). */
+s32 func_L06_003E3ED0(s32 moby) {
+    s8 *hero = gHeroState;
+    if (*(s32 *)(hero + 0x229C) == 3 || *(s32 *)(hero + 0x2294) == 0x1B) {
+        if (*(s32 *)(hero + 0x588) != moby) goto failure;
         return 1;
     }
-    if (*(s16 *)(p + 0x34E) != 0) goto failure;
-    if (*(s32 *)(p + 0x33C) == arg0) return 1;
+    if (*(s16 *)(hero + 0x34E) != 0) goto failure;
+    if (*(s32 *)(hero + 0x33C) == moby) return 1;
 failure:
     return 0;
 }

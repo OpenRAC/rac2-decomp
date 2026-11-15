@@ -47,68 +47,69 @@ extern void func_002A677C(int a0);
 extern void ref_L03_002AD540_06(void);
 extern void func_L00_002A9760(void);
 
+/* Runs one frame of the level: updates the hero, camera, effects and every game system, then the sound and the HUD. */
 void func_L03_002AD540(void) {
-    char *p;
+    char *resident;
 
-    p = D_00189E20;
-    *(short *)(p + 0x2162) = 0;
-    *(short *)(p + 0x2160) = 0;
-    if (*(unsigned char *)(p + 0x22B4) != 0) {
+    resident = gHeroState;
+    *(short *)(resident + 0x2162) = 0;
+    *(short *)(resident + 0x2160) = 0;
+    if (*(unsigned char *)(resident + 0x22B4) != 0) {
         ref_L03_002AD540_00();
         return;
     }
-    func_L00_002D24E8();
+    AdvanceHeroAnimation();
     ref_L03_002AD540_01();
     ref_L03_002AD540_02();
-    ref_L03_002AD540_03(p + 0x80, p + 0x90, p + 0x550);
+    ref_L03_002AD540_03(resident + 0x80, resident + 0x90, resident + 0x550);
     ref_L03_002AD540_04();
     ref_L03_002AD540_05();
     if (D_L03_001A8F00 == 2 || D_L03_001A8F00 == 6) {
-        if (*(unsigned char *)(p + 0x22B5) != 0)
-            func_L00_002D2E68();
+        if (*(unsigned char *)(resident + 0x22B5) != 0)
+            SetHeroObjectsFlagBit();
         else
-            func_L00_002D3068();
+            ClearHeroObjectsFlagBit();
         return;
     }
-    func_L00_002AE0C8();
-    if (*(unsigned char *)(p + 0x22B4) != 0)
+    RebuildRegionObjectMembership();
+    if (*(unsigned char *)(resident + 0x22B4) != 0)
         return;
-    func_L00_002B9CA8();
-    func_L00_002AC1A0();
-    func_L00_002AB1D8();
-    func_L00_002AB420();
-    func_L00_002ABBA0();
-    func_L00_002AB948();
-    func_L00_002A5518();
-    func_L00_002A5840();
-    func_L00_002B7718();
-    func_L00_002A5368();
-    func_L00_002A9460();
-    func_L00_002AA178(0);
-    func_L00_002B2120();
-    func_L00_002B2318();
-    func_L00_002B2200();
-    func_L00_002AFBC0();
-    if (*(unsigned char *)(p + 0x22B5) != 0 || func_L00_002D6418() != 0)
-        func_L00_002D2E68();
+    UpdateDelayedSounds();
+    UpdateHeroEasingTargetsAndPointEffects();
+    UpdateCameraBlendAngles();
+    UpdateHeroPitchAndYawEasingTargets();
+    UpdateHeroAutoAimAngles();
+    UpdateHeroIdleRandomRotationTargets();
+    ClampHeroControlAndUpdateEffects();
+    UpdateHeroGlowAndExtraManipulators();
+    UpdateHeroTiltPoseTargets();
+    UpdateAllAttachmentRecords();
+    update_hero_moby();
+    SpawnEffectFromRecord(0);
+    UpdateHeroItemsAndFlags();
+    UpdateHeroLockOnWeaponFire();
+    PlayHeroVoiceLineForProgress();
+    UpdateHeroItemsFrame();
+    if (*(unsigned char *)(resident + 0x22B5) != 0 || IsHeroActionAllowed() != 0)
+        SetHeroObjectsFlagBit();
     else
-        func_L00_002D3068();
-    func_L00_002A7958();
-    func_L00_002A7748();
-    func_L00_002A67F8();
-    func_L00_002D5EB8();
-    func_L00_002A6420();
-    func_L00_002D5158();
+        ClearHeroObjectsFlagBit();
+    FadeScreenEffect();
+    ApplyHeroAxisScales();
+    UpdateHeroStatTrackers();
+    UpdateCollectionProgress();
+    CheckHeroTargetingTriggers();
+    UpdateHeroAimAndTransitions();
     {
-        char *q = D_00189E20;
-        if ((*(int *)(q + 0x229C) != 0x16 && *(int *)(q + 0x229C) != 0x1F
-             && *(int *)(q + 0x2294) != 0x31) || func_L00_002A7000() != 0)
-            func_L00_003080D0(D_00189EA0);
+        char *residentCopy = gHeroState;
+        if ((*(int *)(residentCopy + 0x229C) != 0x16 && *(int *)(residentCopy + 0x229C) != 0x1F
+             && *(int *)(residentCopy + 0x2294) != 0x31) || IsHeroInSwingOrGrindMode() != 0)
+            ClearMapBitsAroundPosition(gHeroPosition);
     }
     {
-        char *q = D_00189E20;
-        func_002A677C(*(int *)(q + 0x2290));
+        char *residentCopy = gHeroState;
+        func_002A677C(*(int *)(residentCopy + 0x2290));
     }
     ref_L03_002AD540_06();
-    func_L00_002A9760();
+    UpdateHeroMobyProbedHeightBounds();
 }

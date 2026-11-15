@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_L12_00413CE0 is a unit of its own: it needs the opt-in quadword-copy profile and its
    scheduling barrier (-frac2-qcopy -frac2-qcopy-barrier, config/cflags.txt), which give
@@ -46,52 +47,52 @@ extern u8 *D_L12_001FEAC0[];
 extern f32 func_00282E80(void *a, void *b);
 
 /* Hands the object's path state to the nearest eligible entity of its group. */
-void func_L12_00413CE0(u8 *a0)
+void func_L12_00413CE0(u8 *moby)
 {
-    PathState *state = *(PathState **)(a0 + 0x68);
-    u8 *best;
-    f32 bestd;
-    f32 vec[4];
-    u16 *p;
-    u8 *e;
-    PathState *sub;
-    f32 d;
+    PathState *state = *(PathState **)(moby + 0x68);
+    u8 *bestEntity;
+    f32 bestDistance;
+    f32 origin[4];
+    u16 *entry;
+    u8 *entity;
+    PathState *entityState;
+    f32 distance;
 
     if (state->f2C0 != -1) {
-        *(TI128 *)vec = *(TI128 *)(D_L12_001FEAC0[state->f2C0] + 0x10);
-        best = 0;
-        bestd = 100000.0f;
-        for (p = D_L12_001FB960[a0[0x21]];
-             a0[0x21] != 0xFF && a0[0x21] <= D_L12_001B2EB8 && p != 0 &&
-             ((p != 0 && (s16)p[-1] >= 0) || p == D_L12_001FB960[a0[0x21]]);
-             p++) {
-            e = D_L12_001B2E9C_base[0] + ((*p & 0x7FFF) << 8);
-            if (e == 0)
+        *(TI128 *)origin = *(TI128 *)(D_L12_001FEAC0[state->f2C0] + 0x10);
+        bestEntity = 0;
+        bestDistance = 100000.0f;
+        for (entry = D_L12_001FB960[moby[0x21]];
+             moby[0x21] != 0xFF && moby[0x21] <= D_L12_001B2EB8 && entry != 0 &&
+             ((entry != 0 && (s16)entry[-1] >= 0) || entry == D_L12_001FB960[moby[0x21]]);
+             entry++) {
+            entity = D_L12_001B2E9C_base[0] + ((*entry & 0x7FFF) << 8);
+            if (entity == 0)
                 break;
-            sub = *(PathState **)(e + 0x68);
-            d = func_00282E80(e + 0x10, vec);
-            if (sub != 0 && (sub->f302 & 1)) {
-                if (d < bestd) {
-                    bestd = d;
-                    best = e;
+            entityState = *(PathState **)(entity + 0x68);
+            distance = vec_distance_xy(entity + 0x10, origin);
+            if (entityState != 0 && (entityState->f302 & 1)) {
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestEntity = entity;
                 }
             }
         }
-        if (best != 0) {
-            PathState *dst = *(PathState **)(best + 0x68);
+        if (bestEntity != 0) {
+            PathState *target = *(PathState **)(bestEntity + 0x68);
 
-            dst->f2B0 = state->f2B0;
-            dst->f2B4 = state->f2B4;
-            dst->f2B8 = state->f2B8;
-            dst->f2BC = state->f2BC;
-            dst->f2C0 = state->f2C0;
-            dst->f2D0 = state->f2D0;
-            dst->f2D4 = state->f2D4;
-            dst->f2E0 = D_L12_001B1840_h;
-            dst->f2DC = state->f2C0;
-            dst->f2EA = 1;
-            dst->f302 = 2;
-            dst->f303 = state->f303;
+            target->f2B0 = state->f2B0;
+            target->f2B4 = state->f2B4;
+            target->f2B8 = state->f2B8;
+            target->f2BC = state->f2BC;
+            target->f2C0 = state->f2C0;
+            target->f2D0 = state->f2D0;
+            target->f2D4 = state->f2D4;
+            target->f2E0 = D_L12_001B1840_h;
+            target->f2DC = state->f2C0;
+            target->f2EA = 1;
+            target->f302 = 2;
+            target->f303 = state->f303;
         }
     }
 }

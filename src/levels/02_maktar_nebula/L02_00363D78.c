@@ -71,11 +71,11 @@ void func_L02_00363D78(void)
     short *angles;
 
     D_L02_001B3B20[0]->relocation_state = 0;
-    func_00283388(D_L02_001B3B50);
-    func_002E3478(0);
-    func_002E3940(0);
-    func_002E3478(1);
-    func_002E3940(1);
+    set_identity_matrix(D_L02_001B3B50);
+    UpdateViewRotation(0);
+    ProcessViewEntry(0);
+    UpdateViewRotation(1);
+    ProcessViewEntry(1);
     if (D_L02_001B3B20[0]->effect_count == 0) {
         D_L02_001B3B20[0]->effect_count = 0x100;
         i = 0;
@@ -87,36 +87,36 @@ void func_L02_00363D78(void)
             if (i >= 0xF6) {
                 effect->randomize_color = 0;
                 angles = &effect->state.angles.azimuth;
-                effect->state.angles.azimuth = (short)(func_001163B0() >> 16);
-                angles[1] = (short)(func_001163B0() >> 16);
+                effect->state.angles.azimuth = (short)(Rand() >> 16);
+                angles[1] = (short)(Rand() >> 16);
                 effect->size = 0.16f;
                 effect->texture_index = 1;
                 effect->flags = effect_flags;
             } else {
                 effect->randomize_color = 3;
-                effect->state.angles.azimuth = func_002A77E0(0x100);
-                effect->texture_index = (func_001163B0() >> 16) & 1;
+                effect->state.angles.azimuth = RandomIntBelow(0x100);
+                effect->texture_index = (Rand() >> 16) & 1;
                 effect->flags = effect_flags;
-                effect->angle = func_002A7940();
-                effect->size = func_00283CE0(func_002A77E0(0x30) + 0x20) * 0.00390625f;
-                azimuth = func_002A7940();
-                elevation = func_002A7940();
-                trig_product = func_00283180(azimuth);
-                trig_product = trig_product * func_00283198(elevation);
+                effect->angle = RandomAngle();
+                effect->size = IntToFloat(RandomIntBelow(0x30) + 0x20) * 0.00390625f;
+                azimuth = RandomAngle();
+                elevation = RandomAngle();
+                trig_product = FastSinOrCosA(azimuth);
+                trig_product = trig_product * FastSinOrCosB(elevation);
                 trig_product = trig_product * radius;
                 effect->position_x = trig_product;
-                trig_product = func_00283198(azimuth);
-                trig_product = trig_product * func_00283198(elevation);
+                trig_product = FastSinOrCosB(azimuth);
+                trig_product = trig_product * FastSinOrCosB(elevation);
                 trig_product = trig_product * radius;
                 effect->position_y = trig_product;
-                trig_product = func_00283180(elevation);
-                trig_product = trig_product * func_00283180(elevation);
+                trig_product = FastSinOrCosA(elevation);
+                trig_product = trig_product * FastSinOrCosA(elevation);
                 trig_product = trig_product * 36.0f;
                 trig_product = trig_product + 16.0f;
                 effect->position_z = trig_product;
-                color_delta = func_002A77E0(0x18);
-                alpha_delta = func_002A77E0(0x20) << 24;
-                if ((func_001163B0() >> 16) & 1)
+                color_delta = RandomIntBelow(0x18);
+                alpha_delta = RandomIntBelow(0x20) << 24;
+                if ((Rand() >> 16) & 1)
                     effect->state.base_color = alpha_delta + ((color_delta << 16) + base_color);
                 else
                     effect->state.base_color = (alpha_delta + ((color_delta << 8) + base_color)) | color_delta;
@@ -130,17 +130,17 @@ void func_L02_00363D78(void)
             angles = &effect->state.angles.azimuth;
             effect->state.angles.azimuth = (short)(effect->state.angles.azimuth + 1);
             angles[1] = (u16)(angles[1] + 1);
-            azimuth = func_00283CE0((orbit->azimuth & 0xFFF) - 0x800) * 0.0015339808f;
-            elevation = func_00283CE0((angles[1] & 0xFFF) - 0x800) * 0.0015339808f;
-            trig_product = func_00283180(azimuth);
-            trig_product = trig_product * func_00283198(elevation);
+            azimuth = IntToFloat((orbit->azimuth & 0xFFF) - 0x800) * 0.0015339808f;
+            elevation = IntToFloat((angles[1] & 0xFFF) - 0x800) * 0.0015339808f;
+            trig_product = FastSinOrCosA(azimuth);
+            trig_product = trig_product * FastSinOrCosB(elevation);
             trig_product = trig_product * 50.0f;
             effect->position_x = trig_product;
-            trig_product = func_00283198(azimuth);
-            trig_product = trig_product * func_00283198(elevation);
+            trig_product = FastSinOrCosB(azimuth);
+            trig_product = trig_product * FastSinOrCosB(elevation);
             trig_product = trig_product * 50.0f;
             effect->position_y = trig_product;
-            effect->position_z = func_00282C48(func_00283180(elevation)) * 50.0f;
+            effect->position_z = FloatAbs(FastSinOrCosA(elevation)) * 50.0f;
             if ((u32)(orbit->azimuth & 0x3F) < 8U)
                 effect->color = 0x702020F0;
             else
@@ -149,7 +149,7 @@ void func_L02_00363D78(void)
             u32 color_value;
             u32 color_offset;
 
-            random_bits = func_001163B0() >> 16;
+            random_bits = Rand() >> 16;
             color_offset = ((random_bits & 0x1F00) << 10) + 0xFFDFDFE0;
             color_value = effect->state.base_color + color_offset;
             color_value += (random_bits & 0x1F0) << 6;
@@ -157,10 +157,10 @@ void func_L02_00363D78(void)
             effect->color = color_value;
         }
     }
-    func_L02_00364A18();
-    func_002FC560(0x42, (0x8000ULL << 24) | 0x44);
-    func_002E3478(2);
-    func_002E3940(2);
-    func_002E3478(3);
-    func_002E3940(3);
+    DrawSkyEffects();
+    VU1_addGSregister(0x42, (0x8000ULL << 24) | 0x44);
+    UpdateViewRotation(2);
+    ProcessViewEntry(2);
+    UpdateViewRotation(3);
+    ProcessViewEntry(3);
 }

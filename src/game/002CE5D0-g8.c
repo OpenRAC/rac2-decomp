@@ -19,33 +19,34 @@ static __inline__ int menu_screen_y(float value, float offset)
     return (int)(y + offset);
 }
 
-void func_002CE5D0(int left, int right)
+/* Draws the two small frames at the bottom and the left and right arrows used to page through a menu. */
+void func_002CE5D0(int showLeft, int showRight)
 {
-    int color, text;
+    int dimColor, sprite;
 
-    func_0028FC48(42, menu_screen_y(318.0f, D_001AB9E0), 44, menu_screen_y(343.0f, D_001AB9E0), 0x55F0C070, 0);
-    func_0028FC48(64, menu_screen_y(318.0f, D_001AB9E0), 66, menu_screen_y(343.0f, D_001AB9E0), 0x55F0C070, 0);
-    func_0028FC48(42, menu_screen_y(317.0f, D_001AB9E0), 66, menu_screen_y(319.0f, D_001AB9E0), 0x55F0C070, 0);
-    func_0028FC48(42, menu_screen_y(342.0f, D_001AB9E0), 66, menu_screen_y(344.0f, D_001AB9E0), 0x55F0C070, 0);
-    func_0028FC48(463, menu_screen_y(318.0f, D_001AB9E0), 465, menu_screen_y(343.0f, D_001AB9E0), 0x55F0C070, 0);
-    func_0028FC48(485, menu_screen_y(318.0f, D_001AB9E0), 487, menu_screen_y(343.0f, D_001AB9E0), 0x55F0C070, 0);
-    func_0028FC48(463, menu_screen_y(317.0f, D_001AB9E0), 487, menu_screen_y(319.0f, D_001AB9E0), 0x55F0C070, 0);
-    func_0028FC48(463, menu_screen_y(342.0f, D_001AB9E0), 487, menu_screen_y(344.0f, D_001AB9E0), 0x55F0C070, 0);
-    color = func_002A9588(0x60241700, 0x55F0C070, 25, 0, 0);
-    if (left) {
+    AppendScreenRectPacket(42, menu_screen_y(318.0f, D_001AB9E0), 44, menu_screen_y(343.0f, D_001AB9E0), 0x55F0C070, 0);
+    AppendScreenRectPacket(64, menu_screen_y(318.0f, D_001AB9E0), 66, menu_screen_y(343.0f, D_001AB9E0), 0x55F0C070, 0);
+    AppendScreenRectPacket(42, menu_screen_y(317.0f, D_001AB9E0), 66, menu_screen_y(319.0f, D_001AB9E0), 0x55F0C070, 0);
+    AppendScreenRectPacket(42, menu_screen_y(342.0f, D_001AB9E0), 66, menu_screen_y(344.0f, D_001AB9E0), 0x55F0C070, 0);
+    AppendScreenRectPacket(463, menu_screen_y(318.0f, D_001AB9E0), 465, menu_screen_y(343.0f, D_001AB9E0), 0x55F0C070, 0);
+    AppendScreenRectPacket(485, menu_screen_y(318.0f, D_001AB9E0), 487, menu_screen_y(343.0f, D_001AB9E0), 0x55F0C070, 0);
+    AppendScreenRectPacket(463, menu_screen_y(317.0f, D_001AB9E0), 487, menu_screen_y(319.0f, D_001AB9E0), 0x55F0C070, 0);
+    AppendScreenRectPacket(463, menu_screen_y(342.0f, D_001AB9E0), 487, menu_screen_y(344.0f, D_001AB9E0), 0x55F0C070, 0);
+    dimColor = PingPongBlendValues(0x60241700, 0x55F0C070, 25, 0, 0);
+    if (showLeft) {
         char *root = D_001A8CFC;
         int selected = 0x80F0F0F0;
         if (!(D_00138340.w0 & 0x8000))
-            selected = color;
-        text = func_00336D50(root + 0x8710, 75);
-        func_00300A00((char *)text, selected, 213.0f, 322.0f, 1.0f, D_001B23A8, 0.0f);
+            selected = dimColor;
+        sprite = FindTableEntryById(root + 0x8710, 75);
+        DrawScaledObjectTwoAxes((char *)sprite, selected, 213.0f, 322.0f, 1.0f, D_001B23A8, 0.0f);
     }
-    if (right) {
+    if (showRight) {
         char *root = D_001A8CFC;
         int selected = 0x80F0F0F0;
         if (!(D_00138340.w0 & 0x2000))
-            selected = color;
-        text = func_00336D50(root + 0x8710, 74);
-        func_00300A00((char *)text, selected, 311.0f, 322.0f, 1.0f, D_001B23A8, 0.0f);
+            selected = dimColor;
+        sprite = FindTableEntryById(root + 0x8710, 74);
+        DrawScaledObjectTwoAxes((char *)sprite, selected, 311.0f, 322.0f, 1.0f, D_001B23A8, 0.0f);
     }
 }

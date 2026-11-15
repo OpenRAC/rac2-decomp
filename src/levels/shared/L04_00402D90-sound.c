@@ -9,44 +9,45 @@ extern int func_002E5CF8(int, int, void *);
 extern int func_L01_00355BA0(int, int);
 extern int func_002E5F40(int, int);
 
-void func_L04_0040DF90(unsigned char *m, unsigned char *p)
+/* Starts and updates the racer's two engine sounds, changing their volume and pitch as it speeds up. */
+void func_L04_0040DF90(unsigned char *racer, unsigned char *vars)
 {
     float elapsed, amount, original;
-    if (*(int *)(p + 0x32c) && func_00282948(p + 0x324)) {
-        int handle = *(int *)(p + 0x328);
+    if (*(int *)(vars + 0x32c) && FastFloatHelperD(vars + 0x324)) {
+        int handle = *(int *)(vars + 0x328);
         if (handle != -1) {
-            unsigned char *record = D_00188660 + handle * 0x70;
-            if (*(void **)(record + 0x88) == m && record[0x74])
-                func_002E59F8(handle);
+            unsigned char *record = gSoundState + handle * 0x70;
+            if (*(void **)(record + 0x88) == racer && record[0x74])
+                StopSoundVoice(handle);
         }
-        *(int *)(p + 0x32c) = 0;
-        *(int *)(p + 0x328) = -1;
-        *(int *)(p + 0x324) = 0;
+        *(int *)(vars + 0x32c) = 0;
+        *(int *)(vars + 0x328) = -1;
+        *(int *)(vars + 0x324) = 0;
     }
-    elapsed = *(float *)(p + 0x30c) + *(float *)(p + 0x27c) - 0.050000004f;
+    elapsed = *(float *)(vars + 0x30c) + *(float *)(vars + 0x27c) - 0.050000004f;
     if (elapsed < 0.0f) elapsed = 0.0f;
-    if (!func_002E59B0(m, *(int *)(p + 0x330))) {
-        if (m[0x20] == 3)
-            *(int *)(p + 0x330) = func_002E5CF8(20, 5, m);
+    if (!IsVoicePlayingForOwner(racer, *(int *)(vars + 0x330))) {
+        if (racer[0x20] == 3)
+            *(int *)(vars + 0x330) = PlayMobySound(20, 5, racer);
         else
-            *(int *)(p + 0x330) = func_002E5CF8(0, 5, m);
+            *(int *)(vars + 0x330) = PlayMobySound(0, 5, racer);
     }
-    if (!func_002E59B0(m, *(int *)(p + 0x334))) {
-        if (m[0x20] == 3)
-            *(int *)(p + 0x334) = func_002E5CF8(21, 5, m);
+    if (!IsVoicePlayingForOwner(racer, *(int *)(vars + 0x334))) {
+        if (racer[0x20] == 3)
+            *(int *)(vars + 0x334) = PlayMobySound(21, 5, racer);
         else
-            *(int *)(p + 0x334) = func_002E5CF8(1, 5, m);
+            *(int *)(vars + 0x334) = PlayMobySound(1, 5, racer);
     }
-    if (func_002E59B0(m, *(int *)(p + 0x330))) {
+    if (IsVoicePlayingForOwner(racer, *(int *)(vars + 0x330))) {
         amount = elapsed * 3.0f;
         if (amount > 1.0f) amount = 1.0f;
         amount = 1.0f - amount;
-        func_L01_00355BA0(*(int *)(p + 0x330), func_00283CF0(func_00283CE0(1024) * amount));
+        SetSoundSlotField(*(int *)(vars + 0x330), FloatToInt(IntToFloat(1024) * amount));
         amount = elapsed * 3.0f;
         if (amount > 1.0f) amount = 1.0f;
-        func_002E5F40(*(int *)(p + 0x330), func_00283CF0(amount * 2816.0f));
+        SetVoicePitchBend(*(int *)(vars + 0x330), FloatToInt(amount * 2816.0f));
     }
-    if (func_002E59B0(m, *(int *)(p + 0x334))) {
+    if (IsVoicePlayingForOwner(racer, *(int *)(vars + 0x334))) {
         float limit;
         /* Same line on purpose: under -g a line note between the load and the
          * division adds a second nop. */
@@ -59,8 +60,8 @@ void func_L04_0040DF90(unsigned char *m, unsigned char *p)
             amount -= limit;
             amount = (1.0f - amount) * 0.8f + 0.2f;
         }
-        func_L01_00355BA0(*(int *)(p + 0x334), func_00283CF0(func_00283CE0(1024) * amount));
+        SetSoundSlotField(*(int *)(vars + 0x334), FloatToInt(IntToFloat(1024) * amount));
         amount = (1.0f - original) * -2816.0f;
-        func_002E5F40(*(int *)(p + 0x334), func_00283CF0(amount));
+        SetVoicePitchBend(*(int *)(vars + 0x334), FloatToInt(amount));
     }
 }

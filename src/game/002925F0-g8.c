@@ -33,16 +33,17 @@ extern void func_002FC3C0(s32);
 extern s32 func_002B7C80(s32, s32, s32);
 extern void func_002934F8(s32, s32, void *, s32);
 
+/* Reads entry n of the disc table into memory and sends it for drawing. */
 void func_002925F0(s32 n) {
-    SelectTable *b;
-    s32 h;
-    D_00152C00.f18 = n;
-    func_002FC3C0(1);
-    b = &D_0014B540;
-    h = D_001BAF30[0];
-    func_002B7C80(h, b->e[n].a + b->base, b->e[n].b);
-    D_001C4DC0[0] = D_00152C00.f38;
+    SelectTable *table;
+    s32 handle;
+    gHeroMoby_00152C00.f18 = n;
+    WaitForDmaStatusBits(1);
+    table = &gCopySetupData;
+    handle = D_001BAF30[0];
+    ReadDiscWithPause(handle, table->e[n].a + table->base, table->e[n].b);
+    D_001C4DC0[0] = gHeroMoby_00152C00.f38;
     D_001C4DC0[1] = 0xFFA0000000E0;
     D_001C4DC0[2] = 0x40000400004000;
-    func_002934F8(h, 0, &D_001A91E0, -1);
+    RelocateTextureBlock(handle, 0, &D_001A91E0, -1);
 }

@@ -7,6 +7,7 @@ extern unsigned char D_001A7BD5 __attribute__((sda));
 extern unsigned char D_001A7B08 __attribute__((sda));
 extern unsigned short ref_L00_0030EE40_00;
 
+/* Checks two status bytes, sets an id to match, and returns 0, 1 or 2 for the combination. */
 int func_0029DDC0(void)
 {
     if (D_001A7BD5 == 0 && D_001A7B08 == 0) {

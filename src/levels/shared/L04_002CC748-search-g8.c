@@ -28,14 +28,14 @@ extern float func_00282E80(void *, void *);
 int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, void *region,
                       int regionCount, float distance)
 {
-    char *best = D_00189E20.moby;
+    char *best = gHeroState.moby;
     int result = 0;
     char *velocity, *previous, *next;
     int i, j, valid;
     char *m;
     float d;
 
-    if (D_00189E20.mode == 24 || D_00189E20.state == 0x6F) {
+    if (gHeroState.mode == 24 || gHeroState.state == 0x6F) {
         best = 0;
         result = 2;
         velocity = (char *)out->velocity;
@@ -52,7 +52,7 @@ int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, vo
             next = (char *)out->next;
         } while (0);
         for (; i < limit; i++) {
-            if (func_002ACBC8((char *)&D_00189E20 + 0x80, areas[i])) {
+            if (IsPointInCuboid((char *)&gHeroState + 0x80, areas[i])) {
                 best = 0;
                 result = 2;
                 break;
@@ -63,27 +63,27 @@ int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, vo
         previous = (char *)out->previous;
         next = (char *)out->next;
         if (region && regionCount > 0
-            && !func_002A8AF0((char *)&D_00189E20 + 0x80, region, regionCount)) {
+            && !point_in_path_xy((char *)&gHeroState + 0x80, region, regionCount)) {
             best = 0;
             result = 2;
         }
     }
     for (j = 1; j <= D_L04_001B2630[0]; j++) {
-        m = D_L04_001B24DC + (D_L04_001B2630[j] << 8);
-        if (m && (WSHORT(m, 0xAA) == 0xCB || WSHORT(m, 0xAA) == 0x76C) && WBYTE(m, 0x20) != 0xFE
+        m = gMobyPool_L04 + (D_L04_001B2630[j] << 8);
+        if (m && (WSHORT(m, 0xAA) == 0xCB /* Decoy */ || WSHORT(m, 0xAA) == 0x76C /* moby class 1900 */) && WBYTE(m, 0x20) != 0xFE
             && WBYTE(m, 0x20) != 0xFD && WBYTE(m, 0x20) == 3) {
             valid = 1;
-            d = func_00282E80(source + 0x10, m + 0x10);
+            d = vec_distance_xy(source + 0x10, m + 0x10);
             if (distance <= d) {
                 valid = 0;
             } else if (count > 0) {
                 for (i = 0; i < count - 1; i++) {
-                    if (func_002ACBC8(m + 0x10, areas[i])) {
+                    if (IsPointInCuboid(m + 0x10, areas[i])) {
                         valid = 0;
                         break;
                     }
                 }
-            } else if (region && regionCount > 0 && !func_002A8AF0(m + 0x10, region, regionCount)) {
+            } else if (region && regionCount > 0 && !point_in_path_xy(m + 0x10, region, regionCount)) {
                 valid = 0;
             }
             if (valid) {
@@ -97,9 +97,9 @@ int func_L04_003429F8(char *source, SearchOutput *out, int *areas, int count, vo
         out->moby = best;
         qcopy(out, best + 0x10);
         qcopy(velocity, best + 0xF0);
-        if (best == D_00189E20.moby) {
-            qcopy(previous, (char *)&D_00189E20 + 0xD0);
-            qcopy(next, (char *)&D_00189E20 + 0xE0);
+        if (best == gHeroState.moby) {
+            qcopy(previous, (char *)&gHeroState + 0xD0);
+            qcopy(next, (char *)&gHeroState + 0xE0);
         } else {
             qcopy(next, out);
             out->next[2] += 0.6f;

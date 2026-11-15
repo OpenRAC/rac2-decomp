@@ -36,55 +36,56 @@ typedef struct {
 extern Ctx D_00189E20;
 extern s8 D_00188660[];
 
+/* Goes through nine tracked slots. If a slot still points at a live entry it runs a cleanup on it, then marks the slot as empty. */
 void func_L00_002A6708(void) {
-    Ctx *c = &D_00189E20;
-    s8 *tb = D_00188660;
-    void **pp = c->ptrs;
-    s32 *var_s0 = c->slots;
-    s32 off = 0;
-    s32 var_s2 = 8;
-    s32 temp_a0;
-    void *var_a1;
-    s8 *temp_v1;
-    u8 var_v0;
-    s32 m1 = -1;
+    Ctx *ctx = &gHeroState;
+    s8 *table = gSoundState;
+    void **ownerPtrs = ctx->ptrs;
+    s32 *slotPtr = ctx->slots;
+    s32 byteOffset = 0;
+    s32 remaining = 8;
+    s32 slotIndex;
+    void *owner;
+    s8 *entry;
+    u8 isActive;
+    s32 none = -1;
 
     do {
-        var_a1 = *(void **)(off + (s32)pp);
-        temp_a0 = *var_s0;
-        if (var_a1 != 0) {
-            if (temp_a0 == m1) {
-                *var_s0 = m1;
+        owner = *(void **)(byteOffset + (s32)ownerPtrs);
+        slotIndex = *slotPtr;
+        if (owner != 0) {
+            if (slotIndex == none) {
+                *slotPtr = none;
                 goto L_inc;
             }
-            temp_v1 = tb + temp_a0 * 0x70;
-            if (*(s32 *)(temp_v1 + 0x88) != (s32)var_a1) {
-                *var_s0 = m1;
+            entry = table + slotIndex * 0x70;
+            if (*(s32 *)(entry + 0x88) != (s32)owner) {
+                *slotPtr = none;
                 goto L_inc;
             }
-            var_v0 = *(u8 *)(temp_v1 + 0x74);
+            isActive = *(u8 *)(entry + 0x74);
         } else {
-            if (temp_a0 == m1) {
-                *var_s0 = m1;
+            if (slotIndex == none) {
+                *slotPtr = none;
                 goto L_inc;
             }
-            temp_v1 = tb + temp_a0 * 0x70;
-            var_a1 = temp_v1;
-            if (*(s32 *)(temp_v1 + 0x88) != c->f2290) {
-                *var_s0 = m1;
+            entry = table + slotIndex * 0x70;
+            owner = entry;
+            if (*(s32 *)(entry + 0x88) != ctx->f2290) {
+                *slotPtr = none;
                 goto L_inc;
             }
-            var_v0 = *(u8 *)(temp_v1 + 0x74);
+            isActive = *(u8 *)(entry + 0x74);
         }
-        if (var_v0 == 0) {
-            *var_s0 = m1;
+        if (isActive == 0) {
+            *slotPtr = none;
             goto L_inc;
         }
-        ref_L00_002A6708_00(temp_a0, var_a1);
-        *var_s0 = m1;
+        ref_L00_002A6708_00(slotIndex, owner);
+        *slotPtr = none;
     L_inc:
-        var_s0 += 1;
-        var_s2 -= 1;
-        off += 4;
-    } while (var_s2 >= 0);
+        slotPtr += 1;
+        remaining -= 1;
+        byteOffset += 4;
+    } while (remaining >= 0);
 }

@@ -27,51 +27,52 @@ extern float D_L04_001B0118[2] __attribute__((sda));
 extern float D_L04_001B0120[] __attribute__((sda));
 extern float D_L04_001B0124 __attribute__((sda));
 
-void func_L04_003EC140(char *o)
+/* Moves a hovering object. When the player is using it, it steers by the player's input, and it always adds a gentle bobbing and swaying. */
+void func_L04_003EC140(char *moby)
 {
     float rate[4], base[4], desired[4], input[4], matrix[16], delta[4];
     float scale, angle;
     int active, i;
-    char *p = *(char **)(o + 0x68);
+    char *vars = *(char **)(moby + 0x68);
 
-    qcopy(o + 0x10, p + 0x1b0);
-    func_00115484(input, 0, 12);
+    qcopy(moby + 0x10, vars + 0x1b0);
+    memset(input, 0, 12);
     scale = 1.0f;
     active = 0;
-    if (D_00189E20.ptr[0x33c / 4] == o && D_00189E20.i[0x340 / 4]) {
+    if (gHeroState.ptr[0x33c / 4] == moby && gHeroState.i[0x340 / 4]) {
         active = 1;
-        if (D_00189E20.i[0x340 / 4] == 1) {
+        if (gHeroState.i[0x340 / 4] == 1) {
             scale = D_L04_001B0124;
-            *(int *)(p + 0x1d0) = 0;
-            *(int *)(p + 0x1d4) = 0;
-            *(int *)(p + 0x1d8) = 0;
+            *(int *)(vars + 0x1d0) = 0;
+            *(int *)(vars + 0x1d4) = 0;
+            *(int *)(vars + 0x1d8) = 0;
         }
-        func_00283698(matrix, o + 0xc0);
-        func_00282CF0(delta, D_00189E20.b + 0x80, o + 0x10);
-        func_00283098(delta, delta, matrix);
+        matrix_from_basis_rows(matrix, moby + 0xc0);
+        FastVecSub(delta, gHeroState.b + 0x80, moby + 0x10);
+        matrix_mul_vec3(delta, delta, matrix);
         input[0] += -delta[1] * 0.333f;
         input[1] += delta[0] * 1.5f;
     }
     for (i = 0; i < 2; i++) {
-        base[i] = D_L04_001B0118[i] * ((func_00282C48(input[i]) + 1.0f) * 0.00027777778f);
+        base[i] = D_L04_001B0118[i] * ((FloatAbs(input[i]) + 1.0f) * 0.00027777778f);
         rate[i] = base[i] * scale;
         desired[i] = active ? D_L04_001B0108[i] * input[i] : 0;
-        func_002AA548(p + 0x1c4 + i * 4, p + 0x1d0 + i * 4, desired[i], rate[i], base[i], 0.1f);
+        StepValueTowardTarget(vars + 0x1c4 + i * 4, vars + 0x1d0 + i * 4, desired[i], rate[i], base[i], 0.1f);
     }
     base[2] = D_L04_001B0120[0] * 0.00027777778f;
     rate[2] = base[2] * scale;
     desired[2] = active ? D_L04_001B0110[0] : 0;
-    func_002AA548(p + 0x1cc, p + 0x1d8, desired[2], rate[2], base[2], 0.1f);
-    *(float *)(o + 0xf0) = *(float *)(p + 0x1c4);
-    *(float *)(o + 0xf4) = *(float *)(p + 0x1c8);
-    *(float *)(o + 0x18) += *(float *)(p + 0x1cc);
-    angle = func_00283B98(*(float *)(p + 0x1a8), D_L04_001B00E8 * 0.0002908882452175021f);
-    *(float *)(p + 0x1a8) = angle;
-    *(float *)(o + 0xf0) += D_L04_001B00F8 * (func_00283198(angle) * 0.017453294f);
-    angle = func_00283B98(*(float *)(p + 0x1ac), D_L04_001B00EC[0] * 0.0002908882452175021f);
-    *(float *)(p + 0x1ac) = angle;
-    *(float *)(o + 0xf4) += D_L04_001B00FC[0] * (func_00283198(angle) * 0.017453294f);
-    angle = func_00283B98(*(float *)(p + 0x1c0), D_L04_001B00F0[0] * 0.0002908882452175021f);
-    *(float *)(p + 0x1c0) = angle;
-    *(float *)(o + 0x18) += D_L04_001B0100[0] * func_00283198(angle);
+    StepValueTowardTarget(vars + 0x1cc, vars + 0x1d8, desired[2], rate[2], base[2], 0.1f);
+    *(float *)(moby + 0xf0) = *(float *)(vars + 0x1c4);
+    *(float *)(moby + 0xf4) = *(float *)(vars + 0x1c8);
+    *(float *)(moby + 0x18) += *(float *)(vars + 0x1cc);
+    angle = FastAddRotations(*(float *)(vars + 0x1a8), D_L04_001B00E8 * 0.0002908882452175021f);
+    *(float *)(vars + 0x1a8) = angle;
+    *(float *)(moby + 0xf0) += D_L04_001B00F8 * (FastSinOrCosB(angle) * 0.017453294f);
+    angle = FastAddRotations(*(float *)(vars + 0x1ac), D_L04_001B00EC[0] * 0.0002908882452175021f);
+    *(float *)(vars + 0x1ac) = angle;
+    *(float *)(moby + 0xf4) += D_L04_001B00FC[0] * (FastSinOrCosB(angle) * 0.017453294f);
+    angle = FastAddRotations(*(float *)(vars + 0x1c0), D_L04_001B00F0[0] * 0.0002908882452175021f);
+    *(float *)(vars + 0x1c0) = angle;
+    *(float *)(moby + 0x18) += D_L04_001B0100[0] * FastSinOrCosB(angle);
 }

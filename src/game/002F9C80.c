@@ -30,35 +30,37 @@ extern void func_002F97A0(float,float,unsigned long,float,char *,int);
 
 #define screen_y(y) ((int)(D_001B2280[0] * (y) + 0.5f) + (D_001A7B90 ? 4 : 0))
 
+/* Draws the scrolling row of item icons in the vendor menu, with a pulsing frame around the
+   selected one and a label under items already owned or for sale. */
 void func_002F9C80(void)
 {
     int pulse;
     int i, index, y, icon, kind, special, alpha0, alpha1;
     unsigned int color, colors[4];
     double distance;
-    func_002FC620(58,456,(int)(D_001B2280[0]*320.0f+0.5f),screen_y(382));
-    if (D_0021F240.scroll < 0) D_0021F240.scroll += 4;
-    else if (D_0021F240.scroll > 0) D_0021F240.scroll -= 4;
+    SetGsScissorClamped(58,456,(int)(D_001B2280[0]*320.0f+0.5f),screen_y(382));
+    if (gVendorMenuState.scroll < 0) gVendorMenuState.scroll += 4;
+    else if (gVendorMenuState.scroll > 0) gVendorMenuState.scroll -= 4;
     i = -5;
-    pulse = ((func_00282C30(((D_0021F240.tick*4)&63)-32)+64)*0x10202)|0x80000000;
-    func_00285548(229,screen_y(325),285,screen_y(381),D_001A7340,D_001A7344,
+    pulse = ((subtract_integer_with_clamp(((gVendorMenuState.tick*4)&63)-32)+64)*0x10202)|0x80000000;
+    DrawFramebufferRect(229,screen_y(325),285,screen_y(381),gScreenWidth,gScreenHeight,
         pulse);
-    func_00285548(231,screen_y(327),283,screen_y(379),D_001A7340,D_001A7344,0x80442d00);
-    y = D_0021F240.scroll - 47;
+    DrawFramebufferRect(231,screen_y(327),283,screen_y(379),gScreenWidth,gScreenHeight,0x80442d00);
+    y = gVendorMenuState.scroll - 47;
     do {
-        index = i + D_0021F240.selected;
-        if (index >= 0 && index < D_0021F240.count) {
-            icon = func_0028E588((D_00239BA0 + D_00139568[D_0021F240.rows[index].id])->icon,0);
-            if (D_0021F240.rows[index].owned) kind = 2;
+        index = i + gVendorMenuState.selected;
+        if (index >= 0 && index < gVendorMenuState.count) {
+            icon = GetIconFrame((gWeaponTable_00239BA0 + gItemSlotToRecord[gVendorMenuState.rows[index].id])->icon,0);
+            if (gVendorMenuState.rows[index].owned) kind = 2;
             else {
                 special = 0;
-                kind = D_00239BA0[D_00139568[D_0021F240.rows[index].id]].color;
-                switch (D_0021F240.rows[index].id) {
+                kind = gWeaponTable_00239BA0[gItemSlotToRecord[gVendorMenuState.rows[index].id]].color;
+                switch (gVendorMenuState.rows[index].id) {
                 case 12: case 14: case 17: case 18: case 53: special = 1; break;
                 }
                 kind = special && kind == 1 ? 2 : kind;
             }
-            color = func_00336EF8(kind) & 0xffffff;
+            color = GetItemColorEntry(kind) & 0xffffff;
             distance = (double)(256.0f - (float)(y+2));
             if (distance < 0.0) distance = -distance;
             alpha0 = 128 - (int)(distance * 0.75);
@@ -71,15 +73,15 @@ void func_002F9C80(void)
             alpha1 <<= 24;
             colors[2] = colors[0] = alpha0 | color;
             colors[3] = colors[1] = alpha1 | color;
-            func_0028EA58(icon,y+4,screen_y(329),40,(int)(D_001B2280[0]*40.0f+0.5f),colors);
-            if (D_0021F240.rows[index].owned) {
-                char *text = func_00288FB8(0x325f);
-                int tx = (func_0027F288(text,-1,0.75f) >> 1) - 25;
-                func_002F97A0((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
-            } else if (D_0021F240.rows[index].kind == 1) {
-                char *text = func_00288FB8(0x2dc9);
-                int tx = (func_0027F288(text,-1,0.75f) >> 1) - 25;
-                func_002F97A0((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
+            DrawHudSpriteGradient(icon,y+4,screen_y(329),40,(int)(D_001B2280[0]*40.0f+0.5f),colors);
+            if (gVendorMenuState.rows[index].owned) {
+                char *text = GetLocalizedString(0x325f);
+                int tx = (MeasureTextWidthSmallFontScaled(text,-1,0.75f) >> 1) - 25;
+                draw_large_text_edge_faded((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
+            } else if (gVendorMenuState.rows[index].kind == 1) {
+                char *text = GetLocalizedString(0x2dc9);
+                int tx = (MeasureTextWidthSmallFontScaled(text,-1,0.75f) >> 1) - 25;
+                draw_large_text_edge_faded((float)(y - tx),(float)screen_y(366),0x80f0f0f0UL,0.75f,text,-1);
             }
         }
         i++;

@@ -11,36 +11,38 @@ extern void func_00282CC0(void *, void *, void *);
 
 
 
+/* Builds a local axis frame from the input direction and places the owner's linked part there. */
 void func_00305310(char *owner, Quad *input)
 {
     Vector local[7];
-    char *transform = func_002FEC50(*(int *)(*(char **)(owner + 0x68) + 0x48));
+    char *transform = GetSlotByIndex(*(int *)(*(char **)(owner + 0x68) + 0x48));
     qcopy(&local[3], input);
     qcopy(&local[0], &local[3]);
     local[4].bits = 0;
     local[4].f[2] = 1.0f;
-    func_00282DD8(&local[1], &local[0], &local[4]);
-    func_00282F20(&local[1], &local[1], 1.0f);
-    func_00282DD8(&local[2], &local[1], &local[0]);
-    func_002AB600(transform + 0x10, &local[0]);
-    func_0029FCC0(owner, 0, &local[5]);
-    func_00283098(&local[3], input, owner + 0xC0);
-    func_00282CC0(&local[6], &local[3], &local[5]);
+    FastVecCross(&local[1], &local[0], &local[4]);
+    vec_scale_to_length(&local[1], &local[1], 1.0f);
+    FastVecCross(&local[2], &local[1], &local[0]);
+    TransformMatrixViaCopy(transform + 0x10, &local[0]);
+    TransformMobyJointToWorld(owner, 0, &local[5]);
+    matrix_mul_vec3(&local[3], input, owner + 0xC0);
+    FastVecAdd(&local[6], &local[3], &local[5]);
 }
 
+/* Same as func_00305310: builds a local axis frame from the input direction and places the linked part. */
 void func_00307AD0(char *owner, Quad *input)
 {
     Vector local[7];
-    char *transform = func_002FEC50(*(int *)(*(char **)(owner + 0x68) + 0x48));
+    char *transform = GetSlotByIndex(*(int *)(*(char **)(owner + 0x68) + 0x48));
     qcopy(&local[3], input);
     qcopy(&local[0], &local[3]);
     local[4].bits = 0;
     local[4].f[2] = 1.0f;
-    func_00282DD8(&local[1], &local[0], &local[4]);
-    func_00282F20(&local[1], &local[1], 1.0f);
-    func_00282DD8(&local[2], &local[1], &local[0]);
-    func_002AB600(transform + 0x10, &local[0]);
-    func_0029FCC0(owner, 0, &local[5]);
-    func_00283098(&local[3], input, owner + 0xC0);
-    func_00282CC0(&local[6], &local[3], &local[5]);
+    FastVecCross(&local[1], &local[0], &local[4]);
+    vec_scale_to_length(&local[1], &local[1], 1.0f);
+    FastVecCross(&local[2], &local[1], &local[0]);
+    TransformMatrixViaCopy(transform + 0x10, &local[0]);
+    TransformMobyJointToWorld(owner, 0, &local[5]);
+    matrix_mul_vec3(&local[3], input, owner + 0xC0);
+    FastVecAdd(&local[6], &local[3], &local[5]);
 }

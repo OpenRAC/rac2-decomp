@@ -32,6 +32,7 @@ extern s32 func_002B3868(char *);
 extern void func_L01_00323310(s32, s32);
 extern s32 func_L00_00329520(char *, s32);
 #define FIELD(p,o) (*(s32 *)((p)+(o)))
+/* Per-frame update of the Dobbo switch controller (moby class 3485): it turns linked lights, doors and lifts on and off as the hero uses it. */
 void func_L09_00406FC8(u8 *obj)
 {
     char *data = *(char **)(obj + 0x68);
@@ -55,8 +56,8 @@ void func_L09_00406FC8(u8 *obj)
                 mode = (u8)D_L09_001B285C[(index2 << 8)+0x20];
                 if (mode != 254) {
                     if (mode == 253) goto skip58;
-                    if (func_L09_00406BF8(FIELD(data,0xC),-1)) {
-                        func_0029F338(D_L09_001B285C + (FIELD(data,0x58) << 8));
+                    if (CheckHeroTriggerResult(FIELD(data,0xC),-1)) {
+                        MarkMobySpawned(D_L09_001B285C + (FIELD(data,0x58) << 8));
                         FIELD(data,0x58) = -1;
                     }
                 }
@@ -64,10 +65,10 @@ void func_L09_00406FC8(u8 *obj)
 skip58:
             if ((u8)D_001395B8[0x2D] && FIELD(data,0x60) != -1) {
                 char *other;
-                func_L00_003672F8();
+                SetFlagToOne();
                 other = D_L09_001B285C_1;
                 other += FIELD(data,0x60) << 8;
-                func_L00_002B9D60(other+0x10,other+0xF0,0,1);
+                ResetHeroPositionAndDirection(other+0x10,other+0xF0,0,1);
                 D_001395B8[0x2D] = 0;
             }
             if ((u8)D_001395B8[0x1E]) {
@@ -80,173 +81,173 @@ skip58:
             {
                 id = *(u16 *)((index5<<8) + (u32)D_L09_001B285C + 0xB2);
                 if (D_L09_0021E9F0.active[(s16)id]) goto active;
-                bits = D_0019B4A8[D_001A79F0][(s16)id>>1];
+                bits = D_0019B4A8[gCurrentMapIndex][(s16)id>>1];
                 if (!((id & 1) ? ((bits>>4)&7) : (bits&7))) goto inactive;
 active:
-    func_L08_00328B80(FIELD(data,0x4C),1,1,1);
-                func_L09_00406C90(obj);
+    SetMobyFlagsByIndex(FIELD(data,0x4C),1,1,1);
+                ReleaseLinkedMoby(obj);
                 goto after_active;
 inactive:
-    func_L08_00328B80(FIELD(data,0x4C),0,0,0);
+    SetMobyFlagsByIndex(FIELD(data,0x4C),0,0,0);
 after_active:
-                func_L09_00406CC0(obj);
+                ReleaseLinkedObjectsIfReady(obj);
             }
             if (!(u8)D_001395B8[0xA3]) {
                 D_001395B8[0xA3] = 1;
-                func_0029B3E0(0,-1);
+                MemcardSave(0,-1);
             }
         }
         if (D_L09_001B2388 < 6) break;
-        func_L09_00406C68(FIELD(data,0x30),0,0,-1);
-        func_L09_00406C68(FIELD(data,0x34),0,0,-1);
-        func_L09_00406C68(FIELD(data,0x38),0,-1,-1);
-        func_L09_00406C68(FIELD(data,0x3C),0,0,0);
-        func_L08_00328B80(FIELD(data,0x50),0,0,0);
-        func_L08_00328B80(FIELD(data,0x54),0,0,-1);
-        func_L08_00328B80(FIELD(data,0x58),0,0,0);
-        func_L08_00328B80(FIELD(data,0x5C),0,0,-1);
-        func_L08_00328B80(FIELD(data,0x68),0,0,0);
-        func_L08_00328B80(FIELD(data,0x64),0,0,-1);
-        if (func_L09_00406BF8(FIELD(data,0),FIELD(data,0x20))) {
-            func_L09_00406BA0(FIELD(data,0x24),2);
-            func_L08_00328B80(FIELD(data,0x50),0,0,0);
-            func_L08_00328B80(FIELD(data,0x54),0,0,-1);
-            func_L08_00328B80(FIELD(data,0x58),0,0,0);
-            func_L08_00328B80(FIELD(data,0x5C),0,0,-1);
-            func_L08_00328B80(FIELD(data,0x4C),0,0,0);
-            func_002A7750(obj,1,-1);
-        } else if (func_L09_00406BF8(FIELD(data,4),FIELD(data,0x24))) {
-            func_L09_00406BA0(FIELD(data,0x20),2);
-            func_L08_00328B80(FIELD(data,0x50),1,1,1);
-            func_L08_00328B80(FIELD(data,0x54),1,1,-1);
-            func_L08_00328B80(FIELD(data,0x58),1,1,1);
+        ActivateLinkedMobyIfValid(FIELD(data,0x30),0,0,-1);
+        ActivateLinkedMobyIfValid(FIELD(data,0x34),0,0,-1);
+        ActivateLinkedMobyIfValid(FIELD(data,0x38),0,-1,-1);
+        ActivateLinkedMobyIfValid(FIELD(data,0x3C),0,0,0);
+        SetMobyFlagsByIndex(FIELD(data,0x50),0,0,0);
+        SetMobyFlagsByIndex(FIELD(data,0x54),0,0,-1);
+        SetMobyFlagsByIndex(FIELD(data,0x58),0,0,0);
+        SetMobyFlagsByIndex(FIELD(data,0x5C),0,0,-1);
+        SetMobyFlagsByIndex(FIELD(data,0x68),0,0,0);
+        SetMobyFlagsByIndex(FIELD(data,0x64),0,0,-1);
+        if (CheckHeroTriggerResult(FIELD(data,0),FIELD(data,0x20))) {
+            SetLinkedMobyState(FIELD(data,0x24),2);
+            SetMobyFlagsByIndex(FIELD(data,0x50),0,0,0);
+            SetMobyFlagsByIndex(FIELD(data,0x54),0,0,-1);
+            SetMobyFlagsByIndex(FIELD(data,0x58),0,0,0);
+            SetMobyFlagsByIndex(FIELD(data,0x5C),0,0,-1);
+            SetMobyFlagsByIndex(FIELD(data,0x4C),0,0,0);
+            SetMobyState(obj,1,-1);
+        } else if (CheckHeroTriggerResult(FIELD(data,4),FIELD(data,0x24))) {
+            SetLinkedMobyState(FIELD(data,0x20),2);
+            SetMobyFlagsByIndex(FIELD(data,0x50),1,1,1);
+            SetMobyFlagsByIndex(FIELD(data,0x54),1,1,-1);
+            SetMobyFlagsByIndex(FIELD(data,0x58),1,1,1);
             index6 = FIELD(data,0x54);
             if (index6 != -1 && (u8)D_L09_001B285C[(index6<<8)+0x20] >= 3) {
-                func_L08_00328B80(FIELD(data,0x5C),1,1,-1);
+                SetMobyFlagsByIndex(FIELD(data,0x5C),1,1,-1);
             } else {
-                func_L08_00328B80(FIELD(data,0x5C),0,0,-1);
+                SetMobyFlagsByIndex(FIELD(data,0x5C),0,0,-1);
             }
-            if (!func_L09_00406CC0(obj) && D_001397C4 < 0) {
-                func_L08_00328B80(FIELD(data,0x68),1,1,1);
-                func_L08_00328B80(FIELD(data,0x64),1,-1,-1);
+            if (!ReleaseLinkedObjectsIfReady(obj) && D_001397C4 < 0) {
+                SetMobyFlagsByIndex(FIELD(data,0x68),1,1,1);
+                SetMobyFlagsByIndex(FIELD(data,0x64),1,-1,-1);
             }
-            func_002A7750(obj,2,-1);
-        } else if (func_L00_00329520(D_00189EA0,FIELD(data,0x10))) {
-            func_L09_00406BA0(FIELD(data,0x20),2);
-            func_L08_00328B80(FIELD(data,0x50),1,1,1);
-            func_L08_00328B80(FIELD(data,0x54),1,1,-1);
-            func_L08_00328B80(FIELD(data,0x58),1,1,1);
-            func_L08_00328B80(FIELD(data,0x5C),1,1,-1);
-            if (!func_L09_00406CC0(obj) && D_001397C4 < 0) {
-                func_L08_00328B80(FIELD(data,0x68),1,1,1);
-                func_L08_00328B80(FIELD(data,0x64),1,-1,-1);
+            SetMobyState(obj,2,-1);
+        } else if (IsPointInsideRegion(gHeroPosition,FIELD(data,0x10))) {
+            SetLinkedMobyState(FIELD(data,0x20),2);
+            SetMobyFlagsByIndex(FIELD(data,0x50),1,1,1);
+            SetMobyFlagsByIndex(FIELD(data,0x54),1,1,-1);
+            SetMobyFlagsByIndex(FIELD(data,0x58),1,1,1);
+            SetMobyFlagsByIndex(FIELD(data,0x5C),1,1,-1);
+            if (!ReleaseLinkedObjectsIfReady(obj) && D_001397C4 < 0) {
+                SetMobyFlagsByIndex(FIELD(data,0x68),1,1,1);
+                SetMobyFlagsByIndex(FIELD(data,0x64),1,-1,-1);
             }
-            func_002A7750(obj,4,-1);
+            SetMobyState(obj,4,-1);
         }
-        func_L09_00406E78(obj);
+        UpdateCollectedItemIndicator(obj);
         break;
     case 1:
-        if (func_002B3868(obj) && D_001A63F0[0] != FIELD(data,0x78))
-            func_L01_00323310(FIELD(data,0x78),FIELD(data,0x74));
-        if (!func_L09_00406BF8(FIELD(data,4),FIELD(data,0x24))) break;
-        func_L09_00406BA0(FIELD(data,0x20),2);
-        func_L08_00328B80(FIELD(data,0x50),1,1,1);
-        func_L08_00328B80(FIELD(data,0x54),1,1,-1);
-        func_L08_00328B80(FIELD(data,0x58),1,1,1);
-        func_L08_00328B80(FIELD(data,0x5C),0,0,-1);
+        if (SetFirstPendingFlag(obj) && D_001A63F0[0] != FIELD(data,0x78))
+            QueueKeyedRequest(FIELD(data,0x78),FIELD(data,0x74));
+        if (!CheckHeroTriggerResult(FIELD(data,4),FIELD(data,0x24))) break;
+        SetLinkedMobyState(FIELD(data,0x20),2);
+        SetMobyFlagsByIndex(FIELD(data,0x50),1,1,1);
+        SetMobyFlagsByIndex(FIELD(data,0x54),1,1,-1);
+        SetMobyFlagsByIndex(FIELD(data,0x58),1,1,1);
+        SetMobyFlagsByIndex(FIELD(data,0x5C),0,0,-1);
         index7 = FIELD(data,0x58);
         if (index7 == -1 || (u8)D_L09_001B285C[(index7<<8)+0x20] == 254 ||
             (u8)D_L09_001B285C[(index7<<8)+0x20] == 253) {
-            func_L09_00406C68(FIELD(data,0x3C),1,1,1);
+            ActivateLinkedMobyIfValid(FIELD(data,0x3C),1,1,1);
             FIELD(data,0x58) = -1;
         }
-        func_002A7750(obj,2,-1);
+        SetMobyState(obj,2,-1);
         break;
     case 2:
-        if (func_002B3868(obj) && D_001A63F0[0] != FIELD(data,0x70))
-            func_L01_00323310(FIELD(data,0x70),FIELD(data,0x74));
+        if (SetFirstPendingFlag(obj) && D_001A63F0[0] != FIELD(data,0x70))
+            QueueKeyedRequest(FIELD(data,0x70),FIELD(data,0x74));
         index8 = FIELD(data,0x58);
         if (index8 == -1) goto after_release;
         mode = (u8)D_L09_001B285C[(index8<<8)+0x20];
         if (mode == 254) goto release;
         if (mode != 253) goto after_release;
 release:
-        func_L09_00406C68(FIELD(data,0x3C),1,1,1);
+        ActivateLinkedMobyIfValid(FIELD(data,0x3C),1,1,1);
         FIELD(data,0x58) = -1;
 after_release:
-        if (func_L09_00406BF8(FIELD(data,0),FIELD(data,0x20))) {
-            func_L09_00406BA0(FIELD(data,0x24),2);
-            func_L08_00328B80(FIELD(data,0x50),0,0,0);
-            func_L08_00328B80(FIELD(data,0x54),0,0,-1);
-            func_L08_00328B80(FIELD(data,0x58),0,0,0);
-            func_L08_00328B80(FIELD(data,0x5C),0,0,-1);
-            func_L08_00328B80(FIELD(data,0x4C),0,0,0);
-            func_002A7750(obj,1,-1);
-        } else if (D_0018A160 && func_L09_00406BF8(FIELD(data,0xC),-1)) {
-            func_L09_00406C68(FIELD(data,0x30),1,1,-1);
+        if (CheckHeroTriggerResult(FIELD(data,0),FIELD(data,0x20))) {
+            SetLinkedMobyState(FIELD(data,0x24),2);
+            SetMobyFlagsByIndex(FIELD(data,0x50),0,0,0);
+            SetMobyFlagsByIndex(FIELD(data,0x54),0,0,-1);
+            SetMobyFlagsByIndex(FIELD(data,0x58),0,0,0);
+            SetMobyFlagsByIndex(FIELD(data,0x5C),0,0,-1);
+            SetMobyFlagsByIndex(FIELD(data,0x4C),0,0,0);
+            SetMobyState(obj,1,-1);
+        } else if (D_0018A160 && CheckHeroTriggerResult(FIELD(data,0xC),-1)) {
+            ActivateLinkedMobyIfValid(FIELD(data,0x30),1,1,-1);
             D_001395B8[0x1E] = 1;
             index10 = FIELD(data,0x40);
             if (index10 != -1 && FIELD(data,0x48) != -1)
                 FIELD(*(char **)(D_L09_001B285C+(index10<<8)+0x68),0) = FIELD(data,0x48);
-            func_L09_00406E78(obj);
-            func_002A7750(obj,3,-1);
+            UpdateCollectedItemIndicator(obj);
+            SetMobyState(obj,3,-1);
         }
         if ((u32)((u8)obj[0x20] - 1) < 2) break;
         /* State 3's common follow-up is also reached after the transition. */
     case 3:
         index11 = FIELD(data,0x54);
         if (index11 != -1 && (u8)D_L09_001B285C[(index11<<8)+0x20] >= 3)
-            func_L08_00328B80(FIELD(data,0x5C),1,1,-1);
-        if (!func_L09_00406CC0(obj) && D_001397C4 < 0) {
-            func_L08_00328B80(FIELD(data,0x68),1,1,1);
-            func_L08_00328B80(FIELD(data,0x64),1,-1,-1);
+            SetMobyFlagsByIndex(FIELD(data,0x5C),1,1,-1);
+        if (!ReleaseLinkedObjectsIfReady(obj) && D_001397C4 < 0) {
+            SetMobyFlagsByIndex(FIELD(data,0x68),1,1,1);
+            SetMobyFlagsByIndex(FIELD(data,0x64),1,-1,-1);
         }
-        if (!func_L09_00406BF8(FIELD(data,0xC),-1)) goto reset_to_2;
+        if (!CheckHeroTriggerResult(FIELD(data,0xC),-1)) goto reset_to_2;
         if (D_0018C0B4 == 0x31) {
-            func_L09_00406E78(obj);
-            func_L09_00406BA0(FIELD(data,0x24),2);
-            func_L09_00406C68(FIELD(data,0x3C),0,0,0);
-            func_002A7750(obj,4,-1);
+            UpdateCollectedItemIndicator(obj);
+            SetLinkedMobyState(FIELD(data,0x24),2);
+            ActivateLinkedMobyIfValid(FIELD(data,0x3C),0,0,0);
+            SetMobyState(obj,4,-1);
         }
         break;
     case 4:
-        if (func_L09_00406BF8(FIELD(data,0x10),-1)) {
-            func_L09_00406C68(FIELD(data,0x30),0,0,-1);
-            func_L09_00406CC0(obj);
-            func_002A7750(obj,5,-1);
+        if (CheckHeroTriggerResult(FIELD(data,0x10),-1)) {
+            ActivateLinkedMobyIfValid(FIELD(data,0x30),0,0,-1);
+            ReleaseLinkedObjectsIfReady(obj);
+            SetMobyState(obj,5,-1);
         }
         break;
     case 5:
-        func_L09_00406E78(obj);
-        if (!func_L09_00406BF8(FIELD(data,0xC),-1)) break;
-        func_L09_00406C90(obj);
-        func_L09_00406BA0(FIELD(data,0x24),0);
+        UpdateCollectedItemIndicator(obj);
+        if (!CheckHeroTriggerResult(FIELD(data,0xC),-1)) break;
+        ReleaseLinkedMoby(obj);
+        SetLinkedMobyState(FIELD(data,0x24),0);
         index12 = FIELD(data,0x6C);
         if (index12 != -1) {
             char *other = D_L09_001B294C + (index12<<7);
-            func_L00_002B9D60(other+0x30,other+0x70,0,0);
+            ResetHeroPositionAndDirection(other+0x30,other+0x70,0,0);
         }
-        func_L09_00406CC0(obj);
-        func_002A7750(obj,6,-1);
+        ReleaseLinkedObjectsIfReady(obj);
+        SetMobyState(obj,6,-1);
         break;
     case 6:
-        func_L09_00406CC0(obj);
-        if (func_L09_00406BF8(FIELD(data,0),FIELD(data,0x20))) {
-            func_L08_00328B80(FIELD(data,0x50),0,0,0);
-            func_L08_00328B80(FIELD(data,0x54),0,0,-1);
-            func_L08_00328B80(FIELD(data,0x58),0,0,0);
-            func_L08_00328B80(FIELD(data,0x5C),0,0,-1);
-            func_L09_00406BA0(FIELD(data,0x24),2);
-            func_002A7750(obj,1,-1);
-        } else if (!func_L09_00406BF8(FIELD(data,0xC),-1)) {
+        ReleaseLinkedObjectsIfReady(obj);
+        if (CheckHeroTriggerResult(FIELD(data,0),FIELD(data,0x20))) {
+            SetMobyFlagsByIndex(FIELD(data,0x50),0,0,0);
+            SetMobyFlagsByIndex(FIELD(data,0x54),0,0,-1);
+            SetMobyFlagsByIndex(FIELD(data,0x58),0,0,0);
+            SetMobyFlagsByIndex(FIELD(data,0x5C),0,0,-1);
+            SetLinkedMobyState(FIELD(data,0x24),2);
+            SetMobyState(obj,1,-1);
+        } else if (!CheckHeroTriggerResult(FIELD(data,0xC),-1)) {
 reset_to_2:
-            func_L09_00406BA0(FIELD(data,0x24),0);
-            func_002A7750(obj,2,-1);
+            SetLinkedMobyState(FIELD(data,0x24),0);
+            SetMobyState(obj,2,-1);
         } else if (D_0018C0B4 == 0x31) {
-            func_L09_00406E78(obj);
-            func_L09_00406BA0(FIELD(data,0x24),2);
-            func_L09_00406C68(FIELD(data,0x3C),0,0,0);
-            func_002A7750(obj,4,-1);
+            UpdateCollectedItemIndicator(obj);
+            SetLinkedMobyState(FIELD(data,0x24),2);
+            ActivateLinkedMobyIfValid(FIELD(data,0x3C),0,0,0);
+            SetMobyState(obj,4,-1);
         }
         break;
     }

@@ -22,62 +22,65 @@ extern int r1_func_00118CC0(int);
 extern void func_001277F8(void *);
 
 /* rac1-decomp src/core/001236F0.c: func_001239D8 */
-int func_00127630(int arg0, int arg1, int arg2) {
-    int r = func_00127508(arg0, arg1, arg2, 0x40);
-    if (r == 0) {
+/* Makes a new folder on a memory card. It opens with a special mode and marks the command as a folder creation. */
+int func_00127630(int port, int slot, int dirName) {
+    int result = SceMcOpen(port, slot, dirName, 0x40);
+    if (result == 0) {
         r1_D_00132EA8 = 0xB;
     }
-    return r;
+    return result;
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00123A10 */
 /* RPC 3 on the client r1_D_00159B00, in func_00127630's shape: -100 with
    no server bound, -200 when the semaphore wait fails. */
-int func_00127668(int arg0) {
-    char *cd = r1_D_00159B00;
-    int r;
+/* Closes an open memory card file. */
+int func_00127668(int fd) {
+    char *client = r1_D_00159B00;
+    int result;
 
-    if (*(int *)(cd + 0x24) == 0) {
+    if (*(int *)(client + 0x24) == 0) {
         return -100;
     }
     if (r1_func_00118CC0(r1_D_00132EAC) < 0) {
         return -200;
     }
-    r1_D_00159B80 = arg0;
-    r = r1_func_0011B4C8(cd, 3, 1, &r1_D_00159B80, 0x30, r1_D_0015B0C0, 4, 0, 0);
-    if (r == 0) {
+    r1_D_00159B80 = fd;
+    result = r1_func_0011B4C8(client, 3, 1, &r1_D_00159B80, 0x30, r1_D_0015B0C0, 4, 0, 0);
+    if (result == 0) {
         r1_D_00132EA8 = 3;
     } else {
         r1_func_00118C90(r1_D_00132EAC);
     }
-    return r;
+    return result;
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00123AC8 */
 /* RPC 4, the same shape with three request words. `buf` is assigned
    after the semaphore call, so retail builds its address in a temp. */
-int func_00127720(int arg0, int arg1, int arg2) {
-    char *cd = r1_D_00159B00;
-    int *buf;
-    int r;
+/* Moves the read/write position inside an open memory card file. */
+int func_00127720(int fd, int offset, int origin) {
+    char *client = r1_D_00159B00;
+    int *request;
+    int result;
 
-    if (*(int *)(cd + 0x24) == 0) {
+    if (*(int *)(client + 0x24) == 0) {
         return -100;
     }
     if (r1_func_00118CC0(r1_D_00132EAC) < 0) {
         return -200;
     }
-    buf = &r1_D_00159B80;
-    buf[0] = arg0;
-    buf[4] = arg1;
-    buf[5] = arg2;
-    r = r1_func_0011B4C8(cd, 4, 1, buf, 0x30, r1_D_0015B0C0, 4, 0, 0);
-    if (r == 0) {
+    request = &r1_D_00159B80;
+    request[0] = fd;
+    request[4] = offset;
+    request[5] = origin;
+    result = r1_func_0011B4C8(client, 4, 1, request, 0x30, r1_D_0015B0C0, 4, 0, 0);
+    if (result == 0) {
         r1_D_00132EA8 = 4;
     } else {
         r1_func_00118C90(r1_D_00132EAC);
     }
-    return r;
+    return result;
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00123BA0 */
@@ -99,32 +102,33 @@ int func_00127720(int arg0, int arg1, int arg2) {
  * invariant where retail has it. (Folding the +0x10 into the load
  * offset instead of keeping a base pointer costs another 8.)
  */
-void func_001277F8(void *arg0) {
-    char *p = (char *)((unsigned int)arg0 | 0x20000000);
+/* Copies the leftover bytes at the start and end of a memory card read into the caller's buffer. */
+void func_001277F8(void *descAddr) {
+    char *desc = (char *)((unsigned int)descAddr | 0x20000000);
     unsigned char *src;
-    char *d;
+    char *dst;
     int i;
 
-    if (*(int *)(p + 0x0) != 0) {
-        d = *(char **)(p + 0x8);
+    if (*(int *)(desc + 0x0) != 0) {
+        dst = *(char **)(desc + 0x8);
         i = 0;
-        if (i < *(int *)(p + 0x0)) {
-            src = (unsigned char *)(p + 0x10);
+        if (i < *(int *)(desc + 0x0)) {
+            src = (unsigned char *)(desc + 0x10);
             do {
-                *d++ = src[i];
+                *dst++ = src[i];
                 i++;
-            } while (i < *(int *)(p + 0x0));
+            } while (i < *(int *)(desc + 0x0));
         }
     }
-    if (*(int *)(p + 0x4) != 0) {
-        d = *(char **)(p + 0xC);
+    if (*(int *)(desc + 0x4) != 0) {
+        dst = *(char **)(desc + 0xC);
         i = 0;
-        if (i < *(int *)(p + 0x4)) {
-            src = (unsigned char *)(p + 0x50);
+        if (i < *(int *)(desc + 0x4)) {
+            src = (unsigned char *)(desc + 0x50);
             do {
-                *d++ = src[i];
+                *dst++ = src[i];
                 i++;
-            } while (i < *(int *)(p + 0x4));
+            } while (i < *(int *)(desc + 0x4));
         }
     }
 }

@@ -72,8 +72,8 @@ int func_L00_00341820(const Path *path, Vector *out, int *index, float *offset, 
     if (j >= path->count) {
         j %= path->count;
     }
-    func_00282CF0(&delta, &path->points[j], &path->points[i]);
-    func_00282F20(&delta, &delta, *offset);
-    func_00282CC0(out, out, &delta);
+    FastVecSub(&delta, &path->points[j], &path->points[i]);
+    vec_scale_to_length(&delta, &delta, *offset);
+    FastVecAdd(out, out, &delta);
     return reached;
 }

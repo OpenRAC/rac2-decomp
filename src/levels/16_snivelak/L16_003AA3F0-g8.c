@@ -45,12 +45,13 @@ extern void *func_002BAA28(void *,void *,void *,int,int,int,int,int,int);
    gcse: it splits the block, so the call's &jitter takes the reaching register as in the first loop. */
 static inline void flipCoin(int *heads)
 {
-    if (func_002A77E0(2))
+    if (RandomIntBelow(2))
         *heads = 1;
     else
         *heads = 0;
 }
 
+/* Builds a new random lightning beam with branches and spawns sparks along it. */
 void func_L16_003AA3F0(BeamMoby *object)
 {
     Beam *beam = object->vars;
@@ -64,27 +65,27 @@ void func_L16_003AA3F0(BeamMoby *object)
     int i, smoothIndex, branchIndex, particleIndex, j, k;
     int selected;
     object->position.w = 1.0f;
-    beam->lifetime = func_002A7820(D_L16_001AF884, D_L16_001AF888);
+    beam->lifetime = RandomIntRange(D_L16_001AF884, D_L16_001AF888);
     beam->duration = beam->lifetime;
-    if (D_001A79F0 == 0xd5 || D_001A79F0 == 16)
-        spread = func_002A7878(40.0f, 45.0f);
-    else spread = func_002A7878(4.0f, 8.0f);
+    if (gCurrentMapIndex == 0xd5 || gCurrentMapIndex == 16)
+        spread = RandomFloatRange(40.0f, 45.0f);
+    else spread = RandomFloatRange(4.0f, 8.0f);
     half = 0.5f;
     timeStep = frameTime;
     unit = 1.0f;
     for (i = 0; i < 32; i++) {
-        float height = func_00283CE0(i);
-        float last = func_00283CE0(31);
+        float height = IntToFloat(i);
+        float last = IntToFloat(31);
         height = height / last;
         height = (half - height) * spread;
         if ((unsigned)(i - 3) >= 26) {
-            func_00282C88(&positions[i]);
-            func_00282C88(&velocities[i]);
+            ClearVector128(&positions[i]);
+            ClearVector128(&velocities[i]);
         } else {
-            func_002A7A00(&positions[i], 0.0f, D_L16_001AF908);
-            if (D_001A79F0 == 16 || D_001A79F0 == 0xd5)
-                func_002A7A00(&velocities[i], 0.0f, 0.20000001788139343f);
-            else func_002A7A00(&velocities[i], 0.0f, D_L16_001AF90C * timeStep);
+            RandomDirectionVector(&positions[i], 0.0f, D_L16_001AF908);
+            if (gCurrentMapIndex == 16 || gCurrentMapIndex == 0xd5)
+                RandomDirectionVector(&velocities[i], 0.0f, 0.20000001788139343f);
+            else RandomDirectionVector(&velocities[i], 0.0f, D_L16_001AF90C * timeStep);
         }
         {
             float y = positions[i].y;
@@ -97,19 +98,19 @@ void func_L16_003AA3F0(BeamMoby *object)
             qcopy(&beam->positions[smoothIndex], &positions[smoothIndex]);
             qcopy(&beam->velocities[smoothIndex], &velocities[smoothIndex]);
         } else {
-            func_00282CC0(&scratch, &positions[smoothIndex-1], &positions[smoothIndex]);
-            func_00282CC0(&scratch, &scratch, &positions[smoothIndex+1]);
-            func_00282D30(&beam->positions[smoothIndex], &scratch, 0.333f);
-            func_00282CC0(&scratch, &velocities[smoothIndex-1], &velocities[smoothIndex]);
-            func_00282CC0(&scratch, &scratch, &velocities[smoothIndex+1]);
-            func_00282D30(&beam->velocities[smoothIndex], &scratch, 0.333f);
+            FastVecAdd(&scratch, &positions[smoothIndex-1], &positions[smoothIndex]);
+            FastVecAdd(&scratch, &scratch, &positions[smoothIndex+1]);
+            FastVecScale(&beam->positions[smoothIndex], &scratch, 0.333f);
+            FastVecAdd(&scratch, &velocities[smoothIndex-1], &velocities[smoothIndex]);
+            FastVecAdd(&scratch, &scratch, &velocities[smoothIndex+1]);
+            FastVecScale(&beam->velocities[smoothIndex], &scratch, 0.333f);
         }
     }
     for (branchIndex = 0; branchIndex < 4; branchIndex++) {
-        if (D_001A79F0 == 0xd5 || D_001A79F0 == 16)
-            func_002A7A00(&scratch, 1.0f, 1.0f);
-        else func_002A7A00(&scratch, D_L16_001AF908, D_L16_001AF908);
-        selected = func_00283CF0(func_002A7878((float)branchIndex * 6.0f, (float)(branchIndex + 1) * 6.0f)) + 4;
+        if (gCurrentMapIndex == 0xd5 || gCurrentMapIndex == 16)
+            RandomDirectionVector(&scratch, 1.0f, 1.0f);
+        else RandomDirectionVector(&scratch, D_L16_001AF908, D_L16_001AF908);
+        selected = FloatToInt(RandomFloatRange((float)branchIndex * 6.0f, (float)(branchIndex + 1) * 6.0f)) + 4;
         beam->selected[branchIndex] = selected;
         qcopy(&beam->branches[0][branchIndex], &beam->positions[selected]);
         qcopy(&beam->branchVelocities[0][branchIndex], &beam->velocities[selected]);
@@ -119,39 +120,39 @@ void func_L16_003AA3F0(BeamMoby *object)
             for (j = 1; j < 4; j++) {
                 Beam *column = (Beam *)(branchIndex * 16);
                 column = (Beam *)((int)column + (int)beam);
-                func_002A7A00(&jitter, 0.1f, 0.1f);
-                if (D_001A79F0 == 0xd5 || D_001A79F0 == 16)
-                    func_002A7A00(((Row *)((char *)beam + velOffset))[j], 0.0f, 0.20000001788139343f);
-                else func_002A7A00(((Row *)((char *)beam + velOffset))[j], 0.0f, D_L16_001AF90C * frameTime);
-                func_00282CC0(((Row *)((char *)beam + curOffset))[j], column->branches[j-1], &scratch);
-                func_00282CC0(((Row *)((char *)beam + curOffset))[j], ((Row *)((char *)beam + curOffset))[j], &jitter);
+                RandomDirectionVector(&jitter, 0.1f, 0.1f);
+                if (gCurrentMapIndex == 0xd5 || gCurrentMapIndex == 16)
+                    RandomDirectionVector(((Row *)((char *)beam + velOffset))[j], 0.0f, 0.20000001788139343f);
+                else RandomDirectionVector(((Row *)((char *)beam + velOffset))[j], 0.0f, D_L16_001AF90C * frameTime);
+                FastVecAdd(((Row *)((char *)beam + curOffset))[j], column->branches[j-1], &scratch);
+                FastVecAdd(((Row *)((char *)beam + curOffset))[j], ((Row *)((char *)beam + curOffset))[j], &jitter);
             }
         }
     }
-    if (func_00282E80(&object->position, D_L16_001B9B00) >= 4.0f) {
+    if (vec_distance_xy(&object->position, D_L16_001B9B00) >= 4.0f) {
         char *definition = (char *)(beam->index * 128 + (int)D_L16_001B2C0C);
         beam->rotation[2] = *(float *)(definition + 0x78);
         beam->rotation[1] = *(float *)(definition + 0x74);
-        beam->rotation[0] = func_002A7940();
-        func_00283410(transform, beam->rotation);
+        beam->rotation[0] = RandomAngle();
+        euler_to_matrix(transform, beam->rotation);
         qcopy(&transform[3], &object->position);
         for (particleIndex = 0; particleIndex < 32; particleIndex += 8) {
             int color, duration;
-            func_002830C0(&scratch, &beam->positions[particleIndex], transform);
+            transform_vector(&scratch, &beam->positions[particleIndex], transform);
             qcopy(&jitter, &beam->velocities[particleIndex]);
             jitter.w = D_L16_001AF920;
-            color = func_002A77E0(2) ? D_L16_001AF928 : D_L16_001AF92C;
-            duration = func_002A77E0(10);
-            func_002BAA28(&scratch, &jitter, &jitter, D_L16_001AF914, D_L16_001AF918, particleIndex >> 1, 15, duration + 20, color);
+            color = RandomIntBelow(2) ? D_L16_001AF928 : D_L16_001AF92C;
+            duration = RandomIntBelow(10);
+            SpawnTrailParticle_002BAA28(&scratch, &jitter, &jitter, D_L16_001AF914, D_L16_001AF918, particleIndex >> 1, 15, duration + 20, color);
         }
         for (k = 0; k < 2; k++) {
             int duration, heads;
-            func_002830C0(&scratch, &beam->branches[3][k], transform);
+            transform_vector(&scratch, &beam->branches[3][k], transform);
             qcopy(&jitter, &beam->branchVelocities[3][k]);
             jitter.w = D_L16_001AF920;
             flipCoin(&heads);
-            duration = func_002A77E0(10);
-            func_002BAA28(&scratch, &jitter, &jitter, D_L16_001AF914, D_L16_001AF918, beam->selected[k] >> 1, 15, duration + 20, D_L16_001AF92C);
+            duration = RandomIntBelow(10);
+            SpawnTrailParticle_002BAA28(&scratch, &jitter, &jitter, D_L16_001AF914, D_L16_001AF918, beam->selected[k] >> 1, 15, duration + 20, D_L16_001AF92C);
         }
     }
 }

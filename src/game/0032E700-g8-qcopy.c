@@ -74,14 +74,14 @@ void func_0032E700(char *object) {
     endpoint.v[2] = end[2];
     endpoint.v[3] = 0.0f;
     origin.word = *(EffectVectorWord *)(object + 0x10);
-    life = func_00283CE0(state->timer) * state->rate;
-    life = func_00283198(life * 3.1415927f);
-    func_00281DE8(&packet.header, 23, 0, 0x80);
+    life = IntToFloat(state->timer) * state->rate;
+    life = FastSinOrCosB(life * 3.1415927f);
+    InitQuadPacketState(&packet.header, 23, 0, 0x80);
     alpha = life * 128.0f;
     COLORS(packet)[0] = COLORS(packet)[1] = COLORS(packet)[2] = COLORS(packet)[3] =
-        state->color0 | ((u32)func_00283CF0(alpha) << 24);
+        state->color0 | ((u32)FloatToInt(alpha) << 24);
     COLORS(packet)[2] = COLORS(packet)[3] =
-        state->color1 | ((u32)func_00283CF0(alpha) << 24);
+        state->color1 | ((u32)FloatToInt(alpha) << 24);
     UV(packet)[0] = 0.0f; UV(packet)[1] = 0.0f; UV(packet)[2] = 0.0f; UV(packet)[3] = 1.0f;
     UV(packet)[4] = 1.0f; UV(packet)[5] = 0.0f; UV(packet)[6] = 1.0f; UV(packet)[7] = 1.0f;
     for (i = 0; i < 4; i++) {
@@ -91,28 +91,28 @@ void func_0032E700(char *object) {
     state->scroll -= 0.1f;
     if (state->scroll <= 4.0f) state->scroll += 4.0f;
     position = (char *)&origin;
-    func_00282CF0(&camera_delta, position, D_L00_001B8DC0);
-    func_00282CF0(&segment, &endpoint, position);
-    func_00282D30(&segment, &segment, 0.5f);
-    func_00282CC0(&midpoint, position, &segment);
-    func_00282DD8(&normal, &camera_delta, &segment);
-    func_00282F20(&normal, &normal, state->width0);
-    func_00282CC0(VERTEX(packet,0), position, &normal);
-    func_00282CF0(VERTEX(packet,1), position, &normal);
-    func_00282F20(&normal, &normal, state->width1);
-    func_00282CC0(VERTEX(packet,2), &midpoint, &normal);
-    func_00282CF0(VERTEX(packet,3), &midpoint, &normal);
-    func_00280B90(&packet, 0, 0);
+    FastVecSub(&camera_delta, position, gCameraPosition_L00);
+    FastVecSub(&segment, &endpoint, position);
+    FastVecScale(&segment, &segment, 0.5f);
+    FastVecAdd(&midpoint, position, &segment);
+    FastVecCross(&normal, &camera_delta, &segment);
+    vec_scale_to_length(&normal, &normal, state->width0);
+    FastVecAdd(VERTEX(packet,0), position, &normal);
+    FastVecSub(VERTEX(packet,1), position, &normal);
+    vec_scale_to_length(&normal, &normal, state->width1);
+    FastVecAdd(VERTEX(packet,2), &midpoint, &normal);
+    FastVecSub(VERTEX(packet,3), &midpoint, &normal);
+    draw_world_quad(&packet, 0, 0);
     COLORS(packet)[0] = COLORS(packet)[2];
     COLORS(packet)[1] = COLORS(packet)[3];
     COLORS(packet)[2] = COLORS(packet)[3] = state->color2;
     *(EffectVectorWord *)VERTEX(packet,0) = *(EffectVectorWord *)VERTEX(packet,2);
     *(EffectVectorWord *)VERTEX(packet,1) = *(EffectVectorWord *)VERTEX(packet,3);
-    func_00282CC0(VERTEX(packet,2), VERTEX(packet,2), &segment);
-    func_00282CC0(VERTEX(packet,3), VERTEX(packet,3), &segment);
-    func_00280B90(&packet, 0, 0);
-    func_00281DE8(&packet.header, 14, 1, 0x80);
-    color = state->color3 | ((u32)func_00283CF0(life * 64.0f) << 24);
+    FastVecAdd(VERTEX(packet,2), VERTEX(packet,2), &segment);
+    FastVecAdd(VERTEX(packet,3), VERTEX(packet,3), &segment);
+    draw_world_quad(&packet, 0, 0);
+    InitQuadPacketState(&packet.header, 14, 1, 0x80);
+    color = state->color3 | ((u32)FloatToInt(life * 64.0f) << 24);
     COLORS(packet)[0] = COLORS(packet)[1] = COLORS(packet)[2] = COLORS(packet)[3] = color;
     UV(packet)[0] = 0.0f;
     UV(packet)[1] = 0.0f;
@@ -124,13 +124,13 @@ void func_0032E700(char *object) {
     UV(packet)[7] = 1.0f;
     COLORS(packet)[2] = COLORS(packet)[3] = state->color4;
 
-    func_00282F20(&normal, &normal, state->width2);
-    func_00282CC0(VERTEX(packet,0), position, &normal);
-    func_00282CF0(VERTEX(packet,1), position, &normal);
-    func_00282CC0(&midpoint, position, &segment);
-    func_00282CC0(&midpoint, &midpoint, &segment);
-    func_00282F20(&normal, &normal, state->width3);
-    func_00282CC0(VERTEX(packet,2), &midpoint, &normal);
-    func_00282CF0(VERTEX(packet,3), &midpoint, &normal);
-    func_00280B90(&packet, 0, 0);
+    vec_scale_to_length(&normal, &normal, state->width2);
+    FastVecAdd(VERTEX(packet,0), position, &normal);
+    FastVecSub(VERTEX(packet,1), position, &normal);
+    FastVecAdd(&midpoint, position, &segment);
+    FastVecAdd(&midpoint, &midpoint, &segment);
+    vec_scale_to_length(&normal, &normal, state->width3);
+    FastVecAdd(VERTEX(packet,2), &midpoint, &normal);
+    FastVecSub(VERTEX(packet,3), &midpoint, &normal);
+    draw_world_quad(&packet, 0, 0);
 }

@@ -5,6 +5,7 @@
 
 extern f32 func_0034EE78(f32, f32, f32, f32, f32);
 
-void func_00335C10(u8 *p, f32 *out, f32 t) {
-    *out = func_0034EE78(t, 0.0f, *(f32 *)(p + 8), *(f32 *)(p + 0xC), 1.0f);
+/* Evaluates a curve at time t using two values stored in the object and saves the result. */
+void func_00335C10(u8 *curve, f32 *out, f32 t) {
+    *out = EvaluateCubicHermite(t, 0.0f, *(f32 *)(curve + 8), *(f32 *)(curve + 0xC), 1.0f);
 }

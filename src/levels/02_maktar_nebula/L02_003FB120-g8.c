@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -44,50 +45,51 @@ extern s32 func_00282978(char *);
    weight division: the assembler pads a `div.s` that follows a -g line label by two nops when
    the division is a statement of its own, and by one when the statement shares its source line
    with the two before it, as written here. */
-void func_L02_003FB120(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
-    u16 *q;
+/* Keeps score of the arena's enemies and how much they and the hero have lost recently. */
+void func_L02_003FB120(char *actor) {
+    char *state = *(char **)(actor + 0x68);
+    u16 *idList;
 
     if (GROUP(0x40) != 0xFF) {
-        q = (u16 *)D_L02_001FC060[GROUP(0x40)];
-        if (q != 0) {
-            u16 *p = q;
-            char *e;
+        idList = (u16 *)gEntityGroupLists[GROUP(0x40)];
+        if (idList != 0) {
+            u16 *idCursor = idList;
+            char *entity;
             s32 count = 0;
             s32 kind;
             f32 sum = 0.0f;
-            f32 f;
+            f32 value;
 
             do {
-                e = (char *)D_L02_001B359C[0] + ((*p & 0x7FFF) << 8);
-                if (e != 0 && *(u8 *)(e + 0x20) != 0xFE && *(u8 *)(e + 0x20) != 0xFD &&
-                    *(u8 *)(e + 0x20) != 1) {
-                    kind = *(s16 *)(e + 0xAA);
-                    if (kind == 0x9CA || kind == 0xB22 || kind == 0xC3B || kind == 0xC3E) {
-                        f = *(f32 *)(*(char **)(e + 0x68) + 0x20);
-                        sum += f;
-                        if (f > 0.0f)
+                entity = (char *)gMobyPool_L02[0] + ((*idCursor & 0x7FFF) << 8);
+                if (entity != 0 && *(u8 *)(entity + 0x20) != 0xFE && *(u8 *)(entity + 0x20) != 0xFD &&
+                    *(u8 *)(entity + 0x20) != 1) {
+                    kind = *(s16 *)(entity + 0xAA);
+                    if (kind == 0x9CA /* moby class 2506 */ || kind == 0xB22 /* moby class 2850 */ || kind == 0xC3B /* Megacorp Security Robot - Flamethrower */ || kind == 0xC3E /* PX6 BladeBall */) {
+                        value = *(f32 *)(*(char **)(entity + 0x68) + 0x20);
+                        sum += value;
+                        if (value > 0.0f)
                             count++;
-                    } else if (kind == 0x9F8 || kind == 0xA44) {
+                    } else if (kind == 0x9F8 /* Chainblade */ || kind == 0xA44 /* B2 Brawler Legs */) {
                         count++;
-                        sum += *(f32 *)(*(char **)(e + 0x68) + 0x20);
+                        sum += *(f32 *)(*(char **)(entity + 0x68) + 0x20);
                     }
                 }
-            } while ((s16)*p++ >= 0);
+            } while ((s16)*idCursor++ >= 0);
             {
-                char *hero = D_00189E20;
-                s32 k;
-                s32 r;
-                s32 x;
-                f32 w;
-                f32 s0;
-                f32 s1;
-                f32 s2;
+                char *hero = gHeroState;
+                s32 ageIndex;
+                s32 ringIndex;
+                s32 rawIndex;
+                f32 weight;
+                f32 weightedCount;
+                f32 weightedSum;
+                f32 weightedHero;
 
-                func_L02_00400720(a0, *(s32 *)(state + 0x60) - count, *(f32 *)(state + 0x64) - sum,
+                PickRandomIdleMessage(actor, *(s32 *)(state + 0x60) - count, *(f32 *)(state + 0x64) - sum,
                                   *(f32 *)(state + 0x68) - (f32) * (s32 *)(hero + 0x24CC));
                 if (*(f32 *)(state + 0x68) - (f32) * (s32 *)(hero + 0x24CC) > 0.0f)
-                    func_L00_0035F5A0(0x17, 0, 0);
+                    StartEffectInSlot(0x17, 0, 0);
                 if (count < *(s32 *)(state + 0x60))
                     *(s32 *)(state + ((s16) * (s16 *)(state + 0x11C) << 4)) +=
                         *(s32 *)(state + 0x60) - count;
@@ -106,26 +108,26 @@ void func_L02_003FB120(char *a0) {
                 *(f32 *)(state + 0x64) = sum;
                 *(s32 *)(state + 0x60) = count;
                 *(f32 *)(state + 0x68) = (f32) * (s32 *)(hero + 0x24CC);
-                s0 = 0.0f;
-                s1 = 0.0f;
-                s2 = 0.0f;
-                for (k = 4; k > 0; k--) {
+                weightedCount = 0.0f;
+                weightedSum = 0.0f;
+                weightedHero = 0.0f;
+                for (ageIndex = 4; ageIndex > 0; ageIndex--) {
                     char *b4;
                     char *b8;
 
-                    x = *(s16 *)(state + 0x11C) + k; r = x - x / 4 * 4; w = 1.0f / (5.0f - (f32)k);
+                    rawIndex = *(s16 *)(state + 0x11C) + ageIndex; ringIndex = rawIndex - rawIndex / 4 * 4; weight = 1.0f / (5.0f - (f32)ageIndex);
                     b4 = state + 4;
                     b8 = state + 8;
-                    s1 += w * *(f32 *)(b4 + (r << 4));
-                    s0 += w * (f32) * (s32 *)(state + (r << 4));
-                    s2 += w * *(f32 *)(b8 + (r << 4));
+                    weightedSum += weight * *(f32 *)(b4 + (ringIndex << 4));
+                    weightedCount += weight * (f32) * (s32 *)(state + (ringIndex << 4));
+                    weightedHero += weight * *(f32 *)(b8 + (ringIndex << 4));
                 }
                 *(f32 *)(state + 0x6C) =
-                    D_L02_001B1218 * s1 + D_L02_001B121C * s0 + D_L02_001B1220 * s2;
+                    D_L02_001B1218 * weightedSum + D_L02_001B121C * weightedCount + D_L02_001B1220 * weightedHero;
                 {
                     char *timer = state + 0x11E;
 
-                    if (func_00282978(timer)) {
+                    if (FastDecTimer(timer)) {
                         char *b4 = state + 4;
                         char *b8 = state + 8;
                         u16 reload = D_L02_001B1214;

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct {
     unsigned char pad_0[478];
@@ -43,13 +44,14 @@ extern int D_L03_001A9010 __attribute__((sda));
 extern void func_00282A88(void *, int);
 extern int func_L03_002C6F08(int, int);
 
+/* Reads the hero's button action this frame and switches the hero to the matching state (jump, glide, swing and so on). */
 void func_L03_002B2798(void)
 {
     PlayerInput *player = PLAYER;
     short action = player->action;
     unsigned char saved = player->saved;
     int active;
-    func_00282A88(&player->action, 16);
+    FastMemoryHelperB(&player->action, 16);
     player->saved = saved;
     player->action = action;
     player->flag = 0;
@@ -71,14 +73,14 @@ void func_L03_002B2798(void)
     if (action == 12) PLAYER->tertiary = 1;
     if (PLAYER->primary) {
         if (active && PLAYER->state == 1 && PLAYER->mode != 0x7a) {
-            func_L03_002C6F08(0x7a, 1);
+            EnterHeroState_L03(0x7a, 1);
         } else if (PLAYER->primary && active) {
             if (PLAYER->mode == 0x38 && !PLAYER->enabled) return;
-            if (PLAYER->busy) func_L03_002C6F08(0x38, 1);
-            else if (D_001A79F0 == 2 && D_L03_001A9010) func_L03_002C6F08(0x7d, 1);
+            if (PLAYER->busy) EnterHeroState_L03(0x38, 1);
+            else if (gCurrentMapIndex == 2 && D_L03_001A9010) EnterHeroState_L03(0x7d, 1);
             else if (*(int *)(*(char **)(PLAYER->object + 0x24) + 0x1f0))
-                func_L03_002C6F08(0x79, 1);
-            else func_L03_002C6F08(0x39, 1);
+                EnterHeroState_L03(0x79, 1);
+            else EnterHeroState_L03(0x39, 1);
         }
     }
 }

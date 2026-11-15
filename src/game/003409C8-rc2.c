@@ -29,65 +29,66 @@ extern s16 D_00259F58[][5];
 
 struct Obj {
     s8 pad[0x814];
-    s32 f814;
-    s32 f818;
-    s32 f81C;
-    s32 f820;
+    s32 column;  /* 0x814 */
+    s32 page;  /* 0x818 */
+    s32 flag;  /* 0x81C */
+    s32 value;  /* 0x820 */
 };
 
+/* Moves the selection around the four-column item grid and remembers the selected value. */
 void func_003409C8(struct Obj *o, s32 flags) {
     if (flags & 0x1000) {
-        s32 m1;
-        s32 r;
-        s32 t;
-        func_002E5E58(3, 0, 0);
-        m1 = -1;
-        t = o->f818 - 1;
-        r = (m1 < t) ? t : 5;
-        o->f818 = r;
+        s32 minusOne;
+        s32 newPage;
+        s32 nextValue;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        minusOne = -1;
+        nextValue = o->page - 1;
+        newPage = (minusOne < nextValue) ? nextValue : 5;
+        o->page = newPage;
     } else if (flags & 0x4000) {
-        s32 t;
-        func_002E5E58(3, 0, 0);
-        t = o->f818 + 1;
-        t = (5 < t) ? 0 : t;
-        o->f818 = t;
+        s32 nextValue;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        nextValue = o->page + 1;
+        nextValue = (5 < nextValue) ? 0 : nextValue;
+        o->page = nextValue;
     } else if (flags & 0x8000) {
-        s32 t;
-        s32 a;
-        s32 b;
-        func_002E5E58(3, 0, 0);
-        t = o->f814 - 1;
-        o->f814 = t;
-        if (t < 0) {
-            a = o->f818;
-            o->f814 = 3;
-            b = a - 4;
-            if ((u32)b < 2) {
-                o->f814 = 2;
-                o->f818 = b;
-                o->f81C = 1;
+        s32 nextValue;
+        s32 savedPage;
+        s32 pageOffset;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        nextValue = o->column - 1;
+        o->column = nextValue;
+        if (nextValue < 0) {
+            savedPage = o->page;
+            o->column = 3;
+            pageOffset = savedPage - 4;
+            if ((u32)pageOffset < 2) {
+                o->column = 2;
+                o->page = pageOffset;
+                o->flag = 1;
             }
         }
     } else if (flags & 0x2000) {
-        s32 t;
-        s32 k;
-        func_002E5E58(3, 0, 0);
-        t = o->f814 + 1;
-        o->f814 = t;
-        if (t >= 4) {
-            o->f814 = 0;
-            k = o->f818;
-            if (k == 4) {
-                o->f818 = 0;
-                o->f81C = 1;
-            } else if (k == 5) {
-                o->f814 = 1;
-                o->f818 = 1;
-                o->f81C = 1;
+        s32 nextValue;
+        s32 currentPage;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        nextValue = o->column + 1;
+        o->column = nextValue;
+        if (nextValue >= 4) {
+            o->column = 0;
+            currentPage = o->page;
+            if (currentPage == 4) {
+                o->page = 0;
+                o->flag = 1;
+            } else if (currentPage == 5) {
+                o->column = 1;
+                o->page = 1;
+                o->flag = 1;
             }
         }
     } else if (flags & 0x40) {
-        func_003407F8(o, D_00259F58, 4);
+        AddMenuItemToRing(o, D_00259F58, 4);
     }
-    o->f820 = D_00259F58[o->f814 + o->f818 * 4][3];
+    o->value = D_00259F58[o->column + o->page * 4][3];
 }

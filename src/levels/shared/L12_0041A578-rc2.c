@@ -25,28 +25,29 @@
 
 extern s32 *ref_L12_0041A578_00[];
 
-s32 func_L12_0041A578(s8 *arg0, s32 arg1) {
-    s32 i  = arg1 + 1;
-    f32 z  = 0.0f;
-    s32 **tb  = (s32 **)ref_L12_0041A578_00;
-    s32 q  = (i << 4) + 0x1C;
-    s8 *t;
-    s32 n;
-    s32 r;
-    f32 *p;
+/* Finds the next point on the route, after the given one, that is marked as a stopping point. Returns the last point if none is marked. */
+s32 func_L12_0041A578(s8 *moby, s32 startIndex) {
+    s32 i  = startIndex + 1;
+    f32 zero  = 0.0f;
+    s32 **tables  = (s32 **)ref_L12_0041A578_00;
+    s32 byteOffset  = (i << 4) + 0x1C;
+    s8 *path;
+    s32 count;
+    s32 lastIndex;
+    f32 *flagPtr;
 
-    t = (s8 *)tb[*(s32 *)(*(s8 **)(arg0 + 0x68) + 0x110)];
-    n = *(s32 *)t;
-    r = n - 1;
-    p = (f32 *)(q + (s32)t);
+    path = (s8 *)tables[*(s32 *)(*(s8 **)(moby + 0x68) + 0x110)];
+    count = *(s32 *)path;
+    lastIndex = count - 1;
+    flagPtr = (f32 *)(byteOffset + (s32)path);
 loop:
-    if (i >= n) {
-        return r;
+    if (i >= count) {
+        return lastIndex;
     }
-    if (*p == z) {
+    if (*flagPtr == zero) {
         return i;
     }
-    p += 4;
+    flagPtr += 4;
     i += 1;
     goto loop;
 }

@@ -70,29 +70,29 @@ typedef struct {
 /* Raises the object, emits particles, and expands a damaging ring before reset. */
 void func_L12_0041A790(Obj *self)
 {
-    V v;
+    V vec;
     u8 damage[0x30] __attribute__((aligned(16)));
     V next;
-    Vars *s = self->vars;
+    Vars *vars = self->vars;
 
     switch (self->state) {
     case 0:
-        qcopy(&s->origin, &self->position);
+        qcopy(&vars->origin, &self->position);
         self->state = 1;
         break;
     case 1: {
         f32 distance;
         distance = 100000;
-        if (func_L12_003DE4B0())
-            distance = func_00282E48(&self->position, D_L12_001B090C + 0x10);
-        else if (func_L12_00404778())
-            distance = func_00282E48(&self->position, D_L12_001B1360 + 0x10);
-        if (func_00282E80(&self->position, &D_00189EA0) < D_L12_001B1C7C ||
-           func_002A9640(self, 0x30000, 0) || distance < D_L12_001B1C7C * 0.5f) {
+        if (IsTrackedObjectOpen())
+            distance = fast_vec_dist(&self->position, D_L12_001B090C + 0x10);
+        else if (IsSecondTrackedObjectOpen())
+            distance = fast_vec_dist(&self->position, D_L12_001B1360 + 0x10);
+        if (vec_distance_xy(&self->position, &gHeroPosition) < D_L12_001B1C7C ||
+           FindOwnedEffectSlot(self, 0x30000, 0) || distance < D_L12_001B1C7C * 0.5f) {
             self->state = 2;
-            s->timer = func_00283CF0(D_L12_001B1C84 * 60);
-            s->radius = D_L12_001B1C78;
-            s->age = 0;
+            vars->timer = FloatToInt(D_L12_001B1C84 * 60);
+            vars->radius = D_L12_001B1C78;
+            vars->age = 0;
         }
         break;
     }
@@ -100,52 +100,52 @@ void func_L12_0041A790(Obj *self)
         f32 step, ratio, angle, cosine, sine, size;
         s32 color, i;
         u8 life, alpha;
-        if (func_002B3868(self))
-            func_002E5CF8(0, 0, self);
-        func_L00_002E6CF0(func_L12_0041AEF0, self);
-        s->age += D_L12_001B1C88 * 0.016666668f;
-        func_002AA548(&self->position.z, &s->heightSpeed, s->origin.z + 0.5f, 1, 0.008333334f, 1);
-        func_002AA2E8(&s->angularSpeed, 0.4188791f, 0.1f);
-        self->rotation[2] = func_00283B98(self->rotation[2], s->angularSpeed);
+        if (SetFirstPendingFlag(self))
+            PlayMobySound(0, 0, self);
+        AddDrawCallbackToList1(DrawAnimatedRings, self);
+        vars->age += D_L12_001B1C88 * 0.016666668f;
+        StepValueTowardTarget(&self->position.z, &vars->heightSpeed, vars->origin.z + 0.5f, 1, 0.008333334f, 1);
+        ApproachValue(&vars->angularSpeed, 0.4188791f, 0.1f);
+        self->rotation[2] = FastAddRotations(self->rotation[2], vars->angularSpeed);
         step = D_L12_001B1C88 * 0.016666668f;
         ratio = D_L12_001B1C80 / step;
-        angle = func_002A7878(-15, 15) * 0.017453294f;
-        sine = func_00283198(angle);
-        cosine = func_00283180(angle);
-        angle = func_002A7940();
-        v.x = func_00283180(angle) * cosine;
-        v.y = func_00283198(angle) * cosine;
-        v.z = sine;
-        func_00282F20(&v, &v, step);
-        color = func_00283D38(D_L12_001B1C94, D_L12_001B1C98, func_002A7878(0, 1));
-        size = func_002A7878(D_L12_001B1C9C, D_L12_001B1CA0);
-        life = func_00283CF0(func_002A7878(1, 1.5f) * 7) & 255;
-        alpha = func_002A77E0(255) & 255;
-        func_002C3150(&self->position, &v, color, size, life, alpha, 0);
-        if (func_00282948(&s->timer)) {
+        angle = RandomFloatRange(-15, 15) * 0.017453294f;
+        sine = FastSinOrCosB(angle);
+        cosine = FastSinOrCosA(angle);
+        angle = RandomAngle();
+        vec.x = FastSinOrCosA(angle) * cosine;
+        vec.y = FastSinOrCosB(angle) * cosine;
+        vec.z = sine;
+        vec_scale_to_length(&vec, &vec, step);
+        color = FastTweenColor(D_L12_001B1C94, D_L12_001B1C98, RandomFloatRange(0, 1));
+        size = RandomFloatRange(D_L12_001B1C9C, D_L12_001B1CA0);
+        life = FloatToInt(RandomFloatRange(1, 1.5f) * 7) & 255;
+        alpha = RandomIntBelow(255) & 255;
+        SpawnHeroRelativeParticle(&self->position, &vec, color, size, life, alpha, 0);
+        if (FastFloatHelperD(&vars->timer)) {
             self->state = 3;
-            s->timer = 20;
+            vars->timer = 20;
             for (i = 0; i < D_L12_001B1CA8; i++) {
                 f32 angle, sine, cosine, size;
                 s32 color;
                 u8 life, alpha;
-                angle = func_002A7878(-D_L12_001B1CA4, D_L12_001B1CA4) * 0.017453294f;
-                sine = func_00283198(angle);
-                cosine = func_00283180(angle);
-                angle = func_002A7940();
-                v.x = func_00283180(angle) * cosine;
-                v.y = func_00283198(angle) * cosine;
-                v.z = sine;
-                func_00282F20(&v, &v, step);
-                color = func_00283D38(D_L12_001B1C94, D_L12_001B1C98, func_002A7878(0, 1));
-                size = func_002A7878(D_L12_001B1C9C, D_L12_001B1CA0);
-                life = func_00283CF0(ratio * func_002A7878(1, 1.5f)) & 255;
-                alpha = func_002A77E0(255) & 255;
-                func_002C3150(&self->position, &v, color, size, life, alpha, 0);
+                angle = RandomFloatRange(-D_L12_001B1CA4, D_L12_001B1CA4) * 0.017453294f;
+                sine = FastSinOrCosB(angle);
+                cosine = FastSinOrCosA(angle);
+                angle = RandomAngle();
+                vec.x = FastSinOrCosA(angle) * cosine;
+                vec.y = FastSinOrCosB(angle) * cosine;
+                vec.z = sine;
+                vec_scale_to_length(&vec, &vec, step);
+                color = FastTweenColor(D_L12_001B1C94, D_L12_001B1C98, RandomFloatRange(0, 1));
+                size = RandomFloatRange(D_L12_001B1C9C, D_L12_001B1CA0);
+                life = FloatToInt(ratio * RandomFloatRange(1, 1.5f)) & 255;
+                alpha = RandomIntBelow(255) & 255;
+                SpawnHeroRelativeParticle(&self->position, &vec, color, size, life, alpha, 0);
             }
-            func_002A7A00(&v, 0.016666668f, 0.033333335f);
-            v.z = func_002A7878(5, 8) * 0.016666668f;
-            func_L02_0032B468(self, 0xFF6, &self->position, self->rotation, 0, 0, &v, &D_L12_001A8F20, &D_L12_001A8F20, 0);
+            RandomDirectionVector(&vec, 0.016666668f, 0.033333335f);
+            vec.z = RandomFloatRange(5, 8) * 0.016666668f;
+            SpawnFlyingFragment(self, 0xFF6, &self->position, self->rotation, 0, 0, &vec, &D_L12_001A8F20, &D_L12_001A8F20, 0);
         }
         break;
     }
@@ -154,41 +154,41 @@ void func_L12_0041A790(Obj *self)
         s32 i;
         self->flags = (self->flags | 0x41) & 0xEFFF;
         self->collision = 0;
-        if (D_L12_001B1C80 < s->radius) {
+        if (D_L12_001B1C80 < vars->radius) {
             if (D_L12_001B1CAC) {
                 self->flags = (self->flags & 0xEFBE) | 0x1000;
                 self->collision = *(s32 *)(self->classData + 0x10);
-                qcopy(&self->position, &s->origin);
+                qcopy(&self->position, &vars->origin);
                 self->state = 1;
-                s->angularSpeed = 0;
-                s->radius = 0;
+                vars->angularSpeed = 0;
+                vars->radius = 0;
             }
             break;
         }
-        func_L00_002E6CF0(func_L12_0041AEF0, self);
+        AddDrawCallbackToList1(DrawAnimatedRings, self);
         step = D_L12_001B1C88 * 0.016666668f;
-        s->radius += step;
-        s->age += step;
-        func_002A8C00(damage, self, 0x10001, (f32)s->damage, &D_L12_001A8F20);
+        vars->radius += step;
+        vars->age += step;
+        make_hit_descriptor(damage, self, 0x10001, (f32)vars->damage, &D_L12_001A8F20);
         angle = 0;
-        v.x = func_00283180(angle) * s->radius;
-        v.y = func_00283198(angle) * s->radius;
-        v.z = 0;
-        func_00282CC0(&v, &v, &self->position);
+        vec.x = FastSinOrCosA(angle) * vars->radius;
+        vec.y = FastSinOrCosB(angle) * vars->radius;
+        vec.z = 0;
+        FastVecAdd(&vec, &vec, &self->position);
         angle = 0.52359885f;
         for (i = 11; i >= 0; i--) {
-            next.x = func_00283180(angle) * s->radius;
-            next.y = func_00283198(angle) * s->radius;
+            next.x = FastSinOrCosA(angle) * vars->radius;
+            next.y = FastSinOrCosB(angle) * vars->radius;
             next.z = 0;
-            func_00282CC0(&next, &next, &self->position);
-            func_002761F8(&next, &v, 9, self, damage);
-            angle = func_00283B98(angle, 0.52359885f);
-            qcopy(&v, &next);
+            FastVecAdd(&next, &next, &self->position);
+            CollLine(&next, &vec, 9, self, damage);
+            angle = FastAddRotations(angle, 0.52359885f);
+            qcopy(&vec, &next);
         }
-        if (func_L12_003DE4B0() && func_00282E48(&self->position, D_L12_001B090C + 0x10) < s->radius)
-            func_L00_003DF6B0(1, 0);
-        if (func_L12_00404778() && func_00282E48(&self->position, D_L12_001B1360 + 0x10) < s->radius)
-            func_L00_004028C0(1, 0);
+        if (IsTrackedObjectOpen() && fast_vec_dist(&self->position, D_L12_001B090C + 0x10) < vars->radius)
+            SetTrackedObjectState(1, 0);
+        if (IsSecondTrackedObjectOpen() && fast_vec_dist(&self->position, D_L12_001B1360 + 0x10) < vars->radius)
+            StartGlobalObject(1, 0);
         break;
     }
     }

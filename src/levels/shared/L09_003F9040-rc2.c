@@ -30,33 +30,34 @@ extern s32 ref_L09_003F9040_02 __attribute__((sda));
 extern s32 ref_L09_003F9040_03 __attribute__((sda));
 extern s32 ref_L09_003F9040_04 __attribute__((sda));
 
-void func_L09_003F9040(s8 *arg0) {
-    s32 v;
-    s32 m;
-    s32 w;
+/* On two levels, applies that level's colour tint to the object. */
+void func_L09_003F9040(s8 *moby) {
+    s32 colorWord;
+    s32 alphaMask;
+    s32 packedValue;
 
-    switch (D_001A79F0) {
+    switch (gCurrentMapIndex) {
     case 8:
-        w = ref_L09_003F9040_01;
-        m = 0xFF000000;
-        if ((w & m) != 0) {
-            ref_L09_003F9040_00(arg0, w & 0xFF, (w >> 8) & 0xFF, (w >> 16) & 0xFF);
+        packedValue = ref_L09_003F9040_01;
+        alphaMask = 0xFF000000;
+        if ((packedValue & alphaMask) != 0) {
+            ref_L09_003F9040_00(moby, packedValue & 0xFF, (packedValue >> 8) & 0xFF, (packedValue >> 16) & 0xFF);
         }
-        v = ref_L09_003F9040_02;
+        colorWord = ref_L09_003F9040_02;
         goto block_9;
     case 20:
-        w = ref_L09_003F9040_03;
-        m = 0xFF000000;
-        if ((w & m) != 0) {
-            ref_L09_003F9040_00(arg0, w & 0xFF, (w >> 8) & 0xFF, (w >> 16) & 0xFF);
+        packedValue = ref_L09_003F9040_03;
+        alphaMask = 0xFF000000;
+        if ((packedValue & alphaMask) != 0) {
+            ref_L09_003F9040_00(moby, packedValue & 0xFF, (packedValue >> 8) & 0xFF, (packedValue >> 16) & 0xFF);
         }
-        v = ref_L09_003F9040_04;
+        colorWord = ref_L09_003F9040_04;
         goto block_9;
     }
     return;
 block_9:
-    if ((v & m) != 0) {
-        (*(s32 *)((s8 *)(arg0) + (0x78))) = v;
-        (*(u16 *)((s8 *)(arg0) + (0x34))) = (*(u16 *)((s8 *)(arg0) + (0x34))) | 0x10;
+    if ((colorWord & alphaMask) != 0) {
+        (*(s32 *)((s8 *)(moby) + (0x78))) = colorWord;
+        (*(u16 *)((s8 *)(moby) + (0x34))) = (*(u16 *)((s8 *)(moby) + (0x34))) | 0x10;
     }
 }

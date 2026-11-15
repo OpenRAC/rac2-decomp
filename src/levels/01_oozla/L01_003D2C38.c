@@ -9,11 +9,12 @@ extern u8 D_001A7B26;
 extern void func_0029F338(void *a0);
 
 /* Marks the object at 0x68 busy and notifies the owner once the 0xBC flag is clear. */
-void func_L01_003D2C38(u8 *a0)
+/* Keeps the object around until it is triggered or the level is over, then removes it. */
+void func_L01_003D2C38(u8 *moby)
 {
-    u8 *p = a0;
+    u8 *mobyAlias = moby;
 
-    *(u32 *)(*(u8 **)(p + 0x68) + 0x5C) |= 1;
-    if (*(u8 *)(p + 0xBC) != 0 || D_001A7B26 != 0)
-        func_0029F338(p);
+    *(u32 *)(*(u8 **)(mobyAlias + 0x68) + 0x5C) |= 1;
+    if (*(u8 *)(mobyAlias + 0xBC) != 0 || D_001A7B26 != 0)
+        MarkMobySpawned(mobyAlias);
 }

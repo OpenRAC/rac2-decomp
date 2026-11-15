@@ -88,9 +88,9 @@ end:
 
         qzero(&buf);
 
-        ((float *)&buf)[2] = func_00283248(D_00189E20.position[0] - pos[0],
-                                           D_00189E20.position[1] - pos[1]);
-        if (func_L20_0039DCF8(found, pos, &buf) == 0) {
+        ((float *)&buf)[2] = FastMatrixHelperA(gHeroState.position[0] - pos[0],
+                                           gHeroState.position[1] - pos[1]);
+        if (InitSpawnedTrooper(found, pos, &buf) == 0) {
             found = 0;
         }
     }

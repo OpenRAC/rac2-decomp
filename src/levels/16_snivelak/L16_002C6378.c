@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -31,9 +32,10 @@ extern void func_002A7470(void *, s32, s32, s32);
    line labels let the assembler reproduce the padding before its division. */
 
 /* runs the readiness helper once when the handle is in state 1 with flag 2 set */
-void func_L16_003AA0C8(u8 *arg0) {
-    if (arg0[0x43] == 1 && (arg0[0x60] & 2) != 0) {
-        func_002A7470(arg0, 0, 0, 1);
+/* Restarts the object's animation once it is in state 1 and its ready flag is set. */
+void func_L16_003AA0C8(u8 *object) {
+    if (object[0x43] == 1 && (object[0x60] & 2) != 0) {
+        StartAnimationBlended(object, 0, 0, 1);
     }
 }
 
@@ -68,21 +70,22 @@ extern void func_0029F338(char *);
 
 /* Tears the resident down (state 0) or starts it once the readiness test passes
    (state 1), chosen by the record's own state byte. */
-void func_L16_003F54F8(char *a0) {
-    char *s0 = a0;
+/* Shuts the object down in state 0, or fires off its effects once it is ready in state 1. */
+void func_L16_003F54F8(char *object) {
+    char *self = object;
 
-    switch (*(u8 *)(s0 + 0x20)) {
+    switch (*(u8 *)(self + 0x20)) {
     case 0:
-        *(u16 *)(s0 + 0x32) = 0x200;
-        *(u16 *)(s0 + 0x34) |= 0x4000;
-        func_002A7750(s0, 1, -1);
+        *(u16 *)(self + 0x32) = 0x200;
+        *(u16 *)(self + 0x34) |= 0x4000;
+        SetMobyState(self, 1, -1);
         break;
     case 1:
-        if (func_002A9640(s0, 0x80000, 0) != 0) {
-            func_L16_003F55A0(s0);
-            func_L16_003F5708(s0);
-            func_002E5CF8(0, 0, s0);
-            func_0029F338(s0);
+        if (FindOwnedEffectSlot(self, 0x80000, 0) != 0) {
+            SpawnRandomBurstsOutsideBox(self);
+            EmitParticlesOutsideCentralBox(self);
+            PlayMobySound(0, 0, self);
+            MarkMobySpawned(self);
         }
         break;
     }

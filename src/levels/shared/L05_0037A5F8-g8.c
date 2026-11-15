@@ -67,6 +67,7 @@ static __inline__ int hud_coord(float value, float scale, float half)
     return result;
 }
 
+/* Draws the small HUD markers over nearby objects, pointing toward them. */
 void func_L05_0037A5F8(void)
 {
     float offset[4],rotation[4],rotate[12],view[12];
@@ -77,31 +78,31 @@ void func_L05_0037A5F8(void)
     int i,alpha,c,ty;
     u8 *entry;
     y = (float)hud_coord(D_L05_001AC4E4, D_L05_001B2D84[0], 0.5f);
-    texture = func_0027C878(D_L05_001AC4FC);
-    func_L05_003008C0(D_L05_001AC4E0,y,D_L05_001AC4E8,D_L05_001AC4EC,0,0,D_L05_001AC4F0,D_L05_001AC4F4,0x80808080ULL,texture);
-    for (i=0;i<func_L00_004272A0();i++) {
+    texture = GetEffectTextureDescriptor(D_L05_001AC4FC);
+    AppendSubpixelTexturedScreenQuad(D_L05_001AC4E0,y,D_L05_001AC4E8,D_L05_001AC4EC,0,0,D_L05_001AC4F0,D_L05_001AC4F4,0x80808080ULL,texture);
+    for (i=0;i<GetLevelSavedValue();i++) {
         entry = D_L05_00225DD0[i];
         nextList = D_L05_001FB220[entry[0x21]];
         if (!nextList) continue;
         list = nextList;
         do {
             object = D_L05_001B251C[0]+((*list&0x7FFF)<<8);
-            state = (u8 *)func_002ED688(object);
+            state = (u8 *)GetMobyMotionData(object);
             if (*(int *)(state+0x110) && *(int *)(state+0x14C)) {
-                distance = func_00282E48(D_L05_001B96C0.position,object+0x10);
+                distance = fast_vec_dist(D_L05_001B96C0.position,object+0x10);
                 if (distance <= 128.0f) {
                     radius = D_L05_001AC4F8;
                     radius *= 0.0078125f;
                     *(Quad *)rotation = 0;
                     rotation[2] = 1.5707964f;
                     scale = distance*radius;
-                    func_002833F0(rotate,rotation);
-                    func_00282CF0(offset,object+0x10,D_L05_001B96C0.position);
-                    func_00282F20(offset,offset,scale);
-                    func_002836E8(view,D_L05_001B96C0.view);
-                    func_00283098(offset,offset,view);
-                    func_00283098(offset,offset,rotate);
-                    alpha = func_00283CF0(func_002A7798(1.0f-distance*0.0078125f)*128.0f);
+                    euler_rotation_basis(rotate,rotation);
+                    FastVecSub(offset,object+0x10,D_L05_001B96C0.position);
+                    vec_scale_to_length(offset,offset,scale);
+                    FastMatrixHelperC(view,D_L05_001B96C0.view);
+                    matrix_mul_vec3(offset,offset,view);
+                    matrix_mul_vec3(offset,offset,rotate);
+                    alpha = FloatToInt(EaseOutQuad(1.0f-distance*0.0078125f)*128.0f);
                     distance = offset[2]*0.125f+D_L05_001AC4E8*0.5f;
                     if (*(int *)(state+0x158)) { alpha=128; distance=D_L05_001AC4E8*0.5f; }
                     if (distance > D_L05_001AC4E8+D_L05_001AC4E8) distance=D_L05_001AC4E8+D_L05_001AC4E8;
@@ -112,18 +113,18 @@ void func_L05_0037A5F8(void)
                     c = *(s32 *)(state+0x150);
                     c |= alpha<<24;
                     color = c;
-                    texture = func_0027C878(D_L05_001AC4FC);
-                    func_L05_003008C0(x,y,distance,distance,0,0,D_L05_001AC4F0,D_L05_001AC4F4,color,texture);
+                    texture = GetEffectTextureDescriptor(D_L05_001AC4FC);
+                    AppendSubpixelTexturedScreenQuad(x,y,distance,distance,0,0,D_L05_001AC4F0,D_L05_001AC4F4,color,texture);
                 } else if (*(int *)(state+0x158)) {
                     *(Quad *)rotation = 0;
                     rotation[2] = 1.5707964f;
                     y = D_L05_001AC4F8;
-                    func_002833F0(rotate,rotation);
-                    func_00282CF0(offset,object+0x10,D_L05_001B96C0.position);
-                    func_00282F20(offset,offset,y);
-                    func_002836E8(view,D_L05_001B96C0.view);
-                    func_00283098(offset,offset,view);
-                    func_00283098(offset,offset,rotate);
+                    euler_rotation_basis(rotate,rotation);
+                    FastVecSub(offset,object+0x10,D_L05_001B96C0.position);
+                    vec_scale_to_length(offset,offset,y);
+                    FastMatrixHelperC(view,D_L05_001B96C0.view);
+                    matrix_mul_vec3(offset,offset,view);
+                    matrix_mul_vec3(offset,offset,rotate);
                     alpha=128;
                     distance = D_L05_001AC4E8;
                     if (distance > D_L05_001AC4E8+D_L05_001AC4E8) distance=D_L05_001AC4E8+D_L05_001AC4E8;
@@ -134,8 +135,8 @@ void func_L05_0037A5F8(void)
                     c = *(s32 *)(state+0x150);
                     c |= alpha<<24;
                     color2 = c;
-                    texture = func_0027C878(D_L05_001AC4FC);
-                    func_L05_003008C0(x,y,distance,distance,0,0,D_L05_001AC4F0,D_L05_001AC4F4,color2,texture);
+                    texture = GetEffectTextureDescriptor(D_L05_001AC4FC);
+                    AppendSubpixelTexturedScreenQuad(x,y,distance,distance,0,0,D_L05_001AC4F0,D_L05_001AC4F4,color2,texture);
                 }
             }
         } while ((s16)*list++ >= 0);

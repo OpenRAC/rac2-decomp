@@ -85,62 +85,64 @@ typedef struct TodanoInitObject {
     int f98;
 } TodanoInitObject;
 
-void func_L12_003E04B8(TodanoInitObject *o) {
-    TodanoInitState *d = o->f68;
-    if (!o->f20) {
+/* Sets up a Todano creature on its first frame (health, speeds, animation) and then handles
+   its hits and its death each frame. */
+void func_L12_003E04B8(TodanoInitObject *moby) {
+    TodanoInitState *vars = moby->f68;
+    if (!moby->f20) {
         int kind;
-        o->f7C = 1 << func_002A77E0(6);
+        moby->f7C = 1 << RandomIntBelow(6);
         kind = 3;
-        d->fCC = kind;
-        d->fCE = kind;
-        d->fA8 = kind;
-        d->f70 = 9;
-        d->f71 = 8;
-        d->f72 = 8;
-        d->f76 = 9;
-        d->f77 = 10;
-        d->f7C = 0.100000009f;
-        d->f80 = 0.0666666701f;
-        d->f84 = 0.00416666688f;
-        d->f88 = 0.00833333377f;
-        d->f8C = 0.00416666688f;
-        d->f90 = 0.5f;
-        d->f94 = 0.5f;
-        d->f9C = 0.4f;
-        d->fCD = 6;
-        d->fCF = 6;
-        d->fD2 = 13;
-        d->fD3 = 26;
-        d->f28 = kind;
-        o->f30 = 200;
-        o->f32 = 200;
-        d->f584 = 0.25f;
-        d->f554 = D_L12_001B09F8;
-        d->f550 = 0.3f;
-        d->f558 = 1;
-        d->f55C = 1;
-        d->f580 = 0.261799425f;
-        d->f57C = 0.00555555569f;
-        d->f58C = -1;
-        d->f560 = 3.14159012f;
-        d->f588 |= 1;
-        func_002B60B0(o, 0.00333333341f, 0.100000009f, 0.00349065894f, 0.209439546f);
-        qcopy((u8 *)d + 0x760, (u8 *)o + 0x10);
-        func_00282CF0((u8 *)d + 0x770, (u8 *)o + 0x10, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x30);
-        func_00283098((u8 *)d + 0x770, (u8 *)d + 0x770, D_L12_001B2F8C[0] + (d->f518 << 7) + 0x40);
-        d->f598 = (u8 *)d + 0x6C0;
-        d->f59C = (u8 *)d + 0x640;
-        d->f790 = func_L02_0032E508(o, d->f510, (u8 *)d + 0x110, 32);
-        o->f98 = 0;
-        o->f34 = (o->f34 | 0x41) & 0xEFFF;
-        func_002A7750(o, 1, 0);
-        if (o->f43)func_002A7470(o, 0, 0, 0);
+        vars->fCC = kind;
+        vars->fCE = kind;
+        vars->fA8 = kind;
+        vars->f70 = 9;
+        vars->f71 = 8;
+        vars->f72 = 8;
+        vars->f76 = 9;
+        vars->f77 = 10;
+        vars->f7C = 0.100000009f;
+        vars->f80 = 0.0666666701f;
+        vars->f84 = 0.00416666688f;
+        vars->f88 = 0.00833333377f;
+        vars->f8C = 0.00416666688f;
+        vars->f90 = 0.5f;
+        vars->f94 = 0.5f;
+        vars->f9C = 0.4f;
+        vars->fCD = 6;
+        vars->fCF = 6;
+        vars->fD2 = 13;
+        vars->fD3 = 26;
+        vars->f28 = kind;
+        moby->f30 = 200;
+        moby->f32 = 200;
+        vars->f584 = 0.25f;
+        vars->f554 = D_L12_001B09F8;
+        vars->f550 = 0.3f;
+        vars->f558 = 1;
+        vars->f55C = 1;
+        vars->f580 = 0.261799425f;
+        vars->f57C = 0.00555555569f;
+        vars->f58C = -1;
+        vars->f560 = 3.14159012f;
+        vars->f588 |= 1;
+        SetControllerSpeedLimits(moby, 0.00333333341f, 0.100000009f, 0.00349065894f, 0.209439546f);
+        qcopy((u8 *)vars + 0x760, (u8 *)moby + 0x10);
+        FastVecSub((u8 *)vars + 0x770, (u8 *)moby + 0x10, D_L12_001B2F8C[0] + (vars->f518 << 7) + 0x30);
+        matrix_mul_vec3((u8 *)vars + 0x770, (u8 *)vars + 0x770, D_L12_001B2F8C[0] + (vars->f518 << 7) + 0x40);
+        vars->f598 = (u8 *)vars + 0x6C0;
+        vars->f59C = (u8 *)vars + 0x640;
+        vars->f790 = BuildRouteNodes(moby, vars->f510, (u8 *)vars + 0x110, 32);
+        moby->f98 = 0;
+        moby->f34 = (moby->f34 | 0x41) & 0xEFFF;
+        SetMobyState(moby, 1, 0);
+        if (moby->f43)StartAnimationBlended(moby, 0, 0, 0);
         D_L12_001B09F4 = 0;
     }
-    if (o->f31 && func_00282E48((u8 *)o + 0x10, D_L12_001B9E00) < 24) {
-        func_002A93B0(o);
-        o->f6F = 22;
+    if (moby->f31 && fast_vec_dist((u8 *)moby + 0x10, D_L12_001B9E00) < 24) {
+        UpdateMobyGroundCheck(moby);
+        moby->f6F = 22;
     }
-    func_002B0ED8(o, (u8 *)d + 0x60, 0);
-    if (o->f20 != 8 && o->f20 != 1)func_L00_002E6EF8(func_L12_003E0B68, o);
+    ApplyDamageToObject(moby, (u8 *)vars + 0x60, 0);
+    if (moby->f20 != 8 && moby->f20 != 1)AddDrawCallbackToList3(AddTwoGlowSprites, moby);
 }

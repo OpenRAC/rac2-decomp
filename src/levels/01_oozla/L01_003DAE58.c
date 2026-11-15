@@ -52,6 +52,7 @@ typedef unsigned int UpdateQuad __attribute__((mode(TI)));
 
 /* Runs the moby's state machine on obj[0x95]; from state 3 on, except 5, it then eases the
    rotation at 0xF4 and 0xF0 towards a direction, each angle clamped to 40 degrees. */
+/* Update handler for the Mutant Muckdweller moby. */
 void func_L01_003DAE58(u8 *obj)
 {
     f32 delta[4] __attribute__((aligned(16)));
@@ -65,10 +66,10 @@ void func_L01_003DAE58(u8 *obj)
     s32 result;
 
     if (obj[0x95])
-        func_L01_003DD3A0(obj);
+        UpdateMuckdwellerTargeting(obj);
     switch (obj[0x95]) {
     case 0:
-        func_L01_003DCF40(obj);
+        InitMuckdwellerMoby(obj);
         break;
     case 1:
         if (state[0x3D0]) {
@@ -76,67 +77,67 @@ void func_L01_003DAE58(u8 *obj)
             I(obj, 0x98) = 0;
             obj[0x31] = 0;
         }
-        if (I(state, 0x2F4) == 1 && func_00282978(state + 0x3D4)) {
+        if (I(state, 0x2F4) == 1 && FastDecTimer(state + 0x3D4)) {
             if (state[0x3D0]) {
-                func_L01_003DCE70(obj, pos);
-                func_00282CF0(delta, pos, obj + 0x10);
+                FindFarthestAnchorPoint(obj, pos);
+                FastVecSub(delta, pos, obj + 0x10);
                 rate = 0.033333335071802139282f;
-                if (func_00282DF0(delta) * rate < 0.13333334028720855713f)
-                    speed = func_00282DF0(delta) * rate;
+                if (FastVecLength(delta) * rate < 0.13333334028720855713f)
+                    speed = FastVecLength(delta) * rate;
                 else
                     speed = 0.13333334028720855713f;
-                func_00282F20(delta, delta, speed);
+                vec_scale_to_length(delta, delta, speed);
                 height = 0;
-                delta[2] = func_L00_0031CDD0(obj + 0x10, pos, &height, speed, -0.005f);
+                delta[2] = ComputeShotLaunchSpeed(obj + 0x10, pos, &height, speed, -0.005f);
                 qcopy(state + 0x190, delta);
                 qcopy(state + 0x390, pos);
                 if (obj[0x43] != 12)
-                    func_002A7470(obj, 12, 0, 2);
+                    StartAnimationBlended(obj, 12, 0, 2);
                 if (height > 0)
                     F(obj, 0x48) = 51.0f / height;
                 I(obj, 0x98) = I(*(u8 **)(obj + 0x24), 0x10);
                 obj[0x31] = 1;
                 U(obj, 0x34) &= 0xfffe;
-                func_002A7750(obj, 0, 2);
+                SetMobyState(obj, 0, 2);
             } else {
                 if (I(state, 0x41C) != -1)
                     I(state, 0x3F8) = I(state, 0x41C);
                 if (obj[0x43] != 7)
-                    func_002A7470(obj, 7, 0, func_002A7820(7, 12));
-                func_002A7750(obj, 3, 3);
+                    StartAnimationBlended(obj, 7, 0, RandomIntRange(7, 12));
+                SetMobyState(obj, 3, 3);
             }
         }
         break;
     case 2: {
         f32 distance;
 
-        func_00282CC0(obj + 0x10, obj + 0x10, state + 0x190);
-        func_002A7CA0(obj, func_00283248(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
+        FastVecAdd(obj + 0x10, obj + 0x10, state + 0x190);
+        MobySpringTurn(obj, FastMatrixHelperA(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
                       F(state, 0x1D4), F(state, 0x1E4), F(state, 0x1DC) * 2, state + 0x274);
         F(state, 0x198) -= 0.005f;
-        if (F(state, 0x198) <= 0 && func_00282C48(F(obj, 0x18) - F(state, 0x398)) < -F(state, 0x198)) {
+        if (F(state, 0x198) <= 0 && FloatAbs(F(obj, 0x18) - F(state, 0x398)) < -F(state, 0x198)) {
             F(obj, 0x48) = 1;
             F(obj, 0x18) = F(state, 0x398);
             F(state, 0x198) = 0;
-            distance = func_00282E80(obj + 0x10, state + 0x390);
-            if (distance < func_00282DF0(state + 0x190)) {
+            distance = vec_distance_xy(obj + 0x10, state + 0x390);
+            if (distance < FastVecLength(state + 0x190)) {
                 qcopy(obj + 0x10, state + 0x390);
                 qzero(state + 0x190);
             }
             if (obj[0x60] & 2) {
                 qcopy(state + 0x2B0, obj + 0x10);
                 if (obj[0x43] != 6)
-                    func_002A7470(obj, 6, 0, 10);
+                    StartAnimationBlended(obj, 6, 0, 10);
                 F(obj, 0x48) = 1;
-                F(state, 0x3DC) = func_002A78D8(20, 45) * 0.01745329424738884f;
+                F(state, 0x3DC) = RandomSignedFloatRange(20, 45) * 0.01745329424738884f;
                 if (I(state, 0x41C) != -1)
                     I(state, 0x3F8) = I(state, 0x41C);
                 if (state[0x3D3])
-                    func_002A7750(obj, 2, 3);
+                    SetMobyState(obj, 2, 3);
                 else {
                     if (I(state, 0x3C0) != -1)
                         I(state, 0x1FC) = I(state, 0x3C0);
-                    func_002A7750(obj, 3, 3);
+                    SetMobyState(obj, 3, 3);
                 }
             }
         }
@@ -146,14 +147,14 @@ void func_L01_003DAE58(u8 *obj)
         switch (obj[0x20]) {
         case 1:
             if ((obj[0x60] & 2) && !H(state, 0x3D8)) {
-                H(state, 0x3D8) = func_002A7820(180, 440);
+                H(state, 0x3D8) = RandomIntRange(180, 440);
                 if (obj[0x43] != 6)
-                    func_002A7470(obj, 6, 7, func_002A7820(7, 12));
-                func_002A7750(obj, 2, -1);
+                    StartAnimationBlended(obj, 6, 7, RandomIntRange(7, 12));
+                SetMobyState(obj, 2, -1);
             }
             break;
         case 2:
-            func_L01_003DCD40(obj, state + 0x2B0);
+            MoveObjectKeepingTransformAlt(obj, state + 0x2B0);
             if (!obj[0x40]) {
                 if ((I(state, 0x2F4) == 1 || H(state, 0x3D6)) &&
                     (I(state, 0x408) != -1 || (**(s32 **)(state + 0x400) == H(obj, 0xB2) && !I(state, 0x404)))) {
@@ -162,12 +163,12 @@ void func_L01_003DAE58(u8 *obj)
                     H(state, 0x3D6) = 360;
                     if (I(state, 0x408) != -1) {
                         if (obj[0x43] != 7)
-                            func_002A7470(obj, 7, 0, func_002A7820(7, 12));
-                        func_002A7750(obj, 3, -1);
+                            StartAnimationBlended(obj, 7, 0, RandomIntRange(7, 12));
+                        SetMobyState(obj, 3, -1);
                     } else {
-                        if (obj[0x43] != (func_001163B0() & 1) + 2)
-                            func_002A7470(obj, (func_001163B0() & 1) + 2, 0, func_002A7820(7, 12));
-                        func_002A7750(obj, 5, -1);
+                        if (obj[0x43] != (Rand() & 1) + 2)
+                            StartAnimationBlended(obj, (Rand() & 1) + 2, 0, RandomIntRange(7, 12));
+                        SetMobyState(obj, 5, -1);
                     }
                 } else {
                     Timer16 timer = *(Timer16 *)(state + 0x3D8);
@@ -176,13 +177,13 @@ void func_L01_003DAE58(u8 *obj)
                         break;
                     if (!H(state, 0x3D6) && I(state, 0x408) == -1) {
                         H(state, 0x3D8) = 120;
-                        if (obj[0x43] != (func_001163B0() & 1))
-                            func_002A7470(obj, func_001163B0() & 1, 0, 12);
-                        func_002A7750(obj, 1, 3);
+                        if (obj[0x43] != (Rand() & 1))
+                            StartAnimationBlended(obj, Rand() & 1, 0, 12);
+                        SetMobyState(obj, 1, 3);
                     } else if (!timer.value && I(state, 0x408) == -1) {
-                        if (obj[0x43] != (func_001163B0() & 1) + 4)
-                            func_002A7470(obj, (func_001163B0() & 1) | 4, 0, 12);
-                        func_002A7750(obj, 1, 3);
+                        if (obj[0x43] != (Rand() & 1) + 4)
+                            StartAnimationBlended(obj, (Rand() & 1) | 4, 0, 12);
+                        SetMobyState(obj, 1, 3);
                     }
                 }
             }
@@ -190,8 +191,8 @@ void func_L01_003DAE58(u8 *obj)
         case 3: {
             f32 distance;
 
-            func_L01_003DCDD8(obj, state + 0x390);
-            distance = func_00282E80(obj + 0x10, state + 0x390);
+            MoveObjectKeepingTransform(obj, state + 0x390);
+            distance = vec_distance_xy(obj + 0x10, state + 0x390);
             if (obj[0x60] & 2) {
                 if ((H(*(u8 **)(state + 0x2F0), 0xAA) != 0xB1A && distance <= 3) ||
                     (H(*(u8 **)(state + 0x2F0), 0xAA) == 0xB1A && distance < 1)) {
@@ -199,44 +200,44 @@ void func_L01_003DAE58(u8 *obj)
                     F(state, 0x3F4) = 0.3f;
                     I(state, 0x3F0) = 0;
                     if (obj[0x43] != 8)
-                        func_002A7470(obj, 8, 0, func_002A7820(4, 7));
-                    func_002A7750(obj, 0, 4);
+                        StartAnimationBlended(obj, 8, 0, RandomIntRange(4, 7));
+                    SetMobyState(obj, 0, 4);
                 }
-                if (I(state, 0x2F4) != 1 && !H(state, 0x3D6) && I(state, 0x408) == -1 && !func_002A77E0(39)) {
-                    if (!func_002A77E0(3)) {
+                if (I(state, 0x2F4) != 1 && !H(state, 0x3D6) && I(state, 0x408) == -1 && !RandomIntBelow(39)) {
+                    if (!RandomIntBelow(3)) {
                         I(state, 0x404) = 180;
                         F(state, 0x3F4) = 0.3f;
                         I(state, 0x3F0) = 0;
                         if (obj[0x43] != 8)
-                            func_002A7470(obj, 8, 0, func_002A7820(4, 7));
-                        func_002A7750(obj, 0, 4);
+                            StartAnimationBlended(obj, 8, 0, RandomIntRange(4, 7));
+                        SetMobyState(obj, 0, 4);
                     } else {
                         if (obj[0x43] != 6)
-                            func_002A7470(obj, 6, 0, func_002A7820(12, 18));
-                        func_002A7750(obj, 4, 3);
+                            StartAnimationBlended(obj, 6, 0, RandomIntRange(12, 18));
+                        SetMobyState(obj, 4, 3);
                     }
                 }
             }
             break;
         }
         case 4:
-            func_L01_003DCD40(obj, state + 0x2B0);
+            MoveObjectKeepingTransformAlt(obj, state + 0x2B0);
             if (obj[0x60] & 2) {
-                if (!I(state, 0x404) || func_00282E80(obj + 0x10, D_00189E20 + 0x80) > 7) {
+                if (!I(state, 0x404) || vec_distance_xy(obj + 0x10, gHeroState + 0x80) > 7) {
                     H(state, 0x3D8) = 60;
-                    if (obj[0x43] != (func_001163B0() & 1) + 4)
-                        func_002A7470(obj, (func_001163B0() & 1) | 4, 0, 12);
-                    func_002A7750(obj, 1, 3);
+                    if (obj[0x43] != (Rand() & 1) + 4)
+                        StartAnimationBlended(obj, (Rand() & 1) | 4, 0, 12);
+                    SetMobyState(obj, 1, 3);
                 }
             }
             break;
         case 5:
-            func_002A7CA0(obj, func_00283248(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
+            MobySpringTurn(obj, FastMatrixHelperA(F(state, 0x2E0) - F(obj, 0x10), F(state, 0x2E4) - F(obj, 0x14)),
                           F(state, 0x1D4) * 2, F(state, 0x1E4), F(state, 0x1DC) * 2, state + 0x274);
             if (obj[0x60] & 2) {
                 if (obj[0x43] != 7)
-                    func_002A7470(obj, 7, 0, func_002A7820(7, 12));
-                func_002A7750(obj, 3, -1);
+                    StartAnimationBlended(obj, 7, 0, RandomIntRange(7, 12));
+                SetMobyState(obj, 3, -1);
             }
             break;
         }
@@ -245,79 +246,79 @@ void func_L01_003DAE58(u8 *obj)
         f32 distance;
         u8 *target;
 
-        distance = func_0029F530(obj);
+        distance = GetMobyAnimationValue(obj);
         target = *(u8 **)(state + 0x2F0);
-        func_002AAA00(obj + 0xF8, func_00283248(F(target, 0x10) - F(obj, 0x10), F(target, 0x14) - F(obj, 0x14)),
+        ApproachTargetWithDirectionMode(obj + 0xF8, FastMatrixHelperA(F(target, 0x10) - F(obj, 0x10), F(target, 0x14) - F(obj, 0x14)),
                       F(state, 0x1D4), F(state, 0x1D8), F(state, 0x1DC), state + 0x274, 0);
         if (obj[0x42] == 8 && distance >= 18 && distance <= 23) {
             F(obj, 0x48) = 0.4f;
-            func_002A8D70(obj, 0, 0x4000001, 0, 1, 0, 0.2f, (f32)state[0x34], 1);
-            func_L01_003DC078(obj, 0);
+            TestHitAtBone(obj, 0, 0x4000001, 0, 1, 0, 0.2f, (f32)state[0x34], 1);
+            FireMuckdwellerSpitShot(obj, 0);
         } else {
             F(obj, 0x48) = 1;
-            func_L01_003DC078(obj, 1);
+            FireMuckdwellerSpitShot(obj, 1);
         }
         if (obj[0x42] == 8 && distance >= 25) {
-            F(state, 0x380) = func_00283180(F(obj, 0xF8)) * 3.25f;
-            F(state, 0x384) = func_00283198(F(obj, 0xF8)) * 3.25f;
+            F(state, 0x380) = FastSinOrCosA(F(obj, 0xF8)) * 3.25f;
+            F(state, 0x384) = FastSinOrCosB(F(obj, 0xF8)) * 3.25f;
             I(state, 0x388) = 0;
-            func_00282CC0(state + 0x380, state + 0x380, obj + 0x10);
-            F(state, 0x388) = func_002A89A8(state + 0x380, 0, 0.5f) + 0.025f;
-            func_L01_003DBB88(obj, 1);
+            FastVecAdd(state + 0x380, state + 0x380, obj + 0x10);
+            F(state, 0x388) = ProbeGroundHeightBelow(state + 0x380, 0, 0.5f) + 0.025f;
+            SpawnPuffsAroundPoint(obj, 1);
         }
         if (obj[0x60] & 2) {
             if (obj[0x43] != 6)
-                func_002A7470(obj, 6, 0, func_002A7820(12, 18));
-            func_002A7750(obj, 4, 3);
+                StartAnimationBlended(obj, 6, 0, RandomIntRange(12, 18));
+            SetMobyState(obj, 4, 3);
         }
         break;
     }
     case 5:
-        result = func_002B1C20(obj, state + 0x110);
+        result = DispatchActionByKind(obj, state + 0x110);
         if (result & 1)
-            func_002A7750(obj, 0, 6);
+            SetMobyState(obj, 0, 6);
         else if (result & 2) {
             I(state, 0x410) = -1;
-            func_L01_003DBF38(obj);
+            SpawnBubblesWhileMoving(obj);
             if (I(state, 0x3C0) != -1)
                 I(state, 0x1FC) = I(state, 0x3C0);
             if (I(state, 0x41C) != -1)
                 I(state, 0x3F8) = I(state, 0x41C);
             H(state, 0x3D6) = 600;
             H(state, 0x3D8) = 30;
-            if (obj[0x43] != (func_001163B0() & 1) + 4)
-                func_002A7470(obj, (func_001163B0() & 1) | 4, 0, 12);
-            func_002A7750(obj, 1, 3);
+            if (obj[0x43] != (Rand() & 1) + 4)
+                StartAnimationBlended(obj, (Rand() & 1) | 4, 0, 12);
+            SetMobyState(obj, 1, 3);
         }
         break;
     case 6:
-        func_002A6C58(obj, 0, 3);
-        func_L01_003DBF38(obj);
-        func_L01_003DBB88(obj, 1);
-        func_L01_003E9CF8(obj, 0, 0);
+        SetDeathBits(obj, 0, 3);
+        SpawnBubblesWhileMoving(obj);
+        SpawnPuffsAroundPoint(obj, 1);
+        QueueMobyForGlowEffect(obj, 0, 0);
         break;
     }
     if (obj[0x95] != 5 && obj[0x95] >= 3) {
         *(UpdateQuad *)pos = 0;
         pos[2] = F(obj, 0xF8);
         *(UpdateQuad *)delta = *(UpdateQuad *)pos;
-        func_00283410(matrix, delta);
-        func_00283698(inverse, matrix);
-        func_00283698(oldInverse, obj + 0xC0);
+        euler_to_matrix(matrix, delta);
+        matrix_from_basis_rows(inverse, matrix);
+        matrix_from_basis_rows(oldInverse, obj + 0xC0);
         {
             f32 *v;
             u8 *target = *(u8 **)(state + 0x248);
 
-            if (target && !func_L00_0031BE88(target)) {
+            if (target && !HasPendingInnerFlag(target)) {
                 v = pos;
                 qcopy(v, D_L01_001AC5A0);
             } else
-                func_00282F20(pos, state + 0x210, 1);
+                vec_scale_to_length(pos, state + 0x210, 1);
             v = pos;
-            func_00283098(v, v, inverse);
+            matrix_mul_vec3(v, v, inverse);
         }
-        angle = func_00283248(pos[2], pos[0]);
-        pitch = -func_00283248(pos[2], pos[1]);
+        angle = FastMatrixHelperA(pos[2], pos[0]);
+        pitch = -FastMatrixHelperA(pos[2], pos[1]);
         if (angle > 0.69813179969787597656f)
             angle = 0.69813179969787597656f;
         else if (angle < -0.69813179969787597656f)
@@ -326,10 +327,10 @@ void func_L01_003DAE58(u8 *obj)
             pitch = 0.69813179969787597656f;
         else if (pitch < -0.69813179969787597656f)
             pitch = -0.69813179969787597656f;
-        func_002AAA00(obj + 0xF4, angle, 0.0017453294713050127f, 0.0017453294713050127f,
+        ApproachTargetWithDirectionMode(obj + 0xF4, angle, 0.0017453294713050127f, 0.0017453294713050127f,
                       0.10471977293491363525f, state + 0x3EC, 0);
-        func_002AAA00(obj + 0xF0, pitch, 0.0017453294713050127f, 0.0017453294713050127f,
+        ApproachTargetWithDirectionMode(obj + 0xF0, pitch, 0.0017453294713050127f, 0.0017453294713050127f,
                       0.10471977293491363525f, state + 0x3E8, 0);
     }
-    func_L01_003DD6A8(obj);
+    TickMuckdwellerTimers(obj);
 }

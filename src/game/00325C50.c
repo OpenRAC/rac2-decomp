@@ -13,6 +13,7 @@ extern void func_00283738(void *, void *, void *);
 extern int func_002A77E0(int);
 extern void func_003258C0(void *, int, void *);
 
+/* Attaches the two child parts to their parent, turns them by the given angle and sometimes puffs out a small effect at each one. */
 void func_00325C50(float angle, char *parent, char **children, int randomize, void *effect)
 {
     char rotation[0x30] __attribute__((aligned(16)));
@@ -22,13 +23,13 @@ void func_00325C50(float angle, char *parent, char **children, int randomize, vo
 
     euler.q = 0;
     euler.f[2] = angle;
-    func_002833F0(rotation, &euler);
+    euler_rotation_basis(rotation, &euler);
     for (i = 1; i >= 0; i--) {
-        func_002AF1D0(parent, *children, (unsigned char)(*children)[0xBC], 0);
-        func_00283738(*children + 0xC0, *children + 0xC0, rotation);
-        if (randomize != 0 && func_002A77E0(6) == 0) {
+        CopyJointTransformToObject(parent, *children, (unsigned char)(*children)[0xBC], 0);
+        multiply_matrix3x3(*children + 0xC0, *children + 0xC0, rotation);
+        if (randomize != 0 && RandomIntBelow(6) == 0) {
             qcopy(&position, *children + 0x10);
-            func_003258C0(&position, 1, effect);
+            SpawnDriftingPuffPair(&position, 1, effect);
         }
         children++;
     }

@@ -59,7 +59,7 @@ extern void func_0029F338(void *);
 /* The class slot table: D_00139568 maps a slot to its class record. */
 static inline int func_00333048_kind(int index)
 {
-    ClassRecord333048 *record = &D_00239BA0[D_00139568[index]];
+    ClassRecord333048 *record = &gWeaponTable_00239BA0[gItemSlotToRecord[index]];
     return record->model != 0 && record->kind == 3;
 }
 
@@ -77,66 +77,66 @@ void func_00333048(char *object)
     float angle;
     int i;
     int j;
-    int k;
+    int remaining;
     int count;
     char *camera;
 
-    func_002E5CF8(3, 0, (int *)object);
+    PlayMobySound(3, 0, (int *)object);
     for (i = 0; i < 30; i++) {
-        distance = func_002A7878(0.0f, 0.37f);
-        yaw = func_002A7940();
-        func_002AF000(spark, distance, yaw, func_002A7940());
-        spark[2] += func_002A7878(0.35f, 0.6f);
-        func_00282CC0(spark, spark, object + 0x10);
-        distance = func_002A7878(0.0016666668f, 0.016666668f);
-        yaw = func_002A7940();
-        func_002AF000(direction, distance, yaw, func_002A7940());
-        func_002BDBC0(spark, direction, 0x4F20507F, 0x102F, func_002A7820(30, 57), 150000.0f);
+        distance = RandomFloatRange(0.0f, 0.37f);
+        yaw = RandomAngle();
+        BuildSphericalOffset(spark, distance, yaw, RandomAngle());
+        spark[2] += RandomFloatRange(0.35f, 0.6f);
+        FastVecAdd(spark, spark, object + 0x10);
+        distance = RandomFloatRange(0.0016666668f, 0.016666668f);
+        yaw = RandomAngle();
+        BuildSphericalOffset(direction, distance, yaw, RandomAngle());
+        SpawnGrowingPuffParticle(spark, direction, 0x4F20507F, 0x102F, RandomIntRange(30, 57), 150000.0f);
     }
-    camera = D_001B5200;
+    camera = gActiveCamera;
     for (j = 0; j < 50; j++) {
-        angle = func_00283248(*(float *)(camera + 0x140) - *(float *)(object + 0x10),
+        angle = FastMatrixHelperA(*(float *)(camera + 0x140) - *(float *)(object + 0x10),
                               *(float *)(camera + 0x144) - *(float *)(object + 0x14));
-        func_00283CF0(func_002A78D8(1.0f, 2.0f));
-        direction[0] = *(float *)(object + 0x10) + func_002A78D8(0.0f, 0.15f);
-        direction[1] = *(float *)(object + 0x14) + func_002A78D8(0.0f, 0.15f);
-        direction[2] = *(float *)(object + 0x18) + func_002A78D8(0.0f, 0.15f);
+        FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
+        direction[0] = *(float *)(object + 0x10) + RandomSignedFloatRange(0.0f, 0.15f);
+        direction[1] = *(float *)(object + 0x14) + RandomSignedFloatRange(0.0f, 0.15f);
+        direction[2] = *(float *)(object + 0x18) + RandomSignedFloatRange(0.0f, 0.15f);
         distance = D_001B0C30;
-        angle = func_00283B98(angle, func_002A78D8(0.0f, -1.5707965f));
-        spark[0] = func_00283180(angle) * 0.016666668f * distance;
-        spark[1] = func_00283198(angle) * 0.016666668f * distance;
+        angle = FastAddRotations(angle, RandomSignedFloatRange(0.0f, -1.5707965f));
+        spark[0] = FastSinOrCosA(angle) * 0.016666668f * distance;
+        spark[1] = FastSinOrCosB(angle) * 0.016666668f * distance;
         distance = D_001B0C34;
         spark[2] = distance * 0.016666668f;
-        func_002C7E28(direction, spark, 0x140);
+        SpawnSpinningSparkParticle_002C7E28(direction, spark, 0x140);
     }
-    func_002ACAD0(object, D_001B1CF0);
-    func_0032C700(object + 0x10, 1.0f, 20.0f, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, D_001AD7EC);
-    count = func_00277F48(object + 0x10, 0, object, 0, 3.0f);
+    RemoveMobyFromIndexList(object, D_001B1CF0);
+    SpawnExplosion(object + 0x10, 1.0f, 20.0f, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, D_001AD7EC);
+    count = ProcessCollisionHit(object + 0x10, 0, object, 0, 3.0f);
     if (count > 0) {
-        char **list = D_001BF000;
-        k = count;
+        char **mobyList = D_001BF000;
+        remaining = count;
         do {
-            char *moby = *list;
+            char *moby = *mobyList;
             if (*(short *)(*(char **)(moby + 0x24) + 0x46) == 5
                 || (*(unsigned short *)(moby + 0x34) & 0x4000)) {
                 float radius;
-                func_00282CF0(direction, moby + 0x10, object + 0x10);
-                func_00282F20(direction, direction, 1.0f);
-                func_00282F20(hit.vector, hit.vector, 1.0f);
+                FastVecSub(direction, moby + 0x10, object + 0x10);
+                vec_scale_to_length(direction, direction, 1.0f);
+                vec_scale_to_length(hit.vector, hit.vector, 1.0f);
                 radius = 10.0f;
                 if (func_00333048_kind(0x10))
                     radius = 55.0f;
-                func_002A8C00(hit.vector, object, 0x810000, direction, radius);
+                make_hit_descriptor(hit.vector, object, 0x810000, direction, radius);
                 *(TI128_333048 *)hit.vector = *(TI128_333048 *)direction;
                 hit.vector[3] = 5627.9248f;
                 hit.source = 3;
                 hit.flag = 1;
                 hit.type = 5;
                 hit.oclass = *(short *)(moby + 0xAA);
-                func_002A8E20(moby, &hit);
+                QueueMobyImpact(moby, &hit);
             }
-            list++;
-        } while (--k);
+            mobyList++;
+        } while (--remaining);
     }
-    func_0029F338(object);
+    MarkMobySpawned(object);
 }

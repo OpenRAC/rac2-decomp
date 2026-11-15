@@ -27,20 +27,21 @@ extern void func_0011B3D0();
 extern s32 *D_001A7480 __attribute__((sda));
 extern s32 D_001A7484 __attribute__((sda));
 
-void func_001322B8(s32 *arg0, s32 arg1) {
-    s8 *var_s0;
-    s32 var_s1;
-    s32 var_v0;
+/* Sets up a reply buffer for the next sound request and flushes it from the cache. */
+void func_001322B8(s32 *buffer, s32 count) {
+    s8 *base;
+    s32 byteOffset;
+    s32 endAddr;
 
-    D_001A7484 = arg1;
-    var_s0 = (s8 *)(arg0);
-    var_s1 = arg1 * 4;
-    var_v0 = var_s1 + var_s0;
-    D_001A7480 = var_s0;
-    (*(s32 *)((s8 *)(&((s32 *)var_s0)[arg1]) + (4))) = 0;
-    *(s32 *)var_s0 = 0;
-    func_0011B3D0(arg0, var_s0 + 3);
-    var_s1 += 4;
-    var_s0 += var_s1;
-    func_0011B3D0(var_s0, var_s0 + 3);
+    D_001A7484 = count;
+    base = (s8 *)(buffer);
+    byteOffset = count * 4;
+    endAddr = byteOffset + base;
+    D_001A7480 = base;
+    (*(s32 *)((s8 *)(&((s32 *)base)[count]) + (4))) = 0;
+    *(s32 *)base = 0;
+    ProcessKernelRequestB(buffer, base + 3);
+    byteOffset += 4;
+    base += byteOffset;
+    ProcessKernelRequestB(base, base + 3);
 }

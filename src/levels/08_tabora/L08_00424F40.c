@@ -1,3 +1,4 @@
+#include "names.h"
 typedef unsigned char u8;
 typedef int s32;
 
@@ -7,6 +8,7 @@ extern void func_L08_00424ED0(char *a);
 
 /* Walks the 0x21 slot's entry list: one record per step, each clamps its byte 0x20D down
    against the context's, and the walk ends when the helper reports the list empty. */
+/* Removes this creature from its group: the others behind it move up one place and the group gets one smaller. */
 void func_L08_00424F40(char *object)
 {
     char *state;
@@ -24,5 +26,5 @@ void func_L08_00424F40(char *object)
         func_00328D28(&cursor, cursor, 0, 0);
     }
     *(s32 *)(*(char **)(state + 0x1FC)) = *(s32 *)(*(char **)(state + 0x1FC)) - 1;
-    func_L08_00424ED0(object);
+    AdvanceGroupTurn(object);
 }

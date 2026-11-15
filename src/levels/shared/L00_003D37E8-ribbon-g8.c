@@ -45,7 +45,7 @@ void func_L00_003D37E8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
     /* Separate zero constants for the setup and for each loop. */
     const float zero = 0.0f;
 
-    core.texture = func_0027C878(D_L00_001B023C);
+    core.texture = GetEffectTextureDescriptor(D_L00_001B023C);
     coreColor = D_L00_001B01AC | (alpha << 24);
     core.flags = 0x8000000048ULL;
     core.mode = 0xFF9000000260ULL;
@@ -55,7 +55,7 @@ void func_L00_003D37E8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
     core.color[1] = coreColor;
     core.color[0] = coreColor;
 
-    halo.texture = func_0027C878(D_L00_001B0240);
+    halo.texture = GetEffectTextureDescriptor(D_L00_001B0240);
     halo.flags = core.flags;
     halo.mode = core.mode;
     halo.primitive = core.primitive;
@@ -83,28 +83,28 @@ void func_L00_003D37E8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
     core.uv[6] = D_L00_001B01CC + 1.0f;
     core.uv[7] = 1;
 
-    func_00282CF0(&eye, points, D_L00_001B8DC0);
-    func_00282CF0(&tangent, points + 1, points);
-    func_00282DD8(&normal, &tangent, &eye);
-    initialLength = func_00282DF0(&normal);
+    FastVecSub(&eye, points, gCameraPosition_L00);
+    FastVecSub(&tangent, points + 1, points);
+    FastVecCross(&normal, &tangent, &eye);
+    initialLength = FastVecLength(&normal);
     if (initialLength != zero)
         initialLength = 1.0f / initialLength;
-    func_00282D30(&normal, &normal, coreWidth * initialLength);
-    func_00282CC0(&core.vertex[0], points, &normal);
-    func_00282CF0(&core.vertex[1], points, &normal);
+    FastVecScale(&normal, &normal, coreWidth * initialLength);
+    FastVecAdd(&core.vertex[0], points, &normal);
+    FastVecSub(&core.vertex[1], points, &normal);
 
     for (i = 1; i < count - 1; i++) {
         float coreZero = 0.0f;
 
-        func_00282CF0(&eye, points + i, D_L00_001B8DC0);
-        func_00282CF0(&tangent, points + i + 1, points + i);
-        func_00282DD8(&normal, &tangent, &eye);
-        length = func_00282DF0(&normal);
+        FastVecSub(&eye, points + i, gCameraPosition_L00);
+        FastVecSub(&tangent, points + i + 1, points + i);
+        FastVecCross(&normal, &tangent, &eye);
+        length = FastVecLength(&normal);
         if (length != coreZero)
             length = 1.0f / length;
-        func_00282D30(&normal, &normal, coreWidth * length);
-        func_00282CC0(&core.vertex[2], points + i, &normal);
-        func_00282CF0(&core.vertex[3], points + i, &normal);
+        FastVecScale(&normal, &normal, coreWidth * length);
+        FastVecAdd(&core.vertex[2], points + i, &normal);
+        FastVecSub(&core.vertex[3], points + i, &normal);
 
         if (i == 1) {
             core.color[1] = D_L00_001B01AC;
@@ -117,7 +117,7 @@ void func_L00_003D37E8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
             core.color[0] = coreColor;
         }
 
-        func_00280B90(&core, 0, 0);
+        draw_world_quad(&core, 0, 0);
         qcopy(&core.vertex[0], &core.vertex[2]);
         qcopy(&core.vertex[1], &core.vertex[3]);
     }
@@ -125,39 +125,39 @@ void func_L00_003D37E8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
     for (i = 0; i < count - 1; i++) {
         float haloZero = 0.0f;
 
-        func_00282CF0(&firstRay, points + i, D_L00_001B8DC0);
-        func_00282CF0(&lastRay, points + i + 1, D_L00_001B8DC0);
-        firstLength = func_00282DF0(&firstRay);
-        lastLength = func_00282DF0(&lastRay);
+        FastVecSub(&firstRay, points + i, gCameraPosition_L00);
+        FastVecSub(&lastRay, points + i + 1, gCameraPosition_L00);
+        firstLength = FastVecLength(&firstRay);
+        lastLength = FastVecLength(&lastRay);
         if (lastLength < firstLength) {
             if (lastLength == haloZero)
                 qcopy(&lastRay, &firstRay);
             else
-                func_00282D30(&lastRay, &lastRay, firstLength / lastLength);
+                FastVecScale(&lastRay, &lastRay, firstLength / lastLength);
         } else {
             if (firstLength == haloZero)
                 qcopy(&firstRay, &lastRay);
             else
-                func_00282D30(&firstRay, &firstRay, lastLength / firstLength);
+                FastVecScale(&firstRay, &firstRay, lastLength / firstLength);
         }
 
-        func_00282CC0(&first, D_L00_001B8DC0, &firstRay);
-        func_00282CC0(&last, D_L00_001B8DC0, &lastRay);
-        func_00282CF0(&tangent, &last, &first);
-        func_00282D30(&extension, &tangent, extend);
-        func_00282CF0(&first, &first, &extension);
-        func_00282CC0(&last, &last, &extension);
+        FastVecAdd(&first, gCameraPosition_L00, &firstRay);
+        FastVecAdd(&last, gCameraPosition_L00, &lastRay);
+        FastVecSub(&tangent, &last, &first);
+        FastVecScale(&extension, &tangent, extend);
+        FastVecSub(&first, &first, &extension);
+        FastVecAdd(&last, &last, &extension);
 
-        func_00282CF0(&toEye, D_L00_001B8DC0, &first);
-        func_00282DD8(&normal, &toEye, &tangent);
-        haloLength = func_00282DF0(&normal);
+        FastVecSub(&toEye, gCameraPosition_L00, &first);
+        FastVecCross(&normal, &toEye, &tangent);
+        haloLength = FastVecLength(&normal);
         if (haloLength != haloZero)
             haloLength = 1.0f / haloLength;
-        func_00282D30(&widthVector, &normal, width * haloLength);
-        func_00282CC0(&halo.vertex[0], &first, &widthVector);
-        func_00282CF0(&halo.vertex[1], &first, &widthVector);
-        func_00282CC0(&halo.vertex[2], &last, &widthVector);
-        func_00282CF0(&halo.vertex[3], &last, &widthVector);
+        FastVecScale(&widthVector, &normal, width * haloLength);
+        FastVecAdd(&halo.vertex[0], &first, &widthVector);
+        FastVecSub(&halo.vertex[1], &first, &widthVector);
+        FastVecAdd(&halo.vertex[2], &last, &widthVector);
+        FastVecSub(&halo.vertex[3], &last, &widthVector);
 
         if (i == 0) {
             halo.color[1] = D_L00_001B01B0;
@@ -170,8 +170,8 @@ void func_L00_003D37E8(Vector *points, u32 alpha, u32 outerAlpha, float coreWidt
             halo.color[0] = haloColor;
         }
 
-        func_00280B90(&halo, 0, 0);
+        draw_world_quad(&halo, 0, 0);
     }
 
-    func_002FC560(0x47, 0x5360B);
+    VU1_addGSregister(0x47, 0x5360B);
 }

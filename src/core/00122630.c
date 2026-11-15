@@ -96,6 +96,7 @@ static __inline__ int fp_pack_iszero(fp_number_type *number) {
     return number->kind == CLASS_ZERO;
 }
 
+/* Packs the broken-out parts of a double back into a real double, with rounding. */
 FLO_type func_00122630(fp_number_type *src) {
     FLO_union_type dst;
     fractype fraction = src->fraction.ll;

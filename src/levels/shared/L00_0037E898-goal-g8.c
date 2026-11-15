@@ -67,17 +67,17 @@ void func_L00_00383B90(unsigned char *object)
             if (D_L00_001A8F00==0) {
                 D_L00_001AEDD0_gp[0]=0;
                 D_L00_001AEDD0[1]=0;
-                func_002B49E0(7,1,(int)object,3,0);
+                BeginSlotRequest(7,1,(int)object,3,0);
                 mode=D_L00_001A8F00;
             }
-            if (mode==7 && func_L00_00384070((char *)object)) {
-                func_00283360(&D_L00_001B8DC0.basis);
-                func_002A7750(object,1,-1);
+            if (mode==7 && CreateSynthenoidsAndSheep((char *)object)) {
+                set_identity_rotation_rows(&gCameraPosition_L00.basis);
+                SetMobyState(object,1,-1);
             } else {
                 unsigned int timer=*(unsigned short *)(object+0x96);
                 unsigned int old=timer++;
                 *(unsigned short *)(object+0x96)=timer;
-                if (old>=6) func_0029F338(object);
+                if (old>=6) MarkMobySpawned(object);
             }
         }
         break;
@@ -86,38 +86,38 @@ void func_L00_00383B90(unsigned char *object)
             float zero=0.0f;
             float step;
             D_L00_001B1BE8=phase;
-            func_L00_002E6CF0(func_L00_003852A0,object);
+            AddDrawCallbackToList1(DrawThreeObjectCounters,object);
             step=0.13333334028720856f;
-            func_002AA2E8(&D_L00_001B18E4,zero,step);
-            func_002AA2E8(&D_L00_001B18E0,zero,step);
-            func_L00_00384248(object);
-            func_L00_00384678(object);
-            func_L00_00384F28(object);
-            func_L00_00385040(object);
+            ApproachValue(&D_L00_001B18E4,zero,step);
+            ApproachValue(&D_L00_001B18E0,zero,step);
+            UpdateTwinGunsAndFire(object);
+            UpdateSheepBoard(object);
+            UpdateBoardMobysOfSameClass(object);
+            SpawnRandomParticleBurst(object);
             if (D_L00_001A8F00!=7) {
-                func_L00_00384C20(object);
+                DestroySheepBoardObjects(object);
                 goto destroy;
             }
             if ((D_00138324&0x810) || (D_001386A4&0x810) ||
                 (D_L00_001AEDD0_gp[0] && D_L00_001AEDD0[1]))
-                func_002B4B70(0,0);
+                EndSlotRequest(0,0);
         }
         break;
     case 2:
         position=(char *)object+0x10;
-        func_00282CC0(position,position,*(void **)(object+0x68));
-        func_L00_00384E08(object,position);
-        if (func_00277F48(position,0.01f,0,*(char **)(object+0xB8),0) &&
-            D_L00_001BF200.object) {
-            func_00282CF0(&workspace.local,position,D_L00_001BF200.object+0x10);
-            func_002AFDD8(D_L00_001BF200.object,&workspace.local,&workspace.local,0);
+        FastVecAdd(position,position,*(void **)(object+0x68));
+        SpawnGoalHitParticles(object,position);
+        if (ProcessCollisionHit(position,0.01f,0,*(char **)(object+0xB8),0) &&
+            gCollisionResult.object) {
+            FastVecSub(&workspace.local,position,gCollisionResult.object+0x10);
+            TransformVectorByObjectOrGiven(gCollisionResult.object,&workspace.local,&workspace.local,0);
             if (workspace.local.z>=0.0f && workspace.local.z<=D_L00_001AED64) {
-                func_002A8F70(D_L00_001BF200.object,(int)object,0x10000,position,D_L00_001A8F20,1.0f);
+                QueueImpactEffect(gCollisionResult.object,(int)object,0x10000,position,D_L00_001A8F20,1.0f);
                 {
                     ControllerOwnerState *state=*(ControllerOwnerState **)(D_L00_001AC0C0+0x68);
                     state->scores[object[0xBC]]+=10;
                 }
-                func_0029F338(object);
+                MarkMobySpawned(object);
                 break;
             }
         }
@@ -127,10 +127,10 @@ void func_L00_00383B90(unsigned char *object)
             int old=timer++;
             *(unsigned short *)(object+0x96)=timer;
             if (limit<old)
-                func_0029F338(object);
+                MarkMobySpawned(object);
         } else {
 destroy:
-            func_0029F338(object);
+            MarkMobySpawned(object);
         }
         break;
     case 3:
@@ -139,18 +139,18 @@ destroy:
             char *vector=(char *)object+0x10;
             char *goal;
             owner=*(ControllerOwnerState **)(D_L00_001AC0C0+0x68);
-            *(float *)(object+0xF0)=func_00283B98(*(float *)(object+0xF0),-0.05235988646745682f);
-            func_00282CC0(vector,vector,motion);
-            func_00283698(&workspace.inverse,&D_L00_001B8DC0.basis);
-            func_00282CF0(&workspace.local,vector,&D_L00_001B8DC0.position);
-            func_00283098(&workspace.local,&workspace.local,&workspace.inverse);
-            if (func_00282C48(workspace.local.y-0.5f)<0.02f) {
+            *(float *)(object+0xF0)=FastAddRotations(*(float *)(object+0xF0),-0.05235988646745682f);
+            FastVecAdd(vector,vector,motion);
+            matrix_from_basis_rows(&workspace.inverse,&gCameraPosition_L00.basis);
+            FastVecSub(&workspace.local,vector,&gCameraPosition_L00.position);
+            matrix_mul_vec3(&workspace.local,&workspace.local,&workspace.inverse);
+            if (FloatAbs(workspace.local.y-0.5f)<0.02f) {
                 for (index=0,goal=(char *)owner+0x8;index<2;index++) {
-                    if (func_00282C48((workspace.local.z-*(float *)goal)-0.045f)<0.05f) {
-                        func_L00_003851A0(object,(char *)object+0x10);
+                    if (FloatAbs((workspace.local.z-*(float *)goal)-0.045f)<0.05f) {
+                        SpawnGoalScoreParticles(object,(char *)object+0x10);
                         D_L00_001AEDD0_gp[index]=240;
-                        func_002E5CF8(2,0,owner->targets[index]);
-                        func_002AA340(&owner->scores[index],0,100);
+                        PlayMobySound(2,0,owner->targets[index]);
+                        StepIntTowardTarget(&owner->scores[index],0,100);
                         goto destroy;
                     }
                     goal+=0x10;
@@ -164,7 +164,7 @@ destroy:
                 *(unsigned short *)(object+0x96)=timer;
                 if (limit>=old || object[0x31]!=0) break;
             }
-            func_0029F338(object);
+            MarkMobySpawned(object);
         }
         break;
     }

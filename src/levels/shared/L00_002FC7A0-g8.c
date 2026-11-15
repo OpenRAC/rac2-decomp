@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef unsigned int Rac2Native_3e18d05650488ad4_FallbackU32;
@@ -15,17 +16,19 @@ extern int D_L00_001A904C;
 
 extern void func_0028A670(int);
 
+/* Calls the bolt counter update only when the level has the counter enabled. */
 void func_L00_0030DC30(int argument)
 {
     if (D_L00_001A904C != 0) {
-        func_0028A2F8(argument);
+        UpdateBoltCounter(argument);
     }
 }
 
+/* Calls the bolt counter delta drawing only when the level has the counter enabled. */
 void func_L00_0030DC58(int argument)
 {
     if (D_L00_001A904C != 0) {
-        func_0028A670(argument);
+        DrawBoltCounterDeltas(argument);
     }
 }
 
@@ -38,18 +41,18 @@ extern struct LoadSlots_L00 D_00152CD0;
 extern int ref_L00_00304AE8_00 __attribute__((sda));
 
 /* The level's copy of the load-slot release: same body as func_00294130 with the slot cursor in the level's small data. */
-void func_L00_00304AE8(int *p, int a1)
+void func_L00_00304AE8(int *entry, int doRelease)
 {
-    if (a1 != 0) {
-        if (p[1] >= 0) {
-            D_00152CD0.slot[p[1]] = p[0];
-            if (p[1] != ref_L00_00304AE8_00)
+    if (doRelease != 0) {
+        if (entry[1] >= 0) {
+            D_00152CD0.slot[entry[1]] = entry[0];
+            if (entry[1] != ref_L00_00304AE8_00)
                 goto out;
-            ref_L00_00304AE8_00 = p[1] ^ 1;
+            ref_L00_00304AE8_00 = entry[1] ^ 1;
         }
     }
 out:
-    *p = -1;
+    *entry = -1;
 }
 
 typedef unsigned char u8;
@@ -80,23 +83,23 @@ extern RelocBlock_00300378 *D_L00_001B1AC4 __attribute__((section(".sdata")));
 extern RelocBlock_00300378 *D_L00_001B1AC4_1 __attribute__((sda));
 
 /* Publishes the three blocks a header's offsets select and relocates the second and third. */
-void func_L00_00300378(u8 *a0)
+void func_L00_00300378(u8 *header)
 {
-    if (*(int *)(a0 + 0) != 0)
-        D_L00_001BF200[0] = (u32)(a0 + *(int *)(a0 + 0));
-    if (*(int *)(a0 + 4) != 0) {
+    if (*(int *)(header + 0) != 0)
+        gCollisionResult[0] = (u32)(header + *(int *)(header + 0));
+    if (*(int *)(header + 4) != 0) {
         int i;
 
-        D_L00_001B1AC0_1 = (RelocBlock_00300378 *)(a0 + *(int *)(a0 + 4));
+        D_L00_001B1AC0_1 = (RelocBlock_00300378 *)(header + *(int *)(header + 4));
         for (i = 0; i < D_L00_001B1AC0_1->count; i++)
             D_L00_001B1AC0_1->items[i].ptr = (int)D_L00_001B1AC0_1 + D_L00_001B1AC0_1->items[i].ptr;
     } else {
         D_L00_001B1AC0 = 0;
     }
-    if (*(int *)(a0 + 8) != 0) {
+    if (*(int *)(header + 8) != 0) {
         int i;
 
-        D_L00_001B1AC4_1 = (RelocBlock_00300378 *)(a0 + *(int *)(a0 + 8));
+        D_L00_001B1AC4_1 = (RelocBlock_00300378 *)(header + *(int *)(header + 8));
         for (i = 0; i < D_L00_001B1AC4_1->count; i++)
             D_L00_001B1AC4_1->items[i].ptr = (int)D_L00_001B1AC4_1 + D_L00_001B1AC4_1->items[i].ptr;
     } else {
@@ -117,11 +120,12 @@ extern Packet_FE268 D_L00_001C91C0[];
 extern unsigned long long D_L00_001A9510 __attribute__((sda));
 extern void func_002933D0(void *, int, void *);
 
+/* Writes a GS register packet from the given value and sends it for drawing. */
 void func_L00_002FE268(unsigned int value)
 {
     D_001A72C0 = value;
     D_L00_001C91C0[0].data = D_001A72C8;
     D_L00_001C91C0[0].tag1 = 0x0000FFA0000000E0ULL;
     D_L00_001C91C0[0].tag2 = 0x0040000400004000ULL;
-    func_002933D0(D_L00_001BF1B4[0], 0, &D_L00_001A9510);
+    RelocateRenderGroups(D_L00_001BF1B4[0], 0, &D_L00_001A9510);
 }

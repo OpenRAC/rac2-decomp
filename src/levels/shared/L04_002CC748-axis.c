@@ -16,6 +16,7 @@ extern void func_00283388(void *dst);
    with K the skew matrix of axis, and hands it to func_002AB6D8 with this
    function's own copy of rotation. Both vectors are copied on entry, the way
    16-byte arguments passed by value arrive. */
+/* Turns an object by an angle around an axis. */
 void func_L04_00344568(f32 angle, void *axis, void *rotation) {
     union { L04Quad q; f32 f[4]; } axis_copy, rotation_copy;
     f32 skew[16];
@@ -52,11 +53,11 @@ void func_L04_00344568(f32 angle, void *axis, void *rotation) {
     skew[11] = 0;
     skew[15] = 0;
 
-    func_00283788(square, skew, skew);
-    func_L03_002EFB60(cosine, square, 1.0f - func_00283180(angle));
-    func_L03_002EFB60(sine, skew, func_00283198(angle));
-    func_L04_0030FA30(sine, sine, cosine);
-    func_00283388(cosine);
-    func_L04_0030FA30(result, sine, cosine);
-    func_002AB6D8(result, out);
+    multiply_matrix(square, skew, skew);
+    func_L03_002EFB60(cosine, square, 1.0f - FastSinOrCosA(angle));
+    func_L03_002EFB60(sine, skew, FastSinOrCosB(angle));
+    ProcessLevelDrawHelper(sine, sine, cosine);
+    set_identity_matrix(cosine);
+    ProcessLevelDrawHelper(result, sine, cosine);
+    GetEulerAnglesFromMatrix(result, out);
 }

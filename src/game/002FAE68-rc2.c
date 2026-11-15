@@ -52,88 +52,90 @@ extern struct A D_0021F240;
 extern struct B D_001393E0;
 extern s32 D_001A7A20;
 
+/* Steps through the shop's buy and message states: shows the right line of text for the item
+   and moves on to the next step. */
 void func_002FAE68(void) {
     {
     static void *volatile rc2_labels[] = {&&rc2_case_0, &&rc2_case_1, &&rc2_case_2, &&rc2_case_3, &&rc2_case_4, &&rc2_case_5, &&rc2_case_6};
-    u32 rc2_selector = (u32)(D_0021F240.st);
+    u32 rc2_selector = (u32)(gVendorMenuState.st);
     if (rc2_selector > 6U) goto rc2_default;
 goto *D_0026DBE0[rc2_selector];
 
     rc2_case_0:
     rc2_case_2:
-        if (D_001393E0.f15C < 3 && D_001393E0.f164 < 0 && D_001393E0.f8 == 2) {
-            if (D_001393E0.f14 != 0) {
-                D_001393E0.f164 = 0x18;
-                D_0021F240.st = 3;
-                D_001393E0.f168 = 0;
+        if (gMemcardState.f15C < 3 && gMemcardState.f164 < 0 && gMemcardState.f8 == 2) {
+            if (gMemcardState.f14 != 0) {
+                gMemcardState.f164 = 0x18;
+                gVendorMenuState.st = 3;
+                gMemcardState.f168 = 0;
                 goto rc2_switch_end;
             }
         }
-        if (D_0021F240.st != 0) {
-            D_0021F240.st = 4;
+        if (gVendorMenuState.st != 0) {
+            gVendorMenuState.st = 4;
         } else {
-            D_0021F240.st = 6;
+            gVendorMenuState.st = 6;
         }
         goto rc2_switch_end;
     rc2_case_1:
     rc2_case_3:
-        if (D_001393E0.f15C < 3 && D_001393E0.f164 < 0) {
+        if (gMemcardState.f15C < 3 && gMemcardState.f164 < 0) {
             if (D_001A7A20 & 0x80) {
-                if (D_001393E0.f1C == 1) {
-                    func_002F88D8(D_001AD468);
-                } else if (D_001393E0.f1C >= 3) {
-                    func_002F88D8(D_001AD498);
+                if (gMemcardState.f1C == 1) {
+                    SetShopMessageText(D_001AD468);
+                } else if (gMemcardState.f1C >= 3) {
+                    SetShopMessageText(D_001AD498);
                 } else {
-                    func_002F88D8(D_001AD4C0);
+                    SetShopMessageText(D_001AD4C0);
                 }
             } else {
-                func_002F88D8(D_001AD4E8);
+                SetShopMessageText(D_001AD4E8);
             }
-            func_002FADB0();
-            if (D_0021F240.st != 0) {
-                D_0021F240.st = 4;
+            MarkBoughtSpecialItemsOwned();
+            if (gVendorMenuState.st != 0) {
+                gVendorMenuState.st = 4;
             } else {
-                D_0021F240.st = 6;
+                gVendorMenuState.st = 6;
             }
         }
         goto rc2_switch_end;
     rc2_case_4:
-        if (D_001393E0.f15C < 3 && D_001393E0.f164 < 0 && D_001393E0.fA8 == 2 && D_001393E0.fB4 != 0) {
-            D_001393E0.f164 = 0x18;
-            D_001393E0.f168 = 1;
-            D_0021F240.st = 5;
+        if (gMemcardState.f15C < 3 && gMemcardState.f164 < 0 && gMemcardState.fA8 == 2 && gMemcardState.fB4 != 0) {
+            gMemcardState.f164 = 0x18;
+            gMemcardState.f168 = 1;
+            gVendorMenuState.st = 5;
             goto rc2_switch_end;
         }
-        D_0021F240.st = 6;
+        gVendorMenuState.st = 6;
         goto rc2_switch_end;
     rc2_case_5:
-        if (D_001393E0.f15C < 3 && D_001393E0.f164 < 0) {
+        if (gMemcardState.f15C < 3 && gMemcardState.f164 < 0) {
             if (D_001A7A20 & 0x80) {
-                if (D_001393E0.fBC == 1) {
-                    func_002F88D8(D_001AD468);
-                } else if (D_001393E0.fBC >= 3) {
-                    func_002F88D8(D_001AD498);
+                if (gMemcardState.fBC == 1) {
+                    SetShopMessageText(D_001AD468);
+                } else if (gMemcardState.fBC >= 3) {
+                    SetShopMessageText(D_001AD498);
                 } else {
-                    func_002F88D8(D_001AD4C0);
+                    SetShopMessageText(D_001AD4C0);
                 }
             } else {
-                func_002F88D8(D_001AD4E8);
+                SetShopMessageText(D_001AD4E8);
             }
-            func_002FADB0();
-            D_0021F240.st = 6;
+            MarkBoughtSpecialItemsOwned();
+            gVendorMenuState.st = 6;
         }
         goto rc2_switch_end;
     rc2_case_6:
-        if (D_001393E0.f15C < 3 && D_001393E0.f164 < 0) {
-            if (D_001393E0.f1C == 0) {
-                s32 a = D_001393E0.f8;
-                if (a == 2 && D_001393E0.f14 != 0) {
-                    D_0021F240.st = a;
+        if (gMemcardState.f15C < 3 && gMemcardState.f164 < 0) {
+            if (gMemcardState.f1C == 0) {
+                s32 mode = gMemcardState.f8;
+                if (mode == 2 && gMemcardState.f14 != 0) {
+                    gVendorMenuState.st = mode;
                     goto rc2_switch_end;
                 }
             }
-            if (D_001393E0.fBC == 0 && D_001393E0.fA8 == 2 && D_001393E0.fB4 != 0) {
-                D_0021F240.st = 4;
+            if (gMemcardState.fBC == 0 && gMemcardState.fA8 == 2 && gMemcardState.fB4 != 0) {
+                gVendorMenuState.st = 4;
             }
         }
         goto rc2_switch_end;

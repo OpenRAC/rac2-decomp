@@ -1,5 +1,6 @@
 #include "common.h"
 
-int func_0012E8C8(void *arg0, int arg1) {
-    return (int)(*(unsigned long *)arg0 >> (0x40 - arg1));
+/* Returns the top bits of a 64-bit value without consuming them. */
+int func_0012E8C8(void *valuePtr, int bitCount) {
+    return (int)(*(unsigned long *)valuePtr >> (0x40 - bitCount));
 }

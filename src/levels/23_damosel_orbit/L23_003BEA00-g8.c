@@ -115,6 +115,7 @@ extern void *func_L23_004256F0(u8 *,u8 *,u8 *,u8,u8,float,float,float,float,shor
 extern void func_0029FCC0(char *,int,char *);
 extern int func_L00_002D6900(unsigned int);
 
+/* Per-frame update of the boss-like enemy: checks the hero distance and facing, then runs its state machine (idle, chase, attack, charge, hurt) and finishes with the shared timers. */
 void func_L23_003BEA00(u8 *object)
 {
     float difference[4] __attribute__((aligned(16))),point[4] __attribute__((aligned(16))),local[4] __attribute__((aligned(16)));
@@ -122,203 +123,203 @@ void func_L23_003BEA00(u8 *object)
     int facing,selected,index,mask;
     unsigned long flags;
     float distance,range;
-    func_L23_003BF9B0((Moby_003BF9B0 *)object);
+    InitAndUpdateFlyingEnemy((Moby_003BF9B0 *)object);
     if (D_L23_001B1424>200) return;
-    if (func_L23_0041E548())
-        func_002A90C8((int)object,(int)object,0x10000,(int)(object+0x10),(float)D_L23_001B36F0);
+    if (IsBossFightStateFour())
+        StartEffectWithDefaultTable((int)object,(int)object,0x10000,(int)(object+0x10),(float)D_L23_001B36F0);
     selected=D_L23_001B36B0==object;
     facing=0;
     ((DispatchState *)state)->f326=0;
     if (selected && (unsigned int)(object[0x20]-9)>2)
-        func_L23_003C1960((char *)object);
+        ClearSelectedObject((char *)object);
     if (object[0x20]!=13) {
-        ((DispatchState *)state)->f270=func_002B0360((char *)object+0x10);
-        func_00282CF0(difference,D_00189E20.position,object+0x10);
-        if (func_L02_00329C48((char *)object,(Quad *)difference,0)<=0.7853982f) facing=1;
-        distance=func_00282E48(D_00189E20.position,object+0x10);
+        ((DispatchState *)state)->f270=GetDistanceFromGravityCenter((char *)object+0x10);
+        FastVecSub(difference,gHeroState.position,object+0x10);
+        if (MeasureStepAngle((char *)object,(Quad *)difference,0)<=0.7853982f) facing=1;
+        distance=fast_vec_dist(gHeroState.position,object+0x10);
         range=D_L23_001AFA6C;
         ((DispatchState *)state)->f27C=distance;
         ((DispatchState *)state)->f324=0;
         if (distance<range)
-            ((DispatchState *)state)->f324=func_L23_003C0A60(object,object+0x10,D_00189E20.position);
+            ((DispatchState *)state)->f324=IsPathClear(object,object+0x10,gHeroState.position);
         qcopy((state+0x300), (object+0x10));
-        func_L23_00418650(state+0x300,0.0f);
+        ProjectPointOntoPlanetSurface(state+0x300,0.0f);
     }
     if (object[0x95]==3) {
-        flags=func_002B1C20(object,(Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchContext *)(state+0x140));
+        flags=DispatchActionByKind(object,(Rac2Native_bf55aa2a4d0dd351_SDataCallDispatchContext *)(state+0x140));
         if (((DispatchState *)state)->f3B4!=-1) {
-            func_002E59F8(((DispatchState *)state)->f3B4); ((DispatchState *)state)->f3B4=-1;
+            StopSoundVoice(((DispatchState *)state)->f3B4); ((DispatchState *)state)->f3B4=-1;
         }
-        if (object[0x43]==8 && func_00282DF0(state+0x1C0)>0.0f) {
-            if (((DispatchState *)state)->f270<D_L23_001B36A4) func_L23_00418650((char *)object+0x10,0.0f);
+        if (object[0x43]==8 && FastVecLength(state+0x1C0)>0.0f) {
+            if (((DispatchState *)state)->f270<D_L23_001B36A4) ProjectPointOntoPlanetSurface((char *)object+0x10,0.0f);
             *(Quad *)local=0; local[2]=((DispatchState *)state)->f174;
             *(Quad *)point=*(Quad *)local;
-            func_00283098(point,point,object+0xC0);
-            func_00282CC0(point,point,object+0x10);
-            func_00282F20(difference,state+0x1C0,4.0f);
-            func_00282CC0(point,point,difference);
-            func_002A8C28(object,point,0x90000,0,1,0,5.0f,100.0f,0.0f);
+            matrix_mul_vec3(point,point,object+0xC0);
+            FastVecAdd(point,point,object+0x10);
+            vec_scale_to_length(difference,state+0x1C0,4.0f);
+            FastVecAdd(point,point,difference);
+            SweepCollisionFromObject(object,point,0x90000,0,1,0,5.0f,100.0f,0.0f);
         }
         if ((((DispatchState *)state)->f178&1) && ((DispatchState *)state)->f2A4==0) {
-            func_002E5DA0(5,0,(char *)object,0x7E5);
-            func_0032C700(((DispatchState *)state)->f2A0+0x10,1,35,20,20,20,45,1,2.5f,20.0f,1,0,0,0);
+            PlaySoundFromClassBank(5,0,(char *)object,0x7E5);
+            SpawnExplosion(((DispatchState *)state)->f2A0+0x10,1,35,20,20,20,45,1,2.5f,20.0f,1,0,0,0);
             ((DispatchState *)state)->f2A4=1;
-            if (((DispatchState *)state)->f38==(char *)D_00189E20.object) {
+            if (((DispatchState *)state)->f38==(char *)gHeroState.object) {
                 qcopy(difference, (object+0x10));
-                func_L23_00418650((char *)difference,0.0f);
-                index=func_L23_0041E418();
-                if (index!=-1) func_L22_003A3C70((int)D_00189E20.position,index);
+                ProjectPointOntoPlanetSurface((char *)difference,0.0f);
+                index=PickRandomReadyAttack();
+                if (index!=-1) ForwardToStoredObject((int)gHeroState.position,index);
             }
-            qcopy((object+0x10), D_00189E20.position);
-            func_L23_00418650((char *)object+0x10,(-D_L23_001B36A4)*2.0f);
+            qcopy((object+0x10), gHeroState.position);
+            ProjectPointOntoPlanetSurface((char *)object+0x10,(-D_L23_001B36A4)*2.0f);
         }
-        if ((flags & 1UL) == 1UL) func_L23_003C0028((char *)object);
-        else if (func_002B3868(object) && object[0x43]==8) {
-            func_L00_0035F5A0(31,0,0);
-            func_L23_003BFFC0((char *)object,8,0,4,2,1.0f);
+        if ((flags & 1UL) == 1UL) ResetObjectToIdle((char *)object);
+        else if (SetFirstPendingFlag(object) && object[0x43]==8) {
+            StartEffectInSlot(31,0,0);
+            PlayAnimOnObjectAndLink((char *)object,8,0,4,2,1.0f);
             ((DispatchState *)state)->f26=25; ((DispatchState *)state)->f2A6=0;
-            func_0032C700(((DispatchState *)state)->f2A0+0x10,0,10,15,15,15,15,0,1.0f,20.0f,0,0,0,0);
-        } else if ((flags & 2UL) == 2UL) func_002A7750(object,5,0);
+            SpawnExplosion(((DispatchState *)state)->f2A0+0x10,0,10,15,15,15,15,0,1.0f,20.0f,0,0,0,0);
+        } else if ((flags & 2UL) == 2UL) SetMobyState(object,5,0);
     }
     switch (object[0x20]) {
     case 5:
-        if (func_002B3890(object)) {
-            func_L23_003BFFC0((char *)object,3,0,4,3,1.0f);
-            if (((DispatchState *)state)->f3B4!=-1) { func_002E59F8(((DispatchState *)state)->f3B4); ((DispatchState *)state)->f3B4=-1; }
+        if (SetSecondPendingFlag(object)) {
+            PlayAnimOnObjectAndLink((char *)object,3,0,4,3,1.0f);
+            if (((DispatchState *)state)->f3B4!=-1) { StopSoundVoice(((DispatchState *)state)->f3B4); ((DispatchState *)state)->f3B4=-1; }
         }
-        if (U(object,0x96)>8) func_002A7750(object,7,1);
+        if (U(object,0x96)>8) SetMobyState(object,7,1);
         else if (U(object,0x96)>=11) {
             mask=0;
             if (object[0x43]!=3) mask|=1;
             if (((u8 *)((DispatchState *)state)->f2A0)[0x43]!=3) mask|=2;
-            if (mask) func_L23_003BFFC0((char *)object,3,0,20,mask,1.0f);
-            func_L11_003404E0((char *)object);
+            if (mask) PlayAnimOnObjectAndLink((char *)object,3,0,20,mask,1.0f);
+            CallSharedHelperWithObjectBlocks((char *)object);
         }
         break;
     case 1:
-        if (func_002B3890(object)) func_L23_003C00D0((char *)object);
-        else if (U(object,0x96)>=6) func_002A7750(object,3,0);
+        if (SetSecondPendingFlag(object)) ResetEnemyToCalmState((char *)object);
+        else if (U(object,0x96)>=6) SetMobyState(object,3,0);
         break;
     case 2:
         I(object,0x98)=0;
-        if (func_002B3890(object)) {
-            func_L23_003C00D0((char *)object);
-            func_L23_003BFFC0((char *)object,9,0,0,1,1.0f);
-            func_L23_003BFFC0((char *)object,1,0,0,2,1.0f);
-            func_L23_003C01F8((char *)object,1);
+        if (SetSecondPendingFlag(object)) {
+            ResetEnemyToCalmState((char *)object);
+            PlayAnimOnObjectAndLink((char *)object,9,0,0,1,1.0f);
+            PlayAnimOnObjectAndLink((char *)object,1,0,0,2,1.0f);
+            SnapEnemyToGround((char *)object,1);
             ((DispatchState *)state)->f3BC=1; ((DispatchState *)state)->f3B8=(float)D_L23_001AFA38;
         }
-        func_L00_002E6CF0(func_L23_003C1E88,object);
+        AddDrawCallbackToList1(DrawPulsingBeam,object);
         break;
     case 6:
-        func_L23_003C1B58((char *)object); break;
+        RelocateEnemyNearHero((char *)object); break;
     case 3:
-        if (func_002B3890(object) && object[0x43]!=1)
-            func_L23_003BFFC0((char *)object,1,0,4,3,1.0f);
-        func_L11_003404E0((char *)object);
+        if (SetSecondPendingFlag(object) && object[0x43]!=1)
+            PlayAnimOnObjectAndLink((char *)object,1,0,4,3,1.0f);
+        CallSharedHelperWithObjectBlocks((char *)object);
         if (((DispatchState *)state)->f110) {
-            func_002A7750(object,5,0);
-            func_L23_003BFFC0((char *)object,3,0,10,3,1.0f);
+            SetMobyState(object,5,0);
+            PlayAnimOnObjectAndLink((char *)object,3,0,10,3,1.0f);
         } else {
-            func_00282D30(point,object+0xE0,-3.0f);
-            func_00282CC0(point,point,object+0x10);
-            func_00282D30(difference,object+0xE0,0.2f);
-            func_00282CC0(difference,difference,object+0x10);
-            if (func_002761F8(difference,point,18,0,0) && func_00282E48(D_L23_001C0AA0,object+0x10)<4.0f)
-                func_002A7750(object,4,0);
+            FastVecScale(point,object+0xE0,-3.0f);
+            FastVecAdd(point,point,object+0x10);
+            FastVecScale(difference,object+0xE0,0.2f);
+            FastVecAdd(difference,difference,object+0x10);
+            if (CollLine(difference,point,18,0,0) && fast_vec_dist(D_L23_001C0AA0,object+0x10)<4.0f)
+                SetMobyState(object,4,0);
         }
         break;
     case 4:
-        if (func_002B3890(object) && object[0x43]!=2)
-            func_L23_003BFFC0((char *)object,2,0,6,3,1.0f);
-        else if ((object[0x60]&2) || func_0029F530((char *)object)>12.0f) {
-            func_002A7750(object,5,0);
-            func_L23_003BFFC0((char *)object,3,0,20,3,1.0f);
+        if (SetSecondPendingFlag(object) && object[0x43]!=2)
+            PlayAnimOnObjectAndLink((char *)object,2,0,6,3,1.0f);
+        else if ((object[0x60]&2) || GetMobyAnimationValue((char *)object)>12.0f) {
+            SetMobyState(object,5,0);
+            PlayAnimOnObjectAndLink((char *)object,3,0,20,3,1.0f);
         }
-        func_L11_003404E0((char *)object);
+        CallSharedHelperWithObjectBlocks((char *)object);
         break;
     case 7:
-        if (func_002B3890(object)) {
+        if (SetSecondPendingFlag(object)) {
             ((DispatchState *)state)->f250=200;
-            ((DispatchState *)state)->f2A8=D_L23_001AFA58+func_002A7878(0.0f,D_L23_001AFA58*0.5f);
-            ((DispatchState *)state)->f320=(char *)D_00189E20.position;
+            ((DispatchState *)state)->f2A8=D_L23_001AFA58+RandomFloatRange(0.0f,D_L23_001AFA58*0.5f);
+            ((DispatchState *)state)->f320=(char *)gHeroState.position;
         }
         if (!object[0x31]) ((DispatchState *)state)->f2A8=D_L23_001AFA60;
         else if (((DispatchState *)state)->f2A8==D_L23_001AFA60)
-            ((DispatchState *)state)->f2A8=D_L23_001AFA58+func_002A7878(0.0f,D_L23_001AFA58*0.5f);
-        if (((DispatchState *)state)->f250==0) func_002A7750(object,5,0);
+            ((DispatchState *)state)->f2A8=D_L23_001AFA58+RandomFloatRange(0.0f,D_L23_001AFA58*0.5f);
+        if (((DispatchState *)state)->f250==0) SetMobyState(object,5,0);
         else if (((DispatchState *)state)->f324 && facing && ((DispatchState *)state)->f27C<D_L23_001AFA78)
-            func_002A7750(object,8,2);
-        else func_L23_003C02C8(object);
+            SetMobyState(object,8,2);
+        else UpdatePathFollowing(object);
         break;
     case 8:
-        if (func_002B3868(object)) ((DispatchState *)state)->f2A8=D_L23_001AFA58+func_002A7878(0.0f,D_L23_001AFA58*0.5f);
+        if (SetFirstPendingFlag(object)) ((DispatchState *)state)->f2A8=D_L23_001AFA58+RandomFloatRange(0.0f,D_L23_001AFA58*0.5f);
         if (((u8 *)((DispatchState *)state)->f2A0)[0x43]!=4) {
-            func_L23_003BFFC0((char *)object,4,0,10,2,1.0f);
+            PlayAnimOnObjectAndLink((char *)object,4,0,10,2,1.0f);
             F(((DispatchState *)state)->f2A0,0x48)=D_L23_001B3708;
         }
         if (!((DispatchState *)state)->f324 || ((DispatchState *)state)->f27C>D_L23_001AFA80) {
-            func_002A7750(object,5,0); ((DispatchState *)state)->f250=0;
+            SetMobyState(object,5,0); ((DispatchState *)state)->f250=0;
         } else if (((DispatchState *)state)->f27C>D_L23_001AFA88 ||
                    ((unsigned int)(object[0x43]-5)<2 && ((DispatchState *)state)->f27C>D_L23_001AFA88-2.0f)) {
-            ((DispatchState *)state)->f320=(char *)D_00189E20.position; func_L23_003C02C8(object);
+            ((DispatchState *)state)->f320=(char *)gHeroState.position; UpdatePathFollowing(object);
         } else {
-            func_L23_003BFFC0((char *)object,3,0,10,1,1.0f); func_L11_003404E0((char *)object);
+            PlayAnimOnObjectAndLink((char *)object,3,0,10,1,1.0f); CallSharedHelperWithObjectBlocks((char *)object);
         }
-        if (func_002AEB60(((DispatchState *)state)->f2A0,28.0f)) func_L23_003BFE90((char *)object,D_L23_001B36F4+D_L23_001B36F4,(int)D_00189F00,0);
-        else if (func_002AEB60(((DispatchState *)state)->f2A0,14.0f)) func_L23_003BFE90((char *)object,D_L23_001B36F4+D_L23_001B36F4,(int)D_00189F00,1);
+        if (IsValueWithinStepOfThreshold(((DispatchState *)state)->f2A0,28.0f)) LaunchHeroDirectedHitEffect((char *)object,D_L23_001B36F4+D_L23_001B36F4,(int)D_00189F00,0);
+        else if (IsValueWithinStepOfThreshold(((DispatchState *)state)->f2A0,14.0f)) LaunchHeroDirectedHitEffect((char *)object,D_L23_001B36F4+D_L23_001B36F4,(int)D_00189F00,1);
         break;
     case 9:
-        if (func_002B3868(object)) {
-            func_L23_003BFFC0((char *)object,6,0,12,1,D_L23_001AFA14);
-            func_L23_003BFFC0((char *)object,8,0,12,2,4.0f);
-            func_L23_003C1988((char *)object);
-            ((DispatchState *)state)->f328=func_L23_004256F0((u8 *)state+0x330,object,(u8 *)state+0x340,50,70,0.7f,0.85f,0.5f,1.2f,30,5,0x7F7F7F,0x7F7F7F,0,-1,0);
-            ((DispatchState *)state)->f32C=func_L23_004256F0((u8 *)state+0x330,object,(u8 *)state+0x340,50,70,1.9f,2.05f,0.5f,1.2f,10,2,0x3F00000,0x3F0000,0,-1,0);
+        if (SetFirstPendingFlag(object)) {
+            PlayAnimOnObjectAndLink((char *)object,6,0,12,1,D_L23_001AFA14);
+            PlayAnimOnObjectAndLink((char *)object,8,0,12,2,4.0f);
+            StopObjectEffects((char *)object);
+            ((DispatchState *)state)->f328=CreateRibbonTrail((u8 *)state+0x330,object,(u8 *)state+0x340,50,70,0.7f,0.85f,0.5f,1.2f,30,5,0x7F7F7F,0x7F7F7F,0,-1,0);
+            ((DispatchState *)state)->f32C=CreateRibbonTrail((u8 *)state+0x330,object,(u8 *)state+0x340,50,70,1.9f,2.05f,0.5f,1.2f,10,2,0x3F00000,0x3F0000,0,-1,0);
             ((DispatchState *)state)->f2A8=D_L23_001AFA5C;
-            ((DispatchState *)state)->f3B4=func_002E5DA0(4,4,(char *)object,0x7E5);
+            ((DispatchState *)state)->f3B4=PlaySoundFromClassBank(4,4,(char *)object,0x7E5);
         }
         if (!((DispatchState *)state)->f324 || ((DispatchState *)state)->f27C>D_L23_001AFA80) {
-            func_002A7750(object,5,0); ((DispatchState *)state)->f250=0; break;
+            SetMobyState(object,5,0); ((DispatchState *)state)->f250=0; break;
         }
-        func_0029FCC0(((DispatchState *)state)->f2A0,1,state+0x330);
-        func_0029FCC0(((DispatchState *)state)->f2A0,0,state+0x340);
+        TransformMobyJointToWorld(((DispatchState *)state)->f2A0,1,state+0x330);
+        TransformMobyJointToWorld(((DispatchState *)state)->f2A0,0,state+0x340);
         if ((int)U(object,0x96)>D_L23_001AFA94) {
-            ((DispatchState *)state)->f320=(char *)D_00189E20.position;
-            if (((DispatchState *)state)->f27C<D_L23_001AFA8C) func_002A7750(object,10,2);
-            func_L23_003C02C8(object);
+            ((DispatchState *)state)->f320=(char *)gHeroState.position;
+            if (((DispatchState *)state)->f27C<D_L23_001AFA8C) SetMobyState(object,10,2);
+            UpdatePathFollowing(object);
         }
         break;
     case 10:
-        if (!((DispatchState *)state)->f324 || ((DispatchState *)state)->f27C>D_L23_001AFA90) { func_002A7750(object,5,0); break; }
-        func_0029FCC0(((DispatchState *)state)->f2A0,1,state+0x330);
-        func_0029FCC0(((DispatchState *)state)->f2A0,0,state+0x340);
-        if (func_002B3868(object)) {
-            func_L23_003C1988((char *)object);
-            ((DispatchState *)state)->f328=func_L23_004256F0((u8 *)state+0x330,object,(u8 *)D_L23_001B36D0,95,80,4.0f,4.25f,0.7f,1.3f,35,5,0x5F0000,0x5F2020,0,-1,0);
-            ((DispatchState *)state)->f32C=func_L23_004256F0((u8 *)state+0x340,object,(u8 *)D_L23_001B36D0,95,80,4.0f,4.25f,0.7f,1.3f,35,5,0x5F0000,0x5F2020,0,-1,0);
+        if (!((DispatchState *)state)->f324 || ((DispatchState *)state)->f27C>D_L23_001AFA90) { SetMobyState(object,5,0); break; }
+        TransformMobyJointToWorld(((DispatchState *)state)->f2A0,1,state+0x330);
+        TransformMobyJointToWorld(((DispatchState *)state)->f2A0,0,state+0x340);
+        if (SetFirstPendingFlag(object)) {
+            StopObjectEffects((char *)object);
+            ((DispatchState *)state)->f328=CreateRibbonTrail((u8 *)state+0x330,object,(u8 *)D_L23_001B36D0,95,80,4.0f,4.25f,0.7f,1.3f,35,5,0x5F0000,0x5F2020,0,-1,0);
+            ((DispatchState *)state)->f32C=CreateRibbonTrail((u8 *)state+0x340,object,(u8 *)D_L23_001B36D0,95,80,4.0f,4.25f,0.7f,1.3f,35,5,0x5F0000,0x5F2020,0,-1,0);
             break;
         }
         if ((int)U(object,0x96)<=D_L23_001AFA98) break;
-        func_00282CC0(difference,state+0x330,state+0x340);
-        func_00282D30(difference,difference,0.5f);
-        if (func_00282E48(difference,D_L23_001B36D0)<D_L23_001AFA4C) {
-            func_00282F20(point,((DispatchState *)state)->f2A0+0xE0,0.25f);
-            func_00282CC0(point,point,((DispatchState *)state)->f2A0+0xC0);
-            func_00282D30(point,point,15.0f); point[3]=5627.9248f;
-            func_002A8F70((int)D_0018C0B0,(int)object,0x10007,(int)(object+0x10),(int)point,D_L23_001B36F8);
-            func_L00_002D6900(43);
-            func_0032C700(D_L23_001B36D0,1,10,10,10,10,45,0,1.2f,20.0f,0,1,0,0);
+        FastVecAdd(difference,state+0x330,state+0x340);
+        FastVecScale(difference,difference,0.5f);
+        if (fast_vec_dist(difference,D_L23_001B36D0)<D_L23_001AFA4C) {
+            vec_scale_to_length(point,((DispatchState *)state)->f2A0+0xE0,0.25f);
+            FastVecAdd(point,point,((DispatchState *)state)->f2A0+0xC0);
+            FastVecScale(point,point,15.0f); point[3]=5627.9248f;
+            QueueImpactEffect((int)gHeroMoby_0018C0B0,(int)object,0x10007,(int)(object+0x10),(int)point,D_L23_001B36F8);
+            QueueRecordsByIndex(43);
+            SpawnExplosion(D_L23_001B36D0,1,10,10,10,10,45,0,1.2f,20.0f,0,1,0,0);
             ((DispatchState *)state)->f3BE=1;
         }
-        func_002A7750(object,11,2);
+        SetMobyState(object,11,2);
         break;
     case 11:
-        if (func_002B3868(object)) {
-            if (((DispatchState *)state)->f3B4!=-1) { func_002E59F8(((DispatchState *)state)->f3B4); ((DispatchState *)state)->f3B4=-1; }
-        } else if ((int)U(object,0x96)>D_L23_001AFA9C) { func_L23_003C1960((char *)object); func_002A7750(object,5,0); } else {
+        if (SetFirstPendingFlag(object)) {
+            if (((DispatchState *)state)->f3B4!=-1) { StopSoundVoice(((DispatchState *)state)->f3B4); ((DispatchState *)state)->f3B4=-1; }
+        } else if ((int)U(object,0x96)>D_L23_001AFA9C) { ClearSelectedObject((char *)object); SetMobyState(object,5,0); } else {
             if ((int)U(object,0x96)>=D_L23_001AFA9C-5 && ((DispatchState *)state)->f3BE) {
-                func_L00_0035F5A0(29,0,0); ((DispatchState *)state)->f3BE=0; func_L00_002D6900(43);
+                StartEffectInSlot(29,0,0); ((DispatchState *)state)->f3BE=0; QueueRecordsByIndex(43);
             }
         }
         break;
@@ -326,6 +327,6 @@ void func_L23_003BEA00(u8 *object)
     case 13:
         break;
     }
-    func_L23_003BFE38((char *)object);
-    if (object[0x20]!=13) { func_L23_003C16D8((char *)object); func_L23_003C1AE8((char *)object); }
+    TickObjectTimers((char *)object);
+    if (object[0x20]!=13) { UpdateChildOrientation((char *)object); UpdateObjectGlow((char *)object); }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef struct { float x, y, z, w; } Vector;
 typedef struct { Vector vertices[4]; unsigned int colors[4]; float uv[8]; long zero, texture, state, flags; } Packet;
 typedef struct {
@@ -28,6 +29,7 @@ static inline float lerp(float a, float b, float t)
     return a + (b - a) * t;
 }
 
+/* Draws a white flash over the screen near the end of its timer, plus a glowing sprite that fades with the effect. */
 void func_L05_003FE430(char *object)
 {
     Packet packet;
@@ -38,8 +40,8 @@ void func_L05_003FE430(char *object)
     unsigned int color;
 
     if (context->end - context->current < 2 && context->active != 0 && context->flash != 0) {
-        func_002FC560(0x42, 0x48);
-        func_0027DE50(0, D_001A6480.height, 0, D_001A6480.width, 0xFFFFFFFF80808080UL);
+        VU1_addGSregister(0x42, 0x48);
+        DrawColoredRectangle(0, gScreenAdjustOffsets.height, 0, gScreenAdjustOffsets.width, 0xFFFFFFFF80808080UL);
     }
     if (context->effect != 0) {
         delta = context->end - context->current;
@@ -51,13 +53,13 @@ void func_L05_003FE430(char *object)
             ref_L05_003FE430_00(object + 0x10, amount, 0.5f, 0.0f, 0.0f, 0.0f, 60, 0);
         }
     }
-    if (context->active != 0 && D_001A79F0 != 13 && D_001A79F0 != 16 && context->visible != 0) {
+    if (context->active != 0 && gCurrentMapIndex != 13 && gCurrentMapIndex != 16 && context->visible != 0) {
         width = 0.075f;
-        func_002AFFD8(object + 0x10, (char *)&up, 1);
-        opacity = func_00283CE0(context->active);
+        ComputeViewDirection(object + 0x10, (char *)&up, 1);
+        opacity = IntToFloat(context->active);
         opacity *= context->opacity;
-        func_00281DE8(&packet, 11, 4, 0x80);
-        color = ((unsigned int)func_00283CF0(opacity * 255.0f) << 24) | 0xFFFFFFu;
+        InitQuadPacketState(&packet, 11, 4, 0x80);
+        color = ((unsigned int)FloatToInt(opacity * 255.0f) << 24) | 0xFFFFFFu;
         packet.colors[3] = color;
         packet.colors[2] = color;
         packet.colors[1] = color;
@@ -70,19 +72,19 @@ void func_L05_003FE430(char *object)
         packet.uv[5] = 0.0f;
         packet.uv[6] = 1.0f;
         packet.uv[7] = 1.0f;
-        func_00282CF0(&difference, object + 0x10, &D_L00_001B8DC0);
-        func_00282F20(&unit, &difference, 0.1f);
-        func_00282CC0(&center, &D_L00_001B8DC0, &unit);
-        func_00282DD8(&horizontal, &difference, &up);
-        func_00282F20(&horizontal, &horizontal, width);
-        func_00282DD8(&vertical, &horizontal, &difference);
-        func_00282F20(&vertical, &vertical, width);
-        func_00282CC0(&corner, &center, &vertical);
-        func_00282CC0(&packet.vertices[0], &corner, &horizontal);
-        func_00282CF0(&packet.vertices[1], &corner, &horizontal);
-        func_00282CF0(&corner, &center, &vertical);
-        func_00282CC0(&packet.vertices[2], &corner, &horizontal);
-        func_00282CF0(&packet.vertices[3], &corner, &horizontal);
-        func_00280B90(&packet, 0, 0);
+        FastVecSub(&difference, object + 0x10, &gCameraPosition_L00);
+        vec_scale_to_length(&unit, &difference, 0.1f);
+        FastVecAdd(&center, &gCameraPosition_L00, &unit);
+        FastVecCross(&horizontal, &difference, &up);
+        vec_scale_to_length(&horizontal, &horizontal, width);
+        FastVecCross(&vertical, &horizontal, &difference);
+        vec_scale_to_length(&vertical, &vertical, width);
+        FastVecAdd(&corner, &center, &vertical);
+        FastVecAdd(&packet.vertices[0], &corner, &horizontal);
+        FastVecSub(&packet.vertices[1], &corner, &horizontal);
+        FastVecSub(&corner, &center, &vertical);
+        FastVecAdd(&packet.vertices[2], &corner, &horizontal);
+        FastVecSub(&packet.vertices[3], &corner, &horizontal);
+        draw_world_quad(&packet, 0, 0);
     }
 }

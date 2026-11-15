@@ -129,152 +129,153 @@ extern struct {
     int f4;
 } D_L07_001B2024;
 
-void func_L07_0040E198(ShipObject *o)
+/* Main update for the Siberius ship objects (moby classes 4569 to 4573): starts them, runs the ride along the path, and plays the final crash sequence. */
+void func_L07_0040E198(ShipObject *ship)
 {
-    Vector p, r, v, w, x, y;
-    ShipState *s = o->vars;
-    float t, z, k, m;
+    Vector savedPos, savedRot, v, w, x, y;
+    ShipState *vars = ship->vars;
+    float bounceSpeed, spin, offsetX, fadeState;
     int i;
 
-    if (!s)
+    if (!vars)
         return;
 
-    switch (o->state) {
+    switch (ship->state) {
     case 0:
-        o->flags |= 1;
-        o->f31 = 0;
-        func_L07_0040F8F8(o);
-        s->f1AC = -1;
-        if (s->f90 == -1) {
-            if (o->classId == 0x11D9)
-                func_002A7750(o, 3, -1);
+        ship->flags |= 1;
+        ship->f31 = 0;
+        ComputePathCentersAndRadii(ship);
+        vars->f1AC = -1;
+        if (vars->f90 == -1) {
+            if (ship->classId == 0x11D9 /* moby class 4569 */)
+                SetMobyState(ship, 3, -1);
             else
-                func_002A7750(o, 4, -1);
+                SetMobyState(ship, 4, -1);
         } else {
-            o->f30 = 255;
-            func_L07_0040FC50(o);
-            func_L07_0040E980(o);
-            func_002A7750(o, 2, -1);
+            ship->f30 = 255;
+            ClearFlagBlock(ship);
+            StartShipChain(ship);
+            SetMobyState(ship, 2, -1);
         }
         break;
     case 2:
         if (D_L07_001B1740) {
             D_L07_001B1740 = 0;
-            func_L07_00410700(s->f100, s->fD0);
+            StartShipSecondPhase(vars->f100, vars->fD0);
         }
         if (D_L07_001C9780) {
-            func_002A7750(o, 1, -1);
-            s->f16CC = func_002E5CF8(2, 4, o);
-            s->f16C8 = 6.0f;
+            SetMobyState(ship, 1, -1);
+            vars->f16CC = PlayMobySound(2, 4, ship);
+            vars->f16C8 = 6.0f;
         }
         break;
     case 1:
         D_0018C0E2 = 1;
         D_L07_001B19F8 = 1;
-        func_L07_0040EC08(o);
-        func_L07_0040FC88(o);
+        MoveShipRidersAlongPath(ship);
+        RunShipSequenceEvents(ship);
         break;
     case 3:
-        if (func_002B3868(o))
-            func_002E5CF8(1, 0, o);
-        func_L07_0040F0D0(o);
-        if (D_001A7BD0 || (D_0019B2E8[D_001A79F0][o->fB0] & 0x80)) {
-            func_L07_0040F0D0(o);
-            o->flags |= 2;
+        if (SetFirstPendingFlag(ship))
+            PlayMobySound(1, 0, ship);
+        UpdateShipAttachedParts(ship);
+        if (D_001A7BD0 || (D_0019B2E8[gCurrentMapIndex][ship->fB0] & 0x80)) {
+            UpdateShipAttachedParts(ship);
+            ship->flags |= 2;
             break;
         }
-        if (D_0018A15C[0] == o) {
-            if (s->f110 >= 0.5f)
-                func_002E5CF8(1, 0, o);
-            func_002AAA00(&s->f110, &s->f118, -1.0f, 0.0017453294713050127f,
+        if (D_0018A15C[0] == ship) {
+            if (vars->f110 >= 0.5f)
+                PlayMobySound(1, 0, ship);
+            ApproachTargetWithDirectionMode(&vars->f110, &vars->f118, -1.0f, 0.0017453294713050127f,
                           0.0017453294713050127f, 0.10471977f, 0);
-            if (s->f110 <= -1.0f) {
-                func_L02_002DCEA0(1, 10.0f);
+            if (vars->f110 <= -1.0f) {
+                StartTimedCountdown(1, 10.0f);
                 if (D_L07_001B1D20 >= 1.0f) {
-                    p.q = 0;
-                    r.q = 0;
-                    p.f[0] = 191.5800018310547f;
-                    p.f[1] = 501.15f;
-                    p.f[2] = 457.69000244140625f;
-                    r.f[2] = 3.1415927f;
-                    func_L00_00303530(1, 0);
-                    func_L00_002B9D60(&p, &r, 0, 1);
+                    savedPos.q = 0;
+                    savedRot.q = 0;
+                    savedPos.f[0] = 191.5800018310547f;
+                    savedPos.f[1] = 501.15f;
+                    savedPos.f[2] = 457.69000244140625f;
+                    savedRot.f[2] = 3.1415927f;
+                    LoadSceneChunk(1, 0);
+                    ResetHeroPositionAndDirection(&savedPos, &savedRot, 0, 1);
                 }
             }
         } else {
-            func_002AAA00(&s->f110, &s->f118, 0.5f, 0.0017453294713050127f,
+            ApproachTargetWithDirectionMode(&vars->f110, &vars->f118, 0.5f, 0.0017453294713050127f,
                           0.0017453294713050127f, 0.10471977f, 0);
         }
         break;
     case 5:
-        if (s->f16B8 >= 1.0f && D_L07_001B1D20 >= 1.0f) {
-            if (D_001A63A8.f72 != 3 || D_001A63A8.f6C >= 6000)
+        if (vars->f16B8 >= 1.0f && D_L07_001B1D20 >= 1.0f) {
+            if (gMusicState.f72 != 3 || gMusicState.f6C >= 6000)
                 break;
             D_L07_001B9330 = 0;
-            func_002B6D28();
+            ResumeMusicStream();
         }
-        p.q = *(TI128 *)o->pos;
-        r.q = *(TI128 *)o->rot;
-        if (s->f16B8 > 0.0f) {
-            func_002AA548(o->pos, &s->f11C, 400.0f, 0.0f, D_L07_001B1748 * 0.00027777778f,
+        savedPos.q = *(TI128 *)ship->pos;
+        savedRot.q = *(TI128 *)ship->rot;
+        if (vars->f16B8 > 0.0f) {
+            StepValueTowardTarget(ship->pos, &vars->f11C, 400.0f, 0.0f, D_L07_001B1748 * 0.00027777778f,
                           D_L07_001B1744 * 0.016666668f);
-            s->f16B8 = (o->pos[0] - 400.0f) * 0.014285714f;
-            o->rot[2] = func_002AA140(D_L07_001B1750, 0.0f, s->f16B8);
-            o->rot[0] = func_002AA140(0.7853975296020508f, 0.0f, s->f16B8);
-            o->pos[2] = 213.0f - s->f16B8 * 3.0f;
-        } else if ((m = D_L07_001B1D20) == 0.0f) {
-            func_00283098(&v, D_L07_001B1760, o->mtx);
-            s->f16B4 += o->rot[0] * 7.272206130437553e-05f + 7.272206130437553e-05f;
-            o->rot[0] += s->f16B4;
-            if (o->rot[0] > 1.5707964f) {
-                o->rot[0] = 1.5707964f;
-                t = func_00282C48(s->f16B4);
-                if (t < 0.0005817764904350042f)
-                    func_L02_002DCEA0(1, 15.0f);
+            vars->f16B8 = (ship->pos[0] - 400.0f) * 0.014285714f;
+            ship->rot[2] = LerpFloat_002AA140(D_L07_001B1750, 0.0f, vars->f16B8);
+            ship->rot[0] = LerpFloat_002AA140(0.7853975296020508f, 0.0f, vars->f16B8);
+            ship->pos[2] = 213.0f - vars->f16B8 * 3.0f;
+        } else if ((fadeState = D_L07_001B1D20) == 0.0f) {
+            matrix_mul_vec3(&v, D_L07_001B1760, ship->mtx);
+            vars->f16B4 += ship->rot[0] * 7.272206130437553e-05f + 7.272206130437553e-05f;
+            ship->rot[0] += vars->f16B4;
+            if (ship->rot[0] > 1.5707964f) {
+                ship->rot[0] = 1.5707964f;
+                bounceSpeed = FloatAbs(vars->f16B4);
+                if (bounceSpeed < 0.0005817764904350042f)
+                    StartTimedCountdown(1, 15.0f);
                 else
-                    s->f16B4 *= -0.333f;
-                if (!s->f16BC) {
+                    vars->f16B4 *= -0.333f;
+                if (!vars->f16BC) {
                     D_L07_001B90C0.f16C = 0;
                     D_L07_001B90C0.f188 = 90;
                     D_L07_001B90C0.f180 = 0.02f;
-                    s->f16BC = 1;
+                    vars->f16BC = 1;
                 }
             }
-            func_002833F0(o->mtx, o->rot);
-            func_00283098(&w, D_L07_001B1760, o->mtx);
-            func_00282CF0(&v, &w, &v);
-            func_00282CF0(o->pos, o->pos, &v);
-        } else if (m >= 1.0f) {
-            func_L07_00410930(o);
+            euler_rotation_basis(ship->mtx, ship->rot);
+            matrix_mul_vec3(&w, D_L07_001B1760, ship->mtx);
+            FastVecSub(&v, &w, &v);
+            FastVecSub(ship->pos, ship->pos, &v);
+        } else if (fadeState >= 1.0f) {
+            EnterBossSecondPhase(ship);
             break;
         }
 
         D_L07_001B2024.f4 = 1;
-        func_002AA2E8(&s->f16B0, 1.0f, D_L07_001B174C * 0.00027777778f);
-        k = s->f11C + s->f16B0;
-        if (k > 0.0f)
-            k = 0.0f;
+        ApproachValue(&vars->f16B0, 1.0f, D_L07_001B174C * 0.00027777778f);
+        offsetX = vars->f11C + vars->f16B0;
+        if (offsetX > 0.0f)
+            offsetX = 0.0f;
         v.q = *(TI128 *)D_L07_001B9200;
-        v.f[0] += k;
+        v.f[0] += offsetX;
         v.f[2] += D_L07_001B175C * 0.016666668f;
         func_L07_00423B28(&v);
 
         qzero_nc(&w);
-        x.q = *(TI128 *)o->pos;
+        x.q = *(TI128 *)ship->pos;
         x.f[2] += 6.0f;
-        w.f[2] = func_00283248(o->pos[0] - D_L07_001B90C0.pos[0], o->pos[1] - D_L07_001B90C0.pos[1]);
-        w.f[1] = func_00283248(func_00282E80(&x, D_L07_001B90C0.pos), D_L07_001B90C0.pos[2] - x.f[2]);
+        w.f[2] = FastMatrixHelperA(ship->pos[0] - D_L07_001B90C0.pos[0], ship->pos[1] - D_L07_001B90C0.pos[1]);
+        w.f[1] = FastMatrixHelperA(vec_distance_xy(&x, D_L07_001B90C0.pos), D_L07_001B90C0.pos[2] - x.f[2]);
         w.f[0] = D_L07_001B1758 * 0.017453294f;
         func_L07_00423B80(&w);
 
-        func_L07_004106B8(o);
+        UpdateMobyMatrix(ship);
 
-        z = s->f16B8 * 0.04363323748111725f + 0.008726648f;
+        spin = vars->f16B8 * 0.04363323748111725f + 0.008726648f;
         for (i = 0; i < 8; i++)
-            *(float *)((u8 *)s + 0x15B4 + i * 0x20) = func_00283B98(*(float *)((u8 *)s + 0x15B4 + i * 0x20), z);
+            *(float *)((u8 *)vars + 0x15B4 + i * 0x20) = FastAddRotations(*(float *)((u8 *)vars + 0x15B4 + i * 0x20), spin);
 
-        func_00282CF0(&y, o->pos, &p);
-        func_002AD6F0((u8 *)s + 0x20, &y, &r, o->rot);
+        FastVecSub(&y, ship->pos, &savedPos);
+        CombineTransformsAndStore((u8 *)vars + 0x20, &y, &savedRot, ship->rot);
         break;
     }
 }

@@ -52,63 +52,64 @@ extern void func_L00_002E6EF8(void (*)(void *), void *);
 
 extern void func_L11_0045FEF8(void *);
 
-void func_L20_0044AE58(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    float buf20[4] __attribute__((aligned(16)));
-    float buf30[4] __attribute__((aligned(16)));
-    float buf40[4] __attribute__((aligned(16)));
-    float buf50[4] __attribute__((aligned(16)));
+/* Update handler for moby class 4855, a homing shot: it steers and moves each frame, leaves a particle trail, and explodes when it hits something. */
+void func_L20_0044AE58(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    float newPos[4] __attribute__((aligned(16)));
+    float step[4] __attribute__((aligned(16)));
+    float sparkVelocity[4] __attribute__((aligned(16)));
+    float sparkScratch[4] __attribute__((aligned(16)));
     u8 mode;
 
     if (D_L20_001A8F00 == 2) {
-        func_0029F338(arg0);
+        MarkMobySpawned(moby);
         return;
     }
-    mode = *(u8 *)(arg0 + 0x20);
+    mode = *(u8 *)(moby + 0x20);
     switch (mode) {
     case 0: {
         char *base;
-        float v = *(float *)(state + 0x28);
-        float a;
-        float b;
+        float speed = *(float *)(state + 0x28);
+        float startSize;
+        float endSize;
 
-        base = arg0 + 0x10;
-        *(float *)(arg0 + 0xF0) =
-            func_00283B98(*(float *)(arg0 + 0xF0), v * 0.7f);
-        *(float *)(arg0 + 0xF4) = func_00283B98(
-            *(float *)(arg0 + 0xF4), *(float *)(state + 0x28) * 0.5f);
-        *(float *)(arg0 + 0xF8) = func_00283B98(
-            *(float *)(arg0 + 0xF8), *(float *)(state + 0x28));
-        func_00282D08(buf30, state, state + 0x10,
+        base = moby + 0x10;
+        *(float *)(moby + 0xF0) =
+            FastAddRotations(*(float *)(moby + 0xF0), speed * 0.7f);
+        *(float *)(moby + 0xF4) = FastAddRotations(
+            *(float *)(moby + 0xF4), *(float *)(state + 0x28) * 0.5f);
+        *(float *)(moby + 0xF8) = FastAddRotations(
+            *(float *)(moby + 0xF8), *(float *)(state + 0x28));
+        lerp_vector(step, state, state + 0x10,
                       *(float *)(state + 0x30));
-        func_002AA2E8((float *)(state + 0x30), 1.0f, *(float *)(state + 0x34));
-        func_00282CC0(buf20, base, buf30);
-        if (func_00277258(buf20, 0, arg0, D_L20_001B2468) != 0) {
+        ApproachValue((float *)(state + 0x30), 1.0f, *(float *)(state + 0x34));
+        FastVecAdd(newPos, base, step);
+        if (TestPointAgainstCollision(newPos, 0, moby, D_L20_001B2468) != 0) {
             int id = D_L20_001C0418;
 
-            if (id != 0 && id != *(int *)(arg0 + 0xB8)) {
-                func_002A7750(arg0, 1, -1);
+            if (id != 0 && id != *(int *)(moby + 0xB8)) {
+                SetMobyState(moby, 1, -1);
                 break;
             }
         }
-        qcopy(arg0 + 0x10, buf20);
-        func_00282D30(buf40, state, -0.5f);
-        func_00282C88(buf50);
-        a = func_002A7878(2.5f, 3.0f) * 210000.0f;
-        b = func_002A7878(0.2f, 0.4f) * 210000.0f;
-        func_002C65A0(arg0 + 0x10, buf40, a, b, 0.0f, 0xF,
+        qcopy(moby + 0x10, newPos);
+        FastVecScale(sparkVelocity, state, -0.5f);
+        ClearVector128(sparkScratch);
+        startSize = RandomFloatRange(2.5f, 3.0f) * 210000.0f;
+        endSize = RandomFloatRange(0.2f, 0.4f) * 210000.0f;
+        SpawnGravityFadeParticle(moby + 0x10, sparkVelocity, startSize, endSize, 0.0f, 0xF,
                       D_L20_001B2460, 3, 0x50, 0, 0);
     } break;
     case 1: {
         char *base;
-        base = arg0 + 0x10;
-        func_002A8C28(arg0, base, 0x10001, 0, 3.0f, *(float *)(state + 0x20),
+        base = moby + 0x10;
+        SweepCollisionFromObject(moby, base, 0x10001, 0, 3.0f, *(float *)(state + 0x20),
                       1.0f, 1, 0);
-        func_0032C700(base, 1, 0xA, 0xA, 0xA, 0xA, 0xA, 0, 2.0f, 20.0f, mode,
+        SpawnExplosion(base, 1, 0xA, 0xA, 0xA, 0xA, 0xA, 0, 2.0f, 20.0f, mode,
                       mode, 0, 0);
-        func_0029F338(arg0);
+        MarkMobySpawned(moby);
         return;
     }
     }
-    func_L00_002E6EF8(&func_L11_0045FEF8, arg0);
+    AddDrawCallbackToList3(&SpawnTwoGlowEffects, moby);
 }

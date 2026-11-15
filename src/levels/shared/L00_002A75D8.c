@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 typedef unsigned char u8;
 typedef float f32;
@@ -28,22 +29,23 @@ extern void func_00283410(void *, void *);
 extern void func_002830C0(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 
+/* Updates the hero model for one special state. It tilts the model and copies a height value onto it, then moves the model by a small offset. */
 void func_L00_002A75D8(void)
 {
-    Owner_002A75D8 *o = &D_00189E20;
-    float v[4];
-    float m[16];
+    Owner_002A75D8 *hero = &gHeroState;
+    float offset[4];
+    float matrix[16];
 
-    if (o->state == 0x7C)
-        func_002AEE70(o->obj, &o->f7A8, &o->f7AC, 0.3f, 0.1163553f, -1.0f);
-    if (o->f6BC == 0)
+    if (hero->state == 0x7C)
+        UpdateWrappedAngleOffset(hero->obj, &hero->f7A8, &hero->f7AC, 0.3f, 0.1163553f, -1.0f);
+    if (hero->f6BC == 0)
         return;
-    if (o->f660 != 0)
+    if (hero->f660 != 0)
         return;
-    *(float *)(o->obj + 0xF4) = o->f6B0;
-    *(TI128 *)v = 0;
-    v[2] = 2.0f;
-    func_00283410(m, o->obj + 0xF0);
-    func_002830C0(v, v, m);
-    func_00282CC0(o->obj + 0x10, o->v80, v);
+    *(float *)(hero->obj + 0xF4) = hero->f6B0;
+    *(TI128 *)offset = 0;
+    offset[2] = 2.0f;
+    euler_to_matrix(matrix, hero->obj + 0xF0);
+    transform_vector(offset, offset, matrix);
+    FastVecAdd(hero->obj + 0x10, hero->v80, offset);
 }

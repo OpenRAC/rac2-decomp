@@ -81,61 +81,61 @@ void func_L00_002AC578(void)
     float steps;
     float height, distance, angle, limit;
 
-    if (D_00189E20.f31C < 0.4f) return;
-    if (func_L00_002D3B00((char *)&D_00189E20 + 0xF0) < -0.3333333432674408f || D_00189E20.f22C3) return;
-    if (D_00189E20.f578) {
-        D_00189E20.f1D4 = 0;
+    if (gHeroState.f31C < 0.4f) return;
+    if (GetViewSpaceHeight((char *)&gHeroState + 0xF0) < -0.3333333432674408f || gHeroState.f22C3) return;
+    if (gHeroState.f578) {
+        gHeroState.f1D4 = 0;
         return;
     }
-    qcopy(&predicted, (unsigned char *)&D_00189E20 + 0x80);
+    qcopy(&predicted, (unsigned char *)&gHeroState + 0x80);
     ticks = 20;
-    qcopy(&probeEnd, (unsigned char *)&D_00189E20 + 0x110);
+    qcopy(&probeEnd, (unsigned char *)&gHeroState + 0x110);
     steps = (float)ticks;
-    func_L00_002D3B58(&probeEnd.q, &probeEnd.q, 0.0f);
-    func_L00_002D3BD8((char *)&probeEnd, (int)&probeEnd, steps);
-    func_00282CC0(&predicted, &predicted, &probeEnd);
-    distance = func_L00_002D3B00((char *)&D_00189E20 + 0xF0);
-    distance = distance * steps - D_00189E20.f520 * steps * steps * 0.5f;
-    func_L00_002D3778((ContactVector3 *)&predicted,
+    SetViewSpaceHeight(&probeEnd.q, &probeEnd.q, 0.0f);
+    SetViewSpaceVectorLength((char *)&probeEnd, (int)&probeEnd, steps);
+    FastVecAdd(&predicted, &predicted, &probeEnd);
+    distance = GetViewSpaceHeight((char *)&gHeroState + 0xF0);
+    distance = distance * steps - gHeroState.f520 * steps * steps * 0.5f;
+    ApplyHeroModeTransformReversed((ContactVector3 *)&predicted,
                      (ContactVector3 *)&predicted, distance);
-    if (func_L00_002ACF88(&predicted, (unsigned char *)&D_00189E20 + 0x90, 0)) {
-        D_00189E20.f1D4 = 0;
-        D_00189E20.f210 = 0x16;
+    if (FindHeroLedgeGrab(&predicted, (unsigned char *)&gHeroState + 0x90, 0)) {
+        gHeroState.f1D4 = 0;
+        gHeroState.f210 = 0x16;
         return;
     }
-    if (!func_L00_002AB108(0, 0.3f, 1.0f)) return;
+    if (!TestHeroReachBlend(0, 0.3f, 1.0f)) return;
     state = 0;
-    if (D_L00_001BF200.object) state = (unsigned char *)func_002AD0B0(D_L00_001BF200.object);
+    if (gCollisionResult.object) state = (unsigned char *)GetMobyPrivateValue2(gCollisionResult.object);
     height = 1.7f;
     if (state && (*(unsigned int *)(state + 0x3C) & 0x20)) height = 0.5f;
-    else if (D_00189E20.f2294 != 0x11 && (!D_00189E20.f285 || D_00189E20.f284)) height = 3.0f;
-    func_L00_002D3638(predicted.f, 0.0f, 0.0f, height, 1);
-    func_L00_002D3638(probeEnd.f, D_00189E20.f264 + 1.4f, 0.0f, height, 1);
-    if (!func_002761F8(&predicted, &probeEnd, 2, 0, 0)) return;
-    contact = func_00278E78();
+    else if (gHeroState.f2294 != 0x11 && (!gHeroState.f285 || gHeroState.f284)) height = 3.0f;
+    BuildHeroRelativeOffset(predicted.f, 0.0f, 0.0f, height, 1);
+    BuildHeroRelativeOffset(probeEnd.f, gHeroState.f264 + 1.4f, 0.0f, height, 1);
+    if (!CollLine(&predicted, &probeEnd, 2, 0, 0)) return;
+    contact = GetCollHitMaterial();
     if (contact == 10 || contact == 12) return;
-    D_00189E20.f294 = D_L00_001BF200.object;
-    angle = func_L00_002D3EA8(&D_L00_001BF200.normal);
+    gHeroState.f294 = gCollisionResult.object;
+    angle = GetViewSpaceAngle(&gCollisionResult.normal);
     if (angle < 1.3089970350265503f) return;
-    func_002830C0(&localNormal, &D_L00_001BF200.normal, (unsigned char *)&D_00189E20 + 0x40);
-    angle = func_00283248(localNormal.f[0], localNormal.f[1]);
-    angle = func_00283C80(angle, 3.1415927410125732f);
+    transform_vector(&localNormal, &gCollisionResult.normal, (unsigned char *)&gHeroState + 0x40);
+    angle = FastMatrixHelperA(localNormal.f[0], localNormal.f[1]);
+    angle = FastDiffRots(angle, 3.1415927410125732f);
     if (0.8726646900177002f < angle) return;
-    limit = D_00189E20.f2294 == 0x11 ? 0.95f : 0.72f;
-    func_L00_002D3638(predicted.f, 0.0f, 0.0f, 0.2f, 1);
-    func_L00_002D3638(probeEnd.f, D_00189E20.f264 + 1.4f, 0.0f, 0.2f, 1);
-    if (!func_002761F8(&predicted, &probeEnd, 2, 0, 0)) return;
-    distance = func_00282E80(&D_L00_001BF200.point, &predicted);
+    limit = gHeroState.f2294 == 0x11 ? 0.95f : 0.72f;
+    BuildHeroRelativeOffset(predicted.f, 0.0f, 0.0f, 0.2f, 1);
+    BuildHeroRelativeOffset(probeEnd.f, gHeroState.f264 + 1.4f, 0.0f, 0.2f, 1);
+    if (!CollLine(&predicted, &probeEnd, 2, 0, 0)) return;
+    distance = vec_distance_xy(&gCollisionResult.point, &predicted);
     if (limit < distance) return;
-    *(Quadword *)((unsigned char *)&D_00189E20 + 0x4E0) = D_L00_001BF200.normal.q;
-    D_00189E20.f4EC = func_00283248(D_L00_001BF200.normal.f[0], D_L00_001BF200.normal.f[1]);
-    if (D_00189E20.f229C != 4 && D_00189E20.f22A4 != 4 && D_00189E20.f22B0 != 4) return;
-    if (D_00189E20.f24D8 && func_00283C80(D_00189E20.f4FC, D_00189E20.f4EC) < 2.967060089111328f) return;
-    D_00189E20.f24DA = 0;
-    if (contact == 15) D_00189E20.f24DA = 1;
-    else if (D_00189E20.f24DB) return;
-    if (D_00189E20.f2294 == 0x11)
-        D_00189E20.f1D4 = 7;
+    *(Quadword *)((unsigned char *)&gHeroState + 0x4E0) = gCollisionResult.normal.q;
+    gHeroState.f4EC = FastMatrixHelperA(gCollisionResult.normal.f[0], gCollisionResult.normal.f[1]);
+    if (gHeroState.f229C != 4 && gHeroState.f22A4 != 4 && gHeroState.f22B0 != 4) return;
+    if (gHeroState.f24D8 && FastDiffRots(gHeroState.f4FC, gHeroState.f4EC) < 2.967060089111328f) return;
+    gHeroState.f24DA = 0;
+    if (contact == 15) gHeroState.f24DA = 1;
+    else if (gHeroState.f24DB) return;
+    if (gHeroState.f2294 == 0x11)
+        gHeroState.f1D4 = 7;
     else
-        D_00189E20.f1D4 = 6;
+        gHeroState.f1D4 = 6;
 }

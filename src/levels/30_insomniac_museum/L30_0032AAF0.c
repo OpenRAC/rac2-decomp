@@ -104,8 +104,9 @@ extern float func_321018(float);
 
 
 
-float func_L30_00382EF0(float a0, float a1, float a2) {
-    return a0 * (1.0f - a2) + a1 * a2;
+/* Blends smoothly between two numbers; the third number says how far along to go, from 0 to 1. */
+float func_L30_00382EF0(float from, float to, float blend) {
+    return from * (1.0f - blend) + to * blend;
 }
 
 typedef struct {
@@ -116,13 +117,14 @@ typedef struct {
 /* Clears the 0x1B00-byte block and lays a 24-by-24 grid of two-float cells over the table at
    0x235560: every cell's first float comes from its row index and its second from its column,
    both on a one-sixth step starting at -2. */
+/* Sets up the museum water surface: it clears the heights and lays out the 24 by 24 points of the water grid. */
 void func_L30_00382F10(void) {
     int i;
     int j;
 
-    func_00115484(D_00233A60, 0, 0x1B00);
+    memset(D_00233A60, 0, 0x1B00);
     for (i = 0; i < 24; i++) {
-        L30Pair2f *row = (L30Pair2f *)(D_L30_00235560 + i * 0xC0);
+        L30Pair2f *row = (L30Pair2f *)(gMuseumWaterGridPoints + i * 0xC0);
 
         for (j = 0; j < 24; j++) {
             row[j].x = i * (1.0f / 6.0f) + -2.0f;
@@ -145,29 +147,30 @@ void func_L30_00382F10(void) {
 
 /* func_L30_003840E0 uses small data in L30_0032AAF0-g8.c. */
 
-void func_L30_003842E0(char *a0) {
-    char *st = *(char **)(a0 + 0x68);
+/* Updates a museum trigger object (moby class 4839). It starts up, then watches a value and switches between its two waiting states as the value turns on and off. */
+void func_L30_003842E0(char *obj) {
+    char *vars = *(char **)(obj + 0x68);
 
-    switch (*(unsigned char *)(a0 + 0x20)) {
+    switch (*(unsigned char *)(obj + 0x20)) {
     case 0:
-        if (*(int *)st == -1) {
-            func_316DB8(a0);
+        if (*(int *)vars == -1) {
+            func_316DB8(obj);
         } else {
-            func_320FD0(a0, 1, -1);
+            func_320FD0(obj, 1, -1);
         }
         break;
     case 1:
-        if (func_32C0D0(D_001B9DC0, *(int *)st) != 0) {
+        if (func_32C0D0(D_001B9DC0, *(int *)vars) != 0) {
             *(unsigned char *)D_0018C0DC = 1;
-            func_320FD0(a0, 2, -1);
+            func_320FD0(obj, 2, -1);
         }
         break;
     case 2:
-        if (func_32C0D0(D_001B9DC0, *(int *)st) != 0) {
+        if (func_32C0D0(D_001B9DC0, *(int *)vars) != 0) {
             *(unsigned char *)D_0018C0DC = 1;
         } else {
             *(unsigned char *)D_0018C0DC = 0;
-            func_320FD0(a0, 1, -1);
+            func_320FD0(obj, 1, -1);
         }
         break;
     }
@@ -177,48 +180,51 @@ void func_L30_003842E0(char *a0) {
 
 /* Walks the context's 27-word handle table and adopts the first live one the shared probe
    accepts, stamping its index at +0x144 and the handle at +0x140; -1 when none is live. */
-int func_L30_00384768(char *a0) {
-    char *q = *(char **)(a0 + 0x68);
+/* Looks through the object's list of entries for the first one that is still active and remembers it. */
+int func_L30_00384768(char *obj) {
+    char *vars = *(char **)(obj + 0x68);
     int i;
 
     for (i = 0; i < 27; i++) {
-        int h = *(int *)(q + i * 4);
+        int handle = *(int *)(vars + i * 4);
 
-        if (h != -1 && func_002ACBC8(D_00189EA0, h) != 0) {
-            *(int *)(q + 0x140) = *(int *)(q + i * 4);
-            *(int *)(q + 0x144) = i;
-            return *(int *)(q + i * 4);
+        if (handle != -1 && IsPointInCuboid(gHeroPosition, handle) != 0) {
+            *(int *)(vars + 0x140) = *(int *)(vars + i * 4);
+            *(int *)(vars + 0x144) = i;
+            return *(int *)(vars + i * 4);
         }
     }
     return -1;
 }
 
-void func_L30_003847F8(char *a0) {
-    char *st = *(char **)(a0 + 0x68);
+/* Draws the currently picked entry on the screen with a fixed color. */
+void func_L30_003847F8(char *obj) {
+    char *vars = *(char **)(obj + 0x68);
     Vec6 buf;
-    int v;
+    int model;
 
-    D_00189E20.mode = 5;
-    D_00189E20.flag = 1;
+    gHeroState.mode = 5;
+    gHeroState.flag = 1;
     buf = *(Vec6 *)D_001AEC98;
-    v = func_2FB3C8(*(int *)(D_00295BF0 + *(int *)(st + 0x144) * 4));
-    func_3132D8(&buf, 0x80F0F0F0, v, 1, 0, -1, 0, 0, 0, 0);
+    model = func_2FB3C8(*(int *)(D_00295BF0 + *(int *)(vars + 0x144) * 4));
+    func_3132D8(&buf, 0x80F0F0F0, model, 1, 0, -1, 0, 0, 0, 0);
 }
 
 
-int func_L30_00384980(char *a0) {
-    char *st = *(char **)(a0 + 0x68);
-    char *g = (char *)D_001A63A8;
+/* Starts the countdown for the picked entry if nothing else is running; returns 1 if it did, 0 if not. */
+int func_L30_00384980(char *obj) {
+    char *vars = *(char **)(obj + 0x68);
+    char *gameState = (char *)gMusicState;
     int idx;
 
-    if (*(int *)(g + 0x68) == 0 && *(int *)(g + 0x24) == -1) {
-        char *q;
+    if (*(int *)(gameState + 0x68) == 0 && *(int *)(gameState + 0x24) == -1) {
+        char *entry;
 
-        idx = *(int *)(st + 0x144);
+        idx = *(int *)(vars + 0x144);
         if (idx != -1) {
-            q = st + idx * 4;
-            *(int *)(g + 0x24) = (*(int *)(q + 0x70) & 0x3FFF) + 0xBB8;
-            *(int *)(g + 0x28) = 0;
+            entry = vars + idx * 4;
+            *(int *)(gameState + 0x24) = (*(int *)(entry + 0x70) & 0x3FFF) + 0xBB8;
+            *(int *)(gameState + 0x28) = 0;
             return 1;
         }
     }
@@ -227,6 +233,7 @@ int func_L30_00384980(char *a0) {
 
 /* func_L30_00386300 lives in the -g8 sibling: it reaches its globals through $gp. */
 
+/* Moves a thrown object for one frame and checks what it hits. It bounces off surfaces and sprays sparks when it lands. */
 void func_L30_0038E7E0(unsigned char *obj) {
     struct {
         Vec old, velocity, normal;
@@ -250,52 +257,52 @@ void func_L30_0038E7E0(unsigned char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, ctx, position);
-    func_002FEE70(*(int *)(ctx + 0x1C), ctx, 0);
-    func_00300190(position, position);
-    func_00300248(ctx, ctx);
-    func_002FE880(position, ctx, 0.0030555557f);
-    func_L00_0038F178(obj);
+    FastVecAdd(position, ctx, position);
+    SteerEffectDirection(*(int *)(ctx + 0x1C), ctx, 0);
+    TransformVectorOrCopy(position, position);
+    TriggerCurrentStateEffect(ctx, ctx);
+    AddObjectDirectionScaled(position, ctx, 0.0030555557f);
+    EmitSparkleParticles(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0x122)
         frame.packet.flags = 0x830001;
     frame.packet.enabled = 1;
     frame.packet.material =
-        ((Material *)((u32)D_L30_002693F0 + D_00139568[12] * sizeof(Material)))->material;
+        ((Material *)((u32)D_L30_002693F0 + gItemSlotToRecord[12] * sizeof(Material)))->material;
     qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.kind = 2;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.active = 1;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
-        if (!func_00278E78() && *(float *)(ctx + 8) < 0.0f) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
+        if (!GetCollHitMaterial() && *(float *)(ctx + 8) < 0.0f) {
             char *effect;
             Vec *spread;
-            func_002FD1B8(D_L30_001B34B0, D_L30_001B34B8, 1,
+            RippleDisturb(D_L30_001B34B0, D_L30_001B34B8, 1,
                 *(float *)(obj + 0x10), *(float *)(obj + 0x14), 0.5f, -0.35f);
             *(int *)(ctx + 0x14) = 1;
-            func_00282C88(ctx);
+            ClearVector128(ctx);
             *(float *)(ctx + 8) = -0.025000002f;
             frame.position.f[0] = *(float *)(obj + 0x10);
             frame.position.f[1] = *(float *)(obj + 0x14);
             frame.position.f[2] = D_L30_001C0200.point.f[2];
-            effect = func_00312D58(&frame.position, 2.0f);
+            effect = SpawnScaledEffectMoby(&frame.position, 2.0f);
             if (effect)
                 effect[0x23] = 0x70;
             spread = &frame.spread;
             i = 15;
             do {
                 --i;
-                angle = func_002A7940();
-                speed = func_002A7878(0.0f, 0.050000004f);
-                frame.spread.f[0] = func_00283180(angle) * speed;
-                frame.spread.f[1] = func_00283198(angle) * speed;
-                frame.spread.f[2] = func_002A7878(0.050000004f, 0.10833334f);
-                lifetime = func_002A7820(90, 120);
-                func_002BFB38(&frame.position, spread, func_002A77E0(2), lifetime);
+                angle = RandomAngle();
+                speed = RandomFloatRange(0.0f, 0.050000004f);
+                frame.spread.f[0] = FastSinOrCosA(angle) * speed;
+                frame.spread.f[1] = FastSinOrCosB(angle) * speed;
+                frame.spread.f[2] = RandomFloatRange(0.050000004f, 0.10833334f);
+                lifetime = RandomIntRange(90, 120);
+                SpawnSparkParticle_002BFB38(&frame.position, spread, RandomIntBelow(2), lifetime);
             } while (i >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
@@ -306,39 +313,40 @@ void func_L30_0038E7E0(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) > 0x121)
+                if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L30_001C0200;
                 model = reread->hit;
-                if (*(int *)(model + 0x64) == D_L30_001AC790 && *(short *)(model + 0xAA) != 0x336)
+                if (*(int *)(model + 0x64) == D_L30_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &reread->point);
-                func_00283028(&frame.velocity, ctx, &reread->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &reread->normal, 1.0f);
+                FastVectorNormalize(&frame.velocity, ctx, &reread->normal);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
             } else {
                 if (collision->count < 1)
                     goto finish;
                 obj[0xBC] = 1;
                 qcopy(obj + 0x10, &collision->point);
-                func_00283028(&frame.velocity, ctx, &collision->normal);
-                func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-                func_00282F20(&frame.normal, &collision->normal, 1.0f);
+                FastVectorNormalize(&frame.velocity, ctx, &collision->normal);
+                vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+                vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
             }
         }
-    } else if (func_00282948(ctx + 0x18)) {
+    } else if (FastFloatHelperD(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (obj[0xBC]) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
-        func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+        ClearEntryFlag(*(int *)(ctx + 0x1C));
+        SpawnBigExplosionEffect(obj, &frame.velocity, &frame.normal);
     }
 }
 
 
+/* Moves a thrown object for one frame and bounces it off whatever it hits; after many bounces it ends in a different way. */
 void func_L30_0038EBF8(char *obj) {
     struct {
         Vec velocity, normal, old, surface;
@@ -362,10 +370,10 @@ void func_L30_0038EBF8(char *obj) {
     frame.normal.q = 0;
     frame.normal.f[2] = 1.0f;
     qcopy(&frame.old, position);
-    func_00282CC0(position, position, ctx);
-    func_002AFFD8(position, &frame.surface, 0);
-    func_00282D30(&frame.surface, &frame.surface, 0.0003055556f);
-    func_L00_0038F3D8(obj);
+    FastVecAdd(position, position, ctx);
+    ComputeViewDirection(position, &frame.surface, 0);
+    FastVecScale(&frame.surface, &frame.surface, 0.0003055556f);
+    SpawnSparkPuff(obj);
     frame.packet.moby = obj;
     frame.packet.flags = 0x830000;
     if (*(int *)(ctx + 0x18) < 0x122)
@@ -373,24 +381,24 @@ void func_L30_0038EBF8(char *obj) {
     frame.packet.enabled = 1;
     frame.packet.material = (D_00139574 + D_L30_002693F0)->material;
     qcopy(&frame.packet.vector, ctx);
-    func_00282F70(&frame.packet.vector, &frame.packet.vector, 1.0f);
+    FastVectorNormalizeHelper(&frame.packet.vector, &frame.packet.vector, 1.0f);
     frame.packet.kind = 2;
     frame.packet.vector.f[3] = 5627.925f;
     frame.packet.class_id = *(unsigned short *)(obj + 0xAA);
     frame.packet.vector.f[2] = 1.0f;
     frame.packet.active = 1;
     (*(int *)(ctx + 0x14))++;
-    if (func_002761F8(&frame.old, position, 0x10, obj, &frame.packet)) {
+    if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
         collision = &D_L30_001C0200;
         hit = collision->hit;
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == D_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == gHeroMoby_0018C0B0 || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L30_001C0200;
             model = reread->hit;
-            if (*(int *)(model + 0x64) == D_L30_001AC790 && *(short *)(model + 0xAA) != 0x336)
+            if (*(int *)(model + 0x64) == D_L30_001AC790 && *(short *)(model + 0xAA) != 0x336 /* moby class 822 */)
                 goto finish;
             obj[0xBC] = 1;
             {
@@ -398,50 +406,51 @@ void func_L30_0038EBF8(char *obj) {
                 void *dest = obj + 0x10;
                 qcopy(dest, source);
             }
-            func_00283028(&frame.velocity, ctx, &reread->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &reread->normal, 1.0f);
+            FastVectorNormalize(&frame.velocity, ctx, &reread->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
             collision = &D_L30_001C0200;
             if (collision->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
             qcopy(position, &collision->point);
-            func_00283028(&frame.velocity, ctx, &collision->normal);
-            func_00282F20(&frame.velocity, &frame.velocity, 0.033333335f);
-            func_00282F20(&frame.normal, &collision->normal, 1.0f);
+            FastVectorNormalize(&frame.velocity, ctx, &collision->normal);
+            vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
+            vec_scale_to_length(&frame.normal, &collision->normal, 1.0f);
         }
-    } else if (func_00282948(ctx + 0x18)) {
+    } else if (FastFloatHelperD(ctx + 0x18)) {
         obj[0xBC] = 1;
-        func_00282CC0((char *)&frame.velocity, (char *)&frame.velocity, ctx);
+        FastVecAdd((char *)&frame.velocity, (char *)&frame.velocity, ctx);
     }
 finish:
     if (*(unsigned char *)(obj + 0xBC)) {
-        func_002FEE50(*(int *)(ctx + 0x1C));
+        ClearEntryFlag(*(int *)(ctx + 0x1C));
         if (*(int *)(ctx + 0x14) < 20)
-            func_L00_0038DE70(obj, &frame.velocity, &frame.normal);
+            SpawnBigExplosionEffect(obj, &frame.velocity, &frame.normal);
         else
-            func_L00_0038E880(obj, &frame.velocity, &frame.normal);
+            SpawnImpactBurst(obj, &frame.velocity, &frame.normal);
     }
 }
 
 
 
 
-void func_L30_003B3E60(float *a0, float *a1, float *a2, float *a3) {
-    *a0 = -D_00189E20.f1FB0;
-    *a2 = -D_00189E20.f1FB4;
-    *a1 = func_321018(D_00138180.f128) - func_321018(D_00138180.f124);
-    *a3 = D_00138180.f12C;
-    if (*a0 > 1.0f) {
-        *a0 = 1.0f;
-    } else if (*a0 < -1.0f) {
-        *a0 = -1.0f;
+/* Reads the player's stick and button input into four numbers, keeping the stick values between -1 and 1. */
+void func_L30_003B3E60(float *stickX, float *stickY, float *stickZ, float *button) {
+    *stickX = -gHeroState.f1FB0;
+    *stickZ = -gHeroState.f1FB4;
+    *stickY = func_321018(gPadState.f128) - func_321018(gPadState.f124);
+    *button = gPadState.f12C;
+    if (*stickX > 1.0f) {
+        *stickX = 1.0f;
+    } else if (*stickX < -1.0f) {
+        *stickX = -1.0f;
     }
-    if (*a1 > 1.0f) {
-        *a1 = 1.0f;
-    } else if (*a1 < -1.0f) {
-        *a1 = -1.0f;
+    if (*stickY > 1.0f) {
+        *stickY = 1.0f;
+    } else if (*stickY < -1.0f) {
+        *stickY = -1.0f;
     }
 }
 
@@ -449,21 +458,22 @@ void func_L30_003B3E60(float *a0, float *a1, float *a2, float *a3) {
 
 /* func_L30_003BE478 uses small data in L30_0032AAF0-g8.c. */
 
-void func_L30_003BE678(char *a0) {
-    char *st = *(char **)(a0 + 0x68);
+/* Moves a museum info stand to its next state and plays the matching animation and sound. */
+void func_L30_003BE678(char *obj) {
+    char *vars = *(char **)(obj + 0x68);
 
-    if (*(unsigned char *)(a0 + 0x20) == 1) {
-        if (*(unsigned char *)(a0 + 0x43) != 1) {
-            func_002A7470(a0, 1, 0, 5);
+    if (*(unsigned char *)(obj + 0x20) == 1) {
+        if (*(unsigned char *)(obj + 0x43) != 1) {
+            StartAnimationBlended(obj, 1, 0, 5);
         }
-        *(unsigned char *)(a0 + 0x20) = 2;
+        *(unsigned char *)(obj + 0x20) = 2;
     } else {
-        if (*(unsigned char *)(a0 + 0x43) != 2) {
-            func_002A7470(a0, 2, 0, 5);
+        if (*(unsigned char *)(obj + 0x43) != 2) {
+            StartAnimationBlended(obj, 2, 0, 5);
         }
-        *(unsigned char *)(a0 + 0x20) = 5;
-        if (*(int *)(st + 0xC) != -1) {
-            func_L00_0042A500(*(int *)(st + 0xC));
+        *(unsigned char *)(obj + 0x20) = 5;
+        if (*(int *)(vars + 0xC) != -1) {
+            ResetCameraEntry(*(int *)(vars + 0xC));
         }
     }
 }
@@ -485,35 +495,36 @@ void func_L30_003BE678(char *a0) {
 
 extern int D_001A79F0 MACRO_ADDR;
 
-void func_L30_0040B4E0(float *a0, float *a1, float *a2, float *a3, float *a4, float *a5) {
+/* Reads the player's controls for the hover vehicle into six numbers, keeping the stick values between -1 and 1. */
+void func_L30_0040B4E0(float *stickX, float *stickY, float *stickZ, float *buttonA, float *strafe, float *buttonB) {
     int mode;
 
-    *a0 = -D_00189E20.f1FB0;
-    *a2 = -D_00189E20.f1FB4;
-    *a1 = func_321018(D_00138180.f128) - func_321018(D_00138180.f124);
-    mode = D_001A79F0;
+    *stickX = -gHeroState.f1FB0;
+    *stickZ = -gHeroState.f1FB4;
+    *stickY = func_321018(gPadState.f128) - func_321018(gPadState.f124);
+    mode = gCurrentMapIndex;
     if (mode == 8 || mode == 0x10 || mode == 0x15 || mode == 0x1E) {
-        *a3 = D_00138180.f12C;
-        *a5 = 0.0f;
+        *buttonA = gPadState.f12C;
+        *buttonB = 0.0f;
     } else {
-        *a5 = D_00138180.f12C;
-        *a3 = 0.0f;
+        *buttonB = gPadState.f12C;
+        *buttonA = 0.0f;
     }
-    *a4 = func_321018(D_00138180.f138) - func_321018(D_00138180.f13C);
-    if (*a0 > 1.0f) {
-        *a0 = 1.0f;
-    } else if (*a0 < -1.0f) {
-        *a0 = -1.0f;
+    *strafe = func_321018(gPadState.f138) - func_321018(gPadState.f13C);
+    if (*stickX > 1.0f) {
+        *stickX = 1.0f;
+    } else if (*stickX < -1.0f) {
+        *stickX = -1.0f;
     }
-    if (*a1 > 1.0f) {
-        *a1 = 1.0f;
-    } else if (*a1 < -1.0f) {
-        *a1 = -1.0f;
+    if (*stickY > 1.0f) {
+        *stickY = 1.0f;
+    } else if (*stickY < -1.0f) {
+        *stickY = -1.0f;
     }
-    if (*a4 > 1.0f) {
-        *a4 = 1.0f;
-    } else if (*a4 < -1.0f) {
-        *a4 = -1.0f;
+    if (*strafe > 1.0f) {
+        *strafe = 1.0f;
+    } else if (*strafe < -1.0f) {
+        *strafe = -1.0f;
     }
 }
 

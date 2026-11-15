@@ -25,9 +25,10 @@ extern Quad D_L01_001B01F0 MACRO_ADDR, D_L01_001B0200 MACRO_ADDR, D_L01_001B0210
 extern Quad D_L01_001B0220 __attribute__((sda)), D_L01_001B0230 __attribute__((sda));
 extern Quad D_L01_001B0260 __attribute__((sda)), D_L01_001B0290 __attribute__((sda));
 #define APPEND_QUAD(value) { cursor[offset] = (value); offset += 1; D_L01_001B2CC8[0] = (unsigned char *)(cursor + offset); }
+/* Builds the animated water wave grid. It works out the height and shading of each grid point, then writes the draw packet. */
 void func_L01_003CB668(void)
 {
-    func_L01_003CAFE0();
+    DrawAnimatedWaterBackground();
     {
         int i;
         int firstPhase[8], secondPhase[8];
@@ -36,10 +37,10 @@ void func_L01_003CB668(void)
         float secondAngle = (float)(D_L01_001B2088 % (D_L01_001B037C * 2) - D_L01_001B037C)
             * (3.14159274f / (float)D_L01_001B037C);
         for (i = 0; i < 8; i++) {
-            firstPhase[i] = (int)((func_00283180(firstAngle) + 1.0f) * D_L01_001B0370);
-            secondPhase[i] = (int)((func_00283180(secondAngle) + 1.0f) * D_L01_001B0378);
-            firstAngle = func_00283B98(firstAngle, 0.785398006f);
-            secondAngle = func_00283B98(secondAngle, 0.785398006f);
+            firstPhase[i] = (int)((FastSinOrCosA(firstAngle) + 1.0f) * D_L01_001B0370);
+            secondPhase[i] = (int)((FastSinOrCosA(secondAngle) + 1.0f) * D_L01_001B0378);
+            firstAngle = FastAddRotations(firstAngle, 0.785398006f);
+            secondAngle = FastAddRotations(secondAngle, 0.785398006f);
         }
         { int row, col;
         for (row = 0; row < 8; row++)
@@ -56,10 +57,10 @@ void func_L01_003CB668(void)
         float horizontal[4] __attribute__((aligned(16)));
         float vertical[4] __attribute__((aligned(16)));
         float normal[4] __attribute__((aligned(16)));
-        unsigned int c, target;
-        direction[0] = func_00283180(D_L01_001B0384) * func_00283180(D_L01_001B0388);
-        direction[1] = func_00283198(D_L01_001B0384) * func_00283180(D_L01_001B0388);
-        direction[2] = func_00283198(D_L01_001B0388);
+        unsigned int shade, target;
+        direction[0] = FastSinOrCosA(D_L01_001B0384) * FastSinOrCosA(D_L01_001B0388);
+        direction[1] = FastSinOrCosB(D_L01_001B0384) * FastSinOrCosA(D_L01_001B0388);
+        direction[2] = FastSinOrCosB(D_L01_001B0388);
         for (i = 0; i < 8; i++) {
             int palette = ((i + 2) * 128) | 8;
             for (j = 0; j < 8; j++) {
@@ -70,16 +71,16 @@ void func_L01_003CB668(void)
                 vertical[0] = 0.0f;
                 vertical[1] = D_L01_001B0380;
                 vertical[2] = (float)(D_L01_00297580[k + 38] - D_L01_00297580[k + 2]) * 0.0009765625f;
-                func_00282DD8(normal, vertical, horizontal);
-                func_00282F20(normal, normal, 1.0f);
-                c = (int)(func_00282DB0(normal, direction) * 128.0f);
+                FastVecCross(normal, vertical, horizontal);
+                vec_scale_to_length(normal, normal, 1.0f);
+                shade = (int)(FastVecDot(normal, direction) * 128.0f);
                 {
-                    unsigned int green = (c << 8) | 0x80000000;
-                    unsigned int red = c << 16;
+                    unsigned int green = (shade << 8) | 0x80000000;
+                    unsigned int red = shade << 16;
                     target = red | green;
-                    target |= c;
+                    target |= shade;
                 }
-                D_L01_00297960[(i) * 9 + (j)] = func_00283D38(
+                D_L01_00297960[(i) * 9 + (j)] = FastTweenColor(
                     *(unsigned int *)(palette + (unsigned int)D_L01_001B036C), target, D_L01_001B038C);
                 palette += 4;
             }
@@ -110,5 +111,5 @@ void func_L01_003CB668(void)
     cursor[offset] = D_L01_001B0290; offset += 1;
     D_L01_001B2CC8_gp = (unsigned char *)(cursor + offset);
     }
-    func_L01_003CB540();
+    FinishWaveGridPacket();
 }

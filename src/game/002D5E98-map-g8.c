@@ -89,6 +89,7 @@ extern int func_002956E8(void), func_002958B8(void);
 extern void func_002EEED0(int, void *, int, int, int);
 extern int func_002B7B18(int, int, int);
 
+/* Runs the map screen: handles buttons, loads the map picture for the chosen page and streams the next one from disc. */
 int func_002D6F38(int arg)
 {
     int prev, idx, id, slot, n, buf, pick, next, k;
@@ -97,18 +98,18 @@ int func_002D6F38(int arg)
     int mapped;
     char *tbase;
 
-    func_00295D00();
-    if (D_001F2840.current != (MapPage *)D_0025E680) {
-        prev = D_001C4FA0.level;
-        if ((D_00138180[0x1C4 / 4] & 0xD00) && !D_001F2840.locked) {
+    UpdateMapOverlayPanZoom();
+    if (gPauseMenuState.current != (MapPage *)D_0025E680) {
+        prev = gMapOverlayState.level;
+        if ((gPadState[0x1C4 / 4] & 0xD00) && !gPauseMenuState.locked) {
 close_map:
             return 1;
         }
-        if (D_00138180[0x1C4 / 4] & 0x10) {
+        if (gPadState[0x1C4 / 4] & 0x10) {
             int result;
-            if (D_001F2840.current->back)
-                D_001F2840.next = D_001F2840.current->back;
-            else if (!D_001F2840.locked) {
+            if (gPauseMenuState.current->back)
+                gPauseMenuState.next = gPauseMenuState.current->back;
+            else if (!gPauseMenuState.locked) {
                 result = -1;
                 goto back_done;
             }
@@ -116,138 +117,138 @@ close_map:
 back_done:
             return result;
         }
-        if (D_00138180[0x1C4 / 4] & 0x40)
-            D_001F2840.next = (int)D_0025A498;
-        if ((D_00138180[0x1C4 / 4] & 0x20) && D_001C4FA0.level >= 0 && !D_001F2840.pending) {
-            if (D_001C4FA0.level == 0)
+        if (gPadState[0x1C4 / 4] & 0x40)
+            gPauseMenuState.next = (int)D_0025A498;
+        if ((gPadState[0x1C4 / 4] & 0x20) && gMapOverlayState.level >= 0 && !gPauseMenuState.pending) {
+            if (gMapOverlayState.level == 0)
                 mapped = 21;
-            else if (D_001C4FA0.level == 24)
+            else if (gMapOverlayState.level == 24)
                 mapped = 0;
             else
-                mapped = D_001C4FA0.level;
-            if (D_001C4FA0.level < 0) goto close_map;
+                mapped = gMapOverlayState.level;
+            if (gMapOverlayState.level < 0) goto close_map;
             {
-                unsigned int word = (unsigned)D_001C4FA0.level >> 2;
-                int bit = 1 << (D_001C4FA0.level & 0x1F);
+                unsigned int word = (unsigned)gMapOverlayState.level >> 2;
+                int bit = 1 << (gMapOverlayState.level & 0x1F);
                 if (!(D_00139768[word] & bit)) goto close_map;
             }
-            D_001A72D4 = D_001F2840.mode;
-            func_002C9E60(0);
+            D_001A72D4 = gPauseMenuState.mode;
+            RestoreSavedScreenImage(0);
             {
                 int saved_mode = D_001A7478;
-                D_001F2840.saved_page = D_001F2840.current;
-                D_001F2840.saved_state = D_001F2840.state;
-                D_001F2840.warp = D_001C4FA0.level;
-                D_001F2840.saved_mode = saved_mode;
+                gPauseMenuState.saved_page = gPauseMenuState.current;
+                gPauseMenuState.saved_state = gPauseMenuState.state;
+                gPauseMenuState.warp = gMapOverlayState.level;
+                gPauseMenuState.saved_mode = saved_mode;
             }
             D_001A7478_sda = 2;
-            func_00288AA0(D_001BAD40, mapped);
-            func_00288BE8(D_001BAD40);
+            PushRequestQueue(D_001BAD40, mapped);
+            LaunchQueuedRequest(D_001BAD40);
             goto close_map;
         }
-        idx = func_00295A10(D_001C4FA0.level);
+        idx = FindMapTableIndex(gMapOverlayState.level);
         if (idx >= 0) {
-            if ((D_00138180[0x1C4 / 4] & 8) && idx < 27) {
-                if (D_001AA4F0[idx + 1]) func_00295C50(D_001AA4F0[idx + 1]);
+            if ((gPadState[0x1C4 / 4] & 8) && idx < 27) {
+                if (D_001AA4F0[idx + 1]) SetCurrentMapAndRefresh(D_001AA4F0[idx + 1]);
             }
-            if ((D_00138180[0x1C4 / 4] & 4) && idx) {
-                if (D_001AA4F0[idx - 1]) func_00295C50(D_001AA4F0[idx - 1]);
+            if ((gPadState[0x1C4 / 4] & 4) && idx) {
+                if (D_001AA4F0[idx - 1]) SetCurrentMapAndRefresh(D_001AA4F0[idx - 1]);
             }
         }
-        if (D_001C4FA0.level != prev) {
-            func_002E5E58(3, 0, 0);
-            func_0029D830();
+        if (gMapOverlayState.level != prev) {
+            PlaySoundFromGlobalBank(3, 0, 0);
+            UpdateEntryStates();
         }
     }
-    if (D_001F2840.current == (MapPage *)D_0025E680)
-        D_001C4FA0.stream = 1;
-    id = D_001C4FA0.level;
+    if (gPauseMenuState.current == (MapPage *)D_0025E680)
+        gMapOverlayState.stream = 1;
+    id = gMapOverlayState.level;
     if (D_001A7AFD) id += 256;
-    slot = func_00295828(id);
-    if (D_001C4FA0.level != D_001C4FA0.loaded && slot != -1) {
-        n = func_00295A80();
-        if (D_001C4FA0.slots[0] && n > 0) {
-            func_00295788(n, 0);
+    slot = FindMapCacheSlotById(id);
+    if (gMapOverlayState.level != gMapOverlayState.loaded && slot != -1) {
+        n = ChooseMapSlotToReuse();
+        if (gMapOverlayState.slots[0] && n > 0) {
+            MoveMapCacheSlot(n, 0);
             if (!slot) slot = n;
         }
-        func_0029D4D0(D_001C4FA0.slots[slot], D_001C4FA0.header);
-        hdr = D_001C4FA0.header;
+        fast_decompress(gMapOverlayState.slots[slot], gMapOverlayState.header);
+        hdr = gMapOverlayState.header;
         pix = (char *)hdr + hdr->pixels;
         pal = (char *)hdr + hdr->palette;
-        buf = func_002DE550(0);
+        buf = ClaimFreeStreamChunk(0);
         if (buf) {
-            base = (char *)D_001C4FA0.header;
+            base = (char *)gMapOverlayState.header;
             a = base + hdr->mask + 8;
-            if (D_001C4FA0.level == D_001A79F0)
-                func_00295BE8(pal, pix, pal, D_001C4FA0.mask);
+            if (gMapOverlayState.level == gCurrentMapIndex)
+                compose_bitmap_from_mask(pal, pix, pal, gMapOverlayState.mask);
             else {
-                if (D_001A7BE8[D_001C4FA0.level])
-                    func_00297730(buf, D_0018D278 + (D_001C4FA0.level << 11), base + hdr->chunks);
+                if (D_001A7BE8[gMapOverlayState.level])
+                    DecodeOcclusionMap(buf, D_0018D278 + (gMapOverlayState.level << 11), base + hdr->chunks);
                 else
-                    func_00297400(buf, a, a);
-                func_00295BE8(pal, pix, pal, (void *)buf);
+                    BuildMapMaskBitmap(buf, a, a);
+                compose_bitmap_from_mask(pal, pix, pal, (void *)buf);
             }
         }
-        tbase = (char *)D_001C4FA0.header;
+        tbase = (char *)gMapOverlayState.header;
         tex = tbase + hdr->texture;
         b = tbase + hdr->layer1 + 0x420;
         c = tbase + hdr->layer2 + 0x420;
-        D_001C4FA0.texture[0] = func_00294D80(7, 7, tex + 32, tex + 0x420, D_001C4FA0.clut_vram, D_001C4FA0.texture_vram[0]);
-        D_001C4FA0.texture[1] = func_00294D80(7, 7, tex + 32, b, D_001C4FA0.clut_vram, D_001C4FA0.texture_vram[1]);
-        D_001C4FA0.texture[2] = func_00294D80(7, 7, tex + 32, c, D_001C4FA0.clut_vram, D_001C4FA0.texture_vram[2]);
-        if (buf) func_00294D80(9, 9, pal, pal, 0x3FF000, D_001C4FA0.image_vram);
+        gMapOverlayState.texture[0] = register_8bit_texture(7, 7, tex + 32, tex + 0x420, gMapOverlayState.clut_vram, gMapOverlayState.texture_vram[0]);
+        gMapOverlayState.texture[1] = register_8bit_texture(7, 7, tex + 32, b, gMapOverlayState.clut_vram, gMapOverlayState.texture_vram[1]);
+        gMapOverlayState.texture[2] = register_8bit_texture(7, 7, tex + 32, c, gMapOverlayState.clut_vram, gMapOverlayState.texture_vram[2]);
+        if (buf) register_8bit_texture(9, 9, pal, pal, 0x3FF000, gMapOverlayState.image_vram);
         func_0029D0E0();
-        if (buf) func_002DE618(buf);
-        D_001C4FA0.slots[0] = (int)pix;
-        D_001C4FA0.loaded = D_001C4FA0.level;
-        func_0029DEA8(D_001C4FA0.level, 0);
+        if (buf) ReleaseStreamChunk(buf);
+        gMapOverlayState.slots[0] = (int)pix;
+        gMapOverlayState.loaded = gMapOverlayState.level;
+        func_0029DEA8(gMapOverlayState.level, 0);
     }
-    if (!D_001A63A8.mode && D_001C4FA0.selected != -1) {
-        D_001F2840.pending = 0;
-        D_001C4FA0.ids[D_001C4FA0.selected] ^= 0x1000;
-        D_001C4FA0.selected = -1;
+    if (!gMusicState.mode && gMapOverlayState.selected != -1) {
+        gPauseMenuState.pending = 0;
+        gMapOverlayState.ids[gMapOverlayState.selected] ^= 0x1000;
+        gMapOverlayState.selected = -1;
     }
     pick = -1;
-    if (D_001C4FA0.stream && !D_001A63A8.mode) {
-        pick = func_002956E8();
+    if (gMapOverlayState.stream && !gMusicState.mode) {
+        pick = SelectFirstUsableMapSlot();
         if (pick != -1) {
-            next = func_002958B8();
+            next = PickNextMap();
             if (next != -1) {
-                k = (D_001A79F0 + D_001C4FA0.source_level == 0) ? 0 : 256;
+                k = (gCurrentMapIndex + gMapOverlayState.source_level == 0) ? 0 : 256;
                 if (k == next) {
-                    func_002EEED0(D_001C4FA0.slots[pick], D_001C4FA0.source, 0, D_001C4FA0.source_size, 0);
-                    D_001C4FA0.sizes[pick] = D_001C4FA0.source_size;
+                    UploadRecordsToBufferSlot(gMapOverlayState.slots[pick], gMapOverlayState.source, 0, gMapOverlayState.source_size, 0);
+                    gMapOverlayState.sizes[pick] = gMapOverlayState.source_size;
                 } else {
                     if (next & 256) {
                         int *size;
                         int sector, origin, read_buffer, sectors;
-                        origin = D_0014B540.base;
-                        sector = D_0014B540.alt_maps[next ^ 256].offset;
-                        size = &D_0014B540.alt_maps[next ^ 256].size;
-                        read_buffer = D_001C4FA0.slots[pick];
+                        origin = gCopySetupData.base;
+                        sector = gCopySetupData.alt_maps[next ^ 256].offset;
+                        size = &gCopySetupData.alt_maps[next ^ 256].size;
+                        read_buffer = gMapOverlayState.slots[pick];
                         sectors = *size;
-                        func_002B7B18(read_buffer, sector + origin, sectors);
-                        D_001C4FA0.sizes[pick] = (*size << 11) >> 4;
+                        StartDiscRead(read_buffer, sector + origin, sectors);
+                        gMapOverlayState.sizes[pick] = (*size << 11) >> 4;
                     } else {
                         int *size;
                         int sector, origin, read_buffer, sectors;
-                        origin = D_0014B540.base;
-                        sector = D_0014B540.maps[next].offset;
-                        size = &D_0014B540.maps[next].size;
-                        read_buffer = D_001C4FA0.slots[pick];
+                        origin = gCopySetupData.base;
+                        sector = gCopySetupData.maps[next].offset;
+                        size = &gCopySetupData.maps[next].size;
+                        read_buffer = gMapOverlayState.slots[pick];
                         sectors = *size;
-                        func_002B7B18(read_buffer, sector + origin, sectors);
-                        D_001C4FA0.sizes[pick] = (*size << 11) >> 4;
+                        StartDiscRead(read_buffer, sector + origin, sectors);
+                        gMapOverlayState.sizes[pick] = (*size << 11) >> 4;
                     }
-                    D_001F2840.pending = 1;
+                    gPauseMenuState.pending = 1;
                 }
-                D_001C4FA0.ids[pick] = next | 0x1000;
-                D_001C4FA0.selected = pick;
+                gMapOverlayState.ids[pick] = next | 0x1000;
+                gMapOverlayState.selected = pick;
             }
         }
     }
-    slot = func_00295828(id);
-    if (D_001C4FA0.level != D_001C4FA0.loaded && !D_001A63A8.mode && slot == -1 && pick == slot)
-        func_00295A80();
+    slot = FindMapCacheSlotById(id);
+    if (gMapOverlayState.level != gMapOverlayState.loaded && !gMusicState.mode && slot == -1 && pick == slot)
+        ChooseMapSlotToReuse();
     return 0;
 }

@@ -23,29 +23,30 @@
  */
 #include "common.h"
 
-s32 func_003415B8(s32 arg0) {
-    s32 temp_v1;
-    s32 var_a0;
-    s32 var_v0;
-    s32 tmp0;
+/* Returns the address of the selected entry in the table of the current tab. */
+s32 func_003415B8(s32 self) {
+    s32 tab;
+    s32 table;
+    s32 index;
+    s32 base;
 
-    temp_v1 = (*(s32 *)((s8 *)(arg0) + (0x2FC)));
-    if (temp_v1 == 0) {
+    tab = (*(s32 *)((s8 *)(self) + (0x2FC)));
+    if (tab == 0) {
         goto block_2;
     }
     goto block_5;
 block_2:
-    var_v0 = (*(s32 *)((s8 *)(arg0) + (0x1B8)));
-    var_a0 = (*(s32 *)((s8 *)(arg0) + (0x2F0)));
+    index = (*(s32 *)((s8 *)(self) + (0x1B8)));
+    table = (*(s32 *)((s8 *)(self) + (0x2F0)));
 block_4:
-    return var_a0 + (var_v0 * 0x14);
+    return table + (index * 0x14);
 block_5:
-    if (temp_v1 != 1) {
-        tmp0 = arg0 + (temp_v1 * 4);
-        return (*(s32 *)((s8 *)(arg0) + (0x2F8))) + ((*(s32 *)((s8 *)(tmp0) + (0x1B8))) * 0x14);
+    if (tab != 1) {
+        base = self + (tab * 4);
+        return (*(s32 *)((s8 *)(self) + (0x2F8))) + ((*(s32 *)((s8 *)(base) + (0x1B8))) * 0x14);
     }
-    var_a0 = (*(s32 *)((s8 *)(arg0) + (0x2F4)));
-    return var_a0 + (((*(s32 *)((s8 *)(arg0) + (0x1BC)))) * 0x14);
+    table = (*(s32 *)((s8 *)(self) + (0x2F4)));
+    return table + (((*(s32 *)((s8 *)(self) + (0x1BC)))) * 0x14);
 block_7:
-    return (*(s32 *)((s8 *)(arg0) + (0x2F8))) + ((*(s32 *)((s8 *)((arg0 + (temp_v1 * 4))) + (0x1B8))) * 0x14);
+    return (*(s32 *)((s8 *)(self) + (0x2F8))) + ((*(s32 *)((s8 *)((self + (tab * 4))) + (0x1B8))) * 0x14);
 }

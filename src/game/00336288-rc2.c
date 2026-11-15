@@ -29,18 +29,19 @@ extern void func_00336ED0(s32, s32);
 
 extern s8 D_001ADA58[];
 
-void func_00336288(void *arg0, s32 arg1) {
-    s32 temp_a0;
+/* Sets the object type pointer, releases the attached data when each part is not in use and runs the shared base cleanup. */
+void func_00336288(void *obj, s32 flags) {
+    s32 attached;
 
-    (*(s32 *)((char *)(arg0) + (0x30))) = (s32)D_001ADA58;
-    temp_a0 = (*(s32 *)((char *)(arg0) + (0x2C)));
-    if (temp_a0 != 0) {
-        if ((*(s32 *)((char *)(arg0) + (0x44))) == 0) {
-            func_00336ED0(temp_a0, (*(s32 *)((char *)(arg0) + (0x34))));
+    (*(s32 *)((char *)(obj) + (0x30))) = (s32)D_001ADA58;
+    attached = (*(s32 *)((char *)(obj) + (0x2C)));
+    if (attached != 0) {
+        if ((*(s32 *)((char *)(obj) + (0x44))) == 0) {
+            FreePoolCell(attached, (*(s32 *)((char *)(obj) + (0x34))));
         }
-        if ((*(s32 *)((char *)(arg0) + (0x48))) == 0) {
-            func_00336ED0((*(s32 *)((char *)(arg0) + (0x2C))), (*(s32 *)((char *)(arg0) + (0x38))));
+        if ((*(s32 *)((char *)(obj) + (0x48))) == 0) {
+            FreePoolCell((*(s32 *)((char *)(obj) + (0x2C))), (*(s32 *)((char *)(obj) + (0x38))));
         }
     }
-    func_003360F8(arg0, arg1);
+    DestroyArrayObject(obj, flags);
 }

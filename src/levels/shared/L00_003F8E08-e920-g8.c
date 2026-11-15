@@ -42,39 +42,39 @@ void func_L00_003FE920(u8 *obj, u8 *out, int mode, u8 *flag)
     float spread;
     float axis[4] __attribute__((aligned(16)));
     float rotation[4] __attribute__((aligned(16)));
-    Hero_L00_003FE920 *h = &D_00189E20;
+    Hero_L00_003FE920 *h = &gHeroState;
 
     {
         int index = D_00139581[0];
-        TableEntry_L00_003FE920 *entry = D_L00_00262570 + index;
+        TableEntry_L00_003FE920 *entry = gWeaponTable_L00 + index;
 
         factor = entry->scale * 0.016666668f;
     }
 
     if (h->state == 1) {
-        func_00282F20(out, obj + 0xD0, -factor);
+        vec_scale_to_length(out, obj + 0xD0, -factor);
         qcopy(axis, obj + 0xC0);
     } else {
-        func_00282F20(out, h->vec760, factor);
+        vec_scale_to_length(out, h->vec760, factor);
         qcopy(axis, h->vec750);
         if (h->optional != 0) {
-            func_L00_0037FA90(out, flag, factor, 32.0f, 0.6981318f);
+            ComputeAimDirection(out, flag, factor, 32.0f, 0.6981318f);
             qcopy(axis, D_L00_001B9010);
         }
     }
 
-    if (D_00189E20.effect != 0)
-        func_L00_0032A1A8(D_00189E20.effect, flag, out, factor);
+    if (gHeroState.effect != 0)
+        ComputeObjectToTargetVector(gHeroState.effect, flag, out, factor);
 
-    factor = func_00283CE0(mode);
-    denom = func_00283CE0(D_L00_001B0C0C - 1);
+    factor = IntToFloat(mode);
+    denom = IntToFloat(D_L00_001B0C0C - 1);
     factor = factor / denom;
     spread = ((D_L00_001B0C10 * 0.017453294f) * 2.0f) * factor;
     if (mode != 2) {
         float *rot = rotation;
 
-        angle = func_00283B98(-(D_L00_001B0C10 * 0.017453294f), spread);
-        func_002AB668(angle, rot, axis);
-        func_002ACDE8(out, out, rot);
+        angle = FastAddRotations(-(D_L00_001B0C10 * 0.017453294f), spread);
+        BuildAxisAngleQuaternion(angle, rot, axis);
+        RotateVectorByQuaternion(out, out, rot);
     }
 }

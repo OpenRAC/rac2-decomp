@@ -145,64 +145,64 @@ void func_L05_0041FD48(void)
    fires the object's effect and takes the moby down, which it reports. */
 int func_L05_0041FFF8(char *obj, int flag)
 {
-    char *s0;
-    float *s2;
-    char *s3;
-    char *v;
-    float v3[3];
+    char *attached;
+    float *health;
+    char *hitSource;
+    char *vars;
+    float burstPos[3];
     int ret = 0;
 
-    s3 = func_002A9640(obj, (char *)0x230000, 0);
+    hitSource = FindOwnedEffectSlot(obj, (char *)0x230000, 0);
     *(unsigned char *)(obj + 0xA8) = 0xFF;
-    v = *(char **)(obj + 0x68);
-    s0 = *(char **)(v + 0x10);
-    s2 = *(float **)(v + 0x0);
-    if (s0 != 0) {
-        func_002AB8C0(obj, s0);
+    vars = *(char **)(obj + 0x68);
+    attached = *(char **)(vars + 0x10);
+    health = *(float **)(vars + 0x0);
+    if (attached != 0) {
+        UpdateColorFade(obj, attached);
     }
-    if (s3 != 0) {
-        if (s0 != 0) {
-            *(unsigned char *)(s0 + 7) = 0xFF;
-            func_002AB800(obj, s0);
+    if (hitSource != 0) {
+        if (attached != 0) {
+            *(unsigned char *)(attached + 7) = 0xFF;
+            StartColorFade(obj, attached);
         }
-        *s2 = *s2 - *(float *)(s3 + 0x2C);
+        *health = *health - *(float *)(hitSource + 0x2C);
         if (*(short *)(obj + 0xAA) != 0xB73) {
-            func_002E5DA0(0xD, 0, obj, 0xFBF);
-            if (func_002A77E0(3) == 0) {
+            PlaySoundFromClassBank(0xD, 0, obj, 0xFBF);
+            if (RandomIntBelow(3) == 0) {
                 if (*(short *)(obj + 0xAA) == 0x10F5) {
-                    func_002E5DA0(1, 0, obj, 0x10F5);
+                    PlaySoundFromClassBank(1, 0, obj, 0x10F5);
                 } else {
-                    func_002E5DA0(0xB, 0, obj, 0xFBF);
+                    PlaySoundFromClassBank(0xB, 0, obj, 0xFBF);
                 }
             }
         }
-        if (*s2 <= 0.0f) {
-            *s2 = 0.0f;
+        if (*health <= 0.0f) {
+            *health = 0.0f;
             if (*(short *)(obj + 0xAA) == 0x10F5) {
                 func_L05_00398F18(obj + 0x10, 0, 0x19, 0, 0, 0x1E, 0, 1, 0.8f);
             } else if (*(short *)(obj + 0xAA) == 0x111A) {
                 func_L05_00398F18(obj + 0x10, 0, 0xF, 0, 0, 0x1E, 0, 0, 2.0f);
-                v3[0] = *(float *)(obj + 0x10) + func_002A7878(1.5f, -1.5f);
-                v3[1] = *(float *)(obj + 0x14) + func_002A7878(1.5f, -1.5f);
-                v3[2] = *(float *)(obj + 0x18) + func_002A7878(1.5f, -1.5f);
-                func_L05_00398F18(v3, 0, 0xF, 0, 0, 0x1E, 0, 0, 2.0f);
-                v3[0] = *(float *)(obj + 0x10) + func_002A7878(1.5f, -1.5f);
-                v3[1] = *(float *)(obj + 0x14) + func_002A7878(1.5f, -1.5f);
-                v3[2] = *(float *)(obj + 0x18) + func_002A7878(1.5f, -1.5f);
-                func_L05_00398F18(v3, 0, 0xF, 0, 0, 0x1E, 0, 0, 2.0f);
+                burstPos[0] = *(float *)(obj + 0x10) + RandomFloatRange(1.5f, -1.5f);
+                burstPos[1] = *(float *)(obj + 0x14) + RandomFloatRange(1.5f, -1.5f);
+                burstPos[2] = *(float *)(obj + 0x18) + RandomFloatRange(1.5f, -1.5f);
+                func_L05_00398F18(burstPos, 0, 0xF, 0, 0, 0x1E, 0, 0, 2.0f);
+                burstPos[0] = *(float *)(obj + 0x10) + RandomFloatRange(1.5f, -1.5f);
+                burstPos[1] = *(float *)(obj + 0x14) + RandomFloatRange(1.5f, -1.5f);
+                burstPos[2] = *(float *)(obj + 0x18) + RandomFloatRange(1.5f, -1.5f);
+                func_L05_00398F18(burstPos, 0, 0xF, 0, 0, 0x1E, 0, 0, 2.0f);
             } else {
-                func_L05_00424990(obj + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.75f);
+                SpawnShockwaveBurst(obj + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.75f);
             }
             if (D_L05_001B1350 == 0) {
                 func_L05_00421908(obj, 1, 5);
             } else {
                 func_L05_00421908(obj, 0, 5);
             }
-            if (func_L05_0037BBB8(obj)) {
-                func_L05_0037BE98(obj);
+            if (IsObjectInUse(obj)) {
+                ReleaseObjectFromGroup(obj);
             }
             if (flag == 0) {
-                func_L05_0037AE40(obj);
+                ResetObjectActionState(obj);
             }
             ret = 1;
         }

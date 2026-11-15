@@ -68,56 +68,56 @@ int func_L04_002DB970(int reason)
     int n;
     int hit;
 
-    if (D_00189E20.air_frames)
+    if (gHeroState.air_frames)
         return 1;
 
-    qcopy(old, D_00189E20.position);
-    func_00282C88(move);
-    if (D_00189E20.f24FE) {
-        func_L00_002D49F0();
-        D_00189E20.f24FE = 0;
+    qcopy(old, gHeroState.position);
+    ClearVector128(move);
+    if (gHeroState.f24FE) {
+        CheckHeroTimedCondition();
+        gHeroState.f24FE = 0;
     }
 
     grounded = 0;
-    if (func_00282DB0(D_00189E20.axis20, D_00189E20.axis2C0) > -0.92f)
+    if (FastVecDot(gHeroState.axis20, gHeroState.axis2C0) > -0.92f)
         grounded = 1;
 
-    if (D_00189E20.control_mode != 0x11) {
-        if (D_00189E20.f22C3 || D_00189E20.f218 || grounded) {
-            if (D_00189E20.f22B4 == 2) {
-                func_L00_002D38A0(move, move, 5.0f);
-            } else if (D_00189E20.f22C3 == 1 || D_00189E20.f218) {
-                func_L00_002D36E0(move, 0, 0.0f, 0.0f, 0.6f);
+    if (gHeroState.control_mode != 0x11) {
+        if (gHeroState.f22C3 || gHeroState.f218 || grounded) {
+            if (gHeroState.f22B4 == 2) {
+                OffsetPointInViewSpace(move, move, 5.0f);
+            } else if (gHeroState.f22C3 == 1 || gHeroState.f218) {
+                BuildHeroRelativePoint(move, 0, 0.0f, 0.0f, 0.6f);
             } else if (D_001A8FF0) {
-                func_L00_002D38A0(move, move, 0.77f);
+                OffsetPointInViewSpace(move, move, 0.77f);
             } else {
-                func_L00_002D36E0(move, 0, 0.0f, 0.0f, D_00189E20.f254);
+                BuildHeroRelativePoint(move, 0, 0.0f, 0.0f, gHeroState.f254);
             }
         } else {
-            move[2] = D_00189E20.f254;
+            move[2] = gHeroState.f254;
         }
     }
-    func_00282CC0(D_00189E20.position, D_00189E20.position, move);
+    FastVecAdd(gHeroState.position, gHeroState.position, move);
 
     for (n = 0; n < 8; n++) {
-        if (D_00189E20.control_mode == 0x11) {
-            if (!func_00277258(0.6f, D_00189E20.position, 0x24, D_00189E20.object))
+        if (gHeroState.control_mode == 0x11) {
+            if (!TestPointAgainstCollision(0.6f, gHeroState.position, 0x24, gHeroState.object))
                 break;
         } else {
-            if (D_00189E20.f22C3 || grounded) {
-                hit = func_00277258(D_00189E20.radius, D_00189E20.position, 0x24,
-                                    D_00189E20.object) |
-                      (D_00189E20.f1E6 ? 0 : func_00278870(D_00189E20.radius,
-                                                           D_00189E20.position));
+            if (gHeroState.f22C3 || grounded) {
+                hit = TestPointAgainstCollision(gHeroState.radius, gHeroState.position, 0x24,
+                                    gHeroState.object) |
+                      (gHeroState.f1E6 ? 0 : ProcessCollisionTriangles(gHeroState.radius,
+                                                           gHeroState.position));
             } else {
-                float height = D_00189E20.f250 - D_00189E20.f254;
+                float height = gHeroState.f250 - gHeroState.f254;
 
                 if (height < 0.05f)
                     height = 0.05f;
-                hit = func_L00_002E0200(D_00189E20.radius, height, D_00189E20.position, 0x24,
-                                        D_00189E20.object) |
-                      (D_00189E20.f1E6 ? 0 : func_00278870(D_00189E20.radius,
-                                                           D_00189E20.position));
+                hit = func_L00_002E0200(gHeroState.radius, height, gHeroState.position, 0x24,
+                                        gHeroState.object) |
+                      (gHeroState.f1E6 ? 0 : ProcessCollisionTriangles(gHeroState.radius,
+                                                           gHeroState.position));
             }
             if (!hit)
                 break;
@@ -126,17 +126,17 @@ int func_L04_002DB970(int reason)
         {
             char *collision = D_L04_001BFAF0;
 
-            qcopy(D_00189E20.position, collision);
-            qcopy(D_00189E20.contact_a, collision + 0x10);
-            qcopy(D_00189E20.contact_b, collision - 0x10);
-            D_00189E20.collision_flag = 1;
-            D_00189E20.collision_id = *(s32 *)(collision - 0x18);
+            qcopy(gHeroState.position, collision);
+            qcopy(gHeroState.contact_a, collision + 0x10);
+            qcopy(gHeroState.contact_b, collision - 0x10);
+            gHeroState.collision_flag = 1;
+            gHeroState.collision_id = *(s32 *)(collision - 0x18);
         }
     }
 
-    func_00282CF0(D_00189E20.position, D_00189E20.position, move);
-    func_00282CF0(delta, D_00189E20.position, old);
-    if (func_00282DF0(delta) > D_00189E20.radius * 1.5f) {
+    FastVecSub(gHeroState.position, gHeroState.position, move);
+    FastVecSub(delta, gHeroState.position, old);
+    if (FastVecLength(delta) > gHeroState.radius * 1.5f) {
         if (reason == 15) {
             if (delta[0] > 512.0f)
                 delta[0] = 512.0f;
@@ -150,8 +150,8 @@ int func_L04_002DB970(int reason)
                 delta[2] = 512.0f;
             else if (delta[2] < -512.0f)
                 delta[2] = -512.0f;
-            func_00282F20(delta, delta, D_00189E20.radius);
-            func_00282CC0(D_00189E20.position, old, delta);
+            vec_scale_to_length(delta, delta, gHeroState.radius);
+            FastVecAdd(gHeroState.position, old, delta);
         }
         return -1;
     }

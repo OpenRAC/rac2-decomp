@@ -31,37 +31,38 @@ typedef struct {
     int f2210;
 } RecordSet;
 
-void func_0034E070(void *object, void *a1, void *a2)
+/* Sets up the records screen: the record row texts, the ammo and bolt HUD, and the other panels. */
+void func_0034E070(void *object, void *fontData, void *context)
 {
     RecordSet *set = object;
     char *record = (char *)0x8710;
     char *end = set->records + 0x750;
     void *colour;
 
-    set->f220C = func_00336D50((int)D_001A8CFC + (int)record, 0x57);
-    set->f2210 = func_00336D50((int)D_001A8CFC + (int)record, 0x58);
+    set->f220C = FindTableEntryById((int)D_001A8CFC + (int)record, 0x57);
+    set->f2210 = FindTableEntryById((int)D_001A8CFC + (int)record, 0x58);
     record = set->records;
     do {
-        func_00336408(record, 0x20, 1, D_001AE710, a2);
-        func_00336CC8(record, 5);
-        func_00336B90(record, 0x64);
-        func_00336B98(record, 0);
-        func_00336498(record, 0x8049C1FF, 0x80001EFF);
-        func_003364B0(record, 0x50F0C070, 0x50F0C070);
-        func_00336CE0(record, 0x80000000);
-        func_00336CC0(record, 1);
+        InitDerivedObjectB(record, 0x20, 1, D_001AE710, context);
+        SetWidgetPositionY(record, 5);
+        SetMeterMaximum(record, 0x64);
+        SetMeterValue(record, 0);
+        SetFirstPair(record, 0x8049C1FF, 0x80001EFF);
+        SetSecondPair(record, 0x50F0C070, 0x50F0C070);
+        SetTextAlignment(record, 0x80000000);
+        SetWidgetField38(record, 1);
         record += 0x48;
     } while (record < end);
     record = set->f1D30;
-    func_0034B2C8(set->f7A0, a1, a2);
-    func_00336710(record, D_001AE720, a2);
-    colour = func_00335E20(record);
+    InitAmmoBoltHud(set->f7A0, fontData, context);
+    InitDerivedObjectC(record, D_001AE720, context);
+    colour = GetFieldC(record);
     *(float *)colour = 2155905152.0f;
-    colour = func_003367B8(record);
+    colour = GetFieldAt34(record);
     *(float *)colour = 60008.0f;
-    colour = func_003367B8(record);
+    colour = GetFieldAt34(record);
     *(int *)((char *)colour + 4) = 0;
-    set->f798 = a2;
-    func_00337C10(set->f1D6C, a2);
-    func_00337C10(set->f1FBC, a2);
+    set->f798 = context;
+    InitTextPanel(set->f1D6C, context);
+    InitTextPanel(set->f1FBC, context);
 }

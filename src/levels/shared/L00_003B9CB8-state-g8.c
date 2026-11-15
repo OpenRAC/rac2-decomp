@@ -81,19 +81,21 @@ extern void ref_L00_003BAC30_00(void *, EffectObject *);
 extern void func_L00_003BB668(void *);
 
 /* Updates motion and hits, then shrinks, emits particles and releases resources. */
+/* Per-frame update of the moby class 2473 effect: it hurts and pushes nearby things, fades out,
+   then removes itself. */
 void func_L00_003BAC30(EffectObject *self)
 {
     EffectAngles angles;
     char *hits[16];
     char vector[16];
     EffectHitPacket packet;
-    int count;
+    int hitCount;
     EffectState *state = self->state;
-    char *result;
+    char *hitTarget;
     int i;
-    int handle;
-    int material;
-    EffectMaterialEntry *entry;
+    int lightHandle;
+    int classIndex;
+    EffectMaterialEntry *classEntry;
     float scale;
     float ratio;
 
@@ -102,64 +104,64 @@ void func_L00_003BAC30(EffectObject *self)
     case 0:
     case 1:
         state->intensity += (0.6f - state->intensity) * 0.125f;
-        result = func_L00_003BB1F8(self);
-        if (result) {
+        hitTarget = MoveSparkProjectile(self);
+        if (hitTarget) {
             qcopy(vector, state);
-            func_00282F20(vector, vector, 0.033333335f);
-            material = D_00139568.index;
-            entry = D_L00_00262570 + material;
-            scale = entry->scale;
-            func_002A8C00(&packet, self, 0x210000, scale, vector);
+            vec_scale_to_length(vector, vector, 0.033333335f);
+            classIndex = gItemSlotToRecord.index;
+            classEntry = gWeaponTable_L00 + classIndex;
+            scale = classEntry->scale;
+            make_hit_descriptor(&packet, self, 0x210000, scale, vector);
             packet.field_18 = 1;
             packet.field_19 = 3;
             packet.id = self->id;
-            func_002A8E20(result, &packet);
-            func_0032D758(result, 0x3E, self->f_B8);
+            QueueMobyImpact(hitTarget, &packet);
+            StartAttachedEffect(hitTarget, 0x3E, self->f_B8);
         }
-        func_002AF580(self->position, 6.2831855f, self->f_C0, 6.2831855f, 15.0f, 0.0f,
-                      &count, hits, 15, 0, 0.0f, 0, &angles);
-        for (i = 0; i < count; i++) {
-            if (state->f54 < 15 && func_L00_0037DD80(self, hits[i])) {
-                func_L00_0037DD18(self, hits[i], 120);
-                func_L00_003BB8B8(self, hits[i], 10);
-                func_002E5CF8(0, 0, self);
+        SelectBestTargetInCone(self->position, 6.2831855f, self->f_C0, 6.2831855f, 15.0f, 0.0f,
+                      &hitCount, hits, 15, 0, 0.0f, 0, &angles);
+        for (i = 0; i < hitCount; i++) {
+            if (state->f54 < 15 && IsOwnerKeyPairFree(self, hits[i])) {
+                KeyOwnerTableInsert(self, hits[i], 120);
+                SpawnOrbitingSparkRecord(self, hits[i], 10);
+                PlayMobySound(0, 0, self);
             }
         }
-        if (func_00282948(&state->timer)) {
+        if (FastFloatHelperD(&state->timer)) {
             self->phase = 2;
             state->timer = 40;
         }
         break;
     case 2:
-        func_L00_003BB1F8(self);
-        ratio = func_00283CE0(state->timer) / func_00283CE0(40);
+        MoveSparkProjectile(self);
+        ratio = IntToFloat(state->timer) / IntToFloat(40);
         state->intensity = ratio * 0.5900000333786011f + 0.01f;
-        self->position[0] += func_002A7878(-0.1f, 0.1f);
-        self->position[1] += func_002A7878(-0.1f, 0.1f);
-        self->position[2] += func_002A7878(-0.1f, 0.1f);
-        func_00282C88(vector);
-        func_002C2210(self->position, 0.15f, 1.5f, 60, 0x4FFF0000, 0, 2, vector, 0.0013888889225199819f, 1);
-        func_002C2210(self->position, 0.125f, 1.25f, 60, 0x7FFFFFFF, 0, 2, vector, 0.0013888889225199819f, 1);
-        if (func_00282948(&state->timer))
+        self->position[0] += RandomFloatRange(-0.1f, 0.1f);
+        self->position[1] += RandomFloatRange(-0.1f, 0.1f);
+        self->position[2] += RandomFloatRange(-0.1f, 0.1f);
+        ClearVector128(vector);
+        SpawnGroundEffectParticle(self->position, 0.15f, 1.5f, 60, 0x4FFF0000, 0, 2, vector, 0.0013888889225199819f, 1);
+        SpawnGroundEffectParticle(self->position, 0.125f, 1.25f, 60, 0x7FFFFFFF, 0, 2, vector, 0.0013888889225199819f, 1);
+        if (FastFloatHelperD(&state->timer))
             self->phase = 3;
         break;
     case 3:
         if (state->f54 == 0 && state->f58 == 0) {
-            func_002FE8D8(self->position, &packet);
-            func_L00_003BD510(self->position, &packet, 6, 0x72FF);
-            func_L00_003BD510(self->position, &packet, 6, 0xFF0000);
-            func_002FEE50(state->f50);
-            func_L00_0037E0C0(self);
-            handle = state->light_index;
+            GetObjectFacingDirection(self->position, &packet);
+            SpawnSparkBurst_L00_3(self->position, &packet, 6, 0x72FF);
+            SpawnSparkBurst_L00_3(self->position, &packet, 6, 0xFF0000);
+            ClearEntryFlag(state->f50);
+            ClearOwnerKeyEntries(self);
+            lightHandle = state->light_index;
             D_L00_001AFDA0--;
-            if (handle != -1)
-                func_00291450(handle);
-            func_0029F338(self);
+            if (lightHandle != -1)
+                FreePointLight(lightHandle);
+            MarkMobySpawned(self);
             return;
         }
         break;
     }
-    func_L00_003BBB68(self);
-    func_L00_003BCC10(self);
-    ref_L00_003BAC30_00(func_L00_003BB668, self);
+    UpdateEffectSparkSlots(self);
+    UpdateOrbitSparks(self);
+    ref_L00_003BAC30_00(DrawSparkProjectile, self);
 }

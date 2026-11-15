@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned int ti_word __attribute__((mode(TI)));
 
@@ -35,90 +36,97 @@ extern void func_L04_003A02A0(void *, int);
 extern void func_0029FCC0(void *, int, void *);
 
 
+/* Sets the object to ease toward a target height and resets its blend to 0.2. */
 void func_L08_00329EC0(float value, float *object) {
     object[29] = 0.2f;
     object[28] = value - object[6];
 }
 
-f32 func_L08_0032EA60(char *a0, char *a1, char *a2, f32 f0, f32 f1, f32 f2, f32 f3) {
-    f32 out[4];
-    f32 t[4];
-    f32 r;
+/* Measures how far a point is from one corner of a box and keeps the larger of that and the running minimum. */
+f32 func_L08_0032EA60(char *point, char *basis, char *origin, f32 minimum, f32 scaleX, f32 scaleY, f32 scaleZ) {
+    f32 corner[4];
+    f32 scaled[4];
+    f32 distance;
 
-    func_2F9E60(t, a1, f1);
-    func_2F9DF0(out, a2, t);
-    func_2F9E60(t, a1 + 0x10, f2);
-    func_2F9DF0(out, out, t);
-    func_2F9E60(t, a1 + 0x20, f3);
-    func_2F9DF0(out, out, t);
-    r = func_2F9FD0(a0, out);
-    if (f0 < r) f0 = r;
-    return f0;
+    func_2F9E60(scaled, basis, scaleX);
+    func_2F9DF0(corner, origin, scaled);
+    func_2F9E60(scaled, basis + 0x10, scaleY);
+    func_2F9DF0(corner, corner, scaled);
+    func_2F9E60(scaled, basis + 0x20, scaleZ);
+    func_2F9DF0(corner, corner, scaled);
+    distance = func_2F9FD0(point, corner);
+    if (minimum < distance) minimum = distance;
+    return minimum;
 }
 
+/* Checks a point against all 27 corner, edge and face samples of a box and keeps the largest result. */
 float func_L08_0032EB48(ti_word *object, int index, float minimum) {
     char *entry;
-    float a, b, c;
+    float stepX, stepY, stepZ;
 
     if (index == -1) return minimum;
     entry = (char *)D_L08_001B2ACC + index * 128;
-    for (c = -1.0f; c <= 1.0f; c += 1.0f)
-        for (b = -1.0f; b <= 1.0f; b += 1.0f)
-            for (a = -1.0f; a <= 1.0f; a += 1.0f)
-                minimum = func_L08_0032EA60((char *)object, entry, entry + 0x30, minimum, a, b, c);
+    for (stepZ = -1.0f; stepZ <= 1.0f; stepZ += 1.0f)
+        for (stepY = -1.0f; stepY <= 1.0f; stepY += 1.0f)
+            for (stepX = -1.0f; stepX <= 1.0f; stepX += 1.0f)
+                minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, stepX, stepY, stepZ);
     return minimum;
 }
 
+/* Checks a point against the six face centres of a box and keeps the largest result. */
 float func_L08_0032EC38(ti_word *object, int index, float minimum) {
     char *entry;
-    float x;
+    float sign;
 
     if (index == -1) return minimum;
     entry = (char *)D_L08_001B2AD4 + index * 128;
-    for (x = -1.0f; x <= 1.0f; x += 2.0f)
-        minimum = func_L08_0032EA60((char *)object, entry, entry + 0x30, minimum, 0.0f, 0.0f, x);
-    for (x = -1.0f; x <= 1.0f; x += 2.0f)
-        minimum = func_L08_0032EA60((char *)object, entry, entry + 0x30, minimum, 0.0f, x, 0.0f);
-    for (x = -1.0f; x <= 1.0f; x += 2.0f)
-        minimum = func_L08_0032EA60((char *)object, entry, entry + 0x30, minimum, x, 0.0f, 0.0f);
+    for (sign = -1.0f; sign <= 1.0f; sign += 2.0f)
+        minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, 0.0f, 0.0f, sign);
+    for (sign = -1.0f; sign <= 1.0f; sign += 2.0f)
+        minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, 0.0f, sign, 0.0f);
+    for (sign = -1.0f; sign <= 1.0f; sign += 2.0f)
+        minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, sign, 0.0f, 0.0f);
     return minimum;
 }
 
+/* Checks a point against the edge samples of a box and keeps the largest result. */
 float func_L08_0032ED98(ti_word *object, int index, float minimum) {
     char *entry;
-    float a, b, c;
+    float stepX, stepY, stepZ;
 
     if (index == -1) return minimum;
     entry = (char *)D_L08_001B2ADC + index * 128;
-    for (c = -1.0f; c <= 1.0f; c += 1.0f) {
-        for (a = -1.0f; a <= 1.0f; a += 2.0f)
-            minimum = func_L08_0032EA60((char *)object, entry, entry + 0x30, minimum, 0.0f, a, c);
-        for (b = -1.0f; b <= 1.0f; b += 2.0f)
-            minimum = func_L08_0032EA60((char *)object, entry, entry + 0x30, minimum, b, 0.0f, c);
+    for (stepZ = -1.0f; stepZ <= 1.0f; stepZ += 1.0f) {
+        for (stepX = -1.0f; stepX <= 1.0f; stepX += 2.0f)
+            minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, 0.0f, stepX, stepZ);
+        for (stepY = -1.0f; stepY <= 1.0f; stepY += 2.0f)
+            minimum = MaxDistanceToBoxCorner((char *)object, entry, entry + 0x30, minimum, stepY, 0.0f, stepZ);
     }
     return minimum;
 }
 
+/* Checks a point against a list of planes and keeps the largest result. */
 float func_L08_0032EED8(ti_word *object, int index, float minimum) {
-    int *list;
+    int *planeList;
     int i;
     if (index == -1) return minimum;
-    list = D_L08_001FE7C0[index];
+    planeList = D_L08_001FE7C0[index];
 
-    for (i = 0; i < *list; i++) {
-        float value = func_00282E80((char *)(list + 4) + i * 0x10, object);
-        if (minimum < value) minimum = value;
+    for (i = 0; i < *planeList; i++) {
+        float planeValue = vec_distance_xy((char *)(planeList + 4) + i * 0x10, object);
+        if (minimum < planeValue) minimum = planeValue;
     }
     return minimum;
 }
 
-float func_L08_0032EF80(ti_word *input, int initial, int first, int second, int third) {
-    ti_word value = *input;
-    float result;
-    result = func_L08_0032EED8(&value, initial, 0.0f);
-    result = func_L08_0032EB48(&value, first, result);
-    result = func_L08_0032EC38(&value, second, result);
-    return func_L08_0032ED98(&value, third, result);
+/* Works out how deep a point is inside a combination of volumes, using the largest of the four checks. */
+float func_L08_0032EF80(ti_word *point, int planeListIndex, int cornerBoxIndex, int faceBoxIndex, int edgeBoxIndex) {
+    ti_word pointCopy = *point;
+    float depth;
+    depth = MaxDepthInPlaneList(&pointCopy, planeListIndex, 0.0f);
+    depth = MaxDepthInBoxAllSamples(&pointCopy, cornerBoxIndex, depth);
+    depth = MaxDepthInBoxFaceSamples(&pointCopy, faceBoxIndex, depth);
+    return MaxDepthInBoxEdgeSamples(&pointCopy, edgeBoxIndex, depth);
 }
 
 /* func_L08_0032F898 is defined in L08_0032F898.c. */
@@ -131,18 +139,21 @@ float func_L08_0032EF80(ti_word *input, int initial, int first, int second, int 
 
 /* func_L08_003CFE68 is in the sibling file L08_002D90C8-g8.c (it uses $gp addresses). */
 
+/* Starts the shared effect with the level effect table. */
 void func_L08_003CFFE8(void) {
-    func_L04_003A21F8(D_L08_002A0D00, 7);
+    render_water_grids(D_L08_002A0D00, 7);
 }
 
+/* Stops the shared effect with the level effect table. */
 void func_L08_003D0010(void) {
-    func_L04_003A02A0(D_L08_002A0D00, 7);
+    StartRipplePatch(D_L08_002A0D00, 7);
 }
 
+/* Moves the object's two attached parts to the object. */
 void func_L08_003D0040(void *object) {
-    void **parts = *(void ***)((char *)object + 0x68);
-    if (parts[0]) func_0029FCC0(object, 0, (char *)parts[0] + 0x10);
-    if (parts[1]) func_0029FCC0(object, 1, (char *)parts[1] + 0x10);
+    void **partList = *(void ***)((char *)object + 0x68);
+    if (partList[0]) TransformMobyJointToWorld(object, 0, (char *)partList[0] + 0x10);
+    if (partList[1]) TransformMobyJointToWorld(object, 1, (char *)partList[1] + 0x10);
 }
 
 /* func_L08_003D00C8 is defined in L08_003D00C8-g8.c. */
@@ -169,30 +180,31 @@ extern void func_347A38(void *, int, int, f32, f32, int);
 /* five draws of a random point around the object: a random angle and radius,
    the object's own position added, and the height the driver reads as the
    third component; each point goes to func_347A38 */
-void func_L08_003D7E68(void *arg0) {
-    f32 vec[4];
-    f32 t;
-    f32 f20, f21, f22, f23;
-    void *s3;
-    int count;
+/* Throws out several small sparks from random points around the object. */
+void func_L08_003D7E68(void *object) {
+    f32 point[4];
+    f32 yOffset;
+    f32 angle, radius, speedMax, speedMin;
+    void *state;
+    int lifetime;
     int i;
 
-    s3 = *(void **)((char *)arg0 + 0x68);
+    state = *(void **)((char *)object + 0x68);
     i = 4;
     do {
         i--;
-        f20 = func_3279B8();
-        f21 = func_3278F0(0.0f, 0.8f);
-        f23 = func_3278F0(0.0f, 3.5f);
-        f22 = func_3278F0(3.5f, 8.7f);
-        count = func_327898(100, 180);
-        vec[0] = func_2FA3C8(f20) * f21;
-        t = func_2FA3E0(f20) * f21;
-        vec[2] = 0.0f;
-        vec[1] = t;
-        func_2F9DF0(vec, vec, (f32 *)((char *)arg0 + 0x10));
-        vec[2] = *(f32 *)((char *)s3 + 0x434) + 0.025f;
-        func_347A38(vec, 0x38002028, 0x2020, f23, f22, count);
+        angle = func_3279B8();
+        radius = func_3278F0(0.0f, 0.8f);
+        speedMin = func_3278F0(0.0f, 3.5f);
+        speedMax = func_3278F0(3.5f, 8.7f);
+        lifetime = func_327898(100, 180);
+        point[0] = func_2FA3C8(angle) * radius;
+        yOffset = func_2FA3E0(angle) * radius;
+        point[2] = 0.0f;
+        point[1] = yOffset;
+        func_2F9DF0(point, point, (f32 *)((char *)object + 0x10));
+        point[2] = *(f32 *)((char *)state + 0x434) + 0.025f;
+        func_347A38(point, 0x38002028, 0x2020, speedMin, speedMax, lifetime);
     } while (i >= 0);
 }
 

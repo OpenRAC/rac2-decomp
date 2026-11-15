@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -24,123 +25,131 @@ typedef struct {
 extern Ent *D_L08_001B29DC __attribute__((sda));
 
 /* handle is valid and the entry's class byte is a live one */
-s32 func_L08_003D8918(s32 a0)
+/* Tells whether the linked object is running (or when there is no link, says yes). */
+s32 func_L08_003D8918(s32 mobyIndex)
 {
-    Ent *t;
-    s32 i;
+    Ent *mobyTable;
+    s32 byteOffset;
 
-    if (a0 != -1) {
-        t = D_L08_001B29DC;
-        i = a0 << 8;
-        return *(u8 *)((u8 *)t + i + 0x20) >= 3;
+    if (mobyIndex != -1) {
+        mobyTable = D_L08_001B29DC;
+        byteOffset = mobyIndex << 8;
+        return *(u8 *)((u8 *)mobyTable + byteOffset + 0x20) >= 3;
     }
     return 1;
 }
 
 /* handle is valid and the entry's class byte is a live one */
-s32 func_L08_004229C8(s32 a0)
+/* Tells whether the linked object is running (or when there is no link, says yes). */
+s32 func_L08_004229C8(s32 mobyIndex)
 {
-    Ent *t;
-    s32 i;
+    Ent *mobyTable;
+    s32 byteOffset;
 
-    if (a0 != -1) {
-        t = D_L08_001B29DC;
-        i = a0 << 8;
-        return *(u8 *)((u8 *)t + i + 0x20) >= 3;
+    if (mobyIndex != -1) {
+        mobyTable = D_L08_001B29DC;
+        byteOffset = mobyIndex << 8;
+        return *(u8 *)((u8 *)mobyTable + byteOffset + 0x20) >= 3;
     }
     return 1;
 }
 
 /* the entry's two faces are either unset or already gone */
-s32 func_L08_003D8948(s32 a0)
+/* Tells whether the linked object is gone (or when there is no link, says yes). */
+s32 func_L08_003D8948(s32 mobyIndex)
 {
-    Ent *p;
-    s32 r;
+    Ent *linked;
+    s32 gone;
 
-    if (a0 != -1) {
-        p = D_L08_001B29DC + a0;
-        r = 0;
-        if (p == 0 || p->f20 == 0xFE || p->f20 == 0xFD) r = 1;
-        return r;
+    if (mobyIndex != -1) {
+        linked = D_L08_001B29DC + mobyIndex;
+        gone = 0;
+        if (linked == 0 || linked->f20 == 0xFE || linked->f20 == 0xFD) gone = 1;
+        return gone;
     }
     return 1;
 }
 
 /* the entry's two faces are either unset or already gone */
-s32 func_L08_003D8990(s32 a0)
+/* Tells whether the linked object is gone (or when there is no link, says yes). */
+s32 func_L08_003D8990(s32 mobyIndex)
 {
-    Ent *p;
-    s32 r;
+    Ent *linked;
+    s32 gone;
 
-    if (a0 != -1) {
-        p = D_L08_001B29DC + a0;
-        r = 0;
-        if (p == 0 || p->f20 == 0xFE || p->f20 == 0xFD) r = 1;
-        return r;
+    if (mobyIndex != -1) {
+        linked = D_L08_001B29DC + mobyIndex;
+        gone = 0;
+        if (linked == 0 || linked->f20 == 0xFE || linked->f20 == 0xFD) gone = 1;
+        return gone;
     }
     return 1;
 }
 
 /* the entry's two faces are either unset or already gone */
-s32 func_L08_004229F8(s32 a0)
+/* Tells whether the linked object is gone (or when there is no link, says yes). */
+s32 func_L08_004229F8(s32 mobyIndex)
 {
-    Ent *p;
-    s32 r;
+    Ent *linked;
+    s32 gone;
 
-    if (a0 != -1) {
-        p = D_L08_001B29DC + a0;
-        r = 0;
-        if (p == 0 || p->f20 == 0xFE || p->f20 == 0xFD) r = 1;
-        return r;
+    if (mobyIndex != -1) {
+        linked = D_L08_001B29DC + mobyIndex;
+        gone = 0;
+        if (linked == 0 || linked->f20 == 0xFE || linked->f20 == 0xFD) gone = 1;
+        return gone;
     }
     return 1;
 }
 
 /* the entry's two faces are either unset or already gone */
-s32 func_L08_00422A40(s32 a0)
+/* Tells whether the linked object is gone (or when there is no link, says yes). */
+s32 func_L08_00422A40(s32 mobyIndex)
 {
-    Ent *p;
-    s32 r;
+    Ent *linked;
+    s32 gone;
 
-    if (a0 != -1) {
-        p = D_L08_001B29DC + a0;
-        r = 0;
-        if (p == 0 || p->f20 == 0xFE || p->f20 == 0xFD) r = 1;
-        return r;
+    if (mobyIndex != -1) {
+        linked = D_L08_001B29DC + mobyIndex;
+        gone = 0;
+        if (linked == 0 || linked->f20 == 0xFE || linked->f20 == 0xFD) gone = 1;
+        return gone;
     }
     return 1;
 }
 
 /* the entry is a live class or an unset one */
-s32 func_L08_003D89D8(s32 a0)
+/* Tells whether the linked object is running or gone (or when there is no link, says yes). */
+s32 func_L08_003D89D8(s32 mobyIndex)
 {
-    Ent *p;
-    u32 b;
-    s32 r;
+    Ent *linked;
+    u32 stateByte;
+    s32 ready;
 
-    if (a0 != -1) {
-        p = D_L08_001B29DC + a0;
-        b = p->f20;
-        r = 0;
-        if (b >= 3u || p == 0 || b == 0xFE || b == 0xFD) r = 1;
-        return r;
+    if (mobyIndex != -1) {
+        linked = D_L08_001B29DC + mobyIndex;
+        stateByte = linked->f20;
+        ready = 0;
+        if (stateByte >= 3u || linked == 0 || stateByte == 0xFE || stateByte == 0xFD) ready = 1;
+        return ready;
     }
     return 1;
 }
 
 /* the entry is a live class or an unset one */
-s32 func_L08_00422A88(s32 a0)
+/* Tells whether the linked object is running or gone (or when there is no link, says yes). */
+s32 func_L08_00422A88(s32 mobyIndex)
 {
-    Ent *p;
-    u32 b;
-    s32 r;
+    Ent *linked;
+    u32 stateByte;
+    s32 ready;
 
-    if (a0 != -1) {
-        p = D_L08_001B29DC + a0;
-        b = p->f20;
-        r = 0;
-        if (b >= 3u || p == 0 || b == 0xFE || b == 0xFD) r = 1;
-        return r;
+    if (mobyIndex != -1) {
+        linked = D_L08_001B29DC + mobyIndex;
+        stateByte = linked->f20;
+        ready = 0;
+        if (stateByte >= 3u || linked == 0 || stateByte == 0xFE || stateByte == 0xFD) ready = 1;
+        return ready;
     }
     return 1;
 }
@@ -162,21 +171,22 @@ typedef struct {
     s32 tail[2];
 } QueryWork;
 
-float func_L08_003F76C0(void *arg0) {
-    QueryWork work;
-    float temp_f20;
-    s32 temp_s1;
+/* Looks up the ground height under the object from the level height map, giving -1 when the spot is off the map. */
+float func_L08_003F76C0(void *moby) {
+    QueryWork query;
+    float groundHeight;
+    s32 positionAddr;
 
-    temp_s1 = *(s32 *)((signed char *)arg0 + 0x68) + 0x10;
-    ref_L08_003F76C0_00(&work, (s32 *)temp_s1, ref_L08_003F76C0_05);
-    temp_f20 = ref_L08_003F76C0_01(&work, ref_L08_003F76C0_05 + 0x230);
-    ref_L08_003F76C0_02((s32 *)temp_s1, &work.x, &work.y);
-    if (work.x < 0 ||
-        work.x >= D_001A7340 - 0x10 ||
-        work.y < 0 ||
-        work.y >= D_001A7344[0] - 8 ||
-        !(temp_f20 > 0.0f) ||
-        ref_L08_003F76C0_03(-1, (u16)work.x, (u16)work.y, 0x10, 8, 0, &ref_L08_003F76C0_04) == -1) {
+    positionAddr = *(s32 *)((signed char *)moby + 0x68) + 0x10;
+    ref_L08_003F76C0_00(&query, (s32 *)positionAddr, ref_L08_003F76C0_05);
+    groundHeight = ref_L08_003F76C0_01(&query, ref_L08_003F76C0_05 + 0x230);
+    ref_L08_003F76C0_02((s32 *)positionAddr, &query.x, &query.y);
+    if (query.x < 0 ||
+        query.x >= gScreenWidth - 0x10 ||
+        query.y < 0 ||
+        query.y >= gScreenHeight[0] - 8 ||
+        !(groundHeight > 0.0f) ||
+        ref_L08_003F76C0_03(-1, (u16)query.x, (u16)query.y, 0x10, 8, 0, &ref_L08_003F76C0_04) == -1) {
         ref_L08_003F76C0_04 = -1.0f;
     }
     return ref_L08_003F76C0_04;

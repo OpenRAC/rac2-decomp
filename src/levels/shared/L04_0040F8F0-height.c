@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef short s16;
 
@@ -33,14 +34,14 @@ void func_L04_00412C58(void *object, HeightState *state, float height, float bas
     }
 
     if (margin + base < height) {
-        if (D_001A79F0[0] == 4 && state->f274 != 0 &&
+        if (gCurrentMapIndex[0] == 4 && state->f274 != 0 &&
             state->f314 == -1 && state->animFrame >= 476) {
             t = state->f27C * 9.999999f;
             if (t > 1.0f)
                 t = 1.0f;
             else if (t < 0.0f)
                 t = 0.0f;
-            if (D_L04_001A8FE4[0] >= 2)
+            if (gCurrentLap[0] >= 2)
                 extra = t * 7.0f + 3.5f;
             else
                 extra = t * 3.0f + 1.5f;

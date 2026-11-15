@@ -21,9 +21,9 @@ extern void func_002B0A18(int, int);
 /* Once the level's mode word reaches 6 and the timer at D_L01_001AEC38 has run out, raises the
    one-shot flag and starts the sequence (mode 2 first rearms the timer to 0x42). A fresh
    object (state 0) clears its byte at +0x30. */
-void func_L01_00378A80(char *arg0) {
-    if (*(unsigned char *)(arg0 + 0x20) == 0)
-        *(unsigned char *)(arg0 + 0x30) = 0xFF;
+void func_L01_00378A80(char *effectObject) {
+    if (*(unsigned char *)(effectObject + 0x20) == 0)
+        *(unsigned char *)(effectObject + 0x30) = 0xFF;
     if (D_L01_001B2088 == 2)
         D_L01_001AEC38 = 0x42;
     if (D_L01_001B2088 < 6)
@@ -33,7 +33,7 @@ void func_L01_00378A80(char *arg0) {
     if (D_001A7A6F != 0)
         return;
     D_001A7A6F = 1;
-    func_002E5E58(1, 0, 0);
-    func_002B0A18(0x1233, -1);
+    PlaySoundFromGlobalBank(1, 0, 0);
+    SetEntryValueByIndex(0x1233, -1);
     D_L01_001A907C = 1;
 }

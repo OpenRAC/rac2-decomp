@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int Q128 __attribute__((mode(TI)));
 
 typedef struct {
@@ -23,35 +24,36 @@ extern void func_L00_00428588(char *);
 extern void ref_L00_00428F00_00(char *); /* func_L00_00428EB0 in most levels */
 extern void func_L00_002DA1E0(char *, float);
 
-void func_L00_00428F00(char *o)
+/* Updates the swingshot camera. If the hero grabs a different node, it saves the old view and restarts the camera setup. */
+void func_L00_00428F00(char *camera)
 {
-    int *t = (int *)(*(char **)(o + 0x70) + 0xB8);
-    int st = D_00189E20.state;
+    int *tracking = (int *)(*(char **)(camera + 0x70) + 0xB8);
+    int heroState = gHeroState.state;
     char *pos;
-    int x, y;
+    int trackedId, heroTargetId;
 
-    if (st == 0x2B) {
-        x = t[2];
-        pos = o + 0x30;
-        y = D_00189E20.fAD4;
+    if (heroState == 0x2B) {
+        trackedId = tracking[2];
+        pos = camera + 0x30;
+        heroTargetId = gHeroState.fAD4;
     } else {
-        pos = o + 0x30;
-        if ((unsigned int)(st - 0x23) >= 3)
+        pos = camera + 0x30;
+        if ((unsigned int)(heroState - 0x23) >= 3)
             goto done;
-        x = t[2];
-        y = D_00189E20.fAA4;
+        trackedId = tracking[2];
+        heroTargetId = gHeroState.fAA4;
     }
-    if (x != y) {
-        char *p = D_L00_001B8C80.dst;
-        *(Q128 *)(p + 0x30) = *(Q128 *)pos;
-        *(Q128 *)p = *(Q128 *)o;
-        *(Q128 *)(p + 0x10) = *(Q128 *)(o + 0x10);
-        *(Q128 *)(p + 0x20) = *(Q128 *)(o + 0x20);
-        func_L00_00428588(o);
+    if (trackedId != heroTargetId) {
+        char *cameraDst = D_L00_001B8C80.dst;
+        *(Q128 *)(cameraDst + 0x30) = *(Q128 *)pos;
+        *(Q128 *)cameraDst = *(Q128 *)camera;
+        *(Q128 *)(cameraDst + 0x10) = *(Q128 *)(camera + 0x10);
+        *(Q128 *)(cameraDst + 0x20) = *(Q128 *)(camera + 0x20);
+        InitSwingshotCamera(camera);
         D_L00_001B8C80.f314 = 0x2D;
     }
 done:
-    ref_L00_00428F00_00(o);
-    func_L00_002DA1E0(pos, 0.5f);
-    *(int *)(*(char **)(o + 0x70) + 0x80) = 0;
+    ref_L00_00428F00_00(camera);
+    ResolveCameraMovementCollisions(pos, 0.5f);
+    *(int *)(*(char **)(camera + 0x70) + 0x80) = 0;
 }

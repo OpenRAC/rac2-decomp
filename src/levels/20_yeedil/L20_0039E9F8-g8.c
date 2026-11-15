@@ -19,6 +19,7 @@ extern int func_00282C30(int);
 extern void func_00282C90(char *);
 extern void func_002830C0(char *, char *, char *);
 
+/* Swings the object back and forth along an arc around its anchor, reversing at each end. */
 void func_L20_0039E9F8(char *obj) {
     char *state = FLD(obj, char *, 0x68);
     char *entry;
@@ -32,24 +33,24 @@ void func_L20_0039E9F8(char *obj) {
     spin = D_L20_001AED0C * 0.016666668f;
     target = FLD(entry, float, 0x78);
     if (FLD(state, int, 0x190) < 0) {
-        target = func_00283B98(target, 3.1415927f);
+        target = FastAddRotations(target, 3.1415927f);
     }
-    r = func_00283C80(FLD(obj, float, 0xF8), target);
+    r = FastDiffRots(FLD(obj, float, 0xF8), target);
     if (r > 0.017453294f) {
-        func_002AAA00(obj + 0xF8, target, 0.00087266474f, 0.00087266474f, 0.052359886f,
+        ApproachTargetWithDirectionMode(obj + 0xF8, target, 0.00087266474f, 0.00087266474f, 0.052359886f,
                       state + 0x19C, 0);
     } else {
-        func_002AA548(state + 0x194, state + 0x198, (float)FLD(state, int, 0x190), turn,
+        StepValueTowardTarget(state + 0x194, state + 0x198, (float)FLD(state, int, 0x190), turn,
                       turn, spin);
         r = FLD(state, float, 0x194) * (float)FLD(state, int, 0x190);
         if (r > 0.0f) {
-            target = func_00282C48(FLD(state, float, 0x194));
-            if ((float)func_00282C30(FLD(state, int, 0x190)) <= target) {
+            target = FloatAbs(FLD(state, float, 0x194));
+            if ((float)subtract_integer_with_clamp(FLD(state, int, 0x190)) <= target) {
                 FLD(state, int, 0x190) = -FLD(state, int, 0x190);
             }
         }
     }
-    func_00282C90(obj + 0x10);
+    StoreVectorHelper(obj + 0x10);
     FLD(obj, float, 0x10) = FLD(state, float, 0x194);
-    func_002830C0(obj + 0x10, obj + 0x10, D_L20_001B308C + (FLD(state, int, 0x84) << 7));
+    transform_vector(obj + 0x10, obj + 0x10, D_L20_001B308C + (FLD(state, int, 0x84) << 7));
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Menu list update: shows the widgets for the current mode, places the five fixed widgets and
    the list rows relative to the menu origin, greys out disabled rows, then steps the selection
@@ -39,6 +40,7 @@ static inline void WrapLow(int *index, int last)
 #define MODE (*(int *)(m + 0x44C))
 #define ORG (*(float **)(m + 0x434))
 
+/* Shows the right parts of the choice list for the mode, places the rows and moves the selection up or down past disabled rows. */
 int func_003489E8(u8 *m, int pad)
 {
     u8 *w98 = m + 0x98;
@@ -47,95 +49,95 @@ int func_003489E8(u8 *m, int pad)
     u8 *w17C = m + 0x17C;
     u8 *w1C8 = m + 0x1C8;
     u8 *a, *b, *c;
-    float *p;
+    float *pos;
     EnabledSet *flags;
-    int step, i = 0, v = 0, start = 0, lim = 0;
+    int step, i = 0, nextIndex = 0, startIndex = 0, lastIndex = 0;
 
-    func_00335E68(m, MODE == 0);
-    func_00335E68(w98, MODE == 0);
-    func_00335E68(w4C, MODE == 0);
-    func_00335E68(m + 0xE4, MODE == 0);
-    func_00335E68(w130, MODE == 0);
-    func_00335E68(w17C, MODE == 1);
-    func_00335E68(w1C8, MODE == 1);
-    func_003363C0(w17C, D_001AE5EC);
-    func_003363C0(w1C8, D_001AE5EC);
+    SetFlagValue(m, MODE == 0);
+    SetFlagValue(w98, MODE == 0);
+    SetFlagValue(w4C, MODE == 0);
+    SetFlagValue(m + 0xE4, MODE == 0);
+    SetFlagValue(w130, MODE == 0);
+    SetFlagValue(w17C, MODE == 1);
+    SetFlagValue(w1C8, MODE == 1);
+    SetFloatAt38(w17C, D_001AE5EC);
+    SetFloatAt38(w1C8, D_001AE5EC);
 
     if (MODE == 0 && *(int *)(m + 0x448) != 0) {
-        func_003363C0(m, 1.0f);
-        func_003363C0(m + 0x98, 1.0f);
-        func_003363C0(m + 0x4C, 1.0f);
-        func_003363C0(m + 0x130, 1.0f);
+        SetFloatAt38(m, 1.0f);
+        SetFloatAt38(m + 0x98, 1.0f);
+        SetFloatAt38(m + 0x4C, 1.0f);
+        SetFloatAt38(m + 0x130, 1.0f);
         c = m + 0x98;
         b = m + 0x4C;
         a = m + 0x130;
         ORG[1] = 170.0f;
     } else {
-        func_003363C0(m, 0.0f);
-        func_003363C0(m + 0x98, 0.0f);
-        func_003363C0(m + 0x4C, 0.0f);
-        func_003363C0(m + 0x130, 0.0f);
+        SetFloatAt38(m, 0.0f);
+        SetFloatAt38(m + 0x98, 0.0f);
+        SetFloatAt38(m + 0x4C, 0.0f);
+        SetFloatAt38(m + 0x130, 0.0f);
         c = m + 0x98;
         b = m + 0x4C;
         a = m + 0x130;
         ORG[1] = 190.0f;
     }
 
-    p = ((float *)func_00335E10(m));
-    p[0] = D_001AE760[0] + ORG[0];
-    p[1] = D_001AE760[1] + ORG[1];
-    p = ((float *)func_00335E10(a));
-    p[0] = D_001AE760[2] + ORG[0];
-    p[1] = D_001AE760[3] + ORG[1];
-    p = ((float *)func_00335E10(b));
-    p[0] = D_001AE760[4] + ORG[0];
-    p[1] = D_001AE760[5] + ORG[1];
-    p = ((float *)func_00335E10(c));
-    p[0] = D_001AE760[6] + ORG[0];
-    p[1] = D_001AE760[7] + ORG[1];
-    p = ((float *)func_00335E10(m + 0xE4));
-    p[0] = D_001AE760[8] + ORG[0];
-    p[1] = D_001AE760[9] + ORG[1];
+    pos = ((float *)GetFirstField(m));
+    pos[0] = D_001AE760[0] + ORG[0];
+    pos[1] = D_001AE760[1] + ORG[1];
+    pos = ((float *)GetFirstField(a));
+    pos[0] = D_001AE760[2] + ORG[0];
+    pos[1] = D_001AE760[3] + ORG[1];
+    pos = ((float *)GetFirstField(b));
+    pos[0] = D_001AE760[4] + ORG[0];
+    pos[1] = D_001AE760[5] + ORG[1];
+    pos = ((float *)GetFirstField(c));
+    pos[0] = D_001AE760[6] + ORG[0];
+    pos[1] = D_001AE760[7] + ORG[1];
+    pos = ((float *)GetFirstField(m + 0xE4));
+    pos[0] = D_001AE760[8] + ORG[0];
+    pos[1] = D_001AE760[9] + ORG[1];
 
     for (i = 0; i < *(int *)(m + 0x444); i++) {
         u8 *row = m + 0x218 + i * 0x48;
 
-        p = ((float *)func_00335E10(row));
-        p[0] = ((float *)(*(int *)(m + 0x414) + i * 12))[0] + ORG[0];
-        p[1] = ((float *)(*(int *)(m + 0x414) + i * 12))[1] + ORG[1];
-        func_00335F88(row, ((float *)(*(int *)(m + 0x414) + i * 12))[2], 0.0f, 0.0f, 0.0f);
+        pos = ((float *)GetFirstField(row));
+        pos[0] = ((float *)(*(int *)(m + 0x414) + i * 12))[0] + ORG[0];
+        pos[1] = ((float *)(*(int *)(m + 0x414) + i * 12))[1] + ORG[1];
+        SetSecondFloat4(row, ((float *)(*(int *)(m + 0x414) + i * 12))[2], 0.0f, 0.0f, 0.0f);
         if (*(int *)(m + 0x418 + i * 4) != 0)
-            *((unsigned int *)func_00335E20(row)) = 0x80F0F0F0;
+            *((unsigned int *)GetFieldC(row)) = 0x80F0F0F0;
         else
-            *((unsigned int *)func_00335E20(row)) = 0x80808080;
+            *((unsigned int *)GetFieldC(row)) = 0x80808080;
     }
 
     step = 0;
     if (pad & 0x1000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         step = -1;
     } else if (pad & 0x4000) {
-        func_002E5E58(3, 0, 0);
+        PlaySoundFromGlobalBank(3, 0, 0);
         step = 1;
     }
     if (step != 0) {
-        start = *(int *)(m + 0x43C);
-        func_002A9588(0, 0, 1, 0, 1);
-        lim = *(int *)(m + 0x444) - 1;
+        startIndex = *(int *)(m + 0x43C);
+        PingPongBlendValues(0, 0, 1, 0, 1);
+        lastIndex = *(int *)(m + 0x444) - 1;
         flags = (EnabledSet *)(m + 0x418);
         do {
             int wrapped;
-            v = *(int *)(m + 0x43C) + step;
-            if (lim < v)
-                v = 0;
-            wrapped = v;
-            WrapLow(&wrapped, lim);
+            nextIndex = *(int *)(m + 0x43C) + step;
+            if (lastIndex < nextIndex)
+                nextIndex = 0;
+            wrapped = nextIndex;
+            WrapLow(&wrapped, lastIndex);
             *(int *)(m + 0x43C) = wrapped;
             if (flags->enabled[wrapped] != 0)
                 break;
-        } while (start != *(int *)(m + 0x43C));
+        } while (startIndex != *(int *)(m + 0x43C));
     }
-    func_003363C0(m + 0xE4, (float)*(int *)(m + 0x43C));
-    *((unsigned int *)func_00335E20(m + (*(int *)(m + 0x43C) * 0x48 + 0x218))) = 0x70FFFEED;
+    SetFloatAt38(m + 0xE4, (float)*(int *)(m + 0x43C));
+    *((unsigned int *)GetFieldC(m + (*(int *)(m + 0x43C) * 0x48 + 0x218))) = 0x70FFFEED;
     return *(int *)(m + 0x43C);
 }

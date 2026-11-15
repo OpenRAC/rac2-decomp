@@ -28,25 +28,26 @@ extern s32 ref_L04_0040ACC8_01 __attribute__((sda));
 extern s32 ref_L04_0040ACC8_02 __attribute__((sda));
 extern s32 ref_L04_0040ACC8_03 __attribute__((sda));
 
+/* Counts how often a player event happens in a row. Three times in a row sets a flag, and a long gap resets the count. */
 void func_L04_0040ACC8(void) {
-    s8 *temp_a0;
-    s32 temp_v0;
-    s32 temp_v1;
+    s8 *vars;
+    s32 newCount;
+    s32 eventFlag;
 
-    temp_a0 = *(s8 **)(ref_L04_0040ACC8_00 + 0x68);
-    if (*(s32 *)(temp_a0 + 0x744) < 5) {
-        temp_v1 = *(s32 *)(temp_a0 + 0x724);
+    vars = *(s8 **)(ref_L04_0040ACC8_00 + 0x68);
+    if (*(s32 *)(vars + 0x744) < 5) {
+        eventFlag = *(s32 *)(vars + 0x724);
         ref_L04_0040ACC8_01 = 1;
-        if (temp_v1 != 0) {
-            temp_v0 = ref_L04_0040ACC8_03 + 1;
-            ref_L04_0040ACC8_03 = temp_v0;
-            if (temp_v0 == 3) {
+        if (eventFlag != 0) {
+            newCount = ref_L04_0040ACC8_03 + 1;
+            ref_L04_0040ACC8_03 = newCount;
+            if (newCount == 3) {
                 ref_L04_0040ACC8_02 = 1;
             }
         }
     } else if (ref_L04_0040ACC8_03 < 4) {
         ref_L04_0040ACC8_03 = 0;
     }
-    *(s32 *)(temp_a0 + 0x724) = 0;
-    *(s32 *)(temp_a0 + 0x744) = 0;
+    *(s32 *)(vars + 0x724) = 0;
+    *(s32 *)(vars + 0x744) = 0;
 }

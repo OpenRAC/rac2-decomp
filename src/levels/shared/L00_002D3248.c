@@ -1,3 +1,4 @@
+#include "names.h"
 /* The resident block the level state lives in. */
 extern char D_00189E20[];
 
@@ -5,15 +6,15 @@ extern char D_00189E20[];
  * +0x1430 and +0x1434, the short argument at +0x1438, the byte at +0x143C, and the
  * third and fourth byte arguments spliced into the halfword at +0x143E as
  * (old & ~arg3) | arg2. */
-void func_L00_002D3248(short arg0, unsigned char arg1, unsigned char arg2, unsigned char arg3,
-                       float arg4, float arg5)
+void func_L00_002D3248(short count, unsigned char byteValue, unsigned char setBits, unsigned char clearBits,
+                       float clockA, float clockB)
 {
-    char *base = D_00189E20;
+    char *base = gHeroState;
     unsigned short old = *(unsigned short *)(base + 0x143E);
 
-    *(float *)(base + 0x1434) = arg5;
-    *(int *)(base + 0x1438) = arg0;
-    *(short *)(base + 0x143C) = arg1;
-    *(short *)(base + 0x143E) = (short)((old & ~arg3) | arg2);
-    *(float *)(base + 0x1430) = arg4;
+    *(float *)(base + 0x1434) = clockB;
+    *(int *)(base + 0x1438) = count;
+    *(short *)(base + 0x143C) = byteValue;
+    *(short *)(base + 0x143E) = (short)((old & ~clearBits) | setBits);
+    *(float *)(base + 0x1430) = clockA;
 }

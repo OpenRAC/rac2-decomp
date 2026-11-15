@@ -27,6 +27,7 @@ extern void func_00282CC0(void *, void *, void *);
 extern float func_00282DF0(void *);
 extern void func_00282D30(void *, void *, float);
 
+/* Pulls the chain points back to their set spacing in four passes, keeping them above the ground. */
 void func_L11_00437FD0(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
@@ -45,18 +46,18 @@ void func_L11_00437FD0(u8 *object)
             previous = (float *)(state + 0x1D0);
             for (i = 0; i < 12; i++) {
                 float length;
-                if (object[0x20] >= 3 && current[2] < func_L11_004417E8(*(void **)(object + 0xB8))[2]) {
-                    current[2] = func_L11_004417E8(*(void **)(object + 0xB8))[2];
+                if (object[0x20] >= 3 && current[2] < GetArenaCenterPoint(*(void **)(object + 0xB8))[2]) {
+                    current[2] = GetArenaCenterPoint(*(void **)(object + 0xB8))[2];
                     previous[2] = current[2];
                 }
                 next = current + 4;
-                func_00282CF0(delta, next, current);
+                FastVecSub(delta, next, current);
                 previous += 4;
-                distance = func_00282DF0(delta);
+                distance = FastVecLength(delta);
                 length = ((float *)(state + 0x2F0))[i];
-                func_00282D30(delta, delta, length / (distance + length) - 0.5f);
-                func_00282CF0(current, current, delta);
-                func_00282CC0(next, next, delta);
+                FastVecScale(delta, delta, length / (distance + length) - 0.5f);
+                FastVecSub(current, current, delta);
+                FastVecAdd(next, next, delta);
                 current = next;
             }
         } else {
@@ -66,18 +67,18 @@ void func_L11_00437FD0(u8 *object)
             previous = (float *)(state + 0x290);
             for (i = 11; i >= 0; i--) {
                 float length;
-                if (object[0x20] >= 3 && current[2] < func_L11_004417E8(*(void **)(object + 0xB8))[2]) {
-                    current[2] = func_L11_004417E8(*(void **)(object + 0xB8))[2];
+                if (object[0x20] >= 3 && current[2] < GetArenaCenterPoint(*(void **)(object + 0xB8))[2]) {
+                    current[2] = GetArenaCenterPoint(*(void **)(object + 0xB8))[2];
                     previous[2] = current[2];
                 }
                 next = current - 4;
-                func_00282CF0(delta, next, current);
+                FastVecSub(delta, next, current);
                 previous -= 4;
-                distance = func_00282DF0(delta);
+                distance = FastVecLength(delta);
                 length = ((float *)(state + 0x2F0))[i];
-                func_00282D30(delta, delta, length / (distance + length) - 0.5f);
-                func_00282CF0(current, current, delta);
-                func_00282CC0(next, next, delta);
+                FastVecScale(delta, delta, length / (distance + length) - 0.5f);
+                FastVecSub(current, current, delta);
+                FastVecAdd(next, next, delta);
                 current = next;
             }
         }

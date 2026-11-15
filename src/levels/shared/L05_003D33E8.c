@@ -83,32 +83,32 @@ void func_L05_003D33E8(char *obj)
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 137; j++) {
-            float speed = func_002A7878(0.5f, 4.0f);
+            float speed = RandomFloatRange(0.5f, 4.0f);
 
-            func_00282C88(D_L05_0023F920[*st][i][j]);
+            ClearVector128(D_L05_0023F920[*st][i][j]);
             D_L05_0024A460[*st][i][j] = speed;
         }
         /* This slot and the actor position do not contain the private index. */
         qcopy_nc(D_L05_0024D020[*st][i], position);
         D_L05_0024CFD0[*st][i] = 6;
-        D_L05_0024CF30[*st][i] = func_001163B0() % 128 + 128;
-        D_L05_0024CF80[*st][i] = func_001163B0() % 2 + 6;
+        D_L05_0024CF30[*st][i] = Rand() % 128 + 128;
+        D_L05_0024CF80[*st][i] = Rand() % 2 + 6;
         {
-            float jitter = func_002A7878(0.0f, 0.5f) + -0.25f;
+            float jitter = RandomFloatRange(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
             v = (float *)((char *)D_L05_0024D020 + offset);
             v[0] += jitter;
         }
         {
-            float jitter = func_002A7878(0.0f, 0.5f) + -0.25f;
+            float jitter = RandomFloatRange(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
             v = (float *)((char *)D_L05_0024D020 + offset);
             v[1] += jitter;
         }
         {
-            float jitter = func_002A7878(0.0f, 0.5f) + -0.25f;
+            float jitter = RandomFloatRange(0.0f, 0.5f) + -0.25f;
             int offset = i * 16 + *st * 64;
 
             v = (float *)((char *)D_L05_0024D020 + offset);
@@ -126,26 +126,27 @@ void func_L05_003D33E8(char *obj)
 
 
 /* shared native body of family 5a97ab89858c */
-void func_L05_00416630(char *p)
+/* Fills a four-corner sprite packet with default corners, colours and draw settings. */
+void func_L05_00416630(char *packet)
 {
-    *(long long *)(p + 112) = 0;
-    *(float *)(p + 8) = -1.0f;
-    *(float *)(p + 24) = 1.0f;
-    *(float *)(p + 40) = -1.0f;
-    *(float *)(p + 56) = 1.0f;
-    *(float *)(p + 4) = -1.0f;
-    *(float *)(p + 36) = 1.0f;
-    *(float *)(p + 52) = 1.0f;
-    *(int *)(p + 0) = 0;
-    *(int *)(p + 16) = 0;
-    *(int *)(p + 32) = 0;
-    *(int *)(p + 48) = 0;
-    *(float *)(p + 12) = 1.0f;
-    *(float *)(p + 28) = 1.0f;
-    *(float *)(p + 44) = 1.0f;
-    *(long long *)(p + 128) = 0x0000FF9000000260LL;
-    *(float *)(p + 20) = -1.0f;
-    *(float *)(p + 60) = 1.0f;
+    *(long long *)(packet + 112) = 0;
+    *(float *)(packet + 8) = -1.0f;
+    *(float *)(packet + 24) = 1.0f;
+    *(float *)(packet + 40) = -1.0f;
+    *(float *)(packet + 56) = 1.0f;
+    *(float *)(packet + 4) = -1.0f;
+    *(float *)(packet + 36) = 1.0f;
+    *(float *)(packet + 52) = 1.0f;
+    *(int *)(packet + 0) = 0;
+    *(int *)(packet + 16) = 0;
+    *(int *)(packet + 32) = 0;
+    *(int *)(packet + 48) = 0;
+    *(float *)(packet + 12) = 1.0f;
+    *(float *)(packet + 28) = 1.0f;
+    *(float *)(packet + 44) = 1.0f;
+    *(long long *)(packet + 128) = 0x0000FF9000000260LL;
+    *(float *)(packet + 20) = -1.0f;
+    *(float *)(packet + 60) = 1.0f;
 }
 
 
@@ -155,22 +156,22 @@ void func_L05_00417448(char *object)
 {
     char *sub = *(char **)(object + 0x68);
     char *table;
-    float a, b, c;
+    float distance, angleA, angleB;
 
     *(unsigned char *)(object + 0x20) = 1;
     *(unsigned short *)(object + 0x34) = *(unsigned short *)(object + 0x34) | 0x100;
-    *(int *)(func_002ED688(object) + 0x148) = 1;
-    func_L05_0037AEC0(object, 1);
+    *(int *)(GetMobyMotionData(object) + 0x148) = 1;
+    InitSpawnedSubObject(object, 1);
     table = D_L05_001B2614 + D_L05_00221D10[0] * 128;
     *(int *)(sub + 0x1C8) = 0x78;
     *(int *)(sub + 0x1C0) = -1;
     *(int *)(sub + 0x1C4) = -1;
     *(float *)(sub + 0x180) = 1.0f;
-    a = func_002A7878(0.0f, *(float *)table);
-    b = func_002A7940();
-    c = func_002A7940();
-    func_002AF000(object + 0x10, a, b, c);
-    func_00282CC0(object + 0x10, table + 0x30, object + 0x10);
+    distance = RandomFloatRange(0.0f, *(float *)table);
+    angleA = RandomAngle();
+    angleB = RandomAngle();
+    BuildSphericalOffset(object + 0x10, distance, angleA, angleB);
+    FastVecAdd(object + 0x10, table + 0x30, object + 0x10);
     *(int *)(sub + 0x1B8) = 0;
     *(float *)(object + 0x2C) = 0.02f;
 }
@@ -188,70 +189,71 @@ extern void func_002A10E8(int);
 
 /* Walks the state's fifteen id fields: a live one is handed to the level's own
     helper together with the object, then to the shared one. */
-void func_L05_00418508(char *a0)
+/* Keeps the equipment parts that are alive in step with the main object, one by one. */
+void func_L05_00418508(char *object)
 {
-    char *s0;
+    char *vars;
 
-    s0 = *(char **)(a0 + 0x68);
-    if (*(int *)(s0 + 0x40) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x40));
-        func_002A10E8(*(int *)(s0 + 0x40));
+    vars = *(char **)(object + 0x68);
+    if (*(int *)(vars + 0x40) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x40));
+        func_002A10E8(*(int *)(vars + 0x40));
     }
-    if (*(int *)(s0 + 0x44) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x44));
-        func_002A10E8(*(int *)(s0 + 0x44));
+    if (*(int *)(vars + 0x44) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x44));
+        func_002A10E8(*(int *)(vars + 0x44));
     }
-    if (*(int *)(s0 + 0x48) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x48));
-        func_002A10E8(*(int *)(s0 + 0x48));
+    if (*(int *)(vars + 0x48) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x48));
+        func_002A10E8(*(int *)(vars + 0x48));
     }
-    if (*(int *)(s0 + 0x4C) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x4C));
-        func_002A10E8(*(int *)(s0 + 0x4C));
+    if (*(int *)(vars + 0x4C) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x4C));
+        func_002A10E8(*(int *)(vars + 0x4C));
     }
-    if (*(int *)(s0 + 0x50) != 0) {
-        func_L05_00432158(a0, *(int *)(s0 + 0x50));
-        func_002A10E8(*(int *)(s0 + 0x50));
+    if (*(int *)(vars + 0x50) != 0) {
+        CopyObjectTransform(object, *(int *)(vars + 0x50));
+        func_002A10E8(*(int *)(vars + 0x50));
     }
-    if (*(int *)(s0 + 0xAC) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0xAC));
-        func_002A10E8(*(int *)(s0 + 0xAC));
+    if (*(int *)(vars + 0xAC) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0xAC));
+        func_002A10E8(*(int *)(vars + 0xAC));
     }
-    if (*(int *)(s0 + 0x1F0) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x1F0));
-        func_002A10E8(*(int *)(s0 + 0x1F0));
+    if (*(int *)(vars + 0x1F0) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x1F0));
+        func_002A10E8(*(int *)(vars + 0x1F0));
     }
-    if (*(int *)(s0 + 0x1F4) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x1F4));
-        func_002A10E8(*(int *)(s0 + 0x1F4));
+    if (*(int *)(vars + 0x1F4) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x1F4));
+        func_002A10E8(*(int *)(vars + 0x1F4));
     }
-    if (*(int *)(s0 + 0x1F8) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x1F8));
-        func_002A10E8(*(int *)(s0 + 0x1F8));
+    if (*(int *)(vars + 0x1F8) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x1F8));
+        func_002A10E8(*(int *)(vars + 0x1F8));
     }
-    if (*(int *)(s0 + 0x1FC) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x1FC));
-        func_002A10E8(*(int *)(s0 + 0x1FC));
+    if (*(int *)(vars + 0x1FC) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x1FC));
+        func_002A10E8(*(int *)(vars + 0x1FC));
     }
-    if (*(int *)(s0 + 0x200) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x200));
-        func_002A10E8(*(int *)(s0 + 0x200));
+    if (*(int *)(vars + 0x200) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x200));
+        func_002A10E8(*(int *)(vars + 0x200));
     }
-    if (*(int *)(s0 + 0x204) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x204));
-        func_002A10E8(*(int *)(s0 + 0x204));
+    if (*(int *)(vars + 0x204) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x204));
+        func_002A10E8(*(int *)(vars + 0x204));
     }
-    if (*(int *)(s0 + 0x208) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x208));
-        func_002A10E8(*(int *)(s0 + 0x208));
+    if (*(int *)(vars + 0x208) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x208));
+        func_002A10E8(*(int *)(vars + 0x208));
     }
-    if (*(int *)(s0 + 0x274) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x274));
-        func_002A10E8(*(int *)(s0 + 0x274));
+    if (*(int *)(vars + 0x274) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x274));
+        func_002A10E8(*(int *)(vars + 0x274));
     }
-    if (*(int *)(s0 + 0x278) != 0) {
-        func_L05_0041C7E8(a0, *(int *)(s0 + 0x278));
-        func_002A10E8(*(int *)(s0 + 0x278));
+    if (*(int *)(vars + 0x278) != 0) {
+        CopyOwnerTransformToPart(object, *(int *)(vars + 0x278));
+        func_002A10E8(*(int *)(vars + 0x278));
     }
 }
 /* func_L05_004186D8 is defined in L05_004186D8-g8.c. */
@@ -266,6 +268,7 @@ void func_L05_00418508(char *a0)
 
 /* func_L05_00419F10 is defined in L05_00419F10-g8.c. */
 
+/* An empty function that does nothing. */
 void func_L05_0041A218(void)
 {
     char buf[0x20];
@@ -276,33 +279,34 @@ void func_L05_0041A218(void)
 
 /* func_L05_0041C1F0 is defined in L05_0041C1F0-g8.c. */
 
+/* Sets up the four glow sprites with random start phases, fixed speeds and sizes. */
 void func_L05_0041C410(char *object)
 {
-    char *state = *(char **)(object + 0x68);
-    float *f = (float *)state;
-    int *w;
+    char *vars = *(char **)(object + 0x68);
+    float *cursor = (float *)vars;
+    int *wordPtr;
     int i;
     int j;
-    int v;
+    int value;
 
     for (i = 3; i >= 0; i--)
-        *f++ = (float)func_332AB8(0xFF);
-    *(float *)(state + 0x10) = -1.0f;
-    *(float *)(state + 0x14) = -2.25f;
-    *(float *)(state + 0x18) = 1.25f;
-    *(float *)(state + 0x1C) = 2.5f;
+        *cursor++ = (float)func_332AB8(0xFF);
+    *(float *)(vars + 0x10) = -1.0f;
+    *(float *)(vars + 0x14) = -2.25f;
+    *(float *)(vars + 0x18) = 1.25f;
+    *(float *)(vars + 0x1C) = 2.5f;
     j = 3;
-    w = (int *)(state + 0x2C);
-    v = 0xFF;
+    wordPtr = (int *)(vars + 0x2C);
+    value = 0xFF;
     for (; j >= 0; j--) {
-        *w = v;
-        w = (int *)((char *)w - 4);
-        v -= 0x40;
+        *wordPtr = value;
+        wordPtr = (int *)((char *)wordPtr - 4);
+        value -= 0x40;
     }
-    *(float *)(state + 0x30) = 3.0f;
-    *(float *)(state + 0x34) = 3.7f;
-    *(float *)(state + 0x3C) = 3.0f;
-    *(float *)(state + 0x38) = 3.7f;
+    *(float *)(vars + 0x30) = 3.0f;
+    *(float *)(vars + 0x34) = 3.7f;
+    *(float *)(vars + 0x3C) = 3.0f;
+    *(float *)(vars + 0x38) = 3.7f;
 }
 
 
@@ -311,33 +315,34 @@ void func_L05_0041C410(char *object)
 
 /* func_L05_0041D570 is defined in L05_003D33E8-g8.c (it reaches D_L05_001B1348 through $gp). */
 
+/* Sets up the four glow sprites with random start phases, fixed speeds and sizes. */
 void func_L05_0041D728(char *object)
 {
-    char *state = *(char **)(object + 0x68);
-    float *f = (float *)state;
-    int *w;
+    char *vars = *(char **)(object + 0x68);
+    float *cursor = (float *)vars;
+    int *wordPtr;
     int i;
     int j;
-    int v;
+    int value;
 
     for (i = 3; i >= 0; i--)
-        *f++ = (float)func_332AB8(0xFF);
-    *(float *)(state + 0x10) = -1.0f;
-    *(float *)(state + 0x14) = -2.25f;
-    *(float *)(state + 0x18) = 1.25f;
-    *(float *)(state + 0x1C) = 2.5f;
+        *cursor++ = (float)func_332AB8(0xFF);
+    *(float *)(vars + 0x10) = -1.0f;
+    *(float *)(vars + 0x14) = -2.25f;
+    *(float *)(vars + 0x18) = 1.25f;
+    *(float *)(vars + 0x1C) = 2.5f;
     j = 3;
-    w = (int *)(state + 0x2C);
-    v = 0xFF;
+    wordPtr = (int *)(vars + 0x2C);
+    value = 0xFF;
     for (; j >= 0; j--) {
-        *w = v;
-        w = (int *)((char *)w - 4);
-        v -= 0x40;
+        *wordPtr = value;
+        wordPtr = (int *)((char *)wordPtr - 4);
+        value -= 0x40;
     }
-    *(float *)(state + 0x30) = 2.8f;
-    *(float *)(state + 0x34) = 3.5f;
-    *(float *)(state + 0x3C) = 2.8f;
-    *(float *)(state + 0x38) = 3.5f;
+    *(float *)(vars + 0x30) = 2.8f;
+    *(float *)(vars + 0x34) = 3.5f;
+    *(float *)(vars + 0x3C) = 2.8f;
+    *(float *)(vars + 0x38) = 3.5f;
 }
 
 
@@ -346,12 +351,13 @@ void func_L05_0041D728(char *object)
 
 /* func_L05_00421908 is in L05_003D33E8-reward-g8.c: -G8, with its own jump table. */
 
+/* Registers the object for drawing when its flag is set, and marks it as visible. */
 void func_L05_00424780(char *object)
 {
-    char *state = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
 
-    if (*(int *)(state + 0xC) != 0)
-        func_L00_002E6EF8(&ref_L05_00424780_00, object);
+    if (*(int *)(vars + 0xC) != 0)
+        AddDrawCallbackToList3(&ref_L05_00424780_00, object);
     *(unsigned short *)(object + 0x34) |= 0x41;
 }
 
@@ -368,8 +374,9 @@ extern void ref_L05_004247C8_08(float *, int, int, int, float, float, float);
 extern float ref_L05_004247C8_09(float, float);
 extern float ref_L05_004247C8_10(float);
 
-void func_L05_004247C8(char *obj) {
-    float v[4];
+/* Scatters 30 sparkle sprites around the object in a ring, each drawn twice. */
+void func_L05_004247C8(char *object) {
+    float point[4];
     char *state;
     int color;
     int grey;
@@ -378,23 +385,23 @@ void func_L05_004247C8(char *obj) {
 
     full = 128.0f;
     grey = 0x808080;
-    state = FLD(obj, char *, 0x68);
-    ref_L05_004247C8_00(obj + 0x10, ref_L05_004247C8_01);
+    state = FLD(object, char *, 0x68);
+    ref_L05_004247C8_00(object + 0x10, ref_L05_004247C8_01);
     for (i = 29; i >= 0; i--) {
         float angle = ref_L05_004247C8_02();
-        v[0] = 0.0f;
-        v[1] = ref_L05_004247C8_03(angle);
-        v[2] = -ref_L05_004247C8_04(angle);
-        ref_L05_004247C8_05(v, v, obj + 0xC0);
-        ref_L05_004247C8_06(v, v, obj + 0x10);
-        ref_L05_004247C8_08(v, 0x13, (ref_L05_004247C8_07(full) << 24) | grey, 1, 0.25f, 0.1f, ref_L05_004247C8_02());
+        point[0] = 0.0f;
+        point[1] = ref_L05_004247C8_03(angle);
+        point[2] = -ref_L05_004247C8_04(angle);
+        ref_L05_004247C8_05(point, point, object + 0xC0);
+        ref_L05_004247C8_06(point, point, object + 0x10);
+        ref_L05_004247C8_08(point, 0x13, (ref_L05_004247C8_07(full) << 24) | grey, 1, 0.25f, 0.1f, ref_L05_004247C8_02());
         {
             float half = 0.5f;
             int alpha = ref_L05_004247C8_07(full * half);
             color = FLD(state, int, 8);
             color &= 0xFFFFFF;
             color |= alpha << 24;
-            ref_L05_004247C8_08(v, 0x13, color, 1, half, 0.1f, ref_L05_004247C8_02());
+            ref_L05_004247C8_08(point, 0x13, color, 1, half, 0.1f, ref_L05_004247C8_02());
         }
     }
     FLD(state, float, 4) = 0.13380859792232513f;
@@ -402,18 +409,20 @@ void func_L05_004247C8(char *obj) {
     ref_L05_004247C8_10(FLD(state, float, 0));
 }
 
+/* Sets the colour value of the effect. */
 void func_L05_00424970(char *object, int value)
 {
-    char *state = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
 
-    *(int *)(state + 0x8) = value;
+    *(int *)(vars + 0x8) = value;
 }
 
+/* Turns the effect on or off with the given value. */
 void func_L05_00424980(char *object, int value)
 {
-    char *state = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
 
-    *(int *)(state + 0xC) = value;
+    *(int *)(vars + 0xC) = value;
 }
 
 /* Creates a camera-facing burst, sets its lifetime and colors, and shakes
@@ -423,7 +432,7 @@ char *func_L05_00424990(void *pos, int shake, int c20, int c24, int c28,
                          int c38, float scale)
 {
     float toward[4], up[4], sphere[4], cameraDir[4];
-    char *obj = func_0029EFD0(0x116A);
+    char *obj = CreateMoby(0x116A /* moby class 4458 */);
     char *st;
 
     if (obj) {
@@ -433,13 +442,13 @@ char *func_L05_00424990(void *pos, int shake, int c20, int c24, int c28,
         obj[0x20] = 0;
         qcopy(obj + 0x10, pos);
         *(float *)(obj + 0x1C) = 1.0f;
-        func_00282CF0(toward, D_L05_001B96C0, (float *)(obj + 0x10));
-        func_00282F20(toward, toward, 1.0f);
-        func_002AFFD8(obj + 0x10, up, 1);
+        FastVecSub(toward, D_L05_001B96C0, (float *)(obj + 0x10));
+        vec_scale_to_length(toward, toward, 1.0f);
+        ComputeViewDirection(obj + 0x10, up, 1);
         qcopy(obj + 0xC0, toward);
-        func_00282DD8(obj + 0xD0, obj + 0xC0, up);
-        func_00282F20((float *)(obj + 0xD0), (float *)(obj + 0xD0), 1.0f);
-        func_00282DD8(obj + 0xE0, obj + 0xD0, obj + 0xC0);
+        FastVecCross(obj + 0xD0, obj + 0xC0, up);
+        vec_scale_to_length((float *)(obj + 0xD0), (float *)(obj + 0xD0), 1.0f);
+        FastVecCross(obj + 0xE0, obj + 0xD0, obj + 0xC0);
         *(float *)(obj + 0xCC) = *(float *)(obj + 0xDC) = *(float *)(obj + 0xEC) = 0.0f;
         *(short *)st = 60;
         *(short *)(st + 2) = 60;
@@ -457,10 +466,10 @@ char *func_L05_00424990(void *pos, int shake, int c20, int c24, int c28,
         *(int *)(st + 0x18) = 0;
         qcopy(sphere, obj + 0x10);
         sphere[3] = scale * 3.0f;
-        if (func_00283DB8(sphere, 128.0f) == 1) {
+        if (FastMathHelperA(sphere, 128.0f) == 1) {
             *(short *)(st + 4) = 10;
             *(float *)(st + 0x10) = 0.1f;
-            if (func_00282E48(pos, D_L05_001B96C0) < 48.0f && shake) {
+            if (fast_vec_dist(pos, D_L05_001B96C0) < 48.0f && shake) {
                 char *mgr = D_L05_001B96C0 - 0x140;
 
                 *(int *)(mgr + 0x16C) = 0;
@@ -468,9 +477,9 @@ char *func_L05_00424990(void *pos, int shake, int c20, int c24, int c28,
                 *(float *)(mgr + 0x160) = 0.075f;
             }
             if (*(int *)(st + 0x18)) {
-                func_00282CF0(cameraDir, obj + 0x10, (float *)D_L05_001B96C0);
-                func_00282F20(cameraDir, cameraDir, 1.0f);
-                if (1.5707964f - func_002831B0(func_00282DB0(cameraDir, D_L05_001B96C0 + 0x230)) < 0.45378566f)
+                FastVecSub(cameraDir, obj + 0x10, (float *)D_L05_001B96C0);
+                vec_scale_to_length(cameraDir, cameraDir, 1.0f);
+                if (1.5707964f - FastAngleHelper(FastVecDot(cameraDir, D_L05_001B96C0 + 0x230)) < 0.45378566f)
                     *(int *)(st + 0x18) = 1;
                 else
                     *(int *)(st + 0x18) = 0;
@@ -479,20 +488,21 @@ char *func_L05_00424990(void *pos, int shake, int c20, int c24, int c28,
             *(short *)(st + 4) = 0;
             *(int *)(st + 0x18) = 0;
         }
-        func_L05_00425058(obj, up);
+        SpawnLargeExplosionEffect(obj, up);
     }
     return obj;
 }
 
+/* Counts down two timers; when the first one has run out the object is deleted. */
 void func_L05_00424C88(char *object)
 {
-    char *state = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
 
-    if (func_00282978(state) == 0) {
-        func_00282978(state + 4);
+    if (FastDecTimer(vars) == 0) {
+        FastDecTimer(vars + 4);
         ref_L05_00424C88_01(&ref_L05_00424C88_00, object);
     } else {
-        func_0029F338(object);
+        MarkMobySpawned(object);
     }
 }
 
@@ -502,67 +512,69 @@ void func_L05_00424C88(char *object)
 
 /* func_L05_004260B8 is defined in L05_003D33E8-g8.c (it reaches D_L05_001B14FC through $gp). */
 
+/* Sets up the four glow sprites with random start phases, fixed speeds and sizes. */
 void func_L05_00426270(char *object)
 {
-    char *state = *(char **)(object + 0x68);
-    float *f = (float *)state;
-    int *w;
+    char *vars = *(char **)(object + 0x68);
+    float *cursor = (float *)vars;
+    int *wordPtr;
     int i;
     int j;
-    int v;
+    int value;
 
     for (i = 3; i >= 0; i--)
-        *f++ = (float)func_332AB8(0xFF);
-    *(float *)(state + 0x10) = -1.0f;
-    *(float *)(state + 0x14) = -2.25f;
-    *(float *)(state + 0x18) = 1.25f;
-    *(float *)(state + 0x1C) = 2.5f;
+        *cursor++ = (float)func_332AB8(0xFF);
+    *(float *)(vars + 0x10) = -1.0f;
+    *(float *)(vars + 0x14) = -2.25f;
+    *(float *)(vars + 0x18) = 1.25f;
+    *(float *)(vars + 0x1C) = 2.5f;
     j = 3;
-    w = (int *)(state + 0x2C);
-    v = 0xFF;
+    wordPtr = (int *)(vars + 0x2C);
+    value = 0xFF;
     for (; j >= 0; j--) {
-        *w = v;
-        w = (int *)((char *)w - 4);
-        v -= 0x40;
+        *wordPtr = value;
+        wordPtr = (int *)((char *)wordPtr - 4);
+        value -= 0x40;
     }
-    *(float *)(state + 0x30) = 2.4f;
-    *(float *)(state + 0x34) = 3.0f;
-    *(float *)(state + 0x3C) = 2.4f;
-    *(float *)(state + 0x38) = 3.0f;
+    *(float *)(vars + 0x30) = 2.4f;
+    *(float *)(vars + 0x34) = 3.0f;
+    *(float *)(vars + 0x3C) = 2.4f;
+    *(float *)(vars + 0x38) = 3.0f;
 }
 
-void func_L05_00426348(unsigned char *a0)
+/* Draws four pulsing glow sprites in a short line in front of the object, each fading in. */
+void func_L05_00426348(unsigned char *object)
 {
-    GlowRingState *st = *(GlowRingState **)(a0 + 0x68);
+    GlowRingState *glow = *(GlowRingState **)(object + 0x68);
     float m[4];
     float q[4];
     float src[4];
     int i;
 
-    *(GlowRingVector *)src = *(GlowRingVector *)(a0 + 0x10);
+    *(GlowRingVector *)src = *(GlowRingVector *)(object + 0x10);
     src[2] += 0.25f;
-    func_00282CF0(m, ref_L05_00426348_00, src);
-    func_00282F20(m, m, -0.3f);
-    func_00282F20(q, m, 0.1f);
-    func_00282CC0((char *)m, (char *)m, (char *)src);
+    FastVecSub(m, ref_L05_00426348_00, src);
+    vec_scale_to_length(m, m, -0.3f);
+    vec_scale_to_length(q, m, 0.1f);
+    FastVecAdd((char *)m, (char *)m, (char *)src);
 
     for (i = 0; i < 4; i++) {
-        float v = st->phase[i] + st->rate[i];
+        float v = glow->phase[i] + glow->rate[i];
         u32 color;
         GlowRingSprite *s;
-        st->phase[i] = v;
+        glow->phase[i] = v;
         if (v >= 255.0f)
-            st->phase[i] = v - 255.0f;
+            glow->phase[i] = v - 255.0f;
         else if (v <= 0.0f)
-            st->phase[i] = v + 255.0f;
-        if (func_00282948(&st->alpha[i]))
-            st->alpha[i] = 0xFF;
-        v = func_00282C48(0.5f - func_00283CE0(0xFF - st->alpha[i]) * 0.0039215689f);
-        color = func_00283D38(0x502020FF, 0x102020FF, v);
-        s = func_002C2FD8(m, color, func_00283CF0(st->phase[i]) & 0xFF, 0x35, 1, 2, 0, st->size[i]);
+            glow->phase[i] = v + 255.0f;
+        if (FastFloatHelperD(&glow->alpha[i]))
+            glow->alpha[i] = 0xFF;
+        v = FloatAbs(0.5f - IntToFloat(0xFF - glow->alpha[i]) * 0.0039215689f);
+        color = FastTweenColor(0x502020FF, 0x102020FF, v);
+        s = SpawnFadingParticle_002C2FD8(m, color, FloatToInt(glow->phase[i]) & 0xFF, 0x35, 1, 2, 0, glow->size[i]);
         if (s)
-            s->fade = func_00283CF0(1.0f) + 0x60;
-        func_00282CC0((char *)m, (char *)m, (char *)q);
+            s->fade = FloatToInt(1.0f) + 0x60;
+        FastVecAdd((char *)m, (char *)m, (char *)q);
     }
 }
 
@@ -571,67 +583,69 @@ void func_L05_00426348(unsigned char *a0)
 
 /* func_L05_00426658 is defined in L05_003D33E8-g8.c (it reaches D_L05_001B1500 through $gp). */
 
+/* Sets up the four glow sprites with random start phases, fixed speeds and sizes. */
 void func_L05_00426810(char *object)
 {
-    char *state = *(char **)(object + 0x68);
-    float *f = (float *)state;
-    int *w;
+    char *vars = *(char **)(object + 0x68);
+    float *cursor = (float *)vars;
+    int *wordPtr;
     int i;
     int j;
-    int v;
+    int value;
 
     for (i = 3; i >= 0; i--)
-        *f++ = (float)func_332AB8(0xFF);
-    *(float *)(state + 0x10) = -1.0f;
-    *(float *)(state + 0x14) = -2.25f;
-    *(float *)(state + 0x18) = 1.25f;
-    *(float *)(state + 0x1C) = 2.5f;
+        *cursor++ = (float)func_332AB8(0xFF);
+    *(float *)(vars + 0x10) = -1.0f;
+    *(float *)(vars + 0x14) = -2.25f;
+    *(float *)(vars + 0x18) = 1.25f;
+    *(float *)(vars + 0x1C) = 2.5f;
     j = 3;
-    w = (int *)(state + 0x2C);
-    v = 0xFF;
+    wordPtr = (int *)(vars + 0x2C);
+    value = 0xFF;
     for (; j >= 0; j--) {
-        *w = v;
-        w = (int *)((char *)w - 4);
-        v -= 0x40;
+        *wordPtr = value;
+        wordPtr = (int *)((char *)wordPtr - 4);
+        value -= 0x40;
     }
-    *(float *)(state + 0x30) = 2.0f;
-    *(float *)(state + 0x34) = 2.5f;
-    *(float *)(state + 0x3C) = 2.0f;
-    *(float *)(state + 0x38) = 2.5f;
+    *(float *)(vars + 0x30) = 2.0f;
+    *(float *)(vars + 0x34) = 2.5f;
+    *(float *)(vars + 0x3C) = 2.0f;
+    *(float *)(vars + 0x38) = 2.5f;
 }
 
-void func_L05_004268E8(unsigned char *a0)
+/* Draws four pulsing glow sprites in a short line in front of the object, each fading in. */
+void func_L05_004268E8(unsigned char *object)
 {
-    GlowRingState *st = *(GlowRingState **)(a0 + 0x68);
+    GlowRingState *glow = *(GlowRingState **)(object + 0x68);
     float m[4];
     float q[4];
     float src[4];
     int i;
 
-    *(GlowRingVector *)src = *(GlowRingVector *)(a0 + 0x10);
+    *(GlowRingVector *)src = *(GlowRingVector *)(object + 0x10);
     src[2] += 0.25f;
-    func_00282CF0(m, ref_L05_004268E8_00, src);
-    func_00282F20(m, m, -0.3f);
-    func_00282F20(q, m, 0.1f);
-    func_00282CC0((char *)m, (char *)m, (char *)src);
+    FastVecSub(m, ref_L05_004268E8_00, src);
+    vec_scale_to_length(m, m, -0.3f);
+    vec_scale_to_length(q, m, 0.1f);
+    FastVecAdd((char *)m, (char *)m, (char *)src);
 
     for (i = 0; i < 4; i++) {
-        float v = st->phase[i] + st->rate[i];
+        float v = glow->phase[i] + glow->rate[i];
         u32 color;
         GlowRingSprite *s;
-        st->phase[i] = v;
+        glow->phase[i] = v;
         if (v >= 255.0f)
-            st->phase[i] = v - 255.0f;
+            glow->phase[i] = v - 255.0f;
         else if (v <= 0.0f)
-            st->phase[i] = v + 255.0f;
-        if (func_00282948(&st->alpha[i]))
-            st->alpha[i] = 0xFF;
-        v = func_00282C48(0.5f - func_00283CE0(0xFF - st->alpha[i]) * 0.0039215689f);
-        color = func_00283D38(0x50207FFF, 0x10207FFF, v);
-        s = func_002C2FD8(m, color, func_00283CF0(st->phase[i]) & 0xFF, 0x35, 1, 2, 0, st->size[i]);
+            glow->phase[i] = v + 255.0f;
+        if (FastFloatHelperD(&glow->alpha[i]))
+            glow->alpha[i] = 0xFF;
+        v = FloatAbs(0.5f - IntToFloat(0xFF - glow->alpha[i]) * 0.0039215689f);
+        color = FastTweenColor(0x50207FFF, 0x10207FFF, v);
+        s = SpawnFadingParticle_002C2FD8(m, color, FloatToInt(glow->phase[i]) & 0xFF, 0x35, 1, 2, 0, glow->size[i]);
         if (s)
-            s->fade = func_00283CF0(1.0f) + 0x60;
-        func_00282CC0((char *)m, (char *)m, (char *)q);
+            s->fade = FloatToInt(1.0f) + 0x60;
+        FastVecAdd((char *)m, (char *)m, (char *)q);
     }
 }
 
@@ -639,33 +653,34 @@ void func_L05_004268E8(unsigned char *a0)
 
 /* func_L05_00426BE0 is defined in L05_003D33E8-g8.c (it reaches D_L05_001B1504 through $gp). */
 
+/* Sets up the four glow sprites with random start phases, fixed speeds and sizes. */
 void func_L05_00426D98(char *object)
 {
-    char *state = *(char **)(object + 0x68);
-    float *f = (float *)state;
-    int *w;
+    char *vars = *(char **)(object + 0x68);
+    float *cursor = (float *)vars;
+    int *wordPtr;
     int i;
     int j;
-    int v;
+    int value;
 
     for (i = 3; i >= 0; i--)
-        *f++ = (float)func_332AB8(0xFF);
-    *(float *)(state + 0x10) = -1.0f;
-    *(float *)(state + 0x14) = -2.25f;
-    *(float *)(state + 0x18) = 1.25f;
-    *(float *)(state + 0x1C) = 2.5f;
+        *cursor++ = (float)func_332AB8(0xFF);
+    *(float *)(vars + 0x10) = -1.0f;
+    *(float *)(vars + 0x14) = -2.25f;
+    *(float *)(vars + 0x18) = 1.25f;
+    *(float *)(vars + 0x1C) = 2.5f;
     j = 3;
-    w = (int *)(state + 0x2C);
-    v = 0xFF;
+    wordPtr = (int *)(vars + 0x2C);
+    value = 0xFF;
     for (; j >= 0; j--) {
-        *w = v;
-        w = (int *)((char *)w - 4);
-        v -= 0x40;
+        *wordPtr = value;
+        wordPtr = (int *)((char *)wordPtr - 4);
+        value -= 0x40;
     }
-    *(float *)(state + 0x30) = 2.5f;
-    *(float *)(state + 0x34) = 3.2f;
-    *(float *)(state + 0x3C) = 2.5f;
-    *(float *)(state + 0x38) = 3.2f;
+    *(float *)(vars + 0x30) = 2.5f;
+    *(float *)(vars + 0x34) = 3.2f;
+    *(float *)(vars + 0x3C) = 2.5f;
+    *(float *)(vars + 0x38) = 3.2f;
 }
 
 

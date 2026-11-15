@@ -48,6 +48,7 @@ extern int D_00139688[];
 extern int D_001ADB10 __attribute__((sda));
 extern int D_001F2880[];
 
+/* Moves the cursor on the item grid, shows the name and ammo of the item under it and returns the choice when cross is pressed. */
 int func_00346C60(ItemMenu *menu, int buttons)
 {
     float pos0[2] __attribute__((aligned(16)));
@@ -60,29 +61,29 @@ int func_00346C60(ItemMenu *menu, int buttons)
     float pos258[2] __attribute__((aligned(16)));
     float pos2A0[2] __attribute__((aligned(16)));
     int result = -1;
-    int old = menu->column + menu->row * 4;
-    int selection, n;
+    int oldSelection = menu->column + menu->row * 4;
+    int selection, nextValue;
     int *color;
     int entry, item, ammo, maxAmmo;
     ItemRecord *record, *initialRecord;
     char *text;
 
     if (buttons & 0x1000) {
-        func_002E5E58(3, 0, 0);
-        n = menu->row - 1;
-        menu->row = n < 0 ? 5 : n;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        nextValue = menu->row - 1;
+        menu->row = nextValue < 0 ? 5 : nextValue;
     } else if (buttons & 0x4000) {
-        func_002E5E58(3, 0, 0);
-        n = menu->row + 1;
-        menu->row = n <= 5 ? n : 0;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        nextValue = menu->row + 1;
+        menu->row = nextValue <= 5 ? nextValue : 0;
     } else if (buttons & 0x8000) {
-        func_002E5E58(3, 0, 0);
-        n = menu->column - 1;
-        menu->column = n < 0 ? 3 : n;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        nextValue = menu->column - 1;
+        menu->column = nextValue < 0 ? 3 : nextValue;
     } else if (buttons & 0x2000) {
-        func_002E5E58(3, 0, 0);
-        n = menu->column + 1;
-        menu->column = n <= 3 ? n : 0;
+        PlaySoundFromGlobalBank(3, 0, 0);
+        nextValue = menu->column + 1;
+        menu->column = nextValue <= 3 ? nextValue : 0;
     }
     selection = menu->column + menu->row * 4;
 
@@ -95,64 +96,64 @@ int func_00346C60(ItemMenu *menu, int buttons)
     __builtin_memcpy(pos210, D_001AE510, 8);
     __builtin_memcpy(pos258, D_001AE518, 8);
     __builtin_memcpy(pos2A0, D_001AE520, 8);
-    if (old != selection)
-        func_002A9588(0, 0, 1, 0, 1);
-    color = func_00335E20((char *)menu + 0xE4);
-    *color = func_002A9588(0x60442D00, 0x70FFFEED, 20, 0, 0);
+    if (oldSelection != selection)
+        PingPongBlendValues(0, 0, 1, 0, 1);
+    color = GetFieldC((char *)menu + 0xE4);
+    *color = PingPongBlendValues(0x60442D00, 0x70FFFEED, 20, 0, 0);
 
-    func_00335E38((char *)menu + 0x0, pos0[0] + menu->origin[0], pos0[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x4C, pos4C[0] + menu->origin[0], pos4C[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x130, pos130[0] + menu->origin[0], pos130[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x98, pos98[0] + menu->origin[0], pos98[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0xE4,
+    SetFirstFloat4((char *)menu + 0x0, pos0[0] + menu->origin[0], pos0[1] + menu->origin[1], 0.0f, 0.0f);
+    SetFirstFloat4((char *)menu + 0x4C, pos4C[0] + menu->origin[0], pos4C[1] + menu->origin[1], 0.0f, 0.0f);
+    SetFirstFloat4((char *)menu + 0x130, pos130[0] + menu->origin[0], pos130[1] + menu->origin[1], 0.0f, 0.0f);
+    SetFirstFloat4((char *)menu + 0x98, pos98[0] + menu->origin[0], pos98[1] + menu->origin[1], 0.0f, 0.0f);
+    SetFirstFloat4((char *)menu + 0xE4,
                   cursor[0] + menu->origin[0] + (float)menu->column * 53.5f,
                   cursor[1] + menu->origin[1] + (float)menu->row * 47.0f, 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x17C, pos17C[0] + menu->origin[0], pos17C[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x210, pos210[0] + menu->origin[0], pos210[1] + menu->origin[1], 0.0f, 0.0f);
+    SetFirstFloat4((char *)menu + 0x17C, pos17C[0] + menu->origin[0], pos17C[1] + menu->origin[1], 0.0f, 0.0f);
+    SetFirstFloat4((char *)menu + 0x210, pos210[0] + menu->origin[0], pos210[1] + menu->origin[1], 0.0f, 0.0f);
 
-    D_001ADB10 = -1;
+    gSelectedItemMaterial = -1;
     if (selection >= 0) {
         entry = D_00259F58[selection][3];
-        item = D_00139568[entry];
-        initialRecord = &D_00239BA0[item];
+        item = gItemSlotToRecord[entry];
+        initialRecord = &gWeaponTable_00239BA0[item];
         if (initialRecord->byte04) {
-            D_001A7AF8[entry] = 1;
+            gItemOwnedFlags[entry] = 1;
             D_001A7B30[entry] = 1;
         }
-        if (D_001A7AF8[entry]) {
+        if (gItemOwnedFlags[entry]) {
             text = menu->detail;
-            D_001ADB10 = D_00239BA0[D_00139568[entry]].material;
-            func_00115DA8(menu->name, func_00288FB8(D_00239BA0[D_00139568[entry]].name));
-            record = &D_00239BA0[D_00139568[entry]];
-            ammo = D_00139688[entry];
+            gSelectedItemMaterial = gWeaponTable_00239BA0[gItemSlotToRecord[entry]].material;
+            Sprintf(menu->name, GetLocalizedString(gWeaponTable_00239BA0[gItemSlotToRecord[entry]].name));
+            record = &gWeaponTable_00239BA0[gItemSlotToRecord[entry]];
+            ammo = gItemAmmoCounts[entry];
             maxAmmo = record->maxAmmo;
             if (record->usesAmmo) {
-                text += func_00115DA8(text, D_001AE528, func_00288FB8(0x2DC9));
+                text += Sprintf(text, D_001AE528, GetLocalizedString(0x2DC9));
                 if (ammo < 1000)
-                    text += func_00115DA8(text, D_001AE530, ammo);
+                    text += Sprintf(text, D_001AE530, ammo);
                 else
-                    text += func_00115DA8(text, D_001AE538, ammo / 1000, ammo % 1000);
+                    text += Sprintf(text, D_001AE538, ammo / 1000, ammo % 1000);
                 if (maxAmmo < 1000)
-                    func_00115DA8(text, D_001ADF98, maxAmmo);
+                    Sprintf(text, D_001ADF98, maxAmmo);
                 else
-                    func_00115DA8(text, D_001AE548, maxAmmo / 1000, maxAmmo % 1000);
+                    Sprintf(text, D_001AE548, maxAmmo / 1000, maxAmmo % 1000);
             } else {
-                func_00115DA8(text, ref_00346C60_00, func_00288FB8(0x2DB9));
+                Sprintf(text, ref_00346C60_00, GetLocalizedString(0x2DB9));
             }
             if (buttons & 0x40) {
                 result = selection;
-                func_002E5E58(4, 0, 0);
+                PlaySoundFromGlobalBank(4, 0, 0);
                 D_001F2880[0] = entry;
             }
         } else {
             menu->detail[0] = 0;
             menu->name[0] = 0;
             if (buttons & 0x40)
-                func_002E5E58(5, 0, 0);
+                PlaySoundFromGlobalBank(5, 0, 0);
         }
     }
 
-    func_00335E38((char *)menu + 0x258, pos258[0] + menu->origin[0], pos258[1] + menu->origin[1], 0.0f, 0.0f);
-    func_00335E38((char *)menu + 0x2A0, pos2A0[0] + menu->origin[0], pos2A0[1] + menu->origin[1], 0.0f, 0.0f);
+    SetFirstFloat4((char *)menu + 0x258, pos258[0] + menu->origin[0], pos258[1] + menu->origin[1], 0.0f, 0.0f);
+    SetFirstFloat4((char *)menu + 0x2A0, pos2A0[0] + menu->origin[0], pos2A0[1] + menu->origin[1], 0.0f, 0.0f);
     return result;
 }

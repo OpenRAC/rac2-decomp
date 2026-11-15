@@ -16,7 +16,7 @@ void func_002934F8(U8 *block, void *textures, U8 *map, int index)
     int count;
     if (compressed) {
         int size;
-        func_0026FEB8(ref_002934F8_00, index);
+        STUB_printf(ref_002934F8_00, index);
         size = *(int *)(block + 0x2C);
         if (size > 0x3FC00) size = 0x3FC00;
         block[0xB] = 0;
@@ -46,7 +46,7 @@ void func_002934F8(U8 *block, void *textures, U8 *map, int index)
                     ((unsigned short *)data)[j] = ((unsigned short *)data)[j * 2];
                 *(unsigned short *)(data + 0xE) = 0;
                 *(unsigned short *)(data + 0xC) = *(unsigned short *)(data + 0x18) - 16;
-                func_00282B50((unsigned short *)data + j, data + 32, (entry[0xC] - 2) * 16);
+                FastMemoryHelperC((unsigned short *)data + j, data + 32, (entry[0xC] - 2) * 16);
             }
         }
     }
@@ -101,5 +101,5 @@ void func_002934F8(U8 *block, void *textures, U8 *map, int index)
     }
     if (index >= 0) qcopy(&ref_002934F8_03[ref_002934F8_01[index]], map);
     if (*(void **)block)
-        func_002932B8(*(void **)block, textures, map, count);
+        DrawTextureBatches(*(void **)block, textures, map, count);
 }

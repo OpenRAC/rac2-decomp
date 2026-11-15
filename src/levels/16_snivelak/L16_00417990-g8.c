@@ -17,6 +17,7 @@ extern char D_L16_001B1BF0[] SDATA(D_L16_001B1BF0);
 extern char D_L16_001B1BE8[] SDATA(D_L16_001B1BE8);
 extern char D_L16_001B1BE0[] SDATA(D_L16_001B1BE0);
 extern int D_L16_001B1C10 __attribute__((sda));
+/* Runs a destructible object: it smokes, then bursts into sparks and fire when destroyed, then keeps puffing for a while. */
 void func_L16_00417990(char *object)
 {
     Vector128 position[1],velocity[1],zero[1];
@@ -29,39 +30,39 @@ void func_L16_00417990(char *object)
     ((float *)velocity)[2]=0.1166666746f;
     switch(*(unsigned char *)(object+0x20)) {
     case 0:
-        func_002A7750((unsigned char *)object,1,-1);
+        SetMobyState((unsigned char *)object,1,-1);
         break;
     case 1:
-        func_00282D30(position,position,*(float *)(object+0x2c));
-        state[1]=(int)func_L00_0033E220(position,object,0x28202080u,-1,1,2,0,0x60,*(float *)(object+0x2c)*3780000.0f,0.75f);
-        if(func_002A9640(object,0x4010000u,0)!=0 && state[0]==0) func_002A7750((unsigned char *)object,2,-1);
+        FastVecScale(position,position,*(float *)(object+0x2c));
+        state[1]=(int)SpawnObjectFollowingEffect(position,object,0x28202080u,-1,1,2,0,0x60,*(float *)(object+0x2c)*3780000.0f,0.75f);
+        if(FindOwnedEffectSlot(object,0x4010000u,0)!=0 && state[0]==0) SetMobyState((unsigned char *)object,2,-1);
         *(unsigned char *)(object+0xa8)=0xff;
         break;
     case 2:
-        func_L00_0032A258(object,D_L16_001B1BF0,D_L16_001B1BE8,D_L16_001B1BE0,0xffff,0,D_L16_001B1C10,0,0xffff,0xff,0);
-        func_L00_002EC248(object,position,0.2f,velocity,0.1166666746f,40,1,1.0f,5.0f,1.0f);
+        ExplodeObjectIntoPieces(object,D_L16_001B1BF0,D_L16_001B1BE8,D_L16_001B1BE0,0xffff,0,D_L16_001B1C10,0,0xffff,0xff,0);
+        SpawnSparkBurst_L00(object,position,0.2f,velocity,0.1166666746f,40,1,1.0f,5.0f,1.0f);
         *(Vector128 *)zero=0;
-        func_L00_00324F18(object,(char *)position,13.0f,0.0f,14.0f);
-        func_002ABBB8(object,zero,position,0.0f,0.0f,10,3,5,0.0f,-1,1.0f,9.0f,0.75f,0.0f,0,0,-1,0,0x810001);
-        if(state[1]!=0) func_002B9180((void *)state[1]);
-        func_L00_00326620(object,0x10f2,0);
+        LocalOffsetToWorld(object,(char *)position,13.0f,0.0f,14.0f);
+        SpawnExplosionEffects(object,zero,position,0.0f,0.0f,10,3,5,0.0f,-1,1.0f,9.0f,0.75f,0.0f,0,0,-1,0,0x810001);
+        if(state[1]!=0) KillParticle((void *)state[1]);
+        SpawnChildMoby_L00(object,0x10f2,0);
         *(int *)(object+0x98)=0;
         object[0x31]=0;
         *(unsigned short *)(object+0x34)|=1;
         state[2]=100;
-        func_002A7750((unsigned char *)object,3,-1);
+        SetMobyState((unsigned char *)object,3,-1);
         break;
     case 3:
         if(state[2]>80) {
-            func_00282D30(velocity,velocity,0.5f);
-            func_L00_002EC248(object,position,0.0f,velocity,0.05000000447f,4,1,1.0f,5.0f,1.0f);
+            FastVecScale(velocity,velocity,0.5f);
+            SpawnSparkBurst_L00(object,position,0.0f,velocity,0.05000000447f,4,1,1.0f,5.0f,1.0f);
         }
-        if(func_00282948(state+2)!=0) {
-            func_00282D30(velocity,velocity,0.3333333433f);
+        if(FastFloatHelperD(state+2)!=0) {
+            FastVecScale(velocity,velocity,0.3333333433f);
             ((float *)velocity)[2]*=0.3333333433f;
-            func_L00_002EC248(object,position,0.0f,velocity,0.05000000447f,func_002A7820(3,6),1,0.5f,15.0f,1.0f);
-            func_L00_002EC248(object,position,0.0f,velocity,0.05000000447f,func_002A7820(3,6),0,0.5f,15.0f,1.0f);
-            state[2]=func_002A7820(30,80);
+            SpawnSparkBurst_L00(object,position,0.0f,velocity,0.05000000447f,RandomIntRange(3,6),1,0.5f,15.0f,1.0f);
+            SpawnSparkBurst_L00(object,position,0.0f,velocity,0.05000000447f,RandomIntRange(3,6),0,0.5f,15.0f,1.0f);
+            state[2]=RandomIntRange(30,80);
         }
         break;
     }

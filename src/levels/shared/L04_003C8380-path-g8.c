@@ -13,45 +13,46 @@ extern s32 ref_L04_00400D48_02(u8 *a0, u8 *a1, s32 a2);
 extern f32 func_00283CE0(s32 value);
 extern void L04_UpdatePath(float, float, u8 *, u8 *, u8 *, u8 *) __asm__("func_002C96F8");
 
-void func_L04_00400D48(u8 *a0, u8 *a1, s32 a2)
+/* Picks a route and the nearest point on it for a racing hoverbike, then points its steering at that spot. */
+void func_L04_00400D48(u8 *racer, u8 *bike, s32 snapToPoint)
 {
-    u8 *s1 = *(u8 **)(*(u8 **)(a1 + 0x164) + 0x68);
-    s32 a3 = -1;
-    f32 f;
-    f32 t;
-    f32 h;
-    u8 *o;
+    u8 *riderVars = *(u8 **)(*(u8 **)(bike + 0x164) + 0x68);
+    s32 pointIndex = -1;
+    f32 targetDist;
+    f32 pointDist;
+    f32 routeLength;
+    u8 *route;
 
-    if ((s32)ref_L04_00400D48_00 == 0x28 || D_001A79F0 == 4) {
-        if (*(s32 *)(s1 + 0x314) == -1) {
-            *(u8 **)(a1 + 0x110) = D_L04_001FE340[*(s32 *)(a1 + 0x54)];
-        } else if (D_L04_002C63C0[ref_L04_00400D48_01].flags & 4) {
-            *(u8 **)(a1 + 0x110) = D_L04_001FE340[*(s32 *)(a1 + 0x6C)];
-            if (*(s32 *)(a1 + 0x120) == 1 && *(s32 *)(a1 + 0x124) >= 3) {
-                a3 = 0x82;
+    if ((s32)ref_L04_00400D48_00 == 0x28 || gCurrentMapIndex == 4) {
+        if (*(s32 *)(riderVars + 0x314) == -1) {
+            *(u8 **)(bike + 0x110) = gRoutePathTable[*(s32 *)(bike + 0x54)];
+        } else if (gRaceChallengeTable[ref_L04_00400D48_01].flags & 4) {
+            *(u8 **)(bike + 0x110) = gRoutePathTable[*(s32 *)(bike + 0x6C)];
+            if (*(s32 *)(bike + 0x120) == 1 && *(s32 *)(bike + 0x124) >= 3) {
+                pointIndex = 0x82;
             }
         }
     }
-    if (a3 == -1) {
-        a3 = ref_L04_00400D48_02(a0, *(u8 **)(a1 + 0x110), 1);
+    if (pointIndex == -1) {
+        pointIndex = ref_L04_00400D48_02(racer, *(u8 **)(bike + 0x110), 1);
     }
-    if (a2 != 0) {
-        *(Q16_B0e5d8f83 *)(a0 + 0x10) = *(Q16_B0e5d8f83 *)(*(u8 **)(a1 + 0x110) + a3 * 16 + 0x10);
+    if (snapToPoint != 0) {
+        *(Q16_B0e5d8f83 *)(racer + 0x10) = *(Q16_B0e5d8f83 *)(*(u8 **)(bike + 0x110) + pointIndex * 16 + 0x10);
     }
-    t = func_00283CE0(a3);
-    t = t * *(f32 *)(*(u8 **)(a1 + 0x110) + 0x1C);
-    if (*(s32 *)(a1 + 0x244) != 0) {
-        f = t + 15.0f;
+    pointDist = IntToFloat(pointIndex);
+    pointDist = pointDist * *(f32 *)(*(u8 **)(bike + 0x110) + 0x1C);
+    if (*(s32 *)(bike + 0x244) != 0) {
+        targetDist = pointDist + 15.0f;
     } else {
-        f = t + 5.0f;
+        targetDist = pointDist + 5.0f;
     }
-    *(f32 *)(a1 + 0xA8) = f;
-    o = *(u8 **)(a1 + 0x110);
-    h = *(f32 *)(o + 0x1C);
-    L04_UpdatePath(f, h, o, a1 + 0x114, a1 + 0x118, a1 + 0xF0);
-    *(s32 *)(a1 + 0x1C0) = 0;
-    *(f32 *)(s1 + 0x63C) = 1.0f;
-    *(s32 *)(s1 + 0x4C4) = 0;
+    *(f32 *)(bike + 0xA8) = targetDist;
+    route = *(u8 **)(bike + 0x110);
+    routeLength = *(f32 *)(route + 0x1C);
+    L04_UpdatePath(targetDist, routeLength, route, bike + 0x114, bike + 0x118, bike + 0xF0);
+    *(s32 *)(bike + 0x1C0) = 0;
+    *(f32 *)(riderVars + 0x63C) = 1.0f;
+    *(s32 *)(riderVars + 0x4C4) = 0;
 }
 
 /* A route of D_L04_001FE340: a point count, then the points. */
@@ -104,7 +105,7 @@ int func_L04_00400AB0(Moby *moby, Route *path, int clamp)
     float delta[4];
 
     for (i = 0; i < path->count; i += 5) {
-        func_00282CF0(delta, moby->position, path->points[i]);
+        FastVecSub(delta, moby->position, path->points[i]);
         distance = func_L00_002EE290(delta);
         if (distance < nearest) {
             nearest = distance;
@@ -119,7 +120,7 @@ int func_L04_00400AB0(Moby *moby, Route *path, int clamp)
             index += count;
         else if (index >= count)
             index -= count;
-        func_00282CF0(delta, moby->position, path->points[index]);
+        FastVecSub(delta, moby->position, path->points[index]);
         distance = func_L00_002EE290(delta);
         if (distance < nearest) {
             best = index;
@@ -128,33 +129,33 @@ int func_L04_00400AB0(Moby *moby, Route *path, int clamp)
     }
 
     if (clamp) {
-        if ((int)ref_L04_00400AB0_00 == 40 || D_001A79F0 == 4) {
+        if ((int)ref_L04_00400AB0_00 == 40 || gCurrentMapIndex == 4) {
             Route *route6;
 
-            if (moby->oClass == 0xBBC) {
+            if (moby->oClass == 0xBBC /* moby class 3004 */) {
                 RacerVarsBBC *vars = moby->vars;
-                route6 = (Route *)D_L04_001FE340[vars->routes[6]];
+                route6 = (Route *)gRoutePathTable[vars->routes[6]];
             } else {
                 RacerVars *vars = moby->vars;
-                route6 = (Route *)D_L04_001FE340[vars->routes[6]];
+                route6 = (Route *)gRoutePathTable[vars->routes[6]];
             }
             if (path == route6 && best >= 105 && best < 124)
                 best = 124;
-        } else if (D_001A79F0 == 11) {
+        } else if (gCurrentMapIndex == 11) {
             Route *route0;
             Route *route7;
             Route *route2;
 
-            if (moby->oClass == 0xBBC) {
+            if (moby->oClass == 0xBBC /* moby class 3004 */) {
                 RacerVarsBBC *vars = moby->vars;
-                route7 = (Route *)D_L04_001FE340[vars->routes[7]];
-                route0 = (Route *)D_L04_001FE340[vars->routes[0]];
-                route2 = (Route *)D_L04_001FE340[vars->routes[2]];
+                route7 = (Route *)gRoutePathTable[vars->routes[7]];
+                route0 = (Route *)gRoutePathTable[vars->routes[0]];
+                route2 = (Route *)gRoutePathTable[vars->routes[2]];
             } else {
                 RacerVars *vars = moby->vars;
-                route7 = (Route *)D_L04_001FE340[vars->routes[7]];
-                route0 = (Route *)D_L04_001FE340[vars->routes[0]];
-                route2 = (Route *)D_L04_001FE340[vars->routes[2]];
+                route7 = (Route *)gRoutePathTable[vars->routes[7]];
+                route0 = (Route *)gRoutePathTable[vars->routes[0]];
+                route2 = (Route *)gRoutePathTable[vars->routes[2]];
             }
             if (path == route7) {
                 if (best >= 12 && best < 22)

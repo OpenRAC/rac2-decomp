@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef unsigned char u8;
 typedef struct { u8 pad[0x10]; u8 count; } Sub_2D23C0;
 typedef struct { u8 pad[0x48]; Sub_2D23C0 *items[1]; } Tab_2D23C0;
@@ -17,19 +18,20 @@ extern void func_0029F390(void *);
 extern int func_L00_002A4DB0(void *a0, int a1, int a2, char *a3);
 extern char D_001B4400[];
 
-void func_L00_002D23C0(int a0, int a1)
+/* Starts the object's animation at the given sequence and frame, ending one frame later or at the last frame. */
+void func_L00_002D23C0(int seq, int frame)
 {
-    Obj_2D23C0 *o = D_0018C0B0;
-    int t;
-    o->b41 = a1 + 1;
-    o->b40 = a1;
-    t = o->tab->items[a0]->count - 1;
-    if (t < o->b41)
-        o->b41 = t;
-    o->w44 = 0;
-    o->b42 = a0;
-    o->b43 = a0;
-    func_0029F390(o);
-    o->w58 = func_L00_002A4DB0(o, o->b42, o->b40, D_001B4400);
-    o->w5C = func_L00_002A4DB0(o, o->b43, o->b41, D_001B4400 + 0x600);
+    Obj_2D23C0 *obj = gHeroMoby_0018C0B0;
+    int lastFrame;
+    obj->b41 = frame + 1;
+    obj->b40 = frame;
+    lastFrame = obj->tab->items[seq]->count - 1;
+    if (lastFrame < obj->b41)
+        obj->b41 = lastFrame;
+    obj->w44 = 0;
+    obj->b42 = seq;
+    obj->b43 = seq;
+    update_moby_animation_state(obj);
+    obj->w58 = CopyAnimationEntryData(obj, obj->b42, obj->b40, D_001B4400);
+    obj->w5C = CopyAnimationEntryData(obj, obj->b43, obj->b41, D_001B4400 + 0x600);
 }

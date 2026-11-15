@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef signed char s8;
 typedef unsigned char u8;
@@ -38,33 +39,34 @@ extern char D_L09_001BFE58[];
 extern s32 func_002761F8(void *, void *, int, void *, int);
 extern s32 func_00277258(void *, int, void *, float);
 
-s32 func_L09_003F9568(T3F9568_Obj *a0, s32 a1, s32 a2, s32 a3)
+/* Checks whether the enemy has a clear line to its target. Returns 1 if something blocks the view. */
+s32 func_L09_003F9568(T3F9568_Obj *moby, s32 checkSolid, s32 fromPathPoint, s32 lowShot)
 {
-    T3F9568_Owned *o = a0->f68;
+    T3F9568_Owned *vars = moby->f68;
     TI128 pos[1];
     TI128 aim[1];
     TI128 probe[1];
     s32 blocked;
 
-    if (o->f30F != 0)
+    if (vars->f30F != 0)
         return 1;
-    pos[0] = *(TI128 *)((char *)a0 + 0x10);
-    if (a2 != 0 && o->f2DC != -1 && o->f1CA != -1)
-        pos[0] = *(TI128 *)((char *)D_L09_001FE6C0[o->f2DC] + o->f1CA * 16 + 0x10);
-    if (a3 != 0)
+    pos[0] = *(TI128 *)((char *)moby + 0x10);
+    if (fromPathPoint != 0 && vars->f2DC != -1 && vars->f1CA != -1)
+        pos[0] = *(TI128 *)((char *)D_L09_001FE6C0[vars->f2DC] + vars->f1CA * 16 + 0x10);
+    if (lowShot != 0)
         ((float *)pos)[2] += 1.0f;
     else
         ((float *)pos)[2] += 1.76f;
-    aim[0] = o->f200->f10;
+    aim[0] = vars->f200->f10;
     blocked = 0;
     ((float *)aim)[2] += 1.18f;
-    if (func_002761F8(pos, aim, 0, a0, 0) == 0 || *(T3F9568_Hit **)D_L09_001BFE58 == (T3F9568_Hit *)o->f200)
+    if (CollLine(pos, aim, 0, moby, 0) == 0 || *(T3F9568_Hit **)D_L09_001BFE58 == (T3F9568_Hit *)vars->f200)
         blocked = 1;
-    if (a1 != 0 && blocked == 0) {
+    if (checkSolid != 0 && blocked == 0) {
         probe[0] = *(TI128 *)(D_L09_001BFE58 + 8);
-        if (func_00277258(probe, 1, a0, 0.5f) != 0) {
-            T3F9568_Hit *h = *(T3F9568_Hit **)D_L09_001BFE58;
-            if (h == 0 || h->f24 == 0 || *(s16 *)(h->f24 + 0x46) != 5)
+        if (TestPointAgainstCollision(probe, 1, moby, 0.5f) != 0) {
+            T3F9568_Hit *hit = *(T3F9568_Hit **)D_L09_001BFE58;
+            if (hit == 0 || hit->f24 == 0 || *(s16 *)(hit->f24 + 0x46) != 5)
                 blocked = 1;
         }
     }

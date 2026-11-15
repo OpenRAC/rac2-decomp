@@ -18,8 +18,9 @@ extern void func_35E728(void);
 
 extern void func_37CA78(unsigned int, unsigned long);
 
+/* Sets up the Endako sky effect each frame and slowly scrolls a texture offset that wraps around at 1.0. */
 void func_L03_002FDB10(void) {
-    float *p;
+    float *scroll;
 
     func_35E6B8();
     D_L03_001B2850 = (int)D_L03_00282D40;
@@ -27,8 +28,8 @@ void func_L03_002FDB10(void) {
     func_35E728();
     func_37CA78(0x47, 0x5360B);
     func_37CA78(0x4E, 0x1000000 | (D_001A72E0 >> 13));
-    p = (float *)(D_L03_001AD390 + 0x74);
-    *p += 0.011100001f;
-    if (*p > 1.0f)
-        *p -= 1.0f;
+    scroll = (float *)(D_L03_001AD390 + 0x74);
+    *scroll += 0.011100001f;
+    if (*scroll > 1.0f)
+        *scroll -= 1.0f;
 }

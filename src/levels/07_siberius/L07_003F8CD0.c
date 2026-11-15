@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int Q128 __attribute__((mode(TI)));
 
 extern void func_0029FCC0(void *entity, int a, void *out);
@@ -7,22 +8,23 @@ extern void func_L04_0030C4C0(void *, void *, void *, void *, void *, void *, in
 extern void func_L07_003F6528(char *);
 extern char *func_L07_003F65E8(int);
 
-void func_L07_003F8CD0(char *obj)
+/* Launches every member of the object's group away from it at a fixed speed. */
+void func_L07_003F8CD0(char *moby)
 {
-    char *s2 = *(char **)(obj + 0x68);
-    float v10[4];
-    float v20[4];
-    float v30[4];
-    char *p;
+    char *vars = *(char **)(moby + 0x68);
+    float start[4];
+    float velocity[4];
+    float offset[4];
+    char *member;
 
-    func_0029FCC0(obj, 0, v10);
-    *(Q128 *)v30 = 0;
-    v30[2] = 5.0f;
-    func_00282F20(v20, obj + 0xC0, 2.0f);
+    TransformMobyJointToWorld(moby, 0, start);
+    *(Q128 *)offset = 0;
+    offset[2] = 5.0f;
+    vec_scale_to_length(velocity, moby + 0xC0, 2.0f);
     for (;;) {
-        p = func_L07_003F65E8(*(int *)(s2 + 0x180));
-        if (p == 0) break;
-        func_L07_003F6528(p);
-        func_L04_0030C4C0(p, v10, v20, p + 0x10, v30, p + 0xF0, 0x5A, 0, 0);
+        member = PickRandomActiveGroupEntity(*(int *)(vars + 0x180));
+        if (member == 0) break;
+        StartSwingingTurret(member);
+        BuildSpawnRecordFromBlocks(member, start, velocity, member + 0x10, offset, member + 0xF0, 0x5A, 0, 0);
     }
 }

@@ -39,33 +39,34 @@ extern int func_0011AFC0(int);
 extern int func_002B7BC0(void *, int, int, void (*)(int *, int), StreamLoad *);
 extern void func_00294130(int *p, int a1);
 
+/* Continues a streamed disc load. With go set to 0 it marks the load as finished; otherwise it sends the first chunk to the sound processor and starts reading the file. */
 void func_00294180(StreamLoad *load, s32 go) {
     SifDma dma;
     u8 *buf;
     s32 *hdr;
-    s32 off;
-    s32 id;
+    s32 slotOffset;
+    s32 dmaId;
 
     if (go == 0) {
         load->file = -1;
     } else {
-        if (D_0014B540.files[load->file].sectors != 0) {
-            off = load->slot * 0xC800;
+        if (gCopySetupData.files[load->file].sectors != 0) {
+            slotOffset = load->slot * 0xC800;
             buf = load->buf;
             hdr = (s32 *)(buf + 0x18);
-            dma.size = D_0014B540.files[load->file].sectors << 11;
+            dma.size = gCopySetupData.files[load->file].sectors << 11;
             dma.data = buf;
             dma.mode = 0;
-            dma.addr = D_001A7278 + off;
+            dma.addr = D_001A7278 + slotOffset;
             *(s32 *)(buf + 0x14) = 0xC000;
             hdr[0x28 / 4] = 0xC000;
             hdr[0x2C / 4] = 0xC000;
-            func_0011AEA0(0);
-            id = func_0011AFE0(&dma, 1);
-            while (func_0011AFC0(id) >= 0) {
+            FlushCache(0);
+            dmaId = sceSifSetDma(&dma, 1);
+            while (sceSifDmaStat(dmaId) >= 0) {
             }
         }
-        func_002B7BC0(load->buf, D_0014B540.files[load->file].offset + D_0014B540.base,
-                      D_0014B540.files[load->file].size, func_00294130, load);
+        StartDiscReadWithCallback(load->buf, gCopySetupData.files[load->file].offset + gCopySetupData.base,
+                      gCopySetupData.files[load->file].size, ReleaseClassCacheSlot, load);
     }
 }

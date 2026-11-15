@@ -10,57 +10,58 @@ extern f32 func_00283198(f32);
 extern s32 func_00283CF0(f32);
 extern s32 func_002A77E0(s32);
 extern u8 *func_002BDCE8(void *, f32, f32, f32, f32, s32, void *, u32, s32);
+/* Spawns small puffs of sparks from two points on the object, three per point. */
 void func_L12_00418D20(u8 *self)
 {
     f32 pos[4] __attribute__((aligned(16)));
     f32 offset[4] __attribute__((aligned(16)));
     f32 velocity[4] __attribute__((aligned(16)));
     s32 i;
-    u8 *p;
+    u8 *particle;
     u8 *origin=self+0x10;
     for(i=0;i<2;i++) {
-        if(i==0) func_00283098(offset,D_L12_001B1C50,self+0xC0);
-        else func_00283098(offset,D_L12_001B1C60,self+0xC0);
+        if(i==0) matrix_mul_vec3(offset,D_L12_001B1C50,self+0xC0);
+        else matrix_mul_vec3(offset,D_L12_001B1C60,self+0xC0);
         qcopy(pos,origin);
-        func_00282CC0(pos,pos,offset);
-        velocity[0]=func_00283180(func_00283B98(*(f32 *)(self+0xF8),3.141593f))*0.050000004f;
-        velocity[1]=func_00283198(func_00283B98(*(f32 *)(self+0xF8),3.141593f))*0.050000004f;
+        FastVecAdd(pos,pos,offset);
+        velocity[0]=FastSinOrCosA(FastAddRotations(*(f32 *)(self+0xF8),3.141593f))*0.050000004f;
+        velocity[1]=FastSinOrCosB(FastAddRotations(*(f32 *)(self+0xF8),3.141593f))*0.050000004f;
         velocity[2]=0.033333335f;
-        p=func_002BDCE8(pos,0.1f,1.0f,0.9f,210000.0f,func_002A77E0(16),velocity,0xDF202020,0);
-        if(p) {
-            u8 *d=p+0x20;
-            *(u16 *)(p+10)=10;
-            p[9]=func_00283CF0(4.0f)+0x70;
-            *(s32 *)(d+4)=2;
-            d[10]=0xDF;
-            d[11]=p[10];
-            p[3]=0x44;
+        particle=SpawnSpinningSparkParticle(pos,0.1f,1.0f,0.9f,210000.0f,RandomIntBelow(16),velocity,0xDF202020,0);
+        if(particle) {
+            u8 *particleData=particle+0x20;
+            *(u16 *)(particle+10)=10;
+            particle[9]=FloatToInt(4.0f)+0x70;
+            *(s32 *)(particleData+4)=2;
+            particleData[10]=0xDF;
+            particleData[11]=particle[10];
+            particle[3]=0x44;
         }
-        velocity[0]=func_00283180(func_00283B98(*(f32 *)(self+0xF8),3.141593f))*0.050000004f;
-        velocity[1]=func_00283198(func_00283B98(*(f32 *)(self+0xF8),3.141593f))*0.050000004f;
+        velocity[0]=FastSinOrCosA(FastAddRotations(*(f32 *)(self+0xF8),3.141593f))*0.050000004f;
+        velocity[1]=FastSinOrCosB(FastAddRotations(*(f32 *)(self+0xF8),3.141593f))*0.050000004f;
         velocity[2]=0.033333335f;
-        p=func_002BDCE8(pos,0.1f,1.0f,0.9f,210000.0f,func_002A77E0(16),velocity,0xDF208080,0);
-        if(p) {
-            u8 *d=p+0x20;
-            *(u16 *)(p+10)=10;
-            p[9]=func_00283CF0(4.0f)+0x70;
-            *(s32 *)(d+4)=2;
-            d[10]=0xDF;
-            d[11]=p[10];
-            p[3]=0x48;
+        particle=SpawnSpinningSparkParticle(pos,0.1f,1.0f,0.9f,210000.0f,RandomIntBelow(16),velocity,0xDF208080,0);
+        if(particle) {
+            u8 *particleData=particle+0x20;
+            *(u16 *)(particle+10)=10;
+            particle[9]=FloatToInt(4.0f)+0x70;
+            *(s32 *)(particleData+4)=2;
+            particleData[10]=0xDF;
+            particleData[11]=particle[10];
+            particle[3]=0x48;
         }
-        velocity[0]=func_00283180(func_00283B98(*(f32 *)(self+0xF8),3.141593f))*0.016666668f;
-        velocity[1]=func_00283198(func_00283B98(*(f32 *)(self+0xF8),3.141593f))*0.016666668f;
+        velocity[0]=FastSinOrCosA(FastAddRotations(*(f32 *)(self+0xF8),3.141593f))*0.016666668f;
+        velocity[1]=FastSinOrCosB(FastAddRotations(*(f32 *)(self+0xF8),3.141593f))*0.016666668f;
         velocity[2]=0.033333335f;
-        p=func_002BDCE8(pos,0.1f,1.0f,0.9f,210000.0f,func_002A77E0(16),velocity,0xDF808080,0);
-        if(p) {
-            u8 *d=p+0x20;
-            *(u16 *)(p+10)=10;
-            p[9]=func_00283CF0(4.0f)+0x70;
-            *(s32 *)(d+4)=2;
-            d[10]=0xDF;
-            d[11]=p[10];
-            p[3]=0x44;
+        particle=SpawnSpinningSparkParticle(pos,0.1f,1.0f,0.9f,210000.0f,RandomIntBelow(16),velocity,0xDF808080,0);
+        if(particle) {
+            u8 *particleData=particle+0x20;
+            *(u16 *)(particle+10)=10;
+            particle[9]=FloatToInt(4.0f)+0x70;
+            *(s32 *)(particleData+4)=2;
+            particleData[10]=0xDF;
+            particleData[11]=particle[10];
+            particle[3]=0x44;
         }
     }
 }

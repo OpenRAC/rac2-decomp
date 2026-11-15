@@ -40,18 +40,18 @@ int func_002D99E8(Menu_002D99E8 *menu)
     mask = 0;
     y = 4;
     x = 4;
-    func_0027C540(0);
+    SetupGifPaging(0);
     list = (int *)0x70000000;
-    count = func_0029DB28(list, &mask, 0, 0);
-    func_002FC560(0x42, 0x44);
-    func_002FC560(0x47, 0x10B);
+    count = ListActiveMenuEntries(list, &mask, 0, 0);
+    VU1_addGSregister(0x42, 0x44);
+    VU1_addGSregister(0x47, 0x10B);
     if (!D_001AB910) {
         x = menu->x;
         y = menu->y;
     }
-    func_0027F538(x, y, 0x80FFA888, (signed char *)func_00288FB8(0x2DC5), -1);
+    DrawTextSmallFont(x, y, 0x80FFA888, (signed char *)GetLocalizedString(0x2DC5), -1);
     y += 20;
-    func_00115484(&initial, 0, 24);
+    memset(&initial, 0, 24);
     initial.bottom = menu->height;
     initial.right = menu->width;
     initial.line = 16;
@@ -59,34 +59,34 @@ int func_002D99E8(Menu_002D99E8 *menu)
     initial.left = x;
     draw = initial;
     if (D_001ABB28)
-        func_0027EB88(y, menu->height, x, menu->width, 64, 0x202020);
+        DrawRoundedBox(y, menu->height, x, menu->width, 64, 0x202020);
     for (i = 0; i < count; i++) {
         iconX = x + 4;
         iconY = y + 10;
-        base = D_001C4FA0;
+        base = gMapOverlayState;
         selected = menu->selected[base[0x230 / 4]] == i;
         color = selected ? 0x8020FFFF : 0x80FFA888;
         if (selected)
-            func_0027F120();
+            DisableScreenFlag();
         limit = x + 16;
         draw.x = limit;
         draw.y = y - menu->scroll;
-        func_00280200(&draw, color, (signed char *)func_00288FB8(list[i]), -1);
+        DrawTextWindowMediumFont(&draw, color, (signed char *)GetLocalizedString(list[i]), -1);
         if (selected) {
             if ((s16)draw.y < (limit = (s16)draw.top + 4))
                 menu->scroll -= 4;
             if ((s16)draw.bottom - (s16)draw.height - 4 < (s16)draw.y)
                 menu->scroll += 4;
-            func_0027F110();
+            EnableScreenFlag();
         }
         rows = (s16)draw.height / (s16)draw.line;
         if (rows == 2)
             iconY += 6;
         iconTop = iconY - menu->scroll;
         if ((s16)draw.top + 4 <= iconTop && iconTop <= (s16)draw.bottom - 4)
-            func_002D9CF8(iconX + 5, iconTop, (mask >> i) & 1);
+            DrawMenuCheckBox(iconX + 5, iconTop, (mask >> i) & 1);
         y += rows * 16;
     }
-    func_0027C660();
+    DoGifPaging();
     return 2;
 }

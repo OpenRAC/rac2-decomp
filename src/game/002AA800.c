@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { int colors[6]; } Colors1043;
 extern Colors1043 ref_L00_002AC728_00, ref_L00_002AC728_01;
@@ -127,14 +128,14 @@ void func_002AA800 (float *p, int a1, float fx, float fl)
 {
   float v;
 
-  v = func_002AA738 (fx, a1, p[0]);
+  v = GetShortestAngleDelta (fx, a1, p[0]);
   if (fl < v)
     v = fl;
   else if (v < -fl)
     v = -fl;
   v = func_00283B98_14 (p[0], v);
   p[0] = v;
-  func_002AA738 (fx, a1, v);
+  GetShortestAngleDelta (fx, a1, v);
 }
 
 extern void func_002AA198(float *, float, float, float, float);
@@ -152,12 +153,12 @@ float func_002AA898(float *position, float target, float *velocity,
             if (target < 0.0f) direction = -1;
         } else direction = 0;
     }
-    distance = func_002AA738(target, direction, *position);
-    func_002AA198(velocity, distance, acceleration, damping, limit);
+    distance = GetShortestAngleDelta(target, direction, *position);
+    UpdateSpringVelocity(velocity, distance, acceleration, damping, limit);
     distance = func_00283B98_14(*position, *velocity);
     *position = distance;
-    residual = func_002AA738(target, direction, distance);
-    if (func_00282C48(residual) < limit * 0.01f) {
+    residual = GetShortestAngleDelta(target, direction, distance);
+    if (FloatAbs(residual) < limit * 0.01f) {
         *position = target;
         *velocity = 0.0f;
         return *velocity;
@@ -193,11 +194,12 @@ void func_002AAF40(int *a, int *b, int *c, int mask) {
 /* Scales four float arguments by 255, converts each through the same routine, masks each result to a byte and packs the four bytes into one word, low byte first. */
 
 
+/* Shuffles the red, green and blue parts of a packed color according to a mask and keeps the alpha part. */
 int func_002AAFA0(unsigned int color, int mask)
 {
     int tmp[3];
     int mid;
-    unsigned int a;
+    unsigned int alpha;
     int result;
 
     if (mask == 0)
@@ -207,41 +209,42 @@ int func_002AAFA0(unsigned int color, int mask)
     mid = color & 0xFF00;
     tmp[1] = mid >> 8;
     tmp[2] = (color >> 16) & 0xFF;
-    a = color >> 24;
-    func_002AAF40(tmp, tmp + 1, tmp + 2, mask);
-    result = a << 24;
+    alpha = color >> 24;
+    swap_color_channel_words(tmp, tmp + 1, tmp + 2, mask);
+    result = alpha << 24;
     result |= tmp[2] << 16;
     result |= tmp[1] << 8;
     result |= tmp[0];
     return result;
 }
 
-void func_002AB028(float (*m)[4])
+/* Makes each of the three columns of a matrix have length one. */
+void func_002AB028(float (*matrix)[4])
 {
-    int k;
+    int column;
     int i;
-    float v[4];
+    float vec[4];
 
-    for (k = 0; k < 3; k++) {
-        v[3] = 0.0f;
+    for (column = 0; column < 3; column++) {
+        vec[3] = 0.0f;
         for (i = 0; i < 3; i++)
-            v[i] = m[i][k];
-        Fa5914967_FUN_00282F20(v, v, 1.0f);
+            vec[i] = matrix[i][column];
+        Fa5914967_FUN_00282F20(vec, vec, 1.0f);
         for (i = 0; i < 3; i++)
-            m[i][k] = v[i];
+            matrix[i][column] = vec[i];
     }
 }
 
 /* Initialises a 96-byte stack workspace, calls one routine on its first window with two of the incoming integers, fills the third window from a second routine, combines the three windows with a third routine, and returns one float of the middle window indexed by the fourth integer. */
-float func_002AB0E8(int a0, int a1, int a2, int a3)
+float func_002AB0E8(int argA, int argB, int argC, int index)
 {
-	float v[24];
-	float *m = v + 4;
+	float workspace[24];
+	float *middle = workspace + 4;
 
-	func_00282CF0_13(v, a2, a0);
-	func_00283698_4(v + 8, a1);
-	func_002830C0_7(m, v, v + 8);
-	return m[a3];
+	func_00282CF0_13(workspace, argC, argA);
+	func_00283698_4(workspace + 8, argB);
+	func_002830C0_7(middle, workspace, workspace + 8);
+	return middle[index];
 }
 
 extern void func_00282F20(float *, float *, float);
@@ -249,26 +252,29 @@ extern float func_00282DB0(void *, void *);
 extern void func_00282D30(void *, void *, float);
 extern void func_00282CF0(void *, void *, void *);
 
+/* Adds to a vector a piece of itself that points along the given axis, scaled by an amount. */
 void func_002AB168(float *out, float *vector, float *axis, float amount)
 {
     float scaled[4];
     float unit[4];
     float dot;
-    func_00282F20(unit, axis, 1.0f);
-    dot = func_00282DB0(unit, vector);
-    func_00282D30(scaled, unit, dot * amount);
-    func_00282CF0(out, vector, scaled);
+    vec_scale_to_length(unit, axis, 1.0f);
+    dot = FastVecDot(unit, vector);
+    FastVecScale(scaled, unit, dot * amount);
+    FastVecSub(out, vector, scaled);
 }
 
-s32 func_002AB1F0(u8 *a0) {
- if(a0==0) return 0;
- if((*(unsigned short *)(a0+0x34)&0x20)!=0) return (*(s32 **)(a0+0x68))[0];
+/* Returns the first value stored in the object's private data, or 0 if it has none. */
+s32 func_002AB1F0(u8 *moby) {
+ if(moby==0) return 0;
+ if((*(unsigned short *)(moby+0x34)&0x20)!=0) return (*(s32 **)(moby+0x68))[0];
  return 0;
 }
 
-s32 func_002AB220(u8 *a0) {
- if(a0==0) return 0;
- if((*(unsigned short *)(a0+0x34)&0x20)!=0) return (*(s32 **)(a0+0x68))[4];
+/* Returns the fifth value stored in the object's private data, or 0 if it has none. */
+s32 func_002AB220(u8 *moby) {
+ if(moby==0) return 0;
+ if((*(unsigned short *)(moby+0x34)&0x20)!=0) return (*(s32 **)(moby+0x68))[4];
  return 0;
 }
 
@@ -278,6 +284,7 @@ extern int func_002A7820(int, int);
 extern void func_002AF000(float *, float, float, float);
 extern void func_002BAE50(void *, void *, unsigned int, int, int, int, int, int);
 
+/* Spawns small glowing sparks at several points around an object. */
 void func_002AB250(void *owner, char *offset, void *filter)
 {
     char vectors[320];
@@ -288,7 +295,7 @@ void func_002AB250(void *owner, char *offset, void *filter)
     int result;
     int first;
     float angle;
-    result = func_002A99A0(owner, 20, vectors, filter, 14.0f);
+    result = ScatterPointsInCollisionShapes(owner, 20, vectors, filter, 14.0f);
     if (result == 0)
         return;
     if (result > 0) {
@@ -296,12 +303,12 @@ void func_002AB250(void *owner, char *offset, void *filter)
         cursor = vectors;
         count = result;
         do {
-            angle = func_002A7940();
-            func_002AF000(point, 0.030000001192092896f, angle, func_002A7940());
+            angle = RandomAngle();
+            BuildSphericalOffset(point, 0.030000001192092896f, angle, RandomAngle());
             F904cc63b_FUN_00282CC0((V4_F904cc63b *)point, (V4_F904cc63b *)point, offset);
             position[2] += 0.015000000596046448f;
-            first = func_002A7820(20, 35);
-            func_002BAE50(cursor, point, 0x7000A0FFu, 255, first, 30, func_002A7820(40, 60), 1);
+            first = RandomIntRange(20, 35);
+            SpawnScalingParticle(cursor, point, 0x7000A0FFu, 255, first, 30, RandomIntRange(40, 60), 1);
             cursor += 16;
         } while (--count != 0);
     }
@@ -312,89 +319,92 @@ extern void func_00283658(void *, void *);
 extern void func_002AB378(void *, void *);
 extern void func_00283678(void *, void *);
 
-void func_002AB600(void *a0, void *a1) {
-    unsigned char local[0x40];
-    func_00283658(local, a1);
-    func_002AB378(a0, local);
-    func_00283678(a1, local);
+/* Copies a matrix, changes the copy, and writes the result back. */
+void func_002AB600(void *target, void *matrix) {
+    unsigned char copy[0x40];
+    copy_matrix_rotation(copy, matrix);
+    ConvertMatrixToQuaternion(target, copy);
+    copy_matrix3x4(matrix, copy);
 }
 
-void func_002AB650(u8 *a0) {
-    u8 *p = *(u8 **)D_0018C0B0;
-    *(long *)(a0 + 0x38) = *(long *)(p + 0x38);
+/* Copies an 8-byte value from one object into another. */
+void func_002AB650(u8 *dest) {
+    u8 *source = *(u8 **)gHeroMoby_0018C0B0;
+    *(long *)(dest + 0x38) = *(long *)(source + 0x38);
 }
 
 /* Halves the float argument and calls one helper with it, forwards the second and first arguments plus that helper result to a second helper, and stores a third helper result into the field at offset 12 of the first argument. */
-void func_002AB668(void *a0, int a1, float x)
+void func_002AB668(void *rotation, int axis, float angle)
 {
-    float h = x * 0.5f;
-    float t = func_00283198_7(h);
+    float halfAngle = angle * 0.5f;
+    float sine = func_00283198_7(halfAngle);
 
-    func_00282D30_18(a0, a1, t);
-    *(float *)((char *)a0 + 12) = func_00283180_8(h);
+    func_00282D30_18(rotation, axis, sine);
+    *(float *)((char *)rotation + 12) = func_00283180_8(halfAngle);
 }
 
 
 /* Copies 64 bytes of a source record onto the stack, normalises the last element of the copy to 1.0, queries three pairwise float angles from the copy after two scratch-matrix builds, and writes the three angles into the caller's output record. */
 void func_002AB6D8(float *src, float *out)
 {
-    V4_F876460d6 tmp[4];
-    float m[16];
+    V4_F876460d6 rotation[4];
+    float matrix[16];
     float local[4];
-    float a, b, c;
+    float angleZ, angleY, angleX;
 
-    *(V4_F876460d6 *)(m + 0) = *(V4_F876460d6 *)(src + 0);
-    *(V4_F876460d6 *)(m + 4) = *(V4_F876460d6 *)(src + 4);
-    *(V4_F876460d6 *)(m + 8) = *(V4_F876460d6 *)(src + 8);
-    *(V4_F876460d6 *)(m + 12) = *(V4_F876460d6 *)(src + 12);
-    func_00282C88_3((char *)(m + 12));
-    m[15] = 1.0f;
-    a = func_00283248_6(m[0], m[1]);
+    *(V4_F876460d6 *)(matrix + 0) = *(V4_F876460d6 *)(src + 0);
+    *(V4_F876460d6 *)(matrix + 4) = *(V4_F876460d6 *)(src + 4);
+    *(V4_F876460d6 *)(matrix + 8) = *(V4_F876460d6 *)(src + 8);
+    *(V4_F876460d6 *)(matrix + 12) = *(V4_F876460d6 *)(src + 12);
+    func_00282C88_3((char *)(matrix + 12));
+    matrix[15] = 1.0f;
+    angleZ = func_00283248_6(matrix[0], matrix[1]);
     local[0] = 0.0f;
     local[1] = 0.0f;
-    local[2] = -a;
-    func_00283410_7((char *)tmp, (char *)local);
-    func_00283788_4((char *)m, (char *)tmp, (char *)m);
-    b = func_00283248_6(m[0], -m[2]);
+    local[2] = -angleZ;
+    func_00283410_7((char *)rotation, (char *)local);
+    func_00283788_4((char *)matrix, (char *)rotation, (char *)matrix);
+    angleY = func_00283248_6(matrix[0], -matrix[2]);
     local[0] = 0.0f;
     local[2] = 0.0f;
-    local[1] = -b;
-    func_00283430((char *)tmp, (char *)local);
-    func_00283788_4((char *)m, (char *)tmp, (char *)m);
-    c = func_00283248_6(m[5], m[6]);
-    out[2] = a;
-    out[1] = b;
-    out[0] = c;
+    local[1] = -angleY;
+    FastMatrixHelperB((char *)rotation, (char *)local);
+    func_00283788_4((char *)matrix, (char *)rotation, (char *)matrix);
+    angleX = func_00283248_6(matrix[5], matrix[6]);
+    out[2] = angleZ;
+    out[1] = angleY;
+    out[0] = angleX;
     local[1] = 0.0f;
-    local[0] = -c;
+    local[0] = -angleX;
     local[2] = 0.0f;
 }
 
+/* Starts or restarts a color fade timer for a light or glow. */
 void func_002AB800(int first, char *object)
 {
-    char *s0 = object;
-    short s1 = *(short *)(s0 + 0);
-    unsigned short total;
+    char *fader = object;
+    short oldTime = *(short *)(fader + 0);
+    unsigned short duration;
     float limit;
     int result;
 
-    if (s1 != 0 && *(short *)(s0 + 2) == 0)
+    if (oldTime != 0 && *(short *)(fader + 2) == 0)
         return;
-    total = *(unsigned short *)(s0 + 12);
-    *(short *)(s0 + 2) = 0;
-    *(short *)(s0 + 0) = total;
-    if (s1 != 0) {
-        limit = F500f9762_FUN_00283CE0(*(short *)(s0 + 14));
-        result = F500f9762_FUN_00283CF0((float)*(short *)(s0 + 12) * ((float)s1 / limit));
-        *(short *)(s0 + 0) = (short)result;
+    duration = *(unsigned short *)(fader + 12);
+    *(short *)(fader + 2) = 0;
+    *(short *)(fader + 0) = duration;
+    if (oldTime != 0) {
+        limit = F500f9762_FUN_00283CE0(*(short *)(fader + 14));
+        result = F500f9762_FUN_00283CF0((float)*(short *)(fader + 12) * ((float)oldTime / limit));
+        *(short *)(fader + 0) = (short)result;
         if ((short)result <= 0)
-            *(short *)(s0 + 0) = 1;
+            *(short *)(fader + 0) = 1;
     } else {
-        int a, b, c;
-        F500f9762_FUN_002A04B8(first, (char *)&a, (char *)&b, (char *)&c);
-        *(char *)(s0 + 4) = (unsigned char)a;
-        *(char *)(s0 + 5) = (unsigned char)b;
-        *(char *)(s0 + 6) = (unsigned char)c;
+        int red, green, blue;
+        F500f9762_FUN_002A04B8(first, (char *)&red, (char *)&green, (char *)&blue);
+        *(char *)(fader + 4) = (unsigned char)red;
+        *(char *)(fader + 5) = (unsigned char)green;
+        *(char *)(fader + 6) = (unsigned char)blue;
     }
 }
 
@@ -402,10 +412,11 @@ extern int F500f9762_FUN_00282978(char *a0);
 
 extern void F500f9762_FUN_002A0488(void *a, int b, int c, int d);
 
+/* Updates a color fade each frame and sets the light color on the owner. */
 void func_002AB8C0(void *owner, u8 *obj)
 {
-    int r, g, b;
-    float limit, f;
+    int red, green, blue;
+    float limit, blend;
 
     if (*(short *)obj == 0)
         return;
@@ -421,19 +432,19 @@ void func_002AB8C0(void *owner, u8 *obj)
 
     if (*(short *)(obj + 2) == 0) {
         limit = F500f9762_FUN_00283CE0(*(short *)(obj + 0xC));
-        f = (limit - (float)*(short *)obj) / limit;
-        r = obj[7] ? F500f9762_FUN_00283CF0((float)obj[4] + (float)(obj[7] - obj[4]) * f) : obj[4];
-        g = obj[8] ? F500f9762_FUN_00283CF0((float)obj[5] + (float)(obj[8] - obj[5]) * f) : obj[5];
-        b = obj[9] ? F500f9762_FUN_00283CF0((float)obj[6] + (float)(obj[9] - obj[6]) * f) : obj[6];
+        blend = (limit - (float)*(short *)obj) / limit;
+        red = obj[7] ? F500f9762_FUN_00283CF0((float)obj[4] + (float)(obj[7] - obj[4]) * blend) : obj[4];
+        green = obj[8] ? F500f9762_FUN_00283CF0((float)obj[5] + (float)(obj[8] - obj[5]) * blend) : obj[5];
+        blue = obj[9] ? F500f9762_FUN_00283CF0((float)obj[6] + (float)(obj[9] - obj[6]) * blend) : obj[6];
     } else {
         limit = F500f9762_FUN_00283CE0(*(short *)(obj + 0xE));
-        f = (limit - (float)*(short *)obj) / limit;
-        r = obj[7] ? F500f9762_FUN_00283CF0((float)obj[7] + (float)(obj[4] - obj[7]) * f) : obj[4];
-        g = obj[8] ? F500f9762_FUN_00283CF0((float)obj[8] + (float)(obj[5] - obj[8]) * f) : obj[5];
-        b = obj[9] ? F500f9762_FUN_00283CF0((float)obj[9] + (float)(obj[6] - obj[9]) * f) : obj[6];
+        blend = (limit - (float)*(short *)obj) / limit;
+        red = obj[7] ? F500f9762_FUN_00283CF0((float)obj[7] + (float)(obj[4] - obj[7]) * blend) : obj[4];
+        green = obj[8] ? F500f9762_FUN_00283CF0((float)obj[8] + (float)(obj[5] - obj[8]) * blend) : obj[5];
+        blue = obj[9] ? F500f9762_FUN_00283CF0((float)obj[9] + (float)(obj[6] - obj[9]) * blend) : obj[6];
     }
 
-    F500f9762_FUN_002A0488(owner, r, g, b);
+    F500f9762_FUN_002A0488(owner, red, green, blue);
 }
 
 
@@ -442,6 +453,7 @@ void func_002AB8C0(void *owner, u8 *obj)
 extern char *g_mobyTableBase __attribute__((sda));
 extern char *g_mobyTableEnd __attribute__((sda));
 
+/* Returns true if the pointer is a valid object in the object table and its class is one of a small group of classes. */
 int func_002ABB78(char *object)
 {
     if (object != 0)
@@ -456,30 +468,31 @@ check:
     return (unsigned int)(*(unsigned short *)(object + 0xAA) - 500) < 41;
 }
 
+/* Creates an explosion at a position with sparks, flashes, a sound and an optional shockwave. */
 void func_002AC728(unsigned char *object, void *position, int sound, float scale, float radius)
 {
     float zero[4];
-    Colors1043 first, second;
+    Colors1043 colorsA, colorsB;
     float speed, energy;
     int i, life;
-    int *a, *b;
+    int *colorA, *colorB;
     func_00282C88_3((char *)zero);
     for (i=2;i>=0;i--) {
-        speed = func_002A7878(8.0f,10.0f) * 0.01666666753590107f;
+        speed = RandomFloatRange(8.0f,10.0f) * 0.01666666753590107f;
         energy = scale * 400000.0f;
-        first = ref_L00_002AC728_00;
-        second = ref_L00_002AC728_01;
-        a = &first.colors[func_002A77E0(6)];
-        b = &second.colors[func_002A77E0(6)];
-        life = func_002A7820(15,20);
-        func_002BBCB0(position,zero,*a,*b,energy,life,func_002A7820(25,30),speed*scale,0,0);
+        colorsA = ref_L00_002AC728_00;
+        colorsB = ref_L00_002AC728_01;
+        colorA = &colorsA.colors[RandomIntBelow(6)];
+        colorB = &colorsB.colors[RandomIntBelow(6)];
+        life = RandomIntRange(15,20);
+        SpawnFireworkSparkParticle(position,zero,*colorA,*colorB,energy,life,RandomIntRange(25,30),speed*scale,0,0);
     }
     if (object) {
-        func_00308408(object,position,zero,20,127,64,0,48,scale*4.0f);
-        func_00308408(object,position,zero,29,96,32,0,32,scale*3.0f);
+        SpawnShockwaveRing(object,position,zero,20,127,64,0,48,scale*4.0f);
+        SpawnShockwaveRing(object,position,zero,29,96,32,0,32,scale*3.0f);
         if (object[0x20] != 0xfe)
             if (object[0x20] != 0xfd)
-                if (sound != -1) func_002E5CF8(sound,0,object);
+                if (sound != -1) PlayMobySound(sound,0,object);
     }
     if (radius != 0.0f) {
         if (radius > 0.0f) {
@@ -491,14 +504,15 @@ void func_002AC728(unsigned char *object, void *position, int sound, float scale
             ref_L00_002AC728_02[10]=13.0f;
             ref_L00_002AC728_02[8]=13.0f;
         }
-        func_00312B70(ref_L00_002AC728_02,position,0,0);
+        SpawnTemplateEffectMoby(ref_L00_002AC728_02,position,0,0);
     }
 }
 
 
 extern void func_00282F20(float *, float *, float);
 extern float func_00282DF0(float *);
-void func_002AC9F8(float *p, float threshold) { if (threshold < func_00282DF0(p)) func_00282F20(p, p, threshold); }
+/* Shortens a vector to the given length if it is longer than that. */
+void func_002AC9F8(float *vector, float threshold) { if (threshold < FastVecLength(vector)) vec_scale_to_length(vector, vector, threshold); }
 
 
 extern int D_L02_001B359C;
@@ -508,7 +522,7 @@ void func_002ACA50(int param_1, short *param_2, short param_3)
 {
     int i;
 
-    param_1 = (param_1 - D_L02_001B359C) << 8 >> 16;
+    param_1 = (param_1 - gMobyPool_L02) << 8 >> 16;
     for (i = 1; i <= param_2[0]; i++) {
         if (param_2[i] == param_1) return;
     }
@@ -524,7 +538,7 @@ void func_002ACAD0(int param_1, unsigned short *param_2)
     int i;
 
     for (i = 1; i <= (short)param_2[0]; i++) {
-        if (D_L02_001B359C + ((short)param_2[i] << 8) == param_1) {
+        if (gMobyPool_L02 + ((short)param_2[i] << 8) == param_1) {
             param_2[i] = param_2[(short)param_2[0]];
             param_2[0] = param_2[0] - 1;
             return;
@@ -537,9 +551,9 @@ void func_002ACB48(float *vector, float scale)
 {
     float negative = -scale;
 
-    vector[0] = vector[0] + func_002A7878(negative, scale);
-    vector[1] = vector[1] + func_002A7878(negative, scale);
-    vector[2] = vector[2] + func_002A7878(negative, scale);
+    vector[0] = vector[0] + RandomFloatRange(negative, scale);
+    vector[1] = vector[1] + RandomFloatRange(negative, scale);
+    vector[2] = vector[2] + RandomFloatRange(negative, scale);
 }
 
 extern char *D_001B1C4C __attribute__((sda));
@@ -553,9 +567,9 @@ int func_002ACBC8(void *point, int index)
 
     if (index != -1) {
         record = D_001B1C4C + (index << 7);
-        func_00282CF0(local, point, record + 0x30);
+        FastVecSub(local, point, record + 0x30);
         local[3] = 0.0f;
-        func_00283098((char *)transformed, (char *)local, record + 0x40);
+        matrix_mul_vec3((char *)transformed, (char *)local, record + 0x40);
         if (transformed[0] >= -1.0f && transformed[0] <= 1.0f &&
             transformed[1] >= -1.0f && transformed[1] <= 1.0f &&
             transformed[2] >= -1.0f && transformed[2] <= 1.0f)
@@ -578,10 +592,10 @@ int func_002ACCA8(void *point, int index)
         return 0;
     } else {
         record = D_001B1C54 + (index << 7);
-        func_00282CF0(local, point, record + 0x30);
+        FastVecSub(local, point, record + 0x30);
         local[3] = 0.0f;
-        func_00283098((char *)transformed, (char *)local, record + 0x40);
-        if (func_00282DF0(transformed) < 1.0f)
+        matrix_mul_vec3((char *)transformed, (char *)local, record + 0x40);
+        if (FastVecLength(transformed) < 1.0f)
             return 1;
     }
     return 0;
@@ -592,12 +606,13 @@ typedef struct { int selected, reserved04, reserved08, count; } MatchRange;
 extern MatchRange ref_L00_002ACD38_00;
 extern float ref_L00_002ACD38_01[][4];
 extern int func_00283D80(void *, void *, void *);
+/* Checks whether an object is inside one of the saved zones and whether it is the selected one. */
 int func_002ACD38(void *object)
 {
     int found = 0;
     int i;
     for (i = ref_L00_002ACD38_00.count - 1; i >= 0; i--) {
-        if (func_00283D80(object, ref_L00_002ACD38_01[i], ref_L00_002ACD38_01[i + 2])) {
+        if (FastVectorHelperF(object, ref_L00_002ACD38_01[i], ref_L00_002ACD38_01[i + 2])) {
             found = i + 1;
             break;
         }
@@ -610,75 +625,79 @@ int func_002ACD38(void *object)
 extern void func_00282F20(float *dst, float *src, float scale);
 extern float func_00282C10(float x);
 
-void func_002ACE78(float *p, float *src, float x) { func_00282F20(p, src, x); p[3] = func_00282C10(1.0f - x * x); }
+/* Sets a direction vector and stores a matching value from its length in the fourth slot. */
+void func_002ACE78(float *out, float *dir, float x) { vec_scale_to_length(out, dir, x); out[3] = square_root(1.0f - x * x); }
 
 
 
 
-s32 func_002AD0B0(u8 *a0) {
- if(a0==0) return 0;
- if((*(unsigned short *)(a0+0x34)&0x20)==0) return 0;
- return (*(s32 **)(a0+0x68))[2];
+/* Returns the third value stored in the object's private data, or 0 if it has none. */
+s32 func_002AD0B0(u8 *moby) {
+ if(moby==0) return 0;
+ if((*(unsigned short *)(moby+0x34)&0x20)==0) return 0;
+ return (*(s32 **)(moby+0x68))[2];
 }
 
 
 /* func_002AD250 is in 002AD250-rc2.c (it needs the grouped 128-bit copy). */
 
-int func_002AD330(char *a0, char *a1, char *a2, char *a3)
+/* Moves a point through an object's attached transform and writes the result. Returns 0 if the object has no transform. */
+int func_002AD330(char *unused, char *object, char *point, char *out)
 {
-    V4_F904cc63b b0[4];
-    V4_F904cc63b b1[1];
-    V4_F904cc63b b2[4];
-    V4_F904cc63b b3[4];
-    char *p;
+    V4_F904cc63b matA[4];
+    V4_F904cc63b work[1];
+    V4_F904cc63b matInverse[4];
+    V4_F904cc63b matCopy[4];
+    char *record;
 
-    p = F904cc63b_FUN_002AD0B0(a1);
-    if (p == 0)
+    record = F904cc63b_FUN_002AD0B0(object);
+    if (record == 0)
     {
-        *(V4_F904cc63b *)a3 = 0;
+        *(V4_F904cc63b *)out = 0;
         return 0;
     }
-    F904cc63b_FUN_00283410(b0, p);
-    F904cc63b_FUN_00282CC0(b1, (V4_F904cc63b *)a2, p + 16);
-    F904cc63b_FUN_00282CF0(b1, b1, a1 + 16);
-    if (*(int *)(p + 60) & 2)
+    F904cc63b_FUN_00283410(matA, record);
+    F904cc63b_FUN_00282CC0(work, (V4_F904cc63b *)point, record + 16);
+    F904cc63b_FUN_00282CF0(work, work, object + 16);
+    if (*(int *)(record + 60) & 2)
     {
-        F904cc63b_FUN_00283410(b3, p + 32);
-        F904cc63b_FUN_00283698(b2, b3);
-        F904cc63b_FUN_00283098(b1, b1, b2);
-        F904cc63b_FUN_00283098(b1, b1, (V4_F904cc63b *)(a1 + 192));
+        F904cc63b_FUN_00283410(matCopy, record + 32);
+        F904cc63b_FUN_00283698(matInverse, matCopy);
+        F904cc63b_FUN_00283098(work, work, matInverse);
+        F904cc63b_FUN_00283098(work, work, (V4_F904cc63b *)(object + 192));
     }
     else
     {
-        F904cc63b_FUN_00283098(b1, b1, b0);
+        F904cc63b_FUN_00283098(work, work, matA);
     }
-    F904cc63b_FUN_00282CC0(b1, b1, a1 + 16);
-    F904cc63b_FUN_00282CF0((V4_F904cc63b *)a3, b1, a2);
+    F904cc63b_FUN_00282CC0(work, work, object + 16);
+    F904cc63b_FUN_00282CF0((V4_F904cc63b *)out, work, point);
     return 1;
 }
 
 
+/* Builds rotation angles for a point relative to an object's attached transform. Returns 0 if there is none. */
 int func_002AD5F8(char *unused, char *obj, char *arg2, char *arg3, char *arg4, char *arg5)
 {
-    char buf0[64];
-    char buf1[16];
-    char buf2[64];
-    char *p;
+    char invMatrix[64];
+    char localPos[16];
+    char tempMatrix[64];
+    char *record;
 
-    p = F0e7bb6a8_FUN_002AD0B0(obj);
-    if (p == 0)
+    record = F0e7bb6a8_FUN_002AD0B0(obj);
+    if (record == 0)
         return 0;
-    if (*(int *)(p + 60) & 0x40) {
-        F0e7bb6a8_FUN_00283410(buf0, obj + 240);
-        F0e7bb6a8_FUN_00283698(buf0, buf0);
+    if (*(int *)(record + 60) & 0x40) {
+        F0e7bb6a8_FUN_00283410(invMatrix, obj + 240);
+        F0e7bb6a8_FUN_00283698(invMatrix, invMatrix);
     } else {
-        F0e7bb6a8_FUN_00283698(buf0, obj + 192);
+        F0e7bb6a8_FUN_00283698(invMatrix, obj + 192);
     }
-    F0e7bb6a8_FUN_00282CF0(buf1, arg2, obj + 16);
-    F0e7bb6a8_FUN_002830C0(arg4, buf1, buf0);
-    F0e7bb6a8_FUN_00283410(buf2, arg3);
-    F0e7bb6a8_FUN_00283788(buf2, buf0, buf2);
-    F0e7bb6a8_FUN_002AB6D8(buf2, arg5);
+    F0e7bb6a8_FUN_00282CF0(localPos, arg2, obj + 16);
+    F0e7bb6a8_FUN_002830C0(arg4, localPos, invMatrix);
+    F0e7bb6a8_FUN_00283410(tempMatrix, arg3);
+    F0e7bb6a8_FUN_00283788(tempMatrix, invMatrix, tempMatrix);
+    F0e7bb6a8_FUN_002AB6D8(tempMatrix, arg5);
     return 1;
 }
 
@@ -721,48 +740,49 @@ extern u8 D_00139568[];
 typedef struct { u8 before[0x14]; s32 kind; u8 after[0xE0 - 0x18]; } KindRecord;
 extern KindRecord D_00239BA0[];
 
+/* Works out which kind slot an object belongs to from its class, or 255 if none matches. */
 s32 func_002AD980(u8 *object) {
     s32 i;
 
     switch (*(short *)(object + 0xAA)) {
-    case 0xA66:
-    case 0xA82:
+    case 0xA66: /* moby class 2662 */
+    case 0xA82: /* moby class 2690 */
         return 0x29;
-    case 0xC07:
-    case 0xCE4:
-    case 0xCE5:
+    case 0xC07: /* Mini Nuke Projectile */
+    case 0xCE4: /* moby class 3300 */
+    case 0xCE5: /* moby class 3301 */
         return 0x2A;
-    case 0x87A:
+    case 0x87A: /* moby class 2170 */
         return 0x16;
-    case 0xD01:
+    case 0xD01: /* moby class 3329 */
         return 0x18;
-    case 0xB2E:
+    case 0xB2E: /* moby class 2862 */
         return 0x1D;
-    case 0xE64:
-    case 0xECE:
+    case 0xE64: /* moby class 3684 */
+    case 0xECE: /* moby class 3790 */
         return 0x25;
-    case 0x5DA:
+    case 0x5DA: /* moby class 1498 */
         return 0x1B;
-    case 0x9A9:
-    case 0xA9B:
+    case 0x9A9: /* moby class 2473 */
+    case 0xA9B: /* moby class 2715 */
         return 0x1C;
-    case 0xB58:
-    case 0xE79:
+    case 0xB58: /* Spider Bot */
+    case 0xE79: /* Turret Spider Bot */
         return 0x20;
-    case 0x79:
+    case 0x79: /* moby class 121 */
         return 0xC;
-    case 0xAC:
+    case 0xAC: /* Visibomb Missile */
         return 0xE;
     }
 
-    if (object == D_00189E20.owner) {
-        return D_00189E20.value;
+    if (object == gHeroState.owner) {
+        return gHeroState.value;
     }
-    if (*(u8 **)(object + 0xB8) != 0 && *(u8 **)(object + 0xB8) == D_00189E20.owner) {
-        return D_00189E20.value;
+    if (*(u8 **)(object + 0xB8) != 0 && *(u8 **)(object + 0xB8) == gHeroState.owner) {
+        return gHeroState.value;
     }
     for (i = 0; i < 0x38; i++) {
-        KindRecord *rec = &D_00239BA0[D_00139568[i]];
+        KindRecord *rec = &gWeaponTable_00239BA0[gItemSlotToRecord[i]];
         s32 type = rec->kind;
 
         if (*(short *)(object + 0xAA) == type) {
@@ -788,9 +808,9 @@ extern int func_00283CF0(float);
    in v0, but the observed callers consume the output word, not that register. */
 void func_002AE730(float *v, int *out)
 {
-    float a = func_00282C48(v[0]);
-    float b = func_00282C48(v[1]);
-    float c = func_00282C48(v[2]);
+    float a = FloatAbs(v[0]);
+    float b = FloatAbs(v[1]);
+    float c = FloatAbs(v[2]);
     float m;
     float scale;
     int n;
@@ -799,7 +819,7 @@ void func_002AE730(float *v, int *out)
 
     m = (a > b) ? a : b;
     c = (m > c) ? m : c;
-    n = func_00283CF0(c * 158.73016357421875f);
+    n = FloatToInt(c * 158.73016357421875f);
     n = (n < 256) ? n : 255;
     n = (n > 0) ? n : 1;
     t[3] = (float)n;
@@ -807,7 +827,7 @@ void func_002AE730(float *v, int *out)
     t[0] = v[0] * scale + 127.0f;
     t[1] = v[1] * scale + 127.0f;
     t[2] = v[2] * scale + 127.0f;
-    r = func_00283108(t);
+    r = FastVectorToPackedChars(t);
     *out = r;
     return;
 }
@@ -818,18 +838,20 @@ void func_002AE730(float *v, int *out)
 
 extern float func_0029F530(void *);
 extern float func_002AEAE0(int, float);
+/* Returns true if a value is at or above the threshold but within one step of it. */
 int func_002AEB60(char *object, float threshold)
 {
-    float current = func_002AEAE0(4, func_0029F530(object));
+    float current = RoundToDecimalPlaces(4, GetMobyAnimationValue(object));
     float difference = current - threshold;
-    float step = func_002AEAE0(4, *(float *)(object + 0x48) * *(float *)(object + 0x4C));
+    float step = RoundToDecimalPlaces(4, *(float *)(object + 0x48) * *(float *)(object + 0x4C));
     if (threshold <= current)
         return difference < step;
     return 0;
 }
 
 
-void func_002AEC18(void *a0, int a1) { extern void func_002A0488(void *, unsigned char, unsigned char, unsigned char); int high = a1 >> 16; int middle = a1 >> 8; func_002A0488(a0, (unsigned char)a1, (unsigned char)middle, (unsigned char)high); }
+/* Sets the light color of an object from a packed color. */
+void func_002AEC18(void *moby, int color) { extern void set_moby_color(void *, unsigned char, unsigned char, unsigned char); int high = color >> 16; int middle = color >> 8; set_moby_color(moby, (unsigned char)color, (unsigned char)middle, (unsigned char)high); }
 
 extern void func_0029F9F0(char *list, unsigned char *node);
 extern void func_0029F978(char *a0, char *a1, unsigned char *a2);
@@ -838,58 +860,59 @@ extern void func_00282C88(unsigned char *);
 extern float func_002AA898(float *position, float target, float *velocity,
                            float acceleration, float damping, float limit, int direction);
 
-void func_002AEC48(char *owner, unsigned char *obj, char *arg2, float acceleration, float damping)
+/* Eases a node's position and scale toward their targets each frame and adds it to the owner's list while it is moving. */
+void func_002AEC48(char *owner, unsigned char *node, char *list, float acceleration, float damping)
 {
-    char *current = *(char **)(obj + 0x78);
+    char *current = *(char **)(node + 0x78);
     float scale;
 
     if (current == 0) {
-        *(char **)(obj + 0x78) = owner;
+        *(char **)(node + 0x78) = owner;
     } else if (current != owner) {
-        if (obj[1] != 0 && (unsigned char)current[0x20] < 0x7F)
-            func_0029F9F0(current, obj);
-        obj[1] = 0;
-        *(char **)(obj + 0x78) = owner;
+        if (node[1] != 0 && (unsigned char)current[0x20] < 0x7F)
+            DetachManipulator(current, node);
+        node[1] = 0;
+        *(char **)(node + 0x78) = owner;
     }
-    if (*(float *)(obj + 0x60) == 0.0f && *(float *)(obj + 0x64) == 0.0f &&
-        *(float *)(obj + 0x68) == 0.0f && *(float *)(obj + 0x70) == 1.0f) {
-        if (func_00282C48(*(float *)(obj + 0x40)) < 0.005f && func_00282C48(*(float *)(obj + 0x44)) < 0.005f &&
-            func_00282C48(*(float *)(obj + 0x48)) < 0.005f) {
-            if (obj[1] != 0)
-                func_0029F9F0(owner, obj);
+    if (*(float *)(node + 0x60) == 0.0f && *(float *)(node + 0x64) == 0.0f &&
+        *(float *)(node + 0x68) == 0.0f && *(float *)(node + 0x70) == 1.0f) {
+        if (FloatAbs(*(float *)(node + 0x40)) < 0.005f && FloatAbs(*(float *)(node + 0x44)) < 0.005f &&
+            FloatAbs(*(float *)(node + 0x48)) < 0.005f) {
+            if (node[1] != 0)
+                DetachManipulator(owner, node);
             return;
         }
     }
-    func_002AA898((float *)(obj + 0x40), *(float *)(obj + 0x60), (float *)(obj + 0x50), acceleration, damping, 0.0f, 0);
-    func_002AA898((float *)(obj + 0x44), *(float *)(obj + 0x64), (float *)(obj + 0x54), acceleration, damping, 0.0f, 0);
-    func_002AA898((float *)(obj + 0x48), *(float *)(obj + 0x68), (float *)(obj + 0x58), acceleration, damping, 0.0f, 0);
-    if (obj[1] == 0)
-        func_0029F978(owner, arg2, obj);
-    func_002A91F0(obj + 0x10, (char *)(obj + 0x40));
-    scale = *(float *)(obj + 0x70);
-    *(float *)(obj + 0x20) = scale;
-    *(float *)(obj + 0x24) = scale;
-    *(float *)(obj + 0x28) = scale;
-    func_00282C88(obj + 0x60);
-    *(float *)(obj + 0x70) = 1.0f;
+    ApproachWithVelocity((float *)(node + 0x40), *(float *)(node + 0x60), (float *)(node + 0x50), acceleration, damping, 0.0f, 0);
+    ApproachWithVelocity((float *)(node + 0x44), *(float *)(node + 0x64), (float *)(node + 0x54), acceleration, damping, 0.0f, 0);
+    ApproachWithVelocity((float *)(node + 0x48), *(float *)(node + 0x68), (float *)(node + 0x58), acceleration, damping, 0.0f, 0);
+    if (node[1] == 0)
+        AttachManipulator(owner, list, node);
+    BuildRotationFromAngles(node + 0x10, (char *)(node + 0x40));
+    scale = *(float *)(node + 0x70);
+    *(float *)(node + 0x20) = scale;
+    *(float *)(node + 0x24) = scale;
+    *(float *)(node + 0x28) = scale;
+    ClearVector128(node + 0x60);
+    *(float *)(node + 0x70) = 1.0f;
 }
 
 /* Branches on a float argument: when it is positive it rewrites a float in place with a helper result and sets a field at offset 24 to (helper2 * scale) + offset; otherwise it subtracts a float through a third pointer, rewrites that pointer with (helper2 * scale) and adds it back to the field. */
-void func_002AEE70(float *a0, float *a1, float *a2,
-                                        float b, float unused, float c)
+void func_002AEE70(float *out, float *angle, float *prevOffset,
+                                        float scale, float unused, float offset)
 {
-    if (c > 0.0f) {
-        float r = func_00283B98_11(*a1);
+    if (offset > 0.0f) {
+        float wrapped = func_00283B98_11(*angle);
 
-        *a1 = r;
-        a0[6] = func_00283198_13(r) * b + c;
+        *angle = wrapped;
+        out[6] = func_00283198_13(wrapped) * scale + offset;
     } else {
-        float r = func_00283B98_11(*a1);
+        float wrapped = func_00283B98_11(*angle);
 
-        *a1 = r;
-        a0[6] = a0[6] - *a2;
-        *a2 = func_00283198_13(*a1) * b;
-        a0[6] = a0[6] + *a2;
+        *angle = wrapped;
+        out[6] = out[6] - *prevOffset;
+        *prevOffset = func_00283198_13(*angle) * scale;
+        out[6] = out[6] + *prevOffset;
     }
 }
 
@@ -932,17 +955,18 @@ void func_002AF0A8(int index)
     if (index > 20)
         index = 20;
     if (index == 3)
-        func_002B0A18(table.items[3], 0xF0);
+        SetEntryValueByIndex(table.items[3], 0xF0);
     else
-        func_002B0CE0(8, table.items[index], 0xB4);
+        ForceClaimNotice(8, table.items[index], 0xB4);
 }
 
 /* func_002AF1D0 is matched in its own unit, src/game/002AF1D0-qcopy.c (-frac2-qcopy -frac2-qcopy-barrier). */
 
-float func_002AF2E8(char *a0, char *a1, int *a2,
+/* Measures how far a target is from a point and sets a flag if it is too far or too high. Returns the reach. */
+float func_002AF2E8(char *origin, char *target, int *outOfRange,
                                        float p1, float p2, float p3, float p4)
 {
-    float best = p4;
+    float minHeight = p4;
     float hi = p3;
     float radius;
     float reach = p2;
@@ -950,31 +974,31 @@ float func_002AF2E8(char *a0, char *a1, int *a2,
     float near;
     float tmp;
 
-    *a2 = 0;
-    far = Fb5729173_FUN_00282E48(a0, a1 + 16);
+    *outOfRange = 0;
+    far = Fb5729173_FUN_00282E48(origin, target + 16);
     if (reach < far) {
-        *a2 = 1;
+        *outOfRange = 1;
     }
 
     reach = 0.0f;
-    radius = Fb5729173_FUN_00283C80(Fb5729173_FUN_00283248(((float *)(a1 + 16))[0] - ((float *)a0)[0],
-                             ((float *)(a1 + 16))[1] - ((float *)a0)[1]), p1);
-    near = Fb5729173_FUN_00282E80(a0, a1 + 16);
-    tmp = Fb5729173_FUN_00283C80(Fb5729173_FUN_00283248(near, ((float *)(a1 + 16))[2] - ((float *)a0)[2]), 0.0f);
+    radius = Fb5729173_FUN_00283C80(Fb5729173_FUN_00283248(((float *)(target + 16))[0] - ((float *)origin)[0],
+                             ((float *)(target + 16))[1] - ((float *)origin)[1]), p1);
+    near = Fb5729173_FUN_00282E80(origin, target + 16);
+    tmp = Fb5729173_FUN_00283C80(Fb5729173_FUN_00283248(near, ((float *)(target + 16))[2] - ((float *)origin)[2]), 0.0f);
 
     if (reach < hi) {
         if (hi < radius) {
-            *a2 = 1;
+            *outOfRange = 1;
         }
     }
-    if (0.0f < best) {
-        if (best < tmp) {
-            *a2 = 1;
+    if (0.0f < minHeight) {
+        if (minHeight < tmp) {
+            *outOfRange = 1;
         }
     }
 
     reach = far + radius * far;
-    if (Fb5729173_FUN_002ABB78(a1) != 0) {
+    if (Fb5729173_FUN_002ABB78(target) != 0) {
         reach = reach + 8.0f;
     }
     return reach;
@@ -984,25 +1008,27 @@ float func_002AF2E8(char *a0, char *a1, int *a2,
 /* func_002AF580 is matched in its own unit, src/game/002AF580-qcopy.c. */
 
 
-void func_002AFD88(float x, float y, float z, char *a0, char *a1)
+/* Moves a point by an object's transform and adds it to an output vector. */
+void func_002AFD88(float x, float y, float z, char *object, char *out)
 {
     float buf[3];
     buf[0] = x;
     buf[1] = y;
     buf[2] = z;
-    F10bf3d29_FUN_00283098((char *)buf, (char *)buf, a0 + 0xC0);
-    F904cc63b_FUN_00282CC0((V4_F904cc63b *)a1, (V4_F904cc63b *)a1, (char *)buf);
+    F10bf3d29_FUN_00283098((char *)buf, (char *)buf, object + 0xC0);
+    F904cc63b_FUN_00282CC0((V4_F904cc63b *)out, (V4_F904cc63b *)out, (char *)buf);
 }
 
-void func_002AFDD8(char *a0, char *a1, char *a2, char *a3)
+/* Combines a vector with a transform, using the object's own one if none is given. */
+void func_002AFDD8(char *object, char *out, char *in, char *transform)
 {
     char buf[64];
 
-    if (a3 == 0) {
-        F10bf3d29_FUN_00283698(buf, a0 + 192);
-        F10bf3d29_FUN_00283098(a1, a2, buf);
+    if (transform == 0) {
+        F10bf3d29_FUN_00283698(buf, object + 192);
+        F10bf3d29_FUN_00283098(out, in, buf);
     } else {
-        F10bf3d29_FUN_00283098(a1, a2, a3);
+        F10bf3d29_FUN_00283098(out, in, transform);
     }
 }
 
@@ -1010,16 +1036,18 @@ void func_002AFDD8(char *a0, char *a1, char *a2, char *a3)
 extern void func_00282F70(char *, char *, float);
 extern void func_00283098(char *, char *, char *);
 
+/* Transforms a vector, scales it and moves it into the object's space. */
 void func_002AFE58(char *object, char *out, char *in, char *transform, float scale)
 {
-    func_002AFDD8(object, out, in, transform);
-    func_00282F70(out, out, scale);
-    func_00283098(out, out, object + 0xC0);
+    TransformVectorByObjectOrGiven(object, out, in, transform);
+    FastVectorNormalizeHelper(out, out, scale);
+    matrix_mul_vec3(out, out, object + 0xC0);
 }
 
+/* Transforms a vector, sets its height and moves it into the object's space. */
 void func_002AFEB8(char *object, char *out, char *in, char *transform, float z)
 {
-    func_002AFDD8(object, out, in, transform);
+    TransformVectorByObjectOrGiven(object, out, in, transform);
     *(float *)(out + 8) = z;
-    func_00283098(out, out, object + 0xC0);
+    matrix_mul_vec3(out, out, object + 0xC0);
 }

@@ -9,16 +9,17 @@ extern void func_002FE880(void *a, void *b, float c);
 extern int func_002761F8(void *a, void *b, int c, void *d, int e);
 
 /* The level's copy of func_00304AD0: same body, the $gp word is the level's. */
-void func_L00_00389E18(void *obj)
+/* Moves the projectile forward and checks if it hit something; if so it switches to its hit state. */
+void func_L00_00389E18(void *moby)
 {
-    void *s2 = obj;
-    void *s0 = (char *)s2 + 0x10;
-    void *s1 = *(void **)((char *)s2 + 0x68);
+    void *owner = moby;
+    void *target = (char *)owner + 0x10;
+    void *source = *(void **)((char *)owner + 0x68);
     TI128 local;
 
-    *(TI128 *)&local = *(TI128 *)s0;
-    func_00282CC0(s0, s0, s1);
-    func_002FE880(s0, s1, ref_L00_00389E18_00 * 2.7777778e-05f);
-    if (func_002761F8(&local, s0, 0x10, s2, 0) != 0)
-        *(unsigned char *)((char *)s2 + 0x20) = 8;
+    *(TI128 *)&local = *(TI128 *)target;
+    FastVecAdd(target, target, source);
+    AddObjectDirectionScaled(target, source, ref_L00_00389E18_00 * 2.7777778e-05f);
+    if (CollLine(&local, target, 0x10, owner, 0) != 0)
+        *(unsigned char *)((char *)owner + 0x20) = 8;
 }

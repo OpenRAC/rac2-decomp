@@ -29,19 +29,20 @@ extern Effect2BFB38 *func_002B9030(int);
 extern int func_00283CF0(float);
 extern float func_002A7878(float, float);
 
+/* Creates a small spark effect at a spot, moving in a given direction for a set time. */
 Effect2BFB38 *func_002BFB38(void *pos, void *dir, s32 kind, s32 life) {
     Effect2BFB38 *e;
     Spark2BFB38 *s;
 
-    e = func_002B9030(0x23);
+    e = AllocParticle(0x23);
     if (e != 0) {
         qcopy(e->pos, pos);
         s = &e->s;
         e->color = 0x80808080;
-        e->f9 = func_00283CF0(2.0f) + 0x10;
+        e->f9 = FloatToInt(2.0f) + 0x10;
         e->f1 = 0;
         e->f3 = 0x44;
-        e->fC = func_002A7878(10500.0f, 16800.0f);
+        e->fC = RandomFloatRange(10500.0f, 16800.0f);
         e->f2 = *D_001F25CC[0];
         qcopy(s->pos, dir);
         s->life = life;
@@ -50,7 +51,7 @@ Effect2BFB38 *func_002BFB38(void *pos, void *dir, s32 kind, s32 life) {
         if (kind == 2) {
             s->z = 0;
         }
-        s->rate = func_002A7878(0.0029166667f, 0.005f);
+        s->rate = RandomFloatRange(0.0029166667f, 0.005f);
     }
     return e;
 }

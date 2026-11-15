@@ -16,29 +16,29 @@ extern int D_001B1888[];
 extern int D_001B1894[];
 extern int D_001B1898[];
 
-void func_0028AFE8(int n) {
-    int off = ((GroupTable *)D_001B1888[0])->c[n];
+void func_0028AFE8(int group) {
+    int groupSize = ((GroupTable *)D_001B1888[0])->c[group];
     int i;
     int end;
     int start;
-    int j;
+    int entry;
 
-    if (n == 0) {
-        for (j = 0; j < ((GroupTable *)D_001B1888[0])->b[0]; j++) {
-            *(s16 *)(j * 8 + D_001B1894[0] + 4) = 0;
+    if (group == 0) {
+        for (entry = 0; entry < ((GroupTable *)D_001B1888[0])->b[0]; entry++) {
+            *(s16 *)(entry * 8 + D_001B1894[0] + 4) = 0;
         }
     }
-    start = n != 0 ? ((GroupTable *)D_001B1888[0])->a[n - 1] : 0;
-    end = ((GroupTable *)D_001B1888[0])->a[n];
+    start = group != 0 ? ((GroupTable *)D_001B1888[0])->a[group - 1] : 0;
+    end = ((GroupTable *)D_001B1888[0])->a[group];
     for (i = start; i < end; i++) {
-        *(int *)(i * 8 + D_001B1898[0]) -= off;
+        *(int *)(i * 8 + D_001B1898[0]) -= groupSize;
         *(int *)(i * 8 + D_001B1898[0]) |= 0x80000000;
     }
-    start = n != 0 ? ((GroupTable *)D_001B1888[0])->b[n - 1] : 0;
-    end = ((GroupTable *)D_001B1888[0])->b[n];
+    start = group != 0 ? ((GroupTable *)D_001B1888[0])->b[group - 1] : 0;
+    end = ((GroupTable *)D_001B1888[0])->b[group];
     for (i = start; i < end; i++) {
-        *(int *)(i * 8 + D_001B1894[0]) -= off;
+        *(int *)(i * 8 + D_001B1894[0]) -= groupSize;
         *(int *)(i * 8 + D_001B1894[0]) |= 0x80000000;
     }
-    ((GroupTable *)D_001B1888[0])->c[n] = 0;
+    ((GroupTable *)D_001B1888[0])->c[group] = 0;
 }

@@ -50,19 +50,20 @@ struct ActivationState {
     char pad424[8];
     int threshold;
 };
+/* Turns the enemy and its linked parts on or off when a trigger or timer says so. */
 int func_L09_003F9D08(ActivationObject *obj)
 {
     ActivationState *s = obj->state;
     if (s->group && obj->group == 255) obj->group = s->group;
     if (s->trigger != -1 && !obj->command) {
-        if (!func_L00_00329520(D_00189EA0, s->trigger)) {
+        if (!IsPointInsideRegion(gHeroPosition, s->trigger)) {
             if (!s->disabled) s->command = -2;
             else if (s->command == -2) s->command = 0;
         } else if ((!s->mode || ((s->flags^1) & 1)) && !s->command) s->command = 1;
     }
     if (s->flags & 2) {
-        if (func_L09_003F71C8(obj, s->threshold_arg) < s->threshold) { s->command = 0; return 1; }
-        if (func_00282978(&s->timer)) s->command = 1;
+        if (CountGroupLegsWithValue(obj, s->threshold_arg) < s->threshold) { s->command = 0; return 1; }
+        if (FastDecTimer(&s->timer)) s->command = 1;
         else s->command = 0;
     }
     if (s->command < 0) {
@@ -73,14 +74,14 @@ int func_L09_003F9D08(ActivationObject *obj)
             obj->flags |= 1;
             obj->update = 0;
             p = s->parent;
-            if (p && p->class_code == 0xD0E && p->status != 0xFE && p->status != 0xFD) {
+            if (p && p->class_code == 0xD0E /* Megacorp Trooper Torso */ && p->status != 0xFE && p->status != 0xFD) {
                 p->flags |= 1;
                 s->parent->enabled = 0;
                 s->parent->update = 0;
             }
             for (i = 0; i < 2; ++i) {
                 ActivationObject *part = s->parts[i];
-                if (part && part->class_code == 0xD66 && part->status != 0xFE && part->status != 0xFD) {
+                if (part && part->class_code == 0xD66 /* moby class 3430 */ && part->status != 0xFE && part->status != 0xFD) {
                     part->flags |= 1;
                     s->parts[i]->enabled = 0;
                 }
@@ -95,13 +96,13 @@ int func_L09_003F9D08(ActivationObject *obj)
             int i;
             s->disabled = 0;
             s->command = 0;
-            func_0026FEB8(D_L09_001B10E0, D_L09_001B2388[0], obj->id, 0);
+            STUB_printf(D_L09_001B10E0, D_L09_001B2388[0], obj->id, 0);
             obj->flags &= ~1;
             obj->enabled = 1;
             obj->update = obj->type->update;
             obj->flags |= 0x1000;
             p = s->parent;
-            if (p && p->class_code == 0xD0E && p->status != 0xFE && p->status != 0xFD) {
+            if (p && p->class_code == 0xD0E /* Megacorp Trooper Torso */ && p->status != 0xFE && p->status != 0xFD) {
                 p->flags &= ~1;
                 s->parent->enabled = 1;
                 s->parent->update = s->parent->type->update;
@@ -109,12 +110,12 @@ int func_L09_003F9D08(ActivationObject *obj)
             }
             for (i = 0; i < 2; ++i) {
                 ActivationObject *part = s->parts[i];
-                if (part && part->class_code == 0xD66 && part->status != 0xFE && part->status != 0xFD) {
+                if (part && part->class_code == 0xD66 /* moby class 3430 */ && part->status != 0xFE && part->status != 0xFD) {
                     part->flags &= ~1;
                     s->parts[i]->enabled = 1;
                 }
             }
-            func_L02_002EF388(obj, (char *)obj + 0x10, (char *)obj + 0xF0, (char **)s->parts, 3);
+            FuseObjectWithLinkedObjects(obj, (char *)obj + 0x10, (char *)obj + 0xF0, (char **)s->parts, 3);
         }
     } else if (s->disabled) {
         if (s->command == -2) s->command = 0;

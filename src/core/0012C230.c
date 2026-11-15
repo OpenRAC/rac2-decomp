@@ -24,49 +24,51 @@ extern void r1_func_0012BCC8(int);
  * Get_motion_code (IPU VLC table 2); func_0012B3C0 is Get_dmvector (table
  * 3, already matched in this file). func_0012C008 is decode_motion_vector.
  */
-void func_0012C230(void *arg0, int *PMV, int *dmvector, int h_r_size,
+/* Reads one motion vector (horizontal and vertical parts) from the video stream. */
+void func_0012C230(void *decoderPtr, int *PMV, int *dmvector, int h_r_size,
                     int v_r_size, int dmv, int mvscale, int full_pel_vector) {
-    char *s = (char *)arg0;
+    char *s = (char *)decoderPtr;
     int motion_code;
     int motion_residual;
 
-    motion_code = func_0012C508((int)s, 2);
-    motion_residual = (h_r_size != 0 && motion_code != 0) ? func_0012C878(s, h_r_size) : 0;
-    func_0012C008(PMV, h_r_size, motion_code, motion_residual, full_pel_vector);
+    motion_code = ReadIpuVlcCode((int)s, 2);
+    motion_residual = (h_r_size != 0 && motion_code != 0) ? ReadMpegBits(s, h_r_size) : 0;
+    DecodeMpegMotionVector(PMV, h_r_size, motion_code, motion_residual, full_pel_vector);
     if (dmv) {
-        dmvector[0] = func_0012B3C0((int)s);
+        dmvector[0] = ReadMpegDualPrimeValue((int)s);
     }
 
-    motion_code = func_0012C508((int)s, 2);
-    motion_residual = (v_r_size != 0 && motion_code != 0) ? func_0012C878(s, v_r_size) : 0;
+    motion_code = ReadIpuVlcCode((int)s, 2);
+    motion_residual = (v_r_size != 0 && motion_code != 0) ? ReadMpegBits(s, v_r_size) : 0;
     if (mvscale) {
         PMV[1] >>= 1;
     }
-    func_0012C008(PMV + 1, v_r_size, motion_code, motion_residual, full_pel_vector);
+    DecodeMpegMotionVector(PMV + 1, v_r_size, motion_code, motion_residual, full_pel_vector);
     if (mvscale) {
         PMV[1] <<= 1;
     }
     if (dmv) {
-        dmvector[1] = func_0012B3C0((int)s);
+        dmvector[1] = ReadMpegDualPrimeValue((int)s);
     }
 }
 
 /* rac1-decomp src/core/00125630.c: func_00128560 */
-void func_0012C380(char *arg0, unsigned int arg1) {
-    IPU_CMD = arg1;
-    *(int *)(arg0 + 0x818) = r1_D_00132F70[arg1 >> 28];
+/* Sends a command to the video decoder chip and remembers how many bits it will use. */
+void func_0012C380(char *decoderPtr, unsigned int command) {
+    IPU_CMD = command;
+    *(int *)(decoderPtr + 0x818) = r1_D_00132F70[command >> 28];
 }
 
 /* rac1-decomp src/core/00125630.c: func_00128590 */
 /* Spins until the VIF1 DMA channel (D_CHCR 0x10002010) reports idle,
    nudging the IOP via r1_func_0012BCC8 every 5001 spins so a stalled
    stream cannot deadlock. Same wait loop documented on func_0012C680. */
-void func_0012C3B0(void *arg0) {
+void func_0012C3B0(void *decoderPtr) {
     int counter = 0;
 
     while ((((int)IPU_CTRL) & 0x80004000) == 0x80000000) {
         if (counter++ >= 0x1389) {
-            r1_func_0012BCC8(*(int *)((char *)arg0 + 0x858));
+            r1_func_0012BCC8(*(int *)((char *)decoderPtr + 0x858));
             counter = 0;
         }
     }
@@ -86,12 +88,12 @@ void func_0012C3B0(void *arg0) {
  * `volatile long *chcr` local made the compiler use the constant as an
  * absolute `ld` address instead (160 against 176 bytes).
  */
-long func_0012C458(void *arg0) {
+long func_0012C458(void *decoderPtr) {
     long v;
     int counter = 0;
     while ((v = ((long)IPU_CMD64)) < 0 && (((int)IPU_CTRL) & 0x4000) == 0) {
         if (counter++ >= 0x1389) {
-            r1_func_0012BCC8(*(int *)((char *)arg0 + 0x858));
+            r1_func_0012BCC8(*(int *)((char *)decoderPtr + 0x858));
             counter = 0;
         }
     }

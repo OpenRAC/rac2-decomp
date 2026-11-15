@@ -25,25 +25,25 @@ int func_L04_003A15C0(char *obj, int *count, int *used, WaterHeaderSlot *slots, 
         }
     }
     if (!WPTR(obj, 0x98)) {
-        func_0026FEB8(D_L04_001AD968);
-        func_0026FEB8(D_L04_001AD998, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA));
-        func_00282A28();
+        STUB_printf(D_L04_001AD968);
+        STUB_printf(D_L04_001AD998, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA));
+        TrapAlways();
     }
     if (*count >= 6) {
-        func_0026FEB8(D_L04_002C9880);
-        func_0026FEB8(D_L04_001AD998, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA));
-        func_0026FEB8(D_L04_001AD9B0, *count, *used, 0x2000);
-        func_00282A28();
+        STUB_printf(D_L04_002C9880);
+        STUB_printf(D_L04_001AD998, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA));
+        STUB_printf(D_L04_001AD9B0, *count, *used, 0x2000);
+        TrapAlways();
     }
     i = *count;
     WINT(state, 0x1C) = i;
-    size = func_L04_003A1540((PackedHeaderCountView *)WPTR(obj, 0x98));
+    size = GetPackedHeaderBlockCount((PackedHeaderCountView *)WPTR(obj, 0x98));
     twice = size * 2;
     if (*used + twice > 0x2000) {
-        func_0026FEB8(D_L04_002C98D0);
-        func_0026FEB8(D_L04_001AD9E0, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA), size);
-        func_0026FEB8(D_L04_001AD9B0, *count, *used, 0x2000);
-        func_00282A28();
+        STUB_printf(D_L04_002C98D0);
+        STUB_printf(D_L04_001AD9E0, WSHORT(obj, 0xB2), WSHORT(obj, 0xAA), size);
+        STUB_printf(D_L04_001AD9B0, *count, *used, 0x2000);
+        TrapAlways();
     }
     slots[i].id = WSHORT(obj, 0xAA);
     slots[i].offsets[0] = *used;
@@ -59,9 +59,9 @@ int func_L04_003A15C0(char *obj, int *count, int *used, WaterHeaderSlot *slots, 
         *dst2++ = *src++;
     }
     WPTR(obj, 0x98) = (char *)(buffer + slots[i].offsets[0]);
-    func_L04_003A14B8(obj, 0);
+    SetTagBitsOnWordArray(obj, 0);
     WPTR(obj, 0x98) = (char *)(buffer + slots[i].offsets[1]);
-    func_L04_003A14B8(obj, 7);
-    func_L04_003A1578(obj, (int)slots, (int)buffer);
+    SetTagBitsOnWordArray(obj, 7);
+    SelectWaterTableSlot(obj, (int)slots, (int)buffer);
     return i;
 }

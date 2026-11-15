@@ -121,49 +121,50 @@ extern int func_002A77E0(int);
 extern char *func_002BDCE8(float *, float, float, int, float *, float, float, unsigned, int);
 extern char *func_002C16C0_1(float *, float *, int, int, unsigned, int, float, float, float, float, float);
 /* Emit twenty paired particles around a position, optionally adding two final flashes. */
+/* Bursts of sparks fly out from a point, with two extra flashes if asked. */
 void func_L00_003E3258(float *pos, int unused, int extra)
 {
-    float v[4], dir[4], out[4];
-    float angle, speed, scale, mag, direction;
-    int id, i, n;
-    char *p, *d;
-    func_00282CF0((char *)v, D_L00_001B8DC0, (char *)pos);
-    angle = func_00283248(v[0], v[1]);
+    float toCamera[4], velocity[4], spawnPos[4];
+    float cameraAngle, speed, scale, pitch, yaw;
+    int id, i, colorSeed;
+    char *particle, *extraData;
+    FastVecSub((char *)toCamera, gCameraPosition_L00, (char *)pos);
+    cameraAngle = FastMatrixHelperA(toCamera[0], toCamera[1]);
     for (i = 19; i >= 0; i--) {
-        func_00282D30(dir, D_0018A0E0, -(func_002A7878(0.2f, 3.0f) * 0.01666666753590107f));
-        id = func_00283CF0(func_002A78D8(1.0f, 2.0f));
-        speed = func_002A7878(0.3f, 0.75f) * 210000.0f;
-        out[0] = pos[0] + func_002A78D8(0.0f, 0.2f);
-        out[1] = pos[1] + func_002A78D8(0.0f, 0.2f);
-        out[2] = pos[2] + func_002A78D8(0.0f, 0.2f);
-        p = func_002BDCE8(out, 0.0f, 1.0f, id, dir, 1.01f, speed, 0x7F202020, 1);
-        if (p) {
-            p[3] = 68;
-            *(short *)(p + 10) = 90;
-            d = p + 32;
-            p[9] = func_00283CF0(4.0f) + 64;
-            *(float *)(d + 28) = func_00283CE0(5);
-            *(int *)(d + 4) = 3;
-            d[10] = 48;
-            d[11] = p[10];
+        FastVecScale(velocity, D_0018A0E0, -(RandomFloatRange(0.2f, 3.0f) * 0.01666666753590107f));
+        id = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
+        speed = RandomFloatRange(0.3f, 0.75f) * 210000.0f;
+        spawnPos[0] = pos[0] + RandomSignedFloatRange(0.0f, 0.2f);
+        spawnPos[1] = pos[1] + RandomSignedFloatRange(0.0f, 0.2f);
+        spawnPos[2] = pos[2] + RandomSignedFloatRange(0.0f, 0.2f);
+        particle = SpawnSpinningSparkParticle(spawnPos, 0.0f, 1.0f, id, velocity, 1.01f, speed, 0x7F202020, 1);
+        if (particle) {
+            particle[3] = 68;
+            *(short *)(particle + 10) = 90;
+            extraData = particle + 32;
+            particle[9] = FloatToInt(4.0f) + 64;
+            *(float *)(extraData + 28) = IntToFloat(5);
+            *(int *)(extraData + 4) = 3;
+            extraData[10] = 48;
+            extraData[11] = particle[10];
         }
-        scale = func_002A7878(1.0f, 2.0f);
-        mag = func_002A7878(0.0f, 1.396263599395752f);
-        direction = func_00283B98(angle, func_002A78D8(0.0f, 1.396263599395752f));
-        func_002AF000(dir, scale * 0.01666666753590107f, direction, mag);
-        out[0] = pos[0] + func_002A78D8(0.0f, 0.1f);
-        out[1] = pos[1] + func_002A78D8(0.0f, 0.1f);
-        out[2] = pos[2] + func_002A78D8(0.0f, 0.1f);
-        func_002C16C0_1(out, dir, 30, 127, 0x7F7F7F, id,
-            func_002A7878(0.1f, 0.5f) * 210000.0f, 500.0f, 1.0f, 0.0f, 1.0f);
+        scale = RandomFloatRange(1.0f, 2.0f);
+        pitch = RandomFloatRange(0.0f, 1.396263599395752f);
+        yaw = FastAddRotations(cameraAngle, RandomSignedFloatRange(0.0f, 1.396263599395752f));
+        BuildSphericalOffset(velocity, scale * 0.01666666753590107f, yaw, pitch);
+        spawnPos[0] = pos[0] + RandomSignedFloatRange(0.0f, 0.1f);
+        spawnPos[1] = pos[1] + RandomSignedFloatRange(0.0f, 0.1f);
+        spawnPos[2] = pos[2] + RandomSignedFloatRange(0.0f, 0.1f);
+        func_002C16C0_1(spawnPos, velocity, 30, 127, 0x7F7F7F, id,
+            RandomFloatRange(0.1f, 0.5f) * 210000.0f, 500.0f, 1.0f, 0.0f, 1.0f);
     }
     if (extra == 1) {
         char *last;
         speed = 525000.0f;
-        n = func_002A77E0(255);
-        last = func_002C16C0_1(pos, (float *)D_L00_001A8F20_1, 5, 127, 0x207080, n, speed, 0.0f, 1.0f, 0.0f, 1.0f);
+        colorSeed = RandomIntBelow(255);
+        last = func_002C16C0_1(pos, (float *)D_L00_001A8F20_1, 5, 127, 0x207080, colorSeed, speed, 0.0f, 1.0f, 0.0f, 1.0f);
         if (last) last[2] = *D_L00_001FEA14;
-        last = func_002C16C0_1(pos, (float *)D_L00_001A8F20_1, 5, 127, 0x207080, (n + 128) & 255, speed, 0.0f, 1.0f, 0.0f, 1.0f);
+        last = func_002C16C0_1(pos, (float *)D_L00_001A8F20_1, 5, 127, 0x207080, (colorSeed + 128) & 255, speed, 0.0f, 1.0f, 0.0f, 1.0f);
         if (last) last[2] = *D_L00_001FEA14;
     }
 }
@@ -188,76 +189,80 @@ extern void func_002C16C0(float *, float *, int, int, unsigned int, int,
 /* Twenty rounds that spawn a particle at the point: each round draws a step and a random
    magnitude, jitters the point on each axis and hands the result to the spawn helper with
    210000.0f, 500.0f, 1.0f, 0.0f and 1.0f; the original game role is unknown. */
+/* Sprays twenty small sparks from a point. */
 void func_L00_003E3668(float *pos)
 {
-    float v[4];
-    float dir[4];
-    float out[4];
-    float ang;
-    float angle;
-    float scale;
-    float mag;
+    float toCamera[4];
+    float velocity[4];
+    float spawnPos[4];
+    float cameraAngle;
+    float yaw;
+    float step;
+    float pitch;
     float speed;
     int id;
     int i;
 
-    func_00282CF0((char *)v, D_L00_001B8DC0, (char *)pos);
-    ang = func_00283248(v[0], v[1]);
+    FastVecSub((char *)toCamera, gCameraPosition_L00, (char *)pos);
+    cameraAngle = FastMatrixHelperA(toCamera[0], toCamera[1]);
 
     for (i = 19; i >= 0; i--) {
-        scale = func_002A7878(0.25f, 0.5f);
-        id = func_00283CF0(func_002A78D8(1.0f, 2.0f));
-        func_002A7878(0.05f, 0.2f);
+        step = RandomFloatRange(0.25f, 0.5f);
+        id = FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
+        RandomFloatRange(0.05f, 0.2f);
         speed = 210000.0f;
-        mag = func_002A7878(0.0f, 1.396263599395752f);
-        angle = func_00283B98(ang, func_002A78D8(0.0f, 1.396263599395752f));
-        func_002AF000(dir, scale * 0.01666666753590107f, angle, mag);
-        out[0] = pos[0] + func_002A78D8(0.0f, 0.075f);
-        out[1] = pos[1] + func_002A78D8(0.0f, 0.075f);
-        out[2] = pos[2] + func_002A78D8(0.0f, 0.075f);
-        func_002C16C0(out, dir, 15, 127, 0x007F7F7F, id,
-                      func_002A7878(0.05f, 0.2f) * speed, 500.0f, 1.0f, 0.0f, 1.0f);
+        pitch = RandomFloatRange(0.0f, 1.396263599395752f);
+        yaw = FastAddRotations(cameraAngle, RandomSignedFloatRange(0.0f, 1.396263599395752f));
+        BuildSphericalOffset(velocity, step * 0.01666666753590107f, yaw, pitch);
+        spawnPos[0] = pos[0] + RandomSignedFloatRange(0.0f, 0.075f);
+        spawnPos[1] = pos[1] + RandomSignedFloatRange(0.0f, 0.075f);
+        spawnPos[2] = pos[2] + RandomSignedFloatRange(0.0f, 0.075f);
+        SpawnBurstParticle_002C16C0(spawnPos, velocity, 15, 127, 0x007F7F7F, id,
+                      RandomFloatRange(0.05f, 0.2f) * speed, 500.0f, 1.0f, 0.0f, 1.0f);
     }
 }
 
 /* Family 40487154aa250cc8: fixed-field addend writes into one resource record. */
+/* Sets the colour scale of an object from three values that slowly settle. */
 void func_L00_003E3890(char *object)
 {
     char *data;
-    float x;
-    float y;
-    float z;
+    float scaleX;
+    float scaleY;
+    float scaleZ;
 
     data = *(char **)(object + 104);
     func_002833F0_1(object + 192, object + 240);
-    x = func_00283198_1(*(float *)(data + 4)) * 0.15f + 0.35000002f;
-    y = func_00283198_1(*(float *)(data + 8)) * 0.15f + 0.35000002f;
-    z = func_00283198_1(*(float *)(data + 12)) * 0.15f + 0.35000002f;
-    func_00282D30_3(object + 192, object + 192, x);
-    func_00282D30_3(object + 208, object + 208, y);
-    func_00282D30_3(object + 224, object + 224, z);
+    scaleX = func_00283198_1(*(float *)(data + 4)) * 0.15f + 0.35000002f;
+    scaleY = func_00283198_1(*(float *)(data + 8)) * 0.15f + 0.35000002f;
+    scaleZ = func_00283198_1(*(float *)(data + 12)) * 0.15f + 0.35000002f;
+    func_00282D30_3(object + 192, object + 192, scaleX);
+    func_00282D30_3(object + 208, object + 208, scaleY);
+    func_00282D30_3(object + 224, object + 224, scaleZ);
     *(float *)(data + 4) = func_00283B98_3(*(float *)(data + 4), 0.5f);
     *(float *)(data + 8) = func_00283B98_3(*(float *)(data + 8), 0.5f);
     *(float *)(data + 12) = func_00283B98_3(*(float *)(data + 12), 0.5f);
 }
 
 /* calls two guards and returns 1 only when both succeed and the object's float field is not positive */
+/* Tells if an object is a living target that can still be hit. */
 int func_L00_003E39B8(char *object)
 {
-    float *p;
+    float *health;
 
-    if (func_002ABB78(object) != 0)
+    if (IsMobyInSpecialClassRange(object) != 0)
         return 0;
-    p = func_002AB1F0(object);
-    if (p == 0)
+    health = GetMobyPrivateValue0(object);
+    if (health == 0)
         return 0;
-    if (0.0f < *p)
+    if (0.0f < *health)
         return 0;
     return 1;
 }
 
 /* func_L00_003E4508 is defined in L00_003E4508-g8.c. */
 
+/* Calls a helper that does nothing more on its own. */
 void func_L00_003E4948(void)
 {
     ref_L00_003E4948_00();
@@ -270,42 +275,43 @@ extern int func_002A77E0(int);
 extern void *func_002C65A0(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
 extern char D_L00_001FE940[];
 extern char D_L00_001A8F20[] __attribute__((sda));
-void func_L00_003E4968(char *a0) {
-    float a[4];
-    float b[4];
-    float c[4];
-    float d[4];
-    char *tbl;
-    int n;
-    char *r;
-    char *v;
-    float big;
+/* Throws out bright particles in a short line from an object's position. */
+void func_L00_003E4968(char *moby) {
+    float origin[4];
+    float backOffset[4];
+    float upStep[4];
+    float jittered[4];
+    char *table;
+    int colorSeed;
+    char *particle;
+    char *vars;
+    float size;
     int i;
 
-    v = *(char **)(a0 + 0x68);
-    { float *p = (float *)(v + 0x14);
-    a[0] = p[0];
-    a[1] = p[1];
-    a[2] = p[2]; }
-    a[3] = 0.0f;
-    func_00282D30(b, a0 + 0xD0, -0.1f);
-    func_00282CC0(a, a, b);
-    func_00282D30(c, a0 + 0xE0, 0.15f);
-    func_00282CC0(a, a, c);
-    func_00282D30(c, a0 + 0xE0, -0.033333335f);
-    tbl = D_L00_001FE940;
+    vars = *(char **)(moby + 0x68);
+    { float *p = (float *)(vars + 0x14);
+    origin[0] = p[0];
+    origin[1] = p[1];
+    origin[2] = p[2]; }
+    origin[3] = 0.0f;
+    FastVecScale(backOffset, moby + 0xD0, -0.1f);
+    FastVecAdd(origin, origin, backOffset);
+    FastVecScale(upStep, moby + 0xE0, 0.15f);
+    FastVecAdd(origin, origin, upStep);
+    FastVecScale(upStep, moby + 0xE0, -0.033333335f);
+    table = D_L00_001FE940;
     for (i = 8; i >= 0; i--) {
-        d[0] = a[0] + func_002A78D8(0.0f, 0.1f);
-        d[1] = a[1] + func_002A78D8(0.0f, 0.1f);
-        d[2] = a[2] + func_002A78D8(0.0f, 0.1f);
-        n = func_002A77E0(0xFF);
-        big = 42000.0f;
-        func_002C65A0(d, D_L00_001A8F20, 4, 0x808080, n, 0x7F, 0x7F, big, big, 0.0f, 1);
-        big = 273000.0f;
-        r = func_002C65A0(a, D_L00_001A8F20, 4, 0x406080, n, 0x10, 0x10, big, big, 0.0f, 1);
-        if (r != 0)
-            *(unsigned char *)(r + 2) = *(unsigned char *)(*(unsigned *)(tbl + 0xD4));
-        func_00282CC0(a, a, c);
+        jittered[0] = origin[0] + RandomSignedFloatRange(0.0f, 0.1f);
+        jittered[1] = origin[1] + RandomSignedFloatRange(0.0f, 0.1f);
+        jittered[2] = origin[2] + RandomSignedFloatRange(0.0f, 0.1f);
+        colorSeed = RandomIntBelow(0xFF);
+        size = 42000.0f;
+        SpawnGravityFadeParticle(jittered, D_L00_001A8F20, 4, 0x808080, colorSeed, 0x7F, 0x7F, size, size, 0.0f, 1);
+        size = 273000.0f;
+        particle = SpawnGravityFadeParticle(origin, D_L00_001A8F20, 4, 0x406080, colorSeed, 0x10, 0x10, size, size, 0.0f, 1);
+        if (particle != 0)
+            *(unsigned char *)(particle + 2) = *(unsigned char *)(*(unsigned *)(table + 0xD4));
+        FastVecAdd(origin, origin, upStep);
     }
 }
 
@@ -314,6 +320,7 @@ void func_L00_003E4968(char *a0) {
 
 /* func_L00_003E51C0 is defined in L00_003E51C0-g8.c. */
 
+/* Clears a saved object pointer. */
 void func_L00_003E5328(void)
 {
     D_L00_001B05DC_2 = 0;
@@ -321,6 +328,7 @@ void func_L00_003E5328(void)
 
 /* clears two words of the shared state block; the second store reaches through
    $gp because it lands in the return delay slot */
+/* Clears the blast data pointer and the saved object pointer. */
 void func_L00_003E5330(void)
 {
     D_L00_001B2B50_1 = 0;
@@ -338,6 +346,7 @@ extern void ref_L00_003E5340_00(float *, float *, int, int, int);
 /* Emits ten particles at POSITION: one thrown towards D_L00_001B8DC0 with a random spread, then
    nine at random upward angles turned by the object's matrix, about a third of them (rand() % 3
    == 0) in mode 1. */
+/* Throws out ten sparks from a point, some upward and some toward the camera. */
 void func_L00_003E5340(char *object, float *position)
 {
     Vector delta, velocity, random;
@@ -346,32 +355,32 @@ void func_L00_003E5340(char *object, float *position)
     int i = 8;
     int mode;
 
-    func_00282CF0((char *)delta, D_L00_001B8DC0, (char *)position);
-    distance = func_00282DF0(delta);
+    FastVecSub((char *)delta, gCameraPosition_L00, (char *)position);
+    distance = FastVecLength(delta);
     *(VectorBits *)random = 0;
-    random[0] = func_002A7878(-1.0f, 1.0f);
-    random[1] = func_002A7878(-1.0f, 1.0f);
-    random[2] = func_002A7878(-1.0f, 1.0f);
+    random[0] = RandomFloatRange(-1.0f, 1.0f);
+    random[1] = RandomFloatRange(-1.0f, 1.0f);
+    random[2] = RandomFloatRange(-1.0f, 1.0f);
     delta[2] += distance * 0.5f;
     *(VectorBits *)velocity = *(VectorBits *)random;
-    func_00282F20(velocity, velocity, distance * 0.0033333336468786f);
-    func_00282F20(delta, delta, (distance + distance) * 0.01666666753590107f);
-    func_00282CC0(velocity, velocity, delta);
-    func_00282FB8(velocity, velocity, 0.1666666716337204f);
-    ref_L00_003E5340_00(position, velocity, func_002A7820(60, 90), 0, 0);
+    vec_scale_to_length(velocity, velocity, distance * 0.0033333336468786f);
+    vec_scale_to_length(delta, delta, (distance + distance) * 0.01666666753590107f);
+    FastVecAdd(velocity, velocity, delta);
+    FastVectorDivideHelper(velocity, velocity, 0.1666666716337204f);
+    ref_L00_003E5340_00(position, velocity, RandomIntRange(60, 90), 0, 0);
     for (; i >= 0; i--) {
         float pitch, yaw, speed;
 
         mode = 0;
-        pitch = func_002A7878(0.2617994248867035f, 1.3089970350265503f);
-        yaw = func_002A7940();
-        speed = func_002A7878(8.0f, 12.0f);
-        func_002AF000(random, speed * 0.01666666753590107f, yaw, pitch);
+        pitch = RandomFloatRange(0.2617994248867035f, 1.3089970350265503f);
+        yaw = RandomAngle();
+        speed = RandomFloatRange(8.0f, 12.0f);
+        BuildSphericalOffset(random, speed * 0.01666666753590107f, yaw, pitch);
         random[2] += 0.05000000447034836f;
-        if (func_001163B0() % divisor == 0)
+        if (Rand() % divisor == 0)
             mode = 1;
-        func_00283098(random, random, object + 0xC0);
-        ref_L00_003E5340_00(position, random, func_002A7820(60, 90), mode, 0);
+        matrix_mul_vec3(random, random, object + 0xC0);
+        ref_L00_003E5340_00(position, random, RandomIntRange(60, 90), mode, 0);
     }
 }
 
@@ -392,6 +401,7 @@ void func_L00_003E5340(char *object, float *position)
    twice with a zero amount; the record is then closed. The amount is converted from an int
    so that the compiler keeps it in a saved register across the calls, as the retail code
    does. */
+/* Goes through the blast's effect records and keeps the ones owned by this object updating. */
 void func_L00_003E6628(char *object)
 {
     char *rec;
@@ -404,20 +414,20 @@ void func_L00_003E6628(char *object)
         i--;
         rec = (char *)(offset + (int)D_L00_001B2B50_1);
         if (*(int *)(rec + 0x30) == (int)object) {
-            if (func_00282948(rec + 0x34) != 0) {
+            if (FastFloatHelperD(rec + 0x34) != 0) {
                 if (*(int *)(rec + 0x38) == 0) {
                     *(int *)(rec + 0x30) = 0;
                 }
-            } else if ((func_001163B0() & 1) == 0) {
-                func_L00_003E6778(rec, 0, amount, amount, 0);
-                func_L00_003E6778(rec, 0, amount, amount, 0);
+            } else if ((Rand() & 1) == 0) {
+                AllocateOwnedEffectParticle(rec, 0, amount, amount, 0);
+                AllocateOwnedEffectParticle(rec, 0, amount, amount, 0);
             }
-            func_L00_003E6C10(rec);
+            UpdateOwnedEffectParticles(rec);
         }
         offset += 0x50;
     } while (i >= 0);
 }
-
+/* Goes through the blast's effect records and tidies up the ones owned by this object. */
 void func_L00_003E6710(char *object)
 {
     char *rec;
@@ -430,7 +440,7 @@ void func_L00_003E6710(char *object)
         i--;
         rec = (char *)(offset + (int)D_L00_001B2B50_1);
         if (*(int *)(rec + 0x30) == (int)object)
-            func_L00_003E6F48(rec);
+            SpawnEffectsForOwnedPieces(rec);
         offset += 0x50;
     } while (i >= 0);
 }
@@ -444,21 +454,23 @@ extern void ref_L00_003E6F48_01(char *rec, float f1, int a1, int a2, int a3,
 
 /* Same body as func_L00_003F09A0, with this function's own callees. */
 extern char *ref_L00_003E6F48_00 __attribute__((sda));
-void func_L00_003E6F48(char *obj)
+/* Finds every piece owned by the object and spawns a small effect for it. */
+void func_L00_003E6F48(char *owner)
 {
-    char *rec;
-    int i;
+    char *piece;
+    int index;
 
-    for (i = 0; i < 320; i++) {
-        rec = (char *)(i * 128 + (int)ref_L00_003E6F48_00);
-        if (*(int *)(rec + 0x7C) == (int)obj)
-            ref_L00_003E6F48_01(rec, *(float *)(rec + 0x48), *(int *)(rec + 0x68),
-                                *(int *)(rec + 0x60), 46, *(float *)(rec + 0x34),
-                                *(int *)(rec + 0x70), 0.25f);
+    for (index = 0; index < 320; index++) {
+        piece = (char *)(index * 128 + (int)ref_L00_003E6F48_00);
+        if (*(int *)(piece + 0x7C) == (int)owner)
+            ref_L00_003E6F48_01(piece, *(float *)(piece + 0x48), *(int *)(piece + 0x68),
+                                *(int *)(piece + 0x60), 46, *(float *)(piece + 0x34),
+                                *(int *)(piece + 0x70), 0.25f);
     }
 }
 
 /* resets a state record: zero words, plus/minus one float flags and two 64-bit fields in the retail store order */
+/* Resets a record to its starting values. */
 void func_L00_003E6FC8(char *p)
 {
     *(long long *)(p + 112) = 0LL;
@@ -490,18 +502,20 @@ void func_L00_003E6FC8(char *p)
 }
 
 /* Scales four consecutive 16-byte XYZ vectors in place by one scalar through a vector helper. */
-void func_L00_003E7050(char *p, float scale)
+/* Makes four vectors bigger or smaller by the same amount. */
+void func_L00_003E7050(char *vectors, float scale)
 {
-    func_00282D30_2(p, p, scale);
-    func_00282D30_2(p + 16, p + 16, scale);
-    func_00282D30_2(p + 32, p + 32, scale);
-    func_00282D30_2(p + 48, p + 48, scale);
+    func_00282D30_2(vectors, vectors, scale);
+    func_00282D30_2(vectors + 16, vectors + 16, scale);
+    func_00282D30_2(vectors + 32, vectors + 32, scale);
+    func_00282D30_2(vectors + 48, vectors + 48, scale);
 }
 
 /* func_L00_003E70B8 is defined in L00_003E70B8.c. */
 
 /* func_L00_003E7650 is defined in L00_003E7650-qcopy.c. */
 
+/* Does nothing. */
 void func_L00_003E7760(void)
 {
 }
@@ -510,17 +524,18 @@ void func_L00_003E7760(void)
 
 /* func_L00_003E7E40 lives in L00_003E7E40-trails.c. */
 
+/* Sets the see-through level and colour of one fading object. */
 void func_L00_003E80A8(int index, char *object)
 {
     int r;
     int high;
 
-    *(char *)((char *)D_L00_0024EFC0[index].object + 0x23) =
-        func_00283CF0(D_L00_0024EFC0[index].scale * 96.0f);
-    r = func_00283D38(object, D_L00_0024EFC0[index].index,
-                      D_L00_0024EFC0[index].scale);
+    *(char *)((char *)gFadingMobyList[index].object + 0x23) =
+        FloatToInt(gFadingMobyList[index].scale * 96.0f);
+    r = FastTweenColor(object, gFadingMobyList[index].index,
+                      gFadingMobyList[index].scale);
     high = (r >> 16) & 0xFF;
-    func_002A0488((int)D_L00_0024EFC0[index].object, r & 0xFF, (r >> 8) & 0xFF,
+    set_moby_color((int)gFadingMobyList[index].object, r & 0xFF, (r >> 8) & 0xFF,
                   high);
 }
 
@@ -529,9 +544,10 @@ void func_L00_003E80A8(int index, char *object)
 /* func_L00_003E9490 is defined in L00_003E9490-qcopy.c. */
 
 /* Component-wise cubic interpolation, with exact endpoint vector copies. */
+/* Works out a smooth point along a curve between two points. */
 void func_L00_003E9540(float *out, float *b, float *c, float *a, float *d, float t)
 {
-    float t2, t3, p, q, r;
+    float tSquared, tCubed, curveA, curveB, curveC;
 
     if (t == 0.0f) {
         qcopy(out, b);
@@ -541,53 +557,55 @@ void func_L00_003E9540(float *out, float *b, float *c, float *a, float *d, float
         qcopy(out, c);
         return;
     }
-    t2 = t * t;
-    t3 = t2 * t;
+    tSquared = t * t;
+    tCubed = tSquared * t;
 
-    p = (d[0] - c[0]) - (a[0] - b[0]);
-    q = (a[0] - b[0]) - p;
-    r = c[0] - a[0];
-    out[0] = p * t3 + q * t2 + r * t + b[0];
+    curveA = (d[0] - c[0]) - (a[0] - b[0]);
+    curveB = (a[0] - b[0]) - curveA;
+    curveC = c[0] - a[0];
+    out[0] = curveA * tCubed + curveB * tSquared + curveC * t + b[0];
 
-    p = (d[1] - c[1]) - (a[1] - b[1]);
-    q = (a[1] - b[1]) - p;
-    r = c[1] - a[1];
-    out[1] = p * t3 + q * t2 + r * t + b[1];
+    curveA = (d[1] - c[1]) - (a[1] - b[1]);
+    curveB = (a[1] - b[1]) - curveA;
+    curveC = c[1] - a[1];
+    out[1] = curveA * tCubed + curveB * tSquared + curveC * t + b[1];
 
-    p = (d[2] - c[2]) - (a[2] - b[2]);
-    q = (a[2] - b[2]) - p;
-    r = c[2] - a[2];
-    out[2] = p * t3 + q * t2 + r * t + b[2];
+    curveA = (d[2] - c[2]) - (a[2] - b[2]);
+    curveB = (a[2] - b[2]) - curveA;
+    curveC = c[2] - a[2];
+    out[2] = curveA * tCubed + curveB * tSquared + curveC * t + b[2];
     out[3] = 0.0f;
 }
 
 /* Shared native body; original game role is unknown. */
-void func_L00_003E9660(int unused, float *p, int n)
+/* Moves each entry in a list of wave values forward and works out its new offsets. */
+void func_L00_003E9660(int unused, float *points, int count)
 {
-    float *v;
-    int count;
-    if (n <= 0)
+    float *cursor;
+    int remaining;
+    if (count <= 0)
         return;
-    v = p;
-    count = n;
+    cursor = points;
+    remaining = count;
     do {
-        v[0] = func_00283B98_2(v[0], v[3]);
-        v[1] = func_00283B98_2(v[1], v[4]);
-        v[2] = func_00283B98_2(v[2], v[5]);
-        v[9] = func_00283B98_2(v[9], v[12]);
-        v[10] = func_00283B98_2(v[10], v[13]);
-        v[11] = func_00283B98_2(v[11], v[14]);
-        v[20] = func_00283180(v[0]) * v[6];
-        v[21] = func_00283198(v[1]) * v[7];
-        v[22] = -func_00283198(v[2]) * v[8];
-        v[24] = func_00283180(v[9]) * v[15];
-        v[25] = func_00283198(v[10]) * v[16];
-        v[26] = -func_00283198(v[11]) * v[17];
-        v += 32;
-    } while (--count != 0);
+        cursor[0] = func_00283B98_2(cursor[0], cursor[3]);
+        cursor[1] = func_00283B98_2(cursor[1], cursor[4]);
+        cursor[2] = func_00283B98_2(cursor[2], cursor[5]);
+        cursor[9] = func_00283B98_2(cursor[9], cursor[12]);
+        cursor[10] = func_00283B98_2(cursor[10], cursor[13]);
+        cursor[11] = func_00283B98_2(cursor[11], cursor[14]);
+        cursor[20] = FastSinOrCosA(cursor[0]) * cursor[6];
+        cursor[21] = FastSinOrCosB(cursor[1]) * cursor[7];
+        cursor[22] = -FastSinOrCosB(cursor[2]) * cursor[8];
+        cursor[24] = FastSinOrCosA(cursor[9]) * cursor[15];
+        cursor[25] = FastSinOrCosB(cursor[10]) * cursor[16];
+        cursor[26] = -FastSinOrCosB(cursor[11]) * cursor[17];
+        cursor += 32;
+    } while (--remaining != 0);
 }
 
 /* Derives a 16-byte element at index-1 from its index-2 and index-3 neighbours through two bound helpers; original game role is unknown. */
+/* Works out the next point in a list from the two points before it. */
 void func_L00_003E9A98(Vec16_Fc936841d *object, int index)
 {
     char local[16];
@@ -597,6 +615,7 @@ void func_L00_003E9A98(Vec16_Fc936841d *object, int index)
 }
 
 /* Derives a value from half of one argument, merges a helper's low byte into a packed word, then scales an input float, doubles a second helper's result and dispatches a seven-argument spawn. */
+/* Spawns one random effect from a position and colour. */
 void func_L00_003E9B00(int p0, int p1, int p2, int p3, float v)
 {
     int r;
@@ -608,7 +627,7 @@ void func_L00_003E9B00(int p0, int p1, int p2, int p3, float v)
     s = func_002A7878_5(v * 0.75f, v);
     s = s + s;
     t = func_002A7940_2();
-    func_00281EB8((char *)p1, 44, p2, 1, s, 0.08f, t);
+    DrawBillboardQuad_00281EB8((char *)p1, 44, p2, 1, s, 0.08f, t);
 }
 
 /* Draw a two-layer ribbon along a sequence of sampled beam points. */
@@ -616,6 +635,7 @@ void func_L00_003E9B00(int p0, int p1, int p2, int p3, float v)
 
 
 /* straight-line constant-store body (no calls, no branches, no loads) */
+/* Sets a record to its starting values with a larger size. */
 void func_L00_003EA050(char *p)
 {
     *(long long *)(p + 112) = 0LL;

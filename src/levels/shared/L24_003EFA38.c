@@ -76,6 +76,7 @@ typedef struct BeamVars {
     int disabled;
 } BeamVars;
 
+/* Per-frame update of a Thermanator moby (class 4016): it fires a beam at a target in front of it while the player holds the button, and shows the target progress on the HUD. */
 void func_L24_003EFA38(Target *obj)
 {
     BeamVars *v = obj->vars;
@@ -87,25 +88,25 @@ void func_L24_003EFA38(Target *obj)
     int a, b;
 
     pos = v->position;
-    func_0029FCC0(obj, 0, pos);
-    distance = func_003004B0(4.5f);
-    if (D_00189E20.planet == 29) {
+    TransformMobyJointToWorld(obj, 0, pos);
+    distance = GetOverrideValue(4.5f);
+    if (gHeroState.planet == 29) {
         distance += 6.5f;
     }
     v->hit = 0;
     v->valid = 0;
-    func_002FDF40(dir, pos, 0, 0.00001f, distance, 0.25f, 0.0030555558f, 0);
-    func_002FE5A0(pos, dir, v->endpoint, v->normal, obj, &v->hit, 0, 0.0030555558f);
+    CalculateAimedLaunchVelocity(dir, pos, 0, 0.00001f, distance, 0.25f, 0.0030555558f, 0);
+    TraceProjectileToImpact(pos, dir, v->endpoint, v->normal, obj, &v->hit, 0, 0.0030555558f);
     hit = v->hit;
     if (hit != 0) {
         if (hit->class->type == 18) {
             TargetVars *target = hit->vars;
             target->maximum = 25;
             if (v->hit->slot != 255) {
-                func_00334050(v->hit->slot, 25);
+                SetEntryListFlagByte(v->hit->slot, 25);
             }
-            ratio = func_00283CE0(v->hit->progress);
-            ratio /= func_00283CE0(target->maximum);
+            ratio = IntToFloat(v->hit->progress);
+            ratio /= IntToFloat(target->maximum);
             v->fraction = ratio;
             if (target->reverse) {
                 v->fraction = 1.0f - ratio;
@@ -129,15 +130,15 @@ void func_L24_003EFA38(Target *obj)
         obj->state = 2;
         break;
     case 2:
-        if ((D_00138320 & D_00189E20.input) && v->hit && v->valid && !v->disabled) {
-            func_L00_002AF568();
+        if ((D_00138320 & gHeroState.input) && v->hit && v->valid && !v->disabled) {
+            start_equipped_item_animation();
             obj->state = 3;
             if (!v->reverse) {
-                func_00329CB8((int)obj, v->position, dir);
+                SpawnFlyingChunkMoby3032((int)obj, v->position, dir);
             } else {
-                func_003285C0((int)obj, v->position, dir);
+                SpawnFlyingChunkMoby3031((int)obj, v->position, dir);
             }
-            func_002E5DA0(1, 0, (char *)obj, 0xFB0);
+            PlaySoundFromClassBank(1, 0, (char *)obj, 0xFB0);
             if (v->reverse) {
                 v->countdown = 14;
             } else {
@@ -146,22 +147,22 @@ void func_L24_003EFA38(Target *obj)
         }
         break;
     case 3:
-        if (!(D_00138320 & D_00189E20.input) || !v->hit || !v->valid || v->disabled) {
-            func_L00_002AF7D0();
+        if (!(D_00138320 & gHeroState.input) || !v->hit || !v->valid || v->disabled) {
+            cancel_hero_item_animation();
             obj->state = 2;
-        } else if (func_00282948(&v->countdown)) {
+        } else if (FastFloatHelperD(&v->countdown)) {
             qcopy(spread, dir);
-            length = func_00282DF0(spread);
-            spread[0] += func_002A7878(-0.005f, 0.005f);
-            spread[1] += func_002A7878(-0.005f, 0.005f);
-            spread[2] += func_002A7878(-0.005f, 0.005f);
-            func_00282F20(spread, spread, length);
+            length = FastVecLength(spread);
+            spread[0] += RandomFloatRange(-0.005f, 0.005f);
+            spread[1] += RandomFloatRange(-0.005f, 0.005f);
+            spread[2] += RandomFloatRange(-0.005f, 0.005f);
+            vec_scale_to_length(spread, spread, length);
             if (!v->reverse) {
-                func_00329CB8((int)obj, v->position, spread);
+                SpawnFlyingChunkMoby3032((int)obj, v->position, spread);
             } else {
-                func_003285C0((int)obj, v->position, spread);
+                SpawnFlyingChunkMoby3031((int)obj, v->position, spread);
             }
-            func_002E5DA0(1, 0, (char *)obj, 0xFB0);
+            PlaySoundFromClassBank(1, 0, (char *)obj, 0xFB0);
             if (v->reverse) {
                 v->countdown = 14;
             } else {
@@ -173,7 +174,7 @@ void func_L24_003EFA38(Target *obj)
         break;
     }
 
-    if (D_00189E20.mode == 3) {
+    if (gHeroState.mode == 3) {
         obj->state = 4;
         v->fade -= 0.02f;
     } else {
@@ -199,10 +200,10 @@ void func_L24_003EFA38(Target *obj)
         v->smoothed = v->fraction;
     }
 
-    a = func_002B0910(ref_L24_003EFA38_00[0], 90, ref_L24_003EFA38_01[0], ref_L24_003EFA38_01[1]);
-    b = func_002B0910(ref_L24_003EFA38_00[0], 90, ref_L24_003EFA38_01[2], ref_L24_003EFA38_01[3]);
+    a = BlendColorsByCycleStep(ref_L24_003EFA38_00[0], 90, ref_L24_003EFA38_01[0], ref_L24_003EFA38_01[1]);
+    b = BlendColorsByCycleStep(ref_L24_003EFA38_00[0], 90, ref_L24_003EFA38_01[2], ref_L24_003EFA38_01[3]);
     if (v->smoothed >= 0.0f && v->smoothed <= 1.0f) {
-        func_00290010(0, a, b, v->smoothed);
+        ShowGaugePopup(0, a, b, v->smoothed);
     }
-    func_L00_002E6EF8(func_003340A8, obj);
+    AddDrawCallbackToList3(UpdateAttachedEffectByState, obj);
 }

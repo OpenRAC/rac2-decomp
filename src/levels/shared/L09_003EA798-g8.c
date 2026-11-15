@@ -81,6 +81,7 @@ typedef struct {
    The store order is the one sched1 (stores ending a constant's life first) and sched2
    (stores with more dependants first, 0x50 being the 34th memory reference) turn into
    retail's sequence. */
+/* Sets up the starting values of a new walking enemy and moves it to its first path point. */
 void func_L09_003EA798(char *object) {
     DobboMoverState *state = *(DobboMoverState **)(object + 0x68);
     char *pos = object + 0x10;
@@ -88,8 +89,8 @@ void func_L09_003EA798(char *object) {
 
     qcopy((char *)state + 0x330, pos);
     qcopy((char *)state + 0x340, object + 0xF0);
-    state->f48 = func_00283CF0(25.0f);
-    state->f4A = func_00283CF0(19.2f);
+    state->f48 = FloatToInt(25.0f);
+    state->f4A = FloatToInt(19.2f);
     state->f1EC = 4;
     state->f1EE = 4;
     state->f191 = 2;
@@ -122,18 +123,18 @@ void func_L09_003EA798(char *object) {
     state->f50 = 3.5f;
     state->f60 = 3.141593f;
     state->f80 = 0.52359885f;
-    func_002B60B0(object, ref_L09_003EA798_00 * 0.00027777778f, ref_L09_003EA798_01 * 0.016666668f,
+    SetControllerSpeedLimits(object, ref_L09_003EA798_00 * 0.00027777778f, ref_L09_003EA798_01 * 0.016666668f,
                   ref_L09_003EA798_02 * 4.8481374e-06f, ref_L09_003EA798_03 * 0.00029088825f);
     state->f354 = state->f374;
-    func_L09_0033E7A0(state->f36C);
-    func_L09_0033E7A0(state->f350);
+    GetPathTableEntryLength(state->f36C);
+    GetPathTableEntryLength(state->f350);
     entry = state->f36C;
     if (entry != -1) {
         qcopy(pos, (char *)D_L09_001FE6C0[entry] + 0x10);
-        func_L09_003EA2D0(object, entry, -1);
+        StartMobyOnPathEntry(object, entry, -1);
         state->f380 = 0;
     } else {
         state->f380 = 1;
     }
-    func_002A7750(object, 1, 1);
+    SetMobyState(object, 1, 1);
 }

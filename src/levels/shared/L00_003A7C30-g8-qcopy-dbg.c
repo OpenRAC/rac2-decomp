@@ -36,9 +36,9 @@ char *func_L00_003A7C30(void *position, void *velocity, int handle, int mode)
     char *moby;
     BeamState *state;
     float speed;
-    if (handle == -1 || !func_002B4038(0x5CB, handle))
+    if (handle == -1 || !IsSavedRecordValue(0x5CB /* Pulse Rifle */, handle))
         return 0;
-    moby = func_0029EFD0(0x5D6);
+    moby = CreateMoby(0x5D6 /* moby class 1494 */);
     if (moby != 0) {
         *(unsigned char *)(moby + 0x30) = 0xFF;
         *(unsigned short *)(moby + 0x32) = 0xFF;
@@ -47,28 +47,28 @@ char *func_L00_003A7C30(void *position, void *velocity, int handle, int mode)
         qcopy(moby + 0x10, position);
         *(unsigned char *)(moby + 0x20) = 0;
         state->mode = mode;
-        func_003001E0(state, velocity, position);
-        speed = (D_L00_00262570 + D_0013957F[0])->speed * (1.0f / 60.0f);
-        state->frames = func_00283CF0(128.0f / speed);
-        state->rate = 1.0f / func_00283CE0(state->frames);
+        AddTransformedVectorOrCopy(state, velocity, position);
+        speed = (gWeaponTable_L00 + D_0013957F[0])->speed * (1.0f / 60.0f);
+        state->frames = FloatToInt(128.0f / speed);
+        state->rate = 1.0f / IntToFloat(state->frames);
         state->handle = handle;
-        state->target = func_L00_0032A088(0x5CB, handle);
-        func_002AFFD8(moby + 0x10, (char *)normal, 1);
-        func_00282D30(normal, normal, -1.0f);
-        func_L00_003A8060(moby, (char *)normal);
+        state->target = GetSlotBody(0x5CB /* Pulse Rifle */, handle);
+        ComputeViewDirection(moby + 0x10, (char *)normal, 1);
+        FastVecScale(normal, normal, -1.0f);
+        BuildMobyAxisVectors(moby, (char *)normal);
         if (D_L00_001AF6D4 >= 4)
             D_L00_001AF6D4 = 0;
         state->slot = D_L00_001AF6D4;
         D_L00_001AF6D4 = (int)(D_L00_001AF6D4 + 1) % 3;
-        func_L00_003A8E28(moby);
+        StoreTrailSample(moby);
         if (mode == 1) {
-            qcopy(&state->origin, D_L00_001B8DC0);
-            func_00282F20(&state->velocity, D_L00_001B8DC0 + 0x230, func_00282DF0(velocity));
+            qcopy(&state->origin, gCameraPosition_L00);
+            vec_scale_to_length(&state->velocity, gCameraPosition_L00 + 0x230, FastVecLength(velocity));
         }
         if (mode == 2) {
             qcopy(previous, position);
-            func_00282CC0(moby + 0x10, position, velocity);
-            if (func_L00_003A80F8(moby, previous))
+            FastVecAdd(moby + 0x10, position, velocity);
+            if (TestBeamSegmentHit(moby, previous))
                 *(unsigned char *)(moby + 0x20) = 2;
         }
     }

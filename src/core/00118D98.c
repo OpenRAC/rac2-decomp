@@ -44,7 +44,7 @@ extern unsigned int strlen(const char *) __asm__("func_001157AC");
         fp->cursor += (len); \
     } else { \
         if (fp->status.word == 0) fp->status.fields.file = 1; \
-        func_00118BC0(fp->status.fields.file, (ptr), (len), 0); \
+        BufferedWrite128(fp->status.fields.file, (ptr), (len), 0); \
     } \
 }
 #define PAD(howmany, with) { \
@@ -57,6 +57,7 @@ extern unsigned int strlen(const char *) __asm__("func_001157AC");
 #define SARG() (flags & 0x20 ? GET(long long) : flags & 0x10 ? GET(long) : flags & 0x40 ? (long)(short)GET(int) : (long)GET(int))
 #define UARG() (flags & 0x20 ? GET(unsigned long long) : flags & 0x10 ? GET(unsigned long) : flags & 0x40 ? (unsigned long)(unsigned short)GET(int) : (unsigned long)GET(unsigned int))
 
+/* Prints text from a format string, including decimal numbers. */
 int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
 {
     register char *fmt;
@@ -83,13 +84,13 @@ int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
     char ox[2];
     int state;
 
-    func_00115228();
+    InitLibraryStdioState();
     state = 0;
     fmt = (char *)fmt0;
     ret = 0;
     for (;;) {
         cp = fmt;
-        while ((n = func_00115FC0(D_00133E74, &wc, fmt, D_00133B80, &state)) > 0) {
+        while ((n = MultibyteToWideCharReentrant(D_00133E74, &wc, fmt, D_00133B80, &state)) > 0) {
             fmt += n;
             if (wc == '%') {
                 fmt--;
@@ -198,7 +199,7 @@ int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
                     if (fvalue != 0.0) {
                         double magnitude = fvalue;
                         if (fvalue < 0.0) magnitude = -fvalue;
-                        exponent = func_001182B8(magnitude);
+                        exponent = __ieee754_log10(magnitude);
                     } else exponent = 1.0;
                     if (exponent < -4.0 || exponent >= prec)
                         ch = ch == 'g' ? 'e' : 'E';
@@ -209,7 +210,7 @@ int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
                     dot = 0;
                     if (prec == 0) prec = 1;
                 }
-                cp = func_001185E8(fvalue, prec, ch, dot);
+                cp = FormatFloatDigits(fvalue, prec, ch, dot);
                 size = strlen(cp);
                 break;
             }
@@ -322,6 +323,6 @@ int func_00118D98(void *data, PrintFile *fp, const char *fmt0, char *ap)
     }
  done:
     if (!((unsigned short)fp->status.fields.flags & 0x200))
-        func_00118BC0(fp->status.fields.file, 0, 0, 1);
+        BufferedWrite128(fp->status.fields.file, 0, 0, 1);
     return ret;
 }

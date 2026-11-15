@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 struct RouteNode {
     int path;
@@ -22,13 +23,15 @@ extern float func_L02_0032EC98(void *, void *, void *, float, float);
 /* func_L02_002EFB60 is defined in L02_002EFB60-g8.c. */
 
 
+/* Subtracts one 4-number vector from another and stores the result. */
 ASM_FUNC("asm/levels", func_L02_002F1FB8);
 
+/* Returns the squared flat distance between two points. */
 ASM_FUNC("asm/levels", func_L02_002F21C0);
 
 float func_L02_0031E918(float scale)
 {
-  float r = ((float) (0xFFF & (func_001163B0() >> 16))) * (1.0f / 4096.0f);
+  float r = ((float) (0xFFF & (Rand() >> 16))) * (1.0f / 4096.0f);
   float new_var;
   new_var = r * r;
   new_var = 1.0f - new_var;
@@ -42,13 +45,14 @@ extern float func_00283180(float x);
 extern float func_00283198(float x);
 extern void func_00282C88(void *target);
 
-void func_L02_0031E9E8(float *arg0, float arg1) {
-    float a = func_002A7940();
-    float b = func_L02_0031E918(arg1);
+/* Makes a flat offset of random length that points in a random direction. */
+void func_L02_0031E9E8(float *outVec, float radius) {
+    float angle = RandomAngle();
+    float length = RandomCurvedScale(radius);
 
-    func_00282C88(arg0);
-    arg0[0] = func_00283180(a) * b;
-    arg0[1] = func_00283198(a) * b;
+    ClearVector128(outVec);
+    outVec[0] = FastSinOrCosA(angle) * length;
+    outVec[1] = FastSinOrCosB(angle) * length;
 }
 
 extern unsigned int D_L02_001FC060[];
@@ -56,14 +60,15 @@ extern char *D_L02_001B359C __attribute__((section(".sdata")));
 extern void func_L00_003294F0(unsigned char *entity, int enabled);
 
 /* Walk the 16-bit stream the table entry points at; a negative word ends it. */
-void func_L02_0031F858(int arg0, int arg1) {
-    short *p;
+/* Applies an on or off setting to every object in a group's list. */
+void func_L02_0031F858(int groupId, int enabled) {
+    short *entry;
 
-    if (D_L02_001FC060[arg0] != 0) {
-        p = (short *)D_L02_001FC060[arg0];
+    if (gEntityGroupLists[groupId] != 0) {
+        entry = (short *)gEntityGroupLists[groupId];
         do {
-            func_L00_003294F0((unsigned char *)(D_L02_001B359C + ((*(unsigned short *)p & 0x7FFF) << 8)), arg1);
-        } while (*p++ >= 0);
+            SetObjectFlagBit((unsigned char *)(gMobyPool_L02 + ((*(unsigned short *)entry & 0x7FFF) << 8)), enabled);
+        } while (*entry++ >= 0);
     }
 }
 
@@ -71,27 +76,29 @@ void func_L02_0031F858(int arg0, int arg1) {
 extern void func_002A04B8(char *object, int *out0, int *out4, int *out8);
 
 /* Pack the three words the callee fills in behind a marker bit. */
-int func_L02_003272D8(char *arg0) {
+/* Packs three numbers describing an object into one handle number. */
+int func_L02_003272D8(char *object) {
     int w0;
     int w4;
     int w8;
-    int v;
+    int packed;
 
-    func_002A04B8(arg0, &w0, &w4, &w8);
-    v = (w4 << 8) | 0x80000000;
-    return (w8 << 16) | v | w0;
+    get_moby_color(object, &w0, &w4, &w8);
+    packed = (w4 << 8) | 0x80000000;
+    return (w8 << 16) | packed | w0;
 }
 
 extern char *D_L02_001B368C __attribute__((section(".sdata")));
 extern void func_L02_00327390(char *arg0, char *arg1, int arg2);
 
 /* Index -1 means "no record". */
-void func_L02_00327350(int arg0, int arg1) {
-    char *base;
+/* Starts an effect for a record by its index, and does nothing if the index is empty. */
+void func_L02_00327350(int index, int param) {
+    char *record;
 
-    if (arg0 != -1) {
-        base = D_L02_001B368C + (arg0 << 7);
-        func_L02_00327390(base + 0x30, base + 0x70, arg1);
+    if (index != -1) {
+        record = D_L02_001B368C + (index << 7);
+        StartRecordEffectByLevelKind(record + 0x30, record + 0x70, param);
     }
 }
 
@@ -99,20 +106,21 @@ extern unsigned char D_0018C0D4;
 extern void func_L00_002B9D60(int a0, int a1, int a2, int a3);
 extern void func_L00_0042A500(int arg0);
 
-void func_L02_00327390(char *arg0, char *arg1, int arg2) {
-    int kind = 0;
+/* Starts an effect whose variant depends on the current setting, then runs an optional follow-up. */
+void func_L02_00327390(char *first, char *second, int extra) {
+    int variant = 0;
 
     switch (D_0018C0D4) {
     case 1:
-        kind = 0x3F;
+        variant = 0x3F;
         break;
     case 2:
-        kind = 0x56;
+        variant = 0x56;
         break;
     }
-    func_L00_002B9D60((int)arg0, (int)arg1, kind, 1);
-    if (arg2 != -1)
-        func_L00_0042A500(arg2);
+    ResetHeroPositionAndDirection((int)first, (int)second, variant, 1);
+    if (extra != -1)
+        ResetCameraEntry(extra);
 }
 
 /* func_L02_00329410 is matched in its own unit, L02_00329410.c. */
@@ -120,13 +128,14 @@ void func_L02_00327390(char *arg0, char *arg1, int arg2) {
 extern void func_00282C88(void *target);
 extern void func_00283098(float *out, const float *a, const float *b);
 
-void func_L02_003294D8(char *arg0, float *arg1, float arg2) {
-    float *p = arg1;
-    char *q = arg0;
+/* Makes a vector of the given length that points the way the object faces. */
+void func_L02_003294D8(char *object, float *outVec, float length) {
+    float *out = outVec;
+    char *obj = object;
 
-    func_00282C88(p);
-    *p = arg2;
-    func_00283098(p, p, (const float *)(q + 0xC0));
+    ClearVector128(out);
+    *out = length;
+    matrix_mul_vec3(out, out, (const float *)(obj + 0xC0));
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -135,10 +144,11 @@ extern float func_002B04E0(char *arg0, float *arg1, char *transform);
 extern float func_00282C48(float t);
 
 /* Copy the incoming 16-byte record to a local, hand both to the two calls. */
-float func_L02_00329C48(char *arg0, TI128 *arg1, char *transform) {
-    TI128 buf = *arg1;
+/* Checks how far the object would move from the given position and returns a clamped result. */
+float func_L02_00329C48(char *object, TI128 *input, char *transform) {
+    TI128 localCopy = *input;
 
-    return func_00282C48(func_002B04E0(arg0, (float *)&buf, transform));
+    return FloatAbs(GetHeadingAngleOfVector(object, (float *)&localCopy, transform));
 }
 
 /* func_L02_0032B468 is defined in L02_0032B468.c. */
@@ -147,8 +157,9 @@ extern int func_L02_0032E3B0(void *a0, float *a1, int a2);
 
 /* The shared lookup takes the record index as a third argument; the retail wrapper hands it
    only two, so the call goes through a two-parameter prototype. */
-void func_L02_0032E390(void *a0, void *a1) {
-    ((int (*)(void *, void *))func_L02_0032E3B0)(a0, (char *)a1 + 0x10);
+/* Counts which side of the object its group members are on, looking toward the other object. */
+void func_L02_0032E390(void *object, void *other) {
+    ((int (*)(void *, void *))CountGroupSideTowardTarget)(object, (char *)other + 0x10);
 }
 
 extern void func_00283410(float *matrix, float *quat);
@@ -156,6 +167,7 @@ extern void func_00283698(void *dst, void *src);
 extern void func_00282CF0(float *out, const float *a, const float *b);
 extern float func_00283248(float a, float b);
 
+/* Counts the group members on each side of the line toward the target and returns the difference. */
 int func_L02_0032E3B0(void *object, float *target, int index) {
     float quat[4];
     float vec[4];
@@ -172,17 +184,17 @@ int func_L02_0032E3B0(void *object, float *target, int index) {
     }
     best = 0.0f;
     count = 0;
-    func_00282C88(quat);
-    quat[2] = func_00283248(target[0] - *(float *)((char *)object + 0x10),
+    ClearVector128(quat);
+    quat[2] = FastMatrixHelperA(target[0] - *(float *)((char *)object + 0x10),
                                    target[1] - *(float *)((char *)object + 0x14));
-    func_00283410(mat, quat);
-    func_00283698(mat, mat);
-    p = (short *)D_L02_001FC060[index];
+    euler_to_matrix(mat, quat);
+    matrix_from_basis_rows(mat, mat);
+    p = (short *)gEntityGroupLists[index];
     do {
-        entity = D_L02_001B359C + ((*(unsigned short *)p & 0x7FFF) << 8);
+        entity = gMobyPool_L02 + ((*(unsigned short *)p & 0x7FFF) << 8);
         if (entity[0x20] >= 0 && entity != (char *)object) {
-            func_00282CF0(vec, (float *)(entity + 0x10), (float *)((char *)object + 0x10));
-            func_00283098(vec, vec, mat);
+            FastVecSub(vec, (float *)(entity + 0x10), (float *)((char *)object + 0x10));
+            matrix_mul_vec3(vec, vec, mat);
             if (best < vec[1])
                 count--;
             else
@@ -194,18 +206,19 @@ int func_L02_0032E3B0(void *object, float *target, int index) {
 
 /* func_L02_0032E508 is matched in its own unit, src/levels/shared/L02_0032E508.c (-g). */
 
+/* Finds a route through linked areas to the target and turns the heading toward the next gap. */
 int func_L02_0032E998(float *position, float *target, float *heading, struct RouteNode *nodes, int count, int *sourceNode, int *targetNode, float override, float margin) {
     unsigned char visited[256];
     int i, j, found, portal, step, routeDepth;
     int layer;
     char *path;
     float angle;
-    *heading = func_00283248(target[0] - position[0], target[1] - position[1]);
+    *heading = FastMatrixHelperA(target[0] - position[0], target[1] - position[1]);
     if (override != 0.0f)
-        *heading = func_00283B98(override, *heading);
-    if (!func_L02_0032EDD8(position, nodes, count, sourceNode))
+        *heading = FastAddRotations(override, *heading);
+    if (!FindRouteNodeContainingPoint(position, nodes, count, sourceNode))
         return 0;
-    if (!func_L02_0032EDD8(target, nodes, count, targetNode))
+    if (!FindRouteNodeContainingPoint(target, nodes, count, targetNode))
         return 0;
     if (nodes[*targetNode].flags & 1)
         return 0;
@@ -241,7 +254,7 @@ int func_L02_0032E998(float *position, float *target, float *heading, struct Rou
     }
     if (found == -1)
         return 0;
-    path = D_L02_001FF1C0[nodes[found].path];
+    path = gRoutePolygons[nodes[found].path];
     angle = *heading;
     routeDepth = visited[found];
     if (routeDepth >= 3) {
@@ -250,12 +263,12 @@ int func_L02_0032E998(float *position, float *target, float *heading, struct Rou
         for (edge = 0; edge < 4; edge++) {
             if (visited[nodes[found].neighbors[edge]] == step) {
                 int offset = nodes[found].portals[edge] * 16;
-                angle = func_L02_0032EC98(path + (offset + 0x10), path + (offset + 0x20), position, angle, margin);
+                angle = ClampHeadingToGap(path + (offset + 0x10), path + (offset + 0x20), position, angle, margin);
                 break;
             }
         }
     }
-    *heading = func_L02_0032EC98(path + (portal * 16 + 0x10), path + (portal * 16 + 0x20), position, angle, margin);
+    *heading = ClampHeadingToGap(path + (portal * 16 + 0x10), path + (portal * 16 + 0x20), position, angle, margin);
     return 1;
 }
 
@@ -271,32 +284,33 @@ extern float func_00283B98(float a, float b);
    difference from the middle direction is limited by func_00282C48 of half the gap's angle.
    The heading argument itself holds the clamped difference, so it lives across blocks and is
    allocated globally, after the block-local first direction has taken $f21, as in retail. */
-float func_L02_0032EC98(void *a0, void *a1, void *position, float angle, float margin) {
-    float v0[4];
-    float v1[4];
-    float v2[4];
+/* Turns a heading toward a gap between two points without turning too far. */
+float func_L02_0032EC98(void *gapStart, void *gapEnd, void *position, float angle, float margin) {
+    float gapDir[4];
+    float leftPoint[4];
+    float rightPoint[4];
     float half;
     float start;
     float mid;
-    float f;
+    float limit;
 
-    func_00282CF0(v0, (float *)a1, (float *)a0);
-    func_00282F20(v0, v0, margin);
-    func_00282CC0(v1, a0, v0);
-    func_00282CF0(v2, (float *)a1, v0);
+    FastVecSub(gapDir, (float *)gapEnd, (float *)gapStart);
+    vec_scale_to_length(gapDir, gapDir, margin);
+    FastVecAdd(leftPoint, gapStart, gapDir);
+    FastVecSub(rightPoint, (float *)gapEnd, gapDir);
 
-    start = func_00283248(v1[0] - *(float *)position, v1[1] - *(float *)((char *)position + 4));
-    half = func_00283BE0(func_00283248(v2[0] - *(float *)position,
-                                       v2[1] - *(float *)((char *)position + 4)), start) * 0.5f;
-    mid = func_00283B98(half, start);
-    angle = func_00283BE0(angle, mid);
-    f = func_00282C48(half);
-    if (f < angle)
-        angle = f;
-    f = -f;
-    if (angle < f)
-        angle = f;
-    return func_00283B98(angle, mid);
+    start = FastMatrixHelperA(leftPoint[0] - *(float *)position, leftPoint[1] - *(float *)((char *)position + 4));
+    half = fast_subtract_rotations(FastMatrixHelperA(rightPoint[0] - *(float *)position,
+                                       rightPoint[1] - *(float *)((char *)position + 4)), start) * 0.5f;
+    mid = FastAddRotations(half, start);
+    angle = fast_subtract_rotations(angle, mid);
+    limit = FloatAbs(half);
+    if (limit < angle)
+        angle = limit;
+    limit = -limit;
+    if (angle < limit)
+        angle = limit;
+    return FastAddRotations(angle, mid);
 }
 
 extern int func_002A8AF0(float *p, float *v, int n);
@@ -312,21 +326,21 @@ int func_L02_0032EDD8(void *point, struct RouteNode *nodes, int count, int *inde
     if (*index != -1) {
         char *entry;
         int n;
-        entry = D_L02_001FF1C0[nodes[*index].path];
+        entry = gRoutePolygons[nodes[*index].path];
         n = *(int *)entry;
         entry += 0x10;
-        if (func_002A8AF0(point, (float *)entry, n) != 0)
+        if (point_in_path_xy(point, (float *)entry, n) != 0)
             return 1;
     }
     for (i = 0; i < count; i++) {
         if (i != *index
-            && func_00282E80(point, (char *)&nodes[i] + 0x10) <= *(float *)((char *)&nodes[i] + 0x1C)) {
+            && vec_distance_xy(point, (char *)&nodes[i] + 0x10) <= *(float *)((char *)&nodes[i] + 0x1C)) {
             char *entry;
             int n;
-            entry = D_L02_001FF1C0[nodes[i].path];
+            entry = gRoutePolygons[nodes[i].path];
             n = *(int *)entry;
             entry += 0x10;
-            if (func_002A8AF0(point, (float *)entry, n) != 0) {
+            if (point_in_path_xy(point, (float *)entry, n) != 0) {
                 *index = i;
                 return 1;
             }
@@ -350,7 +364,7 @@ int func_L02_00331440(void *a0, void *a1, int a2, float f12, float f13, float f1
     float old20;
     int ret;
 
-    rec = (char *)func_L00_0032C638((char *)a0);
+    rec = (char *)GetObjectVarsWord18((char *)a0);
     if (rec == 0)
         return 8;
     old38 = *(int *)(rec + 0x38);
@@ -361,7 +375,7 @@ int func_L02_00331440(void *a0, void *a1, int a2, float f12, float f13, float f1
     old20 = *(float *)(rec + 0x20);
     if (0.0f < f14)
         *(float *)(rec + 0x20) = f14;
-    ret = func_002B50E0(a0, a1, f12);
+    ret = StepMovementController(a0, a1, f12);
     *(int *)(rec + 0x38) = old38;
     *(float *)(rec + 0x28) = old28;
     *(float *)(rec + 0x20) = old20;
@@ -371,11 +385,12 @@ int func_L02_00331440(void *a0, void *a1, int a2, float f12, float f13, float f1
 extern void func_00282CF0(float *out, const float *a, const float *b);
 extern int func_L02_00332668(char *arg0, char *arg1);
 
-int func_L02_00332630(char *arg0, void *arg1) {
-    int tmp[4];
+/* Works out the offset from the object to a point and checks it. */
+int func_L02_00332630(char *object, void *target) {
+    int offset[4];
 
-    func_00282CF0((float *)tmp, (const float *)arg1, (const float *)(arg0 + 0x10));
-    return func_L02_00332668(arg0, (char *)tmp);
+    FastVecSub((float *)offset, (const float *)target, (const float *)(object + 0x10));
+    return CheckMoveTargetReachable(object, (char *)offset);
 }
 
 extern int D_L02_001A8FF0 __attribute__((sda));
@@ -390,12 +405,12 @@ int func_L02_00332668(char *arg0, char *arg1) {
     float h;
 
     if (D_L02_001A8FF0 == 0)
-        return func_L01_00322288(arg0, func_00283248(*(float *)(arg1), *(float *)(arg1 + 4)));
+        return StartMobyEffectFromEntry(arg0, FastMatrixHelperA(*(float *)(arg1), *(float *)(arg1 + 4)));
 
-    rec = func_L00_0032C638(arg0);
+    rec = GetObjectVarsWord18(arg0);
     if (rec == 0)
         return 0;
-    h = func_L00_003BFF68(arg0, rec, arg1, 0);
+    h = AimMobyAtTarget(arg0, rec, arg1, 0);
     if (*(float *)((char *)rec + 0x30) < h)
         return 0;
     return 1;
@@ -409,15 +424,15 @@ extern float func_L00_0031CDD0(char *a0, char *a1, int a2, float f12, float f13)
 
 /* Aim the record at the shape the caller found. */
 int func_L02_003329C8(char *a0, char *a1, float f12, float f13) {
-    char *rec = func_L00_0032C638(a0);
+    char *rec = GetObjectVarsWord18(a0);
 
     if (rec == 0)
         return 0;
     *(float *)(rec + 0x2C) = f13;
-    func_00282CF0((float *)(rec + 0xA0), (const float *)a1, (const float *)(a0 + 0x10));
+    FastVecSub((float *)(rec + 0xA0), (const float *)a1, (const float *)(a0 + 0x10));
     *(int *)(rec + 0xA8) = 0;
-    func_00282F20((float *)(rec + 0xA0), (const float *)(rec + 0xA0), f12);
-    *(float *)(rec + 0xA8) = func_L00_0031CDD0(a0 + 0x10, a1, 0, f12, -f13);
+    vec_scale_to_length((float *)(rec + 0xA0), (const float *)(rec + 0xA0), f12);
+    *(float *)(rec + 0xA8) = ComputeShotLaunchSpeed(a0 + 0x10, a1, 0, f12, -f13);
     return 1;
 }
 
@@ -441,55 +456,56 @@ extern void func_L00_003253A0(u8 *, float *, float *, float);
 extern float func_002AFF38(char *, char *, char *);
 extern void func_002AAC80(float *, float, float, float, float);
 
+/* Moves the object toward its target, speeding up and slowing down smoothly, and keeps it at the right height. */
 void func_L02_00332A80(char *object, char *data, void *target, TI128 *input, void *unused0, void *unused1, char *transform) {
     MotionVector desired, change;
     float vertical;
     float heading, distance, speed, height, drop;
     if (!(*(unsigned int *)(data + 0x38) & 0x10))
-        func_L00_003BFF68(object, data, (char *)input, (int)transform);
+        AimMobyAtTarget(object, data, (char *)input, (int)transform);
     heading = 0.0f;
     if (!(*(unsigned int *)(data + 0x38) & 0x10))
-        heading = func_L02_00329C48(object, input, transform);
+        heading = MeasureStepAngle(object, input, transform);
     if (*(float *)(data + 0x30) < heading) {
-        func_00282C88(&desired.q);
+        ClearVector128(&desired.q);
     } else {
         float gap;
-        distance = func_00282E48(object + 0x10, target);
+        distance = fast_vec_dist(object + 0x10, target);
         *(float *)(data + 0xCC) = distance;
         gap = *(float *)(data + 0x34);
         if (distance <= gap) {
             qzero(&desired);
         } else {
             gap = distance - gap;
-            speed = func_00282C10((gap + gap) * *(float *)(data + 0x24));
+            speed = square_root((gap + gap) * *(float *)(data + 0x24));
             if (*(float *)(data + 0x28) < speed)
                 speed = *(float *)(data + 0x28);
-            func_L02_003294D8(object, desired.f, speed);
+            BuildForwardVector(object, desired.f, speed);
         }
     }
-    func_00282CF0(change.f, desired.f, (float *)(data + 0xA0));
-    func_002AFEB8(object, (char *)&change, (char *)&change, 0.0f, transform);
-    if (func_00282DB0(&desired, data + 0xA0) > 0.0f)
-        func_002AC9F8(change.f, *(float *)(data + 0x20));
+    FastVecSub(change.f, desired.f, (float *)(data + 0xA0));
+    TransformAndSetHeight(object, (char *)&change, (char *)&change, 0.0f, transform);
+    if (FastVecDot(&desired, data + 0xA0) > 0.0f)
+        ClampVectorLength(change.f, *(float *)(data + 0x20));
     else
-        func_002AC9F8(change.f, *(float *)(data + 0x24));
-    func_00282CC0(data + 0xA0, data + 0xA0, &change);
-    *(float *)(data + 0xB0) = func_002AFF08(object, data + 0xA0, transform);
+        ClampVectorLength(change.f, *(float *)(data + 0x24));
+    FastVecAdd(data + 0xA0, data + 0xA0, &change);
+    *(float *)(data + 0xB0) = GetHorizontalOffsetLength(object, data + 0xA0, transform);
     if (!(*(unsigned int *)(data + 0x38) & 4)) {
-        height = func_002B0360(object + 0x10);
+        height = GetDistanceFromGravityCenter(object + 0x10);
         if (*(float *)(data + 0x90) < height) {
-            func_L00_003253A0((u8 *)object, (float *)(data + 0xA0), (float *)(data + 0xA0), *(float *)(data + 0x2C));
+            MixOnInnerData((u8 *)object, (float *)(data + 0xA0), (float *)(data + 0xA0), *(float *)(data + 0x2C));
             if (*(short *)(data + 0xC0) == 0)
                 *(unsigned int *)(data + 0x94) |= 0x20;
         } else {
-            vertical = func_002AFF38(object, data + 0xA0, transform);
+            vertical = GetVerticalOffset(object, data + 0xA0, transform);
             drop = vertical;
             if (*(float *)(data + 0x90) - height < drop)
                 vertical = *(float *)(data + 0x90) - height;
             else if (vertical < 0.0f)
                 vertical = 0.0f;
-            func_002AAC80(&vertical, *(float *)(data + 0x90) - height, 0.011111111380159855f, 0.011111111380159855f, 1.0f);
-            func_002AFEB8(object, data + 0xA0, data + 0xA0, vertical, transform);
+            ApproachTargetWithBraking(&vertical, *(float *)(data + 0x90) - height, 0.011111111380159855f, 0.011111111380159855f, 1.0f);
+            TransformAndSetHeight(object, data + 0xA0, data + 0xA0, vertical, transform);
         }
     }
 }
@@ -513,33 +529,34 @@ void func_L02_00333300(char *a0, char *a1) {
     char *obj;
     char *sub;
 
-    func_002AFFD8(a0 + 0x10, (char *)buf0, 1);
-    func_00282F20(buf1, buf0, *(float *)(a1 + 8) + 0.1f);
-    func_00282F20(buf2, buf0, -*(float *)(a1 + 0xC) - 0.1f);
-    func_00282CC0((char *)buf1, (char *)buf1, a0 + 0x10);
-    func_00282CC0((char *)buf2, (char *)buf2, a0 + 0x10);
-    if (func_002761F8((char *)buf1, (char *)buf2, 0, a0, 0)) {
+    ComputeViewDirection(a0 + 0x10, (char *)buf0, 1);
+    vec_scale_to_length(buf1, buf0, *(float *)(a1 + 8) + 0.1f);
+    vec_scale_to_length(buf2, buf0, -*(float *)(a1 + 0xC) - 0.1f);
+    FastVecAdd((char *)buf1, (char *)buf1, a0 + 0x10);
+    FastVecAdd((char *)buf2, (char *)buf2, a0 + 0x10);
+    if (CollLine((char *)buf1, (char *)buf2, 0, a0, 0)) {
         obj = &D_L02_001C0960;
-        *(float *)(a1 + 0x90) = func_002B0360(obj);
+        *(float *)(a1 + 0x90) = GetDistanceFromGravityCenter(obj);
         sub = obj - 0x20;
         *(int *)(a1 + 0x88) = *(int *)(sub + 0x18);
         *(int *)(a1 + 0x8C) = *(int *)(sub + 0x1C);
-        func_00282F20((float *)(a1 + 0x50), (float *)(obj + 0x20), 1.0f);
+        vec_scale_to_length((float *)(a1 + 0x50), (float *)(obj + 0x20), 1.0f);
     } else {
         *(int *)(a1 + 0x90) = 0;
         *(int *)(a1 + 0x88) = 0;
         *(int *)(a1 + 0x8C) = 0;
-        func_00282C88(a1 + 0x50);
+        ClearVector128(a1 + 0x50);
     }
 }
 
 extern void func_L02_00333480(char *arg0, char *arg1, void *arg2);
 
-void func_L02_00333438(char *arg0, char *arg1) {
-    int tmp[4];
+/* Works out the offset from the object to a point and aims at it. */
+void func_L02_00333438(char *object, char *target) {
+    int offset[4];
 
-    func_00282CF0((float *)tmp, (const float *)arg1, (const float *)(arg0 + 0x10));
-    func_L02_00333480(arg0, arg1, tmp);
+    FastVecSub((float *)offset, (const float *)target, (const float *)(object + 0x10));
+    UpdateObjectController(object, target, offset);
 }
 
 /* func_L02_00333480 is matched in its own unit, L02_00333480.c. */
@@ -554,44 +571,44 @@ extern unsigned char *D_L02_002001D8;
 extern int func_001163B0(void);
 
 /* Build one enemy record: pick its kind, place it, and aim it. */
-void *func_L02_003449D8(void *a0, void *a1, void *a2, void *a3, int a4) {
-    float buf[4];
+void *func_L02_003449D8(void *origin, void *direction, void *config, void *flag, int extra) {
+    float offset[4];
     unsigned char *rec;
-    unsigned char *rec2;
-    short *p;
-    short *q;
-    int *r;
-    float f21;
-    float f20;
+    unsigned char *aim;
+    short *range;
+    short *values;
+    int *pair;
+    float roll;
+    float fraction;
 
-    rec = (unsigned char *)func_002B9030(0x56);
+    rec = (unsigned char *)AllocParticle(0x56);
     if (rec != 0) {
-        rec[9] = (unsigned char)(func_00283CF0(0.04f) - 0x60);
-        rec[3] = (a3 != 0) ? 0x48 : 0x44;
+        rec[9] = (unsigned char)(FloatToInt(0.04f) - 0x60);
+        rec[3] = (flag != 0) ? 0x48 : 0x44;
         rec[1] = 0;
         rec[2] = *D_L02_002001D8;
-        rec[8] = (unsigned char)func_001163B0();
-        f21 = func_002A7878(0.0f, 1.0f);
+        rec[8] = (unsigned char)Rand();
+        roll = RandomFloatRange(0.0f, 1.0f);
 
-        p = *(short **)((char *)a2 + 8);
-        f20 = f21 / func_00283CE0(p[1] - p[0]);
+        range = *(short **)((char *)config + 8);
+        fraction = roll / IntToFloat(range[1] - range[0]);
 
-        r = *(int **)((char *)a2 + 0);
-        *(int *)(rec + 4) = func_L00_0031C998(r[0], r[1], f20);
+        pair = *(int **)((char *)config + 0);
+        *(int *)(rec + 4) = LerpIntegerFraction(pair[0], pair[1], fraction);
 
-        q = *(short **)((char *)a2 + 4);
-        *(float *)(rec + 0xC) = ((float)q[0] + f20 * (float)(q[1] - q[0])) * 1000.0f;
+        values = *(short **)((char *)config + 4);
+        *(float *)(rec + 0xC) = ((float)values[0] + fraction * (float)(values[1] - values[0])) * 1000.0f;
 
-        func_00282D30(buf, a1, f21);
-        func_00282CC0(rec + 0x10, a0, buf);
+        FastVecScale(offset, direction, roll);
+        FastVecAdd(rec + 0x10, origin, offset);
 
-        *(short *)(rec + 0xA) = (short)(*(int *)((char *)a2 + 0x10) - (f21 > 0.5f));
+        *(short *)(rec + 0xA) = (short)(*(int *)((char *)config + 0x10) - (roll > 0.5f));
 
-        rec2 = rec + 0x20;
-        func_00282D30(rec2, a1, f21 * *(float *)((char *)a2 + 0x14));
-        *(int *)(rec2 + 0x18) = a4;
-        *(void **)(rec2 + 0x10) = a2;
-        *(short *)(rec2 + 0x14) = 0;
+        aim = rec + 0x20;
+        FastVecScale(aim, direction, roll * *(float *)((char *)config + 0x14));
+        *(int *)(aim + 0x18) = extra;
+        *(void **)(aim + 0x10) = config;
+        *(short *)(aim + 0x14) = 0;
     }
 
     return rec;
@@ -632,65 +649,65 @@ extern void func_L02_0038DA00(void *arg0);
    past 89 or the resident word is 0x74. State 0 runs func_L02_0038BD00; state 1 switches the
    whole group off (+0x31 cleared, bit 0 of +0x34 set) when the record test passes, then runs
    func_L02_0038C998 and queues func_L02_0038DA00; state 2 switches the group back on. */
-void func_L02_0038BA28(unsigned char *arg0) {
-    unsigned char *o = *(unsigned char **)(arg0 + 0x68);
+void func_L02_0038BA28(unsigned char *controller) {
+    unsigned char *vars = *(unsigned char **)(controller + 0x68);
 
-    if (D_001A79F0 == 13) {
-        if (89.0f < D_00189E20.f88 || D_00189E20.f2294 == 0x74) {
-            arg0[0x30] = 0xFF;
-            *(unsigned short *)(arg0 + 0x34) = (*(unsigned short *)(arg0 + 0x34) | 0x41) & 0xEFFF;
-            *(int *)(arg0 + 0x98) = 0;
+    if (gCurrentMapIndex == 13) {
+        if (89.0f < gHeroState.f88 || gHeroState.f2294 == 0x74) {
+            controller[0x30] = 0xFF;
+            *(unsigned short *)(controller + 0x34) = (*(unsigned short *)(controller + 0x34) | 0x41) & 0xEFFF;
+            *(int *)(controller + 0x98) = 0;
             return;
         }
-        *(unsigned short *)(arg0 + 0x34) = (*(unsigned short *)(arg0 + 0x34) & 0xFFBE) | 0x1000;
-        *(int *)(arg0 + 0x98) = *(int *)(*(char **)(arg0 + 0x24) + 0x10);
+        *(unsigned short *)(controller + 0x34) = (*(unsigned short *)(controller + 0x34) & 0xFFBE) | 0x1000;
+        *(int *)(controller + 0x98) = *(int *)(*(char **)(controller + 0x24) + 0x10);
     }
-    if (*(unsigned short *)(arg0 + 0x34) & 2)
+    if (*(unsigned short *)(controller + 0x34) & 2)
         return;
     if (D_L02_001CAA80 != 0)
         return;
-    switch (arg0[0x20]) {
+    switch (controller[0x20]) {
     case 0:
-        func_L02_0038BD00(arg0, arg0[0x21]);
+        InitRailGroupMembers(controller, controller[0x21]);
         break;
     case 1:
-        /* each walk has its own q and e: retail gives the two walks different registers */
-        if (*(int *)(o + 0xC) != -1 && func_L00_00329520(D_L02_001BA500, *(int *)(o + 0xC)) != 0) {
-            unsigned short *q;
-            unsigned char *e;
+        /* each walk has its own idPtr and entity: retail gives the two walks different registers */
+        if (*(int *)(vars + 0xC) != -1 && IsPointInsideRegion(gCameraPosition_L02, *(int *)(vars + 0xC)) != 0) {
+            unsigned short *idPtr;
+            unsigned char *entity;
 
-            q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-            while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-                   ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-                e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-                if (e == 0)
+            idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+            while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+                   ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
+                entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+                if (entity == 0)
                     break;
-                e[0x31] = 0;
-                *(unsigned short *)(e + 0x34) |= 1;
-                q++;
+                entity[0x31] = 0;
+                *(unsigned short *)(entity + 0x34) |= 1;
+                idPtr++;
             }
-            func_002A7750(arg0, 2, -1);
+            SetMobyState(controller, 2, -1);
         }
-        func_L02_0038C998(arg0);
-        if (D_001A79F0 != 13 || !(89.0f < D_00189E20.f88))
-            func_L00_002E6CF0(func_L02_0038DA00, arg0);
+        UpdateMovingTargetsOnPath(controller);
+        if (gCurrentMapIndex != 13 || !(89.0f < gHeroState.f88))
+            AddDrawCallbackToList1(DrawAllLampGlows, controller);
         break;
     case 2:
-        if (func_L00_00329520(D_L02_001BA500, *(int *)(o + 0xC)) == 0) {
-            unsigned short *q;
-            unsigned char *e;
+        if (IsPointInsideRegion(gCameraPosition_L02, *(int *)(vars + 0xC)) == 0) {
+            unsigned short *idPtr;
+            unsigned char *entity;
 
-            q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-            while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-                   ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-                e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-                if (e == 0)
+            idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+            while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+                   ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
+                entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+                if (entity == 0)
                     break;
-                e[0x31] = 1;
-                *(unsigned short *)(e + 0x34) &= 0xFFFE;
-                q++;
+                entity[0x31] = 1;
+                *(unsigned short *)(entity + 0x34) &= 0xFFFE;
+                idPtr++;
             }
-            func_002A7750(arg0, 1, -1);
+            SetMobyState(controller, 1, -1);
         }
         break;
     }
@@ -706,17 +723,17 @@ extern int func_00282978(void *p);
 extern int func_00283D38(int a0, int a1, float f12);
 
 /* Toggle the lamp and hand the new state to the colour routine. */
-void func_L02_0038D978(char *arg0) {
-    char *s0 = *(char **)(arg0 + 0x68);
+void func_L02_0038D978(char *moby) {
+    char *vars = *(char **)(moby + 0x68);
 
-    if (*(short *)(arg0 + 0xAA) != 0x9B0)
+    if (*(short *)(moby + 0xAA) != 0x9B0 /* moby class 2480 */)
         return;
-    if (func_00282978(s0 + 0x74) != 0) {
-        *(unsigned short *)(s0 + 0x74) = 0x32;
-        *(unsigned int *)(s0 + 0x8C) = (*(unsigned int *)(s0 + 0x8C) == 0);
+    if (FastDecTimer(vars + 0x74) != 0) {
+        *(unsigned short *)(vars + 0x74) = 0x32;
+        *(unsigned int *)(vars + 0x8C) = (*(unsigned int *)(vars + 0x8C) == 0);
     }
-    *(int *)(arg0 + 0x78) = func_00283D38(*(int *)(arg0 + 0x78),
-        *(unsigned int *)(s0 + 0x8C) != 0 ? 0x50787878 : 0x50141414, 0.15f);
+    *(int *)(moby + 0x78) = FastTweenColor(*(int *)(moby + 0x78),
+        *(unsigned int *)(vars + 0x8C) != 0 ? 0x50787878 : 0x50141414, 0.15f);
 }
 
 
@@ -729,15 +746,16 @@ extern void func_L02_0038E430(unsigned char *arg0);
 extern void func_L02_0038E610(unsigned char *arg0);
 extern void func_L02_0038E838(unsigned char *arg0);
 
-void func_L02_0038DA00(void *arg0) {
-    func_L02_0038DA60(arg0);
-    func_L02_0038DC68(arg0);
-    func_L02_0038DE58(arg0);
-    func_L02_0038E048(arg0);
-    func_L02_0038E250(arg0);
-    func_L02_0038E430(arg0);
-    func_L02_0038E610(arg0);
-    func_L02_0038E838(arg0);
+/* Draws the glow effects of every kind of lamp in the controller's group. */
+void func_L02_0038DA00(void *controller) {
+    DrawGroupGlowsClass2480(controller);
+    DrawGroupGlowsSceneryShip(controller);
+    DrawGroupGlowsClass2837(controller);
+    DrawGroupGlowsClass4939(controller);
+    DrawGroupGlowsClass4733(controller);
+    DrawGroupGlowsClass4747(controller);
+    DrawGroupGlowsClass4752(controller);
+    DrawGroupGlowsClass4928(controller);
 }
 
 extern void func_00282D60(void *buf, void *value, float scale);
@@ -750,335 +768,336 @@ extern int func_L02_002F1658(void);
 /* Walks the object's group id list: every entity of kind 0x9B0 in state 1 that passes the
    visibility test gets its phase at +0x1C advanced (while the flag word is clear) and one effect
    call. */
-void func_L02_0038DA60(unsigned char *arg0) {
-    unsigned short *q;
-    unsigned char *e;
-    char *o;
-    float buf[4];
-    int flag;
+void func_L02_0038DA60(unsigned char *controller) {
+    unsigned short *idPtr;
+    unsigned char *entity;
+    char *vars;
+    float bounds[4];
+    int animate;
 
-    if (arg0[0x21] == 0xFF)
+    if (controller[0x21] == 0xFF)
         return;
-    flag = func_L02_002F1658();
-    q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-        e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    animate = IsResidentFlagClear();
+    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
+        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+        if (entity == 0)
             break;
-        o = *(char **)(e + 0x68);
-        if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
-            buf[3] *= 1.1f;
-            if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
-                (*(unsigned short *)(e + 0x34) & 1) == 0 && *(short *)(e + 0xAA) == 0x9B0 &&
-                e[0x20] == 1) {
-                if (flag != 0) {
-                    *(float *)(o + 0x1C) -= 0.1f;
-                    if (*(float *)(o + 0x1C) <= -8.0f)
-                        *(float *)(o + 0x1C) += 8.0f;
+        vars = *(char **)(entity + 0x68);
+        if (entity[0x31] != 0) {
+            scale_vector(bounds, entity, 0.0009765625f);
+            bounds[3] *= 1.1f;
+            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+                (*(unsigned short *)(entity + 0x34) & 1) == 0 && *(short *)(entity + 0xAA) == 0x9B0 /* moby class 2480 */ &&
+                entity[0x20] == 1) {
+                if (animate != 0) {
+                    *(float *)(vars + 0x1C) -= 0.1f;
+                    if (*(float *)(vars + 0x1C) <= -8.0f)
+                        *(float *)(vars + 0x1C) += 8.0f;
                 }
-                func_L00_002ECFE8(e, o + 0xA0, 3, 0x60804040, *(float *)(o + 0x78) * 0.8f,
-                                  *(float *)(o + 0x78) * 5.0f, *(float *)(o + 0x1C), 0x204090, 0x17);
+                DrawOrientedQuadsAtPoints(entity, vars + 0xA0, 3, 0x60804040, *(float *)(vars + 0x78) * 0.8f,
+                                  *(float *)(vars + 0x78) * 5.0f, *(float *)(vars + 0x1C), 0x204090, 0x17);
             }
         }
-        q++;
+        idPtr++;
     }
 }
 
 /* Walk the object's group list: every entity of kind 0x9B7 in state 1 that is in view gets one
    effect call. While the resident flag word is clear, its object's phase (+0x1C) first steps
    down by 0.1, and up by 8 once it reaches -8. */
-void func_L02_0038DC68(unsigned char *arg0) {
-    float buf[4];
-    unsigned short *q;
-    unsigned char *e;
-    char *o;
-    int flag;
+void func_L02_0038DC68(unsigned char *controller) {
+    float bounds[4];
+    unsigned short *idPtr;
+    unsigned char *entity;
+    char *vars;
+    int animate;
 
-    if (arg0[0x21] == 0xFF)
+    if (controller[0x21] == 0xFF)
         return;
-    flag = func_L02_002F1658();
-    q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-        e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    animate = IsResidentFlagClear();
+    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
+        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+        if (entity == 0)
             break;
-        o = *(char **)(e + 0x68);
-        if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
-            buf[3] *= 1.1f;
-            if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
-                !(*(unsigned short *)(e + 0x34) & 1) && *(short *)(e + 0xAA) == 0x9B7 &&
-                e[0x20] == 1) {
-                if (flag != 0) {
-                    *(float *)(o + 0x1C) -= 0.1f;
-                    if (*(float *)(o + 0x1C) <= -8.0f)
-                        *(float *)(o + 0x1C) += 8.0f;
+        vars = *(char **)(entity + 0x68);
+        if (entity[0x31] != 0) {
+            scale_vector(bounds, entity, 0.0009765625f);
+            bounds[3] *= 1.1f;
+            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+                !(*(unsigned short *)(entity + 0x34) & 1) && *(short *)(entity + 0xAA) == 0x9B7 /* Scenery Ship */ &&
+                entity[0x20] == 1) {
+                if (animate != 0) {
+                    *(float *)(vars + 0x1C) -= 0.1f;
+                    if (*(float *)(vars + 0x1C) <= -8.0f)
+                        *(float *)(vars + 0x1C) += 8.0f;
                 }
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78),
-                                  *(float *)(o + 0x78) * 7.0f, *(float *)(o + 0x1C), 0xC0, 0x17);
+                DrawOrientedQuadsAtPoints(entity, vars + 0xA0, 2, 0x605696FF, *(float *)(vars + 0x78),
+                                  *(float *)(vars + 0x78) * 7.0f, *(float *)(vars + 0x1C), 0xC0, 0x17);
             }
         }
-        q++;
+        idPtr++;
     }
 }
 
 /* The same walk as func_L02_0038DC68, for the entities of kind 0xB15. */
-void func_L02_0038DE58(unsigned char *arg0) {
-    float buf[4];
-    unsigned short *q;
-    unsigned char *e;
-    char *o;
-    int flag;
+void func_L02_0038DE58(unsigned char *controller) {
+    float bounds[4];
+    unsigned short *idPtr;
+    unsigned char *entity;
+    char *vars;
+    int animate;
 
-    if (arg0[0x21] == 0xFF)
+    if (controller[0x21] == 0xFF)
         return;
-    flag = func_L02_002F1658();
-    q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-        e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    animate = IsResidentFlagClear();
+    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
+        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+        if (entity == 0)
             break;
-        o = *(char **)(e + 0x68);
-        if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
-            buf[3] *= 1.1f;
-            if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
-                !(*(unsigned short *)(e + 0x34) & 1) && *(short *)(e + 0xAA) == 0xB15 &&
-                e[0x20] == 1) {
-                if (flag != 0) {
-                    *(float *)(o + 0x1C) -= 0.1f;
-                    if (*(float *)(o + 0x1C) <= -8.0f)
-                        *(float *)(o + 0x1C) += 8.0f;
+        vars = *(char **)(entity + 0x68);
+        if (entity[0x31] != 0) {
+            scale_vector(bounds, entity, 0.0009765625f);
+            bounds[3] *= 1.1f;
+            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+                !(*(unsigned short *)(entity + 0x34) & 1) && *(short *)(entity + 0xAA) == 0xB15 /* moby class 2837 */ &&
+                entity[0x20] == 1) {
+                if (animate != 0) {
+                    *(float *)(vars + 0x1C) -= 0.1f;
+                    if (*(float *)(vars + 0x1C) <= -8.0f)
+                        *(float *)(vars + 0x1C) += 8.0f;
                 }
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78),
-                                  *(float *)(o + 0x78) * 7.0f, *(float *)(o + 0x1C), 0xC0, 0x17);
+                DrawOrientedQuadsAtPoints(entity, vars + 0xA0, 2, 0x605696FF, *(float *)(vars + 0x78),
+                                  *(float *)(vars + 0x78) * 7.0f, *(float *)(vars + 0x1C), 0xC0, 0x17);
             }
         }
-        q++;
+        idPtr++;
     }
 }
 
 /* Like func_L02_0038DA60 for kind 0x134B: one effect call, with the scale 2.1000001f
    (0x40066667, one above 2.1f). */
-void func_L02_0038E048(unsigned char *arg0) {
-    unsigned short *q;
-    unsigned char *e;
-    char *o;
-    float buf[4];
-    int flag;
+void func_L02_0038E048(unsigned char *controller) {
+    unsigned short *idPtr;
+    unsigned char *entity;
+    char *vars;
+    float bounds[4];
+    int animate;
 
-    if (arg0[0x21] == 0xFF)
+    if (controller[0x21] == 0xFF)
         return;
-    flag = func_L02_002F1658();
-    q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-        e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    animate = IsResidentFlagClear();
+    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
+        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+        if (entity == 0)
             break;
-        o = *(char **)(e + 0x68);
-        if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
-            buf[3] *= 1.1f;
-            if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
-                (*(unsigned short *)(e + 0x34) & 1) == 0 && *(short *)(e + 0xAA) == 0x134B &&
-                e[0x20] == 1) {
-                if (flag != 0) {
-                    *(float *)(o + 0x1C) -= 0.1f;
-                    if (*(float *)(o + 0x1C) <= -8.0f)
-                        *(float *)(o + 0x1C) += 8.0f;
+        vars = *(char **)(entity + 0x68);
+        if (entity[0x31] != 0) {
+            scale_vector(bounds, entity, 0.0009765625f);
+            bounds[3] *= 1.1f;
+            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+                (*(unsigned short *)(entity + 0x34) & 1) == 0 && *(short *)(entity + 0xAA) == 0x134B /* moby class 4939 */ &&
+                entity[0x20] == 1) {
+                if (animate != 0) {
+                    *(float *)(vars + 0x1C) -= 0.1f;
+                    if (*(float *)(vars + 0x1C) <= -8.0f)
+                        *(float *)(vars + 0x1C) += 8.0f;
                 }
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x60804040, *(float *)(o + 0x78) * 0.3f,
-                                  *(float *)(o + 0x78) * 2.1000001f, *(float *)(o + 0x1C), 0x204090, 0x17);
+                DrawOrientedQuadsAtPoints(entity, vars + 0xA0, 2, 0x60804040, *(float *)(vars + 0x78) * 0.3f,
+                                  *(float *)(vars + 0x78) * 2.1000001f, *(float *)(vars + 0x1C), 0x204090, 0x17);
             }
         }
-        q++;
+        idPtr++;
     }
 }
 
 /* Walk the object's group list: every entity of kind 0x127D in state 1 that is in view has its
    object's phase (+0x1C) stepped down by 0.1 (and up by 8 once it reaches -8), and gets one
    effect call. */
-void func_L02_0038E250(unsigned char *arg0) {
-    float buf[4];
-    unsigned short *q;
-    unsigned char *e;
-    char *o;
+void func_L02_0038E250(unsigned char *controller) {
+    float bounds[4];
+    unsigned short *idPtr;
+    unsigned char *entity;
+    char *vars;
 
-    if (arg0[0x21] == 0xFF)
+    if (controller[0x21] == 0xFF)
         return;
-    q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-        e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
+        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+        if (entity == 0)
             break;
-        o = *(char **)(e + 0x68);
-        if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
-            buf[3] *= 1.1f;
-            if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
-                !(*(unsigned short *)(e + 0x34) & 1) && *(short *)(e + 0xAA) == 0x127D &&
-                e[0x20] == 1) {
-                *(float *)(o + 0x1C) -= 0.1f;
-                if (*(float *)(o + 0x1C) <= -8.0f)
-                    *(float *)(o + 0x1C) += 8.0f;
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78) * 0.4f,
-                                  *(float *)(o + 0x78) * 4.0f, *(float *)(o + 0x1C), 0xC0, 0x17);
+        vars = *(char **)(entity + 0x68);
+        if (entity[0x31] != 0) {
+            scale_vector(bounds, entity, 0.0009765625f);
+            bounds[3] *= 1.1f;
+            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+                !(*(unsigned short *)(entity + 0x34) & 1) && *(short *)(entity + 0xAA) == 0x127D /* moby class 4733 */ &&
+                entity[0x20] == 1) {
+                *(float *)(vars + 0x1C) -= 0.1f;
+                if (*(float *)(vars + 0x1C) <= -8.0f)
+                    *(float *)(vars + 0x1C) += 8.0f;
+                DrawOrientedQuadsAtPoints(entity, vars + 0xA0, 2, 0x605696FF, *(float *)(vars + 0x78) * 0.4f,
+                                  *(float *)(vars + 0x78) * 4.0f, *(float *)(vars + 0x1C), 0xC0, 0x17);
             }
         }
-        q++;
+        idPtr++;
     }
 }
 
 /* The same walk as func_L02_0038E250, for the entities of kind 0x128B (the effect's second
    scale is 3 times the object's +0x78 instead of 4 times). */
-void func_L02_0038E430(unsigned char *arg0) {
-    float buf[4];
-    unsigned short *q;
-    unsigned char *e;
-    char *o;
+void func_L02_0038E430(unsigned char *controller) {
+    float bounds[4];
+    unsigned short *idPtr;
+    unsigned char *entity;
+    char *vars;
 
-    if (arg0[0x21] == 0xFF)
+    if (controller[0x21] == 0xFF)
         return;
-    q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-        e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
+        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+        if (entity == 0)
             break;
-        o = *(char **)(e + 0x68);
-        if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
-            buf[3] *= 1.1f;
-            if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
-                !(*(unsigned short *)(e + 0x34) & 1) && *(short *)(e + 0xAA) == 0x128B &&
-                e[0x20] == 1) {
-                *(float *)(o + 0x1C) -= 0.1f;
-                if (*(float *)(o + 0x1C) <= -8.0f)
-                    *(float *)(o + 0x1C) += 8.0f;
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78) * 0.4f,
-                                  *(float *)(o + 0x78) * 3.0f, *(float *)(o + 0x1C), 0xC0, 0x17);
+        vars = *(char **)(entity + 0x68);
+        if (entity[0x31] != 0) {
+            scale_vector(bounds, entity, 0.0009765625f);
+            bounds[3] *= 1.1f;
+            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+                !(*(unsigned short *)(entity + 0x34) & 1) && *(short *)(entity + 0xAA) == 0x128B /* moby class 4747 */ &&
+                entity[0x20] == 1) {
+                *(float *)(vars + 0x1C) -= 0.1f;
+                if (*(float *)(vars + 0x1C) <= -8.0f)
+                    *(float *)(vars + 0x1C) += 8.0f;
+                DrawOrientedQuadsAtPoints(entity, vars + 0xA0, 2, 0x605696FF, *(float *)(vars + 0x78) * 0.4f,
+                                  *(float *)(vars + 0x78) * 3.0f, *(float *)(vars + 0x1C), 0xC0, 0x17);
             }
         }
-        q++;
+        idPtr++;
     }
 }
 
 /* Like func_L02_0038DA60 for kind 0x1290, without the flag word: the phase always advances
    and two effect calls follow, the second one at +0xC0 with both scales times 1.5. */
-void func_L02_0038E610(unsigned char *arg0) {
-    unsigned short *q;
-    unsigned char *e;
-    char *o;
-    float buf[4];
-    float a;
-    float b;
+void func_L02_0038E610(unsigned char *controller) {
+    unsigned short *idPtr;
+    unsigned char *entity;
+    char *vars;
+    float bounds[4];
+    float scaleA;
+    float scaleB;
 
-    if (arg0[0x21] == 0xFF)
+    if (controller[0x21] == 0xFF)
         return;
-    q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-        e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
+        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+        if (entity == 0)
             break;
-        o = *(char **)(e + 0x68);
-        if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
-            buf[3] *= 1.1f;
-            if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
-                (*(unsigned short *)(e + 0x34) & 1) == 0 && *(short *)(e + 0xAA) == 0x1290 &&
-                e[0x20] == 1) {
-                *(float *)(o + 0x1C) -= 0.1f;
-                if (*(float *)(o + 0x1C) <= -8.0f)
-                    *(float *)(o + 0x1C) += 8.0f;
-                a = *(float *)(o + 0x78) * 0.4f;
-                b = *(float *)(o + 0x78) * 3.0f;
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x60804020, a, b, *(float *)(o + 0x1C), 0xC00000, 0x17);
-                func_L00_002ECFE8(e, o + 0xC0, 1, 0x60804020, a * 1.5f, b * 1.5f, *(float *)(o + 0x1C), 0xC00000,
+        vars = *(char **)(entity + 0x68);
+        if (entity[0x31] != 0) {
+            scale_vector(bounds, entity, 0.0009765625f);
+            bounds[3] *= 1.1f;
+            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+                (*(unsigned short *)(entity + 0x34) & 1) == 0 && *(short *)(entity + 0xAA) == 0x1290 /* moby class 4752 */ &&
+                entity[0x20] == 1) {
+                *(float *)(vars + 0x1C) -= 0.1f;
+                if (*(float *)(vars + 0x1C) <= -8.0f)
+                    *(float *)(vars + 0x1C) += 8.0f;
+                scaleA = *(float *)(vars + 0x78) * 0.4f;
+                scaleB = *(float *)(vars + 0x78) * 3.0f;
+                DrawOrientedQuadsAtPoints(entity, vars + 0xA0, 2, 0x60804020, scaleA, scaleB, *(float *)(vars + 0x1C), 0xC00000, 0x17);
+                DrawOrientedQuadsAtPoints(entity, vars + 0xC0, 1, 0x60804020, scaleA * 1.5f, scaleB * 1.5f, *(float *)(vars + 0x1C), 0xC00000,
                                   0x17);
             }
         }
-        q++;
+        idPtr++;
     }
 }
 
 /* Like func_L02_0038DA60 for kind 0x1340: one effect call whose first scale is the +0x78
    field itself and the second is seven times it. */
-void func_L02_0038E838(unsigned char *arg0) {
-    unsigned short *q;
-    unsigned char *e;
-    char *o;
-    float buf[4];
-    int flag;
+void func_L02_0038E838(unsigned char *controller) {
+    unsigned short *idPtr;
+    unsigned char *entity;
+    char *vars;
+    float bounds[4];
+    int animate;
 
-    if (arg0[0x21] == 0xFF)
+    if (controller[0x21] == 0xFF)
         return;
-    flag = func_L02_002F1658();
-    q = (unsigned short *)D_L02_001FC060[arg0[0x21]];
-    while (arg0[0x21] != 0xFF && arg0[0x21] <= D_L02_001B35B8 && q != 0 &&
-           ((q != 0 && (short)q[-1] >= 0) || q == (unsigned short *)D_L02_001FC060[arg0[0x21]])) {
-        e = (unsigned char *)(D_L02_001B359C + ((*q & 0x7FFF) << 8));
-        if (e == 0)
+    animate = IsResidentFlagClear();
+    idPtr = (unsigned short *)gEntityGroupLists[controller[0x21]];
+    while (controller[0x21] != 0xFF && controller[0x21] <= D_L02_001B35B8 && idPtr != 0 &&
+           ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == (unsigned short *)gEntityGroupLists[controller[0x21]])) {
+        entity = (unsigned char *)(gMobyPool_L02 + ((*idPtr & 0x7FFF) << 8));
+        if (entity == 0)
             break;
-        o = *(char **)(e + 0x68);
-        if (e[0x31] != 0) {
-            func_00282D60(buf, e, 0.0009765625f);
-            buf[3] *= 1.1f;
-            if (func_00283DB8(buf, (float)*(int *)(o + 0x98)) != -1 &&
-                (*(unsigned short *)(e + 0x34) & 1) == 0 && *(short *)(e + 0xAA) == 0x1340 &&
-                e[0x20] == 1) {
-                if (flag != 0) {
-                    *(float *)(o + 0x1C) -= 0.1f;
-                    if (*(float *)(o + 0x1C) <= -8.0f)
-                        *(float *)(o + 0x1C) += 8.0f;
+        vars = *(char **)(entity + 0x68);
+        if (entity[0x31] != 0) {
+            scale_vector(bounds, entity, 0.0009765625f);
+            bounds[3] *= 1.1f;
+            if (FastMathHelperA(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
+                (*(unsigned short *)(entity + 0x34) & 1) == 0 && *(short *)(entity + 0xAA) == 0x1340 /* moby class 4928 */ &&
+                entity[0x20] == 1) {
+                if (animate != 0) {
+                    *(float *)(vars + 0x1C) -= 0.1f;
+                    if (*(float *)(vars + 0x1C) <= -8.0f)
+                        *(float *)(vars + 0x1C) += 8.0f;
                 }
-                func_L00_002ECFE8(e, o + 0xA0, 2, 0x605696FF, *(float *)(o + 0x78), *(float *)(o + 0x78) * 7.0f,
-                                  *(float *)(o + 0x1C), 0xC0, 0x17);
+                DrawOrientedQuadsAtPoints(entity, vars + 0xA0, 2, 0x605696FF, *(float *)(vars + 0x78), *(float *)(vars + 0x78) * 7.0f,
+                                  *(float *)(vars + 0x1C), 0xC0, 0x17);
             }
         }
-        q++;
+        idPtr++;
     }
 }
 
 /* Raise the byte field to eight when it is below. */
-void func_L02_00392C70(unsigned char *a0) {
-    if (a0[0x20] < 8) {
-        a0[0x20] = 8;
+void func_L02_00392C70(unsigned char *moby) {
+    if (moby[0x20] < 8) {
+        moby[0x20] = 8;
     }
 }
 
 /* Raise the byte field to eight when it is below. */
-void func_L02_003948D0(unsigned char *a0) {
-    if (a0[0x20] < 8) {
-        a0[0x20] = 8;
+void func_L02_003948D0(unsigned char *moby) {
+    if (moby[0x20] < 8) {
+        moby[0x20] = 8;
     }
 }
 
 extern void func_L02_003AA650(char *arg0);
 
-void func_L02_003A6F78(char *arg0) {
-    unsigned char *p;
-    unsigned char *q;
+/* Puts the object into its final state and lets go of the child object it holds. */
+void func_L02_003A6F78(char *moby) {
+    unsigned char *vars;
+    unsigned char *child;
 
-    arg0[0x20] = 6;
-    *(unsigned short *)(arg0 + 0x34) = (*(unsigned short *)(arg0 + 0x34) | 0x41) & 0xEFFF;
-    *(int *)(arg0 + 0x98) = 0;
-    p = *(unsigned char **)(arg0 + 0x68);
-    p[0xC8] = 1;
-    p[0xC9] = 0xFF;
-    q = *(unsigned char **)(p + 0xFC);
-    if (q != 0) {
-        if (*(short *)(q + 0xAA) == 0x326) {
-            func_L02_003AA650(q);
-            *(unsigned char **)(p + 0xFC) = 0;
+    moby[0x20] = 6;
+    *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) | 0x41) & 0xEFFF;
+    *(int *)(moby + 0x98) = 0;
+    vars = *(unsigned char **)(moby + 0x68);
+    vars[0xC8] = 1;
+    vars[0xC9] = 0xFF;
+    child = *(unsigned char **)(vars + 0xFC);
+    if (child != 0) {
+        if (*(short *)(child + 0xAA) == 0x326 /* moby class 806 */) {
+            ReleaseSlotsAndRetireObject(child);
+            *(unsigned char **)(vars + 0xFC) = 0;
         } else {
-            *(unsigned char **)(p + 0xFC) = 0;
+            *(unsigned char **)(vars + 0xFC) = 0;
         }
     }
 }
@@ -1087,22 +1106,23 @@ void func_L02_003A6F78(char *arg0) {
    two-byte kind code. */
 extern int func_00312E20(void *, int);
 
-void func_L02_003A6FE8(char *self) {
-    char *s1;
-    short t;
+/* Sets up a crate object and attaches the child object for its class. */
+void func_L02_003A6FE8(char *moby) {
+    char *vars;
+    short classId;
 
-    *(unsigned short *)(self + 0x34) = (*(unsigned short *)(self + 0x34) & 0xFFBE) | 0x1000;
-    s1 = *(char **)(self + 0x68);
-    *(unsigned int *)(self + 0x98) = *(unsigned int *)(*(unsigned int *)(self + 0x24) + 0x10);
-    self[0x20] = 1;
-    *(unsigned int *)(s1 + 0x100) = 0;
-    t = *(short *)(self + 0xAA);
-    if (t == 0x1F5) {
-        *(unsigned int *)(s1 + 0xFC) = func_00312E20(self, 0);
-    } else if (t == 0x200) {
-        *(unsigned int *)(s1 + 0xFC) = func_00312E20(self, 1);
+    *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
+    vars = *(char **)(moby + 0x68);
+    *(unsigned int *)(moby + 0x98) = *(unsigned int *)(*(unsigned int *)(moby + 0x24) + 0x10);
+    moby[0x20] = 1;
+    *(unsigned int *)(vars + 0x100) = 0;
+    classId = *(short *)(moby + 0xAA);
+    if (classId == 0x1F5 /* Nanotech Crate */) {
+        *(unsigned int *)(vars + 0xFC) = SpawnLinkedChildMoby(moby, 0);
+    } else if (classId == 0x200 /* Purple Nanotech Crate */) {
+        *(unsigned int *)(vars + 0xFC) = SpawnLinkedChildMoby(moby, 1);
     }
-    self[0x7F] = 0;
+    moby[0x7F] = 0;
 }
 
 /* func_L02_003A8770 is defined in L02_002B5F50-quad.c. */
@@ -1112,22 +1132,22 @@ extern void func_0029F338(void *e);
 extern void *D_L02_001B31EC __attribute__((sda));
 
 /* Release the eight slots behind the entity, then retire it. */
-void func_L02_003AA650(char *arg0) {
-    void **p;
+void func_L02_003AA650(char *moby) {
+    void **slot;
     int i;
 
-    p = (void **)(*(char **)(arg0 + 0x68) + 0x30);
+    slot = (void **)(*(char **)(moby + 0x68) + 0x30);
     for (i = 7; i >= 0; i--) {
-        if (p[0] != 0) {
-            func_002B9180(p[0]);
-            p[0] = 0;
+        if (slot[0] != 0) {
+            KillParticle(slot[0]);
+            slot[0] = 0;
         }
-        p++;
+        slot++;
     }
-    if (D_L02_001B31EC == arg0)
-        arg0[0x20] = 4;
+    if (D_L02_001B31EC == moby)
+        moby[0x20] = 4;
     else
-        func_0029F338(arg0);
+        MarkMobySpawned(moby);
 }
 
 

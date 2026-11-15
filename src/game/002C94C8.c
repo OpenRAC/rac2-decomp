@@ -20,54 +20,54 @@ extern void func_00282C88(float *);
 extern void func_00283098(float *, float *, float *);
 extern void func_00282D08(float *, float *, float *, float);
 
-int func_002C94C8(int idx, float *a, float *b, float *c)
+int func_002C94C8(int pathIndex, float *start, float *end, float *hitPoint)
 {
-    float v[4], w[4], z[4], t[4], u[4];
+    float direction[4], sideways[4], upAxis[4], startLocal[4], endLocal[4];
     float best;
     float zero;
     int found = 0;
     int i = 1;
     int offset;
-    float *prev;
-    float *cur;
+    float *older;
+    float *newer;
 
-    func_00282CF0(v, b, a);
-    v[2] = 0;
-    func_00282F20(v, v, 1.0f / func_00282DF0(v));
-    func_00282C88(w);
-    w[0] = v[1];
-    w[1] = -v[0];
-    func_00282C88(z);
-    z[2] = 1.0f;
+    FastVecSub(direction, end, start);
+    direction[2] = 0;
+    vec_scale_to_length(direction, direction, 1.0f / FastVecLength(direction));
+    ClearVector128(sideways);
+    sideways[0] = direction[1];
+    sideways[1] = -direction[0];
+    ClearVector128(upAxis);
+    upAxis[2] = 1.0f;
     best = 1.0f;
-    func_00282CF0(t, (float *)((char *)D_001F1700[idx] + 0x10), a);
-    func_00283098(t, t, v);
-    prev = t;
-    cur = u;
-    if (i < D_001F1700[idx]->count) {
+    FastVecSub(startLocal, (float *)((char *)gPathTable_001F1700[pathIndex] + 0x10), start);
+    matrix_mul_vec3(startLocal, startLocal, direction);
+    older = startLocal;
+    newer = endLocal;
+    if (i < gPathTable_001F1700[pathIndex]->count) {
         offset = 0x20;
         zero = 0.0f;
         do {
-            func_00282CF0(cur, (float *)((char *)D_001F1700[idx] + offset), a);
-            func_00283098(cur, cur, v);
-            if (t[3] != zero || u[3] != zero) {
-                if (u[1] * t[1] < 0.0f) {
-                    float q = (t[0] - u[0]) / (t[1] - u[1]);
-                    float x = q * -u[1] + u[0];
-                    if (x > 0.0f && x < best) {
-                        best = x;
+            FastVecSub(newer, (float *)((char *)gPathTable_001F1700[pathIndex] + offset), start);
+            matrix_mul_vec3(newer, newer, direction);
+            if (startLocal[3] != zero || endLocal[3] != zero) {
+                if (endLocal[1] * startLocal[1] < 0.0f) {
+                    float ratio = (startLocal[0] - endLocal[0]) / (startLocal[1] - endLocal[1]);
+                    float along = ratio * -endLocal[1] + endLocal[0];
+                    if (along > 0.0f && along < best) {
+                        best = along;
                         found = 1;
-                        qcopy(prev, cur);
+                        qcopy(older, newer);
                         goto next;
                     }
                 }
             }
-            qcopy(prev, cur);
+            qcopy(older, newer);
         next:
             i++;
             offset += 0x10;
-        } while (i < D_001F1700[idx]->count);
+        } while (i < gPathTable_001F1700[pathIndex]->count);
     }
-    func_00282D08(c, a, b, best);
+    lerp_vector(hitPoint, start, end, best);
     return found;
 }

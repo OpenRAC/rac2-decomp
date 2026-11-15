@@ -25,25 +25,25 @@ extern float func_002A7940(void);
 extern char *func_002ED688(void *);
 
 /* Draw a pulsing glow at every live moby of this moby's group. */
-void func_L10_0041EE00(u8 *m)
+void func_L10_0041EE00(u8 *moby)
 {
-    f32 v[4] __attribute__((aligned(16)));
-    u16 *first = D_L10_001FB1E0[m[0x21]];
+    f32 glowPos[4] __attribute__((aligned(16)));
+    u16 *first = D_L10_001FB1E0[moby[0x21]];
     u16 *list;
-    Moby_L10_0041EE00 *o;
+    Moby_L10_0041EE00 *target;
     Vars_L10_0041EE00 *vars;
     u32 color;
 
     if (first != 0) {
         list = first;
         do {
-            o = (Moby_L10_0041EE00 *)(D_L10_001B251C[0] + ((*list & 0x7FFF) << 8));
-            if (*(s32 *)(func_002ED688(o) + 0x110) != 0) {
-                vars = o->vars;
-                func_00282D30(v, o->axis, 0.25f);
-                func_00282CC0(v, o->pos, v);
-                color = (func_00283CF0((func_00283180(vars->phase) + 1.0f) * 0.5f * 64.0f) << 24) | 0x63B4FF;
-                func_00281EB8(v, 0x31, color, 1, 7.5f, 2.0f, func_002A7940());
+            target = (Moby_L10_0041EE00 *)(D_L10_001B251C[0] + ((*list & 0x7FFF) << 8));
+            if (*(s32 *)(GetMobyMotionData(target) + 0x110) != 0) {
+                vars = target->vars;
+                FastVecScale(glowPos, target->axis, 0.25f);
+                FastVecAdd(glowPos, target->pos, glowPos);
+                color = (FloatToInt((FastSinOrCosA(vars->phase) + 1.0f) * 0.5f * 64.0f) << 24) | 0x63B4FF;
+                DrawBillboardQuad_00281EB8(glowPos, 0x31, color, 1, 7.5f, 2.0f, RandomAngle());
             }
         } while ((s16)*list++ >= 0);
     }

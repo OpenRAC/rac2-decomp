@@ -30,25 +30,25 @@ extern char D_L11_001B1990[8] __attribute__((sda));
 /* Emits count sparks at the object, then one more unless the chance roll says no. */
 void func_L11_00447018(char *obj, s32 count)
 {
-    L11_447018_Spark s;
+    L11_447018_Spark spark;
     s32 i;
 
     for (i = 0; i < count; i++) {
-        qcopy(s.pos, func_L11_004417E8(obj));
-        func_002ACB48(s.pos, D_L11_001B1964);
-        s.pos[2] += D_L11_001B1968;
-        func_00282C88(&s);
-        func_002ACB48(&s, func_002A7878(D_L11_001B195C, D_L11_001B1960) * 0.016666668f);
-        s.flag = 0;
-        func_L02_003449D8(s.pos, &s, D_L11_001B1990, func_002A77E0(2), func_002A7820(D_L11_001B1954, D_L11_001B1958));
+        qcopy(spark.pos, GetArenaCenterPoint(obj));
+        AddRandomOffsetToVector(spark.pos, D_L11_001B1964);
+        spark.pos[2] += D_L11_001B1968;
+        ClearVector128(&spark);
+        AddRandomOffsetToVector(&spark, RandomFloatRange(D_L11_001B195C, D_L11_001B1960) * 0.016666668f);
+        spark.flag = 0;
+        SpawnEnemyRecord(spark.pos, &spark, D_L11_001B1990, RandomIntBelow(2), RandomIntRange(D_L11_001B1954, D_L11_001B1958));
     }
-    if (func_002A77E0(D_L11_001B1950) == 0) {
-        qcopy(s.pos, func_L11_004417E8(obj));
-        func_002ACB48(s.pos, D_L11_001B1964);
-        s.pos[2] += D_L11_001B1968;
-        func_00282C88(&s);
-        func_002ACB48(&s, func_002A7878(D_L11_001B195C, D_L11_001B1960) * 0.016666668f);
-        s.flag = 0;
-        func_L02_003449D8(s.pos, &s, D_L11_001B1990, func_002A77E0(2), func_002A7820(D_L11_001B1954, D_L11_001B1958));
+    if (RandomIntBelow(D_L11_001B1950) == 0) {
+        qcopy(spark.pos, GetArenaCenterPoint(obj));
+        AddRandomOffsetToVector(spark.pos, D_L11_001B1964);
+        spark.pos[2] += D_L11_001B1968;
+        ClearVector128(&spark);
+        AddRandomOffsetToVector(&spark, RandomFloatRange(D_L11_001B195C, D_L11_001B1960) * 0.016666668f);
+        spark.flag = 0;
+        SpawnEnemyRecord(spark.pos, &spark, D_L11_001B1990, RandomIntBelow(2), RandomIntRange(D_L11_001B1954, D_L11_001B1958));
     }
 }

@@ -4,9 +4,10 @@
  * hud_coord5, the dead-test rounding helper with five tests: cse follows at most 9 jumps per
  * path, so the colour copy cC survives to the call as retail. A compiler rule was tried first
  * (cse path length, copy-variable merges, argument-source rules) and did not close it; the
- * helper is allowed by owner ruling, 13 November 2026. y3 uses label_y3 on (void *)e.
+ * helper is allowed by owner ruling, 13 November 2026. y3 uses label_y3 on (void *)textResult.
  */
 #include "include_asm.h"
+#include "names.h"
 typedef struct { char pad[0x1CC]; unsigned char *entries; int count; int timer; } MenuEntryState;
 extern MenuEntryState D_001F2840;
 typedef struct {
@@ -117,14 +118,15 @@ static __inline__ int label_y3(void *handle, float value, float scale, float hal
         scaled = scale;
     return result;
 }
+/* Draws the options screen: the titles, the framed boxes, the row of choice icons around the selected one, the help text and the live model preview. */
 int func_002D3FA0(void)
 {
     MenuCorners corners = D_001ABA78;
     char text[32];
-    int color = func_002A9588(0x60241700, 0x55F0C070, 30, 0, 0);
+    int color = PingPongBlendValues(0x60241700, 0x55F0C070, 30, 0, 0);
     int x, index, i;
     char *first, *second;
-    int t, r, e;
+    int texture, hintResult, textResult;
     int y1, y2, y3;
     int on2 = 1, on3 = 1;
     int one = 1;
@@ -134,47 +136,47 @@ int func_002D3FA0(void)
     unsigned long cB;
     unsigned long cC;
     float px, py;
-    func_0027C540(0);
-    func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD0), 0x60442D00, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD1), 0x60241700, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD2), 0x55F0C070, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
-    func_00300A00(func_00336D50(D_001A8CFC[0] + 0x8710, 0XD3), 0x55F0C070, (float)(D_001A7340[0] / 2), (float)hud_coord((float)(D_001A7344[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    SetupGifPaging(0);
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC[0] + 0x8710, 0XD0), 0x60442D00, (float)(gScreenWidth[0] / 2), (float)hud_coord((float)(gScreenHeight[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC[0] + 0x8710, 0XD1), 0x60241700, (float)(gScreenWidth[0] / 2), (float)hud_coord((float)(gScreenHeight[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC[0] + 0x8710, 0XD2), 0x55F0C070, (float)(gScreenWidth[0] / 2), (float)hud_coord((float)(gScreenHeight[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_001A8CFC[0] + 0x8710, 0XD3), 0x55F0C070, (float)(gScreenWidth[0] / 2), (float)hud_coord((float)(gScreenHeight[0] / 2), D_001B23A4[0], 0.5f, one), 1.0f, 1.0f, 0.0f);
     ya = hud_coord(326.0f, D_001B23A4[0], 0.5f, one);
     yb = hud_coord(387.0f, D_001B23A4[0], 0.5f, one);
     cB = color;
     cC = cB;
-    func_0028FC48(228, ya, 230, yb, cB, 0);
-    func_0028FC48(286, hud_coord5(326.0f, D_001B23A4[0], 0.5f, one), 288, hud_coord5(387.0f, D_001B23A4[0], 0.5f, one), cC, 0);
-    func_0028FC48(228, hud_coord(325.0f, D_001B23A4[0], 0.5f, one), 288, hud_coord(327.0f, D_001B23A4[0], 0.5f, one), cC, 0);
-    func_0028FC48(228, hud_coord(386.0f, D_001B23A4[0], 0.5f, one2), 288, hud_coord(388.0f, D_001B23A4[0], 0.5f, one2), cB, 0);
-    t = func_0028E588(0xEAA8, 0); func_0028EA58(t, 16, label_y((void *)t, 36.0f, D_001B23A4[0], 0.5f, one2), 192, label_y((void *)t, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    t = func_0028E588(0xEAA8, 0); func_0028EA58(t, 400, label_y((void *)t, 36.0f, D_001B23A4[0], 0.5f, one2), -192, label_y((void *)t, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    t = func_0028E588(0xEAA8, 0); func_0028EA58(t, 16, label_y((void *)t, 228.0f, D_001B23A4[0], 0.5f, one2), 192, -label_y((void *)t, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    t = func_0028E588(0xEAA8, 0); func_0028EA58(t, 400, label_y((void *)t, 228.0f, D_001B23A4[0], 0.5f, one2), -192, -label_y((void *)t, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
-    t = func_0028E588(0xEAA8, 1); func_0028E868(t, 402, label_y((void *)t, 50.0f, D_001B23A4[0], 0.5f, one2), 89, label_y((void *)t, 115.0f, D_001B23A4[0], 0.5f, one2), 64);
+    AppendScreenRectPacket(228, ya, 230, yb, cB, 0);
+    AppendScreenRectPacket(286, hud_coord5(326.0f, D_001B23A4[0], 0.5f, one), 288, hud_coord5(387.0f, D_001B23A4[0], 0.5f, one), cC, 0);
+    AppendScreenRectPacket(228, hud_coord(325.0f, D_001B23A4[0], 0.5f, one), 288, hud_coord(327.0f, D_001B23A4[0], 0.5f, one), cC, 0);
+    AppendScreenRectPacket(228, hud_coord(386.0f, D_001B23A4[0], 0.5f, one2), 288, hud_coord(388.0f, D_001B23A4[0], 0.5f, one2), cB, 0);
+    texture = GetIconFrame(0xEAA8, 0); DrawHudSpriteGradient(texture, 16, label_y((void *)texture, 36.0f, D_001B23A4[0], 0.5f, one2), 192, label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 0); DrawHudSpriteGradient(texture, 400, label_y((void *)texture, 36.0f, D_001B23A4[0], 0.5f, one2), -192, label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 0); DrawHudSpriteGradient(texture, 16, label_y((void *)texture, 228.0f, D_001B23A4[0], 0.5f, one2), 192, -label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 0); DrawHudSpriteGradient(texture, 400, label_y((void *)texture, 228.0f, D_001B23A4[0], 0.5f, one2), -192, -label_y((void *)texture, 96.0f, D_001B23A4[0], 0.5f, one2), &corners);
+    texture = GetIconFrame(0xEAA8, 1); DrawHudSprite(texture, 402, label_y((void *)texture, 50.0f, D_001B23A4[0], 0.5f, one2), 89, label_y((void *)texture, 115.0f, D_001B23A4[0], 0.5f, one2), 64);
     y1 = hud_coord(116.0f, D_001B23A4[0], 0.5f, one2);
-    e = func_0027FB40(445, y1, 0x80F0F0F0ULL, func_00288FB8(0x3212), -1);
+    textResult = DrawTextCenteredMediumFont(445, y1, 0x80F0F0F0ULL, GetLocalizedString(0x3212), -1);
     y2 = hud_coord(134.0f, D_001B23A4[0], 0.5f, one2);
-    e = func_0027FB40(445, y2, 0x80F0F0F0ULL, func_00288FB8(0x3213), -1);
-    e = func_00115DA8(text, D_001AB998, func_00288FB8(0x3213), func_00288FB8(0x2D55));
-    e = func_0027FAA8(159, hud_coord(18.0f, D_001B23A4[0], 0.5f, on3), 0x80F0F0F0ULL, text, -1);
+    textResult = DrawTextCenteredMediumFont(445, y2, 0x80F0F0F0ULL, GetLocalizedString(0x3213), -1);
+    textResult = Sprintf(text, D_001AB998, GetLocalizedString(0x3213), GetLocalizedString(0x2D55));
+    textResult = DrawTextCenteredSmallFont(159, hud_coord(18.0f, D_001B23A4[0], 0.5f, on3), 0x80F0F0F0ULL, text, -1);
     do {
-    y3 = label_y3((void *)e, 187.0f, D_001B23A4[0], 0.5f, on3);
+    y3 = label_y3((void *)textResult, 187.0f, D_001B23A4[0], 0.5f, on3);
     } while (0);
-    r = func_0027FAA8(445, y3, 0x80F0F0F0ULL, func_00288FB8(0x2D4F), -1);
+    hintResult = DrawTextCenteredSmallFont(445, y3, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
     x = 235;
     for (i = 0; i < 12; i++) {
         index = D_001ABA74 - i;
         if (index >= 0 && index < 12) {
             while (index >= 0) {
-                if ((D_001A7AF0[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
+                if ((gEquipmentBits[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
                     break;
                 index--;
                 i++;
             }
             if (index < 0)
                 continue;
-            func_002D3D88(index, x);
+            DrawPreviewChoiceIcon(index, x);
         }
         x -= 56;
     }
@@ -183,28 +185,28 @@ int func_002D3FA0(void)
         index = D_001ABA74 + i;
         if (index >= 0 && index < 12) {
             while (index < 12) {
-                if ((D_001A7AF0[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
+                if ((gEquipmentBits[0] & D_0026CFD0[index].selectionMask) == D_0026CFD0[index].requiredBits)
                     break;
                 index++;
                 i++;
             }
             if (index >= 12)
                 continue;
-            func_002D3D88(index, x);
+            DrawPreviewChoiceIcon(index, x);
         }
         x += 56;
     }
-    func_0027C660();
-    func_002FC620(30, 385, label_y2((void *)r, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)i, 213.0f, D_001B23A4[0], 0.5f, on3));
-    func_002A0250();
-    func_002A01C8();
-    func_002A01F0();
-    func_002A0300(D_001F2840.entries, D_001F2840.count);
-    func_002A0220();
-    func_002A0380();
-    func_0027C540(0);
-    func_002ECB70(D_001F2840.entries);
-    func_0027C660();
-    func_002FC620(0, D_001A7340[0] - 1, 0, D_001A7344[0] - 1);
+    DoGifPaging();
+    SetGsScissorClamped(30, 385, label_y2((void *)hintResult, 50.0f, D_001B23A4[0], 0.5f, on2), label_y((void *)i, 213.0f, D_001B23A4[0], 0.5f, on3));
+    DrawMobysSetup();
+    FillScratchArea();
+    SaveScratchArea();
+    UploadObjectTextures(gPauseMenuState.entries, gPauseMenuState.count);
+    RestoreScratchArea();
+    RunTextureUploadAndSetup();
+    SetupGifPaging(0);
+    render_environment_mapped_object(gPauseMenuState.entries);
+    DoGifPaging();
+    SetGsScissorClamped(0, gScreenWidth[0] - 1, 0, gScreenHeight[0] - 1);
     return 0;
 }

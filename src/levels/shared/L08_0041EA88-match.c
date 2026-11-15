@@ -26,39 +26,41 @@ extern void func_00282CC0(char *, char *, char *);
 extern int func_002761F8(void *, void *, int, void *, int);
 extern int func_00277258(void *, int, void *, float);
 
-void func_L08_0041EA88(u8 *a0)
+/* Ends the hero's ride on a vehicle: frees the vehicle's effects, resets the hero's state and
+   places the hero on the ground in front of the vehicle. */
+void func_L08_0041EA88(u8 *vehicle)
 {
-    u8 *s0;
-    u8 *r;
-    L08Scratch sc;
+    u8 *vars;
+    u8 *hero;
+    L08Scratch spot;
 
-    s0 = *(u8 **)(a0 + 0x68);
-    func_L01_00323310(*(void **)(s0 + 0x198), *(void **)(s0 + 0x1A0));
-    func_L08_00318F90(0, 0, 1);
-    r = D_00189E20;
-    *(u8 *)(r + 0x22B5) = 0;
+    vars = *(u8 **)(vehicle + 0x68);
+    QueueKeyedRequest(*(void **)(vars + 0x198), *(void **)(vars + 0x1A0));
+    SetGameStatePair(0, 0, 1);
+    hero = gHeroState;
+    *(u8 *)(hero + 0x22B5) = 0;
     ref_L08_0041EA88_00(0, 1);
-    *(f32 *)(r + 0x108) = 0.16666667f;
-    *(s16 *)(r + 0x1834) = -1;
-    *(s32 *)(r + 0x1830) = 0;
-    if (*(u32 *)(s0 + 0x74) != 0)
-        func_0029F338((void *)*(u32 *)(s0 + 0x74));
-    *(u32 *)(s0 + 0x74) = 0;
-    *(s16 *)(s0 + 0x88) = 0;
-    *(u8 *)(s0 + 0x8A) = 0;
-    qcopy(&sc, D_L08_001B9D30);
-    sc.s.scale = 0.0f;
-    func_00282F20((char *)&sc, (char *)&sc, 2.5f);
-    sc.s.scale = 0.7f;
-    func_00282CC0((char *)&sc, (char *)(a0 + 0x10), (char *)&sc);
-    *(u32 *)(a0 + 0x98) = 0;
-    if (func_002761F8(r + 0x80, (char *)&sc, 2, (void *)*(u32 *)(r + 0x2290), 0) != 0) {
-        qcopy(&sc, &D_L08_001BFF60);
-        if (func_00277258((char *)&sc, 2, (void *)*(u32 *)(r + 0x2290), 0.4f) != 0) {
-            qcopy(&sc, &D_L08_001BFF60);
+    *(f32 *)(hero + 0x108) = 0.16666667f;
+    *(s16 *)(hero + 0x1834) = -1;
+    *(s32 *)(hero + 0x1830) = 0;
+    if (*(u32 *)(vars + 0x74) != 0)
+        MarkMobySpawned((void *)*(u32 *)(vars + 0x74));
+    *(u32 *)(vars + 0x74) = 0;
+    *(s16 *)(vars + 0x88) = 0;
+    *(u8 *)(vars + 0x8A) = 0;
+    qcopy(&spot, D_L08_001B9D30);
+    spot.s.scale = 0.0f;
+    vec_scale_to_length((char *)&spot, (char *)&spot, 2.5f);
+    spot.s.scale = 0.7f;
+    FastVecAdd((char *)&spot, (char *)(vehicle + 0x10), (char *)&spot);
+    *(u32 *)(vehicle + 0x98) = 0;
+    if (CollLine(hero + 0x80, (char *)&spot, 2, (void *)*(u32 *)(hero + 0x2290), 0) != 0) {
+        qcopy(&spot, &D_L08_001BFF60);
+        if (TestPointAgainstCollision((char *)&spot, 2, (void *)*(u32 *)(hero + 0x2290), 0.4f) != 0) {
+            qcopy(&spot, &D_L08_001BFF60);
         }
     }
-    qcopy(D_00189EA0, &sc);
-    *(u32 *)(a0 + 0x98) = *(u32 *)((u8 *)*(u32 **)(a0 + 0x24) + 0x10);
-    *(u32 *)((u8 *)*(u32 **)(D_00189EA0 + 0x2210) + 0x9C) = 0;
+    qcopy(gHeroPosition, &spot);
+    *(u32 *)(vehicle + 0x98) = *(u32 *)((u8 *)*(u32 **)(vehicle + 0x24) + 0x10);
+    *(u32 *)((u8 *)*(u32 **)(gHeroPosition + 0x2210) + 0x9C) = 0;
 }

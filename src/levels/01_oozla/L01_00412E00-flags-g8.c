@@ -15,25 +15,26 @@ extern void func_314008(void *);
 extern int D_L01_001AEBF8 __attribute__((sda));
 extern int D_L01_001AEC38;
 extern int ref_L01_00412E00_00 __attribute__((sda));
-void func_L01_00412E00(unsigned char *a0) {
-    unsigned char *s1 = *(unsigned char **)(a0 + 0x68);
+/* Counts itself, waits for the player to trigger it and then flashes an effect. */
+void func_L01_00412E00(unsigned char *moby) {
+    unsigned char *vars = *(unsigned char **)(moby + 0x68);
 
-    switch (a0[0x20]) {
+    switch (moby[0x20]) {
     case 0:
         ref_L01_00412E00_00 = ref_L01_00412E00_00 + 1;
-        func_3248E0(a0, 1, -1);
+        func_3248E0(moby, 1, -1);
         break;
     case 1:
-        if (func_326C70(a0, 0x04010000, 0) != 0 && *(int *)s1 == 0) {
+        if (func_326C70(moby, 0x04010000, 0) != 0 && *(int *)vars == 0) {
             ref_L01_00412E00_00 = D_L01_001AEC38 - 1;
-            func_3248E0(a0, 2, -1);
+            func_3248E0(moby, 2, -1);
         }
-        a0[0xA8] = 0xFF;
+        moby[0xA8] = 0xFF;
         break;
     case 2:
-        func_333240(a0, &D_L01_001B1960, &D_L01_001B1958, &D_L01_001B1950, 0xFFFF, 0, -1, 0,
+        func_333240(moby, &D_L01_001B1960, &D_L01_001B1958, &D_L01_001B1950, 0xFFFF, 0, -1, 0,
                     0xFFFF, 0xFF, 0);
-        func_314008(a0);
+        func_314008(moby);
         break;
     }
 }

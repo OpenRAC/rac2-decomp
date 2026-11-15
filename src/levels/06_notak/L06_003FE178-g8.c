@@ -34,13 +34,13 @@ void func_L06_003FDEB8(int group)
     if (!entry)
         return;
     state = D_L06_001B281C[*entry & 0x7FFF].state;
-    path = D_L06_001FE500[*(int *)state];
+    path = gPathList[*(int *)state];
     count = 0;
-    reciprocal = func_00282E48(path + 0x10, path + 0x20);
+    reciprocal = fast_vec_dist(path + 0x10, path + 0x20);
     reciprocal = 1.0f / reciprocal;
     pathLength = (float)*(int *)path;
     closed = 1;
-    if (!(func_00282E48(path + 0x10, path + (*(int *)path << 4)) < 5.0f))
+    if (!(fast_vec_dist(path + 0x10, path + (*(int *)path << 4)) < 5.0f))
         closed = 0;
     do {
         last = (char *)&D_L06_001B281C[*entry & 0x7FFF];
@@ -53,12 +53,12 @@ void func_L06_003FDEB8(int group)
         float position;
         state = *(char **)(moby + 0x68);
         *(float *)(state + 0x14) = (reciprocal * (1.0f / 60.0f)) *
-                                  func_002A7878(*(float *)(state + 8), *(float *)(state + 0xC));
+                                  RandomFloatRange(*(float *)(state + 8), *(float *)(state + 0xC));
         *(float *)(state + 0x18) = (reciprocal * 0.0002777777845f) *
                                   (*(float *)(state + 0xC) - *(float *)(state + 8));
-        position = func_00283CE0(reverse);
+        position = IntToFloat(reverse);
         reverse--;
-        position = position / func_00283CE0(count);
+        position = position / IntToFloat(count);
         position *= pathLength;
         *(char **)(state + 0x34) = last;
         *(float *)(state + 0x60) = reciprocal;
@@ -68,12 +68,12 @@ void func_L06_003FDEB8(int group)
         *(float *)(state + 0x5C) = *(float *)(state + 0x14);
         *(float *)(state + 0x1C) = reciprocal * 3.5f;
         *(float *)(state + 0x10) = position;
-        func_00282C88(state + 0x20);
-        *(float *)(state + 0x20) = func_002A78D8(0.0f, *(float *)(state + 4));
-        *(float *)(state + 0x28) = func_002A78D8(0.0f, *(float *)(state + 4));
-        *(int *)(state + 0x48) = func_002A7820(D_L06_001AFC58, D_L06_001AFC5C);
-        *(float *)(state + 0x4C) = func_002A7940();
-        *(float *)(state + 0x50) = func_002A78D8(D_L06_001AFC60, D_L06_001AFC64) * 0.0002908882452f;
+        ClearVector128(state + 0x20);
+        *(float *)(state + 0x20) = RandomSignedFloatRange(0.0f, *(float *)(state + 4));
+        *(float *)(state + 0x28) = RandomSignedFloatRange(0.0f, *(float *)(state + 4));
+        *(int *)(state + 0x48) = RandomIntRange(D_L06_001AFC58, D_L06_001AFC5C);
+        *(float *)(state + 0x4C) = RandomAngle();
+        *(float *)(state + 0x50) = RandomSignedFloatRange(D_L06_001AFC60, D_L06_001AFC64) * 0.0002908882452f;
         *(unsigned char *)(moby + 0x20) = 1;
         *(unsigned short *)(moby + 0x32) = 0xFF;
         *(int *)(state + 0x54) = -1;
@@ -88,11 +88,11 @@ void func_L06_003FE178(char *moby)
     char *next;
     float phase, pathPosition;
     int length;
-    func_002C9828(*(char **)(state + 0x30), *(int *)(state + 0x40),
+    SamplePathPosition(*(char **)(state + 0x30), *(int *)(state + 0x40),
                  (float *)(moby + 0x10), (float *)(moby + 0xF0), 0, *(float *)(state + 0x10));
-    phase = func_00283B98(*(float *)(state + 0x4C), *(float *)(state + 0x50));
+    phase = FastAddRotations(*(float *)(state + 0x4C), *(float *)(state + 0x50));
     *(float *)(state + 0x4C) = phase;
-    *(float *)(moby + 0x18) += D_L06_001AFCA0 * func_00283198(phase);
+    *(float *)(moby + 0x18) += D_L06_001AFCA0 * FastSinOrCosB(phase);
     length = **(int **)(state + 0x30);
     pathPosition = *(float *)(state + 0x10) + *(float *)(state + 0x14);
     *(float *)(state + 0x10) = pathPosition;
@@ -139,7 +139,7 @@ void func_L06_003FE178(char *moby)
             return;
         *(float *)(state + 0x38) = *(float *)(other + 0x38);
     } else {
-        float random = func_002A7878(*(float *)(state + 8), *(float *)(state + 0xC));
+        float random = RandomFloatRange(*(float *)(state + 8), *(float *)(state + 0xC));
         *(float *)(state + 0x38) = (*(float *)(state + 0x60) * (1.0f / 60.0f)) * random;
     }
 }

@@ -22,6 +22,7 @@ typedef struct {
     float radii[2][4];
 } L18ArcControl;
 
+/* Draws the crackling lightning on both sides of the Extermibot beam, with extra branches when the beam is strong, plus glows at both ends. */
 void func_L18_00433B70(u8 *obj) {
     L18ArcControl control __attribute__((aligned(16)));
     float branch[6][4] __attribute__((aligned(16)));
@@ -36,63 +37,63 @@ void func_L18_00433B70(u8 *obj) {
     if (active) width  =  0.08f;
     count  =  active ? 12 : 8;
     path  =  __builtin_alloca(count * 16);
-    life  =  strong ? func_002A7820(48, 128) : func_002A7820(48, 80);
-    size  =  strong ? func_002A7878(0.02f, 0.12f) : func_002A7878(0.02f, 0.07f);
-    speed  =  strong ? func_002A7878(2.0f, 6.0f) : func_002A7878(2.0f, 3.0f);
-    func_L11_003F4198(path, count, state + 0x610, width);
-    func_L18_00434510(path, count, life, 0x60FFFFFF, 0x30FF0000, size, speed);
+    life  =  strong ? RandomIntRange(48, 128) : RandomIntRange(48, 80);
+    size  =  strong ? RandomFloatRange(0.02f, 0.12f) : RandomFloatRange(0.02f, 0.07f);
+    speed  =  strong ? RandomFloatRange(2.0f, 6.0f) : RandomFloatRange(2.0f, 3.0f);
+    BuildJitteredCurvePointsAlt(path, count, state + 0x610, width);
+    DrawLightningRibbon_L18(path, count, life, 0x60FFFFFF, 0x30FF0000, size, speed);
     if ((unsigned)(*(u16 *)(state + 0x806) - 2) < 2) {
-        qcopy(control.endpoints[0], path[func_002A7820(count - 6, count - 3)]);
+        qcopy(control.endpoints[0], path[RandomIntRange(count - 6, count - 3)]);
         qcopy(control.endpoints[1], path[count - 2]);
-        func_002ACB48(control.endpoints[1], 1.0f);
-        func_002A7A00(control.tangents[0], 1.0f, 2.0f);
-        func_002A7A00(control.tangents[1], 1.0f, 2.0f);
-        life = func_002A7820(48, 96);
-        size = func_002A7878(0.02f, 0.08f);
-        speed = func_002A7878(2.0f, 3.0f);
-        func_L11_003F4198(branch, 6, &control, 0.05f);
-        func_L18_00434510(branch, 6, life, 0x60FF3030, 0x30FF0000, size, speed);
+        AddRandomOffsetToVector(control.endpoints[1], 1.0f);
+        RandomDirectionVector(control.tangents[0], 1.0f, 2.0f);
+        RandomDirectionVector(control.tangents[1], 1.0f, 2.0f);
+        life = RandomIntRange(48, 96);
+        size = RandomFloatRange(0.02f, 0.08f);
+        speed = RandomFloatRange(2.0f, 3.0f);
+        BuildJitteredCurvePointsAlt(branch, 6, &control, 0.05f);
+        DrawLightningRibbon_L18(branch, 6, life, 0x60FF3030, 0x30FF0000, size, speed);
     }
-    life  =  strong ? func_002A7820(48, 128) : func_002A7820(48, 80);
-    size  =  strong ? func_002A7878(0.02f, 0.12f) : func_002A7878(0.02f, 0.07f);
-    speed  =  strong ? func_002A7878(2.0f, 6.0f) : func_002A7878(2.0f, 3.0f);
-    func_L11_003F4198(path, count, state + 0x6B0, width);
-    func_L18_00434510(path, count, life, 0x60FFFFFF, 0x30FF0000, size, speed);
+    life  =  strong ? RandomIntRange(48, 128) : RandomIntRange(48, 80);
+    size  =  strong ? RandomFloatRange(0.02f, 0.12f) : RandomFloatRange(0.02f, 0.07f);
+    speed  =  strong ? RandomFloatRange(2.0f, 6.0f) : RandomFloatRange(2.0f, 3.0f);
+    BuildJitteredCurvePointsAlt(path, count, state + 0x6B0, width);
+    DrawLightningRibbon_L18(path, count, life, 0x60FFFFFF, 0x30FF0000, size, speed);
     if ((unsigned)(*(u16 *)(state + 0x806) - 2) < 2) {
-        qcopy(control.endpoints[0], path[func_002A7820(count - 6, count - 3)]);
+        qcopy(control.endpoints[0], path[RandomIntRange(count - 6, count - 3)]);
         qcopy(control.endpoints[1], path[count - 2]);
-        func_002ACB48(control.endpoints[1], 1.0f);
-        func_002A7A00(control.tangents[0], 1.0f, 2.0f);
-        func_002A7A00(control.tangents[1], 1.0f, 2.0f);
-        life = func_002A7820(48, 96);
-        size = func_002A7878(0.02f, 0.08f);
-        speed = func_002A7878(2.0f, 3.0f);
-        func_L11_003F4198(branch, 6, &control, 0.05f);
-        func_L18_00434510(branch, 6, life, 0x60FF3030, 0x30FF0000, size, speed);
+        AddRandomOffsetToVector(control.endpoints[1], 1.0f);
+        RandomDirectionVector(control.tangents[0], 1.0f, 2.0f);
+        RandomDirectionVector(control.tangents[1], 1.0f, 2.0f);
+        life = RandomIntRange(48, 96);
+        size = RandomFloatRange(0.02f, 0.08f);
+        speed = RandomFloatRange(2.0f, 3.0f);
+        BuildJitteredCurvePointsAlt(branch, 6, &control, 0.05f);
+        DrawLightningRibbon_L18(branch, 6, life, 0x60FF3030, 0x30FF0000, size, speed);
     }
     scale  =  *(float *)(state + 0x7E0) * 2.0f + 1.0f;
-    func_0029FCC0(*(void **)(state + 0x7C8), 0, control.endpoints[0]);
-    func_0029FCC0(*(void **)(state + 0x7C8), 1, control.endpoints[1]);
+    TransformMobyJointToWorld(*(void **)(state + 0x7C8), 0, control.endpoints[0]);
+    TransformMobyJointToWorld(*(void **)(state + 0x7C8), 1, control.endpoints[1]);
     half = scale * 0.5f;
     {
-        int glowLife = func_002A7820(80, 96);
-        float angle = func_002A7940();
-        func_L02_003FFC48(control.endpoints[0], 0x807070, half, glowLife, angle, 49, 2);
+        int glowLife = RandomIntRange(80, 96);
+        float angle = RandomAngle();
+        DrawAimedEffectPacket(control.endpoints[0], 0x807070, half, glowLife, angle, 49, 2);
     }
     scale = scale * 0.7f;
     {
-        int glowLife = func_002A7820(8, 22);
-        float angle = func_002A7940();
-        func_L02_003FFC48(control.endpoints[0], 0x802020, scale, glowLife, angle, 11, 2);
+        int glowLife = RandomIntRange(8, 22);
+        float angle = RandomAngle();
+        DrawAimedEffectPacket(control.endpoints[0], 0x802020, scale, glowLife, angle, 11, 2);
     }
     {
-        int glowLife = func_002A7820(80, 96);
-        float angle = func_002A7940();
-        func_L02_003FFC48(control.endpoints[1], 0x807070, half, glowLife, angle, 49, 2);
+        int glowLife = RandomIntRange(80, 96);
+        float angle = RandomAngle();
+        DrawAimedEffectPacket(control.endpoints[1], 0x807070, half, glowLife, angle, 49, 2);
     }
     {
-        int glowLife = func_002A7820(8, 22);
-        float angle = func_002A7940();
-        func_L02_003FFC48(control.endpoints[1], 0x802020, scale, glowLife, angle, 11, 2);
+        int glowLife = RandomIntRange(8, 22);
+        float angle = RandomAngle();
+        DrawAimedEffectPacket(control.endpoints[1], 0x802020, scale, glowLife, angle, 11, 2);
     }
 }

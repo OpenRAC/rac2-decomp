@@ -3,6 +3,7 @@
  * argument of func_L09_0033E8B0, as in func_L09_0033E8B0_1's callers. The frame's index and end
  * are re-read, not cached, and the -1 the result is compared with is a literal. */
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned int u32;
 
@@ -18,6 +19,7 @@ extern float func_002AAA00(void *, void *, int, float, float, float, float);
 
 /* Steps the run's frame to the next entry of the level's table and hands the
    distance from the object to that entry's point to the stage. */
+/* Walks the enemy along its path to the next point and turns it to face along the way. */
 int func_L09_003F7B28(char *object, int index)
 {
     char *frame = *(char **)(object + 0x68);
@@ -39,16 +41,16 @@ int func_L09_003F7B28(char *object, int index)
             ret = 0;
     }
     step = idx + 1;
-    if (func_L09_0033E658(index) < step) {
+    if (GetPathTableEntryId(index) < step) {
         float *rec = (float *)(D_L09_001FE6C0[index] + step * 16);
 
-        dist = func_00283248(rec[4] - *(float *)(object + 0x10),
+        dist = FastMatrixHelperA(rec[4] - *(float *)(object + 0x10),
                              rec[5] - *(float *)(object + 0x14));
     } else {
-        dist = func_00283248(*(float *)(frame + 0x1F0) - *(float *)(object + 0x10),
+        dist = FastMatrixHelperA(*(float *)(frame + 0x1F0) - *(float *)(object + 0x10),
                              *(float *)(frame + 0x1F4) - *(float *)(object + 0x14));
     }
-    func_002AAA00(object + 0xF8, frame + 0x1B4, 0, dist, *(float *)(frame + 0x114), *(float *)(frame + 0x118),
+    ApproachTargetWithDirectionMode(object + 0xF8, frame + 0x1B4, 0, dist, *(float *)(frame + 0x114), *(float *)(frame + 0x118),
                   *(float *)(frame + 0x11C));
     return ret;
 }

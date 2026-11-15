@@ -51,8 +51,9 @@ typedef signed int s32_1B4C8;
 extern s32_1B4C8 func_0011CD20();
 
 /* rac1-decomp src/core/00119D88.c: func_0011A758 */
-int func_0011C8B0(int arg0) {
-    return r1_D_00155080[arg0];
+/* Returns the value saved for one command slot. */
+int func_0011C8B0(int slot) {
+    return r1_D_00155080[slot];
 }
 
 extern int r1_D_00155080[];
@@ -89,19 +90,20 @@ extern int r1_func_0011A748(void *arg0, void *arg1);
 extern s32_1B4C8 r1_func_0011ABC8();
 
 /* rac1-decomp src/core/00119D88.c: func_0011C8D8 */
+/* Sets up the command channel to the sound/IO processor once, and tells it we are ready. */
 void func_0011C8D8(void) {
     int i;
-    unsigned t5, t6;
+    unsigned recvBuffer, sendBuffer;
     r1_func_0011D960();
     if (r1_D_0012FD04 != 0) {
         r1_func_0011D9A8();
         return;
     }
     r1_D_0012FD04 = 1;
-    t6 = (unsigned)r1_D_00154E80 | 0x20000000;
-    t5 = (unsigned)r1_D_00154F00 | 0x20000000;
-    r1_D_00154F58.a0 = (void *)t6;
-    r1_D_00154F58.a1 = (void *)t5;
+    sendBuffer = (unsigned)r1_D_00154E80 | 0x20000000;
+    recvBuffer = (unsigned)r1_D_00154F00 | 0x20000000;
+    r1_D_00154F58.a0 = (void *)sendBuffer;
+    r1_D_00154F58.a1 = (void *)recvBuffer;
     r1_D_00154F58.a2 = 0;
     r1_D_00154F58.a3 = r1_D_00154F80;
     r1_D_00154F58.a4 = 0x20;
@@ -148,6 +150,7 @@ void func_0011C8D8(void) {
 /* rac1-decomp src/core/00119D88.c: func_0011AA00 */
 /* r1_func_001193F8 and r1_func_00118AD0 both return int; their results decide
    which registers the globals' addresses get. */
+/* Shuts the command channel down. */
 void func_0011CB58(void) {
     r1_func_001193F8_i(0x5);
     r1_func_00118AD0_i(0x5, r1_D_00154F54);
@@ -158,32 +161,34 @@ void func_0011CB58(void) {
 /* Sets slot arg0's two words: r1_D_00154F6C's for arg0 >= 0, r1_D_00154F64's
    below. In func_0011CBC0's shape: reassigning arg0 to the table is what
    puts the base in $a0, as in retail. */
-void func_0011CB90(int arg0, int arg1, int arg2) {
-    int off = arg0 << 3;
-    if (arg0 < 0) {
-        arg0 = r1_D_00154F64;
+void func_0011CB90(int cmdId, int handler, int handlerData) {
+    int offset = cmdId << 3;
+    if (cmdId < 0) {
+        cmdId = r1_D_00154F64;
     } else {
-        arg0 = r1_D_00154F6C;
+        cmdId = r1_D_00154F6C;
     }
-    off += arg0;
-    *(int *)(off + 0) = arg1;
-    *(int *)(off + 4) = arg2;
+    offset += cmdId;
+    *(int *)(offset + 0) = handler;
+    *(int *)(offset + 4) = handlerData;
 }
 
 /* rac1-decomp src/core/00119D88.c: func_0011AA68 */
-void func_0011CBC0(int arg0) {
-    int offset = arg0 << 3;
-    if (arg0 < 0) {
-        arg0 = r1_D_00154F64;
+/* Removes the handler for one command id. */
+void func_0011CBC0(int cmdId) {
+    int offset = cmdId << 3;
+    if (cmdId < 0) {
+        cmdId = r1_D_00154F64;
     } else {
-        arg0 = r1_D_00154F6C;
+        cmdId = r1_D_00154F6C;
     }
-    offset += arg0;
+    offset += cmdId;
     *(int *)offset = 0;
 }
 
 /* rac1-decomp src/core/00119D88.c: func_0011AA90 */
 /* Adapted from Lombyte (GPL-3.0) for PAL by OpenRAC's tools/port.py: src/sdk/rpc/sce_sif_send_cmd.c, _sceSifSendCmd. */
+/* Builds and starts the transfer that sends one command packet (and optional data) to the other processor. */
 s32 func_0011CBE8(u32 packet, s32 mode, SifCmd *cmd, s32 size, u32 src, u32 dst, s32 dst_size) {
     SifDma tags[2];
     s32 num;
@@ -236,13 +241,14 @@ s32 func_0011CBE8(u32 packet, s32 mode, SifCmd *cmd, s32 size, u32 src, u32 dst,
    `addiu $sp,$sp,-0x10` fourth, after three argument moves, which
    2.95.3 could not produce (11/60). */
 
-int func_0011CD20(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5) {
-    return func_0011CBE8(arg0, 0, arg1, arg2, arg3, arg4, arg5);
+int func_0011CD20(int cmdId, int cmd, int size, int src, int dst, int dstSize) {
+    return SendSifCmdPacket(cmdId, 0, cmd, size, src, dst, dstSize);
 }
 
 /* rac1-decomp src/core/00119D88.c: func_0011AC08 */
-int func_0011CD60(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5) {
-    return func_0011CBE8(arg0, 0x1, arg1, arg2, arg3, arg4, arg5);
+/* Same as the normal send, but safe to call from an interrupt. */
+int func_0011CD60(int cmdId, int cmd, int size, int src, int dst, int dstSize) {
+    return SendSifCmdPacket(cmdId, 0x1, cmd, size, src, dst, dstSize);
 }
 
 ASM_FUNC("asm/core", func_0011CDA0);

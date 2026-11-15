@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
 
@@ -30,24 +31,24 @@ void func_L05_0041CE00(char *object)
     *(TI128 *)v1 = 0;
     v0[0] = -0.8f;
     v0[3] = 1.0f;
-    func_00283098(v2, v0, object + 0xC0);
+    matrix_mul_vec3(v2, v0, object + 0xC0);
     half = 0.5f;
-    func_00282CC0(v2, v2, object + 0x10);
+    FastVecAdd(v2, v2, object + 0x10);
     v2[3] = 0.0f;
     *(TI128 *)v3 = *(TI128 *)v2;
     *(TI128 *)v4 = *(TI128 *)v2;
     *(TI128 *)v5 = *(TI128 *)v2;
-    func_002ACB48(v2, 0.1f);
-    func_002ACB48(v3, 0.1f);
-    func_002ACB48(v4, 0.1f);
-    func_002ACB48(v5, 0.1f);
-    f = func_002A7878(7.5f, 10.0f);
+    AddRandomOffsetToVector(v2, 0.1f);
+    AddRandomOffsetToVector(v3, 0.1f);
+    AddRandomOffsetToVector(v4, 0.1f);
+    AddRandomOffsetToVector(v5, 0.1f);
+    f = RandomFloatRange(7.5f, 10.0f);
     v1[0] = -(f * 0.016666668f) * half;
-    func_L00_0033C0D0(object, v3, v1, &D_L05_001B1310, 1);
-    f = func_002A7878(7.5f, 10.0f);
+    SpawnObjectRelativeParticle(object, v3, v1, &D_L05_001B1310, 1);
+    f = RandomFloatRange(7.5f, 10.0f);
     v1[0] = -(f * 0.016666668f) * half;
-    func_L00_0033C0D0(object, v4, v1, &D_L05_001B1320, 1);
-    f = func_002A7878(7.5f, 10.0f);
+    SpawnObjectRelativeParticle(object, v4, v1, &D_L05_001B1320, 1);
+    f = RandomFloatRange(7.5f, 10.0f);
     v1[0] = -(f * 0.016666668f) * half;
-    func_L00_0033C0D0(object, v5, v1, &D_L05_001B1330, 1);
+    SpawnObjectRelativeParticle(object, v5, v1, &D_L05_001B1330, 1);
 }

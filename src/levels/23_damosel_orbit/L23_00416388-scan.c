@@ -33,40 +33,40 @@ static inline int SlotAt(int i) {
  * giving up after a full turn. Two point pairs are built from the first and
  * last points of the slot's record, and the slot is marked spent once
  * func_L23_00418BC8 accepts both pairs. */
-void func_L23_00419970(char *obj) {
-    float a[4], b[4], c[4], d[4], e[4], f[4], g[4], h[4], i[4], j[4];
-    char *s;
-    int old = D_L23_001B166C;
+void func_L23_00419970(char *moby) {
+    float startA[4], startB[4], endA[4], endB[4], sideB[4], sideA[4], span[4], startDir[4], endDir[4], scratch[4];
+    char *vars;
+    int startSlot = D_L23_001B166C;
     char *rec;
-    s = *(char **)(obj + 0x68);
+    vars = *(char **)(moby + 0x68);
     while (SlotAt(D_L23_001B166C = (D_L23_001B166C + 1) % D_L23_001B38C0) == -1) {
-        if (old == D_L23_001B166C) return;
+        if (startSlot == D_L23_001B166C) return;
     }
-    rec = (char *)D_L23_001FF300[((ScanSub_00419970 *)s)->record_ids[(&D_L23_001B1658)[D_L23_001B166C]]];
-    qcopy_nc(a, rec + 16);
-    qcopy_nc(c, rec + *(int *)rec * 16);
-    qcopy_nc(b, rec + 16);
-    qcopy_nc(d, rec + *(int *)rec * 16);
-    func_0032A1C8(a, h, 1);
-    func_0032A1C8(c, i, 1);
-    func_002F3D60(h, h, 1.0f);
-    func_002F3D60(i, i, 1.0f);
-    func_002F3AB0(g, c, a);
-    func_002F3BB0(e, g, h);
-    func_002F3D60(e, e, -1.5f);
-    func_002F3D60(f, e, -1.5f);
-    func_002F3AF0(j, h, *(float *)(s + 0x54) + *(float *)(s + 0x50));
-    func_002F3A80(j, j, f);
-    func_002F3A80(a, a, j);
-    func_002F3AF0(j, i, *(float *)(s + 0x54) + *(float *)(s + 0x50));
-    func_002F3A80(j, j, f);
-    func_002F3A80(c, c, j);
-    func_002F3AF0(j, h, *(float *)(s + 0x54) + *(float *)(s + 0x50));
-    func_002F3A80(j, j, e);
-    func_002F3A80(b, b, j);
-    func_002F3AF0(j, i, *(float *)(s + 0x54) + *(float *)(s + 0x50));
-    func_002F3A80(j, j, e);
-    func_002F3A80(d, d, j);
-    if (func_L23_00418BC8(obj, a, c) && func_L23_00418BC8(obj, b, d))
+    rec = (char *)gPathLists[((ScanSub_00419970 *)vars)->record_ids[(&D_L23_001B1658)[D_L23_001B166C]]];
+    qcopy_nc(startA, rec + 16);
+    qcopy_nc(endA, rec + *(int *)rec * 16);
+    qcopy_nc(startB, rec + 16);
+    qcopy_nc(endB, rec + *(int *)rec * 16);
+    func_0032A1C8(startA, startDir, 1);
+    func_0032A1C8(endA, endDir, 1);
+    func_002F3D60(startDir, startDir, 1.0f);
+    func_002F3D60(endDir, endDir, 1.0f);
+    func_002F3AB0(span, endA, startA);
+    func_002F3BB0(sideB, span, startDir);
+    func_002F3D60(sideB, sideB, -1.5f);
+    func_002F3D60(sideA, sideB, -1.5f);
+    func_002F3AF0(scratch, startDir, *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
+    func_002F3A80(scratch, scratch, sideA);
+    func_002F3A80(startA, startA, scratch);
+    func_002F3AF0(scratch, endDir, *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
+    func_002F3A80(scratch, scratch, sideA);
+    func_002F3A80(endA, endA, scratch);
+    func_002F3AF0(scratch, startDir, *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
+    func_002F3A80(scratch, scratch, sideB);
+    func_002F3A80(startB, startB, scratch);
+    func_002F3AF0(scratch, endDir, *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
+    func_002F3A80(scratch, scratch, sideB);
+    func_002F3A80(endB, endB, scratch);
+    if (CheckClearPathBetweenPoints(moby, startA, endA) && CheckClearPathBetweenPoints(moby, startB, endB))
         (&D_L23_001B1658)[D_L23_001B166C] = -1;
 }

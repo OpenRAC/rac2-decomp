@@ -30,22 +30,23 @@ extern void func_002A7750(void *, int, int);
 extern void func_002A93B0(void *);
 extern float func_002AA548(void *, void *, float, float, float, float);
 
+/* Starts the object falling; when not quiet it first lifts the object a little and gives it a downward push. */
 void func_L03_00409C38(L03Moby9C38 *self, s32 quiet) {
     L03Vars9C38 *vars = self->vars;
 
     if (self->state != 2) {
         self->flags = (self->flags & 0xFFBE) | 0x1000;
         self->f98 = self->cls[4];
-        func_002A7750(self, 2, -1);
+        SetMobyState(self, 2, -1);
         qcopy(self->pos, vars);
         vars->drop = 0;
         if (quiet == 0) {
             self->pos[2] = self->pos[2] + 10.0f;
-            func_002AA548(&self->pos[2], &vars->drop, vars->height, 1.0f,
+            StepValueTowardTarget(&self->pos[2], &vars->drop, vars->height, 1.0f,
                           D_L03_001B1654 * 0.00027777778f, D_L03_001B1658 * 0.016666668f);
         }
     }
     self->flags |= 0x400;
-    func_002A93B0(self);
+    UpdateMobyGroundCheck(self);
     vars->state = 4;
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Scrolls the sky layer's texture offset (wrapping it by 8) and draws its two layers
    with the current colours, the planet-specific colour pair and light set for planet
@@ -41,9 +42,9 @@ void func_0030D430(SkyMoby30D430 *moby)
     int colour0;
     int colour1;
 
-    if (D_001A79F0 == 1 && D_001A8BB0 == 2)
+    if (gCurrentMapIndex == 1 && gCurrentGameMode == 2)
         vars = &D_001C1490;
-    if (D_001A79F0 == 20 && D_001A8BB0 == 2)
+    if (gCurrentMapIndex == 20 && gCurrentGameMode == 2)
         vars = &D_001C14E0;
     offset = D_001AEFFC - D_001AF000;
     D_001AEFFC = offset;
@@ -53,11 +54,11 @@ void func_0030D430(SkyMoby30D430 *moby)
     bottom = D_001AEFEC << 24;
     colour0 = top | D_001AF008;
     colour1 = bottom | D_001AF00C;
-    if (D_001A79F0 == 20 && D_001A8BB0 == 2) {
+    if (gCurrentMapIndex == 20 && gCurrentGameMode == 2) {
         colour0 = top | 0xEFCD12;
         colour1 = bottom | 0xEF3212;
     }
-    func_0030D5B8(D_00229710, colour0, colour1, vars->tex, D_001AF018, D_001AF01C, D_001AF04C);
-    func_0030D5B8(D_00229710 + 0x140, colour0, colour1, vars->tex, D_001AF028, D_001AF02C, D_001AF050);
-    func_0030DB88(moby);
+    DrawRibbonWithHalo_0030D5B8(D_00229710, colour0, colour1, vars->tex, D_001AF018, D_001AF01C, D_001AF04C);
+    DrawRibbonWithHalo_0030D5B8(D_00229710 + 0x140, colour0, colour1, vars->tex, D_001AF028, D_001AF02C, D_001AF050);
+    DrawBeamAnchorGlowLevelVariant(moby);
 }

@@ -14,32 +14,33 @@ typedef struct {
     int level;
 } Gauge;
 
-void func_0028FF50(Gauge *g)
+/* Updates the fade counters of a HUD gauge: they grow while the level is full and shrink back otherwise. */
+void func_0028FF50(Gauge *gauge)
 {
-    unsigned char *c = g->counter;
-    int max = *g->limit;
-    int cur = g->current;
+    unsigned char *fades = gauge->counter;
+    int limitValue = *gauge->limit;
+    int currentValue = gauge->current;
 
-    g->clamped = max;
-    if (cur < max)
-        g->clamped = cur;
-    else if (max < 0)
-        g->clamped = 0;
-    if (g->level >= 5) {
-        g->level = 5;
-        if (c[0] < 8) {
-            c[0]++;
-        } else if (c[1] < 8) {
-            c[1]++;
+    gauge->clamped = limitValue;
+    if (currentValue < limitValue)
+        gauge->clamped = currentValue;
+    else if (limitValue < 0)
+        gauge->clamped = 0;
+    if (gauge->level >= 5) {
+        gauge->level = 5;
+        if (fades[0] < 8) {
+            fades[0]++;
+        } else if (fades[1] < 8) {
+            fades[1]++;
         }
     } else {
-        g->state = 1;
-        if (c[1] != 0) {
-            c[1]--;
-        } else if (c[0] != 0) {
-            c[0]--;
+        gauge->state = 1;
+        if (fades[1] != 0) {
+            fades[1]--;
+        } else if (fades[0] != 0) {
+            fades[0]--;
         } else {
-            g->state = -6;
+            gauge->state = -6;
         }
     }
 }

@@ -75,6 +75,7 @@ extern void func_003058C8(void *);
 #define PP(p,o) (*(unsigned char **)((p)+(o)))
 #define PV(p,o) (*(ProjectileVector *)((p)+(o)))
 
+/* Updates the Miniturret Glove projectile: flies it, sticks it to what it hits, then arms and finally pops it. */
 void func_00304210(unsigned char *object) {
     unsigned char *state = PP(object, 0x68);
     unsigned char *attached, *created;
@@ -95,21 +96,21 @@ void func_00304210(unsigned char *object) {
         ref_00304210_00 = (counter + 1) % 100; }
         PI(object, 0x98) = 0;
     case 1:
-        func_002FE8D8(object + 0x10, &normal);
-        func_00282F20(&forward, object + 0xE0, 1.0f);
-        func_00282DD8(&cross, &forward, &normal);
-        halfAngle = func_00282DB0(&forward, &normal) * 0.5f;
-        func_00282D30(&quaternion, &cross, func_00283198(halfAngle));
-        quaternion.v.w = func_00283180(halfAngle);
-        func_00283958(&quaternion, matrix);
-        func_00283738(object + 0xC0, matrix, object + 0xC0);
+        GetObjectFacingDirection(object + 0x10, &normal);
+        vec_scale_to_length(&forward, object + 0xE0, 1.0f);
+        FastVecCross(&cross, &forward, &normal);
+        halfAngle = FastVecDot(&forward, &normal) * 0.5f;
+        FastVecScale(&quaternion, &cross, FastSinOrCosB(halfAngle));
+        quaternion.v.w = FastSinOrCosA(halfAngle);
+        quaternion_to_rotation_basis(&quaternion, matrix);
+        multiply_matrix3x3(object + 0xC0, matrix, object + 0xC0);
         qcopy(&oldPosition, object + 0x10);
-        func_00282CC0(object + 0x10, object + 0x10, state);
-        func_002FEE70((signed char)state[0x4F], state, 0);
-        func_002FE880(ref_00304210_01 * 0.00027777778450399637f, object + 0x10, state);
-        func_00300190(object + 0x10, object + 0x10);
+        FastVecAdd(object + 0x10, object + 0x10, state);
+        SteerEffectDirection((signed char)state[0x4F], state, 0);
+        AddObjectDirectionScaled(ref_00304210_01 * 0.00027777778450399637f, object + 0x10, state);
+        TransformVectorOrCopy(object + 0x10, object + 0x10);
         excluded[0] = 0;
-        excluded[1] = 0xC5A;
+        excluded[1] = 0xC5A /* Miniturret Glove */;
         qcopy(&query.previous, &oldPosition);
         qcopy(&query.position, object + 0x10);
         qcopy(&query.velocity, state);
@@ -124,13 +125,13 @@ void func_00304210(unsigned char *object) {
         query.tolerance = 0.07400000095367432f;
         query.active = 1;
         query.enabled = 1;
-        collision = func_002FE9D0(&query);
+        collision = CollideSweptSphere(&query);
         qcopy(object + 0x10, &query.position);
         qcopy(state, &query.velocity);
         if (collision == 2) {
             unsigned char *hit = query.hitObject;
-            if (!hit || (*(short *)(hit + 0xAA) != 0xCB &&
-                *(short *)(hit + 0xAA) != 0x1366 && *(short *)(hit + 0xAA) != 0x1367)) {
+            if (!hit || (*(short *)(hit + 0xAA) != 0xCB /* Decoy */ &&
+                *(short *)(hit + 0xAA) != 0x1366 /* Miniturret */ && *(short *)(hit + 0xAA) != 0x1367 /* Megaturret */)) {
                 qzero_nc(state);
                 PP(state, 0x70) = hit;
                 if (hit) {
@@ -138,36 +139,36 @@ void func_00304210(unsigned char *object) {
                     PF(state, 0x78) = PF(hit, 0x14);
                     PF(state, 0x7C) = PF(hit, 0x18);
                 }
-                response = func_00300540(query.surface);
+                response = GetWeaponGroup(query.surface);
                 if (response == 2) {
                     PF(state, 8) = -0.02500000223517418f;
                     object[0x20] = 7;
                     if (!query.surface) {
-                        func_002FD1B8(ref_00304210_03, ref_00304210_04[0], 1, PF(object, 0x10), PF(object, 0x14), 0.5f, -0.35f);
-                        created = func_00312D58(2.0f, object + 0x10);
+                        RippleDisturb(ref_00304210_03, ref_00304210_04[0], 1, PF(object, 0x10), PF(object, 0x14), 0.5f, -0.35f);
+                        created = SpawnScaledEffectMoby(2.0f, object + 0x10);
                         if (created)
                             created[0x23] = 0x70;
                     }
                 } else if (response == 1) {
                     object[0x20] = 8;
                 } else {
-                    state[0x4E] = func_00300280(&ref_00304210_06, object);
-                    func_00305418();
+                    state[0x4E] = AddToSlotList(&ref_00304210_06, object);
+                    CleanupProjectileTable();
                     if (ref_00304210_06.row1[(signed char)state[0x4E]]) {
                         object[0x20] = 2;
-                        func_002E5CF8(1, 0, object);
-                        func_002A75E0(object, 1, 0, 0, 0);
+                        PlayMobySound(1, 0, object);
+                        StartAnimationBlendedWithFlags(object, 1, 0, 0, 0);
                     } else {
                         object[0x20] = 6;
                     }
                 }
-                func_002FEE50((signed char)state[0x4F]);
+                ClearEntryFlag((signed char)state[0x4F]);
                 { unsigned char *owner = ref_00304210_05[0];
                 ref_00304210_07[PI(state, 0x6C)] = owner;
                 if (owner) {
-                    func_00282CF0(&relative, object + 0x10, owner + 0x10);
-                    func_00283698(inverse, ref_00304210_07[PI(state, 0x6C)] + 0xC0);
-                    func_002830C0(&relative, &relative, inverse);
+                    FastVecSub(&relative, object + 0x10, owner + 0x10);
+                    matrix_from_basis_rows(inverse, ref_00304210_07[PI(state, 0x6C)] + 0xC0);
+                    transform_vector(&relative, &relative, inverse);
                     { int entry = PI(state, 0x6C) * 12;
                     entry += (int)ref_00304210_08;
                     ((ProjectileOffset *)entry)->x = relative.v.x;
@@ -176,22 +177,22 @@ void func_00304210(unsigned char *object) {
                 } }
                 PI(object, 0x98) = PI(PP(object, 0x24), 0x10);
             } else {
-                func_00282D30(state, state, 1.1f);
+                FastVecScale(state, state, 1.1f);
             }
         }
         break;
     case 2:
-        if (func_0029F530(object) >= 6.0f) {
-            func_002A75E0(object, 2, 0, 0, 0);
+        if (GetMobyAnimationValue(object) >= 6.0f) {
+            StartAnimationBlendedWithFlags(object, 2, 0, 0, 0);
             object[0x20] = 3;
         }
         break;
     case 3:
-        func_00304D38(object);
+        LaunchProjectileAtTarget(object);
         goto checkAttached;
     case 4:
-        func_00304F28(object);
-        func_00305058(object);
+        AimMiniturretAtTarget(object);
+        FireMiniturretShot(object);
 checkAttached:
         attached = PP(state, 0x70);
         if (attached) {
@@ -200,14 +201,14 @@ checkAttached:
                     break;
             }
             PI(object, 0x98) = 0;
-            state[0x4F] = func_002FED90(1.0f, 1.0f, 1.0f, object, 0);
+            state[0x4F] = AllocEffectSlot_002FED90(1.0f, 1.0f, 1.0f, object, 0);
             object[0x20] = 1;
             PP(state, 0x70) = 0;
         }
         break;
     case 5:
-        if (func_0029F530(object) <= 1.0f) {
-            func_002A75E0(object, 0, 0, 0, 0);
+        if (GetMobyAnimationValue(object) <= 1.0f) {
+            StartAnimationBlendedWithFlags(object, 0, 0, 0, 0);
             PF(object, 0x48) = 1.0f;
             object[0x20] = 6;
         }
@@ -215,28 +216,28 @@ checkAttached:
     case 6:
         if (ref_00304210_06.row1[(signed char)state[0x4E]]) {
             object[0x20] = 2;
-            func_002E5CF8(1, 0, object);
-            func_002A75E0(object, 1, 0, 0, 0);
-            PI(state, 0x48) = func_002FEC78(object, 0);
+            PlayMobySound(1, 0, object);
+            StartAnimationBlendedWithFlags(object, 1, 0, 0, 0);
+            PI(state, 0x48) = AllocateSlotForObject(object, 0);
         }
         break;
     case 7:
-        func_00304AD0(object);
-        func_00304B68(object);
+        MoveProjectileAndCheckHit_00304AD0(object);
+        ApplyRandomPushToProjectile(object);
         break;
     case 8:
-        func_002E5CF8(3, 0, object);
-        func_002AC728(0.5f, 13.0f, object, object + 0x10, -1);
+        PlayMobySound(3, 0, object);
+        SpawnExplosionWithSparks(0.5f, 13.0f, object, object + 0x10, -1);
         object[0x20] = 9;
         *(unsigned short *)(object + 0x34) |= 0x41;
         break;
     case 9:
         if (!PI(state, 0x64)) {
             if (PI(state, 0x48) != -1)
-                func_002FED28(PI(state, 0x48));
+                FreeSlot(PI(state, 0x48));
             if ((signed char)state[0x4E] != -1)
-                func_00300300(&ref_00304210_06, (signed char)state[0x4E]);
-            func_0029F338(object);
+                RemoveFromSlotList(&ref_00304210_06, (signed char)state[0x4E]);
+            MarkMobySpawned(object);
             return;
         }
         break;
@@ -249,22 +250,22 @@ checkAttached:
         normal.v.y = ((ProjectileOffset *)entry)->y;
         normal.v.z = ((ProjectileOffset *)entry)->z; }
         normal.v.w = 0;
-        func_00283098(&normal, &normal, ref_00304210_07[PI(state, 0x6C)] + 0xC0);
-        func_00282CC0(object + 0x10, ref_00304210_07[PI(state, 0x6C)] + 0x10, &normal);
+        matrix_mul_vec3(&normal, &normal, ref_00304210_07[PI(state, 0x6C)] + 0xC0);
+        FastVecAdd(object + 0x10, ref_00304210_07[PI(state, 0x6C)] + 0x10, &normal);
     }
     if ((unsigned int)(object[0x20] - 3) < 2)
-        func_00305228(object);
-    func_002829D8(state + 0x5C);
-    if ((func_00282948(state + 0x40) || PI(D_00189E20, 0x2294) == 0x6F) && object[0x20] != 9)
+        AdvanceGrowEffect(object);
+    FastVectorHelperB(state + 0x5C);
+    if ((FastFloatHelperD(state + 0x40) || PI(gHeroState, 0x2294) == 0x6F) && object[0x20] != 9)
         object[0x20] = 8;
-    func_003054E8(object);
+    UpdateOwnedParticleTrails(object);
     if ((unsigned int)(object[0x20] - 3) < 2) {
-        func_00304C18(object);
+        CheckProjectileHitBreak(object);
         if (!ref_00304210_06.row1[(signed char)state[0x4E]]) {
-            func_002A75E0(object, 1, 9, 0, 0);
+            StartAnimationBlendedWithFlags(object, 1, 9, 0, 0);
             object[0x20] = 5;
             PF(object, 0x48) = -1.0f;
-            func_002FED28(PI(state, 0x48));
+            FreeSlot(PI(state, 0x48));
             PI(state, 0x48) = -1;
             *(short *)(state + 0x4C) = 1;
             PI(state, 0x50) = 0;
@@ -275,6 +276,6 @@ checkAttached:
         }
     }
     if (object[0x20] < 8 && PP(state, 0x70))
-        func_00304C78(object);
-    func_0027CFD0(func_003058C8, object);
+        FollowAttachedMobyMotion(object);
+    RegisterOverlayDrawCallback(DrawProjectileEffects, object);
 }

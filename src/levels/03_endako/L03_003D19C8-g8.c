@@ -53,134 +53,135 @@ extern int func_2F01A0(int, int, float);
 #define P(p, o) (*(char **)((p) + (o)))
 #define F(p, o) (*(float *)((p) + (o)))
 
-void func_L03_003D19C8(char *obj)
+/* Per-frame update of moby class 2568: a switch that plays a Clank scene, spawns Clank and tracks which scene stage the hero has seen. */
+void func_L03_003D19C8(char *moby)
 {
-    char *v = P(obj, 0x68);
-    int state = B(obj, 0x20);
+    char *vars = P(moby, 0x68);
+    int state = B(moby, 0x20);
 
     switch (state) {
     case 0: {
-        char *p;
+        char *spawned;
 
-        B(obj, 0x30) = 255;
-        if (!(B(D_0019B2E8, B(obj, 0xB0) + (D_001A79F0 << 4)) & 128)) {
-            if (D_00189E20.mode == 1) {
-                func_31B920(obj, 2, -1);
-                func_32F140(I(v, 0x20), -1);
+        B(moby, 0x30) = 255;
+        if (!(B(D_0019B2E8, B(moby, 0xB0) + (gCurrentMapIndex << 4)) & 128)) {
+            if (gHeroState.mode == 1) {
+                func_31B920(moby, 2, -1);
+                func_32F140(I(vars, 0x20), -1);
             } else {
-                func_31B920(obj, 1, -1);
+                func_31B920(moby, 1, -1);
                 {
-                    char *existing = D_L03_001B2A1C + (I(v, 0) << 8);
+                    char *existing = D_L03_001B2A1C + (I(vars, 0) << 8);
                     I(existing, 0x98) = 0;
                     H(existing, 0x34) = (H(existing, 0x34) | 0x41) & ~0x1000;
                 }
-                p = func_3113F0(0x57);
-                func_32AA20(p, obj);
-                qcopy_nc(p + 0x10, D_L03_001B2B0C[I(v, 4)].position);
-                qcopy_nc(p + 0xF0, D_L03_001B2B0C[I(v, 4)].rotation);
-                H(p, 0x32) = 0x30;
-                H(p, 0x34) |= 2;
-                func_31B568(p, 0x13, 0);
-                I(p, 0x98) = 0;
-                qcopy_nc(p + 0x10, D_L03_001B0650);
-                F(p, 0xF4) = D_L03_001B0664;
-                F(p, 0xF8) = D_L03_001B0668;
-                func_313E40(p);
-                P(v, 0x2C) = p;
+                spawned = func_3113F0(0x57 /* Clank */);
+                func_32AA20(spawned, moby);
+                qcopy_nc(spawned + 0x10, D_L03_001B2B0C[I(vars, 4)].position);
+                qcopy_nc(spawned + 0xF0, D_L03_001B2B0C[I(vars, 4)].rotation);
+                H(spawned, 0x32) = 0x30;
+                H(spawned, 0x34) |= 2;
+                func_31B568(spawned, 0x13, 0);
+                I(spawned, 0x98) = 0;
+                qcopy_nc(spawned + 0x10, D_L03_001B0650);
+                F(spawned, 0xF4) = D_L03_001B0664;
+                F(spawned, 0xF8) = D_L03_001B0668;
+                func_313E40(spawned);
+                P(vars, 0x2C) = spawned;
                 if (D_001395B8.first) {
                     func_368958();
-                    func_324168(I(v, 0x18), I(v, 0x1C));
+                    func_324168(I(vars, 0x18), I(vars, 0x1C));
                 }
             }
-            func_31C988(I(v, 0xC), 1);
-            D_00189E20.flag = 1;
+            func_31C988(I(vars, 0xC), 1);
+            gHeroState.flag = 1;
         } else {
             if (!D_001395B8.seen) {
                 func_368958();
-                func_2BEE78(obj + 0x10, obj + 0xF0, 0, 1);
+                func_2BEE78(moby + 0x10, moby + 0xF0, 0, 1);
             }
-            if (D_00189E20.mode == 1) {
-                func_32F140(I(v, 0x24), -1);
+            if (gHeroState.mode == 1) {
+                func_32F140(I(vars, 0x24), -1);
                 func_2B8510(0);
-                func_311758(D_L03_001B2A1C + (I(v, 0) << 8));
-                func_313378(B(obj, 0xB0));
-                func_2BEE78(obj + 0x10, obj + 0xF0, 0, 1);
+                func_311758(D_L03_001B2A1C + (I(vars, 0) << 8));
+                func_313378(B(moby, 0xB0));
+                func_2BEE78(moby + 0x10, moby + 0xF0, 0, 1);
             }
             /* Resident flag bytes, 8 bytes further on in USA v2.00. A symbol-plus-offset
                .sdata address is neither split nor a one-insn operand, so each store stays
                retail's lui $at/sb macro (see L00_002CAB08.c). */
-            D_001A7AF8[2] = 1;
-            D_001A7AF8[0x3A] = 1;
-            D_001A7AF8[3] = 1;
-            D_001A7AF8[0x3B] = 1;
-            D_001A7AF8[4] = 1;
-            D_001A7AF8[0x3C] = 1;
-            D_00189E20.flag = 0;
-            func_31C988(I(v, 8), 1);
-            func_31C988(I(v, 0xC), 0);
-            func_311758(obj);
+            gItemOwnedFlags[2] = 1;
+            gItemOwnedFlags[0x3A] = 1;
+            gItemOwnedFlags[3] = 1;
+            gItemOwnedFlags[0x3B] = 1;
+            gItemOwnedFlags[4] = 1;
+            gItemOwnedFlags[0x3C] = 1;
+            gHeroState.flag = 0;
+            func_31C988(I(vars, 8), 1);
+            func_31C988(I(vars, 0xC), 0);
+            func_311758(moby);
         }
         return;
     }
     case 1:
         if (!D_001395B8.first
-            && func_321988(D_00189E20.position, I(v, 4))
+            && func_321988(gHeroState.position, I(vars, 4))
             && func_2F5010(D_L03_001BFB80, 0x31)) {
             func_2F5158(D_L03_001BFB80);
-            func_371D60(func_L03_003D1FB0, obj);
+            func_371D60(RestoreLinkedObjectAfterScene, moby);
             D_001395B8.first = state;
         }
         if (D_L03_001A8F00 != 2) {
             {
-                u32 timer = H(P(v, 0x2C), 0x96);
+                u32 timer = H(P(vars, 0x2C), 0x96);
                 u32 old = timer++;
-                H(P(v, 0x2C), 0x96) = timer;
+                H(P(vars, 0x2C), 0x96) = timer;
                 if (old >= 4) {
-                    H(P(v, 0x2C), 0x34) &= ~0x41;
-                    H(P(v, 0x2C), 0x34) |= 0x1000;
-                    I(P(v, 0x2C), 0x98) = I(P(P(v, 0x2C), 0x24), 0x10);
+                    H(P(vars, 0x2C), 0x34) &= ~0x41;
+                    H(P(vars, 0x2C), 0x34) |= 0x1000;
+                    I(P(vars, 0x2C), 0x98) = I(P(P(vars, 0x2C), 0x24), 0x10);
                 }
             }
         } else {
-            H(P(v, 0x2C), 0x34) |= 0x41;
-            H(P(v, 0x2C), 0x34) &= ~0x1000;
-            I(P(v, 0x2C), 0x98) = 0;
+            H(P(vars, 0x2C), 0x34) |= 0x41;
+            H(P(vars, 0x2C), 0x34) &= ~0x1000;
+            I(P(vars, 0x2C), 0x98) = 0;
         }
-        if (func_32AB10(obj)) {
-            H(P(v, 0x2C), 0x34) |= 0x41;
-            H(P(v, 0x2C), 0x34) &= ~0x1000;
-            I(P(v, 0x2C), 0x98) = 0;
+        if (func_32AB10(moby)) {
+            H(P(vars, 0x2C), 0x34) |= 0x41;
+            H(P(vars, 0x2C), 0x34) &= ~0x1000;
+            I(P(vars, 0x2C), 0x98) = 0;
             if (D_001395B8.second)
-                func_L03_003D2018(obj);
+                FinishClankScene(moby);
             else if (func_2F5010(D_L03_001BFB80, 0x32)) {
                 func_2F5158(D_L03_001BFB80);
-                func_371D60(func_L03_003D2018, obj);
+                func_371D60(FinishClankScene, moby);
             }
             func_371D70();
-            func_31B920(obj, 2, -1);
+            func_31B920(moby, 2, -1);
             return;
-        } else if (D_00189E20.mode == 1) {
-            char *p;
+        } else if (gHeroState.mode == 1) {
+            char *spawned;
 
-            func_32F140(I(v, 0x20), -1);
-            p = D_L03_001B2A1C + (I(v, 0) << 8);
-            H(p, 0x34) = (H(p, 0x34) & ~0x41) | 0x1000;
-            I(p, 0x98) = I(P(p, 0x24), 0x10);
-            H(P(v, 0x2C), 0x34) |= 0x41;
-            H(P(v, 0x2C), 0x34) &= ~0x1000;
-            I(P(v, 0x2C), 0x98) = 0;
-            func_31B920(obj, 2, -1);
+            func_32F140(I(vars, 0x20), -1);
+            spawned = D_L03_001B2A1C + (I(vars, 0) << 8);
+            H(spawned, 0x34) = (H(spawned, 0x34) & ~0x41) | 0x1000;
+            I(spawned, 0x98) = I(P(spawned, 0x24), 0x10);
+            H(P(vars, 0x2C), 0x34) |= 0x41;
+            H(P(vars, 0x2C), 0x34) &= ~0x1000;
+            I(P(vars, 0x2C), 0x98) = 0;
+            func_31B920(moby, 2, -1);
             return;
         }
         return;
     case 2:
-        if (D_00189E20.object == obj && D_00189E20.active) {
-            func_31C988(I(v, 8), 1);
-            func_31C988(I(v, 0xC), 0);
+        if (gHeroState.object == moby && gHeroState.active) {
+            func_31C988(I(vars, 8), 1);
+            func_31C988(I(vars, 0xC), 0);
             if (func_2F5010(D_L03_001BFB80, 0x33)) {
                 func_2F5158(D_L03_001BFB80);
-                func_371D60(func_L03_003D20F8, obj);
-                func_31B920(obj, 3, -1);
+                func_371D60(EndRemoteViewCleanup, moby);
+                func_31B920(moby, 3, -1);
             }
             return;
         }
@@ -189,9 +190,9 @@ void func_L03_003D19C8(char *obj)
         return;
     }
     {
-        F(v, 0x30) = func_2F0000(F(v, 0x30), 0.10762865096330643f);
+        F(vars, 0x30) = func_2F0000(F(vars, 0x30), 0.10762865096330643f);
         state = func_2F01A0(0x808C8C8C, 0x80282828,
-            func_2EF5C0(F(v, 0x30)) * 0.5f + 0.5f);
-        I(obj, 0x78) = func_2F01A0(I(obj, 0x78), state, 0.15f);
+            func_2EF5C0(F(vars, 0x30)) * 0.5f + 0.5f);
+        I(moby, 0x78) = func_2F01A0(I(moby, 0x78), state, 0.15f);
     }
 }

@@ -9,17 +9,18 @@ extern f32 D_L03_001B0B80 __attribute__((sda));
 extern f32 D_L03_001B36B0[] __attribute__((sda));
 extern f32 D_L03_001B36C0[] __attribute__((sda));
 
+/* Smoothly turns the puzzle to its new orientation and marks the turn as done when it arrives. */
 void func_L03_003E3678(u8 *object)
 {
     f32 quaternion[4] __attribute__((aligned(16)));
     u8 *vars = *(u8 **)(object + 0x68);
-    func_002AA548(vars + 0x4C, vars + 0x48, 1.0f,
+    StepValueTowardTarget(vars + 0x4C, vars + 0x48, 1.0f,
                  D_L03_001B0B78 * 0.00027777778450399637f,
                  D_L03_001B0B7C * 0.00027777778450399637f,
                  D_L03_001B0B80 * 0.01666666753590107f);
-    func_00283810(quaternion, D_L03_001B36B0, D_L03_001B36C0,
+    FastVectorNormalize3(quaternion, D_L03_001B36B0, D_L03_001B36C0,
                  *(f32 *)(vars + 0x4C));
-    func_00283958(quaternion, object + 0xC0);
+    quaternion_to_rotation_basis(quaternion, object + 0xC0);
     if (1.0f <= *(f32 *)(vars + 0x4C)) {
         *(short *)(vars + 0x56) = 1;
         qcopy(D_L03_001B36B0, D_L03_001B36C0);

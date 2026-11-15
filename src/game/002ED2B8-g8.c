@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned int u32;
 typedef int RecordTi16 __attribute__((mode(TI)));
@@ -10,6 +11,7 @@ extern u32 D_L04_001AC18C __attribute__((sda));
    `base`, not from `cursor`: with `cursor + 16` the loop optimizer sees a biv that is a giv of `cursor` and drops
    its register, where retail keeps both counting by 80. The order of the four initialisations and of the three
    increments is retail's. */
+/* Adds a new particle to the table by copying it into the first free slot. */
 void func_002ED2B8(u32 owner, u32 source)
 {
     u32 base;
@@ -18,7 +20,7 @@ void func_002ED2B8(u32 owner, u32 source)
     u32 source_tail;
     int i;
 
-    base = D_L04_001AC18C;
+    base = gEffectRecordTable;
     if (base == 0) {
         return;
     }

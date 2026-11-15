@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef unsigned char u8;
 typedef short s16;
@@ -14,33 +15,33 @@ extern int func_00283CF0(float);
    the next racer in the ordered list. */
 void func_L04_00410F80(u8 *object) {
     u8 *list[24], **out;
-    u8 *state = *(u8 **)(object + 0x68), *obj, *p, *route;
+    u8 *state = *(u8 **)(object + 0x68), *obj, *otherVars, *route;
     int *slot = (int *)(state + 0x1E4);
-    int i, j, n = 1, a, b, k;
+    int i, j, n = 1, keyA, keyB, slotsLeft;
     float length, distance;
 
     out = list + 1;
     *(u8 **)(state + 0x39C) = object;
     list[0] = object;
-    for (k = 19; k >= 0; k--, slot++) {
+    for (slotsLeft = 19; slotsLeft >= 0; slotsLeft--, slot++) {
         if (*slot != -1) {
-            obj = D_L04_001B24DC + (*slot << 8);
-            p = *(u8 **)(obj + 0x68);
+            obj = gMobyPool_L04 + (*slot << 8);
+            otherVars = *(u8 **)(obj + 0x68);
             *out++ = obj;
             n++;
-            if (*(int *)(p + 0x1A0) == 0) {
-                route = D_L04_001FE340[*(int *)(state + 0x1A8)];
+            if (*(int *)(otherVars + 0x1A0) == 0) {
+                route = gRoutePathTable[*(int *)(state + 0x1A8)];
                 length = (float)*(int *)route * *(float *)(route + 0x1C);
-                distance = length - *(float *)(p + 0x11C) +
-                           length * (float)(D_L04_001A8FE4[0] - *(int *)(p + 0x160));
+                distance = length - *(float *)(otherVars + 0x11C) +
+                           length * (float)(gCurrentLap[0] - *(int *)(otherVars + 0x160));
                 if (distance <= 0.0f) {
-                    distance = func_002A7878(10.0f, 20.0f);
+                    distance = RandomFloatRange(10.0f, 20.0f);
                 }
-                *(int *)(p + 0x1A0) = func_00283CF0(distance * 3.0f);
-                if (*(int *)(p + 0x1A0) < 6) {
-                    *(int *)(p + 0x1A0) = 6;
+                *(int *)(otherVars + 0x1A0) = FloatToInt(distance * 3.0f);
+                if (*(int *)(otherVars + 0x1A0) < 6) {
+                    *(int *)(otherVars + 0x1A0) = 6;
                 }
-                *(int *)(p + 0x1A0) += D_L04_001A8FE8[0];
+                *(int *)(otherVars + 0x1A0) += gRaceTimeTicks[0];
             }
         }
     }
@@ -48,25 +49,25 @@ void func_L04_00410F80(u8 *object) {
         int i;
         for (i = 0; i < n - 1; i++) {
             for (j = 0; j < n - i - 1; j++) {
-                a = 0;
-                b = 0;
+                keyA = 0;
+                keyB = 0;
                 {
                     u8 *obj = list[j];
-                    if (*(s16 *)(obj + 0xAA) == 0xBBC) {
-                        a = D_L04_001A8FE8[0];
-                    } else if (*(s16 *)(obj + 0xAA) == 0xB2D) {
-                        a = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
+                    if (*(s16 *)(obj + 0xAA) == 0xBBC /* moby class 3004 */) {
+                        keyA = gRaceTimeTicks[0];
+                    } else if (*(s16 *)(obj + 0xAA) == 0xB2D /* Enemy Hoverbike */) {
+                        keyA = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
                     }
                 }
                 {
                     u8 *obj = list[j + 1];
-                    if (*(s16 *)(obj + 0xAA) == 0xBBC) {
-                        b = D_L04_001A8FE8[0];
-                    } else if (*(s16 *)(obj + 0xAA) == 0xB2D) {
-                        b = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
+                    if (*(s16 *)(obj + 0xAA) == 0xBBC /* moby class 3004 */) {
+                        keyB = gRaceTimeTicks[0];
+                    } else if (*(s16 *)(obj + 0xAA) == 0xB2D /* Enemy Hoverbike */) {
+                        keyB = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
                     }
                 }
-                if (b < a) {
+                if (keyB < keyA) {
                     u8 *obj = list[j];
                     list[j] = list[j + 1];
                     list[j + 1] = obj;
@@ -76,22 +77,22 @@ void func_L04_00410F80(u8 *object) {
     }
     *(u8 **)(state + 0x39C) = list[0];
     for (i = 0; i < n; i++) {
-        u8 *obj, *p;
+        u8 *obj, *otherVars;
         obj = list[i];
-        if (*(s16 *)(obj + 0xAA) == 0xBBC) {
+        if (*(s16 *)(obj + 0xAA) == 0xBBC /* moby class 3004 */) {
             *(int *)(state + 0x320) = i + 1;
             if (i == n - 1) {
                 *(u8 **)(state + 0x3A0) = 0;
             } else {
                 *(u8 **)(state + 0x3A0) = list[i + 1];
             }
-        } else if (*(s16 *)(obj + 0xAA) == 0xB2D) {
-            p = *(u8 **)(obj + 0x68);
-            p[0xA2] = i + 1;
+        } else if (*(s16 *)(obj + 0xAA) == 0xB2D /* Enemy Hoverbike */) {
+            otherVars = *(u8 **)(obj + 0x68);
+            otherVars[0xA2] = i + 1;
             if (i == n - 1) {
-                *(u8 **)(p + 0x1A4) = 0;
+                *(u8 **)(otherVars + 0x1A4) = 0;
             } else {
-                *(u8 **)(p + 0x1A4) = list[i + 1];
+                *(u8 **)(otherVars + 0x1A4) = list[i + 1];
             }
         }
     }
@@ -128,6 +129,7 @@ extern int func_00282948(int *);
 extern int func_00283D38(int, int, float);
 extern void func_L04_00415E28(void *);
 extern void func_L00_002E6CF0(void (*)(void *), void *);
+/* Moves the trails left behind by the racers: drops them to the ground, ages them, adds new points and fades finished ones away. */
 void func_L04_00416018(void)
 {
     float local[4] __attribute__((aligned(16)));
@@ -139,14 +141,14 @@ void func_L04_00416018(void)
     int i, j, count;
     char *owner;
     for (i = 0; i < 140; i++) {
-        trail = &D_L04_00254E10[i];
+        trail = &gRacerTrailPool[i];
         if (!trail->active)
             continue;
         owner = trail->owner;
         count = trail->count;
-        if (*(short *)(owner + 0xaa) == 0xbbc) {
+        if (*(short *)(owner + 0xaa) == 0xbbc /* moby class 3004 */) {
             /* Through a pointer, as retail keeps the hero base in a register. */
-            unsigned char *hero = D_00189E20;
+            unsigned char *hero = gHeroState;
             floorZ = *(float *)(hero + 0x318) + 0.1f;
         } else {
             floorZ = *(float *)(owner + 0x18) - 0.25f;
@@ -162,9 +164,9 @@ void func_L04_00416018(void)
                 ((float *)((char *)point + 0x80))[2] -= gravity;
             scale = 1.0f;
             scale -= (*age - 5) * 0.01f;
-            func_00282CC0(point, point, velocity);
-            func_00282D30(local, trail->impulse, scale);
-            func_00282CC0(point, point, local);
+            FastVecAdd(point, point, velocity);
+            FastVecScale(local, trail->impulse, scale);
+            FastVecAdd(point, point, local);
             if (point[2] < floorZ) {
                 point[2] = floorZ;
                 trail->landed[j] = 1;
@@ -172,27 +174,27 @@ void func_L04_00416018(void)
             point[3] = trail->ages[0] * widthStep + 0.01f + *age * widthStep;
         }
         if (count < 8 &&
-            ((*(short *)(trail->owner + 0xaa) == 0xbbc && D_L04_001B08F0) ||
-             (*(short *)(trail->owner + 0xaa) == 0xb2d &&
+            ((*(short *)(trail->owner + 0xaa) == 0xbbc /* moby class 3004 */ && D_L04_001B08F0) ||
+             (*(short *)(trail->owner + 0xaa) == 0xb2d /* Enemy Hoverbike */ &&
               *(int *)(*(char **)(trail->owner + 0x68) + 0x244)))) {
             if (trail->ages[count - 1] < 3)
                 continue;
             point = trail->points[count];
-            func_00283098(local, trail->origin, trail->owner + 0xc0);
-            func_00282CC0(point, trail->offset, local);
-            func_00282CC0(point, point, trail->impulse);
+            matrix_mul_vec3(local, trail->origin, trail->owner + 0xc0);
+            FastVecAdd(point, trail->offset, local);
+            FastVecAdd(point, point, trail->impulse);
             qcopy(trail->velocities[count], local);
             point[3] = 0.005f;
             trail->ages[count] = 0;
             trail->count++;
         } else if (trail->landed[count - 1] == 1) {
-            if (func_00282948(&trail->lifetime)) {
+            if (FastFloatHelperD(&trail->lifetime)) {
                 trail->active = 0;
             } else {
-                trail->colour = func_00283D38(0x00858585, 0x80858585,
+                trail->colour = FastTweenColor(0x00858585, 0x80858585,
                     trail->lifetime * 0.033333335f);
             }
         }
     }
-    func_L00_002E6CF0(func_L04_00415E28, D_L04_001B0914);
+    AddDrawCallbackToList1(UpdateActiveEffectEntries, D_L04_001B0914);
 }

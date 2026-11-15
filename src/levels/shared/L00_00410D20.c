@@ -26,85 +26,86 @@ extern char D_00189E20[];
 extern ParticleEffectSlot ref_L00_00410D20_01[];
 extern char *ref_L00_00410D20_02[];
 
-void func_L00_00410D20(char *m) {
-    float a[4], b[4];
+/* Keeps up to 30 tracked targets lit with colour changes and little sparks, and cleans each one up when its target is gone. Also creates extra sparks when a target touches something. */
+void func_L00_00410D20(char *moby) {
+    float sparkDirA[4], sparkDirB[4];
     int i;
 
-    qcopy_nc(m + 0x10, D_00189E20);
+    qcopy_nc(moby + 0x10, gHeroState);
     for (i = 0; i < 30; i++) {
-        char *s;
-        char *other;
-        int dead;
+        char *slot;
+        char *hitMoby;
+        int isDead;
 
         if (!ref_L00_00410D20_01[i].target)
             continue;
-        s = (char *)&ref_L00_00410D20_01[i];
-        *(float *)(s + 0xC) = func_00283B98(*(float *)(s + 0xC), 0.20943954586982727f);
-        dead = 0;
-        if (*(signed char *)(*(char **)(s + 0x18) + 0x20) < 0)
-            dead = 1;
-        if (!*(int *)(*(char **)(s + 0x18) + 0x98))
-            dead = 1;
-        if (func_00282948(s))
-            dead = 1;
-        if (func_002829D8(s + 0x1C)) {
+        slot = (char *)&ref_L00_00410D20_01[i];
+        *(float *)(slot + 0xC) = FastAddRotations(*(float *)(slot + 0xC), 0.20943954586982727f);
+        isDead = 0;
+        if (*(signed char *)(*(char **)(slot + 0x18) + 0x20) < 0)
+            isDead = 1;
+        if (!*(int *)(*(char **)(slot + 0x18) + 0x98))
+            isDead = 1;
+        if (FastFloatHelperD(slot))
+            isDead = 1;
+        if (FastVectorHelperB(slot + 0x1C)) {
             int count, j;
-            char *target = *(char **)(s + 0x18);
+            char *target = *(char **)(slot + 0x18);
 
-            *(float *)(s + 0x1C) = *(float *)(s + 0x14);
-            count = func_00277F48(target + 0x10, 0, target, 0, 8.0f);
+            *(float *)(slot + 0x1C) = *(float *)(slot + 0x14);
+            count = ProcessCollisionHit(target + 0x10, 0, target, 0, 8.0f);
             for (j = 0; j < count; j++) {
-                other = ref_L00_00410D20_02[j];
-                if ((*(unsigned short *)(other + 0x34) & 0x1000) && other &&
-                    *(unsigned char *)(other + 0x20) != 254 && *(unsigned char *)(other + 0x20) != 253 &&
-                    *(short *)(*(char **)(other + 0x24) + 0x46) == 5)
+                hitMoby = ref_L00_00410D20_02[j];
+                if ((*(unsigned short *)(hitMoby + 0x34) & 0x1000) && hitMoby &&
+                    *(unsigned char *)(hitMoby + 0x20) != 254 && *(unsigned char *)(hitMoby + 0x20) != 253 &&
+                    *(short *)(*(char **)(hitMoby + 0x24) + 0x46) == 5)
                     goto collide;
             }
         }
     random_particles:
-        if (func_001163B0() % 11 == 0) {
+        if (Rand() % 11 == 0) {
             int j, count;
 
             {
-                float scale = func_002A7878(0.3f, 0.65f) * 0.0009764999849721789f;
-                float x = *(float *)(*(char **)(s + 0x18) + 0xC) * scale;
-                float y = func_002A7940();
-                float z = func_002A7940();
+                float scale = RandomFloatRange(0.3f, 0.65f) * 0.0009764999849721789f;
+                float x = *(float *)(*(char **)(slot + 0x18) + 0xC) * scale;
+                float y = RandomAngle();
+                float z = RandomAngle();
 
-                func_002AF000(a, x, y, z);
+                BuildSphericalOffset(sparkDirA, x, y, z);
             }
             {
-                float scale = func_002A7878(0.3f, 0.65f) * 0.0009764999849721789f;
-                float x = *(float *)(*(char **)(s + 0x18) + 0xC) * scale;
-                float y = func_002A7940();
-                float z = func_002A7940();
+                float scale = RandomFloatRange(0.3f, 0.65f) * 0.0009764999849721789f;
+                float x = *(float *)(*(char **)(slot + 0x18) + 0xC) * scale;
+                float y = RandomAngle();
+                float z = RandomAngle();
 
-                func_002AF000(b, x, y, z);
+                BuildSphericalOffset(sparkDirB, x, y, z);
             }
-            j = func_002A7820(5, 15);
-            count = func_002A7820(15, 30);
-            func_L00_004118A8(m, *(char **)(s + 0x18), *(char **)(s + 0x18), a, b, 0, j, count, s, 0.0f);
+            j = RandomIntRange(5, 15);
+            count = RandomIntRange(15, 30);
+            SpawnTumblingPiece(moby, *(char **)(slot + 0x18), *(char **)(slot + 0x18), sparkDirA, sparkDirB, 0, j, count, slot, 0.0f);
         }
-        if (dead) {
-            func_L00_004110D8(s);
-            *(char **)(s + 0x18) = 0;
+        if (isDead) {
+            ApplySlotColorToTarget(slot);
+            *(char **)(slot + 0x18) = 0;
             continue;
         }
         goto timer;
     collide:
-        func_00282C88(a);
-        func_L00_004118A8(m, *(char **)(s + 0x18), other, a, a, 1, 10, 30, s, *(float *)(s + 0x10));
-        func_L00_004118A8(m, *(char **)(s + 0x18), other, a, a, 0, 10, 30, s, 0.0f);
+        ClearVector128(sparkDirA);
+        SpawnTumblingPiece(moby, *(char **)(slot + 0x18), hitMoby, sparkDirA, sparkDirA, 1, 10, 30, slot, *(float *)(slot + 0x10));
+        SpawnTumblingPiece(moby, *(char **)(slot + 0x18), hitMoby, sparkDirA, sparkDirA, 0, 10, 30, slot, 0.0f);
         goto random_particles;
     timer:
-        if (*(int *)(s + 0x24) == 0) {
-            int c = func_00283D38(*(int *)(s + 4), *(int *)(s + 8),
-                                  (func_00283180(*(float *)(s + 0xC)) + 1.0f) * 0.5f);
+        if (*(int *)(slot + 0x24) == 0) {
+            int color = FastTweenColor(*(int *)(slot + 4), *(int *)(slot + 8),
+                                  (FastSinOrCosA(*(float *)(slot + 0xC)) + 1.0f) * 0.5f);
 
-            func_002A0488(*(char **)(s + 0x18), c & 255, (c >> 8) & 255, (c >> 16) & 255);
+            set_moby_color(*(char **)(slot + 0x18), color & 255, (color >> 8) & 255, (color >> 16) & 255);
         } else
-            --*(int *)(s + 0x24);
+            --*(int *)(slot + 0x24);
     }
-    func_L00_00411B30(m);
-    ref_L00_00410D20_00(func_L00_004117B8, m);
+    UpdateTumblingPieces(moby);
+    ref_L00_00410D20_00(UpdateTrackedTargetOffsets, moby);
 }

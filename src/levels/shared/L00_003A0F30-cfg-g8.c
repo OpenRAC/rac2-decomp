@@ -9,6 +9,7 @@ extern int func_L00_00329E90(char *, int, void *);
 extern char *func_L00_0032A088(int, int);
 extern int func_L00_00329FF0(int);
 
+/* Sets up a new Lancer-class (or similar) object: clears its state, picks its sound table and sets the turn rates. */
 void func_L00_003A7AF0(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -29,16 +30,16 @@ void func_L00_003A7AF0(char *object)
     *(int *)(state + 44) = 0;
     *(int *)(state + 48) = 0;
     *(int *)(state + 60) = -1;
-    if (*(short *)(object + 0xAA) == 1490)
+    if (*(short *)(object + 0xAA) == 1490 /* Lancer */)
         *(int *)(state + 52) = D_L00_001AF6C4;
     else
         *(int *)(state + 52) = D_L00_001AF6CC;
     *(unsigned int *)(object + 0x78) = 0xFF0020FF;
-    index = func_L00_00329E90(object, 0, local);
+    index = AcquireEntitySlot(object, 0, local);
     *(short *)(state + 18) = index;
     if (local[0] == 0) {
-        table = (int *)func_L00_0032A088(*(short *)(object + 0xAA), (short)index);
-        value = func_L00_00329FF0((int)(table + 16));
+        table = (int *)GetSlotBody(*(short *)(object + 0xAA), (short)index);
+        value = RoundUpToMultipleOf16_L00((int)(table + 16));
         for (i = 0; i < 16; i++) {
             table[i] = value;
             value += 640;
@@ -47,7 +48,7 @@ void func_L00_003A7AF0(char *object)
     kind = *(short *)(object + 0xAA);
     D_L00_001B2868 = 0.104719766f;
     range = 30.0f;
-    if (kind == 1490) {
+    if (kind == 1490 /* Lancer */) {
         range = 20.0f;
         D_L00_001B286C = range;
     } else {

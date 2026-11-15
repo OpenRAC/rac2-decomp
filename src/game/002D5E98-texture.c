@@ -110,19 +110,19 @@ extern u64 func_00294D80(int, int, void *, void *, int, int);
 static inline int startRead(MenuStream *stream, int index, int buffer)
 {
     if (stream->flags & 0x20) {
-        int offset = func_002DE6F0(buffer) - stream->entries[index].count * 2048;
+        int offset = GetStreamChunkSize(buffer) - stream->entries[index].count * 2048;
 
         stream->offset = offset;
         buffer += offset;
     }
     if (stream->flags & 0x10000)
-        return func_002B7B18(buffer, stream->entries[index].sector + D_0014D11C,
+        return StartDiscRead(buffer, stream->entries[index].sector + D_0014D11C,
                              stream->entries[index].count);
     /* Flag 0x10 reads from the same base as the default. */
     if (stream->flags & 0x10)
-        return func_002B7B18(buffer, stream->entries[index].sector + D_0014B8AC,
+        return StartDiscRead(buffer, stream->entries[index].sector + D_0014B8AC,
                              stream->entries[index].count);
-    return func_002B7B18(buffer, stream->entries[index].sector + D_0014B8AC,
+    return StartDiscRead(buffer, stream->entries[index].sector + D_0014B8AC,
                          stream->entries[index].count);
 }
 
@@ -137,24 +137,24 @@ int func_002D9DA0(MenuStream *stream)
         if (index == -1)
             return 0;
     } else if (flags & 2) {
-        index = D_001C4FA0.page;
+        index = gMapOverlayState.page;
     } else if (flags & 4) {
-        index = D_001F2840.current->focus->data.grid.cell;
+        index = gPauseMenuState.current->focus->data.grid.cell;
     } else if (flags & 0x100) {
-        index = D_001F2840.current->focus->data.save.slot;
+        index = gPauseMenuState.current->focus->data.save.slot;
         if (index < 0)
             index = 0;
         if (index > 4)
             index = 4;
-        if (D_001393E0.state < 3 && D_001393E0.pendingState < 0 && D_001F2840.age > 10) {
+        if (gMemcardState.state < 3 && gMemcardState.pendingState < 0 && gPauseMenuState.age > 10) {
             if (stream->state == -1)
                 stream->state = 0;
-            index = D_001393E0.slots[index].resource;
+            index = gMemcardState.slots[index].resource;
         } else {
             stream->state = -1;
         }
     } else {
-        index = D_001F2840.current->focus->data.list.selected;
+        index = gPauseMenuState.current->focus->data.list.selected;
         if (index < 0)
             index = 0;
     }
@@ -167,7 +167,7 @@ int func_002D9DA0(MenuStream *stream)
         if (stream->entries[index].count == 0)
             break;
         if (startRead(stream, index, stream->buffer[0])) {
-            func_002DE750(stream->buffer[0]);
+            SetStreamChunkLatchFlag(stream->buffer[0]);
             stream->loaded[0] = index;
             stream->state++;
         } else {
@@ -184,18 +184,18 @@ int func_002D9DA0(MenuStream *stream)
             int logWidth;
             int logHeight;
 
-            func_002DE7A0(stream->buffer[0]);
+            ClearStreamChunkLatchFlag(stream->buffer[0]);
             if (stream->flags & 0x20) {
-                func_0029D4D0((u8 *)stream->buffer[0] + stream->offset, (u8 *)stream->buffer[0]);
+                fast_decompress((u8 *)stream->buffer[0] + stream->offset, (u8 *)stream->buffer[0]);
                 stream->offset = 0;
             }
             image = (StreamImage *)stream->buffer[0];
             clut = image->clut;
             pixels = image->pixels;
-            logWidth = func_00282A18(image->width);
-            logHeight = func_00282A18(image->height);
-            D_001C4FA0.tex0 = func_00294D80(logWidth, logHeight, clut, pixels,
-                                            D_001C4FA0.clutVram, D_001C4FA0.imageVram);
+            logWidth = log2dim(image->width);
+            logHeight = log2dim(image->height);
+            gMapOverlayState.tex0 = register_8bit_texture(logWidth, logHeight, clut, pixels,
+                                            gMapOverlayState.clutVram, gMapOverlayState.imageVram);
             func_0029D0E0();
             stream->frames = 0;
             stream->state = 2;

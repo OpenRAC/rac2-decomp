@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int Copy128 __attribute__((mode(TI)));
 typedef union { Copy128 q; float f[4]; } Vector16;
 
@@ -13,22 +14,23 @@ extern void func_002AC728(char *, void *, int,float, float);
 extern void func_002B0A68(char *, int, float *,unsigned char,float, float,float, float);
 extern void func_0029F338(void *);
 
+/* Blows the object up: plays a sound, throws pieces away from the hero and removes the object. */
 void func_L09_004050E0(char *object)
 {
     Vector16 position, offset, impulse;
     char *origin = object + 0x10;
     float zero;
-    func_002A6C58(object, 0, 3);
+    SetDeathBits(object, 0, 3);
     zero = 0.0f;
-    func_002E5CF8(1, 0, object);
+    PlayMobySound(1, 0, object);
     offset.q = 0;
     offset.f[2] = 0.75f;
-    func_00283098(&position, &offset, object + 0xC0);
-    func_00282CC0(&position, &position, origin);
-    func_002AC728(object, &position, -1, 0.333f, zero);
-    func_00282CF0(&impulse, origin, D_00189EA0);
+    matrix_mul_vec3(&position, &offset, object + 0xC0);
+    FastVecAdd(&position, &position, origin);
+    SpawnExplosionWithSparks(object, &position, -1, 0.333f, zero);
+    FastVecSub(&impulse, origin, gHeroPosition);
     impulse.f[2] = zero;
-    func_00282F20(&impulse, &impulse, 0.10000001f);
-    func_002B0A68(object, 0x1F, impulse.f, 255, 3.0f, 6.0f, 3.0f, 6.0f);
-    func_0029F338(object);
+    vec_scale_to_length(&impulse, &impulse, 0.10000001f);
+    SpawnDebrisForMaskedParts(object, 0x1F, impulse.f, 255, 3.0f, 6.0f, 3.0f, 6.0f);
+    MarkMobySpawned(object);
 }

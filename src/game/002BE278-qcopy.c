@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* func_002BE278 in its own unit for the grouped lq/sq profile. */
 
@@ -32,33 +33,33 @@ extern unsigned char *D_001F25A4;
    shrinking when flag is set; a negative size picks a random one. */
 void func_002BE278(TI128 *position, TI128 *velocity, int flag, float size)
 {
-    Particle_002BE278 *p = func_002B9030(0x19);
-    typeof(p->motion) *m = &p->motion;
+    Particle_002BE278 *particle = AllocParticle(0x19);
+    typeof(particle->motion) *motion = &particle->motion;
 
-    if (p != 0) {
-        p->position = *position;
+    if (particle != 0) {
+        particle->position = *position;
         if (flag == 0) {
-            p->colour = func_002AAE98(1.0f, 1.0f, 1.0f, 0.6f);
-            m->scale[0] = 1.0f;
-            m->scale[1] = 1.0f;
-            m->scale[2] = 1.0f;
+            particle->colour = PackColorFloatsToWord(1.0f, 1.0f, 1.0f, 0.6f);
+            motion->scale[0] = 1.0f;
+            motion->scale[1] = 1.0f;
+            motion->scale[2] = 1.0f;
         } else {
-            p->colour = func_002AAE98(1.0f, 1.0f, 1.0f, 0.6f);
-            m->scale[0] = -1.0f;
-            m->scale[1] = -1.0f;
-            m->scale[2] = -1.0f;
+            particle->colour = PackColorFloatsToWord(1.0f, 1.0f, 1.0f, 0.6f);
+            motion->scale[0] = -1.0f;
+            motion->scale[1] = -1.0f;
+            motion->scale[2] = -1.0f;
         }
-        p->unk09 = func_00283CF0(4.0f) + 0x40;
-        p->unk03 = 0x48;
-        p->unk01 = 0;
+        particle->unk09 = FloatToInt(4.0f) + 0x40;
+        particle->unk03 = 0x48;
+        particle->unk01 = 0;
         if (size < 0.0f)
-            p->size = func_002A7878(5000.0f, 30000.0f);
+            particle->size = RandomFloatRange(5000.0f, 30000.0f);
         else
-            p->size = size;
-        p->unk08 = 0;
-        p->unk02 = *D_001F25A4;
-        m->alpha = 0.6f;
-        p->life = 0x50;
-        m->velocity = *velocity;
+            particle->size = size;
+        particle->unk08 = 0;
+        particle->unk02 = *D_001F25A4;
+        motion->alpha = 0.6f;
+        particle->life = 0x50;
+        motion->velocity = *velocity;
     }
 }

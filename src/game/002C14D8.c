@@ -27,6 +27,7 @@ extern int func_00283CF0(float);
 extern void func_00282CC0(void *, void *, void *);
 
 /* Age a smoke particle: fade its colour towards grey and its alpha in and out. */
+/* Updates a smoke puff: it ages, changes colour a little, fades in and out, and rises. */
 void func_002C14D8(SmokeParticle *p)
 {
     SmokeMotion *m = &p->motion;
@@ -34,21 +35,21 @@ void func_002C14D8(SmokeParticle *p)
     int r, g, b, a;
     u32 color;
     if (m->life < ++p->age) {
-        func_002B9180(p);
+        KillParticle(p);
         return;
     }
-    t = func_00283CE0(p->age) / func_00283CE0(m->life);
+    t = IntToFloat(p->age) / IntToFloat(m->life);
     t = 1.0f - t;
-    r = func_00283CF0(func_00283CE0(m->red) + t * -0.001f) & 0xFF;
-    g = func_00283CF0(func_00283CE0(m->green) + t * -0.0011f) & 0xFF;
-    b = func_00283CF0(func_00283CE0(m->blue) + t * -0.00111f) & 0xFF;
+    r = FloatToInt(IntToFloat(m->red) + t * -0.001f) & 0xFF;
+    g = FloatToInt(IntToFloat(m->green) + t * -0.0011f) & 0xFF;
+    b = FloatToInt(IntToFloat(m->blue) + t * -0.00111f) & 0xFF;
     if (p->age < 30) {
-        t = func_00283CE0(p->age) / func_00283CE0(30);
-        a = func_00283CF0(func_00283CE0(m->alpha) * t) & 0xFF;
+        t = IntToFloat(p->age) / IntToFloat(30);
+        a = FloatToInt(IntToFloat(m->alpha) * t) & 0xFF;
     } else {
-        t = func_00283CE0(p->age - 30) / func_00283CE0(m->life - 30);
+        t = IntToFloat(p->age - 30) / IntToFloat(m->life - 30);
         t = 1.0f - t;
-        a = func_00283CF0(func_00283CE0(m->alpha) * t) & 0xFF;
+        a = FloatToInt(IntToFloat(m->alpha) * t) & 0xFF;
     }
     color = a << 24;
     color |= b << 16;
@@ -56,6 +57,6 @@ void func_002C14D8(SmokeParticle *p)
     color |= r;
     p->color = color;
     p->frame++;
-    func_00282CC0(p->position, p->position, m);
+    FastVecAdd(p->position, p->position, m);
     m->velocity[2] += 0.0005f;
 }

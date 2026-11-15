@@ -3,6 +3,7 @@
 
 extern int D_L05_001B0F50 __attribute__((sda));
 
+/* Resets the object's counters and a global flag to zero. */
 void func_L05_00417730(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -22,17 +23,18 @@ extern int func_L00_002FCF18(void *p, float, float, float, float, float);
 
 extern int D_L05_001B0FA4 __attribute__((sda));
 
+/* Starts a light effect a few units in front of the object. */
 void func_L05_00418200(char *object)
 {
     float local[4];
     float one = 1.0f;
 
-    func_00282C88(local);
+    ClearVector128(local);
     local[0] = 4.0f;
     local[2] = one;
-    func_00283098(local, local, object + 0xC0);
-    func_00282CC0(local, local, object + 0x10);
-    D_L05_001B0FA4 = func_L00_002FCF18(local, 0.0f, 0.0f, 0.0f, one, 0.0f);
+    matrix_mul_vec3(local, local, object + 0xC0);
+    FastVecAdd(local, local, object + 0x10);
+    D_L05_001B0FA4 = AllocateEffectSlot_L00_2(local, 0.0f, 0.0f, 0.0f, one, 0.0f);
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -75,16 +77,17 @@ extern void func_0029F338(void *);
 
 extern void func_L05_00426348(char *);
 
+/* Flies the pickup toward the player and gives a reward when it arrives. */
 void func_L05_004260B8(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float scale;
 
     if (D_L05_001B14FC != 0) {
-        scale = func_00282E48((void *)(D_L05_001B14FC + 0x10), object + 0x10);
+        scale = fast_vec_dist((void *)(D_L05_001B14FC + 0x10), object + 0x10);
 
-        if (D_001A79F0 == 0x14) {
-            func_002AA458(object + 0x10, (void *)(D_L05_001B14FC + 0x10), state + 0x40,
+        if (gCurrentMapIndex == 0x14) {
+            SpringVectorToTarget(object + 0x10, (void *)(D_L05_001B14FC + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -99,20 +102,20 @@ void func_L05_004260B8(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            func_002AA458(object + 0x10, (void *)(D_L05_001B14FC + 0x10), state + 0x40,
+            SpringVectorToTarget(object + 0x10, (void *)(D_L05_001B14FC + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
 check_scale:
         if (scale < 0.5f) {
-            func_L05_0037AB88(2, 10);
+            AddSlotValueClamped(2, 10);
             func_0029CC50(0x1288, 10, -1);
-            func_002E5DA0(0xC, 0, object, 0xFBF);
-            func_0029F338(object);
+            PlaySoundFromClassBank(0xC, 0, object, 0xFBF);
+            MarkMobySpawned(object);
             return;
         }
     }
-    *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), 0.04f);
-    func_L05_00426348(object);
+    *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), 0.04f);
+    DrawGlowRingSprites_L05_3(object);
 }
 
 extern int D_L05_001B1500 __attribute__((sda));
@@ -123,16 +126,17 @@ extern int D_L05_001B1348 __attribute__((sda));
 
 extern void func_L05_0041D800(char *);
 
+/* Flies the pickup toward the player and gives a reward when it arrives. */
 void func_L05_0041D570(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float scale;
 
     if (D_L05_001B1348 != 0) {
-        scale = func_00282E48((void *)(D_L05_001B1348 + 0x10), object + 0x10);
+        scale = fast_vec_dist((void *)(D_L05_001B1348 + 0x10), object + 0x10);
 
-        if (D_001A79F0 == 0x14) {
-            func_002AA458(object + 0x10, (void *)(D_L05_001B1348 + 0x10), state + 0x40,
+        if (gCurrentMapIndex == 0x14) {
+            SpringVectorToTarget(object + 0x10, (void *)(D_L05_001B1348 + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -147,33 +151,34 @@ void func_L05_0041D570(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            func_002AA458(object + 0x10, (void *)(D_L05_001B1348 + 0x10), state + 0x40,
+            SpringVectorToTarget(object + 0x10, (void *)(D_L05_001B1348 + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
     check_scale:
         if (scale < 0.5f) {
-            func_002E5DA0(0xC, 0, object, 0xFBF);
-            func_L05_0037AB88(1, 10);
+            PlaySoundFromClassBank(0xC, 0, object, 0xFBF);
+            AddSlotValueClamped(1, 10);
             func_0029CC50(0x1286, 10, -1);
-            func_0029F338(object);
+            MarkMobySpawned(object);
             return;
         }
     }
-    *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), 0.04f);
-    func_L05_0041D800(object);
+    *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), 0.04f);
+    DrawGlowRingSprites_L05_2(object);
 }
 
 /* Same shape as func_L05_004260B8, on its own data slot and with its own tail. */
+/* Flies the pickup toward the player and gives a reward when it arrives. */
 void func_L05_00426658(char *object)
 {
     char *state = *(char **)(object + 0x68);
     float scale;
 
     if (D_L05_001B1500 != 0) {
-        scale = func_00282E48((void *)(D_L05_001B1500 + 0x10), object + 0x10);
+        scale = fast_vec_dist((void *)(D_L05_001B1500 + 0x10), object + 0x10);
 
-        if (D_001A79F0 == 0x14) {
-            func_002AA458(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
+        if (gCurrentMapIndex == 0x14) {
+            SpringVectorToTarget(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
             goto check_scale;
         }
@@ -188,26 +193,27 @@ void func_L05_00426658(char *object)
                 if (v < cap)
                     *(float *)(object + 0x2C) = cap;
             }
-            func_002AA458(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
+            SpringVectorToTarget(object + 0x10, (void *)(D_L05_001B1500 + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);
         }
 check_scale:
         if (scale < 0.5f) {
-            func_L05_0037AB88(3, 10);
+            AddSlotValueClamped(3, 10);
             func_0029CC50(0x1287, 10, -1);
-            func_002E5DA0(0xC, 0, object, 0xFBF);
-            func_0029F338(object);
+            PlaySoundFromClassBank(0xC, 0, object, 0xFBF);
+            MarkMobySpawned(object);
             return;
         }
     }
-    *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), 0.04f);
-    func_L05_004268E8(object);
+    *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), 0.04f);
+    DrawGlowRingSprites_L05_4(object);
 }
 
 extern void func_L05_00426E70(void *);
 
 /* Turns the object towards the global target and clamps its aim cone; a target within
    half a unit takes the fast path, the rest the slow one (an angle step and an update). */
+/* Flies the pickup toward the player and gives a reward when it arrives. */
 void func_L05_00426BE0(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -219,9 +225,9 @@ void func_L05_00426BE0(char *object)
         float scaled;
         float capped;
 
-        distance = func_00282E48((char *)D_L05_001B1504 + 0x10, pos);
-        if (D_001A79F0 == 0x14) {
-            func_002AA458(pos, (char *)D_L05_001B1504 + 0x10, state + 0x40,
+        distance = fast_vec_dist((char *)D_L05_001B1504 + 0x10, pos);
+        if (gCurrentMapIndex == 0x14) {
+            SpringVectorToTarget(pos, (char *)D_L05_001B1504 + 0x10, state + 0x40,
                           0.008888889f, 0.0033333333f, 1.0666667f);
         } else {
             if (distance < 60.0f) {
@@ -231,20 +237,20 @@ void func_L05_00426BE0(char *object)
                 capped = *(float *)(aim + 0x24) * 0.3f;
                 if (capped > scaled)
                     *(float *)(object + 0x2C) = capped;
-                func_002AA458(pos, (char *)D_L05_001B1504 + 0x10, state + 0x40,
+                SpringVectorToTarget(pos, (char *)D_L05_001B1504 + 0x10, state + 0x40,
                               0.0055555556f, 0.0016666667f, 0.5f);
             }
         }
         if (distance < 0.5f) {
-            func_L05_0037AB88(4, 1);
+            AddSlotValueClamped(4, 1);
             func_0029CC50(0x1285, 1, -1);
-            func_002E5DA0(0xC, 0, object, 0xFBF);
-            func_0029F338(object);
+            PlaySoundFromClassBank(0xC, 0, object, 0xFBF);
+            MarkMobySpawned(object);
             return;
         }
     }
-    *(float *)(object + 0xF8) = func_00283B98(*(float *)(object + 0xF8), 0.04f);
-    func_L05_00426E70(object);
+    *(float *)(object + 0xF8) = FastAddRotations(*(float *)(object + 0xF8), 0.04f);
+    DrawGlowRingSprites_L05_5(object);
 }
 
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vector;
@@ -281,23 +287,23 @@ void func_L05_00419888(u8 *actor)
     int count, i;
 
     qcopy(&previous, actor + 0x10);
-    func_L05_0041A218(actor);
-    func_00282CC0(actor + 0x10, actor + 0x10, state + 0x10);
-    if (func_00282948(state) != 0) {
-        func_0029F338(actor);
+    EmptyStub_L05(actor);
+    FastVecAdd(actor + 0x10, actor + 0x10, state + 0x10);
+    if (FastFloatHelperD(state) != 0) {
+        MarkMobySpawned(actor);
         return;
     }
     if (*(float *)(actor + 0x10) < 2.0f || *(float *)(actor + 0x10) > 1021.0f ||
         *(float *)(actor + 0x14) < 2.0f || *(float *)(actor + 0x14) > 1021.0f ||
         *(float *)(actor + 0x18) < 2.0f || *(float *)(actor + 0x18) > 1021.0f) {
         if (*(int *)(state + 0x38) == 0) {
-            func_0029F338(actor);
+            MarkMobySpawned(actor);
             return;
         }
     }
     if (*(int *)(state + 0x38) != 0) {
-        if (func_00282E80(actor + 0x10, D_L05_001B9580 + 0x140) < 2.0f) {
-            func_0029F338(actor);
+        if (vec_distance_xy(actor + 0x10, D_L05_001B9580 + 0x140) < 2.0f) {
+            MarkMobySpawned(actor);
             return;
         }
     }
@@ -311,57 +317,57 @@ void func_L05_00419888(u8 *actor)
         impact.damage = 1.0f;
     impact.enabled = 1;
     qcopy(impact.direction, state + 0x10);
-    func_00282F20(impact.direction, impact.direction, 1.0f);
+    vec_scale_to_length(impact.direction, impact.direction, 1.0f);
     impact.kind = 1;
     impact.mode = 1;
     impact.direction[3] = 5627.9248046875f;
     impact.object_class = *(u16 *)(actor + 0xAA);
     /* The last Impact word is read by the receiver but not initialized by retail. */
     *(float *)(state + 0x3C) += *(float *)(state + 0x40);
-    if (func_002761F8(&previous, actor + 0x10, 0, *(void **)(state + 4), &impact) != 0 &&
-        func_00278E78() != 6) {
-        func_002E5DA0(7, 0, (char *)actor, 0xFBF);
-        func_L05_00419F10(D_L05_001BFB20, 20, *(u32 *)(state + 0x24), actor);
-        func_0029F338(actor);
+    if (CollLine(&previous, actor + 0x10, 0, *(void **)(state + 4), &impact) != 0 &&
+        GetCollHitMaterial() != 6) {
+        PlaySoundFromClassBank(7, 0, (char *)actor, 0xFBF);
+        SpawnSpritePairBurst(D_L05_001BFB20, 20, *(u32 *)(state + 0x24), actor);
+        MarkMobySpawned(actor);
         return;
     }
     if (*(s16 *)(*(u8 **)(state + 4) + 0xAA) != 0xFBF) {
-        func_L00_0031BDC0(&point, &previous, actor + 0x10, D_L05_001B9580 + 0x140);
-        if (func_00282E48(&point, D_L05_001B9580 + 0x140) < D_L05_001B104C) {
-            func_002E5DA0(7, 0, (char *)actor, 0xFBF);
+        ProjectPointOnSegment(&point, &previous, actor + 0x10, D_L05_001B9580 + 0x140);
+        if (fast_vec_dist(&point, D_L05_001B9580 + 0x140) < D_L05_001B104C) {
+            PlaySoundFromClassBank(7, 0, (char *)actor, 0xFBF);
             {
                 char *camera = D_L05_001B9580;
                 *(int *)(camera + 0x16C) = 0;
                 *(int *)(camera + 0x168) = 30;
                 *(float *)(camera + 0x160) = 0.05f;
             }
-            func_L05_00419F10(&point, 20, *(u32 *)(state + 0x24), actor);
-            func_0029F338(actor);
+            SpawnSpritePairBurst(&point, 20, *(u32 *)(state + 0x24), actor);
+            MarkMobySpawned(actor);
             return;
         }
         goto finish;
 destroy:
-        func_0029F338(actor);
+        MarkMobySpawned(actor);
         return;
     }
-    func_00282D08(&point, &previous, actor + 0x10, 0.5f);
-    func_00282CF0(&delta, actor + 0x10, &previous);
-    count = func_00277F48(&point, 1, *(void **)(state + 4), 0, func_00282DF0(&delta));
+    lerp_vector(&point, &previous, actor + 0x10, 0.5f);
+    FastVecSub(&delta, actor + 0x10, &previous);
+    count = ProcessCollisionHit(&point, 1, *(void **)(state + 4), 0, FastVecLength(&delta));
     if (count != 0) {
         for (i = 0; i < count; i++) {
-            func_L00_0031BDC0(&closest, &previous, actor + 0x10, D_L05_001C3B80[i] + 0x10);
-            func_00282CF0(&delta, D_L05_001C3B80[i] + 0x10, &closest);
-            if (func_00282DF0(&delta) < *(float *)(state + 0x3C)) {
-                func_002E5DA0(7, 0, (char *)actor, 0xFBF);
-                func_L05_00419F10(&closest, 20, *(u32 *)(state + 0x24), actor);
-                func_002A8E20(D_L05_001C3B80[i], &impact);
+            ProjectPointOnSegment(&closest, &previous, actor + 0x10, D_L05_001C3B80[i] + 0x10);
+            FastVecSub(&delta, D_L05_001C3B80[i] + 0x10, &closest);
+            if (FastVecLength(&delta) < *(float *)(state + 0x3C)) {
+                PlaySoundFromClassBank(7, 0, (char *)actor, 0xFBF);
+                SpawnSpritePairBurst(&closest, 20, *(u32 *)(state + 0x24), actor);
+                QueueMobyImpact(D_L05_001C3B80[i], &impact);
                 goto destroy;
             }
         }
     }
 finish:
-    func_L05_00418440(actor);
-    func_L00_002E6EF8(func_L05_0041A228, actor);
+    AddNearbyObjectToLightSpot(actor);
+    AddDrawCallbackToList3(DrawEnergyBlastEffect, actor);
 }
 
 extern void func_00282D30(void *, void *, float);
@@ -384,10 +390,10 @@ static __inline__ void ShotEndFlight(char *object, char *state)
 {
     if (*(int *)(state + 0x2C)) {
         if (*(int *)(state + 0x24))
-            func_L05_00424990(object + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);
+            SpawnShockwaveBurst(object + 0x10, 0, 50, 30, 30, 30, 40, 1, 1, 1, 1, 2.0f);
         func_L05_003D1E60(object + 0x10, 0, 0);
     }
-    func_0029F338(object);
+    MarkMobySpawned(object);
 }
 
 /* Per-frame update of a shot: moves it, removes it when it leaves the 2..1021 world box or expires
@@ -410,12 +416,12 @@ void func_L05_00427238(char *object)
     Collision *collision;
 
     qcopy(old, object + 0x10);
-    func_00282CC0(object + 0x10, object + 0x10, state);
+    FastVecAdd(object + 0x10, object + 0x10, state);
     *(float *)(object + 0x2C) += 0.07f;
     if (*(float *)(object + 0x2C) > *(float *)(*(char **)(object + 0x24) + 0x24))
         *(float *)(object + 0x2C) = *(float *)(*(char **)(object + 0x24) + 0x24);
-    if (func_00282948(state + 0x18)) {
-        func_0029F338(object);
+    if (FastFloatHelperD(state + 0x18)) {
+        MarkMobySpawned(object);
         return;
     }
     x = *(float *)(object + 0x10);
@@ -423,22 +429,22 @@ void func_L05_00427238(char *object)
     if (x < value || x > 1021.0f
         || *(float *)(object + 0x14) < value || *(float *)(object + 0x14) > 1021.0f
         || *(float *)(object + 0x18) < value || *(float *)(object + 0x18) > 1021.0f) {
-        func_0029F338(object);
+        MarkMobySpawned(object);
         return;
     }
-    if (func_00282948(state + 0x28)) {
+    if (FastFloatHelperD(state + 0x28)) {
         hit = 0;
         radius = *(int *)(state + 0x24) ? D_L05_001B1534 : D_L05_001B1530;
-        if (func_00277258(object + 0x10, 16, *(void **)(state + 0x20), radius)) {
+        if (TestPointAgainstCollision(object + 0x10, 16, *(void **)(state + 0x20), radius)) {
             hit = 1;
             qcopy(object + 0x10, D_L05_001BFB30);
         }
-        if (hit || func_002761F8(old, object + 0x10, 16, *(void **)(state + 0x20), 0)) {
+        if (hit || CollLine(old, object + 0x10, 16, *(void **)(state + 0x20), 0)) {
             collision = (Collision *)D_L05_001BFB00;
             if (collision->hit) {
-                func_002E5DA0(7, 0, object, 0xFBF);
+                PlaySoundFromClassBank(7, 0, object, 0xFBF);
                 qcopy(object + 0x10, &collision->point);
-                func_L05_004276E8(object, state, object + 0x10);
+                ApplyImpactAndSpawnSparks(object, state, object + 0x10);
                 ShotEndFlight(object, state);
                 return;
             }
@@ -446,41 +452,41 @@ void func_L05_00427238(char *object)
         ShotEndFlight(object, state);
         return;
     }
-    if (func_00278E78() != 6) {
+    if (GetCollHitMaterial() != 6) {
         hit = 0;
         radius = 1.0f;
         if (*(int *)(state + 0x24))
             radius = 1.5f;
-        if (func_00277258(object + 0x10, 16, *(void **)(state + 0x20), radius)) {
+        if (TestPointAgainstCollision(object + 0x10, 16, *(void **)(state + 0x20), radius)) {
             hit = 1;
             qcopy(object + 0x10, D_L05_001BFB30);
         }
-        if (hit || func_002761F8(old, object + 0x10, 16, *(void **)(state + 0x20), 0)) {
-            func_002E5DA0(7, 0, object, 0xFBF);
+        if (hit || CollLine(old, object + 0x10, 16, *(void **)(state + 0x20), 0)) {
+            PlaySoundFromClassBank(7, 0, object, 0xFBF);
             qcopy(object + 0x10, &((Collision *)D_L05_001BFB00)->point);
-            func_L05_004276E8(object, state, object + 0x10);
+            ApplyImpactAndSpawnSparks(object, state, object + 0x10);
             ShotEndFlight(object, state);
             return;
         }
     }
     qcopy(pos, old);
-    func_00282CF0(step, object + 0x10, old);
-    func_00282D30(step, step, 0.333f);
+    FastVecSub(step, object + 0x10, old);
+    FastVecScale(step, step, 0.333f);
     for (i = 2; i >= 0; i--) {
-        func_00282CC0(pos, pos, step);
-        value = func_002A7940();
-        angle = func_002A7940();
-        func_002AF000(random, 0.012500001f, value, angle);
+        FastVecAdd(pos, pos, step);
+        value = RandomAngle();
+        angle = RandomAngle();
+        BuildSphericalOffset(random, 0.012500001f, value, angle);
         if (*(int *)(state + 0x24)) {
-            particle = func_002BD8B0(pos, random, 0x4FFF0040, 0x1FFF0040, 10, 1, 30000.0f);
+            particle = SpawnTrailingSparkParticle(pos, random, 0x4FFF0040, 0x1FFF0040, 10, 1, 30000.0f);
             if (particle)
                 particle[2] = D_L05_001FF240[97][7];
-            particle = func_002BD8B0(pos, random, 0x4FFF2040, 0x1FFF2040, 10, 1, 15000.0f);
+            particle = SpawnTrailingSparkParticle(pos, random, 0x4FFF2040, 0x1FFF2040, 10, 1, 15000.0f);
         } else {
-            particle = func_002BD8B0(pos, random, 0x4F00FF20, 0x1F00FF20, 10, 1, 30000.0f);
+            particle = SpawnTrailingSparkParticle(pos, random, 0x4F00FF20, 0x1F00FF20, 10, 1, 30000.0f);
             if (particle)
                 particle[2] = D_L05_001FF240[97][7];
-            particle = func_002BD8B0(pos, random, 0x4F20FF20, 0x1F20FF20, 10, 1, 15000.0f);
+            particle = SpawnTrailingSparkParticle(pos, random, 0x4F20FF20, 0x1F20FF20, 10, 1, 15000.0f);
         }
         if (particle)
             particle[2] = D_L05_001FF240[97][7];

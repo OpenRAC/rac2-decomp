@@ -1,12 +1,14 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_001AA100 __attribute__((sda));
 extern int D_001B1D50[];
 
+/* Returns the most recent entry of the mode stack, or -2 when it is empty. */
 int func_002B4BE8(void) {
-    int count = D_001AA100;
-    if (count != 0)
-        return D_001B1D50[count - 1];
+    int depth = D_001AA100;
+    if (depth != 0)
+        return D_001B1D50[depth - 1];
     return -2;
 }
 
@@ -61,15 +63,16 @@ extern void func_00291108(void);
    `entering` only keep the labels alive. A handler reached through a table starts with no known
    values, so D_001A8BB8 is read again where retail reads it (the compare in the first handler of
    mode 3) without any qualifier on the global. */
+/* Switches the game to a newly requested mode: shuts down the old mode, starts the new one and clears the request. */
 void func_002B4C18(void)
 {
     static void *leaving[12] = {&&L1_3, &&L1_4, &&L1_1, &&L1_2, &&L1_6, &&L1_5, &&L1_7, &&L1_8, &&L1_9, &&L1_0, &&L1_def, &&shared};
     static void *entering[11] = {&&L2_3, &&L2_0, &&L2_4, &&L2_1, &&L2_2, &&L2_6, &&L2_5, &&L2_7, &&L2_8, &&L2_9, &&L2_def};
-    int mode = D_001A8BB0;
-    int sel;
+    int oldMode = gCurrentGameMode;
+    int newMode;
     int hold;
-    D_001A8BB4 = mode;
-    if (D_001A8BB8 == -2)
+    gPreviousGameMode = oldMode;
+    if (gRequestedGameMode == -2)
         return;
     if (D_001AA0F4 > 0) {
         D_001AA0F4--;
@@ -77,122 +80,122 @@ void func_002B4C18(void)
     }
     if (D_0018C2EC == 0)
         return;
-    if ((unsigned)mode >= 10)
+    if ((unsigned)oldMode >= 10)
         goto L1_def;
-    goto *D_0026CBB0[mode];
+    goto *D_0026CBB0[oldMode];
 L1_3:
-    if (D_001A8BB8 != 4 || D_001AA0F8 == 8)
-        func_002CA790();
+    if (gRequestedGameMode != 4 || D_001AA0F8 == 8)
+        RestoreMenuDisplayState();
     goto E1;
 L1_4:
-    func_00285860();
+    EndMenu();
     goto E1;
 L1_1:
-    func_002F5EF8();
+    ResumeAfterMovie();
     goto shared;
 L1_2:
-    func_002F57A8();
+    EndCutscene();
 shared:
     D_001B90F0 = 0.62f;
-    func_0026FF08(0, 3, 1.1243411f, 0.005f, 0.2f, 0.0f);
-    func_0027AB40();
+    SetCameraValueTarget(0, 3, 1.1243411f, 0.005f, 0.2f, 0.0f);
+    UpdateViewContext();
     goto E1;
 L1_6:
     if (D_001AA0F8 != 4)
-        func_002E7248();
+        EndPlaybackScene();
     goto E1;
 L1_5:
-    func_002F8768();
+    ResetShopMenuCamera();
     goto E1;
 L1_7:
-    func_002DF380();
+    ShowAllMobys();
     goto E1;
 L1_8:
-    func_002FF288();
+    NoOp_002FF288();
     goto E1;
 L1_9:
-    func_00291128();
+    CallFunc00278F80Wrapper();
     goto E1;
 L1_def:
-    func_00282A28();
+    TrapAlways();
 L1_0:
 E1:
-    func_002B49B0(10);
+    SetRequestSettingA(10);
     hold = 0;
-    sel = D_001A8BB8;
-    if ((unsigned)sel >= 10)
+    newMode = gRequestedGameMode;
+    if ((unsigned)newMode >= 10)
         goto L2_def;
-    goto *D_0026CBE0[sel];
+    goto *D_0026CBE0[newMode];
 L2_3:
-    if (D_001A8BB4 != 4 || func_002857B0() == 8)
-        func_002C9CF8(D_001AA0F8);
+    if (gPreviousGameMode != 4 || GetMenuMode() == 8)
+        InitPauseMenuState(D_001AA0F8);
 L2_0:
     hold = 0;
     goto E2;
 L2_4:
-    func_002858C0(D_001AA0F8, D_001AA0FC);
+    SetMenuMode(D_001AA0F8, D_001AA0FC);
     goto E2;
 L2_1:
-    func_002F5D40(D_001AA0FC);
+    StartMovieFromTocEntry(D_001AA0FC);
     hold = 0;
     goto E2;
 L2_2:
-    if ((unsigned)(D_001A8BB0 - 1) >= 2) {
+    if ((unsigned)(gCurrentGameMode - 1) >= 2) {
         float f;
-        func_002AA2E8(&D_001A8C7C, 1.2f, 0.10000001f);
+        ApproachValue(&D_001A8C7C, 1.2f, 0.10000001f);
         f = D_001A8C7C;
-        D_001B15A0 = f;
+        gScreenFade = f;
         if (1.0f < f)
-            D_001B15A0 = 1.0f;
+            gScreenFade = 1.0f;
         if (1.2f <= f) {
             hold = 0;
             D_001A8C7C = 1.0f;
-            func_002F53C8(D_001AA0F8);
+            StartCutscene(D_001AA0F8);
         } else {
             hold = 1;
         }
     } else {
-        func_002F53C8(D_001AA0F8);
+        StartCutscene(D_001AA0F8);
     }
     goto E2;
 L2_6:
     if (D_001AA0F8 == 5) {
-        func_00288CB0(D_001AA0FC, 1);
+        SetSmallDataValueAndRefresh(D_001AA0FC, 1);
     } else if (D_001AA0F8 == 6) {
-        func_002E71B8();
+        InitPlaybackSceneState();
     } else {
-        if (D_001A8BB4 == 3)
-            func_002E7090(D_001AA0FC);
+        if (gPreviousGameMode == 3)
+            InitSceneListForLevel(D_001AA0FC);
         else
-            func_002E7018();
+            ResetSceneStateOnStart();
         D_001B1694 = 1;
     }
     goto E2;
 L2_5:
-    func_002F8178(D_001AA0F8);
+    OpenVendorMenu(D_001AA0F8);
     goto E2;
 L2_7:
     {
         int fallback = D_001ABD80;
-        func_002DF2E0(D_001AA0F8 ? D_001AA0F8 : fallback, D_001AA0FC);
+        HideAllMobys(D_001AA0F8 ? D_001AA0F8 : fallback, D_001AA0FC);
     }
     goto E2;
 L2_8:
-    func_002FF0D8();
+    BeginPreviewTransition();
     goto E2;
 L2_9:
-    func_00291108();
+    CallLightingInit();
     goto E2;
 L2_def:
-    func_00282A28();
+    TrapAlways();
 E2:
     if (hold == 0) {
         int state;
         if (D_001AA104 != 0)
             *D_001AA104 = 1;
-        state = D_001A8BB8;
-        D_001A8BB8 = -2;
-        D_001A8BB0 = state;
+        state = gRequestedGameMode;
+        gRequestedGameMode = -2;
+        gCurrentGameMode = state;
         D_001AA104 = 0;
     }
 }

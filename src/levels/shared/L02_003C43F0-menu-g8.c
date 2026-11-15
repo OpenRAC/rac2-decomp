@@ -47,6 +47,7 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
     return result;
 }
 
+/* Draws the challenge menu: the four button icons and the help text at the bottom. The text depends on the controller's state. */
 void func_L02_003C43F0(char *obj) {
     char *text;
     int state;
@@ -58,29 +59,29 @@ void func_L02_003C43F0(char *obj) {
     k = 203.0f;
     half = 0.5f;
     on = 1;
-    id = func_00336D50(D_L02_001A904C + entry, 0x70);
+    id = FindTableEntryById(D_L02_001A904C + entry, 0x70);
     y = menu_coord(D_L02_001B3E04, k, half, on);
     one = 1.0f;
     zero = 0.0f;
     s = (float)y;
-    func_00300A00(id, 0x60442D00, 258.0f, s, one, one, zero);
-    func_00300A00(func_00336D50(D_L02_001A904C + entry, 0x6F), 0x60442D00, 258.0f,
+    DrawScaledObjectTwoAxes(id, 0x60442D00, 258.0f, s, one, one, zero);
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_L02_001A904C + entry, 0x6F), 0x60442D00, 258.0f,
                   (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
-    func_00300A00(func_00336D50(D_L02_001A904C + entry, 0x71), 0x55F0C070, 258.0f,
+    DrawScaledObjectTwoAxes(FindTableEntryById(D_L02_001A904C + entry, 0x71), 0x55F0C070, 258.0f,
                   (float)menu_coord(D_L02_001B3E04, k, half, on), one, one, zero);
-    id = func_00336D50(D_L02_001A904C + entry, 0x72);
+    id = FindTableEntryById(D_L02_001A904C + entry, 0x72);
     y = menu_coord(D_L02_001B3E04, k, half, on);
     s = one;
-    func_00300A00(id, 0x55F0C070, 258.0f, (float)y, s, s, zero);
-    func_002FC560(0x47, 0x5360BUL);
+    DrawScaledObjectTwoAxes(id, 0x55F0C070, 258.0f, (float)y, s, s, zero);
+    VU1_addGSregister(0x47, 0x5360BUL);
     state = *(unsigned char *)(obj + 0x20);
     if (state == 7) {
-        text = func_00288FB8(0x2F5C);
-        func_0027FBD8(254, menu_coord2(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
+        text = GetLocalizedString(0x2F5C);
+        DrawTextCenteredLargeFont(254, menu_coord2(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
     } else if (state != 8 && state != 5) {
-        text = func_00288FB8(0x2F5B);
-        func_0027FBD8(262, menu_coord2(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
+        text = GetLocalizedString(0x2F5B);
+        DrawTextCenteredLargeFont(262, menu_coord2(D_L02_001B3E04, 23.0f, half), 0x88FFFFFF, text, -1);
     }
-    text = func_00288FB8(0x2F5A);
-    func_0027FBD8(254, label_y(text, 373.0f, D_L02_001B3E04, 0.5f, 1), 0x88FFFFFF, text, -1);
+    text = GetLocalizedString(0x2F5A);
+    DrawTextCenteredLargeFont(254, label_y(text, 373.0f, D_L02_001B3E04, 0.5f, 1), 0x88FFFFFF, text, -1);
 }

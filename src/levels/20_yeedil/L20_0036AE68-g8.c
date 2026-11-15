@@ -14,22 +14,23 @@ extern InitEntry12 D_L20_0021E0F0[];
 extern int * volatile D_L20_001AA7F0 __attribute__((sda));
 extern struct { char pad[0x230]; int selected; } D_L20_001CA5A0;
 
-int func_L20_0036AE68(char *obj) {
-    int i, entry;
-    int *list;
+/* Fills the menu entry list from a table of ids, then finds which entry is currently picked and stores its position in the menu. */
+int func_L20_0036AE68(char *menu) {
+    int i, item;
+    int *itemList;
     for (i = 0; i < 28 && D_00139948[i]; i++) {
         D_L20_0021E0F0[i].kind = 3;
         D_L20_0021E0F0[i].callback = D_L20_002923E0;
         D_L20_0021E0F0[i].id = D_L20_00296920[D_00139948[i]].id;
         D_L20_0021E0F0[i].value = D_L20_00296920[D_00139948[i]].value;
     }
-    list = D_L20_001AA7F0;
+    itemList = D_L20_001AA7F0;
     D_L20_0021E0F0[i].id = 0;
-    *(int *)(obj + 0x40) = 0;
-    *(unsigned int *)(obj + 0x30) |= 0x8000;
-    for (i = 0, entry = list[0]; entry; entry = D_L20_001AA7F0[++i]) {
-        if (D_L20_001CA5A0.selected == entry) {
-            *(int *)(obj + 0x40) = i;
+    *(int *)(menu + 0x40) = 0;
+    *(unsigned int *)(menu + 0x30) |= 0x8000;
+    for (i = 0, item = itemList[0]; item; item = D_L20_001AA7F0[++i]) {
+        if (D_L20_001CA5A0.selected == item) {
+            *(int *)(menu + 0x40) = i;
             break;
         }
     }

@@ -19,6 +19,7 @@ extern int D_001AD5A4 __attribute__((sda)), D_001AD5AC __attribute__((sda));
 extern float func_00282C10(float);
 extern float func_00282C48(float);
 
+/* Adds a ripple bump to the water surface patches around a point and copies edge values to neighbouring patches. */
 void func_002FD1B8(SurfacePatch *patch, int count, int mode,
                   float x, float y, float radius, float strength)
 {
@@ -50,9 +51,9 @@ void func_002FD1B8(SurfacePatch *patch, int count, int mode,
                 float impulse;
                 int page;
                 if (distanceSquared < 1.0f) impulse = strength;
-                else impulse = strength / func_00282C10(distanceSquared);
+                else impulse = strength / square_root(distanceSquared);
                 if (mode == 0) {
-                    if (func_00282C48(impulse) < func_00282C48(patch->samples[D_001AD5A4].rows[row][column]))
+                    if (FloatAbs(impulse) < FloatAbs(patch->samples[D_001AD5A4].rows[row][column]))
                         impulse = patch->samples[D_001AD5A4].rows[row][column];
                 } else impulse += patch->samples[D_001AD5AC].rows[row][column];
                 page = D_001AD5A4;

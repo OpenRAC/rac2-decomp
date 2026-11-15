@@ -28,6 +28,7 @@ extern u8 ref_L22_003FC870_08[];
 extern u8 * ref_L22_003FC870_09;
 extern void func_L22_003FCF08(void *, void *, int, int);
 
+/* Updates moby class 3643 each frame. It spins and shrinks over about 45 frames following the player or a target, then removes itself. */
 void func_L22_003FC870(u8 *obj) {
     u8 *ctl = *(u8 **)(obj + 0x68);
     f32 f;
@@ -49,92 +50,92 @@ void func_L22_003FC870(u8 *obj) {
             f32 end[4];
         } collision;
     } scratch __attribute__((aligned(16)));
-    if (func_002B3868(obj) && obj[0x20] == 0x10) func_L00_0035F5A0(0x12, 0, 0);
+    if (SetFirstPendingFlag(obj) && obj[0x20] == 0x10) StartEffectInSlot(0x12, 0, 0);
     if (obj[0x31]) {
-        f = func_00282E48(D_00189E20 + 0x80, obj + 0x10);
+        f = fast_vec_dist(gHeroState + 0x80, obj + 0x10);
         *(f32 *)(ctl + 0x44) = f;
     if (ref_L22_003FC870_07 <= f) obj[0x23] = 127;
     } else *(f32 *)(ctl + 0x44) = 2000.0f;
     if (obj[0x20] == 0) {
         qzero_nc(rot);
         rot[2] = 0.018907737f;
-        func_002833F0(scratch.transform.mat, rot);
-        func_00283738(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
-        func_002AFFD8(obj + 0x10, ctl + 0x10, 0);
-        func_L00_00325600(obj + 0xC0, ctl + 0x10, 0);
+        euler_rotation_basis(scratch.transform.mat, rot);
+        multiply_matrix3x3(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
+        ComputeViewDirection(obj + 0x10, ctl + 0x10, 0);
+        NegateAndForwardVector(obj + 0xC0, ctl + 0x10, 0);
     } else {
         qzero_nc(rot);
         rot[2] = ((45.0f - (f32)*(u16 *)(obj + 0x96)) * 22.0f + 155.0f) * 0.00029088825f;
-        func_002833F0(scratch.transform.mat, rot);
-        if (func_002B3868(obj)) { obj[0x23] = 127; *(f32 *)(obj + 0x2C) *= 1.2f; }
+        euler_rotation_basis(scratch.transform.mat, rot);
+        if (SetFirstPendingFlag(obj)) { obj[0x23] = 127; *(f32 *)(obj + 0x2C) *= 1.2f; }
         if (obj[0x23] >= 3) obj[0x23]--;
         if (obj[0x23] >= 11 && obj[0x20] == 0x10) {
             switch (*(u16 *)(obj + 0x96) & 3) {
             case 0:
-                func_00282D30(scratch.transform.start, obj + 0xC0, -ref_L22_003FC870_00);
-                func_00282CC0(scratch.transform.start, scratch.transform.start, obj + 0x10);
-                func_00282D30(scratch.transform.end, obj + 0xD0, -ref_L22_003FC870_01);
+                FastVecScale(scratch.transform.start, obj + 0xC0, -ref_L22_003FC870_00);
+                FastVecAdd(scratch.transform.start, scratch.transform.start, obj + 0x10);
+                FastVecScale(scratch.transform.end, obj + 0xD0, -ref_L22_003FC870_01);
                 break;
             case 1:
-                func_00282D30(scratch.transform.start, obj + 0xC0, ref_L22_003FC870_00);
-                func_00282CC0(scratch.transform.start, scratch.transform.start, obj + 0x10);
-                func_00282D30(scratch.transform.end, obj + 0xD0, ref_L22_003FC870_01);
+                FastVecScale(scratch.transform.start, obj + 0xC0, ref_L22_003FC870_00);
+                FastVecAdd(scratch.transform.start, scratch.transform.start, obj + 0x10);
+                FastVecScale(scratch.transform.end, obj + 0xD0, ref_L22_003FC870_01);
                 break;
             case 2:
-                func_00282D30(scratch.transform.start, obj + 0xD0, ref_L22_003FC870_00);
-                func_00282CC0(scratch.transform.start, scratch.transform.start, obj + 0x10);
-                func_00282D30(scratch.transform.end, obj + 0xC0, ref_L22_003FC870_01);
+                FastVecScale(scratch.transform.start, obj + 0xD0, ref_L22_003FC870_00);
+                FastVecAdd(scratch.transform.start, scratch.transform.start, obj + 0x10);
+                FastVecScale(scratch.transform.end, obj + 0xC0, ref_L22_003FC870_01);
                 break;
             case 3:
-                func_00282D30(scratch.transform.start, obj + 0xD0, -ref_L22_003FC870_00);
-                func_00282CC0(scratch.transform.start, scratch.transform.start, obj + 0x10);
-                func_00282D30(scratch.transform.end, obj + 0xC0, -ref_L22_003FC870_01);
+                FastVecScale(scratch.transform.start, obj + 0xD0, -ref_L22_003FC870_00);
+                FastVecAdd(scratch.transform.start, scratch.transform.start, obj + 0x10);
+                FastVecScale(scratch.transform.end, obj + 0xC0, -ref_L22_003FC870_01);
                 break;
             }
-            func_L22_003FCF08(scratch.transform.start, scratch.transform.end, ref_L22_003FC870_02, 0);
+            EmitSprayBurst(scratch.transform.start, scratch.transform.end, ref_L22_003FC870_02, 0);
         }
-        func_00283360(scratch.transform.scale);
+        set_identity_rotation_rows(scratch.transform.scale);
         scratch.transform.scale[0] = scratch.transform.scale[5] = scratch.transform.scale[10] = (45.0f - (f32)*(u16 *)(obj + 0x96) * 0.022222223f) * (ref_L22_003FC870_03 * 0.022222223f);
-        func_00283738(scratch.transform.mat, scratch.transform.scale, scratch.transform.mat);
-        func_00283738(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
+        multiply_matrix3x3(scratch.transform.mat, scratch.transform.scale, scratch.transform.mat);
+        multiply_matrix3x3(obj + 0xC0, obj + 0xC0, scratch.transform.mat);
         
         if (*(u16 *)(obj + 0x96) >= 46) {
-            func_0029F338(obj);
+            MarkMobySpawned(obj);
             return;
         }
         if (obj[0x20] == 0x10) {
-            qcopy(obj + 0x10, D_00189E20 + 0x80);
-            func_002AFFD8(obj + 0x10, ctl + 0x10, 0);
-            func_L00_00325600(obj + 0xC0, ctl + 0x10, 0);
-            func_00282F20(scratch.transform.start, ctl + 0x10, -((f32)*(u16 *)(obj + 0x96) * 0.022222223f) * 7.5f);
-            func_00282CC0(obj + 0x10, obj + 0x10, scratch.transform.start);
+            qcopy(obj + 0x10, gHeroState + 0x80);
+            ComputeViewDirection(obj + 0x10, ctl + 0x10, 0);
+            NegateAndForwardVector(obj + 0xC0, ctl + 0x10, 0);
+            vec_scale_to_length(scratch.transform.start, ctl + 0x10, -((f32)*(u16 *)(obj + 0x96) * 0.022222223f) * 7.5f);
+            FastVecAdd(obj + 0x10, obj + 0x10, scratch.transform.start);
         } else {
             qcopy(obj + 0x10, ref_L22_003FC870_04 + 0x10);
-            func_002AFFD8(obj + 0x10, ctl + 0x10, 0);
-            func_L00_00325600(obj + 0xC0, ctl + 0x10, 0);
-            func_00282F20(scratch.transform.start, ctl + 0x10, -((f32)*(u16 *)(obj + 0x96) * 0.022222223f) * 7.5f);
-            func_00282CC0(obj + 0x10, obj + 0x10, scratch.transform.start);
+            ComputeViewDirection(obj + 0x10, ctl + 0x10, 0);
+            NegateAndForwardVector(obj + 0xC0, ctl + 0x10, 0);
+            vec_scale_to_length(scratch.transform.start, ctl + 0x10, -((f32)*(u16 *)(obj + 0x96) * 0.022222223f) * 7.5f);
+            FastVecAdd(obj + 0x10, obj + 0x10, scratch.transform.start);
         }
     }
     if (*(u16 *)(obj + 0x96) < 65535) (*(u16 *)(obj + 0x96))++;
     else *(u16 *)(obj + 0x96) = 0;
     if (*(s16 *)(ctl + 0x2A) != 0 && (*(u16 *)(obj + 0x96) & 31) == 0) {
-        func_00282D30(rot, ctl + 0x10, 6.0f);
-        func_00282D30(scratch.collision.mat, ctl + 0x10, -3.0f);
-        func_00282CC0(rot, rot, obj + 0x10);
-        func_00282CC0(scratch.collision.mat, scratch.collision.mat, obj + 0x10);
-        if (func_002761F8(scratch.collision.mat, rot, 0x12, 0, 0) == 0) {
-            func_L22_003A2988(obj + 0x10, 0.0f);
-            func_00282D30(scratch.collision.move,
-                obj + 0xC0 + func_002A77E0(2) * 16,
-                func_002A77E0(2) ? ref_L22_003FC870_05 : -ref_L22_003FC870_06);
-            func_00282CC0(obj + 0x10, obj + 0x10, scratch.collision.move);
-            func_L22_003A2988(obj + 0x10, 0.0f);
-            func_00282D30(scratch.collision.start, ctl + 0x10, 3.0f);
-            func_00282D30(scratch.collision.end, ctl + 0x10, -3.0f);
-            func_00282CC0(scratch.collision.start, scratch.collision.start, obj + 0x10);
-            func_00282CC0(scratch.collision.end, scratch.collision.end, obj + 0x10);
-            if (func_002761F8(scratch.collision.end, scratch.collision.start, 0x12, 0, 0)) qcopy(obj + 0x10, ref_L22_003FC870_08);
+        FastVecScale(rot, ctl + 0x10, 6.0f);
+        FastVecScale(scratch.collision.mat, ctl + 0x10, -3.0f);
+        FastVecAdd(rot, rot, obj + 0x10);
+        FastVecAdd(scratch.collision.mat, scratch.collision.mat, obj + 0x10);
+        if (CollLine(scratch.collision.mat, rot, 0x12, 0, 0) == 0) {
+            PushPointOutOfArena(obj + 0x10, 0.0f);
+            FastVecScale(scratch.collision.move,
+                obj + 0xC0 + RandomIntBelow(2) * 16,
+                RandomIntBelow(2) ? ref_L22_003FC870_05 : -ref_L22_003FC870_06);
+            FastVecAdd(obj + 0x10, obj + 0x10, scratch.collision.move);
+            PushPointOutOfArena(obj + 0x10, 0.0f);
+            FastVecScale(scratch.collision.start, ctl + 0x10, 3.0f);
+            FastVecScale(scratch.collision.end, ctl + 0x10, -3.0f);
+            FastVecAdd(scratch.collision.start, scratch.collision.start, obj + 0x10);
+            FastVecAdd(scratch.collision.end, scratch.collision.end, obj + 0x10);
+            if (CollLine(scratch.collision.end, scratch.collision.start, 0x12, 0, 0)) qcopy(obj + 0x10, ref_L22_003FC870_08);
             *(s16 *)(ctl + 0x2A) = 0;
         }
     }

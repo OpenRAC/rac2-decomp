@@ -29,7 +29,7 @@ void func_L17_003C5200(char *obj)
     Vec start, current, offset, delta, camera, side, world;
     char *state = *(char **)(obj + 0x68);
     float along, length, amount;
-    u64 texture = func_0027C878(15);
+    u64 texture = GetEffectTextureDescriptor(15);
     u64 blend = (u64)D_L17_001B02D8 | ((u64)D_L17_001B02DC << 2);
     blend |= (u64)D_L17_001B02E0 << 4;
     blend |= (u64)D_L17_001B02E4 << 6;
@@ -52,34 +52,34 @@ void func_L17_003C5200(char *obj)
     frame.uv[7].f = 1.0f;
     qzero_nc(&offset);
     offset.f[2] = D_L17_001B0290;
-    func_00283098(&offset, &offset, obj + 0xC0);
-    func_00282CD8(&world, &offset, obj + 0x10);
+    matrix_mul_vec3(&offset, &offset, obj + 0xC0);
+    add_vectors(&world, &offset, obj + 0x10);
     {
         unsigned int index = *(int *)(state + 0x10);
         unsigned int address = index << 8;
-        address += (unsigned int)D_L17_001B2C1C;
+        address += (unsigned int)gMobyPool_L17;
         start.q = *(Quad *)(address + 0x10);
     }
     qcopy(&current, &start);
-    func_00282CF0(&delta, &offset, &start);
+    FastVecSub(&delta, &offset, &start);
     along = 0;
-    length = func_00282DF0(&delta);
+    length = FastVecLength(&delta);
     qcopy(&frame.vertices[0], &start);
     qcopy(&frame.vertices[2], &start);
     while (along < length) {
         amount = 0.3f;
         if (length - along < amount) amount = length - along;
         along += amount;
-        func_00282F20(&delta, &delta, amount);
-        func_00282CC0(&current, &current, &delta);
+        vec_scale_to_length(&delta, &delta, amount);
+        FastVecAdd(&current, &current, &delta);
         qcopy(&frame.vertices[1], &current);
         qcopy(&frame.vertices[3], &current);
-        func_00282CF0(&camera, D_L17_001B9BC0, &current);
-        func_00282DD8(&side, &camera, &delta);
-        func_00282F20(&side, &side, 0.1f);
-        func_00282CC0(&frame.vertices[1], &frame.vertices[1], &side);
-        func_00282CF0(&frame.vertices[3], &frame.vertices[3], &side);
-        func_00280B90(&frame, 0, 1);
+        FastVecSub(&camera, D_L17_001B9BC0, &current);
+        FastVecCross(&side, &camera, &delta);
+        vec_scale_to_length(&side, &side, 0.1f);
+        FastVecAdd(&frame.vertices[1], &frame.vertices[1], &side);
+        FastVecSub(&frame.vertices[3], &frame.vertices[3], &side);
+        draw_world_quad(&frame, 0, 1);
         qcopy(&start, &current);
         qcopy(&frame.vertices[0], &frame.vertices[1]);
         qcopy(&frame.vertices[2], &frame.vertices[3]);

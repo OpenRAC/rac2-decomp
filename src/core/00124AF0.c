@@ -46,30 +46,32 @@ extern char r1_D_00132E08[];
  * layout alone does not tell them apart; the prebuilt libcdvd.a, which
  * this matches, is 2.9-ee's.
  */
+/* Asks the CD drive if the disc is ready and returns the reply. */
 int func_00124AF0(void) {
-    int r;
+    int result;
 
-    if (func_00124980(2) == 0) {
+    if (CheckSCommandReady(2) == 0) {
         return 0;
     }
     if (r1_func_0011B4C8(r1_D_00132590, 0xE, 0, 0, 0, &r1_D_00131440, 4, 0, 0) < 0) {
         r1_func_00118C90(r1_D_001313E8);
         return 0;
     }
-    r = *(int *)((unsigned int)&r1_D_00131440 | 0x20000000);
+    result = *(int *)((unsigned int)&r1_D_00131440 | 0x20000000);
     r1_func_00118C90(r1_D_001313E8);
-    return r;
+    return result;
 }
 
 /* rac1-decomp src/core/001208E8.c: func_00120F30 */
 /* sceCdSyncS */
-int func_00124B88(int arg0) {
-    if (arg0 == 0) {
+/* Waits for the last CD system command to finish, or only checks if it is still running. */
+int func_00124B88(int pollOnly) {
+    if (pollOnly == 0) {
         if (r1_D_001313D0 > 0) {
             r1_func_0011A6C8(r1_D_00152FF0);
         }
         while (r1_D_001313F0 != 0 || r1_func_0011B6B8(r1_D_00132590) != 0) {
-            func_00124568(0x3C);
+            SleepWithAlarm(0x3C);
         }
         return 0;
     }
@@ -81,13 +83,14 @@ int func_00124B88(int arg0) {
 
 /* rac1-decomp src/core/001208E8.c: func_00120FD0 */
 /* sceCdSync */
-int func_00124C28(int arg0) {
-    if (arg0 == 0) {
+/* Waits for the last CD read command to finish, or only checks if it is still running. */
+int func_00124C28(int pollOnly) {
+    if (pollOnly == 0) {
         if (r1_D_001313D0 > 0) {
             r1_func_0011A6C8(r1_D_00153000);
         }
         while (r1_func_0011B6B8(r1_D_00132E08) != 0) {
-            func_00124568(0x3C);
+            SleepWithAlarm(0x3C);
         }
         return 0;
     }

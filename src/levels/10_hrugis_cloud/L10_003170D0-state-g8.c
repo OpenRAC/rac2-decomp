@@ -161,7 +161,7 @@ void func_L10_00421288(Moby *moby)
         D_L10_001B13F0 = moby;
         D_L10_001B1438 = 1;
         D_L10_001B1428 = 0;
-        D_L10_001B13A4 = 0;
+        gMissionInitialized = 0;
         D_L10_001B1408 = 0;
         D_L10_001B13D0 = 0;
         D_L10_001B13D4 = 0;
@@ -183,90 +183,90 @@ void func_L10_00421288(Moby *moby)
         D_L10_001B3554 = 540;
         D_L10_001B3558 = 360;
         D_L10_001B1430 = 0;
-        D_L10_00221CD0.reset = func_L10_004235A0;
-        D_L10_00221CD0.resetAll = func_L10_00423698;
-        D_L10_00221CD0.onHit = func_L10_00423788;
+        D_L10_00221CD0.reset = ResetMissionCountersAndObjects;
+        D_L10_00221CD0.resetAll = ResetMissionCountersAndObjectsAlt;
+        D_L10_00221CD0.onHit = ProcessObjectCollisionDamage;
         D_L10_00221CD0.controller = moby;
-        func_L05_00379F18(1);
-        func_L05_00379F28(0);
-        while (!D_L10_002A3C70[func_L05_0037AA88(D_L10_001B1428)].f00
-               || !D_L10_002A3C70[func_L05_0037AA88(D_L10_001B1428)].f1E)
+        SetPlayerStateField13(1);
+        SetPlayerStateField15(0);
+        while (!D_L10_002A3C70[FindActiveSlotInChain(D_L10_001B1428)].f00
+               || !D_L10_002A3C70[FindActiveSlotInChain(D_L10_001B1428)].f1E)
             ++D_L10_001B1428;
         completed0 = D_001395B8.completions[0];
         completed1 = D_001395B8.completions[1];
         completed2 = D_001395B8.completions[2];
         completed3 = D_001395B8.completions[3];
-        D_L10_001AA7A0 = func_L10_004235A0;
-        D_L10_001AA7A8 = func_L10_00423698;
+        D_L10_001AA7A0 = ResetMissionCountersAndObjects;
+        D_L10_001AA7A8 = ResetMissionCountersAndObjectsAlt;
         D_L10_001B1394 = completed1;
         D_L10_001B1398 = completed2;
         D_L10_001B139C = completed3;
-        D_L10_001B1390 = completed0;
-        if (!D_L10_001B1390)
+        gMissionCompletionCounts = completed0;
+        if (!gMissionCompletionCounts)
             D_L10_001B1444 = 1;
         else
             D_L10_001B1444 = 0;
-        if (D_00189E20.moby != 0)
-            D_00189E20.moby->flags |= 0x41;
+        if (gHeroState.moby != 0)
+            gHeroState.moby->flags |= 0x41;
         /* fall through */
     case 1: {
         /* One 1 for the stores and the test below: literal 1s compile differently. */
         s32 on = 1;
 
-        func_L05_00379B60();
-        func_L05_0030C930((s32)(D_L10_001B2D84 * -230.0f + 0.5f), 2);
+        SelectRandomLevelObject();
+        StorePairWithIncrement((s32)(D_L10_001B2D84 * -230.0f + 0.5f), 2);
         if (D_L10_00221CD0.selection != D_L10_001B13A0) {
             D_L10_00221CD0.selection = D_L10_001B13A0;
             D_L10_00221CD0.f88 = 0;
         }
         if (!D_L10_001B1420) {
-            func_L00_003294F0(&D_L10_001B251C[vars->moby], 1);
+            SetObjectFlagBit(&D_L10_001B251C[vars->moby], 1);
             D_L10_001B1420 = on;
             D_L10_001B1424 = 0;
         }
         if (D_L10_001B1424++ < 5 || D_L10_001A8F00 == 2)
             break;
 
-        func_L00_002C42E0(0x31, 0);
+        SetHeroAction_L00(0x31, 0);
         if (D_L10_001B1438) {
-            func_L05_00379F48(on);
-            D_L10_001B13A0 = func_L05_0041ED18();
+            SetPlayerStateField18(on);
+            D_L10_001B13A0 = LockedEntryMenuInput();
             if (D_L10_001B13A0 != -2)
-                func_L05_00445A98();
+                SaveShipTransformState();
             break;
         }
         if (!D_L10_001B142C) {
-            func_00288E18(0xA17, 0x6E);
+            RequestSubtitleVoiceLine(0xA17, 0x6E);
             D_L10_001B142C = on;
         }
         if ((D_0013A170[0] == on || D_0013A170[0] == 5 || D_0013A170[0] == 10)
-            && !func_L10_0037F510() && !D_L10_001B1430) {
-            func_00288E18(0xA18, 0x6F);
+            && !AnyStatusRecordNonzero() && !D_L10_001B1430) {
+            RequestSubtitleVoiceLine(0xA18, 0x6F);
             D_L10_001B1430 = 1;
         }
-        if (func_00282948(&vars->timer))
+        if (FastFloatHelperD(&vars->timer))
             D_L10_00221CD0.waiting = 0;
         else
             D_L10_00221CD0.waiting = 1;
-        func_L05_00379F48(0);
+        SetPlayerStateField18(0);
         if (D_L10_001B13A0 != -2 && D_L10_001B2048 >= 3) {
             switch (D_L10_001B13A0) {
             case 0:
-                func_L10_00424028(moby);
+                UpdateMissionControllerKind0(moby);
                 break;
             case 1:
-                func_L10_00424290(moby);
+                UpdateMissionControllerKind1(moby);
                 break;
             case 2:
-                func_L10_00424448(moby);
+                UpdateMissionControllerKind2(moby);
                 break;
             case 3:
-                func_L10_00424528(moby);
+                UpdateGateCourse(moby);
                 break;
             }
         }
         if (D_L10_001A904C && !D_L10_001B13E8 && !D_L10_001B1440) {
-            func_0029B758(0, func_L10_00421790);
+            StoreLevelObjectValuePair(0, DrawHrugisMissionHud);
             D_L10_001B13EC = 0;
             D_L10_001B13E8 = 1;
         }
@@ -275,7 +275,7 @@ void func_L10_00421288(Moby *moby)
     case 2:
         break;
     case 3:
-        if (!func_L05_00442860()) {
+        if (!IsCameraModeActive()) {
             D_L10_00221CD0.waiting = 0;
             D_L10_00221CD0.rounds++;
             moby->state = 1;

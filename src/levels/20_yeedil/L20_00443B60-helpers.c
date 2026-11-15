@@ -14,38 +14,39 @@ extern void func_00282CC0(char *, char *, char *);
 extern void func_00283098(char *, char *, char *);
 extern void func_00282D30(char *, char *, float);
 
-void func_L20_00443B60(char *arg0, char *arg1, char *arg2, float *arg3) {
-    char *state = *(char **)(arg0 + 0x68);
-    L20_V4 v1;
-    L20_V4 v2;
-    L20_V4 v3;
+/* Works out where the enemy fires from and how fast and in which direction the shot flies, with a bit of randomness. */
+void func_L20_00443B60(char *moby, char *outPosition, char *outVelocity, float *aimAngle) {
+    char *state = *(char **)(moby + 0x68);
+    L20_V4 muzzle;
+    L20_V4 throwBase;
+    L20_V4 scratch;
     struct {
         TI128 angles;
         L20_V4 adjustment;
         TI128 basis[3];
     } transform;
-    f32 r;
+    f32 randomValue;
 
-    v1.v = 0;
-    v1.f.x = 5.0f;
-    v3.v = 0;
-    v1.f.z = 5.5f;
-    r = func_002A7878(-1.0f, 1.0f);
-    v3.f.y = r;
+    muzzle.v = 0;
+    muzzle.f.x = 5.0f;
+    scratch.v = 0;
+    muzzle.f.z = 5.5f;
+    randomValue = RandomFloatRange(-1.0f, 1.0f);
+    scratch.f.y = randomValue;
     transform.adjustment.v = 0;
-    v2.v = v3.v;
+    throwBase.v = scratch.v;
     transform.adjustment.f.z = *(float *)(state + 0x298) * 0.5f;
     transform.angles = transform.adjustment.v;
-    func_002833F0(transform.basis, &transform.angles);
-    func_00283738(transform.basis, transform.basis, arg0 + 0xC0);
-    func_00282CC0((char *)&v1, (char *)&v1, (char *)&v2);
-    func_00283098((char *)&v1, (char *)&v1, (char *)&transform.basis);
-    func_00282CC0(arg1, (char *)&v1, arg0 + 0x10);
-    r = func_002A7878(5.0f, 10.0f);
-    v2.f.x = r;
-    r = func_002A7878(4.0f, 6.0f);
-    v2.f.z = r;
-    func_00283098((char *)&v3, (char *)&v2, (char *)&transform.basis);
-    func_00282D30(arg2, (char *)&v3, 0.016666668f);
-    *arg3 = *arg3 * v2.f.y;
+    euler_rotation_basis(transform.basis, &transform.angles);
+    multiply_matrix3x3(transform.basis, transform.basis, moby + 0xC0);
+    FastVecAdd((char *)&muzzle, (char *)&muzzle, (char *)&throwBase);
+    matrix_mul_vec3((char *)&muzzle, (char *)&muzzle, (char *)&transform.basis);
+    FastVecAdd(outPosition, (char *)&muzzle, moby + 0x10);
+    randomValue = RandomFloatRange(5.0f, 10.0f);
+    throwBase.f.x = randomValue;
+    randomValue = RandomFloatRange(4.0f, 6.0f);
+    throwBase.f.z = randomValue;
+    matrix_mul_vec3((char *)&scratch, (char *)&throwBase, (char *)&transform.basis);
+    FastVecScale(outVelocity, (char *)&scratch, 0.016666668f);
+    *aimAngle = *aimAngle * throwBase.f.y;
 }

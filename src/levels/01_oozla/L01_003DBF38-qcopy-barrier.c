@@ -13,30 +13,31 @@ extern float func_00282DF0(void *a0);
 extern f32 D_L01_001AFE18[];
 
 /* Same body as func_L01_003B4480, with this function's own callees. */
-void func_L01_003DBF38(u8 *arg0)
+/* Makes bubbles while the object moves and spawns a splash when it is fast enough. */
+void func_L01_003DBF38(u8 *moby)
 {
-    u8 *state = *(u8 **)(arg0 + 0x68);
-    float v[4];
-    float f;
+    u8 *state = *(u8 **)(moby + 0x68);
+    float bubblePos[4];
+    float size;
     int i;
 
-    func_002A89A8(arg0 + 0x10, 0, 0.5f);
-    if (func_00278E78() != 3)
+    ProbeGroundHeightBelow(moby + 0x10, 0, 0.5f);
+    if (GetCollHitMaterial() != 3)
         return;
     {
-        u8 *p = arg0 + 0x10;
-        u8 *q = state + 0x190;
+        u8 *objPos = moby + 0x10;
+        u8 *velocityVec = state + 0x190;
         i = 0;
         while (i >= 0) {
-            *(V4 *)v = *(V4 *)p;
-            func_002ACB48(v, 0.1f);
-            v[2] = func_L01_003BAFB0();
-            f = func_002A7878(0.2f, 2.0f);
-            func_002C19D8((char *)v, (int)D_L01_001AFE18,
-                          (int)((((u32)func_002A77E0(6) + 0x14) << 24) | 0x5060), f, 10000.0f);
+            *(V4 *)bubblePos = *(V4 *)objPos;
+            AddRandomOffsetToVector(bubblePos, 0.1f);
+            bubblePos[2] = GetWaterHeight();
+            size = RandomFloatRange(0.2f, 2.0f);
+            SpawnDriftingParticle_002C19D8((char *)bubblePos, (int)D_L01_001AFE18,
+                          (int)((((u32)RandomIntBelow(6) + 0x14) << 24) | 0x5060), size, 10000.0f);
             i--;
         }
-        if (0.0333333333f < func_00282DF0(q))
-            func_L01_003DBCB8(arg0, 3, 10, 1);
+        if (0.0333333333f < FastVecLength(velocityVec))
+            SpawnWaterSplashEffects_L01_2(moby, 3, 10, 1);
     }
 }

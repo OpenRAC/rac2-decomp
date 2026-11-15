@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* This unit is built with -G8: every body here reaches a global through $gp.
    The markers below are the functions of L20_0039C448.c whose retail bodies access
@@ -20,12 +21,13 @@ extern float D_L20_001B29E0 __attribute__((sda));
  * stores as one dead store, and gas expands this one to lui $at / swc1. */
 extern float D_L20_001B29E0_1;
 
-void func_L20_004095D0(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    float v = *(float *)(state + 0xC) * 1.2f;
+/* Scales a speed value by 1.2 and caps a stored scale at 1.0 when it gets higher. */
+void func_L20_004095D0(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    float scaledSpeed = *(float *)(state + 0xC) * 1.2f;
 
-    D_L20_001B29E0 = v;
-    if (v > 1.0f) {
+    D_L20_001B29E0 = scaledSpeed;
+    if (scaledSpeed > 1.0f) {
         D_L20_001B29E0_1 = 1.0f;
     }
 }
@@ -59,58 +61,59 @@ extern void *D_L20_001B9FC0[];
 extern float D_L20_001AED04 __attribute__((sda));
 extern float D_L20_001AED08 __attribute__((sda));
 
-void func_L20_0039E368(char *arg0)
+/* Runs the per-frame states of this enemy: it picks its animation by state, spreads a trail effect while it walks, and removes itself when it dies. */
+void func_L20_0039E368(char *moby)
 {
     char bufA[0x10];
     char bufB[0x40];
     char bufC[0x10];
     char *state;
 
-    state = *(char **)(arg0 + 0x68);
-    func_L20_0039E5F0(arg0);
+    state = *(char **)(moby + 0x68);
+    UpdateObjectLifeTimer(moby);
     if (D_L20_001A8F00 == 2 && D_L20_001BDCF0 >= 5) {
-        func_0029F338(arg0);
+        MarkMobySpawned(moby);
         return;
     }
-    switch (*(u8 *)(arg0 + 0x20)) {
+    switch (*(u8 *)(moby + 0x20)) {
     case 2:
-        if (func_002B3868(arg0) != 0 && *(u8 *)(arg0 + 0x43) != 0)
-            func_002A7470(arg0, 0, 0, 0xA);
-        if (*(u8 *)(arg0 + 0x31) != 0 && *(u16 *)(arg0 + 0x96) >= 0xB5)
-            func_002A7750(arg0, 3, -1);
+        if (SetFirstPendingFlag(moby) != 0 && *(u8 *)(moby + 0x43) != 0)
+            StartAnimationBlended(moby, 0, 0, 0xA);
+        if (*(u8 *)(moby + 0x31) != 0 && *(u16 *)(moby + 0x96) >= 0xB5)
+            SetMobyState(moby, 3, -1);
         break;
     case 3:
-        if (func_002B3868(arg0) != 0 && *(u8 *)(arg0 + 0x43) != 1)
-            func_002A7470(arg0, 1, 0, 0xF);
-        if ((D_L20_001B2AC8 & 0xF) == (((int)arg0 >> 8) & 0xF)) {
-            func_0029FCC0(arg0, 2, bufA);
-            func_0029FC20(arg0, 2, bufB);
-            func_00282F20(bufC, bufB, D_L20_001AED04 * 0.016666668f);
-            func_L09_003AE8C8(bufA, arg0, bufC, 1, 1, (float)*(u8 *)(state + 0x34),
+        if (SetFirstPendingFlag(moby) != 0 && *(u8 *)(moby + 0x43) != 1)
+            StartAnimationBlended(moby, 1, 0, 0xF);
+        if ((D_L20_001B2AC8 & 0xF) == (((int)moby >> 8) & 0xF)) {
+            TransformMobyJointToWorld(moby, 2, bufA);
+            TransformMobyJointPoint(moby, 2, bufB);
+            vec_scale_to_length(bufC, bufB, D_L20_001AED04 * 0.016666668f);
+            SpawnProjectileMoby_L09(bufA, moby, bufC, 1, 1, (float)*(u8 *)(state + 0x34),
                               D_L20_001AED08, 1.0f, 1.0f);
         }
-        if (*(u8 *)(arg0 + 0x31) == 0 || *(u16 *)(arg0 + 0x96) >= 0xB5)
-            func_002A7750(arg0, 2, -1);
+        if (*(u8 *)(moby + 0x31) == 0 || *(u16 *)(moby + 0x96) >= 0xB5)
+            SetMobyState(moby, 2, -1);
         break;
     case 4:
-        if (func_002B3868(arg0) != 0 && *(u8 *)(arg0 + 0x43) != 2)
-            func_002A7470(arg0, 2, 0, 0xA);
-        if (*(u8 *)(arg0 + 0x60) & 0x2)
-            func_002A7750(arg0, 2, -1);
+        if (SetFirstPendingFlag(moby) != 0 && *(u8 *)(moby + 0x43) != 2)
+            StartAnimationBlended(moby, 2, 0, 0xA);
+        if (*(u8 *)(moby + 0x60) & 0x2)
+            SetMobyState(moby, 2, -1);
         break;
     case 5:
-        func_00282CF0(bufA, D_L20_001B9FC0, arg0 + 0x10);
-        func_00282F20(bufA, bufA, 1.0f);
-        func_0032DA58(arg0, arg0 + 0x10, bufA, 0.0f);
-        func_002A6C58(arg0, 0, 3);
-        func_0029F338(arg0);
+        FastVecSub(bufA, D_L20_001B9FC0, moby + 0x10);
+        vec_scale_to_length(bufA, bufA, 1.0f);
+        SpawnBlastEffectMoby(moby, moby + 0x10, bufA, 0.0f);
+        SetDeathBits(moby, 0, 3);
+        MarkMobySpawned(moby);
         return;
     default:
         break;
     case 1:
         return;
     }
-    func_L20_0039E770(arg0);
+    AimTrooperAtTarget(moby);
 }
 
 extern char *D_L20_001FBB20[];
@@ -123,54 +126,55 @@ extern char *D_L20_001B308C __attribute__((sda));
 
 extern void func_0032F5B0(void *, int, int);
 
-void func_L20_0039E890(int arg0, float arg1) {
-    char *s1 = D_L20_001FBB20[arg0];
-    int s4 = arg0 & 0xFF;
-    float f20 = arg1;
+/* Wakes every object of a group that is waiting in state 1 and starts it moving, and can store a new amount for it. */
+void func_L20_0039E890(int group, float amount) {
+    char *idList = D_L20_001FBB20[group];
+    int groupByte = group & 0xFF;
+    float amountCopy = amount;
 
-    if (s4 == 0xFF) {
+    if (groupByte == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8 < arg0) {
+    if (D_L20_001B2FB8 < group) {
         goto end;
     }
-    if (s1 == 0) {
+    if (idList == 0) {
         goto end;
     }
     for (;;) {
-        char *s0 = (char *)D_L20_001B2F9C + ((*(u16 *)s1 & 0x7FFF) << 8);
+        char *member = (char *)D_L20_001B2F9C + ((*(u16 *)idList & 0x7FFF) << 8);
 
-        if (s0 == 0) {
+        if (member == 0) {
             goto end;
         }
-        if (*(u8 *)(s0 + 0x20) == 1) {
-            u16 v0 = *(u16 *)(s0 + 0x34);
-            char *a3 = *(char **)(s0 + 0x24);
+        if (*(u8 *)(member + 0x20) == 1) {
+            u16 flags = *(u16 *)(member + 0x34);
+            char *parentRec = *(char **)(member + 0x24);
 
-            v0 = (u16)((v0 & 0xFFBE) | 0x1000);
-            *(u16 *)(s0 + 0x34) = v0;
-            *(int *)(s0 + 0x98) = *(int *)(a3 + 0x10);
-            func_0032F5B0(s0, 2, -1);
-            if (0.0f < f20) {
-                char *v1 = *(char **)(s0 + 0x68);
+            flags = (u16)((flags & 0xFFBE) | 0x1000);
+            *(u16 *)(member + 0x34) = flags;
+            *(int *)(member + 0x98) = *(int *)(parentRec + 0x10);
+            func_0032F5B0(member, 2, -1);
+            if (0.0f < amountCopy) {
+                char *memberVars = *(char **)(member + 0x68);
 
-                *(f32 *)((char *)D_L20_001B308C + 0x38 + (*(int *)(v1 + 0x84) << 7)) = f20;
+                *(f32 *)((char *)D_L20_001B308C + 0x38 + (*(int *)(memberVars + 0x84) << 7)) = amountCopy;
             }
         }
-        s1 += 2;
-        if ((arg0 & 0xFF) == 0xFF) {
+        idList += 2;
+        if ((group & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8 < arg0) {
+        if (D_L20_001B2FB8 < group) {
             goto end;
         }
-        if (s1 == 0) {
+        if (idList == 0) {
             return;
         }
-        if (*(s16 *)(s1 - 2) >= 0) {
+        if (*(s16 *)(idList - 2) >= 0) {
             continue;
         }
-        if (s1 == D_L20_001FBB20[arg0]) {
+        if (idList == D_L20_001FBB20[group]) {
             continue;
         }
         break;
@@ -199,34 +203,35 @@ extern int D_L20_001AED94;
 extern int D_L20_001AED98;
 extern int D_L20_001AED9C;
 
-void func_L20_0039ED78(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
+/* Makes a glowing orb pulse: it spins the angle, blends two colours with a wave and fades the colour, then queues the orb to be drawn. */
+void func_L20_0039ED78(char *moby) {
+    char *state = *(char **)(moby + 0x68);
 
-    if (func_00282948(state) != 0) {
-        func_0029F338(arg0);
+    if (FastFloatHelperD(state) != 0) {
+        MarkMobySpawned(moby);
     } else {
-        f32 x = *(f32 *)(state + 0x8);
-        f32 r, s;
-        int v, w, lo, hi;
+        f32 angle = *(f32 *)(state + 0x8);
+        f32 newAngle, wave;
+        int blendColour, mixedColour, rgbPart, alphaPart;
 
         if (*(int *)(state + 0xC) != 0) {
-            r = func_00283B98(x, (f32)D_L20_001AEDA8 * 0.0002908882452f);
-            *(f32 *)(state + 0x8) = r;
-            s = func_00283198(r);
-            v = func_00283D38(s * 0.5f + 0.5f, D_L20_001AED90, D_L20_001AED94);
+            newAngle = FastAddRotations(angle, (f32)D_L20_001AEDA8 * 0.0002908882452f);
+            *(f32 *)(state + 0x8) = newAngle;
+            wave = FastSinOrCosB(newAngle);
+            blendColour = FastTweenColor(wave * 0.5f + 0.5f, D_L20_001AED90, D_L20_001AED94);
         } else {
-            r = func_00283B98(x, (f32)D_L20_001AEDA8 * 0.0002908882452f);
-            *(f32 *)(state + 0x8) = r;
-            s = func_00283198(r);
-            v = func_00283D38(s * s * 0.5f + 0.5f, D_L20_001AED98, D_L20_001AED9C);
+            newAngle = FastAddRotations(angle, (f32)D_L20_001AEDA8 * 0.0002908882452f);
+            *(f32 *)(state + 0x8) = newAngle;
+            wave = FastSinOrCosB(newAngle);
+            blendColour = FastTweenColor(wave * wave * 0.5f + 0.5f, D_L20_001AED98, D_L20_001AED9C);
         }
-        w = func_00283D38(0.15f, *(int *)(state + 0x10) | *(int *)(state + 0x4), v);
-        lo = w & 0xFFFFFF;
-        hi = w & 0xFF000000;
-        *(int *)(state + 0x10) = hi;
-        *(int *)(state + 0x4) = lo;
-        *(f32 *)(state + 0x14) = func_00283CE0(hi >> 24) * 0.00390625f;
-        func_L00_002E6CF0(func_L20_0039F230, arg0);
+        mixedColour = FastTweenColor(0.15f, *(int *)(state + 0x10) | *(int *)(state + 0x4), blendColour);
+        rgbPart = mixedColour & 0xFFFFFF;
+        alphaPart = mixedColour & 0xFF000000;
+        *(int *)(state + 0x10) = alphaPart;
+        *(int *)(state + 0x4) = rgbPart;
+        *(f32 *)(state + 0x14) = IntToFloat(alphaPart >> 24) * 0.00390625f;
+        AddDrawCallbackToList1(DrawElectricOrb, moby);
     }
 }
 
@@ -249,52 +254,53 @@ extern struct { u8 header[0x464]; u8 collected[0]; } D_L20_0021E340;
 extern struct { u8 header[0x464]; u8 collected[0]; } D_L20_0021EFB0;
 extern s32 D_001A79F0 __attribute__((sda));
 
-void func_L20_003BFEB8(char *arg0) {
-    char *state = *(char **)(arg0 + 0x68);
-    s32 *p = (s32 *)state;
+/* Once its conditions are met, marks this collectable as picked up in the level save tables and then removes it or moves it to its next state. */
+void func_L20_003BFEB8(char *moby) {
+    char *state = *(char **)(moby + 0x68);
+    s32 *slot = (s32 *)state;
     s32 count;
-    s32 c;
+    s32 nextState;
     char *hero;
 
     for (count = 0; count < 8; count++) {
-        if (*p != -1) {
-            if (func_002A8508(*p, -1) != 0) {
+        if (*slot != -1) {
+            if (CountMobysInGroupNotInState(*slot, -1) != 0) {
                 return;
             }
-            p++;
+            slot++;
         }
     }
-    hero = D_00189E20;
+    hero = gHeroState;
     if (*(s32 *)(hero + 0x2294) == 0x31) {
         return;
     }
-    if (*(s32 *)(state + 0x28) != -1 && func_002ACBC8(hero + 0x80, *(s32 *)(state + 0x28)) == 0) {
+    if (*(s32 *)(state + 0x28) != -1 && IsPointInCuboid(hero + 0x80, *(s32 *)(state + 0x28)) == 0) {
         return;
     }
     if (*(s32 *)(state + 0x24) != -1) {
-        *(u8 *)(arg0 + 0xBC) = *(u8 *)(state + 0x24);
+        *(u8 *)(moby + 0xBC) = *(u8 *)(state + 0x24);
     }
-    c = *(s32 *)(state + 0x20);
-    if (c == 0xFF) {
+    nextState = *(s32 *)(state + 0x20);
+    if (nextState == 0xFF) {
         u8 group;
 
-        D_L20_0021E340.collected[*(s16 *)(arg0 + 0xB2)] = *(u8 *)(arg0 + 0xB0) + 2;
-        if (*(u8 *)(arg0 + 0xB0) == 0xFF) {
+        D_L20_0021E340.collected[*(s16 *)(moby + 0xB2)] = *(u8 *)(moby + 0xB0) + 2;
+        if (*(u8 *)(moby + 0xB0) == 0xFF) {
             goto record;
         }
-        group = *(u8 *)(arg0 + 0xB0);
-        if (!(D_L20_001B2DE0[group] & 0x80) && (D_0019B2E8[group + (D_001A79F0 << 4)] & 0x80)) {
+        group = *(u8 *)(moby + 0xB0);
+        if (!(D_L20_001B2DE0[group] & 0x80) && (D_0019B2E8[group + (gCurrentMapIndex << 4)] & 0x80)) {
         record:
-            D_L20_0021EFB0.collected[*(s16 *)(arg0 + 0xB2)] = *(u8 *)(arg0 + 0xB0) + 2;
+            D_L20_0021EFB0.collected[*(s16 *)(moby + 0xB2)] = *(u8 *)(moby + 0xB0) + 2;
         }
-        func_0029F338(arg0);
+        MarkMobySpawned(moby);
         return;
     }
-    if (c != -1) {
-        *(u8 *)(arg0 + 0x20) = *(u8 *)(state + 0x20);
+    if (nextState != -1) {
+        *(u8 *)(moby + 0x20) = *(u8 *)(state + 0x20);
     }
     if (*(s32 *)(state + 0x2C) != -1) {
-        func_L02_0031F858(*(s32 *)(state + 0x2C), 1);
+        SetGroupObjectsEnabled(*(s32 *)(state + 0x2C), 1);
     }
 }
 

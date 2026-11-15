@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef signed int s32;
 typedef unsigned int u32;
@@ -13,6 +14,7 @@ extern u8 D_00189E20[] __attribute__((nosda));
 
 /* Walks the state's class list: the count and the sum of the records of the eight
    known classes go to the state's 0x140 and 0x144 words, the level's default to 0x148. */
+/* Counts the arena fighters of the known kinds and adds up their health at the start of a wave. */
 void func_L11_00440238(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     s32 index = *(s32 *)(state + 0xC0);
@@ -25,12 +27,12 @@ void func_L11_00440238(u8 *obj) {
     if (index == 0xFF) {
         return;
     }
-    list = D_L11_001FC420[index];
+    list = gGroupIdLists[index];
     if (list == 0) {
         return;
     }
     cursor = (u16 *)list;
-    base = D_L11_001B359C;
+    base = gMobyTable_L11;
     do {
         u16 value = *cursor;
         u8 *record = base + ((value & 0x7FFF) << 8);
@@ -38,14 +40,14 @@ void func_L11_00440238(u8 *obj) {
         if (record != 0 && record[0x20] != 0xFE && record[0x20] != 0xFD && record[0x20] != 1) {
             s16 id = *(s16 *)(record + 0xAA);
 
-            if (id == 0xD98 || id == 0xDCF || id == 0xDF4 || id == 0xDF7 ||
-                id == 0xDF9 || id == 0xD37 || id == 0xD4A || id == 0xB3A) {
+            if (id == 0xD98 /* Joba security robot */ || id == 0xDCF /* Joba smasher robot */ || id == 0xDF4 /* moby class 3572 */ || id == 0xDF7 /* moby class 3575 */ ||
+                id == 0xDF9 /* Joba fighter */ || id == 0xD37 /* moby class 3383 */ || id == 0xD4A /* moby class 3402 */ || id == 0xB3A /* Arachnoid */) {
                 *(s32 *)(state + 0x140) += 1;
                 *(f32 *)(state + 0x144) += *(f32 *)(*(u32 *)(record + 0x68) + 0x20);
             }
         }
     } while (*(s16 *)cursor++ >= 0);
-    list = D_00189E20;
+    list = gHeroState;
     *(f32 *)(state + 0x148) = (f32)*(s32 *)(list + 0x24CC);
 }
 
@@ -54,6 +56,7 @@ extern s32 func_L11_00440C90(u8 *obj, u8 *record);
 
 /* Finds the class record the identifier names: the first live record of the state's
    class list whose identifier matches, and hands it to the class's handler. */
+/* Wakes up the first sleeping fighter of the asked kind and sends it into the arena. */
 s32 func_L11_00440790(u8 *obj, s32 id, s32 flag) {
     u8 *state = *(u8 **)(obj + 0x68);
     s32 index = *(s32 *)(state + 0xC0);
@@ -65,12 +68,12 @@ s32 func_L11_00440790(u8 *obj, s32 id, s32 flag) {
     if (index == 0xFF) {
         return 0;
     }
-    list = D_L11_001FC420[index];
+    list = gGroupIdLists[index];
     if (list == 0) {
         return 0;
     }
     cursor = (u16 *)list;
-    base = D_L11_001B359C;
+    base = gMobyTable_L11;
     do {
         record = base + ((*cursor & 0x7FFF) << 8);
 
@@ -78,9 +81,9 @@ s32 func_L11_00440790(u8 *obj, s32 id, s32 flag) {
             *(s16 *)(record + 0xAA) == id && record[0x20] == 1) {
             *(u32 *)(record + 0xB8) = (u32)obj;
             if (flag != 0) {
-                return func_L11_00440970(obj, record);
+                return PlaceAndStartFighter(obj, record);
             }
-            return func_L11_00440C90(obj, record);
+            return AddFighterToSquad(obj, record);
         }
     } while (*(s16 *)cursor++ >= 0);
     return 0;

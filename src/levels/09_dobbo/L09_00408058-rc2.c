@@ -23,51 +23,52 @@
  */
 #include "common.h"
 
-void func_L09_00408058(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    u16 temp_v0_2;
-    u16 var_v0;
-    u16 var_v0_2 ;
-    s32 temp_v1 ;
-    void *temp_v0;
-    void *temp_v0_3;
-    void *temp_v0_4;
+/* Switches parts of an object on or off by setting its flag bits and model: each of the three modes turns something on if positive, off if negative. */
+void func_L09_00408058(void *obj, s32 modeA, s32 modeB, s32 modeC) {
+    u16 flags;
+    u16 newFlags;
+    u16 newFlags2 ;
+    s32 stateByte ;
+    void *classInfo;
+    void *classInfo2;
+    void *classInfo3;
 
-    if ((arg0 != 0) &&
-        (temp_v1 = (*(u8 *)((s8 *)(arg0) + (0x20))), temp_v1 != 0xFE) &&
-        (temp_v1 != 0xFD)) {
-        if ((arg1 != 0) &&
-            ((temp_v0 = (*(void **)((s8 *)(arg0) + (0x24))), temp_v0 == 0) ||
-             ((*(s16 *)((s8 *)(temp_v0) + (0x46))) != 0x12))) {
-            temp_v0_2 = (*(u16 *)((s8 *)(arg0) + (0x34)));
-            if (arg1 > 0) {
-                var_v0 = temp_v0_2 & 0xFFFD;
+    if ((obj != 0) &&
+        (stateByte = (*(u8 *)((s8 *)(obj) + (0x20))), stateByte != 0xFE) &&
+        (stateByte != 0xFD)) {
+        if ((modeA != 0) &&
+            ((classInfo = (*(void **)((s8 *)(obj) + (0x24))), classInfo == 0) ||
+             ((*(s16 *)((s8 *)(classInfo) + (0x46))) != 0x12))) {
+            flags = (*(u16 *)((s8 *)(obj) + (0x34)));
+            if (modeA > 0) {
+                newFlags = flags & 0xFFFD;
             } else {
-                var_v0 = temp_v0_2 | 2;
+                newFlags = flags | 2;
             }
-            (*(u16 *)((s8 *)(arg0) + (0x34))) = var_v0;
+            (*(u16 *)((s8 *)(obj) + (0x34))) = newFlags;
         }
-        if ((arg2 != 0) &&
-            ((arg0 == 0) ||
-             ((temp_v0_3 = (*(void **)((s8 *)(arg0) + (0x24))), temp_v0_3 == 0) ||
-              ((*(s16 *)((s8 *)(temp_v0_3) + (0x46))) != 0x12)))) {
-            temp_v1 = 1;
-            if (arg2 > 0) {
-                (*(s8 *)((s8 *)(arg0) + (0x31))) = temp_v1;
-                var_v0_2 = (*(u16 *)((s8 *)(arg0) + (0x34))) & 0xFFFE;
+        if ((modeB != 0) &&
+            ((obj == 0) ||
+             ((classInfo2 = (*(void **)((s8 *)(obj) + (0x24))), classInfo2 == 0) ||
+              ((*(s16 *)((s8 *)(classInfo2) + (0x46))) != 0x12)))) {
+            stateByte = 1;
+            if (modeB > 0) {
+                (*(s8 *)((s8 *)(obj) + (0x31))) = stateByte;
+                newFlags2 = (*(u16 *)((s8 *)(obj) + (0x34))) & 0xFFFE;
             } else {
-                (*(s8 *)((s8 *)(arg0) + (0x31))) = 0;
-                var_v0_2 = (*(u16 *)((s8 *)(arg0) + (0x34))) | 1;
+                (*(s8 *)((s8 *)(obj) + (0x31))) = 0;
+                newFlags2 = (*(u16 *)((s8 *)(obj) + (0x34))) | 1;
             }
-            (*(u16 *)((s8 *)(arg0) + (0x34))) = var_v0_2;
+            (*(u16 *)((s8 *)(obj) + (0x34))) = newFlags2;
         }
-        if (arg3 != 0) {
-            temp_v0_4 = (*(void **)((s8 *)(arg0) + (0x24)));
-            if (temp_v0_4 != 0) {
-                if (arg3 > 0) {
-                    (*(s32 *)((s8 *)(arg0) + (0x98))) = (s32)(*(s32 *)((s8 *)(temp_v0_4) + (0x10)));
+        if (modeC != 0) {
+            classInfo3 = (*(void **)((s8 *)(obj) + (0x24)));
+            if (classInfo3 != 0) {
+                if (modeC > 0) {
+                    (*(s32 *)((s8 *)(obj) + (0x98))) = (s32)(*(s32 *)((s8 *)(classInfo3) + (0x10)));
                     return;
                 }
-                (*(s32 *)((s8 *)(arg0) + (0x98))) = 0;
+                (*(s32 *)((s8 *)(obj) + (0x98))) = 0;
             }
         }
     }

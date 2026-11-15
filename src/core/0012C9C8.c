@@ -16,26 +16,28 @@ extern int func_0012C878(void *, int);
 extern void func_0012CFA0(void *);
 
 /* rac1-decomp src/core/00125630.c: func_00128BA8 */
-void func_0012C9C8(void *arg0) {
+/* Skips ahead in the video stream to the next start code. */
+void func_0012C9C8(void *decoderPtr) {
     int pad;
 
-    func_0012C3B0(arg0);
+    WaitIpuIdle(decoderPtr);
     pad = -(((int)IPU_BP) & 7) & 7;
     if (pad != 0) {
-        func_0012C788(arg0, pad);
+        SkipMpegBits(decoderPtr, pad);
     }
-    while (func_0012C680(arg0, 0x18) != 1) {
-        func_0012C788(arg0, 8);
+    while (PeekMpegBits(decoderPtr, 0x18) != 1) {
+        SkipMpegBits(decoderPtr, 8);
     }
 }
 
 /* rac1-decomp src/core/00125630.c: func_00128C28 */
-int func_0012CA48(void *arg0) {
-    *(int *)((char *)arg0 + 0x1B4) = func_0012C878(arg0, 5);
-    if (func_0012C878(arg0, 1) != 0) {
-        func_0012C878(arg0, 1);
-        func_0012C788(arg0, 7);
-        func_0012CFA0(arg0);
+/* Reads the rest of a slice header: the quantiser scale and any extra bytes. Always returns 0. */
+int func_0012CA48(void *decoderPtr) {
+    *(int *)((char *)decoderPtr + 0x1B4) = ReadMpegBits(decoderPtr, 5);
+    if (ReadMpegBits(decoderPtr, 1) != 0) {
+        ReadMpegBits(decoderPtr, 1);
+        SkipMpegBits(decoderPtr, 7);
+        SkipMpegExtraInfoBits(decoderPtr);
     }
     return 0;
 }
@@ -68,8 +70,9 @@ extern void r1_func_001291C8_0012CBC0();
  * knows) touch the struct. P_TYPE/B_TYPE (2/3) is the classic
  * (x-2)<2u range check; B_TYPE alone is a plain ==3.
  */
-void func_0012CBC0(void *arg0) {
-    char *s = (char *)arg0;
+/* Reads a picture header: its type and the precision of its motion vectors. */
+void func_0012CBC0(void *decoderPtr) {
+    char *s = (char *)decoderPtr;
     int temporal_reference = r1_func_00128A58_0012CBC0(s, 10);
 
     *(int *)(s + 0x150) = r1_func_00128A58_0012CBC0(s, 3);   /* picture_coding_type */
@@ -112,40 +115,41 @@ typedef struct {
     int progressive_frame;          /* 0x188 */
 } PicExt_0012CDB0;
 
-void func_0012CDB0(void *arg) {
-    PicExt_0012CDB0 *arg0 = arg;
-    int temp_2_35;
-    int temp_6_65;
-    int temp_6_77;
-    int temp_6_89;
+/* Reads the picture coding extension: motion vector precision, field or frame layout and scan settings. */
+void func_0012CDB0(void *decoderPtr) {
+    PicExt_0012CDB0 *dec = decoderPtr;
+    int pictureStructureBits;
+    int qScaleCtrl;
+    int vlcFormatCtrl;
+    int altScanCtrl;
 
-    arg0->f_code00 = func_0012C878(arg0, 4);
-    arg0->f_code01 = func_0012C878(arg0, 4);
-    arg0->f_code10 = func_0012C878(arg0, 4);
-    arg0->f_code11 = func_0012C878(arg0, 4);
-    *(int *)0x10002010 = (*(int *)0x10002010 & 0xFFFCFFFF) | (func_0012C878(arg0, 2) << 0x10);
-    temp_2_35 = func_0012C878(arg0, 2);
-    arg0->picture_structure = temp_2_35;
-    if (arg0->pict_struct0 == 0) {
-        arg0->pict_struct0 = temp_2_35;
+    dec->f_code00 = ReadMpegBits(dec, 4);
+    dec->f_code01 = ReadMpegBits(dec, 4);
+    dec->f_code10 = ReadMpegBits(dec, 4);
+    dec->f_code11 = ReadMpegBits(dec, 4);
+    *(int *)0x10002010 = (*(int *)0x10002010 & 0xFFFCFFFF) | (ReadMpegBits(dec, 2) << 0x10);
+    pictureStructureBits = ReadMpegBits(dec, 2);
+    dec->picture_structure = pictureStructureBits;
+    if (dec->pict_struct0 == 0) {
+        dec->pict_struct0 = pictureStructureBits;
     }
-    arg0->top_field_first = func_0012C878(arg0, 1);
-    arg0->frame_pred_frame_dct = func_0012C878(arg0, 1);
-    arg0->concealment_mvs = func_0012C878(arg0, 1);
-    temp_6_65 = (IPU_CTRL & 0xFFBFFFFF) | (func_0012C878(arg0, 1) << 0x16);
-    IPU_CTRL = temp_6_65;
-    temp_6_77 = (IPU_CTRL & 0xFFDFFFFF) | (func_0012C878(arg0, 1) << 0x15);
-    IPU_CTRL = temp_6_77;
-    temp_6_89 = (IPU_CTRL & 0xFFEFFFFF) | (func_0012C878(arg0, 1) << 0x14);
-    IPU_CTRL = temp_6_89;
-    arg0->repeat_first_field = func_0012C878(arg0, 1);
-    func_0012C878(arg0, 1);
-    arg0->progressive_frame = func_0012C878(arg0, 1);
-    if (func_0012C878(arg0, 1) != 0) {
-        func_0012C878(arg0, 1);
-        func_0012C878(arg0, 3);
-        func_0012C878(arg0, 1);
-        func_0012C878(arg0, 7);
-        func_0012C878(arg0, 8);
+    dec->top_field_first = ReadMpegBits(dec, 1);
+    dec->frame_pred_frame_dct = ReadMpegBits(dec, 1);
+    dec->concealment_mvs = ReadMpegBits(dec, 1);
+    qScaleCtrl = (IPU_CTRL & 0xFFBFFFFF) | (ReadMpegBits(dec, 1) << 0x16);
+    IPU_CTRL = qScaleCtrl;
+    vlcFormatCtrl = (IPU_CTRL & 0xFFDFFFFF) | (ReadMpegBits(dec, 1) << 0x15);
+    IPU_CTRL = vlcFormatCtrl;
+    altScanCtrl = (IPU_CTRL & 0xFFEFFFFF) | (ReadMpegBits(dec, 1) << 0x14);
+    IPU_CTRL = altScanCtrl;
+    dec->repeat_first_field = ReadMpegBits(dec, 1);
+    ReadMpegBits(dec, 1);
+    dec->progressive_frame = ReadMpegBits(dec, 1);
+    if (ReadMpegBits(dec, 1) != 0) {
+        ReadMpegBits(dec, 1);
+        ReadMpegBits(dec, 3);
+        ReadMpegBits(dec, 1);
+        ReadMpegBits(dec, 7);
+        ReadMpegBits(dec, 8);
     }
 }

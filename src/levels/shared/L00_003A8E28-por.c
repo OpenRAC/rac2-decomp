@@ -39,6 +39,7 @@ extern void func_002AFFD8(void *, void *, int);
 extern void func_00282DD8(void *, void *, void *);
 extern void func_00282CC0(void *, void *, void *);
 
+/* Stores a new position sample for a trail in the slot that belongs to its source. */
 void func_L00_003A8E28(Actor *self)
 {
     Slot *slots;
@@ -48,19 +49,19 @@ void func_L00_003A8E28(Actor *self)
 
     source = self->source;
     if (D_0018C0B4 == 0x1D) return;
-    base = func_L00_0032A088(0x5CB, source->id);
-    slots = (Slot *)(base + *func_L00_0032A0B8(0x5CB, source->id));
-    func_00282F20(&m, source, 1.0f);
+    base = GetSlotBody(0x5CB, source->id);
+    slots = (Slot *)(base + *GetSlotHeader(0x5CB, source->id));
+    vec_scale_to_length(&m, source, 1.0f);
     dir.q = 0;
     dir.f[2] = 1.0f;
     dir.f[3] = 1.0f;
-    if (D_L00_001A8FF0) func_002AFFD8(&self->pos, &dir, 1);
-    func_00282DD8(&tmp, &m, &dir);
-    func_00282F20(&tmp, &tmp, 1.0f);
-    func_00282DD8(&slots[source->index].d, &tmp, &m);
+    if (D_L00_001A8FF0) ComputeViewDirection(&self->pos, &dir, 1);
+    FastVecCross(&tmp, &m, &dir);
+    vec_scale_to_length(&tmp, &tmp, 1.0f);
+    FastVecCross(&slots[source->index].d, &tmp, &m);
     qcopy_nc(&slots[source->index].c, &m);
     qcopy_nc(&slots[source->index].pos, &self->pos);
-    func_00282CC0(&slots[source->index].a, &self->pos, source);
+    FastVecAdd(&slots[source->index].a, &self->pos, source);
     qcopy_nc(&slots[source->index].b, &slots[source->index].a);
     slots[source->index].count = D_L00_001AF770;
     slots[source->index].rate = 1.0f / slots[source->index].count;
@@ -100,6 +101,7 @@ extern char *func_002BBCB0(void *, void *, int, int, float, int, int, float, int
 extern char *func_L00_003A0DA0(int, void *, void *, int, unsigned char, unsigned char,
                                unsigned char, unsigned char, float);
 
+/* Makes a burst of sparks and glows where a group of trail points is used up. */
 void func_L00_003B14D0(float x, float y, float z)
 {
     Vec16_Fc936841d p, v;
@@ -115,58 +117,58 @@ void func_L00_003B14D0(float x, float y, float z)
     p.x = x;
     p.y = y;
     p.z = z;
-    n = func_00277F48(&p, 16, D_00189E20.owner, 0, 3.0f);
+    n = ProcessCollisionHit(&p, 16, gHeroState.owner, 0, 3.0f);
     one = 1.0f;
-    func_002A9850(D_00189E20.owner, &p, D_L00_001C3280, n, 0, 0x830000, 2, 1, 8.0f, one, one);
+    QueueKnockbackForNodes(gHeroState.owner, &p, gAreaHitTargets, n, 0, 0x830000, 2, 1, 8.0f, one, one);
     *(EffectQuad *)&v = 0;
     v.z = 1.0f / 30.0f;
-    func_00282CF0(&delta, D_L00_001B8DC0, &p);
-    distance = func_00282DF0(&delta);
-    n = distance < 6.0f ? func_00283CF0(distance) + 1 : 4;
+    FastVecSub(&delta, gCameraPosition_L00, &p);
+    distance = FastVecLength(&delta);
+    n = distance < 6.0f ? FloatToInt(distance) + 1 : 4;
     fade = 0.0f;
     if (distance < 7.0f)
         fade = 7.0f - distance;
     {
         int count;
         for (count = 0; count < n; count++) {
-            speed = func_002A7878(8.0f, 10.0f) * (1.0f / 60.0f);
+            speed = RandomFloatRange(8.0f, 10.0f) * (1.0f / 60.0f);
             speed -= fade * (1.0f / 60.0f);
             a = D_L00_001AF858;
             b = D_L00_001AF870;
             {
-                int choice = func_002A77E0(6);
-                EffectMaterial *entry = D_L00_00262570 + D_00139568.index;
-                ca = func_002AAFA0(a.v[choice], entry->enabled != 0);
-                choice = func_002A77E0(6);
-                entry = D_L00_00262570 + D_00139568.index;
-                cb = func_002AAFA0(b.v[choice], entry->enabled != 0);
+                int choice = RandomIntBelow(6);
+                EffectMaterial *entry = gWeaponTable_L00 + gItemSlotToRecord.index;
+                ca = SwapPackedColorChannels(a.v[choice], entry->enabled != 0);
+                choice = RandomIntBelow(6);
+                entry = gWeaponTable_L00 + gItemSlotToRecord.index;
+                cb = SwapPackedColorChannels(b.v[choice], entry->enabled != 0);
             }
-            t0 = func_002A7820(15, 20);
-            t1 = func_002A7820(25, 30);
-            func_002BBCB0(&p, &v, ca, cb, 400000.0f, t0, t1, speed, 0, 0);
+            t0 = RandomIntRange(15, 20);
+            t1 = RandomIntRange(25, 30);
+            SpawnFireworkSparkParticle(&p, &v, ca, cb, 400000.0f, t0, t1, speed, 0, 0);
         }
     }
     if (distance > 9.0f) {
-        func_L00_003A0DA0(D_00189E20.owner, &p, &v, 15, 127, 127, 127, 32, one * 4.0f);
+        CreateExplosionEffect(gHeroState.owner, &p, &v, 15, 127, 127, 127, 32, one * 4.0f);
         r = 127;
         g = 32;
         blue = 0;
-        func_002AAF40(&r, &g, &blue, D_L00_00262570[D_00139568.index].enabled != 0);
-        func_L00_003A0DA0(D_00189E20.owner, &p, &v, 24, r, g, blue, 32, one * 4.0f);
+        swap_color_channel_words(&r, &g, &blue, gWeaponTable_L00[gItemSlotToRecord.index].enabled != 0);
+        CreateExplosionEffect(gHeroState.owner, &p, &v, 24, r, g, blue, 32, one * 4.0f);
     }
     c0 = 127;
     c1 = 63;
     c2 = 0;
-    func_002AAF40(&c0, &c1, &c2, D_L00_00262570[D_00139568.index].enabled != 0);
-    func_L00_003A0DA0(D_00189E20.owner, &p, &v, 20, c0, c1, c2, 48, one * 4.0f);
+    swap_color_channel_words(&c0, &c1, &c2, gWeaponTable_L00[gItemSlotToRecord.index].enabled != 0);
+    CreateExplosionEffect(gHeroState.owner, &p, &v, 20, c0, c1, c2, 48, one * 4.0f);
     c0 = 96;
     c1 = 16;
     c2 = 0;
-    func_002AAF40(&c0, &c1, &c2, D_L00_00262570[D_00139568.index].enabled != 0);
-    func_L00_003A0DA0(D_00189E20.owner, &p, &v, 27, c0, c1, c2, 64, one * 3.5f);
+    swap_color_channel_words(&c0, &c1, &c2, gWeaponTable_L00[gItemSlotToRecord.index].enabled != 0);
+    CreateExplosionEffect(gHeroState.owner, &p, &v, 27, c0, c1, c2, 64, one * 3.5f);
     c0 = 32;
     c1 = 0;
     c2 = 0;
-    func_002AAF40(&c0, &c1, &c2, D_L00_00262570[D_00139568.index].enabled != 0);
-    func_L00_003A0DA0(D_00189E20.owner, &p, &v, 29, c0, c1, c2, 32, one * 3.0f);
+    swap_color_channel_words(&c0, &c1, &c2, gWeaponTable_L00[gItemSlotToRecord.index].enabled != 0);
+    CreateExplosionEffect(gHeroState.owner, &p, &v, 29, c0, c1, c2, 32, one * 3.0f);
 }

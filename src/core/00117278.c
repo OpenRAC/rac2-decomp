@@ -58,6 +58,7 @@ extern const char _ctype_[];
 
 #define ERANGE 34
 
+/* Turns a text string of digits into a whole number in the given number base. */
 long func_00117278(struct _reent *rptr, const char *nptr, char **endptr, int base) {
     register const char *s = nptr;
     register unsigned long acc;

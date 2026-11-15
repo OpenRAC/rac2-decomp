@@ -33,28 +33,29 @@ extern s32 func_0011AC40(s32);
 extern s32 func_0011AC70(s32);
 extern s32 func_0011D620(s32, s32, s32, s32, s32, s32, s32, s32, s32);
 
-s32 func_00127F90(s32 arg0, s32 arg1) {
-    s8 *base = D_00141B00;
-    s8 *blk;
-    s32 a1 = arg1;
-    s32 a0;
-    s32 r;
+/* Sends a memory card command that takes a port and a slot (probably the format command). */
+s32 func_00127F90(s32 port, s32 slot) {
+    s8 *client = D_00141B00;
+    s8 *request;
+    s32 slotCopy = slot;
+    s32 portCopy;
+    s32 result;
 
-    if (*(s32 *)(base + 0x24) == 0) {
+    if (*(s32 *)(client + 0x24) == 0) {
         return -0x64;
     }
-    a0 = arg0;
-    if (func_0011AC70(D_00137E6C) < 0) {
+    portCopy = port;
+    if (PollSema(D_00137E6C) < 0) {
         return -0xC8;
     }
-    blk = D_00141B80;
-    *(s32 *)(blk + 4) = a0;
-    *(s32 *)(blk + 8) = a1;
-    r = func_0011D620((s32)base, 0x10, 1, (s32)blk, 0x30, (s32)D_001430C0, 4, 0, 0);
-    if (r == 0) {
+    request = D_00141B80;
+    *(s32 *)(request + 4) = portCopy;
+    *(s32 *)(request + 8) = slotCopy;
+    result = CallRpcServer((s32)client, 0x10, 1, (s32)request, 0x30, (s32)D_001430C0, 4, 0, 0);
+    if (result == 0) {
         D_00137E68 = 0x10;
     } else {
-        func_0011AC40(D_00137E6C);
+        SignalSema(D_00137E6C);
     }
-    return r;
+    return result;
 }

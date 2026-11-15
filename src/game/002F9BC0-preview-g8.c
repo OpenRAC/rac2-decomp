@@ -85,6 +85,8 @@ extern void func_00294BC8(int, int);
 typedef char PreviewMobySize[(sizeof(PreviewMoby) == 0x100) ? 1 : -1];
 typedef char PreviewStateSize[(sizeof(PreviewState) == 0x760) ? 1 : -1];
 
+/* Sets up the 3D preview for the shop entry that is selected: armor, equipment pieces or an item
+   model, or a picture and description for items and ammo. */
 void func_002FB1A0(void)
 {
     PreviewClasses classes;
@@ -95,25 +97,25 @@ void func_002FB1A0(void)
     PreviewState *state;
     int mode;
     float facing;
-    if (D_0021F240.resourceActive) func_002FB170();
-    mode = D_0021F240.mode;
-    moby = D_0021F240.objects;
-    D_0021F240.objectCount = 1;
+    if (gVendorMenuState.resourceActive) ClearShopPreview();
+    mode = gVendorMenuState.mode;
+    moby = gVendorMenuState.objects;
+    gVendorMenuState.objectCount = 1;
     if (mode == 3) {
-        D_0021F240.objectCount = 0;
+        gVendorMenuState.objectCount = 0;
         classes = D_001AD500;
-        if (D_0021F240.rows.armor[D_0021F240.selected].value == 0) {
-            func_002F88D8(((char *)func_00288FB8(0x3188)));
+        if (gVendorMenuState.rows.armor[gVendorMenuState.selected].value == 0) {
+            SetShopMessageText(((char *)GetLocalizedString(0x3188)));
         } else {
-            if (D_001A7290[0] != D_0021F240.rows.armor[D_0021F240.selected].value)
-                func_002923C0((void *)D_0021F240.rows.armor[D_0021F240.selected].value);
-            func_002F88D8(((char *)func_00288FB8(D_001AD250[D_0021F240.rows.armor[D_0021F240.selected].value])));
+            if (D_001A7290[0] != gVendorMenuState.rows.armor[gVendorMenuState.selected].value)
+                LoadLevelTexturePack((void *)gVendorMenuState.rows.armor[gVendorMenuState.selected].value);
+            SetShopMessageText(((char *)GetLocalizedString(D_001AD250[gVendorMenuState.rows.armor[gVendorMenuState.selected].value])));
         }
-        facing = func_00283B98(func_00283248(D_001B5200.x, D_001B5200.y), 1.7453294f);
-        while (classes.ids[D_0021F240.objectCount] >= 0) {
-            moby = &D_0021F240.objects[D_0021F240.objectCount];
-            func_0029F0C8(moby, classes.ids[D_0021F240.objectCount]);
-            func_002A0468(moby, 0x202020, 14, 14, 0);
+        facing = FastAddRotations(FastMatrixHelperA(gActiveCamera.x, gActiveCamera.y), 1.7453294f);
+        while (classes.ids[gVendorMenuState.objectCount] >= 0) {
+            moby = &gVendorMenuState.objects[gVendorMenuState.objectCount];
+            InitMobyInstance(moby, classes.ids[gVendorMenuState.objectCount]);
+            PackRenderCommandFields(moby, 0x202020, 14, 14, 0);
             moby->color = 0x80808080;
             moby->drawMask = 64;
             moby->render = 1;
@@ -126,128 +128,128 @@ void func_002FB1A0(void)
             moby->unk62 = 255;
             func_002A0F48(moby);
             moby->anim = 0; moby->anim2 = 0;
-            func_0029F390(moby);
+            update_moby_animation_state(moby);
             if (D_001A7290[0]) moby->rotZ = facing;
-            if (D_001A7290[0] == 4 && moby->classId == 0x50A) moby->flags |= 1;
-            if (D_001A7290[0] >= 3 && moby->classId == 0xA73) moby->flags |= 1;
-            D_0021F240.objectCount++;
+            if (D_001A7290[0] == 4 && moby->classId == 0x50A /* moby class 1290 */) moby->flags |= 1;
+            if (D_001A7290[0] >= 3 && moby->classId == 0xA73 /* moby class 2675 */) moby->flags |= 1;
+            gVendorMenuState.objectCount++;
         }
-        func_00282A60(D_001B1390, 0, 0x40);
-        func_0029F978(D_0021F240.objects, 24, D_001B1390);
+        ClearMemory(D_001B1390, 0, 0x40);
+        AttachManipulator(gVendorMenuState.objects, 24, D_001B1390);
         D_001B1390[10] = D_001A7C94[0];
         D_001B1390[9] = D_001B1390[8] = D_001A7C94[0] * 0.97f;
         if (D_001A7290[0] < 3) {
             int i;
-            func_00282A60(&D_001B2980[0], 0, 0x40);
-            func_00282A60(&D_001B2980[1], 0, 0x40);
+            ClearMemory(&D_001B2980[0], 0, 0x40);
+            ClearMemory(&D_001B2980[1], 0, 0x40);
             for (i = 0; i < 2; i++) {
                 PreviewTransform *transform = &D_001B2980[i];
-                func_0029F978(D_0021F240.objects, i + 22, transform);
+                AttachManipulator(gVendorMenuState.objects, i + 22, transform);
                 transform->m[8] = 0.01f;
                 transform->m[9] = 0.01f;
                 transform->m[10] = 0.01f;
             }
         }
         {
-            PreviewMoby *moby = D_0021F240.objects;
+            PreviewMoby *moby = gVendorMenuState.objects;
             PreviewClass *pc = moby->pclass;
             PreviewAnimation *anim = pc->anim[moby->anim];
             if (anim->data[0] & 0xF0000000) {
                 func_002A1130((char *)&anim->data[anim->frames] + anim->triggers * 4,
-                             anim->data[moby->frame], D_0021F240.animBuffers[0], pc->count);
-                moby->animData = D_0021F240.animBuffers[0];
+                             anim->data[moby->frame], gVendorMenuState.animBuffers[0], pc->count);
+                moby->animData = gVendorMenuState.animBuffers[0];
             }
             {
                 PreviewClass *pc2 = moby->pclass;
                 PreviewAnimation *anim2 = pc2->anim[moby->anim2];
                 if (anim2->data[0] & 0xF0000000) {
                     func_002A1130((char *)&anim2->data[anim2->frames] + anim2->triggers * 4,
-                                 anim2->data[moby->frame2], D_0021F240.animBuffers[1], pc2->count);
-                    moby->animData2 = D_0021F240.animBuffers[1];
+                                 anim2->data[moby->frame2], gVendorMenuState.animBuffers[1], pc2->count);
+                    moby->animData2 = gVendorMenuState.animBuffers[1];
                 }
             }
         }
         do {
-            D_0021F240.position[0] = -9.0f; D_0021F240.position[1] = 4.5f; D_0021F240.position[2] = -1.0f;
-            D_0021F240.scale = 3.5f; D_0021F240.modelActive = 1;
-            D_0021F240.field9c = 0; D_0021F240.resourceActive = 0; D_0021F240.field90 = 0;
+            gVendorMenuState.position[0] = -9.0f; gVendorMenuState.position[1] = 4.5f; gVendorMenuState.position[2] = -1.0f;
+            gVendorMenuState.scale = 3.5f; gVendorMenuState.modelActive = 1;
+            gVendorMenuState.field9c = 0; gVendorMenuState.resourceActive = 0; gVendorMenuState.field90 = 0;
         } while (0);
     } else if (mode == 2) {
-        int index = D_0021F240.selected;
+        int index = gVendorMenuState.selected;
         int kind;
         int value;
         int armor;
-        D_0021F240.objectCount = 10;
-        D_0021F240.equipment = (D_001A7AF0[0] & ~D_0021F240.rows.equipment[index].value) | D_0021F240.rows.equipment[index].unknown;
-        parts[0] = D_001A8C20[D_0021F240.equipment & 3] << 16;
-        if (D_0021F240.rows.equipment[index].value == 3) parts[0] |= 0x80000000;
-        parts[1] = D_001A8C28[(D_0021F240.equipment & 12) >> 2] << 16;
+        gVendorMenuState.objectCount = 10;
+        gVendorMenuState.equipment = (gEquipmentBits[0] & ~gVendorMenuState.rows.equipment[index].value) | gVendorMenuState.rows.equipment[index].unknown;
+        parts[0] = D_001A8C20[gVendorMenuState.equipment & 3] << 16;
+        if (gVendorMenuState.rows.equipment[index].value == 3) parts[0] |= 0x80000000;
+        parts[1] = D_001A8C28[(gVendorMenuState.equipment & 12) >> 2] << 16;
         parts[2] = parts[1] | 0x8000;
-        if (D_0021F240.rows.equipment[index].value == 12) { parts[1] |= 0x80000000; parts[2] |= 0x80000000; }
-        parts[3] = D_001A8C50[(D_0021F240.equipment & 0xC00) >> 10] << 16;
+        if (gVendorMenuState.rows.equipment[index].value == 12) { parts[1] |= 0x80000000; parts[2] |= 0x80000000; }
+        parts[3] = D_001A8C50[(gVendorMenuState.equipment & 0xC00) >> 10] << 16;
         parts[4] = parts[3] | 0x8000;
-        if (D_0021F240.rows.equipment[index].value == 0xC00) { parts[3] |= 0x80000000; parts[4] |= 0x80000000; }
-        parts[5] = D_001A8C30[(D_0021F240.equipment & 0x30) >> 4] << 16;
-        if (D_0021F240.rows.equipment[index].value == 0x30) parts[5] |= 0x80000000;
-        parts[6] = D_001A8C38[(D_0021F240.equipment & 0x40) >> 6] << 16;
+        if (gVendorMenuState.rows.equipment[index].value == 0xC00) { parts[3] |= 0x80000000; parts[4] |= 0x80000000; }
+        parts[5] = D_001A8C30[(gVendorMenuState.equipment & 0x30) >> 4] << 16;
+        if (gVendorMenuState.rows.equipment[index].value == 0x30) parts[5] |= 0x80000000;
+        parts[6] = D_001A8C38[(gVendorMenuState.equipment & 0x40) >> 6] << 16;
         parts[7] = parts[6] | 0x8000;
-        if (D_0021F240.rows.equipment[index].value == 0x40) { parts[6] |= 0x80000000; parts[7] |= 0x80000000; }
-        parts[8] = D_001A8C48[(D_0021F240.equipment & 0x200) >> 9] << 16;
+        if (gVendorMenuState.rows.equipment[index].value == 0x40) { parts[6] |= 0x80000000; parts[7] |= 0x80000000; }
+        parts[8] = D_001A8C48[(gVendorMenuState.equipment & 0x200) >> 9] << 16;
         parts[9] = parts[8] | 0x8000;
-        if (D_0021F240.rows.equipment[index].value == 0x200) { parts[8] |= 0x80000000; parts[9] |= 0x80000000; }
-        kind = (D_0021F240.equipment & 0x180) >> 7;
+        if (gVendorMenuState.rows.equipment[index].value == 0x200) { parts[8] |= 0x80000000; parts[9] |= 0x80000000; }
+        kind = (gVendorMenuState.equipment & 0x180) >> 7;
         if (kind) {
-            int n = D_0021F240.objectCount;
+            int n = gVendorMenuState.objectCount;
             parts[n] = parts[n + 1] = D_001A8C40[kind] << 16;
             parts[n + 1] |= 0x8000;
-            if (D_0021F240.rows.equipment[index].value == 0x180) {
+            if (gVendorMenuState.rows.equipment[index].value == 0x180) {
                 parts[n] |= 0x80000000;
                 parts[n + 1] |= 0x80000000;
             }
-            D_0021F240.objectCount += 2;
+            gVendorMenuState.objectCount += 2;
         }
-        parts[D_0021F240.objectCount] = D_001A8C58[(D_0021F240.equipment & 0xC000) >> 14] << 16;
-        if (D_0021F240.rows.equipment[index].value == 0xC000) parts[D_0021F240.objectCount] |= 0x80000000;
-        D_0021F240.objectCount++;
-        if (D_0021F240.equipment & 0x1000) {
-            parts[D_0021F240.objectCount] = 0x10E20000;
-            if (D_0021F240.rows.equipment[index].value == 0x1000) parts[D_0021F240.objectCount] = 0x90E20000;
-            D_0021F240.objectCount++;
+        parts[gVendorMenuState.objectCount] = D_001A8C58[(gVendorMenuState.equipment & 0xC000) >> 14] << 16;
+        if (gVendorMenuState.rows.equipment[index].value == 0xC000) parts[gVendorMenuState.objectCount] |= 0x80000000;
+        gVendorMenuState.objectCount++;
+        if (gVendorMenuState.equipment & 0x1000) {
+            parts[gVendorMenuState.objectCount] = 0x10E20000;
+            if (gVendorMenuState.rows.equipment[index].value == 0x1000) parts[gVendorMenuState.objectCount] = 0x90E20000;
+            gVendorMenuState.objectCount++;
         }
-        if (D_0021F240.equipment & 0x2000) {
-            parts[D_0021F240.objectCount] = 0x10E40000;
-            if (D_0021F240.rows.equipment[index].value == 0x2000) parts[D_0021F240.objectCount] = 0x90E40000;
-            D_0021F240.objectCount++;
+        if (gVendorMenuState.equipment & 0x2000) {
+            parts[gVendorMenuState.objectCount] = 0x10E40000;
+            if (gVendorMenuState.rows.equipment[index].value == 0x2000) parts[gVendorMenuState.objectCount] = 0x90E40000;
+            gVendorMenuState.objectCount++;
         }
-        parts[D_0021F240.objectCount++] = 0x10E30000;
-        D_0021F240.fielda4 = 0;
-        value = D_0021F240.rows.equipment[index].value;
+        parts[gVendorMenuState.objectCount++] = 0x10E30000;
+        gVendorMenuState.fielda4 = 0;
+        value = gVendorMenuState.rows.equipment[index].value;
         if (value == 0xC00 || value == 0x200 || value == 12 || value == 3 || value == 0x40) {
-            D_0021F240.x = 0.346f; D_0021F240.y = 0.3227f; D_0021F240.z = -0.7141964f;
+            gVendorMenuState.x = 0.346f; gVendorMenuState.y = 0.3227f; gVendorMenuState.z = -0.7141964f;
         } else if (value == 0x30 || value == 0x2000) {
-            D_0021F240.x = 0.0225f; D_0021F240.y = 0.0239f; D_0021F240.z = func_00283BE0(-3.0301f, 1.5707964f);
+            gVendorMenuState.x = 0.0225f; gVendorMenuState.y = 0.0239f; gVendorMenuState.z = fast_subtract_rotations(-3.0301f, 1.5707964f);
         } else if (value == 0x1000 || value == 0x180) {
-            D_0021F240.x = -0.587f; D_0021F240.y = 0.165f; D_0021F240.z = 0.4842037f;
+            gVendorMenuState.x = -0.587f; gVendorMenuState.y = 0.165f; gVendorMenuState.z = 0.4842037f;
         } else if (value == 0x1F0000) {
-            D_0021F240.x = (index & 1) ? 0.533f : 0.566f;
-            D_0021F240.y = (index & 1) ? 0.3203f : 0.165f;
-            D_0021F240.z = (index & 1) ? -0.90089637f : -0.13629639f;
+            gVendorMenuState.x = (index & 1) ? 0.533f : 0.566f;
+            gVendorMenuState.y = (index & 1) ? 0.3203f : 0.165f;
+            gVendorMenuState.z = (index & 1) ? -0.90089637f : -0.13629639f;
         } else if (value == 0xC000) {
-            D_0021F240.x = -0.5f; D_0021F240.y = -0.4f; D_0021F240.z = func_00283BE0(-2.1f, 1.5707964f);
+            gVendorMenuState.x = -0.5f; gVendorMenuState.y = -0.4f; gVendorMenuState.z = fast_subtract_rotations(-2.1f, 1.5707964f);
         } else {
-            D_0021F240.x = 0; D_0021F240.y = 0; D_0021F240.z = -1.5707964f;
+            gVendorMenuState.x = 0; gVendorMenuState.y = 0; gVendorMenuState.z = -1.5707964f;
         }
         {
             int i;
             int n = 0;
-            D_0021F240.selectedPart[1] = D_0021F240.selectedPart[0] = -1;
-            for (i = 0; i < D_0021F240.objectCount; i++) {
-                PreviewState *loopState = &D_0021F240;
+            gVendorMenuState.selectedPart[1] = gVendorMenuState.selectedPart[0] = -1;
+            for (i = 0; i < gVendorMenuState.objectCount; i++) {
+                PreviewState *loopState = &gVendorMenuState;
                 PreviewMoby *moby = &loopState->objects[i];
                 float one = 1.0f;
                 unsigned mask = 0x80000000;
-                func_0029F0C8(moby, (unsigned short)((unsigned)parts[i] >> 16) & 0x7FFF);
-                func_002A0468(moby, 0x202020, 14, 14, 0);
+                InitMobyInstance(moby, (unsigned short)((unsigned)parts[i] >> 16) & 0x7FFF);
+                PackRenderCommandFields(moby, 0x202020, 14, 14, 0);
                 if ((unsigned)parts[i] & mask) loopState->selectedPart[n++] = i;
                 moby->drawMask = 0x100;
                 moby->render = 1;
@@ -264,50 +266,50 @@ void func_002FB1A0(void)
                 func_002A0F48(moby);
             }
         }
-        state = &D_0021F240;
+        state = &gVendorMenuState;
         state->modelActive = 1; state->field9c = 0; state->resourceActive = 0; state->field90 = 0;
-        func_002F88D8(((char *)func_00288FB8(state->rows.equipment[state->selected].extra)));
+        SetShopMessageText(((char *)GetLocalizedString(state->rows.equipment[state->selected].extra)));
         armor = ((unsigned)state->equipment >> 16) & 0x1F;
-        if (D_00152C00[12] != armor) func_002926B8(armor);
+        if (gHeroMoby_00152C00[12] != armor) LoadDiscTableTexture(armor);
     } else if (mode == 0) {
-        D_0021F240.field750 = 0;
-        if (D_0021F240.rows.item[D_0021F240.selected].kind == 1) {
-            func_0029F0C8(moby, 0xCDB);
-            func_002A0468(moby, 0x202020, 14, 14, 0);
+        gVendorMenuState.field750 = 0;
+        if (gVendorMenuState.rows.item[gVendorMenuState.selected].kind == 1) {
+            InitMobyInstance(moby, 0xCDB /* Ammo */);
+            PackRenderCommandFields(moby, 0x202020, 14, 14, 0);
             moby->drawMask = 64; moby->color = 0x80808080; moby->flags = 0x2010;
             moby->render = 1; moby->opacity = 0; moby->unk23 = 0; moby->state = 0; moby->unk98 = 0; moby->unk7c = 1;
-            D_0021F240.scale = 3.5f;
-            qcopy(D_0021F240.position, D_001AD1D0);
-            if (D_001A7BB1) D_0021F240.position[2] -= 0.55f;
+            gVendorMenuState.scale = 3.5f;
+            qcopy(gVendorMenuState.position, D_001AD1D0);
+            if (D_001A7BB1) gVendorMenuState.position[2] -= 0.55f;
             moby->rotX = 0; moby->rotY = 0; moby->rotZ = 0;
-            D_0021F240.field9c = 0;
+            gVendorMenuState.field9c = 0;
             func_002A0F48(moby);
-            D_0021F240.modelActive = 1; D_0021F240.resourceActive = 0;
-            D_0021F240.field90 = 0;
+            gVendorMenuState.modelActive = 1; gVendorMenuState.resourceActive = 0;
+            gVendorMenuState.field90 = 0;
         } else {
-            if (D_0021F240.rows.item[D_0021F240.selected].owned) {
+            if (gVendorMenuState.rows.item[gVendorMenuState.selected].owned) {
                 int special = 0;
-                switch (D_0021F240.rows.item[D_0021F240.selected].id) {
+                switch (gVendorMenuState.rows.item[gVendorMenuState.selected].id) {
                 case 12: case 14: case 17: case 18: case 53: special = 1;
                 }
-                func_00288870(&info, D_0021F240.rows.item[D_0021F240.selected].id, special ? 1 : 2);
-                func_002F88D8(((char *)func_00288FB8(info.text)));
+                CopyHelpRecordAtDepth(&info, gVendorMenuState.rows.item[gVendorMenuState.selected].id, special ? 1 : 2);
+                SetShopMessageText(((char *)GetLocalizedString(info.text)));
             } else {
-                func_002F88D8(((char *)func_00288FB8((D_00139568[D_0021F240.rows.item[D_0021F240.selected].id] + D_00239BA0)->text)));
+                SetShopMessageText(((char *)GetLocalizedString((gItemSlotToRecord[gVendorMenuState.rows.item[gVendorMenuState.selected].id] + gWeaponTable_00239BA0)->text)));
             }
-            func_002B7CE0(1);
-            state = &D_0021F240;
-            func_00294BC8(state->rows.item[state->selected].resource, state->buffer);
+            PumpMusicAndDiscRead(1);
+            state = &gVendorMenuState;
+            StartDiscEntryLoadById(state->rows.item[state->selected].resource, state->buffer);
             state->resourceActive = 1; state->previous = state->selected; state->modelActive = 0;
         }
     } else if (mode == 1) {
-        if (D_0021F240.count) {
-            func_002F88D8(((char *)func_00288FB8(D_001A8B00[D_0021F240.rows.ammo[D_0021F240.selected][0]])));
-            func_002B7CE0(1);
-            func_00294BC8(D_0021F240.rows.ammo[D_0021F240.selected][3], D_0021F240.buffer);
-            D_0021F240.resourceActive = 1; D_0021F240.previous = D_0021F240.selected; D_0021F240.modelActive = 0;
+        if (gVendorMenuState.count) {
+            SetShopMessageText(((char *)GetLocalizedString(D_001A8B00[gVendorMenuState.rows.ammo[gVendorMenuState.selected][0]])));
+            PumpMusicAndDiscRead(1);
+            StartDiscEntryLoadById(gVendorMenuState.rows.ammo[gVendorMenuState.selected][3], gVendorMenuState.buffer);
+            gVendorMenuState.resourceActive = 1; gVendorMenuState.previous = gVendorMenuState.selected; gVendorMenuState.modelActive = 0;
         }
     } else {
-        D_0021F240.resourceActive = 0; D_0021F240.modelActive = 0;
+        gVendorMenuState.resourceActive = 0; gVendorMenuState.modelActive = 0;
     }
 }

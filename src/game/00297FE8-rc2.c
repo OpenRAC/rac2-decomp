@@ -26,20 +26,21 @@
 extern f32 *func_00297F98(s32);
 extern s32 D_001A79F0;
 
-void func_00297FE8(f32 fparg0, f32 fparg1, f32 *arg0, f32 *arg1, s32 arg2) {
-    f32 *temp_s1;
-    f32 *temp_s1_2;
-    s32 temp_s0;
+/* Turns a world position into a 0-1 position on the map screen for the given map (or the current map when -1 is passed). */
+void func_00297FE8(f32 worldX, f32 worldY, f32 *outMapX, f32 *outMapY, s32 requestedMap) {
+    f32 *xTransform;
+    f32 *yTransform;
+    s32 mapIndex;
 
-    temp_s0 = (~arg2 != 0) ? arg2 : D_001A79F0;
-    if (temp_s0 <= -1) {
-        temp_s0 = 0;
+    mapIndex = (~requestedMap != 0) ? requestedMap : gCurrentMapIndex;
+    if (mapIndex <= -1) {
+        mapIndex = 0;
     }
-    if (temp_s0 >= 0x15) {
-        temp_s0 = 0;
+    if (mapIndex >= 0x15) {
+        mapIndex = 0;
     }
-    temp_s1 = func_00297F98(temp_s0);
-    *arg0 = (temp_s1[0] + (func_00297F98(temp_s0)[1] * fparg0)) * 0.001953125f;
-    temp_s1_2 = func_00297F98(temp_s0);
-    *arg1 = (temp_s1_2[2] + (func_00297F98(temp_s0)[3] * fparg1)) * 0.001953125f;
+    xTransform = GetMapCoefficients(mapIndex);
+    *outMapX = (xTransform[0] + (GetMapCoefficients(mapIndex)[1] * worldX)) * 0.001953125f;
+    yTransform = GetMapCoefficients(mapIndex);
+    *outMapY = (yTransform[2] + (GetMapCoefficients(mapIndex)[3] * worldY)) * 0.001953125f;
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef struct { char prefix[20]; int *data; } SplashState;
 extern SplashState D_001BAEC0;
@@ -22,20 +23,20 @@ void func_0026EA00(int arg)
     int *data;
     int count;
 
-    func_0029D4D0(arg, D_001BAEC0.data);
-    func_0011AEA0(0);
+    fast_decompress(arg, D_001BAEC0.data);
+    FlushCache(0);
     for (count = 0x80; count >= 0; count -= 2) {
-        func_002FC1D8();
+        ResetPacketBuffer();
         data = D_001BAEC0.data;
-        func_002FCB00(data + 4, D_001A72DC[0], data[0], data[1]);
-        func_0027B858();
-        func_0027DDC0(0, 0, 0, count);
-        func_00284FC0();
-        func_00285338();
-        func_0011AEA0(0);
-        func_002FC280();
-        func_002FC3C0(1);
-        func_001244B8(0, 0);
-        func_001261F0(0);
+        UploadTextureBlocksReturnTex0(data + 4, D_001A72DC[0], data[0], data[1]);
+        WriteClearColorPackets();
+        SetClearColorPacket(0, 0, 0, count);
+        PutDrawBufferSmall();
+        QueueSecondStripPacket();
+        FlushCache(0);
+        SubmitBufferedDmaChain();
+        WaitForDmaStatusBits(1);
+        WaitGsPathsIdle(0, 0);
+        GetGsCurrentField(0);
     }
 }

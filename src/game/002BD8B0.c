@@ -9,33 +9,34 @@ extern int func_001163B0(void);
 extern unsigned char *D_001F2594;
 
 
-void *func_002BD8B0(void *a0, void *a1, int a2, int a3, int a4, int a5, float f)
+/* Creates a spark particle that leaves a short trail of copies behind it. It returns the new particle, or 0 when there is no life to give it. */
+void *func_002BD8B0(void *position, void *velocity, int color, int colorEnd, int life, int trailFlag, float size)
 {
-    void *p;
-    char *q;
-    int v;
+    void *particle;
+    char *motion;
+    int variation;
 
-    if (a4 == 0)
+    if (life == 0)
         return 0;
-    p = func_002B9030(0x15);
-    if (p != 0) {
-        qcopy((char *)p + 0x10, a0);
-        *(int *)((char *)p + 4) = a2;
-        v = func_00283CF0(4.0f);
-        *(unsigned char *)((char *)p + 1) = 0;
-        *(float *)((char *)p + 0xC) = f;
-        *(unsigned char *)((char *)p + 3) = 0x48;
-        *(unsigned char *)((char *)p + 9) = (unsigned char)(v - 0x60);
-        *(unsigned char *)((char *)p + 8) = (unsigned char)func_001163B0();
-        q = (char *)p + 0x20;
-        *(unsigned char *)((char *)p + 2) = *D_001F2594;
-        *(short *)((char *)p + 0xA) = a4;
-        *(short *)(q + 0x18) = a4;
-        *(float *)(q + 0x1C) = f;
-        *(int *)(q + 0x10) = a2;
-        *(int *)(q + 0x14) = a3;
-        *(short *)(q + 0x1A) = a5;
-        qcopy(q, a1);
+    particle = AllocParticle(0x15);
+    if (particle != 0) {
+        qcopy((char *)particle + 0x10, position);
+        *(int *)((char *)particle + 4) = color;
+        variation = FloatToInt(4.0f);
+        *(unsigned char *)((char *)particle + 1) = 0;
+        *(float *)((char *)particle + 0xC) = size;
+        *(unsigned char *)((char *)particle + 3) = 0x48;
+        *(unsigned char *)((char *)particle + 9) = (unsigned char)(variation - 0x60);
+        *(unsigned char *)((char *)particle + 8) = (unsigned char)Rand();
+        motion = (char *)particle + 0x20;
+        *(unsigned char *)((char *)particle + 2) = *D_001F2594;
+        *(short *)((char *)particle + 0xA) = life;
+        *(short *)(motion + 0x18) = life;
+        *(float *)(motion + 0x1C) = size;
+        *(int *)(motion + 0x10) = color;
+        *(int *)(motion + 0x14) = colorEnd;
+        *(short *)(motion + 0x1A) = trailFlag;
+        qcopy(motion, velocity);
     }
-    return p;
+    return particle;
 }

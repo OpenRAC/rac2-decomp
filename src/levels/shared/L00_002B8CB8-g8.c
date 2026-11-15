@@ -40,7 +40,7 @@ extern float func_00282C48(float f);
 void func_L00_002B8CB8(void)
 {
     LeanMoby *live;
-    LeanHero *st = (LeanHero *)D_00189E20;
+    LeanHero *st = (LeanHero *)gHeroState;
     float x;
     float y;
     float share;
@@ -72,7 +72,7 @@ void func_L00_002B8CB8(void)
     ((Rac2Native_002B8CB8_Record *)D_L00_0025BE10)->f_CC8 = y;
 
     share = 0.1f;
-    len = func_00282C48(x) * share;
+    len = FloatAbs(x) * share;
     share = len + share;
     if (0.07f < share)
         share = 0.07f;

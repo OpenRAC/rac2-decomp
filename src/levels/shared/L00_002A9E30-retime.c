@@ -27,13 +27,14 @@ typedef struct {
 extern AnimationResident D_00189E20_2;
 extern float func_002AA2E8(float *, float, float);
 
-float func_L00_002A9E30(float arg0, float arg1, float arg2, float arg3)
+/* Works out how fast the hero animation should play so it reaches a wanted frame in a set time. */
+float func_L00_002A9E30(float frame, float duration, float amount, float blendRate)
 {
     float threshold = D_00189E20_2.threshold;
     float step;
     float negone = -1.0f;
-    if (threshold < arg0) {
-        step = arg0 - threshold;
+    if (threshold < frame) {
+        step = frame - threshold;
     } else {
         float rate = 2.0f;
         if (D_00189E20_2.flag == 0)
@@ -43,20 +44,20 @@ float func_L00_002A9E30(float arg0, float arg1, float arg2, float arg3)
             int index = owner->index;
             AnimationEntry *entry = owner->table->entries[index];
             int count = entry->count;
-            step = arg0 + (rate * (float)count - threshold);
+            step = frame + (rate * (float)count - threshold);
         }
     }
-    if (0.0f < arg1) {
+    if (0.0f < duration) {
         float scale = D_00189E20_2.scale;
         if (D_00189E20_2.flag != 0)
             scale = *D_00189E20_2.owner->scale;
         {
-            float value = (arg2 * step) / (arg1 * scale);
-            if (arg3 == negone) {
+            float value = (amount * step) / (duration * scale);
+            if (blendRate == negone) {
                 D_00189E20_2.value = value;
                 return negone;
             }
-            return func_002AA2E8(&D_00189E20_2.value, value, arg3);
+            return ApproachValue(&D_00189E20_2.value, value, blendRate);
         }
     }
     return 0.0f;

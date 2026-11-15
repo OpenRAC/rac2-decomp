@@ -6,10 +6,11 @@ extern int D_L07_001B0AE0 __attribute__((sda));
 extern void func_0029F338(int);
 
 /* Run the shared per-object pass once a level latch is set. */
-void func_L07_003E61B8(int arg)
+/* Per-frame update for moby class 3361: removes the object once the level flag is set. */
+void func_L07_003E61B8(int moby)
 {
     if (D_L07_001B0AE0 != 0)
-        func_0029F338(arg);
+        MarkMobySpawned(moby);
 }
 
 extern char *func_002AD0B0(char *);
@@ -81,36 +82,36 @@ typedef struct {
    at TARGET: velocity toward the target at the configured speed, with the vertical component of
    a ballistic arc under the configured gravity (both per 60 Hz frame). With an owner, the
    velocity and the offset from the owner are kept in the owner's frame. Returns the object. */
-char *func_L07_003F43E0(char *a0, char *a1, char *a2, char *a3, float a4)
+char *func_L07_003F43E0(char *parent, char *owner, char *spawnPos, char *targetPos, float extraValue)
 {
-    F43E0Moby *obj = (F43E0Moby *)func_0029EFD0(0xE1D);
+    F43E0Moby *obj = (F43E0Moby *)CreateMoby(0xE1D /* moby class 3613 */);
 
     if (obj != 0) {
-        F43E0Vars *st;
+        F43E0Vars *vars;
         float speed, gravity;
         float buf[16];
 
-        func_002B37E8(obj, a0);
-        qcopy(obj->pos, a2);
-        obj->rot[2] = func_002A7940();
-        obj->rot[0] = func_002A7940();
-        func_002833F0(obj->mtx, obj->rot);
+        InitChildObjectFromParent(obj, parent);
+        qcopy(obj->pos, spawnPos);
+        obj->rot[2] = RandomAngle();
+        obj->rot[0] = RandomAngle();
+        euler_rotation_basis(obj->mtx, obj->rot);
         obj->flags |= 0x100;
-        st = (F43E0Vars *)obj->pVars;
+        vars = (F43E0Vars *)obj->pVars;
         obj->scale = *(float *)(obj->pClass + 0x24) * D_L07_001B0E38;
         speed = D_L07_001B0E34 * (1.0f / 60.0f);
         gravity = D_L07_001B0E30 * (1.0f / 3600.0f);
-        st->owner = a1;
-        func_00282CF0(st->vel, a3, obj->pos);
-        func_00282F70(st->vel, st->vel, speed);
-        st->vel[2] = func_L00_0031CDD0(obj->pos, (float *)a3, 0, speed, -gravity);
-        st->vel[3] = gravity;
-        st->x34 = a4;
-        if (a1 != 0) {
-            func_00283698(buf, a1 + 0xC0);
-            func_00283098(st->vel, st->vel, buf);
-            func_00282CF0(st->offset, obj->pos, a1 + 0x10);
-            func_00283098(st->offset, st->offset, buf);
+        vars->owner = owner;
+        FastVecSub(vars->vel, targetPos, obj->pos);
+        FastVectorNormalizeHelper(vars->vel, vars->vel, speed);
+        vars->vel[2] = ComputeShotLaunchSpeed(obj->pos, (float *)targetPos, 0, speed, -gravity);
+        vars->vel[3] = gravity;
+        vars->x34 = extraValue;
+        if (owner != 0) {
+            matrix_from_basis_rows(buf, owner + 0xC0);
+            matrix_mul_vec3(vars->vel, vars->vel, buf);
+            FastVecSub(vars->offset, obj->pos, owner + 0x10);
+            matrix_mul_vec3(vars->offset, vars->offset, buf);
         }
     }
     return (char *)obj;

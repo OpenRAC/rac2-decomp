@@ -22,23 +22,23 @@ void func_0032ABC0(void *owner)
 {
     Debris0032ABC0 *debris;
     int i;
-    float out[4];
+    float targetOffset[4];
     TI_0032ABC0 delta;
     TI_0032ABC0 pos;
 
     for (i = 0; i < 12; i++) {
-        debris = &D_00232760[i];
+        debris = &gDebrisPieces[i];
         if (debris->owner == 0) {
             debris->owner = owner;
-            debris->spin = func_002A7940();
-            debris->speed = func_002A78D8(1200.0f, 1400.0f) * 0.00029088825f;
+            debris->spin = RandomAngle();
+            debris->speed = RandomSignedFloatRange(1200.0f, 1400.0f) * 0.00029088825f;
             debris->life = 0x25;
-            debris->scale = func_002A7878(0.3f, 0.4f);
-            func_002FE8D8(((Hero_0032ABC0 *)D_00189E20)->ptr[0x2290 / 4] + 0x10, out);
-            qcopy(&pos, ((Hero_0032ABC0 *)D_00189E20)->ptr[0x2290 / 4] + 0x10);
-            func_00282CC0(&delta, &pos, out);
-            func_00282DD8(&pos, &pos, &delta);
-            func_00282F20(debris->dir, (float *)&pos, debris->scale);
+            debris->scale = RandomFloatRange(0.3f, 0.4f);
+            GetObjectFacingDirection(((Hero_0032ABC0 *)gHeroState)->ptr[0x2290 / 4] + 0x10, targetOffset);
+            qcopy(&pos, ((Hero_0032ABC0 *)gHeroState)->ptr[0x2290 / 4] + 0x10);
+            FastVecAdd(&delta, &pos, targetOffset);
+            FastVecCross(&pos, &pos, &delta);
+            vec_scale_to_length(debris->dir, (float *)&pos, debris->scale);
             return;
         }
     }

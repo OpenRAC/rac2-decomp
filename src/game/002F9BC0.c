@@ -1,4 +1,5 @@
 #include "ps2_hw.h"
+#include "names.h"
 #include "include_asm.h"
 
 extern int func_00115DA8_1(char *, char *, ...);
@@ -26,6 +27,7 @@ extern int D_L06_001B2370 __attribute__((sda));
 extern int D_L06_001B2374 __attribute__((sda));
 
 /* shared native body of family bc82131e */
+/* Writes a number as text, with a space or comma between each group of three digits. */
 void func_002F9BC0(char *dst, int value)
 {
     if (value > 999999)
@@ -47,13 +49,15 @@ void func_002F9BC0(char *dst, int value)
 extern volatile int D_001A7A20[] __attribute__((sda));
 extern void func_002FAD68(int);
 
+/* Marks each special weapon bought this visit as owned in the shop list, then clears the
+   flag that triggered it. */
 void func_002FADB0(void)
 {
-    if (D_001A7A20[0] & 1) func_002FAD68(12);
-    if (D_001A7A20[0] & 2) func_002FAD68(53);
-    if (D_001A7A20[0] & 4) func_002FAD68(17);
-    if (D_001A7A20[0] & 8) func_002FAD68(14);
-    if (D_001A7A20[0] & 16) func_002FAD68(18);
+    if (D_001A7A20[0] & 1) MarkShopItemOwned(12);
+    if (D_001A7A20[0] & 2) MarkShopItemOwned(53);
+    if (D_001A7A20[0] & 4) MarkShopItemOwned(17);
+    if (D_001A7A20[0] & 8) MarkShopItemOwned(14);
+    if (D_001A7A20[0] & 16) MarkShopItemOwned(18);
     D_001A7A20[0] &= ~128;
 }
 
@@ -61,12 +65,14 @@ void func_002FADB0(void)
 extern void func_002B7AD0(void);
 extern int ref_L00_002FB170_00[];
 
-void func_002FB170(void) { func_002B7AD0(); ref_L00_002FB170_00[0x23] = 0; ref_L00_002FB170_00[0x22] = 0; }
+/* Stops the shop preview and clears its two active flags. */
+void func_002FB170(void) { RequestDiscReadBreak(); ref_L00_002FB170_00[0x23] = 0; ref_L00_002FB170_00[0x22] = 0; }
 
 
 typedef struct { int key; int value; } Func002FBFB8Entry;
 extern Func002FBFB8Entry D_00264F70[];
 
+/* Looks up a key in the table and returns its matching value, or -1 if it is not there. */
 int func_002FBFB8(int key)
 {
     if (D_00264F70[0].key >= 0) {
@@ -84,9 +90,10 @@ int func_002FBFB8(int key)
 
 extern int func_002FBFB8(int);
 extern unsigned char D_001395B8[];
-int func_002FC010(int arg, int bit)
+/* Checks one bit of the save byte that belongs to a key; returns 1 if it is set. */
+int func_002FC010(int key, int bit)
 {
-    int index = func_002FBFB8(arg);
+    int index = LookupTableValueByKey(key);
     if (index >= 0) {
         unsigned char value = D_001395B8[index] & (1 << bit);
         D_001395B8[index] = value;
@@ -95,12 +102,13 @@ int func_002FC010(int arg, int bit)
     return 0;
 }
 
-void func_002FC070(int mask)
+/* Starts a transfer on DMA channel 0 from the given list address and waits until it is done. */
+void func_002FC070(int listAddress)
 {
     while (((int)D0_CHCR) & 0x100)
         Fbbb7bee1_FUN_00282A38(16);
     D0_QWC = 0;
-    D0_TADR = mask & 0x0FFFFFFF;
+    D0_TADR = listAddress & 0x0FFFFFFF;
     D0_CHCR = 325;
     while (((int)D0_CHCR) & 0x100)
         Fbbb7bee1_FUN_00282A38(16);
@@ -113,23 +121,24 @@ void func_002FC070(int mask)
 /* func_002FC1D8 is matched in 002F9BC0-g8.c (-G8 small data). */
 
 /* shared native body of family 74e6a904f3b4f71c (default profile) */
+/* Switches to the other of the two packet buffers and works out where drawing into it starts. */
 void func_002FC220(void)
 {
-    int a0;
-    int a1;
-    int a2;
-    int v1;
+    int nextBuffer;
+    int target;
+    int offset;
+    int bufferStart;
 
-    a0 = 1 - D_L06_001B2F94;
-    a1 = D_L06_001B2F90;
-    a2 = D_L06_001A8F10;
-    D_L06_001B2F94 = a0;
-    v1 = D_L06_001B2F80[a0];
-    a1 = v1 + D_L06_001B2F90;
-    D_L06_001B2F88_5 = v1;
-    a1 = a1 - a2;
-    D_L06_001B2370 = a1;
-    D_L06_001B2374 = a1 - 8192;
+    nextBuffer = 1 - D_L06_001B2F94;
+    target = D_L06_001B2F90;
+    offset = D_L06_001A8F10;
+    D_L06_001B2F94 = nextBuffer;
+    bufferStart = D_L06_001B2F80[nextBuffer];
+    target = bufferStart + D_L06_001B2F90;
+    D_L06_001B2F88_5 = bufferStart;
+    target = target - offset;
+    D_L06_001B2370 = target;
+    D_L06_001B2374 = target - 8192;
 }
 
 /* func_002FC280 is matched in 002F9BC0-packet-g8.c. */

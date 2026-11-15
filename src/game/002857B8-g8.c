@@ -13,10 +13,10 @@ extern void func_00284268(int, int, int, int, int, int);
 /* Calls one callee with 1 and a second with no argument, then tests an absolute global word: when it is set it calls a callee with (512, 416, 640, 448, 0, 0), otherwise (512, 416, 512, 448, 0, 0). */
 void func_002857B8(void)
 {
-    func_002FC3C0(1);
+    WaitForDmaStatusBits(1);
     func_00284000_1();
-    if (D_001A7BB8 != 0)
-        func_00284268(512, 416, 640, 448, 0, 0);
+    if (gWidescreenFlag != 0)
+        SetupFS_AA_buffer(512, 416, 640, 448, 0, 0);
     else
-        func_00284268(512, 416, 512, 448, 0, 0);
+        SetupFS_AA_buffer(512, 416, 512, 448, 0, 0);
 }

@@ -91,39 +91,39 @@ void func_L14_00430410(char *self)
         s->wa8=20; s->wac=s->w14=0.8f;
         s->wb0=70; s->wb4=s->w9c=2.0f;
         for(i=0;i<32;i++) {
-            D_L14_00260270[i]=func_002A7878(-3.1415927f,3.1415927f);
+            D_L14_00260270[i]=RandomFloatRange(-3.1415927f,3.1415927f);
             D_L14_002602F0[i]=(float)i*0.03125f;
         }
         s->wb8=71; s->wbc=1.0f;
         s->wc0=0x80800000;
         self[0x31]=0; *(unsigned short *)(self+0x34)|=1;
         s->sound=-1;
-        func_002A7750(self,1,-1);
+        SetMobyState(self,1,-1);
         break;
     case 1:
-        if (((PrisonSoundAnchor *)(D_00188660+s->sound*112))->owner!=self ||
-            !((PrisonSoundAnchor *)(D_00188660+s->sound*112))->active)
+        if (((PrisonSoundAnchor *)(gSoundState+s->sound*112))->owner!=self ||
+            !((PrisonSoundAnchor *)(gSoundState+s->sound*112))->active)
             s->sound=prisonStartSound(0,4,self);
-        func_L00_002E6EF8(func_L14_00430B70,self);
-        if(func_002B38B8(self)) {
+        AddDrawCallbackToList3(DrawAnimatedPrisonQuads,self);
+        if(IsThirdPendingFlagSet(self)) {
             if(D_L14_001B20C8_1<50) s->baseScale=0;
-            func_002A7750(self,2,-1);
+            SetMobyState(self,2,-1);
         }
         break;
     case 2: {
         int sound=s->sound;
-        if(sound!=-1 && ((PrisonSoundAnchor *)(D_00188660+sound*112))->owner==self &&
-            ((PrisonSoundAnchor *)(D_00188660+sound*112))->active) func_002E59F8(sound);
+        if(sound!=-1 && ((PrisonSoundAnchor *)(gSoundState+sound*112))->owner==self &&
+            ((PrisonSoundAnchor *)(gSoundState+sound*112))->active) StopSoundVoice(sound);
         s->sound=-1;
-        if(func_002B3868(self)) *(int *)(self+0x98)=0;
+        if(SetFirstPendingFlag(self)) *(int *)(self+0x98)=0;
         if(s->baseScale>0.5f) {
-            func_L00_002E6EF8(func_L14_00430B70,self);
+            AddDrawCallbackToList3(DrawAnimatedPrisonQuads,self);
             s->baseScale-=0.05f;
         }
         break;
     }
     }
     s->currentScale=s->baseScale+s->pulseScale*
-        func_00283198(func_L14_00430898((float)D_L14_001B20C8*6.2831855f/(float)s->pulseFrames));
+        FastSinOrCosB(WrapAngleFullTurn((float)D_L14_001B20C8*6.2831855f/(float)s->pulseFrames));
 }
 

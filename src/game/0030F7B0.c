@@ -70,6 +70,7 @@ extern void func_002A7470(void *, int, int, int);
 extern void func_0029F338(void *);
 extern void func_002A10E8(void *);
 
+/* Updates the Swingshot hook. It copies the Swingshot's state into matching animations and removes itself when the Swingshot is gone. */
 void func_00310A40(unsigned char *self)
 {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};
@@ -83,7 +84,7 @@ void func_00310A40(unsigned char *self)
     if (data == 0)
         return;
     peer = *(unsigned char **)data;
-    if (peer == 0 || *(short *)(peer + 0xAA) != 0xD0 || peer[0x20] == 0xFE ||
+    if (peer == 0 || *(short *)(peer + 0xAA) != 0xD0 /* Swingshot */ || peer[0x20] == 0xFE ||
         peer[0x20] == 0xFD || *(unsigned char **)(*(unsigned char **)(peer + 0x68) + 0x14) != self)
         goto destroy;
     if ((*(unsigned short *)(peer + 0x34) & 1) || D_0018C0DF != 0)
@@ -97,7 +98,7 @@ void func_00310A40(unsigned char *self)
 c0:
     if (self[0x60] & 2) {
         if (self[0x43] != 1)
-            func_002A7470(self, 1, 0, 10);
+            StartAnimationBlended(self, 1, 0, 10);
         self[0x20] = 1;
         *(float *)(self + 0x48) = 1.0f;
     }
@@ -105,12 +106,12 @@ c0:
 c1:
     if ((*(unsigned char **)data)[0x20] == 2) {
         if (self[0x43] != 3)
-            func_002A7470(self, 3, 0, 10);
+            StartAnimationBlended(self, 3, 0, 10);
         self[0x20] = 3;
         *(float *)(self + 0x48) = 1.0f;
     } else if ((*(unsigned char **)data)[0x20] == 8) {
         if (self[0x43] != 2)
-            func_002A7470(self, 2, 0, 10);
+            StartAnimationBlended(self, 2, 0, 10);
         self[0x20] = 2;
         *(float *)(self + 0x48) = 1.0f;
     }
@@ -119,19 +120,19 @@ c2:
     if (!(self[0x60] & 2))
         goto finish;
 destroy:
-    func_0029F338(self);
+    MarkMobySpawned(self);
     return;
 c3:
     if (self[0x60] & 2) {
         if (self[0x43] != 4)
-            func_002A7470(self, 4, 0, 10);
+            StartAnimationBlended(self, 4, 0, 10);
         self[0x20] = 4;
     }
     goto finish;
 c4:
     if ((unsigned int)((*(unsigned char **)data)[0x20] - 3) < 3) {
         if (self[0x43] != 5)
-            func_002A7470(self, 5, 0, 10);
+            StartAnimationBlended(self, 5, 0, 10);
         self[0x20] = 5;
     }
     goto finish;
@@ -141,7 +142,7 @@ c5:
     if ((unsigned int)((*(unsigned char **)data)[0x20] - 6) < 2) {
         *(float *)(self + 0x48) = 1.0f;
         if (self[0x43] != 7)
-            func_002A7470(self, 7, 0, 10);
+            StartAnimationBlended(self, 7, 0, 10);
         self[0x20] = 7;
     }
     goto finish;
@@ -150,7 +151,7 @@ c7:
         goto finish;
 activate_one:
     if (self[0x43] != 1)
-        func_002A7470(self, 1, 0, 10);
+        StartAnimationBlended(self, 1, 0, 10);
     self[0x20] = 1;
 c6:
 finish:
@@ -165,22 +166,23 @@ extern int func_002A77E0(int);
 extern void func_002A7750(unsigned char *, unsigned char, int);
 extern void func_0029F338(void *);
 
+/* Waits to be hit or set off at random, then fades out and removes itself. */
 void func_00310C88(unsigned char *self)
 {
     if (D_001AD7EC != 0)
-        func_00310D78((char *)self, D_001AD7EC);
+        CarryObjectWithSurface((char *)self, D_001AD7EC);
     switch (self[0x20]) {
     case 0:
-        if (func_00273B70(self) != 0 ||
-            (D_001B1690[0] > 0.949999988079071044921875f && func_002A77E0(10) == 0)) {
-            func_002A7750(self, 1, -1);
+        if (UpdateCameraMoby(self) != 0 ||
+            (D_001B1690[0] > 0.949999988079071044921875f && RandomIntBelow(10) == 0)) {
+            SetMobyState(self, 1, -1);
             *(unsigned short *)(self + 0x34) |= 0x2800;
         }
         break;
     case 1:
-        func_00273B70(self);
+        UpdateCameraMoby(self);
         if (self[0x23] < 2)
-            func_0029F338(self);
+            MarkMobySpawned(self);
         else
             self[0x23] -= 2;
         break;
@@ -188,6 +190,7 @@ void func_00310C88(unsigned char *self)
 }
 
 
+/* Moves the first object along with the moving surface the second one stands on, so it keeps its place on it. */
 void func_00310D78(char *o0, char *o1)
 {
     char b0[64];
@@ -297,11 +300,11 @@ void func_003116E8(SupportMoby *moby) {
     group = moby->group;
     vars->flags |= 4;
     if (group == 0xFF) {
-        if (moby->oclass == 0x1F4 && func_002A77E0(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
-            moby->rotation[2] = func_00283B98(moby->rotation[2], 1.5707964897155762f);
+        if (moby->oclass == 0x1F4 /* Crate */ && RandomIntBelow(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
+            moby->rotation[2] = FastAddRotations(moby->rotation[2], 1.5707964897155762f);
         }
-        if ((moby->oclass == 0x1F5 || moby->oclass == 0x200) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
-            func_0029F338(moby);
+        if ((moby->oclass == 0x1F5 /* Nanotech Crate */ || moby->oclass == 0x200 /* Purple Nanotech Crate */) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
+            MarkMobySpawned(moby);
             return;
         }
         flags_before = vars->flags;
@@ -313,7 +316,7 @@ void func_003116E8(SupportMoby *moby) {
         qcopy_nc(&probe_bottom, src1);
         probe_top.z += 0.5f;
         probe_bottom.z = 0.1f;
-        if (func_002761F8(&probe_top, &probe_bottom, 2, 0, 0) == 0) {
+        if (CollLine(&probe_top, &probe_bottom, 2, 0, 0) == 0) {
             vars->support = 0;
             return;
         }
@@ -322,27 +325,27 @@ void func_003116E8(SupportMoby *moby) {
             vars->support = 0;
             return;
         }
-        if (func_002ABB78(HIT.moby) != 0) return;
+        if (IsMobyInSpecialClassRange(HIT.moby) != 0) return;
         vars->support = 0;
         vars->flags |= 8;
-        if (func_002AD0B0(HIT.moby) != 0) {
+        if (GetMobyPrivateValue2(HIT.moby) != 0) {
             if (moby != 0) moby->occlusion = 0x7F80;
-            func_002AD5F8(member, HIT.moby, &moby->position, &moby->rotation[0], &vars->link_pos, &vars->link_rot);
+            GetAttachmentRotationAngles(member, HIT.moby, &moby->position, &moby->rotation[0], &vars->link_pos, &vars->link_rot);
             vars->stack_level = 0;
             vars->standing_on = HIT.moby;
         }
         return;
     }
 
-    func_002A8600(&moby, group, 0, 0);
+    GetFirstMobyInGroup(&moby, group, 0, 0);
     while (moby != 0) {
         vars = moby->vars;
-        if (func_002ABB78(moby) != 0) {
-            if (moby->oclass == 0x1F4 && func_002A77E0(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
-                moby->rotation[2] = func_00283B98(moby->rotation[2], 1.5707964897155762f);
+        if (IsMobyInSpecialClassRange(moby) != 0) {
+            if (moby->oclass == 0x1F4 /* Crate */ && RandomIntBelow(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
+                moby->rotation[2] = FastAddRotations(moby->rotation[2], 1.5707964897155762f);
             }
-            if ((moby->oclass == 0x1F5 || moby->oclass == 0x200) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
-                func_0029F338(moby);
+            if ((moby->oclass == 0x1F5 /* Nanotech Crate */ || moby->oclass == 0x200 /* Purple Nanotech Crate */) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
+                MarkMobySpawned(moby);
             } else {
                 member_flags = vars->flags;
                 vars->model = moby->model;
@@ -353,13 +356,13 @@ void func_003116E8(SupportMoby *moby) {
                 qcopy_nc(&probe_bottom, src2);
                 probe_top.z += 0.5f;
                 probe_bottom.z = 0.1f;
-                if (func_002761F8(&probe_top, &probe_bottom, 2, 0, 0) == 0) {
+                if (CollLine(&probe_top, &probe_bottom, 2, 0, 0) == 0) {
                     vars->support = 0;
                 } else {
                     if (HIT.moby == 0) {
                         moby->position.z = HIT.point_z;
                         vars->support = 0;
-                    } else if (func_002ABB78(HIT.moby) == 0 && (u16)(HIT.moby->oclass - 0x128) >= 2) {
+                    } else if (IsMobyInSpecialClassRange(HIT.moby) == 0 && (u16)(HIT.moby->oclass - 0x128) >= 2) {
                         vars->support = 0;
                         moby->update_distance = 0xFF;
                         vars->flags |= 8;
@@ -367,17 +370,17 @@ void func_003116E8(SupportMoby *moby) {
                         vars->support = 0;
                     } else if (HIT.moby->group != moby->group) {
                         vars->support = 0;
-                    } else if (func_002ABB78(HIT.moby) != 0) {
+                    } else if (IsMobyInSpecialClassRange(HIT.moby) != 0) {
                         vars->support = HIT.moby;
                         src3 = &moby->position;
                         below = HIT.moby;
                         qcopy_nc(src3, &below->position);
-                        func_00282CC0(src3, src3, &below->offset);
+                        FastVecAdd(src3, src3, &below->offset);
                         vars = HIT.moby->vars;
-                        if (func_002ABB78(moby) != 0) {
+                        if (IsMobyInSpecialClassRange(moby) != 0) {
                             vars->above = moby;
                         } else {
-                            func_00282A28();
+                            TrapAlways();
                             vars->above = 0;
                         }
                     } else {
@@ -387,22 +390,22 @@ void func_003116E8(SupportMoby *moby) {
                 }
             }
         }
-        func_002A86E8(&moby, moby, 0, 0);
+        GetNextMobyInGroup(&moby, moby, 0, 0);
     }
 
-    func_002A8600(&member, group, 0, 0);
+    GetFirstMobyInGroup(&member, group, 0, 0);
     while (member != 0) {
         vars = member->vars;
-        if (func_002ABB78(member) != 0 && vars->support == 0) {
+        if (IsMobyInSpecialClassRange(member) != 0 && vars->support == 0) {
             src4 = &member->position;
             qcopy_nc(&probe_up, src4);
             qcopy_nc(&probe_down, src4);
             probe_up.z += vars->height * 0.5f;
             probe_down.z = 0.1f;
-            if (func_002761F8(&probe_up, &probe_down, 2, moby, 0) != 0) {
-                if (HIT.moby != 0 && func_002AD0B0(HIT.moby) != 0) {
+            if (CollLine(&probe_up, &probe_down, 2, moby, 0) != 0) {
+                if (HIT.moby != 0 && GetMobyPrivateValue2(HIT.moby) != 0) {
                     if (moby != 0) moby->occlusion = 0x7F80;
-                    func_002AD5F8(member, HIT.moby, &member->position, &member->rotation[0], &vars->link_pos, &vars->link_rot);
+                    GetAttachmentRotationAngles(member, HIT.moby, &member->position, &member->rotation[0], &vars->link_pos, &vars->link_rot);
                     vars->stack_level = 0;
                     vars->standing_on = HIT.moby;
                     vars->flags |= 8;
@@ -422,8 +425,8 @@ void func_003116E8(SupportMoby *moby) {
                         vars->stack_level = below_vars->stack_level + 1.0f;
                     }
                 }
-                if ((vars->hC6 != 0 || (moby->oclass == 0x1F5 || moby->oclass == 0x200)) && vars->above != 0 && vars->route_index != -1) {
-                    route = D_001F1700[vars->route_index];
+                if ((vars->hC6 != 0 || (moby->oclass == 0x1F5 /* Nanotech Crate */ || moby->oclass == 0x200 /* Purple Nanotech Crate */)) && vars->above != 0 && vars->route_index != -1) {
+                    route = gPathTable_001F1700[vars->route_index];
                     if (route->count == 0) {
                         vars->route_index = -1;
                     } else {
@@ -440,29 +443,29 @@ void func_003116E8(SupportMoby *moby) {
                             }
                         } else {
                             route->entries[0].state = 0x11;
-                            for (i = 0; i < D_001F1700[vars->route_index]->count; i++) {
-                                D_001F1700[vars->route_index]->entries[i].state = 0;
+                            for (i = 0; i < gPathTable_001F1700[vars->route_index]->count; i++) {
+                                gPathTable_001F1700[vars->route_index]->entries[i].state = 0;
                             }
                         }
                     }
                 }
             }
         }
-        func_002A86E8(&member, member, 0, 0);
+        GetNextMobyInGroup(&member, member, 0, 0);
     }
 
-    func_002A8600(&moby, group, 0, 0);
+    GetFirstMobyInGroup(&moby, group, 0, 0);
     while (moby != 0) {
-        if (func_002ABB78(moby) != 0) {
-            func_002A86E8(&other, moby, 0, 0);
+        if (IsMobyInSpecialClassRange(moby) != 0) {
+            GetNextMobyInGroup(&other, moby, 0, 0);
             while (other != 0) {
-                if (func_002ABB78(other) != 0) {
-                    func_00282E48(&moby->position, &other->position);
+                if (IsMobyInSpecialClassRange(other) != 0) {
+                    fast_vec_dist(&moby->position, &other->position);
                 }
-                func_002A86E8(&other, other, 0, 0);
+                GetNextMobyInGroup(&other, other, 0, 0);
             }
         }
-        func_002A86E8(&moby, moby, 0, 0);
+        GetNextMobyInGroup(&moby, moby, 0, 0);
     }
 }
 
@@ -473,6 +476,7 @@ void func_003116E8(SupportMoby *moby) {
 
 /* func_00312600 is in 0030F7B0-crate-g8.c. */
 
+/* Returns 1 when the object is in state 6. */
 int func_00312B58(Level16VendorMoby *moby) {
     return moby->state == 6;
 }
@@ -482,6 +486,7 @@ int func_00312B58(Level16VendorMoby *moby) {
 
 
 
+/* Returns 1 when the object is in state 1. */
 int func_00312E10(unsigned char *p) { return p[0x20] == 1; }
 
 
@@ -497,16 +502,17 @@ extern void func_00282CC0(void *, void *, void *);
 
 typedef struct { char pad[0x30]; char *entries[1]; } SolEmitterData;
 
+/* Finds the position of one of the emitter's slots, turned by the emitter's angle and lifted by its height. */
 void func_00313548(unsigned char *object, float *out, int index)
 {
     char local[16];
     char *data = *(char **)(object + 0x68);
     char *entry;
-    func_002ACEC0(local, D_L00_0023A670[index], data + 0x20, *(float *)(data + 0x2C));
+    ApplyAxisRotationToQuaternion(local, D_L00_0023A670[index], data + 0x20, *(float *)(data + 0x2C));
     entry = ((SolEmitterData *)data)->entries[index];
     if (entry && object[0x20] == 2)
-        func_00282F20(local, local, *(float *)(entry + 0x28));
-    func_00282CC0(out, data + 0x10, local);
+        vec_scale_to_length(local, local, *(float *)(entry + 0x28));
+    FastVecAdd(out, data + 0x10, local);
     out[2] += *(float *)data;
 }
 
@@ -548,37 +554,37 @@ void func_00316400(void *owner, char *object, int duration)
 
         effect->owner = owner;
         qcopy(effect->origin, origin);
-        effect->angle[0] = func_002A7878(-3.1415927f, 3.1415927f);
-        effect->angle[1] = func_002A7878(-3.1415927f, 3.1415927f);
-        effect->angle[2] = func_002A7878(-3.1415927f, 3.1415927f);
-        effect->angle2[0] = func_002A7878(-3.1415927f, 3.1415927f);
-        effect->angle2[1] = func_002A7878(-3.1415927f, 3.1415927f);
-        effect->angle2[2] = func_002A7878(-3.1415927f, 3.1415927f);
-        effect->speed[0] = func_002A78D8(0.001f, 0.005f);
-        effect->speed[1] = func_002A78D8(0.001f, 0.005f);
-        effect->speed[2] = func_002A78D8(0.001f, 0.005f);
-        effect->speed2[0] = func_002A78D8(0.001f, 0.005f);
-        effect->speed2[1] = func_002A78D8(0.001f, 0.005f);
-        effect->speed2[2] = func_002A78D8(0.001f, 0.005f);
-        effect->amplitude[0] = func_002A7878(3.25f, 4.75f) * 0.5f;
-        effect->amplitude[1] = func_002A7878(3.25f, 4.75f) * 0.5f;
-        effect->amplitude[2] = func_002A7878(3.25f, 4.75f) * 0.5f;
-        effect->amplitude2[0] = func_002A7878(3.25f, 4.75f) * 0.5f;
-        effect->amplitude2[1] = func_002A7878(3.25f, 4.75f) * 0.5f;
-        effect->amplitude2[2] = func_002A7878(3.25f, 4.75f) * 0.5f;
-        func_00282C88(effect->offset);
-        func_00282C88(effect->rotation);
+        effect->angle[0] = RandomFloatRange(-3.1415927f, 3.1415927f);
+        effect->angle[1] = RandomFloatRange(-3.1415927f, 3.1415927f);
+        effect->angle[2] = RandomFloatRange(-3.1415927f, 3.1415927f);
+        effect->angle2[0] = RandomFloatRange(-3.1415927f, 3.1415927f);
+        effect->angle2[1] = RandomFloatRange(-3.1415927f, 3.1415927f);
+        effect->angle2[2] = RandomFloatRange(-3.1415927f, 3.1415927f);
+        effect->speed[0] = RandomSignedFloatRange(0.001f, 0.005f);
+        effect->speed[1] = RandomSignedFloatRange(0.001f, 0.005f);
+        effect->speed[2] = RandomSignedFloatRange(0.001f, 0.005f);
+        effect->speed2[0] = RandomSignedFloatRange(0.001f, 0.005f);
+        effect->speed2[1] = RandomSignedFloatRange(0.001f, 0.005f);
+        effect->speed2[2] = RandomSignedFloatRange(0.001f, 0.005f);
+        effect->amplitude[0] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
+        effect->amplitude[1] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
+        effect->amplitude[2] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
+        effect->amplitude2[0] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
+        effect->amplitude2[1] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
+        effect->amplitude2[2] = RandomFloatRange(3.25f, 4.75f) * 0.5f;
+        ClearVector128(effect->offset);
+        ClearVector128(effect->rotation);
         effect->timer = duration;
         effect->duration = duration;
         effect->fade = 15;
         effect->object = object;
         effect->expired = 0;
 
-        info = func_002AB1F0(object);
+        info = GetMobyPrivateValue0(object);
         if (info != 0) {
-            func_002B00B0(object, displacement, 1);
-            func_00282D30(displacement, displacement, *(float *)(info + 16));
-            func_00282CC0(effect->position, displacement, object + 16);
+            GetGravityDirectionAtObject(object, displacement, 1);
+            FastVecScale(displacement, displacement, *(float *)(info + 16));
+            FastVecAdd(effect->position, displacement, object + 16);
         } else {
             char *source = object + 16;
 
@@ -611,47 +617,48 @@ void func_003166C8(void *owner)
         p = slot;
         qcopy(p->origin, D_001B2520);
         if (p->timer) {
-            p->angle[0] = func_00283B98(p->angle[0], p->speed[0] * 100.0f);
-            p->angle[1] = func_00283B98(p->angle[1], p->speed[1] * 100.0f);
-            p->angle[2] = func_00283B98(p->angle[2], p->speed[2] * 100.0f);
-            p->angle2[0] = func_00283B98(p->angle2[0], p->speed2[0] * 100.0f);
-            p->angle2[1] = func_00283B98(p->angle2[1], p->speed2[1] * 100.0f);
-            p->angle2[2] = func_00283B98(p->angle2[2], p->speed2[2] * 100.0f);
+            p->angle[0] = FastAddRotations(p->angle[0], p->speed[0] * 100.0f);
+            p->angle[1] = FastAddRotations(p->angle[1], p->speed[1] * 100.0f);
+            p->angle[2] = FastAddRotations(p->angle[2], p->speed[2] * 100.0f);
+            p->angle2[0] = FastAddRotations(p->angle2[0], p->speed2[0] * 100.0f);
+            p->angle2[1] = FastAddRotations(p->angle2[1], p->speed2[1] * 100.0f);
+            p->angle2[2] = FastAddRotations(p->angle2[2], p->speed2[2] * 100.0f);
         } else {
-            p->angle[0] = func_00283B98(p->angle[0], p->speed[0] * 50.0f);
-            p->angle[1] = func_00283B98(p->angle[1], p->speed[1] * 50.0f);
-            p->angle[2] = func_00283B98(p->angle[2], p->speed[2] * 50.0f);
-            p->angle2[0] = func_00283B98(p->angle2[0], p->speed2[0] * 50.0f);
-            p->angle2[1] = func_00283B98(p->angle2[1], p->speed2[1] * 50.0f);
-            p->angle2[2] = func_00283B98(p->angle2[2], p->speed2[2] * 50.0f);
+            p->angle[0] = FastAddRotations(p->angle[0], p->speed[0] * 50.0f);
+            p->angle[1] = FastAddRotations(p->angle[1], p->speed[1] * 50.0f);
+            p->angle[2] = FastAddRotations(p->angle[2], p->speed[2] * 50.0f);
+            p->angle2[0] = FastAddRotations(p->angle2[0], p->speed2[0] * 50.0f);
+            p->angle2[1] = FastAddRotations(p->angle2[1], p->speed2[1] * 50.0f);
+            p->angle2[2] = FastAddRotations(p->angle2[2], p->speed2[2] * 50.0f);
         }
-        p->offset[0] = func_00283180(p->angle[0]) * p->amplitude[0];
-        p->offset[1] = func_00283198(p->angle[1]) * p->amplitude[1];
-        p->offset[2] = -func_00283198(p->angle[2]) * p->amplitude[2];
-        p->rotation[0] = func_00283180(p->angle2[0]) * p->amplitude2[0];
-        p->rotation[1] = func_00283198(p->angle2[1]) * p->amplitude2[1];
-        p->rotation[2] = -func_00283198(p->angle2[2]) * p->amplitude2[2];
+        p->offset[0] = FastSinOrCosA(p->angle[0]) * p->amplitude[0];
+        p->offset[1] = FastSinOrCosB(p->angle[1]) * p->amplitude[1];
+        p->offset[2] = -FastSinOrCosB(p->angle[2]) * p->amplitude[2];
+        p->rotation[0] = FastSinOrCosA(p->angle2[0]) * p->amplitude2[0];
+        p->rotation[1] = FastSinOrCosB(p->angle2[1]) * p->amplitude2[1];
+        p->rotation[2] = -FastSinOrCosB(p->angle2[2]) * p->amplitude2[2];
         if (p->object) {
-            info = func_002AB1F0(p->object);
+            info = GetMobyPrivateValue0(p->object);
             if (info) {
-                func_002B00B0(p->object, local, 1);
-                func_00282D30(local, local, *(float *)(info + 16));
-                func_00282CC0(p->position, local, p->object + 16);
+                GetGravityDirectionAtObject(p->object, local, 1);
+                FastVecScale(local, local, *(float *)(info + 16));
+                FastVecAdd(p->position, local, p->object + 16);
             } else {
                 qcopy(p->position, p->object + 16);
             }
-            ratio = func_00283CE0(p->timer);
-            ratio /= func_00283CE0(p->duration);
-            func_00282D08(p->position, p->origin, p->position, 1.0f - ratio);
+            ratio = IntToFloat(p->timer);
+            ratio /= IntToFloat(p->duration);
+            lerp_vector(p->position, p->origin, p->position, 1.0f - ratio);
         }
-        if (func_00282948(&p->timer)) {
+        if (FastFloatHelperD(&p->timer)) {
             if (!p->expired) p->expired = 1;
-            if (func_00282948(&p->fade)) p->owner = 0;
+            if (FastFloatHelperD(&p->fade)) p->owner = 0;
         }
     }
 }
 
 
+/* Fills a draw packet with its default corner positions, colors and settings. */
 void func_00316B40(char *p)
 {
     *(long long *)(p + 112) = 0LL;
@@ -684,6 +691,7 @@ void func_00316B40(char *p)
 
 /* func_00316BC8 is defined in 00316BC8-qcopy.c. */
 
+/* Adds one more point to the end of a curve by continuing the direction of the last two points. */
 void func_00316DA0(Vec16_Fc936841d *object, int index)
 {
     char local[16];

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* The grouped quadword copy: the R5900 lq/sq pair with both addresses in registers. */
 typedef int Rac2TI128 __attribute__((mode(TI)));
@@ -43,7 +44,7 @@ extern void func_00282C88(void *p);
    pointer in it, copies two quadwords in and fills the drawn values. */
 void func_0032B598(char *owner, char *src, int arg)
 {
-    Rec_0032B598 *base = D_002351A0;
+    Rec_0032B598 *base = gRingPieces;
     Rec_0032B598 *slot;
     int i;
 
@@ -54,26 +55,26 @@ void func_0032B598(char *owner, char *src, int arg)
         slot->w_9C = (int)owner;
         *(Rac2TI128 *)((char *)slot + 0x20) = *(Rac2TI128 *)D_00189F00;
         *(Rac2TI128 *)((char *)slot + 0x40) = *(Rac2TI128 *)src;
-        slot->f_50 = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_54 = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_58 = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_74 = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_78 = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_7C = func_002A7878(-3.14159274f, 3.14159274f);
-        slot->f_5C = func_002A78D8(0.001f, 0.005f);
-        slot->f_60 = func_002A78D8(0.001f, 0.005f);
-        slot->f_64 = func_002A78D8(0.001f, 0.005f);
-        slot->f_80 = func_002A78D8(0.001f, 0.005f);
-        slot->f_84 = func_002A78D8(0.001f, 0.005f);
-        slot->f_88 = func_002A78D8(0.001f, 0.005f);
-        slot->f_68 = func_002A7878(3.25f, 4.75f);
-        slot->f_6C = func_002A7878(3.25f, 4.75f);
-        slot->f_70 = func_002A7878(3.25f, 4.75f);
-        slot->f_8C = func_002A7878(3.25f, 4.75f);
-        slot->f_90 = func_002A7878(3.25f, 4.75f);
-        slot->f_94 = func_002A7878(3.25f, 4.75f);
-        func_00282C88(slot);
-        func_00282C88((char *)slot + 0x10);
+        slot->f_50 = RandomFloatRange(-3.14159274f, 3.14159274f);
+        slot->f_54 = RandomFloatRange(-3.14159274f, 3.14159274f);
+        slot->f_58 = RandomFloatRange(-3.14159274f, 3.14159274f);
+        slot->f_74 = RandomFloatRange(-3.14159274f, 3.14159274f);
+        slot->f_78 = RandomFloatRange(-3.14159274f, 3.14159274f);
+        slot->f_7C = RandomFloatRange(-3.14159274f, 3.14159274f);
+        slot->f_5C = RandomSignedFloatRange(0.001f, 0.005f);
+        slot->f_60 = RandomSignedFloatRange(0.001f, 0.005f);
+        slot->f_64 = RandomSignedFloatRange(0.001f, 0.005f);
+        slot->f_80 = RandomSignedFloatRange(0.001f, 0.005f);
+        slot->f_84 = RandomSignedFloatRange(0.001f, 0.005f);
+        slot->f_88 = RandomSignedFloatRange(0.001f, 0.005f);
+        slot->f_68 = RandomFloatRange(3.25f, 4.75f);
+        slot->f_6C = RandomFloatRange(3.25f, 4.75f);
+        slot->f_70 = RandomFloatRange(3.25f, 4.75f);
+        slot->f_8C = RandomFloatRange(3.25f, 4.75f);
+        slot->f_90 = RandomFloatRange(3.25f, 4.75f);
+        slot->f_94 = RandomFloatRange(3.25f, 4.75f);
+        ClearVector128(slot);
+        ClearVector128((char *)slot + 0x10);
         slot->w_A8 = 0;
         slot->w_A0 = arg;
         slot->w_98 = 20;

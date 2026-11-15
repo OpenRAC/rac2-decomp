@@ -20,77 +20,78 @@ extern int func_002E5DA0(int,int,void *,int);
 extern int func_002E5E58(int, int, void *);
 extern void func_0029F338(void *), func_002B0A18(int, int);
 extern int func_L08_00435938(void);
-void func_L08_003CC750(char *object) {
-    char *state;
-    float vector[4] __attribute__((aligned(16)));
-    float distance, speed, threshold;
-    F(object,u16,0x96)++;
-    state = F(object,char *,0x68);
-    switch (F(object,u8,0x20)) {
+/* Collectible that waits until the hero is close, then flies to the hero, shrinks, and is collected with a sound and a saved flag. */
+void func_L08_003CC750(char *moby) {
+    char *vars;
+    float toHero[4] __attribute__((aligned(16)));
+    float heroDistance, flySpeed, arriveDistance;
+    F(moby,u16,0x96)++;
+    vars = F(moby,char *,0x68);
+    switch (F(moby,u8,0x20)) {
     case 0:
-        F(object,u8,0x23) = 0x50;
-        F(object,u16,0x34) |= 0x800;
-        func_002A7750(object,1,-1);
-        if (F(object,u8,0x43)) func_002A7470(object,0,0,0);
+        F(moby,u8,0x23) = 0x50;
+        F(moby,u16,0x34) |= 0x800;
+        SetMobyState(moby,1,-1);
+        if (F(moby,u8,0x43)) StartAnimationBlended(moby,0,0,0);
         break;
     case 1:
-        if (func_00282E80(object+0x10,D_00189EA0) < D_L08_001AFED0) {
-            F(state,float,0) = D_L08_001AFEE4;
-            if (F(object,u8,0x43) != 1) func_002A7470(object,1,0,0x14);
-            F(object,float,0x48) = F(state,float,0) + F(state,float,0);
-            func_002A7750(object,2,-1);
+        if (vec_distance_xy(moby+0x10,gHeroPosition) < D_L08_001AFED0) {
+            F(vars,float,0) = D_L08_001AFEE4;
+            if (F(moby,u8,0x43) != 1) StartAnimationBlended(moby,1,0,0x14);
+            F(moby,float,0x48) = F(vars,float,0) + F(vars,float,0);
+            SetMobyState(moby,2,-1);
         }
-        if (F(object,u8,0x31)) func_L08_003CC4B8(object);
+        if (F(moby,u8,0x31)) DrawGlowingSparkRings(moby);
         break;
     case 2:
-        F(state,float,0) += (1.0f - F(state,float,0)) * D_L08_001AFEDC;
-        F(object,float,0x48) = F(state,float,0) + F(state,float,0);
-        func_00282CF0(vector,D_00189EA0,object+0x10);
-        vector[2] += 0.6f;
-        distance = func_00282E20(vector);
-        threshold = 0.12f;
-        if (F(object,u16,0x96) < 180) {
-            if (F(D_00189EA0,int,0x2214) != 0x31)
-                speed = D_L08_001AFED4 * (F(state,float,0) * 0.016666668f);
+        F(vars,float,0) += (1.0f - F(vars,float,0)) * D_L08_001AFEDC;
+        F(moby,float,0x48) = F(vars,float,0) + F(vars,float,0);
+        FastVecSub(toHero,gHeroPosition,moby+0x10);
+        toHero[2] += 0.6f;
+        heroDistance = vec_length_xy(toHero);
+        arriveDistance = 0.12f;
+        if (F(moby,u16,0x96) < 180) {
+            if (F(gHeroPosition,int,0x2214) != 0x31)
+                flySpeed = D_L08_001AFED4 * (F(vars,float,0) * 0.016666668f);
             else {
-                speed = D_L08_001AFED8 * (F(state,float,0) * 0.016666668f);
-                threshold = 0.8f;
+                flySpeed = D_L08_001AFED8 * (F(vars,float,0) * 0.016666668f);
+                arriveDistance = 0.8f;
             }
-        } else speed = F(state,float,0) + F(state,float,0);
-        func_00282FB8(vector,vector,speed);
-        func_00282CC0(object+0x10,object+0x10,vector);
-        if (((ObjectView *)object)->scale > 0.1f || distance < threshold || distance < speed)
-            ((ObjectView *)object)->scale -= D_L08_001AFEE8 * F(((ObjectView *)object)->descriptor,float,0x24);
-        if ((distance < speed && ((ObjectView *)object)->scale < F(((ObjectView *)object)->descriptor,float,0x24)*0.01f) ||
-            D_00189E20.action == 0x14 || D_00189E20.action == 0x19 ||
-            D_00189E20.mode == 0x39 || D_00189E20.mode == 0x6F) {
-            func_002E5DA0(3,0,object,0x96A);
+        } else flySpeed = F(vars,float,0) + F(vars,float,0);
+        FastVectorDivideHelper(toHero,toHero,flySpeed);
+        FastVecAdd(moby+0x10,moby+0x10,toHero);
+        if (((ObjectView *)moby)->scale > 0.1f || heroDistance < arriveDistance || heroDistance < flySpeed)
+            ((ObjectView *)moby)->scale -= D_L08_001AFEE8 * F(((ObjectView *)moby)->descriptor,float,0x24);
+        if ((heroDistance < flySpeed && ((ObjectView *)moby)->scale < F(((ObjectView *)moby)->descriptor,float,0x24)*0.01f) ||
+            gHeroState.action == 0x14 || gHeroState.action == 0x19 ||
+            gHeroState.mode == 0x39 || gHeroState.mode == 0x6F) {
+            PlaySoundFromClassBank(3,0,moby,0x96A);
             D_001A7A1A++;
-            if (F(state,char *,4)) {
-                D_L08_0021DE80.flags[F(F(state,char *,4),short,0xB2)] = F(F(state,char *,4),u8,0xB0)+2;
-                if (F(F(state,char *,4),u8,0xB0) == 0xFF ||
-                    (!(D_L08_001B2840[F(F(state,char *,4),u8,0xB0)] & 0x80) &&
-                     (F(D_0019B2E8,u8,F(F(state,char *,4),u8,0xB0)+(D_001A79F0<<4)) & 0x80)))
-                    D_L08_0021EAF0.flags[F(F(state,char *,4),short,0xB2)] = F(F(state,char *,4),u8,0xB0)+2;
+            if (F(vars,char *,4)) {
+                D_L08_0021DE80.flags[F(F(vars,char *,4),short,0xB2)] = F(F(vars,char *,4),u8,0xB0)+2;
+                if (F(F(vars,char *,4),u8,0xB0) == 0xFF ||
+                    (!(D_L08_001B2840[F(F(vars,char *,4),u8,0xB0)] & 0x80) &&
+                     (F(D_0019B2E8,u8,F(F(vars,char *,4),u8,0xB0)+(gCurrentMapIndex<<4)) & 0x80)))
+                    D_L08_0021EAF0.flags[F(F(vars,char *,4),short,0xB2)] = F(F(vars,char *,4),u8,0xB0)+2;
                 {
-                    u16 index = F(F(state,char *,4),u16,0xB2);
-                    if (index & 1) {
-                        u8 *bits = (u8 *)D_0019B4A8 + (((short)index >> 1) + (D_001A79F0 << 10));
-                        if (((*bits >> 4) & 7) != 7) *bits += 0x10;
+                    u16 flagIndex = F(F(vars,char *,4),u16,0xB2);
+                    if (flagIndex & 1) {
+                        u8 *flagBits = (u8 *)D_0019B4A8 + (((short)flagIndex >> 1) + (gCurrentMapIndex << 10));
+                        if (((*flagBits >> 4) & 7) != 7) *flagBits += 0x10;
                     } else {
-                        u8 *bits = (u8 *)D_0019B4A8 + (((short)index >> 1) + (D_001A79F0 << 10));
-                        if ((*bits & 7) != 7) ++*bits;
+                        u8 *flagBits = (u8 *)D_0019B4A8 + (((short)flagIndex >> 1) + (gCurrentMapIndex << 10));
+                        if ((*flagBits & 7) != 7) ++*flagBits;
                     }
                 }
             }
-            func_0029F338(object);
-            if (!func_L08_00435938() && !D_001A7A60[5]) {
+            MarkMobySpawned(moby);
+            if (!GetLevelSavedCount() && !D_001A7A60[5]) {
                 D_001A7A60[5] = 1;
-                func_002E5E58(1,0,0);
-                func_002B0A18(0x1233,-1);
+                PlaySoundFromGlobalBank(1,0,0);
+                SetEntryValueByIndex(0x1233,-1);
                 D_L08_001A903C = 1;
             }
-        } else func_L08_003CC4B8(object);
+        } else DrawGlowingSparkRings(moby);
         break;
     }
 }

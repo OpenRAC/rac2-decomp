@@ -4,6 +4,7 @@ extern char *D_L08_001B29DC SDATA(D_L08_001B29DC);
 extern void *func_0029EFD0(int);
 extern void func_002A0F48(void *), func_0029F338(void *);
 
+/* Replaces a tracked object with a fresh one of another kind that copies its position, rotation and size, then removes the old one. */
 void func_L08_003F6D30(char *object)
 {
     char *state = *(char **)(object + 0x68);
@@ -11,7 +12,7 @@ void func_L08_003F6D30(char *object)
     float scale, numerator, denominator, ratio;
     if (*(int *)(state + 0x2c) != -1) {
         source = D_L08_001B29DC + *(int *)(state + 0x2c) * 256;
-        replacement = func_0029EFD0(0x131d);
+        replacement = CreateMoby(0x131d /* moby class 4893 */);
         scale = *(float *)(replacement + 0x2c);
         *(unsigned short *)(replacement + 0x32) = *(unsigned short *)(source + 0x32);
         replacement[0x30] = source[0x30];
@@ -26,7 +27,7 @@ void func_L08_003F6D30(char *object)
         *(TaboraReplacementQuad *)(replacement + 0x10) = *(TaboraReplacementQuad *)(source + 0x10);
         func_002A0F48(replacement);
         if (*(int *)(state + 0x2c) != -1)
-            func_0029F338(D_L08_001B29DC + *(int *)(state + 0x2c) * 256);
+            MarkMobySpawned(D_L08_001B29DC + *(int *)(state + 0x2c) * 256);
         *(int *)(state + 0x2c) = -1;
     }
 }

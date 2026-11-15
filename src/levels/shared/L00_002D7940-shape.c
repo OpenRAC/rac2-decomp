@@ -44,6 +44,7 @@ extern float func_00282E48(float *, float *);
 /* Is the position inside the primitive's shape, the radius widening a sphere? Each shape is
    tested in its own space: a cuboid against the unit cube, a cylinder against the unit
    cylinder, and a pill against its cylinder and then the sphere at either end. */
+/* Tells whether a point is inside a collision shape. */
 int func_L00_002DB4B8(Quad *position, CollisionPrimitive *primitive, float radius)
 {
     Vec origin, axis, local, transformed;
@@ -54,9 +55,9 @@ int func_L00_002DB4B8(Quad *position, CollisionPrimitive *primitive, float radiu
     case 3: {
         CollisionShape *cuboid = D_L00_001B1F8C + primitive->index;
 
-        func_00282CF0(local.f, point, cuboid->position);
+        FastVecSub(local.f, point, cuboid->position);
         local.f[3] = 0.0f;
-        func_00283098(transformed.f, local.f, cuboid->inverse);
+        matrix_mul_vec3(transformed.f, local.f, cuboid->inverse);
         return -1.0f <= transformed.f[0] && transformed.f[0] <= 1.0f
             && -1.0f <= transformed.f[1] && transformed.f[1] <= 1.0f
             && -1.0f <= transformed.f[2] && transformed.f[2] <= 1.0f;
@@ -65,44 +66,44 @@ int func_L00_002DB4B8(Quad *position, CollisionPrimitive *primitive, float radiu
         CollisionShape *cylinder = D_L00_001B1F9C + primitive->index;
         int inside = 0;
 
-        func_00282CF0(local.f, point, cylinder->position);
+        FastVecSub(local.f, point, cylinder->position);
         local.f[3] = 0.0f;
-        func_00283098(transformed.f, local.f, cylinder->inverse);
-        if (func_00282E20(transformed.f) < 1.0f && -1.0f <= transformed.f[2] && transformed.f[2] <= 1.0f)
+        matrix_mul_vec3(transformed.f, local.f, cylinder->inverse);
+        if (vec_length_xy(transformed.f) < 1.0f && -1.0f <= transformed.f[2] && transformed.f[2] <= 1.0f)
             inside = 1;
         return inside;
     }
     case 5: {
         CollisionShape *sphere = D_L00_001B1F94 + primitive->index;
-        float limit = func_00282DF0(sphere->matrix) + radius;
+        float limit = FastVecLength(sphere->matrix) + radius;
 
-        return func_00282E48(point, sphere->position) < limit;
+        return fast_vec_dist(point, sphere->position) < limit;
     }
     case 7: {
         CollisionPill *pill = D_L00_001B1F84 + primitive->index;
 
-        func_00282CF0(local.f, point, pill->position);
+        FastVecSub(local.f, point, pill->position);
         local.f[3] = 0.0f;
-        func_00283098(transformed.f, local.f, pill->inverse);
-        if (func_00282E20(transformed.f) < 1.0f && -1.0f <= transformed.f[2] && transformed.f[2] <= 1.0f)
+        matrix_mul_vec3(transformed.f, local.f, pill->inverse);
+        if (vec_length_xy(transformed.f) < 1.0f && -1.0f <= transformed.f[2] && transformed.f[2] <= 1.0f)
             return 1;
         axis.f[0] = 0.0f;
         axis.f[1] = 0.0f;
         axis.f[2] = 1.0f;
         axis.f[3] = 1.0f;
-        func_00283098(transformed.f, axis.f, pill->matrix);
-        func_00282CC0(transformed.f, transformed.f, pill->position);
-        func_00282CF0(axis.f, point, transformed.f);
-        if (func_00282DF0(axis.f) < pill->radius)
+        matrix_mul_vec3(transformed.f, axis.f, pill->matrix);
+        FastVecAdd(transformed.f, transformed.f, pill->position);
+        FastVecSub(axis.f, point, transformed.f);
+        if (FastVecLength(axis.f) < pill->radius)
             return 1;
         axis.f[0] = 0.0f;
         axis.f[1] = 0.0f;
         axis.f[2] = -1.0f;
         axis.f[3] = 1.0f;
-        func_00283098(transformed.f, axis.f, pill->matrix);
-        func_00282CC0(transformed.f, transformed.f, pill->position);
-        func_00282CF0(axis.f, point, transformed.f);
-        if (func_00282DF0(axis.f) < pill->radius)
+        matrix_mul_vec3(transformed.f, axis.f, pill->matrix);
+        FastVecAdd(transformed.f, transformed.f, pill->position);
+        FastVecSub(axis.f, point, transformed.f);
+        if (FastVecLength(axis.f) < pill->radius)
             return 1;
         return 0;
     }

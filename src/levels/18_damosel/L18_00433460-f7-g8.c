@@ -59,52 +59,53 @@ typedef struct {
     char dir[0x10];
 } Thing;
 
-void func_L18_00436B80(Thing *m)
+/* A trigger that waits for the player to step into its area, then plays a short scene or message, gives an item if one is set, and removes itself. */
+void func_L18_00436B80(Thing *moby)
 {
-    TriggerVars *p = m->vars;
+    TriggerVars *triggerVars = moby->vars;
     int notify, i, missing, fail;
     int played;
 
-    switch (m->state) {
+    switch (moby->state) {
     case 0:
-        if ((p->item != -1 && D_001A7BC8[p->item] != 0)
-            || (m->group != 0xFF && (D_0019B2E8[m->group + D_001A79F0 * 16] & 0x80))) {
-            func_0029F338(m);
+        if ((triggerVars->item != -1 && D_001A7BC8[triggerVars->item] != 0)
+            || (moby->group != 0xFF && (D_0019B2E8[moby->group + gCurrentMapIndex * 16] & 0x80))) {
+            MarkMobySpawned(moby);
             break;
         }
-        func_002A7750(m, 1, -1);
+        SetMobyState(moby, 1, -1);
     case 1:
-        if (p->on == 0 && func_002B38B8(m) == 0 && m->hit == 0)
+        if (triggerVars->on == 0 && IsThirdPendingFlagSet(moby) == 0 && moby->hit == 0)
             break;
-        p->on = 1;
-        func_002A7750(m, 2, -1);
+        triggerVars->on = 1;
+        SetMobyState(moby, 2, -1);
     case 2:
-        if (p->on == 0) {
-            func_002A7750(m, 1, -1);
+        if (triggerVars->on == 0) {
+            SetMobyState(moby, 1, -1);
             break;
         }
-        if (D_00189E20.mode == 0x1C)
+        if (gHeroState.mode == 0x1C)
             break;
-        if (D_00189E20.health <= 0)
+        if (gHeroState.health <= 0)
             break;
         if (D_L18_001A8F00 != 0)
             break;
-        if (p->msg != -1 && func_002ACBC8(D_00189E20.body, p->msg) == 0)
+        if (triggerVars->msg != -1 && IsPointInCuboid(gHeroState.body, triggerVars->msg) == 0)
             break;
         fail = 1;
         missing = 1;
-        if (D_L18_002BD8C0[D_001A79F0] != 0 && D_L18_002BD8C0[D_001A79F0][p->idx] != 0) {
-            for (i = 0; D_L18_002BD8C0[D_001A79F0][p->idx][i] != -1; i++) {
-                int e = D_L18_002BD8C0[D_001A79F0][p->idx][i];
+        if (D_L18_002BD8C0[gCurrentMapIndex] != 0 && D_L18_002BD8C0[gCurrentMapIndex][triggerVars->idx] != 0) {
+            for (i = 0; D_L18_002BD8C0[gCurrentMapIndex][triggerVars->idx][i] != -1; i++) {
+                int entryId = D_L18_002BD8C0[gCurrentMapIndex][triggerVars->idx][i];
 
                 missing = 0;
-                if (p->tail.b.quiet == 0) {
-                    int bit = 1 << (e & 0x1F);
-                    if (D_00139768[(unsigned int)e >> 2] & bit)
+                if (triggerVars->tail.b.quiet == 0) {
+                    int bit = 1 << (entryId & 0x1F);
+                    if (D_00139768[(unsigned int)entryId >> 2] & bit)
                         continue;
                 }
-                if (func_00288AA0(D_L18_001BF9C0, e) == 0 && i == 0) {
-                    func_0026FEB8(D_L18_002C0C60, m->id, m->oclass, D_001A79F0, p->idx, e);
+                if (PushRequestQueue(D_L18_001BF9C0, entryId) == 0 && i == 0) {
+                    STUB_printf(D_L18_002C0C60, moby->id, moby->oclass, gCurrentMapIndex, triggerVars->idx, entryId);
                     return;
                 }
                 fail = 0;
@@ -116,80 +117,80 @@ void func_L18_00436B80(Thing *m)
            on an 8-byte boundary. */
         do {
             if (missing != 0)
-                func_0026FEB8(D_L18_001B18C0, D_001A79F0, p->idx);
+                STUB_printf(D_L18_001B18C0, gCurrentMapIndex, triggerVars->idx);
         } while (0);
         if (fail != 0) {
-            p->tail.b.had = 0;
-            func_002A7750(m, 4, -1);
+            triggerVars->tail.b.had = 0;
+            SetMobyState(moby, 4, -1);
             break;
         }
-        p->tail.b.had = 1;
-        func_00288BE8(D_L18_001BF9C0);
-        if (D_L18_001B2348 < 5 || (D_001A79F0 == 6 && p->idx == 0))
-            func_002F5CC8();
-        func_002A7750(m, 3, -1);
+        triggerVars->tail.b.had = 1;
+        LaunchQueuedRequest(D_L18_001BF9C0);
+        if (D_L18_001B2348 < 5 || (gCurrentMapIndex == 6 && triggerVars->idx == 0))
+            SetSlowdownFactorAndLowFpsFade();
+        SetMobyState(moby, 3, -1);
         break;
     case 3:
-        if (func_002F5D10() == 0) {
-            if (p->link != -1) {
-                char *o = D_L18_001B290C + (p->link << 7);
-                func_L00_002B9D60(o + 0x30, o + 0x70, 0, 1);
+        if (IsEitherModeTwo() == 0) {
+            if (triggerVars->link != -1) {
+                char *waypoint = gWaypointTable + (triggerVars->link << 7);
+                ResetHeroPositionAndDirection(waypoint + 0x30, waypoint + 0x70, 0, 1);
             }
-            func_002A7750(m, 4, -1);
+            SetMobyState(moby, 4, -1);
         }
-        if (D_001A79F0 != 0)
+        if (gCurrentMapIndex != 0)
             break;
-        if (p->item == -1)
+        if (triggerVars->item == -1)
             break;
-        if (func_002F5D10() != 0)
+        if (IsEitherModeTwo() != 0)
             break;
         notify = 0;
-        if (p->item != -1) {
-            func_002AD7B8(p->item);
-            if (p->item != 0x18)
-                func_002AF0A8(p->item);
+        if (triggerVars->item != -1) {
+            MarkFlagAndAppendToList(triggerVars->item);
+            if (triggerVars->item != 0x18)
+                PlayIndexedSound(triggerVars->item);
             notify = 1;
         }
-        if (m->group != 0xFF && !(D_0019B2E8[m->group + D_001A79F0 * 16] & 0x80)) {
-            func_002A0430(m->group);
+        if (moby->group != 0xFF && !(D_0019B2E8[moby->group + gCurrentMapIndex * 16] & 0x80)) {
+            MarkTableEntryFlagged(moby->group);
             notify = 1;
         }
-        if (p->count != 0 && (p->tail.word & 0xFFFF0000)) {
-            if (p->link != -1) {
-                char *o = D_L18_001B290C + (p->link << 7);
-                func_002DF3F8(o + 0x30, o + 0x70);
+        if (triggerVars->count != 0 && (triggerVars->tail.word & 0xFFFF0000)) {
+            if (triggerVars->link != -1) {
+                char *waypoint = gWaypointTable + (triggerVars->link << 7);
+                CaptureCheckpointState(waypoint + 0x30, waypoint + 0x70);
             } else
-                func_002DF3F8(m->pos, m->dir);
+                CaptureCheckpointState(moby->pos, moby->dir);
         }
-        if (p->tail.low != -1)
-            func_00288CB0(p->tail.low, 1);
-        else if (notify != 0 || p->tail.b.had != 0)
-            func_0029B3E0(0, -1);
+        if (triggerVars->tail.low != -1)
+            SetSmallDataValueAndRefresh(triggerVars->tail.low, 1);
+        else if (notify != 0 || triggerVars->tail.b.had != 0)
+            MemcardSave(0, -1);
         break;
     case 4:
         played = 0;
-        if (p->item != -1) {
-            func_002AD7B8(p->item);
-            if (p->item != 0x18)
-                func_002AF0A8(p->item);
+        if (triggerVars->item != -1) {
+            MarkFlagAndAppendToList(triggerVars->item);
+            if (triggerVars->item != 0x18)
+                PlayIndexedSound(triggerVars->item);
             played = 1;
         }
-        if (m->group != 0xFF && !(D_0019B2E8[m->group + D_001A79F0 * 16] & 0x80)) {
-            func_002A0430(m->group);
+        if (moby->group != 0xFF && !(D_0019B2E8[moby->group + gCurrentMapIndex * 16] & 0x80)) {
+            MarkTableEntryFlagged(moby->group);
             played = 1;
         }
-        if (p->count > 0 && (p->tail.word & 0xFFFF0000)) {
-            if (p->link != -1) {
-                char *o = D_L18_001B290C + (p->link << 7);
-                func_002DF3F8(o + 0x30, o + 0x70);
+        if (triggerVars->count > 0 && (triggerVars->tail.word & 0xFFFF0000)) {
+            if (triggerVars->link != -1) {
+                char *waypoint = gWaypointTable + (triggerVars->link << 7);
+                CaptureCheckpointState(waypoint + 0x30, waypoint + 0x70);
             } else
-                func_002DF3F8(D_00189EA0, D_00189EA0 + 0x10);
+                CaptureCheckpointState(gHeroPosition, gHeroPosition + 0x10);
         }
-        if (p->tail.low != -1)
-            func_00288CB0(p->tail.low, 1);
-        else if ((played != 0 || p->tail.b.had != 0) && p->count != p->tail.low)
-            func_0029B3E0(0, -1);
-        func_0029F338(m);
+        if (triggerVars->tail.low != -1)
+            SetSmallDataValueAndRefresh(triggerVars->tail.low, 1);
+        else if ((played != 0 || triggerVars->tail.b.had != 0) && triggerVars->count != triggerVars->tail.low)
+            MemcardSave(0, -1);
+        MarkMobySpawned(moby);
         break;
     }
 }

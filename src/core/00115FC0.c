@@ -55,6 +55,7 @@ extern unsigned int strlen(const char *);
 
 extern int strcmp(const char *, const char *);
 
+/* Reads one multibyte character (such as Shift-JIS or EUC-JP) and gives its code. */
 int func_00115FC0(MbtowcReent *r, int *pwc, const char *s, unsigned int n, int *state) {
     int dummy;
     unsigned char *t = (unsigned char *)s;

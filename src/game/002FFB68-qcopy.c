@@ -33,30 +33,30 @@ char *func_002FFB68(char *obj)
     qcopy(pos, obj + 0x10);
     qcopy(rot, obj + 0xF0);
     if (id == 0x4D || id == 0x6B || id == 0x6C) {
-        func_002FF3F8();
+        SetupPreviewObject();
         mode = 0;
     } else if (id == 0x3D || id == 0x49 || id == 0x5D || id == 0x5E) {
-        func_002FF3F8();
+        SetupPreviewObject();
         mode = 1;
     } else {
-        func_0029F338(obj);
-        rec = D_00239BA0 + id * 0xE0;
-        if (func_00294630(*(s32 *)(rec + 0x14)) == 0) {
-            func_00294420(*(s32 *)(rec + 0x14));
-            func_002B7CE0(1);
+        MarkMobySpawned(obj);
+        rec = gWeaponTable_00239BA0 + id * 0xE0;
+        if (IsClassCached(*(s32 *)(rec + 0x14)) == 0) {
+            LoadClassIntoFreeCacheSlot(*(s32 *)(rec + 0x14));
+            PumpMusicAndDiscRead(1);
         }
-        func_00294988(*(s32 *)(rec + 0x14));
+        SwitchCachedDiscAsset(*(s32 *)(rec + 0x14));
     }
-    rec = D_00239BA0 + id * 0xE0;
-    spawned = func_002FF300(*(s32 *)(rec + 0x14), mode);
+    rec = gWeaponTable_00239BA0 + id * 0xE0;
+    spawned = InitSharedEffectObject(*(s32 *)(rec + 0x14), mode);
     if (spawned != 0) {
         qcopy(spawned + 0x10, pos);
         qcopy(spawned + 0xF0, rot);
         if (mode < 0) {
             slot = *(s32 *)(rec + 0xC);
             D_001A7398[slot] = 0;
-            ((HeroRec50 *)(D_00189E20 + slot * 0x50))->word = 0;
-            ((HeroTable *)D_00189E20)->word[slot] = 0;
+            ((HeroRec50 *)(gHeroState + slot * 0x50))->word = 0;
+            ((HeroTable *)gHeroState)->word[slot] = 0;
         }
     }
     return spawned;

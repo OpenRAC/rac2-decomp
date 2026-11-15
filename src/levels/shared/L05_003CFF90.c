@@ -52,59 +52,61 @@ extern char D_00188660[];
 
 /* The object's three-state update. State 1 also aims at a target from the object table; states
    1 and 2 restart the looping sound when its slot no longer belongs to this object. */
+/* Runs a creature's three states, aiming at its target, playing its sounds and attacking when
+   it is ready. */
 void func_L05_003CFF90(char *obj)
 {
     float a[4] __attribute__((aligned(16)));
     float b[4] __attribute__((aligned(16)));
     ObjVars003CFF90 *s = *(ObjVars003CFF90 **)(obj + 0x68);
-    ObjCommon003CFF90 *p = func_002ED688(obj);
+    ObjCommon003CFF90 *p = GetMobyMotionData(obj);
     switch (*(unsigned char *)(obj + 0x20)) {
     case 0:
         *(unsigned char *)(obj + 0x30) = 255;
-        if (!func_L00_00367720()) return;
-        func_L05_003D0320(obj);
-        func_00282C88(a);
-        if (s->hasCallback) func_L05_00379E60(obj, func_L05_003D02C8, 0, 0);
+        if (!GetStoredPointerValue()) return;
+        InitObjectReachAndPosition(obj);
+        ClearVector128(a);
+        if (s->hasCallback) AppendLevelObject(obj, func_L05_003D02C8, 0, 0);
         return;
     case 1:
-        func_L05_0037C160(obj);
-        if (func_L05_0037B538(obj, 0, 0, 0) == 1) func_002E5DA0(1, 0, obj, 0x957);
-        func_L05_0037B948(obj, 0, 176.0f);
+        UpdateObjectMovementState(obj);
+        if (ProcessObjectCollisionHit(obj, 0, 0, 0) == 1) PlaySoundFromClassBank(1, 0, obj, 0x957);
+        CheckPlayerInViewAndRange(obj, 0, 176.0f);
         if (p->state110 == 1) {
             if (s->target != -1) {
                 char *target;
                 p->hasTarget = 1;
                 target = (char *)(D_L05_001B251C + (s->target << 8));
                 p->targetObject = target;
-                if (func_00282E48(target + 0x10, obj + 0x10) < 10.0f) {
-                    SoundSlot003CFF90 *sound = (SoundSlot003CFF90 *)(D_00188660 + s->nearSound * 0x70);
-                    if ((sound->owner != obj || sound->live == 0) && func_002A77E0(400) == 0)
-                        s->nearSound = func_002E5DA0(14, 0, obj, 0xFBF);
+                if (fast_vec_dist(target + 0x10, obj + 0x10) < 10.0f) {
+                    SoundSlot003CFF90 *sound = (SoundSlot003CFF90 *)(gSoundState + s->nearSound * 0x70);
+                    if ((sound->owner != obj || sound->live == 0) && RandomIntBelow(400) == 0)
+                        s->nearSound = PlaySoundFromClassBank(14, 0, obj, 0xFBF);
                 }
             }
-            if (p->flag108 && p->flag104) func_L05_003D0420(obj);
-            if (func_L05_0037B888(obj)) func_L05_0037B6D0(obj);
-            func_00282948(s->block1B8);
+            if (p->flag108 && p->flag104) SpawnObjectEffectOnce(obj);
+            if (CanObjectTakeNextStep(obj)) StartObjectMovementState(obj);
+            FastFloatHelperD(s->block1B8);
             qcopy(b, obj + 0x10);
             b[3] = *(float *)(obj + 0xC) * 0.0009765599970705807f;
-            if (func_00283DB8(b, 100.0f) != -1) func_L05_003D0538(obj);
+            if (FastMathHelperA(b, 100.0f) != -1) func_L05_003D0538(obj);
         }
         break;
     case 2:
-        func_L05_0037C160(obj);
-        if (func_L05_0037B538(obj, 0, 0, 0) == 1) func_002E5DA0(1, 0, obj, 0x957);
-        func_L05_0037B948(obj, 0, 176.0f);
+        UpdateObjectMovementState(obj);
+        if (ProcessObjectCollisionHit(obj, 0, 0, 0) == 1) PlaySoundFromClassBank(1, 0, obj, 0x957);
+        CheckPlayerInViewAndRange(obj, 0, 176.0f);
         if (p->state110 == 1) {
-            if (p->flag104) func_L05_003D0420(obj);
-            if (func_L05_0037B888(obj)) func_L05_0037B6D0(obj);
-            func_00282948(s->block1B8);
+            if (p->flag104) SpawnObjectEffectOnce(obj);
+            if (CanObjectTakeNextStep(obj)) StartObjectMovementState(obj);
+            FastFloatHelperD(s->block1B8);
             func_L05_003D0538(obj);
         }
         break;
     }
     {
-        SoundSlot003CFF90 *sound = (SoundSlot003CFF90 *)(D_00188660 + s->loopSound * 0x70);
+        SoundSlot003CFF90 *sound = (SoundSlot003CFF90 *)(gSoundState + s->loopSound * 0x70);
         if (sound->owner != obj || sound->live == 0)
-            s->loopSound = func_002E5DA0(3, 6, obj, 0x957);
+            s->loopSound = PlaySoundFromClassBank(3, 6, obj, 0x957);
     }
 }

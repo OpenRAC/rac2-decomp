@@ -14,6 +14,7 @@ extern int func_002B0CE0(int, int, int);
 extern int func_L11_002D8EF8(int, int);
 extern float func_00283B98(float, float);
 
+/* Per-frame update of the Levitator Pad (moby class 2274). */
 /* State 0 opens the trigger; state 1 reacts to the hero being on the object, or being in state
  * 0x82 inside its cuboid. Then pulses the object's colour, in the channel the flag selects. */
 void func_L11_003CF250(char *obj)
@@ -26,39 +27,39 @@ void func_L11_003CF250(char *obj)
     switch (*(unsigned char *)(obj + 0x20)) {
     case 0:
         *(unsigned short *)(obj + 0x34) |= 0x10;
-        func_002A7750(obj, 1, -1);
+        SetMobyState(obj, 1, -1);
         break;
     case 1:
-        if (func_002B3868(obj) != 0) {
+        if (SetFirstPendingFlag(obj) != 0) {
             word = *(int *)rig;
             if (word != -1) {
-                func_L00_00429020(word);
+                LockCameraEntry(word);
                 *(int *)rig = -1;
             }
         }
-        hero = D_00189E20;
+        hero = gHeroState;
         if (*(char **)(hero + 0x33C) == obj && *(int *)(hero + 0x340) != 0) {
             if (D_001A7A40[0xC0] != 0) {
-                func_002B0CE0(0xC, 0x27F7, 1);
+                ForceClaimNotice(0xC, 0x27F7, 1);
                 *(short *)(hero + 0x1F2) = 0xA;
                 turn = *(float *)(rig + 0xC);
                 if (turn != 0.0f)
                     *(float *)(hero + 0x5B8) = turn;
             }
         } else {
-            other = D_00189E20;
+            other = gHeroState;
             if (*(int *)(other + 0x2294) == 0x82) {
                 level = *(int *)(rig + 8);
-                if (level >= 0 && func_002ACBC8(other + 0x80, level) != 0)
-                    func_L11_002D8EF8(6, 1);
+                if (level >= 0 && IsPointInCuboid(other + 0x80, level) != 0)
+                    EnterHeroState_L11(6, 1);
             }
         }
         break;
     }
     if (*(unsigned char *)(obj + 0x31) != 0) {
-        pulse = func_00283B98(*(float *)(rig + 4), 0.10471977f);
+        pulse = FastAddRotations(*(float *)(rig + 4), 0.10471977f);
         *(float *)(rig + 4) = pulse;
-        glow = func_00283CF0(func_00283198(pulse) * 128.0f);
+        glow = FloatToInt(FastSinOrCosB(pulse) * 128.0f);
         if (glow > 0x80)
             glow = 0x80;
         else if (glow < 0x20)

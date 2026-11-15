@@ -165,10 +165,11 @@ extern void func_002AFFD8(void *, void *, s32);
 
 extern void func_L00_00325600(void *, void *, s32);
 
+/* Sets up this flying enemy on its first frame (stats, speeds, a helper object), then each frame scales it, keeps its helper object in step and checks if it should die near the boss spot. */
 void func_L23_003BF9B0(Moby_003BF9B0 *moby)
 {
     State_003BF9B0 *vars = moby->pVars;
-    f32 k;
+    f32 sizeFactor;
 
     if (moby->state == 0) {
         f32 fps;
@@ -225,50 +226,50 @@ void func_L23_003BF9B0(Moby_003BF9B0 *moby)
         vars->f88 |= 0x81;
         moby->f32 = 0xFF;
         moby->f30 = 0xFF;
-        vars->child = func_0029EFD0(0x7E6);
-        func_00283360(vars->child->fC0);
+        vars->child = CreateMoby(0x7E6 /* moby class 2022 */);
+        set_identity_rotation_rows(vars->child->fC0);
         vars->f258 = 0;
-        func_L23_003C0028(moby);
-        vars->f48 = func_00283CF0(12.0f);
-        vars->f4A = func_00283CF0(14.4f);
+        ResetObjectToIdle(moby);
+        vars->f48 = FloatToInt(12.0f);
+        vars->f4A = FloatToInt(14.4f);
     } else if (ref_L23_003BF9B0_00 != 0 && D_L23_001B1424 == 0) {
         if (D_L23_001B36AC < 10)
-            func_L23_003C1B58(moby);
+            RelocateEnemyNearHero(moby);
         else
             D_L23_001B1650 = 0;
     }
     if (moby->state == 13)
         return;
-    func_002B60B0(moby, 0.0044444446f, 0.13333334f, 0.0017453295f, 0.20943955f);
-    k = 1.4f;
+    SetControllerSpeedLimits(moby, 0.0044444446f, 0.13333334f, 0.0017453295f, 0.20943955f);
+    sizeFactor = 1.4f;
     if (moby->state == 2)
-        k = 0.7f;
-    moby->scale = moby->pClass->scale * k;
+        sizeFactor = 0.7f;
+    moby->scale = moby->pClass->scale * sizeFactor;
     if (vars->child != 0) {
         vars->child->f32 = moby->f32;
         vars->child->f30 = moby->f30;
         vars->child->f38 = moby->f38;
         vars->child->f78 = moby->f78;
         vars->child->f31 = 1;
-        vars->child->scale = vars->child->pClass->scale * k;
-        if (vars->child->f31 != 0 && func_00282E48(vars->child->pos, D_L23_001BA640) < 24.0f) {
-            func_002A93B0(vars->child);
+        vars->child->scale = vars->child->pClass->scale * sizeFactor;
+        if (vars->child->f31 != 0 && fast_vec_dist(vars->child->pos, gCameraPosition_L23) < 24.0f) {
+            UpdateMobyGroundCheck(vars->child);
             vars->child->f6F = 22;
         }
     }
-    if (moby->f31 != 0 && func_00282E48(moby->pos, D_L23_001BA640) < 24.0f) {
-        func_002A93B0(moby);
+    if (moby->f31 != 0 && fast_vec_dist(moby->pos, gCameraPosition_L23) < 24.0f) {
+        UpdateMobyGroundCheck(moby);
         moby->f6F = 22;
     }
     {
-        Found_003BF9B0 *found = func_002A9640(moby, 0x30000, 1);
+        Found_003BF9B0 *found = FindOwnedEffectSlot(moby, 0x30000, 1);
 
-        if (found != 0 && found->info != 0 && found->info->fAA == 0x1190)
+        if (found != 0 && found->info != 0 && found->info->fAA == 0x1190 /* moby class 4496 */)
             vars->f20 = 0;
     }
     if (moby->state == 2)
         vars->f178 = 0;
-    func_002B0ED8(moby, vars->f140, 0);
-    func_002AFFD8(moby->pos, vars->f280, 0);
-    func_L00_00325600(moby->fC0, vars->f280, 0);
+    ApplyDamageToObject(moby, vars->f140, 0);
+    ComputeViewDirection(moby->pos, vars->f280, 0);
+    NegateAndForwardVector(moby->fC0, vars->f280, 0);
 }

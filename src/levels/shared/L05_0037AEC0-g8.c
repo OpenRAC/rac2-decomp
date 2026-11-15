@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* Built with -G8: the spawn counter at 0x1AC4D8 and the object table base at 0x1B251C are
    reached through $gp in retail, so those two bodies live here. */
@@ -29,20 +30,22 @@ extern void func_L05_0037AEC0(char *object, int flag);
 
 extern void func_0029F338(void *object);
 
-extern void func_L05_0037AFF8(int entry);
+extern /* Sets up one effect entry: calls the callbacks of matching registered objects, then spawns each object in its list. */
+void func_L05_0037AFF8(int entry);
 
 extern void func_L05_0037B108(void);
 
 /* Runs the constructor over every registered entry, then clears the two shared counters. */
+/* Sets up every registered effect entry, then resets the two shared counters. */
 void func_L05_0037B210(void)
 {
     int i;
 
     for (i = 0; i < D_L05_001AC4D8; i++)
-        func_L05_0037AFF8(D_L05_00225DD0[i]);
+        SpawnEntryListObjects(D_L05_00225DD0[i]);
     D_L05_00221D10[4] = 0;
     D_L05_00221D10[3] = 0;
-    func_L05_0037B108();
+    RemoveEffectFamilyMobys();
 }
 
 /* Runs the entry's list: every registered object with the same id gets its callback, then
@@ -58,7 +61,7 @@ void func_L05_0037AFF8(int entry)
     if (D_L05_001FB220[obj[0x21]] == 0)
         return;
 
-    count = func_L00_004272A0();
+    count = GetLevelSavedValue();
     for (i = 0; i < count; i++) {
         char *e = (char *)D_L05_00225DD0[i];
 
@@ -76,15 +79,16 @@ void func_L05_0037AFF8(int entry)
 
         off = (p[0] & 0x7FFF) << 8;
         base = D_L05_001B251C;
-        if (func_002ED688(base + off) != 0) {
+        if (GetMobyMotionData(base + off) != 0) {
             base = D_L05_001B251C;
-            func_L05_0037AE40(base + off);
+            ResetObjectActionState(base + off);
         }
     } while (*(short *)p++ >= 0);
 }
 
 /* Offers the entry to every registered object with the same id, then walks the entry's list
    and offers each object it names to the handler. */
+/* Same as the entry setup above, but spawns the listed objects with a given flag. */
 void func_L05_0037B280(char *object, int handler)
 {
     unsigned char *obj = (unsigned char *)object;
@@ -96,7 +100,7 @@ void func_L05_0037B280(char *object, int handler)
     if (D_L05_001FB220[obj[0x21]] == 0)
         return;
 
-    count = func_L00_004272A0();
+    count = GetLevelSavedValue();
     for (i = 0; i < count; i++) {
         char *e = (char *)D_L05_00225DD0[i];
 
@@ -114,9 +118,9 @@ void func_L05_0037B280(char *object, int handler)
 
         off = (p[0] & 0x7FFF) << 8;
         base = D_L05_001B251C;
-        if (func_002ED688(base + off) != 0) {
+        if (GetMobyMotionData(base + off) != 0) {
             base = D_L05_001B251C;
-            func_L05_0037AEC0(base + off, handler);
+            InitSpawnedSubObject(base + off, handler);
         }
     } while (*(short *)p++ >= 0);
 }
@@ -125,6 +129,7 @@ void func_L05_0037B280(char *object, int handler)
 extern void func_L05_0037B108(void);
 
 /* Finds the free entry of the level list that belongs to id and spawns it there. */
+/* Finds the first listed object that is free and spawns it. */
 char *func_L05_0037B440(int id, int flag)
 {
     int i;
@@ -140,10 +145,10 @@ char *func_L05_0037B440(int id, int flag)
             entry = (short *)list;
             do {
                 unsigned int offset = (*entry & 0x7FFF) << 8;
-                char *v = (char *)func_002ED688(D_L05_001B251C + offset);
+                char *v = (char *)GetMobyMotionData(D_L05_001B251C + offset);
                 if (v != 0 && *(int *)(v + 0x110) == 0) {
                     spawned = D_L05_001B251C + offset;
-                    func_L05_0037AEC0(spawned, flag);
+                    InitSpawnedSubObject(spawned, flag);
                     break;
                 }
             } while (*entry++ >= 0);

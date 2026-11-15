@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 extern int D_001A72D0 __attribute__((sda));
 extern int D_001A72D4;
@@ -16,17 +17,18 @@ extern void func_00282B50(void *, void *, int);
 
 /* Starts the display list for the level, moves the resident chain cursor and
    appends the 0x20-byte packet at D_001ACA60. */
+/* Draws one frame of the level: sets up the render state, runs each render pass in order, then adds the frame's final packet. */
 void func_002F0EF8(void)
 {
-    func_002FC560(0x47, 0x5180B);
+    VU1_addGSregister(0x47, 0x5180B);
     D_001A72D0 = D_001A72D4;
-    func_0011AEA0(0);
+    FlushCache(0);
     func_002F1010();
-    func_002F0E08();
-    func_0011AEA0(0);
+    RunLevelRenderStep();
+    FlushCache(0);
     func_002F35B0();
     func_002F1E88();
     func_002F2A38();
-    func_00282B50(D_001B22A8, D_001ACA60, 0x20);
-    D_001B22A8 += 0x20;
+    FastMemoryHelperC(gDmaPacketCursor, D_001ACA60, 0x20);
+    gDmaPacketCursor += 0x20;
 }

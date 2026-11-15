@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 typedef signed char s8;
 
@@ -178,19 +179,21 @@ extern void ref_L09_003F8858_00(char *object, int value);
 
 
 
+/* Returns 1 if the object is the hero or is in one of a few special states, otherwise 0. */
 int func_L09_00326E90(u8 *object)
 {
     int state;
 
-    if (object == D_0018C0B0)
+    if (object == gHeroMoby_0018C0B0)
         return 1;
-    state = func_002AD980(object);
+    state = GetMobyKindSlot(object);
     if (state == 255 || state == 10 || state == 18 || state == 53 || state == 14
         || state == 17 || state == 12)
         return 1;
     return 0;
 }
 
+/* Looks up the entry for an index in the level table and checks it against the object. Returns 0 if there is no entry. */
 int func_L09_00329028(char *object, int index)
 {
     unsigned int entry;
@@ -200,9 +203,10 @@ int func_L09_00329028(char *object, int index)
     entry = D_L09_001FE6C0[index];
     if (entry == 0)
         return 0;
-    return func_002B6120(object, entry);
+    return FollowPathNodes(object, entry);
 }
 
+/* Looks up the entry for an index in the level table and applies a count and a value to it for the object. Returns 0 if there is no entry. */
 int func_L09_00329178(char *object, int index, int count, int value)
 {
     unsigned int entry;
@@ -212,7 +216,7 @@ int func_L09_00329178(char *object, int index, int count, int value)
     entry = D_L09_001FE6C0[index];
     if (entry == 0)
         return 0;
-    return func_002B6228(object, (void *)entry, count, value);
+    return SetPathFollowerNodes(object, (void *)entry, count, value);
 }
 
 /* func_L09_003364E0 is matched in its own unit, src/levels/shared/L09_003364E0.c (default flags). */
@@ -220,6 +224,7 @@ int func_L09_00329178(char *object, int index, int count, int value)
 /* func_L09_0033E658 is matched in L09_0033E658-rc2.c. */
 
 
+/* Looks up the entry for an index in the level table and measures the object against it. Returns -1 if there is no entry. */
 int func_L09_0033E690(char *object, int index, float base)
 {
     unsigned int entry;
@@ -229,9 +234,10 @@ int func_L09_0033E690(char *object, int index, float base)
     entry = D_L09_001FE6C0[index];
     if (entry == 0)
         return -1;
-    return func_L06_00382850(object, (char *)entry, base);
+    return FindPointNearestWantedDistance(object, (char *)entry, base);
 }
 
+/* Looks up the entry for an index in the level table and returns its length. Returns -1 if there is no entry. */
 float func_L09_0033E7A0(int index)
 {
     unsigned int entry;
@@ -241,9 +247,10 @@ float func_L09_0033E7A0(int index)
     entry = D_L09_001FE6C0[index];
     if (entry == 0)
         return -1.0f;
-    return func_L01_003377C8((void *)entry);
+    return ComputePathSegmentLengths_L01((void *)entry);
 }
 
+/* Looks up the entry for an index in the level table and steps one point along it in the given direction. Returns -1 if there is no entry. */
 int func_L09_0033E8B0(char *object, int index, void *out, int current, int direction, float step)
 {
     unsigned int entry;
@@ -253,7 +260,7 @@ int func_L09_0033E8B0(char *object, int index, void *out, int current, int direc
     entry = D_L09_001FE6C0[index];
     if (entry == 0)
         return -1;
-    return func_L01_00337888(object, entry, out, current, direction, step);
+    return AdvancePointAlongPolyline(object, entry, out, current, direction, step);
 }
 
 /* func_L09_0037FCE8 is defined in L09_0037FCE8-g8.c. */
@@ -267,36 +274,37 @@ int func_L09_0033E8B0(char *object, int index, void *out, int current, int direc
 
 /* func_L09_003AEA88 is matched in its own unit, src/levels/shared/L09_003AEA88.c (default flags). */
 
+/* Sets up the starting direction and size of a new projectile. */
 void func_L09_003AEE10(char *object)
 {
-    char *p = *(char **)(object + 104);
-    char *q = object + 0x10;
+    char *vars = *(char **)(object + 104);
+    char *position = object + 0x10;
 
-    func_00282CC0(p, q, p + 0x30);
-    func_00282DD8(p, p, q);
-    func_00282F20(p, p, 0.25f);
-    *(float *)(p + 0x5C) = func_002A7940();
+    FastVecAdd(vars, position, vars + 0x30);
+    FastVecCross(vars, vars, position);
+    vec_scale_to_length(vars, vars, 0.25f);
+    *(float *)(vars + 0x5C) = RandomAngle();
 }
 
 /* rebuilds the object's orientation matrix from its stored angles and hands it to the stage */
 void func_L09_003AEE80(char *object)
 {
-    char *p = *(char **)(object + 0x68);
-    float m[4];
-    char *q = object + 0x10;
-    char *r = p + 0x10;
+    char *vars = *(char **)(object + 0x68);
+    float matrix[4];
+    char *position = object + 0x10;
+    char *basis = vars + 0x10;
 
-    func_00282F20((char *)m, p + 0x30, 1.0f);
-    func_002AB668(m, m, *(float *)(p + 0x5C));
-    func_00282D30(r, p, *(float *)(p + 0x50));
-    func_002ACDE8(r, r, (char *)m);
-    *(float *)(p + 0x20) = -*(float *)(p + 0x10);
-    *(float *)(p + 0x24) = -*(float *)(p + 0x14);
-    *(float *)(p + 0x28) = -*(float *)(p + 0x18);
-    func_00282CC0(r, q, r);
-    func_00282CC0(p + 0x20, q, p + 0x20);
-    *(float *)(p + 0x5C) = func_00283BE0(*(float *)(p + 0x5C), 0.3141593039035797f);
-    func_L00_002E6CF0(D_L09_003AEF78, object);
+    vec_scale_to_length((char *)matrix, vars + 0x30, 1.0f);
+    BuildAxisAngleQuaternion(matrix, matrix, *(float *)(vars + 0x5C));
+    FastVecScale(basis, vars, *(float *)(vars + 0x50));
+    RotateVectorByQuaternion(basis, basis, (char *)matrix);
+    *(float *)(vars + 0x20) = -*(float *)(vars + 0x10);
+    *(float *)(vars + 0x24) = -*(float *)(vars + 0x14);
+    *(float *)(vars + 0x28) = -*(float *)(vars + 0x18);
+    FastVecAdd(basis, position, basis);
+    FastVecAdd(vars + 0x20, position, vars + 0x20);
+    *(float *)(vars + 0x5C) = fast_subtract_rotations(*(float *)(vars + 0x5C), 0.3141593039035797f);
+    AddDrawCallbackToList1(D_L09_003AEF78, object);
 }
 
 /* func_L09_003AF060 is defined in L09_003AF060.c. */
@@ -314,31 +322,31 @@ void func_L09_003AF508(char *object)
     int color;
 
     frame = *(char **)(object + 0x68);
-    func_L00_003C1D30(&local);
-    local.v120 = func_0027C878(11);
+    ResetLargeSpriteRecord(&local);
+    local.v120 = GetEffectTextureDescriptor(11);
     local.v128 = 0xFF9000000260LL;
     local.v136 = 0x0000008000000048LL;
     local.v112 = 0;
-    color = (func_002A7820(0x20, 0x30) << 24) + 0x103080;
+    color = (RandomIntRange(0x20, 0x30) << 24) + 0x103080;
     local.k0 = local.k1 = local.k2 = local.k3 = color;
     data = D_L09_001BF98C0;
     local.v220 = 0.0f;
-    local.f216 = func_00283248(*(float *)(data + 0x140) - *(float *)(object + 0x10),
+    local.f216 = FastMatrixHelperA(*(float *)(data + 0x140) - *(float *)(object + 0x10),
                                *(float *)(data + 0x144) - *(float *)(object + 0x14));
     len = func_00282E80_1(object + 0x10, data + 0x140);
-    local.f212 = -func_00283248(len, *(float *)(data + 0x148) - *(float *)(object + 0x18));
-    local.v208 = func_002A7940();
-    func_00283410(&local.m00, &local.v208);
+    local.f212 = -FastMatrixHelperA(len, *(float *)(data + 0x148) - *(float *)(object + 0x18));
+    local.v208 = RandomAngle();
+    euler_to_matrix(&local.m00, &local.v208);
     local.v192 = *(float *)(object + 0x10);
     local.v196 = *(float *)(object + 0x14);
     local.v200 = *(float *)(object + 0x18);
     local.v204 = 1.0f;
-    scale = func_002A7878(0.35f, 0.45f) * *(float *)(frame + 0x50);
-    func_00282D30((char *)&local.b0, (char *)&local.b0, scale);
-    func_00282D30((char *)&local.b1, (char *)&local.b1, scale);
-    func_00282D30((char *)&local.b2, (char *)&local.b2, scale);
-    func_00282D30((char *)&local.b3, (char *)&local.b3, scale);
-    func_00280B90(&local, &local.m00, 0);
+    scale = RandomFloatRange(0.35f, 0.45f) * *(float *)(frame + 0x50);
+    FastVecScale((char *)&local.b0, (char *)&local.b0, scale);
+    FastVecScale((char *)&local.b1, (char *)&local.b1, scale);
+    FastVecScale((char *)&local.b2, (char *)&local.b2, scale);
+    FastVecScale((char *)&local.b3, (char *)&local.b3, scale);
+    draw_world_quad(&local, &local.m00, 0);
 }
 
 /* builds the effect's frame, colour word and query box, then hands the result to the stage */
@@ -352,42 +360,42 @@ void func_L09_003AF6B0(char *object)
     float scale;
     int color;
 
-    func_L00_003C1D30(&local);
-    func_00282D08(pos, frame + 0x10, frame + 0x20, func_002A7878(0.0f, 1.0f));
-    pos[0] += func_002A7878(-0.1f, 0.1f) * *(float *)(frame + 0x50);
-    pos[1] += func_002A7878(-0.1f, 0.1f) * *(float *)(frame + 0x50);
-    pos[2] += func_002A7878(-0.1f, 0.1f) * *(float *)(frame + 0x50);
-    local.v120 = func_0027C878(11);
+    ResetLargeSpriteRecord(&local);
+    lerp_vector(pos, frame + 0x10, frame + 0x20, RandomFloatRange(0.0f, 1.0f));
+    pos[0] += RandomFloatRange(-0.1f, 0.1f) * *(float *)(frame + 0x50);
+    pos[1] += RandomFloatRange(-0.1f, 0.1f) * *(float *)(frame + 0x50);
+    pos[2] += RandomFloatRange(-0.1f, 0.1f) * *(float *)(frame + 0x50);
+    local.v120 = GetEffectTextureDescriptor(11);
     local.v128 = 0xFF9000000260LL;
     local.v112 = 0;
-    local.v136 = 0x0000008000000040LL | ((long long)(func_001163B0() % 2 + 1) << 2);
-    color = func_002A7820(0x40, 0x7F) << 24;
+    local.v136 = 0x0000008000000040LL | ((long long)(Rand() % 2 + 1) << 2);
+    color = RandomIntRange(0x40, 0x7F) << 24;
     local.v220 = 0.0f;
     local.k0 = local.k1 = local.k2 = local.k3 = color + 0x103080;
     data = D_L09_001B98C0;     /* the level's target point: three floats at +0x140 */
-    local.f216 = func_00283248(*(float *)(data + 0x140) - pos[0],
+    local.f216 = FastMatrixHelperA(*(float *)(data + 0x140) - pos[0],
                                *(float *)(data + 0x144) - pos[1]);
     len = func_00282E80_1(pos, data + 0x140);
-    local.f212 = -func_00283248(len, *(float *)(data + 0x148) - pos[2]);
-    local.v208 = func_002A7940();
-    func_00283410(&local.m00, &local.v208);
+    local.f212 = -FastMatrixHelperA(len, *(float *)(data + 0x148) - pos[2]);
+    local.v208 = RandomAngle();
+    euler_to_matrix(&local.m00, &local.v208);
     local.v192 = pos[0];
     local.v196 = pos[1];
     local.v200 = pos[2];
     local.v204 = 1.0f;
-    scale = func_002A7878(0.05f, 0.15f) * *(float *)(frame + 0x50);
-    func_00282D30(&local.b0, &local.b0, scale);
-    func_00282D30(&local.b1, &local.b1, scale);
-    func_00282D30(&local.b2, &local.b2, scale);
-    func_00282D30(&local.b3, &local.b3, scale);
-    func_00280B90(&local, &local.m00, 0);
+    scale = RandomFloatRange(0.05f, 0.15f) * *(float *)(frame + 0x50);
+    FastVecScale(&local.b0, &local.b0, scale);
+    FastVecScale(&local.b1, &local.b1, scale);
+    FastVecScale(&local.b2, &local.b2, scale);
+    FastVecScale(&local.b3, &local.b3, scale);
+    draw_world_quad(&local, &local.m00, 0);
     local.k0 = local.k1 = local.k2 = local.k3 = color + 0x7F7F7F;
-    func_00282D30(&local.b0, &local.b0, 0.5f);
-    func_00282D30(&local.b1, &local.b1, 0.5f);
-    func_00282D30(&local.b2, &local.b2, 0.5f);
-    func_00282D30(&local.b3, &local.b3, 0.5f);
-    func_00280B90(&local, &local.m00, 0);
-    func_L09_003AF9E8(object, pos);
+    FastVecScale(&local.b0, &local.b0, 0.5f);
+    FastVecScale(&local.b1, &local.b1, 0.5f);
+    FastVecScale(&local.b2, &local.b2, 0.5f);
+    FastVecScale(&local.b3, &local.b3, 0.5f);
+    draw_world_quad(&local, &local.m00, 0);
+    SpawnSparkStrips(object, pos);
 }
 
 
@@ -406,7 +414,7 @@ int func_L09_003EA058(char *object, int index) {
     char buf[16];
     short value = *(short *)(frame + 0x118);
     int dir = value < *(short *)(frame + 0x11A) ? 1 : -1;
-    float f;
+    float distance;
     int off;
     unsigned int base;
 
@@ -414,24 +422,25 @@ int func_L09_003EA058(char *object, int index) {
         func_L09_0033E8B0_1(object, index, buf, value, dir, *(float *)(frame + 0x78) * 10.0f);
     base = D_L09_001FE6C0[index];
     off = (*(short *)(frame + 0x11A) << 4) + 0x10;
-    f = func_00282E48_2(object + 0x10, base + off);
-    return func_L09_003E9E60(object, buf, f);
+    distance = func_00282E48_2(object + 0x10, base + off);
+    return MoveMobyTowardPathPoint(object, buf, distance);
 }
 
 /* func_L09_003EA108 is in L09_003EA108-qcopy.c. */
 
+/* Starts the object moving along the level table entry for an index. Returns the current point, or -1 if there is no entry. */
 int func_L09_003EA2D0(char *object, int index, int value)
 {
     unsigned int entry = D_L09_001FE6C0[index];
-    char *p = *(char **)(object + 0x68);
+    char *vars = *(char **)(object + 0x68);
     int result;
 
     if (entry != 0) {
         result = func_L06_00382850_1(object + 0x10, entry, 0.0f);
         result = func_002B6228_1(object, entry, value, result);
-        return *(short *)(p + 0x118);
+        return *(short *)(vars + 0x118);
     }
-    *(short *)(p + 0x118) = 0;
+    *(short *)(vars + 0x118) = 0;
     return -1;
 }
 
@@ -439,35 +448,38 @@ int func_L09_003EA2D0(char *object, int index, int value)
 
 /* func_L09_003EA798 is defined in L09_003EA798-g8.c. */
 
+/* Adds one to the object frame counter (up to its limit) and restarts two timers. */
 void func_L09_003EA9D0(char *object)
 {
     unsigned short count = *(unsigned short *)(object + 0x96);
-    char *p = *(char **)(object + 104);
+    char *vars = *(char **)(object + 104);
 
     if (count <= 0xFFFE)
         *(unsigned short *)(object + 0x96) = count + 1;
-    func_00282978(p + 0x36A);
-    func_002829A8(p + 0x368);
+    FastDecTimer(vars + 0x36A);
+    FastVectorHelperA(vars + 0x368);
 }
 
+/* Plays a sound, spawns an explosion at the object and destroys it. */
 void func_L09_003EAF60(char *object)
 {
-    func_002E5CF8(2, 0, object);
-    func_002A6C58(object, 0, 3);
-    func_0032C700(object + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1,
+    PlayMobySound(2, 0, object);
+    SetDeathBits(object, 0, 3);
+    SpawnExplosion(object + 0x10, 1, 0x19, 0x14, 0x14, 0x14, 0x2D, 1,
                   1.0f, 20.0f, 1, 1, 0, 0);
-    func_0029F338(object);
+    MarkMobySpawned(object);
 }
 
 /* func_L09_003F65E0 is in L09_003F65E0-g8.c. */
 
 /* Defined in L09_003F65E0.c. */
 
+/* Per-frame update for trooper torso objects: when the hero is close, wakes them up and switches them to their next state. */
 void func_L09_003F7158(char *object)
 {
     if (*(unsigned char *)(object + 0x31) != 0) {
-        if (func_00282E48(object + 0x10, D_L09_001B9A00) < 24.0f) {
-            func_002A93B0(object);
+        if (fast_vec_dist(object + 0x10, D_L09_001B9A00) < 24.0f) {
+            UpdateMobyGroundCheck(object);
             *(unsigned char *)(object + 0x6F) = 0x16;
         }
     }
@@ -480,42 +492,45 @@ void func_L09_003F7158(char *object)
 /* spawns one measured stage with the object's placement lifted by DY */
 /* func_L09_003F7370 is matched in its own unit, src/levels/shared/L09_003F7370.c (default flags). */
 
+/* Gives back the shared counter this object was holding, if it had taken one. */
 void func_L09_003F73E8(char *object)
 {
-    char *p = *(char **)(object + 104);
+    char *vars = *(char **)(object + 104);
 
-    if (*(unsigned char *)(object + 33) != 0xFF && *(unsigned char *)(p + 0x2EB) != 0) {
-        func_00282948(*(void **)(p + 0x304));
+    if (*(unsigned char *)(object + 33) != 0xFF && *(unsigned char *)(vars + 0x2EB) != 0) {
+        FastFloatHelperD(*(void **)(vars + 0x304));
     }
-    *(unsigned char *)(p + 0x2EB) = 0;
+    *(unsigned char *)(vars + 0x2EB) = 0;
 }
 
+/* Takes one use of the shared counter if the object does not hold it yet. */
 void func_L09_003F7430(char *object)
 {
-    char *p = *(char **)(object + 104);
-    char *q;
+    char *vars = *(char **)(object + 104);
+    char *counter;
 
     if (*(unsigned char *)(object + 33) == 0xFF)
         return;
-    if (*(unsigned char *)(p + 0x2EB) != 0)
+    if (*(unsigned char *)(vars + 0x2EB) != 0)
         return;
-    q = *(char **)(p + 0x304);
-    (*(int *)q)++;
-    *(unsigned char *)(p + 0x2EB) = 1;
+    counter = *(char **)(vars + 0x304);
+    (*(int *)counter)++;
+    *(unsigned char *)(vars + 0x2EB) = 1;
 }
 
+/* Clears a value on the object and on its parent Megacorp Trooper Torso, unless they are already gone. */
 void func_L09_003F7468(char *object)
 {
     char *parent;
 
-    char *p;
+    char *vars;
 
-    p = *(char **)(object + 104);
+    vars = *(char **)(object + 104);
     *(int *)(object + 152) = 0;
-    parent = *(char **)(p + 0x2F8);
+    parent = *(char **)(vars + 0x2F8);
     if (parent == 0)
         return;
-    if (*(short *)(parent + 170) != 3342)
+    if (*(short *)(parent + 170) != 3342 /* Megacorp Trooper Torso */)
         return;
     if (*(unsigned char *)(parent + 32) == 254)
         return;
@@ -528,48 +543,51 @@ void func_L09_003F7468(char *object)
    save object's word 152 from its owner's field 16, then repeat for a second
    object found through two pointer hops, skipping the sentinel byte values. */
 
-void func_L09_003F74A8(char *p)
+/* Copies a value from the owner of the object and of its linked Megacorp Trooper Torso into each of them. */
+void func_L09_003F74A8(char *moby)
 {
-    char *q;
-    char *r;
-    char *s;
-    int v;
+    char *owner;
+    char *vars;
+    char *linked;
+    int linkedOwner;
 
-    if (p == 0)
+    if (moby == 0)
         return;
-    if (*(unsigned char *)(p + 32) == 254)
+    if (*(unsigned char *)(moby + 32) == 254)
         return;
-    if (*(unsigned char *)(p + 32) == 253)
-        return;
-
-    q = *(char **)(p + 36);
-    r = *(char **)(p + 104);
-    *(int *)(p + 152) = *(int *)(q + 16);
-
-    s = *(char **)(r + 760);
-    if (s == 0)
-        return;
-    if (*(short *)(s + 170) != 3342)
-        return;
-    if (*(unsigned char *)(s + 32) == 254)
-        return;
-    if (*(unsigned char *)(s + 32) == 253)
+    if (*(unsigned char *)(moby + 32) == 253)
         return;
 
-    v = *(int *)(s + 36);
-    *(int *)(s + 152) = *(int *)(v + 16);
+    owner = *(char **)(moby + 36);
+    vars = *(char **)(moby + 104);
+    *(int *)(moby + 152) = *(int *)(owner + 16);
+
+    linked = *(char **)(vars + 760);
+    if (linked == 0)
+        return;
+    if (*(short *)(linked + 170) != 3342 /* Megacorp Trooper Torso */)
+        return;
+    if (*(unsigned char *)(linked + 32) == 254)
+        return;
+    if (*(unsigned char *)(linked + 32) == 253)
+        return;
+
+    linkedOwner = *(int *)(linked + 36);
+    *(int *)(linked + 152) = *(int *)(linkedOwner + 16);
 }
 
 /* func_L09_003F7518 is in L09_003F7518-g8.c. */
 
+/* Copies the color of one object onto another. */
 void func_L09_003F7788(char *object, char *target)
 {
     int out0, out1, out2;
 
-    func_002A04B8(object, &out0, &out1, &out2);
-    func_002A0488(target, out0, out1, out2);
+    get_moby_color(object, &out0, &out1, &out2);
+    set_moby_color(target, out0, out1, out2);
 }
 
+/* Destroys the objects linked to this one and clears the links. */
 void func_L09_003F77D0(char *object)
 {
     char *descriptor = *(char **)(object + 0x68);
@@ -577,13 +595,13 @@ void func_L09_003F77D0(char *object)
     int i;
 
     if (*(int *)(descriptor + 0x2F8) != 0) {
-        func_0029F338(*(void **)(descriptor + 0x2F8));
+        MarkMobySpawned(*(void **)(descriptor + 0x2F8));
         *(int *)(descriptor + 0x2F8) = 0;
     }
     slots = descriptor + 0x2F0;
     for (i = 0; i < 2; ++i) {
         if (*(int *)(slots + i * 4) != 0) {
-            func_0029F338(*(void **)(slots + i * 4));
+            MarkMobySpawned(*(void **)(slots + i * 4));
             *(int *)(slots + i * 4) = 0;
         }
     }
@@ -593,12 +611,12 @@ void func_L09_003F77D0(char *object)
 /* reports whether the index still names a reachable entry, or whether the frame moved close enough */
 int func_L09_003F7A88(char *object, int index) {
     char *frame = *(char **)(object + 0x68);
-    int entry = func_L09_00329028(object, index);
+    int entry = CheckPathTableEntryForMoby(object, index);
 
     if (entry == 0 && index != -1) {
         int off = (*(short *)(frame + 0x1CA) << 4) + 0x10;
 
-        if (func_00282E80(object + 0x10, D_L09_001FE6C0[index] + off) <
+        if (vec_distance_xy(object + 0x10, D_L09_001FE6C0[index] + off) <
             *(float *)(frame + 0x134))
             entry = 1;
     }
@@ -611,31 +629,33 @@ int func_L09_003F7A88(char *object, int index) {
 
 /* func_L09_003F8598 is defined in L09_003F8598-g8.c. */
 
+/* Marks every Megacorp Trooper Legs object in a group so it knows to react. */
 void func_L09_003F87D8(char *unused, int index)
 {
     unsigned int entry;
-    unsigned short *q;
+    unsigned short *idList;
 
     if (index == 0xFF)
         return;
     entry = D_L09_001FB560[index];
     if (entry == 0)
         return;
-    q = (unsigned short *)entry;
+    idList = (unsigned short *)entry;
     do {
-        char *r = D_L09_001B285C + ((q[0] & 0x7FFF) << 8);
+        char *target = D_L09_001B285C + ((idList[0] & 0x7FFF) << 8);
 
-        if (*(signed char *)(r + 0x20) >= 0 && *(short *)(r + 0xAA) == 0xD0F)
-            *(unsigned char *)(*(int *)(r + 0x68) + 0x2EA) = 1;
-    } while ((short)*q++ >= 0);
+        if (*(signed char *)(target + 0x20) >= 0 && *(short *)(target + 0xAA) == 0xD0F /* Megacorp Trooper Legs */)
+            *(unsigned char *)(*(int *)(target + 0x68) + 0x2EA) = 1;
+    } while ((short)*idList++ >= 0);
 }
 
+/* Passes two stored values of the object to a shared helper, one after the other. */
 void func_L09_003F8858(char *object)
 {
-    char *p = *(char **)(object + 104);
+    char *vars = *(char **)(object + 104);
 
     ref_L09_003F8858_00(object, *(unsigned char *)(object + 33));
-    ref_L09_003F8858_00(object, *(int *)(p + 0x308));
+    ref_L09_003F8858_00(object, *(int *)(vars + 0x308));
 }
 
 /* func_L09_003F8898 lives in the L09_002B7238-g8.c sibling: its four counters are small data. */

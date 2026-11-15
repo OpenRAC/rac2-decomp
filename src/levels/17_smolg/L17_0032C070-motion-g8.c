@@ -104,27 +104,27 @@ void func_L17_003C4090(Moby *moby)
     case 0:
         /* First update: pick the rise, the spin and a random point in the cycle. */
         vars->baseZ = moby->position[2];
-        vars->rise = func_002A7878(vars->minRise, vars->maxRise);
-        spin = func_002A7878(0.004363324f, 0.013089972f);
-        if (func_002A77E0(2))
+        vars->rise = RandomFloatRange(vars->minRise, vars->maxRise);
+        spin = RandomFloatRange(0.004363324f, 0.013089972f);
+        if (RandomIntBelow(2))
             spin = -spin;
         vars->spinSpeed = spin;
         vars->sound = -1;
-        if (func_002A77E0(2)) {
+        if (RandomIntBelow(2)) {
             moby->position[2] += vars->rise;
             vars->state = 3;
         } else {
             vars->state = 1;
         }
-        vars->timer = func_002A7820(func_00283CF0(vars->minWait * 60.0f),
-                                    func_00283CF0(vars->maxWait * 60.0f));
-        vars->timer = func_002A7820(0, vars->timer);
+        vars->timer = RandomIntRange(FloatToInt(vars->minWait * 60.0f),
+                                    FloatToInt(vars->maxWait * 60.0f));
+        vars->timer = RandomIntRange(0, vars->timer);
         break;
 
     case 1:
         /* Resting low. */
-        if (func_00282948(&vars->timer)) {
-            vars->timer = func_00283CF0(vars->riseTime * 60.0f);
+        if (FastFloatHelperD(&vars->timer)) {
+            vars->timer = FloatToInt(vars->riseTime * 60.0f);
             vars->state = 2;
         }
         moby->position[2] = vars->baseZ;
@@ -132,23 +132,23 @@ void func_L17_003C4090(Moby *moby)
 
     case 2:
         /* Rising. */
-        if (func_00282948(&vars->timer)) {
+        if (FastFloatHelperD(&vars->timer)) {
             moby->position[2] = vars->baseZ + vars->rise;
             vars->state = 3;
-            vars->timer = func_002A7820(func_00283CF0(vars->minWait * 60.0f),
-                                        func_00283CF0(vars->maxWait * 60.0f));
+            vars->timer = RandomIntRange(FloatToInt(vars->minWait * 60.0f),
+                                        FloatToInt(vars->maxWait * 60.0f));
         } else {
-            ratio = func_00283CE0(vars->timer) / (vars->riseTime * 60.0f);
+            ratio = IntToFloat(vars->timer) / (vars->riseTime * 60.0f);
             moby->position[2] = vars->baseZ +
-                vars->rise * (func_00283180(ratio * 3.141593f) * 0.5f) +
+                vars->rise * (FastSinOrCosA(ratio * 3.141593f) * 0.5f) +
                 vars->rise * 0.5f;
         }
         break;
 
     case 3:
         /* Resting high. */
-        if (func_00282948(&vars->timer)) {
-            vars->timer = func_00283CF0(vars->fallTime * 60.0f);
+        if (FastFloatHelperD(&vars->timer)) {
+            vars->timer = FloatToInt(vars->fallTime * 60.0f);
             vars->state = 4;
         }
         moby->position[2] = vars->baseZ + vars->rise;
@@ -156,47 +156,47 @@ void func_L17_003C4090(Moby *moby)
 
     case 4:
         /* Falling. */
-        if (func_00282948(&vars->timer)) {
+        if (FastFloatHelperD(&vars->timer)) {
             moby->position[2] = vars->baseZ;
             vars->state = 1;
-            vars->timer = func_002A7820(func_00283CF0(vars->minWait * 60.0f),
-                                        func_00283CF0(vars->maxWait * 60.0f));
+            vars->timer = RandomIntRange(FloatToInt(vars->minWait * 60.0f),
+                                        FloatToInt(vars->maxWait * 60.0f));
         } else {
-            ratio = func_00283CE0(vars->timer) / (vars->fallTime * 60.0f);
+            ratio = IntToFloat(vars->timer) / (vars->fallTime * 60.0f);
             moby->position[2] = vars->baseZ +
-                vars->rise * (func_00283180((1.0f - ratio) * 3.141593f) * 0.5f) +
+                vars->rise * (FastSinOrCosA((1.0f - ratio) * 3.141593f) * 0.5f) +
                 vars->rise * 0.5f;
         }
         break;
     }
 
     /* The periods are in seconds: 0.00029088825 is one degree per second, in radians per frame. */
-    func_002AEE70(moby, &vars->bobPhase, &vars->bobOffset, D_L17_001B024C,
+    UpdateWrappedAngleOffset(moby, &vars->bobPhase, &vars->bobOffset, D_L17_001B024C,
                   360.0f / D_L17_001B0248 * 0.00029088825f, moby->position[2]);
-    func_002AEF28(moby, &vars->swayPhase, &vars->tiltPhase, D_L17_001B0250,
+    ScaleOwnerWordsByAngles(moby, &vars->swayPhase, &vars->tiltPhase, D_L17_001B0250,
                   360.0f / D_L17_001B0254 * 0.00029088825f,
                   360.0f / D_L17_001B0258 * 0.00029088825f);
-    moby->rotation[2] = func_00283B98(moby->rotation[2], vars->spinSpeed);
+    moby->rotation[2] = FastAddRotations(moby->rotation[2], vars->spinSpeed);
 
-    if (func_00282E80(moby->position, D_00189EA0) < 80.0f) {
-        SoundVoice *voice = (SoundVoice *)&D_00188660[vars->sound];
+    if (vec_distance_xy(moby->position, gHeroPosition) < 80.0f) {
+        SoundVoice *voice = (SoundVoice *)&gSoundState[vars->sound];
         if (voice->owner != moby || !voice->active)
-            vars->sound = func_002E5CF8(0, 4, moby);
+            vars->sound = PlayMobySound(0, 4, moby);
     } else {
         int sound = vars->sound;
         if (sound != -1) {
-            SoundVoice *voice = (SoundVoice *)&D_00188660[sound];
+            SoundVoice *voice = (SoundVoice *)&gSoundState[sound];
             if (voice->owner == moby && voice->active)
-                func_002E59F8(sound);
+                StopSoundVoice(sound);
         }
         vars->sound = -1;
     }
 
-    if (func_002A9640(moby, 0x4010000, 0)) {
-        func_0032C700(moby->position, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 0, 10.0f, 20.0f);
-        func_002B0A68(moby, 127, D_L17_001A8F20, 255, 3.0f, 6.0f, 3.0f, 6.0f);
-        func_L00_00326110(moby, 9, 0);
-        func_0029F338(moby);
+    if (FindOwnedEffectSlot(moby, 0x4010000, 0)) {
+        SpawnExplosion(moby->position, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, 0, 10.0f, 20.0f);
+        SpawnDebrisForMaskedParts(moby, 127, D_L17_001A8F20, 255, 3.0f, 6.0f, 3.0f, 6.0f);
+        SpawnScaledBolts(moby, 9, 0);
+        MarkMobySpawned(moby);
     } else {
         moby->impactSlot = 255;
     }

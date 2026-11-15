@@ -27,24 +27,25 @@ extern s32 D_001A79F0;
 extern s32 ref_L01_00367F78_00 __attribute__((sda));
 extern u8 D_001395B8[];
 
+/* Sets a bit in the saved data for each slot from 1 to 4 that matches the current level. */
 void func_L01_00367F78(void) {
-    u8 *base;
-    s32 g;
-    s32 *var_a1;
-    u32 var_a0;
+    u8 *saveData;
+    s32 levelId;
+    s32 *slotIds;
+    u32 slotIndex;
     u32 one;
 
-    base = D_001395B8;
-    g = D_001A79F0;
-    var_a0 = 1;
+    saveData = D_001395B8;
+    levelId = gCurrentMapIndex;
+    slotIndex = 1;
     one = 1;
-    var_a1 = &ref_L01_00367F78_00;
-    for (; (s32) var_a0 < 5; var_a0++) {
-        if (g == *var_a1) {
-            if (var_a0 < 8U) {
-                base[0x8D] = (u8) (base[0x8D] | (one << var_a0));
+    slotIds = &ref_L01_00367F78_00;
+    for (; (s32) slotIndex < 5; slotIndex++) {
+        if (levelId == *slotIds) {
+            if (slotIndex < 8U) {
+                saveData[0x8D] = (u8) (saveData[0x8D] | (one << slotIndex));
             }
         }
-        var_a1 += 1;
+        slotIds += 1;
     }
 }

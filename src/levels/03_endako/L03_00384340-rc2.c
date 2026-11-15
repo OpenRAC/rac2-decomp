@@ -34,57 +34,58 @@ extern s32 g_001B2B0C __attribute__((sda));
 extern s8 ref_L03_00384340_06[];
 
 
-void func_L03_00384340(void *arg0) {
-    void *var_s1  = arg0;
-    s32 *var_s0  = (*(s32 **)((s8 *)(arg0) + (0x68)));
-    s32 temp_v1  = (*(u8 *)((s8 *)(arg0) + (0x20)));
-    s32 var_s2 ;
-    s32 var_s3 ;
-    s32 addr_v0 ;
-    f32 temp_f20 ;
-    f32 result_f0 ;
-    f32 product_f1 ;
-    s32 temp_a0;
+/* Updates a group of linked effect objects. At start it fills in each entry from two values, then it switches between two states depending on a timed check. */
+void func_L03_00384340(void *moby) {
+    void *mobyCopy  = moby;
+    s32 *idList  = (*(s32 **)((s8 *)(moby) + (0x68)));
+    s32 stateOrBase  = (*(u8 *)((s8 *)(moby) + (0x20)));
+    s32 remaining ;
+    s32 noneId ;
+    s32 entryAddr ;
+    f32 valueA ;
+    f32 valueB ;
+    f32 product ;
+    s32 entryId;
 
-    switch (temp_v1) {
+    switch (stateOrBase) {
     case 0:
-        var_s3 = -1;
-        var_s2 = 0xF;
+        noneId = -1;
+        remaining = 0xF;
         do {
-            temp_a0 = *var_s0;
-            if (temp_a0 != var_s3) {
-                temp_f20 = ref_L03_00384340_00(g_001B2B0C + (temp_a0 << 7));
-                result_f0 = ref_L03_00384340_00(ref_L03_00384340_05 + (*var_s0 << 7) + 0x10);
-                addr_v0 = *var_s0;
-                product_f1 = temp_f20 * result_f0;
-                temp_v1 = ref_L03_00384340_05;
-                result_f0 = (result_f0 < temp_f20) ? temp_f20 : result_f0;
-                addr_v0 <<= 7;
-                addr_v0 += temp_v1;
-                (*(f32 *)((s8 *)(addr_v0) + (0x7C))) = product_f1;
-                addr_v0 = *var_s0;
-                addr_v0 <<= 7;
-                addr_v0 += temp_v1;
-                (*(f32 *)((s8 *)(addr_v0) + (0x3C))) = result_f0;
-                ref_L03_00384340_01(var_s1, 2, -1);
+            entryId = *idList;
+            if (entryId != noneId) {
+                valueA = ref_L03_00384340_00(g_001B2B0C + (entryId << 7));
+                valueB = ref_L03_00384340_00(ref_L03_00384340_05 + (*idList << 7) + 0x10);
+                entryAddr = *idList;
+                product = valueA * valueB;
+                stateOrBase = ref_L03_00384340_05;
+                valueB = (valueB < valueA) ? valueA : valueB;
+                entryAddr <<= 7;
+                entryAddr += stateOrBase;
+                (*(f32 *)((s8 *)(entryAddr) + (0x7C))) = product;
+                entryAddr = *idList;
+                entryAddr <<= 7;
+                entryAddr += stateOrBase;
+                (*(f32 *)((s8 *)(entryAddr) + (0x3C))) = valueB;
+                ref_L03_00384340_01(mobyCopy, 2, -1);
             }
-            var_s2 -= 1;
-            var_s0 += 1;
-        } while (var_s2 >= 0);
+            remaining -= 1;
+            idList += 1;
+        } while (remaining >= 0);
         break;
     case 1:
 
-        ref_L03_00384340_03(var_s1);
-        if ((ref_L03_00384340_04 & 0xF) == (((s32)var_s1 >> 8) & 0xF)) {
-            if (ref_L03_00384340_02(ref_L03_00384340_06, (*(s32 *)((s8 *)(var_s0) + (0x44)))) == 0) {
-                ref_L03_00384340_01(var_s1, 2, -1);
+        ref_L03_00384340_03(mobyCopy);
+        if ((ref_L03_00384340_04 & 0xF) == (((s32)mobyCopy >> 8) & 0xF)) {
+            if (ref_L03_00384340_02(ref_L03_00384340_06, (*(s32 *)((s8 *)(idList) + (0x44)))) == 0) {
+                ref_L03_00384340_01(mobyCopy, 2, -1);
             }
         }
         break;
     case 2:
-        if (((g_001B2548 & 0xF) == (((s32)var_s1 >> 8) & 0xF)) &&
-            (ref_L03_00384340_02(ref_L03_00384340_06, (*(s32 *)((s8 *)(var_s0) + (0x44)))) != 0)) {
-            ref_L03_00384340_01(var_s1, 1, -1);
+        if (((g_001B2548 & 0xF) == (((s32)mobyCopy >> 8) & 0xF)) &&
+            (ref_L03_00384340_02(ref_L03_00384340_06, (*(s32 *)((s8 *)(idList) + (0x44)))) != 0)) {
+            ref_L03_00384340_01(mobyCopy, 1, -1);
         }
         break;
     }

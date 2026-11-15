@@ -16,12 +16,13 @@ extern void func_0012E088(void *, int);
  * | 0x80000000 (spr flag), QWC = arg1 >> 4 (bytes -> qwords), CHCR = 0x100
  * (start, from-memory... actually to-memory chain/normal mode).
  */
-void func_0012E088(void *arg0, int arg1) {
-    int r = r1_func_0011D960();
-    D3_MADR = ((unsigned int)arg0 & 0x0FFFFFFF) | 0x80000000;
-    D3_QWC = arg1 >> 4;
+/* Starts a DMA transfer of arg1 bytes from the video chip to memory. */
+void func_0012E088(void *address, int byteCount) {
+    int intrState = r1_func_0011D960();
+    D3_MADR = ((unsigned int)address & 0x0FFFFFFF) | 0x80000000;
+    D3_QWC = byteCount >> 4;
     D3_CHCR = 0x100;
-    if (r != 0) {
+    if (intrState != 0) {
         r1_func_0011D9A8();
     }
 }

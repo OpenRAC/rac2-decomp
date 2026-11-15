@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 
 /* A row of a choice list: its label, the byte it edits and up to four choice labels. */
 typedef struct {
@@ -103,12 +104,13 @@ extern int func_00339760(int);
 
 extern int D_L00_001A904C_8 __attribute__((sda));
 
-void func_002D5E98(int param_1)
+/* Starts a menu action using the two values stored in the menu object. */
+void func_002D5E98(int args)
 {
-  int auStack_20[4];
+  int result[4];
 
-  auStack_20[0] = 0;
-  func_002D5B58(*(short *)(param_1 + 2), *(int *)(param_1 + 4), &auStack_20[0]);
+  result[0] = 0;
+  ProcessMenuRequest(*(short *)(args + 2), *(int *)(args + 4), &result[0]);
   return;
 }
 /* func_002D5EC0 is in 002D5E98-list-g8.c. */
@@ -127,10 +129,11 @@ extern State2D6E78 D_001F2840;
 extern unsigned char D_001F291B;
 extern void func_002B7AD0(void);
 
+/* Cancels a pending map choice by flipping its flag back and clearing the selection. */
 int func_002D6E78(void)
 {
-    if (D_001A63A8.mode == 0) {
-        Map2D6E78 *map = &D_001C4FA0;
+    if (gMusicState.mode == 0) {
+        Map2D6E78 *map = &gMapOverlayState;
         int index = map->selected;
         if (index != -1) {
             D_001F291B = 0;
@@ -138,13 +141,13 @@ int func_002D6E78(void)
             map->selected = -1;
         }
     }
-    if (D_001A63A8.mode != 0) {
-        State2D6E78 *state = &D_001F2840;
+    if (gMusicState.mode != 0) {
+        State2D6E78 *state = &gPauseMenuState;
         if (state->active != 0) {
             Map2D6E78 *map;
-            func_002B7AD0();
+            RequestDiscReadBreak();
             state->active = 0;
-            map = &D_001C4FA0;
+            map = &gMapOverlayState;
             map->flags[map->selected] = -1;
             map->selected = -1;
         }
@@ -159,12 +162,13 @@ typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;
 extern Base2D75E8 D_0025A6E0;
 extern int D_0025A620[];
 
-int func_002D75E8(int *arg0)
+/* Sets up a preview of the selected entry by loading its two data words from the tables. */
+int func_002D75E8(int *object)
 {
-    func_0029D830(arg0);
-    *(int *)((char *)arg0 + 0xA0) = func_0029DB28(0x70000000, 0, 0x70000100, 1);
+    UpdateEntryStates(object);
+    *(int *)((char *)object + 0xA0) = ListActiveMenuEntries(0x70000000, 0, 0x70000100, 1);
     {
-        char *base = (char *)arg0 + 0x30;
+        char *base = (char *)object + 0x30;
         int index = D_001C51D0;
 
         if (*(int *)(base + (index << 2)) != -1) {
@@ -173,25 +177,28 @@ int func_002D75E8(int *arg0)
             *(int *)D_0025A620 = *(int *)(0x70000100 + 4 * *(int *)(base + (index << 2)));
         }
     }
-    *(int *)((char *)arg0 + 0xA4) = 0;
+    *(int *)((char *)object + 0xA4) = 0;
     return 0;
 }
 
 
+/* Clears the saved selection by setting it to -1. */
 int func_002D7AC8(void)
 {
     D_001C51D4 = -1;
     return 0;
 }
 
+/* Runs the shared reset step and does nothing else. */
 int func_002D7AE0(void) {
-    func_002DE3A0(1);
+    InitStreamChunkTable(1);
     return 0;
 }
 
 extern int D_001A7BA0[] __attribute__((sda));
 extern int D_001886B0[];
 
+/* Copies one saved value into the settings table. */
 int func_002D7B00(void) {
     D_001886B0[0] = D_001A7BA0[0];
     return 0;
@@ -227,16 +234,16 @@ int func_002D7B18(Menu2D7B18 *menu)
     int old_slider1;
     int old_slider0;
 
-    if ((((Pad2D7B18 *)D_00138180)->pressed & 0x900) != 0 && ((CtxB6 *)&D_001F2840)->active == 0)
+    if ((((Pad2D7B18 *)gPadState)->pressed & 0x900) != 0 && ((CtxB6 *)&gPauseMenuState)->active == 0)
         return 1;
-    if ((((Pad2D7B18 *)D_00138180)->pressed & 0x10) != 0) {
-        int back = ((CtxB6 *)&D_001F2840)->owner->back;
+    if ((((Pad2D7B18 *)gPadState)->pressed & 0x10) != 0) {
+        int back = ((CtxB6 *)&gPauseMenuState)->owner->back;
         int result;
 
         /* One shared exit: it keeps the 0/-1 choice a branch, not a conditional move. */
         if (back != 0) {
-            ((CtxB6 *)&D_001F2840)->next = back;
-        } else if (((CtxB6 *)&D_001F2840)->active == 0) {
+            ((CtxB6 *)&gPauseMenuState)->next = back;
+        } else if (((CtxB6 *)&gPauseMenuState)->active == 0) {
             result = -1;
             goto back_done;
         }
@@ -246,46 +253,46 @@ back_done:
     }
 
     previous = menu->selection;
-    if ((((Pad2D7B18 *)D_00138180)->pressed & 0x1000) != 0)
+    if ((((Pad2D7B18 *)gPadState)->pressed & 0x1000) != 0)
         menu->selection = (previous + 2) % 3;
-    if ((((Pad2D7B18 *)D_00138180)->pressed & 0x4000) != 0)
+    if ((((Pad2D7B18 *)gPadState)->pressed & 0x4000) != 0)
         menu->selection = (menu->selection + 1) % 3;
-    if (menu->selection != previous || ((CtxB6 *)&D_001F2840)->owner->pendingFocus != 0) {
-        func_002DF190(1, 0x11);
+    if (menu->selection != previous || ((CtxB6 *)&gPauseMenuState)->owner->pendingFocus != 0) {
+        PlayMenuSoundIfEnabled(1, 0x11);
         if (menu->flags & 0x20)
-            func_00295C50(D_001AA4F0[menu->selection]);
+            SetCurrentMapAndRefresh(D_001AA4F0[menu->selection]);
     }
 
-    old_slider1 = D_001A7B90.slider1;
-    old_slider0 = D_001A7B90.slider0;
-    if ((((Pad2D7B18 *)D_00138180)->held & 0x2000) != 0) {
+    old_slider1 = gIsPalVideo.slider1;
+    old_slider0 = gIsPalVideo.slider0;
+    if ((((Pad2D7B18 *)gPadState)->held & 0x2000) != 0) {
         if (menu->selection == 0) {
-            int next = D_001A7B90.slider0 + 3;
-            D_001A7B90.slider0 = next < 1025 ? next : 1024;
+            int next = gIsPalVideo.slider0 + 3;
+            gIsPalVideo.slider0 = next < 1025 ? next : 1024;
         }
         if (menu->selection == 1) {
-            int next = D_001A7B90.slider1 + 3;
-            D_001A7B90.slider1 = next < 1025 ? next : 1024;
+            int next = gIsPalVideo.slider1 + 3;
+            gIsPalVideo.slider1 = next < 1025 ? next : 1024;
         }
     }
-    if ((((Pad2D7B18 *)D_00138180)->held & 0x8000) != 0) {
+    if ((((Pad2D7B18 *)gPadState)->held & 0x8000) != 0) {
         if (menu->selection == 0) {
-            int next = D_001A7B90.slider0 - 3;
-            D_001A7B90.slider0 = next >= 0 ? next : 0;
+            int next = gIsPalVideo.slider0 - 3;
+            gIsPalVideo.slider0 = next >= 0 ? next : 0;
         }
         if (menu->selection == 1) {
-            int next = D_001A7B90.slider1 - 3;
-            D_001A7B90.slider1 = next >= 0 ? next : 0;
+            int next = gIsPalVideo.slider1 - 3;
+            gIsPalVideo.slider1 = next >= 0 ? next : 0;
         }
     }
-    if (old_slider1 != D_001A7B90.slider1 || old_slider0 != D_001A7B90.slider0)
-        func_002E4860();
+    if (old_slider1 != gIsPalVideo.slider1 || old_slider0 != gIsPalVideo.slider0)
+        SetDefaultSoundGroupVolumes();
 
-    if ((((Pad2D7B18 *)D_00138180)->pressed & 0x40) != 0) {
+    if ((((Pad2D7B18 *)gPadState)->pressed & 0x40) != 0) {
         if (menu->selection == 2)
-            D_001A7B90.mode = !D_001A7B90.mode;
-        func_00132938(!D_001A7B90.mode);
-        func_002DF190(0, 0x11);
+            gIsPalVideo.mode = !gIsPalVideo.mode;
+        SendSoundCommand11_00132938(!gIsPalVideo.mode);
+        PlayMenuSoundIfEnabled(0, 0x11);
     }
     return 0;
 }
@@ -293,6 +300,7 @@ back_done:
 /* func_002D7DB8 is in 002D5E98-audio.c. */
 
 
+/* Empty menu step that does nothing. */
 int func_002D81A8(void) {
     return 0;
 }
@@ -313,28 +321,28 @@ int func_002D81B0(char *object)
     unsigned int *key;
     unsigned int *flags;
 
-    func_002DE3A0(1);
+    InitStreamChunkTable(1);
     *(int *)(object + 0x54) = 0;
     *(int *)(object + 0x38) = 0;
-    length = D_0014B540.length;
-    D_0014B540.length = length / 2;
+    length = gCopySetupData.length;
+    gCopySetupData.length = length / 2;
     flags = &D_001B1F50[0].flags;
     key = &D_001B1F50[0].key;
     for (i = 0; i < 5; i++) {
-        if (*key != 0 && *key < D_001F2840.limit)
+        if (*key != 0 && *key < gPauseMenuState.limit)
             *flags |= 2;
         flags += 2;
         key += 2;
     }
     *(int *)(object + 0x50) = 0;
-    if (D_001A63A8.mode == 0) {
-        if (func_002B7B18(D_001F2958, D_0014B540.start + D_0014B540.offset, D_0014B540.length) != 0)
+    if (gMusicState.mode == 0) {
+        if (StartDiscRead(D_001F2958, gCopySetupData.start + gCopySetupData.offset, gCopySetupData.length) != 0)
             *(int *)(object + 0x50) = 1;
         else
             *(int *)(object + 0x50) = 3;
     }
     *(int *)(object + 0x10) |= 4;
-    D_0014B540.length = length;
+    gCopySetupData.length = length;
     return 0;
 }
 
@@ -343,16 +351,17 @@ extern void func_002B7AD0(void);
 extern int D_001B1840 __attribute__((sda));
 extern int D_00254EA4;
 
+/* Finishes the loader: stops a running read, then stores the loaded block values. */
 int func_002D82C8(char *object)
 {
     if (D_001A63AC != 0 && *(int *)(object + 0x50) == 1)
-        func_002B7AD0();
-    func_002DE3A0(1);
+        RequestDiscReadBreak();
+    InitStreamChunkTable(1);
     {
         int value = *(int *)(object + 0x54);
         if (value != 0) {
             D_00254EA4 = *(int *)(object + 0x38);
-            D_001B1840 = value;
+            gSubtitleEntries = value;
         }
     }
     return 0;
@@ -384,9 +393,9 @@ int func_002D8338(char *object)
         break;
     case 0:
         if (D_001A63AC == 0) {
-            Stream2D81B0 *stream = &D_0014B540;
+            Stream2D81B0 *stream = &gCopySetupData;
 
-            if (func_002B7B18(D_001F2958, stream->start + stream->offset, stream->length))
+            if (StartDiscRead(D_001F2958, stream->start + stream->offset, stream->length))
                 loader->state = 1;
             else
                 loader->state = 3;
@@ -394,20 +403,20 @@ int func_002D8338(char *object)
         break;
     case 1:
         if (D_001A63AC == 0) {
-            char *data = D_001F2840.loaded;
+            char *data = gPauseMenuState.loaded;
             int *header = (int *)(data + ((int *)data)[D_001A7BB4]);
             int count = *header++;
             int size = *header++;
             char *base;
             int i;
 
-            func_00282AB0(data, header, ((size + 3) & ~3) - 8);
-            loader->saved_base = D_001B1840;
-            loader->saved_count = D_00254E78[11];
-            D_00254E78[11] = count;
-            base = D_001F2840.loaded;
-            D_001B1840 = (int)base;
-            for (i = 0; i < D_00254E78[11]; i++) {
+            CopyMemoryAligned(data, header, ((size + 3) & ~3) - 8);
+            loader->saved_base = gSubtitleEntries;
+            loader->saved_count = gSubtitleState[11];
+            gSubtitleState[11] = count;
+            base = gPauseMenuState.loaded;
+            gSubtitleEntries = (int)base;
+            for (i = 0; i < gSubtitleState[11]; i++) {
                 int reloc = (int)base - 8;
 
                 ((int *)base)[i * 4] += reloc;
@@ -432,17 +441,18 @@ extern void func_00335E68(unsigned char *, int);
 extern void func_00336B98(char *, int);
 extern void func_00336B90(unsigned char *, int);
 extern void func_0034E220(char *, int, int, int, int);
+/* Draws one icon for a menu row at the given spot, using the row image if it has one. */
 void func_002D8EC0(char *source, short *row, int first, int second, int x, int y)
 {
     int index = second * *(int *)(source + 0x44) + first;
-    unsigned char *widget = (unsigned char *)func_0034E5B8(D_001A8CFC[0] + 0x36F28) + index * 0x48;
-    func_00335E68(widget, 0);
-    if (((WidgetClass2D8EC0 *)(D_00139568[row[3]] * 0xE0 + (unsigned int)D_00239BA0))->handle != 0) {
-        func_00335E68(widget, 1);
-        func_00336B98((char *)widget, D_00139868[row[3]] >> 5);
-        func_00336B90(widget, ((WidgetClass2D8EC0 *)(D_00139568[row[3]] * 0xE0 + (unsigned int)D_00239BA0))->handle);
+    unsigned char *widget = (unsigned char *)ReturnArgument_0034E5B8(D_001A8CFC[0] + 0x36F28) + index * 0x48;
+    SetFlagValue(widget, 0);
+    if (((WidgetClass2D8EC0 *)(gItemSlotToRecord[row[3]] * 0xE0 + (unsigned int)gWeaponTable_00239BA0))->handle != 0) {
+        SetFlagValue(widget, 1);
+        SetMeterValue((char *)widget, D_00139868[row[3]] >> 5);
+        SetMeterMaximum(widget, ((WidgetClass2D8EC0 *)(gItemSlotToRecord[row[3]] * 0xE0 + (unsigned int)gWeaponTable_00239BA0))->handle);
     }
-    func_0034E220(D_001A8CFC[0] + 0x36F28, index, x, y, 0x80);
+    PlaceRadialMenuItem(D_001A8CFC[0] + 0x36F28, index, x, y, 0x80);
 }
 
 
@@ -464,9 +474,10 @@ static inline short pauseFlagState_r002D95D8(void) {
 /* The select sits in a `static inline short` helper so that it stays a
    branch: jump.c turns an if into movz/movn only when its arm sets a
    full register, and the inline's short return value is a subreg. */
-int func_002D95D8(char *arg0) {
-    char *p = *(char **)(arg0 + 0x34);
-    *(short *)(p + 2) = pauseFlagState_r002D95D8();
+/* Stores a pause state value (3 or 0) in the object data. */
+int func_002D95D8(char *object) {
+    char *data = *(char **)(object + 0x34);
+    *(short *)(data + 2) = pauseFlagState_r002D95D8();
     return 0;
 }
 
@@ -524,55 +535,56 @@ int func_002D9600(EffectSlots_2D9600 *o)
             break;
         }
     call:
-        func_002DF158(o->entries[i], 1);
+        AddToActiveTotal(o->entries[i], 1);
     }
     return 4;
 }
 
-int func_002D9798(int *arg0)
+/* Draws five text labels in a column, sized to the widest one. */
+int func_002D9798(int *object)
 {
-    int min;
-    int v;
-    int slot;
-    int count;
-    int off;
+    int maxWidth;
+    int width;
+    int xPos;
+    int rowStep;
+    int yPos;
 
     F70997ba9_FUN_002FC560(66, 68);
     F70997ba9_FUN_002FC560(71, 11);
     F70997ba9_FUN_0027C540(0);
-    min = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11613), -1);
-    v = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11625), -1);
-    if (v >= min)
-        min = v;
+    maxWidth = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11613), -1);
+    width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11625), -1);
+    if (width >= maxWidth)
+        maxWidth = width;
     if (*(int *)0x1A79F0 != 0) {
-        v = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11614), -1);
-        if (v >= min)
-            min = v;
+        width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11614), -1);
+        if (width >= maxWidth)
+            maxWidth = width;
     }
-    v = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11626), -1);
-    if (v >= min)
-        min = v;
-    v = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11627), -1);
-    if (v >= min)
-        min = v;
-    v = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11599), -1);
-    if (v >= min)
-        min = v;
-    slot = (arg0[8] - min) >> 1;
-    if (slot <= 1)
-        slot = 2;
-    count = arg0[9] / (*(int *)0x1A79F0 != 0 ? 7 : 6);
+    width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11626), -1);
+    if (width >= maxWidth)
+        maxWidth = width;
+    width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11627), -1);
+    if (width >= maxWidth)
+        maxWidth = width;
+    width = F70997ba9_FUN_0027F198(F70997ba9_FUN_00288FB8(11599), -1);
+    if (width >= maxWidth)
+        maxWidth = width;
+    xPos = (object[8] - maxWidth) >> 1;
+    if (xPos <= 1)
+        xPos = 2;
+    rowStep = object[9] / (*(int *)0x1A79F0 != 0 ? 7 : 6);
     F70997ba9_FUN_0027F120();
-    off = count - 6;
-    F70997ba9_FUN_0027F5B8(slot, off, 0x80FFA888L, F70997ba9_FUN_00288FB8(11613), -1);
-    off += count;
-    F70997ba9_FUN_0027F5B8(slot, off, 0x80FFA888L, F70997ba9_FUN_00288FB8(11625), -1);
-    off += count;
-    F70997ba9_FUN_0027F5B8(slot, off, 0x80FFA888L, F70997ba9_FUN_00288FB8(11626), -1);
-    off += count;
-    F70997ba9_FUN_0027F5B8(slot, off, 0x80FFA888L, F70997ba9_FUN_00288FB8(11627), -1);
-    off += count;
-    F70997ba9_FUN_0027F5B8(slot, off, 0x80FFA888L, F70997ba9_FUN_00288FB8(11599), -1);
+    yPos = rowStep - 6;
+    F70997ba9_FUN_0027F5B8(xPos, yPos, 0x80FFA888L, F70997ba9_FUN_00288FB8(11613), -1);
+    yPos += rowStep;
+    F70997ba9_FUN_0027F5B8(xPos, yPos, 0x80FFA888L, F70997ba9_FUN_00288FB8(11625), -1);
+    yPos += rowStep;
+    F70997ba9_FUN_0027F5B8(xPos, yPos, 0x80FFA888L, F70997ba9_FUN_00288FB8(11626), -1);
+    yPos += rowStep;
+    F70997ba9_FUN_0027F5B8(xPos, yPos, 0x80FFA888L, F70997ba9_FUN_00288FB8(11627), -1);
+    yPos += rowStep;
+    F70997ba9_FUN_0027F5B8(xPos, yPos, 0x80FFA888L, F70997ba9_FUN_00288FB8(11599), -1);
     F70997ba9_FUN_0027F110();
     F70997ba9_FUN_0027C660();
     return 2;
@@ -637,10 +649,10 @@ int func_002DA118(Object_2DA118 *object)
             }
         }
         color = (shade << 24) | 0x808080;
-        func_0027E018(0, 0, D_001A6480.x, D_001A6480.y, 0, 0, object->width, object->height, color, D_001C5208);
+        DrawTexturedQuad(0, 0, gScreenAdjustOffsets.x, gScreenAdjustOffsets.y, 0, 0, object->width, object->height, color, D_001C5208);
     } else {
         color = 0x80808080ULL;
-        func_0027E018(0, 0, D_001A6480.x, D_001A6480.y, 0, 0, object->width, object->height, color, D_001C5208);
+        DrawTexturedQuad(0, 0, gScreenAdjustOffsets.x, gScreenAdjustOffsets.y, 0, 0, object->width, object->height, color, D_001C5208);
     }
     return 0x10;
 }
@@ -649,14 +661,14 @@ int func_002DA118(Object_2DA118 *object)
 s32 func_002DA238 (s32 self)
 {
   *(s32 *) (self + 68) = 0;
-  *(s32 *) (self + 72) = func_002DE550 (*(s32 *) (self + 52) & 0x200);
-  *(s32 *) (self + 76) = func_002DE550 (*(s32 *) (self + 52) & 0x200);
+  *(s32 *) (self + 72) = ClaimFreeStreamChunk (*(s32 *) (self + 52) & 0x200);
+  *(s32 *) (self + 76) = ClaimFreeStreamChunk (*(s32 *) (self + 52) & 0x200);
   if ((*(s32 *) (self + 52) & 0x200) == 0)
     {
       if (*(s32 *) (self + 72) == 0)
-        *(s32 *) (self + 72) = func_002DE550 (1);
+        *(s32 *) (self + 72) = ClaimFreeStreamChunk (1);
       if (*(s32 *) (self + 76) == 0)
-        *(s32 *) (self + 76) = func_002DE550 (1);
+        *(s32 *) (self + 76) = ClaimFreeStreamChunk (1);
     }
   *(s32 *) (self + 92) = 0;
   *(s32 *) (self + 80) = -1;
@@ -673,13 +685,14 @@ typedef struct {
 
 extern void func_002B7CE0(int);
 
+/* Resets the object stream handles and selection to -1 and starts a stream step. */
 int func_002DA2D0(Handles_2DCB28 *object) {
-    object->first = func_002DE618(object->first);
-    object->second = func_002DE618(object->second);
+    object->first = ReleaseStreamChunk(object->first);
+    object->second = ReleaseStreamChunk(object->second);
     object->index = -1;
     object->pending = -1;
     object->state = -1;
-    func_002B7CE0(1);
+    PumpMusicAndDiscRead(1);
     return 0;
 }
 
@@ -751,31 +764,31 @@ int func_002DA9A8(MenuPanel2DA9A8 *menu)
     MenuRow2DA9A8 *row;
     int message;
 
-    if (menu->active < 0 || func_002B49C8(6)) return 0;
+    if (menu->active < 0 || IsCurrentRequestSlot(6)) return 0;
     if (menu->mode < 2) {
         if (!(menu->flags & 0x100)) return 1;
-        if (D_001393E0.state == 2
-            && !(D_001393E0.stage < 3 && D_001393E0.status < 0 && Menu_2DA9A8.age > 10)) {
-            func_0027C540(0);
+        if (gMemcardState.state == 2
+            && !(gMemcardState.stage < 3 && gMemcardState.status < 0 && Menu_2DA9A8.age > 10)) {
+            SetupGifPaging(0);
             message = 0x2E00;
             if (Menu_2DA9A8.message_override) message = Menu_2DA9A8.message;
-            text = func_00288FB8(message);
+            text = GetLocalizedString(message);
             {
                 TextWindow2DA9A8 window = {1, menu->height + 1, 1, menu->width + 1,
                                            menu->width >> 1, 5, 0, 0, 16, 5};
-                func_00280200(&window, 0x80000000L, text, -1);
+                DrawTextWindowMediumFont(&window, 0x80000000L, text, -1);
                 window.anchor_y = (menu->height - window.rendered_height) >> 1;
                 window.flags ^= 4;
-                func_00280200(&window, 0x80000000L, text, -1);
+                DrawTextWindowMediumFont(&window, 0x80000000L, text, -1);
                 window.top--;
                 window.bottom--;
                 window.left--;
                 window.right--;
                 window.anchor_x--;
                 window.anchor_y--;
-                func_00280200(&window, 0x80FFA888L, text, -1);
+                DrawTextWindowMediumFont(&window, 0x80FFA888L, text, -1);
             }
-            func_0027C660();
+            DoGifPaging();
         }
         return 2;
     }
@@ -784,20 +797,20 @@ int func_002DA9A8(MenuPanel2DA9A8 *menu)
         row = &Menu_2DA9A8.owner->rows->rows[menu->choice[selection]];
         if (row->type == 0) {
             short id = row->id;
-            if (!D_001A7AF8[id]) return 1;
+            if (!gItemOwnedFlags[id]) return 1;
         }
         if (row->type == 1 && !D_001395B8[row->id]) return 1;
     }
-    func_0027C540(0);
-    if (menu->mode < 4) texture = func_00294C40(menu->texture[0]);
-    else texture = func_00294C40(menu->texture[1]);
+    SetupGifPaging(0);
+    if (menu->mode < 4) texture = load_texture_file(menu->texture[0]);
+    else texture = load_texture_file(menu->texture[1]);
     if (menu->placement & 8)
-        func_0027E018(menu->x, (char *)menu->y, menu->width, menu->height, 0, 0,
+        DrawTexturedQuad(menu->x, (char *)menu->y, menu->width, menu->height, 0, 0,
                       menu->u_width, menu->v_height, 0x80808080ULL, texture);
     else
-        func_0027E018(0, 0, D_001A6480.x, D_001A6480.y, 0, 0,
+        DrawTexturedQuad(0, 0, gScreenAdjustOffsets.x, gScreenAdjustOffsets.y, 0, 0,
                       menu->u_width, menu->v_height, 0x80808080ULL, texture);
-    func_0027C660();
+    DoGifPaging();
     return 16;
 }
 
@@ -822,10 +835,10 @@ int func_002DAD18(Handles_2DCB28 *object)
             if (D_001A63AC != 0)
                 break;
             {
-                StreamReads2DAD18 *reads = (StreamReads2DAD18 *)&D_0014B540;
+                StreamReads2DAD18 *reads = (StreamReads2DAD18 *)&gCopySetupData;
                 int offset = reads->offset;
 
-                if (func_002B7B18(object->first,
+                if (StartDiscRead(object->first,
                                   reads->first[D_001A7BB4 % 5].start + offset,
                                   reads->first[D_001A7BB4 % 5].length) != 0)
                     object->state++;
@@ -844,10 +857,10 @@ int func_002DAD18(Handles_2DCB28 *object)
             if (D_001A63AC != 0)
                 break;
             {
-                StreamReads2DAD18 *reads = (StreamReads2DAD18 *)&D_0014B540;
+                StreamReads2DAD18 *reads = (StreamReads2DAD18 *)&gCopySetupData;
                 int offset = reads->offset;
 
-                if (func_002B7B18(object->second,
+                if (StartDiscRead(object->second,
                                   reads->second[D_001A7BB4 % 5].start + offset,
                                   reads->second[D_001A7BB4 % 5].length) != 0)
                     object->state++;
@@ -899,9 +912,9 @@ int func_002DAF68(void)
     int page;
     Dialog2DAF68 *dialog;
 
-    if (((Dialog2DAF68 *)&D_001C4FA0)->image < 0)
+    if (((Dialog2DAF68 *)&gMapOverlayState)->image < 0)
         return 0;
-    page = ((Dialog2DAF68 *)&D_001C4FA0)->page;
+    page = ((Dialog2DAF68 *)&gMapOverlayState)->page;
     if (page == 5 || page == 10 || page == 15)
         return 0;
     if (page >= 21 && page != 24)
@@ -926,22 +939,22 @@ int func_002DAF68(void)
         width = 153;
         height = 140;
     }
-    dialog = (Dialog2DAF68 *)&D_001C4FA0;
+    dialog = (Dialog2DAF68 *)&gMapOverlayState;
     style = D_00261998[dialog->image];
     scroll = (D_001B1598[0] + dialog->image * 0x2AB) % 2048;
     border = inset[style];
 
-    func_002FC560(0x47, 0);
-    func_002FC560(8, 0);
+    VU1_addGSregister(0x47, 0);
+    VU1_addGSregister(8, 0);
     if (style == 0) {
-        func_0028F278(dialog->tex0, left << 4, top << 4, 7, 7, width << 4, height << 4, 0, 0, 0x80);
+        DrawHudSpriteRegion(dialog->tex0, left << 4, top << 4, 7, 7, width << 4, height << 4, 0, 0, 0x80);
     } else {
-        func_0028F278(dialog->tex0, (left + border) << 4, (top + border) << 4, 7, 7,
+        DrawHudSpriteRegion(dialog->tex0, (left + border) << 4, (top + border) << 4, 7, 7,
                       (width - border * 2) << 4, (height - border * 2) << 4, scroll, 0, 0x80);
-        func_002FC560(8, 5);
-        func_0028F278(dialog->tex1, left << 4, top << 4, 7, 7, width << 4, height << 4, 0, 0, 0x80);
+        VU1_addGSregister(8, 5);
+        DrawHudSpriteRegion(dialog->tex1, left << 4, top << 4, 7, 7, width << 4, height << 4, 0, 0, 0x80);
     }
-    func_002FC560(0x47, 0x360B);
+    VU1_addGSregister(0x47, 0x360B);
     return 4;
 }
 
@@ -950,16 +963,16 @@ int func_002DAF68(void)
 /* Choice list input: close, back, row navigation and cycling the selected row's value. */
 int func_002DB648(ChoiceMenu *menu)
 {
-    CtxB6 *menuSystem = (CtxB6 *)&D_001F2840;
+    CtxB6 *menuSystem = (CtxB6 *)&gPauseMenuState;
     int result;
     int previous;
 
     if (menuSystem->owner->focus != menu)
         return 0;
-    if ((((Pad2D7B18 *)D_00138180)->pressed & 0x900) != 0 && menuSystem->active == 0)
+    if ((((Pad2D7B18 *)gPadState)->pressed & 0x900) != 0 && menuSystem->active == 0)
         return 1;
-    if ((((Pad2D7B18 *)D_00138180)->pressed & 0x10) != 0) {
-        CtxB6 *menus = (CtxB6 *)&D_001F2840;
+    if ((((Pad2D7B18 *)gPadState)->pressed & 0x10) != 0) {
+        CtxB6 *menus = (CtxB6 *)&gPauseMenuState;
         int back = menus->owner->back;
 
         /* The shared exit keeps the 0/-1 choice a branch rather than a conditional move. */
@@ -975,16 +988,16 @@ back_done:
     }
 
     previous = menu->selected;
-    if ((((Pad2D7B18 *)D_00138180)->pressed & 0x1000) != 0 && previous != 0)
+    if ((((Pad2D7B18 *)gPadState)->pressed & 0x1000) != 0 && previous != 0)
         menu->selected = previous - 1;
-    if ((((Pad2D7B18 *)D_00138180)->pressed & 0x4000) != 0) {
+    if ((((Pad2D7B18 *)gPadState)->pressed & 0x4000) != 0) {
         int selected = menu->selected;
 
         if (menu->rows[selected + 1].text != 0)
             menu->selected = selected + 1;
     }
     if (previous != menu->selected)
-        func_002DF190(1, 0x11);
+        PlayMenuSoundIfEnabled(1, 0x11);
 
     {
         ChoiceRow *row = &menu->rows[menu->selected];
@@ -996,12 +1009,12 @@ back_done:
                 count++;
             } while (choices[count] != 0 && count < 4);
         }
-        if ((((Pad2D7B18 *)D_00138180)->pressed & 0x40) != 0) {
+        if ((((Pad2D7B18 *)gPadState)->pressed & 0x40) != 0) {
             unsigned char *value = row->value;
 
             if (value != 0) {
                 *value = (*value + 1) % count;
-                func_002DF190(0, 0x11);
+                PlayMenuSoundIfEnabled(0, 0x11);
             }
         }
     }
@@ -1012,6 +1025,7 @@ back_done:
 
 /* func_002DB988 is defined in 002DB988-init-g8.c. */
 
+/* Switches the menu draw hook to a different handler when flag 0x40 of the game flags is set. */
 int func_002DBAA8(void)
 {
     extern s32 D_00138344;
@@ -1024,21 +1038,24 @@ int func_002DBAA8(void)
 
 extern void func_00288D88(int, int, int, int);
 
-int func_002DBAD0(char *p) { int x = *(int *)(p + 0x18); int y = *(int *)(p + 0x1C); int w = *(int *)(p + 0x20); int h = *(int *)(p + 0x24); func_00288D88(x, x + w, y, y + h); return 2; }
+/* Sets the screen clip box to the rectangle stored in the object. */
+int func_002DBAD0(char *p) { int x = *(int *)(p + 0x18); int y = *(int *)(p + 0x1C); int w = *(int *)(p + 0x20); int h = *(int *)(p + 0x24); EmptySubtitleStubA(x, x + w, y, y + h); return 2; }
 
 extern char *D_001F2854;
 
+/* Clears the menu lock flag and creates a new handle for the object. */
 int func_002DBB08(char *object) {
     *(int *)(D_001F2854 + 0x12C) = 0;
-    *(int *)(object + 0x54) = func_002DE550(0);
+    *(int *)(object + 0x54) = ClaimFreeStreamChunk(0);
     return 0;
 }
 
-undefined8 func_002DBB48(int param_1)
+/* Passes the object handle through a conversion step and stores the result back. */
+undefined8 func_002DBB48(int object)
 {
-  undefined4 uVar1;
-  uVar1 = func_002DE618(*(undefined4 *)(param_1 + 0x54));
-  *(undefined4 *)(param_1 + 0x54) = uVar1;
+  undefined4 handle;
+  handle = ReleaseStreamChunk(*(undefined4 *)(object + 0x54));
+  *(undefined4 *)(object + 0x54) = handle;
   return 0;
 }
 
@@ -1046,9 +1063,10 @@ extern int D_001A7420 __attribute__((sda));
 extern unsigned int D_00138344;
 typedef struct { char reserved00[0x14]; char *object; int value; char reserved1C[0xC8]; int clear; } SceneState;
 extern SceneState ref_L00_002DBB78_00;
+/* Updates the menu value from its owner and sets or clears the lock flag when certain buttons are held. */
 int func_002DBB78(void)
 {
-    if (D_001A7420 != 16 && D_001A7420 != 1) {
+    if (gSaveMenuScreen != 16 && gSaveMenuScreen != 1) {
         ref_L00_002DBB78_00.value = *(int *)(ref_L00_002DBB78_00.object + 0xE0);
         return 0;
     }
@@ -1079,8 +1097,9 @@ extern int r1_D_001D48A8[];
 /* rac1-decomp src/game/pause.c: func_00222D70 */
 /* `r1_D_001D48A8[(unsigned)r1_D_0015EE84 % 19]`; the older near-miss
    predated MACRO_ADDR. */
-int func_002DBE80(char *arg0) {
-    *(int *)(arg0 + 0x34) = r1_D_001D48A8[(unsigned int)r1_D_0015EE84 % 19];
+/* Picks an entry from a table of 19 and stores it in the object. */
+int func_002DBE80(char *object) {
+    *(int *)(object + 0x34) = r1_D_001D48A8[(unsigned int)r1_D_0015EE84 % 19];
     return 0;
 }
 
@@ -1088,11 +1107,12 @@ extern int D_00138180[];
 extern int D_001F2974;
 extern void func_002DF190(int, int);
 
+/* Handles input for a list of 30 entries: close, back, and moving up or down with wrap-around. */
 int func_002DBEC0(char *object)
 {
     int flags;
     {
-        int *state = D_00138180;
+        int *state = gPadState;
         if (!(state[0x1C4 / 4] & 0x900))
             goto proceed;
         if (D_001F2974 == 0)
@@ -1100,11 +1120,11 @@ int func_002DBEC0(char *object)
     }
 proceed:
     {
-        int *state = D_00138180;
+        int *state = gPadState;
         flags = state[0x1C4 / 4];
     }
     if (flags & 0x10) {
-        char *root = (char *)&D_001F2840;
+        char *root = (char *)&gPauseMenuState;
         int value = *(int *)(*(char **)(root + 0x14) + 0xE0);
         int status;
         if (value != 0) {
@@ -1129,7 +1149,7 @@ finish:
         else if (flags & 0x20)
             *(int *)(object + 0x40) = (old + 29) % 30;
         if (*(int *)(object + 0x40) != old)
-            func_002DF190(1, 17);
+            PlayMenuSoundIfEnabled(1, 17);
     }
     return 0;
 }
@@ -1139,11 +1159,12 @@ extern int D_00138180[];
 extern int D_001F2974;
 extern void func_002DF190(int, int);
 
+/* Handles input for a list of 12 entries: close, back, and stepping forward or back with wrap-around. */
 int func_002DBF98(char *object)
 {
     int flags;
     {
-        int *state = D_00138180;
+        int *state = gPadState;
         if (!(state[0x1C4 / 4] & 0x900))
             goto proceed;
         if (D_001F2974 == 0)
@@ -1151,11 +1172,11 @@ int func_002DBF98(char *object)
     }
 proceed:
     {
-        int *state = D_00138180;
+        int *state = gPadState;
         flags = state[0x1C4 / 4];
     }
     if (flags & 0x10) {
-        char *root = (char *)&D_001F2840;
+        char *root = (char *)&gPauseMenuState;
         int value = *(int *)(*(char **)(root + 0x14) + 0xE0);
         int status;
         if (value != 0) {
@@ -1175,31 +1196,32 @@ finish:
     }
     if (flags & 0x2040) {
         *(int *)(object + 0x54) = (*(int *)(object + 0x54) + 1) % 12;
-        func_002DF190(1, 17);
+        PlayMenuSoundIfEnabled(1, 17);
     } else if (flags & 0x8020) {
         *(int *)(object + 0x54) = (*(int *)(object + 0x54) + 11) % 12;
-        func_002DF190(1, 17);
+        PlayMenuSoundIfEnabled(1, 17);
     }
     return 0;
 }
 
 /* Two-branch draw set-up: copies a 2-byte record from one of two tables into a 16-byte local, then issues a draw call with five float arguments (scale, per-instance angle, two constants, colour value) plus a 64-bit attribute word, a geometry handle, a fifth integer argument -1 and a local buffer. */
-int func_002DC090(char *s0)
+/* Draws a small arrow with a label on one side of the menu, depending on a flag in the object. */
+int func_002DC090(char *object)
 {
     signed char local[16];
     float y;
 
     func_0027C540_1(0);
-    if (*(int *)(s0 + 56) != 0) {
+    if (*(int *)(object + 56) != 0) {
         *(TWO_F73af1964 *)local = *(TWO_F73af1964 *)D_L01_001ABE90;
-        func_0027F538(4, *(int *)(s0 + 36) / 2 - 8, 0x80FFA888, local, -1);
-        y = (float)(*(int *)(s0 + 36) * 8);
-        func_0028F410(640.0f, y, 128.0f, 256.0f, 0.0f, 32, 16, func_0028E640(func_0028E588(0xE99D, 6)));
+        DrawTextSmallFont(4, *(int *)(object + 36) / 2 - 8, 0x80FFA888, local, -1);
+        y = (float)(*(int *)(object + 36) * 8);
+        DrawRotatedSprite(640.0f, y, 128.0f, 256.0f, 0.0f, 32, 16, GetFrameTexture(GetIconFrame(0xE99D, 6)));
     } else {
         *(TWO_F73af1964 *)local = *(TWO_F73af1964 *)D_L01_001ABE98;
-        func_0027F538(*(int *)(s0 + 32) - 24, *(int *)(s0 + 36) / 2 - 8, 0x80FFA888, local, -1);
-        y = (float)(*(int *)(s0 + 36) * 8);
-        func_0028F410(192.0f, y, 128.0f, 256.0f, 3.1415927f, 32, 16, func_0028E640(func_0028E588(0xE99D, 6)));
+        DrawTextSmallFont(*(int *)(object + 32) - 24, *(int *)(object + 36) / 2 - 8, 0x80FFA888, local, -1);
+        y = (float)(*(int *)(object + 36) * 8);
+        DrawRotatedSprite(192.0f, y, 128.0f, 256.0f, 3.1415927f, 32, 16, GetFrameTexture(GetIconFrame(0xE99D, 6)));
     }
     func_0027C660_1();
     return 2;
@@ -1214,7 +1236,8 @@ int func_002DC090(char *s0)
 
 /* func_002DCAB8 is built from 002D5E98-g8.c for small-data access. */
 
+/* Passes the first handle of the object through a conversion step. */
 int func_002DCB28(Handles_2DCB28 *object) {
-    object->first = func_002DE618(object->first);
+    object->first = ReleaseStreamChunk(object->first);
     return 0;
 }

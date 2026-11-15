@@ -121,7 +121,7 @@ ProjectileObject *func_L22_0039CDC0(ProjectileObject *owner, Quad *position,
     ProjectileData *data;
     f32 ownerangle, targetangle, distance, dot;
 
-    obj = ref_L22_0039CDC0_0(0x100);
+    obj = ref_L22_0039CDC0_0(0x100 /* moby class 256 */);
     if (obj) {
         data = obj->data;
         ref_L22_0039CDC0_1(obj, owner);
@@ -153,7 +153,7 @@ ProjectileObject *func_L22_0039CDC0(ProjectileObject *owner, Quad *position,
                 data->mode = 0;
             }
         }
-        if (owner == D_00189E20.moby)
+        if (owner == gHeroState.moby)
             data->player = 1;
         if (!data->mode && data->target) {
             ref_L22_0039CDC0_2(&offset, &data->target->basis[2], 5.0f);
@@ -174,16 +174,16 @@ ProjectileObject *func_L22_0039CDC0(ProjectileObject *owner, Quad *position,
                 reject = 1;
             qcopy(&facing, &obj->basis[0]);
             dot = ref_L22_0039CDC0_10(&direction, &facing);
-            if ((owner == D_00189E20.moby && !data->target->targetable)
+            if ((owner == gHeroState.moby && !data->target->targetable)
                 || dot < D_L22_001AF2C8 || distance > 50.0f || reject)
                 data->target = 0;
-            if (owner == D_00189E20.moby) {
+            if (owner == gHeroState.moby) {
                 if (data->target) {
-                    D_00189E20.aim = &data->direction;
-                } else if (D_00189E20.state == 0x5b) {
+                    gHeroState.aim = &data->direction;
+                } else if (gHeroState.state == 0x5b) {
                     qcopy(&D_L22_001B1930, &owner->basis[2]);
                     ref_L22_0039CDC0_2(&D_L22_001B1930, &D_L22_001B1930, -1.0f);
-                    D_00189E20.aim = &D_L22_001B1930;
+                    gHeroState.aim = &D_L22_001B1930;
                     qcopy(&data->direction, &D_L22_001B1930);
                     data->mode = 0;
                     data->target = (ProjectileObject *)1;

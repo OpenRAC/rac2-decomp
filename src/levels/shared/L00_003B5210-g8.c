@@ -18,8 +18,8 @@ void func_L00_003B5210(void)
 
     for (i = 0; i < 4; i++) {
         if (D_L00_001B28B0[i] != 0) {
-            int v = func_00283CF0(func_00283CE0(D_L00_001B28B8[i]) * D_L00_001B28D8);
-            func_L00_003B52C8(D_L00_0023D9E0 + i * 0x50, v, v, 5, D_L00_001AFA00, D_L00_001AFA04, 0.2f);
+            int v = FloatToInt(IntToFloat(D_L00_001B28B8[i]) * D_L00_001B28D8);
+            DrawRibbonWithHalo_L00_2(D_L00_0023D9E0 + i * 0x50, v, v, 5, D_L00_001AFA00, D_L00_001AFA04, 0.2f);
         }
     }
 }

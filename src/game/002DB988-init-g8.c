@@ -14,6 +14,7 @@ extern MenuEntry D_00210AF0[];
 extern int * volatile D_001AA4F0 __attribute__((sda));
 extern struct { char unknown00[0x230]; int selected; } D_001C4FA0;
 
+/* Builds the menu entries from a table and puts the cursor on the entry matching the current selection. */
 int func_002DB988(char *object)
 {
     int i, entry;
@@ -29,7 +30,7 @@ int func_002DB988(char *object)
     *(int *)(object + 0x40) = 0;
     *(unsigned int *)(object + 0x30) |= 0x8000;
     for (i = 0, entry = list[0]; entry; entry = D_001AA4F0[++i]) {
-        if (D_001C4FA0.selected == entry) {
+        if (gMapOverlayState.selected == entry) {
             *(int *)(object + 0x40) = i;
             break;
         }

@@ -57,7 +57,7 @@ extern void func_0029F338(void *moby);
 #define HIDE_GROUP(n, type1, type2, type3)                                        \
     {                                                                             \
         short *entries, *list;                                                    \
-        if (data[n] == 255 || (entries = D_L11_001FC420[data[n]]) == 0) goto done; \
+        if (data[n] == 255 || (entries = gGroupIdLists[data[n]]) == 0) goto done; \
         list = entries;                                                           \
         do {                                                                      \
             JobaGroupMoby *m = GROUP_MEMBER(*list);                               \
@@ -73,16 +73,17 @@ extern void func_0029F338(void *moby);
 #define MEMBER_ALIVE(m) ((m) && (m)->state != 254 && (m)->state != 253 && health > 0.0f)
 
 static __inline__ void FinishGroupMoby(float *vec, JobaGroupMoby *self) {
-    func_002B0A68(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
-    func_002AC728(self, 1.0f, 13.0f, self->position, -1);
-    func_0029F338(self);
+    SpawnDebrisForMaskedParts(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
+    SpawnExplosionWithSparks(self, 1.0f, 13.0f, self->position, -1);
+    MarkMobySpawned(self);
 }
 
 /* Parent moby in vars[0], two member groups in vars[1] and vars[2], sound handle in vars[5]. */
+/* Updates a group controller: when the hero is near, it wakes up its tribesmen and saur-beasts, plays its sound, and fades out when hit. */
 void func_L11_0047A310(JobaGroupMoby *self) {
     float vec[4];
     int *data = self->vars;
-    JobaGroupMoby *parent = (JobaGroupMoby *)(D_L11_001B359C + (data[0] << 8));
+    JobaGroupMoby *parent = (JobaGroupMoby *)(gMobyTable_L11 + (data[0] << 8));
     short *list;
     char *event;
     float health;
@@ -91,83 +92,83 @@ void func_L11_0047A310(JobaGroupMoby *self) {
         self->state = 1;
         self->flags |= 0x800;
         parent->flags |= 0x41;
-        HIDE_GROUP(1, 0xCF5, 0xCF6, 0xD07)
-        HIDE_GROUP(2, 0xD07, 0xCF6, 0xCF5)
+        HIDE_GROUP(1, 0xCF5 /* Joba Tribesman */, 0xCF6 /* moby class 3318 */, 0xD07 /* Jobian Saur-Beast */)
+        HIDE_GROUP(2, 0xD07 /* Jobian Saur-Beast */, 0xCF6 /* moby class 3318 */, 0xCF5 /* Joba Tribesman */)
     }
     if (self->state == 1) {
-        if (func_L00_00324120(parent) || func_002B38B8(parent) ||
-            (D_0019B2E8[self->index + (D_001A79F0 << 4)] & 0x80)) {
+        if (IsCurrentSelectedId(parent) || IsThirdPendingFlagSet(parent) ||
+            (D_0019B2E8[self->index + (gCurrentMapIndex << 4)] & 0x80)) {
             self->timer = 0;
             self->state = 2;
-            func_002E5CF8(1, 0, self);
+            PlayMobySound(1, 0, self);
             {
-                unsigned char *record = D_00188660 + data[5] * 0x70;
+                unsigned char *record = gSoundState + data[5] * 0x70;
                 if (*(JobaGroupMoby **)(record + 0x88) != self || record[0x74] == 0) {
-                    data[5] = func_002E5CF8(2, 4, self);
+                    data[5] = PlayMobySound(2, 4, self);
                 }
             }
             {
                 short *entries;
-                if (data[1] == 255 || (entries = D_L11_001FC420[data[1]]) == 0) goto done;
+                if (data[1] == 255 || (entries = gGroupIdLists[data[1]]) == 0) goto done;
                 list = entries;
                 do {
                     JobaGroupMoby *m = GROUP_MEMBER(*list);
-                    health = *func_002AB1F0(m);
-                    if (MEMBER_ALIVE(m) && m->type == 0xCF5) { m->active = 1; ACTIVATE_MEMBER(m); }
-                    else if (MEMBER_ALIVE(m) && m->type == 0xCF6) { m->active = 1; ACTIVATE_MEMBER(m); }
-                    else if (MEMBER_ALIVE(m) && m->type == 0xD07) { m->active = 1; ACTIVATE_MEMBER(m); }
+                    health = *GetMobyPrivateValue0(m);
+                    if (MEMBER_ALIVE(m) && m->type == 0xCF5 /* Joba Tribesman */) { m->active = 1; ACTIVATE_MEMBER(m); }
+                    else if (MEMBER_ALIVE(m) && m->type == 0xCF6 /* moby class 3318 */) { m->active = 1; ACTIVATE_MEMBER(m); }
+                    else if (MEMBER_ALIVE(m) && m->type == 0xD07 /* Jobian Saur-Beast */) { m->active = 1; ACTIVATE_MEMBER(m); }
                 } while (*list++ >= 0);
             }
             {
                 short *entries;
-                if (data[2] == 255 || (entries = D_L11_001FC420[data[2]]) == 0) goto done;
+                if (data[2] == 255 || (entries = gGroupIdLists[data[2]]) == 0) goto done;
                 list = entries;
                 do {
                     JobaGroupMoby *m = GROUP_MEMBER(*list);
                     if ((signed char)m->state >= 0) {
-                        if (m->type == 0xD07) { m->active = 1; ACTIVATE_MEMBER(m); }
-                        else if (m->type == 0xCF6) { m->active = 1; ACTIVATE_MEMBER(m); }
-                        else if (m->type == 0xCF5) { m->active = 1; ACTIVATE_MEMBER(m); }
+                        if (m->type == 0xD07 /* Jobian Saur-Beast */) { m->active = 1; ACTIVATE_MEMBER(m); }
+                        else if (m->type == 0xCF6 /* moby class 3318 */) { m->active = 1; ACTIVATE_MEMBER(m); }
+                        else if (m->type == 0xCF5 /* Joba Tribesman */) { m->active = 1; ACTIVATE_MEMBER(m); }
                     }
                 } while (*list++ >= 0);
             }
         }
-        event = func_002A9640(self, 0x10000, 0);
+        event = FindOwnedEffectSlot(self, 0x10000, 0);
         if (event) {
-            func_00282F20(vec, self->target, 0.4166666865f);
-            if ((*(JobaGroupMoby **)(event + 0x20))->type == 0xDD9) {
+            vec_scale_to_length(vec, self->target, 0.4166666865f);
+            if ((*(JobaGroupMoby **)(event + 0x20))->type == 0xDD9 /* moby class 3545 */) {
                 short *entries, *list;
-                func_002E5CF8(0, 0, self);
+                PlayMobySound(0, 0, self);
                 self->timer = 0;
                 self->slot = 255;
                 /* Each exit writes its calls out: jump2 shares only the last call between them. */
                 if (data[1] == 255) { FinishGroupMoby(vec, self); return; }
-                entries = D_L11_001FC420[data[1]];
+                entries = gGroupIdLists[data[1]];
                 if (entries == 0) { FinishGroupMoby(vec, self); return; }
                 list = entries;
                 do {
                     JobaGroupMoby *m = GROUP_MEMBER(*list);
                     if ((signed char)m->state >= 0) {
-                        if (m->type == 0xCF5) { ACTIVATE_MEMBER(m); m->active = 1; }
-                        else if (m->type == 0xCF6) { ACTIVATE_MEMBER(m); m->active = 1; }
-                        else if (m->type == 0xD07) { ACTIVATE_MEMBER(m); m->active = 1; }
+                        if (m->type == 0xCF5 /* Joba Tribesman */) { ACTIVATE_MEMBER(m); m->active = 1; }
+                        else if (m->type == 0xCF6 /* moby class 3318 */) { ACTIVATE_MEMBER(m); m->active = 1; }
+                        else if (m->type == 0xD07 /* Jobian Saur-Beast */) { ACTIVATE_MEMBER(m); m->active = 1; }
                     }
                 } while (*list++ >= 0);
                 if (data[2] == 255) { FinishGroupMoby(vec, self); return; }
-                entries = D_L11_001FC420[data[2]];
+                entries = gGroupIdLists[data[2]];
                 if (entries == 0) { FinishGroupMoby(vec, self); return; }
                 list = entries;
                 do {
                     JobaGroupMoby *m = GROUP_MEMBER(*list);
                     if ((signed char)m->state >= 0) {
-                        if (m->type == 0xD07) { ACTIVATE_MEMBER(m); m->active = 1; }
-                        else if (m->type == 0xCF6) { ACTIVATE_MEMBER(m); m->active = 1; }
-                        else if (m->type == 0xCF5) { ACTIVATE_MEMBER(m); m->active = 1; }
+                        if (m->type == 0xD07 /* Jobian Saur-Beast */) { ACTIVATE_MEMBER(m); m->active = 1; }
+                        else if (m->type == 0xCF6 /* moby class 3318 */) { ACTIVATE_MEMBER(m); m->active = 1; }
+                        else if (m->type == 0xCF5 /* Joba Tribesman */) { ACTIVATE_MEMBER(m); m->active = 1; }
                     }
                 } while (*list++ >= 0);
-                func_002AC728(self, 1.0f, 13.0f, self->position, -1);
-                func_002B0A68(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
-                func_0029F338(self);
+                SpawnExplosionWithSparks(self, 1.0f, 13.0f, self->position, -1);
+                SpawnDebrisForMaskedParts(self, 255, 3.0f, 6.0f, 3.0f, 6.0f, vec, 255);
+                MarkMobySpawned(self);
                 return;
             }
             self->slot = 255;
@@ -178,9 +179,9 @@ void func_L11_0047A310(JobaGroupMoby *self) {
         self->position[2] += 0.15f;
         if (++self->timer > 60) {
             if (data[5] != -1) {
-                unsigned char *record = D_00188660 + data[5] * 0x70;
+                unsigned char *record = gSoundState + data[5] * 0x70;
                 if (*(JobaGroupMoby **)(record + 0x88) == self && record[0x74]) {
-                    func_002E59F8(data[5]);
+                    StopSoundVoice(data[5]);
                 }
             }
             data[5] = -1;

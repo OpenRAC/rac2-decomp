@@ -1,30 +1,31 @@
 extern unsigned char D_001AD030[27] __attribute__((sda));
 extern unsigned char D_001AD04B[] __attribute__((sda));
 
-unsigned long func_002EF010(int a0)
+/* Turns a cutscene number into a compact index by skipping the unused numbers in between. Numbers outside the normal range are shifted down. */
+unsigned long func_002EF010(int cutsceneId)
 {
     int i;
-    int limit;
-    unsigned char v;
-    int out = (unsigned int)(a0 - 0x20) >= 0x91;
+    int firstGapEnd;
+    unsigned char gapSize;
+    int outOfRange = (unsigned int)(cutsceneId - 0x20) >= 0x91;
 
-    if (!out) {
-        limit = D_001AD04B[0];
-        if (a0 >= limit) {
-            a0 -= limit;
+    if (!outOfRange) {
+        firstGapEnd = D_001AD04B[0];
+        if (cutsceneId >= firstGapEnd) {
+            cutsceneId -= firstGapEnd;
         } else {
             i = 0x1B;
         next:
             i--;
             if (i >= 0) {
-                v = D_001AD030[i];
-                if (a0 < v)
+                gapSize = D_001AD030[i];
+                if (cutsceneId < gapSize)
                     goto next;
-                a0 -= v;
+                cutsceneId -= gapSize;
             }
         }
-    } else if (a0 >= 0xB1) {
-        a0 -= 0x91;
+    } else if (cutsceneId >= 0xB1) {
+        cutsceneId -= 0x91;
     }
-    return a0;
+    return cutsceneId;
 }

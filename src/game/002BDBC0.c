@@ -33,31 +33,32 @@ extern int func_00283CF0(float);
 extern float func_00283CE0(int);
 extern int func_001163B0(void);
 
+/* Creates a puff of smoke that starts small and grows to the given size over its life. */
 void func_002BDBC0(void *pos, void *dir, u32 color, s32 flags, s32 frames, f32 size) {
-    Puff2BDBC0 *p;
-    Effect2BDBC0 *e;
-    f32 len;
-    f32 d;
+    Puff2BDBC0 *puff;
+    Effect2BDBC0 *effect;
+    f32 lifeFrames;
+    f32 sizeGrowth;
 
-    e = func_002B9030(0x16);
-    if (e != 0) {
-        p = &e->p;
-        e->color = color;
-        e->f9 = func_00283CF0(4.0f) + 0x70;
-        e->f1 = 0;
-        e->f3 = 0x44;
-        e->size = size * 0.2f;
-        e->f8 = func_001163B0();
-        e->f2 = *D_001F2598[0];
-        e->frames = frames;
-        p->frames = frames;
-        len = func_00283CE0(frames);
-        d = size - e->size;
-        p->color = color;
-        p->flags = flags;
-        p->fade = d / len;
-        qcopy(p, dir);
-        qcopy(e->pos, pos);
-        p->decay = 0.00034444444f;
+    effect = AllocParticle(0x16);
+    if (effect != 0) {
+        puff = &effect->p;
+        effect->color = color;
+        effect->f9 = FloatToInt(4.0f) + 0x70;
+        effect->f1 = 0;
+        effect->f3 = 0x44;
+        effect->size = size * 0.2f;
+        effect->f8 = Rand();
+        effect->f2 = *D_001F2598[0];
+        effect->frames = frames;
+        puff->frames = frames;
+        lifeFrames = IntToFloat(frames);
+        sizeGrowth = size - effect->size;
+        puff->color = color;
+        puff->flags = flags;
+        puff->fade = sizeGrowth / lifeFrames;
+        qcopy(puff, dir);
+        qcopy(effect->pos, pos);
+        puff->decay = 0.00034444444f;
     }
 }

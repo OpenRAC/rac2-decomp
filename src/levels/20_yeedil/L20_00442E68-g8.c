@@ -16,8 +16,9 @@ extern void func_L02_003A6F78(char *);
    leaves the exit test at the bottom of the loop, which gives retail's `b test` entry.
    The entity bank is an `sda` array of unknown size, which gives retail's absolute
    lui/lw load in this -G8 unit. */
-void func_L20_00442E68(char *a0) {
-    char *state = *(char **)(a0 + 0x68);
+/* Gets every object in this enemy group ready for the fight by setting a value on it and starting its setup. */
+void func_L20_00442E68(char *moby) {
+    char *state = *(char **)(moby + 0x68);
     u16 *p;
     char *e;
 
@@ -30,6 +31,6 @@ void func_L20_00442E68(char *a0) {
         if (e == 0)
             break;
         *(u16 *)(e + 0x36) = 0x7F80;
-        func_L02_003A6F78(e);
+        FinishObjectAndReleaseChild(e);
     }
 }

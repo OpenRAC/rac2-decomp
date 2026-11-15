@@ -73,6 +73,7 @@ extern struct eh_context *(*get_eh_context) (void);
 
 extern void __sjthrow (void) __attribute__ ((__noreturn__));
 
+/* Throws an exception by running cleanups, then jumping to the next handler, or stops if none is left. */
 void
 func_00120528 ()
 {
@@ -151,6 +152,7 @@ func_00120528 ()
 
 extern void __sjpopnthrow (void) __attribute__ ((__noreturn__));
 
+/* Runs cleanups, removes the top handler and throws again. */
 __attribute__ ((section (".text.func_00120528"))) void
 __sjpopnthrow ()
 {
@@ -207,6 +209,7 @@ __sjpopnthrow ()
 
 /* Support code for all exception region-based exception handling.  */
 
+/* Asks the type matcher whether the thrown exception fits the given type. */
 __attribute__ ((section (".text.func_00120528"))) int
 __eh_rtime_match (void *rtime)
 {

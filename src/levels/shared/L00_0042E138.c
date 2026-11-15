@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 extern unsigned char D_001A7B96 __attribute__((sda));
 
 extern void func_0033AE18(unsigned char *owner, int value);
@@ -31,14 +32,17 @@ extern volatile unsigned char D_001A7BB2_1 __attribute__((sda));
 
 extern volatile unsigned char D_001A7BB3 __attribute__((sda));
 
+/* Does nothing. */
 void func_L00_0042E138(void)
 {
 }
 
+/* Does nothing. */
 void func_L00_0042E388(void)
 {
 }
 
+/* Does nothing. */
 void func_L00_0042E880(void)
 {
 }
@@ -47,7 +51,7 @@ void func_L00_0042E880(void)
 /* Forward owner+8 and the supplied signed word to the measured two-argument setter. */
 void func_L00_0042F0A0(unsigned char *owner, int value)
 {
-    func_0033AE18(owner + 8, value);
+    SetButtonPromptTextsEnabled(owner + 8, value);
 }
 
 
@@ -67,7 +71,7 @@ void func_L00_00430948(float first, float second, float **cell)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_L00_00431668(char *object)
 {
-    func_0033AB50(object + 8);
+    DestroyButtonPromptBar(object + 8);
     return object;
 }
 
@@ -75,7 +79,7 @@ char *func_L00_00431668(char *object)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_L00_00431AA8(char *object)
 {
-    func_0033AB50(object + 8);
+    DestroyButtonPromptBar(object + 8);
     return object;
 }
 
@@ -83,7 +87,7 @@ char *func_L00_00431AA8(char *object)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_L00_00431D60(char *object)
 {
-    func_0033AB50(object + 8);
+    DestroyButtonPromptBar(object + 8);
     return object;
 }
 
@@ -91,7 +95,7 @@ char *func_L00_00431D60(char *object)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_L00_004322E8(char *object)
 {
-    func_0033AB50(object + 8);
+    DestroyButtonPromptBar(object + 8);
     return object;
 }
 
@@ -132,7 +136,7 @@ int func_L00_00432448(char *a0, int a1)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_L00_00432D70(char *object)
 {
-    func_0033AB50(object + 8);
+    DestroyButtonPromptBar(object + 8);
     return object;
 }
 
@@ -144,7 +148,7 @@ int func_L00_00432ED0 (char *object, int flags)
   float *vec;
   int discarded;
 
-  func_0033AE28 (object + 8);
+  UpdateButtonPromptBar (object + 8);
   vec = *(float **) (object + 684);
   func_L00_00430948_1 (object + 8, vec[0], vec[1]);
 
@@ -161,7 +165,7 @@ int func_L00_00432ED0 (char *object, int flags)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_L00_00433038(char *object)
 {
-    func_0033AB50(object + 8);
+    DestroyButtonPromptBar(object + 8);
     return object;
 }
 
@@ -201,7 +205,7 @@ int func_L00_00433198(char *a0, int a1)
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_L00_00433400(char *object)
 {
-    func_0033AB50(object + 8);
+    DestroyButtonPromptBar(object + 8);
     return object;
 }
 

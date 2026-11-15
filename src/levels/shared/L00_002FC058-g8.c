@@ -24,9 +24,9 @@ void func_L00_002FC058(void)
         break;
     case 2:
         ref_L00_002FC058_02 = ref_L00_002FC058_02 - 1;
-        if (func_L00_002FC018() != 0) {
-            func_L00_002FC020();
-            func_L00_002FC028();
+        if (GetLevelFlagD() != 0) {
+            ClearLevelFlagE();
+            ClearLevelFlagF();
         } else if (ref_L00_002FC058_02 == 0) {
             if (*(int *)D_00138320 & 0x10)
                 ref_L00_002FC058_00++;

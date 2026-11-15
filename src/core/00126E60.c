@@ -52,25 +52,27 @@ extern int func_00127040(void *);
  * `lui 0xff; ori 0xffff` and was 24/112. The channel word is read
  * volatile, as the hardware register it is.
  */
-void func_00126E60(void *arg0) {
-    int n = 0x1000000;
+/* Waits for a DMA channel to finish and reports a timeout if it takes too long. */
+void func_00126E60(void *channelReg) {
+    int pollsLeft = 0x1000000;
 
-    while ((*(volatile int *)arg0 & 0x100) != 0) {
-        if (--n < 0) {
+    while ((*(volatile int *)channelReg & 0x100) != 0) {
+        if (--pollsLeft < 0) {
             r1_func_0011A6C8(r1_D_001534E0);
-            func_001272A8(arg0);
+            SceDmaPause(channelReg);
         }
     }
 }
 
 
 /* rac1-decomp src/core/00123168.c: func_00123280 */
-int func_00126ED8(int arg0) {
-    if ((unsigned int)arg0 >> 28 == 7) {
-        arg0 &= 0x0FFFFFFF;
-        arg0 |= 0x80000000;
+/* Turns a scratchpad address into the matching address the DMA unit uses and leaves other addresses alone. */
+int func_00126ED8(int addr) {
+    if ((unsigned int)addr >> 28 == 7) {
+        addr &= 0x0FFFFFFF;
+        addr |= 0x80000000;
     }
-    return arg0;
+    return addr;
 }
 
 /* rac1-decomp src/core/00123168.c: func_001232A8 */
@@ -83,6 +85,7 @@ int func_00126ED8(int arg0) {
    puts the nop in the slot. That is the "unfilled short-loop slot" seen
    elsewhere in core_text. Under 2.95.3 the same C gets the registers
    right but reorg fills the slot (6/52); the old do-while was 2/52. */
+/* Fills a block of memory with zeros. */
 void func_00126F00(char *dst, int n) {
     while (n-- != 0) {
         *dst++ = 0;
@@ -93,41 +96,43 @@ void func_00126F00(char *dst, int n) {
 /* sceDmaGetChan: the channel's register block, 0 for an id past the ten
    channels. The in-range return comes first under 2.9-ee (the
    `>= 0xA` guard-first form matched 2.95.3 and is 21/40 here). */
-int func_00126F38(unsigned int arg0) {
-    if (arg0 < 0xA) {
-        return r1_D_00132E70[arg0];
+/* Returns the register block of a DMA channel, or 0 if the number is too big. */
+int func_00126F38(unsigned int channelId) {
+    if (channelId < 0xA) {
+        return r1_D_00132E70[channelId];
     }
     return 0;
 }
 
 /* rac1-decomp src/core/00123168.c: func_00123308 */
-int func_00126F60(int arg0) {
-    char buf[0x14];
-    int flag;
+/* Resets all DMA channels and the DMA status, then sets a clean DMA setup. */
+int func_00126F60(int mode) {
+    char envBuf[0x14];
+    int dmaEnabled;
     int i;
 
-    flag = D_CTRL & 1;
+    dmaEnabled = D_CTRL & 1;
 
     for (i = 0; i < 10; i++) {
         if (r1_D_001534F8[i] != 0) {
-            int *p = (int *)r1_D_00132E70[i];
-            p[0] = 0;
-            p[0xC] = 0;
-            p[4] = 0;
-            p[0x14] = 0;
-            p[0x10] = 0;
-            p[0x20] = 0;
+            int *chanRegs = (int *)r1_D_00132E70[i];
+            chanRegs[0] = 0;
+            chanRegs[0xC] = 0;
+            chanRegs[4] = 0;
+            chanRegs[0x14] = 0;
+            chanRegs[0x10] = 0;
+            chanRegs[0x20] = 0;
         }
     }
 
     *(unsigned int *)0x1000E010 = 0xFF1F;
     *(unsigned int *)0x1000E010 = D_STAT & 0xFF1F0000;
 
-    func_00126F00(buf, 0x14);
-    func_00127040(buf);
+    ZeroFillBytes(envBuf, 0x14);
+    SceDmaPutEnv(envBuf);
 
-    if (arg0 == 1) {
+    if (mode == 1) {
         D_CTRL = D_CTRL | 1;
     }
-    return flag;
+    return dmaEnabled;
 }

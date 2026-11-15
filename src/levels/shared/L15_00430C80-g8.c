@@ -26,6 +26,7 @@ extern void func_L15_00430590(void *, int);
 extern void func_L15_00435E80(void *);
 extern void func_L15_00436090(void *);
 
+/* On first call sets up the level's special objects, then starts the next scene once its condition is met. */
 void func_L15_00430C80(void *self) {
     Moby430C80 **list;
     void *obj;
@@ -35,25 +36,25 @@ void func_L15_00430C80(void *self) {
     if (D_L15_001B1534 == 0) {
         D_L15_001B1534 = 1;
         D_L15_00221E10[0x2C / 4] = 0;
-        func_002B7320();
-        func_L05_0037B210();
-        func_L05_00379F18(0);
-        list = func_L05_00379EB8();
-        n = func_L00_004272A0();
+        music_Unpause();
+        InitAllRegisteredEntries();
+        SetPlayerStateField13(0);
+        list = GetLevelObjectList();
+        n = GetLevelSavedValue();
         for (i = 0; i < n; i++) {
-            if (list[i]->uid == 0x957) {
-                func_L05_0037B280(list[i], 1);
+            if (list[i]->uid == 0x957 /* moby class 2391 */) {
+                SpawnEntryListObjectsWithFlag(list[i], 1);
                 func_L05_0037CEE0(list[i], D_L15_001B2714[0] + D_L15_00221E10[0] * 128 + 0x30, 64.0f);
                 func_L05_0037D608(list[i], D_L15_001B2714[0] + D_L15_00221E10[0] * 128 + 0x30, 64.0f);
             }
         }
-        obj = func_L05_0037B440(0x1211, 1);
+        obj = SpawnFreeLevelObjectById(0x1211 /* moby class 4625 */, 1);
         if (obj != 0) {
-            func_L15_00435E80(obj);
-            func_L15_00436090(obj);
+            ResetGroupToPathStart(obj);
+            StartGornShipFalling(obj);
         }
     }
-    if (func_L15_00381CF0(func_L05_00379ED0(0x1211)) == 0 && D_L15_001B2148[0] >= 6) {
-        func_L15_00430590(self, 2);
+    if (CountActiveLinkedListObjects(FindLevelObjectByClassId(0x1211 /* moby class 4625 */)) == 0 && D_L15_001B2148[0] >= 6) {
+        FinishGornChallengeStage(self, 2);
     }
 }

@@ -49,76 +49,77 @@ void func_002C7E28(struct Vec4 *a, struct Vec4 *b, s32 c);
 void func_003323F0(struct Obj *a);
 void func_0029F338(struct Obj *a);
 
-void func_003320F0(struct Obj *arg0)
+/* Per-frame update for an explosion effect: throws out a few sparks and pushed particles (fewer as the counter drops), counts the counter down and then runs the shared update. */
+void func_003320F0(struct Obj *moby)
 {
-    struct Vec4 b;
-    struct Vec4 a;
-    struct Tab *tb;
+    struct Vec4 vecB;
+    struct Vec4 vecA;
+    struct Tab *camera;
     s32 i;
     s32 j;
-    f32 ra;
-    f32 rb;
-    f32 rc;
-    f32 rd;
-    f32 re;
-    f32 rf;
-    f32 rg;
-    s32 rh;
-    f32 p1;
-    f32 p2;
-    f32 r3;
-    f32 r4;
-    f32 r5;
-    f32 r6;
-    f32 pa;
-    f32 pb;
-    f32 d80;
+    f32 randA;
+    f32 randB;
+    f32 randC;
+    f32 randD;
+    f32 randE;
+    f32 randF;
+    f32 randG;
+    s32 randH;
+    f32 angle;
+    f32 spreadAngle;
+    f32 offsetX;
+    f32 offsetY;
+    f32 offsetZ;
+    f32 turn;
+    f32 cosPart;
+    f32 sinPart;
+    f32 speed;
 
     i = 0;
     if (0x21 - D_001AFC6C > 0) {
         do {
             i++;
-            ra = func_002A7878(0.0f, 0.3700000047683716f);
-            rb = func_002A7940();
-            rc = func_002A7940();
-            func_002AF000(&a, ra, rb, rc);
-            rd = func_002A7878(0.3499999940395355f, 0.6000000238418579f);
-            a.z = a.z + rd;
-            func_00282CC0(&a, &a, &arg0->pos);
-            re = func_002A7878(0.0016666668234393f, 0.01666666753590107f);
-            rf = func_002A7940();
-            rg = func_002A7940();
-            func_002AF000(&b, re, rf, rg);
-            rh = func_002A7820(0x1E, 0x39);
-            func_002BDBC0(&a, &b, 0x4F20507F, 0x102F, rh, 150000.0f);
+            randA = RandomFloatRange(0.0f, 0.3700000047683716f);
+            randB = RandomAngle();
+            randC = RandomAngle();
+            BuildSphericalOffset(&vecA, randA, randB, randC);
+            randD = RandomFloatRange(0.3499999940395355f, 0.6000000238418579f);
+            vecA.z = vecA.z + randD;
+            FastVecAdd(&vecA, &vecA, &moby->pos);
+            randE = RandomFloatRange(0.0016666668234393f, 0.01666666753590107f);
+            randF = RandomAngle();
+            randG = RandomAngle();
+            BuildSphericalOffset(&vecB, randE, randF, randG);
+            randH = RandomIntRange(0x1E, 0x39);
+            SpawnGrowingPuffParticle(&vecA, &vecB, 0x4F20507F, 0x102F, randH, 150000.0f);
         } while (i < 0x21 - D_001AFC6C);
     }
     j = 0;
     if (0x32 - D_001AFC6C > 0) {
-        tb = (struct Tab *)D_001B5200;
+        camera = (struct Tab *)gActiveCamera;
         do {
             j++;
-            p1 = func_00283248(tb->f140 - arg0->pos.x, tb->f144 - arg0->pos.y);
-            func_00283CF0(func_002A78D8(1.0f, 2.0f));
-            r3 = func_002A78D8(0.0f, 0.15000000596046448f);
-            b.x = arg0->pos.x + r3;
-            r4 = func_002A78D8(0.0f, 0.15000000596046448f);
-            b.y = arg0->pos.y + r4;
-            r5 = func_002A78D8(0.0f, 0.15000000596046448f);
-            b.z = arg0->pos.z + r5;
-            d80 = D_001B0A80;
-            r6 = func_002A78D8(0.0f, -1.5707964897155762f);
-            p2 = func_00283B98(p1, r6);
-            pa = func_00283180(p2);
-            a.x = pa * 0.01666666753590107f * d80;
-            pb = func_00283198(p2);
-            a.y = pb * 0.01666666753590107f * d80;
-            d80 = D_001B0A84;
-            a.z = d80 * 0.01666666753590107f;
-            func_002C7E28(&b, &a, 0x12C);
+            angle = FastMatrixHelperA(camera->f140 - moby->pos.x, camera->f144 - moby->pos.y);
+            FloatToInt(RandomSignedFloatRange(1.0f, 2.0f));
+            offsetX = RandomSignedFloatRange(0.0f, 0.15000000596046448f);
+            vecB.x = moby->pos.x + offsetX;
+            offsetY = RandomSignedFloatRange(0.0f, 0.15000000596046448f);
+            vecB.y = moby->pos.y + offsetY;
+            offsetZ = RandomSignedFloatRange(0.0f, 0.15000000596046448f);
+            vecB.z = moby->pos.z + offsetZ;
+            speed = D_001B0A80;
+            turn = RandomSignedFloatRange(0.0f, -1.5707964897155762f);
+            spreadAngle = FastAddRotations(angle, turn);
+            cosPart = FastSinOrCosA(spreadAngle);
+            vecA.x = cosPart * 0.01666666753590107f * speed;
+            sinPart = FastSinOrCosB(spreadAngle);
+            vecA.y = sinPart * 0.01666666753590107f * speed;
+            speed = D_001B0A84;
+            vecA.z = speed * 0.01666666753590107f;
+            SpawnSpinningSparkParticle_002C7E28(&vecB, &vecA, 0x12C);
         } while (j < 0x32 - D_001AFC6C);
     }
     g_001AFC6C = D_001AFC6C - 1;
-    func_003323F0(arg0);
-    func_0029F338(arg0);
+    ReleaseSlotById(moby);
+    MarkMobySpawned(moby);
 }

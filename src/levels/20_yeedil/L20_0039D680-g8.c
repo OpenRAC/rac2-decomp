@@ -15,9 +15,10 @@ extern int D_L20_001B2FB8 __attribute__((sda));
    skipping state 6; sets state+0x27C when fewer than two are.  The loop condition is
    the group-iteration form of func_00325DA0: its size keeps jump from duplicating the
    exit test, so the test stays at the bottom, entered by a branch, as in retail. */
+/* Checks how many trooper friends are closer to the player than this one and records whether it is among the closest two. */
 void func_L20_0039D680(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
-    float limit = func_00282E80(object + 0x10, D_00189EA0);
+    float limit = vec_distance_xy(object + 0x10, gHeroPosition);
     unsigned short *p;
     unsigned char *e;
     int count = 0;
@@ -29,7 +30,7 @@ void func_L20_0039D680(unsigned char *object) {
         e = (unsigned char *)D_L20_001B2F9C + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        if (e != object && e[0x20] != 6 && func_00282E80(e + 0x10, D_00189EA0) < limit)
+        if (e != object && e[0x20] != 6 && vec_distance_xy(e + 0x10, gHeroPosition) < limit)
             count++;
     }
     *(int *)(state + 0x27C) = count < 2;

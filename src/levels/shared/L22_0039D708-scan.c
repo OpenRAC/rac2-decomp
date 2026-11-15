@@ -33,16 +33,17 @@ static inline int SlotAt(int i) {
  * giving up after a full turn. Two point pairs are built from the first and
  * last points of the slot's record, and the slot is marked spent once
  * func_L22_003A2780 accepts both pairs. */
+/* Picks the next flight lane that has not been checked yet and tests whether it is clear to fly along. */
 void func_L22_003A4938(char *obj) {
     float a[4], b[4], c[4], d[4], e[4], f[4], g[4], h[4], i[4], j[4];
-    char *s;
+    char *vars;
     int old = D_L22_001AF3C4;
     char *rec;
-    s = *(char **)(obj + 0x68);
+    vars = *(char **)(obj + 0x68);
     while (SlotAt(D_L22_001AF3C4 = (D_L22_001AF3C4 + 1) % D_L22_001B2AD4[0]) == -1) {
         if (old == D_L22_001AF3C4) return;
     }
-    rec = D_L22_001FE940[((ScanSub_003A4938 *)s)->record_ids[D_L22_001AF3B0[D_L22_001AF3C4]]];
+    rec = D_L22_001FE940[((ScanSub_003A4938 *)vars)->record_ids[D_L22_001AF3B0[D_L22_001AF3C4]]];
     qcopy_nc(a, rec + 16);
     qcopy_nc(c, rec + *(int *)rec * 16);
     qcopy_nc(b, rec + 16);
@@ -55,18 +56,18 @@ void func_L22_003A4938(char *obj) {
     func_002F3BB0(e, g, h);
     func_002F3D60(e, e, -1.5f);
     func_002F3D60(f, e, -1.5f);
-    func_002F3AF0(j, h, *(float *)(s + 0x114) + *(float *)(s + 0x110));
+    func_002F3AF0(j, h, *(float *)(vars + 0x114) + *(float *)(vars + 0x110));
     func_002F3A80(j, j, f);
     func_002F3A80(a, a, j);
-    func_002F3AF0(j, i, *(float *)(s + 0x114) + *(float *)(s + 0x110));
+    func_002F3AF0(j, i, *(float *)(vars + 0x114) + *(float *)(vars + 0x110));
     func_002F3A80(j, j, f);
     func_002F3A80(c, c, j);
-    func_002F3AF0(j, h, *(float *)(s + 0x114) + *(float *)(s + 0x110));
+    func_002F3AF0(j, h, *(float *)(vars + 0x114) + *(float *)(vars + 0x110));
     func_002F3A80(j, j, e);
     func_002F3A80(b, b, j);
-    func_002F3AF0(j, i, *(float *)(s + 0x114) + *(float *)(s + 0x110));
+    func_002F3AF0(j, i, *(float *)(vars + 0x114) + *(float *)(vars + 0x110));
     func_002F3A80(j, j, e);
     func_002F3A80(d, d, j);
-    if (func_L22_003A2780(obj, a, c) && func_L22_003A2780(obj, b, d))
+    if (WalkPathIsClear(obj, a, c) && WalkPathIsClear(obj, b, d))
         D_L22_001AF3B0[D_L22_001AF3C4] = -1;
 }

@@ -33,24 +33,24 @@ extern void func_003546B0(void *, int, float);
    would hoist D_L10_0026CEA0's high half out of the list loop, which retail recomputes.
    The initial values of k, entry, prim, transform and case 0's i only size gcse's
    expression table (185 buckets), which orders the matrix pointers' registers as retail. */
-void func_L10_0042B500(char *p) {
+void func_L10_0042B500(char *moby) {
     union {
         struct { float m[3][12]; CloudVec rotations[3]; } init;
         struct { CloudVec temp, visible, direction, position, offset; } update;
     } scratch;
     CloudVec points[18], temp;
-    char *st = *(char **)(p + 0x68);
-    int n, k = 0;
+    char *vars = *(char **)(moby + 0x68);
+    int pointCount, k = 0;
     unsigned short *entry = 0;
     char *prim = 0, *transform = 0;
-    float a,b,c,t,weight;
+    float yaw,pitch,cosPitch,elevation,weight;
     int color;
-    switch ((unsigned char)p[0x20]) {
+    switch ((unsigned char)moby[0x20]) {
     case 0: {
         int i = 0;
-        int index = *(int *)st;
+        int index = *(int *)vars;
         if (index >= D_L10_001A9018[0] || !D_L10_001A9014[index] || index == -1) {
-            func_0032AF78(p);
+            func_0032AF78(moby);
             return;
         }
         {
@@ -59,20 +59,20 @@ void func_L10_0042B500(char *p) {
         float angle1 = 2.094395399093628f;
         float angle2;
         int alpha=255;
-        *(float *)(st+4) = 0.0f;
-        *(float *)(st+8) = step;
+        *(float *)(vars+4) = 0.0f;
+        *(float *)(vars+8) = step;
         angle2=-2.094395399093628f;
         scratch.init.rotations[0].q=0; scratch.init.rotations[1].q=0; scratch.init.rotations[2].q=0;
         scratch.init.rotations[0].v.z=angle0;
         scratch.init.rotations[1].v.z=angle1;
         scratch.init.rotations[2].v.z=angle2;
-        p[0x30] = alpha;
+        moby[0x30] = alpha;
         }
         func_00309390(scratch.init.m[0],scratch.init.rotations);
         func_00309390(scratch.init.m[1],scratch.init.rotations+1);
         func_00309390(scratch.init.m[2],scratch.init.rotations+2);
         { int j; for(j=17;j>=0;j--) points[j].v.w=0; }
-        n=0;
+        pointCount=0;
         points[0].v.x=0; points[0].v.y=10; points[0].v.z=-4;
         func_00308FF0(points+1,points,scratch.init.m[1]);
         func_00308FF0(points+2,points,scratch.init.m[2]);
@@ -91,9 +91,9 @@ void func_L10_0042B500(char *p) {
         points[15].v.x=30; points[15].v.y=15; points[15].v.z=2.5f;
         points[16].v.x=60; points[16].v.y=-15; points[16].v.z=8;
         points[17].v.x=60; points[17].v.y=-30; points[17].v.z=10;
-        entry=D_L10_001A9014[*(int *)st];
+        entry=D_L10_001A9014[*(int *)vars];
         while(entry) {
-            if ((short)entry[-1]<0 && entry!=D_L10_001A9014[*(int *)st]) break;
+            if ((short)entry[-1]<0 && entry!=D_L10_001A9014[*(int *)vars]) break;
             transform=D_L10_001B2B9C+(*entry&0x7fff)*64;
             if(!transform) break;
             prim=D_L10_001B2B94+(*entry&0x7fff)*32;
@@ -103,18 +103,18 @@ void func_L10_0042B500(char *p) {
                 k=D_L10_002273C0[(unsigned char)prim[0x1d]];
                 k=k==0xdf6 ? 0 : k==0xdf7 ? 6 : 12;
                 func_00308FF0(&temp,points+(i+k),transform);
-                func_00308B30(D_L10_0026CEA0+n,transform+0x30,&temp);
-                n++;
+                func_00308B30(D_L10_0026CEA0+pointCount,transform+0x30,&temp);
+                pointCount++;
             }
             entry = next;
             }
         }
-        p[0x20]=1;
+        moby[0x20]=1;
         break;
     }
     case 1: {
         int i;
-        *(float *)(st+4)+=*(float *)(st+8);
+        *(float *)(vars+4)+=*(float *)(vars+8);
         for(i=0;i<1056;i++) {
             qcopy(&scratch.update.temp,D_L10_0026CEA0+i);
             func_00308B78(&scratch.update.visible,&scratch.update.temp,D_L10_001B9680);
@@ -123,21 +123,21 @@ void func_L10_0042B500(char *p) {
             float one=1.0f, lower=1.396263599395752f, lowEnd, highStart, upper;
             weight=0.0f;
             lowEnd=1.466076731681824f;
-            a=func_00339730(*(float *)(st+4)*0.392699122f);
+            yaw=func_00339730(*(float *)(vars+4)*0.392699122f);
             highStart=1.65806293f;
             upper=2.26892829f;
-            b=func_00339730(*(float *)(st+4)*0.581194639f);
-            c=func_00309138(b);
-            scratch.update.direction.v.x=c*func_00309120(a);
-            scratch.update.direction.v.y=c*func_00309138(a);
-            scratch.update.direction.v.z=func_00309120(b);
-            func_00308B78(&scratch.update.position,&scratch.update.temp,p+0x10);
+            pitch=func_00339730(*(float *)(vars+4)*0.581194639f);
+            cosPitch=func_00309138(pitch);
+            scratch.update.direction.v.x=cosPitch*func_00309120(yaw);
+            scratch.update.direction.v.y=cosPitch*func_00309138(yaw);
+            scratch.update.direction.v.z=func_00309120(pitch);
+            func_00308B78(&scratch.update.position,&scratch.update.temp,moby+0x10);
             func_00308E10(&scratch.update.position,&scratch.update.position,one);
-            t=1.57079637f-func_00309150(func_00308C38(&scratch.update.position,&scratch.update.direction));
-            if(t>lower) {
-                if(t<=lowEnd) weight=func_L10_0042BC78((t-lower)/0.0698131323f);
-                else if(t<=highStart) weight=one;
-                else if(t<=upper) weight=one-func_L10_0042BC78((t-highStart)/0.610865355f);
+            elevation=1.57079637f-func_00309150(func_00308C38(&scratch.update.position,&scratch.update.direction));
+            if(elevation>lower) {
+                if(elevation<=lowEnd) weight=func_L10_0042BC78((elevation-lower)/0.0698131323f);
+                else if(elevation<=highStart) weight=one;
+                else if(elevation<=upper) weight=one-func_L10_0042BC78((elevation-highStart)/0.610865355f);
             }
             color=32;
             if(weight!=0) {

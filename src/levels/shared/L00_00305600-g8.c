@@ -1,3 +1,4 @@
+#include "names.h"
 /* Looks the object up in the 0x30 five-word entries at +0x4B40 of D_0014FB540; when it is
    there and D_L00_001A9670 is -1, calls func_002FC3C0(1) and hands the object, the short at
    D_00152CE4 and the argument to func_002946C0. Returns 0 only when the entry is found but
@@ -26,7 +27,7 @@ int func_L00_00305600(int object, int argument)
         return 1;
     if (D_L00_001A9670 != -1)
         return 0;
-    func_002FC3C0(1);
-    func_002946C0(object, D_00152CE4[0], argument);
+    WaitForDmaStatusBits(1);
+    LoadCachedMobyClass(object, D_00152CE4[0], argument);
     return 1;
 }

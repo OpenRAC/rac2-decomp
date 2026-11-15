@@ -39,14 +39,14 @@ void func_L11_00415E70(u8 *object) {
     }
     if (object[0xBC] == 0) *(s32 *)(object + 0x98) = 0;
     else *(s32 *)(object + 0x98) = *(s32 *)(*(u8 **)(object + 0x24) + 0x10);
-    if (func_L00_00324120(object)) {
+    if (IsCurrentSelectedId(object)) {
         if (object[0x20] == 0) {
             {
-                u8 *record = (u8 *)D_00188660 + *(s32 *)(state + 0x70) * 0x70;
+                u8 *record = (u8 *)gSoundState + *(s32 *)(state + 0x70) * 0x70;
                 if (*(u8 **)(record + 0x88) != object || record[0x74] == 0)
-                    *(s32 *)(state + 0x70) = func_002E5CF8(0, 4, object);
+                    *(s32 *)(state + 0x70) = PlayMobySound(0, 4, object);
             }
-            *(u8 **)(state + 0x68) = func_L00_002D70A0(5);
+            *(u8 **)(state + 0x68) = AllocCameraOverrideSlot(5);
             *(f32 *)(*(u8 **)(state + 0x68)) = 10.0f;
             *(s16 *)(*(u8 **)(state + 0x68) + 0x1A) = 1;
             *(s32 *)(*(u8 **)(state + 0x68) + 0x3C) = 1;
@@ -54,13 +54,13 @@ void func_L11_00415E70(u8 *object) {
             {
                 u8 *record = *(u8 **)(state + 0x68) + 0x20;
                 *(TI128 *)(record) = *(TI128 *)(object + 0xC0);
-                func_00282F20(record, record, -1.0f);
+                vec_scale_to_length(record, record, -1.0f);
             }
             (*(u8 **)(state + 0x68))[0x1E] = 1;
             object[0x20] = 1;
-            if (D_0019B2E8[D_001A79F0[0]][object[0xB0]] & 0x80) {
+            if (D_0019B2E8[gCurrentMapIndex[0]][object[0xB0]] & 0x80) {
                 u8 *path;
-                func_L00_002D7140(*(u8 **)(state + 0x68));
+                EndCameraOverride(*(u8 **)(state + 0x68));
                 path = D_L11_001FF580[*(s32 *)(state + 0x60)];
                 object[0x20] = 6;
                 *(s32 *)(state + 0x64) = *(s32 *)path - 1;
@@ -69,8 +69,8 @@ void func_L11_00415E70(u8 *object) {
     } else if (object[0x20] == 0) {
         slot = *(s32 *)(state + 0x70);
         if (slot != -1) {
-            u8 *record = (u8 *)D_00188660 + slot * 0x70;
-            if (*(u8 **)(record + 0x88) == object && record[0x74]) func_002E59F8(slot);
+            u8 *record = (u8 *)gSoundState + slot * 0x70;
+            if (*(u8 **)(record + 0x88) == object && record[0x74]) StopSoundVoice(slot);
         }
         *(s32 *)(state + 0x70) = -1;
     }
@@ -78,54 +78,54 @@ void func_L11_00415E70(u8 *object) {
         u8 *path;
         path = D_L11_001FF580[*(s32 *)(state + 0x60)];
         if (*(s32 *)(state + 0x64) >= *(s32 *)path) {
-            if (!func_L00_00324120(object)) {
+            if (!IsCurrentSelectedId(object)) {
                 object[0x20] = 2;
-                func_L00_002D7140(*(u8 **)(state + 0x68));
-                func_002A8598(object[0x21], 0);
+                EndCameraOverride(*(u8 **)(state + 0x68));
+                SetByteOnGroupMobys(object[0x21], 0);
             }
             slot = *(s32 *)(state + 0x70);
             if (slot != -1) {
-                u8 *record = (u8 *)D_00188660 + slot * 0x70;
-                if (*(u8 **)(record + 0x88) == object && record[0x74]) func_002E59F8(slot);
+                u8 *record = (u8 *)gSoundState + slot * 0x70;
+                if (*(u8 **)(record + 0x88) == object && record[0x74]) StopSoundVoice(slot);
             }
             *(s32 *)(state + 0x70) = -1;
         } else {
             *(TI128 *)(point) = *(TI128 *)(path + 0x10 + *(s32 *)(state + 0x64) * 16);
-            func_00282CF0(step, point, (object + 0x10));
-            func_00282F20(step, step, 0.033333335f);
-            func_00282CC0((object + 0x10), (object + 0x10), step);
-            if (func_00282E80((object + 0x10), point) < 0.05f) ++*(s32 *)(state + 0x64);
+            FastVecSub(step, point, (object + 0x10));
+            vec_scale_to_length(step, step, 0.033333335f);
+            FastVecAdd((object + 0x10), (object + 0x10), step);
+            if (vec_distance_xy((object + 0x10), point) < 0.05f) ++*(s32 *)(state + 0x64);
         }
-        if (func_002ACBC8(D_00189EA0, *(s32 *)(state + 0x6C))) {
-            func_002A8598(object[0x21], 0);
+        if (IsPointInCuboid(gHeroPosition, *(s32 *)(state + 0x6C))) {
+            SetByteOnGroupMobys(object[0x21], 0);
             *(TI128 *)((object + 0x10)) = *(TI128 *)(path + 0x10);
             object[0x20] = 0;
             *(s32 *)(state + 0x64) = 0;
             slot = *(s32 *)(state + 0x70);
             if (slot != -1) {
-                u8 *record = (u8 *)D_00188660 + slot * 0x70;
-                if (*(u8 **)(record + 0x88) == object && record[0x74]) func_002E59F8(slot);
+                u8 *record = (u8 *)gSoundState + slot * 0x70;
+                if (*(u8 **)(record + 0x88) == object && record[0x74]) StopSoundVoice(slot);
             }
             *(s32 *)(state + 0x70) = -1;
-            func_L00_002D7140(*(u8 **)(state + 0x68));
+            EndCameraOverride(*(u8 **)(state + 0x68));
         }
     }
     position = object + 0x10;
     if (object[0x20] == 2) {
         u8 *path;
-        if (func_002ACBC8(D_00189EA0, *(s32 *)(state + 0x6C))) {
+        if (IsPointInCuboid(gHeroPosition, *(s32 *)(state + 0x6C))) {
             path = D_L11_001FF580[*(s32 *)(state + 0x60)];
-            func_002A8598(object[0x21], 0);
+            SetByteOnGroupMobys(object[0x21], 0);
             *(TI128 *)(position) = *(TI128 *)(path + 0x10);
             object[0x20] = 0;
             *(s32 *)(state + 0x64) = 0;
             slot = *(s32 *)(state + 0x70);
             if (slot != -1) {
-                u8 *record = (u8 *)D_00188660 + slot * 0x70;
-                if (*(u8 **)(record + 0x88) == object && record[0x74]) func_002E59F8(slot);
+                u8 *record = (u8 *)gSoundState + slot * 0x70;
+                if (*(u8 **)(record + 0x88) == object && record[0x74]) StopSoundVoice(slot);
             }
             *(s32 *)(state + 0x70) = -1;
-            func_L00_002D7140(*(u8 **)(state + 0x68));
+            EndCameraOverride(*(u8 **)(state + 0x68));
         }
     }
     if (object[0x20] == 3) {
@@ -136,10 +136,10 @@ void func_L11_00415E70(u8 *object) {
             *(s32 *)(state + 0x64) = 0;
         } else {
             *(TI128 *)(point) = *(TI128 *)(path + 0x10 + *(s32 *)(state + 0x64) * 16);
-            func_00282CF0(step, point, position);
-            func_00282F20(step, step, 0.06666667f);
-            func_00282CC0(position, position, step);
-            if (func_00282E80(position, point) < 0.05f) --*(s32 *)(state + 0x64);
+            FastVecSub(step, point, position);
+            vec_scale_to_length(step, step, 0.06666667f);
+            FastVecAdd(position, position, step);
+            if (vec_distance_xy(position, point) < 0.05f) --*(s32 *)(state + 0x64);
         }
     }
     if (object[0x20] == 5) {
@@ -150,42 +150,42 @@ void func_L11_00415E70(u8 *object) {
             *(s32 *)(state + 0x64) = 0;
             slot = *(s32 *)(state + 0x70);
             if (slot != -1) {
-                u8 *record = (u8 *)D_00188660 + slot * 0x70;
-                if (*(u8 **)(record + 0x88) == object && record[0x74]) func_002E59F8(slot);
+                u8 *record = (u8 *)gSoundState + slot * 0x70;
+                if (*(u8 **)(record + 0x88) == object && record[0x74]) StopSoundVoice(slot);
             }
             *(s32 *)(state + 0x70) = -1;
         } else {
             *(TI128 *)(point) = *(TI128 *)(path + 0x10 + *(s32 *)(state + 0x64) * 16);
-            func_00282CF0(step, point, position);
-            func_00282F20(step, step, 0.06666667f);
-            func_00282CC0(position, position, step);
-            if (func_00282E48(position, point) < 0.05f) --*(s32 *)(state + 0x64);
+            FastVecSub(step, point, position);
+            vec_scale_to_length(step, step, 0.06666667f);
+            FastVecAdd(position, position, step);
+            if (fast_vec_dist(position, point) < 0.05f) --*(s32 *)(state + 0x64);
         }
     }
     if (object[0x20] == 6) {
         u8 *path;
         path = D_L11_001FF580[*(s32 *)(state + 0x60)];
         if (*(s32 *)(state + 0x64) >= *(s32 *)path) {
-            if (!func_L00_00324120(object)) {
+            if (!IsCurrentSelectedId(object)) {
                 object[0x20] = 2;
                 *(s32 *)(state + 0x64) = 0;
-                func_002A8598(object[0x21], 0);
+                SetByteOnGroupMobys(object[0x21], 0);
                 slot = *(s32 *)(state + 0x70);
                 if (slot != -1) {
-                    u8 *record = (u8 *)D_00188660 + slot * 0x70;
-                    if (*(u8 **)(record + 0x88) == object && record[0x74]) func_002E59F8(slot);
+                    u8 *record = (u8 *)gSoundState + slot * 0x70;
+                    if (*(u8 **)(record + 0x88) == object && record[0x74]) StopSoundVoice(slot);
                 }
                 *(s32 *)(state + 0x70) = -1;
             }
         } else {
             *(TI128 *)(point) = *(TI128 *)(path + 0x10 + *(s32 *)(state + 0x64) * 16);
-            func_00282CF0(step, point, position);
-            func_00282F20(step, step, 0.06666667f);
-            func_00282CC0(position, position, step);
-            if (func_00282E48(position, point) < 0.05f) ++*(s32 *)(state + 0x64);
+            FastVecSub(step, point, position);
+            vec_scale_to_length(step, step, 0.06666667f);
+            FastVecAdd(position, position, step);
+            if (fast_vec_dist(position, point) < 0.05f) ++*(s32 *)(state + 0x64);
         }
     }
-    func_00282CF0(delta, position, previous);
-    func_002AD6F0(state + 0x20, delta, rotation, rotation);
-    func_L01_003208D0(object, state + 0x74, object[0xBC]);
+    FastVecSub(delta, position, previous);
+    CombineTransformsAndStore(state + 0x20, delta, rotation, rotation);
+    UpdateFlickeringGlow(object, state + 0x74, object[0xBC]);
 }

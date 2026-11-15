@@ -18,8 +18,9 @@ extern int r1_D_0012FD9C NOT_SDA;
 extern s32 r1_func_00118CB0(s32);
 
 /* rac1-decomp src/core/00119D88.c: func_0011BC40 */
+/* Takes the file system lock, creating it first if needed. */
 int func_0011DD98(void) {
-    func_0011DD48();
+    InitFileLockSemaphore();
     r1_func_00118CB0(r1_D_0012FD9C);
     return 0;
 }

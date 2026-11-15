@@ -1,3 +1,4 @@
+#include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 extern float func_00282F70(void *, void *, float);
@@ -18,22 +19,23 @@ struct S {
     int f20;
 };
 
-void func_L00_003B3090(char *a0, char *a1, char *a2) {
-    struct S s;
-    char *s0 = a1;
-    char *s1 = a0;
-    char *s2 = a2;
+/* Hurts everything near a point, using the size and damage kept in a shot's data. */
+void func_L00_003B3090(char *moby, char *vars, char *position) {
+    struct S hit;
+    char *shot = vars;
+    char *owner = moby;
+    char *center = position;
 
-    s.f14 = 0x10000;
-    s.f1C = *(float *)(s0 + 0x2C);
-    s.f20 = 1;
-    s.p10 = s1;
-    *(TI128 *)&s.f0 = *(TI128 *)s0;
-    func_00282F70(&s, &s, 1.0f);
-    s.f8 = 1.0f;
-    s.fC = 5627.925f;
-    s.b18 = 3;
-    s.b19 = 2;
-    s.h1A = *(unsigned short *)(s1 + 0xAA);
-    func_00277F48(s2, 1, D_L00_0018C0B0, &s, *(float *)(s0 + 0x30));
+    hit.f14 = 0x10000;
+    hit.f1C = *(float *)(shot + 0x2C);
+    hit.f20 = 1;
+    hit.p10 = owner;
+    *(TI128 *)&hit.f0 = *(TI128 *)shot;
+    FastVectorNormalizeHelper(&hit, &hit, 1.0f);
+    hit.f8 = 1.0f;
+    hit.fC = 5627.925f;
+    hit.b18 = 3;
+    hit.b19 = 2;
+    hit.h1A = *(unsigned short *)(owner + 0xAA);
+    ProcessCollisionHit(center, 1, D_L00_0018C0B0, &hit, *(float *)(shot + 0x30));
 }

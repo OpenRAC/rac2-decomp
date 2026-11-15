@@ -47,77 +47,78 @@ static __inline__ unsigned int BarlowHintPlayed(Statistics *hint, int level) { r
 
 typedef struct { char pad[0x14]; unsigned char active; } BarlowVendor;
 
-void func_L04_00422318(char *m)
+/* Watches the player's progress on this level and shows the right hint messages, and also checks on the vendor. */
+void func_L04_00422318(char *moby)
 {
-    char *p=*(char **)(m+0x68);
-    BarlowVendor *q;
+    char *vars=*(char **)(moby+0x68);
+    BarlowVendor *vendor;
     unsigned int now, old;
-    switch(B(m,0x20)) {
+    switch(B(moby,0x20)) {
     case 0:
-        B(m,0x30)=255; I(p,0x10)=2400; B(m,0x20)=1;
-        func_L04_00422D40(m);
-        func_L00_00382CE8(m);
+        B(moby,0x30)=255; I(vars,0x10)=2400; B(moby,0x20)=1;
+        ResetLensFlareLightPosition(moby);
+        InitSparkleTable(moby);
         break;
     case 1:
-        if (func_002ACBC8(D_00189EA0,I(p,0)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_0018C958[2519].count && !D_0018C360[115].count) {
-            func_00288E18(0x9D7,0x2E); D_0018C958[46].count=65535;
+        if (IsPointInCuboid(gHeroPosition,I(vars,0)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !gSubtitleHistory[2519].count && !D_0018C360[115].count) {
+            RequestSubtitleVoiceLine(0x9D7,0x2E); gSubtitleHistory[46].count=65535;
         }
-        if (func_002ACBC8(D_00189EA0,I(p,0xC)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_001A7AFA) {
-            if (++I(p,0x10)>1200) { func_00288E18(0x9DE,0x35); I(p,0x10)=0; }
+        if (IsPointInCuboid(gHeroPosition,I(vars,0xC)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_001A7AFA) {
+            if (++I(vars,0x10)>1200) { RequestSubtitleVoiceLine(0x9DE,0x35); I(vars,0x10)=0; }
         }
-        if (func_002ACBC8(D_00189EA0,I(p,0x28)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && D_001A7AFA && (I(D_00189EA0,0x2214)==0 || I(D_00189EA0,0x2214)==2) && (((D_001395B8.b[116]>>D_001A79F0)^1)&1)) {
-            now=D_001A7390; old=D_0018C958[35].maximum;
-            if(now-old>300 || !old) func_00288E18(0x9CC,0x23);
-            else if(old<now) D_0018C958[35].maximum=now;
+        if (IsPointInCuboid(gHeroPosition,I(vars,0x28)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && D_001A7AFA && (I(gHeroPosition,0x2214)==0 || I(gHeroPosition,0x2214)==2) && (((D_001395B8.b[116]>>gCurrentMapIndex)^1)&1)) {
+            now=D_001A7390; old=gSubtitleHistory[35].maximum;
+            if(now-old>300 || !old) RequestSubtitleVoiceLine(0x9CC,0x23);
+            else if(old<now) gSubtitleHistory[35].maximum=now;
         }
-        if(func_002ACBC8(D_00189EA0,I(p,0x40))) D_001395B8.b[116]|=BarlowLevelBit(D_001A79F0);
-        if(func_002ACBC8(D_00189EA0,I(p,8)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_001A7B05 && D_0018C958[49].levels>=0) func_00288E18(0x9DA,0x31);
-        if(D_00189E20.i[2215]==18 && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && func_002ACBC8(D_00189E20.b+0x80,I(p,0x14))) {
-                ++I(p,0x18);
-                if(func_002ACBC8(D_00189E20.b+0x80,I(p,0x14)) && I(p,0x18)>240) {
-                    now=D_001A7390; old=D_0018C958[50].maximum;
-                    if(now-old>1080 || !old) func_00288E18(0x9DB,0x32);
-                    else if(old<now) D_0018C958[50].maximum=now;
+        if(IsPointInCuboid(gHeroPosition,I(vars,0x40))) D_001395B8.b[116]|=BarlowLevelBit(gCurrentMapIndex);
+        if(IsPointInCuboid(gHeroPosition,I(vars,8)) && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && !D_001A7B05 && gSubtitleHistory[49].levels>=0) RequestSubtitleVoiceLine(0x9DA,0x31);
+        if(gHeroState.i[2215]==18 && !I(D_L04_00296748,0) && I(D_L04_00296748,0x24)==-1 && IsPointInCuboid(gHeroState.b+0x80,I(vars,0x14))) {
+                ++I(vars,0x18);
+                if(IsPointInCuboid(gHeroState.b+0x80,I(vars,0x14)) && I(vars,0x18)>240) {
+                    now=D_001A7390; old=gSubtitleHistory[50].maximum;
+                    if(now-old>1080 || !old) RequestSubtitleVoiceLine(0x9DB,0x32);
+                    else if(old<now) gSubtitleHistory[50].maximum=now;
                 }
         } else {
-            if(D_00189E20.i[2215]==17) D_0018C958[50].count=65535;
-            else I(p,0x18)=0;
+            if(gHeroState.i[2215]==17) gSubtitleHistory[50].count=65535;
+            else I(vars,0x18)=0;
         }
-        if(!(D_001395B8.b[117]&16) && func_002ACBC8(D_00189EA0,I(p,0x44)) && *(short *)(D_00189EA0+0x247C) && (D_001A7390-D_0018C750[38].maximum>432000 || !D_0018C750[38].count)) {
-            D_001395B8.b[117]|=16; func_0028A180(0xA3C,0x93);
+        if(!(D_001395B8.b[117]&16) && IsPointInCuboid(gHeroPosition,I(vars,0x44)) && *(short *)(gHeroPosition+0x247C) && (D_001A7390-gProgressStatistics[38].maximum>432000 || !gProgressStatistics[38].count)) {
+            D_001395B8.b[117]|=16; QueueHintMessage(0xA3C,0x93);
         }
-        if(func_002ACBC8(D_00189EA0,I(p,0x48)) && D_001A7390-D_0018C750[20].maximum>72000 && !(BarlowHintPlayed(&D_0018C958[32], D_001A79F0))) func_00288E18(0x9C9,0x20);
-        if(D_001A7AF8[0x27] && func_002ACBC8(D_00189EA0,I(p,0x2C))) {
-            now=D_001A7390; old=D_0018C958[51].maximum;
-            if(now-old>1080 || !old) func_00288E18(0x9DC,0x33);
-            else if(old<now) D_0018C958[51].maximum=now;
-            if(D_00189E20.i[1170]==39 && D_00189E20.p[0x1220/4]) {
-                char *vehicle=*(char **)(D_00189E20.p[0x1220/4]+0x68);
-                if(I(vehicle,0x54) && !I(vehicle,0x5C)) D_0018C958[51].count=65535;
+        if(IsPointInCuboid(gHeroPosition,I(vars,0x48)) && D_001A7390-gProgressStatistics[20].maximum>72000 && !(BarlowHintPlayed(&gSubtitleHistory[32], gCurrentMapIndex))) RequestSubtitleVoiceLine(0x9C9,0x20);
+        if(gItemOwnedFlags[0x27] && IsPointInCuboid(gHeroPosition,I(vars,0x2C))) {
+            now=D_001A7390; old=gSubtitleHistory[51].maximum;
+            if(now-old>1080 || !old) RequestSubtitleVoiceLine(0x9DC,0x33);
+            else if(old<now) gSubtitleHistory[51].maximum=now;
+            if(gHeroState.i[1170]==39 && gHeroState.p[0x1220/4]) {
+                char *vehicle=*(char **)(gHeroState.p[0x1220/4]+0x68);
+                if(I(vehicle,0x54) && !I(vehicle,0x5C)) gSubtitleHistory[51].count=65535;
             }
         }
-        if(I(p,0x1C)!=-1 && D_001A7AF8[0x27]) {
-            q=*(BarlowVendor **)(D_L04_001B24DC+(I(p,0x1C)<<8)+0x68);
-            if(func_002ACBC8(D_00189EA0,I(p,0x20))) {
-                if(!q->active && !D_L04_001B0CFC) {
-                    if(D_0018C958[52].count) {
-                        old=D_0018C958[52].maximum;
-                        if(D_001A7390-old>1080 || !old) func_00288E18(0x9DD,0x34);
-                        else if(old<D_001A7390) D_0018C958[52].maximum=D_001A7390;
+        if(I(vars,0x1C)!=-1 && gItemOwnedFlags[0x27]) {
+            vendor=*(BarlowVendor **)(gMobyPool_L04+(I(vars,0x1C)<<8)+0x68);
+            if(IsPointInCuboid(gHeroPosition,I(vars,0x20))) {
+                if(!vendor->active && !D_L04_001B0CFC) {
+                    if(gSubtitleHistory[52].count) {
+                        old=gSubtitleHistory[52].maximum;
+                        if(D_001A7390-old>1080 || !old) RequestSubtitleVoiceLine(0x9DD,0x34);
+                        else if(old<D_001A7390) gSubtitleHistory[52].maximum=D_001A7390;
                         return;
                     }
-                    if(D_0018C958[52].count<65535) D_0018C958[52].count++;
-                    if(D_0018C958[52].maximum<D_001A7390) D_0018C958[52].maximum=D_001A7390;
-                    D_0018C958[52].levels = (D_0018C958[52].levels | BarlowLevelBit(D_001A79F0)) | 0x80000000;
+                    if(gSubtitleHistory[52].count<65535) gSubtitleHistory[52].count++;
+                    if(gSubtitleHistory[52].maximum<D_001A7390) gSubtitleHistory[52].maximum=D_001A7390;
+                    gSubtitleHistory[52].levels = (gSubtitleHistory[52].levels | BarlowLevelBit(gCurrentMapIndex)) | 0x80000000;
                     return;
                 }
             }
-            if(q->active && D_L04_001B0D00) { D_L04_001B0CFC=1; D_0018C958[52].count=65535; }
-            else if(!q->active) D_L04_001B0D00=1;
+            if(vendor->active && D_L04_001B0D00) { D_L04_001B0CFC=1; gSubtitleHistory[52].count=65535; }
+            else if(!vendor->active) D_L04_001B0D00=1;
         }
-        if(func_002ACBC8(D_00189EA0,I(p,4)) && D_001A7390-D_0018C750[9].maximum>108000 && !(BarlowHintPlayed(&D_0018C958[12], D_001A79F0))) func_00288E18(0x9B5,12);
+        if(IsPointInCuboid(gHeroPosition,I(vars,4)) && D_001A7390-gProgressStatistics[9].maximum>108000 && !(BarlowHintPlayed(&gSubtitleHistory[12], gCurrentMapIndex))) RequestSubtitleVoiceLine(0x9B5,12);
         break;
     }
-    D_L04_001B9980.intensity=func_L04_00422A00(m);
-    func_L00_002E6CF0(func_L04_00422DA8,m);
+    gLensFlare.intensity=QueryScreenPointValue(moby);
+    AddDrawCallbackToList1(DrawLensFlare_L04,moby);
 }

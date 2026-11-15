@@ -31,22 +31,23 @@ extern void func_0012C788(s64,s32);
 extern u32 func_0012C878(s64,s32);
  
 extern void func_0012C9C8(s64);
-void func_0012CC88(s64 arg0) {
+/* Reads the extension and user data blocks that follow a header, running a handler for each extension type. */
+void func_0012CC88(s64 decoderAddr) {
     struct T44 tab;
-    s32 v;
+    s32 startCode;
     u32 idx;
     tab=*(struct T44 *)D_0013BBC8;
-    func_0012C9C8(arg0);
-    while ((v=func_0012C680(arg0,0x20))==0x1B5 || v==0x1B2) {
-        if (v==0x1B5) {
-            func_0012C788(arg0,0x20);
-            idx=func_0012C878(arg0,4);
+    SkipToMpegStartCode(decoderAddr);
+    while ((startCode=PeekMpegBits(decoderAddr,0x20))==0x1B5 || startCode==0x1B2) {
+        if (startCode==0x1B5) {
+            SkipMpegBits(decoderAddr,0x20);
+            idx=ReadMpegBits(decoderAddr,4);
             idx=(idx>10)?0:idx;
-            ((void (*)(s64))tab.f[idx])(arg0);
-            func_0012C9C8(arg0);
+            ((void (*)(s64))tab.f[idx])(decoderAddr);
+            SkipToMpegStartCode(decoderAddr);
         } else {
-            func_0012C788(arg0,0x20);
-            func_0012C9C8(arg0);
+            SkipMpegBits(decoderAddr,0x20);
+            SkipToMpegStartCode(decoderAddr);
         }
     }
 }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "names.h"
 typedef int V4_L00_004170A8 __attribute__((mode(TI)));
 extern char D_L00_0025A920[];
 extern V4_L00_004170A8 D_L00_001BF220;
@@ -15,38 +16,39 @@ extern void func_L00_00417700(char *);
 extern void func_0029F338(char *);
 extern void ref_L00_004170A8_00(void (*)(char *), char *);
 
+/* Updates the spark effect object (moby class 5022). Each frame it picks a random spot nearby for a new spark, and when its time is up it frees all the sparks and removes itself. */
 void func_L00_004170A8(char *object)
 {
     char *state = *(char **)(object + 0x68);
-    V4_L00_004170A8 local;
-    float a, b;
+    V4_L00_004170A8 target;
+    float randA, randB;
     int i;
-    char *p;
-    if (func_00282948(state) == 0) {
+    char *record;
+    if (FastFloatHelperD(state) == 0) {
         if (*(int *)(state + 4) == 0)
-            func_L00_004173B0(object);
+            EmitSparkBurstAtMoby(object);
         if (*(int *)(state + 4) == 0) {
-            a = func_002A7940();
-            b = func_002A7940();
-            func_002AF000(&local, 7.0f, a, b);
+            randA = RandomAngle();
+            randB = RandomAngle();
+            BuildSphericalOffset(&target, 7.0f, randA, randB);
         } else {
-            a = func_002A7940();
-            b = func_002A7940();
-            func_002AF000(&local, 5.0f, a, b);
+            randA = RandomAngle();
+            randB = RandomAngle();
+            BuildSphericalOffset(&target, 5.0f, randA, randB);
         }
-        func_00282CC0(&local, &local, object + 0x10);
-        if (func_002761F8(object + 0x10, &local, 0, object, 0) != 0)
-            local = D_L00_001BF220;
-        func_L00_00417A40(object, &local, 20);
-        func_L00_00417D70(object);
-        ref_L00_004170A8_00(func_L00_00417700, object);
+        FastVecAdd(&target, &target, object + 0x10);
+        if (CollLine(object + 0x10, &target, 0, object, 0) != 0)
+            target = D_L00_001BF220;
+        ClaimSparkRecord_L00(object, &target, 20);
+        UpdateSparkRecords(object);
+        ref_L00_004170A8_00(UpdateOwnedBeamGlowSprites, object);
     } else {
-        p = D_L00_0025A920;
-        p += 0x106C;
-        for (i = 23; i >= 0; --i, p -= 0xB0)
-            *(int *)p = 0;
+        record = gSparkRecords_L00;
+        record += 0x106C;
+        for (i = 23; i >= 0; --i, record -= 0xB0)
+            *(int *)record = 0;
         if (*(int *)(state + 4) == 0)
-            func_L00_00417218(object);
-        func_0029F338(object);
+            SpawnDriftingParticles(object);
+        MarkMobySpawned(object);
     }
 }

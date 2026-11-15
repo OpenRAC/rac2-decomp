@@ -35,6 +35,7 @@ extern void func_L00_002E6CF0(void *, void *);
 extern void func_L02_00411D18(u8 *);
 
 /* Track the four linked actors and fade the controller's visible effect. */
+/* Update handler of moby class 3201: it removes itself and its four partners once they are all gone. */
 void func_L02_00411750(u8 *object)
 {
     ControllerScratch scratch[2];
@@ -46,24 +47,24 @@ void func_L02_00411750(u8 *object)
     case 0:
         {
         s32 i;
-        if (D_0019B2E8[object[0xB0] + (D_001A79F0 << 4)] & 0x80) {
-            func_L02_0031F858(*(s32 *)(state + 0x10), 1);
-            func_0029F338(object);
+        if (D_0019B2E8[object[0xB0] + (gCurrentMapIndex << 4)] & 0x80) {
+            SetGroupObjectsEnabled(*(s32 *)(state + 0x10), 1);
+            MarkMobySpawned(object);
             return;
         }
         *(float *)(state + 0x1C) = 1.0f;
-        *(float *)(state + 0x2C) = func_002A7940();
+        *(float *)(state + 0x2C) = RandomAngle();
         *(s32 *)(state + 0x20) = 0;
         *(float *)(state + 0x24) = 0.5f;
         {
-        float visible = func_00282E80(D_L02_001BA500, object + 0x10) > 66.0f ? 0.0f : 1.0f;
+        float visible = vec_distance_xy(gCameraPosition_L02, object + 0x10) > 66.0f ? 0.0f : 1.0f;
         *(float *)(state + 0x1C) = visible;
         }
         i = 3;
         phase = (float *)(state + 0x3C);
         do { *phase-- = 1.0f; } while (--i >= 0);
         object[0x30] = 0x65;
-        func_002A7750(object, 1, -1);
+        SetMobyState(object, 1, -1);
         object[0x31] = 0;
         *(u16 *)(object + 0x34) |= 1;
         break;
@@ -73,51 +74,51 @@ void func_L02_00411750(u8 *object)
             s32 ready = 1;
             s32 i;
             for (i = 0, ids = (s32 *)state; i < 4; i++) {
-                if (!func_L02_004127F8(D_L02_001B359C + (*ids << 8))) {
+                if (!IsMobyInStateTwo(gMobyPool_L02 + (*ids << 8))) {
                     ready = 0;
                     break;
                 }
                 ids++;
             }
             if (ready)
-                func_002A7750(object, 2, -1);
+                SetMobyState(object, 2, -1);
         }
         break;
     case 2:
-        func_002AA2E8((float *)(state + 0x1C), 0.0f, 0.016666668f);
+        ApproachValue((float *)(state + 0x1C), 0.0f, 0.016666668f);
         if (*(float *)(state + 0x1C) <= 0.0f) {
             s32 i;
             ids = (s32 *)state;
             i = 3;
-            do { func_0029F338(D_L02_001B359C + (*ids++ << 8)); } while (--i >= 0);
-            func_L02_0031F858(*(s32 *)(state + 0x10), 1);
-            func_002A0430(object[0xB0]);
+            do { MarkMobySpawned(gMobyPool_L02 + (*ids++ << 8)); } while (--i >= 0);
+            SetGroupObjectsEnabled(*(s32 *)(state + 0x10), 1);
+            MarkTableEntryFlagged(object[0xB0]);
             {
                 u8 *record = D_L02_001B368C + (*(s32 *)(state + 0x14) << 7);
-                func_002DF3F8(record + 0x30, record + 0x70);
+                CaptureCheckpointState(record + 0x30, record + 0x70);
             }
-            func_0029F338(object);
+            MarkMobySpawned(object);
             return;
         }
         break;
     }
     if (*(float *)(state + 0x1C) != 0.0f) {
-        if (D_00189E20.ptr[0x270 / 4] == object || D_00189E20.ptr[0x26C / 4] == object) {
-            scratch[0].quad = D_00189E20.q[0xE0 / 16];
+        if (gHeroState.ptr[0x270 / 4] == object || gHeroState.ptr[0x26C / 4] == object) {
+            scratch[0].quad = gHeroState.q[0xE0 / 16];
             scratch[0].f[0] = *(float *)(object + 0x10);
-            if (func_002761F8(&D_00189E20.q[0xE0 / 16], scratch[0].f, 2, D_00189E20.v[0x2290 / 4], 0)) {
+            if (CollLine(&gHeroState.q[0xE0 / 16], scratch[0].f, 2, gHeroState.v[0x2290 / 4], 0)) {
                 s32 lifetime;
                 s32 shade;
                 scratch[1].quad = D_L02_001C0960;
-                scratch[1].f[2] += func_002A7878(-0.5f, 0.5f);
-                lifetime = (u8)func_002A7820(30, 60);
-                shade = (u8)func_002A77E0(255);
-                func_002C3150(scratch[1].f, D_L02_001A8F20, 0x60106070, lifetime, shade, 0, 1.0f);
+                scratch[1].f[2] += RandomFloatRange(-0.5f, 0.5f);
+                lifetime = (u8)RandomIntRange(30, 60);
+                shade = (u8)RandomIntBelow(255);
+                SpawnHeroRelativeParticle(scratch[1].f, D_L02_001A8F20, 0x60106070, lifetime, shade, 0, 1.0f);
             }
         }
-        func_00282D60(scratch[0].f, object, 0.0009765625f);
-        if (func_00283DB8(scratch[0].f, 80.0f) != -1) {
-            *(float *)(state + 0x2C) = func_00283B98(*(float *)(state + 0x2C), 0.040724356f);
+        scale_vector(scratch[0].f, object, 0.0009765625f);
+        if (FastMathHelperA(scratch[0].f, 80.0f) != -1) {
+            *(float *)(state + 0x2C) = FastAddRotations(*(float *)(state + 0x2C), 0.040724356f);
             *(float *)(state + 0x28) += 0.020833334f;
             if (*(float *)(state + 0x28) > 1.0f)
                 *(float *)(state + 0x28) -= 1.0f;
@@ -132,14 +133,14 @@ void func_L02_00411750(u8 *object)
                 phase++;
             } while (--i >= 0);
             }
-            func_L00_002E6CF0(func_L02_00411D18, object);
+            AddDrawCallbackToList1(DrawEnergyGateEffect, object);
         }
-        if (func_00282E80(object + 0x10, D_L02_001BA500) > 68.0f)
-            func_002AA2E8((float *)(state + 0x1C), 0.0f, 0.008333334f);
+        if (vec_distance_xy(object + 0x10, gCameraPosition_L02) > 68.0f)
+            ApproachValue((float *)(state + 0x1C), 0.0f, 0.008333334f);
         else
-            func_002AA2E8((float *)(state + 0x1C), 1.0f, 0.008333334f);
-    } else if (*(float *)(state + 0x1C) < 1.0f && func_00282E80(object + 0x10, D_L02_001BA500) < 64.0f)
-        func_002AA2E8((float *)(state + 0x1C), 1.0f, 0.008333334f);
+            ApproachValue((float *)(state + 0x1C), 1.0f, 0.008333334f);
+    } else if (*(float *)(state + 0x1C) < 1.0f && vec_distance_xy(object + 0x10, gCameraPosition_L02) < 64.0f)
+        ApproachValue((float *)(state + 0x1C), 1.0f, 0.008333334f);
 
     {
     s32 *out = (s32 *)scratch;
@@ -147,7 +148,7 @@ void func_L02_00411750(u8 *object)
     ids = (s32 *)state;
     i = 3;
     do {
-    *out = !func_L02_004127F8(D_L02_001B359C + (*ids++ << 8));
+    *out = !IsMobyInStateTwo(gMobyPool_L02 + (*ids++ << 8));
     out++;
     } while (--i >= 0);
     }

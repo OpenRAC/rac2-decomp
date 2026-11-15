@@ -91,6 +91,7 @@ extern unsigned int ref_L00_00309798_00;
 
 extern int ref_L00_00309798_02;
 
+/* Save menu screen step: clears a flag and, when the list is in mode 2, jumps to another menu screen depending on the selection. */
 void func_002983D0(void)
 {
     ref_L00_003095C8_01 &= ~0x20;
@@ -109,6 +110,7 @@ void func_002983D0(void)
         ref_L00_003095C8_02 = 5;
 }
 
+/* Save menu screen step: goes to screen 3 unless the selection is -2, in which case a flag can send it to screen 6. */
 void func_00298440(void)
 {
     if (ref_L00_00309638_02.selector_10 != -2) {
@@ -119,6 +121,7 @@ void func_00298440(void)
         ref_L00_00309638_03 = 6;
 }
 
+/* Save menu screen step: reacts to two button flags (screen 23 or 5, and screen 7), or goes to screen 3 when the selection is not -2. */
 void func_00298490(void)
 {
     if (ref_L00_00309688_02.selector_10 != -2) {
@@ -139,6 +142,7 @@ void func_00298490(void)
     }
 }
 
+/* Save menu screen step: clears the selection, picks entry 3 if nothing is chosen, then moves to screen 8. */
 void func_00298510(void)
 {
     ref_L00_00309708_00.selector_10 = 0;
@@ -149,6 +153,7 @@ void func_00298510(void)
     ref_L00_00309708_01 = 8;
 }
 
+/* Save menu screen step: when the memory card is idle and no request is waiting, moves to screen 17 or 14 depending on an error word. */
 void func_00298540(void)
 {
     if (ref_L00_00309738_00.mode_15c != 2 || ref_L00_00309738_00.selected_164 >= 0)
@@ -161,6 +166,7 @@ void func_00298540(void)
     ref_L00_00309738_02 = 14;
 }
 
+/* Save menu screen step: goes to screen 3, 10 or 25 depending on the selection and which button flags are set. */
 void func_002985A0(void)
 {
     if (ref_L00_00309798_01.selector_10 != 0) {

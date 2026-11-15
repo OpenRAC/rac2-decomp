@@ -17,131 +17,132 @@ extern void func_003349E8(void *,int,float);
 #define F651(p,o) (*(float *)((p)+(o)))
 #define I651(p,o) (*(int *)((p)+(o)))
 #define B651(p,o) (*(unsigned char *)((p)+(o)))
-void func_00334A88(char *obj, void *out)
+/* Updates the camera pivot state each frame: follows the camera axis, runs the pivot state machine and writes the resulting vector to the output. */
+void func_00334A88(char *moby, void *result)
 {
-    V651 base, temp;
+    V651 baseVec, tempVec;
 
-    char *cam = D_001B53A0;
-    char *state = *(char **)(obj+0x70)+0x60;
+    char *camera = D_001B53A0;
+    char *state = *(char **)(moby+0x70)+0x60;
     char *axis;
     int mode, blocked;
-    float f;
-    if (D_00189E20.h348 || D_001A8CA0 || (H651(state,0xEE) && D_00189E20.h34E)) {
+    float scalar;
+    if (gHeroState.h348 || D_001A8CA0 || (H651(state,0xEE) && gHeroState.h34E)) {
         H651(state,0xEC)=15;
         B651(state,0xD6)=1;
         H651(state,0xEE)=1;
-        func_00282D30(state+0x10,cam+0x30,func_00282DB0(state,cam+0x30));
+        FastVecScale(state+0x10,camera+0x30,FastVecDot(state,camera+0x30));
         qcopy(state+0x20,state+0x10);
         mode=B651(state,0xC4);
-        axis=cam+0x30;
+        axis=camera+0x30;
         if ((unsigned)(mode-5)<3 || mode==3)
-            func_003349E8(state+0x30,1,D_001B120C*0.5f);
+            ComputeCameraOffset(state+0x30,1,D_001B120C*0.5f);
     } else {
         if (H651(state,0xEE)==1) {
-            func_00282D30(state+0x10,cam+0x30,func_00282DB0(state,cam+0x30));
+            FastVecScale(state+0x10,camera+0x30,FastVecDot(state,camera+0x30));
             qcopy(state+0x20,state+0x10);
             mode=B651(state,0xC4);
-            axis=cam+0x30;
+            axis=camera+0x30;
             if ((unsigned)(mode-5)<3 || mode==3)
-                func_003349E8(state+0x30,1,D_001B120C*0.5f);
-            f=func_00283CE0(H651(state,0xD8))/func_00283CE0(15);
-            H651(state,0xD8)=func_00283CF0(func_00283CE0(H651(state,0xEC))*f);
+                ComputeCameraOffset(state+0x30,1,D_001B120C*0.5f);
+            scalar=IntToFloat(H651(state,0xD8))/IntToFloat(15);
+            H651(state,0xD8)=FloatToInt(IntToFloat(H651(state,0xEC))*scalar);
             H651(state,0xEE)=2;
         } else {
-            axis=cam+0x30;
+            axis=camera+0x30;
             if (H651(state,0xEE)>=2) {
-            f=func_00282DB0(state,axis);
-            func_00282D30(state+0x10,axis,f);
+            scalar=FastVecDot(state,axis);
+            FastVecScale(state+0x10,axis,scalar);
             qcopy(state+0x20,state+0x10);
             mode=B651(state,0xC4);
-            axis=cam+0x30;
+            axis=camera+0x30;
             if ((unsigned)(mode-5)<3 || mode==3)
-                func_003349E8(state+0x30,1,D_001B120C*0.5f);
+                ComputeCameraOffset(state+0x30,1,D_001B120C*0.5f);
             if (++H651(state,0xEE)>=16) H651(state,0xEE)=0;
             }
         }
     }
-    func_00334710((int)obj,&base.q);
-    if (D_00189E20.i2294==0x74) {
-        func_00282D30(out,axis,func_00282DB0(state,axis));
-        func_00282CF0(state,state,out);
-        func_00282D30(out,axis,func_00282DB0(axis,state+0x60));
-        qcopy(state+0x10,out);
+    CopyHeroVectorToOut((int)moby,&baseVec.q);
+    if (gHeroState.i2294==0x74) {
+        FastVecScale(result,axis,FastVecDot(state,axis));
+        FastVecSub(state,state,result);
+        FastVecScale(result,axis,FastVecDot(axis,state+0x60));
+        qcopy(state+0x10,result);
         if (B651(state,0xC4)!=11) {
-            char *p;
+            char *modeData;
             B651(state,0xC4)=11;
-            qcopy(obj+0x40,obj);
-            p=*(char **)(obj+0x70)+0x20;
-            H651(p,0)=D_001B11D8;
-            F651(p,0x24)=1.0f/func_00283CE0(H651(p,0));
+            qcopy(moby+0x40,moby);
+            modeData=*(char **)(moby+0x70)+0x20;
+            H651(modeData,0)=D_001B11D8;
+            F651(modeData,0x24)=1.0f/IntToFloat(H651(modeData,0));
         }
         return;
     }
     switch (B651(state,0xC4)) {
     case 2: {
         float angle;
-        if (D_00189E20.i2294==17 || (D_00189E20.b49E && D_00189E20.distance>0.2f && ((angle=func_003348A8(obj,F651(state,0xB0)))<D_001B11C4 || angle>D_001B11C0))) {
+        if (gHeroState.i2294==17 || (gHeroState.b49E && gHeroState.distance>0.2f && ((angle=ComputeSignedAngleToCameraPoint(moby,F651(state,0xB0)))<D_001B11C4 || angle>D_001B11C0))) {
             B651(state,0xC4)=1;
             H651(state,0xC6)=D_001B11F0;
-            F651(state,0xC8)=1.0f/func_00283CE0(H651(state,0xC6));
+            F651(state,0xC8)=1.0f/IntToFloat(H651(state,0xC6));
         }
         blocked=0;
-        if (D_00189E20.h34C && (!D_00189E20.b49E || D_00189E20.h4AE>=16)) blocked=1;
-        else if (func_00334730(&temp,1)!=1) blocked=1;
+        if (gHeroState.h34C && (!gHeroState.b49E || gHeroState.h4AE>=16)) blocked=1;
+        else if (ResolveCameraPosition(&tempVec,1)!=1) blocked=1;
         else {
-            f=func_00282DB0(&temp,axis);
-            if (f<func_00282DF0(state+0x10)) blocked=1;
+            scalar=FastVecDot(&tempVec,axis);
+            if (scalar<FastVecLength(state+0x10)) blocked=1;
         }
         if (blocked) {
-            qcopy(out,state+0x10);
-            f=func_00282DB0(&base,axis);
-            func_00282D30(&temp,axis,f);
-            func_00282CF0(state,&base,&temp);
+            qcopy(result,state+0x10);
+            scalar=FastVecDot(&baseVec,axis);
+            FastVecScale(&tempVec,axis,scalar);
+            FastVecSub(state,&baseVec,&tempVec);
         } else {
-            func_00334730(&temp,1);
-            func_00282D30(out,axis,func_00282DB0(&temp,axis));
-            func_00282CF0(state,&temp,out);
+            ResolveCameraPosition(&tempVec,1);
+            FastVecScale(result,axis,FastVecDot(&tempVec,axis));
+            FastVecSub(state,&tempVec,result);
         }
         break;
     }
     case 3: case 5: case 6: case 7:
-        func_00282D08(state+0x10,state+0x30,state+0x20,(float)H651(state,0xD4)*F651(state,0xCC));
-        if (!B651(state,0xD7) && func_00277258(obj+0x30,18,0,0.2f)) {
+        lerp_vector(state+0x10,state+0x30,state+0x20,(float)H651(state,0xD4)*F651(state,0xCC));
+        if (!B651(state,0xD7) && TestPointAgainstCollision(moby+0x30,18,0,0.2f)) {
             qcopy(state+0x30,state+0x10); B651(state,0xD7)=1;
         }
-        qcopy(out,state+0x10);
-        f=func_00282DB0(&base,axis);
-        func_00282D30(&temp,axis,f);
-        func_00282CF0(state,&base,&temp);
-        if (func_00282978(state+0xD4)) {
+        qcopy(result,state+0x10);
+        scalar=FastVecDot(&baseVec,axis);
+        FastVecScale(&tempVec,axis,scalar);
+        FastVecSub(state,&baseVec,&tempVec);
+        if (FastDecTimer(state+0xD4)) {
             if (B651(state,0xC4)==9) {
                 B651(state,0xC4)=10; H651(state,0xD4)=D_001B1220;
                 qcopy(state+0x20,state+0x10);
-                func_00282D30(&temp,axis,F651(state,0xD0));
-                func_00282CF0(state+0x30,state+0x20,&temp);
+                FastVecScale(&tempVec,axis,F651(state,0xD0));
+                FastVecSub(state+0x30,state+0x20,&tempVec);
             } else if (B651(state,0xC4)==6) {
                 B651(state,0xC4)=7; H651(state,0xD4)=D_001B11F4;
                 qcopy(state+0x30,state+0x20); qcopy(state+0x20,state+0x10);
             } else {
                 B651(state,0xC4)=4; H651(state,0xC6)=D_001B1208;
-                F651(state,0xC8)=1.0f/func_00283CE0(H651(state,0xC6));
+                F651(state,0xC8)=1.0f/IntToFloat(H651(state,0xC6));
             }
         }
         break;
     case 8:
-        qcopy(out,state+0x10);
-        f=func_00282DB0(&base,axis);
-        func_00282D30(&temp,axis,f);
-        func_00282CF0(state,&base,&temp);
+        qcopy(result,state+0x10);
+        scalar=FastVecDot(&baseVec,axis);
+        FastVecScale(&tempVec,axis,scalar);
+        FastVecSub(state,&baseVec,&tempVec);
         break;
     case 9: case 10:
-        func_00282D30(out,axis,func_00282DB0(&base,axis));
-        func_00282CF0(state,&base,out);
-        func_00282D08(out,out,state+0x20,D_001B1234);
+        FastVecScale(result,axis,FastVecDot(&baseVec,axis));
+        FastVecSub(state,&baseVec,result);
+        lerp_vector(result,result,state+0x20,D_001B1234);
         break;
     default:
-        func_00282D30(out,axis,func_00282DB0(&base,axis));
-        func_00282CF0(state,&base,out);
+        FastVecScale(result,axis,FastVecDot(&baseVec,axis));
+        FastVecSub(state,&baseVec,result);
         break;
     }
 }

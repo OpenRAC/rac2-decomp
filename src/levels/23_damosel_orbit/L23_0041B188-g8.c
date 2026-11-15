@@ -23,6 +23,7 @@ extern void func_00282CF0(char *, char *, char *);
 extern void func_00282F20(char *, char *, float);
 extern void func_00282CC0(char *, char *, char *);
 
+/* Moves the boss along its path toward the next point, reverses or picks a new path at the ends, and eases it back toward the middle. */
 void func_L23_0041B188(char *obj) {
     char *state = *(char **)(obj + 0x68);
     char *slots;
@@ -31,14 +32,14 @@ void func_L23_0041B188(char *obj) {
     float x, mid, dev;
     int side, flip, step, slot;
 
-    func_L23_00418650(state + 0x3A0, *(float *)(state + 0x588));
+    ProjectPointOntoPlanetSurface(state + 0x3A0, *(float *)(state + 0x588));
     mid = D_L23_001B14E4;
     x = *(float *)(state + 0x5B8);
     if (mid + D_L23_001B14E8 <= x || x <= mid - D_L23_001B14E8) {
         flip = 0;
         if (mid - D_L23_001B14E8 < x) {
             side = 3;
-            dev = func_00282C48(x - mid);
+            dev = FloatAbs(x - mid);
             if (*(u32 *)(state + 0x5F0) >= 2) {
                 flip = 1;
                 *(short *)(state + 0x392) = -*(short *)(state + 0x392);
@@ -46,46 +47,46 @@ void func_L23_0041B188(char *obj) {
             *(int *)(state + 0x5F0) = 1;
         } else {
             side = 2;
-            dev = func_00282C48(x - mid);
+            dev = FloatAbs(x - mid);
             if (*(int *)(state + 0x5F0) != 0 && *(int *)(state + 0x5F0) != 2) {
                 flip = 1;
                 *(short *)(state + 0x392) = -*(short *)(state + 0x392);
             }
             *(int *)(state + 0x5F0) = 2;
         }
-        if (flip != 0 || func_00282E48(obj + 0x10, state + 0x3A0) < D_L23_001B1680) {
+        if (flip != 0 || fast_vec_dist(obj + 0x10, state + 0x3A0) < D_L23_001B1680) {
             step = *(short *)(state + 0x396) + *(short *)(state + 0x392);
             if (step < 0) {
                 char *ids = state + 0x230;
 
-                func_L23_004190C8(obj, *(u64 *)(D_L23_002595C8 + (*(int *)(ids + (*(short *)(state + 0x394) << 2)) << 4)), side, 1);
+                SelectMaskedEncounterTarget(obj, *(u64 *)(gPathEndMasks + (*(int *)(ids + (*(short *)(state + 0x394) << 2)) << 4)), side, 1);
             } else {
                 char *ids = state + 0x230;
 
                 slot = *(int *)(ids + (*(short *)(state + 0x394) << 2));
-                list = D_L23_001FF300[slot];
+                list = gPathLists[slot];
                 if (step >= *list) {
-                    char *masks = D_L23_002595C8;
+                    char *masks = gPathEndMasks;
                     char *second = masks + 8;
 
-                    func_L23_004190C8(obj, *(u64 *)(second + (slot << 4)), side, 1);
+                    SelectMaskedEncounterTarget(obj, *(u64 *)(second + (slot << 4)), side, 1);
                 } else
                     *(short *)(state + 0x396) = step;
             }
             slots = state + 0x230;
-            qcopy(state + 0x3A0, (char *)D_L23_001FF300[*(int *)(slots + (*(short *)(state + 0x394) << 2))] + *(short *)(state + 0x396) * 16 + 0x10);
-            func_L23_00418650(state + 0x3A0, *(float *)(state + 0x588));
+            qcopy(state + 0x3A0, (char *)gPathLists[*(int *)(slots + (*(short *)(state + 0x394) << 2))] + *(short *)(state + 0x396) * 16 + 0x10);
+            ProjectPointOntoPlanetSurface(state + 0x3A0, *(float *)(state + 0x588));
         }
-        func_00282CF0((char *)&vec, state + 0x3A0, obj + 0x10);
+        FastVecSub((char *)&vec, state + 0x3A0, obj + 0x10);
         dev = dev * 0.0625f;
         if (D_L23_001B14DC < dev)
             dev = D_L23_001B14DC;
         else if (dev < D_L23_001B14DC * 0.05f)
             dev = D_L23_001B14DC * 0.05f;
-        func_00282F20((char *)&vec, (char *)&vec, dev);
+        vec_scale_to_length((char *)&vec, (char *)&vec, dev);
         qcopy(&D_L23_001B38D0, &vec);
-        func_00282CC0(obj + 0x10, obj + 0x10, (char *)&vec);
-        func_L23_00418650(obj + 0x10, *(float *)(state + 0x588));
+        FastVecAdd(obj + 0x10, obj + 0x10, (char *)&vec);
+        ProjectPointOntoPlanetSurface(obj + 0x10, *(float *)(state + 0x588));
     }
     D_L23_001B1410 = 1.0f;
 }

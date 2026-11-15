@@ -19,69 +19,70 @@ extern void func_00282CF0(void *,void *,void *), func_00282DD8(void *,void *,voi
 extern void func_00282F20(void *,void *,float), func_00282D30(void *,void *,float);
 extern void func_002830C0(void *,void *,void *);
 
+/* Draws the object's ring of lights facing the camera, once on each side. */
 void func_L09_003FD128(char *moby) {
-    char *d = *(char **)(moby + 0x68);
+    char *vars = *(char **)(moby + 0x68);
     struct {
         float mat[4][4]; /* camera-facing frame */
         float verts[82][3]; /* ring vertices transformed by mat */
-    } f;
-    u32 cols[84];
-    float v[4];
+    } frame;
+    u32 colors[84];
+    float point[4];
     int i;
     int j;
 
-    func_L09_003FCF68(moby);
-    qcopy(f.mat[0], d + 0x340);
-    func_00282CF0(f.mat[2], d + 0x370, D_L09_001B9A00);
-    func_00282DD8(f.mat[1], f.mat[0], f.mat[2]);
-    func_00282F20(f.mat[1], f.mat[1], 1.0f);
-    func_00282DD8(f.mat[2], f.mat[1], f.mat[0]);
-    qcopy(f.mat[3], d + 0x370);
-    f.mat[3][3] = 1.0f;
-    func_002FC560(6, func_0027C878(0x16));
-    func_002FC560(0x42, 0x8000000048);
-    func_002FC560(8, 5);
-    func_002FC560(0x14, 0xFF9000000260);
-    func_002FC560(0x47, 0x51001);
-    func_002FC560(0x4A, 0);
-    func_00280328();
+    DrawBeamTipGlow(moby);
+    qcopy(frame.mat[0], vars + 0x340);
+    FastVecSub(frame.mat[2], vars + 0x370, D_L09_001B9A00);
+    FastVecCross(frame.mat[1], frame.mat[0], frame.mat[2]);
+    vec_scale_to_length(frame.mat[1], frame.mat[1], 1.0f);
+    FastVecCross(frame.mat[2], frame.mat[1], frame.mat[0]);
+    qcopy(frame.mat[3], vars + 0x370);
+    frame.mat[3][3] = 1.0f;
+    VU1_addGSregister(6, GetEffectTextureDescriptor(0x16));
+    VU1_addGSregister(0x42, 0x8000000048);
+    VU1_addGSregister(8, 5);
+    VU1_addGSregister(0x14, 0xFF9000000260);
+    VU1_addGSregister(0x47, 0x51001);
+    VU1_addGSregister(0x4A, 0);
+    font_queue_vu_state();
     for (i = 0; i < D_L09_001B11D8; i++) {
-        float *s = D_L09_002A1FF0[i];
-        float *o = f.verts[i];
-        v[0] = s[0];
-        v[1] = s[1];
-        v[2] = s[2];
-        v[3] = 1.0f;
-        func_002830C0(v, v, f.mat);
-        o[0] = v[0];
-        o[1] = v[1];
-        o[2] = v[2];
-        if (*(short *)(d + 0x422) != 0) {
-            cols[i] = D_L09_002A2658[i] & 0xFF0000FF;
+        float *src = D_L09_002A1FF0[i];
+        float *out = frame.verts[i];
+        point[0] = src[0];
+        point[1] = src[1];
+        point[2] = src[2];
+        point[3] = 1.0f;
+        transform_vector(point, point, frame.mat);
+        out[0] = point[0];
+        out[1] = point[1];
+        out[2] = point[2];
+        if (*(short *)(vars + 0x422) != 0) {
+            colors[i] = D_L09_002A2658[i] & 0xFF0000FF;
         }
     }
-    if (*(short *)(d + 0x422) != 0) {
-        func_00281810(D_L09_001B11D8, f.verts, cols, D_L09_002A23C8, 1);
+    if (*(short *)(vars + 0x422) != 0) {
+        DrawGlintEffect(D_L09_001B11D8, frame.verts, colors, D_L09_002A23C8, 1);
     } else {
-        func_00281810(D_L09_001B11D8, f.verts, D_L09_002A2658, D_L09_002A23C8, 1);
+        DrawGlintEffect(D_L09_001B11D8, frame.verts, D_L09_002A2658, D_L09_002A23C8, 1);
     }
-    func_00282D30(f.mat[1], f.mat[1], -1.0f);
-    func_00282D30(f.mat[2], f.mat[2], -1.0f);
+    FastVecScale(frame.mat[1], frame.mat[1], -1.0f);
+    FastVecScale(frame.mat[2], frame.mat[2], -1.0f);
     for (j = 0; j < D_L09_001B11D8; j++) {
-        float *o = f.verts[j];
-        float *s = D_L09_002A1FF0[j];
-        v[0] = s[0];
-        v[1] = s[1];
-        v[2] = s[2];
-        v[3] = 1.0f;
-        func_002830C0(v, v, f.mat);
-        o[0] = v[0];
-        o[1] = v[1];
-        o[2] = v[2];
+        float *out = frame.verts[j];
+        float *src = D_L09_002A1FF0[j];
+        point[0] = src[0];
+        point[1] = src[1];
+        point[2] = src[2];
+        point[3] = 1.0f;
+        transform_vector(point, point, frame.mat);
+        out[0] = point[0];
+        out[1] = point[1];
+        out[2] = point[2];
     }
-    if (*(short *)(d + 0x422) != 0) {
-        func_00281810(D_L09_001B11D8, f.verts, cols, D_L09_002A23C8, 1);
+    if (*(short *)(vars + 0x422) != 0) {
+        DrawGlintEffect(D_L09_001B11D8, frame.verts, colors, D_L09_002A23C8, 1);
     } else {
-        func_00281810(D_L09_001B11D8, f.verts, D_L09_002A2658, D_L09_002A23C8, 1);
+        DrawGlintEffect(D_L09_001B11D8, frame.verts, D_L09_002A2658, D_L09_002A23C8, 1);
     }
 }

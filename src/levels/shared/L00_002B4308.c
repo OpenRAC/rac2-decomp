@@ -7,35 +7,36 @@ extern void func_00282CC0(char *, char *, char *);
 extern void func_001290E0(int *, int *);
 extern unsigned char D_00189E20_1[];
 
+/* When the hero runs into a wall, takes away the part of the hero speed that goes into it and slows the hero down a little. */
 void func_L00_002B4308(void)
 {
-    char *p = (char *)D_00189E20_1;
+    char *hero = (char *)D_00189E20_1;
     float distance;
     float angle;
-    float value;
+    float pushAmount;
     float vector[4] __attribute__((aligned(16)));
 
-    if (*(short *)(p + 0x34E) == 0)
+    if (*(short *)(hero + 0x34E) == 0)
         return;
-    if (!(*(float *)(p + 0x31C) < 0.15f))
+    if (!(*(float *)(hero + 0x31C) < 0.15f))
         return;
-    if (!(0.0f < *(float *)(p + 0x118)))
+    if (!(0.0f < *(float *)(hero + 0x118)))
         return;
-    if (*(unsigned char *)(p + 0x287) == 0)
+    if (*(unsigned char *)(hero + 0x287) == 0)
         return;
-    if (!(0.0f < *(float *)(p + 0x238)))
+    if (!(0.0f < *(float *)(hero + 0x238)))
         return;
-    distance = func_00282E20(p + 0x230);
-    angle = func_00283248(*(float *)(p + 0x238), distance);
+    distance = vec_length_xy(hero + 0x230);
+    angle = FastMatrixHelperA(*(float *)(hero + 0x238), distance);
     if (!(angle >= 0.8726646900177002f))
         return;
-    qcopy(vector, p + 0x230);
+    qcopy(vector, hero + 0x230);
     vector[2] = 0.0f;
     func_001290E0((int *)vector, (int *)vector);
-    value = -*(float *)(p + 0xF0) * vector[0] - *(float *)(p + 0xF4) * vector[1];
-    if (value > 0.0f) {
-        func_00282D30((char *)vector, (char *)vector, value);
-        func_00282CC0(p + 0xF0, p + 0xF0, (char *)vector);
-        *(float *)(p + 0xF8) -= 0.030000001192092896f;
+    pushAmount = -*(float *)(hero + 0xF0) * vector[0] - *(float *)(hero + 0xF4) * vector[1];
+    if (pushAmount > 0.0f) {
+        FastVecScale((char *)vector, (char *)vector, pushAmount);
+        FastVecAdd(hero + 0xF0, hero + 0xF0, (char *)vector);
+        *(float *)(hero + 0xF8) -= 0.030000001192092896f;
     }
 }
