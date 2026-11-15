@@ -34,6 +34,7 @@ struct S272198 {
 
 extern struct S272198 D_001B5200;
 
+/* Starts a fade: resets the fade value to 1.0 and sets its rate to the reciprocal of the given duration. */
 void func_00272198(f32 fparg0) {
     D_001B15A0[0] = 1.0f;
     D_001B5200.f26C = 0;

@@ -29,6 +29,7 @@ extern s32 D_001A9720[];
 
 typedef struct { s32 w[16]; } Tab32;
 
+/* Decodes a 128-word table from the input stream D_001C4FAC into arg0. */
 void func_00297BB0(u8 *arg0)
 {
     s32 buf[128];

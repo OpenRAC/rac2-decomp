@@ -21,6 +21,7 @@ extern GroupTable *D_001B1888[];
 extern GroupEntry *D_001B1894[];
 extern GroupEntry *D_001B1898[];
 
+/* Links the HUD bank group n with the given size, clearing the top bit in the entries of the group. */
 void func_0028AE88(s32 n, s32 size) {
     s32 i;
     s32 j;

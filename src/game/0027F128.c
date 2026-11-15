@@ -59,6 +59,7 @@ extern char D_001A6D40[];
 
 extern char D_001A6E90[];
 
+/* Returns the total advance width of up to a1 characters of a0, using the glyph width table a2. */
 s32 func_0027F128(u8 *a0,s32 a1,u8 *a2) {
  s32 out=0,i=0;
  u8 *p;
@@ -76,24 +77,28 @@ s32 func_0027F128(u8 *a0,s32 a1,u8 *a2) {
 
 extern u8 D_00263B50[];
 
+/* Returns the width of text in the first font. */
 s32 func_0027F178(u8 *text, s32 length) {
     return func_0027F128(text, length, D_00263B50);
 }
 
 extern u8 D_00263EF0[];
 
+/* Returns the width of text in the second font. */
 s32 func_0027F198(u8 *text, s32 length) {
     return func_0027F128(text, length, D_00263EF0);
 }
 
 extern u8 D_00264290[];
 
+/* Returns the width of text in the third font. */
 s32 func_0027F1B8(u8 *text, s32 length) {
     return func_0027F128(text, length, D_00264290);
 }
 
 extern int func_0027F1D8(u8 *, int, u8 *, float);
 
+/* Returns the scaled width of text in the first font. */
 int func_0027F288(u8 *text, int length, float scale) {
     return func_0027F1D8(text, length, D_00263B50, scale);
 }
@@ -103,12 +108,14 @@ int func_0027F288(u8 *text, int length, float scale) {
 extern u64 func_0027C878(int);
 extern void func_0027F2A8(int, int, u64, u8 *, int, u64, u8 *);
 
+/* Prints text at (x, y) with the first font. */
 void func_0027F538(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font = func_0027C878(1);
     func_0027F2A8(x, y, style, text, length, font, D_00263B50);
 }
 
+/* Prints text at (x, y) with the second font. */
 void func_0027F5B8(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font = func_0027C878(2);
@@ -137,12 +144,14 @@ void func_0027F5B8(int x, int y, u64 style, u8 *text, int length)
 
 extern void func_0027FC70(unsigned short *, u64, u8 *, int, u64, u8 *);
 
+/* Prints text into a layout window with the first font. */
 void func_00280190(unsigned short *layout, u64 style, u8 *text, int length)
 {
     u64 font = func_0027C878(1);
     func_0027FC70(layout, style, text, length, font, D_00263B50);
 }
 
+/* Prints text into a layout window with the second font. */
 void func_00280200(unsigned short *layout, u64 style, u8 *text, int length)
 {
     u64 font = func_0027C878(2);
@@ -150,12 +159,14 @@ void func_00280200(unsigned short *layout, u64 style, u8 *text, int length)
 }
 
 
+/* Prints text into a layout window with the third font. */
 void func_00280270(unsigned short *layout, u64 style, u8 *text, int length)
 {
     u64 font = func_0027C878(3);
     func_0027FC70(layout, style, text, length, font, D_00264290);
 }
 
+/* Fills a text window layout with its position, size and margin values and clears its cursor fields. */
 void func_002802E0(unsigned short *a0,s32 a1,s32 a2,s32 a3,s32 a4,s32 a5,s32 a6,s32 a7,s32 a8) {
  a0[0]=a1;a0[1]=a2;a0[2]=a3;a0[3]=a4;
  a0[4]=a5;a0[5]=a6;a0[8]=a7;a0[9]=a8;
@@ -190,6 +201,7 @@ extern void func_00284EA8(void);
 extern void func_0027A9F0(void);
 extern void func_0027AB40(void);
 
+/* Per-frame screen update: calls func_00284EA8, func_0027A9F0 and UpdateViewContext. */
 void func_00280600(void) {
     func_00284EA8();
     func_0027A9F0();
@@ -250,6 +262,7 @@ typedef struct {
     long f88;   /* the flags */
 } QuadPacket;
 
+/* Fills a quad packet with the texture descriptor and primitive flags of table entry a2. */
 void func_00281DE8(QuadPacket *q, int a1, int a2, int a3) {
     QuadEntry *e;
     long flags;
@@ -274,6 +287,7 @@ void func_002820A0(void) {
  func_002FC560(0x47,0x513f1UL);
 }
 
+/* Empty function; does nothing. */
 void func_002820C8(void)
 {
 }
@@ -534,10 +548,12 @@ ASM_FUNC("asm/game", func_00283EF0);
 
 extern long long D_001A6D78;
 
+/* Packs the three colour components into the background colour word with the high bit set. */
 void func_00284E18(s32 a0, s32 a1, s32 a2) {
     D_001A6D78 = a0 | ((long long)a1 << 8) | ((long long)a2 << 16) | 0x80000000ULL;
 }
 
+/* Returns the result of func_00125D98 for the current display structure. */
 int func_00284E80(void)
 {
     extern int func_00125D98(void *);

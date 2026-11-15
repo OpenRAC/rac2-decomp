@@ -62,6 +62,7 @@ extern int ref_L00_00309D68_00;
 
 extern int ref_L00_00309D68_02;
 
+/* Memory card state callback: clears flag bits 4 and 2 and moves to state 21 when bit 0x80 is set. */
 void func_00298838(void)
 {
     if ((ref_L00_00309A30_01 & 4) != 0)
@@ -89,11 +90,13 @@ void func_00298838(void)
 extern unsigned int D_001A7424[] __attribute__((sda));
 extern int D_001A7420[] __attribute__((sda));
 
+/* Sets the memory card state to 3 unless flag bit 0x40 is set. */
 void func_002988F0(void) {
     if ((D_001A7424[0] & 0x40) == 0)
         D_001A7420[0] = 3;
 }
 
+/* Sets the memory card state to 3 unless flag bit 0x40 is set. */
 void func_00298918(void) {
     if ((D_001A7424[0] & 0x40) == 0)
         D_001A7420[0] = 3;
@@ -101,21 +104,25 @@ void func_00298918(void) {
 
 extern int D_001393F0[];
 
+/* Sets the memory card state to 3 if D_001393F0 is non-zero. */
 void func_00298940(void) {
     if (D_001393F0[0] != 0)
         D_001A7420[0] = 3;
 }
 
+/* Sets the memory card state to 3 unless flag bit 0x40 is set. */
 void func_00298960(void) {
     if ((D_001A7424[0] & 0x40) == 0)
         D_001A7420[0] = 3;
 }
 
+/* Sets the memory card state to 3 unless flag bit 0x40 is set. */
 void func_00298988(void) {
     if ((D_001A7424[0] & 0x40) == 0)
         D_001A7420[0] = 3;
 }
 
+/* Memory card state callback: when the mode is 2 and the selection is negative, goes to state 21 with flags set if an extra field is set. */
 void func_002989B0(void)
 {
     if (ref_L00_00309BA8_00.mode_15c != 2 || ref_L00_00309BA8_00.selected_164 >= 0)
@@ -135,6 +142,7 @@ extern int D_001A8BB0[] __attribute__((sda));
 extern int ref_L00_00309C18_00 __attribute__((sda));
 extern int func_002B49E0(int, int, unsigned int, unsigned int, unsigned char *);
 extern void func_00288D70(void);
+/* Memory card state callback: when the mode is 2 and the selection is negative, picks state 21 or the next mode from the stored fields. */
 void func_00298A20(void)
 {
     int nextmode;
@@ -167,6 +175,7 @@ void func_00298A20(void)
 }
 
 
+/* Memory card state callback: goes to state 3 unless the selector is -2, or to state 5 when flag bit 0x20 is set. */
 void func_00298B28(void)
 {
     if (ref_L00_00309D20_01.selector_10 != -2) {
@@ -179,6 +188,7 @@ void func_00298B28(void)
     }
 }
 
+/* Memory card state callback: goes to state 3 if the selector is set, or to state 12 when flag bit 0x20 is set. */
 void func_00298B70(void)
 {
     if (ref_L00_00309D68_01.selector_10 != 0) {
@@ -198,6 +208,7 @@ extern unsigned char D_001A7980[];
 extern unsigned char D_001A79A0[];
 extern unsigned char D_001A79D0[];
 extern void func_00115AC0(void *, int, int);
+/* Copies the identifying characters of a save header (from offset 0x12 on) into the string at D_001A7930. */
 void func_00298BB8(unsigned char *source)
 {
     int i;
@@ -228,6 +239,7 @@ extern int D_00256138[];
 extern char D_00256368[];
 extern int func_0029AE78(int *);
 
+/* Restores the save data from a packet if both stored sizes match the current ones; otherwise prints a message. */
 void func_00298D28(int *a0)
 {
     int len1 = func_0029AE78(D_00256138);
@@ -255,6 +267,7 @@ extern char D_00256368[];
 extern int func_0029AE78(int *);
 extern int func_0029AF98(char *, int, int *);
 
+/* Writes the save data into a buffer: the two table sizes first, then the data of each of the tables. */
 void func_0029ADA0(char *a0)
 {
     char *out = a0;
@@ -273,6 +286,7 @@ extern int func_00127348(void);
 extern char D_001A9A28[];
 extern void func_0026FEB8(void *);
 
+/* Prints a message if the check func_00127348 returns non-zero. */
 void func_0029AE48(void) {
     if (func_00127348() != 0)
         func_0026FEB8(D_001A9A28);

@@ -4,12 +4,14 @@ extern int ref_L00_002FC030_00 __attribute__((sda));
 
 extern int ref_L00_002FC048_00 __attribute__((sda));
 
+/* Sets ref_L00_002FC030_00 to 1 if it is 0. */
 void func_00290730(void)
 {
     if (ref_L00_002FC030_00 == 0)
         ref_L00_002FC030_00 = 1;
 }
 
+/* Returns whether ref_L00_002FC048_00 equals 3. */
 int func_00290748(void)
 {
     return ref_L00_002FC048_00 == 3;
@@ -26,6 +28,7 @@ extern int D_001A72D4, D_001A79F0, D_001A9A50;
 extern char D_001B1740[], D_001CE4E0[], D_001D1580[], D_001D0E00[];
 extern char D_00216480[], D_0021D880[], D_0021D480[], D_00212720[], D_00214520[], D_00213F20[];
 
+/* Resets the engine state: reinitialises the memory slots and fills several buffers with their initial patterns. */
 void func_00290758(void)
 {
     int base;

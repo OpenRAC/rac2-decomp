@@ -14,6 +14,7 @@ typedef struct {
     int level;
 } Gauge;
 
+/* Updates a gauge: clamps its current value to its limit and advances its level and counters. */
 void func_0028FF50(Gauge *g)
 {
     unsigned char *c = g->counter;

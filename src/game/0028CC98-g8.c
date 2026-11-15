@@ -6,6 +6,7 @@ extern int D_001A8DD8[2] __attribute__((sda));
 extern int D_001A8D48 __attribute__((sda));
 extern int D_001B18D0[] __attribute__((sda));
 
+/* Initialises the element at a0 with default sizes and values. */
 void func_0028CC98(void *a0)
 {
     D_001B18D0[0] = 8;

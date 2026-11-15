@@ -28,6 +28,7 @@ extern s32 D_001A8D18;
 extern s32 D_001A8D28 __attribute__((sda));
 extern s32 D_001B1840;
 
+/* Returns the string for the given key from the help table, or a default string if the key is not found. */
 s32 func_00288FB8(s32 arg0) {
     s32 t;
 

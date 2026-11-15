@@ -9,6 +9,7 @@ extern int D_001B166C;
 extern int D_001B1668 __attribute__((sda));
 extern int D_001A89B0[8] __attribute__((sda));
 extern void func_0027E018(int,int,int,int,int,int,int,int,long,long);
+/* Prints text with the given font at screen position (x, y), drawing one textured glyph quad per character up to the character limit. */
 void func_0027F2A8(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 texture,
                       u8 *metrics) {
     struct Glyph_F6668 *glyphs = (struct Glyph_F6668 *)metrics;
@@ -70,6 +71,7 @@ void func_0027F2A8(s32 x, s32 y, u64 color, u8 *text, s32 character_limit, u64 t
 }
 
 extern float func_00283CE0(int);
+/* Prints text with the given font at floating-point position (x, y), scaled, one glyph quad per character. */
 extern void func_0027E1A0(float x, float y, float draw_width, float draw_height,
                          int u, int v, int width, int height,
                          unsigned int *colors, u64 texture);

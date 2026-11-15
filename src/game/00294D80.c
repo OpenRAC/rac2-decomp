@@ -14,6 +14,7 @@ typedef struct {
 extern GsTextureUploadSlot D_001B9340[];
 extern u32 D_001B15FC __attribute__((sda));
 
+/* Builds and returns the GS texture register value for an 8-bit texture from its size, base and format arguments. */
 u64 func_00294D80(int a0, int a1, u32 a2, u32 a3, int arg5, int arg6)
 {
     int shift;

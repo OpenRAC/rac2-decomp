@@ -4,6 +4,7 @@ extern char *D_001B22A8 __attribute__((sda));
 extern char D_001A6600[];
 extern char D_001A6860[];
 
+/* Appends a DMA tag that points at the prebuilt packet at D_001A6600 to the current packet buffer. */
 void func_002852D8(void)
 {
     *(int *)(*(char * volatile *)&D_001B22A8 + 0) = 0x30000026;
@@ -14,6 +15,7 @@ void func_002852D8(void)
 }
 
 
+/* Appends a DMA tag that points at the prebuilt packet at D_001A6860 to the current packet buffer. */
 void func_00285338(void)
 {
     *(int *)(*(char * volatile *)&D_001B22A8 + 0) = 0x30000029;

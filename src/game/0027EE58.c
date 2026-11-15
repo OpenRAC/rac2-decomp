@@ -4,6 +4,7 @@ extern unsigned long func_0027C878(int);
 extern float func_00283B98(float,float),func_00283180(float),func_00283198(float);
 extern int func_00283CF0(float);
 extern void func_0027E920(const long *,const int *,const int *,unsigned long,int);
+/* Draws a textured ring segment (arc) as a strip of quads between the inner and outer radius from the start to the end angle. */
 void func_0027EE58(int x,int y,int inner,int outer,int *colors,int *uv,int textureId,int segments,float start,float end)
 {
     long depth=0xFFFFF000000000L;

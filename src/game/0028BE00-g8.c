@@ -47,6 +47,7 @@ static inline Info *InfoOf(int id)
     return &D_00239BA0[D_00139568[id]];
 }
 
+/* Updates the radial selector each frame: reads the stick, picks the selection by angle and handles activation. */
 void func_0028BE00(Selector *p)
 {
     float x, y, mag, ang, a, f, r;

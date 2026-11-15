@@ -1,5 +1,6 @@
 #include "include_asm.h"
 
+/* Decodes a compressed block from source to destination: runs func_00298170, then func_002977A8 or func_002979D8 depending on the flags. */
 void func_00297730(char *destination, unsigned char *source, int argument)
 {
     extern void func_00298170(void);

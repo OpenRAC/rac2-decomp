@@ -65,6 +65,7 @@ void func_0029B910(void) {
         }
     }
 }
+/* Updates the mission selection menu each frame and returns its result, or -1 when the menu is not active. */
 int func_0029BB30(void) {
  int result, changed;
  if (D_001A9A50 == 0) return -1;

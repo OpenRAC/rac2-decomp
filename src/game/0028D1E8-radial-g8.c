@@ -37,6 +37,7 @@ static __inline__ void draw_background(char *tex, int color, float sx, float sy,
     func_00300A00(tex, color, 129.0f, (float)(int)(D_001B23A4 * scale + half), sx, sy, rot);
 }
 
+/* Draws the radial selector panel: positions each entry on the circle with its colours and label. */
 int func_0028D1E8(unsigned char *o)
 {
     int total = D_001B189C[2] + D_001B189C[4] + D_001B189C[3];

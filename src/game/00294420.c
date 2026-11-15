@@ -18,6 +18,7 @@ extern short D_001A63AC;
 extern int D_001A7398 __attribute__((sda));
 extern int D_001A7A04 __attribute__((sda));
 
+/* Loads a class into a free cache slot unless it is already loaded or the loading is blocked. */
 void func_00294420(int value)
 {
     int a, b, i, sa, sb;

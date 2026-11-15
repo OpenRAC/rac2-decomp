@@ -15,6 +15,7 @@ extern SlotBlock D_001C4FA0;
 extern s32 func_00295680(s32);
 extern void func_00295788(s32, s32);
 
+/* Finds a free entry (of 5) and copies entry 0 into it; returns its index. */
 s32 func_002956E8(void) {
     s32 i = func_00295680(1);
 

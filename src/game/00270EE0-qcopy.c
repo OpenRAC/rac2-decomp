@@ -7,6 +7,7 @@ extern void func_00270D50(void);
 extern void func_00270E30(void);
 extern void func_00270EA8(void);
 extern float func_00283CE0(int);
+/* Copies the camera block selected by its sub-mode into working vectors and updates the camera from them. */
 void func_00270EE0(char *from)
 {
     unsigned char *r = (unsigned char *)D_001B5200 + 0x290;

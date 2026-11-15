@@ -29,6 +29,7 @@ extern f32 func_00283180(f32);
 extern f32 func_00283198(f32);
 extern f32 func_00283B98(f32, f32);
 
+/* Spawns a pair of effect vertices for an object, depending on the effect type, using the effect texture descriptor. */
 void func_002729A0(s8 *arg0, f32 fparg0, f32 fparg1)
 {
     f32 v[2][4];

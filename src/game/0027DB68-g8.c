@@ -33,6 +33,7 @@ extern short D_001A6480[];
 extern ScreenEffectSettingsView *ref_0027DB68_00 __attribute__((sda));
 extern void func_002FC560(u32, u64);
 extern void func_0027DE50(int, int, int, int, unsigned long);
+/* Draws the background and the lines of text of a text box using colours and alphas from its description. */
 void func_0027DB68(void)
 {
     int line;

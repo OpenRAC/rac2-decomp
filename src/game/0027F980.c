@@ -9,6 +9,7 @@ extern u8 D_00263B50[];
 extern u8 D_00263EF0[];
 extern u8 D_00264290[];
 
+/* Prints text right-aligned at x with the first font. */
 void func_0027F980(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font;
@@ -17,6 +18,7 @@ void func_0027F980(int x, int y, u64 style, u8 *text, int length)
     func_0027F2A8(x, y, style, text, length, font, D_00263B50);
 }
 
+/* Prints text right-aligned at x with the second font. */
 void func_0027FA10(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font;
@@ -25,6 +27,7 @@ void func_0027FA10(int x, int y, u64 style, u8 *text, int length)
     func_0027F2A8(x, y, style, text, length, font, D_00263EF0);
 }
 
+/* Prints text centred on x with the first font and returns the left edge used. */
 int func_0027FAA8(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font;
@@ -34,6 +37,7 @@ int func_0027FAA8(int x, int y, u64 style, u8 *text, int length)
     return x;
 }
 
+/* Prints text centred on x with the second font and returns the left edge used. */
 int func_0027FB40(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font;
@@ -43,6 +47,7 @@ int func_0027FB40(int x, int y, u64 style, u8 *text, int length)
     return x;
 }
 
+/* Prints text centred on x with the third font and returns the left edge used. */
 int func_0027FBD8(int x, int y, u64 style, u8 *text, int length)
 {
     u64 font;

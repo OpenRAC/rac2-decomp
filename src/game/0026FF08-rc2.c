@@ -27,6 +27,7 @@
 extern f32 func_00283CE0(s32);
 extern s8 D_001B5200[];
 
+/* Starts a camera transition of the kind selected by arg1, storing its target and timing in the camera state. */
 void func_0026FF08(s32 arg0, s32 arg1, f32 fparg0, f32 fparg1, f32 fparg2, f32 fparg3) {
     f32 temp_f1;
 

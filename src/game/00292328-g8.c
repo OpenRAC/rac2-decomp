@@ -14,6 +14,7 @@ extern u64 D_001A91D0 __attribute__((sda));
 extern char *D_001CDB80[];
 extern void func_002933D0(void *, int, void *);
 
+/* Copies the data pointers into the table, fills in the GS tags for each entry and loads the first block. */
 void func_00292328(void *param)
 {
     int i;

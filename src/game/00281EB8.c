@@ -17,6 +17,7 @@ extern u8 D_001B5340[];
 extern u8 D_0018A0E0[];
 extern f32 D_001A9FD0[][4];
 
+/* Draws a textured quad of the given kind at a position, with scale, offset and angle, filling all four vertex colours with color. */
 void func_00281EB8(void *position, s32 texture, u32 color, s32 kind,
                    f32 scale, f32 offset, f32 angle)
 {

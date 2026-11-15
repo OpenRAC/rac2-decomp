@@ -64,6 +64,7 @@ extern int func_00288F48(int);
     (D_0018C958[D_00254E78.selection].levels = \
         (D_0018C958[D_00254E78.selection].levels | (1u << D_001A79F0[0])) | 0x80000000u)
 
+/* Enables the subtitles once their delay has run out or the mode allows it, counting a wait of 120 frames after input. */
 void func_00289178(void)
 {
     if (!D_00254E78.enabled) {

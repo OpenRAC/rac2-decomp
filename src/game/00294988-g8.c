@@ -16,6 +16,7 @@ extern int D_001B22B0[] __attribute__((sda));
 extern void func_002FC3C0(int),func_002945E8(int,int),func_0029CFB0(void *,void *,int),func_00132858(int),func_00132828(void);
 extern int func_00132028(void),func_001326D8(char *);
 extern void func_0026FEB8(char *,int),func_002946C0(int,int,void *);
+/* Makes the asset with the given id the current one: finds it in the 48 cached entries and updates the loaded slots. */
 void func_00294988(int id)
 {
     int index=0,slot;

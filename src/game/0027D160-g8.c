@@ -9,6 +9,7 @@ extern int D_001B163C;
 extern int func_0027C878(int);
 extern void func_00282F20(void *, void *, float);
 extern void func_00280B90(void *, int, int);
+/* Draws the light quads as textured quads using the effect texture descriptor 0. */
 void func_0027D160(void) {
     FRow m[4];
     int colors[4];

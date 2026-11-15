@@ -19,6 +19,7 @@ extern int func_0028DF68(void);
 extern void func_0028BA50(void *);
 extern void func_0028BA88(void *);
 
+/* Updates the selected entry of the menu: looks up its record and label and handles the selection when valid. */
 void func_0028E2A8(void)
 {
     int selected;

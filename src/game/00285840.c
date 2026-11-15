@@ -12,11 +12,13 @@ extern unsigned int D_001BAD08;
 /* func_002858B0: owner ABI/declaration review retained. */
 extern int D_001BAD14;
 
+/* Returns the value of D_001BACC0. */
 unsigned int func_00285840(void)
 {
     return D_001BACC0;
 }
 
+/* Returns the value of D_001BAD08. */
 unsigned int func_00285850(void)
 {
     return D_001BAD08;
@@ -28,6 +30,7 @@ extern void func_002B7320(void);
 extern void func_00132028(void);
 extern void func_002B8518(void);
 
+/* If the sound check on 3 fails, unpauses music and pumps the sound system; then clears D_001BACC0. */
 void func_00285860(void)
 {
     if (func_002B49C8(3) == 0) {
@@ -39,6 +42,7 @@ void func_00285860(void)
     D_001BACC0 = 0;
 }
 
+/* Stores param_1 in D_001BAD14. */
 void func_002858B0(int param_1)
 {
   D_001BAD14 = param_1;

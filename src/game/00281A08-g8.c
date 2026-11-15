@@ -25,6 +25,7 @@ typedef struct { float u, v; } UiTexCoord;
 extern UiTexCoord D_001A89E0[] __attribute__((sda));
 extern UiTexCoord D_001A89E0_gp[] SDATA(D_001A89E0);
 
+/* Draws a ring of connected quads through the given vertices, positions and rotations, blending the colours from first_color to last_color. */
 void func_00281A08(UiVector *vertices, int vertex_count, UiVector *positions,
                    UiVector *rotations, int phase, int steps,
                    int first_color, int last_color, float blend)

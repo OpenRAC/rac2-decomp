@@ -28,6 +28,7 @@ extern int D_001B1DA0 __attribute__((sda));
 extern int D_001B1654 __attribute__((sda));
 extern void func_0027AB40(void);
 
+/* Copies the lighting parameters from one block into another, depending on a global flag. */
 void func_00279FF0(void)
 {
     if (D_001B5600 != 0) {

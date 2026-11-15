@@ -47,6 +47,7 @@ extern void func_0027AB40(void), func_002FC748(void), func_002A0220(void), func_
 extern int func_002A0380(void);
 extern void func_00280B90(void *, int, int);
 
+/* Renders the captured moby into the capture texture, saving and restoring the view matrix around it. */
 void func_0027BA68(void)
 {
     CaptureObject *object = D_001B8840.capture;

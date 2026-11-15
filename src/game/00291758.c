@@ -152,6 +152,7 @@ extern struct Table1 Fee2b87d1_D_0014B540;
 
 extern struct Table2 Fee2b87d1_D_00152CD0;
 
+/* Frees the light with the given index and creates a point light for it. */
 void func_00291758(int param_1)
 {
     func_00291788(param_1);
@@ -352,6 +353,7 @@ extern u8 *D_L03_001DAB80[];
 extern void func_002934B8(u8 *, u8 *);
 extern unsigned char *D_001BAF38;
 
+/* Runs the two setup steps for param, sets up the table from D_001BAF38 and stores param at 0x001A7290. */
 void func_002923C0(void *param)
 {
     func_00292078(param);
@@ -540,6 +542,7 @@ void func_002933D0(RenderHeader *base, char *textures, unsigned char *map)
 
 
 
+/* Fills a table header from a block: copies four bytes and sets two pointers relative to the block start. */
 void func_002934B8(u8 *a0, u8 *a1) {
     *(u8 *)(a0 + 4) = *(u8 *)(a1 + 0);
     *(u8 *)(a0 + 5) = *(u8 *)(a1 + 1);
@@ -645,6 +648,7 @@ int func_00293A60(void)
 }
 
 
+/* Looks up the value following entry index in the entry table, using the current table selector and hold value. */
 int func_00293CA8(int index)
 {
     int j = index + 1;
@@ -687,6 +691,7 @@ extern PartsState parts_state __asm__("D_001B8840");
 extern int func_002B7B18(int, int, int);
 extern void func_0027D330(int);
 
+/* Reads the part file at index from disc into the part buffer and fades if flag is set, then initialises its part entries. */
 void func_00293F98(int index, int flag)
 {
     PartEntry *r;
@@ -728,6 +733,7 @@ void func_00294070(int index)
     p->cur = ref_00294070_01 + ref_00294070_02;
 }
 
+/* Clears the 0x35840-byte table and sets its slot indexes to -1. */
 void func_002940C0(void)
 {
     extern void func_00282A60(unsigned int *, unsigned int, int);
@@ -746,6 +752,7 @@ void func_002940C0(void)
 
 extern void func_002942A0(int, int, int, int);
 
+/* Finds the table slot holding value among the 48 entries and starts loading it into slot index if it is not there yet. */
 void func_00294398(int value, int index)
 {
     int i = 0;
@@ -762,6 +769,7 @@ after:
 
 extern void func_00294398(int a0, int a1);
 
+/* Calls func_00294398 with the two arguments between two calls to func_002B7CE0(1). */
 void func_002945E8(void *a0, void *a1)
 {
     F46b43b72_FUN_002B7CE0(1);
@@ -769,6 +777,7 @@ void func_002945E8(void *a0, void *a1)
     F46b43b72_FUN_002B7CE0(1);
 }
 
+/* Returns 1 if value is not among the 48 table slots; otherwise checks whether it is already in one of the 3 loaded slots. */
 s32 func_00294630(s32 value) {
     s32 i = 0;
     s32 *q;

@@ -6,6 +6,7 @@ typedef unsigned short u16;
 
 extern u16 *D_001B188C __attribute__((sda));
 
+/* Returns the index of value in the 8-byte-stride table at D_001B188C, ending at the 0xFFFF terminator. */
 int func_0028AB20(int value)
 {
     u16 *table = D_001B188C;

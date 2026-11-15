@@ -3,6 +3,7 @@
 
 extern unsigned int ref_L00_002F9D30_00 __attribute__((sda));
 
+/* Decrements ref_L00_002F9D30_00 if it is non-zero. */
 void func_0028E440(void)
 {
     if (ref_L00_002F9D30_00 != 0)
@@ -24,6 +25,7 @@ extern s32 D_001B17B8[] __attribute__((sda));
 extern s32 D_001A8BB0[] __attribute__((sda));
 extern Task28E458 D_00255330[];
 
+/* Runs the update callback of each of the 13 HUD slots, last to first, unless the HUD is frozen. */
 void func_0028E458(void) {
     Task28E458 *t;
     s32 i;
@@ -69,6 +71,7 @@ extern short *D_001B1890;
 extern unsigned int *D_001B1898;
 extern unsigned int *D_001B1894;
 
+/* Returns the texture frame number for the icon with the given key and frame index, or the failure value if not found. */
 int func_0028E588(int key, int index)
 {
     int number = func_0028AB20(key);
@@ -96,6 +99,7 @@ extern int D_001A7350;
 extern int D_001A7354;
 extern int func_0028E640(int);
 
+/* Draws a HUD sprite from the texture table row a0 at the given position and size. */
 void func_0028E868(int a0, int a1, int a2, int a3, int a4, int a5)
 {
     short *row = (short *)((a0 << 2) + (unsigned int)D_001B1890);
@@ -128,6 +132,7 @@ void func_0028E868(int a0, int a1, int a2, int a3, int a4, int a5)
 }
 
 
+/* Appends a sprite to the packet buffer with the given texture, position and size. */
 void func_0028ECD8(int a0, int a1, int a2, int a3, int a4, int a5)
 {
     int *p;
@@ -156,6 +161,7 @@ void func_0028ECD8(int a0, int a1, int a2, int a3, int a4, int a5)
 }
 
 
+/* Draws a HUD sprite from the texture table row a0, positioned at the given point with its size and colour. */
 void func_0028EE98(int a0, int a1, int a2, int a3, int a4, int a5)
 {
     short *row = (short *)((a0 << 2) + (unsigned int)D_001B1890);
@@ -187,6 +193,7 @@ void func_0028EE98(int a0, int a1, int a2, int a3, int a4, int a5)
     ref_L00_001B2608_00 = (int *)((char *)ref_L00_001B2608_00 + 0x50);
 }
 
+/* Draws a HUD sprite at a sub-pixel position from the texture table row a0, with a colour. */
 void func_0028F078(int a0, int a1, int a2, int a3, int a4, int a5, unsigned int color)
 {
     short *row = (short *)((a0 << 2) + (unsigned int)D_001B1890);
@@ -267,6 +274,7 @@ extern int D_001A7350;
 extern int D_001A7354;
 extern int func_0028E640(int);
 
+/* Appends a sprite quad to the packet buffer using ten position, size and texture parameters. */
 void func_0028F788(int a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9)
 {
     int *p;

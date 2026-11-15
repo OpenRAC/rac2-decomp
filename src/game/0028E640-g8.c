@@ -23,6 +23,7 @@ extern int D_001A72D0;
 extern int D_001A72D0_gp SDATA(D_001A72D0);
 extern int D_001A72DC;
 
+/* Returns the GS texture register value for texture index, queueing its upload if it is not loaded yet. */
 u64 func_0028E640(int index)
 {
     short *pair = (short *)((index << 2) + (u32)D_001B1890);

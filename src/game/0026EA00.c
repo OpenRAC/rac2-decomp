@@ -21,6 +21,7 @@ extern void func_00279BD8(MarkerVector *, MarkerVector *);
 extern long func_0027C878(int);
 extern float func_00282C48(float);
 extern int func_00283CF0(float);
+/* Draws a textured screen rectangle with the given position, size, UVs, colour and texture. */
 extern void func_0027E018(int x, int y, int width, int height,
                         int u, int v, int uw, int vh, long colour, long texture);
 
@@ -111,6 +112,7 @@ extern void func_00284EA8(void);
 extern void func_00284F40(int);
 extern void func_002FCDA8(void);
 
+/* Draws one frame of the loading screen for the given argument using the loader state. */
 void func_0026EAC8(int arg)
 {
     char *state = D_001BAEC0;
@@ -138,6 +140,7 @@ void func_0026EAC8(int arg)
 
 extern int func_002A77E0(int);
 
+/* Picks one of the six orderings of the values 0, 1 and 2 at random and stores it in first, second and third. */
 void func_0026EB98(int *first, int *second, int *third) {
     switch (func_002A77E0(3)) {
     case 0:
@@ -166,6 +169,7 @@ void func_0026EB98(int *first, int *second, int *third) {
 typedef struct { char b[8]; } CdClock;
 extern int func_001256D8(CdClock *);
 extern void func_001163A0(unsigned int);
+/* Seeds from the CD clock and writes a random permutation as a short array to out. */
 void func_0026EC58(unsigned short *out)
 {
     CdClock clock;
@@ -219,137 +223,167 @@ unsigned int func_0026F710(void)
     return 0;
 }
 
+/* Empty function; does nothing. */
 void func_0026F718(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F720(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F728(void)
 {
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F730(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F738(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F740(void)
 {
     return 0;
 }
 
+/* Stub that ignores its two arguments and returns 0. */
 unsigned int func_0026F748(int unused0, int unused1)
 {
     return 0;
 }
 
+/* Empty function; does nothing. */
 void func_0026F750(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F758(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F760(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F768(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F770(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F778(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F780(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F788(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F790(void)
 {
 }
 
+/* Empty function; does nothing. */
 void func_0026F798(void)
 {
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F7A0(void)
 {
     return 0;
 }
 
+/* Empty function; does nothing. */
 void func_0026F7B0(void)
 {
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F7B8(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F7C0(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F7C8(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F7D0(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F7D8(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F7E0(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F7E8(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F7F0(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F7F8(void)
 {
     return 0;
 }
 
+/* Stub that returns 0. */
 unsigned int func_0026F800(void)
 {
     return 0;
 }
 
+/* Empty function; does nothing. */
 void func_0026F808(void)
 {
 }
@@ -396,6 +430,7 @@ extern int func_00282A18(int);
 extern int func_00126288(GsLoadImage26FC78 *, short, short, short, short, short, short, short);
 extern int func_001265B0(GsLoadImage26FC78 *, void *);
 
+/* Builds the GS image-load packet for a PIF texture and its palette, and writes the resulting texture register values to out. */
 void func_0026FC78(char *arg0, unsigned long long *out, int tbp, int cbp)
 {
     PifTex26FC78 d;
@@ -447,6 +482,7 @@ extern unsigned long long D_001A7468 __attribute__((sda));
 extern int func_002B7C80(char *, int, int);
 extern void func_0026FC78(char *, unsigned long long *, int, int);
 
+/* Reads a PIF texture from disc into a buffer, uploads it with func_0026FC78 and stores the resulting texture register value. */
 void func_0026FE48(void)
 {
     unsigned long long local[4];
@@ -456,6 +492,7 @@ void func_0026FE48(void)
     *(volatile unsigned long long *)&D_001A7468 = local[0];
 }
 
+/* Printf-style debug output hook; takes a format and does nothing. */
 void func_0026FEB8(const char *format,...) {
 }
 
@@ -485,6 +522,7 @@ extern float func_00283CE0(int);
 extern int func_00282978(void *);
 extern void func_0027AB40(void);
 
+/* Per-frame update of the camera field-of-view transition, easing between values according to the transition mode. */
 void func_00270018(void) {
     float half;
     float t;
@@ -524,6 +562,7 @@ extern char *D_001B5390;
 extern char D_001B7550[];
 extern char D_001B7C30[];
 
+/* Copies two blocks of data into the display buffers and links the second one into the first at offset 0x70. */
 void func_002701B0(void)
 {
     func_00282B50(D_001B7550, D_001B5390, 0xA0);
@@ -634,6 +673,7 @@ extern char D_001B53A0[];
 extern void *func_00302A20(void *);
 extern void func_0029F338(void *);
 
+/* Creates the object's attached effect when the field at offset 0x86 is zero, and frees it otherwise. */
 void func_002704F0(char *p)
 {
     char *base = D_001B53A0;
@@ -652,6 +692,7 @@ typedef void (*ObjectDispatch)(void *);
 typedef struct { ObjectDispatch entries[5]; } ObjectDispatchRecord;
 extern ObjectDispatchRecord D_0026E900[];
 
+/* Calls the object's per-type update callback from the dispatch table, if one is set. */
 void func_00270550(char *object) {
     ObjectDispatch callback = D_0026E900[*(short *)(object + 0x8C)].entries[2];
     if (callback != 0)
@@ -766,6 +807,7 @@ extern float D_L00_001B18E0 __attribute__((sda));
 extern float func_002AA2E8(float *, float, float);
 extern int func_00282948(void *);
 
+/* Per-frame update of the first scalar transition: moves the value toward its target and clears the target when its timer expires. */
 void func_002721C8(void)
 {
     ScalarTransitionView *state = &D_L00_001B8C80;
@@ -785,6 +827,7 @@ void func_002721C8(void)
 /* Advances the second shared scalar towards its stored target and updates its timer. */
 extern float D_L00_001B18E4 __attribute__((sda));
 
+/* Per-frame update of the second scalar transition: moves the value toward its target at the step or rate given. */
 void func_00272280(void)
 {
     if (D_L00_001B8C80.step2 != 0.0f) {

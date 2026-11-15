@@ -27,6 +27,7 @@
 extern s32  D_001B22B0[] __attribute__((sda));
 
 extern s8 D_001BAECC[];
+/* Returns -1 with *arg1 cleared if arg0 exceeds 0x40000; otherwise stores the free space left after arg0 bytes in *arg1 and returns 0. */
 s32 func_00288970(u32 arg0, s32 *arg1) {
     if (arg0 > 0x40000U) {
         *arg1 = 0;

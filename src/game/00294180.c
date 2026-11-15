@@ -39,6 +39,7 @@ extern int func_0011AFC0(int);
 extern int func_002B7BC0(void *, int, int, void (*)(int *, int), StreamLoad *);
 extern void func_00294130(int *p, int a1);
 
+/* Starts or ends a streamed read: with go set, builds the DMA header for the file's next sector run; with go clear, releases the file. */
 void func_00294180(StreamLoad *load, s32 go) {
     SifDma dma;
     u8 *buf;

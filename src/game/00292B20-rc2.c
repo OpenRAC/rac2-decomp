@@ -29,6 +29,7 @@ extern s32  D_001B1888[] __attribute__((sda));
 
 extern s32 func_0029D4D0();
 
+/* Decompresses the block of size arg1 (rounded up to 16) for entry arg0 at the base D_001A7288. */
 void func_00292B20(s32 arg0, s32 arg1) {
     s32 temp_a0;
     s32 temp_a1;

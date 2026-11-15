@@ -33,6 +33,7 @@ extern void func_002802E0(unsigned short *, int, int, int, int, int, int, int, i
 extern void func_00280200(unsigned short *, unsigned long long, unsigned char *, int);
 extern void func_00289AA0(void);
 
+/* Draws the subtitle box for the active subtitle state, counting down the offset timer and respecting the subtitle setting. */
 void func_00289AA8(void)
 {
     unsigned short layout[16];

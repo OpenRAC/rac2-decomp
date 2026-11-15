@@ -66,6 +66,7 @@ extern int Ff67aa9df_D_001A7354 __attribute__((sda));
 
 extern void func_0027EA28(void *v, void *x);
 
+/* Resets the GS display registers (background colour, PMODE, SMODE2, framebuffers and display areas). */
 void func_0027B948(void)
 {
     GsRegisterValue framebuffer, display;
@@ -98,6 +99,7 @@ void func_0027B9C0(int width, int height)
     func_002FC560(0x42, 0x8000000044UL);
 }
 
+/* Calls func_00284EA8 and returns. */
 void func_0027BA48(void)
 {
   func_00284EA8();
@@ -123,6 +125,7 @@ extern void func_0027BD70(void);
 extern void func_002CBC58(int);
 extern void func_002859C8(void);
 
+/* If the screen state is 1, redraws the frame; if it is 0, resets the screen effect; then updates the panel. */
 void func_0027C4A8(void)
 {
     if (func_00285850() == 1) {
@@ -136,6 +139,7 @@ void func_0027C4A8(void)
 }
 
 
+/* Calls func_002CBC58(0) and returns. */
 void func_0027C520(void)
 {
   func_002CBC58(0);
@@ -152,6 +156,7 @@ extern int D_001B1608[] __attribute__((sda));
 extern fn_t D_001B9E40[];
 extern int D_001B9F40[];
 
+/* Registers a callback and its argument in the first callback table (at most 64 entries). */
 void func_0027CDC8(fn_t first, int second) {
     int index = D_001B1608[0];
     if (index < 64) {
@@ -161,6 +166,7 @@ void func_0027CDC8(fn_t first, int second) {
     }
 }
 
+/* Calls every callback registered in the first callback table with its argument. */
 void func_0027CE18(void) {
     int index;
     for (index = 0; index < D_001B1608[0]; ++index)
@@ -171,6 +177,7 @@ extern int D_001B1610[] __attribute__((sda));
 extern fn_t D_001BA240[];
 extern int D_001BA340[];
 
+/* Registers a callback and its argument in the second callback table (at most 64 entries). */
 void func_0027CE90(fn_t first, int second) {
     int index = D_001B1610[0];
     if (index < 64) {
@@ -180,6 +187,7 @@ void func_0027CE90(fn_t first, int second) {
     }
 }
 
+/* Calls every callback registered in the second callback table with its argument. */
 void func_0027CEE0(void) {
     int index;
     for (index = 0; index < D_001B1610[0]; ++index)
@@ -190,6 +198,7 @@ extern int D_001B1614[] __attribute__((sda));
 extern fn_t D_001BA440[];
 extern int D_001BA540[];
 
+/* Calls every callback registered in the third callback table with its argument. */
 void func_0027CF58(void) {
     int index;
     for (index = 0; index < D_001B1614[0]; ++index)
@@ -200,6 +209,7 @@ extern int D_001B160C[] __attribute__((sda));
 extern fn_t D_001BA040[];
 extern int D_001BA140[];
 
+/* Registers a callback and its argument in the third callback table (at most 64 entries). */
 void func_0027CFD0(fn_t first, int second) {
     int index = D_001B160C[0];
     if (index < 64) {
@@ -209,6 +219,7 @@ void func_0027CFD0(fn_t first, int second) {
     }
 }
 
+/* Calls every callback registered in the third callback table with its argument. */
 void func_0027D020(void) {
     int index;
     for (index = 0; index < D_001B160C[0]; ++index)
@@ -219,6 +230,7 @@ extern int D_001B1638[] __attribute__((sda));
 extern fn_t D_001B1618[] __attribute__((sda));
 extern int D_001B1628[] __attribute__((sda));
 
+/* Registers a callback and its argument in a small callback table (at most 4 entries). */
 void func_0027D098(fn_t callback, int argument) {
     int index = D_001B1638[0];
     if (index < 4) {
@@ -254,6 +266,7 @@ extern unsigned char *func_00288FB8(int);
 
 extern int func_0027FB40(int, int, long, unsigned char *, int);
 
+/* Draws a line of text at a fixed screen position with a value computed from a counter. */
 void func_0027D4B8(void)
 {
     int y;
@@ -298,6 +311,7 @@ extern void func_0027F5B8(int, int, unsigned long, unsigned char *, int);
 extern unsigned int func_001157AC(unsigned char *);
 extern void func_0027EB88(int, int, int, int, int, int);
 
+/* Draws the active subtitle lines whose time range contains the current subtitle time. */
 void func_0027D5C0(void)
 {
     SubtitleRecord *p;
@@ -553,6 +567,7 @@ void func_0027EAE8(int i0, int i1, int i2, int i3, int tag, void *x)
 
 extern void func_0027DE50(int a, int b, int c, int d, unsigned long e);
 
+/* Draws a rectangle outline with a shadow by drawing several offset rectangles. */
 void func_0027EB88(int x, int y, int z, int w, int hi, int lo)
 {
     int c = (hi << 24) | lo;
@@ -568,6 +583,7 @@ void func_0027EB88(int x, int y, int z, int w, int hi, int lo)
 
 extern void func_0027DE50(int a, int b, int c, int d, unsigned long e);
 
+/* Draws a rectangle with a jagged border by drawing several offset rectangles in two colours. */
 void func_0027ECC8(int x, int y, int z, int w, int v)
 {
     int c = (v & 0xFF000000) | 4;

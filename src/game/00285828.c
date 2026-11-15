@@ -8,6 +8,7 @@ extern int ref_L00_002F0E20_02 __attribute__((sda));
 
 extern int ref_L00_002F0E20_03;
 
+/* Stores four values in consecutive level variables. */
 void func_00285828(int first, int second, int third, int fourth)
 {
     ref_L00_002F0E20_00 = first;

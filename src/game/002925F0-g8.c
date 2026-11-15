@@ -33,6 +33,7 @@ extern void func_002FC3C0(s32);
 extern s32 func_002B7C80(s32, s32, s32);
 extern void func_002934F8(s32, s32, void *, s32);
 
+/* Loads entry n of the select table from disc into a buffer, fills the first three table words and starts the block load. */
 void func_002925F0(s32 n) {
     SelectTable *b;
     s32 h;

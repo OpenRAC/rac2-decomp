@@ -33,6 +33,7 @@ extern void func_00282B50(void *, void *, int);
 extern void func_00297730(char *, unsigned char *, int);
 extern void func_00297400(u8 *, u8 *, short *);
 
+/* Sets up the map: fills the per-entry tables (21 entries) with their defaults and unpacks the map data into the scratch buffer. */
 void func_00294F10(void)
 {
     int i;

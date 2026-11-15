@@ -29,6 +29,7 @@ extern s32 func_002B49E0(s32, s32, u32, u32, u8 *);
 
 extern void func_L00_002F4180(BarlowUtilityQueueView *);
 
+/* Releases the resources of param via func_00288B38, clears its first word and clears it with func_00288B18. */
 void func_00288BB8(void *param)
 {
   func_00288B38((int)param);

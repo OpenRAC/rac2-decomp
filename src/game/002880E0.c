@@ -80,6 +80,7 @@ int func_002880E0(int x)
 }
 
 
+/* Adds a value to the first free record of the table unless func_00288188 rejects it or it is already present. */
 void func_00288208(int a0)
 {
     ClassRecord *record;
@@ -198,6 +199,7 @@ int func_002886C8(int id, int value)
     return 0;
 }
 
+/* Returns 1 if value is an id in table D_002403C0 (which ends at id -2), otherwise 0. */
 int func_00288768(int value) {
     int i;
     for (i = 0; D_002403C0[i].id != -2; i++)
@@ -231,6 +233,7 @@ int func_00288870(ClassRecord *dst, int index, int depth)
 
 
 
+/* Clears a five-entry ring buffer: zeroes its counters, fills its entries with 0xCD and sets its flags. */
 void func_002889B8(u8 *a0) {
     *(s32 *)(a0 + 0x30) = 0;
     *(s32 *)(a0 + 0x34) = 0;
@@ -240,6 +243,7 @@ void func_002889B8(u8 *a0) {
     *(s32 *)(a0 + 0x40) = 1;
 }
 
+/* Pops the oldest entry from the five-entry ring buffer into a1 and a2; returns 0 if it is empty. */
 s32 func_00288A00(u8 *a0,s32 *a1,s32 *a2) {
  s32 *values,*flags; s32 idx;
  if(*(s32 *)(a0+0x38)==0) return 0;
@@ -255,6 +259,7 @@ s32 func_00288A00(u8 *a0,s32 *a1,s32 *a2) {
  return 1;
 }
 
+/* Pushes a1 onto the five-entry ring buffer with a flag for whether it is in the range 0x20 to 0xB0; returns 0 if full or blocked. */
 s32 func_00288AA0(u8 *a0,s32 a1) {
  s32 v;
  if(*(s32 *)(a0+0x38)==5 || *(s32 *)(a0+0x44)!=0) return 0;

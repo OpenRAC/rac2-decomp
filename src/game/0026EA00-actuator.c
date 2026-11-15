@@ -11,6 +11,7 @@ typedef struct {
 } WaveChannel;
 extern WaveChannel D_001B5180[8];
 
+/* Counts the active entries of a small scratch table filled for two slots and writes per-slot results to out. */
 int func_0026F810(int *out)
 {
     int scratch[3][4];

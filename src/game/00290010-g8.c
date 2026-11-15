@@ -14,6 +14,7 @@ extern int func_002900B8(void);
 extern void func_0029B7C0(int (*)(void), int (*)(void), int);
 extern float func_002AA340(int *, int, int);
 
+/* Starts or updates a screen overlay of the given mode with two values and an amount. */
 void func_00290010(int mode, int first, int second, float amount)
 {
     if (D_001A9000 == 0 || (D_001A9004 != 2 && mode == 2)) {

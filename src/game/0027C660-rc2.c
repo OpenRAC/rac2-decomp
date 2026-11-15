@@ -29,6 +29,7 @@ extern s8 *D_001B15F8;
 extern void func_0029D0E0(s8 *p);
 extern void func_002FC748(void);
 
+/* Starts a new GIF packet page: records the current buffer position and writes a DMA tag. */
 void func_0027C660(void) {
     s8 *t;
     s8 *v;

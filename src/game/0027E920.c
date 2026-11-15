@@ -18,6 +18,7 @@ typedef struct { u32 tag, address, vif0, vif1; } DmaTag;
 typedef union { DmaTag *tag; int *words; u8 *bytes; int address; } PacketCursor;
 extern PacketCursor ref_0027E920_00;
 extern QuadWord ref_0027E920_01;
+/* Appends a textured, coloured quad to the display list from the given vertices, UVs, colours and texture. */
 void func_0027E920(const s64 *vertices, const int *uv, const int *colors,
                   u64 texture, int enabled)
 {

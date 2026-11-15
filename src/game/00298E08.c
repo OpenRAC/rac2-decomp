@@ -34,6 +34,7 @@ extern void func_002B7C80(int, int, int);
 extern void func_00282AB0(void *, void *, int);
 extern void func_00298D28(char *);
 
+/* Reads the save block from disc into a buffer and restores the memory card data from it. */
 void func_00298E08(void)
 {
     char buf[40];

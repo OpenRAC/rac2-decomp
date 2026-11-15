@@ -31,6 +31,7 @@ extern s8 D_001B9250[];
 extern s32 D_001A7340;
 extern s32 D_001A7344;
 
+/* Projects a world position to screen coordinates and writes the two results to arg1 and arg2. */
 void func_0027C768(s32 arg0, f32 *arg1, f32 *arg2) {
     f32 sp[4];
     s8 *base;

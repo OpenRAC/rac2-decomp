@@ -6,6 +6,7 @@ extern char D_001AC830[];
 extern char *ref_L00_002FA150_00 MACRO_ADDR;
 extern int D_001A7350, D_001A7354, D_001B187C;
 extern u64 func_0028E640(int);
+/* Draws a textured rectangle for the given texture index at the given position and size with the four colours. */
 void func_0028EA58(int texture, int x, int y, int width, int height, int *colors)
 {
     short *pair = (short *)((texture << 2) + (u32)D_001B1890);

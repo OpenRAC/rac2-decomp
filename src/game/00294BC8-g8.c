@@ -18,6 +18,7 @@ typedef struct {
 
 extern Quad16 D_00255ED0[];
 
+/* Returns the address of the record for a0, or an alternating record of two in mode 20. */
 int func_00297F98(int a0)
 {
     if (D_001A79F0 == 20) {

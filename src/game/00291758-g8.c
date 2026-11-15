@@ -9,6 +9,7 @@ extern int D_001D0E00[];
 extern void func_002B65B8(int, int);
 extern void func_002934F8(char *, int, int, int);
 
+/* Registers an object under id in the object tables, or assigns the next free index when object is null. */
 void func_00293890(char *object, int a, int b, int id)
 {
     if (object == 0) {

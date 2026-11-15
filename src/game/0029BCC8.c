@@ -2,6 +2,7 @@
 
 extern int ref_L00_0030CDA0_00;
 
+/* Sets ref_L00_0030CDA0_00 to -1. */
 void func_0029BCC8(void)
 {
     ref_L00_0030CDA0_00 = -1;
@@ -12,6 +13,7 @@ void func_0029BCC8(void)
 extern char *D_001A8CFC;
 extern void func_0034E4D8(void *);
 
+/* Forwards to func_0034E4D8 on the sub-block at offset 0x36F28 of the object D_001A8CFC points to, if that object exists. */
 void func_0029BE88(void) {
     if (D_001A8CFC != 0)
         func_0034E4D8(D_001A8CFC + 0x36F28);
@@ -22,6 +24,7 @@ extern int D_001A9A54 __attribute__((sda));
 extern int D_001A8C64;
 extern void func_0033A6D8(void *);
 
+/* Updates the mission selection menu data in the menu block when the menu is enabled and active. */
 void func_0029BEB8(void) {
     if (D_001A9A50 != 0 && D_001A8C64 == 0 && D_001A9A54 != 0 && D_001A8CFC != 0)
         func_0033A6D8(D_001A8CFC + 0x3F138);
@@ -34,6 +37,7 @@ void func_0029C0D0(void) {
 
 extern void func_0034E478(void *);
 
+/* Forwards to func_0034E478 on the sub-block at offset 0x36F28 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C0D8(void) {
     if (D_001A8CFC != 0)
         func_0034E478(D_001A8CFC + 0x36F28);
@@ -41,6 +45,7 @@ void func_0029C0D8(void) {
 
 extern void func_0034E4F8(void *);
 
+/* Forwards to func_0034E4F8 on the sub-block at offset 0x36F28 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C108(void) {
     if (D_001A8CFC != 0)
         func_0034E4F8(D_001A8CFC + 0x36F28);
@@ -48,6 +53,7 @@ void func_0029C108(void) {
 
 extern void func_00348EC0(void *);
 
+/* Forwards to func_00348EC0 on the sub-block at offset 0x39140 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C138(void) {
     if (D_001A8CFC != 0)
         func_00348EC0(D_001A8CFC + 0x39140);
@@ -55,6 +61,7 @@ void func_0029C138(void) {
 
 extern int func_003489E8(void *, int);
 
+/* Forwards to UpdateMenuChoiceListWidgets on the sub-block at offset 0x39140 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C168(int value) {
     if (D_001A8CFC != 0)
         return func_003489E8(D_001A8CFC + 0x39140, value);
@@ -63,6 +70,7 @@ int func_0029C168(int value) {
 
 extern void func_003478F0(void *);
 
+/* Forwards to func_003478F0 on the sub-block at offset 0x39590 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C1A8(void) {
     if (D_001A8CFC != 0)
         func_003478F0(D_001A8CFC + 0x39590);
@@ -70,6 +78,7 @@ void func_0029C1A8(void) {
 
 extern void func_003465D0(void *);
 
+/* Forwards to func_003465D0 on the sub-block at offset 0x39A98 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C1D8(void) {
     if (D_001A8CFC != 0)
         func_003465D0(D_001A8CFC + 0x39A98);
@@ -77,6 +86,7 @@ void func_0029C1D8(void) {
 
 extern int func_00346C60(void *, int);
 
+/* Forwards to UpdateItemGridMenu on the sub-block at offset 0x39590 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C208(int value) {
     if (D_001A8CFC != 0)
         return func_00346C60(D_001A8CFC + 0x39590, value);
@@ -85,6 +95,7 @@ int func_0029C208(int value) {
 
 extern int func_00345F70(void *, int, int);
 
+/* Forwards to func_00345F70 on the sub-block at offset 0x39A98 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C248(int first, int second)
 {
     if (D_001A8CFC != 0)
@@ -94,6 +105,7 @@ int func_0029C248(int first, int second)
 
 extern int func_00339320(void *, int);
 
+/* Forwards to func_00339320 on the sub-block at offset 0x3B1F0 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C290(int value) {
     if (D_001A8CFC != 0)
         return func_00339320(D_001A8CFC + 0x3B1F0, value);
@@ -102,6 +114,7 @@ int func_0029C290(int value) {
 
 extern void func_00339590(void *);
 
+/* Forwards to func_00339590 on the sub-block at offset 0x3B1F0 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C2D0(void) {
     if (D_001A8CFC != 0)
         func_00339590(D_001A8CFC + 0x3B1F0);
@@ -109,6 +122,7 @@ void func_0029C2D0(void) {
 
 extern int func_00339F28(void *, int);
 
+/* Forwards to func_00339F28 on the sub-block at offset 0x3ADE8 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C300(int value) {
     if (D_001A8CFC != 0)
         return func_00339F28(D_001A8CFC + 0x3ADE8, value);
@@ -117,6 +131,7 @@ int func_0029C300(int value) {
 
 extern void func_0033A3E0(void *);
 
+/* Forwards to func_0033A3E0 on the sub-block at offset 0x3ADE8 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C340(void) {
     if (D_001A8CFC != 0)
         func_0033A3E0(D_001A8CFC + 0x3ADE8);
@@ -124,6 +139,7 @@ void func_0029C340(void) {
 
 extern void func_0033B910(void *);
 
+/* Forwards to func_0033B910 on the sub-block at offset 0x3B490 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C370(void) {
     if (D_001A8CFC != 0)
         func_0033B910(D_001A8CFC + 0x3B490);
@@ -131,6 +147,7 @@ void func_0029C370(void) {
 
 extern int func_0033B540(void *, int);
 
+/* Forwards to func_0033B540 on the sub-block at offset 0x3B490 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C3A0(int value) {
     if (D_001A8CFC != 0)
         return func_0033B540(D_001A8CFC + 0x3B490, value);
@@ -139,6 +156,7 @@ int func_0029C3A0(int value) {
 
 extern void func_0033F030(void *);
 
+/* Forwards to func_0033F030 on the sub-block at offset 0x3B7C0 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C3E0(void) {
     if (D_001A8CFC != 0)
         func_0033F030(D_001A8CFC + 0x3B7C0);
@@ -146,6 +164,7 @@ void func_0029C3E0(void) {
 
 extern int func_0033EA60(void *, int);
 
+/* Forwards to func_0033EA60 on the sub-block at offset 0x3B7C0 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C410(int value) {
     if (D_001A8CFC != 0)
         return func_0033EA60(D_001A8CFC + 0x3B7C0, value);
@@ -154,6 +173,7 @@ int func_0029C410(int value) {
 
 extern void func_00345358(void *);
 
+/* Forwards to func_00345358 on the sub-block at offset 0x39F38 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C450(void) {
     if (D_001A8CFC != 0)
         func_00345358(D_001A8CFC + 0x39F38);
@@ -161,6 +181,7 @@ void func_0029C450(void) {
 
 extern int func_00344478(void *, int);
 
+/* Forwards to func_00344478 on the sub-block at offset 0x39F38 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C480(int value) {
     if (D_001A8CFC != 0)
         return func_00344478(D_001A8CFC + 0x39F38, value);
@@ -169,6 +190,7 @@ int func_0029C480(int value) {
 
 extern void func_00341C20(void *);
 
+/* Forwards to func_00341C20 on the sub-block at offset 0x3BE08 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C4C0(void) {
     if (D_001A8CFC != 0)
         func_00341C20(D_001A8CFC + 0x3BE08);
@@ -176,17 +198,20 @@ void func_0029C4C0(void) {
 
 extern int func_003418C0(void *, int);
 
+/* Forwards to func_003418C0 on the sub-block at offset 0x3BE08 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C4F0(int value) {
     if (D_001A8CFC != 0)
         return func_003418C0(D_001A8CFC + 0x3BE08, value);
     return 0;
 }
 
+/* Forwards to func_00341C20 on the sub-block at offset 0x3BE08 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C530(void) {
     if (D_001A8CFC != 0)
         func_00341C20(D_001A8CFC + 0x3BE08);
 }
 
+/* Forwards to func_003418C0 on the sub-block at offset 0x3BE08 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C560(int value) {
     if (D_001A8CFC != 0)
         return func_003418C0(D_001A8CFC + 0x3BE08, value);
@@ -195,6 +220,7 @@ int func_0029C560(int value) {
 
 extern void func_003438E8(void *);
 
+/* Forwards to func_003438E8 on the sub-block at offset 0x3C108 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C5A0(void) {
     if (D_001A8CFC != 0)
         func_003438E8(D_001A8CFC + 0x3C108);
@@ -202,6 +228,7 @@ void func_0029C5A0(void) {
 
 extern int func_00343798(void *, int);
 
+/* Forwards to func_00343798 on the sub-block at offset 0x3C108 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C5D0(int value) {
     if (D_001A8CFC != 0)
         return func_00343798(D_001A8CFC + 0x3C108, value);
@@ -210,6 +237,7 @@ int func_0029C5D0(int value) {
 
 extern void func_0033E620(void *);
 
+/* Forwards to func_0033E620 on the sub-block at offset 0x3C440 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C610(void) {
     if (D_001A8CFC != 0)
         func_0033E620(D_001A8CFC + 0x3C440);
@@ -217,6 +245,7 @@ void func_0029C610(void) {
 
 extern int func_0033E5C0(void *, int);
 
+/* Forwards to func_0033E5C0 on the sub-block at offset 0x3C440 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C640(int value) {
     if (D_001A8CFC != 0)
         return func_0033E5C0(D_001A8CFC + 0x3C440, value);
@@ -225,6 +254,7 @@ int func_0029C640(int value) {
 
 extern void func_0033D970(void *);
 
+/* Forwards to func_0033D970 on the sub-block at offset 0x3CDB0 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C680(void) {
     if (D_001A8CFC != 0)
         func_0033D970(D_001A8CFC + 0x3CDB0);
@@ -232,6 +262,7 @@ void func_0029C680(void) {
 
 extern int func_0033D868(void *, int);
 
+/* Forwards to func_0033D868 on the sub-block at offset 0x3CDB0 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C6B0(int value) {
     if (D_001A8CFC != 0)
         return func_0033D868(D_001A8CFC + 0x3CDB0, value);
@@ -240,6 +271,7 @@ int func_0029C6B0(int value) {
 
 extern int func_0033C590(void *, int);
 
+/* Forwards to UpdateFourOptionMenuInput on the sub-block at offset 0x3D060 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C6F0(int value) {
     if (D_001A8CFC != 0)
         return func_0033C590(D_001A8CFC + 0x3D060, value);
@@ -248,6 +280,7 @@ int func_0029C6F0(int value) {
 
 extern void func_0033C738(void *);
 
+/* Forwards to func_0033C738 on the sub-block at offset 0x3D060 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C730(void) {
     if (D_001A8CFC != 0)
         func_0033C738(D_001A8CFC + 0x3D060);
@@ -255,6 +288,7 @@ void func_0029C730(void) {
 
 extern int func_0033CB18(void *, int);
 
+/* Forwards to func_0033CB18 on the sub-block at offset 0x3D310 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C760(int value) {
     if (D_001A8CFC != 0)
         return func_0033CB18(D_001A8CFC + 0x3D310, value);
@@ -263,6 +297,7 @@ int func_0029C760(int value) {
 
 extern void func_0033CC20(void *);
 
+/* Forwards to func_0033CC20 on the sub-block at offset 0x3D310 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C7A0(void) {
     if (D_001A8CFC != 0)
         func_0033CC20(D_001A8CFC + 0x3D310);
@@ -270,6 +305,7 @@ void func_0029C7A0(void) {
 
 extern int func_0033D5A0(void *, int);
 
+/* Forwards to func_0033D5A0 on the sub-block at offset 0x3D900 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C7D0(int value) {
     if (D_001A8CFC != 0)
         return func_0033D5A0(D_001A8CFC + 0x3D900, value);
@@ -278,6 +314,7 @@ int func_0029C7D0(int value) {
 
 extern void func_0033D638(void *);
 
+/* Forwards to func_0033D638 on the sub-block at offset 0x3D900 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C810(void) {
     if (D_001A8CFC != 0)
         func_0033D638(D_001A8CFC + 0x3D900);
@@ -285,6 +322,7 @@ void func_0029C810(void) {
 
 extern int func_0033BE98(void *, int);
 
+/* Forwards to func_0033BE98 on the sub-block at offset 0x3DBB0 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C840(int value) {
     if (D_001A8CFC != 0)
         return func_0033BE98(D_001A8CFC + 0x3DBB0, value);
@@ -293,6 +331,7 @@ int func_0029C840(int value) {
 
 extern void func_0033C028(void *);
 
+/* Forwards to func_0033C028 on the sub-block at offset 0x3DBB0 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C880(void) {
     if (D_001A8CFC != 0)
         func_0033C028(D_001A8CFC + 0x3DBB0);
@@ -300,6 +339,7 @@ void func_0029C880(void) {
 
 extern int func_0033C2D8(void *, int);
 
+/* Forwards to func_0033C2D8 on the sub-block at offset 0x3DE60 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C8B0(int value) {
     if (D_001A8CFC != 0)
         return func_0033C2D8(D_001A8CFC + 0x3DE60, value);
@@ -308,6 +348,7 @@ int func_0029C8B0(int value) {
 
 extern void func_0033C378(void *);
 
+/* Forwards to func_0033C378 on the sub-block at offset 0x3DE60 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C8F0(void) {
     if (D_001A8CFC != 0)
         func_0033C378(D_001A8CFC + 0x3DE60);
@@ -315,6 +356,7 @@ void func_0029C8F0(void) {
 
 extern int func_0033E3A0(void *, int);
 
+/* Forwards to func_0033E3A0 on the sub-block at offset 0x3EDB8 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C920(int value) {
     if (D_001A8CFC != 0)
         return func_0033E3A0(D_001A8CFC + 0x3EDB8, value);
@@ -323,6 +365,7 @@ int func_0029C920(int value) {
 
 extern void func_0033E428(void *);
 
+/* Forwards to func_0033E428 on the sub-block at offset 0x3EDB8 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C960(void) {
     if (D_001A8CFC != 0)
         func_0033E428(D_001A8CFC + 0x3EDB8);
@@ -330,6 +373,7 @@ void func_0029C960(void) {
 
 extern int func_0033D028(void *, int);
 
+/* Forwards to func_0033D028 on the sub-block at offset 0x3D5C0 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029C990(int value) {
     if (D_001A8CFC != 0)
         return func_0033D028(D_001A8CFC + 0x3D5C0, value);
@@ -338,6 +382,7 @@ int func_0029C990(int value) {
 
 extern void func_0033D2C0(void *);
 
+/* Forwards to func_0033D2C0 on the sub-block at offset 0x3D5C0 of the object D_001A8CFC points to, if that object exists. */
 void func_0029C9D0(void) {
     if (D_001A8CFC != 0)
         func_0033D2C0(D_001A8CFC + 0x3D5C0);
@@ -345,6 +390,7 @@ void func_0029C9D0(void) {
 
 extern int func_0033DC30(void *, int);
 
+/* Forwards to func_0033DC30 on the sub-block at offset 0x3E5A8 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029CA00(int value) {
     if (D_001A8CFC != 0)
         return func_0033DC30(D_001A8CFC + 0x3E5A8, value);
@@ -353,6 +399,7 @@ int func_0029CA00(int value) {
 
 extern void func_0033DCC8(void *);
 
+/* Forwards to func_0033DCC8 on the sub-block at offset 0x3E5A8 of the object D_001A8CFC points to, if that object exists. */
 void func_0029CA40(void) {
     if (D_001A8CFC != 0)
         func_0033DCC8(D_001A8CFC + 0x3E5A8);
@@ -360,6 +407,7 @@ void func_0029CA40(void) {
 
 extern int func_003424C0(void *, int);
 
+/* Forwards to func_003424C0 on the sub-block at offset 0x3E1D8 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029CA70(int value) {
     if (D_001A8CFC != 0)
         return func_003424C0(D_001A8CFC + 0x3E1D8, value);
@@ -368,6 +416,7 @@ int func_0029CA70(int value) {
 
 extern void func_00342758(void *);
 
+/* Forwards to func_00342758 on the sub-block at offset 0x3E1D8 of the object D_001A8CFC points to, if that object exists. */
 void func_0029CAB0(void) {
     if (D_001A8CFC != 0)
         func_00342758(D_001A8CFC + 0x3E1D8);
@@ -375,6 +424,7 @@ void func_0029CAB0(void) {
 
 extern int func_00341EE8(void *, int);
 
+/* Forwards to func_00341EE8 on the sub-block at offset 0x3E430 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029CAE0(int value) {
     if (D_001A8CFC != 0)
         return func_00341EE8(D_001A8CFC + 0x3E430, value);
@@ -383,6 +433,7 @@ int func_0029CAE0(int value) {
 
 extern void func_00341F38(void *);
 
+/* Forwards to func_00341F38 on the sub-block at offset 0x3E430 of the object D_001A8CFC points to, if that object exists. */
 void func_0029CB20(void) {
     if (D_001A8CFC != 0)
         func_00341F38(D_001A8CFC + 0x3E430);
@@ -391,6 +442,7 @@ void func_0029CB20(void) {
 
 extern void func_0028A2F8(void);
 
+/* Calls UpdateBoltCounter if the menu object exists. */
 void func_0029CB58(void) {
     if (D_001A8CFC != 0)
         func_0028A2F8();
@@ -398,6 +450,7 @@ void func_0029CB58(void) {
 
 extern void func_0028A670(void);
 
+/* Calls DrawBoltCounterDeltas if the menu object exists. */
 void func_0029CB80(void) {
     if (D_001A8CFC != 0)
         func_0028A670();
@@ -405,6 +458,7 @@ void func_0029CB80(void) {
 
 extern void func_0034CE98(void *, int);
 
+/* Forwards to func_0034CE98 on the sub-block at offset 0x376C8 of the object D_001A8CFC points to, if that object exists. */
 void func_0029CBA8(int value) {
     if (D_001A8CFC != 0)
         func_0034CE98(D_001A8CFC + 0x376C8, value);
@@ -412,6 +466,7 @@ void func_0029CBA8(int value) {
 
 extern int func_0033FB98(void *, int);
 
+/* Forwards to func_0033FB98 on the sub-block at offset 0x3A388 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029CBE0(int value) {
     if (D_001A8CFC != 0)
         return func_0033FB98(D_001A8CFC + 0x3A388, value);
@@ -420,6 +475,7 @@ int func_0029CBE0(int value) {
 
 extern void func_00340250(void *);
 
+/* Forwards to func_00340250 on the sub-block at offset 0x3A388 of the object D_001A8CFC points to, if that object exists. */
 void func_0029CC20(void) {
     if (D_001A8CFC != 0)
         func_00340250(D_001A8CFC + 0x3A388);
@@ -430,6 +486,7 @@ void func_0029CC50(int a0, int a1, int a2) { if (D_001A8CFC != 0) func_00338718(
 
 extern void func_003387A0(void *, int, int);
 
+/* Forwards to func_003387A0 on the sub-block at offset 0x36F28 of the object D_001A8CFC points to, if that object exists. */
 void func_0029CC98(int first, int second) {
     if (D_001A8CFC != 0)
         func_003387A0(D_001A8CFC + 0x36F28, first, second);
@@ -437,17 +494,20 @@ void func_0029CC98(int first, int second) {
 
 extern void func_00338040(void *, int, int);
 
+/* Forwards to func_00338040 on the sub-block at offset 0x36F28 of the object D_001A8CFC points to, if that object exists. */
 void func_0029CCD8(int first, int second) {
     if (D_001A8CFC != 0)
         func_00338040(D_001A8CFC + 0x36F28, first, second);
 }
 
+/* Empty function; does nothing. */
 void func_0029CD18(void) {
 }
 
 extern int D_001A7B90[] __attribute__((sda));
 extern void func_00335DC0(int);
 
+/* Calls func_00335DC0 with whether D_001A7B90 is non-zero. */
 void func_0029CD20(void) {
     func_00335DC0(D_001A7B90[0] != 0);
 }
@@ -472,6 +532,7 @@ void func_0029CE38(void)
 
 extern void func_003399B0(void *);
 
+/* Forwards to func_003399B0 on the sub-block at offset 0x3CAA8 of the object D_001A8CFC points to, if that object exists. */
 void func_0029CED8(void) {
     if (D_001A8CFC != 0)
         func_003399B0(D_001A8CFC + 0x3CAA8);
@@ -479,6 +540,7 @@ void func_0029CED8(void) {
 
 extern int func_003398A8(void *, int);
 
+/* Forwards to func_003398A8 on the sub-block at offset 0x3CAA8 of the object D_001A8CFC points to, if that object exists. Returns its result, or 0. */
 int func_0029CF08(int value) {
     if (D_001A8CFC != 0)
         return func_003398A8(D_001A8CFC + 0x3CAA8, value);
@@ -577,6 +639,7 @@ L11:
 extern int D_001397C4[];
 extern unsigned char D_001395D5[];
 
+/* Returns 1 if D_001397C4 is negative and D_001395D5 is non-zero, otherwise 0. */
 int func_0029DCD0(void) {
     if (D_001397C4[0] < 0) {
         if (D_001395D5[0] != 0)

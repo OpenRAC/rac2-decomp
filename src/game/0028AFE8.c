@@ -16,6 +16,7 @@ extern int D_001B1888[];
 extern int D_001B1894[];
 extern int D_001B1898[];
 
+/* Resets the entries of HUD group n in the group table. */
 void func_0028AFE8(int n) {
     int off = ((GroupTable *)D_001B1888[0])->c[n];
     int i;

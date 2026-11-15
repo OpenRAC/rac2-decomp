@@ -38,6 +38,7 @@ typedef unsigned char u8;
 
 typedef unsigned int u32;
 
+/* Empty function; does nothing. */
 void func_00288D88(void)
 {
 }
@@ -52,6 +53,7 @@ typedef struct {
 
 extern SubtitleState D_00254E78;
 
+/* Ends the active entry: depending on its state, moves it to the closing state and resets its timer. */
 void func_00288D90(void)
 {
     switch (D_00254E78.active) {
@@ -87,6 +89,7 @@ typedef struct { unsigned short key; char reserved02[10]; } SelectorRow;
 extern SelectorState ref_L00_00288E18_00;
 extern SelectorOwner D_001A63A8;
 extern SelectorRow D_0018C958[];
+/* Starts the selector with the given key and selection if it and the other selector are idle and the selection is valid; returns whether it started. */
 int func_00288E18(int key, int selection)
 {
     SelectorState *state = &ref_L00_00288E18_00;
@@ -109,6 +112,7 @@ typedef struct { char pad00[0x2A20]; int unk2A20[1]; } DiscToc;
 extern TextEntry *D_001B1840 __attribute__((sda));
 extern DiscToc D_0014B540;
 
+/* Per-frame update of the active entry: tracks the index of the current item and updates the selector state accordingly. */
 void func_00288EA0(void)
 {
     int idx;
@@ -143,6 +147,7 @@ void func_00289AA0(void)
 
 extern short D_00254EC8[][2];
 
+/* Searches the 170-row table for key in column field and returns its row, writing the other column to out if out is set; returns -1 if not found. */
 int func_00289FC8(short key, int field, unsigned short *out)
 {
     int i;
@@ -161,6 +166,7 @@ extern unsigned char D_0018D0E8[];
 extern int D_001A7C04_sda __attribute__((sda));
 extern int D_001A7C04[] __attribute__((sda));
 
+/* Removes the entry for id from the list D_0018D0E8, shifting the later entries down and decrementing the count. */
 void func_0028A030(short id)
 {
     int val = func_00289FC8(id, 1, 0);
@@ -364,6 +370,7 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
+/* Draws the counter rows with their change amounts, fading and scaling each text by its state. */
 void func_0028A670(void)
 {
     char text[16];
@@ -581,6 +588,7 @@ void func_0028ACB0(int mode)
 extern int D_001A7308 __attribute__((section(".sdata")));
 extern void func_0028F948(unsigned int, int, int, int, int, int);
 
+/* Sends the pages of the resident HUD texture bank to the GS, sizing each page from its width and height log2. */
 void func_0028B160(int bank, int base, int immediate)
 {
     struct HudTexCounts *counts;
@@ -623,6 +631,7 @@ extern char *D_001BAF3C;
 extern char * volatile D_001B1880 __attribute__((sda));
 extern char * volatile D_001B1884 __attribute__((sda));
 
+/* Initialises the HUD allocator: sets its start at D_001BAF3C and its end 0x64000 bytes later. */
 void func_0028B288(void)
 {
     char *p = D_001BAF3C;
@@ -630,6 +639,7 @@ void func_0028B288(void)
     D_001B1884 = p + 0x64000;
 }
 
+/* Allocates size bytes (rounded up to 16) from the HUD allocator, or returns 0 if it does not fit. */
 char *func_0028B2B8(int size)
 {
     char *end;
@@ -672,6 +682,7 @@ typedef struct { unsigned char pad00[0x64]; int key; unsigned char pad68[0x28]; 
 extern SearchRow_28B5D0 D_00255330[];
 extern void func_0028B3D0(int, int, int, int, int, int, int);
 
+/* Resets all 13 HUD slot records. */
 void func_0028B540(void)
 {
     char *row = (char *)D_00255330;
@@ -688,6 +699,7 @@ void func_0028B540(void)
     } while (i < 13);
 }
 
+/* Finds the HUD slot whose key matches and resets it; returns whether it was found. */
 int func_0028B5D0(int key)
 {
     int i;
@@ -718,6 +730,7 @@ void func_0028B6C8(int key, unsigned int value)
     }
 }
 
+/* Adjusts x and y by the element's size according to its alignment flags to get its screen position. */
 int func_0028B740(HudElem *rec, int *x, int *y) {
     int w = rec->w;
     int h = rec->h;
@@ -743,6 +756,7 @@ extern float ref_L00_002F6FB8_01[];
 extern float func_00283CE0(int);
 extern int func_00283CF0(float);
 
+/* Computes the animated screen offset of an element from its flags, scale and index plus delta, and adds it to x and y. */
 void func_0028B7A8(HudElem *t1, int *x, int *y, int index, int delta)
 {
     float scale;
@@ -779,6 +793,7 @@ void func_0028B7A8(HudElem *t1, int *x, int *y, int index, int delta)
     *y += dy;
 }
 
+/* Initialises an element's counter display from the value its pointer refers to, clamped to its maximum, and counts its digits. */
 void func_0028B950(u8 *a0) {
     s32 *value=*(s32 **)(a0+0xc);
     s32 digits;
@@ -809,6 +824,7 @@ void func_0028BA50(HudElem *a0) { a0->unk7C = 0xD2; a0->unk48 = 0; a0->unk4A = 0
 extern float func_00282C10(float);
 extern void func_0028DF80(void *);
 
+/* Updates an element's displayed value toward its target value and sets its display timer when it changes. */
 void func_0028BA88(HudElem *p)
 {
     unsigned char *c = p->cnt;
@@ -859,6 +875,7 @@ void func_0028BA88(HudElem *p)
 extern void func_0029CCD8(int, int);
 extern void func_002B0CE0(int, int, int);
 
+/* Calls func_0029CCD8(arg, 1) and then ForceClaimNotice(13, 0, 1). */
 void func_0028BCA0(int arg) {
     func_0029CCD8(arg, 1);
     func_002B0CE0(13, 0, 1);

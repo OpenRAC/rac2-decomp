@@ -85,6 +85,7 @@ extern void func_002E10B8(void);
 extern void func_0029FEE0(void);
 extern void func_00279FF0(void);
 
+/* Renders one frame: runs the scene, effect and packet passes in order. */
 void func_0027BD70(void)
 {
     char text[64];

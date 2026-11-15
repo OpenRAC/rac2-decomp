@@ -91,6 +91,7 @@ extern unsigned int ref_L00_00309798_00;
 
 extern int ref_L00_00309798_02;
 
+/* Memory card state callback: clears flag bit 0x20 and, when mode is 2, picks the next state from the selector. */
 void func_002983D0(void)
 {
     ref_L00_003095C8_01 &= ~0x20;
@@ -109,6 +110,7 @@ void func_002983D0(void)
         ref_L00_003095C8_02 = 5;
 }
 
+/* Memory card state callback: goes to state 3 unless the selector is -2, or to state 6 when flags are set. */
 void func_00298440(void)
 {
     if (ref_L00_00309638_02.selector_10 != -2) {
@@ -119,6 +121,7 @@ void func_00298440(void)
         ref_L00_00309638_03 = 6;
 }
 
+/* Memory card state callback: picks state 3, 5 or 23 from the selector and flag bit 0x20. */
 void func_00298490(void)
 {
     if (ref_L00_00309688_02.selector_10 != -2) {
@@ -139,6 +142,7 @@ void func_00298490(void)
     }
 }
 
+/* Memory card state callback: clears the selector, sets the selection to 3 if it is negative and goes to state 8. */
 void func_00298510(void)
 {
     ref_L00_00309708_00.selector_10 = 0;
@@ -149,6 +153,7 @@ void func_00298510(void)
     ref_L00_00309708_01 = 8;
 }
 
+/* Memory card state callback: when the mode is 2 and the selection is negative, goes to state 17 or 14 depending on a field. */
 void func_00298540(void)
 {
     if (ref_L00_00309738_00.mode_15c != 2 || ref_L00_00309738_00.selected_164 >= 0)
@@ -161,6 +166,7 @@ void func_00298540(void)
     ref_L00_00309738_02 = 14;
 }
 
+/* Memory card state callback: goes to state 3, 10 or 25 depending on the selector and flag bits. */
 void func_002985A0(void)
 {
     if (ref_L00_00309798_01.selector_10 != 0) {

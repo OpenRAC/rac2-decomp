@@ -23,6 +23,7 @@ extern s32 D_001A8BB0;
 extern s32 D_001A8630 __attribute__((sda));
 extern DebugMarks D_001B7600;
 
+/* Queues a debug mark for a moby (up to six per frame) with its scale, colour, type and size. */
 void func_00273318(void *moby, f32 scale, u32 color, void *pos, s32 type, f32 size, s32 arg, f32 angle, s32 unused) {
     DebugMark *e;
 

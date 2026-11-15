@@ -17,6 +17,7 @@ extern int D_001B1598_GP SDATA(D_001B1598);
 extern PacketCursor ref_0027D330_00;
 extern char D_00138990[];
 
+/* Fades the screen to black over the given number of frames, drawing one frame per step. */
 void func_0027D330(int frames)
 {
     int i;

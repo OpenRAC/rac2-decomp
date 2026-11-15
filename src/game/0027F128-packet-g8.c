@@ -15,6 +15,7 @@ extern void func_002FC410(void *, int);
 extern void func_00283788(void *, void *, void *);
 extern void func_002FC870(void);
 
+/* Sets up the VU1 state for font drawing: builds a scale matrix with the camera position and queues the font program once. */
 void func_00280328(void) {
     float m[16];
     char *cam;

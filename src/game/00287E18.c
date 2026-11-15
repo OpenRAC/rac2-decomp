@@ -26,6 +26,7 @@ void func_00287E18(void) {
     }
 }
 
+/* Returns whether D_001BACC0 equals 7. */
 int func_00287E48(void)
 {
     return D_001BACC0 == 7;

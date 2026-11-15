@@ -26,6 +26,7 @@
 extern f32 *func_00297F98(s32);
 extern s32 D_001A79F0;
 
+/* Maps fparg0 and fparg1 through the record of the given (or current) level and writes the results to arg0 and arg1. */
 void func_00297FE8(f32 fparg0, f32 fparg1, f32 *arg0, f32 *arg1, s32 arg2) {
     f32 *temp_s1;
     f32 *temp_s1_2;

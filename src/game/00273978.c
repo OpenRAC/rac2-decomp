@@ -5,6 +5,7 @@ extern void func_00282D30(void *, void *, float);
 extern void func_00282CF0(void *, void *, void *);
 extern void func_002AFDD8(void *, void *, void *, int);
 extern void func_0029F6A0(void *, int, void *);
+/* Initialises an object's attached effect block from two vectors and an angle, setting its flags and default parameters. */
 void func_00273978(char *obj, int mode, int index, void *a, void *b, unsigned char tag, float angle) {
     char *p;
     float local[4];

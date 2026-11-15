@@ -74,6 +74,7 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
     return result;
 }
 
+/* Draws the bar overlay each frame, with a pulse, scale and text, while it is active. */
 int func_002900B8(void)
 {
     float saved;

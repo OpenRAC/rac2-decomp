@@ -5,6 +5,7 @@ extern char D_L00_001B8C80[];
 extern void func_00282F20(float *, float *, float);
 extern void func_00270B58(float *, float *, float *, float *, float *, float *);
 
+/* Normalises the hero's vectors and fills the camera block with them for the current frame. */
 void func_00270D50(void)
 {
     Vector first;

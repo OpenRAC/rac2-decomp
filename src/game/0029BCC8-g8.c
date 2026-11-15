@@ -22,6 +22,7 @@ typedef struct {
     Slot slot2[2];
 } Sub;
 
+/* Per-frame update of the menu objects: updates the mission selection menu and then runs the callbacks of each active state. */
 void func_0029BCD8(void)
 {
     int i;
@@ -101,6 +102,7 @@ typedef struct { char pad[0xB0]; float scale; } CamBf;
 /* The camera object: its projection scale is at +0xB0. */
 extern CamBf ref_L00_0030CFE0_01;
 
+/* Per-frame draw of the menu objects: runs the callbacks of each active state unless drawing is disabled. */
 void func_0029BF08(void)
 {
     int result;
@@ -184,6 +186,7 @@ extern State29D830 D_001B1A50[] __attribute__((sda));
 extern unsigned char D_001A7BE8[] MACRO_ADDR;
 extern int func_0029D9D0(int, int);
 
+/* Marks the entries of the current list as active or not and returns whether any entry is active. */
 int func_0029D830(void)
 {
     Entry29D830 *e;

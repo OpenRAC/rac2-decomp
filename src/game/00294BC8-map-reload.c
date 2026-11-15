@@ -24,6 +24,7 @@ typedef struct {
 } MapToc;
 extern MapToc D_0014B540;
 
+/* Reloads the map data: rebuilds the buffers in the arena from the stored sizes and offsets. */
 void func_002954C0(void)
 {
     int *arena;

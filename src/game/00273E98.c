@@ -19,6 +19,7 @@ extern int func_002E5F00(int, char *);
 extern void func_00283028(void *, void *, void *);
 extern float D_001BAFC0[];
 
+/* Moves an object toward a target: computes the offset, steps along it with a correction and plays a sound; returns a status. */
 int func_00273E98(char *object)
 {
     float delta[4];

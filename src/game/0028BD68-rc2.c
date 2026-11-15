@@ -26,6 +26,7 @@
 extern s32 D_001A73B8[];
 extern s32 *D_001B18D4;
 
+/* Compares the eight stored values with the current ones and updates the ones that changed. */
 void func_0028BD68(void) {
     s32 i;
     s32 *var_a0;

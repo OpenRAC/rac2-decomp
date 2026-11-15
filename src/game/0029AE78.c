@@ -30,6 +30,7 @@ extern int D_L00_001A904C_6 __attribute__((sda));
 
 extern void func_003380B0(int *p, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10);
 
+/* Returns the size in bytes of a save table, walking its entries until the terminating zero entry. */
 s32 func_0029AE78(s32 *a0) {
  s32 n=8;
  while(a0[0]!=0) {
@@ -41,6 +42,7 @@ s32 func_0029AE78(s32 *a0) {
 
 extern int D_00256138[];
 
+/* Computes a CRC (polynomial 0xEDB88320) over length bytes of data; returns 0 if length exceeds the save data size. */
 int func_0029AEB0(char *data, int length)
 {
     char *end;
@@ -64,6 +66,7 @@ int func_0029AEB0(char *data, int length)
     return crc & 0xFFFF;
 }
 
+/* Checks a save packet: returns whether the CRC of its data matches the expected value stored in its header. */
 int func_0029AF58(char *a0)
 {
     extern int func_0029AEB0(char *, int);
@@ -75,6 +78,7 @@ int func_0029AF58(char *a0)
     return result;
 }
 
+/* Writes the records of a save table (shifted by mult times the second field) into out and returns the number of bytes written. */
 int func_0029AF98(char *out, int mult, int *recs)
 {
     int off = 0;
@@ -136,6 +140,7 @@ void func_0029B0B0(char *src, int slot, int entry)
 extern char *D_001A8CFC[] __attribute__((sda));
 extern void func_0034CE28(void *, int);
 
+/* Forwards to func_0034CE28 on the sub-block at offset 0x376C8 of the object D_001A8CFC points to, if that object exists. */
 void func_0029B698(int value) {
     if (D_001A8CFC[0] != 0)
         func_0034CE28(D_001A8CFC[0] + 0x376C8, value);
@@ -143,6 +148,7 @@ void func_0029B698(int value) {
 
 extern void func_0034CAE8(void *, int, int);
 
+/* Forwards to func_0034CAE8 on the sub-block at offset 0x376C8 of the object D_001A8CFC points to, if that object exists. */
 void func_0029B6D0(int first, int second) {
     if (D_001A8CFC[0] != 0)
         func_0034CAE8(D_001A8CFC[0] + 0x376C8, first, second);
@@ -151,6 +157,7 @@ void func_0029B6D0(int first, int second) {
 
 extern void func_0034B000(void *, int);
 
+/* Forwards to func_0034B000 on the sub-block at offset 0x37EB0 of the object D_001A8CFC points to, if that object exists. */
 void func_0029B720(int value) {
     if (D_001A8CFC[0] != 0)
         func_0034B000(D_001A8CFC[0] + 0x37EB0, value);
@@ -166,6 +173,7 @@ void func_0029B758(BatchA_A08_s32 a0, BatchA_A08_s32 a1) {
     p[0x736C/4] = a1;
 }
 
+/* Returns 1 if either of two state words in the menu block is non-zero, otherwise 0. */
 int func_0029B780(void) {
     int base = D_L00_001A904C[0];
     if (base != 0) {
@@ -180,6 +188,7 @@ int func_0029B780(void) {
 
 extern void func_0034E4B8(void *);
 
+/* Forwards to func_0034E4B8 on the sub-block at offset 0x36F28 of the object D_001A8CFC points to, if that object exists. */
 void func_0029B858(void) {
     if (D_001A8CFC[0] != 0)
         func_0034E4B8(D_001A8CFC[0] + 0x36F28);

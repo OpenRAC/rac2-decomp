@@ -21,6 +21,7 @@ extern Def70838 *D_001B1504 __attribute__((section(".sdata")));
 extern char *D_001B1380 __attribute__((section(".sdata")));
 extern char D_00189E20[], D_00189EA0[];
 extern int func_002ACBC8(void *, int);
+/* Decides whether the current camera may be replaced by the other one, comparing priorities through the per-type callback. */
 int func_00270838(unsigned char *cur, unsigned char *other) {
     unsigned char *state = (unsigned char *)cur+0x74;
     if ((unsigned char)cur[0x7c]==0) return 0;

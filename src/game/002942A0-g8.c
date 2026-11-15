@@ -34,6 +34,7 @@ extern s32 func_002B7BC0();
 extern void func_00294130();
 extern void func_00294180();
 
+/* Queues loading of table entry a0 into slot a1 unless another load is in progress; returns the result. */
 s32 func_002942A0(s32 a0, s32 a1, s32 a2, s32 a3) {
     s32 t;
     if (D_0014B540.el[a0].f8 != 0) {

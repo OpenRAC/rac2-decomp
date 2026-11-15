@@ -8,6 +8,7 @@
 extern u8 D_0019B4A8[][0x400];
 extern int D_001A79F0 __attribute__((sda));
 
+/* Returns a percentage of a1 taken from a small table indexed by the current mode and a2. */
 int func_00279B70(u8 *a0, int a1, int a2)
 {
     int c = D_0019B4A8[D_001A79F0][a2 >> 1];

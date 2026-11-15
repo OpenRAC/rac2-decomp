@@ -24,6 +24,7 @@ typedef struct {
 
 extern u32 D_00139768[];
 
+/* Calls func_002889B8 on the owner to clear it. */
 void func_00288B18(void *owner)
 {
     func_002889B8(owner);

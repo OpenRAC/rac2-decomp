@@ -28,6 +28,7 @@ extern s32 D_001A7290 __attribute__((nosda));
 extern s32 D_001A72C0 __attribute__((nosda));
 extern s32 D_00152C00[];
 
+/* Resets four slot indexes and a counter to -1 or 0. */
 void func_0029B628(void) {
     s32 *p;
 

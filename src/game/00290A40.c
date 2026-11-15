@@ -44,6 +44,7 @@ extern int func_0011AFE0(Request_290AB0 *, int);
 extern int func_0011AFC0(int);
 extern int func_0011ED08(int, int, int);
 
+/* Copies length bytes from source to destination with a DMA request and waits for it to finish; returns 1 on success. */
 int func_00290AB0(int source, int destination, int length)
 {
     Request_290AB0 request;
@@ -62,6 +63,7 @@ int func_00290AB0(int source, int destination, int length)
     return result;
 }
 
+/* Initialises the memory slot table at D_001BAEC0: clears it and sets the slot bounds from the level data and D_001B22B0. */
 void func_00290B48(void)
 {
     int *state = (int *)D_001BAEC0;
@@ -278,6 +280,7 @@ void func_00290C60(void)
     func_002889B8(D_001BAD40);
 }
 
+/* Calls func_00278EB0 and returns. */
 void func_00291108(void)
 {
   func_00278EB0();
@@ -286,6 +289,7 @@ void func_00291108(void)
 
 extern void func_00278F80(void);
 
+/* Calls func_00278F80. */
 void func_00291128(void) {
     func_00278F80();
 }
@@ -326,6 +330,7 @@ extern char D_001C2B40[];
 extern char D_001C2C40[];
 extern void func_00282A88(void *, int);
 
+/* Finds a free light slot (of 8) and fills it with the given position, range, radius and colour; returns its index or -1 if none is free. */
 int func_00291308(float *position, float range, float radius, int color)
 {
     LightDef *def;
@@ -360,6 +365,7 @@ extern void func_00282A88(void *, int);
 extern char D_001C2B40[];
 extern char D_001C2C40[];
 
+/* Frees light slot index (0 to 7) and clears its two records. */
 void func_00291450(int index) {
     if ((unsigned int)index >= 8)
         return;

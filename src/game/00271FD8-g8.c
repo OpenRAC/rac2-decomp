@@ -19,6 +19,7 @@ extern int D_001B1514 __attribute__((section(".sdata")));
 extern int D_001B150C __attribute__((sda));
 extern int D_001A79F0 __attribute__((section(".sdata")));
 extern float D_001B5348[];
+/* Updates the follow camera state from the hero state, setting the camera distance and related values by mode. */
 void func_00271FD8(void) {
     HeroView *p = &D_00189E20;
     char *s = D_001B53A0;

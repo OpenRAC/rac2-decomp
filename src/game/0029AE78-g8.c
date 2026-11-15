@@ -9,6 +9,7 @@ extern void func_00349490(void *, int);
 extern void func_0033AA00(void *,void *,void *);
 extern void func_0033A9C8(void *,float);
 extern void func_0033A9E0(void *,int);
+/* Starts or stops the menu data depending on a game check, loading its data when it is enabled. */
 void func_0029BA58(void) {
  int enabled;
  if (D_001A8CFC[0] != 0) {

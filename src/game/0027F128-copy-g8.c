@@ -12,6 +12,7 @@ extern void func_00285708(int, int, int, int, void *);
 extern void func_001244B8(int, int);
 extern void func_00280670(void *, int);
 
+/* Walks the queued framebuffer copy entries and copies each region between the two buffers, retiring entries when their pass completes. */
 void func_00280710(void) {
     u8 *buffers[2];
     int current, next, i, index;

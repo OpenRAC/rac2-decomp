@@ -77,6 +77,7 @@ extern char *D_001B18DC;
 extern int D_001B18E0;
 extern int D_001B18E4;
 
+/* Switches between the two moby contexts when the requested one is not the current one, swapping the stored pointers and counts. */
 void func_0028B338(int requested)
 {
     int state = D_001A8D44;
@@ -105,6 +106,7 @@ void func_0028B338(int requested)
     }
 }
 
+/* Sets up or refreshes one of 16 slot records (0x90 bytes each) with an id, callback and four values; returns 0 if it is refused. */
 int func_0028B3D0(int slot, int id, int callback, int value1, int value2, int value3, int value4)
 {
     int index = slot & 15;

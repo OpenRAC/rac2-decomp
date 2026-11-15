@@ -8,6 +8,7 @@ extern float func_00283198(float);
 extern void func_002ACE78(float *, float *, float);
 extern void func_002837D0(void *, void *, void *);
 
+/* Clamps the length of an input vector between two limits and writes the resulting vector to output. */
 void func_00274A88(void *unused, float *output, const TI128_00274A88 *input)
 {
     TI128_00274A88 vector;

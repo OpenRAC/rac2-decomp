@@ -21,6 +21,7 @@ extern void func_0029CD18(void);
 /* The level object's callback table: the two slots at +0x734C and +0x7350. */
 typedef struct { char pad[0x734C]; void *cb1; void *cb2; } SubBf;
 
+/* Clears the 0x40000-byte buffer with 0xCD and zeroes the fields 104 to 111 of the D_00138180 block. */
 void func_0029CD48(void)
 {
     char *state = D_001BAEC0;

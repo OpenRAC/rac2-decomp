@@ -35,6 +35,7 @@ extern int func_0029AE78(int *);
 extern int func_00115340(void *, void *, int);
 extern void func_00282AB0(void *, void *, int);
 
+/* Restores save data from a packet into the given restore entries, copying each matched entry and counting errors; returns 1 if the packet is invalid. */
 int func_0029B168(unsigned char *save_packet, int slot, RestoreEntry29B168 *restore_entries)
 {
     RestoreEntry29B168 *matched_entry;

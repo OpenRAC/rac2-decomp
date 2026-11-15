@@ -21,6 +21,7 @@ extern void func_00284000_1(void);
 
 extern void func_00284268(int, int, int, int, int, int);
 
+/* Builds an image transfer from the four rectangle values and sends it to the buffer a4. */
 void func_00285708(s32 a0, s32 a1, s32 a2, s32 a3, u8 *a4) {
     u8 image[112];
     func_00126470(image, (D_001A72E0[0]<<8)>>16, (D_001A7340[0]<<10)>>16,
@@ -35,6 +36,7 @@ typedef struct {
 } Limits_285788;
 extern Limits_285788 D_001BAC80;
 
+/* Stores two limits, using 64 and 16 when the arguments are zero. */
 void func_00285788(int first, int second) {
     int first_limit = 64;
     int second_limit = 16;
@@ -46,6 +48,7 @@ void func_00285788(int first, int second) {
 
 extern int D_001A8A5C __attribute__((sda));
 
+/* Returns the value of D_001A8A5C. */
 int func_002857B0(void) {
     return D_001A8A5C;
 }

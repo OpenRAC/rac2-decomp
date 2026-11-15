@@ -27,6 +27,7 @@ extern s32 func_00288768(s32 a0);
 extern s8 D_001A7B68[];
 extern s8 D_001A7B88[];
 
+/* Checks the list of entries in D_001A7B68 up to D_001A7B88 and returns whether every filled entry is valid. */
 s32 func_002908D0(void) {
     s32 p;
     s32 end;

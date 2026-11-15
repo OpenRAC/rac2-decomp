@@ -63,6 +63,7 @@ extern s32 D_001B1680_1;
 extern void func_00288D68(void);
 extern void func_0029B3E0(s32, s32);
 
+/* Sets the value D_001B1680 to a0 and, when a0 is -1, clears the related fields and flag bit 0x200; a1 selects further handling. */
 void func_00288CB0(int a0, int a1)
 {
     D_001A8B84 = 1;

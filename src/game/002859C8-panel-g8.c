@@ -140,6 +140,7 @@ extern void func_0027C660(void);
 
 #define SPR ((unsigned char *)0x70000000)
 
+/* Draws the panel for the current state: sets up the GIF packet and draws its boxes and text. */
 void func_002859C8(void)
 {
     char buf[0x300];

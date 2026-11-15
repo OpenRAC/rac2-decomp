@@ -10,6 +10,7 @@ extern unsigned char D_001A7BB0[] __attribute__((sda));
 typedef union { int *words; char *bytes; int address; } PacketCursor;
 extern PacketCursor ref_0027D900_01;
 extern char ref_0027D900_02[], ref_0027D900_03[];
+/* Draws the top and bottom letterbox bars, growing them to 52 lines while the flag is set and shrinking them otherwise. */
 void func_0027D900(void) {
     int h;
 

@@ -33,6 +33,7 @@ extern s32 func_00287E48(void);
 extern void func_002B72E8(s32);
 extern int func_002E5E58(int, unsigned int, void *);
 
+/* Sets the current state p0 and its parameter p1 in the state block and clears its other fields. */
 void func_002858C0(s32 p0, s32 p1)
 {
     s32 i;

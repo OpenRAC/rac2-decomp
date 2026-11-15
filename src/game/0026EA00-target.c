@@ -45,6 +45,7 @@ extern float func_00283248(float, float);
 extern long func_0027C878(int);
 extern int func_00283D38(unsigned int, unsigned int, float);
 extern int func_00283CF0(float);
+/* Fades the reticle in on the requested target and out when the target changes, and spins it. */
 extern void func_0027E4A8(float, float, float, float, float, int, int, long, int, int,
                           unsigned char, unsigned char, float, float);
 extern void func_0027EE58(int, int, int, int, unsigned int *, unsigned int *, int, int, float, float);

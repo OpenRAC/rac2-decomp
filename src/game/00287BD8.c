@@ -38,6 +38,7 @@ extern void func_002AAC80(char *a, float f1, float f2, float f3, float f4);
 
 extern void func_00283958(char *a, char *b);
 
+/* Builds a rotation from the direction between two level vectors and applies it to a vector, using local matrices. */
 void func_00287BD8(char *arg0, int arg1)
 {
     Block48_F8c659bbc a;
@@ -72,6 +73,7 @@ extern void func_00282CC0(char *a, char *b, char *c);
 
 extern int D_L00_001A8DC8 __attribute__((sda));
 
+/* Moves the level vector by arg0 relative to the reference point, rescales it to the stored length and moves it back. */
 void func_00287D98(char *arg0)
 {
     func_00282CF0(D_L00_001B8DC0, D_L00_001B8DC0, D_L00_001B1B10);

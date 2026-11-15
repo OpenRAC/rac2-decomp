@@ -13,6 +13,7 @@ extern void func_00282CC0(void *, void *, void *);
 extern void func_002ACE78(void *, void *, float);
 extern void func_00283958(void *, void *);
 extern void func_00283738(void *, void *, void *);
+/* Updates the camera shake: tracks how long it has run, derives the amplitude and frequency, and applies the offset matrix. */
 void func_00271958(CameraShake *s, int mode)
 {
     float buf[4], matrix[12];

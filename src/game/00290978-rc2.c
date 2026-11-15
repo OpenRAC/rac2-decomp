@@ -39,6 +39,7 @@ extern volatile s8 D_001A7B36;
 extern volatile s8 D_001A7B68;
 extern volatile s8 D_001A7B69;
 
+/* Sets up the default entries (ids 0x1E, 0x2A, 0x2F and others) that are not yet owned, registering each with func_00288308 and func_002AD860. */
 void func_00290978(void) {
     if (D_001A7B16 == 0) {
         func_00288308(0x1E);

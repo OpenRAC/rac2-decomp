@@ -65,6 +65,7 @@ extern void func_002883E8(int);
 
 extern void func_00288208(int);
 
+/* Marks slot a0 as set (once only), copies a default value from its class record and runs the follow-up updates for that slot. */
 void func_00288308(int a0)
 {
     ClassRecord *record;

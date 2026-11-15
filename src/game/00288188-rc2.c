@@ -26,6 +26,7 @@
 extern s16 D_00259F58[];
 extern s16 D_00259CE0[];
 
+/* Returns 1 if arg0 is found in the id table at D_00259F58, otherwise 0. */
 s32 func_00288188(s32 arg0) {
     s16 *ta;
     s16 *tb;

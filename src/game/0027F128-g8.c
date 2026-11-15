@@ -14,6 +14,7 @@ extern int ref_L00_002EA630_01;
 extern f32 func_00283CE0(s32);
 extern s32 func_00283CF0(f32);
 
+/* Clears the 0x600-byte table at ref_L00_002EA630_00 and resets its counter. */
 void func_00280630(void) {
     func_00282A60(ref_L00_002EA630_00, 0, 0x600);
     ref_L00_002EA630_01 = 0;
@@ -44,6 +45,7 @@ extern s32 D_001A7B90;
 extern s32 func_00124418(void);
 extern s32 func_001257D0(s32,s32,s32,s32);
 
+/* Resets the display mode: calls the video setup and picks the output settings from the mode flags D_001A7B90 and D_001A7BB8. */
 void func_00284000(void) {
     func_00124418();
     if (D_001A7B90 != 0) D_001A7BB8 = 0;

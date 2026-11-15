@@ -6,6 +6,7 @@ extern u64 D_001AC7F0[2];
 extern int D_001A7354 __attribute__((sda));
 extern int D_001A7350 __attribute__((sda));
 
+/* Appends a GS rectangle primitive for the given coordinates and colour to the current packet buffer. */
 void func_0027DE50(int x0, int x1, int y0, int y1, u64 color)
 {
     unsigned char *current, *next;

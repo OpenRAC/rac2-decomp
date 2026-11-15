@@ -33,6 +33,7 @@ extern s32 func_00274120(void *);
 extern s32 func_00282978(void *);
 extern s32 D_001B1688;
 
+/* Per-frame behaviour of an object chosen by the selector byte at offset 0x5D of its state; returns a result code. */
 s32 func_00273B70(void *arg0) {
     s8 loc[0x210];
     s8 *s0;

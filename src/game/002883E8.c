@@ -23,6 +23,7 @@ extern unsigned char D_001A7AF8[] MACRO_ADDR;
 /* 32 slot bytes: the low six bits hold a class id, 0xFF marks a free slot. */
 extern unsigned char D_001A7B68[] MACRO_ADDR;
 
+/* Looks up the class record of slot a0 and, if it has the needed data, searches the 32-entry list for a free or matching entry; returns the result. */
 int func_002883E8(int a0)
 {
     ClassRecord *record = &D_00239BA0[D_00139568[a0]];

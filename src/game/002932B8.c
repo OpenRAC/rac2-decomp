@@ -9,6 +9,7 @@
 extern void func_00292B88();
 extern void func_00292EB0();
 
+/* Walks n four-word entries and remaps their indexes through the table c in groups of four. */
 void func_002932B8(s32 *a0, u8 *b, u8 *c, s32 n) {
     s32 i, j, cnt, lo, idx;
     s32 *e, *nx;

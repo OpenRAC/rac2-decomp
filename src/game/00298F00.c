@@ -142,6 +142,7 @@ extern void func_0029B628(void);
 extern int func_00127720(int, int, int);
 extern int func_0029AF58(void *);
 
+/* Memory card command step: polls the pending command and, when it finishes, handles the card state and result. */
 void func_00298F00(void)
 {
     union {

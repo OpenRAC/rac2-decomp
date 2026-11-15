@@ -32,6 +32,7 @@ extern s32 D_001A7354;
 extern s32 D_001B187C;
 extern s8 *volatile D_001B22A8;
 
+/* Draws a sprite rotated by an angle around its centre, scaled and coloured. */
 void func_0028F410(s32 arg0, s32 arg1, s64 arg2, f32 fparg0, f32 fparg1, f32 fparg2, f32 fparg3, f32 fparg4) {
     s8 sp[0x68];
     s64 rt1 ;

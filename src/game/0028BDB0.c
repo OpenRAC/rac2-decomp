@@ -29,6 +29,7 @@ extern int func_0028E588(int, int);
 extern void func_0028ECD8(int,int,int,int,int,int);
 extern void func_0028E868(int,int,int,int,int,int);
 extern short D_0018B69A;
+/* Draws a gauge element with its icon and a bar scaled to its current value. */
 int func_0028DDD8(char *o) {
  int x=*(int *)(o+0x50), y=*(int *)(o+0x54);
  int w;
@@ -44,6 +45,7 @@ int func_0028DDD8(char *o) {
 
 void func_0028DF38(char *object) { extern void func_0028B950(u8 *); *(int *)(object + 0x58) = 0x20; *(int *)(object + 0x7C) = 0x96; *(int *)(object + 0x5C) = 0x20; func_0028B950((u8 *)object); }
 
+/* Stub that returns 0. */
 int func_0028DF68(void) {
     return 0;
 }
@@ -122,6 +124,7 @@ typedef struct { char reserved00[0x88]; unsigned short valid; char reserved8A[0x
 extern MapSelection D_00189E20;
 extern unsigned char D_00139568[];
 extern MapRecord ref_L00_0028E260_00[];
+/* Returns the selected index, or 0 if its record is not valid or the selection is blocked. */
 int func_0028E260(void)
 {
     int selected = D_00189E20.selected;

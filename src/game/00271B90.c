@@ -16,6 +16,7 @@ extern void func_00282CF0(void *, void *, void *);
 extern float func_00282DF0(void *);
 extern void func_00282D30(void *, void *, float);
 extern float func_002702C8(float *, float, float, float, float, float);
+/* Follow camera update: computes the direction from the hero, smooths the follow target and adjusts the up vector. */
 void func_00271B90(void)
 {
     Vec dir, projection;

@@ -16,6 +16,7 @@ extern int D_001B1600 __attribute__((sda));
 extern Entry_001B9740 D_001B9740[];
 extern short func_00282A18(int);
 
+/* Reads count entries of four words each into the table at D_001B9740, shifting two and taking the log2 of the other two. */
 void func_00291DE0(int *p, int count) {
     for (D_001B1600 = 0; D_001B1600 < count; D_001B1600++) {
         int w0 = *p++;

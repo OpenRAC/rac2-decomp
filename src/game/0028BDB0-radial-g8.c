@@ -21,6 +21,7 @@ extern int D_001B18FC, D_001B18F8, D_001B1598;
 extern int D_001B1900 __attribute__((sda));
 typedef struct { char pad[0x64]; int handle; char pad68[4]; int timer; unsigned char fade[4]; int selected, state, timeout; } Selector;
 
+/* Updates the radial menu selection from the stick position, setting its timers and picking the choice by angle when the stick is past the dead zone. */
 void func_0028CCE0(Selector *object)
 {
     float x, y, magnitude, angle;

@@ -10,6 +10,7 @@ extern U8 ref_002934F8_01[];
 extern int ref_002934F8_02[];
 extern Q128 ref_002934F8_03[];
 
+/* Loads a block: if it is compressed, decompresses it (at most 0x3FC00 bytes) and clears the flag, then processes its textures. */
 void func_002934F8(U8 *block, void *textures, U8 *map, int index)
 {
     int compressed = block[0xB] != 0;

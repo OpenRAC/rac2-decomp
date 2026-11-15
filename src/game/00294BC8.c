@@ -187,6 +187,7 @@ long func_00294C40(char *p)
 }
 
 
+/* Sets the bit for index in the flag bytes at BOOT_D_001395B8 + 0xA7 and returns its previous value. */
 s32 func_00294E48(s32 index)
 {
     s32 byte = index / 8;
@@ -237,6 +238,7 @@ int func_00295680(int arg)
 }
 
 
+/* Copies the entry a1 of the map table over entry a0 and updates the sizes. */
 void func_00295788(int a0, int a1)
 {
     extern int D_001C4FA0[];
@@ -253,6 +255,7 @@ void func_00295788(int a0, int a1)
     out[a1] = -1;
 }
 
+/* Returns the index of the entry among the first 5 that is in use and has the given id, or -1. */
 int func_00295828(int id) {
     extern int D_001C4FA0[];
     int *base = D_001C4FA0;
@@ -335,6 +338,7 @@ extern int func_00295A10(int);
 
 extern int func_00282C30(int);
 
+/* Picks the best entry of the 5 candidates by comparing their differences; returns its index or -1. */
 int func_00295A80(void)
 {
     int i;
@@ -382,6 +386,7 @@ int func_00295A80(void)
 
 
 
+/* Composes a bitmap: for each bit of the mask a3, copies a byte from a1 if set and from a2 if clear into a0. */
 void func_00295BE8(u8 *a0,u8 *a1,u8 *a2,u8 *a3) {
  s32 i=0;
  do {
@@ -405,6 +410,7 @@ void func_00295BE8(u8 *a0,u8 *a1,u8 *a2,u8 *a3) {
 extern int D_001C51D0;
 extern int func_00295C70(void);
 
+/* Stores value in D_001C51D0 and calls func_00295C70. */
 void func_00295C50(int value) {
     D_001C51D0 = value;
     func_00295C70();
@@ -475,6 +481,7 @@ void func_00297400(u8 *out, u8 *base, short *offsets)
     }
 }
 
+/* Decodes one run-length encoded map row into out, using the offsets table to find the row's records. */
 void func_00297550(u8 *out,s32 index,u8 *base,short *offsets) {
     s32 pending=0;
     u8 *start;
@@ -663,6 +670,7 @@ void func_002980D0(void)
     } while (--first != 0);
 }
 
+/* Empty function; does nothing. */
 void func_00298170(void)
 {
 }
@@ -683,6 +691,7 @@ extern unsigned int D_001A7424[] __attribute__((sda));
 extern int D_001B1A3C __attribute__((sda));
 extern int D_001B1A38 __attribute__((sda));
 extern void (*D_002560D0[])(void);
+/* Per-frame state step of the memory card handler: handles the flag bits in D_001A7424 and picks the next state. */
 void func_00298178(void)
 {
     int old;
@@ -708,6 +717,7 @@ void func_00298178(void)
         D_001B1A38 = 0;
 }
 
+/* Sets the memory card state to 3 and clears two fields of its state block. */
 void func_00298278(void) {
     D_001A7420[0] = 3;
     D_001393E0.field17c = 0;
@@ -762,11 +772,13 @@ void func_00298298(void)
 extern unsigned int D_001A7424[] __attribute__((sda));
 extern int D_001A7420[] __attribute__((sda));
 
+/* Sets the memory card state to 3 unless bit 0 of the flags is set. */
 void func_00298380(void) {
     if (((D_001A7424[0] ^ 1) & 1) != 0)
         D_001A7420[0] = 3;
 }
 
+/* Sets the memory card state to 4 and sets two fields of its state block to -1. */
 void func_002983A8(void) {
     D_001393E0.field164 = -1;
     D_001A7420[0] = 4;

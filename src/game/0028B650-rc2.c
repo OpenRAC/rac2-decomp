@@ -26,6 +26,7 @@
 extern s32 func_0028AB20(s32);
 extern s8 *D_001B188C;
 
+/* Fills an element from the table row found for a1: stores its index, frame count and size fields. */
 void func_0028B650(s8 *a0, s32 a1) {
     s32 v;
     u16 t;

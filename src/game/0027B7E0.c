@@ -35,6 +35,7 @@ extern Rac2Native_967caba148c0b35c_u32 ref_L00_002E56B0_14 __attribute__((sda));
 
 extern Rac2Native_967caba148c0b35c_u32 ref_L00_002E56B0_15;
 
+/* Resets a group of flags in the level data to zero. */
 void func_0027B7E0(void)
 {
     ref_L00_002E56B0_00 = 0;
@@ -62,6 +63,7 @@ extern char D_00139120[];
 extern char D_001B9040[];
 extern void func_002FC560(unsigned int, unsigned long);
 
+/* Appends GIF tag words to the current packet buffer and advances the buffer pointer. */
 void func_0027B858(void)
 {
     unsigned long packed;

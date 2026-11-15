@@ -15,6 +15,7 @@ extern int D_001A8BC0 __attribute__((sda));
 extern float D_001B15A0 __attribute__((sda));
 extern int D_001A72D4 __attribute__((sda));
 
+/* Prepares the screen for the next state: sets up the display, adjusts buffer offsets and initialises the state block. */
 void func_00278EB0(void)
 {
     CamState *state;

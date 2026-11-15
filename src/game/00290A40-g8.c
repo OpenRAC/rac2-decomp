@@ -10,6 +10,7 @@ extern float *D_001B1990 __attribute__((sda));
 extern int D_001A79F0;
 extern int D_001A72E0;
 
+/* Starts the frame setup: runs the pre-frame steps, selects the setup by the current mode and queues the GS registers 0x47 and 0x4E. */
 void func_00291268(void)
 {
     func_002E37B0();

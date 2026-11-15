@@ -16,6 +16,7 @@ extern void func_001256D8(void *), func_00131A98(void *);
 extern void func_002980D0(void), func_00297670(void *);
 extern void *memcpy(void *, const void *, unsigned int);
 extern int func_0029AF98(void *, int, int *);
+/* Saves the game to the memory card slot: gathers the save data into a buffer and writes it. */
 int func_0029B3E0(int slot, int flags) {
  unsigned char saved;
  func_001256D8(D_001A7360);

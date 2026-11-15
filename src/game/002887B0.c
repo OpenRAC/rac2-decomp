@@ -56,6 +56,7 @@ extern int D_00139868[];
 
 extern int func_00287FF8(int, int);
 
+/* Checks the class record of slot a0 and returns a result that depends on whether the slot is one of a few small ones (0xC, 0xE, 0x11, 0x12, 0x35). */
 int func_002887B0(int a0)
 {
     ClassRecord *record = &D_00239BA0[D_00139568[a0]];

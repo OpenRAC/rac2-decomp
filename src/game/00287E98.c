@@ -6,11 +6,13 @@ extern short r1_D_0015EDC4;
 extern void func_00287E98(void);
 extern int D_001A8A64 __attribute__((sda));
 
+/* Sets D_001A8A64 to 1. */
 void func_00287E98(void) {
     D_001A8A64 = 1;
 }
 
 
+/* Clears D_001A8A64. */
 void func_00287EA8(void) {
     D_001A8A64 = 0;
 }
@@ -51,6 +53,7 @@ void func_00287EB0(int index)
     if (D_00239BA0[D_00139568[index]].f00 != 0) D_00139688[index] = D_00239BA0[D_00139568[index]].f8E;
 }
 
+/* Follows the chain in table D_00239BA0 back to its start and returns how many entries follow it. */
 int func_00287F60(int index)
 {
     int count = 0;
@@ -65,6 +68,7 @@ int func_00287F60(int index)
     return count;
 }
 
+/* Moves slot to the entry n steps along its chain if the chain is long enough; returns 1 on success, otherwise 0. */
 int func_00287FF8(int slot, int n)
 {
     int result = 0;

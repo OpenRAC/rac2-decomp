@@ -26,6 +26,7 @@ void func_00298780(void)
 extern int D_001A7424 __attribute__((sda));
 extern int D_001A7424_1[] __attribute__((sda));
 
+/* Memory card state callback: when the mode is 2 and the selection is negative, goes to state 18 or selects entry 7. */
 void func_002987C0(void)
 {
     if (D_001393E0_1.mode_15c == 2 && D_001393E0_1.selected_164 < 0) {

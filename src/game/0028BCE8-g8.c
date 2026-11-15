@@ -21,6 +21,7 @@ extern u8 D_00139568[];
 extern Rec_0028BCE8 D_00239BA0[];
 extern Entry_0028BCE8 D_00255170[];
 
+/* Initialises the eight displayed records from the class table and the stored ids. */
 void func_0028BCE8(void)
 {
     int i;

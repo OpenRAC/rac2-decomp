@@ -8,6 +8,7 @@
 extern u8 D_001A7BB4;
 extern char Fd8e166aa_D_001B7F80[];
 
+/* Loads the entry table of the current entry set from the resident table and initialises each entry. */
 void func_00279828(void)
 {
     char *g = Fd8e166aa_D_001B7F80;

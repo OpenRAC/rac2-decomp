@@ -95,6 +95,7 @@ static inline void store(unsigned long *d, unsigned long v) {
     *d = v;
 }
 
+/* Sets up the full-screen anti-aliasing buffer from the display and storage sizes and offsets, and builds its draw packets. */
 void func_00284268(int display_width, int display_height, int storage_width, int storage_height,
                    int display_offset_x, int display_offset_y) {
     unsigned long *q;

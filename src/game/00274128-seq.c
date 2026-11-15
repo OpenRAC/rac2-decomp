@@ -54,6 +54,7 @@ extern int func_00279988(void);
 extern void func_002AA2E8(float *p, float a, float b);
 extern void func_002E4AC8(void);
 
+/* State machine that steps through a sequence of screens, handling each state in turn. */
 void func_00278FC0(void)
 {
     if (D_00138324 & 2) {

@@ -5,6 +5,7 @@ extern char D_001B5570[],D_001B9100[],D_001B92C0[];
 extern void func_00283788(void *,void *,void *);
 extern void func_00282D60(void *,void *,float);
 extern void func_00282D30(void *,void *,float);
+/* Builds the scene transform for the frame by copying the current view matrix and combining it with the scene data. */
 void func_00279D18(void) {
     float m[4][4];
     SceneG *g;

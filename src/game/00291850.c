@@ -34,6 +34,7 @@ typedef struct {
     s32 height_log2;
 } MipUpload;
 
+/* Uploads a mipmapped texture and its palette to the GS and writes its texture register values to regs. */
 s32 func_00291850(MipTexture *tex, unsigned long *regs)
 {
     MipUpload upload;

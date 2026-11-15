@@ -132,6 +132,7 @@ static inline int CardFormat(BootMemcard *mc) { return mc->card[0].format; }
 static inline int CardStatus(BootMemcard *mc) { return mc->card[0].status; }
 static inline int CardFree(BootMemcard *mc) { return mc->card[0].free; }
 
+/* Loader state machine: loads the resource tables and archive for the current level step by step, advancing frame by frame. */
 void func_0026EDE8(void)
 {
     LoaderResource *tables[8];

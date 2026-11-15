@@ -24,6 +24,7 @@ extern int D_00139688[];
 typedef struct { int active; char reserved04[0x44]; short localizedName; char reserved4A[0x3E]; unsigned short sellsAmmo; char reserved8A[4]; unsigned short ammoCapacity; char reserved90[0x50]; } WheelWeaponRecord;
 extern WheelWeaponRecord D_L00_00262570[];
 extern char D_001A8E28[];
+/* Draws the weapon wheel for an object: computes the fade alpha, then draws each weapon entry and its text. */
 int func_0028C6D0(char *o)
 {
     float a,b;

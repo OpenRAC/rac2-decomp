@@ -13,6 +13,7 @@ extern void func_00282A60(void *, unsigned int, int);
 extern void func_00282B50(void *, const void *, int);
 
 
+/* Decodes a block into dst using the control bytes and spans, wrapping at the end of the buffer. */
 void func_002977A8(void *dst, const unsigned char *ctrl, const unsigned char *spans) {
     unsigned char *dst_end;
     unsigned char *end;

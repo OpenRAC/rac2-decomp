@@ -84,6 +84,7 @@ extern void func_00279BD8(void *, void *);
 extern void func_002729A0(void *, float, float);
 extern float func_00283CE0(int);
 
+/* Per-frame update of the debug mark list: scales each queued mark against the base vector and clears the list when the debug mode is 111. */
 void func_00273418(void) {
     float base[4] __attribute__((aligned(16)));
     float vec[4] __attribute__((aligned(16)));
@@ -133,6 +134,7 @@ extern void func_00271E88(void);
 extern void func_002735A0(void *);
 extern void func_00270018(void);
 
+/* Per-frame camera update: bumps the frame counter, runs the transition, follow and shake updates, then updates the tracked object. */
 void func_00272368(void) {
     char *d = D_001B5200;
     char *obj;

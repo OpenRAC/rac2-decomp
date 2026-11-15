@@ -2,6 +2,7 @@
 
 extern int ref_L00_002F4398_00 __attribute__((sda));
 
+/* Returns whether ref_L00_002F4398_00 is non-zero. */
 int func_00288D30(void)
 {
     return ref_L00_002F4398_00 != 0;

@@ -17,6 +17,7 @@ extern long D_001A7470;
 extern void func_00282A88();
 extern int func_00125F20(void *, short, short, short, short, short);
 
+/* Sets up a sprite texture draw state from the texture width, height and base pointer for the given mode. */
 void func_00285030(s32 tw, s32 th, s32 tbp, s32 mode) {
     DrawState *s = D_001A6480;
     s32 tbw;

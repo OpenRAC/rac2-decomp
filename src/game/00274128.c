@@ -230,6 +230,7 @@ extern ScreenExtent D_001A7340 __attribute__((sda));
 typedef struct { char pad[0x150]; short width, height; } ScreenDimensions;
 extern ScreenDimensions D_001A6480;
 
+/* Transforms the object's vectors by its matrices and updates its position in the object's state block. */
 void func_00274128(Obj_F4778f810 *obj)
 {
     V4_F4778f810 tmp[6];
@@ -245,6 +246,7 @@ void func_00274128(Obj_F4778f810 *obj)
     F4778f810_FUN_00282CF0((char *)obj + 0x10, (char *)obj + 0x10, (char *)&tmp[2]);
 }
 
+/* Transforms the object's vectors by its matrices and updates its position (same body as func_00274128 for a second object type). */
 void func_00274208(Obj_F4778f810 *obj)
 {
     V4_F4778f810 tmp[6];
@@ -260,6 +262,7 @@ void func_00274208(Obj_F4778f810 *obj)
     F4778f810_FUN_00282CF0((char *)obj + 0x10, (char *)obj + 0x10, (char *)&tmp[2]);
 }
 
+/* Per-frame update of an object from several aligned vectors: computes its motion and orientation. */
 void func_002742E8(char *o)
 {
     float a[4] __attribute__((aligned(16)));
@@ -300,6 +303,7 @@ void func_002742E8(char *o)
     FastVecSub((float *)(o + 0x10), (float *)(o + 0x10), i);
 }
 
+/* Tests the object's points against the collision world and returns whether any hit was found. */
 int func_00274500(Obj_F4778f810 *obj)
 {
     float tmp0[4];
@@ -346,6 +350,7 @@ int func_00274500(Obj_F4778f810 *obj)
     return -1;
 }
 
+/* Transforms the object's offset into world space, tests it for a collision and nudges the object away; returns whether it hit. */
 int func_002746C8(Obj_F4778f810 *obj)
 {
     V4_F4778f810 tmp[2];
@@ -377,6 +382,7 @@ unsigned int func_00274768(OozlaAppendObject164 *object, unsigned int index, con
     return descriptor->count;
 }
 
+/* Scales a vector, takes its dot product with a second vector and applies the result to it. */
 void func_00274B58(OozlaAppendObject164 *a0, float *a1, const float *a2) {
     float tmp[4];
     float value;
@@ -405,6 +411,7 @@ int func_00274BA8(void *p, void *q, void *r, float f12, float f13)
     return 0;
 }
 
+/* Copies up to limit points from an object's data table to output, scaled, and returns how many were written. */
 int func_00274C90(char *object, float *output, int limit)
 {
     char *data = *(char **)(*(char **)(object + 0x24) + 0x10);
@@ -455,6 +462,7 @@ ASM_FUNC("asm/game", func_00278CE0);
 
 ASM_FUNC("asm/game", func_00278E78);
 
+/* Starts the transition out of the current screen: sets up the display and fades to black over 30 frames. */
 void func_00278F80(void) {
     func_002FC3C0(1);
     func_002FC138();
@@ -517,10 +525,12 @@ int func_002798A0(int value, int *out_index, int *out_offset)
     return 0;
 }
 
+/* Returns the result of the timer check on the timer at D_001B7FA8. */
 int func_00279988(void) {
     return func_00282948(D_001B7FA8);
 }
 
+/* Initialises the selection indexes of the state block and reports whether the current step has finished. */
 int func_002799A8(void)
 {
     int t1, t2;
@@ -570,6 +580,7 @@ int func_002799A8(void)
     return !found;
 }
 
+/* Tests the first set of coordinates and, if that fails, the other set; returns the first non-zero result. */
 int func_0027A1D0(float x, int a, int b, int c, int d, int e, int g)
 {
     int r, p, q, s;
@@ -726,6 +737,7 @@ void func_0027A288(void)
 }
 
 
+/* Clears the visibility bitmap to -1 when the mode is 0 and updates it when the mode is 2. */
 void func_0027A9A0(void)
 {
     if (D_001B1710 == 0)
