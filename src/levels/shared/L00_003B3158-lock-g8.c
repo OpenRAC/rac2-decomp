@@ -148,7 +148,7 @@ void target_lock_on_update(unsigned char *object,AimState *state)
             FastVecAdd(&temp,&temp,&origin);
             if (CollLine(&origin,&temp,0,g_hero_state.f2290,0)) {
                 unsigned char *hit=g_collision_result.hit;
-                if (hit && B(hit,0x20)!=254 && B(hit,0x20)!=253 && S(hit,0xaa)==0xee1 /* Receiver Bot */) {
+                if (hit && B(hit,0x20)!=254 && B(hit,0x20)!=253 && S(hit,0xaa)==MOBY_CLASS_RECEIVER_BOT) {
                     entry=P(hit,0x68);
                     if ((B(entry,0x3b1)&0x80) && (F(entry,0x3e4)==0.0f || vec_distance_xy(&origin,object+0x10)<F(entry,0x3e4)))
                         candidate=g_collision_result.hit;

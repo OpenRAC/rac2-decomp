@@ -26,19 +26,19 @@ extern void gfx_add_draw_callback_third(void *, void *);
 /* Update of the beam moby. It starts up, then each frame it follows a joint of its target
    moby, slowly turns around its own axis and draws the beam. */
 void hrugis_beam_update(u8 *moby) {
-    f32 upVector[4] __attribute__((aligned(16)));
-    f32 jointMatrix[4][4] __attribute__((aligned(16)));
-    f32 newPosition[4] __attribute__((aligned(16)));
-    f32 spinQuat[4] __attribute__((aligned(16)));
-    f32 spinMatrix[12] __attribute__((aligned(16)));
+    f32 up_vector[4] __attribute__((aligned(16)));
+    f32 joint_matrix[4][4] __attribute__((aligned(16)));
+    f32 new_position[4] __attribute__((aligned(16)));
+    f32 spin_quat[4] __attribute__((aligned(16)));
+    f32 spin_matrix[12] __attribute__((aligned(16)));
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *forward;
     f32 *right;
     f32 angle;
     u8 *target;
 
-    *(TI128 *)upVector = 0;
-    upVector[2] = 1.0f;
+    *(TI128 *)up_vector = 0;
+    up_vector[2] = 1.0f;
     switch (moby[0x20]) {
     case 0:
         moby[0x30] = 0xFF;
@@ -58,18 +58,18 @@ void hrugis_beam_update(u8 *moby) {
         angle = func_00309B38(*(f32 *)(vars + 0x27C), 0.011635531f);
         target = D_001B251C[0] + (*(int *)(vars + 0x260) << 8);
         *(f32 *)(vars + 0x27C) = angle;
-        moby_transform_joint_point(target, *(int *)(vars + 0x26C), jointMatrix);
-        vec_scale_to_length(newPosition, jointMatrix[1], 50.0f);
-        FastVecAdd(newPosition, jointMatrix[3], newPosition);
-        vec_scale_to_length(forward, jointMatrix[1], -1.0f);
-        FastVecCross(right, forward, upVector);
+        moby_transform_joint_point(target, *(int *)(vars + 0x26C), joint_matrix);
+        vec_scale_to_length(new_position, joint_matrix[1], 50.0f);
+        FastVecAdd(new_position, joint_matrix[3], new_position);
+        vec_scale_to_length(forward, joint_matrix[1], -1.0f);
+        FastVecCross(right, forward, up_vector);
         vec_scale_to_length(right, right, 1.0f);
         FastVecCross(moby + 0xE0, right, forward);
-        FastVecScale(spinQuat, forward, math_fast_sin_or_cos_b(*(f32 *)(vars + 0x27C) * 0.5f));
-        spinQuat[3] = math_fast_sin_or_cos_a(*(f32 *)(vars + 0x27C) * 0.5f);
-        quaternion_to_rotation_basis(spinQuat, spinMatrix);
-        multiply_matrix3x3(forward, spinMatrix, forward);
-        qcopy(moby + 0x10, newPosition);
+        FastVecScale(spin_quat, forward, math_fast_sin_or_cos_b(*(f32 *)(vars + 0x27C) * 0.5f));
+        spin_quat[3] = math_fast_sin_or_cos_a(*(f32 *)(vars + 0x27C) * 0.5f);
+        quaternion_to_rotation_basis(spin_quat, spin_matrix);
+        multiply_matrix3x3(forward, spin_matrix, forward);
+        qcopy(moby + 0x10, new_position);
         moby_process_collision_hit(moby, 0, 0, 0);
         break;
     }

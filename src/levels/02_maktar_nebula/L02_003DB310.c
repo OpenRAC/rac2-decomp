@@ -262,17 +262,17 @@ void slot_machine_award_prize(char *actor) {
     char *state = *(char **)(actor + 0x68);
     float point[4];
     float offset[4];
-    int outValue;
+    int out_value;
     char *created;
-    unsigned int prizeMode;
+    unsigned int prize_mode;
 
     moby_set_state(actor, 1, -1);
     math_random_planar_offset(offset, 1.0f);
     moby_compute_local_point(actor, point, 3.0f, 0.0f, 2.0f);
     FastVecAdd(point, offset, point);
-    prizeMode = *(int *)(state + 0x5C) - 1;
-    if (prizeMode < 5)
-        goto *D_L02_002A52D0[prizeMode];
+    prize_mode = *(int *)(state + 0x5C) - 1;
+    if (prize_mode < 5)
+        goto *D_L02_002A52D0[prize_mode];
     goto other;
 c1:
     PlayMobySound(2, 0x20, actor);
@@ -285,8 +285,8 @@ c2:
     goto done;
 c3:
     PlayMobySound(2, 0x20, actor);
-    PickAmmoDropItem(actor, &outValue);
-    created = *(char **)(SpawnWeaponAmmoPickup(point, outValue, -1, 0) + 0x68);
+    PickAmmoDropItem(actor, &out_value);
+    created = *(char **)(SpawnWeaponAmmoPickup(point, out_value, -1, 0) + 0x68);
     FastVecScale(created, created, 0.35f);
     goto done;
 c4:
@@ -390,30 +390,30 @@ extern float vec_distance_xy(char *, char *);
 float path_update_progress(char *actor) {
     State *state = *(State **)(actor + 0x68);
     Entry *entry = (Entry *)g_route_polygons[state->id];
-    float currentDistance = vec_distance_xy(g_hero_position, (char *)&entry->pts[state->idx]);
-    float neighborDistance;
+    float current_distance = vec_distance_xy(g_hero_position, (char *)&entry->pts[state->idx]);
+    float neighbor_distance;
 
     if (state->idx < entry->count - 1) {
-        neighborDistance = vec_distance_xy(g_hero_position, (char *)&entry->pts[state->idx + 1]);
-        if (neighborDistance < currentDistance) {
+        neighbor_distance = vec_distance_xy(g_hero_position, (char *)&entry->pts[state->idx + 1]);
+        if (neighbor_distance < current_distance) {
             state->t += entry->pts[state->idx].w;
             if (state->t > 14.0f)
                 state->t = 14.0f;
             state->idx += 1;
-            return neighborDistance;
+            return neighbor_distance;
         }
     }
     if (state->idx > 0) {
-        neighborDistance = vec_distance_xy(g_hero_position, (char *)&entry->pts[state->idx - 1]);
-        if (neighborDistance < currentDistance) {
+        neighbor_distance = vec_distance_xy(g_hero_position, (char *)&entry->pts[state->idx - 1]);
+        if (neighbor_distance < current_distance) {
             state->t -= entry->pts[state->idx].w;
             if (state->t < 0.0f)
                 state->t = 0.0f;
             state->idx -= 1;
-            return neighborDistance;
+            return neighbor_distance;
         }
     }
-    return currentDistance;
+    return current_distance;
 }
 
 extern float math_fabs(float);
@@ -439,13 +439,13 @@ extern char *g_route_polygons[];
 void path_update_hero_heading(char *actor) {
     char *hero = *(char **)(&g_camera_l02_position + 0x50);
     char *state;
-    char *heroVars;
-    char *camVars;
+    char *hero_vars;
+    char *cam_vars;
     float *dir;
     char *path;
     float scale;
-    float segmentAngle;
-    float heroAngle;
+    float segment_angle;
+    float hero_angle;
     float easing;
     int last;
     int i;
@@ -454,9 +454,9 @@ void path_update_hero_heading(char *actor) {
     if (*(short *)(hero + 0x86) != 0)
         return;
     state = *(char **)(actor + 0x68);
-    heroVars = *(char **)(hero + 0x70);
-    camVars = heroVars + 0x1C0;
-    dir = (float *)(heroVars + 0x160);
+    hero_vars = *(char **)(hero + 0x70);
+    cam_vars = hero_vars + 0x1C0;
+    dir = (float *)(hero_vars + 0x160);
     path = g_route_polygons[*(int *)state];
     scale = (*(float *)(state + 0x34) - 6.0f) * 0.125f;
     if (scale < 0.0f)
@@ -472,21 +472,21 @@ void path_update_hero_heading(char *actor) {
         char *p0 = path + i * 16;
         char *p1 = path + j * 16;
 
-        segmentAngle = mat_fast_helper_a(*(float *)(p1 + 0x10) - *(float *)(p0 + 0x10),
+        segment_angle = mat_fast_helper_a(*(float *)(p1 + 0x10) - *(float *)(p0 + 0x10),
                            *(float *)(p1 + 0x14) - *(float *)(p0 + 0x14));
     }
-    heroAngle = mat_fast_helper_a(dir[0], dir[1]);
-    heroAngle = FastAddRotations(heroAngle, 3.1415927f);
-    segmentAngle = fast_subtract_rotations(segmentAngle, heroAngle);
-    if (math_fabs(segmentAngle) < 0.0017453294713050127f) {
+    hero_angle = mat_fast_helper_a(dir[0], dir[1]);
+    hero_angle = FastAddRotations(hero_angle, 3.1415927f);
+    segment_angle = fast_subtract_rotations(segment_angle, hero_angle);
+    if (math_fabs(segment_angle) < 0.0017453294713050127f) {
         *(float *)(state + 0x38) = 0.0f;
     } else {
         easing = scale * D_L02_001B0E90;
-        math_approach_target_with_braking(state + 0x38, segmentAngle, (easing + 0.5f) * 0.00027777778450399637f,
+        math_approach_target_with_braking(state + 0x38, segment_angle, (easing + 0.5f) * 0.00027777778450399637f,
                       (easing + 0.5f) * 0.00027777778450399637f, easing * 0.01666666753590107f);
     }
-    *(float *)(camVars + 0x1C) = 1.0f;
-    *(float *)(camVars + 0x14) = *(float *)(state + 0x38);
+    *(float *)(cam_vars + 0x1C) = 1.0f;
+    *(float *)(cam_vars + 0x14) = *(float *)(state + 0x38);
     if (scale >= 0.9f) {
         set_follow_camera_orbit_clamp_mode(0);
         cam_set_lock_flag();
@@ -586,12 +586,12 @@ typedef struct {
    it is attached to and releases it. */
 void swaying_actor_update(char *actor) {
     St003F1298 *vars = *(St003F1298 **)(actor + 0x68);
-    float swayAngle;
+    float sway_angle;
 
     if (*(u8 *)(actor + 0x20) == 0) {
         vars->p18 = (char *)&vars->f110;
-        swayAngle = math_random_float_range(15.0f, 40.0f) * 0.017453294f;
-        vars->f4B4 = (math_random_int_below(2) != 0) ? -swayAngle : swayAngle;
+        sway_angle = math_random_float_range(15.0f, 40.0f) * 0.017453294f;
+        vars->f4B4 = (math_random_int_below(2) != 0) ? -sway_angle : sway_angle;
         vars->b48 = FloatToInt(15.0f);
         vars->b4A = FloatToInt(12.0f);
         if (math_random_int_below(2) == 1)

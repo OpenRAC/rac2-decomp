@@ -26,14 +26,14 @@ extern float mat_fast_helper_a(float, float);
 extern float math_random_angle(void);
 
 /* Wakes an idle turret from a group of objects, places it at a position facing a direction, and returns it (or null if none is free). */
-char *turret_spawn_from_group(int parent, int groupIndex, float *position, float *direction) {
-    char *idp = D_L20_001FBB20[groupIndex];
+char *turret_spawn_from_group(int parent, int group_index, float *position, float *direction) {
+    char *idp = D_L20_001FBB20[group_index];
     char *found = 0;
 
-    if ((groupIndex & 0xFF) == 0xFF) {
+    if ((group_index & 0xFF) == 0xFF) {
         goto end;
     }
-    if (D_L20_001B2FB8[0] < groupIndex) {
+    if (D_L20_001B2FB8[0] < group_index) {
         goto end;
     }
     if (idp == 0) {
@@ -50,10 +50,10 @@ char *turret_spawn_from_group(int parent, int groupIndex, float *position, float
             goto end;
         }
         idp += 2;
-        if ((groupIndex & 0xFF) == 0xFF) {
+        if ((group_index & 0xFF) == 0xFF) {
             goto end;
         }
-        if (D_L20_001B2FB8[0] < groupIndex) {
+        if (D_L20_001B2FB8[0] < group_index) {
             goto end;
         }
         if (idp == 0) {
@@ -62,7 +62,7 @@ char *turret_spawn_from_group(int parent, int groupIndex, float *position, float
         if (*(s16 *)(idp - 2) >= 0) {
             continue;
         }
-        if (idp == D_L20_001FBB20[groupIndex]) {
+        if (idp == D_L20_001FBB20[group_index]) {
             continue;
         }
         break;

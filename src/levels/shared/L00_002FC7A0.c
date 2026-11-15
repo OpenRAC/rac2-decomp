@@ -892,11 +892,11 @@ int level_lookup_cache_entry(int key)
 
 /* rac1-decomp src/overlays/shared/menu_00249720.c: func_L00_0024B1B0 */
 /* stores a value into a table slot chosen by the current index */
-void level_store_value_in_table_slot(int value, int slotIndex) {
+void level_store_value_in_table_slot(int value, int slot_index) {
     int i = r1_D_0015EE84_m;
     if (i < 19) {
-        slotIndex += r1_D_L00_001C47B8[i];
-        r1_D_L00_001792B8[slotIndex] = value;
+        slot_index += r1_D_L00_001C47B8[i];
+        r1_D_L00_001792B8[slot_index] = value;
     }
 }
 
@@ -1556,9 +1556,9 @@ void level_count_active_records(void)
 /* Shifts every point in a set of coordinate lists by the given x and y amounts. */
 void offset_moby_class_point_pairs(unsigned char *object, int dx, int dy) {
     int i;
-    int listCount = object[4] + object[5];
+    int list_count = object[4] + object[5];
     int *entries = *(int **)object;
-    for (i = 0; i < listCount; i++, entries += 4) {
+    for (i = 0; i < list_count; i++, entries += 4) {
         unsigned short *coords = *(unsigned short **)entries;
         int count = ((unsigned char *)coords)[2]; int remaining; coords += 2; if (count != 0) { remaining = count; do { coords[0] = coords[0] + dx; coords[1] = coords[1] + dy; coords += 2; remaining--; } while (remaining != 0); }
     }
@@ -1653,49 +1653,49 @@ typedef struct L110E8Src {
 
 
 /* Builds a new data block from two tables: copies the entry data and rewrites the sizes and offsets in its header. */
-void level_build_data_block(L110E8Src *source, int listIndex, int entryIndex, L110E8Out *outBuffer)
+void level_build_data_block(L110E8Src *source, int list_index, int entry_index, L110E8Out *out_buffer)
 {
-    char *tableB = source->f18;
-    char *tableA = source->f14;
-    unsigned char countB = (unsigned char)tableB[8];
-    unsigned char countA = (unsigned char)tableA[8];
-    int *entryList;
+    char *table_b = source->f18;
+    char *table_a = source->f14;
+    unsigned char count_b = (unsigned char)table_b[8];
+    unsigned char count_a = (unsigned char)table_a[8];
+    int *entry_list;
     L110E8Rec *rec;
     unsigned short *uf;
     unsigned short uhA;
     unsigned short uhE;
-    L110E8Out *out = outBuffer;
+    L110E8Out *out = out_buffer;
     short hA;
     short hE;
     int destinationOffset;
     int v;
     int len;
 
-    tableB += listIndex * 4;
-    entryList = *(int **)(tableB + 0x48);
-    entryList += entryIndex;
-    rec = ((L110E8Rec **)entryList)[7];
+    table_b += list_index * 4;
+    entry_list = *(int **)(table_b + 0x48);
+    entry_list += entry_index;
+    rec = ((L110E8Rec **)entry_list)[7];
     uf = (unsigned short *)rec;
-    mem_fast_helper_b(out, ((countA + 3) * 8) & 0xFF0);
+    mem_fast_helper_b(out, ((count_a + 3) * 8) & 0xFF0);
 
-    destinationOffset = countA * 8;
+    destinationOffset = count_a * 8;
     {
-        char *msrc = (char *)rec + (countB * 8 + 0x10);
+        char *msrc = (char *)rec + (count_b * 8 + 0x10);
 
         hA = rec->f0A;
         hE = rec->f0E;
         out->f08 = (short)destinationOffset;
-        v = countA + hA;
+        v = count_a + hA;
         v += hE;
         v += 1;
         out->f06 = (short)(v >> 1);
         uhA = uf[5];
         out->f0A = uhA;
-        out->f0C = (short)((uhA + countA) * 8);
+        out->f0C = (short)((uhA + count_a) * 8);
         uhE = uf[7];
         out->f0E = uhE;
 
-        len = rec->f06 * 16 - countB * 8;
+        len = rec->f06 * 16 - count_b * 8;
         if (len != 0)
             mem_copy_aligned((char *)out + (destinationOffset + 0x10), msrc, len);
     }
@@ -1705,8 +1705,8 @@ void level_build_data_block(L110E8Src *source, int listIndex, int entryIndex, L1
         int i;
         unsigned long long *src = (unsigned long long *)((char *)rec + 0x10);
 
-        if (countB != 0) {
-            i = countB;
+        if (count_b != 0) {
+            i = count_b;
 
             while (i != 0) {
                 *(unsigned long long *)((char *)out + table[0] * 8 + 0x10) = src[0];
@@ -1726,7 +1726,7 @@ void level_build_data_block(L110E8Src *source, int listIndex, int entryIndex, L1
 }
 
 /* scales a float field by 1/1024, fills a 64-byte stack buffer from the object, then applies three per-element helper calls over n 64-byte records. */
-void mat_transform_array(char *object, int count, int extraArg, char *matrices)
+void mat_transform_array(char *object, int count, int extra_arg, char *matrices)
 {
     char buf[64];
     float scale;
@@ -1734,7 +1734,7 @@ void mat_transform_array(char *object, int count, int extraArg, char *matrices)
 
     scale = *(float *)(object + 44) * 0.0009765625f;
     func_00283658_1(buf, object + 192);
-    func_002A3F10_3(object, count, extraArg, matrices);
+    func_002A3F10_3(object, count, extra_arg, matrices);
     for (i = 0; i < count; i++) {
         func_00283788_5(matrices + i * 64, buf, matrices + i * 64);
         func_00282D30_21(matrices + i * 64 + 48, matrices + i * 64 + 48, scale);

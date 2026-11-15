@@ -26,9 +26,9 @@ extern char *D_L06_001B281C[] __attribute__((sda));
 
 /* a moby's three states: idle, hit, and gone */
 /* Updates a one-shot effect object (moby class 2322): it waits, then bursts into sparks and rings when hit, and goes away. */
-void spark_burst_on_hit_update(char *mobyIn)
+void spark_burst_on_hit_update(char *moby_in)
 {
-    char *moby = mobyIn;
+    char *moby = moby_in;
     char *vars;
     float scratch[4];
 
@@ -69,16 +69,16 @@ extern void snd_stop_voice(int);
 /* a moby that wakes up: it takes the level's step, and it gives its handle
    back when the moby it is attached to is gone */
 /* Updates a helper object (moby class 2376) that follows its parent's progress and plays or stops a looping sound as that changes. */
-void parent_linked_sound_update(char *mobyIn)
+void parent_linked_sound_update(char *moby_in)
 {
-    char *moby = mobyIn;
+    char *moby = moby_in;
     char *vars;
-    char *parentVars;
-    char *parentMoby;
-    char *soundSlot;
-    int parentIndex;
-    int soundHandle;
-    long long savedValue;
+    char *parent_vars;
+    char *parent_moby;
+    char *sound_slot;
+    int parent_index;
+    int sound_handle;
+    long long saved_value;
 
     vars = *(char **)(moby + 0x68);
     if (vars == 0)
@@ -87,30 +87,30 @@ void parent_linked_sound_update(char *mobyIn)
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         *(float *)(vars + 8) = *(float *)(moby + 0x18);
-        savedValue = *(long long *)(*(char **)g_hero_moby + 0x38);
+        saved_value = *(long long *)(*(char **)g_hero_moby + 0x38);
         *(unsigned char *)(moby + 0x20) = 1;
-        *(long long *)(moby + 0x38) = savedValue;
+        *(long long *)(moby + 0x38) = saved_value;
         *(int *)(vars + 0x10) = 0;
         break;
     case 1:
-        parentIndex = *(int *)vars;
-        if (parentIndex == -1)
+        parent_index = *(int *)vars;
+        if (parent_index == -1)
             break;
-        parentMoby = D_L06_001B281C[0] + (parentIndex << 8);
-        if (parentMoby == 0)
+        parent_moby = D_L06_001B281C[0] + (parent_index << 8);
+        if (parent_moby == 0)
             break;
-        parentVars = *(char **)(parentMoby + 0x68);
-        *(float *)(moby + 0x18) = *(float *)(parentVars + 0) * *(float *)(vars + 4)
+        parent_vars = *(char **)(parent_moby + 0x68);
+        *(float *)(moby + 0x18) = *(float *)(parent_vars + 0) * *(float *)(vars + 4)
                                + *(float *)(vars + 8);
-        if (*(float *)(parentVars + 0) != *(float *)(vars + 0x10)) {
-            if (*(float *)(parentVars + 0) == 1.0f || *(float *)(parentVars + 0) == 0.0f) {
+        if (*(float *)(parent_vars + 0) != *(float *)(vars + 0x10)) {
+            if (*(float *)(parent_vars + 0) == 1.0f || *(float *)(parent_vars + 0) == 0.0f) {
                 if (snd_is_voice_playing_for_owner(moby, *(int *)(vars + 0xC)) != 0) {
-                    soundHandle = *(int *)(vars + 0xC);
-                    if (soundHandle != -1) {
-                        soundSlot = g_sound_state + soundHandle * 0x70;
-                        if (*(int *)(soundSlot + 0x88) == (int)moby) {
-                            if (*(unsigned char *)(soundSlot + 0x74) != 0)
-                                snd_stop_voice(soundHandle);
+                    sound_handle = *(int *)(vars + 0xC);
+                    if (sound_handle != -1) {
+                        sound_slot = g_sound_state + sound_handle * 0x70;
+                        if (*(int *)(sound_slot + 0x88) == (int)moby) {
+                            if (*(unsigned char *)(sound_slot + 0x74) != 0)
+                                snd_stop_voice(sound_handle);
                         }
                     }
                     *(int *)(vars + 0xC) = -1;
@@ -122,18 +122,18 @@ void parent_linked_sound_update(char *mobyIn)
             }
         } else {
             if (snd_is_voice_playing_for_owner(moby, *(int *)(vars + 0xC)) != 0) {
-                soundHandle = *(int *)(vars + 0xC);
-                if (soundHandle != -1) {
-                    soundSlot = g_sound_state + soundHandle * 0x70;
-                    if (*(int *)(soundSlot + 0x88) == (int)moby) {
-                        if (*(unsigned char *)(soundSlot + 0x74) != 0)
-                            snd_stop_voice(soundHandle);
+                sound_handle = *(int *)(vars + 0xC);
+                if (sound_handle != -1) {
+                    sound_slot = g_sound_state + sound_handle * 0x70;
+                    if (*(int *)(sound_slot + 0x88) == (int)moby) {
+                        if (*(unsigned char *)(sound_slot + 0x74) != 0)
+                            snd_stop_voice(sound_handle);
                     }
                 }
                 *(int *)(vars + 0xC) = -1;
             }
         }
-        *(float *)(vars + 0x10) = *(float *)(parentVars + 0);
+        *(float *)(vars + 0x10) = *(float *)(parent_vars + 0);
         break;
     }
 }
@@ -169,20 +169,20 @@ typedef int TI128 __attribute__((mode(TI)));
          p++)
 
 /* Updates a switch-like object (moby classes 2155 and 2157) that controls a group of other mobys, turning them on and off. */
-void group_switch_update(char *mobyIn)
+void group_switch_update(char *moby_in)
 {
     static void *cases[5] = {&&c0, &&c1, &&c2, &&done, &&c4};
-    char *s1 = mobyIn;
+    char *s1 = moby_in;
     char *vars;
-    unsigned short *memberId;
+    unsigned short *member_id;
     char *member;
-    char *soundSlot;
+    char *sound_slot;
     char *member2;
-    unsigned short *memberId2;
+    unsigned short *member_id2;
     int cls;
     unsigned int sel;
-    float sprayVelocity[4];
-    float sprayPosition[4];
+    float spray_velocity[4];
+    float spray_position[4];
 
     sel = *(unsigned char *)(s1 + 0x20);
     vars = *(char **)(s1 + 0x68);
@@ -195,8 +195,8 @@ c0:
     goto done;
 c1:
     if (*(int *)(vars + 0x64) != -1 && coll_point_inside_region(D_L06_001B9840, *(int *)(vars + 0x64)) != 0) {
-        FOR_EACH_ID(memberId) {
-            member = D_L06_001B281C_abs[0] + ((*memberId & 0x7FFF) << 8);
+        FOR_EACH_ID(member_id) {
+            member = D_L06_001B281C_abs[0] + ((*member_id & 0x7FFF) << 8);
             if (member == 0)
                 break;
             *(unsigned char *)(member + 0x31) = 0;
@@ -205,8 +205,8 @@ c1:
         moby_set_state(s1, 4, -1);
     }
     UpdatePathMobySpacing(s1);
-    soundSlot = g_sound_state + *(int *)(vars + 0x54) * 0x70;
-    if (*(int *)(soundSlot + 0x88) != (int)s1 || *(unsigned char *)(soundSlot + 0x74) == 0)
+    sound_slot = g_sound_state + *(int *)(vars + 0x54) * 0x70;
+    if (*(int *)(sound_slot + 0x88) != (int)s1 || *(unsigned char *)(sound_slot + 0x74) == 0)
         *(int *)(vars + 0x54) = PlayMobySound(0, 4, s1);
     if (*(unsigned char *)(s1 + 0x31) == 0)
         goto done;
@@ -237,8 +237,8 @@ c1:
     goto done;
 c4:
     if (coll_point_inside_region(D_L06_001B9840, *(int *)(vars + 0x64)) == 0) {
-        FOR_EACH_ID(memberId2) {
-            member2 = D_L06_001B281C_abs[0] + ((*memberId2 & 0x7FFF) << 8);
+        FOR_EACH_ID(member_id2) {
+            member2 = D_L06_001B281C_abs[0] + ((*member_id2 & 0x7FFF) << 8);
             if (member2 == 0)
                 break;
             *(unsigned char *)(member2 + 0x31) = 1;
@@ -252,10 +252,10 @@ c2:
     euler_rotation_basis(s1 + 0xC0, s1 + 0xF0);
     *(float *)(s1 + 0x18) = *(float *)(s1 + 0x18) - 0.0200000014f;
     if (math_random_int_below(4) == 0 && *(short *)(s1 + 0xAA) == 0x86B /* moby class 2155 */) {
-        *(TI128 *)sprayVelocity = 0;
-        sprayVelocity[2] = 0.083333336f;
-        moby_compute_local_point(s1, sprayPosition, -1.5f, 0.0f, 1.0f);
-        part_l01_spawn_spark_burst(sprayPosition, sprayVelocity, 1, 0x40F0E0D0, 0, 0.041666668f, 2.0f, 1.02f);
+        *(TI128 *)spray_velocity = 0;
+        spray_velocity[2] = 0.083333336f;
+        moby_compute_local_point(s1, spray_position, -1.5f, 0.0f, 1.0f);
+        part_l01_spawn_spark_burst(spray_position, spray_velocity, 1, 0x40F0E0D0, 0, 0.041666668f, 2.0f, 1.02f);
     }
     if (math_fast_float_d(vars + 0x58)) {
         *(unsigned char *)(s1 + 0x31) = 0;

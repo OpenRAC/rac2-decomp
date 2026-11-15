@@ -35,7 +35,7 @@ typedef struct {
 /* Apply gravity and the current jump or hovering motion to the hero's velocity. */
 void ApplyHeroGravityAndJumpMotion(void)
 {
-    float offset[4], rayEnd[4], rayStart[4], currentSpeed;
+    float offset[4], ray_end[4], ray_start[4], current_speed;
     float speed, distance;
     int near, clear;
 
@@ -53,13 +53,13 @@ void ApplyHeroGravityAndJumpMotion(void)
                 cam_set_view_space_height(hero + 0xF0, hero + 0xF0, 0.0f);
                 hero_apply_mode_transform(hero + 0xF0, hero + 0xF0, 0.015000001f);
             } else {
-                float fallSpeed;
+                float fall_speed;
 
                 hero_apply_mode_transform(hero + 0xF0, hero + 0xF0, *(float *)(hero + 0x520));
-                fallSpeed = cam_get_view_space_height(hero + 0xF0);
-                if (fallSpeed < -*(float *)(hero + 0x4A0))
-                    fallSpeed = -*(float *)(hero + 0x4A0);
-                cam_set_view_space_height(hero + 0xF0, hero + 0xF0, fallSpeed);
+                fall_speed = cam_get_view_space_height(hero + 0xF0);
+                if (fall_speed < -*(float *)(hero + 0x4A0))
+                    fall_speed = -*(float *)(hero + 0x4A0);
+                cam_set_view_space_height(hero + 0xF0, hero + 0xF0, fall_speed);
             }
         }
     }
@@ -94,14 +94,14 @@ void ApplyHeroGravityAndJumpMotion(void)
                             }
                         }
                         {
-                            char *heroAlt = (char *)g_hero_state;
+                            char *hero_alt = (char *)g_hero_state;
 
-                            *(int *)(heroAlt + 0x243C) = -1;
+                            *(int *)(hero_alt + 0x243C) = -1;
                         }
                     }
-                    hero_build_relative_point(rayStart, 0.0f, 0.0f, 1.0f, 1);
-                    hero_build_relative_point(rayEnd, 0.0f, 0.0f, 2.7f, 1);
-                    if (CollLine(rayStart, rayEnd, 2, 0, 0))
+                    hero_build_relative_point(ray_start, 0.0f, 0.0f, 1.0f, 1);
+                    hero_build_relative_point(ray_end, 0.0f, 0.0f, 2.7f, 1);
+                    if (CollLine(ray_start, ray_end, 2, 0, 0))
                         clear = 0;
                 }
             }
@@ -128,20 +128,20 @@ void ApplyHeroGravityAndJumpMotion(void)
                 char *hero = (char *)&g_hero_state;
 
                 if (*(int *)(hero + 0x1B8) < 8) {
-                    currentSpeed = cam_get_view_space_height(hero + 0xF0);
-                    if (currentSpeed < speed)
-                        ApproachValue(&currentSpeed, speed, 0.041666668f);
-                    cam_set_view_space_height(hero + 0xF0, hero + 0xF0, currentSpeed);
+                    current_speed = cam_get_view_space_height(hero + 0xF0);
+                    if (current_speed < speed)
+                        ApproachValue(&current_speed, speed, 0.041666668f);
+                    cam_set_view_space_height(hero + 0xF0, hero + 0xF0, current_speed);
                 }
             }
         } else {
             int zero = 0;
-            char *heroCheck;
+            char *hero_check;
 
             if (*(float *)(hero + 0x4B0) == 0.0f && *(float *)(hero + 0x4B4) == 0.0f)
                 zero = 1;
             if ((D_00138320[0] & 0x40) || zero ||
-                (heroCheck = (char *)g_hero_state, *(int *)(heroCheck + 0x2294) == 18)) {
+                (hero_check = (char *)g_hero_state, *(int *)(hero_check + 0x2294) == 18)) {
                 char *hero = (char *)&g_hero_state;
 
                 if (*(float *)(hero + 0x4A8) < *(float *)(hero + 0x50C) &&

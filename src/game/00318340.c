@@ -266,17 +266,17 @@ extern void moby_scale_owner_words_by_angles(float, float, char *, char *, float
 /* Updates one flying enemy each frame: picks its next action, moves it, aims and fires at the hero, and keeps its sound playing. */
 void hover_enemy_update(char *obj)
 {
-    f32 muzzlePos[4] __attribute__((aligned(16)));
-    f32 targetPos[4] __attribute__((aligned(16)));
-    f32 aimDir[4] __attribute__((aligned(16)));
+    f32 muzzle_pos[4] __attribute__((aligned(16)));
+    f32 target_pos[4] __attribute__((aligned(16)));
+    f32 aim_dir[4] __attribute__((aligned(16)));
     f32 axis[4] __attribute__((aligned(16)));
-    f32 toTarget[4] __attribute__((aligned(16)));
+    f32 to_target[4] __attribute__((aligned(16)));
     char *pv = *(char **)(obj + 0x68);
     char *tgt13, *tgt10, *tgt16;
     f32 *pos;
     s32 *path;
     int id;
-    int mode0, mode2, flags, stateNow;
+    int mode0, mode2, flags, state_now;
     float h13, h12, floor12, y12, diff12, h5, diff5, dist10, dot, dist11, dist16, sx, sy, sz;
 
     if (((Hero_00318340 *)g_hero_state)->b[0x22B4] == 1)
@@ -510,36 +510,36 @@ void hover_enemy_update(char *obj)
         }
         dist10 = moby_get_anim_value(obj);
         if (math_is_value_within_step(obj, 17.0f) != 0) {
-            moby_transform_joint_to_world(obj, 4, muzzlePos);
+            moby_transform_joint_to_world(obj, 4, muzzle_pos);
             tgt10 = *(char **)(pv + 0x30);
             if (tgt10 == (char *)((Hero_00318340 *)g_hero_state)->ptr[0x2290 / 4]) {
-                qcopy(targetPos, &((Hero_00318340 *)g_hero_state)->q[0xD0 / 16]);
-                pos = targetPos;
+                qcopy(target_pos, &((Hero_00318340 *)g_hero_state)->q[0xD0 / 16]);
+                pos = target_pos;
             } else {
                 if (tgt10 == 0)
                     break;
-                qcopy(targetPos, tgt10 + 0x10);
-                pos = targetPos;
-                targetPos[2] += *(f32 *)(tgt10 + 0xC) * 0.0009765625f;
+                qcopy(target_pos, tgt10 + 0x10);
+                pos = target_pos;
+                target_pos[2] += *(f32 *)(tgt10 + 0xC) * 0.0009765625f;
             }
             if (moby_is_target_outside_turn_limit(obj, 10.0f) != 0) {
-                FastVecSub(toTarget, pos, muzzlePos);
-                qcopy(aimDir, D_001A8BD0);
-                aimDir[0] = 1.0f;
-                matrix_mul_vec3(aimDir, aimDir, obj + 0xC0);
-                FastVecCross(axis, aimDir, toTarget);
-                dot = FastVecDot(aimDir, toTarget);
+                FastVecSub(to_target, pos, muzzle_pos);
+                qcopy(aim_dir, D_001A8BD0);
+                aim_dir[0] = 1.0f;
+                matrix_mul_vec3(aim_dir, aim_dir, obj + 0xC0);
+                FastVecCross(axis, aim_dir, to_target);
+                dot = FastVecDot(aim_dir, to_target);
                 if (dot > 0.0f)
-                    math_apply_axis_rotation_to_quat(aimDir, aimDir, axis, -0.17453294f);
+                    math_apply_axis_rotation_to_quat(aim_dir, aim_dir, axis, -0.17453294f);
                 else
-                    math_apply_axis_rotation_to_quat(aimDir, aimDir, axis, 0.17453294f);
+                    math_apply_axis_rotation_to_quat(aim_dir, aim_dir, axis, 0.17453294f);
             } else {
-                FastVecSub(aimDir, pos, muzzlePos);
+                FastVecSub(aim_dir, pos, muzzle_pos);
             }
-            vec_scale_to_length(aimDir, aimDir, 0.33333334f);
-            part_spawn_spinning_effect_moby(obj, aimDir, muzzlePos, 0, 0, *(u8 *)(pv + 0x54));
+            vec_scale_to_length(aim_dir, aim_dir, 0.33333334f);
+            part_spawn_spinning_effect_moby(obj, aim_dir, muzzle_pos, 0, 0, *(u8 *)(pv + 0x54));
         } else if (dist10 < 17.0f && *(u8 *)(obj + 0x43) == 0x1E) {
-            moby_transform_joint_to_world(obj, 4, muzzlePos);
+            moby_transform_joint_to_world(obj, 4, muzzle_pos);
         }
         break;
     case 11:
@@ -596,34 +596,34 @@ void hover_enemy_update(char *obj)
         }
         dist16 = moby_get_anim_value(obj);
         if (math_is_value_within_step(obj, 16.0f) != 0) {
-            moby_transform_joint_to_world(obj, 4, muzzlePos);
+            moby_transform_joint_to_world(obj, 4, muzzle_pos);
             tgt16 = *(char **)(pv + 0x30);
             if (tgt16 == (char *)((Hero_00318340 *)g_hero_state)->ptr[0x2290 / 4]) {
-                qcopy(targetPos, &((Hero_00318340 *)g_hero_state)->q[0xD0 / 16]);
-                pos = targetPos;
+                qcopy(target_pos, &((Hero_00318340 *)g_hero_state)->q[0xD0 / 16]);
+                pos = target_pos;
             } else {
                 if (tgt16 == 0)
                     break;
-                qcopy(targetPos, tgt16 + 0x10);
-                pos = targetPos;
-                targetPos[2] += *(f32 *)(tgt16 + 0xC) * 0.0009765625f;
+                qcopy(target_pos, tgt16 + 0x10);
+                pos = target_pos;
+                target_pos[2] += *(f32 *)(tgt16 + 0xC) * 0.0009765625f;
             }
-            FastVecSub(aimDir, pos, muzzlePos);
-            vec_scale_to_length(aimDir, aimDir, 0.33333334f);
+            FastVecSub(aim_dir, pos, muzzle_pos);
+            vec_scale_to_length(aim_dir, aim_dir, 0.33333334f);
             PlayMobySound(0xB, 0, obj);
-            part_spawn_spinning_effect_moby(obj, aimDir, muzzlePos, 0, 0, *(u8 *)(pv + 0x54));
+            part_spawn_spinning_effect_moby(obj, aim_dir, muzzle_pos, 0, 0, *(u8 *)(pv + 0x54));
         } else if (dist16 < 17.0f && *(u8 *)(obj + 0x43) == 0x1E) {
-            moby_transform_joint_to_world(obj, 4, muzzlePos);
+            moby_transform_joint_to_world(obj, 4, muzzle_pos);
             sx = math_random_float_range(1.0f, 1.5f) * 210000.0f;
             sy = math_random_float_range(0.2f, 0.4f) * 210000.0f;
             sz = math_random_signed_float_range(0.0f, 0.1f);
-            part_spawn_gravity_fade(muzzlePos, D_001A8BD0, 4, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
+            part_spawn_gravity_fade(muzzle_pos, D_001A8BD0, 4, 0x808080, 9, 0x4F, 0, 0, sx, sy, sz);
         }
         break;
     }
 
-    stateNow = *(u8 *)(obj + 0x20);
-    if (stateNow == 12 || stateNow == 13 || stateNow == 14 || stateNow == 16) {
+    state_now = *(u8 *)(obj + 0x20);
+    if (state_now == 12 || state_now == 13 || state_now == 14 || state_now == 16) {
         u8 *recA;
         recA = *(s32 *)(pv + 0x2C4) * 0x70 + g_sound_state;
         if (*(char **)(recA + 0x88) != obj || recA[0x74] == 0)

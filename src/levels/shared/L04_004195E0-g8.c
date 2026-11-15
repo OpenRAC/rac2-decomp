@@ -61,7 +61,7 @@ void hoverbike_init_race_course(char *obj)
     if (*(int *)(data + 0x260) != -1) {
         GetFirstMobyInGroup(&moby, *(int *)(data + 0x260), 0, 0);
         if (moby) do {
-            if (*(short *)(moby + 0xAA) == 0xAB8 /* Hoverbike Race Item Box */) {
+            if (*(short *)(moby + 0xAA) == MOBY_CLASS_HOVERBIKE_RACE_ITEM_BOX) {
                 if (*(int *)(D_L04_002C63C4 + (g_current_race_index << 6)) & 1) {
                     **(int **)(moby + 0x68) = 0;
                     *(unsigned short *)(moby + 0x34) &= 0xFFBE;

@@ -92,8 +92,8 @@ void UpdateMobyGroupTrigger(JobaGroupMoby *self) {
         self->state = 1;
         self->flags |= 0x800;
         parent->flags |= 0x41;
-        HIDE_GROUP(1, 0xCF5 /* Joba Tribesman */, 0xCF6 /* moby class 3318 */, 0xD07 /* Jobian Saur-Beast */)
-        HIDE_GROUP(2, 0xD07 /* Jobian Saur-Beast */, 0xCF6 /* moby class 3318 */, 0xCF5 /* Joba Tribesman */)
+        HIDE_GROUP(1, MOBY_CLASS_JOBA_TRIBESMAN, 0xCF6 /* moby class 3318 */, MOBY_CLASS_JOBIAN_SAUR_BEAST)
+        HIDE_GROUP(2, MOBY_CLASS_JOBIAN_SAUR_BEAST, 0xCF6 /* moby class 3318 */, MOBY_CLASS_JOBA_TRIBESMAN)
     }
     if (self->state == 1) {
         if (hero_is_current_selected_id(parent) || flag_is_third_pending_set(parent) ||
@@ -114,9 +114,9 @@ void UpdateMobyGroupTrigger(JobaGroupMoby *self) {
                 do {
                     JobaGroupMoby *m = GROUP_MEMBER(*list);
                     health = *moby_get_private_value_0(m);
-                    if (MEMBER_ALIVE(m) && m->type == 0xCF5 /* Joba Tribesman */) { m->active = 1; ACTIVATE_MEMBER(m); }
+                    if (MEMBER_ALIVE(m) && m->type == MOBY_CLASS_JOBA_TRIBESMAN) { m->active = 1; ACTIVATE_MEMBER(m); }
                     else if (MEMBER_ALIVE(m) && m->type == 0xCF6 /* moby class 3318 */) { m->active = 1; ACTIVATE_MEMBER(m); }
-                    else if (MEMBER_ALIVE(m) && m->type == 0xD07 /* Jobian Saur-Beast */) { m->active = 1; ACTIVATE_MEMBER(m); }
+                    else if (MEMBER_ALIVE(m) && m->type == MOBY_CLASS_JOBIAN_SAUR_BEAST) { m->active = 1; ACTIVATE_MEMBER(m); }
                 } while (*list++ >= 0);
             }
             {
@@ -126,9 +126,9 @@ void UpdateMobyGroupTrigger(JobaGroupMoby *self) {
                 do {
                     JobaGroupMoby *m = GROUP_MEMBER(*list);
                     if ((signed char)m->state >= 0) {
-                        if (m->type == 0xD07 /* Jobian Saur-Beast */) { m->active = 1; ACTIVATE_MEMBER(m); }
+                        if (m->type == MOBY_CLASS_JOBIAN_SAUR_BEAST) { m->active = 1; ACTIVATE_MEMBER(m); }
                         else if (m->type == 0xCF6 /* moby class 3318 */) { m->active = 1; ACTIVATE_MEMBER(m); }
-                        else if (m->type == 0xCF5 /* Joba Tribesman */) { m->active = 1; ACTIVATE_MEMBER(m); }
+                        else if (m->type == MOBY_CLASS_JOBA_TRIBESMAN) { m->active = 1; ACTIVATE_MEMBER(m); }
                     }
                 } while (*list++ >= 0);
             }
@@ -149,9 +149,9 @@ void UpdateMobyGroupTrigger(JobaGroupMoby *self) {
                 do {
                     JobaGroupMoby *m = GROUP_MEMBER(*list);
                     if ((signed char)m->state >= 0) {
-                        if (m->type == 0xCF5 /* Joba Tribesman */) { ACTIVATE_MEMBER(m); m->active = 1; }
+                        if (m->type == MOBY_CLASS_JOBA_TRIBESMAN) { ACTIVATE_MEMBER(m); m->active = 1; }
                         else if (m->type == 0xCF6 /* moby class 3318 */) { ACTIVATE_MEMBER(m); m->active = 1; }
-                        else if (m->type == 0xD07 /* Jobian Saur-Beast */) { ACTIVATE_MEMBER(m); m->active = 1; }
+                        else if (m->type == MOBY_CLASS_JOBIAN_SAUR_BEAST) { ACTIVATE_MEMBER(m); m->active = 1; }
                     }
                 } while (*list++ >= 0);
                 if (data[2] == 255) { FinishGroupMoby(vec, self); return; }
@@ -161,9 +161,9 @@ void UpdateMobyGroupTrigger(JobaGroupMoby *self) {
                 do {
                     JobaGroupMoby *m = GROUP_MEMBER(*list);
                     if ((signed char)m->state >= 0) {
-                        if (m->type == 0xD07 /* Jobian Saur-Beast */) { ACTIVATE_MEMBER(m); m->active = 1; }
+                        if (m->type == MOBY_CLASS_JOBIAN_SAUR_BEAST) { ACTIVATE_MEMBER(m); m->active = 1; }
                         else if (m->type == 0xCF6 /* moby class 3318 */) { ACTIVATE_MEMBER(m); m->active = 1; }
-                        else if (m->type == 0xCF5 /* Joba Tribesman */) { ACTIVATE_MEMBER(m); m->active = 1; }
+                        else if (m->type == MOBY_CLASS_JOBA_TRIBESMAN) { ACTIVATE_MEMBER(m); m->active = 1; }
                     }
                 } while (*list++ >= 0);
                 part_spawn_explosion_with_sparks(self, 1.0f, 13.0f, self->position, -1);

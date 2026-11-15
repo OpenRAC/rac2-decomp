@@ -39,7 +39,7 @@ void UpdateOwnerOrbitingParticle(char *particle)
     char *state = particle + 32;
     Vec16_C5120 velocity;
     float delta[4], side[4];
-    float *velocityOut;
+    float *velocity_out;
     float progress;
     int alpha;
 
@@ -75,10 +75,10 @@ void UpdateOwnerOrbitingParticle(char *particle)
             else
                 vec_scale_to_length(velocity.f, delta, FastVecLength(velocity.f));
             velocity.f[2] += 0.02f;
-            velocityOut = (float *)(state + 12);
-            velocityOut[0] = velocity.f[0];
-            velocityOut[1] = velocity.f[1];
-            velocityOut[2] = velocity.f[2];
+            velocity_out = (float *)(state + 12);
+            velocity_out[0] = velocity.f[0];
+            velocity_out[1] = velocity.f[1];
+            velocity_out[2] = velocity.f[2];
         }
     }
     if (FastDecTimer((short *)(particle + 10)))

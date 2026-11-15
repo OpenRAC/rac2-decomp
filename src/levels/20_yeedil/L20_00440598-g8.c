@@ -114,12 +114,12 @@ extern s32 D_0018C0B4[];
 void yeedil_boss_update(char *self) {
     float vecs[16] __attribute__((aligned(16)));
     char *st;
-    int levelMode = D_L20_001CA540[0];
-    int soundIndex, animDone, gameMode, animDoneB, soundIndexEnd;
-    int modeNow;
-    char *heroMoby, *target, *heroPos, *sideOffset, *heroPosNear, *iter, *sideOffsetCopy, *soundSlot, *soundSlotCheck, *soundSlotEnd;
+    int level_mode = D_L20_001CA540[0];
+    int sound_index, anim_done, game_mode, anim_done_b, sound_index_end;
+    int mode_now;
+    char *hero_moby, *target, *hero_pos, *side_offset, *hero_pos_near, *iter, *side_offset_copy, *sound_slot, *sound_slot_check, *sound_slot_end;
 
-    if (levelMode == 2) {
+    if (level_mode == 2) {
         st = AT(char *, self, 0x68);
         yeedil_boss_init_damage(self);
         if (AT(u8, self, 0x95) == 6) {
@@ -131,12 +131,12 @@ void yeedil_boss_update(char *self) {
                     level_capture_checkpoint_state(vecs, &vecs[4]);
                     D_L20_001B20A0 = D_L20_001B20A0 + 1.0f;
                     moby_set_state(self, 1, 0);
-                    modeNow = D_L20_001A8F00[0];
+                    mode_now = D_L20_001A8F00[0];
                 } else {
-                    modeNow = D_L20_001A8F00_gp;
+                    mode_now = D_L20_001A8F00_gp;
                 }
                 /* ctr is 2 here; retail compares against its saved copy. */
-                if (modeNow == levelMode) {
+                if (mode_now == level_mode) {
                     AT(s32, self, 0x98) = 0;
                     AT(u16, self, 0x34) = (AT(u16, self, 0x34) | 0x41) & 0xEFFF;
                 } else {
@@ -153,8 +153,8 @@ void yeedil_boss_update(char *self) {
             if (flag_set_first_pending(self) != 0 && AT(u8, self, 0x43) != 0x13) {
                 anim_start_blended(self, 0x13, 0, 0x14);
             }
-            heroMoby = g_hero_moby[0];
-            moby_start_effect_from_entry(self, mat_fast_helper_a(AT(f32, heroMoby, 0x10) - AT(f32, self, 0x10), AT(f32, heroMoby, 0x14) - AT(f32, self, 0x14)));
+            hero_moby = g_hero_moby[0];
+            moby_start_effect_from_entry(self, mat_fast_helper_a(AT(f32, hero_moby, 0x10) - AT(f32, self, 0x10), AT(f32, hero_moby, 0x14) - AT(f32, self, 0x14)));
             if (AT(u8, self, 0x60) & 2) {
                 enemy_choose_next_state(self);
             }
@@ -167,8 +167,8 @@ void yeedil_boss_update(char *self) {
                 moby_set_motion_limits(self);
                 AT(s32, self, 0x9C) = 1;
             }
-            soundSlot = (char *)g_sound_state + AT(s32, st, 0x1854) * 0x70;
-            if (AT(s32, soundSlot, 0x88) != (s32)self || AT(u8, soundSlot, 0x74) == 0) {
+            sound_slot = (char *)g_sound_state + AT(s32, st, 0x1854) * 0x70;
+            if (AT(s32, sound_slot, 0x88) != (s32)self || AT(u8, sound_slot, 0x74) == 0) {
                 AT(s32, st, 0x1854) = PlayMobySound(1, 4, self);
             }
             if (AT(char *, st, 0x1850) != 0) {
@@ -178,10 +178,10 @@ void yeedil_boss_update(char *self) {
             }
             if (yeedil_boss_update_grab(self) != 0) {
                 moby_set_state(self, 3, -1);
-                soundIndex = AT(s32, st, 0x1854);
-                if (soundIndex != -1 && (soundSlotCheck = (char *)g_sound_state + soundIndex * 0x70, AT(s32, soundSlotCheck, 0x88) == (s32)self)) {
-                    if (AT(u8, soundSlotCheck, 0x74) != 0) {
-                        snd_stop_voice(soundIndex);
+                sound_index = AT(s32, st, 0x1854);
+                if (sound_index != -1 && (sound_slot_check = (char *)g_sound_state + sound_index * 0x70, AT(s32, sound_slot_check, 0x88) == (s32)self)) {
+                    if (AT(u8, sound_slot_check, 0x74) != 0) {
+                        snd_stop_voice(sound_index);
                     }
                 }
                 AT(s32, st, 0x1854) = -1;
@@ -270,8 +270,8 @@ void yeedil_boss_update(char *self) {
                 }
                 moby_set_motion_limits_range(self, AT(f32, st, 0x1838) * 0.5f);
             }
-            heroPos = (char *)(&((Hero *)g_hero_state)->b[0x80]);
-            moby_chase_target_update(self, heroPos, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
+            hero_pos = (char *)(&((Hero *)g_hero_state)->b[0x80]);
+            moby_chase_target_update(self, hero_pos, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
             if (AT(f32, st, 0x11C) < AT(f32, st, 0x1838) && FastDiffRots(AT(f32, self, 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
                 moby_set_state(self, AT(s32, st, 0x1834), -1);
             }
@@ -382,16 +382,16 @@ void yeedil_boss_update(char *self) {
             }
             break;
         case 13:
-            animDone = flag_set_first_pending(self);
-            sideOffset = st + 0x17D0;
-            if (animDone != 0) {
+            anim_done = flag_set_first_pending(self);
+            side_offset = st + 0x17D0;
+            if (anim_done != 0) {
                 if (AT(u8, self, 0x43) != 2) {
                     anim_start_blended(self, 2, 0, 0x14);
                 }
-                yeedil_boss_compute_side_step(self, sideOffset);
+                yeedil_boss_compute_side_step(self, side_offset);
                 moby_set_motion_limits_range(self, 1.0f);
             }
-            moby_chase_target_update(self, sideOffset, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
+            moby_chase_target_update(self, side_offset, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
             if (AT(f32, st, 0x11C) < 1.0f && FastDiffRots(AT(f32, self, 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
                 moby_set_state(self, 0xE, -1);
             } else if (group_count_active_members(AT(s32, st, 0x21C)) < 3) {
@@ -456,8 +456,8 @@ void yeedil_boss_update(char *self) {
             dist = moby_get_anim_value(self);
             if (AT(u8, self, 0x42) == AT(u8, self, 0x43)) {
                 if ((AT(u8, self, 0x42) == 8 && dist < 9.0f) || (AT(u8, self, 0x42) == 9 && dist > 12.0f && dist < 30.0f)) {
-                    heroPosNear = (char *)(&((Hero *)g_hero_state)->b[0x80]);
-                    moby_chase_target_update(self, heroPosNear, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
+                    hero_pos_near = (char *)(&((Hero *)g_hero_state)->b[0x80]);
+                    moby_chase_target_update(self, hero_pos_near, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
                     if (AT(u8, self, 0x42) == AT(u8, self, 0x43)) {
                         if ((AT(u8, self, 0x42) == 8 && dist < 9.0f && dist > 7.0f) || (AT(u8, self, 0x43) == 9 && dist > 25.0f && dist < 30.0f)) {
                             qcopy(vecs, self + 0x10);
@@ -489,12 +489,12 @@ void yeedil_boss_update(char *self) {
                     anim_start_blended(self, 0x15, 0, 0xA);
                 }
                 iter = D_L20_001B2FA8[0];
-                gameMode = D_L20_001A8F00_gp;
+                game_mode = D_L20_001A8F00_gp;
                 if (iter != 0) {
                     /* Retail keeps these four in saved registers; with literals cc1 folds the two state
                        tests into one range check. */
-                    int class_removed = 0xCBC /* Megacorp Hover Tank */, state_dead = 0xFE, state_dying = 0xFD;
-                    int class_reset = 0xD0F /* Megacorp Trooper Legs */;
+                    int class_removed = MOBY_CLASS_MEGACORP_HOVER_TANK, state_dead = 0xFE, state_dying = 0xFD;
+                    int class_reset = MOBY_CLASS_MEGACORP_TROOPER_LEGS;
                     int id;
                     do {
                         id = AT(s16, iter, 0xAA);
@@ -514,12 +514,12 @@ void yeedil_boss_update(char *self) {
                         }
                         iter = AT(char *, iter, 0x28);
                     } while (iter != 0);
-                    gameMode = D_L20_001A8F00[0];
+                    game_mode = D_L20_001A8F00[0];
                 }
             } else {
-                gameMode = D_L20_001A8F00[0];
+                game_mode = D_L20_001A8F00[0];
             }
-            if (gameMode == 2) {
+            if (game_mode == 2) {
                 AT(s32, self, 0x98) = 0;
                 AT(u16, self, 0x34) = (AT(u16, self, 0x34) | 0x41) & 0xEFFF;
             }
@@ -581,9 +581,9 @@ void yeedil_boss_update(char *self) {
             }
             break;
         case 24:
-            animDoneB = flag_set_first_pending(self);
-            sideOffsetCopy = st + 0x17D0;
-            if (animDoneB != 0) {
+            anim_done_b = flag_set_first_pending(self);
+            side_offset_copy = st + 0x17D0;
+            if (anim_done_b != 0) {
                 f32 mag = math_random_float_range(5.0f, 15.0f);
                 f32 ang = math_random_angle();
                 char *target;
@@ -593,13 +593,13 @@ void yeedil_boss_update(char *self) {
                 target = D_L20_001B308C[0] + (AT(s32, st, 0x230) << 7);
                 AT(s32, st, 0x17D8) = 0;
                 AT(f32, st, 0x17D4) = y;
-                FastVecAdd(sideOffsetCopy, sideOffsetCopy, target + 0x30);
+                FastVecAdd(side_offset_copy, side_offset_copy, target + 0x30);
                 if (AT(u8, self, 0x43) != 2) {
                     anim_start_blended(self, 2, 0, 0x14);
                 }
                 moby_set_motion_limits_range(self, 1.5f);
             }
-            moby_chase_target_update(self, sideOffsetCopy, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
+            moby_chase_target_update(self, side_offset_copy, mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14)));
             if (AT(f32, st, 0x11C) <= 1.5f && FastDiffRots(AT(f32, self, 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - AT(f32, self, 0x10), ((Hero *)g_hero_state)->f[0x84 / 4] - AT(f32, self, 0x14))) < 0.087266475f) {
                 moby_set_state(self, 0x19, -1);
             }
@@ -620,11 +620,11 @@ void yeedil_boss_update(char *self) {
         }
         yeedil_boss_frame_upkeep(self);
         if (AT(u8, self, 0x20) != 2) {
-            soundIndexEnd = AT(s32, st, 0x1854);
-            if (soundIndexEnd != -1) {
-                soundSlotEnd = (char *)g_sound_state + soundIndexEnd * 0x70;
-                if (AT(s32, soundSlotEnd, 0x88) == (s32)self && AT(u8, soundSlotEnd, 0x74) != 0) {
-                    snd_stop_voice(soundIndexEnd);
+            sound_index_end = AT(s32, st, 0x1854);
+            if (sound_index_end != -1) {
+                sound_slot_end = (char *)g_sound_state + sound_index_end * 0x70;
+                if (AT(s32, sound_slot_end, 0x88) == (s32)self && AT(u8, sound_slot_end, 0x74) != 0) {
+                    snd_stop_voice(sound_index_end);
                 }
             }
             AT(s32, st, 0x1854) = -1;

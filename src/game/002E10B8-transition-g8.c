@@ -112,7 +112,7 @@ void level_transition_scene_start(int mode)
     p = D_001B1B60;
     object->flags |= 1;
     for (; p->status != 255; p++) {
-        if (!(p->status & 0x80) && (p->type == 0x4A /* moby class 74 */ || p->type == 0xCB /* Decoy */))
+        if (!(p->status & 0x80) && (p->type == 0x4A /* moby class 74 */ || p->type == MOBY_CLASS_DECOY))
             p->flags |= 0x80;
     }
 

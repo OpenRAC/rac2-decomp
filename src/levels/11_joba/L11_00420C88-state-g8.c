@@ -609,7 +609,7 @@ void tribesman_l11_update(unsigned char *object)
         }
         if ((unsigned int)(BYTE(object, 0x42) - 0x1a) < 2 && (BYTE(object, 0x60) & 2) != 0) {
             PLAY(object, 0x1d, 0, 30);
-            if (HALF(POINTER(state, 0x55c), 0xaa) == 0xcf5 /* Joba Tribesman */) {
+            if (HALF(POINTER(state, 0x55c), 0xaa) == MOBY_CLASS_JOBA_TRIBESMAN) {
                 WORD(POINTER(POINTER(state, 0x55c), 0x68), 0x540) = 1;
                 WORD(state, 0x540) = 2;
             }
@@ -624,7 +624,7 @@ void tribesman_l11_update(unsigned char *object)
                 ids = g_group_id_lists[BYTE(object, 0x21)];
                 for (;;) {
                     linked = moby_at(group_entry_id(ids));
-                    if (moby_state(linked) >= 0 && moby_class(linked) == 0xcf5 /* Joba Tribesman */ &&
+                    if (moby_state(linked) >= 0 && moby_class(linked) == MOBY_CLASS_JOBA_TRIBESMAN &&
                         rider_kind(linked) == 1)
                         break;
                     if (*(short *)ids++ < 0) goto partner_done;

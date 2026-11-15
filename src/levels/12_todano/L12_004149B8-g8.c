@@ -185,7 +185,7 @@ void todano_guard_update(GuardMoby *moby)
     GuardVars *vars;
     GuardMoby *list[3];
     s32 sx, sy, sz;
-    s32 helperCount;
+    s32 helper_count;
     s8 alarm;
 
     if (D_L12_001CA380.kind != 0) {
@@ -246,16 +246,16 @@ void todano_guard_update(GuardMoby *moby)
         vars->f31C = 1;
         guard_handle_hit_handover(moby);
         *(TI128 *)&moby->x = *(TI128 *)(D_L12_001FEAC0[vars->f2C0] + 0x10);
-        helperCount = 0;
+        helper_count = 0;
         if (vars->f2F8 != 0) {
             list[0] = vars->f2F8;
-            helperCount = 1;
+            helper_count = 1;
         }
         if (vars->f2F0[0] != 0)
-            list[helperCount++] = vars->f2F0[0];
+            list[helper_count++] = vars->f2F0[0];
         if (vars->f2F0[1] != 0)
-            list[helperCount++] = vars->f2F0[1];
-        moby_fuse_linked_objects(moby, &moby->x, (char *)moby + 0xF0, list, helperCount);
+            list[helper_count++] = vars->f2F0[1];
+        moby_fuse_linked_objects(moby, &moby->x, (char *)moby + 0xF0, list, helper_count);
     }
 
     if (vars->f4A0 != 0) {

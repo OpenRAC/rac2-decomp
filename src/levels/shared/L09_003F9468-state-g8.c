@@ -65,7 +65,7 @@ void enemy_choose_next_action(char *obj)
         }
     } else if ((*(u8 *)(vars + 0x303) && *(u8 *)(obj + 0x95) == 5) || (*(int *)(vars + 0x4C0) && *(u8 *)(obj + 0x95) == 3)) {
         parent = *(char **)(vars + 0x2F8);
-        if (parent && *(short *)(parent + 0xAA) == 0xD0E /* Megacorp Trooper Torso */ && *(u8 *)(parent + 0x20) != 0xFE && *(u8 *)(parent + 0x20) != 0xFD) {
+        if (parent && *(short *)(parent + 0xAA) == MOBY_CLASS_MEGACORP_TROOPER_TORSO && *(u8 *)(parent + 0x20) != 0xFE && *(u8 *)(parent + 0x20) != 0xFD) {
             *(u8 *)(vars + 0x30C) = 0;
             *(u8 *)(vars + 0x30D) = 1;
             if (*(u8 *)(parent + 0x42) == 10) trooper_fire_arm_shot(obj);

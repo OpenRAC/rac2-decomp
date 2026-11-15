@@ -29,7 +29,7 @@ extern float D_001AA318 __attribute__((sda));
 void part_update_drifting(char *particle)
 {
     char *motion = particle + 0x20;
-    float speed, lifeLeft, maxLife, lifeFraction;
+    float speed, life_left, max_life, life_fraction;
 
     particle[8] = (unsigned char)particle[8] + (unsigned char)motion[0x1E];
     FastVecAdd(particle + 0x10, particle + 0x10, motion);
@@ -37,18 +37,18 @@ void part_update_drifting(char *particle)
     math_step_value_toward_target(particle + 0x30, &speed, 0.0f, 0.0f, D_001AA348 * 0.00027777778f, speed);
     vec_scale_to_length(motion, motion, -speed);
     *(float *)(particle + 0x18) += D_001AA34C * 0.016666667f;
-    lifeLeft = IntToFloat(*(short *)(particle + 0xA));
-    maxLife = IntToFloat((unsigned char)motion[0x1D]);
-    lifeFraction = lifeLeft / maxLife;
+    life_left = IntToFloat(*(short *)(particle + 0xA));
+    max_life = IntToFloat((unsigned char)motion[0x1D]);
+    life_fraction = life_left / max_life;
     if (motion[0x1F] & 1)
-        *(float *)(particle + 0xC) = LERP(D_001AA33C, D_001AA338, lifeFraction) * 210000.0f;
+        *(float *)(particle + 0xC) = LERP(D_001AA33C, D_001AA338, life_fraction) * 210000.0f;
     else
-        *(float *)(particle + 0xC) = LERP(D_001AA31C, D_001AA318, lifeFraction) * 210000.0f;
-    *(int *)(particle + 4) = FastTweenColor(*(int *)(motion + 0x18), *(int *)(motion + 0x14), lifeFraction);
+        *(float *)(particle + 0xC) = LERP(D_001AA31C, D_001AA318, life_fraction) * 210000.0f;
+    *(int *)(particle + 4) = FastTweenColor(*(int *)(motion + 0x18), *(int *)(motion + 0x14), life_fraction);
     if (*(short *)(particle + 0xA) < 15) {
-        lifeLeft = IntToFloat(*(short *)(particle + 0xA));
-        maxLife = IntToFloat(10);
-        *(int *)(particle + 4) = FastTweenColor(*(int *)(particle + 4) & 0xFFFFFF, *(int *)(particle + 4), lifeLeft / maxLife);
+        life_left = IntToFloat(*(short *)(particle + 0xA));
+        max_life = IntToFloat(10);
+        *(int *)(particle + 4) = FastTweenColor(*(int *)(particle + 4) & 0xFFFFFF, *(int *)(particle + 4), life_left / max_life);
     }
     if (*(float *)(particle + 0x10) < 2.0f || *(float *)(particle + 0x10) > 1021.0f ||
         *(float *)(particle + 0x14) < 2.0f || *(float *)(particle + 0x14) > 1021.0f ||

@@ -51,47 +51,47 @@ extern void draw_joint_aligned_beam_effect(void), beam_spawn_trail_particles(voi
 /* Adapted from RAC1 update_beam_effect_lifecycle (OpenRAC, GPL-3.0). */
 /* Switches the beam effect on and off depending on what the player is doing. It grows and shrinks while it is on. */
 void beam_effect_update(void *p) {
-    O_4198 *beamObj = (O_4198 *)p;
-    V_4198 *v = beamObj->v;
-    s32 wantActive = 0;
-    s32 heroMode;
+    O_4198 *beam_obj = (O_4198 *)p;
+    V_4198 *v = beam_obj->v;
+    s32 want_active = 0;
+    s32 hero_mode;
 
     if ((&g_hero_state)->i1338 == 3 || stub_empty_29(3) == 8) {
-        if (beamObj->state == 1 || beamObj->state == 3) {
-            heroMode = (&g_hero_state)->i2294;
-            if ((u32)(heroMode - 0xB) < 4
-                || (heroMode == 0x1B && ((u8 *)(&g_hero_state)->p2290)[0x42] == ((u8 *)(&g_hero_state)->p2290)[0x43]
+        if (beam_obj->state == 1 || beam_obj->state == 3) {
+            hero_mode = (&g_hero_state)->i2294;
+            if ((u32)(hero_mode - 0xB) < 4
+                || (hero_mode == 0x1B && ((u8 *)(&g_hero_state)->p2290)[0x42] == ((u8 *)(&g_hero_state)->p2290)[0x43]
                     && (&g_hero_state)->fC38 >= 6.0f && (&g_hero_state)->fC38 <= 16.0f)) {
-                if (!(&g_hero_state)->i49E) wantActive = 1;
+                if (!(&g_hero_state)->i49E) want_active = 1;
             }
-            if ((&g_hero_state)->i2294 == 0x82 && (D_00138320 & 0x40)) wantActive = 1;
+            if ((&g_hero_state)->i2294 == 0x82 && (D_00138320 & 0x40)) want_active = 1;
             if ((&g_hero_state)->i2294 == 0x10) {
                 if ((&g_hero_state)->i1B8 < 44) {
-                    wantActive = 1;
+                    want_active = 1;
                 }
             }
             if ((&g_hero_state)->i2294 == 0x21) {
                 if ((&g_hero_state)->i1B8 < 15
                     || (33 < (&g_hero_state)->i1B8 && (&g_hero_state)->i34E != 0)) {
-                    wantActive = 1;
+                    want_active = 1;
                 }
             }
-            if ((&g_hero_state)->i2294 == 8) wantActive = 1;
-            if ((&g_hero_state)->i2294 == 0x82) wantActive = 1;
+            if ((&g_hero_state)->i2294 == 8) want_active = 1;
+            if ((&g_hero_state)->i2294 == 0x82) want_active = 1;
         }
     }
-    switch (beamObj->state) {
+    switch (beam_obj->state) {
     case 0:
-        beamObj->f18 += 0.5f;
-        beamObj->state = 1;
-        beamObj->u30 = 0xFF;
-        beamObj->u34 |= 1;
+        beam_obj->f18 += 0.5f;
+        beam_obj->state = 1;
+        beam_obj->u30 = 0xFF;
+        beam_obj->u34 |= 1;
         break;
     case 1:
         if ((stub_empty_29(3) != 3 && stub_empty_29(3) != 8) || !g_hero_state.i1314) {
-            moby_mark_spawned(beamObj);
-        } else if (wantActive != 0) {
-            beamObj->state = 2;
+            moby_mark_spawned(beam_obj);
+        } else if (want_active != 0) {
+            beam_obj->state = 2;
             v->i0 = 2;
             v->f30 = 0.0125f / 2;
             v->f34 = 0.2f / 2;
@@ -109,9 +109,9 @@ void beam_effect_update(void *p) {
         v->f28 += v->f38;
         v->f2C += v->f3C;
         v->i8 = (&g_hero_state)->i1310;
-        gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, beamObj);
+        gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, beam_obj);
         if (math_fast_float_d(v) != 0) {
-            beamObj->state = 3;
+            beam_obj->state = 3;
             v->f20 = 0.0125f;
             v->f24 = 0.2f;
             v->f28 = 0.05f;
@@ -121,9 +121,9 @@ void beam_effect_update(void *p) {
         break;
     case 3:
         v->i8 = (&g_hero_state)->i1310;
-        gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, beamObj);
-        if (wantActive == 0) {
-            beamObj->state = 4;
+        gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, beam_obj);
+        if (want_active == 0) {
+            beam_obj->state = 4;
             v->i0 = 8;
             v->f30 = 0.0125f / 8;
             v->f34 = 0.2f / 8;
@@ -131,19 +131,19 @@ void beam_effect_update(void *p) {
             v->f3C = 0.025f / 8;
         } else {
             v->f20 = 0.0125f;
-            beam_spawn_trail_particles(beamObj);
+            beam_spawn_trail_particles(beam_obj);
         }
         break;
     case 4:
         if (math_fast_float_d(v) != 0) {
-            beamObj->state = 1;
+            beam_obj->state = 1;
         } else {
             v->f20 -= v->f30;
             v->f24 -= v->f34;
             v->f28 -= v->f38;
             v->f2C -= v->f3C;
             v->i8 = (&g_hero_state)->i1310;
-            gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, beamObj);
+            gfx_register_overlay_draw_callback(draw_joint_aligned_beam_effect, beam_obj);
         }
         break;
     }

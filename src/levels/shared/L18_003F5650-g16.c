@@ -69,9 +69,9 @@ void protopet_run_state_machine(u8 *moby)
     float point[4] __attribute__((aligned(16)));
     float vec[4] __attribute__((aligned(16)));
     float offset[4] __attribute__((aligned(16)));
-    s32 spawnLimit;
+    s32 spawn_limit;
     u8 *vars;
-    s32 groupId;
+    s32 group_id;
 
     vars = *(u8 **)(moby + 0x68);
     switch (moby[0x20]) {
@@ -150,7 +150,7 @@ void protopet_run_state_machine(u8 *moby)
         }
         break;
     case 16: {
-        float heroDistance;
+        float hero_distance;
         if (flag_set_first_pending(moby) != 0) {
             if (moby[0x43] != 2) {
                 anim_start_blended(moby, 2, 0, 0xA);
@@ -158,12 +158,12 @@ void protopet_run_state_machine(u8 *moby)
             vec_scale_to_length(vars + 0x1A0, moby + 0xC0, -0.06666667f);
             break;
         }
-        heroDistance = moby_get_anim_value(moby);
-        if (*(float *)(moby + 0x48) == 1.0f && 23.0f < heroDistance) {
+        hero_distance = moby_get_anim_value(moby);
+        if (*(float *)(moby + 0x48) == 1.0f && 23.0f < hero_distance) {
             *(float *)(moby + 0x48) = -0.65f;
             vec_scale_to_length(vars + 0x1A0, moby + 0xC0, 0.13333334f);
             *(float *)(vars + 0x1A8) += 0.1388889f;
-        } else if (*(float *)(moby + 0x48) == -0.65f && heroDistance < 3.0f) {
+        } else if (*(float *)(moby + 0x48) == -0.65f && hero_distance < 3.0f) {
             *(float *)(moby + 0x48) = 1.0f;
             moby_set_state(moby, moby[0x94], -1);
         }
@@ -220,11 +220,11 @@ void protopet_run_state_machine(u8 *moby)
             }
             moby[0xBC] = 1;
         } else if (moby[0xBC] == 1) {
-            spawnLimit = 0x32;
+            spawn_limit = 0x32;
             if (*(u16 *)(moby + 0x96) >= 0x15) {
                 u8 *spawn;
                 *(u16 *)(moby + 0x96) = 0;
-                spawn = protopet_count_group(*(u8 **)(vars + 0x25C), &spawnLimit);
+                spawn = protopet_count_group(*(u8 **)(vars + 0x25C), &spawn_limit);
                 if (spawn != 0) {
                     float wobble;
                     FastVecAdd(point, moby + 0x10, D_L18_001B0420);
@@ -239,7 +239,7 @@ void protopet_run_state_machine(u8 *moby)
                     (*(s16 *)(vars + 0x298))++;
                 }
             }
-            if (*(s16 *)(vars + 0x298) >= 3 || spawnLimit == 0) {
+            if (*(s16 *)(vars + 0x298) >= 3 || spawn_limit == 0) {
                 if (moby[0x43] != 8) {
                     anim_start_blended(moby, 8, 0, 0xA);
                 }
@@ -252,7 +252,7 @@ void protopet_run_state_machine(u8 *moby)
         }
         break;
     case 10: {
-        float heroDistance;
+        float hero_distance;
         s32 count;
         s32 i;
         if (flag_set_first_pending(moby) != 0) {
@@ -261,8 +261,8 @@ void protopet_run_state_machine(u8 *moby)
             }
             break;
         }
-        heroDistance = moby_get_anim_value(moby);
-        if (moby[0x42] == 5 && heroDistance < 10.0f) {
+        hero_distance = moby_get_anim_value(moby);
+        if (moby[0x42] == 5 && hero_distance < 10.0f) {
             moby_set_controller_speed_limits(moby, 0.083333336f, 0.33333334f, 0.1939255f, 2.9088826f);
             if (moby[0x94] == 0xB && *(u8 **)(vars + 0x258) != 0) {
                 protopet_start_turn_toward_target(moby, *(u8 **)(vars + 0x258) + 0x10);
@@ -270,7 +270,7 @@ void protopet_run_state_machine(u8 *moby)
                 protopet_start_turn_toward_target(moby, vars + 0x1F0);
             }
         }
-        if (moby[0x42] == 5 && 10.0f < heroDistance && heroDistance < 17.0f) {
+        if (moby[0x42] == 5 && 10.0f < hero_distance && hero_distance < 17.0f) {
             moby_transform_joint_to_world(moby, 0, point);
             count = coll_process_hit(point, 0, moby, 0, 0.2f);
             if (count != 0) {
@@ -281,7 +281,7 @@ void protopet_run_state_machine(u8 *moby)
                         qcopy(vec, hero + 0x80);
                     } else {
                         qcopy(vec, other + 0x10);
-                        if (*(s16 *)(other + 0xAA) == 0xB69 /* Protopet */) {
+                        if (*(s16 *)(other + 0xAA) == MOBY_CLASS_PROTOPET) {
                             continue;
                         }
                     }
@@ -334,37 +334,37 @@ void protopet_run_state_machine(u8 *moby)
     case 12: {
         u8 phase;
         if (flag_set_first_pending(moby) != 0) {
-            float turnDegrees;
+            float turn_degrees;
             if (moby[0x43] != 4) {
                 anim_start_blended(moby, 4, 0, 0xA);
             }
-            turnDegrees = math_random_float_range(15.0f, 30.0f);
-            *(float *)(vars + 0x24C) = turnDegrees * (math_random_int_below(2) != 0 ? -0.017453294f : 0.017453294f);
+            turn_degrees = math_random_float_range(15.0f, 30.0f);
+            *(float *)(vars + 0x24C) = turn_degrees * (math_random_int_below(2) != 0 ? -0.017453294f : 0.017453294f);
             moby[0xBC] = 0;
         }
         phase = moby[0xBC];
         if (phase == 0) {
             qcopy(vars + 0x230, vars + 0x1F0);
-            groupId = *(s32 *)(vars + 0x27C);
-            if (groupId != -1 && (D_L18_001B2348[0] & 7) == (((s32)moby >> 8) & 7)) {
-                u16 *groupEntry;
+            group_id = *(s32 *)(vars + 0x27C);
+            if (group_id != -1 && (D_L18_001B2348[0] & 7) == (((s32)moby >> 8) & 7)) {
+                u16 *group_entry;
                 float best = 1000.0f;
                 s32 lost = 1;
-                for (groupEntry = D_L18_001FB320[groupId];
-                     (u8)groupId != 0xFF && groupId <= D_L18_001B2838[0] && groupEntry != 0
-                     && ((groupEntry != 0 && (s16)groupEntry[-1] >= 0) || groupEntry == D_L18_001FB320[groupId]);
-                     groupId = *(s32 *)(vars + 0x27C), groupEntry++) {
-                    u8 *other = g_moby_l18_table[0] + ((*groupEntry & 0x7FFF) << 8);
+                for (group_entry = D_L18_001FB320[group_id];
+                     (u8)group_id != 0xFF && group_id <= D_L18_001B2838[0] && group_entry != 0
+                     && ((group_entry != 0 && (s16)group_entry[-1] >= 0) || group_entry == D_L18_001FB320[group_id]);
+                     group_id = *(s32 *)(vars + 0x27C), group_entry++) {
+                    u8 *other = g_moby_l18_table[0] + ((*group_entry & 0x7FFF) << 8);
                     if (other == 0) {
                         break;
                     }
                     if (other[0x20] != 0xFE) {
                         if (other[0x20] != 0xFD) {
-                            float candidateDistance;
+                            float candidate_distance;
                             lost = 0;
-                            candidateDistance = vec_distance_xy(moby + 0x10, other + 0x10);
-                            if (candidateDistance < best) {
-                                best = candidateDistance;
+                            candidate_distance = vec_distance_xy(moby + 0x10, other + 0x10);
+                            if (candidate_distance < best) {
+                                best = candidate_distance;
                             }
                         }
                     }
@@ -397,33 +397,33 @@ void protopet_run_state_machine(u8 *moby)
         break;
     }
     case 13: {
-        u16 *groupEntry;
+        u16 *group_entry;
         s32 lost;
         if (flag_set_first_pending(moby) != 0) {
-            float turnDegrees;
+            float turn_degrees;
             if (moby[0x43] != 4) {
                 anim_start_blended(moby, 4, 0, 0xA);
             }
             *(s16 *)(vars + 0x29A) = path_measure_moby_against_entry(moby + 0x10, *(s32 *)(vars + 0x278), 0.0f);
-            turnDegrees = math_random_float_range(15.0f, 30.0f);
-            *(float *)(vars + 0x24C) = turnDegrees * (math_random_int_below(2) != 0 ? -0.017453294f : 0.017453294f);
+            turn_degrees = math_random_float_range(15.0f, 30.0f);
+            *(float *)(vars + 0x24C) = turn_degrees * (math_random_int_below(2) != 0 ? -0.017453294f : 0.017453294f);
             moby_set_controller_speed_limits(moby, 0.0016666667f, 0.050000004f, 0.003490659f, 0.10471977f);
             break;
         }
         path_advance(moby, vars + 0x230, *(s32 *)(vars + 0x278), (s16 *)(vars + 0x29A), 0, 3.0f);
-        groupId = *(s32 *)(vars + 0x27C);
-        if (groupId == -1) {
+        group_id = *(s32 *)(vars + 0x27C);
+        if (group_id == -1) {
             break;
         }
         if ((D_L18_001B2348[0] & 0x3F) != (((s32)moby >> 8) & 0x3F)) {
             break;
         }
         lost = 1;
-        for (groupEntry = D_L18_001FB320[groupId];
-             (*(s32 *)(vars + 0x27C) & 0xFF) != 0xFF && *(s32 *)(vars + 0x27C) <= D_L18_001B2838[0] && groupEntry != 0
-             && ((groupEntry != 0 && (s16)groupEntry[-1] >= 0) || groupEntry == D_L18_001FB320[*(s32 *)(vars + 0x27C)]);
-             groupEntry++) {
-            u8 *other = g_moby_l18_table[0] + ((*groupEntry & 0x7FFF) << 8);
+        for (group_entry = D_L18_001FB320[group_id];
+             (*(s32 *)(vars + 0x27C) & 0xFF) != 0xFF && *(s32 *)(vars + 0x27C) <= D_L18_001B2838[0] && group_entry != 0
+             && ((group_entry != 0 && (s16)group_entry[-1] >= 0) || group_entry == D_L18_001FB320[*(s32 *)(vars + 0x27C)]);
+             group_entry++) {
+            u8 *other = g_moby_l18_table[0] + ((*group_entry & 0x7FFF) << 8);
             if (other == 0) {
                 break;
             }
@@ -481,19 +481,19 @@ void protopet_run_state_machine(u8 *moby)
                 moby_set_table_entry_byte(moby, 0, 2);
             }
         } else {
-            float targetDistance;
+            float target_distance;
             u8 *pos;
             if (path_advance(moby, vars + 0x230, *(s32 *)(vars + 0x26C), (s16 *)(vars + 0x29A),
                                   *(s16 *)(vars + 0x29C), 0.2f) == 0) {
                 moby_set_state(moby, 0xF, -1);
             }
             pos = moby + 0x10;
-            targetDistance = fast_vec_dist(pos, g_hero_position);
-            if (targetDistance < 8.0f) {
+            target_distance = fast_vec_dist(pos, g_hero_position);
+            if (target_distance < 8.0f) {
                 if (moby[0x43] != 1) {
                     anim_start_blended(moby, 1, 0, 0xA);
                 }
-                if (targetDistance < 2.0f) {
+                if (target_distance < 2.0f) {
                     u8 *hit;
                     float reach;
                     qcopy(point, pos);
@@ -502,7 +502,7 @@ void protopet_run_state_machine(u8 *moby)
                     coll_sweep_from_object(moby, point, 1, 0, 1, 0, reach, IntToFloat(D_001A7A00[0]) * 0.25f, 1.0f);
                     if (coll_test_point(point, 1, moby, *(float *)(vars + 0x100) + 0.2f) != 0) {
                         hit = D_L18_001BFC18[0];
-                        if (hit != 0 && *(s16 *)(hit + 0xAA) != 0xB69 /* Protopet */) {
+                        if (hit != 0 && *(s16 *)(hit + 0xAA) != MOBY_CLASS_PROTOPET) {
                             *(s32 *)(vars + 0x20) = 0;
                             vec_scale_to_length(vec, moby + 0xC0, -1.0f);
                             vec_add_random_offset(vec, 0.3f);
@@ -528,7 +528,7 @@ void protopet_run_state_machine(u8 *moby)
         break;
     case 17: {
         s32 flags;
-        float heroDistance;
+        float hero_distance;
         if (flag_set_first_pending(moby) != 0) {
             if (moby[0x42] == 0xC || moby[0x43] == 0xC) {
                 *(u16 *)(moby + 0x34) &= 0xEFFF;
@@ -539,13 +539,13 @@ void protopet_run_state_machine(u8 *moby)
         }
         flags = moby_dispatch_action_by_kind(moby, vars + 0x50);
         if (moby[0x94] == 0xE || moby[0x94] == 0xF) {
-            heroDistance = moby_get_anim_value(moby);
-            if (moby[0x42] == 0xB && 16.0f < heroDistance) {
+            hero_distance = moby_get_anim_value(moby);
+            if (moby[0x42] == 0xB && 16.0f < hero_distance) {
                 moby_set_state(moby, 0xF, -1);
             }
         }
-        heroDistance = moby_get_anim_value(moby);
-        if ((flags & 1) || (moby[0x42] == 0xC && 15.0f < heroDistance && math_random_int_below(0xF) == 0)) {
+        hero_distance = moby_get_anim_value(moby);
+        if ((flags & 1) || (moby[0x42] == 0xC && 15.0f < hero_distance && math_random_int_below(0xF) == 0)) {
             SetDeathBits(moby, 0, 1);
             protopet_end_action(moby, 0);
             break;

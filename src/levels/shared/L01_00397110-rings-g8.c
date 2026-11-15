@@ -21,22 +21,22 @@ extern int ref_L01_00397A28_03 __attribute__((sda));
  * Adapted from RAC1 update_gold_bolt_glow_rings (GPL-3.0). */
 void part_draw_bolt_glow_rings(char *moby) {
     char *vars = *(char **)(moby + 0x68);
-    float ringPos[4], mobyPos[4], ringStep[4];
+    float ring_pos[4], moby_pos[4], ring_step[4];
     float scale = 1.0f;
     int i;
     float *phase, *speed, *size;
     int *timer;
     if (*(unsigned char *)(moby + 0x20) == 1)
-        FastVecScale(mobyPos, moby, 0.0009765625f);
+        FastVecScale(moby_pos, moby, 0.0009765625f);
     else {
-        moby_transform_joint_to_world(moby, 0, mobyPos);
+        moby_transform_joint_to_world(moby, 0, moby_pos);
         scale = (160.0f - moby_get_anim_value(moby)) * 0.1f;
         if (scale > 1.0f) scale = 1.0f;
     }
-    FastVecSub(ringPos, D_L01_001B94C0, mobyPos);
-    vec_scale_to_length(ringPos, ringPos, -0.3f);
-    vec_scale_to_length(ringStep, ringPos, 0.1f);
-    FastVecAdd(ringPos, ringPos, mobyPos);
+    FastVecSub(ring_pos, D_L01_001B94C0, moby_pos);
+    vec_scale_to_length(ring_pos, ring_pos, -0.3f);
+    vec_scale_to_length(ring_step, ring_pos, 0.1f);
+    FastVecAdd(ring_pos, ring_pos, moby_pos);
     phase = (float *)(vars + 0x20);
     speed = (float *)(vars + 0x30);
     timer = (int *)(vars + 0x40);
@@ -52,8 +52,8 @@ void part_draw_bolt_glow_rings(char *moby) {
         t = IntToFloat(255 - timer[i]) * 0.003921568859368563f;
         color = FastTweenColor(ref_L01_00397A28_00, ref_L01_00397A28_01,
             math_fabs(0.5f - t));
-        part_spawn_fading(ringPos, color, (unsigned char)FloatToInt(phase[i]), ref_L01_00397A28_03,
+        part_spawn_fading(ring_pos, color, (unsigned char)FloatToInt(phase[i]), ref_L01_00397A28_03,
             ref_L01_00397A28_02, 2, 0, size[i] * scale);
-        FastVecAdd(ringPos, ringPos, ringStep);
+        FastVecAdd(ring_pos, ring_pos, ring_step);
     }
 }

@@ -19,11 +19,11 @@ typedef struct GrelbinMoby {
     u8 pad4C[0x1C];
     void * pvars;
     u8 pad6C[0x29];
-    u8 aiMode;
+    u8 ai_mode;
     u16 timer;
     int w98;
     u8 pad9C[0xC];
-    u8 hitFlash;
+    u8 hit_flash;
     u8 padA9[0x1];
     s16 classId;
     u8 padAC[0x6];
@@ -138,9 +138,9 @@ typedef struct {
 int leviathan_update_helper(GrelbinMoby *moby)
 {
     GrelbinUpdateState *vars=moby->pvars;
-    void *otherMoby;
+    void *other_moby;
     GrelbinMoby *spawn;
-    u8 *effectVars;
+    u8 *effect_vars;
     int i;
     float top[4] __attribute__((aligned(16)));
     float bottom[4] __attribute__((aligned(16)));
@@ -216,24 +216,24 @@ int leviathan_update_helper(GrelbinMoby *moby)
         spawn->state=0;spawn->bBC=0;spawn->b31=1;
         qcopy(spawn->position,vars->source->position);
         spawn->position[2]+=1.f;func_00310760(spawn);func_0031CA60(spawn);
-        effectVars=spawn->pvars;F(effectVars,0)=0.1f;
+        effect_vars=spawn->pvars;F(effect_vars,0)=0.1f;
         func_00317F60(spawn,1,0,20);
-        { float duration=F(effectVars,0); spawn->state=2;spawn->f48=duration+duration; }
+        { float duration=F(effect_vars,0); spawn->state=2;spawn->f48=duration+duration; }
         goto success;
     }
     func_0031CDC8(moby,&vars->damageState);
     {
-    otherMoby=func_0031A8C8(moby,0x10000,0);
-    if(!func_002EB5C0((u8 *)vars+0x26)) otherMoby=0;
-    if(otherMoby) {
-        float damage=F(otherMoby,0x2C);
+    other_moby=func_0031A8C8(moby,0x10000,0);
+    if(!func_002EB5C0((u8 *)vars+0x26)) other_moby=0;
+    if(other_moby) {
+        float damage=F(other_moby,0x2C);
         if(vars->damageScale!=0.f) {
-            GrelbinMoby *source=*(GrelbinMoby **)(otherMoby+0x20);
-            if(source && moby->classId==source->classId) F(otherMoby,0x2C)=damage*vars->damageScale;
+            GrelbinMoby *source=*(GrelbinMoby **)(other_moby+0x20);
+            if(source && moby->classId==source->classId) F(other_moby,0x2C)=damage*vars->damageScale;
         }
         {
-            float damage=func_0031A928(moby,otherMoby);
-            moby->hitFlash=255;vars->damageTimer=200;
+            float damage=func_0031A928(moby,other_moby);
+            moby->hit_flash=255;vars->damageTimer=200;
             vars->health-=damage;
         }
         func_0031CD08(moby,&vars->damageState);
@@ -242,19 +242,19 @@ int leviathan_update_helper(GrelbinMoby *moby)
             if(moby->animation!=5) func_00317F60(moby,5,0,20);
             func_00318240(moby,12,3);
             target=vars->target;
-            if(target && target->classId==0x10D0 /* Y.E.T.I. */) {
+            if(target && target->classId==MOBY_CLASS_YETI) {
                 g_active_yeti_count=g_active_yeti_count-1;
                 func_0030DFE8(target);
                 vars->target=g_hero_state.object;
                 vars->targetSet=1;qcopy(vars->targetPosition,g_hero_state.previousPosition);
             }
         }
-        moby->hitFlash=255;
+        moby->hit_flash=255;
     }
     }
     if(moby->state!=11) {
     vars->w2FC=func_00326D70(moby,vars->w210,36.f,0,10.f,0);
-    if(moby->aiMode) {
+    if(moby->ai_mode) {
         vars->w2F8=func_00326D70(moby,vars->w2F4,vars->f214*1.5f,0,0.f,0);
         if(vars->w2F4==-1) {
             if(func_002EBB00(moby->position,g_hero_position)<32.f) vars->w2F8=1;
@@ -262,24 +262,24 @@ int leviathan_update_helper(GrelbinMoby *moby)
         }
     }
     if(g_hero_state.mode==49) qcopy(vars->targetPosition,g_hero_state.position);
-    otherMoby=D_L19_001B2A28;
-    while(otherMoby) {
-        if(((GrelbinMoby *)otherMoby)->classId==0x10D0 /* Y.E.T.I. */ && moby->state!=4 && moby->state!=9 && moby->state!=8 && vars->health>0.f) {
+    other_moby=D_L19_001B2A28;
+    while(other_moby) {
+        if(((GrelbinMoby *)other_moby)->classId==MOBY_CLASS_YETI && moby->state!=4 && moby->state!=9 && moby->state!=8 && vars->health>0.f) {
             if(moby->state==7 && moby->timer>=16) break;
-            if(func_002EBB00(moby->position,((GrelbinMoby *)otherMoby)->position)<16.f && func_002EBB00(moby->position,((GrelbinMoby *)otherMoby)->position)>15.f && ((GrelbinMoby *)otherMoby)->aiMode && I(((GrelbinMoby *)otherMoby)->pvars,0x254)) {
-                vars->target=otherMoby;vars->targetSet=1;qcopy(vars->targetPosition,((GrelbinMoby *)otherMoby)->position);break;
+            if(func_002EBB00(moby->position,((GrelbinMoby *)other_moby)->position)<16.f && func_002EBB00(moby->position,((GrelbinMoby *)other_moby)->position)>15.f && ((GrelbinMoby *)other_moby)->ai_mode && I(((GrelbinMoby *)other_moby)->pvars,0x254)) {
+                vars->target=other_moby;vars->targetSet=1;qcopy(vars->targetPosition,((GrelbinMoby *)other_moby)->position);break;
             }
         }
-        otherMoby=((GrelbinMoby *)otherMoby)->next;
+        other_moby=((GrelbinMoby *)other_moby)->next;
     }
     }
     {
     GrelbinMoby *target=vars->target;
-    if(target && target->classId==0x10D0 /* Y.E.T.I. */ && func_002EBB00(moby->position,target->position)<16.f && func_002EBB00(moby->position,vars->target->position)>15.f && moby->state!=11 && moby->aiMode) {
+    if(target && target->classId==MOBY_CLASS_YETI && func_002EBB00(moby->position,target->position)<16.f && func_002EBB00(moby->position,vars->target->position)>15.f && moby->state!=11 && moby->ai_mode) {
         vars->height=vars->previousHeight;
         if(moby->animation!=6) func_00317F60(moby,6,0,19);
         func_00318240(moby,11,-1);
-        vars->target->state=23;vars->target->aiMode=4;
+        vars->target->state=23;vars->target->ai_mode=4;
         func_00317F60(vars->target,6,0,15);
     }
     }

@@ -99,14 +99,14 @@ void game_update_frame(void) {
     hero_check_targeting_triggers();
     UpdateHeroAimAndTransitions();
     {
-        char *heroBlock = g_hero_state;
-        if ((*(int *)(heroBlock + 0x229C) != 0x16 && *(int *)(heroBlock + 0x229C) != 0x1F
-             && *(int *)(heroBlock + 0x2294) != 0x31) || hero_is_in_swing_or_grind_mode() != 0)
+        char *hero_block = g_hero_state;
+        if ((*(int *)(hero_block + 0x229C) != 0x16 && *(int *)(hero_block + 0x229C) != 0x1F
+             && *(int *)(hero_block + 0x2294) != 0x31) || hero_is_in_swing_or_grind_mode() != 0)
             coll_clear_map_bits_around_pos(g_hero_position);
     }
     {
-        char *heroBlock = g_hero_state;
-        func_30F444(*(int *)(heroBlock + 0x2290));
+        char *hero_block = g_hero_state;
+        func_30F444(*(int *)(hero_block + 0x2290));
     }
     weapon_update_equipped_effect();
     func_2AB328();

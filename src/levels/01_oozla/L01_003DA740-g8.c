@@ -8,23 +8,23 @@ extern u16 *D_L01_001FB020[];
 /* Raises the measured flag on every record of the table the object's selector names. */
 /* Sets a flag on every Mutant Muckdweller in this object's group. */
 void muckdweller_alert_group(s32 moby) {
-    s32 mobyBase;
+    s32 moby_base;
     s16 *member;
-    s16 *groupList;
+    s16 *group_list;
 
     if (*(u8 *)(moby + 0x21) == 0xFF)
         return;
-    groupList = D_L01_001FB020[*(u8 *)(moby + 0x21)];
-    if (groupList == 0)
+    group_list = D_L01_001FB020[*(u8 *)(moby + 0x21)];
+    if (group_list == 0)
         return;
-    member = groupList;
-    mobyBase = (s32)g_moby_l01_table;
+    member = group_list;
+    moby_base = (s32)g_moby_l01_table;
     do {
         u32 offset = (*(u16 *)member & 0x7FFF) << 8;
 
-        if (*(s8 *)(mobyBase + offset + 0x20) >= 0) {
-            if (*(s16 *)(mobyBase + offset + 0xAA) == 0xB2B /* Mutant Muckdweller */)
-                *(u16 *)(*(u32 *)(mobyBase + offset + 0x68) + 0x3DA) = 1;
+        if (*(s8 *)(moby_base + offset + 0x20) >= 0) {
+            if (*(s16 *)(moby_base + offset + 0xAA) == MOBY_CLASS_MUTANT_MUCKDWELLER)
+                *(u16 *)(*(u32 *)(moby_base + offset + 0x68) + 0x3DA) = 1;
         }
     } while (*member++ >= 0);
 }
@@ -43,14 +43,14 @@ extern float coll_probe_ground_height_below(void *, int, float);
 
 /* Picks the farthest of up to three points from the hero and gives its position and ground height. */
 void muckdweller_find_farthest_anchor(u8 *moby, u8 *out) {
-    s32 *indexPtr = (s32 *)(*(u32 *)(moby + 0x68) + 0x3C4);
+    s32 *index_ptr = (s32 *)(*(u32 *)(moby + 0x68) + 0x3C4);
     TI128 point;
     int count = 3;
     f32 distance;
 
     *(f32 *)(out + 0xC) = 0.0f;
     while (--count >= 0) {
-        s32 index = *indexPtr;
+        s32 index = *index_ptr;
 
         if (index != -1) {
             u8 *base = D_L01_001B264C;
@@ -62,7 +62,7 @@ void muckdweller_find_farthest_anchor(u8 *moby, u8 *out) {
                 *(f32 *)(out + 0xC) = distance;
             }
         }
-        indexPtr++;
+        index_ptr++;
     }
     *(f32 *)(out + 0x8) = coll_probe_ground_height_below(out, 0, 10.0f);
 }

@@ -14,45 +14,45 @@ extern f32 IntToFloat(s32 value);
 extern void L04_UpdatePath(float, float, u8 *, u8 *, u8 *, u8 *) __asm__("func_002C96F8");
 
 /* Picks a route and the nearest point on it for a racing hoverbike, then points its steering at that spot. */
-void hoverbike_select_route_point(u8 *racer, u8 *bike, s32 snapToPoint)
+void hoverbike_select_route_point(u8 *racer, u8 *bike, s32 snap_to_point)
 {
-    u8 *riderVars = *(u8 **)(*(u8 **)(bike + 0x164) + 0x68);
-    s32 pointIndex = -1;
-    f32 targetDist;
-    f32 pointDist;
-    f32 routeLength;
+    u8 *rider_vars = *(u8 **)(*(u8 **)(bike + 0x164) + 0x68);
+    s32 point_index = -1;
+    f32 target_dist;
+    f32 point_dist;
+    f32 route_length;
     u8 *route;
 
     if ((s32)ref_L04_00400D48_00 == 0x28 || g_current_map_index == 4) {
-        if (*(s32 *)(riderVars + 0x314) == -1) {
+        if (*(s32 *)(rider_vars + 0x314) == -1) {
             *(u8 **)(bike + 0x110) = g_route_path_table[*(s32 *)(bike + 0x54)];
         } else if (g_race_challenge_table[ref_L04_00400D48_01].flags & 4) {
             *(u8 **)(bike + 0x110) = g_route_path_table[*(s32 *)(bike + 0x6C)];
             if (*(s32 *)(bike + 0x120) == 1 && *(s32 *)(bike + 0x124) >= 3) {
-                pointIndex = 0x82;
+                point_index = 0x82;
             }
         }
     }
-    if (pointIndex == -1) {
-        pointIndex = ref_L04_00400D48_02(racer, *(u8 **)(bike + 0x110), 1);
+    if (point_index == -1) {
+        point_index = ref_L04_00400D48_02(racer, *(u8 **)(bike + 0x110), 1);
     }
-    if (snapToPoint != 0) {
-        *(Q16_B0e5d8f83 *)(racer + 0x10) = *(Q16_B0e5d8f83 *)(*(u8 **)(bike + 0x110) + pointIndex * 16 + 0x10);
+    if (snap_to_point != 0) {
+        *(Q16_B0e5d8f83 *)(racer + 0x10) = *(Q16_B0e5d8f83 *)(*(u8 **)(bike + 0x110) + point_index * 16 + 0x10);
     }
-    pointDist = IntToFloat(pointIndex);
-    pointDist = pointDist * *(f32 *)(*(u8 **)(bike + 0x110) + 0x1C);
+    point_dist = IntToFloat(point_index);
+    point_dist = point_dist * *(f32 *)(*(u8 **)(bike + 0x110) + 0x1C);
     if (*(s32 *)(bike + 0x244) != 0) {
-        targetDist = pointDist + 15.0f;
+        target_dist = point_dist + 15.0f;
     } else {
-        targetDist = pointDist + 5.0f;
+        target_dist = point_dist + 5.0f;
     }
-    *(f32 *)(bike + 0xA8) = targetDist;
+    *(f32 *)(bike + 0xA8) = target_dist;
     route = *(u8 **)(bike + 0x110);
-    routeLength = *(f32 *)(route + 0x1C);
-    L04_UpdatePath(targetDist, routeLength, route, bike + 0x114, bike + 0x118, bike + 0xF0);
+    route_length = *(f32 *)(route + 0x1C);
+    L04_UpdatePath(target_dist, route_length, route, bike + 0x114, bike + 0x118, bike + 0xF0);
     *(s32 *)(bike + 0x1C0) = 0;
-    *(f32 *)(riderVars + 0x63C) = 1.0f;
-    *(s32 *)(riderVars + 0x4C4) = 0;
+    *(f32 *)(rider_vars + 0x63C) = 1.0f;
+    *(s32 *)(rider_vars + 0x4C4) = 0;
 }
 
 /* A route of D_L04_001FE340: a point count, then the points. */

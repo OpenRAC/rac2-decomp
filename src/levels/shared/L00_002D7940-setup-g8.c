@@ -61,26 +61,26 @@ extern void func_L00_002EE0D0(void *);
    first, which is the operand order retail's addu has without RAC1's -fno-force-mem. */
 /* Resets all level cameras when a level starts. */
 void SetupLevelCameras(void) {
-    CameraState9E *camState = &D_L00_001B8C80;
-    CameraState9E *camState2;
+    CameraState9E *cam_state = &D_L00_001B8C80;
+    CameraState9E *cam_state2;
     CameraFollow9E *follow;
     CameraVec9E *up;
     CameraHero9E *hero;
-    int i,slotIndex;
-    camState->frames=0;
-    camState->underwater=0;
+    int i,slot_index;
+    cam_state->frames=0;
+    cam_state->underwater=0;
     D_001A8900=0.85f;
     D_L00_001B1840=0;
-    for(slotIndex=0;slotIndex<48;slotIndex++) {
-        D_L00_001B91D0[slotIndex].hard_cut=0;
-        D_L00_001BB930[slotIndex]=0;
+    for(slot_index=0;slot_index<48;slot_index++) {
+        D_L00_001B91D0[slot_index].hard_cut=0;
+        D_L00_001BB930[slot_index]=0;
     }
     cam_clear_override_slots();
     cam_l00_init_blend_values();
-    camState2=&D_L00_001B8C80;
-    camState2->previous=0;
-    camState2->blend.phase=0;
-    qzero_nc(&camState2->clear);
+    cam_state2=&D_L00_001B8C80;
+    cam_state2->previous=0;
+    cam_state2->blend.phase=0;
+    qzero_nc(&cam_state2->clear);
     follow=&D_L00_001B8C80.follow;
     hero=&g_hero_state;
     up=&follow->up;

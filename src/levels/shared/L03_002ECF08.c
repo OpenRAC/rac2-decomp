@@ -17,7 +17,7 @@ void SpawnParticleBurst(unsigned char *object, float *minimumPosition, float *ma
     int flags = 0x1003C;
     float scale;
     float gravity = 0.0013888889f;
-    int countA, countB, countC, startColor, endColor;
+    int count_a, count_b, count_c, startColor, endColor;
     int i;
 
     for (i = 0; i < count; i++) {
@@ -30,12 +30,12 @@ void SpawnParticleBurst(unsigned char *object, float *minimumPosition, float *ma
         matrix_mul_vec3(&velocity, &velocity, object + 0xC0);
         vec_local_offset_to_world(position.x, position.y, position.z, object, &position);
         scale = math_random_float_range(0.5f, 1.5f);
-        countA = FloatToInt(scale * 10.0f);
-        countB = FloatToInt(scale * 35.0f);
-        countC = FloatToInt(scale * 7.0f);
+        count_a = FloatToInt(scale * 10.0f);
+        count_b = FloatToInt(scale * 35.0f);
+        count_c = FloatToInt(scale * 7.0f);
         velocity.w = math_random_float_range(0.1f, 0.4f);
         vec_clear_128(&acceleration);
-        acceleration.z = -gravity * (float)(countA + countB + countC);
+        acceleration.z = -gravity * (float)(count_a + count_b + count_c);
         FastVecAdd(&acceleration, &acceleration, &velocity);
         acceleration.w = 0.01f;
         switch (style) {
@@ -57,6 +57,6 @@ void SpawnParticleBurst(unsigned char *object, float *minimumPosition, float *ma
             endColor = FastTweenColor(math_random_float_range(0.0f, 1.0f), 0x4080, 0x408080);
             break;
         }
-        part_spawn_trail(&position, &velocity, &acceleration, startColor, endColor, countA, countB, countC, flags);
+        part_spawn_trail(&position, &velocity, &acceleration, startColor, endColor, count_a, count_b, count_c, flags);
     }
 }

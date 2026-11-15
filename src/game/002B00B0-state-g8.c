@@ -14,36 +14,36 @@ extern int GetLocalizedString(int);
 extern void func_0029CCD8(int, int);
 
 /* Tries to take the notice slot for an owner and show a text. */
-int TryClaimNotice(int owner, int textId, int style)
+int TryClaimNotice(int owner, int text_id, int style)
 {
     int current = g_notice_owner;
 
     if (current == owner) {
-        if (textId != 0)
-            func_0029CCD8(GetLocalizedString(textId), style);
-        g_notice_text_id = textId;
+        if (text_id != 0)
+            func_0029CCD8(GetLocalizedString(text_id), style);
+        g_notice_text_id = text_id;
         D_001A8C60_1 = 2;
         return 2;
     }
     if (current == 0) {
-        if (textId != 0)
-            func_0029CCD8(GetLocalizedString(textId), style);
+        if (text_id != 0)
+            func_0029CCD8(GetLocalizedString(text_id), style);
         D_001A8C64_1 = owner;
         D_001A8C60 = 2;
-        D_001B1D48_1 = textId;
+        D_001B1D48_1 = text_id;
         return 1;
     }
     return 0;
 }
 
 /* Like TryClaimNotice but takes over the slot when it is already used. */
-int ForceClaimNotice(int owner, int textId, int style)
+int ForceClaimNotice(int owner, int text_id, int style)
 {
-    int result = TryClaimNotice(owner, textId, style);
+    int result = TryClaimNotice(owner, text_id, style);
 
     if (result == 0) {
-        if (textId != 0) {
-            func_0029CCD8(GetLocalizedString(textId), style);
+        if (text_id != 0) {
+            func_0029CCD8(GetLocalizedString(text_id), style);
             D_001A8C60 = style;
             result = 3;
         } else {
@@ -51,7 +51,7 @@ int ForceClaimNotice(int owner, int textId, int style)
             result = 3;
         }
         D_001A8C64_1 = owner;
-        D_001B1D48_1 = textId;
+        D_001B1D48_1 = text_id;
     }
     return result;
 }

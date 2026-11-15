@@ -40,8 +40,8 @@ extern void AttachManipulator(unsigned char *, unsigned int, unsigned char *);
 void rotor_reaim_random_spin(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
-    float spinAngle;
-    float spinRate;
+    float spin_angle;
+    float spin_rate;
 
     *(unsigned char *)(state + 0x2E) = 3;
     *(float *)(state + 0x20) = (float)*(short *)(state + 0x24);
@@ -54,16 +54,16 @@ void rotor_reaim_random_spin(char *obj)
     *(unsigned char *)(obj + 0x7F) = 0;
     if (*(unsigned char *)(obj + 0x43) != 1)
         anim_start_blended(obj, 1, 0, 0);
-    spinAngle = math_random_float_range(10.0f, 30.0f) * 0.017453294f;
+    spin_angle = math_random_float_range(10.0f, 30.0f) * 0.017453294f;
     if (math_random_int_below(2) != 0)
-        spinAngle = -spinAngle;
-    *(float *)(state + 0x2D4) = spinAngle;
+        spin_angle = -spin_angle;
+    *(float *)(state + 0x2D4) = spin_angle;
     if (math_random_int_below(2) != 0)
-        spinRate = -D_L11_001B1338;
+        spin_rate = -D_L11_001B1338;
     else
-        spinRate = D_L11_001B1338;
+        spin_rate = D_L11_001B1338;
     *(short *)(state + 0x2EE) = 0;
-    *(float *)(state + 0x2DC) = spinRate;
+    *(float *)(state + 0x2DC) = spin_rate;
     mem_clear((unsigned int *)(state + 0x220), 0, 0x40);
     AttachManipulator((unsigned char *)obj, 2, (unsigned char *)(state + 0x220));
     mem_clear((unsigned int *)(state + 0x260), 0, 0x40);
@@ -101,20 +101,20 @@ void rotor_aim_at_entry(char *obj, int index, int flag)
     char *base3;
     int offset = index * 4;
     char *entry;
-    float aimVec[3];
+    float aim_vec[3];
     float falloff;
-    int randomValue;
+    int random_value;
     int record;
 
     entry = arena_get_center_point(*(char **)(obj + 0xB8));
 
     base1 = g_moby_l11_table;
-    FastVecSub(aimVec, entry, ((char *)(base1 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))) + 0x10);
-    randomValue = math_random_int_below(10) + 15;
-    vec_scale_to_length(aimVec, aimVec, (float)randomValue * (1.0f / 60.0f));
-    vec_add_random_offset(aimVec, 1.0f / 60.0f);
-    randomValue = math_random_int_below(5) + 5;
-    aimVec[2] = (float)randomValue * (1.0f / 60.0f);
+    FastVecSub(aim_vec, entry, ((char *)(base1 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))) + 0x10);
+    random_value = math_random_int_below(10) + 15;
+    vec_scale_to_length(aim_vec, aim_vec, (float)random_value * (1.0f / 60.0f));
+    vec_add_random_offset(aim_vec, 1.0f / 60.0f);
+    random_value = math_random_int_below(5) + 5;
+    aim_vec[2] = (float)random_value * (1.0f / 60.0f);
 
     falloff = 1.0f - ((float)*(short *)(state + 0x378) - 4.0f) * (1.0f / 6.0f);
     if (falloff > 1.0f)
@@ -123,7 +123,7 @@ void rotor_aim_at_entry(char *obj, int index, int flag)
         falloff = 0.0f;
 
     base2 = g_moby_l11_table;
-    InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), aimVec, D_L11_001B12C4 * (1.0f / 3600.0f), falloff);
+    InitializeRandomizedObjectMotion(((char *)(base2 + (*(int *)(*(char **)(obj + 0x68) + offset + 0x330) << 8))), aim_vec, D_L11_001B12C4 * (1.0f / 3600.0f), falloff);
 
     base3 = g_moby_l11_table;
     /* The record's field at 0xB8 takes the object's own handle. */
@@ -175,37 +175,37 @@ extern float D_L11_001B1214[] __attribute__((sda));
    corners are crossed out from the span and submitted as one textured quad. */
 void joba_draw_beam_first_stage(char *obj, void *q)
 {
-    EffectQuadFrame quadFrame;
+    EffectQuadFrame quad_frame;
     char *vars;
     int i;
 
-    quadFrame.saved = *(TI128 *)q;
+    quad_frame.saved = *(TI128 *)q;
     vars = *(char **)(obj + 0x68);
-    FastVecSub(quadFrame.c, vars, vars + 0x10);
-    FastVecSub(quadFrame.a, vars, D_L11_001BA8C0);
-    FastVecSub(quadFrame.b, vars + 0x10, D_L11_001BA8C0);
-    FastVecCross(quadFrame.a, quadFrame.a, quadFrame.c);
-    vec_scale_to_length(quadFrame.a, quadFrame.a, 0.1f);
-    FastVecCross(quadFrame.b, quadFrame.b, quadFrame.c);
-    vec_scale_to_length(quadFrame.b, quadFrame.b, 0.1f);
-    quadFrame.quad.texture = GetEffectTextureDescriptor(7);
-    quadFrame.quad.mode = 0x0000ff9000000260UL;
-    quadFrame.quad.registers = ((unsigned long)D_L11_001B11FC << 32) | 0x48;
-    quadFrame.quad.primitive = 0;
-    quadFrame.quad.color[0] = quadFrame.quad.color[1] = quadFrame.quad.color[2] = quadFrame.quad.color[3] = D_L11_001B1204;
+    FastVecSub(quad_frame.c, vars, vars + 0x10);
+    FastVecSub(quad_frame.a, vars, D_L11_001BA8C0);
+    FastVecSub(quad_frame.b, vars + 0x10, D_L11_001BA8C0);
+    FastVecCross(quad_frame.a, quad_frame.a, quad_frame.c);
+    vec_scale_to_length(quad_frame.a, quad_frame.a, 0.1f);
+    FastVecCross(quad_frame.b, quad_frame.b, quad_frame.c);
+    vec_scale_to_length(quad_frame.b, quad_frame.b, 0.1f);
+    quad_frame.quad.texture = GetEffectTextureDescriptor(7);
+    quad_frame.quad.mode = 0x0000ff9000000260UL;
+    quad_frame.quad.registers = ((unsigned long)D_L11_001B11FC << 32) | 0x48;
+    quad_frame.quad.primitive = 0;
+    quad_frame.quad.color[0] = quad_frame.quad.color[1] = quad_frame.quad.color[2] = quad_frame.quad.color[3] = D_L11_001B1204;
     for (i = 0; i < 4; i++) {
-        quadFrame.quad.uv[i][0] = D_L11_001B1210[i * 2];
-        quadFrame.quad.uv[i][1] = D_L11_001B1214[i * 2];
+        quad_frame.quad.uv[i][0] = D_L11_001B1210[i * 2];
+        quad_frame.quad.uv[i][1] = D_L11_001B1214[i * 2];
     }
-    FastVecSub(&quadFrame.corner, vars, quadFrame.a);
-    quadFrame.quad.position[0] = quadFrame.corner;
-    FastVecAdd(&quadFrame.corner, vars, quadFrame.a);
-    quadFrame.quad.position[1] = quadFrame.corner;
-    FastVecSub(&quadFrame.corner, vars + 0x10, quadFrame.b);
-    quadFrame.quad.position[2] = quadFrame.corner;
-    FastVecAdd(&quadFrame.corner, vars + 0x10, quadFrame.b);
-    quadFrame.quad.position[3] = quadFrame.corner;
-    draw_world_quad(&quadFrame.quad, 0, 0);
+    FastVecSub(&quad_frame.corner, vars, quad_frame.a);
+    quad_frame.quad.position[0] = quad_frame.corner;
+    FastVecAdd(&quad_frame.corner, vars, quad_frame.a);
+    quad_frame.quad.position[1] = quad_frame.corner;
+    FastVecSub(&quad_frame.corner, vars + 0x10, quad_frame.b);
+    quad_frame.quad.position[2] = quad_frame.corner;
+    FastVecAdd(&quad_frame.corner, vars + 0x10, quad_frame.b);
+    quad_frame.quad.position[3] = quad_frame.corner;
+    draw_world_quad(&quad_frame.quad, 0, 0);
 }
 
 extern int D_L11_001B1200 __attribute__((sda));
@@ -215,40 +215,40 @@ extern int D_L11_001B1208 __attribute__((sda));
    once with its own texture and then again with the additive overlay. */
 void joba_draw_beam_second_stage(char *obj, void *q)
 {
-    EffectQuadFrame quadFrame;
+    EffectQuadFrame quad_frame;
     char *vars;
     int i;
 
-    quadFrame.saved = *(TI128 *)q;
+    quad_frame.saved = *(TI128 *)q;
     vars = *(char **)(obj + 0x68);
-    FastVecSub(quadFrame.c, vars, vars + 0x10);
-    FastVecSub(quadFrame.a, vars, D_L11_001BA8C0);
-    FastVecSub(quadFrame.b, vars + 0x10, D_L11_001BA8C0);
-    FastVecCross(quadFrame.a, quadFrame.a, quadFrame.c);
-    vec_scale_to_length(quadFrame.a, quadFrame.a, 0.05f);
-    FastVecCross(quadFrame.b, quadFrame.b, quadFrame.c);
-    vec_scale_to_length(quadFrame.b, quadFrame.b, 0.05f);
-    quadFrame.quad.texture = GetEffectTextureDescriptor(0x13);
-    quadFrame.quad.mode = 0x0000ff9000000260UL;
-    quadFrame.quad.registers = ((unsigned long)D_L11_001B1200 << 32) | 0x48;
-    quadFrame.quad.primitive = 0;
-    quadFrame.quad.color[0] = quadFrame.quad.color[1] = quadFrame.quad.color[2] = quadFrame.quad.color[3] = D_L11_001B1208;
+    FastVecSub(quad_frame.c, vars, vars + 0x10);
+    FastVecSub(quad_frame.a, vars, D_L11_001BA8C0);
+    FastVecSub(quad_frame.b, vars + 0x10, D_L11_001BA8C0);
+    FastVecCross(quad_frame.a, quad_frame.a, quad_frame.c);
+    vec_scale_to_length(quad_frame.a, quad_frame.a, 0.05f);
+    FastVecCross(quad_frame.b, quad_frame.b, quad_frame.c);
+    vec_scale_to_length(quad_frame.b, quad_frame.b, 0.05f);
+    quad_frame.quad.texture = GetEffectTextureDescriptor(0x13);
+    quad_frame.quad.mode = 0x0000ff9000000260UL;
+    quad_frame.quad.registers = ((unsigned long)D_L11_001B1200 << 32) | 0x48;
+    quad_frame.quad.primitive = 0;
+    quad_frame.quad.color[0] = quad_frame.quad.color[1] = quad_frame.quad.color[2] = quad_frame.quad.color[3] = D_L11_001B1208;
     for (i = 0; i < 4; i++) {
-        quadFrame.quad.uv[i][0] = D_L11_001B1210[i * 2];
-        quadFrame.quad.uv[i][1] = D_L11_001B1214[i * 2];
+        quad_frame.quad.uv[i][0] = D_L11_001B1210[i * 2];
+        quad_frame.quad.uv[i][1] = D_L11_001B1214[i * 2];
     }
-    FastVecSub(&quadFrame.corner, vars, quadFrame.a);
-    quadFrame.quad.position[0] = quadFrame.corner;
-    FastVecAdd(&quadFrame.corner, vars, quadFrame.a);
-    quadFrame.quad.position[1] = quadFrame.corner;
-    FastVecSub(&quadFrame.corner, vars + 0x10, quadFrame.b);
-    quadFrame.quad.position[2] = quadFrame.corner;
-    FastVecAdd(&quadFrame.corner, vars + 0x10, quadFrame.b);
-    quadFrame.quad.position[3] = quadFrame.corner;
-    draw_world_quad(&quadFrame.quad, 0, 0);
-    quadFrame.quad.texture = GetEffectTextureDescriptor(0x10);
-    quadFrame.quad.mode = 0x0000ff9000000260UL;
-    quadFrame.quad.registers = 0x8000000048UL;
-    quadFrame.quad.primitive = 0;
-    draw_world_quad(&quadFrame.quad, 0, 0);
+    FastVecSub(&quad_frame.corner, vars, quad_frame.a);
+    quad_frame.quad.position[0] = quad_frame.corner;
+    FastVecAdd(&quad_frame.corner, vars, quad_frame.a);
+    quad_frame.quad.position[1] = quad_frame.corner;
+    FastVecSub(&quad_frame.corner, vars + 0x10, quad_frame.b);
+    quad_frame.quad.position[2] = quad_frame.corner;
+    FastVecAdd(&quad_frame.corner, vars + 0x10, quad_frame.b);
+    quad_frame.quad.position[3] = quad_frame.corner;
+    draw_world_quad(&quad_frame.quad, 0, 0);
+    quad_frame.quad.texture = GetEffectTextureDescriptor(0x10);
+    quad_frame.quad.mode = 0x0000ff9000000260UL;
+    quad_frame.quad.registers = 0x8000000048UL;
+    quad_frame.quad.primitive = 0;
+    draw_world_quad(&quad_frame.quad, 0, 0);
 }

@@ -36,7 +36,7 @@ void enemy_hoverbike_update(u8 *bike)
 {
     u8 *vars = *(u8 **)(bike + 0x68);
     u8 *leader;
-    u8 *leaderVars;
+    u8 *leader_vars;
     u8 *pos;
     u8 *dst;
     u8 *src;
@@ -46,12 +46,12 @@ void enemy_hoverbike_update(u8 *bike)
         f32 d[4];
     } u;
     f32 scale;
-    f32 targetDistance;
-    int nearestPoint;
+    f32 target_distance;
+    int nearest_point;
     int i;
-    Quad axisRow0, axisRow1, axisRow2;
+    Quad axis_row0, axis_row1, axis_row2;
     int j;
-    f32 *phasePtr;
+    f32 *phase_ptr;
 
     *(f32 *)(bike + 0x2C) = *(f32 *)(*(u8 **)(bike + 0x24) + 0x24) * 0.25f;
     bike[0x30] = 0xFF;
@@ -77,14 +77,14 @@ void enemy_hoverbike_update(u8 *bike)
         racer_compute_route_lengths(bike);
         bike[0x20] = 1;
         *(s32 *)(vars + 0x30) = 0;
-        axisRow0 = D_001B0630.v[0];
-        axisRow1 = D_001B0630.v[1];
-        axisRow2 = D_001B0630.v[2];
+        axis_row0 = D_001B0630.v[0];
+        axis_row1 = D_001B0630.v[1];
+        axis_row2 = D_001B0630.v[2];
         *(u16 *)(bike + 0x34) |= 0x41;
         bike[0x62] = 1;
-        u.axes.v[0] = axisRow0;
-        u.axes.v[1] = axisRow1;
-        u.axes.v[2] = axisRow2;
+        u.axes.v[0] = axis_row0;
+        u.axes.v[1] = axis_row1;
+        u.axes.v[2] = axis_row2;
         scale = *(f32 *)(bike + 0x2C) / *(f32 *)(*(u8 **)(bike + 0x24) + 0x24);
         src = (u8 *)&u.axes;
         for (i = 2; i >= 0; i--) {
@@ -92,9 +92,9 @@ void enemy_hoverbike_update(u8 *bike)
             src += 0x10;
             dst += 0x10;
         }
-        phasePtr = phases;
+        phase_ptr = phases;
         for (j = 5; j >= 0; j--)
-            *phasePtr++ = math_random_float_range(0.0f, 1.0f);
+            *phase_ptr++ = math_random_float_range(0.0f, 1.0f);
         return;
     case 1:
         break;
@@ -109,24 +109,24 @@ void enemy_hoverbike_update(u8 *bike)
         return;
     case 3:
         if (*(u16 *)(bike + 0x96) == 0) {
-            nearestPoint = FindNearestRoutePointIndex(bike, *(u8 **)(vars + 0x110), 1);
-            *(Quad *)(bike + 0x10) = *(Quad *)(*(u8 **)(vars + 0x110) + nearestPoint * 16 + 0x10);
-            targetDistance = IntToFloat(nearestPoint) * *(f32 *)(*(u8 **)(vars + 0x110) + 0x1C) +
+            nearest_point = FindNearestRoutePointIndex(bike, *(u8 **)(vars + 0x110), 1);
+            *(Quad *)(bike + 0x10) = *(Quad *)(*(u8 **)(vars + 0x110) + nearest_point * 16 + 0x10);
+            target_distance = IntToFloat(nearest_point) * *(f32 *)(*(u8 **)(vars + 0x110) + 0x1C) +
                 (*(s32 *)(vars + 0x244) != 0 ? 15.0f : 5.0f);
-            *(f32 *)(vars + 0xA8) = targetDistance;
-            anim_sample_key_track(targetDistance, *(f32 *)(*(u8 **)(vars + 0x110) + 0x1C), *(u8 **)(vars + 0x110),
+            *(f32 *)(vars + 0xA8) = target_distance;
+            anim_sample_key_track(target_distance, *(f32 *)(*(u8 **)(vars + 0x110) + 0x1C), *(u8 **)(vars + 0x110),
                           vars + 0x114, vars + 0x118, vars + 0xF0);
         }
         if (*(u16 *)(bike + 0x96) >= 300 && (leader = *(u8 **)(vars + 0x164)) != 0) {
             pos = bike + 0x10;
-            leaderVars = *(u8 **)(leader + 0x68);
+            leader_vars = *(u8 **)(leader + 0x68);
             FastVecSub(u.d, pos, leader + 0x10);
             if (math_fast_helper_a(pos, 60.0f) == -1 && FastVecDot(u.d, u.d) > 25.0f) {
                 *(s32 *)(bike + 0x98) = *(s32 *)(*(u8 **)(bike + 0x24) + 0x10);
                 *(u16 *)(bike + 0x34) = (*(u16 *)(bike + 0x34) & 0xFFBE) | 0x1400;
                 if (*(u8 **)(vars + 0x8C) != 0)
                     *(u16 *)(*(u8 **)(vars + 0x8C) + 0x34) &= 0xFFBE;
-                FindNearestRoutePoint(bike, leaderVars, vars + 0x120, vars + 0x124, vars + 0x11C, *(void **)(vars + 0x160));
+                FindNearestRoutePoint(bike, leader_vars, vars + 0x120, vars + 0x124, vars + 0x11C, *(void **)(vars + 0x160));
                 bike[0x20] = 2;
             }
         }

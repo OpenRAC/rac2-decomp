@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char u8;
@@ -21,7 +22,7 @@ extern char ref_L18_002571A0_00[];
 
 /* Only the tagged object starts the sequence; the answer is always false. */
 s32 receiver_bot_start_sequence(char *moby) {
-    if (*(s16 *)(moby + 0xAA) == 0xEE1 /* Receiver Bot */)
+    if (*(s16 *)(moby + 0xAA) == MOBY_CLASS_RECEIVER_BOT)
         func_3DB8F8(moby, ref_L18_002571A0_00);
     return 0;
 }
@@ -37,7 +38,7 @@ s32 enemy_get_kind_index(u8 *moby) {
 
     switch (*(s16 *)(moby + 0xAA)) {
     case 0xEC0 /* moby class 3776 */: result = 3; break;
-    case 0xEE1 /* Receiver Bot */: result = 10; break;
+    case MOBY_CLASS_RECEIVER_BOT: result = 10; break;
     default: result = -1; break;
     }
     return result;
@@ -62,7 +63,7 @@ void enemy_reset_timer_by_kind(u8 *moby) {
             break;
         case 0xED4 /* moby class 3796 */:
             break;
-        case 0xEE1 /* Receiver Bot */:
+        case MOBY_CLASS_RECEIVER_BOT:
             break;
         default:
             STUB_printf(D_L18_001B1360);

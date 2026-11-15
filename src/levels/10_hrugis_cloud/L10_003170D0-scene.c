@@ -36,7 +36,7 @@ void hrugis_update_scene_effects(void) {
         u8 *object=D_L10_001BD380.objects[i];
         if(object && *(s16 *)(object+0xAA)==0xE29 /* moby class 3625 */) *(u16 *)(object+0x34)|=0x800;
         if(*(s16 *)(object+0xAA)==0xD54 /* moby class 3412 */) UpdateEquipmentPieces(object);
-        if(object && *(s16 *)(object+0xAA)==0xFA0 /* TV Screens */) {
+        if(object && *(s16 *)(object+0xAA)==MOBY_CLASS_TV_SCREENS) {
             state=*(u8 **)(object+0x68);
             if(state) math_store_angle_update_result(object,state+0xC,0x80AAAAD2,0x80396464,0.061086535f);
         }

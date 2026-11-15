@@ -128,17 +128,17 @@ void moby_fire_shot(char *moby, char *shot)
 {
     char velocity[16];
     char *vars = *(char **)(moby + 0x68);
-    char *classRecord;
-    char *classRecord2;
+    char *class_record;
+    char *class_record2;
     float speed;
-    float secondValue;
+    float second_value;
     float value;
     float extra;
     int mode;
-    void *newMoby;
+    void *new_moby;
 
-    classRecord = g_weapon_l00_table + (unsigned char)g_item_slot_to_record[0x19] * 0xE0;
-    value = *(float *)(classRecord + 0x50);
+    class_record = g_weapon_l00_table + (unsigned char)g_item_slot_to_record[0x19] * 0xE0;
+    value = *(float *)(class_record + 0x50);
     speed = value * 0.016666667f;
     mode = D_00189E20_13.state;
     if (mode == 1)
@@ -146,8 +146,8 @@ void moby_fire_shot(char *moby, char *shot)
     else
         vec_scale_to_length(velocity, D_00189E20_13.vector, speed);
 
-    classRecord2 = g_weapon_l00_table + (unsigned char)g_item_slot_to_record[0x19] * 0xE0;
-    secondValue = *(float *)(classRecord2 + 0x70);
+    class_record2 = g_weapon_l00_table + (unsigned char)g_item_slot_to_record[0x19] * 0xE0;
+    second_value = *(float *)(class_record2 + 0x70);
     part_l00_spawn_spark_shower(moby, shot, velocity);
 
     mode = D_00189E20_13.mode;
@@ -156,10 +156,10 @@ void moby_fire_shot(char *moby, char *shot)
 
     value = FastVecLength(velocity);
     extra = D_001AFF08;
-    newMoby = SpawnProjectile(shot, velocity, moby, 0, value, secondValue, extra);
-    *(int *)vars = (int)newMoby;
-    if (newMoby != 0) {
-        *(int *)((char *)newMoby + 0xB8) = (int)moby;
+    new_moby = SpawnProjectile(shot, velocity, moby, 0, value, second_value, extra);
+    *(int *)vars = (int)new_moby;
+    if (new_moby != 0) {
+        *(int *)((char *)new_moby + 0xB8) = (int)moby;
     }
 }
 

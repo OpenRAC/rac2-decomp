@@ -129,7 +129,7 @@ void UpdateCrateStackMotion(Moby *moby)
             if (math_fabs(delta[0]) < 0.55f && math_fabs(delta[1]) < 0.55f &&
                 delta[2] < 0.0f && delta[2] > -(g_hero_state.f250 + g_hero_state.f264) &&
                 (moby->state == 1 || moby->state == 5)) {
-                DestroyCrate(moby, moby->oClass == 0x1F9 /* Explosive Crate */, 0);
+                DestroyCrate(moby, moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE, 0);
                 crate_drop_loot(moby);
             }
 
@@ -193,12 +193,12 @@ void UpdateCrateStackMotion(Moby *moby)
                     /* A fast landing sets off a Explosive Crate (class 0x1F9) in state 1: this one, or the
                      * one below. */
                     if ((vars->flags & 0x20) && FastVecLength(vars->velocity) > 0.008333334f) {
-                        if (moby->oClass == 0x1F9 /* Explosive Crate */ && moby->state == 1) {
+                        if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE && moby->state == 1) {
                             moby->fBC = 0;
                             moby->state = 5;
                         } else {
                             below = vars->below;
-                            if (below != 0 && below->oClass == 0x1F9 /* Explosive Crate */ && below->state == 1) {
+                            if (below != 0 && below->oClass == MOBY_CLASS_EXPLOSIVE_CRATE && below->state == 1) {
                                 below->state = 5;
                                 vars->below->fBC = 0;
                             }

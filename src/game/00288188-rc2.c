@@ -28,30 +28,30 @@ extern s16 D_00259F58[];
 extern s16 D_00259CE0[];
 
 /* Returns 1 when the help id appears in either of the two help id tables, otherwise 0. */
-s32 help_is_id_in_either_table(s32 helpId) {
-    s16 *tableA;
-    s16 *tableB;
-    s16 *idPtr;
+s32 help_is_id_in_either_table(s32 help_id) {
+    s16 *table_a;
+    s16 *table_b;
+    s16 *id_ptr;
 
-    tableA = D_00259F58;
-    if (tableA[3] != -1) {
-        idPtr = tableA + 3;
+    table_a = D_00259F58;
+    if (table_a[3] != -1) {
+        id_ptr = table_a + 3;
         do {
-            if (helpId == *idPtr) {
+            if (help_id == *id_ptr) {
                 return 1;
             }
-            idPtr += 5;
-        } while (*idPtr != -1);
+            id_ptr += 5;
+        } while (*id_ptr != -1);
     }
-    tableB = D_00259CE0;
-    if (tableB[3] != -1) {
-        idPtr = tableB + 3;
+    table_b = D_00259CE0;
+    if (table_b[3] != -1) {
+        id_ptr = table_b + 3;
         do {
-            if (helpId == *idPtr) {
+            if (help_id == *id_ptr) {
                 return 1;
             }
-            idPtr += 5;
-        } while (*idPtr != -1);
+            id_ptr += 5;
+        } while (*id_ptr != -1);
     }
     return 0;
 }

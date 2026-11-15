@@ -122,7 +122,7 @@ s32 DrawGornStageHud(void) {
     char *label;
     u32 colors[2], colors2[2];
     Block b0, b1, b2;
-    s32 hours, minutes, seconds, weaponIndex, newWeaponIndex, color, textX;
+    s32 hours, minutes, seconds, weapon_index, new_weapon_index, color, textX;
     HudBlinkVars *data = *(HudBlinkVars **)(D_L15_001B1580 + 0x68);
     f32 x, y, ratio, tmp, base, end, fill, tweenColor;
     void *sprite0, *sprite2;
@@ -189,9 +189,9 @@ s32 DrawGornStageHud(void) {
         gfx_draw_scaled_object(D_L15_001B1564, x, y, 0x55f0c070, 1.0f, 0.0f);
 
         /* The weapon's level gauge, red to green in one, two or three segments. */
-        weaponIndex = table_find_last_used_entry(6);
-        ratio = IntToFloat(D_L15_0029FD80[weaponIndex].value) / IntToFloat(D_L15_0029FD80[weaponIndex].maxLevel);
-        switch (weaponIndex) {
+        weapon_index = table_find_last_used_entry(6);
+        ratio = IntToFloat(D_L15_0029FD80[weapon_index].value) / IntToFloat(D_L15_0029FD80[weapon_index].maxLevel);
+        switch (weapon_index) {
         case 6:
             if (ratio > 0.0f) {
                 tweenColor = FastTweenColor(0x800000ff, 0x8000ff00, ratio);
@@ -243,9 +243,9 @@ s32 DrawGornStageHud(void) {
             gfx_draw_screen_rectangle(156, 14, (s32)tmp, 27, 1, colors);
 
         /* Ammo bar. */
-        weaponIndex = table_find_last_used_entry(7);
-        ratio = IntToFloat(D_L15_0029FD80[weaponIndex].value);
-        fill = ratio / IntToFloat(D_L15_0029FD80[weaponIndex].maxAmmo);
+        weapon_index = table_find_last_used_entry(7);
+        ratio = IntToFloat(D_L15_0029FD80[weapon_index].value);
+        fill = ratio / IntToFloat(D_L15_0029FD80[weapon_index].maxAmmo);
         color = FastTweenColor(0x800000ff, 0x8000ff00, fill);
         base = IntToFloat(450);
         end = IntToFloat(386);
@@ -272,11 +272,11 @@ s32 DrawGornStageHud(void) {
 
         /* Weapon switch. */
         level_set_counter_plus_one(2);
-        newWeaponIndex = level_lookup_step_table();
-        if (newWeaponIndex >= 0) {
+        new_weapon_index = level_lookup_step_table();
+        if (new_weapon_index >= 0) {
             D_L15_0029FD80[table_find_last_used_entry(D_L15_001B15B0)].active = 0;
-            D_L15_001B15B0 = newWeaponIndex;
-            D_L15_0029FD80[table_find_last_used_entry(newWeaponIndex)].active = 1;
+            D_L15_001B15B0 = new_weapon_index;
+            D_L15_0029FD80[table_find_last_used_entry(new_weapon_index)].active = 1;
         }
         gfx_draw_scaled_object(D_L15_001B1568, x, y, 0x80f0f0f0, 1.0f, 0.0f);
     }

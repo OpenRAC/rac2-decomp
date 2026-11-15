@@ -30,7 +30,7 @@ extern float IntToFloat(int);
 /* Moves every beam record this object owns toward the hero, releases finished ones, and shakes the camera the first time a beam hits the hero. */
 void beam_update_records(char *obj)
 {
-    char aimPoint[16] __attribute__((aligned(16)));
+    char aim_point[16] __attribute__((aligned(16)));
     char lift[16] __attribute__((aligned(16)));
     int i;
     char *position;
@@ -45,16 +45,16 @@ void beam_update_records(char *obj)
             continue;
         }
         moby_transform_joint_to_world(obj, 0, (char *)&record->origin);
-        qcopy(aimPoint, *(char **)(state + 0x120) + 0x10);
-        FastVecAdd(aimPoint, (char *)&record->offset, aimPoint);
+        qcopy(aim_point, *(char **)(state + 0x120) + 0x10);
+        FastVecAdd(aim_point, (char *)&record->offset, aim_point);
         FastVecScale(lift, *(char **)(state + 0x120) + 0xC0, 0.5f);
-        FastVecSub(aimPoint, aimPoint, lift);
+        FastVecSub(aim_point, aim_point, lift);
         switch (record->mode) {
         case 0: {
             float distance;
             qcopy(position, (char *)&record->origin);
-            lerp_vector((char *)&record->next, (char *)record, aimPoint, record->progress);
-            distance = fast_vec_dist((char *)&record->origin, aimPoint);
+            lerp_vector((char *)&record->next, (char *)record, aim_point, record->progress);
+            distance = fast_vec_dist((char *)&record->origin, aim_point);
             if (distance > 64.0f) distance = 64.0f;
             else if (distance < 1.0f) distance = 1.0f;
             record->progress += 2.0f / distance;
@@ -65,8 +65,8 @@ void beam_update_records(char *obj)
             break;
         }
         case 1:
-            qcopy((char *)&record->next, aimPoint);
-            lerp_vector((char *)record, aimPoint, (char *)&record->origin, record->progress);
+            qcopy((char *)&record->next, aim_point);
+            lerp_vector((char *)record, aim_point, (char *)&record->origin, record->progress);
             record->progress -= 0.25f;
             if (record->progress <= 0.0f) record->owner = 0;
             break;
@@ -96,12 +96,12 @@ void beam_fire_burst(char *object)
     char origin[16] __attribute__((aligned(16)));
     char colors[8];
     char *state = *(char **)(object + 0x68);
-    char *targetInfo = moby_get_motion_data(object);
+    char *target_info = moby_get_motion_data(object);
     int i;
     char *position;
-    if (!targetInfo || !*(char **)(targetInfo + 0x120) || *(int *)(state + 0x268)) return;
+    if (!target_info || !*(char **)(target_info + 0x120) || *(int *)(state + 0x268)) return;
     position = object + 0x10;
-    FastVecSub(delta, *(char **)(targetInfo + 0x120) + 0x10, position);
+    FastVecSub(delta, *(char **)(target_info + 0x120) + 0x10, position);
     {
         float speed = 0.5833333730697632f;
         qcopy_nc(pos, position);

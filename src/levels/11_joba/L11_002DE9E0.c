@@ -90,7 +90,7 @@ void moby_update_list_flags(void) {
             mob->flags |= 0x800;
         if (mob->type == 0xD54 /* moby class 3412 */)
             UpdateEquipmentPieces(mob);
-        if (mob != 0 && mob->type == 0xFA0 /* TV Screens */ && mob->p68 != 0)
+        if (mob != 0 && mob->type == MOBY_CLASS_TV_SCREENS && mob->p68 != 0)
             math_store_angle_update_result(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.0610865355f);
     }
     if (g_current_map_index == 0xB && ref_L11_0030F060_00.mode == 2)
@@ -205,7 +205,7 @@ void shot_update_with_sparks(unsigned char *moby) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L11_001C0D00;
                 model = reread->hit;
@@ -286,7 +286,7 @@ void shot_update_explode(char *moby) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L11_001C0D00;
             model = reread->hit;

@@ -164,7 +164,7 @@ void falling_l06_object_update(char *obj) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L06_001BFC80;
             model = reread->hit;
@@ -324,13 +324,13 @@ extern void gfx_update_color_fade(char *a0, char *a1);
 /* runs a moby's timer down and picks the dying or the revived path from what is left */
 void spawner_update_damage_timer(char *moby, char *vars)
 {
-    float damageStep = moby_update_aim_target_strength(moby, part_find_owned_effect_slot(moby, 0xC30000, 0));
+    float damage_step = moby_update_aim_target_strength(moby, part_find_owned_effect_slot(moby, 0xC30000, 0));
 
-    if (damageStep > 0.0f) {
-        float timeLeft = *(float *)(vars + 0x20) - damageStep;
+    if (damage_step > 0.0f) {
+        float time_left = *(float *)(vars + 0x20) - damage_step;
 
-        *(float *)(vars + 0x20) = timeLeft;
-        if (timeLeft > 0.0f) {
+        *(float *)(vars + 0x20) = time_left;
+        if (time_left > 0.0f) {
             *(unsigned char *)(vars + 0x57) = 0x5A;
             gfx_start_color_fade(moby, vars + 0x50);
         } else {
@@ -347,10 +347,10 @@ void spawner_update_damage_timer(char *moby, char *vars)
 extern int moby_count_group_not_in_state(int a0, int a1);
 
 /* counts the 0x75E-slot entries that are live and returns the last free one */
-int flock_count_members_find_free(int spawnerMoby, char *varsIn)
+int flock_count_members_find_free(int spawner_moby, char *vars_in)
 {
-    char *vars = varsIn;
-    int freeSlot = -1;
+    char *vars = vars_in;
+    int free_slot = -1;
     int i;
 
     *(unsigned char *)(vars + 0x81) = moby_count_group_not_in_state(*(int *)(vars + 0x84), -1);
@@ -361,9 +361,9 @@ int flock_count_members_find_free(int spawnerMoby, char *varsIn)
             && *(unsigned char *)(member + 0x20) != 0xFE && *(unsigned char *)(member + 0x20) != 0xFD)
             (*(unsigned char *)(vars + 0x81))++;
         else
-            freeSlot = i;
+            free_slot = i;
     }
-    return freeSlot;
+    return free_slot;
 }
 
 /* func_L06_003F3800 is matched in L06_003F3800-g8.c. */
@@ -375,14 +375,14 @@ extern void moby_mark_spawned(char *a0);
 /* clears one word of a 0x75D moby's state block when it is neither dying nor gone */
 void flock_release_member(char *moby, char *vars)
 {
-    char *spawnerMoby = *(char **)(vars + 0x10);
+    char *spawner_moby = *(char **)(vars + 0x10);
 
-    if (spawnerMoby != 0 && *(short *)(spawnerMoby + 0xAA) == 0x75D /* moby class 1885 */
-        && *(unsigned char *)(spawnerMoby + 0x20) != 0xFE && *(unsigned char *)(spawnerMoby + 0x20) != 0xFD) {
-        int *spawnerVars = *(int **)(spawnerMoby + 0x68);
+    if (spawner_moby != 0 && *(short *)(spawner_moby + 0xAA) == 0x75D /* moby class 1885 */
+        && *(unsigned char *)(spawner_moby + 0x20) != 0xFE && *(unsigned char *)(spawner_moby + 0x20) != 0xFD) {
+        int *spawner_vars = *(int **)(spawner_moby + 0x68);
 
-        spawnerVars += *(unsigned char *)(vars + 0x1C);
-        spawnerVars[40] = 0;
+        spawner_vars += *(unsigned char *)(vars + 0x1C);
+        spawner_vars[40] = 0;
     }
     moby_mark_spawned(moby);
 }
@@ -533,14 +533,14 @@ done:
 /* clears one word of a 0xA58 moby's state block when it is neither dying nor gone */
 void flock_release_second_member(char *moby, char *vars)
 {
-    char *spawnerMoby = *(char **)(vars + 0x10);
+    char *spawner_moby = *(char **)(vars + 0x10);
 
-    if (spawnerMoby != 0 && *(short *)(spawnerMoby + 0xAA) == 0xA58 /* moby class 2648 */
-        && *(unsigned char *)(spawnerMoby + 0x20) != 0xFE && *(unsigned char *)(spawnerMoby + 0x20) != 0xFD) {
-        int *spawnerVars = *(int **)(spawnerMoby + 0x68);
+    if (spawner_moby != 0 && *(short *)(spawner_moby + 0xAA) == 0xA58 /* moby class 2648 */
+        && *(unsigned char *)(spawner_moby + 0x20) != 0xFE && *(unsigned char *)(spawner_moby + 0x20) != 0xFD) {
+        int *spawner_vars = *(int **)(spawner_moby + 0x68);
 
-        spawnerVars += *(unsigned char *)(vars + 0x1C);
-        spawnerVars[40] = 0;
+        spawner_vars += *(unsigned char *)(vars + 0x1C);
+        spawner_vars[40] = 0;
     }
     moby_mark_spawned(moby);
 }

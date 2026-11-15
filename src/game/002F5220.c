@@ -509,19 +509,19 @@ int GetSelectedShopItemPrice(void)
     int result = 0;
 
     if (*(int *)((char *)&g_purchase_menu_model + offset + 0x154) != 0) {
-        int isSpecial = 0;
+        int is_special = 0;
         switch (*(int *)((char *)&g_purchase_menu_model + offset + 0x140)) {
         case 12:
         case 14:
         case 17:
         case 18:
         case 53:
-            isSpecial = 1;
+            is_special = 1;
             break;
         default:
             break;
         }
-        if (isSpecial) {
+        if (is_special) {
             if (help_copy_record_at_depth(&local, *(int *)((char *)&g_purchase_menu_model + g_purchase_menu_model.selected * 24 + 0x140), 1))
                 result = local.fields.value;
         } else {

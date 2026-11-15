@@ -7,8 +7,8 @@ extern void r1_func_0011D9A8(void);
 
 typedef struct {
     unsigned char pad0[0x838];
-    int bitWindow;
-    int bitsLeft;
+    int bit_window;
+    int bits_left;
     unsigned char pad840[0x18];
     void *cbData;
 } MpegDec;
@@ -34,11 +34,11 @@ extern void r1_func_0012A0F8(void *);
 extern char r1_D_001537E8[];
 typedef struct {
     char pad0[0x128];
-    int outAddr;
+    int out_addr;
     int unk12C;
-    int isIntra;
+    int is_intra;
     int unk134;
-    int needsMotionComp;
+    int needs_motion_comp;
     int unk13C;
 } Elem00125630;
 typedef struct {
@@ -48,25 +48,25 @@ typedef struct {
 } Ref00125630;
 typedef struct {
     char pad0[0x11C];
-    int errorFlag;
+    int error_flag;
     char pad120[0xC];
-    int mbWidth;
+    int mb_width;
     char pad130[0x44];
     int pictureStructure;
     char pad178[0x48];
-    Ref00125630 *refFrame0;
+    Ref00125630 *ref_frame0;
     char pad1C4[0xC];
-    Ref00125630 *refFrame1;
+    Ref00125630 *ref_frame1;
     char pad1D4[0xC];
-    Ref00125630 *refFrame2;
+    Ref00125630 *ref_frame2;
     char pad1E4[0x3AC];
     Elem00125630 e[2];
-    int curSlot;
+    int cur_slot;
 } Dec00125630;
 
 /* rac1-decomp src/core/00125630.c: func_00129450 */
 /* Motion-compensate one macroblock (or wait for the intra IDCT) and record its output slot. */
-int mpeg_decode_macroblock_motion(void *decoder, int mbAddr, int mbInc, int mbType, int motionType,
+int mpeg_decode_macroblock_motion(void *decoder, int mbAddr, int mb_inc, int mbType, int motionType,
                   void *pmv, void *mvfs, void *dmv) {
     Dec00125630 *d = (Dec00125630 *)decoder;
     int intra;
@@ -77,18 +77,18 @@ int mpeg_decode_macroblock_motion(void *decoder, int mbAddr, int mbInc, int mbTy
     Ref00125630 *ref;
 
     intra = mbType & 1;
-    y = mbAddr / d->mbWidth;
-    x = mbAddr % d->mbWidth;
+    y = mbAddr / d->mb_width;
+    x = mbAddr % d->mb_width;
     by = y * 16;
     bx = x * 16;
     if (intra) {
         while ((D9_CHCR >> 8) & 1)
             ;
-        d->e[d->curSlot].needsMotionComp = 0;
+        d->e[d->cur_slot].needs_motion_comp = 0;
     } else {
         if ((unsigned int)(motionType - 1) >= 3) {
             r1_func_0012C430(d, r1_D_001537E8, motionType);
-            d->errorFlag = 1;
+            d->error_flag = 1;
             return 0;
         }
         r1_func_00125880((struct MpegDecoder *)d, bx, by, mbType, motionType,
@@ -96,23 +96,23 @@ int mpeg_decode_macroblock_motion(void *decoder, int mbAddr, int mbInc, int mbTy
         while ((D9_CHCR >> 8) & 1)
             ;
         r1_func_0012A0F8(d);
-        d->e[d->curSlot].needsMotionComp = 1;
+        d->e[d->cur_slot].needs_motion_comp = 1;
     }
-    if (mbInc == 1 && (mbType & 2)) {
-        d->e[d->curSlot].unk134 = mbInc;
+    if (mb_inc == 1 && (mbType & 2)) {
+        d->e[d->cur_slot].unk134 = mb_inc;
     } else {
-        d->e[d->curSlot].unk134 = 0;
+        d->e[d->cur_slot].unk134 = 0;
     }
-    d->e[d->curSlot].isIntra = intra;
+    d->e[d->cur_slot].is_intra = intra;
     if (d->pictureStructure == 3) {
-        d->e[d->curSlot].outAddr = d->refFrame0->unk0 + (x * d->refFrame0->unk10 + y) * 0x180;
+        d->e[d->cur_slot].out_addr = d->ref_frame0->unk0 + (x * d->ref_frame0->unk10 + y) * 0x180;
     } else {
         if (d->pictureStructure == 2) {
-            ref = d->refFrame2;
+            ref = d->ref_frame2;
         } else {
-            ref = d->refFrame1;
+            ref = d->ref_frame1;
         }
-        d->e[d->curSlot].outAddr = ref->unk0 + (x * ref->unk10 + y) * 0x180;
+        d->e[d->cur_slot].out_addr = ref->unk0 + (x * ref->unk10 + y) * 0x180;
     }
     return 1;
 }
@@ -428,42 +428,42 @@ typedef struct {
     void (*fb[4])(void *);
     char a[4][0x1C];
     char b[4][0x1C];
-    int outAddr;
+    int out_addr;
     int count;
-    int isIntra;
+    int is_intra;
     int pad134;
-    int needsMotionComp;
+    int needs_motion_comp;
     int unk13C;
 } Elem001263A8;
 typedef struct {
     char pad0[0x590];
     Elem001263A8 e[2];
     char pad810[0xC];
-    int workBuf;
+    int work_buf;
 } Dec001263A8;
 
 
 /* rac1-decomp src/core/00125630.c: func_0012A1C8 */
 /* Run a channel's per-block callbacks, then hand its buffer to the output routine. */
-void mpeg_run_block_callbacks(void *decoderPtr, int idx) {
-    Dec001263A8 *decoder = (Dec001263A8 *)decoderPtr;
+void mpeg_run_block_callbacks(void *decoder_ptr, int idx) {
+    Dec001263A8 *decoder = (Dec001263A8 *)decoder_ptr;
     int i;
 
-    if (decoder->e[idx].needsMotionComp != 0) {
+    if (decoder->e[idx].needs_motion_comp != 0) {
         for (i = 0; i < decoder->e[idx].count; i++) {
             decoder->e[idx].fa[i](decoder->e[idx].a[i]);
             decoder->e[idx].fb[i](decoder->e[idx].b[i]);
         }
     }
-    if (decoder->e[idx].isIntra != 0 && decoder->e[idx].unk13C != 0) {
+    if (decoder->e[idx].is_intra != 0 && decoder->e[idx].unk13C != 0) {
         r1_func_0012C468(decoder, r1_D_00153870);
     }
-    if (decoder->e[idx].isIntra != 0) {
-        r1_func_00127318(decoder->e[idx].outAddr, decoder->e[idx].unk4);
+    if (decoder->e[idx].is_intra != 0) {
+        r1_func_00127318(decoder->e[idx].out_addr, decoder->e[idx].unk4);
     } else if (decoder->e[idx].unk13C != 0) {
-        r1_func_00127318(decoder->e[idx].outAddr, decoder->workBuf);
+        r1_func_00127318(decoder->e[idx].out_addr, decoder->work_buf);
     } else {
-        r1_func_001272B8(decoder->e[idx].outAddr, decoder->workBuf, decoder->e[idx].unk4);
+        r1_func_001272B8(decoder->e[idx].out_addr, decoder->work_buf, decoder->e[idx].unk4);
     }
 }
 
@@ -503,16 +503,16 @@ ASM_FUNC("asm/core", func_0012B0D8);
 
 /* rac1-decomp src/core/00125630.c: func_00127378 */
 /* Sets or clears one flag bit in the video decoder chip control register. */
-void mpeg_set_control_flag(int bitValue) {
-    unsigned int *ctrlReg = (unsigned int *)0x10002010;
-    *ctrlReg = (*ctrlReg & 0xFF7FFFFF) | (bitValue << 23);
+void mpeg_set_control_flag(int bit_value) {
+    unsigned int *ctrl_reg = (unsigned int *)0x10002010;
+    *ctrl_reg = (*ctrl_reg & 0xFF7FFFFF) | (bit_value << 23);
 }
 
 /* rac1-decomp src/core/00125630.c: func_001273A0 */
 /* _waitBdecOut (libmpeg). Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Waits for the video decoder chip to finish its current block, and resets it if it hit an error. */
-int mpeg_wait_block_decode_done(void *decoderPtr) {
-    MpegDec *d = decoderPtr;
+int mpeg_wait_block_decode_done(void *decoder_ptr) {
+    MpegDec *d = decoder_ptr;
     int cb1[8];
     int cb2[8];
     int ret;
@@ -533,12 +533,12 @@ int mpeg_wait_block_decode_done(void *decoderPtr) {
     }
     bp = IPU_BP;
     top = IPU_TOP;
-    d->bitWindow = top;
+    d->bit_window = top;
     if (top < 0) {
         rest = bp & 0x1F;
-        d->bitsLeft = rest ? 32 - rest : 0;
+        d->bits_left = rest ? 32 - rest : 0;
     } else {
-        d->bitsLeft = 32;
+        d->bits_left = 32;
     }
     if (IPU_CTRL & 0x4000) {
         r1_func_0012C468(d, r1_D_00153888);

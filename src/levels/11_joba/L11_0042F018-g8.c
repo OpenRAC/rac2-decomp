@@ -486,25 +486,25 @@ void saur_beast_update(u8 *saur) {
         }
         break;
     case 18: {
-        f32 sparkPos[4] __attribute__((aligned(16)));
-        f32 sparkOffset[4] __attribute__((aligned(16)));
+        f32 spark_pos[4] __attribute__((aligned(16)));
+        f32 spark_offset[4] __attribute__((aligned(16)));
         f32 f, g;
         s32 n;
 
         if (*(u8 **)(data + 0x27C) != 0 && saur[0x42] == 9) {
-            moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
-            sparkOffset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
-            sparkOffset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
-            sparkOffset[2] = 0.0f;
-            FastVecAdd(sparkPos, sparkPos, sparkOffset);
-            sparkPos[2] -= 0.05f;
+            moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, spark_pos);
+            spark_offset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
+            spark_offset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
+            spark_offset[2] = 0.0f;
+            FastVecAdd(spark_pos, spark_pos, spark_offset);
+            spark_pos[2] -= 0.05f;
             g = moby_get_anim_value(saur);
             f = math_random_float_range(0.2f, 0.9f) * 0.2f * g;
             n = math_random_int_below(2);
             if (n == 0)
                 n = n - 1;
-            part_spawn_ground_effect(sparkPos, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
-            part_spawn_ground_effect(sparkPos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(spark_pos, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
+            part_spawn_ground_effect(spark_pos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
             *(f32 *)(data + 0x288) = g;
         }
         if (saur[0x60] & 2) {
@@ -569,22 +569,22 @@ void saur_beast_update(u8 *saur) {
                 break;
             }
         } else if (math_is_value_within_step(saur, 3.0f) != 0 && *(u8 **)(data + 0x27C) != 0) {
-            f32 sparkPos[4] __attribute__((aligned(16)));
-            f32 sparkOffset[4] __attribute__((aligned(16)));
+            f32 spark_pos[4] __attribute__((aligned(16)));
+            f32 spark_offset[4] __attribute__((aligned(16)));
 
             if (FastDiffRots(*(f32 *)(saur + 0xF8), mat_fast_helper_a(((Hero *)g_hero_state)->f[0x80 / 4] - *(f32 *)(saur + 0x10),
                                                                  ((Hero *)g_hero_state)->f[0x84 / 4] - *(f32 *)(saur + 0x14))) < 0.78539824f) {
                 s32 k;
                 u8 *l;
 
-                moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
-                sparkOffset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
-                sparkOffset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
-                sparkOffset[2] = 0.0f;
-                FastVecAdd(sparkPos, sparkPos, sparkOffset);
-                sparkPos[2] -= 0.05f;
-                *(TI128 *)(data + 0x230) = *(TI128 *)sparkPos;
-                FastVecSub(data + 0x250, &((Hero *)g_hero_state)->f[0xD0 / 4], sparkPos);
+                moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, spark_pos);
+                spark_offset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
+                spark_offset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
+                spark_offset[2] = 0.0f;
+                FastVecAdd(spark_pos, spark_pos, spark_offset);
+                spark_pos[2] -= 0.05f;
+                *(TI128 *)(data + 0x230) = *(TI128 *)spark_pos;
+                FastVecSub(data + 0x250, &((Hero *)g_hero_state)->f[0xD0 / 4], spark_pos);
                 *(f32 *)(data + 0x298) = 0.0f;
                 moby_set_flag_bit(saur, 0);
                 k = part_l00_alloc_effect_slot_2(saur + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
@@ -603,18 +603,18 @@ void saur_beast_update(u8 *saur) {
                 s32 k;
                 u8 *l;
 
-                moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
-                sparkOffset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
-                sparkOffset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
-                sparkOffset[2] = 0.0f;
-                FastVecAdd(sparkPos, sparkPos, sparkOffset);
-                sparkPos[2] -= 0.05f;
-                *(TI128 *)(data + 0x230) = *(TI128 *)sparkPos;
-                sparkOffset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 25.0f;
-                sparkOffset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 25.0f;
-                sparkOffset[2] = 0.0f;
-                FastVecAdd(sparkOffset, sparkOffset, saur + 0x10);
-                FastVecSub(data + 0x250, sparkOffset, sparkPos);
+                moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, spark_pos);
+                spark_offset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
+                spark_offset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
+                spark_offset[2] = 0.0f;
+                FastVecAdd(spark_pos, spark_pos, spark_offset);
+                spark_pos[2] -= 0.05f;
+                *(TI128 *)(data + 0x230) = *(TI128 *)spark_pos;
+                spark_offset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 25.0f;
+                spark_offset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 25.0f;
+                spark_offset[2] = 0.0f;
+                FastVecAdd(spark_offset, spark_offset, saur + 0x10);
+                FastVecSub(data + 0x250, spark_offset, spark_pos);
                 *(f32 *)(data + 0x298) = 0.0f;
                 moby_set_flag_bit(saur, 0);
                 k = part_l00_alloc_effect_slot_2(saur + 0x10, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
@@ -634,23 +634,23 @@ void saur_beast_update(u8 *saur) {
         t = moby_get_anim_value(saur);
         if (t < 3.0f || saur[0x42] != 0xA) {
             if (*(u8 **)(data + 0x27C) != 0) {
-                f32 sparkPos[4] __attribute__((aligned(16)));
-                f32 sparkOffset[4] __attribute__((aligned(16)));
+                f32 spark_pos[4] __attribute__((aligned(16)));
+                f32 spark_offset[4] __attribute__((aligned(16)));
                 f32 f;
                 s32 n;
 
-                moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, sparkPos);
-                sparkOffset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
-                sparkOffset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
-                sparkOffset[2] = 0.0f;
-                FastVecAdd(sparkPos, sparkPos, sparkOffset);
-                sparkPos[2] -= 0.05f;
+                moby_transform_joint_to_world(*(u32 *)(*(u8 **)(*(u8 **)(data + 0x27C) + 0x68) + 0x278), 0, spark_pos);
+                spark_offset[0] = math_fast_sin_or_cos_a(*(f32 *)(saur + 0xF8)) * 0.1f;
+                spark_offset[1] = math_fast_sin_or_cos_b(*(f32 *)(saur + 0xF8)) * 0.1f;
+                spark_offset[2] = 0.0f;
+                FastVecAdd(spark_pos, spark_pos, spark_offset);
+                spark_pos[2] -= 0.05f;
                 f = math_random_float_range(0.2f, 0.9f) * 0.2f * *(f32 *)(data + 0x288);
                 n = math_random_int_below(2);
                 if (n == 0)
                     n = n - 1;
-                part_spawn_ground_effect(sparkPos, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
-                part_spawn_ground_effect(sparkPos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(spark_pos, 2, f * 0.3f, f, 0x804020FF, 0, n, D_L11_001A8F20, 0.0f, 0);
+                part_spawn_ground_effect(spark_pos, 2, f * 0.04f, f * 0.4f, 0x7F6F6FFF, 1, -n, D_L11_001A8F20, 0.0f, 0);
                 *(f32 *)(data + 0x288) = *(f32 *)(data + 0x288) + 1.0f;
             }
         }

@@ -156,18 +156,18 @@ void hero_l04_decide_state_transition(void) {
     s32 sp68;
     s32 sp6C;
     s32 sp70;
-    void *heroMoby;
+    void *hero_moby;
     s32 sp78;
     s32 sp7C;
-    s32 heroAnim;
+    s32 hero_anim;
     s32 temp_a0_11;
     s32 temp_a0_31;
     s32 pad3C;
 
-    heroMoby = FLD(g_hero_state, void *, 0x2290);
+    hero_moby = FLD(g_hero_state, void *, 0x2290);
     sp78 = FLD(g_hero_state, s32, 0x229C);
     sp7C = FLD(g_hero_state, s32, 0x2298);
-    heroAnim = FLD(heroMoby, u8, 0x43);
+    hero_anim = FLD(hero_moby, u8, 0x43);
     if (hero_check_surface_contact(1) != 0) {
         goto end;
     }
@@ -247,7 +247,7 @@ void hero_l04_decide_state_transition(void) {
                 anim_start_blended(obj, 1, 0, 0xC);
             }
         }
-        anim = math_l00_return_argument(FLD(heroMoby, u8, 0x43));
+        anim = math_l00_return_argument(FLD(hero_moby, u8, 0x43));
         if ((anim == hero_get_weapon_animation_id(0)) && notcrouch) {
             if (hero_choose_idle_anim(&sp40) != 0) {
                 u8 *rec;
@@ -745,7 +745,7 @@ void hero_l04_decide_state_transition(void) {
         s32 n;
         s32 turned;
         u32 st;
-        if ((FLD(g_hero_state, u8, 0x40E) != 0) && ((FLD(heroMoby, f32, 0x44) > 0.9f) || (FLD(heroMoby, u8, 0x42) != 0xFF))) {
+        if ((FLD(g_hero_state, u8, 0x40E) != 0) && ((FLD(hero_moby, f32, 0x44) > 0.9f) || (FLD(hero_moby, u8, 0x42) != 0xFF))) {
             FLD(g_hero_state, u8, 0x40E) = 0;
         }
         if ((FLD(g_hero_state, u8, 0x149A) != 0) && (FLD(g_hero_state, s16, 0x34C) == 0)) {
@@ -846,7 +846,7 @@ void hero_l04_decide_state_transition(void) {
             if ((FLD(g_pad_state, s32, 0x1D4) != 0) && (vec_length_xy(g_hero_state + 0xF0) < 0.0008333334f) && (FLD(g_hero_state, f32, 0x320) < 0.087266475f) && (hero_l04_enter_state(0, 0) != 0)) {
                 set_hero_animation(hero_get_weapon_animation_id(0), 0, 17.0f);
             }
-            if (FLD(heroMoby, u8, 0x43) == 0x37) {
+            if (FLD(hero_moby, u8, 0x43) == 0x37) {
                 FLD(g_hero_state, f32, 0xC20) = (1.0f - FLD(g_hero_state, f32, 0x400)) * 2.0f;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.7f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.7f;
@@ -854,7 +854,7 @@ void hero_l04_decide_state_transition(void) {
                 if (FLD(g_hero_state, f32, 0xC20) < 0.75f) {
                     FLD(g_hero_state, f32, 0xC20) = 0.75f;
                 }
-            } else if (FLD(heroMoby, u8, 0x43) == 0x66) {
+            } else if (FLD(hero_moby, u8, 0x43) == 0x66) {
                 FLD(g_hero_state, f32, 0xC20) = FLD(g_hero_state, f32, 0x170) * 10.0f;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.1f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.1f;
@@ -1509,7 +1509,7 @@ void hero_l04_decide_state_transition(void) {
                 if (near == 0) {
                     s32 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 2;
                     if (FLD(g_hero_state, f32, 0xC38) < FLD(g_hero_state, f32, 0x4CC) - 1.5f) {
-                        set_hero_animation(math_l00_return_argument(FLD(heroMoby, u8, 0x43)), k, 7.0f);
+                        set_hero_animation(math_l00_return_argument(FLD(hero_moby, u8, 0x43)), k, 7.0f);
                     }
                 }
             }
@@ -1518,7 +1518,7 @@ void hero_l04_decide_state_transition(void) {
             FLD(g_hero_state, f32, 0xC20) = 1.0f;
         } else if (FLD(g_hero_state, u8, 0x49E) != 0) {
             s32 cur;
-            if ((s32)FLD(heroMoby, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
+            if ((s32)FLD(hero_moby, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
                 if ((FLD(g_hero_state, u32, 0x2294) == 0xE) && (FLD(g_hero_state, f32, 0xC38) < 37.0f)) {
                     ApproachValue((f32 *)(g_hero_state + 0xC20), 1.0f, 0.15f);
                 } else {
@@ -1528,7 +1528,7 @@ void hero_l04_decide_state_transition(void) {
                 if (near == 0) {
                     s32 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 2;
                     if (FLD(g_hero_state, f32, 0xC20) > 1.8f) {
-                        set_hero_animation(math_l00_return_argument(FLD(heroMoby, u8, 0x43)), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 3));
+                        set_hero_animation(math_l00_return_argument(FLD(hero_moby, u8, 0x43)), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 3));
                     }
                 }
                 if (FLD(g_hero_state, f32, 0xC20) < 0.2f) {
@@ -1539,7 +1539,7 @@ void hero_l04_decide_state_transition(void) {
                 }
             }
             cur = FLD(g_hero_state, u32, 0x2294);
-            if ((cur == 9) && ((FLD(g_hero_state, f32, 0x4CC) - FLD(g_hero_state, f32, 0xC38)) > 6.0f) && ((math_l00_return_argument(FLD(heroMoby, u8, 0x42)) == 8) || (math_l00_return_argument(FLD(heroMoby, u8, 0x42)) == cur)) && (FLD(heroMoby, u8, 0x42) == FLD(heroMoby, u8, 0x43)) && (FLD(g_hero_state, f32, 0x1B0) < D_L04_001A7DAC[1][1] * 0.0016666668f) && (FLD(g_hero_state, f32, 0x174) < 0.041666668f)) {
+            if ((cur == 9) && ((FLD(g_hero_state, f32, 0x4CC) - FLD(g_hero_state, f32, 0xC38)) > 6.0f) && ((math_l00_return_argument(FLD(hero_moby, u8, 0x42)) == 8) || (math_l00_return_argument(FLD(hero_moby, u8, 0x42)) == cur)) && (FLD(hero_moby, u8, 0x42) == FLD(hero_moby, u8, 0x43)) && (FLD(g_hero_state, f32, 0x1B0) < D_L04_001A7DAC[1][1] * 0.0016666668f) && (FLD(g_hero_state, f32, 0x174) < 0.041666668f)) {
                 f32 rate = 9.0f / FLD(g_hero_state, f32, 0xC20);
                 s32 at;
                 if (rate > 10.0f) {
@@ -1728,7 +1728,7 @@ end:
     if (sp7C != FLD(g_hero_state, s32, 0x2298)) {
         FLD(g_hero_state, s32, 0x1C0) = 0;
     }
-    if (heroAnim != FLD(heroMoby, u8, 0x43)) {
+    if (hero_anim != FLD(hero_moby, u8, 0x43)) {
         FLD(g_hero_state, s32, 0x1C4) = 0;
     }
 }

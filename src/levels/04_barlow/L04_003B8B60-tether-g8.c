@@ -187,16 +187,16 @@ void tether_l04_update_lock_on(Moby *self)
     float angle0, angle1;
     int n;
     Tgt *candidate;
-    int candidateIndex;
+    int candidate_index;
     float dist, ang, sa2, cs, sm, score, proj, fa, fb;
     float d0;
-    float *infoA, *infoB;
-    Tgt *targetA, *targetB;
+    float *info_a, *info_b;
+    Tgt *target_a, *target_b;
     float length, blend;
     float amp, height, angle, old, cd;
     int fa2;
-    Tgt *hitTarget;
-    float *hitInfo;
+    Tgt *hit_target;
+    float *hit_info;
     float *tv, apj, *ainfo;
     int an;
     float bpj, *binfo;
@@ -224,8 +224,8 @@ void tether_l04_update_lock_on(Moby *self)
             tether->lockB = 0;
             tether->u.s.h42 = 0;
         } else {
-            candidateIndex = 0;
-            for (candidate = g_moby_list[0]; candidate != 0; candidate = g_moby_list[++candidateIndex]) {
+            candidate_index = 0;
+            for (candidate = g_moby_list[0]; candidate != 0; candidate = g_moby_list[++candidate_index]) {
                 if (candidate != tether->lockA && candidate != tether->lockB) {
                     if (candidate != 0 && candidate->cls != 0 && candidate->cls->id == 5) {
                         if (candidate->kind != 0xFE) {
@@ -303,19 +303,19 @@ void tether_l04_update_lock_on(Moby *self)
     }
     len = 0.0f;
     if (tether->lockA != 0) {
-        infoA = moby_get_private_value_0(tether->lockA);
-        targetA = tether->lockA;
-        qcopy(v0, targetA->pos);
-        FastVecScale(va, (char *)targetA + 0xE0, infoA[4]);
+        info_a = moby_get_private_value_0(tether->lockA);
+        target_a = tether->lockA;
+        qcopy(v0, target_a->pos);
+        FastVecScale(va, (char *)target_a + 0xE0, info_a[4]);
         FastVecAdd(v0, v0, va);
         len = fast_vec_dist(tether, v0);
         reach = len * 0.05f;
     }
     if (tether->lockB != 0) {
-        infoB = moby_get_private_value_0(tether->lockB);
-        targetB = tether->lockB;
-        qcopy(va, targetB->pos);
-        FastVecScale(vb, (char *)targetB + 0xE0, infoB[4]);
+        info_b = moby_get_private_value_0(tether->lockB);
+        target_b = tether->lockB;
+        qcopy(va, target_b->pos);
+        FastVecScale(vb, (char *)target_b + 0xE0, info_b[4]);
         FastVecAdd(va, va, vb);
         reach = (fast_vec_dist(v0, va) + len) * 0.05f;
     }
@@ -466,17 +466,17 @@ void tether_l04_update_lock_on(Moby *self)
             qcopy(&hit1, vb);
             got = CollLine(D_L04_0023A1F0[i], &D_L04_0023A210[0][i], 0x10, self, 0);
             if (got != 0) {
-                hitTarget = D_L04_001BFAD8.hit;
-                if (hitTarget != 0) {
-                    hitInfo = moby_get_private_value_0(hitTarget);
-                    if (hitInfo == 0) {
-                        QueueMobyImpact(hitTarget, &hit1);
-                    } else if (hitTarget->cls == 0 || hitTarget->cls->id != 5) {
-                        QueueMobyImpact(hitTarget, &hit1);
+                hit_target = D_L04_001BFAD8.hit;
+                if (hit_target != 0) {
+                    hit_info = moby_get_private_value_0(hit_target);
+                    if (hit_info == 0) {
+                        QueueMobyImpact(hit_target, &hit1);
+                    } else if (hit_target->cls == 0 || hit_target->cls->id != 5) {
+                        QueueMobyImpact(hit_target, &hit1);
                     } else {
                         got = 0;
-                        held[nheld++] = hitTarget;
-                        hitTarget->f98 = 0;
+                        held[nheld++] = hit_target;
+                        hit_target->f98 = 0;
                     }
                 }
                 if (got != 0) {

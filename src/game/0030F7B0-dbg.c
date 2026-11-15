@@ -40,7 +40,7 @@ extern void gfx_draw_wavy_link_strip(char *);
 void swingshot_update(u8 *self)
 {
     FollowVars *vars;
-    u8 *hookVars;
+    u8 *hook_vars;
     f32 dist;
     f32 v1[4];
     f32 v2[4];
@@ -50,13 +50,13 @@ void swingshot_update(u8 *self)
     vars = *(FollowVars **)(self + 0x68);
     if (vars == 0)
         return;
-    hookVars = 0;
+    hook_vars = 0;
     if (vars->target == 0) {
         vars->target = (u8 *)swingshot_hook_spawn((s32)self, 0.8000001f);
         if (vars->target == 0)
             goto have;
     }
-    hookVars = *(u8 **)(vars->target + 0x68);
+    hook_vars = *(u8 **)(vars->target + 0x68);
 have:
     if ((((Hero *)g_hero_state)->i[0x2294 / 4] == 1 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x1D) && ((Hero *)g_hero_state)->i[0x1B8 / 4] >= 2) {
         hud_add_moby_marker(self, 1.0f, 0xFF0000FF, 0, 0x24, 0.0f, -1, 90.0f, 4);
@@ -83,34 +83,34 @@ have:
             *(TI128 *)(t + 0xE0) = *(TI128 *)(self + 0xE0);
         }
         if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x23 || (((Hero *)g_hero_state)->i[0x229C / 4] == 0xF && ((Hero *)g_hero_state)->i[0x684 / 4] != 0)) {
-            if (hookVars != 0) {
+            if (hook_vars != 0) {
                 vars->f20 = 0.28f;
                 vars->f1C = 1.0f;
                 vars->f18 = 0.0f;
-                *(f32 *)(hookVars + 4) = 0.8000001f;
+                *(f32 *)(hook_vars + 4) = 0.8000001f;
                 if (self[0x43] != 3)
                     anim_start_blended(self, 3, 0, 10);
                 PlayMobySound(0, 0, (char *)self);
                 self[0x20] = 2;
             }
         } else if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x8A) {
-            if (hookVars != 0) {
+            if (hook_vars != 0) {
                 vars->f20 = 0.28f;
                 vars->f1C = 1.0f;
                 vars->f18 = 0.0f;
-                *(f32 *)(hookVars + 4) = 0.8000001f;
+                *(f32 *)(hook_vars + 4) = 0.8000001f;
                 if (self[0x43] != 3)
                     anim_start_blended(self, 3, 0, 10);
                 PlayMobySound(0, 0, (char *)self);
                 self[0x20] = 0xF;
             }
         } else if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x2B) {
-            if (hookVars != 0) {
+            if (hook_vars != 0) {
                 f32 d = fast_vec_dist(((Hero *)g_hero_state)->ptr[0xAD4 / 4] + 0x10, vars->target + 0x10);
                 int n = 7;
                 if (((Hero *)g_hero_state)->i[0x1240 / 4] <= 0x1D)
                     n = 5;
-                *(f32 *)(hookVars + 4) = d / (f32)n;
+                *(f32 *)(hook_vars + 4) = d / (f32)n;
                 vars->f20 = 0.28f;
                 vars->f1C = 1.0f;
                 vars->f18 = 0.0f;
@@ -126,7 +126,7 @@ have:
         if ((self[0x60] & 2) && self[0x43] != 4)
             anim_start_blended(self, 4, 0, 10);
         FastVecSub(v1, ((Hero *)g_hero_state)->ptr[0xAA4 / 4] + 0x10, vars->target + 0x10);
-        dist = *(f32 *)(hookVars + 4);
+        dist = *(f32 *)(hook_vars + 4);
         dist += FastVecLength(&((Hero *)g_hero_state)->b[0x150]);
         if (((Hero *)g_hero_state)->i[0x229C / 4] == 0xF) {
             dist += ((Hero *)g_hero_state)->f[0x644 / 4];
@@ -210,13 +210,13 @@ have:
         break;
     case 6:
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
-        *(f32 *)(hookVars + 4) = 1.3333334f;
+        *(f32 *)(hook_vars + 4) = 1.3333334f;
         self[0x20] = 7;
         break;
     case 7:
         moby_transform_joint_to_world(self, 0, v2);
         FastVecSub(v1, v2, vars->target + 0x10);
-        dist = *(f32 *)(hookVars + 4);
+        dist = *(f32 *)(hook_vars + 4);
         dist += FastVecLength(&((Hero *)g_hero_state)->b[0x150]);
         if (dist < fast_vec_dist(vars->target + 0x10, v2)) {
             vec_scale_to_length(v1, v1, dist);
@@ -234,8 +234,8 @@ have:
         if ((self[0x60] & 2) && self[0x43] != 4)
             anim_start_blended(self, 4, 0, 10);
         FastVecSub(v1, ((Hero *)g_hero_state)->ptr[0xAD4 / 4] + 0x10, vars->target + 0x10);
-        if (*(f32 *)(hookVars + 4) < FastVecLength(v1)) {
-            vec_scale_to_length(v1, v1, *(f32 *)(hookVars + 4));
+        if (*(f32 *)(hook_vars + 4) < FastVecLength(v1)) {
+            vec_scale_to_length(v1, v1, *(f32 *)(hook_vars + 4));
             FastVecAdd(vars->target + 0x10, vars->target + 0x10, v1);
         } else {
             qcopy(vars->target + 0x10, ((Hero *)g_hero_state)->ptr[0xAD4 / 4] + 0x10);
@@ -273,7 +273,7 @@ have:
         if ((self[0x60] & 2) && self[0x43] != 4)
             anim_start_blended(self, 4, 0, 10);
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
-        *(f32 *)(hookVars + 4) = 1.3333334f;
+        *(f32 *)(hook_vars + 4) = 1.3333334f;
         self[0x20] = 0xE;
         break;
     case 14:
@@ -281,8 +281,8 @@ have:
             anim_start_blended(self, 4, 0, 10);
         moby_transform_joint_to_world(self, 0, v2);
         FastVecSub(v1, v2, vars->target + 0x10);
-        if (*(f32 *)(hookVars + 4) < fast_vec_dist(vars->target + 0x10, v2)) {
-            vec_scale_to_length(v1, v1, *(f32 *)(hookVars + 4));
+        if (*(f32 *)(hook_vars + 4) < fast_vec_dist(vars->target + 0x10, v2)) {
+            vec_scale_to_length(v1, v1, *(f32 *)(hook_vars + 4));
             FastVecAdd(vars->target + 0x10, vars->target + 0x10, v1);
             gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         } else {
@@ -291,8 +291,8 @@ have:
                 anim_start_blended(self, 1, 0, 10);
             self[0x20] = 1;
         }
-        if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x2B && hookVars != 0) {
-            *(f32 *)(hookVars + 4) = fast_vec_dist(((Hero *)g_hero_state)->ptr[0xAD4 / 4] + 0x10, vars->target + 0x10) * 0.1f;
+        if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x2B && hook_vars != 0) {
+            *(f32 *)(hook_vars + 4) = fast_vec_dist(((Hero *)g_hero_state)->ptr[0xAD4 / 4] + 0x10, vars->target + 0x10) * 0.1f;
             vars->f1C = 1.0f;
             vars->f20 = 0.0f;
             vars->f18 = 0.0f;
@@ -317,8 +317,8 @@ have:
             self[0x20] = 0x13;
         } else {
             FastVecSub(v2, ((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10, vars->target + 0x10);
-            if (*(f32 *)(hookVars + 4) < FastVecLength(v2)) {
-                vec_scale_to_length(v2, v2, *(f32 *)(hookVars + 4));
+            if (*(f32 *)(hook_vars + 4) < FastVecLength(v2)) {
+                vec_scale_to_length(v2, v2, *(f32 *)(hook_vars + 4));
                 FastVecAdd(vars->target + 0x10, vars->target + 0x10, v2);
             } else {
                 qcopy(vars->target + 0x10, ((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10);
@@ -357,7 +357,7 @@ have:
         if ((self[0x60] & 2) && self[0x43] != 4)
             anim_start_blended(self, 4, 0, 10);
         gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
-        *(f32 *)(hookVars + 4) = 1.3333334f;
+        *(f32 *)(hook_vars + 4) = 1.3333334f;
         self[0x20] = 0x14;
         break;
     case 20:
@@ -365,8 +365,8 @@ have:
             anim_start_blended(self, 4, 0, 10);
         moby_transform_joint_to_world(self, 0, v2);
         FastVecSub(v1, v2, vars->target + 0x10);
-        if (*(f32 *)(hookVars + 4) < fast_vec_dist(vars->target + 0x10, v2)) {
-            vec_scale_to_length(v1, v1, *(f32 *)(hookVars + 4));
+        if (*(f32 *)(hook_vars + 4) < fast_vec_dist(vars->target + 0x10, v2)) {
+            vec_scale_to_length(v1, v1, *(f32 *)(hook_vars + 4));
             FastVecAdd(vars->target + 0x10, vars->target + 0x10, v1);
             gfx_register_world_draw_callback(gfx_draw_wavy_link_strip, (char *)self);
         } else {
@@ -375,8 +375,8 @@ have:
                 anim_start_blended(self, 1, 0, 10);
             self[0x20] = 1;
         }
-        if (((Hero *)g_hero_state)->i[0x229C / 4] == 0x21 && hookVars != 0) {
-            *(f32 *)(hookVars + 4) = fast_vec_dist(((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10, vars->target + 0x10) * 0.1f;
+        if (((Hero *)g_hero_state)->i[0x229C / 4] == 0x21 && hook_vars != 0) {
+            *(f32 *)(hook_vars + 4) = fast_vec_dist(((Hero *)g_hero_state)->ptr[0xB10 / 4] + 0x10, vars->target + 0x10) * 0.1f;
             vars->f1C = 1.0f;
             vars->f20 = 0.0f;
             vars->f18 = 0.0f;

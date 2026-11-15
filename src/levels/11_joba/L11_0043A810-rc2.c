@@ -49,16 +49,16 @@ extern void ref_L11_0043A810_14(s32, void *, f32);
 void drone_aim_head_at_hero(void *moby) {
     Fr fr;
     s8 *vars;
-    s8 *aimTarget;
+    s8 *aim_target;
     f32 distance;
-    f32 pitch, headingToHero, turnedHeading, smoothedHeading, swayStep, newSway, swayLimit, sway;
-    s16 swayDirection;
+    f32 pitch, heading_to_hero, turned_heading, smoothed_heading, sway_step, new_sway, sway_limit, sway;
+    s16 sway_direction;
 
     vars = *(s8 **)((s8 *)moby + 0x68);
     ref_L11_0043A810_12(moby, 3, fr.b00);
-    aimTarget = vars + 0x50;
-    ref_L11_0043A810_06(&fr.v10.x, (s32)aimTarget, fr.b00);
-    distance = ref_L11_0043A810_07((s32)aimTarget, fr.b00);
+    aim_target = vars + 0x50;
+    ref_L11_0043A810_06(&fr.v10.x, (s32)aim_target, fr.b00);
+    distance = ref_L11_0043A810_07((s32)aim_target, fr.b00);
     ref_L11_0043A810_05(&fr.v20);
     pitch = ref_L11_0043A810_08(fr.v10.z, distance) + -1.5707964f + ref_L11_0043A810_04;
     fr.v20.y = pitch;
@@ -70,25 +70,25 @@ void drone_aim_head_at_hero(void *moby) {
     ref_L11_0043A810_13(&fr.v30, &fr.v20);
     ref_L11_0043A810_14((s32)(vars + 0x270), &fr.v30, ref_L11_0043A810_03);
     ref_L11_0043A810_05(&fr.v20);
-    headingToHero = ref_L11_0043A810_08(fr.v10.x, fr.v10.y);
-    fr.v20.z = headingToHero;
-    turnedHeading = ref_L11_0043A810_10(headingToHero, *(f32 *)(moby + 0xF8));
-    fr.v20.z = turnedHeading;
-    smoothedHeading = ref_L11_0043A810_11(turnedHeading);
-    fr.v20.z = smoothedHeading;
-    fr.v20.z = smoothedHeading + *(f32 *)(vars + 0x2DC);
-    swayStep = *(f32 *)(vars + 0x2E0) * 0.00029088825f;
-    swayDirection = *(s16 *)(vars + 0x2EE);
+    heading_to_hero = ref_L11_0043A810_08(fr.v10.x, fr.v10.y);
+    fr.v20.z = heading_to_hero;
+    turned_heading = ref_L11_0043A810_10(heading_to_hero, *(f32 *)(moby + 0xF8));
+    fr.v20.z = turned_heading;
+    smoothed_heading = ref_L11_0043A810_11(turned_heading);
+    fr.v20.z = smoothed_heading;
+    fr.v20.z = smoothed_heading + *(f32 *)(vars + 0x2DC);
+    sway_step = *(f32 *)(vars + 0x2E0) * 0.00029088825f;
+    sway_direction = *(s16 *)(vars + 0x2EE);
     sway = *(f32 *)(vars + 0x2DC);
-    if (swayDirection == 0) {
-        newSway = sway - swayStep;
+    if (sway_direction == 0) {
+        new_sway = sway - sway_step;
     } else {
-        newSway = sway + swayStep;
+        new_sway = sway + sway_step;
     }
-    swayLimit = ref_L11_0043A810_00;
-    *(f32 *)(vars + 0x2DC) = newSway;
-    if ((swayLimit < newSway) || (swayLimit = -swayLimit, (newSway < swayLimit))) {
-        *(f32 *)(vars + 0x2DC) = swayLimit;
+    sway_limit = ref_L11_0043A810_00;
+    *(f32 *)(vars + 0x2DC) = new_sway;
+    if ((sway_limit < new_sway) || (sway_limit = -sway_limit, (new_sway < sway_limit))) {
+        *(f32 *)(vars + 0x2DC) = sway_limit;
         *(s16 *)(vars + 0x2EE) = (s16)((u16)*(s16 *)(vars + 0x2EE) ^ 1);
     }
     ref_L11_0043A810_13(&fr.v30, &fr.v20);

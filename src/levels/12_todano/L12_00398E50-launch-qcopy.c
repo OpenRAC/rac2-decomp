@@ -21,7 +21,7 @@ s32 space_tourist_launch(s32 id, void *pos, void *target)
     do {
         u16 packed = *list;
         u8 *object = D_L12_001B2E9C + ((packed & 0x7FFF) << 8);
-        if (*(s16 *)(object + 0xAA) == 0xBB8 /* Space Tourist */ && object[0x20] == 1) {
+        if (*(s16 *)(object + 0xAA) == MOBY_CLASS_SPACE_TOURIST && object[0x20] == 1) {
             u8 *state = *(u8 **)(object + 0x68);
             result = 1;
             *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) & 0xFFBE) | 0x1000;

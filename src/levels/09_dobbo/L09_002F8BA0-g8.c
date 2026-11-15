@@ -20,13 +20,13 @@ extern void FastVecAdd(char *, char *, char *);
    sub-object itself is left alone. */
 void moby_rescale_vector(unsigned char *moby) {
     unsigned char *self = moby;
-    unsigned char *pointA = *(unsigned char **)(self + 0x68);
-    unsigned char *pointB = pointA + 0x10;
+    unsigned char *point_a = *(unsigned char **)(self + 0x68);
+    unsigned char *point_b = point_a + 0x10;
     char buf[16];
-    FastVecSub((f32 *)buf, (const f32 *)pointA, (const f32 *)pointB);
+    FastVecSub((f32 *)buf, (const f32 *)point_a, (const f32 *)point_b);
     FastVecScale(buf, buf, D_L09_001B0EE8);
-    FastVecAdd((char *)pointB, (char *)pointB, buf);
-    FastVecAdd((char *)(self + 0x10), (char *)(self + 0x10), (char *)pointB);
+    FastVecAdd((char *)point_b, (char *)point_b, buf);
+    FastVecAdd((char *)(self + 0x10), (char *)(self + 0x10), (char *)point_b);
 }
 
 /* The pulse table's entry count, reached as 0x21E8($gp). */
@@ -78,26 +78,26 @@ extern unsigned short *D_L09_001FB560[];
    loaded ahead of the first test, as retail does. */
 void group_flag_peers(unsigned char *moby) {
     unsigned char *state;
-    unsigned short *trackEntry;
+    unsigned short *track_entry;
     unsigned char *peer;
-    unsigned char *peerState;
+    unsigned char *peer_state;
 
     state = *(unsigned char **)(moby + 0x68);
     if (moby[0x21] == 0xFF)
         return;
     if (*(int *)(state + 0x310) == 0xFF)
         return;
-    for (trackEntry = D_L09_001FB560[moby[0x21]];
-         moby[0x21] != 0xFF && moby[0x21] <= D_L09_001B2878 && trackEntry != 0 &&
-         ((trackEntry != 0 && (short)trackEntry[-1] >= 0) || trackEntry == D_L09_001FB560[moby[0x21]]);
-         trackEntry++) {
-        peer = D_L09_001B285C_1[0] + ((*trackEntry & 0x7FFF) << 8);
+    for (track_entry = D_L09_001FB560[moby[0x21]];
+         moby[0x21] != 0xFF && moby[0x21] <= D_L09_001B2878 && track_entry != 0 &&
+         ((track_entry != 0 && (short)track_entry[-1] >= 0) || track_entry == D_L09_001FB560[moby[0x21]]);
+         track_entry++) {
+        peer = D_L09_001B285C_1[0] + ((*track_entry & 0x7FFF) << 8);
         if (peer == 0)
             break;
-        peerState = *(unsigned char **)(peer + 0x68);
-        if (peerState != 0) {
-            if (*(int *)(peerState + 0x310) == *(int *)(state + 0x310))
-                peerState[0x440] = 1;
+        peer_state = *(unsigned char **)(peer + 0x68);
+        if (peer_state != 0) {
+            if (*(int *)(peer_state + 0x310) == *(int *)(state + 0x310))
+                peer_state[0x440] = 1;
         }
     }
 }

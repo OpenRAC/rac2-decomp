@@ -14,19 +14,19 @@ typedef union {
 /* Rebuilds the camera's three axes so it looks from its position toward the player. */
 void cam_look_at_player(char *obj) {
     Quad offset;
-    Quad upVector;
-    char *axisY;
-    char *cameraData = *(char **)(obj + 0x70);
+    Quad up_vector;
+    char *axis_y;
+    char *camera_data = *(char **)(obj + 0x70);
 
     qcopy(&offset, g_hero_position);
-    offset.f[2] = offset.f[2] + *(float *)(cameraData + 0x90);
-    upVector.q = 0;
-    upVector.f[2] = 1.0f;
-    upVector.f[3] = 1.0f;
+    offset.f[2] = offset.f[2] + *(float *)(camera_data + 0x90);
+    up_vector.q = 0;
+    up_vector.f[2] = 1.0f;
+    up_vector.f[3] = 1.0f;
     FastVecSub(obj, &offset, obj + 0x30);
     vec_scale_to_length(obj, obj, 1.0f);
-    axisY = obj + 0x10;
-    FastVecCross(axisY, obj, &upVector);
-    vec_scale_to_length(axisY, axisY, 1.0f);
-    FastVecCross(obj + 0x20, axisY, obj);
+    axis_y = obj + 0x10;
+    FastVecCross(axis_y, obj, &up_vector);
+    vec_scale_to_length(axis_y, axis_y, 1.0f);
+    FastVecCross(obj + 0x20, axis_y, obj);
 }

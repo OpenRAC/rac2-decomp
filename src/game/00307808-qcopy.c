@@ -23,32 +23,32 @@ extern char *shot_moby_create(void *, void *, float, float, float, float, unsign
 /* One step of an object's launch routine: fires the pending shot and counts it down. */
 void megaturret_fire_shot(char *moby)
 {
-    V4_F307808 upDir, targetPos, shotVelocity, muzzlePos, targetMotion;
+    V4_F307808 up_dir, target_pos, shot_velocity, muzzle_pos, target_motion;
     char *vars = *(char **)(moby + 0x68);
-    char *targetInfo;
+    char *target_info;
     char *target;
     float speed;
-    char *weaponDef;
+    char *weapon_def;
     char *effect;
 
-    moby_transform_joint_to_world(moby, 1, muzzlePos);
-    moby_get_facing_direction(moby + 0x10, upDir);
+    moby_transform_joint_to_world(moby, 1, muzzle_pos);
+    moby_get_facing_direction(moby + 0x10, up_dir);
     if (*(float *)(vars + 0x5C) == 0.0f) {
         if (*(s32 *)(vars + 0x50) != 0) {
             if (*(char **)(vars + 0x64) != 0) {
-                targetInfo = moby_get_private_value_0(*(char **)(vars + 0x64));
+                target_info = moby_get_private_value_0(*(char **)(vars + 0x64));
                 target = *(char **)(vars + 0x64);
-                qcopy(targetPos, target + 0x10);
-                if (targetInfo != 0) {
-                    FastVecScale(targetMotion, target + 0xE0, *(float *)(targetInfo + 0x10));
-                    FastVecAdd(targetPos, targetPos, targetMotion);
+                qcopy(target_pos, target + 0x10);
+                if (target_info != 0) {
+                    FastVecScale(target_motion, target + 0xE0, *(float *)(target_info + 0x10));
+                    FastVecAdd(target_pos, target_pos, target_motion);
                 }
-                weaponDef = ENTRY();
-                speed = *(float *)(weaponDef + 0x50) * 0.016666668f;
-                FastVecSub(shotVelocity, targetPos, muzzlePos);
-                vec_scale_to_length(shotVelocity, shotVelocity, speed);
-                snd_play_from_class_bank(0, 0, moby, 0x1367 /* Megaturret */);
-                effect = shot_moby_create(muzzlePos, shotVelocity, 2.0f, 15.0f, 0.5f, 3.0f, 0x50, 0xC8, 1, 0, 0x10E, *(char **)(vars + 0x64));
+                weapon_def = ENTRY();
+                speed = *(float *)(weapon_def + 0x50) * 0.016666668f;
+                FastVecSub(shot_velocity, target_pos, muzzle_pos);
+                vec_scale_to_length(shot_velocity, shot_velocity, speed);
+                snd_play_from_class_bank(0, 0, moby, MOBY_CLASS_MEGATURRET);
+                effect = shot_moby_create(muzzle_pos, shot_velocity, 2.0f, 15.0f, 0.5f, 3.0f, 0x50, 0xC8, 1, 0, 0x10E, *(char **)(vars + 0x64));
                 if (effect != 0)
                     *(s32 *)(effect + 0xB8) = *(s32 *)(vars + 0x68);
                 *(s32 *)(vars + 0x40) = D_001AEC68;

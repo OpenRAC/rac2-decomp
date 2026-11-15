@@ -394,27 +394,27 @@ void turn_record_update(unsigned char *moby) {
    state the stored duration becomes a signed angle (0.000290888245f is
    2*pi/21600) which the resident step body folds into the record's angle. */
 void random_l09_offset_anim_start(unsigned char *moby) {
-    int typeData;
-    unsigned char *typeStats;
+    int type_data;
+    unsigned char *type_stats;
     if (moby[0x20] != 0)
         return;
-    typeData = *(int *)(moby + 0x24);
-    typeStats = *(unsigned char **)(typeData + 0x48);
+    type_data = *(int *)(moby + 0x24);
+    type_stats = *(unsigned char **)(type_data + 0x48);
     anim_start_blended(moby, 0,
-                  (int)((float)typeStats[0x10] * ((float)((int)moby % 3) * 0.333f)), 1);
+                  (int)((float)type_stats[0x10] * ((float)((int)moby % 3) * 0.333f)), 1);
     func_002A7750_3(moby, 1, -1);
 }
 
 /* Same measured body as func_L09_003DDAA0, at its own place in the level. */
 void random_l09_offset_anim_start_2(unsigned char *moby) {
-    int typeData;
-    unsigned char *typeStats;
+    int type_data;
+    unsigned char *type_stats;
     if (moby[0x20] != 0)
         return;
-    typeData = *(int *)(moby + 0x24);
-    typeStats = *(unsigned char **)(typeData + 0x48);
+    type_data = *(int *)(moby + 0x24);
+    type_stats = *(unsigned char **)(type_data + 0x48);
     anim_start_blended(moby, 0,
-                  (int)((float)typeStats[0x10] * ((float)((int)moby % 3) * 0.333f)), 1);
+                  (int)((float)type_stats[0x10] * ((float)((int)moby % 3) * 0.333f)), 1);
     func_002A7750_3(moby, 1, -1);
 }
 

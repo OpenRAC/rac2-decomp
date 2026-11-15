@@ -102,14 +102,14 @@ void level_update_frame(void) {
     hero_check_targeting_triggers();
     UpdateHeroAimAndTransitions();
     {
-        char *residentCopy = g_hero_state;
-        if ((*(int *)(residentCopy + 0x229C) != 0x16 && *(int *)(residentCopy + 0x229C) != 0x1F
-             && *(int *)(residentCopy + 0x2294) != 0x31) || hero_is_in_swing_or_grind_mode() != 0)
+        char *resident_copy = g_hero_state;
+        if ((*(int *)(resident_copy + 0x229C) != 0x16 && *(int *)(resident_copy + 0x229C) != 0x1F
+             && *(int *)(resident_copy + 0x2294) != 0x31) || hero_is_in_swing_or_grind_mode() != 0)
             coll_clear_map_bits_around_pos(g_hero_position);
     }
     {
-        char *residentCopy = g_hero_state;
-        func_002A677C(*(int *)(residentCopy + 0x2290));
+        char *resident_copy = g_hero_state;
+        func_002A677C(*(int *)(resident_copy + 0x2290));
     }
     ref_L03_002AD540_06();
     UpdateHeroMobyProbedHeightBounds();

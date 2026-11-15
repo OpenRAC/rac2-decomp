@@ -97,14 +97,14 @@ int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, 
                 result = 1;
                 if (S(D_L04_001BFAC0.object, 0xAA) == type) {
                     result = 2;
-                } else if (!mode && S(D_L04_001BFAC0.object, 0xAA) == 0xB2D /* Enemy Hoverbike */) {
+                } else if (!mode && S(D_L04_001BFAC0.object, 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE) {
                     a = P(D_L04_001BFAC0.object, 0x68);
                     I(a, 0x178) = 40;
                     FastVecScale(a + 0x100, &horizontal, -0.05f);
                     a = P(object, 0x68);
                     I(a, 0x178) = 40;
                     FastVecScale(a + 0x100, &horizontal, 0.05f);
-                } else if ((mode && S(D_L04_001BFAC0.object, 0xAA) == 0xB2D /* Enemy Hoverbike */)
+                } else if ((mode && S(D_L04_001BFAC0.object, 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE)
                            || (!mode && S(D_L04_001BFAC0.object, 0xAA) == 0xBBC /* moby class 3004 */)) {
                     part_l04_spawn_burst(&D_L04_001BFAC0.point, vel, 2, 0);
                     if (mode) {
@@ -176,14 +176,14 @@ int ResolveVehicleMovementCollisions(u8 *object, Vec *pos, Vec *vel, Vec *prev, 
                         F(a, 0x1E8) = 1;
                     }
                     *flag = 2;
-                } else if (S(D_L04_001BFAC0.object, 0xAA) == 0x8BA /* moby class 2234 */ || S(D_L04_001BFAC0.object, 0xAA) == 0xA77 /* Hoverbike Race Bomb */) {
+                } else if (S(D_L04_001BFAC0.object, 0xAA) == 0x8BA /* moby class 2234 */ || S(D_L04_001BFAC0.object, 0xAA) == MOBY_CLASS_HOVERBIKE_RACE_BOMB) {
                     *flag = 3;
                     make_hit_descriptor(damage, object, 0x30000, &step, 1.0f);
                     B(damage, 0x18) = 0;
                     B(damage, 0x19) = 1;
                     S(damage, 0x1A) = S(object, 0xAA);
                     QueueMobyImpact(D_L04_001BFAC0.object, damage);
-                    if (friction > 0.25f || S(D_L04_001BFAC0.object, 0xAA) == 0xA77 /* Hoverbike Race Bomb */) result = 2;
+                    if (friction > 0.25f || S(D_L04_001BFAC0.object, 0xAA) == MOBY_CLASS_HOVERBIKE_RACE_BOMB) result = 2;
                 }
             } else {
                 cur.q = ((Vec *)(&D_L04_001BFAC0.position))->q;

@@ -290,15 +290,15 @@ void moby_show_angles_debug(char *moby)
 {
     char *obj = moby;
     float angles[4];
-    float bentAngle;
+    float bent_angle;
 
     moby_transform_joint_to_world(moby, 1, angles);
     /* retail holds 0x40490FD0 here; this spelling is what the rebuilt assembler reads to
        those bits */
-    bentAngle = func_00283B98_12(*(float *)(obj + 0xF8), 3.14159f);
+    bent_angle = func_00283B98_12(*(float *)(obj + 0xF8), 3.14159f);
     STUB_printf(D_L02_001AFE38, func_801234F0(angles[0]), func_801234F0(angles[1]),
-                  func_801234F0(angles[2]), func_801234F0(bentAngle));
-    hero_start_target_state(angles, 0, bentAngle);
+                  func_801234F0(angles[2]), func_801234F0(bent_angle));
+    hero_start_target_state(angles, 0, bent_angle);
 }
 
 /* The level's three trigger boxes, each a lower and an upper bound, and the point they hold:
@@ -463,31 +463,31 @@ struct L02NearBlock {
 /* Finds the object of the group that is nearest to the player. All the other objects of the group get a longer wait timer. */
 void moby_delay_group_except_nearest(struct L02NearObject *owner)
 {
-    unsigned short *groupList;
+    unsigned short *group_list;
     unsigned short *cursor;
     unsigned short *cursor2;
     char *entity;
     char *nearest;
     struct L02NearBlock *vars;
-    float minDist;
+    float min_dist;
     float dist;
 
     if (owner->group == 0xFF)
         return;
-    groupList = (unsigned short *)g_entity_group_lists[owner->group];
-    if (groupList == 0)
+    group_list = (unsigned short *)g_entity_group_lists[owner->group];
+    if (group_list == 0)
         return;
     nearest = 0;
-    minDist = 1000.0f;
-    cursor = groupList;
+    min_dist = 1000.0f;
+    cursor = group_list;
     while (owner->group != 0xFF && owner->group <= D_L02_001B35B8 && cursor != 0 &&
            ((cursor != 0 && (short)cursor[-1] >= 0) || cursor == (unsigned short *)g_entity_group_lists[owner->group])) {
         entity = g_moby_l02_pool + ((*cursor & 0x7FFF) << 8);
         if (entity == 0)
             break;
         dist = fast_vec_dist(entity + 0x10, g_hero_position);
-        if (dist < minDist) {
-            minDist = dist;
+        if (dist < min_dist) {
+            min_dist = dist;
             nearest = entity;
         }
         cursor++;
@@ -534,15 +534,15 @@ struct L02GroupEntity {
 /* Gives every object in the group a random wait timer. */
 void moby_randomize_group_timers(struct L02GroupObject *owner)
 {
-    unsigned short *groupList;
+    unsigned short *group_list;
     unsigned short *cursor;
     struct L02GroupEntity *entity;
 
     if (owner->group == 0xFF)
         return;
-    groupList = (unsigned short *)g_entity_group_lists[owner->group];
-    if (groupList != 0) {
-        cursor = groupList;
+    group_list = (unsigned short *)g_entity_group_lists[owner->group];
+    if (group_list != 0) {
+        cursor = group_list;
         while (owner->group != 0xFF && owner->group <= D_L02_001B35B8 && cursor != 0 &&
                ((cursor != 0 && (short)cursor[-1] >= 0) ||
                 cursor == (unsigned short *)g_entity_group_lists[owner->group])) {
@@ -693,7 +693,7 @@ void moby_run_entry_hook_by_mode(char *moby, char *target, int mode) {
 /* Resets the object's turn values and counts up a frame counter. Then it moves the object with two helpers. */
 void moby_reset_turn_place(char *moby) {
     char *vars = *(char **)(moby + 0x68);
-    char *subObj;
+    char *sub_obj;
     unsigned short counter;
 
     FastDecTimer(vars + 0x310);
@@ -701,9 +701,9 @@ void moby_reset_turn_place(char *moby) {
     counter = *(unsigned short *)(moby + 0x96);
     if (counter <= 0xFFFE)
         *(unsigned short *)(moby + 0x96) = counter + 1;
-    subObj = vars + 0x260;
-    moby_update_eased_node(moby, subObj, 0, 0.03f, 0.3000000119209289550781250f);
-    value_set_and_smooth(moby, subObj, 0, 1.79999995231628417968750f, 1);
+    sub_obj = vars + 0x260;
+    moby_update_eased_node(moby, sub_obj, 0, 0.03f, 0.3000000119209289550781250f);
+    value_set_and_smooth(moby, sub_obj, 0, 1.79999995231628417968750f, 1);
 }
 
 /* Defined in L02_003CEA28.c. */
@@ -758,7 +758,7 @@ void turret_clamp_aim_yaw_pitch(char *moby) {
 extern int coll_check_object_inside_polygon(unsigned char *object);
 
 /* Moves the object to a new place and facing, and switches it to its next state. It only works when the object is in state 0xD. */
-void moby_teleport_to_new_pose(char *moby, char *newPos, char *newDir)
+void moby_teleport_to_new_pose(char *moby, char *new_pos, char *new_dir)
 {
     union { TI128 q; float f[4]; } vectors[2];
     TI128 *p0 = &vectors[0].q;
@@ -766,8 +766,8 @@ void moby_teleport_to_new_pose(char *moby, char *newPos, char *newDir)
     char *vars;
     unsigned short flags;
 
-    vectors[0].q = *(TI128 *)newPos;
-    vectors[1].q = *(TI128 *)newDir;
+    vectors[0].q = *(TI128 *)new_pos;
+    vectors[1].q = *(TI128 *)new_dir;
     vars = *(char **)(moby + 0x68);
     if (*(unsigned char *)(moby + 0x20) != 0xD)
         return;
@@ -839,17 +839,17 @@ struct L02Kind330Object {
    and refreshes every live entity of kind 0xA4E, then registers func_L02_003CEFD8. */
 void chickenbot_update_group_pulse_color(struct L02Kind330Object *owner) {
     struct L02Kind330 *vars = owner->obj;
-    struct L02PairWord colorPair = D_L02_001B00C0;
+    struct L02PairWord color_pair = D_L02_001B00C0;
     float phase;
     unsigned short *cursor;
     struct L02Kind330Entity *entity;
-    struct L02Kind330 *entVars;
+    struct L02Kind330 *ent_vars;
 
     phase = FastAddRotations(vars->f328, 0.20943954586982727f);
     vars->f328 = phase;
     phase = math_fast_sin_or_cos_b(phase);
     vars->f32C = phase * 0.5f + 0.5f;
-    owner->f78 = FastTweenColor(colorPair.a, colorPair.b, vars->f32C);
+    owner->f78 = FastTweenColor(color_pair.a, color_pair.b, vars->f32C);
     if (vars->f330 != g_frame_l02_counter) {
         for (cursor = (unsigned short *)g_entity_group_lists[owner->group];
              owner->group != 0xFF && owner->group <= D_L02_001B35B8 && cursor != 0 &&
@@ -858,10 +858,10 @@ void chickenbot_update_group_pulse_color(struct L02Kind330Object *owner) {
             entity = (struct L02Kind330Entity *)(g_moby_l02_pool + ((*cursor & 0x7FFF) << 8));
             if (entity == 0)
                 break;
-            if (entity->f31 != 0 && entity->type == 0xA4E /* Megacorp Chickenbot */ && entity->state != 0xFE && entity->state != 0xFD) {
-                entVars = entity->obj;
-                moby_transform_joint_point((char *)entity, 0, (char *)entVars + 0x220);
-                entVars->f330 = g_frame_l02_counter;
+            if (entity->f31 != 0 && entity->type == MOBY_CLASS_MEGACORP_CHICKENBOT && entity->state != 0xFE && entity->state != 0xFD) {
+                ent_vars = entity->obj;
+                moby_transform_joint_point((char *)entity, 0, (char *)ent_vars + 0x220);
+                ent_vars->f330 = g_frame_l02_counter;
             }
         }
         gfx_add_draw_callback_first((void *)chickenbot_emit_sparks, owner);
@@ -1140,7 +1140,7 @@ void moby_try_alloc_enter_state2(void *moby) {
 
 /* Aims a 144-byte packet at the level's aim vector: the quaternion comes from the source
    point, the matrix's last row from the same point, and the packet is dispatched. */
-void gfx_draw_aimed_effect_packet(char *pos, int colorLow, int alpha, char *resource, int flags, float scale, float roll)
+void gfx_draw_aimed_effect_packet(char *pos, int color_low, int alpha, char *resource, int flags, float scale, float roll)
 {
     char pkt[144];
     float m[16];
@@ -1152,10 +1152,10 @@ void gfx_draw_aimed_effect_packet(char *pos, int colorLow, int alpha, char *reso
 
     *(long long *)(pkt + 136) = ((long long)flags << 2) | 0x8000000040LL;
     *(long long *)(pkt + 128) = 280993940374112LL;
-    *(int *)(pkt + 76) = colorLow + (alpha << 24);
-    *(int *)(pkt + 72) = colorLow + (alpha << 24);
-    *(int *)(pkt + 68) = colorLow + (alpha << 24);
-    *(int *)(pkt + 64) = colorLow + (alpha << 24);
+    *(int *)(pkt + 76) = color_low + (alpha << 24);
+    *(int *)(pkt + 72) = color_low + (alpha << 24);
+    *(int *)(pkt + 68) = color_low + (alpha << 24);
+    *(int *)(pkt + 64) = color_low + (alpha << 24);
     *(long long *)(pkt + 112) = 0LL;
     *(long long *)(pkt + 120) = r;
 

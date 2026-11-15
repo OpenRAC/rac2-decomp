@@ -209,7 +209,7 @@ void feltzin_init_scene_objects(void)
         if (current && *(short *)(current + 0xAA) == 0xE29 /* moby class 3625 */)
             *(unsigned short *)(current + 0x34) |= 0x800;
         if (*(short *)(current + 0xAA) == 0xD54 /* moby class 3412 */) UpdateEquipmentPieces(current);
-        if (current && *(short *)(current + 0xAA) == 0xFA0 /* TV Screens */) {
+        if (current && *(short *)(current + 0xAA) == MOBY_CLASS_TV_SCREENS) {
             char *state = *(char **)(current + 0x68);
             if (state) math_store_angle_update_result(current, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);
         }
@@ -323,7 +323,7 @@ void bouncing_l05_shot_update(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = ((Collision *)D_L05_001BFB00);
                 model = reread->hit;
@@ -403,7 +403,7 @@ void bouncing_shot_update_with_limit(char *obj) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = ((Collision *)D_L05_001BFB00);
             model = reread->hit;
@@ -507,7 +507,7 @@ void feltzin_enemy_init_position(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
     char *table;
-    float radius, angleA, angleB;
+    float radius, angle_a, angle_b;
 
     *(unsigned char *)(obj + 0x20) = 1;
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
@@ -520,9 +520,9 @@ void feltzin_enemy_init_position(char *obj)
     *(int *)(state + 0x268) = 0;
     *(float *)(obj + 0x2C) = 0.02f;
     radius = func_332B50(0.0f, *(float *)table);
-    angleA = func_332C18();
-    angleB = func_332C18();
-    func_33B330(obj + 0x10, radius, angleA, angleB);
+    angle_a = func_332C18();
+    angle_b = func_332C18();
+    func_33B330(obj + 0x10, radius, angle_a, angle_b);
     func_306630(obj + 0x10, table + 0x30, obj + 0x10);
 }
 
@@ -635,7 +635,7 @@ void feltzin_enemy_init_with_helpers(char *obj)
     char *state = *(char **)(obj + 0x68);
     char *info;
     char *table;
-    float radius, angleA, angleB;
+    float radius, angle_a, angle_b;
 
     *(unsigned char *)(obj + 0x20) = 1;
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
@@ -647,9 +647,9 @@ void feltzin_enemy_init_with_helpers(char *obj)
     *(float *)(state + 0x180) = 5.0f;
     *(int *)(state + 0x268) = 0;
     radius = func_332B50(0.0f, *(float *)table);
-    angleA = func_332C18();
-    angleB = func_332C18();
-    func_33B330(obj + 0x10, radius, angleA, angleB);
+    angle_a = func_332C18();
+    angle_b = func_332C18();
+    func_33B330(obj + 0x10, radius, angle_a, angle_b);
     func_306630(obj + 0x10, table + 0x30, obj + 0x10);
     if (*(int *)(info + 0x110) == 1) {
         *(int *)(state + 0x26C) = feltzin_helper_create(obj, 0);
@@ -709,16 +709,16 @@ char *feltzin_helper_create(char *owner, int side)
     char *child = func_328508(0xF81 /* moby class 3969 */);
 
     if (child != 0) {
-        char *childVars = *(char **)(child + 0x68);
+        char *child_vars = *(char **)(child + 0x68);
 
         *(unsigned char *)(child + 0x30) = 0xFF;
         *(unsigned short *)(child + 0x32) = 0x1FF;
         *(unsigned short *)(child + 0x34) = *(unsigned short *)(child + 0x34) | 0x100;
         *(unsigned char *)(child + 0x20) = 0;
-        *(char **)(childVars + 0x50) = owner;
-        *(int *)(childVars + 0x54) = side;
-        func_3065F8(childVars + 0x30);
-        func_3065F8(childVars + 0x40);
+        *(char **)(child_vars + 0x50) = owner;
+        *(int *)(child_vars + 0x54) = side;
+        func_3065F8(child_vars + 0x30);
+        func_3065F8(child_vars + 0x40);
         donor_transform_copy(child);
         func_32AF08(child);
     }
@@ -837,7 +837,7 @@ void feltzin_enemy_init_position_fast(char *obj)
 {
     char *state = *(char **)(obj + 0x68);
     char *table;
-    float radius, angleA, angleB;
+    float radius, angle_a, angle_b;
 
     *(unsigned char *)(obj + 0x20) = 1;
     *(unsigned short *)(obj + 0x34) = *(unsigned short *)(obj + 0x34) | 0x100;
@@ -848,9 +848,9 @@ void feltzin_enemy_init_position_fast(char *obj)
     *(float *)(state + 0x180) = 5.0f;
     *(float *)(obj + 0x2C) = 0.08f;
     radius = func_332B50(0.0f, *(float *)table);
-    angleA = func_332C18();
-    angleB = func_332C18();
-    func_33B330(obj + 0x10, radius, angleA, angleB);
+    angle_a = func_332C18();
+    angle_b = func_332C18();
+    func_33B330(obj + 0x10, radius, angle_a, angle_b);
     func_306630(obj + 0x10, table + 0x30, obj + 0x10);
 }
 

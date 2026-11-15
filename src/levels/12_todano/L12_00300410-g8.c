@@ -78,23 +78,23 @@ extern void part_l00_spawn_spinning(void *, void *, int);
    and in mode 5 it sprays effects from the two emitters and runs the current story event. */
 void todano_scene_update_events(void)
 {
-    V posA, posB, velBuf, zeroVec;
-    V *velPtr;
-    int objIndex, emitterIndex, sparkIndex;
+    V pos_a, pos_b, vel_buf, zero_vec;
+    V *vel_ptr;
+    int obj_index, emitter_index, spark_index;
     char *obj;
     State *scene;
-    char **emitterList;
+    char **emitter_list;
 
     anim_start_startup_animations();
-    for (objIndex = 0; objIndex < D_L12_001BDB00.count; objIndex++) {
-        obj = D_L12_001BDB00.objects[objIndex];
+    for (obj_index = 0; obj_index < D_L12_001BDB00.count; obj_index++) {
+        obj = D_L12_001BDB00.objects[obj_index];
         if (obj && *(short *)(obj + 0xAA) == 0xE29) {
             *(unsigned short *)(obj + 0x34) |= 0x800;
         }
         if (*(short *)(obj + 0xAA) == 0xD54) {
             UpdateEquipmentPieces(obj);
         }
-        if (obj && *(short *)(obj + 0xAA) == 0xFA0 /* TV Screens */) {
+        if (obj && *(short *)(obj + 0xAA) == MOBY_CLASS_TV_SCREENS) {
             char *p = *(char **)(obj + 0x68);
             if (p) {
                 math_store_angle_update_result(obj, p + 0xC, 0x80AAAAD2, 0x80396464, 0.061086535f);
@@ -107,26 +107,26 @@ void todano_scene_update_events(void)
     if (scene->mode != 5) {
         return;
     }
-    emitterList = scene->emitters;
-    velPtr = &velBuf;
-    for (emitterIndex = 1; emitterIndex >= 0; emitterIndex--) {
-        char *emitter = *emitterList;
+    emitter_list = scene->emitters;
+    vel_ptr = &vel_buf;
+    for (emitter_index = 1; emitter_index >= 0; emitter_index--) {
+        char *emitter = *emitter_list;
 
-        moby_transform_joint_to_world(emitter, 3, &posA);
-        moby_transform_joint_to_world(emitter, 5, &posB);
-        lerp_vector(&posA, &posA, &posB, 0.5f);
-        zeroVec.q = 0;
-        zeroVec.f[2] = -(math_random_float_range(D_L12_001A93E0, D_L12_001A93E4[0]) * 0.016666668f);
-        velBuf.q = zeroVec.q;
+        moby_transform_joint_to_world(emitter, 3, &pos_a);
+        moby_transform_joint_to_world(emitter, 5, &pos_b);
+        lerp_vector(&pos_a, &pos_a, &pos_b, 0.5f);
+        zero_vec.q = 0;
+        zero_vec.f[2] = -(math_random_float_range(D_L12_001A93E0, D_L12_001A93E4[0]) * 0.016666668f);
+        vel_buf.q = zero_vec.q;
         if (D_L12_001B29C8[0] & 1) {
-            part_spawn_scaling(&posA, velPtr, D_L12_001A93E8, D_L12_001A93EC[0], math_random_int_range(18, 22),
+            part_spawn_scaling(&pos_a, vel_ptr, D_L12_001A93E8, D_L12_001A93EC[0], math_random_int_range(18, 22),
                           D_L12_001A9400, -10, 1);
         } else {
-            part_spawn_scaling(&posA, velPtr, D_L12_001A93F0[0], D_L12_001A93F4[0], math_random_int_range(20, 24),
+            part_spawn_scaling(&pos_a, vel_ptr, D_L12_001A93F0[0], D_L12_001A93F4[0], math_random_int_range(20, 24),
                           D_L12_001A9404[0], -10, 1);
         }
-        emitterList++;
-        part_spawn_scaling(&posA, velPtr, D_L12_001A93F8[0], D_L12_001A93FC[0], math_random_int_range(10, 15),
+        emitter_list++;
+        part_spawn_scaling(&pos_a, vel_ptr, D_L12_001A93F8[0], D_L12_001A93FC[0], math_random_int_range(10, 15),
                       D_L12_001A9408[0], -10, 1);
     }
 
@@ -134,7 +134,7 @@ void todano_scene_update_events(void)
     case 2:
         for (obj = D_L12_001B2E9C[0]; obj < D_L12_001B2EA4[0]; obj += 0x100) {
             int cls = *(short *)(obj + 0xAA);
-            if (cls == 0x11EB || cls == 0x1F5 /* Nanotech Crate */ || cls == 0x326) {
+            if (cls == 0x11EB || cls == MOBY_CLASS_NANOTECH_CRATE || cls == 0x326) {
                 moby_mark_spawned(obj);
             }
         }
@@ -143,35 +143,35 @@ void todano_scene_update_events(void)
         D_L12_001B9CC0.fade = 0.5f;
         D_L12_001B9CC0.time = 45;
         D_L12_001B9CC0.flag = 0;
-        moby_transform_joint_to_world(D_L12_001BDB00.objects[4], 0, &posA);
-        SpawnExplosion(&posA, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
+        moby_transform_joint_to_world(D_L12_001BDB00.objects[4], 0, &pos_a);
+        SpawnExplosion(&pos_a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
         break;
     case 0x6F5:
         D_L12_001B9CC0.fade = 0.5f;
         D_L12_001B9CC0.time = 60;
         D_L12_001B9CC0.flag = 0;
-        vec_scale_to_length(&posA, &D_L12_001B9CC0.rot, 4.0f);
-        FastVecAdd(&posA, &posA, &D_L12_001B9CC0.pos);
-        vec_scale_to_length(&posB, &D_L12_001B9CC0.rot, -1.0f);
-        part_spawn_blast_effect_moby(D_L12_001BDB00.objects[2], &posA, &posB, 0.0f);
+        vec_scale_to_length(&pos_a, &D_L12_001B9CC0.rot, 4.0f);
+        FastVecAdd(&pos_a, &pos_a, &D_L12_001B9CC0.pos);
+        vec_scale_to_length(&pos_b, &D_L12_001B9CC0.rot, -1.0f);
+        part_spawn_blast_effect_moby(D_L12_001BDB00.objects[2], &pos_a, &pos_b, 0.0f);
         break;
     case 0x8D2:
         D_L12_001B9CC0.fade = 0.5f;
-        posA.q = 0;
-        posA.f[0] = 4.0f;
-        posA.f[1] = -1.0f;
-        posA.f[2] = 1.0f;
+        pos_a.q = 0;
+        pos_a.f[0] = 4.0f;
+        pos_a.f[1] = -1.0f;
+        pos_a.f[2] = 1.0f;
         D_L12_001B9CC0.time = 45;
         D_L12_001B9CC0.flag = 0;
-        matrix_mul_vec3(&posA, &posA, &D_L12_001B9CC0.rot);
-        FastVecAdd(&posA, &posA, &D_L12_001B9CC0.pos);
-        SpawnExplosion(&posA, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
-        for (sparkIndex = 24; sparkIndex >= 0; sparkIndex--) {
-            qcopy(&posB, &posA);
-            vec_add_random_offset(&posB, 0.3f);
-            FastVecSub(velPtr, &posB, &posA);
-            vec_scale_to_length(velPtr, velPtr, math_random_float_range(0.0f, 1.0f) * 0.016666668f);
-            part_l00_spawn_spinning(&posB, velPtr, 300);
+        matrix_mul_vec3(&pos_a, &pos_a, &D_L12_001B9CC0.rot);
+        FastVecAdd(&pos_a, &pos_a, &D_L12_001B9CC0.pos);
+        SpawnExplosion(&pos_a, 1, 25, 20, 20, 20, 45, 1, 0.666f, 20.0f, 1, 1, 0, 0);
+        for (spark_index = 24; spark_index >= 0; spark_index--) {
+            qcopy(&pos_b, &pos_a);
+            vec_add_random_offset(&pos_b, 0.3f);
+            FastVecSub(vel_ptr, &pos_b, &pos_a);
+            vec_scale_to_length(vel_ptr, vel_ptr, math_random_float_range(0.0f, 1.0f) * 0.016666668f);
+            part_l00_spawn_spinning(&pos_b, vel_ptr, 300);
         }
         break;
     }

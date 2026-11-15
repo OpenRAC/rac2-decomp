@@ -81,15 +81,15 @@ void linked_rotation_follower_update(char *moby) {
         if (*(int *)vars != -1) {
             other = D_L06_001B281C + *(int *)vars * 256;
             if (other) {
-                char *linkVars = *(char **)(other + 0x68);
+                char *link_vars = *(char **)(other + 0x68);
                 if (math_fabs(*(float *)(vars + 0xC)) > 0.0f)
-                    *(float *)(vars + 0x14) = *(float *)linkVars * (*(float *)(vars + 0xC) * 3.1415927f);
+                    *(float *)(vars + 0x14) = *(float *)link_vars * (*(float *)(vars + 0xC) * 3.1415927f);
                 else *(float *)(vars + 0x14) = 0;
                 *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(vars + 8), *(float *)(vars + 0x14));
-                if (*(float *)linkVars > 0.6f)
-                    *(float *)(moby + 0xF4) = fast_subtract_rotations(*(float *)(vars + 0x18), (*(float *)linkVars - 0.6f) * 0.13089971244335175f);
+                if (*(float *)link_vars > 0.6f)
+                    *(float *)(moby + 0xF4) = fast_subtract_rotations(*(float *)(vars + 0x18), (*(float *)link_vars - 0.6f) * 0.13089971244335175f);
                 if (*(int *)(vars + 0x10) == 0) {
-                    if (*(float *)linkVars != *(float *)(vars + 0x24) && *(float *)linkVars != 1.0f && *(float *)linkVars != 0.0f) {
+                    if (*(float *)link_vars != *(float *)(vars + 0x24) && *(float *)link_vars != 1.0f && *(float *)link_vars != 0.0f) {
                         if (!snd_is_voice_playing_for_owner(moby, *(int *)(vars + 0x20)))
                             *(int *)(vars + 0x20) = func_003A0948(0, 4, moby);
                     } else if (snd_is_voice_playing_for_owner(moby, *(int *)(vars + 0x20))) {
@@ -100,7 +100,7 @@ void linked_rotation_follower_update(char *moby) {
                         *(int *)(vars + 0x20) = -1;
                     }
                 }
-                *(float *)(vars + 0x24) = *(float *)linkVars;
+                *(float *)(vars + 0x24) = *(float *)link_vars;
             }
         }
         if (*(int *)(vars + 0x10)) func_003514C8((void *)*(int *)(vars + 0x10), 0, moby + 0x10);
@@ -111,38 +111,38 @@ void linked_rotation_follower_update(char *moby) {
 /* Resolves the table entries a spawn record names; returns 1 after reporting a missing one. */
 int spawn_record_resolve_links(u8 *moby, u8 *vars)
 {
-    s32 pathIdxA, pathIdxB, anchorIdx, homeIdx;
-    u8 *pathA, *pathB;
+    s32 path_idx_a, path_idx_b, anchor_idx, home_idx;
+    u8 *path_a, *path_b;
 
-    pathIdxA = *(s32 *)(vars + 0x100);
-    if (pathIdxA == -1) {
+    path_idx_a = *(s32 *)(vars + 0x100);
+    if (path_idx_a == -1) {
         STUB_printf(D_L06_001B1990, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
-    pathA = g_path_list[pathIdxA];
-    *(u8 **)(vars + 0x118) = pathA;
-    path_l06_compute_segment_lengths((char *)pathA);
-    pathIdxB = *(s32 *)(vars + 0x134);
-    if (pathIdxB == -1) {
+    path_a = g_path_list[path_idx_a];
+    *(u8 **)(vars + 0x118) = path_a;
+    path_l06_compute_segment_lengths((char *)path_a);
+    path_idx_b = *(s32 *)(vars + 0x134);
+    if (path_idx_b == -1) {
         STUB_printf(D_L06_001B19C8, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
-    pathB = g_path_list[pathIdxB];
-    *(u8 **)(vars + 0x138) = pathB;
-    path_l06_compute_segment_lengths((char *)pathB);
-    anchorIdx = *(s32 *)(vars + 0x108);
-    if (anchorIdx == -1) {
+    path_b = g_path_list[path_idx_b];
+    *(u8 **)(vars + 0x138) = path_b;
+    path_l06_compute_segment_lengths((char *)path_b);
+    anchor_idx = *(s32 *)(vars + 0x108);
+    if (anchor_idx == -1) {
         STUB_printf(D_L06_001B1A00, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
-    *(u8 **)(vars + 0x11C) = D_L06_001B281C + (anchorIdx << 8) + 0x18;
+    *(u8 **)(vars + 0x11C) = D_L06_001B281C + (anchor_idx << 8) + 0x18;
     moby[0xBC] = actor_classify_headroom((char *)moby, (char *)vars);
-    homeIdx = *(s32 *)(vars + 0x104);
-    if (homeIdx == -1) {
+    home_idx = *(s32 *)(vars + 0x104);
+    if (home_idx == -1) {
         STUB_printf(D_L06_001B1A30, (moby - D_L06_001B281C) >> 8);
         return 1;
     }
-    qcopy(vars + 0xE0, D_L06_001B290C + 0x30 + (homeIdx << 7));
+    qcopy(vars + 0xE0, D_L06_001B290C + 0x30 + (home_idx << 7));
     qcopy(vars + 0xD0, moby + 0x10);
     actor_start_size_anim(moby, vars);
     *(s32 *)(vars + 0x124) = func_001163B0() % 120;

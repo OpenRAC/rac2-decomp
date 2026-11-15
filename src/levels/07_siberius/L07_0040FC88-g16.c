@@ -63,7 +63,7 @@ void ship_run_sequence_events(u8 *moby)
 {
     Vec pos, rot;
     int i,j;
-    u8 *vars=P(moby,0x68), *partVars, *target;
+    u8 *vars=P(moby,0x68), *part_vars, *target;
     float *cursor;
     int *path;
     float remaining;
@@ -84,17 +84,17 @@ void ship_run_sequence_events(u8 *moby)
                     }
                 }
             } else {
-                partVars=P(P(vars,0xf4),0x68);
-                math_approach_target_with_direction_mode(partVars+0x114,0.0f,partVars+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
-                if(F(partVars,0x114)<=0) D_L07_001B31A0[i]=2;
+                part_vars=P(P(vars,0xf4),0x68);
+                math_approach_target_with_direction_mode(part_vars+0x114,0.0f,part_vars+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
+                if(F(part_vars,0x114)<=0) D_L07_001B31A0[i]=2;
             }
             break;
         case 2:
             if(D_L07_001B31A0[i]==0 && D_L07_0018A1C0==P(vars,0xf8)) {
-                u8 *riderVars=P(D_L07_0018A1C0,0x68);
+                u8 *rider_vars=P(D_L07_0018A1C0,0x68);
                 int idx;
-                moby_set_group_enabled(W(riderVars,0x94),1);
-                idx=W(riderVars,0xb8);
+                moby_set_group_enabled(W(rider_vars,0x94),1);
+                idx=W(rider_vars,0xb8);
                 pos.q=D_L07_001B1710;
                 rot.q=D_L07_001B1720;
                 moby_attach_to_parent(g_moby_l07_array[0]+(idx<<8),P(vars,0xf8),&pos,&rot);
@@ -103,17 +103,17 @@ void ship_run_sequence_events(u8 *moby)
             break;
         case 1:
             if(D_L07_001B31A0[i]==0) {
-                partVars=P(P(vars,0xf8),0x68);
-                if(moby_count_group_not_in_state(W(partVars,0x94),-1)<3) {
-                    moby_set_flag_bit(g_moby_l07_array[0]+(W(partVars,0xb8)<<8),1);
+                part_vars=P(P(vars,0xf8),0x68);
+                if(moby_count_group_not_in_state(W(part_vars,0x94),-1)<3) {
+                    moby_set_flag_bit(g_moby_l07_array[0]+(W(part_vars,0xb8)<<8),1);
                     D_L07_001B31A0[i]=2;
                 }
             }
             break;
         case 3:
             if(D_L07_001B31A0[i]==0) {
-                partVars=P(P(vars,0xf8),0x68);
-                if(moby_count_group_not_in_state(W(partVars,0x98),-1)==0 && moby_count_group_not_in_state(W(partVars,0x9c),-1)==0) {
+                part_vars=P(P(vars,0xf8),0x68);
+                if(moby_count_group_not_in_state(W(part_vars,0x98),-1)==0 && moby_count_group_not_in_state(W(part_vars,0x9c),-1)==0) {
                     entity_set_state_five(g_moby_l07_array[0]+(W(P(P(vars,0xf8),0x68),0xb8)<<8));
                     boss_start_move_tier(g_moby_l07_array[0]+(W(vars,0xc4)<<8),P(vars,0xf8),0);
                     D_L07_001B31A0[i]=2;
@@ -154,9 +154,9 @@ void ship_run_sequence_events(u8 *moby)
             break;
         case 5:
             if(D_L07_001B31A0[i]!=0) {
-                partVars=P(P(vars,0xfc),0x68);
-                math_approach_target_with_direction_mode(partVars+0x110,0.0f,partVars+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
-                if(F(partVars,0x110)>=0) D_L07_001B31A0[i]=2;
+                part_vars=P(P(vars,0xfc),0x68);
+                math_approach_target_with_direction_mode(part_vars+0x110,0.0f,part_vars+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
+                if(F(part_vars,0x110)>=0) D_L07_001B31A0[i]=2;
             }
             break;
         case 6:
@@ -167,17 +167,17 @@ void ship_run_sequence_events(u8 *moby)
             break;
         case 7:
             if(D_L07_001B31A0[i]==0) {
-                partVars=P(P(vars,0xfc),0x68);
-                if(moby_count_group_not_in_state(W(partVars,0xa0),-1)==0) {
-                    W(partVars,0x16cc)=snd_play_from_class_bank(2,4,P(vars,0xfc),0x11d9);
-                    D_L07_001B31A0[i]=2; F(partVars,0x16c8)=6.0f;
+                part_vars=P(P(vars,0xfc),0x68);
+                if(moby_count_group_not_in_state(W(part_vars,0xa0),-1)==0) {
+                    W(part_vars,0x16cc)=snd_play_from_class_bank(2,4,P(vars,0xfc),0x11d9);
+                    D_L07_001B31A0[i]=2; F(part_vars,0x16c8)=6.0f;
                 }
             }
             break;
         case 8:
             if(D_L07_001B31A0[i]==0) {
-                partVars=P(P(vars,0xfc),0x68);
-                if(moby_count_group_not_in_state(W(partVars,0x98),-1)==0 && moby_count_group_not_in_state(W(partVars,0x9c),-1)==0) {
+                part_vars=P(P(vars,0xfc),0x68);
+                if(moby_count_group_not_in_state(W(part_vars,0x98),-1)==0 && moby_count_group_not_in_state(W(part_vars,0x9c),-1)==0) {
                     D_L07_001B31A0[i]=1;
                     snd_play_from_class_bank(1,0,P(vars,0xfc),0x11d9);
                 } else if((D_L07_001B1E08[0]&7)==(((int)P(vars,0xfc)>>8)&7)) {
@@ -189,9 +189,9 @@ void ship_run_sequence_events(u8 *moby)
                     }
                 }
             } else {
-                partVars=P(P(vars,0xfc),0x68);
-                math_approach_target_with_direction_mode(partVars+0x114,0.0f,partVars+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
-                if(F(partVars,0x114)<=0) D_L07_001B31A0[i]=2;
+                part_vars=P(P(vars,0xfc),0x68);
+                math_approach_target_with_direction_mode(part_vars+0x114,0.0f,part_vars+0x118,0,0.0017453294713050127f,0.0017453294713050127f,0.10471977f);
+                if(F(part_vars,0x114)<=0) D_L07_001B31A0[i]=2;
             }
             break;
         case 9:

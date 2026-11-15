@@ -18,13 +18,13 @@ extern EntryECE0 *D_L07_001B23CC __attribute__((nosda));
 void path_reset_follower_to_point(char *moby)
 {
     TI128 scratch;
-    char *mobyAlias = moby;
+    char *moby_alias = moby;
     char *vars;
     char *definition;
     unsigned short flags;
-    int pathIndex;
-    char *pathPoint;
-    float posY, posX;
+    int path_index;
+    char *path_point;
+    float pos_y, pos_x;
 
     vars = *(char **)(moby + 0x68);
     flags = *(unsigned short *)(moby + 0x34);
@@ -36,18 +36,18 @@ void path_reset_follower_to_point(char *moby)
     *(unsigned short *)(moby + 0x32) = 0xFF;
 
     if (*(int *)(vars + 0x98) != 0) {
-        scale_vector(&scratch, mobyAlias, 0.0009765625f);
-        pathIndex = math_fast_helper_a(&scratch, 128.0f);
-        if (pathIndex != -1) {
+        scale_vector(&scratch, moby_alias, 0.0009765625f);
+        path_index = math_fast_helper_a(&scratch, 128.0f);
+        if (path_index != -1) {
             qcopy(moby + 0x10, &D_L07_001B23CC[*(int *)(vars + 0x98)].bytes[0x30]);
         }
     }
 
-    pathIndex = *(int *)(vars + 0x94);
-    pathPoint = (char *)(pathIndex * 128 + (int)D_L07_001B23CC);
-    posX = *(float *)(moby + 0x10);
-    posY = *(float *)(moby + 0x14);
-    *(float *)(vars + 0xE8) = mat_fast_helper_a(*(float *)(pathPoint + 0x30) - posX, *(float *)(pathPoint + 0x34) - posY);
+    path_index = *(int *)(vars + 0x94);
+    path_point = (char *)(path_index * 128 + (int)D_L07_001B23CC);
+    pos_x = *(float *)(moby + 0x10);
+    pos_y = *(float *)(moby + 0x14);
+    *(float *)(vars + 0xE8) = mat_fast_helper_a(*(float *)(path_point + 0x30) - pos_x, *(float *)(path_point + 0x34) - pos_y);
     qcopy(vars + 0xF0, moby + 0x10);
     qcopy(vars + 0xD0, &D_L07_001B23CC[*(int *)(vars + 0x94)].bytes[0x30]);
 }

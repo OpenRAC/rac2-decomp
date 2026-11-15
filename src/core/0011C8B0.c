@@ -93,17 +93,17 @@ extern s32_1B4C8 r1_func_0011ABC8();
 /* Sets up the command channel to the sound/IO processor once, and tells it we are ready. */
 void sceSifInitCmd(void) {
     int i;
-    unsigned recvBuffer, sendBuffer;
+    unsigned recv_buffer, send_buffer;
     r1_func_0011D960();
     if (r1_D_0012FD04 != 0) {
         r1_func_0011D9A8();
         return;
     }
     r1_D_0012FD04 = 1;
-    sendBuffer = (unsigned)r1_D_00154E80 | 0x20000000;
-    recvBuffer = (unsigned)r1_D_00154F00 | 0x20000000;
-    r1_D_00154F58.a0 = (void *)sendBuffer;
-    r1_D_00154F58.a1 = (void *)recvBuffer;
+    send_buffer = (unsigned)r1_D_00154E80 | 0x20000000;
+    recv_buffer = (unsigned)r1_D_00154F00 | 0x20000000;
+    r1_D_00154F58.a0 = (void *)send_buffer;
+    r1_D_00154F58.a1 = (void *)recv_buffer;
     r1_D_00154F58.a2 = 0;
     r1_D_00154F58.a3 = r1_D_00154F80;
     r1_D_00154F58.a4 = 0x20;
@@ -161,28 +161,28 @@ void sceSifExitCmd(void) {
 /* Sets slot arg0's two words: r1_D_00154F6C's for arg0 >= 0, r1_D_00154F64's
    below. In func_0011CBC0's shape: reassigning arg0 to the table is what
    puts the base in $a0, as in retail. */
-void sceSifAddCmdHandler(int cmdId, int handler, int handlerData) {
-    int offset = cmdId << 3;
-    if (cmdId < 0) {
-        cmdId = r1_D_00154F64;
+void sceSifAddCmdHandler(int cmd_id, int handler, int handler_data) {
+    int offset = cmd_id << 3;
+    if (cmd_id < 0) {
+        cmd_id = r1_D_00154F64;
     } else {
-        cmdId = r1_D_00154F6C;
+        cmd_id = r1_D_00154F6C;
     }
-    offset += cmdId;
+    offset += cmd_id;
     *(int *)(offset + 0) = handler;
-    *(int *)(offset + 4) = handlerData;
+    *(int *)(offset + 4) = handler_data;
 }
 
 /* rac1-decomp src/core/00119D88.c: func_0011AA68 */
 /* Removes the handler for one command id. */
-void sif_cmd_remove_handler(int cmdId) {
-    int offset = cmdId << 3;
-    if (cmdId < 0) {
-        cmdId = r1_D_00154F64;
+void sif_cmd_remove_handler(int cmd_id) {
+    int offset = cmd_id << 3;
+    if (cmd_id < 0) {
+        cmd_id = r1_D_00154F64;
     } else {
-        cmdId = r1_D_00154F6C;
+        cmd_id = r1_D_00154F6C;
     }
-    offset += cmdId;
+    offset += cmd_id;
     *(int *)offset = 0;
 }
 
@@ -241,14 +241,14 @@ s32 _sceSifSendCmd(u32 packet, s32 mode, SifCmd *cmd, s32 size, u32 src, u32 dst
    `addiu $sp,$sp,-0x10` fourth, after three argument moves, which
    2.95.3 could not produce (11/60). */
 
-int sceSifSendCmd(int cmdId, int cmd, int size, int src, int dst, int dstSize) {
-    return _sceSifSendCmd(cmdId, 0, cmd, size, src, dst, dstSize);
+int sceSifSendCmd(int cmd_id, int cmd, int size, int src, int dst, int dstSize) {
+    return _sceSifSendCmd(cmd_id, 0, cmd, size, src, dst, dstSize);
 }
 
 /* rac1-decomp src/core/00119D88.c: func_0011AC08 */
 /* Same as the normal send, but safe to call from an interrupt. */
-int isceSifSendCmd(int cmdId, int cmd, int size, int src, int dst, int dstSize) {
-    return _sceSifSendCmd(cmdId, 0x1, cmd, size, src, dst, dstSize);
+int isceSifSendCmd(int cmd_id, int cmd, int size, int src, int dst, int dstSize) {
+    return _sceSifSendCmd(cmd_id, 0x1, cmd, size, src, dst, dstSize);
 }
 
 ASM_FUNC("asm/core", func_0011CDA0);

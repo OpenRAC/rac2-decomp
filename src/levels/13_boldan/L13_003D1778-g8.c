@@ -26,7 +26,7 @@ char *hero_l13_find_aim_target(char *obj,Vec *origin,float *yaw,float *pitch) {
     struct { Vec origin,offset,player; char *disabled[128]; Vec target,aim,ray,axis; } frame;
     Vec *start=&frame.origin;
     char *ctx=*(char **)(obj+0x68),*selected,*candidate,*definition,*hit;
-    Vec *pos; int disabledCount,index,accepted,visible,tries,i;
+    Vec *pos; int disabled_count,index,accepted,visible,tries,i;
     float best=D_L13_001B0424,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
     FastVecScale(&frame.offset,g_hero_state.object+0xE0,0.5f);
@@ -36,7 +36,7 @@ char *hero_l13_find_aim_target(char *obj,Vec *origin,float *yaw,float *pitch) {
         qcopy(start,&D_L13_001BFD20);
         return 0;
     }
-    disabledCount=0; index=0;
+    disabled_count=0; index=0;
     while((candidate=D_L13_001FB7E0[index])!=0) {
         if(*(unsigned char *)(candidate+0x20)==0xFE) goto next;
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
@@ -92,8 +92,8 @@ char *hero_l13_find_aim_target(char *obj,Vec *origin,float *yaw,float *pitch) {
                 hit=col->hit;
                 if(hit) {
                     if(*(short *)(hit+0xAA)==0xE7D || *(short *)(hit+0xAA)==0xEB0) {
-                        frame.disabled[disabledCount++]=hit; *(int *)(hit+0x98)=0;
-                        if(disabledCount>127) break;
+                        frame.disabled[disabled_count++]=hit; *(int *)(hit+0x98)=0;
+                        if(disabled_count>127) break;
                         qcopy(&frame.ray,&col->point);
                         continue;
                     }
@@ -106,6 +106,6 @@ char *hero_l13_find_aim_target(char *obj,Vec *origin,float *yaw,float *pitch) {
 next:
         ++index;
     }
-    for(i=0;i<disabledCount;++i) { char *m=frame.disabled[i]; *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10); }
+    for(i=0;i<disabled_count;++i) { char *m=frame.disabled[i]; *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10); }
     return selected;
 }

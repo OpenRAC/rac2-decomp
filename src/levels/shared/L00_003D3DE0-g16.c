@@ -27,7 +27,7 @@ char *kilonoid_spawn(char *owner, Quad *position)
     i = 0;
     do {
         char *m = g_kilonoid_slots[i];
-        if (m == 0 || *(short *)(m + 0xAA) != 0xB02 /* Kilonoid */ || (unsigned char)m[0x20] == 0xFE
+        if (m == 0 || *(short *)(m + 0xAA) != MOBY_CLASS_KILONOID || (unsigned char)m[0x20] == 0xFE
             || (unsigned char)m[0x20] == 0xFD) {
             slot = i;
             break;
@@ -37,10 +37,10 @@ char *kilonoid_spawn(char *owner, Quad *position)
     if (slot < 0)
         return 0;
     if (weapon_spend_ammo(0x1F, 1) == 0) {
-        snd_play_from_class_bank(6, 0, owner, 0xB02 /* Kilonoid */);
+        snd_play_from_class_bank(6, 0, owner, MOBY_CLASS_KILONOID);
         return 0;
     }
-    moby = CreateMoby(0xB02 /* Kilonoid */);
+    moby = CreateMoby(MOBY_CLASS_KILONOID);
     if (moby != 0) {
         state = *(char **)(moby + 0x68);
         *(char **)(state + 0x34) = owner;

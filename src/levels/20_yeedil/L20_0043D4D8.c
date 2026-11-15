@@ -39,15 +39,15 @@ void rotating_object_update(unsigned char *moby) {
         float speed = *(float *)(state + 0x74) * 0.017453294f;
         float range = 6.2831854820251465f;
         float one = 1.0f;
-        unsigned int savedValue;
+        unsigned int saved_value;
         *(int *)(state + 0x5C) |= 1;
         *(float *)(state + 0x70) = range;
         *(float *)(state + 0x74) = speed;
-        savedValue = moby[0xBC];
+        saved_value = moby[0xBC];
         *(int *)(state + 0x60) = 0;
         *(int *)(state + 0x68) = 0;
         *(int *)(state + 0x80) = 0;
-        *(unsigned int *)(state + 0x7C) = savedValue;
+        *(unsigned int *)(state + 0x7C) = saved_value;
         *(float *)(state + 0x64) = one;
         *(float *)(state + 0x6C) = one;
         moby_set_state(moby, 1, -1);

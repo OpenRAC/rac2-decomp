@@ -37,7 +37,7 @@ void part_spawn_channel_beam_effects(char *moby)
     float point[4];
     float offset[4];
     float angle;
-    float levelValue;
+    float level_value;
     s32 count;
     int i;
 
@@ -49,11 +49,11 @@ void part_spawn_channel_beam_effects(char *moby)
         matrix_mul_vec3(point, point, g_moby_l11_table[0] + (state->entity << 8) + 0xC0);
         FastVecAdd(point, point, g_moby_l11_table[0] + (state->entity << 8) + 0x10);
         angle = math_lerp_float(D_L11_001B1940, D_L11_001B1944[0], state->level[i]);
-        levelValue = state->level[i];
-        if (levelValue < 0.1f)
-            count = FloatToInt((float)D_L11_001B1948 * levelValue * 10.0f);
+        level_value = state->level[i];
+        if (level_value < 0.1f)
+            count = FloatToInt((float)D_L11_001B1948 * level_value * 10.0f);
         else
-            count = FloatToInt((float)D_L11_001B1948 * (1.0f - levelValue));
+            count = FloatToInt((float)D_L11_001B1948 * (1.0f - level_value));
         gfx_draw_billboard_quad_with_uv(point, count, 0, angle, D_L11_001B194C, 0.08f);
     }
 }

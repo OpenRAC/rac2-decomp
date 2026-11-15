@@ -33,22 +33,22 @@ extern s32 ref_L01_003D9830_02 __attribute__((sda));
 
 /* Checks whether a swamp monster has touched the platform, and if so starts the platform sinking. */
 void platform_sink_when_hit(void *moby) {
-    s16 classId;
-    u8 attachedState;
+    s16 class_id;
+    u8 attached_state;
     void *vars;
-    void *hitSource;
-    void *hitClassData;
+    void *hit_source;
+    void *hit_class_data;
     void *attached;
 
     vars = (*(void **)((s8 *)(moby) + (0x68)));
-    hitSource = ref_L01_003D9830_00(moby, 1, 0);
-    if ((hitSource != NULL) && (hitClassData = (*(void **)((s8 *)(hitSource) + (0x20))), (hitClassData != NULL))) {
-        classId = (*(s16 *)((s8 *)(hitClassData) + (0xAA)));
-        if ((classId == 0xB24 /* moby class 2852 */) || (classId == 0xA54 /* Swamp Monster II */)) {
+    hit_source = ref_L01_003D9830_00(moby, 1, 0);
+    if ((hit_source != NULL) && (hit_class_data = (*(void **)((s8 *)(hit_source) + (0x20))), (hit_class_data != NULL))) {
+        class_id = (*(s16 *)((s8 *)(hit_class_data) + (0xAA)));
+        if ((class_id == 0xB24 /* moby class 2852 */) || (class_id == MOBY_CLASS_SWAMP_MONSTER_II)) {
             attached = (*(void **)((s8 *)(vars) + (0xC8)));
             if (attached != NULL) {
-                attachedState = (*(u8 *)((s8 *)(attached) + (0x20)));
-                if ((attachedState != 1) && (attachedState != 4) && (attachedState != 5)) {
+                attached_state = (*(u8 *)((s8 *)(attached) + (0x20)));
+                if ((attached_state != 1) && (attached_state != 4) && (attached_state != 5)) {
                     (*(s32 *)((s8 *)(vars) + (0xC4))) = ref_L01_003D9830_02;
                     ref_L01_003D9830_01(moby, 2, -1);
                 }

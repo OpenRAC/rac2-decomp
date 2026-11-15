@@ -32,7 +32,7 @@ void vehicle_compute_height_limits(Ent *entry)
 {
     Mount *mount = entry->f68;
     f32 pos[4] __attribute__((aligned(16)));
-    f32 floorTop, hero;
+    f32 floor_top, hero;
     qcopy(pos, entry->pos);
     if (entry->f20 == 0) {
         mount->f1B0 = coll_find_ground_height(pos, mount->f158 + 20.0f, mount->f158 - 10.0f, mount->f1D4, mount->f1D0);
@@ -40,7 +40,7 @@ void vehicle_compute_height_limits(Ent *entry)
         mount->f1B0 = coll_find_ground_height(pos, entry->pos[2] + 2.0f, entry->pos[2] - 10.0f, mount->f1D4, mount->f1D0);
     }
     if (mount->f1B0 < mount->f1D4) mount->f1B0 = mount->f1D4;
-    floorTop = mount->f1B0 + 1.7f;
+    floor_top = mount->f1B0 + 1.7f;
     hero = ((Hero *)g_hero_state)->f[0x88 / 4] + 0.1f;
-    mount->f1B4 = floorTop > hero ? floorTop : hero;
+    mount->f1B4 = floor_top > hero ? floor_top : hero;
 }

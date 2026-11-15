@@ -11,13 +11,13 @@ extern void FastVecAdd(char *, char *, char *);
 /* Allocate an owner-tagged effect record and initialize its mode-specific fields. */
 char *AllocateOwnedEffectParticle(char *rec, int mode, float amount, char *pos)
 {
-    char offsetA[16] __attribute__((aligned(16)));
-    char offsetB[16] __attribute__((aligned(16)));
+    char offset_a[16] __attribute__((aligned(16)));
+    char offset_b[16] __attribute__((aligned(16)));
     char *piece;
     char *base = D_L00_001B2B54;
     int i;
-    int zeroInt = 0;
-    float zero = (float)zeroInt;
+    int zero_int = 0;
+    float zero = (float)zero_int;
     for (i = 0; i < 320; i++) {
         if (*(int *)(base + i * 128 + 124) != 0) continue;
         switch (mode) {
@@ -55,8 +55,8 @@ char *AllocateOwnedEffectParticle(char *rec, int mode, float amount, char *pos)
             *(float *)(piece + 36) = zero;
             *(int *)(piece + 88) = *(int *)(piece + 84) = math_random_int_range(100, 120);
             qcopy(piece, *(char **)(piece + 124) + 32);
-            vec_scale_to_length(offsetA, piece + 16, math_random_float_range(0.15f, 0.75f));
-            FastVecAdd(piece, offsetA, piece);
+            vec_scale_to_length(offset_a, piece + 16, math_random_float_range(0.15f, 0.75f));
+            FastVecAdd(piece, offset_a, piece);
             *(int *)(piece + 112) = 2;
             goto zero_angle;
         } else if (mode == 1) {
@@ -87,10 +87,10 @@ zero_angle:
             *(float *)(piece + 76) = math_random_float_range(0.5f, 0.8f) * 1.15f;
             *(float *)(piece + 36) = 0.058333337f;
             *(int *)(piece + 88) = *(int *)(piece + 84) = 90;
-            vec_scale_to_length(offsetA, *(char **)(piece + 124), 0.2f);
-            FastVecAdd(piece, *(char **)(piece + 124) + 32, offsetA);
-            vec_scale_to_length(offsetB, piece + 16, 0.75f);
-            FastVecAdd(piece, offsetB, piece);
+            vec_scale_to_length(offset_a, *(char **)(piece + 124), 0.2f);
+            FastVecAdd(piece, *(char **)(piece + 124) + 32, offset_a);
+            vec_scale_to_length(offset_b, piece + 16, 0.75f);
+            FastVecAdd(piece, offset_b, piece);
             *(float *)(piece + 48) = math_random_signed_float_range(0.052359886f, 0.10471977f);
             *(int *)(piece + 112) = mode;
         }

@@ -28,7 +28,7 @@ extern float math_random_float_range(float, float);
 /* Creates a homing shot and sets its start place, speed and target. */
 char *homing_l00_shot_spawn(char *position, char *source, char *target)
 {
-    Vector scratchA,scratchB,scratchC,scratchD;
+    Vector scratch_a,scratch_b,scratch_c,scratch_d;
     char *object = CreateMoby(0xCBB /* moby class 3259 */);
     char *state, *info;
     float speed;
@@ -43,16 +43,16 @@ char *homing_l00_shot_spawn(char *position, char *source, char *target)
         speed = (*(ProjectileTuning *)(D_00139587 * 224 + (char *)g_weapon_l00_table)).speed * 0.016666667f;
         if (g_hero_state.mode==29 && (*(unsigned short *)(g_hero_state.camera+0x34)&1)) {
             qcopy(object+0x10,g_camera_l00_position);
-            FastVecScale((char *)&scratchA,g_camera_l00_position+0x250,-0.5f);
-            FastVecAdd(object+0x10,object+0x10,&scratchA);
-            FastVecScale((char *)&scratchB,g_camera_l00_position+0x240,-0.25f);
-            FastVecAdd(object+0x10,object+0x10,&scratchB);
-            FastVecScale((char *)&scratchC,g_camera_l00_position+0x230,0.1f);
-            FastVecAdd(object+0x10,object+0x10,&scratchC);
-            FastVecScale((char *)&scratchD,g_camera_l00_position+0x230,20.0f);
-            FastVecAdd(&scratchD,g_camera_l00_position,&scratchD);
-            if(CollLine(g_camera_l00_position,&scratchD,0,g_hero_state.camera,0)) qcopy(&scratchD,D_L00_001BF220);
-            FastVecSub(state+0x20,&scratchD,object+0x10);
+            FastVecScale((char *)&scratch_a,g_camera_l00_position+0x250,-0.5f);
+            FastVecAdd(object+0x10,object+0x10,&scratch_a);
+            FastVecScale((char *)&scratch_b,g_camera_l00_position+0x240,-0.25f);
+            FastVecAdd(object+0x10,object+0x10,&scratch_b);
+            FastVecScale((char *)&scratch_c,g_camera_l00_position+0x230,0.1f);
+            FastVecAdd(object+0x10,object+0x10,&scratch_c);
+            FastVecScale((char *)&scratch_d,g_camera_l00_position+0x230,20.0f);
+            FastVecAdd(&scratch_d,g_camera_l00_position,&scratch_d);
+            if(CollLine(g_camera_l00_position,&scratch_d,0,g_hero_state.camera,0)) qcopy(&scratch_d,D_L00_001BF220);
+            FastVecSub(state+0x20,&scratch_d,object+0x10);
             vec_scale_to_length(state+0x20,state+0x20,speed);
         } else {
             if (g_hero_state.alternate==1) {
@@ -60,14 +60,14 @@ char *homing_l00_shot_spawn(char *position, char *source, char *target)
                 qcopy(object+0x10,position);
             } else {
                 if(target) {
-                    qcopy(&scratchA,target+0x10);
+                    qcopy(&scratch_a,target+0x10);
                     info=moby_get_private_value_0(target);
                     if(info) {
-                        cam_compute_view_direction(target+0x10,&scratchB,1);
-                        FastVecScale((char *)&scratchB,(char *)&scratchB,*(float *)(info+0x10));
-                        FastVecAdd(&scratchA,&scratchA,&scratchB);
+                        cam_compute_view_direction(target+0x10,&scratch_b,1);
+                        FastVecScale((char *)&scratch_b,(char *)&scratch_b,*(float *)(info+0x10));
+                        FastVecAdd(&scratch_a,&scratch_a,&scratch_b);
                     }
-                    FastVecSub(state+0x20,&scratchA,position);
+                    FastVecSub(state+0x20,&scratch_a,position);
                     vec_scale_to_length(state+0x20,state+0x20,speed);
                 } else vec_scale_to_length(state+0x20,source+0xC0,speed);
                 qcopy(object+0x10,position);

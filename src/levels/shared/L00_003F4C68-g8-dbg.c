@@ -50,7 +50,7 @@ char *vaporizer_bolt_spawn(char *position,char *velocity,int id,int mode)
     HeaderView *header;
     unsigned char stamp;
     int next;
-    if (id == -1 || save_is_record_value(0xc04 /* Vaporizer */,id) == 0) return 0;
+    if (id == -1 || save_is_record_value(MOBY_CLASS_VAPORIZER,id) == 0) return 0;
     object=CreateMoby(0xcf7 /* moby class 3319 */);
     if (object != 0) {
         *(unsigned char *)(object + 0x30) = 0xFF;
@@ -67,7 +67,7 @@ char *vaporizer_bolt_spawn(char *position,char *velocity,int id,int mode)
            so no division padding (docs/build/compiler-notes.md). */
         state->rate=1.0f/IntToFloat(state->frames);
         state->id=id;
-        state->target=level_get_slot_body(0xc04 /* Vaporizer */,id);
+        state->target=level_get_slot_body(MOBY_CLASS_VAPORIZER,id);
         state->age=0;
         state->fadeFrames=D_L00_001B0938;
         state->fadeRate=1.0f/IntToFloat(state->fadeFrames);

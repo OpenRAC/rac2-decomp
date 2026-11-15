@@ -46,13 +46,13 @@ extern void func_32C9E0();
 void arena_reset_state(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     s32 i;
-    s32 *wordPtr = (s32 *)(state + 0x134);
+    s32 *word_ptr = (s32 *)(state + 0x134);
     *(s16 *)(state + 0x1F0) = -1;
     *(s16 *)(state + 0x1E8) = 0;
     *(s16 *)(state + 0x1F2) = -1;
     for (i = 5; i >= 0; i--) {
-        *wordPtr = 0;
-        wordPtr--;
+        *word_ptr = 0;
+        word_ptr--;
     }
     *(s32 *)(state + 0x18C) = 0;
     *(s32 *)(state + 0x180) = 0;
@@ -103,7 +103,7 @@ u8 *arena_activate_boss_of_class(u8 *obj, s32 id) {
                 rotor_reset_group(record);
                 *(s32 *)(state + 0x118) += 1;
                 return record;
-            case 0xB3A /* Arachnoid */:
+            case MOBY_CLASS_ARACHNOID:
                 joba_rail_reset(record);
                 *(s32 *)(state + 0x11C) += 1;
                 return record;
@@ -358,7 +358,7 @@ void arena_run_member_handlers(u8 *obj)
         case 0xD4B /* moby class 3403 */:
             drone_kill_with_effects(entry);
             break;
-        case 0xB3A /* Arachnoid */:
+        case MOBY_CLASS_ARACHNOID:
             joba_enemy_reset(entry);
             break;
         }
@@ -484,36 +484,36 @@ void arena_set_group_a_active_count(u8 *object, s32 count) {
     u8 *state = *(u8 **)(object + 0x68);
     u16 *cursor;
     u8 *member;
-    s32 activeCount = 0;
+    s32 active_count = 0;
 
     FOR_EACH_ID(cursor, 0xC8) {
         member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
         if (member == 0)
             break;
         if (moby_get_vars_counter(member))
-            activeCount++;
+            active_count++;
     }
-    if (activeCount < count) {
+    if (active_count < count) {
         FOR_EACH_ID(cursor, 0xC8) {
             member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
             if (member == 0)
                 break;
             if (!moby_get_vars_counter(member)) {
                 moby_set_vars_counter_to_1(member);
-                activeCount++;
-                if (activeCount >= count)
+                active_count++;
+                if (active_count >= count)
                     break;
             }
         }
-    } else if (activeCount > count) {
+    } else if (active_count > count) {
         FOR_EACH_ID(cursor, 0xC8) {
             member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
             if (member == 0)
                 break;
             if (moby_get_vars_counter(member)) {
                 moby_clear_vars_counter(member);
-                activeCount--;
-                if (activeCount <= count)
+                active_count--;
+                if (active_count <= count)
                     break;
             }
         }
@@ -532,36 +532,36 @@ void arena_set_group_b_active_count(u8 *object, s32 count) {
     u8 *state = *(u8 **)(object + 0x68);
     u16 *cursor;
     u8 *member;
-    s32 activeCount = 0;
+    s32 active_count = 0;
 
     FOR_EACH_ID(cursor, 0xCC) {
         member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
         if (member == 0)
             break;
         if (moby_get_busy_flag(member))
-            activeCount++;
+            active_count++;
     }
-    if (activeCount < count) {
+    if (active_count < count) {
         FOR_EACH_ID(cursor, 0xCC) {
             member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
             if (member == 0)
                 break;
             if (!moby_get_busy_flag(member)) {
                 moby_set_busy_flag(member);
-                activeCount++;
-                if (activeCount >= count)
+                active_count++;
+                if (active_count >= count)
                     break;
             }
         }
-    } else if (activeCount > count) {
+    } else if (active_count > count) {
         FOR_EACH_ID(cursor, 0xCC) {
             member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
             if (member == 0)
                 break;
             if (moby_get_busy_flag(member)) {
                 moby_clear_busy_flag(member);
-                activeCount--;
-                if (activeCount <= count)
+                active_count--;
+                if (active_count <= count)
                     break;
             }
         }
@@ -582,10 +582,10 @@ void arena_mark_nearest_fighters_to_attack(u8 *object) {
     u16 *cursor;
     u8 *member;
     u8 *nearest;
-    f32 bestDistance;
+    f32 best_distance;
     f32 distance;
     s32 i;
-    s32 readyFlag;
+    s32 ready_flag;
 
     FOR_EACH_ID(cursor, 0xC0) {
         member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
@@ -621,24 +621,24 @@ void arena_mark_nearest_fighters_to_attack(u8 *object) {
 
     for (i = 0; i < 2; i++) {
         nearest = 0;
-        bestDistance = 10000.0f;
+        best_distance = 10000.0f;
         FOR_EACH_ID(cursor, 0xC0) {
             member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
             if (member == 0)
                 break;
-            readyFlag = -1;
+            ready_flag = -1;
             switch (*(s16 *)(member + 0xAA)) {
             case 0xD98 /* Joba security robot */:
-                readyFlag = *(s16 *)(*(u8 **)(member + 0x68) + 0x366);
+                ready_flag = *(s16 *)(*(u8 **)(member + 0x68) + 0x366);
                 break;
             case 0xDCF /* Joba smasher robot */:
-                readyFlag = *(s16 *)(*(u8 **)(member + 0x68) + 0x4CA);
+                ready_flag = *(s16 *)(*(u8 **)(member + 0x68) + 0x4CA);
                 break;
             case 0xDF9 /* Joba fighter */:
-                readyFlag = *(s16 *)(*(u8 **)(member + 0x68) + 0x256);
+                ready_flag = *(s16 *)(*(u8 **)(member + 0x68) + 0x256);
                 break;
             case 0xD37 /* moby class 3383 */:
-                readyFlag = *(s16 *)(*(u8 **)(member + 0x68) + 0x282);
+                ready_flag = *(s16 *)(*(u8 **)(member + 0x68) + 0x282);
                 break;
             }
             /* Retail tests the entity again after the switch and reads its class a second time as
@@ -652,18 +652,18 @@ void arena_mark_nearest_fighters_to_attack(u8 *object) {
             if ((s16)*(u16 *)(member + 0xAA) != 0xD98 /* Joba security robot */ && (s16)*(u16 *)(member + 0xAA) != 0xDCF /* Joba smasher robot */ &&
                 (s16)*(u16 *)(member + 0xAA) != 0xDF9 /* Joba fighter */ && (s16)*(u16 *)(member + 0xAA) != 0xD37 /* moby class 3383 */)
                 continue;
-            if (readyFlag == 1)
+            if (ready_flag == 1)
                 continue;
             if (member[0x20] < 4)
                 continue;
             if (nearest == 0) {
                 nearest = member;
-                bestDistance = vec_distance_squared_xy(nearest + 0x10, g_hero_position);
+                best_distance = vec_distance_squared_xy(nearest + 0x10, g_hero_position);
             } else {
                 distance = vec_distance_squared_xy(member + 0x10, g_hero_position);
-                if (distance < bestDistance) {
+                if (distance < best_distance) {
                     nearest = member;
-                    bestDistance = distance;
+                    best_distance = distance;
                 }
             }
         }
@@ -771,15 +771,15 @@ extern void moby_finish_release_child(u8 *);
 void arena_run_helper_on_spawn_groups(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
     u16 *cursor;
-    u16 *firstEntry;
+    u16 *first_entry;
     u8 *member;
 
     if (GROUP(0x178) == 0xFF)
         return;
-    firstEntry = (u16 *)g_group_id_lists[GROUP(0x178)];
-    if (firstEntry == 0)
+    first_entry = (u16 *)g_group_id_lists[GROUP(0x178)];
+    if (first_entry == 0)
         return;
-    for (cursor = firstEntry; (GROUP(0x178) & 0xFF) != 0xFF && GROUP(0x178) <= D_L11_001B35B8[0] && cursor != 0 &&
+    for (cursor = first_entry; (GROUP(0x178) & 0xFF) != 0xFF && GROUP(0x178) <= D_L11_001B35B8[0] && cursor != 0 &&
                 ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)g_group_id_lists[GROUP(0x178)]);
          cursor++) {
         member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
@@ -789,10 +789,10 @@ void arena_run_helper_on_spawn_groups(u8 *object) {
     }
     if (GROUP(0x174) == 0xFF)
         return;
-    firstEntry = (u16 *)g_group_id_lists[GROUP(0x174)];
-    if (firstEntry == 0)
+    first_entry = (u16 *)g_group_id_lists[GROUP(0x174)];
+    if (first_entry == 0)
         return;
-    for (cursor = firstEntry; (GROUP(0x174) & 0xFF) != 0xFF && GROUP(0x174) <= D_L11_001B35B8[0] && cursor != 0 &&
+    for (cursor = first_entry; (GROUP(0x174) & 0xFF) != 0xFF && GROUP(0x174) <= D_L11_001B35B8[0] && cursor != 0 &&
                 ((cursor != 0 && (s16)cursor[-1] >= 0) || cursor == (u16 *)g_group_id_lists[GROUP(0x174)]);
          cursor++) {
         member = g_moby_l11_table + ((*cursor & 0x7FFF) << 8);
@@ -885,17 +885,17 @@ extern u8 g_music_state[];
 /* Starts a voice line for the arena. Returns 1 if the line could be started. */
 s32 arena_queue_voice_line(u8 *obj, s32 idx) {
     u8 *state = *(u8 **)(obj + 0x68);
-    s32 lineValue;
+    s32 line_value;
 
     if ((u32)idx >= 0x27) {
         return 0;
     }
     if (idx < 0x14) {
-        s32 *slotPtr = (s32 *)((u8 *)state + idx * 4);
-        lineValue = slotPtr[0x84];
+        s32 *slot_ptr = (s32 *)((u8 *)state + idx * 4);
+        line_value = slot_ptr[0x84];
     } else {
-        s32 *slotPtr = (s32 *)((u8 *)state + (idx - 0x14) * 4);
-        lineValue = slotPtr[0x98];
+        s32 *slot_ptr = (s32 *)((u8 *)state + (idx - 0x14) * 4);
+        line_value = slot_ptr[0x98];
     }
     {
         JobaCallSlotView *slot = (JobaCallSlotView *)g_music_state;
@@ -906,11 +906,11 @@ s32 arena_queue_voice_line(u8 *obj, s32 idx) {
         if (slot->field24 != -1) {
             goto fail;
         }
-        slot->field24 = (lineValue & 0x3FFF) + 0x7D0;
+        slot->field24 = (line_value & 0x3FFF) + 0x7D0;
         slot->field28 = 0;
         {
-            s16 *slotPtr = (s16 *)((u8 *)state + idx * 2 + 0x2A0);
-            *slotPtr = 1;
+            s16 *slot_ptr = (s16 *)((u8 *)state + idx * 2 + 0x2A0);
+            *slot_ptr = 1;
         }
     }
     return 1;

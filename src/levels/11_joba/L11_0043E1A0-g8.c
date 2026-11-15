@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef int s32;
@@ -413,7 +414,7 @@ void arena_update_camera_guide(u8 *obj) {
                 SET_GUIDE(D_L11_001B15D4, D_L11_001B15D8, D_L11_001B15DC);
             if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == 0xD4B /* moby class 3403 */)
                 SET_GUIDE(D_L11_001B15EC, D_L11_001B15F0, D_L11_001B15F4);
-            else if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == 0xB3A /* Arachnoid */)
+            else if (*(s16 *)(*(u8 **)(s + 0x184) + 0xAA) == MOBY_CLASS_ARACHNOID)
                 SET_GUIDE(D_L11_001B15E0, D_L11_001B15E4, D_L11_001B15E8);
         } else if (obj[0x20] == 9) {
             u8 *player = g_hero_state;

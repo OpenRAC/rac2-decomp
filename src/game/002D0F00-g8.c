@@ -19,43 +19,43 @@ extern unsigned char D_001A7A0A;
 /* Marks each movie in the list as available if the player has seen it, or all of them when everything is unlocked. */
 int movie_list_update_availability(void)
 {
-    unsigned int *seenMask;
-    unsigned char allUnlocked;
-    char *entryTable;
-    char *tableEnd;
-    int clearBase;
-    char *idPtr;
-    char *enabledPtr;
-    int clearOffset;
+    unsigned int *seen_mask;
+    unsigned char all_unlocked;
+    char *entry_table;
+    char *table_end;
+    int clear_base;
+    char *id_ptr;
+    char *enabled_ptr;
+    int clear_offset;
     int one;
 
     if (D_001A8CFC == 0)
         goto done;
     D_001F2848[0] = 1;
-    entryTable = (char *)D_0026185A;
-    seenMask = D_00139768;
-    allUnlocked = D_001A7A0A;
-    clearBase = (int)entryTable + 2;
+    entry_table = (char *)D_0026185A;
+    seen_mask = D_00139768;
+    all_unlocked = D_001A7A0A;
+    clear_base = (int)entry_table + 2;
     one = 1;
-    enabledPtr = entryTable + 8;
-    idPtr = entryTable + 6;
-    tableEnd = entryTable + 0xC6;
-    clearOffset = 6;
+    enabled_ptr = entry_table + 8;
+    id_ptr = entry_table + 6;
+    table_end = entry_table + 0xC6;
+    clear_offset = 6;
     do {
-        int entryId;
-        if (allUnlocked != 0) {
-            *(short *)enabledPtr = one;
+        int entry_id;
+        if (all_unlocked != 0) {
+            *(short *)enabled_ptr = one;
         } else {
-            entryId = *(short *)idPtr;
-            if (seenMask[(unsigned int)entryId >> 2] & (one << (entryId & 31)))
-                *(short *)enabledPtr = one;
+            entry_id = *(short *)id_ptr;
+            if (seen_mask[(unsigned int)entry_id >> 2] & (one << (entry_id & 31)))
+                *(short *)enabled_ptr = one;
             else
-                *(short *)(clearOffset + clearBase) = 0;
+                *(short *)(clear_offset + clear_base) = 0;
         }
-        idPtr += 6;
-        enabledPtr += 6;
-        clearOffset += 6;
-    } while ((int)idPtr < (int)tableEnd);
+        id_ptr += 6;
+        enabled_ptr += 6;
+        clear_offset += 6;
+    } while ((int)id_ptr < (int)table_end);
 done:
     return 0;
 }

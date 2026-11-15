@@ -76,7 +76,7 @@ void path_guide_update(char *obj)
     case 2:
         if (g_hero_state.mode==0x31) {
             glider=g_hero_state.target;
-            if(glider && *(short *)(glider+0xaa)==0x905 /* Glider */ && B(glider,0x20)!=0xfe && B(glider,0x20)!=0xfd) {
+            if(glider && *(short *)(glider+0xaa)==MOBY_CLASS_GLIDER && B(glider,0x20)!=0xfe && B(glider,0x20)!=0xfd) {
                 B(obj,0x30)=0xff; *(short *)(obj+0x32)=0x3ff; I(vars,0x268)=0;
                 if(((DobboAnimation *)obj)->animation!=4) anim_start_blended(obj,4,0,10);
                 moby_set_state(obj,1,-1);

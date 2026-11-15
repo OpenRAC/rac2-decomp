@@ -27,7 +27,7 @@
 extern s8 D_00222AE0[];
 extern s8 D_002222E0[];
 extern s8 g_hero_position[];
-extern s32 IsPointInCuboid(s32 noisePtr, s32 index);
+extern s32 IsPointInCuboid(s32 noise_ptr, s32 index);
 
 /* Sets the height of each surface grid point from its base height plus the wave noise. */
 void surface_grid_update_heights(void *object) {
@@ -35,32 +35,32 @@ void surface_grid_update_heights(void *object) {
     s32 index;
     s32 flags;
     s32 row;
-    s32 tableOffset;
-    s8 *noisePtr;
-    s8 *heightPtr;
-    s8 *tablePtr;
+    s32 table_offset;
+    s8 *noise_ptr;
+    s8 *height_ptr;
+    s8 *table_ptr;
 
     state = (*(void **)((s8 *)(object) + (0x68)));
     index = (*(s32 *)((s8 *)(state) + (0x44)));
     if (index != -1 && IsPointInCuboid((s32)g_hero_position, index) != 0 && !((*(u32 *)((s8 *)(state) + (0x4C))) & 4)) {
-        tableOffset = (*(s32 *)((s8 *)(state) + (0x40))) << 10;
-        tablePtr = (s8 *)D_00222AE0;
-        tablePtr += 8;
-        heightPtr = tablePtr + tableOffset;
-        noisePtr = D_002222E0;
+        table_offset = (*(s32 *)((s8 *)(state) + (0x40))) << 10;
+        table_ptr = (s8 *)D_00222AE0;
+        table_ptr += 8;
+        height_ptr = table_ptr + table_offset;
+        noise_ptr = D_002222E0;
         for (index = 0; index < 0x40; index++) {
-            *(f32 *)heightPtr = (*(f32 *)((s8 *)(state) + (0x70))) + (*(f32 *)((s8 *)(state) + (4)));
+            *(f32 *)height_ptr = (*(f32 *)((s8 *)(state) + (0x70))) + (*(f32 *)((s8 *)(state) + (4)));
             flags = (*(s32 *)((s8 *)(state) + (0x4C)));
             if (~flags & 0x10) {
                 if ((index % 8 != 0 && index % 8 != 7) || ((flags ^ 1) & 1)) {
                     row = index / 8;
                     if ((row != 0 && row != 7) || !((*(s32 *)((s8 *)(state) + (0x4C))) & 2)) {
-                        *(f32 *)heightPtr += *(f32 *)noisePtr * (*(f32 *)((s8 *)(state) + (0x34)));
+                        *(f32 *)height_ptr += *(f32 *)noise_ptr * (*(f32 *)((s8 *)(state) + (0x34)));
                     }
                 }
             }
-            noisePtr += 0x20;
-            heightPtr += 0x10;
+            noise_ptr += 0x20;
+            height_ptr += 0x10;
         }
     }
 }

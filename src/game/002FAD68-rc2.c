@@ -27,26 +27,26 @@
 extern s8 g_vendor_menu_state[];
 
 /* Marks every entry for the given item in the shop list as owned. */
-void shop_mark_item_owned(s32 itemId) {
+void shop_mark_item_owned(s32 item_id) {
     s32 i;
     s32 count;
-    s32 ownedValue;
+    s32 owned_value;
     s8 *shop;
-    s8 *shopBase;
+    s8 *shop_base;
     s8 *row;
 
     shop = g_vendor_menu_state;
     if ((*(s32 *)((s8 *)(shop) + (0x740))) > 0) {
         i = 0;
-        shopBase = shop;
-        ownedValue = 1;
-        row = shopBase + 0x150;
+        shop_base = shop;
+        owned_value = 1;
+        row = shop_base + 0x150;
         do {
-            if ((*(s32 *)((s8 *)(row) + (-0x10))) == itemId) {
-                (*(s32 *)((s8 *)(row) + (0))) = ownedValue;
+            if ((*(s32 *)((s8 *)(row) + (-0x10))) == item_id) {
+                (*(s32 *)((s8 *)(row) + (0))) = owned_value;
             }
             row += 0x18;
-            count = (*(s32 *)((s8 *)(shopBase) + (0x740)));
+            count = (*(s32 *)((s8 *)(shop_base) + (0x740)));
             i++;
         } while (i < count);
     }

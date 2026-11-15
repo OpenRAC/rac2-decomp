@@ -38,7 +38,7 @@ void arena_start_enemy_tally(char *object)
         if ((u8)record[0x20] == 1)
             continue;
         type = *(short *)(record + 0xAA);
-        if (type == 0x9CA /* moby class 2506 */ || type == 0xB22 /* moby class 2850 */ || type == 0xC3B /* Megacorp Security Robot - Flamethrower */ || type == 0xC3E /* PX6 BladeBall */ || type == 0x9F8 /* Chainblade */ || type == 0xA44 /* B2 Brawler Legs */) {
+        if (type == 0x9CA /* moby class 2506 */ || type == 0xB22 /* moby class 2850 */ || type == MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER || type == MOBY_CLASS_PX6_BLADEBALL || type == MOBY_CLASS_CHAINBLADE || type == MOBY_CLASS_B2_BRAWLER_LEGS) {
             *(int *)(state + 0x60) += 1;
             *(float *)(state + 0x64) += *(float *)(*(char **)(record + 0x68) + 0x20);
         }

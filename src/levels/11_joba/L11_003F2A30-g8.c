@@ -11,8 +11,8 @@ extern f32 *arena_get_center_point(s32);
 extern void euler_rotation_basis(void *,void *);
 /* Spins the enemy around its anchor point, speeding up in one direction, and turns it to
    face along its orbit. */
-void joba_enemy_update_orbit(u8 *mobyArg) {
-    u8 *moby = mobyArg;
+void joba_enemy_update_orbit(u8 *moby_arg) {
+    u8 *moby = moby_arg;
     u8 *vars = *(u8 **)(moby + 0x68);
     f32 limit, speed, trig;
     switch (*(u8 *)(moby + 0x42)) {

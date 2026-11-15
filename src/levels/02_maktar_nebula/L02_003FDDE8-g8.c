@@ -73,9 +73,9 @@ void arena_draw_menu_help_prompts(u8 *object, int enabled)
     u8 *state;
     char *label;
     int phase, i, one, k3, entry;
-    unsigned int color, buttonColor;
-    float x3, nextX, x, fy, pulse, half, sc, z;
-    HelpEntry *entryRecord;
+    unsigned int color, button_color;
+    float x3, next_x, x, fy, pulse, half, sc, z;
+    HelpEntry *entry_record;
 
     if (D_L02_001A904C == 0) return;
     gfx_append_draw_list_packet_c();
@@ -102,27 +102,27 @@ void arena_draw_menu_help_prompts(u8 *object, int enabled)
             label = (char *)table_find_by_id(D_L02_001A904C + 0x8710, 0x4b);
             k3 = 1;
             x3 = (float)D_L02_001B126C;
-            if (g_pad_state.buttons & 0x8000) buttonColor = D_L02_001B1288; else buttonColor = color;
+            if (g_pad_state.buttons & 0x8000) button_color = D_L02_001B1288; else button_color = color;
             fy = (float)label_y(label, (float)D_L02_001B1270, D_L02_001B3E04, 0.5f, k3);
-            gfx_draw_scaled_object_two_axes(label, x3, buttonColor, fy, D_L02_001B1260, 1.0f, 0.0f);
+            gfx_draw_scaled_object_two_axes(label, x3, button_color, fy, D_L02_001B1260, 1.0f, 0.0f);
         }
         for (i = *(short *)(state + 0x118) + 1; i < 14; i++) {
             if (D_001395B8[arena_get_challenge_save_index(*(int *)(D_L02_001B1190[i] + 8))] == 0) continue;
             if (i >= 12 && !flag_is_byte_set()) continue;
             if (i == 7) {
-                entryRecord = &D_L02_00264A70[g_item_slot_to_record[0x1e]];
-                if (entryRecord->available == 0) continue;
+                entry_record = &D_L02_00264A70[g_item_slot_to_record[0x1e]];
+                if (entry_record->available == 0) continue;
             }
             if (i == 8) {
-                entryRecord = &D_L02_00264A70[g_item_slot_to_record[0x2a]];
-                if (entryRecord->available == 0) continue;
+                entry_record = &D_L02_00264A70[g_item_slot_to_record[0x2a]];
+                if (entry_record->available == 0) continue;
             }
             label = (char *)table_find_by_id(D_L02_001A904C + 0x8710, 0x4a);
             one = 1;
-            buttonColor = (g_pad_state.buttons & 0x2000) ? D_L02_001B128C : color;
-            nextX = (float)D_L02_001B1274;
+            button_color = (g_pad_state.buttons & 0x2000) ? D_L02_001B128C : color;
+            next_x = (float)D_L02_001B1274;
             fy = (float)label_y(label, (float)D_L02_001B1278, D_L02_001B3E04, 0.5f, one);
-            gfx_draw_scaled_object_two_axes(label, nextX, buttonColor, fy, D_L02_001B1260, 1.0f, 0.0f);
+            gfx_draw_scaled_object_two_axes(label, next_x, button_color, fy, D_L02_001B1260, 1.0f, 0.0f);
             break;
         }
     }

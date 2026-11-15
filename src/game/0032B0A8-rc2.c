@@ -37,11 +37,11 @@ void part_draw_trail_nodes(s32 owner) {
     for (i = 0; i < 0x80; i++) {
         s32 node = (s32)g_trail_nodes + i * 0x50;
         if (*(s32 *)(node + 0x44) == owner) {
-            f32 secondSize;
+            f32 second_size;
             FastVecAdd(offset, (void *)node, *(s32 *)(hero + 0x2290) + 0x10);
             gfx_draw_facing_sprite_copy(offset, 0x7F7F7F, *(s32 *)(node + 0x34), 0x31, 2, *(f32 *)(node + 0x20), *(f32 *)(node + 0x2C), 0.001f);
-            secondSize = *(volatile f32 *)(node + 0x24);
-            gfx_draw_facing_sprite_copy(offset, *(s32 *)(node + 0x38), *(s32 *)(node + 0x34) >> 1, 0x31, 2, secondSize, *(f32 *)(node + 0x2C), 0.001f);
+            second_size = *(volatile f32 *)(node + 0x24);
+            gfx_draw_facing_sprite_copy(offset, *(s32 *)(node + 0x38), *(s32 *)(node + 0x34) >> 1, 0x31, 2, second_size, *(f32 *)(node + 0x2C), 0.001f);
         }
     }
 }

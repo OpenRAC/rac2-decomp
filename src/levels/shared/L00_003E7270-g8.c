@@ -66,7 +66,7 @@ void mini_nuke_projectile_update(unsigned char *object) {
         part_steer_effect_direction(BI(state, 0x34), state, 0);
         vec_add_object_direction_scaled(object + 0x10, (float *)state, D_L00_001AFEC8 * 0.00027777778f);
         work.excluded[0] = 0;
-        work.excluded[1] = 0xA5A /* Mini-Nuke */;
+        work.excluded[1] = MOBY_CLASS_MINI_NUKE;
         qcopy(&work.query.previous, &work.previous);
         qcopy(&work.query.position, object + 0x10);
         qcopy(&work.query.velocity, state);

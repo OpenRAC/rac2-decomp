@@ -271,24 +271,24 @@ void swinging_mover_update(char *self)
 /* func_L14_003E5030 is matched in its own unit, src/levels/shared/L14_003E5030-g8.c (-O2 -G8 -ffunction-sections -frac2-qcopy -frac2-qcopy-barrier). */
 
 /* Draws two lines on either side of the object, along its facing direction. */
-void gfx_draw_moby_edge_lines(char *moby, int isFirst) {
-    float offsetA[4];
-    float offsetB[4];
+void gfx_draw_moby_edge_lines(char *moby, int is_first) {
+    float offset_a[4];
+    float offset_b[4];
     char *vars;
     char *pos;
 
     vars = *(char **)(moby + 0x68);
-    func_2F5CC0(offsetA, moby + 0xC0, 2.0f);
-    func_2F5CC0(offsetB, moby + 0xC0, -2.0f);
+    func_2F5CC0(offset_a, moby + 0xC0, 2.0f);
+    func_2F5CC0(offset_b, moby + 0xC0, -2.0f);
     if (*(int *)(vars + 0x7C) != 0) {
-        func_2F5CC0(offsetA, offsetA, -1.0f);
-        func_2F5CC0(offsetB, offsetB, -1.0f);
+        func_2F5CC0(offset_a, offset_a, -1.0f);
+        func_2F5CC0(offset_b, offset_b, -1.0f);
     }
     pos = moby + 0x10;
-    func_2F5C38(offsetA, offsetA, pos);
-    func_2F5C38(offsetB, offsetB, pos);
-    func_420B10(*(int *)(vars + 0x64), offsetA, pos, isFirst == 0);
-    func_420B10(*(int *)(vars + 0x64), offsetB, pos, 0);
+    func_2F5C38(offset_a, offset_a, pos);
+    func_2F5C38(offset_b, offset_b, pos);
+    func_420B10(*(int *)(vars + 0x64), offset_a, pos, is_first == 0);
+    func_420B10(*(int *)(vars + 0x64), offset_b, pos, 0);
 }
 
 /* The id-list walks of func_L14_003DF440 and func_L14_003DF540 read D_L14_001B259C as a bare
@@ -449,7 +449,7 @@ typedef struct {
 
 /* The caller supplies an unused scale in F12; the body replaces it before use. */
 /* Builds two ribbon-like quads at the object with random fading colours and draws them. */
-void gfx_draw_fading_quads(char *moby, char *target, float unused_scale, int colorBase, int fadeA, int fadeB) {
+void gfx_draw_fading_quads(char *moby, char *target, float unused_scale, int color_base, int fade_a, int fade_b) {
     L14_003F0F38_frame fr;
     char *vars;
     long long id;
@@ -459,7 +459,7 @@ void gfx_draw_fading_quads(char *moby, char *target, float unused_scale, int col
 
     vars = *(char **)(moby + 0x68);
 
-    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 5.0f)) << 24);
+    fade_a = fade_a - ((int)FloatToInt(math_random_signed_float_range(0.0f, 5.0f)) << 24);
     coll_reset_box_record(&fr.rec);
 
     fr.rec.f[0] = *(float *)vars;
@@ -475,15 +475,15 @@ void gfx_draw_fading_quads(char *moby, char *target, float unused_scale, int col
     fr.rec.r = id;
     fr.rec.s = 280993940374112LL;
     fr.t = 0x8000000048LL;
-    fr.rec.p[0] = colorBase + fadeA;
+    fr.rec.p[0] = color_base + fade_a;
     fr.rec.q = 0LL;
 
-    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[1] = colorBase + fadeA;
-    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[2] = colorBase + fadeA;
-    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[3] = colorBase + fadeA;
+    fade_a = fade_a - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[1] = color_base + fade_a;
+    fade_a = fade_a - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[2] = color_base + fade_a;
+    fade_a = fade_a - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[3] = color_base + fade_a;
 
     fr.dir[2] = *(float *)(moby + 0xF8);
     fr.dir[1] = *(float *)(moby + 0xF4);
@@ -507,14 +507,14 @@ void gfx_draw_fading_quads(char *moby, char *target, float unused_scale, int col
     fr.rec.f[2] = *(float *)(vars + 8);
     fr.rec.f[3] = 1.0f;
     fr.t = tv;
-    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[0] = colorBase + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[1] = colorBase + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[2] = colorBase + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[3] = colorBase + fadeB;
+    fade_b = fade_b - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[0] = color_base + fade_b;
+    fade_b = fade_b - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[1] = color_base + fade_b;
+    fade_b = fade_b - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[2] = color_base + fade_b;
+    fade_b = fade_b - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[3] = color_base + fade_b;
     fr.rec.f[4] = *(float *)(vars + 8) + 1.0f;
     fr.rec.f[5] = 0.0f;
     fr.rec.f[6] = *(float *)(vars + 8) + 1.0f;

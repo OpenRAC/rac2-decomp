@@ -51,7 +51,7 @@ extern void arena_push_point_out(void *, float);
 
 /* makes sure the word chosen by the key holds an object (creating and aiming it when it does
    not), then moves it to the given position */
-void keyed_object_place(u8 *owner, TI128 *position, s32 isAlternate) {
+void keyed_object_place(u8 *owner, TI128 *position, s32 is_alternate) {
     s32 *slot = &ref_L22_003B8FE8_00;
     TI128 local;
     TI128 *pos = &local;
@@ -65,13 +65,13 @@ void keyed_object_place(u8 *owner, TI128 *position, s32 isAlternate) {
     float dot;
     float dist;
 
-    if (isAlternate != 0) {
+    if (is_alternate != 0) {
         slot = &ref_L22_003B8FE8_01;
     }
     local = *position;
     if (*slot == 0) {
         keyed_object_create(owner, &local);
-        if (isAlternate != 0) {
+        if (is_alternate != 0) {
             D_L22_001AFA00 = snd_start_in_slot(0x14, 0, 0);
         } else {
             D_L22_001AFA04 = snd_start_in_slot(0x14, 0, 0);
@@ -92,12 +92,12 @@ void keyed_object_place(u8 *owner, TI128 *position, s32 isAlternate) {
             } else if ((hero = (u8 *)g_hero_moby[0]) == 0) {
                 *(s32 *)(payload + 0x48) = 0;
             } else {
-                if (isAlternate != 0) {
+                if (is_alternate != 0) {
                     *(u8 **)(payload + 0x44) = target;
                 } else {
                     *(u8 **)(payload + 0x44) = hero;
                 }
-                if (isAlternate != 0) {
+                if (is_alternate != 0) {
                     FastVecScale(&dir, *(u8 **)(payload + 0x44) + 0xE0, 4.0f);
                     FastVecAdd(&dir, &dir, *(u8 **)(payload + 0x44) + 0x10);
                 } else {
@@ -109,7 +109,7 @@ void keyed_object_place(u8 *owner, TI128 *position, s32 isAlternate) {
                 qcopy(&facing, owner + 0xC0);
                 vec_scale_to_length(&facing, &facing, 1.0f);
                 dot = FastVecDot(payload + 0x50, &facing);
-                if (isAlternate != 0) {
+                if (is_alternate != 0) {
                     dist = fast_vec_dist(target + 0x10, &((Hero *)g_hero_state)->q[8]);
                     if (dot < D_L22_001AF9E4) {
                         *(s32 *)(payload + 0x44) = 0;
@@ -124,7 +124,7 @@ void keyed_object_place(u8 *owner, TI128 *position, s32 isAlternate) {
                 *(s32 *)(payload + 0x48) = 0;
             }
         }
-        *(s16 *)(payload + 0x40) = isAlternate;
+        *(s16 *)(payload + 0x40) = is_alternate;
     }
     obj = (u8 *)*slot;
     *(TI128 *)(obj + 0x10) = *pos;

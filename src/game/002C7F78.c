@@ -18,8 +18,8 @@ extern void FastVecSub(char *, char *, char *);
 /* Updates a floating particle: it slows down, sinks, gets pushed away by the hero and fades out. It is removed when its life runs out. */
 void part_update_floating_dust(char *particle)
 {
-    char *motion, *position = particle + 16, *hero, *heroBase;
-    float push[4], heroPos[4];
+    char *motion, *position = particle + 16, *hero, *hero_base;
+    float push[4], hero_pos[4];
     float a, b;
     motion = particle + 32;
     vec_transform_or_copy(position, position);
@@ -28,13 +28,13 @@ void part_update_floating_dust(char *particle)
     FastVecAdd(position, position, motion);
     hero = g_hero_position;
     if (fast_vec_dist(position, hero) < 1.05f) {
-      heroBase = hero - 128;
-      if (*(float *)(heroBase + 0x170) != 0) {
-        qcopy(heroPos, hero);
-        FastVecSub((char *)push, position, (char *)heroPos);
+      hero_base = hero - 128;
+      if (*(float *)(hero_base + 0x170) != 0) {
+        qcopy(hero_pos, hero);
+        FastVecSub((char *)push, position, (char *)hero_pos);
         a = math_random_float_range(0.1f, 2.0f);
-        vec_scale_to_length((char *)push, (char *)push, *(float *)(heroBase + 0x170) * 0.2f + a * 0.016666667f * 0.15f);
-        *(unsigned char *)(particle + 8) += (int)(*(short *)(motion + 22) * *(float *)(heroBase + 0x170) * 0.5f);
+        vec_scale_to_length((char *)push, (char *)push, *(float *)(hero_base + 0x170) * 0.2f + a * 0.016666667f * 0.15f);
+        *(unsigned char *)(particle + 8) += (int)(*(short *)(motion + 22) * *(float *)(hero_base + 0x170) * 0.5f);
         FastVecAdd(position, position, (char *)push);
     }
     }

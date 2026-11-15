@@ -74,7 +74,7 @@ void DestroyCrate(CrateMoby *self, int explode, CrateHit *hit)
     if (subtract_integer_with_clamp(g_game_time - D_001B24AC) >= 2) {
         switch (self->oClass) {
         case 0x1FA /* moby class 506 */: snd_play_from_class_bank(0, 0, (char *)self, 0x1F4); break;
-        case 0x1FF /* Ammo Crate */: snd_play_from_class_bank(1, 0, (char *)self, 0x1FF); break;
+        case MOBY_CLASS_AMMO_CRATE: snd_play_from_class_bank(1, 0, (char *)self, 0x1FF); break;
         default: PlayMobySound(0, 0, (char *)self); break;
         }
         D_001B24AC = g_game_time;
@@ -130,14 +130,14 @@ void DestroyCrate(CrateMoby *self, int explode, CrateHit *hit)
         type = self->oClass;
         D_001AF0FC += amount;
         switch (type) {
-        case 0x1F4 /* Crate */: case 0x1FF /* Ammo Crate */:
+        case MOBY_CLASS_CRATE: case MOBY_CLASS_AMMO_CRATE:
             switch (amount) {
             case 1: kind = 1; break;
             case 2: kind = 5; break;
             case 3: default: kind = 37; break;
             }
             break;
-        case 0x1F5 /* Nanotech Crate */: case 0x200 /* Purple Nanotech Crate */:
+        case MOBY_CLASS_NANOTECH_CRATE: case MOBY_CLASS_PURPLE_NANOTECH_CRATE:
             kind = (1 << (amount - 1)) - 1;
             if (kind > 15)
                 kind = 15;

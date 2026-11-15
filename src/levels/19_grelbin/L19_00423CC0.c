@@ -22,7 +22,7 @@ extern struct {
 /* Waits for the player to come near, then marks the object as used in the level's saved data and moves to its finished state. */
 void UpdateRegionTriggeredObject(char *moby)
 {
-    char *classInfoA, *classInfoB;
+    char *class_info_a, *class_info_b;
     int vars = *(int *)(moby + 0x68);
 
     if (vars == 0) {
@@ -43,36 +43,36 @@ void UpdateRegionTriggeredObject(char *moby)
         if (IsPointInCuboid(g_hero_position, *(int *)vars) != 0) {
             int uid = *(unsigned short *)(moby + 0xB2);
             if (uid & 1) {
-                unsigned char *counterByte = &D_0019B4A8[((short)uid >> 1) + (D_001A79F0_gp << 10)];
-                if (((*counterByte >> 4) & 7) != 7) {
-                    *counterByte += 0x10;
+                unsigned char *counter_byte = &D_0019B4A8[((short)uid >> 1) + (D_001A79F0_gp << 10)];
+                if (((*counter_byte >> 4) & 7) != 7) {
+                    *counter_byte += 0x10;
                 }
             } else {
-                unsigned char *counterByte = &D_0019B4A8[((short)uid >> 1) + (D_001A79F0_gp << 10)];
-                if ((*counterByte & 7) != 7) {
-                    *counterByte += 1;
+                unsigned char *counter_byte = &D_0019B4A8[((short)uid >> 1) + (D_001A79F0_gp << 10)];
+                if ((*counter_byte & 7) != 7) {
+                    *counter_byte += 1;
                 }
             }
             *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
-            classInfoA = *(char **)(moby + 0x24);
-            *(int *)(moby + 0x98) = *(int *)(classInfoA + 0x10);
-            *(int *)(moby + 0x98) = *(int *)(classInfoA + 0x10);
+            class_info_a = *(char **)(moby + 0x24);
+            *(int *)(moby + 0x98) = *(int *)(class_info_a + 0x10);
+            *(int *)(moby + 0x98) = *(int *)(class_info_a + 0x10);
             moby_set_state(moby, 2, -1);
         }
         {
             int uid = *(unsigned short *)(moby + 0xB2);
 
             if (D_L19_0021EA30.state[(short)uid] == 0) {
-                int savedCount = D_0019B4A8[((short)uid >> 1) + (g_current_map_index[0] << 10)];
+                int saved_count = D_0019B4A8[((short)uid >> 1) + (g_current_map_index[0] << 10)];
 
-                if (!((uid & 1) ? ((savedCount >> 4) & 7) : (savedCount & 7)))
+                if (!((uid & 1) ? ((saved_count >> 4) & 7) : (saved_count & 7)))
                     return;
             }
         }
         *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
-        classInfoB = *(char **)(moby + 0x24);
-        *(int *)(moby + 0x98) = *(int *)(classInfoB + 0x10);
-        *(int *)(moby + 0x98) = *(int *)(classInfoB + 0x10);
+        class_info_b = *(char **)(moby + 0x24);
+        *(int *)(moby + 0x98) = *(int *)(class_info_b + 0x10);
+        *(int *)(moby + 0x98) = *(int *)(class_info_b + 0x10);
         moby_set_state(moby, 2, -1);
         break;
     }

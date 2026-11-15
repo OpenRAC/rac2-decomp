@@ -34,14 +34,14 @@ extern void ref_L04_002D9780_02(void *, void *, f32, f32, f32, f32);
 /* Sets the hero's turn and tilt speeds for its current state, then eases the camera values toward them. */
 void hero_update_turn_tilt_speeds(void) {
     s8 *hero;
-    s8 *heroA;
-    s8 *heroB;
+    s8 *hero_a;
+    s8 *hero_b;
 
-    s32 stateB;
-    s32 stateA;
-    s8 *camBlock;
-    s8 *heroBase;
-    f32 probeValue;
+    s32 state_b;
+    s32 state_a;
+    s8 *cam_block;
+    s8 *hero_base;
+    f32 probe_value;
 
     hero = g_hero_state;
     if ((*(u8 *)((char *)(hero) + (0x22B4))) == 0) {
@@ -49,19 +49,19 @@ void hero_update_turn_tilt_speeds(void) {
         (*(f32 *)((char *)(hero) + (0x25C))) = 0.7f;
         (*(f32 *)((char *)(hero) + (0x260))) = 0.45f;
     }
-    stateB = (*(s32 *)((char *)(hero) + (0x229C)));
-    if (stateB == 4) {
-        heroA = g_hero_state;
-        if ((*(s16 *)((char *)(heroA) + (0x4AC))) < (*(s32 *)((char *)(heroA) + (0x1B8))) && (*(u8 *)((char *)(heroA) + (0x49E))) == 0) {
-            (*(f32 *)((char *)(heroA) + (0x25C))) = (*(f32 *)((char *)(heroA) + (0x4B8)));
+    state_b = (*(s32 *)((char *)(hero) + (0x229C)));
+    if (state_b == 4) {
+        hero_a = g_hero_state;
+        if ((*(s16 *)((char *)(hero_a) + (0x4AC))) < (*(s32 *)((char *)(hero_a) + (0x1B8))) && (*(u8 *)((char *)(hero_a) + (0x49E))) == 0) {
+            (*(f32 *)((char *)(hero_a) + (0x25C))) = (*(f32 *)((char *)(hero_a) + (0x4B8)));
         }
     } else {
-        stateA = (*(s32 *)((char *)(hero) + (0x2294)));
-        if (stateA == 6) {
+        state_a = (*(s32 *)((char *)(hero) + (0x2294)));
+        if (state_a == 6) {
             (*(f32 *)((char *)(hero) + (0x25C))) = 0.5f;
-        } else if (stateA == 4) {
+        } else if (state_a == 4) {
             (*(f32 *)((char *)(hero) + (0x258))) = 0.35000002f;
-        } else if ((u32)(stateB - 0x11) < 2U) {
+        } else if ((u32)(state_b - 0x11) < 2U) {
             (*(s32 *)((char *)(hero) + (0x25C))) = 0;
             (*(s32 *)((char *)(hero) + (0x258))) = 0;
         } else {
@@ -76,12 +76,12 @@ void hero_update_turn_tilt_speeds(void) {
             }
         }
     }
-    heroB = g_hero_state;
-    if ((*(u8 *)((char *)(heroB) + (0x287))) == 0 || (*(s32 *)((char *)(heroB) + (0x22A4))) == 0x12 || (*(s32 *)((char *)(heroB) + (0x22B0))) == 0x12 || ((*(u8 *)((char *)(heroB) + (0x22B4))) == 0 && (*(f32 *)((char *)(heroB) + (0x254))) < 0.53f) || (*(s32 *)((char *)(heroB) + (0x229C))) == 0x11 || (*(u8 *)((char *)(heroB) + (0x1494))) != 0 || ((probeValue = ref_L04_002D9780_00(heroB + 0x240, heroB + 0x80, hero, stateB)), ((*(f32 *)((char *)(heroB) + (0x264))) * 0.5f) < probeValue)) {
-        camBlock = D_0018A070;
-        heroBase = camBlock - 0x250;
-        ref_L04_002D9780_01(camBlock, (*(f32 *)((char *)(heroBase) + (0x258))), 0.02f);
-        ref_L04_002D9780_01(camBlock + 4, (*(f32 *)((char *)(heroBase) + (0x25C))), 0.02f);
-        ref_L04_002D9780_02(camBlock + 0x14, camBlock + 0x18, (*(f32 *)((char *)(heroBase) + (0x260))), 0.02f, 0.3f, 0.066666670143604278564453125f);
+    hero_b = g_hero_state;
+    if ((*(u8 *)((char *)(hero_b) + (0x287))) == 0 || (*(s32 *)((char *)(hero_b) + (0x22A4))) == 0x12 || (*(s32 *)((char *)(hero_b) + (0x22B0))) == 0x12 || ((*(u8 *)((char *)(hero_b) + (0x22B4))) == 0 && (*(f32 *)((char *)(hero_b) + (0x254))) < 0.53f) || (*(s32 *)((char *)(hero_b) + (0x229C))) == 0x11 || (*(u8 *)((char *)(hero_b) + (0x1494))) != 0 || ((probe_value = ref_L04_002D9780_00(hero_b + 0x240, hero_b + 0x80, hero, state_b)), ((*(f32 *)((char *)(hero_b) + (0x264))) * 0.5f) < probe_value)) {
+        cam_block = D_0018A070;
+        hero_base = cam_block - 0x250;
+        ref_L04_002D9780_01(cam_block, (*(f32 *)((char *)(hero_base) + (0x258))), 0.02f);
+        ref_L04_002D9780_01(cam_block + 4, (*(f32 *)((char *)(hero_base) + (0x25C))), 0.02f);
+        ref_L04_002D9780_02(cam_block + 0x14, cam_block + 0x18, (*(f32 *)((char *)(hero_base) + (0x260))), 0.02f, 0.3f, 0.066666670143604278564453125f);
     }
 }

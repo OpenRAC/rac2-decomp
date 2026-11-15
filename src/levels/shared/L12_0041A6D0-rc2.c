@@ -28,19 +28,19 @@ extern s8 g_music_state[];
 
 /* Tries to claim the single attack turn: if nobody has it, records this enemy and starts a delay taken from its table. Returns 1 on success. */
 s32 enemy_claim_attack_turn(s8 *moby, u32 slot) {
-    s8 *turnState;
+    s8 *turn_state;
     s8 *vars;
     s32 delay;
 
-    turnState = g_music_state;
-    if ((*(s32 *)(turnState + 0x68) == 0) && (*(s32 *)(turnState + 0x24) == -1)) {
+    turn_state = g_music_state;
+    if ((*(s32 *)(turn_state + 0x68) == 0) && (*(s32 *)(turn_state + 0x24) == -1)) {
         vars = *(s8 **)(moby + 0x68);
         if (slot >= 10) {
             return 0;
         }
         delay = *(s32 *)(vars + (slot << 2) + 0x230);
-        *(s8 **)(turnState + 0x28) = moby;
-        *(s32 *)(turnState + 0x24) = delay + 0x7D0;
+        *(s8 **)(turn_state + 0x28) = moby;
+        *(s32 *)(turn_state + 0x24) = delay + 0x7D0;
         return 1;
     }
     return 0;

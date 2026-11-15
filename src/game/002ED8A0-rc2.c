@@ -30,7 +30,7 @@ extern s8 D_00262958[];
 s32 table_find_last_used_entry(s32 index) {
     s32 table;
     s32 offset;
-    s8 *nextBase;
+    s8 *next_base;
     s32 stride ;
     s32 cur;
     s32 last ;
@@ -39,7 +39,7 @@ s32 table_find_last_used_entry(s32 index) {
     last = -1;
     table = (s32)D_00262958;
     stride = 0x28;
-    nextBase = (s8 *)(table - 0x14);
+    next_base = (s8 *)(table - 0x14);
     for (;;) {
         if (cur < 0) {
             goto done;
@@ -50,7 +50,7 @@ s32 table_find_last_used_entry(s32 index) {
             return last;
         }
         last = cur;
-        cur = *(s32 *)(offset + (s32)nextBase);
+        cur = *(s32 *)(offset + (s32)next_base);
     }
 done:
     return last;

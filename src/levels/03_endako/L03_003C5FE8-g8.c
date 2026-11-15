@@ -30,17 +30,17 @@ void rotor_update(char *moby)
         state->fade = 1.0f;
         break;
     case 1: {
-        f32 angleScale = 0.000290888245f;
-        f32 *speedTable = D_L03_001B0058;
-        f32 *wobbleAngle = state->wobble;
+        f32 angle_scale = 0.000290888245f;
+        f32 *speed_table = D_L03_001B0058;
+        f32 *wobble_angle = state->wobble;
         s32 i;
 
-        state->spin = FastAddRotations(state->spin, D_L03_001B0050 * angleScale);
-        state->roll = FastAddRotations(state->roll, D_L03_001B0054 * angleScale);
+        state->spin = FastAddRotations(state->spin, D_L03_001B0050 * angle_scale);
+        state->roll = FastAddRotations(state->roll, D_L03_001B0054 * angle_scale);
         for (i = 1; i >= 0; i--) {
-            *wobbleAngle = FastAddRotations(*wobbleAngle, *speedTable * 0.000290888245f);
-            wobbleAngle++;
-            speedTable++;
+            *wobble_angle = FastAddRotations(*wobble_angle, *speed_table * 0.000290888245f);
+            wobble_angle++;
+            speed_table++;
         }
         gfx_add_draw_callback_first(rotor_draw, self);
         if (flag_is_third_pending_set(self) != 0) {
@@ -54,18 +54,18 @@ void rotor_update(char *moby)
     }
     }
     if (*(u8 *)(self + 0x20) == 1) {
-        char *soundSlot = D_L03_00188660 + state->slot * 0x70;
+        char *sound_slot = D_L03_00188660 + state->slot * 0x70;
 
-        if (*(char **)(soundSlot + 0x88) != self || *(u8 *)(soundSlot + 0x74) == 0)
+        if (*(char **)(sound_slot + 0x88) != self || *(u8 *)(sound_slot + 0x74) == 0)
             state->slot = PlayMobySound(0, 4, self);
     } else {
-        s32 slotIndex = state->slot;
+        s32 slot_index = state->slot;
 
-        if (slotIndex != -1) {
-            char *soundSlot = D_L03_00188660 + slotIndex * 0x70;
+        if (slot_index != -1) {
+            char *sound_slot = D_L03_00188660 + slot_index * 0x70;
 
-            if (*(char **)(soundSlot + 0x88) == self && *(u8 *)(soundSlot + 0x74) != 0)
-                snd_stop_voice(slotIndex);
+            if (*(char **)(sound_slot + 0x88) == self && *(u8 *)(sound_slot + 0x74) != 0)
+                snd_stop_voice(slot_index);
         }
         state->slot = -1;
     }

@@ -30,9 +30,9 @@ extern s32 D_001A74C0 __attribute__((sda));
 
 /* Counts one more queued sound command and then runs the sound update. */
 void snd_commit_queued_command(void) {
-    s32 *countPtr;
+    s32 *count_ptr;
 
-    countPtr = *(s32 *)((s32) ((s8 *) ((D_001A74C0 * 4)) + (s32) (&D_001A74A0)));
-    *countPtr += 1;
+    count_ptr = *(s32 *)((s32) ((s8 *) ((D_001A74C0 * 4)) + (s32) (&D_001A74A0)));
+    *count_ptr += 1;
     snd_Pump();
 }

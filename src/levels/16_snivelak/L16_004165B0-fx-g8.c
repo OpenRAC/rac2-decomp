@@ -61,7 +61,7 @@ void snivelak_turret_update(char *self) {
     char *vars = P(self, 0x68), *hit;
     float angle;
     int state;
-    Global *heroView;
+    Global *hero_view;
     switch (B(self, 0x20)) {
     case 0:
         if (I(vars, 0x60) == -1) {
@@ -82,9 +82,9 @@ void snivelak_turret_update(char *self) {
         if (func_00321930(self))
             func_00357288(3, 0, self);
         state = B(self, 0x20);
-        if ((state == 4 && g_hero_state.target != self) || ((heroView = &g_hero_state), H(heroView, 0x34e) >= 20))
+        if ((state == 4 && g_hero_state.target != self) || ((hero_view = &g_hero_state), H(hero_view, 0x34e) >= 20))
             B(self, 0x20) = 1;
-        else if (state == 1 && heroView->target == self && heroView->active) {
+        else if (state == 1 && hero_view->target == self && hero_view->active) {
             func_002E7968(buf, (char *)&D_L16_001B1A80, self + 0xc0);
             func_002E7488(buf, buf, self + 0x10);
             func_002B9578(buf, self + 0xf0, 0x31, 0);

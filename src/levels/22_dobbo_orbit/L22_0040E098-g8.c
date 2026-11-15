@@ -43,7 +43,7 @@ void part_update_scrolling_effect(u8 *obj) {
     float direction[4];
     u8 *vars = *(u8 **)(obj + 0x68);
     float phase;
-    float phaseStep;
+    float phase_step;
     float size;
 
     *(TI128 *)direction = 0;
@@ -53,9 +53,9 @@ void part_update_scrolling_effect(u8 *obj) {
     if (phase <= -8.0f) {
         *(float *)(vars + 0x14) = phase + 8.0f;
     }
-    phaseStep = func_002F3BC8(vars);
+    phase_step = func_002F3BC8(vars);
     size = D_L22_001B11EC * 0.2f;
-    *(float *)(vars + 0x18) = *(float *)(vars + 0x18) + phaseStep;
+    *(float *)(vars + 0x18) = *(float *)(vars + 0x18) + phase_step;
     func_002F2BB8(obj + 0x10, 0x31, D_L22_001B11C8, 1, size, 0.0f, func_0031FDE8());
     func_002F2BB8(obj + 0x10, 0x31, D_L22_001B11CC, 1, D_L22_001B11EC * 0.1f, 0.0f, func_0031FDE8());
     func_002F2BB8(obj + 0x10, 0x2F, D_L22_001B11D0, 1, D_L22_001B11EC * 0.05f, 0.0f, func_0031FDE8());

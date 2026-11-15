@@ -30,14 +30,14 @@ extern void ref_L00_003BCDC0_01(s32, void *);
 /* Finds every sprite record owned by this moby and passes it to a helper. */
 void spark_process_owned_records(s32 owner) {
     s8 *record;
-    s8 *tableEnd;
+    s8 *table_end;
 
     record = ref_L00_003BCDC0_00;
-    tableEnd = record + 0xB00;
+    table_end = record + 0xB00;
     do {
         if (*(s32 *)(record + 0xA0) == owner) {
             ref_L00_003BCDC0_01(owner, record);
         }
         record += 0xB0;
-    } while ((s32) record < (s32) tableEnd);
+    } while ((s32) record < (s32) table_end);
 }

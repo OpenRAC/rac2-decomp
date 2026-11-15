@@ -45,57 +45,57 @@ extern char D_L02_001A9420[8] __attribute__((sda));
    div.s, which has no label in front of it, stays unpadded. */
 /* During the intro cutscene, shows the timed picture overlays and fades them into each other. */
 void cutscene_draw_intro_overlays(void *unused) {
-    L02_Table10 frameTable;
-    int tableIndex, fadeFrame, alpha, overlayId, fadeOutId, extra;
-    float fadeFraction;
+    L02_Table10 frame_table;
+    int table_index, fade_frame, alpha, overlay_id, fade_out_id, extra;
+    float fade_fraction;
 
     if (g_current_map_index == 2) {
         int first_end = 0x136, second_end = 0x17C, third_end = 0x190;
 
-        frameTable = D_L02_001A9460;
+        frame_table = D_L02_001A9460;
         if (D_L02_001BE200.time >= 0x10B) {
             if (D_L02_001BE200.time < 0x115) {
-                tableIndex = D_L02_001BE200.time - 0x10B;
-                if (tableIndex < 10)
-                    D_L02_001B2FE4 = frameTable.v[tableIndex];
+                table_index = D_L02_001BE200.time - 0x10B;
+                if (table_index < 10)
+                    D_L02_001B2FE4 = frame_table.v[table_index];
             }
         }
-        overlayId = -1;
-        fadeOutId = -1;
+        overlay_id = -1;
+        fade_out_id = -1;
         alpha = 0x80;
         extra = 0;
         if (D_L02_001BE200.time > 0 && D_L02_001BE200.time <= first_end) {
-            fadeFrame = D_L02_001BE200.time - 0x10E;
-            overlayId = 0x46;
-            if (fadeFrame > 0) {
-                overlayId = 0x47;
-                fadeFraction = IntToFloat(fadeFrame);
-                fadeFraction = fadeFraction / IntToFloat(0x28);
-                fadeOutId = 0x46;
-                alpha = FloatToInt(fadeFraction * 127.0f);
+            fade_frame = D_L02_001BE200.time - 0x10E;
+            overlay_id = 0x46;
+            if (fade_frame > 0) {
+                overlay_id = 0x47;
+                fade_fraction = IntToFloat(fade_frame);
+                fade_fraction = fade_fraction / IntToFloat(0x28);
+                fade_out_id = 0x46;
+                alpha = FloatToInt(fade_fraction * 127.0f);
             }
         } else if (D_L02_001BE200.time > first_end && D_L02_001BE200.time <= second_end) {
-            overlayId = 0x47;
+            overlay_id = 0x47;
         } else if (D_L02_001BE200.time > second_end && D_L02_001BE200.time < third_end) {
             extra = math_random_int_range(0, 3);
-            overlayId = 0x49;
+            overlay_id = 0x49;
         } else if (D_L02_001BE200.time > third_end && D_L02_001BE200.time < 0x1B5) {
-            fadeFrame = D_L02_001BE200.time - 0x1A1;
-            overlayId = 0x48;
-            if (fadeFrame > 0) {
-                fadeFraction = IntToFloat(fadeFrame);
-                fadeFraction = fadeFraction / IntToFloat(0xF);
-                alpha = 0x7F - FloatToInt(fadeFraction * 127.0f);
+            fade_frame = D_L02_001BE200.time - 0x1A1;
+            overlay_id = 0x48;
+            if (fade_frame > 0) {
+                fade_fraction = IntToFloat(fade_frame);
+                fade_fraction = fade_fraction / IntToFloat(0xF);
+                alpha = 0x7F - FloatToInt(fade_fraction * 127.0f);
             }
             if (alpha < 0)
                 alpha = 0;
         }
-        if (overlayId != -1) {
-            if (fadeOutId == -1 || overlayId == fadeOutId) {
-                DrawQuadWithRotatedUVs(D_L02_001A9420, overlayId, 0, (alpha << 24) | 0x808080, extra);
+        if (overlay_id != -1) {
+            if (fade_out_id == -1 || overlay_id == fade_out_id) {
+                DrawQuadWithRotatedUVs(D_L02_001A9420, overlay_id, 0, (alpha << 24) | 0x808080, extra);
             } else {
-                DrawQuadWithRotatedUVs(D_L02_001A9420, overlayId, 0, (alpha << 24) | 0x808080, extra);
-                DrawQuadWithRotatedUVs(D_L02_001A9420, fadeOutId, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(D_L02_001A9420, overlay_id, 0, (alpha << 24) | 0x808080, extra);
+                DrawQuadWithRotatedUVs(D_L02_001A9420, fade_out_id, 0, ((0x7F - alpha) << 24) | 0x808080, extra);
             }
         }
     }

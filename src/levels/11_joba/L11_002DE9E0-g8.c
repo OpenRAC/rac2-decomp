@@ -18,25 +18,25 @@ extern f32 D_L11_001AEC40 __attribute__((sda));
 /* Scales the state's vector by the level's factor, clamps its timer to the state's
    limit, and runs the two animation angles through the engine's wrap function. */
 /* Updates a falling, swinging piece of debris: it slows down, drops and spins. */
-void debris_update_falling_piece(u8 *mobyArg) {
-    u8 *moby = mobyArg;
+void debris_update_falling_piece(u8 *moby_arg) {
+    u8 *moby = moby_arg;
     u8 *vars = *(u8 **)(moby + 0x68);
-    f32 valueA, valueB, fallSpeed, minFall;
+    f32 value_a, value_b, fall_speed, minFall;
 
     FastVecAdd((f32 *)(moby + 0x10), (f32 *)(moby + 0x10), (f32 *)vars);
-    fallSpeed = *(f32 *)(vars + 0x8) - 0.0041666667f;
-    valueA = *(f32 *)(vars + 0x0) * D_L11_001AEC40;
-    valueB = *(f32 *)(vars + 0x4) * D_L11_001AEC40;
+    fall_speed = *(f32 *)(vars + 0x8) - 0.0041666667f;
+    value_a = *(f32 *)(vars + 0x0) * D_L11_001AEC40;
+    value_b = *(f32 *)(vars + 0x4) * D_L11_001AEC40;
     minFall = *(f32 *)(vars + 0x20);
-    *(f32 *)(vars + 0x8) = fallSpeed;
-    *(f32 *)(vars + 0x0) = valueA;
-    *(f32 *)(vars + 0x4) = valueB;
-    if (fallSpeed < minFall)
+    *(f32 *)(vars + 0x8) = fall_speed;
+    *(f32 *)(vars + 0x0) = value_a;
+    *(f32 *)(vars + 0x4) = value_b;
+    if (fall_speed < minFall)
         *(f32 *)(vars + 0x8) = minFall;
     *(f32 *)(moby + 0xF8) = FastAddRotations(*(f32 *)(moby + 0xF8), *(f32 *)(vars + 0x28));
     *(f32 *)(moby + 0xF0) = FastAddRotations(*(f32 *)(moby + 0xF0), *(f32 *)(vars + 0x2C) * (f32)*(s32 *)(vars + 0x24));
-    valueA = math_fabs(*(f32 *)(moby + 0xF0));
-    if (valueA > 0.78539824f)
+    value_a = math_fabs(*(f32 *)(moby + 0xF0));
+    if (value_a > 0.78539824f)
         *(s32 *)(vars + 0x24) = -*(s32 *)(vars + 0x24);
     if (math_fast_float_d(vars + 0x1C) != 0) {
         moby_mark_spawned(moby);

@@ -26,7 +26,7 @@ char *hero_l19_find_aim_target(char *obj,Vec *origin,float *yaw,float *pitch) {
     struct { Vec origin,offset,player; char *disabled[128]; Vec target,aim,ray,axis; } frame;
     Vec *start=&frame.origin;
     char *ctx=*(char **)(obj+0x68),*selected,*candidate,*definition,*hit;
-    Vec *pos; int disabledCount,candidateIndex,accepted,visible,tries,i;
+    Vec *pos; int disabled_count,candidate_index,accepted,visible,tries,i;
     float best=D_L19_001B0384,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
     FastVecScale(&frame.offset,g_hero_state.object+0xE0,0.5f);
@@ -36,11 +36,11 @@ char *hero_l19_find_aim_target(char *obj,Vec *origin,float *yaw,float *pitch) {
         qcopy(start,&D_L19_001BFEA0);
         return 0;
     }
-    disabledCount=0; candidateIndex=0;
-    while((candidate=g_moby_pointer_list[candidateIndex])!=0) {
+    disabled_count=0; candidate_index=0;
+    while((candidate=g_moby_pointer_list[candidate_index])!=0) {
         if(*(unsigned char *)(candidate+0x20)==0xFE) goto next;
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
-        if(*(short *)(candidate+0xAA)==0xE7D /* Sheep */ || *(short *)(candidate+0xAA)==0xEB0 /* Dark Sheep */) goto next;
+        if(*(short *)(candidate+0xAA)==MOBY_CLASS_SHEEP || *(short *)(candidate+0xAA)==MOBY_CLASS_DARK_SHEEP) goto next;
         { Vec *t=&frame.target; qcopy(t,candidate+0x10); }
         definition=moby_get_private_value_0(candidate);
         if(!definition || *(unsigned char *)(definition+0xE)==3) goto next;
@@ -91,9 +91,9 @@ char *hero_l19_find_aim_target(char *obj,Vec *origin,float *yaw,float *pitch) {
                 col=&D_L19_001BFE80;
                 hit=col->hit;
                 if(hit) {
-                    if(*(short *)(hit+0xAA)==0xE7D /* Sheep */ || *(short *)(hit+0xAA)==0xEB0 /* Dark Sheep */) {
-                        frame.disabled[disabledCount++]=hit; *(int *)(hit+0x98)=0;
-                        if(disabledCount>127) break;
+                    if(*(short *)(hit+0xAA)==MOBY_CLASS_SHEEP || *(short *)(hit+0xAA)==MOBY_CLASS_DARK_SHEEP) {
+                        frame.disabled[disabled_count++]=hit; *(int *)(hit+0x98)=0;
+                        if(disabled_count>127) break;
                         qcopy(&frame.ray,&col->point);
                         continue;
                     }
@@ -104,8 +104,8 @@ char *hero_l19_find_aim_target(char *obj,Vec *origin,float *yaw,float *pitch) {
             if(visible) { *pitch=-elevation; best=distance; if(delta<0.17453295f) *yaw=heading; selected=candidate; if(candidate==*(char **)(ctx+0x10)) return selected; }
         }
 next:
-        ++candidateIndex;
+        ++candidate_index;
     }
-    for(i=0;i<disabledCount;++i) { char *m=frame.disabled[i]; *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10); }
+    for(i=0;i<disabled_count;++i) { char *m=frame.disabled[i]; *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10); }
     return selected;
 }

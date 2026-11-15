@@ -28,20 +28,20 @@ extern TI128 D_L07_001BF660;
 /* Fires a beam from the boss toward its target: works out the line, stops it at the first thing in the way, and spawns the beam object. */
 void boss_fire_beam_attack(u8 *moby)
 {
-    TI128 beamPoints[3];
+    TI128 beam_points[3];
     u8 *vars;
     f32 distance;
 
     vars = *(u8 **)(moby + 0x68);
     PlayMobySound(1, 0, moby);
-    moby_transform_joint_to_world(moby, 0, &beamPoints[0]);
-    moby_get_pos_rel_parent(moby, &beamPoints[2]);
-    FastVecSub(&beamPoints[1], &beamPoints[2], &beamPoints[0]);
-    distance = FastVecLength(&beamPoints[1]);
-    vec_scale_to_length(&beamPoints[1], &beamPoints[1], distance + 2.0f);
-    FastVecAdd(&beamPoints[1], &beamPoints[1], &beamPoints[0]);
-    if (CollLine(&beamPoints[0], &beamPoints[1], 2, moby, 0) != 0) {
-        beamPoints[1] = D_L07_001BF660;
+    moby_transform_joint_to_world(moby, 0, &beam_points[0]);
+    moby_get_pos_rel_parent(moby, &beam_points[2]);
+    FastVecSub(&beam_points[1], &beam_points[2], &beam_points[0]);
+    distance = FastVecLength(&beam_points[1]);
+    vec_scale_to_length(&beam_points[1], &beam_points[1], distance + 2.0f);
+    FastVecAdd(&beam_points[1], &beam_points[1], &beam_points[0]);
+    if (CollLine(&beam_points[0], &beam_points[1], 2, moby, 0) != 0) {
+        beam_points[1] = D_L07_001BF660;
     }
-    beam_spawn(moby, *(s32 *)(vars + 0x418), &beamPoints[0], &beamPoints[1], (f32)*(u8 *)(vars + 0x34));
+    beam_spawn(moby, *(s32 *)(vars + 0x418), &beam_points[0], &beam_points[1], (f32)*(u8 *)(vars + 0x34));
 }

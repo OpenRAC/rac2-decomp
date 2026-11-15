@@ -28,7 +28,7 @@ void enemy_count_trigger_update(unsigned char *object) {
             int kind;
             for (entry = D_L02_001B35A8[0]; entry; entry = *(char **)(entry + 0x28)) {
                 kind = *(short *)(entry + 0xAA);
-                if ((kind == 0xA9C /* Slot Machine */ || kind == 0xD0D /* moby class 3341 */ || kind == 0xAA4 /* moby class 2724 */ || kind == 0xE93 /* moby class 3731 */ || kind == 0x1259 /* moby class 4697 */) && *(float *)(entry + 0x18) < 400.0f)
+                if ((kind == MOBY_CLASS_SLOT_MACHINE || kind == 0xD0D /* moby class 3341 */ || kind == 0xAA4 /* moby class 2724 */ || kind == 0xE93 /* moby class 3731 */ || kind == 0x1259 /* moby class 4697 */) && *(float *)(entry + 0x18) < 400.0f)
                     ++g_hovering_object_count;
             }
         } else if (g_current_map_index[0] == 3) {

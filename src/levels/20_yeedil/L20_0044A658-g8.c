@@ -25,7 +25,7 @@ void turret_update_health_aim(char *moby) {
     char *state;
     char *hit;
     u32 *hitter;
-    short hitClass;
+    short hit_class;
     float damage;
 
     state = *(char **)(moby + 0x68);
@@ -45,8 +45,8 @@ void turret_update_health_aim(char *moby) {
     if (hit != 0) {
         hitter = *(u32 **)(hit + 0x20);
         if (hitter != 0) {
-            hitClass = *(short *)((char *)hitter + 0xAA);
-            if (hitClass == 0x12F2 /* moby class 4850 */ || hitClass == 0x12EF /* moby class 4847 */) {
+            hit_class = *(short *)((char *)hitter + 0xAA);
+            if (hit_class == 0x12F2 /* moby class 4850 */ || hit_class == 0x12EF /* moby class 4847 */) {
                 hit = 0;
             }
         }

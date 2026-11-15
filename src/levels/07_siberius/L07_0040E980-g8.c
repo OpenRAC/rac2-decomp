@@ -39,7 +39,7 @@ void ship_start_chain(u8 *moby)
     s32 i;
     u16 *entry;
     u8 *member;
-    u8 *memberVars;
+    u8 *member_vars;
 
     base = D_L07_001FDEC0[*(s32 *)(state + 0x90)];
     inv = 1.0f / fast_vec_dist(base + 0x10, base + 0x20);
@@ -69,11 +69,11 @@ void ship_start_chain(u8 *moby)
                     *(u16 *)(member + 0x34) |= 1;
                     member[0x31] = 0;
                     *(f32 *)(member + 0x2C) = *(f32 *)(*(u8 **)(member + 0x24) + 0x24) * scale;
-                    memberVars = *(u8 **)(member + 0x68);
+                    member_vars = *(u8 **)(member + 0x68);
                     *(u16 *)(member + 0x34) |= 0x22;
-                    *(u8 **)(memberVars + 8) = memberVars + 0x20;
-                    *(s32 *)(memberVars + 0x5C) = 2;
-                    *(TI128 *)(memberVars + 0x40) = *(TI128 *)(member + 0xF0);
+                    *(u8 **)(member_vars + 8) = member_vars + 0x20;
+                    *(s32 *)(member_vars + 0x5C) = 2;
+                    *(TI128 *)(member_vars + 0x40) = *(TI128 *)(member + 0xF0);
                     ((SiberiusChain *)state)->times[i] =
                         ((SiberiusChain *)state)->times[i - 1] + D_L07_001B1770[i];
                     ((SiberiusChain *)state)->ents[i] = member;

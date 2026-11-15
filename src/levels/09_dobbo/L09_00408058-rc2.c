@@ -25,48 +25,48 @@
 #include "common.h"
 
 /* Switches parts of an object on or off by setting its flag bits and model: each of the three modes turns something on if positive, off if negative. */
-void dobbo_set_mode_flags(void *obj, s32 modeA, s32 modeB, s32 modeC) {
+void dobbo_set_mode_flags(void *obj, s32 mode_a, s32 mode_b, s32 mode_c) {
     u16 flags;
-    u16 newFlags;
-    u16 newFlags2 ;
-    s32 stateByte ;
-    void *classInfo;
-    void *classInfo2;
-    void *classInfo3;
+    u16 new_flags;
+    u16 new_flags2 ;
+    s32 state_byte ;
+    void *class_info;
+    void *class_info2;
+    void *class_info3;
 
     if ((obj != 0) &&
-        (stateByte = (*(u8 *)((s8 *)(obj) + (0x20))), stateByte != 0xFE) &&
-        (stateByte != 0xFD)) {
-        if ((modeA != 0) &&
-            ((classInfo = (*(void **)((s8 *)(obj) + (0x24))), classInfo == 0) ||
-             ((*(s16 *)((s8 *)(classInfo) + (0x46))) != 0x12))) {
+        (state_byte = (*(u8 *)((s8 *)(obj) + (0x20))), state_byte != 0xFE) &&
+        (state_byte != 0xFD)) {
+        if ((mode_a != 0) &&
+            ((class_info = (*(void **)((s8 *)(obj) + (0x24))), class_info == 0) ||
+             ((*(s16 *)((s8 *)(class_info) + (0x46))) != 0x12))) {
             flags = (*(u16 *)((s8 *)(obj) + (0x34)));
-            if (modeA > 0) {
-                newFlags = flags & 0xFFFD;
+            if (mode_a > 0) {
+                new_flags = flags & 0xFFFD;
             } else {
-                newFlags = flags | 2;
+                new_flags = flags | 2;
             }
-            (*(u16 *)((s8 *)(obj) + (0x34))) = newFlags;
+            (*(u16 *)((s8 *)(obj) + (0x34))) = new_flags;
         }
-        if ((modeB != 0) &&
+        if ((mode_b != 0) &&
             ((obj == 0) ||
-             ((classInfo2 = (*(void **)((s8 *)(obj) + (0x24))), classInfo2 == 0) ||
-              ((*(s16 *)((s8 *)(classInfo2) + (0x46))) != 0x12)))) {
-            stateByte = 1;
-            if (modeB > 0) {
-                (*(s8 *)((s8 *)(obj) + (0x31))) = stateByte;
-                newFlags2 = (*(u16 *)((s8 *)(obj) + (0x34))) & 0xFFFE;
+             ((class_info2 = (*(void **)((s8 *)(obj) + (0x24))), class_info2 == 0) ||
+              ((*(s16 *)((s8 *)(class_info2) + (0x46))) != 0x12)))) {
+            state_byte = 1;
+            if (mode_b > 0) {
+                (*(s8 *)((s8 *)(obj) + (0x31))) = state_byte;
+                new_flags2 = (*(u16 *)((s8 *)(obj) + (0x34))) & 0xFFFE;
             } else {
                 (*(s8 *)((s8 *)(obj) + (0x31))) = 0;
-                newFlags2 = (*(u16 *)((s8 *)(obj) + (0x34))) | 1;
+                new_flags2 = (*(u16 *)((s8 *)(obj) + (0x34))) | 1;
             }
-            (*(u16 *)((s8 *)(obj) + (0x34))) = newFlags2;
+            (*(u16 *)((s8 *)(obj) + (0x34))) = new_flags2;
         }
-        if (modeC != 0) {
-            classInfo3 = (*(void **)((s8 *)(obj) + (0x24)));
-            if (classInfo3 != 0) {
-                if (modeC > 0) {
-                    (*(s32 *)((s8 *)(obj) + (0x98))) = (s32)(*(s32 *)((s8 *)(classInfo3) + (0x10)));
+        if (mode_c != 0) {
+            class_info3 = (*(void **)((s8 *)(obj) + (0x24)));
+            if (class_info3 != 0) {
+                if (mode_c > 0) {
+                    (*(s32 *)((s8 *)(obj) + (0x98))) = (s32)(*(s32 *)((s8 *)(class_info3) + (0x10)));
                     return;
                 }
                 (*(s32 *)((s8 *)(obj) + (0x98))) = 0;

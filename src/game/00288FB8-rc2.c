@@ -29,14 +29,14 @@ extern s32 D_001A8D18;
 extern s32 D_001A8D28 __attribute__((sda));
 extern s32 g_subtitle_entries;
 
-s32 GetLocalizedString(s32 stringId) {
+s32 GetLocalizedString(s32 string_id) {
     s32 index;
 
-    index = Help_FindIndex(stringId);
+    index = Help_FindIndex(string_id);
     if (index >= 0) {
         return *(s32 *)(g_subtitle_entries + index * 0x10);
     }
-    if (stringId == 0x9C40) {
+    if (string_id == 0x9C40) {
         return D_001A8D18;
     }
     return (s32)&D_001A8D28;

@@ -195,7 +195,7 @@ void UpdateScopedWeapon(u8 *moby)
         break;
     }
     case 1: {
-        float zoomBlend;
+        float zoom_blend;
         if (HERO->i[0x2294 / 4] == 1)
             hero_l00_set_action(0x1D, 1);
         fire = 1;
@@ -256,10 +256,10 @@ void UpdateScopedWeapon(u8 *moby)
                 gfx_update_frame_time_scales(1);
             }
         }
-        zoomBlend = (st->zoom - 0.17453295f) / (st->zoom_max - 0.17453295f);
-        D_L00_001B15D0 = (D_L00_001AF614 - 0.03f) * zoomBlend + 0.03f;
-        D_L00_001B15D4 = (D_L00_001AF618 - 0.4f) * zoomBlend + 0.4f;
-        D_L00_001B15CC = (D_L00_001AF620 - 0.010471977f) * zoomBlend + 0.010471977f;
+        zoom_blend = (st->zoom - 0.17453295f) / (st->zoom_max - 0.17453295f);
+        D_L00_001B15D0 = (D_L00_001AF614 - 0.03f) * zoom_blend + 0.03f;
+        D_L00_001B15D4 = (D_L00_001AF618 - 0.4f) * zoom_blend + 0.4f;
+        D_L00_001B15CC = (D_L00_001AF620 - 0.010471977f) * zoom_blend + 0.010471977f;
         if (HERO->b[0x22BC] == 0 && (GAME->i[0x1A4 / 4] & HERO->i[0x1230 / 4]) && fire) {
             if (weapon_spend_ammo(-1, 1) != 0) {
                 start_equipped_item_animation();
@@ -315,7 +315,7 @@ void UpdateScopedWeapon(u8 *moby)
             if (st->light == -1)
                 st->light = gfx_add_point_light(15.0f, moby + 0x10, 0x7F608060, 0.0f);
             if (st->light >= 0) {
-                float flashFraction;
+                float flash_fraction;
                 if (HERO->h[0x24EC / 2] == 1) {
                     moby_transform_joint_to_world(moby, 0, muzzle);
                     vec_scale_to_length(offset, moby + 0xD0, -1.5f);
@@ -329,9 +329,9 @@ void UpdateScopedWeapon(u8 *moby)
                     FastVecAdd(positions[st->light], muzzle, offset);
                     lights = (MuzzleLight *)((char *)positions - 0x10);
                     lights[st->light].position[3] = 15.0f;
-                    flashFraction = IntToFloat(st->flash) / IntToFloat(30);
-                    lights[st->light].spread = flashFraction;
-                    lights[st->light].radius = flashFraction * 0.75f;
+                    flash_fraction = IntToFloat(st->flash) / IntToFloat(30);
+                    lights[st->light].spread = flash_fraction;
+                    lights[st->light].radius = flash_fraction * 0.75f;
                     lights[st->light].power = lights[st->light].radius;
                 }
             }

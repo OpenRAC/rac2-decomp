@@ -9,12 +9,12 @@ extern int func_0032F680(int);
 /* Picks which attack the enemy does next. It avoids repeating the same attack until all of them have been used. */
 void yeedil_boss_choose_attack(char *moby) {
     char *vars = *(char **)(moby + 0x68);
-    int mask, i, startIndex, forcedChoice;
+    int mask, i, start_index, forced_choice;
 
-    forcedChoice = D_L20_001B20CC;
+    forced_choice = D_L20_001B20CC;
     *(float *)(vars + 0x1838) = 50.0f;
-    if (forcedChoice) {
-        *(int *)(vars + 0x1834) = D_L20_001B20D8[forcedChoice - 1];
+    if (forced_choice) {
+        *(int *)(vars + 0x1834) = D_L20_001B20D8[forced_choice - 1];
         if (*(int *)(vars + 0x1834) == 10)
             *(float *)(vars + 0x1838) = 30.0f;
     } else if (*(int *)(vars + 0x183C) == 0x12D3) {
@@ -34,9 +34,9 @@ void yeedil_boss_choose_attack(char *moby) {
         }
         if (*(int *)(vars + 0x184C) & mask)
             mask = *(int *)(vars + 0x184C) & mask;
-        startIndex = func_0032F680(4);
+        start_index = func_0032F680(4);
         for (i = 0; i < 4; i++) {
-            int bit = 1 << ((startIndex + i) % 4);
+            int bit = 1 << ((start_index + i) % 4);
 
             if (bit & mask) {
                 *(int *)(vars + 0x184C) &= ~bit;

@@ -54,7 +54,7 @@ void extermibot_init_parts(u8 *moby) {
     F(s, 0x110) = 1.5707965f;
     if (W(s, 0x798) != -1) W(s, 0x13C) = W(s, 0x798);
 
-    CHILD(0x7C0) = CreateMoby(0xF0B /* Extermibot Torso */);
+    CHILD(0x7C0) = CreateMoby(MOBY_CLASS_EXTERMIBOT_TORSO);
     if (CHILD(0x7C0) == 0) goto fail;
     CHILD(0x7C0)[0x30] = moby[0x30];
     U(CHILD(0x7C0), 0x32) = U(moby, 0x32);

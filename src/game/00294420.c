@@ -21,7 +21,7 @@ extern int D_001A7A04 __attribute__((sda));
 /* Loads the given item into a cache slot that the hero is not using right now. */
 void LoadClassIntoFreeCacheSlot(int value)
 {
-    int primaryValue, secondValue, i, slotA, slotB;
+    int primary_value, second_value, i, slot_a, slot_b;
 
     if (load_is_class_cached(value))
         return;
@@ -30,37 +30,37 @@ void LoadClassIntoFreeCacheSlot(int value)
     i = 0;
     {
         CacheHero *hero = &g_hero_state;
-        int primaryIndex = hero->primary;
-        int secondIndex = D_001A7398;
-        CacheRecord *rec = &g_weapon_table[g_item_slot_to_record[primaryIndex]];
-        CacheRecord *rec2 = &g_weapon_table[g_item_slot_to_record[secondIndex]];
+        int primary_index = hero->primary;
+        int second_index = D_001A7398;
+        CacheRecord *rec = &g_weapon_table[g_item_slot_to_record[primary_index]];
+        CacheRecord *rec2 = &g_weapon_table[g_item_slot_to_record[second_index]];
 
-        primaryValue = rec->value;
-        secondValue = rec2->value;
+        primary_value = rec->value;
+        second_value = rec2->value;
     }
-    if (secondValue == primaryValue) {
+    if (second_value == primary_value) {
         CacheRecord *rec = &g_weapon_table[g_item_slot_to_record[D_001A7A04]];
 
-        secondValue = rec->value;
+        second_value = rec->value;
     }
-    slotB = -1;
-    if (primaryValue == value)
-        primaryValue = -1;
-    if (secondValue == value)
-        secondValue = -1;
-    slotA = -1;
+    slot_b = -1;
+    if (primary_value == value)
+        primary_value = -1;
+    if (second_value == value)
+        second_value = -1;
+    slot_a = -1;
     for (; i < 3; i++) {
         struct Table2 *cache = &D_00152CD0;
         /* A cache slot may be -1. Its word belongs to the preceding part of
            the complete table owner, not to slots[-1]. */
-        int slotValue = *(int *)((char *)&g_copy_setup_data + (0x4B40 + cache->slots[i] * 20));
+        int slot_value = *(int *)((char *)&g_copy_setup_data + (0x4B40 + cache->slots[i] * 20));
 
-        if (primaryValue == slotValue)
-            slotA = i;
-        if (secondValue == slotValue)
-            slotB = i;
+        if (primary_value == slot_value)
+            slot_a = i;
+        if (second_value == slot_value)
+            slot_b = i;
     }
-    for (i = 0; i == slotA || i == slotB; i++)
+    for (i = 0; i == slot_a || i == slot_b; i++)
         ;
     {
         CacheHero *hero = &g_hero_state;
@@ -68,13 +68,13 @@ void LoadClassIntoFreeCacheSlot(int value)
 
         if (cur) {
             struct Table2 *cache = &D_00152CD0;
-            int slotId = cache->slots[i];
+            int slot_id = cache->slots[i];
 
-            if (slotId != -1) {
+            if (slot_id != -1) {
                 struct Table1 *toc = &g_copy_setup_data;
                 CacheRecord *rec = &g_weapon_table[g_item_slot_to_record[cur]];
 
-                if (rec->value == toc->slots[slotId].w)
+                if (rec->value == toc->slots[slot_id].w)
                     hero->cur = 0;
             }
         }

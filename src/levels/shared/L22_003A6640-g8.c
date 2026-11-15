@@ -21,14 +21,14 @@ extern int FloatToInt(float);
 extern float IntToFloat(int);
 
 /* Spawns one particle near the object (or one of its sockets) with a random spread and speed, flying off at a random angle. */
-void part_spawn_scatter(char *object, int socketIndex, int override, float radius) {
+void part_spawn_scatter(char *object, int socket_index, int override, float radius) {
     float initial[4], point[4], velocity[4];
     float heading, speed, tilt, yaw;
     unsigned char *particle;
     unsigned char *data;
 
-    if (socketIndex != -1) {
-        moby_transform_joint_to_world(object, socketIndex, initial);
+    if (socket_index != -1) {
+        moby_transform_joint_to_world(object, socket_index, initial);
     } else {
         if (override != 0)
             qcopy(initial, &override);

@@ -53,13 +53,13 @@ extern int sceDmaPutEnv(void *);
  * volatile, as the hardware register it is.
  */
 /* Waits for a DMA channel to finish and reports a timeout if it takes too long. */
-void dma_wait_channel_done(void *channelReg) {
-    int pollsLeft = 0x1000000;
+void dma_wait_channel_done(void *channel_reg) {
+    int polls_left = 0x1000000;
 
-    while ((*(volatile int *)channelReg & 0x100) != 0) {
-        if (--pollsLeft < 0) {
+    while ((*(volatile int *)channel_reg & 0x100) != 0) {
+        if (--polls_left < 0) {
             r1_func_0011A6C8(r1_D_001534E0);
-            sceDmaPause(channelReg);
+            sceDmaPause(channel_reg);
         }
     }
 }
@@ -97,9 +97,9 @@ void mem_zero_fill_bytes(char *dst, int n) {
    channels. The in-range return comes first under 2.9-ee (the
    `>= 0xA` guard-first form matched 2.95.3 and is 21/40 here). */
 /* Returns the register block of a DMA channel, or 0 if the number is too big. */
-int sceDmaGetChan(unsigned int channelId) {
-    if (channelId < 0xA) {
-        return r1_D_00132E70[channelId];
+int sceDmaGetChan(unsigned int channel_id) {
+    if (channel_id < 0xA) {
+        return r1_D_00132E70[channel_id];
     }
     return 0;
 }
@@ -107,32 +107,32 @@ int sceDmaGetChan(unsigned int channelId) {
 /* rac1-decomp src/core/00123168.c: func_00123308 */
 /* Resets all DMA channels and the DMA status, then sets a clean DMA setup. */
 int sceDmaReset(int mode) {
-    char envBuf[0x14];
-    int dmaEnabled;
+    char env_buf[0x14];
+    int dma_enabled;
     int i;
 
-    dmaEnabled = D_CTRL & 1;
+    dma_enabled = D_CTRL & 1;
 
     for (i = 0; i < 10; i++) {
         if (r1_D_001534F8[i] != 0) {
-            int *chanRegs = (int *)r1_D_00132E70[i];
-            chanRegs[0] = 0;
-            chanRegs[0xC] = 0;
-            chanRegs[4] = 0;
-            chanRegs[0x14] = 0;
-            chanRegs[0x10] = 0;
-            chanRegs[0x20] = 0;
+            int *chan_regs = (int *)r1_D_00132E70[i];
+            chan_regs[0] = 0;
+            chan_regs[0xC] = 0;
+            chan_regs[4] = 0;
+            chan_regs[0x14] = 0;
+            chan_regs[0x10] = 0;
+            chan_regs[0x20] = 0;
         }
     }
 
     *(unsigned int *)0x1000E010 = 0xFF1F;
     *(unsigned int *)0x1000E010 = D_STAT & 0xFF1F0000;
 
-    mem_zero_fill_bytes(envBuf, 0x14);
-    sceDmaPutEnv(envBuf);
+    mem_zero_fill_bytes(env_buf, 0x14);
+    sceDmaPutEnv(env_buf);
 
     if (mode == 1) {
         D_CTRL = D_CTRL | 1;
     }
-    return dmaEnabled;
+    return dma_enabled;
 }

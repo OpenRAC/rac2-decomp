@@ -59,23 +59,23 @@ void beam_update_chain_points(Actor *actor)
     Vector goal, dir, side, step, last, delta, tip;
     float angle;
     float len;
-    float *waveOffset;
-    int byteOffset;
+    float *wave_offset;
+    int byte_offset;
     float dist;
     void *target;
-    float previousWave;
+    float previous_wave;
     int spin;
-    float stepLength;
+    float step_length;
     float weight;
     float wave;
     int i;
     float sway;
-    void *heroTarget;
+    void *hero_target;
     BeamState *beam = actor->vars;
     float zero;
-    Vector *lastPtr;
+    Vector *last_ptr;
     ThingInfo *info;
-    float segmentsLeft;
+    float segments_left;
 
     if (g_current_map_index == 1 && D_L00_001A8F00 == 2)
         beam = D_L00_001C5890;
@@ -85,12 +85,12 @@ void beam_update_chain_points(Actor *actor)
     D_L00_001AF2FC = FastAddRotations(D_L00_001AF2FC, D_L00_001AF300);
     D_L00_001AF304 = fast_subtract_rotations(D_L00_001AF304, D_L00_001AF308);
     D_L00_001AF318 = FastAddRotations(D_L00_001AF318, D_L00_001AF31C);
-    heroTarget = 0;
+    hero_target = 0;
     if (beam->target == 0)
-        heroTarget = ((Hero *)g_hero_state)->ptr[0x5C0 / 4];
-    if (heroTarget != 0) {
+        hero_target = ((Hero *)g_hero_state)->ptr[0x5C0 / 4];
+    if (hero_target != 0) {
         if (beam->target == 0)
-            beam->target = heroTarget;
+            beam->target = hero_target;
     }
     target = beam->target;
     if (target != 0) {
@@ -117,23 +117,23 @@ void beam_update_chain_points(Actor *actor)
     i = 1;
     do {
         float fi = i;
-        byteOffset = i * 4;
+        byte_offset = i * 4;
         weight = IntToFloat(i) * 0.05f;
         wave = D_L00_001AF2F4 + (D_L00_001AF2F8 - D_L00_001AF2F4) * weight;
         wave = wave * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(D_L00_001AF2FC + fi * D_L00_001AF2F0));
         wave = wave + math_random_signed_float_range(D_L00_001AF334, D_L00_001AF338);
-        waveOffset = (float *)(byteOffset + (char *)D_L00_0023A490);
-        previousWave = *waveOffset;
-        *waveOffset = wave;
-        D_L00_0023A210[0][i].f[2] -= previousWave;
+        wave_offset = (float *)(byte_offset + (char *)D_L00_0023A490);
+        previous_wave = *wave_offset;
+        *wave_offset = wave;
+        D_L00_0023A210[0][i].f[2] -= previous_wave;
         FastVecSub(&side, &D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
         lerp_vector(&step, &side, &last, 0.85f);
         zero = 0.0f;
-        stepLength = FastVecLength(&step);
-        if (stepLength == zero) {
+        step_length = FastVecLength(&step);
+        if (step_length == zero) {
             qcopy(&D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1]);
         } else {
-            FastVecScale(&step, &step, len / stepLength);
+            FastVecScale(&step, &step, len / step_length);
             FastVecAdd(&D_L00_0023A210[0][i], &D_L00_0023A210[0][i - 1], &step);
             qcopy(&last, &step);
         }
@@ -148,15 +148,15 @@ void beam_update_chain_points(Actor *actor)
                     len = dist;
                 } else if (i >= 0x10) {
                     sway = 0.5f;
-                    segmentsLeft = IntToFloat(0x13 - i);
-                    len = dist / segmentsLeft;
+                    segments_left = IntToFloat(0x13 - i);
+                    len = dist / segments_left;
                 } else {
                     sway = 0.1f;
                 }
                 /* Live across the next call: loop.c hoists this copy, which retail's preheader order shows. */
-                lastPtr = &last;
+                last_ptr = &last;
                 FastVecScale(&tip, &tip, len / dist);
-                lerp_vector(lastPtr, lastPtr, &tip, sway);
+                lerp_vector(last_ptr, last_ptr, &tip, sway);
             }
         }
         angle = math_wrap_angle_to_pi(D_L00_001AF304 + (float)i * D_L00_001AF30C);

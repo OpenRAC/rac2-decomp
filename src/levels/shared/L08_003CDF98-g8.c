@@ -154,26 +154,26 @@ extern PlayerCDF98 g_hero_state;
    steers and glides with the stick, leaves a smoke trail, and lands or lets go at a target. */
 void UpdateHeroNpc(u8 *obj)
 {
-    Vec previousPos;
+    Vec previous_pos;
     union {
         Vec inverse[4];
         struct { Vec velocity, point, joint; } v;
     } scratch;
     u8 *d, *particle;
-    int i, jointIndex, checkpointIndex;
+    int i, joint_index, checkpoint_index;
     float amount;
 
     d = *(u8 **)(obj + 0x68);
-    qcopy(&previousPos, d);
+    qcopy(&previous_pos, d);
     if (OH(0x96) < 0x7FFD)
         OH(0x96) = OH(0x96) + 1;
     switch (OB(0x20)) {
     case 0:
-        checkpointIndex = DI(0x6C);
-        if (checkpointIndex > 0) {
+        checkpoint_index = DI(0x6C);
+        if (checkpoint_index > 0) {
             HeroCDF98 *table = D_L08_001B29DC;
-            qcopy(d, table[checkpointIndex].bytes + 0x10);
-            qcopy(d + 0x10, table[checkpointIndex].bytes + 0xF0);
+            qcopy(d, table[checkpoint_index].bytes + 0x10);
+            qcopy(d + 0x10, table[checkpoint_index].bytes + 0xF0);
             moby_place_at_stored_transform(obj);
         } else {
             STUB_printf(D_L08_001B0148, *(s16 *)(obj + 0xB2));
@@ -206,7 +206,7 @@ void UpdateHeroNpc(u8 *obj)
                 }
             } else {
                 u8 *q = (u8 *)D_0018A15C[0];
-                if (q != 0 && *(s16 *)(q + 0xAA) == 0x988 /* Glider Pad */ && q == D_L08_001B29DC[DI(0x6C)].bytes) {
+                if (q != 0 && *(s16 *)(q + 0xAA) == MOBY_CLASS_GLIDER_PAD && q == D_L08_001B29DC[DI(0x6C)].bytes) {
                     if (OB(0x43) != 0)
                         anim_start_blended(obj, 0, 0, 0xA);
                     moby_set_state(obj, 2, -1);
@@ -215,18 +215,18 @@ void UpdateHeroNpc(u8 *obj)
         }
         break;
     case 2: {
-        int canGrab;
+        int can_grab;
         hero_save_transform_snap_object(obj, d);
-        if (g_hero_state.target == 0 || *(s16 *)(g_hero_state.target + 0xAA) != 0x988 /* Glider Pad */) {
+        if (g_hero_state.target == 0 || *(s16 *)(g_hero_state.target + 0xAA) != MOBY_CLASS_GLIDER_PAD) {
             if (OB(0x43) != 0)
                 anim_start_blended(obj, 0, 0, 0xA);
             qcopy(d, D_L08_001B29DC[DI(0x6C)].bytes + 0x10);
             DF(8) = DF(8) + D_L08_001AFFD0;
             moby_set_state(obj, 1, -1);
         }
-        canGrab = TryClaimNotice(7, 0x279E, 1) != 0;
+        can_grab = TryClaimNotice(7, 0x279E, 1) != 0;
         if (OB(0x20) == 2 && (D_00138324[0] & 0x40)) {
-            if (canGrab && g_hero_state.target == D_L08_001B29DC[DI(0x6C)].bytes && g_hero_state.unk340 != 0
+            if (can_grab && g_hero_state.target == D_L08_001B29DC[DI(0x6C)].bytes && g_hero_state.unk340 != 0
                 && g_hero_state.unk34E == 0) {
                 u8 *q;
                 hero_l08_enter_state(0x31, 0);
@@ -346,16 +346,16 @@ void UpdateHeroNpc(u8 *obj)
         }
         if (D_L08_001B0140 != 0)
             FastVecAdd(d, d, d + 0x20);
-        if (vehicle_handle_collision(obj, &previousPos) == 0) {
-            float newSpeed = DF(0x54) + D_L08_001AFFFC * 0.00027777778f;
-            float maxSpeed = D_L08_001AFFF8 * 0.016666668f;
-            float turnRate;
-            DF(0x54) = newSpeed;
-            if (maxSpeed < newSpeed)
-                DF(0x54) = maxSpeed;
-            turnRate = D_L08_001B0000 * 0.00029088825f;
+        if (vehicle_handle_collision(obj, &previous_pos) == 0) {
+            float new_speed = DF(0x54) + D_L08_001AFFFC * 0.00027777778f;
+            float max_speed = D_L08_001AFFF8 * 0.016666668f;
+            float turn_rate;
+            DF(0x54) = new_speed;
+            if (max_speed < new_speed)
+                DF(0x54) = max_speed;
+            turn_rate = D_L08_001B0000 * 0.00029088825f;
             if (DI(0x50) < D_L08_001AFFDC - D_L08_001AFFE4 && D_L08_001B0140 != 0)
-                DF(0x14) = fast_subtract_rotations(DF(0x14), turnRate);
+                DF(0x14) = fast_subtract_rotations(DF(0x14), turn_rate);
             if (DF(0x14) < 0.0f)
                 DF(0x14) = 0.0f;
             if (math_fast_float_d(d + 0x50) != 0) {
@@ -419,7 +419,7 @@ void UpdateHeroNpc(u8 *obj)
             } else {
                 float e = D_L08_001B000C;
                 float k = b - a;
-                float lo, newSpeed, maxSpeed;
+                float lo, new_speed, max_speed;
                 k += e;
                 k /= e - c;
                 if (k > 1.0f)
@@ -428,12 +428,12 @@ void UpdateHeroNpc(u8 *obj)
                     k = 0.0f;
                 lo = D_L08_001B0018 * 0.016666668f;
                 k = 1.0f - k;
-                newSpeed = lo + (k * ((D_L08_001B0010 * 0.016666668f) - lo));
-                if (DI(0x98) == 0 || newSpeed < DF(0x54))
-                    DF(0x54) = DF(0x54) + ((newSpeed - DF(0x54)) * 0.1f);
-                maxSpeed = D_L08_001B0018 * 0.016666668f;
-                if (maxSpeed < DF(0x54))
-                    DF(0x54) = maxSpeed;
+                new_speed = lo + (k * ((D_L08_001B0010 * 0.016666668f) - lo));
+                if (DI(0x98) == 0 || new_speed < DF(0x54))
+                    DF(0x54) = DF(0x54) + ((new_speed - DF(0x54)) * 0.1f);
+                max_speed = D_L08_001B0018 * 0.016666668f;
+                if (max_speed < DF(0x54))
+                    DF(0x54) = max_speed;
             }
         }
         if (DF(0x64) < 1.0f) {
@@ -468,7 +468,7 @@ void UpdateHeroNpc(u8 *obj)
             moby_set_state(obj, 7, -1);
         }
         hero_move_with_mount_to_transform(obj, d);
-        vehicle_handle_collision(obj, &previousPos);
+        vehicle_handle_collision(obj, &previous_pos);
         if (g_hero_state.unk2294 != 0x31)
             moby_set_state(obj, 1, -1);
         break;
@@ -490,7 +490,7 @@ void UpdateHeroNpc(u8 *obj)
         if (D_L08_001B0140 != 0)
             DF(0x14) = FastAddRotations(DF(0x14), DF(0x68));
         vehicle_update_steering(obj, d, 1.0f);
-        vehicle_handle_collision(obj, &previousPos);
+        vehicle_handle_collision(obj, &previous_pos);
         hero_move_with_mount_to_transform(obj, d);
         break;
     }
@@ -511,7 +511,7 @@ void UpdateHeroNpc(u8 *obj)
         DF(0x54) = FastVecLength(d + 0x20);
         vehicle_update_steering(obj, d, 1.0f);
         hero_move_with_mount_to_transform(obj, d);
-        vehicle_handle_collision(obj, &previousPos);
+        vehicle_handle_collision(obj, &previous_pos);
         break;
     }
     case 9: {
@@ -532,7 +532,7 @@ void UpdateHeroNpc(u8 *obj)
         if (D_L08_001B0140 != 0)
             FastVecAdd(d, d, d + 0x20);
         hero_move_with_mount_to_transform(obj, d);
-        vehicle_handle_collision(obj, &previousPos);
+        vehicle_handle_collision(obj, &previous_pos);
         if (DF(0x28) > 0.0f || DF(8) < 12.0f || FastVecLength(d + 0x20) < 0.016666668f
             || D_L08_001B0130 < (s32)OH(0x96)) {
             SpawnExplosionEffects(obj, D_L08_001A8F20, 0, 0.0f, 0.0f, 0xA, 3, 0x10, 4.0f, 2.0f, 9.0f, 1.0f,
@@ -543,15 +543,15 @@ void UpdateHeroNpc(u8 *obj)
         break;
     }
     case 10: {
-        float distToTarget, lim;
+        float dist_to_target, lim;
         if (DI(0xAC) != -1) {
             if (((VoiceSlotCDF98 *)(g_sound_state + DI(0xAC) * 0x70))->voice.owner == obj
                     && ((VoiceSlotCDF98 *)(g_sound_state + DI(0xAC) * 0x70))->voice.active != 0)
                 snd_stop_voice(DI(0xAC));
         }
         DI(0xAC) = -1;
-        distToTarget = fast_vec_dist(d, d + 0x80);
-        lim = DF(0x94) < distToTarget ? DF(0x94) : distToTarget;
+        dist_to_target = fast_vec_dist(d, d + 0x80);
+        lim = DF(0x94) < dist_to_target ? DF(0x94) : dist_to_target;
         if (D_L08_001B0140 != 0) {
             StepAngleTowardTarget(d + 0x14, 0, 0.0f, D_L08_001B0138 * 0.00029088825f);
             StepAngleTowardTarget(d + 0x10, 0, 0.0f, D_L08_001B0138 * 0.00029088825f);
@@ -562,7 +562,7 @@ void UpdateHeroNpc(u8 *obj)
             OB(0x31) = 0;
             OH(0x34) = OH(0x34) | 1;
         }
-        if (lim < distToTarget) {
+        if (lim < dist_to_target) {
             FastVecSub(&scratch.v.velocity, d + 0x80, d);
             vec_scale_to_length(&scratch.v.velocity, &scratch.v.velocity, lim * D_L08_001B0128);
             FastVecScale(d + 0x20, d + 0x20, D_L08_001B0124);
@@ -613,8 +613,8 @@ void UpdateHeroNpc(u8 *obj)
                 }
             }
             FastVecScale(&scratch.v.velocity, d + 0x20, 0.25f);
-            for (jointIndex = 0; jointIndex < 7; jointIndex++) {
-                moby_transform_joint_to_world(obj, jointIndex, &scratch.v.joint);
+            for (joint_index = 0; joint_index < 7; joint_index++) {
+                moby_transform_joint_to_world(obj, joint_index, &scratch.v.joint);
                 for (f = 0.0f; f < 1.0f; f += 0.2f) {
                     FastVecScale(&scratch.v.point, d + 0x20, -f);
                     FastVecAdd(&scratch.v.point, &scratch.v.point, &scratch.v.joint);

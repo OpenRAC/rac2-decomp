@@ -224,19 +224,19 @@ void extermibot_update_states(u8 *self)
         }
         break;
     case 8: {
-        u8 *homePoint;
+        u8 *home_point;
         if (flag_set_first_pending(self) != 0)
             extermibot_set_anim_on_parts(self, math_random_int_below(2) + 6, 0, 0xA);
         if (*(int *)(vars + 0x79C) != 1) {
             moby_set_state(self, 6, -1);
             break;
         }
-        homePoint = vars + 0x1F0;
-        if (extermibot_is_position_short(self, homePoint) != 0) {
+        home_point = vars + 0x1F0;
+        if (extermibot_is_position_short(self, home_point) != 0) {
             *(u8 **)(vars + 0x7BC) = 0;
             moby_set_state(self, 0xB, -1);
-        } else if (extermibot_get_position_length_offset(self, homePoint) >= 0.0f || extermibot_get_turn_angle_to_point(self, homePoint) >= 0.0f
-                   || extermibot_is_path_to_point_clear(self, homePoint) == 0) {
+        } else if (extermibot_get_position_length_offset(self, home_point) >= 0.0f || extermibot_get_turn_angle_to_point(self, home_point) >= 0.0f
+                   || extermibot_is_path_to_point_clear(self, home_point) == 0) {
             *(u8 **)(vars + 0x7BC) = 0;
             moby_set_state(self, 9, -1);
         } else if (extermibot_is_cooldown_finished(self) != 0) {
@@ -261,9 +261,9 @@ void extermibot_update_states(u8 *self)
         extermibot_set_aim_toward_point(self, vec, 0);
         if (self[0xBC] == 0) {
             if (extermibot_is_position_short(self, vec) != 0) {
-                u8 savedAnim = self[0x94];
+                u8 saved_anim = self[0x94];
                 moby_set_state(self, 0xB, -1);
-                self[0x94] = savedAnim;
+                self[0x94] = saved_anim;
                 break;
             }
             if (self[0x60] & 2) {
@@ -285,9 +285,9 @@ void extermibot_update_states(u8 *self)
         }
         if (self[0xBC] == 1) {
             if (extermibot_is_position_short(self, vec) != 0) {
-                u8 savedAnim = self[0x94];
+                u8 saved_anim = self[0x94];
                 moby_set_state(self, 0xB, -1);
-                self[0x94] = savedAnim;
+                self[0x94] = saved_anim;
                 break;
             }
             if (extermibot_is_facing_point(self, vec) != 0) {
@@ -312,9 +312,9 @@ void extermibot_update_states(u8 *self)
             if (self[0x60] & 2) {
                 if (*(u8 **)(vars + 0x7BC) == 0) {
                     if (extermibot_is_position_short(self, vec) != 0) {
-                        u8 savedAnim = self[0x94];
+                        u8 saved_anim = self[0x94];
                         moby_set_state(self, 0xB, -1);
-                        self[0x94] = savedAnim;
+                        self[0x94] = saved_anim;
                         break;
                     }
                     if (extermibot_is_cooldown_finished(self) != 0 && extermibot_get_position_length_offset(self, vec) < 0.0f

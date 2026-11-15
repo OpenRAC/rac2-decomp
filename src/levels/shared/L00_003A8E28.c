@@ -107,7 +107,7 @@ char *SpawnProjectile(void *position, void *velocity, char *owner, float speed, 
     ProjectilePoint step;
     ProjectilePoint forward;
     ProjectilePoint projected;
-    char *moby = CreateMoby(0x5D8 /* Hoverbomb Projectile */);
+    char *moby = CreateMoby(MOBY_CLASS_HOVERBOMB_PROJECTILE);
     char *hit;
     ProjectileVars *vars;
     float along;

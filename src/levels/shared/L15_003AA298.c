@@ -62,7 +62,7 @@ void projectile_bounce_count_update(unsigned char *object)
     ++*(int *)(state + 0x14);
     if (CollLine(previous, position, 0x10, object, collision)) {
         if (D_L15_001BFC00.object) {
-            if ((D_L15_001BFC00.object == g_hero_moby || *(short *)(D_L15_001BFC00.object + 0xaa) == 0xc0 /* Bomb Glove */) &&
+            if ((D_L15_001BFC00.object == g_hero_moby || *(short *)(D_L15_001BFC00.object + 0xaa) == MOBY_CLASS_BOMB_GLOVE) &&
                 *(int *)(state + 0x18) >= 0x122)
                 goto finished;
             if (*(void **)(D_L15_001BFC00.object + 0x64) == D_L15_001AC810 && *(short *)(D_L15_001BFC00.object + 0xaa) != 0x336 /* moby class 822 */)

@@ -36,19 +36,19 @@ typedef struct {
    https://github.com/open-goal/jak-project/blob/master/game/graphics/sceGraphicsInterface.h
    (sceGsSyncV(u32 mode)). Only the signature is used, with no HLE code copied. */
 /* Returns which screen field is being drawn when the picture is interlaced, otherwise 1. */
-int sceGsSyncV(int unusedMode) {
-    GsGParam *gParam = r1_func_00121D08();
+int sceGsSyncV(int unused_mode) {
+    GsGParam *g_param = r1_func_00121D08();
     long csr;
 
-    if (gParam->unk_08 == 0) {
+    if (g_param->unk_08 == 0) {
         r1_func_00118ED0();
-        if (gParam->interlace != 1) {
+        if (g_param->interlace != 1) {
             return 1;
         }
         return (GS_CSR >> 13) & 1;
     }
     csr = (r1_func_00118F60() >> 13) & 1;
-    if (gParam->interlace != 1) {
+    if (g_param->interlace != 1) {
         return 1;
     }
     return csr;
@@ -68,10 +68,10 @@ ASM_FUNC("asm/core", func_00126284);
  * into retail's single call, where a shared label needs an extra branch. */
 /* Copies an image into the graphics chip with two transfers and waits for the channel each time. */
 int sceGsExecLoadImage(GsLoadImage *src, void *dst) {
-    unsigned int pollCount = 0;
+    unsigned int poll_count = 0;
 
     while (D2_CHCR & 0x100) {
-        if (pollCount++ > 0x1000000) {
+        if (poll_count++ > 0x1000000) {
             r1_func_0011A6C8(r1_D_001532D0);
             return -1;
         }
@@ -86,7 +86,7 @@ int sceGsExecLoadImage(GsLoadImage *src, void *dst) {
     D2_CHCR = 0x101;
 
     while (D2_CHCR & 0x100) {
-        if (pollCount++ > 0x1000000) {
+        if (poll_count++ > 0x1000000) {
             r1_func_0011A6C8(r1_D_001532D0);
             return -1;
         }
@@ -116,23 +116,23 @@ extern void r1_func_00119390(int);
    handler. */
 /* Sets or removes the handler that runs on each screen refresh and returns the old one. */
 int sceGsSyncVCallback(void *handler) {
-    char *gParam = (char *)r1_func_00121D08();
-    int intcLine = 2;
-    int prevHandler = *(int *)(gParam + 8);
+    char *g_param = (char *)r1_func_00121D08();
+    int intc_line = 2;
+    int prev_handler = *(int *)(g_param + 8);
 
     if (handler == 0) {
-        r1_func_00119328(intcLine);
-        r1_func_00118AA0(intcLine, *(int *)(gParam + 0xC));
-        *(int *)(gParam + 0xC) = 0;
-        *(int *)(gParam + 8) = 0;
+        r1_func_00119328(intc_line);
+        r1_func_00118AA0(intc_line, *(int *)(g_param + 0xC));
+        *(int *)(g_param + 0xC) = 0;
+        *(int *)(g_param + 8) = 0;
     } else {
-        if (prevHandler != 0) {
-            r1_func_00119328(intcLine);
-            r1_func_00118AA0(intcLine, *(int *)(gParam + 0xC));
+        if (prev_handler != 0) {
+            r1_func_00119328(intc_line);
+            r1_func_00118AA0(intc_line, *(int *)(g_param + 0xC));
         }
-        *(int *)(gParam + 8) = (int)handler;
-        *(int *)(gParam + 0xC) = r1_func_00118A90(intcLine, handler, -1);
-        r1_func_00119390(intcLine);
+        *(int *)(g_param + 8) = (int)handler;
+        *(int *)(g_param + 0xC) = r1_func_00118A90(intc_line, handler, -1);
+        r1_func_00119390(intc_line);
     }
-    return prevHandler;
+    return prev_handler;
 }

@@ -82,7 +82,7 @@ void spring_holder_update(char *moby)
                     case 0xCFC /* moby class 3324 */:
                         moby_start_fall_state(*(char **)(vars + 0xF0), vars + 0xE0);
                         break;
-                    case 0xFFD /* Megacorp Laser Bot */:
+                    case MOBY_CLASS_MEGACORP_LASER_BOT:
                         laser_bot_set_state_copy_vector(*(char **)(vars + 0xF0), vars + 0xE0);
                         break;
                     }
@@ -147,7 +147,7 @@ void spring_holder_update(char *moby)
                     }
                     break;
                 }
-                case 0xFFD /* Megacorp Laser Bot */:
+                case MOBY_CLASS_MEGACORP_LASER_BOT:
                     height = *(f32 *)(contact + 0x18) + 2.0f;
                     if (height < *(f32 *)(buf + 8)) {
                         landed = 0;
@@ -184,7 +184,7 @@ void spring_holder_update(char *moby)
             height = 2.2f;
             y = *(f32 *)(buf + 8);
             goto add_height;
-        case 0xFFD /* Megacorp Laser Bot */:
+        case MOBY_CLASS_MEGACORP_LASER_BOT:
         default:
             y = *(f32 *)(buf + 8);
             height = 2.0f;
@@ -214,7 +214,7 @@ void spring_holder_update(char *moby)
                 PlayMobySound(2, 0, moby);
                 object_store_mode_release(*(char **)(vars + 0xF0), (s32)moby);
                 break;
-            case 0xFFD /* Megacorp Laser Bot */:
+            case MOBY_CLASS_MEGACORP_LASER_BOT:
                 PlayMobySound(2, 0, moby);
                 robot_set_speed_state(*(char **)(vars + 0xF0), moby);
                 break;

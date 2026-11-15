@@ -37,45 +37,45 @@ extern s32 func_31E2E0(s32 arg0, s32 arg1);
 extern void func_3296A8(void *arg0, void *arg1, s32 arg2, f32 x, s32 arg3);
 
 /* Walks the measured table of the given index down to its terminator. */
-s32 space_tourist_all_idle(s32 listIndex) {
-    u16 *listCursor = D_L12_001FB960[listIndex];
-    u16 packedId;
-    u8 *mobyBase;
+s32 space_tourist_all_idle(s32 list_index) {
+    u16 *list_cursor = D_L12_001FB960[list_index];
+    u16 packed_id;
+    u8 *moby_base;
 
-    if (listCursor == 0)
+    if (list_cursor == 0)
         return 1;
-    mobyBase = D_L12_001B2E9C;
+    moby_base = D_L12_001B2E9C;
     do {
-        u8 *mobyRecord;
-        packedId = *listCursor;
-        mobyRecord = mobyBase + (packedId & 0x7FFF) * 0x100;
-        if (*(s16 *)(mobyRecord + 0xAA) == 0xBB8 /* Space Tourist */) {
-            if (*(u8 *)(mobyRecord + 0x20) != 1)
+        u8 *moby_record;
+        packed_id = *list_cursor;
+        moby_record = moby_base + (packed_id & 0x7FFF) * 0x100;
+        if (*(s16 *)(moby_record + 0xAA) == MOBY_CLASS_SPACE_TOURIST) {
+            if (*(u8 *)(moby_record + 0x20) != 1)
                 return 0;
         }
-        listCursor++;
-    } while ((s16)packedId >= 0);
+        list_cursor++;
+    } while ((s16)packed_id >= 0);
     return 1;
 }
 
 /* Arms the measured sub-object on the first entry. */
-void sub_object_start_move(u8 *object, u8 *sourceObj, u8 *dims, s32 firstEntry) {
-    f32 moveVec[4];
-    u16 oldFlags;
+void sub_object_start_move(u8 *object, u8 *source_obj, u8 *dims, s32 first_entry) {
+    f32 move_vec[4];
+    u16 old_flags;
 
     if (*(u8 *)(object + 0x43) != 0xA)
         func_31DEF0(object, 0xA, 0, 5);
     if (*(u8 *)(object + 0xBC) != 8)
         func_31E1D0(object, 8, 1);
-    func_2F1958(moveVec, sourceObj, object + 0x10);
-    func_323F98(moveVec, 0.16666667f);
-    func_2F1928(object + 0x10, object + 0x10, moveVec);
+    func_2F1958(move_vec, source_obj, object + 0x10);
+    func_323F98(move_vec, 0.16666667f);
+    func_2F1928(object + 0x10, object + 0x10, move_vec);
     func_321940(object + 0xF8, 0, *(f32 *)(dims + 8), 0.20943954f);
-    if (firstEntry != 0) {
-        oldFlags = *(u16 *)(object + 0x34);
+    if (first_entry != 0) {
+        old_flags = *(u16 *)(object + 0x34);
         D_L12_001B09F4 = D_L12_001B09F4 + 1;
         *(s32 *)(object + 0x98) = 0;
-        *(u16 *)(object + 0x34) = (oldFlags | 0x41) & 0xEFFF;
+        *(u16 *)(object + 0x34) = (old_flags | 0x41) & 0xEFFF;
         func_3239B8(object, object + 0x10, -1, 1.0f, 0.0f);
         func_31E1D0(object, 1, 0);
     }
@@ -197,10 +197,10 @@ void guard_creature_update(u8 *creature) {
     *(short *)(vars+0x364)=weapon_select_aim_target(creature,-1,0,0,*(float *)(vars+0x36C),3);
     if(*(u8 **)(vars+0x120)) *(u8 **)(vars+0x368)=*(u8 **)(vars+0x120); else *(u8 **)(vars+0x368)=g_hero_moby;
     if(*(short *)(vars+0x364)==1) {
-        float zoneRange=D_L12_001B0A40;
+        float zone_range=D_L12_001B0A40;
         if(*(int *)(vars+0x130)!=-1) {
-            u8 *zoneInfo=D_L12_001FEAC0[*(int *)(vars+0x130)];
-            if(!point_in_path_xy(*(u8 **)(vars+0x120)+0x10,zoneInfo+0x10,*(int *)zoneInfo,zoneRange)) *(short *)(vars+0x364)=0;
+            u8 *zone_info=D_L12_001FEAC0[*(int *)(vars+0x130)];
+            if(!point_in_path_xy(*(u8 **)(vars+0x120)+0x10,zone_info+0x10,*(int *)zone_info,zone_range)) *(short *)(vars+0x364)=0;
         }
     }
     value_set_and_smooth(creature,vars+0x3C0,1,1,D_L12_001B0A40);
@@ -243,13 +243,13 @@ void UpdateTodanoSubtitleTriggers(u8 *creature) {
             subtitle_request_voice_line(0xA22, 121);
         if (IsPointInCuboid(g_hero_position, *(int *)(vars + 4)) && !g_item_owned_flags[0x33]) {
             if (g_subtitle_history[92].count) {
-                u32 nowTime = D_001A7390;
-                u32 lastTime = g_subtitle_history[92].time;
+                u32 now_time = D_001A7390;
+                u32 last_time = g_subtitle_history[92].time;
 
-                if (nowTime - lastTime > 0x438 || lastTime == 0)
+                if (now_time - last_time > 0x438 || last_time == 0)
                     subtitle_request_voice_line(0xA05, 92);
-                else if (lastTime < nowTime)
-                    g_subtitle_history[92].time = nowTime;
+                else if (last_time < now_time)
+                    g_subtitle_history[92].time = now_time;
             } else {
                 if (g_subtitle_history[92].count < 65535)
                     g_subtitle_history[92].count++;
@@ -265,17 +265,17 @@ void UpdateTodanoSubtitleTriggers(u8 *creature) {
                 if (*(int *)(vars + 0x10) < 0)
                     *(int *)(vars + 0x10) = 0x2A30;
                 else if (!*(int *)(vars + 0x10)) {
-                    u32 seenBefore = g_subtitle_history[93].levels & (1 << g_current_map_index[0]);
+                    u32 seen_before = g_subtitle_history[93].levels & (1 << g_current_map_index[0]);
 
-                    if (!seenBefore)
+                    if (!seen_before)
                         subtitle_request_voice_line(0xA06, 93);
                 }
             }
         }
         if (g_item_owned_flags[7] && D_0018C0B4 != 0x6F) {
-            u32 seenBefore = g_subtitle_history[127].levels & (1 << g_current_map_index[0]);
+            u32 seen_before = g_subtitle_history[127].levels & (1 << g_current_map_index[0]);
 
-            if (!seenBefore)
+            if (!seen_before)
                 subtitle_request_voice_line(0xA28, 127);
         }
         if (*(int *)(vars + 0x10) >= 0)

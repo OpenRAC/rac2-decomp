@@ -19,7 +19,7 @@ void part_emit_timer_burst(u8 *moby) {
     u8 *state;
     f32 ratio;
     f32 intensity;
-    s32 particleCount;
+    s32 particle_count;
 
     gfx_set_gs_register_constant();
     state = *(u8 **)(moby + 0x68);
@@ -30,9 +30,9 @@ void part_emit_timer_burst(u8 *moby) {
         ratio = 0.0f;
     intensity = math_lerp_float(D_L18_001B0778, D_L18_001B077C[0], ratio);
     if (ratio < 0.1f) {
-        particleCount = FloatToInt((f32)D_L18_001B0780 * ratio * 10.0f);
+        particle_count = FloatToInt((f32)D_L18_001B0780 * ratio * 10.0f);
     } else {
-        particleCount = FloatToInt((f32)D_L18_001B0780 * (1.0f - ratio));
+        particle_count = FloatToInt((f32)D_L18_001B0780 * (1.0f - ratio));
     }
-    gfx_draw_billboard_quad_with_uv(state + 0x90, particleCount, 0, intensity, D_L18_001B0784, 0.08f);
+    gfx_draw_billboard_quad_with_uv(state + 0x90, particle_count, 0, intensity, D_L18_001B0784, 0.08f);
 }

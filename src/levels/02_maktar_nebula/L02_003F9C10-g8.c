@@ -1,4 +1,5 @@
 #include "names.h"
+#include "moby_classes.h"
 /* func_L02_003F9C10 in its own unit (-G8 -Wa,-G64 with the qcopy profile: the class table
  * and the loadout bytes are small data reached through $gp).
  * The Maktar arena's encounter driver, the counterpart of Joba's func_L11_0043E1A0
@@ -473,14 +474,14 @@ void UpdateArenaController(char *actor) {
         arena_clear_spawn_slots(actor); spawned=0; actor_pick_watched_entity(actor);
         if(st->slots[st->slot] && moby_has_free_child_slot_state2(st->slots[st->slot])) {
             int i;
-            for(i=st->counts[3];i<H(row,6);i++) spawned|=arena_claim_enemy(actor,0xc3e /* PX6 BladeBall */);
+            for(i=st->counts[3];i<H(row,6);i++) spawned|=arena_claim_enemy(actor,MOBY_CLASS_PX6_BLADEBALL);
             for(i=st->counts[1];i<H(row,2);i++) spawned|=arena_claim_enemy(actor,0xb22 /* moby class 2850 */);
-            for(i=st->counts[2];i<H(row,4);i++) spawned|=arena_claim_enemy(actor,0xc3b /* Megacorp Security Robot - Flamethrower */);
+            for(i=st->counts[2];i<H(row,4);i++) spawned|=arena_claim_enemy(actor,MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER);
             for(i=st->counts[0];i<H(row,0);i++) spawned|=arena_claim_enemy(actor,0x9ca /* moby class 2506 */);
         }
         if(!st->counts[4] && B(row,16) && !st->counts[5] && B(row,17)) {
             char *a, *b;
-            a=arena_claim_boss(actor,0x9f8 /* Chainblade */,0); b=arena_claim_boss(actor,0xa44 /* B2 Brawler Legs */,1);
+            a=arena_claim_boss(actor,MOBY_CLASS_CHAINBLADE,0); b=arena_claim_boss(actor,MOBY_CLASS_B2_BRAWLER_LEGS,1);
             chainblade_set_helper(a,b); brawler_set_watched_entity(b,a); chainblade_advance_health_phase(a); st->owner=a;
             { MaktarFlags *g=(MaktarFlags *)D_L02_001BA3C0; if(!g->owner) { g->owner=a; g->timer=0; } }
             if(!D_L02_001B3770[0]) { D_L02_001B3770[0]=a; mem_clear(D_L02_001FF6B8,0,224); }
@@ -488,13 +489,13 @@ void UpdateArenaController(char *actor) {
             arena_start_announcer_message(actor,15); script_queue_keyed_request(st->track,st->trackVolume);
         } else if(!st->counts[4] && B(row,16)) {
             char *a;
-            a=arena_claim_boss(actor,0x9f8 /* Chainblade */,0); st->owner=a;
+            a=arena_claim_boss(actor,MOBY_CLASS_CHAINBLADE,0); st->owner=a;
             { MaktarFlags *g=(MaktarFlags *)D_L02_001BA3C0; if(!g->owner) { g->owner=a; g->timer=0; } }
             { char *snd=st->owner; if(!D_L02_001B3770[0]) { D_L02_001B3770[0]=snd; mem_clear(D_L02_001FF6B8,0,224); } }
             arena_start_announcer_message(actor,14); script_queue_keyed_request(st->track,st->trackVolume);
         } else if(!st->counts[5] && B(row,17)) {
             char *a;
-            a=arena_claim_boss(actor,0xa44 /* B2 Brawler Legs */,0); st->owner=a;
+            a=arena_claim_boss(actor,MOBY_CLASS_B2_BRAWLER_LEGS,0); st->owner=a;
             { MaktarFlags *g=(MaktarFlags *)D_L02_001BA3C0; if(!g->owner) { g->owner=a; g->timer=0; } }
             { char *snd=st->owner; if(!D_L02_001B3770[1]) { char *buf=D_L02_001FF6B8; D_L02_001B3770[1]=snd; mem_clear(buf+224,0,224); } }
             arena_start_announcer_message(actor,20); script_queue_keyed_request(st->track,st->trackVolume);

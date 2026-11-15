@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 extern void func_002A05A8(char *);
@@ -90,7 +91,7 @@ void chainblade_update_effects_timers(char *self) {
         (*(unsigned short *)(self + 0x96))++;
     }
     if (g_active_attacker_robot != 0 &&
-        (g_active_attacker_robot == self || *(short *)(g_active_attacker_robot + 0xAA) == 0x9F8 /* Chainblade */)) {
+        (g_active_attacker_robot == self || *(short *)(g_active_attacker_robot + 0xAA) == MOBY_CLASS_CHAINBLADE)) {
         *(short *)(state + 0x32A) = -1;
     }
     *(unsigned short *)(state + 0x32A) = *(unsigned short *)(state + 0x32A) + 1;

@@ -20,7 +20,7 @@ void object_copy_vector_to_selected(void *vec)
     Obj_35370 *current;
     Obj_35370 *selected;
     void *dst;
-    char *dstPtr;
+    char *dst_ptr;
 
     current = ref_L00_00335370_00;
     if (current->f86_35370 != 5) {
@@ -29,6 +29,6 @@ void object_copy_vector_to_selected(void *vec)
         selected = current;
     }
     dst = selected->f70_35370;
-    dstPtr = (char *)dst + 0x80;
-    qcopy(dstPtr, vec);
+    dst_ptr = (char *)dst + 0x80;
+    qcopy(dst_ptr, vec);
 }

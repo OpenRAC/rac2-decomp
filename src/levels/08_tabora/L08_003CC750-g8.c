@@ -23,8 +23,8 @@ extern int level_get_saved_count(void);
 /* Collectible that waits until the hero is close, then flies to the hero, shrinks, and is collected with a sound and a saved flag. */
 void orb_update(char *moby) {
     char *vars;
-    float toHero[4] __attribute__((aligned(16)));
-    float heroDistance, flySpeed, arriveDistance;
+    float to_hero[4] __attribute__((aligned(16)));
+    float hero_distance, fly_speed, arrive_distance;
     F(moby,u16,0x96)++;
     vars = F(moby,char *,0x68);
     switch (F(moby,u8,0x20)) {
@@ -46,23 +46,23 @@ void orb_update(char *moby) {
     case 2:
         F(vars,float,0) += (1.0f - F(vars,float,0)) * D_L08_001AFEDC;
         F(moby,float,0x48) = F(vars,float,0) + F(vars,float,0);
-        FastVecSub(toHero,g_hero_position,moby+0x10);
-        toHero[2] += 0.6f;
-        heroDistance = vec_length_xy(toHero);
-        arriveDistance = 0.12f;
+        FastVecSub(to_hero,g_hero_position,moby+0x10);
+        to_hero[2] += 0.6f;
+        hero_distance = vec_length_xy(to_hero);
+        arrive_distance = 0.12f;
         if (F(moby,u16,0x96) < 180) {
             if (F(g_hero_position,int,0x2214) != 0x31)
-                flySpeed = D_L08_001AFED4 * (F(vars,float,0) * 0.016666668f);
+                fly_speed = D_L08_001AFED4 * (F(vars,float,0) * 0.016666668f);
             else {
-                flySpeed = D_L08_001AFED8 * (F(vars,float,0) * 0.016666668f);
-                arriveDistance = 0.8f;
+                fly_speed = D_L08_001AFED8 * (F(vars,float,0) * 0.016666668f);
+                arrive_distance = 0.8f;
             }
-        } else flySpeed = F(vars,float,0) + F(vars,float,0);
-        vec_fast_divide_helper(toHero,toHero,flySpeed);
-        FastVecAdd(moby+0x10,moby+0x10,toHero);
-        if (((ObjectView *)moby)->scale > 0.1f || heroDistance < arriveDistance || heroDistance < flySpeed)
+        } else fly_speed = F(vars,float,0) + F(vars,float,0);
+        vec_fast_divide_helper(to_hero,to_hero,fly_speed);
+        FastVecAdd(moby+0x10,moby+0x10,to_hero);
+        if (((ObjectView *)moby)->scale > 0.1f || hero_distance < arrive_distance || hero_distance < fly_speed)
             ((ObjectView *)moby)->scale -= D_L08_001AFEE8 * F(((ObjectView *)moby)->descriptor,float,0x24);
-        if ((heroDistance < flySpeed && ((ObjectView *)moby)->scale < F(((ObjectView *)moby)->descriptor,float,0x24)*0.01f) ||
+        if ((hero_distance < fly_speed && ((ObjectView *)moby)->scale < F(((ObjectView *)moby)->descriptor,float,0x24)*0.01f) ||
             g_hero_state.action == 0x14 || g_hero_state.action == 0x19 ||
             g_hero_state.mode == 0x39 || g_hero_state.mode == 0x6F) {
             snd_play_from_class_bank(3,0,moby,0x96A);
@@ -74,13 +74,13 @@ void orb_update(char *moby) {
                      (F(D_0019B2E8,u8,F(F(vars,char *,4),u8,0xB0)+(g_current_map_index<<4)) & 0x80)))
                     D_L08_0021EAF0.flags[F(F(vars,char *,4),short,0xB2)] = F(F(vars,char *,4),u8,0xB0)+2;
                 {
-                    u16 flagIndex = F(F(vars,char *,4),u16,0xB2);
-                    if (flagIndex & 1) {
-                        u8 *flagBits = (u8 *)D_0019B4A8 + (((short)flagIndex >> 1) + (g_current_map_index << 10));
-                        if (((*flagBits >> 4) & 7) != 7) *flagBits += 0x10;
+                    u16 flag_index = F(F(vars,char *,4),u16,0xB2);
+                    if (flag_index & 1) {
+                        u8 *flag_bits = (u8 *)D_0019B4A8 + (((short)flag_index >> 1) + (g_current_map_index << 10));
+                        if (((*flag_bits >> 4) & 7) != 7) *flag_bits += 0x10;
                     } else {
-                        u8 *flagBits = (u8 *)D_0019B4A8 + (((short)flagIndex >> 1) + (g_current_map_index << 10));
-                        if ((*flagBits & 7) != 7) ++*flagBits;
+                        u8 *flag_bits = (u8 *)D_0019B4A8 + (((short)flag_index >> 1) + (g_current_map_index << 10));
+                        if ((*flag_bits & 7) != 7) ++*flag_bits;
                     }
                 }
             }

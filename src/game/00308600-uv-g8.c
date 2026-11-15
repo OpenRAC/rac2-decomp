@@ -43,11 +43,11 @@ extern void part_draw_glint_effect(int, void *, void *, void *, int);
 void draw_joint_aligned_beam_effect(char *moby) {
     Quad_2B4918 quad;
     BeamVec basis[4];
-    BeamVec jointPoints[2];
+    BeamVec joint_points[2];
     Ids_2B4918 ids;
     BeamVec up;
-    BeamVec worldMatrix[4];
-    BeamVec offsetMatrix[4];
+    BeamVec world_matrix[4];
+    BeamVec offset_matrix[4];
     BeamVec a;
     BeamVec b;
     BeamVec c;
@@ -66,14 +66,14 @@ void draw_joint_aligned_beam_effect(char *moby) {
     quad.tag[0] = 0;
     if (data->f4 != 0) {
         ids = D_001AED90;
-        moby_transform_point_list(child, 2, &ids, jointPoints);
+        moby_transform_point_list(child, 2, &ids, joint_points);
     } else {
         ids = D_001AED98;
-        moby_transform_point_list(child, 2, &ids, jointPoints);
+        moby_transform_point_list(child, 2, &ids, joint_points);
     }
     *(Q_2B4918 *)&up = 0;
     up.y = 1.0f;
-    FastVecSub(&basis[2], &jointPoints[0], &jointPoints[1]);
+    FastVecSub(&basis[2], &joint_points[0], &joint_points[1]);
     vec_scale_to_length(&basis[2], &basis[2], 1.0f);
     basis[2].w = 0.0f;
     FastVecCross(&basis[0], &up, &basis[2]);
@@ -81,18 +81,18 @@ void draw_joint_aligned_beam_effect(char *moby) {
     basis[0].w = 0.0f;
     FastVecCross(&basis[1], &basis[2], &basis[0]);
     basis[1].w = 0.0f;
-    qcopy(&basis[3], &jointPoints[1]);
+    qcopy(&basis[3], &joint_points[1]);
     basis[3].w = 1.0f;
     qcopy(moby + 0xC0, &basis[0]);
     qcopy(moby + 0xD0, &basis[1]);
     qcopy(moby + 0xE0, &basis[2]);
     qcopy(moby + 0x10, &basis[3]);
-    set_identity_matrix(offsetMatrix);
-    offsetMatrix[3].w = 1.0f;
-    offsetMatrix[3].z = -0.075f;
-    offsetMatrix[3].x = 0.0f;
-    offsetMatrix[3].y = 0.0f;
-    multiply_matrix(worldMatrix, basis, offsetMatrix);
+    set_identity_matrix(offset_matrix);
+    offset_matrix[3].w = 1.0f;
+    offset_matrix[3].z = -0.075f;
+    offset_matrix[3].x = 0.0f;
+    offset_matrix[3].y = 0.0f;
+    multiply_matrix(world_matrix, basis, offset_matrix);
     quad.tag[1] = GetEffectTextureDescriptor(0xC);
     for (i = 0; i < 4; i++) {
         quad.col[i] = 0x80808080;
@@ -106,7 +106,7 @@ void draw_joint_aligned_beam_effect(char *moby) {
         quad.uv[i][0] = D_001AED70[i].u;
         quad.uv[i][1] = beam_uv_absolute[i].v;
     }
-    draw_world_quad(&quad, worldMatrix, 0);
+    draw_world_quad(&quad, world_matrix, 0);
     for (i = 0; i < 4; i++) {
         if (i == 0 || i == 2) {
             FastVecScale(quad.pos[i], D_001AED30[i], data->f2C);
@@ -116,7 +116,7 @@ void draw_joint_aligned_beam_effect(char *moby) {
             v[2] -= math_random_float_range(0.0f, 0.1f);
         }
     }
-    draw_world_quad(&quad, worldMatrix, 0);
+    draw_world_quad(&quad, world_matrix, 0);
     quad.tag[1] = GetEffectTextureDescriptor(0xB);
     FastVecScale(&d, &basis[2], -0.13f);
     FastVecAdd(&d, &d, &basis[3]);

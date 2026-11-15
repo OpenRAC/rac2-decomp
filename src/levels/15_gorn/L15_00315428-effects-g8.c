@@ -65,7 +65,7 @@ void UpdateGornStageEffects(void)
         if (FIELD(short, obj, 0xAA) == 0xD54) {
             UpdateEquipmentPieces(obj);
         }
-        if (obj && FIELD(short, obj, 0xAA) == 0xFA0 /* TV Screens */) {
+        if (obj && FIELD(short, obj, 0xAA) == MOBY_CLASS_TV_SCREENS) {
             if (FIELD(char *, obj, 0x68)) {
                 math_store_angle_update_result(obj, FIELD(char *, obj, 0x68) + 0xC,
                                  0x80AAAAD2, 0x80396464, 0.061086535f);

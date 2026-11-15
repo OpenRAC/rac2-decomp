@@ -91,7 +91,7 @@ void math_compute_curve_control_point(u8 *obj, float *dst, TI16 *src1, TI16 *src
     TI16 vb;
     u8 *vars;
     s16 randRange;
-    s32 angleDeg;
+    s32 angle_deg;
     float angle;
     float offset;
 
@@ -105,9 +105,9 @@ void math_compute_curve_control_point(u8 *obj, float *dst, TI16 *src1, TI16 *src
     FastVecCross((float *)&loc[4], (float *)&loc[3], (float *)&loc[2]);
     vec_scale_to_length((float *)&loc[4], (float *)&loc[4], 1.0f);
     randRange = *(s16 *)(vars + 0xC);
-    angleDeg = math_random_int_range(-randRange, randRange);
-    angleDeg = (((s32)*(u16 *)(obj + 0x96) << *(s16 *)(vars + 0xE)) + angleDeg) % 360 - 180;
-    angle = math_fast_float_g((float)angleDeg * 0.017453294f);
+    angle_deg = math_random_int_range(-randRange, randRange);
+    angle_deg = (((s32)*(u16 *)(obj + 0x96) << *(s16 *)(vars + 0xE)) + angle_deg) % 360 - 180;
+    angle = math_fast_float_g((float)angle_deg * 0.017453294f);
     offset = math_fast_sin_or_cos_b(angle) * scale;
     FastVecScale((float *)&loc[5], (float *)&loc[4], offset);
     FastVecAdd(dst, (float *)&loc[0], (float *)&loc[5]);

@@ -20,13 +20,13 @@ void lightning_beam_machine_update(u8 *moby)
 {
     u8 *vars;
     s32 one;
-    L13_Quad checkPos;
+    L13_Quad check_pos;
 
     vars = *(u8 **)(moby + 0x68);
     if (moby[0x20] != 0) {
-        qcopy(&checkPos, moby + 0x10);
-        checkPos.f[3] = *(f32 *)(vars + 0x624);
-        if (math_fast_helper_a(&checkPos, 52.0f) < 0)
+        qcopy(&check_pos, moby + 0x10);
+        check_pos.f[3] = *(f32 *)(vars + 0x624);
+        if (math_fast_helper_a(&check_pos, 52.0f) < 0)
             return;
     }
     if (*(s32 *)(vars + 0x628) == 0)

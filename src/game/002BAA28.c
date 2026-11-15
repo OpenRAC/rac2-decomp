@@ -36,8 +36,8 @@ extern u8 *D_001F259C;
 Particle *part_spawn_trail(void *position, float *from, float *to, int startColor, int endColor, int kind, int duration, int size, int flags)
 {
     Particle *particle = part_alloc(2);
-    float packedVecA[4], packedVecB[4];
-    struct ParticleTrail *trailData;
+    float packed_vec_a[4], packed_vec_b[4];
+    struct ParticleTrail *trail_data;
     if (particle != 0) {
         qcopy(&particle->position, position);
         particle->color = startColor;
@@ -54,18 +54,18 @@ Particle *part_spawn_trail(void *position, float *from, float *to, int startColo
                 particle->mode = 0x48;
         }
         particle->kind = kind;
-        trailData = &particle->trail;
-        trailData->scaleA = FloatToInt(from[3] * 210.00002f);
-        trailData->scaleB = FloatToInt(to[3] * 210.00002f);
-        vec_pack_direction(from, &trailData->packedA);
-        vec_pack_direction(to, &trailData->packedB);
-        vec_decode_byte_color(packedVecA, &trailData->packedA);
-        vec_decode_byte_color(packedVecB, &trailData->packedB);
-        trailData->startColor = startColor;
-        trailData->endColor = endColor;
-        trailData->kind = kind;
-        trailData->duration = duration;
-        trailData->size = size;
+        trail_data = &particle->trail;
+        trail_data->scaleA = FloatToInt(from[3] * 210.00002f);
+        trail_data->scaleB = FloatToInt(to[3] * 210.00002f);
+        vec_pack_direction(from, &trail_data->packedA);
+        vec_pack_direction(to, &trail_data->packedB);
+        vec_decode_byte_color(packed_vec_a, &trail_data->packedA);
+        vec_decode_byte_color(packed_vec_b, &trail_data->packedB);
+        trail_data->startColor = startColor;
+        trail_data->endColor = endColor;
+        trail_data->kind = kind;
+        trail_data->duration = duration;
+        trail_data->size = size;
     }
     return particle;
 }

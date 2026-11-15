@@ -24,7 +24,7 @@ extern f32 D_L07_001AA698 __attribute__((sda));
 /* Updates a Siberius trigger object (moby class 3943): waits for a touch, plays an effect and sound once, then removes itself after a timer. */
 void siberius_trigger_update(u8 *moby)
 {
-    f32 myPos[4], targetPos[4];
+    f32 my_pos[4], target_pos[4];
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *target;
     s32 blocked;
@@ -36,15 +36,15 @@ void siberius_trigger_update(u8 *moby)
         if (!*(s32 *)vars) {
             target = part_find_owned_effect_slot(moby, 0x4010000, 0);
             if (target) {
-                qcopy(myPos, moby + 0x10);
-                myPos[2] += 0.5f;
+                qcopy(my_pos, moby + 0x10);
+                my_pos[2] += 0.5f;
                 blocked = 1;
                 if (*(u8 **)(target + 0x20)) {
-                    qcopy(targetPos, *(u8 **)(target + 0x20) + 0x10);
-                    targetPos[2] += 0.5f;
-                    if (fast_vec_dist(targetPos, myPos) < 64.0f) {
+                    qcopy(target_pos, *(u8 **)(target + 0x20) + 0x10);
+                    target_pos[2] += 0.5f;
+                    if (fast_vec_dist(target_pos, my_pos) < 64.0f) {
                         blocked = 0;
-                        if (!CollLine(targetPos, myPos, 2, moby, 0)) blocked = 1;
+                        if (!CollLine(target_pos, my_pos, 2, moby, 0)) blocked = 1;
                     }
                 }
                 if (blocked) moby_set_state(moby, 2, -1);

@@ -18,22 +18,22 @@ extern void part_spawn_masked_debris(void *, s32, void *, f32, f32, f32, f32, s3
 void linked_moby_trigger_burst(u8 *moby) {
     u8 *self = moby;
     f32 vec[4];
-    u16 rawId;
+    u16 raw_id;
 
     FastVecSub(vec, (f32 *)(self + 0x10), (f32 *)g_hero_position);
     vec_transform_and_set_height((char *)self, (char *)vec, (char *)vec, 0, 0.0f);
     vec_scale_to_length(vec, vec, 0.10000000894069672f);
     part_spawn_masked_debris(self, 31, vec, 6.0f, 12.0f, 6.0f, 12.0f, 255);
 
-    rawId = *(u16 *)(self + 0xB2);
-    if (rawId & 1) {
-        u8 *counter = (u8 *)(((s16)rawId >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+    raw_id = *(u16 *)(self + 0xB2);
+    if (raw_id & 1) {
+        u8 *counter = (u8 *)(((s16)raw_id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
         u8 packed = *counter;
 
         if (((packed >> 4) & 7) != 7)
             *counter = packed + 0x10;
     } else {
-        u8 *counter = (u8 *)(((s16)rawId >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        u8 *counter = (u8 *)(((s16)raw_id >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
         u8 packed = *counter;
 
         if ((packed & 7) != 7)

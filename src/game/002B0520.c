@@ -17,26 +17,26 @@ extern int FloatToInt(float);
 
 /* Looks up the terrain height under a position from a height map, giving a large default when the position is off the map. */
 float coll_get_heightmap_height(TI *position) {
-    float worldPos[4] __attribute__((aligned(16)));
+    float world_pos[4] __attribute__((aligned(16)));
     float rel[4] __attribute__((aligned(16)));
-    s32 cellIndex;
-    u8 heightByte;
+    s32 cell_index;
+    u8 height_byte;
 
-    *(TI *)worldPos = *position;
+    *(TI *)world_pos = *position;
     if (D_001B1A20 == 0) {
         return 0.0f;
     }
-    FastVecSub(rel, worldPos, D_001B19E0);
+    FastVecSub(rel, world_pos, D_001B19E0);
     rel[0] = rel[0] / D_001B1A10;
     rel[1] = rel[1] / D_001B1A14;
     if (rel[0] < 0.0f || 256.0f < rel[0] || rel[1] < 0.0f || 256.0f < rel[1] || D_001A91C0 != D_001C4F40) {
         return 1023.0f;
     }
-    cellIndex = FloatToInt(rel[1]) << 8;
-    cellIndex += FloatToInt(rel[0]);
-    heightByte = D_001B1A20[cellIndex];
-    if (heightByte == 0xFF) {
+    cell_index = FloatToInt(rel[1]) << 8;
+    cell_index += FloatToInt(rel[0]);
+    height_byte = D_001B1A20[cell_index];
+    if (height_byte == 0xFF) {
         return 1023.0f;
     }
-    return IntToFloat(heightByte) * D_001B1A18 + D_001B19E0[2];
+    return IntToFloat(height_byte) * D_001B1A18 + D_001B19E0[2];
 }

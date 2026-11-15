@@ -15,18 +15,18 @@ extern void moby_update_eased_node(char *, char *, int, float, float);
 void actor_aim_body_at_target(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    float groundHeight, angle;
+    float ground_height, angle;
 
     gfx_update_color_fade(moby, vars + 0x50);
     FastDecTimer(vars + 0x24A);
     if (*(unsigned short *)(moby + 0x96) <= 0xFFFE)
         ++*(unsigned short *)(moby + 0x96);
-    groundHeight = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
-    if (math_fabs(*(float *)(moby + 0x18) - groundHeight) < 10.0f) {
-        math_spring_float_to_goal(moby + 0x18, groundHeight, 0.00083333341171965f,
+    ground_height = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
+    if (math_fabs(*(float *)(moby + 0x18) - ground_height) < 10.0f) {
+        math_spring_float_to_goal(moby + 0x18, ground_height, 0.00083333341171965f,
                       0.010000000707805157f, 0.18000000715255737f, vars + 0x49C);
-        if (*(float *)(moby + 0x18) < groundHeight)
-            *(float *)(moby + 0x18) = groundHeight;
+        if (*(float *)(moby + 0x18) < ground_height)
+            *(float *)(moby + 0x18) = ground_height;
     }
     if (FastDiffRots(*(float *)(moby + 0xF8),
                       mat_fast_helper_a(*(float *)(vars + 0x200) - *(float *)(moby + 0x10),

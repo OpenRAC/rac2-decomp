@@ -78,33 +78,33 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
 /* Draws the gauge pop-up: a dark panel with scale bars filled up to the current amount. */
 int gauge_popup_draw(void)
 {
-    float savedOpacity;
+    float saved_opacity;
     float blend;
     float scale;
     float zero;
     float y;
-    char *panelTexture;
-    int backColor;
-    int frameColor;
+    char *panel_texture;
+    int back_color;
+    int frame_color;
     int one;
     float half;
 
     if (D_001A8CFC[0] != 0 && g_subtitle_state.active == 0 && g_subtitle_state.unk24 == -1) {
         one = 1;
         half = 0.5f;
-        savedOpacity = D_001B9040.opacity;
+        saved_opacity = D_001B9040.opacity;
         D_001B9040.opacity = 0.62f;
         UpdateViewContext();
         blend = IntToFloat(g_gauge_popup_blend) * 0.1f;
-        backColor = FastTweenColor(0x442D00, 0x60442D00, blend);
-        frameColor = FastTweenColor(0xF0C070, 0x55F0C070, blend);
-        panelTexture = table_find_by_id(D_001A8CFC[0] + 0x8710, 0xA6);
-        y = (float)label_y(panelTexture, 206.0f, D_001B23A4[0], half, one);
+        back_color = FastTweenColor(0x442D00, 0x60442D00, blend);
+        frame_color = FastTweenColor(0xF0C070, 0x55F0C070, blend);
+        panel_texture = table_find_by_id(D_001A8CFC[0] + 0x8710, 0xA6);
+        y = (float)label_y(panel_texture, 206.0f, D_001B23A4[0], half, one);
         scale = 1.0f;
         zero = 0.0f;
-        gfx_draw_scaled_object_two_axes(panelTexture, backColor, 484.0f, y, scale, scale, zero);
-        panelTexture = table_find_by_id(D_001A8CFC[0] + 0x8710, 0xA7);
-        gfx_draw_scaled_object_two_axes(panelTexture, frameColor, 484.0f, (float)label_y(panelTexture, 206.0f, D_001B23A4[0], half, one), 1.0f, 1.0f, 0.0f);
+        gfx_draw_scaled_object_two_axes(panel_texture, back_color, 484.0f, y, scale, scale, zero);
+        panel_texture = table_find_by_id(D_001A8CFC[0] + 0x8710, 0xA7);
+        gfx_draw_scaled_object_two_axes(panel_texture, frame_color, 484.0f, (float)label_y(panel_texture, 206.0f, D_001B23A4[0], half, one), 1.0f, 1.0f, 0.0f);
         switch (g_gauge_popup_mode) {
         case 0:
             if (zero <= g_gauge_popup_amount && g_gauge_popup_amount <= scale) {
@@ -185,7 +185,7 @@ int gauge_popup_draw(void)
             }
         }
         }
-        D_001B9040.opacity = savedOpacity;
+        D_001B9040.opacity = saved_opacity;
         UpdateViewContext();
     }
     return D_001A8D40;

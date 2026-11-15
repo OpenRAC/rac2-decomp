@@ -12,9 +12,9 @@ extern void moby_mark_spawned(void *a0);
 /* Keeps the object around until it is triggered or the level is over, then removes it. */
 void triggered_removal_update(u8 *moby)
 {
-    u8 *mobyAlias = moby;
+    u8 *moby_alias = moby;
 
-    *(u32 *)(*(u8 **)(mobyAlias + 0x68) + 0x5C) |= 1;
-    if (*(u8 *)(mobyAlias + 0xBC) != 0 || D_001A7B26 != 0)
-        moby_mark_spawned(mobyAlias);
+    *(u32 *)(*(u8 **)(moby_alias + 0x68) + 0x5C) |= 1;
+    if (*(u8 *)(moby_alias + 0xBC) != 0 || D_001A7B26 != 0)
+        moby_mark_spawned(moby_alias);
 }

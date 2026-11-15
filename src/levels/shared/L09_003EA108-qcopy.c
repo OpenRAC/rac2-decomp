@@ -19,9 +19,9 @@ int path_steer_moby_to_nearest(char *moby, int index)
     find_nearest_path_point(D_L09_001FE6C0[index], pos, &local.v0, 100000.0f, 1.0f, local.f = 0.0f, &local.e, &local.f, 0);
     if (fast_vec_dist(&local.v0, (TI128 *)(moby + 0x10)) > 2.0f) {
         TI128 *q2 = &local.v2;
-        short forwardIdx = path_step_along_entry(moby, index, q2, *(short *)(vars + 0x118), 1, *(float *)(vars + 0x78) * 10.0f);
+        short forward_idx = path_step_along_entry(moby, index, q2, *(short *)(vars + 0x118), 1, *(float *)(vars + 0x78) * 10.0f);
         TI128 *q3 = &local.v3;
-        short backIdx = path_step_along_entry(moby, index, q3, *(short *)(vars + 0x118), -1, *(float *)(vars + 0x78) * 10.0f);
+        short back_idx = path_step_along_entry(moby, index, q3, *(short *)(vars + 0x118), -1, *(float *)(vars + 0x78) * 10.0f);
         float d;
 
         fast_vec_dist(pos, q2);
@@ -29,10 +29,10 @@ int path_steer_moby_to_nearest(char *moby, int index)
         d = fast_vec_dist(&local.v0, q2);
         if (d < fast_vec_dist(&local.v0, q3)) {
             local.v1 = *q2;
-            *(short *)(vars + 0x118) = forwardIdx;
+            *(short *)(vars + 0x118) = forward_idx;
         } else {
             local.v1 = *q3;
-            *(short *)(vars + 0x118) = backIdx;
+            *(short *)(vars + 0x118) = back_idx;
         }
     } else {
         local.v1 = local.v0;

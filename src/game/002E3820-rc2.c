@@ -34,25 +34,25 @@ extern s32 gfx_append_vu1_preset_a(void);
 
 /* Links the render packet buffers together into one chain and restores the buffer mark. */
 void gfx_link_packet_chain(void) {
-    s32 tagWord;
-    s8 *firstTag;
+    s32 tag_word;
+    s8 *first_tag;
 
     D_001B20E4 = g_dma_packet_cursor;
-    tagWord = 0x20000000;
+    tag_word = 0x20000000;
     g_dma_packet_cursor = g_dma_packet_cursor + 0x10;
-    (*(s32 *)((s8 *)(D_001B20E0) + (0))) = tagWord;
-    firstTag = D_001B20E0;
-    (*(s8 **)((s8 *)(firstTag) + (4))) = g_dma_packet_cursor;
+    (*(s32 *)((s8 *)(D_001B20E0) + (0))) = tag_word;
+    first_tag = D_001B20E0;
+    (*(s8 **)((s8 *)(first_tag) + (4))) = g_dma_packet_cursor;
     (*(s32 *)((s8 *)(D_001B20E0) + (8))) = 0;
     (*(s32 *)((s8 *)(D_001B20E0) + (0xC))) = 0;
-    func_0029D0E0(firstTag);
+    func_0029D0E0(first_tag);
     (void) gfx_append_vu1_preset_a();
-    (*(s32 *)((s8 *)(g_dma_packet_cursor) + (0))) = tagWord;
+    (*(s32 *)((s8 *)(g_dma_packet_cursor) + (0))) = tag_word;
     (*(s8 **)((s8 *)(g_dma_packet_cursor) + (4))) = D_001B20E0 + 0x10;
     (*(s32 *)((s8 *)(g_dma_packet_cursor) + (8))) = 0;
     (*(s32 *)((s8 *)(g_dma_packet_cursor) + (0xC))) = 0;
     g_dma_packet_cursor = g_dma_packet_cursor + 0x10;
-    (*(s32 *)((s8 *)(D_001B20E4) + (0))) = tagWord;
+    (*(s32 *)((s8 *)(D_001B20E4) + (0))) = tag_word;
     (*(s8 **)((s8 *)(D_001B20E4) + (4))) = g_dma_packet_cursor;
     (*(s32 *)((s8 *)(D_001B20E4) + (8))) = 0;
     (*(s32 *)((s8 *)(D_001B20E4) + (0xC))) = 0;

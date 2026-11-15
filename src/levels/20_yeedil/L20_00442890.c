@@ -30,7 +30,7 @@ void yeedil_boss_update_camera(char *moby)
     char *base = D_L20_001B9E80;
     char *vars;
     float *p;
-    float angleToHero, heroHeading, angleDiff, headingX;
+    float angle_to_hero, hero_heading, angle_diff, heading_x;
 
     if (*(short *)(*(char **)(base + 0x190) + 0x86) != 0) {
         return;
@@ -48,14 +48,14 @@ void yeedil_boss_update_camera(char *moby)
         cursor = st;
         p = (float *)(st + 0x160);
     }
-    angleToHero = mat_fast_helper_a(*(float *)(moby + 0x10) - g_hero_state.pos[0],
+    angle_to_hero = mat_fast_helper_a(*(float *)(moby + 0x10) - g_hero_state.pos[0],
                       *(float *)(moby + 0x14) - g_hero_state.pos[1]);
-    headingX = p[0];
+    heading_x = p[0];
     cursor += 0x1C0;
-    heroHeading = mat_fast_helper_a(headingX, p[1]);
-    heroHeading = FastAddRotations(heroHeading, 3.1415927f);
-    angleDiff = fast_subtract_rotations(angleToHero, heroHeading);
-    math_approach_target_with_direction_mode((char *)&angleDiff, 0.0f,
+    hero_heading = mat_fast_helper_a(heading_x, p[1]);
+    hero_heading = FastAddRotations(hero_heading, 3.1415927f);
+    angle_diff = fast_subtract_rotations(angle_to_hero, hero_heading);
+    math_approach_target_with_direction_mode((char *)&angle_diff, 0.0f,
                    D_L20_001B2150 * 4.84813745e-06f,
                    D_L20_001B2150 * 4.84813745e-06f,
                    D_L20_001B2154 * 0.000290888245f, vars + 0x17F0, 0);

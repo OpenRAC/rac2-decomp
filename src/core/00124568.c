@@ -125,39 +125,39 @@ extern int cd_scmd_check_ready(int);
    `sd $31` where retail interleaves the descriptor stores between the
    `$16` and `$31` saves. */
 /* Sleeps for a number of ticks by setting an alarm that wakes this thread, then waiting on it. */
-void cd_sleep_with_alarm(unsigned short delayTicks) {
-    int semaParam[8];
-    int alarmSema;
-    semaParam[2] = 0;
-    semaParam[1] = 1;
-    semaParam[5] = 0;
-    alarmSema = r1_func_00118C70(semaParam);
-    r1_func_00118B20(delayTicks, (char *)r1_func_001208E4 + 4, alarmSema);
-    r1_func_00118CB0(alarmSema);
-    r1_func_00118C80(alarmSema);
+void cd_sleep_with_alarm(unsigned short delay_ticks) {
+    int sema_param[8];
+    int alarm_sema;
+    sema_param[2] = 0;
+    sema_param[1] = 1;
+    sema_param[5] = 0;
+    alarm_sema = r1_func_00118C70(sema_param);
+    r1_func_00118B20(delay_ticks, (char *)r1_func_001208E4 + 4, alarm_sema);
+    r1_func_00118CB0(alarm_sema);
+    r1_func_00118C80(alarm_sema);
 }
 
 /* rac1-decomp src/core/001208E8.c: func_00120978 */
 /* Sets the CD callback handler and returns the previous one. Does nothing if the CD system is busy. */
-void *sceCdCallback(void *newHandler) {
-    void *oldHandler;
-    int intrWasOn;
+void *sceCdCallback(void *new_handler) {
+    void *old_handler;
+    int intr_was_on;
     if (sceCdSyncS(1) != 0) {
         return 0;
     }
-    intrWasOn = r1_func_0011D960();
-    oldHandler = r1_D_00159840;
-    r1_D_00159840 = newHandler;
-    if (intrWasOn != 0) {
+    intr_was_on = r1_func_0011D960();
+    old_handler = r1_D_00159840;
+    r1_D_00159840 = new_handler;
+    if (intr_was_on != 0) {
         r1_func_0011D9A8();
     }
-    return oldHandler;
+    return old_handler;
 }
 
 /* rac1-decomp src/core/001208E8.c: func_001209D8 */
 /* Runs when a CD command finishes. Records the status and wakes up the thread waiting for the result. */
-void cd_command_done_callback(int *cmdStatus) {
-    r1_D_00131414_v = *cmdStatus;
+void cd_command_done_callback(int *cmd_status) {
+    r1_D_00131414_v = *cmd_status;
     r1_D_00131418_v = r1_D_00131414_v;
     if (r1_D_00131414_v == 0xB) {
         r1_D_00131414_v = 0;
@@ -185,8 +185,8 @@ extern void r1_func_001209D8(int *arg0);
 
 /* rac1-decomp src/core/001208E8.c: func_001246D0 */
 /* Copies the two small result buffers from the CD reply packet to their destinations, then finishes the command. */
-void cd_copy_reply_buffers(int bufAddr) {
-    CdRecv *recv = (CdRecv *)(bufAddr | 0x20000000);
+void cd_copy_reply_buffers(int buf_addr) {
+    CdRecv *recv = (CdRecv *)(buf_addr | 0x20000000);
     int i;
 
     if (recv->n0 > 0) {
@@ -261,7 +261,7 @@ void cd_create_semaphores(void) {
  */
 /* Shuts down the CD system: wakes the callback thread, deletes the semaphores and removes the command handler. */
 void cd_shutdown(void) {
-    int intrWasOn;
+    int intr_was_on;
     if (r1_D_001313D4 != 0) {
         do {
             r1_D_00131414_v = -1;
@@ -271,9 +271,9 @@ void cd_shutdown(void) {
     r1_func_00118C80_i(r1_D_001313E8);
     r1_func_00118C80_i(r1_D_001313EC);
     r1_func_00118C80_i(r1_D_001313E0);
-    intrWasOn = r1_func_0011D960();
+    intr_was_on = r1_func_0011D960();
     r1_func_0011AA68(0x80000012);
-    if (intrWasOn != 0) {
+    if (intr_was_on != 0) {
         r1_func_0011D9A8();
     }
 }
@@ -282,12 +282,12 @@ void cd_shutdown(void) {
 /* rac1-decomp src/core/001208E8.c: func_00120CA0 */
 /* Installs the CD command handler with interrupts off and marks the CD system as ready. */
 int cd_install_command_handler(void) {
-    int intrWasOn;
+    int intr_was_on;
 
     r1_D_001313E4 = 1;
-    intrWasOn = r1_func_0011D960();
+    intr_was_on = r1_func_0011D960();
     r1_func_0011AA38(0x80000012, (int)((char *)r1_func_00120C58 + 8), 0);
-    if (intrWasOn != 0) {
+    if (intr_was_on != 0) {
         r1_func_0011D9A8();
     }
     r1_D_001313E4 = 0;
@@ -299,18 +299,18 @@ int cd_install_command_handler(void) {
 /* rac1-decomp src/core/001208E8.c: func_00120D28 */
 /* _sceCd_scmd_prechk (libcdvd.a cdvd000.o) */
 /* Checks that a CD system command can start. Takes the lock and connects to the CD server, retrying until it answers. */
-int cd_scmd_check_ready(int cmdId) {
+int cd_scmd_check_ready(int cmd_id) {
     int spin;
     volatile int *sem = &r1_D_001313E8;
 
     r1_func_00120B28();
     if (*sem != r1_func_00118CC0(*sem)) {
         if (r1_D_001313D0 > 0) {
-            r1_func_0011A6C8(r1_D_00152FB0, cmdId, r1_D_001313DC);
+            r1_func_0011A6C8(r1_D_00152FB0, cmd_id, r1_D_001313DC);
         }
         return 0;
     }
-    r1_D_001313DC = cmdId;
+    r1_D_001313DC = cmd_id;
     r1_func_00118BF0(r1_D_00159850, r1_D_00159858);
     if (sceCdSyncS(1) != 0) {
         r1_func_00118C90(*sem);

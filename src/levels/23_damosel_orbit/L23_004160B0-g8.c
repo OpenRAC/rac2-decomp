@@ -63,7 +63,7 @@ extern void moby_fade_out_update(void);
 void enemy_handle_hit_sparks(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     char *hit;
-    int particleCount;
+    int particle_count;
     int i;
     float velocity[3];
 
@@ -92,13 +92,13 @@ void enemy_handle_hit_sparks(char *moby) {
         if (*(short *)(*(char **)(hit + 0x20) + 0xAA) != 0x118F /* moby class 4495 */)
             *(short *)(vars + 0x26) = 0x14;
         if (*(unsigned short *)(moby + 0x7C) != 0) {
-            float damageRatio;
+            float damage_ratio;
 
-            damageRatio = *(float *)(vars + 0x20) / D_L23_001B13C8;
-            particleCount = 10 - (int)(damageRatio * 10.0f);
+            damage_ratio = *(float *)(vars + 0x20) / D_L23_001B13C8;
+            particle_count = 10 - (int)(damage_ratio * 10.0f);
             if (*(float *)(vars + 0x20) <= D_L23_001B13CC)
-                particleCount = 10;
-            for (i = 0; i < particleCount; i++) {
+                particle_count = 10;
+            for (i = 0; i < particle_count; i++) {
                 int mask = *(unsigned short *)(moby + 0x7C);
 
                 if ((mask >> i) & 1) {

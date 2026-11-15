@@ -15,7 +15,7 @@ unsigned char *bike_find_aim_target(unsigned char *shooter, AimTargetQuad *origi
 {
     float start[4], dir[4], delta[4], unit[4], target[4];
     float *startp=start, *dirp=dir;
-    unsigned char *bestTarget=0, *candidate;
+    unsigned char *best_target=0, *candidate;
     float distance, dot;
     *(AimTargetQuad *)startp=*origin;
     *(AimTargetQuad *)dir=*direction;
@@ -26,25 +26,25 @@ unsigned char *bike_find_aim_target(unsigned char *shooter, AimTargetQuad *origi
         int type;
         if((signed char)candidate[0x20]<0)continue;
         type=*(short *)(candidate+0xaa);
-        if(type!=0x8ba /* moby class 2234 */ && type!=0xb2d /* Enemy Hoverbike */ && type!=0xa77 /* Hoverbike Race Bomb */)continue;
-        if(type==0xb2d /* Enemy Hoverbike */ && candidate[0x20]==3)continue;
+        if(type!=0x8ba /* moby class 2234 */ && type!=MOBY_CLASS_ENEMY_HOVERBIKE && type!=MOBY_CLASS_HOVERBIKE_RACE_BOMB)continue;
+        if(type==MOBY_CLASS_ENEMY_HOVERBIKE && candidate[0x20]==3)continue;
         qcopy(target,candidate+0x10);
         target[2]+=0.5f;
         FastVecSub(delta,target,startp);
         distance=FastVecLength(delta);
         FastVecScale(unit,delta,1.0f/distance);
-        if((*(short *)(candidate+0xaa)!=0xb2d /* Enemy Hoverbike */ || (bestTarget && *(short *)(bestTarget+0xaa)==*(short *)(candidate+0xaa))) && distance>range)continue;
+        if((*(short *)(candidate+0xaa)!=MOBY_CLASS_ENEMY_HOVERBIKE || (best_target && *(short *)(best_target+0xaa)==*(short *)(candidate+0xaa))) && distance>range)continue;
         dot=FastVecDot(unit,shooter+0xc0);
         if(dot>0.707f || (dot>0.0f && distance<3.0f)) {
             if(CollLine(startp,target,2,shooter,0))continue;
             if(CollLine(target,startp,2,shooter,0))continue;
             range=distance;
-            bestTarget=candidate;
+            best_target=candidate;
             *yaw=mat_fast_helper_a(target[0]-startp[0],target[1]-startp[1]);
             *pitch=-mat_fast_helper_a(vec_distance_xy(startp,target),target[2]-startp[2]);
             *height=0.5f;
         }
     }
     }
-    return bestTarget;
+    return best_target;
 }

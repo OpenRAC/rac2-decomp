@@ -27,37 +27,37 @@ struct OwnerPrefix { char reserved00[0x60]; int tableIndex, groupIndex; };
 /* Pushes group members and the player up through the launch volume when they step into it. */
 void UpdateLaunchVolume(char *self) {
     float mtx[16] __attribute__((aligned(16)));
-    float localOffset[4] __attribute__((aligned(16)));
+    float local_offset[4] __attribute__((aligned(16)));
     float projected[4] __attribute__((aligned(16)));
-    float launchVelocity[4] __attribute__((aligned(16)));
+    float launch_velocity[4] __attribute__((aligned(16)));
     struct OwnerPrefix *state = *(struct OwnerPrefix **)(self + 0x68);
-    unsigned short *listEntry;
+    unsigned short *list_entry;
     unsigned char *member;
-    char *heroBase;
-    char *heroNow;
+    char *hero_base;
+    char *hero_now;
     int inside;
-    float topHeight;
-    float riseHeight;
-    float fallHeight;
+    float top_height;
+    float rise_height;
+    float fall_height;
     float duration;
 
     matrix_from_basis_rows(mtx, self + 0xC0);
-    for (listEntry = g_group_entity_lists[state->groupIndex];
+    for (list_entry = g_group_entity_lists[state->groupIndex];
          (state->groupIndex & 0xFF) != 0xFF && state->groupIndex <= D_L14_001B25B8 &&
-         listEntry != 0 && ((listEntry != 0 && (short)listEntry[-1] >= 0) || listEntry == g_group_entity_lists[state->groupIndex]);
-         listEntry++) {
-        member = ((*listEntry & 0x7FFF) << 8) + g_moby_l14_pool;
+         list_entry != 0 && ((list_entry != 0 && (short)list_entry[-1] >= 0) || list_entry == g_group_entity_lists[state->groupIndex]);
+         list_entry++) {
+        member = ((*list_entry & 0x7FFF) << 8) + g_moby_l14_pool;
         if (member == 0)
             break;
         if (member[0x20] != 0xFE) {
             if (member[0x20] != 0xFD) {
-                FastVecSub(localOffset, member + 0x10, self + 0x10);
-                vec_transform_by_object_or_given(self, (char *)localOffset, (char *)localOffset, (char *)mtx);
-                localOffset[3] = 1.0f;
-                localOffset[0] = localOffset[0] + 2.0f;
-                inside = math_fabs(localOffset[0]) < 1.0f && math_fabs(localOffset[1]) < 1.0f;
+                FastVecSub(local_offset, member + 0x10, self + 0x10);
+                vec_transform_by_object_or_given(self, (char *)local_offset, (char *)local_offset, (char *)mtx);
+                local_offset[3] = 1.0f;
+                local_offset[0] = local_offset[0] + 2.0f;
+                inside = math_fabs(local_offset[0]) < 1.0f && math_fabs(local_offset[1]) < 1.0f;
                 if (inside) {
-                    transform_vector(projected, localOffset, &D_L14_001B268C[state->tableIndex]);
+                    transform_vector(projected, local_offset, &D_L14_001B268C[state->tableIndex]);
                     entity_start_launch_to_target((char *)member, projected,
                                       D_L14_001B268C[state->tableIndex].height +
                                           math_random_float_range(1.0f, 2.0f),
@@ -66,25 +66,25 @@ void UpdateLaunchVolume(char *self) {
             }
         }
     }
-    heroBase = g_hero_state;
-    if ((*(char **)(heroBase + 0x33C) == self && *(int *)(heroBase + 0x340) != 0) ||
-        *(float *)(heroBase + 0x31C) < 0.5f) {
-        FastVecSub(localOffset, g_hero_state + 0x80, self + 0x10);
-        vec_transform_by_object_or_given(self, (char *)localOffset, (char *)localOffset, (char *)mtx);
-        localOffset[3] = 1.0f;
-        localOffset[0] = localOffset[0] + 2.0f;
-        inside = math_fabs(localOffset[0]) < 1.0f && math_fabs(localOffset[1]) < 1.0f;
+    hero_base = g_hero_state;
+    if ((*(char **)(hero_base + 0x33C) == self && *(int *)(hero_base + 0x340) != 0) ||
+        *(float *)(hero_base + 0x31C) < 0.5f) {
+        FastVecSub(local_offset, g_hero_state + 0x80, self + 0x10);
+        vec_transform_by_object_or_given(self, (char *)local_offset, (char *)local_offset, (char *)mtx);
+        local_offset[3] = 1.0f;
+        local_offset[0] = local_offset[0] + 2.0f;
+        inside = math_fabs(local_offset[0]) < 1.0f && math_fabs(local_offset[1]) < 1.0f;
         if (inside) {
-            transform_vector(projected, localOffset, &D_L14_001B268C[state->tableIndex]);
-            heroNow = g_hero_state;
-            topHeight = D_L14_001B268C[state->tableIndex].height + 1.5f;
-            riseHeight = topHeight - *(float *)(heroNow + 0x88);
-            riseHeight *= 2.0f; duration = square_root(riseHeight / 0.0055555557f);
-            fallHeight = (topHeight - projected[2]) * 2.0f; duration += square_root(fallHeight / 0.0055555557f);
-            FastVecSub(launchVelocity, projected, heroNow + 0x80); FastVecScale(launchVelocity, launchVelocity, 1.0f / duration);
-            launchVelocity[2] = square_root(riseHeight * 0.0055555557f);
+            transform_vector(projected, local_offset, &D_L14_001B268C[state->tableIndex]);
+            hero_now = g_hero_state;
+            top_height = D_L14_001B268C[state->tableIndex].height + 1.5f;
+            rise_height = top_height - *(float *)(hero_now + 0x88);
+            rise_height *= 2.0f; duration = square_root(rise_height / 0.0055555557f);
+            fall_height = (top_height - projected[2]) * 2.0f; duration += square_root(fall_height / 0.0055555557f);
+            FastVecSub(launch_velocity, projected, hero_now + 0x80); FastVecScale(launch_velocity, launch_velocity, 1.0f / duration);
+            launch_velocity[2] = square_root(rise_height * 0.0055555557f);
             hero_l00_set_action(0x44, 1);
-            qcopy(heroNow + 0xF0, launchVelocity);
+            qcopy(hero_now + 0xF0, launch_velocity);
         }
     }
 }

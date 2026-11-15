@@ -12,7 +12,7 @@ extern int part_alloc_effect_slot(void *object, int mode, float x, float y, floa
 /* Spawns the object of type 0xB58 at position with velocity in its state, quarter size, and registers it as the shared one. */
 char *spider_bot_spawn(Quad *position, Quad *velocity)
 {
-    char *object = CreateMoby(0xb58 /* Spider Bot */);
+    char *object = CreateMoby(MOBY_CLASS_SPIDER_BOT);
     char *state;
     char *base;
 

@@ -30,23 +30,23 @@ extern u8 D_001395B8[];
 
 /* Sets a bit in the saved data for each slot from 1 to 4 that matches the current level. */
 void save_mark_matching_level_slots(void) {
-    u8 *saveData;
-    s32 levelId;
-    s32 *slotIds;
-    u32 slotIndex;
+    u8 *save_data;
+    s32 level_id;
+    s32 *slot_ids;
+    u32 slot_index;
     u32 one;
 
-    saveData = D_001395B8;
-    levelId = g_current_map_index;
-    slotIndex = 1;
+    save_data = D_001395B8;
+    level_id = g_current_map_index;
+    slot_index = 1;
     one = 1;
-    slotIds = &ref_L01_00367F78_00;
-    for (; (s32) slotIndex < 5; slotIndex++) {
-        if (levelId == *slotIds) {
-            if (slotIndex < 8U) {
-                saveData[0x8D] = (u8) (saveData[0x8D] | (one << slotIndex));
+    slot_ids = &ref_L01_00367F78_00;
+    for (; (s32) slot_index < 5; slot_index++) {
+        if (level_id == *slot_ids) {
+            if (slot_index < 8U) {
+                save_data[0x8D] = (u8) (save_data[0x8D] | (one << slot_index));
             }
         }
-        slotIds += 1;
+        slot_ids += 1;
     }
 }

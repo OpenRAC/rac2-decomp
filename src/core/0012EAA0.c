@@ -205,26 +205,26 @@ int sceMpegDemuxPssRing(sceMpeg *mp, u8 *start, int size, u8 *bufstart, int bufs
  * the previous callback.
  */
 /* Registers a handler for one kind of movie stream and returns the previous handler. */
-int sceMpegAddStrCallback(void *mpeg, int streamType, int streamIndex, int callback, int userData) {
+int sceMpegAddStrCallback(void *mpeg, int stream_type, int stream_index, int callback, int user_data) {
     int old = 0;
     char *sys = *(char **)((char *)mpeg + 0x40);
     StrCbEnt *handlers = *(StrCbEnt **)(sys + 0x44);
-    long key = r1_func_0012AC80(streamType, streamIndex);
-    int handlerCount = *(int *)(sys + 0x48);
+    long key = r1_func_0012AC80(stream_type, stream_index);
+    int handler_count = *(int *)(sys + 0x48);
     int i;
 
-    for (i = 0; i < handlerCount; i++) {
+    for (i = 0; i < handler_count; i++) {
         if (key == handlers[i].key) {
             old = handlers[i].cb;
             break;
         }
     }
     if (i < 0x40) {
-        *(int *)(sys + 0x48) = handlerCount + 1;
+        *(int *)(sys + 0x48) = handler_count + 1;
         handlers[i].key = key;
-        handlers[i].data = userData;
+        handlers[i].data = user_data;
         handlers[i].cb = callback;
-        handlers[i].extra = r1_D_00132FD8[streamType].extra;
+        handlers[i].extra = r1_D_00132FD8[stream_type].extra;
     }
     return old;
 }
@@ -248,22 +248,22 @@ int sceMpegAddStrCallback(void *mpeg, int streamType, int streamIndex, int callb
 /* Reads a movie stream pack header and stores the timing values. Returns 1. */
 int mpeg_read_pack_header(void *stream, void *header) {
     char *hdr = (char *)header;
-    unsigned int timeHigh, timeMid, timeLow, stuffing;
+    unsigned int time_high, time_mid, time_low, stuffing;
     unsigned int i;
 
     r1_func_0012AB60(stream, 0x22);
-    timeHigh = r1_func_0012AB60(stream, 3);
+    time_high = r1_func_0012AB60(stream, 3);
     r1_func_0012ABB0(stream);
-    timeMid = r1_func_0012AB60(stream, 0xF);
+    time_mid = r1_func_0012AB60(stream, 0xF);
     r1_func_0012ABB0(stream);
-    timeLow = r1_func_0012AB60(stream, 0xF);
+    time_low = r1_func_0012AB60(stream, 0xF);
     r1_func_0012ABB0(stream);
     *(int *)(hdr + 0x0) = r1_func_0012AB60(stream, 9);
     r1_func_0012AB60(stream, 0x1E);
     stuffing = r1_func_0012AB60(stream, 3);
 
-    *(unsigned int *)(hdr + 0x8) = (timeHigh >> 2) & 1;
-    *(unsigned int *)(hdr + 0x4) = (timeHigh << 30) | (timeMid << 15) | timeLow;
+    *(unsigned int *)(hdr + 0x8) = (time_high >> 2) & 1;
+    *(unsigned int *)(hdr + 0x4) = (time_high << 30) | (time_mid << 15) | time_low;
 
     for (i = 0; i < stuffing; i++) {
         r1_func_0012AB60(stream, 8);

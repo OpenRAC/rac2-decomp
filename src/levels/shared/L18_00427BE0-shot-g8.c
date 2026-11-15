@@ -38,7 +38,7 @@ int shooter_fire_shot(unsigned char *obj, int side) {
 
     switch (*(short *)(obj + 0xAA)) {
     case 0xEC0 /* moby class 3776 */: func_002C27F0(D_L18_001B1338, 0xEC0 /* moby class 3776 */); break;
-    case 0xEE1 /* Receiver Bot */: range = D_L18_001B1284; speed = D_L18_001B128C; break;
+    case MOBY_CLASS_RECEIVER_BOT: range = D_L18_001B1284; speed = D_L18_001B128C; break;
     case 0xED4 /* moby class 3796 */:
     default: range = D_L18_001B1280; speed = D_L18_001B1288; break;
     }

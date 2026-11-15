@@ -130,8 +130,8 @@ void miniturret_update(unsigned char *object) {
         qcopy(state, &query.velocity);
         if (collision == 2) {
             unsigned char *hit = query.hitObject;
-            if (!hit || (*(short *)(hit + 0xAA) != 0xCB /* Decoy */ &&
-                *(short *)(hit + 0xAA) != 0x1366 /* Miniturret */ && *(short *)(hit + 0xAA) != 0x1367 /* Megaturret */)) {
+            if (!hit || (*(short *)(hit + 0xAA) != MOBY_CLASS_DECOY &&
+                *(short *)(hit + 0xAA) != MOBY_CLASS_MINITURRET && *(short *)(hit + 0xAA) != MOBY_CLASS_MEGATURRET)) {
                 qzero_nc(state);
                 PP(state, 0x70) = hit;
                 if (hit) {

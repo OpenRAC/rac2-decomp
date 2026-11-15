@@ -28,20 +28,20 @@ extern f32 *map_get_coefficients(s32);
 extern s32 g_current_map_index;
 
 /* Turns a world position into a 0-1 position on the map screen for the given map (or the current map when -1 is passed). */
-void map_convert_world_to_map_position(f32 worldX, f32 worldY, f32 *outMapX, f32 *outMapY, s32 requestedMap) {
-    f32 *xTransform;
-    f32 *yTransform;
-    s32 mapIndex;
+void map_convert_world_to_map_position(f32 world_x, f32 world_y, f32 *out_map_x, f32 *out_map_y, s32 requested_map) {
+    f32 *x_transform;
+    f32 *y_transform;
+    s32 map_index;
 
-    mapIndex = (~requestedMap != 0) ? requestedMap : g_current_map_index;
-    if (mapIndex <= -1) {
-        mapIndex = 0;
+    map_index = (~requested_map != 0) ? requested_map : g_current_map_index;
+    if (map_index <= -1) {
+        map_index = 0;
     }
-    if (mapIndex >= 0x15) {
-        mapIndex = 0;
+    if (map_index >= 0x15) {
+        map_index = 0;
     }
-    xTransform = map_get_coefficients(mapIndex);
-    *outMapX = (xTransform[0] + (map_get_coefficients(mapIndex)[1] * worldX)) * 0.001953125f;
-    yTransform = map_get_coefficients(mapIndex);
-    *outMapY = (yTransform[2] + (map_get_coefficients(mapIndex)[3] * worldY)) * 0.001953125f;
+    x_transform = map_get_coefficients(map_index);
+    *out_map_x = (x_transform[0] + (map_get_coefficients(map_index)[1] * world_x)) * 0.001953125f;
+    y_transform = map_get_coefficients(map_index);
+    *out_map_y = (y_transform[2] + (map_get_coefficients(map_index)[3] * world_y)) * 0.001953125f;
 }

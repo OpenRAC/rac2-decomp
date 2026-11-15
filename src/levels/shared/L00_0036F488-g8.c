@@ -95,7 +95,7 @@ void level_update_game_frame_input(void)
     blocked = ((Hero *)g_hero_state)->state != 0x31;
     if (((Hero *)g_hero_state)->object) {
         int id = ((Hero *)g_hero_state)->object->id;
-        if (id == 0x905 /* Glider */ || id == 0x85C /* moby class 2140 */ || id == 0xEEF /* Mining Vehicle */ || id == 0x10EE)
+        if (id == MOBY_CLASS_GLIDER || id == 0x85C /* moby class 2140 */ || id == MOBY_CLASS_MINING_VEHICLE || id == 0x10EE)
             special = 1;
     }
     blocked |= special;

@@ -127,10 +127,10 @@ s32 DrawHrugisMissionHud(void) {
     char *label;
     u32 colors[2], colors2[2];
     Block b0, b1, b2;
-    s32 timePart0, timePart1, timePart2, score, idx, newidx, color, textX;
+    s32 time_part0, time_part1, time_part2, score, idx, newidx, color, textX;
     void *object;
     HudBlinkVars *data = *(HudBlinkVars **)(D_L10_001B13F0 + 0x68);
-    f32 x, y, ratio, barRight, base, end, fill, tweenColor;
+    f32 x, y, ratio, bar_right, base, end, fill, tweenColor;
     void *sprite0, *sprite2;
 
     switch (D_L10_001B13A0) {
@@ -197,9 +197,9 @@ s32 DrawHrugisMissionHud(void) {
         sprintf(text, D_L10_001B14C8, label, D_L10_001B141C);
         textX = D_L10_001B14C0 - 65;
         text_draw_medium(textX, label_y((void *)textX, D_L10_001B14C4 - 8, D_L10_001B2D84, half, 1), 0x80808080, text, 128);
-        math_split_time_into_parts(D_L10_001B3550, &timePart0, &timePart1, &timePart2);
+        math_split_time_into_parts(D_L10_001B3550, &time_part0, &time_part1, &time_part2);
         label = GetLocalizedString(0x2f83);
-        sprintf(text, D_L10_001B14D0, label, timePart0, timePart1, timePart2);
+        sprintf(text, D_L10_001B14D0, label, time_part0, time_part1, time_part2);
         textX2 = D_L10_001B14A8 - 80;
         text_draw_medium(textX2, label_y((void *)textX2, D_L10_001B14AC - 8, D_L10_001B2D84, half, 1), 0x80808080, text, 128);
         break;
@@ -268,9 +268,9 @@ s32 DrawHrugisMissionHud(void) {
         }
         colors[1] = FastTweenColor(0x800000ff, 0x8000ff00, fill);
         colors[0] = 0x800000ff;
-        barRight = fill * 200.0f + 156.0f;
+        bar_right = fill * 200.0f + 156.0f;
         if (data->blinkOn)
-            gfx_draw_screen_rectangle(156, 14, (s32)barRight, 27, 1, colors);
+            gfx_draw_screen_rectangle(156, 14, (s32)bar_right, 27, 1, colors);
 
         /* Ammo bar. */
         idx = table_find_last_used_entry(7);
@@ -283,9 +283,9 @@ s32 DrawHrugisMissionHud(void) {
         colors2[0] = 0x800000ff;
         colors2[1] = color;
         end = end * fill;
-        barRight = base + end;
+        bar_right = base + end;
         if (fill > 0.0f)
-            gfx_draw_screen_rectangle(450, 8, (s32)barRight, 19, 1, colors2);
+            gfx_draw_screen_rectangle(450, 8, (s32)bar_right, 19, 1, colors2);
 
         /* Weapon icons and the fill count. */
         b0 = D_L10_001B14E8;

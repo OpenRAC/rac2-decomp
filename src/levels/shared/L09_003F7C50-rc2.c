@@ -28,18 +28,18 @@ extern s32 ref_L09_003F7C50_00(s8 *, s32, s32, s32);
 extern s32 ref_L09_003F7C50_01(s8 *, s32, f32);
 
 /* Chooses a path for the enemy to follow and returns its current point, or -1 if there is no path. */
-s32 enemy_select_path(s8 *moby, s32 pathIndex, s32 mode) {
+s32 enemy_select_path(s8 *moby, s32 path_index, s32 mode) {
     s8 *vars;
-    s32 pathParam;
+    s32 path_param;
 
     vars = (*(s8 **)((s8 *)(moby) + (0x68)));
-    (*(s32 *)((s8 *)(vars) + (0x2DC))) = pathIndex;
-    if (pathIndex == -1) {
-        (*(s16 *)((s8 *)(vars) + (0x1C8))) = (s16) pathIndex;
+    (*(s32 *)((s8 *)(vars) + (0x2DC))) = path_index;
+    if (path_index == -1) {
+        (*(s16 *)((s8 *)(vars) + (0x1C8))) = (s16) path_index;
         return -1;
     }
-    pathParam = ref_L09_003F7C50_01(moby + 0x10, pathIndex, 0.0f);
-    if (ref_L09_003F7C50_00(moby, pathIndex, mode, pathParam) != 0) {
+    path_param = ref_L09_003F7C50_01(moby + 0x10, path_index, 0.0f);
+    if (ref_L09_003F7C50_00(moby, path_index, mode, path_param) != 0) {
         return (*(s16 *)((s8 *)(vars) + (0x1C8)));
     }
     (*(s16 *)((s8 *)(vars) + (0x1C8))) = 0;

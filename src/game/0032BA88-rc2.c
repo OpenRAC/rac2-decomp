@@ -32,16 +32,16 @@ extern f32 math_random_float_range(f32 a, f32 b);
 /* Draws the flashes for each active piece of an owner. */
 void part_draw_ring_piece_flashes(s32 owner) {
     s32 i;
-    s32 tableAddr;
+    s32 table_addr;
     s8 *piece;
     s8 *table;
 
     table = g_ring_pieces;
     piece = table + 0x30;
-    tableAddr = (s32) table;
+    table_addr = (s32) table;
     for (i = 0; i < 12; i++) {
         if ((*(s32 *)((s8 *)(piece) + (0x6C))) == owner) {
-            gfx_draw_lightning_bolt_variant(owner, tableAddr);
+            gfx_draw_lightning_bolt_variant(owner, table_addr);
             if ((*(s32 *)((s8 *)(piece) + (0x70))) == 0) {
                 gfx_draw_billboard_quad(piece, 0x31, 0x3F7F0000, 1, math_random_float_range(0.125f, 0.25f) * 5.0f, 1.25f, 0.0f);
                 gfx_draw_billboard_quad(piece, 0x31, 0x5F7F7F7F, 1, math_random_float_range(0.0625f, 0.125f) * 5.0f, 1.24f, 0.0f);
@@ -49,6 +49,6 @@ void part_draw_ring_piece_flashes(s32 owner) {
             }
         }
         piece += 0xB0;
-        tableAddr += 0xB0;
+        table_addr += 0xB0;
     }
 }

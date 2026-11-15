@@ -128,34 +128,34 @@ s32 nearest_rail_point(s8 *, void **, s128 *, void *, void *, s32 *, void *, s32
 
 /* Each frame, decides which state the hero is in (walking, jumping, swinging, swimming and so on) from the controller buttons and what the hero is touching, and switches to the new state when needed. */
 void hero_l13_decide_state(void) {
-    f32 vecA[4] __attribute__((aligned(16)));
-    f32 vecB[4] __attribute__((aligned(16)));
-    f32 vecC[4] __attribute__((aligned(16)));
-    s32 selectedIndex;
-    s32 outValueA;
-    s32 pathIndex;
-    f32 pathOffset;
-    void *newPath;
-    void *probeOutA;
-    void *probeOutB;
-    s32 newPathFlags;
-    s32 angleA;
-    s32 angleB;
-    s32 angleC;
-    s32 outValueB;
-    s32 angleD;
-    void *animInfo;
-    s32 prevValue229C;
-    s32 prevValue2298;
-    s32 prevAnim;
-    s32 jumpCount;
-    s32 stateCode;
-    s32 padButtons;
+    f32 vec_a[4] __attribute__((aligned(16)));
+    f32 vec_b[4] __attribute__((aligned(16)));
+    f32 vec_c[4] __attribute__((aligned(16)));
+    s32 selected_index;
+    s32 out_value_a;
+    s32 path_index;
+    f32 path_offset;
+    void *new_path;
+    void *probe_out_a;
+    void *probe_out_b;
+    s32 new_path_flags;
+    s32 angle_a;
+    s32 angle_b;
+    s32 angle_c;
+    s32 out_value_b;
+    s32 angle_d;
+    void *anim_info;
+    s32 prev_value229_c;
+    s32 prev_value2298;
+    s32 prev_anim;
+    s32 jump_count;
+    s32 state_code;
+    s32 pad_buttons;
 
-    animInfo = FLD(g_hero_state, void *, 0x2290);
-    prevValue229C = FLD(g_hero_state, s32, 0x229C);
-    prevValue2298 = FLD(g_hero_state, s32, 0x2298);
-    prevAnim = FLD(animInfo, u8, 0x43);
+    anim_info = FLD(g_hero_state, void *, 0x2290);
+    prev_value229_c = FLD(g_hero_state, s32, 0x229C);
+    prev_value2298 = FLD(g_hero_state, s32, 0x2298);
+    prev_anim = FLD(anim_info, u8, 0x43);
     if (hero_try_grab_object(1) != 0) {
         goto end;
     }
@@ -241,13 +241,13 @@ void hero_l13_decide_state(void) {
                 anim_start_blended(obj, 1, 0, 0xC);
             }
         }
-        anim = math_l00_return_argument(FLD(animInfo, u8, 0x43));
+        anim = math_l00_return_argument(FLD(anim_info, u8, 0x43));
         if ((anim == hero_get_weapon_or_form_id(0)) && notcrouch) {
-            if (hero_choose_idle_anim(&selectedIndex) != 0) {
+            if (hero_choose_idle_anim(&selected_index) != 0) {
                 u8 *rec;
                 FLD(g_hero_state, s16, 0x208) = 0x78;
-                FLD(g_hero_state, s32, 0x248C) = selectedIndex;
-                rec = D_L13_00266900 + selectedIndex * 0x70;
+                FLD(g_hero_state, s32, 0x248C) = selected_index;
+                rec = D_L13_00266900 + selected_index * 0x70;
                 FLD(rec, s32, 0x60) = FLD(rec, f32, 0x5C) * 60.0f;
                 if (FLD(rec, s32, 0x44) != 0) {
                     hero_change_action(0x3C, 1);
@@ -363,7 +363,7 @@ void hero_l13_decide_state(void) {
             hero_change_action(1, 1);
             break;
         }
-        if ((FLD(g_hero_state, s16, 0x34E) != 0) || ((padButtons = FLD(g_pad_state, s32, 0x1A0)) & 0x40) || (padButtons & 8)) {
+        if ((FLD(g_hero_state, s16, 0x34E) != 0) || ((pad_buttons = FLD(g_pad_state, s32, 0x1A0)) & 0x40) || (pad_buttons & 8)) {
             hero_change_action(0x3D, 1);
             break;
         }
@@ -743,7 +743,7 @@ void hero_l13_decide_state(void) {
         s32 n;
         s32 turned;
         u32 st;
-        if ((FLD(g_hero_state, u8, 0x40E) != 0) && ((FLD(animInfo, f32, 0x44) > 0.9f) || (FLD(animInfo, u8, 0x42) != 0xFF))) {
+        if ((FLD(g_hero_state, u8, 0x40E) != 0) && ((FLD(anim_info, f32, 0x44) > 0.9f) || (FLD(anim_info, u8, 0x42) != 0xFF))) {
             FLD(g_hero_state, u8, 0x40E) = 0;
         }
         if ((FLD(g_hero_state, u8, 0x149A) != 0) && (FLD(g_hero_state, s16, 0x34C) == 0)) {
@@ -848,7 +848,7 @@ void hero_l13_decide_state(void) {
             if ((FLD(g_pad_state, s32, 0x1D4) != 0) && (vec_length_xy(g_hero_state + 0xF0) < 0.0008333334f) && (FLD(g_hero_state, f32, 0x320) < 0.087266475f) && (hero_change_action(0, 0) != 0)) {
                 set_hero_animation(hero_get_weapon_or_form_id(0), 0, 17.0f);
             }
-            if (FLD(animInfo, u8, 0x43) == 0x37) {
+            if (FLD(anim_info, u8, 0x43) == 0x37) {
                 FLD(g_hero_state, f32, 0xC20) = (1.0f - FLD(g_hero_state, f32, 0x400)) * 2.0f;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.7f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.7f;
@@ -856,7 +856,7 @@ void hero_l13_decide_state(void) {
                 if (FLD(g_hero_state, f32, 0xC20) < 0.75f) {
                     FLD(g_hero_state, f32, 0xC20) = 0.75f;
                 }
-            } else if (FLD(animInfo, u8, 0x43) == 0x66) {
+            } else if (FLD(anim_info, u8, 0x43) == 0x66) {
                 FLD(g_hero_state, f32, 0xC20) = FLD(g_hero_state, f32, 0x170) * 10.0f;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.1f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.1f;
@@ -914,14 +914,14 @@ void hero_l13_decide_state(void) {
                     break;
                 }
             }
-            *(s128 *)vecC = 0;
-            vecC[0] = -0.083333336f;
-            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x16, (s8 *)vecA);
-            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x17, (s8 *)vecB);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vecA, vecC, (s32 *)D_L13_001A7CA0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vecA, vecC, (s32 *)D_L13_001A7CB0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vecB, vecC, (s32 *)D_L13_001A7CA0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vecB, vecC, (s32 *)D_L13_001A7CB0, 1);
+            *(s128 *)vec_c = 0;
+            vec_c[0] = -0.083333336f;
+            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x16, (s8 *)vec_a);
+            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x17, (s8 *)vec_b);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vec_a, vec_c, (s32 *)D_L13_001A7CA0, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vec_a, vec_c, (s32 *)D_L13_001A7CB0, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vec_b, vec_c, (s32 *)D_L13_001A7CA0, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vec_b, vec_c, (s32 *)D_L13_001A7CB0, 1);
         }
         break;
     }
@@ -952,8 +952,8 @@ void hero_l13_decide_state(void) {
         }
         break;
                 case 0x65:                          /* switch 2 */
-                    jumpCount = FLD(g_hero_state, s32, 0x18C0);
-                    if ((jumpCount < 3) && (((jumpCount * 7) + 0xA) < FLD(g_hero_state, s32, 0x1B8)) && (PadPressedWithin(0x40U, 7, &outValueA) != 0)) {
+                    jump_count = FLD(g_hero_state, s32, 0x18C0);
+                    if ((jump_count < 3) && (((jump_count * 7) + 0xA) < FLD(g_hero_state, s32, 0x1B8)) && (PadPressedWithin(0x40U, 7, &out_value_a) != 0)) {
                         hero_change_action(0x66, 1);
                     }
                     if (FLD(g_hero_state, f32, 0x88) < (FLD(g_hero_state, f32, 0x334) - 1.2f)) {
@@ -1194,20 +1194,20 @@ void hero_l13_decide_state(void) {
                 if ((u32)(FLD(g_hero_state, u32, 0x2294) - 0x28) < 2) {
                     up = 0.45f;
                 }
-                hero_build_relative_point(vecA, 1, 0.25f, 0.0f, up + half);
-                hit = coll_test_point(vecA, 2, NULL, half) != 0;
+                hero_build_relative_point(vec_a, 1, 0.25f, 0.0f, up + half);
+                hit = coll_test_point(vec_a, 2, NULL, half) != 0;
             }
             if ((hit != 0) || (FLD(g_hero_state, s16, 0x68E) != 0)) {
                 s32 clear = 1;
                 s32 level;
                 if (FLD(g_hero_state, u8, 0x287) != 0) {
-                    qcopy(vecA, g_hero_state + 0x5D0);
-                    vecA[2] += 1.5f;
-                    vecB[0] = math_fast_sin_or_cos_a(FLD(g_hero_state, f32, 0x64C)) * 5.0f;
-                    vecB[1] = math_fast_sin_or_cos_b(FLD(g_hero_state, f32, 0x64C)) * 5.0f;
-                    vecB[2] = 0.0f;
-                    FastVecAdd(vecB, vecB, vecA);
-                    if (CollLine(vecA, vecB, 2, NULL, 0) != 0) {
+                    qcopy(vec_a, g_hero_state + 0x5D0);
+                    vec_a[2] += 1.5f;
+                    vec_b[0] = math_fast_sin_or_cos_a(FLD(g_hero_state, f32, 0x64C)) * 5.0f;
+                    vec_b[1] = math_fast_sin_or_cos_b(FLD(g_hero_state, f32, 0x64C)) * 5.0f;
+                    vec_b[2] = 0.0f;
+                    FastVecAdd(vec_b, vec_b, vec_a);
+                    if (CollLine(vec_a, vec_b, 2, NULL, 0) != 0) {
                         clear = 0;
                     }
                 }
@@ -1273,10 +1273,10 @@ void hero_l13_decide_state(void) {
                 hero_change_action(0x28, 1);
                 FLD(g_hero_state, s32, 0x694) = 1;
                 h = weapon_compute_shot_launch_speed((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0x620), NULL, FLD(g_hero_state, f32, 0x174), -FLD(g_hero_state, f32, 0x520));
-                *(s128 *)vecB = 0;
-                vecB[2] = h;
-                *(s128 *)vecA = 0;
-                t = math_compute_falling_step_offset(vecA, vecB, NULL, FLD(g_hero_state, f32, 0x520));
+                *(s128 *)vec_b = 0;
+                vec_b[2] = h;
+                *(s128 *)vec_a = 0;
+                t = math_compute_falling_step_offset(vec_a, vec_b, NULL, FLD(g_hero_state, f32, 0x520));
                 FLD(g_hero_state, f32, 0x508) = t;
                 FLD(g_hero_state, f32, 0x520) = FLD(g_hero_state, f32, 0x698);
                 FLD(g_hero_state, f32, 0x4A8) = t;
@@ -1333,24 +1333,24 @@ void hero_l13_decide_state(void) {
                     lim = 4.5f;
                     for (d = 2.0f; d <= lim; d += 0.75f) {
                         char *pos = g_hero_state + 0x80;
-                        *(s128 *)vecA = *(s128 *)pos;
-                        pathIndex = FLD(g_hero_state, s32, 0x634);
-                        pathOffset = FLD(g_hero_state, f32, 0x638);
-                        if (Spline_AdvanceByDistance(FLD(g_hero_state, void *, 0x630), vecA, &pathIndex, &pathOffset, FLD(g_hero_state, s32, 0x654), 0.0f) != 0) {
-                            FastVecScale(vecB, g_hero_state + 0x110, 48.0f);
-                            FastVecAdd(vecA, pos, vecB);
+                        *(s128 *)vec_a = *(s128 *)pos;
+                        path_index = FLD(g_hero_state, s32, 0x634);
+                        path_offset = FLD(g_hero_state, f32, 0x638);
+                        if (Spline_AdvanceByDistance(FLD(g_hero_state, void *, 0x630), vec_a, &path_index, &path_offset, FLD(g_hero_state, s32, 0x654), 0.0f) != 0) {
+                            FastVecScale(vec_b, g_hero_state + 0x110, 48.0f);
+                            FastVecAdd(vec_a, pos, vec_b);
                         }
-                        vecA[0] += math_fast_sin_or_cos_a(ang) * d;
-                        vecA[1] += math_fast_sin_or_cos_b(ang) * d;
-                        if (nearest_rail_point((s8 *)vecA, &newPath, (s128 *)vecB, &probeOutA, &probeOutB, &newPathFlags, FLD(g_hero_state, void *, 0x630), 0, 1) != 0) {
+                        vec_a[0] += math_fast_sin_or_cos_a(ang) * d;
+                        vec_a[1] += math_fast_sin_or_cos_b(ang) * d;
+                        if (nearest_rail_point((s8 *)vec_a, &new_path, (s128 *)vec_b, &probe_out_a, &probe_out_b, &new_path_flags, FLD(g_hero_state, void *, 0x630), 0, 1) != 0) {
                             FLD(g_hero_state, void *, 0x664) = FLD(g_hero_state, void *, 0x630);
                             FLD(g_hero_state, s32, 0x668) = FLD(g_hero_state, s32, 0x634);
                             FLD(g_hero_state, f32, 0x66C) = FLD(g_hero_state, f32, 0x638);
                             FLD(g_hero_state, s32, 0x670) = FLD(g_hero_state, s32, 0x654);
                             *(s128 *)(g_hero_state + 0x610) = *(s128 *)(g_hero_state + 0x5D0);
-                            FLD(g_hero_state, void *, 0x630) = newPath;
-                            FLD(g_hero_state, s32, 0x654) = newPathFlags;
-                            find_nearest_path_point(newPath, pos, g_hero_state + 0x5D0, (s32 *)(g_hero_state + 0x634), (f32 *)(g_hero_state + 0x638), newPathFlags, 999.0f, 2.0f, 0.0f);
+                            FLD(g_hero_state, void *, 0x630) = new_path;
+                            FLD(g_hero_state, s32, 0x654) = new_path_flags;
+                            find_nearest_path_point(new_path, pos, g_hero_state + 0x5D0, (s32 *)(g_hero_state + 0x634), (f32 *)(g_hero_state + 0x638), new_path_flags, 999.0f, 2.0f, 0.0f);
                             FLD(g_hero_state, s32, 0x660) = 1;
                             FLD(g_hero_state, s32, 0x678) = 0;
                             hero_change_action(0x29, 1);
@@ -1365,8 +1365,8 @@ void hero_l13_decide_state(void) {
             lo = FLD(g_hero_state, s16, 0x4AC);
             now = FLD(g_hero_state, s32, 0x1B8);
             if ((now >= lo + 1) && (now < lo + 9) && (FLD(g_hero_state, u8, 0x49E) == 0) && (FLD(g_hero_state, s32, 0xC2C) == 0)) {
-                EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angleA, FLD(g_hero_state, f32, 0x520));
-                AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)angleA, 0.5f, 0.25f);
+                EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angle_a, FLD(g_hero_state, f32, 0x520));
+                AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)angle_a, 0.5f, 0.25f);
                 if (FLD(g_hero_state, s32, 0x660) != 0) {
                     if (FLD(g_hero_state, f32, 0xC20) > 2.0f) {
                         FLD(g_hero_state, f32, 0xC20) = 2.0f;
@@ -1426,8 +1426,8 @@ void hero_l13_decide_state(void) {
             }
         } else if (st == 0x3E) {
             if (FLD(g_hero_state, f32, 0xF8) > 0.0f) {
-                EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angleB, 0.006388889f);
-                AdjustHeroAnimationSpeedForTargetFrame(9.0f, (f32)angleB, 0.5f, -1.0f);
+                EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angle_b, 0.006388889f);
+                AdjustHeroAnimationSpeedForTargetFrame(9.0f, (f32)angle_b, 0.5f, -1.0f);
             }
             if (FLD(g_hero_state, s32, 0xC28) & 2) {
                 hero_change_action(0x27, 1);
@@ -1466,10 +1466,10 @@ void hero_l13_decide_state(void) {
         }
         if (FLD(g_hero_state, f32, 0x24B8) > 0.5f) {
             if (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) < 0.78539824f) {
-                qcopy(vecA, g_hero_state + 0x80);
-                vecA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
-                vecA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
-                if (hero_find_ledge_grab((s8 *)vecA, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
+                qcopy(vec_a, g_hero_state + 0x80);
+                vec_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
+                vec_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
+                if (hero_find_ledge_grab((s8 *)vec_a, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
                     hero_change_action(0x19, 1);
                 }
                 break;
@@ -1477,10 +1477,10 @@ void hero_l13_decide_state(void) {
         }
         if (FLD(g_hero_state, f32, 0x24B8) > 0.5f) {
             if (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) < 0.78539824f) {
-                qcopy(vecA, g_hero_state + 0x80);
-                vecA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
-                vecA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
-                if (hero_find_ledge_grab((s8 *)vecA, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
+                qcopy(vec_a, g_hero_state + 0x80);
+                vec_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
+                vec_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
+                if (hero_find_ledge_grab((s8 *)vec_a, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
                     hero_change_action(0x1A, 1);
                 }
             }
@@ -1490,15 +1490,15 @@ void hero_l13_decide_state(void) {
     case 0x1A:
     {
         f32 side;
-        *(s128 *)vecA = FLD(g_hero_state + 0x80, s128, 0);
+        *(s128 *)vec_a = FLD(g_hero_state + 0x80, s128, 0);
         side = 1.5707965f;
         if (FLD(g_hero_state, u32, 0x2294) == 0x1A) {
             side = -1.5707965f;
         }
-        vecA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
-        vecA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
+        vec_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
+        vec_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
         hero_resolve_stick_direction(0, 1.0f);
-        if ((FLD(g_hero_state, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) > 0.78539824f) || (hero_find_ledge_grab((s8 *)vecA, (s8 *)(g_hero_state + 0x90), NULL) == 0)) {
+        if ((FLD(g_hero_state, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) > 0.78539824f) || (hero_find_ledge_grab((s8 *)vec_a, (s8 *)(g_hero_state + 0x90), NULL) == 0)) {
             if (FLD(g_hero_state, s32, 0xC28) & 2) {
                 hero_change_action(0x18, 1);
                 break;
@@ -1817,8 +1817,8 @@ void hero_l13_decide_state(void) {
                     AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x438), left, FLD(g_hero_state, f32, 0x514), -1.0f);
                 }
             } else if (FLD(g_hero_state, u32, 0x2294) != 0xE) {
-                EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angleC, FLD(g_hero_state, f32, 0x520));
-                AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)angleC, FLD(g_hero_state, f32, 0x514), -1.0f);
+                EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angle_c, FLD(g_hero_state, f32, 0x520));
+                AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)angle_c, FLD(g_hero_state, f32, 0x514), -1.0f);
                 if (FLD(g_hero_state, f32, 0xC20) > 1.5f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.5f;
                 }
@@ -1851,7 +1851,7 @@ void hero_l13_decide_state(void) {
                 if (near == 0) {
                     s32 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 2;
                     if (FLD(g_hero_state, f32, 0xC38) < FLD(g_hero_state, f32, 0x4CC) - 1.5f) {
-                        set_hero_animation(math_l00_return_argument(FLD(animInfo, u8, 0x43)), k, 7.0f);
+                        set_hero_animation(math_l00_return_argument(FLD(anim_info, u8, 0x43)), k, 7.0f);
                     }
                 }
             }
@@ -1860,7 +1860,7 @@ void hero_l13_decide_state(void) {
             FLD(g_hero_state, f32, 0xC20) = 1.0f;
         } else if (FLD(g_hero_state, u8, 0x49E) != 0) {
             s32 cur;
-            if ((s32)FLD(animInfo, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
+            if ((s32)FLD(anim_info, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
                 if ((FLD(g_hero_state, u32, 0x2294) == 0xE) && (FLD(g_hero_state, f32, 0xC38) < 37.0f)) {
                     ApproachValue((f32 *)(g_hero_state + 0xC20), 1.0f, 0.15f);
                 } else {
@@ -1870,7 +1870,7 @@ void hero_l13_decide_state(void) {
                 if (near == 0) {
                     s32 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 2;
                     if (FLD(g_hero_state, f32, 0xC20) > 1.8f) {
-                        set_hero_animation(math_l00_return_argument(FLD(animInfo, u8, 0x43)), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 3));
+                        set_hero_animation(math_l00_return_argument(FLD(anim_info, u8, 0x43)), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 3));
                     }
                 }
                 if (FLD(g_hero_state, f32, 0xC20) < 0.2f) {
@@ -1881,7 +1881,7 @@ void hero_l13_decide_state(void) {
                 }
             }
             cur = FLD(g_hero_state, u32, 0x2294);
-            if ((cur == 9) && ((FLD(g_hero_state, f32, 0x4CC) - FLD(g_hero_state, f32, 0xC38)) > 6.0f) && ((math_l00_return_argument(FLD(animInfo, u8, 0x42)) == 8) || (math_l00_return_argument(FLD(animInfo, u8, 0x42)) == cur)) && (FLD(animInfo, u8, 0x42) == FLD(animInfo, u8, 0x43)) && (FLD(g_hero_state, f32, 0x1B0) < D_L13_001A7DAC[1][1] * 0.0016666668f) && (FLD(g_hero_state, f32, 0x174) < 0.041666668f)) {
+            if ((cur == 9) && ((FLD(g_hero_state, f32, 0x4CC) - FLD(g_hero_state, f32, 0xC38)) > 6.0f) && ((math_l00_return_argument(FLD(anim_info, u8, 0x42)) == 8) || (math_l00_return_argument(FLD(anim_info, u8, 0x42)) == cur)) && (FLD(anim_info, u8, 0x42) == FLD(anim_info, u8, 0x43)) && (FLD(g_hero_state, f32, 0x1B0) < D_L13_001A7DAC[1][1] * 0.0016666668f) && (FLD(g_hero_state, f32, 0x174) < 0.041666668f)) {
                 f32 rate = 9.0f / FLD(g_hero_state, f32, 0xC20);
                 s32 at;
                 if (rate > 10.0f) {
@@ -1934,7 +1934,7 @@ void hero_l13_decide_state(void) {
             if ((s == 7) || (s == 9) || (s == 0x11)) {
                 ok = 1;
             }
-            if ((FLD(g_hero_state, s32, 0x1D4) != 0) && (FLD(g_hero_state, u8, 0x49C) == 0) && (ok != 0) && ((FLD(g_hero_state, u32, 0x2294) != 0x11) || (FLD(g_hero_state, s32, 0x1B8) >= 0x1A)) && (PadPressedWithin(0x40, 7, &outValueB) != 0) && (outValueB < FLD(g_hero_state, s32, 0x1B8))) {
+            if ((FLD(g_hero_state, s32, 0x1D4) != 0) && (FLD(g_hero_state, u8, 0x49C) == 0) && (ok != 0) && ((FLD(g_hero_state, u32, 0x2294) != 0x11) || (FLD(g_hero_state, s32, 0x1B8) >= 0x1A)) && (PadPressedWithin(0x40, 7, &out_value_b) != 0) && (out_value_b < FLD(g_hero_state, s32, 0x1B8))) {
                 hero_change_action(0x11, 1);
                 break;
             }
@@ -2104,8 +2104,8 @@ void hero_l13_decide_state(void) {
             break;
         }
         if (now == lo + 1) {
-            EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angleD, FLD(g_hero_state, f32, 0x520));
-            AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)angleD, FLD(g_hero_state, f32, 0x514), -1.0f);
+            EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angle_d, FLD(g_hero_state, f32, 0x520));
+            AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)angle_d, FLD(g_hero_state, f32, 0x514), -1.0f);
             break;
         }
         if ((FLD(g_hero_state, u8, 0x49D) != 0) && (now >= FLD(g_hero_state, s32, 0x430)) && (now < FLD(g_hero_state, s32, 0x434))) {
@@ -2124,7 +2124,7 @@ void hero_l13_decide_state(void) {
                 FLD(g_hero_state, u8, 0x49C) = 1;
                 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 3;
                 if (FLD(g_hero_state, f32, 0xC38) < FLD(g_hero_state, f32, 0x4CC)) {
-                    set_hero_animation(FLD(animInfo, u8, 0x43), k, 6.0f);
+                    set_hero_animation(FLD(anim_info, u8, 0x43), k, 6.0f);
                 }
             }
         }
@@ -2132,13 +2132,13 @@ void hero_l13_decide_state(void) {
             FLD(g_hero_state, f32, 0xC20) = 1.0f;
         } else if (FLD(g_hero_state, u8, 0x49E) != 0) {
             s32 a;
-            if ((s32)FLD(animInfo, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
+            if ((s32)FLD(anim_info, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
                 s32 k;
                 FLD(g_hero_state, s16, 0x4AE) = FloatToInt(hero_find_collision_time(60.0f, FLD(g_hero_state, f32, 0x520), -1.0f));
                 AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4CC), (f32)FLD(g_hero_state, s16, 0x4AE), FLD(g_hero_state, f32, 0x514), -1.0f);
                 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 1;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.8f) {
-                    set_hero_animation(FLD(animInfo, u8, 0x43), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 2));
+                    set_hero_animation(FLD(anim_info, u8, 0x43), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 2));
                 }
                 if (FLD(g_hero_state, f32, 0xC20) < 0.2f) {
                     FLD(g_hero_state, f32, 0xC20) = 0.2f;
@@ -2320,8 +2320,8 @@ void hero_l13_decide_state(void) {
         break;
     case 0x47:
         hero_resolve_stick_direction(0, 1.0f);
-        *(s128 *)vecA = FLD(g_hero_state + 0x80, s128, 0);
-        if (hero_find_ledge_grab((s8 *)vecA, (s8 *)(g_hero_state + 0x90), NULL) == 0) {
+        *(s128 *)vec_a = FLD(g_hero_state + 0x80, s128, 0);
+        if (hero_find_ledge_grab((s8 *)vec_a, (s8 *)(g_hero_state + 0x90), NULL) == 0) {
             hero_change_action(0x41, 1);
             FLD(g_hero_state, s16, 0x1D0) = 0xA;
             break;
@@ -2337,10 +2337,10 @@ void hero_l13_decide_state(void) {
         }
         if (FLD(g_hero_state, f32, 0x24B8) > 0.5f) {
             if (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) < 0.78539824f) {
-                qcopy(vecB, g_hero_state + 0x80);
-                vecB[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
-                vecB[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
-                if (hero_find_ledge_grab((s8 *)vecB, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
+                qcopy(vec_b, g_hero_state + 0x80);
+                vec_b[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
+                vec_b[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
+                if (hero_find_ledge_grab((s8 *)vec_b, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
                     hero_change_action(0x49, 1);
                 }
                 break;
@@ -2348,10 +2348,10 @@ void hero_l13_decide_state(void) {
         }
         if (FLD(g_hero_state, f32, 0x24B8) > 0.5f) {
             if (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) < 0.78539824f) {
-                qcopy(vecB, g_hero_state + 0x80);
-                vecB[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
-                vecB[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
-                if (hero_find_ledge_grab((s8 *)vecB, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
+                qcopy(vec_b, g_hero_state + 0x80);
+                vec_b[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
+                vec_b[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
+                if (hero_find_ledge_grab((s8 *)vec_b, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
                     hero_change_action(0x4A, 1);
                 }
             }
@@ -2361,15 +2361,15 @@ void hero_l13_decide_state(void) {
     case 0x4A:
     {
         f32 side;
-        *(s128 *)vecA = FLD(g_hero_state + 0x80, s128, 0);
+        *(s128 *)vec_a = FLD(g_hero_state + 0x80, s128, 0);
         side = 1.5707965f;
         if (FLD(g_hero_state, u32, 0x2294) == 0x4A) {
             side = -1.5707965f;
         }
-        vecA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
-        vecA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
+        vec_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
+        vec_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
         hero_resolve_stick_direction(0, 1.0f);
-        if ((FLD(g_hero_state, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) > 0.78539824f) || (hero_find_ledge_grab((s8 *)vecA, (s8 *)(g_hero_state + 0x90), NULL) == 0)) {
+        if ((FLD(g_hero_state, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) > 0.78539824f) || (hero_find_ledge_grab((s8 *)vec_a, (s8 *)(g_hero_state + 0x90), NULL) == 0)) {
             if (FLD(g_hero_state, s32, 0xC28) & 2) {
                 hero_change_action(0x47, 1);
                 break;
@@ -2429,17 +2429,17 @@ void hero_l13_decide_state(void) {
         break;
     }
 end:
-    if (prevValue229C != FLD(g_hero_state, s32, 0x229C)) {
+    if (prev_value229_c != FLD(g_hero_state, s32, 0x229C)) {
         hero_clear_tracked_slots();
     }
-    stateCode = FLD(g_hero_state, s32, 0x22A0);
-    if (((stateCode == 0x3C) && (FLD(g_hero_state, s32, 0x2294) != 0x3D)) || ((stateCode == 0x3D) && (FLD(g_hero_state, s32, 0x1854) != 0))) {
+    state_code = FLD(g_hero_state, s32, 0x22A0);
+    if (((state_code == 0x3C) && (FLD(g_hero_state, s32, 0x2294) != 0x3D)) || ((state_code == 0x3D) && (FLD(g_hero_state, s32, 0x1854) != 0))) {
         hero_clear_target_flags();
     }
-    if (prevValue2298 != FLD(g_hero_state, s32, 0x2298)) {
+    if (prev_value2298 != FLD(g_hero_state, s32, 0x2298)) {
         FLD(g_hero_state, s32, 0x1C0) = 0;
     }
-    if (prevAnim != FLD(animInfo, u8, 0x43)) {
+    if (prev_anim != FLD(anim_info, u8, 0x43)) {
         FLD(g_hero_state, s32, 0x1C4) = 0;
     }
 }

@@ -274,7 +274,7 @@ void PrepareVendorSelectionPreview(void)
     } else if (mode == 0) {
         g_vendor_menu_state.field750 = 0;
         if (g_vendor_menu_state.rows.item[g_vendor_menu_state.selected].kind == 1) {
-            moby_init_instance(moby, 0xCDB /* Ammo */);
+            moby_init_instance(moby, MOBY_CLASS_AMMO);
             gfx_pack_render_command_fields(moby, 0x202020, 14, 14, 0);
             moby->drawMask = 64; moby->color = 0x80808080; moby->flags = 0x2010;
             moby->render = 1; moby->opacity = 0; moby->unk23 = 0; moby->state = 0; moby->unk98 = 0; moby->unk7c = 1;

@@ -19,7 +19,7 @@ extern int part_alloc_effect_slot(Moby_332590 *object, TI128 *src, float x, floa
 extern void FastVecSub(void *dst, void *a, void *b);
 
 /* Creates a moby of class 3755 at the given position and fills in its start vector, direction and owner. */
-Moby_332590 *projectile_create(int owner, TI128 *pos, void *targetPos, TI128 *startVec)
+Moby_332590 *projectile_create(int owner, TI128 *pos, void *target_pos, TI128 *start_vec)
 {
     Moby_332590 *moby;
     char *vars;
@@ -31,9 +31,9 @@ Moby_332590 *projectile_create(int owner, TI128 *pos, void *targetPos, TI128 *st
         moby->alpha = 0xFF;
         moby->state20 = 0;
         moby->position = *pos;
-        *(TI128 *)vars = *startVec;
+        *(TI128 *)vars = *start_vec;
         *(int *)(vars + 0x30) = part_alloc_effect_slot(moby, 0, 1.0f, 1.0f, 1.0f);
-        FastVecSub(vars + 0x20, targetPos, pos);
+        FastVecSub(vars + 0x20, target_pos, pos);
         *(int *)(vars + 0x34) = owner;
     }
     return moby;

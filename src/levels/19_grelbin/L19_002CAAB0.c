@@ -100,7 +100,7 @@ void UpdateCutsceneEffects(void)
          * empty slot. */
         if (*(short *)(actor + 0xaa) == 0xd54 /* moby class 3412 */)
             UpdateEquipmentPieces(actor);
-        if (actor && *(short *)(actor + 0xaa) == 4000 /* TV Screens */ && *(char **)(actor + 0x68))
+        if (actor && *(short *)(actor + 0xaa) == MOBY_CLASS_TV_SCREENS && *(char **)(actor + 0x68))
             math_store_angle_update_result(actor, (float *)(*(char **)(actor + 0x68) + 0xc), 0x80aaaad2, 0x80396464, 0.061086535f);
     }
     if (g_current_map_index == 19) {
@@ -248,23 +248,23 @@ void linked_object_watcher_update(char *moby)
         int *ids = vars + 4;
         int *cls = vars + 12;
         char *base = g_moby_l19_array;
-        int aliveCount = 0;
+        int alive_count = 0;
         int i;
 
         for (i = 0; i < 8; i++) {
             int id = ids[i];
-            int savedClass;
+            int saved_class;
             unsigned char *linked;
-            if (id != -1 && (savedClass = cls[i]) != -1) {
+            if (id != -1 && (saved_class = cls[i]) != -1) {
                 linked = (unsigned char *)(base + (id << 8));
-                if (linked != 0 && *(short *)(linked + 0xAA) == savedClass && linked[0x20] != 0xFE && linked[0x20] != 0xFD) {
-                    aliveCount++;
+                if (linked != 0 && *(short *)(linked + 0xAA) == saved_class && linked[0x20] != 0xFE && linked[0x20] != 0xFD) {
+                    alive_count++;
                     continue;
                 }
             }
             cls[i] = -1;
         }
-        if (aliveCount < vars[0])
+        if (alive_count < vars[0])
             moby_mark_spawned(moby);
     }
 }
@@ -361,7 +361,7 @@ void falling_fragment_update_splash(unsigned char *fragment) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L19_001BFE80;
                 model = reread->hit;
@@ -442,7 +442,7 @@ void falling_fragment_update(char *fragment) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L19_001BFE80;
             model = reread->hit;

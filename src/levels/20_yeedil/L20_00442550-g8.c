@@ -1,8 +1,8 @@
 #include "common.h"
 typedef struct {
     unsigned char pad0[0x30];
-    float pointX;
-    float pointY;
+    float point_x;
+    float point_y;
     unsigned char pad1[0x48];
 } Rec_42550;
 
@@ -33,10 +33,10 @@ int UpdateBouncingMoby(char *moby) {
     char *self = moby;
     char *vars = *(char **)(moby + 0x68);
     char *hero;
-    char *heroPos;
+    char *hero_pos;
     float value;
-    int pathIndex;
-    Rec_42550 *pathPoint;
+    int path_index;
+    Rec_42550 *path_point;
 
     ApproachValue((float *)(self + 0x48), 1.0f, 0.033333335f);
 
@@ -51,20 +51,20 @@ int UpdateBouncingMoby(char *moby) {
 
     if (*(int *)(hero + 0x2294) == 0x8C) {
         float value;
-        heroPos = hero + 0x80;
-        value = vec_distance_xy(heroPos, self + 0x10);
+        hero_pos = hero + 0x80;
+        value = vec_distance_xy(hero_pos, self + 0x10);
         if (value <= 4.0f) {
             value = *(float *)(hero + 0x88);
             value += 5.0f;
             *(float *)(hero + 0x88) = value;
-            value = coll_probe_ground_height_below(heroPos, 0, 0.5f);
+            value = coll_probe_ground_height_below(hero_pos, 0, 0.5f);
             *(float *)(hero + 0x88) = value;
             *(unsigned short *)(hero + 0x1E0) = 5;
             *(unsigned short *)(hero + 0x1F0) = 5;
         }
-        pathIndex = *(int *)(vars + 0x230);
-        pathPoint = (Rec_42550 *)((pathIndex << 7) + (unsigned int)D_L20_001B308C);
-        value = mat_fast_helper_a(pathPoint->pointX - *(float *)(self + 0x10), pathPoint->pointY - *(float *)(self + 0x14));
+        path_index = *(int *)(vars + 0x230);
+        path_point = (Rec_42550 *)((path_index << 7) + (unsigned int)D_L20_001B308C);
+        value = mat_fast_helper_a(path_point->point_x - *(float *)(self + 0x10), path_point->point_y - *(float *)(self + 0x14));
         moby_start_effect_from_entry(self, value);
 
     } else {

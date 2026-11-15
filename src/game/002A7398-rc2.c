@@ -28,40 +28,40 @@ extern void update_moby_animation_state(s8 *);
 
 /* Starts an animation on an object right away, with no blending. */
 void anim_start_immediate(s8 *moby, s32 animation, s32 frame) {
-    s32 animOffset;
-    s8 *animEntry;
-    s8 *animPtr;
-    s8 *animData;
-    s32 startFrame;
-    s32 lastFrame;
-    s32 nextFrame;
-    u8 frameCount;
+    s32 anim_offset;
+    s8 *anim_entry;
+    s8 *anim_ptr;
+    s8 *anim_data;
+    s32 start_frame;
+    s32 last_frame;
+    s32 next_frame;
+    u8 frame_count;
     f32 rate;
 
-    animOffset = animation * 4;
-    animEntry = (*(s8 **)((s8 *)(moby) + (0x24)));
-    animEntry = animEntry + 0x48;
-    animEntry = animEntry + animOffset;
-    frameCount = (*(u8 *)((s8 *)(*(s8 **)animEntry) + (0x10)));
+    anim_offset = animation * 4;
+    anim_entry = (*(s8 **)((s8 *)(moby) + (0x24)));
+    anim_entry = anim_entry + 0x48;
+    anim_entry = anim_entry + anim_offset;
+    frame_count = (*(u8 *)((s8 *)(*(s8 **)anim_entry) + (0x10)));
     (*(s8 *)((s8 *)(moby) + (0x42))) = animation;
-    startFrame = (frame < (s32) frameCount) ? frame : (frameCount - 1);
-    nextFrame = startFrame + 1;
-    (*(s8 *)((s8 *)(moby) + (0x40))) = startFrame;
-    (*(s8 *)((s8 *)(moby) + (0x41))) = nextFrame;
-    animPtr = *(s8 **)animEntry;
-    lastFrame = (*(u8 *)((s8 *)(animPtr) + (0x10))) - 1;
-    if (lastFrame < (s32) (u8) (*(s8 *)((s8 *)(moby) + (0x41)))) {
-        (*(s8 *)((s8 *)(moby) + (0x41))) = lastFrame;
+    start_frame = (frame < (s32) frame_count) ? frame : (frame_count - 1);
+    next_frame = start_frame + 1;
+    (*(s8 *)((s8 *)(moby) + (0x40))) = start_frame;
+    (*(s8 *)((s8 *)(moby) + (0x41))) = next_frame;
+    anim_ptr = *(s8 **)anim_entry;
+    last_frame = (*(u8 *)((s8 *)(anim_ptr) + (0x10))) - 1;
+    if (last_frame < (s32) (u8) (*(s8 *)((s8 *)(moby) + (0x41)))) {
+        (*(s8 *)((s8 *)(moby) + (0x41))) = last_frame;
     }
     (*(s8 *)((s8 *)(moby) + (0x43))) = animation;
-    animData = *(s8 **)((*(s8 **)((s8 *)(moby) + (0x24))) + animOffset + 0x48);
-    frameCount = (*(u8 *)((s8 *)(animData) + (0x10)));
-    if ((u8) (*(u8 *)((s8 *)(moby) + (0x41))) >= frameCount) {
+    anim_data = *(s8 **)((*(s8 **)((s8 *)(moby) + (0x24))) + anim_offset + 0x48);
+    frame_count = (*(u8 *)((s8 *)(anim_data) + (0x10)));
+    if ((u8) (*(u8 *)((s8 *)(moby) + (0x41))) >= frame_count) {
         (*(s8 *)((s8 *)(moby) + (0x41))) = 0;
     }
     update_moby_animation_state(moby);
     rate = *(*(f32 **)((s8 *)(moby) + (0x58)));
     (*(f32 *)((s8 *)(moby) + (0x4C))) = rate;
     (*(u8 *)((s8 *)(moby) + (0x60))) = (*(u8 *)((s8 *)(moby) + (0x60))) & 0xFD;
-    (*(s8 *)((s8 *)(moby) + (0x6C))) = (*(u8 *)((s8 *)(*(s8 **)((*(s8 **)((s8 *)(moby) + (0x24))) + animOffset + 0x48)) + (0x11)));
+    (*(s8 *)((s8 *)(moby) + (0x6C))) = (*(u8 *)((s8 *)(*(s8 **)((*(s8 **)((s8 *)(moby) + (0x24))) + anim_offset + 0x48)) + (0x11)));
 }

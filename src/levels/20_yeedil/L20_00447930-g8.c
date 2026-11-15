@@ -36,10 +36,10 @@ extern void FastVecAdd(void *, void *, void *);
 /* Moves a platform (moby class 4687) smoothly from its start to the end of a path once it is triggered, then removes it. */
 void eased_platform_update(char *moby) {
     char *state = *(char **)(moby + 0x68);
-    TI128 startPos, startRot, offset;
+    TI128 start_pos, start_rot, offset;
 
-    qcopy(&startPos, moby + 0x10);
-    qcopy(&startRot, moby + 0xF0);
+    qcopy(&start_pos, moby + 0x10);
+    qcopy(&start_rot, moby + 0xF0);
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
         if (*(int *)(state + 0x80) == -1) {
@@ -113,7 +113,7 @@ void eased_platform_update(char *moby) {
         break;
     }
     if (*(u8 *)(moby + 0x20) < 3) {
-        FastVecSub(&offset, moby + 0x10, &startPos);
-        mat_combine_and_store(state + 0x20, &offset, &startRot, moby + 0xF0);
+        FastVecSub(&offset, moby + 0x10, &start_pos);
+        mat_combine_and_store(state + 0x20, &offset, &start_rot, moby + 0xF0);
     }
 }

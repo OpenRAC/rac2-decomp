@@ -1,4 +1,5 @@
 #include "names.h"
+#include "moby_classes.h"
 extern unsigned short *ref_L02_003CE9A8_00[];
 extern char *ref_L02_003CE9A8_01 __attribute__((sda));
 
@@ -13,7 +14,7 @@ void chickenbot_alert_group(char *self)
             int key;
             do {
                 char *object = (char *)((unsigned int)base + ((*entry & 0x7FFF) << 8));
-                if (object[0x20] >= 0 && *(short *)(object + 0xAA) == 0xA4E /* Megacorp Chickenbot */)
+                if (object[0x20] >= 0 && *(short *)(object + 0xAA) == MOBY_CLASS_MEGACORP_CHICKENBOT)
                     *(short *)(*(char **)(object + 0x68) + 0x316) = 1;
                 key = *(short *)entry++;
             } while (key >= 0);

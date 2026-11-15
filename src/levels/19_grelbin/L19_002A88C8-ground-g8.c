@@ -86,14 +86,14 @@ extern float math_fabs(float);
 /* Probes the ground under the hero each frame and records the floor height, slope and surface it stands on. */
 void UpdateGrelbinHeroGroundContacts(void) {
     Vec4 v0, v10, v20, v30, v40, v50, v60;
-    s32 probeResult;
+    s32 probe_result;
     s32 i;
     f32 angle;
     u8 *object;
     Vec4 *normal;
     HeroGround *hero;
 
-    s32 probeCount;
+    s32 probe_count;
     f32 gravity;
 
     g_hero_state.xF278 = 1.0f;
@@ -110,19 +110,19 @@ void UpdateGrelbinHeroGroundContacts(void) {
     if (g_hero_state.xI2f8 != 0) {
         g_hero_state.xI2f8++;
     }
-    probeCount = 1;
+    probe_count = 1;
     gravity = g_hero_state.xF234 * 2.2f;
     if (g_hero_state.xI208c == 2) {
         gravity = g_hero_state.xF234 * 2.9f;
     }
     if (hero_is_in_special_kind_or_mode()) gravity = 0.0f;
-    BuildOffsetVectorPair(&v10, &v0, probeCount, gravity, -48.0f);
+    BuildOffsetVectorPair(&v10, &v0, probe_count, gravity, -48.0f);
     if (CollLine(&v10, &v0, 2, g_hero_state.xI2080, 0) == 0) {
         goto tail;
     }
-    probeResult = func_L00_002E2048();
+    probe_result = func_L00_002E2048();
 
-    g_hero_state.xB12ed = probeResult;
+    g_hero_state.xB12ed = probe_result;
     if (D_L19_001BFE80.i18 != 0) g_hero_state.xB12ed = 0;
     if (g_current_map_index == 7 && D_L19_001BFE80.i18 != 0) g_hero_state.xB12ed = 1;
     g_hero_state.xH12e0 = GetCollHitMaterial();
@@ -134,8 +134,8 @@ void UpdateGrelbinHeroGroundContacts(void) {
         if (CollLine(&v10, &v0, 0x24, g_hero_state.xI2080, 0) == 0) {
             goto tail;
         }
-        probeResult = func_L00_002E2048();
-        g_hero_state.xB12ed = probeResult;
+        probe_result = func_L00_002E2048();
+        g_hero_state.xB12ed = probe_result;
     }
     if (g_hero_state.xH12e0 == 0xD) {
         g_hero_state.xF2f0 = D_L19_001BFE80.v20.f[2];

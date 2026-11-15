@@ -91,7 +91,7 @@ void equipment_holder_update(Obj_L05_00417D48 *object)
 {
     State_L05_00417D48 *vars = object->pVar;
     int phase = object->state;
-    int partClass;
+    int part_class;
     unsigned int selector;
 
     switch (phase) {
@@ -126,9 +126,9 @@ void equipment_holder_update(Obj_L05_00417D48 *object)
         vars->f40 = equipment_spawn_part_moby(object, 0.05f, 0, D_L05_001A8F70[selector]);
         if (vars->f40) *(int *)(vars->f40 + 0x98) = 0;
         selector = (g_equipment_bits >> 2) & 3;
-        partClass = D_L05_001A8F78[selector];
-        vars->f44 = equipment_spawn_part_moby(object, 0.05f, 0, partClass);
-        vars->f48 = equipment_spawn_part_moby(object, 0.05f, 1, partClass);
+        part_class = D_L05_001A8F78[selector];
+        vars->f44 = equipment_spawn_part_moby(object, 0.05f, 0, part_class);
+        vars->f48 = equipment_spawn_part_moby(object, 0.05f, 1, part_class);
         if (vars->f44) *(int *)(vars->f44 + 0x98) = 0;
         if (vars->f48) *(int *)(vars->f48 + 0x98) = 0;
         selector = (g_equipment_bits >> 4) & 3;
@@ -136,31 +136,31 @@ void equipment_holder_update(Obj_L05_00417D48 *object)
         if (vars->f4C) *(int *)(vars->f4C + 0x98) = 0;
         vars->f50 = CreateTransformClone(object, 0.05f);
         selector = (g_equipment_bits >> 6) & 1;
-        partClass = D_L05_001A8F88[selector];
-        vars->fAC = equipment_spawn_part_moby(object, 0.05f, 0, partClass);
-        vars->f1F0 = equipment_spawn_part_moby(object, 0.05f, 1, partClass);
+        part_class = D_L05_001A8F88[selector];
+        vars->fAC = equipment_spawn_part_moby(object, 0.05f, 0, part_class);
+        vars->f1F0 = equipment_spawn_part_moby(object, 0.05f, 1, part_class);
         if (vars->fAC) *(int *)(vars->fAC + 0x98) = 0;
         if (vars->f1F0) *(int *)(vars->f1F0 + 0x98) = 0;
         selector = (g_equipment_bits >> 9) & 1;
-        partClass = D_L05_001A8F98[selector];
-        vars->f1F4 = equipment_spawn_part_moby(object, 0.05f, 0, partClass);
-        vars->f1F8 = equipment_spawn_part_moby(object, 0.05f, 1, partClass);
+        part_class = D_L05_001A8F98[selector];
+        vars->f1F4 = equipment_spawn_part_moby(object, 0.05f, 0, part_class);
+        vars->f1F8 = equipment_spawn_part_moby(object, 0.05f, 1, part_class);
         if (vars->f1F4) *(int *)(vars->f1F4 + 0x98) = 0;
         if (vars->f1F8) *(int *)(vars->f1F8 + 0x98) = 0;
         if (table_find_last_used_entry(3)) {
             selector = (g_equipment_bits >> 7) & 3;
-            partClass = D_L05_001A8F90[selector];
-            if (partClass) {
-                vars->f1FC = equipment_spawn_part_moby(object, 0.05f, 0, partClass);
-                vars->f200 = equipment_spawn_part_moby(object, 0.05f, 1, partClass);
+            part_class = D_L05_001A8F90[selector];
+            if (part_class) {
+                vars->f1FC = equipment_spawn_part_moby(object, 0.05f, 0, part_class);
+                vars->f200 = equipment_spawn_part_moby(object, 0.05f, 1, part_class);
                 if (vars->f1FC) *(int *)(vars->f1FC + 0x98) = 0;
                 if (vars->f200) *(int *)(vars->f200 + 0x98) = 0;
             }
         }
         selector = (g_equipment_bits >> 10) & 3;
-        partClass = D_L05_001A8FA0[selector];
-        vars->f204 = equipment_spawn_part_moby(object, 0.05f, 0, partClass);
-        vars->f208 = equipment_spawn_part_moby(object, 0.05f, 1, partClass);
+        part_class = D_L05_001A8FA0[selector];
+        vars->f204 = equipment_spawn_part_moby(object, 0.05f, 0, part_class);
+        vars->f208 = equipment_spawn_part_moby(object, 0.05f, 1, part_class);
         if (vars->f204) *(int *)(vars->f204 + 0x98) = 0;
         if (vars->f208) *(int *)(vars->f208 + 0x98) = 0;
         if (table_find_last_used_entry(4) != -1) {

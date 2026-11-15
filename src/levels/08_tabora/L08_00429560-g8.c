@@ -40,9 +40,9 @@ extern s32 part_l00_alloc_effect_slot_2(void *,f32,f32,f32,f32,f32);
 void update_slot_panes_and_effects(s32 unused,s32 slot) {
     f32 delta[4],point[4],step[4],basis[4][4],enddelta[4],end[4],velocity[4],temp[4];
     s32 first,second,i,j,k,light;
-    f32 spacing,previous,advance,height,half,angleStep,weight,wave,twist,sway,swayAmount,twistCos,randomValue,indexF,kF;
-    char *effect,*data,*owner,*lightData,*lightData2;
-    f32 (*stripRow)[4],(*strip2Row)[4];
+    f32 spacing,previous,advance,height,half,angleStep,weight,wave,twist,sway,sway_amount,twist_cos,random_value,index_f,k_f;
+    char *effect,*data,*owner,*light_data,*light_data2;
+    f32 (*strip_row)[4],(*strip2Row)[4];
     s32 index=slot;
 
     if(!level_is_resident_flag_clear()) return;
@@ -83,15 +83,15 @@ void update_slot_panes_and_effects(s32 unused,s32 slot) {
             previous=height;
         }
         FastVecAdd(point,point,step);
-        indexF=(f32)i;
+        index_f=(f32)i;
         weight=(IntToFloat(i)/IntToFloat(20))*0.3f+0.1f;
-        wave=math_wrap_angle_to_pi(D_L08_001B39B0[index]+indexF*angleStep);
+        wave=math_wrap_angle_to_pi(D_L08_001B39B0[index]+index_f*angleStep);
         weight=weight*math_fast_sin_or_cos_b(wave);
-        stripRow=D_L08_002604A0[first];
-        stripRow[i][1]=0;
-        stripRow[i][3]=1;
-        stripRow[i][0]=spacing*indexF;
-        stripRow[i][2]=weight-height;
+        strip_row=D_L08_002604A0[first];
+        strip_row[i][1]=0;
+        strip_row[i][3]=1;
+        strip_row[i][0]=spacing*index_f;
+        strip_row[i][2]=weight-height;
     }
     qcopy_nc(basis[3],D_L08_002603E0[index][3]);
     FastVecSub(enddelta,D_L08_001B3A40[index],basis[3]);
@@ -103,27 +103,27 @@ void update_slot_panes_and_effects(s32 unused,s32 slot) {
     *(Quadword *)(D_L08_001B3A70[index])=*(Quadword *)(end);
     strip2Row=D_L08_002604A0[second];
     for(k=0;k<19;k++){
-        kF=(f32)k;
+        k_f=(f32)k;
         (*strip2Row)[2]=0;
-        twist=math_wrap_angle_to_pi(D_L08_001B39C0[index]+kF*0.99483776f);
-        sway=math_wrap_angle_to_pi(D_L08_001B39D0[index]+kF*0.20944f);
-        swayAmount=math_fast_sin_or_cos_b(sway)*0.5f;
-        twistCos=math_fast_sin_or_cos_b(twist);
-        randomValue=math_random_signed_float_range(0,0.2f);
+        twist=math_wrap_angle_to_pi(D_L08_001B39C0[index]+k_f*0.99483776f);
+        sway=math_wrap_angle_to_pi(D_L08_001B39D0[index]+k_f*0.20944f);
+        sway_amount=math_fast_sin_or_cos_b(sway)*0.5f;
+        twist_cos=math_fast_sin_or_cos_b(twist);
+        random_value=math_random_signed_float_range(0,0.2f);
         (*strip2Row)[2]=D_L08_002604A0[first][k][2];
-        (*strip2Row)[2]=(*strip2Row)[2]+swayAmount*twistCos+randomValue;
+        (*strip2Row)[2]=(*strip2Row)[2]+sway_amount*twist_cos+random_value;
         (*strip2Row)[1]=math_fast_sin_or_cos_a(twist)*0.3f;
         (*strip2Row)[3]=1;
-        (*strip2Row)[0]=spacing*kF;
+        (*strip2Row)[0]=spacing*k_f;
         strip2Row++;
     }
-    randomValue=math_random_float_range(0.03f,0.12f);
+    random_value=math_random_float_range(0.03f,0.12f);
     *(Quadword *)velocity=0;
     velocity[0]=1;
     velocity[3]=1;
     velocity[1]=math_random_float_range(-1,1);
     velocity[2]=math_random_float_range(-1,1);
-    vec_scale_to_length(velocity,velocity,randomValue);
+    vec_scale_to_length(velocity,velocity,random_value);
     matrix_mul_vec3(velocity,velocity,D_L08_002603E0[index]);
     part_spawn_short_lived(D_L08_002603E0[index][3],velocity,127,g_beam_slot_key[index]);
     if(!math_random_int_below(3)){
@@ -160,9 +160,9 @@ void update_slot_panes_and_effects(s32 unused,s32 slot) {
             if(D_L08_001B39E0[index]==-1) D_L08_001B39E0[index]=part_l00_alloc_effect_slot_2(temp,D_L08_001B1D20,0,2,1,2);
             light=D_L08_001B39E0[index];
             if(light>=0){
-                lightData=D_L08_001C7C80+light*32;
-                *(Quadword *)(lightData+16)=*(Quadword *)(temp);
-                *(f32 *)(lightData+28)=D_L08_001B1D20;
+                light_data=D_L08_001C7C80+light*32;
+                *(Quadword *)(light_data+16)=*(Quadword *)(temp);
+                *(f32 *)(light_data+28)=D_L08_001B1D20;
             }
         }
         if(D_L08_001B3A00[index]&2){
@@ -170,9 +170,9 @@ void update_slot_panes_and_effects(s32 unused,s32 slot) {
             if(D_L08_001B39F0[index]==-1) D_L08_001B39F0[index]=part_l00_alloc_effect_slot_2(end,D_L08_001B1D20,0,2,1,2);
             light=D_L08_001B39F0[index];
             if(light>=0){
-                lightData2=D_L08_001C7C80+light*32;
-                *(Quadword *)(lightData2+16)=*(Quadword *)(end);
-                *(f32 *)(lightData2+28)=D_L08_001B1D20;
+                light_data2=D_L08_001C7C80+light*32;
+                *(Quadword *)(light_data2+16)=*(Quadword *)(end);
+                *(f32 *)(light_data2+28)=D_L08_001B1D20;
             }
         }
     }

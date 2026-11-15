@@ -84,8 +84,8 @@ extern void func_2EE108(void *, void *, void *);
 int trail_update_slot(TrailActor *self)
 {
     TrailSource *source = self->source;
-    char *base = level_get_slot_body(0x5CB /* Pulse Rifle */, source->id);
-    char *data = base + *level_get_slot_header(0x5CB /* Pulse Rifle */, source->id);
+    char *base = level_get_slot_body(MOBY_CLASS_PULSE_RIFLE, source->id);
+    char *data = base + *level_get_slot_header(MOBY_CLASS_PULSE_RIFLE, source->id);
     TrailSlot *slots = (TrailSlot *)data;
     Qword rot[1];
 

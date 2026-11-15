@@ -41,29 +41,29 @@ s32 table_find_by_id(s32, s32);
 
 /* Draws a paged menu screen with a title, left and right page arrows (shown only when there is a page to go to) and the back and select hints. */
 s32 menu_paged_screen_draw(void) {
-    s32 arrowColor;
-    s32 highlightColor;
+    s32 arrow_color;
+    s32 highlight_color;
     f32 depth;
 
     SetupGifPaging(0);
     depth = 0.0f;
     gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC + 0x8710, 0xE5), 0x60442D00, (f32) (g_screen_width / 2), (f32) D_001ABA6C, 1.0f, D_001B23A8, depth);
     gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC + 0x8710, 0xE4), 0x55F0C070, (f32) (g_screen_width / 2), (f32) D_001ABA6C, 1.0f, D_001B23A8, depth);
-    highlightColor = math_ping_pong_blend_values(0x60241700, 0x55F0C070, 0x19, 0, 0);
+    highlight_color = math_ping_pong_blend_values(0x60241700, 0x55F0C070, 0x19, 0, 0);
     if (D_001ABA68 > 0) {
-        arrowColor = 0x80F0F0F0;
+        arrow_color = 0x80F0F0F0;
         if (!(D_00138340.w0 & 0x8000)) {
-            arrowColor = highlightColor;
+            arrow_color = highlight_color;
         }
-        gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC + 0x8710, 0x4B), arrowColor, 216.0f, 373.0f, 1.0f, D_001B23A8 * 0.8f, depth);
+        gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC + 0x8710, 0x4B), arrow_color, 216.0f, 373.0f, 1.0f, D_001B23A8 * 0.8f, depth);
         text_draw_centered_small(0x53, 0x171, 0x80F0F0F0, GetLocalizedString(0x2F40), -1);
     }
     if (D_001ABA68 < 6) {
-        arrowColor = 0x80F0F0F0;
+        arrow_color = 0x80F0F0F0;
         if (!(D_00138340.w0 & 0x2000)) {
-            arrowColor = highlightColor;
+            arrow_color = highlight_color;
         }
-        gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC + 0x8710, 0x4A), arrowColor, 295.0f, 373.0f, 1.0f, D_001B23A8 * 0.8f, depth);
+        gfx_draw_scaled_object_two_axes(table_find_by_id(D_001A8CFC + 0x8710, 0x4A), arrow_color, 295.0f, 373.0f, 1.0f, D_001B23A8 * 0.8f, depth);
         text_draw_right_aligned_small(0x1C1, 0x171, 0x80F0F0F0, GetLocalizedString(0x2F41), -1);
     }
     text_draw_centered_small(g_screen_width / 2, 0x1D, 0x80F0F0F0, GetLocalizedString(0x3294), -1);

@@ -29,7 +29,7 @@ void UpdateBoldanVerticalPlatform(u8 *moby) {
     u8 oldpos[16] __attribute__((aligned(16)));
     u8 oldrot[16] __attribute__((aligned(16)));
     u8 delta[16] __attribute__((aligned(16)));
-    int soundId;
+    int sound_id;
     unsigned int pulse, color;
     int tickPhase;
     float phase;
@@ -50,9 +50,9 @@ void UpdateBoldanVerticalPlatform(u8 *moby) {
         I(vars,0x64)=0;
         break;
     case 1:
-        soundId=I(vars,0xB0);
-        if(soundId!=-1) {
-            u8 *sound=g_sound_state+soundId*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(soundId);
+        sound_id=I(vars,0xB0);
+        if(sound_id!=-1) {
+            u8 *sound=g_sound_state+sound_id*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(sound_id);
         }
         I(vars,0xB0)=-1;
         if(hero_is_current_selected_id(moby)) {
@@ -82,8 +82,8 @@ void UpdateBoldanVerticalPlatform(u8 *moby) {
     case 2:
         if(F(moby,0x18)<=F(vars,0x88)) {
             if(I(vars,0xBC)) { cam_end_override(P(vars,0xB8)); I(vars,0xBC)=0; }
-            soundId=I(vars,0xB0);
-            if(soundId!=-1) { u8 *sound=g_sound_state+soundId*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(soundId); }
+            sound_id=I(vars,0xB0);
+            if(sound_id!=-1) { u8 *sound=g_sound_state+sound_id*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(sound_id); }
             I(vars,0xB0)=-1;
             if(!hero_is_current_selected_id(moby)) moby[0x20]=1;
         } else if(!coll_test_point(moby+0x10,1,moby,2.8f) ||
@@ -91,8 +91,8 @@ void UpdateBoldanVerticalPlatform(u8 *moby) {
             { u8 *sound=g_sound_state+I(vars,0xB0)*0x70; if(P(sound,0x88)!=moby || !sound[0x74]) I(vars,0xB0)=PlayMobySound(0,4,moby); }
             math_step_value_toward_target((float *)(moby+0x18),(float *)(vars+0x64),F(vars,0x88),0.00194444449f,0.00166666671f,0.100000009f);
         } else {
-            soundId=I(vars,0xB0);
-            if(soundId!=-1) { u8 *sound=g_sound_state+soundId*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(soundId); }
+            sound_id=I(vars,0xB0);
+            if(sound_id!=-1) { u8 *sound=g_sound_state+sound_id*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(sound_id); }
             I(vars,0xB0)=-1;
         }
         break;
@@ -100,8 +100,8 @@ void UpdateBoldanVerticalPlatform(u8 *moby) {
         math_step_value_toward_target((float *)(moby+0x18),(float *)(vars+0x64),F(vars,0x98),0.00194444449f,0.00166666671f,0.100000009f);
         if(F(moby,0x18)>=F(vars,0x98)) {
             if(I(vars,0xBC)) { cam_end_override(P(vars,0xB8)); I(vars,0xBC)=0; }
-            soundId=I(vars,0xB0);
-            if(soundId!=-1) { u8 *sound=g_sound_state+soundId*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(soundId); }
+            sound_id=I(vars,0xB0);
+            if(sound_id!=-1) { u8 *sound=g_sound_state+sound_id*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(sound_id); }
             I(vars,0xB0)=-1;
             if(!hero_is_current_selected_id(moby)) { I(vars,0x60)=I(vars,0x74); --I(vars,0x78); moby[0x20]=1; }
         } else {
@@ -109,8 +109,8 @@ void UpdateBoldanVerticalPlatform(u8 *moby) {
         }
         break;
     case 4:
-        soundId=I(vars,0xB0);
-        if(soundId!=-1) { u8 *sound=g_sound_state+soundId*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(soundId); }
+        sound_id=I(vars,0xB0);
+        if(sound_id!=-1) { u8 *sound=g_sound_state+sound_id*0x70; if(P(sound,0x88)==moby && sound[0x74]) snd_stop_voice(sound_id); }
         I(vars,0xB0)=-1; break;
     }
     phase=(float)D_L13_001B2448*(1.0f/60.0f);

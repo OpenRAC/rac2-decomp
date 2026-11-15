@@ -23,38 +23,38 @@ extern s32 PlayMobySound(s32, s32, char *);
 /* Fires the Miniturret's shot at its target and uses up one round. */
 void miniturret_fire_shot(char *moby)
 {
-    V4_F305058 upDir, targetPos, shotVelocity, muzzlePos, targetMotion;
+    V4_F305058 up_dir, target_pos, shot_velocity, muzzle_pos, target_motion;
     char *vars = *(char **)(moby + 0x68);
-    char *targetInfo;
+    char *target_info;
     char *target;
     float speed;
-    char *weaponDef;
+    char *weapon_def;
 
-    moby_transform_joint_to_world(moby, 1, muzzlePos);
-    moby_get_facing_direction(moby + 0x10, upDir);
+    moby_transform_joint_to_world(moby, 1, muzzle_pos);
+    moby_get_facing_direction(moby + 0x10, up_dir);
     if (*(float *)(vars + 0x5C) == 0.0f) {
         if (*(s32 *)(vars + 0x50) != 0) {
             if (*(char **)(vars + 0x68) != 0) {
-                targetInfo = moby_get_private_value_0(*(char **)(vars + 0x68));
+                target_info = moby_get_private_value_0(*(char **)(vars + 0x68));
                 target = *(char **)(vars + 0x68);
-                qcopy(targetPos, target + 0x10);
-                if (targetInfo != 0) {
-                    FastVecScale(targetMotion, target + 0xE0, *(float *)(targetInfo + 0x10));
-                    FastVecAdd(targetPos, targetPos, targetMotion);
+                qcopy(target_pos, target + 0x10);
+                if (target_info != 0) {
+                    FastVecScale(target_motion, target + 0xE0, *(float *)(target_info + 0x10));
+                    FastVecAdd(target_pos, target_pos, target_motion);
                 }
-                weaponDef = ENTRY();
-                speed = *(float *)(weaponDef + 0x50) * 0.016666668f;
-                FastVecSub(shotVelocity, targetPos, muzzlePos);
-                vec_scale_to_length(shotVelocity, shotVelocity, speed);
-                vec_add_transformed_or_copy(shotVelocity, shotVelocity, muzzlePos);
-                part_add_trail_entry(moby, shotVelocity);
+                weapon_def = ENTRY();
+                speed = *(float *)(weapon_def + 0x50) * 0.016666668f;
+                FastVecSub(shot_velocity, target_pos, muzzle_pos);
+                vec_scale_to_length(shot_velocity, shot_velocity, speed);
+                vec_add_transformed_or_copy(shot_velocity, shot_velocity, muzzle_pos);
+                part_add_trail_entry(moby, shot_velocity);
                 PlayMobySound(0, 0, moby);
                 *(s32 *)(vars + 0x40) = D_001AEC08;
                 *(s32 *)(vars + 0x44) = 6;
                 if (--*(s32 *)(vars + 0x60) <= 0)
                     *(u8 *)(moby + 0x20) = 8;
-                weaponDef = ENTRY();
-                *(float *)(vars + 0x5C) = 1.0f / *(float *)(weaponDef + 0x54);
+                weapon_def = ENTRY();
+                *(float *)(vars + 0x5C) = 1.0f / *(float *)(weapon_def + 0x54);
             }
         }
     }

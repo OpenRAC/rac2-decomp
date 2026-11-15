@@ -179,12 +179,12 @@ extern float D_L00_001B1648 __attribute__((sda));
 /* Works out the object's position and facing from the hero and the model, then nudges its position gradually toward the new spot. */
 void moby_update_follow_position(Self_42A698 *self)
 {
-    float baseRow[4];
+    float base_row[4];
     float l1[4];
     float l2[4];
     float l3[4];
     float l4[4];
-    float modelRow[4];
+    float model_row[4];
     float l6[4];
     float l7[4];
     float l8[4];
@@ -194,9 +194,9 @@ void moby_update_follow_position(Self_42A698 *self)
 
     entity = D_L00_001B1844[self->idx].ent;
     if (tracked_moby_get_flag(self) != 0 || global_object_get_flag() != 0) {
-        qcopy(baseRow, entity->model->mE0);
+        qcopy(base_row, entity->model->mE0);
     } else {
-        vec_clear_or_compute(self->m30, baseRow);
+        vec_clear_or_compute(self->m30, base_row);
     }
     position = self->m30;
     if (tracked_moby_is_active() != 0 || global_object_is_busy() != 0) {
@@ -207,11 +207,11 @@ void moby_update_follow_position(Self_42A698 *self)
     FastVecAdd((char *)l1, (char *)entity->model + 0x10, (char *)l1);
     FastVecSub(l2, l1, position);
     vec_scale_to_length(self, l2, 1.0f);
-    FastVecCross(self->m10, self, baseRow);
+    FastVecCross(self->m10, self, base_row);
     vec_scale_to_length(self->m10, self->m10, 1.0f);
     FastVecCross(self->m20, self->m10, self);
-    qcopy(modelRow, entity->model->mE0);
-    mat_build_rotation_toward_vector(entity->v60, entity->v60, modelRow, 0, 0.125f);
+    qcopy(model_row, entity->model->mE0);
+    mat_build_rotation_toward_vector(entity->v60, entity->v60, model_row, 0, 0.125f);
     FastVecScale(l2, l2, -1.0f);
     dot = FastVecDot(l2, entity->v60);
     FastVecScale(l3, entity->v60, dot);

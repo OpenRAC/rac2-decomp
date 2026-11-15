@@ -12,12 +12,12 @@ extern void func_3030C0(int, int, int, int, int, int);
 void searchlight_draw_glow(char *self)
 {
     char *state;
-    int blendColor;
+    int blend_color;
 
     state = *(char **)(self + 0x68);
-    blendColor = FastTweenColor(D_L14_001B17D8, D_L14_001B17DC, *(float *)state);
+    blend_color = FastTweenColor(D_L14_001B17D8, D_L14_001B17DC, *(float *)state);
     func_385CB8(0x42, 0x8000000044UL);
-    func_3030C0(0, 0, 600, 500, blendColor, 0);
+    func_3030C0(0, 0, 600, 500, blend_color, 0);
     func_385CB8(0x4E, 0x1000000UL | (D_001A72E0 >> 13));
 }
 
@@ -184,30 +184,30 @@ extern void SetDeathBits(char *a0, int a1, int a2);
 /* Updates a falling object that dies when it runs out of health or drops too low, and fixes the size of its Protopet child. */
 void protopet_holder_update(char *moby)
 {
-    char *mobyAlias = moby;
+    char *moby_alias = moby;
     char *state;
-    char *childModel;
+    char *child_model;
     char *child;
 
-    state = *(char **)(mobyAlias + 0x68);
+    state = *(char **)(moby_alias + 0x68);
     child = (char *)part_find_owned_effect_slot(moby, 0x10000, 1);
     if (child != 0) {
-        childModel = *(char **)(child + 0x20);
-        if (childModel != 0 && *(short *)(childModel + 0xAA) == 0xB69 /* Protopet */) {
-            if (*(unsigned char *)(mobyAlias + 0x31) == 0)
+        child_model = *(char **)(child + 0x20);
+        if (child_model != 0 && *(short *)(child_model + 0xAA) == MOBY_CLASS_PROTOPET) {
+            if (*(unsigned char *)(moby_alias + 0x31) == 0)
                 *(float *)(child + 0x2C) = 0.0f;
             else
                 *(float *)(child + 0x2C) = 1.0f;
         }
     }
-    moby_apply_damage_to_object(mobyAlias, state + 0x60, 0);
+    moby_apply_damage_to_object(moby_alias, state + 0x60, 0);
     if (*(float *)(state + 0x20) <= 0.0f) {
-        part_spawn_explosion_with_sparks(mobyAlias, mobyAlias + 0x10, 1.0f, 13.0f, -1);
-        SetDeathBits(mobyAlias, 0, 3);
-        moby_mark_spawned(mobyAlias);
-    } else if (*(float *)(mobyAlias + 0x18) < D_L14_001B16B0) {
-        SetDeathBits(mobyAlias, 0, 3);
-        moby_mark_spawned(mobyAlias);
+        part_spawn_explosion_with_sparks(moby_alias, moby_alias + 0x10, 1.0f, 13.0f, -1);
+        SetDeathBits(moby_alias, 0, 3);
+        moby_mark_spawned(moby_alias);
+    } else if (*(float *)(moby_alias + 0x18) < D_L14_001B16B0) {
+        SetDeathBits(moby_alias, 0, 3);
+        moby_mark_spawned(moby_alias);
     }
 }
 

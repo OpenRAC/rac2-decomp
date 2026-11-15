@@ -127,34 +127,34 @@ s32 nearest_rail_point(s8 *, void **, s128 *, void *, void *, s32 *, void *, s32
 /* Picks the hero's next move each frame, based on the current move, the buttons and the
    surroundings. It also handles landing, jumping, swinging, swimming and getting hurt. */
 void hero_decide_todano_state(void) {
-    f32 vecA[4] __attribute__((aligned(16)));
-    f32 vecB[4] __attribute__((aligned(16)));
-    f32 vecC[4] __attribute__((aligned(16)));
-    s32 selectedSlot;
-    s32 spawnSlot;
-    s32 outVal48;
-    f32 outFloat;
-    void *ptrA;
-    void *ptrB;
-    void *ptrC;
-    s32 tmpA;
-    s32 tmpB;
-    s32 tmpC;
-    s32 angleOutA;
-    s32 tmpD;
-    s32 angleOutB;
-    void *curMove;
-    s32 savedTarget;
-    s32 savedPrevState;
-    s32 savedMoveId;
-    s32 spawnCount;
-    s32 prevStateId;
+    f32 vec_a[4] __attribute__((aligned(16)));
+    f32 vec_b[4] __attribute__((aligned(16)));
+    f32 vec_c[4] __attribute__((aligned(16)));
+    s32 selected_slot;
+    s32 spawn_slot;
+    s32 out_val48;
+    f32 out_float;
+    void *ptr_a;
+    void *ptr_b;
+    void *ptr_c;
+    s32 tmp_a;
+    s32 tmp_b;
+    s32 tmp_c;
+    s32 angle_out_a;
+    s32 tmp_d;
+    s32 angle_out_b;
+    void *cur_move;
+    s32 saved_target;
+    s32 saved_prev_state;
+    s32 saved_move_id;
+    s32 spawn_count;
+    s32 prev_state_id;
     s32 pad3C;
 
-    curMove = FLD(g_hero_state, void *, 0x2290);
-    savedTarget = FLD(g_hero_state, s32, 0x229C);
-    savedPrevState = FLD(g_hero_state, s32, 0x2298);
-    savedMoveId = FLD(curMove, u8, 0x43);
+    cur_move = FLD(g_hero_state, void *, 0x2290);
+    saved_target = FLD(g_hero_state, s32, 0x229C);
+    saved_prev_state = FLD(g_hero_state, s32, 0x2298);
+    saved_move_id = FLD(cur_move, u8, 0x43);
     if (hero_try_grab_object(1) != 0) {
         goto end;
     }
@@ -240,13 +240,13 @@ void hero_decide_todano_state(void) {
                 anim_start_blended(obj, 1, 0, 0xC);
             }
         }
-        anim = math_l00_return_argument(FLD(curMove, u8, 0x43));
+        anim = math_l00_return_argument(FLD(cur_move, u8, 0x43));
         if ((anim == hero_get_weapon_or_form_id(0)) && notcrouch) {
-            if (hero_choose_idle_anim(&selectedSlot) != 0) {
+            if (hero_choose_idle_anim(&selected_slot) != 0) {
                 u8 *rec;
                 FLD(g_hero_state, s16, 0x208) = 0x78;
-                FLD(g_hero_state, s32, 0x248C) = selectedSlot;
-                rec = D_L12_0025CD80 + selectedSlot * 0x70;
+                FLD(g_hero_state, s32, 0x248C) = selected_slot;
+                rec = D_L12_0025CD80 + selected_slot * 0x70;
                 FLD(rec, s32, 0x60) = FLD(rec, f32, 0x5C) * 60.0f;
                 if (FLD(rec, s32, 0x44) != 0) {
                     hero_l12_set_action(0x3C, 1);
@@ -738,7 +738,7 @@ void hero_decide_todano_state(void) {
         s32 n;
         s32 turned;
         u32 st;
-        if ((FLD(g_hero_state, u8, 0x40E) != 0) && ((FLD(curMove, f32, 0x44) > 0.9f) || (FLD(curMove, u8, 0x42) != 0xFF))) {
+        if ((FLD(g_hero_state, u8, 0x40E) != 0) && ((FLD(cur_move, f32, 0x44) > 0.9f) || (FLD(cur_move, u8, 0x42) != 0xFF))) {
             FLD(g_hero_state, u8, 0x40E) = 0;
         }
         if ((FLD(g_hero_state, u8, 0x149A) != 0) && (FLD(g_hero_state, s16, 0x34C) == 0)) {
@@ -839,7 +839,7 @@ void hero_decide_todano_state(void) {
             if ((FLD(g_pad_state, s32, 0x1D4) != 0) && (vec_length_xy(g_hero_state + 0xF0) < 0.0008333334f) && (FLD(g_hero_state, f32, 0x320) < 0.087266475f) && (hero_l12_set_action(0, 0) != 0)) {
                 set_hero_animation(hero_get_weapon_or_form_id(0), 0, 17.0f);
             }
-            if (FLD(curMove, u8, 0x43) == 0x37) {
+            if (FLD(cur_move, u8, 0x43) == 0x37) {
                 FLD(g_hero_state, f32, 0xC20) = (1.0f - FLD(g_hero_state, f32, 0x400)) * 2.0f;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.7f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.7f;
@@ -847,7 +847,7 @@ void hero_decide_todano_state(void) {
                 if (FLD(g_hero_state, f32, 0xC20) < 0.75f) {
                     FLD(g_hero_state, f32, 0xC20) = 0.75f;
                 }
-            } else if (FLD(curMove, u8, 0x43) == 0x66) {
+            } else if (FLD(cur_move, u8, 0x43) == 0x66) {
                 FLD(g_hero_state, f32, 0xC20) = FLD(g_hero_state, f32, 0x170) * 10.0f;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.1f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.1f;
@@ -905,14 +905,14 @@ void hero_decide_todano_state(void) {
                     break;
                 }
             }
-            *(s128 *)vecC = 0;
-            vecC[0] = -0.083333336f;
-            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x16, (s8 *)vecA);
-            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x17, (s8 *)vecB);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vecA, vecC, (s32 *)D_L12_001A7CA0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vecA, vecC, (s32 *)D_L12_001A7CB0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vecB, vecC, (s32 *)D_L12_001A7CA0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vecB, vecC, (s32 *)D_L12_001A7CB0, 1);
+            *(s128 *)vec_c = 0;
+            vec_c[0] = -0.083333336f;
+            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x16, (s8 *)vec_a);
+            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x17, (s8 *)vec_b);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vec_a, vec_c, (s32 *)D_L12_001A7CA0, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vec_a, vec_c, (s32 *)D_L12_001A7CB0, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vec_b, vec_c, (s32 *)D_L12_001A7CA0, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), vec_b, vec_c, (s32 *)D_L12_001A7CB0, 1);
         }
         break;
     }
@@ -943,8 +943,8 @@ void hero_decide_todano_state(void) {
         }
         break;
                 case 0x65:                          /* switch 2 */
-                    spawnCount = FLD(g_hero_state, s32, 0x18C0);
-                    if ((spawnCount < 3) && (((spawnCount * 7) + 0xA) < FLD(g_hero_state, s32, 0x1B8)) && (PadPressedWithin(0x40U, 7, &spawnSlot) != 0)) {
+                    spawn_count = FLD(g_hero_state, s32, 0x18C0);
+                    if ((spawn_count < 3) && (((spawn_count * 7) + 0xA) < FLD(g_hero_state, s32, 0x1B8)) && (PadPressedWithin(0x40U, 7, &spawn_slot) != 0)) {
                         hero_l12_set_action(0x66, 1);
                     }
                     if (FLD(g_hero_state, f32, 0x88) < (FLD(g_hero_state, f32, 0x334) - 1.2f)) {
@@ -1202,10 +1202,10 @@ void hero_decide_todano_state(void) {
         }
         if (FLD(g_hero_state, f32, 0x24B8) > 0.5f) {
             if (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) < 0.78539824f) {
-                qcopy(vecA, g_hero_state + 0x80);
-                vecA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
-                vecA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
-                if (hero_find_ledge_grab((s8 *)vecA, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
+                qcopy(vec_a, g_hero_state + 0x80);
+                vec_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
+                vec_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
+                if (hero_find_ledge_grab((s8 *)vec_a, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
                     hero_l12_set_action(0x19, 1);
                 }
                 break;
@@ -1213,10 +1213,10 @@ void hero_decide_todano_state(void) {
         }
         if (FLD(g_hero_state, f32, 0x24B8) > 0.5f) {
             if (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) < 0.78539824f) {
-                qcopy(vecA, g_hero_state + 0x80);
-                vecA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
-                vecA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
-                if (hero_find_ledge_grab((s8 *)vecA, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
+                qcopy(vec_a, g_hero_state + 0x80);
+                vec_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
+                vec_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
+                if (hero_find_ledge_grab((s8 *)vec_a, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
                     hero_l12_set_action(0x1A, 1);
                 }
             }
@@ -1226,15 +1226,15 @@ void hero_decide_todano_state(void) {
     case 0x1A:
     {
         f32 side;
-        *(s128 *)vecA = FLD(g_hero_state + 0x80, s128, 0);
+        *(s128 *)vec_a = FLD(g_hero_state + 0x80, s128, 0);
         side = 1.5707965f;
         if (FLD(g_hero_state, u32, 0x2294) == 0x1A) {
             side = -1.5707965f;
         }
-        vecA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
-        vecA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
+        vec_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
+        vec_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
         hero_resolve_stick_direction(0, 1.0f);
-        if ((FLD(g_hero_state, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) > 0.78539824f) || (hero_find_ledge_grab((s8 *)vecA, (s8 *)(g_hero_state + 0x90), NULL) == 0)) {
+        if ((FLD(g_hero_state, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) > 0.78539824f) || (hero_find_ledge_grab((s8 *)vec_a, (s8 *)(g_hero_state + 0x90), NULL) == 0)) {
             if (FLD(g_hero_state, s32, 0xC28) & 2) {
                 hero_l12_set_action(0x18, 1);
                 break;
@@ -1553,8 +1553,8 @@ void hero_decide_todano_state(void) {
                     AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x438), left, FLD(g_hero_state, f32, 0x514), -1.0f);
                 }
             } else if (FLD(g_hero_state, u32, 0x2294) != 0xE) {
-                EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angleOutA, FLD(g_hero_state, f32, 0x520));
-                AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)angleOutA, FLD(g_hero_state, f32, 0x514), -1.0f);
+                EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angle_out_a, FLD(g_hero_state, f32, 0x520));
+                AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)angle_out_a, FLD(g_hero_state, f32, 0x514), -1.0f);
                 if (FLD(g_hero_state, f32, 0xC20) > 1.5f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.5f;
                 }
@@ -1587,7 +1587,7 @@ void hero_decide_todano_state(void) {
                 if (near == 0) {
                     s32 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 2;
                     if (FLD(g_hero_state, f32, 0xC38) < FLD(g_hero_state, f32, 0x4CC) - 1.5f) {
-                        set_hero_animation(math_l00_return_argument(FLD(curMove, u8, 0x43)), k, 7.0f);
+                        set_hero_animation(math_l00_return_argument(FLD(cur_move, u8, 0x43)), k, 7.0f);
                     }
                 }
             }
@@ -1596,7 +1596,7 @@ void hero_decide_todano_state(void) {
             FLD(g_hero_state, f32, 0xC20) = 1.0f;
         } else if (FLD(g_hero_state, u8, 0x49E) != 0) {
             s32 cur;
-            if ((s32)FLD(curMove, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
+            if ((s32)FLD(cur_move, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
                 if ((FLD(g_hero_state, u32, 0x2294) == 0xE) && (FLD(g_hero_state, f32, 0xC38) < 37.0f)) {
                     ApproachValue((f32 *)(g_hero_state + 0xC20), 1.0f, 0.15f);
                 } else {
@@ -1606,7 +1606,7 @@ void hero_decide_todano_state(void) {
                 if (near == 0) {
                     s32 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 2;
                     if (FLD(g_hero_state, f32, 0xC20) > 1.8f) {
-                        set_hero_animation(math_l00_return_argument(FLD(curMove, u8, 0x43)), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 3));
+                        set_hero_animation(math_l00_return_argument(FLD(cur_move, u8, 0x43)), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 3));
                     }
                 }
                 if (FLD(g_hero_state, f32, 0xC20) < 0.2f) {
@@ -1617,7 +1617,7 @@ void hero_decide_todano_state(void) {
                 }
             }
             cur = FLD(g_hero_state, u32, 0x2294);
-            if ((cur == 9) && ((FLD(g_hero_state, f32, 0x4CC) - FLD(g_hero_state, f32, 0xC38)) > 6.0f) && ((math_l00_return_argument(FLD(curMove, u8, 0x42)) == 8) || (math_l00_return_argument(FLD(curMove, u8, 0x42)) == cur)) && (FLD(curMove, u8, 0x42) == FLD(curMove, u8, 0x43)) && (FLD(g_hero_state, f32, 0x1B0) < D_L12_001A7DAC[1][1] * 0.0016666668f) && (FLD(g_hero_state, f32, 0x174) < 0.041666668f)) {
+            if ((cur == 9) && ((FLD(g_hero_state, f32, 0x4CC) - FLD(g_hero_state, f32, 0xC38)) > 6.0f) && ((math_l00_return_argument(FLD(cur_move, u8, 0x42)) == 8) || (math_l00_return_argument(FLD(cur_move, u8, 0x42)) == cur)) && (FLD(cur_move, u8, 0x42) == FLD(cur_move, u8, 0x43)) && (FLD(g_hero_state, f32, 0x1B0) < D_L12_001A7DAC[1][1] * 0.0016666668f) && (FLD(g_hero_state, f32, 0x174) < 0.041666668f)) {
                 f32 rate = 9.0f / FLD(g_hero_state, f32, 0xC20);
                 s32 at;
                 if (rate > 10.0f) {
@@ -1670,7 +1670,7 @@ void hero_decide_todano_state(void) {
             if ((s == 7) || (s == 9) || (s == 0x11)) {
                 ok = 1;
             }
-            if ((FLD(g_hero_state, s32, 0x1D4) != 0) && (FLD(g_hero_state, u8, 0x49C) == 0) && (ok != 0) && ((FLD(g_hero_state, u32, 0x2294) != 0x11) || (FLD(g_hero_state, s32, 0x1B8) >= 0x1A)) && (PadPressedWithin(0x40, 7, &tmpD) != 0) && (tmpD < FLD(g_hero_state, s32, 0x1B8))) {
+            if ((FLD(g_hero_state, s32, 0x1D4) != 0) && (FLD(g_hero_state, u8, 0x49C) == 0) && (ok != 0) && ((FLD(g_hero_state, u32, 0x2294) != 0x11) || (FLD(g_hero_state, s32, 0x1B8) >= 0x1A)) && (PadPressedWithin(0x40, 7, &tmp_d) != 0) && (tmp_d < FLD(g_hero_state, s32, 0x1B8))) {
                 hero_l12_set_action(0x11, 1);
                 break;
             }
@@ -1840,8 +1840,8 @@ void hero_decide_todano_state(void) {
             break;
         }
         if (now == lo + 1) {
-            EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angleOutB, FLD(g_hero_state, f32, 0x520));
-            AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)angleOutB, FLD(g_hero_state, f32, 0x514), -1.0f);
+            EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &angle_out_b, FLD(g_hero_state, f32, 0x520));
+            AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)angle_out_b, FLD(g_hero_state, f32, 0x514), -1.0f);
             break;
         }
         if ((FLD(g_hero_state, u8, 0x49D) != 0) && (now >= FLD(g_hero_state, s32, 0x430)) && (now < FLD(g_hero_state, s32, 0x434))) {
@@ -1860,7 +1860,7 @@ void hero_decide_todano_state(void) {
                 FLD(g_hero_state, u8, 0x49C) = 1;
                 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 3;
                 if (FLD(g_hero_state, f32, 0xC38) < FLD(g_hero_state, f32, 0x4CC)) {
-                    set_hero_animation(FLD(curMove, u8, 0x43), k, 6.0f);
+                    set_hero_animation(FLD(cur_move, u8, 0x43), k, 6.0f);
                 }
             }
         }
@@ -1868,13 +1868,13 @@ void hero_decide_todano_state(void) {
             FLD(g_hero_state, f32, 0xC20) = 1.0f;
         } else if (FLD(g_hero_state, u8, 0x49E) != 0) {
             s32 a;
-            if ((s32)FLD(curMove, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
+            if ((s32)FLD(cur_move, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
                 s32 k;
                 FLD(g_hero_state, s16, 0x4AE) = FloatToInt(hero_find_collision_time(60.0f, FLD(g_hero_state, f32, 0x520), -1.0f));
                 AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4CC), (f32)FLD(g_hero_state, s16, 0x4AE), FLD(g_hero_state, f32, 0x514), -1.0f);
                 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 1;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.8f) {
-                    set_hero_animation(FLD(curMove, u8, 0x43), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 2));
+                    set_hero_animation(FLD(cur_move, u8, 0x43), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 2));
                 }
                 if (FLD(g_hero_state, f32, 0xC20) < 0.2f) {
                     FLD(g_hero_state, f32, 0xC20) = 0.2f;
@@ -2056,8 +2056,8 @@ void hero_decide_todano_state(void) {
         break;
     case 0x47:
         hero_resolve_stick_direction(0, 1.0f);
-        *(s128 *)vecA = FLD(g_hero_state + 0x80, s128, 0);
-        if (hero_find_ledge_grab((s8 *)vecA, (s8 *)(g_hero_state + 0x90), NULL) == 0) {
+        *(s128 *)vec_a = FLD(g_hero_state + 0x80, s128, 0);
+        if (hero_find_ledge_grab((s8 *)vec_a, (s8 *)(g_hero_state + 0x90), NULL) == 0) {
             hero_l12_set_action(0x41, 1);
             FLD(g_hero_state, s16, 0x1D0) = 0xA;
             break;
@@ -2073,10 +2073,10 @@ void hero_decide_todano_state(void) {
         }
         if (FLD(g_hero_state, f32, 0x24B8) > 0.5f) {
             if (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) < 0.78539824f) {
-                qcopy(vecB, g_hero_state + 0x80);
-                vecB[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
-                vecB[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
-                if (hero_find_ledge_grab((s8 *)vecB, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
+                qcopy(vec_b, g_hero_state + 0x80);
+                vec_b[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
+                vec_b[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
+                if (hero_find_ledge_grab((s8 *)vec_b, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
                     hero_l12_set_action(0x49, 1);
                 }
                 break;
@@ -2084,10 +2084,10 @@ void hero_decide_todano_state(void) {
         }
         if (FLD(g_hero_state, f32, 0x24B8) > 0.5f) {
             if (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) < 0.78539824f) {
-                qcopy(vecB, g_hero_state + 0x80);
-                vecB[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
-                vecB[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
-                if (hero_find_ledge_grab((s8 *)vecB, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
+                qcopy(vec_b, g_hero_state + 0x80);
+                vec_b[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
+                vec_b[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
+                if (hero_find_ledge_grab((s8 *)vec_b, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
                     hero_l12_set_action(0x4A, 1);
                 }
             }
@@ -2097,15 +2097,15 @@ void hero_decide_todano_state(void) {
     case 0x4A:
     {
         f32 side;
-        *(s128 *)vecA = FLD(g_hero_state + 0x80, s128, 0);
+        *(s128 *)vec_a = FLD(g_hero_state + 0x80, s128, 0);
         side = 1.5707965f;
         if (FLD(g_hero_state, u32, 0x2294) == 0x4A) {
             side = -1.5707965f;
         }
-        vecA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
-        vecA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
+        vec_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
+        vec_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
         hero_resolve_stick_direction(0, 1.0f);
-        if ((FLD(g_hero_state, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) > 0.78539824f) || (hero_find_ledge_grab((s8 *)vecA, (s8 *)(g_hero_state + 0x90), NULL) == 0)) {
+        if ((FLD(g_hero_state, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) > 0.78539824f) || (hero_find_ledge_grab((s8 *)vec_a, (s8 *)(g_hero_state + 0x90), NULL) == 0)) {
             if (FLD(g_hero_state, s32, 0xC28) & 2) {
                 hero_l12_set_action(0x47, 1);
                 break;
@@ -2165,17 +2165,17 @@ void hero_decide_todano_state(void) {
         break;
     }
 end:
-    if (savedTarget != FLD(g_hero_state, s32, 0x229C)) {
+    if (saved_target != FLD(g_hero_state, s32, 0x229C)) {
         hero_clear_tracked_slots();
     }
-    prevStateId = FLD(g_hero_state, s32, 0x22A0);
-    if (((prevStateId == 0x3C) && (FLD(g_hero_state, s32, 0x2294) != 0x3D)) || ((prevStateId == 0x3D) && (FLD(g_hero_state, s32, 0x1854) != 0))) {
+    prev_state_id = FLD(g_hero_state, s32, 0x22A0);
+    if (((prev_state_id == 0x3C) && (FLD(g_hero_state, s32, 0x2294) != 0x3D)) || ((prev_state_id == 0x3D) && (FLD(g_hero_state, s32, 0x1854) != 0))) {
         hero_clear_target_flags();
     }
-    if (savedPrevState != FLD(g_hero_state, s32, 0x2298)) {
+    if (saved_prev_state != FLD(g_hero_state, s32, 0x2298)) {
         FLD(g_hero_state, s32, 0x1C0) = 0;
     }
-    if (savedMoveId != FLD(curMove, u8, 0x43)) {
+    if (saved_move_id != FLD(cur_move, u8, 0x43)) {
         FLD(g_hero_state, s32, 0x1C4) = 0;
     }
 }

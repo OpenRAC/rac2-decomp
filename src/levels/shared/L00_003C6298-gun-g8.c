@@ -188,7 +188,7 @@ have_target:
         gauge_popup_show(1, math_update_angle_and_blend(context->beam, D_L00_001AFFB0_sda, D_L00_001AFFB0[1], rate * 0.0002908882452175021f), 0, D_L00_001AFFC8);
         if (context->target && context->remaining <= 0.0f) {
             int target_class = FIELD(context->target, short, 0xAA);
-            if (g_current_map_index == 12 && target_class == 0xFB4 /* Mutant Test-Squirrel */) {
+            if (g_current_map_index == 12 && target_class == MOBY_CLASS_MUTANT_TEST_SQUIRREL) {
                 D_L00_001B0E30[0] = D_L00_001B0E30[0] + 1;
                 if (D_L00_001B0E30[0] >= 16 && !D_001A7A60[22]) {
                     D_001A7A60[22] = 1;

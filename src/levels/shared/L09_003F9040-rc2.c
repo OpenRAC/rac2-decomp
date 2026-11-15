@@ -33,32 +33,32 @@ extern s32 ref_L09_003F9040_04 __attribute__((sda));
 
 /* On two levels, applies that level's colour tint to the object. */
 void level_apply_colour_tint(s8 *moby) {
-    s32 colorWord;
-    s32 alphaMask;
-    s32 packedValue;
+    s32 color_word;
+    s32 alpha_mask;
+    s32 packed_value;
 
     switch (g_current_map_index) {
     case 8:
-        packedValue = ref_L09_003F9040_01;
-        alphaMask = 0xFF000000;
-        if ((packedValue & alphaMask) != 0) {
-            ref_L09_003F9040_00(moby, packedValue & 0xFF, (packedValue >> 8) & 0xFF, (packedValue >> 16) & 0xFF);
+        packed_value = ref_L09_003F9040_01;
+        alpha_mask = 0xFF000000;
+        if ((packed_value & alpha_mask) != 0) {
+            ref_L09_003F9040_00(moby, packed_value & 0xFF, (packed_value >> 8) & 0xFF, (packed_value >> 16) & 0xFF);
         }
-        colorWord = ref_L09_003F9040_02;
+        color_word = ref_L09_003F9040_02;
         goto block_9;
     case 20:
-        packedValue = ref_L09_003F9040_03;
-        alphaMask = 0xFF000000;
-        if ((packedValue & alphaMask) != 0) {
-            ref_L09_003F9040_00(moby, packedValue & 0xFF, (packedValue >> 8) & 0xFF, (packedValue >> 16) & 0xFF);
+        packed_value = ref_L09_003F9040_03;
+        alpha_mask = 0xFF000000;
+        if ((packed_value & alpha_mask) != 0) {
+            ref_L09_003F9040_00(moby, packed_value & 0xFF, (packed_value >> 8) & 0xFF, (packed_value >> 16) & 0xFF);
         }
-        colorWord = ref_L09_003F9040_04;
+        color_word = ref_L09_003F9040_04;
         goto block_9;
     }
     return;
 block_9:
-    if ((colorWord & alphaMask) != 0) {
-        (*(s32 *)((s8 *)(moby) + (0x78))) = colorWord;
+    if ((color_word & alpha_mask) != 0) {
+        (*(s32 *)((s8 *)(moby) + (0x78))) = color_word;
         (*(u16 *)((s8 *)(moby) + (0x34))) = (*(u16 *)((s8 *)(moby) + (0x34))) | 0x10;
     }
 }

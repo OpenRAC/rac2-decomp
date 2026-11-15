@@ -52,21 +52,21 @@ void single_child_rise_controller_update(Actor *self)
     switch (self->f20) {
 
     case 0: {
-        u16 rawId;
+        u16 raw_id;
 
         self->f20 = 1;
         vars->f8 = self->f18;
-        rawId = self->fB2;
-        if (D_L12_0021EDF0.flags[(s16)rawId] != 0)
+        raw_id = self->fB2;
+        if (D_L12_0021EDF0.flags[(s16)raw_id] != 0)
             goto Destroy;
         {
-            s32 savedBits = D_0019B4A8[((s16)rawId >> 1) + (g_current_map_index << 10)];
-            if (rawId & 1) {
-                if (((savedBits >> 4) & 7) != 0)
+            s32 saved_bits = D_0019B4A8[((s16)raw_id >> 1) + (g_current_map_index << 10)];
+            if (raw_id & 1) {
+                if (((saved_bits >> 4) & 7) != 0)
                     goto Destroy;
                 return;
             } else {
-                if ((savedBits & 7) == 0)
+                if ((saved_bits & 7) == 0)
                     return;
                 goto Destroy;
             }
@@ -104,7 +104,7 @@ void single_child_rise_controller_update(Actor *self)
         return;
 
     case 3: {
-        u16 rawId;
+        u16 raw_id;
 
         if (math_fast_float_d(&vars->fC) != 0) {
             u8 *child = (u8 *)D_L12_001B2E9C + (vars->f0 << 8);
@@ -121,13 +121,13 @@ void single_child_rise_controller_update(Actor *self)
                 ((Actor *)D_L12_001B2E9C)[vars->f0].f34 &= 0xEFFF;
                 moby_mark_spawned(D_L12_001B2E9C + (vars->f0 << 8));
             }
-        rawId = self->fB2;
-        if (rawId & 1) {
-            u8 *cell = D_0019B4A8 + (((s16)rawId >> 1) + (g_current_map_index << 10));
+        raw_id = self->fB2;
+        if (raw_id & 1) {
+            u8 *cell = D_0019B4A8 + (((s16)raw_id >> 1) + (g_current_map_index << 10));
             if (((*cell >> 4) & 7) != 7)
                 *cell += 0x10;
         } else {
-            u8 *cell = D_0019B4A8 + (((s16)rawId >> 1) + (g_current_map_index << 10));
+            u8 *cell = D_0019B4A8 + (((s16)raw_id >> 1) + (g_current_map_index << 10));
             if ((*cell & 7) != 7)
                 *cell += 1;
         }
@@ -141,15 +141,15 @@ Destroy:
 
     }
     case 5: {
-        u16 rawId;
+        u16 raw_id;
 
-        rawId = self->fB2;
-        if (rawId & 1) {
-            u8 *cell = D_0019B4A8 + (((s16)rawId >> 1) + (g_current_map_index << 10));
+        raw_id = self->fB2;
+        if (raw_id & 1) {
+            u8 *cell = D_0019B4A8 + (((s16)raw_id >> 1) + (g_current_map_index << 10));
             if (((*cell >> 4) & 7) != 7)
                 *cell += 0x10;
         } else {
-            u8 *cell = D_0019B4A8 + (((s16)rawId >> 1) + (g_current_map_index << 10));
+            u8 *cell = D_0019B4A8 + (((s16)raw_id >> 1) + (g_current_map_index << 10));
             if ((*cell & 7) != 7)
                 *cell += 1;
         }

@@ -27,10 +27,10 @@ extern void FastVecSub(void *, void *, void *);
 /* Update handler for moby class 4739: lifts the object upward when it is triggered, then holds it at the top. */
 void rising_l20_platform_update(char *moby) {
     char *state = *(char **)(moby + 0x68);
-    TI128 oldPos, oldRot, moveDelta;
+    TI128 old_pos, old_rot, move_delta;
 
-    qcopy(&oldPos, moby + 0x10);
-    qcopy(&oldRot, moby + 0xF0);
+    qcopy(&old_pos, moby + 0x10);
+    qcopy(&old_rot, moby + 0xF0);
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
         *(float *)(state + 0x90) = 0.0f;
@@ -76,7 +76,7 @@ void rising_l20_platform_update(char *moby) {
     }
     }
     if (*(u8 *)(moby + 0x20) < 3) {
-        FastVecSub(&moveDelta, moby + 0x10, &oldPos);
-        mat_combine_and_store(state + 0x20, &moveDelta, &oldRot, moby + 0xF0);
+        FastVecSub(&move_delta, moby + 0x10, &old_pos);
+        mat_combine_and_store(state + 0x20, &move_delta, &old_rot, moby + 0xF0);
     }
 }

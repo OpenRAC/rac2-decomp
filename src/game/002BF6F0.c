@@ -568,11 +568,11 @@ void part_update_splitting_spark(SplitParticle *p) {
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
 /* Updates a fading spark that can split in two, bounces off surfaces, and fades out until it is removed. */
 void part_update_fading_split_spark(FadeSplitParticle *particle) {
-    SplitVector newVel, nextPos;
+    SplitVector new_vel, next_pos;
     FadeSplitCollision collision;
     FadeSplitMotion *motion = &particle->e;
     FadeSplitParticle *child;
-    f32 spread, negSpread, alpha, lifeRatio;
+    f32 spread, neg_spread, alpha, life_ratio;
     s32 hit;
     u8 flags;
     u8 *table;
@@ -581,15 +581,15 @@ void part_update_fading_split_spark(FadeSplitParticle *particle) {
         motion->b18 |= 0x88;
         spread = particle->fC * 0.0000011111111462014378f;
         particle->fC *= 0.8f;
-        negSpread = -spread;
-        func_00282D30_12((char *)&newVel, (char *)motion, math_random_float_range(0.5f, 0.7f));
-        nextPos.f[0] = particle->pos.f[0] + math_random_float_range(negSpread, spread);
-        nextPos.f[1] = particle->pos.f[1] + math_random_float_range(negSpread, spread);
-        nextPos.f[2] = particle->pos.f[2] + math_random_float_range(negSpread, spread);
-        newVel.f[0] += math_random_float_range(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
-        newVel.f[1] += math_random_float_range(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
-        newVel.f[2] += math_random_float_range(-motion->v.f[2] * 0.2f, 0.0f);
-        child = (FadeSplitParticle *)part_spawn_smoke((char *)&nextPos, (char *)&newVel, (motion->b18 & 0x10) | 0x88, motion->x1C);
+        neg_spread = -spread;
+        func_00282D30_12((char *)&new_vel, (char *)motion, math_random_float_range(0.5f, 0.7f));
+        next_pos.f[0] = particle->pos.f[0] + math_random_float_range(neg_spread, spread);
+        next_pos.f[1] = particle->pos.f[1] + math_random_float_range(neg_spread, spread);
+        next_pos.f[2] = particle->pos.f[2] + math_random_float_range(neg_spread, spread);
+        new_vel.f[0] += math_random_float_range(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
+        new_vel.f[1] += math_random_float_range(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
+        new_vel.f[2] += math_random_float_range(-motion->v.f[2] * 0.2f, 0.0f);
+        child = (FadeSplitParticle *)part_spawn_smoke((char *)&next_pos, (char *)&new_vel, (motion->b18 & 0x10) | 0x88, motion->x1C);
         if (child) {
             child->hA = 2;
             child->fC = particle->fC;
@@ -598,36 +598,36 @@ void part_update_fading_split_spark(FadeSplitParticle *particle) {
         motion->v.f[0] += math_random_float_range(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
         motion->v.f[1] += math_random_float_range(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
         motion->v.f[2] += math_random_float_range(-motion->v.f[2] * 0.2f, 0.0f);
-        particle->pos.f[0] += math_random_float_range(negSpread, spread);
-        particle->pos.f[1] += math_random_float_range(negSpread, spread);
-        particle->pos.f[2] += math_random_float_range(negSpread, spread);
+        particle->pos.f[0] += math_random_float_range(neg_spread, spread);
+        particle->pos.f[1] += math_random_float_range(neg_spread, spread);
+        particle->pos.f[2] += math_random_float_range(neg_spread, spread);
     }
     table = D_001F2570;
     { int index = particle->b2 - table[0];
     particle->b2 = table[(particle->hA + motion->h16 + index) & 7]; }
-    FastVecAdd((char *)&newVel, (char *)&particle->pos, (char *)motion);
+    FastVecAdd((char *)&new_vel, (char *)&particle->pos, (char *)motion);
     hit = 0;
     if (motion->h14 > 3) {
-        FastVecSub(&nextPos, &particle->pos, motion);
+        FastVecSub(&next_pos, &particle->pos, motion);
     } else {
-        nextPos.q = particle->pos.q;
+        next_pos.q = particle->pos.q;
     }
     func_00282D30_12((char *)&collision, (char *)&collision, 0.01f);
     flags = motion->b18;
     if (flags & 8) {
         if (!(particle->x4 & 0xFF000000)) goto kill;
         motion->b18 = flags | 8;
-        if (!math_random_int_below(3) && !(motion->b18 & 0x10)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, 0) != 0;
+        if (!math_random_int_below(3) && !(motion->b18 & 0x10)) hit = CollLine(&next_pos, &new_vel, 0, (void *)motion->x1C, 0) != 0;
     } else {
         collision.x10 = motion->x1C;
         collision.x1C = 1.0f;
         collision.v.q = motion->v.q;
         collision.x14 = 1;
         collision.x20 = 1;
-        if (!math_random_int_below(3) && !(motion->b18 & 0x10)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, &collision) != 0;
+        if (!math_random_int_below(3) && !(motion->b18 & 0x10)) hit = CollLine(&next_pos, &new_vel, 0, (void *)motion->x1C, &collision) != 0;
     }
     if (hit) motion->b18 |= 8;
-    else qcopy(&particle->pos, &newVel);
+    else qcopy(&particle->pos, &new_vel);
     if (motion->b18 & 8) {
         motion->h16++;
         particle->fC -= 18055.5546875f;
@@ -639,8 +639,8 @@ void part_update_fading_split_spark(FadeSplitParticle *particle) {
     } else {
         particle->fC += 14444.4443359375f;
     }
-    lifeRatio = func_00283CE0_2(motion->h14);
-    alpha = lifeRatio * 0.000246913579758257f + 0.08f;
+    life_ratio = func_00283CE0_2(motion->h14);
+    alpha = life_ratio * 0.000246913579758257f + 0.08f;
     if (alpha < 0.0f) alpha = 0.0f;
     if (0.08f < alpha) alpha = 0.08f;
     if (motion->b18 & 8) alpha /= (f32)motion->h16 * 0.142857149243355f + 1.0f;
@@ -651,13 +651,13 @@ void part_update_fading_split_spark(FadeSplitParticle *particle) {
         motion->v.f[1] *= 0.95f;
     }
     { u8 f2 = motion->b18;
-    lifeRatio = -1.0f;
-    if (f2 & 1) lifeRatio = 1.0f;
+    life_ratio = -1.0f;
+    if (f2 & 1) life_ratio = 1.0f;
     if (f2 & 8) {
         motion->v.f[2] += 0.008f;
-        motion->x10 += lifeRatio * (-0.01f) / func_00283CE0_2(motion->h16);
+        motion->x10 += life_ratio * (-0.01f) / func_00283CE0_2(motion->h16);
     } else {
-        motion->x10 += lifeRatio * (-0.01f);
+        motion->x10 += life_ratio * (-0.01f);
     } }
     if (1.0f < motion->x10) motion->x10 -= 1.0f;
     if (motion->x10 < 0.0f) motion->x10 += 1.0f;
@@ -802,18 +802,18 @@ extern void func_00282D30_fa(void *, void *, float);
 /* Slows a particle a little each frame, grows it, and fades it out until it disappears. */
 void part_update_slowing_fade(char *particle)
 {
-    char *particleCopy = particle;
-    char *motion = particleCopy + 32;
-    int fadeValue;
+    char *particle_copy = particle;
+    char *motion = particle_copy + 32;
+    int fade_value;
 
     func_00282D30_fa(motion, motion, 0.975f);
-    FastVecAdd(particleCopy + 16, particleCopy + 16, motion);
-    *(float *)(particleCopy + 12) = *(float *)(particleCopy + 12) + 14700.0f;
-    *(u8 *)(particleCopy + 8) = *(u8 *)(particleCopy + 8) + *(u8 *)(motion + 16);
-    fadeValue = *(int *)(particleCopy + 4) + 0xFE000000;
-    *(int *)(particleCopy + 4) = fadeValue;
-    if (fadeValue < 0) {
-        part_kill(particleCopy);
+    FastVecAdd(particle_copy + 16, particle_copy + 16, motion);
+    *(float *)(particle_copy + 12) = *(float *)(particle_copy + 12) + 14700.0f;
+    *(u8 *)(particle_copy + 8) = *(u8 *)(particle_copy + 8) + *(u8 *)(motion + 16);
+    fade_value = *(int *)(particle_copy + 4) + 0xFE000000;
+    *(int *)(particle_copy + 4) = fade_value;
+    if (fade_value < 0) {
+        part_kill(particle_copy);
     }
 }
 
@@ -842,16 +842,16 @@ void part_update_drifting_fade(unsigned char *particle)
 {
     float tmp[4];
     char *motion;
-    int fadeValue;
+    int fade_value;
 
     motion = (char *)particle + 32;
     Fa2a84657_FUN_00282D48(tmp, motion, 9.4999998807907104492188e-01f);
     *(float *)(motion + 8) = *(float *)(motion + 8) + 1.3888889225199818611145e-03f;
     Fa2a84657_FUN_00282CD8(tmp, (char *)particle + 16, motion);
 
-    fadeValue = *(int *)(particle + 4) + (int)0xFE000000;
-    *(int *)(particle + 4) = fadeValue;
-    if (((unsigned)(fadeValue & 0xFF000000) - 1) > 0x5EFFFFFFu || Fa2a84657_FUN_00282978((char *)particle + 10) != 0) {
+    fade_value = *(int *)(particle + 4) + (int)0xFE000000;
+    *(int *)(particle + 4) = fade_value;
+    if (((unsigned)(fade_value & 0xFF000000) - 1) > 0x5EFFFFFFu || Fa2a84657_FUN_00282978((char *)particle + 10) != 0) {
         Fa2a84657_FUN_002B9180(particle);
     } else {
         float growth;
@@ -1089,7 +1089,7 @@ extern unsigned char *r1_D_L00_001B2400[];
 /* rac1-decomp src/overlays/shared/alpha_fade_particle_updates.c: func_002C2FD8 */
 /* spawns particle type 0x3B from a position, colour index and flags */
 /* Creates a fading particle at a position with a given size, color and lifetime. It can optionally follow the view. */
-unsigned char *part_spawn_fading(float size, void *pos, int color, unsigned char frame, int colorIndex, int flag, int lifetime, int mode) {
+unsigned char *part_spawn_fading(float size, void *pos, int color, unsigned char frame, int color_index, int flag, int lifetime, int mode) {
     unsigned char *particle = r1_func_00218928(0x3B);
     if (particle != 0) {
         char *motion = (char *)particle + 0x20;
@@ -1108,7 +1108,7 @@ unsigned char *part_spawn_fading(float size, void *pos, int color, unsigned char
         particle[8] = frame;
         particle[1] = 0;
         *(float *)(particle + 0xC) = size * 210000.0f;
-        particle[2] = *r1_D_L00_001B2400[colorIndex];
+        particle[2] = *r1_D_L00_001B2400[color_index];
         *(short *)(particle + 0xA) = lifetime;
     }
     return particle;
@@ -1135,7 +1135,7 @@ void part_update_size_fade(u8 *self)
 {
     char *motion = (char *)self + 32;
     int color;
-    float prevTime;
+    float prev_time;
 
     if (*(int *)(motion + 28) == 1) {
         char *base = D_00189E20_18;
@@ -1163,10 +1163,10 @@ void part_update_size_fade(u8 *self)
     }
 
     color = *(int *)(self + 4) & 0xFFFFFF;
-    prevTime = func_00283CE0_4(*(short *)(self + 10) - 1);
+    prev_time = func_00283CE0_4(*(short *)(self + 10) - 1);
     /* One statement: retail has no line label between the second call and the
        division, so no division padding (docs/build/compiler-notes.md). */
-    *(int *)(self + 4) = func_00283D38_3(color, *(int *)(self + 4), prevTime / func_00283CE0_4(*(short *)(self + 10)));
+    *(int *)(self + 4) = func_00283D38_3(color, *(int *)(self + 4), prev_time / func_00283CE0_4(*(short *)(self + 10)));
 }
 
 /* func_002C3430 uses the hazard-label profile in 002C3430-fade.c. */
@@ -1208,14 +1208,14 @@ tail:
 
 /* Advances a spark, stops it on collision, and decays its RGBA channels. */
 void UpdateCollidingSpark(char *particle) {
- float nextPos[4];char *motion;
+ float next_pos[4];char *motion;
  if(!particle)return;
  motion=particle+32;*(float *)(particle+12)+=-100.0f;
- FastVecAdd((char *)nextPos,particle+16,motion);
+ FastVecAdd((char *)next_pos,particle+16,motion);
  if(*(float *)motion!=0 || *(float *)(motion+4)!=0 || *(float *)(motion+8)!=0){
- if(CollLine(particle+16,nextPos,2,particle,0)){*(U128 *)(particle+16)=*(U128 *)D_001BAFA0;vec_clear_128(motion);*(float *)(particle+12)+=*(float *)(particle+12);}
- else {*(U128 *)(particle+16)=*(U128 *)nextPos;if(*(float *)(motion+12)!=0)*(float *)(motion+8)+=*(float *)(motion+12);else *(float *)(motion+8)+=-0.0063f;}}
- if(*(float *)(motion+28)<=0 || FastDecTimer((short *)(particle+10)) || *(float *)(particle+12)<0 || nextPos[0]<0.01f || nextPos[1]<0.01f || nextPos[2]<0.01f){part_kill(particle);return;}
+ if(CollLine(particle+16,next_pos,2,particle,0)){*(U128 *)(particle+16)=*(U128 *)D_001BAFA0;vec_clear_128(motion);*(float *)(particle+12)+=*(float *)(particle+12);}
+ else {*(U128 *)(particle+16)=*(U128 *)next_pos;if(*(float *)(motion+12)!=0)*(float *)(motion+8)+=*(float *)(motion+12);else *(float *)(motion+8)+=-0.0063f;}}
+ if(*(float *)(motion+28)<=0 || FastDecTimer((short *)(particle+10)) || *(float *)(particle+12)<0 || next_pos[0]<0.01f || next_pos[1]<0.01f || next_pos[2]<0.01f){part_kill(particle);return;}
  *(float *)(motion+16)+=-0.01f;if(*(float *)(motion+16)<0)*(float *)(motion+16)=0;
  *(float *)(motion+20)+=-0.03001f;if(*(float *)(motion+20)<0)*(float *)(motion+20)=0;
  *(float *)(motion+24)+=-0.05f;if(*(float *)(motion+24)<0)*(float *)(motion+24)=0;
@@ -1332,10 +1332,10 @@ destroy:
 
 /* decrements a signed short counter and, at zero, rotates a 24-bit identifier beside it and reloads the counter; calls a helper when the identifier's top byte is clear */
 void part_step_fade_timer(u8 *particle) {
-    s16_F570cfb4b *timerPtr = (s16_F570cfb4b *)(particle + 10);
-    if (--*timerPtr == 0) {
+    s16_F570cfb4b *timer_ptr = (s16_F570cfb4b *)(particle + 10);
+    if (--*timer_ptr == 0) {
         *(s32 *)(particle + 4) += 0xff000000;
-        *timerPtr = 2;
+        *timer_ptr = 2;
     }
     if ((*(s32 *)(particle + 4) & 0xff000000) == 0) {
         func_002B9180_7(particle);
@@ -1461,7 +1461,7 @@ void part_update_scaled_color(char *self)
 /* Shrinks and fades a particle each frame and removes it when it leaves the world or its timer ends. */
 void part_update_shrinking_fade(Obj_F7cacd225 *particle)
 {
-    int fadeMode;
+    int fade_mode;
 
     if (particle->f16 < 2.0f || particle->f16 > 1021.0f ||
         particle->f20 < 2.0f || particle->f20 > 1021.0f ||
@@ -1470,8 +1470,8 @@ void part_update_shrinking_fade(Obj_F7cacd225 *particle)
         F7cacd225_FUN_002B9180((char *)particle);
         return;
     }
-    fadeMode = particle->f32;
-    if (fadeMode != 0) {
+    fade_mode = particle->f32;
+    if (fade_mode != 0) {
         particle->f12 = particle->f12 * 0.99f;
         particle->f4 = F7cacd225_FUN_00283D38(0x30FFFFFF, particle->f4, F7cacd225_FUN_00283CE0(particle->s10 - 1) / F7cacd225_FUN_00283CE0(particle->s10));
     } else {
@@ -1520,11 +1520,11 @@ void part_update_burst_ember(char *particle) {
 /* Adapted from RAC1 effect_particle_updates.c; measured against RAC2 retail. */
 /* Updates a fading spark like the other splitting sparks but with lighter gravity. It splits, bounces and fades out. */
 void part_update_split_spark_low_gravity(FadeSplitParticle *particle) {
-    SplitVector newVel, nextPos;
+    SplitVector new_vel, next_pos;
     FadeSplitCollision collision;
     FadeSplitMotion *motion = &particle->e;
     FadeSplitParticle *child;
-    f32 spread, negSpread, alpha, lifeRatio;
+    f32 spread, neg_spread, alpha, life_ratio;
     s32 hit;
     u8 flags;
     u8 *table;
@@ -1533,15 +1533,15 @@ void part_update_split_spark_low_gravity(FadeSplitParticle *particle) {
         motion->b18 |= 0x88;
         spread = particle->fC * 0.0000011111111462014378f;
         particle->fC *= 0.8f;
-        negSpread = -spread;
-        func_00282D30_12((char *)&newVel, (char *)motion, math_random_float_range(0.5f, 0.7f));
-        nextPos.f[0] = particle->pos.f[0] + math_random_float_range(negSpread, spread);
-        nextPos.f[1] = particle->pos.f[1] + math_random_float_range(negSpread, spread);
-        nextPos.f[2] = particle->pos.f[2] + math_random_float_range(negSpread, spread);
-        newVel.f[0] += math_random_float_range(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
-        newVel.f[1] += math_random_float_range(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
-        newVel.f[2] += math_random_float_range(-motion->v.f[2] * 0.2f, 0.0f);
-        child = (FadeSplitParticle *)part_spawn_smoke_alt((char *)&nextPos, (char *)&newVel, 0x88, motion->x1C);
+        neg_spread = -spread;
+        func_00282D30_12((char *)&new_vel, (char *)motion, math_random_float_range(0.5f, 0.7f));
+        next_pos.f[0] = particle->pos.f[0] + math_random_float_range(neg_spread, spread);
+        next_pos.f[1] = particle->pos.f[1] + math_random_float_range(neg_spread, spread);
+        next_pos.f[2] = particle->pos.f[2] + math_random_float_range(neg_spread, spread);
+        new_vel.f[0] += math_random_float_range(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
+        new_vel.f[1] += math_random_float_range(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
+        new_vel.f[2] += math_random_float_range(-motion->v.f[2] * 0.2f, 0.0f);
+        child = (FadeSplitParticle *)part_spawn_smoke_alt((char *)&next_pos, (char *)&new_vel, 0x88, motion->x1C);
         if (child) {
             child->hA = 2;
             child->fC = particle->fC;
@@ -1550,36 +1550,36 @@ void part_update_split_spark_low_gravity(FadeSplitParticle *particle) {
         motion->v.f[0] += math_random_float_range(-motion->v.f[0] * 0.2f, motion->v.f[0] * 0.2f);
         motion->v.f[1] += math_random_float_range(-motion->v.f[1] * 0.2f, motion->v.f[1] * 0.2f);
         motion->v.f[2] += math_random_float_range(-motion->v.f[2] * 0.2f, 0.0f);
-        particle->pos.f[0] += math_random_float_range(negSpread, spread);
-        particle->pos.f[1] += math_random_float_range(negSpread, spread);
-        particle->pos.f[2] += math_random_float_range(negSpread, spread);
+        particle->pos.f[0] += math_random_float_range(neg_spread, spread);
+        particle->pos.f[1] += math_random_float_range(neg_spread, spread);
+        particle->pos.f[2] += math_random_float_range(neg_spread, spread);
     }
     table = D_001F2688;
     { int index = particle->b2 - table[0];
     particle->b2 = table[(particle->hA + motion->h16 + index) & 7]; }
-    FastVecAdd((char *)&newVel, (char *)&particle->pos, (char *)motion);
+    FastVecAdd((char *)&new_vel, (char *)&particle->pos, (char *)motion);
     hit = 0;
     if (motion->h14 > 3) {
-        FastVecSub(&nextPos, &particle->pos, motion);
+        FastVecSub(&next_pos, &particle->pos, motion);
     } else {
-        nextPos.q = particle->pos.q;
+        next_pos.q = particle->pos.q;
     }
     func_00282D30_12((char *)&collision, (char *)&collision, 0.01f);
     flags = motion->b18;
     if (flags & 8) {
         if (!(particle->x4 & 0xFF000000)) goto kill;
         motion->b18 = flags | 8;
-        if (!math_random_int_below(3)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, 0) != 0;
+        if (!math_random_int_below(3)) hit = CollLine(&next_pos, &new_vel, 0, (void *)motion->x1C, 0) != 0;
     } else {
         collision.x10 = motion->x1C;
         collision.x1C = 1.0f;
         collision.v.q = motion->v.q;
         collision.x14 = 1;
         collision.x20 = 1;
-        if (!math_random_int_below(3)) hit = CollLine(&nextPos, &newVel, 0, (void *)motion->x1C, &collision) != 0;
+        if (!math_random_int_below(3)) hit = CollLine(&next_pos, &new_vel, 0, (void *)motion->x1C, &collision) != 0;
     }
     if (hit) motion->b18 |= 8;
-    else qcopy(&particle->pos, &newVel);
+    else qcopy(&particle->pos, &new_vel);
     if (motion->b18 & 8) {
         motion->h16++;
         particle->fC -= 18055.5546875f;
@@ -1591,8 +1591,8 @@ void part_update_split_spark_low_gravity(FadeSplitParticle *particle) {
     } else {
         particle->fC += 14444.4443359375f;
     }
-    lifeRatio = func_00283CE0_2(motion->h14);
-    alpha = lifeRatio * 0.000246913579758257f + 0.08f;
+    life_ratio = func_00283CE0_2(motion->h14);
+    alpha = life_ratio * 0.000246913579758257f + 0.08f;
     if (alpha < 0.0f) alpha = 0.0f;
     if (0.08f < alpha) alpha = 0.08f;
     if (motion->b18 & 8) alpha /= (f32)motion->h16 * 0.142857149243355f + 1.0f;
@@ -1603,13 +1603,13 @@ void part_update_split_spark_low_gravity(FadeSplitParticle *particle) {
         motion->v.f[1] *= 0.95f;
     }
     { u8 f2 = motion->b18;
-    lifeRatio = -1.0f;
-    if (f2 & 1) lifeRatio = 1.0f;
+    life_ratio = -1.0f;
+    if (f2 & 1) life_ratio = 1.0f;
     if (f2 & 8) {
         motion->v.f[2] += 0.0002f;
-        motion->x10 += lifeRatio * (-0.01f) / func_00283CE0_2(motion->h16);
+        motion->x10 += life_ratio * (-0.01f) / func_00283CE0_2(motion->h16);
     } else {
-        motion->x10 += lifeRatio * (-0.01f);
+        motion->x10 += life_ratio * (-0.01f);
     } }
     if (1.0f < motion->x10) motion->x10 -= 1.0f;
     if (motion->x10 < 0.0f) motion->x10 += 1.0f;
@@ -1646,9 +1646,9 @@ void part_update_pulsing_2(char *particle)
 /* If a probe call on a sub-object returns zero, folds a byte counter into the top byte of a packed word, rebuilds a 16-byte vector from two sub-records for a helper, then clamps a running float against a limit and accumulates two sub-record fields into the object. */
 void part_update_spin_falling(char *obj)
 {
-    Vec16_F9a4b4d8b spinVec;
+    Vec16_F9a4b4d8b spin_vec;
     char *motion;
-    char *posPtr;
+    char *pos_ptr;
     int packed;
     int spin;
 
@@ -1661,18 +1661,18 @@ void part_update_spin_falling(char *obj)
     motion = obj + 32;
     *(int *)(obj + 4) = (packed & 0x00ffffff) | (((packed >> 24) + *(unsigned char *)(motion + 20)) << 24);
 
-    posPtr = obj + 16;
-    spinVec.f[0] = *(float *)(obj + 32);
-    spinVec.f[1] = *(float *)(motion + 4);
-    spinVec.f[2] = *(float *)(motion + 8);
-    spinVec.f[3] = 0.0f;
-    func_00282CC0_21(posPtr, posPtr, (char *)&spinVec);
+    pos_ptr = obj + 16;
+    spin_vec.f[0] = *(float *)(obj + 32);
+    spin_vec.f[1] = *(float *)(motion + 4);
+    spin_vec.f[2] = *(float *)(motion + 8);
+    spin_vec.f[3] = 0.0f;
+    func_00282CC0_21(pos_ptr, pos_ptr, (char *)&spin_vec);
 
     *(float *)(motion + 8) = *(float *)(motion + 8) - *(float *)(motion + 12);
 
     if (*(float *)(obj + 28) != 0.0f) {
         if (*(float *)(obj + 28) == 2.0f)
-            func_00300190_2(posPtr, posPtr);
+            func_00300190_2(pos_ptr, pos_ptr);
         *(float *)(obj + 28) = 2.0f;
     }
     spin = *(unsigned char *)(motion + 21);
@@ -1894,12 +1894,12 @@ void part_update_growing_falling(char *particle)
     char *motion = particle + 32;
     float size;
     float growth;
-    float fallSpeed;
+    float fall_speed;
 
     growth = *(float *)(motion + 16) + 1.0000000474974513053894e-03f;
-    fallSpeed = *(float *)(motion + 8) - 3.0000000260770320892334e-03f;
+    fall_speed = *(float *)(motion + 8) - 3.0000000260770320892334e-03f;
     *(float *)(motion + 16) = growth;
-    *(float *)(motion + 8) = fallSpeed;
+    *(float *)(motion + 8) = fall_speed;
     size = *(float *)(motion + 20) * growth * 2.1000000000000000000000e+05f;
     buf = *(V4_Fc3cb9262 *)motion;
     *(float *)(particle + 12) = size;

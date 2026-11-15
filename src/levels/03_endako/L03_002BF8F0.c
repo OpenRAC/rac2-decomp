@@ -198,8 +198,8 @@ void hero_l03_update_state_machine(void) {
     f32 vec50[4] __attribute__((aligned(16)));
     f32 vec60[8] __attribute__((aligned(16)));
     f32 matrix70[16] __attribute__((aligned(16)));
-    f32 vecC0[4] __attribute__((aligned(16)));
-    f32 vecD0[4] __attribute__((aligned(16)));
+    f32 vec_c0[4] __attribute__((aligned(16)));
+    f32 vec_d0[4] __attribute__((aligned(16)));
     f32 stick_turn;
     f32 k03;
     s32 anim2F;
@@ -224,19 +224,19 @@ void hero_l03_update_state_machine(void) {
     f32 k02;
     s32 cntA40;
 
-    f32 spillFloat1;
-    f32 spillFloat2;
-    f32 spillFloat3;
-    f32 spillFloat4;
-    f32 spillFloat5;
-    f32 spillFloat6;
-    f32 spillFloat7;
+    f32 spill_float1;
+    f32 spill_float2;
+    f32 spill_float3;
+    f32 spill_float4;
+    f32 spill_float5;
+    f32 spill_float6;
+    f32 spill_float7;
     s32 spill1;
-    f32 spillFloat8;
+    f32 spill_float8;
     s32 spill2;
-    f32 spillFloat9;
-    f32 spillFloat10;
-    f32 spillFloat11;
+    f32 spill_float9;
+    f32 spill_float10;
+    f32 spill_float11;
     s32 spill3;
     s32 spill4;
     s32 spill5;
@@ -765,8 +765,8 @@ void hero_l03_update_state_machine(void) {
         } else if (value38 == 1) {
             ApproachValue((s32) (((void*)g_hero_state) + 0xAA0), 0.0f, 0.011666667f);
         }
-        if ((math_solve_quadratic((s32) &spillFloat3, (s32) &spillFloat4, -0.0058333334f, ((Hero *)g_hero_state)->f[0xAA0/4], 1.9f - ((Hero *)g_hero_state)->f[0xAB0/4]) > 0) && (spillFloat3 > 0.0f)) {
-            ((Hero *)g_hero_state)->f[0xAAC/4] = spillFloat3;
+        if ((math_solve_quadratic((s32) &spill_float3, (s32) &spill_float4, -0.0058333334f, ((Hero *)g_hero_state)->f[0xAA0/4], 1.9f - ((Hero *)g_hero_state)->f[0xAB0/4]) > 0) && (spill_float3 > 0.0f)) {
+            ((Hero *)g_hero_state)->f[0xAAC/4] = spill_float3;
             ((Hero *)g_hero_state)->i[0x2298/4] = 1;
         }
         ((Hero *)g_hero_state)->h[0x226/2] = 3;
@@ -876,39 +876,39 @@ void hero_l03_update_state_machine(void) {
             if (ptr22 != 0) {
                 scalar31 = FastVecLength((s32) ptr31);
                 scalar32 = M2C_FIELD(ptr22, f32* , 0xC);
-                spillFloat5 = scalar31;
+                spill_float5 = scalar31;
                 if (scalar32 < scalar31) {
-                    ApproachValue((s32) &spillFloat5, scalar32, 0.004166667f);
-                    vec_scale_to_length((s32) ptr31, (s32) ptr31, spillFloat5);
+                    ApproachValue((s32) &spill_float5, scalar32, 0.004166667f);
+                    vec_scale_to_length((s32) ptr31, (s32) ptr31, spill_float5);
                 }
             }
         }
         scalar3 = FastAddRotations(((Hero *)g_hero_state)->f[0x98/4], -1.5707965f);
         ptr44 = ((void*)g_hero_state) + 0x80;
         ptr43 = ((void*)g_hero_state) + 0xF0;
-        vecD0[0] = math_fast_sin_or_cos_a(scalar3) * 0.15f;
+        vec_d0[0] = math_fast_sin_or_cos_a(scalar3) * 0.15f;
         scalar4 = math_fast_sin_or_cos_b(scalar3) * 0.15f;
-        (*(s32*)&vecD0[2]) = 0;
-        vecD0[1] = scalar4;
-        FastVecAdd((s32) &vecD0[0], (s32) &vecD0[0], (s32) ptr44);
-        FastVecAdd((s32) ((TI128*)vec30), (s32) &vecD0[0], (s32) ptr43);
-        FastVecSub((s32) ((TI128*)vecC0), (s32) ((TI128*)vec30), (s32) (((Hero *)g_hero_state)->ptr[0xAD4/4] + 0x10));
-        vec_scale_to_length((s32) ((TI128*)vecC0), (s32) ((TI128*)vecC0), ((Hero *)g_hero_state)->f[0xAE4/4]);
-        FastVecAdd((s32) ((TI128*)vec30), (s32) (((Hero *)g_hero_state)->ptr[0xAD4/4] + 0x10), (s32) ((TI128*)vecC0));
-        FastVecSub((s32) ptr43, (s32) ((TI128*)vec30), (s32) &vecD0[0]);
+        (*(s32*)&vec_d0[2]) = 0;
+        vec_d0[1] = scalar4;
+        FastVecAdd((s32) &vec_d0[0], (s32) &vec_d0[0], (s32) ptr44);
+        FastVecAdd((s32) ((TI128*)vec30), (s32) &vec_d0[0], (s32) ptr43);
+        FastVecSub((s32) ((TI128*)vec_c0), (s32) ((TI128*)vec30), (s32) (((Hero *)g_hero_state)->ptr[0xAD4/4] + 0x10));
+        vec_scale_to_length((s32) ((TI128*)vec_c0), (s32) ((TI128*)vec_c0), ((Hero *)g_hero_state)->f[0xAE4/4]);
+        FastVecAdd((s32) ((TI128*)vec30), (s32) (((Hero *)g_hero_state)->ptr[0xAD4/4] + 0x10), (s32) ((TI128*)vec_c0));
+        FastVecSub((s32) ptr43, (s32) ((TI128*)vec30), (s32) &vec_d0[0]);
         scalar69 = ((Hero *)g_hero_state)->f[0xAE4/4];
         math_spring_float_to_goal((s32) (((void*)g_hero_state) + 0xAE4), (s32) (((void*)g_hero_state) + 0xAE8), ((Hero *)g_hero_state)->f[0xAE0/4], ((Hero *)g_hero_state)->f[0xB04/4], ((Hero *)g_hero_state)->f[0xB08/4], ((Hero *)g_hero_state)->f[0xB0C/4]);
         scalar70 = ((Hero *)g_hero_state)->f[0xAE4/4] - scalar69;
-        if (((Hero *)g_hero_state)->f[0xAE4/4] < FastVecLength((s32) ((TI128*)vecC0))) {
-            vec_scale_to_length((s32) ((TI128*)vecC0), (s32) ((TI128*)vecC0), scalar70);
-            FastVecAdd((s32) ptr44, (s32) ptr44, (s32) ((TI128*)vecC0));
+        if (((Hero *)g_hero_state)->f[0xAE4/4] < FastVecLength((s32) ((TI128*)vec_c0))) {
+            vec_scale_to_length((s32) ((TI128*)vec_c0), (s32) ((TI128*)vec_c0), scalar70);
+            FastVecAdd((s32) ptr44, (s32) ptr44, (s32) ((TI128*)vec_c0));
         }
         if ((((Hero *)g_hero_state)->h[0xAFE/2] != 0) && (value69 != 0)) {
             min2B = 0.23333335f;
             scalar5 = vec_length_xy((s32) ptr43);
-            spillFloat6 = scalar5;
+            spill_float6 = scalar5;
             if (scalar5 < min2B) {
-                math_spring_float_to_goal((s32) &spillFloat6, (s32) (((void*)g_hero_state) + 0xAF4), min2B, 0.047f, 0.3f, 0.0f);
+                math_spring_float_to_goal((s32) &spill_float6, (s32) (((void*)g_hero_state) + 0xAF4), min2B, 0.047f, 0.3f, 0.0f);
                 vec30[0] = math_fast_sin_or_cos_a(((Hero *)g_hero_state)->f[0xAEC/4]) * ((Hero *)g_hero_state)->f[0xAF4/4];
                 scalar6 = math_fast_sin_or_cos_b(((Hero *)g_hero_state)->f[0xAEC/4]);
                 vec30[2] = 0.0f;
@@ -1015,9 +1015,9 @@ void hero_l03_update_state_machine(void) {
         lim3 = 0xE;
         if (value39 < 9) {
             ptr23 = ((void*)g_hero_state) + 0xF0;
-            spillFloat7 = cam_get_view_space_height((s32) ptr23);
-            ApproachValue((s32) &spillFloat7, scalar144, 0.041666668f);
-            cam_set_view_space_height((s32) ptr23, (s32) ptr23, spillFloat7);
+            spill_float7 = cam_get_view_space_height((s32) ptr23);
+            ApproachValue((s32) &spill_float7, scalar144, 0.041666668f);
+            cam_set_view_space_height((s32) ptr23, (s32) ptr23, spill_float7);
         } else if (value39 > lim3) {
             ptr32 = ((void*)g_hero_state) + 0xF0;
             hero_apply_mode_transform((s32) ptr32, (s32) ptr32, 0.036111113f);
@@ -1580,12 +1580,12 @@ void hero_l03_update_state_machine(void) {
                 scalar61 = ((Hero *)g_hero_state)->f[0x170/4] * 30.0f;
                 qcopy(vec20, &((Hero *)g_hero_state)->q[0x80/16]);
                 spill1 = ((Hero *)g_hero_state)->i[0x634/4];
-                spillFloat8 = ((Hero *)g_hero_state)->f[0x638/4];
-                value25 = Spline_AdvanceByDistance(((Hero *)g_hero_state)->i[0x630/4], (s32) ((TI128*)vec20), (s32) &spill1, (s32) &spillFloat8, ((Hero *)g_hero_state)->i[0x654/4], scalar61);
+                spill_float8 = ((Hero *)g_hero_state)->f[0x638/4];
+                value25 = Spline_AdvanceByDistance(((Hero *)g_hero_state)->i[0x630/4], (s32) ((TI128*)vec20), (s32) &spill1, (s32) &spill_float8, ((Hero *)g_hero_state)->i[0x654/4], scalar61);
                 qcopy(vec30, &((Hero *)g_hero_state)->q[0x80/16]);
                 spill1 = ((Hero *)g_hero_state)->i[0x634/4];
-                spillFloat8 = ((Hero *)g_hero_state)->f[0x638/4];
-                if ((((value25 | Spline_AdvanceByDistance(((Hero *)g_hero_state)->i[0x630/4], (s32) ((TI128*)vec30), (s32) &spill1, (s32) &spillFloat8, ((Hero *)g_hero_state)->i[0x654/4], scalar61 + 0.1f)) == 0) || (((Hero *)g_hero_state)->i[0x654/4] != 0)) && (((Hero *)g_hero_state)->u[0x2294/4] == 0x27)) {
+                spill_float8 = ((Hero *)g_hero_state)->f[0x638/4];
+                if ((((value25 | Spline_AdvanceByDistance(((Hero *)g_hero_state)->i[0x630/4], (s32) ((TI128*)vec30), (s32) &spill1, (s32) &spill_float8, ((Hero *)g_hero_state)->i[0x654/4], scalar61 + 0.1f)) == 0) || (((Hero *)g_hero_state)->i[0x654/4] != 0)) && (((Hero *)g_hero_state)->u[0x2294/4] == 0x27)) {
                     scalar133 = fast_subtract_rotations(((Hero *)g_hero_state)->f[0x64C/4], mat_fast_helper_a(vec30[0] - vec20[0], vec30[1] - vec20[1])) * 0.47f;
                     if (scalar133 > 0.78539824f) {
                         scalar133 = 0.78539824f;
@@ -1730,9 +1730,9 @@ block_807:
                     math_approach_with_velocity((s32)(g_hero_state + 0x6A0), scalar104, (s32)(g_hero_state + 0x6A4), 0.015f, 0.3f, 0.0f, 0);
                     ApproachValue((s32)(g_hero_state + 0x680), 0.20000002f, 0.004166667f);
                     spill2 = ((Hero *)g_hero_state)->i[0x634/4];
-                    spillFloat9 = ((Hero *)g_hero_state)->f[0x638/4];
+                    spill_float9 = ((Hero *)g_hero_state)->f[0x638/4];
                     qcopy(vec20, &((Hero *)g_hero_state)->q[0x80/16]);
-                    Spline_AdvanceByDistance(((Hero *)g_hero_state)->i[0x630/4], (s32) ((TI128*)vec20), (s32) &spill2, (s32) &spillFloat9, ((Hero *)g_hero_state)->i[0x654/4], 0.3f);
+                    Spline_AdvanceByDistance(((Hero *)g_hero_state)->i[0x630/4], (s32) ((TI128*)vec20), (s32) &spill2, (s32) &spill_float9, ((Hero *)g_hero_state)->i[0x654/4], 0.3f);
                     scalar17 = mat_fast_helper_a(vec_distance_xy((s32)(g_hero_state + 0x5D0), (s32) ((TI128*)vec20)), M2C_BITWISE(f32, vec20[2]) - ((Hero *)g_hero_state)->f[0x5D8/4]);
                     if (scalar17 > 0.0f) {
                         scalar112 = scalar17 * -0.07957746f;
@@ -1769,8 +1769,8 @@ block_807:
                     FastVecSub((s32) (((void*)g_hero_state) + 0xF0), (s32)((TI128*)vec0), (s32) ptr26);
                     ptr41 = ((void*)g_hero_state) + 0x80;
                     FastVecSub((s32) ((TI128*)vec20), (s32) ptr26, (s32) ptr41);
-                    spillFloat10 = -FastVecLength((s32) ((TI128*)vec20));
-                    math_spring_float_to_goal((s32) &spillFloat10, (s32) (((void*)g_hero_state) + 0x6AC), 0.0f, 0.03f, 0.3f, 0.116666675f);
+                    spill_float10 = -FastVecLength((s32) ((TI128*)vec20));
+                    math_spring_float_to_goal((s32) &spill_float10, (s32) (((void*)g_hero_state) + 0x6AC), 0.0f, 0.03f, 0.3f, 0.116666675f);
                     scalar19 = FastVecLength((s32) ((TI128*)vec20));
                     if (scalar19 < ((Hero *)g_hero_state)->f[0x6AC/4]) {
                         ((Hero *)g_hero_state)->f[0x6AC/4] = scalar19;
@@ -1980,15 +1980,15 @@ block_807:
             scalar153 = scalar42;
         }
         ptr27 = ((void*)g_hero_state) + 0xF0;
-        spillFloat11 = cam_get_view_space_height((s32) ptr27);
+        spill_float11 = cam_get_view_space_height((s32) ptr27);
         hero_resolve_stick_direction(scalar152, 0);
         hero_steer_heading(0, 0.025f, 0.3f, 0.20943955f);
         hero_approach_speed(0.004166667f, 0.0019444445f);
         hero_compute_push_direction(99999.0f);
         hero_apply_mode_pose_offsets();
         cam_project_vector_onto_view_plane((s32) ptr27, (s32) ptr27);
-        math_spring_float_to_goal((s32) &spillFloat11, (s32) (((void*)g_hero_state) + 0xA98), -scalar152 * scalar153, 0.025f, 0.3f, 0.28333336f);
-        hero_apply_mode_transform((s32) ptr27, (s32) ptr27, -spillFloat11);
+        math_spring_float_to_goal((s32) &spill_float11, (s32) (((void*)g_hero_state) + 0xA98), -scalar152 * scalar153, 0.025f, 0.3f, 0.28333336f);
+        hero_apply_mode_transform((s32) ptr27, (s32) ptr27, -spill_float11);
         scalar36 = ((Hero *)g_hero_state)->f[0x88/4];
         if (scalar36 < ((Hero *)g_hero_state)->f[0x490/4]) {
             ApproachValue((s32) (((void*)g_hero_state) + 0x490), scalar36, 0.06666667f);

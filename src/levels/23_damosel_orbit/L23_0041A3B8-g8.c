@@ -38,7 +38,7 @@ extern char *SpawnExplosion(char *, int, int, int, int, int, int, int, float, fl
 extern void mothership_turn_joints(char *, float, float);
 
 /* Fires the encounter weapon when it is ready: spawns the burst or the explosion shot and plays its sound. Returns 1 if the object was handled. */
-int mothership_fire_weapon(char *moby, char *targetPos) {
+int mothership_fire_weapon(char *moby, char *target_pos) {
     char *state = *(char **)(moby + 0x68);
     float tmp;
     float vec[4];
@@ -68,7 +68,7 @@ int mothership_fire_weapon(char *moby, char *targetPos) {
         int m = *(short *)(state + 0x336);
         if ((*(unsigned short *)(moby + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
             return 1;
-        FastVecSub((char *)vec, targetPos, D_L23_001B3850);
+        FastVecSub((char *)vec, target_pos, D_L23_001B3850);
         vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33C) * 0.016666668f);
         flying_shot_create_child(moby, (char *)vec, D_L23_001B3850, 0, *(float *)(state + 0x304));
         SpawnExplosion(D_L23_001B3850, 0, 2, 3, 2, 2, 0xA, 0, 0.5f, 20.0f, 1, 1, 0, 0);
@@ -77,7 +77,7 @@ int mothership_fire_weapon(char *moby, char *targetPos) {
         int m = *(short *)(state + 0x334);
         if ((*(unsigned short *)(moby + 0x96) & ((1 << (9 - m)) - 1)) != ((1 << (9 - m)) - 1))
             return 1;
-        FastVecSub((char *)vec, targetPos, D_L23_001B3870);
+        FastVecSub((char *)vec, target_pos, D_L23_001B3870);
         vec_scale_to_length((char *)vec, (char *)vec, *(short *)(state + 0x33A) * 0.016666668f);
         directed_shot_create(D_L23_001B3850, (char *)vec, (float *)(state + 0x300));
         snd_start_in_slot(0x21, 0, 0);

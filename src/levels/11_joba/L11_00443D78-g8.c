@@ -74,7 +74,7 @@ static __inline__ int hud_coord(float value, float scale, float half)
 
 void joba_menu_draw_selection_panel(unsigned char *moby) {
     unsigned char box[32]; char buffer[64];
-    unsigned char *state; char *text,*label,*unit,*lineText,*labelText,*nextHintText,*t3,*t4,*t5; int i,value,valueY,countY,prevHintY,nextHintY,hintY1,hintY2,hintY3,one,bx,by,bh; u64 headerColor,valueColor,countColor,prevHintColor,nextHintColor,hintColor1,hintColor2,hintColor3; float half;
+    unsigned char *state; char *text,*label,*unit,*line_text,*label_text,*next_hint_text,*t3,*t4,*t5; int i,value,value_y,count_y,prev_hint_y,next_hint_y,hint_y1,hint_y2,hint_y3,one,bx,by,bh; u64 header_color,value_color,count_color,prev_hint_color,next_hint_color,hint_color1,hint_color2,hint_color3; float half;
     one=1;
     joba_menu_draw_help_prompts(moby,1);
     state=*(unsigned char **)(moby+0x68);
@@ -83,35 +83,35 @@ void joba_menu_draw_selection_panel(unsigned char *moby) {
     by=hud_coord((float)D_L11_001B1664, D_L11_001B3E04, 0.5f);
     bh=hud_coord((float)D_L11_001B1658, D_L11_001B3E04, 0.5f);
     FontSetWindow(box,bx,by,D_L11_001B1668,D_L11_001B166C,D_L11_001B1654,bh,D_L11_001B1670,3);
-    headerColor=D_L11_001B1650; text_draw_window_large(box,headerColor,text,func_001157AC(text));
+    header_color=D_L11_001B1650; text_draw_window_large(box,header_color,text,func_001157AC(text));
     if(SEL==0 && !D_001395B8[arena_get_challenge_flag_index(0)]) goto counts;
     if(SEL==one && !D_001395B8[arena_get_challenge_flag_index(one)]) goto counts;
     {
         do {
             text=((char *)GetLocalizedString(0x2f44)); unit=((char *)GetLocalizedString(0x2f5e)); value=func_L11_00442958(SEL);
-            if(value<10000) { sprintf(buffer,D_L11_001B15A0,text,value,unit); lineText=buffer; goto draw1; }
+            if(value<10000) { sprintf(buffer,D_L11_001B15A0,text,value,unit); line_text=buffer; goto draw1; }
             sprintf(buffer,D_L11_001B16E8,text,value);
         } while(0);
-        lineText=buffer;
+        line_text=buffer;
     draw1:
-        valueY=hud_coord((float)D_L11_001B167C, D_L11_001B3E04, 0.5f); valueColor=D_L11_001B1680; text_draw_medium(D_L11_001B1678,valueY,valueColor,lineText,func_001157AC(lineText));
+        value_y=hud_coord((float)D_L11_001B167C, D_L11_001B3E04, 0.5f); value_color=D_L11_001B1680; text_draw_medium(D_L11_001B1678,value_y,value_color,line_text,func_001157AC(line_text));
     }
 counts:
     if(D_001395B8[arena_get_challenge_flag_index(SEL)]) {
-        labelText=((char *)GetLocalizedString(0x2f3e));
-        sprintf(buffer,D_L11_001B16E8,labelText,D_001395B8[arena_get_challenge_flag_index(SEL)]); lineText=buffer;
-        countY=(int)((float)D_L11_001B16AC * D_L11_001B3E04 + 0.5f); do { countColor=D_L11_001B16B0; } while(0); text_draw_medium(D_L11_001B16A8,countY,countColor,lineText,func_001157AC(lineText));
+        label_text=((char *)GetLocalizedString(0x2f3e));
+        sprintf(buffer,D_L11_001B16E8,label_text,D_001395B8[arena_get_challenge_flag_index(SEL)]); line_text=buffer;
+        count_y=(int)((float)D_L11_001B16AC * D_L11_001B3E04 + 0.5f); do { count_color=D_L11_001B16B0; } while(0); text_draw_medium(D_L11_001B16A8,count_y,count_color,line_text,func_001157AC(line_text));
     }
-    if(SEL!=0) { labelText=((char *)GetLocalizedString(0x2f40)); prevHintY=hud_coord((float)D_L11_001B168C, D_L11_001B3E04, 0.5f); prevHintColor=D_L11_001B1690; text_draw_small(D_L11_001B1688,prevHintY,prevHintColor,labelText,func_001157AC(labelText)); }
+    if(SEL!=0) { label_text=((char *)GetLocalizedString(0x2f40)); prev_hint_y=hud_coord((float)D_L11_001B168C, D_L11_001B3E04, 0.5f); prev_hint_color=D_L11_001B1690; text_draw_small(D_L11_001B1688,prev_hint_y,prev_hint_color,label_text,func_001157AC(label_text)); }
     for(i=SEL+1;i<13;i++) {
         half=0.5f;
         if(!D_001395B8[arena_get_challenge_flag_index(TABLE[i][2])]) continue;
         if(i>=11 && !flag_is_byte_set()) continue;
         if(i==8 && !((MenuRecord *)(D_L11_00279BA0 + g_item_slot_to_record[0x1e] * 0xe0))->enabled) continue;
-        nextHintText=((char *)GetLocalizedString(0x2f41)); nextHintY=hud_coord((float)D_L11_001B169C, D_L11_001B3E04, half); nextHintColor=D_L11_001B16A0; text_draw_small(D_L11_001B1698,nextHintY,nextHintColor,nextHintText,func_001157AC(nextHintText)); break;
+        next_hint_text=((char *)GetLocalizedString(0x2f41)); next_hint_y=hud_coord((float)D_L11_001B169C, D_L11_001B3E04, half); next_hint_color=D_L11_001B16A0; text_draw_small(D_L11_001B1698,next_hint_y,next_hint_color,next_hint_text,func_001157AC(next_hint_text)); break;
     }
     half=0.5f;
-    text=((char *)GetLocalizedString(0x2f3f)); hintY1=hud_coord((float)D_L11_001B16BC, D_L11_001B3E04, half); hintColor1=D_L11_001B16C0; text_draw_small(D_L11_001B16B8,hintY1,hintColor1,text,func_001157AC(text));
-    text=((char *)GetLocalizedString(0x2f42)); hintY2=hud_coord((float)D_L11_001B16DC, D_L11_001B3E04, half); hintColor2=D_L11_001B16E0; text_draw_small(D_L11_001B16D8,hintY2,hintColor2,text,func_001157AC(text));
-    text=((char *)GetLocalizedString(0x2f43)); hintY3=hud_coord((float)D_L11_001B16CC, D_L11_001B3E04, half); hintColor3=D_L11_001B16D0; text_draw_small(D_L11_001B16C8,hintY3,hintColor3,text,func_001157AC(text));
+    text=((char *)GetLocalizedString(0x2f3f)); hint_y1=hud_coord((float)D_L11_001B16BC, D_L11_001B3E04, half); hint_color1=D_L11_001B16C0; text_draw_small(D_L11_001B16B8,hint_y1,hint_color1,text,func_001157AC(text));
+    text=((char *)GetLocalizedString(0x2f42)); hint_y2=hud_coord((float)D_L11_001B16DC, D_L11_001B3E04, half); hint_color2=D_L11_001B16E0; text_draw_small(D_L11_001B16D8,hint_y2,hint_color2,text,func_001157AC(text));
+    text=((char *)GetLocalizedString(0x2f43)); hint_y3=hud_coord((float)D_L11_001B16CC, D_L11_001B3E04, half); hint_color3=D_L11_001B16D0; text_draw_small(D_L11_001B16C8,hint_y3,hint_color3,text,func_001157AC(text));
 }

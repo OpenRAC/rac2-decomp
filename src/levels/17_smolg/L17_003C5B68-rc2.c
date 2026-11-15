@@ -37,50 +37,50 @@ extern s32 ref_L17_003C5B68_00 __attribute__((sda));
 s32 ride_platform_can_start(void *moby) {
     void *vars;
     void *carried;
-    s32 classId;
-    s32 carriedClass;
-    s32 triggerIndex;
-    s32 triggerState;
+    s32 class_id;
+    s32 carried_class;
+    s32 trigger_index;
+    s32 trigger_state;
     void *trigger;
 
     if (D_0018A160.w0 == 0) {
         return 0;
     }
-    classId = (*(s16 *)((char *)(moby) + (0xAA)));
-    if (classId == 0x920) {
+    class_id = (*(s16 *)((char *)(moby) + (0xAA)));
+    if (class_id == 0x920) {
 success:
         return 1;
     }
-    if (classId != 0x929) {
+    if (class_id != 0x929) {
         goto fail;
     }
     vars = (*(void **)((char *)(moby) + (0x68)));
     carried = (*(void **)((char *)(vars) + (0x9C)));
     if (carried != NULL) {
-        carriedClass = (*(u16 *)((char *)(carried) + (0xAA)));
-        if ((u32) (carriedClass - 0x920) < 2U) {
+        carried_class = (*(u16 *)((char *)(carried) + (0xAA)));
+        if ((u32) (carried_class - 0x920) < 2U) {
             goto fail;
         }
-        if ((s16) carriedClass == classId) {
+        if ((s16) carried_class == class_id) {
             goto fail;
         }
     }
     if ((*(f32 *)((char *)(vars) + (0x98))) != 0.0f) {
         goto fail;
     }
-    triggerIndex = (*(s32 *)((char *)(vars) + (0xA0)));
-    if (triggerIndex == -1) {
+    trigger_index = (*(s32 *)((char *)(vars) + (0xA0)));
+    if (trigger_index == -1) {
         goto success;
     }
-    trigger = (void *) (ref_L17_003C5B68_00 + (triggerIndex << 8));
+    trigger = (void *) (ref_L17_003C5B68_00 + (trigger_index << 8));
     if (trigger == NULL) {
         goto success;
     }
-    triggerState = (*(u8 *)((char *)(trigger) + (0x20)));
-    if (triggerState == 0xFE) {
+    trigger_state = (*(u8 *)((char *)(trigger) + (0x20)));
+    if (trigger_state == 0xFE) {
         goto success;
     }
-    if (triggerState == 0xFD) {
+    if (trigger_state == 0xFD) {
         goto success;
     }
 fail:

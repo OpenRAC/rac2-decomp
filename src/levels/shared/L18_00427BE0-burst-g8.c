@@ -48,7 +48,7 @@ int shooter_update_ranged_attack(u8 *object)
         }
         break;
     case 0xED4 /* moby class 3796 */:
-    case 0xEE1 /* Receiver Bot */:
+    case MOBY_CLASS_RECEIVER_BOT:
         if (object[0xBC] != 1) {
             u8 *target = *(u8 **)(state + 0x230);
             moby_step_at_own_position_factor(object, mat_fast_helper_a(*(float *)(target + 0x10) - *(float *)(object + 0x10),
@@ -67,7 +67,7 @@ int shooter_update_ranged_attack(u8 *object)
             }
             break;
         case 11:
-            if (*(short *)(object + 0xAA) == 0xEE1 /* Receiver Bot */) {
+            if (*(short *)(object + 0xAA) == MOBY_CLASS_RECEIVER_BOT) {
                 if (*(short *)(state + 0x394) % 6 == 0) {
                     shooter_fire_shot(object, 0);
                     vec_fast_helper_a(state + 0x39D);

@@ -47,12 +47,12 @@ char *part_create_flash(float size, char *position, int trigger, int kind, int r
     Vector128 direction[1], up[1], sphere[1], difference[1];
     char *object = CreateMoby(0xec1);
     SpawnState *state;
-    SpawnObject *spawnObject;
+    SpawnObject *spawn_object;
     char *camera;
     float angle;
     if (object != 0) {
-        spawnObject = (SpawnObject *)object;
-        state = spawnObject->state;
+        spawn_object = (SpawnObject *)object;
+        state = spawn_object->state;
         *(unsigned char *)(object + 0x30) = 0xff;
         *(short *)(object + 0x32) = 0xff;
         object[0x20] = 0;
@@ -66,7 +66,7 @@ char *part_create_flash(float size, char *position, int trigger, int kind, int r
         FastVecCross(object + 0xd0, object + 0xc0, up);
         vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
         FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
-        spawnObject->forward[3] = spawnObject->right[3] = spawnObject->up[3] = 0.0f;
+        spawn_object->forward[3] = spawn_object->right[3] = spawn_object->up[3] = 0.0f;
         /* Both countdowns start together. */
         state->timer = state->life = 60;
         state->outer = size + size;

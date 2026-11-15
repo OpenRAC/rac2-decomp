@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef signed char s8;
@@ -123,7 +124,7 @@ void tribesman_alert_group(char *object)
     cursor = list;
     do {
         member = mobyTable + ((*(u16 *)cursor & 0x7FFF) << 8);
-        if (((s8 *)member)[0x20] >= 0 && *(s16 *)(member + 0xAA) == 0xCF5 /* Joba Tribesman */) {
+        if (((s8 *)member)[0x20] >= 0 && *(s16 *)(member + 0xAA) == MOBY_CLASS_JOBA_TRIBESMAN) {
             vars = *(char **)(member + 0x68);
             *(u16 *)(vars + 0x266) = 1;
             *(int *)(vars + 0x560) += 1;

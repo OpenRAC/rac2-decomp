@@ -79,10 +79,10 @@ static __inline__ int hud_coord(int mode, float value, float half, float offset,
 int DrawWupashCombatHud(void)
 {
     char text[128];
-    int healthColors[2], ammoColors[2];
+    int health_colors[2], ammo_colors[2];
     char *state=*(char **)(D_L25_001B0CE0+0x68);
     char *row;
-    float iconX,iconY,fillRatio,fill;
+    float icon_x,icon_y,fill_ratio,fill;
     int selection=1, color, result;
     char *message;
     float edge, ammoCount, ammoStart, ammoWidth;
@@ -107,38 +107,38 @@ int DrawWupashCombatHud(void)
         D_L25_001B0CE4=table_find_by_id(D_L25_001A904C+0x8710,131);
         D_L25_001B0CE8=table_find_by_id(D_L25_001A904C+0x8710,132);
         D_L25_001B0CEC=table_find_by_id(D_L25_001A904C+0x8710,133);
-        iconX=IntToFloat(g_screen_width)*half;
-        iconY=(float)hud_coord(D_L25_001B2900,200.0f,half,4.0f,selection);
-        gfx_draw_scaled_object(D_L25_001B0CD0,iconX,iconY,0x60442d00,1.0f,0.0f);
-        gfx_draw_scaled_object(D_L25_001B0CD4,iconX,iconY,0x55f0c070,1.0f,0.0f);
+        icon_x=IntToFloat(g_screen_width)*half;
+        icon_y=(float)hud_coord(D_L25_001B2900,200.0f,half,4.0f,selection);
+        gfx_draw_scaled_object(D_L25_001B0CD0,icon_x,icon_y,0x60442d00,1.0f,0.0f);
+        gfx_draw_scaled_object(D_L25_001B0CD4,icon_x,icon_y,0x55f0c070,1.0f,0.0f);
         selection=table_find_last_used_entry(6);
-        fillRatio=IntToFloat(D_L25_0029C320[selection].count);
-        fillRatio/=IntToFloat(D_L25_0029C320[selection].capacity);
+        fill_ratio=IntToFloat(D_L25_0029C320[selection].count);
+        fill_ratio/=IntToFloat(D_L25_0029C320[selection].capacity);
         switch(selection) {
         case 6:
-            if(fillRatio>0.0f) gfx_draw_scaled_object(D_L25_001B0CE4,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio),1.0f,0.0f);
+            if(fill_ratio>0.0f) gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio),1.0f,0.0f);
             break;
         case 12:
-            if(fillRatio>0.5f) {
-                fillRatio-=0.5f;
-                gfx_draw_scaled_object(D_L25_001B0CE8,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio+fillRatio),1.0f,0.0f);
-                gfx_draw_scaled_object(D_L25_001B0CE4,iconX,iconY,0x8000ff00,1.0f,0.0f);
-            } else if(fillRatio>0.0f) {
-                gfx_draw_scaled_object(D_L25_001B0CE4,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio+fillRatio),1.0f,0.0f);
+            if(fill_ratio>0.5f) {
+                fill_ratio-=0.5f;
+                gfx_draw_scaled_object(D_L25_001B0CE8,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio+fill_ratio),1.0f,0.0f);
+                gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
+            } else if(fill_ratio>0.0f) {
+                gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio+fill_ratio),1.0f,0.0f);
             }
             break;
         case 14:
-            if(fillRatio>0.666666687f) {
-                fillRatio-=0.666666687f;
-                gfx_draw_scaled_object(D_L25_001B0CEC,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio*3.0f),1.0f,0.0f);
-                gfx_draw_scaled_object(D_L25_001B0CE8,iconX,iconY,0x8000ff00,1.0f,0.0f);
-                gfx_draw_scaled_object(D_L25_001B0CE4,iconX,iconY,0x8000ff00,1.0f,0.0f);
-            } else if(fillRatio>0.333333343f) {
-                fillRatio-=0.333333343f;
-                gfx_draw_scaled_object(D_L25_001B0CE8,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio*3.0f),1.0f,0.0f);
-                gfx_draw_scaled_object(D_L25_001B0CE4,iconX,iconY,0x8000ff00,1.0f,0.0f);
-            } else if(fillRatio>0.0f) {
-                gfx_draw_scaled_object(D_L25_001B0CE4,iconX,iconY,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fillRatio*3.0f),1.0f,0.0f);
+            if(fill_ratio>0.666666687f) {
+                fill_ratio-=0.666666687f;
+                gfx_draw_scaled_object(D_L25_001B0CEC,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio*3.0f),1.0f,0.0f);
+                gfx_draw_scaled_object(D_L25_001B0CE8,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
+                gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
+            } else if(fill_ratio>0.333333343f) {
+                fill_ratio-=0.333333343f;
+                gfx_draw_scaled_object(D_L25_001B0CE8,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio*3.0f),1.0f,0.0f);
+                gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,0x8000ff00,1.0f,0.0f);
+            } else if(fill_ratio>0.0f) {
+                gfx_draw_scaled_object(D_L25_001B0CE4,icon_x,icon_y,(int)(float)FastTweenColor(0x800000ff,0x8000ff00,fill_ratio*3.0f),1.0f,0.0f);
             }
             break;
         }
@@ -148,10 +148,10 @@ int DrawWupashCombatHud(void)
         } else if(math_fast_float_d(state+0x24)) {
             I(state,0x24)=5; I(state,0x28)^=1;
         }
-        healthColors[1]=FastTweenColor(0x800000ff,0x8000ff00,fill);
-        healthColors[0]=0x800000ff;
+        health_colors[1]=FastTweenColor(0x800000ff,0x8000ff00,fill);
+        health_colors[0]=0x800000ff;
         edge=fill*200.0f+156.0f;
-        if(I(state,0x28)) gfx_draw_screen_rectangle(156,14,(int)edge,27,1,healthColors);
+        if(I(state,0x28)) gfx_draw_screen_rectangle(156,14,(int)edge,27,1,health_colors);
         selection=table_find_last_used_entry(7);
         ammoCount=IntToFloat(D_L25_0029C320[selection].count);
         fill=ammoCount/IntToFloat(D_L25_0029C320[selection].maximum);
@@ -159,10 +159,10 @@ int DrawWupashCombatHud(void)
         ammoStart=IntToFloat(450);
         ammoWidth=IntToFloat(386);
         ammoWidth-=IntToFloat(450);
-        ammoColors[0]=0x800000ff; ammoColors[1]=color;
+        ammo_colors[0]=0x800000ff; ammo_colors[1]=color;
         ammoWidth*=fill;
         edge=ammoStart+ammoWidth;
-        if(fill>0.0f) gfx_draw_screen_rectangle(450,8,(int)edge,19,1,ammoColors);
+        if(fill>0.0f) gfx_draw_screen_rectangle(450,8,(int)edge,19,1,ammo_colors);
         {
         Rgba rect[4]={{0x70,0xc0,0xf0,0x55},{0x70,0xc0,0xf0,0x55},{0x70,0xc0,0xf0,0x55},{0x70,0xc0,0xf0,0x55}};
         Rgba rect1[4]={{0x00,0x2d,0x44,0x60},{0x00,0x2d,0x44,0x60},{0x00,0x2d,0x44,0x60},{0x00,0x2d,0x44,0x60}};
@@ -184,26 +184,26 @@ int DrawWupashCombatHud(void)
             D_L25_001B0CF0=result;
             D_L25_0029C320[table_find_last_used_entry(result)].active=1;
         }
-        gfx_draw_scaled_object(D_L25_001B0CD8,iconX,iconY,0x80f0f0f0,1.0f,0.0f);
+        gfx_draw_scaled_object(D_L25_001B0CD8,icon_x,icon_y,0x80f0f0f0,1.0f,0.0f);
     }
     module_l00_call_handler_2();
     {
     float four=4.0f, half2=0.5f;
-    char *darkSprite, *lightSprite;
-    int spriteY;
-    float spriteX;
-    darkSprite=table_find_by_id(D_L25_001A904C+0x8710,186);
+    char *dark_sprite, *light_sprite;
+    int sprite_y;
+    float sprite_x;
+    dark_sprite=table_find_by_id(D_L25_001A904C+0x8710,186);
     state=table_find_by_id(D_L25_001A904C+0x8710,187);   /* the second texture reuses state */
-    lightSprite=table_find_by_id(D_L25_001A904C+0x8710,188);
-    spriteX=D_L25_001AC4E0+four;
-    spriteY=label_y(darkSprite,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
-    gfx_draw_scaled_object(darkSprite,spriteX,(float)spriteY,0x60442d00,0.8f,0.0f);
-    spriteX=D_L25_001AC4E0+four;
-    spriteY=label_y(state,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
-    gfx_draw_scaled_object(state,spriteX,(float)spriteY,0x60241700,0.8f,0.0f);
-    spriteX=D_L25_001AC4E0+four;
-    spriteY=label_y(lightSprite,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
-    gfx_draw_scaled_object(lightSprite,spriteX,(float)spriteY,0x55f0c070,0.8f,0.0f);
+    light_sprite=table_find_by_id(D_L25_001A904C+0x8710,188);
+    sprite_x=D_L25_001AC4E0+four;
+    sprite_y=label_y(dark_sprite,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
+    gfx_draw_scaled_object(dark_sprite,sprite_x,(float)sprite_y,0x60442d00,0.8f,0.0f);
+    sprite_x=D_L25_001AC4E0+four;
+    sprite_y=label_y(state,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
+    gfx_draw_scaled_object(state,sprite_x,(float)sprite_y,0x60241700,0.8f,0.0f);
+    sprite_x=D_L25_001AC4E0+four;
+    sprite_y=label_y(light_sprite,D_L25_001AC4E4+four,D_L25_001B2904,half2,1);
+    gfx_draw_scaled_object(light_sprite,sprite_x,(float)sprite_y,0x55f0c070,0.8f,0.0f);
     }
     hud_draw_object_markers();
     return 1;

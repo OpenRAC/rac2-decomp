@@ -181,7 +181,7 @@ void wave_line_update(char *object)
     char local[32];
     char *child;
     int code, index;
-    float *childData;
+    float *child_data;
     if (FastDecTimer(state + 0x1E) != 0) {
         moby_mark_spawned(object);
         return;
@@ -197,9 +197,9 @@ void wave_line_update(char *object)
         child = *(char **)(state + 0x20);
         if (child != 0) {
             qcopy(state + 0x30, child + 0x10);
-            childData = moby_get_private_value_0(child);
-            if (childData != 0) {
-                FastVecScale(local + 16, *(char **)(state + 0x20) + 0xE0, childData[4]);
+            child_data = moby_get_private_value_0(child);
+            if (child_data != 0) {
+                FastVecScale(local + 16, *(char **)(state + 0x20) + 0xE0, child_data[4]);
                 FastVecAdd(state + 0x30, state + 0x30, local + 16);
             }
         }

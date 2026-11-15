@@ -172,22 +172,22 @@ int guard_init_check(char *obj) {
     return 0;
 }
 /* Turns an object a little toward a direction, a small step each time. */
-void moby_rotate_toward_dir(char *basis, char *axis, char *outCopy)
+void moby_rotate_toward_dir(char *basis, char *axis, char *out_copy)
 {
     float rotation[12];
     float vec[4];
-    float scaledAxis[4];
+    float scaled_axis[4];
     float dot;
 
-    vec_scale_to_length((char *)scaledAxis, axis, 1.0f);
-    FastVecCross((char *)vec, (char *)scaledAxis, basis + 0x20);
+    vec_scale_to_length((char *)scaled_axis, axis, 1.0f);
+    FastVecCross((char *)vec, (char *)scaled_axis, basis + 0x20);
     FastVecScale(vec, vec, 0.05f);
     dot = FastVecLength(vec);
     vec[3] = -square_root(1.0f - dot * dot);
     quaternion_to_rotation_basis((char *)vec, (char *)rotation);
     multiply_matrix3x3(basis, (char *)rotation, basis);
-    if (outCopy != 0) {
-        mem_copy_aligned(outCopy, rotation, 0x30);
+    if (out_copy != 0) {
+        mem_copy_aligned(out_copy, rotation, 0x30);
     }
 }
 
@@ -420,13 +420,13 @@ void moby_turn_toward_hero(char *object)
 void guard_update_hit_timer(char *object)
 {
     char *vars = *(char **)(object + 0x68);
-    u16 frameCount;
+    u16 frame_count;
 
     math_fast_float_d(vars + 0x240);
     math_fast_float_d(vars + 0x244);
-    frameCount = *(u16 *)(object + 0x96);
-    if (frameCount <= 0xFFFEu) {
-        *(u16 *)(object + 0x96) = frameCount + 1;
+    frame_count = *(u16 *)(object + 0x96);
+    if (frame_count <= 0xFFFEu) {
+        *(u16 *)(object + 0x96) = frame_count + 1;
     }
     value_set_and_smooth(object, vars + 0x2E0, 1, 1, 2.5f);
 }
@@ -456,16 +456,16 @@ extern int D_L13_001B2938 __attribute__((section(".sdata")));
 /* Tells the nearby rock-paper-scissors creatures in the same group that this one was hit. */
 void guard_alert_nearby(u8 *object)
 {
-    u16 *listStart;
+    u16 *list_start;
     u16 *entry;
     u8 *other;
 
     if (object[0x21] == 0xFF)
         return;
-    listStart = D_L13_001FB420[object[0x21]];
-    if (listStart == 0)
+    list_start = D_L13_001FB420[object[0x21]];
+    if (list_start == 0)
         return;
-    for (entry = listStart; object[0x21] != 0xFF && object[0x21] <= D_L13_001B2938 && entry != 0 &&
+    for (entry = list_start; object[0x21] != 0xFF && object[0x21] <= D_L13_001B2938 && entry != 0 &&
            ((entry != 0 && (s16)entry[-1] >= 0) || entry == D_L13_001FB420[object[0x21]]);
          entry++) {
         other = D_L13_001B291C + ((*entry & 0x7FFF) << 8);
@@ -612,13 +612,13 @@ int guard_alt_init_check(char *obj) {
 void guard_alt_update_hit_timer(char *object)
 {
     char *vars = *(char **)(object + 0x68);
-    u16 frameCount;
+    u16 frame_count;
 
     math_fast_float_d(vars + 0x240);
     math_fast_float_d(vars + 0x244);
-    frameCount = *(u16 *)(object + 0x96);
-    if (frameCount <= 0xFFFEu) {
-        *(u16 *)(object + 0x96) = frameCount + 1;
+    frame_count = *(u16 *)(object + 0x96);
+    if (frame_count <= 0xFFFEu) {
+        *(u16 *)(object + 0x96) = frame_count + 1;
     }
     value_set_and_smooth(object, vars + 0x2D0, 4, 1, 2.5f);
 }
@@ -628,16 +628,16 @@ void guard_alt_update_hit_timer(char *object)
 /* Tells the nearby rock-paper-scissors creatures in the same group that this one was hit. */
 void guard_alt_alert_nearby(u8 *object)
 {
-    u16 *listStart;
+    u16 *list_start;
     u16 *entry;
     u8 *other;
 
     if (object[0x21] == 0xFF)
         return;
-    listStart = D_L13_001FB420[object[0x21]];
-    if (listStart == 0)
+    list_start = D_L13_001FB420[object[0x21]];
+    if (list_start == 0)
         return;
-    for (entry = listStart; object[0x21] != 0xFF && object[0x21] <= D_L13_001B2938 && entry != 0 &&
+    for (entry = list_start; object[0x21] != 0xFF && object[0x21] <= D_L13_001B2938 && entry != 0 &&
            ((entry != 0 && (s16)entry[-1] >= 0) || entry == D_L13_001FB420[object[0x21]]);
          entry++) {
         other = D_L13_001B291C + ((*entry & 0x7FFF) << 8);

@@ -22,16 +22,16 @@ extern void set_moby_color(void *, int, int, int);
 #define CHILD (D_L02_001B359C + *(int *)(PRIVATE + 0x244) * 0x100)
 typedef struct { char pad[0x34]; unsigned short flags; char pad36[0xC2]; float heading; } ActorFlags;
 /* Reinitializes an actor and its child, attaching the three active effect slots. */
-void ReinitializeActorAndChild(char *actor, int useAltState) {
+void ReinitializeActorAndChild(char *actor, int use_alt_state) {
     char *state = PRIVATE;
-    Quad jointMatrix[4];
-    int hitPoints;
+    Quad joint_matrix[4];
+    int hit_points;
     *(float *)(state + 0x20) = (float)*(short *)(state + 0x24);
     *(unsigned char *)(actor + 0x31) = 1;
     ((ActorFlags *)actor)->flags &= 0xFFFE;
-    hitPoints = *(int *)(*(char **)(actor + 0x24) + 0x10);
+    hit_points = *(int *)(*(char **)(actor + 0x24) + 0x10);
     ((ActorFlags *)actor)->flags = (((ActorFlags *)actor)->flags | 0x1000) & 0xFFFD;
-    *(int *)(actor + 0x98) = hitPoints;
+    *(int *)(actor + 0x98) = hit_points;
     *(int *)(actor + 0x9C) = 0;
     *(unsigned char *)(actor + 0x7F) = 0;
     *(unsigned char *)(state + 0x2E) = 1;
@@ -48,8 +48,8 @@ void ReinitializeActorAndChild(char *actor, int useAltState) {
         ((ActorFlags *)ATTACHMENT)->flags &= 0xFFFE;
         *(unsigned char *)(ATTACHMENT + 0x31) = 1;
     }
-    moby_transform_joint_point(actor, 0, jointMatrix);
-    qcopy(CHILD + 0x10, &jointMatrix[3]);
+    moby_transform_joint_point(actor, 0, joint_matrix);
+    qcopy(CHILD + 0x10, &joint_matrix[3]);
     *(float *)(actor + 0xF8) = mat_fast_helper_a(g_hero_state.x - *(float *)(actor + 0x10), g_hero_state.y - *(float *)(actor + 0x14));
     ((ActorFlags *)CHILD)->heading = mat_fast_helper_a(g_hero_state.x - *(float *)(actor + 0x10), g_hero_state.y - *(float *)(actor + 0x14));
     func_002A05A8(CHILD);
@@ -70,7 +70,7 @@ void ReinitializeActorAndChild(char *actor, int useAltState) {
         mem_clear(state + 0x1F0, 0, 0x40);
         AttachManipulator(CHILD, 4, state + 0x1F0);
     }
-    if (useAltState == 0) {
+    if (use_alt_state == 0) {
         moby_set_state(actor, 2, 0);
         *(int *)(state + 0x264) = 0;
     } else moby_set_state(actor, 4, 0);

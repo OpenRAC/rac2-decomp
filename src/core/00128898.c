@@ -44,10 +44,10 @@ extern int r1_D_00132ED0;
 
 typedef struct {
     char unk_00[4];
-    int  isLinked;
-    int  linkHandle;
-    char *dmaBuffer;
-    char buttonSlots[0x320];
+    int  is_linked;
+    int  link_handle;
+    char *dma_buffer;
+    char button_slots[0x320];
 } Ent330;
 
 extern Ent330 r1_D_0015B640[];
@@ -135,9 +135,9 @@ int pad_init_socket_table(void) {
 /* Creates a controller socket and sets up its two data buffers. Returns the socket number or a negative error. */
 int scePad2CreateSocket(void *param, char *buf) {
     Pad2SockParam desc;
-    int socketId;
+    int socket_id;
     int i;
-    char *slotBuf;
+    char *slot_buf;
 
     if (((int)buf & 0x3F) != 0) {
         return -1;
@@ -158,24 +158,24 @@ int scePad2CreateSocket(void *param, char *buf) {
     }
     desc.w0 |= 1;
     desc.mode = 1;
-    socketId = sceDbcCreateSocket(&desc, (int)buf, (int)buf + 0x80);
-    if (socketId < 0) {
-        return socketId;
+    socket_id = sceDbcCreateSocket(&desc, (int)buf, (int)buf + 0x80);
+    if (socket_id < 0) {
+        return socket_id;
     }
-    *(int *)(r1_D_0015B640_b + socketId * 0x330) = 1;
-    *(char **)(r1_D_0015B640_b + socketId * 0x330 + 0xC) = buf;
-    slotBuf = buf;
+    *(int *)(r1_D_0015B640_b + socket_id * 0x330) = 1;
+    *(char **)(r1_D_0015B640_b + socket_id * 0x330 + 0xC) = buf;
+    slot_buf = buf;
     for (i = 1; i >= 0; i--) {
-        slotBuf[0] = 0;
-        *(int *)(slotBuf + 0x7C) = 0;
-        slotBuf[1] = 0;
-        slotBuf[3] = 0;
-        slotBuf[2] = 0;
-        *(int *)(slotBuf + 4) = 0;
-        r1_func_001153FC(slotBuf + 0x1C, 0xFF, 0x20);
-        slotBuf += 0x80;
+        slot_buf[0] = 0;
+        *(int *)(slot_buf + 0x7C) = 0;
+        slot_buf[1] = 0;
+        slot_buf[3] = 0;
+        slot_buf[2] = 0;
+        *(int *)(slot_buf + 4) = 0;
+        r1_func_001153FC(slot_buf + 0x1C, 0xFF, 0x20);
+        slot_buf += 0x80;
     }
-    return socketId;
+    return socket_id;
 }
 
 extern char r1_D_0015B650[];
@@ -199,7 +199,7 @@ int pad_read_record(int id, void *dst) {
     if (*(int *)((char *)r1_D_0015B640 + id * 0x330) == 0) {
         return -1;
     }
-    if (r1_D_0015B640[id].isLinked == 0) {
+    if (r1_D_0015B640[id].is_linked == 0) {
         if (scePad2LinkDriver(id) < 0) {
             return -1;
         }
@@ -225,12 +225,12 @@ int pad_read_record(int id, void *dst) {
    returns into the entry's slots (func_00128E98) and returns the result
    word func_001287A8 filled in. */
 /* Reads which buttons a controller has and fills in the port's button slots. */
-int pad_read_button_mask(int port, void *replyBytes) {
+int pad_read_button_mask(int port, void *reply_bytes) {
     McCmd cmd;
     int result;
     int status;
 
-    if (r1_D_0015B640[port].isLinked == 0) {
+    if (r1_D_0015B640[port].is_linked == 0) {
         if (scePad2LinkDriver(port) < 0) {
             return -1;
         }
@@ -239,11 +239,11 @@ int pad_read_button_mask(int port, void *replyBytes) {
     cmd.b.f1 = 3;
     cmd.b.f2 = 2;
     cmd.b.f3 = 1;
-    status = dbc_send_command(port, cmd.i, &result, replyBytes);
+    status = dbc_send_command(port, cmd.i, &result, reply_bytes);
     if (status < 0) {
         return status;
     }
-    pad_expand_button_mask(replyBytes, (int *)r1_D_0015B640[port].buttonSlots);
+    pad_expand_button_mask(reply_bytes, (int *)r1_D_0015B640[port].button_slots);
     return result;
 }
 
@@ -264,7 +264,7 @@ int scePad2GetState(int port) {
     char *side;
     McCmd cmd;
 
-    if (r1_D_0015B640[port].isLinked == 0) {
+    if (r1_D_0015B640[port].is_linked == 0) {
         if (scePad2LinkDriver(port) < 0) {
             return 0;
         }
@@ -276,7 +276,7 @@ int scePad2GetState(int port) {
         } else if (scePad2LinkDriver(port) >= 0) {
             buf.state = side[0];
         } else {
-            r1_D_0015B640[port].isLinked = 0;
+            r1_D_0015B640[port].is_linked = 0;
             return 0;
         }
         return buf.state;

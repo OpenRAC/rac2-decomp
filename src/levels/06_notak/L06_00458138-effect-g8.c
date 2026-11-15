@@ -24,15 +24,15 @@ extern int D_L06_001B1C30 __attribute__((sda));
 /* Updates a breakable object: once hit it throws out debris and sparks, then removes itself. */
 void breakable_l06_debris_update(char *obj)
 {
-    float pos[4], vecA[4], vecB[4], vecC[4];
+    float pos[4], vec_a[4], vec_b[4], vec_c[4];
     char *vars = *(char **)(obj + 0x68);
     char *hit;
     int state = *(unsigned char *)(obj + 0x20);
     int i;
 
-    *(Quad *)vecA = 0;
-    vecA[2] = *(float *)(obj + 0x2C) * 21.5f;
-    *(Quad *)pos = *(Quad *)vecA;
+    *(Quad *)vec_a = 0;
+    vec_a[2] = *(float *)(obj + 0x2C) * 21.5f;
+    *(Quad *)pos = *(Quad *)vec_a;
     switch (state) {
     case 0:
         part_spawn_object_following_effect(pos, obj, 0x50801420, -1, 0, -1, 0, 96, 430500.0f, 0.0f);
@@ -42,14 +42,14 @@ void breakable_l06_debris_update(char *obj)
     case 1:
         hit = func_0035CBA0(obj, 0x4010000, 0);
         if (hit && !*(int *)vars) {
-            *(Quad *)vecA = 0;
-            vecA[1] = vecA[0] = 3.0f;
+            *(Quad *)vec_a = 0;
+            vec_a[1] = vec_a[0] = 3.0f;
             *(float *)(hit + 0x18) = 0.75f;
-            FastVecScale(vecB, hit + 0x10, math_random_float_range(6.0f, 8.0f));
-            qcopy(vecC, vecB);
-            FastVecSub(vecB, vecB, vecA);
-            FastVecAdd(vecC, vecC, vecA);
-            part_explode_object_into_pieces(obj, vecB, D_L06_001B1C08, D_L06_001B1C00,
+            FastVecScale(vec_b, hit + 0x10, math_random_float_range(6.0f, 8.0f));
+            qcopy(vec_c, vec_b);
+            FastVecSub(vec_b, vec_b, vec_a);
+            FastVecAdd(vec_c, vec_c, vec_a);
+            part_explode_object_into_pieces(obj, vec_b, D_L06_001B1C08, D_L06_001B1C00,
                              65535, -1, D_L06_001B1C30, 9, state, 255, 0);
             moby_set_state(obj, 2, -1);
         }
@@ -59,15 +59,15 @@ void breakable_l06_debris_update(char *obj)
         part_explode_object_into_pieces(obj, D_L06_001B1C10, D_L06_001B1C08, D_L06_001B1C00,
                          65535, 0, D_L06_001B1C30, 7, 62, 255, 0);
         part_spawn_scaled_bolts(obj, 1, pos[2] * 0.33333334f);
-        moby_compute_local_point(obj, vecA, pos[0], pos[1], pos[2]);
-        SpawnExplosionEffects(obj, D_L06_001A8F20, vecA, 0, 0, 8, 3, 3, 0, 0, 9, 0.35f,
+        moby_compute_local_point(obj, vec_a, pos[0], pos[1], pos[2]);
+        SpawnExplosionEffects(obj, D_L06_001A8F20, vec_a, 0, 0, 8, 3, 3, 0, 0, 9, 0.35f,
                       -1, 0, 0, 0, -1, 0, 0x810001);
         for (i = 0; i < 4; i++) {
-            vecB[0] = (i / 2 * 2 - 1) * 0.0166666675f;
-            vecB[1] = (i % 2 * 2 - 1) * 0.0166666675f;
-            vecB[2] = 0.1166666746f;
-            matrix_mul_vec3(vecB, vecB, obj + 0xC0);
-            SpawnTintedEffects(obj, vecA, 3, 0, 1, vecB, 5, 0x7FFF8080, 0.45f, 0.6f, 0);
+            vec_b[0] = (i / 2 * 2 - 1) * 0.0166666675f;
+            vec_b[1] = (i % 2 * 2 - 1) * 0.0166666675f;
+            vec_b[2] = 0.1166666746f;
+            matrix_mul_vec3(vec_b, vec_b, obj + 0xC0);
+            SpawnTintedEffects(obj, vec_a, 3, 0, 1, vec_b, 5, 0x7FFF8080, 0.45f, 0.6f, 0);
         }
         func_00350388(obj);
         break;

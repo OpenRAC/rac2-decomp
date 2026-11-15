@@ -38,26 +38,26 @@ void part_spawn_ring(char *moby, void *position, int count,
 {
     float offset[4], velocity[4], accel[4], boost[4];
     char *vars = *(char **)(moby + 0x68);
-    int colorStart = D_L08_001B1ADC;
-    int colorEnd = D_L08_001B1AE0;
+    int color_start = D_L08_001B1ADC;
+    int color_end = D_L08_001B1AE0;
     if (!GetCollHitMaterial()) {
-        colorStart = D_L08_001B1B74;
-        colorEnd = D_L08_001B1B78;
+        color_start = D_L08_001B1B74;
+        color_end = D_L08_001B1B78;
     }
     { int i;
     for (i = 0; i < count; i++) {
         int red,green,blue;
         char *particle;
-        float cosPart,sinPart,speedRange;
-        cosPart = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927410125732f,3.1415927410125732f));
-        offset[0] = cosPart * math_random_float_range(minRadius,maxRadius);
-        sinPart = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927410125732f,3.1415927410125732f));
-        sinPart *= math_random_float_range(minRadius,maxRadius);
-        offset[1] = sinPart;
+        float cos_part,sin_part,speed_range;
+        cos_part = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927410125732f,3.1415927410125732f));
+        offset[0] = cos_part * math_random_float_range(minRadius,maxRadius);
+        sin_part = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927410125732f,3.1415927410125732f));
+        sin_part *= math_random_float_range(minRadius,maxRadius);
+        offset[1] = sin_part;
         offset[2] = 0;
         matrix_mul_vec3(offset,offset,moby+0xC0);
-        speedRange = (speed * ((maxRadius-FastVecLength(offset))*0.01666666753590107f))/maxRadius;
-        vec_scale_to_length(velocity,offset,math_random_float_range(speedRange / D_L08_001B1B14,speedRange));
+        speed_range = (speed * ((maxRadius-FastVecLength(offset))*0.01666666753590107f))/maxRadius;
+        vec_scale_to_length(velocity,offset,math_random_float_range(speed_range / D_L08_001B1B14,speed_range));
         qcopy(boost,vars);
         boost[2] *= D_L08_001B1B68;
         FastVecAdd(velocity,velocity,boost);
@@ -72,7 +72,7 @@ void part_spawn_ring(char *moby, void *position, int count,
         red = FloatToInt(math_random_float_range(D_L08_001B1AE4,D_L08_001B1AE8));
         green = FloatToInt(math_random_float_range(D_L08_001B1AEC,D_L08_001B1AF0));
         blue = FloatToInt(math_random_float_range(D_L08_001B1AF4,D_L08_001B1AF8));
-        particle = part_spawn_trail(offset,velocity,accel,colorStart,colorEnd,red,green,blue,-1);
+        particle = part_spawn_trail(offset,velocity,accel,color_start,color_end,red,green,blue,-1);
         if (particle && (func_001163B0() & 1)) particle[3] = 0x48;
     }
     }

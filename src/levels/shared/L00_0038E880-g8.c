@@ -50,7 +50,7 @@ void part_l00_spawn_impact_burst(char *object, BurstVector *velocity, BurstVecto
     BurstTemplate tmpl;
     BurstVector delta, projected, shard, random, drift, point;
     float scale, distance, height, ground;
-    int shadeColor;
+    int shade_color;
     BurstWeapon *weapon;
     char *pa, *pb, *pc, *pd, *pe, *pf;
     int *pg;
@@ -156,12 +156,12 @@ void part_l00_spawn_impact_burst(char *object, BurstVector *velocity, BurstVecto
                 c1 | r1, 1.0f / 180.0f, c2 | r2, on);
             }
         }
-        shadeColor = (0x7F << 24) | (cb << 16) | (cg << 8);
+        shade_color = (0x7F << 24) | (cb << 16) | (cg << 8);
         {
             int i;
             int count = 20, full = 0x7F000000, black = 0, lmin = 90, lmax = 150, one = 1, ntex = -1, zero = 0;
             char *o4 = object;
-            int c4 = shadeColor;
+            int c4 = shade_color;
             short r3 = cr;
             float h5 = height;
             for (i = 0; i < count; i++) {

@@ -34,9 +34,9 @@ void flag_nodes_effect_update(u8 *moby) {
     case 1:
         if (D_L13_001A8F00 == 2 && D_001BD5F0 == 3) {
             for (node = D_L13_001B2928[0]; node != 0; node = node->next) {
-                s16 classId = node->fAA;
+                s16 class_id = node->fAA;
 
-                if (classId == 0x1F4 || classId == 0xEA3 || classId == 0xEA4 || classId == 0x11EB) {
+                if (class_id == 0x1F4 || class_id == 0xEA3 || class_id == 0xEA4 || class_id == 0x11EB) {
                     node->f98 = 0;
                     node->flags = (node->flags | 0x41) & 0xEFFF;
                 }

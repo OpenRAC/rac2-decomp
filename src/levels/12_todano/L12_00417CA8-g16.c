@@ -74,7 +74,7 @@ extern void gfx_draw_barrier_field_strips(void);
 /* Updates a barrier field. It checks how deep the hero has pushed into it, knocks the hero back, and counts progress when the end is reached. */
 void barrier_field_update(Moby7CA8 *self)
 {
-    V offset, direction, rotation[3], matrix[4], hit, rayStart, rayEnd, pushDir, point, normal, tmp;
+    V offset, direction, rotation[3], matrix[4], hit, ray_start, ray_end, push_dir, point, normal, tmp;
     u8 impulse[0x30] __attribute__((aligned(16)));
     Vars7CA8 *vars = self->vars;
     f32 length;
@@ -117,21 +117,21 @@ active:
         }
         matrix_from_basis_rows(matrix, rotation);
         matrix_mul_vec3(&hit, &D_L12_001B1BD0, &D_L12_001B2F8C[0][vars->base].rows[4]);
-        rayStart.q = 0;
-        rayEnd.q = 0;
-        rayStart.f.x = 1;
-        rayStart.f.w = 1;
-        rayEnd.f.x = 1;
-        rayEnd.f.w = 1;
-        FastVecAdd(&rayStart, &rayStart, &hit);
-        matrix_mul_vec3(&rayStart, &rayStart, &D_L12_001B2F8C[0][vars->base]);
-        FastVecSub(&rayEnd, &D_L12_001B2F8C[0][vars->base].rows[3], &rayStart);
-        FastVecAdd(&rayStart, &D_L12_001B2F8C[0][vars->base].rows[3], &rayStart);
-        rayStart.f.z += 2.5f;
-        rayEnd.f.z += 2.5f;
+        ray_start.q = 0;
+        ray_end.q = 0;
+        ray_start.f.x = 1;
+        ray_start.f.w = 1;
+        ray_end.f.x = 1;
+        ray_end.f.w = 1;
+        FastVecAdd(&ray_start, &ray_start, &hit);
+        matrix_mul_vec3(&ray_start, &ray_start, &D_L12_001B2F8C[0][vars->base]);
+        FastVecSub(&ray_end, &D_L12_001B2F8C[0][vars->base].rows[3], &ray_start);
+        FastVecAdd(&ray_start, &D_L12_001B2F8C[0][vars->base].rows[3], &ray_start);
+        ray_start.f.z += 2.5f;
+        ray_end.f.z += 2.5f;
         vars->hit = 0;
-        pushDir.q = 0;
-        if (CollLine(&rayStart, &rayEnd, 0x12, 0, 0)) {
+        push_dir.q = 0;
+        if (CollLine(&ray_start, &ray_end, 0x12, 0, 0)) {
             V *collision = &D_L12_001C0240.point;
             V *transform = &D_L12_001B2F8C[0][vars->transform].rows[3];
             vars->hit = 1;
@@ -148,8 +148,8 @@ active:
                 FastVecSub(&tmp, &point, &self->position);
                 point.q = tmp.q;
                 point.f.z = 0;
-                qcopy(&pushDir, &point);
-                FastVecScale(&pushDir, &pushDir, D_L12_001B1BC4);
+                qcopy(&push_dir, &point);
+                FastVecScale(&push_dir, &push_dir, D_L12_001B1BC4);
             }
         }
         qcopy(&point, &g_hero_position);
@@ -163,7 +163,7 @@ active:
                 !vars->hit || vars->mode == 1) {
                 normal.q = 0;
                 normal.f.z = -3;
-                FastVecSub(&normal, &normal, &pushDir);
+                FastVecSub(&normal, &normal, &push_dir);
                 make_hit_descriptor(&impulse, self, 0x10001, &normal, (f32)(D_001A7A00[0] / 2));
                 QueueMobyImpact(g_hero_moby, &impulse);
             }

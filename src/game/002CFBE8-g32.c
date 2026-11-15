@@ -25,22 +25,22 @@ int menu_handle_skill_points_list_input(void)
 {
     int result = 0;
     int flags = g_pad_state.flags;
-    int oldCursor = D_001AB9FC;
+    int old_cursor = D_001AB9FC;
 
     if (flags & 0x10) {
         int value;
-        int returnCode;
+        int return_code;
         D_001AB9FC = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
         else if (g_pause_menu_state.fallback == 0) {
-            returnCode = -1;
+            return_code = -1;
             goto finish;
         }
-        returnCode = 0;
+        return_code = 0;
 finish:
-        return returnCode;
+        return return_code;
     }
     if (flags & 0x900) {
         D_001AB9FC = 0;
@@ -58,11 +58,11 @@ finish:
         MenuFields *menu = &D_0025C0B8;
         menu->f58 = D_001AB9FC;
         if (D_001A7A60[D_001AB9FC] != 0) {
-            if (oldCursor == D_001AB9FC) {
+            if (old_cursor == D_001AB9FC) {
                 if (D_001A63AC[0] == 0) {
-                    if (menu->f50 == oldCursor && menu->f44 == 2) {
+                    if (menu->f50 == old_cursor && menu->f44 == 2) {
                         D_0025C024[0]->flags &= -5;
-                    } else if (menu->f54 == oldCursor && menu->f44 == 4) {
+                    } else if (menu->f54 == old_cursor && menu->f44 == 4) {
                         D_0025C024[0]->flags &= -5;
                     }
                 }

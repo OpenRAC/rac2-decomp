@@ -86,7 +86,7 @@ typedef struct {
 void actor_init(char *self)
 {
     L14State_423000 *s = *(L14State_423000 **)(self + 0x68);
-    short startState;
+    short start_state;
 
     s->b70 = 8;
     s->iA8 = 4;
@@ -135,9 +135,9 @@ void actor_init(char *self)
 
     s->vec710 = *(L14_TI128 *)(self + 0x10);
 
-    startState = s->h774;
-    if (startState > 0 && (startState != 3 || s->i730 != -1))
-        moby_set_state(self, startState, 1);
+    start_state = s->h774;
+    if (start_state > 0 && (start_state != 3 || s->i730 != -1))
+        moby_set_state(self, start_state, 1);
     else
         moby_set_state(self, 1, 1);
 }

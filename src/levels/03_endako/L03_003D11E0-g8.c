@@ -29,12 +29,12 @@ extern char *part_spawn_burst(void *, void *, int, int, int, int, float, float, 
 void part_emit_debris_burst(char *obj)
 {
     float velocityOffset[4], vector[4], particleVector[4], verticalVelocity[4];
-    float angle, radius, paramA, paramB;
+    float angle, radius, param_a, param_b;
     int color, alpha, count;
     char *spawn, *particle;
 
     vec_scale_to_length(velocityOffset, obj + 0xc0, -(D_L03_001B0610*(1.0f/60.0f)));
-    { int i = 0; float paramA, paramB;
+    { int i = 0; float param_a, param_b;
     do {
         angle = math_random_angle();
         radius = math_random_float_range(0.0f, D_L03_001B05F8)*(1.0f/60.0f);
@@ -43,9 +43,9 @@ void part_emit_debris_burst(char *obj)
         vector[2] = 0.0f;
         vector[2] = math_random_float_range(D_L03_001B05F0, D_L03_001B05F0_1[1])*(1.0f/60.0f);
         FastVecAdd(vector, vector, velocityOffset);
-        paramA = math_random_float_range(D_L03_001B0600, D_L03_001B0600_1[1]);
-        paramB = math_random_float_range(D_L03_001B0608, D_L03_001B0608_1[1]);
-        spawn = cam_moby_create(obj, 2, *(short *)(obj + 0xaa), i, obj + 0x10, obj + 0xf0, vector, 255, paramA, paramB);
+        param_a = math_random_float_range(D_L03_001B0600, D_L03_001B0600_1[1]);
+        param_b = math_random_float_range(D_L03_001B0608, D_L03_001B0608_1[1]);
+        spawn = cam_moby_create(obj, 2, *(short *)(obj + 0xaa), i, obj + 0x10, obj + 0xf0, vector, 255, param_a, param_b);
         { char *state = *(char **)(spawn + 0x68);
         float life = D_L03_001B0618*(1.0f/60.0f);
         *(float *)(state + 0x38) = D_L03_001B0614;
@@ -63,8 +63,8 @@ void part_emit_debris_burst(char *obj)
         *(TI128 *)(vector) = *(TI128 *)(particleVector);
         matrix_mul_vec3(vector, vector, obj + 0xc0);
         FastVecAdd(vector, vector, obj + 0x10);
-        paramA = math_random_float_range(D_L03_001B0628, D_L03_001B0628_1[1])*210000.0f;
-        paramB = math_random_float_range(D_L03_001B0620, D_L03_001B0620_1[1])*0.000277777785f;
+        param_a = math_random_float_range(D_L03_001B0628, D_L03_001B0628_1[1])*210000.0f;
+        param_b = math_random_float_range(D_L03_001B0620, D_L03_001B0620_1[1])*0.000277777785f;
         angle = math_random_float_range(0.0f, 1.0f);
         color = FastTweenColor(D_L03_001B0630, D_L03_001B0630_1[1], angle);
         alpha = color>>24;
@@ -73,7 +73,7 @@ void part_emit_debris_burst(char *obj)
         verticalVelocity[2] = math_random_float_range(0.0f, D_L03_001B0640*(1.0f/60.0f));
         *(TI128 *)(particleVector) = *(TI128 *)(verticalVelocity);
         color&=0xffffff;
-        particle = part_spawn_burst(vector, particleVector, count, alpha, color, math_random_int_below(3)-1, paramA, 500.0f, 1.0f, paramB, 0.0f);
+        particle = part_spawn_burst(vector, particleVector, count, alpha, color, math_random_int_below(3)-1, param_a, 500.0f, 1.0f, param_b, 0.0f);
         if (particle) {
             u8 type = **(u8 **)(context + 0x5c);
             particle[3] = 0x44;

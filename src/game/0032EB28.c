@@ -269,11 +269,11 @@ void part_spawn_flash_puffs(f32 *pos, f32 scale)
 
 
 /* Removes an id from the list of 16 slots, or reports a problem if it is not there. */
-void moby_release_slot_by_id(int slotId) {
+void moby_release_slot_by_id(int slot_id) {
     int i;
 
     for (i = 0; i < 16; i++) {
-        if (D_001B2860[i] == slotId) {
+        if (D_001B2860[i] == slot_id) {
             D_001B2860[i] = 0;
             return;
         }
@@ -624,14 +624,14 @@ s32 object_is_flag_positive(u8 *object) {
 }
 
 /* Compares the second argument with the word at offset 4 of the object; when they differ, and when the word at offset 44 is non-zero while the word at offset 24 is zero, it calls a two-argument helper with those two words, marks offset 24 with 1, and finally writes the second argument into offset 4. */
-void object_change_first_value(char *object, int newValue)
+void object_change_first_value(char *object, int new_value)
 {
-    if (newValue != *(int *)(object + 4)) {
+    if (new_value != *(int *)(object + 4)) {
         if (*(int *)(object + 44) != 0 && *(int *)(object + 24) == 0) {
             pool_free_cell(*(int *)(object + 44), *(int *)(object + 4));
             *(int *)(object + 24) = 1;
         }
-        *(int *)(object + 4) = newValue;
+        *(int *)(object + 4) = new_value;
     }
 }
 

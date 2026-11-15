@@ -30,10 +30,10 @@ void UpdateTodanoPathMover(u8 *self) {
     f32 oldpos[4], oldrot[4], temp[4], delta[4];
     u8 *st = *(u8 **)(self + 0x68);
     u16 flag = *(u16 *)(self + 0xb2);
-    s32 savedBits;
+    s32 saved_bits;
     if (D_L12_0021EDF0.flags[(s16)flag] ||
-        ((savedBits = D_0019B4A8[((s16)flag >> 1) + (g_current_map_index << 10)]),
-         (flag & 1) ? ((savedBits >> 4) & 7) : (savedBits & 7))) {
+        ((saved_bits = D_0019B4A8[((s16)flag >> 1) + (g_current_map_index << 10)]),
+         (flag & 1) ? ((saved_bits >> 4) & 7) : (saved_bits & 7))) {
         moby_mark_spawned(self);
         return;
     }

@@ -42,10 +42,10 @@ s32 enemy_choose_action(void *moby) {
     s32 action ;
     s32 phase ;
     s32 roll;
-    s32 handlerB;
-    s32 handlerA;
-    s32 rangeMin;
-    s32 rangeMax;
+    s32 handler_b;
+    s32 handler_a;
+    s32 range_min;
+    s32 range_max;
 
     vars = *(u8 **)((u8 *)moby + 0x68);
     phase = *(s32 *)(vars + 0x420);
@@ -103,35 +103,35 @@ state_default:
 dispatch:
 switch (action) {
     case 7:
-        handlerA = ref_L07_003F8908_05;
-        rangeMin = 3;
-        handlerB = ref_L07_003F8908_08;
-        rangeMax = 5;
+        handler_a = ref_L07_003F8908_05;
+        range_min = 3;
+        handler_b = ref_L07_003F8908_08;
+        range_max = 5;
         goto block_35;
     case 6:
-        handlerA = ref_L07_003F8908_04;
-        rangeMin = 2;
-        handlerB = ref_L07_003F8908_07;
-        rangeMax = 3;
+        handler_a = ref_L07_003F8908_04;
+        range_min = 2;
+        handler_b = ref_L07_003F8908_07;
+        range_max = 3;
         goto block_35;
     case 8:
         *(s32 *)(vars + 0x438) = 1;
         *(s32 *)(vars + 0x41C) = ref_L07_003F8908_03(*(s32 *)(vars + 0x180));
         goto block_36;
     case 9:
-        handlerA = ref_L07_003F8908_06;
-        rangeMin = 1;
-        handlerB = ref_L07_003F8908_09;
-        rangeMax = 3;
+        handler_a = ref_L07_003F8908_06;
+        range_min = 1;
+        handler_b = ref_L07_003F8908_09;
+        range_max = 3;
         goto block_35;
     default:
         return action;
     }
 
 block_35:
-    *(s32 *)(vars + 0x444) = handlerA;
-    *(s32 *)(vars + 0x448) = handlerB;
-    *(s32 *)(vars + 0x438) = ref_L07_003F8908_01(rangeMin, rangeMax);
+    *(s32 *)(vars + 0x444) = handler_a;
+    *(s32 *)(vars + 0x448) = handler_b;
+    *(s32 *)(vars + 0x438) = ref_L07_003F8908_01(range_min, range_max);
 
 block_36:
     return action;

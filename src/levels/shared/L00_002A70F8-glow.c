@@ -69,7 +69,7 @@ void update_moby_pulsing_glow_effects(GlowMoby *object) {
         moby_transform_joint_to_world((char *)object, 6, (char *)&position);
         if (math_fabs(object->z - position.f[2]) > 2.0f)
             hero_queue_glow_point(&position, 0x200000C0U, 0.25f, 0.15f);
-    } else if (object->kind == 0x57 /* Clank */) {
+    } else if (object->kind == MOBY_CLASS_CLANK) {
         emit = 1;
         if (g_current_map_index == 3 && D_L00_001BCAC0.state == 7 && D_L00_001BCAC0.timer > 0x470)
             emit = 0;

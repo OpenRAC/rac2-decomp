@@ -135,25 +135,25 @@ int mpeg_decode_pictures(void *mpeg) {
    (_decodeOrSkipField), for the frame-picture path. Adapted from
    Lombyte (GPL-3.0) for PAL. */
 /* Decodes or skips one full video frame and moves the frame counters forward. */
-int mpeg_decode_or_skip_frame(void *mpeg, int frameIndex, int frameLimit) {
+int mpeg_decode_or_skip_frame(void *mpeg, int frame_index, int frame_limit) {
     Wrapper *wrapper = (Wrapper *)mpeg;
     Obj40 *decoder = wrapper->obj;
     int skipped = 0;
-    int decodedOk;
+    int decoded_ok;
     int result;
 
-    if (frameLimit == -1 || frameIndex < frameLimit) {
+    if (frame_limit == -1 || frame_index < frame_limit) {
         if (decoder->unk008 == 0) {
             wrapper->unk08 = 0;
             decoder->unk008 = 1;
         }
         if (r1_func_00129690(decoder, 0) == 0) {
-            decodedOk = 0;
+            decoded_ok = 0;
         } else {
-            decodedOk = 0;
-            decodedOk = r1_func_00129530(decoder) != decodedOk;
+            decoded_ok = 0;
+            decoded_ok = r1_func_00129530(decoder) != decoded_ok;
         }
-        result = decodedOk;
+        result = decoded_ok;
     } else {
         skipped = 1;
         result = r1_func_00129690(decoder, 0);

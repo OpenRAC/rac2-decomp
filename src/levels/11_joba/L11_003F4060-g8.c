@@ -15,15 +15,15 @@ extern f32 D_L11_001B05DC __attribute__((sda));
 typedef int TI128 __attribute__((mode(TI)));
 
 /* Swings the points of each of the two beam arms around toward their target angles, around the object. */
-void UpdateTwinRecordAnglesAndPositions(u8 *mobyArg) {
-    u8 *moby = mobyArg;
+void UpdateTwinRecordAnglesAndPositions(u8 *moby_arg) {
+    u8 *moby = moby_arg;
     u8 *vars = *(u8 **)(moby + 0x68);
     f32 center[4];
     u8 *arm;
     u8 *joint;
-    s32 i, nextIndex;
+    s32 i, next_index;
 
-    for (i = 0; i < 2; i = nextIndex) {
+    for (i = 0; i < 2; i = next_index) {
         s32 j;
 
         arm = vars + 0xA0 + i * 0xA0;
@@ -34,7 +34,7 @@ void UpdateTwinRecordAnglesAndPositions(u8 *mobyArg) {
                 vec_scale_to_length(center, (f32 *)(moby + 0xE0), D_L11_001B05DC);
             }
         }
-        nextIndex = i + 1;
+        next_index = i + 1;
         i = (s32)arm;
         joint = (u8 *)i;
         for (j = 1; j >= 0; j--) {

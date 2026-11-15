@@ -16,14 +16,14 @@ extern void mpeg_fill_buffer_addresses(unsigned int *, unsigned int *, unsigned 
 /* Reports bufferA video error through the registered callback, or prints it if there is none. */
 void mpeg_report_error(void *mpeg, void *message) {
     char *bytes = (char *)mpeg;
-    void *callbackOwner = *(void **)(bytes + 0x858);
+    void *callback_owner = *(void **)(bytes + 0x858);
     /* the mpeg null test is retail's, after it has already dereferenced
        mpeg -- one of the "dead-looking guards" that must be written out */
-    if (callbackOwner != 0 && mpeg != 0 && *(int *)(bytes + 0xC) != 0) {
+    if (callback_owner != 0 && mpeg != 0 && *(int *)(bytes + 0xC) != 0) {
         int event[4];
         event[0] = 0;
         event[1] = (int)message;
-        mpeg_dispatch_callback(callbackOwner, event);
+        mpeg_dispatch_callback(callback_owner, event);
     } else {
         mpeg_print_error(message);
     }
@@ -34,8 +34,8 @@ void mpeg_report_error(void *mpeg, void *message) {
    here recorded 4/32 with the 0x4/0x8 stores swapped; the function is
    exact under both compilers now.) */
 /* Stores a picture width and height and the same sizes counted in 16-pixel blocks. */
-int mpeg_set_picture_size(void *sizeInfo, int width, int height) {
-    char *bytes = (char *)sizeInfo;
+int mpeg_set_picture_size(void *size_info, int width, int height) {
+    char *bytes = (char *)size_info;
     *(int *)(bytes + 0x4) = width;
     *(int *)(bytes + 0x8) = height;
     *(int *)(bytes + 0xC) = width >> 4;
@@ -91,7 +91,7 @@ void mpeg_read_sequence_header(void *decoder) {
     char *bytes = (char *)decoder;
     unsigned int bits;
     int height;
-    unsigned int hasMatrix;
+    unsigned int has_matrix;
 
     *(unsigned int *)(bytes + 0xD4) = 0;
 
@@ -107,9 +107,9 @@ void mpeg_read_sequence_header(void *decoder) {
     *(unsigned int *)(bytes + 0x134) = bits >> 12;
     *(unsigned int *)(bytes + 0x138) = (bits >> 1) & 0x3FF;
 
-    hasMatrix = r1_func_00128A58(bytes, 1);
-    *(unsigned int *)(bytes + 0x840) = hasMatrix;
-    if (hasMatrix != 0) {
+    has_matrix = r1_func_00128A58(bytes, 1);
+    *(unsigned int *)(bytes + 0x840) = has_matrix;
+    if (has_matrix != 0) {
         r1_func_00128590(bytes);
         r1_func_00128560(bytes, 0x50000000);
         r1_func_00128590(bytes);
@@ -117,9 +117,9 @@ void mpeg_read_sequence_header(void *decoder) {
         r1_func_0012C990(bytes, 0x50000000, (int)r1_D_001330C0);
     }
 
-    hasMatrix = r1_func_00128A58(bytes, 1);
-    *(unsigned int *)(bytes + 0x844) = hasMatrix;
-    if (hasMatrix != 0) {
+    has_matrix = r1_func_00128A58(bytes, 1);
+    *(unsigned int *)(bytes + 0x844) = has_matrix;
+    if (has_matrix != 0) {
         r1_func_00128590(bytes);
         r1_func_00128560(bytes, 0x58000000);
         r1_func_00128590(bytes);
@@ -133,12 +133,12 @@ void mpeg_read_sequence_header(void *decoder) {
 
 /* rac1-decomp src/core/0012AC80.c: mpeg_init_seq (func_0012C608) */
 /* Works out the picture size in blocks and sets up the picture buffers when the size changes. */
-void mpeg_init_seq(void *sizeInfo) {
-    int *sizes = (int *)sizeInfo;
-    char *decoder = *(char **)((char *)sizeInfo + 0x40);
+void mpeg_init_seq(void *size_info) {
+    int *sizes = (int *)size_info;
+    char *decoder = *(char **)((char *)size_info + 0x40);
     int started = *(int *)(decoder + 0x848);
-    int blockRows, widthPixels, heightPixels;
-    unsigned int bufferSize, rowSize;
+    int block_rows, width_pixels, height_pixels;
+    unsigned int buffer_size, row_size;
     unsigned int *desc0, *desc1, *desc2, *desc3, *desc4, *desc5, *desc6, *desc7, *desc8;
 
     if (started == 0) {
@@ -151,27 +151,27 @@ void mpeg_init_seq(void *sizeInfo) {
     }
     *(int *)(decoder + 0x12C) = (*(int *)(decoder + 0x124) + 0xF) >> 4;
     if (started != 0 && *(int *)(decoder + 0x13C) == 0)
-        blockRows = ((*(int *)(decoder + 0x128) + 0x1F) >> 5) << 1;
+        block_rows = ((*(int *)(decoder + 0x128) + 0x1F) >> 5) << 1;
     else
-        blockRows = (*(int *)(decoder + 0x128) + 0xF) >> 4;
-    *(int *)(decoder + 0x130) = blockRows;
-    heightPixels = blockRows << 4;
-    widthPixels = *(int *)(decoder + 0x12C) << 4;
+        block_rows = (*(int *)(decoder + 0x128) + 0xF) >> 4;
+    *(int *)(decoder + 0x130) = block_rows;
+    height_pixels = block_rows << 4;
+    width_pixels = *(int *)(decoder + 0x12C) << 4;
     {
-    unsigned int *outDesc;
-    if (widthPixels != sizes[0]) {
-        outDesc = (unsigned int *)(decoder + 0x528);
+    unsigned int *out_desc;
+    if (width_pixels != sizes[0]) {
+        out_desc = (unsigned int *)(decoder + 0x528);
     } else {
-        if (heightPixels == sizes[1])
+        if (height_pixels == sizes[1])
             return;
-        outDesc = (unsigned int *)(decoder + 0x528);
+        out_desc = (unsigned int *)(decoder + 0x528);
     }
-    sizes[0] = widthPixels;
-    sizes[1] = heightPixels;
-    if ((widthPixels & 0xF) && (widthPixels & 0xE))
-        outDesc = desc8;
-    desc8 = outDesc;
-    rowSize = heightPixels * 0x180;
+    sizes[0] = width_pixels;
+    sizes[1] = height_pixels;
+    if ((width_pixels & 0xF) && (width_pixels & 0xE))
+        out_desc = desc8;
+    desc8 = out_desc;
+    row_size = height_pixels * 0x180;
     desc0 = (unsigned int *)(decoder + 0x1E8);
     desc1 = (unsigned int *)(decoder + 0x250);
     desc2 = (unsigned int *)(decoder + 0x2B8);
@@ -180,24 +180,24 @@ void mpeg_init_seq(void *sizeInfo) {
     desc5 = (unsigned int *)(decoder + 0x3F0);
     desc6 = (unsigned int *)(decoder + 0x458);
     desc7 = (unsigned int *)(decoder + 0x4C0);
-    bufferSize = (widthPixels * rowSize) >> 8;
+    buffer_size = (width_pixels * row_size) >> 8;
     mpeg_restore_counter(decoder + 0x108);
-    *(unsigned int *)(decoder + 0xFC) = mpeg_alloc_aligned(decoder, decoder + 0x108, bufferSize, 0x40);
-    *(unsigned int *)(decoder + 0x100) = mpeg_alloc_aligned(decoder, decoder + 0x108, bufferSize, 0x40);
-    *(unsigned int *)(decoder + 0x104) = mpeg_alloc_aligned(decoder, decoder + 0x108, bufferSize, 0x40);
+    *(unsigned int *)(decoder + 0xFC) = mpeg_alloc_aligned(decoder, decoder + 0x108, buffer_size, 0x40);
+    *(unsigned int *)(decoder + 0x100) = mpeg_alloc_aligned(decoder, decoder + 0x108, buffer_size, 0x40);
+    *(unsigned int *)(decoder + 0x104) = mpeg_alloc_aligned(decoder, decoder + 0x108, buffer_size, 0x40);
     mpeg_fill_buffer_addresses(desc0, desc1, desc2,
                   desc3, desc4, desc5,
                   desc6, desc7, desc8,
-                  *(int *)(decoder + 0xFC), *(int *)(decoder + 0x100), *(int *)(decoder + 0x104), widthPixels, heightPixels);
-    mpeg_set_picture_size(desc0, widthPixels, heightPixels);
-    mpeg_set_picture_size(desc1, widthPixels, heightPixels);
-    mpeg_set_picture_size(desc2, widthPixels, heightPixels);
-    mpeg_set_picture_size(desc3, widthPixels, heightPixels >> 1);
-    mpeg_set_picture_size(desc4, widthPixels, heightPixels >> 1);
-    mpeg_set_picture_size(desc5, widthPixels, heightPixels >> 1);
-    mpeg_set_picture_size(desc6, widthPixels, heightPixels >> 1);
-    mpeg_set_picture_size(desc7, widthPixels, heightPixels >> 1);
-    mpeg_set_picture_size(desc8, widthPixels, heightPixels >> 1);
+                  *(int *)(decoder + 0xFC), *(int *)(decoder + 0x100), *(int *)(decoder + 0x104), width_pixels, height_pixels);
+    mpeg_set_picture_size(desc0, width_pixels, height_pixels);
+    mpeg_set_picture_size(desc1, width_pixels, height_pixels);
+    mpeg_set_picture_size(desc2, width_pixels, height_pixels);
+    mpeg_set_picture_size(desc3, width_pixels, height_pixels >> 1);
+    mpeg_set_picture_size(desc4, width_pixels, height_pixels >> 1);
+    mpeg_set_picture_size(desc5, width_pixels, height_pixels >> 1);
+    mpeg_set_picture_size(desc6, width_pixels, height_pixels >> 1);
+    mpeg_set_picture_size(desc7, width_pixels, height_pixels >> 1);
+    mpeg_set_picture_size(desc8, width_pixels, height_pixels >> 1);
     }
 }
 
@@ -236,18 +236,18 @@ extern void mpeg_load_default_quant_matrix(void *, int, int);
 void mpeg_load_default_quant_matrix(void *decoder, int cmd, int addr) {
     char *bytes = decoder;
     int event[8];
-    int interruptsWereOn;
+    int interrupts_were_on;
 
     event[0] = 2;
     r1_func_0012BC78(*(void **)(bytes + 0x858), event);
     r1_func_00128590(bytes);
     IPU_CMD = 0;
     r1_func_00128590(bytes);
-    interruptsWereOn = r1_func_0011D960();
+    interrupts_were_on = r1_func_0011D960();
     D4_MADR = addr & 0x0FFFFFFF;
     D4_QWC = 4;
     D4_CHCR = 0x101;
-    if (interruptsWereOn != 0) {
+    if (interrupts_were_on != 0) {
         r1_func_0011D9A8();
     }
     r1_func_00128560(bytes, cmd);

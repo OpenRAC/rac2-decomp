@@ -9,8 +9,8 @@ extern void mpeg_skip_extra_info_bits(void *);
 
 /* rac1-decomp src/core/00125630.c: func_00129180 */
 /* Skips extra information bytes, each one marked by a leading 1 bit. */
-void mpeg_skip_extra_info_bits(void *decoderPtr) {
-    while (mpeg_read_bits(decoderPtr, 1) != 0) {
-        mpeg_skip_bits(decoderPtr, 8);
+void mpeg_skip_extra_info_bits(void *decoder_ptr) {
+    while (mpeg_read_bits(decoder_ptr, 1) != 0) {
+        mpeg_skip_bits(decoder_ptr, 8);
     }
 }

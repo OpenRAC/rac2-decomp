@@ -24,8 +24,8 @@ char *part_init_shared_effect_object(int mode, int variant)
     if (variant >= 0) {
         anim_start_immediate(object, variant, 0);
     } else {
-        char *objectClass = *(char **)(object + 0x24);
-        if (objectClass != 0 && *(unsigned char *)(objectClass + 0xC) >= 2)
+        char *object_class = *(char **)(object + 0x24);
+        if (object_class != 0 && *(unsigned char *)(object_class + 0xC) >= 2)
             anim_start_immediate(object, 1, 0);
     }
     if ((*(unsigned short *)(object + 0x34) & 4) == 0)

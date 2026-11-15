@@ -80,13 +80,13 @@ BoltSpawnObject *moby_spawn_bolt_pickup(BoltSpawnObject *source, void *position,
     }
     switch (value) {
     default:
-    case 1: object=(BoltSpawnObject *)CreateMoby(13 /* Bolt */); scale=ref_00302470_03; break;
-    case 5: object=(BoltSpawnObject *)CreateMoby(14 /* Bolt */); scale=ref_00302470_04; break;
-    case 20: object=(BoltSpawnObject *)CreateMoby(15 /* Bolt */); scale=ref_00302470_05; break;
-    case 50: object=(BoltSpawnObject *)CreateMoby(16 /* Bolt */); scale=ref_00302470_06; break;
-    case 100: object=(BoltSpawnObject *)CreateMoby(17 /* Bolt */); scale=ref_00302470_07; break;
-    case 500: object=(BoltSpawnObject *)CreateMoby(18 /* Bolt */); scale=ref_00302470_08; break;
-    case 1000: object=(BoltSpawnObject *)CreateMoby(19 /* Bolt */); scale=ref_00302470_09; break;
+    case 1: object=(BoltSpawnObject *)CreateMoby(MOBY_CLASS_BOLT); scale=ref_00302470_03; break;
+    case 5: object=(BoltSpawnObject *)CreateMoby(MOBY_CLASS_BOLT_2); scale=ref_00302470_04; break;
+    case 20: object=(BoltSpawnObject *)CreateMoby(MOBY_CLASS_BOLT_3); scale=ref_00302470_05; break;
+    case 50: object=(BoltSpawnObject *)CreateMoby(MOBY_CLASS_BOLT_4); scale=ref_00302470_06; break;
+    case 100: object=(BoltSpawnObject *)CreateMoby(MOBY_CLASS_BOLT_5); scale=ref_00302470_07; break;
+    case 500: object=(BoltSpawnObject *)CreateMoby(MOBY_CLASS_BOLT_6); scale=ref_00302470_08; break;
+    case 1000: object=(BoltSpawnObject *)CreateMoby(MOBY_CLASS_BOLT_7); scale=ref_00302470_09; break;
     }
     if (object) {
     state=object->vars;

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -388,7 +389,7 @@ s32 extermibot_find_nearest_protopet(u8 *moby)
         e = g_moby_l18_table[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        if (*(s16 *)(e + 0xAA) == 0xB69 /* Protopet */) {
+        if (*(s16 *)(e + 0xAA) == MOBY_CLASS_PROTOPET) {
             if (e[0x20] != 0xFE) {
                 if (e[0x20] != 0xFD) {
                     if ((*(u16 *)(e + 0x34) ^ 1) & 1) {

@@ -24,11 +24,11 @@ typedef struct { u8 pad[0xf0]; float rx, ry, rz; } EMob;
    playing a sound while it moves. */
 void moving_platform_update(u8 *moby)
 {
-    TI128 oldPos, oldRot, delta;
+    TI128 old_pos, old_rot, delta;
     EPlatform *platform = *(EPlatform **)(moby+0x68);
-    float distToStart,distToEnd,blend;
-    qcopy(&oldPos,moby+0x10);
-    qcopy(&oldRot,moby+0xf0);
+    float dist_to_start,dist_to_end,blend;
+    qcopy(&old_pos,moby+0x10);
+    qcopy(&old_rot,moby+0xf0);
     switch(moby[0x20]) {
     case 0:
         platform->sound=-1;
@@ -40,10 +40,10 @@ void moving_platform_update(u8 *moby)
         moby_set_state(moby,1,-1);
         break;
     case 1:
-        distToStart=math_fabs(E_F((u8 *)platform,0x68)-g_hero_state.z);
-        distToEnd=math_fabs(E_F(D_L08_001B2ACC+platform->index*128,0x38)-g_hero_state.z);
+        dist_to_start=math_fabs(E_F((u8 *)platform,0x68)-g_hero_state.z);
+        dist_to_end=math_fabs(E_F(D_L08_001B2ACC+platform->index*128,0x38)-g_hero_state.z);
         if (((!platform->trigger || FloatToInt(platform->progress)==platform->side) && g_hero_state.object==(int)moby && g_hero_state.state!=0) ||
-            (platform->progress<0.1f && distToEnd<distToStart) || (platform->progress>0.9f && distToStart<distToEnd)) {
+            (platform->progress<0.1f && dist_to_end<dist_to_start) || (platform->progress>0.9f && dist_to_start<dist_to_end)) {
             moby[0xbc]^=1;
             moby_set_state(moby,2,-1);
         }
@@ -75,8 +75,8 @@ void moving_platform_update(u8 *moby)
         break;
     }
     if(moby[0x20]<4) {
-        FastVecSub(&delta,moby+0x10,&oldPos);
-        mat_combine_and_store((u8 *)platform+0x20,&delta,&oldRot,moby+0xf0);
+        FastVecSub(&delta,moby+0x10,&old_pos);
+        mat_combine_and_store((u8 *)platform+0x20,&delta,&old_rot,moby+0xf0);
     }
 }
 

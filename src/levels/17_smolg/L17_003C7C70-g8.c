@@ -32,23 +32,23 @@ extern s32 D_L17_001B1DD0 __attribute__((sda));
    does it again (moby class 2477). */
 void effect_l17_spawner_update(s32 moby)
 {
-    s32 mobyAddr = moby;
-    u32 *vars = *(u32 **)(mobyAddr + 0x68);
+    s32 moby_addr = moby;
+    u32 *vars = *(u32 **)(moby_addr + 0x68);
     u32 packed;
     s32 frames;
     f32 scale;
 
-    if (*(u8 *)(mobyAddr + 0x20) == 0) {
+    if (*(u8 *)(moby_addr + 0x20) == 0) {
         u8 one = 1;
 
-        *(u8 *)(mobyAddr + 0x30) = 0xFF;
-        *(u16 *)(mobyAddr + 0x96) = one;
-        *(u8 *)(mobyAddr + 0x20) = one;
+        *(u8 *)(moby_addr + 0x30) = 0xFF;
+        *(u16 *)(moby_addr + 0x96) = one;
+        *(u8 *)(moby_addr + 0x20) = one;
     }
     {
-        s32 remaining = (s32)*(u16 *)(mobyAddr + 0x96) - 1;
+        s32 remaining = (s32)*(u16 *)(moby_addr + 0x96) - 1;
 
-        *(u16 *)(mobyAddr + 0x96) = remaining;
+        *(u16 *)(moby_addr + 0x96) = remaining;
         if ((u16)remaining != 0)
             return;
     }
@@ -58,10 +58,10 @@ void effect_l17_spawner_update(s32 moby)
     packed |= vars[0];
     scale = *(f32 *)&vars[4] * 210000.0f;
     frames = FloatToInt(D_L17_001B04B8 * 60.0f);
-    if (part_l17_spawn_fading(scale, mobyAddr, packed, frames) != 0)
-        *(u16 *)(mobyAddr + 0x96) = FloatToInt(D_L17_001B04B8 * 60.0f);
+    if (part_l17_spawn_fading(scale, moby_addr, packed, frames) != 0)
+        *(u16 *)(moby_addr + 0x96) = FloatToInt(D_L17_001B04B8 * 60.0f);
     else
-        *(u16 *)(mobyAddr + 0x96) = 1;
+        *(u16 *)(moby_addr + 0x96) = 1;
 }
 
 /* Sets the object's stage up: the first stage asks the level's own spawner for a child and
@@ -365,13 +365,13 @@ typedef struct {
 /* A glowing pad that pulses its colour and reacts when the player targets it. */
 void target_pad_update(u8 *obj)
 {
-    L17PadVars *padVars = *(L17PadVars **)(obj + 0x68);
+    L17PadVars *pad_vars = *(L17PadVars **)(obj + 0x68);
     s32 shade, nibble;
     u16 id;
     u8 *counter;
 
-    padVars->phase = FastAddRotations(padVars->phase, 0.10471977f);
-    shade = FloatToInt(math_fast_sin_or_cos_b(padVars->phase) * 128.0f);
+    pad_vars->phase = FastAddRotations(pad_vars->phase, 0.10471977f);
+    shade = FloatToInt(math_fast_sin_or_cos_b(pad_vars->phase) * 128.0f);
     if (shade > 128)
         shade = 128;
     else if (shade < 32)
@@ -385,7 +385,7 @@ void target_pad_update(u8 *obj)
     case 1:
         flag_set_first_pending(obj);
         if (g_hero_state.target == obj) {
-            if (padVars->group != -1) {
+            if (pad_vars->group != -1) {
                 id = *(u16 *)(obj + 0xB2);
                 if (!D_L17_0021EBB0.collected[(s16)id]) {
                     nibble = D_0019B4A8[((s16)id >> 1) + (g_current_map_index << 10)];
@@ -393,7 +393,7 @@ void target_pad_update(u8 *obj)
                     if (!nibble) {
                         u16 slot;
 
-                        cam_lock_entry(padVars->group);
+                        cam_lock_entry(pad_vars->group);
                         slot = *(u16 *)(obj + 0xB2);
                         if (slot & 1) {
                             counter = D_0019B4A8 + (((s16)slot >> 1) + (g_current_map_index << 10));
@@ -404,22 +404,22 @@ void target_pad_update(u8 *obj)
                             if ((*counter & 7) != 7)
                                 *counter += 1;
                         }
-                        if (padVars->linked != -1)
-                            moby_set_flag_bit(g_moby_l17_pool + (padVars->linked << 8), 1);
-                        padVars->group = -1;
+                        if (pad_vars->linked != -1)
+                            moby_set_flag_bit(g_moby_l17_pool + (pad_vars->linked << 8), 1);
+                        pad_vars->group = -1;
                     }
                 }
             }
             ForceClaimNotice(12, 0x27F7, 1);
             *(s32 *)(obj + 0x78) = (0x80 << 24) | (shade << 8);
             g_hero_state.status = 2;
-            if (padVars->speed != 0)
-                g_hero_state.speed = padVars->speed;
+            if (pad_vars->speed != 0)
+                g_hero_state.speed = pad_vars->speed;
         } else
             *(s32 *)(obj + 0x78) = (0x80 << 24) | shade;
         break;
     }
-    if (padVars->cuboid >= 0 && IsPointInCuboid(g_hero_state.pos, padVars->cuboid)
+    if (pad_vars->cuboid >= 0 && IsPointInCuboid(g_hero_state.pos, pad_vars->cuboid)
         && g_hero_state.mode == 0x82)
         hero_change_action(6, 1);
 }

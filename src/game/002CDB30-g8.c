@@ -43,7 +43,7 @@ extern int snd_play_from_global_bank(int, unsigned int, void *);
 int menu_handle_item_list_input(void)
 {
     int flags = D_00138344;
-    int previousRow = D_001AB9B0;
+    int previous_row = D_001AB9B0;
     int result = 0;
 
     if (flags & 0x10) {
@@ -61,7 +61,7 @@ return_value:
     if (flags & 0x900) {
         result = 1;
     } else if (flags & 0x8000) {
-        if (previousRow != D_001AB9B4)
+        if (previous_row != D_001AB9B4)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
@@ -69,7 +69,7 @@ return_value:
         if (D_001AB9B0 <= 0)
             D_001AB9B0 = 1;
     } else if (flags & 0x2000) {
-        if (previousRow != D_001AB9B8)
+        if (previous_row != D_001AB9B8)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
@@ -91,12 +91,12 @@ return_value:
         }
     }
     {
-        int currentRow = D_001AB9B0;
+        int current_row = D_001AB9B0;
         for (;;) {
             if (D_00188510[D_001AB9B8][0] != 0 || D_00188510[D_001AB9B8][1] != 0)
                 break;
             if (++D_001AB9B8 >= 64) {
-                D_001AB9B8 = currentRow;
+                D_001AB9B8 = current_row;
                 break;
             }
         }
@@ -109,7 +109,7 @@ return_value:
         D_0025ABC0.value = D_001AB9B0 - 1;
         D_0025AC28.value = D_00264630[D_001AB9B0].value;
     }
-    if (D_001AB9B0 != previousRow)
+    if (D_001AB9B0 != previous_row)
         D_0025AC28.motion = -576;
     return result;
 }

@@ -26,7 +26,7 @@ void DrawBeamRingAndRailEffects(void *object)
     SurfacePacket packet;
     SurfaceVector edge, side, normal, eye;
     int row, i;
-    float texU, texV, texW;
+    float tex_u, tex_v, tex_w;
     D_L00_001B007C -= D_L00_001B0080;
     if (D_L00_001B007C <= -8.0f) D_L00_001B007C += 8.0f;
     DrawScrollingRibbonColored(D_L00_00240480, D_L00_001B005C, D_L00_001B0060, D_L00_001B0064, D_L00_001B0068, D_L00_001B006C, 12, D_L00_001B0074);
@@ -36,7 +36,7 @@ void DrawBeamRingAndRailEffects(void *object)
     {
         int color = D_L00_001B0084;
         packet.texture = GetEffectTextureDescriptor(D_L00_001B008C);
-        texU = D_L00_001AFFF4;
+        tex_u = D_L00_001AFFF4;
         packet.mode = 0xFF9000000260ULL;
         packet.flags = 0x8000000048ULL;
         packet.primitive = 0;
@@ -52,7 +52,7 @@ void DrawBeamRingAndRailEffects(void *object)
         SurfaceVector *point2;
         for (row = 2; row < 12;) {
             int nextRow = row + 1;
-            texV = D_L00_001AFFFC; texW = D_L00_001B0000;
+            tex_v = D_L00_001AFFFC; tex_w = D_L00_001B0000;
             for (i = 0; i < 20; i++) {
                 qcopy_nc(&packet.vertex[0], &D_L00_00240600[row][i]);
                 qcopy_nc(&packet.vertex[1], &D_L00_00240600[row][(i + 1) % 20]);
@@ -63,33 +63,33 @@ void DrawBeamRingAndRailEffects(void *object)
                 FastVecCross(&normal, &side, &edge);
                 FastVecSub(&eye, &packet.vertex[1], g_camera_l00_position);
                 if (FastVecDot(&normal, &eye) >= 0) {
-                    texV += D_L00_001AFFF0; texW += D_L00_001AFFF0;
+                    tex_v += D_L00_001AFFF0; tex_w += D_L00_001AFFF0;
                 } else {
                     if (row == 11) { packet.color[1] = D_L00_001B0084 & 0xFFFFFF; packet.color[0] = D_L00_001B0084 & 0xFFFFFF; }
-                    packet.uv[5] = texV;
-                    packet.uv[1] = texV;
-                    packet.uv[3] = texV + D_L00_001AFFF0;
-                    packet.uv[4] = texU - D_L00_001AFFEC;
-                    packet.uv[0] = texU;
-                    packet.uv[2] = texU;
-                    packet.uv[7] = texV + D_L00_001AFFF0;
-                    packet.uv[6] = texU - D_L00_001AFFEC;
-                    texV = texV + D_L00_001AFFF0;
+                    packet.uv[5] = tex_v;
+                    packet.uv[1] = tex_v;
+                    packet.uv[3] = tex_v + D_L00_001AFFF0;
+                    packet.uv[4] = tex_u - D_L00_001AFFEC;
+                    packet.uv[0] = tex_u;
+                    packet.uv[2] = tex_u;
+                    packet.uv[7] = tex_v + D_L00_001AFFF0;
+                    packet.uv[6] = tex_u - D_L00_001AFFEC;
+                    tex_v = tex_v + D_L00_001AFFF0;
                     draw_world_quad(&packet, 0, 0);
-                    packet.uv[0] = texU;
-                    packet.uv[1] = texW;
-                    packet.uv[2] = texU;
-                    packet.uv[3] = texW + D_L00_001AFFF0;
-                    packet.uv[5] = texW;
-                    packet.uv[4] = texU - D_L00_001AFFEC;
-                    packet.uv[6] = texU - D_L00_001AFFEC;
-                    packet.uv[7] = texW + D_L00_001AFFF0;
-                    texW = texW + D_L00_001AFFF0;
+                    packet.uv[0] = tex_u;
+                    packet.uv[1] = tex_w;
+                    packet.uv[2] = tex_u;
+                    packet.uv[3] = tex_w + D_L00_001AFFF0;
+                    packet.uv[5] = tex_w;
+                    packet.uv[4] = tex_u - D_L00_001AFFEC;
+                    packet.uv[6] = tex_u - D_L00_001AFFEC;
+                    packet.uv[7] = tex_w + D_L00_001AFFF0;
+                    tex_w = tex_w + D_L00_001AFFF0;
                     draw_world_quad(&packet, 0, 0);
                 }
             }
             row = nextRow;
-            texU += D_L00_001AFFEC;
+            tex_u += D_L00_001AFFEC;
         }
     }
 }

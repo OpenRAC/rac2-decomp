@@ -372,7 +372,7 @@ void gfx_scale_sprite_packet_corners(char *p, float scale)
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void gfx_draw_camera_facing_sprite(char *pos, int colorRgb, float scale, int alpha, float roll, char *textureId, int blendFlags, float offsetScale)
+void gfx_draw_camera_facing_sprite(char *pos, int color_rgb, float scale, int alpha, float roll, char *texture_id, int blend_flags, float offset_scale)
 {
     char packet[144];
     float m[16];
@@ -381,14 +381,14 @@ void gfx_draw_camera_facing_sprite(char *pos, int colorRgb, float scale, int alp
     long long texture;
 
     func_L00_003DC820_1(packet);
-    texture = func_002E67A0_1(textureId);
+    texture = func_002E67A0_1(texture_id);
 
-    *(long long *)(packet + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
+    *(long long *)(packet + 136) = ((long long)blend_flags << 2) | 0x8000000040LL;
     *(long long *)(packet + 128) = 280993940374112LL;
-    *(int *)(packet + 76) = colorRgb + (alpha << 24);
-    *(int *)(packet + 72) = colorRgb + (alpha << 24);
-    *(int *)(packet + 68) = colorRgb + (alpha << 24);
-    *(int *)(packet + 64) = colorRgb + (alpha << 24);
+    *(int *)(packet + 76) = color_rgb + (alpha << 24);
+    *(int *)(packet + 72) = color_rgb + (alpha << 24);
+    *(int *)(packet + 68) = color_rgb + (alpha << 24);
+    *(int *)(packet + 64) = color_rgb + (alpha << 24);
     *(long long *)(packet + 112) = 0LL;
     *(long long *)(packet + 120) = texture;
 
@@ -401,7 +401,7 @@ void gfx_draw_camera_facing_sprite(char *pos, int colorRgb, float scale, int alp
 
     func_802EE970_1(m, quat);
     func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
-    func_802EE3D0_1(off, off, offsetScale);
+    func_802EE3D0_1(off, off, offset_scale);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
@@ -413,7 +413,7 @@ void gfx_draw_camera_facing_sprite(char *pos, int colorRgb, float scale, int alp
 }
 
 /* Builds a 144-byte packet, derives a quaternion from source floats through four float helpers, writes the last matrix row from a source point plus a computed offset, then dispatches the packet. */
-void gfx_draw_directional_sprite(char *pos, int colorRgb, int alpha, float scale, float roll, char *textureId, int blendFlags,
+void gfx_draw_directional_sprite(char *pos, int color_rgb, int alpha, float scale, float roll, char *texture_id, int blend_flags,
                        char *direction)
 {
     char packet[144];
@@ -423,16 +423,16 @@ void gfx_draw_directional_sprite(char *pos, int colorRgb, int alpha, float scale
     long long texture;
 
     func_L00_003DC820_1(packet);
-    texture = func_0027C878_1(textureId);
+    texture = func_0027C878_1(texture_id);
 
-    *(int *)(packet + 76) = colorRgb + (alpha << 24);
-    *(int *)(packet + 72) = colorRgb + (alpha << 24);
-    *(int *)(packet + 68) = colorRgb + (alpha << 24);
-    *(int *)(packet + 64) = colorRgb + (alpha << 24);
+    *(int *)(packet + 76) = color_rgb + (alpha << 24);
+    *(int *)(packet + 72) = color_rgb + (alpha << 24);
+    *(int *)(packet + 68) = color_rgb + (alpha << 24);
+    *(int *)(packet + 64) = color_rgb + (alpha << 24);
     *(long long *)(packet + 112) = 0LL;
     *(long long *)(packet + 120) = texture;
     *(long long *)(packet + 128) = 280993940374112LL;
-    *(long long *)(packet + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
+    *(long long *)(packet + 136) = ((long long)blend_flags << 2) | 0x8000000040LL;
 
     quat[3] = 0.0f;
     quat[2] = func_00283248_3(*(float *)(direction + 0), *(float *)(direction + 4));
@@ -611,8 +611,8 @@ void gfx_scale_sprite_packet_corners_b(char *p, float scale)
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void gfx_draw_camera_facing_sprite_b(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
-                       float scale, float roll, float offsetScale)
+void gfx_draw_camera_facing_sprite_b(char *pos, int color_rgb, int alpha, char *texture_id, int blend_flags,
+                       float scale, float roll, float offset_scale)
 {
     char packet[144];
     float m[16];
@@ -621,14 +621,14 @@ void gfx_draw_camera_facing_sprite_b(char *pos, int colorRgb, int alpha, char *t
     long long texture;
 
     func_L00_003DFF98_1(packet);
-    texture = func_002E67A0_1(textureId);
+    texture = func_002E67A0_1(texture_id);
 
-    *(long long *)(packet + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
+    *(long long *)(packet + 136) = ((long long)blend_flags << 2) | 0x8000000040LL;
     *(long long *)(packet + 128) = 280993940374112LL;
-    *(int *)(packet + 76) = colorRgb + (alpha << 24);
-    *(int *)(packet + 72) = colorRgb + (alpha << 24);
-    *(int *)(packet + 68) = colorRgb + (alpha << 24);
-    *(int *)(packet + 64) = colorRgb + (alpha << 24);
+    *(int *)(packet + 76) = color_rgb + (alpha << 24);
+    *(int *)(packet + 72) = color_rgb + (alpha << 24);
+    *(int *)(packet + 68) = color_rgb + (alpha << 24);
+    *(int *)(packet + 64) = color_rgb + (alpha << 24);
     *(long long *)(packet + 112) = 0LL;
     *(long long *)(packet + 120) = texture;
 
@@ -641,7 +641,7 @@ void gfx_draw_camera_facing_sprite_b(char *pos, int colorRgb, int alpha, char *t
 
     func_802EE970_1(m, quat);
     func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
-    func_802EE3D0_1(off, off, offsetScale);
+    func_802EE3D0_1(off, off, offset_scale);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];
@@ -693,7 +693,7 @@ void gfx_scale_sprite_packet_corners_c(char *p, float scale)
 }
 
 /* Builds a 144-byte packet, derives a quaternion from source floats through four float helpers, writes the last matrix row from a source point plus a computed offset, then dispatches the packet. */
-void gfx_draw_directional_sprite_b(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
+void gfx_draw_directional_sprite_b(char *pos, int color_rgb, int alpha, char *texture_id, int blend_flags,
                                         char *direction, float scale, float roll)
 {
     char packet[144];
@@ -703,16 +703,16 @@ void gfx_draw_directional_sprite_b(char *pos, int colorRgb, int alpha, char *tex
     long long texture;
 
     func_L00_003E0CE8_1(packet);
-    texture = func_0027C878_1(textureId);
+    texture = func_0027C878_1(texture_id);
 
-    *(int *)(packet + 76) = colorRgb + (alpha << 24);
-    *(int *)(packet + 72) = colorRgb + (alpha << 24);
-    *(int *)(packet + 68) = colorRgb + (alpha << 24);
-    *(int *)(packet + 64) = colorRgb + (alpha << 24);
+    *(int *)(packet + 76) = color_rgb + (alpha << 24);
+    *(int *)(packet + 72) = color_rgb + (alpha << 24);
+    *(int *)(packet + 68) = color_rgb + (alpha << 24);
+    *(int *)(packet + 64) = color_rgb + (alpha << 24);
     *(long long *)(packet + 112) = 0LL;
     *(long long *)(packet + 120) = texture;
     *(long long *)(packet + 128) = 280993940374112LL;
-    *(long long *)(packet + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
+    *(long long *)(packet + 136) = ((long long)blend_flags << 2) | 0x8000000040LL;
 
     quat[3] = 0.0f;
     quat[2] = func_00283248_3(*(float *)(direction + 0), *(float *)(direction + 4));
@@ -732,8 +732,8 @@ void gfx_draw_directional_sprite_b(char *pos, int colorRgb, int alpha, char *tex
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void gfx_draw_camera_facing_sprite_c(char *pos, int colorRgb, int alpha, char *textureId, int blendFlags,
-                       float scale, float roll, float offsetScale)
+void gfx_draw_camera_facing_sprite_c(char *pos, int color_rgb, int alpha, char *texture_id, int blend_flags,
+                       float scale, float roll, float offset_scale)
 {
     char packet[144];
     float m[16];
@@ -742,14 +742,14 @@ void gfx_draw_camera_facing_sprite_c(char *pos, int colorRgb, int alpha, char *t
     long long texture;
 
     ref_L00_003E0F58_00(packet);
-    texture = func_002E67A0_1(textureId);
+    texture = func_002E67A0_1(texture_id);
 
-    *(long long *)(packet + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
+    *(long long *)(packet + 136) = ((long long)blend_flags << 2) | 0x8000000040LL;
     *(long long *)(packet + 128) = 280993940374112LL;
-    *(int *)(packet + 76) = colorRgb + (alpha << 24);
-    *(int *)(packet + 72) = colorRgb + (alpha << 24);
-    *(int *)(packet + 68) = colorRgb + (alpha << 24);
-    *(int *)(packet + 64) = colorRgb + (alpha << 24);
+    *(int *)(packet + 76) = color_rgb + (alpha << 24);
+    *(int *)(packet + 72) = color_rgb + (alpha << 24);
+    *(int *)(packet + 68) = color_rgb + (alpha << 24);
+    *(int *)(packet + 64) = color_rgb + (alpha << 24);
     *(long long *)(packet + 112) = 0LL;
     *(long long *)(packet + 120) = texture;
 
@@ -762,7 +762,7 @@ void gfx_draw_camera_facing_sprite_c(char *pos, int colorRgb, int alpha, char *t
 
     func_802EE970_1(m, quat);
     func_802EE138_1(off, &D_L00_001B8C80.x_140, pos);
-    func_802EE3D0_1(off, off, offsetScale);
+    func_802EE3D0_1(off, off, offset_scale);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];

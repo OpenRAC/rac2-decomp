@@ -18,65 +18,65 @@ extern void DrawQuadWithRotatedUVs(void *, int, int, int, int);
 /* Draws a glowing quad on the nearest path record while two timed windows are active, using a fixed target point for each window. */
 void path_draw_nearest_record_quad(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
-    float targetPos[4] __attribute__((aligned(16)));
-    float tempVec[4] __attribute__((aligned(16)));
+    float target_pos[4] __attribute__((aligned(16)));
+    float temp_vec[4] __attribute__((aligned(16)));
     float matrix[16] __attribute__((aligned(16)));
     unsigned short *entry;
     u8 *record;
-    u8 *bestRecord;
-    float bestDist;
+    u8 *best_record;
+    float best_dist;
     float dist;
-    int effectId;
-    int bestIndex;
+    int effect_id;
+    int best_index;
     int window;
     int row;
 
     for (window = 0; window < 2; window++) {
-        effectId = -1;
+        effect_id = -1;
         if (window == 0) {
             if (D_L02_001BE200.timer >= 0x3B6) {
                 if (D_L02_001BE200.timer < 0x547) {
-                    *(TI128 *)tempVec = 0;
-                    tempVec[0] = 495.0f;
-                    tempVec[1] = 587.0f;
-                    tempVec[2] = 513.0f;
-                    qcopy(targetPos, tempVec);
-                    effectId = 0x3F;
+                    *(TI128 *)temp_vec = 0;
+                    temp_vec[0] = 495.0f;
+                    temp_vec[1] = 587.0f;
+                    temp_vec[2] = 513.0f;
+                    qcopy(target_pos, temp_vec);
+                    effect_id = 0x3F;
                 }
             }
         }
         if (window == 1) {
             if (D_L02_001BE200.timer >= 0x4E2) {
                 if (D_L02_001BE200.timer < 0x5DD) {
-                    *(TI128 *)tempVec = 0;
-                    tempVec[0] = 515.0f;
-                    tempVec[1] = 596.0f;
-                    tempVec[2] = 512.0f;
-                    qcopy(targetPos, tempVec);
-                    effectId = 0x40;
+                    *(TI128 *)temp_vec = 0;
+                    temp_vec[0] = 515.0f;
+                    temp_vec[1] = 596.0f;
+                    temp_vec[2] = 512.0f;
+                    qcopy(target_pos, temp_vec);
+                    effect_id = 0x40;
                 }
             }
         }
-        if (effectId != -1) {
-            bestIndex = -1;
-            bestDist = 99999.0f;
+        if (effect_id != -1) {
+            best_index = -1;
+            best_dist = 99999.0f;
             for (entry = D_L02_001A9014[*(int *)vars];
                  entry != 0 && ((short)entry[-1] >= 0 || entry == D_L02_001A9014[*(int *)vars]) &&
                  (record = D_L02_001B3C1C + ((*entry & 0x7FFF) << 6)) != 0;
                  entry++) {
-                dist = vec_distance_xy(record + 0x30, targetPos);
-                if (dist < bestDist) {
-                    bestDist = dist;
-                    bestIndex = *entry & 0x7FFF;
+                dist = vec_distance_xy(record + 0x30, target_pos);
+                if (dist < best_dist) {
+                    best_dist = dist;
+                    best_index = *entry & 0x7FFF;
                 }
             }
-            if (bestIndex != -1) {
-                bestRecord = D_L02_001B3C1C + (bestIndex << 6);
+            if (best_index != -1) {
+                best_record = D_L02_001B3C1C + (best_index << 6);
                 for (row = 0; row < 4; row++) {
-                    matrix_mul_vec3(matrix + row * 4, D_L02_001B2640 + row * 4, bestRecord);
-                    FastVecAdd(matrix + row * 4, matrix + row * 4, bestRecord + 0x30);
+                    matrix_mul_vec3(matrix + row * 4, D_L02_001B2640 + row * 4, best_record);
+                    FastVecAdd(matrix + row * 4, matrix + row * 4, best_record + 0x30);
                 }
-                DrawQuadWithRotatedUVs(matrix, effectId, 2, 0xFF808080, 0);
+                DrawQuadWithRotatedUVs(matrix, effect_id, 2, 0xFF808080, 0);
             }
         }
     }

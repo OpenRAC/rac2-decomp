@@ -19,26 +19,26 @@ extern void moby_mark_spawned(void *);
 
 /* Destroys every Megacorp Trooper Legs object in the given group. */
 void trooper_legs_destroy_group(s32 group) {
-    char *idList = D_L20_001FBB20[group];
-    s32 groupByte = group & 0xFF;
+    char *id_list = D_L20_001FBB20[group];
+    s32 group_byte = group & 0xFF;
     char *member;
 
-    if (groupByte == 0xFF) {
+    if (group_byte == 0xFF) {
         goto end;
     }
     if (D_L20_001B2FB8 < group) {
         goto end;
     }
-    if (idList == 0) {
+    if (id_list == 0) {
         goto end;
     }
     for (;;) {
-        member = D_L20_001B2F9C + ((*(u16 *)idList & 0x7FFF) << 8);
+        member = D_L20_001B2F9C + ((*(u16 *)id_list & 0x7FFF) << 8);
 
         if (member == 0) {
             goto end;
         }
-        if (*(s16 *)(member + 0xAA) == 0xD0F /* Megacorp Trooper Legs */) {
+        if (*(s16 *)(member + 0xAA) == MOBY_CLASS_MEGACORP_TROOPER_LEGS) {
             if (*(u8 *)(member + 0x20) != 0xFE) {
                 if (*(u8 *)(member + 0x20) != 0xFD) {
                     *(int *)(*(char **)(member + 0x68) + 0x20) = 0;
@@ -48,20 +48,20 @@ void trooper_legs_destroy_group(s32 group) {
                 }
             }
         }
-        idList += 2;
+        id_list += 2;
         if ((group & 0xFF) == 0xFF) {
             goto end;
         }
         if (D_L20_001B2FB8 < group) {
             goto end;
         }
-        if (idList == 0) {
+        if (id_list == 0) {
             return;
         }
-        if (*(s16 *)(idList - 2) >= 0) {
+        if (*(s16 *)(id_list - 2) >= 0) {
             continue;
         }
-        if (idList == D_L20_001FBB20[group]) {
+        if (id_list == D_L20_001FBB20[group]) {
             continue;
         }
         break;

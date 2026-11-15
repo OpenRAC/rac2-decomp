@@ -32,7 +32,7 @@ extern void ref_L22_003FBF00_04(void *a, void *b, f32 c);
 extern void ref_L22_003FBF00_05(void *a, void *b, void *c);
 
 /* Works out the world position of one of the object's eight particle anchors, scaled while the object is in its first state. */
-void part_get_anchor_position(void *obj, void *outPos, s32 index) {
+void part_get_anchor_position(void *obj, void *out_pos, s32 index) {
     s32 slot ;
     void *vars ;
     s32 offset[4];
@@ -52,5 +52,5 @@ void part_get_anchor_position(void *obj, void *outPos, s32 index) {
     }
     ref_L22_003FBF00_04(scaled, (s8 *)obj + 0xE0, ref_L22_003FBF00_01);
     ref_L22_003FBF00_05(mid, (s8 *)obj + 0x10, scaled);
-    ref_L22_003FBF00_05(outPos, mid, offset);
+    ref_L22_003FBF00_05(out_pos, mid, offset);
 }

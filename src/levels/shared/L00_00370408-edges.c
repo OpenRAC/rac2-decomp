@@ -126,7 +126,7 @@ void cutscene_update_frame(void) {
                 id = *(short *)(object + 0xAA);
                 if (id == 0 || id == 0xF6B /* moby class 3947 */) level_setup_glow_effects(object, 0);
                 id = *(short *)(object + 0xAA);
-                if (id == 10 || id == 0x1159 /* moby class 4441 */ || id == 0x57 /* Clank */ || id == 0xD6B /* moby class 3435 */) update_moby_pulsing_glow_effects(object);
+                if (id == 10 || id == 0x1159 /* moby class 4441 */ || id == MOBY_CLASS_CLANK || id == 0xD6B /* moby class 3435 */) update_moby_pulsing_glow_effects(object);
             }
         }
     }

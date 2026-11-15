@@ -32,16 +32,16 @@ void weapon_menu_sync_slots(void) {
     s32 i;
     s32 *slot;
     s32 offset;
-    s32 newValue;
-    s32 oldValue;
+    s32 new_value;
+    s32 old_value;
 
     offset = 0;
     slot = g_weapon_menu_slots;
     for (i = 0; i < 8; i++) {
-        newValue = *(s32 *)((s8 *)(offset + *g_radial_menu_pages) + 0x18);
-        oldValue = *slot;
-        if (oldValue != newValue) {
-            *slot = newValue;
+        new_value = *(s32 *)((s8 *)(offset + *g_radial_menu_pages) + 0x18);
+        old_value = *slot;
+        if (old_value != new_value) {
+            *slot = new_value;
         }
         offset += 0x1C;
         slot += 1;

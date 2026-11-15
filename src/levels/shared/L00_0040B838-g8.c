@@ -11,7 +11,7 @@ typedef struct {
     s32 f18;
     s32 f1C;
     u8 pad20[0x10];
-    f32 anchorPos[4];
+    f32 anchor_pos[4];
 } Vars40B838;
 
 typedef struct {
@@ -46,14 +46,14 @@ extern void func_002A0F48(void *);
 /* Creates a Clank Zapper at a position, attached to a parent object, with random spin. */
 Moby40B838 *clank_zapper_spawn(f32 *pos, int param, f32 *parent, int extra)
 {
-    f32 parentPos[4] __attribute__((aligned(16)));
+    f32 parent_pos[4] __attribute__((aligned(16)));
     f32 offset[4] __attribute__((aligned(16)));
     Moby40B838 *moby;
     Vars40B838 *vars;
     Link40B838 *link;
     int i;
 
-    moby = CreateMoby(0xED8 /* Clank Zapper */);
+    moby = CreateMoby(MOBY_CLASS_CLANK_ZAPPER);
     if (moby != 0) {
         vars = moby->vars;
         moby->alpha = 0xFF;
@@ -62,15 +62,15 @@ Moby40B838 *clank_zapper_spawn(f32 *pos, int param, f32 *parent, int extra)
         moby->f31 = 1;
         moby->fB8 = param;
         moby->state = 0;
-        qcopy(vars->anchorPos, parent + 4);
-        vars->anchorPos[2] += moby_get_private_value_0(parent)->f10;
+        qcopy(vars->anchor_pos, parent + 4);
+        vars->anchor_pos[2] += moby_get_private_value_0(parent)->f10;
         if (parent != 0) {
-            qcopy(parentPos, parent + 4);
+            qcopy(parent_pos, parent + 4);
             link = moby_get_private_value_0(parent);
             if (link != 0) {
                 cam_compute_view_direction(parent + 4, offset, 1);
                 FastVecScale(offset, offset, link->f10);
-                FastVecAdd(parentPos, parentPos, offset);
+                FastVecAdd(parent_pos, parent_pos, offset);
             }
         }
         qcopy(moby->pos, pos);

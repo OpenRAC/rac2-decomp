@@ -147,12 +147,12 @@ int feltzin_target_damage(char *obj, int flag)
 {
     char *attached;
     float *health;
-    char *hitSource;
+    char *hit_source;
     char *vars;
-    float burstPos[3];
+    float burst_pos[3];
     int ret = 0;
 
-    hitSource = part_find_owned_effect_slot(obj, (char *)0x230000, 0);
+    hit_source = part_find_owned_effect_slot(obj, (char *)0x230000, 0);
     *(unsigned char *)(obj + 0xA8) = 0xFF;
     vars = *(char **)(obj + 0x68);
     attached = *(char **)(vars + 0x10);
@@ -160,12 +160,12 @@ int feltzin_target_damage(char *obj, int flag)
     if (attached != 0) {
         gfx_update_color_fade(obj, attached);
     }
-    if (hitSource != 0) {
+    if (hit_source != 0) {
         if (attached != 0) {
             *(unsigned char *)(attached + 7) = 0xFF;
             gfx_start_color_fade(obj, attached);
         }
-        *health = *health - *(float *)(hitSource + 0x2C);
+        *health = *health - *(float *)(hit_source + 0x2C);
         if (*(short *)(obj + 0xAA) != 0xB73) {
             snd_play_from_class_bank(0xD, 0, obj, 0xFBF);
             if (math_random_int_below(3) == 0) {
@@ -182,14 +182,14 @@ int feltzin_target_damage(char *obj, int flag)
                 func_L05_00398F18(obj + 0x10, 0, 0x19, 0, 0, 0x1E, 0, 1, 0.8f);
             } else if (*(short *)(obj + 0xAA) == 0x111A) {
                 func_L05_00398F18(obj + 0x10, 0, 0xF, 0, 0, 0x1E, 0, 0, 2.0f);
-                burstPos[0] = *(float *)(obj + 0x10) + math_random_float_range(1.5f, -1.5f);
-                burstPos[1] = *(float *)(obj + 0x14) + math_random_float_range(1.5f, -1.5f);
-                burstPos[2] = *(float *)(obj + 0x18) + math_random_float_range(1.5f, -1.5f);
-                func_L05_00398F18(burstPos, 0, 0xF, 0, 0, 0x1E, 0, 0, 2.0f);
-                burstPos[0] = *(float *)(obj + 0x10) + math_random_float_range(1.5f, -1.5f);
-                burstPos[1] = *(float *)(obj + 0x14) + math_random_float_range(1.5f, -1.5f);
-                burstPos[2] = *(float *)(obj + 0x18) + math_random_float_range(1.5f, -1.5f);
-                func_L05_00398F18(burstPos, 0, 0xF, 0, 0, 0x1E, 0, 0, 2.0f);
+                burst_pos[0] = *(float *)(obj + 0x10) + math_random_float_range(1.5f, -1.5f);
+                burst_pos[1] = *(float *)(obj + 0x14) + math_random_float_range(1.5f, -1.5f);
+                burst_pos[2] = *(float *)(obj + 0x18) + math_random_float_range(1.5f, -1.5f);
+                func_L05_00398F18(burst_pos, 0, 0xF, 0, 0, 0x1E, 0, 0, 2.0f);
+                burst_pos[0] = *(float *)(obj + 0x10) + math_random_float_range(1.5f, -1.5f);
+                burst_pos[1] = *(float *)(obj + 0x14) + math_random_float_range(1.5f, -1.5f);
+                burst_pos[2] = *(float *)(obj + 0x18) + math_random_float_range(1.5f, -1.5f);
+                func_L05_00398F18(burst_pos, 0, 0xF, 0, 0, 0x1E, 0, 0, 2.0f);
             } else {
                 part_spawn_shockwave_burst(obj + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.75f);
             }

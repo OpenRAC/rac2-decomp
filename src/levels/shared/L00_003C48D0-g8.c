@@ -49,7 +49,7 @@ void electric_ribbons_update(unsigned char *object) {
         if (D_L00_001B2990[k]) {
             alphaValue = FloatToInt(IntToFloat(D_L00_001B29A0[k]) * D_L00_001B29D4[0]);
             colour = D_L00_001AFF20;
-            if (*(short *)(object + 0xAA) == 0x1192 /* Tesla Barrier */) colour = D_L00_001AFF24;
+            if (*(short *)(object + 0xAA) == MOBY_CLASS_TESLA_BARRIER) colour = D_L00_001AFF24;
             DrawTwoLayerPolylineRibbon(D_L00_00240080[k], 23, 14, 10,
                              ((unsigned int)alphaValue << 24) | 0x7F7F7F,
                              ((unsigned int)alphaValue << 24) | colour, 0.0f, 4.0f, 0.0f);

@@ -13,21 +13,21 @@ extern char *D_L20_001B2F9C;
 
 /* Counts how many objects of a group are still alive (not in state 6). */
 s32 group_count_live_members(s32 group) {
-    char *idList = D_L20_001FBB20[group];
-    s32 groupByte = group & 0xFF;
+    char *id_list = D_L20_001FBB20[group];
+    s32 group_byte = group & 0xFF;
     s32 count = 0;
 
-    if (groupByte == 0xFF) {
+    if (group_byte == 0xFF) {
         goto end;
     }
     if (D_L20_001B2FB8 < group) {
         goto end;
     }
-    if (idList == 0) {
+    if (id_list == 0) {
         goto end;
     }
     for (;;) {
-        char *member = D_L20_001B2F9C + ((*(u16 *)idList & 0x7FFF) << 8);
+        char *member = D_L20_001B2F9C + ((*(u16 *)id_list & 0x7FFF) << 8);
 
         if (member == 0) {
             goto end;
@@ -35,20 +35,20 @@ s32 group_count_live_members(s32 group) {
         if (*(u8 *)(member + 0x20) != 6) {
             count++;
         }
-        idList += 2;
+        id_list += 2;
         if ((group & 0xFF) == 0xFF) {
             goto end;
         }
         if (D_L20_001B2FB8 < group) {
             goto end;
         }
-        if (idList == 0) {
+        if (id_list == 0) {
             goto end;
         }
-        if (*(s16 *)(idList - 2) >= 0) {
+        if (*(s16 *)(id_list - 2) >= 0) {
             continue;
         }
-        if (idList == D_L20_001FBB20[group]) {
+        if (id_list == D_L20_001FBB20[group]) {
             continue;
         }
         break;

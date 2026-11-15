@@ -24,7 +24,7 @@ void DrawFiveLayerScrollingRibbons(char *moby)
     float origin[4], step[4], center[4], width[4], offset[4];
     float scratch;
     char *vars = *(char **)(moby + 0x68);
-    float phase, scrollV, t, doubleScale, scale;
+    float phase, scroll_v, t, doubleScale, scale;
     float stepScale = 2.0f;
     float increment;
     quad.texture = GetEffectTextureDescriptor(*(int *)(vars + 0x78) + 63);
@@ -45,19 +45,19 @@ void DrawFiveLayerScrollingRibbons(char *moby)
     {
         int i;
         for (i = 0; i < 5; i++) {
-            scrollV = 0.0f;
+            scroll_v = 0.0f;
             switch (i) {
             case 0:
                 origin[2] += 0.02f;
                 qcopy(center, origin);
                 quad.color[2] = quad.color[3] = gfx_pack_color_floats(0.25f, 1.0f, 0.5f, 0.0f);
                 phase = SplitFloatFraction(&scratch, *(float *)(vars + 0x74));
-                scrollV = phase;
+                scroll_v = phase;
                 break;
             case 1:
                 qcopy(center, origin);
                 quad.color[2] = quad.color[3] = gfx_pack_color_floats(0.25f, 0.5f, 1.0f, 0.0f);
-                scrollV = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) + 0.5f);
+                scroll_v = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) + 0.5f);
                 break;
             case 2:
                 origin[2] += 0.02f;
@@ -67,10 +67,10 @@ void DrawFiveLayerScrollingRibbons(char *moby)
                 stepScale *= 0.4f;
                 increment *= 0.4f;
                 vec_scale_to_length(step, moby + 0xC0, stepScale * (float)*(int *)(vars + 0x7C));
-                scrollV = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) * 3.0f);
+                scroll_v = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) * 3.0f);
                 break;
             case 3:
-                scrollV = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) * 3.5f);
+                scroll_v = SplitFloatFraction(&scratch, *(float *)(vars + 0x74) * 3.5f);
                 quad.color[2] = quad.color[3] = gfx_pack_color_floats(1.0f, 1.0f, 1.0f, 0.0f);
                 FastVecAdd(center, origin, offset);
                 break;
@@ -84,8 +84,8 @@ void DrawFiveLayerScrollingRibbons(char *moby)
             FastVecAdd(center, center, step);
             quad.uv[2][0] = quad.uv[0][0] = 0.0f;
             quad.uv[3][0] = quad.uv[1][0] = 1.0f;
-            quad.uv[1][1] = quad.uv[0][1] = scrollV;
-            quad.uv[3][1] = quad.uv[2][1] = scrollV + 1.0f;
+            quad.uv[1][1] = quad.uv[0][1] = scroll_v;
+            quad.uv[3][1] = quad.uv[2][1] = scroll_v + 1.0f;
             while (t < 1.0f) {
                 phase = math_ease_out_quad(math_fast_sin_or_cos_b(t * 3.1415927f));
                 quad.color[0] = quad.color[1] = quad.color[2];

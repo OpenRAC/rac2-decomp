@@ -35,7 +35,7 @@ void trooper_legs_update_frame(u8 *object)
     }
     if (object[0xA8] == 255) {
         u8 *child = P(state,0x2F8);
-        if (child && S(child,0xAA) == 0xD0E /* Megacorp Trooper Torso */ && child[0x20] != 0xFE && child[0x20] != 0xFD) {
+        if (child && S(child,0xAA) == MOBY_CLASS_MEGACORP_TROOPER_TORSO && child[0x20] != 0xFE && child[0x20] != 0xFD) {
             if (child[0xA8] != 255) {
                 int index = child[0xA8];
                 TargetSlot *slots = D_L09_001C40C0;
@@ -114,7 +114,7 @@ void trooper_legs_update_frame(u8 *object)
     if (state[0x2E] == 2) remove = 1;
     else {
         u8 *child = P(state,0x2F8);
-        if (child && S(child,0xAA) == 0xD0E /* Megacorp Trooper Torso */ && child[0x20] != 0xFE && child[0x20] != 0xFD)
+        if (child && S(child,0xAA) == MOBY_CLASS_MEGACORP_TROOPER_TORSO && child[0x20] != 0xFE && child[0x20] != 0xFD)
             remove = P(child,0x68)[0x2E] == 2;
     }
     if (remove) {

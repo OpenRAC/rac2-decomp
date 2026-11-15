@@ -251,9 +251,9 @@ void UpdateWaveLineEffect(char *object)
     BoltHit scratch;
     BoltState *state = *(BoltState **)(object + 0x68);
     float distance = fast_vec_dist(object + 0x10, &state->pos);
-    float burst, ratio, spacing, step, burstSpeed, yaw, pitch;
+    float burst, ratio, spacing, step, burst_speed, yaw, pitch;
     float point10, amp10, point19, phase19, wave19, amp19, rate19;
-    int i, sign, lineIdx, waveIdx;
+    int i, sign, line_idx, wave_idx;
 
     if (state->timer != 0) {
         if (FastDecTimer(&state->timer) && state->target != 0) {
@@ -281,33 +281,33 @@ void UpdateWaveLineEffect(char *object)
     state->phase3 = FastAddRotations(state->phase3, D_L00_001B13B4);
     step = (360 / IntToFloat(10)) * step;
 
-    for (lineIdx = 0; lineIdx < 10; lineIdx++) {
-        point10 = IntToFloat(lineIdx);
+    for (line_idx = 0; line_idx < 10; line_idx++) {
+        point10 = IntToFloat(line_idx);
         IntToFloat(10);
         amp10 = D_L00_001B1398;
-        if (lineIdx == 0 || lineIdx == 9) {
+        if (line_idx == 0 || line_idx == 9) {
             amp10 = 0;
         } else {
             amp10 *= math_fast_sin_or_cos_b(math_wrap_angle_to_pi(state->phase1 + point10 * step));
             amp10 += math_random_signed_float_range(0, D_L00_001B1394);
         }
-        state->line[lineIdx].f[2] = amp10;
-        state->line[lineIdx].f[1] = 0.0f;
-        state->line[lineIdx].f[0] = spacing * point10;
-        state->line[lineIdx].f[3] = 1;
+        state->line[line_idx].f[2] = amp10;
+        state->line[line_idx].f[1] = 0.0f;
+        state->line[line_idx].f[0] = spacing * point10;
+        state->line[line_idx].f[3] = 1;
     }
 
-    for (waveIdx = 0; waveIdx < 19; waveIdx++) {
-        point19 = IntToFloat(waveIdx);
+    for (wave_idx = 0; wave_idx < 19; wave_idx++) {
+        point19 = IntToFloat(wave_idx);
         rate19 = point19 * D_L00_001B13AC;
-        state->wave[waveIdx].f[2] = 0.0f;
+        state->wave[wave_idx].f[2] = 0.0f;
         phase19 = math_wrap_angle_to_pi(state->phase2 + rate19);
         wave19 = D_L00_001B13BC * math_fast_sin_or_cos_b(math_wrap_angle_to_pi(state->phase3 + point19 * D_L00_001B13B8));
         amp19 = wave19 * math_fast_sin_or_cos_b(phase19) + math_random_signed_float_range(D_L00_001B1390, D_L00_001B1394);
-        state->wave[waveIdx].f[2] += amp19;
-        state->wave[waveIdx].f[1] = D_L00_001B13C0 * math_fast_sin_or_cos_a(phase19);
-        state->wave[waveIdx].f[0] = spacing * point19;
-        state->wave[waveIdx].f[3] = 1;
+        state->wave[wave_idx].f[2] += amp19;
+        state->wave[wave_idx].f[1] = D_L00_001B13C0 * math_fast_sin_or_cos_a(phase19);
+        state->wave[wave_idx].f[0] = spacing * point19;
+        state->wave[wave_idx].f[3] = 1;
     }
 
     ref_L00_00413358_01(ref_L00_00413358_00, object);
@@ -317,10 +317,10 @@ void UpdateWaveLineEffect(char *object)
             float third = 0.0f;
             float frame = 0.016666668f;
             float size = 0.0f;
-            burstSpeed = math_random_float_range(1, 6) * frame;
+            burst_speed = math_random_float_range(1, 6) * frame;
             yaw = math_random_angle();
             pitch = math_random_angle();
-            vec_build_spherical_offset(&scratch, burstSpeed, yaw, pitch);
+            vec_build_spherical_offset(&scratch, burst_speed, yaw, pitch);
             sign = math_random_int_range(1, 4);
             if (math_random_int_below(2)) {
                 sign = -sign;

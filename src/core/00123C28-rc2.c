@@ -38,29 +38,29 @@ typedef struct {
 
 /* Reads the shared header of a frame record and gives back where its instructions start. */
 s8 *eh_extract_cie_info(s32 fde, s32 info) {
-    s32 ulebValue[4];
-    s32 ciePtr;
-    s32 augEnd;
-    s32 readPtr;
+    s32 uleb_value[4];
+    s32 cie_ptr;
+    s32 aug_end;
+    s32 read_ptr;
 
-    ciePtr = (fde - *(s32 *)(fde + 4)) + 0xD;
-    *(s32 *)info = ciePtr;
-    if (func_00115544(ciePtr, (s32) D_0013B060) != 0 && func_00115544(*(s32 *)info, (s32) D_0013B068) != 0 && *(s8 *)*(s32 *)info != 0x7A) {
+    cie_ptr = (fde - *(s32 *)(fde + 4)) + 0xD;
+    *(s32 *)info = cie_ptr;
+    if (func_00115544(cie_ptr, (s32) D_0013B060) != 0 && func_00115544(*(s32 *)info, (s32) D_0013B068) != 0 && *(s8 *)*(s32 *)info != 0x7A) {
         return 0;
     }
-    augEnd = *(s32 *)info + func_001157AC(*(s32 *)info);
-    readPtr = augEnd + 1;
+    aug_end = *(s32 *)info + func_001157AC(*(s32 *)info);
+    read_ptr = aug_end + 1;
     if (func_00115544(*(s32 *)info, (s32) D_0013B068) == 0) {
-        *(s32 *)(info + 4) = ((UA32 *)readPtr)->v;
-        readPtr = augEnd + 5;
+        *(s32 *)(info + 4) = ((UA32 *)read_ptr)->v;
+        read_ptr = aug_end + 5;
     } else {
         *(s32 *)(info + 4) = 0;
     }
-    readPtr = eh_read_sleb128(eh_read_uleb128(readPtr, info + 8), info + 0xC);
-    *(s32 *)(info + 0x10) = *(u8 *)readPtr;
-    readPtr = readPtr + 1;
+    read_ptr = eh_read_sleb128(eh_read_uleb128(read_ptr, info + 8), info + 0xC);
+    *(s32 *)(info + 0x10) = *(u8 *)read_ptr;
+    read_ptr = read_ptr + 1;
     if (*(s8 *)*(s32 *)info == 0x7A) {
-        readPtr = eh_read_uleb128(readPtr, (s32) ulebValue) + ulebValue[0];
+        read_ptr = eh_read_uleb128(read_ptr, (s32) uleb_value) + uleb_value[0];
     }
-    return (s8 *) readPtr;
+    return (s8 *) read_ptr;
 }

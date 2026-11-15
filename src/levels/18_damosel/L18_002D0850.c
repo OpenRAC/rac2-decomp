@@ -9,7 +9,7 @@ extern float math_spring_float_to_goal(float *, float *, float, float, float, fl
 /* Sets the hero's movement speed targets for the current state and eases the current speeds toward them. */
 void hero_l18_update_speed_targets(void) {
     int mode;
-    int animState;
+    int anim_state;
     float dist;
 
     if (((Hero *)g_hero_state)->b[0x22B4] == 0 || ((Hero *)g_hero_state)->b[0x22B4] == 4) {
@@ -26,10 +26,10 @@ void hero_l18_update_speed_targets(void) {
             }
         }
     } else {
-        animState = ((Hero *)g_hero_state)->i[0x2294 / 4];
-        if (animState == 6) {
+        anim_state = ((Hero *)g_hero_state)->i[0x2294 / 4];
+        if (anim_state == 6) {
             ((Hero *)g_hero_state)->f[0x25C / 4] = 0.5f;
-        } else if (animState == 4) {
+        } else if (anim_state == 4) {
             ((Hero *)g_hero_state)->f[0x258 / 4] = 0.35000002384185791f;
         } else if ((u32)(mode - 0x11) < 2) {
             ((Hero *)g_hero_state)->i[0x258 / 4] = 0;

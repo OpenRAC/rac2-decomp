@@ -40,7 +40,7 @@ extern float D_001B1644 MACRO_ADDR, D_001B1648 MACRO_ADDR, D_001B164C MACRO_ADDR
 extern void mem_copy_aligned(void *, void *, int);
 
 /* Takes a snapshot of the map progress, two positions and several game values so they can be restored later. */
-void level_capture_checkpoint_state(void *vecA, void *vecB) {
+void level_capture_checkpoint_state(void *vec_a, void *vec_b) {
     unsigned char *dst;
     unsigned char *src;
     int i;
@@ -73,8 +73,8 @@ void level_capture_checkpoint_state(void *vecA, void *vecB) {
         }
     }
     D_002119B0.active = 1;
-    qcopy_nc(D_002119B0.a, vecA);
-    qcopy_nc(D_002119B0.b, vecB);
+    qcopy_nc(D_002119B0.a, vec_a);
+    qcopy_nc(D_002119B0.b, vec_b);
     {
         ObjectDF3F8 *obj = g_hero_state.object;
         D_002119B0.obj_a = obj->a;

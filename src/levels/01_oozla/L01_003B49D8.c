@@ -20,16 +20,16 @@ void swamp_beast_move(u8 *object, void *input) {
     u8 *vars = *(u8 **)(object + 0x68);
     void *list[16];
     int count = 0;
-    f32 savedSpeedA, savedSpeedB;
+    f32 saved_speed_a, saved_speed_b;
 
     if (vars[0x35D] != 0) {
         swamp_beast_collect_nearby(object, list, &count);
     }
-    savedSpeedA = *(f32 *)(vars + 0x130);
-    savedSpeedB = *(f32 *)(vars + 0x138);
+    saved_speed_a = *(f32 *)(vars + 0x130);
+    saved_speed_b = *(f32 *)(vars + 0x138);
     if (count > 0) {
-        *(f32 *)(vars + 0x138) = savedSpeedB + savedSpeedB;
-        *(f32 *)(vars + 0x130) = savedSpeedA + savedSpeedA;
+        *(f32 *)(vars + 0x138) = saved_speed_b + saved_speed_b;
+        *(f32 *)(vars + 0x130) = saved_speed_a + saved_speed_a;
     }
     enemy_update_wander_heading(object, input, vars + 0x110);
     moby_follow_attached_target(object);
@@ -38,8 +38,8 @@ void swamp_beast_move(u8 *object, void *input) {
 
         *(f32 *)(vars + 0x1B8) = (scaled < 0.083333336f) ? scaled : 0.083333336f;
     }
-    *(f32 *)(vars + 0x130) = savedSpeedA;
-    *(f32 *)(vars + 0x138) = savedSpeedB;
+    *(f32 *)(vars + 0x130) = saved_speed_a;
+    *(f32 *)(vars + 0x138) = saved_speed_b;
     if (vars[0x35D] != 0) {
         swamp_beast_clear_collected_marks(list, &count);
     }
@@ -51,17 +51,17 @@ int swamp_beast_move_with_speed(u8 *object, void *input, f32 *speed) {
     u8 *vars = *(u8 **)(object + 0x68);
     void *list[16];
     int count = 0;
-    f32 savedSpeedA, savedSpeedB;
+    f32 saved_speed_a, saved_speed_b;
     int result;
 
     if (vars[0x35D] != 0) {
         swamp_beast_collect_nearby(object, list, &count);
     }
-    savedSpeedA = *(f32 *)(vars + 0x130);
-    savedSpeedB = *(f32 *)(vars + 0x138);
+    saved_speed_a = *(f32 *)(vars + 0x130);
+    saved_speed_b = *(f32 *)(vars + 0x138);
     if (count > 0) {
-        *(f32 *)(vars + 0x138) = savedSpeedB + savedSpeedB;
-        *(f32 *)(vars + 0x130) = savedSpeedA + savedSpeedA;
+        *(f32 *)(vars + 0x138) = saved_speed_b + saved_speed_b;
+        *(f32 *)(vars + 0x130) = saved_speed_a + saved_speed_a;
     }
     result = moby_turn_toward_target_and_step(object, input, *speed);
     moby_follow_attached_target(object);
@@ -70,8 +70,8 @@ int swamp_beast_move_with_speed(u8 *object, void *input, f32 *speed) {
 
         *(f32 *)(vars + 0x1B8) = (scaled < 0.083333336f) ? scaled : 0.083333336f;
     }
-    *(f32 *)(vars + 0x130) = savedSpeedA;
-    *(f32 *)(vars + 0x138) = savedSpeedB;
+    *(f32 *)(vars + 0x130) = saved_speed_a;
+    *(f32 *)(vars + 0x138) = saved_speed_b;
     if (vars[0x35D] != 0) {
         swamp_beast_clear_collected_marks(list, &count);
     }

@@ -95,32 +95,32 @@ static __inline__ int label_y(void *handle, float value, float scale, float half
 }
 
 /* Updates the mission object: sets up the level, runs the timer and moves on when the mission is done. */
-void mission_timer_update(char *missionMoby)
+void mission_timer_update(char *mission_moby)
 {
-    char *vars = *(char **)(missionMoby+0x68);
-    float targetPosA[4] __attribute__((aligned(16)));
-    float targetPosB[4] __attribute__((aligned(16)));
-    float camPos[4] __attribute__((aligned(16)));
-    float camLookAt[4] __attribute__((aligned(16)));
-    int waitCounter;
+    char *vars = *(char **)(mission_moby+0x68);
+    float target_pos_a[4] __attribute__((aligned(16)));
+    float target_pos_b[4] __attribute__((aligned(16)));
+    float cam_pos[4] __attribute__((aligned(16)));
+    float cam_look_at[4] __attribute__((aligned(16)));
+    int wait_counter;
     int active = 1;
     MissionContext *ctx;
-    switch (B(missionMoby,0x20)) {
+    switch (B(mission_moby,0x20)) {
     case 0:
         ctx = &D_L25_00221850;
         
         ctx->scale=8.0f;
         ctx->deathCallback=moby_tick_death_timer;
-        D_L25_001B0CE0=missionMoby;
+        D_L25_001B0CE0=mission_moby;
         D_L25_001B0CD0=0; D_L25_001B0CD4=0;
         D_L25_001B0CD8=0; D_L25_001B0CDC=0;
-        H(missionMoby,0x32)=0x1ff; B(missionMoby,0x30)=0xff; B(missionMoby,0x20)=1;
+        H(mission_moby,0x32)=0x1ff; B(mission_moby,0x30)=0xff; B(mission_moby,0x20)=1;
         I(vars,0x2c)=150; I(vars,0x30)=300;
         I(vars,0x38)=180; I(vars,0x34)=720; I(vars,0x24)=0;
         ctx->health=*(float **)vars;
         ctx->enabled=1;
         D_L25_001B3060=540;
-        ctx->owner=missionMoby;
+        ctx->owner=mission_moby;
         if (g_hero_moby) H(g_hero_moby,0x34)|=0x41;
     case 1:
         
@@ -130,32 +130,32 @@ void mission_timer_update(char *missionMoby)
         else D_L25_00221850.timerVisible=1;
         active = 1;
         level_select_random_object();
-        level_store_pair_with_increment(label_y(missionMoby, -224.0f, D_L25_001B2904, 0.5f, 1),2);
-        qcopy(missionMoby+0x10,(void *)((I(vars,0x20)<<8) + D_L25_001B209C + 0x10));
-        if (D_00138324&0x10) snd_play_from_class_bank(0,0,missionMoby,0xeee);
+        level_store_pair_with_increment(label_y(mission_moby, -224.0f, D_L25_001B2904, 0.5f, 1),2);
+        qcopy(mission_moby+0x10,(void *)((I(vars,0x20)<<8) + D_L25_001B209C + 0x10));
+        if (D_00138324&0x10) snd_play_from_class_bank(0,0,mission_moby,0xeee);
         if (D_L25_001A904C && !D_L25_001B0CDC) {
             level_store_value_pair(0,DrawWupashCombatHud);
             D_L25_001B0CDC=active;
         }
         /* Retail executes this counted wait before reading the mission vars:
            6, decrement, padded backward bgez, decrement in its waitCounter slot. */
-        for (waitCounter=6; waitCounter>=0; waitCounter--) {}
+        for (wait_counter=6; wait_counter>=0; wait_counter--) {}
         if (D_L25_00221850.paused || D_L25_001B1BC8<6) break;
         if (D_L25_00221850.completed<=0) {
             D_L25_00221850.timerVisible=1;
             if (!math_fast_float_d(vars+0x2c)) break;
             I(vars,0x2c)=540;
             ship_start_transition(&D_L25_001B0CC0,&D_L25_001B0CB0,240);
-            *(Quad *)targetPosA=0; *(Quad *)targetPosB=0;
-            B(missionMoby,0x20)=3;
-            targetPosA[0]=359.0f; targetPosA[1]=440.0f; targetPosA[2]=524.0f;
-            targetPosB[0]=403.0f; targetPosB[1]=456.0f; targetPosB[2]=524.0f;
+            *(Quad *)target_pos_a=0; *(Quad *)target_pos_b=0;
+            B(mission_moby,0x20)=3;
+            target_pos_a[0]=359.0f; target_pos_a[1]=440.0f; target_pos_a[2]=524.0f;
+            target_pos_b[0]=403.0f; target_pos_b[1]=456.0f; target_pos_b[2]=524.0f;
             level_offer_entries_ptr((u8 *)1);
-            level_offer_entries_float((u8 *)targetPosA,10.0f); level_offer_entries_float_alt((u8 *)targetPosB,10.0f);
-            *(Quad *)camLookAt = *(Quad *)camPos = 0;
-            camPos[0]=417.18f; camPos[1]=454.03f; camPos[2]=532.6f;
-            camLookAt[0]=420.93f; camLookAt[1]=413.79f; camLookAt[2]=534.54f;
-            ship_point_camera_at_target(camPos,camLookAt);
+            level_offer_entries_float((u8 *)target_pos_a,10.0f); level_offer_entries_float_alt((u8 *)target_pos_b,10.0f);
+            *(Quad *)cam_look_at = *(Quad *)cam_pos = 0;
+            cam_pos[0]=417.18f; cam_pos[1]=454.03f; cam_pos[2]=532.6f;
+            cam_look_at[0]=420.93f; cam_look_at[1]=413.79f; cam_look_at[2]=534.54f;
+            ship_point_camera_at_target(cam_pos,cam_look_at);
         } else {
             if (math_fast_float_d(vars+0x2c)) {
                 entry_init_all_registered(); level_store_value_pair(0,0);
@@ -176,7 +176,7 @@ void mission_timer_update(char *missionMoby)
         if (!cam_is_mode_active()) {
             D_L25_00221850.timerVisible=0;
             D_L25_00221850.completed++;
-            B(missionMoby,0x20)=active;
+            B(mission_moby,0x20)=active;
         }
         break;
     }

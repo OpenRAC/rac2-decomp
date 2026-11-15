@@ -15,7 +15,7 @@ extern void FastVecSub(void *,void *,void *),shared_counter_release(void *),moby
 extern float coll_probe_ground_height_below(void *,int,float);
 /* Sets up a new trooper: fills in its tuning values, creates its torso and two arm parts, and picks its first animation. */
 void trooper_legs_init(u8 *moby) {
-    u8 *vars=*(u8 **)(moby+0x68), *torso,*torsoVars; float transform[16]; float pos[4]; int i,j; u8 *parameters; u8 stage; float acceleration; int animation=9; float slow=0.004166666883975267f;
+    u8 *vars=*(u8 **)(moby+0x68), *torso,*torso_vars; float transform[16]; float pos[4]; int i,j; u8 *parameters; u8 stage; float acceleration; int animation=9; float slow=0.004166666883975267f;
     *(float *)(moby+0x2C)*=D_L09_001B0F08;
     vars[0x60]=14;
     *(int *)(vars+0x98)=animation;
@@ -64,15 +64,15 @@ void trooper_legs_init(u8 *moby) {
     if(*(int *)(vars+0x2BC)!=-1)path_l01_compute_segment_lengths(D_L09_001FE6C0[*(int *)(vars+0x2BC)]);
     if(*(int *)(vars+0x2B4)!=-1)path_l01_compute_segment_lengths(D_L09_001FE6C0[*(int *)(vars+0x2B4)]);
     if(*(int *)(vars+0x2B8)!=-1)path_l01_compute_segment_lengths(D_L09_001FE6C0[*(int *)(vars+0x2B8)]);
-    torso=CreateMoby(0xD0E /* Megacorp Trooper Torso */);
+    torso=CreateMoby(MOBY_CLASS_MEGACORP_TROOPER_TORSO);
     if(torso) {
         *(u8 **)(vars+0x2F8)=torso;*(u16 *)(torso+0x32)=*(u16 *)(moby+0x32);torso[0x30]=moby[0x30];
         *(u64 *)(torso+0x38)=*(u64 *)(moby+0x38);*(int *)(torso+0x78)=*(int *)(moby+0x78);torso[0x31]=1;
         *(float *)(torso+0x2C)*=D_L09_001B0F08;
         moby_transform_joint_to_world(moby,0,torso+0x10);qcopy(torso+0xF0,moby+0xF0);
-        torsoVars=*(u8 **)(torso+0x68);*(InitBlock *)(torsoVars+0x20)=*(InitBlock *)(vars+0x20);
-        *(float *)(torsoVars+0x20)=*(float *)(vars+0x20);*(u16 *)(torsoVars+0x24)=*(u16 *)(vars+0x24);torsoVars[0x28]=vars[0x28];
-        torsoVars[0x2F]=stage;*(float *)(torsoVars+0x30)=0.7f;torsoVars[0x2A]=2;torsoVars[0x4D]=1;torsoVars[0x4A]=3;torsoVars[0x2E]=1;*(u8 **)(torsoVars+0x70)=moby;
+        torso_vars=*(u8 **)(torso+0x68);*(InitBlock *)(torso_vars+0x20)=*(InitBlock *)(vars+0x20);
+        *(float *)(torso_vars+0x20)=*(float *)(vars+0x20);*(u16 *)(torso_vars+0x24)=*(u16 *)(vars+0x24);torso_vars[0x28]=vars[0x28];
+        torso_vars[0x2F]=stage;*(float *)(torso_vars+0x30)=0.7f;torso_vars[0x2A]=2;torso_vars[0x4D]=1;torso_vars[0x4A]=3;torso_vars[0x2E]=1;*(u8 **)(torso_vars+0x70)=moby;
         moby_transform_joint_point(moby,0,transform);copy_matrix3x4(torso+0xC0,transform);
         func_002A0F48(torso);mat_normalize_columns(torso+0xC0);func_002A10E8(torso);
         for(i=0;i<2;i++) {
@@ -83,14 +83,14 @@ void trooper_legs_init(u8 *moby) {
                 *(u16 *)(child+0x32)=*(u16 *)(moby+0x32);*(u8 **)(vars+0x2F0+i*4)=child;*(u16 *)(child+0x34)|=2;
             }
         }
-        parameters=torsoVars+0x50;
+        parameters=torso_vars+0x50;
         for(j=0;j<10;j++)parameters[j]=D_L09_001B10D0[j];
         switch(func_001163B0()%3) {
         case 0:parameters[4]=FloatToInt((2.0f/ *(s16 *)(vars+0x24))*255.0f);parameters[8]=FloatToInt((1.0f/ *(s16 *)(vars+0x24))*255.0f);break;
         case 1:parameters[5]=FloatToInt((2.0f/ *(s16 *)(vars+0x24))*255.0f);parameters[9]=FloatToInt((1.0f/ *(s16 *)(vars+0x24))*255.0f);break;
         case 2:parameters[7]=FloatToInt((2.0f/ *(s16 *)(vars+0x24))*255.0f);break;
         }
-        part_spawn_damage_debris(*(u8 **)(vars+0x2F8),torsoVars+0x50,torsoVars+0x20);{ u8 *partner=*(u8 **)(vars+0x2F8);*(u16 *)(partner+0x7C)&=0xFCFF; }
+        part_spawn_damage_debris(*(u8 **)(vars+0x2F8),torso_vars+0x50,torso_vars+0x20);{ u8 *partner=*(u8 **)(vars+0x2F8);*(u16 *)(partner+0x7C)&=0xFCFF; }
     }
     if(vars[0x302]&1) {
         vars[0x302]=(vars[0x302]|1)&0xFD;
@@ -98,7 +98,7 @@ void trooper_legs_init(u8 *moby) {
             u8 *partner; u8 **slots; int k;
             moby[0x31]=0;*(int *)(moby+0x98)=0;*(u16 *)(moby+0x34)=(*(u16 *)(moby+0x34)|1)&0xEFFF;
             partner=*(u8 **)(vars+0x2F8);
-            if(partner && *(s16 *)(partner+0xAA)==0xD0E /* Megacorp Trooper Torso */ && partner[0x20]!=254 && partner[0x20]!=253) {
+            if(partner && *(s16 *)(partner+0xAA)==MOBY_CLASS_MEGACORP_TROOPER_TORSO && partner[0x20]!=254 && partner[0x20]!=253) {
                 *(u16 *)(partner+0x34)|=1;(*(u8 **)(vars+0x2F8))[0x31]=0;*(int *)(*(u8 **)(vars+0x2F8)+0x98)=0;*(u16 *)(*(u8 **)(vars+0x2F8)+0x34)&=0xEFFF;
             }
             slots=(u8 **)(vars+0x2F0);

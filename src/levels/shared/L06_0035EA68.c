@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char u8;
@@ -168,7 +169,7 @@ void collectable_pickup_update(u8 *moby)
 
 /* Returns 1 if this is a Taxi moby that is in one of its flying states (2 to 6). */
 s32 taxi_is_flying(u8 *moby) {
-    if (*(s16 *)(moby + 0xAA) != 0x330 /* Taxi */)
+    if (*(s16 *)(moby + 0xAA) != MOBY_CLASS_TAXI)
         return 0;
     return (u32)(moby[0x20] - 2) < 5;
 }

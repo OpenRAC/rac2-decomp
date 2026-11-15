@@ -8,14 +8,14 @@ extern void *ref_L07_002E2090_00(void *, void *, void *, void *, void *, void *,
 
 /* Spawns an effect between two points, pushing it forward and back along the depth axis by 40
    percent of the gap between them. */
-void *part_spawn_between_points_depth_push(void *owner, float *startPos, float *endPos, void *extra, int option, void *extraData, unsigned int extraFlags) {
-    float startVelocity[4];
-    float endVelocity[4];
-    float depthSpeed;
-    qzero_nc(startVelocity);
-    qzero_nc(endVelocity);
-    depthSpeed = (endPos[2] - startPos[2]) * 0.4f;
-    startVelocity[2] = depthSpeed;
-    endVelocity[2] = -depthSpeed;
-    return ref_L07_002E2090_00(owner, startPos, startVelocity, endPos, endVelocity, extra, option, extraData, extraFlags);
+void *part_spawn_between_points_depth_push(void *owner, float *start_pos, float *end_pos, void *extra, int option, void *extra_data, unsigned int extra_flags) {
+    float start_velocity[4];
+    float end_velocity[4];
+    float depth_speed;
+    qzero_nc(start_velocity);
+    qzero_nc(end_velocity);
+    depth_speed = (end_pos[2] - start_pos[2]) * 0.4f;
+    start_velocity[2] = depth_speed;
+    end_velocity[2] = -depth_speed;
+    return ref_L07_002E2090_00(owner, start_pos, start_velocity, end_pos, end_velocity, extra, option, extra_data, extra_flags);
 }

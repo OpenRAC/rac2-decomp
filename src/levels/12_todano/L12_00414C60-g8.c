@@ -20,7 +20,7 @@ void guard_aim_hand_helper_at_target(u8 *moby)
     s32 near = 1;
     s32 side, shift;
     u8 *hand;
-    f32 handPos[4] __attribute__((aligned(16)));
+    f32 hand_pos[4] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
     if (!(vec_distance_xy(moby+0x10, *(u8 **)(vars+0x200)+0x10) < D_L12_001B1814)) near=0;
     if (*(u8 **)(vars+0x2F8) == 0) return;
@@ -32,15 +32,15 @@ void guard_aim_hand_helper_at_target(u8 *moby)
         hand = ((SlotVars *)vars)->slots[side];
         if (hand && *(s16 *)(hand+0xAA)==0xD66 /* moby class 3430 */ && hand[0x20]!=0xFE && hand[0x20]!=0xFD) {
             *(u16 *)(vars+0x2E4)=D_L12_001B1828;
-            moby_transform_joint_to_world(((SlotVars *)vars)->slots[side],0,handPos);
-            FastVecSub(delta,vars+0x1F0,handPos);
+            moby_transform_joint_to_world(((SlotVars *)vars)->slots[side],0,hand_pos);
+            FastVecSub(delta,vars+0x1F0,hand_pos);
             vec_scale_to_length(delta,delta,D_L12_001B1810 * 0.016666668f);
             if (!near && !vars[0x30D]) {
                 if (delta[2] > 0.033333335f) delta[2]=0.033333335f;
                 else if (delta[2] < -0.033333335f) delta[2]=-0.033333335f;
             }
             vec_scale_to_length(delta,delta,D_L12_001B1810 * 0.016666668f);
-            moby_spawn_aimed_effect(moby,delta,(f32)vars[0x34],handPos);
+            moby_spawn_aimed_effect(moby,delta,(f32)vars[0x34],hand_pos);
         }
     } else *(u16 *)(vars+0x2E4)=D_L12_001B1828;
 }

@@ -115,10 +115,10 @@ static inline void hud_ammo_fade_lo_34B2C8(char **pobj, f32 lo)
 void hud_ammo_bolt_init(char *hud, char *font, s32 context)
 {
     char *self = hud;
-    char nameBuf[16];
+    char name_buf[16];
     s32 i;
     s32 color;
-    f32 *zeroBlock;
+    f32 *zero_block;
 
     *(s32 *)(self + 0x157C) = 0;
     *(s32 *)(self + 0x1580) = 0;
@@ -159,12 +159,12 @@ void hud_ammo_bolt_init(char *hud, char *font, s32 context)
     hud_set_widget_value_pair(self + 0x280, 0x7567, 0);
 
     if (context != 0) {
-        zeroBlock = ui_return_second_arg(0x10, pool_alloc_cell(context));
-        *(f32 **)(self + 0x7E4) = zeroBlock;
-        zeroBlock[1] = 0.0f;
-        zeroBlock[2] = 0.0f;
-        zeroBlock[3] = 0.0f;
-        zeroBlock[0] = 0.0f;
+        zero_block = ui_return_second_arg(0x10, pool_alloc_cell(context));
+        *(f32 **)(self + 0x7E4) = zero_block;
+        zero_block[1] = 0.0f;
+        zero_block[2] = 0.0f;
+        zero_block[3] = 0.0f;
+        zero_block[0] = 0.0f;
     }
 
     object_init_derived_arrays(self + 0x2C0, D_001ADFE0, context);
@@ -189,30 +189,30 @@ void hud_ammo_bolt_init(char *hud, char *font, s32 context)
     object_set_flag_value(self + 0x5B8, 0);
 
     for (i = 0; i < 8; i++) {
-        char *textWidget;
-        char *iconWidget;
-        f32 iconAngle;
-        f32 iconX;
+        char *text_widget;
+        char *icon_widget;
+        f32 icon_angle;
+        f32 icon_x;
 
-        sprintf(nameBuf, D_001AE010, i);
-        textWidget = self + (i * 0x4C + 0x358);
-        object_init_derived_arrays(textWidget, nameBuf, context);
-        object_set_helper_result(textWidget, font + 0x8710, i + 8);
-        object_set_second_float4(textWidget, 1.0f, 1.0f, 0.0f, 0.0f);
-        object_set_first_float4(textWidget, 125.0f, 208.0f, 0.0f, 0.0f);
-        object_change_second_value(textWidget, *(f32 **)(self + 0x7E4));
+        sprintf(name_buf, D_001AE010, i);
+        text_widget = self + (i * 0x4C + 0x358);
+        object_init_derived_arrays(text_widget, name_buf, context);
+        object_set_helper_result(text_widget, font + 0x8710, i + 8);
+        object_set_second_float4(text_widget, 1.0f, 1.0f, 0.0f, 0.0f);
+        object_set_first_float4(text_widget, 125.0f, 208.0f, 0.0f, 0.0f);
+        object_change_second_value(text_widget, *(f32 **)(self + 0x7E4));
         color = 0x442D00;
-        *object_get_fourth_field(textWidget) = color;
-        sprintf(nameBuf, D_001AE020, i);
-        iconWidget = self + (i * 0x3C + 0x604);
-        object_init_derived_c(iconWidget, nameBuf, context);
-        object_set_flag_value(iconWidget, 0);
-        iconAngle = FastAddRotations((f32)i * 2.0f * 0.39269909f - 3.14159274f, 1.57079637f);
-        iconX = (s32)(math_fast_sin_or_cos_a(iconAngle) * 82.14f) + 109;
-        object_set_first_float4(iconWidget, iconX, (s32)(math_fast_sin_or_cos_b(iconAngle) * 76.442f) + 189, 0.0f, 0.0f);
-        object_set_second_float4(iconWidget, 32.0f, 32.0f, 0.0f, 0.0f);
+        *object_get_fourth_field(text_widget) = color;
+        sprintf(name_buf, D_001AE020, i);
+        icon_widget = self + (i * 0x3C + 0x604);
+        object_init_derived_c(icon_widget, name_buf, context);
+        object_set_flag_value(icon_widget, 0);
+        icon_angle = FastAddRotations((f32)i * 2.0f * 0.39269909f - 3.14159274f, 1.57079637f);
+        icon_x = (s32)(math_fast_sin_or_cos_a(icon_angle) * 82.14f) + 109;
+        object_set_first_float4(icon_widget, icon_x, (s32)(math_fast_sin_or_cos_b(icon_angle) * 76.442f) + 189, 0.0f, 0.0f);
+        object_set_second_float4(icon_widget, 32.0f, 32.0f, 0.0f, 0.0f);
         color = 0xF0F0B0;
-        *object_get_fourth_field(iconWidget) = color;
+        *object_get_fourth_field(icon_widget) = color;
     }
     {
         s32 j;

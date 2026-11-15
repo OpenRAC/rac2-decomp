@@ -18,7 +18,7 @@ extern int D_L04_001B1850 SDATA(D_L04_001B1850);
 /* Launches a burst of effects from the object: it spawns a stream, waits, then fires the main burst and removes itself. */
 void barlow_effect_emitter_update(unsigned char *object)
 {
-    BarlowEffectVector velocity, lower, upper, minOffset, maxOffset;
+    BarlowEffectVector velocity, lower, upper, min_offset, max_offset;
     char *state = *(char **)(object + 0x68);
     velocity.q = 0;
     velocity.f[0] = -21.5f;
@@ -35,17 +35,17 @@ void barlow_effect_emitter_update(unsigned char *object)
         break;
     case 2:
         part_explode_object_into_pieces(object, D_L04_001B1830, D_L04_001B1828, D_L04_001B1820, 65535, 0, D_L04_001B1850, 8, 65535, 255, 0);
-        minOffset.q = 0;
-        maxOffset.q = 0;
+        min_offset.q = 0;
+        max_offset.q = 0;
         lower.q = 0;
         upper.q = 0;
         upper.f[0] = lower.f[0] = -15.0f;
-        minOffset.f[0] = -10.0f;
-        minOffset.f[2] = minOffset.f[1] = -4.0f;
-        maxOffset.f[0] = -3.0f;
-        maxOffset.f[1] = 5.0f;
-        maxOffset.f[2] = 4.0f;
-        SpawnParticleBurst(object, &lower, &upper, &minOffset, &maxOffset, 45, 0);
+        min_offset.f[0] = -10.0f;
+        min_offset.f[2] = min_offset.f[1] = -4.0f;
+        max_offset.f[0] = -3.0f;
+        max_offset.f[1] = 5.0f;
+        max_offset.f[2] = 4.0f;
+        SpawnParticleBurst(object, &lower, &upper, &min_offset, &max_offset, 45, 0);
         vec_local_offset_to_world(object, &velocity, -21.5f, 0.0f, 0.0f);
         SpawnExplosion(object + 0x10, 0, 25, 20, 20, 20, 45, 1,
                      *(float *)(object + 0x2c) * 5.0f, 20.0f, 1, 1, 0, 0);

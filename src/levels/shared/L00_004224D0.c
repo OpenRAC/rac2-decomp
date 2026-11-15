@@ -139,19 +139,19 @@ int cam_check_noop(void)
 
 /* reads a pointer from the field at +112 of the first argument, advances it by 176, then runs three 16-byte records and two float parameters through a fixed sequence of seven calls that alternate between three helpers */
 void cam_compute_push_out(char *camera, void *result, void *point, void *direction,
-                                      void *original, float pushAmount, float blend)
+                                      void *original, float push_amount, float blend)
 {
-    V4_F0fba48d3 delta, scaled, toGoal, blended;
+    V4_F0fba48d3 delta, scaled, to_goal, blended;
     void *movement = (void *)(*(int *)(camera + 112));
 
     movement = (void *)((int)movement + 176);
 
     func_00282CF0_2(&delta, point, direction);
-    vec_scale_to_length(&scaled, &delta, pushAmount);
+    vec_scale_to_length(&scaled, &delta, push_amount);
     FastVecAdd(point, point, &scaled);
-    func_00282CF0_2(&toGoal, point, movement);
-    vec_scale_to_length(&toGoal, &toGoal, blend);
-    FastVecAdd(&blended, movement, &toGoal);
+    func_00282CF0_2(&to_goal, point, movement);
+    vec_scale_to_length(&to_goal, &to_goal, blend);
+    FastVecAdd(&blended, movement, &to_goal);
     func_00282CF0_2(result, &blended, original);
 }
 
@@ -161,15 +161,15 @@ void cam_compute_push_out(char *camera, void *result, void *point, void *directi
 int cam_is_step_behind_plane(int camera, int index)
 {
     char vec[16];
-    int movementPtr;
+    int movement_ptr;
     int result;
 
     if (index != 1) {
         result = 0;
     } else {
-        movementPtr = *(int *)(camera + 112) + 352;
+        movement_ptr = *(int *)(camera + 112) + 352;
         func_00282CF0_7(vec, D_L00_001BF220_1);
-        result = func_00282DB0_1(vec, (char *)movementPtr) < 0.0f ? 1 : 0;
+        result = func_00282DB0_1(vec, (char *)movement_ptr) < 0.0f ? 1 : 0;
     }
     return result;
 }
@@ -200,7 +200,7 @@ int cam_release_request_slot(int request)
 /* func_L00_00424978 is matched in L00_00424978.c (built with -mno-split-addresses). */
 
 /* Sets a new camera goal value and its speed, and can also set the current value straight away. */
-void follow_camera_set_distance(int alsoSetCurrent, float goal, float rate)
+void follow_camera_set_distance(int also_set_current, float goal, float rate)
 {
     char *camera = g_follow_camera_object;
 
@@ -211,14 +211,14 @@ void follow_camera_set_distance(int alsoSetCurrent, float goal, float rate)
         *(short *)(block + 60) = 1;
         *(float *)(block + 72) = rate;
         *(float *)(block + 64) = goal;
-        if (alsoSetCurrent) {
+        if (also_set_current) {
             *(float *)(block + 88) = goal;
         }
     }
 }
 
 /* Stores the two incoming floats and a flag into the block at +352 of the owner object. */
-void follow_camera_set_height(float firstValue, float secondValue)
+void follow_camera_set_height(float first_value, float second_value)
 {
     char *camera = g_follow_camera_object;
 
@@ -227,13 +227,13 @@ void follow_camera_set_height(float firstValue, float secondValue)
         char *block = state + 352;
 
         *(short *)(block + 62) = 1;
-        *(float *)(block + 76) = firstValue;
-        *(float *)(block + 84) = secondValue;
+        *(float *)(block + 76) = first_value;
+        *(float *)(block + 84) = second_value;
     }
 }
 
 /* Sets a flag and a value on the block at +96; the value is offset by a shared float when a0 is set. */
-void cam_set_aim_offset_target(int addBase, float offset, float speed)
+void cam_set_aim_offset_target(int add_base, float offset, float speed)
 {
     char *camera = g_follow_camera_object;
 
@@ -243,7 +243,7 @@ void cam_set_aim_offset_target(int addBase, float offset, float speed)
 
         *(short *)(block + 0xDA) = 1;
         *(float *)(block + 0xB8) = speed;
-        if (addBase) {
+        if (add_base) {
             *(float *)(block + 0xB4) = *(float *)(D_L00_001BB040 + 0x110) + offset;
         } else {
             *(float *)(block + 0xB4) = offset;
@@ -384,7 +384,7 @@ float cam_steer_toward_direction(char *object, char *vector, float threshold)
     float dot;
     float length;
     float angle;
-    float signedAngle = 0.0f;
+    float signed_angle = 0.0f;
     float sign;
     float factor;
     FastVecScale(temporary, up, FastVecDot(vector, up));
@@ -400,12 +400,12 @@ float cam_steer_toward_direction(char *object, char *vector, float threshold)
     sign = -1.0f;
     FastVecCross(cross, first, up);
     if (FastVecDot(cross, second) >= 0.0f) sign = 1.0f;
-    signedAngle = fast_subtract_rotations(3.14159265359f, angle);
-    if (threshold != 0.0f && math_fabs(signedAngle) > threshold) return signedAngle;
-    factor = cubic_hermite_scalar(-1.0f, 0.0f, 1.0f, 0.0f, signedAngle * 0.63661975f);
+    signed_angle = fast_subtract_rotations(3.14159265359f, angle);
+    if (threshold != 0.0f && math_fabs(signed_angle) > threshold) return signed_angle;
+    factor = cubic_hermite_scalar(-1.0f, 0.0f, 1.0f, 0.0f, signed_angle * 0.63661975f);
     if (factor > 1.0f) factor = 1.0f;
     *(float *)(output + 0x1C) = factor * sign;
-    return signedAngle;
+    return signed_angle;
 }
 
 /* Builds a vector from a1 and the +96 source block, then feeds it to the inner routine. */
@@ -453,21 +453,21 @@ void cam_follow_update_reach(char *camera)
     char *follow = state + 496;
     char *movement = state + 352;
     float offset[4];
-    float reach, maxReach, current;
+    float reach, max_reach, current;
 
     if (*(short *)(state + 16) <= 0) return;
     func_00282CF0_4(offset, state, state + 176);
     lerp_vector((float *)movement, movement, (char *)offset, D_L00_001A8900);
     reach = FastVecLength((float *)movement);
-    maxReach = *(float *)(movement + 44);
-    if (maxReach < reach) {
-        reach = maxReach;
+    max_reach = *(float *)(movement + 44);
+    if (max_reach < reach) {
+        reach = max_reach;
         func_00282F20_3((float *)movement, (float *)movement, reach);
         current = *(float *)(movement + 44);
     } else {
-        float minReach = maxReach - *(float *)(follow + 48);
-        if (reach < minReach) {
-            reach = minReach;
+        float min_reach = max_reach - *(float *)(follow + 48);
+        if (reach < min_reach) {
+            reach = min_reach;
             func_00282F20_3((float *)movement, (float *)movement, reach);
         }
         current = *(float *)(movement + 44);

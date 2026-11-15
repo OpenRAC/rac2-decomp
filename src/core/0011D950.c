@@ -88,50 +88,50 @@ extern void *r1_func_00115248(void *, const void *, u32);
 /* Handles the reply to a file request from the IOP: copies the returned data to its destination and wakes the waiting thread. */
 void iop_file_handle_reply(s32 *message) {
     FsRcvHead head;
-    FsRcvHead *headSrc;
-    FsRcvBuf *bufSrc;
+    FsRcvHead *head_src;
+    FsRcvBuf *buf_src;
     union {
         FsRcvPtr p;
         FsRcvBuf b;
     } u;
-    FsRcvRead *readReply;
+    FsRcvRead *read_reply;
     u8 *packet;
     u8 *buffers;
-    u8 *copyDest;
+    u8 *copy_dest;
     u32 *bank = r1_D_0012FD90;
-    s32 bankIndex;
+    s32 bank_index;
     s32 i;
     s64 ret;
-    u32 byteCount;
-    u32 packetAddr;
+    u32 byte_count;
+    u32 packet_addr;
 
-    bankIndex = r1_D_0012FD98[0] != 0 ? message[3] : 0;
-    *bank = bankIndex;
+    bank_index = r1_D_0012FD98[0] != 0 ? message[3] : 0;
+    *bank = bank_index;
     buffers = r1_D_00157600;
-    packetAddr = (u32)buffers;
-    packetAddr += (u32)bankIndex * 0x440;
-    packet = (u8 *)(packetAddr | 0x20000000);
-    headSrc = (FsRcvHead *)packet;
-    head.ret = headSrc->ret;
-    head.func = headSrc->func;
-    head.dest = headSrc->dest;
-    head.size = headSrc->size;
+    packet_addr = (u32)buffers;
+    packet_addr += (u32)bank_index * 0x440;
+    packet = (u8 *)(packet_addr | 0x20000000);
+    head_src = (FsRcvHead *)packet;
+    head.ret = head_src->ret;
+    head.func = head_src->func;
+    head.dest = head_src->dest;
+    head.size = head_src->size;
     if (head.ret.v >= 0) {
         r1_func_00115248((void *)head.dest.v, packet + 0x10, head.size.v);
     }
     switch (head.func.v) {
     case 2:
-        readReply = (FsRcvRead *)(packet + 0x14);
-        if (readReply->n1 > 0) {
-            copyDest = readReply->d1;
-            for (i = 0; i < readReply->n1; i++) {
-                copyDest[i] = readReply->buf1[i];
+        read_reply = (FsRcvRead *)(packet + 0x14);
+        if (read_reply->n1 > 0) {
+            copy_dest = read_reply->d1;
+            for (i = 0; i < read_reply->n1; i++) {
+                copy_dest[i] = read_reply->buf1[i];
             }
         }
-        if (readReply->n2 > 0) {
-            copyDest = readReply->d2;
-            for (i = 0; i < readReply->n2; i++) {
-                copyDest[i] = readReply->buf2[i];
+        if (read_reply->n2 > 0) {
+            copy_dest = read_reply->d2;
+            for (i = 0; i < read_reply->n2; i++) {
+                copy_dest[i] = read_reply->buf2[i];
             }
         }
         break;
@@ -146,15 +146,15 @@ void iop_file_handle_reply(s32 *message) {
     case 23:
     case 25:
     case 26:
-        bufSrc = (FsRcvBuf *)(packet + 0x14);
-        u.b.dest = bufSrc->dest;
-        u.b.size = bufSrc->size;
-        byteCount = u.b.size.v;
-        if (byteCount > 0x400) {
+        buf_src = (FsRcvBuf *)(packet + 0x14);
+        u.b.dest = buf_src->dest;
+        u.b.size = buf_src->size;
+        byte_count = u.b.size.v;
+        if (byte_count > 0x400) {
             u.b.size.v = 0x400;
-            byteCount = 0x400;
+            byte_count = 0x400;
         }
-        r1_func_00115248((void *)u.b.dest.v, packet + 0x1C, byteCount);
+        r1_func_00115248((void *)u.b.dest.v, packet + 0x1C, byte_count);
         break;
     }
     if (head.ret.v < 0) {

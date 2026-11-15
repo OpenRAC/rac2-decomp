@@ -42,15 +42,15 @@ extern void request_begin_slot(s32, s32, s32, s32, s32);
    test: retail allocates it that way (the test in $v1, the pad word kept in $v0). */
 void hrugis_finish_mission_reward(u8 *obj, s32 kind) {
     u8 *s = *(u8 **)(obj + 0x68);
-    u8 *ownerMoby = D_001B251C + *(s32 *)(s + 0x24) * 256;
-    RewardOwnerState *os = *(RewardOwnerState **)(ownerMoby + 0x68);
+    u8 *owner_moby = D_001B251C + *(s32 *)(s + 0x24) * 256;
+    RewardOwnerState *os = *(RewardOwnerState **)(owner_moby + 0x68);
     s32 id = os->effect;
-    s32 completedCount, reward, tmp, capped;
+    s32 completed_count, reward, tmp, capped;
     u8 multiplier;
 
     if (id != -1) {
         u8 *record = D_L10_00188660 + id * 0x70;
-        if (*(u8 **)(record + 0x88) == ownerMoby && record[0x74])
+        if (*(u8 **)(record + 0x88) == owner_moby && record[0x74])
             func_00373410(id);
     }
     os->effect = -1;
@@ -62,8 +62,8 @@ void hrugis_finish_mission_reward(u8 *obj, s32 kind) {
     if (D_L10_001A904C && !D_L10_001B1440) {
         FadeToBlack(30);
         level_store_value_pair(0, menu_draw_reward_panel);
-        completedCount = D_L10_001B1390_gp[kind];
-        capped = completedCount < 3 ? completedCount : 2;
+        completed_count = D_L10_001B1390_gp[kind];
+        capped = completed_count < 3 ? completed_count : 2;
         multiplier = D_001A7A0A;
         D_L10_001B1440 = 1;
         D_L10_001B355C = kind;
@@ -72,7 +72,7 @@ void hrugis_finish_mission_reward(u8 *obj, s32 kind) {
         reward = D_L10_001B1448_gp[kind][capped];
         if (multiplier)
             reward *= 10;
-        D_L10_001B1390_gp[kind] = completedCount + 1;
+        D_L10_001B1390_gp[kind] = completed_count + 1;
         g_player_bolts = g_player_bolts + reward;
         mission_store_completion_counts();
         MemcardSave(0, -1);

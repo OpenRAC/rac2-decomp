@@ -21,20 +21,20 @@ typedef struct { u8 pad[0x2290]; char *hero; } VisibilityHero;
 extern VisibilityHero g_hero_state;
 
 /* Checks that nothing solid blocks the straight route from the enemy to its target, stepping along it. */
-int IsPathClear(char *moby, TI128 *startPos, TI128 *targetPos) {
+int IsPathClear(char *moby, TI128 *start_pos, TI128 *target_pos) {
     char *vars = *(char **)(moby + 0x68);
     TI128 loc[6];
     int found;
     char *hit;
 
-    if (D_L23_001AFA70 < fast_vec_dist(startPos, targetPos))
+    if (D_L23_001AFA70 < fast_vec_dist(start_pos, target_pos))
         return 0;
-    qcopy(&loc[0], targetPos);
+    qcopy(&loc[0], target_pos);
     mothership_project_point_onto_surface(&loc[0], *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
-    FastVecSub(&loc[1], &loc[0], startPos);
+    FastVecSub(&loc[1], &loc[0], start_pos);
     vec_scale_to_length(&loc[1], &loc[1], D_L23_001AFAB0);
-    qcopy(&loc[4], startPos);
-    qcopy(&loc[2], startPos);
+    qcopy(&loc[4], start_pos);
+    qcopy(&loc[2], start_pos);
     mothership_project_point_onto_surface(&loc[2], *(float *)(vars + 0x54) + *(float *)(vars + 0x50));
     found = 0;
     do {

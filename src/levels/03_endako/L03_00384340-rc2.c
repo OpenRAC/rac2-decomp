@@ -37,56 +37,56 @@ extern s8 ref_L03_00384340_06[];
 
 /* Updates a group of linked effect objects. At start it fills in each entry from two values, then it switches between two states depending on a timed check. */
 void linked_effect_group_update(void *moby) {
-    void *mobyCopy  = moby;
-    s32 *idList  = (*(s32 **)((s8 *)(moby) + (0x68)));
-    s32 stateOrBase  = (*(u8 *)((s8 *)(moby) + (0x20)));
+    void *moby_copy  = moby;
+    s32 *id_list  = (*(s32 **)((s8 *)(moby) + (0x68)));
+    s32 state_or_base  = (*(u8 *)((s8 *)(moby) + (0x20)));
     s32 remaining ;
-    s32 noneId ;
-    s32 entryAddr ;
-    f32 valueA ;
-    f32 valueB ;
+    s32 none_id ;
+    s32 entry_addr ;
+    f32 value_a ;
+    f32 value_b ;
     f32 product ;
-    s32 entryId;
+    s32 entry_id;
 
-    switch (stateOrBase) {
+    switch (state_or_base) {
     case 0:
-        noneId = -1;
+        none_id = -1;
         remaining = 0xF;
         do {
-            entryId = *idList;
-            if (entryId != noneId) {
-                valueA = ref_L03_00384340_00(g_001B2B0C + (entryId << 7));
-                valueB = ref_L03_00384340_00(ref_L03_00384340_05 + (*idList << 7) + 0x10);
-                entryAddr = *idList;
-                product = valueA * valueB;
-                stateOrBase = ref_L03_00384340_05;
-                valueB = (valueB < valueA) ? valueA : valueB;
-                entryAddr <<= 7;
-                entryAddr += stateOrBase;
-                (*(f32 *)((s8 *)(entryAddr) + (0x7C))) = product;
-                entryAddr = *idList;
-                entryAddr <<= 7;
-                entryAddr += stateOrBase;
-                (*(f32 *)((s8 *)(entryAddr) + (0x3C))) = valueB;
-                ref_L03_00384340_01(mobyCopy, 2, -1);
+            entry_id = *id_list;
+            if (entry_id != none_id) {
+                value_a = ref_L03_00384340_00(g_001B2B0C + (entry_id << 7));
+                value_b = ref_L03_00384340_00(ref_L03_00384340_05 + (*id_list << 7) + 0x10);
+                entry_addr = *id_list;
+                product = value_a * value_b;
+                state_or_base = ref_L03_00384340_05;
+                value_b = (value_b < value_a) ? value_a : value_b;
+                entry_addr <<= 7;
+                entry_addr += state_or_base;
+                (*(f32 *)((s8 *)(entry_addr) + (0x7C))) = product;
+                entry_addr = *id_list;
+                entry_addr <<= 7;
+                entry_addr += state_or_base;
+                (*(f32 *)((s8 *)(entry_addr) + (0x3C))) = value_b;
+                ref_L03_00384340_01(moby_copy, 2, -1);
             }
             remaining -= 1;
-            idList += 1;
+            id_list += 1;
         } while (remaining >= 0);
         break;
     case 1:
 
-        ref_L03_00384340_03(mobyCopy);
-        if ((ref_L03_00384340_04 & 0xF) == (((s32)mobyCopy >> 8) & 0xF)) {
-            if (ref_L03_00384340_02(ref_L03_00384340_06, (*(s32 *)((s8 *)(idList) + (0x44)))) == 0) {
-                ref_L03_00384340_01(mobyCopy, 2, -1);
+        ref_L03_00384340_03(moby_copy);
+        if ((ref_L03_00384340_04 & 0xF) == (((s32)moby_copy >> 8) & 0xF)) {
+            if (ref_L03_00384340_02(ref_L03_00384340_06, (*(s32 *)((s8 *)(id_list) + (0x44)))) == 0) {
+                ref_L03_00384340_01(moby_copy, 2, -1);
             }
         }
         break;
     case 2:
-        if (((g_001B2548 & 0xF) == (((s32)mobyCopy >> 8) & 0xF)) &&
-            (ref_L03_00384340_02(ref_L03_00384340_06, (*(s32 *)((s8 *)(idList) + (0x44)))) != 0)) {
-            ref_L03_00384340_01(mobyCopy, 1, -1);
+        if (((g_001B2548 & 0xF) == (((s32)moby_copy >> 8) & 0xF)) &&
+            (ref_L03_00384340_02(ref_L03_00384340_06, (*(s32 *)((s8 *)(id_list) + (0x44)))) != 0)) {
+            ref_L03_00384340_01(moby_copy, 1, -1);
         }
         break;
     }

@@ -25,9 +25,9 @@ char *SpawnCB2Moby(char *owner, Quad *position)
     int i, j;
     i = 0;
     do {
-        char *slotMoby = g_synthenoid_slots[i];
-        if (slotMoby == 0 || *(short *)(slotMoby + 0xAA) != 0xCB2 /* Synthenoid */ || (unsigned char)slotMoby[0x20] == 0xFE
-            || (unsigned char)slotMoby[0x20] == 0xFD) {
+        char *slot_moby = g_synthenoid_slots[i];
+        if (slot_moby == 0 || *(short *)(slot_moby + 0xAA) != MOBY_CLASS_SYNTHENOID || (unsigned char)slot_moby[0x20] == 0xFE
+            || (unsigned char)slot_moby[0x20] == 0xFD) {
             slot = i;
             break;
         }
@@ -37,7 +37,7 @@ char *SpawnCB2Moby(char *owner, Quad *position)
         return 0;
     if (weapon_spend_ammo(0x1F, 1) == 0)
         return 0;
-    moby = CreateMoby(0xCB2 /* Synthenoid */);
+    moby = CreateMoby(MOBY_CLASS_SYNTHENOID);
     if (moby != 0) {
         state = *(char **)(moby + 0x68);
         *(char **)(state + 0x34) = owner;

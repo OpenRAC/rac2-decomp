@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 /* Big level-side array: keep the absolute materialisation (`lui+addiu`), never $gp. */
@@ -100,13 +101,13 @@ void moby_aim_body_toward_point(unsigned char *object, void *target) {
     matrix_mul_vec3(&toTarget, &toTarget, inverseFrame);
 
     switch (*(short *)(object + 0xAA)) {
-    case 0x964 /* Gadgebot */:
+    case MOBY_CLASS_GADGEBOT:
         toTarget.z -= D_L03_001B0040;
         break;
     case 0x93C /* moby class 2364 */:
         toTarget.z -= D_L03_001B0044;
         break;
-    case 0x940 /* Bridgebot */:
+    case MOBY_CLASS_BRIDGEBOT:
         toTarget.z -= D_L03_001B0048;
         break;
     case 0xA59 /* moby class 2649 */:
@@ -376,7 +377,7 @@ void moby_turn_toward_move_direction(unsigned char *object) {
     ref_L03_003C4240_02(*(void **)(vars + 0x220), object + 0x10, vars + 0x368);
     target = *(unsigned char **)(vars + 0x194);
     if (target != 0) {
-        if (*(short *)(target + 0xAA) == 0x940 /* Bridgebot */ || *(short *)(target + 0xAA) == 0x93C /* moby class 2364 */ ||
+        if (*(short *)(target + 0xAA) == MOBY_CLASS_BRIDGEBOT || *(short *)(target + 0xAA) == 0x93C /* moby class 2364 */ ||
             *(short *)(target + 0xAA) == 0x964)
             ref_L03_003C4240_03(*(unsigned char **)(vars + 0x194), object + 0x10);
     }

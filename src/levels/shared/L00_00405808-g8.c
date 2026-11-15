@@ -166,7 +166,7 @@ clear_target:
         gauge_popup_show(1,0x60000000,0,D_L00_001B0E48);
         if (state->target && state->left<=0.0f) {
             int oclass=H(state->target,0xaa);
-            if (g_current_map_index==12 && oclass==4020 /* Mutant Test-Squirrel */) {
+            if (g_current_map_index==12 && oclass==MOBY_CLASS_MUTANT_TEST_SQUIRREL) {
                 if (++D_L00_001B0E30>=16 && !D_001A7A60[22]) {
                     D_001A7A60[22]=1; snd_play_from_global_bank(1,0,0); value_set_entry_by_index(4659,-1); D_L00_001A903C=1;
                 }

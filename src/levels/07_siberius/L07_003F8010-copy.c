@@ -12,12 +12,12 @@ extern void copy_matrix3x4(void *, void *);
 void ship_attach_parts(u8 *moby)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *mainPart = *(u8 **)(vars + 0x410);
+    u8 *main_part = *(u8 **)(vars + 0x410);
     struct { u8 basis[48]; u8 translation[16]; } __attribute__((aligned(16))) transform;
-    if (mainPart != 0) {
-        qcopy(mainPart + 0x10, moby + 0x10);
-        qcopy(mainPart + 0xF0, moby + 0xF0);
-        moby_update_ground_check(mainPart);
+    if (main_part != 0) {
+        qcopy(main_part + 0x10, moby + 0x10);
+        qcopy(main_part + 0xF0, moby + 0xF0);
+        moby_update_ground_check(main_part);
     }
     func_002A0F48(*(u8 **)(vars + 0x410));
     if (*(u8 **)(vars + 0x414) != 0) {

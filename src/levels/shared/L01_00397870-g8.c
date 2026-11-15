@@ -48,13 +48,13 @@ extern void part_draw_bolt_glow_rings(Obj_397870 *);
 void bobbing_l01_moby_update(Obj_397870 *moby)
 {
     State_397870 *vars = moby->st;
-    float bobSine;
+    float bob_sine;
 
     moby->f2C = moby->cls->f24 * D_L01_001AF50C;
 
     if (moby->b20 == 1) {
-        bobSine = math_fast_sin_or_cos_b(moby->fFC);
-        moby->f18 = vars->f18 + D_L01_001AF510 + D_L01_001AF514 * bobSine;
+        bob_sine = math_fast_sin_or_cos_b(moby->fFC);
+        moby->f18 = vars->f18 + D_L01_001AF510 + D_L01_001AF514 * bob_sine;
         moby->fF0 = FastAddRotations(moby->fF0, vars->f68);
         moby->fF4 = FastAddRotations(moby->fF4, vars->f64);
         moby->fF8 = FastAddRotations(moby->fF8, vars->f60);

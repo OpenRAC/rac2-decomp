@@ -79,7 +79,7 @@ void path_gunner_update(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     unsigned int state;
-    int hitFlags;
+    int hit_flags;
     if (follower_init_and_check_hits(moby)) {
         moby_mark_spawned(moby);
     } else {
@@ -129,10 +129,10 @@ void path_gunner_update(char *moby)
             break;
         case 3:
             ++*(int *)(vars + 0x278);
-            hitFlags = moby_dispatch_action_by_kind(moby, vars + 0x60);
-            if (hitFlags & 1) {
+            hit_flags = moby_dispatch_action_by_kind(moby, vars + 0x60);
+            if (hit_flags & 1) {
                 moby_set_state(moby, 8, -1);
-            } else if (hitFlags & 2) {
+            } else if (hit_flags & 2) {
                 if (*(unsigned char *)(moby + 0x43) != 1) anim_start_blended(moby, 1, 0, 10);
                 *(int *)(vars + 0x278) = 0;
                 qzero(vars + 0x230);

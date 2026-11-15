@@ -39,10 +39,10 @@ extern void add_vectors(void *,void *,void *);
 
 /* Advance the sampled route and update its bounded lateral offset. */
 void hoverbike_update_route_steering(char *bike,RouteState1006 *state) {
- int oldRouteIndex,i; float gap,angle; float v[4] __attribute__((aligned(16))); float out[4] __attribute__((aligned(16)));
+ int old_route_index,i; float gap,angle; float v[4] __attribute__((aligned(16))); float out[4] __attribute__((aligned(16)));
  UpdateLinkedRouteSelection(bike);
  state->progress=UpdateNearestRoutePoint(bike,state,&state->pathIndex,&state->pointIndex,g_current_lap,D_L04_001B08F0);
- oldRouteIndex=state->routeIndex;
+ old_route_index=state->routeIndex;
  gap=vec_distance_xy(&state->routePos[0],bike+0x10);
  if (D_L04_001B08F0 ? gap<20.0f : gap<5.0f) {
   state->distance+=(D_L04_001B08F0 ? 20.0f:5.0f)-gap;
@@ -60,7 +60,7 @@ void hoverbike_update_route_steering(char *bike,RouteState1006 *state) {
    anim_sample_key_track(state->distance,state->route->points[0][3],state->route,&state->routeIndex,&state->fraction,state->routePos);
   }
  }
- for(i=oldRouteIndex;i<=state->routeIndex;i++) {
+ for(i=old_route_index;i<=state->routeIndex;i++) {
   float knot=state->route->points[i][3];
   if(knot>=1000.0f) {
    state->lateral+=math_random_float_range(-0.25f,0.25f);

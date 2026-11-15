@@ -48,7 +48,7 @@ void UpdatePartsPurchaseNpc(u8 *obj)
     float position[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(obj + 0x68);
-    float speed, yaw, pitch, randomYaw;
+    float speed, yaw, pitch, random_yaw;
     float blend = 0.3f;
     int active;
 
@@ -200,9 +200,9 @@ void UpdatePartsPurchaseNpc(u8 *obj)
         }
         if (math_fast_float_d(state + 0x118)) {
             S32_AT(state, 0x118) = FloatToInt(math_random_float_range(180, 300));
-            randomYaw = FastAddRotations(F32_AT(obj, 0xF8), math_random_float_range(-90, 90) * 0.017453294f);
+            random_yaw = FastAddRotations(F32_AT(obj, 0xF8), math_random_float_range(-90, 90) * 0.017453294f);
             pitch = math_random_float_range(0, 30);
-            vec_build_spherical_offset(state + 0x100, 6, randomYaw, pitch * 0.017453294f);
+            vec_build_spherical_offset(state + 0x100, 6, random_yaw, pitch * 0.017453294f);
             FastVecAdd(state + 0x100, state + 0x100, obj + 0x10);
         }
         if (S32_AT(state, 0x114)) {

@@ -117,30 +117,30 @@ void wrench_update(char *moby)
     f32 vectors[8][4] __attribute__((aligned(16)));
     char *vars;
     float angle;
-    char *heroMoby;
-    char *heroMobyCheck;
-    char *hitClass;
+    char *hero_moby;
+    char *hero_moby_check;
+    char *hit_class;
     char *mode;
     char *pos;
     char *sound;
     float *link;
     float yaw;
-    float yawDiff;
+    float yaw_diff;
     float lim;
     float range;
     float pull;
-    float reachScale;
-    float distanceToHero;
-    float mobyZ;
-    float checkRadius;
-    float groundZ;
-    LevelClass *levelClass;
-    CamMode *camMode;
-    int canHit;
-    int swingAllowed;
-    int didHit;
+    float reach_scale;
+    float distance_to_hero;
+    float moby_z;
+    float check_radius;
+    float ground_z;
+    LevelClass *level_class;
+    CamMode *cam_mode;
+    int can_hit;
+    int swing_allowed;
+    int did_hit;
     int arrived;
-    int tooFar;
+    int too_far;
 
     vars = *(char **)(moby + 0x68);
     ((Hero *)g_hero_state)->b[0x123C] = 0;
@@ -193,51 +193,51 @@ void wrench_update(char *moby)
             && *(u8 *)(moby + 0x43) >= 3 && *(u8 *)(moby + 0x43) < 6) {
             anim_start_blended(moby, 1, 0, 4);
         }
-        heroMoby = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
-        if (*(u8 *)(heroMoby + 0x43) != *(u8 *)(heroMoby + 0x42) || *(u8 *)(heroMoby + 0x41) - *(u8 *)(heroMoby + 0x40) >= 3) {
+        hero_moby = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
+        if (*(u8 *)(hero_moby + 0x43) != *(u8 *)(hero_moby + 0x42) || *(u8 *)(hero_moby + 0x41) - *(u8 *)(hero_moby + 0x40) >= 3) {
             *(u16 *)(vars + 0x74) += 1;
         }
         *(f32 *)(moby + 0x48) = ((Hero *)g_hero_state)->f[0xC20 / 4];
-        camMode = &D_L00_0025D990[((Hero *)g_hero_state)->h[0xBFC / 2]];
+        cam_mode = &D_L00_0025D990[((Hero *)g_hero_state)->h[0xBFC / 2]];
         if (((Hero *)g_hero_state)->i[0x229C / 4] != 6 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x2A) {
             return;
         }
-        canHit = 1;
-        if (((Hero *)g_hero_state)->i[0xC2C / 4] != 0 || ((Hero *)g_hero_state)->f[0xC38 / 4] < (f32)camMode->i1C || (f32)camMode->i20 < ((Hero *)g_hero_state)->f[0xC38 / 4]) {
-            canHit = 0;
+        can_hit = 1;
+        if (((Hero *)g_hero_state)->i[0xC2C / 4] != 0 || ((Hero *)g_hero_state)->f[0xC38 / 4] < (f32)cam_mode->i1C || (f32)cam_mode->i20 < ((Hero *)g_hero_state)->f[0xC38 / 4]) {
+            can_hit = 0;
         }
-        swingAllowed = 0;
+        swing_allowed = 0;
         if (*(s16 *)(vars + 0x7C) != *(s16 *)(vars + 0x74)) {
-            heroMobyCheck = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
-            if (*(u8 *)(heroMobyCheck + 0x42) == *(u8 *)(heroMobyCheck + 0x43)) {
-                if (*(u8 *)(heroMobyCheck + 0x42) == 0x17) {
-                    swingAllowed = 1;
+            hero_moby_check = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
+            if (*(u8 *)(hero_moby_check + 0x42) == *(u8 *)(hero_moby_check + 0x43)) {
+                if (*(u8 *)(hero_moby_check + 0x42) == 0x17) {
+                    swing_allowed = 1;
                     if (!(0.0f <= ((Hero *)g_hero_state)->f[0xC38 / 4])) {
-                        swingAllowed = 0;
+                        swing_allowed = 0;
                     }
-                } else if (*(u8 *)(heroMobyCheck + 0x42) == 0x18) {
-                    swingAllowed = 1;
+                } else if (*(u8 *)(hero_moby_check + 0x42) == 0x18) {
+                    swing_allowed = 1;
                     if (!(0.0f <= ((Hero *)g_hero_state)->f[0xC38 / 4])) {
-                        swingAllowed = 0;
+                        swing_allowed = 0;
                     }
-                } else if (*(u8 *)(heroMobyCheck + 0x42) == 0x19) {
-                    swingAllowed = 1;
+                } else if (*(u8 *)(hero_moby_check + 0x42) == 0x19) {
+                    swing_allowed = 1;
                     if (!(12.0f <= ((Hero *)g_hero_state)->f[0xC38 / 4])) {
-                        swingAllowed = 0;
+                        swing_allowed = 0;
                     }
-                } else if (*(u8 *)(heroMobyCheck + 0x42) == 0x2B) {
-                    swingAllowed = 1;
+                } else if (*(u8 *)(hero_moby_check + 0x42) == 0x2B) {
+                    swing_allowed = 1;
                     if (!(23.0f <= ((Hero *)g_hero_state)->f[0xC38 / 4])) {
-                        swingAllowed = 0;
+                        swing_allowed = 0;
                     }
                 }
             }
         }
-        if (swingAllowed != 0) {
+        if (swing_allowed != 0) {
             *(f32 *)(vars + 0x70) = 1.0f;
             *(s16 *)(vars + 0x7C) = *(s16 *)(vars + 0x74);
         }
-        yawDiff = 0.0f;
+        yaw_diff = 0.0f;
         yaw = ((Hero *)g_hero_state)->f[0x98 / 4];
         qcopy(&((Hero *)g_hero_state)->b[0xB90], &((Hero *)g_hero_state)->b[0xB70]);
         qcopy(&((Hero *)g_hero_state)->b[0xB80], &((Hero *)g_hero_state)->b[0xB60]);
@@ -255,16 +255,16 @@ void wrench_update(char *moby)
             FastVecSub(vectors[0], &((Hero *)g_hero_state)->b[0xB70], &((Hero *)g_hero_state)->b[0xB60]);
             vec_scale_to_length(vectors[0], vectors[0], FastVecLength(vectors[0]) + 0.17f);
             if (((Hero *)g_hero_state)->i[0x229C / 4] != 0xF && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6D && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x14) {
-                yawDiff = FastDiffRots(((Hero *)g_hero_state)->f[0x98 / 4],
+                yaw_diff = FastDiffRots(((Hero *)g_hero_state)->f[0x98 / 4],
                                      mat_fast_helper_a(((Hero *)g_hero_state)->f[0xB70 / 4] - ((Hero *)g_hero_state)->f[0x80 / 4],
                                                    ((Hero *)g_hero_state)->f[0xB74 / 4] - ((Hero *)g_hero_state)->f[0x84 / 4]));
-                if (yawDiff > 1.57079649f) {
-                    canHit = 0;
+                if (yaw_diff > 1.57079649f) {
+                    can_hit = 0;
                 }
                 vec_scale_by_angle_limit((char *)vectors[0]);
             }
             FastVecAdd(&((Hero *)g_hero_state)->b[0xB70], &((Hero *)g_hero_state)->b[0xB60], vectors[0]);
-            if (((Hero *)g_hero_state)->i[0x2294 / 4] != 0x2A && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6D && yawDiff < 1.22173059f
+            if (((Hero *)g_hero_state)->i[0x2294 / 4] != 0x2A && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6D && yaw_diff < 1.22173059f
                 && ((Hero *)g_hero_state)->i[0x1B8 / 4] >= 11) {
                 qcopy(vectors[0], &((Hero *)g_hero_state)->b[0x80]);
                 vectors[0][2] = vectors[0][2] + 0.5f;
@@ -304,19 +304,19 @@ void wrench_update(char *moby)
                 }
             }
         }
-        if (canHit != 0) {
-            levelClass = &g_weapon_l00_table[g_item_slot_to_record[0xA]];
-            reachScale = 1.0f;
-            range = levelClass->f70;
+        if (can_hit != 0) {
+            level_class = &g_weapon_l00_table[g_item_slot_to_record[0xA]];
+            reach_scale = 1.0f;
+            range = level_class->f70;
             if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x14) {
-                range = levelClass->f74;
-                reachScale = 1.55f;
+                range = level_class->f74;
+                reach_scale = 1.55f;
             }
             vectors[3][0] = math_fast_sin_or_cos_a(yaw);
             vectors[3][1] = math_fast_sin_or_cos_b(yaw);
             vectors[3][2] = 0.0f;
             make_hit_descriptor(vectors[0], moby, 0x10000, vectors[3], range);
-            vec_fast_normalize_helper(vectors[0], vectors[0], reachScale);
+            vec_fast_normalize_helper(vectors[0], vectors[0], reach_scale);
             vectors[0][2] = 1.0f;
             vectors[0][3] = 5627.9248f;
             ((CollQuery *)vectors[0])->b19 = 1;
@@ -338,14 +338,14 @@ void wrench_update(char *moby)
             FastVecSub(vectors[5], &((Hero *)g_hero_state)->b[0xB70], &((Hero *)g_hero_state)->b[0xB60]);
             vec_scale_to_length(vectors[5], vectors[5], FastVecLength(vectors[5]) - 0.085f);
             FastVecAdd(vectors[4], vectors[5], &((Hero *)g_hero_state)->b[0xB60]);
-            checkRadius = 0.35f;
+            check_radius = 0.35f;
             if (((Hero *)g_hero_state)->i[0x229C / 4] == 0xF) {
-                checkRadius = 0.7f;
+                check_radius = 0.7f;
             }
             if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x14) {
-                checkRadius = 0.47f;
+                check_radius = 0.47f;
             }
-            if (coll_process_hit(checkRadius, vectors[4], 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], (CollQuery *)vectors[0]) == 0) {
+            if (coll_process_hit(check_radius, vectors[4], 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], (CollQuery *)vectors[0]) == 0) {
                 return;
             }
             if (g_area_hit_targets != 0 && *(char **)(g_area_hit_targets + 0x24) != 0
@@ -380,14 +380,14 @@ void wrench_update(char *moby)
         }
         pos = moby + 0x10;
         if (((Hero *)g_hero_state)->b[0x22C3] == 0) {
-            groundZ = coll_probe_ground_height_below(pos, 0, 0.5f);
-            mobyZ = *(f32 *)(moby + 0x18);
-            if (mobyZ - groundZ < 0.8f) {
-                groundZ = groundZ + 0.55f;
-                if (mobyZ < groundZ) {
-                    ApproachValue((f32 *)(moby + 0x18), groundZ, 0.06666667f);
+            ground_z = coll_probe_ground_height_below(pos, 0, 0.5f);
+            moby_z = *(f32 *)(moby + 0x18);
+            if (moby_z - ground_z < 0.8f) {
+                ground_z = ground_z + 0.55f;
+                if (moby_z < ground_z) {
+                    ApproachValue((f32 *)(moby + 0x18), ground_z, 0.06666667f);
                 } else {
-                    ApproachValue((f32 *)(moby + 0x18), groundZ, 0.016666668f);
+                    ApproachValue((f32 *)(moby + 0x18), ground_z, 0.016666668f);
                 }
             }
         }
@@ -412,17 +412,17 @@ void wrench_update(char *moby)
             FastVecSub(vectors[1], &((Hero *)g_hero_state)->b[0x1200], pos);
             *(f32 *)(vars + 0x64) = *(f32 *)(vars + 0x64) + 0.00025f;
             *(f32 *)(vars + 0x60) = *(f32 *)(vars + 0x60) + *(f32 *)(vars + 0x64);
-            distanceToHero = FastVecLength(vectors[1]);
-            if (distanceToHero / *(f32 *)(vars + 0x60) < 5.0f && *(u8 *)(moby + 0x43) != 1) {
+            distance_to_hero = FastVecLength(vectors[1]);
+            if (distance_to_hero / *(f32 *)(vars + 0x60) < 5.0f && *(u8 *)(moby + 0x43) != 1) {
                 anim_start_blended(moby, 1, 0, 5);
             }
-            if (distanceToHero <= *(f32 *)(vars + 0x60)) {
-                *(f32 *)(vars + 0x60) = distanceToHero;
+            if (distance_to_hero <= *(f32 *)(vars + 0x60)) {
+                *(f32 *)(vars + 0x60) = distance_to_hero;
                 arrived = 1;
             }
             vec_scale_to_length(vectors[1], vectors[1], *(f32 *)(vars + 0x60));
             FastVecAdd(pos, pos, vectors[1]);
-            if (distanceToHero / *(f32 *)(vars + 0x60) < 4.0f && ((Hero *)g_hero_state)->i[0xC40 / 4] != -1) {
+            if (distance_to_hero / *(f32 *)(vars + 0x60) < 4.0f && ((Hero *)g_hero_state)->i[0xC40 / 4] != -1) {
                 hero_set_anim_mode(2);
                 ((Hero *)g_hero_state)->i[0xC44 / 4] = 0x1A;
                 if (((Hero *)g_hero_state)->i[0x2430 / 4] != -1) {
@@ -433,12 +433,12 @@ void wrench_update(char *moby)
                 }
                 ((Hero *)g_hero_state)->i[0x2430 / 4] = -1;
             }
-            tooFar = 0;
-            if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x61 || distanceToHero > 32.0f) {
-                tooFar = 1;
+            too_far = 0;
+            if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x61 || distance_to_hero > 32.0f) {
+                too_far = 1;
             }
-            if (arrived != 0 || tooFar != 0) {
-                if (tooFar == 0) {
+            if (arrived != 0 || too_far != 0) {
+                if (too_far == 0) {
                     hero_play_sound(5, 0);
                 }
                 if (((Hero *)g_hero_state)->i[0x2430 / 4] != -1) {
@@ -453,12 +453,12 @@ void wrench_update(char *moby)
                 *(u8 *)(moby + 0x20) = 0;
             }
         }
-        didHit = 0;
+        did_hit = 0;
         if (CollLine(vectors[0], pos, 2, 0, 0) != 0 && GetCollHitMaterial() != 0
             && (g_collision_result.moby == 0 || moby_is_in_special_class_range(g_collision_result.moby) == 0)) {
-            didHit = g_collision_result.count != 0;
+            did_hit = g_collision_result.count != 0;
         }
-        if (didHit != 0 || *(s16 *)(vars + 0x76) != 0) {
+        if (did_hit != 0 || *(s16 *)(vars + 0x76) != 0) {
             *(s16 *)(vars + 0x76) = 0;
             if (((Hero *)g_hero_state)->h[0xBFE / 2] == 0) {
                 *(int *)(vars + 0x6C) = 0x1E;
@@ -490,8 +490,8 @@ void wrench_update(char *moby)
         if ((coll_process_hit(0.4f, vectors[5], 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], (CollQuery *)vectors[1]) != 0
              || (moby_transform_joint_to_world(moby, 0, vectors[5]), coll_process_hit(0.4f, vectors[5], 0, ((Hero *)g_hero_state)->ptr[0x2290 / 4], (CollQuery *)vectors[1]) != 0))
             && ((Hero *)g_hero_state)->h[0xBFE / 2] == 0 && g_collision_result.moby != 0) {
-            hitClass = *(char **)(g_collision_result.moby + 0x24);
-            if (hitClass == 0 || *(s16 *)(hitClass + 0x46) != 0x14) {
+            hit_class = *(char **)(g_collision_result.moby + 0x24);
+            if (hit_class == 0 || *(s16 *)(hit_class + 0x46) != 0x14) {
                 link = moby_get_private_value_0(g_collision_result.moby);
                 if (link == 0 || *(s16 *)((char *)link + 0x1C) == 0 || *(char **)((char *)link + 0x18) != moby) {
                     *(TI128 *)vectors[7] = *(TI128 *)(g_collision_result.moby + 0x10);

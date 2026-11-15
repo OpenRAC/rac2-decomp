@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 /* Update two linked parts from a valid parent and propagate object state and color. */
@@ -66,7 +67,7 @@ void trooper_attach_arm_parts(DobboPartsObject252 *object)
     DobboPartsDescriptor252 *descriptor = object->descriptor;
     DobboPartsObject252 *parent = descriptor->parent;
     int i;
-    if (!parent || parent->class_code != 0xd0e /* Megacorp Trooper Torso */ || parent->status == 0xfe || parent->status == 0xfd)
+    if (!parent || parent->class_code != MOBY_CLASS_MEGACORP_TROOPER_TORSO || parent->status == 0xfe || parent->status == 0xfd)
         return;
     for (i = 0; i < 2; ++i) {
         if (descriptor->parts[i]) {

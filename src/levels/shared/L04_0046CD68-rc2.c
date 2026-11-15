@@ -54,7 +54,7 @@ extern s32 ref_L04_0046CD68_06 __attribute__((sda));
 void cam_init_follow_offset(Outer *camera, s32 mirrored) {
     Entity *record = camera->entity;
     f32 *base = &record->f70;
-    Entity *recordAgain ;
+    Entity *record_again ;
 
     record->f70 = ref_L04_0046CD68_02;
     if (mirrored != 0) {
@@ -67,14 +67,14 @@ void cam_init_follow_offset(Outer *camera, s32 mirrored) {
     base[3] = 1.0f;
     base[4] = ref_L04_0046CD68_00(base);
 
-    recordAgain = camera->entity;
-    recordAgain->f90 = ref_L04_0046CD68_05;
+    record_again = camera->entity;
+    record_again->f90 = ref_L04_0046CD68_05;
     if (mirrored != 0) {
-        recordAgain->f90 = ref_L04_0046CD68_05 * 1.1f;
+        record_again->f90 = ref_L04_0046CD68_05 * 1.1f;
     }
 
-    recordAgain = camera->entity;
-    recordAgain->f94 = 0;
-    recordAgain->f98 = 0;
+    record_again = camera->entity;
+    record_again->f94 = 0;
+    record_again->f98 = 0;
     ref_L04_0046CD68_01(camera);
 }

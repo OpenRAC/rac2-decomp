@@ -22,108 +22,108 @@ typedef struct {
 /* The EE ABI independently orders integer and floating-point arguments.
  * This interleaving preserves a0-a3 and f12-f14. */
 // Draws a ribbon of quads along a polyline, in two passes with edge colouring and a scrolled texture (colours from globals).
-void DrawBeamAndArcTwoPassQuads(void *points, int alphaA, int alphaB, float sx, float width, int count, float extend) {
-    RW_2BBDE8 coreQuad[4];
-    RT_2BBDE8 corePacket;
+void DrawBeamAndArcTwoPassQuads(void *points, int alpha_a, int alpha_b, float sx, float width, int count, float extend) {
+    RW_2BBDE8 core_quad[4];
+    RT_2BBDE8 core_packet;
     RW_2BBDE8 q2[4];
-    RT_2BBDE8 haloPacket;
-    RW_2BBDE8 normal, haloOffset, eyeRay, tangent, firstPoint, lastPoint, firstRay, lastRay, toEye, extension;
-    int i, coreColor, haloColor;
-    float length, initialLength, haloLength, firstLength, lastLength;
-    corePacket.q0 = GetEffectTextureDescriptor(*(int *)&D_001AEE98);
-    coreColor = *(int *)&D_001AEE54 | (alphaA << 24);
-    corePacket.q2 = 0x8000000048L;
-    corePacket.q1 = 0xFF9000000260L;
-    corePacket.z4 = 0;
-    corePacket.c[3] = coreColor;
-    corePacket.c[2] = coreColor;
-    corePacket.c[1] = coreColor;
-    corePacket.c[0] = coreColor;
-    haloPacket.q0 = GetEffectTextureDescriptor(*(int *)&D_001AEE9C);
-    haloColor = *(int *)&D_001AEE58 | (alphaB << 24);
-    haloPacket.q2 = corePacket.q2;
-    haloPacket.q1 = corePacket.q1;
-    haloPacket.z4 = corePacket.z4;
-    haloPacket.c[3] = haloColor;
-    haloPacket.c[2] = haloColor;
-    haloPacket.c[1] = haloColor;
-    haloPacket.c[0] = haloColor;
-    haloPacket.f[0] = 0; haloPacket.f[1] = 0; haloPacket.f[2] = 0; haloPacket.f[3] = 1.0f; haloPacket.f[4] = 1.0f; haloPacket.f[5] = 0; haloPacket.f[6] = 1.0f; haloPacket.f[7] = 1.0f;
-    corePacket.f[0] = D_001AEE4C;
-    corePacket.f[1] = 0;
-    corePacket.f[2] = D_001AEE4C;
-    corePacket.f[3] = 1.0f;
-    corePacket.f[4] = 1.0f + D_001AEE4C;
-    corePacket.f[5] = 0;
-    corePacket.f[6] = 1.0f + D_001AEE4C;
-    corePacket.f[7] = 1.0f;
-    FastVecSub(eyeRay, points, g_camera_eye_state);
+    RT_2BBDE8 halo_packet;
+    RW_2BBDE8 normal, halo_offset, eye_ray, tangent, first_point, last_point, first_ray, last_ray, to_eye, extension;
+    int i, core_color, halo_color;
+    float length, initial_length, halo_length, first_length, last_length;
+    core_packet.q0 = GetEffectTextureDescriptor(*(int *)&D_001AEE98);
+    core_color = *(int *)&D_001AEE54 | (alpha_a << 24);
+    core_packet.q2 = 0x8000000048L;
+    core_packet.q1 = 0xFF9000000260L;
+    core_packet.z4 = 0;
+    core_packet.c[3] = core_color;
+    core_packet.c[2] = core_color;
+    core_packet.c[1] = core_color;
+    core_packet.c[0] = core_color;
+    halo_packet.q0 = GetEffectTextureDescriptor(*(int *)&D_001AEE9C);
+    halo_color = *(int *)&D_001AEE58 | (alpha_b << 24);
+    halo_packet.q2 = core_packet.q2;
+    halo_packet.q1 = core_packet.q1;
+    halo_packet.z4 = core_packet.z4;
+    halo_packet.c[3] = halo_color;
+    halo_packet.c[2] = halo_color;
+    halo_packet.c[1] = halo_color;
+    halo_packet.c[0] = halo_color;
+    halo_packet.f[0] = 0; halo_packet.f[1] = 0; halo_packet.f[2] = 0; halo_packet.f[3] = 1.0f; halo_packet.f[4] = 1.0f; halo_packet.f[5] = 0; halo_packet.f[6] = 1.0f; halo_packet.f[7] = 1.0f;
+    core_packet.f[0] = D_001AEE4C;
+    core_packet.f[1] = 0;
+    core_packet.f[2] = D_001AEE4C;
+    core_packet.f[3] = 1.0f;
+    core_packet.f[4] = 1.0f + D_001AEE4C;
+    core_packet.f[5] = 0;
+    core_packet.f[6] = 1.0f + D_001AEE4C;
+    core_packet.f[7] = 1.0f;
+    FastVecSub(eye_ray, points, g_camera_eye_state);
     FastVecSub(tangent, &((P_2BBDE8 *)points)[1], points);
-    FastVecCross(normal, tangent, eyeRay);
-    initialLength = FastVecLength(normal);
-    if (initialLength != 0) initialLength = 1.0f / initialLength;
-    FastVecScale(normal, normal, *(float *)&D_001AEE5C * initialLength);
-    FastVecAdd(coreQuad[0], points, normal);
-    FastVecSub(coreQuad[1], points, normal);
+    FastVecCross(normal, tangent, eye_ray);
+    initial_length = FastVecLength(normal);
+    if (initial_length != 0) initial_length = 1.0f / initial_length;
+    FastVecScale(normal, normal, *(float *)&D_001AEE5C * initial_length);
+    FastVecAdd(core_quad[0], points, normal);
+    FastVecSub(core_quad[1], points, normal);
     for (i = 1; i < count - 1; i++) {
-        FastVecSub(eyeRay, &((P_2BBDE8 *)points)[i], g_camera_eye_state);
+        FastVecSub(eye_ray, &((P_2BBDE8 *)points)[i], g_camera_eye_state);
         FastVecSub(tangent, &((P_2BBDE8 *)points)[i + 1], &((P_2BBDE8 *)points)[i]);
-        FastVecCross(normal, tangent, eyeRay);
+        FastVecCross(normal, tangent, eye_ray);
         length = FastVecLength(normal);
         if (length != 0) length = 1.0f / length;
         FastVecScale(normal, normal, *(float *)&D_001AEE5C * length);
-        FastVecAdd(coreQuad[2], &((P_2BBDE8 *)points)[i], normal);
-        FastVecSub(coreQuad[3], &((P_2BBDE8 *)points)[i], normal);
+        FastVecAdd(core_quad[2], &((P_2BBDE8 *)points)[i], normal);
+        FastVecSub(core_quad[3], &((P_2BBDE8 *)points)[i], normal);
         if (i == 1) {
-            corePacket.c[1] = *(int *)&D_001AEE54;
-            corePacket.c[0] = *(int *)&D_001AEE54;
+            core_packet.c[1] = *(int *)&D_001AEE54;
+            core_packet.c[0] = *(int *)&D_001AEE54;
         } else if (i == count - 2) {
-            corePacket.c[3] = *(int *)&D_001AEE54;
-            corePacket.c[2] = *(int *)&D_001AEE54;
+            core_packet.c[3] = *(int *)&D_001AEE54;
+            core_packet.c[2] = *(int *)&D_001AEE54;
         } else if (i == 2) {
-            corePacket.c[1] = coreColor;
-            corePacket.c[0] = coreColor;
+            core_packet.c[1] = core_color;
+            core_packet.c[0] = core_color;
         }
-        draw_world_quad(coreQuad, 0, 0);
-        qcopy(coreQuad[0], coreQuad[2]);
-        qcopy(coreQuad[1], coreQuad[3]);
+        draw_world_quad(core_quad, 0, 0);
+        qcopy(core_quad[0], core_quad[2]);
+        qcopy(core_quad[1], core_quad[3]);
     }
     for (i = 0; i < count - 1; i++) {
-        FastVecSub(firstRay, &((P_2BBDE8 *)points)[i], g_camera_eye_state);
-        FastVecSub(lastRay, &((P_2BBDE8 *)points)[i + 1], g_camera_eye_state);
-        firstLength = FastVecLength(firstRay);
-        lastLength = FastVecLength(lastRay);
-        if (lastLength < firstLength) {
-            if (lastLength == 0) qcopy(lastRay, firstRay);
-            else FastVecScale(lastRay, lastRay, firstLength / lastLength);
+        FastVecSub(first_ray, &((P_2BBDE8 *)points)[i], g_camera_eye_state);
+        FastVecSub(last_ray, &((P_2BBDE8 *)points)[i + 1], g_camera_eye_state);
+        first_length = FastVecLength(first_ray);
+        last_length = FastVecLength(last_ray);
+        if (last_length < first_length) {
+            if (last_length == 0) qcopy(last_ray, first_ray);
+            else FastVecScale(last_ray, last_ray, first_length / last_length);
         } else {
-            if (firstLength == 0) qcopy(firstRay, lastRay);
-            else FastVecScale(firstRay, firstRay, lastLength / firstLength);
+            if (first_length == 0) qcopy(first_ray, last_ray);
+            else FastVecScale(first_ray, first_ray, last_length / first_length);
         }
-        FastVecAdd(firstPoint, g_camera_eye_state, firstRay);
-        FastVecAdd(lastPoint, g_camera_eye_state, lastRay);
-        FastVecSub(tangent, lastPoint, firstPoint);
+        FastVecAdd(first_point, g_camera_eye_state, first_ray);
+        FastVecAdd(last_point, g_camera_eye_state, last_ray);
+        FastVecSub(tangent, last_point, first_point);
         FastVecScale(extension, tangent, extend);
-        FastVecSub(firstPoint, firstPoint, extension);
-        FastVecAdd(lastPoint, lastPoint, extension);
-        FastVecSub(toEye, g_camera_eye_state, firstPoint);
-        FastVecCross(normal, toEye, tangent);
-        haloLength = FastVecLength(normal);
-        if (haloLength != 0) haloLength = 1.0f / haloLength;
-        FastVecScale(haloOffset, normal, width * haloLength);
-        FastVecAdd(q2[0], firstPoint, haloOffset);
-        FastVecSub(q2[1], firstPoint, haloOffset);
-        FastVecAdd(q2[2], lastPoint, haloOffset);
-        FastVecSub(q2[3], lastPoint, haloOffset);
+        FastVecSub(first_point, first_point, extension);
+        FastVecAdd(last_point, last_point, extension);
+        FastVecSub(to_eye, g_camera_eye_state, first_point);
+        FastVecCross(normal, to_eye, tangent);
+        halo_length = FastVecLength(normal);
+        if (halo_length != 0) halo_length = 1.0f / halo_length;
+        FastVecScale(halo_offset, normal, width * halo_length);
+        FastVecAdd(q2[0], first_point, halo_offset);
+        FastVecSub(q2[1], first_point, halo_offset);
+        FastVecAdd(q2[2], last_point, halo_offset);
+        FastVecSub(q2[3], last_point, halo_offset);
         if (i == 0) {
-            haloPacket.c[1] = *(int *)&D_001AEE58;
-            haloPacket.c[0] = *(int *)&D_001AEE58;
+            halo_packet.c[1] = *(int *)&D_001AEE58;
+            halo_packet.c[0] = *(int *)&D_001AEE58;
         } else if (i == count - 2) {
-            haloPacket.c[3] = *(int *)&D_001AEE58;
-            haloPacket.c[2] = *(int *)&D_001AEE58;
+            halo_packet.c[3] = *(int *)&D_001AEE58;
+            halo_packet.c[2] = *(int *)&D_001AEE58;
         } else if (i == 1) {
-            haloPacket.c[1] = haloColor;
-            haloPacket.c[0] = haloColor;
+            halo_packet.c[1] = halo_color;
+            halo_packet.c[0] = halo_color;
         }
         draw_world_quad(q2, 0, 0);
     }

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char u8;
@@ -65,12 +66,12 @@ void arena_update_enemy_tally(char *actor) {
                 if (entity != 0 && *(u8 *)(entity + 0x20) != 0xFE && *(u8 *)(entity + 0x20) != 0xFD &&
                     *(u8 *)(entity + 0x20) != 1) {
                     kind = *(s16 *)(entity + 0xAA);
-                    if (kind == 0x9CA /* moby class 2506 */ || kind == 0xB22 /* moby class 2850 */ || kind == 0xC3B /* Megacorp Security Robot - Flamethrower */ || kind == 0xC3E /* PX6 BladeBall */) {
+                    if (kind == 0x9CA /* moby class 2506 */ || kind == 0xB22 /* moby class 2850 */ || kind == MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER || kind == MOBY_CLASS_PX6_BLADEBALL) {
                         value = *(f32 *)(*(char **)(entity + 0x68) + 0x20);
                         sum += value;
                         if (value > 0.0f)
                             count++;
-                    } else if (kind == 0x9F8 /* Chainblade */ || kind == 0xA44 /* B2 Brawler Legs */) {
+                    } else if (kind == MOBY_CLASS_CHAINBLADE || kind == MOBY_CLASS_B2_BRAWLER_LEGS) {
                         count++;
                         sum += *(f32 *)(*(char **)(entity + 0x68) + 0x20);
                     }

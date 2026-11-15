@@ -93,7 +93,7 @@ extern void hud_draw_sprite_gradient(int, int, int, int, int, int *);
 void menu_list_draw_entries(MenuList *object)
 {
     float high, low, current;
-    int index, topAlpha, bottomAlpha, texture;
+    int index, top_alpha, bottom_alpha, texture;
     MenuColourQuad normal, alternate;
     char *colours;
     MenuClipRectangle clip;
@@ -109,16 +109,16 @@ void menu_list_draw_entries(MenuList *object)
         colours = (char *)&normal;
         if (*(int *)entry && entry[4]) colours = (char *)&alternate;
         current = (float)index;
-        topAlpha = ComputeListEntryAlpha((char *)object, low,
+        top_alpha = ComputeListEntryAlpha((char *)object, low,
                 object->position->y + object->rowHeight * current + (float)object->scrollOffset,
                 high, D_001AE1D0, D_001AE1D4);
-        bottomAlpha = ComputeListEntryAlpha((char *)object, low,
+        bottom_alpha = ComputeListEntryAlpha((char *)object, low,
                 object->position->y + object->rowHeight * current + object->iconSize + (float)object->scrollOffset,
                 high, D_001AE1D0, D_001AE1D4);
-        *(unsigned int *)(colours + 0) = (*(unsigned int *)(colours + 0) & 0xFFFFFF) | ((unsigned int)topAlpha << 24);
-        *(unsigned int *)(colours + 4) = (*(unsigned int *)(colours + 4) & 0xFFFFFF) | ((unsigned int)topAlpha << 24);
-        *(unsigned int *)(colours + 8) = (*(unsigned int *)(colours + 8) & 0xFFFFFF) | ((unsigned int)bottomAlpha << 24);
-        *(unsigned int *)(colours + 12) = (*(unsigned int *)(colours + 12) & 0xFFFFFF) | ((unsigned int)bottomAlpha << 24);
+        *(unsigned int *)(colours + 0) = (*(unsigned int *)(colours + 0) & 0xFFFFFF) | ((unsigned int)top_alpha << 24);
+        *(unsigned int *)(colours + 4) = (*(unsigned int *)(colours + 4) & 0xFFFFFF) | ((unsigned int)top_alpha << 24);
+        *(unsigned int *)(colours + 8) = (*(unsigned int *)(colours + 8) & 0xFFFFFF) | ((unsigned int)bottom_alpha << 24);
+        *(unsigned int *)(colours + 12) = (*(unsigned int *)(colours + 12) & 0xFFFFFF) | ((unsigned int)bottom_alpha << 24);
         if (D_001B23C0 == 0) {
             clip.y0 = 63;
             clip.y1 = 340;

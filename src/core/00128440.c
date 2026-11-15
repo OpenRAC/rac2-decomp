@@ -57,10 +57,10 @@ extern char r1_D_001537A0[];
    success path is the branch target, letting the result load sit in the
    bgez delay slot. */
 /* Gives the controller server the shared buffer to use. */
-int dbc_set_dma_buffer(int bufferAddr) {
+int dbc_set_dma_buffer(int buffer_addr) {
     int *request = &r1_D_0015B180;
 
-    request[1] = bufferAddr;
+    request[1] = buffer_addr;
     if (r1_func_0011B4C8(r1_D_0015B108, 0x80000904, 0, request, 0x400,
                       request, 0x400, 0, 0) >= 0) {
         return r1_D_0015B180;
@@ -84,19 +84,19 @@ int dbc_set_dma_buffer(int bufferAddr) {
    precomputed so each byte address is one base+index add, and the call
    re-takes &r1_D_0015B180 for its buffer arguments. */
 /* Asks the controller server to create a socket for a controller port. Returns 0 on failure. */
-int sceDbcCreateSocket(void *socketRecord, int port, int mode) {
+int sceDbcCreateSocket(void *socket_record, int port, int mode) {
     int *request = &r1_D_0015B180;
-    char *namesrc = (char *)socketRecord + 0x14;
+    char *namesrc = (char *)socket_record + 0x14;
     char *namedst = (char *)request + 0x14;
     int i;
 
     request[10] = port;
     request[11] = mode;
-    ((void **)request)[0] = ((void **)socketRecord)[0];
-    ((void **)request)[1] = ((void **)socketRecord)[1];
-    ((void **)request)[2] = ((void **)socketRecord)[2];
-    ((void **)request)[3] = ((void **)socketRecord)[3];
-    ((void **)request)[4] = ((void **)socketRecord)[4];
+    ((void **)request)[0] = ((void **)socket_record)[0];
+    ((void **)request)[1] = ((void **)socket_record)[1];
+    ((void **)request)[2] = ((void **)socket_record)[2];
+    ((void **)request)[3] = ((void **)socket_record)[3];
+    ((void **)request)[4] = ((void **)socket_record)[4];
     for (i = 0; i < 0x10; i++) {
         namedst[i] = namesrc[i];
     }
@@ -149,7 +149,7 @@ int sceDbcGetDepNumber(int port) {
    arms of the copy guard with one return; two returns would be
    cross-jumped into one. */
 /* Sends a command to the controller server and copies the reply bytes to the caller. */
-int dbc_send_command(int port, int command, int *countPtr, char *dst) {
+int dbc_send_command(int port, int command, int *count_ptr, char *dst) {
     int *request = &r1_D_0015B180;
     unsigned char *src;
     int i;
@@ -157,14 +157,14 @@ int dbc_send_command(int port, int command, int *countPtr, char *dst) {
 
     request[0] = port;
     request[1] = command;
-    request[2] = *countPtr;
+    request[2] = *count_ptr;
     if (r1_func_0011B4C8(r1_D_0015B108, 0x8000091A, 0, request, 0x400, request, 0x400, 0, 0) < 0) {
         debug_print_stub(r1_D_001537A0);
         return 0;
     }
     result = request[0x23];
     if (result >= 0) {
-        *countPtr = request[2];
+        *count_ptr = request[2];
         i = 0;
         if (i < request[2]) {
             src = (unsigned char *)request + 0xC;

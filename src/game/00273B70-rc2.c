@@ -39,21 +39,21 @@ s32 cam_moby_update(void *arg0) {
     s8 buffer[0x210];
     s8 *vars;
     s32 result;
-    u32 camMode;
+    u32 cam_mode;
     f32 coord;
 
     static void *tgt[] = {&&case02, &&case02, &&case4, &&case5, &&case13, &&case13};
 
     vars = (*(s8 **)((s8 *)(arg0) + (0x68)));
     result = 0;
-    camMode = (*(u8 *)((s8 *)(vars) + (0x5D)));
-    if (camMode >= 6) {
+    cam_mode = (*(u8 *)((s8 *)(vars) + (0x5D)));
+    if (cam_mode >= 6) {
         goto done;
     }
     {
         s8 *table = D_0026C550;
 
-        goto *(void *)*(s32 *)(table + camMode * 4);
+        goto *(void *)*(s32 *)(table + cam_mode * 4);
     }
 
 case02:

@@ -89,13 +89,13 @@ void UpdateMovingEffectState(EffectObject *self)
     char *hits[16];
     char vector[16];
     EffectHitPacket packet;
-    int hitCount;
+    int hit_count;
     EffectState *state = self->state;
-    char *hitTarget;
+    char *hit_target;
     int i;
-    int lightHandle;
-    int classIndex;
-    EffectMaterialEntry *classEntry;
+    int light_handle;
+    int class_index;
+    EffectMaterialEntry *class_entry;
     float scale;
     float ratio;
 
@@ -104,23 +104,23 @@ void UpdateMovingEffectState(EffectObject *self)
     case 0:
     case 1:
         state->intensity += (0.6f - state->intensity) * 0.125f;
-        hitTarget = spark_move_projectile(self);
-        if (hitTarget) {
+        hit_target = spark_move_projectile(self);
+        if (hit_target) {
             qcopy(vector, state);
             vec_scale_to_length(vector, vector, 0.033333335f);
-            classIndex = g_item_slot_to_record.index;
-            classEntry = g_weapon_l00_table + classIndex;
-            scale = classEntry->scale;
+            class_index = g_item_slot_to_record.index;
+            class_entry = g_weapon_l00_table + class_index;
+            scale = class_entry->scale;
             make_hit_descriptor(&packet, self, 0x210000, scale, vector);
             packet.field_18 = 1;
             packet.field_19 = 3;
             packet.id = self->id;
-            QueueMobyImpact(hitTarget, &packet);
-            StartAttachedEffect(hitTarget, 0x3E, self->f_B8);
+            QueueMobyImpact(hit_target, &packet);
+            StartAttachedEffect(hit_target, 0x3E, self->f_B8);
         }
         SelectBestTargetInCone(self->position, 6.2831855f, self->f_C0, 6.2831855f, 15.0f, 0.0f,
-                      &hitCount, hits, 15, 0, 0.0f, 0, &angles);
-        for (i = 0; i < hitCount; i++) {
+                      &hit_count, hits, 15, 0, 0.0f, 0, &angles);
+        for (i = 0; i < hit_count; i++) {
             if (state->f54 < 15 && pair_is_owner_key_free(self, hits[i])) {
                 KeyOwnerTableInsert(self, hits[i], 120);
                 spark_spawn_orbiting_record(self, hits[i], 10);
@@ -152,10 +152,10 @@ void UpdateMovingEffectState(EffectObject *self)
             part_l00_spawn_spark_burst_2(self->position, &packet, 6, 0xFF0000);
             table_clear_entry_flag(state->f50);
             pair_clear_owner_key_entries(self);
-            lightHandle = state->light_index;
+            light_handle = state->light_index;
             D_L00_001AFDA0--;
-            if (lightHandle != -1)
-                gfx_free_point_light(lightHandle);
+            if (light_handle != -1)
+                gfx_free_point_light(light_handle);
             moby_mark_spawned(self);
             return;
         }

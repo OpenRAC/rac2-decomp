@@ -29,6 +29,6 @@ extern void ref_L22_0040DD20_00(void *a, void *b);
 
 /* Calls a helper on the object with a zeroed 16-byte vector. */
 void moby_call_with_zero_vector(void *moby) {
-    TI zeroVec = 0;
-    ref_L22_0040DD20_00(moby, &zeroVec);
+    TI zero_vec = 0;
+    ref_L22_0040DD20_00(moby, &zero_vec);
 }

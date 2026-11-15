@@ -35,13 +35,13 @@ char *yeedil_boss_place_group_member(char *moby, TI128 *position) {
     }
     if (found != 0) {
         char *p = found + 0x10;
-        char *foundVars;
+        char *found_vars;
 
         qcopy(p, position);
         nanotech_crate_init(found);
         moby_fuse_linked_objects(found, p, found + 0xF0, 0, 0);
-        foundVars = *(char **)(found + 0x68);
-        *(int *)(foundVars + 0xAC) |= 8;
+        found_vars = *(char **)(found + 0x68);
+        *(int *)(found_vars + 0xAC) |= 8;
         qcopy(&buf, p);
         buf.component[2] -= 0.5f;
         glow_effect_create(found, (char *)&buf, 0x168, 0);

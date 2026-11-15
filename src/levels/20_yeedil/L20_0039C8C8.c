@@ -19,7 +19,7 @@ extern char D_0018A0E0[];
 /* Throws 20 bursts of sparks and smoke out from a point. */
 void part_l20_spawn_spark_burst(float *origin)
 {
-    float toCamera[4];
+    float to_camera[4];
     float dir[4];
     float out[4];
     float ang;
@@ -30,10 +30,10 @@ void part_l20_spawn_spark_burst(float *origin)
     int id;
     int i;
     char *smoke;
-    char *smokeExt;
+    char *smoke_ext;
 
-    FastVecSub((char *)toCamera, D_L20_001B9FC0, (char *)origin);
-    ang = mat_fast_helper_a(toCamera[0], toCamera[1]);
+    FastVecSub((char *)to_camera, D_L20_001B9FC0, (char *)origin);
+    ang = mat_fast_helper_a(to_camera[0], to_camera[1]);
 
     for (i = 19; i >= 0; i--) {
         rnd = math_random_float_range(0.2f, 3.0f);
@@ -45,14 +45,14 @@ void part_l20_spawn_spark_burst(float *origin)
         out[2] = origin[2] + math_random_signed_float_range(0.0f, 0.2f);
         smoke = SpawnSpinningSparkParticle((char *)out, 0.0f, 1.0f, 1.01f, rnd, id, (char *)dir, 0x7F202020, 0);
         if (smoke != 0) {
-            smokeExt = smoke + 32;
+            smoke_ext = smoke + 32;
             *(unsigned char *)(smoke + 3) = 0x44;
             *(short *)(smoke + 10) = 0x5A;
             *(unsigned char *)(smoke + 9) = FloatToInt(4.0f) + 0x40;
-            *(float *)(smokeExt + 0x1C) = IntToFloat(5);
-            *(int *)(smokeExt + 4) = 3;
-            *(unsigned char *)(smokeExt + 0xA) = 0x30;
-            *(unsigned char *)(smokeExt + 0xB) = *(unsigned char *)(smoke + 10);
+            *(float *)(smoke_ext + 0x1C) = IntToFloat(5);
+            *(int *)(smoke_ext + 4) = 3;
+            *(unsigned char *)(smoke_ext + 0xA) = 0x30;
+            *(unsigned char *)(smoke_ext + 0xB) = *(unsigned char *)(smoke + 10);
         }
         scale = math_random_float_range(1.0f, 2.0f);
         mag = math_random_float_range(0.0f, 1.396263599395752f);

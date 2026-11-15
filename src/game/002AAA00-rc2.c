@@ -34,14 +34,14 @@ extern void StepAngleTowardTarget(f32 *, s32, f32, f32);
 
 /* Moves a value toward a target using a speed that builds up and then brakes in time to
    stop on the target. Mode 2 lets it pick the shorter way around. */
-f32 math_approach_target_with_direction_mode(f32 *value, f32 *velocity, s32 mode, f32 target, f32 accel, f32 brake, f32 maxSpeed)
+f32 math_approach_target_with_direction_mode(f32 *value, f32 *velocity, s32 mode, f32 target, f32 accel, f32 brake, f32 max_speed)
 {
     s32 direction;
     f32 delta;
-    f32 stopDistance;
-    f32 absDelta;
-    f32 absDeltaTmp;
-    f32 desiredSpeed;
+    f32 stop_distance;
+    f32 abs_delta;
+    f32 abs_delta_tmp;
+    f32 desired_speed;
 
     direction = mode;
     if (mode != 2) {
@@ -66,45 +66,45 @@ abc:
         return 0.0f;
     }
     {
-        f32 oldVelocity = *velocity;
-        f32 newVelocity;
+        f32 old_velocity = *velocity;
+        f32 new_velocity;
 
-        if (0.0f <= oldVelocity * delta) {
-            stopDistance = ((oldVelocity * oldVelocity) / brake) * 0.5f;
-            if (math_fabs(delta) < stopDistance) {
-                absDeltaTmp = math_fabs(delta);
-                if (stopDistance < absDeltaTmp + math_fabs(*velocity)) {
+        if (0.0f <= old_velocity * delta) {
+            stop_distance = ((old_velocity * old_velocity) / brake) * 0.5f;
+            if (math_fabs(delta) < stop_distance) {
+                abs_delta_tmp = math_fabs(delta);
+                if (stop_distance < abs_delta_tmp + math_fabs(*velocity)) {
                     ApproachValue(velocity, 0.0f, brake);
                 } else {
                     ApproachValue(velocity, 0.0f, brake * 1.1f);
                 }
             } else {
-                desiredSpeed = square_root((brake + brake) * delta);
-                if (maxSpeed < desiredSpeed) {
-                    desiredSpeed = maxSpeed;
+                desired_speed = square_root((brake + brake) * delta);
+                if (max_speed < desired_speed) {
+                    desired_speed = max_speed;
                 }
                 if (delta < 0.0f) {
-                    StepAngleTowardTarget(velocity, 0, -desiredSpeed, accel);
+                    StepAngleTowardTarget(velocity, 0, -desired_speed, accel);
                 } else {
-                    StepAngleTowardTarget(velocity, 0, desiredSpeed, accel);
+                    StepAngleTowardTarget(velocity, 0, desired_speed, accel);
                 }
             }
-            absDelta = math_fabs(delta);
-            if (math_fabs(*velocity) < absDelta) {
-                newVelocity = *velocity;
+            abs_delta = math_fabs(delta);
+            if (math_fabs(*velocity) < abs_delta) {
+                new_velocity = *velocity;
             } else {
                 *value = target;
                 return delta;
             }
         } else {
-            if (0.0f <= oldVelocity) {
-                newVelocity = oldVelocity - brake;
+            if (0.0f <= old_velocity) {
+                new_velocity = old_velocity - brake;
             } else {
-                newVelocity = oldVelocity + brake;
+                new_velocity = old_velocity + brake;
             }
-            *velocity = newVelocity;
+            *velocity = new_velocity;
         }
-        *value = FastAddRotations(newVelocity, *value);
+        *value = FastAddRotations(new_velocity, *value);
         return *velocity;
     }
 }

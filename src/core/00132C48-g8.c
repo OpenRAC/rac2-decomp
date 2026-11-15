@@ -20,8 +20,8 @@ extern int sceSifCallRpc(void *, int, int, void *, int, void *, int, int, int);
 extern int snd_poll_rpc_done(void);
 extern void snd_submit_dma_buffer(void);
 /* Sends a sound command to the sound server and waits for the answer. Returns the reply value. */
-int snd_SendCommandSync(int command, int size, void *argData) {
-    unsigned char *bytes = argData;
+int snd_SendCommandSync(int command, int size, void *arg_data) {
+    unsigned char *bytes = arg_data;
     int i;
     int result;
     for (i = 0; i < size; i++) D_001A70C0[i] = bytes[i];

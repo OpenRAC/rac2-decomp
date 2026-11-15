@@ -26,38 +26,38 @@ extern char g_hero_position[];
 char *yeedil_boss_fire_lobbed_projectile(char *moby)
 {
     char *state = *(char **)(moby + 0x68);
-    float launchPos[4];
-    float launchVelocity[4];
+    float launch_pos[4];
+    float launch_velocity[4];
     float spread[4];
-    float aimAngle;
+    float aim_angle;
     float heading;
 
-    aimAngle = 0.78539825f;
-    yeedil_boss_compute_shot_launch(moby, (char *)launchPos, (char *)launchVelocity, &aimAngle);
-    launchPos[2] = launchPos[2] + 1.0f;
-    if (aimAngle < 0.0f) {
-        if (aimAngle > -0.52359885f)
-            aimAngle = -0.52359885f;
-        else if (aimAngle < -0.78539825f)
-            aimAngle = -0.78539825f;
+    aim_angle = 0.78539825f;
+    yeedil_boss_compute_shot_launch(moby, (char *)launch_pos, (char *)launch_velocity, &aim_angle);
+    launch_pos[2] = launch_pos[2] + 1.0f;
+    if (aim_angle < 0.0f) {
+        if (aim_angle > -0.52359885f)
+            aim_angle = -0.52359885f;
+        else if (aim_angle < -0.78539825f)
+            aim_angle = -0.78539825f;
     } else {
-        if (aimAngle > 0.78539825f)
-            aimAngle = 0.78539825f;
-        else if (aimAngle < 0.52359885f)
-            aimAngle = 0.52359885f;
+        if (aim_angle > 0.78539825f)
+            aim_angle = 0.78539825f;
+        else if (aim_angle < 0.52359885f)
+            aim_angle = 0.52359885f;
     }
-    heading = FastAddRotations(aimAngle, *(float *)(moby + 0xF8));
-    launchVelocity[0] = math_fast_sin_or_cos_a(heading) * 0.16666667f;
-    launchVelocity[1] = math_fast_sin_or_cos_b(heading) * 0.16666667f;
-    launchVelocity[2] = -0.033333335f;
+    heading = FastAddRotations(aim_angle, *(float *)(moby + 0xF8));
+    launch_velocity[0] = math_fast_sin_or_cos_a(heading) * 0.16666667f;
+    launch_velocity[1] = math_fast_sin_or_cos_b(heading) * 0.16666667f;
+    launch_velocity[2] = -0.033333335f;
     if (math_random_int_below(2) != 0) {
-        FastVecScale(spread, launchVelocity, 90.0f);
+        FastVecScale(spread, launch_velocity, 90.0f);
     } else {
-        FastVecScale(spread, launchVelocity, math_random_float_range(0.4f, 0.6f) * 180.0f);
+        FastVecScale(spread, launch_velocity, math_random_float_range(0.4f, 0.6f) * 180.0f);
     }
-    FastVecAdd(spread, spread, launchPos);
+    FastVecAdd(spread, spread, launch_pos);
     FastVecSub(spread, g_hero_position, spread);
     spread[2] = 0.0f;
     vec_scale_to_length(spread, spread, 0.16666667f);
-    return part_create_interpolated_emitter((int)moby, 0, launchPos, launchVelocity, spread, 0xB4, 0x258, *(unsigned char *)(state + 0x36));
+    return part_create_interpolated_emitter((int)moby, 0, launch_pos, launch_velocity, spread, 0xB4, 0x258, *(unsigned char *)(state + 0x36));
 }

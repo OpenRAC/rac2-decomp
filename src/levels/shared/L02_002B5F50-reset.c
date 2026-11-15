@@ -37,7 +37,7 @@ extern void hero_l00_set_action(int a0, int a1);
 /* Clears the hero's carried objects and state, then restores the normal setup. */
 void hero_reset_carried_objects(void) {
     char *hero;
-    char *heroMoby;
+    char *hero_moby;
     int handle;
 
     hero = g_hero_state;
@@ -73,15 +73,15 @@ void hero_reset_carried_objects(void) {
     }
     *(float *)(hero + 0xC24) = 1.0f;
     hero_clear_queued_anim();
-    heroMoby = *(char **)(hero + 0x2290);
-    if (*(unsigned char *)((char *)heroMoby + 0x42) != 0xFF) {
-        handle = anim_copy_entry_data(heroMoby, *(unsigned char *)((char *)heroMoby + 0x42),
-                              *(unsigned char *)((char *)heroMoby + 0x40), D_L02_001B5B40);
+    hero_moby = *(char **)(hero + 0x2290);
+    if (*(unsigned char *)((char *)hero_moby + 0x42) != 0xFF) {
+        handle = anim_copy_entry_data(hero_moby, *(unsigned char *)((char *)hero_moby + 0x42),
+                              *(unsigned char *)((char *)hero_moby + 0x40), D_L02_001B5B40);
         *(int *)(*(char **)(hero + 0x2290) + 0x58) = handle;
     }
-    heroMoby = *(char **)(hero + 0x2290);
-    handle = anim_copy_entry_data(heroMoby, *(unsigned char *)((char *)heroMoby + 0x43),
-                          *(unsigned char *)((char *)heroMoby + 0x41), D_L02_001B6140);
+    hero_moby = *(char **)(hero + 0x2290);
+    handle = anim_copy_entry_data(hero_moby, *(unsigned char *)((char *)hero_moby + 0x43),
+                          *(unsigned char *)((char *)hero_moby + 0x41), D_L02_001B6140);
     *(int *)(*(char **)(hero + 0x2290) + 0x5C) = handle;
     if (*(int *)(hero + 0x2294) != 0x61 ||
         (D_001A8F40 != 2 && D_001A8F40 != 6))

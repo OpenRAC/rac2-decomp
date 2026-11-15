@@ -68,7 +68,7 @@ extern void r1_func_0011B710(void);
 s32 iop_file_init_client(void) {
     s32 result, i;
     char *slot;
-    struct W4 versionWord;
+    struct W4 version_word;
     s32 *q;
 
     struct RpcCb *rq = &r1_D_00158100;
@@ -105,8 +105,8 @@ s32 iop_file_init_client(void) {
         return (s32)0xFFFEFFFF;
     }
     *(struct W4 *)r1_D_001580A8 = *(struct W4 *)((u32)r1_D_001575C0 | 0x20000000);
-    versionWord = *(struct W4 *)((u32)(r1_D_001575C0 + 4) | 0x20000000);
-    r1_D_0012FD98[0] = (*(s32 *)&versionWord == 2);
+    version_word = *(struct W4 *)((u32)(r1_D_001575C0 + 4) | 0x20000000);
+    r1_D_0012FD98[0] = (*(s32 *)&version_word == 2);
     r1_D_0012FD94 = 1;
     return 0;
 }

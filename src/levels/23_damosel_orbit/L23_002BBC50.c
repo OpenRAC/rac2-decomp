@@ -79,7 +79,7 @@ extern void vec_clear_128(void *);
 extern void FastVecAdd(void *, void *, void *);
 
 /* Checks whether the hero touched a hit object and, if asked, pushes the hero away and plays the hit reaction. Returns 1 when a push happened. */
-s32 hero_l23_apply_contact_push(s32 applyPush) {
+s32 hero_l23_apply_contact_push(s32 apply_push) {
     TI16 vec;
     Entry_002BBC50 *e;
     u8 *moby;
@@ -133,7 +133,7 @@ s32 hero_l23_apply_contact_push(s32 applyPush) {
             g_hero_state.f1874 = 0;
         }
     }
-    if (applyPush == 0) {
+    if (apply_push == 0) {
         return 1;
     }
     flag = 0;

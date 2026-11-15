@@ -8,7 +8,7 @@ extern void vec_scale_to_length(u8 *, u8 *, f32);
 
 /* Checks up to eight trigger boxes. When the player is inside one, it pushes the player along a set direction and sets a speed value. */
 void push_zone_update(u8 *moby) {
-    s32 *boxIds = *(s32 **)(moby + 0x68);
+    s32 *box_ids = *(s32 **)(moby + 0x68);
     s32 i;
 
     if (moby[0x20] == 0) {
@@ -16,8 +16,8 @@ void push_zone_update(u8 *moby) {
         moby[0x20] = 1;
     }
     for (i = 0; i < 8; i++) {
-        if (boxIds[i] != -1 && IsPointInCuboid(g_hero_state.data, boxIds[i]) != 0) {
-            vec_scale_to_length(g_hero_state.data + 0x270, D_L13_001B2A0C + (boxIds[i] << 7), -1.0f);
+        if (box_ids[i] != -1 && IsPointInCuboid(g_hero_state.data, box_ids[i]) != 0) {
+            vec_scale_to_length(g_hero_state.data + 0x270, D_L13_001B2A0C + (box_ids[i] << 7), -1.0f);
             g_hero_state.value = 10.0f;
         }
     }

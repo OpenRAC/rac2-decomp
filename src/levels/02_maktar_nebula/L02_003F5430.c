@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char u8;
@@ -322,11 +323,11 @@ char *arena_claim_boss(char *actor, s32 classId, s32 variant) {
             && *(s16 *)(entity + 0xAA) == classId && *(u8 *)(entity + 0x20) == 1) {
             *(char **)(entity + 0xB8) = actor;
             switch (classId) {
-            case 0x9F8 /* Chainblade */:
+            case MOBY_CLASS_CHAINBLADE:
                 chainblade_reset_to_start(entity, *(s16 *)(state + 0x120) == 0xC);
                 *(s32 *)(state + 0xA0) += 1;
                 return entity;
-            case 0xA44 /* B2 Brawler Legs */:
+            case MOBY_CLASS_B2_BRAWLER_LEGS:
                 ReinitializeActorAndChild(entity, variant);
                 *(s32 *)(state + 0xA4) += 1;
                 return entity;
@@ -357,11 +358,11 @@ s32 arena_register_spawned_enemy(char *actor, char *enemy) {
                 *(s32 *)(state + 0x94) += 1;
                 *(float *)(*(char **)(enemy + 0x68) + 0x20) = 1.0f;
                 break;
-            case 0xC3B /* Megacorp Security Robot - Flamethrower */:
+            case MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER:
                 *(s32 *)(state + 0x98) += 1;
                 *(float *)(*(char **)(enemy + 0x68) + 0x20) = 1.0f;
                 break;
-            case 0xC3E /* PX6 BladeBall */:
+            case MOBY_CLASS_PX6_BLADEBALL:
                 *(s32 *)(state + 0x9C) += 1;
                 *(float *)(*(char **)(enemy + 0x68) + 0x20) = 1.0f;
                 break;
@@ -449,16 +450,16 @@ void arena_reset_group_enemies(char *actor) {
         case 0xB22 /* moby class 2850 */:
             actor_tear_down(entity);
             break;
-        case 0xC3B /* Megacorp Security Robot - Flamethrower */:
+        case MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER:
             flamethrower_robot_knock_out(entity);
             break;
-        case 0xC3E /* PX6 BladeBall */:
+        case MOBY_CLASS_PX6_BLADEBALL:
             blade_ball_explode(entity);
             break;
-        case 0x9F8 /* Chainblade */:
+        case MOBY_CLASS_CHAINBLADE:
             chainblade_reset_to_idle(entity);
             break;
-        case 0xA44 /* B2 Brawler Legs */:
+        case MOBY_CLASS_B2_BRAWLER_LEGS:
             brawler_switch_off_actor(entity);
             break;
         }
@@ -575,9 +576,9 @@ void arena_set_current_boss(char *actor, char *boss) {
     }
     *(u32 *)(state + 0xD0) = (u32)boss;
     classId = *(s16 *)(boss + 0xAA);
-    if (classId == 0x9F8 /* Chainblade */)
+    if (classId == MOBY_CLASS_CHAINBLADE)
         arena_start_announcer_message(actor, 0xF);
-    else if (classId == 0xA44 /* B2 Brawler Legs */)
+    else if (classId == MOBY_CLASS_B2_BRAWLER_LEGS)
         arena_start_announcer_message(actor, 0x15);
 }
 
@@ -611,20 +612,20 @@ s32 arena_take_enemy_quota(char *actor, s32 classId) {
             return 1;
         }
         break;
-    case 0xC3B /* Megacorp Security Robot - Flamethrower */:
+    case MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER:
         if (*(s32 *)(state + 0x58) > 0) {
             *(s32 *)(state + 0x58) -= 1;
             return 1;
         }
         break;
-    case 0xC3E /* PX6 BladeBall */:
+    case MOBY_CLASS_PX6_BLADEBALL:
         if (*(s32 *)(state + 0x5C) > 0) {
             *(s32 *)(state + 0x5C) -= 1;
             return 1;
         }
         break;
-    case 0x9F8 /* Chainblade */:
-    case 0xA44 /* B2 Brawler Legs */:
+    case MOBY_CLASS_CHAINBLADE:
+    case MOBY_CLASS_B2_BRAWLER_LEGS:
         return 0;
     default:
         break;
@@ -635,7 +636,7 @@ s32 arena_take_enemy_quota(char *actor, s32 classId) {
 /* Adds one back to the stored enemy count for this enemy type. */
 void IncrementMaktarTypeCounter(char *actor, s32 classId) {
     s32 *counts = *(s32 **)(actor + 0x68);
-    s32 result = 0xA44 /* B2 Brawler Legs */;
+    s32 result = MOBY_CLASS_B2_BRAWLER_LEGS;
     if (classId == result)
         goto low_return;
     if (classId >= 0xA45)
@@ -646,7 +647,7 @@ void IncrementMaktarTypeCounter(char *actor, s32 classId) {
 low_return:
     return;
 high:
-    result = 0xC3B /* Megacorp Security Robot - Flamethrower */;
+    result = MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER;
     if (classId == result)
         goto inc58;
     if (classId >= 0xC3C)
@@ -656,7 +657,7 @@ high:
         goto inc54;
     return;
 highest:
-    result = 0xC3E /* PX6 BladeBall */;
+    result = MOBY_CLASS_PX6_BLADEBALL;
     if (classId == result)
         goto inc5c;
     return;
@@ -815,11 +816,11 @@ void arena_update_group_enemies(char *actor) {
             moby_set_anim_type_three(entity, 0, -1);
             actor_tear_down(entity);
             break;
-        case 0xC3B /* Megacorp Security Robot - Flamethrower */:
+        case MOBY_CLASS_MEGACORP_SECURITY_ROBOT_FLAMETHROWER:
             moby_set_anim_type_three(entity, 0, -1);
             flamethrower_robot_knock_out(entity);
             break;
-        case 0xC3E /* PX6 BladeBall */:
+        case MOBY_CLASS_PX6_BLADEBALL:
             moby_set_anim_type_three(entity, 0, -1);
             blade_ball_explode(entity);
             break;
@@ -1053,29 +1054,29 @@ void arena_notify_mobys_challenge_start(void) {
 
     for (moby = D_L02_001B35A8; moby != 0; moby = *(char **)(moby + 0x28)) {
         switch (*(s16 *)(moby + 0xAA)) {
-        case 0xE7D /* Sheep */:
+        case MOBY_CLASS_SHEEP:
             explosion_effect_update(moby);
             break;
-        case 0xEB0 /* Dark Sheep */:
+        case MOBY_CLASS_DARK_SHEEP:
             moby_explode_and_hurt_nearby(moby);
             break;
-        case 0xCB2 /* Synthenoid */:
+        case MOBY_CLASS_SYNTHENOID:
             moby_copy_sub_byte_40_to_25(moby);
             break;
-        case 0xB02 /* Kilonoid */:
+        case MOBY_CLASS_KILONOID:
             moby_copy_vars_byte_40_to_25(moby);
             break;
-        case 0x1366 /* Miniturret */:
+        case MOBY_CLASS_MINITURRET:
             moby_raise_state_to_eight(moby);
             break;
-        case 0x1367 /* Megaturret */:
+        case MOBY_CLASS_MEGATURRET:
             moby_raise_state_to_eight_copy(moby);
             break;
         case 0x326 /* moby class 806 */:
             moby_release_slots_retire(moby);
             break;
-        case 0xA5C /* Shield Charger */:
-        case 0x1192 /* Tesla Barrier */:
+        case MOBY_CLASS_SHIELD_CHARGER:
+        case MOBY_CLASS_TESLA_BARRIER:
             moby_call_helper_10000(moby);
             break;
         case 0xAE0:
@@ -1094,7 +1095,7 @@ void arena_notify_mobys_challenge_start(void) {
         case 0xCC7:
         case 0xCC8:
         case 0xCC9:
-        case 0xCDB /* Ammo */:
+        case MOBY_CLASS_AMMO:
             moby_mark_spawned(moby);
             break;
         }

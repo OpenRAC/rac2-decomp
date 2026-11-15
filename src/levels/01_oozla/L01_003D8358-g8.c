@@ -58,8 +58,8 @@ void water_raft_update(u8 *moby)
     f32 oldPos[4] __attribute__((aligned(16)));
     f32 move[4] __attribute__((aligned(16)));
     u8 *vars = *(u8 **)(moby+0x68);
-    f32 tiltScale, height, previous, slopeX, slopeY, pitch, scale, speed, step;
-    u8 *linkedMoby;
+    f32 tilt_scale, height, previous, slope_x, slope_y, pitch, scale, speed, step;
+    u8 *linked_moby;
     FastVecScale(delta,moby+0x10,-1.0f);
     qcopy(rotation,moby+0xF0);
     previous=F(moby,0x18);
@@ -83,19 +83,19 @@ void water_raft_update(u8 *moby)
         }
         break;
     case 1:
-        linkedMoby=g_moby_l01_table+(I(vars,0x8C)<<8);
-        if(!linkedMoby || linkedMoby[0x20]==0xFE || linkedMoby[0x20]==0xFD) moby[0x20]=2;
+        linked_moby=g_moby_l01_table+(I(vars,0x8C)<<8);
+        if(!linked_moby || linked_moby[0x20]==0xFE || linked_moby[0x20]==0xFD) moby[0x20]=2;
         break;
     case 2:
         if(g_hero_state.mode==0 && *(u8 **)(HERO+0x33C)==moby) {
             FastVecSub(relative,HERO+0x80,moby+0x10);
-            slopeX=FastVecDot(relative,moby+0xC0);
-            slopeY=FastVecDot(relative,moby+0xD0);
-            tiltScale=D_L01_001B076C;
-            pitch=-tiltScale*slopeY;
+            slope_x=FastVecDot(relative,moby+0xC0);
+            slope_y=FastVecDot(relative,moby+0xD0);
+            tilt_scale=D_L01_001B076C;
+            pitch=-tilt_scale*slope_y;
             *(Quad *)oldAngle=*(Quad *)(vars+0x60);
             *(Quad *)oldPos=*(Quad *)(moby+0x10);
-            scale=tiltScale*slopeX;
+            scale=tilt_scale*slope_x;
             math_approach_with_velocity(vars+0x60,pitch,vars+0x70,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
             math_approach_with_velocity(vars+0x64,scale,vars+0x74,D_L01_001B077C,D_L01_001B0780,D_L01_001B0784,0);
             mat_transform_offset_two_matrices(HERO+0x80,move,moby+0x10,oldAngle,vars+0x60);

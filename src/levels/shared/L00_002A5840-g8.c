@@ -42,7 +42,7 @@ extern void FastVecScale(void *, void *, float);
 void UpdateHeroGlowAndExtraManipulators(void) {
     unsigned char *hero0, *hero1, *hero2;
     unsigned char *object;
-    int alpha, greenBase, redWave, red, blue, green, greenOffset, redOffset, blueOffset, period;
+    int alpha, green_base, red_wave, red, blue, green, green_offset, red_offset, blue_offset, period;
     float normalized, wave, amplitude;
     if (D_001A7A43)
         ApproachValue(&D_L00_001A7CF8, 1.8f, 0.05f);
@@ -69,14 +69,14 @@ void UpdateHeroGlowAndExtraManipulators(void) {
     normalized = normalized * 3.1415927f;
     wave = math_fast_sin_or_cos_b(normalized + -3.1415927f);
     amplitude = wave * 24.0f;
-    blueOffset = FloatToInt(amplitude) + 12;
-    blue += blueOffset;
-    greenBase = FloatToInt(wave * 48.0f);
-    greenOffset = greenBase + 24;
-    redWave = FloatToInt(amplitude);
-    green = greenBase + 160;
-    redOffset = redWave + 12;
-    red = redWave + 76;
+    blue_offset = FloatToInt(amplitude) + 12;
+    blue += blue_offset;
+    green_base = FloatToInt(wave * 48.0f);
+    green_offset = green_base + 24;
+    red_wave = FloatToInt(amplitude);
+    green = green_base + 160;
+    red_offset = red_wave + 12;
+    red = red_wave + 76;
     if (*(short *)(hero1 + 0x20E) != 0) {
         float blend = 1.0f;
         int max = 40;
@@ -85,9 +85,9 @@ void UpdateHeroGlowAndExtraManipulators(void) {
             blend = IntToFloat(45 - *(short *)(hero1 + 0x20E)) / IntToFloat(5);
         if (*(short *)(hero1 + 0x20E) < 20)
             blend = IntToFloat(*(short *)(hero1 + 0x20E)) / IntToFloat(20);
-        blue -= FloatToInt((float)blueOffset * blend);
-        green -= FloatToInt((float)greenOffset * blend);
-        red -= FloatToInt((float)redOffset * blend);
+        blue -= FloatToInt((float)blue_offset * blend);
+        green -= FloatToInt((float)green_offset * blend);
+        red -= FloatToInt((float)red_offset * blend);
         blue += FloatToInt(blend * 112.0f);
         green -= FloatToInt(blend * 72.0f);
     }

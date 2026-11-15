@@ -8,19 +8,19 @@ extern void *part_spawn_ground_effect(void *, u32, u32, f32, f32, u32, s32, void
 extern char D_L02_001A8F20[] __attribute__((sda));
 
 /* Spawn one particle and, when both secondary parameters are set, its opposite. */
-void SpawnOpposedParticles(void *pos, void *primaryA, void *primaryB, void *secondaryA, void *secondaryB)
+void SpawnOpposedParticles(void *pos, void *primary_a, void *primary_b, void *secondary_a, void *secondary_b)
 {
-    TI128 posCopy;
+    TI128 pos_copy;
     float scale;
     float zero = 0.0f;
     int sign;
 
-    posCopy = *(TI128 *)pos;
+    pos_copy = *(TI128 *)pos;
     scale = math_random_float_range(2.0f, 4.0f);
     sign = math_random_int_below(2);
     if (sign == 0)
         sign--;
-    part_spawn_ground_effect(&posCopy, (u32)primaryA, (u32)primaryB, scale * 0.3f, scale, 0, sign, D_L02_001A8F20, zero, 0);
-    if (secondaryA != 0 && secondaryB != 0)
-        part_spawn_ground_effect(&posCopy, (u32)secondaryA, (u32)secondaryB, scale * 0.04f, scale * 0.4f, 1, -sign, D_L02_001A8F20, zero, 0);
+    part_spawn_ground_effect(&pos_copy, (u32)primary_a, (u32)primary_b, scale * 0.3f, scale, 0, sign, D_L02_001A8F20, zero, 0);
+    if (secondary_a != 0 && secondary_b != 0)
+        part_spawn_ground_effect(&pos_copy, (u32)secondary_a, (u32)secondary_b, scale * 0.04f, scale * 0.4f, 1, -sign, D_L02_001A8F20, zero, 0);
 }

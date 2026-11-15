@@ -42,7 +42,7 @@ void cam_path_update_cinematic(char *moby) {
     char *f;
     struct CamK_72D8 *k;
     char *desc;
-    char *pathData;
+    char *path_data;
     short phase;
     float t;
 
@@ -125,27 +125,27 @@ void cam_path_update_cinematic(char *moby) {
     {
         float d;
         float nv;
-        int pathDone;
+        int path_done;
         int i;
         struct CamKeys *keys;
 
-        pathData = D_L00_001FDA80[*(int *)(desc + 0x20)];
+        path_data = D_L00_001FDA80[*(int *)(desc + 0x20)];
         qcopy(va, (moby + 0x30));
-        pathDone = Spline_AdvanceByDistance(pathData, (moby + 0x30), (int *)f, (float *)(f + 4), *(float *)(desc + 0x3C) * 0.01666666753590107f, 0);
+        path_done = Spline_AdvanceByDistance(path_data, (moby + 0x30), (int *)f, (float *)(f + 4), *(float *)(desc + 0x3C) * 0.01666666753590107f, 0);
         if (*(short *)(f + 0x16) != 0) {
             if (FastDecTimer(f + 0x16) != 0) {
-                pathDone = 1;
+                path_done = 1;
             } else if (*(int *)(desc + 0x40) != 0) {
                 short s16 = *(short *)(f + 0x16);
                 if (s16 < FloatToInt(20.0f)) {
-                    pathDone = 1;
+                    path_done = 1;
                 }
             }
         }
         if (*(unsigned char *)(desc + 0x39) != 0) {
-            pathDone = 1;
+            path_done = 1;
         }
-        if (pathDone != 0) {
+        if (path_done != 0) {
             *(short *)(f + 0x14) = 2;
             if (*(int *)(desc + 0x40) == 0) {
                 return;
@@ -166,12 +166,12 @@ void cam_path_update_cinematic(char *moby) {
                 int j;
                 int j2;
                 for (j = keys->ids[i]; j < *(int *)f; j++) {
-                    sum = sum + *(float *)(pathData + j * 16 + 0x1C);
+                    sum = sum + *(float *)(path_data + j * 16 + 0x1C);
                 }
                 total = sum;
                 sum = sum + fv;
                 for (j2 = *(int *)f; j2 < keys->ids[i + 1]; j2++) {
-                    total = total + *(float *)(pathData + j2 * 16 + 0x1C);
+                    total = total + *(float *)(path_data + j2 * 16 + 0x1C);
                 }
                 r = math_cosine_blend(keys->vals[i], keys->vals[i + 1], sum / total);
                 m = r * 0.00872664712369442f;

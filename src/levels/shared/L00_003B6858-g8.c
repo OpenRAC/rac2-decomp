@@ -32,7 +32,7 @@ int InitializePairedObjects(char *object)
     source=D_L00_001AFA70;
     out=state->positions;
     do {
-        *slot=CreateMoby(i?0xe7d /* Sheep */:0xeb0 /* Dark Sheep */);
+        *slot=CreateMoby(i?MOBY_CLASS_SHEEP:MOBY_CLASS_DARK_SHEEP);
         moby_init_child_from_parent(*slot,0);
         *(unsigned short *)(*slot+0x34)|=0x4100;
         (*slot)[0xbc]=i;

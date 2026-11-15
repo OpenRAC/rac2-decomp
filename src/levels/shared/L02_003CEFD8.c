@@ -76,7 +76,7 @@ void chickenbot_emit_sparks(struct L02PushObject *a0)
         e = (struct L02PushEntity *)(g_moby_l02_pool + ((*p & 0x7FFF) << 8));
         if (e == 0)
             break;
-        if (e->f31 != 0 && e->type == 0xA4E /* Megacorp Chickenbot */ && e->state != 0xFE && e->state != 0xFD) {
+        if (e->f31 != 0 && e->type == MOBY_CLASS_MEGACORP_CHICKENBOT && e->state != 0xFE && e->state != 0xFD) {
             o = e->obj;
             FastVecScale(tmp, &vec, o->f324);
             transform_vector(tmp, tmp, (char *)o + 0x220);

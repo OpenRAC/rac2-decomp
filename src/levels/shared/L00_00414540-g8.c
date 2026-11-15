@@ -49,7 +49,7 @@ void part_spawn_explosion_burst_with_drift(u8 *object, void *unused, float *drif
     u8 *state = *(u8 **)(object + 0x68);
     float inner, outer, angle, speed;
     u8 *effect;
-    int coreIdx, glowIdx, brightIdx, largeIdx, smallIdx, debrisIdx, smokeIdx, sign;
+    int core_idx, glow_idx, bright_idx, large_idx, small_idx, debris_idx, smoke_idx, sign;
 
     inner = D_L00_001B13E0 * F(state, 0x14) * 210000.0f;
     outer = D_L00_001B13E4 * F(state, 0x14) * 210000.0f;
@@ -63,21 +63,21 @@ void part_spawn_explosion_burst_with_drift(u8 *object, void *unused, float *drif
         if (effect)
             effect[2] = D_L00_001FE940.fireColors[0];
     }
-    for (coreIdx = 1; coreIdx >= 0; coreIdx--) {
+    for (core_idx = 1; core_idx >= 0; core_idx--) {
         {
             effect = part_spawn_gravity_fade(object + 0x10, drift, D_L00_001B13E8, 0xF78E38, 0, 127, 0, inner, outer, 0.0f, 0);
             if (effect)
                 effect[2] = D_L00_001FE940.fireColors[5];
         }
     }
-    for (glowIdx = 1; glowIdx >= 0; glowIdx--) {
+    for (glow_idx = 1; glow_idx >= 0; glow_idx--) {
         {
             effect = part_spawn_gravity_fade(object + 0x10, drift, D_L00_001B13E8, 0xF78E38, 0, 127, 0, inner, outer, 0.0f, 0);
             if (effect)
                 effect[2] = D_L00_001FE940.fireColors[6];
         }
     }
-    for (brightIdx = 0; brightIdx < I(state, 0x20); brightIdx++) {
+    for (bright_idx = 0; bright_idx < I(state, 0x20); bright_idx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
         heading = mat_fast_helper_a(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
@@ -102,7 +102,7 @@ void part_spawn_explosion_burst_with_drift(u8 *object, void *unused, float *drif
                 effect[2] = D_L00_001FE940.sparkColors[0];
         }
     }
-    for (largeIdx = 0; largeIdx < I(state, 0x24); largeIdx++) {
+    for (large_idx = 0; large_idx < I(state, 0x24); large_idx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
         heading = mat_fast_helper_a(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
@@ -122,7 +122,7 @@ void part_spawn_explosion_burst_with_drift(u8 *object, void *unused, float *drif
         FastVecAdd(velocity, velocity, drift);
         part_spawn_fading_drift(position, velocity, lifetime, 0xFF8F00, phase, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00405555591f, 5);
     }
-    for (smallIdx = 0; smallIdx < I(state, 0x28); smallIdx++) {
+    for (small_idx = 0; small_idx < I(state, 0x28); small_idx++) {
         float heading, angle, size, speed;
         int lifetime, phase;
         heading = mat_fast_helper_a(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
@@ -142,7 +142,7 @@ void part_spawn_explosion_burst_with_drift(u8 *object, void *unused, float *drif
         FastVecAdd(velocity, velocity, drift);
         part_spawn_fading_drift(position, velocity, lifetime, 0xFF6430, phase, 127, 127, size * 210000.0f, F(state, 0x14) * 2100.0f, 0.00405555591f, 3);
     }
-    for (debrisIdx = 0; debrisIdx < I(state, 0x30); debrisIdx++) {
+    for (debris_idx = 0; debris_idx < I(state, 0x30); debris_idx++) {
         float roll, turn;
         speed = math_random_float_range(15.0f, 20.0f) * F(state, 0x14) * 0.016666668f;
         FastVecScale(position, object + 0xC0, speed);
@@ -166,7 +166,7 @@ void part_spawn_explosion_burst_with_drift(u8 *object, void *unused, float *drif
         SpawnExplosionEffects(object, D_L00_001A8F20, object + 0x10, 0.0f, 0.0f, 0, 0, 0, 0.0f, 0.0f, 9.0f, 0.0f, -1, 0, 0, -1, 0, 0x810001, F(state, 0x14) * 20.0f);
     sign = 1;
     angle = mat_fast_helper_a(D_L00_001B8C80.target[0] - F(object, 0x10), D_L00_001B8C80.target[1] - F(object, 0x14));
-    for (smokeIdx = 0; smokeIdx < I(state, 0x2C); smokeIdx++) {
+    for (smoke_idx = 0; smoke_idx < I(state, 0x2C); smoke_idx++) {
         float radius, roll, turn;
         position[0] = F(object, 0x10) + math_random_signed_float_range(0.0f, 1.0f) * F(state, 0x14);
         sign = -sign;

@@ -41,12 +41,12 @@ typedef struct StateData {
 
 /* Fires the object's emitter for the new state, doubles the object's rate, arms the two
    animation tables the state selects and hands the state to both owners. */
-void guard_switch_animation(u8 *moby, s32 animId, s32 animFlags, s32 blendFrames) {
+void guard_switch_animation(u8 *moby, s32 anim_id, s32 anim_flags, s32 blend_frames) {
     StateData *vars = *(StateData **)(moby + 0x68);
     f32 rate0, rate1, rate2, rate3;
     u8 *owner;
 
-    if (animId == 12) {
+    if (anim_id == 12) {
         rate0 = D_L12_001B17F4;
         rate1 = D_L12_001B17F8;
         rate2 = D_L12_001B1804;
@@ -65,7 +65,7 @@ void guard_switch_animation(u8 *moby, s32 animId, s32 animFlags, s32 blendFrames
             rate3 * 0.00029088824f);
         vars->field_118 = vars->field_118 * 2.0f;
     }
-    if ((u32)(animId - 13) < 3) {
+    if ((u32)(anim_id - 13) < 3) {
         vars->field_6C = 0;
         vars->field_70 = 0;
         vars->field_74 = 0;
@@ -81,7 +81,7 @@ void guard_switch_animation(u8 *moby, s32 animId, s32 animFlags, s32 blendFrames
         vars->field_C2 = 7;
         vars->field_C3 = 0x13;
         vars->field_C6 = 1;
-    } else if (animId == 0x10) {
+    } else if (anim_id == 0x10) {
         vars->field_74 = 0.0041666669f;
         vars->field_62 = 0x11;
         vars->field_C6 = 0;
@@ -98,9 +98,9 @@ void guard_switch_animation(u8 *moby, s32 animId, s32 animFlags, s32 blendFrames
         vars->field_C2 = 0xA;
         vars->field_C3 = 0x11;
     }
-    if (*(u8 *)(moby + 0x43) != animId)
-        anim_start_blended(moby, animId, animFlags, blendFrames);
+    if (*(u8 *)(moby + 0x43) != anim_id)
+        anim_start_blended(moby, anim_id, anim_flags, blend_frames);
     owner = vars->field_2F8;
-    if (owner != 0 && owner[0x43] != animId)
-        anim_start_blended(owner, animId, animFlags, blendFrames);
+    if (owner != 0 && owner[0x43] != anim_id)
+        anim_start_blended(owner, anim_id, anim_flags, blend_frames);
 }

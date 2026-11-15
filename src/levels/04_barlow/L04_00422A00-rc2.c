@@ -43,18 +43,18 @@ typedef struct {
 /* Projects the object's position onto the screen and, if it lands inside the view, looks up a value for that spot; returns -1 when it does not. */
 f32 screen_query_point_value(void *object) {
     QueryWork work;
-    f32 queryResult;
-    s32 positionPtr;
+    f32 query_result;
+    s32 position_ptr;
 
-    positionPtr = *(s32 *)((s8 *)object + 0x68) + 0x30;
-    ref_L04_00422A00_00(&work, (s32 *)positionPtr, ref_L04_00422A00_05);
-    queryResult = ref_L04_00422A00_01(&work, ref_L04_00422A00_05 + 0x230);
-    ref_L04_00422A00_02((s32 *)positionPtr, &work.x, &work.y);
+    position_ptr = *(s32 *)((s8 *)object + 0x68) + 0x30;
+    ref_L04_00422A00_00(&work, (s32 *)position_ptr, ref_L04_00422A00_05);
+    query_result = ref_L04_00422A00_01(&work, ref_L04_00422A00_05 + 0x230);
+    ref_L04_00422A00_02((s32 *)position_ptr, &work.x, &work.y);
     if (work.x < 0 ||
         work.x >= g_screen_width - 0x10 ||
         work.y < 0 ||
         work.y >= g_screen_height[0] - 8 ||
-        !(queryResult > 0.0f) ||
+        !(query_result > 0.0f) ||
         ref_L04_00422A00_03(-1, (u16)work.x, (u16)work.y, 0x10, 8, 0, &ref_L04_00422A00_04) == -1) {
         ref_L04_00422A00_04 = -1.0f;
     }

@@ -29,23 +29,23 @@ extern int ref_L01_0031BC68_00(int, int, f32);
 void path_puzzle_update_glow_color(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u32 colors[2];
-    f32 easeStep;
+    f32 ease_step;
     f32 blend;
 
     if (moby[0x20] == 5 || *(short *)(vars + 0x6A) == 0) {
         colors[0] = D_L03_001B0C48;
         colors[1] = D_L03_001B0C4C;
-        easeStep = D_L03_001B0C60 * 0.00029088825f;
+        ease_step = D_L03_001B0C60 * 0.00029088825f;
     } else if (*(short *)(vars + 0x68) != 0) {
         colors[0] = D_L03_001B0C50;
         colors[1] = D_L03_001B0C54;
-        easeStep = D_L03_001B0C64 * 0.00029088825f;
+        ease_step = D_L03_001B0C64 * 0.00029088825f;
     } else {
         colors[0] = D_L03_001B0C58;
         colors[1] = D_L03_001B0C5C;
-        easeStep = D_L03_001B0C64 * 0.00029088825f;
+        ease_step = D_L03_001B0C64 * 0.00029088825f;
     }
-    blend = FastAddRotations(*(f32 *)(vars + 0x78), easeStep);
+    blend = FastAddRotations(*(f32 *)(vars + 0x78), ease_step);
     *(f32 *)(vars + 0x78) = blend;
     *(u32 *)(moby + 0x78) = ref_L01_0031BC68_00(colors[0], colors[1], blend);
 }

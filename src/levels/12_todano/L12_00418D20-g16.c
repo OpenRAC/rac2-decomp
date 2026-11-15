@@ -29,12 +29,12 @@ void part_spawn_driver_spark_bursts(u8 *self)
         velocity[2]=0.033333335f;
         particle=SpawnSpinningSparkParticle(pos,0.1f,1.0f,0.9f,210000.0f,math_random_int_below(16),velocity,0xDF202020,0);
         if(particle) {
-            u8 *particleData=particle+0x20;
+            u8 *particle_data=particle+0x20;
             *(u16 *)(particle+10)=10;
             particle[9]=FloatToInt(4.0f)+0x70;
-            *(s32 *)(particleData+4)=2;
-            particleData[10]=0xDF;
-            particleData[11]=particle[10];
+            *(s32 *)(particle_data+4)=2;
+            particle_data[10]=0xDF;
+            particle_data[11]=particle[10];
             particle[3]=0x44;
         }
         velocity[0]=math_fast_sin_or_cos_a(FastAddRotations(*(f32 *)(self+0xF8),3.141593f))*0.050000004f;
@@ -42,12 +42,12 @@ void part_spawn_driver_spark_bursts(u8 *self)
         velocity[2]=0.033333335f;
         particle=SpawnSpinningSparkParticle(pos,0.1f,1.0f,0.9f,210000.0f,math_random_int_below(16),velocity,0xDF208080,0);
         if(particle) {
-            u8 *particleData=particle+0x20;
+            u8 *particle_data=particle+0x20;
             *(u16 *)(particle+10)=10;
             particle[9]=FloatToInt(4.0f)+0x70;
-            *(s32 *)(particleData+4)=2;
-            particleData[10]=0xDF;
-            particleData[11]=particle[10];
+            *(s32 *)(particle_data+4)=2;
+            particle_data[10]=0xDF;
+            particle_data[11]=particle[10];
             particle[3]=0x48;
         }
         velocity[0]=math_fast_sin_or_cos_a(FastAddRotations(*(f32 *)(self+0xF8),3.141593f))*0.016666668f;
@@ -55,12 +55,12 @@ void part_spawn_driver_spark_bursts(u8 *self)
         velocity[2]=0.033333335f;
         particle=SpawnSpinningSparkParticle(pos,0.1f,1.0f,0.9f,210000.0f,math_random_int_below(16),velocity,0xDF808080,0);
         if(particle) {
-            u8 *particleData=particle+0x20;
+            u8 *particle_data=particle+0x20;
             *(u16 *)(particle+10)=10;
             particle[9]=FloatToInt(4.0f)+0x70;
-            *(s32 *)(particleData+4)=2;
-            particleData[10]=0xDF;
-            particleData[11]=particle[10];
+            *(s32 *)(particle_data+4)=2;
+            particle_data[10]=0xDF;
+            particle_data[11]=particle[10];
             particle[3]=0x44;
         }
     }

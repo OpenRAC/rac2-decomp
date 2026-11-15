@@ -110,7 +110,7 @@ void level_process_mob_list(void) {
             mob->flags |= 0x800;
         if (mob->type == 0xD54 /* moby class 3412 */)
             UpdateEquipmentPieces(mob);
-        if (mob != 0 && mob->type == 0xFA0 /* TV Screens */ && mob->p68 != 0)
+        if (mob != 0 && mob->type == MOBY_CLASS_TV_SCREENS && mob->p68 != 0)
             math_store_angle_update_result(mob, (unsigned char *)mob->p68 + 0xC, 0x80AAAAD2, 0x80396464, 0.0610865355f);
     }
     if (g_current_map_index == 0xE && ref_L14_00304588_00.mode == 0) {
@@ -141,17 +141,17 @@ void moby_pass_pos_rot_to_helper(char *moby, char *offset, char *extra) {
 /* Sets up four pairs of entries from two tables, using the settings stored in the object. */
 void part_setup_effect_entry_pairs(char *moby) {
     char *vars = *(char **)(moby + 0x68);
-    char *tableA = D_L14_00237B00;
-    char *tableB = tableA + 0x400;
+    char *table_a = D_L14_00237B00;
+    char *table_b = table_a + 0x400;
     int i;
 
     for (i = 0; i < 4; i++) {
-        func_3910E0(moby, (char *)(((*(int *)(vars + 0xDC) + i) << 8) + (unsigned int)tableA),
+        func_3910E0(moby, (char *)(((*(int *)(vars + 0xDC) + i) << 8) + (unsigned int)table_a),
                     *(int *)(vars + 0x38), *(int *)(vars + 0x40),
                     *(int *)(vars + 0x60), *(int *)(vars + 0x44), *(int *)(vars + 0x64),
                     *(float *)(vars + 0x50), *(float *)(vars + 0x70), *(float *)(vars + 0x54),
                     *(float *)(vars + 0x74), 0.9f);
-        func_3910E0(moby, (char *)(((*(int *)(vars + 0xDC) + i) << 8) + (unsigned int)tableB),
+        func_3910E0(moby, (char *)(((*(int *)(vars + 0xDC) + i) << 8) + (unsigned int)table_b),
                     *(int *)(vars + 0x38), *(int *)(vars + 0x48),
                     *(int *)(vars + 0x68), *(int *)(vars + 0x4C), *(int *)(vars + 0x6C),
                     *(float *)(vars + 0x58), *(float *)(vars + 0x78), *(float *)(vars + 0x5C),
@@ -247,7 +247,7 @@ void debris_l14_update(unsigned char *moby) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L14_001BF940;
                 model = reread->hit;
@@ -328,7 +328,7 @@ void projectile_l14_update(char *moby) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L14_001BF940;
             model = reread->hit;
@@ -482,7 +482,7 @@ extern float func_324F78(float a, float b, float c);
    cleared. The first call takes the object's own matrix as its second argument, but the
    compiler overwrites it with the local buffer before the call, so the callee sees the
    buffer (as retail does). */
-void moby_place_from_group_matrices(char *self, float angleStep) {
+void moby_place_from_group_matrices(char *self, float angle_step) {
     char buf[16];
     char *vars = *(char **)(self + 0x68);
     char *mB0 = vars + 0xB0;
@@ -494,8 +494,8 @@ void moby_place_from_group_matrices(char *self, float angleStep) {
     float zero;
 
     func_2F5C68(buf, m10, mB0);
-    func_328340(buf, buf, mC0, angleStep);
-    f0 = *(float *)(vars + 0x80) + angleStep;
+    func_328340(buf, buf, mC0, angle_step);
+    f0 = *(float *)(vars + 0x80) + angle_step;
     *(float *)(vars + 0x80) = f0;
     func_2F5F18(buf, buf,
                 func_324F78(*(float *)(vars + 0x84), *(float *)(vars + 0x88), f0 * 0.63661977f));
@@ -1016,16 +1016,16 @@ void moby_send_colors_to_linked(char *moby) {
     char *linked = *(char **)(vars + 0x30);
 
     if (linked != 0) {
-        char *linkedVars = *(char **)(linked + 0x68);
+        char *linked_vars = *(char **)(linked + 0x68);
 
-        *(int *)(linkedVars + 0x48) = ((unsigned int)*(s16 *)(vars + 0x44) << 16)
+        *(int *)(linked_vars + 0x48) = ((unsigned int)*(s16 *)(vars + 0x44) << 16)
                               | ((unsigned int)*(s16 *)(vars + 0x42) << 8)
                               | (unsigned int)*(s16 *)(vars + 0x40);
-        *(int *)(linkedVars + 0x4C) = ((unsigned int)*(s16 *)(vars + 0x4A) << 16)
+        *(int *)(linked_vars + 0x4C) = ((unsigned int)*(s16 *)(vars + 0x4A) << 16)
                               | ((unsigned int)*(s16 *)(vars + 0x48) << 8)
                               | (unsigned int)*(s16 *)(vars + 0x46);
-        *(int *)(linkedVars + 0x3C) = 1;
-        *(int *)(linkedVars + 0x34) = *(int *)(vars + 0x18);
+        *(int *)(linked_vars + 0x3C) = 1;
+        *(int *)(linked_vars + 0x34) = *(int *)(vars + 0x18);
     }
 }
 
@@ -1034,32 +1034,32 @@ void moby_set_child_fade_colors(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     short index = *(short *)(vars + 0x16);
     if ((short)(index % 2) == 1) {
-        int startKey = ((short *)vars)[index];
-        int endKey = ((short *)vars)[(index + 1) % 8];
+        int start_key = ((short *)vars)[index];
+        int end_key = ((short *)vars)[(index + 1) % 8];
         char *child;
-        char *childVars;
-        int greenBits;
+        char *child_vars;
+        int green_bits;
         child = *(char **)(vars + 0x28);
         if (child) {
-            childVars = *(char **)(child + 0x68);
-            *(int *)(childVars + 0x14) = *(short *)(vars + 0x14) - startKey;
-            *(int *)(childVars + 0x18) = startKey - endKey;
-            greenBits = (*(short *)(vars + 0x42) << 8) | 0x80000000;
-            *(int *)(childVars + 0x30) = *(int *)(childVars + 0x38) = (*(short *)(vars + 0x44) << 16) | greenBits | *(short *)(vars + 0x40);
-            greenBits = (*(short *)(vars + 0x48) << 8) | 0x80000000;
-            *(int *)(childVars + 0x34) = *(int *)(childVars + 0x3C) = (*(short *)(vars + 0x4A) << 16) | greenBits | *(short *)(vars + 0x46);
-            *(float *)(childVars + 0xC) = 1.0f;
+            child_vars = *(char **)(child + 0x68);
+            *(int *)(child_vars + 0x14) = *(short *)(vars + 0x14) - start_key;
+            *(int *)(child_vars + 0x18) = start_key - end_key;
+            green_bits = (*(short *)(vars + 0x42) << 8) | 0x80000000;
+            *(int *)(child_vars + 0x30) = *(int *)(child_vars + 0x38) = (*(short *)(vars + 0x44) << 16) | green_bits | *(short *)(vars + 0x40);
+            green_bits = (*(short *)(vars + 0x48) << 8) | 0x80000000;
+            *(int *)(child_vars + 0x34) = *(int *)(child_vars + 0x3C) = (*(short *)(vars + 0x4A) << 16) | green_bits | *(short *)(vars + 0x46);
+            *(float *)(child_vars + 0xC) = 1.0f;
         }
         child = *(char **)(vars + 0x2C);
         if (child) {
-            childVars = *(char **)(child + 0x68);
-            *(int *)(childVars + 0x14) = *(short *)(vars + 0x14) - startKey;
-            *(int *)(childVars + 0x18) = startKey - endKey;
-            greenBits = (*(short *)(vars + 0x42) << 8) | 0x80000000;
-            *(int *)(childVars + 0x30) = *(int *)(childVars + 0x38) = (*(short *)(vars + 0x44) << 16) | greenBits | *(short *)(vars + 0x40);
-            greenBits = (*(short *)(vars + 0x48) << 8) | 0x80000000;
-            *(int *)(childVars + 0x34) = *(int *)(childVars + 0x3C) = (*(short *)(vars + 0x4A) << 16) | greenBits | *(short *)(vars + 0x46);
-            *(float *)(childVars + 0xC) = 1.0f;
+            child_vars = *(char **)(child + 0x68);
+            *(int *)(child_vars + 0x14) = *(short *)(vars + 0x14) - start_key;
+            *(int *)(child_vars + 0x18) = start_key - end_key;
+            green_bits = (*(short *)(vars + 0x42) << 8) | 0x80000000;
+            *(int *)(child_vars + 0x30) = *(int *)(child_vars + 0x38) = (*(short *)(vars + 0x44) << 16) | green_bits | *(short *)(vars + 0x40);
+            green_bits = (*(short *)(vars + 0x48) << 8) | 0x80000000;
+            *(int *)(child_vars + 0x34) = *(int *)(child_vars + 0x3C) = (*(short *)(vars + 0x4A) << 16) | green_bits | *(short *)(vars + 0x46);
+            *(float *)(child_vars + 0xC) = 1.0f;
         }
     }
 }

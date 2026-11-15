@@ -42,7 +42,7 @@ void part_update_fading_effect(char *self)
 {
     char *effect = self;
     char *anim = self + 0x20;
-    Vec4_002BABE8 step, fromStep, toStep;
+    Vec4_002BABE8 step, from_step, to_step;
     float progress;
 
     if (g_game_time & 1) {
@@ -60,10 +60,10 @@ void part_update_fading_effect(char *self)
             *(short *)(effect + 0xA) = *(unsigned short *)(anim + 0x12);
         }
     } else if (*(short *)(anim + 0x12) != 0) {
-        vec_decode_byte_color((char *)&fromStep, anim);
-        vec_decode_byte_color((char *)&toStep, effect + 0x24);
+        vec_decode_byte_color((char *)&from_step, anim);
+        vec_decode_byte_color((char *)&to_step, effect + 0x24);
         progress = IntToFloat(*(short *)(effect + 0xA)) / IntToFloat(*(short *)(anim + 0x12));
-        lerp_vector((float *)&step, (char *)&toStep, (char *)&fromStep, progress);
+        lerp_vector((float *)&step, (char *)&to_step, (char *)&from_step, progress);
         FastVecAdd(effect + 0x10, effect + 0x10, (char *)&step);
         *(float *)(effect + 0xC) = ((float)(*(short *)(anim + 0x16) - *(short *)(anim + 0x18)) * progress
                                + (float)*(short *)(anim + 0x18)) * 1000.0f;
@@ -290,9 +290,9 @@ typedef struct {
 extern PadPollState g_pad_state;
 
 /* Reads the state of one controller each frame, fetching its button and vibration profile when it connects, and sends the vibration levels. */
-void poll_pad_device_state(void *padArg)
+void poll_pad_device_state(void *pad_arg)
 {
-    PadPollState *p = padArg;
+    PadPollState *p = pad_arg;
     unsigned char buf[64];
     short vibration;
     int status, n, i;

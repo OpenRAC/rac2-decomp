@@ -343,7 +343,7 @@ void RideableMobyUpdate(RideMoby *moby)
         }
         if (((Hero *)g_hero_state)->ptr[0x33C / 4] != 0) {
             s16 kind = *(s16 *)(((Hero *)g_hero_state)->ptr[0x33C / 4] + 0xAA);
-            if (kind == 0x13E /* moby class 318 */ || kind == 0x46F /* Teleporter */) {
+            if (kind == 0x13E /* moby class 318 */ || kind == MOBY_CLASS_TELEPORTER) {
                 break;
             }
         }

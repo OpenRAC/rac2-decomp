@@ -151,10 +151,10 @@ char *chained_segment_spawn(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     char *segment = 0;
-    char *segmentVars;
+    char *segment_vars;
     float angle;
-    float dirTag;
-    float segLength;
+    float dir_tag;
+    float seg_length;
 
     if (*(float *)(vars + 4) > 0.0f) {
         segment = CreateMoby(0xFE2 /* moby class 4066 */);
@@ -163,30 +163,30 @@ char *chained_segment_spawn(char *moby)
             *(unsigned char *)(segment + 0x30) = 0xFF;
             *(short *)(segment + 0x32) = 0xFF;
             *(unsigned char *)(segment + 0x20) = 1;
-            segmentVars = *(char **)(segment + 0x68);
+            segment_vars = *(char **)(segment + 0x68);
             *(float *)(segment + 0x2C) = *(float *)(moby + 0x2C);
             *(long *)(segment + 0x38) = *(long *)(moby + 0x38);
-            *(char **)(segmentVars + 0x10) = moby;
-            *(int *)segmentVars = *(int *)vars;
-            segLength = *(float *)(vars + 0x1C);
-            *(float *)(segmentVars + 0x1C) = segLength;
-            *(float *)(segmentVars + 4) = *(float *)(vars + 4) - segLength;
+            *(char **)(segment_vars + 0x10) = moby;
+            *(int *)segment_vars = *(int *)vars;
+            seg_length = *(float *)(vars + 0x1C);
+            *(float *)(segment_vars + 0x1C) = seg_length;
+            *(float *)(segment_vars + 4) = *(float *)(vars + 4) - seg_length;
             angle = FastAddRotations(*(float *)(moby + 0xF8), 3.1415927f);
-            *(float *)(segmentVars + 8) = angle;
+            *(float *)(segment_vars + 8) = angle;
             qcopy(segment + 0xF0, moby + 0xF0);
             *(float *)(segment + 0xF8) = angle;
-            dirTag = *(float *)(vars + 0xC);
-            if (dirTag == 0.0001f)
-                *(float *)(segmentVars + 0xC) = 1.0f;
-            else if (dirTag == -0.0001f)
-                *(float *)(segmentVars + 0xC) = -1.0f;
-            else if (dirTag == 1.0f)
-                *(float *)(segmentVars + 0xC) = -0.0001f;
-            else if (dirTag == -1.0f)
-                *(float *)(segmentVars + 0xC) = 0.0001f;
-            moby_transform_joint_to_world(*(char **)(segmentVars + 0x10), 0, segment + 0x10);
+            dir_tag = *(float *)(vars + 0xC);
+            if (dir_tag == 0.0001f)
+                *(float *)(segment_vars + 0xC) = 1.0f;
+            else if (dir_tag == -0.0001f)
+                *(float *)(segment_vars + 0xC) = -1.0f;
+            else if (dir_tag == 1.0f)
+                *(float *)(segment_vars + 0xC) = -0.0001f;
+            else if (dir_tag == -1.0f)
+                *(float *)(segment_vars + 0xC) = 0.0001f;
+            moby_transform_joint_to_world(*(char **)(segment_vars + 0x10), 0, segment + 0x10);
             func_002A0F48(segment);
-            if (*(float *)(segmentVars + 4) > 0.0f)
+            if (*(float *)(segment_vars + 4) > 0.0f)
                 chained_segment_spawn(segment);
         }
     }
@@ -201,20 +201,20 @@ void projectile_draw_trails(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     char *trail = D_L06_0025FFC0;
-    short *alphaTimers = D_L06_001B37A0;
-    short *activeTimers = D_L06_001B3790;
+    short *alpha_timers = D_L06_001B37A0;
+    short *active_timers = D_L06_001B3790;
     int i;
 
     for (i = 5; i >= 0; i--) {
-        if (*activeTimers != 0) {
-            float alphaFloat = IntToFloat(*alphaTimers);
-            int alpha = FloatToInt(alphaFloat);
+        if (*active_timers != 0) {
+            float alpha_float = IntToFloat(*alpha_timers);
+            int alpha = FloatToInt(alpha_float);
 
             DrawNotakRibbonWithHalo(trail + *(int *)(vars + 0x48) * 0x180, alpha, alpha, 4, 0.025f, 0.5f, 0.2f);
         }
         trail += 0x40;
-        alphaTimers++;
-        activeTimers++;
+        alpha_timers++;
+        active_timers++;
     }
     gfx_l06_draw_facing_glow_sprite(moby);
 }
@@ -271,10 +271,10 @@ void path_l06_compute_segment_lengths(char *path) {
     count = *(int *)path;
     i = 0;
     while (i < count) {
-        int byteOffset = i * 16;
+        int byte_offset = i * 16;
 
-        length = func_0032D788(path + (byteOffset + 16), path + (((i + 1) % count) * 16 + 0x10));
-        *(float *)(path + byteOffset + 0x1C) = length;
+        length = func_0032D788(path + (byte_offset + 16), path + (((i + 1) % count) * 16 + 0x10));
+        *(float *)(path + byte_offset + 0x1C) = length;
         i++;
         count = *(int *)path;
     }
@@ -384,15 +384,15 @@ fallback:
 void actor_apply_fall_move(char *moby, char *vars, float f, float g, float h)
 {
     char position[16];
-    char *varsAlias = vars;
+    char *vars_alias = vars;
 
     if (*(float *)(*(char **)(vars + 0x11C)) - 0.3f < *(float *)(moby + 0x18)) {
         *(float *)(vars + 0xC8) -= 0.163333335f;
     }
     qcopy(position, moby + 0x10);
-    math_step_value_toward_target(position + 8, varsAlias + 0xC8, *(float *)(varsAlias + 0x128), f, g, h);
-    if (math_blend_scaled_count(moby, varsAlias + 0xC0, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-        FastVecScale(varsAlias + 0xC0, varsAlias + 0xC0, 0.5f);
+    math_step_value_toward_target(position + 8, vars_alias + 0xC8, *(float *)(vars_alias + 0x128), f, g, h);
+    if (math_blend_scaled_count(moby, vars_alias + 0xC0, 0x400, 0x10, 1.0f, 0.0f) != 0) {
+        FastVecScale(vars_alias + 0xC0, vars_alias + 0xC0, 0.5f);
     }
 }
 
@@ -401,13 +401,13 @@ int actor_adjust_speed_facing(char *moby, char *vars, float p1, float p2, float 
                       float p6, float p7)
 {
     float speed = vec_length_xy(vars + 0xC0);
-    float angleDiff = FastDiffRots(*(float *)(moby + 0xF8), p1);
-    int speedingUp = 0;
+    float angle_diff = FastDiffRots(*(float *)(moby + 0xF8), p1);
+    int speeding_up = 0;
 
-    if (angleDiff < p2) {
+    if (angle_diff < p2) {
         speed += p3;
-        speedingUp = 1;
-    } else if (p4 < angleDiff) {
+        speeding_up = 1;
+    } else if (p4 < angle_diff) {
         speed -= p5;
     }
     if (p6 < speed) {
@@ -417,7 +417,7 @@ int actor_adjust_speed_facing(char *moby, char *vars, float p1, float p2, float 
     }
     *(float *)(vars + 0xC0) = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8)) * speed;
     *(float *)(vars + 0xC4) = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8)) * speed;
-    return speedingUp;
+    return speeding_up;
 }
 
 extern float moby_get_anim_value(char *);
@@ -460,11 +460,11 @@ extern void *D_L06_001BFC98;
 /* Checks whether a short probe from the object hits the given thing; returns 1 if it does. */
 int actor_probe_hits_target(void *moby, void *expected, f32 reach) {
     char probe[16];
-    int hitResult;
+    int hit_result;
 
     func_003514C8(moby, 0, probe);
-    hitResult = func_0031EBF8(reach, probe, 0x21, moby);
-    if (hitResult != 0) {
+    hit_result = func_0031EBF8(reach, probe, 0x21, moby);
+    if (hit_result != 0) {
         if (D_L06_001BFC98 == expected) {
             return 1;
         }
@@ -473,7 +473,7 @@ int actor_probe_hits_target(void *moby, void *expected, f32 reach) {
 }
 
 /* Returns 1 if another object of the same group is in a state between the two given values. */
-int group_is_member_in_state_range(char *moby, int minState, int maxState)
+int group_is_member_in_state_range(char *moby, int min_state, int max_state)
 {
     char *found = 0;
 
@@ -482,10 +482,10 @@ int group_is_member_in_state_range(char *moby, int minState, int maxState)
     }
     while (found != 0) {
         if (found != moby) {
-            int otherState = *(unsigned char *)(found + 0x20);
+            int other_state = *(unsigned char *)(found + 0x20);
 
-            if (otherState >= minState) {
-                if (otherState <= maxState) {
+            if (other_state >= min_state) {
+                if (other_state <= max_state) {
                     return 1;
                 }
             }
@@ -731,7 +731,7 @@ void linked_trigger_update(char *moby)
 
 
 /* Stores two values in the settings block of the object of kind 5, finding that object first if needed. */
-void object_set_kind_five_settings(float valueA, float valueB)
+void object_set_kind_five_settings(float value_a, float value_b)
 {
     char *first = D_L06_001B9890[0];
     char *target;
@@ -743,7 +743,7 @@ void object_set_kind_five_settings(float valueA, float valueB)
         target = first;
     }
     settings = *(char **)(target + 0x70) + 0xE0;
-    *(float *)(settings + 0x44) = valueA;
-    *(float *)(settings + 0x48) = valueB;
+    *(float *)(settings + 0x44) = value_a;
+    *(float *)(settings + 0x48) = value_b;
 }
 

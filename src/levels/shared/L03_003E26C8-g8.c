@@ -49,7 +49,7 @@ extern void path_puzzle_choose_next_node(u8 *);
    from the angles at +0xF0, builds the path (func_L03_003E2968, func_L03_003E2C08) and the
    choice list, and starts the walk at node 0 with the starting timer. */
 void InitializePathPuzzle(u8 *moby) {
-    PuzzlePath *pathState = *(PuzzlePath **)(moby + 0x68);
+    PuzzlePath *path_state = *(PuzzlePath **)(moby + 0x68);
     u8 *position;
     u8 *rotation;
     PuzzleNode *node;
@@ -58,9 +58,9 @@ void InitializePathPuzzle(u8 *moby) {
 
     for (k = 0; k < 14; k++) {
         vec_scale_to_length(&D_L03_0029BBF0[k], &D_L03_0029BBF0[k], 1.0f);
-        pathState->facing[k] = 255;
+        path_state->facing[k] = 255;
     }
-    pathState->facing[14] = 255;
+    path_state->facing[14] = 255;
     rotation = moby + 0xC0;
     position = moby + 0xF0;
 
@@ -85,24 +85,24 @@ void InitializePathPuzzle(u8 *moby) {
 
     mat_get_euler_angles(rotation, position);
     mat_build_rotation_from_angles(D_L03_001B36B0, position);
-    func_001163A0(pathState->sound);
+    func_001163A0(path_state->sound);
     path_puzzle_generate_route(moby);
     SelectPathStepNodes(moby);
     choice_list_build(moby);
     path_puzzle_choose_next_node(moby);
 
     for (m = 0; m < 16; m++) {
-        pathState->order[m] = 255;
-        pathState->visited[m] = 0;
+        path_state->order[m] = 255;
+        path_state->visited[m] = 0;
     }
-    pathState->order[0] = 0;
-    pathState->visited[0] = 1;
-    pathState->pending = -1;
-    pathState->timer = D_L03_001B0B5C;
-    pathState->current = 0;
-    pathState->last = 0;
-    pathState->next = 0;
-    pathState->cursor = 0;
-    pathState->depth = 0;
-    pathState->length = 0;
+    path_state->order[0] = 0;
+    path_state->visited[0] = 1;
+    path_state->pending = -1;
+    path_state->timer = D_L03_001B0B5C;
+    path_state->current = 0;
+    path_state->last = 0;
+    path_state->next = 0;
+    path_state->cursor = 0;
+    path_state->depth = 0;
+    path_state->length = 0;
 }

@@ -84,16 +84,16 @@ extern float math_fabs(float);
 
 /* Probes the ground under the hero each frame and records floor height, slope and surface type. */
 void UpdateDamoselHeroGroundCollision(void) {
-    Vec4 probeEnd, probeStart, edgeDir, sideStart, sideEnd, sideTilt, sideNormal;
+    Vec4 probe_end, probe_start, edge_dir, side_start, side_end, side_tilt, side_normal;
     s32 flag;
     s32 i;
     f32 angle;
-    u8 *hitObj;
-    Vec4 *groundNormal;
+    u8 *hit_obj;
+    Vec4 *ground_normal;
     HeroGround *hero;
 
-    s32 probeMode;
-    f32 probeLength;
+    s32 probe_mode;
+    f32 probe_length;
 
     g_hero_state.xF278 = 1.0f;
     g_hero_state.u30e.U++;
@@ -109,14 +109,14 @@ void UpdateDamoselHeroGroundCollision(void) {
     if (g_hero_state.xI2f8 != 0) {
         g_hero_state.xI2f8++;
     }
-    probeMode = 1;
-    probeLength = g_hero_state.xF234 * 2.2f;
+    probe_mode = 1;
+    probe_length = g_hero_state.xF234 * 2.2f;
     if (g_hero_state.xI208c == 2) {
-        probeLength = g_hero_state.xF234 * 2.9f;
+        probe_length = g_hero_state.xF234 * 2.9f;
     }
-    if (hero_is_in_special_kind_or_mode()) probeLength = 0.0f;
-    BuildOffsetVectorPair(&probeStart, &probeEnd, probeMode, probeLength, -48.0f);
-    if (CollLine(&probeStart, &probeEnd, 2, g_hero_state.xI2080, 0) == 0) {
+    if (hero_is_in_special_kind_or_mode()) probe_length = 0.0f;
+    BuildOffsetVectorPair(&probe_start, &probe_end, probe_mode, probe_length, -48.0f);
+    if (CollLine(&probe_start, &probe_end, 2, g_hero_state.xI2080, 0) == 0) {
         goto tail;
     }
     flag = func_L00_002E2048();
@@ -130,7 +130,7 @@ void UpdateDamoselHeroGroundCollision(void) {
         if (g_hero_state.xF88 < g_hero_state.xF2f0 && g_hero_state.xI2f8 <= 0) {
             g_hero_state.xI2f8 = 1;
         }
-        if (CollLine(&probeStart, &probeEnd, 0x24, g_hero_state.xI2080, 0) == 0) {
+        if (CollLine(&probe_start, &probe_end, 0x24, g_hero_state.xI2080, 0) == 0) {
             goto tail;
         }
         flag = func_L00_002E2048();
@@ -140,12 +140,12 @@ void UpdateDamoselHeroGroundCollision(void) {
         if (moby_is_in_special_class_range(D_L18_001BFC00.i18)) {
             g_hero_state.xH30a = 1;
         }
-        hitObj = moby_get_private_value_0(D_L18_001BFC00.i18);
-        if (hitObj != 0 && (*(u16 *)(hitObj + 0x1E) & 8)) {
+        hit_obj = moby_get_private_value_0(D_L18_001BFC00.i18);
+        if (hit_obj != 0 && (*(u16 *)(hit_obj + 0x1E) & 8)) {
             g_hero_state.xH30a = 1;
         }
-        hitObj = moby_get_private_value_2(D_L18_001BFC00.i18);
-        if (hitObj != 0 && (*(int *)(hitObj + 0x3c) & 8)) g_hero_state.xH30a = 1;
+        hit_obj = moby_get_private_value_2(D_L18_001BFC00.i18);
+        if (hit_obj != 0 && (*(int *)(hit_obj + 0x3c) & 8)) g_hero_state.xH30a = 1;
     }
     if (D_L18_001BFC00.i1C > 0) {
         qcopy((u8 *)&g_hero_state + 0x2D0, &D_L18_001BFC00.v20);
@@ -156,8 +156,8 @@ void UpdateDamoselHeroGroundCollision(void) {
         func_001290E0((u8 *)&g_hero_state + 0x2A0, (u8 *)&D_L18_001BFC00.f40);
         g_hero_state.u2e0.F = cam_get_view_space_angle((u8 *)&D_L18_001BFC00.f40);
         g_hero_state.xF2ec = mat_fast_helper_a(D_L18_001BFC00.f40, D_L18_001BFC00.f44);
-        FastVecSub(&edgeDir, ((u8 *)&g_hero_state + 0x2D0), (u8 *)&g_hero_state + 0x80);
-        if (0.0f < FastVecDot(&edgeDir, (u8 *)&g_hero_state + 0x2A0)) {
+        FastVecSub(&edge_dir, ((u8 *)&g_hero_state + 0x2D0), (u8 *)&g_hero_state + 0x80);
+        if (0.0f < FastVecDot(&edge_dir, (u8 *)&g_hero_state + 0x2A0)) {
             g_hero_state.xF2dc = -g_hero_state.xF2dc;
         }
         if (g_hero_state.xF2dc < 0.02f) {
@@ -175,28 +175,28 @@ tail:
         g_hero_state.xI300++;
         qcopy((u8 *)&g_hero_state + 0x2E0, (u8 *)&g_hero_state + 0x2D0);
     }
-    groundNormal = (Vec4 *)((u8 *)&g_hero_state + 0x2C0);
-    vec_clear_128(groundNormal);
-    hero = (HeroGround *)((u8 *)groundNormal - 0x2C0);
+    ground_normal = (Vec4 *)((u8 *)&g_hero_state + 0x2C0);
+    vec_clear_128(ground_normal);
+    hero = (HeroGround *)((u8 *)ground_normal - 0x2C0);
     switch (hero->xB20b3) {
     case 0:
         hero->xF298 = -1.0f;
         break;
     case 1:
-        if (D_001A8FF4) vec_compute_flat_direction_from_point((u8 *)groundNormal - 0x240, groundNormal, 0);
+        if (D_001A8FF4) vec_compute_flat_direction_from_point((u8 *)ground_normal - 0x240, ground_normal, 0);
         else if (*(float *)((u8 *)hero + 0x2fc) != 0.0f) {
-            ApproachValue((float *)((u8 *)groundNormal + 0x3c), 0.0f, 1.0f);
-            qcopy(groundNormal, (u8 *)groundNormal + 0x30);
+            ApproachValue((float *)((u8 *)ground_normal + 0x3c), 0.0f, 1.0f);
+            qcopy(ground_normal, (u8 *)ground_normal + 0x30);
         } else {
-            qcopy(groundNormal, (u8 *)groundNormal - 0x20);
-            FastVecScale(groundNormal, groundNormal, -1.0f);
+            qcopy(ground_normal, (u8 *)ground_normal - 0x20);
+            FastVecScale(ground_normal, ground_normal, -1.0f);
         }
         break;
     case 2:
         angle = -1.0f;
         if (*(float *)((u8 *)hero + 0xbc) > 0.0f) angle = 1.0f;
-        FastVecSub(groundNormal, (u8 *)groundNormal - 0x210, (u8 *)groundNormal - 0x240);
-        vec_scale_to_length(groundNormal, groundNormal, angle);
+        FastVecSub(ground_normal, (u8 *)ground_normal - 0x210, (u8 *)ground_normal - 0x240);
+        vec_scale_to_length(ground_normal, ground_normal, angle);
         break;
     }
     g_hero_state.u2e4.I = 0;
@@ -213,33 +213,33 @@ tail:
     if (!(g_hero_state.xI208c == 0 || g_hero_state.xI208c == 12 || g_hero_state.xI208c == 9 || g_hero_state.xI208c == 7 || (g_hero_state.xI208c == 4 && *(u8 *)((u8 *)&g_hero_state + 0x49c)) || g_hero_state.xI208c == 1)) {
         return;
     }
-    hero_compute_angles_to_local_dir((u8 *)&g_hero_state + 0x2A0, &edgeDir);
-    if (-0.785398244f < edgeDir.f[1] && edgeDir.f[1] < 0.785398244f) {
-        g_hero_state.u2e4.F = edgeDir.f[1];
+    hero_compute_angles_to_local_dir((u8 *)&g_hero_state + 0x2A0, &edge_dir);
+    if (-0.785398244f < edge_dir.f[1] && edge_dir.f[1] < 0.785398244f) {
+        g_hero_state.u2e4.F = edge_dir.f[1];
     }
-    if (-0.785398244f < edgeDir.f[0] && edgeDir.f[0] < 0.785398244f) {
-        g_hero_state.u2e8.F = edgeDir.f[0];
+    if (-0.785398244f < edge_dir.f[0] && edge_dir.f[0] < 0.785398244f) {
+        g_hero_state.u2e8.F = edge_dir.f[0];
     }
     for (i = 0; i < 2; i++) {
         angle = 1.57079649f;
         if (i == 1) {
             angle = -angle;
         }
-        hero_build_relative_offset(&sideStart, 0.2f, angle, 0.45f, 1);
-        hero_build_relative_offset(&sideEnd, 0.2f, angle, -0.45f, 1);
-        if (CollLine(&sideStart, &sideEnd, 0x22, g_hero_state.xI2080, 0)) {
+        hero_build_relative_offset(&side_start, 0.2f, angle, 0.45f, 1);
+        hero_build_relative_offset(&side_end, 0.2f, angle, -0.45f, 1);
+        if (CollLine(&side_start, &side_end, 0x22, g_hero_state.xI2080, 0)) {
             if (D_001A8FF0) g_hero_state.a2c0.f[i] = gravity_get_center_distance(&D_L18_001BFC00.v20) - gravity_get_center_distance((u8 *)&g_hero_state + 0x2d0);
             else g_hero_state.a2c0.f[i] = D_L18_001BFC00.v20.f[2] - g_hero_state.u2d8.F;
             if (0.4f < math_fabs(g_hero_state.a2c0.f[i])) {
                 g_hero_state.a2c0.f[i] = 0.0f;
             }
-            func_001290E0(&sideNormal, (u8 *)&D_L18_001BFC00.f40);
-            hero_compute_angles_to_local_dir(&sideNormal, &sideTilt);
-            if (-0.785398244f < sideTilt.f[1] && sideTilt.f[1] < 0.785398244f) {
-                g_hero_state.a2c8.f[i] = sideTilt.f[1];
+            func_001290E0(&side_normal, (u8 *)&D_L18_001BFC00.f40);
+            hero_compute_angles_to_local_dir(&side_normal, &side_tilt);
+            if (-0.785398244f < side_tilt.f[1] && side_tilt.f[1] < 0.785398244f) {
+                g_hero_state.a2c8.f[i] = side_tilt.f[1];
             }
-            if (-0.785398244f < sideTilt.f[0] && sideTilt.f[0] < 0.785398244f) {
-                g_hero_state.a2d0.f[i] = sideTilt.f[0];
+            if (-0.785398244f < side_tilt.f[0] && side_tilt.f[0] < 0.785398244f) {
+                g_hero_state.a2d0.f[i] = side_tilt.f[0];
             }
         } else {
             g_hero_state.a2c0.i[i] = 0;

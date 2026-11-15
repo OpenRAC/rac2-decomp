@@ -27,28 +27,28 @@
 extern s32 *ref_L12_0041A578_00[];
 
 /* Finds the next point on the route, after the given one, that is marked as a stopping point. Returns the last point if none is marked. */
-s32 path_find_next_stop_point(s8 *moby, s32 startIndex) {
-    s32 i  = startIndex + 1;
+s32 path_find_next_stop_point(s8 *moby, s32 start_index) {
+    s32 i  = start_index + 1;
     f32 zero  = 0.0f;
     s32 **tables  = (s32 **)ref_L12_0041A578_00;
-    s32 byteOffset  = (i << 4) + 0x1C;
+    s32 byte_offset  = (i << 4) + 0x1C;
     s8 *path;
     s32 count;
-    s32 lastIndex;
-    f32 *flagPtr;
+    s32 last_index;
+    f32 *flag_ptr;
 
     path = (s8 *)tables[*(s32 *)(*(s8 **)(moby + 0x68) + 0x110)];
     count = *(s32 *)path;
-    lastIndex = count - 1;
-    flagPtr = (f32 *)(byteOffset + (s32)path);
+    last_index = count - 1;
+    flag_ptr = (f32 *)(byte_offset + (s32)path);
 loop:
     if (i >= count) {
-        return lastIndex;
+        return last_index;
     }
-    if (*flagPtr == zero) {
+    if (*flag_ptr == zero) {
         return i;
     }
-    flagPtr += 4;
+    flag_ptr += 4;
     i += 1;
     goto loop;
 }

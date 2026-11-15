@@ -16,23 +16,23 @@ extern float ref_L00_00338810_03 __attribute__((sda));
 void text_panel_update_fade(void *object)
 {
     char *panel = (char *)object;
-    u32 *fillColor;
-    u32 *textColor;
-    u32 *bracketColor;
-    u32 *topColor;
-    int showTimer = *(int *)(panel + 0x1B8);
+    u32 *fill_color;
+    u32 *text_color;
+    u32 *bracket_color;
+    u32 *top_color;
+    int show_timer = *(int *)(panel + 0x1B8);
     int alpha = *(u8 *)((u8 *)*(u32 **)(panel + 8) + 3);
-    int lineCount;
-    int baseSize;
-    float heightFloat;
+    int line_count;
+    int base_size;
+    float height_float;
     float tween;
     float zero;
 
-    if (showTimer > 0) {
+    if (show_timer > 0) {
         alpha += 8;
-        showTimer--;
+        show_timer--;
         alpha = (alpha < 0x61) ? alpha : 0x60;
-        *(int *)(panel + 0x1B8) = showTimer;
+        *(int *)(panel + 0x1B8) = show_timer;
     } else {
         alpha = (alpha - 8 >= 0) ? alpha - 8 : 0;
     }
@@ -45,33 +45,33 @@ void text_panel_update_fade(void *object)
     tween = 0.0f;
     alpha <<= 24;
 
-    fillColor = *(u32 **)(panel + 8);
-    *fillColor = (*fillColor & 0x00FFFFFF) | (u32)alpha;
-    textColor = *(u32 **)(panel + 0xC);
-    *textColor = (*textColor & 0x00FFFFFF) | (u32)alpha;
-    bracketColor = (u32 *)ref_L00_00338810_00(panel + 0x10);
-    *bracketColor = (*bracketColor & 0x00FFFFFF) | (u32)alpha;
-    topColor = (u32 *)ref_L00_00338810_00(panel + 0x5C);
-    *topColor = (*topColor & 0x00FFFFFF) | (u32)alpha;
+    fill_color = *(u32 **)(panel + 8);
+    *fill_color = (*fill_color & 0x00FFFFFF) | (u32)alpha;
+    text_color = *(u32 **)(panel + 0xC);
+    *text_color = (*text_color & 0x00FFFFFF) | (u32)alpha;
+    bracket_color = (u32 *)ref_L00_00338810_00(panel + 0x10);
+    *bracket_color = (*bracket_color & 0x00FFFFFF) | (u32)alpha;
+    top_color = (u32 *)ref_L00_00338810_00(panel + 0x5C);
+    *top_color = (*top_color & 0x00FFFFFF) | (u32)alpha;
 
     if (*(int *)(panel + 0x1C4) != 1)
         return;
 
-    baseSize = *(int *)(panel + 0x1D4);
-    lineCount = *(int *)(panel + 0x1B0);
+    base_size = *(int *)(panel + 0x1D4);
+    line_count = *(int *)(panel + 0x1B0);
     *(int *)(panel + 0x1BC) = 8;
     *(int *)(panel + 0x1C0) = 6;
-    *(int *)(panel + 0x1AC) = ((lineCount << 4) >> 1) + 6;
-    *(int *)(panel + 0x1A8) = (baseSize >> 1) + 8;
+    *(int *)(panel + 0x1AC) = ((line_count << 4) >> 1) + 6;
+    *(int *)(panel + 0x1A8) = (base_size >> 1) + 8;
     zero = tween;
-    ref_L00_00338810_01(panel + 0x5C, ((float)((baseSize >> 1) + 8) - 4.0000000000000000000000e+01f)
+    ref_L00_00338810_01(panel + 0x5C, ((float)((base_size >> 1) + 8) - 4.0000000000000000000000e+01f)
             * 4.9504949711263179779053e-03f * 5.6749999523162841796875e-01f
             + 4.9999998882412910461426e-03f);
     if (zero < ref_L00_00338810_02)
         ref_L00_00338810_01(panel + 0x5C, ref_L00_00338810_02);
-    lineCount = *(int *)(panel + 0x1AC);
-    heightFloat = (float)lineCount;
-    tween = (heightFloat - 1.4000000000000000000000e+01f) * 6.5789474174380302429199e-03f;
+    line_count = *(int *)(panel + 0x1AC);
+    height_float = (float)line_count;
+    tween = (height_float - 1.4000000000000000000000e+01f) * 6.5789474174380302429199e-03f;
     ref_L00_00338810_01(panel + 0x10, tween * 8.5000002384185791015625e-01f
             + 2.9999999329447746276855e-02f);
     if (zero <= ref_L00_00338810_03)

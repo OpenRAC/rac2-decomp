@@ -33,22 +33,22 @@ extern u32 mpeg_read_bits(s64,s32);
  
 extern void mpeg_skip_to_start_code(s64);
 /* Reads the extension and user data blocks that follow a header, running a handler for each extension type. */
-void mpeg_read_extension_data(s64 decoderAddr) {
+void mpeg_read_extension_data(s64 decoder_addr) {
     struct T44 tab;
-    s32 startCode;
+    s32 start_code;
     u32 idx;
     tab=*(struct T44 *)D_0013BBC8;
-    mpeg_skip_to_start_code(decoderAddr);
-    while ((startCode=mpeg_peek_bits(decoderAddr,0x20))==0x1B5 || startCode==0x1B2) {
-        if (startCode==0x1B5) {
-            mpeg_skip_bits(decoderAddr,0x20);
-            idx=mpeg_read_bits(decoderAddr,4);
+    mpeg_skip_to_start_code(decoder_addr);
+    while ((start_code=mpeg_peek_bits(decoder_addr,0x20))==0x1B5 || start_code==0x1B2) {
+        if (start_code==0x1B5) {
+            mpeg_skip_bits(decoder_addr,0x20);
+            idx=mpeg_read_bits(decoder_addr,4);
             idx=(idx>10)?0:idx;
-            ((void (*)(s64))tab.f[idx])(decoderAddr);
-            mpeg_skip_to_start_code(decoderAddr);
+            ((void (*)(s64))tab.f[idx])(decoder_addr);
+            mpeg_skip_to_start_code(decoder_addr);
         } else {
-            mpeg_skip_bits(decoderAddr,0x20);
-            mpeg_skip_to_start_code(decoderAddr);
+            mpeg_skip_bits(decoder_addr,0x20);
+            mpeg_skip_to_start_code(decoder_addr);
         }
     }
 }

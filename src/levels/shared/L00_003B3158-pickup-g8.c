@@ -65,7 +65,7 @@ void spiderbot_glove_pickup_update(char *m) {
         if (state == 40 || state == 62 || state == 39 || state == 41 || state == 42 || state == 6 ||
             state == 116 || state == 129)
             goto blocked;
-        if (*(char **)(g + 0x33C) && (*(short *)(*(char **)(g + 0x33C) + 0xAA) == 0x330 /* Taxi */ ||
+        if (*(char **)(g + 0x33C) && (*(short *)(*(char **)(g + 0x33C) + 0xAA) == MOBY_CLASS_TAXI ||
                                       *(short *)(*(char **)(g + 0x33C) + 0xAA) == 0xB21 /* moby class 2849 */))
             goto blocked;
         if (hit && (*(short *)(hit + 0xAA) == 0xB21 /* moby class 2849 */ || *(short *)(hit + 0xAA) == 0xB5B /* moby class 2907 */))

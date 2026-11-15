@@ -51,15 +51,15 @@ extern int D_L03_001B0B40 __attribute__((sda));
 /* Updates a floating object that sways in the air, drifts toward something that touches it, then flies off, plays an effect and disappears. */
 void swaying_floater_update(char *obj)
 {
-    float tmpVec[4] __attribute__((aligned(16)));
+    float tmp_vec[4] __attribute__((aligned(16)));
     float angles[4] __attribute__((aligned(16)));
     char matrix[0x30] __attribute__((aligned(16)));
     char *vars = *(char **)(obj + 0x68);
     float angle;
-    int stateId;
+    int state_id;
 
-    stateId = *(u8 *)(obj + 0x20);
-    switch (stateId) {
+    state_id = *(u8 *)(obj + 0x20);
+    switch (state_id) {
     case 0:
         qcopy(vars, obj + 0x10);
         *(int *)(obj + 0x48) = 0;
@@ -87,8 +87,8 @@ void swaying_floater_update(char *obj)
         *(Quad *)angles = 0;
         angles[0] = *(float *)(vars + 0x10);
         angles[2] = *(float *)(vars + 0x14);
-        *(Quad *)tmpVec = *(Quad *)angles;
-        euler_rotation_basis(matrix, tmpVec);
+        *(Quad *)tmp_vec = *(Quad *)angles;
+        euler_rotation_basis(matrix, tmp_vec);
         FastVecScale(obj + 0x10, matrix + 0x10, D_L03_001B0AF8);
         FastVecAdd(obj + 0x10, obj + 0x10, vars);
         if (!*(int *)(vars + 0x30)) {
@@ -123,17 +123,17 @@ void swaying_floater_update(char *obj)
             *(float *)(obj + 0xF4) *= 4.0f;
             vec_scale_to_length(vars + 0x20, vars + 0x20, 1.0f / 6.0f);
         }
-        *(Quad *)tmpVec = 0;
-        tmpVec[2] = 1.0f / 15.0f;
+        *(Quad *)tmp_vec = 0;
+        tmp_vec[2] = 1.0f / 15.0f;
         if (!math_random_int_below(2))
-            part_l01_spawn_spark_burst(obj + 0x10, tmpVec, 1, 0x40202020, 1, 0.0066666672937572f, 0.9f, 1.02f);
+            part_l01_spawn_spark_burst(obj + 0x10, tmp_vec, 1, 0x40202020, 1, 0.0066666672937572f, 0.9f, 1.02f);
         *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8), 0.20943954586982727f);
         FastVecAdd(obj + 0x10, obj + 0x10, vars + 0x20);
         {
             int timer = *(unsigned short *)(obj + 0x96);
 
-            stateId = timer - 1;
-            *(unsigned short *)(obj + 0x96) = stateId;
+            state_id = timer - 1;
+            *(unsigned short *)(obj + 0x96) = state_id;
             if (!timer)
                 moby_set_state(obj, 3, -1);
         }
@@ -149,8 +149,8 @@ void swaying_floater_update(char *obj)
                               D_L03_001B0B40, 6, 65535, 255, 0);
             moby_mark_spawned(effect);
         }
-        vec_local_offset_to_world(obj, tmpVec, D_L03_001B0B30, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
-        SpawnExplosionEffects(obj, D_L03_001A8F20, tmpVec, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
+        vec_local_offset_to_world(obj, tmp_vec, D_L03_001B0B30, D_L03_001B0B30_1[1], D_L03_001B0B30_1[2]);
+        SpawnExplosionEffects(obj, D_L03_001A8F20, tmp_vec, 0.0f, 0.0f, 10, 5, 15, 0.0f, 0.0f, 9.0f,
                       *(float *)(obj + 0x2C) * 30.0f, -1, 0.0f, 0, 0, -1, 0, 0x810001);
         moby_mark_spawned(obj);
         break;

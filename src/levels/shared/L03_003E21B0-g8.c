@@ -42,7 +42,7 @@ typedef struct {
 void UpdateTimedPathPuzzle(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     PathRecord *path = (PathRecord *)vars;
-    int i, soundHandle;
+    int i, sound_handle;
     float ratio;
     u8 *timeRecord;
 
@@ -100,11 +100,11 @@ void UpdateTimedPathPuzzle(u8 *moby) {
             if (choice == 0) {
                 PlayMobySound(0, 0, moby);
             } else {
-                soundHandle = PlayMobySound(1, 0, moby);
-                if (soundHandle != -1) {
+                sound_handle = PlayMobySound(1, 0, moby);
+                if (sound_handle != -1) {
                     ratio = IntToFloat(path->length);
                     ratio /= IntToFloat(D_L03_001B0B50);
-                    snd_set_voice_pitch_bend(soundHandle, FloatToInt(ratio * 1024.0f) + 1024);
+                    snd_set_voice_pitch_bend(sound_handle, FloatToInt(ratio * 1024.0f) + 1024);
                 }
             }
         }
@@ -160,15 +160,15 @@ void UpdateTimedPathPuzzle(u8 *moby) {
     if (moby[0x20] != 5 && path->active)
         FastDecTimer(&path->timer);
     if (path->active && path->timer) {
-        u8 *soundSlot = g_sound_state + *(int *)(vars + 0x7C) * 112;
-        if (*(u8 **)(soundSlot + 0x88) != moby || !soundSlot[0x74])
+        u8 *sound_slot = g_sound_state + *(int *)(vars + 0x7C) * 112;
+        if (*(u8 **)(sound_slot + 0x88) != moby || !sound_slot[0x74])
             *(int *)(vars + 0x7C) = PlayMobySound(3, 4, moby);
     } else {
         int handle = *(int *)(vars + 0x7C);
         if (handle != -1) {
             int offset = handle * 112;
-            u8 *soundSlot = g_sound_state + offset;
-            if (*(u8 **)(soundSlot + 0x88) == moby && soundSlot[0x74])
+            u8 *sound_slot = g_sound_state + offset;
+            if (*(u8 **)(sound_slot + 0x88) == moby && sound_slot[0x74])
                 snd_stop_voice(handle);
         }
         *(int *)(vars + 0x7C) = -1;

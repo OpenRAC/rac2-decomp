@@ -26,12 +26,12 @@ extern float vec_distance_xy(char *, void *);
 /* Looks for a group member in front of the enemy and turns the enemy toward it. Returns 1 if one was found. */
 int AimAtGroupEntityInConeL02(char *self) {
     char *state = *(char **)(self + 0x68);
-    float aimPoint[4];
-    u16 *idPtr;
+    float aim_point[4];
+    u16 *id_ptr;
     char *entity;
-    float savedStep;
-    float turnAngle;
-    char *upAxis;
+    float saved_step;
+    float turn_angle;
+    char *up_axis;
 
 #define GROUP (*(int *)(state + 0x2EC))
 #define ANGLE()                                                                       \
@@ -39,11 +39,11 @@ int AimAtGroupEntityInConeL02(char *self) {
                   *(float *)(entity + 0x14) - *(float *)(self + 0x14))
     if (GROUP == -1)
         return 0;
-    for (idPtr = g_entity_group_lists[GROUP];
-         (GROUP & 0xFF) != 0xFF && GROUP <= D_L02_001B35B8 && idPtr != 0 &&
-         ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == g_entity_group_lists[GROUP]);
-         idPtr++) {
-        entity = (char *)D_L02_001B359C_1[0] + ((*idPtr & 0x7FFF) << 8);
+    for (id_ptr = g_entity_group_lists[GROUP];
+         (GROUP & 0xFF) != 0xFF && GROUP <= D_L02_001B35B8 && id_ptr != 0 &&
+         ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == g_entity_group_lists[GROUP]);
+         id_ptr++) {
+        entity = (char *)D_L02_001B359C_1[0] + ((*id_ptr & 0x7FFF) << 8);
         if (entity == 0)
             return 0;
         if (moby_get_busy_flag(entity) == 0)
@@ -52,19 +52,19 @@ int AimAtGroupEntityInConeL02(char *self) {
             continue;
         if (!(FastDiffRots(*(float *)(self + 0xF8), ANGLE()) < D_L02_001B0170 * 0.017453294f))
             continue;
-        if (idPtr == 0)
+        if (id_ptr == 0)
             return 0;
 
-        FastVecSub(aimPoint, (float *)(self + 0x10), (float *)(entity + 0x10));
-        upAxis = self + 0xE0;
-        turnAngle = D_L02_001B0174 * 0.017453294f;
-        math_apply_axis_rotation_to_quat(aimPoint, aimPoint, upAxis,
-                      0.0f <= fast_subtract_rotations(*(float *)(self + 0xF8), ANGLE()) ? -turnAngle : turnAngle);
-        FastVecAdd(aimPoint, aimPoint, entity + 0x10);
-        savedStep = *(float *)(state + 0x134);
+        FastVecSub(aim_point, (float *)(self + 0x10), (float *)(entity + 0x10));
+        up_axis = self + 0xE0;
+        turn_angle = D_L02_001B0174 * 0.017453294f;
+        math_apply_axis_rotation_to_quat(aim_point, aim_point, up_axis,
+                      0.0f <= fast_subtract_rotations(*(float *)(self + 0xF8), ANGLE()) ? -turn_angle : turn_angle);
+        FastVecAdd(aim_point, aim_point, entity + 0x10);
+        saved_step = *(float *)(state + 0x134);
         *(float *)(state + 0x134) = 0.0001f;
-        moby_l01_turn_toward_target(self, aimPoint);
-        *(float *)(state + 0x134) = savedStep;
+        moby_l01_turn_toward_target(self, aim_point);
+        *(float *)(state + 0x134) = saved_step;
         return 1;
     }
 #undef ANGLE

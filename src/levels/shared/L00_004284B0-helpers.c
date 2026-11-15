@@ -12,8 +12,8 @@ extern char g_hero_position[];
 void cam_init_control_vectors(char *camera)
 {
     char *state;
-    char *blendVec;
-    char *cameraAlias = camera;
+    char *blend_vec;
+    char *camera_alias = camera;
     {
         char *initial = *(char **)(camera + 0x70);
         char *block = initial + 0xB0;
@@ -23,9 +23,9 @@ void cam_init_control_vectors(char *camera)
         state = *(char **)(camera + 0x70);
         qcopy(state + 0x80, block);
     }
-    blendVec = state + 0x14;
-    moby_zero_five_words(blendVec);
+    blend_vec = state + 0x14;
+    moby_zero_five_words(blend_vec);
     *(f32 *)(state + 0x1C) = 4.64f;
-    vec_copy5_blend_first(cameraAlias + 0x50, blendVec, 0.0f);
-    cam_l00_init_blend_values_2(cameraAlias);
+    vec_copy5_blend_first(camera_alias + 0x50, blend_vec, 0.0f);
+    cam_l00_init_blend_values_2(camera_alias);
 }

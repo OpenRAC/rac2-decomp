@@ -54,7 +54,7 @@ void yeedil_boss_init_damage(char *obj) {
  *(float *)(st+0x30)=D_L20_001B2034;
  p=part_find_owned_effect_slot(obj,0x10000,0);
  if(p && (p=*(char **)(p+0x20))) {
-  switch (*(short *)(p+0xAA)) { case 0x5DE: case 0x3A6: case 0xD0F /* Megacorp Trooper Legs */: *(u8 *)(obj+0xA8)=255; }
+  switch (*(short *)(p+0xAA)) { case 0x5DE: case 0x3A6: case MOBY_CLASS_MEGACORP_TROOPER_LEGS: *(u8 *)(obj+0xA8)=255; }
  }
  h=moby_update_aim_target_strength(obj,part_find_owned_effect_slot(obj,0x10000,0));
  ApproachValue(st+0x20,0.0f,h); *(u8 *)(obj+0xA8)=255;

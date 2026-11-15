@@ -80,13 +80,13 @@ int mpeg_clear_buffer_flags(void *mpeg) {
  * spelling was 12/36 under both.
  */
 /* Sets the function to call for one kind of video event and returns the previous one. */
-int sceMpegAddCallback(void *mpeg, int eventType, int callback, int callbackData) {
+int sceMpegAddCallback(void *mpeg, int event_type, int callback, int callback_data) {
     MpegCbTbl *table = *(MpegCbTbl **)((char *)mpeg + 0x40);
-    MpegCbFn oldCallback;
-    table->cb[eventType].data = (void *)callbackData;
-    oldCallback = table->cb[eventType].func;
-    table->cb[eventType].func = (MpegCbFn)callback;
-    return (int)oldCallback;
+    MpegCbFn old_callback;
+    table->cb[event_type].data = (void *)callback_data;
+    old_callback = table->cb[event_type].func;
+    table->cb[event_type].func = (MpegCbFn)callback;
+    return (int)old_callback;
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012BC78 */
@@ -128,12 +128,12 @@ void mpeg_send_event_one(int mpeg) {
 
 /* rac1-decomp src/core/0012AC80.c: func_0012BD28 */
 /* Sets up four counters of a small state block from a start value and a size. */
-void mpeg_init_counters(void *state, int startValue, int size) {
+void mpeg_init_counters(void *state, int start_value, int size) {
     int *words = (int *)state;
     words[1] = size;
-    words[0] = startValue;
-    words[2] = startValue;
-    words[3] = startValue;
+    words[0] = start_value;
+    words[2] = start_value;
+    words[3] = start_value;
 }
 
 /* rac1-decomp src/core/0012AC80.c: func_0012BD40 */

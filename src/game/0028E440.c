@@ -106,21 +106,21 @@ void hud_draw_sprite(int texture, int x, int y, int width, int height, int alpha
     unsigned char *entry = (unsigned char *)((unsigned int)D_001B1894 + (row[1] << 3));
     int mask6 = 1 << entry[6];
     int mask7 = 1 << entry[7];
-    int *oldCursor;
+    int *old_cursor;
     char *packet;
-    int textureWord;
+    int texture_word;
 
     *(int *)ref_L00_001B2608_00 = 0x10000005;
     *(int *)((char *)ref_L00_001B2608_00 + 4) = 0;
     *(int *)((char *)ref_L00_001B2608_00 + 8) = 0;
     *(int *)((char *)ref_L00_001B2608_00 + 12) = 0x50000005;
-    oldCursor = ref_L00_001B2608_00;
-    ref_L00_001B2608_00 = oldCursor + 4;
+    old_cursor = ref_L00_001B2608_00;
+    ref_L00_001B2608_00 = old_cursor + 4;
     packet = (char *)ref_L00_001B2608_00;
-    *(long long *)(oldCursor + 4) = 0x7400000000008001LL;
+    *(long long *)(old_cursor + 4) = 0x7400000000008001LL;
     *(long long *)(packet + 8) = 0x05353106;
-    textureWord = GetFrameTexture(texture);
-    *(long long *)(packet + 16) = textureWord;
+    texture_word = GetFrameTexture(texture);
+    *(long long *)(packet + 16) = texture_word;
     *(long long *)(packet + 24) = 0x156;
     *(long long *)(packet + 32) = ((long long)alpha << 24) | 0x7F7F7F;
     *(long long *)(packet + 40) = 0;
@@ -135,21 +135,21 @@ void hud_draw_sprite(int texture, int x, int y, int width, int height, int alpha
 /* Draws a picture on the screen like the one above, but the picture size is the size given. */
 void hud_draw_sprite_sized_texture(int texture, int x, int y, int width, int height, int alpha)
 {
-    int *oldCursor;
+    int *old_cursor;
     char *packet;
-    int textureWord;
+    int texture_word;
 
     *(int *)ref_L00_001B2608_00 = 0x10000005;
     *(int *)((char *)ref_L00_001B2608_00 + 4) = 0;
     *(int *)((char *)ref_L00_001B2608_00 + 8) = 0;
     *(int *)((char *)ref_L00_001B2608_00 + 12) = 0x50000005;
-    oldCursor = ref_L00_001B2608_00;
-    ref_L00_001B2608_00 = oldCursor + 4;
+    old_cursor = ref_L00_001B2608_00;
+    ref_L00_001B2608_00 = old_cursor + 4;
     packet = (char *)ref_L00_001B2608_00;
-    *(long long *)(oldCursor + 4) = 0x7400000000008001LL;
+    *(long long *)(old_cursor + 4) = 0x7400000000008001LL;
     *(long long *)(packet + 8) = 0x05353106;
-    textureWord = GetFrameTexture(texture);
-    *(long long *)(packet + 16) = textureWord;
+    texture_word = GetFrameTexture(texture);
+    *(long long *)(packet + 16) = texture_word;
     *(long long *)(packet + 24) = 0x156;
     *(long long *)(packet + 32) = ((long long)alpha << 24) | 0x7F7F7F;
     *(long long *)(packet + 40) = 0;
@@ -168,21 +168,21 @@ void hud_draw_sprite_subpixel_no_color(int texture, int x, int y, int width, int
     unsigned char *entry = (unsigned char *)((unsigned int)D_001B1894 + (row[1] << 3));
     int mask6 = 1 << entry[6];
     int mask7 = 1 << entry[7];
-    int *oldCursor;
+    int *old_cursor;
     char *packet;
-    int textureWord;
+    int texture_word;
 
     *(int *)ref_L00_001B2608_00 = 0x10000005;
     *(int *)((char *)ref_L00_001B2608_00 + 4) = 0;
     *(int *)((char *)ref_L00_001B2608_00 + 8) = 0;
     *(int *)((char *)ref_L00_001B2608_00 + 12) = 0x50000005;
-    oldCursor = ref_L00_001B2608_00;
-    ref_L00_001B2608_00 = oldCursor + 4;
+    old_cursor = ref_L00_001B2608_00;
+    ref_L00_001B2608_00 = old_cursor + 4;
     packet = (char *)ref_L00_001B2608_00;
-    *(long long *)(oldCursor + 4) = 0x7400000000008001LL;
+    *(long long *)(old_cursor + 4) = 0x7400000000008001LL;
     *(long long *)(packet + 8) = 0x05353106;
-    textureWord = GetFrameTexture(texture);
-    *(long long *)(packet + 16) = textureWord;
+    texture_word = GetFrameTexture(texture);
+    *(long long *)(packet + 16) = texture_word;
     *(long long *)(packet + 24) = 0x156;
     *(long long *)(packet + 32) = ((long long)alpha << 24) | 0x7F7F7F;
     *(long long *)(packet + 40) = 0;
@@ -235,28 +235,28 @@ void DrawHudSpriteSubpixel(int a0, int a1, int a2, int a3, int a4, int a5, unsig
    With a9 used only there, combine folds the load into the extension behind the
    header stores, and the colour loses $v1 to the cursor reloads. */
 /* Draws part of a picture on the screen, choosing which piece of the picture to show. */
-void hud_draw_sprite_region(long long textureWord, int x, int y, int uWidthLog2, int vHeightLog2, int width, int height, int u, int v, int a9)
+void hud_draw_sprite_region(long long texture_word, int x, int y, int u_width_log2, int v_height_log2, int width, int height, int u, int v, int a9)
 {
-    int *oldCursor;
+    int *old_cursor;
     char *packet;
     int alpha = a9;
 
-    a9 = 1 << (vHeightLog2 + 4);
+    a9 = 1 << (v_height_log2 + 4);
     *(int *)ref_L00_001B2608_00 = 0x10000005;
     *(int *)((char *)ref_L00_001B2608_00 + 4) = 0;
     *(int *)((char *)ref_L00_001B2608_00 + 8) = 0;
     *(int *)((char *)ref_L00_001B2608_00 + 12) = 0x50000005;
-    oldCursor = ref_L00_001B2608_00;
-    ref_L00_001B2608_00 = oldCursor + 4;
+    old_cursor = ref_L00_001B2608_00;
+    ref_L00_001B2608_00 = old_cursor + 4;
     packet = (char *)ref_L00_001B2608_00;
-    *(long long *)(oldCursor + 4) = 0x7400000000008001LL;
+    *(long long *)(old_cursor + 4) = 0x7400000000008001LL;
     *(long long *)(packet + 8) = 0x05353106;
-    *(long long *)(packet + 16) = textureWord;
+    *(long long *)(packet + 16) = texture_word;
     *(long long *)(packet + 24) = 0x156;
     *(long long *)(packet + 32) = ((long long)alpha << 24) | 0x7F7F7F;
     *(long long *)(packet + 40) = u | ((long long)v << 16);
     *(long long *)(packet + 48) = (x + g_screen_offset_x - 8) | ((long long)(y + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
-    *(long long *)(packet + 56) = (u + (1 << (uWidthLog2 + 4))) | ((long long)(v + a9) << 16);
+    *(long long *)(packet + 56) = (u + (1 << (u_width_log2 + 4))) | ((long long)(v + a9) << 16);
     *(long long *)(packet + 64) = (x + width + g_screen_offset_x - 8) | ((long long)(y + height + g_screen_offset_y - 8) << 16) | ((long long)ref_L00_001B1BBC_01 << 32);
     *(long long *)(packet + 72) = 0;
     ref_L00_001B2608_00 = (int *)((char *)ref_L00_001B2608_00 + 0x50);
@@ -278,21 +278,21 @@ extern int GetFrameTexture(int);
 /* Draws a picture between two screen corners, using a chosen part of the picture. */
 void hud_draw_quad_uv(int texture, int x0, int y0, int x1, int y1, int u0, int v0, int u1, int v1, int alpha)
 {
-    int *oldCursor;
+    int *old_cursor;
     char *packet;
-    int textureWord;
+    int texture_word;
 
     *(int *)ref_L00_001B2608_00 = 0x10000005;
     *(int *)((char *)ref_L00_001B2608_00 + 4) = 0;
     *(int *)((char *)ref_L00_001B2608_00 + 8) = 0;
     *(int *)((char *)ref_L00_001B2608_00 + 12) = 0x50000005;
-    oldCursor = ref_L00_001B2608_00;
-    ref_L00_001B2608_00 = oldCursor + 4;
+    old_cursor = ref_L00_001B2608_00;
+    ref_L00_001B2608_00 = old_cursor + 4;
     packet = (char *)ref_L00_001B2608_00;
-    *(long long *)(oldCursor + 4) = 0x7400000000008001LL;
+    *(long long *)(old_cursor + 4) = 0x7400000000008001LL;
     *(long long *)(packet + 8) = 0x05353106;
-    textureWord = GetFrameTexture(texture);
-    *(long long *)(packet + 16) = textureWord;
+    texture_word = GetFrameTexture(texture);
+    *(long long *)(packet + 16) = texture_word;
     *(long long *)(packet + 24) = 0x156;
     *(long long *)(packet + 32) = ((long long)alpha << 24) | 0x7F7F7F;
     *(long long *)(packet + 40) = u0 | ((long long)v0 << 16);

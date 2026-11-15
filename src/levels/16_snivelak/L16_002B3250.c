@@ -75,12 +75,12 @@ extern void cam_scale_view_space_height(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
 /* Handles the player touching a damaging or pushing object: picks the hurt reaction and shoves the player away. */
-s32 hero_handle_contact_reaction(s32 applyReaction) {
+s32 hero_handle_contact_reaction(s32 apply_reaction) {
     TI16 impulse;
     PlayerContactEntry *entry;
     u8 *moby;
-    u8 *contactMoby;
-    s32 fixedDirection;
+    u8 *contact_moby;
+    s32 fixed_direction;
 
     if (g_hero_state.f229C == 20 || g_hero_state.f229C == 7) {
         return 0;
@@ -122,15 +122,15 @@ s32 hero_handle_contact_reaction(s32 applyReaction) {
         g_hero_state.f68E = 1;
         return 0;
     }
-    if (applyReaction == 0) {
+    if (apply_reaction == 0) {
         return 1;
     }
-    fixedDirection = 0;
+    fixed_direction = 0;
     hero_clear_tracked_slots();
     if (entry->f30 & 1) {
         qcopy(&impulse, &entry->f10);
         if (entry->f1C == 5627.9248046875f) {
-            fixedDirection = 1;
+            fixed_direction = 1;
         }
     } else if (entry->f20 != 0) {
         FastVecSub(&impulse, &g_hero_state.f80, entry->f20 + 0x10);
@@ -139,17 +139,17 @@ s32 hero_handle_contact_reaction(s32 applyReaction) {
     }
     switch (g_hero_state.f22B4) {
     case 0:
-        contactMoby = g_hero_state.f249C;
-        if (contactMoby != 0 && (*(s16 *)(contactMoby + 0xAA) == 0x4EB /* moby class 1259 */ || *(s16 *)(contactMoby + 0xAA) == 0x558 /* moby class 1368 */)) {
+        contact_moby = g_hero_state.f249C;
+        if (contact_moby != 0 && (*(s16 *)(contact_moby + 0xAA) == 0x4EB /* moby class 1259 */ || *(s16 *)(contact_moby + 0xAA) == 0x558 /* moby class 1368 */)) {
             hero_l16_enter_state(0x7D, 1);
             return 1;
         }
         if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
             && !(entry->f24 & 8)) {
-            u8 *hitInfo = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
+            u8 *hit_info = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
 
-            if (hitInfo != 0) {
-                AdjustPlayerHealth(FloatToInt(*(float *)(hitInfo + 0x2C)));
+            if (hit_info != 0) {
+                AdjustPlayerHealth(FloatToInt(*(float *)(hit_info + 0x2C)));
             }
             if (g_hero_state.f24CC == 0) {
                 hero_l16_enter_state(0x16, 1);
@@ -169,8 +169,8 @@ s32 hero_handle_contact_reaction(s32 applyReaction) {
         if (g_hero_state.f2294 == 0x8C) {
             qzero(&impulse);
         } else {
-            hero_flatten_push_vector(&impulse, fixedDirection, g_hero_state.f1497 ? 0.0f : 0.055000003f, 0.028333336f);
-            if (fixedDirection != 0 && entry->f28 == 4) {
+            hero_flatten_push_vector(&impulse, fixed_direction, g_hero_state.f1497 ? 0.0f : 0.055000003f, 0.028333336f);
+            if (fixed_direction != 0 && entry->f28 == 4) {
                 cam_scale_view_space_height(&impulse, &impulse, 2.0f);
             }
         }

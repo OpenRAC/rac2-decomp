@@ -181,8 +181,8 @@ void joba_hud_draw_challenge(u8 *moby)
     Rect rF0;
     u8 *data;
     u8 *obj;
-    u8 *bossVars;
-    f32 savedScale;
+    u8 *boss_vars;
+    f32 saved_scale;
     s32 sum;
     s32 i;
     s32 n;
@@ -231,7 +231,7 @@ void joba_hud_draw_challenge(u8 *moby)
     do { scaled = (f32)D_L11_001B175C[0] * D_L11_001B3E04 + half; y = scaled; } while (0);
     three3 = 3;
     FontSetWindow(&rD0, x, y, D_L11_001B1760[0], D_L11_001B1764[0], D_L11_001B1750, hud_coord((f32)D_L11_001B1754, D_L11_001B3E04, half), 0, three3);
-    savedScale = ((HudRenderState *)D_L11_001BEDC0)->text_scale;
+    saved_scale = ((HudRenderState *)D_L11_001BEDC0)->text_scale;
     ((HudRenderState *)D_L11_001BEDC0)->text_scale = 0.62f;
     UpdateViewContext();
     k2 = 1;
@@ -255,8 +255,8 @@ void joba_hud_draw_challenge(u8 *moby)
         DRAW(text_draw_window_small, &rB0, ((char *)GetLocalizedString(0x2F63)));
         LABEL(k2, k3);
         LABEL50(1);
-        bossVars = *(u8 **)(*(u8 **)(data + 0x180) + 0x68);
-        hud_draw_boss_health_bar(*(f32 *)(bossVars + 0x20) / IntToFloat(*(s16 *)(bossVars + 0x24)));
+        boss_vars = *(u8 **)(*(u8 **)(data + 0x180) + 0x68);
+        hud_draw_boss_health_bar(*(f32 *)(boss_vars + 0x20) / IntToFloat(*(s16 *)(boss_vars + 0x24)));
         gfx_draw_scaled_object_two_axes(((char *)table_find_by_id(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
     } else if (*(s16 *)(data + 0x1F0) == 8) {
         s32 ofs = 0x8710;
@@ -301,15 +301,15 @@ void joba_hud_draw_challenge(u8 *moby)
             obj = *(u8 **)(data + 0x180);
             switch (*(s16 *)(obj + 0xAA)) {
             case 0xD4A /* moby class 3402 */:
-                bossVars = *(u8 **)(obj + 0x68);
-                if (*(f32 *)(bossVars + 0x20) > 0.0f) {
-                    hud_draw_boss_health_bar(*(f32 *)(bossVars + 0x20) / IntToFloat(*(s16 *)(bossVars + 0x24)));
+                boss_vars = *(u8 **)(obj + 0x68);
+                if (*(f32 *)(boss_vars + 0x20) > 0.0f) {
+                    hud_draw_boss_health_bar(*(f32 *)(boss_vars + 0x20) / IntToFloat(*(s16 *)(boss_vars + 0x24)));
                 }
                 gfx_draw_scaled_object_two_axes(((char *)table_find_by_id(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 1.0f);
                 break;
-            case 0xB3A /* Arachnoid */:
-                bossVars = *(u8 **)(obj + 0x68);
-                hud_draw_boss_health_bar(*(f32 *)(bossVars + 0x20) / IntToFloat(*(s16 *)(bossVars + 0x24)));
+            case MOBY_CLASS_ARACHNOID:
+                boss_vars = *(u8 **)(obj + 0x68);
+                hud_draw_boss_health_bar(*(f32 *)(boss_vars + 0x20) / IntToFloat(*(s16 *)(boss_vars + 0x24)));
                 gfx_draw_scaled_object_two_axes(((char *)table_find_by_id(D_L11_001A904C[0] + ofs, 0xE3)), D_L11_001B17B4, D_L11_001B17B0, D_L11_001B17B8, D_L11_001B17C4, 1.0f, 2.0f);
                 break;
             }
@@ -329,6 +329,6 @@ void joba_hud_draw_challenge(u8 *moby)
     }
     VU1_addGSregister(0x47, 0x5360B);
     VU1_addGSregister(0x47, 0x5360B);
-    ((HudRenderState *)D_L11_001BEDC0)->text_scale = savedScale;
+    ((HudRenderState *)D_L11_001BEDC0)->text_scale = saved_scale;
     UpdateViewContext();
 }

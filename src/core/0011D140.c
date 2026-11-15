@@ -52,7 +52,7 @@ typedef struct {
     int packetAddress;
     int requestId;
     int client;
-    int serviceId;
+    int service_id;
 } BindPacket;
 
 extern char r1_D_00156900[];
@@ -102,31 +102,31 @@ extern void r1_func_00119678(int thread_id);
    the function comes out 4 bytes short. Giving the two arms their own
    assignments to `id` keeps both definitions alive. */
 /* Finds a free packet slot in the RPC packet table and hands it out with a fresh id. Returns 0 if the table is full. */
-void *sif_rpc_alloc_packet(void *tablePtr) {
-    char *table = (char *)tablePtr;
-    int slotCount;
+void *sif_rpc_alloc_packet(void *table_ptr) {
+    char *table = (char *)table_ptr;
+    int slot_count;
     char *slot;
     int i;
-    int slotId;
-    int nextCount;
+    int slot_id;
+    int next_count;
 
     r1_func_0011D960();
-    slotCount = *(int *)(table + 0x8);
+    slot_count = *(int *)(table + 0x8);
     i = 0;
     slot = *(char **)(table + 0x4);
-    while (i < slotCount) {
+    while (i < slot_count) {
         if ((*(int *)(slot + 0x10) & 1) == 0) {
             *(int *)(slot + 0x10) = (i << 16) | 5;
-            nextCount = *(int *)table + 1;
-            *(int *)table = nextCount;
-            if (nextCount == 1) {
-                *(int *)table = nextCount + 1;
-                slotId = 1;
+            next_count = *(int *)table + 1;
+            *(int *)table = next_count;
+            if (next_count == 1) {
+                *(int *)table = next_count + 1;
+                slot_id = 1;
             } else {
-                slotId = nextCount;
+                slot_id = next_count;
             }
             *(char **)(slot + 0x14) = slot;
-            *(int *)(slot + 0x18) = slotId;
+            *(int *)(slot + 0x18) = slot_id;
             r1_func_0011D9A8();
             return slot;
         }
@@ -139,8 +139,8 @@ void *sif_rpc_alloc_packet(void *tablePtr) {
 
 /* rac1-decomp src/core/00119D88.c: func_0011B090 */
 /* Gives a packet slot back by clearing its id and its in-use flag. */
-void sif_rpc_free_packet(void *slotPtr) {
-    char *slot = (char *)slotPtr;
+void sif_rpc_free_packet(void *slot_ptr) {
+    char *slot = (char *)slot_ptr;
     unsigned int flags = *(unsigned int *)(slot + 0x10);
     *(int *)(slot + 0x18) = 0;
     *(unsigned int *)(slot + 0x10) = flags & 0xFFFFFFFEu;
@@ -173,8 +173,8 @@ void sif_rpc_free_packet(void *slotPtr) {
 /* The slot address is computed into a local before next = i + 1 is
    stored. */
 /* Hands out the next response packet from a ring of packets, wrapping around at the end. */
-void *sif_rpc_get_next_response_packet(void *ringPtr) {
-    char *ring = (char *)ringPtr;
+void *sif_rpc_get_next_response_packet(void *ring_ptr) {
+    char *ring = (char *)ring_ptr;
     int index = *(int *)(ring + 0x24) % *(int *)(ring + 0x18);
     char *slot = *(char **)(ring + 0x14) + index * 0x40;
     *(int *)(ring + 0x24) = index + 1;
@@ -185,7 +185,7 @@ void *sif_rpc_get_next_response_packet(void *ringPtr) {
 /* Finishes an RPC request: runs any end callback, wakes the waiting thread and frees the packet. */
 void sif_rpc_finish_request(char *request) {
     char *client;
-    int semaId;
+    int sema_id;
 
     switch (*(unsigned int *)(request + 0x20)) {
     case 0x8000000A:
@@ -206,9 +206,9 @@ void sif_rpc_finish_request(char *request) {
         client = *(char **)(request + 0x1C);
         break;
     }
-    semaId = *(int *)(client + 0x8);
-    if (semaId >= 0) {
-        r1_func_00118CA0(semaId);
+    sema_id = *(int *)(client + 0x8);
+    if (sema_id >= 0) {
+        r1_func_00118CA0(sema_id);
     }
     sif_rpc_free_packet(*(void **)client);
     *(int *)client = 0;
@@ -242,15 +242,15 @@ void sif_rpc_handle_read_data(void *rdata, void *data) {
 
 /* rac1-decomp src/core/00119D88.c: func_0011B1F8 */
 /* Searches the list of servers for the one with the given id. Returns 0 if none is found. */
-void *sif_rpc_find_server_by_id(int key, void *dataTable) {
-    void *queue = *(void **)((char *)dataTable + 0x28);
+void *sif_rpc_find_server_by_id(int key, void *data_table) {
+    void *queue = *(void **)((char *)data_table + 0x28);
     while (queue != 0) {
-        void *serverData = *(void **)((char *)queue + 8);
-        while (serverData != 0) {
-            if (*(int *)serverData == key) {
-                return serverData;
+        void *server_data = *(void **)((char *)queue + 8);
+        while (server_data != 0) {
+            if (*(int *)server_data == key) {
+                return server_data;
             }
-            serverData = *(void **)((char *)serverData + 0x38);
+            server_data = *(void **)((char *)server_data + 0x38);
         }
         queue = *(void **)((char *)queue + 0x14);
     }
@@ -280,20 +280,20 @@ void sif_rpc_handle_bind(void *bind, void *data) {
     int *response = (int *)sif_rpc_get_next_response_packet(data);
     int pkt_addr = request[5];
     int cd = request[7];
-    int *serverData;
+    int *server_data;
 
     response[7] = cd;
     response[5] = pkt_addr;
     response[8] = 0x80000009;
-    serverData = (int *)sif_rpc_find_server_by_id(request[8], data);
-    if (serverData == 0) {
+    server_data = (int *)sif_rpc_find_server_by_id(request[8], data);
+    if (server_data == 0) {
         response[9] = 0;
         response[10] = 0;
         response[11] = 0;
     } else {
-        response[9] = (int)serverData;
-        response[10] = serverData[2];
-        response[11] = serverData[5];
+        response[9] = (int)server_data;
+        response[10] = server_data[2];
+        response[11] = server_data[5];
     }
     isceSifSendCmd(0x80000008, (int)response, 0x40, 0, 0, 0);
 }
@@ -303,10 +303,10 @@ void sif_rpc_handle_bind(void *bind, void *data) {
 
 /* sceSifBindRpc. Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Connects a client to a server on the IOP and waits until the server answers. */
-int sceSifBindRpc(void *clientArg, int serviceId, int mode) {
-    BindClient *client = clientArg;
+int sceSifBindRpc(void *client_arg, int service_id, int mode) {
+    BindClient *client = client_arg;
     int sema_param[6];
-    int semaId;
+    int sema_id;
     BindPacket *packet;
 
     client->unk10 = 0;
@@ -317,7 +317,7 @@ int sceSifBindRpc(void *clientArg, int serviceId, int mode) {
     }
     client->requestId = packet->requestId;
     client->packet = (int)packet;
-    packet->serviceId = serviceId;
+    packet->service_id = service_id;
     packet->packetAddress = (int)packet;
     packet->client = (int)client;
     if (mode & 1) {
@@ -325,9 +325,9 @@ int sceSifBindRpc(void *clientArg, int serviceId, int mode) {
     }
     sema_param[1] = 1;
     sema_param[2] = 0;
-    semaId = r1_func_00118C70(sema_param);
-    client->semaphoreId = semaId;
-    if (semaId >= 0) {
+    sema_id = r1_func_00118C70(sema_param);
+    client->semaphoreId = sema_id;
+    if (sema_id >= 0) {
         goto block_4;
     }
     sif_rpc_free_packet(packet);
@@ -542,8 +542,8 @@ s32_1B4C8 sceSifCallRpc(struct SifRpcClient_1B4C8 *client, s32_1B4C8 rpc_number,
    form returning 1 merges the exits; early returns give bnel. */
 /* One test for the three failure cases, then return 1. */
 /* Checks that an RPC handle still points to a packet that is in use. */
-int sif_rpc_is_handle_valid(void *handlePtr) {
-    char *handle = (char *)handlePtr;
+int sif_rpc_is_handle_valid(void *handle_ptr) {
+    char *handle = (char *)handle_ptr;
     char *slot = *(char **)handle;
 
     if (slot == 0 || *(int *)(handle + 4) != *(int *)(slot + 0x18) ||

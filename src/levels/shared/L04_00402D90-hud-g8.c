@@ -40,21 +40,21 @@ void hud_draw_race_banner(unsigned char *controller)
     B1202Five end = D_L04_001B09F8;
     int colors[5];
     unsigned char *vars = *(unsigned char **)(controller+0x68);
-    int frame,i,j,right,fadeInStart,fadeInEnd,fadeOutStart,fadeOutEnd;
-    int sprite,bannerSprite;
-    float angle, sine, sign, leftX, innerX;
+    int frame,i,j,right,fade_in_start,fade_in_end,fade_out_start,fade_out_end;
+    int sprite,banner_sprite;
+    float angle, sine, sign, left_x, inner_x;
     int one, top, off;
     if (controller[0xbc]==3 || controller[0xbc]==4 || controller[0xbc]==1 || controller[0xbc]==2) frame=150-*(int *)(vars+0x394);
     else frame=g_race_time_ticks+150;
     if (!D_L04_001A904C) return;
     for(i=0;i<5;i++) {
-        if(i==4) { fadeInStart=120;fadeInEnd=149;do{fadeOutStart=156;}while(0);fadeOutEnd=171; }
-        else { j=i*30; fadeInStart=j;fadeInEnd=fadeInStart+30;fadeOutEnd=fadeInStart+45;fadeOutStart=fadeInEnd; }
+        if(i==4) { fade_in_start=120;fade_in_end=149;do{fade_out_start=156;}while(0);fade_out_end=171; }
+        else { j=i*30; fade_in_start=j;fade_in_end=fade_in_start+30;fade_out_end=fade_in_start+45;fade_out_start=fade_in_end; }
         colors[i]=0;
-        if(frame>=fadeInStart && frame<fadeInEnd) colors[i]=FastTweenColor(0,start.v[i],(float)(frame-fadeInStart)*0.033333335f);
-        else if(frame>=fadeInEnd && frame<fadeOutStart && fadeInEnd!=fadeOutStart) colors[i]=start.v[i];
-        else if(frame>=fadeOutStart && frame<fadeOutEnd) colors[i]=FastTweenColor(start.v[i],end.v[i],(float)(frame-fadeOutStart)*0.06666667f);
-        else if(frame>=fadeOutEnd) colors[i]=end.v[i];
+        if(frame>=fade_in_start && frame<fade_in_end) colors[i]=FastTweenColor(0,start.v[i],(float)(frame-fade_in_start)*0.033333335f);
+        else if(frame>=fade_in_end && frame<fade_out_start && fade_in_end!=fade_out_start) colors[i]=start.v[i];
+        else if(frame>=fade_out_start && frame<fade_out_end) colors[i]=FastTweenColor(start.v[i],end.v[i],(float)(frame-fade_out_start)*0.06666667f);
+        else if(frame>=fade_out_end) colors[i]=end.v[i];
     }
     i=0;
     off=0x8710;
@@ -67,18 +67,18 @@ void hud_draw_race_banner(unsigned char *controller)
     one=1;
     for(;i<2;i++) {
         if(i==0) {j=10;right=31;sign=1.0f;} else {j=498;right=478;sign=-1.0f;}
-        leftX=(float)j;
-        bannerSprite=table_find_by_id((char *)D_L04_001A904C+off,58);
+        left_x=(float)j;
+        banner_sprite=table_find_by_id((char *)D_L04_001A904C+off,58);
         top=hud_coord(120.0f,D_L04_001B2D44,0.5f,one);
-        gfx_draw_scaled_object_two_axes(bannerSprite,(float)j,0x60442d00,(float)top,sign,1.0f,0.0f);
+        gfx_draw_scaled_object_two_axes(banner_sprite,(float)j,0x60442d00,(float)top,sign,1.0f,0.0f);
         sprite=table_find_by_id((char *)D_L04_001A904C+off,59);
         top=hud_coord(120.0f,D_L04_001B2D44,0.5f,one);
         gfx_draw_scaled_object_two_axes(sprite,(float)j,0x55f0c070,(float)top,sign,1.0f,0.0f);
         sprite=table_find_by_id((char *)D_L04_001A904C+off,60);
-        gfx_draw_scaled_object_two_axes(sprite,leftX,0x55f0c070,(float)hud_coord(120.0f,D_L04_001B2D44,0.5f,one),sign,1.0f,0.0f);
-        innerX=(float)right;
+        gfx_draw_scaled_object_two_axes(sprite,left_x,0x55f0c070,(float)hud_coord(120.0f,D_L04_001B2D44,0.5f,one),sign,1.0f,0.0f);
+        inner_x=(float)right;
         for(j=0;j<5;j++) {
-            gfx_draw_scaled_object_two_axes(table_find_by_id((char *)D_L04_001A904C+0x8710,61),innerX,colors[j],(float)(g_is_pal_video?y.v[j]:x.v[j]),0.8f,0.8f,0.0f);
+            gfx_draw_scaled_object_two_axes(table_find_by_id((char *)D_L04_001A904C+0x8710,61),inner_x,colors[j],(float)(g_is_pal_video?y.v[j]:x.v[j]),0.8f,0.8f,0.0f);
         }
         VU1_addGSregister(71,0x5360b);
     }

@@ -92,7 +92,7 @@ void MuseumVehicleUpdate(MuseumVehicle *obj) {
         obj->position[2]=s->height;
         hit=part_find_owned_effect_slot(obj,1,0);
         if (hit && P(hit,0x20) && *(short *)(P(hit,0x20)+0xAA)!=0xF2F /* moby class 3887 */ && *(short *)(P(hit,0x20)+0xAA)!=0x942 /* moby class 2370 */) {
-            if (*(short *)(P(hit,0x20)+0xAA)!=0xFFF /* Mutant Sandfly */ && (P(hit,0x20)!=s->lastHit || !s->hitTimer)) {
+            if (*(short *)(P(hit,0x20)+0xAA)!=MOBY_CLASS_MUTANT_SANDFLY && (P(hit,0x20)!=s->lastHit || !s->hitTimer)) {
                 B(s,0x87)=0xD2;B(s,0x88)=0xD2;B(s,0x89)=0xD2;
                 gfx_start_color_fade(obj,&s->flash);
                 s->health-=F(hit,0x2C);

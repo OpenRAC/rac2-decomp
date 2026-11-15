@@ -31,12 +31,12 @@ extern float cubic_hermite_scalar(float, float, float, float, float);
 /* Creates a homing shot at a position with a velocity, and builds its trail of followers. If the shot would start inside a wall it bursts into sparks at once and returns 0. */
 unsigned char *SpawnHomingShot(int owner, float *pos, float *velocity, int life)
 {
-    float originBuf[4], directionBuf[4];
-    float *origin = originBuf, *direction = directionBuf;
+    float origin_buf[4], direction_buf[4];
+    float *origin = origin_buf, *direction = direction_buf;
     SweepProbe probe;
     float start[4], scratch[4], random[4];
     unsigned char *shot, *vars, *particle;
-    int i, trailIndex;
+    int i, trail_index;
     unsigned short kind;
     float fade, alpha, numerator, denominator;
     *(QuadWord *)origin = *(QuadWord *)pos;
@@ -89,18 +89,18 @@ unsigned char *SpawnHomingShot(int owner, float *pos, float *velocity, int life)
             return 0;
         }
         SpawnJointFollowParticle(shot, 0x2F4F7F7F, *(int *)(vars + 0x10), -1, 100000);
-        for (trailIndex = 0; trailIndex < 17; trailIndex++) {
+        for (trail_index = 0; trail_index < 17; trail_index++) {
             particle = part_spawn_random_effect_record(shot + 0x10, D_L04_001A8F20, 1, 0);
             if (particle) {
                 *(float *)(particle + 0xC) = math_random_float_range(15000, 25000);
-                numerator = IntToFloat(trailIndex);
+                numerator = IntToFloat(trail_index);
                 denominator = IntToFloat(16);
                 fade = cubic_hermite_scalar(-1.5f, 0, 1, 0, numerator / denominator);
                 *(float *)(particle + 0xC) += (8000.0f - *(float *)(particle + 0xC)) * fade;
                 alpha = fade * -64.0f + 128.0f;
                 *(unsigned int *)(particle + 4) = (FloatToInt(alpha) << 24) | 0xFFFFFF;
-                *(void **)(vars + 0x1C + trailIndex * 4) = particle;
-            } else *(void **)(vars + 0x1C + trailIndex * 4) = 0;
+                *(void **)(vars + 0x1C + trail_index * 4) = particle;
+            } else *(void **)(vars + 0x1C + trail_index * 4) = 0;
         }
     }
     return shot;

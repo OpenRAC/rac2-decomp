@@ -20,9 +20,9 @@ extern short D_001ABD18[] MACRO_ADDR;
 
 /* Draws the list of eight entries with five rows around the cursor; locked ones show a placeholder. */
 int menu_entry_list_draw(void) {
-    int i, y, entryIndex, color;
+    int i, y, entry_index, color;
     int r;
-    char *rowText;
+    char *row_text;
     float z;
     SetupGifPaging(0);
     z = 0.0f;
@@ -39,17 +39,17 @@ int menu_entry_list_draw(void) {
     text_draw_centered_small(0xB5, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0x2D75), -1);
     menu_draw_scroll_arrows_and_frame();
     for (i = 0, y = 0x112; i < 5; i++, y += 20) {
-        entryIndex = i + D_001ABA28 - 2;
-        if (entryIndex < 0) entryIndex += 8;
-        if (entryIndex >= 8) entryIndex -= 8;
-        rowText = GetLocalizedString(D_001ABA30[entryIndex] ? D_001ABD18[entryIndex] : 0x2DC0);
+        entry_index = i + D_001ABA28 - 2;
+        if (entry_index < 0) entry_index += 8;
+        if (entry_index >= 8) entry_index -= 8;
+        row_text = GetLocalizedString(D_001ABA30[entry_index] ? D_001ABD18[entry_index] : 0x2DC0);
         if (i == 0 || i == 4) color = 0x10F0F0F0;
         else if (i == 1 || i == 3) color = 0x50F0F0F0;
         else {
             color = 0x70F0F0F0;
-            menu_draw_text_highlight_frame(text_measure_width_medium(rowText, func_001157AC(rowText)), 0x70F0F0F0);
+            menu_draw_text_highlight_frame(text_measure_width_medium(row_text, func_001157AC(row_text)), 0x70F0F0F0);
         }
-        text_draw_centered_medium(g_screen_width / 2, y, color, rowText, -1);
+        text_draw_centered_medium(g_screen_width / 2, y, color, row_text, -1);
     }
     DoGifPaging();
     return 0;

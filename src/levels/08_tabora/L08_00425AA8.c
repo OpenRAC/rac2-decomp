@@ -17,7 +17,7 @@ extern char D_L08_001B1BD0[];
 void hover_init_defaults(char *moby) {
     float probe[4];
     char *vars = *(char **)(moby + 0x68);
-    float floorHeight;
+    float floor_height;
     *(u8 *)(vars + 0x48) = FloatToInt(40.0f);
     *(u8 *)(vars + 0x4A) = FloatToInt(64.0f);
     *(u8 *)(vars + 0x29) = 1;
@@ -31,12 +31,12 @@ void hover_init_defaults(char *moby) {
     }
     *(u8 *)(vars + 0x20E) = *(u8 *)(moby + 0x30);
     *(Quad *)probe = *(Quad *)(moby + 0x10);
-    floorHeight = coll_point_depth_in_volumes(probe, *(int *)(vars + 0x1D0), -1, *(int *)(vars + 0x1D4), -1);
-    if (floorHeight > 0.0f) *(u8 *)(moby + 0x30) = FloatToInt(floorHeight + 2.0f);
+    floor_height = coll_point_depth_in_volumes(probe, *(int *)(vars + 0x1D0), -1, *(int *)(vars + 0x1D4), -1);
+    if (floor_height > 0.0f) *(u8 *)(moby + 0x30) = FloatToInt(floor_height + 2.0f);
     *(u8 *)(vars + 0x20E) = *(u8 *)(vars + 0x20F) = *(u8 *)(moby + 0x30);
     *(Quad *)probe = *(Quad *)(moby + 0x10);
-    floorHeight = coll_point_depth_in_volumes(probe, *(int *)(vars + 0x1D8), *(int *)(vars + 0x1E0), *(int *)(vars + 0x1DC), -1);
-    if (floorHeight > 0.0f) *(u8 *)(vars + 0x20E) = FloatToInt(floorHeight + 2.0f);
+    floor_height = coll_point_depth_in_volumes(probe, *(int *)(vars + 0x1D8), *(int *)(vars + 0x1E0), *(int *)(vars + 0x1DC), -1);
+    if (floor_height > 0.0f) *(u8 *)(vars + 0x20E) = FloatToInt(floor_height + 2.0f);
     if (*(int *)(vars + 0x1E4) != -1) path_l01_compute_segment_lengths(D_L08_001FE7C0[*(int *)(vars + 0x1E4)]);
     *(u8 *)(vars + 0x60) = 5;
     *(int *)(vars + 0x98) = -1;

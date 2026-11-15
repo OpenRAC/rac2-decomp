@@ -55,12 +55,12 @@ extern int math_fast_float_d(void *);
 extern void STUB_printf(void *);
 
 /* Turns a ring of four linked objects a quarter turn at a time, pausing between turns and playing a sound while they turn. */
-void UpdateRotatingObjectGroup(char *mobyPtr)
+void UpdateRotatingObjectGroup(char *moby_ptr)
 {
-    Object8010 *obj = (Object8010 *)mobyPtr;
-    Private8010 *vars = *(Private8010 **)(mobyPtr + 0x68);
-    unsigned char partPos[16] __attribute__((aligned(16))),
-        oldPos[16] __attribute__((aligned(16))),
+    Object8010 *obj = (Object8010 *)moby_ptr;
+    Private8010 *vars = *(Private8010 **)(moby_ptr + 0x68);
+    unsigned char part_pos[16] __attribute__((aligned(16))),
+        old_pos[16] __attribute__((aligned(16))),
         delta[16] __attribute__((aligned(16))),
         rot[16] __attribute__((aligned(16)));
 
@@ -77,21 +77,21 @@ void UpdateRotatingObjectGroup(char *mobyPtr)
         vars->targetAngle = FastAddRotations(obj->angle, 1.5707964897155762f);
         if (vars->direction)
             vars->targetAngle = fast_subtract_rotations(obj->angle, 1.5707964897155762f);
-        anim_start_blended(mobyPtr, 1, 0, 0);
-        moby_set_state(mobyPtr, 1, -1);
+        anim_start_blended(moby_ptr, 1, 0, 0);
+        moby_set_state(moby_ptr, 1, -1);
         {
             int i;
             for (i = 0; i < 4; i++) {
-                char *part, *partVars;
+                char *part, *part_vars;
                 part = g_moby_l04_pool + (vars->ids[i] << 8);
-                partVars = *(char **)(part + 0x68);
-                *(int *)(partVars + 0x5C) |= 1;
+                part_vars = *(char **)(part + 0x68);
+                *(int *)(part_vars + 0x5C) |= 1;
                 ((Object8010 *)part)->alpha = 128;
                 ((Object8010 *)part)->flags = 128;
             }
         }
         if (vars->direction)
-            anim_start_blended(mobyPtr, 2, 0, 0);
+            anim_start_blended(moby_ptr, 2, 0, 0);
         obj->speed = 1.0f / 3;
         break;
     }
@@ -99,35 +99,35 @@ void UpdateRotatingObjectGroup(char *mobyPtr)
         char *part;
         float frame;
 
-        frame = moby_get_anim_value(mobyPtr);
+        frame = moby_get_anim_value(moby_ptr);
         part = (char *)g_sound_state + vars->sound * 0x70;
-        if (*(char **)(part + 0x88) != mobyPtr || !*(u8 *)(part + 0x74))
-            vars->sound = PlayMobySound(0, 4, mobyPtr);
+        if (*(char **)(part + 0x88) != moby_ptr || !*(u8 *)(part + 0x74))
+            vars->sound = PlayMobySound(0, 4, moby_ptr);
         if (!vars->direction)
-            math_approach_target_with_direction_mode(mobyPtr + 0xF8, vars->targetAngle, &vars->turnSpeed,
+            math_approach_target_with_direction_mode(moby_ptr + 0xF8, vars->targetAngle, &vars->turnSpeed,
                          0.0001939255f, 0.0001939255f, 0.06981318444013596f, 0);
         else
-            math_approach_target_with_direction_mode(mobyPtr + 0xF8, vars->targetAngle, &vars->turnSpeed,
+            math_approach_target_with_direction_mode(moby_ptr + 0xF8, vars->targetAngle, &vars->turnSpeed,
                          0.0001939255f, 0.0001939255f, 0.06981318444013596f, 0);
-        euler_rotation_basis(mobyPtr + 0xC0, mobyPtr + 0xF0);
+        euler_rotation_basis(moby_ptr + 0xC0, moby_ptr + 0xF0);
         {
             int i;
             for (i = 0; i < 4; i++) {
-                char *part, *partVars;
+                char *part, *part_vars;
                 part = g_moby_l04_pool + (vars->ids[i] << 8);
-                partVars = *(char **)(part + 0x68);
+                part_vars = *(char **)(part + 0x68);
                 /* oldPos is a separate stack vector; subsequent accesses use part. */
-                qcopy_nc(oldPos, part + 0x10);
-                moby_transform_joint_to_world(mobyPtr, i, partPos);
-                *(Quad8010 *)(part + 0x10) = *(Quad8010 *)partPos;
+                qcopy_nc(old_pos, part + 0x10);
+                moby_transform_joint_to_world(moby_ptr, i, part_pos);
+                *(Quad8010 *)(part + 0x10) = *(Quad8010 *)part_pos;
                 *(Quad8010 *)rot = *(Quad8010 *)(part + 0xF0);
                 if (vars->direction)
                     *(float *)(part + 0xF8) = FastAddRotations(obj->angle, 0.00872664712369442f);
-                FastVecSub(delta, part + 0x10, oldPos);
+                FastVecSub(delta, part + 0x10, old_pos);
                 if (vars->selected == i && vars->direction)
-                    mat_combine_and_store(partVars + 0x20, delta, rot, part + 0xF0);
+                    mat_combine_and_store(part_vars + 0x20, delta, rot, part + 0xF0);
                 else
-                    mat_combine_and_store(partVars + 0x20, delta, rot, rot);
+                    mat_combine_and_store(part_vars + 0x20, delta, rot, rot);
             }
         }
         if (frame == vars->stopFrame) {
@@ -136,7 +136,7 @@ void UpdateRotatingObjectGroup(char *mobyPtr)
             vars->stopFrame += 30;
             if (vars->stopFrame >= 120)
                 vars->stopFrame = 0;
-            moby_set_state(mobyPtr, 2, -1);
+            moby_set_state(moby_ptr, 2, -1);
             vars->turnSpeed = 0;
         }
         break;
@@ -148,7 +148,7 @@ void UpdateRotatingObjectGroup(char *mobyPtr)
 
             if (i != -1) {
                 part = (char *)g_sound_state + i * 0x70;
-                if (*(char **)(part + 0x88) == mobyPtr && *(u8 *)(part + 0x74))
+                if (*(char **)(part + 0x88) == moby_ptr && *(u8 *)(part + 0x74))
                     snd_stop_voice(i);
             }
             vars->sound = -1;
@@ -161,7 +161,7 @@ void UpdateRotatingObjectGroup(char *mobyPtr)
             vars->targetAngle = FastAddRotations(obj->angle, 1.5707964897155762f);
             if (vars->direction)
                 vars->targetAngle = fast_subtract_rotations(obj->angle, 1.5707964897155762f);
-            moby_set_state(mobyPtr, 1, -1);
+            moby_set_state(moby_ptr, 1, -1);
             obj->z = vars->initialHeight;
             obj->speed = 1.0f / 3;
         } else if (vars->timer < 25) {
@@ -171,14 +171,14 @@ void UpdateRotatingObjectGroup(char *mobyPtr)
         {
             int i;
             for (i = 0; i < 4; i++) {
-                char *part, *partVars;
+                char *part, *part_vars;
                 part = g_moby_l04_pool + (vars->ids[i] << 8);
-                partVars = *(char **)(part + 0x68);
-                qcopy_nc(oldPos, part + 0x10);
-                moby_transform_joint_to_world(mobyPtr, i, partPos);
-                *(Quad8010 *)(part + 0x10) = *(Quad8010 *)partPos;
-                FastVecSub(delta, part + 0x10, oldPos);
-                mat_combine_and_store(partVars + 0x20, delta, part + 0xF0, part + 0xF0);
+                part_vars = *(char **)(part + 0x68);
+                qcopy_nc(old_pos, part + 0x10);
+                moby_transform_joint_to_world(moby_ptr, i, part_pos);
+                *(Quad8010 *)(part + 0x10) = *(Quad8010 *)part_pos;
+                FastVecSub(delta, part + 0x10, old_pos);
+                mat_combine_and_store(part_vars + 0x20, delta, part + 0xF0, part + 0xF0);
             }
         }
         break;

@@ -33,23 +33,23 @@ int hud_draw_timer_a(void)
 {
     char text[64];
     int hours, minutes, seconds;
-    int id, y, one, textOffset;
+    int id, y, one, text_offset;
     float half;
-    float ox, sc, z, baseY;
+    float ox, sc, z, base_y;
 
     if (D_001B00FC == 0)
         return 1;
-    baseY = 380.0f;
+    base_y = 380.0f;
     half = 0.5f;
     one = 1;
-    textOffset = 0x8710;
-    id = table_find_by_id(D_001A8CFC[0] + textOffset, 0xC1);
-    y = hud_coord(baseY, D_001B23A4[0], half, one);
+    text_offset = 0x8710;
+    id = table_find_by_id(D_001A8CFC[0] + text_offset, 0xC1);
+    y = hud_coord(base_y, D_001B23A4[0], half, one);
     ox = -0.5f;
     sc = 1.0f;
     gfx_draw_scaled_object_two_axes(id, 0x60442D00, 454.0f, (float)y, ox, sc, z = 0.0f);
-    id = table_find_by_id(D_001A8CFC[0] + textOffset, 0xC2);
-    y = hud_coord(baseY, D_001B23A4[0], half, one);
+    id = table_find_by_id(D_001A8CFC[0] + text_offset, 0xC2);
+    y = hud_coord(base_y, D_001B23A4[0], half, one);
     gfx_draw_scaled_object_two_axes(id, 0x55F0C070, 454.0f, (float)y, ox, sc, z);
     math_split_time_into_parts(D_001B27C0[0], &hours, &minutes, &seconds);
     sprintf(text, D_001B0110, hours, minutes, seconds);

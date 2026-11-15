@@ -42,11 +42,11 @@ extern char r1_D_00153968[];
  * happens along the way.
  */
 /* Decodes the macroblocks of one picture in order. Returns 0 when done, or a nonzero code if the stream is damaged. */
-int mpeg_decode_slice_macroblocks(void *decoderPtr, int mbCount) {
-    char *dec = (char *)decoderPtr;
+int mpeg_decode_slice_macroblocks(void *decoder_ptr, int mbCount) {
+    char *dec = (char *)decoder_ptr;
     int mbAddr = 0;
     int mbInc = 0;
-    int mbType, motionType, dctType;
+    int mb_type, motion_type, dct_type;
     int pmv[8];
     int mvfs[4];
     int dmvector[4];
@@ -98,21 +98,21 @@ int mpeg_decode_slice_macroblocks(void *decoderPtr, int mbCount) {
         }
 
         if (mbInc == 1) {
-            r = mpeg_decode_macroblock_modes(dec, &mbType, &motionType, &dctType, pmv,
+            r = mpeg_decode_macroblock_modes(dec, &mb_type, &motion_type, &dct_type, pmv,
                                mvfs, dmvector);
             if (r == 0) {
                 *(int *)(dec + 0x11C) = 0;
                 return 1;
             }
         } else {
-            r = mpeg_handle_skipped_macroblock(dec, pmv, &motionType, mvfs, &mbType);
+            r = mpeg_handle_skipped_macroblock(dec, pmv, &motion_type, mvfs, &mb_type);
             if (r == 0) {
                 *(int *)(dec + 0x11C) = 0;
                 return 2;
             }
         }
 
-        r = r1_func_00125630(dec, mbAddr, mbInc, mbType, motionType, pmv,
+        r = r1_func_00125630(dec, mbAddr, mbInc, mb_type, motion_type, pmv,
                            mvfs, dmvector);
         if (r == 0) {
             *(int *)(dec + 0x11C) = 0;
@@ -120,8 +120,8 @@ int mpeg_decode_slice_macroblocks(void *decoderPtr, int mbCount) {
         }
 
         if (mbAddr != 0) {
-            int curSlot = *(int *)(dec + 0x810);
-            r1_func_001263A8(dec, curSlot ^ 1);
+            int cur_slot = *(int *)(dec + 0x810);
+            r1_func_001263A8(dec, cur_slot ^ 1);
         }
 
         mbAddr = mbAddr + 1;
@@ -139,40 +139,40 @@ int mpeg_decode_slice_macroblocks(void *decoderPtr, int mbCount) {
  * +0x150 == 1. The r1_func_0012C468 call takes arg0 -- the moby struct,
  * still live in $4 -- not a4/s0, which is a common trap here. */
 /* Handles a skipped macroblock by setting default motion data and clearing its intra flag. Returns 0 on a stream error. */
-int mpeg_handle_skipped_macroblock(void *decoderPtr, int *pmv, int *motionType, int *mvfs, int *mbType) {
+int mpeg_handle_skipped_macroblock(void *decoder_ptr, int *pmv, int *motion_type, int *mvfs, int *mb_type) {
     int idx;
     char *entry;
     int ret = 1;
     int c;
     int mask;
 
-    idx = *(int *)((char *)decoderPtr + 0x810);
-    entry = (char *)decoderPtr + idx * 0x140;
+    idx = *(int *)((char *)decoder_ptr + 0x810);
+    entry = (char *)decoder_ptr + idx * 0x140;
     *(int *)(entry + 0x6CC) = 1;
-    *(int *)((char *)decoderPtr + 0x1B0) = 1;
+    *(int *)((char *)decoder_ptr + 0x1B0) = 1;
 
-    if (*(int *)((char *)decoderPtr + 0x150) == 2) {
+    if (*(int *)((char *)decoder_ptr + 0x150) == 2) {
         *(int *)((char *)pmv + 0x14) = 0;
         *(int *)((char *)pmv + 0x10) = 0;
         *(int *)((char *)pmv + 0x4) = 0;
         *(int *)((char *)pmv + 0x0) = 0;
     }
 
-    if (*(int *)((char *)decoderPtr + 0x174) == 3) {
-        *motionType = 2;
+    if (*(int *)((char *)decoder_ptr + 0x174) == 3) {
+        *motion_type = 2;
     } else {
-        *motionType = 1;
-        c = (*(int *)((char *)decoderPtr + 0x174) == 2);
+        *motion_type = 1;
+        c = (*(int *)((char *)decoder_ptr + 0x174) == 2);
         mvfs[1] = c;
         *mvfs = c;
     }
 
-    if (*(int *)((char *)decoderPtr + 0x150) == 1) {
-        r1_func_0012C468(decoderPtr, r1_D_00153968);
+    if (*(int *)((char *)decoder_ptr + 0x150) == 1) {
+        r1_func_0012C468(decoder_ptr, r1_D_00153968);
         ret = 0;
     }
-    mask = *mbType;
+    mask = *mb_type;
     mask &= ~1;
-    *mbType = mask;
+    *mb_type = mask;
     return ret;
 }

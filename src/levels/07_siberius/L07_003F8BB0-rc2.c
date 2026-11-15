@@ -33,13 +33,13 @@ extern void ref_L07_003F8BB0_03(s8 *, s32, TI *, TI *, f32);
 
 /* Looks up a joint position and direction on the object and passes them, with the target and a power value, to an effect routine. */
 void joint_query_pose_effect(s8 *moby) {
-    TI jointPos;
-    TI jointDir;
+    TI joint_pos;
+    TI joint_dir;
     s8 *vars;
 
     vars = *(s8 **)(moby + 0x68);
     ref_L07_003F8BB0_00(3, 0, moby);
-    ref_L07_003F8BB0_01(moby, 0, &jointPos);
-    ref_L07_003F8BB0_02(moby, &jointDir);
-    ref_L07_003F8BB0_03(moby, *(s32 *)(vars + 0x418), &jointPos, &jointDir, (f32)*(u8 *)(vars + 0x35));
+    ref_L07_003F8BB0_01(moby, 0, &joint_pos);
+    ref_L07_003F8BB0_02(moby, &joint_dir);
+    ref_L07_003F8BB0_03(moby, *(s32 *)(vars + 0x418), &joint_pos, &joint_dir, (f32)*(u8 *)(vars + 0x35));
 }

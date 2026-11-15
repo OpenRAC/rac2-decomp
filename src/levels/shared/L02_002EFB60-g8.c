@@ -25,7 +25,7 @@ void part_spawn_spark_burst_line(void *owner, void *from, void *to, int count, i
     Vec4 velocity;
     float gravity = speed * 0.00027777778f;
     float brightness, blend;
-    int red, green, blue, firstSprite, secondSprite, i;
+    int red, green, blue, first_sprite, second_sprite, i;
     int *rgb = &D_L02_001A8D68;
     if (colour) rgb = colour;
     for (i = 0; i < count; i++) {
@@ -41,9 +41,9 @@ void part_spawn_spark_burst_line(void *owner, void *from, void *to, int count, i
         FastVecAdd(&velocity, &velocity, &direction);
         velocity.f[3] = position.f[3];
         blend = math_random_float_range(0.0f, 1.0f);
-        firstSprite = FastTweenColor(D_L02_001A8D58, D_L02_001A8D5C, blend);
+        first_sprite = FastTweenColor(D_L02_001A8D58, D_L02_001A8D5C, blend);
         blend = math_random_float_range(0.0f, 1.0f);
-        secondSprite = FastTweenColor(D_L02_001A8D60, D_L02_001A8D64, blend);
-        part_spawn_trail(owner, &position, &velocity, firstSprite, secondSprite, red, green, blue, D_L02_001A8D50);
+        second_sprite = FastTweenColor(D_L02_001A8D60, D_L02_001A8D64, blend);
+        part_spawn_trail(owner, &position, &velocity, first_sprite, second_sprite, red, green, blue, D_L02_001A8D50);
     }
 }

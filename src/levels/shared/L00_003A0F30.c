@@ -76,14 +76,14 @@ extern void gfx_reset_draw_quad(char *);
 
 /* Shared native body; original game role is unknown. */
 /* Spins the wobble angles of each beam point and works out where it sits this frame. */
-void beam_update_wobble_points(int unused, float *points, int pointCount)
+void beam_update_wobble_points(int unused, float *points, int point_count)
 {
     float *point;
     int remaining;
-    if (pointCount <= 0)
+    if (point_count <= 0)
         return;
     point = points;
-    remaining = pointCount;
+    remaining = point_count;
     do {
         point[0] = func_00283B98_2(point[0], point[3]);
         point[1] = func_00283B98_2(point[1], point[4]);
@@ -116,13 +116,13 @@ void beam_extend_trail_point(Vec16_Fc936841d *object, int index)
 
 /* Derives a value from half of one argument, merges a helper's low byte into a packed word, then scales an input float, doubles a second helper's result and dispatches a seven-argument spawn. */
 /* Spawns one glowing flare at a point, with a random size and brightness. */
-void beam_spawn_flare(int owner, int position, int color, int alphaBase, float size)
+void beam_spawn_flare(int owner, int position, int color, int alpha_base, float size)
 {
     int alpha;
     float radius;
     float rotation;
 
-    alpha = func_002A7820_2(alphaBase >> 1, alphaBase);
+    alpha = func_002A7820_2(alpha_base >> 1, alpha_base);
     color = color | (alpha << 24);
     radius = func_002A7878_5(size * 0.75f, size);
     radius = radius + radius;
@@ -167,16 +167,16 @@ void gfx_reset_draw_quad(char *quad)
 
 /* scales a float field by 1/1024, passes a caller word and two 16/48-byte scratch buffers to a four-argument helper, then forwards the second buffer with the scaled float to one helper and two sub-objects of the same parameter to three more helpers */
 /* Works out where one of the weapon's attachment points is in the world. */
-void weapon_get_attachment_world_pos(char *moby, int jointIndex, char *out, char *offset)
+void weapon_get_attachment_world_pos(char *moby, int joint_index, char *out, char *offset)
 {
-    char jointMatrices[48];
+    char joint_matrices[48];
     char scratch[16];
     int joint;
     float scale;
 
     scale = *(float *)(moby + 44) * 0.0009765625f;
-    joint = jointIndex;
-    get_moby_joint_matrices(moby, 1, &joint, jointMatrices);
+    joint = joint_index;
+    get_moby_joint_matrices(moby, 1, &joint, joint_matrices);
     func_00282D30_3(out, scratch, scale);
     func_00282CC0_4(out, out, offset);
     func_00283098_2(out, out, moby + 192);
@@ -334,27 +334,27 @@ void beam_clear_particle_pool(char *index)
 {
 	int cursor;
 	int offset;
-	int slotTable;
+	int slot_table;
 	int i;
-	int slotEnd;
+	int slot_end;
 	short *particle;
 
-	cursor = (int)func_L00_0032A088_1(1483 /* Pulse Rifle */, index);
-	offset = *func_L00_0032A0B8_1(1483 /* Pulse Rifle */, index);
-	slotTable = cursor + offset;
+	cursor = (int)func_L00_0032A088_1(MOBY_CLASS_PULSE_RIFLE, index);
+	offset = *func_L00_0032A0B8_1(MOBY_CLASS_PULSE_RIFLE, index);
+	slot_table = cursor + offset;
 	particle = (short *)(cursor + 8866);
 	for (i = 79; i >= 0; i--) {
 		*particle = 0;
 		particle = particle - 56;
 	}
-	cursor = slotTable;
-	slotEnd = cursor + 288;
+	cursor = slot_table;
+	slot_end = cursor + 288;
 	do {
 		*(short *)(cursor + 80) = 0;
 		*(int *)(cursor + 84) = 0;
 		*(int *)(cursor + 88) = 0;
 		cursor = cursor + 96;
-	} while (cursor < slotEnd);
+	} while (cursor < slot_end);
 }
 
 /* Runs the two setup helpers on the object. When either reports a failure the dispatch
@@ -375,15 +375,15 @@ extern void ref_L00_002E6EF8_00(void (*)(char *), char *);
 /* Updates the beam effect each frame, and removes it once nothing is left to show. */
 void beam_l00_effect_update(char *moby)
 {
-    char *thisMoby = moby;
+    char *this_moby = moby;
     int first = beam_update_particles(moby);
     int second = trail_update_slot(moby);
 
     if (first == 0 && second == 0) {
-        if (*(unsigned char *)(thisMoby + 0x20) == 2)
-            func_310440(thisMoby);
+        if (*(unsigned char *)(this_moby + 0x20) == 2)
+            func_310440(this_moby);
     } else {
-        ref_L00_002E6EF8_00(beam_effect_draw, thisMoby);
+        ref_L00_002E6EF8_00(beam_effect_draw, this_moby);
     }
 }
 /* Dispatches on a table lookup: the object's +0x68 pointer names a short that is looked up
@@ -397,13 +397,13 @@ extern void func_3A91A0(char *);
 /* Draws the beam effect, or removes it if its particle pool is gone. */
 void beam_effect_draw(char *moby)
 {
-    char *thisMoby = moby;
+    char *this_moby = moby;
 
-    if (func_32A060(0x5CB /* Pulse Rifle */, *(short *)(*(char **)(thisMoby + 0x68) + 0x1A)) == 0)
-        func_310440(thisMoby);
+    if (func_32A060(MOBY_CLASS_PULSE_RIFLE, *(short *)(*(char **)(this_moby + 0x68) + 0x1A)) == 0)
+        func_310440(this_moby);
     else {
-        func_3A8940(thisMoby);
-        func_3A91A0(thisMoby);
+        func_3A8940(this_moby);
+        func_3A91A0(this_moby);
     }
 }
 

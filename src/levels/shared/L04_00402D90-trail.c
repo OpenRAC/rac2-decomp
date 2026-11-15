@@ -35,31 +35,31 @@ void racer_draw_trail(u8 *obj)
     Vec73E8 tangent;
     Vec73E8 d;
     u8 *vars = *(u8 **)(obj + 0x68);
-    int pointCount;
+    int point_count;
     int i;
     int j;
     int k;
     float t;
-    u32 lineColor;
+    u32 line_color;
 
     if (*(short *)(vars + 0x32) < 3)
         return;
     set_identity_matrix(cam);
     head.quad = *(Quad *)D_001A8F20;
-    pointCount = *(short *)(vars + 0x32);
-    if (pointCount > 30)
-        pointCount = 30;
+    point_count = *(short *)(vars + 0x32);
+    if (point_count > 30)
+        point_count = 30;
     pts[0].quad = *(Quad *)(obj + 0x10);
     off.quad = *(Quad *)vars;
-    for (j = 1; j < pointCount; j++) {
+    for (j = 1; j < point_count; j++) {
         (pts + j)->quad = pts[j - 1].quad;
         off.f[2] += *(float *)(vars + 0x38);
         part_compute_ribbon_point_offset(&eye, &pts[j], &off);
     }
-    for (i = 0; i < pointCount - 1; i++) {
-        Vec73E8 *leftPoint = &side[i];
+    for (i = 0; i < point_count - 1; i++) {
+        Vec73E8 *left_point = &side[i];
 
-        t = IntToFloat(pointCount - i) / IntToFloat(pointCount);
+        t = IntToFloat(point_count - i) / IntToFloat(point_count);
         if (t > 1.0f)
             t = 1.0f;
         t *= *(float *)(vars + 0x3C);
@@ -70,10 +70,10 @@ void racer_draw_trail(u8 *obj)
         FastVecSub(&d, D_L04_001B9680, &pts[i]);
         eye.quad = d.quad;
         FastVecCross(&normal, &eye, &tangent);
-        vec_scale_to_length(leftPoint, &normal, t);
-        FastVecSub(&d, &pts[i], leftPoint);
+        vec_scale_to_length(left_point, &normal, t);
+        FastVecSub(&d, &pts[i], left_point);
         side[i + 30].quad = d.quad;
-        add_vectors(&d, leftPoint, &pts[i]);
+        add_vectors(&d, left_point, &pts[i]);
     }
     pkt.texture = GetEffectTextureDescriptor(0x16);
     pkt.mode = 0xFF9000000260ULL;
@@ -83,16 +83,16 @@ void racer_draw_trail(u8 *obj)
     pkt.uv[2] = 0.7f;
     pkt.uv[4] = 0.5f;
     pkt.uv[6] = 0.7f;
-    for (k = 0; k < pointCount - 2; k++) {
-        pkt.uv[1] = IntToFloat(k) / IntToFloat(pointCount);
-        pkt.uv[3] = IntToFloat(k) / IntToFloat(pointCount);
-        pkt.uv[5] = IntToFloat(k + 1) / IntToFloat(pointCount);
-        pkt.uv[7] = IntToFloat(k + 1) / IntToFloat(pointCount);
-        lineColor = ((pointCount - k) * 0x60 / pointCount) << 24 | 0x30FF;
+    for (k = 0; k < point_count - 2; k++) {
+        pkt.uv[1] = IntToFloat(k) / IntToFloat(point_count);
+        pkt.uv[3] = IntToFloat(k) / IntToFloat(point_count);
+        pkt.uv[5] = IntToFloat(k + 1) / IntToFloat(point_count);
+        pkt.uv[7] = IntToFloat(k + 1) / IntToFloat(point_count);
+        line_color = ((point_count - k) * 0x60 / point_count) << 24 | 0x30FF;
         pkt.color[3] = 0x8080;
         pkt.color[1] = 0x8080;
-        pkt.color[2] = lineColor;
-        pkt.color[0] = lineColor;
+        pkt.color[2] = line_color;
+        pkt.color[0] = line_color;
         pkt.vertex[0].quad = (pts + k)->quad;
         pkt.vertex[1].quad = (side + k)->quad;
         pkt.vertex[2].quad = (&pts[k + 1])->quad;

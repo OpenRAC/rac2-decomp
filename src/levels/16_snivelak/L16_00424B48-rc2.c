@@ -30,9 +30,9 @@ extern void ref_L16_00424B48_00(s32, s32, s8 *, s32);
 /* After being triggered, slowly sinks the object for a short time and then stops. */
 void sinking_l16_platform_update(s8 *moby) {
     s32 frame;
-    s32 frameLow;
-    s32 stillRunning;
-    f32 newHeight;
+    s32 frame_low;
+    s32 still_running;
+    f32 new_height;
 
     if ((*(u8 *)((char *)(moby) + (0x20))) == 0) {
         if ((*(u8 *)((char *)(moby) + (0xBC))) != 0) {
@@ -42,13 +42,13 @@ void sinking_l16_platform_update(s8 *moby) {
         (*(s16 *)((char *)(moby) + (0x32))) = 0x80;
     }
     if ((*(u8 *)((char *)(moby) + (0x20))) == 1) {
-        newHeight = (*(f32 *)((char *)(moby) + (0x18))) - 0.13333334028720855712890625f;
+        new_height = (*(f32 *)((char *)(moby) + (0x18))) - 0.13333334028720855712890625f;
         frame = (*(u16 *)((char *)(moby) + (0x96))) + 1;
-        frameLow = frame & 0xFFFF;
+        frame_low = frame & 0xFFFF;
         (*(u16 *)((char *)(moby) + (0x96))) = frame;
-        stillRunning = (u32) frameLow < 0x3CU;
-        (*(f32 *)((char *)(moby) + (0x18))) = newHeight;
-        if (stillRunning == 0) {
+        still_running = (u32) frame_low < 0x3CU;
+        (*(f32 *)((char *)(moby) + (0x18))) = new_height;
+        if (still_running == 0) {
             (*(u8 *)((char *)(moby) + (0x20))) = 2;
         }
     }

@@ -14,11 +14,11 @@ extern int mpeg_decode_or_skip_frame(void *, int, int);
    Returns its callees' values: retail keeps the frame and calls both, and
    2.9-ee tail-calls each arm (bare `j`, SIZE 40/68) when it is void. */
 /* Picks the frame or field decoder depending on the video mode and runs it. */
-int mpeg_decode_picture_2(void *mpeg, int frameIndex, int frameLimit) {
+int mpeg_decode_picture_2(void *mpeg, int frame_index, int frame_limit) {
     Obj40 *decoder = ((Wrapper *)mpeg)->obj;
     if (decoder->unk174 != 3) {
-        return mpeg_decode_field(mpeg, frameIndex, frameLimit);
+        return mpeg_decode_field(mpeg, frame_index, frame_limit);
     } else {
-        return mpeg_decode_or_skip_frame(mpeg, frameIndex, frameLimit);
+        return mpeg_decode_or_skip_frame(mpeg, frame_index, frame_limit);
     }
 }

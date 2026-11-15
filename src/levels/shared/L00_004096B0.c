@@ -148,12 +148,12 @@ char *flare_spawn(float size, char *position, int trigger, int kind, int red, in
     Vector128 direction[1], up[1], sphere[1], difference[1];
     char *object = CreateMoby(0xf6d /* moby class 3949 */);
     SpawnState *state;
-    SpawnObject *mobyView;
+    SpawnObject *moby_view;
     char *camera;
     float angle;
     if (object != 0) {
-        mobyView = (SpawnObject *)object;
-        state = mobyView->state;
+        moby_view = (SpawnObject *)object;
+        state = moby_view->state;
         *(unsigned char *)(object + 0x30) = 0xff;
         *(short *)(object + 0x32) = 0xff;
         object[0x20] = 0;
@@ -167,7 +167,7 @@ char *flare_spawn(float size, char *position, int trigger, int kind, int red, in
         FastVecCross(object + 0xd0, object + 0xc0, up);
         vec_scale_to_length(object + 0xd0, object + 0xd0, 1.0f);
         FastVecCross(object + 0xe0, object + 0xd0, object + 0xc0);
-        mobyView->forward[3] = mobyView->right[3] = mobyView->up[3] = 0.0f;
+        moby_view->forward[3] = moby_view->right[3] = moby_view->up[3] = 0.0f;
         /* Both countdowns start together. */
         state->timer = state->life = 60;
         state->outer = size + size;
@@ -332,24 +332,24 @@ extern void part_emit_spark_particle_pairs(void *, int, int);
 /* Moves each of this object's 48 flying pieces toward its target. When a piece arrives it hits the target with damage and sparks, and the piece is freed. */
 void tumbling_pieces_update(char *moby)
 {
-    Vector128 offsetVec[1];
-    char hitEvent[48];
-    char *record, *activeRecord, *linkData, *currentPos, *startPos;
+    Vector128 offset_vec[1];
+    char hit_event[48];
+    char *record, *active_record, *link_data, *current_pos, *start_pos;
     int i;
     float fraction, amount;
     for (i = 0; i < 48; i++) {
         record = D_L00_00256BC0 + i * 0xd0;
         if (*(char **)(record + 0xac) != moby) continue;
-        currentPos = record + 0x20;
-        qcopy(currentPos, record + 0x40);
+        current_pos = record + 0x20;
+        qcopy(current_pos, record + 0x40);
         if (*(char **)(record + 0xb4)) {
-            linkData = moby_get_private_value_0(*(char **)(record + 0xb4));
-            if (linkData) {
-                cam_compute_view_direction(*(char **)(record + 0xb4) + 0x10, offsetVec, 1);
-                FastVecScale(offsetVec, offsetVec, *(float *)(linkData + 0x10));
-                FastVecAdd(offsetVec, offsetVec, *(char **)(record + 0xb4) + 0x10);
-                FastVecAdd(currentPos, offsetVec, currentPos);
-            } else qcopy(currentPos, *(char **)(record + 0xb4) + 0x10);
+            link_data = moby_get_private_value_0(*(char **)(record + 0xb4));
+            if (link_data) {
+                cam_compute_view_direction(*(char **)(record + 0xb4) + 0x10, offset_vec, 1);
+                FastVecScale(offset_vec, offset_vec, *(float *)(link_data + 0x10));
+                FastVecAdd(offset_vec, offset_vec, *(char **)(record + 0xb4) + 0x10);
+                FastVecAdd(current_pos, offset_vec, current_pos);
+            } else qcopy(current_pos, *(char **)(record + 0xb4) + 0x10);
         }
         if (*(int *)(record + 0xb8)) {
             *(float *)(record + 96) = FastAddRotations(*(float *)(record + 96), *(float *)(record + 108) * 100.0f);
@@ -374,35 +374,35 @@ void tumbling_pieces_update(char *moby)
         *(float *)(record + 24) = -math_fast_sin_or_cos_b(*(float *)(record + 140)) * *(float *)(record + 164);
         qcopy(record + 0x30, record + 0x50);
         if (*(char **)(record + 0xb0)) {
-            linkData = moby_get_private_value_0(*(char **)(record + 0xb0));
-            if (linkData) {
-                cam_compute_view_direction(*(char **)(record + 0xb0) + 0x10, offsetVec, 1);
-                FastVecScale(offsetVec, offsetVec, *(float *)(linkData + 0x10));
-                FastVecAdd(offsetVec, offsetVec, *(char **)(record + 0xb0) + 0x10);
-                FastVecAdd(record + 0x30, offsetVec, record + 0x30);
+            link_data = moby_get_private_value_0(*(char **)(record + 0xb0));
+            if (link_data) {
+                cam_compute_view_direction(*(char **)(record + 0xb0) + 0x10, offset_vec, 1);
+                FastVecScale(offset_vec, offset_vec, *(float *)(link_data + 0x10));
+                FastVecAdd(offset_vec, offset_vec, *(char **)(record + 0xb0) + 0x10);
+                FastVecAdd(record + 0x30, offset_vec, record + 0x30);
             } else qcopy(record + 0x30, *(char **)(record + 0xb0) + 0x10);
         }
-        currentPos = record + 0x30;
-        activeRecord = record;
-        fraction = IntToFloat(*(int *)(activeRecord + 0xb8));
-        fraction /= IntToFloat(*(int *)(activeRecord + 0xbc));
-        startPos = activeRecord + 0x20;
-        lerp_vector(currentPos, startPos, currentPos, 1.0f - fraction);
-        if (!math_fast_float_d(activeRecord + 0xb8)) continue;
-        if (*(int *)(*(char **)(activeRecord + 0xb0) + 0x98) && !*(int *)(activeRecord + 0xc0) && *(int *)(activeRecord + 0xc4)) {
-            FastVecSub(offsetVec, currentPos, startPos);
-            vec_scale_to_length(offsetVec, offsetVec, 0.033333335f);
-            amount = *(float *)(activeRecord + 0xc8);
-            *(int *)(moby + 0xb8) = *(int *)(*(char **)(activeRecord + 0xcc) + 0x20);
-            make_hit_descriptor(hitEvent, moby, 0x210000, offsetVec, amount);
-            hitEvent[0x18] = 5;
-            hitEvent[0x19] = 3;
-            *(short *)(hitEvent + 0x1a) = *(short *)(moby + 0xaa);
-            QueueMobyImpact(*(char **)(activeRecord + 0xb0), hitEvent);
-            *(int *)(activeRecord + 0xc0) = 1;
-            part_emit_spark_particle_pairs(currentPos, 10, 1);
+        current_pos = record + 0x30;
+        active_record = record;
+        fraction = IntToFloat(*(int *)(active_record + 0xb8));
+        fraction /= IntToFloat(*(int *)(active_record + 0xbc));
+        start_pos = active_record + 0x20;
+        lerp_vector(current_pos, start_pos, current_pos, 1.0f - fraction);
+        if (!math_fast_float_d(active_record + 0xb8)) continue;
+        if (*(int *)(*(char **)(active_record + 0xb0) + 0x98) && !*(int *)(active_record + 0xc0) && *(int *)(active_record + 0xc4)) {
+            FastVecSub(offset_vec, current_pos, start_pos);
+            vec_scale_to_length(offset_vec, offset_vec, 0.033333335f);
+            amount = *(float *)(active_record + 0xc8);
+            *(int *)(moby + 0xb8) = *(int *)(*(char **)(active_record + 0xcc) + 0x20);
+            make_hit_descriptor(hit_event, moby, 0x210000, offset_vec, amount);
+            hit_event[0x18] = 5;
+            hit_event[0x19] = 3;
+            *(short *)(hit_event + 0x1a) = *(short *)(moby + 0xaa);
+            QueueMobyImpact(*(char **)(active_record + 0xb0), hit_event);
+            *(int *)(active_record + 0xc0) = 1;
+            part_emit_spark_particle_pairs(current_pos, 10, 1);
         }
-        if (math_fast_float_d(activeRecord + 0xa8)) *(int *)(activeRecord + 0xac) = 0;
+        if (math_fast_float_d(active_record + 0xa8)) *(int *)(active_record + 0xac) = 0;
     }
 }
 

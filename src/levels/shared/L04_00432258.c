@@ -13,7 +13,7 @@ extern void ref_L04_00432258_07(float *, float, char *, int, float, int, int, in
 
 /* Pulsing glow marker: spins a phase stored in its record, derives a pulsing alpha from it and, while the distance test passes, spawns a 0xC0-tick light effect with that colour. */
 void pulsing_glow_update(char *obj) {
-    float lightData[8];
+    float light_data[8];
     float *vars = FLD(obj, float *, 0x68);
     float intensity;
     float sum;
@@ -42,12 +42,12 @@ void pulsing_glow_update(char *obj) {
     }
     one = 1.0f;
     FLD(obj, int, 0x78) = ref_L04_00432258_01(0x7F, ref_L04_00432258_00(vars[0]) * 0.5235987901687622f + 0.5235987901687622f);
-    ref_L04_00432258_02(lightData, ref_L04_00432258_03, obj + 0x10);
-    ref_L04_00432258_04(lightData, lightData, one);
-    intensity = ref_L04_00432258_05(obj + 0xC0, lightData);
+    ref_L04_00432258_02(light_data, ref_L04_00432258_03, obj + 0x10);
+    ref_L04_00432258_04(light_data, light_data, one);
+    intensity = ref_L04_00432258_05(obj + 0xC0, light_data);
     if (!(intensity < 0)) {
         color = (FLD(obj, int, 0x78) & 0xFFFFFF) | ((int)(intensity * 127.0f) << 24);
-        ref_L04_00432258_06(&lightData[4]);
-        ref_L04_00432258_07(&lightData[4], 105000.0f, obj, color, one, -1, 1, 2, 0, 0xC0);
+        ref_L04_00432258_06(&light_data[4]);
+        ref_L04_00432258_07(&light_data[4], 105000.0f, obj, color, one, -1, 1, 2, 0, 0xC0);
     }
 }

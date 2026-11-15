@@ -105,7 +105,7 @@ extern void hero_build_relative_point(void *, int, float, float, float), hero_ap
  * src/overlays/shared/hero_vehicle_and_collision.c. */
 /* Counts up the hero's frame timers every frame, tracks how long the hero has been standing still, and sets how far the hero can reach for objects. */
 void hero_update_timers_and_reach(void) {
-    unsigned char *nearbyMoby, *mobyPos, *hero;
+    unsigned char *nearby_moby, *moby_pos, *hero;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
     if (!g_hero_state.tilt_disabled) hero_ease_lean_to_upright();
@@ -184,15 +184,15 @@ void hero_update_timers_and_reach(void) {
         }
     }
     if (g_hero_state.field_224) {
-        for (i = 0;(nearbyMoby = D_L22_001FBBA0[i]) != 0;i++) {
-            if (moby_is_in_special_class_range(nearbyMoby) || (nearbyMoby && BP(nearbyMoby, 0x24) && BS(BP(nearbyMoby, 0x24), 0x46) == 22)) {
-                if ((D_L22_001B1C48&7) == (((int)nearbyMoby>>8)&7) || !math_random_int_below(4)) {
+        for (i = 0;(nearby_moby = D_L22_001FBBA0[i]) != 0;i++) {
+            if (moby_is_in_special_class_range(nearby_moby) || (nearby_moby && BP(nearby_moby, 0x24) && BS(BP(nearby_moby, 0x24), 0x46) == 22)) {
+                if ((D_L22_001B1C48&7) == (((int)nearby_moby>>8)&7) || !math_random_int_below(4)) {
                     hero = (unsigned char *)&g_hero_state+0x80;
-                    mobyPos = nearbyMoby+0x10;
-                    if (fast_vec_dist(hero, mobyPos)<15.37f) {
-                        FastVecSub(sum, mobyPos, hero);
+                    moby_pos = nearby_moby+0x10;
+                    if (fast_vec_dist(hero, moby_pos)<15.37f) {
+                        FastVecSub(sum, moby_pos, hero);
                         vec_scale_to_length(sum, sum, 1.7f);
-                        part_queue_impact_effect(nearbyMoby, g_hero_state.field_2290, 0x4000000, hero, sum, 1.0f);
+                        part_queue_impact_effect(nearby_moby, g_hero_state.field_2290, 0x4000000, hero, sum, 1.0f);
                     }
                 }
             }

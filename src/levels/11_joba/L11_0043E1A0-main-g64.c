@@ -260,64 +260,64 @@ extern void moby_update_class_specials(char *);
 /* Runs the arena challenge from start to finish: waiting for the player, spawning each wave of fighters, the boss fights, and the win or fail screens. */
 void arena_controller_update(u8 *obj) {
     JobaState *st;
-    JobaRecord *firstRecord;
-    JobaRecord *nextWaveRecord;
-    JobaRecord *currentRecord;
-    JobaRecord *bossSpawnRecord;
-    JobaRecord *followRecord;
-    JobaRecord *newWaveRecord;
-    s32 spawnedAny;
-    s32 spawnedAnyBoss;
-    s32 killSum5;
-    s32 killSum8;
-    s32 killSum12;
-    s32 savedWord1;
-    s32 savedWord2;
-    s32 bossA;
-    s32 bossB;
-    s32 bossC;
-    s32 challengeA;
-    s32 challengeB;
-    u32 challengeU;
-    JobaLight *lightRise;
-    JobaLight *lightLower;
-    JobaLight *lightReset;
-    JobaLight *lightEnd;
-    JobaMoby *lampReset;
-    JobaMoby *lampEnd;
-    JobaMoby *lampLower;
-    u8 *slotEntity;
-    u8 *slotEntityBoss;
-    f32 raisedHeight;
-    f32 loweredHeight;
-    u8 *cameraEntry;
-    u8 *lampBytes;
-    s32 mobySlot;
-    s32 clearIdx;
+    JobaRecord *first_record;
+    JobaRecord *next_wave_record;
+    JobaRecord *current_record;
+    JobaRecord *boss_spawn_record;
+    JobaRecord *follow_record;
+    JobaRecord *new_wave_record;
+    s32 spawned_any;
+    s32 spawned_any_boss;
+    s32 kill_sum5;
+    s32 kill_sum8;
+    s32 kill_sum12;
+    s32 saved_word1;
+    s32 saved_word2;
+    s32 boss_a;
+    s32 boss_b;
+    s32 boss_c;
+    s32 challenge_a;
+    s32 challenge_b;
+    u32 challenge_u;
+    JobaLight *light_rise;
+    JobaLight *light_lower;
+    JobaLight *light_reset;
+    JobaLight *light_end;
+    JobaMoby *lamp_reset;
+    JobaMoby *lamp_end;
+    JobaMoby *lamp_lower;
+    u8 *slot_entity;
+    u8 *slot_entity_boss;
+    f32 raised_height;
+    f32 lowered_height;
+    u8 *camera_entry;
+    u8 *lamp_bytes;
+    s32 moby_slot;
+    s32 clear_idx;
     s32 k2;
-    s32 markIdx;
-    s32 resetIdx;
-    s32 sumIdx5;
-    s32 sumIdx8;
-    s32 spawnIdx;
-    s32 orbIdx;
-    s32 spawnIdxBoss;
-    s32 hoverIdx;
-    s32 resetIdx2;
-    s32 clearIdx2;
-    s32 followIdx;
-    s32 sumIdx12;
-    s32 resetIdx3;
+    s32 mark_idx;
+    s32 reset_idx;
+    s32 sum_idx5;
+    s32 sum_idx8;
+    s32 spawn_idx;
+    s32 orb_idx;
+    s32 spawn_idx_boss;
+    s32 hover_idx;
+    s32 reset_idx2;
+    s32 clear_idx2;
+    s32 follow_idx;
+    s32 sum_idx12;
+    s32 reset_idx3;
     s32 selection;
     s32 code;
-    JobaClass *classInfo;
-    s32 waveIndex;
-    JobaRecord *nextRecord;
-    s32 soundHandleA;
-    u8 *soundBufB;
-    u8 *soundBufC;
-    s32 soundHandleB;
-    s32 soundHandleC;
+    JobaClass *class_info;
+    s32 wave_index;
+    JobaRecord *next_record;
+    s32 sound_handle_a;
+    u8 *sound_buf_b;
+    u8 *sound_buf_c;
+    s32 sound_handle_b;
+    s32 sound_handle_c;
 
     st = OBJ->st;
     blast_call_helper_no_args();
@@ -368,30 +368,30 @@ void arena_controller_update(u8 *obj) {
             OBJ->phase = 0;
             g_moby_l11_table[st->door].flags |= 1;
             g_moby_l11_table[st->door].hidden = 0;
-            lightReset = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-            lampReset = &g_moby_l11_table[st->lamp];
-            lightReset->height = 419.766f;
-            lampReset->y = 419.766f;
+            light_reset = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+            lamp_reset = &g_moby_l11_table[st->lamp];
+            light_reset->height = 419.766f;
+            lamp_reset->y = 419.766f;
         } else if (OBJ->phase == 0) {
             if (OBJ->timer < 0x1F) {
                 D_L11_001B2FE0 = IntToFloat(OBJ->timer) * 0.05f < 1.0f
                                      ? IntToFloat(OBJ->timer) * 0.05f
                                      : 1.0f;
             } else {
-                f32 cameraPos[4] __attribute__((aligned(16)));
+                f32 camera_pos[4] __attribute__((aligned(16)));
 
                 st->fade = D_001A65D2[0];
                 gfx_add_draw_callback_first(hud_draw_fade_bar, obj);
                 if (D_L11_001CAE40[0] != 1) {
                     load_scene_chunk(1, st->music);
                 }
-                cameraEntry = D_L11_001B368C + (st->camera << 7);
-                hero_reset_position_and_direction(cameraEntry + 0x30, cameraEntry + 0x70, 0x6F, 1);
+                camera_entry = D_L11_001B368C + (st->camera << 7);
+                hero_reset_position_and_direction(camera_entry + 0x30, camera_entry + 0x70, 0x6F, 1);
                 level_capture_checkpoint_state(&HERO->f[0x80 / 4], &HERO->f[0x90 / 4]);
                 script_queue_keyed_request(st->music, st->volume);
-                *(TI128 *)cameraPos = *(TI128 *)(D_L11_001B368C + ((st->camera << 7) + 0x30));
-                cameraPos[2] += 2.0f;
-                SetCamera5Pose((char *)cameraPos, (char *)(D_L11_001B368C + (st->camera << 7) + 0x70), 1, 0, 0);
+                *(TI128 *)camera_pos = *(TI128 *)(D_L11_001B368C + ((st->camera << 7) + 0x30));
+                camera_pos[2] += 2.0f;
+                SetCamera5Pose((char *)camera_pos, (char *)(D_L11_001B368C + (st->camera << 7) + 0x70), 1, 0, 0);
                 OBJ->phase = 2;
             }
         } else if (OBJ->phase == 2) {
@@ -529,59 +529,59 @@ void arena_controller_update(u8 *obj) {
         arena_get_challenge_flag_index(1);
         if (flag_set_first_pending(obj) != 0) {
             st->wave = 0;
-            for (clearIdx = 0; clearIdx < 8; clearIdx++) {
-                st->counts[clearIdx] = 0;
+            for (clear_idx = 0; clear_idx < 8; clear_idx++) {
+                st->counts[clear_idx] = 0;
             }
             st->frames = 0;
             st->lost = 0;
             arena_run_helper_on_spawn_groups(obj);
             arena_count_fighters(obj);
             arena_assign_fighters_to_spawns(obj);
-            firstRecord = &TABLE[st->cls]->records[st->wave];
-            arena_set_group_a_active_count(obj, firstRecord->h[7]);
-            arena_set_group_b_active_count(obj, firstRecord->h[6]);
-            for (markIdx = 0; markIdx < 40; markIdx++) {
-                st->marks[markIdx] = 0;
+            first_record = &TABLE[st->cls]->records[st->wave];
+            arena_set_group_a_active_count(obj, first_record->h[7]);
+            arena_set_group_b_active_count(obj, first_record->h[6]);
+            for (mark_idx = 0; mark_idx < 40; mark_idx++) {
+                st->marks[mark_idx] = 0;
             }
-            for (markIdx = 0; markIdx < 6; markIdx++) {
-                st->limits[markIdx] = D_L11_001B14B0[markIdx];
+            for (mark_idx = 0; mark_idx < 6; mark_idx++) {
+                st->limits[mark_idx] = D_L11_001B14B0[mark_idx];
             }
             HERO->i[0x24CC / 4] = D_001A7A00;
             moby_update_class_specials((char *)obj);
             g_moby_l11_table[st->door].flags |= 1;
             g_moby_l11_table[st->door].hidden = 0;
             if (st->cls == 7) {
-                savedWord1 = HERO->i[0x18D4 / 4];
+                saved_word1 = HERO->i[0x18D4 / 4];
                 HERO->i[0x18D4 / 4] = 0;
-                D_L11_001B1588 = savedWord1;
+                D_L11_001B1588 = saved_word1;
             } else if (st->cls == 8) {
-                savedWord2 = HERO->i[0x18D4 / 4];
+                saved_word2 = HERO->i[0x18D4 / 4];
                 HERO->i[0x18D4 / 4] = 0;
                 D_00139700[0] = 300;
-                D_L11_001B1588 = savedWord2;
+                D_L11_001B1588 = saved_word2;
             }
         }
-        currentRecord = &TABLE[st->cls]->records[st->wave];
-        if (currentRecord->b[3] != 0) {
+        current_record = &TABLE[st->cls]->records[st->wave];
+        if (current_record->b[3] != 0) {
             moby_set_state(obj, 9, -1);
             return;
         }
         arena_update_loss_history(obj);
         if (arena_l11_is_wave_complete(obj) != 0) {
             st->wave++;
-            for (resetIdx = 0; resetIdx < 7; resetIdx++) {
-                st->counts[resetIdx] = 0;
+            for (reset_idx = 0; reset_idx < 7; reset_idx++) {
+                st->counts[reset_idx] = 0;
             }
             st->lost = 0;
             if (D_L11_001BA780.owner == st->owner) {
                 D_L11_001BA780.owner = 0;
             }
-            challengeA = st->cls;
-            challengeU = (u16)st->cls;
+            challenge_a = st->cls;
+            challenge_u = (u16)st->cls;
             st->sound = 0;
             st->owner = 0;
-            if (st->wave >= TABLE[challengeA]->count) {
-                if (challengeU - 7U < 2) {
+            if (st->wave >= TABLE[challenge_a]->count) {
+                if (challenge_u - 7U < 2) {
                     HERO->i[0x18D4 / 4] = D_L11_001B1588;
                 }
                 st->result = st->cls;
@@ -594,24 +594,24 @@ void arena_controller_update(u8 *obj) {
                 global_object_start((char *)1, -1);
                 return;
             }
-            if (challengeA >= 13) {
+            if (challenge_a >= 13) {
                 st->cls = 0;
             }
             arena_assign_fighters_to_spawns(obj);
-            nextWaveRecord = &TABLE[st->cls]->records[st->wave];
-            arena_set_group_a_active_count(obj, nextWaveRecord->h[7]);
-            arena_set_group_b_active_count(obj, nextWaveRecord->h[6]);
+            next_wave_record = &TABLE[st->cls]->records[st->wave];
+            arena_set_group_a_active_count(obj, next_wave_record->h[7]);
+            arena_set_group_b_active_count(obj, next_wave_record->h[6]);
         }
         st->frames++;
         if (st->cls == 5) {
             if (st->frames >= 0x1519) {
                 char message[0x70];
 
-                killSum5 = 0;
-                for (sumIdx5 = 0; sumIdx5 < 6; sumIdx5++) {
-                    killSum5 += st->counts[sumIdx5];
+                kill_sum5 = 0;
+                for (sum_idx5 = 0; sum_idx5 < 6; sum_idx5++) {
+                    kill_sum5 += st->counts[sum_idx5];
                 }
-                sprintf(message, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14B8[st->wave] + killSum5 - st->lost,
+                sprintf(message, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14B8[st->wave] + kill_sum5 - st->lost,
                               GetLocalizedString(0x2F61));
                 level_l00_call_module_handler_with_arg_9((int)message, -1);
                 moby_set_state(obj, 11, -1);
@@ -631,11 +631,11 @@ void arena_controller_update(u8 *obj) {
             if (st->frames >= 0xE11) {
                 char message[0x70];
 
-                killSum8 = 0;
-                for (sumIdx8 = 0; sumIdx8 < 6; sumIdx8++) {
-                    killSum8 += st->counts[sumIdx8];
+                kill_sum8 = 0;
+                for (sum_idx8 = 0; sum_idx8 < 6; sum_idx8++) {
+                    kill_sum8 += st->counts[sum_idx8];
                 }
-                sprintf(message, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14D0[st->wave] + killSum8 - st->lost,
+                sprintf(message, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14D0[st->wave] + kill_sum8 - st->lost,
                               GetLocalizedString(0x2F61));
                 level_l00_call_module_handler_with_arg_9((int)message, -1);
                 moby_set_state(obj, 11, -1);
@@ -651,54 +651,54 @@ void arena_controller_update(u8 *obj) {
             global_object_start((char *)1, -1);
             return;
         }
-        currentRecord = &TABLE[st->cls]->records[st->wave];
-        if (OBJ->timer >= 0x3D || currentRecord->b[0] != 0) {
-            spawnedAny = 0;
+        current_record = &TABLE[st->cls]->records[st->wave];
+        if (OBJ->timer >= 0x3D || current_record->b[0] != 0) {
+            spawned_any = 0;
             arena_clear_squad_slots_when_done(obj);
             arena_choose_next_squad_member(obj);
-            slotEntity = st->slots[st->slot];
-            if (slotEntity != 0 && moby_has_free_child_slot_state2(slotEntity) != 0) {
-                for (spawnIdx = st->counts[3]; spawnIdx < currentRecord->h[3]; spawnIdx++) {
-                    spawnedAny |= arena_activate_fighter_of_class(obj, 0xDF7 /* moby class 3575 */, 0);
+            slot_entity = st->slots[st->slot];
+            if (slot_entity != 0 && moby_has_free_child_slot_state2(slot_entity) != 0) {
+                for (spawn_idx = st->counts[3]; spawn_idx < current_record->h[3]; spawn_idx++) {
+                    spawned_any |= arena_activate_fighter_of_class(obj, 0xDF7 /* moby class 3575 */, 0);
                 }
-                for (spawnIdx = st->counts[1]; spawnIdx < currentRecord->h[1]; spawnIdx++) {
-                    spawnedAny |= arena_activate_fighter_of_class(obj, 0xDCF /* Joba smasher robot */, 0);
+                for (spawn_idx = st->counts[1]; spawn_idx < current_record->h[1]; spawn_idx++) {
+                    spawned_any |= arena_activate_fighter_of_class(obj, 0xDCF /* Joba smasher robot */, 0);
                 }
-                for (spawnIdx = st->counts[2]; spawnIdx < currentRecord->h[2]; spawnIdx++) {
-                    spawnedAny |= arena_activate_fighter_of_class(obj, 0xDF4 /* moby class 3572 */, 0);
+                for (spawn_idx = st->counts[2]; spawn_idx < current_record->h[2]; spawn_idx++) {
+                    spawned_any |= arena_activate_fighter_of_class(obj, 0xDF4 /* moby class 3572 */, 0);
                 }
-                for (spawnIdx = st->counts[0]; spawnIdx < currentRecord->h[0]; spawnIdx++) {
-                    spawnedAny |= arena_activate_fighter_of_class(obj, 0xD98 /* Joba security robot */, 0);
+                for (spawn_idx = st->counts[0]; spawn_idx < current_record->h[0]; spawn_idx++) {
+                    spawned_any |= arena_activate_fighter_of_class(obj, 0xD98 /* Joba security robot */, 0);
                 }
-                for (spawnIdx = st->counts[4]; spawnIdx < currentRecord->h[4]; spawnIdx++) {
-                    spawnedAny |= arena_activate_fighter_of_class(obj, 0xDF9 /* Joba fighter */, 0);
+                for (spawn_idx = st->counts[4]; spawn_idx < current_record->h[4]; spawn_idx++) {
+                    spawned_any |= arena_activate_fighter_of_class(obj, 0xDF9 /* Joba fighter */, 0);
                 }
-                for (spawnIdx = st->counts[5]; spawnIdx < currentRecord->h[5]; spawnIdx++) {
-                    spawnedAny |= arena_activate_fighter_of_class(obj, 0xD37 /* moby class 3383 */, 0);
+                for (spawn_idx = st->counts[5]; spawn_idx < current_record->h[5]; spawn_idx++) {
+                    spawned_any |= arena_activate_fighter_of_class(obj, 0xD37 /* moby class 3383 */, 0);
                 }
             }
-            if (st->counts[6] == 0 && currentRecord->b[0] != 0) {
-                bossA = arena_activate_boss_of_class(obj, 0xD4A /* moby class 3402 */, 0);
-                st->sound = bossA;
-                st->owner = bossA;
+            if (st->counts[6] == 0 && current_record->b[0] != 0) {
+                boss_a = arena_activate_boss_of_class(obj, 0xD4A /* moby class 3402 */, 0);
+                st->sound = boss_a;
+                st->owner = boss_a;
                 if (D_L11_001BA780.owner == 0) {
-                    D_L11_001BA780.owner = bossA;
+                    D_L11_001BA780.owner = boss_a;
                     D_L11_001BA780.timer = 0;
                 }
-                soundHandleA = st->sound;
+                sound_handle_a = st->sound;
                 if (D_L11_001B3770[0] == 0) {
-                    D_L11_001B3770[0] = soundHandleA;
+                    D_L11_001B3770[0] = sound_handle_a;
                     mem_clear(D_L11_001FFA78, 0, 0xE0);
                 }
                 arena_queue_voice_line(obj, 10);
                 script_queue_keyed_request(st->track, st->trackVolume);
             }
-            if (currentRecord->b[0] == 0) {
+            if (current_record->b[0] == 0) {
                 if (g_music_state[0x48] != st->music && g_music_state[0x3C] != st->music) {
                     script_queue_keyed_request(st->music, st->volume);
                 }
             }
-            if (spawnedAny != 0) {
+            if (spawned_any != 0) {
                 arena_refresh_squad_slots(obj);
             }
         }
@@ -726,18 +726,18 @@ void arena_controller_update(u8 *obj) {
         if (flag_set_first_pending(obj) != 0) {
             if (st->counts[7] == 0) {
                 if (TABLE[st->cls]->records[st->wave].b[1] != 0) {
-                    bossB = arena_activate_boss_of_class(obj, 0xB3A /* Arachnoid */, 0);
-                    st->sound = bossB;
-                    st->owner = bossB;
+                    boss_b = arena_activate_boss_of_class(obj, MOBY_CLASS_ARACHNOID, 0);
+                    st->sound = boss_b;
+                    st->owner = boss_b;
                     if (D_L11_001BA780.owner == 0) {
-                        D_L11_001BA780.owner = bossB;
+                        D_L11_001BA780.owner = boss_b;
                         D_L11_001BA780.timer = 0;
                     }
-                    soundHandleB = st->sound;
+                    sound_handle_b = st->sound;
                     if (D_L11_001B3770[1] == 0) {
-                        D_L11_001B3770[1] = soundHandleB;
-                        soundBufB = D_L11_001FFA78;
-                        mem_clear(soundBufB + 0xE0, 0, 0xE0);
+                        D_L11_001B3770[1] = sound_handle_b;
+                        sound_buf_b = D_L11_001FFA78;
+                        mem_clear(sound_buf_b + 0xE0, 0, 0xE0);
                     }
                     arena_queue_voice_line(obj, 4);
                     script_queue_keyed_request(st->track, st->trackVolume);
@@ -746,22 +746,22 @@ void arena_controller_update(u8 *obj) {
             st->mode = 1;
             OBJ->phase = 0;
             arena_queue_voice_line(obj, math_random_int_below(2) + 0x1B);
-            for (orbIdx = 0; orbIdx < 4; orbIdx++) {
-                st->phase[orbIdx] = (f32)orbIdx * 0.25f;
-                st->speed[orbIdx] = math_random_float_range(D_L11_001B1590[0], D_L11_001B1590[1]) * 0.016666668f;
-                st->delay[orbIdx] = math_random_float_range(D_L11_001B1598[0], D_L11_001B1598[1]);
+            for (orb_idx = 0; orb_idx < 4; orb_idx++) {
+                st->phase[orb_idx] = (f32)orb_idx * 0.25f;
+                st->speed[orb_idx] = math_random_float_range(D_L11_001B1590[0], D_L11_001B1590[1]) * 0.016666668f;
+                st->delay[orb_idx] = math_random_float_range(D_L11_001B1598[0], D_L11_001B1598[1]);
             }
         } else if (OBJ->phase == 0) {
             joba_update_ribbon_scale(obj);
             arena_update_loss_history(obj);
-            lightRise = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-            lampBytes = (u8 *)&g_moby_l11_table[st->lamp];
-            if (lightRise->height < 421.266f) {
-                raisedHeight = lightRise->height + 0.008333334f;
-                lightRise->height = raisedHeight;
-                *(f32 *)(lampBytes + 0x18) = raisedHeight;
+            light_rise = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+            lamp_bytes = (u8 *)&g_moby_l11_table[st->lamp];
+            if (light_rise->height < 421.266f) {
+                raised_height = light_rise->height + 0.008333334f;
+                light_rise->height = raised_height;
+                *(f32 *)(lamp_bytes + 0x18) = raised_height;
             }
-            if (HERO->ptr[0x33C / 4] == (void *)lampBytes && HERO->i[0x340 / 4] != 0 &&
+            if (HERO->ptr[0x33C / 4] == (void *)lamp_bytes && HERO->i[0x340 / 4] != 0 &&
                 (HERO->i[0x2294 / 4] == 7 || OBJ->timer >= 0x12D)) {
                 HERO->i[0xF0 / 4] = 0;
                 D_L11_001A7CD8 = 80.0f;
@@ -773,28 +773,28 @@ void arena_controller_update(u8 *obj) {
                 } else {
                     hero_l11_enter_state(0x81, 1);
                 }
-                if (vec_distance_xy(&HERO->f[0x80 / 4], lightRise->pos) < 0.01f) {
+                if (vec_distance_xy(&HERO->f[0x80 / 4], light_rise->pos) < 0.01f) {
                     HERO->f[0x84 / 4] += 0.01f;
                 }
             }
-            spawnedAnyBoss = 0;
+            spawned_any_boss = 0;
             arena_clear_squad_slots_when_done(obj);
             arena_choose_next_squad_member(obj);
-            slotEntityBoss = st->slots[st->slot];
-            if (slotEntityBoss != 0 && moby_has_free_child_slot_state2(slotEntityBoss) != 0) {
-                for (spawnIdxBoss = st->counts[1]; spawnIdxBoss < 4; spawnIdxBoss++) {
-                    spawnedAnyBoss |= arena_activate_fighter_of_class(obj, 0xDCF /* Joba smasher robot */, 0);
+            slot_entity_boss = st->slots[st->slot];
+            if (slot_entity_boss != 0 && moby_has_free_child_slot_state2(slot_entity_boss) != 0) {
+                for (spawn_idx_boss = st->counts[1]; spawn_idx_boss < 4; spawn_idx_boss++) {
+                    spawned_any_boss |= arena_activate_fighter_of_class(obj, 0xDCF /* Joba smasher robot */, 0);
                 }
-                for (spawnIdxBoss = st->counts[2]; spawnIdxBoss < 4; spawnIdxBoss++) {
-                    spawnedAnyBoss |= arena_activate_fighter_of_class(obj, 0xDF4 /* moby class 3572 */, 0);
+                for (spawn_idx_boss = st->counts[2]; spawn_idx_boss < 4; spawn_idx_boss++) {
+                    spawned_any_boss |= arena_activate_fighter_of_class(obj, 0xDF4 /* moby class 3572 */, 0);
                 }
-                for (spawnIdxBoss = st->counts[0]; spawnIdxBoss < 4; spawnIdxBoss++) {
-                    spawnedAnyBoss |= arena_activate_fighter_of_class(obj, 0xD98 /* Joba security robot */, 0);
+                for (spawn_idx_boss = st->counts[0]; spawn_idx_boss < 4; spawn_idx_boss++) {
+                    spawned_any_boss |= arena_activate_fighter_of_class(obj, 0xD98 /* Joba security robot */, 0);
                 }
             }
             part_emit_robot_laser(obj);
             gfx_add_draw_callback_first(part_spawn_channel_beam_effects, obj);
-            if (spawnedAnyBoss != 0) {
+            if (spawned_any_boss != 0) {
                 arena_refresh_squad_slots(obj);
             }
             if (D_L11_001A8FF4 == 0) {
@@ -817,26 +817,26 @@ void arena_controller_update(u8 *obj) {
             if (D_L11_001A8FF4 != 0 && st->mode == 3) {
                 OBJ->timer = 0;
                 OBJ->phase = 1;
-                bossSpawnRecord = &TABLE[st->cls]->records[st->wave];
-                for (resetIdx2 = 0; resetIdx2 < 6; resetIdx2++) {
-                    st->counts[resetIdx2] = 0;
+                boss_spawn_record = &TABLE[st->cls]->records[st->wave];
+                for (reset_idx2 = 0; reset_idx2 < 6; reset_idx2++) {
+                    st->counts[reset_idx2] = 0;
                 }
                 st->heading = mat_fast_helper_a(HERO->f[0x80 / 4] - ((f32 *)arena_get_center_point(obj))[0],
                                            HERO->f[0x84 / 4] - ((f32 *)arena_get_center_point(obj))[1]);
                 st->heading = FastAddRotations(st->heading, -1.5707965f);
-                for (hoverIdx = st->counts[3]; hoverIdx < bossSpawnRecord->h[3]; hoverIdx++) {
+                for (hover_idx = st->counts[3]; hover_idx < boss_spawn_record->h[3]; hover_idx++) {
                     arena_activate_fighter_of_class(obj, 0xDF7 /* moby class 3575 */, 1);
                 }
-                for (hoverIdx = st->counts[5]; hoverIdx < bossSpawnRecord->h[5]; hoverIdx++) {
+                for (hover_idx = st->counts[5]; hover_idx < boss_spawn_record->h[5]; hover_idx++) {
                     arena_activate_fighter_of_class(obj, 0xD37 /* moby class 3383 */, 1);
                 }
-                for (hoverIdx = st->counts[1]; hoverIdx < bossSpawnRecord->h[1]; hoverIdx++) {
+                for (hover_idx = st->counts[1]; hover_idx < boss_spawn_record->h[1]; hover_idx++) {
                     arena_activate_fighter_of_class(obj, 0xDCF /* Joba smasher robot */, 1);
                 }
-                for (hoverIdx = st->counts[2]; hoverIdx < bossSpawnRecord->h[2]; hoverIdx++) {
+                for (hover_idx = st->counts[2]; hover_idx < boss_spawn_record->h[2]; hover_idx++) {
                     arena_activate_fighter_of_class(obj, 0xDF4 /* moby class 3572 */, 1);
                 }
-                for (hoverIdx = st->counts[0]; hoverIdx < bossSpawnRecord->h[0]; hoverIdx++) {
+                for (hover_idx = st->counts[0]; hover_idx < boss_spawn_record->h[0]; hover_idx++) {
                     arena_activate_fighter_of_class(obj, 0xD98 /* Joba security robot */, 1);
                 }
             }
@@ -848,47 +848,47 @@ void arena_controller_update(u8 *obj) {
             }
             part_emit_object_sparks(obj, 0);
             if (arena_l11_is_wave_complete(obj) != 0) {
-                for (clearIdx2 = 0; clearIdx2 < 8; clearIdx2++) {
-                    st->counts[clearIdx2] = 0;
+                for (clear_idx2 = 0; clear_idx2 < 8; clear_idx2++) {
+                    st->counts[clear_idx2] = 0;
                 }
                 st->lost = 0;
-                classInfo = TABLE[st->cls];
-                waveIndex = st->wave;
-                nextRecord = &classInfo->records[waveIndex + 1];
-                if (waveIndex + 1 < classInfo->count && nextRecord->b[3] != 0) {
+                class_info = TABLE[st->cls];
+                wave_index = st->wave;
+                next_record = &class_info->records[wave_index + 1];
+                if (wave_index + 1 < class_info->count && next_record->b[3] != 0) {
                     st->heading = mat_fast_helper_a(HERO->f[0x80 / 4] - ((f32 *)arena_get_center_point(obj))[0],
                                                HERO->f[0x84 / 4] - ((f32 *)arena_get_center_point(obj))[1]);
                     st->heading = FastAddRotations(st->heading, -1.5707965f);
                     st->wave++;
-                    followRecord = &TABLE[st->cls]->records[st->wave];
-                    for (followIdx = st->counts[3]; followIdx < followRecord->h[3]; followIdx++) {
+                    follow_record = &TABLE[st->cls]->records[st->wave];
+                    for (follow_idx = st->counts[3]; follow_idx < follow_record->h[3]; follow_idx++) {
                         arena_activate_fighter_of_class(obj, 0xDF7 /* moby class 3575 */, 1);
                     }
-                    for (followIdx = st->counts[5]; followIdx < followRecord->h[5]; followIdx++) {
+                    for (follow_idx = st->counts[5]; follow_idx < follow_record->h[5]; follow_idx++) {
                         arena_activate_fighter_of_class(obj, 0xD37 /* moby class 3383 */, 1);
                     }
-                    for (followIdx = st->counts[1]; followIdx < followRecord->h[1]; followIdx++) {
+                    for (follow_idx = st->counts[1]; follow_idx < follow_record->h[1]; follow_idx++) {
                         arena_activate_fighter_of_class(obj, 0xDCF /* Joba smasher robot */, 1);
                     }
-                    for (followIdx = st->counts[2]; followIdx < followRecord->h[2]; followIdx++) {
+                    for (follow_idx = st->counts[2]; follow_idx < follow_record->h[2]; follow_idx++) {
                         arena_activate_fighter_of_class(obj, 0xDF4 /* moby class 3572 */, 1);
                     }
-                    for (followIdx = st->counts[0]; followIdx < followRecord->h[0]; followIdx++) {
+                    for (follow_idx = st->counts[0]; follow_idx < follow_record->h[0]; follow_idx++) {
                         arena_activate_fighter_of_class(obj, 0xD98 /* Joba security robot */, 1);
                     }
-                    if (st->counts[7] == 0 && followRecord->b[1] != 0) {
-                        bossC = arena_activate_boss_of_class(obj, 0xB3A /* Arachnoid */, 0);
-                        st->sound = bossC;
-                        st->owner = bossC;
+                    if (st->counts[7] == 0 && follow_record->b[1] != 0) {
+                        boss_c = arena_activate_boss_of_class(obj, MOBY_CLASS_ARACHNOID, 0);
+                        st->sound = boss_c;
+                        st->owner = boss_c;
                         if (D_L11_001BA780.owner == 0) {
-                            D_L11_001BA780.owner = bossC;
+                            D_L11_001BA780.owner = boss_c;
                             D_L11_001BA780.timer = 0;
                         }
-                        soundHandleC = st->sound;
+                        sound_handle_c = st->sound;
                         if (D_L11_001B3770[1] == 0) {
-                            D_L11_001B3770[1] = soundHandleC;
-                            soundBufC = D_L11_001FFA78;
-                            mem_clear(soundBufC + 0xE0, 0, 0xE0);
+                            D_L11_001B3770[1] = sound_handle_c;
+                            sound_buf_c = D_L11_001FFA78;
+                            mem_clear(sound_buf_c + 0xE0, 0, 0xE0);
                         }
                         arena_queue_voice_line(obj, 4);
                     }
@@ -906,17 +906,17 @@ void arena_controller_update(u8 *obj) {
                 if (st->frames >= 0x1771) {
                     char message[0x70];
 
-                    killSum12 = 0;
-                    for (sumIdx12 = 0; sumIdx12 < 6; sumIdx12++) {
-                        killSum12 += st->counts[sumIdx12];
+                    kill_sum12 = 0;
+                    for (sum_idx12 = 0; sum_idx12 < 6; sum_idx12++) {
+                        kill_sum12 += st->counts[sum_idx12];
                     }
-                    sprintf(message, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14D8[st->wave] + killSum12 - st->lost,
+                    sprintf(message, D_L11_001B15A0, GetLocalizedString(0x3269), D_L11_001B14D8[st->wave] + kill_sum12 - st->lost,
                                   GetLocalizedString(0x2F61));
                     level_l00_call_module_handler_with_arg_9((int)message, -1);
-                    lightEnd = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-                    lampEnd = &g_moby_l11_table[st->lamp];
-                    lightEnd->height = 419.766f;
-                    lampEnd->y = 419.766f;
+                    light_end = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+                    lamp_end = &g_moby_l11_table[st->lamp];
+                    light_end->height = 419.766f;
+                    lamp_end->y = 419.766f;
                     moby_set_state(obj, 11, -1);
                     tracked_moby_set_state(1, -1);
                     global_object_start((char *)1, -1);
@@ -938,27 +938,27 @@ void arena_controller_update(u8 *obj) {
                 HERO->h[0x1F0 / 2] = 1;
             }
             joba_update_ribbon_scale(obj);
-            lightLower = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
-            lampLower = &g_moby_l11_table[st->lamp];
-            if (lightLower->height > 419.766f) {
-                loweredHeight = lightLower->height - 0.008333334f;
-                lightLower->height = loweredHeight;
-                lampLower->y = loweredHeight;
+            light_lower = &D_L11_001B3C1C[*D_L11_001A9014[st->light] & 0x7FFF];
+            lamp_lower = &g_moby_l11_table[st->lamp];
+            if (light_lower->height > 419.766f) {
+                lowered_height = light_lower->height - 0.008333334f;
+                light_lower->height = lowered_height;
+                lamp_lower->y = lowered_height;
             }
             if (st->mode == 0) {
                 st->wave++;
-                for (resetIdx3 = 0; resetIdx3 < 7; resetIdx3++) {
-                    st->counts[resetIdx3] = 0;
+                for (reset_idx3 = 0; reset_idx3 < 7; reset_idx3++) {
+                    st->counts[reset_idx3] = 0;
                 }
                 st->lost = 0;
                 if (D_L11_001BA780.owner == st->owner) {
                     D_L11_001BA780.owner = 0;
                 }
-                challengeB = st->cls;
+                challenge_b = st->cls;
                 st->sound = 0;
                 st->owner = 0;
-                if (st->wave >= TABLE[challengeB]->count) {
-                    if (challengeB == 1 && D_001395B8[arena_get_challenge_flag_index(1)] == 0) {
+                if (st->wave >= TABLE[challenge_b]->count) {
+                    if (challenge_b == 1 && D_001395B8[arena_get_challenge_flag_index(1)] == 0) {
                         moby_set_state(obj, 13, -1);
                         OBJ->timer = 0xB4;
                     } else {
@@ -970,25 +970,25 @@ void arena_controller_update(u8 *obj) {
                     st->result = st->cls;
                     return;
                 }
-                if (challengeB >= 13) {
+                if (challenge_b >= 13) {
                     st->cls = 0;
                 }
                 arena_assign_fighters_to_spawns(obj);
-                newWaveRecord = &TABLE[st->cls]->records[st->wave];
-                arena_set_group_a_active_count(obj, newWaveRecord->h[7]);
-                arena_set_group_b_active_count(obj, newWaveRecord->h[6]);
+                new_wave_record = &TABLE[st->cls]->records[st->wave];
+                arena_set_group_a_active_count(obj, new_wave_record->h[7]);
+                arena_set_group_b_active_count(obj, new_wave_record->h[6]);
                 OBJ->state = 8;
             }
         }
     tail9:
-        mobySlot = (s32)obj >> 8;
+        moby_slot = (s32)obj >> 8;
         gfx_add_draw_callback_first(joba_hud_draw_challenge, obj);
         arena_update_camera_guide(obj);
         joba_boss_pick_action_by_target(obj);
-        if ((D_L11_001B30C8 & 7) == (mobySlot & 7)) {
+        if ((D_L11_001B30C8 & 7) == (moby_slot & 7)) {
             arena_update_fighters_inside(obj);
         }
-        if ((D_L11_001B30C8 & 0x3F) == (mobySlot & 0x3F)) {
+        if ((D_L11_001B30C8 & 0x3F) == (moby_slot & 0x3F)) {
             arena_mark_nearest_fighters_to_attack(obj);
         }
         if (arena_get_challenge_display_id(st->cls) != -1) {

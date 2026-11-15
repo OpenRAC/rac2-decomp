@@ -32,41 +32,41 @@ extern void eh_collect_fde_records(s32, void *, void *, void *);
 /* Gathers and sorts the frame records of a code module the first time they are needed. */
 void eh_init_object(void *module) {
     u32 builder[6];
-    s32 *listCursor;
-    s32 *fdeLists;
-    s32 *fdeLists2;
+    s32 *list_cursor;
+    s32 *fde_lists;
+    s32 *fde_lists2;
     s32 total;
-    s32 byteCount;
+    s32 byte_count;
 
-    fdeLists = (*(s32 **)((s8 *)(module) + (0xC)));
-    if (fdeLists != 0) {
-        listCursor = fdeLists;
+    fde_lists = (*(s32 **)((s8 *)(module) + (0xC)));
+    if (fde_lists != 0) {
+        list_cursor = fde_lists;
         total = 0;
-        if (*listCursor != 0) {
+        if (*list_cursor != 0) {
             do {
-                total += eh_count_fde_records(*listCursor);
-                listCursor++;
-            } while (*listCursor != 0);
+                total += eh_count_fde_records(*list_cursor);
+                list_cursor++;
+            } while (*list_cursor != 0);
         }
     } else {
         total = eh_count_fde_records((*(s32 *)((s8 *)(module) + (8))));
     }
-    byteCount = total * 4;
+    byte_count = total * 4;
     (*(s32 *)((s8 *)(module) + (0x10))) = total;
-    builder[0] = malloc(byteCount);
-    builder[2] = malloc(byteCount);
+    builder[0] = malloc(byte_count);
+    builder[2] = malloc(byte_count);
     builder[4] = 0xFFFFFFFF;
     builder[1] = 0;
     builder[3] = 0;
     builder[5] = 0;
-    fdeLists2 = (*(s32 **)((s8 *)(module) + (0xC)));
-    if (fdeLists2 != 0) {
-        listCursor = fdeLists2;
-        if (*listCursor != 0) {
+    fde_lists2 = (*(s32 **)((s8 *)(module) + (0xC)));
+    if (fde_lists2 != 0) {
+        list_cursor = fde_lists2;
+        if (*list_cursor != 0) {
             do {
-                eh_collect_fde_records(*listCursor, builder, &builder[4], &builder[5]);
-                listCursor++;
-            } while (*listCursor != 0);
+                eh_collect_fde_records(*list_cursor, builder, &builder[4], &builder[5]);
+                list_cursor++;
+            } while (*list_cursor != 0);
         }
     } else {
         eh_collect_fde_records((*(s32 *)((s8 *)(module) + (8))), builder, &builder[4], &builder[5]);

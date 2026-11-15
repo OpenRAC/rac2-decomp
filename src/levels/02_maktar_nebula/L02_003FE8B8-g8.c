@@ -269,12 +269,12 @@ void DrawMaktarChallengeHud(u8 *moby)
             LABEL50(1);
             obj = *(u8 **)(data + 0xD0);
             switch (*(s16 *)(obj + 0xAA)) {
-            case 0x9F8 /* Chainblade */:
+            case MOBY_CLASS_CHAINBLADE:
                 pv = *(u8 **)(obj + 0x68);
                 hud_draw_boss_health_bar(*(f32 *)(pv + 0x20) / IntToFloat(*(s16 *)(pv + 0x24)));
                 LBL4(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 2.0f, half, k3);
                 break;
-            case 0xA44 /* B2 Brawler Legs */:
+            case MOBY_CLASS_B2_BRAWLER_LEGS:
                 pv = *(u8 **)(obj + 0x68);
                 hud_draw_boss_health_bar(*(f32 *)(pv + 0x20) / IntToFloat(*(s16 *)(pv + 0x24)));
                 LBL4(0x51, D_L02_001B13F0, D_L02_001B13F4, D_L02_001B13F8, D_L02_001B1404, 1.0f, 1.0f, half, k2);

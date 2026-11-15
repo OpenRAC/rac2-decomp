@@ -45,9 +45,9 @@ void homing_l00_shot_update_2(char *obj)
     char *target;
     char *info;
     char *spark;
-    float *trackingDelta;
+    float *tracking_delta;
     float length, speed, scale;
-    int tempWord, i;
+    int temp_word, i;
 
     qcopy(old, obj + 0x10);
     cam_compute_view_direction(obj + 0x10, scratch, 1);
@@ -60,17 +60,17 @@ void homing_l00_shot_update_2(char *obj)
         {
             { float *t = delta;
             FastVecSub(t, *(char **)(state + 0x1C) + 0x10, obj + 0x10);
-            trackingDelta = t; }
+            tracking_delta = t; }
             info = moby_get_private_value_0(*(char **)(state + 0x1C));
             if (info) {
                 FastVecScale((char *)temp, *(char **)(state + 0x1C) + 0xE0, *(float *)(info + 0x10));
-                FastVecAdd(trackingDelta, trackingDelta, temp);
+                FastVecAdd(tracking_delta, tracking_delta, temp);
             }
-            length = FastVecLength(trackingDelta);
+            length = FastVecLength(tracking_delta);
             if (length == 0.0f) goto clear_target;
             {
                 speed = *(float *)(state + 0x2C);
-                FastVecScale(state + 0x20, (char *)trackingDelta, speed / length);
+                FastVecScale(state + 0x20, (char *)tracking_delta, speed / length);
                 *(float *)(state + 0x2C) = speed;
             }
         }
@@ -117,24 +117,24 @@ target_done:
             *(unsigned short *)(obj + 0x34) |= 0x41;
             *(int *)(state + 0x38) = 6;
         }
-        tempWord = math_random_int_below(255);
-        spark = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0x202080, tempWord, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        temp_word = math_random_int_below(255);
+        spark = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0x202080, temp_word, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
         if (spark) spark[2] = *D_L00_001FEA14;
-        spark = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0x202080, (tempWord + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        spark = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 2, 0x202080, (temp_word + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
         if (spark) spark[2] = *D_L00_001FEA14;
-        tempWord = (int)delta;
-        FastVecSub((void *)tempWord, obj + 0x10, previous);
-        FastVecScale((char *)tempWord, (char *)tempWord, 0.1f);
+        temp_word = (int)delta;
+        FastVecSub((void *)temp_word, obj + 0x10, previous);
+        FastVecScale((char *)temp_word, (char *)temp_word, 0.1f);
         qcopy(temp, previous);
-        trackingDelta = (float *)tempWord;
+        tracking_delta = (float *)temp_word;
         for (i = 4; i >= 0; i--) {
-            tempWord = math_random_int_below(255);
+            temp_word = math_random_int_below(255);
             scale = math_random_float_range(0.1f, 0.3f);
             particle[0] = temp[0] + math_random_signed_float_range(0.0f, 0.05f);
             particle[1] = temp[1] + math_random_signed_float_range(0.0f, 0.05f);
             particle[2] = temp[2] + math_random_signed_float_range(0.0f, 0.05f);
-            part_spawn_gravity_fade(particle, D_L00_001A8F20, 15, 0x808080, tempWord, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
-            FastVecAdd(temp, temp, trackingDelta);
+            part_spawn_gravity_fade(particle, D_L00_001A8F20, 15, 0x808080, temp_word, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
+            FastVecAdd(temp, temp, tracking_delta);
         }
         if (g_frame_l00_counter % 10 == 0) {
             spark = part_spawn_gravity_fade(obj + 0x10, D_L00_001A8F20, 30, 0x202080, 0, 32, 0, 2100.0f, 420000.0f, 0.0f, 1);

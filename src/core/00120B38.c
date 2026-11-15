@@ -7,20 +7,20 @@ extern char *__frame_state_for(int, int);
 extern void *eh_get_saved_register_addr(int, void *, int);
 
 /* Works out the stack frame of the caller, filling in its saved register data. */
-char *eh_next_stack_level(int pc, char *udata, int subUdata) {
-    char *nextFrame = __frame_state_for(pc, subUdata);
+char *eh_next_stack_level(int pc, char *udata, int sub_udata) {
+    char *next_frame = __frame_state_for(pc, sub_udata);
     int reg;
     s64 value;
 
-    if (nextFrame == 0)
+    if (next_frame == 0)
         return 0;
-    reg = *(u16 *)(nextFrame + 0x298);
+    reg = *(u16 *)(next_frame + 0x298);
     if (*(s8 *)(udata + reg + 0x29C) != 0) {
         value = *(s64 *)eh_get_saved_register_addr(reg, udata, 0);
-        *(int *)nextFrame = value;
+        *(int *)next_frame = value;
     } else {
-        *(int *)nextFrame = *(int *)udata;
+        *(int *)next_frame = *(int *)udata;
     }
-    *(int *)nextFrame += *(int *)(nextFrame + 8);
-    return nextFrame;
+    *(int *)next_frame += *(int *)(next_frame + 8);
+    return next_frame;
 }

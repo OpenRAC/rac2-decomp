@@ -17,7 +17,7 @@ void sheepinator_trail_update(char *actor) {
         return;
     }
     owner = *(char **)state;
-    if (!owner || *(short *)(owner + 0xAA) != 0xA5D /* Sheepinator */ || *(unsigned char *)(owner + 0x20) == 0xFE || *(unsigned char *)(owner + 0x20) == 0xFD) {
+    if (!owner || *(short *)(owner + 0xAA) != MOBY_CLASS_SHEEPINATOR || *(unsigned char *)(owner + 0x20) == 0xFE || *(unsigned char *)(owner + 0x20) == 0xFD) {
         moby_mark_spawned(actor);
         return;
     }

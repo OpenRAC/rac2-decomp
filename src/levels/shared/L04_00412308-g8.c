@@ -34,53 +34,53 @@ typedef struct RaceObject {
 } RaceObject;
 typedef struct {
     u8 pad000[0x190-0x0];
-    int finishLine;
-    int checkpointLine;
+    int finish_line;
+    int checkpoint_line;
     u8 pad198[0x1E4-0x198];
-    int racerSlots[21];
+    int racer_slots[21];
     u8 pad238[0x27C-0x238];
     float speed;
     u8 pad280[0x310-0x280];
     float routeDistance;
     int path;
-    int pathPoint;
+    int path_point;
     int checkpointArmed;
     int rank;
     u8 pad324[0x330-0x324];
     int x330;
     int x334;
     u8 pad338[0x340-0x338];
-    int lossCount;
-    int winCount;
+    int loss_count;
+    int win_count;
     u8 pad348[0x398-0x348];
     int x398;
     u8 pad39C[0x3A4-0x39C];
-    int wrongWayCount;
-    int pathChangeTimer;
-    RaceObject *trackedRacer;
-    RaceObject *nearestRacer;
-    int trackedTime;
-    float prevRouteDistance;
+    int wrong_way_count;
+    int path_change_timer;
+    RaceObject *tracked_racer;
+    RaceObject *nearest_racer;
+    int tracked_time;
+    float prev_route_distance;
     u8 pad3BC[0x48C-0x3BC];
     int x48C;
     u8 pad490[0x4C4-0x490];
-    RaceObject *boostTarget;
+    RaceObject *boost_target;
     u8 pad4C8[0x63C-0x4C8];
     float x63C;
     u8 pad640[0x654-0x640];
-    int routePoint;
+    int route_point;
     int x658;
-    int routeTimer;
+    int route_timer;
     u8 pad660[0x6A0-0x660];
     int x6A0;
     u8 pad6A4[0x6D0-0x6A4];
     RaceRoute *route;
     int x6D4;
-    float routeSpeed;
+    float route_speed;
     u8 pad6DC[0x6E0-0x6DC];
-    int homeRoute;
+    int home_route;
     u8 pad6E4[0x710-0x6E4];
-    int switchTimer;
+    int switch_timer;
     u8 pad714[0x75C-0x714];
     int x75C;
 } RaceState;
@@ -135,35 +135,35 @@ extern int math_random_int_below(int),math_random_int_range(int,int);
 int race_update_player_progress(RaceObject *object,RaceState *state)
 {
     float delta[4] __attribute__((aligned(16)));
-    int oldPath, oldPoint, winTotal, level, ticks, limit, done, empty, *bestTime;
+    int oldPath, oldPoint, win_total, level, ticks, limit, done, empty, *bestTime;
     int *slot, i, rank;
     RaceRoute *route;
     RaceObject *other;
     RaceRivalState *vars, *loopVars;
-    float myDistance, nearestDistance, otherTime, length, distance, start;
+    float my_distance, nearest_distance, otherTime, length, distance, start;
     racer_find_zone_slot(object);
     {
         float previous=state->routeDistance;
         int lap=g_current_lap, mode=D_L04_001B08F0;
-        oldPath=state->path; oldPoint=state->pathPoint;
-        state->prevRouteDistance=previous;
-        state->routeDistance=UpdateNearestRoutePoint(object,state,&state->path,&state->pathPoint,lap,mode);
+        oldPath=state->path; oldPoint=state->path_point;
+        state->prev_route_distance=previous;
+        state->routeDistance=UpdateNearestRoutePoint(object,state,&state->path,&state->path_point,lap,mode);
     }
-    if (state->routeDistance<state->prevRouteDistance || (state->pathPoint>=451 && oldPoint<3))
-        state->wrongWayCount++;
-    else state->wrongWayCount=0;
-    if (oldPath!=state->path) state->pathChangeTimer=10;
-    if (state->pathChangeTimer>0) math_fast_float_d(&state->pathChangeTimer);
+    if (state->routeDistance<state->prev_route_distance || (state->path_point>=451 && oldPoint<3))
+        state->wrong_way_count++;
+    else state->wrong_way_count=0;
+    if (oldPath!=state->path) state->path_change_timer=10;
+    if (state->path_change_timer>0) math_fast_float_d(&state->path_change_timer);
     else UpdateRacerRanks(object,0);
     {
     D_L04_001B0918++;
     g_race_time_ticks++;
-    if (IsPointInCuboid(object->position,state->checkpointLine)) {
-        if (state->wrongWayCount>0) state->checkpointArmed=0;
+    if (IsPointInCuboid(object->position,state->checkpoint_line)) {
+        if (state->wrong_way_count>0) state->checkpointArmed=0;
         else state->checkpointArmed=1;
     }
     }
-    if (IsPointInCuboid(object->position,state->finishLine) && state->checkpointArmed) {
+    if (IsPointInCuboid(object->position,state->finish_line) && state->checkpointArmed) {
         if (g_current_lap<2) {
             g_current_lap++;
             D_L04_001B091C=180;
@@ -172,14 +172,14 @@ int race_update_player_progress(RaceObject *object,RaceState *state)
             D_L04_001B0918=0;
             state->checkpointArmed=0;
         } else {
-            state->route=g_route_path_table[state->homeRoute];
+            state->route=g_route_path_table[state->home_route];
             length=IntToFloat(FindNearestRoutePointIndex(object,state->route,0))*state->route->length;
             if (D_L04_001B08F0) start=length+20.0f;
             else start=length+5.0f;
-            state->routeSpeed=start;
+            state->route_speed=start;
             route=state->route;
-            anim_sample_key_track(start,route->length,route,&state->routePoint,&state->x6D4,&state->x6A0);
-            state->routeTimer=-1000; state->switchTimer=240; state->x658=0;
+            anim_sample_key_track(start,route->length,route,&state->route_point,&state->x6D4,&state->x6A0);
+            state->route_timer=-1000; state->switch_timer=240; state->x658=0;
             object->state=3;
             state->x398=60;
             D_L04_001B08F8=0;
@@ -193,21 +193,21 @@ int race_update_player_progress(RaceObject *object,RaceState *state)
             racer_release_sound_handles(object,state);
             if (state->rank!=1) {
                 int difficulty=g_current_race_index;
-                state->lossCount++;
+                state->loss_count++;
                 race_increment_course_finish_count(difficulty);
                 script_queue_keyed_request(state->x48C,-1);
             } else {
                 script_queue_keyed_request(state->x75C,-1);
                 {
                 int difficulty=g_current_race_index;
-                state->winCount++;
+                state->win_count++;
                 race_increment_course_win_count(difficulty);
                 }
-                winTotal=race_get_course_win_count(g_current_race_index);
-                if (winTotal>3) winTotal=3;
-                if (winTotal>0) {
+                win_total=race_get_course_win_count(g_current_race_index);
+                if (win_total>3) win_total=3;
+                if (win_total>0) {
                     int scale=10;
-                    int reward=g_race_challenge_table[g_current_race_index].reward[winTotal-1];
+                    int reward=g_race_challenge_table[g_current_race_index].reward[win_total-1];
                     int multiplier=D_001A7A0A;
                     int money=g_player_bolts;
                     int total;
@@ -244,13 +244,13 @@ int race_update_player_progress(RaceObject *object,RaceState *state)
             return 1;
         }
     }
-    myDistance=state->routeDistance;
+    my_distance=state->routeDistance;
     state->rank=1;
-    nearestDistance=999.0f;
-    state->nearestRacer=0;
-    if (myDistance>700.0f && !state->checkpointArmed) myDistance-=D_L04_001B0928;
+    nearest_distance=999.0f;
+    state->nearest_racer=0;
+    if (my_distance>700.0f && !state->checkpointArmed) my_distance-=D_L04_001B0928;
     empty=-1;
-    slot=state->racerSlots;
+    slot=state->racer_slots;
     for (i=20;i>=0;i--,slot++) {
         if (*slot==empty) continue;
         other=g_moby_l04_pool+*slot;
@@ -261,7 +261,7 @@ int race_update_player_progress(RaceObject *object,RaceState *state)
         if (!loopVars->finished) {
             int otherLap=loopVars->lap, playerLap=g_current_lap;
             if (playerLap>=otherLap) {
-                if (!(myDistance<=otherTime)) goto skipRank;
+                if (!(my_distance<=otherTime)) goto skipRank;
                 if (otherLap!=playerLap) goto skipRank;
             }
         }
@@ -270,15 +270,15 @@ skipRank:
         loopVars->nearestPlayer=0;
         FastVecSub(delta,object->position,other->position);
         distance=func_L00_002EE290(delta);
-        if (distance<nearestDistance) {state->nearestRacer=other;nearestDistance=distance;}
+        if (distance<nearest_distance) {state->nearest_racer=other;nearest_distance=distance;}
     }
-    if (state->nearestRacer) {
-        vars=state->nearestRacer->vars;
+    if (state->nearest_racer) {
+        vars=state->nearest_racer->vars;
         vars->nearestPlayer=1;
-        if (nearestDistance<10.0f) {
+        if (nearest_distance<10.0f) {
             rank=(int)((4-g_current_race_index)*3.75f)+2+(int)(race_get_course_finish_count(g_current_race_index)*0.3f);
             if (g_race_time_ticks>=61 && vars->boostRequests<4 && vars->boostTimer<=0 &&
-                !state->boostTarget && state->nearestRacer->state==2 && state->path==vars->path &&
+                !state->boost_target && state->nearest_racer->state==2 && state->path==vars->path &&
                 (g_current_lap<=vars->lap || state->speed<=0.0f) && !math_random_int_below(rank-1)) {
                 int delay;
                 rank=(g_current_race_index+1)*120;
@@ -286,13 +286,13 @@ skipRank:
                 vars->steeringTimer=0; vars->boostTimer=rank+delay;
                 vars->boostAmount=1.0f; vars->boostScale=1.0f; vars->boostPhase=0.0f;
                 vars->boostRequests=0;
-                state->x63C=1.0f;state->boostTarget=state->nearestRacer;
+                state->x63C=1.0f;state->boost_target=state->nearest_racer;
             } else if (vars->boostTimer<=0) {
-                if (nearestDistance<10.0f) vars->boostRequests=4;
+                if (nearest_distance<10.0f) vars->boostRequests=4;
                 else vars->boostRequests=0;
             }
         }
     }
-    if (state->trackedRacer!=state->nearestRacer) {state->trackedRacer=state->nearestRacer;state->trackedTime=0;}
+    if (state->tracked_racer!=state->nearest_racer) {state->tracked_racer=state->nearest_racer;state->tracked_time=0;}
     return 0;
 }

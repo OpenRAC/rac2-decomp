@@ -14,7 +14,7 @@ extern int FloatToInt(float);
 
 /* Updates a streak particle that stretches along its movement and fades out. */
 void part_update_stretched_streak(char *self) {
-    Vec4 prevPos, offset;
+    Vec4 prev_pos, offset;
     char *pos;
     char *motion = self + 0x30;
     float t;
@@ -25,7 +25,7 @@ void part_update_stretched_streak(char *self) {
         return;
     }
     pos = self + 0x10;
-    prevPos.word = *(TI128 *)pos;
+    prev_pos.word = *(TI128 *)pos;
     FastVecAdd(pos, pos, motion);
     *(float *)(motion + 8) = *(float *)(motion + 8) - *(float *)(motion + 0xC);
     t = FastVecLength(motion);

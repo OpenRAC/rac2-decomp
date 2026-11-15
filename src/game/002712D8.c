@@ -31,14 +31,14 @@ int cam_advance_orbit_transition(Camera *cam, CamBlendOrbit *orbit) {
     Vec r0;
     Vec r1;
     Vec r2;
-    Vec tempRot;
+    Vec temp_rot;
     float step;
     float dyaw;
     float dpitch;
     float yaw;
     float turn;
     float sign;
-    float pitchSign;
+    float pitch_sign;
     float d;
     char *hero;
 
@@ -103,16 +103,16 @@ int cam_advance_orbit_transition(Camera *cam, CamBlendOrbit *orbit) {
     if (math_fabs(yaw) < 1e-5f) {
         qcopy(&r2, &axes[0]);
     } else {
-        math_build_axis_angle_quat(&tempRot, &axes[2], yaw);
-        vec_rotate_by_quaternion(&r2, &axes[0], &tempRot);
+        math_build_axis_angle_quat(&temp_rot, &axes[2], yaw);
+        vec_rotate_by_quaternion(&r2, &axes[0], &temp_rot);
     }
     yaw = 1.57079637f - math_fast_angle_helper(FastVecDot(&r2, cam));
     d = FastVecDot(&r2, &cam->basis[2]);
-    pitchSign = -1.0f;
+    pitch_sign = -1.0f;
     if (d >= 0.0f) {
-        pitchSign = 1.0f;
+        pitch_sign = 1.0f;
     }
-    yaw *= pitchSign;
+    yaw *= pitch_sign;
     math_apply_axis_rotation_to_quat(&r0, &r0, &r1, yaw * step);
     vec_scale_to_length(&D_001B5570[0], &r0, 1.0f);
     FastVecCross(&D_001B5570[1], &D_001B5570[0], D_0018A0E0);

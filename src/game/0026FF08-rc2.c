@@ -30,7 +30,7 @@ extern s8 g_active_camera[];
 
 /* Sets a camera value: snaps it to the target, or eases to it over a number of frames. */
 void cam_set_value_target(s32 frames, s32 mode, f32 target, f32 extra1, f32 extra2, f32 extra3) {
-    f32 stepPerFrame;
+    f32 step_per_frame;
 
     switch (mode) {
     case 0: {
@@ -49,10 +49,10 @@ void cam_set_value_target(s32 frames, s32 mode, f32 target, f32 extra1, f32 extr
         } else {
             s8 *camera = g_active_camera;
             (*(s16 *)((char *)(camera) + (0x3EA))) = frames;
-            stepPerFrame = 1.0f / IntToFloat(frames);
+            step_per_frame = 1.0f / IntToFloat(frames);
             (*(s8 *)((char *)(camera) + (0x3E8))) = mode;
             (*(f32 *)((char *)(camera) + (0x3F0))) = (*(f32 *)((char *)(camera) + (0x3D8)));
-            (*(f32 *)((char *)(camera) + (0x3EC))) = stepPerFrame;
+            (*(f32 *)((char *)(camera) + (0x3EC))) = step_per_frame;
         }
         {
             s8 *camera = g_active_camera;

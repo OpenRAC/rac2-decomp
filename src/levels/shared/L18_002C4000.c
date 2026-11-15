@@ -320,12 +320,12 @@ extern char g_camera_l18_position[];
 void protopet_update_step(void *a0) {
     BatchA_A18_u8 *moby = (BatchA_A18_u8 *)a0;
     void *vars;
-    unsigned short stepCount;
+    unsigned short step_count;
 
-    stepCount = *(unsigned short *)((char *)moby + 0x96);
-    if (stepCount <= 0xFFFE) {
+    step_count = *(unsigned short *)((char *)moby + 0x96);
+    if (step_count <= 0xFFFE) {
         vars = *(void **)((char *)moby + 0x68);
-        *(unsigned short *)((char *)moby + 0x96) = stepCount + 1;
+        *(unsigned short *)((char *)moby + 0x96) = step_count + 1;
     } else {
         vars = *(void **)((char *)moby + 0x68);
     }
@@ -497,7 +497,7 @@ BatchA_A18_s32 protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1) {
         entity = (unsigned char *)(g_moby_l18_table[0] + ((*entry & 0x7FFF) << 8));
         if (entity == 0)
             break;
-        if (*(short *)(entity + 0xAA) == 0xB69 /* Protopet */ && entity[0x20] != 0xFE && entity[0x20] != 0xFD && entity[0x20] == 1) {
+        if (*(short *)(entity + 0xAA) == MOBY_CLASS_PROTOPET && entity[0x20] != 0xFE && entity[0x20] != 0xFD && entity[0x20] == 1) {
             (*count)++;
             last = entity;
         }
@@ -693,10 +693,10 @@ void protopet_wake_group_members(unsigned char *a0) {
             entity = (unsigned char *)(g_moby_l18_table[0] + ((*entry & 0x7FFF) << 8));
             if (entity == 0)
                 break;
-            if (*(short *)(entity + 0xAA) == 0xD5C /* Train with Rail */ || *(short *)(entity + 0xAA) == 0x11CC /* moby class 4556 */ ||
-                *(short *)(entity + 0xAA) == 0xD9B /* Train */ || *(short *)(entity + 0xAA) == 0x11CF /* moby class 4559 */) {
+            if (*(short *)(entity + 0xAA) == MOBY_CLASS_TRAIN_WITH_RAIL || *(short *)(entity + 0xAA) == 0x11CC /* moby class 4556 */ ||
+                *(short *)(entity + 0xAA) == MOBY_CLASS_TRAIN || *(short *)(entity + 0xAA) == 0x11CF /* moby class 4559 */) {
                 moby_reset_to_saved_transform(entity);
-            } else if (*(short *)(entity + 0xAA) == 0xB69 /* Protopet */) {
+            } else if (*(short *)(entity + 0xAA) == MOBY_CLASS_PROTOPET) {
                 protopet_reset_to_spawn(entity);
             }
             *(int *)(entity + 0x98) = 0;
@@ -730,7 +730,7 @@ void protopet_wake_group_members(unsigned char *a0) {
         flags = *(unsigned short *)(member + 0x34) & 0xffbc; \
         *(unsigned short *)(member + 0x34) = flags | 0x1000; \
         *(int *)(member + 0x98) = *(int *)(*(char **)(member + 0x24) + 0x10); \
-        if (*(short *)(owner + 0xaa) != 0xb69 /* Protopet */) { \
+        if (*(short *)(owner + 0xaa) != MOBY_CLASS_PROTOPET) { \
             member[0x31] = 0; \
             *(unsigned short *)(member + 0x34) = flags | 0x1001; \
         } \

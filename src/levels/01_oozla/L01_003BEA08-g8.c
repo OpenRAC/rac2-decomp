@@ -61,11 +61,11 @@ void mutant_firefly_update(u8 *moby)
     u8 *pos;
     u8 *position;
     u8 *target;
-    f32 targetHeight;
+    f32 target_height;
     f32 speed;
-    s32 gotHit;
+    s32 got_hit;
     s32 flags;
-    s32 inRange;
+    s32 in_range;
 
     vars = *(u8 **)(moby + 0x68);
     if (((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
@@ -96,17 +96,17 @@ void mutant_firefly_update(u8 *moby)
     case 1:
         *(f32 *)(vars + 0x22C) = 0;
         *(s32 *)(vars + 0x29C) = *(s32 *)(vars + 0x294);
-        gotHit = 0;
+        got_hit = 0;
         if (*(s32 *)(vars + 0x114) == 1) {
-            gotHit = 1;
+            got_hit = 1;
         }
         if (moby[0xBC] != 0) {
-            gotHit = 1;
+            got_hit = 1;
         }
         if (moby[0xBC] & 2) {
-            gotHit = 1;
+            got_hit = 1;
         }
-        if (gotHit) {
+        if (got_hit) {
             moby[0x30] = vars[0x200];
             qzero(vars + 0x1F0);
             *(s32 *)(vars + 0x230) = func_00310528(D_L01_001AFE44, D_L01_001AFE48);
@@ -122,22 +122,22 @@ void mutant_firefly_update(u8 *moby)
         }
         break;
     case 2:
-        targetHeight = *(f32 *)(moby + 0x18);
+        target_height = *(f32 *)(moby + 0x18);
         switch (moby[0x95]) {
         case 0:
-            targetHeight = *(f32 *)(vars + 0x228);
+            target_height = *(f32 *)(vars + 0x228);
             break;
         case 1:
-            targetHeight = *(f32 *)(vars + 0x224) - 1.7f;
+            target_height = *(f32 *)(vars + 0x224) - 1.7f;
             break;
         }
-        func_00313BF8(moby + 0x18, targetHeight, 0.0069444445f, 0.0041666669f, vars + 0x1F8, 0.5f);
+        func_00313BF8(moby + 0x18, target_height, 0.0069444445f, 0.0041666669f, vars + 0x1F8, 0.5f);
         if (func_00306448(moby) < 12.0f) {
             qcopy(vec, moby + 0x10);
             vec[2] = *(f32 *)(vars + 0x224);
             func_003BD178(moby, vec, 3, 1.0f, 1.5f, 0.5f, 0.0f, 0.1f, 0.8f);
         }
-        if (func_002E33E0(*(f32 *)(moby + 0x18) - targetHeight) < 0.2f) {
+        if (func_002E33E0(*(f32 *)(moby + 0x18) - target_height) < 0.2f) {
             switch (moby[0x95]) {
             case 0:
                 *(u16 *)(moby + 0x34) |= 0x1000;
@@ -380,10 +380,10 @@ void mutant_firefly_update(u8 *moby)
         }
         *(f32 *)(vars + 0x22C) = 0;
         *(s32 *)(vars + 0x29C) = *(s32 *)(vars + 0x298);
-        inRange = func_003165E8(moby + 0x10, *(s32 *)(vars + 0x210), *(s32 *)(vars + 0x218), *(s32 *)(vars + 0x21C), -1) != 0;
+        in_range = func_003165E8(moby + 0x10, *(s32 *)(vars + 0x210), *(s32 *)(vars + 0x218), *(s32 *)(vars + 0x21C), -1) != 0;
         if (*(s32 *)(vars + 0x114) == 0 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x31 ||
             ((Hero *)g_hero_state)->i[0x229C / 4] == 0x11 || ((Hero *)g_hero_state)->i[0x229C / 4] == 0x12 ||
-            !inRange || D_L01_001A8F40 == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
+            !in_range || D_L01_001A8F40 == 2 || ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x6F) {
             if (*(s32 *)(vars + 0x238) != 0) {
                 func_003BDBB0(moby);
                 *(s32 *)(vars + 0x230) = 0;
@@ -399,7 +399,7 @@ void mutant_firefly_update(u8 *moby)
                 func_002E3738(vars + 0x1E0, vars + 0x1E0, 5.0f);
                 func_003BDBE8(moby);
                 *(f32 *)(vars + 0x244) *= 3.0f;
-                if (inRange) {
+                if (in_range) {
                     func_003BE058(moby, 260.0f, 180.0f, 270.0f, 32.0f, 0.2f, 3.5f, 0.3f, 0.5f);
                 } else {
                     func_003BE058(moby, 780.0f, 180.0f, 810.0f, 32.0f, 0.2f, 3.5f, 0.3f, 0.5f);

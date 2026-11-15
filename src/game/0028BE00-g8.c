@@ -50,10 +50,10 @@ static inline Info *InfoOf(int id)
 /* Updates the round weapon-select menu: reads the stick, picks a slot, plays the click sound and equips the chosen weapon when the button is let go. */
 void weapon_wheel_update_select(Selector *selector)
 {
-    float stickX, stickY, stickMagnitude, stickAngle, shiftedAngle, slotPosition, oldSlotAngle;
-    int oldSelection, nudge, slot, nextSlot, weaponId;
+    float stick_x, stick_y, stick_magnitude, stick_angle, shifted_angle, slot_position, old_slot_angle;
+    int old_selection, nudge, slot, next_slot, weapon_id;
     int active;
-    unsigned char *fade, *fadeStart;
+    unsigned char *fade, *fade_start;
 
     if (g_notice_owner) return;
     active = 0;
@@ -64,7 +64,7 @@ void weapon_wheel_update_select(Selector *selector)
             if (!hud_is_open_done()) active = 0;
         }
     }
-    fadeStart = selector->fade;
+    fade_start = selector->fade;
     if (active && D_001A8CFC) {
         menu_set_screen_value_restart_six_fades((char *)D_001A8CFC + 0x376C8, menu_is_state_seven() ? D_001A8D30 : 2);
         menu_set_state_word_three();
@@ -72,43 +72,43 @@ void weapon_wheel_update_select(Selector *selector)
     selector->timeout = 180;
     selector->timer = 24;
     if (FastDecTimer(D_0018C316) && !D_001A7BB3) g_pad_state.inhibit = 2;
-    stickX = g_pad_state.x;
-    stickY = g_pad_state.y;
-    stickMagnitude = square_root(stickX * stickX + stickY * stickY);
-    if (stickMagnitude != 0.0f) {
-        stickX /= stickMagnitude;
-        stickY /= stickMagnitude;
+    stick_x = g_pad_state.x;
+    stick_y = g_pad_state.y;
+    stick_magnitude = square_root(stick_x * stick_x + stick_y * stick_y);
+    if (stick_magnitude != 0.0f) {
+        stick_x /= stick_magnitude;
+        stick_y /= stick_magnitude;
     }
-    stickAngle = mat_fast_helper_a(stickX, stickY);
+    stick_angle = mat_fast_helper_a(stick_x, stick_y);
     if ((selector->state >> 24) == 0) {
-        if ((g_pad_state.pressed & 0xF000) || stickMagnitude < 0.5f || --selector->state == -1) {
+        if ((g_pad_state.pressed & 0xF000) || stick_magnitude < 0.5f || --selector->state == -1) {
             selector->selected = -1;
             selector->state = 0x10000FF;
         }
     }
     nudge = 0;
-    oldSelection = selector->selected;
+    old_selection = selector->selected;
     if ((selector->state >> 24) == 1 && (g_pad_state.held & 0x10) && active) {
-        if (stickMagnitude > 0.9f) {
-            shiftedAngle = stickAngle + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)g_radial_slot_count;
-            slotPosition = shiftedAngle * 0.15915494f * (float)g_radial_slot_count;
-            oldSlotAngle = (float)oldSelection * 6.2831855f / IntToFloat(g_radial_slot_count) - 3.1415927f;
-            if (oldSelection == -1 || FastDiffRots(oldSlotAngle, fast_subtract_rotations(stickAngle, 1.5707964f)) > 0.5890487f) {
-                slot = (int)slotPosition % g_radial_slot_count;
+        if (stick_magnitude > 0.9f) {
+            shifted_angle = stick_angle + 3.1415927f + 3.1415927f + 1.5707964f + 3.1415927f / (float)g_radial_slot_count;
+            slot_position = shifted_angle * 0.15915494f * (float)g_radial_slot_count;
+            old_slot_angle = (float)old_selection * 6.2831855f / IntToFloat(g_radial_slot_count) - 3.1415927f;
+            if (old_selection == -1 || FastDiffRots(old_slot_angle, fast_subtract_rotations(stick_angle, 1.5707964f)) > 0.5890487f) {
+                slot = (int)slot_position % g_radial_slot_count;
                 if ((slot ^ 1) & 1) {
-                    float fraction = slotPosition - (float)FloatToInt(slotPosition);
+                    float fraction = slot_position - (float)FloatToInt(slot_position);
                     if (fraction > 0.8f) slot++;
                     else if (fraction < 0.2f) slot--;
                     slot = (slot + g_radial_slot_count) % g_radial_slot_count;
                 }
                 selector->selected = slot;
                 nudge = -1;
-                D_001A8E10 = math_fast_float_g(shiftedAngle - ((float)slot * 0.78539824f + 0.39269912f));
+                D_001A8E10 = math_fast_float_g(shifted_angle - ((float)slot * 0.78539824f + 0.39269912f));
                 if (D_001A8E10 > 0.0f) nudge = 1;
             }
         } else if (g_pad_state.repeat == 0 && (g_pad_state.pressed & 0xF000)) {
             int wanted;
-            wanted = oldSelection;
+            wanted = old_selection;
             if (g_pad_state.pressed & 0x1000) {
                 int target;
                 if (wanted == -1) target = D_001A8D90[4];
@@ -139,13 +139,13 @@ void weapon_wheel_update_select(Selector *selector)
             Slot *target = g_radial_menu_pages[g_radial_menu_page_index];
             int current = selector->selected;
             if (target[current].f0 == 0 && nudge != 0) {
-                nextSlot = (current + nudge) % g_radial_slot_count;
-                if (target[nextSlot].f0 != 0) selector->selected = nextSlot;
+                next_slot = (current + nudge) % g_radial_slot_count;
+                if (target[next_slot].f0 != 0) selector->selected = next_slot;
             }
         }
     }
     fade = selector->fade;
-    if (selector->selected != oldSelection) {
+    if (selector->selected != old_selection) {
         STUB_printf(D_001A8E18);
         load_request_disc_read_break();
         fade[1] = 0;
@@ -156,14 +156,14 @@ void weapon_wheel_update_select(Selector *selector)
     } else {
         if (!(g_pad_state.held & 0x10) && !D_001A63AC) {
             if (fade[0]) fade[0]--;
-            if (fade[0] == 0 && selector->selected >= 0 && (weaponId = g_radial_menu_pages[g_radial_menu_page_index][selector->selected].f18) != 0) {
+            if (fade[0] == 0 && selector->selected >= 0 && (weapon_id = g_radial_menu_pages[g_radial_menu_page_index][selector->selected].f18) != 0) {
                 Info *info;
-                if (g_hero_state.selected != weaponId && g_progress_statistics.uses < 0xFFFF) g_progress_statistics.uses++;
+                if (g_hero_state.selected != weapon_id && g_progress_statistics.uses < 0xFFFF) g_progress_statistics.uses++;
                 if (g_progress_statistics.maxFrame < D_001A7390) g_progress_statistics.maxFrame = D_001A7390;
                 g_progress_statistics.levels = g_progress_statistics.levels | (1 << g_current_map_index) | 0x80000000;
-                g_hero_state.pending = weaponId;
-                info = InfoOf(weaponId);
-                if (info->valid && info->ammo < g_item_ammo_counts[weaponId]) g_item_ammo_counts[weaponId] = info->ammo;
+                g_hero_state.pending = weapon_id;
+                info = InfoOf(weapon_id);
+                if (info->valid && info->ammo < g_item_ammo_counts[weapon_id]) g_item_ammo_counts[weapon_id] = info->ammo;
             }
             if (D_001A7BB3) menu_advance_state_in_mode_seven();
             else {
@@ -172,7 +172,7 @@ void weapon_wheel_update_select(Selector *selector)
             }
         } else if (fade[0] < 8) fade[0]++;
     }
-    if (fadeStart[0] == 0) {
+    if (fade_start[0] == 0) {
         {
             int state = selector->state;
             D_001B1900 = selector->selected;

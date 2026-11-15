@@ -29,11 +29,11 @@ extern s32  D_001B22B0[] __attribute__((sda));
 
 extern s8 D_001BAECC[];
 /* Works out a value from a size, or fails with -1 when the size is above 0x40000. */
-s32 mem_compute_sized_offset(u32 size, s32 *outValue) {
+s32 mem_compute_sized_offset(u32 size, s32 *out_value) {
     if (size > 0x40000U) {
-        *outValue = 0;
+        *out_value = 0;
         return -1;
     }
-    *outValue = (*(s32 *)((s32)D_001BAECC) + D_001B22B0[0]) - size;
+    *out_value = (*(s32 *)((s32)D_001BAECC) + D_001B22B0[0]) - size;
     return 0;
 }

@@ -42,15 +42,15 @@ typedef struct __attribute__((packed, aligned(4))) { long a; int b; } TurnRecord
 /* Moves a homing shot with its trail of followers; breaks up on contact, on timeout or out of bounds. */
 void homing_l04_shot_update(unsigned char *moby)
 {
-    float prevPos[4];
+    float prev_pos[4];
     TurnRecord turn = *(TurnRecord *)D_L04_001B0448;
     SweepProbe probe;
-    float delta[4], sparkDir[4], spark[4], velocity[4];
+    float delta[4], spark_dir[4], spark[4], velocity[4];
     unsigned char *vars = *(unsigned char **)(moby + 0x68), *particle;
-    int i, trailIndex, shotAge;
+    int i, trail_index, shot_age;
     unsigned char **trail;
     float scale, length;
-    qcopy(prevPos, (moby + 0x10));
+    qcopy(prev_pos, (moby + 0x10));
     FastVecAdd(moby + 0x10, moby + 0x10, vars);
     if (*(float *)(moby + 0x10) < 0 || *(float *)(moby + 0x14) < 0 ||
         *(float *)(moby + 0x18) < 0 || 64.0f < vec_distance_xy(moby + 0x10, D_L04_001B9680)) {
@@ -74,22 +74,22 @@ void homing_l04_shot_update(unsigned char *moby)
         moby_mark_spawned(moby);
         return;
     }
-    if (CollLine(prevPos, moby + 0x10, 0, *(void **)(vars + 0x18), &probe)) {
+    if (CollLine(prev_pos, moby + 0x10, 0, *(void **)(vars + 0x18), &probe)) {
         if (!GetCollHitMaterial()) {
             if (*(int *)(vars + 0x10) >= 4) *(int *)(vars + 0x10) = 3;
         } else {
             qcopy((moby + 0x10), D_L04_001BFAE0);
             for (i = 4; i >= 0; i--) {
-                *(QuadWord *)sparkDir = 0;
-                sparkDir[0] = math_random_float_range(-1, 1);
-                sparkDir[1] = math_random_float_range(-1, 1);
-                sparkDir[2] = math_random_float_range(-1, 1);
-                *(QuadWord *)delta = *(QuadWord *)sparkDir;
-                vec_fast_normalize(sparkDir, vars, D_L04_001BFB00);
-                vec_scale_to_length((char *)delta, (char *)delta, FastVecLength(sparkDir) * 0.5f);
-                FastVecAdd(sparkDir, sparkDir, delta);
-                vec_scale_to_length((char *)sparkDir, (char *)sparkDir, math_random_float_range(0.050000004f, 0.10000001f));
-                part_spawn_velocity_particle(moby + 0x10, sparkDir, 0x7F2F4F6F, math_random_int_range(10, 15), 30000);
+                *(QuadWord *)spark_dir = 0;
+                spark_dir[0] = math_random_float_range(-1, 1);
+                spark_dir[1] = math_random_float_range(-1, 1);
+                spark_dir[2] = math_random_float_range(-1, 1);
+                *(QuadWord *)delta = *(QuadWord *)spark_dir;
+                vec_fast_normalize(spark_dir, vars, D_L04_001BFB00);
+                vec_scale_to_length((char *)delta, (char *)delta, FastVecLength(spark_dir) * 0.5f);
+                FastVecAdd(spark_dir, spark_dir, delta);
+                vec_scale_to_length((char *)spark_dir, (char *)spark_dir, math_random_float_range(0.050000004f, 0.10000001f));
+                part_spawn_velocity_particle(moby + 0x10, spark_dir, 0x7F2F4F6F, math_random_int_range(10, 15), 30000);
             }
             moby_destroy_effects_with_burst(moby, 0);
             moby_mark_spawned(moby);
@@ -97,19 +97,19 @@ void homing_l04_shot_update(unsigned char *moby)
         }
     }
     *(float *)(moby + 0xF4) = FastAddRotations(*(float *)(moby + 0xF4), ((float *)&turn)[1]);
-    shotAge = *(int *)(vars + 0x14) - *(int *)(vars + 0x10);
-    if (shotAge < 13) scale = (IntToFloat(shotAge) / IntToFloat(13)) * 0.15f;
+    shot_age = *(int *)(vars + 0x14) - *(int *)(vars + 0x10);
+    if (shot_age < 13) scale = (IntToFloat(shot_age) / IntToFloat(13)) * 0.15f;
     else scale = 0.15f;
-    FastVecSub(delta, prevPos, moby + 0x10);
+    FastVecSub(delta, prev_pos, moby + 0x10);
     vec_scale_to_length((char *)delta, (char *)delta, scale);
-    qcopy(sparkDir, (moby + 0x10));
+    qcopy(spark_dir, (moby + 0x10));
     { unsigned char *head = *(unsigned char **)(vars + 0x1C);
-      if (head) qcopy(head + 0x10, sparkDir); }
-    for (trailIndex = 0; trailIndex < 16; trailIndex++) {
-        particle = ((unsigned char **)(vars + 0x20))[trailIndex];
+      if (head) qcopy(head + 0x10, spark_dir); }
+    for (trail_index = 0; trail_index < 16; trail_index++) {
+        particle = ((unsigned char **)(vars + 0x20))[trail_index];
         if (particle) {
-            FastVecAdd(particle + 0x10, sparkDir, delta);
-            qcopy(sparkDir, (particle + 0x10));
+            FastVecAdd(particle + 0x10, spark_dir, delta);
+            qcopy(spark_dir, (particle + 0x10));
             *(float *)(particle + 0x10) += math_random_signed_float_range(0, 0.075f);
             *(float *)(particle + 0x14) += math_random_signed_float_range(0, 0.075f);
             *(float *)(particle + 0x18) += math_random_signed_float_range(0, 0.075f);

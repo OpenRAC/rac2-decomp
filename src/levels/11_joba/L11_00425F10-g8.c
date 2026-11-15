@@ -232,7 +232,7 @@ s32 jobian_lieutenant_update(u8 *object) {
         u8 *attacker = *(u8 **)(data + 0x38);
         if (attacker) {
             s32 cls = *(s16 *)(attacker + 0xAA);
-            if (cls != 0x47 /* moby class 71 */ && cls != 0xDD9 /* moby class 3545 */ && cls != 0xD1B /* moby class 3355 */ && cls != 0xCE7 /* moby class 3303 */ && cls != 0xD07 /* Jobian Saur-Beast */ && cls != 0)
+            if (cls != 0x47 /* moby class 71 */ && cls != 0xDD9 /* moby class 3545 */ && cls != 0xD1B /* moby class 3355 */ && cls != 0xCE7 /* moby class 3303 */ && cls != MOBY_CLASS_JOBIAN_SAUR_BEAST && cls != 0)
                 D_L11_001AED00 = 0;
         }
         if (object[0xBC] == 1)
@@ -299,22 +299,22 @@ s32 jobian_lieutenant_update(u8 *object) {
 /* Flags every record of the id list whose class halfword is 0xD07. */
 void saur_beast_flag_id_list(u8 *moby) {
     void *list;
-    u16 *idPtr;
-    u8 *mobyTable;
+    u16 *id_ptr;
+    u8 *moby_table;
 
     if (moby[0x21] == 0xFF)
         return;
     list = g_group_id_lists[moby[0x21]];
     if (list == 0)
         return;
-    idPtr = list;
-    mobyTable = g_moby_l11_table;
+    id_ptr = list;
+    moby_table = g_moby_l11_table;
     do {
-        u8 *entry = mobyTable + ((*idPtr & 0x7FFF) << 8);
+        u8 *entry = moby_table + ((*id_ptr & 0x7FFF) << 8);
 
-        if (*(s8 *)(entry + 0x20) >= 0 && *(s16 *)(entry + 0xAA) == 0xD07 /* Jobian Saur-Beast */)
+        if (*(s8 *)(entry + 0x20) >= 0 && *(s16 *)(entry + 0xAA) == MOBY_CLASS_JOBIAN_SAUR_BEAST)
             *(s16 *)(*(u8 **)(entry + 0x68) + 0x276) = 1;
-    } while (*(s16 *)idPtr++ >= 0);
+    } while (*(s16 *)id_ptr++ >= 0);
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -353,37 +353,37 @@ extern float D_L11_001B113C[] __attribute__((sda));
    corners are crossed out from the span and submitted. */
 void saur_beast_draw_beam_quad(char *obj, void *q)
 {
-    EffectQuadFrame quadFrame;
+    EffectQuadFrame quad_frame;
     char *vars;
     int i;
 
-    quadFrame.saved = *(TI128 *)q;
+    quad_frame.saved = *(TI128 *)q;
     vars = *(char **)(obj + 0x68);
-    FastVecSub(quadFrame.c, vars + 0x230, vars + 0x240);
-    FastVecSub(quadFrame.a, vars + 0x230, D_L11_001BA8C0);
-    FastVecSub(quadFrame.b, vars + 0x240, D_L11_001BA8C0);
-    FastVecCross(quadFrame.a, quadFrame.a, quadFrame.c);
-    vec_scale_to_length(quadFrame.a, quadFrame.a, 0.1f);
-    FastVecCross(quadFrame.b, quadFrame.b, quadFrame.c);
-    vec_scale_to_length(quadFrame.b, quadFrame.b, 0.1f);
-    quadFrame.quad.texture = GetEffectTextureDescriptor(7);
-    quadFrame.quad.mode = 0x0000ff9000000260UL;
-    quadFrame.quad.registers = 0x7000000048UL;
-    quadFrame.quad.primitive = 0;
-    quadFrame.quad.color[0] = quadFrame.quad.color[1] = quadFrame.quad.color[2] = quadFrame.quad.color[3] = 0x2F0000FF;
+    FastVecSub(quad_frame.c, vars + 0x230, vars + 0x240);
+    FastVecSub(quad_frame.a, vars + 0x230, D_L11_001BA8C0);
+    FastVecSub(quad_frame.b, vars + 0x240, D_L11_001BA8C0);
+    FastVecCross(quad_frame.a, quad_frame.a, quad_frame.c);
+    vec_scale_to_length(quad_frame.a, quad_frame.a, 0.1f);
+    FastVecCross(quad_frame.b, quad_frame.b, quad_frame.c);
+    vec_scale_to_length(quad_frame.b, quad_frame.b, 0.1f);
+    quad_frame.quad.texture = GetEffectTextureDescriptor(7);
+    quad_frame.quad.mode = 0x0000ff9000000260UL;
+    quad_frame.quad.registers = 0x7000000048UL;
+    quad_frame.quad.primitive = 0;
+    quad_frame.quad.color[0] = quad_frame.quad.color[1] = quad_frame.quad.color[2] = quad_frame.quad.color[3] = 0x2F0000FF;
     for (i = 0; i < 4; i++) {
-        quadFrame.quad.uv[i][0] = D_L11_001B1138[i * 2];
-        quadFrame.quad.uv[i][1] = D_L11_001B113C[i * 2];
+        quad_frame.quad.uv[i][0] = D_L11_001B1138[i * 2];
+        quad_frame.quad.uv[i][1] = D_L11_001B113C[i * 2];
     }
-    FastVecSub(&quadFrame.corner, vars + 0x230, quadFrame.a);
-    quadFrame.quad.position[0] = quadFrame.corner;
-    FastVecAdd(&quadFrame.corner, vars + 0x230, quadFrame.a);
-    quadFrame.quad.position[1] = quadFrame.corner;
-    FastVecSub(&quadFrame.corner, vars + 0x240, quadFrame.b);
-    quadFrame.quad.position[2] = quadFrame.corner;
-    FastVecAdd(&quadFrame.corner, vars + 0x240, quadFrame.b);
-    quadFrame.quad.position[3] = quadFrame.corner;
-    draw_world_quad(&quadFrame.quad, 0, 0);
+    FastVecSub(&quad_frame.corner, vars + 0x230, quad_frame.a);
+    quad_frame.quad.position[0] = quad_frame.corner;
+    FastVecAdd(&quad_frame.corner, vars + 0x230, quad_frame.a);
+    quad_frame.quad.position[1] = quad_frame.corner;
+    FastVecSub(&quad_frame.corner, vars + 0x240, quad_frame.b);
+    quad_frame.quad.position[2] = quad_frame.corner;
+    FastVecAdd(&quad_frame.corner, vars + 0x240, quad_frame.b);
+    quad_frame.quad.position[3] = quad_frame.corner;
+    draw_world_quad(&quad_frame.quad, 0, 0);
 }
 
 extern char D_L11_001BA8C0[];
@@ -396,40 +396,40 @@ extern float D_L11_001B113C[] __attribute__((sda));
    corners are crossed out from the span and submitted (then drawn again as the overlay). */
 void saur_beast_draw_beam_quad_overlay(char *obj, void *q)
 {
-    EffectQuadFrame quadFrame;
+    EffectQuadFrame quad_frame;
     char *vars;
     int i;
 
-    quadFrame.saved = *(TI128 *)q;
+    quad_frame.saved = *(TI128 *)q;
     vars = *(char **)(obj + 0x68);
-    FastVecSub(quadFrame.c, vars + 0x230, vars + 0x240);
-    FastVecSub(quadFrame.a, vars + 0x230, D_L11_001BA8C0);
-    FastVecSub(quadFrame.b, vars + 0x240, D_L11_001BA8C0);
-    FastVecCross(quadFrame.a, quadFrame.a, quadFrame.c);
-    vec_scale_to_length(quadFrame.a, quadFrame.a, 0.05f);
-    FastVecCross(quadFrame.b, quadFrame.b, quadFrame.c);
-    vec_scale_to_length(quadFrame.b, quadFrame.b, 0.05f);
-    quadFrame.quad.texture = GetEffectTextureDescriptor(0x13);
-    quadFrame.quad.mode = 0x0000ff9000000260UL;
-    quadFrame.quad.registers = 0x8000000048UL;
-    quadFrame.quad.primitive = 0;
-    quadFrame.quad.color[0] = quadFrame.quad.color[1] = quadFrame.quad.color[2] = quadFrame.quad.color[3] = 0x2FFFFFFF;
+    FastVecSub(quad_frame.c, vars + 0x230, vars + 0x240);
+    FastVecSub(quad_frame.a, vars + 0x230, D_L11_001BA8C0);
+    FastVecSub(quad_frame.b, vars + 0x240, D_L11_001BA8C0);
+    FastVecCross(quad_frame.a, quad_frame.a, quad_frame.c);
+    vec_scale_to_length(quad_frame.a, quad_frame.a, 0.05f);
+    FastVecCross(quad_frame.b, quad_frame.b, quad_frame.c);
+    vec_scale_to_length(quad_frame.b, quad_frame.b, 0.05f);
+    quad_frame.quad.texture = GetEffectTextureDescriptor(0x13);
+    quad_frame.quad.mode = 0x0000ff9000000260UL;
+    quad_frame.quad.registers = 0x8000000048UL;
+    quad_frame.quad.primitive = 0;
+    quad_frame.quad.color[0] = quad_frame.quad.color[1] = quad_frame.quad.color[2] = quad_frame.quad.color[3] = 0x2FFFFFFF;
     for (i = 0; i < 4; i++) {
-        quadFrame.quad.uv[i][0] = D_L11_001B1138[i * 2];
-        quadFrame.quad.uv[i][1] = D_L11_001B113C[i * 2];
+        quad_frame.quad.uv[i][0] = D_L11_001B1138[i * 2];
+        quad_frame.quad.uv[i][1] = D_L11_001B113C[i * 2];
     }
-    FastVecSub(&quadFrame.corner, vars + 0x230, quadFrame.a);
-    quadFrame.quad.position[0] = quadFrame.corner;
-    FastVecAdd(&quadFrame.corner, vars + 0x230, quadFrame.a);
-    quadFrame.quad.position[1] = quadFrame.corner;
-    FastVecSub(&quadFrame.corner, vars + 0x240, quadFrame.b);
-    quadFrame.quad.position[2] = quadFrame.corner;
-    FastVecAdd(&quadFrame.corner, vars + 0x240, quadFrame.b);
-    quadFrame.quad.position[3] = quadFrame.corner;
-    draw_world_quad(&quadFrame.quad, 0, 0);
-    quadFrame.quad.texture = GetEffectTextureDescriptor(0x10);
-    quadFrame.quad.mode = 0x0000ff9000000260UL;
-    quadFrame.quad.registers = 0x8000000048UL;
-    quadFrame.quad.primitive = 0;
-    draw_world_quad(&quadFrame.quad, 0, 0);
+    FastVecSub(&quad_frame.corner, vars + 0x230, quad_frame.a);
+    quad_frame.quad.position[0] = quad_frame.corner;
+    FastVecAdd(&quad_frame.corner, vars + 0x230, quad_frame.a);
+    quad_frame.quad.position[1] = quad_frame.corner;
+    FastVecSub(&quad_frame.corner, vars + 0x240, quad_frame.b);
+    quad_frame.quad.position[2] = quad_frame.corner;
+    FastVecAdd(&quad_frame.corner, vars + 0x240, quad_frame.b);
+    quad_frame.quad.position[3] = quad_frame.corner;
+    draw_world_quad(&quad_frame.quad, 0, 0);
+    quad_frame.quad.texture = GetEffectTextureDescriptor(0x10);
+    quad_frame.quad.mode = 0x0000ff9000000260UL;
+    quad_frame.quad.registers = 0x8000000048UL;
+    quad_frame.quad.primitive = 0;
+    draw_world_quad(&quad_frame.quad, 0, 0);
 }

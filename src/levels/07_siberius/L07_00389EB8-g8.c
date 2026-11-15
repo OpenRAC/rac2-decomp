@@ -82,7 +82,7 @@ typedef struct {
    at TARGET: velocity toward the target at the configured speed, with the vertical component of
    a ballistic arc under the configured gravity (both per 60 Hz frame). With an owner, the
    velocity and the offset from the owner are kept in the owner's frame. Returns the object. */
-char *SpawnBallisticMoby(char *parent, char *owner, char *spawnPos, char *targetPos, float extraValue)
+char *SpawnBallisticMoby(char *parent, char *owner, char *spawn_pos, char *target_pos, float extra_value)
 {
     F43E0Moby *obj = (F43E0Moby *)CreateMoby(0xE1D /* moby class 3613 */);
 
@@ -92,7 +92,7 @@ char *SpawnBallisticMoby(char *parent, char *owner, char *spawnPos, char *target
         float buf[16];
 
         moby_init_child_from_parent(obj, parent);
-        qcopy(obj->pos, spawnPos);
+        qcopy(obj->pos, spawn_pos);
         obj->rot[2] = math_random_angle();
         obj->rot[0] = math_random_angle();
         euler_rotation_basis(obj->mtx, obj->rot);
@@ -102,11 +102,11 @@ char *SpawnBallisticMoby(char *parent, char *owner, char *spawnPos, char *target
         speed = D_L07_001B0E34 * (1.0f / 60.0f);
         gravity = D_L07_001B0E30 * (1.0f / 3600.0f);
         vars->owner = owner;
-        FastVecSub(vars->vel, targetPos, obj->pos);
+        FastVecSub(vars->vel, target_pos, obj->pos);
         vec_fast_normalize_helper(vars->vel, vars->vel, speed);
-        vars->vel[2] = weapon_compute_shot_launch_speed(obj->pos, (float *)targetPos, 0, speed, -gravity);
+        vars->vel[2] = weapon_compute_shot_launch_speed(obj->pos, (float *)target_pos, 0, speed, -gravity);
         vars->vel[3] = gravity;
-        vars->x34 = extraValue;
+        vars->x34 = extra_value;
         if (owner != 0) {
             matrix_from_basis_rows(buf, owner + 0xC0);
             matrix_mul_vec3(vars->vel, vars->vel, buf);

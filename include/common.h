@@ -4,6 +4,7 @@
 /* Shared with rac1-decomp's include/common.h: the same types, markers and attributes. */
 #include "include_asm.h"
 #include "names.h"   /* readable names for func_ symbols */
+#include "moby_classes.h"   /* MOBY_CLASS_* ids */
 
 typedef unsigned char      u8;
 typedef unsigned short     u16;

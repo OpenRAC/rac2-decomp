@@ -64,7 +64,7 @@ void UpdateBouncingChildLauncher(LauncherObject *obj) {
     u8 *child;
     float damage, z;
     float velocity[4] __attribute__((aligned(16)));
-    float muzzlePos[4] __attribute__((aligned(16)));
+    float muzzle_pos[4] __attribute__((aligned(16)));
     int zero;
 
     damage = moby_update_aim_target_strength(obj, part_find_owned_effect_slot(obj, 0x10000, 0));
@@ -128,9 +128,9 @@ void UpdateBouncingChildLauncher(LauncherObject *obj) {
                 vec_scale_to_length(velocity, D_L18_001B1AF0, D_L18_001B1AC0 * (1.0f / 60.0f));
                 matrix_mul_vec3(velocity, velocity, obj->matrix);
                 vec_add_random_offset(velocity, D_L18_001B1ABC * (1.0f / 60.0f));
-                matrix_mul_vec3(muzzlePos, D_L18_001B1AE0, obj->matrix);
-                FastVecAdd(muzzlePos, muzzlePos, obj->position);
-                protopet_launch_shot(child, muzzlePos, velocity);
+                matrix_mul_vec3(muzzle_pos, D_L18_001B1AE0, obj->matrix);
+                FastVecAdd(muzzle_pos, muzzle_pos, obj->position);
+                protopet_launch_shot(child, muzzle_pos, velocity);
                 *(s32 *)(child + 0xB8) = (s32)obj;
                 vars->fireTimer = math_random_int_range(D_L18_001B1AD0, D_L18_001B1AD4);
             }
@@ -141,8 +141,8 @@ void UpdateBouncingChildLauncher(LauncherObject *obj) {
                 PlayMobySound(1, 0, obj);
                 vec_scale_to_length(velocity, D_L18_001B1AF0, D_L18_001B1AC4 * (1.0f / 60.0f));
                 matrix_mul_vec3(velocity, velocity, obj->matrix);
-                vec_add_random_offset(muzzlePos, D_L18_001B1ABC * (1.0f / 60.0f));
-                FastVecAdd(velocity, velocity, muzzlePos);
+                vec_add_random_offset(muzzle_pos, D_L18_001B1ABC * (1.0f / 60.0f));
+                FastVecAdd(velocity, velocity, muzzle_pos);
                 part_spawn_masked_debris(obj, 5, velocity, 3, 6, 3, 6, 255);
             }
         } else {

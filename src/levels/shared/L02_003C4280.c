@@ -13,7 +13,7 @@ typedef struct {
     char *points;
 } Path_003C4280;
 
-void AdvancePathFollower(void *object, int useFixedSpeed) {
+void AdvancePathFollower(void *object, int use_fixed_speed) {
     Path_003C4280 *state = *(Path_003C4280 **)((char *)object + 0x68);
     float buf[4];
 
@@ -21,7 +21,7 @@ void AdvancePathFollower(void *object, int useFixedSpeed) {
         state->index = 0;
         qcopy((char *)object + 0x10, state->points + 0x10);
     }
-    if (useFixedSpeed == 0) {
+    if (use_fixed_speed == 0) {
         if (state->limit < 480.0f) {
             state->value += (0.03333f / state->value) * 0.00016666666f;
         } else {

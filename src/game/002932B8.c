@@ -10,26 +10,26 @@
 extern void build_indexed_resident_render_packet();
 extern void tex_build_packet_words();
 
-void tex_draw_batches(s32 *batches, u8 *textureTable, u8 *indexMap, s32 batchCount) {
-    s32 i, j, entryCount, lastIndex, textureIndex;
-    s32 *entry, *nextBatch;
+void tex_draw_batches(s32 *batches, u8 *texture_table, u8 *index_map, s32 batch_count) {
+    s32 i, j, entry_count, last_index, texture_index;
+    s32 *entry, *next_batch;
     s32 *batch = batches;
-    for (i = 0; i < batchCount; i++) {
-        nextBatch = batch + 4;
-        entryCount = batch[1] >> 16;
-        lastIndex = batch[1] & 0xFFFF;
-        batch[1] = lastIndex;
-        entry = (s32 *)((u8 *)batch[0] + ((lastIndex - entryCount) << 4));
-        for (j = 0; j < entryCount; j += 4) {
-            textureIndex = entry[8];
-            if (textureIndex >= 0) textureIndex = indexMap[textureIndex];
-            if (textureTable) {
-                build_indexed_resident_render_packet(entry, textureTable + (textureIndex << 4), entry[0], entry[1], entry[4], entry[5], textureIndex);
+    for (i = 0; i < batch_count; i++) {
+        next_batch = batch + 4;
+        entry_count = batch[1] >> 16;
+        last_index = batch[1] & 0xFFFF;
+        batch[1] = last_index;
+        entry = (s32 *)((u8 *)batch[0] + ((last_index - entry_count) << 4));
+        for (j = 0; j < entry_count; j += 4) {
+            texture_index = entry[8];
+            if (texture_index >= 0) texture_index = index_map[texture_index];
+            if (texture_table) {
+                build_indexed_resident_render_packet(entry, texture_table + (texture_index << 4), entry[0], entry[1], entry[4], entry[5], texture_index);
             } else {
-                tex_build_packet_words((unsigned long *)entry, entry[0], entry[1], entry[4], entry[5], textureIndex);
+                tex_build_packet_words((unsigned long *)entry, entry[0], entry[1], entry[4], entry[5], texture_index);
             }
             entry += 16;
         }
-        batch = nextBatch;
+        batch = next_batch;
     }
 }

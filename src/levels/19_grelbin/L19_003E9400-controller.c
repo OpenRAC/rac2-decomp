@@ -28,7 +28,7 @@ void linked_object_mover_update(u8 *moby)
     float start[4] __attribute__((aligned(16)));
     float end[4] __attribute__((aligned(16)));
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *linkedMoby, *linkedVars;
+    u8 *linked_moby, *linked_vars;
     if (I(vars,0x38) > 0 && IsPointInCuboid(g_hero_position,I(vars,0x38))) {
         D_L19_001B2628 = F((u8 *)((I(vars,0x38) << 7) + (int)D_L19_001B2B0C),0x38);
     } else {
@@ -50,30 +50,30 @@ void linked_object_mover_update(u8 *moby)
         }
         break;
     case 2:
-        linkedMoby = g_moby_l19_array + (I(vars,0x14) << 8);
-        linkedVars = 0;
-        if (linkedMoby) linkedVars = *(u8 **)(linkedMoby + 0x68);
+        linked_moby = g_moby_l19_array + (I(vars,0x14) << 8);
+        linked_vars = 0;
+        if (linked_moby) linked_vars = *(u8 **)(linked_moby + 0x68);
         if (flag_set_first_pending(moby)) {
             I(vars,0x24) = 0;
             if (I(vars,0x18) < 0 || I(vars,0x1C) < 0 || I(vars,0x14) < 0) {
                 moby_set_state(moby,1,-1);
                 break;
             }
-            linkedMoby[0xBC] = 1;
-            I(vars,0x28) = I(vars,0x2C) = I(linkedVars,0x2C);
+            linked_moby[0xBC] = 1;
+            I(vars,0x28) = I(vars,0x2C) = I(linked_vars,0x2C);
         }
         qcopy_nc(start,(u8 *)((I(vars,0x18) << 8) + (int)g_moby_l19_array) + 0x10);
         start[2] += F(vars,0x30);
         qcopy_nc(end,(u8 *)((I(vars,0x1C) << 8) + (int)g_moby_l19_array) + 0x10);
         end[2] += F(vars,0x34);
-        F(linkedVars,0x18) = mat_fast_helper_a(end[0]-start[0],end[1]-start[1]);
+        F(linked_vars,0x18) = mat_fast_helper_a(end[0]-start[0],end[1]-start[1]);
         FastVecSub(end,end,start);
         {
             float ratio = (float)I(vars,0x2C) / (float)I(vars,0x28);
             float swing = math_fast_sin_or_cos_b((1.0f - ratio) * 3.1415927f + -1.5707964f);
             FastVecScale(end,end,swing * 0.45f + 0.45f);
         }
-        FastVecAdd(linkedVars,start,end);
+        FastVecAdd(linked_vars,start,end);
         if (math_fast_float_d(vars + 0x2C)) {
             MemcardSave(0,-1);
             moby_set_state(moby,1,-1);

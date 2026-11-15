@@ -57,7 +57,7 @@ extern f32 IntToFloat(s32);
    counter the aim is scaled by. */
 void cam_update_aim_values(s32 *counter, u8 *moby) {
     u8 *owner;
-    f32 fade, scaleA, scaleB, scaleC;
+    f32 fade, scale_a, scale_b, scale_c;
 
     owner = *(u8 **)((u8 *)moby + 0x68);
     if (*(s16 *)((u8 *)D_L08_001B9B50 + 0x86) == 0) {
@@ -79,12 +79,12 @@ void cam_update_aim_values(s32 *counter, u8 *moby) {
     if (fade > 1.0f)
         fade = 1.0f;
 
-    scaleA = fade * 0.985f + 0.015f;
-    scaleB = fade * 0.8f + 0.2f;
-    scaleC = fade * 0.044999998062849045f + 0.015f;
+    scale_a = fade * 0.985f + 0.015f;
+    scale_b = fade * 0.8f + 0.2f;
+    scale_c = fade * 0.044999998062849045f + 0.015f;
 
-    cam_set_speeds_if_nonzero(scaleA, scaleB);
-    cam_set_turn_speeds_if_nonzero(scaleC, 0.2f);
+    cam_set_speeds_if_nonzero(scale_a, scale_b);
+    cam_set_turn_speeds_if_nonzero(scale_c, 0.2f);
     cam_set_snap_flag();
 
     if (*counter < 0x5A)
@@ -100,44 +100,44 @@ extern char g_pad_state[];
 extern s32 g_current_map_index;
 
 /* Reads the player's aim and stick values and gives back six values clamped to the range -1 to 1. */
-void hero_read_aim_input_values(f32 *outX, f32 *outY, f32 *outZ, f32 *outA, f32 *outB, f32 *outC) {
-    char *playerData = (char *)g_hero_state;
+void hero_read_aim_input_values(f32 *out_x, f32 *out_y, f32 *out_z, f32 *out_a, f32 *out_b, f32 *out_c) {
+    char *player_data = (char *)g_hero_state;
     f32 value;
     {
         char *settings = (char *)g_pad_state;
-        *outX = -*(f32 *)(playerData + 0x1FB0);
-        *outZ = -*(f32 *)(playerData + 0x1FB4);
-        *outY = math_ease_out_quad(*(f32 *)(settings + 0x128)) - math_ease_out_quad(*(f32 *)(settings + 0x124));
+        *out_x = -*(f32 *)(player_data + 0x1FB0);
+        *out_z = -*(f32 *)(player_data + 0x1FB4);
+        *out_y = math_ease_out_quad(*(f32 *)(settings + 0x128)) - math_ease_out_quad(*(f32 *)(settings + 0x124));
     }
     if (g_current_map_index == 8 || g_current_map_index == 0x1E || g_current_map_index == 0x15) {
         char *settings = (char *)g_pad_state;
-        *outA = *(f32 *)(settings + 0x12C);
-        *outC = 0;
+        *out_a = *(f32 *)(settings + 0x12C);
+        *out_c = 0;
     } else {
         char *settings = (char *)g_pad_state;
-        *outC = *(f32 *)(settings + 0x12C);
-        *outA = 0;
+        *out_c = *(f32 *)(settings + 0x12C);
+        *out_a = 0;
     }
     {
         char *settings = (char *)g_pad_state;
-        *outB = math_ease_out_quad(*(f32 *)(settings + 0x138)) - math_ease_out_quad(*(f32 *)(settings + 0x13C));
+        *out_b = math_ease_out_quad(*(f32 *)(settings + 0x138)) - math_ease_out_quad(*(f32 *)(settings + 0x13C));
     }
 
-    value = *outX;
+    value = *out_x;
     if (value > 1.0f)
-        *outX = 1.0f;
+        *out_x = 1.0f;
     else if (value < -1.0f)
-        *outX = -1.0f;
+        *out_x = -1.0f;
 
-    value = *outY;
+    value = *out_y;
     if (value > 1.0f)
-        *outY = 1.0f;
+        *out_y = 1.0f;
     else if (value < -1.0f)
-        *outY = -1.0f;
+        *out_y = -1.0f;
 
-    value = *outB;
+    value = *out_b;
     if (value > 1.0f)
-        *outB = 1.0f;
+        *out_b = 1.0f;
     else if (value < -1.0f)
-        *outB = -1.0f;
+        *out_b = -1.0f;
 }

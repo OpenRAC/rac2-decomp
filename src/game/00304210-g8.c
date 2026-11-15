@@ -110,7 +110,7 @@ void miniturret_glove_update(unsigned char *object) {
         vec_add_object_direction_scaled(ref_00304210_01 * 0.00027777778450399637f, object + 0x10, state);
         vec_transform_or_copy(object + 0x10, object + 0x10);
         excluded[0] = 0;
-        excluded[1] = 0xC5A /* Miniturret Glove */;
+        excluded[1] = MOBY_CLASS_MINITURRET_GLOVE;
         qcopy(&query.previous, &oldPosition);
         qcopy(&query.position, object + 0x10);
         qcopy(&query.velocity, state);
@@ -130,8 +130,8 @@ void miniturret_glove_update(unsigned char *object) {
         qcopy(state, &query.velocity);
         if (collision == 2) {
             unsigned char *hit = query.hitObject;
-            if (!hit || (*(short *)(hit + 0xAA) != 0xCB /* Decoy */ &&
-                *(short *)(hit + 0xAA) != 0x1366 /* Miniturret */ && *(short *)(hit + 0xAA) != 0x1367 /* Megaturret */)) {
+            if (!hit || (*(short *)(hit + 0xAA) != MOBY_CLASS_DECOY &&
+                *(short *)(hit + 0xAA) != MOBY_CLASS_MINITURRET && *(short *)(hit + 0xAA) != MOBY_CLASS_MEGATURRET)) {
                 qzero_nc(state);
                 PP(state, 0x70) = hit;
                 if (hit) {

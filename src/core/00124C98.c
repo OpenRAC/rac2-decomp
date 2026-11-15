@@ -80,18 +80,18 @@ extern char r1_D_00137DC8[];
    answers. The two wait loops are written out separately, as retail keeps
    both copies. */
 /* Checks that a CD read command can start. Takes the lock and connects to the CD server, retrying until it answers. */
-int cd_ncmd_check_ready(int cmdId) {
+int cd_ncmd_check_ready(int cmd_id) {
     int spin;
     volatile int *sem = &r1_D_001363AC;
 
     r1_func_00124780();
     if (*sem != r1_func_0011AC70(*sem)) {
         if (r1_D_00136390 > 0) {
-            r1_func_0011C820(r1_D_0013B228, cmdId, r1_D_00136398);
+            r1_func_0011C820(r1_D_0013B228, cmd_id, r1_D_00136398);
         }
         return 0;
     }
-    r1_D_00136398 = cmdId;
+    r1_D_00136398 = cmd_id;
     r1_func_0011AB20(r1_D_00141850, r1_D_00141858);
     if (r1_func_00124C28(1) != 0) {
         r1_func_0011AC40(*sem);
@@ -171,23 +171,23 @@ extern char r1_D_0013B288[];
    Making any one other init store volatile instead (e.g. 63C8) gives the
    same bytes. */
 /* Starts up the CD system. Connects to the CD server, sends the start mode and reads back the drive version. */
-int sceCdInit(int initMode) {
+int sceCdInit(int init_mode) {
     int result;
-    int rpcResult;
+    int rpc_result;
     int spin;
     int status;
     int ver1;
     int ver2;
-    int threadId;
-    char *replyBuf;
+    int thread_id;
+    char *reply_buf;
 
     if (r1_func_00124C28(1) != 0) {
         return 0;
     }
     r1_func_0011CF78(0);
-    threadId = r1_func_0011AB10();
+    thread_id = r1_func_0011AB10();
     r1_D_001363A4 = 1;
-    r1_D_00141850 = threadId;
+    r1_D_00141850 = thread_id;
     r1_D_001363C0 = -1;
     r1_D_001363B8 = -1;
     r1_D_001363C8 = -1;
@@ -197,21 +197,21 @@ int sceCdInit(int initMode) {
     r1_D_001363B4 = 0;
     r1_D_001363D0++;
     while (1) {
-        rpcResult = r1_func_0011D450(&r1_D_00141A68, 0x80000592, 0);
-        if (rpcResult < 0) {
+        rpc_result = r1_func_0011D450(&r1_D_00141A68, 0x80000592, 0);
+        if (rpc_result < 0) {
             if (r1_D_00136390 > 0) {
-                r1_func_0011C820(r1_D_0013B268, rpcResult, r1_D_001363D0);
+                r1_func_0011C820(r1_D_0013B268, rpc_result, r1_D_001363D0);
             }
             for (spin = 0x100000; spin != -1; spin--) {
             }
             continue;
         }
         if (((SifRpcClientData *)&r1_D_00141A68)->serve != 0) {
-            r1_D_00141AC0 = initMode;
+            r1_D_00141AC0 = init_mode;
             r1_D_001363CC = 0;
             r1_func_0011CEC8(&r1_D_00141AC0, 4);
-            replyBuf = r1_D_00137580;
-            if (r1_func_0011D620(&r1_D_00141A68, 0, 0, &r1_D_00141AC0, 4, replyBuf, 0x10, 0, 0) < 0) {
+            reply_buf = r1_D_00137580;
+            if (r1_func_0011D620(&r1_D_00141A68, 0, 0, &r1_D_00141AC0, 4, reply_buf, 0x10, 0, 0) < 0) {
                 r1_D_001363A4 = 0;
                 return 0;
             }
@@ -220,9 +220,9 @@ int sceCdInit(int initMode) {
         for (spin = 0x100000; spin != -1; spin--) {
         }
     }
-    ver1 = *(int *)((unsigned int)(replyBuf + 4) | 0x20000000);
-    ver2 = *(int *)((unsigned int)(replyBuf + 8) | 0x20000000);
-    status = *(int *)((unsigned int)(replyBuf + 0xC) | 0x20000000);
+    ver1 = *(int *)((unsigned int)(reply_buf + 4) | 0x20000000);
+    ver2 = *(int *)((unsigned int)(reply_buf + 8) | 0x20000000);
+    status = *(int *)((unsigned int)(reply_buf + 0xC) | 0x20000000);
     result = 1;
     if (status == 0xFF) {
     } else if (status == 0xFE) {
@@ -233,7 +233,7 @@ int sceCdInit(int initMode) {
         }
     }
     r1_D_001363A4 = 0;
-    switch (initMode) {
+    switch (init_mode) {
     case 5:
         if (r1_D_00136390 > 0) {
             r1_func_0011C820(r1_D_0013B288);
@@ -401,16 +401,16 @@ extern char r1_D_00132E08[];
 /* rac1-decomp src/core/001208E8.c: func_00121688 */
 /* sceCdMmode */
 /* Sets the CD media mode and returns the drive reply. */
-int sceCdMmode(int mediaMode) {
-    int *modeBuf = &r1_D_00132A00;
+int sceCdMmode(int media_mode) {
+    int *mode_buf = &r1_D_00132A00;
     int result;
 
     if (r1_func_00121040(0x22) == 0) {
         return 0;
     }
-    r1_D_00132A00 = mediaMode;
-    r1_func_0011AD70(modeBuf, 4);
-    if (r1_func_0011B4C8(r1_D_00132E08, 0x22, 0, modeBuf, 4, &r1_D_001325C0, 4, 0, 0) < 0) {
+    r1_D_00132A00 = media_mode;
+    r1_func_0011AD70(mode_buf, 4);
+    if (r1_func_0011B4C8(r1_D_00132E08, 0x22, 0, mode_buf, 4, &r1_D_001325C0, 4, 0, 0) < 0) {
         r1_func_00118C90(r1_D_001313EC);
         return 0;
     }

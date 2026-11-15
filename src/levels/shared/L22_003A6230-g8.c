@@ -12,7 +12,7 @@ extern void snd_resume_music_stream(void);
 /* Chooses which animation the object should play next, based on its health, the player's state and a few level flags. */
 void anim_choose_next(u8 *obj) {
     u8 *ctl = *(u8 **)(obj + 0x68);
-    float healthRatio = *(float *)(ctl + 0x20) / *(short *)(ctl + 0x24);
+    float health_ratio = *(float *)(ctl + 0x20) / *(short *)(ctl + 0x24);
     float seconds = g_hero_state.clock * 0.00083333335f;
     if (ref_L22_003A6230_00) return;
     if (D_L22_001B1C48 && !(*(int *)(ctl + 0x4E0) & 0x1000000)) {
@@ -23,9 +23,9 @@ void anim_choose_next(u8 *obj) {
         anim_start_slot(obj,23);
     if (g_hero_state.clock == 0)
         anim_start_free_slot_in_range(obj,20,22);
-    if (healthRatio < 0.25f && !(*(int *)(ctl + 0x4E0) & 0x80))
+    if (health_ratio < 0.25f && !(*(int *)(ctl + 0x4E0) & 0x80))
         anim_start_slot(obj,7);
-    if (healthRatio > 0.02f && seconds > 0.04f) {
+    if (health_ratio > 0.02f && seconds > 0.04f) {
         if (math_fast_float_d(ctl + 0x4E4) && obj[0x31] &&
             vec_fast_helper_c(obj + 0x10, (u8 *)&g_hero_state + 0x80) < 1600.0f)
             anim_start_free_slot_in_range(obj,3,6);

@@ -15,17 +15,17 @@ char *part_spawn_shockwave_ring(char *parent, char *pos, char *childpos, s32 ind
 {
     char *moby;
     char *vars;
-    char anglesCopy[16];
-    float randomAngles[4];
+    char angles_copy[16];
+    float random_angles[4];
 
     moby = CreateMoby(0x70 /* moby class 112 */);
     if (moby != 0) {
         vars = *(char **)(moby + 0x68);
-        *(TI *)randomAngles = 0;
-        randomAngles[0] = math_random_float_range(-3.1415927f, 3.1415927f);
-        randomAngles[1] = math_random_float_range(-3.1415927f, 3.1415927f);
-        randomAngles[2] = math_random_float_range(-3.1415927f, 3.1415927f);
-        *(TI *)anglesCopy = *(TI *)randomAngles;
+        *(TI *)random_angles = 0;
+        random_angles[0] = math_random_float_range(-3.1415927f, 3.1415927f);
+        random_angles[1] = math_random_float_range(-3.1415927f, 3.1415927f);
+        random_angles[2] = math_random_float_range(-3.1415927f, 3.1415927f);
+        *(TI *)angles_copy = *(TI *)random_angles;
         *(u8 *)(moby + 0x20) = 0;
         *(u8 *)(moby + 0x23) = a;
         *(u8 *)(moby + 0x30) = 0xFF;
@@ -37,7 +37,7 @@ char *part_spawn_shockwave_ring(char *parent, char *pos, char *childpos, s32 ind
         *(char **)(vars + 0x10) = parent;
         qcopy(moby + 0x10, pos);
         qcopy(vars, childpos);
-        qcopy(moby + 0xF0, anglesCopy);
+        qcopy(moby + 0xF0, angles_copy);
         *(s32 *)(vars + 0x14) = index;
         *(u16 *)(vars + 0x1C) = *(u16 *)(vars + 0x14) - 4;
         *(f32 *)(moby + 0x2C) = IntToFloat(index - (short)(*(u16 *)(vars + 0x14) - 4))

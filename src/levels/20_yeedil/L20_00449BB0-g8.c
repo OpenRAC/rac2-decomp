@@ -35,15 +35,15 @@ void path_follow_pop_on_touch(char *moby) {
         }
     }
     {
-        TI128 pathPoint;
+        TI128 path_point;
         TI128 offset;
         char *pos = moby + 0x10;
 
-        moby_local_to_world_point(*(char **)(state + 0xA4), (char *)&pathPoint);
-        FastVecSub(&offset, pos, (char *)&pathPoint);
+        moby_local_to_world_point(*(char **)(state + 0xA4), (char *)&path_point);
+        FastVecSub(&offset, pos, (char *)&path_point);
         if (vec_length_xy(&offset) < D_L20_001B23F0) {
             vec_fast_normalize_helper(&offset, &offset, D_L20_001B23F0);
-            FastVecAdd(pos, &offset, &pathPoint);
+            FastVecAdd(pos, &offset, &path_point);
             qcopy(state + 0x60, pos);
             path_push_point_away(*(int *)(state + 0xA0), pos, pos, 0.5f);
         }

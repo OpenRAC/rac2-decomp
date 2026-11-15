@@ -24,7 +24,7 @@ void part_spawn_dust_burst_motion(char *moby, void *position, int count,
                       float size, float endSize)
 {
     float offset[4], velocity[4], accel[4], motion[4];
-    int fadeIn, hold, fadeOut;
+    int fade_in, hold, fade_out;
     char *particle;
     char *vars = *(char **)(moby + 0x68);
 
@@ -57,10 +57,10 @@ void part_spawn_dust_burst_motion(char *moby, void *position, int count,
             offset[2] += -0.75f;
             velocity[3] = size;
             accel[3] = endSize;
-            fadeIn = FloatToInt(math_random_float_range(15.0f, 25.0f));
+            fade_in = FloatToInt(math_random_float_range(15.0f, 25.0f));
             hold = FloatToInt(math_random_float_range(20.0f, 40.0f));
-            fadeOut = FloatToInt(math_random_float_range(50.0f, 70.0f));
-            particle = part_spawn_trail(offset, velocity, accel, 0x70204050, 0x7F7F7F, fadeIn, hold, fadeOut, -1);
+            fade_out = FloatToInt(math_random_float_range(50.0f, 70.0f));
+            particle = part_spawn_trail(offset, velocity, accel, 0x70204050, 0x7F7F7F, fade_in, hold, fade_out, -1);
             if (particle && (func_001163B0() & 1))
                 particle[3] = 0x48;
         }

@@ -25,10 +25,10 @@ void entity_handle_death_or_respawn(u8 *obj) {
     u8 *rec;
     u8 *pos;
     u8 *platform;
-    union { Quad q; f32 f[4]; } burstPos;
+    union { Quad q; f32 f[4]; } burst_pos;
     f32 impulse[4] __attribute__((aligned(16)));
     f32 carry[4] __attribute__((aligned(16)));
-    int livesLeft;
+    int lives_left;
 
     if (vars[0x2E] != 2) {
         SetDeathBits(obj, 0, 1);
@@ -43,10 +43,10 @@ void entity_handle_death_or_respawn(u8 *obj) {
     *(s32 *)(vars + 0x264) = -1;
     PlayMobySound(0, 0, obj);
     pos = obj + 0x10;
-    burstPos.q = 0;
-    burstPos.f[2] = 0.5f;
-    FastVecAdd(&burstPos, &burstPos, pos);
-    SpawnExplosion(&burstPos, 0, 0, 0, 0, 0x14, 0x2D, 1, D_L07_001B0AAC, 20.0f, 1, 0, 0, *(s32 *)(vars + 0x260));
+    burst_pos.q = 0;
+    burst_pos.f[2] = 0.5f;
+    FastVecAdd(&burst_pos, &burst_pos, pos);
+    SpawnExplosion(&burst_pos, 0, 0, 0, 0, 0x14, 0x2D, 1, D_L07_001B0AAC, 20.0f, 1, 0, 0, *(s32 *)(vars + 0x260));
     FastVecSub(impulse, pos, g_hero_position);
     impulse[2] = 0.0f;
     vec_fast_normalize_helper(impulse, impulse, 0.06666667f);
@@ -56,9 +56,9 @@ void entity_handle_death_or_respawn(u8 *obj) {
         FastVecAdd(impulse, impulse, carry);
     }
     part_spawn_masked_debris(obj, 3, impulse, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
-    livesLeft = *(u16 *)(vars + 0x21A) - 1;
-    *(u16 *)(vars + 0x21A) = livesLeft;
-    if ((s16)livesLeft != -1) {
+    lives_left = *(u16 *)(vars + 0x21A) - 1;
+    *(u16 *)(vars + 0x21A) = lives_left;
+    if ((s16)lives_left != -1) {
         *(s16 *)(vars + 0x88) = 0;
         *(s32 *)(obj + 0x98) = 0;
         *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) | 0x41) & 0xEFFF;

@@ -171,13 +171,13 @@ extern void sandfly_release_sounds(Ent *);
 void crawler_release_sounds(Ent *moby)
 {
     Moby *vars = moby->f68;
-    s32 done, secondHandle;
+    s32 done, second_handle;
 
     if (moby->f21 != 0xFF) func_328A38(moby->f21, 1);
     if (vars->f484 != -1) func_328A38(vars->f484, 1);
-    secondHandle = vars->f488;
+    second_handle = vars->f488;
     done = 1;
-    if (secondHandle == -1) {
+    if (second_handle == -1) {
         done = 1;
     } else {
         func_328A38(vars->f484, 1);
@@ -672,7 +672,7 @@ void part_spawn_dust_burst(char *moby, void *position, int count,
                       float size, float endSize)
 {
     float offset[4], velocity[4], accel[4];
-    int fadeIn, hold, fadeOut;
+    int fade_in, hold, fade_out;
     char *particle;
 
     {
@@ -695,10 +695,10 @@ void part_spawn_dust_burst(char *moby, void *position, int count,
             FastVecAdd(offset, offset, position);
             velocity[3] = size;
             accel[3] = endSize;
-            fadeIn = FloatToInt(math_random_float_range(15.0f, 25.0f));
+            fade_in = FloatToInt(math_random_float_range(15.0f, 25.0f));
             hold = FloatToInt(math_random_float_range(20.0f, 40.0f));
-            fadeOut = FloatToInt(math_random_float_range(30.0f, 60.0f));
-            particle = part_spawn_trail(offset, velocity, accel, 0x50204050, 0x7F7F7F, fadeIn, hold, fadeOut, -1);
+            fade_out = FloatToInt(math_random_float_range(30.0f, 60.0f));
+            particle = part_spawn_trail(offset, velocity, accel, 0x50204050, 0x7F7F7F, fade_in, hold, fade_out, -1);
             if (particle && (func_001163B0() & 1))
                 particle[3] = 0x48;
         }
@@ -745,13 +745,13 @@ void part_spawn_ground_sparkles(Ent *moby)
 void sandfly_release_sounds(Ent *moby)
 {
     Moby *vars = moby->f68;
-    s32 done, secondHandle;
+    s32 done, second_handle;
 
     if (moby->f21 != 0xFF) func_328A38(moby->f21, 1);
     if (vars->f1D8 != -1) func_328A38(vars->f1D8, 1);
-    secondHandle = vars->f1DC;
+    second_handle = vars->f1DC;
     done = 1;
-    if (secondHandle == -1) {
+    if (second_handle == -1) {
         done = 1;
     } else {
         func_328A38(vars->f1D8, 1);
@@ -835,13 +835,13 @@ void sandfly_pick_random_target(Ent *moby)
 {
     Moby *vars = moby->f68;
     Quad local;
-    f32 minAngle = -3.1415927f;
-    f32 maxAngle = 3.1415927f;
+    f32 min_angle = -3.1415927f;
+    f32 max_angle = 3.1415927f;
     f32 angle;
 
-    angle = func_3278F0(minAngle, maxAngle);
+    angle = func_3278F0(min_angle, max_angle);
     vars->f160 = func_2FA3C8(angle) * (f32)vars->f189;
-    angle = func_3278F0(minAngle, maxAngle);
+    angle = func_3278F0(min_angle, max_angle);
     vars->f164 = func_2FA3E0(angle) * (f32)vars->f189;
     vars->f168 = 0.0f;
     func_2F9DF0((char *)vars + 0x160, (char *)vars + 0x160, (char *)vars + 0x150);
@@ -867,16 +867,16 @@ void sandfly_check_hit(Ent *moby)
 {
     Moby *vars = moby->f68;
     Sub24 *sub;
-    f32 halfSize;
-    s32 hitResult;
+    f32 half_size;
+    s32 hit_result;
 
     func_3347E0(moby, vars->f1E0, 2, 1, 2.5f);
     vehicle_compute_height_limits(moby);
     sub = moby->f24;
-    halfSize = sub->f24 * 0.5f;
-    moby->f2C = halfSize;
-    hitResult = func_3357E8(moby, vars->f50, 0);
-    if (hitResult != 0) {
+    half_size = sub->f24 * 0.5f;
+    moby->f2C = half_size;
+    hit_result = func_3357E8(moby, vars->f50, 0);
+    if (hit_result != 0) {
         if (vars->f20 <= 0.0f) {
             vars->f88 |= 2;
             vars->fE4 = 0.8377582f;

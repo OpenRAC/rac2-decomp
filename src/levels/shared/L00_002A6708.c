@@ -41,52 +41,52 @@ extern s8 g_sound_state[];
 void hero_clear_tracked_slots(void) {
     Ctx *ctx = &g_hero_state;
     s8 *table = g_sound_state;
-    void **ownerPtrs = ctx->ptrs;
-    s32 *slotPtr = ctx->slots;
-    s32 byteOffset = 0;
+    void **owner_ptrs = ctx->ptrs;
+    s32 *slot_ptr = ctx->slots;
+    s32 byte_offset = 0;
     s32 remaining = 8;
-    s32 slotIndex;
+    s32 slot_index;
     void *owner;
     s8 *entry;
-    u8 isActive;
+    u8 is_active;
     s32 none = -1;
 
     do {
-        owner = *(void **)(byteOffset + (s32)ownerPtrs);
-        slotIndex = *slotPtr;
+        owner = *(void **)(byte_offset + (s32)owner_ptrs);
+        slot_index = *slot_ptr;
         if (owner != 0) {
-            if (slotIndex == none) {
-                *slotPtr = none;
+            if (slot_index == none) {
+                *slot_ptr = none;
                 goto L_inc;
             }
-            entry = table + slotIndex * 0x70;
+            entry = table + slot_index * 0x70;
             if (*(s32 *)(entry + 0x88) != (s32)owner) {
-                *slotPtr = none;
+                *slot_ptr = none;
                 goto L_inc;
             }
-            isActive = *(u8 *)(entry + 0x74);
+            is_active = *(u8 *)(entry + 0x74);
         } else {
-            if (slotIndex == none) {
-                *slotPtr = none;
+            if (slot_index == none) {
+                *slot_ptr = none;
                 goto L_inc;
             }
-            entry = table + slotIndex * 0x70;
+            entry = table + slot_index * 0x70;
             owner = entry;
             if (*(s32 *)(entry + 0x88) != ctx->f2290) {
-                *slotPtr = none;
+                *slot_ptr = none;
                 goto L_inc;
             }
-            isActive = *(u8 *)(entry + 0x74);
+            is_active = *(u8 *)(entry + 0x74);
         }
-        if (isActive == 0) {
-            *slotPtr = none;
+        if (is_active == 0) {
+            *slot_ptr = none;
             goto L_inc;
         }
-        ref_L00_002A6708_00(slotIndex, owner);
-        *slotPtr = none;
+        ref_L00_002A6708_00(slot_index, owner);
+        *slot_ptr = none;
     L_inc:
-        slotPtr += 1;
+        slot_ptr += 1;
         remaining -= 1;
-        byteOffset += 4;
+        byte_offset += 4;
     } while (remaining >= 0);
 }

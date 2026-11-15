@@ -44,26 +44,26 @@ void load_continue_stream(StreamLoad *load, s32 go) {
     SifDma dma;
     u8 *buf;
     s32 *hdr;
-    s32 slotOffset;
-    s32 dmaId;
+    s32 slot_offset;
+    s32 dma_id;
 
     if (go == 0) {
         load->file = -1;
     } else {
         if (g_copy_setup_data.files[load->file].sectors != 0) {
-            slotOffset = load->slot * 0xC800;
+            slot_offset = load->slot * 0xC800;
             buf = load->buf;
             hdr = (s32 *)(buf + 0x18);
             dma.size = g_copy_setup_data.files[load->file].sectors << 11;
             dma.data = buf;
             dma.mode = 0;
-            dma.addr = D_001A7278 + slotOffset;
+            dma.addr = D_001A7278 + slot_offset;
             *(s32 *)(buf + 0x14) = 0xC000;
             hdr[0x28 / 4] = 0xC000;
             hdr[0x2C / 4] = 0xC000;
             FlushCache(0);
-            dmaId = sceSifSetDma(&dma, 1);
-            while (sceSifDmaStat(dmaId) >= 0) {
+            dma_id = sceSifSetDma(&dma, 1);
+            while (sceSifDmaStat(dma_id) >= 0) {
             }
         }
         load_start_disc_read_with_callback(load->buf, g_copy_setup_data.files[load->file].offset + g_copy_setup_data.base,

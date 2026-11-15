@@ -157,11 +157,11 @@ void UpdateNearestTarget(void *owner, void *pos)
 /* Updates a Glider Pad (moby class 2440): draws its glow effect once it has its data. */
 void glider_pad_update(u8 *moby)
 {
-    s32 effectData = *(s32 *)(moby + 0x68);
+    s32 effect_data = *(s32 *)(moby + 0x68);
 
-    if (effectData == 0)
+    if (effect_data == 0)
         return;
-    math_store_angle_update_result(moby, effectData, 0x80AAAAD2, 0x80396464, 0.0610865355f);
+    math_store_angle_update_result(moby, effect_data, 0x80AAAAD2, 0x80396464, 0.0610865355f);
 }
 
 
@@ -172,9 +172,9 @@ void hit_effect_update(u8 *moby)
     float direction[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
-    float randomDir[4] __attribute__((aligned(16)));
+    float random_dir[4] __attribute__((aligned(16)));
     u8 *target = *(u8 **)*(u32 *)(moby + 0x68);
-    int sparksLeft;
+    int sparks_left;
     if (!target || target[0x20] == 0xFE || target[0x20] == 0xFD) {
         moby_mark_spawned(moby);
         return;
@@ -187,18 +187,18 @@ void hit_effect_update(u8 *moby)
         vec_build_spherical_offset(direction, 1.0f, *(float *)(moby+0xF8), -*(float *)(moby+0xF4));
         moby_transform_joint_to_world(moby, 0, position);
         SpawnDirectedEffectObject(moby, position, direction, 0x5A);
-        sparksLeft = 4;
+        sparks_left = 4;
         do {
-            *(TI128 *)randomDir = 0;
-            randomDir[0] = math_random_float_range(-1.0f, 1.0f);
-            randomDir[1] = math_random_float_range(-1.0f, 1.0f);
-            randomDir[2] = math_random_float_range(-1.0f, 1.0f);
-            *(TI128 *)velocity = *(TI128 *)randomDir;
+            *(TI128 *)random_dir = 0;
+            random_dir[0] = math_random_float_range(-1.0f, 1.0f);
+            random_dir[1] = math_random_float_range(-1.0f, 1.0f);
+            random_dir[2] = math_random_float_range(-1.0f, 1.0f);
+            *(TI128 *)velocity = *(TI128 *)random_dir;
             vec_scale_to_length(velocity, velocity, FastVecLength(direction)*0.65f);
             FastVecAdd(velocity, direction, velocity);
             vec_scale_to_length(velocity, velocity, math_random_float_range(0.050000004f, 0.10000001f));
             part_spawn_velocity_particle(position, velocity, 0x5F2F4F6F, math_random_int_range(5,10), 50000.0f);
-        } while (--sparksLeft >= 0);
+        } while (--sparks_left >= 0);
         vec_scale_to_length(direction, direction, 0.008333334f);
         part_spawn_velocity_particle(position, direction, 0x2F4F7F7F, math_random_int_range(4,7), 500000.0f);
     }
@@ -232,20 +232,20 @@ s32 mode_get_selector(void)
 
 /* Reads the controller and gives back five movement values, each limited to the range -1 to 1. */
 /* shared native body of family c459a266b43242d6 */
-void vehicle_read_controls(float *stickX, float *liftAxis, float *stickY, float *throttle, float *turnAxis)
+void vehicle_read_controls(float *stick_x, float *lift_axis, float *stick_y, float *throttle, float *turn_axis)
 {
     float axis;
-    float upDown;
+    float up_down;
     int buttons;
 
-    *stickX = -D_00189E20_14[2028];
-    *stickY = -D_00189E20_14[2029];
+    *stick_x = -D_00189E20_14[2028];
+    *stick_y = -D_00189E20_14[2029];
     buttons = g_pad_state[104];
-    upDown = 0.0f;
+    up_down = 0.0f;
     if (buttons & 0x40)
-        upDown = 1.0f;
-    axis = (buttons & 0x20) ? (upDown - 1.0f) : upDown;
-    *liftAxis = axis;
+        up_down = 1.0f;
+    axis = (buttons & 0x20) ? (up_down - 1.0f) : up_down;
+    *lift_axis = axis;
     *throttle = *(float *)&g_pad_state[75];
     buttons = g_pad_state[104];
     axis = 0.0f;
@@ -253,19 +253,19 @@ void vehicle_read_controls(float *stickX, float *liftAxis, float *stickY, float 
         axis = 1.0f;
     if (buttons & 0x2)
         axis = axis - 1.0f;
-    *turnAxis = axis;
-    if (*stickX > 1.0f)
-        *stickX = 1.0f;
-    else if (*stickX < -1.0f)
-        *stickX = -1.0f;
-    if (*liftAxis > 1.0f)
-        *liftAxis = 1.0f;
-    else if (*liftAxis < -1.0f)
-        *liftAxis = -1.0f;
-    if (*turnAxis > 1.0f)
-        *turnAxis = 1.0f;
-    else if (*turnAxis < -1.0f)
-        *turnAxis = -1.0f;
+    *turn_axis = axis;
+    if (*stick_x > 1.0f)
+        *stick_x = 1.0f;
+    else if (*stick_x < -1.0f)
+        *stick_x = -1.0f;
+    if (*lift_axis > 1.0f)
+        *lift_axis = 1.0f;
+    else if (*lift_axis < -1.0f)
+        *lift_axis = -1.0f;
+    if (*turn_axis > 1.0f)
+        *turn_axis = 1.0f;
+    else if (*turn_axis < -1.0f)
+        *turn_axis = -1.0f;
 }
 
 /* func_L08_0041E790 is defined in L08_0041E790-g8.c. */
@@ -329,13 +329,13 @@ void mystic_handle_entity_list(L08Thing *sample)
    at 1000 (10000 with the flag at D_001A7A00+0xA) each; afterwards aims the head at the hero. */
 void UpdateItemTraderNpc(u8 *mystic)
 {
-    float lookTarget[4] __attribute__((aligned(16)));
-    float headPos[4] __attribute__((aligned(16)));
-    float toTarget[4] __attribute__((aligned(16)));
+    float look_target[4] __attribute__((aligned(16)));
+    float head_pos[4] __attribute__((aligned(16)));
+    float to_target[4] __attribute__((aligned(16)));
     u8 *vars = *(u8 **)(mystic + 0x68);
-    int payMultiplier, watchingHero;
-    float blendSpeed, yaw, pitch, angle;
-    float blendWeight = 0.3f;
+    int pay_multiplier, watching_hero;
+    float blend_speed, yaw, pitch, angle;
+    float blend_weight = 0.3f;
 
     mystic_handle_entity_list((L08Thing *)mystic);
     if (D_L08_001A8F00[0] == 6) {
@@ -475,14 +475,14 @@ void UpdateItemTraderNpc(u8 *mystic)
         if (QUANTITY <= 0)
             moby_set_state(mystic, 6, -1);
         else {
-            payMultiplier = D_001A7A00[0xA] ? 10 : 1;
+            pay_multiplier = D_001A7A00[0xA] ? 10 : 1;
             if (hero_is_reachable_for_count(mystic, 10, 2.5f)) {
-                payMultiplier *= 1000;
-                text_print_localized_formatted(0x2797, QUANTITY, QUANTITY * payMultiplier, -1);
+                pay_multiplier *= 1000;
+                text_print_localized_formatted(0x2797, QUANTITY, QUANTITY * pay_multiplier, -1);
                 level_apply_index_for_key(mystic);
                 if (D_00138324 & 0x10) {
                     level_get_saved_count();
-                    g_player_bolts += QUANTITY * payMultiplier;
+                    g_player_bolts += QUANTITY * pay_multiplier;
                     snd_play_from_class_bank(0, 0, mystic, math_random_int_range(13, 17));
                     QUANTITY = 0;
                     func_L00_0030C710(180);
@@ -511,10 +511,10 @@ void UpdateItemTraderNpc(u8 *mystic)
         } else if ((mystic[0x60] & 2) && mystic[0x43] != 1)
             anim_start_blended(mystic, 1, 0, 10);
     }
-    blendSpeed = 0.02f;
-    watchingHero = 0;
+    blend_speed = 0.02f;
+    watching_hero = 0;
     if (mystic[0x43] == 1) {
-        watchingHero = 1;
+        watching_hero = 1;
         if (vec_distance_xy((char *)mystic + 0x10, g_hero_state.x80) < 8 &&
             FastDiffRots(F(mystic, 0xF8), mat_fast_helper_a(g_hero_state.pos[0] - F(mystic, 0x10),
                                                        g_hero_state.pos[1] - F(mystic, 0x14))) < 1.57079649f) {
@@ -534,17 +534,17 @@ void UpdateItemTraderNpc(u8 *mystic)
             FastVecAdd(vars + 0x100, vars + 0x100, mystic + 0x10);
         }
         if (I(vars, 0x114)) {
-            qcopy(lookTarget, g_hero_state.pos);
-            blendSpeed = 0.04f;
+            qcopy(look_target, g_hero_state.pos);
+            blend_speed = 0.04f;
         } else
-            qcopy(lookTarget, vars + 0x100);
+            qcopy(look_target, vars + 0x100);
     }
-    if (watchingHero) {
-        qcopy(headPos, mystic + 0x10);
-        headPos[2] += 2;
-        FastVecSub(toTarget, lookTarget, headPos);
-        yaw = fast_subtract_rotations(mat_fast_helper_a(toTarget[0], toTarget[1]), F(mystic, 0xF8));
-        pitch = -mat_fast_helper_a(vec_length_xy(toTarget), toTarget[2]);
+    if (watching_hero) {
+        qcopy(head_pos, mystic + 0x10);
+        head_pos[2] += 2;
+        FastVecSub(to_target, look_target, head_pos);
+        yaw = fast_subtract_rotations(mat_fast_helper_a(to_target[0], to_target[1]), F(mystic, 0xF8));
+        pitch = -mat_fast_helper_a(vec_length_xy(to_target), to_target[2]);
         if (yaw > 1.57079649f)
             yaw = 1.57079649f;
         else if (yaw < -1.57079649f)
@@ -559,8 +559,8 @@ void UpdateItemTraderNpc(u8 *mystic)
     }
     if (D_001A7A40[0])
         F(vars, 0x70) = 2.75f;
-    moby_update_eased_node(mystic, vars, 0, blendSpeed, blendWeight);
-    moby_update_eased_node(mystic, vars + 0x80, 1, blendSpeed, blendWeight);
+    moby_update_eased_node(mystic, vars, 0, blend_speed, blend_weight);
+    moby_update_eased_node(mystic, vars + 0x80, 1, blend_speed, blend_weight);
 }
 
 #undef I

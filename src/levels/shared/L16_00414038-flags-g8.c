@@ -85,14 +85,14 @@ extern void gfx_draw_billboard_quad(u8 *, s32, u32, s32, float, float, float);
 /* Same body as func_L23_00428490, with this function's own callees. */
 extern void ref_L16_00414038_00(L23Quad *);
 /* Draws a glowing beam as several scrolling, spinning quads plus two glows at the start. */
-void gfx_draw_beam_quads_glows_alt(s32 unusedArg0, s32 unusedArg1, s32 unusedArg2, s32 unusedArg3, s32 unusedArg4, u8 *object) {
+void gfx_draw_beam_quads_glows_alt(s32 unused_arg0, s32 unused_arg1, s32 unused_arg2, s32 unused_arg3, s32 unused_arg4, u8 *object) {
     L23Quad quad;
     float vrel[4] __attribute__((aligned(16)));
     float vaxis[4] __attribute__((aligned(16)));
     float vtip[4] __attribute__((aligned(16)));
     float vside[4] __attribute__((aligned(16)));
     float vbase[4] __attribute__((aligned(16)));
-    float uvOffset[2];
+    float uv_offset[2];
     float *rel;
     float *axis;
     float *tip;
@@ -100,8 +100,8 @@ void gfx_draw_beam_quads_glows_alt(s32 unusedArg0, s32 unusedArg1, s32 unusedArg
     float *base;
     L23BeamVars *vars;
     float angle;
-    float sinAngle;
-    float cosAngle;
+    float sin_angle;
+    float cos_angle;
     int i;
     int j;
 
@@ -174,13 +174,13 @@ void gfx_draw_beam_quads_glows_alt(s32 unusedArg0, s32 unusedArg1, s32 unusedArg
     quad.uv[3][0] = 1.0f;
     quad.uv[3][1] = 1.0f;
     angle = vars->spin;
-    sinAngle = math_fast_sin_or_cos_a(angle);
-    cosAngle = math_fast_sin_or_cos_b(angle);
+    sin_angle = math_fast_sin_or_cos_a(angle);
+    cos_angle = math_fast_sin_or_cos_b(angle);
     for (j = 0; j < 4; j++) {
-        uvOffset[0] = quad.uv[j][0] - 0.5f;
-        uvOffset[1] = quad.uv[j][1] - 0.5f;
-        quad.uv[j][0] = uvOffset[0] * sinAngle - uvOffset[1] * cosAngle;
-        quad.uv[j][1] = uvOffset[0] * cosAngle + uvOffset[1] * sinAngle;
+        uv_offset[0] = quad.uv[j][0] - 0.5f;
+        uv_offset[1] = quad.uv[j][1] - 0.5f;
+        quad.uv[j][0] = uv_offset[0] * sin_angle - uv_offset[1] * cos_angle;
+        quad.uv[j][1] = uv_offset[0] * cos_angle + uv_offset[1] * sin_angle;
         quad.uv[j][0] += 0.5f;
         quad.uv[j][1] += 0.5f;
     }

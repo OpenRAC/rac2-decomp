@@ -33,12 +33,12 @@ extern float ref_L00_00424F98_03 SDATA(ref_L00_00424F98_03);
 
 /* The vehicle's steering and throttle inputs, with the stunt counter: holding the
    stick centred for a second counts one run and records the best time. */
-void ship_read_steer_and_throttle(char *vehicle, float *steerOut, float *throttleOut)
+void ship_read_steer_and_throttle(char *vehicle, float *steerOut, float *throttle_out)
 {
     L00_00424F98_Input *input = (L00_00424F98_Input *)(*(char **)(vehicle + 0x70) + 0x1C0);
     L00_00424F98_Counter *counter;
-    unsigned int runCount;
-    float stickY;
+    unsigned int run_count;
+    float stick_y;
 
     if (input->flags & 1) {
         *steerOut = 0.0f;
@@ -55,12 +55,12 @@ void ship_read_steer_and_throttle(char *vehicle, float *steerOut, float *throttl
     } else {
         input->steer_out = ref_L00_00424F98_02;
         counter = &g_progress_statistics;
-        runCount = counter->count;
-        if ((unsigned short)runCount < 3U) {
+        run_count = counter->count;
+        if ((unsigned short)run_count < 3U) {
             ref_L00_00424F98_00++;
             if (ref_L00_00424F98_01 == 0 && ref_L00_00424F98_00 > 0x3C) {
-                if ((unsigned short)runCount < 0xFFFF)
-                    counter->count = runCount + 1;
+                if ((unsigned short)run_count < 0xFFFF)
+                    counter->count = run_count + 1;
                 if (D_001A7390 > counter->best)
                     counter->best = D_001A7390;
                 ref_L00_00424F98_01 = 1;
@@ -69,17 +69,17 @@ void ship_read_steer_and_throttle(char *vehicle, float *steerOut, float *throttl
         }
     }
     if (input->flags & 2) {
-        *throttleOut = 0.0f;
+        *throttle_out = 0.0f;
     } else {
-        stickY = D_00138284[0];
-        *throttleOut = -stickY;
+        stick_y = D_00138284[0];
+        *throttle_out = -stick_y;
         if (D_001A7BA4 == 0)
-            *throttleOut = stickY;
-        if (*throttleOut != 0.0f)
+            *throttle_out = stick_y;
+        if (*throttle_out != 0.0f)
             return;
     }
     {
         float throttle = input->throttle;
-        *throttleOut = throttle / ref_L00_00424F98_03;
+        *throttle_out = throttle / ref_L00_00424F98_03;
     }
 }

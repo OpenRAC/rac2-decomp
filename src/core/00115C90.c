@@ -8,14 +8,14 @@ extern int D_00133E78;
 extern u32 kernel_process_request_a(int arg0);
 
 /* Asks the system for more heap memory. If that fails, it hands back the error code. */
-u32 sbrk_reentrant(int *errnoOut, u32 increment) {
+u32 sbrk_reentrant(int *errno_out, u32 increment) {
     u32 result;
 
     D_00133E78 = 0;
     result = kernel_process_request_a(increment);
     if (result == 0xFFFFFFFF) {
         if (D_00133E78 != 0)
-            *errnoOut = D_00133E78;
+            *errno_out = D_00133E78;
     }
     return result;
 }

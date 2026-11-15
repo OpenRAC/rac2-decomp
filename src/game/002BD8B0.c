@@ -11,7 +11,7 @@ extern unsigned char *D_001F2594;
 
 
 /* Creates a spark particle that leaves a short trail of copies behind it. It returns the new particle, or 0 when there is no life to give it. */
-void *part_spawn_trailing_spark(void *position, void *velocity, int color, int colorEnd, int life, int trailFlag, float size)
+void *part_spawn_trailing_spark(void *position, void *velocity, int color, int color_end, int life, int trail_flag, float size)
 {
     void *particle;
     char *motion;
@@ -35,8 +35,8 @@ void *part_spawn_trailing_spark(void *position, void *velocity, int color, int c
         *(short *)(motion + 0x18) = life;
         *(float *)(motion + 0x1C) = size;
         *(int *)(motion + 0x10) = color;
-        *(int *)(motion + 0x14) = colorEnd;
-        *(short *)(motion + 0x1A) = trailFlag;
+        *(int *)(motion + 0x14) = color_end;
+        *(short *)(motion + 0x1A) = trail_flag;
         qcopy(motion, velocity);
     }
     return particle;

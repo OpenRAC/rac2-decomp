@@ -168,7 +168,7 @@ void hero_l15_lock_on_tether_update(Moby *moby)
     float va[4] __attribute__((aligned(16)));
     float vb[4] __attribute__((aligned(16)));
     Hit hit1 __attribute__((aligned(16)));
-    float pullDir[4] __attribute__((aligned(16)));
+    float pull_dir[4] __attribute__((aligned(16)));
     float v70[4] __attribute__((aligned(16)));
     float v80[4] __attribute__((aligned(16)));
     float v90[4] __attribute__((aligned(16)));
@@ -186,9 +186,9 @@ void hero_l15_lock_on_tether_update(Moby *moby)
     float bestScore = 0.0f, secondScore = 0.0f;
     float len;
     float angle0, angle1;
-    int heldIndex;
+    int held_index;
     Tgt *target;
-    int targetIndex;
+    int target_index;
     float dist, ang, sa2, cs, sm, score, proj, fa, fb;
     float d0;
     float *ia, *ib;
@@ -225,8 +225,8 @@ void hero_l15_lock_on_tether_update(Moby *moby)
             tether->lockB = 0;
             tether->u.s.h42 = 0;
         } else {
-            targetIndex = 0;
-            for (target = D_L15_001FB6E0[0]; target != 0; target = D_L15_001FB6E0[++targetIndex]) {
+            target_index = 0;
+            for (target = D_L15_001FB6E0[0]; target != 0; target = D_L15_001FB6E0[++target_index]) {
                 if (target != tether->lockA && target != tether->lockB) {
                     if (target != 0 && target->cls != 0 && target->cls->id == 5) {
                         if (target->kind != 0xFE) {
@@ -331,14 +331,14 @@ void hero_l15_lock_on_tether_update(Moby *moby)
     hit1.tag = moby->tag;
     tether->count = 0x14;
     coll_process_hit(tether, 0x10, g_hero_state.ent, &hit1, 0.3f);
-    FastVecSub(pullDir, tether->b, tether);
-    vec_scale_to_length(pullDir, pullDir, 1.0f);
+    FastVecSub(pull_dir, tether->b, tether);
+    vec_scale_to_length(pull_dir, pull_dir, 1.0f);
     if (tether->lockA != 0 || tether->lockB != 0) {
-        FastVecCross(v70, pullDir, (char *)&g_hero_state + 0x2C0);
-        math_apply_axis_rotation_to_quat(pullDir, pullDir, v70, 0.17453295f);
+        FastVecCross(v70, pull_dir, (char *)&g_hero_state + 0x2C0);
+        math_apply_axis_rotation_to_quat(pull_dir, pull_dir, v70, 0.17453295f);
     }
     got = 0;
-    FastVecScale(v90, pullDir, reach);
+    FastVecScale(v90, pull_dir, reach);
     nheld = 0;
     /* These named pointers, and the short locals below, are live but also steer: each adds
        insns that exist at gcse and die later (asm operands keep the copy; the sign extension
@@ -497,8 +497,8 @@ void hero_l15_lock_on_tether_update(Moby *moby)
         }
     }
     }
-    for (heldIndex = 0; heldIndex < nheld; heldIndex++)
-        held[heldIndex]->f98 = held[heldIndex]->cls->f10;
+    for (held_index = 0; held_index < nheld; held_index++)
+        held[held_index]->f98 = held[held_index]->cls->f10;
     if (got == 0)
         qcopy(tether->b, &D_L15_0023B900);
     if (tether->lockA != 0 && (tether->u.q & 0x0000FFFF0000FFFFUL) == 0) {
@@ -572,7 +572,7 @@ void hero_l15_lock_on_tether_update(Moby *moby)
             D_L15_001B2EE0[k] = 0;
             angle0 = math_random_signed_float_range(0.52359885f, 1.0471977f);
             angle1 = math_random_float_range(-1.0471977f, 0.17453295f);
-            FastVecScale(scratch, pullDir, ksize);
+            FastVecScale(scratch, pull_dir, ksize);
             math_apply_axis_rotation_to_quat(scratch, scratch, D_0018A560, angle1);
             math_apply_axis_rotation_to_quat(scratch, scratch, D_0018A560 + 0x10, angle0);
             qcopy(&D_L15_0023BC30[k].v[0], hb.q);
@@ -615,7 +615,7 @@ void hero_l15_lock_on_tether_update(Moby *moby)
     {
         angle0 = math_random_signed_float_range(0.52359885f, 1.0471977f);
         angle1 = math_random_float_range(-0.52359885f, 1.0471977f);
-        FastVecScale(scratch, pullDir, D_L15_001AF118);
+        FastVecScale(scratch, pull_dir, D_L15_001AF118);
         math_apply_axis_rotation_to_quat(scratch, scratch, D_0018A560, angle1);
         math_apply_axis_rotation_to_quat(scratch, scratch, D_0018A560 + 0x10, angle0);
         spin = math_random_int_range(1, 8);

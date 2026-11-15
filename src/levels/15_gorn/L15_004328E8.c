@@ -73,12 +73,12 @@ void gorn_draw_ribbon_effects(void *moby) {
     VU1_addGSregister(0x42, 0x48);
     gfx_draw_colored_rectangle(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], 0x40404040);
     if (math_fast_float_d(vars + 0x50) == 0) {
-        char *ribbonData = D_L15_00269FE0;
+        char *ribbon_data = D_L15_00269FE0;
 
-        DrawGornRibbon(ribbonData, 0x46, 0x46, 3.2f, 6.35f, 0.2f, 0x0A, 0x007F7F7F, 0x00FF1010);
-        DrawGornRibbon(ribbonData + 0xA0, 0x20, 0x20, 3.1f, 6.19f, 0.2f, 0x0A, 0x007F7F7F, 0x00FF1040);
-        DrawGornRibbon(ribbonData + 0x140, 0x20, 0x20, 3.1f, 6.19f, 0.2f, 0x0A, 0x007F7F7F, 0x00FF1040);
-        DrawGornRibbon(ribbonData + 0x1E0, 0x20, 0x20, 3.1f, 6.19f, 0.2f, 0x0A, 0x007F7F7F, 0x00FF1040);
+        DrawGornRibbon(ribbon_data, 0x46, 0x46, 3.2f, 6.35f, 0.2f, 0x0A, 0x007F7F7F, 0x00FF1010);
+        DrawGornRibbon(ribbon_data + 0xA0, 0x20, 0x20, 3.1f, 6.19f, 0.2f, 0x0A, 0x007F7F7F, 0x00FF1040);
+        DrawGornRibbon(ribbon_data + 0x140, 0x20, 0x20, 3.1f, 6.19f, 0.2f, 0x0A, 0x007F7F7F, 0x00FF1040);
+        DrawGornRibbon(ribbon_data + 0x1E0, 0x20, 0x20, 3.1f, 6.19f, 0.2f, 0x0A, 0x007F7F7F, 0x00FF1040);
     }
 }
 
@@ -210,34 +210,34 @@ void gorn_ship_spawn_damage_effects(void *object)
 {
     u8 *obj = (u8 *)object;
     u8 *vars = *(u8 **)(obj + 0x68);
-    u8 *soundSlot = D_L15_00188660 + *(s32 *)(vars + 0x458) * 0x70;
-    f32 fromPoint[4] __attribute__((aligned(16)));
-    f32 toPoint[4] __attribute__((aligned(16)));
-    s32 burstCount;
+    u8 *sound_slot = D_L15_00188660 + *(s32 *)(vars + 0x458) * 0x70;
+    f32 from_point[4] __attribute__((aligned(16)));
+    f32 to_point[4] __attribute__((aligned(16)));
+    s32 burst_count;
     s32 remaining;
-    s32 *jointList;
+    s32 *joint_list;
 
-    if (*(u8 **)(soundSlot + 0x88) != obj || soundSlot[0x74] == 0) {
+    if (*(u8 **)(sound_slot + 0x88) != obj || sound_slot[0x74] == 0) {
         *(s32 *)(vars + 0x458) = PlayMobySound(3, 4, obj);
     }
     if (math_random_int_below(0xF) == 0 && D_L15_001AEE20[0] < 4) {
-        moby_transform_joint_to_world(obj, D_L15_001B1780[math_random_int_below(0xB)], fromPoint);
-        moby_transform_joint_to_world(obj, D_L15_001B1780[math_random_int_below(0xB)], toPoint);
+        moby_transform_joint_to_world(obj, D_L15_001B1780[math_random_int_below(0xB)], from_point);
+        moby_transform_joint_to_world(obj, D_L15_001B1780[math_random_int_below(0xB)], to_point);
         D_L15_001AEE20[0] = D_L15_001AEE20[0] + 1;
-        CreateEnergyStrip(fromPoint, toPoint, 0x19, 0, 0.5f, 0.2f, 0.4020000100135803f, 1.122249960899353f, 0x7F7F7F, 0xFF1010, 0x46, 0x46);
+        CreateEnergyStrip(from_point, to_point, 0x19, 0, 0.5f, 0.2f, 0.4020000100135803f, 1.122249960899353f, 0x7F7F7F, 0xFF1010, 0x46, 0x46);
     }
     if (*(s32 *)(vars + 0x26C) < 7) {
-        burstCount = FloatToInt(8.0f - (f32)*(s32 *)(vars + 0x26C));
-        if (burstCount > 0) {
-            remaining = burstCount;
-            jointList = D_L15_001B17B0;
+        burst_count = FloatToInt(8.0f - (f32)*(s32 *)(vars + 0x26C));
+        if (burst_count > 0) {
+            remaining = burst_count;
+            joint_list = D_L15_001B17B0;
             while (1) {
                 if (math_random_int_below(2) != 0) {
-                    gorn_part_spawn_puff((char *)obj, *jointList, 0, math_random_float_range(2.0f, 3.0f));
-                    ref_L15_00434D28_00((char *)obj, *jointList, 0, math_random_float_range(0.5f, 1.5f));
+                    gorn_part_spawn_puff((char *)obj, *joint_list, 0, math_random_float_range(2.0f, 3.0f));
+                    ref_L15_00434D28_00((char *)obj, *joint_list, 0, math_random_float_range(0.5f, 1.5f));
                 }
                 remaining--;
-                jointList++;
+                joint_list++;
                 if (remaining == 0) break;
             }
         }
@@ -514,7 +514,7 @@ void gorn_path_mover_fire_shots(char *moby) {
     char *mover = moby;
     char *vars;
     char *owner;
-    int shotIndex;
+    int shot_index;
 
     vars = *(char **)(mover + 0x68);
     owner = (char *)moby_get_motion_data(moby);
@@ -533,9 +533,9 @@ void gorn_path_mover_fire_shots(char *moby) {
     SpawnSpaceProjectile(mover, 0x600000CF, 1, 1.0f, 0, 2.0f, 1.5f, 1.5f, 0x1E,
                      *(int *)(vars + 0x454) * 2 + 5, 0);
     *(int *)(vars + 0x450) = math_random_int_range(0x14, 0x3C);
-    shotIndex = *(int *)(vars + 0x454) + 1;
-    *(int *)(vars + 0x454) = shotIndex;
-    if (shotIndex >= 3) {
+    shot_index = *(int *)(vars + 0x454) + 1;
+    *(int *)(vars + 0x454) = shot_index;
+    if (shot_index >= 3) {
         *(int *)(vars + 0x454) = 0;
     }
 }
@@ -759,16 +759,16 @@ void gorn_group_aim_update(unsigned char *moby)
     unsigned short *q;
     unsigned char *record;
     int i;
-    int bestGroup;
+    int best_group;
     short cls;
-    float bestDistance;
+    float best_distance;
     float distance;
-    float turnB;
+    float turn_b;
 
     switch (moby[0x20]) {
     case 0:
-        bestGroup = -1;
-        bestDistance = 9999.0f;
+        best_group = -1;
+        best_distance = 9999.0f;
         for (i = 0; i < D_L15_001A9018[0]; i++) {
             for (p = D_L15_001A9014[0][i];
                  p != 0 && ((p != 0 && (short)p[-1] >= 0) || p == D_L15_001A9014[0][i]);
@@ -777,14 +777,14 @@ void gorn_group_aim_update(unsigned char *moby)
                 if (record == 0)
                     break;
                 distance = vec_distance_xy(record + 0x30, moby + 0x10);
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    bestGroup = i;
+                if (distance < best_distance) {
+                    best_distance = distance;
+                    best_group = i;
                 }
             }
         }
-        *(int *)vars = bestGroup;
-        if (bestGroup == -1)
+        *(int *)vars = best_group;
+        if (best_group == -1)
             return;
         *(float *)(vars + 0x28) = 12.0f;
         *(float *)(vars + 0x2C) = math_random_float_range(30.0f, 37.0f);
@@ -815,10 +815,10 @@ void gorn_group_aim_update(unsigned char *moby)
         *(unsigned short *)(moby + 0x34) |= 0x104;
         euler_rotation_basis(moby + 0xC0, moby + 0xF0);
         *(float *)(vars + 0x38) = math_random_signed_float_range(27.0f, 52.0f) * 0.000290888245f;
-        turnB = math_random_signed_float_range(25.0f, 37.0f) * 0.000290888245f;
-        *(float *)(vars + 0x3C) = turnB;
-        if (0.0f <= *(float *)(vars + 0x38) * turnB)
-            *(float *)(vars + 0x3C) = -turnB;
+        turn_b = math_random_signed_float_range(25.0f, 37.0f) * 0.000290888245f;
+        *(float *)(vars + 0x3C) = turn_b;
+        if (0.0f <= *(float *)(vars + 0x38) * turn_b)
+            *(float *)(vars + 0x3C) = -turn_b;
         moby[0x20] = 1;
         break;
     case 1:

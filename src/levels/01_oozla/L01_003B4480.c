@@ -26,7 +26,7 @@ extern f32 D_L01_001AFE18[];
 void swamp_beast_spawn_bubbles(u8 *object)
 {
     u8 *state = *(u8 **)(object + 0x68);
-    float bubblePos[4];
+    float bubble_pos[4];
     float value;
     int i;
 
@@ -34,20 +34,20 @@ void swamp_beast_spawn_bubbles(u8 *object)
     if (GetCollHitMaterial() != 3)
         return;
     {
-        u8 *srcPos = object + 0x10;
-        u8 *speedVec = state + 0xE0;
+        u8 *src_pos = object + 0x10;
+        u8 *speed_vec = state + 0xE0;
         i = 0;
         while (i >= 0) {
-            *(V4 *)bubblePos = *(V4 *)srcPos;
-            vec_add_random_offset(bubblePos, 0.15f);
-            bubblePos[2] = level_get_water_height();
+            *(V4 *)bubble_pos = *(V4 *)src_pos;
+            vec_add_random_offset(bubble_pos, 0.15f);
+            bubble_pos[2] = level_get_water_height();
             value = math_random_float_range(0.3f, 2.5f);
-            part_spawn_drifting((char *)bubblePos, (int)D_L01_001AFE18,
+            part_spawn_drifting((char *)bubble_pos, (int)D_L01_001AFE18,
                           (int)((((u32)math_random_int_below(6) + 0x14) << 24) | 0x5060), value, 11000.0f);
             i--;
         }
         value = 0.0333333333f;
-        if (value < FastVecLength(speedVec) || value < FastVecLength(state + 0x2F0))
+        if (value < FastVecLength(speed_vec) || value < FastVecLength(state + 0x2F0))
             part_spawn_water_splash_effects(object, 3, 10, 1);
     }
 }

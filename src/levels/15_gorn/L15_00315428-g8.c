@@ -45,37 +45,37 @@ extern void moby_reset_action_state(char *a0);
    fires the object's effect and takes the moby down, which it reports. */
 int moby_l15_apply_hit_damage(char *obj, int flag)
 {
-    char *attachedPart;
-    float *healthPtr;
-    char *hitInfo;
+    char *attached_part;
+    float *health_ptr;
+    char *hit_info;
     char *vars;
-    short classId;
+    short class_id;
     int ret = 0;
 
-    hitInfo = part_find_owned_effect_slot(obj, 0x230000, 0);
+    hit_info = part_find_owned_effect_slot(obj, 0x230000, 0);
     *(unsigned char *)(obj + 0xA8) = 0xFF;
     vars = *(char **)(obj + 0x68);
-    attachedPart = *(char **)(vars + 0x10);
-    healthPtr = *(float **)(vars + 0x0);
-    if (attachedPart != 0) {
-        gfx_update_color_fade(obj, attachedPart);
+    attached_part = *(char **)(vars + 0x10);
+    health_ptr = *(float **)(vars + 0x0);
+    if (attached_part != 0) {
+        gfx_update_color_fade(obj, attached_part);
     }
-    if (hitInfo != 0) {
-        if (attachedPart != 0) {
-            *(unsigned char *)(attachedPart + 7) = 0xFF;
-            gfx_start_color_fade(obj, attachedPart);
+    if (hit_info != 0) {
+        if (attached_part != 0) {
+            *(unsigned char *)(attached_part + 7) = 0xFF;
+            gfx_start_color_fade(obj, attached_part);
         }
-        *healthPtr = *healthPtr - *(float *)(hitInfo + 0x2C);
-        classId = *(short *)(obj + 0xAA);
-        if (classId != 0xB73 /* moby class 2931 */) {
-            if (classId == 0x1211 /* moby class 4625 */) {
+        *health_ptr = *health_ptr - *(float *)(hit_info + 0x2C);
+        class_id = *(short *)(obj + 0xAA);
+        if (class_id != 0xB73 /* moby class 2931 */) {
+            if (class_id == 0x1211 /* moby class 4625 */) {
                 snd_play_from_class_bank(5, 0, obj, 0x1211);
             } else {
                 snd_play_from_class_bank(0xD, 0, obj, 0xFBF);
             }
         }
-        if (*healthPtr <= 0.0f) {
-            *healthPtr = 0.0f;
+        if (*health_ptr <= 0.0f) {
+            *health_ptr = 0.0f;
             part_spawn_shockwave_burst(obj + 0x10, 0, 0x32, 0x1E, 0x1E, 0x1E, 0x28, 1, 1, 0, 0, 0.75f);
             if (D_L15_001B1520 == 0) {
                 func_L05_00421908(obj, 1, 0xF);

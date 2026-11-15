@@ -102,24 +102,24 @@ void UpdateYeedilParticleEmitter(void *moby)
     u32 vars;
     float drift;
     float angle;
-    float radiusRand;
-    float fadeRand;
-    float zeroTarget;
-    u32 frameCount;
-    unsigned long long prevCount;
+    float radius_rand;
+    float fade_rand;
+    float zero_target;
+    u32 frame_count;
+    unsigned long long prev_count;
     int lifetime;
-    int colorSeed;
-    float speedRand;
-    float sizeRand;
-    float sizeRand2;
+    int color_seed;
+    float speed_rand;
+    float size_rand;
+    float size_rand2;
 
     vars = *(u32 *)((u32)moby + 0x68);
     if (math_fast_float_d((int *)(vars + 4)) != 0)
         goto pathA;
-    frameCount = *(u16 *)((u32)moby + 0x96);
-    prevCount = frameCount++;
-    *(u16 *)((u32)moby + 0x96) = frameCount;
-    if (prevCount < 11)
+    frame_count = *(u16 *)((u32)moby + 0x96);
+    prev_count = frame_count++;
+    *(u16 *)((u32)moby + 0x96) = frame_count;
+    if (prev_count < 11)
         goto check;
     if (*(u16 *)(*(u32 *)((u32)moby + 0xB8) + 0x34) & 1)
         goto pathA;
@@ -127,8 +127,8 @@ check:
     if (vec_distance_xy((void *)((u32)moby + 0x10),
                       (void *)(*(u32 *)((u32)moby + 0xB8) + 0x10)) > 0.1f) {
 pathA:
-        zeroTarget = 0.0f;
-        ApproachValue((float *)vars, zeroTarget, 0.016666667f);
+        zero_target = 0.0f;
+        ApproachValue((float *)vars, zero_target, 0.016666667f);
         if (*(float *)vars == 0.0f) {
             moby_mark_spawned(moby);
             goto end;
@@ -150,30 +150,30 @@ pathA:
         }
     }
 skip:
-    fadeRand = math_random_float_range(0.1f, 0.3f);
+    fade_rand = math_random_float_range(0.1f, 0.3f);
     lifetime = math_random_int_range(30, 60);
     vel.q = 0;
-    speedRand = math_random_float_range(0.5f, 2.0f);
-    vel.f[2] = -speedRand * 0.016666667f;
+    speed_rand = math_random_float_range(0.5f, 2.0f);
+    vel.f[2] = -speed_rand * 0.016666667f;
     pos.q = vel.q;
-    radiusRand = math_random_float_range(0.0f, 1.0f);
+    radius_rand = math_random_float_range(0.0f, 1.0f);
     angle = math_random_angle();
-    vel.f[0] = math_fast_sin_or_cos_a(angle) * radiusRand;
-    vel.f[1] = math_fast_sin_or_cos_b(angle) * radiusRand;
+    vel.f[0] = math_fast_sin_or_cos_a(angle) * radius_rand;
+    vel.f[1] = math_fast_sin_or_cos_b(angle) * radius_rand;
     vel.f[2] = 0.0f;
-    sizeRand = math_random_float_range(1.0f, 10.0f);
-    vel.f[2] = sizeRand;
-    sizeRand2 = math_random_float_range(1.0f, 10.0f);
-    if (!(vel.f[2] > sizeRand2)) {
+    size_rand = math_random_float_range(1.0f, 10.0f);
+    vel.f[2] = size_rand;
+    size_rand2 = math_random_float_range(1.0f, 10.0f);
+    if (!(vel.f[2] > size_rand2)) {
         ;
     } else {
-        vel.f[2] = sizeRand2;
+        vel.f[2] = size_rand2;
     }
     FastVecAdd(&vel, &vel, moby + 0x10);
     {
         u8 particle_count = lifetime;
-        colorSeed = math_random_int_below(255);
-        part_spawn_hero_relative(&vel, &pos, 0x60107080, particle_count, colorSeed & 0xFF, 0, fadeRand);
+        color_seed = math_random_int_below(255);
+        part_spawn_hero_relative(&vel, &pos, 0x60107080, particle_count, color_seed & 0xFF, 0, fade_rand);
     }
     gfx_add_draw_callback_first(part_draw_glow_trail, moby);
 end:
@@ -201,7 +201,7 @@ void level_script_update(void *incoming)
                 *(u16 *)(object+0x34) |= 0x800;
             if (*(s16 *)(object+0xAA) == 0xD54 /* moby class 3412 */)
                 UpdateEquipmentPieces(object);
-            if (object && *(s16 *)(object+0xAA) == 0xFA0 /* TV Screens */ && *(void **)(object+0x68))
+            if (object && *(s16 *)(object+0xAA) == MOBY_CLASS_TV_SCREENS && *(void **)(object+0x68))
                 math_store_angle_update_result((char *)object,(float *)(*(u8 **)(object+0x68)+0xC),
                                   0x80AAAAD2,0x80396464,0.06108653545f);
 

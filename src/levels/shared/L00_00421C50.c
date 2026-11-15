@@ -52,11 +52,11 @@ void cam_follow_update_collision(char *moby)
 {
     float out[4], a[4], b[4], c[4], d[4], e[4], f[4], g[4], h[4], i[4];
     float midpoint[4];
-    char *camData = *(char **)(moby + 0x70);
-    char *settings = camData + 0x60;
-    char *motion = camData + 0x160;
-    char *outVec = camData + 0x70;
-    char *eyeOffset;
+    char *cam_data = *(char **)(moby + 0x70);
+    char *settings = cam_data + 0x60;
+    char *motion = cam_data + 0x160;
+    char *out_vec = cam_data + 0x70;
+    char *eye_offset;
     char *cam = D_L00_001B8E20;
     char *pi;
     char *vp;
@@ -64,21 +64,21 @@ void cam_follow_update_collision(char *moby)
     hero_copy_vector_to_out(moby, a);
     weapon_update_held_anim_state(moby);
     cam_follow_compute_position(moby, out);
-    qcopy(camData + 0x70, out);
+    qcopy(cam_data + 0x70, out);
     qcopy(b, settings);
-    eyeOffset = camData + 0xC0;
-    dist = FastVecDot(cam + 0x30, eyeOffset);
+    eye_offset = cam_data + 0xC0;
+    dist = FastVecDot(cam + 0x30, eye_offset);
     FastVecScale(c, cam + 0x30, dist);
-    FastVecSub(d, eyeOffset, c);
-    *(float *)(settings + 0xF0) = fast_vec_dist(c, outVec);
-    c[0] = math_step_spring_damper_clamped(camData + 0xE0, c[0], *(float *)(settings + 0x10), *(float *)(settings + 0xE4), *(float *)(settings + 0xE8), 0.0f);
-    c[1] = math_step_spring_damper_clamped(camData + 0xE4, c[1], *(float *)(settings + 0x14), *(float *)(settings + 0xE4), *(float *)(settings + 0xE8), 0.0f);
-    c[2] = math_step_spring_damper_clamped(camData + 0xE8, c[2], *(float *)(settings + 0x18), *(float *)(settings + 0xE4), *(float *)(settings + 0xE8), 0.0f);
-    d[0] = math_step_spring_damper_clamped(camData + 0xD0, d[0], *(float *)(settings + 0x0), *(float *)(settings + 0xDC), *(float *)(settings + 0xE0), 0.0f);
-    d[1] = math_step_spring_damper_clamped(camData + 0xD4, d[1], *(float *)(settings + 0x4), *(float *)(settings + 0xDC), *(float *)(settings + 0xE0), 0.0f);
-    d[2] = math_step_spring_damper_clamped(camData + 0xD8, d[2], *(float *)(settings + 0x8), *(float *)(settings + 0xDC), *(float *)(settings + 0xE0), 0.0f);
-    FastVecAdd(settings, settings, outVec);
-    FastVecAdd(eyeOffset, d, c);
+    FastVecSub(d, eye_offset, c);
+    *(float *)(settings + 0xF0) = fast_vec_dist(c, out_vec);
+    c[0] = math_step_spring_damper_clamped(cam_data + 0xE0, c[0], *(float *)(settings + 0x10), *(float *)(settings + 0xE4), *(float *)(settings + 0xE8), 0.0f);
+    c[1] = math_step_spring_damper_clamped(cam_data + 0xE4, c[1], *(float *)(settings + 0x14), *(float *)(settings + 0xE4), *(float *)(settings + 0xE8), 0.0f);
+    c[2] = math_step_spring_damper_clamped(cam_data + 0xE8, c[2], *(float *)(settings + 0x18), *(float *)(settings + 0xE4), *(float *)(settings + 0xE8), 0.0f);
+    d[0] = math_step_spring_damper_clamped(cam_data + 0xD0, d[0], *(float *)(settings + 0x0), *(float *)(settings + 0xDC), *(float *)(settings + 0xE0), 0.0f);
+    d[1] = math_step_spring_damper_clamped(cam_data + 0xD4, d[1], *(float *)(settings + 0x4), *(float *)(settings + 0xDC), *(float *)(settings + 0xE0), 0.0f);
+    d[2] = math_step_spring_damper_clamped(cam_data + 0xD8, d[2], *(float *)(settings + 0x8), *(float *)(settings + 0xDC), *(float *)(settings + 0xE0), 0.0f);
+    FastVecAdd(settings, settings, out_vec);
+    FastVecAdd(eye_offset, d, c);
     FastVecScale(e, cam + 0x20, *(float *)(settings + 0xB0));
     if (*(u8 *)(settings + 0xD6)) {
         *(short *)(settings + 0xD8) += 1;
@@ -86,16 +86,16 @@ void cam_follow_update_collision(char *moby)
             *(short *)(settings + 0xD8) = *(short *)(settings + 0xEC);
         r = IntToFloat(*(short *)(settings + 0xD8));
         r = r / IntToFloat(*(short *)(settings + 0xEC));
-        lerp_vector(f, settings, eyeOffset, r);
-        FastVecAdd(camData + 0xA0, e, f);
+        lerp_vector(f, settings, eye_offset, r);
+        FastVecAdd(cam_data + 0xA0, e, f);
     } else {
-        FastDecTimer(camData + 0x138);
+        FastDecTimer(cam_data + 0x138);
         if (*(short *)(settings + 0xD8) < 0)
             *(short *)(settings + 0xD8) = 0;
         r = IntToFloat(*(short *)(settings + 0xD8));
         r = r / IntToFloat(*(short *)(settings + 0xEC));
-        lerp_vector(f, settings, eyeOffset, r);
-        FastVecAdd(camData + 0xA0, e, f);
+        lerp_vector(f, settings, eye_offset, r);
+        FastVecAdd(cam_data + 0xA0, e, f);
     }
     weapon_update_anim_blend(moby, e);
     if (HERO->b[0x22B4] == 2)

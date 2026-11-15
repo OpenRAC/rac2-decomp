@@ -91,35 +91,35 @@ extern void cam_update_state(void);
 /* Opens the vendor screen: clears its state, picks the menu type from the vendor or how it was called, builds the item list, and moves the camera to the vendor. */
 void OpenVendorMenu(char *moby)
 {
-    int openArg, npcAction, visible, count;
-    float tempVec[4];
+    int open_arg, npc_action, visible, count;
+    float temp_vec[4];
 
     mem_clear(&g_vendor_menu_state, 0, 0x760);
     if (g_is_pal_video) D_001B2280 = 1.076923f;
     else D_001B2280 = 1.0f;
     g_vendor_menu_state.restore = 0;
     D_001AD1C0 = g_player_bolts.level;
-    openArg = (int)moby;
+    open_arg = (int)moby;
     if ((unsigned)moby < 4) {
         g_vendor_menu_state.restore = 1;
-        moby = CreateMoby(11 /* Megacorp Vendor */);
+        moby = CreateMoby(MOBY_CLASS_MEGACORP_VENDOR);
         *(short *)(moby + 0x32) = 64;
-        if (D_001A7BB1) qcopy(tempVec, D_001AD1F0);
-        else qcopy(tempVec, D_001AD1E0);
-        tempVec[2] = -tempVec[2];
-        FastVecAdd(moby + 0x10, g_camera_eye_state, tempVec);
+        if (D_001A7BB1) qcopy(temp_vec, D_001AD1F0);
+        else qcopy(temp_vec, D_001AD1E0);
+        temp_vec[2] = -temp_vec[2];
+        FastVecAdd(moby + 0x10, g_camera_eye_state, temp_vec);
         vec_clear_128(moby + 0xF0);
         *(float *)(moby + 0xF8) = 3.1415927f;
         func_002A0F48(moby);
         g_vendor_menu_state.restore = 1;
         g_vendor_menu_state.field744 = 0;
         moby[0x20] = 3;
-        if (openArg == 0) {
+        if (open_arg == 0) {
             g_vendor_menu_state.field744 = 0;
             g_vendor_menu_state.mode = 0;
-        } else if (openArg == 1) {
+        } else if (open_arg == 1) {
             g_vendor_menu_state.mode = 1;
-        } else if (openArg == 2) {
+        } else if (open_arg == 2) {
             g_vendor_menu_state.mode = 2;
             g_vendor_menu_state.fieldBC = -1.5707964f;
             g_vendor_menu_state.fieldB4 = 0;
@@ -128,26 +128,26 @@ void OpenVendorMenu(char *moby)
         } else {
             g_vendor_menu_state.mode = 3;
         }
-    } else if (*(short *)(moby + 0xAA) == 11 /* Megacorp Vendor */) {
+    } else if (*(short *)(moby + 0xAA) == MOBY_CLASS_MEGACORP_VENDOR) {
         g_vendor_menu_state.field744 = 0;
-        npcAction = *(int *)(*(char **)(moby + 0x68) + 0x94);
-        if (npcAction == 0) {
+        npc_action = *(int *)(*(char **)(moby + 0x68) + 0x94);
+        if (npc_action == 0) {
             g_vendor_menu_state.mode = 0;
-        } else if (npcAction == 1) {
+        } else if (npc_action == 1) {
             g_vendor_menu_state.mode = 1;
             shop_run_menu_input();
-        } else if (npcAction == 4) {
+        } else if (npc_action == 4) {
             g_vendor_menu_state.mode = 2;
-        } else if (npcAction == 2) {
+        } else if (npc_action == 2) {
             g_vendor_menu_state.mode = 3;
-        } else if (npcAction == 3) {
+        } else if (npc_action == 3) {
             g_vendor_menu_state.field744 = 1;
             g_vendor_menu_state.mode = 0;
         }
     } else if (*(short *)(moby + 0xAA) == 0x1309 /* moby class 4873 */) {
         g_vendor_menu_state.moby = moby;
         g_vendor_menu_state.mode = 2;
-    } else if (*(short *)(moby + 0xAA) == 0xDDC /* Slim Cognito Button */) {
+    } else if (*(short *)(moby + 0xAA) == MOBY_CLASS_SLIM_COGNITO_BUTTON) {
         g_vendor_menu_state.moby = moby;
         g_vendor_menu_state.mode = 1;
         shop_run_menu_input();
@@ -216,9 +216,9 @@ void OpenVendorMenu(char *moby)
         FastVecAdd(g_vendor_menu_state.position, g_vendor_menu_state.position, g_vendor_menu_state.moby + 0x10);
         g_vendor_menu_state.rotation[2] = FastAddRotations(*(float *)(g_vendor_menu_state.moby + 0xF8), 3.1415927f);
         SetCamera5Pose(g_vendor_menu_state.position, g_vendor_menu_state.rotation, 1, 0, 0);
-        qcopy(tempVec, g_vendor_menu_state.position);
-        if (g_vendor_menu_state.mode == 2) tempVec[1] += 5.0f;
-        object_copy_vector_to_selected(tempVec);
+        qcopy(temp_vec, g_vendor_menu_state.position);
+        if (g_vendor_menu_state.mode == 2) temp_vec[1] += 5.0f;
+        object_copy_vector_to_selected(temp_vec);
         cam_set_state_rotation(g_vendor_menu_state.rotation);
         cam_update_state();
     }

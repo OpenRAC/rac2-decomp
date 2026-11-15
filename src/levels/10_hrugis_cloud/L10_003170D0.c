@@ -155,9 +155,9 @@ int hrugis_get_boss_difficulty(void) {
 /* Sets up the beam moby: starts it in state 1, always drawn, and scaled up from its class. */
 void hrugis_beam_init(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *heroInfo = (u8 *)func_0037BA88(moby);
+    u8 *hero_info = (u8 *)func_0037BA88(moby);
 
-    *(s32 *)(heroInfo + 0x148) = 2;
+    *(s32 *)(hero_info + 0x148) = 2;
     func_0037CCB0(moby, 1);
     *(f32 *)(vars + 0x180) = 2.0f;
     moby[0x20] = 1;
@@ -165,7 +165,7 @@ void hrugis_beam_init(u8 *moby) {
     *(u16 *)(moby + 0x32) = 0x1FF;
     *(u16 *)(moby + 0x34) = *(u16 *)(moby + 0x34) | 0x100;
     *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * 4.1f;
-    *(s32 *)(heroInfo + 0x14C) = 0;
+    *(s32 *)(hero_info + 0x14C) = 0;
     *(u16 *)(moby + 0x34) = *(u16 *)(moby + 0x34) & 0xEFFF;
 }
 
@@ -235,23 +235,23 @@ void hrugis_update_sway_speed(u8 *moby) {
 void hanging_object_update(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u32 state = moby[0x20];
-    s32 jointA, jointB, jointC;
-    u8 *heroInfo;
+    s32 joint_a, joint_b, joint_c;
+    u8 *hero_info;
 
     switch (state) {
     case 0:
         moby[0x20] = 1;
         /* fall through */
     case 1:
-        func_0032CBD0(*(u8 **)(vars + 0x10), &jointA, &jointB, &jointC);
-        func_0032CBA0(moby, jointA, jointB, jointC);
+        func_0032CBD0(*(u8 **)(vars + 0x10), &joint_a, &joint_b, &joint_c);
+        func_0032CBA0(moby, joint_a, joint_b, joint_c);
         break;
     default:
         return;
     }
     UpdateAttachedObjectTransform(moby);
-    heroInfo = (u8 *)func_0037BA88(*(u8 **)(vars + 0x10));
-    if (*(s32 *)(heroInfo + 0x120) != 0)
+    hero_info = (u8 *)func_0037BA88(*(u8 **)(vars + 0x10));
+    if (*(s32 *)(hero_info + 0x120) != 0)
         hanging_object_aim_joints(moby);
 }
 
@@ -365,61 +365,61 @@ void UpdateAttachedObjectTransform(u8 *moby)
    the target is too far away. */
 void hanging_object_aim_joints(u8 *moby) {
     u8 *state = *(u8 **)(moby + 0x68);
-    f32 xAxis[4] __attribute__((aligned(16)));
-    f32 yAxis[4] __attribute__((aligned(16)));
-    f32 zAxis[4] __attribute__((aligned(16)));
-    f32 quatA[4] __attribute__((aligned(16)));
-    f32 quatB[4] __attribute__((aligned(16)));
-    f32 matrixA[16] __attribute__((aligned(16)));
-    f32 matrixB[16] __attribute__((aligned(16)));
-    f32 aimDir[4] __attribute__((aligned(16)));
+    f32 x_axis[4] __attribute__((aligned(16)));
+    f32 y_axis[4] __attribute__((aligned(16)));
+    f32 z_axis[4] __attribute__((aligned(16)));
+    f32 quat_a[4] __attribute__((aligned(16)));
+    f32 quat_b[4] __attribute__((aligned(16)));
+    f32 matrix_a[16] __attribute__((aligned(16)));
+    f32 matrix_b[16] __attribute__((aligned(16)));
+    f32 aim_dir[4] __attribute__((aligned(16)));
     f32 temp[4] __attribute__((aligned(16)));
-    u8 *heroInfo;
-    u8 *manipA, *manipB;
-    f32 angle, dotValue;
-    *(TI128 *)xAxis = 0; *(TI128 *)yAxis = 0; *(TI128 *)zAxis = 0;
-    *(TI128 *)quatA = 0; *(TI128 *)quatB = 0;
-    xAxis[0]=1.0f; yAxis[2]=1.0f; zAxis[1]=1.0f; quatA[2]=1.0f; quatB[1]=1.0f;
-    heroInfo = (u8 *)moby_get_motion_data(*(u8 **)(state + 0x10));
+    u8 *hero_info;
+    u8 *manip_a, *manip_b;
+    f32 angle, dot_value;
+    *(TI128 *)x_axis = 0; *(TI128 *)y_axis = 0; *(TI128 *)z_axis = 0;
+    *(TI128 *)quat_a = 0; *(TI128 *)quat_b = 0;
+    x_axis[0]=1.0f; y_axis[2]=1.0f; z_axis[1]=1.0f; quat_a[2]=1.0f; quat_b[1]=1.0f;
+    hero_info = (u8 *)moby_get_motion_data(*(u8 **)(state + 0x10));
     if (*(s32 *)(state + 0x14)) {
-        manipA = *(u8 **)(*(u8 **)(state + 0x10) + 0x68) + 0x2F0;
-        manipB = *(u8 **)(*(u8 **)(state + 0x10) + 0x68) + 0x330;
+        manip_a = *(u8 **)(*(u8 **)(state + 0x10) + 0x68) + 0x2F0;
+        manip_b = *(u8 **)(*(u8 **)(state + 0x10) + 0x68) + 0x330;
     } else {
-        manipA = *(u8 **)(*(u8 **)(state + 0x10) + 0x68) + 0x370;
-        manipB = *(u8 **)(*(u8 **)(state + 0x10) + 0x68) + 0x3B0;
+        manip_a = *(u8 **)(*(u8 **)(state + 0x10) + 0x68) + 0x370;
+        manip_b = *(u8 **)(*(u8 **)(state + 0x10) + 0x68) + 0x3B0;
     }
-    matrix_mul_vec3(xAxis,xAxis,moby+0xC0);
-    matrix_mul_vec3(yAxis,yAxis,moby+0xC0);
-    matrix_mul_vec3(zAxis,zAxis,moby+0xC0);
-    moby_transform_joint_point(moby,0,matrixA);
-    moby_transform_joint_point(moby,1,matrixB);
-    if (fast_vec_dist(matrixA+12, *(u8 **)(heroInfo+0x120)+0x10) <= 24.0f)
-        qcopy(aimDir, state);
+    matrix_mul_vec3(x_axis,x_axis,moby+0xC0);
+    matrix_mul_vec3(y_axis,y_axis,moby+0xC0);
+    matrix_mul_vec3(z_axis,z_axis,moby+0xC0);
+    moby_transform_joint_point(moby,0,matrix_a);
+    moby_transform_joint_point(moby,1,matrix_b);
+    if (fast_vec_dist(matrix_a+12, *(u8 **)(hero_info+0x120)+0x10) <= 24.0f)
+        qcopy(aim_dir, state);
     else {
-        FastVecSub((u8 *)aimDir,D_L10_001B9680,(u8 *)(matrixA+12));
-        qcopy(state, aimDir);
+        FastVecSub((u8 *)aim_dir,D_L10_001B9680,(u8 *)(matrix_a+12));
+        qcopy(state, aim_dir);
     }
-    dotValue = FastVecDot(aimDir,yAxis);
-    FastVecScale((u8 *)temp,(u8 *)yAxis,dotValue);
-    FastVecSub((u8 *)aimDir,(u8 *)aimDir,(u8 *)temp);
-    vec_scale_to_length(aimDir,aimDir,1.0f);
-    angle = (1.57079637f-math_fast_angle_helper(FastVecDot(xAxis,aimDir)))*0.5f;
-    if (FastVecDot(aimDir,zAxis)>0.0f) angle=-angle;
-    FastVecScale(manipA+0x10,(u8 *)quatA,math_fast_sin_or_cos_b(angle));
-    *(f32 *)(manipA+0x1C)=math_fast_sin_or_cos_a(angle);
-    FastVecSub((u8 *)aimDir,D_L10_001B9680,(u8 *)(matrixB+12));
-    dotValue = FastVecDot(aimDir,yAxis);
-    FastVecScale((u8 *)temp,(u8 *)yAxis,dotValue);
-    FastVecSub((u8 *)aimDir,(u8 *)aimDir,(u8 *)temp);
-    vec_scale_to_length(aimDir,xAxis,FastVecLength(aimDir));
-    FastVecAdd((u8 *)aimDir,(u8 *)temp,(u8 *)aimDir);
-    vec_scale_to_length(aimDir,aimDir,1.0f);
-    dotValue=FastVecDot(aimDir,yAxis);
-    if(dotValue<=-0.3f) dotValue=-0.3f;
-    else if(dotValue>0.3f) dotValue=0.3f;
-    angle=(1.57079637f-math_fast_angle_helper(dotValue))*0.5f;
-    FastVecScale(manipB+0x10,(u8 *)quatB,-math_fast_sin_or_cos_b(angle));
-    *(f32 *)(manipB+0x1C)=math_fast_sin_or_cos_a(angle);
+    dot_value = FastVecDot(aim_dir,y_axis);
+    FastVecScale((u8 *)temp,(u8 *)y_axis,dot_value);
+    FastVecSub((u8 *)aim_dir,(u8 *)aim_dir,(u8 *)temp);
+    vec_scale_to_length(aim_dir,aim_dir,1.0f);
+    angle = (1.57079637f-math_fast_angle_helper(FastVecDot(x_axis,aim_dir)))*0.5f;
+    if (FastVecDot(aim_dir,z_axis)>0.0f) angle=-angle;
+    FastVecScale(manip_a+0x10,(u8 *)quat_a,math_fast_sin_or_cos_b(angle));
+    *(f32 *)(manip_a+0x1C)=math_fast_sin_or_cos_a(angle);
+    FastVecSub((u8 *)aim_dir,D_L10_001B9680,(u8 *)(matrix_b+12));
+    dot_value = FastVecDot(aim_dir,y_axis);
+    FastVecScale((u8 *)temp,(u8 *)y_axis,dot_value);
+    FastVecSub((u8 *)aim_dir,(u8 *)aim_dir,(u8 *)temp);
+    vec_scale_to_length(aim_dir,x_axis,FastVecLength(aim_dir));
+    FastVecAdd((u8 *)aim_dir,(u8 *)temp,(u8 *)aim_dir);
+    vec_scale_to_length(aim_dir,aim_dir,1.0f);
+    dot_value=FastVecDot(aim_dir,y_axis);
+    if(dot_value<=-0.3f) dot_value=-0.3f;
+    else if(dot_value>0.3f) dot_value=0.3f;
+    angle=(1.57079637f-math_fast_angle_helper(dot_value))*0.5f;
+    FastVecScale(manip_b+0x10,(u8 *)quat_b,-math_fast_sin_or_cos_b(angle));
+    *(f32 *)(manip_b+0x1C)=math_fast_sin_or_cos_a(angle);
 }
 
 /* Update step of the cloud object: the state byte at +0x20 picks the step (0 re-arms the
@@ -428,10 +428,10 @@ void hanging_object_aim_joints(u8 *moby) {
 void cloud_puff_update(u8 *moby) {
     u8 *self = moby;
     u8 *vars = *(u8 **)(self + 0x68);
-    u8 stateByte = self[0x20];
+    u8 state_byte = self[0x20];
     u8 *record;
 
-    switch (stateByte) {
+    switch (state_byte) {
     case 0:
         self[0x30] = 0xFF;
         if (state_get_stored_pointer_value() == 0)
@@ -456,9 +456,9 @@ void cloud_puff_update(u8 *moby) {
 /* Sets up the cloud puff: starts it in state 1, always drawn, and gives it a small size. */
 void cloud_puff_init(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *heroInfo = (u8 *)func_0037BA88(moby);
+    u8 *hero_info = (u8 *)func_0037BA88(moby);
 
-    *(s32 *)(heroInfo + 0x148) = 2;
+    *(s32 *)(hero_info + 0x148) = 2;
     func_0037CCB0(moby, 1);
     *(s32 *)(vars + 0x268) = -1;
     *(f32 *)(vars + 0x180) = 2.0f;
@@ -476,13 +476,13 @@ void cloud_puff_init(u8 *moby) {
 /* Stops the object's sound effect if it is still playing, and forgets it. */
 void snd_stop_moby_effect(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
-    s32 effectId = *(s32 *)(vars + 0x26C);
+    s32 effect_id = *(s32 *)(vars + 0x26C);
 
-    if (effectId != -1) {
-        u8 *record = D_L10_00188660 + effectId * 0x70;
+    if (effect_id != -1) {
+        u8 *record = D_L10_00188660 + effect_id * 0x70;
 
         if (*(u8 **)(record + 0x88) == moby && *(u8 *)(record + 0x74) != 0)
-            func_00373410(effectId);
+            func_00373410(effect_id);
     }
     *(s32 *)(vars + 0x26C) = -1;
 }
@@ -497,7 +497,7 @@ extern u8 *D_001B2614 __attribute__((sda));
 void hrugis_init_flying_piece(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *spot;
-    f32 distance, angleA, angleB;
+    f32 distance, angle_a, angle_b;
 
     moby[0x20] = 1;
     *(u16 *)(moby + 0x34) |= 0x100;
@@ -509,9 +509,9 @@ void hrugis_init_flying_piece(u8 *moby) {
     *(s32 *)(vars + 0x268) = 0;
     *(f32 *)(moby + 0x2C) = 0.04f;
     distance = math_random_float_range(0.0f, *(f32 *)spot);
-    angleA = math_random_angle();
-    angleB = math_random_angle();
-    vec_build_spherical_offset(moby + 0x10, distance, angleA, angleB);
+    angle_a = math_random_angle();
+    angle_b = math_random_angle();
+    vec_build_spherical_offset(moby + 0x10, distance, angle_a, angle_b);
     FastVecAdd(moby + 0x10, spot + 0x30, moby + 0x10);
 }
 
@@ -519,9 +519,9 @@ void hrugis_init_flying_piece(u8 *moby) {
    object is inactive */
 void hrugis_start_timed_effect(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *heroInfo = (u8 *)func_0037BA88(moby);
-    if (heroInfo == 0) return;
-    if (*(s32 *)(heroInfo + 0x120) == 0) return;
+    u8 *hero_info = (u8 *)func_0037BA88(moby);
+    if (hero_info == 0) return;
+    if (*(s32 *)(hero_info + 0x120) == 0) return;
     if (*(s32 *)(vars + 0x268) != 0) return;
     func_0037BD88(moby, 0x60000080, 1, 0, 0, -1, 0, 0.8f, 2.0f, 1.0f, 1.3f);
     if (func_003351C0(3) != 0) {
@@ -537,18 +537,18 @@ extern u8 *D_001B251C_base[] __asm__("D_001B251C") __attribute__((sda));
 /* Sets every moby in the group to state 2. */
 void hrugis_set_group_states(u8 *group)
 {
-    u32 idList = D_L10_001FB1E0[group[0x21]];
-    s16 *idPtr;
+    u32 id_list = D_L10_001FB1E0[group[0x21]];
+    s16 *id_ptr;
     u8 *member;
 
-    if (idList == 0) {
+    if (id_list == 0) {
         return;
     }
-    idPtr = (s16 *)idList;
+    id_ptr = (s16 *)id_list;
     do {
-        member = D_001B251C_base[0] + (((*(u16 *)idPtr & 0x7FFF) << 8));
+        member = D_001B251C_base[0] + (((*(u16 *)id_ptr & 0x7FFF) << 8));
         *(member + 0x20) = 2;
-    } while (*idPtr++ >= 0);
+    } while (*id_ptr++ >= 0);
 }
 
 /* Does nothing. */
@@ -580,7 +580,7 @@ extern s32 g_current_map_index[] __attribute__((sda));
 void pulsing_l10_light_update(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     f32 phase;
-    u8 *heroInfo;
+    u8 *hero_info;
     s32 level;
 
     switch (moby[0x20]) {
@@ -595,9 +595,9 @@ void pulsing_l10_light_update(u8 *moby) {
         }
         break;
     case 1:
-        heroInfo = func_0037BA88(moby);
+        hero_info = func_0037BA88(moby);
         level = g_current_map_index[0];
-        *(s32 *)((u8 *)heroInfo + 0x14C) = 0;
+        *(s32 *)((u8 *)hero_info + 0x14C) = 0;
         if (level == 10 && func_L10_00423780() == 2) {
             *(u16 *)(moby + 0x34) |= 0x1000;
         } else {
@@ -614,11 +614,11 @@ void pulsing_l10_light_update(u8 *moby) {
 /* Sets up the pulsing light: starts it in state 1, always drawn, and scaled from its class. */
 void pulsing_light_init(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *heroInfo = (u8 *)func_0037BA88(moby);
+    u8 *hero_info = (u8 *)func_0037BA88(moby);
 
-    *(s32 *)(heroInfo + 0x148) = 1;
+    *(s32 *)(hero_info + 0x148) = 1;
     func_0037CCB0(moby, 1);
-    *(s32 *)(heroInfo + 0x14C) = 0;
+    *(s32 *)(hero_info + 0x14C) = 0;
     *(f32 *)(vars + 0x180) = 1.0f;
     moby[0x30] = 0xFF;
     moby[0x20] = 1;

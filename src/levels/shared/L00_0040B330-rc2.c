@@ -32,11 +32,11 @@ extern s8 ref_L00_0040B330_04[];
 
 /* Starts an animation on the object, picked from a table by a number in its private data. */
 void moby_start_animation_from_table(void *moby) {
-    s8 animBuf[0x10];
+    s8 anim_buf[0x10];
     s8 *vars;
 
     vars = *(s8 **)((s8 *)moby + 0x68);
-    ref_L00_0040B330_00(moby, animBuf);
-    ref_L00_0040B330_01(animBuf, ref_L00_0040B330_03);
-    ref_L00_0040B330_02(animBuf, (*(s32 *)(vars + 0x2C) << 6) + (s32)ref_L00_0040B330_04, 0.0f, ref_L00_0040B330_03, 4, 0.25f);
+    ref_L00_0040B330_00(moby, anim_buf);
+    ref_L00_0040B330_01(anim_buf, ref_L00_0040B330_03);
+    ref_L00_0040B330_02(anim_buf, (*(s32 *)(vars + 0x2C) << 6) + (s32)ref_L00_0040B330_04, 0.0f, ref_L00_0040B330_03, 4, 0.25f);
 }

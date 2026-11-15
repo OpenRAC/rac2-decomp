@@ -32,50 +32,50 @@ extern void vec_clear_128(void *a);
 /* Sets up the follow camera from the hero's position and facing. It starts the camera just behind the hero. */
 void cam_follow_init_from_hero(CameraInitPrefix *camera)
 {
-    char *cameraState;
+    char *camera_state;
     char *transform;
-    char *nearPoint;
-    char *farPoint;
+    char *near_point;
+    char *far_point;
     char *movement;
     char *hero;
-    char *workPtr;
-    char *heroPosition;
-    V4_F0fba48d3 *quadDest;
-    char backDirection[16];
-    char offsetBuf[16];
+    char *work_ptr;
+    char *hero_position;
+    V4_F0fba48d3 *quad_dest;
+    char back_direction[16];
+    char offset_buf[16];
 
     if (camera->id != 0)
         return;
 
     hero = (char *)g_hero_state + 0x2C0;
-    workPtr = camera->state;
-    movement = workPtr + 0x160;
-    transform = workPtr + 0x60;
-    cameraState = workPtr;
-    workPtr = backDirection;
+    work_ptr = camera->state;
+    movement = work_ptr + 0x160;
+    transform = work_ptr + 0x60;
+    camera_state = work_ptr;
+    work_ptr = back_direction;
 
-    FastVecScale(workPtr, hero, -1.0f);
+    FastVecScale(work_ptr, hero, -1.0f);
     /* The hero's position, 0x240 below the facing direction the call above uses. */
-    heroPosition = hero - 0x240;
-    *(V4_F0fba48d3 *)transform = *(V4_F0fba48d3 *)heroPosition;
-    quadDest = (V4_F0fba48d3 *)(cameraState + 0xC0);
-    *quadDest = *(V4_F0fba48d3 *)transform;
-    nearPoint = cameraState + 0xB0;
-    farPoint = cameraState + 0xF0;
-    FastVecScale(cameraState + 0x70, backDirection, func_00282DB0_1(transform, backDirection));
-    vec_clear_128(cameraState + 0xD0);
-    vec_clear_128(cameraState + 0xE0);
-    vec_clear_128(cameraState + 0x100);
-    FastVecScale(offsetBuf, backDirection, *(float *)(movement + 0x30));
-    FastVecAdd(nearPoint, offsetBuf, transform);
-    FastVecScale(offsetBuf, backDirection, *(float *)(transform + 0xB0));
-    FastVecAdd(farPoint, offsetBuf, transform);
-    quadDest = (V4_F0fba48d3 *)(cameraState + 0xA0);
-    *quadDest = *(V4_F0fba48d3 *)farPoint;
-    func_00282CF0_2(movement, (char *)camera + 0x30, nearPoint);
-    quadDest = (V4_F0fba48d3 *)(cameraState + 0x170);
-    *quadDest = *(V4_F0fba48d3 *)movement;
-    *(V4_F0fba48d3 *)cameraState = *(V4_F0fba48d3 *)((char *)camera + 0x30);
-    FastVecAdd(cameraState + 0x210, nearPoint, movement);
-    *(int *)(cameraState + 0x240) = 0;
+    hero_position = hero - 0x240;
+    *(V4_F0fba48d3 *)transform = *(V4_F0fba48d3 *)hero_position;
+    quad_dest = (V4_F0fba48d3 *)(camera_state + 0xC0);
+    *quad_dest = *(V4_F0fba48d3 *)transform;
+    near_point = camera_state + 0xB0;
+    far_point = camera_state + 0xF0;
+    FastVecScale(camera_state + 0x70, back_direction, func_00282DB0_1(transform, back_direction));
+    vec_clear_128(camera_state + 0xD0);
+    vec_clear_128(camera_state + 0xE0);
+    vec_clear_128(camera_state + 0x100);
+    FastVecScale(offset_buf, back_direction, *(float *)(movement + 0x30));
+    FastVecAdd(near_point, offset_buf, transform);
+    FastVecScale(offset_buf, back_direction, *(float *)(transform + 0xB0));
+    FastVecAdd(far_point, offset_buf, transform);
+    quad_dest = (V4_F0fba48d3 *)(camera_state + 0xA0);
+    *quad_dest = *(V4_F0fba48d3 *)far_point;
+    func_00282CF0_2(movement, (char *)camera + 0x30, near_point);
+    quad_dest = (V4_F0fba48d3 *)(camera_state + 0x170);
+    *quad_dest = *(V4_F0fba48d3 *)movement;
+    *(V4_F0fba48d3 *)camera_state = *(V4_F0fba48d3 *)((char *)camera + 0x30);
+    FastVecAdd(camera_state + 0x210, near_point, movement);
+    *(int *)(camera_state + 0x240) = 0;
 }

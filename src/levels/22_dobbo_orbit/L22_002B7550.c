@@ -79,11 +79,11 @@ extern void vec_clear_128(void *);
 extern void FastVecAdd(void *, void *, void *);
 
 /* Called when the hero touches a hazard object. Checks whether the hit counts, then knocks the hero back or hurts them, depending on the hero's state. */
-s32 hero_l22_apply_hazard_contact(s32 applyPush) {
+s32 hero_l22_apply_hazard_contact(s32 apply_push) {
     TI16 push;
     Entry_002B7550 *entry;
     u8 *moby;
-    u8 *otherMoby;
+    u8 *other_moby;
     s32 flag;
     s32 bits;
 
@@ -133,7 +133,7 @@ s32 hero_l22_apply_hazard_contact(s32 applyPush) {
             g_hero_state.f1874 = 0;
         }
     }
-    if (applyPush == 0) {
+    if (apply_push == 0) {
         return 1;
     }
     flag = 0;
@@ -150,17 +150,17 @@ s32 hero_l22_apply_hazard_contact(s32 applyPush) {
     }
     switch (g_hero_state.f22B4) {
     case 0:
-        otherMoby = g_hero_state.f249C;
-        if (otherMoby != 0 && (*(s16 *)(otherMoby + 0xAA) == 0x4EB /* moby class 1259 */ || *(s16 *)(otherMoby + 0xAA) == 0x558 /* moby class 1368 */)) {
+        other_moby = g_hero_state.f249C;
+        if (other_moby != 0 && (*(s16 *)(other_moby + 0xAA) == 0x4EB /* moby class 1259 */ || *(s16 *)(other_moby + 0xAA) == 0x558 /* moby class 1368 */)) {
             hero_l22_set_action(0x7D, 1);
             return 1;
         }
         if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
             && !(entry->f24 & 8)) {
-            u8 *weaponMoby = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
+            u8 *weapon_moby = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
 
-            if (weaponMoby != 0) {
-                AdjustPlayerHealth(FloatToInt(*(float *)(weaponMoby + 0x2C)));
+            if (weapon_moby != 0) {
+                AdjustPlayerHealth(FloatToInt(*(float *)(weapon_moby + 0x2C)));
             }
             if (g_hero_state.f24CC == 0) {
                 hero_l22_set_action(0x16, 1);

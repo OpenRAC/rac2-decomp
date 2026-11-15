@@ -97,16 +97,16 @@ void trigger_pickup_update(Thing *moby)
         missing = 1;
         if (D_L15_002B6840[g_current_map_index] != 0 && D_L15_002B6840[g_current_map_index][vars->idx] != 0) {
             for (i = 0; D_L15_002B6840[g_current_map_index][vars->idx][i] != -1; i++) {
-                int entryId = D_L15_002B6840[g_current_map_index][vars->idx][i];
+                int entry_id = D_L15_002B6840[g_current_map_index][vars->idx][i];
 
                 missing = 0;
                 if (vars->tail.b.quiet == 0) {
-                    int bit = 1 << (entryId & 0x1F);
-                    if (D_00139768[(unsigned int)entryId >> 2] & bit)
+                    int bit = 1 << (entry_id & 0x1F);
+                    if (D_00139768[(unsigned int)entry_id >> 2] & bit)
                         continue;
                 }
-                if (req_push_queue(D_L15_001BF9C0, entryId) == 0 && i == 0) {
-                    STUB_printf(D_L15_002BBCB0, moby->id, moby->oclass, g_current_map_index, vars->idx, entryId);
+                if (req_push_queue(D_L15_001BF9C0, entry_id) == 0 && i == 0) {
+                    STUB_printf(D_L15_002BBCB0, moby->id, moby->oclass, g_current_map_index, vars->idx, entry_id);
                     return;
                 }
                 fail = 0;
@@ -134,8 +134,8 @@ void trigger_pickup_update(Thing *moby)
     case 3:
         if (game_is_either_mode_two() == 0) {
             if (vars->link != -1) {
-                char *linkObj = D_L15_001B270C + (vars->link << 7);
-                hero_reset_position_and_direction(linkObj + 0x30, linkObj + 0x70, 0, 1);
+                char *link_obj = D_L15_001B270C + (vars->link << 7);
+                hero_reset_position_and_direction(link_obj + 0x30, link_obj + 0x70, 0, 1);
             }
             moby_set_state(moby, 4, -1);
         }
@@ -158,8 +158,8 @@ void trigger_pickup_update(Thing *moby)
         }
         if (vars->count != 0 && (vars->tail.word & 0xFFFF0000)) {
             if (vars->link != -1) {
-                char *linkObj = D_L15_001B270C + (vars->link << 7);
-                level_capture_checkpoint_state(linkObj + 0x30, linkObj + 0x70);
+                char *link_obj = D_L15_001B270C + (vars->link << 7);
+                level_capture_checkpoint_state(link_obj + 0x30, link_obj + 0x70);
             } else
                 level_capture_checkpoint_state(moby->pos, moby->dir);
         }
@@ -182,8 +182,8 @@ void trigger_pickup_update(Thing *moby)
         }
         if (vars->count > 0 && (vars->tail.word & 0xFFFF0000)) {
             if (vars->link != -1) {
-                char *linkObj = D_L15_001B270C + (vars->link << 7);
-                level_capture_checkpoint_state(linkObj + 0x30, linkObj + 0x70);
+                char *link_obj = D_L15_001B270C + (vars->link << 7);
+                level_capture_checkpoint_state(link_obj + 0x30, link_obj + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
         }

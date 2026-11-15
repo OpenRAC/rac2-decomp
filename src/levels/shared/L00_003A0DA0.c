@@ -11,7 +11,7 @@ extern void func_002A0F48(void *);
 char *part_create_explosion(int value,Quad *position,Quad *velocity,int timer,
  unsigned char red,unsigned char green,unsigned char blue,unsigned char flags,float scale)
 {
-    char *object=CreateMoby(1192 /* Explosion Effect */);
+    char *object=CreateMoby(MOBY_CLASS_EXPLOSION_EFFECT);
     char *state;
     /* Two adjacent complete vectors occupy retail stack offsets 0 and 0x10. */
     struct {

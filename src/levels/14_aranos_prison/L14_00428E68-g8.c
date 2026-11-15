@@ -52,7 +52,7 @@ void climbing_enemy_update(char *self)
 {
     char *vars = *(char **)(self + 0x68);
     int result, i;
-    float angle, animTime;
+    float angle, anim_time;
     union {
         int choices[4];
         float pos[4];
@@ -163,13 +163,13 @@ void climbing_enemy_update(char *self)
     case 5:
         if (flag_set_first_pending(self) && B(self, 0x43) != 16)
             anim_start_blended(self, 16, 7, 7);
-        animTime = moby_get_anim_value(self);
-        if (animTime < 19.0f) {
+        anim_time = moby_get_anim_value(self);
+        if (anim_time < 19.0f) {
             angle = mat_fast_helper_a(F(vars, 0x210) - F(self, 0x10),
                                  F(vars, 0x214) - F(self, 0x14));
             moby_start_effect_from_entry(self, angle);
             W(vars, 0x320) = 1;
-        } else if (animTime <= 22.0f && W(vars, 0x320)) {
+        } else if (anim_time <= 22.0f && W(vars, 0x320)) {
             coll_sweep_from_object(self, *(char **)(vars + 0x300) + 0x10,
                           0.57f, 2.0f, 1, 1.5f, 0, 1, 0);
             coll_sweep_from_object(self, *(char **)(vars + 0x304) + 0x10,
@@ -177,7 +177,7 @@ void climbing_enemy_update(char *self)
             moby_transform_joint_to_world(self, 6, scratch.pos);
             result = coll_sweep_from_object(self, scratch.pos, 0.57f, 2.0f, 1, 2.0f, 0, 1, 0);
             for (i = 0; i < result; i++)
-                if (*(short *)(D_L14_001C39C0[i] + 0xAA) == 2404 /* Gadgebot */)
+                if (*(short *)(D_L14_001C39C0[i] + 0xAA) == MOBY_CLASS_GADGEBOT)
                     W(vars, 0x320) = 0;
         }
         break;

@@ -31,16 +31,16 @@ void spark_l13_burst_update(u8 *moby) {
         moby[0xA8] = 0xFF;
         break;
     case 2: {
-        f32 burstPos[4];
+        f32 burst_pos[4];
         part_explode_object_into_pieces(moby, &D_L13_001AEBD0, &D_L13_001AEBC8, &D_L13_001AEBC0,
                     0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
         {
             f32 first = D_L13_001AEBF8;
             f32 x = D_L13_001AEBF0;
             f32 second = D_L13_001AEBF4;
-            moby_compute_local_point(moby, burstPos, x, second, first);
+            moby_compute_local_point(moby, burst_pos, x, second, first);
         }
-        SpawnExplosion(burstPos, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0, 0.3f, 20.0f);
+        SpawnExplosion(burst_pos, 0, 0x19, 0x14, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0, 0.3f, 20.0f);
         moby_mark_spawned(moby);
         break;
     }

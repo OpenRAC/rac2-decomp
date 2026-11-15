@@ -41,26 +41,26 @@ extern void FastVecAdd(void *, void *, void *);
 
 /* Sets up 50 pairs of glowing sprites (one reddish, one red) along a trail that drifts toward the player's aim point. */
 void part_init_trail_sparkle_pairs(void) {
-    s8 zeroVec[16];
+    s8 zero_vec[16];
     s8 drift[16];
     s32 index;
     s32 alpha;
     s8 *point;
     s8 *sprite;
     s8 *hero;
-    f32 redSize;
+    f32 red_size;
 
     index = 0;
-    vec_clear_128(zeroVec);
+    vec_clear_128(zero_vec);
     do {
         alpha = math_random_int_range(0, 0x6F) << 24;
         point = D_002359E0 + index * 16;
-        sprite = part_spawn_ground_effect(point, 0xC, alpha | 0x7F2020, 0, 1, zeroVec, 0, D_001B0594 * 0.5f, D_001B0594, 0.0f);
+        sprite = part_spawn_ground_effect(point, 0xC, alpha | 0x7F2020, 0, 1, zero_vec, 0, D_001B0594 * 0.5f, D_001B0594, 0.0f);
         if (sprite != NULL) {
             *(s8 *)(sprite + 9) = (s8)(FloatToInt(4.0f) + 0x70);
         }
-        redSize = D_001B0598;
-        sprite = part_spawn_ground_effect(point, 0xC, alpha | 0xFF4040, 1, 1, zeroVec, 0, redSize * 0.5f, redSize, 0.0f);
+        red_size = D_001B0598;
+        sprite = part_spawn_ground_effect(point, 0xC, alpha | 0xFF4040, 1, 1, zero_vec, 0, red_size * 0.5f, red_size, 0.0f);
         if (sprite != NULL) {
             *(s8 *)(sprite + 9) = (s8)(FloatToInt(4.0f) + 0x70);
         }

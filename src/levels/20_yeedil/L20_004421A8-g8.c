@@ -71,9 +71,9 @@ void yeedil_boss_update_grab(char *obj) {
     coll_sweep_from_object(obj, &pos, 0x10000, 5.5f, 50.0f, 2.0f, 0, 1, 0);
     other = *(char **)(state + 0xD4);
     if (other) {
-        if (*(short *)(other + 0xAA) == 0x1366 /* Miniturret */) {
+        if (*(short *)(other + 0xAA) == MOBY_CLASS_MINITURRET) {
             moby_raise_state_to_eight(other);
-        } else if (*(short *)(other + 0xAA) == 0x1367 /* Megaturret */) {
+        } else if (*(short *)(other + 0xAA) == MOBY_CLASS_MEGATURRET) {
             moby_raise_state_to_eight_copy(other);
         }
     }

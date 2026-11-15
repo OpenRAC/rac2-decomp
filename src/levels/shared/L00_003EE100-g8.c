@@ -14,12 +14,12 @@ unsigned char *health_drain_slots_create(int unused)
     unsigned char *moby = CreateMoby(0xD04 /* moby class 3332 */);
 
     if (moby != 0) {
-        unsigned int initValue = 0xFF;
+        unsigned int init_value = 0xFF;
 
         D_L00_001B0A20 = moby;
-        *(unsigned short *)(moby + 0x32) = initValue;
+        *(unsigned short *)(moby + 0x32) = init_value;
         moby[0x20] = 1;
-        moby[0x30] = initValue;
+        moby[0x30] = init_value;
     }
     return moby;
 }
@@ -53,7 +53,7 @@ int vaporizer_update_joint_chain(char *moby)
     float value;
 
     state = *(char **)(moby + 0x68);
-    table = level_get_slot_body(0xC04 /* Vaporizer */, *(short *)(state + 0x1A));
+    table = level_get_slot_body(MOBY_CLASS_VAPORIZER, *(short *)(state + 0x1A));
     index = *(short *)(state + 0x18);
     base = *(char **)(table + index * 4);
     count = *(short *)(state + 0x20);
@@ -380,7 +380,7 @@ void hero_lightning_burst_update(char *object)
                     req = &request;
                     if ((*(unsigned long long *)(*hit + 0x30) & 0x500000000000ULL) != 0 &&
                         *hit != ((Hero *)g_hero_state)->ptr[0x2290 / 4] && *(short *)(*hit + 0xaa) != 0xce7 /* moby class 3303 */ &&
-                        *(short *)(*hit + 0xaa) != 0xbb8 /* Space Tourist */) {
+                        *(short *)(*hit + 0xaa) != MOBY_CLASS_SPACE_TOURIST) {
                         FastVecSub(&point, (Vector *)(*hit + 0x10), (Vector *)&((Hero *)g_hero_state)->b[0xE0]);
                         vec_scale_to_length(&point, &point, 1.0f);
                         /* The incoming request impulse is not initialized in retail. */

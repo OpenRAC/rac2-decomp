@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef int V1306TI __attribute__((mode(TI)));
@@ -217,9 +218,9 @@ void moby_update_level_objects(void)
                     object->field64(object);
                     if ((object->field34 & 4) == 0)
                         func_002A0F48(object);
-                } else if (id == 0xCB2 /* Synthenoid */ || id == 0xB02 /* Kilonoid */
+                } else if (id == MOBY_CLASS_SYNTHENOID || id == MOBY_CLASS_KILONOID
                            || id == 0x259 /* moby class 601 */
-                           || id == 0xA5C /* Shield Charger */ || id == 0x1192 /* Tesla Barrier */) {
+                           || id == MOBY_CLASS_SHIELD_CHARGER || id == MOBY_CLASS_TESLA_BARRIER) {
                     func_002A05A8((char *)object);
                     func_002A0F48(object);
                 }

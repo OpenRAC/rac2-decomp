@@ -20,9 +20,9 @@ extern void vec_clear_128(float *);
 extern void matrix_mul_vec3(float *, float *, float *);
 extern void lerp_vector(float *, float *, float *, float);
 
-int SegmentCrossPolyline(int pathIndex, float *start, float *end, float *hitPoint)
+int SegmentCrossPolyline(int path_index, float *start, float *end, float *hit_point)
 {
-    float direction[4], sideways[4], upAxis[4], startLocal[4], endLocal[4];
+    float direction[4], sideways[4], up_axis[4], start_local[4], end_local[4];
     float best;
     float zero;
     int found = 0;
@@ -37,23 +37,23 @@ int SegmentCrossPolyline(int pathIndex, float *start, float *end, float *hitPoin
     vec_clear_128(sideways);
     sideways[0] = direction[1];
     sideways[1] = -direction[0];
-    vec_clear_128(upAxis);
-    upAxis[2] = 1.0f;
+    vec_clear_128(up_axis);
+    up_axis[2] = 1.0f;
     best = 1.0f;
-    FastVecSub(startLocal, (float *)((char *)g_path_table[pathIndex] + 0x10), start);
-    matrix_mul_vec3(startLocal, startLocal, direction);
-    older = startLocal;
-    newer = endLocal;
-    if (i < g_path_table[pathIndex]->count) {
+    FastVecSub(start_local, (float *)((char *)g_path_table[path_index] + 0x10), start);
+    matrix_mul_vec3(start_local, start_local, direction);
+    older = start_local;
+    newer = end_local;
+    if (i < g_path_table[path_index]->count) {
         offset = 0x20;
         zero = 0.0f;
         do {
-            FastVecSub(newer, (float *)((char *)g_path_table[pathIndex] + offset), start);
+            FastVecSub(newer, (float *)((char *)g_path_table[path_index] + offset), start);
             matrix_mul_vec3(newer, newer, direction);
-            if (startLocal[3] != zero || endLocal[3] != zero) {
-                if (endLocal[1] * startLocal[1] < 0.0f) {
-                    float ratio = (startLocal[0] - endLocal[0]) / (startLocal[1] - endLocal[1]);
-                    float along = ratio * -endLocal[1] + endLocal[0];
+            if (start_local[3] != zero || end_local[3] != zero) {
+                if (end_local[1] * start_local[1] < 0.0f) {
+                    float ratio = (start_local[0] - end_local[0]) / (start_local[1] - end_local[1]);
+                    float along = ratio * -end_local[1] + end_local[0];
                     if (along > 0.0f && along < best) {
                         best = along;
                         found = 1;
@@ -66,8 +66,8 @@ int SegmentCrossPolyline(int pathIndex, float *start, float *end, float *hitPoin
         next:
             i++;
             offset += 0x10;
-        } while (i < g_path_table[pathIndex]->count);
+        } while (i < g_path_table[path_index]->count);
     }
-    lerp_vector(hitPoint, start, end, best);
+    lerp_vector(hit_point, start, end, best);
     return found;
 }

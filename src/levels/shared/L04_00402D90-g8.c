@@ -191,14 +191,14 @@ void racer_update_item_use(unsigned char *racer)
  if((g_race_challenge_table[g_current_race_index].flags&1) && racerState->triggerList!=-1) {
   GetFirstMobyInGroup(&target,racerState->triggerList,0,0);
   while(target) {
-   if(H(target,0xaa)==0xab8 /* Hoverbike Race Item Box */) {
+   if(H(target,0xaa)==MOBY_CLASS_HOVERBIKE_RACE_ITEM_BOX) {
     boxVars=P(target,0x68);FastVecSub(delta,target+16,racer+16);
     if(!I(boxVars,0) && func_L00_002EE290(delta)<1) {
      choice=racerState->state;state=choice;
      if(I(boxVars,4)==-1) do {choice=math_random_int_range(1,4);} while(state==choice && I(boxVars,4)==-1);
      if(choice==4) {racerState->alternate=1;racerState->alternateTimer=choices.v[4];}
      else {int duration; racerState->state=choice;duration=choices.v[choice];racerState->timer=0;racerState->duration=duration;}
-     if(racer[0x20]!=3)snd_play_from_class_bank(0,0,racer,0xab8 /* Hoverbike Race Item Box */);
+     if(racer[0x20]!=3)snd_play_from_class_bank(0,0,racer,MOBY_CLASS_HOVERBIKE_RACE_ITEM_BOX);
      part_l04_spawn_burst(target+16,racerState->offset,8,0);I(boxVars,0)=300;
     }
    }

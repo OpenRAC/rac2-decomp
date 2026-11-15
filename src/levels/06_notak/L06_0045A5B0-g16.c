@@ -73,17 +73,17 @@ extern int group_is_member_in_state_range(void *, int, int);
 /* Updates a Notak walking creature: it wanders, chases the player when it spots them, grabs and carries them, and removes itself if it leaves the map. */
 void UpdateMoby4070(u8 *self) {
     Hit hit;
-    Vector vecHead, vecDelta, vecTmp1, vecTmp2, vecPrevPos, vecTarget;
+    Vector vec_head, vec_delta, vec_tmp1, vec_tmp2, vec_prev_pos, vec_target;
     u8 *vars;
-    u8 *pathData;
-    float *unusedPtr;
-    u8 *selfPosA, *selfPosB, *selfPosC, *velA, *velB, *velC, *velD, *velE;
-    int rayHit, timerExpired, closeEnough, tableIdx;
-    u8 nextAnim, nextState;
-    u8 oldMode;
-    int curIndex;
-    int newMode;
-    float floatA, floatB, floatC;
+    u8 *path_data;
+    float *unused_ptr;
+    u8 *self_pos_a, *self_pos_b, *self_pos_c, *vel_a, *vel_b, *vel_c, *vel_d, *vel_e;
+    int ray_hit, timer_expired, close_enough, table_idx;
+    u8 next_anim, next_state;
+    u8 old_mode;
+    int cur_index;
+    int new_mode;
+    float float_a, float_b, float_c;
 
     if (self != NULL && (vars = *(u8 **)(self + 0x68)) != NULL) {
         part_update_attached_scale(self, 0, vars + 0x140, 2.20000005f);
@@ -98,13 +98,13 @@ void UpdateMoby4070(u8 *self) {
         moby_find_nearest_target(self, &hit, 30.0f);
         moby_update_empty_alt(self, vars, vars + 0x20);
         gfx_update_color_fade(self, vars + 0x50);
-        timerExpired = math_fast_float_d(vars + 0x124) != 0;
+        timer_expired = math_fast_float_d(vars + 0x124) != 0;
         if (W(vars, 0x100) != 0 && B(self, 0x20) >= 7) {
-            pathData = *(u8 **)(vars + 0x138);
-            rayHit = point_in_path_xy(&hit, pathData + 0x10, *(int *)pathData) != 0;
+            path_data = *(u8 **)(vars + 0x138);
+            ray_hit = point_in_path_xy(&hit, path_data + 0x10, *(int *)path_data) != 0;
         } else {
-            pathData = *(u8 **)(vars + 0x138);
-            rayHit = point_in_path_xy(g_hero_position, pathData + 0x10, *(int *)pathData) != 0;
+            path_data = *(u8 **)(vars + 0x138);
+            ray_hit = point_in_path_xy(g_hero_position, path_data + 0x10, *(int *)path_data) != 0;
             if (vec_distance_xy(self + 0x10, g_hero_position) < 30.0f) {
                 hit.obj = *(void **)(g_hero_position + 0x2210);
                 qcopy(&hit.pos, g_hero_position);
@@ -122,57 +122,57 @@ void UpdateMoby4070(u8 *self) {
             }
         }
         if (W(vars, 0x100) != 0) {
-            pathData = *(u8 **)(vars + 0x118);
-            point_in_path_xy(self + 0x10, pathData + 0x10, *(int *)pathData);
+            path_data = *(u8 **)(vars + 0x118);
+            point_in_path_xy(self + 0x10, path_data + 0x10, *(int *)path_data);
         }
-        oldMode = B(self, 0xBC);
-        nextState = 0xFF;
-        newMode = actor_classify_headroom(self, vars);
-        nextAnim = 0xFF;
-        B(self, 0xBC) = newMode;
-        if (oldMode != (u8)newMode) {
-            tableIdx = (u8)newMode + oldMode * 3;
-            nextState = D_L06_001B1970[tableIdx];
-            nextAnim = D_L06_001B1980[tableIdx];
+        old_mode = B(self, 0xBC);
+        next_state = 0xFF;
+        new_mode = actor_classify_headroom(self, vars);
+        next_anim = 0xFF;
+        B(self, 0xBC) = new_mode;
+        if (old_mode != (u8)new_mode) {
+            table_idx = (u8)new_mode + old_mode * 3;
+            next_state = D_L06_001B1970[table_idx];
+            next_anim = D_L06_001B1980[table_idx];
         }
-        moby_transform_joint_to_world(self, 0, vecHead.f);
-        if (coll_test_point(vecHead.f, 1, self, 0.800000012f) != 0 && GetCollHitMaterial() == 0) {
-            floatA = **(float **)(vars + 0x11C);
-            floatA -= F(vars, 0x120);
-            floatA *= 0.5f;
-            if (floatA < math_fabs(F(self, 0x18) - vecHead.f[2])) {
-                floatA = (**(float **)(vars + 0x11C) - F(vars, 0x120)) * 0.5f;
+        moby_transform_joint_to_world(self, 0, vec_head.f);
+        if (coll_test_point(vec_head.f, 1, self, 0.800000012f) != 0 && GetCollHitMaterial() == 0) {
+            float_a = **(float **)(vars + 0x11C);
+            float_a -= F(vars, 0x120);
+            float_a *= 0.5f;
+            if (float_a < math_fabs(F(self, 0x18) - vec_head.f[2])) {
+                float_a = (**(float **)(vars + 0x11C) - F(vars, 0x120)) * 0.5f;
             } else {
-                floatA = math_fabs(F(self, 0x18) - vecHead.f[2]);
+                float_a = math_fabs(F(self, 0x18) - vec_head.f[2]);
             }
             if (F(vars, 0xC8) < 0.0f) {
-                floatA = -floatA;
+                float_a = -float_a;
             }
             if (B(self, 0x20) == 0xE || B(self, 0x20) == 0xC) {
-                floatA *= 2.0f;
+                float_a *= 2.0f;
             }
-            selfPosA = self + 0x10;
-            if (vec_distance_xy(selfPosA, D_L06_001BFCA0) > 0.5f) {
-                floatB = vec_distance_xy(selfPosA, D_L06_001BFCA0) * 2.0f;
+            self_pos_a = self + 0x10;
+            if (vec_distance_xy(self_pos_a, D_L06_001BFCA0) > 0.5f) {
+                float_b = vec_distance_xy(self_pos_a, D_L06_001BFCA0) * 2.0f;
             } else {
-                floatB = 1.0f;
+                float_b = 1.0f;
             }
             if (D_L06_001B2348[0] % 45 == H(self, 0xB2) && math_random_int_below(2) == 0) {
-                RippleDisturb(D_L06_001B2FB0, D_L06_001B2FB8[0], 1, F(self, 0x10), F(self, 0x14), floatB, floatA);
+                RippleDisturb(D_L06_001B2FB0, D_L06_001B2FB8[0], 1, F(self, 0x10), F(self, 0x14), float_b, float_a);
             }
             if (D_L06_001B2348[0] % ((func_001163B0() & 7) + 0x14) == 0) {
-                floatC = math_random_float_range(1.5f, 2.4000001f);
-                vecHead.f[0] += math_random_float_range(-0.150000006f, 0.150000006f);
-                vecHead.f[1] += math_random_float_range(-0.150000006f, 0.150000006f);
-                vecHead.f[2] = coll_get_ground_height_at_position(D_L06_001BFCA0, NULL);
-                part_spawn_drifting(vecHead.f, NULL, -1, floatC, 5250.0f);
+                float_c = math_random_float_range(1.5f, 2.4000001f);
+                vec_head.f[0] += math_random_float_range(-0.150000006f, 0.150000006f);
+                vec_head.f[1] += math_random_float_range(-0.150000006f, 0.150000006f);
+                vec_head.f[2] = coll_get_ground_height_at_position(D_L06_001BFCA0, NULL);
+                part_spawn_drifting(vec_head.f, NULL, -1, float_c, 5250.0f);
             }
         }
         if (F(vars, 0x13C) >= 1.0f) {
             *(Quad *)g_hero_position = *(Quad *)(self + 0x10);
         }
-        curIndex = W(vars, 0x108);
-        if (curIndex != -1 && B(*(u8 **)(D_L06_001B281C + (curIndex << 8) + 0x68), 0x14) != 0) {
+        cur_index = W(vars, 0x108);
+        if (cur_index != -1 && B(*(u8 **)(D_L06_001B281C + (cur_index << 8) + 0x68), 0x14) != 0) {
             if (B(self, 0x43) != 0xD) {
                 anim_start_blended(self, 0xD, 0, 0xA);
             }
@@ -183,8 +183,8 @@ void UpdateMoby4070(u8 *self) {
             STUB_printf(D_L06_001B1AA0);
             break;
         case 20:
-            curIndex = W(vars, 0x108);
-            if (curIndex != -1 && B(*(u8 **)(D_L06_001B281C + (curIndex << 8) + 0x68), 0x14) == 0) {
+            cur_index = W(vars, 0x108);
+            if (cur_index != -1 && B(*(u8 **)(D_L06_001B281C + (cur_index << 8) + 0x68), 0x14) == 0) {
                 B(self, 0x20) = 0x15;
             }
             break;
@@ -204,7 +204,7 @@ void UpdateMoby4070(u8 *self) {
             if ((B(self, 0x60) & 2) && B(self, 0x43) != 0) {
                 anim_start_blended(self, 0, 0, 0xA);
             }
-            if (rayHit != 0 && hit.obj != NULL && hit.obj == g_hero_moby && group_is_member_in_state_range(self, 4, 6) == 0) {
+            if (ray_hit != 0 && hit.obj != NULL && hit.obj == g_hero_moby && group_is_member_in_state_range(self, 4, 6) == 0) {
                 if (B(self, 0x43) != 1) {
                     anim_start_blended(self, 1, 0, 0xA);
                 }
@@ -216,7 +216,7 @@ void UpdateMoby4070(u8 *self) {
                 }
                 PlayMobySound(1, 0, self);
                 B(self, 0x20) = 5;
-            } else if (timerExpired != 0) {
+            } else if (timer_expired != 0) {
                 if (B(self, 0x43) != 1) {
                     anim_start_blended(self, 1, 0, 0xA);
                 }
@@ -226,18 +226,18 @@ void UpdateMoby4070(u8 *self) {
             }
             FastVecScale(vars + 0xC0, vars + 0xC0, 0.949999988f);
             actor_apply_fall_move(self, vars, 0.00416666688f, 0.013888889f, 0.13333334f);
-            if (nextState != 0xFF) {
-                if (B(self, 0x43) != nextAnim) {
-                    anim_start_blended(self, nextAnim, 0, 6);
+            if (next_state != 0xFF) {
+                if (B(self, 0x43) != next_anim) {
+                    anim_start_blended(self, next_anim, 0, 6);
                 }
-                B(self, 0x20) = nextState;
+                B(self, 0x20) = next_state;
             }
             break;
         case 2:
             if ((B(self, 0x60) & 2) && B(self, 0x43) != 1) {
                 anim_start_blended(self, 1, 0, 0xA);
             }
-            if (rayHit != 0 && hit.obj != NULL && hit.obj == g_hero_moby) {
+            if (ray_hit != 0 && hit.obj != NULL && hit.obj == g_hero_moby) {
                 if (group_is_member_in_state_range(self, 4, 6) == 0) {
                     if (B(self, 0x43) != 1) {
                         anim_start_blended(self, 1, 0, 0xA);
@@ -247,7 +247,7 @@ void UpdateMoby4070(u8 *self) {
             } else {
                 MobySpringTurn(self, F(vars, 0x12C), vars + 0x110, 0.000484813732f, 0.00126051577f, 0.029088825f);
                 F(self, 0xF4) = math_turn_angle_toward_target(vars + 0x114, F(self, 0xF4), 0.0f, 0.000484813732f, 0.00126051577f, 0.029088825f);
-                if (timerExpired != 0 && IsPointInCuboid(self + 0x10, W(vars, 0x104)) != 0) {
+                if (timer_expired != 0 && IsPointInCuboid(self + 0x10, W(vars, 0x104)) != 0) {
                     if (B(self, 0x43) != 0) {
                         anim_start_blended(self, 0, 0, 0xA);
                     }
@@ -256,7 +256,7 @@ void UpdateMoby4070(u8 *self) {
                 }
             }
             actor_choose_free_heading(self, vars);
-            if (actor_adjust_speed_facing(self, vars, F(vars, 0x12C), 0.209439531f, 0.00166666671f, 0.52359885f, 0.00111111114f, 0.116666675f, 0.0500000045f) != 0 && timerExpired != 0) {
+            if (actor_adjust_speed_facing(self, vars, F(vars, 0x12C), 0.209439531f, 0.00166666671f, 0.52359885f, 0.00111111114f, 0.116666675f, 0.0500000045f) != 0 && timer_expired != 0) {
                 if (B(self, 0x43) != 0) {
                     anim_start_blended(self, 0, 0, 0xA);
                 }
@@ -271,28 +271,28 @@ void UpdateMoby4070(u8 *self) {
                 B(self, 0x20) = 5;
             }
             actor_apply_fall_move(self, vars, 0.00416666688f, 0.013888889f, 0.13333334f);
-            if (nextState != 0xFF) {
-                if (B(self, 0x43) != nextAnim) {
-                    anim_start_blended(self, nextAnim, 0, 6);
+            if (next_state != 0xFF) {
+                if (B(self, 0x43) != next_anim) {
+                    anim_start_blended(self, next_anim, 0, 6);
                 }
-                B(self, 0x20) = nextState;
+                B(self, 0x20) = next_state;
             }
             break;
         case 4:
-            selfPosB = self + 0x10;
-            closeEnough = 1;
-            floatC = mat_fast_helper_a(hit.pos.f[0] - F(self, 0x10), hit.pos.f[1] - F(self, 0x14));
-            MobySpringTurn(self, floatC, vars + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
-            { float t = -mat_fast_helper_a(vec_distance_xy(selfPosB, &hit), hit.pos.f[2] - F(self, 0x18));
+            self_pos_b = self + 0x10;
+            close_enough = 1;
+            float_c = mat_fast_helper_a(hit.pos.f[0] - F(self, 0x10), hit.pos.f[1] - F(self, 0x14));
+            MobySpringTurn(self, float_c, vars + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
+            { float t = -mat_fast_helper_a(vec_distance_xy(self_pos_b, &hit), hit.pos.f[2] - F(self, 0x18));
             F(self, 0xF4) = math_turn_angle_toward_target(vars + 0x114, F(self, 0xF4), t, 0.00349065894f, 0.0f, 0.209439546f); }
-            if (vec_distance_xy(selfPosB, g_hero_position) < 3.0f) {
+            if (vec_distance_xy(self_pos_b, g_hero_position) < 3.0f) {
             } else {
-                closeEnough = 0;
+                close_enough = 0;
             }
-            if (closeEnough != 0) {
+            if (close_enough != 0) {
                 FastVecScale(vars + 0xC0, vars + 0xC0, 0.899999976f);
             }
-            if (actor_adjust_speed_facing(self, vars, floatC, 0.209439531f, 0.00555555569f, 0.52359885f, 0.000833333354f, 0.333333343f, 0.0833333358f) != 0 && closeEnough != 0 && (u32)(W(g_hero_position, 0x221C) - 0x11) < 2) {
+            if (actor_adjust_speed_facing(self, vars, float_c, 0.209439531f, 0.00555555569f, 0.52359885f, 0.000833333354f, 0.333333343f, 0.0833333358f) != 0 && close_enough != 0 && (u32)(W(g_hero_position, 0x221C) - 0x11) < 2) {
                 if (B(self, 0x43) != 2) {
                     anim_start_blended(self, 2, 0, 2);
                 }
@@ -300,38 +300,38 @@ void UpdateMoby4070(u8 *self) {
                 W(self, 0x98) = 0;
                 B(self, 0x20) = 5;
                 F(vars, 0x13C) = 0.0f;
-                qcopy(vars + 0xF0, selfPosB);
+                qcopy(vars + 0xF0, self_pos_b);
             }
             F(vars, 0x128) = hit.pos.f[2] - 0.25f;
             actor_apply_fall_move(self, vars, 0.010555556f, 0.0f, 0.633333385f);
-            if (rayHit == 0 || D_0018A16C == 0) {
+            if (ray_hit == 0 || D_0018A16C == 0) {
                 if (B(self, 0x43) != 1) {
                     anim_start_blended(self, 1, 0, 0xA);
                 }
                 B(self, 0x20) = 2;
             }
-            if (nextState != 0xFF) {
-                if (B(self, 0x43) != nextAnim) {
-                    anim_start_blended(self, nextAnim, 0, 6);
+            if (next_state != 0xFF) {
+                if (B(self, 0x43) != next_anim) {
+                    anim_start_blended(self, next_anim, 0, 6);
                 }
-                B(self, 0x20) = nextState;
+                B(self, 0x20) = next_state;
             }
             break;
         case 5:
-            selfPosC = self + 0x10;
-            moby_transform_joint_to_world(self, 0, vecHead.f);
-            FastVecSub(&vecDelta, vecHead.f, selfPosC);
-            floatB = mat_fast_helper_a(hit.pos.f[0] - vecHead.f[0], hit.pos.f[1] - vecHead.f[1]);
-            MobySpringTurn(self, floatB, vars + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
+            self_pos_c = self + 0x10;
+            moby_transform_joint_to_world(self, 0, vec_head.f);
+            FastVecSub(&vec_delta, vec_head.f, self_pos_c);
+            float_b = mat_fast_helper_a(hit.pos.f[0] - vec_head.f[0], hit.pos.f[1] - vec_head.f[1]);
+            MobySpringTurn(self, float_b, vars + 0x110, 0.00349065894f, 0.0f, 0.209439546f);
             F(self, 0xF4) = F(self, 0xF4) * 0.699999988f;
             F(vars, 0x13C) = F(vars, 0x13C) + 0.0280000009f;
-            qcopy(&vecPrevPos, selfPosC);
-            FastVecSub(&vecTmp1, &hit, &vecDelta);
-            FastVecSub(&vecTmp2, &vecTmp1, vars + 0xF0);
-            FastVecScale(&vecTmp2, &vecTmp2, F(vars, 0x13C) < 1.0f ? F(vars, 0x13C) : 1.0f);
-            FastVecAdd(&vecTarget, &vecTmp2, vars + 0xF0);
-            moby_move_over_ground(self, selfPosC, &vecTarget, 0.75f, 0.75f, 40.0f, 6.28318596f, 3);
-            FastVecSub(vars + 0xC0, selfPosC, &vecPrevPos);
+            qcopy(&vec_prev_pos, self_pos_c);
+            FastVecSub(&vec_tmp1, &hit, &vec_delta);
+            FastVecSub(&vec_tmp2, &vec_tmp1, vars + 0xF0);
+            FastVecScale(&vec_tmp2, &vec_tmp2, F(vars, 0x13C) < 1.0f ? F(vars, 0x13C) : 1.0f);
+            FastVecAdd(&vec_target, &vec_tmp2, vars + 0xF0);
+            moby_move_over_ground(self, self_pos_c, &vec_target, 0.75f, 0.75f, 40.0f, 6.28318596f, 3);
+            FastVecSub(vars + 0xC0, self_pos_c, &vec_prev_pos);
             if (F(vars, 0x13C) >= 1.0f) {
                 ((Hero *)g_hero_state)->i[0x24CC / 4] = 0;
                 hero_l00_set_action(0x39, 1);
@@ -339,7 +339,7 @@ void UpdateMoby4070(u8 *self) {
                 ((Hero *)g_hero_state)->b[0x22B5] = 1;
                 B(self, 0x20) = 6;
             } else {
-                F(vars, 0x12C) = floatB;
+                F(vars, 0x12C) = float_b;
             }
             break;
         case 6:
@@ -351,20 +351,20 @@ void UpdateMoby4070(u8 *self) {
             if ((B(self, 0x60) & 2) && B(self, 0x43) != 1) {
                 anim_start_blended(self, 1, 0, 0xA);
             }
-            if (nextState != 0xFF) {
-                if (B(self, 0x43) != nextAnim) {
-                    anim_start_blended(self, nextAnim, 0, 6);
+            if (next_state != 0xFF) {
+                if (B(self, 0x43) != next_anim) {
+                    anim_start_blended(self, next_anim, 0, 6);
                 }
-                B(self, 0x20) = nextState;
+                B(self, 0x20) = next_state;
             }
             break;
         case 7:
-            if (rayHit != 0) {
+            if (ray_hit != 0) {
                 if (B(self, 0x43) != 4) {
                     anim_start_blended(self, 4, 0, 0xA);
                 }
                 B(self, 0x20) = 9;
-            } else if (timerExpired != 0) {
+            } else if (timer_expired != 0) {
                 if (B(self, 0x43) != 4) {
                     anim_start_blended(self, 4, 0, 0xA);
                 }
@@ -372,21 +372,21 @@ void UpdateMoby4070(u8 *self) {
                 F(vars, 0x12C) = math_random_angle();
                 B(self, 0x20) = 8;
             }
-            velA = vars + 0xC0;
-            FastVecScale(velA, velA, 0.949999988f);
+            vel_a = vars + 0xC0;
+            FastVecScale(vel_a, vel_a, 0.949999988f);
             F(vars, 0xC8) = F(vars, 0xC8) - 0.163333341f;
-            if (math_blend_scaled_count(self, velA, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-                FastVecScale(velA, velA, 0.5f);
+            if (math_blend_scaled_count(self, vel_a, 0x400, 0x10, 1.0f, 0.0f) != 0) {
+                FastVecScale(vel_a, vel_a, 0.5f);
             }
-            if (nextState != 0xFF) {
-                if (B(self, 0x43) != nextAnim) {
-                    anim_start_blended(self, nextAnim, 0, 6);
+            if (next_state != 0xFF) {
+                if (B(self, 0x43) != next_anim) {
+                    anim_start_blended(self, next_anim, 0, 6);
                 }
-                B(self, 0x20) = nextState;
+                B(self, 0x20) = next_state;
             }
             break;
         case 8:
-            if (rayHit != 0) {
+            if (ray_hit != 0) {
                 if (B(self, 0x43) != 4) {
                     anim_start_blended(self, 4, 0, 0xA);
                 }
@@ -394,7 +394,7 @@ void UpdateMoby4070(u8 *self) {
             } else {
                 MobySpringTurn(self, F(vars, 0x12C), vars + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
                 F(self, 0xF4) = math_turn_angle_toward_target(vars + 0x114, F(self, 0xF4), 0.0f, 0.000218166184f, 0.000436332368f, 0.0130899716f);
-                if (timerExpired != 0 && IsPointInCuboid(self + 0x10, W(vars, 0x104)) != 0) {
+                if (timer_expired != 0 && IsPointInCuboid(self + 0x10, W(vars, 0x104)) != 0) {
                     if (B(self, 0x43) != 3) {
                         anim_start_blended(self, 3, 0, 0xA);
                     }
@@ -403,43 +403,43 @@ void UpdateMoby4070(u8 *self) {
                 }
             }
             actor_choose_free_heading(self, vars);
-            if (actor_adjust_speed_facing(self, vars, F(vars, 0x12C), 0.3490659f, 0.000833333354f, 1.0471977f, 0.00249999994f, 0.0166666675f, 0.0166666675f) != 0 && timerExpired != 0) {
+            if (actor_adjust_speed_facing(self, vars, F(vars, 0x12C), 0.3490659f, 0.000833333354f, 1.0471977f, 0.00249999994f, 0.0166666675f, 0.0166666675f) != 0 && timer_expired != 0) {
                 if (B(self, 0x43) != 3) {
                     anim_start_blended(self, 3, 0, 0xA);
                 }
                 W(vars, 0x124) = func_001163B0() % 120 + 0x3C;
                 B(self, 0x20) = 7;
             }
-            velB = vars + 0xC0;
+            vel_b = vars + 0xC0;
             F(vars, 0xC8) = F(vars, 0xC8) - 0.163333341f;
-            if (math_blend_scaled_count(self, velB, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-                FastVecScale(velB, velB, 0.5f);
+            if (math_blend_scaled_count(self, vel_b, 0x400, 0x10, 1.0f, 0.0f) != 0) {
+                FastVecScale(vel_b, vel_b, 0.5f);
             }
-            if (nextState != 0xFF) {
-                if (B(self, 0x43) != nextAnim) {
-                    anim_start_blended(self, nextAnim, 0, 6);
+            if (next_state != 0xFF) {
+                if (B(self, 0x43) != next_anim) {
+                    anim_start_blended(self, next_anim, 0, 6);
                 }
-                B(self, 0x20) = nextState;
+                B(self, 0x20) = next_state;
             }
             break;
         case 9:
         case 10:
-            floatA = mat_fast_helper_a(hit.pos.f[0] - F(self, 0x10), hit.pos.f[1] - F(self, 0x14));
-            MobySpringTurn(self, floatA, vars + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
-            if (actor_adjust_speed_facing(self, vars, floatA, 0.52359885f, 0.00111111114f, 1.57079649f, 0.00249999994f, 0.0250000022f, 0.0166666675f) != 0 && vec_distance_xy(self + 0x10, &hit) < 1.89999998f && B(self, 0x20) != 0xA) {
+            float_a = mat_fast_helper_a(hit.pos.f[0] - F(self, 0x10), hit.pos.f[1] - F(self, 0x14));
+            MobySpringTurn(self, float_a, vars + 0x110, 0.000218166184f, 0.000436332368f, 0.0130899716f);
+            if (actor_adjust_speed_facing(self, vars, float_a, 0.52359885f, 0.00111111114f, 1.57079649f, 0.00249999994f, 0.0250000022f, 0.0166666675f) != 0 && vec_distance_xy(self + 0x10, &hit) < 1.89999998f && B(self, 0x20) != 0xA) {
                 if (B(self, 0x43) != 5) {
                     anim_start_blended(self, 5, 0, 2);
                 }
                 B(self, 0x20) = 0xA;
             }
-            velC = vars + 0xC0;
+            vel_c = vars + 0xC0;
             F(vars, 0xC8) = F(vars, 0xC8) - 0.163333341f;
-            if (math_blend_scaled_count(self, velC, 0x400, 0x10, 1.0f, 0.0f) != 0) {
-                FastVecScale(velC, velC, 0.5f);
+            if (math_blend_scaled_count(self, vel_c, 0x400, 0x10, 1.0f, 0.0f) != 0) {
+                FastVecScale(vel_c, vel_c, 0.5f);
             }
             B(vars, 0x48) = FloatToInt(8.0f);
             B(vars, 0x4A) = FloatToInt(9.60000038f);
-            if (rayHit == 0) {
+            if (ray_hit == 0) {
                 if (B(self, 0x43) != 4) {
                     anim_start_blended(self, 4, 0, 0xA);
                 }
@@ -453,11 +453,11 @@ void UpdateMoby4070(u8 *self) {
                 W(vars, 0x124) = func_001163B0() % 200 + 0x12C;
                 B(self, 0x20) = 8;
             }
-            if (nextState != 0xFF) {
-                if (B(self, 0x43) != nextAnim) {
-                    anim_start_blended(self, nextAnim, 0, 6);
+            if (next_state != 0xFF) {
+                if (B(self, 0x43) != next_anim) {
+                    anim_start_blended(self, next_anim, 0, 6);
                 }
-                B(self, 0x20) = nextState;
+                B(self, 0x20) = next_state;
             }
             break;
         case 11:
@@ -483,24 +483,24 @@ void UpdateMoby4070(u8 *self) {
             }
             break;
         case 16:
-            velD = vars + 0xC0;
-            FastVecScale(velD, velD, 0.949999988f);
+            vel_d = vars + 0xC0;
+            FastVecScale(vel_d, vel_d, 0.949999988f);
             F(vars, 0xC8) = F(vars, 0xC8) - 0.163333341f;
-            math_blend_scaled_count(self, velD, 0x400, 0x10, 1.0f, 0.0f);
+            math_blend_scaled_count(self, vel_d, 0x400, 0x10, 1.0f, 0.0f);
             if (B(self, 0x60) & 2) {
                 actor_start_size_anim(self, vars);
             }
             break;
         case 15:
-            velE = vars + 0xC0;
-            FastVecScale(velE, velE, 0.949999988f);
+            vel_e = vars + 0xC0;
+            FastVecScale(vel_e, vel_e, 0.949999988f);
             F(vars, 0xC8) = F(vars, 0xC8) - 0.163333341f;
-            math_blend_scaled_count(self, velE, 0x400, 0x10, 1.0f, 0.0f);
-            if (nextState != 0xFF) {
-                if (B(self, 0x43) != nextAnim) {
-                    anim_start_blended(self, nextAnim, 0, 6);
+            math_blend_scaled_count(self, vel_e, 0x400, 0x10, 1.0f, 0.0f);
+            if (next_state != 0xFF) {
+                if (B(self, 0x43) != next_anim) {
+                    anim_start_blended(self, next_anim, 0, 6);
                 }
-                B(self, 0x20) = nextState;
+                B(self, 0x20) = next_state;
             }
             break;
         case 17:

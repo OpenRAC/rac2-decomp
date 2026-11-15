@@ -59,7 +59,7 @@ void UpdateTodanoShuttlePlatform(u8 *self)
     VecDDA8 temp;
     f32 work[4] __attribute__((aligned(16)));
     f32 speed, oldSpeed, angle;
-    s32 *nodeIds, i;
+    s32 *node_ids, i;
 
     *(u32 *)(vars + 0x70)|=2;
     qcopy(oldPos, self + 0x10);
@@ -79,10 +79,10 @@ void UpdateTodanoShuttlePlatform(u8 *self)
             for (delay = 0; delay < 2; delay++) {}
         }
         pushable_moby_update(self, vars + 0x50, 1.5f, 1.5f, 0.1f, *(s32 *)(vars + 0xEC));
-        nodeIds=(s32 *)(vars + 0xE0);
-        for (i = 0; i < 2; i++, nodeIds++) {
-            if (*nodeIds != -1)
-                moby_update_empty_alt(D_L12_001B2E9C_gp + (*nodeIds << 8));
+        node_ids=(s32 *)(vars + 0xE0);
+        for (i = 0; i < 2; i++, node_ids++) {
+            if (*node_ids != -1)
+                moby_update_empty_alt(D_L12_001B2E9C_gp + (*node_ids << 8));
         }
         if (*(s32 *)(vars + 0xE8)!=-1 && IsPointInCuboid(self + 0x10, *(s32 *)(vars + 0xE8))) {
             *(s32 *)(vars + 0x138)=60;

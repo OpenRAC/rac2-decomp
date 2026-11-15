@@ -19,14 +19,14 @@ void miniturret_aim_at_target(char *object)
 {
     float vec[28];
     char *vars = *(char **)(object + 0x68);
-    char *targetInfo = moby_get_private_value_0(*(char **)(vars + 0x68));
+    char *target_info = moby_get_private_value_0(*(char **)(vars + 0x68));
     char *target;
 
     moby_get_facing_direction(object + 0x10, &vec[4]);
     target = *(char **)(vars + 0x68);
     qcopy(&vec[0], target + 0x10);
-    if (targetInfo != 0) {
-        FastVecScale((char *)&vec[12], target + 0xE0, *(float *)(targetInfo + 0x10));
+    if (target_info != 0) {
+        FastVecScale((char *)&vec[12], target + 0xE0, *(float *)(target_info + 0x10));
         FastVecAdd(&vec[0], &vec[0], &vec[12]);
     }
     if (*(char **)(vars + 0x68) == 0

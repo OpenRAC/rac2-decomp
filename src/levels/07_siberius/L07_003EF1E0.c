@@ -9,11 +9,11 @@ extern void func_003109C8(char *, int, int);
 void moby_start_timer_state(char *moby, int length, int param)
 {
     int *vars = *(int **)(moby + 0x68);
-    float lengthFloat;
+    float length_float;
 
     vars[0] = 0;
-    lengthFloat = func_002E5460(length);
+    length_float = func_002E5460(length);
     vars[2] = param;
-    *(float *)((char *)vars + 4) = 1.0f / lengthFloat;
+    *(float *)((char *)vars + 4) = 1.0f / length_float;
     func_003109C8(moby, 1, -1);
 }

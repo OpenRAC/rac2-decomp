@@ -1,4 +1,5 @@
 #include "names.h"
+#include "moby_classes.h"
 typedef short s16;
 typedef int s32;
 typedef float f32;
@@ -20,7 +21,7 @@ s32 moby_is_target_in_sight(char *self, char *target) {
     s16 kind = *(s16 *)(self + 0xAA);
     if (kind == 0xED4 /* moby class 3796 */) goto special_range;
     if (kind < 0xED5) goto test_target;
-    if (kind == 0xEE1 /* Receiver Bot */) goto alternate_range;
+    if (kind == MOBY_CLASS_RECEIVER_BOT) goto alternate_range;
     goto test_target;
 special_range:
     range = D_L18_001B12B0;

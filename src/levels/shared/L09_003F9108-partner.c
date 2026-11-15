@@ -28,7 +28,7 @@ void trooper_torso_update_attachment(char *object)
     level_apply_colour_tint(object);
     {
         char *partner = P(data, 0x2F8);
-        if (!partner || *(short *)(partner + 0xAA) != 0xD0E /* Megacorp Trooper Torso */ ||
+        if (!partner || *(short *)(partner + 0xAA) != MOBY_CLASS_MEGACORP_TROOPER_TORSO ||
             B(partner, 0x20) == 254 || B(partner, 0x20) == 253)
             return;
         moby_copy_color(object, partner);

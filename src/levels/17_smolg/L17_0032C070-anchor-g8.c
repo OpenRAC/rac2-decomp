@@ -114,15 +114,15 @@ void UpdateTriggeredAnchorMover(unsigned char *obj)
     case 4:
         vars->delay += 1.0f;
         if (vars->delay >= D_L17_001B0244 * 60.0f) {
-            MotionMoby *sourceMoby;
+            MotionMoby *source_moby;
             obj[0x20] = 3;
             if (vars->direction == 0)
-                sourceMoby = (MotionMoby *)((vars->source0 << 8) + (unsigned int)g_moby_l17_pool);
+                source_moby = (MotionMoby *)((vars->source0 << 8) + (unsigned int)g_moby_l17_pool);
             else if (vars->direction == 1)
-                sourceMoby = (MotionMoby *)((vars->source1 << 8) + (unsigned int)g_moby_l17_pool);
+                source_moby = (MotionMoby *)((vars->source1 << 8) + (unsigned int)g_moby_l17_pool);
             else
                 break;
-            sourceMoby->marked = 0;
+            source_moby->marked = 0;
         }
         break;
     }

@@ -28,7 +28,7 @@ void hero_tracking_head_update(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     float yaw = 0, pitch = 0;
     float acceleration, damping;
-    float halfPitch, halfYaw;
+    float half_pitch, half_yaw;
 
     *(u16 *)(moby + 0x34) |= 4;
     switch (moby[0x20]) {
@@ -66,13 +66,13 @@ void hero_tracking_head_update(u8 *moby) {
         moby_l00_spawn_child(moby, 0x1132, moby[0x30]);
         PlayMobySound(0, 0, moby);
         {
-            int effectId = *(int *)(vars + 0x114);
+            int effect_id = *(int *)(vars + 0x114);
             u8 *effect;
 
-            if (effectId != -1) {
-                effect = g_sound_state + effectId * 0x70;
+            if (effect_id != -1) {
+                effect = g_sound_state + effect_id * 0x70;
                 if (*(u8 **)(effect + 0x88) == moby && effect[0x74])
-                    snd_stop_voice(effectId);
+                    snd_stop_voice(effect_id);
             }
         }
         *(int *)(vars + 0x114) = -1;
@@ -85,13 +85,13 @@ void hero_tracking_head_update(u8 *moby) {
         if (*(u8 **)(effect + 0x88) != moby || !effect[0x74])
             *(int *)(vars + 0x114) = PlayMobySound(1, 4, moby);
     } else {
-        int effectId = *(int *)(vars + 0x114);
+        int effect_id = *(int *)(vars + 0x114);
         u8 *effect;
 
-        if (effectId != -1) {
-            effect = g_sound_state + effectId * 0x70;
+        if (effect_id != -1) {
+            effect = g_sound_state + effect_id * 0x70;
             if (*(u8 **)(effect + 0x88) == moby && effect[0x74])
-                snd_stop_voice(effectId);
+                snd_stop_voice(effect_id);
         }
         *(int *)(vars + 0x114) = -1;
     }
@@ -99,12 +99,12 @@ void hero_tracking_head_update(u8 *moby) {
     math_approach_target_with_direction_mode(vars + 0x100, yaw, vars + 0x108, 0, 0.0017453295f, 0.0017453295f, 0.10471977f);
     damping = 0.3f;
     math_approach_target_with_direction_mode(vars + 0x104, pitch, vars + 0x10C, 0, 0.0017453295f, 0.0017453295f, 0.10471977f);
-    halfPitch = *(float *)(vars + 0x104) * 0.5f;
-    halfYaw = *(float *)(vars + 0x100) * 0.5f;
-    *(float *)(vars + 0x68) = halfYaw;
-    *(float *)(vars + 0x60) = halfPitch;
-    *(float *)(vars + 0xE0) = halfPitch;
-    *(float *)(vars + 0xE8) = halfYaw;
+    half_pitch = *(float *)(vars + 0x104) * 0.5f;
+    half_yaw = *(float *)(vars + 0x100) * 0.5f;
+    *(float *)(vars + 0x68) = half_yaw;
+    *(float *)(vars + 0x60) = half_pitch;
+    *(float *)(vars + 0xE0) = half_pitch;
+    *(float *)(vars + 0xE8) = half_yaw;
     moby_update_eased_node(moby, vars, 0, acceleration, damping);
     moby_update_eased_node(moby, vars + 0x80, 1, acceleration, damping);
     func_002A0F48(moby);

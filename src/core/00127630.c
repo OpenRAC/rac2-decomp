@@ -23,8 +23,8 @@ extern void mc_copy_read_edge_bytes(void *);
 
 /* rac1-decomp src/core/001236F0.c: func_001239D8 */
 /* Makes a new folder on a memory card. It opens with a special mode and marks the command as a folder creation. */
-int sceMcMkdir(int port, int slot, int dirName) {
-    int result = sceMcOpen(port, slot, dirName, 0x40);
+int sceMcMkdir(int port, int slot, int dir_name) {
+    int result = sceMcOpen(port, slot, dir_name, 0x40);
     if (result == 0) {
         r1_D_00132EA8 = 0xB;
     }
@@ -103,8 +103,8 @@ int sceMcSeek(int fd, int offset, int origin) {
  * offset instead of keeping a base pointer costs another 8.)
  */
 /* Copies the leftover bytes at the start and end of a memory card read into the caller's buffer. */
-void mc_copy_read_edge_bytes(void *descAddr) {
-    char *desc = (char *)((unsigned int)descAddr | 0x20000000);
+void mc_copy_read_edge_bytes(void *desc_addr) {
+    char *desc = (char *)((unsigned int)desc_addr | 0x20000000);
     unsigned char *src;
     char *dst;
     int i;

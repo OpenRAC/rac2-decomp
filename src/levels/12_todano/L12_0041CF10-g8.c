@@ -65,15 +65,15 @@ Destroy0:
     }
     case 4: {
         int i;
-        int *childIds;
+        int *child_ids;
         u8 *base = D_L12_001B2E9C;
 
         *(float *)(state + 0xC) += 0.0013888889225199819f;
         *(float *)(self + 0x18) += *(float *)(state + 0xC);
-        childIds = (int *)state;
+        child_ids = (int *)state;
         for (i = 0; i < 3; i++) {
-            if (childIds[i] != -1)
-                *(float *)((childIds[i] << 8) + (u32)base + 0x18) += *(float *)(state + 0xC);
+            if (child_ids[i] != -1)
+                *(float *)((child_ids[i] << 8) + (u32)base + 0x18) += *(float *)(state + 0xC);
         }
         if (*(float *)(state + 0x10) + 8.0f < *(float *)(self + 0x18))
             self[0x20] = 5;
@@ -85,7 +85,7 @@ Destroy0:
         break;
     case 3: {
         int i;
-        int *childIds;
+        int *child_ids;
         u8 *child;
         u16 id;
 
@@ -94,14 +94,14 @@ Destroy0:
             *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) | 0x41) & 0xEFFF;
             vec_scale_to_length(vec, self + 0xC0, -0.10000000894f);
             part_spawn_masked_debris(self, 63, vec, 3.0f, 6.0f, 3.0f, 6.0f, 255);
-            childIds = (int *)state;
-            for (i = 0; i < 3; i++, childIds++) {
-                if (*childIds != -1) {
-                    child = D_L12_001B2E9C_gp + (*childIds << 8);
+            child_ids = (int *)state;
+            for (i = 0; i < 3; i++, child_ids++) {
+                if (*child_ids != -1) {
+                    child = D_L12_001B2E9C_gp + (*child_ids << 8);
                     linked_moby_trigger_burst(child);
                     SpawnExplosion(child + 0x10, 1, 14, 10, 15, 10, 20, 1,
                                   1, 1, 0, 0, 2.0f, 20.0f);
-                    moby_mark_spawned(D_L12_001B2E9C + (*childIds << 8));
+                    moby_mark_spawned(D_L12_001B2E9C + (*child_ids << 8));
                 }
             }
             id = *(u16 *)(self + 0xB2);
@@ -122,12 +122,12 @@ Destroy0:
             break;
         }
         if (*(int *)(state + 0x14) == D_L12_001B1DA0 / 2) {
-            int *childIds2 = (int *)state;
+            int *child_ids2 = (int *)state;
             int j;
 
-            for (j = 0; j < 3; j++, childIds2++) {
-                if (*childIds2 != -1)
-                    ((u8 *)((*childIds2 << 8) + (u32)D_L12_001B2E9C_gp))[0x20] = 4;
+            for (j = 0; j < 3; j++, child_ids2++) {
+                if (*child_ids2 != -1)
+                    ((u8 *)((*child_ids2 << 8) + (u32)D_L12_001B2E9C_gp))[0x20] = 4;
             }
         }
         break;

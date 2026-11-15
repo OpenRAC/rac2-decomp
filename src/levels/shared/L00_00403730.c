@@ -84,7 +84,7 @@ Moby403730 *sheep_spawn_from_object(Moby403730 *self) {
     Weapon403730 *w;
     f32 rate;
 
-    m = CreateMoby(0xE7D /* Sheep */);
+    m = CreateMoby(MOBY_CLASS_SHEEP);
     if (m != 0) {
         m->alpha = 0x7F;
         m->f32 = 0x7F;

@@ -310,7 +310,7 @@ int moby_push_out_of_hit_point(Obj_F4778f810 *obj)
     float tmp1[4];
     float tmp2[4];
     float tmp3[4];
-    float *hitInfo;
+    float *hit_info;
     HitIndex_00274500 *vars = (HitIndex_00274500 *)obj->p068;
     int i;
     int j;
@@ -335,11 +335,11 @@ int moby_push_out_of_hit_point(Obj_F4778f810 *obj)
             matrix_mul_vec3(tmp1, vars->points030[i], (float *)((char *)obj + 0xC0));
             F4778f810_FUN_00282CC0((char *)tmp1, (char *)tmp1, (char *)obj + 0x10);
             if (coll_test_segment_hit(tmp0, tmp1, hit, 0) != 0) {
-                hitInfo = D_001BAFA0;
-                F4778f810_FUN_00282CF0((char *)tmp2, (char *)tmp1, (char *)hitInfo);
-                func_00282F20_16(hitInfo + 8, hitInfo + 8, 1.0f);
-                scale = func_00282DB0_3(tmp2, hitInfo + 8);
-                func_00282F20_16(tmp3, hitInfo + 8, -scale);
+                hit_info = D_001BAFA0;
+                F4778f810_FUN_00282CF0((char *)tmp2, (char *)tmp1, (char *)hit_info);
+                func_00282F20_16(hit_info + 8, hit_info + 8, 1.0f);
+                scale = func_00282DB0_3(tmp2, hit_info + 8);
+                func_00282F20_16(tmp3, hit_info + 8, -scale);
                 F4778f810_FUN_00282CC0((char *)obj + 0x10, (char *)obj + 0x10, (char *)tmp3);
                 return i;
             }

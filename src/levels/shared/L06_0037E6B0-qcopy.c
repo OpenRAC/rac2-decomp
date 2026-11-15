@@ -41,7 +41,7 @@ extern u8 *D_L06_001FF50C;
 /* The func_L04_00362768 spawner with a colour word, a second size and a random
    spin halfword. */
 /* Spawns a spinning effect record at a position, with a colour, a size and a random spin speed. */
-void part_spawn_spinning_effect_record(void *position, void *direction, u32 angle, f32 size, f32 secondSize) {
+void part_spawn_spinning_effect_record(void *position, void *direction, u32 angle, f32 size, f32 second_size) {
     L06Record *record = (L06Record *)(u32)part_alloc(0x53);
     L06RecordTail *tail;
     L06Quad temp;
@@ -63,7 +63,7 @@ void part_spawn_spinning_effect_record(void *position, void *direction, u32 angl
         tail->field10 = 0.5f;
         tail->field14 = size;
         tail->field18 = 0;
-        tail->field1C = secondSize;
+        tail->field1C = second_size;
         tail->field1A = (s16)(math_random_int_below(6) - 3);
     }
 }

@@ -53,7 +53,7 @@ void swinging_l20_arm_update(char *obj) {
         math_step_value_toward_target(obj + 0xF0, state + 4, -1.57079649f, 0.000533295097f, 174.532944f, 290.888275f);
         if (*(float *)(obj + 0xF0)<=-0.785398245f) {
             char *other=*(char **)(state + 0x10);
-            if (other && *(short *)(other + 0xAA)==0xCBC /* Megacorp Hover Tank */ && (unsigned char)other[0x20]!=0xFE && (unsigned char)other[0x20]!=0xFD)
+            if (other && *(short *)(other + 0xAA)==MOBY_CLASS_MEGACORP_HOVER_TANK && (unsigned char)other[0x20]!=0xFE && (unsigned char)other[0x20]!=0xFD)
                 moby_destroy_with_explosion(other);
         }
         if (*(float *)(obj + 0xF0)<=-1.57079649f) { *(int *)(state + 4)=0; moby_set_state(obj, 3, -1); PlayMobySound(1, 0, obj); }

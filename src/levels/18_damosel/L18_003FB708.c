@@ -136,16 +136,16 @@ void train_l18_update(char *moby)
     PvVars *vars;
     char *path;
     char *rec;
-    ClassRec *classTable;
-    ClassRec *classTable2;
+    ClassRec *class_table;
+    ClassRec *class_table2;
     char *src;
     char *sound;
     char *target;
-    int hitCount;
+    int hit_count;
     int i;
     int k;
-    int parentIndex;
-    int savedState;
+    int parent_index;
+    int saved_state;
     int j;
     float f;
     float g;
@@ -175,7 +175,7 @@ void train_l18_update(char *moby)
             qcopy(moby + 0x10, path + 0x10);
             vars->iE0 = -1;
         }
-        if (*(s16 *)(moby + 0xAA) != 0xD9B /* Train */ && *(s16 *)(moby + 0xAA) != 0x11CF /* moby class 4559 */) {
+        if (*(s16 *)(moby + 0xAA) != MOBY_CLASS_TRAIN && *(s16 *)(moby + 0xAA) != 0x11CF /* moby class 4559 */) {
             vars->i8 = 0;
         }
         if (vars->iC8 != -1) {
@@ -213,15 +213,15 @@ void train_l18_update(char *moby)
             vars->fD8 = vars->fD8 + vars->fDC;
         } else {
             if (vars->iC8 != -1) {
-                classTable = g_moby_l18_table[0];
-                *(u16 *)(moby + 0x34) = classTable[vars->iC8].h34;
-                *(u8 *)(moby + 0x23) = classTable[vars->iC8].b23;
-                classTable2 = g_moby_l18_table[0];
-                *(u16 *)(moby + 0x34) = classTable2[vars->iC8].h34;
-                *(int *)(moby + 0x98) = classTable2[vars->iC8].i98;
-                parentIndex = vars->iC8;
+                class_table = g_moby_l18_table[0];
+                *(u16 *)(moby + 0x34) = class_table[vars->iC8].h34;
+                *(u8 *)(moby + 0x23) = class_table[vars->iC8].b23;
+                class_table2 = g_moby_l18_table[0];
+                *(u16 *)(moby + 0x34) = class_table2[vars->iC8].h34;
+                *(int *)(moby + 0x98) = class_table2[vars->iC8].i98;
+                parent_index = vars->iC8;
                 for (k = 0; k < 4; k++) {
-                    qcopy(moby + 0xC0 + k * 16, classTable2[parentIndex].mat[k]);
+                    qcopy(moby + 0xC0 + k * 16, class_table2[parent_index].mat[k]);
                 }
                 matrix_mul_vec3(vm[0], vars->vA0, moby + 0xC0);
                 FastVecAdd(moby + 0x10, vm[0], g_moby_l18_table[0][vars->iC8].pos);
@@ -241,19 +241,19 @@ void train_l18_update(char *moby)
                     }
                 }
                 vars->iE4 = -1;
-                if (*(s16 *)(moby + 0xAA) == 0xD9B /* Train */ || *(s16 *)(moby + 0xAA) == 0x11CF /* moby class 4559 */) {
+                if (*(s16 *)(moby + 0xAA) == MOBY_CLASS_TRAIN || *(s16 *)(moby + 0xAA) == 0x11CF /* moby class 4559 */) {
                     moby_set_state(moby, 5, -1);
                 } else {
                     moby_set_state(moby, 6, -1);
                 }
             }
         }
-        if (*(s16 *)(moby + 0xAA) == 0xD9B /* Train */) {
+        if (*(s16 *)(moby + 0xAA) == MOBY_CLASS_TRAIN) {
             matrix_mul_vec3(vm[0], D_L18_001B05F0, moby + 0xC0);
             FastVecAdd(vm[0], vm[0], moby + 0x10);
-            hitCount = coll_process_hit(D_L18_001B0600, vm[0], 0, moby, 0);
-            if (hitCount != 0) {
-                for (j = 0; j < hitCount; j++) {
+            hit_count = coll_process_hit(D_L18_001B0600, vm[0], 0, moby, 0);
+            if (hit_count != 0) {
+                for (j = 0; j < hit_count; j++) {
                     target = g_nearby_hit_targets[j];
                     if (target == ((Hero *)g_hero_state)->ptr[0x2290 / 4]) {
                         FastVecScale(vm[1], moby + 0xC0, -D_L18_001B0608);
@@ -395,11 +395,11 @@ void train_l18_update(char *moby)
     case 2:
         if (vars->iD4 != -1 && coll_point_inside_region(g_camera_l18_position, vars->iD4) == 0) {
             rec = *(char **)(moby + 0x24);
-            savedState = *(u8 *)(moby + 0x94);
+            saved_state = *(u8 *)(moby + 0x94);
             *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;
             *(int *)(moby + 0x98) = *(int *)(rec + 0x10);
             *(int *)(moby + 0x98) = *(int *)(rec + 0x10);
-            *(u8 *)(moby + 0x20) = savedState;
+            *(u8 *)(moby + 0x20) = saved_state;
         }
         break;
     }

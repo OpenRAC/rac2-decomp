@@ -22,25 +22,25 @@ extern void bouncing_debris_create(void *a0, void *a1, void *a2);
 void part_spray_height(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
-    f32 distanceScale = 60.0f / fast_vec_dist(D_L22_001B9C80, moby + 0x10);
+    f32 distance_scale = 60.0f / fast_vec_dist(D_L22_001B9C80, moby + 0x10);
     f32 count;
-    f32 stepSize;
-    f32 maxCount;
+    f32 step_size;
+    f32 max_count;
     f32 height;
     s32 i;
-    Quad position, scratch, randomVec;
+    Quad position, scratch, random_vec;
 
-    if (distanceScale > 2.2f)
-        distanceScale = 2.7f;
+    if (distance_scale > 2.2f)
+        distance_scale = 2.7f;
     height = *(f32 *)(state + 0xA0);
-    count = distanceScale * distanceScale * height * D_L22_001B0A0C;
-    maxCount = (f32)D_L22_001B2040 * D_L22_001B0A10;
-    stepSize = height / count;
-    if (count > maxCount)
-        count = maxCount;
+    count = distance_scale * distance_scale * height * D_L22_001B0A0C;
+    max_count = (f32)D_L22_001B2040 * D_L22_001B0A10;
+    step_size = height / count;
+    if (count > max_count)
+        count = max_count;
     for (i = 0; (f32)i < count; i++) {
-        f32 progress = IntToFloat(i) * stepSize;
-        f32 spread = distanceScale + progress * 0.1f;
+        f32 progress = IntToFloat(i) * step_size;
+        f32 spread = distance_scale + progress * 0.1f;
 
         scratch.q = 0;
         scratch.f[0] = math_random_signed_float_range(0.0f, spread);
@@ -49,11 +49,11 @@ void part_spray_height(u8 *moby)
         position.q = scratch.q;
         matrix_mul_vec3(&position, &position, moby + 0xC0);
         FastVecAdd(&position, &position, moby + 0x10);
-        randomVec.q = 0;
-        randomVec.f[0] = math_random_angle();
-        randomVec.f[1] = math_random_angle();
-        randomVec.f[2] = math_random_angle();
-        scratch.q = randomVec.q;
+        random_vec.q = 0;
+        random_vec.f[0] = math_random_angle();
+        random_vec.f[1] = math_random_angle();
+        random_vec.f[2] = math_random_angle();
+        scratch.q = random_vec.q;
         bouncing_debris_create(moby, &position, &scratch);
     }
 }

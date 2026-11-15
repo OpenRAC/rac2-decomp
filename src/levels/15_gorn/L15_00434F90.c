@@ -19,14 +19,14 @@ extern int FloatToInt(float);
 extern float IntToFloat(int);
 
 /* Spawns one short-lived puff particle near a joint of the object and flings it away from the camera heading. */
-void gorn_part_spawn_puff(char *object, int jointIndex, int joint, float radius) {
+void gorn_part_spawn_puff(char *object, int joint_index, int joint, float radius) {
     float initial[4], point[4], velocity[4];
     float heading, speed, tilt, yaw;
     unsigned char *particle;
     unsigned char *data;
     int one = 1;
 
-    moby_transform_joint_to_world(object, jointIndex, initial);
+    moby_transform_joint_to_world(object, joint_index, initial);
     heading = mat_fast_helper_a(D_L15_001B9680.position[0] - *(float *)(object + 0x10),
                             D_L15_001B9680.position[1] - *(float *)(object + 0x14));
     point[0] = initial[0] + math_random_signed_float_range(0, radius);

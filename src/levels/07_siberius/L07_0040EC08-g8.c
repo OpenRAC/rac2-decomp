@@ -35,43 +35,43 @@ typedef struct {u8 pad[0xe0];f32 pathpos[5];u8 *objects[5];u8 pad108[0x1a0-0x108
 void ship_move_riders_along_path(u8 *moby)
 {
  f32 oldpos[4],oldrot[4],delta[4],relative[4];
- s32 jointIndex,soundId;
+ s32 joint_index,sound_id;
  f32 step,target,speed,bend;
  u8 *child,*state;
  u8 *vars=*(u8 **)(moby+0x68),*sound;
  s32 pathid=*(s32 *)(vars+0x90);
  s32 *path;
- State *pathState=(State *)vars;
+ State *path_state=(State *)vars;
  D_L07_001ADAAC=0;
  path=D_L07_001FDEC0[pathid];
- target=pathState->target;
- speed=pathState->speed;
+ target=path_state->target;
+ speed=path_state->speed;
  ApproachValue(vars+0x11c,target,speed);
  sound=g_sound_state+*(s32 *)(vars+0x1ac)*0x70;
  if(*(u8 **)(sound+0x88)!=moby || !sound[0x74]) *(s32 *)(vars+0x1ac)=PlayMobySound(2,12,moby);
- soundId=*(s32 *)(vars+0x1ac);
- if(soundId!=-1) qcopy(D_001886F0+soundId*0x70,D_L07_001B9200);
+ sound_id=*(s32 *)(vars+0x1ac);
+ if(sound_id!=-1) qcopy(D_001886F0+sound_id*0x70,D_L07_001B9200);
  {
  s32 i;
  for(i=0;i<5;i++) {
-  child=pathState->objects[i];
+  child=path_state->objects[i];
   state=*(u8 **)(child+0x68);
   qcopy_nc(oldpos,child+0x10);
   qcopy_nc(oldrot,child+0xf0);
-  path_sample_position(path,1,child+0x10,child+0xf0,0,pathState->pathpos[i]);
+  path_sample_position(path,1,child+0x10,child+0xf0,0,path_state->pathpos[i]);
   bend=D_L07_001B1708;
   *(f32 *)(child+0x18)+=D_L07_001B1784;
-  path_compute_heading_and_tilt(path,pathState->pathpos[i],child+0xf0,bend);
+  path_compute_heading_and_tilt(path,path_state->pathpos[i],child+0xf0,bend);
   func_002A0F48(child);
-  pathState->pathpos[i]+=*(f32 *)(vars+0x11c);
-  if(pathState->pathpos[i]>=(f32)path[0]) pathState->pathpos[i]-=(f32)path[0];
+  path_state->pathpos[i]+=*(f32 *)(vars+0x11c);
+  if(path_state->pathpos[i]>=(f32)path[0]) path_state->pathpos[i]-=(f32)path[0];
   step=D_L07_001B1788*0.000290888245f;
-  for(jointIndex=0;jointIndex<8;jointIndex++) *(f32 *)(state+0x15b4+jointIndex*0x20)=FastAddRotations(*(f32 *)(state+0x15b4+jointIndex*0x20),step);
+  for(joint_index=0;joint_index<8;joint_index++) *(f32 *)(state+0x15b4+joint_index*0x20)=FastAddRotations(*(f32 *)(state+0x15b4+joint_index*0x20),step);
   FastVecSub(delta,child+0x10,oldpos);
   mat_combine_and_store(state+0x20,delta,oldrot,child+0xf0);
   if(g_hero_state.object==child || (*(u8 **)(state+0x108) && g_hero_state.object==*(u8 **)(state+0x108)) || (*(u8 **)(state+0x10c) && g_hero_state.object==*(u8 **)(state+0x10c))) {
    D_L07_001ADAAC=child;
-   snow_emitter_update_effect(pathState->pathpos[i]);
+   snow_emitter_update_effect(path_state->pathpos[i]);
   }
   cam_mode_noop(child);
   swingshot_nodes_update_attached(child);

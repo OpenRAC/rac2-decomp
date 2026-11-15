@@ -34,12 +34,12 @@ extern void ref_L04_00441100_03(s8 *, s32, s32);
 /* On its first update waits until the hero is at the linked spot, then sets a level flag and moves to the next state. */
 void barlow_proximity_trigger_update(s8 *object) {
     s32 *links;
-    s32 linkedId;
+    s32 linked_id;
 
     if (*(u8 *)(object + 0x20) == 0) {
         links = *(s32 **)(object + 0x68);
-        linkedId = *links;
-        if (linkedId != -1 && ref_L04_00441100_01(g_hero_position, linkedId) != 0) {
+        linked_id = *links;
+        if (linked_id != -1 && ref_L04_00441100_01(g_hero_position, linked_id) != 0) {
             ref_L04_00441100_02(ref_L04_00441100_00);
             D_001395C8 = 1;
             ref_L04_00441100_03(object, 1, -1);

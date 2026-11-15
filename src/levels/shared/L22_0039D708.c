@@ -245,18 +245,18 @@ int lane_list_enabled_from_mask(float value, int unused, int *out, int flag) {
 }
 
 /* Tells which end of a lane is the entry end for the given mask bit. Returns 0 for the start or the last point number. */
-int lane_get_entry_end(char *obj, int laneSlot, int bit) {
-    char *laneIds = *(char **)(obj + 0x68) + 0x2A0;
-    int *slot = (int *)(laneIds + laneSlot * 4);
+int lane_get_entry_end(char *obj, int lane_slot, int bit) {
+    char *lane_ids = *(char **)(obj + 0x68) + 0x2A0;
+    int *slot = (int *)(lane_ids + lane_slot * 4);
     Rec_003A2D58 *rec;
-    int lastPoint;
+    int last_point;
     rec = D_L22_001FE940[*slot];
     if (math_get_float_bit(bit, rec->angle) != 0) return 0;
     rec = D_L22_001FE940[*slot];
-    lastPoint = rec->count - 1;
-    rec = (Rec_003A2D58 *)((char *)rec + lastPoint * 16);
+    last_point = rec->count - 1;
+    rec = (Rec_003A2D58 *)((char *)rec + last_point * 16);
     math_get_float_bit(bit, rec->angle);
-    return lastPoint;
+    return last_point;
 }
 
 /* Returns bit BIT of VALUE's raw pattern. */
@@ -268,16 +268,16 @@ int math_get_float_bit(int bit, float value) {
 }
 
 /* Remembers the lane the ship just chose and keeps a short history of the last three lanes. */
-void lane_remember_chosen(char *obj, int laneId) {
+void lane_remember_chosen(char *obj, int lane_id) {
     char *vars = *(char **)(obj + 0x68);
-    unsigned short previousLane = *(unsigned short *)(vars + 0x354);
+    unsigned short previous_lane = *(unsigned short *)(vars + 0x354);
     int i = (short)*(short *)(vars + 0x35E);
-    char *historySlot;
+    char *history_slot;
     i = (i + 1) % 3;
     *(short *)(vars + 0x35E) = (short)i;
-    historySlot = vars + i * 2;
-    *(unsigned short *)(historySlot + 0x358) = previousLane;
-    *(unsigned short *)(vars + 0x354) = laneId;
+    history_slot = vars + i * 2;
+    *(unsigned short *)(history_slot + 0x358) = previous_lane;
+    *(unsigned short *)(vars + 0x354) = lane_id;
 }
 
 extern char g_hero_position[];

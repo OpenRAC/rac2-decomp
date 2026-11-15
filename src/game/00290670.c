@@ -20,7 +20,7 @@ extern void gfx_set_clear_color_packet(int, int, int, int);
 void hud_update_letterbox_bars(void)
 {
     int level;
-    int barHeight;
+    int bar_height;
 
     if (g_letterbox_grow_flag != 0) {
         g_letterbox_grow_flag = 0;
@@ -34,9 +34,9 @@ void hud_update_letterbox_bars(void)
         if (level < 0)
             g_letterbox_level = 0;
     }
-    barHeight = (int)((float)g_letterbox_level * 0.1f * 48.0f);
-    if (barHeight != 0)
-        gfx_set_clear_color_packet(0, 0, 0, barHeight);
+    bar_height = (int)((float)g_letterbox_level * 0.1f * 48.0f);
+    if (bar_height != 0)
+        gfx_set_clear_color_packet(0, 0, 0, bar_height);
 }
 
 extern int D_001A901C __attribute__((sda));

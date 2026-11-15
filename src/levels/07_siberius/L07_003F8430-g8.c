@@ -34,8 +34,8 @@ void flyer_steer(u8 *moby)
 {
  f32 offset[4];
  u8 *vars=*(u8 **)(moby+0x68);
- s32 needsNewHeading;
- f32 distance,angle,turnStep;
+ s32 needs_new_heading;
+ f32 distance,angle,turn_step;
  if (!moby[0x95]) {
   func_2E4340(offset,vars+0x140,*(u8 **)(vars+0x418)+0x10);
   func_31B090(*(u8 **)(vars+0x418),offset,offset,0);
@@ -49,20 +49,20 @@ void flyer_steer(u8 *moby)
  } else {
   if (*(s32 *)(vars+0x440)<0) *(s32 *)(vars+0x440)=-*(s32 *)(vars+0x440);
   else if (func_2E4508(moby+0x10,vars+0x3e0)<2.0f) {
-   needsNewHeading=0;
+   needs_new_heading=0;
    distance=func_2E4508(vars+0x140,moby+0x10);
-   if(distance<D_L07_001B1094) needsNewHeading=1;
-   else if(distance>D_L07_001B1098) needsNewHeading=1;
+   if(distance<D_L07_001B1094) needs_new_heading=1;
+   else if(distance>D_L07_001B1098) needs_new_heading=1;
    if(func_2E3F80((s32 *)(vars+0x440))) {
-    needsNewHeading=1;
+    needs_new_heading=1;
     *(s32 *)(vars+0x440)=func_2E5470(math_interpolate_between_limits(5,15,(f32)D_L07_001B10A8,(f32)D_L07_001B10AC));
     *(s32 *)(vars+0x440)+=func_310AD8(0,60);
    }
-   if(needsNewHeading) {
-    turnStep=func_310B30(10.0f,40.0f)*0.017453294f;
+   if(needs_new_heading) {
+    turn_step=func_310B30(10.0f,40.0f)*0.017453294f;
     angle=func_2E49C8(*(f32 *)(moby+0x10)-D_L07_001B90C0.pos[0],*(f32 *)(moby+0x14)-D_L07_001B90C0.pos[1]);
-    if(func_2E5360(angle,D_L07_001B90C0.angle)*turnStep>0.0f) turnStep=-turnStep;
-    angle=func_2E5318(D_L07_001B90C0.angle,turnStep);
+    if(func_2E5360(angle,D_L07_001B90C0.angle)*turn_step>0.0f) turn_step=-turn_step;
+    angle=func_2E5318(D_L07_001B90C0.angle,turn_step);
     *(f32 *)(vars+0x3e0)=func_2E4900(angle)*D_L07_001B109C;
     *(f32 *)(vars+0x3e4)=func_2E4918(angle)*D_L07_001B109C;
     *(f32 *)(vars+0x3e8)=0.0f;

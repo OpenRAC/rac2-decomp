@@ -33,24 +33,24 @@ extern s32 g_screen_width;
 extern s32 g_screen_height;
 
 /* Turns a point in the world into a screen position between 0 and 1. */
-void gfx_world_to_screen_unit(s32 worldPos, f32 *screenX, f32 *screenY) {
+void gfx_world_to_screen_unit(s32 world_pos, f32 *screen_x, f32 *screen_y) {
     f32 point[4];
     s8 *matrices;
     f32 w;
-    f32 pixelX;
-    f32 pixelY;
+    f32 pixel_x;
+    f32 pixel_y;
 
     matrices = g_camera_eye_state;
-    FastVecSub(point, worldPos, matrices);
+    FastVecSub(point, world_pos, matrices);
     FastVecScale(point, point, 1024.0f);
     point[3] = 1.0f;
     transform_vector(point, point, matrices - 0x100);
     w = point[3];
     FastVecScale(point, point, *(f32 *)D_001B9250 / w);
-    pixelX = point[0] + (f32)(g_screen_width >> 1);
-    *screenX = pixelX;
-    *screenX = pixelX / (f32)g_screen_width;
-    pixelY = point[1] + (f32)(g_screen_height >> 1);
-    *screenY = pixelY;
-    *screenY = pixelY / (f32)g_screen_height;
+    pixel_x = point[0] + (f32)(g_screen_width >> 1);
+    *screen_x = pixel_x;
+    *screen_x = pixel_x / (f32)g_screen_width;
+    pixel_y = point[1] + (f32)(g_screen_height >> 1);
+    *screen_y = pixel_y;
+    *screen_y = pixel_y / (f32)g_screen_height;
 }

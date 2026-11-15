@@ -168,20 +168,20 @@ void lock_l19_on_tether_update(Moby *self)
     float vb[4] __attribute__((aligned(16)));
     Hit hit1 __attribute__((aligned(16)));
     float direction[4] __attribute__((aligned(16)));
-    float segmentOffset[4] __attribute__((aligned(16)));
-    float pullVec[4] __attribute__((aligned(16)));
-    float pullDir[4] __attribute__((aligned(16)));
+    float segment_offset[4] __attribute__((aligned(16)));
+    float pull_vec[4] __attribute__((aligned(16)));
+    float pull_dir[4] __attribute__((aligned(16)));
     float wobble[4] __attribute__((aligned(16)));
-    Tgt *heldMobies[128];
+    Tgt *held_mobies[128];
     float scratch[4] __attribute__((aligned(16)));
     union {
         float q[16];
         struct { Hit r; } b;
         struct { float pad[4]; Hit r; } a;
-    } hitBuf __attribute__((aligned(16)));
-    float sparkOffsets[5][4] __attribute__((aligned(16)));
+    } hit_buf __attribute__((aligned(16)));
+    float spark_offsets[5][4] __attribute__((aligned(16)));
     Tgt *best = 0, *second = 0;
-    int hitSomething, heldCount;
+    int hit_something, held_count;
     float bestScore = 0.0f, secondScore = 0.0f;
     float len;
     float angle0, angle1;
@@ -333,12 +333,12 @@ void lock_l19_on_tether_update(Moby *self)
     FastVecSub(direction, tether->b, tether);
     vec_scale_to_length(direction, direction, 1.0f);
     if (tether->lockA != 0 || tether->lockB != 0) {
-        FastVecCross(segmentOffset, direction, (char *)&g_hero_state + 0x2C0);
-        math_apply_axis_rotation_to_quat(direction, direction, segmentOffset, 0.17453295f);
+        FastVecCross(segment_offset, direction, (char *)&g_hero_state + 0x2C0);
+        math_apply_axis_rotation_to_quat(direction, direction, segment_offset, 0.17453295f);
     }
-    hitSomething = 0;
-    FastVecScale(pullDir, direction, reach);
-    heldCount = 0;
+    hit_something = 0;
+    FastVecScale(pull_dir, direction, reach);
+    held_count = 0;
     /* These named pointers, and the short locals below, are live but also steer: each adds
        insns that exist at gcse and die later (asm operands keep the copy; the sign extension
        dies at combine). gcse's hash needs 677 buckets, max_cuid >= 1352, for retail's spill
@@ -361,21 +361,21 @@ void lock_l19_on_tether_update(Moby *self)
         D_L19_0023A850[i] = height;
         D_L19_0023A5D0[0][i].f[2] = D_L19_0023A5D0[0][i].f[2] - old;
         vec_transform_or_copy(&D_L19_0023A5D0[0][i], &D_L19_0023A5D0[0][i]);
-        FastVecSub(segmentOffset, &D_L19_0023A5D0[0][i], D_L19_0023A5C0[i]);
-        lerp_vector(pullVec, segmentOffset, pullDir, 0.85f);
+        FastVecSub(segment_offset, &D_L19_0023A5D0[0][i], D_L19_0023A5C0[i]);
+        lerp_vector(pull_vec, segment_offset, pull_dir, 0.85f);
         {
-            float cm = FastVecLength(pullVec);
+            float cm = FastVecLength(pull_vec);
             if (cm == 0.0f) {
                 prev = &D_L19_0023A5D0[0][i - 1];
                 qcopy(&D_L19_0023A5D0[0][i], prev);
             } else {
-                FastVecScale(pullVec, pullVec, reach / cm);
-                FastVecAdd(&D_L19_0023A5D0[0][i], D_L19_0023A5C0[i], pullVec);
-                qcopy(pullDir, pullVec);
+                FastVecScale(pull_vec, pull_vec, reach / cm);
+                FastVecAdd(&D_L19_0023A5D0[0][i], D_L19_0023A5C0[i], pull_vec);
+                qcopy(pull_dir, pull_vec);
             }
         }
         D_L19_0023A5D0[0][i].f[2] = D_L19_0023A5D0[0][i].f[2] + height;
-        FastVecSub(segmentOffset, &D_L19_0023A5D0[0][i], D_L19_0023A5C0[i]);
+        FastVecSub(segment_offset, &D_L19_0023A5D0[0][i], D_L19_0023A5C0[i]);
         if (tether->lockA != 0) {
             if (!locked || tether->lockB == 0) {
                 FastVecSub(scratch, v0, &D_L19_0023A5D0[0][i]);
@@ -392,7 +392,7 @@ void lock_l19_on_tether_update(Moby *self)
                         blend = 0.1f;
                     }
                     FastVecScale(scratch, scratch, reach / length);
-                    lerp_vector(pullDir, pullDir, scratch, blend);
+                    lerp_vector(pull_dir, pull_dir, scratch, blend);
                 }
             } else {
                 if (i >= 10)
@@ -416,7 +416,7 @@ void lock_l19_on_tether_update(Moby *self)
                         blend = 0.2f;
                     }
                     FastVecScale(scratch, scratch, reach / length);
-                    lerp_vector(pullDir, pullDir, scratch, blend);
+                    lerp_vector(pull_dir, pull_dir, scratch, blend);
                 }
             }
         }
@@ -428,7 +428,7 @@ void lock_l19_on_tether_update(Moby *self)
             D_L19_0023A9E0[i] = height;
             D_L19_0023A5D0[1][i].f[2] = D_L19_0023A5D0[1][i].f[2] + height;
             {
-                float bearing = FastAddRotations(mat_fast_helper_a(segmentOffset[0], segmentOffset[1]), 1.5707965f);
+                float bearing = FastAddRotations(mat_fast_helper_a(segment_offset[0], segment_offset[1]), 1.5707965f);
                 {
                     float radial = D_L19_001AF044 * math_fast_sin_or_cos_a(angle);
                     wobble[0] = math_fast_sin_or_cos_a(bearing) * radial;
@@ -464,8 +464,8 @@ void lock_l19_on_tether_update(Moby *self)
                 FastVecScale(vb, vb, 1.0f / cm2);
             vb[3] = 5627.925f;
             qcopy(&hit1, vb);
-            hitSomething = CollLine(D_L19_0023A5B0[i], &D_L19_0023A5D0[0][i], 0x10, self, 0);
-            if (hitSomething != 0) {
+            hit_something = CollLine(D_L19_0023A5B0[i], &D_L19_0023A5D0[0][i], 0x10, self, 0);
+            if (hit_something != 0) {
                 ht = D_L19_001BFE98.hit;
                 if (ht != 0) {
                     hinfo = moby_get_private_value_0(ht);
@@ -474,12 +474,12 @@ void lock_l19_on_tether_update(Moby *self)
                     } else if (ht->cls == 0 || ht->cls->id != 5) {
                         QueueMobyImpact(ht, &hit1);
                     } else {
-                        hitSomething = 0;
-                        heldMobies[heldCount++] = ht;
+                        hit_something = 0;
+                        held_mobies[held_count++] = ht;
                         ht->f98 = 0;
                     }
                 }
-                if (hitSomething != 0) {
+                if (hit_something != 0) {
                     qcopy(&D_L19_0023A5D0[0][i], D_L19_001BFE98.pos);
                     {
                         short last = i;
@@ -496,12 +496,12 @@ void lock_l19_on_tether_update(Moby *self)
         }
     }
     }
-    for (n = 0; n < heldCount; n++)
-        heldMobies[n]->f98 = heldMobies[n]->cls->f10;
-    if (hitSomething == 0)
+    for (n = 0; n < held_count; n++)
+        held_mobies[n]->f98 = held_mobies[n]->cls->f10;
+    if (hit_something == 0)
         qcopy(tether->b, &D_L19_0023A700);
     if (tether->lockA != 0 && (tether->u.q & 0x0000FFFF0000FFFFUL) == 0) {
-        tv = hitBuf.q;
+        tv = hit_buf.q;
         FastVecSub(scratch, tether->lockA->pos, D_L19_001B9A40);
         if (D_L19_001A8FF0 != 0) {
             apj = FastVecDot(scratch, g_hero_state.ent + 0xE0);
@@ -512,12 +512,12 @@ void lock_l19_on_tether_update(Moby *self)
         }
         vec_scale_to_length(scratch, scratch, 1.0f);
         scratch[3] = 5627.925f;
-        make_hit_descriptor(&hitBuf.a.r, self, 0x210000, scratch, (&D_L19_00265870[g_item_slot_to_record.cur])->f70);
-        hitBuf.a.r.kind = 5;
-        hitBuf.a.r.flag = 3;
-        hitBuf.a.r.tag = self->tag;
+        make_hit_descriptor(&hit_buf.a.r, self, 0x210000, scratch, (&D_L19_00265870[g_item_slot_to_record.cur])->f70);
+        hit_buf.a.r.kind = 5;
+        hit_buf.a.r.flag = 3;
+        hit_buf.a.r.tag = self->tag;
         an = 5;
-        QueueMobyImpact(tether->lockA, &hitBuf.a.r);
+        QueueMobyImpact(tether->lockA, &hit_buf.a.r);
         ainfo = moby_get_private_value_0(tether->lockA);
         if (ainfo != 0) {
             if (((short *)ainfo)[2] == 1)
@@ -532,19 +532,19 @@ void lock_l19_on_tether_update(Moby *self)
         FastVecSub(scratch, tether->lockB->pos, D_L19_001B9A40);
         if (D_L19_001A8FF0 != 0) {
             bpj = FastVecDot(scratch, g_hero_state.ent + 0xE0);
-            FastVecScale(hitBuf.q, g_hero_state.ent + 0xE0, bpj);
-            FastVecSub(scratch, scratch, hitBuf.q);
+            FastVecScale(hit_buf.q, g_hero_state.ent + 0xE0, bpj);
+            FastVecSub(scratch, scratch, hit_buf.q);
         } else {
             *(int *)&scratch[2] = 0;
         }
         vec_scale_to_length(scratch, scratch, 1.0f);
         scratch[3] = 5627.925f;
-        make_hit_descriptor(&hitBuf.b.r, self, 0x210000, scratch, (&D_L19_00265870[g_item_slot_to_record.cur])->f70);
-        hitBuf.b.r.kind = 5;
-        hitBuf.b.r.flag = 3;
-        hitBuf.b.r.tag = self->tag;
+        make_hit_descriptor(&hit_buf.b.r, self, 0x210000, scratch, (&D_L19_00265870[g_item_slot_to_record.cur])->f70);
+        hit_buf.b.r.kind = 5;
+        hit_buf.b.r.flag = 3;
+        hit_buf.b.r.tag = self->tag;
         bn = 5;
-        QueueMobyImpact(tether->lockB, &hitBuf.b.r);
+        QueueMobyImpact(tether->lockB, &hit_buf.b.r);
         binfo = moby_get_private_value_0(tether->lockB);
         if (binfo != 0) {
             if (((short *)binfo)[2] == 1)
@@ -559,11 +559,11 @@ void lock_l19_on_tether_update(Moby *self)
         if (k < 2) {
             {
                 float *from = tether->a;
-                qcopy(hitBuf.q, from);
+                qcopy(hit_buf.q, from);
             }
             ksize = 0.4f;
         } else {
-            qcopy(hitBuf.q, tether->b);
+            qcopy(hit_buf.q, tether->b);
             ksize = 0.5f;
         }
         if (FastDecTimer(&D_L19_001B32C8[k]) != 0) {
@@ -574,27 +574,27 @@ void lock_l19_on_tether_update(Moby *self)
             FastVecScale(scratch, direction, ksize);
             math_apply_axis_rotation_to_quat(scratch, scratch, D_0018A560, angle1);
             math_apply_axis_rotation_to_quat(scratch, scratch, D_0018A560 + 0x10, angle0);
-            qcopy(&D_L19_0023AA30[k].v[0], hitBuf.q);
+            qcopy(&D_L19_0023AA30[k].v[0], hit_buf.q);
             ks = 1.0f;
-            FastVecAdd(&D_L19_0023AA30[k].v[1], hitBuf.q, scratch);
+            FastVecAdd(&D_L19_0023AA30[k].v[1], hit_buf.q, scratch);
             for (j1 = 2; j1 < 5; j1++) {
-                FastVecSub(hitBuf.q + 4, &D_L19_0023AA20[k].p[j1 - 1], D_L19_001B9A40);
+                FastVecSub(hit_buf.q + 4, &D_L19_0023AA20[k].p[j1 - 1], D_L19_001B9A40);
                 kf = math_random_float_range(0.17453295f, 0.9599312f) * ks;
                 ks = -ks;
-                math_apply_axis_rotation_to_quat(scratch, scratch, hitBuf.q + 4, kf);
+                math_apply_axis_rotation_to_quat(scratch, scratch, hit_buf.q + 4, kf);
                 FastVecAdd(D_L19_0023AA30[k].v + j1, &D_L19_0023AA20[k].p[j1 - 1], scratch);
             }
         } else {
             for (j2 = 1; j2 < 5; j2++) {
-                q = sparkOffsets[j2];
+                q = spark_offsets[j2];
                 FastVecSub(q, D_L19_0023AA30[k].v + j2, &D_L19_0023AA20[k].p[j2 - 1]);
                 q[0] = q[0] + math_random_signed_float_range(0.0f, 0.1f);
                 q[1] = q[1] + math_random_signed_float_range(0.0f, 0.1f);
                 q[2] = q[2] + math_random_signed_float_range(0.0f, 0.1f);
             }
-            qcopy(&D_L19_0023AA30[k].v[0], hitBuf.q);
+            qcopy(&D_L19_0023AA30[k].v[0], hit_buf.q);
             for (j2 = 1; j2 < 5; j2++)
-                FastVecAdd(D_L19_0023AA30[k].v + j2, &D_L19_0023AA20[k].p[j2 - 1], sparkOffsets[j2]);
+                FastVecAdd(D_L19_0023AA30[k].v + j2, &D_L19_0023AA20[k].p[j2 - 1], spark_offsets[j2]);
             {
                 int x = D_L19_001B32E0[k];
                 int y = D_L19_001B32C8[k];

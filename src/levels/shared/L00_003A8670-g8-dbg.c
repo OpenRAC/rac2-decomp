@@ -32,7 +32,7 @@ typedef struct {
 /* Starts a new beam particle at a point, using the first unused one in the pool. */
 void beam_spawn_particle(TI128 *position, int index)
 {
-    char *base = level_get_slot_body(1483 /* Pulse Rifle */, index);
+    char *base = level_get_slot_body(MOBY_CLASS_PULSE_RIFLE, index);
     BeamParticle *entry;
     int i, j;
     Context *context = (Context *)g_hero_state;

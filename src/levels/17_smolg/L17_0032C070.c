@@ -152,7 +152,7 @@ int coll_find_clear_side_point(float *origin, float *target, void *out, void *ob
 /* Fades a particle's colour over its lifetime and removes the particle when its time is up. */
 void part_update_fading(char *particle)
 {
-    float lifeRatio;
+    float life_ratio;
     float wave;
     char *extra;
 
@@ -163,8 +163,8 @@ void part_update_fading(char *particle)
         func_332E48(particle);
         return;
     }
-    lifeRatio = func_2F00B0(*(short *)(extra + 4)) / func_2F00B0(*(short *)(extra + 6));
-    wave = func_2EF4E0(lifeRatio * 6.283186f);
+    life_ratio = func_2F00B0(*(short *)(extra + 4)) / func_2F00B0(*(short *)(extra + 6));
+    wave = func_2EF4E0(life_ratio * 6.283186f);
     *(int *)(particle + 4) = (*(int *)(particle + 4) & 0x00FFFFFF)
                        + (func_2F00C0(math_fabs(func_2F00B0(*(int *)(extra + 0xC)) * wave)) << 24);
 }
@@ -189,11 +189,11 @@ void cutscene_update_spark_effects(unsigned char *self) {
         if (D_L17_001A8F00 != 2)
             break;
         if (D_L17_001BD8C0.phase == 6) {
-            EffectMoby *effectMoby;
-            for (effectMoby = D_L17_001B2C28; effectMoby; effectMoby = effectMoby->next) {
-                if (effectMoby->classId == 0xB88 /* Grulch */ || effectMoby->classId == 0x1249) {
-                    effectMoby->unknown = 0;
-                    effectMoby->flags = (effectMoby->flags | 0x43) & 0xEFFF;
+            EffectMoby *effect_moby;
+            for (effect_moby = D_L17_001B2C28; effect_moby; effect_moby = effect_moby->next) {
+                if (effect_moby->classId == MOBY_CLASS_GRULCH || effect_moby->classId == 0x1249) {
+                    effect_moby->unknown = 0;
+                    effect_moby->flags = (effect_moby->flags | 0x43) & 0xEFFF;
                 }
             }
         }
@@ -349,7 +349,7 @@ void splash_projectile_update(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L17_001C0000;
                 model = reread->hit;
@@ -432,7 +432,7 @@ void aging_projectile_update(char *obj) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L17_001C0000;
             model = reread->hit;
@@ -498,20 +498,20 @@ void platform_attach_path_to_lift(char *moby)
     char *position;
     char *matrix;
     char *hero;
-    int pathRef;
+    int path_ref;
     int i;
 
     vars = *(char **)(moby + 0x68);
-    pathRef = *(int *)(vars + 0xD0);
-    if (pathRef == -1)
+    path_ref = *(int *)(vars + 0xD0);
+    if (path_ref == -1)
         return;
-    pathRef = *(int *)(g_path_l17_table + pathRef * 4);
-    if (*(int *)pathRef != 7)
+    path_ref = *(int *)(g_path_l17_table + path_ref * 4);
+    if (*(int *)path_ref != 7)
         return;
     matrix = moby + 0xC0;
     position = moby + 0x10;
     template = D_L17_00296F80;
-    point = pathRef + 0x10;
+    point = path_ref + 0x10;
     for (i = 6; i >= 0; i--) {
         matrix_mul_vec3(point, template, matrix);
         template += 0x10;
@@ -596,20 +596,20 @@ void platform_attach_path_to_transform(char *moby)
     char *position;
     char *matrix;
     char *hero;
-    int pathRef;
+    int path_ref;
     int i;
 
     vars = *(char **)(moby + 0x68);
-    pathRef = *(int *)(vars + 0x128);
-    if (pathRef == -1)
+    path_ref = *(int *)(vars + 0x128);
+    if (path_ref == -1)
         return;
-    pathRef = *(int *)(g_path_l17_table + pathRef * 4);
-    if (*(int *)pathRef != 7)
+    path_ref = *(int *)(g_path_l17_table + path_ref * 4);
+    if (*(int *)path_ref != 7)
         return;
     matrix = moby + 0xC0;
     position = moby + 0x10;
     template = D_L17_00296FF0;
-    point = pathRef + 0x10;
+    point = path_ref + 0x10;
     for (i = 6; i >= 0; i--) {
         matrix_mul_vec3(point, template, matrix);
         template += 0x10;
@@ -630,9 +630,9 @@ void platform_attach_path_to_transform(char *moby)
 /* func_L17_003C71B0 is matched in L17_003C71B0.c (built with -mno-split-addresses). */
 
 /* Stores the second argument in the object's sub-record at 0xA4. */
-void platform_set_path_index(char *moby, int pathIndex)
+void platform_set_path_index(char *moby, int path_index)
 {
-    *(int *)(*(char **)(moby + 0x68) + 0xA4) = pathIndex;
+    *(int *)(*(char **)(moby + 0x68) + 0xA4) = path_index;
 }
 
 

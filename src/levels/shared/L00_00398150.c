@@ -72,7 +72,7 @@ void decoy_update(char *actor) {
         vec_add_object_direction_scaled(actor + 0x10, (float *)(state + 0x10), 0.0030555557f);
         vec_transform_or_copy(actor + 0x10, actor + 0x10);
         shop_trigger_current_state_effect((int)(state + 0x10), (int)(state + 0x10));
-        scratch.ignore[0] = 0; scratch.ignore[1] = 0x232 /* Decoy Glove */;
+        scratch.ignore[0] = 0; scratch.ignore[1] = MOBY_CLASS_DECOY_GLOVE;
         qcopy(&scratch.phase.query.previous, &scratch.oldPosition);
         qcopy(&scratch.phase.query.position, (actor + 0x10));
         qcopy(&scratch.phase.query.velocity, (state + 0x10));
@@ -92,7 +92,7 @@ void decoy_update(char *actor) {
         hit = scratch.phase.query.owner;
         if (hit) {
             type = *(short *)(hit + 0xAA);
-            if (type == 0xCB /* Decoy */ || type == 0x1366 /* Miniturret */ || type == 0x1367 /* Megaturret */) goto accelerate;
+            if (type == MOBY_CLASS_DECOY || type == MOBY_CLASS_MINITURRET || type == MOBY_CLASS_MEGATURRET) goto accelerate;
             *(char **)(state + 0x38) = hit;
         }
         {

@@ -31,31 +31,31 @@ extern s8 D_001A7B88[];
 /* Walks the item list, clears every entry that is not allowed, and tells whether all were fine. */
 s32 level_validate_item_list(void) {
     s32 entry;
-    s32 listEnd;
-    s32 allValid;
+    s32 list_end;
+    s32 all_valid;
     u8 raw;
-    s32 itemId;
+    s32 item_id;
 
-    s32 skipId = 0x1E;
+    s32 skip_id = 0x1E;
     entry = (s32)D_001A7B68;
-    listEnd = (s32)D_001A7B88;
-    allValid = 1;
+    list_end = (s32)D_001A7B88;
+    all_valid = 1;
     do {
         raw = *(u8 *)entry;
         if (raw == 0xFF) {
             entry++;
             continue;
         }
-        itemId = raw & 0x3F;
-        if (itemId == skipId) {
+        item_id = raw & 0x3F;
+        if (item_id == skip_id) {
             entry++;
             continue;
         }
-        if (help_is_id_in_mapping_table(itemId) == 0 || itemId == 0) {
+        if (help_is_id_in_mapping_table(item_id) == 0 || item_id == 0) {
             *(u8 *)entry = 0xFF;
-            allValid = 0;
+            all_valid = 0;
         }
         entry++;
-    } while (entry < listEnd);
-    return allValid;
+    } while (entry < list_end);
+    return all_valid;
 }

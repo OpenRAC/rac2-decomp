@@ -92,8 +92,8 @@ void UpdateTodanoPathDriver(DriverObject *self)
 {
     DriverState *state = self->vars;
     u8 *path;
-    float sightStart[4] __attribute__((aligned(16)));
-    float sightEnd[4] __attribute__((aligned(16)));
+    float sight_start[4] __attribute__((aligned(16)));
+    float sight_end[4] __attribute__((aligned(16)));
     u8 *hit;
     int accepted;
     switch (self->state) {
@@ -144,13 +144,13 @@ void UpdateTodanoPathDriver(DriverObject *self)
     case 3:
         if (flag_set_first_pending(self)) CLEAR_SOUND();
         if (math_fast_float_d(&state->timer)) {
-            matrix_mul_vec3(sightStart,D_L12_001B1C00,(u8 *)self+0xC0);
-            FastVecAdd(sightStart,sightStart,self->position);
-            matrix_mul_vec3(sightEnd,D_L12_001B1C10,(u8 *)self+0xC0);
-            FastVecAdd(sightEnd,sightEnd,self->position);
-            sightEnd[2] += 2.0f;
-            sightEnd[2] = coll_probe_ground_height_below(0.5f,sightEnd,0);
-            if (!space_tourist_launch(state->trigger,sightStart,sightEnd)) {
+            matrix_mul_vec3(sight_start,D_L12_001B1C00,(u8 *)self+0xC0);
+            FastVecAdd(sight_start,sight_start,self->position);
+            matrix_mul_vec3(sight_end,D_L12_001B1C10,(u8 *)self+0xC0);
+            FastVecAdd(sight_end,sight_end,self->position);
+            sight_end[2] += 2.0f;
+            sight_end[2] = coll_probe_ground_height_below(0.5f,sight_end,0);
+            if (!space_tourist_launch(state->trigger,sight_start,sight_end)) {
                 moby_reset_to_saved_position(D_L12_001B2E9C + (state->child << 8));
                 moby_set_state(self,4,-1);
                 if (self->nextAnimation != 0) anim_start_blended(self,0,0,30);
@@ -225,7 +225,7 @@ void UpdateTodanoPathDriver(DriverObject *self)
         if (hit) {
             u8 *owner = *(u8 **)(hit+0x20);
             accepted = 0;
-            if (owner && (*(s16 *)(owner+0xAA) == 0xB69 /* Protopet */ || *(s16 *)(owner+0xAA) == 0xF9E /* moby class 3998 */))
+            if (owner && (*(s16 *)(owner+0xAA) == MOBY_CLASS_PROTOPET || *(s16 *)(owner+0xAA) == 0xF9E /* moby class 3998 */))
                 accepted = 1;
             if (!accepted) {
                 SpawnExplosionEffects(self,self->position,0,0,0,10,3,9,4,2,9,0,-1,15,1,1,-1,0,0x810001);

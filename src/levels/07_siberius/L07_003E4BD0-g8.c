@@ -42,10 +42,10 @@ extern float D_L07_001B0A40[] __attribute__((sda));
    while giving off sparks. */
 void entity_sender_update(unsigned char *moby)
 {
-    float probePos[4] __attribute__((aligned(16)));
-    float aimPos[4] __attribute__((aligned(16)));
-    float sparkPos[4] __attribute__((aligned(16)));
-    float sparkVel[4] __attribute__((aligned(16)));
+    float probe_pos[4] __attribute__((aligned(16)));
+    float aim_pos[4] __attribute__((aligned(16)));
+    float spark_pos[4] __attribute__((aligned(16)));
+    float spark_vel[4] __attribute__((aligned(16)));
     int count;
     char *vars = *(char **)(moby+0x68);
     unsigned char *target;
@@ -75,15 +75,15 @@ void entity_sender_update(unsigned char *moby)
         if (math_fast_float_d(vars+0x14)) {
             target=entity_find_last_idle_member(*(int *)vars,&count);
             if (target) {
-                *(u128 *)probePos=0;
-                probePos[2]=0.7f;
-                matrix_mul_vec3(probePos,probePos,moby+0xC0);
-                FastVecAdd(probePos,probePos,moby+0x10);
-                if (!coll_test_point(probePos,0.5f,0,moby)) {
-                    *(u128 *)aimPos=0;
-                    aimPos[2]=0.5f;
-                    FastVecAdd(aimPos,aimPos,moby+0x10);
-                    entity_send_and_shrink(target,moby+0x10,aimPos,*(int *)(vars+0x10));
+                *(u128 *)probe_pos=0;
+                probe_pos[2]=0.7f;
+                matrix_mul_vec3(probe_pos,probe_pos,moby+0xC0);
+                FastVecAdd(probe_pos,probe_pos,moby+0x10);
+                if (!coll_test_point(probe_pos,0.5f,0,moby)) {
+                    *(u128 *)aim_pos=0;
+                    aim_pos[2]=0.5f;
+                    FastVecAdd(aim_pos,aim_pos,moby+0x10);
+                    entity_send_and_shrink(target,moby+0x10,aim_pos,*(int *)(vars+0x10));
                     PlayMobySound(0,0,moby);
                     *(int *)(vars+0x14)=60;
                 }
@@ -97,23 +97,23 @@ void entity_sender_update(unsigned char *moby)
         }
         gfx_add_draw_callback_first(entity_draw_glow_disc,moby);
         if (moby[0x31] && !math_random_int_below(5)) {
-            qzero_nc(aimPos); qzero_nc(probePos);
+            qzero_nc(aim_pos); qzero_nc(probe_pos);
             if (*(void **)(vars+0x10)) {
-                moby_transform_point_and_rotation_by_parent(moby,*(void **)(vars+0x10),moby+0x10,probePos,aimPos,probePos);
-                FastVecSub(aimPos,aimPos,moby+0x10);
+                moby_transform_point_and_rotation_by_parent(moby,*(void **)(vars+0x10),moby+0x10,probe_pos,aim_pos,probe_pos);
+                FastVecSub(aim_pos,aim_pos,moby+0x10);
             }
             angle=math_random_angle();
-            sparkPos[0]=math_fast_sin_or_cos_a(angle)*0.4f;
-            sparkPos[1]=math_fast_sin_or_cos_b(angle)*0.4f;
-            sparkPos[2]=0;
-            FastVecAdd(sparkPos,sparkPos,moby+0x10);
+            spark_pos[0]=math_fast_sin_or_cos_a(angle)*0.4f;
+            spark_pos[1]=math_fast_sin_or_cos_b(angle)*0.4f;
+            spark_pos[2]=0;
+            FastVecAdd(spark_pos,spark_pos,moby+0x10);
             size=math_random_float_range(D_L07_001B0A40[0],D_L07_001B0A40[1]);
             color=FastTweenColor(D_L07_001B0A48_gp[0],D_L07_001B0A48[1],math_random_float_range(0,1));
             speed=math_random_float_range(1,2);
             life=math_random_int_range(30,60);
-            qcopy(sparkVel,aimPos);
-            sparkVel[2]=speed/IntToFloat(life);
-            part_spawn_hero_relative(sparkPos,sparkVel,color,size,(unsigned char)life,(unsigned char)math_random_int_below(255),0);
+            qcopy(spark_vel,aim_pos);
+            spark_vel[2]=speed/IntToFloat(life);
+            part_spawn_hero_relative(spark_pos,spark_vel,color,size,(unsigned char)life,(unsigned char)math_random_int_below(255),0);
         }
         break;
     case 3:

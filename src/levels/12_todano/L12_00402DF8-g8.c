@@ -48,22 +48,22 @@ typedef struct {
    it plays its sound, bumps the counter and is removed. */
 void collectible_update_todano(u8 *object) {
     u8 *state = *(u8 **)(object + 0x68);
-    u16 flagIndex;
-    s32 counterBits;
-    TodanoObjectFlags *flagTable;
+    u16 flag_index;
+    s32 counter_bits;
+    TodanoObjectFlags *flag_table;
 
     if (object[0x20]) return;
     ((TodanoRotation *)object)->rx = D_L12_001B12B8 * 0.0174532942f;
     ((TodanoRotation *)object)->ry = D_L12_001B12BC * 0.0174532942f;
     ((TodanoRotation *)object)->rz = D_L12_001B12C0 * 0.0174532942f;
     math_update_wrapped_angle_offset(object, D_L12_001B3C1C, D_L12_001B3C20, D_L12_001B12B0, D_L12_001B12B4 * 0.00029088825f, 0.0f);
-    flagIndex = *(u16 *)(object + 0xB2);
-    flagTable = &D_L12_0021EDF0;
-    if (flagTable->flags[(s16)flagIndex]) goto kill;
-    counterBits = (u8)D_0019B4A8[((s16)flagIndex >> 1) + (g_current_map_index << 10)];
-    if (flagIndex & 1) {
-        if ((counterBits >> 4) & 7) goto kill;
-    } else if (counterBits & 7) {
+    flag_index = *(u16 *)(object + 0xB2);
+    flag_table = &D_L12_0021EDF0;
+    if (flag_table->flags[(s16)flag_index]) goto kill;
+    counter_bits = (u8)D_0019B4A8[((s16)flag_index >> 1) + (g_current_map_index << 10)];
+    if (flag_index & 1) {
+        if ((counter_bits >> 4) & 7) goto kill;
+    } else if (counter_bits & 7) {
         goto kill;
     }
     goto update;

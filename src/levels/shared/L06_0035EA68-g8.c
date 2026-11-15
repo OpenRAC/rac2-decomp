@@ -77,7 +77,7 @@ void ribbon_effect_update(char *obj) {
     switch (moby->state) {
     case 0: {
         int i, j, k;
-        float sphereRadius;
+        float sphere_radius;
         if (g_current_map_index == 10 && D_0018C0D4 == 1) {
             moby_mark_spawned(obj);
             break;
@@ -92,23 +92,23 @@ void ribbon_effect_update(char *obj) {
         }
         for (k = 0; k < data->count; k++)
             data->order[k] = buffer.seq.x[k];
-        sphereRadius = FastAddRotations(moby->angle, 1.5707964897155762f);
+        sphere_radius = FastAddRotations(moby->angle, 1.5707964897155762f);
         moby->mode = 0x60;
         moby->state = 1;
-        moby->angle = sphereRadius;
+        moby->angle = sphere_radius;
         data->effect = -1;
         data->timer = FloatToInt(D_L06_001AF620 * 60.0f);
         moby->flags |= 0x41;
         break;
     }
     case 1: {
-        float sphereRadius, halfHeight;
+        float sphere_radius, half_height;
         float sphere[4];
-        sphereRadius = data->radius * 0.5f;
-        halfHeight = (float)data->count * data->step * 0.5f;
+        sphere_radius = data->radius * 0.5f;
+        half_height = (float)data->count * data->step * 0.5f;
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
-        sphere[2] += halfHeight;
-        sphere[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
+        sphere[2] += half_height;
+        sphere[3] = square_root(half_height * half_height + sphere_radius * sphere_radius);
         if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
             if ((float)math_fast_helper_a(sphere, 80.0f) >= 0.0f)
                 gfx_add_draw_callback_third(gfx_l06_draw_ribbon_effect, obj);
@@ -119,20 +119,20 @@ void ribbon_effect_update(char *obj) {
     }
     case 2: {
         int i;
-        float sphereRadius, halfHeight;
+        float sphere_radius, half_height;
         math_fast_float_d(&data->timer);
         i = data->effect;
         if (i != -1) {
-            Effect *soundEffect = (Effect *)(g_sound_state + i * 0x70);
-            if (soundEffect->owner == obj && soundEffect->active)
+            Effect *sound_effect = (Effect *)(g_sound_state + i * 0x70);
+            if (sound_effect->owner == obj && sound_effect->active)
                 snd_stop_voice(i);
         }
         data->effect = -1;
-        sphereRadius = data->radius * 0.5f;
-        halfHeight = (float)data->count * data->step * 0.5f;
+        sphere_radius = data->radius * 0.5f;
+        half_height = (float)data->count * data->step * 0.5f;
         buffer.q = *(Quad *)(obj + 0x10);
-        buffer.f[2] += halfHeight;
-        buffer.f[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
+        buffer.f[2] += half_height;
+        buffer.f[3] = square_root(half_height * half_height + sphere_radius * sphere_radius);
         if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
             (float)math_fast_helper_a(&buffer, 80.0f) >= 0.0f)
             gfx_add_draw_callback_third(gfx_l06_draw_ribbon_effect, obj);
@@ -159,7 +159,7 @@ void ribbon_effect_update_variant(char *obj) {
     switch (moby->state) {
     case 0: {
         int i, j, k;
-        float sphereRadius;
+        float sphere_radius;
         if (g_current_map_index == 10 && D_0018C0D4 == 1) {
             moby_mark_spawned(obj);
             break;
@@ -174,23 +174,23 @@ void ribbon_effect_update_variant(char *obj) {
         }
         for (k = 0; k < data->count; k++)
             data->order[k] = buffer.seq.x[k];
-        sphereRadius = FastAddRotations(moby->angle, 1.5707964897155762f);
+        sphere_radius = FastAddRotations(moby->angle, 1.5707964897155762f);
         moby->mode = 0xFF;
         moby->state = 1;
-        moby->angle = sphereRadius;
+        moby->angle = sphere_radius;
         data->effect = -1;
         data->timer = FloatToInt(D_L06_001AFF20 * 60.0f);
         moby->flags |= 0x41;
         break;
     }
     case 1: {
-        float sphereRadius, halfHeight;
+        float sphere_radius, half_height;
         float sphere[4];
-        sphereRadius = data->radius * 0.5f;
-        halfHeight = (float)data->count * data->step * 0.5f;
+        sphere_radius = data->radius * 0.5f;
+        half_height = (float)data->count * data->step * 0.5f;
         *(Quad *)sphere = *(Quad *)(obj + 0x10);
-        sphere[2] += halfHeight;
-        sphere[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
+        sphere[2] += half_height;
+        sphere[3] = square_root(half_height * half_height + sphere_radius * sphere_radius);
         if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f) {
             if ((float)math_fast_helper_a(sphere, 80.0f) >= 0.0f)
                 gfx_add_draw_callback_third(gfx_draw_ripple_grid, obj);
@@ -201,20 +201,20 @@ void ribbon_effect_update_variant(char *obj) {
     }
     case 2: {
         int i;
-        float sphereRadius, halfHeight;
+        float sphere_radius, half_height;
         math_fast_float_d(&data->timer);
         i = data->effect;
         if (i != -1) {
-            Effect *soundEffect = (Effect *)(g_sound_state + i * 0x70);
-            if (soundEffect->owner == obj && soundEffect->active)
+            Effect *sound_effect = (Effect *)(g_sound_state + i * 0x70);
+            if (sound_effect->owner == obj && sound_effect->active)
                 snd_stop_voice(i);
         }
         data->effect = -1;
-        sphereRadius = data->radius * 0.5f;
-        halfHeight = (float)data->count * data->step * 0.5f;
+        sphere_radius = data->radius * 0.5f;
+        half_height = (float)data->count * data->step * 0.5f;
         buffer.q = *(Quad *)(obj + 0x10);
-        buffer.f[2] += halfHeight;
-        buffer.f[3] = square_root(halfHeight * halfHeight + sphereRadius * sphereRadius);
+        buffer.f[2] += half_height;
+        buffer.f[3] = square_root(half_height * half_height + sphere_radius * sphere_radius);
         if (fast_vec_dist(obj + 0x10, D_L06_001B9840) < 80.0f &&
             (float)math_fast_helper_a(&buffer, 80.0f) >= 0.0f)
             gfx_add_draw_callback_third(gfx_draw_ripple_grid, obj);

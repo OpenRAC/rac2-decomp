@@ -19,12 +19,12 @@ typedef struct {
 } TableBlock;
 
 /* Whether the 28-entry slot table selected by flag 0x100 has a positive value at the low byte's index. */
-int map_is_entry_available(int mapId)
+int map_is_entry_available(int map_id)
 {
-    if ((mapId & 0x100) == 0) {
-        mapId = ((TableBlock *)D_0014B540_1)->clear[mapId & 0xFF].unk4;
-        return mapId > 0;
+    if ((map_id & 0x100) == 0) {
+        map_id = ((TableBlock *)D_0014B540_1)->clear[map_id & 0xFF].unk4;
+        return map_id > 0;
     }
-    mapId = ((TableBlock *)D_0014B540_1)->set[mapId & 0xFF].unk4;
-    return mapId > 0;
+    map_id = ((TableBlock *)D_0014B540_1)->set[map_id & 0xFF].unk4;
+    return map_id > 0;
 }

@@ -34,7 +34,7 @@ void RebuildRegionObjectMembership(void) {
             AppendIndexedObjectRecord(*(unsigned char **)(g_hero_state + 0x2290), region, 1);
         for (index = 1; index <= D_L00_001B1FF0[0]; ++index) {
             object = D_L00_001B1E9C[0] + (D_L00_001B1FF0[index] << 8);
-            if (object && *(short *)(object + 0xAA) == 0xCB /* Decoy */ &&
+            if (object && *(short *)(object + 0xAA) == MOBY_CLASS_DECOY &&
                 object[0x20] != 0xFE && object[0x20] != 0xFD && object[0x20] == 3) {
                 if (coll_point_inside_region(object + 0x10, region))
                     AppendIndexedObjectRecord(object, region, 2);
@@ -49,7 +49,7 @@ void RebuildRegionObjectMembership(void) {
         }
         for (index = 1; index <= D_L00_001B2030[0]; ++index) {
             object = D_L00_001B1E9C[0] + (D_L00_001B2030[index] << 8);
-            if (object && *(short *)(object + 0xAA) == 0xEB0 /* Dark Sheep */ &&
+            if (object && *(short *)(object + 0xAA) == MOBY_CLASS_DARK_SHEEP &&
                 object[0x20] != 0xFE && object[0x20] != 0xFD) {
                 if (coll_point_inside_region(object + 0x10, region))
                     AppendIndexedObjectRecord(object, region, 4);

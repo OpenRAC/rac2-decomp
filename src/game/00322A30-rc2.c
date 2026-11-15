@@ -47,7 +47,7 @@ void robot_spawn_death_debris(void *moby) {
     f32 angle;
     f32 speed;
     f32 value;
-    f32 spinTime;
+    f32 spin_time;
     s32 i;
 
     vars = (*(void **)((s8 *)(moby) + (0x68)));
@@ -65,9 +65,9 @@ void robot_spawn_death_debris(void *moby) {
                 matrix_mul_vec3(&velocity, &velocity, (s8 *)moby + 0xC0);
             }
             FastVecAdd(&velocity, &velocity, &direction);
-            spinTime = math_random_float_range(90.0f, 270.0f);
+            spin_time = math_random_float_range(90.0f, 270.0f);
             value = math_random_float_range(10.0f, 20.0f);
-            piece = cam_moby_create(moby, 2, (*(s16 *)((s8 *)(moby) + (0xAA))), i, (s8 *)moby + 0x10, (s8 *)moby + 0xF0, &velocity, 0xFF, spinTime, value);
+            piece = cam_moby_create(moby, 2, (*(s16 *)((s8 *)(moby) + (0xAA))), i, (s8 *)moby + 0x10, (s8 *)moby + 0xF0, &velocity, 0xFF, spin_time, value);
             if ((*(s32 *)((s8 *)(vars) + (0x2B4))) != 0 && piece != 0) {
                 (*(s32 *)((s8 *)(piece) + (0x64))) = (s32)part_update_fading_debris;
             }

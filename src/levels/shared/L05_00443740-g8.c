@@ -50,43 +50,43 @@ extern void ship_draw_aim_crosshair(void);
 /* Updates the driven moby position and rebuilds its basis, including bank and roll. */
 void UpdateDrivenMobyTransform(char *obj)
 {
-    char oldPos[16] __attribute__((aligned(16)));
-    char forwardOffset[16] __attribute__((aligned(16)));
-    char liftOffset[16] __attribute__((aligned(16)));
-    char sideOffset[16] __attribute__((aligned(16)));
-    char springOffset[16] __attribute__((aligned(16)));
-    char smoothedPos[16] __attribute__((aligned(16)));
+    char old_pos[16] __attribute__((aligned(16)));
+    char forward_offset[16] __attribute__((aligned(16)));
+    char lift_offset[16] __attribute__((aligned(16)));
+    char side_offset[16] __attribute__((aligned(16)));
+    char spring_offset[16] __attribute__((aligned(16)));
+    char smoothed_pos[16] __attribute__((aligned(16)));
     char rotation[16] __attribute__((aligned(16)));
     char *input = P(obj, 0x70) + 0x50;
     char *moby = D_L05_001B251C +
         (I(P(D_L05_001B1EC4 + H(obj, 0x84) * 32, 0x1C), 0x20) << 8);
     char *state = P(moby, 0x68);
-    float leanFraction, angle;
+    float lean_fraction, angle;
     float forward;
 
-    qcopy(oldPos, moby + 0x10);
+    qcopy(old_pos, moby + 0x10);
     forward = D_L05_001B1A7C;
     F(moby, 0x2C) = F(P(moby, 0x24), 0x24) * D_L05_001B1A84;
-    FastVecScale(forwardOffset, obj, forward);
-    FastVecAdd(moby + 0x10, obj + 0x30, forwardOffset);
-    FastVecScale(liftOffset, obj + 0x20, D_L05_001B1A80);
-    FastVecAdd(moby + 0x10, moby + 0x10, liftOffset);
-    leanFraction = -F(input, 0x68) / (F(input, 0x78) * 0.017453294f);
-    if (leanFraction > 1.0f) leanFraction = 1.0f;
-    else if (leanFraction < -1.0f) leanFraction = -1.0f;
-    FastVecScale(sideOffset, obj + 0x10, F(state, 0x250) * leanFraction);
-    FastVecAdd(moby + 0x10, moby + 0x10, sideOffset);
-    leanFraction = F(input, 0x64) / (F(input, 0x74) * 0.017453294f);
-    if (leanFraction < 0.0f) {
-        leanFraction *= F(state, 0x24C);
-        if (leanFraction < -1.0f) leanFraction = -1.0f;
-    } else if (leanFraction > 1.0f) {
-        leanFraction = 1.0f;
+    FastVecScale(forward_offset, obj, forward);
+    FastVecAdd(moby + 0x10, obj + 0x30, forward_offset);
+    FastVecScale(lift_offset, obj + 0x20, D_L05_001B1A80);
+    FastVecAdd(moby + 0x10, moby + 0x10, lift_offset);
+    lean_fraction = -F(input, 0x68) / (F(input, 0x78) * 0.017453294f);
+    if (lean_fraction > 1.0f) lean_fraction = 1.0f;
+    else if (lean_fraction < -1.0f) lean_fraction = -1.0f;
+    FastVecScale(side_offset, obj + 0x10, F(state, 0x250) * lean_fraction);
+    FastVecAdd(moby + 0x10, moby + 0x10, side_offset);
+    lean_fraction = F(input, 0x64) / (F(input, 0x74) * 0.017453294f);
+    if (lean_fraction < 0.0f) {
+        lean_fraction *= F(state, 0x24C);
+        if (lean_fraction < -1.0f) lean_fraction = -1.0f;
+    } else if (lean_fraction > 1.0f) {
+        lean_fraction = 1.0f;
     }
-    F(state, 0xC) = math_step_spring_damper_clamped(F(state, 0xC), leanFraction, D_L05_001B1BF8,
+    F(state, 0xC) = math_step_spring_damper_clamped(F(state, 0xC), lean_fraction, D_L05_001B1BF8,
                                   D_L05_001B1BFC, 0.0f, state + 0x10);
-    FastVecScale(liftOffset, obj + 0x20, F(state, 0x254) * F(state, 0xC));
-    FastVecAdd(moby + 0x10, moby + 0x10, liftOffset);
+    FastVecScale(lift_offset, obj + 0x20, F(state, 0x254) * F(state, 0xC));
+    FastVecAdd(moby + 0x10, moby + 0x10, lift_offset);
     if (D_L05_00221D10.flag) {
         if (!math_fast_float_d(&D_L05_00221D10.timer)) {
             slot_copy_records_to_free(D_L05_002B8770);
@@ -95,12 +95,12 @@ void UpdateDrivenMobyTransform(char *obj)
             D_L05_00221D10.timer = 7;
         }
     }
-    ResolveLinkedMobyMovementCollisions(obj, oldPos);
+    ResolveLinkedMobyMovementCollisions(obj, old_pos);
     ship_update_aim_point(obj, moby);
-    FastVecSub(springOffset, state + 0x20, obj + 0x30);
-    vec_scale_to_length(springOffset, springOffset, D_L05_001B1A98);
-    FastVecAdd(smoothedPos, obj + 0x30, springOffset);
-    FastVecSub(moby + 0xC0, smoothedPos, moby + 0x10);
+    FastVecSub(spring_offset, state + 0x20, obj + 0x30);
+    vec_scale_to_length(spring_offset, spring_offset, D_L05_001B1A98);
+    FastVecAdd(smoothed_pos, obj + 0x30, spring_offset);
+    FastVecSub(moby + 0xC0, smoothed_pos, moby + 0x10);
     vec_scale_to_length(moby + 0xC0, moby + 0xC0, 1.0f);
     FastVecCross(moby + 0xD0, moby + 0xC0, obj + 0x20);
     vec_scale_to_length(moby + 0xD0, moby + 0xD0, 1.0f);

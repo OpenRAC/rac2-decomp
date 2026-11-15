@@ -13,7 +13,7 @@ void hero_cancel_velocity_into_wall(void)
     char *hero = (char *)D_00189E20_1;
     float distance;
     float angle;
-    float pushAmount;
+    float push_amount;
     float vector[4] __attribute__((aligned(16)));
 
     if (*(short *)(hero + 0x34E) == 0)
@@ -33,9 +33,9 @@ void hero_cancel_velocity_into_wall(void)
     qcopy(vector, hero + 0x230);
     vector[2] = 0.0f;
     func_001290E0((int *)vector, (int *)vector);
-    pushAmount = -*(float *)(hero + 0xF0) * vector[0] - *(float *)(hero + 0xF4) * vector[1];
-    if (pushAmount > 0.0f) {
-        FastVecScale((char *)vector, (char *)vector, pushAmount);
+    push_amount = -*(float *)(hero + 0xF0) * vector[0] - *(float *)(hero + 0xF4) * vector[1];
+    if (push_amount > 0.0f) {
+        FastVecScale((char *)vector, (char *)vector, push_amount);
         FastVecAdd(hero + 0xF0, hero + 0xF0, (char *)vector);
         *(float *)(hero + 0xF8) -= 0.030000001192092896f;
     }

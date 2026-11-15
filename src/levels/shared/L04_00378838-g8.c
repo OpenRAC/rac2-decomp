@@ -19,18 +19,18 @@ extern struct { char pad[0x230]; int selected; } D_L04_001C9C60;
 /* Fills the menu entry list from the level tables and selects the entry that is current. */
 int menu_l04_build_entry_list(char *menu) {
     int i, entry;
-    int *idList;
+    int *id_list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {
         D_L04_0021D7B0[i].kind = 3;
         D_L04_0021D7B0[i].callback = D_L04_0029FEE0;
         D_L04_0021D7B0[i].id = D_L04_002A4420[D_00139948[i]].id;
         D_L04_0021D7B0[i].value = D_L04_002A4420[D_00139948[i]].value;
     }
-    idList = D_L04_001AA770;
+    id_list = D_L04_001AA770;
     D_L04_0021D7B0[i].id = 0;
     *(int *)(menu + 0x40) = 0;
     *(unsigned int *)(menu + 0x30) |= 0x8000;
-    for (i = 0, entry = idList[0]; entry; entry = D_L04_001AA770[++i]) {
+    for (i = 0, entry = id_list[0]; entry; entry = D_L04_001AA770[++i]) {
         if (D_L04_001C9C60.selected == entry) {
             *(int *)(menu + 0x40) = i;
             break;

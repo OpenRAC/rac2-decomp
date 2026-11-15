@@ -53,8 +53,8 @@ extern int sceMcOpen(int, int, int, int);
 /* rac1-decomp src/core/00123168.c: func_001233E8 */
 /* sceDmaPutEnv. Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Applies a DMA settings block to the DMA controller registers, and returns a negative number if any value is out of range. */
-int sceDmaPutEnv(void *envPtr) {
-    sceDmaEnv *env = envPtr;
+int sceDmaPutEnv(void *env_ptr) {
+    sceDmaEnv *env = env_ptr;
     unsigned int ctrl;
     unsigned int pcr;
     unsigned int sqwc;
@@ -132,20 +132,20 @@ void dma_reset_channel_state(int *channel, int input) {
  * 2.95.3 the same C differs in the prologue order only (8/152).
  */
 /* Pauses a DMA channel with interrupts off and returns its old control value. */
-int sceDmaPause(void *channelAddr) {
-    volatile unsigned int *chcr = channelAddr;
-    int intWasOn;
-    unsigned int savedEnable, oldChcr;
-    intWasOn = r1_func_0011D960();
-    savedEnable = D_ENABLER;
-    if ((savedEnable & 0x10000) == 0)
-        D_ENABLEW = savedEnable | 0x10000;
+int sceDmaPause(void *channel_addr) {
+    volatile unsigned int *chcr = channel_addr;
+    int int_was_on;
+    unsigned int saved_enable, old_chcr;
+    int_was_on = r1_func_0011D960();
+    saved_enable = D_ENABLER;
+    if ((saved_enable & 0x10000) == 0)
+        D_ENABLEW = saved_enable | 0x10000;
     D_CTRL;
-    oldChcr = *chcr;
-    *chcr = oldChcr & 0xFFFFFEFF;
-    D_ENABLEW = savedEnable;
-    if (intWasOn != 0) r1_func_0011D9A8();
-    return oldChcr;
+    old_chcr = *chcr;
+    *chcr = old_chcr & 0xFFFFFEFF;
+    D_ENABLEW = saved_enable;
+    if (int_was_on != 0) r1_func_0011D9A8();
+    return old_chcr;
 }
 
 typedef struct {
@@ -174,16 +174,16 @@ extern char r1_D_00153590[];
    printing and clearing serve on any failure. */
 /* Starts up the memory card library: finds the memory card server and checks its version. */
 int sceMcInit(void) {
-    int semaParam[8];
+    int sema_param[8];
     int *reply;
     int i;
     int result;
 
     if (r1_D_00132EAC < 0) {
-        semaParam[5] = 0;
-        semaParam[2] = 1;
-        semaParam[1] = 1;
-        r1_D_00132EAC = r1_func_00118C70(semaParam);
+        sema_param[5] = 0;
+        sema_param[2] = 1;
+        sema_param[1] = 1;
+        r1_D_00132EAC = r1_func_00118C70(sema_param);
     }
     r1_func_00123F30(0, 0, 0);
     r1_func_00118CB0(r1_D_00132EAC);
@@ -222,9 +222,9 @@ int sceMcInit(void) {
    sceMcDelete (func_00128068) but with the flags/mode argument stored to
    the descriptor's +0x8 word instead of a hardcoded 0, and RPC command 2. */
 /* Opens a file on a memory card and returns a request handle, or a negative error. */
-int sceMcOpen(int port, int slot, int fnameAddr, int mode) {
+int sceMcOpen(int port, int slot, int fname_addr, int mode) {
     char *client = r1_D_00159B00;
-    char *fname = (char *)fnameAddr;
+    char *fname = (char *)fname_addr;
     char *request;
     int result;
 

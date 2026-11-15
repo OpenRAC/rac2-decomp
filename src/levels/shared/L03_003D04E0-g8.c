@@ -21,8 +21,8 @@ extern void snd_stop_voice(int),gfx_add_draw_callback_first(void *,void *),gfx_l
 /* Interpolates the emitter position, keeps it relative to its attachment,
  * emits particles while active, and releases its sound and object after fading. */
 void UpdateInterpolatedParticleEmitter(char *moby) {
-    float offsetStep[4], rayStart[4], rayEnd[4], hit[12], spawnVec[4], spawnVel[4];
-    char *vars = P(moby, 0x68), *position, *soundSlot;
+    float offset_step[4], ray_start[4], ray_end[4], hit[12], spawn_vec[4], spawn_vel[4];
+    char *vars = P(moby, 0x68), *position, *sound_slot;
     float angle, speed;
 
     if (D_L03_001A8F00 == 2) {
@@ -35,8 +35,8 @@ void UpdateInterpolatedParticleEmitter(char *moby) {
         FastVecSub(position, position, P(vars, 0x40) + 0x10);
         vec_transform_by_object_or_given(P(vars, 0x40), position, position, 0);
     }
-    lerp_vector(offsetStep, vars, vars + 0x10, F(vars, 0x20));
-    FastVecAdd(position, position, offsetStep);
+    lerp_vector(offset_step, vars, vars + 0x10, F(vars, 0x20));
+    FastVecAdd(position, position, offset_step);
     ApproachValue(vars + 0x20, 1.0f, F(vars, 0x24));
     if (P(vars, 0x40)) {
         matrix_mul_vec3(position, position, P(vars, 0x40) + 0xC0);
@@ -49,28 +49,28 @@ void UpdateInterpolatedParticleEmitter(char *moby) {
             moby_set_state(moby, 1, -1);
         break;
     case 1:
-        qcopy(rayStart, position);
-        qcopy(rayEnd, position);
-        rayEnd[2] -= F(vars, 0x20) * 5.0f;
+        qcopy(ray_start, position);
+        qcopy(ray_end, position);
+        ray_end[2] -= F(vars, 0x20) * 5.0f;
         make_hit_descriptor(hit, moby, 0x10001, D_L03_001A8F20, (float)I(vars, 0x38));
-        if (CollLine(rayStart, rayEnd, 0, moby, hit) && !P(vars, 0x40)) {
+        if (CollLine(ray_start, ray_end, 0, moby, hit) && !P(vars, 0x40)) {
             angle = math_random_angle();
             speed = math_random_float_range(0, 0.5f) * (1.0f / 60.0f);
-            spawnVec[0] = math_fast_sin_or_cos_a(angle) * speed;
-            spawnVec[1] = math_fast_sin_or_cos_b(angle) * speed;
-            spawnVec[2] = 0;
-            spawnVec[2] = math_random_float_range(1, 2) * (1.0f / 60.0f);
-            part_spawn_emitter_pair(moby, D_L03_001BFDE0, spawnVec);
+            spawn_vec[0] = math_fast_sin_or_cos_a(angle) * speed;
+            spawn_vec[1] = math_fast_sin_or_cos_b(angle) * speed;
+            spawn_vec[2] = 0;
+            spawn_vec[2] = math_random_float_range(1, 2) * (1.0f / 60.0f);
+            part_spawn_emitter_pair(moby, D_L03_001BFDE0, spawn_vec);
         }
         if (!P(vars, 0x40) && !math_random_int_below(2)) {
-            qcopy(spawnVec, position);
-            spawnVec[2] -= math_random_float_range(0, 5);
-            vec_random_direction(spawnVel, 0, 1.0f / 30.0f);
-            part_spawn_emitter_pair(moby, spawnVec, spawnVel);
+            qcopy(spawn_vec, position);
+            spawn_vec[2] -= math_random_float_range(0, 5);
+            vec_random_direction(spawn_vel, 0, 1.0f / 30.0f);
+            part_spawn_emitter_pair(moby, spawn_vec, spawn_vel);
         }
-        soundSlot = (char *)(I(vars, 0x3C) * 0x70);
-        soundSlot = (char *)((int)soundSlot + (int)g_sound_state);
-        if (P(soundSlot, 0x88) != moby || !((unsigned char *)soundSlot)[0x74])
+        sound_slot = (char *)(I(vars, 0x3C) * 0x70);
+        sound_slot = (char *)((int)sound_slot + (int)g_sound_state);
+        if (P(sound_slot, 0x88) != moby || !((unsigned char *)sound_slot)[0x74])
             I(vars, 0x3C) = PlayMobySound(0, 4, moby);
         if (F(vars, 0x34) < 1)
             ApproachValue(vars + 0x34, 1, 1.0f / 15.0f);

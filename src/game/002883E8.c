@@ -24,9 +24,9 @@ extern unsigned char g_item_owned_flags[] MACRO_ADDR;
 extern unsigned char D_001A7B68[] MACRO_ADDR;
 
 /* Puts a help id into the first free slot of the 32-slot list. Returns 1 if it was stored. */
-int help_store_id_in_slot_list(int helpId)
+int help_store_id_in_slot_list(int help_id)
 {
-    ClassRecord *record = &g_weapon_table[g_item_slot_to_record[helpId]];
+    ClassRecord *record = &g_weapon_table[g_item_slot_to_record[help_id]];
     int result;
     int i;
 
@@ -34,10 +34,10 @@ int help_store_id_in_slot_list(int helpId)
     if (record->word00 != 0 && record->byte04 == 0
         && (record->word80 != 0 || record->half88 != 0)) {
         for (i = 0; i < 32; i++) {
-            if ((D_001A7B68[i] & 0x3F) == helpId || D_001A7B68[i] == 0xFF) {
-                unsigned int mask = g_item_owned_flags[helpId] ? 0x40 : 0;
+            if ((D_001A7B68[i] & 0x3F) == help_id || D_001A7B68[i] == 0xFF) {
+                unsigned int mask = g_item_owned_flags[help_id] ? 0x40 : 0;
                 result = 1;
-                D_001A7B68[i] = helpId | mask;
+                D_001A7B68[i] = help_id | mask;
                 break;
             }
         }

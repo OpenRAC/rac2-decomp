@@ -89,36 +89,36 @@ void gorn_cutscene_update(u8 *moby)
     if (D_L15_001B2148 < 6)
         return;
     if (D_L15_001B15BC == 0) {
-        u8 *targetMoby;
-        u8 *targetPos;
+        u8 *target_moby;
+        u8 *target_pos;
         float distance;
 
         if (math_fast_float_d(vars + 0x6C) == 0)
             return;
         *(int *)(vars + 0x6C) = 60;
         effect_remove_family_mobys();
-        targetMoby = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
-        targetPos = targetMoby + 0x10;
-        qcopy(camera_pos, targetPos);
-        vec_scale_to_length(step, targetMoby + 0xC0, 196.0f);
+        target_moby = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
+        target_pos = target_moby + 0x10;
+        qcopy(camera_pos, target_pos);
+        vec_scale_to_length(step, target_moby + 0xC0, 196.0f);
         distance = 25.0f;
-        FastVecAdd(ahead, targetPos, step);
-        if (CollLine(targetPos, ahead, 0, targetMoby, 0) != 0) {
+        FastVecAdd(ahead, target_pos, step);
+        if (CollLine(target_pos, ahead, 0, target_moby, 0) != 0) {
             Hit *hit = &D_L15_001BFC00;
 
             if (hit->target != 0 && *(short *)(hit->target + 0xAA) == 0x1211 /* moby class 4625 */)
-                distance = fast_vec_dist(hit->pos, targetPos);
+                distance = fast_vec_dist(hit->pos, target_pos);
         }
         if (distance < 16.0f)
             distance = -32.0f;
         else
             distance = distance * 0.5f;
-        vec_scale_to_length(step, targetMoby + 0xC0, distance);
+        vec_scale_to_length(step, target_moby + 0xC0, distance);
         FastVecAdd(camera_pos, camera_pos, step);
         D_L15_001B1550[2] -= 16.0f;
         up.q = 0;
         up.f[2] = 1.0f;
-        qcopy(basis[0], targetMoby + 0xC0);
+        qcopy(basis[0], target_moby + 0xC0);
         qcopy(basis[2], up.f);
         FastVecCross(basis[1], basis[0], basis[2]);
         basis[0][3] = basis[1][3] = basis[2][3] = 0.0f;

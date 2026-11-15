@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 /* Built with -frac2-hazard-labels (config/cflags.txt). The second `t20 <= 0.0f` test reuses
@@ -49,7 +50,7 @@ void extermibot_update_hits(u8 *object)
     hit = part_find_owned_effect_slot(object, 0x10000, 1);
     if (hit != 0) {
         if (*(u8 **)(hit + 0x20) != 0) {
-            if (*(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) == 0xF0A /* Extermibot Legs */ || *(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) == 0xF9E /* moby class 3998 */)
+            if (*(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) == MOBY_CLASS_EXTERMIBOT_LEGS || *(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) == 0xF9E /* moby class 3998 */)
                 *(s32 *)(hit + 0x2C) = 0;
         }
         if ((u8)(object[0x20] - 1) < 2)

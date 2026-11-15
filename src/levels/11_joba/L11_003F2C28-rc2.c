@@ -39,9 +39,9 @@ void joba_enemy_update_effects(void *moby) {
     void *vars = *(void **)((s8 *)moby + 0x68);
     s32 *state = (s32 *)((s8 *)vars + 0x28C);
     s8 *counter;
-    void *callBuffer;
+    void *call_buffer;
     s32 countdown;
-    u16 frameCount;
+    u16 frame_count;
 
     ref_L11_003F2C28_04();
     ref_L11_003F2C28_00(ref_L11_003F2C28_06, moby);
@@ -63,7 +63,7 @@ void joba_enemy_update_effects(void *moby) {
     }
     counter = (s8 *)vars + 0x274;
 loop_setup:
-    callBuffer = (s8 *)vars + 0x2A0;
+    call_buffer = (s8 *)vars + 0x2A0;
     countdown = 1;
     do {
         if (*(s16 *)counter < 0x7FFF) {
@@ -73,9 +73,9 @@ loop_setup:
         counter += 2;
     } while (countdown >= 0);
 
-    frameCount = *(u16 *)((s8 *)moby + 0x96);
-    if (frameCount <= 0xFFFEU) {
-        *(u16 *)((s8 *)moby + 0x96) = frameCount + 1;
+    frame_count = *(u16 *)((s8 *)moby + 0x96);
+    if (frame_count <= 0xFFFEU) {
+        *(u16 *)((s8 *)moby + 0x96) = frame_count + 1;
     }
-    ref_L11_003F2C28_03(moby, callBuffer, 0xC, 1, ref_L11_003F2C28_05);
+    ref_L11_003F2C28_03(moby, call_buffer, 0xC, 1, ref_L11_003F2C28_05);
 }

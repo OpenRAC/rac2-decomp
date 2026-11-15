@@ -21,19 +21,19 @@ void UpdateBeamTrailParticles(char *object)
 {
     float step[4];
     char *state = *(char **)(object + 0x68);
-    char *otherVars;
+    char *other_vars;
     char *axis;
-    float randomValue, spriteSize;
+    float random_value, sprite_size;
     char *effect, *detail;
     int kind;
 
     if (g_current_map_index == 5 || g_current_map_index == 25) {
-        otherVars = ((EffectOwner *)((char *)D_L05_001B251C + (*(int *)(state + 0xA4) << 8)))->state;
+        other_vars = ((EffectOwner *)((char *)D_L05_001B251C + (*(int *)(state + 0xA4) << 8)))->state;
         if (g_current_map_index == 25 ||
-            (!coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(otherVars + 4)) &&
-             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(otherVars + 8)) &&
-             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(otherVars + 12)) &&
-             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(otherVars + 16)))) {
+            (!coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(other_vars + 4)) &&
+             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(other_vars + 8)) &&
+             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(other_vars + 12)) &&
+             !coll_is_point_inside_unit_sphere(object + 0x10, *(int *)(other_vars + 16)))) {
             char *particle;
             float *life;
             int i;
@@ -52,13 +52,13 @@ void UpdateBeamTrailParticles(char *object)
                     *life = math_random_float_range(11.0f, 14.0f);
                 }
                 qcopy(step, axis);
-                randomValue = math_random_float_range(0.15f, 0.25f);
-                vec_scale_to_length(step, step, -randomValue);
-                *life -= randomValue;
+                random_value = math_random_float_range(0.15f, 0.25f);
+                vec_scale_to_length(step, step, -random_value);
+                *life -= random_value;
                 FastVecAdd(particle, particle, step);
-                spriteSize = math_random_float_range(0.07f, 0.12f);
-                randomValue = math_random_float_range(0.0f, 1.0f);
-                gfx_draw_billboard_quad(particle, 0x47, 0x7F7F6464, 0, spriteSize, 0.0f, randomValue);
+                sprite_size = math_random_float_range(0.07f, 0.12f);
+                random_value = math_random_float_range(0.0f, 1.0f);
+                gfx_draw_billboard_quad(particle, 0x47, 0x7F7F6464, 0, sprite_size, 0.0f, random_value);
                 life++;
                 particle += 16;
             }
@@ -82,9 +82,9 @@ void UpdateBeamTrailParticles(char *object)
                 *life = math_random_float_range(10.0f, 30.0f);
             }
             qcopy(step, axis);
-            randomValue = math_random_float_range(0.15f, 0.25f);
-            vec_scale_to_length(step, step, -randomValue);
-            *life -= randomValue;
+            random_value = math_random_float_range(0.15f, 0.25f);
+            vec_scale_to_length(step, step, -random_value);
+            *life -= random_value;
             FastVecAdd(state, state, step);
             effect = SpawnSpinningSparkParticle(state, 2.0f, 1.03f, 1, D_L05_001A8F20, 0x0A786E64, 1.045f, 210000.0f, 0);
             if (effect) {

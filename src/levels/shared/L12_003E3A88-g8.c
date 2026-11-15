@@ -38,8 +38,8 @@ extern char *g_hero_moby NOT_SDA;
 /* Sets up the robot guard on its first frame, then handles its hits, its colour pulse and its awareness of the hero. */
 void robot_guard_init_update_state(char *obj) {
     char *vars = P(obj, 0x68);
-    unsigned char oldState, oldAnim;
-    int hitResult;
+    unsigned char old_state, old_anim;
+    int hit_result;
     float angle;
     float pos[4];
     if (!B(obj, 0x20)) {
@@ -97,17 +97,17 @@ void robot_guard_init_update_state(char *obj) {
     }
     if (W(vars, 0x2A0) && flag_is_third_pending_set(obj))
         moby_set_state(obj, 24, 4);
-    oldState = B(obj, 0x20);
-    oldAnim = B(obj, 0x95);
-    hitResult = moby_apply_damage_to_object(obj, vars + 0x60, 0);
-    if (hitResult) {
-        if (hitResult == 4) {
+    old_state = B(obj, 0x20);
+    old_anim = B(obj, 0x95);
+    hit_result = moby_apply_damage_to_object(obj, vars + 0x60, 0);
+    if (hit_result) {
+        if (hit_result == 4) {
             STUB_printf(D_L12_001B0B70);
             W(vars, 0x278) = 5;
         } else
             W(vars, 0x278) = 1;
-        B(obj, 0x20) = oldState;
-        B(obj, 0x95) = oldAnim;
+        B(obj, 0x20) = old_state;
+        B(obj, 0x95) = old_anim;
         flag_set_first_pending(obj);
         flag_set_second_pending(obj);
         H(vars, 0x26) = D_L12_001B0B00;

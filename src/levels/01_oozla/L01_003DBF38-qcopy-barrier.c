@@ -17,7 +17,7 @@ extern f32 D_L01_001AFE18[];
 void part_spawn_moving_bubbles(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
-    float bubblePos[4];
+    float bubble_pos[4];
     float size;
     int i;
 
@@ -25,19 +25,19 @@ void part_spawn_moving_bubbles(u8 *moby)
     if (GetCollHitMaterial() != 3)
         return;
     {
-        u8 *objPos = moby + 0x10;
-        u8 *velocityVec = state + 0x190;
+        u8 *obj_pos = moby + 0x10;
+        u8 *velocity_vec = state + 0x190;
         i = 0;
         while (i >= 0) {
-            *(V4 *)bubblePos = *(V4 *)objPos;
-            vec_add_random_offset(bubblePos, 0.1f);
-            bubblePos[2] = level_get_water_height();
+            *(V4 *)bubble_pos = *(V4 *)obj_pos;
+            vec_add_random_offset(bubble_pos, 0.1f);
+            bubble_pos[2] = level_get_water_height();
             size = math_random_float_range(0.2f, 2.0f);
-            part_spawn_drifting((char *)bubblePos, (int)D_L01_001AFE18,
+            part_spawn_drifting((char *)bubble_pos, (int)D_L01_001AFE18,
                           (int)((((u32)math_random_int_below(6) + 0x14) << 24) | 0x5060), size, 10000.0f);
             i--;
         }
-        if (0.0333333333f < FastVecLength(velocityVec))
+        if (0.0333333333f < FastVecLength(velocity_vec))
             part_spawn_water_splash_bubbles(moby, 3, 10, 1);
     }
 }

@@ -181,21 +181,21 @@ void lock_l02_on_tether_update(Moby *self)
     } hb __attribute__((aligned(16)));
     float tmp[5][4] __attribute__((aligned(16)));
     Tgt *best = 0, *second = 0;
-    int hitSomething, heldCount;
+    int hit_something, held_count;
     float bestScore = 0.0f, secondScore = 0.0f;
     float len;
     float angle0, angle1;
-    int heldIndex;
+    int held_index;
     Tgt *candidate;
-    int scanIndex;
+    int scan_index;
     float dist, ang, sa2, cs, sm, score, proj, fa, fb;
-    float distToBest;
+    float dist_to_best;
     float *ia, *ib;
     Tgt *ta, *tb;
     float length, blend;
     float amp, height, angle, old, cd;
     int fa2;
-    Tgt *hitTarget;
+    Tgt *hit_target;
     float *hinfo;
     float *tv, apj, *ainfo;
     int an;
@@ -224,8 +224,8 @@ void lock_l02_on_tether_update(Moby *self)
             rope->lockB = 0;
             rope->u.s.h42 = 0;
         } else {
-            scanIndex = 0;
-            for (candidate = D_L02_001FC420[0]; candidate != 0; candidate = D_L02_001FC420[++scanIndex]) {
+            scan_index = 0;
+            for (candidate = D_L02_001FC420[0]; candidate != 0; candidate = D_L02_001FC420[++scan_index]) {
                 if (candidate != rope->lockA && candidate != rope->lockB) {
                     if (candidate != 0 && candidate->cls != 0 && candidate->cls->id == 5) {
                         if (candidate->kind != 0xFE) {
@@ -295,8 +295,8 @@ void lock_l02_on_tether_update(Moby *self)
         }
     }
     if (second != 0 && locked) {
-        distToBest = fast_vec_dist(rope, best->pos);
-        if (distToBest < D_L02_001AF204 && distToBest + fast_vec_dist(best->pos, second->pos) < D_L02_001AF204) {
+        dist_to_best = fast_vec_dist(rope, best->pos);
+        if (dist_to_best < D_L02_001AF204 && dist_to_best + fast_vec_dist(best->pos, second->pos) < D_L02_001AF204) {
             rope->u.s.h42 = 0;
             rope->lockB = second;
         }
@@ -336,9 +336,9 @@ void lock_l02_on_tether_update(Moby *self)
         FastVecCross(v70, v60, (char *)&g_hero_state + 0x2C0);
         math_apply_axis_rotation_to_quat(v60, v60, v70, 0.17453295f);
     }
-    hitSomething = 0;
+    hit_something = 0;
     FastVecScale(v90, v60, reach);
-    heldCount = 0;
+    held_count = 0;
     /* These named pointers, and the short locals below, are live but also steer: each adds
        insns that exist at gcse and die later (asm operands keep the copy; the sign extension
        dies at combine). gcse's hash needs 677 buckets, max_cuid >= 1352, for retail's spill
@@ -464,22 +464,22 @@ void lock_l02_on_tether_update(Moby *self)
                 FastVecScale(vb, vb, 1.0f / cm2);
             vb[3] = 5627.925f;
             qcopy(&hit1, vb);
-            hitSomething = CollLine(D_L02_0023B070[i], &D_L02_0023B090[0][i], 0x10, self, 0);
-            if (hitSomething != 0) {
-                hitTarget = D_L02_001C0958.hit;
-                if (hitTarget != 0) {
-                    hinfo = moby_get_private_value_0(hitTarget);
+            hit_something = CollLine(D_L02_0023B070[i], &D_L02_0023B090[0][i], 0x10, self, 0);
+            if (hit_something != 0) {
+                hit_target = D_L02_001C0958.hit;
+                if (hit_target != 0) {
+                    hinfo = moby_get_private_value_0(hit_target);
                     if (hinfo == 0) {
-                        QueueMobyImpact(hitTarget, &hit1);
-                    } else if (hitTarget->cls == 0 || hitTarget->cls->id != 5) {
-                        QueueMobyImpact(hitTarget, &hit1);
+                        QueueMobyImpact(hit_target, &hit1);
+                    } else if (hit_target->cls == 0 || hit_target->cls->id != 5) {
+                        QueueMobyImpact(hit_target, &hit1);
                     } else {
-                        hitSomething = 0;
-                        held[heldCount++] = hitTarget;
-                        hitTarget->f98 = 0;
+                        hit_something = 0;
+                        held[held_count++] = hit_target;
+                        hit_target->f98 = 0;
                     }
                 }
-                if (hitSomething != 0) {
+                if (hit_something != 0) {
                     qcopy(&D_L02_0023B090[0][i], D_L02_001C0958.pos);
                     {
                         short last = i;
@@ -496,9 +496,9 @@ void lock_l02_on_tether_update(Moby *self)
         }
     }
     }
-    for (heldIndex = 0; heldIndex < heldCount; heldIndex++)
-        held[heldIndex]->f98 = held[heldIndex]->cls->f10;
-    if (hitSomething == 0)
+    for (held_index = 0; held_index < held_count; held_index++)
+        held[held_index]->f98 = held[held_index]->cls->f10;
+    if (hit_something == 0)
         qcopy(rope->b, &D_L02_0023B1C0);
     if (rope->lockA != 0 && (rope->u.q & 0x0000FFFF0000FFFFUL) == 0) {
         tv = hb.q;

@@ -49,7 +49,7 @@ struct S0 {
 
 /* Sets up the movie sound player and reserves sound memory. Returns 1 on success. */
 s32 mpeg_audio_init(struct S0 *decoder, s32 a1, s32 a2, s32 a3) {
-    s32 spuAddr;
+    s32 spu_addr;
     s32 failed;
 
     mem_fast_helper_b(decoder->p08, 0x20);
@@ -67,9 +67,9 @@ s32 mpeg_audio_init(struct S0 *decoder, s32 a1, s32 a2, s32 a3) {
     decoder->w60 = 0;
     D_001B23D4 = a3;
     decoder->w4C = 0x400;
-    spuAddr = func_00133850(0x400, 0x1000, 0x400, 0, 5, 3);
-    decoder->w48 = spuAddr;
-    if (spuAddr < 0) {
+    spu_addr = func_00133850(0x400, 0x1000, 0x400, 0, 5, 3);
+    decoder->w48 = spu_addr;
+    if (spu_addr < 0) {
         failed = 1;
     } else {
         failed = 0;

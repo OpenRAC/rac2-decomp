@@ -40,7 +40,7 @@ void spark_emit_random(char *obj)
     s32 count = 3;
     float step, life;
     float angle, radius;
-    s32 color, particleType;
+    s32 color, particle_type;
 
     do {
         step = timers->phase[i] + timers->rate[i];
@@ -67,9 +67,9 @@ void spark_emit_random(char *obj)
         color = math_random_int_range(D_L22_001AFF40, D_L22_001AFF44[0]);
         life = math_random_float_range(D_L22_001AFF30, D_L22_001AFF34[0]);
         if (math_random_int_below(2) != 0)
-            particleType = D_L22_001AFF38;
+            particle_type = D_L22_001AFF38;
         else
-            particleType = D_L22_001AFF3C[0];
-        part_spawn_hero_relative(&aim, &spark, particleType, life, color & 0xFF, math_random_int_below(0xFF) & 0xFF, 0);
+            particle_type = D_L22_001AFF3C[0];
+        part_spawn_hero_relative(&aim, &spark, particle_type, life, color & 0xFF, math_random_int_below(0xFF) & 0xFF, 0);
     }
 }

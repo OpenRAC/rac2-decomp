@@ -119,7 +119,7 @@ void UpdateTaboraChaseEnemyAI(u8 *object)
         if(CollLine(old,object+0x10,0,object,0)) {
             u8 *hitMoby=D_L08_001BFF40.moby;
             if(hitMoby) {
-                if(S(hitMoby,0xAA)==0x945 /* moby class 2373 */ || S(hitMoby,0xAA)==0x9C6 /* Spitting Dune Crawler */) goto no_ray_response;
+                if(S(hitMoby,0xAA)==0x945 /* moby class 2373 */ || S(hitMoby,0xAA)==MOBY_CLASS_SPITTING_DUNE_CRAWLER) goto no_ray_response;
             }
             FastVecSub(delta,old,D_L08_001BFF40.point);
             vec_scale_to_length(delta,delta,1.5f);FastVecAdd(object+0x10,object+0x10,delta);
@@ -128,7 +128,7 @@ void UpdateTaboraChaseEnemyAI(u8 *object)
         if(coll_test_point(object+0x10,0,object,1.5f)) {
             collisionMoby=D_L08_001BFF40.moby;
             if(collisionMoby) {
-                if(S(collisionMoby,0xAA)==0x945 /* moby class 2373 */ || S(collisionMoby,0xAA)==0x9C6 /* Spitting Dune Crawler */) goto no_overlap_response;
+                if(S(collisionMoby,0xAA)==0x945 /* moby class 2373 */ || S(collisionMoby,0xAA)==MOBY_CLASS_SPITTING_DUNE_CRAWLER) goto no_overlap_response;
             } else {
                 if(F(object,0x18)<=F(state,0x434)+1.5f+0.1f && F(state,0xD8)<0) {
                     ground->flags|=0x1000;
@@ -184,7 +184,7 @@ void UpdateTaboraChaseEnemyAI(u8 *object)
         }
         if(math_random_int_below(7)) break;
         if(I(state,0x448) || SelectNearestListedMoby(object,state+0x210,(float)S(object,0x32),(float)S(state,0x40E),I(state,0x41C),I(state,0x424),I(state,0x420),-1)!=2) {
-            if(I(state,0x428)!=-1) {u8 *waypointList=D_L08_001FE7C0[I(state,0x428)];math_closest_point_on_polygon_edge(state+0x210,state+0x210,waypointList+0x10,I(waypointList,0));}
+            if(I(state,0x428)!=-1) {u8 *waypoint_list=D_L08_001FE7C0[I(state,0x428)];math_closest_point_on_polygon_edge(state+0x210,state+0x210,waypoint_list+0x10,I(waypoint_list,0));}
             if(B(state,0x40C)==3) {
                 I(state,0x48C)=600;I(state,0x15C)=I(state,0x428);B(state,0x40C)=1;
                 qcopy_nc(state+0x3F0,state+0x230);

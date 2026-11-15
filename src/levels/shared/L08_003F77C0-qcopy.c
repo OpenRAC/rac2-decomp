@@ -33,27 +33,27 @@ extern Sparkle D_L08_001B9E00;
    one's colour, lifetime and size. */
 void part_start_sparkle_burst(void *owner)
 {
-    int i, intensity, colorMode, red;
-    unsigned int baseColor;
-    int greenPart;
+    int i, intensity, color_mode, red;
+    unsigned int base_color;
+    int green_part;
     float phase;
     if (D_L08_001B9E00.active == 1) return;
     D_L08_001B9E00.owner = owner;
     D_L08_001B9E00.active = 1;
     i = 1;
-    baseColor = 0x706080;
+    base_color = 0x706080;
     for (; i < 12; ++i) {
         intensity = math_random_int_below(63) + 1;
-        colorMode = math_random_int_below(6);
-        switch (colorMode) {
-        case 0: D_L08_001B9E00.color[i] = intensity + baseColor - (intensity << 16); break;
-        case 1: D_L08_001B9E00.color[i] = (intensity << 8) + (intensity + baseColor); break;
-        case 2: D_L08_001B9E00.color[i] = (math_random_int_below(intensity) << 8) + (intensity + baseColor); break;
+        color_mode = math_random_int_below(6);
+        switch (color_mode) {
+        case 0: D_L08_001B9E00.color[i] = intensity + base_color - (intensity << 16); break;
+        case 1: D_L08_001B9E00.color[i] = (intensity << 8) + (intensity + base_color); break;
+        case 2: D_L08_001B9E00.color[i] = (math_random_int_below(intensity) << 8) + (intensity + base_color); break;
         case 3:
             red = math_random_int_below(intensity);
-            greenPart = (math_random_int_below(intensity) << 8) + baseColor;
-            D_L08_001B9E00.color[i] = (red << 16) + greenPart + intensity; break;
-        default: D_L08_001B9E00.color[i] = baseColor; break;
+            green_part = (math_random_int_below(intensity) << 8) + base_color;
+            D_L08_001B9E00.color[i] = (red << 16) + green_part + intensity; break;
+        default: D_L08_001B9E00.color[i] = base_color; break;
         }
         D_L08_001B9E00.life[i] = math_random_int_below(3) + 1;
         phase = math_random_float_range(-0.95f, 2.5f);

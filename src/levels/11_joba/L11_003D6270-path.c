@@ -6,8 +6,8 @@ extern u8 *D_L11_001FF580[];
 extern s32 math_fast_float_d(void *);
 extern void lerp_vector(void *, void *, void *, f32);
 /* Moves the object along a stored path, waits at each end, then goes back the other way. */
-void path_l11_follower_update(u8 *mobyArg) {
-    u8 *moby = mobyArg;
+void path_l11_follower_update(u8 *moby_arg) {
+    u8 *moby = moby_arg;
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *path;
     s32 segment;

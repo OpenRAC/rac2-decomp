@@ -22,7 +22,7 @@ extern short sceGszbufaddr(short psm, short w, short h);
  */
 /* Works out how many memory pages a picture of the given format and size takes. */
 short sceGszbufaddr(short psm, short w, short h) {
-    unsigned long *gParam = r1_func_00121D08();
+    unsigned long *g_param = r1_func_00121D08();
     int fbw, fbh;
 
     fbw = (w + 63) / 64;
@@ -31,7 +31,7 @@ short sceGszbufaddr(short psm, short w, short h) {
     } else {
         fbh = (h + 31) / 32;
     }
-    if ((*gParam & 0x0000FFFF0000FFFFUL) == 1) {
+    if ((*g_param & 0x0000FFFF0000FFFFUL) == 1) {
         return fbw * fbh;
     }
     return fbw * fbh * 2;
@@ -113,8 +113,8 @@ extern char r1_D_00153178[];
 /* Kicks a DMA transfer on the GIF channel (D2 at 0x1000A000), waiting
    for the channel with a timeout. Every register access is volatile. */
 /* Starts a data transfer to the graphics chip and waits if the channel is busy. */
-int gfx_start_gif_dma_transfer(void *gifPacket) {
-    int packetAddr = (int)gifPacket;
+int gfx_start_gif_dma_transfer(void *gif_packet) {
+    int packet_addr = (int)gif_packet;
     unsigned int spin;
 
     spin = 0;
@@ -124,11 +124,11 @@ int gfx_start_gif_dma_transfer(void *gifPacket) {
             return -1;
         }
     }
-    D2_QWC = (int)(*(long *)gifPacket & 0x7FFF) + 1;
-    if ((packetAddr & 0x70000000) == 0x70000000) {
-        D2_MADR = (packetAddr & 0x0FFFFFFF) | 0x80000000;
+    D2_QWC = (int)(*(long *)gif_packet & 0x7FFF) + 1;
+    if ((packet_addr & 0x70000000) == 0x70000000) {
+        D2_MADR = (packet_addr & 0x0FFFFFFF) | 0x80000000;
     } else {
-        D2_MADR = packetAddr & 0x0FFFFFFF;
+        D2_MADR = packet_addr & 0x0FFFFFFF;
     }
     D2_CHCR = 0x101;
     return 0;

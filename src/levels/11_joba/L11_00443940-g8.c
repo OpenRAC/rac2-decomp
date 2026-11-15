@@ -70,8 +70,8 @@ void joba_menu_draw_help_prompts(u8 *moby, int enabled)
 {
     u8 *state;
     int label, phase, i, one, k3, entry;
-    unsigned int color, labelColor;
-    float confirmX, nextX, labelX, labelY, pulse, half, scale, zero;
+    unsigned int color, label_color;
+    float confirm_x, next_x, label_x, labelY, pulse, half, scale, zero;
     if (D_L11_001A904C == 0) return;
     gfx_append_draw_list_packet_c();
     entry = 0x8710;
@@ -79,16 +79,16 @@ void joba_menu_draw_help_prompts(u8 *moby, int enabled)
     half = 0.5f;
 
     label = table_find_by_id(D_L11_001A904C + entry, 0x49);
-    labelX = (float)D_L11_001B1620;
+    label_x = (float)D_L11_001B1620;
     one = 1;
     labelY = (float)label_y((void *)label, (float)D_L11_001B1624, D_L11_001B3E04, half, one);
     scale = 1.0f;
     zero = 0.0f;
-    gfx_draw_scaled_object_two_axes((char *)label, labelX, D_L11_001B163C, labelY, D_L11_001B161C, scale, zero);
+    gfx_draw_scaled_object_two_axes((char *)label, label_x, D_L11_001B163C, labelY, D_L11_001B161C, scale, zero);
     label = table_find_by_id(D_L11_001A904C + entry, 0x48);
-    labelX = (float)D_L11_001B1620;
+    label_x = (float)D_L11_001B1620;
     labelY = (float)label_y((void *)label, (float)D_L11_001B1624, D_L11_001B3E04, half, 1);
-    gfx_draw_scaled_object_two_axes((char *)label, labelX, D_L11_001B1638, labelY, D_L11_001B161C, scale, zero);
+    gfx_draw_scaled_object_two_axes((char *)label, label_x, D_L11_001B1638, labelY, D_L11_001B161C, scale, zero);
     phase = D_L11_001B30C8 % 50;
     if (phase >= 25) pulse = scale - (float)(phase - 25) * 0.04f;
     else pulse = (float)phase * 0.04f;
@@ -97,10 +97,10 @@ void joba_menu_draw_help_prompts(u8 *moby, int enabled)
         if (*(short *)(state + 0x1e8) != 0) {
             label = table_find_by_id(D_L11_001A904C + 0x8710, 0x4b);
             k3 = 1;
-            confirmX = (float)D_L11_001B1628;
-            labelColor = (((InputView *)g_pad_state)->field1a0 & 0x8000) ? D_L11_001B1644 : color;
+            confirm_x = (float)D_L11_001B1628;
+            label_color = (((InputView *)g_pad_state)->field1a0 & 0x8000) ? D_L11_001B1644 : color;
             labelY = (float)label_y((void *)label, (float)D_L11_001B162C, D_L11_001B3E04, 0.5f, k3);
-            gfx_draw_scaled_object_two_axes((char *)label, confirmX, labelColor, labelY, D_L11_001B161C, 1.0f, 0.0f);
+            gfx_draw_scaled_object_two_axes((char *)label, confirm_x, label_color, labelY, D_L11_001B161C, 1.0f, 0.0f);
         }
         for (i = *(short *)(state + 0x1e8) + 1; i < 13; i++) {
             if (!D_001395B8[arena_get_challenge_flag_index(g_arena_challenge_table[i][2])]) continue;
@@ -111,10 +111,10 @@ void joba_menu_draw_help_prompts(u8 *moby, int enabled)
             }
             label = table_find_by_id(D_L11_001A904C + 0x8710, 0x4a);
             one = 1;
-            labelColor = (((InputView *)g_pad_state)->field1a0 & 0x2000) ? D_L11_001B1648 : color;
-            nextX = (float)D_L11_001B1630;
+            label_color = (((InputView *)g_pad_state)->field1a0 & 0x2000) ? D_L11_001B1648 : color;
+            next_x = (float)D_L11_001B1630;
             labelY = (float)label_y((void *)label, (float)D_L11_001B1634, D_L11_001B3E04, 0.5f, one);
-            gfx_draw_scaled_object_two_axes((char *)label, nextX, labelColor, labelY, D_L11_001B161C, 1.0f, 0.0f);
+            gfx_draw_scaled_object_two_axes((char *)label, next_x, label_color, labelY, D_L11_001B161C, 1.0f, 0.0f);
             break;
         }
     }

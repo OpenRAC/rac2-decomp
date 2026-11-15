@@ -19,17 +19,17 @@ extern void vec_transform_or_copy(void *,void *);
 /* Updates a spark. It falls, fades, and sometimes throws off small sparks of its own. */
 void part_update_spark(char *particle) {
  char *motion=particle+32,*pos,*vel;
- float lifeRatio,speed,maxLife;
+ float life_ratio,speed,max_life;
  float saved[4] __attribute__((aligned(16)));
  float accel[4] __attribute__((aligned(16)));
  float velocity[4] __attribute__((aligned(16)));
- float randomDir[4] __attribute__((aligned(16)));
- int childLife;
+ float random_dir[4] __attribute__((aligned(16)));
+ int child_life;
  if (FastDecTimer(particle+10)) { part_kill(particle); return; }
-  lifeRatio=IntToFloat(*(short *)(particle+10));
- maxLife=IntToFloat(*(short *)(motion+24));
- lifeRatio=lifeRatio* *(float *)(motion+28); lifeRatio=lifeRatio/maxLife;
- *(float *)(particle+12)=lifeRatio;
+  life_ratio=IntToFloat(*(short *)(particle+10));
+ max_life=IntToFloat(*(short *)(motion+24));
+ life_ratio=life_ratio* *(float *)(motion+28); life_ratio=life_ratio/max_life;
+ *(float *)(particle+12)=life_ratio;
  *(int *)(particle+4)=moby_forward_two_values_and_amount(*(int *)(motion+20),*(int *)(motion+16),IntToFloat(*(short *)(particle+10))/IntToFloat(*(short *)(motion+24)));
  FastVecAdd(particle+16,particle+16,motion);
  pos=particle+16;
@@ -44,18 +44,18 @@ void part_update_spark(char *particle) {
   *(float *)(particle+28)=2.0f;
  }
  if (*(short *)(motion+26) && (g_game_time&1)) {
-  *(Quad *)randomDir=0;
-  randomDir[0]=math_random_float_range(-1.0f,1.0f);
-  randomDir[1]=math_random_float_range(-1.0f,1.0f);
-  randomDir[2]=math_random_float_range(-1.0f,1.0f);
-  *(Quad *)velocity=*(Quad *)randomDir;
+  *(Quad *)random_dir=0;
+  random_dir[0]=math_random_float_range(-1.0f,1.0f);
+  random_dir[1]=math_random_float_range(-1.0f,1.0f);
+  random_dir[2]=math_random_float_range(-1.0f,1.0f);
+  *(Quad *)velocity=*(Quad *)random_dir;
   speed=FastVecLength(motion);
   vel=(char *)velocity;
   speed*=math_random_float_range(0.15f,0.25f);
   vec_scale_to_length(vel,vel,speed);
   FastVecAdd(vel,vel,motion);
   FastVecScale(vel,vel,math_random_float_range(0.75f,0.95f));
-  childLife=math_random_int_range(15,30);
-  part_spawn_spark(pos,vel,*(int *)(particle+4),*(int *)(motion+20),*(float *)(particle+12),childLife,0,(unsigned char)particle[2],(unsigned char)particle[3],FloatToInt(*(float *)(particle+28)));
+  child_life=math_random_int_range(15,30);
+  part_spawn_spark(pos,vel,*(int *)(particle+4),*(int *)(motion+20),*(float *)(particle+12),child_life,0,(unsigned char)particle[2],(unsigned char)particle[3],FloatToInt(*(float *)(particle+28)));
  } else FastVecScale(motion,motion,0.96f);
 }

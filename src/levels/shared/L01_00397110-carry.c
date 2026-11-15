@@ -65,9 +65,9 @@ void teleporter_l01_update(char *moby)
  unsigned short flags = *(u16 *)(moby+0xB2);
  if (D_L01_0021E4B0.disabled[(short)flags]) goto completed;
  {
-  int savedBits = (u8)D_0019B4A8[((short)flags>>1)+(g_current_map_index<<10)];
-  if (flags&1) { if ((savedBits>>4)&7) goto completed; }
-  else if(savedBits&7) goto completed;
+  int saved_bits = (u8)D_0019B4A8[((short)flags>>1)+(g_current_map_index<<10)];
+  if (flags&1) { if ((saved_bits>>4)&7) goto completed; }
+  else if(saved_bits&7) goto completed;
   goto flags_checked;
 completed:
   done=1;
@@ -163,17 +163,17 @@ flags_checked:
   if(vars->x34!=0) {
    gfx_add_draw_callback_first(DrawShrinkingMobyRings,moby); ApproachValue(&vars->x34,0.0f,0.06666667f); break;
   } else {
-   char *linkedMoby=g_moby_l01_table+(vars->target<<8);
-   CarryData *linkedVars=*(CarryData **)(linkedMoby+0x68);
-   qcopy_nc(v, linkedMoby+0x10); v[2]+=0.2f;
-   if(vars->x4C!=-1) load_scene_chunk(vars->x4C,linkedVars->x40);
-   hero_reset_position_and_direction(v,linkedMoby+0xF0,0,1);
-   if(linkedVars->x48!=-1) cam_reset_entry(linkedVars->x48);
-   script_queue_keyed_request(linkedVars->x40,linkedVars->x44);
-   moby_set_state(linkedMoby,4,-1);
-   linkedVars->x28=0; linkedVars->x2C=0; linkedVars->x34=0;
-   linkedVars->x24=linkedVars->x20=1; linkedVars->x50=1;
-   PlayMobySound(1,0,linkedMoby); moby_set_state(moby,1,-1);
+   char *linked_moby=g_moby_l01_table+(vars->target<<8);
+   CarryData *linked_vars=*(CarryData **)(linked_moby+0x68);
+   qcopy_nc(v, linked_moby+0x10); v[2]+=0.2f;
+   if(vars->x4C!=-1) load_scene_chunk(vars->x4C,linked_vars->x40);
+   hero_reset_position_and_direction(v,linked_moby+0xF0,0,1);
+   if(linked_vars->x48!=-1) cam_reset_entry(linked_vars->x48);
+   script_queue_keyed_request(linked_vars->x40,linked_vars->x44);
+   moby_set_state(linked_moby,4,-1);
+   linked_vars->x28=0; linked_vars->x2C=0; linked_vars->x34=0;
+   linked_vars->x24=linked_vars->x20=1; linked_vars->x50=1;
+   PlayMobySound(1,0,linked_moby); moby_set_state(moby,1,-1);
    vars->x2C=vars->x28=vars->x24=vars->x20=0;
    vars->x34=1.95f; moby_position_carried_objects(moby);
   }

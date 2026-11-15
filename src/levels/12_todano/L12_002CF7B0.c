@@ -87,10 +87,10 @@ extern float D_L12_001AD234;
 void water_wave_update(unsigned char *object)
 {
     float *state = *(float **)(object + 0x68);
-    float waveA, waveB, waveC, waveD;
-    int rowsLeft, stateId = object[0x20];
+    float wave_a, wave_b, wave_c, wave_d;
+    int rows_left, state_id = object[0x20];
     float *corner;
-    switch (stateId) {
+    switch (state_id) {
     case 0:
         state[0] = 0.0f;
         state[1] = 0.25f;
@@ -104,7 +104,7 @@ void water_wave_update(unsigned char *object)
         object[0x30] = 255;
         if (matrixGP.rows[0][0] > 1000.0f) {
             corner = matrixGP.rows[0];
-            rowsLeft = 3;
+            rows_left = 3;
             do {
                 float x = corner[0] * 0.01f;
                 float y = corner[1] * 0.01f;
@@ -113,26 +113,26 @@ void water_wave_update(unsigned char *object)
                 corner[1] = y;
                 corner[2] = z;
                 corner += 4;
-            } while (--rowsLeft >= 0);
+            } while (--rows_left >= 0);
         }
         break;
     case 1:
         gfx_add_draw_callback_first(gfx_draw_water_wave_strips, object);
-        D_L12_001B363C = stateId;
+        D_L12_001B363C = state_id;
         qcopy(D_L12_001B3640, g_hero_position);
         *(short *)(g_hero_position + 0x17E) = 5;
         D_L12_001B3640[3] = 48.0f;
         D_L12_001B3640[2] = math_fast_sin_or_cos_b((float)(D_L12_001B29C8[0] % 360) * 0.01744444482028484344482421875f - 3.14f) * 0.25f + 59.5f;
         state[4] += state[5];
         if (state[4] >= 8.0f) state[4] -= 8.0f;
-        waveA = math_fast_sin_or_cos_b(state[0] * 3.141590118408203125f) * 0.01f;
-        waveB = math_fast_sin_or_cos_b(state[1] * 3.141590118408203125f) * 0.025f;
-        waveC = math_fast_sin_or_cos_b(state[2] * 3.141590118408203125f) * 0.01f;
-        waveD = math_fast_sin_or_cos_b(state[3] * 3.141590118408203125f) * 0.025f;
-        D_L12_001AEE40.rows[0][2] += waveA;
-        D_L12_001AEE40.rows[1][2] += waveB;
-        D_L12_001AEE40.rows[2][2] += waveC;
-        D_L12_001AEE40.rows[3][2] += waveD;
+        wave_a = math_fast_sin_or_cos_b(state[0] * 3.141590118408203125f) * 0.01f;
+        wave_b = math_fast_sin_or_cos_b(state[1] * 3.141590118408203125f) * 0.025f;
+        wave_c = math_fast_sin_or_cos_b(state[2] * 3.141590118408203125f) * 0.01f;
+        wave_d = math_fast_sin_or_cos_b(state[3] * 3.141590118408203125f) * 0.025f;
+        D_L12_001AEE40.rows[0][2] += wave_a;
+        D_L12_001AEE40.rows[1][2] += wave_b;
+        D_L12_001AEE40.rows[2][2] += wave_c;
+        D_L12_001AEE40.rows[3][2] += wave_d;
         state[0] += 0.01f;
         state[1] += 0.01f;
         state[2] += 0.01f;
@@ -170,7 +170,7 @@ void falling_spark_update(unsigned char *obj) {
     } frame;
     char *vars = *(char **)(obj + 0x68), *position = (char *)obj + 0x10;
     int i, life;
-    float dirAngle, dirSpeed;
+    float dir_angle, dir_speed;
 
     frame.velocity.q = 0;
     frame.velocity.f[2] = 0.033333335f;
@@ -216,10 +216,10 @@ void falling_spark_update(unsigned char *obj) {
             i = 15;
             do {
                 --i;
-                dirAngle = math_random_angle();
-                dirSpeed = math_random_float_range(0.0f, 0.050000004f);
-                frame.spread.f[0] = math_fast_sin_or_cos_a(dirAngle) * dirSpeed;
-                frame.spread.f[1] = math_fast_sin_or_cos_b(dirAngle) * dirSpeed;
+                dir_angle = math_random_angle();
+                dir_speed = math_random_float_range(0.0f, 0.050000004f);
+                frame.spread.f[0] = math_fast_sin_or_cos_a(dir_angle) * dir_speed;
+                frame.spread.f[1] = math_fast_sin_or_cos_b(dir_angle) * dir_speed;
                 frame.spread.f[2] = math_random_float_range(0.050000004f, 0.10833334f);
                 life = math_random_int_range(90, 120);
                 part_spawn_spark_2(&frame.position, spread, math_random_int_below(2), life);
@@ -233,7 +233,7 @@ void falling_spark_update(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L12_001C0240;
                 model = reread->hit;
@@ -283,8 +283,8 @@ void thrown_shard_update(char *obj) {
     } frame;
     char *vars = *(char **)(obj + 0x68);
     char *position = obj + 0x10;
-    char *hitMoby;
-    Collision *hitInfo;
+    char *hit_moby;
+    Collision *hit_info;
 
     frame.velocity.q = 0;
     frame.velocity.f[2] = 0.033333335f;
@@ -310,12 +310,12 @@ void thrown_shard_update(char *obj) {
     frame.packet.active = 1;
     (*(int *)(vars + 0x14))++;
     if (CollLine(&frame.old, position, 0x10, obj, &frame.packet)) {
-        hitInfo = &D_L12_001C0240;
-        hitMoby = hitInfo->hit;
-        if (hitMoby) {
+        hit_info = &D_L12_001C0240;
+        hit_moby = hit_info->hit;
+        if (hit_moby) {
             Collision *reread;
             char *model;
-            if ((hitMoby == g_hero_moby || *(short *)(hitMoby + 0xAA) == 0xC0) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit_moby == g_hero_moby || *(short *)(hit_moby + 0xAA) == 0xC0) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L12_001C0240;
             model = reread->hit;
@@ -331,14 +331,14 @@ void thrown_shard_update(char *obj) {
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
             vec_scale_to_length(&frame.normal, &reread->normal, 1.0f);
         } else {
-            hitInfo = &D_L12_001C0240;
-            if (hitInfo->count <= 0)
+            hit_info = &D_L12_001C0240;
+            if (hit_info->count <= 0)
                 goto finish;
             obj[0xBC] = 1;
-            qcopy(position, &hitInfo->point);
-            vec_fast_normalize(&frame.velocity, vars, &hitInfo->normal);
+            qcopy(position, &hit_info->point);
+            vec_fast_normalize(&frame.velocity, vars, &hit_info->normal);
             vec_scale_to_length(&frame.velocity, &frame.velocity, 0.033333335f);
-            vec_scale_to_length(&frame.normal, &hitInfo->normal, 1.0f);
+            vec_scale_to_length(&frame.normal, &hit_info->normal, 1.0f);
         }
     } else if (math_fast_float_d(vars + 0x18)) {
         obj[0xBC] = 1;

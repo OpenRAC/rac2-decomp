@@ -159,22 +159,22 @@ void effect_draw_slot_sprites(char *owner)
     char *p = base + 0x30;
     char *q = base;
     int i;
-    int firstColor;
-    int secondColor;
+    int first_color;
+    int second_color;
     float scroll;
 
     for (i = 29; i >= 0; p += 0xA0, i--, q += 0xA0) {
         if (*(int *)(p + 0x5C) == (int)owner) {
             lightning_draw_curve(owner, q);
             if (*(int *)(p + 0x64) == 0) {
-                firstColor = math_random_int_range(0x50, 0x60);
-                firstColor = (int)(firstColor << 24) | firstRGB;
+                first_color = math_random_int_range(0x50, 0x60);
+                first_color = (int)(first_color << 24) | firstRGB;
                 scroll = math_random_angle();
-                gfx_draw_billboard_quad(p, 0x31, firstColor, 1, 0.5f, 0.15f, scroll);
-                secondColor = math_random_int_range(0x50, 0x60);
-                secondColor = (int)(secondColor << 24) | secondRGB;
+                gfx_draw_billboard_quad(p, 0x31, first_color, 1, 0.5f, 0.15f, scroll);
+                second_color = math_random_int_range(0x50, 0x60);
+                second_color = (int)(second_color << 24) | secondRGB;
                 scroll = math_random_angle();
-                gfx_draw_billboard_quad(p, 0x31, secondColor, 1, 0.3f, 0.151f, scroll);
+                gfx_draw_billboard_quad(p, 0x31, second_color, 1, 0.3f, 0.151f, scroll);
             }
         }
     }

@@ -1,4 +1,5 @@
 #include "names.h"
+#include "moby_classes.h"
 typedef int EffectWord128 __attribute__((mode(TI)));
 typedef union { EffectWord128 word; float xyzw[4]; } EffectVector;
 typedef struct {
@@ -34,10 +35,10 @@ extern float D_L00_001B0A00 __attribute__((sda));
    spin and size. Does nothing if all slots are in use. */
 void vaporizer_bolt_spawn_spark(char *object, EffectVector *position) {
     char *state = *(char **)(object + 0x68);
-    char *base = level_get_slot_body(0xC04 /* Vaporizer */, *(short *)(state + 0x1A));
+    char *base = level_get_slot_body(MOBY_CLASS_VAPORIZER, *(short *)(state + 0x1A));
     EffectRecord64 *record;
     int i;
-    base += *(int *)(level_get_slot_header(0xC04 /* Vaporizer */, *(short *)(state + 0x1A)) + 4);
+    base += *(int *)(level_get_slot_header(MOBY_CLASS_VAPORIZER, *(short *)(state + 0x1A)) + 4);
     record = (EffectRecord64 *)base;
     for (i = 0; i < 120; i++, record++) {
         if (record->active == 0) {

@@ -49,8 +49,8 @@ void vaporizer_bolt_draw_sparks(char *object)
     unsigned int color;
     float zero;
 
-    table = level_get_slot_body(0xC04 /* Vaporizer */, *(short *)(context + 0x1A));
-    base = table + *(int *)(level_get_slot_header(0xC04 /* Vaporizer */, *(short *)(context + 0x1A)) + 4);
+    table = level_get_slot_body(MOBY_CLASS_VAPORIZER, *(short *)(context + 0x1A));
+    base = table + *(int *)(level_get_slot_header(MOBY_CLASS_VAPORIZER, *(short *)(context + 0x1A)) + 4);
     up.q = 0;
     up.f.z = 1.0f;
     up.f.w = 1.0f;

@@ -58,25 +58,25 @@ int shooter_init(unsigned char *object)
     *(float *)(state+0x10c)=0.5f;
     *(float *)(state+0x110)=1.22173059f;
     randomAngle=math_random_float_range(20.0f,25.0f);
-    { float turnSpeed=D_L18_001B1218.f18;
+    { float turn_speed=D_L18_001B1218.f18;
     *(float *)(state+0x134)=0.5f;
     state[0x1e8]=0; state[0x1e9]=0;
     *(float *)(state+0x130)=randomAngle*0.017453294f;
-    *(float *)(state+0x12c)=turnSpeed*0.0002777777845f; }
+    *(float *)(state+0x12c)=turn_speed*0.0002777777845f; }
     if(*(short *)(object+0xaa)==0xed4 /* moby class 3796 */) *(float *)(state+0x100)=1.0f;
-    if(*(short *)(object+0xaa)==0xee1 /* Receiver Bot */) *(float *)(state+0x100)=1.1f;
+    if(*(short *)(object+0xaa)==MOBY_CLASS_RECEIVER_BOT) *(float *)(state+0x100)=1.1f;
     if(*(float *)(state+0x3c4)==0.0f && *(float *)(state+0x3c0)==0.0f && *(float *)(state+0x3cc)==0.0f && *(float *)(state+0x3c8)==0.0f) {
-        float walkSpeed=D_L18_001B1218.f0,runSpeed=D_L18_001B1218.f4;
-        float strafeSpeed=D_L18_001B1218.f8,backSpeed=D_L18_001B1218.fC;
-        float turnRate=D_L18_001B1218.f10,aimRate=D_L18_001B1218.f14;
-        *(float *)(state+0x3c4)=walkSpeed;
-        *(float *)(state+0x3c0)=runSpeed;
-        *(float *)(state+0x3cc)=strafeSpeed;
-        *(float *)(state+0x3c8)=backSpeed;
-        *(float *)(state+0x3d4)=turnRate;
-        *(float *)(state+0x3d0)=aimRate;
-        *(float *)(state+0x3dc)=turnRate;
-        *(float *)(state+0x3d8)=aimRate;
+        float walk_speed=D_L18_001B1218.f0,run_speed=D_L18_001B1218.f4;
+        float strafe_speed=D_L18_001B1218.f8,back_speed=D_L18_001B1218.fC;
+        float turn_rate=D_L18_001B1218.f10,aim_rate=D_L18_001B1218.f14;
+        *(float *)(state+0x3c4)=walk_speed;
+        *(float *)(state+0x3c0)=run_speed;
+        *(float *)(state+0x3cc)=strafe_speed;
+        *(float *)(state+0x3c8)=back_speed;
+        *(float *)(state+0x3d4)=turn_rate;
+        *(float *)(state+0x3d0)=aim_rate;
+        *(float *)(state+0x3dc)=turn_rate;
+        *(float *)(state+0x3d8)=aim_rate;
     }
     moby_set_controller_speed_limits(object,*(float *)(state+0x3c4)*0.0002777777845f,*(float *)(state+0x3c0)*0.016666668f,*(float *)(state+0x3d4)*0.000004848137451f,*(float *)(state+0x3d0)*0.0002908882452f);
     randomAngle=math_random_float_range(20.0f,40.0f);
@@ -105,7 +105,7 @@ int shooter_init(unsigned char *object)
     switch(*(short *)(object+0xaa)) {
     case 0xec0 /* moby class 3776 */: state[0x39b]=0; *(int *)(state+0x1c)=0; break;
     case 0xed4 /* moby class 3796 */:
-    case 0xee1 /* Receiver Bot */: state[0x39b]=2; break;
+    case MOBY_CLASS_RECEIVER_BOT: state[0x39b]=2; break;
     }
     moby_start_or_forward_anim(object,func_001163B0()&1,0,1.0f);
     if(state[0x3e8]!=0) {

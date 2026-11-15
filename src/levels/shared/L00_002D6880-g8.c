@@ -13,13 +13,13 @@ extern int level_run_mode_update_three(void);
 /* Says whether the game is in one particular mode: a state value of 49 together with a second value of 4 or 11. */
 int level_is_special_mode_active(void)
 {
-    int isActive = 0;
+    int is_active = 0;
     int mode;
     if (level_run_mode_update_three() != 0) goto out;
     if (D_0018C0B4_1 != 49) goto out;
     mode = g_current_map_index;
     if (mode != 4 && mode != 11) goto out;
-    isActive = 1;
+    is_active = 1;
 out:
-    return isActive;
+    return is_active;
 }

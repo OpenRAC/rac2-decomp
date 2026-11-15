@@ -39,8 +39,8 @@ extern void PrepareVendorSelectionPreview(void);
 /* Runs the buy dialog in the vendor screen: works out how many the player can afford, reads the buttons, and completes or cancels the purchase. */
 void VendorPurchaseDialogUpdate(int *cancel, int *confirm)
 {
-    PurchaseItem upgradeInfo;
-    int item, special, boughtCount;
+    PurchaseItem upgrade_info;
+    int item, special, bought_count;
     if (g_vendor_menu_state.state == 1) {
         {
             PurchaseItem *record = &ITEM;
@@ -113,11 +113,11 @@ void VendorPurchaseDialogUpdate(int *cancel, int *confirm)
                     total = record->price * D_001B2248;
                     if (g_player_bolts >= total) {
                         if (*ammo > record->capacity) *ammo = record->capacity;
-                        boughtCount = D_001B2248;
-                        boughtCount -= stub_empty_7(ROW.item, boughtCount);
+                        bought_count = D_001B2248;
+                        bought_count -= stub_empty_7(ROW.item, bought_count);
                         {
                             PurchaseItem *record = &ITEM;
-                            total = record->price * boughtCount;
+                            total = record->price * bought_count;
                             g_player_bolts -= total;
                         }
                         shop_build_vendor_weapon_list(0);
@@ -141,13 +141,13 @@ void VendorPurchaseDialogUpdate(int *cancel, int *confirm)
                         if (special) {
                             PurchaseState *shop = &g_vendor_menu_state;
                             PurchaseRow *rows = shop->rows;
-                            if (help_copy_record_at_depth(&upgradeInfo, rows[shop->index].item, 1) && upgradeInfo.price)
-                                g_item_ammo_counts[rows[shop->index].item] = upgradeInfo.capacity;
+                            if (help_copy_record_at_depth(&upgrade_info, rows[shop->index].item, 1) && upgrade_info.price)
+                                g_item_ammo_counts[rows[shop->index].item] = upgrade_info.capacity;
                         } else {
                             PurchaseState *shop = &g_vendor_menu_state;
                             PurchaseRow *rows = shop->rows;
-                            if (help_copy_record_at_depth(&upgradeInfo, rows[shop->index].item, 2) && upgradeInfo.price)
-                                g_item_ammo_counts[rows[shop->index].item] = upgradeInfo.capacity;
+                            if (help_copy_record_at_depth(&upgrade_info, rows[shop->index].item, 2) && upgrade_info.price)
+                                g_item_ammo_counts[rows[shop->index].item] = upgrade_info.capacity;
                         }
                     }
                     if (item != 31 && item != 61) moby_handle_request_slot_state(item);

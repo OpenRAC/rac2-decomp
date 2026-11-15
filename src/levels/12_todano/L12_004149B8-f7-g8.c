@@ -97,16 +97,16 @@ void requirement_trigger_update(Thing *moby)
         missing = 1;
         if (D_L12_002A10C0[g_current_map_index] != 0 && D_L12_002A10C0[g_current_map_index][trigger->idx] != 0) {
             for (i = 0; D_L12_002A10C0[g_current_map_index][trigger->idx][i] != -1; i++) {
-                int requirementId = D_L12_002A10C0[g_current_map_index][trigger->idx][i];
+                int requirement_id = D_L12_002A10C0[g_current_map_index][trigger->idx][i];
 
                 missing = 0;
                 if (trigger->tail.b.quiet == 0) {
-                    int bit = 1 << (requirementId & 0x1F);
-                    if (D_00139768[(unsigned int)requirementId >> 2] & bit)
+                    int bit = 1 << (requirement_id & 0x1F);
+                    if (D_00139768[(unsigned int)requirement_id >> 2] & bit)
                         continue;
                 }
-                if (req_push_queue(D_L12_001C0000, requirementId) == 0 && i == 0) {
-                    STUB_printf(D_L12_002A8700, moby->id, moby->oclass, g_current_map_index, trigger->idx, requirementId);
+                if (req_push_queue(D_L12_001C0000, requirement_id) == 0 && i == 0) {
+                    STUB_printf(D_L12_002A8700, moby->id, moby->oclass, g_current_map_index, trigger->idx, requirement_id);
                     return;
                 }
                 fail = 0;
@@ -134,8 +134,8 @@ void requirement_trigger_update(Thing *moby)
     case 3:
         if (game_is_either_mode_two() == 0) {
             if (trigger->link != -1) {
-                char *linkedPos = D_L12_001B2F8C + (trigger->link << 7);
-                hero_reset_position_and_direction(linkedPos + 0x30, linkedPos + 0x70, 0, 1);
+                char *linked_pos = D_L12_001B2F8C + (trigger->link << 7);
+                hero_reset_position_and_direction(linked_pos + 0x30, linked_pos + 0x70, 0, 1);
             }
             moby_set_state(moby, 4, -1);
         }
@@ -158,8 +158,8 @@ void requirement_trigger_update(Thing *moby)
         }
         if (trigger->count != 0 && (trigger->tail.word & 0xFFFF0000)) {
             if (trigger->link != -1) {
-                char *linkedPos = D_L12_001B2F8C + (trigger->link << 7);
-                level_capture_checkpoint_state(linkedPos + 0x30, linkedPos + 0x70);
+                char *linked_pos = D_L12_001B2F8C + (trigger->link << 7);
+                level_capture_checkpoint_state(linked_pos + 0x30, linked_pos + 0x70);
             } else
                 level_capture_checkpoint_state(moby->pos, moby->dir);
         }
@@ -182,8 +182,8 @@ void requirement_trigger_update(Thing *moby)
         }
         if (trigger->count > 0 && (trigger->tail.word & 0xFFFF0000)) {
             if (trigger->link != -1) {
-                char *linkedPos = D_L12_001B2F8C + (trigger->link << 7);
-                level_capture_checkpoint_state(linkedPos + 0x30, linkedPos + 0x70);
+                char *linked_pos = D_L12_001B2F8C + (trigger->link << 7);
+                level_capture_checkpoint_state(linked_pos + 0x30, linked_pos + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
         }

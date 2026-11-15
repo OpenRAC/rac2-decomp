@@ -40,19 +40,19 @@ extern f32 D_L11_001B0558 __attribute__((sda));
 extern f32 D_L11_001B0540 __attribute__((sda));
 
 /* Puts the Joba rail object back on its rail at angle zero and resets its state. */
-void joba_rail_reset(u8 *mobyBytes) {
-    L11Moby *moby = (L11Moby *)mobyBytes;
-    u8 *vars = *(u8 **)(mobyBytes + 0x68);
-    f32 *railPoint;
+void joba_rail_reset(u8 *moby_bytes) {
+    L11Moby *moby = (L11Moby *)moby_bytes;
+    u8 *vars = *(u8 **)(moby_bytes + 0x68);
+    f32 *rail_point;
     f32 trig;
-    f32 newY;
-    u32 modelWord;
+    f32 new_y;
+    u32 model_word;
 
     *(f32 *)(vars + 0x20) = (f32)*(s16 *)(vars + 0x24);
-    modelWord = *(u32 *)(moby->model + 0x10);
+    model_word = *(u32 *)(moby->model + 0x10);
     moby->flags &= 0xFFFE;
     moby->b31 = 1;
-    moby->w98 = modelWord;
+    moby->w98 = model_word;
     *(u8 *)(vars + 0x2E) = 1;
     moby->b7F = 0;
     moby->flags = (moby->flags & 0xFFB9) | 0x1000;
@@ -64,18 +64,18 @@ void joba_rail_reset(u8 *mobyBytes) {
                       *(u32 *)(vars + 0x288));
         *(s16 *)(vars + 0x72) = 1;
     }
-    moby_set_state(mobyBytes, 2, 2);
+    moby_set_state(moby_bytes, 2, 2);
     *(s32 *)(vars + 0x250) = 0;
     trig = math_fast_sin_or_cos_a(*(f32 *)(vars + 0x250));
-    railPoint = arena_get_center_point(moby->slot);
-    moby->x = D_L11_001B0558 * trig + railPoint[0];
+    rail_point = arena_get_center_point(moby->slot);
+    moby->x = D_L11_001B0558 * trig + rail_point[0];
     trig = math_fast_sin_or_cos_b(*(f32 *)(vars + 0x250));
-    railPoint = arena_get_center_point(moby->slot);
-    newY = D_L11_001B0558 * trig + railPoint[1];
+    rail_point = arena_get_center_point(moby->slot);
+    new_y = D_L11_001B0558 * trig + rail_point[1];
     moby->z = D_L11_001B0540;
     moby->rotX = -1.5707965f;
     moby->rotW = 0;
-    moby->y = newY;
+    moby->y = new_y;
     moby->rotZ = FastAddRotations(3.1415927f, *(f32 *)(vars + 0x250));
     euler_rotation_basis(moby->mtx, &moby->rotW);
 }

@@ -35,7 +35,7 @@ void armed_enemy_update(char *self) {
     char *state = *(char **)(self + 0x68);
     float ang;
     float dir;
-    char *foundTarget;
+    char *found_target;
 
     if (*(unsigned char *)(self + 0x20) == 0) {
         *(char **)(state + 0x18) = state + 0x100;
@@ -81,10 +81,10 @@ void armed_enemy_update(char *self) {
         }
         if (*(unsigned char *)(self + 0x31) != 0 && *(unsigned char *)(self + 0x20) >= 3) {
             *(float *)(state + 0xFC) = 1.0f;
-            foundTarget = part_find_owned_effect_slot(self, 0x10000, 1);
-            if (foundTarget != 0) {
+            found_target = part_find_owned_effect_slot(self, 0x10000, 1);
+            if (found_target != 0) {
                 *(float *)(state + 0xFC) = 1.0f;
-                if (armed_enemy_is_holding_in_attack(self, foundTarget) != 0) {
+                if (armed_enemy_is_holding_in_attack(self, found_target) != 0) {
                     *(unsigned char *)(state + 0x60) = 0x13;
                     moby_apply_damage_to_object(self, state + 0x50, 1);
                     *(unsigned char *)(state + 0x60) = 0x14;

@@ -9,15 +9,15 @@ extern s32 g_current_map_index;
 
 /* shared native body of family 8c88be3bc489ab9e */
 /* Tells whether a racer is in the right animation window for a certain jump on level 11 and is still below a height limit. */
-int racer_is_in_jump_window(int animId, int animFrame, float limit)
+int racer_is_in_jump_window(int anim_id, int anim_frame, float limit)
 {
     int result = 0;
 
     if (g_current_map_index != 11) goto end;
 
-    if (animId == -1) {
-        if (animFrame >= 166) {
-            if (animFrame < 187) {
+    if (anim_id == -1) {
+        if (anim_frame >= 166) {
+            if (anim_frame < 187) {
                 if (limit < 520.2f) {
                     result = 1;
                     goto end;
@@ -26,14 +26,14 @@ int racer_is_in_jump_window(int animId, int animFrame, float limit)
         }
     }
 
-    if (animId == 2) {
-        if ((unsigned)(animFrame - 1) < 6) {
+    if (anim_id == 2) {
+        if ((unsigned)(anim_frame - 1) < 6) {
             if (limit < 537.0f) {
                 result = 1;
                 goto end;
             }
         }
-        if ((unsigned)(animFrame - 35) < 13) {
+        if ((unsigned)(anim_frame - 35) < 13) {
             if (limit < 534.0f) {
                 result = 1;
                 goto end;

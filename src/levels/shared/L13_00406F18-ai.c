@@ -761,7 +761,7 @@ void guard_l13_update(u8 *moby)
             hit = *(u8 **)(D_L13_001BFD00 + 0x18);
             if (hit != 0 && (hit == g_hero_moby || hit == *(u8 **)(vars + 0x200)
                              || *(s16 *)(hit + 0xAA) == 0xC87 || *(s16 *)(hit + 0xAA) == 0xC86
-                             || *(s16 *)(hit + 0xAA) == 0x1F4 /* Crate */ || *(s16 *)(hit + 0xAA) == 0x10CE
+                             || *(s16 *)(hit + 0xAA) == MOBY_CLASS_CRATE || *(s16 *)(hit + 0xAA) == 0x10CE
                              || *(s16 *)(hit + 0xAA) == 0x200 || *(s16 *)(hit + 0xAA) == 0x1FF)) {
                 if (moby[0x43] != 5) {
                     anim_start_blended(moby, 5, 0, math_random_int_below(0xF));
@@ -851,7 +851,7 @@ void guard_l13_update(u8 *moby)
                 hit = *(u8 **)(D_L13_001BFD00 + 0x18);
                 if (hit != 0 && (hit == g_hero_moby || hit == *(u8 **)(vars + 0x200)
                                  || *(s16 *)(hit + 0xAA) == 0xC87 || *(s16 *)(hit + 0xAA) == 0xC86
-                                 || *(s16 *)(hit + 0xAA) == 0x1F4 /* Crate */ || *(s16 *)(hit + 0xAA) == 0x10CE
+                                 || *(s16 *)(hit + 0xAA) == MOBY_CLASS_CRATE || *(s16 *)(hit + 0xAA) == 0x10CE
                                  || *(s16 *)(hit + 0xAA) == 0x200 || *(s16 *)(hit + 0xAA) == 0x1FF)) {
                     if (moby[0x43] != 5) {
                         anim_start_blended(moby, 5, 0, math_random_int_below(0xF));

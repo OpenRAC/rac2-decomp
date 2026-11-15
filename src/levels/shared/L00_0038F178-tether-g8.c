@@ -39,7 +39,7 @@ extern void cam_compute_view_direction(char *, char *, int), FastVecCross(void *
 extern int part_alloc_effect_slot(void *, int, float, float, float);
 /* Creates the active tether actor and its attachments, inheriting the hero's support frame. */
 char *visibomb_create_missile(char *owner, char *position, float yaw, float pitch) {
-    char *actor = CreateMoby(0xAC /* Visibomb Missile */);
+    char *actor = CreateMoby(MOBY_CLASS_VISIBOMB_MISSILE);
     TetherState *state;
     float start[4] __attribute__((aligned(16)));
     float side[4];

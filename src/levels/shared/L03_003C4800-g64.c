@@ -28,9 +28,9 @@ extern TI128 D_L03_0029A880[5];
 
 /* Visits the objects in a group and spawns an effect at each of their fixed attachment points. */
 void part_spawn_at_attachment_points(unsigned char *object) {
-    unsigned short *idList;
+    unsigned short *id_list;
     unsigned char *entity;
-    int *boneIds;
+    int *bone_ids;
     TI128 *offsets;
     int count;
     int j;
@@ -39,11 +39,11 @@ void part_spawn_at_attachment_points(unsigned char *object) {
     float point[4] __attribute__((aligned(16)));
     float *vp;
 
-    for (idList = D_L03_001FB5A0[object[0x21]];
-         object[0x21] != 0xFF && object[0x21] <= D_L03_001B2A38 && idList != 0 &&
-         ((idList != 0 && (short)idList[-1] >= 0) || idList == D_L03_001FB5A0[object[0x21]]);
-         idList++) {
-        entity = D_L03_001B2A1C + ((*idList & 0x7FFF) << 8);
+    for (id_list = D_L03_001FB5A0[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= D_L03_001B2A38 && id_list != 0 &&
+         ((id_list != 0 && (short)id_list[-1] >= 0) || id_list == D_L03_001FB5A0[object[0x21]]);
+         id_list++) {
+        entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
         if (entity == 0)
             break;
         if (entity[0x31] == 0)
@@ -54,28 +54,28 @@ void part_spawn_at_attachment_points(unsigned char *object) {
             continue;
         switch (*(short *)(entity + 0xAA)) {
         case 0x940: /* Bridgebot */
-            boneIds = D_L03_001AFF88;
+            bone_ids = D_L03_001AFF88;
             offsets = D_L03_001AFFE0;
             count = 3;
             break;
         case 0x93C: /* moby class 2364 */
-            boneIds = D_L03_001AFF78;
+            bone_ids = D_L03_001AFF78;
             offsets = D_L03_001AFFB0;
             count = 3;
             break;
         case 0x964: /* Gadgebot */
-            boneIds = D_L03_001AFF60;
+            bone_ids = D_L03_001AFF60;
             offsets = D_L03_0029A880;
             count = 5;
             break;
         default:
-            boneIds = D_L03_001AFF98;
+            bone_ids = D_L03_001AFF98;
             offsets = D_L03_001B0010;
             count = 3;
             break;
         }
         for (j = 0; j < count; j++) {
-            moby_transform_joint_point((char *)entity, boneIds[j], (char *)matrix);
+            moby_transform_joint_point((char *)entity, bone_ids[j], (char *)matrix);
             qcopy(point, &offsets[j]);
             radius = point[3];
             point[3] = 1.0f;

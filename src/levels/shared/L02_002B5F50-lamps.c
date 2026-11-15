@@ -1,4 +1,5 @@
 #include "names.h"
+#include "moby_classes.h"
 /* Model-specific lamp glow rendering; calls retain all eight GPR inputs. */
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -18,7 +19,7 @@ void UpdateLampGlowEffects(char *object) {
     char *data = *(char **)(object + 0x68);
     short kind = *(short *)(object + 0xAA);
     float distance;
-    if (kind == 0x9B7 /* Scenery Ship */ || kind == 0x9B0 /* moby class 2480 */ || kind == 0xD2C /* moby class 3372 */ || kind == 0xD5C /* Train with Rail */) {
+    if (kind == MOBY_CLASS_SCENERY_SHIP || kind == 0x9B0 /* moby class 2480 */ || kind == 0xD2C /* moby class 3372 */ || kind == MOBY_CLASS_TRAIN_WITH_RAIL) {
         if (g_current_map_index != 13) {
             char *event = (char *)g_sound_state + *(int *)(data + 0x18) * 0x70;
             if (*(char **)(event + 0x88) != object || !((u8 *)event)[0x74])
@@ -49,7 +50,7 @@ void UpdateLampGlowEffects(char *object) {
             part_spawn_object_following_effect(data + 0x50, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
         }
         break;
-    case 0x9B7 /* Scenery Ship */:
+    case MOBY_CLASS_SCENERY_SHIP:
         distance = fast_vec_dist(g_camera_l02_position, object + 0x10);
         if (distance < (float)*(int *)(data + 0x90)) {
             part_spawn_object_following_effect(data + 0x30, object, 0x405696FF, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));
@@ -93,7 +94,7 @@ void UpdateLampGlowEffects(char *object) {
             part_spawn_object_following_effect(data + 0x40, object, 0x20804040, -1, 1, *(float *)(data + 0x78) * 777000.0f, 0.6f, 2, 0, *(int *)(data + 0x94));
         }
         break;
-    case 0xD5C /* Train with Rail */:
+    case MOBY_CLASS_TRAIN_WITH_RAIL:
         distance = fast_vec_dist(g_camera_l02_position, object + 0x10);
         if (distance < (float)*(int *)(data + 0x90)) {
             part_spawn_object_following_effect(data + 0x30, object, 0x40804040, -1, 0, *(float *)(data + 0x78) * 756000.0f, 0.5f, 2, 0, *(int *)(data + 0x90));

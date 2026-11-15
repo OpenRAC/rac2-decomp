@@ -22,7 +22,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern void *part_spawn_random_tinted_effect(float, float, float *, float *, float *);
 
 /* Every so often, puffs out two small particles to the sides of the hero. */
-void part_emit_hero_side_particles(char *emitInterval, int threshold)
+void part_emit_hero_side_particles(char *emit_interval, int threshold)
 {
     float velocity[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
@@ -50,7 +50,7 @@ void part_emit_hero_side_particles(char *emitInterval, int threshold)
             velocity[1] = velocity[1] - math_fast_sin_or_cos_b(D_00189E20_20.angle) * 0.0250000022f;
             size = math_random_float_range(0.4f, 0.5f);
             part_spawn_random_tinted_effect(size, i == 0 ? 2.0f : -2.0f, position, velocity, &D_00189E20_20.z);
-            D_00189E20_20.counter = emitInterval == 0 ? 0 : math_random_int_below((int)emitInterval);
+            D_00189E20_20.counter = emit_interval == 0 ? 0 : math_random_int_below((int)emit_interval);
         }
     }
 }

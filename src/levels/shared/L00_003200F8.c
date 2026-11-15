@@ -35,15 +35,15 @@ extern char *part_spawn_shockwave_ring(char *, char *, char *, float, int,
 extern char *moby_spawn_template_effect(char *, void *, int, void *);
 
 /* Spawns an orange explosion burst of sparks at a position, with glow lights and an optional flash. */
-void part_l00_spawn_explosion_burst(char *parentObj, char *position, float scale, float flashRadius)
+void part_l00_spawn_explosion_burst(char *parent_obj, char *position, float scale, float flash_radius)
 {
     BurstVector zero;
     BurstPalette first, second;
     int rgb[3];
-    int burstIdx;
+    int burst_idx;
     float speed, size, glow;
     vec_clear_128(&zero);
-    for (burstIdx = 2; burstIdx >= 0; burstIdx--) {
+    for (burst_idx = 2; burst_idx >= 0; burst_idx--) {
         int firstColor, secondColor, life, fadeLife;
         speed = math_random_float_range(8.0f, 10.0f) * 0.01666666753590107f;
         size = scale * 500000.0f;
@@ -56,25 +56,25 @@ void part_l00_spawn_explosion_burst(char *parentObj, char *position, float scale
         part_spawn_firework_spark(position, &zero, firstColor, secondColor,
                       size, life, fadeLife, 0, 0, speed * scale);
     }
-    if (parentObj) {
+    if (parent_obj) {
         rgb[0] = 127; rgb[1] = 64; rgb[2] = 0;
         swap_color_channel_words(rgb, rgb + 1, rgb + 2, 1);
         glow = scale * 4.0f;
-        part_spawn_shockwave_ring(parentObj, position, (char *)&zero, glow, 20,
+        part_spawn_shockwave_ring(parent_obj, position, (char *)&zero, glow, 20,
                       *(unsigned char *)&rgb[0], *(unsigned char *)&rgb[1],
                       *(unsigned char *)&rgb[2], 48);
         rgb[0] = 96; rgb[1] = 32; rgb[2] = 0;
         swap_color_channel_words(rgb, rgb + 1, rgb + 2, 1);
         glow = scale * 3.0f;
-        part_spawn_shockwave_ring(parentObj, position, (char *)&zero, glow, 29,
+        part_spawn_shockwave_ring(parent_obj, position, (char *)&zero, glow, 29,
                       *(unsigned char *)&rgb[0], *(unsigned char *)&rgb[1],
                       *(unsigned char *)&rgb[2], 32);
     }
-    if (flashRadius != 0.0f) {
-        if (flashRadius > 0.0f) {
-            D_L00_00281760[0].radius[1] = flashRadius;
-            D_L00_00281760[0].radius[2] = flashRadius;
-            D_L00_00281760[0].radius[0] = flashRadius;
+    if (flash_radius != 0.0f) {
+        if (flash_radius > 0.0f) {
+            D_L00_00281760[0].radius[1] = flash_radius;
+            D_L00_00281760[0].radius[2] = flash_radius;
+            D_L00_00281760[0].radius[0] = flash_radius;
         } else {
             D_L00_00281760[0].radius[1] = 13.0f;
             D_L00_00281760[0].radius[2] = 13.0f;

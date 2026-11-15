@@ -68,17 +68,17 @@ extern void moby_copy_color(void *, void *);
 /* Returns 1 as soon as one of the two bound sub-objects carries a live state word. */
 s32 helper_has_live_object(u8 *moby)
 {
-    u8 *mobyCopy = moby;
+    u8 *moby_copy = moby;
     u8 *vars;
     u8 **slot;
     s32 i;
 
-    if (mobyCopy == 0)
+    if (moby_copy == 0)
         return 0;
-    if (*(s16 *)(mobyCopy + 0xAA) != 0xFAE /* moby class 4014 */)
+    if (*(s16 *)(moby_copy + 0xAA) != 0xFAE /* moby class 4014 */)
         return 0;
-    vars = *(u8 **)(mobyCopy + 0x68);
-    helper_push_objects(mobyCopy);
+    vars = *(u8 **)(moby_copy + 0x68);
+    helper_push_objects(moby_copy);
     slot = (u8 **)(vars + 8);
     for (i = 0; i < 2; i++, slot++) {
         if (*slot != 0) {
@@ -194,14 +194,14 @@ void moby_reset_to_saved_position(u8 *self)
 {
     u8 *dst = self + 0x10;
     u8 *vars = *(u8 **)(self + 0x68);
-    void *classDef;
+    void *class_def;
 
     qcopy(dst, vars + 0x210);
     *(f32 *)(self + 0xF8) = *(f32 *)(vars + 0x21C);
     *(u32 *)(vars + 0x224) = 0;
     *(u16 *)(self + 0x34) = (*(u16 *)(self + 0x34) & 0xFFBE) | 0x1000;
-    classDef = *(void **)(self + 0x24);
-    *(u32 *)(self + 0x98) = *(u32 *)((u8 *)classDef + 0x10);
+    class_def = *(void **)(self + 0x24);
+    *(u32 *)(self + 0x98) = *(u32 *)((u8 *)class_def + 0x10);
     moby_fuse_linked_objects(self, dst, self + 0xF0, 0, 0);
     moby_set_state(self, 2, -1);
     if (*(u8 *)(self + 0x43) != 8)

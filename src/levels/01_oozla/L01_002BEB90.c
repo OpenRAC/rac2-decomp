@@ -61,7 +61,7 @@ extern void func_2E3470(void *, void *, void *);
 extern void func_2E2608(void *, int, int, unsigned int, int);
 
 /* Builds the four-slice trail mesh for the ship's current colour. */
-void ship_build_trail_mesh(char *trailSource) {
+void ship_build_trail_mesh(char *trail_source) {
     char buffer[0x40];
     char end[0x10];
     int kind;
@@ -79,7 +79,7 @@ void ship_build_trail_mesh(char *trailSource) {
         kind = 0x43;
     if (kind == -1)
         return;
-    func_2E3738(end, trailSource + 0xC0, 0.05000000074505806f);
+    func_2E3738(end, trail_source + 0xC0, 0.05000000074505806f);
     offset = 0x30;
     dest = buffer;
     state = D_L01_001BD1C0;
@@ -97,37 +97,37 @@ void ship_build_trail_mesh(char *trailSource) {
 ASM_FUNC("asm/levels", func_L01_003042AC);
 
 /* Spawns a small effect object tied to a parent object and places it at the parent or at one of its joints. */
-void *CreateAttachedType57Effect(L01_00333FA8_PARENT *parent, void *owner, int jointIndex, float size)
+void *CreateAttachedType57Effect(L01_00333FA8_PARENT *parent, void *owner, int joint_index, float size)
 {
     L01_00333FA8_OBJ *obj;
     char buf0[16];
     char buf1[16];
-    L01_00333FA8_TAIL *tailPart;
-    int randomValue;
-    int groupBits;
+    L01_00333FA8_TAIL *tail_part;
+    int random_value;
+    int group_bits;
 
     obj = part_alloc(0x57);
     if (obj != 0) {
-        tailPart = &obj->tail;
-        tailPart->f20 = parent;
-        tailPart->f26 = jointIndex;
-        tailPart->f28 = owner;
-        if ((short)jointIndex == -1) {
+        tail_part = &obj->tail;
+        tail_part->f20 = parent;
+        tail_part->f26 = joint_index;
+        tail_part->f28 = owner;
+        if ((short)joint_index == -1) {
             qcopy(&obj->f10, (char *)parent + 0x10);
         } else {
-            moby_transform_joint_to_world(obj->tail.f20, (short)jointIndex, buf0);
+            moby_transform_joint_to_world(obj->tail.f20, (short)joint_index, buf0);
             FastVecSub(buf1, D_L01_001B94C0, buf0);
             vec_scale_to_length(buf1, buf1, 0.4f);
             FastVecAdd(&obj->f10, buf0, buf1);
         }
         obj->f08 = (char)func_001163B0();
         obj->f04 = (int)owner;
-        randomValue = FloatToInt(4.0f);
-        groupBits = ((short)parent->group >> 5) * 16;
+        random_value = FloatToInt(4.0f);
+        group_bits = ((short)parent->group >> 5) * 16;
         obj->f03 = 0x48;
         obj->f01 = 0;
         *(float *)((char *)obj + 0xC) = size;
-        obj->f09 = (char)(groupBits + randomValue);
+        obj->f09 = (char)(group_bits + random_value);
         obj->f02 = *D_L01_001FF19C;
     }
     return obj;

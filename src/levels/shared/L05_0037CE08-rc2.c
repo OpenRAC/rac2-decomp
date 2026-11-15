@@ -33,7 +33,7 @@ extern u16 *ref_L05_0037CE08_03[];
 s32 list_count_objects_matching_value(void *object, s32 value) {
     s32 count;
     s32 offset;
-    s32 entryWord;
+    s32 entry_word;
     s32 next;
     s32 flag;
     u16 *list;
@@ -52,8 +52,8 @@ s32 list_count_objects_matching_value(void *object, s32 value) {
             next = count + 1;
             count = (flag != 0) ? next : count;
         }
-        entryWord = (s16)*entry;
+        entry_word = (s16)*entry;
         entry += 1;
-    } while (entryWord >= 0);
+    } while (entry_word >= 0);
     return count;
 }

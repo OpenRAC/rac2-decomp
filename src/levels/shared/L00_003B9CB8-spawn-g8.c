@@ -78,7 +78,7 @@ unsigned char *CreateTrailOwnerMoby(int mode)
         return 0;
     }
 
-    owner = (Owner3A *)CreateMoby(mode ? 0x1192 /* Tesla Barrier */ : 0xA5C /* Shield Charger */);
+    owner = (Owner3A *)CreateMoby(mode ? MOBY_CLASS_TESLA_BARRIER : MOBY_CLASS_SHIELD_CHARGER);
     if (owner != 0) {
         state = owner->state;
         D_L00_001AFF98 = (char *)owner;

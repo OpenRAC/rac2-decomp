@@ -9,8 +9,8 @@ extern int D_L00_001B0BE0 __attribute__((sda));
 
 /* Turns a fixed offset by the moby's facing and moves it to the moby's position, giving a
    point in the world. */
-void moby_compute_offset_point(char *sourceMoby, char *worldPoint)
+void moby_compute_offset_point(char *source_moby, char *world_point)
 {
-    func_2EE5B0(worldPoint, &D_L00_001B0BE0, sourceMoby + 0xC0);
-    func_2EE108(worldPoint, worldPoint, sourceMoby + 0x10);
+    func_2EE5B0(world_point, &D_L00_001B0BE0, source_moby + 0xC0);
+    func_2EE108(world_point, world_point, source_moby + 0x10);
 }

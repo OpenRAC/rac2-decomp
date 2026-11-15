@@ -24,47 +24,47 @@ extern void moby_mark_spawned(void *);
 /* Updates a breakable object (moby class 4484): it sets up its glow, waits to be hit, then releases a burst and an explosion and disappears. */
 void breakable_l18_object_update(u8 *obj) {
     float offset[4] __attribute__((aligned(16)));
-    float posA[4] __attribute__((aligned(16)));
-    float posB[4] __attribute__((aligned(16)));
+    float pos_a[4] __attribute__((aligned(16)));
+    float pos_b[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(obj + 0x68), *hit;
-    int i, xOffset, yOffset;
-    float *corner, *posACursor, *posBCursor;
+    int i, x_offset, y_offset;
+    float *corner, *pos_a_cursor, *pos_b_cursor;
 
     switch (obj[0x20]) {
     case 0:
         i = 0;
-        posBCursor = posB;
-        posACursor = posA;
-        yOffset = 20;
-        xOffset = 4;
+        pos_b_cursor = pos_b;
+        pos_a_cursor = pos_a;
+        y_offset = 20;
+        x_offset = 4;
         corner = D_L18_001B1B40;
-        for (; i < 4; i++, yOffset -= 8, xOffset -= 8, corner += 4) {
+        for (; i < 4; i++, y_offset -= 8, x_offset -= 8, corner += 4) {
             FastVecScale(offset, corner, *(float *)(obj + 0x2C));
             part_spawn_object_following_effect(offset, obj, 0x28808080, -1, 0, -1, 0, 0x60,
                              *(float *)(obj + 0x2C) * 1050000.f, .15f);
-            vec_local_offset_to_world(obj, posACursor, corner[0], corner[1], corner[2]);
-            qcopy(posBCursor, posACursor);
+            vec_local_offset_to_world(obj, pos_a_cursor, corner[0], corner[1], corner[2]);
+            qcopy(pos_b_cursor, pos_a_cursor);
             if (i < 2) {
-                vec_local_to_world(obj, posBCursor, (float)xOffset, 0, -4.f);
+                vec_local_to_world(obj, pos_b_cursor, (float)x_offset, 0, -4.f);
             } else {
-                vec_local_to_world(obj, posBCursor, 0, (float)yOffset, -4.f);
+                vec_local_to_world(obj, pos_b_cursor, 0, (float)y_offset, -4.f);
             }
-            posA[3] = .2f;
-            posB[3] = 1.f;
+            pos_a[3] = .2f;
+            pos_b[3] = 1.f;
         }
         moby_set_state(obj, 1, -1);
         break;
     case 1:
         hit = part_find_owned_effect_slot(obj, 0x4010000, 0);
         if (hit && !*(int *)state) {
-            *(TI128 *)posB = 0;
-            posB[0] = 3.f;
-            posB[1] = 3.f;
+            *(TI128 *)pos_b = 0;
+            pos_b[0] = 3.f;
+            pos_b[1] = 3.f;
             *(float *)(hit + 0x18) = .75f;
             FastVecScale(offset, hit + 0x10, math_random_float_range(6.f, 8.f));
-            qcopy(posA, offset);
-            FastVecSub(offset, offset, posB);
-            FastVecAdd(posA, posA, posB);
+            qcopy(pos_a, offset);
+            FastVecSub(offset, offset, pos_b);
+            FastVecAdd(pos_a, pos_a, pos_b);
             part_explode_object_into_pieces(obj, offset, D_L18_001B1B08, D_L18_001B1B00,
                              0xFFFF, -1, D_L18_001B1B30, 9, -128, 255, 0);
             moby_set_state(obj, 2, -1);

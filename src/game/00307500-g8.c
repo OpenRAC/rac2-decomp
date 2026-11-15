@@ -17,18 +17,18 @@ extern void vec_build_spherical_offset(void *, float, float, float);
 /* Looks for a target for the Megaturret. When it finds one it starts shooting, otherwise it picks a random aim direction. */
 void megaturret_find_target(char *obj)
 {
-    SpawnVec origin, muzzlePos;
+    SpawnVec origin, muzzle_pos;
     SpawnParams params;
     SpawnVec angles;
-    SpawnVec aimBasis[4];
+    SpawnVec aim_basis[4];
     SpawnVec up;
-    int targetInfo;
+    int target_info;
     SpawnRecord *vars = *(SpawnRecord **)(obj + 0x68);
     moby_get_facing_direction(obj + 0x10, &origin);
-    moby_transform_joint_to_world(obj, 0, &muzzlePos);
+    moby_transform_joint_to_world(obj, 0, &muzzle_pos);
     if (vars->target == 0) {
         params = D_001AEC70;
-        vars->target = SelectBestTargetInCone(&muzzlePos, obj + 0xC0, 6.2831855f, 6.2831855f, &targetInfo, 0, 0, 0, D_001AEC64, 0.0f, 0.0f, 0, &params);
+        vars->target = SelectBestTargetInCone(&muzzle_pos, obj + 0xC0, 6.2831855f, 6.2831855f, &target_info, 0, 0, 0, D_001AEC64, 0.0f, 0.0f, 0, &params);
         if (vars->target) {
             obj[0x20] = 4;
             vars->timer = 0.0f;
@@ -41,15 +41,15 @@ void megaturret_find_target(char *obj)
         if (vars->target == 0) {
             up.q = 0;
             up.f[2] = 1.0f;
-            qcopy(&aimBasis[0], direction);
-            FastVecCross(&aimBasis[1], &aimBasis[0], &up);
-            vec_scale_to_length(&aimBasis[1], &aimBasis[1], 1.0f);
-            FastVecCross(&aimBasis[2], &aimBasis[1], &aimBasis[0]);
-            aimBasis[3].f[0] = 0;
-            aimBasis[3].f[1] = 0;
-            aimBasis[3].f[2] = 0;
-            aimBasis[3].f[3] = 1;
-            mat_get_euler_angles(&aimBasis, &angles);
+            qcopy(&aim_basis[0], direction);
+            FastVecCross(&aim_basis[1], &aim_basis[0], &up);
+            vec_scale_to_length(&aim_basis[1], &aim_basis[1], 1.0f);
+            FastVecCross(&aim_basis[2], &aim_basis[1], &aim_basis[0]);
+            aim_basis[3].f[0] = 0;
+            aim_basis[3].f[1] = 0;
+            aim_basis[3].f[2] = 0;
+            aim_basis[3].f[3] = 1;
+            mat_get_euler_angles(&aim_basis, &angles);
             {
                 float angle = FastAddRotations(angles.f[2], math_random_signed_float_range(0.78539824f, 1.5707965f));
                 float elevation = math_random_float_range(-0.1f, 0.45f);

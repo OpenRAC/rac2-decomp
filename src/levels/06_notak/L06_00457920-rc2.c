@@ -32,7 +32,7 @@ extern s8 ref_L06_00457920_03[];
 /* Breaks the object into fifteen flying pieces, each with its own update callback. */
 void part_spawn_debris_pieces(void *moby) {
     void *piece;
-    s32 pieceVars;
+    s32 piece_vars;
     s32 index;
 
     index = 0;
@@ -40,8 +40,8 @@ void part_spawn_debris_pieces(void *moby) {
         piece = ref_L06_00457920_00(moby, 2, (*(s16 *)((s8 *)(moby) + (0xAA))), index, (s8 *)moby + 0x10, (s8 *)moby + 0xF0, &ref_L06_00457920_02, 0xFF, 0.0f, 10.0f);
         index += 1;
         if (piece != 0) {
-            pieceVars = (*(s32 *)((s8 *)(piece) + (0x68)));
-            ref_L06_00457920_01(pieceVars, pieceVars + 0x20, 0.00200000009499490261077880859375f);
+            piece_vars = (*(s32 *)((s8 *)(piece) + (0x68)));
+            ref_L06_00457920_01(piece_vars, piece_vars + 0x20, 0.00200000009499490261077880859375f);
             (*(s32 *)((s8 *)(piece) + (0x64))) = (s32)ref_L06_00457920_03;
         }
     } while (index < 0xF);

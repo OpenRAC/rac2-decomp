@@ -36,7 +36,7 @@ extern void cam_set_view_space_height(float *, float *, float);
 void hero_l00_select_aim_target(float a, float b, float c)
 {
     HeroTargetState *hero = &D_00189E20_target;
-    char *bestTarget;
+    char *best_target;
     float yaw;
     float vector[4];
 
@@ -51,12 +51,12 @@ void hero_l00_select_aim_target(float a, float b, float c)
         hero->target = 0;
         hero->active = 1;
     }
-    bestTarget = SelectBestEligibleTarget(a, yaw, b, c, vector, -1, 0);
-    if (bestTarget != 0 && (hero->target == 0 || hero->active != 0)) {
-        hero->aimAngle = mat_fast_helper_a(*(float *)(bestTarget + 0x10) - hero->origin[0],
-                                    *(float *)(bestTarget + 0x14) - hero->origin[1]);
-        FastVecSub(hero->aim, bestTarget + 0x10, hero->origin);
-        hero->target = bestTarget;
+    best_target = SelectBestEligibleTarget(a, yaw, b, c, vector, -1, 0);
+    if (best_target != 0 && (hero->target == 0 || hero->active != 0)) {
+        hero->aimAngle = mat_fast_helper_a(*(float *)(best_target + 0x10) - hero->origin[0],
+                                    *(float *)(best_target + 0x14) - hero->origin[1]);
+        FastVecSub(hero->aim, best_target + 0x10, hero->origin);
+        hero->target = best_target;
     } else {
         D_00189E20_target.aimAngle = yaw;
         qcopy(D_00189E20_target.aim, vector);

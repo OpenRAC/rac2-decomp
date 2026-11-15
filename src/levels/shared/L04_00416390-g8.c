@@ -40,7 +40,7 @@ void EmitTrailEffects(char *owner, void *pos, void *dir, float length)
     FastVecScale(frame.bias, owner + 0xC0, 0.05f);
     FastVecScale(frame.step, dir, 1.0f / length);
     FastVecDot(frame.step, owner + 0xC0);
-    if (*(short *)(owner + 0xAA) == 0xB2D /* Enemy Hoverbike */)
+    if (*(short *)(owner + 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE)
         count = (int)(length + length) + 1;
     else
         count = (int)(length * 5.0f) + 2;

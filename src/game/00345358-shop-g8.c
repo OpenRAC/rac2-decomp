@@ -61,8 +61,8 @@ int UpdateItemGridMenu(ItemMenu *menu, int buttons)
     float pos258[2] __attribute__((aligned(16)));
     float pos2A0[2] __attribute__((aligned(16)));
     int result = -1;
-    int oldSelection = menu->column + menu->row * 4;
-    int selection, nextValue;
+    int old_selection = menu->column + menu->row * 4;
+    int selection, next_value;
     int *color;
     int entry, item, ammo, maxAmmo;
     ItemRecord *record, *initialRecord;
@@ -70,20 +70,20 @@ int UpdateItemGridMenu(ItemMenu *menu, int buttons)
 
     if (buttons & 0x1000) {
         snd_play_from_global_bank(3, 0, 0);
-        nextValue = menu->row - 1;
-        menu->row = nextValue < 0 ? 5 : nextValue;
+        next_value = menu->row - 1;
+        menu->row = next_value < 0 ? 5 : next_value;
     } else if (buttons & 0x4000) {
         snd_play_from_global_bank(3, 0, 0);
-        nextValue = menu->row + 1;
-        menu->row = nextValue <= 5 ? nextValue : 0;
+        next_value = menu->row + 1;
+        menu->row = next_value <= 5 ? next_value : 0;
     } else if (buttons & 0x8000) {
         snd_play_from_global_bank(3, 0, 0);
-        nextValue = menu->column - 1;
-        menu->column = nextValue < 0 ? 3 : nextValue;
+        next_value = menu->column - 1;
+        menu->column = next_value < 0 ? 3 : next_value;
     } else if (buttons & 0x2000) {
         snd_play_from_global_bank(3, 0, 0);
-        nextValue = menu->column + 1;
-        menu->column = nextValue <= 3 ? nextValue : 0;
+        next_value = menu->column + 1;
+        menu->column = next_value <= 3 ? next_value : 0;
     }
     selection = menu->column + menu->row * 4;
 
@@ -96,7 +96,7 @@ int UpdateItemGridMenu(ItemMenu *menu, int buttons)
     __builtin_memcpy(pos210, D_001AE510, 8);
     __builtin_memcpy(pos258, D_001AE518, 8);
     __builtin_memcpy(pos2A0, D_001AE520, 8);
-    if (oldSelection != selection)
+    if (old_selection != selection)
         math_ping_pong_blend_values(0, 0, 1, 0, 1);
     color = object_get_fourth_field((char *)menu + 0xE4);
     *color = math_ping_pong_blend_values(0x60442D00, 0x70FFFEED, 20, 0, 0);

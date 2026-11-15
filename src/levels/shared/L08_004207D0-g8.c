@@ -67,12 +67,12 @@ void radar_draw(u8 *vehicle)
 {
     Vector offset, euler;
     f32 rotation[12], inverse[12];
-    u8 *vars, *blip, *anchorObj;
+    u8 *vars, *blip, *anchor_obj;
     char *label1, *label2, *label3;
-    u16 *listStart, *idCursor;
-    f32 dotY, distance, dotSize, dotX;
-    s32 dotAlpha;
-    s64 dotColor;
+    u16 *list_start, *id_cursor;
+    f32 dot_y, distance, dot_size, dot_x;
+    s32 dot_alpha;
+    s64 dot_color;
     u64 texture;
     f32 half;
     hero_begin_saved_float_hold();
@@ -85,40 +85,40 @@ void radar_draw(u8 *vehicle)
     half = 0.5f;
     gfx_draw_scaled_object_two_axes(label2, 0x60241700, D_L08_001B1B84 + 4.0f, (f32)label_y(label1, D_L08_001B1B88 + 4.0f, D_L08_001B3244, 0.5f, 1), 0.8f, -0.8f, 0.0f);
     gfx_draw_scaled_object_two_axes(label3, 0x55F0C070, D_L08_001B1B84 + 4.0f, (f32)label_y(label3, D_L08_001B1B88 + 4.0f, D_L08_001B3244, half, 1), 0.8f, -0.8f, 0.0f);
-    dotY = (f32)label_y(vehicle, D_L08_001B1B88, D_L08_001B3244, 0.5f, 1);
+    dot_y = (f32)label_y(vehicle, D_L08_001B1B88, D_L08_001B3244, 0.5f, 1);
     texture = GetEffectTextureDescriptor(D_L08_001B1BA0);
-    AppendSubpixelTexturedScreenQuad(D_L08_001B1B84, dotY, D_L08_001B1B8C, D_L08_001B1B90,
+    AppendSubpixelTexturedScreenQuad(D_L08_001B1B84, dot_y, D_L08_001B1B8C, D_L08_001B1B90,
                      0, 0, D_L08_001B1B94, D_L08_001B1B98, 0x80808080UL, texture);
     hero_end_saved_float_hold();
-    anchorObj = *(u8 **)(vars + 0x1B0);
-    if (!anchorObj) return;
-    listStart = D_L08_001FB660[anchorObj[0x21]];
-    if (!listStart) return;
-    idCursor = listStart;
+    anchor_obj = *(u8 **)(vars + 0x1B0);
+    if (!anchor_obj) return;
+    list_start = D_L08_001FB660[anchor_obj[0x21]];
+    if (!list_start) return;
+    id_cursor = list_start;
     do {
-        blip = D_L08_001B29DC + ((*idCursor & 0x7FFF) << 8);
-        if (!blip || blip[0x20] == 0xFE || blip[0x20] == 0xFD || *(s16 *)(blip + 0xAA) == 0x96A /* Desert Crystal Shell */) continue;
+        blip = D_L08_001B29DC + ((*id_cursor & 0x7FFF) << 8);
+        if (!blip || blip[0x20] == 0xFE || blip[0x20] == 0xFD || *(s16 *)(blip + 0xAA) == MOBY_CLASS_DESERT_CRYSTAL_SHELL) continue;
         distance = fast_vec_dist(vehicle + 0x10, blip + 0x10);
         if (distance <= D_L08_001B1BA4) {
-            dotY = distance / D_L08_001B1BA4;
-            dotY *= D_L08_001B1B9C;
+            dot_y = distance / D_L08_001B1BA4;
+            dot_y *= D_L08_001B1B9C;
             euler.q = 0;
             euler.f[2] = 1.5707964f;
             euler_rotation_basis(rotation, &euler);
             FastVecSub(&offset, blip + 0x10, vehicle + 0x10);
-            vec_scale_to_length(&offset, &offset, dotY);
+            vec_scale_to_length(&offset, &offset, dot_y);
             mat_fast_helper_c(inverse, D_L08_001B9D30);
             matrix_mul_vec3(&offset, &offset, inverse);
             matrix_mul_vec3(&offset, &offset, rotation);
-            dotAlpha = FloatToInt((1.0f - distance / D_L08_001B1BA4) * 128.0f);
-            dotSize = offset.f[2] * 0.125f + D_L08_001B1B8C * 0.5f;
-            if (dotSize > D_L08_001B1B8C + D_L08_001B1B8C) dotSize = D_L08_001B1B8C + D_L08_001B1B8C;
-            else if (dotSize < 0.0f) dotSize = 0.0f;
-            dotX = offset.f[0] + D_L08_001B1B84;
-            dotY = (f32)hud_coord(D_L08_001B1B88 - offset.f[1], D_L08_001B3244, 0.5f);
-            dotColor = (s32)(D_L08_001B1BA8 | ((u32)dotAlpha << 24));
+            dot_alpha = FloatToInt((1.0f - distance / D_L08_001B1BA4) * 128.0f);
+            dot_size = offset.f[2] * 0.125f + D_L08_001B1B8C * 0.5f;
+            if (dot_size > D_L08_001B1B8C + D_L08_001B1B8C) dot_size = D_L08_001B1B8C + D_L08_001B1B8C;
+            else if (dot_size < 0.0f) dot_size = 0.0f;
+            dot_x = offset.f[0] + D_L08_001B1B84;
+            dot_y = (f32)hud_coord(D_L08_001B1B88 - offset.f[1], D_L08_001B3244, 0.5f);
+            dot_color = (s32)(D_L08_001B1BA8 | ((u32)dot_alpha << 24));
             texture = GetEffectTextureDescriptor(D_L08_001B1BA0);
-            AppendSubpixelTexturedScreenQuad(dotX, dotY, dotSize, dotSize, 0, 0, D_L08_001B1B94, D_L08_001B1B98, dotColor, texture);
+            AppendSubpixelTexturedScreenQuad(dot_x, dot_y, dot_size, dot_size, 0, 0, D_L08_001B1B94, D_L08_001B1B98, dot_color, texture);
         }
-    } while ((s16)*idCursor++ >= 0);
+    } while ((s16)*id_cursor++ >= 0);
 }

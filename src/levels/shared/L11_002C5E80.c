@@ -119,11 +119,11 @@ void vec_l11_scale_four_3(char *vectors, float scale)
 }
 
 /* Works out how long a thrown object takes to land, from the height gap, its launch speed and gravity. */
-void projectile_compute_flight_time(float startHeight, float endHeight, float launchSpeed, float gravity)
+void projectile_compute_flight_time(float start_height, float end_height, float launch_speed, float gravity)
 {
-    float heightTerm = (gravity + gravity) * (startHeight - endHeight);
+    float height_term = (gravity + gravity) * (start_height - end_height);
 
-    FloatToInt((launchSpeed + square_root(launchSpeed * launchSpeed + heightTerm)) / gravity);
+    FloatToInt((launch_speed + square_root(launch_speed * launch_speed + height_term)) / gravity);
 }
 
 /* func_L11_0044FFA0 lives in L11_0044FFA0-g8.c. */
@@ -221,13 +221,13 @@ void part_reset_quad_record_b(char *record)
 
 /* Fills a local record: the level's handle, the four blocks it scales, and the
  * two vectors the level's own table gives against the object's position. */
-void part_draw_billboard_sprite(char *position, void *color, void *alpha, int textureId, int flags, float scale, float roll)
+void part_draw_billboard_sprite(char *position, void *color, void *alpha, int texture_id, int flags, float scale, float roll)
 {
     LOC_L11_458DF0 local;
     float pitch;
 
     ref_L11_00458DF0_00((char *)&local);
-    local.v120 = GetEffectTextureDescriptor(textureId);
+    local.v120 = GetEffectTextureDescriptor(texture_id);
     local.v128 = 0xFF9000000260LL;
     local.v136 = ((long long)flags << 2) | 0x0000008000000040LL;
     local.k3 = (int)color + ((int)alpha << 24);

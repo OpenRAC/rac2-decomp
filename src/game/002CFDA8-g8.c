@@ -28,8 +28,8 @@ extern short D_0026CF18[][3];
 /* Draws the skill points list with the player's count out of 30 and five rows around the cursor. */
 int DrawFiveRowProgressMenu(void) {
     char buf[64];
-    int r, i, y, entryIndex, color;
-    char *formatText;
+    int r, i, y, entry_index, color;
+    char *format_text;
     float z;
     SetupGifPaging(0);
     z = 0.0f;
@@ -43,8 +43,8 @@ int DrawFiveRowProgressMenu(void) {
     gfx_draw_scaled_object_two_axes(r, 0x55F0C070, (float)(g_screen_width / 2), (float)D_001ABA00, 1.0f, D_001B23A8, z);
     gfx_disable_screen_flag();
     text_draw_centered_small(0xB9, 0x1B, 0x80F0F0F0ULL, GetLocalizedString(0x2E10), -1);
-    formatText = GetLocalizedString(0x2F2F);
-    sprintf(buf, formatText, save_count_nonzero_flags(), 30);
+    format_text = GetLocalizedString(0x2F2F);
+    sprintf(buf, format_text, save_count_nonzero_flags(), 30);
     text_draw_centered_small(0x92, 0x177, 0x80F0F0F0ULL, buf, -1);
     gfx_enable_screen_flag();
     text_draw_centered_small(0x1AD, 0x177, 0x80F0F0F0ULL, GetLocalizedString(0x2D4F), -1);
@@ -53,21 +53,21 @@ int DrawFiveRowProgressMenu(void) {
         text_draw_centered_small(0x1A0, 0xE0, 0x80F0F0F0ULL, GetLocalizedString(D_0026CF18[D_001AB9FC][2]), -1);
     menu_draw_scroll_arrows_and_frame();
     for (y = 0x112, i = 0; i < 5; i++, y += 20) {
-        char *rowText;
-        entryIndex = i + D_001AB9FC - 2;
-        if (entryIndex < 0) entryIndex += 30;
-        if (entryIndex >= 30) entryIndex -= 30;
+        char *row_text;
+        entry_index = i + D_001AB9FC - 2;
+        if (entry_index < 0) entry_index += 30;
+        if (entry_index >= 30) entry_index -= 30;
         color = 0x80F0F0F0;
-        rowText = GetLocalizedString(D_0026CF18[entryIndex][0]);
-        if (D_001A7A60[entryIndex]) color = 0x7029A1FF;
+        row_text = GetLocalizedString(D_0026CF18[entry_index][0]);
+        if (D_001A7A60[entry_index]) color = 0x7029A1FF;
         color &= 0xFFFFFF;
         if (i == 0 || i == 4) color |= 0x10000000;
         else if (i == 1 || i == 3) color |= 0x50000000;
         else {
             color |= 0x70000000;
-            menu_draw_text_highlight_frame(text_measure_width_medium(rowText, func_001157AC(rowText)), color);
+            menu_draw_text_highlight_frame(text_measure_width_medium(row_text, func_001157AC(row_text)), color);
         }
-        text_draw_centered_medium(g_screen_width / 2, y, color, rowText, -1);
+        text_draw_centered_medium(g_screen_width / 2, y, color, row_text, -1);
     }
     DoGifPaging();
     return 0;

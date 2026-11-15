@@ -31,18 +31,18 @@ extern s32  D_001B1888[] __attribute__((sda));
 extern s32 fast_decompress();
 
 /* Unpacks the packed data of one HUD bank into the given memory address and clears that bank's flag. */
-void hud_unpack_bank_data(s32 bankIndex, s32 target) {
+void hud_unpack_bank_data(s32 bank_index, s32 target) {
     s32 root;
-    s32 alignedTarget;
-    s32 bankBase;
-    s32 entryBase;
+    s32 aligned_target;
+    s32 bank_base;
+    s32 entry_base;
 
-    alignedTarget = (target + 0xF) & 0xFFFFFFF0;
-    if (alignedTarget != 0) {
+    aligned_target = (target + 0xF) & 0xFFFFFFF0;
+    if (aligned_target != 0) {
         root = D_001A7288;
-        entryBase = root + (bankIndex * 8);
-        fast_decompress((*(s32 *)((char *)(entryBase) + (0x20))) + root, alignedTarget);
+        entry_base = root + (bank_index * 8);
+        fast_decompress((*(s32 *)((char *)(entry_base) + (0x20))) + root, aligned_target);
     }
-    bankBase = D_001B1888[0] + (bankIndex * 4);
-    (*(s32 *)((char *)(bankBase) + (0x74))) = 0;
+    bank_base = D_001B1888[0] + (bank_index * 4);
+    (*(s32 *)((char *)(bank_base) + (0x74))) = 0;
 }

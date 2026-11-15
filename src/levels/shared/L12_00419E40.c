@@ -36,7 +36,7 @@ extern void enemy_tick_timers_age(void *);
 /* Updates a path-walking enemy (moby class 4076): it waits, shoots at the hero in bursts, walks its route and comes back to its start spot. */
 void path_shooter_update(char *obj) {
     char *vars=P(obj,0x68);
-    int animIndex;
+    int anim_index;
     if(D_L12_001A79F0==13) {
         if(D_L12_001A8F00!=2) {
             U(obj,0x34)=(U(obj,0x34)&0xFFBE)|0x1000;
@@ -60,8 +60,8 @@ void path_shooter_update(char *obj) {
     case 2:
         if((B(obj,0x60)&2) && enemy_claim_attack_turn(obj,W(vars,0x11C))) {
             moby_set_state(obj,8,-1);
-            animIndex=math_random_int_below(4);
-            if(animIndex==W(vars,0x258)) {if(animIndex!=3) animIndex++; else animIndex=0;}
+            anim_index=math_random_int_below(4);
+            if(anim_index==W(vars,0x258)) {if(anim_index!=3) anim_index++; else anim_index=0;}
             goto set_attack_animation;
         }
         break;
@@ -78,10 +78,10 @@ void path_shooter_update(char *obj) {
             if(B(obj,0x43)) anim_start_blended(obj,0,0,20);
             W(vars,0x220)=path_find_next_stop_point(obj,W(vars,0x224));
         } else if(B(obj,0x60)&2) {
-            animIndex=math_random_int_below(4);
-            if(animIndex==W(vars,0x258)) {if(animIndex!=3)animIndex++;else animIndex=0;}
-            if(B(obj,0x43)!=animIndex+1) anim_start_blended(obj,animIndex+1,0,20);
-            W(vars,0x258)=animIndex;
+            anim_index=math_random_int_below(4);
+            if(anim_index==W(vars,0x258)) {if(anim_index!=3)anim_index++;else anim_index=0;}
+            if(B(obj,0x43)!=anim_index+1) anim_start_blended(obj,anim_index+1,0,20);
+            W(vars,0x258)=anim_index;
         }
         break;
     case 6:
@@ -101,11 +101,11 @@ void path_shooter_update(char *obj) {
         moby_step_at_own_position_factor(obj,F(vars,0x228));
         if(math_fast_float_d(vars+0x22C) && enemy_claim_attack_turn(obj,W(vars,0x11C))) {
             moby_set_state(obj,8,-1);
-            animIndex=math_random_int_below(4);
-            if(animIndex==W(vars,0x258)){if(animIndex!=3)animIndex++;else animIndex=0;}
+            anim_index=math_random_int_below(4);
+            if(anim_index==W(vars,0x258)){if(anim_index!=3)anim_index++;else anim_index=0;}
 set_attack_animation:
-            if(B(obj,0x43)!=animIndex+1)anim_start_blended(obj,animIndex+1,0,20);
-            W(vars,0x258)=animIndex;
+            if(B(obj,0x43)!=anim_index+1)anim_start_blended(obj,anim_index+1,0,20);
+            W(vars,0x258)=anim_index;
             W(vars,0x11C)++;
         }
         break;

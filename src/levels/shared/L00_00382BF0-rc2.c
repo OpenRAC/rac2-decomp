@@ -37,16 +37,16 @@ extern s8 ref_L00_00382BF0_05[];
 /* Returns how visible the sun is on screen, or -1 if it is off screen or hidden behind something. */
 f32 lens_flare_get_visibility(void *object) {
     s8 point[0x10];
-    s32 screenX;
-    s32 screenY;
+    s32 screen_x;
+    s32 screen_y;
     f32 depth;
     s32 vars;
 
     vars = *(s32 *)((s8 *)object + 0x68);
     ref_L00_00382BF0_00(point, vars, ref_L00_00382BF0_05);
     depth = ref_L00_00382BF0_01(point, ref_L00_00382BF0_05 + 0x230);
-    ref_L00_00382BF0_02(vars, &screenX, &screenY);
-    if ((screenX < 0) || (screenX >= (g_screen_width - 0x10)) || (screenY < 0) || (screenY >= (g_screen_height - 8)) || !(depth > 0.0f) || (ref_L00_00382BF0_03(-1, (u16) screenX, (u16) screenY, 0x10, 8, 0, &ref_L00_00382BF0_04) == -1)) {
+    ref_L00_00382BF0_02(vars, &screen_x, &screen_y);
+    if ((screen_x < 0) || (screen_x >= (g_screen_width - 0x10)) || (screen_y < 0) || (screen_y >= (g_screen_height - 8)) || !(depth > 0.0f) || (ref_L00_00382BF0_03(-1, (u16) screen_x, (u16) screen_y, 0x10, 8, 0, &ref_L00_00382BF0_04) == -1)) {
         ref_L00_00382BF0_04 = -1.0f;
     }
     return ref_L00_00382BF0_04;

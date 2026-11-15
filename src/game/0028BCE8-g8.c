@@ -25,16 +25,16 @@ extern Entry_0028BCE8 D_00255170[];
 void weapon_menu_init_slots(void)
 {
     int i;
-    u32 weaponId;
+    u32 weapon_id;
     Rec_0028BCE8 *rec;
 
     g_radial_slot_count = 8;
     g_radial_menu_pages = (u32)&D_001A8DD0;
     g_radial_menu_page_index = 0;
     for (i = 0; i < 8; i++) {
-        weaponId = g_weapon_menu_slots[i];
-        rec = &g_weapon_table[g_item_slot_to_record[weaponId]];
-        D_00255170[i].id = weaponId;
+        weapon_id = g_weapon_menu_slots[i];
+        rec = &g_weapon_table[g_item_slot_to_record[weapon_id]];
+        D_00255170[i].id = weapon_id;
         D_00255170[i].value = rec->value;
     }
 }

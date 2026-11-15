@@ -18,7 +18,7 @@ extern void part_spawn_object_relative_particle(char *, void *, void *, void *, 
 void part_l05_spawn_tail_trail_marks(char *object)
 {
     V4_F417550 dir, drift, tail, mark1, mark2, mark3;
-    float driftScale;
+    float drift_scale;
 
     dir.q = 0;
     dir.f[0] = -0.503f;
@@ -26,7 +26,7 @@ void part_l05_spawn_tail_trail_marks(char *object)
     drift.q = 0;
     matrix_mul_vec3(&tail, &dir, object + 0xC0);
     FastVecAdd(&tail, &tail, object + 0x10);
-    driftScale = 0.4f;
+    drift_scale = 0.4f;
     tail.w[3] = 0;
     qcopy(&mark1, &tail);
     qcopy(&mark2, &tail);
@@ -35,10 +35,10 @@ void part_l05_spawn_tail_trail_marks(char *object)
     vec_add_random_offset(&mark1, 0.1f);
     vec_add_random_offset(&mark2, 0.1f);
     vec_add_random_offset(&mark3, 0.1f);
-    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.016666668f) * driftScale;
+    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.016666668f) * drift_scale;
     part_spawn_object_relative_particle(object, &mark1, &drift, &D_L05_001B0F58, 1);
-    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.016666668f) * driftScale;
+    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.016666668f) * drift_scale;
     part_spawn_object_relative_particle(object, &mark2, &drift, &D_L05_001B0F68, 1);
-    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.016666668f) * driftScale;
+    drift.f[0] = -(math_random_float_range(30.0f, 40.0f) * 0.016666668f) * drift_scale;
     part_spawn_object_relative_particle(object, &mark3, &drift, &D_L05_001B0F78, 1);
 }

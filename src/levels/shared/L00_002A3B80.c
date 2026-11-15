@@ -186,13 +186,13 @@ extern void FlushCache(int a0);
 /* walks one loaded entry of an owner's list and hands it to the vector routine when the
    tag bits are set, else to the count-driven copy, then polls and returns the caller's
    handle */
-int anim_copy_entry_data(char *source, int rowIndex, int entryIndex, int dest)
+int anim_copy_entry_data(char *source, int row_index, int entry_index, int dest)
 {
     char *owner = *(char **)(source + 0x24);
     char **rows = (char **)(owner + 0x48);
-    char *row = rows[rowIndex];
+    char *row = rows[row_index];
     int *words = (int *)(row + 0x1C);
-    int entry = words[entryIndex];
+    int entry = words[entry_index];
 
     if (entry & 0xF0000000)
         func_002A1130(row + 0x1C + (*(unsigned char *)(row + 0x10) << 2) - -(*(unsigned char *)(row + 0x13) << 2), entry, dest, *(unsigned char *)(owner + 8));

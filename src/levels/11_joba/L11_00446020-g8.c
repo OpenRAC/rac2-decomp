@@ -14,7 +14,7 @@ void joba_boss_pick_action_by_target(char *moby) {
 
     if (target != 0) {
         action = -1;
-        if (*(short *)(target + 0xAA) != 0xB3A /* Arachnoid */) {
+        if (*(short *)(target + 0xAA) != MOBY_CLASS_ARACHNOID) {
             if (*(short *)(target + 0xAA) == 0xD4A /* moby class 3402 */) {
                 char *targetState = *(char **)(target + 0x68);
                 if ((float)g_hero_state[0x933] <= 0.0f) {

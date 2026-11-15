@@ -64,7 +64,7 @@ void mystic_glow_all(void)
         return;
     for (i = 0; i < D_L19_001BD740.count; i++) {
         mystic = D_L19_001BD740.items[i];
-        if (mystic->kind != 0xE3E /* The Mystic */)
+        if (mystic->kind != MOBY_CLASS_THE_MYSTIC)
             continue;
         if (D_L19_001B22E0[1] != 0)
             continue;
@@ -78,7 +78,7 @@ void mystic_glow_all(void)
 /* func_L19_0042A9A0 is in L19_0042A9A0.c. */
 
 /* Makes every object of the same kind as the given one glow brightly while the glow effect is on. */
-void moby_glow_all_same_class(L19Thing *refMoby)
+void moby_glow_all_same_class(L19Thing *ref_moby)
 {
     L19Thing *other;
     s32 i;
@@ -89,7 +89,7 @@ void moby_glow_all_same_class(L19Thing *refMoby)
         return;
     for (i = 0; i < D_L19_001BD740.count; i++) {
         other = D_L19_001BD740.items[i];
-        if (other->kind != refMoby->kind)
+        if (other->kind != ref_moby->kind)
             continue;
         if (D_L19_001B22E0[1] != 0)
             continue;

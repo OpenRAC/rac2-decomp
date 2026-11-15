@@ -44,10 +44,10 @@ void FollowCameraHideObstructions(char *obj)
     Move243 *move=(Move243 *)(base+352);
     State243 *state=(State243 *)(base+496);
     char *camera=D_L00_001B8E20;
-    char probe[16],toMoby[16],alongAxis[16],perpendicular[16],side[16];
+    char probe[16],to_moby[16],along_axis[16],perpendicular[16],side[16];
     Moby243 *moby;
     char *axis;
-    int count,n,blocked=0,numhidden=0,type,cameraType,i;
+    int count,n,blocked=0,numhidden=0,type,camera_type,i;
     float distance=move->distance-state->offset+1.5f;
     float dot,angle;
     unsigned short timer;
@@ -64,16 +64,16 @@ void FollowCameraHideObstructions(char *obj)
             moby=(Moby243 *)*scan;
             if(moby->visible && (!level_has_pending_inner_flag(moby)||moby->type==2923 /* moby class 2923 */)) {
                 type=moby->type;
-                if(type!=2234 /* moby class 2234 */ && type!=3335 /* Jobian Saur-Beast */ && type!=4304 /* Y.E.T.I. */ && type!=1143 /* Megacorp Vendor Logo */ && type!=11 /* Megacorp Vendor */) {
+                if(type!=2234 /* moby class 2234 */ && type!=MOBY_CLASS_JOBIAN_SAUR_BEAST && type!=MOBY_CLASS_YETI && type!=MOBY_CLASS_MEGACORP_VENDOR_LOGO && type!=MOBY_CLASS_MEGACORP_VENDOR) {
                     *hidden++=(char *)moby;
                     numhidden++;
                     moby->visible=0;
                 } else {
-                    FastVecSub(toMoby,moby->pos,goal);
+                    FastVecSub(to_moby,moby->pos,goal);
                     axis=camera+48;
-                    dot=FastVecDot(axis,toMoby);
-                    FastVecScale(alongAxis,axis,dot);
-                    FastVecSub(perpendicular,toMoby,alongAxis);
+                    dot=FastVecDot(axis,to_moby);
+                    FastVecScale(along_axis,axis,dot);
+                    FastVecSub(perpendicular,to_moby,along_axis);
                     vec_scale_to_length(perpendicular,perpendicular,1.0f);
                     dot=FastVecDot(perpendicular,move);
                     {
@@ -85,7 +85,7 @@ void FollowCameraHideObstructions(char *obj)
                     if(angle<0.4363323450088501f) {
                         FastVecCross(side,move,axis);
                         vec_scale_to_length(side,side,1.0f);
-                        if(FastVecDot(side,toMoby)>0.0f)math_apply_axis_rotation_to_quat(move,move,camera+32,-0.01745329424738884f);
+                        if(FastVecDot(side,to_moby)>0.0f)math_apply_axis_rotation_to_quat(move,move,camera+32,-0.01745329424738884f);
                         else math_apply_axis_rotation_to_quat(move,move,camera+32,0.01745329424738884f);
                     }
                 }
@@ -99,16 +99,16 @@ void FollowCameraHideObstructions(char *obj)
     }
     if(cam_follow_probe_collision(obj))blocked=1;
     {
-    float currentDistance=move->distance;
+    float current_distance=move->distance;
     float minimum=D_L00_001B14CC;
-    if(currentDistance-state->offset<minimum) {
+    if(current_distance-state->offset<minimum) {
         state->timer=2000;
-        state->offset=currentDistance-minimum;
+        state->offset=current_distance-minimum;
     }
     }
     {
-    char *activeCamera=D_L00_001B8C80.active;
-    if(activeCamera && ((cameraType=S(activeCamera,134))==4 || cameraType==81) && D_L00_001B8C80.counter<10) state->timer=1700;
+    char *active_camera=D_L00_001B8C80.active;
+    if(active_camera && ((camera_type=S(active_camera,134))==4 || camera_type==81) && D_L00_001B8C80.counter<10) state->timer=1700;
     }
     if(!state->flag) {
         timer=(unsigned short)state->timer;
@@ -128,9 +128,9 @@ hold:
     else state->timer=2000;
 scaled:
     vec_scale_to_length(move,move,move->distance-state->offset);
-    FastVecAdd(toMoby,move,pos+80);
+    FastVecAdd(to_moby,move,pos+80);
     if(D_L00_00189E20.mode!=49 && !state->locked &&
-       CollLine(pos+80,toMoby,D_L00_001B184C,D_L00_00189E20.owner,0) &&
+       CollLine(pos+80,to_moby,D_L00_001B184C,D_L00_00189E20.owner,0) &&
        !coll_is_point_in_grid(D_L00_001BF220)) {
         state->counter++;
         if(state->counter>=30)cam_reset_default();

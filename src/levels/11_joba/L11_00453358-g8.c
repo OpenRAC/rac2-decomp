@@ -269,7 +269,7 @@ void joba_effect_spawn_quad(char *moby)
     char *vars = *(char **)(moby + 0x68);
     float scale;
     int parity;
-    int alphaShift;
+    int alpha_shift;
 
     gfx_init_square_packet(pkt);
     lerp_vector(point, vars + 0x10, vars + 0x20, math_random_float_range(0.0f, 1.0f));
@@ -284,11 +284,11 @@ void joba_effect_spawn_quad(char *moby)
 
     parity = func_001163B0();
     *(long long *)(pkt + 136) = ((long long)((parity % 2) + 1) << 2) | 0x8000000040LL;
-    alphaShift = math_random_int_range(0x40, 0x7F) << 24;
-    *(int *)(pkt + 76) = (D_L11_001B2014 & 0xFFFFFF) + alphaShift;
-    *(int *)(pkt + 72) = (D_L11_001B2014 & 0xFFFFFF) + alphaShift;
-    *(int *)(pkt + 68) = (D_L11_001B2014 & 0xFFFFFF) + alphaShift;
-    *(int *)(pkt + 64) = (D_L11_001B2014 & 0xFFFFFF) + alphaShift;
+    alpha_shift = math_random_int_range(0x40, 0x7F) << 24;
+    *(int *)(pkt + 76) = (D_L11_001B2014 & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 72) = (D_L11_001B2014 & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 68) = (D_L11_001B2014 & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 64) = (D_L11_001B2014 & 0xFFFFFF) + alpha_shift;
 
     quat[3] = 0.0f;
     quat[2] = mat_fast_helper_a(D_L11_001BA780.x_140 - point[0], D_L11_001BA780.y_144 - point[1]);
@@ -309,10 +309,10 @@ void joba_effect_spawn_quad(char *moby)
     FastVecScale(pkt + 48, pkt + 48, scale);
     draw_world_quad(pkt, matrix, 0);
 
-    *(int *)(pkt + 76) = (D_L11_001B2020 & 0xFFFFFF) + alphaShift;
-    *(int *)(pkt + 72) = (D_L11_001B2020 & 0xFFFFFF) + alphaShift;
-    *(int *)(pkt + 68) = (D_L11_001B2020 & 0xFFFFFF) + alphaShift;
-    *(int *)(pkt + 64) = (D_L11_001B2020 & 0xFFFFFF) + alphaShift;
+    *(int *)(pkt + 76) = (D_L11_001B2020 & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 72) = (D_L11_001B2020 & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 68) = (D_L11_001B2020 & 0xFFFFFF) + alpha_shift;
+    *(int *)(pkt + 64) = (D_L11_001B2020 & 0xFFFFFF) + alpha_shift;
 
     FastVecScale(pkt, pkt, 0.5f);
     FastVecScale(pkt + 16, pkt + 16, 0.5f);
@@ -471,26 +471,26 @@ extern void func_002A0F48(char *p);
 
 /* Initialises a spawned object: clears its state flags, copies the two start vectors and the
    caller's parameters into the object and its state block, and aims it along the first vector. */
-void joba_shot_init(char *moby, int owner, int controller, int goalObject, float gravity, float damage, void *startPos,
-                       float *velocity, int fadeTime)
+void joba_shot_init(char *moby, int owner, int controller, int goal_object, float gravity, float damage, void *start_pos,
+                       float *velocity, int fade_time)
 {
     char *vars = *(char **)(moby + 0x68);
 
-    int flagsWord;
+    int flags_word;
 
     *(unsigned short *)(moby + 0x34) = (*(unsigned short *)(moby + 0x34) & 0xFFBE) | 0x1000;
-    flagsWord = *(int *)(*(char **)(moby + 0x24) + 0x10);
+    flags_word = *(int *)(*(char **)(moby + 0x24) + 0x10);
     *(unsigned short *)(moby + 0x34) &= 0xEFFF;
-    *(int *)(moby + 0x98) = flagsWord;
+    *(int *)(moby + 0x98) = flags_word;
     *(unsigned char *)(moby + 0x30) = 0xFF;
     *(unsigned short *)(moby + 0x32) = 0xFF;
     moby[0x20] = 2;
     *(int *)(vars + 0x15C) = owner;
     *(int *)(moby + 0xB8) = controller;
-    qcopy(moby + 0x10, startPos);
+    qcopy(moby + 0x10, start_pos);
     qcopy(vars + 0xC0, velocity);
     *(unsigned short *)(vars + 0x16C) = D_L11_001B1F84;
-    *(int *)(vars + 0x150) = fadeTime;
+    *(int *)(vars + 0x150) = fade_time;
     *(float *)(vars + 0x4C) = gravity;
     *(unsigned short *)(vars + 0x16E) = 0;
     *(int *)(moby + 0xF0) = 0;
@@ -498,7 +498,7 @@ void joba_shot_init(char *moby, int owner, int controller, int goalObject, float
     *(float *)(moby + 0xF8) = mat_fast_helper_a(velocity[0], velocity[1]);
     *(float *)(vars + 0x158) = damage;
     func_002A0F48(moby);
-    *(int *)(vars + 0x164) = goalObject;
+    *(int *)(vars + 0x164) = goal_object;
     *(int *)(moby + 0x78) = 0xFF84E643;
 }
 

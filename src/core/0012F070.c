@@ -86,7 +86,7 @@ int mpeg_skip_system_header(void *stream) {
 /* Reads one packet header of a movie stream and records its type, length and timestamps. */
 int mpeg_read_pes_packet_header(int mpeg, struct PES_BS *bs, struct PES_HDR *hdr) {
     struct PES_TBL tbl;
-    int mpegCtx;
+    int mpeg_ctx;
     int flag1;
     int len;         /* PES_header_data_length */
     int base;        /* (int)bs->stamp, captured before the header fields */
@@ -95,7 +95,7 @@ int mpeg_read_pes_packet_header(int mpeg, struct PES_BS *bs, struct PES_HDR *hdr
     int v8;          /* 4-bit length, indexes tbl */
     int v5;          /* PES_extension_flag */
 
-    mpegCtx = mpeg;
+    mpeg_ctx = mpeg;
     hdr->unk28 = (int)bs->stamp;
     tbl = *(struct PES_TBL *)r1_D_00153AC8;
     r1_func_0012AB60(bs, 0x18);
@@ -166,7 +166,7 @@ int mpeg_read_pes_packet_header(int mpeg, struct PES_BS *bs, struct PES_HDR *hdr
                 r1_func_0012AB60(bs, 0x20);
             }
             if (a2 == v5) {
-                r1_func_0012C468_a(mpegCtx, r1_D_00153AD8);
+                r1_func_0012C468_a(mpeg_ctx, r1_D_00153AD8);
                 return 0;
             }
             if (a3 == v5) {
@@ -242,7 +242,7 @@ int mpeg_read_pes_packet_header(int mpeg, struct PES_BS *bs, struct PES_HDR *hdr
  */
 /* Starts up the movie player by resetting its DMA channels. */
 void sceMpegInit(void) {
-    int intrState = r1_func_0011D960();
+    int intr_state = r1_func_0011D960();
 
     D_ENABLEW =
         D_ENABLER | 0x10000;
@@ -251,7 +251,7 @@ void sceMpegInit(void) {
     D_ENABLEW =
         D_ENABLER & ~0x10000;
 
-    if (intrState != 0) {
+    if (intr_state != 0) {
         r1_func_0011D9A8();
     }
 
@@ -281,38 +281,38 @@ void sceMpegInit(void) {
  */
 /* Sets up a movie player in a work area. Returns 0 if the area is too small. */
 int sceMpegCreate(void *mpeg, void *workarea, int size) {
-    char *mpegPtr = (char *)mpeg;
-    unsigned int workAddr = (unsigned int)workarea;
+    char *mpeg_ptr = (char *)mpeg;
+    unsigned int work_addr = (unsigned int)workarea;
     char *decoder;
     char *heap;
-    unsigned int availBytes;
+    unsigned int avail_bytes;
     int neg1;
 
     r1_func_001153FC_p(workarea, 0, size);
 
-    decoder = (char *)(((workAddr + 3) >> 2) << 2);
-    availBytes = (unsigned int)size - ((unsigned int)decoder - workAddr);
+    decoder = (char *)(((work_addr + 3) >> 2) << 2);
+    avail_bytes = (unsigned int)size - ((unsigned int)decoder - work_addr);
 
-    if (availBytes < 0x10C0) {
+    if (avail_bytes < 0x10C0) {
         mpeg_report_error(decoder, r1_D_00153B10);
         return 0;
     }
 
     heap = decoder + 0x108;
-    *(int *)(mpegPtr + 0x40) = (int)decoder;
-    availBytes -= 0x10C0;
-    mpeg_init_counters(heap, (int)(decoder + 0x10C0), (int)availBytes);
+    *(int *)(mpeg_ptr + 0x40) = (int)decoder;
+    avail_bytes -= 0x10C0;
+    mpeg_init_counters(heap, (int)(decoder + 0x10C0), (int)avail_bytes);
     neg1 = -1;
 
-    *(int *)(mpegPtr + 0x0) = 0;
-    *(int *)(mpegPtr + 0x4) = 0;
-    *(int *)(mpegPtr + 0x8) = 0;
-    *(long *)(mpegPtr + 0x10) = -1;
-    *(long *)(mpegPtr + 0x18) = -1;
-    *(long *)(mpegPtr + 0x20) = 0;
-    *(long *)(mpegPtr + 0x28) = -1;
-    *(long *)(mpegPtr + 0x30) = -1;
-    *(long *)(mpegPtr + 0x38) = 0;
+    *(int *)(mpeg_ptr + 0x0) = 0;
+    *(int *)(mpeg_ptr + 0x4) = 0;
+    *(int *)(mpeg_ptr + 0x8) = 0;
+    *(long *)(mpeg_ptr + 0x10) = -1;
+    *(long *)(mpeg_ptr + 0x18) = -1;
+    *(long *)(mpeg_ptr + 0x20) = 0;
+    *(long *)(mpeg_ptr + 0x28) = -1;
+    *(long *)(mpeg_ptr + 0x30) = -1;
+    *(long *)(mpeg_ptr + 0x38) = 0;
 
     *(int *)(decoder + 0xB4) = 0;
     *(int *)(decoder + 0xB8) = 0;
@@ -353,12 +353,12 @@ int sceMpegCreate(void *mpeg, void *workarea, int size) {
     *(int *)(decoder + 0x94) = neg1;
     *(int *)(decoder + 0x98) = neg1;
     *(int *)(decoder + 0x9C) = neg1;
-    *(int *)(decoder + 0x858) = (int)mpegPtr;
+    *(int *)(decoder + 0x858) = (int)mpeg_ptr;
     *(int *)(decoder + 0xB0) = 1;
 
     mpeg_set_scratchpad_buffers(decoder);
-    sceMpegReset(mpegPtr);
-    mpeg_clear_buffer_flags(mpegPtr);
+    sceMpegReset(mpeg_ptr);
+    mpeg_clear_buffer_flags(mpeg_ptr);
 
     *(int *)(decoder + 0x1B8) = (int)(decoder + 0x1E8);
     *(int *)(decoder + 0x1BC) = (int)(decoder + 0x250);

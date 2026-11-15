@@ -75,15 +75,15 @@ void part_l04_spawn_paired_sparks(float *pos, int count) {
 
 
 /* Creates a new moby of the given class at the parent's position and turning, sized from its class scale. */
-void *moby_spawn_at_parent_pose(unsigned char *parent, void *classId, float scaleFactor) {
-    unsigned char *child = CreateMoby(classId);
+void *moby_spawn_at_parent_pose(unsigned char *parent, void *class_id, float scale_factor) {
+    unsigned char *child = CreateMoby(class_id);
 
     if (child != 0) {
         child[0x30] = 0xFF;
         child[0x31] = 1;
         *(unsigned short *)(child + 0x32) = 0xFF;
         child[0x20] = 0;
-        *(float *)(child + 0x2C) = *(float *)(*(unsigned char **)(child + 0x24) + 0x24) * scaleFactor;
+        *(float *)(child + 0x2C) = *(float *)(*(unsigned char **)(child + 0x24) + 0x24) * scale_factor;
         *(Q16_B0e5d8f83 *)(child + 0x10) = *(Q16_B0e5d8f83 *)(parent + 0x10);
         *(Q16_B0e5d8f83 *)(child + 0xF0) = *(Q16_B0e5d8f83 *)(parent + 0xF0);
         child[0x62] = 1;
@@ -275,19 +275,19 @@ void moby_start_timed_effect(unsigned char *moby, unsigned char *vars) {
    object is live (not in either harness state) without the 0xB66 mark raises the count,
    every other slot is remembered in the returned index (-1 when all twenty pass). */
 /* Counts the live objects of one kind among twenty slots and returns the last slot that is free, or -1 if none is. */
-int moby_count_slot_objects_find_free(unsigned char *moby, char *varsArg)
+int moby_count_slot_objects_find_free(unsigned char *moby, char *vars_arg)
 {
-    char *vars = varsArg;
+    char *vars = vars_arg;
     int i;
     int last = -1;
 
     *(unsigned char *)(vars + 0x81) = moby_count_group_not_in_state(*(void **)(vars + 0x84), -1);
     for (i = 0; i < 20; i++) {
-        char *slotMoby = *(char **)(vars + 0xA0 + i * 4);
+        char *slot_moby = *(char **)(vars + 0xA0 + i * 4);
 
-        if (slotMoby != 0 && *(short *)(slotMoby + 0xAA) == 0xB66 /* moby class 2918 */
-            && *(unsigned char *)(slotMoby + 0x20) != 0xFE
-            && *(unsigned char *)(slotMoby + 0x20) != 0xFD) {
+        if (slot_moby != 0 && *(short *)(slot_moby + 0xAA) == 0xB66 /* moby class 2918 */
+            && *(unsigned char *)(slot_moby + 0x20) != 0xFE
+            && *(unsigned char *)(slot_moby + 0x20) != 0xFD) {
             *(unsigned char *)(vars + 0x81) = *(unsigned char *)(vars + 0x81) + 1;
         } else {
             last = i;
@@ -302,27 +302,27 @@ int moby_count_slot_objects_find_free(unsigned char *moby, char *varsArg)
 /* Sets up four glow sprites with random start phases, sizes and fading brightness. */
 void glow_l04_ring_init(unsigned char *moby) {
     unsigned char *vars = *(unsigned char **)(moby + 0x68);
-    float *phasePtr;
-    unsigned int *alphaPtr;
-    unsigned int alphaValue;
+    float *phase_ptr;
+    unsigned int *alpha_ptr;
+    unsigned int alpha_value;
     int i;
     int j;
 
-    phasePtr = (float *)(vars + 0x14);
+    phase_ptr = (float *)(vars + 0x14);
     for (i = 3; i >= 0; i--) {
-        *phasePtr++ = (float)math_random_int_below(0xFF);
+        *phase_ptr++ = (float)math_random_int_below(0xFF);
     }
     *(float *)(vars + 0x24) = -1.0f;
     *(float *)(vars + 0x28) = -2.25f;
     *(float *)(vars + 0x2C) = 1.25f;
     *(float *)(vars + 0x30) = 2.5f;
     j = 3;
-    alphaPtr = (unsigned int *)(vars + 0x40);
-    alphaValue = 0xFF;
+    alpha_ptr = (unsigned int *)(vars + 0x40);
+    alpha_value = 0xFF;
     for (; j >= 0; j--) {
-        *alphaPtr = alphaValue;
-        alphaPtr--;
-        alphaValue -= 0x40;
+        *alpha_ptr = alpha_value;
+        alpha_ptr--;
+        alpha_value -= 0x40;
     }
     *(float *)(vars + 0x44) = 2.0f;
     *(float *)(vars + 0x48) = 2.5f;
@@ -334,27 +334,27 @@ void glow_l04_ring_init(unsigned char *moby) {
 /* Sets up four glow sprites with random start phases, sizes and fading brightness (variant with a smaller state block). */
 void glow_ring_init_variant(unsigned char *moby) {
     unsigned char *vars = *(unsigned char **)(moby + 0x68);
-    float *phasePtr;
-    unsigned int *alphaPtr;
-    unsigned int alphaValue;
+    float *phase_ptr;
+    unsigned int *alpha_ptr;
+    unsigned int alpha_value;
     int i;
     int j;
 
-    phasePtr = (float *)(vars + 0x10);
+    phase_ptr = (float *)(vars + 0x10);
     for (i = 3; i >= 0; i--) {
-        *phasePtr++ = (float)math_random_int_below(0xFF);
+        *phase_ptr++ = (float)math_random_int_below(0xFF);
     }
     *(float *)(vars + 0x20) = -1.0f;
     *(float *)(vars + 0x24) = -2.25f;
     *(float *)(vars + 0x28) = 1.25f;
     *(float *)(vars + 0x2C) = 2.5f;
     j = 3;
-    alphaPtr = (unsigned int *)(vars + 0x3C);
-    alphaValue = 0xFF;
+    alpha_ptr = (unsigned int *)(vars + 0x3C);
+    alpha_value = 0xFF;
     for (; j >= 0; j--) {
-        *alphaPtr = alphaValue;
-        alphaPtr--;
-        alphaValue -= 0x40;
+        *alpha_ptr = alpha_value;
+        alpha_ptr--;
+        alpha_value -= 0x40;
     }
     *(float *)(vars + 0x40) = 2.0f;
     *(float *)(vars + 0x44) = 2.5f;
@@ -540,7 +540,7 @@ extern void ref_L04_003FA5A8_02(void *, void *, void *);
 extern void ref_L04_003FA5A8_03(void *, void *, void *, void *, void *, void *, void *);
 /* Creates a homing rocket for its owner and aims it at the given target, or at the best target found ahead. */
 unsigned char *homing_rocket_spawn(unsigned char *owner, float *pos,
-    unsigned char *target, float aimYaw, float aimPitch, float aimHeight, float facingYaw, float facingPitch)
+    unsigned char *target, float aim_yaw, float aim_pitch, float aim_height, float facing_yaw, float facing_pitch)
 {
     float origin[4], matrix[16], position[4];
     unsigned char *rocket = CreateMoby((void *)0xABD /* moby class 2749 */);
@@ -551,15 +551,15 @@ unsigned char *homing_rocket_spawn(unsigned char *owner, float *pos,
         *(short *)(rocket + 0x32) = 255;
         rocket[0x31] = 1;
         rocket[0x20] = 0;
-        *(float *)(rocket + 0xF8) = facingYaw;
-        *(float *)(rocket + 0xF4) = facingPitch;
+        *(float *)(rocket + 0xF8) = facing_yaw;
+        *(float *)(rocket + 0xF4) = facing_pitch;
         *(float *)(rocket + 0x2C) =
             *(float *)(*(unsigned char **)(rocket + 0x24) + 0x24) * 3.0f;
         vars = *(unsigned char **)(rocket + 0x68);
         if (target == 0) {
-            ref_L04_003FA5A8_00(matrix, 0.33333334f, facingYaw, facingPitch);
+            ref_L04_003FA5A8_00(matrix, 0.33333334f, facing_yaw, facing_pitch);
             *(Q16_B0e5d8f83 *)position = *(Q16_B0e5d8f83 *)pos;
-            target = ref_L04_003FA5A8_01(rocket, position, matrix, &aimYaw, &aimPitch, &aimHeight,
+            target = ref_L04_003FA5A8_01(rocket, position, matrix, &aim_yaw, &aim_pitch, &aim_height,
                 0.349065899848938f, 30.0f);
         }
         *(void **)(vars + 0x20) = owner;
@@ -572,13 +572,13 @@ unsigned char *homing_rocket_spawn(unsigned char *owner, float *pos,
         *(int *)(vars + 0x54) = -1;
         *(int *)(vars + 0x50) = -1;
         *(void **)(vars + 0x28) = target;
-        *(float *)(vars + 0x3C) = aimYaw;
-        *(float *)(vars + 0x40) = aimPitch;
+        *(float *)(vars + 0x3C) = aim_yaw;
+        *(float *)(vars + 0x40) = aim_pitch;
         *(int *)(vars + 0x24) = 300;
         if (target != 0) {
             qcopy(vars, target + 0x10);
-            *(float *)(vars + 8) += aimHeight;
-            *(float *)(vars + 0x2C) = aimHeight;
+            *(float *)(vars + 8) += aim_height;
+            *(float *)(vars + 0x2C) = aim_height;
         }
         if (owner != 0 && *(short *)(owner + 0xAA) == 0xBBC /* moby class 3004 */) {
             *(short *)(vars + 0x4E) = 60;
@@ -730,18 +730,18 @@ extern int D_L04_001B0488 __attribute__((sda));
 void blast_effect_update(unsigned char *effect)
 {
     L04_C678Vars *vars = *(L04_C678Vars **)(effect + 0x68);
-    int soundSlot;
-    L04_C678Slot *soundRecord;
+    int sound_slot;
+    L04_C678Slot *sound_record;
 
     *(L04_C678Quad *)(effect + 0x10) = *(L04_C678Quad *)(vars->owner + 0x10);
     StepAngleTowardTarget(effect + 0xF8, 0, *(float *)(vars->owner + 0xF8), 0.026179943f);
     vars->age = vars->age + 1.0f;
     if (vars->timer != 0 && math_fast_float_d(&vars->timer) != 0) {
-        soundSlot = D_L04_001B0488;
-        if (soundSlot != -1) {
-            soundRecord = (L04_C678Slot *)(g_sound_state + soundSlot * 0x70);
-            if (soundRecord->owner == vars->owner && soundRecord->active != 0) {
-                snd_stop_voice(soundSlot);
+        sound_slot = D_L04_001B0488;
+        if (sound_slot != -1) {
+            sound_record = (L04_C678Slot *)(g_sound_state + sound_slot * 0x70);
+            if (sound_record->owner == vars->owner && sound_record->active != 0) {
+                snd_stop_voice(sound_slot);
             }
         }
         D_L04_001B0488 = -1;
@@ -757,15 +757,15 @@ void blast_effect_update(unsigned char *effect)
 }
 
 /* Creates a new moby of the given class at the parent's position and turning, sized from its class scale (without the extra flag). */
-void *moby_create_at_parent_pose(unsigned char *parent, void *classId, float scaleFactor) {
-    unsigned char *child = CreateMoby(classId);
+void *moby_create_at_parent_pose(unsigned char *parent, void *class_id, float scale_factor) {
+    unsigned char *child = CreateMoby(class_id);
 
     if (child != 0) {
         child[0x30] = 0xFF;
         *(unsigned short *)(child + 0x32) = 0xFF;
         child[0x31] = 1;
         child[0x20] = 0;
-        *(float *)(child + 0x2C) = *(float *)(*(unsigned char **)(child + 0x24) + 0x24) * scaleFactor;
+        *(float *)(child + 0x2C) = *(float *)(*(unsigned char **)(child + 0x24) + 0x24) * scale_factor;
         *(Q16_B0e5d8f83 *)(child + 0x10) = *(Q16_B0e5d8f83 *)(parent + 0x10);
         *(Q16_B0e5d8f83 *)(child + 0xF0) = *(Q16_B0e5d8f83 *)(parent + 0xF0);
         func_002A0F48(child);
@@ -791,18 +791,18 @@ extern int FastDecTimer(short *);
 
 /* Blend the nearby pressure-surface contact using a full64-byte inverse matrix. */
 /* Checks whether the racer is inside a nearby boost pad area and keeps a boost timer going, easing the boost up or down. */
-void racer_update_boost_pad_contact(unsigned char *racer, unsigned char *racerVars) {
+void racer_update_boost_pad_contact(unsigned char *racer, unsigned char *racer_vars) {
     EffectVector delta;
     EffectMatrix4 inverse;
     unsigned char *pad;
-    unsigned char *padVars;
-    int padClass;
+    unsigned char *pad_vars;
+    int pad_class;
     float distance;
-    if (*(int *)(racerVars + 0x80) == -1) return;
-    GetFirstMobyInGroup(&pad, *(int *)(racerVars + 0x80), 0, 0);
+    if (*(int *)(racer_vars + 0x80) == -1) return;
+    GetFirstMobyInGroup(&pad, *(int *)(racer_vars + 0x80), 0, 0);
     while (pad) {
-        padClass = *(short *)(pad + 0xAA);
-        if (padClass == 0x474 /* moby class 1140 */ || padClass == 0xCEF /* moby class 3311 */) {
+        pad_class = *(short *)(pad + 0xAA);
+        if (pad_class == 0x474 /* moby class 1140 */ || pad_class == 0xCEF /* moby class 3311 */) {
             FastVecSub(&delta, pad + 0x10, racer + 0x10);
             distance = FastVecDot(&delta, &delta);
             if (!(20.0f < distance)) {
@@ -810,22 +810,22 @@ void racer_update_boost_pad_contact(unsigned char *racer, unsigned char *racerVa
                 matrix_from_basis_rows(&inverse, pad + 0xC0);
                 transform_vector(&delta, &delta, &inverse);
                 if (math_fabs(delta.f[0]) < 2.8f && math_fabs(delta.f[1]) < 1.25f && math_fabs(delta.f[2]) < 1.5f) {
-                    padVars = *(unsigned char **)(pad + 0x68);
-                    if (*(short *)(racerVars + 0x140) == 0 && (*(unsigned char **)(racerVars + 0x164))[0x20] != 3)
+                    pad_vars = *(unsigned char **)(pad + 0x68);
+                    if (*(short *)(racer_vars + 0x140) == 0 && (*(unsigned char **)(racer_vars + 0x164))[0x20] != 3)
                         PlayMobySound(0, 0, (char *)pad);
-                    *(unsigned short *)(racerVars + 0x140) = *(unsigned short *)padVars;
+                    *(unsigned short *)(racer_vars + 0x140) = *(unsigned short *)pad_vars;
                 }
             }
         }
         GetNextMobyInGroup(&pad, pad, 0, 0);
     }
-    if (*(short *)(racerVars + 0x140) != 0) {
-        *(short *)(racerVars + 0x142) = 1;
-        ApproachValue((float *)(racerVars + 0x13C), 0.10000000894069672f, 0.0055555556900799274f);
-        if (*(short *)(racerVars + 0x140)) FastDecTimer((short *)(racerVars + 0x140));
+    if (*(short *)(racer_vars + 0x140) != 0) {
+        *(short *)(racer_vars + 0x142) = 1;
+        ApproachValue((float *)(racer_vars + 0x13C), 0.10000000894069672f, 0.0055555556900799274f);
+        if (*(short *)(racer_vars + 0x140)) FastDecTimer((short *)(racer_vars + 0x140));
     } else {
-        *(short *)(racerVars + 0x142) = 0;
-        ApproachValue((float *)(racerVars + 0x13C), 0.0f, 0.002777777845039964f);
+        *(short *)(racer_vars + 0x142) = 0;
+        ApproachValue((float *)(racer_vars + 0x13C), 0.0f, 0.002777777845039964f);
     }
 }
 
@@ -878,7 +878,7 @@ void racer_reset_for_race(unsigned char *racer) {
     *(int *)(racer+0x98)=*(int *)(*(unsigned char **)(racer+0x24)+0x10);
     *(unsigned short *)(racer+0x34)=(*(unsigned short *)(racer+0x34)&0xFFBE)|0x1400;
     if (!*(void **)(vars+0x8C)) {
-        *(void **)(vars+0x8C)=moby_spawn_at_parent_pose(racer,(void *)0x8EF /* Enemy Hoverbike Racer */,0.25f);
+        *(void **)(vars+0x8C)=moby_spawn_at_parent_pose(racer,(void *)MOBY_CLASS_ENEMY_HOVERBIKE_RACER,0.25f);
         if (!*(void **)(vars+0x8C)) goto done;
     }
     {

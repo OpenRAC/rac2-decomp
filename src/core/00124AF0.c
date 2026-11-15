@@ -65,8 +65,8 @@ int sceCdDiskReady(void) {
 /* rac1-decomp src/core/001208E8.c: func_00120F30 */
 /* sceCdSyncS */
 /* Waits for the last CD system command to finish, or only checks if it is still running. */
-int sceCdSyncS(int pollOnly) {
-    if (pollOnly == 0) {
+int sceCdSyncS(int poll_only) {
+    if (poll_only == 0) {
         if (r1_D_001313D0 > 0) {
             r1_func_0011A6C8(r1_D_00152FF0);
         }
@@ -84,8 +84,8 @@ int sceCdSyncS(int pollOnly) {
 /* rac1-decomp src/core/001208E8.c: func_00120FD0 */
 /* sceCdSync */
 /* Waits for the last CD read command to finish, or only checks if it is still running. */
-int sceCdSync(int pollOnly) {
-    if (pollOnly == 0) {
+int sceCdSync(int poll_only) {
+    if (poll_only == 0) {
         if (r1_D_001313D0 > 0) {
             r1_func_0011A6C8(r1_D_00153000);
         }

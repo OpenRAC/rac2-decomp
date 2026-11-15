@@ -22,8 +22,8 @@ extern void part_spawn_fire_explosion(void *);
    point at D_L23_001BA500 + 0x140 */
 /* Creates an effect object in one of five free slots, if any is free. It also shakes the
    camera when the hero is close. */
-void *slot_effect_create(u8 *pos, u8 *parent, s32 shakeCamera, float scale, s32 a3, s32 a4, s32 a5,
-                        s32 a6, s32 a7, s32 aimCheck, s32 a9, s32 a10, s32 a11, s32 a12) {
+void *slot_effect_create(u8 *pos, u8 *parent, s32 shake_camera, float scale, s32 a3, s32 a4, s32 a5,
+                        s32 a6, s32 a7, s32 aim_check, s32 a9, s32 a10, s32 a11, s32 a12) {
     TI128 sphere;
     TI128 dir;
     s32 i;
@@ -74,14 +74,14 @@ void *slot_effect_create(u8 *pos, u8 *parent, s32 shakeCamera, float scale, s32 
         *(float *)(vars + 0xC) = scale * 4.0f;
         *(s32 *)(vars + 0x1C) = a10;
         *(s32 *)(vars + 0x38) = a11;
-        *(s32 *)(vars + 0x18) = aimCheck;
+        *(s32 *)(vars + 0x18) = aim_check;
         *(float *)(vars + 0x44) = math_random_signed_float_range(65.0f, 80.0f);
         qcopy(&sphere, obj + 0x10);
         ((float *)&sphere)[3] = scale * 3.0f;
         if (math_fast_helper_a(&sphere, 128.0f) == 1) {
             *(s16 *)(vars + 4) = 0x19;
             *(float *)(vars + 0x10) = 0.04f;
-            if (fast_vec_dist(pos, D_L23_001BA500 + 0x140) < 48.0f && shakeCamera != 0) {
+            if (fast_vec_dist(pos, D_L23_001BA500 + 0x140) < 48.0f && shake_camera != 0) {
                 u8 *ref = D_L23_001BA500;
                 *(s32 *)(ref + 0x16C) = 0;
                 *(s32 *)(ref + 0x168) = 0x28;

@@ -41,25 +41,25 @@ extern void pad_clear_port_state(void);
 /* Leaves the pause screen: restores the saved camera and display values and lets the game run normally again. */
 void RestoreMenuDisplayState(void)
 {
-    GameState_2CA790 *pauseState = (GameState_2CA790 *)(void *)g_pause_menu_state;
+    GameState_2CA790 *pause_state = (GameState_2CA790 *)(void *)g_pause_menu_state;
     TI128 *dst;
-    TI128 *src = (TI128 *)((char *)pauseState + 0x50);
+    TI128 *src = (TI128 *)((char *)pause_state + 0x50);
     int mode;
 
     *(int *)(void *)g_pause_menu_state = 0;
     gfx_select_packet_buffer_setup();
     dst = (TI128 *)g_camera_eye_state;
     qcopy(dst, src);
-    src = (TI128 *)((char *)pauseState + 0x60);
+    src = (TI128 *)((char *)pause_state + 0x60);
     qcopy(dst + 1, src);
-    *(float *)D_001B90F0 = pauseState->field_0F8;
+    *(float *)D_001B90F0 = pause_state->field_0F8;
     select_moby_context(0);
     gfx_apply_display_config();
-    mode = pauseState->field_01C;
-    pauseState->field_11C = 0;
-    pauseState->field_114 = 0;
-    pauseState->field_020 = 0;
-    pauseState->field_118 = 0;
+    mode = pause_state->field_01C;
+    pause_state->field_11C = 0;
+    pause_state->field_114 = 0;
+    pause_state->field_020 = 0;
+    pause_state->field_118 = 0;
     if (mode == 3 || mode == 4 || mode == 6 || mode == 5) {
         FadeToBlack(0x10);
     }

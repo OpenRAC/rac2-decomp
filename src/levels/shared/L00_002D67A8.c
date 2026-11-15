@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char u8;
@@ -83,11 +84,11 @@ s32 level_is_tracked_object_of_selected_class(s32 selection) {
         if (primary) {
             switch (selection) {
                 case 0: found = primary->class_id == 0xfbf /* moby class 4031 */; break;
-                case 1: found = primary->class_id == 0x905 /* Glider */; break;
-                case 2: found = primary->class_id == 0xeef /* Mining Vehicle */; break;
+                case 1: found = primary->class_id == MOBY_CLASS_GLIDER; break;
+                case 2: found = primary->class_id == MOBY_CLASS_MINING_VEHICLE; break;
             }
         } else if (fallback && selection == 3) {
-            found = fallback->class_id == 0xc20 /* Turret */;
+            found = fallback->class_id == MOBY_CLASS_TURRET;
         }
     }
     return found;

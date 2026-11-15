@@ -41,13 +41,13 @@ typedef struct { u8 pad[0x120]; float speed; int path,object; u16 delay, timer; 
    random spot) while it has some left, and removes itself when destroyed. */
 void spawner_l08_update(u8 *moby)
 {
-    void *foundChild;
+    void *found_child;
     struct { TI128 target, direction, velocity, step; } frame;
     u8 *vars=*(u8 **)(moby+0x68);
     int index;
 
-    void *pathArg,*targetPos;
-    int pathFlag,targetId;
+    void *path_arg,*target_pos;
+    int path_flag,target_id;
     destructible_update(moby,vars);
     if(moby[0x31] && fast_vec_dist(moby+0x10,D_L08_001B9B00)<24.0f) {
         moby_update_ground_check(moby);moby[0x6f]=0x16;
@@ -56,9 +56,9 @@ void spawner_l08_update(u8 *moby)
     case 0:
         if(D_L08_001B2508) {
             int i;
-            foundChild=0;
+            found_child=0;
             for(i=0;i<2;i++) {
-                while(!GetFirstMobyInGroup(&foundChild,((FVars *)vars)->children[i],0,0)) moby_mark_spawned(foundChild);
+                while(!GetFirstMobyInGroup(&found_child,((FVars *)vars)->children[i],0,0)) moby_mark_spawned(found_child);
             }
             moby[0x20]=1;
         }
@@ -67,10 +67,10 @@ void spawner_l08_update(u8 *moby)
     case 1:
         if(!FastDecTimer(vars+0x12e)) break;
         if(!math_random_int_below(7)) {
-            pathArg=0;pathFlag=0;targetPos=0;targetId=0;
-            if(E_I(vars,0x124)!=-1) {pathArg=vars+0x124;pathFlag=1;}
-            if(E_I(vars,0x128)!=-1) {u8 *target=D_L08_001FE7C0[E_I(vars,0x128)];targetId=E_I(target,0);targetPos=target+0x10;}
-            FindHeroOrMobyTarget(moby,vars+0xc0,pathArg,pathFlag,targetPos,targetId,E_F(vars,0x120));
+            path_arg=0;path_flag=0;target_pos=0;target_id=0;
+            if(E_I(vars,0x124)!=-1) {path_arg=vars+0x124;path_flag=1;}
+            if(E_I(vars,0x128)!=-1) {u8 *target=D_L08_001FE7C0[E_I(vars,0x128)];target_id=E_I(target,0);target_pos=target+0x10;}
+            FindHeroOrMobyTarget(moby,vars+0xc0,path_arg,path_flag,target_pos,target_id,E_F(vars,0x120));
         } else {
             u8 *target=*(u8 **)(vars+0x100);
             if(target && target[0x20]!=0xfe && target[0x20]!=0xfd) qcopy(vars+0xc0,target+0x10);
@@ -84,7 +84,7 @@ void spawner_l08_update(u8 *moby)
         }
         break;
     case 2: {
-        u8 *chosenTarget;
+        u8 *chosen_target;
         float speed;
         if(moby[0x60]&2) {
             moby[0x20]=1;
@@ -92,7 +92,7 @@ void spawner_l08_update(u8 *moby)
             break;
         }
         if(moby_get_anim_value(moby)!=12.0f) break;
-        chosenTarget=0;
+        chosen_target=0;
         if(vars[0x132]) {
             int i;
             float best, distance;
@@ -101,36 +101,36 @@ void spawner_l08_update(u8 *moby)
                 if(((FVars *)vars)->targets[i]!=-1) {
                     u8 *target=D_L08_001B2ACC+((FVars *)vars)->targets[i]*128;
                     distance=fast_vec_dist(g_hero_position,target+0x30);
-                    if(distance<best) {chosenTarget=target;best=distance;}
+                    if(distance<best) {chosen_target=target;best=distance;}
                 }
             }
-            if(!chosenTarget) {
+            if(!chosen_target) {
                 FastVecSub(&frame.target,vars+0xc0,(moby+0x10));
                 FastVecScale(&frame.target,&frame.target,0.5f);
                 if(E_F(vars,0x120)>3.0f) vec_fast_divide_helper(&frame.target,&frame.target,3.0f);
                 if(FastVecLength(&frame.target)<3.0f) vec_scale_to_length(&frame.target,&frame.target,3.0f);
                 FastVecAdd(&frame.target,&frame.target,(moby+0x10));
-            } else qcopy(&frame.target,chosenTarget+0x30);
+            } else qcopy(&frame.target,chosen_target+0x30);
         } else {
-            int startSlot=math_random_int_range(0,3);
+            int start_slot=math_random_int_range(0,3);
             int i;
             for(i=0;i<4;i++) {
-                int slot=(i+startSlot)%4;
+                int slot=(i+start_slot)%4;
                 if(((FVars *)vars)->targets[slot]!=-1) {
-                    chosenTarget=D_L08_001B2ACC+((FVars *)vars)->targets[slot]*128;
+                    chosen_target=D_L08_001B2ACC+((FVars *)vars)->targets[slot]*128;
                     break;
                 }
             }
-            if(!chosenTarget) {
+            if(!chosen_target) {
                 float radius=E_F(vars,0x120);if(radius<3.0f) radius=3.0f;
                 math_random_planar_offset(&frame.target,radius);
                 FastVecAdd(&frame.target,&frame.target,(moby+0x10));
-            } else qcopy(&frame.target,chosenTarget+0x30);
+            } else qcopy(&frame.target,chosen_target+0x30);
         }
-        if(chosenTarget) {
-            FastVecScale(&frame.direction,chosenTarget,math_random_float_range(-1.0f,1.0f));
+        if(chosen_target) {
+            FastVecScale(&frame.direction,chosen_target,math_random_float_range(-1.0f,1.0f));
             FastVecAdd(&frame.target,&frame.target,&frame.direction);
-            FastVecScale(&frame.direction,chosenTarget+0x10,math_random_float_range(-1.0f,1.0f));
+            FastVecScale(&frame.direction,chosen_target+0x10,math_random_float_range(-1.0f,1.0f));
             FastVecAdd(&frame.target,&frame.target,&frame.direction);
         }
         {float height=coll_probe_ground_height_below(&frame.target,0,0.5f);

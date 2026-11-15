@@ -122,21 +122,21 @@ typedef struct {
 } DamoselBeamState;
 /* Runs the Extermibot's electric beam: it charges, shoots out to the target, sticks to what it hits, and then pulls back. It also throws sparks where the beam lands. */
 void extermibot_beam_update(u8 *obj) {
- float startPoint[4] __attribute__((aligned(16))),endPoint[4] __attribute__((aligned(16))),delta[4] __attribute__((aligned(16)));
+ float start_point[4] __attribute__((aligned(16))),end_point[4] __attribute__((aligned(16))),delta[4] __attribute__((aligned(16)));
  struct { float direction[4] __attribute__((aligned(16))); int owner,mode; u8 type,flags;u16 id; float distance;int enabled; } hit;
  u8 *vars=P(obj,0x68),*other;float progress;
- moby_transform_joint_to_world(P(vars,0x7c8),0,startPoint);moby_transform_joint_to_world(P(vars,0x7c8),1,endPoint);F(vars,0x7e0)=0;
+ moby_transform_joint_to_world(P(vars,0x7c8),0,start_point);moby_transform_joint_to_world(P(vars,0x7c8),1,end_point);F(vars,0x7e0)=0;
  switch(H(vars,0x806)) {
  case 0:
-  qcopy(vars+0x610,startPoint);qcopy(vars+0x620,endPoint);qcopy(vars+0x6b0,endPoint);qcopy(vars+0x6c0,startPoint);
+  qcopy(vars+0x610,start_point);qcopy(vars+0x620,end_point);qcopy(vars+0x6b0,end_point);qcopy(vars+0x6c0,start_point);
   if(I(vars,0x7f0)!=-1) {
    u8 *entry=g_sound_state+I(vars,0x7f0)*0x70;
    if(P(entry,0x88)==obj && entry[0x74])snd_stop_voice(I(vars,0x7f0));
   }
   I(vars,0x7f0)=-1;break;
  case 1:
-  qcopy(vars+0x610,startPoint);qcopy(vars+0x620,endPoint);qcopy(vars+0x6b0,endPoint);qcopy(vars+0x6c0,startPoint);
-  coll_sweep_from_object(obj,startPoint,0x10001,0,1,0,0.2f,(float)vars[0x34],1);
+  qcopy(vars+0x610,start_point);qcopy(vars+0x620,end_point);qcopy(vars+0x6b0,end_point);qcopy(vars+0x6c0,start_point);
+  coll_sweep_from_object(obj,start_point,0x10001,0,1,0,0.2f,(float)vars[0x34],1);
   if(H(vars,0x804)>=6) {
    u8 *target=vars+0x760;
    u8 *p3=vars+0x6a0,*p2=vars+0x690,*p1=vars+0x680,*p0=vars+0x670;
@@ -153,13 +153,13 @@ void extermibot_beam_update(u8 *obj) {
   } else F(vars,0x7e0)=IntToFloat(H(vars,0x804))/IntToFloat(5);
   break;
  case 2:
-  qcopy(vars+0x610,startPoint);qcopy(vars+0x6b0,endPoint);
-  coll_sweep_from_object(obj,startPoint,0x10001,0,1,0,0.2f,(float)vars[0x34],1);
+  qcopy(vars+0x610,start_point);qcopy(vars+0x6b0,end_point);
+  coll_sweep_from_object(obj,start_point,0x10001,0,1,0,0.2f,(float)vars[0x34],1);
   if(H(vars,0x804)<6) {
    progress=IntToFloat(H(vars,0x804))/IntToFloat(5);
-   F(vars,0x620)=startPoint[0]+(F(vars,0x760)-startPoint[0])*progress;
-   F(vars,0x624)=startPoint[1]+(F(vars,0x764)-startPoint[1])*progress;
-   F(vars,0x628)=startPoint[2]+(F(vars,0x768)-startPoint[2])*progress;
+   F(vars,0x620)=start_point[0]+(F(vars,0x760)-start_point[0])*progress;
+   F(vars,0x624)=start_point[1]+(F(vars,0x764)-start_point[1])*progress;
+   F(vars,0x628)=start_point[2]+(F(vars,0x768)-start_point[2])*progress;
    qcopy(vars+0x6c0,vars+0x620);
    FastVecSub(delta,vars+0x620,vars+0x610);vec_scale_to_length(delta,delta,1.0f/30.0f);
    make_hit_descriptor(&hit,obj,0x210001,delta,(float)vars[0x34]);
@@ -176,7 +176,7 @@ void extermibot_beam_update(u8 *obj) {
   } else {H(vars,0x806)=4;part_spawn_large_spark_smoke(vars+0x620,10);}
   break;
  case 3:
-  qcopy(vars+0x610,startPoint);qcopy(vars+0x6b0,endPoint);
+  qcopy(vars+0x610,start_point);qcopy(vars+0x6b0,end_point);
   if(H(vars,0x804)<51 && (other=P(vars,0x7e4)) && other[0x20]!=254 && other[0x20]!=253) {
    FastVecSub(delta,other+0x10,vars+0x770);FastVecAdd(vars+0x620,vars+0x620,delta);
    qcopy(vars+0x6c0,vars+0x620);qcopy(vars+0x770,P(vars,0x7e4)+0x10);
@@ -187,15 +187,15 @@ void extermibot_beam_update(u8 *obj) {
   }
   break;
  case 4:
-  qcopy(vars+0x610,startPoint);qcopy(vars+0x6b0,endPoint);
+  qcopy(vars+0x610,start_point);qcopy(vars+0x6b0,end_point);
   if(H(vars,0x804)<5) {
    progress=IntToFloat(H(vars,0x804))/IntToFloat(5);
-   F(vars,0x620)=F(vars,0x760)+(startPoint[0]-F(vars,0x760))*progress;
-   F(vars,0x624)=F(vars,0x764)+(startPoint[1]-F(vars,0x764))*progress;
-   F(vars,0x628)=F(vars,0x768)+(startPoint[2]-F(vars,0x768))*progress;
-   F(vars,0x6c0)=F(vars,0x760)+(endPoint[0]-F(vars,0x760))*progress;
-   F(vars,0x6c4)=F(vars,0x764)+(endPoint[1]-F(vars,0x764))*progress;
-   F(vars,0x6c8)=F(vars,0x768)+(endPoint[2]-F(vars,0x768))*progress;
+   F(vars,0x620)=F(vars,0x760)+(start_point[0]-F(vars,0x760))*progress;
+   F(vars,0x624)=F(vars,0x764)+(start_point[1]-F(vars,0x764))*progress;
+   F(vars,0x628)=F(vars,0x768)+(start_point[2]-F(vars,0x768))*progress;
+   F(vars,0x6c0)=F(vars,0x760)+(end_point[0]-F(vars,0x760))*progress;
+   F(vars,0x6c4)=F(vars,0x764)+(end_point[1]-F(vars,0x764))*progress;
+   F(vars,0x6c8)=F(vars,0x768)+(end_point[2]-F(vars,0x768))*progress;
   } else {
    H(vars,0x804)=0;H(vars,0x806)=0;
    { u8 *p3=vars+0x6a0,*p2=vars+0x690,*p1=vars+0x680,*p0=vars+0x670;
@@ -449,8 +449,8 @@ extern void gfx_update_color_fade(void *, void *);
 /* A spinning target: it turns slowly, flashes and loses health when hit, and plays a sound while it is being hit. */
 void spinning_target_update(u8 *obj) {
     u8 *state;
-    u8 *hitFlash;
-    float hitDamage;
+    u8 *hit_flash;
+    float hit_damage;
 
     if (D_L18_001C9D40 != 0) return;
     state = *(u8 **)(obj + 0x68);
@@ -464,18 +464,18 @@ void spinning_target_update(u8 *obj) {
         if (snd_is_voice_playing_for_owner(obj, *(s32 *)(state + 0x68)) == 0) {
             *(s32 *)(state + 0x68) = PlayMobySound(0, 4, obj);
         }
-        hitFlash = state + 0x50;
+        hit_flash = state + 0x50;
         *(float *)(obj + 0xF8) = FastAddRotations(*(float *)(obj + 0xF8),
                                                *(float *)(state + 0x64) * 0.000290888245f);
-        hitDamage = moby_update_aim_target_strength(obj, part_find_owned_effect_slot(obj, 0x230000, 0));
-        if (hitDamage > 0.0f) {
+        hit_damage = moby_update_aim_target_strength(obj, part_find_owned_effect_slot(obj, 0x230000, 0));
+        if (hit_damage > 0.0f) {
             *(u8 *)(state + 0x57) = 0xFF;
             *(u8 *)(state + 0x58) = 0x40;
             *(u8 *)(state + 0x59) = 0;
-            gfx_start_color_fade(obj, hitFlash);
-            *(float *)(state + 0x20) = *(float *)(state + 0x20) - hitDamage;
+            gfx_start_color_fade(obj, hit_flash);
+            *(float *)(state + 0x20) = *(float *)(state + 0x20) - hit_damage;
         }
-        gfx_update_color_fade(obj, hitFlash);
+        gfx_update_color_fade(obj, hit_flash);
         *(u8 *)(obj + 0xA8) = 0xFF;
         return;
     }
@@ -493,7 +493,7 @@ void spinning_target_update(u8 *obj) {
 /* Works out a point on a smooth curve between two points, using the points before and after them to shape the curve. */
 void math_cubic_spline_point(float *out, float *start, float *end, float *before, float *after, float amount)
 {
-    float amountSquared, amountCubed, cubicCoeff, quadraticCoeff, linearCoeff;
+    float amount_squared, amount_cubed, cubic_coeff, quadratic_coeff, linear_coeff;
 
     if (amount == 0.0f) {
         qcopy(out, start);
@@ -503,23 +503,23 @@ void math_cubic_spline_point(float *out, float *start, float *end, float *before
         qcopy(out, end);
         return;
     }
-    amountSquared = amount * amount;
-    amountCubed = amountSquared * amount;
+    amount_squared = amount * amount;
+    amount_cubed = amount_squared * amount;
 
-    cubicCoeff = (after[0] - end[0]) - (before[0] - start[0]);
-    quadraticCoeff = (before[0] - start[0]) - cubicCoeff;
-    linearCoeff = end[0] - before[0];
-    out[0] = cubicCoeff * amountCubed + quadraticCoeff * amountSquared + linearCoeff * amount + start[0];
+    cubic_coeff = (after[0] - end[0]) - (before[0] - start[0]);
+    quadratic_coeff = (before[0] - start[0]) - cubic_coeff;
+    linear_coeff = end[0] - before[0];
+    out[0] = cubic_coeff * amount_cubed + quadratic_coeff * amount_squared + linear_coeff * amount + start[0];
 
-    cubicCoeff = (after[1] - end[1]) - (before[1] - start[1]);
-    quadraticCoeff = (before[1] - start[1]) - cubicCoeff;
-    linearCoeff = end[1] - before[1];
-    out[1] = cubicCoeff * amountCubed + quadraticCoeff * amountSquared + linearCoeff * amount + start[1];
+    cubic_coeff = (after[1] - end[1]) - (before[1] - start[1]);
+    quadratic_coeff = (before[1] - start[1]) - cubic_coeff;
+    linear_coeff = end[1] - before[1];
+    out[1] = cubic_coeff * amount_cubed + quadratic_coeff * amount_squared + linear_coeff * amount + start[1];
 
-    cubicCoeff = (after[2] - end[2]) - (before[2] - start[2]);
-    quadraticCoeff = (before[2] - start[2]) - cubicCoeff;
-    linearCoeff = end[2] - before[2];
-    out[2] = cubicCoeff * amountCubed + quadraticCoeff * amountSquared + linearCoeff * amount + start[2];
+    cubic_coeff = (after[2] - end[2]) - (before[2] - start[2]);
+    quadratic_coeff = (before[2] - start[2]) - cubic_coeff;
+    linear_coeff = end[2] - before[2];
+    out[2] = cubic_coeff * amount_cubed + quadratic_coeff * amount_squared + linear_coeff * amount + start[2];
     out[3] = 0.0f;
 }
 
@@ -570,7 +570,7 @@ void destructible_object_update(unsigned char *object)
         if (!hit) goto intact;
         owner = *(char **)(hit + 0x20);
         excluded = 0;
-        if (owner && (*(short *)(owner + 0xaa) == 0xb69 /* Protopet */ || *(short *)(owner + 0xaa) == 0xf9e /* moby class 3998 */)) excluded = 1;
+        if (owner && (*(short *)(owner + 0xaa) == MOBY_CLASS_PROTOPET || *(short *)(owner + 0xaa) == 0xf9e /* moby class 3998 */)) excluded = 1;
         if (excluded) break;
         zero = 0.0f;
         damage = moby_update_aim_target_strength(object, hit);

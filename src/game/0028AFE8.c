@@ -18,7 +18,7 @@ extern int D_001B1894[];
 extern int D_001B1898[];
 
 void hud_unlink_bank_group(int group) {
-    int groupSize = ((GroupTable *)D_001B1888[0])->c[group];
+    int group_size = ((GroupTable *)D_001B1888[0])->c[group];
     int i;
     int end;
     int start;
@@ -32,13 +32,13 @@ void hud_unlink_bank_group(int group) {
     start = group != 0 ? ((GroupTable *)D_001B1888[0])->a[group - 1] : 0;
     end = ((GroupTable *)D_001B1888[0])->a[group];
     for (i = start; i < end; i++) {
-        *(int *)(i * 8 + D_001B1898[0]) -= groupSize;
+        *(int *)(i * 8 + D_001B1898[0]) -= group_size;
         *(int *)(i * 8 + D_001B1898[0]) |= 0x80000000;
     }
     start = group != 0 ? ((GroupTable *)D_001B1888[0])->b[group - 1] : 0;
     end = ((GroupTable *)D_001B1888[0])->b[group];
     for (i = start; i < end; i++) {
-        *(int *)(i * 8 + D_001B1894[0]) -= groupSize;
+        *(int *)(i * 8 + D_001B1894[0]) -= group_size;
         *(int *)(i * 8 + D_001B1894[0]) |= 0x80000000;
     }
     ((GroupTable *)D_001B1888[0])->c[group] = 0;

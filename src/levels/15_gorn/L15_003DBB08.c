@@ -50,10 +50,10 @@ void ranged_l15_enemy_update(char *moby) {
         struct { Vector muzzle, velocity, acceleration, transform[4]; } aim;
         struct { Vector frame[4], direction, origin; } relay;
     } work;
-    char *vars = *(char **)(moby + 0x68), *pathData, *relayTarget;
-    L02Collision *hitRecord;
-    int moveFlags;
-    float angle, animTime, shotPower;
+    char *vars = *(char **)(moby + 0x68), *path_data, *relay_target;
+    L02Collision *hit_record;
+    int move_flags;
+    float angle, anim_time, shot_power;
 
     int choice, animation, collision, contact;
     if (linked_child_update(moby)) { moby_mark_spawned(moby); return; }
@@ -94,12 +94,12 @@ void ranged_l15_enemy_update(char *moby) {
         }
         break;
     case 3:
-        moveFlags = moby_dispatch_action_by_kind(moby, vars + 0x50);
-        if (moveFlags & 1) {
+        move_flags = moby_dispatch_action_by_kind(moby, vars + 0x50);
+        if (move_flags & 1) {
             *(u16 *)(*(char **)(vars + 0x370) + 0x34) |= 0x41; *(u16 *)(*(char **)(vars + 0x370) + 0x34) &= 0xEFFF; *(int *)(*(char **)(vars + 0x370) + 0x98) = 0;
             SetDeathBits(moby, 0, 3); part_queue_moby_for_glow(moby, 0, linked_effect_update); return;
         }
-        if (moveFlags & 2) {
+        if (move_flags & 2) {
             *(int *)(vars + 0x33C) = 0;
             if (*(int *)(vars + 0x320) != -1) moby_set_state((u8 *)moby, 18, 4);
             else if (*(int *)(vars + 0x204) == 1) moby_set_state((u8 *)moby, 10, 2);
@@ -192,8 +192,8 @@ void ranged_l15_enemy_update(char *moby) {
             moby_transform_joint_to_world(*(char **)(vars + 0x370), 0, (char *)&work.aim.muzzle);
             contact = CollLine(&work.aim.muzzle, &((L02_ResidentCombatPrefix *)g_hero_state)->target_d0, 16, moby, 0);
             if (contact && D_L15_001BFC00.hit && *(short *)(D_L15_001BFC00.hit + 0xAA) == 0xC1B /* moby class 3099 */) { { moby_set_state((u8 *)moby, 13, -1); break; } break; }
-            if (contact && (hitRecord = &D_L15_001BFC00)->hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290 && !*(short *)(vars + 0x386)) {
-                if (!hitRecord->hit || (!moby_is_in_special_class_range(hitRecord->hit) && (!*(char **)(hitRecord->hit + 0x24) || *(short *)(*(char **)(hitRecord->hit + 0x24) + 0x46) != 22))) break;
+            if (contact && (hit_record = &D_L15_001BFC00)->hit != ((L02_ResidentCombatPrefix *)g_hero_state)->pointer_2290 && !*(short *)(vars + 0x386)) {
+                if (!hit_record->hit || (!moby_is_in_special_class_range(hit_record->hit) && (!*(char **)(hit_record->hit + 0x24) || *(short *)(*(char **)(hit_record->hit + 0x24) + 0x46) != 22))) break;
             }
             { moby_set_state((u8 *)moby, 11, -1); break; }
         } else {
@@ -223,11 +223,11 @@ void ranged_l15_enemy_update(char *moby) {
             moby_transform_joint_to_world(*(char **)(vars + 0x370), 0, (char *)&work.aim.muzzle);
             FastVecSub(&work.aim.velocity, vars + 0x360, &work.aim.muzzle); vec_scale_to_length(&work.aim.velocity, &work.aim.velocity, 0.23333334922790527f);
             FastVecScale(&work.aim.acceleration, &work.aim.velocity, 0.25f);
-            shotPower = (float)(u8)vars[0x34];
+            shot_power = (float)(u8)vars[0x34];
             if (*(short *)(vars + 0x380) >= 2)
-                part_spawn_trail_effect_moby(&work.aim.muzzle, &work.aim.acceleration, &work.aim.velocity, shotPower, shotPower, 0.0055555556900799274f, 10, 30, 1);
+                part_spawn_trail_effect_moby(&work.aim.muzzle, &work.aim.acceleration, &work.aim.velocity, shot_power, shot_power, 0.0055555556900799274f, 10, 30, 1);
             else
-                part_spawn_trail_effect_moby(&work.aim.muzzle, &work.aim.acceleration, &work.aim.velocity, shotPower, shotPower, 0.0055555556900799274f, 30, 80, 1);
+                part_spawn_trail_effect_moby(&work.aim.muzzle, &work.aim.acceleration, &work.aim.velocity, shot_power, shot_power, 0.0055555556900799274f, 30, 80, 1);
             break;
         }
         if (!(((u8 *)moby)[0x60] & 2)) break;
@@ -244,8 +244,8 @@ void ranged_l15_enemy_update(char *moby) {
     case 14:
         if (flag_set_first_pending((u8 *)moby) && ((u8 *)moby)[0x43] != 13) anim_start_blended(moby, 13, 0, 10);
         angle = mat_fast_helper_a(*(float *)(vars + 0x1F0) - *(float *)(moby + 0x10), *(float *)(vars + 0x1F4) - *(float *)(moby + 0x14));
-        moby_start_effect_from_entry((int)moby, angle); animTime = moby_get_anim_value(moby);
-        if (animTime >= 11 && animTime < 12.5f) coll_test_hit_at_bone(0.6f, (float)(u8)vars[0x35], 3.0f, moby, (void *)3, 1, 0, 1, 0);
+        moby_start_effect_from_entry((int)moby, angle); anim_time = moby_get_anim_value(moby);
+        if (anim_time >= 11 && anim_time < 12.5f) coll_test_hit_at_bone(0.6f, (float)(u8)vars[0x35], 3.0f, moby, (void *)3, 1, 0, 1, 0);
         if (((u8 *)moby)[0x60] & 2) { moby_set_state((u8 *)moby, 15, -1); break; }
         break;
     case 15:
@@ -282,9 +282,9 @@ void ranged_l15_enemy_update(char *moby) {
         if (IsPointInCuboid(&((L02_ResidentCombatPrefix *)g_hero_state)->position_80, *(int *)(vars + 0x324)) || *(int *)(vars + 0x204) == 1) { moby_set_state((u8 *)moby, 18, -1); break; }
         break;
     case 18:
-        pathData = D_L15_001FE480[*(int *)(vars + 0x320)];
+        path_data = D_L15_001FE480[*(int *)(vars + 0x320)];
         if (flag_set_first_pending((u8 *)moby)) { if (((u8 *)moby)[0x43] != 6) anim_start_blended(moby, 6, 0, 20); coll_check_object_inside_polygon((u8 *)moby); }
-        if (!(vec_distance_xy(moby + 0x10, pathData + *(int *)pathData * 16) < *(float *)(vars + 0x134)) && !path_follow_nodes(moby, pathData)) break;
+        if (!(vec_distance_xy(moby + 0x10, path_data + *(int *)path_data * 16) < *(float *)(vars + 0x134)) && !path_follow_nodes(moby, path_data)) break;
 
         if (((u8 *)moby)[0x43] != 2) {
             angle = mat_fast_helper_a(*(float *)(vars + 0x1F0) - *(float *)(moby + 0x10), *(float *)(vars + 0x1F4) - *(float *)(moby + 0x14));
@@ -320,14 +320,14 @@ void ranged_l15_enemy_update(char *moby) {
         if (flag_set_first_pending((u8 *)moby) && ((u8 *)moby)[0x43] != 10) anim_start_blended(moby, 10, 0, 10);
         *(float *)(vars + 0x278) = *(float *)(vars + 0x37C);
         if (math_is_value_within_step(moby, 5)) {
-            if ((relayTarget = (char *)moby_find_group_in_state_13(*(int *)(vars + 0x328))) != 0) {
+            if ((relay_target = (char *)moby_find_group_in_state_13(*(int *)(vars + 0x328))) != 0) {
                 moby_transform_joint_point(*(char **)(vars + 0x370), 0, (char *)work.relay.frame);
                 vec_scale_to_length(&work.relay.direction, work.relay.frame, 0.23333334922790527f);
                 {
                     Quad q = *(Quad *)&work.relay.frame[3];
                     *(Quad *)&work.relay.origin = q;
                 }
-                moby_teleport_to_new_pose(relayTarget, &work.relay.origin, &work.relay.direction);
+                moby_teleport_to_new_pose(relay_target, &work.relay.origin, &work.relay.direction);
             }
         } else if (((u8 *)moby)[0x60] & 2) moby_set_state((u8 *)moby, 20, -1);
 

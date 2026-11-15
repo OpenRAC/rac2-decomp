@@ -86,23 +86,23 @@ extern void anim_start_blended();
 /* Picks a random spot near the moby's home position as its next move target. */
 void moby_pick_random_home_target(char *moby)
 {
-    char *mobyPtr = moby;
-    char *vars = *(char **)(mobyPtr + 0x68);
-    char *targetPos = vars + 0x1E0;
+    char *moby_ptr = moby;
+    char *vars = *(char **)(moby_ptr + 0x68);
+    char *target_pos = vars + 0x1E0;
     L01_003BDF28_BUF offset;
 
     *(float *)(vars + 0x1E0) = math_fast_sin_or_cos_a(math_random_float_range(-3.1415927f, 3.1415927f)) * (float)*(unsigned char *)(vars + 0x201);
     *(float *)(vars + 0x1E4) = math_fast_sin_or_cos_b(math_random_float_range(-3.1415927f, 3.1415927f)) * (float)*(unsigned char *)(vars + 0x201);
     *(int *)(vars + 0x1E8) = 0;
-    FastVecAdd(targetPos, targetPos, vars + 0x1D0);
+    FastVecAdd(target_pos, target_pos, vars + 0x1D0);
     *(float *)(vars + 0x1E8) = *(float *)(vars + 0x1E8) + 1.7f;
     if (*(int *)(vars + 0x23C) != 0) {
-        FastVecSub(&offset, targetPos, g_hero_position);
+        FastVecSub(&offset, target_pos, g_hero_position);
         offset.z = 0;
         vec_scale_to_length(&offset, &offset, 8.0f);
-        FastVecAdd(targetPos, targetPos, &offset);
+        FastVecAdd(target_pos, target_pos, &offset);
     }
-    moby_choose_wander_destination(mobyPtr);
+    moby_choose_wander_destination(moby_ptr);
 }
 
 /* func_L01_003BB9D0 is in L01_003BB9D0-ocean-g8.c. */
@@ -319,17 +319,17 @@ void firefly_update_timers_and_color(L01_003BE4D0_OBJ *moby)
 /* func_L01_003BFDC8 */
 
 /* Switches the moby to a new animation when it is not already playing it and sets its animation speed. */
-void moby_set_animation_and_speed(L01_003BFDC8_OBJ *moby, int animIndex, int unusedParam, int blendFrames)
+void moby_set_animation_and_speed(L01_003BFDC8_OBJ *moby, int anim_index, int unused_param, int blend_frames)
 {
     L01_003BFDC8_OBJ *obj = moby;
 
-    if (obj->f43 != animIndex) {
+    if (obj->f43 != anim_index) {
         anim_start_blended(moby);
     }
-    if (animIndex != 12) {
+    if (anim_index != 12) {
         obj->f48 = 0.6666667f;
     }
-    if ((unsigned int)(animIndex - 6) < 3) {
+    if ((unsigned int)(anim_index - 6) < 3) {
         obj->f48 = obj->f48 * 1.25f;
     }
 }

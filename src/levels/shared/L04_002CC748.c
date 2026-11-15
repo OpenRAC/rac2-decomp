@@ -227,10 +227,10 @@ void hero_start_second_sway_anim(void) {
 
 /* Check the hero's surface contact and optionally apply its movement impulse. */
 int hero_check_surface_contact(int update) {
-    char *surfaceEntry, *surfaceMoby;
+    char *surface_entry, *surface_moby;
     HopVector delta;
-    int isSpecial;
-    float impulseAmount;
+    int is_special;
+    float impulse_amount;
 
     if (GROUND_HERO.i[0x229C / 4] == 20) return 0;
     if (GROUND_HERO.i[0x229C / 4] == 7) return 0;
@@ -238,43 +238,43 @@ int hero_check_surface_contact(int update) {
     if (GROUND_HERO.h[0x1DC / 2]) return 0;
     if (D_001A8F00[0]) return 0;
     GROUND_HERO.i[0x249C / 4] = 0;
-    surfaceMoby = GROUND_HERO.p[0x2290 / 4];
-    if (AB(surfaceMoby, 0xA8) == 255) return 0;
-    surfaceEntry = D_L04_001C3D40 + AB(surfaceMoby, 0xA8) * 64;
-    if (AP(surfaceEntry, 0x38) != surfaceMoby) return 0;
-    if (!(AI(surfaceEntry, 0x24) & 9)) return 0;
-    if (AF(surfaceEntry, 0x2C) != 0.0f) {
+    surface_moby = GROUND_HERO.p[0x2290 / 4];
+    if (AB(surface_moby, 0xA8) == 255) return 0;
+    surface_entry = D_L04_001C3D40 + AB(surface_moby, 0xA8) * 64;
+    if (AP(surface_entry, 0x38) != surface_moby) return 0;
+    if (!(AI(surface_entry, 0x24) & 9)) return 0;
+    if (AF(surface_entry, 0x2C) != 0.0f) {
         D_001A7A33 = 0;
         g_bolt_multiplier = 1;
     }
     if (fade_get_value() != 0.0f && !GROUND_HERO.b[0x22B4]) {
-        AF(surfaceEntry, 0x2C) = fade_reduce_value(AF(surfaceEntry, 0x2C));
-        if (AF(surfaceEntry, 0x2C) == 0.0f) return 0;
+        AF(surface_entry, 0x2C) = fade_reduce_value(AF(surface_entry, 0x2C));
+        if (AF(surface_entry, 0x2C) == 0.0f) return 0;
     }
-    GROUND_HERO.p[0x249C / 4] = AP(surfaceEntry, 0x20);
+    GROUND_HERO.p[0x249C / 4] = AP(surface_entry, 0x20);
     if (!update) return 1;
     hero_clear_tracked_slots();
-    isSpecial = 0;
-    if (AI(surfaceEntry, 0x30) & 1) {
-        qcopy(&delta, surfaceEntry + 0x10);
-        if (AF(surfaceEntry, 0x1C) == 5627.925f) isSpecial = 1;
-    } else if (AP(surfaceEntry, 0x20)) {
+    is_special = 0;
+    if (AI(surface_entry, 0x30) & 1) {
+        qcopy(&delta, surface_entry + 0x10);
+        if (AF(surface_entry, 0x1C) == 5627.925f) is_special = 1;
+    } else if (AP(surface_entry, 0x20)) {
         FastVecSub(delta.f, (float *)(GROUND_HERO.b + 0x80),
-                     (float *)(AP(surfaceEntry, 0x20) + 0x10));
+                     (float *)(AP(surface_entry, 0x20) + 0x10));
     } else {
         hero_build_relative_point(&delta, 0, -1.0f, 0.0f, 0.0f);
     }
     if (!GROUND_HERO.b[0x22B4]) {
-        char *surfaceMoby = GROUND_HERO.p[0x249C / 4];
-        if (surfaceMoby && (AH(surfaceMoby, 0xAA) == 0x4EB /* moby class 1259 */ || AH(surfaceMoby, 0xAA) == 0x558 /* moby class 1368 */)) {
+        char *surface_moby = GROUND_HERO.p[0x249C / 4];
+        if (surface_moby && (AH(surface_moby, 0xAA) == 0x4EB /* moby class 1259 */ || AH(surface_moby, 0xAA) == 0x558 /* moby class 1368 */)) {
             hero_l04_enter_state(0x7D, 1);
             return 1;
         }
         if ((GROUND_HERO.i[0x2294 / 4] == 1 ||
              GROUND_HERO.i[0x2294 / 4] == 0x1D || GROUND_HERO.i[0x1500 / 4]) &&
-            !(AI(surfaceEntry, 0x24) & 8)) {
-            char *surfaceMoby = part_find_owned_effect_slot(GROUND_HERO.p[0x2290 / 4], 1, 0);
-            if (surfaceMoby) AdjustPlayerHealth(FloatToInt(AF(surfaceMoby, 0x2C)));
+            !(AI(surface_entry, 0x24) & 8)) {
+            char *surface_moby = part_find_owned_effect_slot(GROUND_HERO.p[0x2290 / 4], 1, 0);
+            if (surface_moby) AdjustPlayerHealth(FloatToInt(AF(surface_moby, 0x2C)));
             if (!GROUND_HERO.i[0x24CC / 4]) hero_l04_enter_state(0x16, 1);
             GROUND_HERO.h[0x1DC / 2] = 0x4D;
             if (!GROUND_HERO.h[0x21C / 2]) GROUND_HERO.h[0x21C / 2] = 0x12;
@@ -283,15 +283,15 @@ int hero_check_surface_contact(int update) {
         }
         if (GROUND_HERO.i[0x229C / 4] == 0x12) hero_l04_enter_state(0x72, 1);
         else if (GROUND_HERO.i[0x229C / 4] == 0x11) hero_l04_enter_state(0x73, 1);
-        else if (AI(surfaceEntry, 0x24) & 8) hero_l04_enter_state(0x8C, 1);
+        else if (AI(surface_entry, 0x24) & 8) hero_l04_enter_state(0x8C, 1);
         else hero_l04_enter_state(0x16, 1);
         if (GROUND_HERO.i[0x2294 / 4] == 0x8C) {
             qzero(&delta);
         } else {
-            impulseAmount = 0.055000003427267075f;
-            if (GROUND_HERO.b[0x1497]) impulseAmount = 0.0f;
-            hero_flatten_push_vector(&delta, isSpecial, impulseAmount, 0.028333336f);
-            if (isSpecial && AB(surfaceEntry, 0x28) == 4)
+            impulse_amount = 0.055000003427267075f;
+            if (GROUND_HERO.b[0x1497]) impulse_amount = 0.0f;
+            hero_flatten_push_vector(&delta, is_special, impulse_amount, 0.028333336f);
+            if (is_special && AB(surface_entry, 0x28) == 4)
                 cam_scale_view_space_height(&delta, &delta, 2.0f);
         }
     }
@@ -656,7 +656,7 @@ void level_update_mob_list_by_type(void) {
         if (mob->type == 0xD54 /* moby class 3412 */) {
             UpdateEquipmentPieces(mob);
         }
-        if (mob != 0 && mob->type == 0xFA0 /* TV Screens */ && mob->p68 != 0) {
+        if (mob != 0 && mob->type == MOBY_CLASS_TV_SCREENS && mob->p68 != 0) {
             math_store_angle_update_result(mob, (void *)((u8 *)mob->p68 + 0xC), 0x80AAAAD2, 0x80396464, 0.0610865355f);
         }
     }
@@ -698,11 +698,11 @@ void MoveCtl_Init(char *settings)
 extern s32 GetFirstMobyInGroup(u32 *out, s32 kind, s32 arg2, s32 arg3);
 extern s32 GetNextMobyInGroup(u32 *out, u32 value, s32 arg2, s32 arg3);
 /* Looks up the object linked to this one and returns it, or 0 if none. */
-s32 moby_find_linked_object(u8 *srcObj) {
+s32 moby_find_linked_object(u8 *src_obj) {
     u32 out = 0;
-    if (GetFirstMobyInGroup(&out, *(u8 *)(srcObj + 0x21), 0, 0) == -1)
+    if (GetFirstMobyInGroup(&out, *(u8 *)(src_obj + 0x21), 0, 0) == -1)
         return 0;
-    if (out != (u32)srcObj)
+    if (out != (u32)src_obj)
         return out;
     if (GetNextMobyInGroup(&out, out, 0, 0) != -1)
         return out;
@@ -734,60 +734,60 @@ extern void mat_get_euler_angles(f32 *src, f32 *out);
 /* Copies the caller's matrix into a local one, takes the two aim angles off
    the target vector, springs one of them, and turns the copy by the three
    angles before handing its axes to the caller. */
-void mat_aim_with_spring(void *srcMatrix, void *outAngles, void *springVelocity, void *targetVec, f32 springAccel, f32 springDamp, f32 maxStep)
+void mat_aim_with_spring(void *src_matrix, void *out_angles, void *spring_velocity, void *target_vec, f32 spring_accel, f32 spring_damp, f32 max_step)
 {
-    f32 springPos;
+    f32 spring_pos;
     f32 buf0[16];
     f32 buf1[16];
     f32 mat[16];
     f32 vec[4];
     f32 res[4];
-    f32 savedRoll;
-    f32 pitchAngle;
-    f32 yawAngle;
-    f32 baseAngle;
+    f32 saved_roll;
+    f32 pitch_angle;
+    f32 yaw_angle;
+    f32 base_angle;
 
-    savedRoll = *(f32 *)((u8 *)outAngles + 8);
-    springPos = 0.0f;
-    copy_matrix_rotation(mat, srcMatrix);
-    pitchAngle = FastVecDot(targetVec, mat + 8);
-    baseAngle = mat_fast_helper_a(pitchAngle, square_root(1.0f - pitchAngle * pitchAngle));
-    FastVecCross(res, targetVec, mat + 8);
+    saved_roll = *(f32 *)((u8 *)out_angles + 8);
+    spring_pos = 0.0f;
+    copy_matrix_rotation(mat, src_matrix);
+    pitch_angle = FastVecDot(target_vec, mat + 8);
+    base_angle = mat_fast_helper_a(pitch_angle, square_root(1.0f - pitch_angle * pitch_angle));
+    FastVecCross(res, target_vec, mat + 8);
     if (res[2] < 0.99f) {
-        yawAngle = mat_fast_helper_a(res[0], res[1]);
+        yaw_angle = mat_fast_helper_a(res[0], res[1]);
         vec[0] = 0.0f;
         vec[1] = 0.0f;
-        vec[2] = -yawAngle;
+        vec[2] = -yaw_angle;
         mat_fast_helper_b(buf1, vec);
         multiply_matrix(mat, buf1, mat);
         transform_vector(res, res, buf1);
-        pitchAngle = mat_fast_helper_a(res[2], res[0]);
+        pitch_angle = mat_fast_helper_a(res[2], res[0]);
         vec[0] = 0.0f;
-        vec[1] = -pitchAngle;
+        vec[1] = -pitch_angle;
         vec[2] = 0.0f;
         mat_fast_helper_b(buf0, vec);
         multiply_matrix(mat, buf0, mat);
         transform_vector(res, res, buf0);
     } else {
-        yawAngle = 0.0f;
-        pitchAngle = 0.0f;
+        yaw_angle = 0.0f;
+        pitch_angle = 0.0f;
     }
-    math_approach_with_velocity(&springPos, baseAngle, (f32 *)springVelocity, springAccel, springDamp, maxStep, 0);
+    math_approach_with_velocity(&spring_pos, base_angle, (f32 *)spring_velocity, spring_accel, spring_damp, max_step, 0);
     vec[0] = 0.0f;
     vec[1] = 0.0f;
-    vec[2] = springPos;
+    vec[2] = spring_pos;
     mat_fast_helper_b(buf1, vec);
     multiply_matrix(mat, buf1, mat);
-    vec[1] = pitchAngle;
+    vec[1] = pitch_angle;
     vec[2] = 0.0f;
     mat_fast_helper_b(buf0, vec);
     multiply_matrix(mat, buf0, mat);
     vec[1] = 0.0f;
-    vec[2] = yawAngle;
+    vec[2] = yaw_angle;
     mat_fast_helper_b(buf1, vec);
     multiply_matrix(mat, buf1, mat);
-    mat_get_euler_angles(mat, (f32 *)outAngles);
-    *(f32 *)((u8 *)outAngles + 8) = savedRoll;
+    mat_get_euler_angles(mat, (f32 *)out_angles);
+    *(f32 *)((u8 *)out_angles + 8) = saved_roll;
 }
 
 typedef struct {
@@ -881,56 +881,56 @@ extern s32 math_random_int_below(s32);
 /* func_L04_0035F3E0 is defined in L04_0035F3E0-qcopy.c. */
 
 /* Creates a short-lived sparkle effect at a position with a given size. */
-void *part_spawn_sparkle(void *spawnPos, void *spawnVel, u32 lifeTime, f32 effectSize) {
-    L04Record *newEffect = (L04Record *)(u32)part_alloc(0x5E);
-    L04RecordTail *effectTail;
-    L04Quad velCopy;
+void *part_spawn_sparkle(void *spawn_pos, void *spawn_vel, u32 life_time, f32 effect_size) {
+    L04Record *new_effect = (L04Record *)(u32)part_alloc(0x5E);
+    L04RecordTail *effect_tail;
+    L04Quad vel_copy;
 
-    if ((u32)newEffect != 0) {
-        newEffect->field10 = *(L04Quad *)spawnPos;
-        effectTail = (L04RecordTail *)((u8 *)newEffect + 0x20);
-        newEffect->field09 = (u8)(FloatToInt(2.0f) + 0x40);
-        newEffect->field03 = 0x48;
-        newEffect->field01 = 0;
-        newEffect->field02 = *(u8 *)ref_L04_00362768_00;
-        newEffect->field0C = effectSize * 105000.0f;
-        newEffect->field08 = (u8)math_random_int_below(0xFF);
-        newEffect->field0A = (u16)lifeTime;
-        velCopy = *(L04Quad *)spawnVel;
-        newEffect->field20 = velCopy;
-        effectTail->field0C = 0;
-        effectTail->field10 = 0.5f;
-        effectTail->field14 = effectSize;
-        effectTail->field18 = (u16)(math_random_int_below(2) - 1);
+    if ((u32)new_effect != 0) {
+        new_effect->field10 = *(L04Quad *)spawn_pos;
+        effect_tail = (L04RecordTail *)((u8 *)new_effect + 0x20);
+        new_effect->field09 = (u8)(FloatToInt(2.0f) + 0x40);
+        new_effect->field03 = 0x48;
+        new_effect->field01 = 0;
+        new_effect->field02 = *(u8 *)ref_L04_00362768_00;
+        new_effect->field0C = effect_size * 105000.0f;
+        new_effect->field08 = (u8)math_random_int_below(0xFF);
+        new_effect->field0A = (u16)life_time;
+        vel_copy = *(L04Quad *)spawn_vel;
+        new_effect->field20 = vel_copy;
+        effect_tail->field0C = 0;
+        effect_tail->field10 = 0.5f;
+        effect_tail->field14 = effect_size;
+        effect_tail->field18 = (u16)(math_random_int_below(2) - 1);
     }
-    return (u32)newEffect;
+    return (u32)new_effect;
 }
 
 /* Creates a fading streak effect at a position, moving in a given direction. */
-void *part_spawn_streak(void *spawnPos, void *spawnVel, u32 lifeTime, f32 effectSize) {
-    L04Spawned *newEffect = (L04Spawned *)(u32)part_alloc(0x5F);
-    L04Vector *velBlock;
-    f32 halfVelocity[4];
+void *part_spawn_streak(void *spawn_pos, void *spawn_vel, u32 life_time, f32 effect_size) {
+    L04Spawned *new_effect = (L04Spawned *)(u32)part_alloc(0x5F);
+    L04Vector *vel_block;
+    f32 half_velocity[4];
 
-    if ((u32)newEffect != 0) {
-        newEffect->field04 = 0x7F003CFF;
-        newEffect->field0C = 0x7F003CFF;
-        newEffect->field09 = (u8)(FloatToInt(2.0f) + 0x20);
-        newEffect->field03 = 0x48;
-        newEffect->field01 = 3;
-        velBlock = (L04Vector *)((u8 *)newEffect + 0x30);
-        newEffect->field02 = *(u8 *)ref_L04_00362940_00;
-        velBlock->v = *(L04Quad *)spawnVel;
-        *(f32 *)((u8 *)velBlock + 0xC) = effectSize;
-        newEffect->field10 = *(L04Quad *)spawnPos;
-        vec_scale_to_length(halfVelocity, (f32 *)velBlock, 0.5f);
-        FastVecSub((f32 *)((u8 *)newEffect + 0x20), (f32 *)spawnPos, halfVelocity);
-        newEffect->field0A = (u16)lifeTime;
-        *(f32 *)((u8 *)newEffect + 0x1C) = 0.005f;
-        newEffect->field08 = (u8)(*(u8 *)&newEffect->field0A - 5);
-        newEffect->field2C = 1.0f;
+    if ((u32)new_effect != 0) {
+        new_effect->field04 = 0x7F003CFF;
+        new_effect->field0C = 0x7F003CFF;
+        new_effect->field09 = (u8)(FloatToInt(2.0f) + 0x20);
+        new_effect->field03 = 0x48;
+        new_effect->field01 = 3;
+        vel_block = (L04Vector *)((u8 *)new_effect + 0x30);
+        new_effect->field02 = *(u8 *)ref_L04_00362940_00;
+        vel_block->v = *(L04Quad *)spawn_vel;
+        *(f32 *)((u8 *)vel_block + 0xC) = effect_size;
+        new_effect->field10 = *(L04Quad *)spawn_pos;
+        vec_scale_to_length(half_velocity, (f32 *)vel_block, 0.5f);
+        FastVecSub((f32 *)((u8 *)new_effect + 0x20), (f32 *)spawn_pos, half_velocity);
+        new_effect->field0A = (u16)life_time;
+        *(f32 *)((u8 *)new_effect + 0x1C) = 0.005f;
+        new_effect->field08 = (u8)(*(u8 *)&new_effect->field0A - 5);
+        new_effect->field2C = 1.0f;
     }
-    return (u32)newEffect;
+    return (u32)new_effect;
 }
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -948,8 +948,8 @@ extern int func_00283CF0_2a50(float);
 /* Moves a streak effect along its direction each frame and fades it out. */
 void part_l04_update_streak(char *self) {
     Vec4 buf, offset;
-    char *curPos;
-    char *velBlock = self + 0x30;
+    char *cur_pos;
+    char *vel_block = self + 0x30;
     float ratio;
     int color;
 
@@ -957,13 +957,13 @@ void part_l04_update_streak(char *self) {
         part_kill(self);
         return;
     }
-    curPos = self + 0x10;
-    buf.word = *(TI128 *)curPos;
-    FastVecAdd(curPos, curPos, velBlock);
-    *(float *)(velBlock + 8) = *(float *)(velBlock + 8) - *(float *)(velBlock + 0xC);
-    ratio = FastVecLength(velBlock);
-    func_00282F20_2a50(&offset, velBlock, ratio * 0.4f);
-    func_00282CF0_2a50(self + 0x20, curPos, &offset);
+    cur_pos = self + 0x10;
+    buf.word = *(TI128 *)cur_pos;
+    FastVecAdd(cur_pos, cur_pos, vel_block);
+    *(float *)(vel_block + 8) = *(float *)(vel_block + 8) - *(float *)(vel_block + 0xC);
+    ratio = FastVecLength(vel_block);
+    func_00282F20_2a50(&offset, vel_block, ratio * 0.4f);
+    func_00282CF0_2a50(self + 0x20, cur_pos, &offset);
     *(float *)(self + 0x2C) = 1.0f;
     if (*(short *)(self + 0xA) < *(unsigned char *)(self + 8)) {
         ratio = IntToFloat(*(short *)(self + 0xA)) / IntToFloat(*(unsigned char *)(self + 8));
@@ -1005,57 +1005,57 @@ typedef struct {
 void water_clear_ripple_grids(u8 *base, s32 count) {
     s32 i;
     s32 j;
-    u8 *mainGrid;
-    u8 *auxGrid2;
-    u8 *auxGrid3;
-    u8 *auxGrid4;
-    u8 *auxGrid5;
-    u8 *auxGrid6;
-    u8 *auxGrid7;
-    u8 *smallBlock;
-    f32 smallValue;
+    u8 *main_grid;
+    u8 *aux_grid2;
+    u8 *aux_grid3;
+    u8 *aux_grid4;
+    u8 *aux_grid5;
+    u8 *aux_grid6;
+    u8 *aux_grid7;
+    u8 *small_block;
+    f32 small_value;
 
     for (i = 0; i < count; i++) {
-        smallBlock = base + (i * 0x1190 + 0x5D0);
-        auxGrid7 = base + (i * 0x1190 + 0x590);
-        auxGrid6 = base + (i * 0x1190 + 0x510);
-        auxGrid5 = base + (i * 0x1190 + 0x550);
-        auxGrid4 = base + (i * 0x1190 + 0x4D0);
-        auxGrid3 = base + (i * 0x1190 + 0x490);
-        auxGrid2 = base + (i * 0x1190 + 0x450);
-        mainGrid = base + (i * 0x1190 + 0x50);
-        smallValue = -0.0016f;
+        small_block = base + (i * 0x1190 + 0x5D0);
+        aux_grid7 = base + (i * 0x1190 + 0x590);
+        aux_grid6 = base + (i * 0x1190 + 0x510);
+        aux_grid5 = base + (i * 0x1190 + 0x550);
+        aux_grid4 = base + (i * 0x1190 + 0x4D0);
+        aux_grid3 = base + (i * 0x1190 + 0x490);
+        aux_grid2 = base + (i * 0x1190 + 0x450);
+        main_grid = base + (i * 0x1190 + 0x50);
+        small_value = -0.0016f;
         for (j = 0; j < 3; j++) {
-            memset(mainGrid, 0, 0x400);
-            mainGrid += 0x5C0;
-            memset(auxGrid2, 0, 0x40);
-            auxGrid2 += 0x5C0;
-            memset(auxGrid3, 0, 0x40);
-            auxGrid3 += 0x5C0;
-            memset(auxGrid4, 0, 0x40);
-            auxGrid4 += 0x5C0;
-            memset(auxGrid5, 0, 0x40);
-            auxGrid5 += 0x5C0;
-            memset(auxGrid6, 0, 0x40);
-            auxGrid6 += 0x5C0;
-            memset(auxGrid7, 0, 0x40);
-            auxGrid7 += 0x5C0;
-            memset(smallBlock, 0, 0x18);
-            smallBlock += 0x5C0;
+            memset(main_grid, 0, 0x400);
+            main_grid += 0x5C0;
+            memset(aux_grid2, 0, 0x40);
+            aux_grid2 += 0x5C0;
+            memset(aux_grid3, 0, 0x40);
+            aux_grid3 += 0x5C0;
+            memset(aux_grid4, 0, 0x40);
+            aux_grid4 += 0x5C0;
+            memset(aux_grid5, 0, 0x40);
+            aux_grid5 += 0x5C0;
+            memset(aux_grid6, 0, 0x40);
+            aux_grid6 += 0x5C0;
+            memset(aux_grid7, 0, 0x40);
+            aux_grid7 += 0x5C0;
+            memset(small_block, 0, 0x18);
+            small_block += 0x5C0;
         }
         {
-            RipplePatch *patchHeader = (RipplePatch *)(base + i * 0x1190);
+            RipplePatch *patch_header = (RipplePatch *)(base + i * 0x1190);
 
-            patchHeader->field30 = 1.5707964f;
-            patchHeader->field34 = -1.5707964f;
-            patchHeader->field38 = 0.02f;
-            patchHeader->field3C = -0.031f;
-            patchHeader->field40 = 0.03f;
-            patchHeader->field20 = 0;
-            patchHeader->field24 = 0;
-            patchHeader->field28 = smallValue;
-            patchHeader->field2C = smallValue;
-            patchHeader->field44 = 0;
+            patch_header->field30 = 1.5707964f;
+            patch_header->field34 = -1.5707964f;
+            patch_header->field38 = 0.02f;
+            patch_header->field3C = -0.031f;
+            patch_header->field40 = 0.03f;
+            patch_header->field20 = 0;
+            patch_header->field24 = 0;
+            patch_header->field28 = small_value;
+            patch_header->field2C = small_value;
+            patch_header->field44 = 0;
         }
     }
 }
@@ -1086,40 +1086,40 @@ extern f32 func_30F3B8(f32 x);
 extern f32 func_30FE40(f32 a, f32 b);
 
 /* Slides the water texture coordinates a little each frame. */
-void water_scroll_texture_coords(D002A00E8Self *waterPatch) {
-    f32 scrollXA, scrollYA, scrollXB, scrollYB;
+void water_scroll_texture_coords(D002A00E8Self *water_patch) {
+    f32 scroll_xa, scroll_ya, scroll_xb, scroll_yb;
     s32 i;
-    waterPatch->field20 = waterPatch->field20 + waterPatch->field28;
-    if (waterPatch->field20 > 1.0f)
-        waterPatch->field20 = waterPatch->field20 - 1.0f;
-    if (waterPatch->field20 < 0.0f)
-        waterPatch->field20 = waterPatch->field20 + 1.0f;
-    waterPatch->field24 = waterPatch->field24 + waterPatch->field2C;
-    if (waterPatch->field24 > 1.0f)
-        waterPatch->field24 = waterPatch->field24 - 1.0f;
-    if (waterPatch->field24 < 0.0f)
-        waterPatch->field24 = waterPatch->field24 + 1.0f;
-    waterPatch->field30 = func_30FE40(waterPatch->field30, waterPatch->field38);
-    waterPatch->field34 = func_30FE40(waterPatch->field34, waterPatch->field3C);
-    scrollXA = waterPatch->field20 + func_30F3A0(waterPatch->field30) * waterPatch->field40;
-    scrollYA = waterPatch->field24 + func_30F3B8(waterPatch->field30) * waterPatch->field40;
-    scrollXB = waterPatch->field20 + func_30F3A0(waterPatch->field34) * waterPatch->field40;
-    scrollYB = waterPatch->field24 + func_30F3B8(waterPatch->field34) * waterPatch->field40;
+    water_patch->field20 = water_patch->field20 + water_patch->field28;
+    if (water_patch->field20 > 1.0f)
+        water_patch->field20 = water_patch->field20 - 1.0f;
+    if (water_patch->field20 < 0.0f)
+        water_patch->field20 = water_patch->field20 + 1.0f;
+    water_patch->field24 = water_patch->field24 + water_patch->field2C;
+    if (water_patch->field24 > 1.0f)
+        water_patch->field24 = water_patch->field24 - 1.0f;
+    if (water_patch->field24 < 0.0f)
+        water_patch->field24 = water_patch->field24 + 1.0f;
+    water_patch->field30 = func_30FE40(water_patch->field30, water_patch->field38);
+    water_patch->field34 = func_30FE40(water_patch->field34, water_patch->field3C);
+    scroll_xa = water_patch->field20 + func_30F3A0(water_patch->field30) * water_patch->field40;
+    scroll_ya = water_patch->field24 + func_30F3B8(water_patch->field30) * water_patch->field40;
+    scroll_xb = water_patch->field20 + func_30F3A0(water_patch->field34) * water_patch->field40;
+    scroll_yb = water_patch->field24 + func_30F3B8(water_patch->field34) * water_patch->field40;
     for (i = 0; i < 0x5C; i += 2) {
         if (D_002A7D90[i >> 1] == 0) {
-            D_002A7A40[i] = D_002A7BC0[i] + scrollXA;
-            D_002A7A40[i + 1] = D_002A7BC0[i + 1] + scrollYA;
+            D_002A7A40[i] = D_002A7BC0[i] + scroll_xa;
+            D_002A7A40[i + 1] = D_002A7BC0[i + 1] + scroll_ya;
         } else {
-            D_002A7A40[i] = D_002A7BC0[i] + scrollXB;
-            D_002A7A40[i + 1] = D_002A7BC0[i + 1] + scrollYB;
+            D_002A7A40[i] = D_002A7BC0[i] + scroll_xb;
+            D_002A7A40[i + 1] = D_002A7BC0[i + 1] + scroll_yb;
         }
     }
 }
 
 extern void RippleDisturb(u32 a0, u32 a1, void *a2);
 /* Passes a water patch to the ripple function with no position. */
-void water_start_ripple_patch(u32 ripplePatch, u32 param) {
-    RippleDisturb(ripplePatch, param, 0);
+void water_start_ripple_patch(u32 ripple_patch, u32 param) {
+    RippleDisturb(ripple_patch, param, 0);
 }
 
 
@@ -1445,7 +1445,7 @@ void falling_l04_debris_update(char *obj) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L04_001BFAC0;
             model = reread->hit;
@@ -1567,14 +1567,14 @@ extern f32 math_random_float_range(f32 a0, f32 a1);
 
 
 /* Sets up one particle with a random direction, speed, size and lifetime. */
-void part_init_simple(void *particleEmitter, u32 a1) {
-    f32 *params = *(f32 **)((u8 *)particleEmitter + 0x68);
+void part_init_simple(void *particle_emitter, u32 a1) {
+    f32 *params = *(f32 **)((u8 *)particle_emitter + 0x68);
     L04SpawnRecord *rec;
-    f32 randX;
+    f32 rand_x;
 
-    randX = math_random_signed_float_range(0.0f, 1.0f);
+    rand_x = math_random_signed_float_range(0.0f, 1.0f);
     rec = &D_L04_0023BDD0[a1];
-    rec->x = randX;
+    rec->x = rand_x;
     rec->y = math_random_signed_float_range(0.0f, 1.0f);
     rec->z = math_random_signed_float_range(0.0f, 1.0f);
     {

@@ -75,7 +75,7 @@ int hud_draw_overlay(void)
     float oldProjection, span, rounding, unit, zero, height;
     int top, bottom;
     unsigned char *node;
-    int barRight, labelY, one, nodeOffset;
+    int bar_right, labelY, one, node_offset;
     if (!D_L01_001A908C || *(int *)D_L01_0027EAC8 || *(int *)(D_L01_0027EAC8 + 0x24) != -1)
         return D_L01_001A90D0[0];
     oldProjection = *(float *)(hud_camera() + 0xB0);
@@ -84,8 +84,8 @@ int hud_draw_overlay(void)
     UpdateViewContext();
     rounding = 0.5f;
     one = 1;
-    nodeOffset = 0x8710;
-    node = (unsigned char *)table_find_by_id(D_L01_001A908C + nodeOffset, 142);
+    node_offset = 0x8710;
+    node = (unsigned char *)table_find_by_id(D_L01_001A908C + node_offset, 142);
     labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
     height = 1.0f;
     unit = height;
@@ -93,22 +93,22 @@ int hud_draw_overlay(void)
     zero = height;
     height = (float)labelY;
     gfx_draw_scaled_object_two_axes(node, 0x60442D00, 250.0f, height, unit, unit, zero);
-    node = (unsigned char *)table_find_by_id(D_L01_001A908C + nodeOffset, 143);
+    node = (unsigned char *)table_find_by_id(D_L01_001A908C + node_offset, 143);
     labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
     height = (float)labelY;
     gfx_draw_scaled_object_two_axes(node, 0x60241700, 250.0f, height, unit, unit, zero);
-    node = (unsigned char *)table_find_by_id(D_L01_001A908C + nodeOffset, 144);
+    node = (unsigned char *)table_find_by_id(D_L01_001A908C + node_offset, 144);
     labelY = hud_coord(span, D_L01_001B2DC4[0], rounding, one);
     height = (float)labelY;
     gfx_draw_scaled_object_two_axes(node, 0x55F0C070, 250.0f, height, unit, unit, zero);
     source.first = (int)0x800050C0;
     source.second = FastTweenColor(0x800050C0, 0x80C04000, D_L01_001A90C4[0]);
     colors = source;
-    barRight = FloatToInt(190.0f + IntToFloat(198) * D_L01_001A90C4[0]);
+    bar_right = FloatToInt(190.0f + IntToFloat(198) * D_L01_001A90C4[0]);
     height = D_L01_001B2DC4[0];
     top = hud_round(374.0f, height, rounding, one);
     bottom = hud_round(388.0f, height, rounding, one);
-    gfx_draw_screen_rectangle(190, top, barRight, bottom, 0, &colors);
+    gfx_draw_screen_rectangle(190, top, bar_right, bottom, 0, &colors);
     if (D_L01_001A90CC[0]) {
         int icon = GetIconFrame(0xEAA7, D_L01_001A90CC[0] - 1);
         height = D_L01_001B2DC4[0];

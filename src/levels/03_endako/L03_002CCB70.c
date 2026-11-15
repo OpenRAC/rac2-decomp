@@ -184,7 +184,7 @@ void level_update_objects(void)
             *(u16 *)(object + 0x34) |= 0x800;
         if (*(s16 *)(object + 0xAA) == 0xD54 /* moby class 3412 */)
             UpdateEquipmentPieces(object);
-        if (object != 0 && *(s16 *)(object + 0xAA) == 0xFA0 /* TV Screens */) {
+        if (object != 0 && *(s16 *)(object + 0xAA) == MOBY_CLASS_TV_SCREENS) {
             u8 *vars = *(u8 **)(object + 0x68);
             if (vars != 0)
                 math_store_angle_update_result(object, vars + 0xC, 0x80AAAAD2, 0x80396464, 0.061086535f);
@@ -194,8 +194,8 @@ void level_update_objects(void)
         return;
     state = &D_L03_001BD680;
     if (state->mode < 3) {
-        u8 *mainObject = state->objects[1];
-        *(f32 *)(mainObject + 0x2C) = *(f32 *)(*(u8 **)(mainObject + 0x24) + 0x24) * D_L03_001A9420;
+        u8 *main_object = state->objects[1];
+        *(f32 *)(main_object + 0x2C) = *(f32 *)(*(u8 **)(main_object + 0x24) + 0x24) * D_L03_001A9420;
     }
     if (state->mode == 6)
         EmitScaledObjectParticles(state->objects[1]);
@@ -360,7 +360,7 @@ void flying_object_update_splash(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L03_001BFDC0;
                 model = reread->hit;
@@ -441,7 +441,7 @@ void flying_object_update_bounce(char *obj) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L03_001BFDC0;
             model = reread->hit;

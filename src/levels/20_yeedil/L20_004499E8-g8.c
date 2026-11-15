@@ -8,7 +8,7 @@ extern float D_L20_001B23E8 __attribute__((sda));
 extern void moby_set_state(char *, int, int);
 
 /* Starts the object moving along a path from a given start position. */
-void moby_start_path_movement(char *moby, char *path, char *startPos)
+void moby_start_path_movement(char *moby, char *path, char *start_pos)
 {
     char *state = *(char **)(moby + 0x68);
 
@@ -17,7 +17,7 @@ void moby_start_path_movement(char *moby, char *path, char *startPos)
     *(s32 *)(state + 0xAC) = 0;
     *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;
     *(s32 *)(moby + 0x98) = *(s32 *)(*(char **)(moby + 0x24) + 0x10);
-    qcopy((moby + 0x10), startPos);
+    qcopy((moby + 0x10), start_pos);
     *(f32 *)(moby + 0x18) = *(f32 *)(moby + 0x18) + 0.5f;
     qzero((state + 0x50));
     moby_set_state(moby, 2, -1);

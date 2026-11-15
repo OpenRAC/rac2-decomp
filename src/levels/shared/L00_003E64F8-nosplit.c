@@ -15,7 +15,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern float FastAddRotations(float a, float b);
 
 /* Takes a free blast record for the owner and fills it, then adds 48 pieces around it. */
-void blast_init_effect_record(char *owner, int kind, void *targetPos, void *startVec, float scale)
+void blast_init_effect_record(char *owner, int kind, void *target_pos, void *start_vec, float scale)
 {
     EffectRecord *base = D_L00_001B2B50;
     EffectRecord *rec;
@@ -31,10 +31,10 @@ void blast_init_effect_record(char *owner, int kind, void *targetPos, void *star
             rec->scale = scale;
             rec->owner = (int)owner;
             rec->busy = 0;
-            qcopy(rec, startVec);
-            qcopy(rec->target, targetPos);
+            qcopy(rec, start_vec);
+            qcopy(rec->target, target_pos);
             rec->target[2] = *(float *)((char *)owner + 0x18);
-            vec_scale_to_length((char *)&local, (char *)startVec, 2.0f);
+            vec_scale_to_length((char *)&local, (char *)start_vec, 2.0f);
             FastVecAdd((char *)&local, (char *)&local, (char *)rec->target);
             FastVecCross((char *)&rec->dir, (char *)rec->target, (char *)&local);
             v = math_random_angle();

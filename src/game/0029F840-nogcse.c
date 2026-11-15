@@ -31,25 +31,25 @@ extern void vec_fast_helper_e(void *, unsigned long long);
 extern void FastVecScale(void *, void *, float);
 /* Builds a joint's position matrix and optional point list from the moby's animation data. Returns how many points it wrote. */
 int moby_get_joint_matrix(char *obj, char *m, char *out, int index) {
-    char *classData = *(char **)(obj + 0x24);
-    int cnt = *(short *)(classData + 0x2E);
+    char *class_data = *(char **)(obj + 0x24);
+    int cnt = *(short *)(class_data + 0x2E);
     int tab;
     char *rec;
     int n;
     int i;
-    int recordOffset;
+    int record_offset;
     char *dst;
-    float unitScale;
+    float unit_scale;
     float scale;
 
     if (cnt == 0) {
         goto fail;
     }
-    tab = (int)classData + cnt * 16;
+    tab = (int)class_data + cnt * 16;
     index += tab;
-    recordOffset = ((unsigned char *)index)[1];
-    classData = m;
-    if (recordOffset == 0xFF) {
+    record_offset = ((unsigned char *)index)[1];
+    class_data = m;
+    if (record_offset == 0xFF) {
         do {
 fail:
             return 0;
@@ -58,12 +58,12 @@ fail:
     do {
         scale = *(float *)(obj + 0x2C);
     } while (0);
-    unitScale = 0.0009765625f;
+    unit_scale = 0.0009765625f;
     do {
-        recordOffset *= 16;
+        record_offset *= 16;
     } while (0);
-    rec = (char *)tab + recordOffset;
-    scale_vector(classData, rec, scale * unitScale);
+    rec = (char *)tab + record_offset;
+    scale_vector(class_data, rec, scale * unit_scale);
     rec += 0x10;
     matrix_mul_vec3(m, m, obj + 0xC0);
     FastVecAdd(m, m, obj + 0x10);
@@ -76,7 +76,7 @@ fail:
             i--;
             vec_fast_helper_e(dst, *(unsigned long long *)rec);
             rec += 8;
-            FastVecScale(dst, dst, *(float *)(obj + 0x2C) * unitScale);
+            FastVecScale(dst, dst, *(float *)(obj + 0x2C) * unit_scale);
             *(float *)(dst + 0xC) = 1.0f;
             dst += 0x10;
         }

@@ -100,8 +100,8 @@ void part_spawn_falling(char *object) {
    the resident mode word says 9, and rebuilds the effect. */
 void enemy_step_animation(char *object) {
     char *vars = *(char **)(object + 0x68);
-    short recordId;
-    int animResult;
+    short record_id;
+    int anim_result;
 
     if (*(unsigned char *)(object + 0x95) == 0)
         walker_init(object);
@@ -113,12 +113,12 @@ void enemy_step_animation(char *object) {
         }
     }
 
-    animResult = moby_apply_damage_to_object(object, vars + 0x180, 0);
-    if (animResult >= 4) {
+    anim_result = moby_apply_damage_to_object(object, vars + 0x180, 0);
+    if (anim_result >= 4) {
         if (g_current_map_index == 9) {
-            recordId = *(short *)(vars + 0x1F0);
-            if (recordId != -1) {
-                if (moby_is_hero_or_special(D_L09_001B285C + (recordId << 8)) == 0)
+            record_id = *(short *)(vars + 0x1F0);
+            if (record_id != -1) {
+                if (moby_is_hero_or_special(D_L09_001B285C + (record_id << 8)) == 0)
                     D_L09_001A9040 = 0;
                 *(short *)(vars + 0x1F0) = -1;
             }
@@ -139,25 +139,25 @@ extern unsigned short *D_L09_001FB560[];
 
 /* Counts the class-0xD0F entities of the object's group whose private state has bit 0 of its
    byte at +0x302 clear and the word a1 at +0x420; -1 when a1 is 0. */
-int trooper_legs_count_with_value(unsigned char *object, int wantedValue) {
-    unsigned short *idPtr;
+int trooper_legs_count_with_value(unsigned char *object, int wanted_value) {
+    unsigned short *id_ptr;
     unsigned char *entity;
     unsigned char *vars;
     int count = 0;
 
-    if (wantedValue == 0)
+    if (wanted_value == 0)
         return -1;
-    for (idPtr = D_L09_001FB560[object[0x21]];
-         object[0x21] != 0xFF && object[0x21] <= D_L09_001B2878 && idPtr != 0 &&
-         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == D_L09_001FB560[object[0x21]]);
-         idPtr++) {
-        entity = D_L09_001B285C_1[0] + ((*idPtr & 0x7FFF) << 8);
+    for (id_ptr = D_L09_001FB560[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= D_L09_001B2878 && id_ptr != 0 &&
+         ((id_ptr != 0 && (short)id_ptr[-1] >= 0) || id_ptr == D_L09_001FB560[object[0x21]]);
+         id_ptr++) {
+        entity = D_L09_001B285C_1[0] + ((*id_ptr & 0x7FFF) << 8);
         if (entity == 0)
             break;
         vars = *(unsigned char **)(entity + 0x68);
-        if (*(short *)(entity + 0xAA) == 0xD0F /* Megacorp Trooper Legs */) {
+        if (*(short *)(entity + 0xAA) == MOBY_CLASS_MEGACORP_TROOPER_LEGS) {
             if (vars != 0 && ((vars[0x302] ^ 1) & 1)) {
-                if (*(int *)(vars + 0x420) == wantedValue)
+                if (*(int *)(vars + 0x420) == wanted_value)
                     count++;
             }
         }
@@ -168,21 +168,21 @@ int trooper_legs_count_with_value(unsigned char *object, int wantedValue) {
 /* The largest word at +0x420 (0 at least) in the private states, whose byte at +0x302 is 0, of
    the class-0xD0F entities of the object's group. */
 int trooper_legs_find_largest_value(unsigned char *object) {
-    unsigned short *idPtr;
+    unsigned short *id_ptr;
     unsigned char *entity;
     unsigned char *vars;
     int largest = 0;
     int value;
 
-    for (idPtr = D_L09_001FB560[object[0x21]];
-         object[0x21] != 0xFF && object[0x21] <= D_L09_001B2878 && idPtr != 0 &&
-         ((idPtr != 0 && (short)idPtr[-1] >= 0) || idPtr == D_L09_001FB560[object[0x21]]);
-         idPtr++) {
-        entity = D_L09_001B285C_1[0] + ((*idPtr & 0x7FFF) << 8);
+    for (id_ptr = D_L09_001FB560[object[0x21]];
+         object[0x21] != 0xFF && object[0x21] <= D_L09_001B2878 && id_ptr != 0 &&
+         ((id_ptr != 0 && (short)id_ptr[-1] >= 0) || id_ptr == D_L09_001FB560[object[0x21]]);
+         id_ptr++) {
+        entity = D_L09_001B285C_1[0] + ((*id_ptr & 0x7FFF) << 8);
         if (entity == 0)
             break;
         vars = *(unsigned char **)(entity + 0x68);
-        if (*(short *)(entity + 0xAA) == 0xD0F /* Megacorp Trooper Legs */) {
+        if (*(short *)(entity + 0xAA) == MOBY_CLASS_MEGACORP_TROOPER_LEGS) {
             if (vars != 0 && vars[0x302] == 0) {
                 value = *(int *)(vars + 0x420);
                 if (value >= largest)

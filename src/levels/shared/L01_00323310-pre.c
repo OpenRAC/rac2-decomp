@@ -8,24 +8,24 @@ typedef unsigned char u8;
 extern u8 D_L01_001A63A8[];
 
 /* Queues a request key and value in a small table, unless the same key is already set and nothing is waiting. */
-void script_queue_keyed_request(int requestKey, int requestValue)
+void script_queue_keyed_request(int request_key, int request_value)
 {
-    u8 *requestTable = D_L01_001A63A8;
+    u8 *request_table = D_L01_001A63A8;
 
-    if (*(short *)(requestTable + 0x48) == requestKey && *(short *)(requestTable + 0x3C) == -1)
+    if (*(short *)(request_table + 0x48) == request_key && *(short *)(request_table + 0x3C) == -1)
         return;
-    if (requestKey != -1)
-        requestKey &= 0xFF;
-    if (requestValue != -1)
-        requestKey &= 0xFF;
-    if (*(short *)(requestTable + 0x4E) == 0 && *(short *)(requestTable + 0x96) == 0) {
-        *(short *)(requestTable + 0x48) = requestKey;
+    if (request_key != -1)
+        request_key &= 0xFF;
+    if (request_value != -1)
+        request_key &= 0xFF;
+    if (*(short *)(request_table + 0x4E) == 0 && *(short *)(request_table + 0x96) == 0) {
+        *(short *)(request_table + 0x48) = request_key;
         return;
     }
     {
-        u8 *tableAgain = D_L01_001A63A8;
+        u8 *table_again = D_L01_001A63A8;
 
-        *(short *)(tableAgain + 0x3C) = requestKey;
-        *(short *)(tableAgain + 0x3E) = requestValue;
+        *(short *)(table_again + 0x3C) = request_key;
+        *(short *)(table_again + 0x3E) = request_value;
     }
 }

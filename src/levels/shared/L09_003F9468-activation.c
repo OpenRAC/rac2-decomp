@@ -75,7 +75,7 @@ int enemy_process_activation(ActivationObject *obj)
             obj->flags |= 1;
             obj->update = 0;
             p = s->parent;
-            if (p && p->class_code == 0xD0E /* Megacorp Trooper Torso */ && p->status != 0xFE && p->status != 0xFD) {
+            if (p && p->class_code == MOBY_CLASS_MEGACORP_TROOPER_TORSO && p->status != 0xFE && p->status != 0xFD) {
                 p->flags |= 1;
                 s->parent->enabled = 0;
                 s->parent->update = 0;
@@ -103,7 +103,7 @@ int enemy_process_activation(ActivationObject *obj)
             obj->update = obj->type->update;
             obj->flags |= 0x1000;
             p = s->parent;
-            if (p && p->class_code == 0xD0E /* Megacorp Trooper Torso */ && p->status != 0xFE && p->status != 0xFD) {
+            if (p && p->class_code == MOBY_CLASS_MEGACORP_TROOPER_TORSO && p->status != 0xFE && p->status != 0xFD) {
                 p->flags &= ~1;
                 s->parent->enabled = 1;
                 s->parent->update = s->parent->type->update;

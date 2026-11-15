@@ -26,16 +26,16 @@ extern void hero_set_state_value_c(int);
 extern void ResetGornStageCounters(void *);
 extern void request_begin_slot(int,int,int,int,int);
 /* Ends a Gorn challenge stage: stops its sound, pays the reward, shows the reward panel and then picks the next menu entry. */
-void gorn_finish_challenge_stage(char *moby, int stageNum)
+void gorn_finish_challenge_stage(char *moby, int stage_num)
 {
     char *vars = *(char **)(moby + 0x68);
-    char *targetMoby = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
-    GornData *data = *(GornData **)(targetMoby + 0x68);
-    int soundId = data->id;
-    if (soundId != -1) {
-        char *entry = g_sound_state + soundId * 0x70;
-        if (*(char **)(entry + 0x88) == targetMoby && *(unsigned char *)(entry + 0x74))
-            snd_stop_voice(soundId);
+    char *target_moby = D_L15_001B261C + (*(int *)(vars + 0x20) << 8);
+    GornData *data = *(GornData **)(target_moby + 0x68);
+    int sound_id = data->id;
+    if (sound_id != -1) {
+        char *entry = g_sound_state + sound_id * 0x70;
+        if (*(char **)(entry + 0x88) == target_moby && *(unsigned char *)(entry + 0x74))
+            snd_stop_voice(sound_id);
     }
     data->id = -1;
     if (D_L15_001A8F00 == 2) {
@@ -45,17 +45,17 @@ void gorn_finish_challenge_stage(char *moby, int stageNum)
         return;
     }
     if (D_L15_001A904C && !D_L15_001B15CC) {
-        int timesDone, reward;
+        int times_done, reward;
         FadeToBlack(30);
         level_store_value_pair(0, gorn_reward_panel_draw);
-        timesDone = D_L15_001B1520[stageNum];
-        reward = D_L15_001B15D8[stageNum][timesDone < 3 ? timesDone : 2];
+        times_done = D_L15_001B1520[stage_num];
+        reward = D_L15_001B15D8[stage_num][times_done < 3 ? times_done : 2];
         D_L15_001B15CC = 1;
-        D_L15_001B36A4 = stageNum;
+        D_L15_001B36A4 = stage_num;
         D_L15_001B157C = 0;
         D_L15_001B1578 = 0;
         if (D_001A7A0A) reward *= 10;
-        D_L15_001B1520[stageNum] = timesDone + 1;
+        D_L15_001B1520[stage_num] = times_done + 1;
         g_player_bolts = g_player_bolts + reward;
         snd_clamp_copy_volumes();
         MemcardSave(0, -1);

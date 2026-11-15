@@ -208,7 +208,7 @@ void mothership_update(L23Moby *moby) {
     L23Boss *state = moby->vars;
     L23Moby *obj;
     L23Moby *scan;
-    int i, j, classId, crowdCount, partCount, mode;
+    int i, j, class_id, crowd_count, part_count, mode;
     float health;
 
     math_fast_float_d(&D_L23_001B3748);
@@ -272,26 +272,26 @@ void mothership_update(L23Moby *moby) {
         state->f57C = 0.098174773f;
         state->i578 = 0;
         D_L23_001B36AC = 0;
-        crowdCount = 0;
-        partCount = 0;
+        crowd_count = 0;
+        part_count = 0;
         if (D_L23_001B279C < D_L23_001B27A0) {
         for (; &D_L23_001B279C[i] < D_L23_001B27A0; i++) {
                 obj = &D_L23_001B279C[i];
-                classId = obj->kind;
-                if (classId == 0x7E5 /* moby class 2021 */) {
-                    D_L23_00259560[crowdCount++] = obj;
-                } else if (classId == 0x27D /* moby class 637 */) {
+                class_id = obj->kind;
+                if (class_id == 0x7E5 /* moby class 2021 */) {
+                    D_L23_00259560[crowd_count++] = obj;
+                } else if (class_id == 0x27D /* moby class 637 */) {
                     qcopy(&vecs[0], &obj->pos);
                     qcopy(g_hero_state + 0x80, &obj->pos);
-                } else if (classId == 0xF7E /* moby class 3966 */) {
-                    state->parts[partCount++] = obj;
-                } else if (classId == 0x120F /* moby class 4623 */) {
+                } else if (class_id == 0xF7E /* moby class 3966 */) {
+                    state->parts[part_count++] = obj;
+                } else if (class_id == 0x120F /* moby class 4623 */) {
                     state->m610 = obj;
-                } else if (classId == 0x123C /* moby class 4668 */) {
+                } else if (class_id == 0x123C /* moby class 4668 */) {
                     state->m614 = obj;
-                } else if (classId == 0xF7F /* Mothership Boss Part */) {
+                } else if (class_id == MOBY_CLASS_MOTHERSHIP_BOSS_PART) {
                     D_L23_001B14FC = obj;
-                } else if (classId == 0xF6E /* moby class 3950 */) {
+                } else if (class_id == 0xF6E /* moby class 3950 */) {
                     L23Tint *tint;
                     D_L23_001B13D0 = obj;
                     obj->alpha = 255;

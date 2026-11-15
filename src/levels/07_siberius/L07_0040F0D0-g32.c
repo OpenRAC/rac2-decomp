@@ -22,10 +22,10 @@ typedef struct {u8 pad[0x108];u8 *children[2];f32 angles[2];} State;
 void ship_update_attached_parts(u8 *moby)
 {
  f32 mat[16],oldpos[4],oldrot[4],delta[4],rot[4];
- u8 *vars=*(u8 **)(moby+0x68),*child,*partVars,*sound;
- s32 i,soundId,side;
+ u8 *vars=*(u8 **)(moby+0x68),*child,*part_vars,*sound;
+ s32 i,sound_id,side;
  u8 *attachment;
- u8 *newPartVars;
+ u8 *new_part_vars;
  State *parts=(State *)vars;
  func_2E4DD8(mat,moby+0xc0);
  qcopy(mat+12,moby+0x10);
@@ -37,9 +37,9 @@ void ship_update_attached_parts(u8 *moby)
    if(child) {
     func_31F9E0(child,moby);
     *(u16 *)(child+0x34)|=0x120;
-    newPartVars=*(u8 **)(child+0x68);
-    *(u8 **)(newPartVars+8)=newPartVars+0x20;
-    *(u32 *)(newPartVars+0x5c)|=2;
+    new_part_vars=*(u8 **)(child+0x68);
+    *(u8 **)(new_part_vars+8)=new_part_vars+0x20;
+    *(u32 *)(new_part_vars+0x5c)|=2;
     func_2E4B70(child+0xc0,child+0xf0);
    }
    parts->children[i]=child;
@@ -53,10 +53,10 @@ void ship_update_attached_parts(u8 *moby)
    func_2E4B70(child+0xc0,rot);
    func_2E4EB8(child+0xc0,mat,child+0xc0);
    func_308EE8(child);
-   partVars=*(u8 **)(child+0x68);
+   part_vars=*(u8 **)(child+0x68);
    func_2E4340(delta,child+0x10,oldpos);
    func_3152C0(child+0xc0,child+0xf0);
-   func_317618(partVars+0x20,delta,oldrot,child+0xf0);
+   func_317618(part_vars+0x20,delta,oldrot,child+0xf0);
   }
  }
  attachment=*(u8 **)(vars+0x16c0);
@@ -72,10 +72,10 @@ void ship_update_attached_parts(u8 *moby)
   if(*(f32 *)(vars+0x16c8)!=0.0f) {
    func_313DD8(vars+0x16c4,*(f32 *)(vars+0x16c8),1.0f/30.0f);
    if(*(f32 *)(vars+0x16c4)>=*(f32 *)(vars+0x16c8)) {
-    soundId=*(s32 *)(vars+0x16cc);
-    if(soundId!=-1) {
-     sound=g_sound_state+soundId*0x70;
-     if(*(u8 **)(sound+0x88)==moby && sound[0x74]) func_355188(soundId);
+    sound_id=*(s32 *)(vars+0x16cc);
+    if(sound_id!=-1) {
+     sound=g_sound_state+sound_id*0x70;
+     if(*(u8 **)(sound+0x88)==moby && sound[0x74]) func_355188(sound_id);
     }
     *(s32 *)(vars+0x16cc)=-1;
     attachment[0x31]=0;

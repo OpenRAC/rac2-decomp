@@ -8,9 +8,9 @@
 extern int FastDecTimer(short *p);
 
 /* Updates the object each frame: counts how long it has been alive and follows a base height. */
-void hover_update_follow_counters(char *mobyIn)
+void hover_update_follow_counters(char *moby_in)
 {
-    char *moby = mobyIn;
+    char *moby = moby_in;
     char *vars = *(char **)(moby + 0x68);
 
     if (*(u16 *)(moby + 0x96) < 0x7FFD)

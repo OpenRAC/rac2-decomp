@@ -74,16 +74,16 @@ typedef struct GroundView {
     float footHeight[2];
     float footYaw[2];
     float footPitch[2];
-    float groundHeight; /* 0x318 */
-    float groundDistance; /* 0x31C */
-    float slopeAngle; /* 0x320 */
+    float ground_height; /* 0x318 */
+    float ground_distance; /* 0x31C */
+    float slope_angle; /* 0x320 */
     float field_324;
     float field_328;
-    float slopeDirection; /* 0x32C */
+    float slope_direction; /* 0x32C */
     float field_330;
     float field_334;
     int field_338;
-    int groundObject; /* 0x33C */
+    int ground_object; /* 0x33C */
     int field_340;
     unsigned char pad344[6];
     short field_34a;
@@ -126,12 +126,12 @@ void hero_l07_update_ground_contact(void)
     ++g_hero_state.field_34c;
     g_hero_state.vector_2a0.field_2a0 = 0;
     g_hero_state.vector_2a0.field_2a4 = 0;
-    g_hero_state.slopeAngle = 0.0f;
-    g_hero_state.groundHeight = 0.0f;
+    g_hero_state.slope_angle = 0.0f;
+    g_hero_state.ground_height = 0.0f;
     vec_clear_128((GroundQuad *)(&g_hero_state.vector_2d0));
     g_hero_state.field_34a = 0;
-    g_hero_state.groundDistance = 32.0f;
-    g_hero_state.groundObject = 0;
+    g_hero_state.ground_distance = 32.0f;
+    g_hero_state.ground_object = 0;
     scale = 2.2f;
     if (g_hero_state.field_338)
         ++g_hero_state.field_338;
@@ -184,20 +184,20 @@ void hero_l07_update_ground_contact(void)
             }
             if (D_L07_001BF640.count > 0) {
                 qcopy(&g_hero_state.vector_2d0, D_L07_001BF640.position);
-                g_hero_state.groundHeight = D_L07_001BF640.position[2];
+                g_hero_state.ground_height = D_L07_001BF640.position[2];
                 if (D_L07_001A8FF0)
-                    g_hero_state.groundHeight = gravity_get_center_distance((char *)D_L07_001BF640.position);
-                g_hero_state.groundDistance = fast_vec_dist(&g_hero_state.vector_80, &g_hero_state.vector_2d0);
-                g_hero_state.groundObject = (int)D_L07_001BF640.object;
+                    g_hero_state.ground_height = gravity_get_center_distance((char *)D_L07_001BF640.position);
+                g_hero_state.ground_distance = fast_vec_dist(&g_hero_state.vector_80, &g_hero_state.vector_2d0);
+                g_hero_state.ground_object = (int)D_L07_001BF640.object;
                 func_001290E0(&g_hero_state.vector_2a0, D_L07_001BF640.normal);
-                g_hero_state.slopeAngle = cam_get_view_space_angle(D_L07_001BF640.normal);
-                g_hero_state.slopeDirection = mat_fast_helper_a(D_L07_001BF640.normal[0], D_L07_001BF640.normal[1]);
+                g_hero_state.slope_angle = cam_get_view_space_angle(D_L07_001BF640.normal);
+                g_hero_state.slope_direction = mat_fast_helper_a(D_L07_001BF640.normal[0], D_L07_001BF640.normal[1]);
                 FastVecSub(difference, &g_hero_state.vector_2d0, &g_hero_state.vector_80);
                 if (FastVecDot(difference, &g_hero_state.vector_2a0) > 0.0f)
-                    g_hero_state.groundDistance = -g_hero_state.groundDistance;
-                if (g_hero_state.groundDistance < 0.02f) {
+                    g_hero_state.ground_distance = -g_hero_state.ground_distance;
+                if (g_hero_state.ground_distance < 0.02f) {
                     g_hero_state.field_34c = 0;
-                    if (g_hero_state.slopeAngle <= 0.8726646900177002f || g_hero_state.field_22c3) {
+                    if (g_hero_state.slope_angle <= 0.8726646900177002f || g_hero_state.field_22c3) {
                         g_hero_state.field_34e = 0;
                         g_hero_state.field_c10 = (int)D_L07_001BF640.object;
                     }
@@ -252,7 +252,7 @@ contacts_done:
     g_hero_state.footYaw[1] = 0;
     g_hero_state.footHeight[0] = 0;
     g_hero_state.footHeight[1] = 0;
-    if (g_hero_state.groundDistance < 0.25f &&
+    if (g_hero_state.ground_distance < 0.25f &&
         (g_hero_state.field_229c == 0 || g_hero_state.field_229c == 12 || g_hero_state.field_229c == 9 || g_hero_state.field_229c == 7 ||
          (g_hero_state.field_229c == 4 && g_hero_state.field_49c) || g_hero_state.field_229c == 1)) {
         hero_compute_angles_to_local_dir(&g_hero_state.vector_2a0, difference);
@@ -271,7 +271,7 @@ contacts_done:
                     float firstHeight = gravity_get_center_distance((char *)D_L07_001BF640.position);
                     g_hero_state.footHeight[side] = firstHeight - gravity_get_center_distance((char *)&g_hero_state.vector_2d0);
                 } else {
-                    g_hero_state.footHeight[side] = D_L07_001BF640.position[2] - g_hero_state.groundHeight;
+                    g_hero_state.footHeight[side] = D_L07_001BF640.position[2] - g_hero_state.ground_height;
                 }
                 if (math_fabs(g_hero_state.footHeight[side]) > 0.4f)
                     g_hero_state.footHeight[side] = 0.0f;

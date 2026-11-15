@@ -28,7 +28,7 @@ void yeedil_destroy_group_protopets(u8 *self) {
         e = D_L20_001B2F9C[0] + ((*p & 0x7FFF) << 8);
         if (e == 0)
             break;
-        if (*(s16 *)(e + 0xAA) == 0xB69 /* Protopet */ && e[0x20] != 0xFE && e[0x20] != 0xFD) {
+        if (*(s16 *)(e + 0xAA) == MOBY_CLASS_PROTOPET && e[0x20] != 0xFE && e[0x20] != 0xFD) {
             SetDeathBits(e, 0, 1);
             protopet_end_action(e, 0);
         }

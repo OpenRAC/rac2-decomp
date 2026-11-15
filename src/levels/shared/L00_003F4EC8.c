@@ -22,7 +22,7 @@ void vaporizer_bolt_update(unsigned char *object) {
     MovingEffectVector previous, point;
     int i;
     float *position;
-    if (!save_is_record_value(0xC04 /* Vaporizer */, *(short *)(state + 0x1A))) {
+    if (!save_is_record_value(MOBY_CLASS_VAPORIZER, *(short *)(state + 0x1A))) {
         moby_mark_spawned(object);
         return;
     }

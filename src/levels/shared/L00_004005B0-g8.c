@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 /* func_L00_004005B0 is a unit of its own: it needs the opt-in quadword-copy profile and
@@ -24,7 +25,7 @@ extern int D_L00_001B2C28;
 /* Creates the Turret Spider Bot (moby class 3705) at the given position with the given starting speed, and returns it. */
 char *spider_bot_create(char *position, char *velocity)
 {
-    char *obj = CreateMoby(0xE79 /* Turret Spider Bot */);
+    char *obj = CreateMoby(MOBY_CLASS_TURRET_SPIDER_BOT);
     char *rec;
     TI128 tmp;
     int iv;

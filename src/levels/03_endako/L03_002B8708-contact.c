@@ -76,7 +76,7 @@ extern void cam_scale_view_space_height(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
 /* Lets the hero be pushed by a touched object. Returns 1 if the push was applied, 0 if ignored. */
-s32 hero_l03_apply_contact_push(s32 applyPush) {
+s32 hero_l03_apply_contact_push(s32 apply_push) {
     TI16 vec;
     Entry_002B8708 *entry;
     u8 *moby;
@@ -124,7 +124,7 @@ s32 hero_l03_apply_contact_push(s32 applyPush) {
         g_hero_state.f68E = 1;
         return 0;
     }
-    if (applyPush == 0) {
+    if (apply_push == 0) {
         return 1;
     }
     flag = 0;
@@ -148,10 +148,10 @@ s32 hero_l03_apply_contact_push(s32 applyPush) {
         }
         if ((g_hero_state.f2294 == 1 || g_hero_state.f2294 == 0x1D || g_hero_state.f1500 != 0)
             && !(entry->f24 & 8)) {
-            u8 *animRecord = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
+            u8 *anim_record = part_find_owned_effect_slot(g_hero_state.f2290, 1, 0);
 
-            if (animRecord != 0) {
-                AdjustPlayerHealth(FloatToInt(*(float *)(animRecord + 0x2C)));
+            if (anim_record != 0) {
+                AdjustPlayerHealth(FloatToInt(*(float *)(anim_record + 0x2C)));
             }
             if (g_hero_state.f24CC == 0) {
                 hero_l03_enter_state(0x16, 1);

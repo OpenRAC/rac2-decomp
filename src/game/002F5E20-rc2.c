@@ -46,7 +46,7 @@ extern void snd_wait_for_music_idle(void);
 extern void snd_clear_all_voices(void);
 
 /* Starts playing a movie: remembers where it is on the disc and fades out to begin it. */
-void mpeg_begin_movie_playback(s32 sector, s32 size, s32 fileEntry, s32 mode, s32 flag)
+void mpeg_begin_movie_playback(s32 sector, s32 size, s32 file_entry, s32 mode, s32 flag)
 {
     u8 *flags;
 
@@ -59,7 +59,7 @@ void mpeg_begin_movie_playback(s32 sector, s32 size, s32 fileEntry, s32 mode, s3
     D_001B2208 = sector;
     D_001B221C = (s32) D_001A63F0[0];
     D_001B220C = size;
-    D_001B2210 = fileEntry;
+    D_001B2210 = file_entry;
     D_001B2214 = mode;
     D_001B2218 = flag;
     FadeToBlack(4);

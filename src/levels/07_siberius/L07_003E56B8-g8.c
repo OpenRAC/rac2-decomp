@@ -30,7 +30,7 @@ void group_entity_base_update(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     char *slot;
-    float accelStep, speedLimit;
+    float accel_step, speed_limit;
 
     if (*(unsigned char *)(moby + 0x20) == 0) {
         *(unsigned char *)(vars + 0x48) = FloatToInt(15.0f);
@@ -38,10 +38,10 @@ void group_entity_base_update(char *moby)
         *(unsigned char *)(vars + 0x60) = 7;
         *(unsigned char *)(vars + 0x2E) = 1;
         *(unsigned char *)(vars + 0xC7) = 1;
-        accelStep = D_L07_001B0AA0;
-        speedLimit = D_L07_001B0AA4;
-        accelStep *= 0.00027777778f;
-        speedLimit *= 0.016666667f;
+        accel_step = D_L07_001B0AA0;
+        speed_limit = D_L07_001B0AA4;
+        accel_step *= 0.00027777778f;
+        speed_limit *= 0.016666667f;
         *(int *)(vars + 0x98) = 3;
         *(float *)(vars + 0x80) = 0.5f;
         *(int *)(vars + 0x84) = 0;
@@ -50,9 +50,9 @@ void group_entity_base_update(char *moby)
         *(float *)(vars + 0xAC) = 1.0f;
         *(float *)(vars + 0x120) = 0.45f;
         *(int *)(vars + 0x124) = 0;
-        *(float *)(vars + 0x140) = accelStep;
-        *(float *)(vars + 0x144) = accelStep;
-        *(float *)(vars + 0x148) = speedLimit;
+        *(float *)(vars + 0x140) = accel_step;
+        *(float *)(vars + 0x144) = accel_step;
+        *(float *)(vars + 0x148) = speed_limit;
         *(int *)(vars + 0x158) |= 0x15;
         *(int *)(vars + 0x30) = 0;
         qcopy(vars + 0x220, moby + 0x10);

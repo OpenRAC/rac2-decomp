@@ -30,7 +30,7 @@ void weapon_update_target_lock(unsigned char *object)
         FastVecAdd(&projection,&((PartialRoot *)g_hero_state)->position,&projection);
         vec_build_spherical_offset(facing.v,1.0f,((PartialRoot *)g_hero_state)->yaw,((PartialRoot *)g_hero_state)->pitch);
         aperture=0.17453295f;
-        if(g_current_map_index==1 && *(unsigned char **)((char *)(context) + 0x14) && (unsigned)(*(unsigned short *)((char *)(*(unsigned char **)((char *)(context) + 0x14)) + 0xAA)-0xA8D /* Swamp Monster I Arm */)<2)
+        if(g_current_map_index==1 && *(unsigned char **)((char *)(context) + 0x14) && (unsigned)(*(unsigned short *)((char *)(*(unsigned char **)((char *)(context) + 0x14)) + 0xAA)-MOBY_CLASS_SWAMP_MONSTER_I_ARM)<2)
             aperture=0.30543268f;
         target=moby_get_or_find_target(&projection,&facing,0,aperture,0.3490659f,30.0f,0.78539824f,0.6108653f);
         if(target) {

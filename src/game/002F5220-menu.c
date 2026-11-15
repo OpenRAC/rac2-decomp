@@ -72,7 +72,7 @@ static __inline__ int menu6608HasType(int id)
 /* Builds the vendor's weapon and upgrade list: which weapons can be bought, upgraded or refilled with ammo. Removes duplicate entries at the end. */
 void shop_build_vendor_weapon_list(int hideUnowned)
 {
-    int listLen, id;
+    int list_len, id;
 
     if (flag_is_byte_set()) {
         int i;
@@ -81,13 +81,13 @@ void shop_build_vendor_weapon_list(int hideUnowned)
                 help_store_id_in_slot_list(i);
         }
     }
-    for (listLen = 0; listLen < 32; listLen++) {
-        if (D_001A7B68[listLen] == 255) break;
+    for (list_len = 0; list_len < 32; list_len++) {
+        if (D_001A7B68[list_len] == 255) break;
     }
     MENU_STATE->count = 0;
     if (!MENU_STATE->locked) {
         int i;
-        for (i = 0; i < listLen; i++) {
+        for (i = 0; i < list_len; i++) {
             if (D_001A7B68[i] == 255) continue;
             id = D_001A7B68[i] & 63;
             if (g_item_owned_flags[id] && menu6608CanUpgrade(id) && !menu6608HasType(id) && MENU_ITEMS[g_item_slot_to_record[id]].cost <= 0 && flag_is_byte_set()) {

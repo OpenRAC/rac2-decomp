@@ -11,7 +11,7 @@ extern void gfx_init_quad_packet_table(void *);
    then three 64-bit fields. */
 typedef struct {
     struct {
-        int textureId;
+        int texture_id;
         float x;
         float y;
         float z;
@@ -34,17 +34,17 @@ typedef struct {
 
 /* The caller supplies an unused scale in F12; the body replaces it before use. */
 /* Draws two fading, randomly tinted strips of ground effect around a hit point. */
-void part_draw_ground_strip(char *moby, char *hitPoint, float unused_scale, int baseColor, int fadeA, int fadeB) {
+void part_draw_ground_strip(char *moby, char *hit_point, float unused_scale, int base_color, int fade_a, int fade_b) {
     L16_004182A8_frame fr;
     char *vars;
-    long long textureId;
+    long long texture_id;
     long long sv;
     long long tw;
     long long tv;
 
     vars = *(char **)(moby + 0x68);
 
-    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 5.0f)) << 24);
+    fade_a = fade_a - ((int)FloatToInt(math_random_signed_float_range(0.0f, 5.0f)) << 24);
     gfx_init_quad_packet_table(&fr.rec);
 
     fr.rec.f[0] = *(float *)(vars + 0x10);
@@ -56,19 +56,19 @@ void part_draw_ground_strip(char *moby, char *hitPoint, float unused_scale, int 
     fr.rec.f[6] = *(float *)(vars + 0x10) + 1.0f;
     fr.rec.f[7] = 1.0f;
 
-    textureId = GetEffectTextureDescriptor(D_L16_001B1C38);
-    fr.rec.r = textureId;
+    texture_id = GetEffectTextureDescriptor(D_L16_001B1C38);
+    fr.rec.r = texture_id;
     fr.rec.s = 280993940374112LL;
     fr.t = 0x8000000048LL;
-    fr.rec.p[0] = baseColor + fadeA;
+    fr.rec.p[0] = base_color + fade_a;
     fr.rec.q = 0LL;
 
-    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[1] = baseColor + fadeA;
-    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[2] = baseColor + fadeA;
-    fadeA = fadeA - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[3] = baseColor + fadeA;
+    fade_a = fade_a - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[1] = base_color + fade_a;
+    fade_a = fade_a - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[2] = base_color + fade_a;
+    fade_a = fade_a - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[3] = base_color + fade_a;
 
     fr.dir[2] = *(float *)(moby + 0xF8);
     fr.dir[1] = *(float *)(moby + 0xF4);
@@ -76,9 +76,9 @@ void part_draw_ground_strip(char *moby, char *hitPoint, float unused_scale, int 
     fr.dir[3] = 0.0f;
     euler_to_matrix(fr.mat, fr.dir);
 
-    fr.vec[0] = *(float *)hitPoint;
-    fr.vec[1] = *(float *)(hitPoint + 4);
-    fr.vec[2] = *(float *)(hitPoint + 8);
+    fr.vec[0] = *(float *)hit_point;
+    fr.vec[1] = *(float *)(hit_point + 4);
+    fr.vec[2] = *(float *)(hit_point + 8);
     fr.vec[3] = 1.0f;
     FastVecScale(&fr.rec.v[0], &fr.rec.v[0], 1.0f);
     FastVecScale(&fr.rec.v[1], &fr.rec.v[1], 1.0f);
@@ -92,14 +92,14 @@ void part_draw_ground_strip(char *moby, char *hitPoint, float unused_scale, int 
     fr.rec.f[2] = *(float *)(vars + 0x18);
     fr.rec.f[3] = 1.0f;
     fr.t = tv;
-    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[0] = baseColor + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[1] = baseColor + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[2] = baseColor + fadeB;
-    fadeB = fadeB - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
-    fr.rec.p[3] = baseColor + fadeB;
+    fade_b = fade_b - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[0] = base_color + fade_b;
+    fade_b = fade_b - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[1] = base_color + fade_b;
+    fade_b = fade_b - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[2] = base_color + fade_b;
+    fade_b = fade_b - ((int)FloatToInt(math_random_signed_float_range(0.0f, 9.0f)) << 24);
+    fr.rec.p[3] = base_color + fade_b;
     fr.rec.f[4] = *(float *)(vars + 0x18) + 1.0f;
     fr.rec.f[5] = 0.0f;
     fr.rec.f[6] = *(float *)(vars + 0x18) + 1.0f;

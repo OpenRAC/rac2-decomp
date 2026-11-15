@@ -20,7 +20,7 @@ extern int sceGsSetDefDrawEnv(void *, short, short, short, short, short);
 
 /* Builds the drawing packet for a picture used as a screen-sized sprite. It records the picture size and where it lives in video memory. */
 void gfx_build_screen_sprite_packet(s32 tw, s32 th, s32 tbp, s32 mode) {
-    DrawState *drawState = g_screen_adjust_offsets;
+    DrawState *draw_state = g_screen_adjust_offsets;
     s32 tbw;
     long tex;
     u8 *bytes;
@@ -30,9 +30,9 @@ void gfx_build_screen_sprite_packet(s32 tw, s32 th, s32 tbp, s32 mode) {
 
     tbw = tw - 6;
     if (tbw <= 0) tbw = 1;
-    drawState->h166 = tbp >> 13;
-    drawState->h160 = 1 << tw;
-    drawState->h162 = 1 << th;
+    draw_state->h166 = tbp >> 13;
+    draw_state->h160 = 1 << tw;
+    draw_state->h162 = 1 << th;
     tex = (tbp >> 8) | ((long)(1 << tbw) << 14);
     tex |= (long)tw << 26;
     tex |= (long)th << 30;
@@ -54,14 +54,14 @@ void gfx_build_screen_sprite_packet(s32 tw, s32 th, s32 tbp, s32 mode) {
     bytes = (u8 *)g_dma_packet_cursor[0];
     packet = (long *)(bytes + 0x10);
     g_dma_packet_cursor[0] = (s32)packet;
-    sceGsSetDefDrawEnv(packet, drawState->h164, drawState->h160, drawState->h162, 3, 0);
-    ((TexBits *)(bytes + 0x10))->lo = drawState->h166;
+    sceGsSetDefDrawEnv(packet, draw_state->h164, draw_state->h160, draw_state->h162, 3, 0);
+    ((TexBits *)(bytes + 0x10))->lo = draw_state->h166;
     if (mode == 0) {
-        packet[2] = drawState->h16E | ((long)(drawState->h16C & 0xF) << 24);
+        packet[2] = draw_state->h16E | ((long)(draw_state->h16C & 0xF) << 24);
     } else {
         s32 n = tw + th;
         if (n > 16) n = 16;
-        packet[2] = ((tbp - (4 << n)) >> 13) | ((long)(drawState->h16C & 0xF) << 24);
+        packet[2] = ((tbp - (4 << n)) >> 13) | ((long)(draw_state->h16C & 0xF) << 24);
     }
     {
         long *t = (long *)(g_dma_packet_cursor[0] + 0x80);

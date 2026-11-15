@@ -262,7 +262,7 @@ void UpdateTargetSeekingProjectile(Moby_003C9978 *self)
         else
             hit = CollLine(&saved, &self->pos, 0x10, self, 0) != 0;
         if (hit) {
-            if (D_L00_001BF218 != 0 && (D_L00_001BF218->oclass == 0x1366 /* Miniturret */ || D_L00_001BF218->oclass == 0x1367 /* Megaturret */))
+            if (D_L00_001BF218 != 0 && (D_L00_001BF218->oclass == MOBY_CLASS_MINITURRET || D_L00_001BF218->oclass == MOBY_CLASS_MEGATURRET))
                 hit = 0;
             if (hit) {
                 int n = coll_process_hit(1.0f, &self->pos, 0, self, 0);

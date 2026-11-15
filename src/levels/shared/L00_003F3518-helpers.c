@@ -38,47 +38,47 @@ void gfx_draw_lit_group_points(char *obj)
     char buf0[0x460] __attribute__((aligned(16)));
     char buf1[0x120] __attribute__((aligned(16)));
     char pos[16] __attribute__((aligned(16)));
-    char groupPoint[16] __attribute__((aligned(16)));
+    char group_point[16] __attribute__((aligned(16)));
     char offset[16] __attribute__((aligned(16)));
     char scratch[16] __attribute__((aligned(16)));
     char facing[16] __attribute__((aligned(16)));
-    char facingBase[16] __attribute__((aligned(16)));
+    char facing_base[16] __attribute__((aligned(16)));
     int idx;
     int count;
     int color;
-    unsigned short *indexList;
+    unsigned short *index_list;
     unsigned char *entry;
     float dot;
 
     idx = *(int *)vars;
     count = 0;
-    indexList = D_L00_001A9014[idx];
-    for (; indexList != 0 && ((short)indexList[-1] >= 0 || indexList == D_L00_001A9014[*(int *)vars]) &&
-           (entry = D_L00_001B251C + ((*indexList & 0x7FFF) << 6)) != 0;
-         indexList++) {
-        qcopy(pos, D_L00_001B2514 + ((*indexList & 0x7FFF) << 5));
+    index_list = D_L00_001A9014[idx];
+    for (; index_list != 0 && ((short)index_list[-1] >= 0 || index_list == D_L00_001A9014[*(int *)vars]) &&
+           (entry = D_L00_001B251C + ((*index_list & 0x7FFF) << 6)) != 0;
+         index_list++) {
+        qcopy(pos, D_L00_001B2514 + ((*index_list & 0x7FFF) << 5));
         *(float *)(pos + 12) += *(float *)(vars + 0x4C);
         if (math_fast_helper_a(pos, *(float *)(vars + 0x60)) < 0)
             continue;
-        qcopy(groupPoint, entry + 0x30);
+        qcopy(group_point, entry + 0x30);
         *(TI128 *)scratch = 0;
         *(float *)(scratch + 0) = *(float *)(vars + 0x50);
         *(float *)(scratch + 4) = *(float *)(vars + 0x54);
         *(float *)(scratch + 8) = *(float *)(vars + 0x58);
         *(TI128 *)offset = *(TI128 *)scratch;
         matrix_mul_vec3(offset, offset, (char *)entry);
-        FastVecAdd(groupPoint, groupPoint, offset);
+        FastVecAdd(group_point, group_point, offset);
         if (*(int *)(vars + 0x6C) != 0) {
-            gfx_append_point_and_color(groupPoint, (int *)(vars + 0x30), buf0, (int *)buf1, &count);
+            gfx_append_point_and_color(group_point, (int *)(vars + 0x30), buf0, (int *)buf1, &count);
             continue;
         }
-        FastVecSub(scratch, (char *)&D_L00_001B8C80.x_140, groupPoint);
+        FastVecSub(scratch, (char *)&D_L00_001B8C80.x_140, group_point);
         vec_scale_to_length(scratch, scratch, 1.0f);
-        *(TI128 *)facingBase = 0;
-        *(float *)(facingBase + 0) = *(float *)(vars + 0x40);
-        *(float *)(facingBase + 4) = *(float *)(vars + 0x44);
-        *(float *)(facingBase + 8) = *(float *)(vars + 0x48);
-        *(TI128 *)facing = *(TI128 *)facingBase;
+        *(TI128 *)facing_base = 0;
+        *(float *)(facing_base + 0) = *(float *)(vars + 0x40);
+        *(float *)(facing_base + 4) = *(float *)(vars + 0x44);
+        *(float *)(facing_base + 8) = *(float *)(vars + 0x48);
+        *(TI128 *)facing = *(TI128 *)facing_base;
         matrix_mul_vec3(facing, facing, (char *)entry);
         vec_scale_to_length(facing, facing, 1.0f);
         dot = FastVecDot(scratch, facing);
@@ -87,7 +87,7 @@ void gfx_draw_lit_group_points(char *obj)
             if (*(int *)(vars + 0x38) != 0)
                 dot = dot * dot;
             color = math_lerp_int_fraction(*(int *)(vars + 0x34), *(int *)(vars + 0x30), dot);
-            gfx_append_point_and_color(groupPoint, &color, buf0, (int *)buf1, &count);
+            gfx_append_point_and_color(group_point, &color, buf0, (int *)buf1, &count);
         }
     }
     DrawOffsetBillboardBatch(count, buf0, buf1, *(float *)(vars + 0x4C), *(float *)(vars + 0x5C));

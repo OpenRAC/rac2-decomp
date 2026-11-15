@@ -29,16 +29,16 @@ void part_draw_glow_sprite_flares(void *position, u32 color, float size, int alp
     char *vars = *(char **)(object + 0x68);
     float *point = position;
     
-    u32 packedColor;
+    u32 packed_color;
     ref_L11_004507B0_00((char *)&quad);
     quad.texture = GetEffectTextureDescriptor(texture);
     quad.giftag = 0xFF9000000260ULL;
     quad.flags = ((u64)flags << 2) | 0x8000000040ULL;
-    packedColor = color + (alpha << 24);
-    quad.color[3] = packedColor;
-    quad.color[2] = packedColor;
-    quad.color[1] = packedColor;
-    quad.color[0] = packedColor;
+    packed_color = color + (alpha << 24);
+    quad.color[3] = packed_color;
+    quad.color[2] = packed_color;
+    quad.color[1] = packed_color;
+    quad.color[0] = packed_color;
     quad.clear = 0;
     
     rotation[3] = 0.0f;

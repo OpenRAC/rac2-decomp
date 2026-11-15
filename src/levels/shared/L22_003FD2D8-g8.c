@@ -41,10 +41,10 @@ void spinning_effect_update_alt(char *o) {
     if (flag_set_first_pending(o) && *(u8 *)(o + 0x20) == 16)
         snd_start_in_slot(18, 0, 0);
     if (*(u8 *)(o + 0x31)) {
-        float playerDistance = fast_vec_dist(g_hero_state + 0x80, o + 0x10);
+        float player_distance = fast_vec_dist(g_hero_state + 0x80, o + 0x10);
         float threshold = D_L22_001AF380;
-        *(float *)(ctl + 0x44) = playerDistance;
-        if (playerDistance >= threshold)
+        *(float *)(ctl + 0x44) = player_distance;
+        if (player_distance >= threshold)
             *(u8 *)(o + 0x23) = 127;
     }
     else *(float *)(ctl + 0x44) = 2000.0f;

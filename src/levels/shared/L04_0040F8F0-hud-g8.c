@@ -178,7 +178,7 @@ tick:
             time = g_race_time_ticks;
             playerSeen = 1;
             racer = *(u8 **)(state + 0x3A0);
-        } else if (*(s16 *)(racer + 0xAA) == 0xB2D /* Enemy Hoverbike */) {
+        } else if (*(s16 *)(racer + 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE) {
             u8 *rs = *(u8 **)(racer + 0x68);
             rank = *(u8 *)(rs + 0xA2);
             time = *(s32 *)(rs + 0x1A0);

@@ -93,11 +93,11 @@ void security_robot_play_idle(char *object)
 s32 security_robot_is_holding_item_attacking(char *object)
 {
     s32 result = 0;
-    u8 stateByte;
+    u8 state_byte;
 
     if (*(s32 *)(*(char **)(object + 0x68) + 0x354) != 0) {
-        stateByte = *(u8 *)(object + 0x20);
-        if (stateByte == 0xF || stateByte == 4 || *(u8 *)(object + 0x95) == 4 || stateByte == 0xE)
+        state_byte = *(u8 *)(object + 0x20);
+        if (state_byte == 0xF || state_byte == 4 || *(u8 *)(object + 0x95) == 4 || state_byte == 0xE)
             result = 1;
     }
     return result;
@@ -131,13 +131,13 @@ extern s32 weapon_select_aim_target(u8 *, s32, f32, f32, s32, s32);
 void security_robot_update_pairing(u8 *self)
 {
     u8 *state = *(u8 **)(self + 0x68);
-    u16 *idPtr;
+    u16 *id_ptr;
     u8 *entry;
     u8 *best;
     u8 *partner;
-    u8 *partnerState;
-    u8 *bestState;
-    f32 bestDistance;
+    u8 *partner_state;
+    u8 *best_state;
+    f32 best_distance;
     u16 group;
 
     if (self[0x20] < 4) {
@@ -157,15 +157,15 @@ void security_robot_update_pairing(u8 *self)
         }
         if (*(s16 *)(state + 0x366) == 2 && *(u8 **)(state + 0x350) != 0) {
             partner = *(u8 **)(state + 0x350);
-            partnerState = *(u8 **)(partner + 0x68);
+            partner_state = *(u8 **)(partner + 0x68);
             if (partner[0x20] != 0xFE) {
                 if (partner[0x20] != 0xFD) {
                     if (partner[0x95] != 0) {
                         if (partner[0x95] != 1) {
-                            if (*(s16 *)(partnerState + 0x366) == *(s16 *)(state + 0x366)) {
-                                if (*(u8 **)(partnerState + 0x350) == self) {
+                            if (*(s16 *)(partner_state + 0x366) == *(s16 *)(state + 0x366)) {
+                                if (*(u8 **)(partner_state + 0x350) == self) {
                                     *(s16 *)(state + 0x36A) = 2;
-                                    *(s16 *)(partnerState + 0x36A) = 2;
+                                    *(s16 *)(partner_state + 0x36A) = 2;
                                     return;
                                 }
                             }
@@ -178,21 +178,21 @@ void security_robot_update_pairing(u8 *self)
             return;
         }
         best = 0;
-        bestDistance = 1000.0f;
-        for (idPtr = g_group_id_lists[self[0x21]];
-             (group = self[0x21]) != 0xFF && group <= D_L11_001B35B8[0] && idPtr != 0 &&
-             ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == g_group_id_lists[group]);
-             idPtr++) {
-            entry = g_moby_l11_table + ((*idPtr & 0x7FFF) << 8);
+        best_distance = 1000.0f;
+        for (id_ptr = g_group_id_lists[self[0x21]];
+             (group = self[0x21]) != 0xFF && group <= D_L11_001B35B8[0] && id_ptr != 0 &&
+             ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == g_group_id_lists[group]);
+             id_ptr++) {
+            entry = g_moby_l11_table + ((*id_ptr & 0x7FFF) << 8);
             if (entry == 0)
                 break;
             if (entry[0x20] != 0xFE) {
                 if (entry[0x20] != 0xFD) {
                     if (entry != self && entry[0x20] >= 3 && *(s16 *)(entry + 0xAA) == 0xD98 /* moby class 3480 */ &&
                         *(s16 *)(*(u8 **)(entry + 0x68) + 0x366) == 0) {
-                        if (vec_distance_xy(self + 0x10, entry + 0x10) < bestDistance) {
+                        if (vec_distance_xy(self + 0x10, entry + 0x10) < best_distance) {
                             best = entry;
-                            bestDistance = vec_distance_xy(self + 0x10, entry + 0x10);
+                            best_distance = vec_distance_xy(self + 0x10, entry + 0x10);
                         }
                     }
                 }
@@ -202,10 +202,10 @@ void security_robot_update_pairing(u8 *self)
             *(u8 **)(state + 0x350) = best;
             *(s16 *)(state + 0x366) = 2;
             *(s16 *)(state + 0x36A) = 2;
-            bestState = *(u8 **)(best + 0x68);
-            *(u8 **)(bestState + 0x350) = self;
-            *(s16 *)(bestState + 0x366) = 2;
-            *(s16 *)(bestState + 0x36A) = 2;
+            best_state = *(u8 **)(best + 0x68);
+            *(u8 **)(best_state + 0x350) = self;
+            *(s16 *)(best_state + 0x366) = 2;
+            *(s16 *)(best_state + 0x36A) = 2;
             return;
         }
     }
@@ -324,15 +324,15 @@ void security_robot_init(char *object, int mode, int active) {
 }
 
 /* Puts the security robot to rest: hides it, lets go of its partner and held item, and resets its effects. */
-void security_robot_deactivate(char *objectArg)
+void security_robot_deactivate(char *object_arg)
 {
-    char *object = objectArg;
+    char *object = object_arg;
     char *state;
-    TI128 itemPos;
+    TI128 item_pos;
 
-    func_32C9E0(objectArg, 1, 0);
-    func_32C700(objectArg, 0, 0, 3);
-    func_324560(objectArg);
+    func_32C9E0(object_arg, 1, 0);
+    func_32C700(object_arg, 0, 0, 3);
+    func_324560(object_arg);
     *(u16 *)(object + 0x34) = (*(u16 *)(object + 0x34) & 0xEFFF) | 0x47;
     *(u8 *)(object + 0x31) = 0;
     *(s32 *)(object + 0x98) = 0;
@@ -342,8 +342,8 @@ void security_robot_deactivate(char *objectArg)
     *(s16 *)(state + 0x366) = 0;
     *(s32 *)(state + 0x350) = 0;
     if (*(s32 *)(state + 0x354) != 0) {
-        itemPos = *(TI128 *)((char *)(long)*(s32 *)(state + 0x354) + 0x10);
-        security_robot_destroy_held_item(object, &itemPos);
+        item_pos = *(TI128 *)((char *)(long)*(s32 *)(state + 0x354) + 0x10);
+        security_robot_destroy_held_item(object, &item_pos);
     }
     if (*(u8 *)(state + 0x2B1) != 0) {
         f32 unit = 1.0f;
@@ -367,11 +367,11 @@ extern void part_queue_moby_for_glow(char *a0, int a1, char *a2);
 /* The moby's death path: clears the spawn flags, hands the last position to the scene
    manager, resets the 0x2B0 rig and leaves the object in its dead state. */
 /* Kills the security robot, then either resets it right away or schedules the reset. */
-void security_robot_kill(char *object, int skipFade, int resetNow)
+void security_robot_kill(char *object, int skip_fade, int reset_now)
 {
     char *state = *(char **)(object + 0x68);
     char *rig;
-    TI128 burstDir;
+    TI128 burst_dir;
     float tiny;
 
     *(s32 *)(state + 0x20) = 0;
@@ -380,8 +380,8 @@ void security_robot_kill(char *object, int skipFade, int resetNow)
     *(s16 *)(state + 0x366) = 0;
     *(s32 *)(state + 0x350) = 0;
     if (*(s32 *)(state + 0x354) != 0) {
-        burstDir = *(TI128 *)((char *)(long)*(s32 *)(state + 0x354) + 0x10);
-        security_robot_destroy_held_item(object, &burstDir);
+        burst_dir = *(TI128 *)((char *)(long)*(s32 *)(state + 0x354) + 0x10);
+        security_robot_destroy_held_item(object, &burst_dir);
     }
     if (*(u8 *)(state + 0x2B1) == 0) {
         rig = state + 0x2B0;
@@ -392,13 +392,13 @@ void security_robot_kill(char *object, int skipFade, int resetNow)
         *(f32 *)(state + 0x2D8) = tiny;
         *(f32 *)(state + 0x2D4) = tiny;
         *(f32 *)(state + 0x2D0) = tiny;
-        vec_random_direction((char *)&burstDir, 1.0f / 60.0f, 0.0500000045f);
-        part_spawn_masked_debris(object, 0x20, (char *)&burstDir, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
+        vec_random_direction((char *)&burst_dir, 1.0f / 60.0f, 0.0500000045f);
+        part_spawn_masked_debris(object, 0x20, (char *)&burst_dir, 3.0f, 6.0f, 3.0f, 6.0f, 0xFF);
     }
     *(s32 *)(object + 0x98) = 0;
-    if (skipFade == 0)
+    if (skip_fade == 0)
         moby_set_anim_type_three(object, 0, -1);
-    if (resetNow == 0)
+    if (reset_now == 0)
         part_queue_moby_for_glow(object, 0, (char *)security_robot_deactivate);
     else
         security_robot_deactivate(object);
@@ -570,7 +570,7 @@ void smasher_robot_start_turn_around(char *object)
 /* func_L11_0044C850 is defined in L11_004465F8-aim-0044C850-g8.c. */
 
 /* Spawns a small flying bit from the robot with the given speed, spin and position. */
-char *robot_spawn_debris(char *owner, TI128 *velocity, TI128 *position, float lifeScale)
+char *robot_spawn_debris(char *owner, TI128 *velocity, TI128 *position, float life_scale)
 {
     char *projectile = CreateMoby(0xDD9 /* moby class 3545 */);
 
@@ -586,7 +586,7 @@ char *robot_spawn_debris(char *owner, TI128 *velocity, TI128 *position, float li
         qcopy(projectile + 0x10, position);
         vars = *(char **)(projectile + 0x68);
         qcopy(vars, velocity);
-        *(float *)(vars + 0x14) = lifeScale;
+        *(float *)(vars + 0x14) = life_scale;
         *(char **)(vars + 0x10) = owner;
         *(float *)(vars + 0x18) = math_random_angle();
         *(float *)(vars + 0x1C) = math_random_float_range(0.20943954586982727f, 0.6283186078071594f);

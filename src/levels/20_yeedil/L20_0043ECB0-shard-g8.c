@@ -83,7 +83,7 @@ void orbiting_shard_update(unsigned char *moby)
         {
             float rate;
 
-            { float zRate = D_L20_001B1FB0 * 0.016666668f; math_step_value_toward_target((float *)(moby + 0x18), &shard->zSpeed, shard->baseZ + 1.0f, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FAC * 0.00027777778f, zRate); }
+            { float z_rate = D_L20_001B1FB0 * 0.016666668f; math_step_value_toward_target((float *)(moby + 0x18), &shard->zSpeed, shard->baseZ + 1.0f, D_L20_001B1FAC * 0.00027777778f, D_L20_001B1FAC * 0.00027777778f, z_rate); }
             rate = D_L20_001B1FB8 * 0.016666668f;
             FastVecSub(target, g_hero_state.top, moby + 0x10);
             target[2] = 0.0f;

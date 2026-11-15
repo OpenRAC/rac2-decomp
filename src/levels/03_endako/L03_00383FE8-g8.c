@@ -32,7 +32,7 @@ void hit_spark_update(char *moby)
         hit = part_find_owned_effect_slot(moby, 0x4010000, 0);
         if (hit) {
             hit = *(char **)(hit + 0x20);
-            if (hit && *(short *)(hit + 0xAA) == 0x825 /* Dynamo */)
+            if (hit && *(short *)(hit + 0xAA) == MOBY_CLASS_DYNAMO)
                 moby_set_state(moby, 3, -1);
             else moby_set_state(moby, 2, -1);
         }
@@ -76,9 +76,9 @@ void hit_spark_update(char *moby)
             moby_set_state(moby, 1, -1);
         } else {
             unsigned int count = *(unsigned short *)(moby + 0x96);
-            unsigned int oldCount = count++;
+            unsigned int old_count = count++;
             *(unsigned short *)(moby + 0x96) = count;
-            if (oldCount >= 61) moby_set_state(moby, 1, -1);
+            if (old_count >= 61) moby_set_state(moby, 1, -1);
         }
         break;
     }

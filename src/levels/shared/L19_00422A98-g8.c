@@ -21,9 +21,9 @@ extern void FastVecSub(char *, float *, char *);
 
 /* Per-frame update of the carried-object marker: arms it, tracks markerOffset linked flag, and while the hero is in state 0x31 places and sizes the marker from the grabbed object's bounds. */
 void carried_marker_update(char *obj) {
-    float markerOffset[4];
-    float markerPos[4];
-    char *heldObject;
+    float marker_offset[4];
+    float marker_pos[4];
+    char *held_object;
 
     int *vars = FLD(obj, int *, 0x68);
 
@@ -45,16 +45,16 @@ void carried_marker_update(char *obj) {
     default:
         return;
     }
-    if (FLD(g_hero_state, int, 0x2294) == 0x31 && (heldObject = FLD(g_hero_state, char *, 0x1830)) != 0) {
-        vec_build_spherical_offset(markerOffset, D_L19_001B1E94, FLD(heldObject, float, 0xF8), -FLD(heldObject, float, 0xF4) * 0.5f);
-        FastVecAdd(markerPos, markerOffset, FLD(g_hero_state, char *, 0x1830) + 0x10);
+    if (FLD(g_hero_state, int, 0x2294) == 0x31 && (held_object = FLD(g_hero_state, char *, 0x1830)) != 0) {
+        vec_build_spherical_offset(marker_offset, D_L19_001B1E94, FLD(held_object, float, 0xF8), -FLD(held_object, float, 0xF4) * 0.5f);
+        FastVecAdd(marker_pos, marker_offset, FLD(g_hero_state, char *, 0x1830) + 0x10);
         if (D_L19_001B1EAC == 0) {
             D_L19_001B1EAC = cam_alloc_override_slot(5);
             if (D_L19_001B1EAC == 0) {
                 return;
             }
         }
-        if (FLD(FLD(g_hero_state, char *, 0x1830), s16, 0xAA) == 0x905 /* Glider */) {
+        if (FLD(FLD(g_hero_state, char *, 0x1830), s16, 0xAA) == MOBY_CLASS_GLIDER) {
             FLD(D_L19_001B1EAC, float, 0) = D_L19_001B1E98;
             FLD(D_L19_001B1EAC, float, 0xC) = -1.0f;
             FLD(D_L19_001B1EAC, float, 8) = -1.0f;
@@ -64,7 +64,7 @@ void carried_marker_update(char *obj) {
             FLD(D_L19_001B1EAC, float, 8) = D_L19_001B1EA8;
         }
         FLD(D_L19_001B1EAC, u8, 0x1F) = 1;
-        FastVecSub(D_L19_001B1EAC + 0x20, markerPos, D_L19_001B9A40);
+        FastVecSub(D_L19_001B1EAC + 0x20, marker_pos, D_L19_001B9A40);
         return;
     }
     if (D_L19_001B1EAC != 0) {

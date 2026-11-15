@@ -98,18 +98,18 @@ void homing_l23_shot_update(u8 *obj) {
     float mtx[12] __attribute__((aligned(16)));
     float quat[4] __attribute__((aligned(16)));
     float axis[4] __attribute__((aligned(16)));
-    float vecA[4] __attribute__((aligned(16)));
-    float vecB[4] __attribute__((aligned(16)));
-    float vecC[4] __attribute__((aligned(16)));
+    float vec_a[4] __attribute__((aligned(16)));
+    float vec_b[4] __attribute__((aligned(16)));
+    float vec_c[4] __attribute__((aligned(16)));
     L23Rec rec;
     u8 *vars;
     u8 *hit;
     u8 *other;
-    float quatLen;
-    float sparkSize;
-    s32 colorRand;
-    s32 hitBoss;
-    u16 otherClass;
+    float quat_len;
+    float spark_size;
+    s32 color_rand;
+    s32 hit_boss;
+    u16 other_class;
 
     *(u16 *)(obj + 0x34) &= 0xFFBE;
     vars = *(u8 **)(obj + 0x68);
@@ -119,23 +119,23 @@ void homing_l23_shot_update(u8 *obj) {
     vec_scale_to_length(axis, up, 1.0f);
     FastVecCross(quat, obj + 0xE0, axis);
     FastVecScale(quat, quat, D_L23_001B192C * 0.5f);
-    quatLen = FastVecLength(quat);
-    quat[3] = -square_root(1.0f - quatLen * quatLen);
+    quat_len = FastVecLength(quat);
+    quat[3] = -square_root(1.0f - quat_len * quat_len);
     quaternion_to_rotation_basis(quat, mtx);
     multiply_matrix3x3(obj + 0xC0, mtx, obj + 0xC0);
     if (*(u8 **)(vars + 0x18) != 0) {
         if (vars[0x28] != 0) {
-            FastVecScale(vecC, *(u8 **)(vars + 0x18) + 0xE0, D_L23_001B1930);
-            FastVecAdd(vecB, *(u8 **)(vars + 0x18) + 0x10, vecC);
-            vec_turn_toward_target(obj + 0x10, obj + 0xC0, vecB, vars + 0x20, up, vecA,
+            FastVecScale(vec_c, *(u8 **)(vars + 0x18) + 0xE0, D_L23_001B1930);
+            FastVecAdd(vec_b, *(u8 **)(vars + 0x18) + 0x10, vec_c);
+            vec_turn_toward_target(obj + 0x10, obj + 0xC0, vec_b, vars + 0x20, up, vec_a,
                               D_L23_001B1914, D_L23_001B1918, 0.0f, D_L23_001B1920);
             vec_scale_to_length(obj + 0xC0, obj + 0xC0, 1.0f);
             FastVecScale(vel, obj + 0xC0, *(float *)(vars + 0x1C));
         } else if (vars[0x29] != 0) {
             if (*(s32 *)(vars + 0x14) < 0x91) {
-                FastVecSub(vecA, obj + 0x10, *(u8 **)(vars + 0x2C));
-                if (FastVecDot(vecA, vel) < 0.0f) {
-                    vec_turn_toward_target(obj + 0x10, obj + 0xC0, *(u8 **)(vars + 0x2C), vars + 0x20, up, vecB,
+                FastVecSub(vec_a, obj + 0x10, *(u8 **)(vars + 0x2C));
+                if (FastVecDot(vec_a, vel) < 0.0f) {
+                    vec_turn_toward_target(obj + 0x10, obj + 0xC0, *(u8 **)(vars + 0x2C), vars + 0x20, up, vec_b,
                                       D_L23_001B1914, D_L23_001B1918, 0.0f, D_L23_001B191C);
                     vec_scale_to_length(obj + 0xC0, obj + 0xC0, 1.0f);
                     FastVecScale(vel, obj + 0xC0, *(float *)(vars + 0x1C));
@@ -143,19 +143,19 @@ void homing_l23_shot_update(u8 *obj) {
             }
         } else {
             FastVecScale(vel, vars + 0x30, *(float *)(vars + 0x1C));
-            vec_scale_to_length(vecA, vel, 1.0f);
-            qcopy(obj + 0xC0, vecA);
+            vec_scale_to_length(vec_a, vel, 1.0f);
+            qcopy(obj + 0xC0, vec_a);
         }
     }
-    qcopy(vecB, obj + 0x10);
-    FastVecScale(vecC, vel, 0.7f);
-    sparkSize = math_random_float_range(0.1f, 0.3f);
-    colorRand = math_random_int_below(0xFF);
-    vec_random_direction(vecA, 0.0f, 0.1f);
-    FastVecAdd(vecA, vecA, vecB);
-    part_spawn_gravity_fade(vecA, D_L23_001A8F20, 0xF, 0x808080, colorRand, 0x20, 0, sparkSize * 210000.0f, sparkSize * 42000.0f, 0.0f, 0);
-    FastVecAdd(vecB, vecB, vecC);
-    qcopy(vecA, obj + 0x10);
+    qcopy(vec_b, obj + 0x10);
+    FastVecScale(vec_c, vel, 0.7f);
+    spark_size = math_random_float_range(0.1f, 0.3f);
+    color_rand = math_random_int_below(0xFF);
+    vec_random_direction(vec_a, 0.0f, 0.1f);
+    FastVecAdd(vec_a, vec_a, vec_b);
+    part_spawn_gravity_fade(vec_a, D_L23_001A8F20, 0xF, 0x808080, color_rand, 0x20, 0, spark_size * 210000.0f, spark_size * 42000.0f, 0.0f, 0);
+    FastVecAdd(vec_b, vec_b, vec_c);
+    qcopy(vec_a, obj + 0x10);
     FastVecAdd(obj + 0x10, obj + 0x10, vel);
     if (*(float *)(obj + 0x10) < 0.0f || *(float *)(obj + 0x14) < 0.0f || *(float *)(obj + 0x18) < 0.0f) {
         moby_mark_spawned(obj);
@@ -168,7 +168,7 @@ void homing_l23_shot_update(u8 *obj) {
     rec.b18 = 3;
     rec.b19 = 3;
     rec.h1A = *(u16 *)(obj + 0xAA);
-    if (obj[0xBC] == 0 && CollLine(vecA, obj + 0x10, 0x10, *(s32 *)(vars + 0x10), &rec) != 0) {
+    if (obj[0xBC] == 0 && CollLine(vec_a, obj + 0x10, 0x10, *(s32 *)(vars + 0x10), &rec) != 0) {
         hit = g_last_ray_hit.f18;
         if (hit != 0) {
             if (hit != *(u8 **)(obj + 0xB8)) {
@@ -179,16 +179,16 @@ void homing_l23_shot_update(u8 *obj) {
             obj[0xBC] = 1;
             qcopy(obj + 0x10, &g_last_ray_hit.f20);
         }
-        hitBoss = 0;
+        hit_boss = 0;
         other = g_last_ray_hit.f18;
         if (other != 0) {
-            otherClass = *(u16 *)(other + 0xAA);
-            if (otherClass == 0xF7E /* moby class 3966 */ || otherClass == 0xF7F /* Mothership Boss Part */ || (s16)otherClass == 0x120F /* moby class 4623 */) {
+            other_class = *(u16 *)(other + 0xAA);
+            if (other_class == 0xF7E /* moby class 3966 */ || other_class == MOBY_CLASS_MOTHERSHIP_BOSS_PART || (s16)other_class == 0x120F /* moby class 4623 */) {
                 PlayMobySound(2, 0, obj);
-                hitBoss = 1;
+                hit_boss = 1;
             }
         }
-        if (hitBoss == 0) {
+        if (hit_boss == 0) {
             PlayMobySound(0, 0, obj);
         }
     } else if (math_fast_float_d(vars + 0x14) != 0) {

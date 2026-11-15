@@ -168,13 +168,13 @@ void hero_l26_update_lock_on_tether(Moby *self)
     float v0[4] __attribute__((aligned(16)));
     float va[4] __attribute__((aligned(16)));
     float vb[4] __attribute__((aligned(16)));
-    Hit probeHit __attribute__((aligned(16)));
-    float tetherDir[4] __attribute__((aligned(16)));
+    Hit probe_hit __attribute__((aligned(16)));
+    float tether_dir[4] __attribute__((aligned(16)));
     float v70[4] __attribute__((aligned(16)));
     float v80[4] __attribute__((aligned(16)));
     float v90[4] __attribute__((aligned(16)));
     float vA0[4] __attribute__((aligned(16)));
-    Tgt *heldTargets[128];
+    Tgt *held_targets[128];
     float s2B0[4] __attribute__((aligned(16)));
     union {
         float q[16];
@@ -183,13 +183,13 @@ void hero_l26_update_lock_on_tether(Moby *self)
     } hb __attribute__((aligned(16)));
     float tmp[5][4] __attribute__((aligned(16)));
     Tgt *best = 0, *second = 0;
-    int hitFound, heldCount;
+    int hit_found, held_count;
     float bestScore = 0.0f, secondScore = 0.0f;
     float len;
     float angle0, angle1;
     int n;
     Tgt *target;
-    int scanIndex;
+    int scan_index;
     float dist, ang, sa2, cs, sm, score, proj, fa, fb;
     float d0;
     float *ia, *ib;
@@ -226,8 +226,8 @@ void hero_l26_update_lock_on_tether(Moby *self)
             rope->lockB = 0;
             rope->u.s.h42 = 0;
         } else {
-            scanIndex = 0;
-            for (target = D_L26_001FAAA0[0]; target != 0; target = D_L26_001FAAA0[++scanIndex]) {
+            scan_index = 0;
+            for (target = D_L26_001FAAA0[0]; target != 0; target = D_L26_001FAAA0[++scan_index]) {
                 if (target != rope->lockA && target != rope->lockB) {
                     if (target != 0 && target->cls != 0 && target->cls->id == 5) {
                         if (target->kind != 0xFE) {
@@ -326,21 +326,21 @@ void hero_l26_update_lock_on_tether(Moby *self)
     else
         D_L26_001AF0A8 = 0x7F2020;
     vec_clear_128(vb);
-    make_hit_descriptor(&probeHit, self, 0x210000, vb, (&D_L26_002622F0[g_item_slot_to_record.cur])->f70);
-    probeHit.kind = 5;
-    probeHit.flag = 1;
-    probeHit.tag = self->tag;
+    make_hit_descriptor(&probe_hit, self, 0x210000, vb, (&D_L26_002622F0[g_item_slot_to_record.cur])->f70);
+    probe_hit.kind = 5;
+    probe_hit.flag = 1;
+    probe_hit.tag = self->tag;
     rope->count = 0x14;
-    coll_process_hit(rope, 0x10, g_hero_state.ent, &probeHit, 0.3f);
-    FastVecSub(tetherDir, rope->b, rope);
-    vec_scale_to_length(tetherDir, tetherDir, 1.0f);
+    coll_process_hit(rope, 0x10, g_hero_state.ent, &probe_hit, 0.3f);
+    FastVecSub(tether_dir, rope->b, rope);
+    vec_scale_to_length(tether_dir, tether_dir, 1.0f);
     if (rope->lockA != 0 || rope->lockB != 0) {
-        FastVecCross(v70, tetherDir, (char *)&g_hero_state + 0x2C0);
-        math_apply_axis_rotation_to_quat(tetherDir, tetherDir, v70, 0.17453295f);
+        FastVecCross(v70, tether_dir, (char *)&g_hero_state + 0x2C0);
+        math_apply_axis_rotation_to_quat(tether_dir, tether_dir, v70, 0.17453295f);
     }
-    hitFound = 0;
-    FastVecScale(v90, tetherDir, reach);
-    heldCount = 0;
+    hit_found = 0;
+    FastVecScale(v90, tether_dir, reach);
+    held_count = 0;
     /* These named pointers, and the short locals below, are live but also steer: each adds
        insns that exist at gcse and die later (asm operands keep the copy; the sign extension
        dies at combine). gcse's hash needs 677 buckets, max_cuid >= 1352, for retail's spill
@@ -465,23 +465,23 @@ void hero_l26_update_lock_on_tether(Moby *self)
             else
                 FastVecScale(vb, vb, 1.0f / cm2);
             vb[3] = 5627.925f;
-            qcopy(&probeHit, vb);
-            hitFound = CollLine(D_L26_002396F0[i], &D_L26_00239710[0][i], 0x10, self, 0);
-            if (hitFound != 0) {
+            qcopy(&probe_hit, vb);
+            hit_found = CollLine(D_L26_002396F0[i], &D_L26_00239710[0][i], 0x10, self, 0);
+            if (hit_found != 0) {
                 ht = D_L26_001BEFD8.hit;
                 if (ht != 0) {
                     hinfo = moby_get_private_value_0(ht);
                     if (hinfo == 0) {
-                        QueueMobyImpact(ht, &probeHit);
+                        QueueMobyImpact(ht, &probe_hit);
                     } else if (ht->cls == 0 || ht->cls->id != 5) {
-                        QueueMobyImpact(ht, &probeHit);
+                        QueueMobyImpact(ht, &probe_hit);
                     } else {
-                        hitFound = 0;
-                        heldTargets[heldCount++] = ht;
+                        hit_found = 0;
+                        held_targets[held_count++] = ht;
                         ht->f98 = 0;
                     }
                 }
-                if (hitFound != 0) {
+                if (hit_found != 0) {
                     qcopy(&D_L26_00239710[0][i], D_L26_001BEFD8.pos);
                     {
                         short last = i;
@@ -498,9 +498,9 @@ void hero_l26_update_lock_on_tether(Moby *self)
         }
     }
     }
-    for (n = 0; n < heldCount; n++)
-        heldTargets[n]->f98 = heldTargets[n]->cls->f10;
-    if (hitFound == 0)
+    for (n = 0; n < held_count; n++)
+        held_targets[n]->f98 = held_targets[n]->cls->f10;
+    if (hit_found == 0)
         qcopy(rope->b, &D_L26_00239840);
     if (rope->lockA != 0 && (rope->u.q & 0x0000FFFF0000FFFFUL) == 0) {
         tv = hb.q;
@@ -573,7 +573,7 @@ void hero_l26_update_lock_on_tether(Moby *self)
             D_L26_001B24D0[k] = 0;
             angle0 = math_random_signed_float_range(0.52359885f, 1.0471977f);
             angle1 = math_random_float_range(-1.0471977f, 0.17453295f);
-            FastVecScale(s2B0, tetherDir, ksize);
+            FastVecScale(s2B0, tether_dir, ksize);
             math_apply_axis_rotation_to_quat(s2B0, s2B0, D_0018A560, angle1);
             math_apply_axis_rotation_to_quat(s2B0, s2B0, D_0018A560 + 0x10, angle0);
             qcopy(&D_L26_00239B70[k].v[0], hb.q);
@@ -616,7 +616,7 @@ void hero_l26_update_lock_on_tether(Moby *self)
     {
         angle0 = math_random_signed_float_range(0.52359885f, 1.0471977f);
         angle1 = math_random_float_range(-0.52359885f, 1.0471977f);
-        FastVecScale(s2B0, tetherDir, D_L26_001AF0D8);
+        FastVecScale(s2B0, tether_dir, D_L26_001AF0D8);
         math_apply_axis_rotation_to_quat(s2B0, s2B0, D_0018A560, angle1);
         math_apply_axis_rotation_to_quat(s2B0, s2B0, D_0018A560 + 0x10, angle0);
         spin = math_random_int_range(1, 8);

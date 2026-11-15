@@ -18,9 +18,9 @@ extern void euler_rotation_basis(void *, void *);
 
 /* Updates a moby of class 2791: a glowing light that pulses, swings around to a half turn and then settles, carrying a linked object with it. */
 void swinging_glow_update(char *self) {
-    float linkPos[4] __attribute__((aligned(16)));
+    float link_pos[4] __attribute__((aligned(16)));
     char *vars = *(char **)(self + 0x68);
-    int glow, baseGlow, scaledGlow;
+    int glow, base_glow, scaled_glow;
 
     switch ((unsigned char)self[0x20]) {
     case 0:
@@ -52,9 +52,9 @@ void swinging_glow_update(char *self) {
         if (*(int *)(vars + 0x1C)) {
             --*(int *)(vars + 0x1C);
         }
-        baseGlow = *(int *)(vars + 0x18);
-        scaledGlow = (int)((float)baseGlow * (float)*(int *)(vars + 0x1C) * 0.01f);
-        *(int *)(self + 0x78) = (long long)(int)(0x80000000 | (scaledGlow << 16) | (scaledGlow << 8)) | baseGlow;
+        base_glow = *(int *)(vars + 0x18);
+        scaled_glow = (int)((float)base_glow * (float)*(int *)(vars + 0x1C) * 0.01f);
+        *(int *)(self + 0x78) = (long long)(int)(0x80000000 | (scaled_glow << 16) | (scaled_glow << 8)) | base_glow;
         if ((*(float *)(self + 0xF8) >= 3.1415927f && !*(int *)(vars + 8)) ||
             (*(float *)(self + 0xF4) <= -3.1415927f && *(int *)(vars + 8))) {
             moby_set_state(self, 3, -1);
@@ -66,9 +66,9 @@ void swinging_glow_update(char *self) {
             *(float *)(self + 0xF8) += *(float *)(vars + 4);
         }
         if (*(char **)(vars + 0x10)) {
-            qcopy(linkPos, D_L14_001A8F20);
-            linkPos[2] -= 0.5f;
-            moby_rotate_about_point(*(char **)(vars + 0x10), linkPos, *(float *)(vars + 4), 0.0f, 0.0f);
+            qcopy(link_pos, D_L14_001A8F20);
+            link_pos[2] -= 0.5f;
+            moby_rotate_about_point(*(char **)(vars + 0x10), link_pos, *(float *)(vars + 4), 0.0f, 0.0f);
             euler_rotation_basis(*(char **)(vars + 0x10) + 0xC0, *(char **)(vars + 0x10) + 0xF0);
         }
         break;

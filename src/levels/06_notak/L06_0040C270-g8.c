@@ -26,7 +26,7 @@ char *aim_find_best_target(char *obj,Vec *origin,float *yaw,float *pitch) {
     struct { Vec origin,offset,player; char *disabled[128]; Vec target,aim,ray,axis; } frame;
     Vec *start=&frame.origin;
     char *ctx=*(char **)(obj+0x68),*selected,*candidate,*definition,*hit;
-    Vec *pos; int disabledCount,index,accepted,visible,tries,i;
+    Vec *pos; int disabled_count,index,accepted,visible,tries,i;
     float best=D_L06_001B0364,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
     FastVecScale(&frame.offset,g_hero_state.object+0xE0,0.5f);
@@ -36,7 +36,7 @@ char *aim_find_best_target(char *obj,Vec *origin,float *yaw,float *pitch) {
         qcopy(start,&D_L06_001BFCA0);
         return 0;
     }
-    disabledCount=0; index=0;
+    disabled_count=0; index=0;
     while((candidate=D_L06_001FB760[index])!=0) {
         if(*(unsigned char *)(candidate+0x20)==0xFE) goto next;
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
@@ -66,9 +66,9 @@ char *aim_find_best_target(char *obj,Vec *origin,float *yaw,float *pitch) {
             }
         } else {
             if(distance<2.5f) {
-                char *playerObj=g_hero_state.object;
+                char *player_obj=g_hero_state.object;
                 angle=mat_fast_helper_a(*(float *)(candidate+0x10)-g_hero_state.position.f[0],*(float *)(candidate+0x14)-g_hero_state.position.f[1]);
-                if(FastDiffRots(*(float *)(playerObj+0xF8),angle)<1.0471977f && math_fabs(start->f[2]-frame.target.f[2])<2.0f) accepted=1;
+                if(FastDiffRots(*(float *)(player_obj+0xF8),angle)<1.0471977f && math_fabs(start->f[2]-frame.target.f[2])<2.0f) accepted=1;
             }
         }
         if(accepted && !CollLine(start,&frame.target,6,g_hero_state.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
@@ -92,8 +92,8 @@ char *aim_find_best_target(char *obj,Vec *origin,float *yaw,float *pitch) {
                 hit=collision->hit;
                 if(hit) {
                     if(*(short *)(hit+0xAA)==0xE7D /* moby class 3709 */ || *(short *)(hit+0xAA)==0xEB0 /* moby class 3760 */) {
-                        frame.disabled[disabledCount++]=hit; *(int *)(hit+0x98)=0;
-                        if(disabledCount>127) break;
+                        frame.disabled[disabled_count++]=hit; *(int *)(hit+0x98)=0;
+                        if(disabled_count>127) break;
                         qcopy(&frame.ray,&collision->point);
                         continue;
                     }
@@ -106,6 +106,6 @@ char *aim_find_best_target(char *obj,Vec *origin,float *yaw,float *pitch) {
 next:
         ++index;
     }
-    for(i=0;i<disabledCount;++i) { char *m=frame.disabled[i]; *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10); }
+    for(i=0;i<disabled_count;++i) { char *m=frame.disabled[i]; *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10); }
     return selected;
 }

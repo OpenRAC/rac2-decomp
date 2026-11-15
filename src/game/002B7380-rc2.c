@@ -38,13 +38,13 @@ extern s8 D_002B8048[];
 /* Updates one music stream channel each frame: starts, pauses, fades out or clears it depending on its state. */
 void snd_update_music_channel(s32 channel) {
     s16 state;
-    s16 stateNow;
-    u16 stateBits;
+    s16 state_now;
+    u16 state_bits;
     s32 handle;
-    s32 handleNow;
-    s32 handleCopy;
-    s32 oldHandle;
-    u64 channelAddr;
+    s32 handle_now;
+    s32 handle_copy;
+    s32 old_handle;
+    u64 channel_addr;
 
     state = (*(s16 *)((s8 *)(channel) + (0xA)));
     if (state == 9) {
@@ -105,38 +105,38 @@ block_17:
         goto block_32;
     }
 block_18:
-    stateNow = (*(s16 *)((s8 *)(channel) + (0xA)));
-    stateBits = (*(u16 *)((s8 *)(channel) + (0xA)));
-    if (stateNow == 1) {
+    state_now = (*(s16 *)((s8 *)(channel) + (0xA)));
+    state_bits = (*(u16 *)((s8 *)(channel) + (0xA)));
+    if (state_now == 1) {
         goto block_32;
     }
-    if (stateNow == 8) {
+    if (state_now == 8) {
         goto block_32;
     }
-    if (stateNow == 9) {
+    if (state_now == 9) {
         goto block_32;
     }
-    if ((u32) (stateBits - 2) >= 2U) {
+    if ((u32) (state_bits - 2) >= 2U) {
         goto block_23;
     }
-    handleNow = (*(s32 *)((s8 *)(channel) + (0)));
+    handle_now = (*(s32 *)((s8 *)(channel) + (0)));
     goto block_25;
 block_23:
-    oldHandle = (*(s32 *)((s8 *)(channel) + (0)));
-    handleCopy = oldHandle;
+    old_handle = (*(s32 *)((s8 *)(channel) + (0)));
+    handle_copy = old_handle;
     (*(u32 *)((s8 *)(channel) + (0))) = 0xFFFFFFFF;
-    channelAddr = (u64) ((s64) channel << 0x20) >> 0x20;
-    snd_send_cmd50_with_settings(handleCopy, ((s32)D_002B8048), channelAddr);
-    snd_send_cmd25_with_settings(oldHandle, ((s32)D_002B7FF0), channelAddr);
+    channel_addr = (u64) ((s64) channel << 0x20) >> 0x20;
+    snd_send_cmd50_with_settings(handle_copy, ((s32)D_002B8048), channel_addr);
+    snd_send_cmd25_with_settings(old_handle, ((s32)D_002B7FF0), channel_addr);
     goto block_32;
 block_25:
-    if (handleNow == 0xFFFFFFFF) {
+    if (handle_now == 0xFFFFFFFF) {
         goto block_32;
     }
-    if (stateNow != 2) {
+    if (state_now != 2) {
         goto block_32;
     }
-    snd_send_cmd79_with_settings(handleNow, ((s32)D_002B7DF8), (u64) ((s64) channel << 0x20) >> 0x20);
+    snd_send_cmd79_with_settings(handle_now, ((s32)D_002B7DF8), (u64) ((s64) channel << 0x20) >> 0x20);
     goto block_32;
 block_28:
 block_29:

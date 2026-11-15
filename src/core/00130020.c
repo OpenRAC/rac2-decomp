@@ -70,13 +70,13 @@ extern void mpeg_output_field_pair(void *, int, int, int);
 
 /* Finishes the last decoded picture, or reports an error if a decode was still in progress. */
 void mpeg_finish_picture(char *decoder) {
-    int frameNumber = *(int *)(decoder + 0x118);
+    int frame_number = *(int *)(decoder + 0x118);
     if (*(int *)(decoder + 0x120) != 0)
         mpeg_report_error(decoder, D_0013BDC8);
     else if (*(int *)(decoder + 0x174) == 3)
-        mpeg_output_picture(decoder, *(int *)(decoder + 0x1BC), frameNumber - 1);
+        mpeg_output_picture(decoder, *(int *)(decoder + 0x1BC), frame_number - 1);
     else
-        mpeg_output_field_pair(decoder, *(int *)(decoder + 0x1CC), *(int *)(decoder + 0x1DC), frameNumber - 1);
+        mpeg_output_field_pair(decoder, *(int *)(decoder + 0x1CC), *(int *)(decoder + 0x1DC), frame_number - 1);
     *(int *)(decoder + 0x120) = 0;
 }
 
@@ -107,10 +107,10 @@ void mpeg_finish_picture(char *decoder) {
 /* Points the decoder buffers at fast scratchpad memory and clears a flag. */
 void mpeg_set_scratchpad_buffers(void *decoder) {
     char *bytes = (char *)decoder;
-    int scratchpadBase = 0x70000000;
+    int scratchpad_base = 0x70000000;
 
     r1_func_00127378(1);
-    *(int *)(bytes + 0x590) = scratchpadBase;
+    *(int *)(bytes + 0x590) = scratchpad_base;
     *(int *)(bytes + 0x594) = 0x70001800;
     *(int *)(bytes + 0x6D0) = 0x70001B00;
     *(int *)(bytes + 0x6D4) = 0x70003300;
@@ -131,11 +131,11 @@ void mpeg_set_scratchpad_buffers(void *decoder) {
 /* Resets the picture decoding hardware: its DMA channels and the picture unit. */
 void mpeg_reset_hardware(void *decoder) {
     char *bytes = (char *)decoder;
-    int interruptsWereOn;
+    int interrupts_were_on;
 
     *(int *)(bytes + 0x818) = 1;
     *(int *)(bytes + 0x1B0) = 0;
-    interruptsWereOn = r1_func_0011D960();
+    interrupts_were_on = r1_func_0011D960();
 
     D_ENABLEW =
         D_ENABLER | 0x10000;
@@ -145,7 +145,7 @@ void mpeg_reset_hardware(void *decoder) {
     D_ENABLEW =
         D_ENABLER & ~0x10000;
 
-    if (interruptsWereOn != 0) {
+    if (interrupts_were_on != 0) {
         r1_func_0011D9A8();
     }
 

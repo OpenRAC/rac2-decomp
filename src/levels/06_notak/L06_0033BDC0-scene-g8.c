@@ -71,7 +71,7 @@ void UpdateNotakSceneEffects(void)
             obj->flags |= 0x800;
         if (obj->class_id == 0xD54 /* moby class 3412 */)
             UpdateEquipmentPieces(obj);
-        if (obj && obj->class_id == 0xFA0 /* TV Screens */) {
+        if (obj && obj->class_id == MOBY_CLASS_TV_SCREENS) {
             char *state = obj->state;
 
             if (state)

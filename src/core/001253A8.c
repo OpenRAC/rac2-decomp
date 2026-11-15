@@ -76,8 +76,8 @@ extern void r1_func_00120A88();
 /* Starts reading sectors from the disc into a memory buffer. */
 int sceCdRead(int lba, int sectors, void *buf, unsigned char *mode) {
     char *req = r1_D_001314C0;
-    int byteCount;
-    int rpcResult;
+    int byte_count;
+    int rpc_result;
 
     if ((r1_D_001313F4 & 1) == 0) {
         if (r1_func_00120E98() == 6) {
@@ -99,20 +99,20 @@ int sceCdRead(int lba, int sectors, void *buf, unsigned char *mode) {
 
     switch (mode[2]) {
     case 1:
-        byteCount = sectors * 0x918;
+        byte_count = sectors * 0x918;
         break;
     case 2:
-        byteCount = sectors * 0x924;
+        byte_count = sectors * 0x924;
         break;
     case 0:
     default:
-        byteCount = sectors << 11;
+        byte_count = sectors << 11;
         break;
     }
 
     r1_D_00132580 = 0;
     if ((*(volatile int *)&r1_D_001313F4 & 2) == 0) {
-        r1_func_0011AD70(buf, byteCount);
+        r1_func_0011AD70(buf, byte_count);
     }
     r1_func_0011AD70(r1_D_001324C0, 0x90);
     r1_func_0011AD70(req, 0x18);
@@ -123,9 +123,9 @@ int sceCdRead(int lba, int sectors, void *buf, unsigned char *mode) {
 
     r1_D_00131414 = 1;
     *(volatile int *)&r1_D_001313F0 = 1;
-    rpcResult = r1_func_0011B4C8(r1_D_00132590, 1, 1, req, 0x18, 0, 0,
+    rpc_result = r1_func_0011B4C8(r1_D_00132590, 1, 1, req, 0x18, 0, 0,
                       (void *)r1_func_00120A88, r1_D_001324C0);
-    if (rpcResult < 0) {
+    if (rpc_result < 0) {
         r1_D_00131414 = 0;
         *(volatile int *)&r1_D_001313F0 = 0;
         r1_func_00118C90(*(volatile int *)&r1_D_001313E8);
@@ -195,7 +195,7 @@ int sceCdBreak(void) {
    8-byte clock after the status word is copied out uncached. Failure
    path first, as in func_00125588. */
 /* Reads the clock from the CD drive into a small structure. */
-int sceCdReadClock(CdClock *clockOut) {
+int sceCdReadClock(CdClock *clock_out) {
     int status;
 
     if (r1_func_00121040(0xF) == 0) {
@@ -208,7 +208,7 @@ int sceCdReadClock(CdClock *clockOut) {
         r1_func_00118C90(r1_D_001313EC);
         return 0;
     }
-    *clockOut = *(CdClock *)(((unsigned int)&r1_D_001325C0 + 4) | 0x20000000);
+    *clock_out = *(CdClock *)(((unsigned int)&r1_D_001325C0 + 4) | 0x20000000);
     if (r1_D_001313D0 > 0) {
         r1_func_0011A6C8(r1_D_00153110);
     }
@@ -223,22 +223,22 @@ int sceCdReadClock(CdClock *clockOut) {
 /* sceGsResetGraph. Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Resets the graphics chip and stores the screen mode settings. */
 void sceGsResetGraph(short mode, short inter, short out, short ff) {
-    sceGsGParam *gParam;
+    sceGsGParam *g_param;
 
     switch (mode) {
     case 0:
-        gParam = (sceGsGParam *)r1_func_00121D08();
+        g_param = (sceGsGParam *)r1_func_00121D08();
         GS_CSR = 0x200;
-        gParam->sceGsInterMode = inter;
-        gParam->sceGsOutMode = out;
-        gParam->sceGsVersion = (short)((GS_CSR >> 16) & 0xFF);
+        g_param->sceGsInterMode = inter;
+        g_param->sceGsOutMode = out;
+        g_param->sceGsVersion = (short)((GS_CSR >> 16) & 0xFF);
         r1_func_00118DE0(0xFF00);
-        gParam->sceGsFFMode = (ff != 0);
-        if (gParam->sceGsVSCfunc != 0) {
+        g_param->sceGsFFMode = (ff != 0);
+        if (g_param->sceGsVSCfunc != 0) {
             r1_func_00119328(2);
-            r1_func_00118AA0(2, gParam->sceGsVSCid);
-            gParam->sceGsVSCfunc = 0;
-            gParam->sceGsVSCid = 0;
+            r1_func_00118AA0(2, g_param->sceGsVSCid);
+            g_param->sceGsVSCfunc = 0;
+            g_param->sceGsVSCid = 0;
         }
         r1_func_00118A50(inter & 1, out & 0xFF, ff & 1);
         break;
@@ -246,11 +246,11 @@ void sceGsResetGraph(short mode, short inter, short out, short ff) {
         GS_CSR = 0x100;
         break;
     case 5:
-        gParam = (sceGsGParam *)r1_func_00121D08();
-        gParam->sceGsFFMode = (ff != 0);
-        gParam->sceGsInterMode = inter;
-        gParam->sceGsOutMode = out;
-        gParam->sceGsVersion = (short)((GS_CSR >> 16) & 0xFF);
+        g_param = (sceGsGParam *)r1_func_00121D08();
+        g_param->sceGsFFMode = (ff != 0);
+        g_param->sceGsInterMode = inter;
+        g_param->sceGsOutMode = out;
+        g_param->sceGsVersion = (short)((GS_CSR >> 16) & 0xFF);
         r1_func_00118A50(inter & 1, out & 0xFF, ff & 1);
         break;
     }

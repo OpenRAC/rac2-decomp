@@ -9,7 +9,7 @@ extern void moby_get_joint_midpoint(void *, int, void *);
 /* Sets up a new camera object's tracking values and finds its first target position. */
 void cam_moby_init_tracking(char *obj, int mode, int index, void *target, void *aim, unsigned char tag, float angle) {
     char *vars;
-    float targetPos[4];
+    float target_pos[4];
     *(int *)(obj+0x98) = 0;
     *(unsigned short *)(obj+0x34)|=0x100;
     vars = *(char **)(obj+0x68);
@@ -44,8 +44,8 @@ void cam_moby_init_tracking(char *obj, int mode, int index, void *target, void *
         case 1:
         *(short *)(vars+0x36) = index;
         *(short *)(obj+0x7c) = (mode<<index)|0x8000;
-        moby_get_joint_midpoint(obj, index, targetPos);
-        FastVecSub(vars+0x20, targetPos, obj+0x10);
+        moby_get_joint_midpoint(obj, index, target_pos);
+        FastVecSub(vars+0x20, target_pos, obj+0x10);
         vec_transform_by_object_or_given(obj, vars+0x20, vars+0x20, 0);
         break;
     }

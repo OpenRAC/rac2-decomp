@@ -22,13 +22,13 @@ void trash_can_debris_update(char *moby)
             int count = func_2E1C70(0.2f, moby + 0x10, 0, moby, 0);
             if (count > 0) {
                 int remaining = count;
-                char **nearbyList = D_L03_001C3E40;
+                char **nearby_list = D_L03_001C3E40;
                 do {
-                    int type = *(s16 *)(*nearbyList + 0xAA);
-                    if (type == 0xFF3 /* Megacorp Sweeper Bot */ || type == 0xFFD /* Megacorp Laser Bot */)
+                    int type = *(s16 *)(*nearby_list + 0xAA);
+                    if (type == MOBY_CLASS_MEGACORP_SWEEPER_BOT || type == MOBY_CLASS_MEGACORP_LASER_BOT)
                         func_31B920(moby, 3, -1);
                     --remaining;
-                    ++nearbyList;
+                    ++nearby_list;
                 } while (remaining);
             }
         }

@@ -28,11 +28,11 @@ extern s32 ref_L18_00427B48_00;
 extern u16 *ref_L18_00427B48_01[];
 
 /* Marks every live shooter in the given group so it will start firing (sets a flag in its state). */
-void shooter_flag_group(s32 unusedArg, s32 group) {
+void shooter_flag_group(s32 unused_arg, s32 group) {
     u16 *entry;
     u16 *list;
     s8 *target;
-    s32 entryValue;
+    s32 entry_value;
 
     if (group != 0xFF) {
         list = ref_L18_00427B48_01[group];
@@ -42,17 +42,17 @@ void shooter_flag_group(s32 unusedArg, s32 group) {
                 target = (s8 *)ref_L18_00427B48_00 + ((*entry & 0x7FFF) << 8);
                 if (target != 0) {
                     if (*(s16 *)(target + 0xAA) == 0xEC0 /* moby class 3776 */) {
-                        s32 stateId = *(u8 *)(target + 0x20);
-                        if (stateId != 0xFE) {
-                            if (stateId != 0xFD) {
+                        s32 state_id = *(u8 *)(target + 0x20);
+                        if (state_id != 0xFE) {
+                            if (state_id != 0xFD) {
                                 *(s8 *)(*(s8 **)(target + 0x68) + 0x39A) = 1;
                             }
                         }
                     }
                 }
-                entryValue = *(s16 *)entry;
+                entry_value = *(s16 *)entry;
                 entry += 1;
-            } while (entryValue >= 0);
+            } while (entry_value >= 0);
         }
     }
 }

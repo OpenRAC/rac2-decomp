@@ -70,7 +70,7 @@ void UpdateOwnedParticleTrails(char *object)
         hit=collision->hit;
         if (hit) {
             if (((*(unsigned short *)(hit+0x34)&0x1000) || *(short *)(*(char **)(hit+0x24)+0x46)==5) &&
-                hit!=g_hero_state.moby && *(short *)(hit+0xaa)!=0x1366 /* Miniturret */) {
+                hit!=g_hero_state.moby && *(short *)(hit+0xaa)!=MOBY_CLASS_MINITURRET) {
                 ParticleDamageDescriptor *descriptor;
                 vec_scale_to_length(&normal,&trail->velocity,1.0f);
                 descriptor = &ref_003054E8_02[g_item_slot_to_record[0x29]];

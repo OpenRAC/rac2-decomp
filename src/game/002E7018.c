@@ -27,19 +27,19 @@ extern u8 D_L24_0028AAC0[];
 /* Resets the scene state when a scene starts. */
 void scene_reset_state_on_start(void)
 {
-    char *gameData = D_00189E20_9;
-    char *transitionData;
-    unsigned short stateValue;
+    char *game_data = D_00189E20_9;
+    char *transition_data;
+    unsigned short state_value;
 
-    if (*(int *)(gameData + 9420) <= 0) {
-        *(int *)(gameData + 9420) = 1;
+    if (*(int *)(game_data + 9420) <= 0) {
+        *(int *)(game_data + 9420) = 1;
     }
     func_002B72E8_1(0);
 
-    transitionData = D_001A63A8_3;
-    stateValue = *(unsigned short *)(transitionData + 114);
-    if ((unsigned short)(stateValue - 6) >= 2) {
-        *(unsigned short *)(transitionData + 114) = 5;
+    transition_data = D_001A63A8_3;
+    state_value = *(unsigned short *)(transition_data + 114);
+    if ((unsigned short)(state_value - 6) >= 2) {
+        *(unsigned short *)(transition_data + 114) = 5;
     }
     UpdateSoundVoices();
     subtitle_clear_state();

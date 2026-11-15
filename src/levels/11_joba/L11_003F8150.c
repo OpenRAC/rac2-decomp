@@ -12,23 +12,23 @@ extern s32 IsPointInCuboid(void *, s32);
 extern f32 IntToFloat(s32);
 extern s32 math_fast_float_d(void *);
 /* Slides the object one way while its trigger object is active, then back the other way when it stops, playing a sound while it moves. */
-void joba_sliding_door_update(u8 *mobyArg) {
+void joba_sliding_door_update(u8 *moby_arg) {
     f32 step[4];
     f32 duration;
-    u8 *moby = mobyArg;
+    u8 *moby = moby_arg;
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *triggerMoby = g_moby_l11_table[0] + *(s32 *)(vars + 0x6C) * 256;
+    u8 *trigger_moby = g_moby_l11_table[0] + *(s32 *)(vars + 0x6C) * 256;
     if (D_0019B2E8[g_current_map_index[0]][*(u8 *)(moby + 0xB0)] & 0x80) return;
     if (*(u8 *)(moby + 0x20) == 0) {
         if (*(s16 *)(moby + 0xAA) == 0xB71 /* moby class 2929 */) *(u32 *)(vars + 0x5C) |= 1;
         *(u8 *)(moby + 0x20) = 1;
     }
     if (*(u8 *)(moby + 0x20) == 1) {
-        if (IsPointInCuboid(triggerMoby + 0x10, *(s32 *)(vars + 0x60))) {
-            u8 *soundSlot;
+        if (IsPointInCuboid(trigger_moby + 0x10, *(s32 *)(vars + 0x60))) {
+            u8 *sound_slot;
             *(u8 *)(moby + 0x20) = 2;
-            soundSlot = D_L11_00188660 + *(s32 *)(vars + 0x70) * 0x70;
-            if (*(u8 **)(soundSlot + 0x88) != moby || *(u8 *)(soundSlot + 0x74) == 0)
+            sound_slot = D_L11_00188660 + *(s32 *)(vars + 0x70) * 0x70;
+            if (*(u8 **)(sound_slot + 0x88) != moby || *(u8 *)(sound_slot + 0x74) == 0)
                 *(s32 *)(vars + 0x70) = PlayMobySound(0, 4, moby);
             *(s32 *)(vars + 0x64) = 45;
         }
@@ -42,17 +42,17 @@ void joba_sliding_door_update(u8 *mobyArg) {
         if (math_fast_float_d(vars + 0x64)) {
             s32 sound = *(s32 *)(vars + 0x70);
             if (sound != -1) {
-                u8 *soundSlot = D_L11_00188660 + sound * 0x70;
-                if (*(u8 **)(soundSlot + 0x88) == moby && *(u8 *)(soundSlot + 0x74)) snd_stop_voice(sound);
+                u8 *sound_slot = D_L11_00188660 + sound * 0x70;
+                if (*(u8 **)(sound_slot + 0x88) == moby && *(u8 *)(sound_slot + 0x74)) snd_stop_voice(sound);
             }
             *(s32 *)(vars + 0x70) = -1;
             *(u8 *)(moby + 0x20) = 3;
         }
     }
     if (*(u8 *)(moby + 0x20) == 3) {
-        if (!IsPointInCuboid(triggerMoby + 0x10, *(s32 *)(vars + 0x60))) {
-            u8 *soundSlot = D_L11_00188660 + *(s32 *)(vars + 0x70) * 0x70;
-            if (*(u8 **)(soundSlot + 0x88) != moby || *(u8 *)(soundSlot + 0x74) == 0)
+        if (!IsPointInCuboid(trigger_moby + 0x10, *(s32 *)(vars + 0x60))) {
+            u8 *sound_slot = D_L11_00188660 + *(s32 *)(vars + 0x70) * 0x70;
+            if (*(u8 **)(sound_slot + 0x88) != moby || *(u8 *)(sound_slot + 0x74) == 0)
                 *(s32 *)(vars + 0x70) = PlayMobySound(0, 4, moby);
             *(u8 *)(moby + 0x20) = 4;
             *(s32 *)(vars + 0x64) = 45;
@@ -67,8 +67,8 @@ void joba_sliding_door_update(u8 *mobyArg) {
         if (math_fast_float_d(vars + 0x64)) {
             s32 sound = *(s32 *)(vars + 0x70);
             if (sound != -1) {
-                u8 *soundSlot = D_L11_00188660 + sound * 0x70;
-                if (*(u8 **)(soundSlot + 0x88) == moby && *(u8 *)(soundSlot + 0x74)) snd_stop_voice(sound);
+                u8 *sound_slot = D_L11_00188660 + sound * 0x70;
+                if (*(u8 **)(sound_slot + 0x88) == moby && *(u8 *)(sound_slot + 0x74)) snd_stop_voice(sound);
             }
             *(s32 *)(vars + 0x70) = -1;
             *(u8 *)(moby + 0x20) = 1;

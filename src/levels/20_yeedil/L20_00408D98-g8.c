@@ -28,28 +28,28 @@ extern void hero_load_state_by_game_mode(int);
 /* The platform controller records switch edges and raises its linked platform. */
 void UpdateLinkedPlatformController(u8 *moby) {
     s32 *state = *(s32 **)(moby + 0x68);
-    int saveOffset;
+    int save_offset;
 
     if (D_L20_001CA540 < 2) D_L20_001B2BE8 = 85.0f;
     switch (moby[0x20]) {
     case 0: {
-        char *otherMoby;
-        saveOffset = g_current_map_index * 16;
+        char *other_moby;
+        save_offset = g_current_map_index * 16;
         state[8] = D_L20_001CA540;
         state[5] = 0;
         state[4] = 0;
-        state[0x23] = D_0019B2E8[state[2] + saveOffset] >> 7;
-        if ((D_0019B2E8[state[1] + saveOffset] & 0x80) == 0) {
+        state[0x23] = D_0019B2E8[state[2] + save_offset] >> 7;
+        if ((D_0019B2E8[state[1] + save_offset] & 0x80) == 0) {
             state[0x1F] = 0;
-            otherMoby = (char *)((state[0x1C] << 8) + (u32)D_L20_001B2F9C);
-            *(float *)(state + 0x1D) = *(float *)(otherMoby + 0x18);
-            *(float *)(otherMoby + 0x18) += 20.0f;
+            other_moby = (char *)((state[0x1C] << 8) + (u32)D_L20_001B2F9C);
+            *(float *)(state + 0x1D) = *(float *)(other_moby + 0x18);
+            *(float *)(other_moby + 0x18) += 20.0f;
         } else state[0x1F] = 1;
         moby_set_state(moby, 1, -1);
         break;
     }
     case 1: {
-        char *otherMoby;
+        char *other_moby;
         if (state[0x23] == 0 &&
             (D_0019B2E8[state[2] + g_current_map_index * 16] & 0x80) != 0 &&
             IsPointInCuboid(g_hero_position, state[10]) != 0) {
@@ -78,13 +78,13 @@ void UpdateLinkedPlatformController(u8 *moby) {
         if (D_0019B2E8[state[1] + g_current_map_index * 16] & 0x80) return;
         if (*(u8 *)(D_L20_001B2F9C + state[0x1B] * 0x100 + 0xBC) == 1) return;
         if (state[0x1F] != 0) return;
-        otherMoby = D_L20_001B2F9C + state[0x19] * 0x100;
-        if (otherMoby != 0 && *(s16 *)(otherMoby + 0xAA) == 0xCBC /* Megacorp Hover Tank */ &&
-            *(u8 *)(otherMoby + 0x20) != 0xFE && *(u8 *)(otherMoby + 0x20) != 0xFD) return;
-        otherMoby = D_L20_001B2F9C + state[0x1A] * 0x100;
-        if (otherMoby != 0 && *(s16 *)(otherMoby + 0xAA) == 0xCBC /* Megacorp Hover Tank */) {
-            int status = *(u8 *)(otherMoby + 0x20);
-            if (status != 0xFE && *(u8 *)(otherMoby + 0x20) != 0xFD) return;
+        other_moby = D_L20_001B2F9C + state[0x19] * 0x100;
+        if (other_moby != 0 && *(s16 *)(other_moby + 0xAA) == MOBY_CLASS_MEGACORP_HOVER_TANK &&
+            *(u8 *)(other_moby + 0x20) != 0xFE && *(u8 *)(other_moby + 0x20) != 0xFD) return;
+        other_moby = D_L20_001B2F9C + state[0x1A] * 0x100;
+        if (other_moby != 0 && *(s16 *)(other_moby + 0xAA) == MOBY_CLASS_MEGACORP_HOVER_TANK) {
+            int status = *(u8 *)(other_moby + 0x20);
+            if (status != 0xFE && *(u8 *)(other_moby + 0x20) != 0xFD) return;
         }
         moby_set_state(moby, 7, -1);
         break;
@@ -102,12 +102,12 @@ movement_callback:
         gfx_add_draw_callback_third((void (*)(void *))moby_set_scaled_speed_capped, moby);
         break;
     case 4: {
-        char *otherMoby;
+        char *other_moby;
         s32 *entry = (s32 *)((u32)state + (state[15] * 4));
-        otherMoby = D_L20_001B308C + entry[9] * 0x80;
+        other_moby = D_L20_001B308C + entry[9] * 0x80;
         load_scene_chunk(state[8], state[0x21]);
         moby_mark_table_entry_flagged(state[0]);
-        hero_reset_position_and_direction(otherMoby + 0x30, otherMoby + 0x70, 0x6F, 1);
+        hero_reset_position_and_direction(other_moby + 0x30, other_moby + 0x70, 0x6F, 1);
         hero_load_state_by_game_mode(0);
         state[7] = 1;
         D_L20_001B29E0 = 1.0f;
@@ -156,12 +156,12 @@ movement_callback:
         break;
     }
     case 7: {
-        char *otherMoby;
+        char *other_moby;
         if (flag_set_first_pending(moby)) {
-            otherMoby = D_L20_001B2F9C + state[0x1B] * 0x100;
-            otherMoby[0xBC] = 1;
+            other_moby = D_L20_001B2F9C + state[0x1B] * 0x100;
+            other_moby[0xBC] = 1;
             {
-                int duration = *(int *)(*(char **)(otherMoby + 0x68) + 0x2C);
+                int duration = *(int *)(*(char **)(other_moby + 0x68) + 0x2C);
                 state[0x1F] = 1;
                 state[6] = duration;
                 state[0x1E] = duration;

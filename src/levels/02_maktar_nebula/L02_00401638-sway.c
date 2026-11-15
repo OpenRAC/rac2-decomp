@@ -26,11 +26,11 @@ extern void vec_scale_to_length(void *,void *,float);
 extern void part_spawn_blast_effect_moby(void *,void *,void *,float);
 /* Moves a swaying object along a preset path, drops a spawned item at the end, then lets the object fall apart and disappear. Update handler of moby class 2934. */
 void sway_path_update(char *moby) {
-    float oldPos[4] __attribute__((aligned(16))), scratch[4] __attribute__((aligned(16)));
+    float old_pos[4] __attribute__((aligned(16))), scratch[4] __attribute__((aligned(16)));
     char *vars = *(char **)(moby+0x68), *path;
     float x,y,z,t;
     void *spawned;
-    if ((unsigned)(*(u8 *)(moby+0x20)-2)<3) qcopy(&oldPos,moby+0x10);
+    if ((unsigned)(*(u8 *)(moby+0x20)-2)<3) qcopy(&old_pos,moby+0x10);
     switch (*(u8 *)(moby+0x20)) {
     case 0: {
         float inv;
@@ -68,18 +68,18 @@ void sway_path_update(char *moby) {
             int highIndex=FloatToInt(y);
             int lowIndex=FloatToInt(x);
             char *path=*(char **)(vars+0x164);
-            char *lowPoint=path+lowIndex*16;
+            char *low_point=path+lowIndex*16;
             path+=highIndex*16;
-            z=*(float *)(path+0x10)-*(float *)(lowPoint+0x10);
+            z=*(float *)(path+0x10)-*(float *)(low_point+0x10);
         }
         {
             int highIndex=FloatToInt(y);
             int lowIndex=FloatToInt(x);
             char *path=*(char **)(vars+0x164);
-            char *lowPoint=path+lowIndex*16;
+            char *low_point=path+lowIndex*16;
             path+=highIndex*16;
             t=*(float *)(path+0x14);
-            t=mat_fast_helper_a(z,t-*(float *)(lowPoint+0x14));
+            t=mat_fast_helper_a(z,t-*(float *)(low_point+0x14));
         }
         t=1.0f-FastDiffRots(t,*(float *)(vars+0x138)); if(t<0.1f)t=0.1f;
         math_step_value_toward_target((float *)(vars+0x14c),(float *)(vars+0x150),(float)**(int **)(vars+0x164)-1.0f,*(float *)(vars+0x154),*(float *)(vars+0x158),t**(float *)(vars+0x15c));
@@ -102,10 +102,10 @@ void sway_path_update(char *moby) {
     if(*(u8 *)(moby+0x31)||*(u8 *)(moby+0x20)==2||*(u8 *)(moby+0x20)==4)sway_apply_wobble(moby);
     if(*(u8 *)(moby+0x31)) {
         if(*(u8 *)(moby+0x20)<2)return;
-        if(*(u8 *)(moby+0x20)<5){FastVecSub(&scratch,moby+0x10,&oldPos);part_spawn_spark_bursts(moby,&scratch);}
+        if(*(u8 *)(moby+0x20)<5){FastVecSub(&scratch,moby+0x10,&old_pos);part_spawn_spark_bursts(moby,&scratch);}
     }
     if(*(u8 *)(moby+0x20)>=2){
-        void *hitMoby=part_find_owned_effect_slot(moby,0x10000,0); x=moby_update_aim_target_strength(moby,hitMoby);
+        void *hit_moby=part_find_owned_effect_slot(moby,0x10000,0); x=moby_update_aim_target_strength(moby,hit_moby);
         ApproachValue((float *)(vars+0x20),0.0f,x); *(u8 *)(moby+0xa8)=255;
         if(*(float *)(vars+0x20)==0.0f){PlayMobySound(2,0,moby);part_spawn_masked_debris(moby,0x7f7,D_L02_001A8F20,255,5.0f,10.0f,5.0f,10.0f);FastVecSub(&scratch,g_camera_l02_position,moby+0x10);vec_scale_to_length(&scratch,&scratch,1.0f);part_spawn_blast_effect_moby(moby,moby+0x10,&scratch,0.0f);moby_mark_spawned(moby);}
     }

@@ -50,10 +50,10 @@ void anim_start_blended_with_flags(Moby_2A75E0 *m, int anim, int f41, int frames
     if (m->f44 > 0.025f || m->f50 != 0 || m->f54 != 0 || (flags & 4)) {
         int slot = moby_alloc_object_slot(m);
         if (slot >= 0) {
-            int slotFlags = slot;
-            if (flags & 1) slotFlags |= 0x100;
-            if (flags & 2) slotFlags |= 0x200;
-            func_002A2450(m, slotFlags);
+            int slot_flags = slot;
+            if (flags & 1) slot_flags |= 0x100;
+            if (flags & 2) slot_flags |= 0x200;
+            func_002A2450(m, slot_flags);
             qcopy(D_001CD540[slot], m->f80);
             if (m->f42 != 0xFF) m->fA9 = m->f42;
             m->f42 = 0xFF;

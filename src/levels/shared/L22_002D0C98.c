@@ -27,12 +27,12 @@ ASM_FUNC("asm/levels", func_L22_002F3B38);
 /* Early-outs when the third float argument is positive; otherwise bends the first angle
    through one helper, feeds the second angle and the angle at the fourth pointer through
    the two placement calls, scales it by the first float argument and stores it back. */
-void math_steer_along_direction(u8 *position, u8 *angleRef, u8 *speedRef, u8 *directionRef, f32 factor, f32 unusedFactor, f32 limit)
+void math_steer_along_direction(u8 *position, u8 *angle_ref, u8 *speed_ref, u8 *direction_ref, f32 factor, f32 unused_factor, f32 limit)
 {
-    u8 *posPtr = position;
-    u8 *angle = angleRef;
-    u8 *dirPtr = directionRef;
-    u8 *speed = speedRef;
+    u8 *pos_ptr = position;
+    u8 *angle = angle_ref;
+    u8 *dir_ptr = direction_ref;
+    u8 *speed = speed_ref;
     TI128 buf;
     f32 keep;
     f32 q;
@@ -41,13 +41,13 @@ void math_steer_along_direction(u8 *position, u8 *angleRef, u8 *speedRef, u8 *di
         return;
     keep = factor;
     *(f32 *)(angle + 0) = func_2F4A88(*(f32 *)(angle + 0));
-    func_2F3AF0(&buf, dirPtr, *(f32 *)(speed + 0));
-    posPtr += 0x10;
-    func_2F3AB0(posPtr, posPtr, &buf);
+    func_2F3AF0(&buf, dir_ptr, *(f32 *)(speed + 0));
+    pos_ptr += 0x10;
+    func_2F3AB0(pos_ptr, pos_ptr, &buf);
     q = func_2F4088(*(f32 *)(angle + 0)) * keep;
     *(f32 *)(speed + 0) = q;
-    func_2F3AF0(&buf, dirPtr, q);
-    func_2F3A80(posPtr, posPtr, &buf);
+    func_2F3AF0(&buf, dir_ptr, q);
+    func_2F3A80(pos_ptr, pos_ptr, &buf);
 }
 
 
@@ -96,9 +96,9 @@ void part_update_fade_record(u8 *object)
         return;
     }
     {
-        u8 *vecPtr = rec + 0x10;
+        u8 *vec_ptr = rec + 0x10;
 
-        func_383120(vecPtr, vecPtr);
+        func_383120(vec_ptr, vec_ptr);
     }
     *(f32 *)(rec + 0xC) = *(f32 *)(rec + 0xC) + *(f32 *)(extra + 4);
     if (*(s32 *)(extra) < 6) {

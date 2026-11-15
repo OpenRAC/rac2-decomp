@@ -50,27 +50,27 @@ struct Fr {
 };
 
 /* Works out a sideways direction for the lightning arcs from two points on a small circle. */
-void vec_compute_arc_side_direction(s8 *moby, s8 *center, s8 *outDirection, f32 radius) {
+void vec_compute_arc_side_direction(s8 *moby, s8 *center, s8 *out_direction, f32 radius) {
     struct Fr frame;
     s32 remaining;
     f32 angle;
-    f32 angleStep;
-    f32 sideValue;
-    f32 depthValue;
+    f32 angle_step;
+    f32 side_value;
+    f32 depth_value;
     struct Ent *entry;
 
     angle = 0.0f;
-    angleStep = 6.283185482025146484375f / ref_L00_003E9930_00(11);
+    angle_step = 6.283185482025146484375f / ref_L00_003E9930_00(11);
     remaining = 1;
     entry = &frame.e[0];
     do {
-        angle = ref_L00_003E9930_01(angle, angleStep);
+        angle = ref_L00_003E9930_01(angle, angle_step);
         entry->xc = 0;
-        sideValue = ref_L00_003E9930_02(angle) * radius;
+        side_value = ref_L00_003E9930_02(angle) * radius;
         entry->x0 = 0;
-        entry->x4 = sideValue;
-        depthValue = ref_L00_003E9930_03(angle);
-        entry->x8 = -depthValue * radius;
+        entry->x4 = side_value;
+        depth_value = ref_L00_003E9930_03(angle);
+        entry->x8 = -depth_value * radius;
         ref_L00_003E9930_04(entry, entry, moby + 0xC0);
         ref_L00_003E9930_05(entry, entry, center);
         entry += 1;
@@ -78,6 +78,6 @@ void vec_compute_arc_side_direction(s8 *moby, s8 *center, s8 *outDirection, f32 
     } while (remaining >= 0);
     ref_L00_003E9930_06(frame.b0, &frame.e[0], center);
     ref_L00_003E9930_06(frame.b1, &frame.e[1], center);
-    ref_L00_003E9930_07(outDirection, frame.b0, frame.b1);
-    ref_L00_003E9930_08(outDirection, outDirection, 1.0f);
+    ref_L00_003E9930_07(out_direction, frame.b0, frame.b1);
+    ref_L00_003E9930_08(out_direction, out_direction, 1.0f);
 }

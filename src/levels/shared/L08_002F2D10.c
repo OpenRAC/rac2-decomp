@@ -178,8 +178,8 @@ s32 moby_count_of_class(s32 classId) {
 
 /* Switches three flags of one record; -1 leaves a group alone, 0 clears it and anything
    else sets it. */
-void moby_set_visibility_flags(void *mobyArg, s32 hideMode, s32 activeMode, s32 collisionMode) {
-    u8 *moby = mobyArg;
+void moby_set_visibility_flags(void *moby_arg, s32 hide_mode, s32 active_mode, s32 collision_mode) {
+    u8 *moby = moby_arg;
     u8 kind;
 
     if (moby == 0)
@@ -189,14 +189,14 @@ void moby_set_visibility_flags(void *mobyArg, s32 hideMode, s32 activeMode, s32 
         return;
     if (kind == 0xFD)
         return;
-    if (hideMode != -1) {
-        if (hideMode != 0)
+    if (hide_mode != -1) {
+        if (hide_mode != 0)
             *(u16 *)(moby + 0x34) &= 0xFFFD;
         else
             *(u16 *)(moby + 0x34) |= 2;
     }
-    if (activeMode != -1) {
-        if (activeMode != 0) {
+    if (active_mode != -1) {
+        if (active_mode != 0) {
             *(u8 *)(moby + 0x31) = 1;
             *(u16 *)(moby + 0x34) &= 0xFFFE;
         } else {
@@ -204,8 +204,8 @@ void moby_set_visibility_flags(void *mobyArg, s32 hideMode, s32 activeMode, s32 
             *(u16 *)(moby + 0x34) |= 1;
         }
     }
-    if (collisionMode != -1) {
-        if (collisionMode != 0)
+    if (collision_mode != -1) {
+        if (collision_mode != 0)
             *(s32 *)(moby + 0x98) = *(s32 *)(*(s32 *)(moby + 0x24) + 0x10);
         else
             *(s32 *)(moby + 0x98) = 0;
@@ -216,10 +216,10 @@ extern u8 *D_L08_001B29DC __attribute__((sda));
 extern void moby_set_visibility_flags(void *, s32, s32, s32);
 
 /* Changes the flags of the object with the given index in the object list; does nothing for -1. */
-void moby_set_flags_by_index(s32 index, s32 hideMode, s32 activeMode, s32 collisionMode) {
+void moby_set_flags_by_index(s32 index, s32 hide_mode, s32 active_mode, s32 collision_mode) {
     if (index == -1)
         return;
-    moby_set_visibility_flags(D_L08_001B29DC + (index << 8), hideMode, activeMode, collisionMode);
+    moby_set_visibility_flags(D_L08_001B29DC + (index << 8), hide_mode, active_mode, collision_mode);
 }
 
 /* Runs func_L08_00328B80 on every object named by entry a0 of the 0x1FB660 table: a u16
@@ -228,13 +228,13 @@ void moby_set_flags_by_index(s32 index, s32 hideMode, s32 activeMode, s32 collis
    callee-saved register across the call). */
 extern u32 D_L08_001FB660[];
 
-void moby_set_group_flags(s32 groupIndex, s32 hideMode, s32 activeMode, s32 collisionMode) {
-    u16 *list = (u16 *)D_L08_001FB660[groupIndex];
+void moby_set_group_flags(s32 group_index, s32 hide_mode, s32 active_mode, s32 collision_mode) {
+    u16 *list = (u16 *)D_L08_001FB660[group_index];
 
     if (list != 0) {
         u16 *entry = list;
         do {
-            moby_set_flags_by_index(entry[0] & 0x7FFF, hideMode, activeMode, collisionMode);
+            moby_set_flags_by_index(entry[0] & 0x7FFF, hide_mode, active_mode, collision_mode);
         } while (*(s16 *)entry++ >= 0);
     }
 }
@@ -244,18 +244,18 @@ extern f32 vec_length_xy(void *);
 
 /* Splits a four-float vector: two components give an angle, 0x45AFDF66 marks an
    already-resolved vector. */
-void vec_resolve_direction(u8 *input, f32 *outAngle, f32 *outScaleA, f32 *outScaleB) {
+void vec_resolve_direction(u8 *input, f32 *out_angle, f32 *out_scale_a, f32 *out_scale_b) {
     f32 vec[4];
 
     *(TI128 *)vec = *(TI128 *)input;
     if (vec[3] != 5627.9248046875f) {
-        *outAngle = mat_fast_helper_a(vec[0], vec[1]);
+        *out_angle = mat_fast_helper_a(vec[0], vec[1]);
         return;
     }
-    *outAngle = mat_fast_helper_a(vec[0], vec[1]);
-    *outScaleA = *outScaleA * vec_length_xy(vec);
+    *out_angle = mat_fast_helper_a(vec[0], vec[1]);
+    *out_scale_a = *out_scale_a * vec_length_xy(vec);
     vec[3] = 0;
-    *outScaleB = *outScaleB * vec[2];
+    *out_scale_b = *out_scale_b * vec[2];
 }
 
 extern float math_fast_sin_or_cos_a(float);
@@ -311,7 +311,7 @@ void moby_init_launched_object(unsigned char *moby, struct LaunchState *launch, 
 }
 
 /* Fills a sound/effect record with the owner object, its position and two speeds. Returns -1 if the owner has no usable data. */
-s32 part_fill_effect_record(u8 *owner, s32 valueA, s32 valueB, u8 *out, f32 speedA, f32 speedB) {
+s32 part_fill_effect_record(u8 *owner, s32 value_a, s32 value_b, u8 *out, f32 speed_a, f32 speed_b) {
     u8 *definition;
     if (owner == 0)
         return -1;
@@ -321,11 +321,11 @@ s32 part_fill_effect_record(u8 *owner, s32 valueA, s32 valueB, u8 *out, f32 spee
     if (*(s32 *)(definition + 0x28) == 0)
         return -1;
     *(u32 *)(out + 0x1C) = (u32)owner;
-    *(f32 *)(out + 0x14) = speedB * 0.016666668f;
-    *(f32 *)(out + 0x10) = speedA * 0.016666668f;
+    *(f32 *)(out + 0x14) = speed_b * 0.016666668f;
+    *(f32 *)(out + 0x10) = speed_a * 0.016666668f;
     *(TI128 *)out = *(TI128 *)(owner + 0x10);
-    *(s32 *)(out + 0x18) = valueB;
-    *(s32 *)(out + 0x20) = valueA;
+    *(s32 *)(out + 0x18) = value_b;
+    *(s32 *)(out + 0x20) = value_a;
     return 1;
 }
 
@@ -364,7 +364,7 @@ void thrown_l08_projectile_update(unsigned char *moby) {
         Vec position, spread;
     } frame;
     char *vars = *(char **)(moby + 0x68), *position = (char *)moby + 0x10;
-    int sparksLeft, lifetime;
+    int sparks_left, lifetime;
     float angle, speed;
 
     frame.velocity.q = 0;
@@ -408,9 +408,9 @@ void thrown_l08_projectile_update(unsigned char *moby) {
             if (effect)
                 effect[0x23] = 0x70;
             spread = &frame.spread;
-            sparksLeft = 15;
+            sparks_left = 15;
             do {
-                --sparksLeft;
+                --sparks_left;
                 angle = math_random_angle();
                 speed = math_random_float_range(0.0f, 0.050000004f);
                 frame.spread.f[0] = math_fast_sin_or_cos_a(angle) * speed;
@@ -418,7 +418,7 @@ void thrown_l08_projectile_update(unsigned char *moby) {
                 frame.spread.f[2] = math_random_float_range(0.050000004f, 0.10833334f);
                 lifetime = math_random_int_range(90, 120);
                 part_spawn_spark_2(&frame.position, spread, math_random_int_below(2), lifetime);
-            } while (sparksLeft >= 0);
+            } while (sparks_left >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
@@ -428,7 +428,7 @@ void thrown_l08_projectile_update(unsigned char *moby) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = &ref_L08_0039DBE8_03;
                 model = reread->hit;
@@ -519,7 +519,7 @@ void bouncing_l08_projectile_update(char *moby) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &ref_L08_0039E000_01;
             model = reread->hit;
@@ -562,16 +562,16 @@ finish:
 
 Moby_L08_003B2DB0 *SpawnDirectedEffectObject(int owner, float *pos, float *dir, int life)
 {
-    float posCopy[4] __attribute__((aligned(16)));
-    float dirCopy[4] __attribute__((aligned(16)));
+    float pos_copy[4] __attribute__((aligned(16)));
+    float dir_copy[4] __attribute__((aligned(16)));
     Moby_L08_003B2DB0 *moby;
     Bolt_L08_003B2DB0 *state;
-    int lifeTicks;
-    float *posPtr = posCopy;
-    float *dirPtr = dirCopy;
+    int life_ticks;
+    float *pos_ptr = pos_copy;
+    float *dir_ptr = dir_copy;
 
-    *(Quad_L08_003B2DB0 *)posCopy = *(Quad_L08_003B2DB0 *)pos;
-    *(Quad_L08_003B2DB0 *)dirCopy = *(Quad_L08_003B2DB0 *)dir;
+    *(Quad_L08_003B2DB0 *)pos_copy = *(Quad_L08_003B2DB0 *)pos;
+    *(Quad_L08_003B2DB0 *)dir_copy = *(Quad_L08_003B2DB0 *)dir;
     moby = CreateMoby(0x4EA /* moby class 1258 */);
     if (moby) {
         state = moby->state;
@@ -581,10 +581,10 @@ Moby_L08_003B2DB0 *SpawnDirectedEffectObject(int owner, float *pos, float *dir, 
         moby->b30 = 0xFF;
         moby->h32 = 0xFF;
         moby->b31 = 1;
-        moby->fF4 = -mat_fast_helper_a(vec_length_xy(dirPtr), dirPtr[2]);
-        moby->fF8 = mat_fast_helper_a(dirCopy[0], dirPtr[1]);
-        qcopy(moby->pos, posPtr);
-        qcopy(state->dir, dirPtr);
+        moby->fF4 = -mat_fast_helper_a(vec_length_xy(dir_ptr), dir_ptr[2]);
+        moby->fF8 = mat_fast_helper_a(dir_copy[0], dir_ptr[1]);
+        qcopy(moby->pos, pos_ptr);
+        qcopy(state->dir, dir_ptr);
         state->f10 = math_random_float_range(-0.02617994323372841f, 0.02617994323372841f);
         state->f14 = 0;
         state->h1C = life;
@@ -592,11 +592,11 @@ Moby_L08_003B2DB0 *SpawnDirectedEffectObject(int owner, float *pos, float *dir, 
         state->f20 = fast_vec_dist(moby->pos, g_hero_position);
         state->f24 = 0;
         state->f28 = 0;
-        lifeTicks = life * 5 / 4;
+        life_ticks = life * 5 / 4;
         moby->h34 |= 0x200;
         moby->b23 = 0x40;
-        SpawnJointFollowParticle(moby, 400000.0f, 0x2F7F4F4F, lifeTicks, -1);
-        SpawnJointFollowParticle(moby, 160000.0f, 0x4F7F7F7F, lifeTicks, -1);
+        SpawnJointFollowParticle(moby, 400000.0f, 0x2F7F4F4F, life_ticks, -1);
+        SpawnJointFollowParticle(moby, 160000.0f, 0x4F7F7F7F, life_ticks, -1);
         func_002A0F48(moby);
     }
     return moby;
@@ -666,8 +666,8 @@ destroy:
     if (!CollLine(&frame.old, moby + 0x10, 0, (void *)state->owner, input)) return;
     qcopy(moby + 0x10, &ref_L08_003B2F70_01);
     if (!*(u8 *)(moby + 0xBC)) {
-        int sparkIndex;
-        for (sparkIndex = 0; sparkIndex < 5; sparkIndex++) {
+        int spark_index;
+        for (spark_index = 0; spark_index < 5; spark_index++) {
             frame.random.q = 0;
             frame.random.f[0] = math_random_float_range(-1.0f, 1.0f);
             frame.random.f[1] = math_random_float_range(-1.0f, 1.0f);

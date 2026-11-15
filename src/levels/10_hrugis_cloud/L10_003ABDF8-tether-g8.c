@@ -169,11 +169,11 @@ void gadget_l10_update_lock_on_tether(Moby *self)
     float va[4] __attribute__((aligned(16)));
     float vb[4] __attribute__((aligned(16)));
     Hit hit1 __attribute__((aligned(16)));
-    float aimDir[4] __attribute__((aligned(16)));
-    float segOffset[4] __attribute__((aligned(16)));
-    float segStep[4] __attribute__((aligned(16)));
-    float segCarry[4] __attribute__((aligned(16)));
-    float sideShift[4] __attribute__((aligned(16)));
+    float aim_dir[4] __attribute__((aligned(16)));
+    float seg_offset[4] __attribute__((aligned(16)));
+    float seg_step[4] __attribute__((aligned(16)));
+    float seg_carry[4] __attribute__((aligned(16)));
+    float side_shift[4] __attribute__((aligned(16)));
     Tgt *held[128];
     float scratch[4] __attribute__((aligned(16)));
     union {
@@ -332,14 +332,14 @@ void gadget_l10_update_lock_on_tether(Moby *self)
     hit1.tag = self->tag;
     st->count = 0x14;
     coll_process_hit(st, 0x10, g_hero_state.ent, &hit1, 0.3f);
-    FastVecSub(aimDir, st->b, st);
-    vec_scale_to_length(aimDir, aimDir, 1.0f);
+    FastVecSub(aim_dir, st->b, st);
+    vec_scale_to_length(aim_dir, aim_dir, 1.0f);
     if (st->lockA != 0 || st->lockB != 0) {
-        FastVecCross(segOffset, aimDir, (char *)&g_hero_state + 0x2C0);
-        math_apply_axis_rotation_to_quat(aimDir, aimDir, segOffset, 0.17453295f);
+        FastVecCross(seg_offset, aim_dir, (char *)&g_hero_state + 0x2C0);
+        math_apply_axis_rotation_to_quat(aim_dir, aim_dir, seg_offset, 0.17453295f);
     }
     got = 0;
-    FastVecScale(segCarry, aimDir, reach);
+    FastVecScale(seg_carry, aim_dir, reach);
     nheld = 0;
     /* These named pointers, and the short locals below, are live but also steer: each adds
        insns that exist at gcse and die later (asm operands keep the copy; the sign extension
@@ -363,21 +363,21 @@ void gadget_l10_update_lock_on_tether(Moby *self)
         D_L10_0023B910[i] = height;
         D_L10_0023B690[0][i].f[2] = D_L10_0023B690[0][i].f[2] - old;
         vec_transform_or_copy(&D_L10_0023B690[0][i], &D_L10_0023B690[0][i]);
-        FastVecSub(segOffset, &D_L10_0023B690[0][i], D_L10_0023B680[i]);
-        lerp_vector(segStep, segOffset, segCarry, 0.85f);
+        FastVecSub(seg_offset, &D_L10_0023B690[0][i], D_L10_0023B680[i]);
+        lerp_vector(seg_step, seg_offset, seg_carry, 0.85f);
         {
-            float cm = FastVecLength(segStep);
+            float cm = FastVecLength(seg_step);
             if (cm == 0.0f) {
                 prev = &D_L10_0023B690[0][i - 1];
                 qcopy(&D_L10_0023B690[0][i], prev);
             } else {
-                FastVecScale(segStep, segStep, reach / cm);
-                FastVecAdd(&D_L10_0023B690[0][i], D_L10_0023B680[i], segStep);
-                qcopy(segCarry, segStep);
+                FastVecScale(seg_step, seg_step, reach / cm);
+                FastVecAdd(&D_L10_0023B690[0][i], D_L10_0023B680[i], seg_step);
+                qcopy(seg_carry, seg_step);
             }
         }
         D_L10_0023B690[0][i].f[2] = D_L10_0023B690[0][i].f[2] + height;
-        FastVecSub(segOffset, &D_L10_0023B690[0][i], D_L10_0023B680[i]);
+        FastVecSub(seg_offset, &D_L10_0023B690[0][i], D_L10_0023B680[i]);
         if (st->lockA != 0) {
             if (!locked || st->lockB == 0) {
                 FastVecSub(scratch, v0, &D_L10_0023B690[0][i]);
@@ -394,7 +394,7 @@ void gadget_l10_update_lock_on_tether(Moby *self)
                         blend = 0.1f;
                     }
                     FastVecScale(scratch, scratch, reach / length);
-                    lerp_vector(segCarry, segCarry, scratch, blend);
+                    lerp_vector(seg_carry, seg_carry, scratch, blend);
                 }
             } else {
                 if (i >= 10)
@@ -418,7 +418,7 @@ void gadget_l10_update_lock_on_tether(Moby *self)
                         blend = 0.2f;
                     }
                     FastVecScale(scratch, scratch, reach / length);
-                    lerp_vector(segCarry, segCarry, scratch, blend);
+                    lerp_vector(seg_carry, seg_carry, scratch, blend);
                 }
             }
         }
@@ -430,22 +430,22 @@ void gadget_l10_update_lock_on_tether(Moby *self)
             D_L10_0023BAA0[i] = height;
             D_L10_0023B690[1][i].f[2] = D_L10_0023B690[1][i].f[2] + height;
             {
-                float bearing = FastAddRotations(mat_fast_helper_a(segOffset[0], segOffset[1]), 1.5707965f);
+                float bearing = FastAddRotations(mat_fast_helper_a(seg_offset[0], seg_offset[1]), 1.5707965f);
                 {
                     float radial = D_L10_001AF154 * math_fast_sin_or_cos_a(angle);
-                    sideShift[0] = math_fast_sin_or_cos_a(bearing) * radial;
-                    sideShift[1] = math_fast_sin_or_cos_b(bearing) * radial;
-                    sideShift[2] = 0.0f;
-                    qcopy_nc(&D_L10_0023B960[i], sideShift);
+                    side_shift[0] = math_fast_sin_or_cos_a(bearing) * radial;
+                    side_shift[1] = math_fast_sin_or_cos_b(bearing) * radial;
+                    side_shift[2] = 0.0f;
+                    qcopy_nc(&D_L10_0023B960[i], side_shift);
                 }
             }
-            FastVecAdd(&D_L10_0023B690[1][i], &D_L10_0023B690[1][i], sideShift);
+            FastVecAdd(&D_L10_0023B690[1][i], &D_L10_0023B690[1][i], side_shift);
         } else {
             fa2 = 0x15 - i;
             qcopy(&D_L10_0023B690[1][i], &D_L10_0023B690[0][i]);
             D_L10_0023B690[1][i].f[2] = D_L10_0023B690[1][i].f[2] + D_L10_0023BAA0[fa2];
             FastVecAdd(&D_L10_0023B690[1][i], &D_L10_0023B690[1][i], &D_L10_0023B960[fa2]);
-            qcopy(sideShift, &D_L10_0023B960[i]);
+            qcopy(side_shift, &D_L10_0023B960[i]);
         }
         if (i >= 2 && (i == 0x13 || !(i & 1))) {
             FastVecSub(vb, &D_L10_0023B690[0][i], D_L10_001B9680);
@@ -573,7 +573,7 @@ void gadget_l10_update_lock_on_tether(Moby *self)
             D_L10_001B2DE0[k] = 0;
             angle0 = math_random_signed_float_range(0.52359885f, 1.0471977f);
             angle1 = math_random_float_range(-1.0471977f, 0.17453295f);
-            FastVecScale(scratch, aimDir, ksize);
+            FastVecScale(scratch, aim_dir, ksize);
             math_apply_axis_rotation_to_quat(scratch, scratch, D_0018A560, angle1);
             math_apply_axis_rotation_to_quat(scratch, scratch, D_0018A560 + 0x10, angle0);
             qcopy(&D_L10_0023BAF0[k].v[0], hb.q);
@@ -616,7 +616,7 @@ void gadget_l10_update_lock_on_tether(Moby *self)
     {
         angle0 = math_random_signed_float_range(0.52359885f, 1.0471977f);
         angle1 = math_random_float_range(-0.52359885f, 1.0471977f);
-        FastVecScale(scratch, aimDir, D_L10_001AF1B8);
+        FastVecScale(scratch, aim_dir, D_L10_001AF1B8);
         math_apply_axis_rotation_to_quat(scratch, scratch, D_0018A560, angle1);
         math_apply_axis_rotation_to_quat(scratch, scratch, D_0018A560 + 0x10, angle0);
         spin = math_random_int_range(1, 8);

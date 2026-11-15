@@ -33,7 +33,7 @@ void moby_update_floor_and_ceiling_heights(Ent *moby)
 {
     Mount *mount = moby->f68;
     f32 pos[4] __attribute__((aligned(16)));
-    f32 top, heroTop;
+    f32 top, hero_top;
     qcopy(pos, moby->pos);
     if (moby->f20 == 0) {
         mount->f224 = coll_get_ground_height_with_limit(pos, mount->f1D8 + 20.0f, mount->f1D8 - 10.0f, mount->f27C, mount->f288);
@@ -42,6 +42,6 @@ void moby_update_floor_and_ceiling_heights(Ent *moby)
     }
     if (mount->f224 < mount->f27C) mount->f224 = mount->f27C;
     top = mount->f224 + 1.7f;
-    heroTop = ((Hero *)g_hero_position)->f[8 / 4] + 0.1f;
-    mount->f228 = top > heroTop ? top : heroTop;
+    hero_top = ((Hero *)g_hero_position)->f[8 / 4] + 0.1f;
+    mount->f228 = top > hero_top ? top : hero_top;
 }

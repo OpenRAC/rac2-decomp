@@ -71,26 +71,26 @@ typedef struct {
 extern int D_L03_002325D0[];
 
 /* Copies a block of image data from the console memory to the graphics chip in 16 KB pieces. */
-void gfx_copy_image_to_gs_blocks(u8 *dest, s32 vramAddr, s32 size) {
+void gfx_copy_image_to_gs_blocks(u8 *dest, s32 vram_addr, s32 size) {
     u8 image[112];
     s32 remaining = (size + 0x3fff) & ~0x3fff;
-    s32 srcOffset = 0, dstOffset = 0;
+    s32 src_offset = 0, dst_offset = 0;
     for (; remaining > 0; remaining -= 0x4000) {
-        func_00126470(image, (s32)(short)((vramAddr+srcOffset)>>8), 1, 1, 0, 0, 64, 64);
-        srcOffset += 0x4000;
+        func_00126470(image, (s32)(short)((vram_addr+src_offset)>>8), 1, 1, 0, 0, 64, 64);
+        src_offset += 0x4000;
         FlushCache(0);
-        func_00126730(image,dest+dstOffset);
-        dstOffset += 0x3000;
+        func_00126730(image,dest+dst_offset);
+        dst_offset += 0x3000;
         gfx_wait_paths_idle(0,0);
     }
 }
 /* shared native body of family d50cdefed4015bae (default profile) */
 /* Uploads image data to the graphics chip in 16 KB pieces by writing DMA packets. */
-void gfx_upload_image_to_gs_packets(int data, int vramAddr, int size)
+void gfx_upload_image_to_gs_packets(int data, int vram_addr, int size)
 {
     int remaining = (size + 16383) & -16384;
-    int vramOffset = 0;
-    int dataOffset = 0;
+    int vram_offset = 0;
+    int data_offset = 0;
 
     while (remaining > 0) {
         *(int *)((char *)D_L02_001B3D08_3 + 0) = 0x10000006;
@@ -100,14 +100,14 @@ void gfx_upload_image_to_gs_packets(int data, int vramAddr, int size)
         {
             int *next = (int *)((char *)D_L02_001B3D08_3 + 16);
             D_L02_001B3D08_5 = next;
-            D_00126288(next, (short)((vramAddr + vramOffset) >> 8), 1, 1, 0, 0, 64, 64);
+            D_00126288(next, (short)((vram_addr + vram_offset) >> 8), 1, 1, 0, 0, 64, 64);
         }
-        vramOffset += 16384;
+        vram_offset += 16384;
         remaining -= 16384;
         {
             int *p = D_L02_001B3D08_3;
-            int off = data + dataOffset;
-            dataOffset += 12288;
+            int off = data + data_offset;
+            data_offset += 12288;
             D_L02_001B3D08_5 = (int *)((char *)p + 96);
             *(int *)((char *)p + 96) = 0x30000300;
             *(int *)((char *)D_L02_001B3D08_3 + 4) = off;
@@ -595,10 +595,10 @@ void PlaceObjectBeforeCamera(PreviewObjectPrefix *object)
     float offset[4] __attribute__((aligned(16)));
     float basis[12] __attribute__((aligned(16)));
     float temporary[4] __attribute__((aligned(16)));
-    int special = object->classId == 0xC5A /* Miniturret Glove */ || object->classId == 0xA65 /* Megaturret Glove */;
+    int special = object->classId == MOBY_CLASS_MINITURRET_GLOVE || object->classId == MOBY_CLASS_MEGATURRET_GLOVE;
     int compact = 0;
-    if (object->classId == 0x879 /* Chopper */ || object->classId == 0xAF6 /* Multi-Star */ ||
-        object->classId == 0x907 /* Spiderbot Glove */ || object->classId == 0xE7A /* Tankbot Glove */ || special)
+    if (object->classId == MOBY_CLASS_CHOPPER || object->classId == MOBY_CLASS_MULTI_STAR ||
+        object->classId == MOBY_CLASS_SPIDERBOT_GLOVE || object->classId == MOBY_CLASS_TANKBOT_GLOVE || special)
         compact = 1;
     if (special) {
         FastVecScale(offset, g_active_camera.forward, 2.5f);
@@ -732,18 +732,18 @@ void shop_draw_preview_dim_overlay(void)
 
 /* Puts a value in the first free place of a 64-entry list and returns the place, or -1 if full. */
 s32 slot_list_add(s32 *list,s32 value) {
- s32 placeIndex=-1,i=0,flagValue=1; s32 *p=list;
+ s32 place_index=-1,i=0,flag_value=1; s32 *p=list;
  for(;i<64;i++,p++) {
   if(*p==0) {
    *p=value;
-   list[0x89]=flagValue;
+   list[0x89]=flag_value;
    list[0x88]++;
-   placeIndex=i;
+   place_index=i;
    p[0x40]=0;
    break;
   }
  }
- return placeIndex;
+ return place_index;
 }
 
 /* Clear corresponding indexed words and decrement a record count */
@@ -776,8 +776,8 @@ extern float vec_fast_helper_c(char *origin, char *point);
 extern char D_00190000[];
 
 /* Sorts the listed objects by distance from the player and keeps the nearest ones. */
-void moby_sort_entries_by_distance(void *tablePtr) {
-    State00300330 *state = (State00300330 *)tablePtr;
+void moby_sort_entries_by_distance(void *table_ptr) {
+    State00300330 *state = (State00300330 *)table_ptr;
     float distances[64];
     int i;
     int k;
@@ -871,10 +871,10 @@ int game_is_id_in_list(int value)
 
 /* func_00300540 : dispatch: weapon category selected by the identifier */
 /* Sorts a weapon id into a group: 2, 1, or 0 for all others. */
-s32 weapon_get_group(s32 weaponId) {
+s32 weapon_get_group(s32 weapon_id) {
     s32 group = 0;
-    if (weaponId == 0 || weaponId == 14 || weaponId == 13) group = 2;
-    else if (weaponId == 1 || weaponId == 3 || weaponId == 11 || weaponId == 12) group = 1;
+    if (weapon_id == 0 || weapon_id == 14 || weapon_id == 13) group = 2;
+    else if (weapon_id == 1 || weapon_id == 3 || weapon_id == 11 || weapon_id == 12) group = 1;
     return group;
 }
 

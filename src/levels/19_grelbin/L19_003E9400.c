@@ -26,10 +26,10 @@ extern float func_2EBF30(float);
 /* Ticks two timers in the object's data and counts up its age, stopping at the maximum. */
 void moby_tick_timers_age(char *moby)
 {
-    int varsAddr = *(int *)(moby + 0x68);
+    int vars_addr = *(int *)(moby + 0x68);
 
-    func_2EB590(varsAddr + 0x218);
-    func_2EB5C0(varsAddr + 0x21C);
+    func_2EB590(vars_addr + 0x218);
+    func_2EB5C0(vars_addr + 0x21C);
     if (*(unsigned short *)(moby + 0x96) < 0xFFFF) {
         *(unsigned short *)(moby + 0x96) += 1;
     }
@@ -166,19 +166,19 @@ extern s32 D_L19_001B2A38[] __attribute__((sda));
 /* Mark every entity in this object's group state. */
 void group_mark_entities(u8 *object)
 {
-    u16 *groupPtr;
+    u16 *group_ptr;
     u8 *entity;
 
     if (object[0x21] == 0xFF)
         return;
-    groupPtr = D_L19_001FB5A0[object[0x21]];
-    while (object[0x21] != 0xFF && object[0x21] <= D_L19_001B2A38[0] && groupPtr != 0 &&
-           ((groupPtr != 0 && (s16)groupPtr[-1] >= 0) || groupPtr == D_L19_001FB5A0[object[0x21]])) {
-        entity = g_moby_l19_array[0] + ((*groupPtr & 0x7FFF) << 8);
+    group_ptr = D_L19_001FB5A0[object[0x21]];
+    while (object[0x21] != 0xFF && object[0x21] <= D_L19_001B2A38[0] && group_ptr != 0 &&
+           ((group_ptr != 0 && (s16)group_ptr[-1] >= 0) || group_ptr == D_L19_001FB5A0[object[0x21]])) {
+        entity = g_moby_l19_array[0] + ((*group_ptr & 0x7FFF) << 8);
         if (entity == 0)
             break;
         *(s32 *)(*(u8 **)(entity + 0x68) + 0x240) = 1;
-        groupPtr++;
+        group_ptr++;
     }
 }
 
@@ -219,7 +219,7 @@ void UpdateGrelbinTriggeredShuttle(char *moby)
     char *vars = *(char **)(moby + 0x68);
     float offset[4] __attribute__((aligned(16)));
     char query[0x30] __attribute__((aligned(16)));
-    char *soundSlot;
+    char *sound_slot;
 
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
@@ -237,15 +237,15 @@ void UpdateGrelbinTriggeredShuttle(char *moby)
     case 2:
         vec_spring_to_target(moby + 0x10, vars + 0x30, vars + 0x14, *(float *)(vars + 8) * 0.00027777778f,
                       *(float *)(vars + 8) * 0.00027777778f, *(float *)(vars + 8) * 0.016666668f);
-        soundSlot = g_sound_state + *(int *)(vars + 0x40) * 0x70;
-        if (*(char **)(soundSlot + 0x88) != moby || !*(u8 *)(soundSlot + 0x74))
+        sound_slot = g_sound_state + *(int *)(vars + 0x40) * 0x70;
+        if (*(char **)(sound_slot + 0x88) != moby || !*(u8 *)(sound_slot + 0x74))
             *(int *)(vars + 0x40) = PlayMobySound(0, 4, moby);
         if (fast_vec_dist(moby + 0x10, vars + 0x30) < *(float *)(vars + 8) * 0.016666668f)
             moby_set_state(moby, 3, -1);
         break;
     case 3:
-        soundSlot = g_sound_state + *(int *)(vars + 0x40) * 0x70;
-        if (*(char **)(soundSlot + 0x88) != moby || !*(u8 *)(soundSlot + 0x74))
+        sound_slot = g_sound_state + *(int *)(vars + 0x40) * 0x70;
+        if (*(char **)(sound_slot + 0x88) != moby || !*(u8 *)(sound_slot + 0x74))
             *(int *)(vars + 0x40) = PlayMobySound(0, 4, moby);
         vec_spring_to_target(moby + 0x10, vars + 0x20, vars + 0x14, *(float *)(vars + 8) * 0.00027777778f,
                       *(float *)(vars + 8) * 0.00027777778f, *(float *)(vars + 8) * 0.016666668f);
@@ -348,12 +348,12 @@ typedef struct {
 void group_release_linked_when_triggered(u8 *moby)
 {
     GrelbinState *state = *(GrelbinState **)(moby + 0x68);
-    u16 *groupPtr;
+    u16 *group_ptr;
     u8 *entity;
     u8 *first;
     s32 i;
     s32 k;
-    u16 flagWord;
+    u16 flag_word;
 
     if (moby[0xBC] == 0) {
         if (flag_is_third_pending_set(moby) == 0) {
@@ -371,11 +371,11 @@ void group_release_linked_when_triggered(u8 *moby)
     for (i = 0; i < 3; i++) {
         if (state->groups[i] == -1)
             continue;
-        for (groupPtr = D_L19_001FB5A0[state->groups[i]];
+        for (group_ptr = D_L19_001FB5A0[state->groups[i]];
              (state->groups[i] & 0xFF) != 0xFF && state->groups[i] <= D_L19_001B2A38[0] &&
-             groupPtr != 0 && ((s16)groupPtr[-1] >= 0 || groupPtr == D_L19_001FB5A0[state->groups[i]]);
-             groupPtr++) {
-            entity = g_moby_l19_array[0] + ((*groupPtr & 0x7FFF) << 8);
+             group_ptr != 0 && ((s16)group_ptr[-1] >= 0 || group_ptr == D_L19_001FB5A0[state->groups[i]]);
+             group_ptr++) {
+            entity = g_moby_l19_array[0] + ((*group_ptr & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             moby_mark_spawned(entity);
@@ -385,15 +385,15 @@ void group_release_linked_when_triggered(u8 *moby)
         if (state->marks[k] != -1)
             moby_set_group_enabled(state->marks[k], 1);
     }
-    flagWord = *(u16 *)(moby + 0xB2);
-    if (flagWord & 1) {
-        u8 *q = (u8 *)(((s16)flagWord >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+    flag_word = *(u16 *)(moby + 0xB2);
+    if (flag_word & 1) {
+        u8 *q = (u8 *)(((s16)flag_word >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
         u8 c = *q;
 
         if (((c >> 4) & 7) != 7)
             *q = c + 0x10;
     } else {
-        u8 *q = (u8 *)(((s16)flagWord >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        u8 *q = (u8 *)(((s16)flag_word >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
         u8 c = *q;
 
         if ((c & 7) != 7)

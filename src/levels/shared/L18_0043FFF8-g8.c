@@ -50,7 +50,7 @@ char *receiver_bot_spawn_streak_projectile(void *position, char *owner, float *d
         *(int *)(state + 0x28) = kind;
         *(int *)(state + 0x2c) = flags;
         *(char **)(state + 0x10) = owner;
-        if (*(short *)(owner + 0xaa) == 0xee1 /* Receiver Bot */)
+        if (*(short *)(owner + 0xaa) == MOBY_CLASS_RECEIVER_BOT)
             PlayMobySound(5, 0, owner);
         object[0x31] = 0;
         *(unsigned short *)(object + 0x34) |= 1;

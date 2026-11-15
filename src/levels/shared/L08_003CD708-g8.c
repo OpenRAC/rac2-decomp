@@ -49,17 +49,17 @@ void vehicle_update_steering(SteeringObject *vehicle,char *steer,float inputScal
     u64 mode;
 
     float gain=D_L08_001B0028;
-    float targetX,targetY,pitchBias=0.0f;
+    float targetX,targetY,pitch_bias=0.0f;
     float limit=D_L08_001B0038;
-    float bankLimit,turnRate,turnStep;
+    float bank_limit,turn_rate,turn_step;
     float magnitude;
     SteeringHero *hero;
     if (vehicle->mode==8) {
         limit=D_L08_001B0048;
-        if (I(steer,0x50)==0) pitchBias=-2.0f;
+        if (I(steer,0x50)==0) pitch_bias=-2.0f;
     }
     targetX=(g_pad_state.x-g_pad_state.baseX+g_pad_state.z)*inputScale;
-    targetY=(g_pad_state.y-g_pad_state.baseY+g_pad_state.baseZ+pitchBias)*inputScale;
+    targetY=(g_pad_state.y-g_pad_state.baseY+g_pad_state.baseZ+pitch_bias)*inputScale;
     if (targetX>inputScale) targetX=inputScale;
     else if (targetX < -inputScale) targetX=-inputScale;
     if (targetY>inputScale) targetY=inputScale;
@@ -80,30 +80,30 @@ void vehicle_update_steering(SteeringObject *vehicle,char *steer,float inputScal
                           D_L08_001B0030,D_L08_001B0034,limit);
             if (D_L08_001B0140)
                 F(steer,0x14)=fast_subtract_rotations(F(steer,0x14),(F(steer,0x60)*0.0002908882452175021f)*D_L08_001B005C);
-            bankLimit=D_L08_001B0004;
+            bank_limit=D_L08_001B0004;
         } else {
             math_spring_float_to_goal((float *)(steer+0x60),(float *)(steer+0x44),targetY,
                           D_L08_001B0040,D_L08_001B0044,limit);
             if (D_L08_001B0140)
                 F(steer,0x14)=fast_subtract_rotations(F(steer,0x14),(F(steer,0x60)*0.0002908882452175021f)*D_L08_001B0060);
-            bankLimit=D_L08_001B0008;
+            bank_limit=D_L08_001B0008;
         }
-        bankLimit*=0.01745329424738884f;
-        if (F(steer,0x14)>bankLimit) F(steer,0x14)=bankLimit;
-        else if (F(steer,0x14)<-bankLimit) F(steer,0x14)=-bankLimit;
+        bank_limit*=0.01745329424738884f;
+        if (F(steer,0x14)>bank_limit) F(steer,0x14)=bank_limit;
+        else if (F(steer,0x14)<-bank_limit) F(steer,0x14)=-bank_limit;
     } else {
         hero=&g_hero_state;
         magnitude=math_fabs(hero->bank);
         if (magnitude<math_fabs(F(steer,0x60)))
             ApproachValue((float *)(steer+0x60),-hero->bank,D_L08_001B0080);
         else F(steer,0x60)=-hero->bank;
-        turnStep=(F(steer,0x60)*0.01745329424738884f)*D_L08_001B0074;
+        turn_step=(F(steer,0x60)*0.01745329424738884f)*D_L08_001B0074;
         if (math_fabs(F(steer,0x60))>0.2f) {
-            turnRate=fast_subtract_rotations(turnStep,F(steer,0x14));
-            bankLimit=D_L08_001B0070*0.0002908882452175021f;
-            if (turnRate>bankLimit) turnRate=bankLimit;
-            else if (turnRate<-bankLimit) turnRate=-bankLimit;
-            ApproachValue((float *)(steer+0x44),turnRate,
+            turn_rate=fast_subtract_rotations(turn_step,F(steer,0x14));
+            bank_limit=D_L08_001B0070*0.0002908882452175021f;
+            if (turn_rate>bank_limit) turn_rate=bank_limit;
+            else if (turn_rate<-bank_limit) turn_rate=-bank_limit;
+            ApproachValue((float *)(steer+0x44),turn_rate,
                          D_L08_001B0078*(g_hero_state.tickScale*4.848137450608192e-06f));
             F(steer,0x14)=FastAddRotations(F(steer,0x14),F(steer,0x44));
         } else {

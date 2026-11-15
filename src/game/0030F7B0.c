@@ -84,7 +84,7 @@ void swingshot_hook_update(unsigned char *self)
     if (data == 0)
         return;
     peer = *(unsigned char **)data;
-    if (peer == 0 || *(short *)(peer + 0xAA) != 0xD0 /* Swingshot */ || peer[0x20] == 0xFE ||
+    if (peer == 0 || *(short *)(peer + 0xAA) != MOBY_CLASS_SWINGSHOT || peer[0x20] == 0xFE ||
         peer[0x20] == 0xFD || *(unsigned char **)(*(unsigned char **)(peer + 0x68) + 0x14) != self)
         goto destroy;
     if ((*(unsigned short *)(peer + 0x34) & 1) || D_0018C0DF != 0)
@@ -300,10 +300,10 @@ void GroundAttachedUpdate(SupportMoby *moby) {
     group = moby->group;
     vars->flags |= 4;
     if (group == 0xFF) {
-        if (moby->oclass == 0x1F4 /* Crate */ && math_random_int_below(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
+        if (moby->oclass == MOBY_CLASS_CRATE && math_random_int_below(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
             moby->rotation[2] = FastAddRotations(moby->rotation[2], 1.5707964897155762f);
         }
-        if ((moby->oclass == 0x1F5 /* Nanotech Crate */ || moby->oclass == 0x200 /* Purple Nanotech Crate */) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
+        if ((moby->oclass == MOBY_CLASS_NANOTECH_CRATE || moby->oclass == MOBY_CLASS_PURPLE_NANOTECH_CRATE) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
             moby_mark_spawned(moby);
             return;
         }
@@ -341,10 +341,10 @@ void GroundAttachedUpdate(SupportMoby *moby) {
     while (moby != 0) {
         vars = moby->vars;
         if (moby_is_in_special_class_range(moby) != 0) {
-            if (moby->oclass == 0x1F4 /* Crate */ && math_random_int_below(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
+            if (moby->oclass == MOBY_CLASS_CRATE && math_random_int_below(2) != 0 && moby->rotation[0] == 0.0f && moby->rotation[1] == 0.0f) {
                 moby->rotation[2] = FastAddRotations(moby->rotation[2], 1.5707964897155762f);
             }
-            if ((moby->oclass == 0x1F5 /* Nanotech Crate */ || moby->oclass == 0x200 /* Purple Nanotech Crate */) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
+            if ((moby->oclass == MOBY_CLASS_NANOTECH_CRATE || moby->oclass == MOBY_CLASS_PURPLE_NANOTECH_CRATE) && moby->mission != 0xFF && D_001A73E0[moby->mission] < vars->death_count) {
                 moby_mark_spawned(moby);
             } else {
                 member_flags = vars->flags;
@@ -425,7 +425,7 @@ void GroundAttachedUpdate(SupportMoby *moby) {
                         vars->stack_level = below_vars->stack_level + 1.0f;
                     }
                 }
-                if ((vars->hC6 != 0 || (moby->oclass == 0x1F5 /* Nanotech Crate */ || moby->oclass == 0x200 /* Purple Nanotech Crate */)) && vars->above != 0 && vars->route_index != -1) {
+                if ((vars->hC6 != 0 || (moby->oclass == MOBY_CLASS_NANOTECH_CRATE || moby->oclass == MOBY_CLASS_PURPLE_NANOTECH_CRATE)) && vars->above != 0 && vars->route_index != -1) {
                     route = g_path_table[vars->route_index];
                     if (route->count == 0) {
                         vars->route_index = -1;

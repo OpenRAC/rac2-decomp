@@ -18,18 +18,18 @@ extern struct { char pad[0x230]; int selected; } D_L20_001CA5A0;
 /* Fills the menu entry list from a table of ids, then finds which entry is currently picked and stores its position in the menu. */
 int menu_l20_build_entry_list(char *menu) {
     int i, item;
-    int *itemList;
+    int *item_list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {
         D_L20_0021E0F0[i].kind = 3;
         D_L20_0021E0F0[i].callback = D_L20_002923E0;
         D_L20_0021E0F0[i].id = D_L20_00296920[D_00139948[i]].id;
         D_L20_0021E0F0[i].value = D_L20_00296920[D_00139948[i]].value;
     }
-    itemList = D_L20_001AA7F0;
+    item_list = D_L20_001AA7F0;
     D_L20_0021E0F0[i].id = 0;
     *(int *)(menu + 0x40) = 0;
     *(unsigned int *)(menu + 0x30) |= 0x8000;
-    for (i = 0, item = itemList[0]; item; item = D_L20_001AA7F0[++i]) {
+    for (i = 0, item = item_list[0]; item; item = D_L20_001AA7F0[++i]) {
         if (D_L20_001CA5A0.selected == item) {
             *(int *)(menu + 0x40) = i;
             break;

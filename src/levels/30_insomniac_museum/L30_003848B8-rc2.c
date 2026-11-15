@@ -31,31 +31,31 @@ extern s8 g_music_state[];
 /* Picks the next time value for the chosen entry and stores it in the game state; returns 1 if it did, 0 if not. */
 s32 museum_schedule_next_exhibit_entry(void *moby) {
     s8 *vars;
-    s8 *gameState;
+    s8 *game_state;
     s8 *state;
     s32 kind;
     s32 slot;
     s32 pending;
     s32 value;
-    s32 firstOffset;
-    s32 secondOffset;
+    s32 first_offset;
+    s32 second_offset;
 
-    gameState = g_music_state;
+    game_state = g_music_state;
     vars = *(s8 **)((s8 *)moby + 0x68);
     slot = *(s32 *)(vars + 0x144);
     kind = ref_L30_003848B8_01[slot];
-    if (*(s32 *)(gameState + 0x68) == 0) {
-        pending = *(s32 *)(gameState + 0x24);
+    if (*(s32 *)(game_state + 0x68) == 0) {
+        pending = *(s32 *)(game_state + 0x24);
         if ((pending == -1) && (slot != pending)) {
             if (kind != 6) {
                 if ((((s32) ref_L30_003848B8_00 >> kind) ^ 1) & 1) {
-                    firstOffset = kind * 4;
-                    value = *(s32 *)(vars + firstOffset + 0xE0);
+                    first_offset = kind * 4;
+                    value = *(s32 *)(vars + first_offset + 0xE0);
                     ref_L30_003848B8_00 |= 1 << kind;
                 } else {
-                    firstOffset = kind * 4;
-                    secondOffset = kind * 4;
-                    value = *(s32 *)(vars + secondOffset + 0x10C);
+                    first_offset = kind * 4;
+                    second_offset = kind * 4;
+                    value = *(s32 *)(vars + second_offset + 0x10C);
                 }
             } else if (slot == 1) {
                 value = *(s32 *)(vars + 0xF8);

@@ -71,23 +71,23 @@ extern void EmitTrailEffects(char *,void *,void *,float);
 void racer_update_bike_animation(char *moby,char *vars) {
  float v[4] __attribute__((aligned(16)));
  float matrix[16] __attribute__((aligned(16)));
- float speedSum,leanSquared,speedBlend,target,scale,leanCurve,angle,period=0.5f; Object1006 *obj;
+ float speed_sum,lean_squared,speed_blend,target,scale,lean_curve,angle,period=0.5f; Object1006 *obj;
  if(!B(moby,0xbc)) return;
- speedSum=F(vars,0x30c)+F(vars,0x27c);
- if(speedSum<0.083333336f) speedSum=0.083333336f;
- leanSquared=F(vars,0x308)*13.750985f;
- speedBlend=speedSum*3.0f;
- leanCurve=F(vars,0x308)*22.918308f;
- leanSquared*=math_fabs(leanSquared);
- leanCurve=1.0f-(1.0f-leanCurve)*(1.0f-leanCurve);
- if(speedBlend>1.0f) speedBlend=1.0f;
+ speed_sum=F(vars,0x30c)+F(vars,0x27c);
+ if(speed_sum<0.083333336f) speed_sum=0.083333336f;
+ lean_squared=F(vars,0x308)*13.750985f;
+ speed_blend=speed_sum*3.0f;
+ lean_curve=F(vars,0x308)*22.918308f;
+ lean_squared*=math_fabs(lean_squared);
+ lean_curve=1.0f-(1.0f-lean_curve)*(1.0f-lean_curve);
+ if(speed_blend>1.0f) speed_blend=1.0f;
  if(F(vars,0x4c8)!=0.0f) {
   if(math_fabs(F(moby,0xf0)-F(vars,0x4c8))<0.003f) F(vars,0x4c8)=0;
   scale=5.0f;
   target=F(vars,0x4c8);
  } else {
   scale=1.0f;
-  target=(1.0f-speedBlend)*leanSquared+speedBlend*leanCurve;
+  target=(1.0f-speed_blend)*lean_squared+speed_blend*lean_curve;
   if(target>1.0f) target=1.0f;
   if(target<-1.0f) target=-1.0f;
   target*=-0.52359885f;

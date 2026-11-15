@@ -83,7 +83,7 @@ void gfx_l23_draw_glowing_beam(s32 unused0, s32 unused1, s32 unused2, s32 unused
     float vtip[4] __attribute__((aligned(16)));
     float vside[4] __attribute__((aligned(16)));
     float vbase[4] __attribute__((aligned(16)));
-    float uvOffset[2];
+    float uv_offset[2];
     float *rel;
     float *axis;
     float *tip;
@@ -91,8 +91,8 @@ void gfx_l23_draw_glowing_beam(s32 unused0, s32 unused1, s32 unused2, s32 unused
     float *base;
     L23BeamVars *vars;
     float angle;
-    float sinAngle;
-    float cosAngle;
+    float sin_angle;
+    float cos_angle;
     int i;
     int j;
 
@@ -165,13 +165,13 @@ void gfx_l23_draw_glowing_beam(s32 unused0, s32 unused1, s32 unused2, s32 unused
     q.uv[3][0] = 1.0f;
     q.uv[3][1] = 1.0f;
     angle = vars->spin;
-    sinAngle = math_fast_sin_or_cos_a(angle);
-    cosAngle = math_fast_sin_or_cos_b(angle);
+    sin_angle = math_fast_sin_or_cos_a(angle);
+    cos_angle = math_fast_sin_or_cos_b(angle);
     for (j = 0; j < 4; j++) {
-        uvOffset[0] = q.uv[j][0] - 0.5f;
-        uvOffset[1] = q.uv[j][1] - 0.5f;
-        q.uv[j][0] = uvOffset[0] * sinAngle - uvOffset[1] * cosAngle;
-        q.uv[j][1] = uvOffset[0] * cosAngle + uvOffset[1] * sinAngle;
+        uv_offset[0] = q.uv[j][0] - 0.5f;
+        uv_offset[1] = q.uv[j][1] - 0.5f;
+        q.uv[j][0] = uv_offset[0] * sin_angle - uv_offset[1] * cos_angle;
+        q.uv[j][1] = uv_offset[0] * cos_angle + uv_offset[1] * sin_angle;
         q.uv[j][0] += 0.5f;
         q.uv[j][1] += 0.5f;
     }

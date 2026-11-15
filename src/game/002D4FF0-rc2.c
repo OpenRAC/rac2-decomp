@@ -31,16 +31,16 @@ extern s8 D_0025BA80[];
 
 /* Sets the given menu item to show the current choice and starts it sliding in from the side when the choice changed, then moves on to the next choice. */
 s32 menu_choice_slide_init(s32 display) {
-    s32 choiceNumber;
-    s32 byteOffset;
+    s32 choice_number;
+    s32 byte_offset;
 
-    choiceNumber = *(s32 *)D_0025B9C0;
-    if (D_001ABAA0 != choiceNumber) {
+    choice_number = *(s32 *)D_0025B9C0;
+    if (D_001ABAA0 != choice_number) {
         (*(s32 *)((s8 *)(display) + (0x3C))) = -0x2BC;
-        D_001ABAA0 = choiceNumber;
+        D_001ABAA0 = choice_number;
     }
-    byteOffset = choiceNumber * 4;
-    (*(s32 *)((s8 *)(display) + (0x34))) = *(s32 *)((s8 *)&D_001AAA38 + byteOffset);
-    *(s32 *)D_0025BA80 = choiceNumber + 1;
+    byte_offset = choice_number * 4;
+    (*(s32 *)((s8 *)(display) + (0x34))) = *(s32 *)((s8 *)&D_001AAA38 + byte_offset);
+    *(s32 *)D_0025BA80 = choice_number + 1;
     return 0;
 }

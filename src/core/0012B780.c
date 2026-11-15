@@ -34,9 +34,9 @@ extern int mpeg_read_mb_address_increment(void *);
  * +0x1B0, and zero eight fields of the *arg4 output struct.
  */
 /* Reads the header of a slice (a row of macroblocks) and works out the first macroblock to decode. Returns 0 on success, nonzero on a stream error. */
-int mpeg_read_slice_header(void *decoderPtr, int mbCount, int *startMbAddr, int *mbIncOut, void *blockInfo) {
-    char *dec = (char *)decoderPtr;
-    char *blockInfoBytes = (char *)blockInfo;
+int mpeg_read_slice_header(void *decoder_ptr, int mb_count, int *start_mb_addr, int *mb_inc_out, void *block_info) {
+    char *dec = (char *)decoder_ptr;
+    char *block_info_bytes = (char *)block_info;
     unsigned int code;
     int sliceB_result;
     int mbInc;
@@ -54,7 +54,7 @@ int mpeg_read_slice_header(void *decoderPtr, int mbCount, int *startMbAddr, int 
     mpeg_skip_bits(dec, 0x20);
     sliceB_result = mpeg_read_slice_header_extra(dec);
     mbInc = mpeg_read_mb_address_increment(dec);
-    *mbIncOut = mbInc;
+    *mb_inc_out = mbInc;
 
     if (*(int *)(dec + 0x11C) != 0) {
         r1_func_0012C468(dec, r1_D_00153928);
@@ -62,16 +62,16 @@ int mpeg_read_slice_header(void *decoderPtr, int mbCount, int *startMbAddr, int 
     }
 
     row = (sliceB_result << 7) + (int)(code & 0xFF) - 1;
-    *startMbAddr = row * (*(int *)(dec + 0x12C)) + mbInc - 1;
-    *mbIncOut = 1;
+    *start_mb_addr = row * (*(int *)(dec + 0x12C)) + mbInc - 1;
+    *mb_inc_out = 1;
     *(int *)(dec + 0x1B0) = 1;
-    *(int *)(blockInfoBytes + 0x14) = 0;
-    *(int *)(blockInfoBytes + 0x10) = 0;
-    *(int *)(blockInfoBytes + 0x4) = 0;
-    *(int *)(blockInfoBytes + 0x0) = 0;
-    *(int *)(blockInfoBytes + 0x1C) = 0;
-    *(int *)(blockInfoBytes + 0x18) = 0;
-    *(int *)(blockInfoBytes + 0xC) = 0;
-    *(int *)(blockInfoBytes + 0x8) = 0;
+    *(int *)(block_info_bytes + 0x14) = 0;
+    *(int *)(block_info_bytes + 0x10) = 0;
+    *(int *)(block_info_bytes + 0x4) = 0;
+    *(int *)(block_info_bytes + 0x0) = 0;
+    *(int *)(block_info_bytes + 0x1C) = 0;
+    *(int *)(block_info_bytes + 0x18) = 0;
+    *(int *)(block_info_bytes + 0xC) = 0;
+    *(int *)(block_info_bytes + 0x8) = 0;
     return 0;
 }

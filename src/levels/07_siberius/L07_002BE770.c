@@ -13,7 +13,7 @@ extern int D_L07_001B2534 __attribute__((sda));
 /* func_L07_002F2C70 is defined in L07_002BE770-g8.isBurst (it reads small data through $gp). */
 
 /* Creates one falling snow particle at source position with source random size, color and spin. */
-char *part_spawn_snow(void *source, void *velocity, int isBurst, int useGroup)
+char *part_spawn_snow(void *source, void *velocity, int is_burst, int use_group)
 {
  char *particle=part_alloc(0x68); char *params;
  if(particle) {
@@ -26,8 +26,8 @@ char *part_spawn_snow(void *source, void *velocity, int isBurst, int useGroup)
  particle[8]=math_random_int_below(255);
  qcopy(particle+16,source); qcopy(params,velocity);
  *(short *)(particle+10)=1<<math_random_int_range(6,10);
- if(isBurst) {*(short *)(particle+10)=120; *(int *)(params+20)=1;}
- if(useGroup) *(int *)(particle+4)+=*(int *)(params+16)<<24;
+ if(is_burst) {*(short *)(particle+10)=120; *(int *)(params+20)=1;}
+ if(use_group) *(int *)(particle+4)+=*(int *)(params+16)<<24;
  { float f=math_random_int_range(0,100); int n=D_L07_001B2534; *(float *)(params+12)=f; D_L07_001B2534=n+1; }
  }
  return particle;

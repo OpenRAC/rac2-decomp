@@ -31,7 +31,7 @@ void mission_target_ship_update(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *actor;
     u8 *record;
-    s32 effectId;
+    s32 effect_id;
     s32 tmp[4];
     s32 one;
 
@@ -51,11 +51,11 @@ void mission_target_ship_update(u8 *moby) {
     func_0037DFB8(moby);
     one = 1;
     if (func_0037D390(moby, 0, 0, 0) == one) {
-        effectId = *(s32 *)(vars + 0x26C);
-        if (effectId != -1) {
-            record = D_L10_00188660 + effectId * 0x70;
+        effect_id = *(s32 *)(vars + 0x26C);
+        if (effect_id != -1) {
+            record = D_L10_00188660 + effect_id * 0x70;
             if (*(u8 **)(record + 0x88) == moby && record[0x74] != 0)
-                func_00373410(effectId);
+                func_00373410(effect_id);
         }
         *(s32 *)(vars + 0x26C) = -1;
         func_003737B8(2, 0, moby, 0xF8E);

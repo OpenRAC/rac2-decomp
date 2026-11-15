@@ -116,7 +116,7 @@ void bouncing_l04_shot_update(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 ProjectileCollision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
                 reread = &ref_L04_003B3168_03;
                 model = reread->hit;

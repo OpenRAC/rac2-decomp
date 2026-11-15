@@ -72,11 +72,11 @@ void hoverbike_update_racing_movement(u8 *object, u8 *bike)
 {
     Vec hit, v30, v40, start, v60, delta;
     Vec matrix[4];
-    Vec targetPos, localOffset, localDelta;
+    Vec target_pos, local_offset, local_delta;
     int flag;
     float ground, height, limit, speed, rate, side, blend;
     u8 *rider;
-    int crashResult;
+    int crash_result;
 
     hit.q = 0;
     hit.f[3] = -1.0f;
@@ -96,13 +96,13 @@ void hoverbike_update_racing_movement(u8 *object, u8 *bike)
         set_identity_matrix(matrix[0].f);
         matrix_from_basis_rows(matrix, P(0x164) + 0xC0);
         FastVecSub(delta.f, (float *)(object + 0x10), (float *)(P(0x164) + 0x10));
-        transform_vector(localDelta.f, delta.f, matrix[0].f);
-        side = math_fabs(localDelta.f[0]);
-        if (I(0x1F0) == 0 && F(0x1E4) >= 1.0f && side < 1.5f && math_fabs(localDelta.f[1]) >= 1.0f) {
+        transform_vector(local_delta.f, delta.f, matrix[0].f);
+        side = math_fabs(local_delta.f[0]);
+        if (I(0x1F0) == 0 && F(0x1E4) >= 1.0f && side < 1.5f && math_fabs(local_delta.f[1]) >= 1.0f) {
             I(0x1F0) = 1;
             F(0x1E8) = 0.05f;
             F(0x1F8) = 2.0f;
-            if (localDelta.f[1] > 0.0f) F(0x1F4) = 0.3490659f;
+            if (local_delta.f[1] > 0.0f) F(0x1F4) = 0.3490659f;
             else F(0x1F4) = -0.3490659f;
         }
         F(0x2B0) = 0.0f;
@@ -119,23 +119,23 @@ void hoverbike_update_racing_movement(u8 *object, u8 *bike)
         } else {
             math_step_value_toward_target((float *)(bike + 0x1E4), (float *)(bike + 0x1EC), F(0x1E8), 0.000277777785f, 0.000277777785f, 0.13333334f);
         }
-        if (localDelta.f[1] > 0.0f)
+        if (local_delta.f[1] > 0.0f)
             FastVecScale(delta.f, (float *)(P(0x164) + 0xD0), F(0x1E4));
         else
             FastVecScale(delta.f, (float *)(P(0x164) + 0xD0), -F(0x1E4));
-        FastVecAdd(targetPos.f, (float *)(P(0x164) + 0x10), delta.f);
+        FastVecAdd(target_pos.f, (float *)(P(0x164) + 0x10), delta.f);
         FastVecScale(delta.f, (float *)(rider + 0x290), 5.0f);
-        FastVecAdd(targetPos.f, targetPos.f, delta.f);
+        FastVecAdd(target_pos.f, target_pos.f, delta.f);
         set_identity_matrix(matrix[0].f);
         matrix_from_basis_rows(matrix, object + 0xC0);
-        FastVecSub(delta.f, targetPos.f, (float *)(object + 0x10));
-        transform_vector(localOffset.f, delta.f, matrix[0].f);
-        rate = math_fabs(localDelta.f[0]) * 0.8f;
+        FastVecSub(delta.f, target_pos.f, (float *)(object + 0x10));
+        transform_vector(local_offset.f, delta.f, matrix[0].f);
+        rate = math_fabs(local_delta.f[0]) * 0.8f;
         if (rate > 1.0f) rate = 1.0f;
         if (rate < 0.0f) rate = 0.0f;
         RF(0x63C) = (1.0f - rate) * 1.75f;
         if (RF(0x63C) < 1.0f) RF(0x63C) = 1.0f;
-        rate = (0.1f - localDelta.f[0]) * 12.5f;
+        rate = (0.1f - local_delta.f[0]) * 12.5f;
         F(0x134) = RF(0x30C) + RF(0x27C);
         if (rate > 0.0f) {
             if (rate < 1.0f) rate = 0.0f;
@@ -148,7 +148,7 @@ void hoverbike_update_racing_movement(u8 *object, u8 *bike)
         blend = F(0x134) * (rate * 0.03f);
         F(0x134) = F(0x134) + blend;
         if (math_fabs(F(0x1D4)) > 1.04719758f || *(int *)(rider + 0x3A4) > 0 ||
-            FastVecDot(&localDelta, &localDelta) > 121.0f || F(0x134) < 0.100000009f) {
+            FastVecDot(&local_delta, &local_delta) > 121.0f || F(0x134) < 0.100000009f) {
             I(0x1C0) = 0;
             I(0x1F0) = 5;
         }
@@ -157,8 +157,8 @@ void hoverbike_update_racing_movement(u8 *object, u8 *bike)
             if (cap < F(0x134)) F(0x134) = cap;
         }
         math_spring_float_to_goal((float *)(bike + 0x138), (float *)(bike + 0x158), F(0x134), 0.027f, 0.2f, 0.00555555569f);
-        if (localOffset.f[0] < 5.0f) localOffset.f[0] = 5.0f;
-        matrix_mul_vec3(delta.f, localOffset.f, object + 0xC0);
+        if (local_offset.f[0] < 5.0f) local_offset.f[0] = 5.0f;
+        matrix_mul_vec3(delta.f, local_offset.f, object + 0xC0);
         FastVecScale((float *)(bike + 0xD0), delta.f, F(0x138) / FastVecLength(delta.f));
         F(0xD8) = F(0xE8);
         math_approach_with_velocity((float *)(object + 0xF8), *(float *)(P(0x164) + 0xF8), (float *)(bike + 0x130), 0.03f, 0.3f, 0.0727220625f, 0);
@@ -336,30 +336,30 @@ void hoverbike_update_racing_movement(u8 *object, u8 *bike)
     }
     *(Quad *)(bike + 0xE0) = *(Quad *)(bike + 0xD0);
     F(0x154) = F(0xE8);
-    crashResult = ResolveVehicleMovementCollisions(object, object + 0x10, bike + 0xD0, bike + 0xE0, &hit, &v60, &v40, bike + 0x144, 0, &flag,
+    crash_result = ResolveVehicleMovementCollisions(object, object + 0x10, bike + 0xD0, bike + 0xE0, &hit, &v60, &v40, bike + 0x144, 0, &flag,
                                speed, limit, F(0x134), F(0x94), F(0x90));
-    if (crashResult != 0 && I(0x244) != 0) FastVecScale((float *)(bike + 0xD0), (float *)(bike + 0xD0), 0.85f);
+    if (crash_result != 0 && I(0x244) != 0) FastVecScale((float *)(bike + 0xD0), (float *)(bike + 0xD0), 0.85f);
     if (flag != 0)
         I(0x1AC) = I(0x1AC) + 1;
     else
         I(0x1AC) = 0;
-    if (OF(0x18) < F(0x98) || racer_is_in_jump_window(I(0x120), I(0x124), OF(0x18))) crashResult = 2;
+    if (OF(0x18) < F(0x98) || racer_is_in_jump_window(I(0x120), I(0x124), OF(0x18))) crash_result = 2;
     if (part_find_owned_effect_slot(object, -1, 0)) {
-        crashResult = 2;
+        crash_result = 2;
         v60.q = *(Quad *)(bike + 0xD0);
     }
     object[0xA8] = 0xFF;
-    if (I(0x1AC) >= 2 && I(0x1C0) > 0 && I(0x178) > 0 && I(0x1BC) >= 4) crashResult = 2;
+    if (I(0x1AC) >= 2 && I(0x1C0) > 0 && I(0x178) > 0 && I(0x1BC) >= 4) crash_result = 2;
     if ((u32)(P(0x164)[0xBC] - 5) < 2) {
         FastVecSub(delta.f, (float *)(object + 0x10), start.f);
         delta.i[2] = 0;
         if (FastVecDot(&delta, &delta) < 0.01f) {
-            if (++I(0x24C) >= 26) crashResult = 2;
+            if (++I(0x24C) >= 26) crash_result = 2;
         } else {
             I(0x24C) = 0;
         }
     }
-    switch (crashResult) {
+    switch (crash_result) {
     case 1: {
         float a = FastAddRotations(mat_fast_helper_a(hit.f[0] - OF(0x10), hit.f[1] - OF(0x14)), 3.14159274f);
         math_approach_with_velocity((float *)(object + 0xF8), a, (float *)(bike + 0x130), 0.011f, 0.3f, 6.0f, 0);

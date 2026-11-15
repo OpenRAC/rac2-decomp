@@ -100,7 +100,7 @@ int weapon_select_aim_target(char *self, int index, Vec128_2B3BA8 *point, int fo
         }
         for (i = 1; i <= D_001B1CB0[0]; i++) {
             mob = D_001B1B5C + (D_001B1CB0[i] << 8);
-            if (mob != 0 && *(short *)(mob + 0xAA) == 0xCB /* Decoy */
+            if (mob != 0 && *(short *)(mob + 0xAA) == MOBY_CLASS_DECOY
                 && *(unsigned char *)(mob + 0x20) != 0xFE
                 && *(unsigned char *)(mob + 0x20) != 0xFD
                 && *(unsigned char *)(mob + 0x20) == 3
@@ -126,7 +126,7 @@ int weapon_select_aim_target(char *self, int index, Vec128_2B3BA8 *point, int fo
         }
         for (i = 1; i <= D_001B1CF0[0]; i++) {
             mob = D_001B1B5C + (D_001B1CF0[i] << 8);
-            if (mob != 0 && *(short *)(mob + 0xAA) == 0xEB0 /* Dark Sheep */
+            if (mob != 0 && *(short *)(mob + 0xAA) == MOBY_CLASS_DARK_SHEEP
                 && *(unsigned char *)(mob + 0x20) != 0xFE
                 && *(unsigned char *)(mob + 0x20) != 0xFD
                 && weapon_is_target_in_range(mob, (char *)origin, range, height)) {

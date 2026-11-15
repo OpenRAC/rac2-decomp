@@ -74,10 +74,10 @@ extern void part_spawn_trail(void *, void *, void *, int, int, int, int, int, in
 
 /* Waterfall: opens and closes with its linked switch, spins its texture, and sprays mist and drops while flowing. */
 void UpdateWaterfall(char * moby) {
-    char * vars = FIELD(moby, char *, 0x68), *soundSlotEntry;
+    char * vars = FIELD(moby, char *, 0x68), *sound_slot_entry;
     int rotationDelta;
-    int soundSlot;
-    float sizeMin, sizeMax;
+    int sound_slot;
+    float size_min, size_max;
     float velocityX, velocityY, accelerationX, accelerationY;
     float velocity[4] __attribute__((aligned(16)));
     float acceleration[4] __attribute__((aligned(16)));
@@ -87,13 +87,13 @@ void UpdateWaterfall(char * moby) {
     float delta[4] __attribute__((aligned(16)));
 
     if (!FIELD(moby, u8, 0x20)) {
-        if (FIELD(moby, s16, 0xAA) == 0x8F9 /* Waterfall (frozen) */) {
+        if (FIELD(moby, s16, 0xAA) == MOBY_CLASS_WATERFALL_FROZEN_3) {
             FIELD(vars, s16, 4) = D_L08_001AFF24;
             FIELD(vars, u8, 0x1E) = D_L08_001AFF2C;
             FIELD(vars, float, 8) = IntToFloat(FIELD(vars, u8, 0x1C));
-            FIELD(vars, void *, 0x10) = waterfall_spawn_piece(moby, 0x8F8 /* Waterfall (frozen) */, D_L08_001AFF26, FIELD(vars, u8, 0x1C), FIELD(vars, int, 0), D_L08_001AFF2E, FIELD(vars, u8, 0x1D));
-            FIELD(vars, void *, 0x14) = waterfall_spawn_piece(moby, 0x8F7 /* Waterfall (frozen) */, D_L08_001AFF28, FIELD(vars, u8, 0x1C), FIELD(vars, int, 0), D_L08_001AFF30, FIELD(vars, u8, 0x1D));
-            FIELD(vars, void *, 0x18) = waterfall_spawn_piece(moby, 0x8F6 /* Waterfall */, D_L08_001AFF2A, FIELD(vars, u8, 0x1C), FIELD(vars, int, 0), D_L08_001AFF32, FIELD(vars, u8, 0x1D));
+            FIELD(vars, void *, 0x10) = waterfall_spawn_piece(moby, MOBY_CLASS_WATERFALL_FROZEN_2, D_L08_001AFF26, FIELD(vars, u8, 0x1C), FIELD(vars, int, 0), D_L08_001AFF2E, FIELD(vars, u8, 0x1D));
+            FIELD(vars, void *, 0x14) = waterfall_spawn_piece(moby, MOBY_CLASS_WATERFALL_FROZEN, D_L08_001AFF28, FIELD(vars, u8, 0x1C), FIELD(vars, int, 0), D_L08_001AFF30, FIELD(vars, u8, 0x1D));
+            FIELD(vars, void *, 0x18) = waterfall_spawn_piece(moby, MOBY_CLASS_WATERFALL, D_L08_001AFF2A, FIELD(vars, u8, 0x1C), FIELD(vars, int, 0), D_L08_001AFF32, FIELD(vars, u8, 0x1D));
         }
         FIELD(vars, float, 0xC) = moby_get_height(FIELD(vars, int, 0));
         FIELD(moby, float, 0x18) += D_L08_001AFFC8;
@@ -137,19 +137,19 @@ void UpdateWaterfall(char * moby) {
             vec_scale_to_length(acceleration, moby + 0xD0, math_random_float_range(-D_L08_001AFF3C, D_L08_001AFF3C));
             FastVecAdd(velocity, velocity, acceleration);
             velocity[2] = FIELD(vars, float, 0xC) + D_L08_001AFFCC;
-            sizeMin = math_random_float_range(D_L08_001AFF40, D_L08_001AFF44);
-            sizeMax = math_random_float_range(D_L08_001AFF48, D_L08_001AFF4C);
-            water_stop_effect(velocity[0], velocity[1], sizeMin, sizeMax);
+            size_min = math_random_float_range(D_L08_001AFF40, D_L08_001AFF44);
+            size_max = math_random_float_range(D_L08_001AFF48, D_L08_001AFF4C);
+            water_stop_effect(velocity[0], velocity[1], size_min, size_max);
             part_spawn_drifting(velocity, 0, -1, math_random_float_range(D_L08_001AFF50, D_L08_001AFF54), D_L08_001AFF58);
         }
     }
     if (!FIELD(vars, u8, 0x1C)) {
-        if (FIELD(moby, s16, 0xAA) == 0x8F9 /* Waterfall (frozen) */) {
-            soundSlot = FIELD(vars, s8, 0x1F);
-            soundSlotEntry = g_sound_state + soundSlot * 0x70;
-            if (FIELD(soundSlotEntry, void *, 0x88) != moby || !FIELD(soundSlotEntry, u8, 0x74))
-                soundSlot = PlayMobySound(0, 4, moby);
-            FIELD(vars, s8, 0x1F) = soundSlot;
+        if (FIELD(moby, s16, 0xAA) == MOBY_CLASS_WATERFALL_FROZEN_3) {
+            sound_slot = FIELD(vars, s8, 0x1F);
+            sound_slot_entry = g_sound_state + sound_slot * 0x70;
+            if (FIELD(sound_slot_entry, void *, 0x88) != moby || !FIELD(sound_slot_entry, u8, 0x74))
+                sound_slot = PlayMobySound(0, 4, moby);
+            FIELD(vars, s8, 0x1F) = sound_slot;
             if (!math_random_int_below(D_L08_001AFFC0 - 1)) {
                 velocity[3] = math_random_float_range(D_L08_001AFF90, D_L08_001AFF94);
                 acceleration[3] = math_random_float_range(D_L08_001AFF98, D_L08_001AFF9C);
@@ -193,14 +193,14 @@ void UpdateWaterfall(char * moby) {
         }
         FIELD(moby, int, 0x98) = 0;
     } else {
-        int playingSlot;
-        if (FIELD(moby, s16, 0xAA) == 0x8F9 /* Waterfall (frozen) */ && FIELD(vars, s8, 0x1F) != -1) {
-            playingSlot = FIELD(vars, s8, 0x1F);
-            soundSlotEntry = g_sound_state + playingSlot * 0x70;
-            if (FIELD(soundSlotEntry, void *, 0x88) == moby && FIELD(soundSlotEntry, u8, 0x74))
-                snd_stop_voice(playingSlot);
-            playingSlot = -1;
-            FIELD(vars, s8, 0x1F) = playingSlot;
+        int playing_slot;
+        if (FIELD(moby, s16, 0xAA) == MOBY_CLASS_WATERFALL_FROZEN_3 && FIELD(vars, s8, 0x1F) != -1) {
+            playing_slot = FIELD(vars, s8, 0x1F);
+            sound_slot_entry = g_sound_state + playing_slot * 0x70;
+            if (FIELD(sound_slot_entry, void *, 0x88) == moby && FIELD(sound_slot_entry, u8, 0x74))
+                snd_stop_voice(playing_slot);
+            playing_slot = -1;
+            FIELD(vars, s8, 0x1F) = playing_slot;
         }
         FIELD(moby, int, 0x98) = FIELD(FIELD(moby, char *, 0x24), int, 0x10);
     }

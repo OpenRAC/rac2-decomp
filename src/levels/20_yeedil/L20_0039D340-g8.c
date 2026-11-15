@@ -126,7 +126,7 @@ void trooper_setup_stats_target(Object0039D340 *object) {
         object->h34 = (object->h34 | 0x4000) & 0xFFFB;
     }
     event = part_find_owned_effect_slot(object, 0x10000, 0);
-    if (event && *(unsigned char **)(event + 0x20) && *(short *)(*(unsigned char **)(event + 0x20) + 0xAA) == 0xD0F /* Megacorp Trooper Legs */)
+    if (event && *(unsigned char **)(event + 0x20) && *(short *)(*(unsigned char **)(event + 0x20) + 0xAA) == MOBY_CLASS_MEGACORP_TROOPER_LEGS)
         object->bA8 = 255;
     moby_apply_damage_to_object(object, &st->damage, 0);
     if (st->b2E == 2) {

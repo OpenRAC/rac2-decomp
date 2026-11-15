@@ -55,7 +55,7 @@ void gorn_path_marker_course_update(char *moby)
     PathRoute *path;
     char **list;
     float heroDot, cameraDot;
-    int objectCount, i;
+    int object_count, i;
     unsigned short objectFlags;
     char *oldFirst;
     up.q = 0;
@@ -72,8 +72,8 @@ void gorn_path_marker_course_update(char *moby)
         hero_set_state_value_b(1);
         D_L15_00221E10.route = *(int *)(vars + 0x30);
         hero_set_state_value_a(0);
-        list = level_get_object_list(); objectCount = level_get_saved_value();
-        for (i = 0; i < objectCount; i++) if (*(short *)(list[i] + 0xAA) == 0xF82 /* moby class 3970 */) entry_spawn_list_objects_with_flag(list[i], 1);
+        list = level_get_object_list(); object_count = level_get_saved_value();
+        for (i = 0; i < object_count; i++) if (*(short *)(list[i] + 0xAA) == 0xF82 /* moby class 3970 */) entry_spawn_list_objects_with_flag(list[i], 1);
         path = D_L15_001FE480[*(int *)(vars + 0x30)];
         while ((!first || !next) && index != path->pointCount) {
             if (path->point[index].f[3] != -1) {

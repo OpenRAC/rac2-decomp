@@ -85,11 +85,11 @@ extern struct TtyInitState r1_D_00154B50;
 /* rac1-decomp src/core/00119868.c: func_00119890 */
 /* Moves the ring buffer write position forward by one and wraps it at the end. */
 void tty_ring_advance_write_ptr(char *ring) {
-    char *writePtr;
+    char *write_ptr;
     *(int *)(ring + 0x4) += 1;
-    writePtr = *(char **)(ring + 0xC) + 1;
-    *(char **)(ring + 0xC) = writePtr;
-    if (writePtr == ring + (*(int *)ring + 0x10)) {
+    write_ptr = *(char **)(ring + 0xC) + 1;
+    *(char **)(ring + 0xC) = write_ptr;
+    if (write_ptr == ring + (*(int *)ring + 0x10)) {
         *(char **)(ring + 0xC) = ring + 0x10;
     }
 }

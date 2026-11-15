@@ -19,7 +19,7 @@ extern s32 gfx_get_buffer_slot_record_count(u32);
 extern s32 sceSifCallRpc(void *, s32, s32, u8 **, s32, u8 *, s32, s32, s32);
 
 /* Copies records into one of the 64 buffer slots, in pieces of at most 0xFFFF records. Returns 0 on success or a negative error code. */
-s32 gfx_upload_records_to_buffer_slot(u8 *src, u32 slot, s32 firstRecord, s32 count, s32 mode) {
+s32 gfx_upload_records_to_buffer_slot(u8 *src, u32 slot, s32 first_record, s32 count, s32 mode) {
     u8 *dest;
     s32 chunk;
     s32 bytes;
@@ -29,10 +29,10 @@ s32 gfx_upload_records_to_buffer_slot(u8 *src, u32 slot, s32 firstRecord, s32 co
     if (slot >= 64 || D_00215050[slot].count == 0) {
         return -3;
     }
-    if (D_00215050[slot].count < firstRecord + count) {
+    if (D_00215050[slot].count < first_record + count) {
         return -1;
     }
-    dest = D_00215050[slot].base + firstRecord * 16;
+    dest = D_00215050[slot].base + first_record * 16;
     while (count != 0) {
         chunk = count;
         if (chunk > 0xFFFF) {

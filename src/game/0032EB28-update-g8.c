@@ -175,7 +175,7 @@ void vehicle_update_ridden(char *obj)
         if (CollLine(&scratch.previous, obj + 0x10, 0, obj, 0)) {
             UpdateCollision *collision = &g_collision_hit;
             char *other = collision->hit;
-            if (other && (other == P(hero, 0x2290) || *(short *)(other + 0xAA) == 0x907 /* Spiderbot Glove */))
+            if (other && (other == P(hero, 0x2290) || *(short *)(other + 0xAA) == MOBY_CLASS_SPIDERBOT_GLOVE))
                 break;
             qcopy(obj + 0x10, &collision->point);
             ForceClaimNotice(6, 0, 1);

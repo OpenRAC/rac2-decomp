@@ -36,7 +36,7 @@ extern void ref_L04_00407F80_07(s8 *, void *);
 /* Sets up the object on its first frame, then keeps registering its update routine until the linked trigger fires. */
 void trigger_wait_update(void *moby) {
     void *vars;
-    s32 triggerId;
+    s32 trigger_id;
 
     vars = (*(void **)((s8 *)(moby) + (0x68)));
     if ((*(u8 *)((s8 *)(moby) + (0x20))) == 0) {
@@ -47,8 +47,8 @@ void trigger_wait_update(void *moby) {
         (*(s16 *)((s8 *)(moby) + (0x32))) = 0;
         return;
     }
-    triggerId = (*(s32 *)((s8 *)(vars) + (8)));
-    if ((triggerId == -1) || (ref_L04_00407F80_06(ref_L04_00407F80_00, triggerId) != 0)) {
+    trigger_id = (*(s32 *)((s8 *)(vars) + (8)));
+    if ((trigger_id == -1) || (ref_L04_00407F80_06(ref_L04_00407F80_00, trigger_id) != 0)) {
         ref_L04_00407F80_05(moby, ref_L04_00407F80_02, ref_L04_00407F80_03, ref_L04_00407F80_04);
         ref_L04_00407F80_07(ref_L04_00407F80_01, moby);
     }

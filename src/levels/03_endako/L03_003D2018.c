@@ -18,18 +18,18 @@ void clank_scene_finish(char *moby)
     char *vars = *(char **)(moby + 0x68);
     char *entry = D_L03_001B2A1C[0] + *(s32 *)vars * 0x100;
     u16 flags = *(u16 *)(entry + 0x34);
-    char *recordPtr = entry + 0xF0;
-    s32 classData = *(s32 *)(entry + 0x24);
+    char *record_ptr = entry + 0xF0;
+    s32 class_data = *(s32 *)(entry + 0x24);
     TI128 copy;
-    f32 *zValue;
+    f32 *z_value;
     char *base;
 
     flags = (flags & 0xFFBE) | 0x1000;
     *(u16 *)(entry + 0x34) = flags;
-    *(s32 *)(entry + 0x98) = *(s32 *)(classData + 0x10);
-    qcopy(&copy, recordPtr);
-    zValue = (f32 *)((char *)&copy + 8);
-    *zValue = FastAddRotations(*zValue, -1.0471977f);
+    *(s32 *)(entry + 0x98) = *(s32 *)(class_data + 0x10);
+    qcopy(&copy, record_ptr);
+    z_value = (f32 *)((char *)&copy + 8);
+    *z_value = FastAddRotations(*z_value, -1.0471977f);
     hero_reset_position_and_direction(entry + 0x10, (char *)&copy, 0, 1);
     SetHeroMode(1, 0x3F, entry);
     base = g_hero_state;

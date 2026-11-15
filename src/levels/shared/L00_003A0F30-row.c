@@ -23,7 +23,7 @@ extern int D_L00_001A8FF0[] __attribute__((sda));
 int beam_update_particles(char *object)
 {
     float local[2][4] __attribute__((aligned(16)));
-    Particle *base = level_get_slot_body(1483 /* Pulse Rifle */, *(short *)(*(char **)(object + 104) + 26));
+    Particle *base = level_get_slot_body(MOBY_CLASS_PULSE_RIFLE, *(short *)(*(char **)(object + 104) + 26));
     int i, j, k;
     int active = 0;
     for (i = 0; i < 80; i = j) {

@@ -10,7 +10,7 @@ char *part_spawn_spark_moby(char *moby, void *position, void *velocity, int kind
 {
     char *obj = CreateMoby(0x11B7 /* moby class 4535 */);
     u8 *st;
-    int red, green, blue, greenAlpha;
+    int red, green, blue, green_alpha;
     if (obj) {
         obj[0x30] = moby[0x30];
         st = *(u8 **)(obj + 0x68);
@@ -49,8 +49,8 @@ char *part_spawn_spark_moby(char *moby, void *position, void *velocity, int kind
             red = math_random_int_range(100,127);
             green = math_random_int_range(100,127);
             blue = math_random_int_range(100,127);
-            greenAlpha = (green << 8) | 0x7F000000;
-            *(u32 *)(st + 0x58) = (red << 16) | greenAlpha | blue;
+            green_alpha = (green << 8) | 0x7F000000;
+            *(u32 *)(st + 0x58) = (red << 16) | green_alpha | blue;
         }
     }
     return obj;

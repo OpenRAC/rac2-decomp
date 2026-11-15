@@ -98,7 +98,7 @@ void blast_l00_update(char *object)
         scale*=6.0f;
         count=coll_process_hit(object+0x10,0,object,0,scale+0.001f);
         for(i=0;i<count;i++) {
-            if((moby_get_private_value_0(g_area_hit_targets[i]) || (*(unsigned short *)(g_area_hit_targets[i]+0x34)&0x4000)) && g_area_hit_targets[i]!=g_hero_state.target && *(short *)(g_area_hit_targets[i]+0xAA)!=0xA5A /* Mini-Nuke */) {
+            if((moby_get_private_value_0(g_area_hit_targets[i]) || (*(unsigned short *)(g_area_hit_targets[i]+0x34)&0x4000)) && g_area_hit_targets[i]!=g_hero_state.target && *(short *)(g_area_hit_targets[i]+0xAA)!=MOBY_CLASS_MINI_NUKE) {
                 FastVecSub(direction,g_area_hit_targets[i]+0x10,object+0x10);
                 vec_scale_to_length(direction,direction,1.0f);
                 vec_scale_to_length(&hit,&hit,1.0f);

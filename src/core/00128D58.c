@@ -3,10 +3,10 @@
 
 typedef struct {
     char unk_00[4];
-    int  isLinked;
-    int  linkHandle;
-    char *dmaBuffer;
-    char buttonSlots[0x320];
+    int  is_linked;
+    int  link_handle;
+    char *dma_buffer;
+    char button_slots[0x320];
 } Ent330;
 
 extern Ent330 r1_D_0015B640[];
@@ -38,8 +38,8 @@ int scePad2LinkDriver(int port) {
     if (handle < 0) {
         return handle;
     }
-    r1_D_0015B640[port].linkHandle = handle;
-    r1_D_0015B640[port].isLinked = 1;
+    r1_D_0015B640[port].link_handle = handle;
+    r1_D_0015B640[port].is_linked = 1;
     return handle;
 }
 
@@ -62,12 +62,12 @@ int scePad2LinkDriver(int port) {
  */
 /* Returns whichever of the two controller data buffers was written most recently. */
 void *pad_select_newer_buffer(int port) {
-    char *padBuf = r1_D_0015B640[port].dmaBuffer;
+    char *pad_buf = r1_D_0015B640[port].dma_buffer;
     char *slot[2];
 
-    slot[0] = padBuf;
-    slot[1] = padBuf + 0x80;
-    r1_func_00119288(padBuf, padBuf + 0x100);
+    slot[0] = pad_buf;
+    slot[1] = pad_buf + 0x80;
+    r1_func_00119288(pad_buf, pad_buf + 0x100);
     return slot[*(int *)(slot[0] + 0x7C) < *(int *)(slot[1] + 0x7C)];
 }
 
@@ -81,13 +81,13 @@ void *pad_select_newer_buffer(int port) {
 /* The old note's decode, exact since 001236F0.c builds with 2.9-ee. */
 /* Returns 1 if the controller data has changed since the last check, otherwise 0. */
 int scePad2CheckDma(int port) {
-    char *padBuf = r1_D_0015B640[port].dmaBuffer;
+    char *pad_buf = r1_D_0015B640[port].dma_buffer;
     char *slot[2];
 
-    slot[0] = padBuf;
-    slot[1] = padBuf + 0x80;
-    if (*(int *)(padBuf + 0x7C) == 0 ||
-        (r1_D_00132ED8[0] == *(int *)(padBuf + 0x7C) &&
+    slot[0] = pad_buf;
+    slot[1] = pad_buf + 0x80;
+    if (*(int *)(pad_buf + 0x7C) == 0 ||
+        (r1_D_00132ED8[0] == *(int *)(pad_buf + 0x7C) &&
          r1_D_00132ED8[1] == *(int *)(slot[1] + 0x7C))) {
         return 0;
     }

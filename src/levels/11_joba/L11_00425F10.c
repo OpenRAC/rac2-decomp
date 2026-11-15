@@ -102,7 +102,7 @@ void saur_beast_prepare_two_stage_anim(u8 *moby) {
 /* Finds the Joba Tribesman and the other group member in the object's id list and alerts them; the tribesman also counts a kill when this object's health is gone. */
 void MarkGroupClassCF5CF6Members(u8 *object) {
     void *list;
-    u16 *idPtr;
+    u16 *id_ptr;
     u8 *record;
     u8 *owner;
     u8 *base;
@@ -114,22 +114,22 @@ void MarkGroupClassCF5CF6Members(u8 *object) {
     if (list == 0)
         return;
     base = g_moby_l11_table[0];
-    idPtr = list;
+    id_ptr = list;
     do {
-        record = base + ((*idPtr & 0x7FFF) << 8);
+        record = base + ((*id_ptr & 0x7FFF) << 8);
         if (*(s8 *)(record + 0x20) >= 0 && *(s16 *)(record + 0xAA) == 0xCF6 /* moby class 3318 */) {
             owner = *(u8 **)(record + 0x68);
             *(u16 *)(owner + 0x266) = 1;
             (*(u32 *)(owner + 0x560))++;
         }
-        if (*(s8 *)(record + 0x20) >= 0 && *(s16 *)(record + 0xAA) == 0xCF5 /* Joba Tribesman */) {
+        if (*(s8 *)(record + 0x20) >= 0 && *(s16 *)(record + 0xAA) == MOBY_CLASS_JOBA_TRIBESMAN) {
             owner = *(u8 **)(record + 0x68);
             *(u16 *)(owner + 0x266) = 1;
             (*(u32 *)(owner + 0x560))++;
             if (*(f32 *)(object + 0x20) <= 0.0f)
                 (*(u32 *)(owner + 0x584))++;
         }
-    } while (*(s16 *)idPtr++ >= 0);
+    } while (*(s16 *)id_ptr++ >= 0);
 }
 
 extern char D_L11_001BA8C0[];
@@ -176,14 +176,14 @@ void part_l11_spawn_paired_sparks(float *pos, int count) {
 
 /* Applies the class setup to this object and its owner, or to this object alone when they
    are the same. */
-void anim_play_on_self_and_owner(u8 *moby, u32 selfAnim, u32 ownerAnim, u32 animArg2, u32 animArg3) {
+void anim_play_on_self_and_owner(u8 *moby, u32 self_anim, u32 owner_anim, u32 anim_arg2, u32 anim_arg3) {
     u8 *vars = *(u8 **)(moby + 0x68);
 
     if (*(u32 *)(vars + 0x27C) != 0) {
-        anim_start_blended(moby, selfAnim, animArg2, animArg3);
-        anim_start_blended(*(u8 **)(vars + 0x27C), ownerAnim, animArg2, animArg3);
-    } else if (moby[0x43] != selfAnim) {
-        anim_start_blended(moby, selfAnim, animArg2, animArg3);
+        anim_start_blended(moby, self_anim, anim_arg2, anim_arg3);
+        anim_start_blended(*(u8 **)(vars + 0x27C), owner_anim, anim_arg2, anim_arg3);
+    } else if (moby[0x43] != self_anim) {
+        anim_start_blended(moby, self_anim, anim_arg2, anim_arg3);
     }
 }
 
@@ -210,20 +210,20 @@ void saur_beast_draw_beam(u8 *moby) {
     u8 *self = moby;
     u8 *vars = *(u8 **)(self + 0x68);
     u8 *owner = *(u8 **)(vars + 0x27C);
-    u8 *ownerVars;
-    f32 followPos[3];
+    u8 *owner_vars;
+    f32 follow_pos[3];
     f32 offset[3];
 
     if (owner == 0)
         return;
-    ownerVars = *(u8 **)(owner + 0x68);
-    moby_transform_joint_to_world(*(u32 *)(ownerVars + 0x278), 0, followPos);
+    owner_vars = *(u8 **)(owner + 0x68);
+    moby_transform_joint_to_world(*(u32 *)(owner_vars + 0x278), 0, follow_pos);
     offset[0] = math_fast_sin_or_cos_a(*(f32 *)(self + 0xF8)) * 0.1f;
     offset[1] = math_fast_sin_or_cos_b(*(f32 *)(self + 0xF8)) * 0.1f;
     offset[2] = 0.0f;
-    FastVecAdd(followPos, followPos, offset);
-    followPos[2] = followPos[2] - 0.05f;
-    saur_beast_draw_beam_quad(self, followPos);
-    saur_beast_draw_beam_quad_overlay(self, followPos);
+    FastVecAdd(follow_pos, follow_pos, offset);
+    follow_pos[2] = follow_pos[2] - 0.05f;
+    saur_beast_draw_beam_quad(self, follow_pos);
+    saur_beast_draw_beam_quad_overlay(self, follow_pos);
 }
 

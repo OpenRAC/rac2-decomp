@@ -73,7 +73,7 @@ void receiver_bot_update_targeting(u8 *moby) {
         moby_update_ground_check(moby);
         moby[0x6F] = 22;
     }
-    if (!(state->b[0x3B1] & 0x80) || *(s16 *)(moby+0xAA) != 0xEE1 /* Receiver Bot */) {
+    if (!(state->b[0x3B1] & 0x80) || *(s16 *)(moby+0xAA) != MOBY_CLASS_RECEIVER_BOT) {
         state->f[0x2B0/4] = 0.0f;
         moby_update_eased_node(moby, state->b+0x240,4,1.0f,1.0f);
     } else if (g_player_bolts[0x4F]) {
@@ -95,7 +95,7 @@ void receiver_bot_update_targeting(u8 *moby) {
         weapon_select_aim_target(moby, state->i[0x37C / 4], 0.0f, 0.0f, 0, 0);
         {
             int id = *(s16 *)(state->p[0x230/4]+0xAA);
-            state->b[0x3B3] = id == 0xEC0 /* moby class 3776 */ || id == 0xED4 /* moby class 3796 */ || id == 0xEE1 /* Receiver Bot */;
+            state->b[0x3B3] = id == 0xEC0 /* moby class 3776 */ || id == 0xED4 /* moby class 3796 */ || id == MOBY_CLASS_RECEIVER_BOT;
         }
         if (!moby[0xBC] && moby[0x95] != 7 && flag_is_third_pending_set(moby)) {
             moby[0x30] = 255;

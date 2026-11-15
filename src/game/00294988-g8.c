@@ -50,9 +50,9 @@ slotfound:
         data=dst;
     }
     for(i=0;i<52;i++) {
-        char *objectRow=(char *)&g_sound_state+i*0x70;
-        int *statePtr=*(int **)(objectRow+0x78);
-        if(statePtr && statePtr[7]==4) *(int **)(objectRow+0x78)=D_001A93B0;
+        char *object_row=(char *)&g_sound_state+i*0x70;
+        int *state_ptr=*(int **)(object_row+0x78);
+        if(state_ptr && state_ptr[7]==4) *(int **)(object_row+0x78)=D_001A93B0;
     }
     if(D_00152CD0.sound) {
         snd_send_cmd6(D_00152CD0.sound);

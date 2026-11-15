@@ -33,15 +33,15 @@ extern void anim_start_blended();
 typedef int TI __attribute__((mode(TI)));
 
 /* Creates the Swingshot hook at the owner's grip, remembers its owner and follow distance, and returns it. */
-s32 swingshot_hook_spawn(s32 owner, f32 followDistance) {
+s32 swingshot_hook_spawn(s32 owner, f32 follow_distance) {
     s32 hook;
-    s32 hookVars;
+    s32 hook_vars;
 
-    hook = CreateMoby(0xD1 /* Swingshot Hook */);
+    hook = CreateMoby(MOBY_CLASS_SWINGSHOT_HOOK);
     if (hook != 0) {
-        hookVars = (*(s32 *)((s8 *)(hook) + (0x68)));
-        (*(f32 *)((s8 *)(hookVars) + (4))) = followDistance;
-        (*(s32 *)((s8 *)(hookVars) + (0))) = owner;
+        hook_vars = (*(s32 *)((s8 *)(hook) + (0x68)));
+        (*(f32 *)((s8 *)(hook_vars) + (4))) = follow_distance;
+        (*(s32 *)((s8 *)(hook_vars) + (0))) = owner;
         (*(u8 *)((s8 *)(hook) + (0x30))) = 0xFF;
         (*(s16 *)((s8 *)(hook) + (0x32))) = 0xFF;
         (*(s8 *)((s8 *)(hook) + (0x31))) = 1;

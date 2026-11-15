@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char u8;
@@ -55,7 +56,7 @@ void race_sort_racers_by_finish_time(u8 *object) {
                     u8 *obj = list[j];
                     if (*(s16 *)(obj + 0xAA) == 0xBBC /* moby class 3004 */) {
                         keyA = g_race_time_ticks[0];
-                    } else if (*(s16 *)(obj + 0xAA) == 0xB2D /* Enemy Hoverbike */) {
+                    } else if (*(s16 *)(obj + 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE) {
                         keyA = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
                     }
                 }
@@ -63,7 +64,7 @@ void race_sort_racers_by_finish_time(u8 *object) {
                     u8 *obj = list[j + 1];
                     if (*(s16 *)(obj + 0xAA) == 0xBBC /* moby class 3004 */) {
                         keyB = g_race_time_ticks[0];
-                    } else if (*(s16 *)(obj + 0xAA) == 0xB2D /* Enemy Hoverbike */) {
+                    } else if (*(s16 *)(obj + 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE) {
                         keyB = *(int *)(*(u8 **)(obj + 0x68) + 0x1A0);
                     }
                 }
@@ -86,7 +87,7 @@ void race_sort_racers_by_finish_time(u8 *object) {
             } else {
                 *(u8 **)(state + 0x3A0) = list[i + 1];
             }
-        } else if (*(s16 *)(obj + 0xAA) == 0xB2D /* Enemy Hoverbike */) {
+        } else if (*(s16 *)(obj + 0xAA) == MOBY_CLASS_ENEMY_HOVERBIKE) {
             otherVars = *(u8 **)(obj + 0x68);
             otherVars[0xA2] = i + 1;
             if (i == n - 1) {
@@ -175,7 +176,7 @@ void racer_update_trails(void)
         }
         if (count < 8 &&
             ((*(short *)(trail->owner + 0xaa) == 0xbbc /* moby class 3004 */ && D_L04_001B08F0) ||
-             (*(short *)(trail->owner + 0xaa) == 0xb2d /* Enemy Hoverbike */ &&
+             (*(short *)(trail->owner + 0xaa) == MOBY_CLASS_ENEMY_HOVERBIKE &&
               *(int *)(*(char **)(trail->owner + 0x68) + 0x244)))) {
             if (trail->ages[count - 1] < 3)
                 continue;

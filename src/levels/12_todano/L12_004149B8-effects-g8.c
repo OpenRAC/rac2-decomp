@@ -36,8 +36,8 @@ void guard_update_attack_sequence(u8 *moby)
             moby_set_state(moby,5,1);
             break;
         case 5: {
-            s32 grabDone=path_toggle_handle_cache(moby);
-            if (!vars[0x303] || grabDone) {
+            s32 grab_done=path_toggle_handle_cache(moby);
+            if (!vars[0x303] || grab_done) {
                 guard_switch_animation(moby,12,0,math_random_int_range(7,12));
                 moby_set_state(moby,8,5);
                 *(u16 *)(vars+0x2E4)=D_L12_001B1828;

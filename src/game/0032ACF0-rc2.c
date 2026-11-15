@@ -38,36 +38,36 @@ extern void part_claim_trail_node(s32, s8 *, s32);
 
 /* Moves the flying debris pieces of an owner, leaves a glowing trail node behind each, and removes a piece when its life runs out. */
 void part_update_debris_pieces(s32 owner) {
-    s8 targetOffset[16];
-    s8 trailPos[16];
-    f32 lifeNow;
-    f32 lifeRatio;
-    s8 *lifePtr;
+    s8 target_offset[16];
+    s8 trail_pos[16];
+    f32 life_now;
+    f32 life_ratio;
+    s8 *life_ptr;
     s8 *piece;
-    s8 *tableEnd;
+    s8 *table_end;
     s8 *table;
     s8 *hero;
 
     table = g_debris_pieces;
-    lifePtr = table + 0x18;
+    life_ptr = table + 0x18;
     piece = table;
-    tableEnd = piece + 0x240;
+    table_end = piece + 0x240;
     hero = g_hero_state;
     do {
         if ((*(s32 *)((s8 *)(piece) + (0x1C))) == owner) {
-            moby_get_facing_direction((*(s32 *)((s8 *)(hero) + (0x2290))) + 0x10, targetOffset);
-            lifeNow = IntToFloat((*(s32 *)((s8 *)(piece) + (0x18))));
-            lifeRatio = lifeNow / IntToFloat(0x25);
-            math_apply_axis_rotation_to_quat(trailPos, piece, targetOffset, (*(f32 *)((s8 *)(piece) + (0x10))));
-            part_claim_trail_node(owner, trailPos, FloatToInt(lifeRatio * 128.0f));
+            moby_get_facing_direction((*(s32 *)((s8 *)(hero) + (0x2290))) + 0x10, target_offset);
+            life_now = IntToFloat((*(s32 *)((s8 *)(piece) + (0x18))));
+            life_ratio = life_now / IntToFloat(0x25);
+            math_apply_axis_rotation_to_quat(trail_pos, piece, target_offset, (*(f32 *)((s8 *)(piece) + (0x10))));
+            part_claim_trail_node(owner, trail_pos, FloatToInt(life_ratio * 128.0f));
             (*(f32 *)((s8 *)(piece) + (0x10))) = FastAddRotations((*(f32 *)((s8 *)(piece) + (0x10))), (*(f32 *)((s8 *)(piece) + (0x14))));
-            vec_scale_to_length(targetOffset, targetOffset, 0.04f);
-            FastVecAdd(piece, piece, targetOffset);
-            if (math_fast_float_d(lifePtr) != 0) {
+            vec_scale_to_length(target_offset, target_offset, 0.04f);
+            FastVecAdd(piece, piece, target_offset);
+            if (math_fast_float_d(life_ptr) != 0) {
                 (*(s32 *)((s8 *)(piece) + (0x1C))) = 0;
             }
         }
         piece += 0x30;
-        lifePtr += 0x30;
-    } while ((s32)piece < (s32)tableEnd);
+        life_ptr += 0x30;
+    } while ((s32)piece < (s32)table_end);
 }

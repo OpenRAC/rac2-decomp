@@ -11,12 +11,12 @@ extern void glow_ring_update_variant(unsigned char *a0);
 /* Update for the hoverbike race item box: waits for its owner slot to be active, then shows or hides itself. */
 void hoverbike_race_item_box_update(unsigned char *moby) {
     unsigned char *vars = *(unsigned char **)(moby + 0x68);
-    int ownerIndex = *(int *)(vars + 8);
-    unsigned char *ownerEntry;
+    int owner_index = *(int *)(vars + 8);
+    unsigned char *owner_entry;
 
-    if (ownerIndex != -1) {
-        ownerEntry = (unsigned char *)((ownerIndex << 8) + g_moby_l04_pool);
-        if ((unsigned int)(ownerEntry[0x20] - 2) >= 2) {
+    if (owner_index != -1) {
+        owner_entry = (unsigned char *)((owner_index << 8) + g_moby_l04_pool);
+        if ((unsigned int)(owner_entry[0x20] - 2) >= 2) {
             return;
         }
     }
@@ -58,45 +58,45 @@ extern int D_L04_001B0488 __attribute__((sda));
    points back at the entity with a 0.5 scale and a jitter table of 28 random floats in
    [-10, 10] / 75, the first and last zero. Returns the object, or 0. */
 /* Creates a shield dome effect around the given object at the given position. */
-unsigned char *shield_dome_spawn(unsigned char *owner, L04_FBD80Quad *posIn)
+unsigned char *shield_dome_spawn(unsigned char *owner, L04_FBD80Quad *pos_in)
 {
-    float spawnPos[4] __attribute__((aligned(16)));
+    float spawn_pos[4] __attribute__((aligned(16)));
     unsigned char *dome;
-    unsigned char *ownerVars;
-    L04_FBD80Vars *domeVars;
+    unsigned char *owner_vars;
+    L04_FBD80Vars *dome_vars;
     int handle;
-    long ownerWord;
+    long owner_word;
     int i;
 
-    *(L04_FBD80Quad *)spawnPos = *posIn;
+    *(L04_FBD80Quad *)spawn_pos = *pos_in;
     if (owner == 0 || *(short *)(owner + 0xAA) != 0xBBC /* moby class 3004 */)
         return 0;
     dome = ref_L04_003FBD80_00(0xABE /* moby class 2750 */);
     if (dome != 0) {
-        ownerVars = *(unsigned char **)(owner + 0x68);
+        owner_vars = *(unsigned char **)(owner + 0x68);
         dome[0x30] = 0x7F;
         *(short *)(dome + 0x32) = 0x7F;
         dome[0x31] = 1;
-        domeVars = *(L04_FBD80Vars **)(dome + 0x68);
+        dome_vars = *(L04_FBD80Vars **)(dome + 0x68);
         handle = ref_L04_003FBD80_01(9, 0, owner);
-        ownerWord = *(long *)(owner + 0x38);
+        owner_word = *(long *)(owner + 0x38);
         D_L04_001B0488 = handle;
-        *(long *)(dome + 0x38) = ownerWord;
-        *(L04_FBD80Quad *)(dome + 0x10) = *(L04_FBD80Quad *)spawnPos;
+        *(long *)(dome + 0x38) = owner_word;
+        *(L04_FBD80Quad *)(dome + 0x10) = *(L04_FBD80Quad *)spawn_pos;
         *(float *)(dome + 0x18) += 0.2f;
         *(L04_FBD80Quad *)(dome + 0xF0) = *(L04_FBD80Quad *)(owner + 0xF0);
-        if (*(short *)(ownerVars + 0x274) != 0)
-            *(float *)(dome + 0xF4) = *(float *)(ownerVars + 0x284);
-        domeVars->owner = owner;
-        domeVars->scale = 0.5f;
-        domeVars->timer = 0;
-        domeVars->age = 0;
+        if (*(short *)(owner_vars + 0x274) != 0)
+            *(float *)(dome + 0xF4) = *(float *)(owner_vars + 0x284);
+        dome_vars->owner = owner;
+        dome_vars->scale = 0.5f;
+        dome_vars->timer = 0;
+        dome_vars->age = 0;
         for (i = 0; i < 28; i++) {
-            domeVars->jitter[i] = ref_L04_003FBD80_02(-10.0f, 10.0f) * 0.013333335f;
+            dome_vars->jitter[i] = ref_L04_003FBD80_02(-10.0f, 10.0f) * 0.013333335f;
             if (i == 0 || i == 27)
-                domeVars->jitter[i] = 0;
+                dome_vars->jitter[i] = 0;
         }
-        moby_damage_in_firing_cone(dome, domeVars);
+        moby_damage_in_firing_cone(dome, dome_vars);
     }
     return dome;
 }
@@ -174,9 +174,9 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
 {
     float target[4], delta[4], rotation[4], axis[4], position[4], velocity[4];
     L04_EE090Vars *vars = *(L04_EE090Vars **)(moby + 0x68);
-    unsigned char *cursorMoby, *chosenTarget, *shot;
-    int foundCount, slot;
-    float speedScale, groundZ;
+    unsigned char *cursor_moby, *chosen_target, *shot;
+    int found_count, slot;
+    float speed_scale, ground_z;
 
     moby_start_timed_effect(moby, (unsigned char *)vars);
     if (moby[0x31] && fast_vec_dist(moby + 0x10, D_L04_001B9680) < 24.0f) {
@@ -189,14 +189,14 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
         vars->speed = 1.0f;
         vars->shots = 0;
         if (D_L04_001B2008) {
-            cursorMoby = 0;
-            foundCount = 0;
-            while (!GetFirstMobyInGroup(&cursorMoby, vars->group, 0, 0)) {
-                moby_mark_spawned(cursorMoby);
-                foundCount++;
+            cursor_moby = 0;
+            found_count = 0;
+            while (!GetFirstMobyInGroup(&cursor_moby, vars->group, 0, 0)) {
+                moby_mark_spawned(cursor_moby);
+                found_count++;
             }
-            if (foundCount < vars->limit)
-                vars->limit = foundCount;
+            if (found_count < vars->limit)
+                vars->limit = found_count;
             moby[0x20] = 1;
         }
         break;
@@ -239,7 +239,7 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
         slot = moby_count_slot_objects_find_free(moby, (unsigned char *)vars);
         if (vars->fired >= vars->limit || slot == -1)
             break;
-        chosenTarget = 0;
+        chosen_target = 0;
         if (vars->nearest) {
             int i;
             best = 100000.0f;
@@ -251,12 +251,12 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
                     unsigned char *q = D_L04_001B25CC + id * 128;
                     distance = fast_vec_dist(g_hero_position, q + 0x30);
                     if (distance < best) {
-                        chosenTarget = q;
+                        chosen_target = q;
                         best = distance;
                     }
                 }
             }
-            if (!chosenTarget) {
+            if (!chosen_target) {
                 FastVecSub(target, &vars->goal, moby + 0x10);
                 FastVecScale(target, target, 0.5f);
                 if (vars->range > 1.0f)
@@ -265,7 +265,7 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
                     vec_scale_to_length(target, target, 1.0f);
                 FastVecAdd(target, target, moby + 0x10);
             } else {
-                qcopy_nc(target, chosenTarget + 0x30);
+                qcopy_nc(target, chosen_target + 0x30);
             }
         } else {
             int i;
@@ -275,36 +275,36 @@ void LaunchSpawnerMobyUpdate(unsigned char *moby)
             for (i = 0; i < 4; i++) {
                 int k = (i + start) % 4;
                 if (vars->targets[k] != -1) {
-                    chosenTarget = D_L04_001B25CC + vars->targets[k] * 128;
+                    chosen_target = D_L04_001B25CC + vars->targets[k] * 128;
                     break;
                 }
             }
-            if (!chosenTarget) {
+            if (!chosen_target) {
                 float radius = vars->range;
                 if (radius < 1.0f)
                     radius = 1.0f;
                 math_random_planar_offset(target, radius);
                 FastVecAdd(target, target, moby + 0x10);
             } else {
-                qcopy_nc(target, chosenTarget + 0x30);
+                qcopy_nc(target, chosen_target + 0x30);
             }
         }
-        if (chosenTarget) {
-            FastVecScale(delta, chosenTarget, math_random_float_range(-0.5f, 0.5f));
+        if (chosen_target) {
+            FastVecScale(delta, chosen_target, math_random_float_range(-0.5f, 0.5f));
             FastVecAdd(target, target, delta);
-            FastVecScale(delta, chosenTarget + 0x10, math_random_float_range(-0.5f, 0.5f));
+            FastVecScale(delta, chosen_target + 0x10, math_random_float_range(-0.5f, 0.5f));
             FastVecAdd(target, target, delta);
         }
-        groundZ = coll_probe_ground_height_below(target, 0, 3.0f);
-        if (groundZ != 0)
-            target[2] = groundZ;
+        ground_z = coll_probe_ground_height_below(target, 0, 3.0f);
+        if (ground_z != 0)
+            target[2] = ground_z;
         FastVecSub(delta, target, moby + 0x10);
-        speedScale = FastVecLength(delta) * 0.0100000007f;
-        vec_scale_to_length(delta, delta, speedScale);
+        speed_scale = FastVecLength(delta) * 0.0100000007f;
+        vec_scale_to_length(delta, delta, speed_scale);
         moby_transform_joint_to_world(moby, 0, rotation);
         vec_scale_to_length(axis, delta, 0.05f);
         vec_add_random_offset(axis, 0.025f);
-        delta[2] = weapon_compute_shot_launch_speed(rotation, target, 0, speedScale, -0.00272222236f);
+        delta[2] = weapon_compute_shot_launch_speed(rotation, target, 0, speed_scale, -0.00272222236f);
         *(UpdateQuad *)position = *(UpdateQuad *)(moby + 0x10);
         shot = SpawnChildMoby(moby, position);
         *(float *)(shot + 0x2C) = *(float *)(*(unsigned char **)(shot + 0x24) + 0x24);

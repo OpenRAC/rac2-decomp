@@ -16,21 +16,21 @@ extern float math_random_angle(void);
 /* Updates the Megacorp Vendor Logo: it spins and turns its inner part the opposite way. */
 void megacorp_vendor_logo_update(char *moby)
 {
-    char *mobyVars = *(char **)(moby + 0x68);
+    char *moby_vars = *(char **)(moby + 0x68);
 
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         *(unsigned char *)(moby + 0x20) = 1;
         *(unsigned char *)(moby + 0x63) = 0x20;
-        *(float *)(mobyVars + 0x40) = math_random_angle();
-        AttachManipulator(moby, 1, mobyVars);
+        *(float *)(moby_vars + 0x40) = math_random_angle();
+        AttachManipulator(moby, 1, moby_vars);
         break;
     case 1: {
-        float spinStep = D_L01_001AF628 * 0.000290888245f;
+        float spin_step = D_L01_001AF628 * 0.000290888245f;
 
-        *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(moby + 0xF8), spinStep);
-        *(float *)(mobyVars + 0x40) = FastAddRotations(*(float *)(mobyVars + 0x40), spinStep * -2.0f);
-        build_axis_rotation_quaternion(mobyVars + 0x10, 2, *(float *)(mobyVars + 0x40));
+        *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(moby + 0xF8), spin_step);
+        *(float *)(moby_vars + 0x40) = FastAddRotations(*(float *)(moby_vars + 0x40), spin_step * -2.0f);
+        build_axis_rotation_quaternion(moby_vars + 0x10, 2, *(float *)(moby_vars + 0x40));
         break;
     }
     }
@@ -101,8 +101,8 @@ extern float ref_L01_00398938_01 __attribute__((sda));
 /* Places each of the three carried child objects at the moby's position and tilts them with a swing. */
 void moby_position_carried_objects(Moby_00398938 *moby)
 {
-    Carrier_00398938 *mobyVars = moby->vars;
-    Moby_00398938 **list = mobyVars->list;
+    Carrier_00398938 *moby_vars = moby->vars;
+    Moby_00398938 **list = moby_vars->list;
     Vec4 *src = &moby->pos;
     Vec4 v;
     float pitch;
@@ -116,12 +116,12 @@ void moby_position_carried_objects(Moby_00398938 *moby)
             list[i]->pos.z = list[i]->pos.z + ref_L01_00398938_00;
             rot = &list[i]->rot;
             rot->y = ref_L01_00398938_01 * 0.017453294f;
-            pitch = mobyVars->swing * 2.4f - 1.2f;
+            pitch = moby_vars->swing * 2.4f - 1.2f;
             euler_rotation_basis(&list[i]->mtx, &list[i]->rot);
             vec_scale_to_length(&v, &list[i]->mtx, pitch);
             FastVecAdd(&list[i]->pos, &list[i]->pos, &v);
             rot = &list[i]->rot;
-            rot->y = mobyVars->t * -1.0471977f - 0.3490659f;
+            rot->y = moby_vars->t * -1.0471977f - 0.3490659f;
             euler_rotation_basis(&list[i]->mtx, &list[i]->rot);
             func_002A0F48(list[i]);
         }
@@ -163,25 +163,25 @@ extern void FastVecAdd(void *, void *, void *);
 /* Spawns three small sparkles at the moby, each with a random drift. */
 void part_spawn_sparkle_drift(char *moby)
 {
-    TI128 sparkPos, driftA, driftB;
+    TI128 spark_pos, drift_a, drift_b;
     int i;
     int alpha;
 
     if (*(unsigned char *)(moby + 0x20) == 1) {
-        FastVecScale(&sparkPos, moby, 0.0009765625f);
+        FastVecScale(&spark_pos, moby, 0.0009765625f);
     } else {
-        moby_transform_joint_to_world(moby, 0, &sparkPos);
+        moby_transform_joint_to_world(moby, 0, &spark_pos);
     }
     i = 2;
-    vec_random_direction(&driftA, D_L01_001B1A9C * 0.016666668f, D_L01_001B1AA0 * 0.016666668f);
+    vec_random_direction(&drift_a, D_L01_001B1A9C * 0.016666668f, D_L01_001B1AA0 * 0.016666668f);
     alpha = D_L01_001B1AAC;
-    part_spawn_hero_relative(&sparkPos, &driftA, D_L01_001B1AB0, alpha, math_random_int_below(255), 0, D_L01_001B1AB8);
+    part_spawn_hero_relative(&spark_pos, &drift_a, D_L01_001B1AB0, alpha, math_random_int_below(255), 0, D_L01_001B1AB8);
     do {
         i--;
-        vec_random_direction(&driftB, D_L01_001B1AA4 * 0.016666668f, D_L01_001B1AA8 * 0.016666668f);
-        FastVecAdd(&driftA, &driftA, &driftB);
+        vec_random_direction(&drift_b, D_L01_001B1AA4 * 0.016666668f, D_L01_001B1AA8 * 0.016666668f);
+        FastVecAdd(&drift_a, &drift_a, &drift_b);
         alpha = D_L01_001B1AAC;
-        part_spawn_hero_relative(&sparkPos, &driftA, D_L01_001B1AB4, alpha, math_random_int_below(255), 0, D_L01_001B1ABC);
+        part_spawn_hero_relative(&spark_pos, &drift_a, D_L01_001B1AB4, alpha, math_random_int_below(255), 0, D_L01_001B1ABC);
     } while (i >= 0);
 }
 
@@ -200,26 +200,26 @@ extern float ref_L01_00397EB0_08 __attribute__((sda));
 /* Spawns three small sparkles at the moby unless it is below the ground height. */
 void part_spawn_sparkle_trail_above_ground(char *moby)
 {
-    TI128 sparkPos, driftA, driftB;
+    TI128 spark_pos, drift_a, drift_b;
     int i;
     int alpha;
 
     if (*(unsigned char *)(moby + 0x20) == 1) {
-        FastVecScale(&sparkPos, moby, 0.0009765625f);
+        FastVecScale(&spark_pos, moby, 0.0009765625f);
     } else {
-        moby_transform_joint_to_world(moby, 0, &sparkPos);
-        if (((float *)&sparkPos)[2] < D_00189F08) return;
+        moby_transform_joint_to_world(moby, 0, &spark_pos);
+        if (((float *)&spark_pos)[2] < D_00189F08) return;
     }
     i = 2;
-    vec_random_direction(&driftA, ref_L01_00397EB0_00 * 0.016666668f, ref_L01_00397EB0_01 * 0.016666668f);
+    vec_random_direction(&drift_a, ref_L01_00397EB0_00 * 0.016666668f, ref_L01_00397EB0_01 * 0.016666668f);
     alpha = ref_L01_00397EB0_02;
-    part_spawn_hero_relative(&sparkPos, &driftA, ref_L01_00397EB0_03, alpha, math_random_int_below(255), 0, ref_L01_00397EB0_04);
+    part_spawn_hero_relative(&spark_pos, &drift_a, ref_L01_00397EB0_03, alpha, math_random_int_below(255), 0, ref_L01_00397EB0_04);
     do {
         i--;
-        vec_random_direction(&driftB, ref_L01_00397EB0_05 * 0.016666668f, ref_L01_00397EB0_06 * 0.016666668f);
-        FastVecAdd(&driftA, &driftA, &driftB);
+        vec_random_direction(&drift_b, ref_L01_00397EB0_05 * 0.016666668f, ref_L01_00397EB0_06 * 0.016666668f);
+        FastVecAdd(&drift_a, &drift_a, &drift_b);
         alpha = ref_L01_00397EB0_02;
-        part_spawn_hero_relative(&sparkPos, &driftA, ref_L01_00397EB0_07, alpha, math_random_int_below(255), 0, ref_L01_00397EB0_08);
+        part_spawn_hero_relative(&spark_pos, &drift_a, ref_L01_00397EB0_07, alpha, math_random_int_below(255), 0, ref_L01_00397EB0_08);
     } while (i >= 0);
 }
 
@@ -274,24 +274,24 @@ void part_queue_moby_for_glow(char *moby, int extra, void (*callback)(char *))
     int count;
     if (manager == 0 || *(short *)(manager + 0xAA) != 0xC41 /* moby class 3137 */ ||
         *(unsigned char *)(manager + 0x20) == 0xFE || *(unsigned char *)(manager + 0x20) == 0xFD) {
-        char *newManager = CreateMoby(0xC41 /* moby class 3137 */);
-        ref_L01_003E9CF8_00 = newManager;
-        *(unsigned char *)(newManager + 0x30) = 0xFF;
+        char *new_manager = CreateMoby(0xC41 /* moby class 3137 */);
+        ref_L01_003E9CF8_00 = new_manager;
+        *(unsigned char *)(new_manager + 0x30) = 0xFF;
     }
     count = ref_L01_003E9CF8_01;
     *(unsigned short *)(moby + 0x34) |= 2;
     *(int *)(moby + 0x48) = 0;
     *(int *)(moby + 0x44) = 0;
     if (count < 0x40) {
-        int slotIndex;
+        int slot_index;
         get_moby_color(moby, &red, &green, &blue);
-        slotIndex = ref_L01_003E9CF8_01;
-        ref_L01_003E9CF8_02[slotIndex].obj = moby;
-        ref_L01_003E9CF8_02[slotIndex].rgb = (blue << 16) | (green << 8) | red;
-        ref_L01_003E9CF8_02[slotIndex].arg = extra;
-        ref_L01_003E9CF8_02[slotIndex].scale = 1.0f;
-        ref_L01_003E9CF8_02[slotIndex].cb = callback;
-        ref_L01_003E9CF8_01 = slotIndex + 1;
+        slot_index = ref_L01_003E9CF8_01;
+        ref_L01_003E9CF8_02[slot_index].obj = moby;
+        ref_L01_003E9CF8_02[slot_index].rgb = (blue << 16) | (green << 8) | red;
+        ref_L01_003E9CF8_02[slot_index].arg = extra;
+        ref_L01_003E9CF8_02[slot_index].scale = 1.0f;
+        ref_L01_003E9CF8_02[slot_index].cb = callback;
+        ref_L01_003E9CF8_01 = slot_index + 1;
     } else if (callback != 0) {
         callback(moby);
     } else {
@@ -316,19 +316,19 @@ extern const int D_L01_001B0D14 __attribute__((sda));
 /* Updates a ring moby: it lifts out of the ground, flashes between two colors while active, then resets. */
 void flashing_ring_update(char *moby)
 {
-    char *mobyVars;
+    char *moby_vars;
 
-    mobyVars = *(char **)(moby + 0x68);
+    moby_vars = *(char **)(moby + 0x68);
     moby_release_and_reset_impact_slot(moby);
 
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         *(float *)(moby + 0x18) = *(float *)(moby + 0x18) + 1.0f;
-        *(float *)(mobyVars + 0x14) = *(float *)(moby + 0xF0);
+        *(float *)(moby_vars + 0x14) = *(float *)(moby + 0xF0);
         *(unsigned char *)(moby + 0x20) = 1;
         if (*(unsigned char *)(moby + 0x43) != 0)
             anim_start_blended(moby, 0, 0, 0xC);
-        *(int *)(mobyVars + 0x50) = 0;
+        *(int *)(moby_vars + 0x50) = 0;
         *(unsigned short *)(moby + 0x34) |= 0x1000;
         break;
     case 1:
@@ -340,26 +340,26 @@ void flashing_ring_update(char *moby)
             break;
         *(unsigned short *)(moby + 0x34) &= 0xEFFF;
         anim_start_immediate(moby, 1, 0);
-        if (*(int *)(mobyVars + 0x0) != 0) {
-            *(int *)(mobyVars + 0x10) = 10;
+        if (*(int *)(moby_vars + 0x0) != 0) {
+            *(int *)(moby_vars + 0x10) = 10;
             *(unsigned char *)(moby + 0x20) = 2;
-            *(int *)(mobyVars + 0xC) = *(int *)(mobyVars + 0x4);
+            *(int *)(moby_vars + 0xC) = *(int *)(moby_vars + 0x4);
         } else {
             *(unsigned char *)(moby + 0x20) = 2;
             *(int *)(moby + 0x78) = D_L01_001B0D14;
-            *(int *)(mobyVars + 0xC) = 0;
+            *(int *)(moby_vars + 0xC) = 0;
         }
         break;
     case 2:
-        if (*(int *)(mobyVars + 0x0) != 0) {
-            if (math_fast_float_d(mobyVars + 0x10) != 0) {
+        if (*(int *)(moby_vars + 0x0) != 0) {
+            if (math_fast_float_d(moby_vars + 0x10) != 0) {
                 if (*(int *)(moby + 0x78) == D_L01_001B0D10)
                     *(int *)(moby + 0x78) = D_L01_001B0D14;
                 else
                     *(int *)(moby + 0x78) = D_L01_001B0D10;
-                *(int *)(mobyVars + 0x10) = 10;
+                *(int *)(moby_vars + 0x10) = 10;
             }
-            if (math_fast_float_d(mobyVars + 0xC) != 0)
+            if (math_fast_float_d(moby_vars + 0xC) != 0)
                 *(unsigned char *)(moby + 0xBC) = 0;
         }
         if ((*(unsigned char *)(moby + 0x60) & 2) != 0) {
@@ -412,7 +412,7 @@ void spiderbot_glove_update(char *moby) {
     float *sweep;
     char *hit;
     int aux;
-    char *mobyVars = *(char **)(moby + 0x68);
+    char *moby_vars = *(char **)(moby + 0x68);
     int result, state, ready;
     float height;
 
@@ -422,18 +422,18 @@ void spiderbot_glove_update(char *moby) {
         if (*(int *)(hero + 0x1244) == 3)
             D_L01_001AFCE0 = 0;
         moby_transform_joint_to_world(moby, 0, pos);
-        *(int *)(mobyVars + 0x2C) = 0;
+        *(int *)(moby_vars + 0x2C) = 0;
         sweep = sweep_storage;
         height = (*(int *)(hero + 0x2294) == 29) ? 11.0f : 4.5f;
         CalculateAimedLaunchVelocity(sweep, pos, 0, 0, 1.6f, height, 0.13333334028720856f, 0.003055555745959282f);
     }
-    *(int *)(mobyVars + 0x24) = coll_trace_projectile_to_impact(pos, sweep, mobyVars, mobyVars + 0x10, moby, &hit, &aux, 0.003055555745959282f);
+    *(int *)(moby_vars + 0x24) = coll_trace_projectile_to_impact(pos, sweep, moby_vars, moby_vars + 0x10, moby, &hit, &aux, 0.003055555745959282f);
     result = weapon_get_group(aux);
     if (D_L01_001A8F40 || D_L01_001A8F48 != -2)
-        *(int *)(mobyVars + 0x2C) = 1;
-    if (D_L01_001A9034 && *(float *)(mobyVars + 8) < 462.42999267578125f)
-        *(int *)(mobyVars + 0x2C) = 1;
-    if (result || !*(int *)(mobyVars + 0x24) || !*(int *)(mobyVars + 0x28))
+        *(int *)(moby_vars + 0x2C) = 1;
+    if (D_L01_001A9034 && *(float *)(moby_vars + 8) < 462.42999267578125f)
+        *(int *)(moby_vars + 0x2C) = 1;
+    if (result || !*(int *)(moby_vars + 0x24) || !*(int *)(moby_vars + 0x28))
         goto blocked;
     {
         char *hero = g_hero_state;
@@ -442,17 +442,17 @@ void spiderbot_glove_update(char *moby) {
         if (state == 40 || state == 62 || state == 39 || state == 41 || state == 42 || state == 6 ||
             state == 116 || state == 129)
             goto blocked;
-        if (*(char **)(hero + 0x33C) && (*(short *)(*(char **)(hero + 0x33C) + 0xAA) == 0x330 /* Taxi */ ||
+        if (*(char **)(hero + 0x33C) && (*(short *)(*(char **)(hero + 0x33C) + 0xAA) == MOBY_CLASS_TAXI ||
                                       *(short *)(*(char **)(hero + 0x33C) + 0xAA) == 0xB21 /* moby class 2849 */))
             goto blocked;
         if (hit && (*(short *)(hit + 0xAA) == 0xB21 /* moby class 2849 */ || *(short *)(hit + 0xAA) == 0xB5B /* moby class 2907 */))
             goto blocked;
     }
-    moby_get_facing_direction(mobyVars, normal);
-    if (!(FastVecDot(mobyVars + 0x10, normal) < 0.75f))
+    moby_get_facing_direction(moby_vars, normal);
+    if (!(FastVecDot(moby_vars + 0x10, normal) < 0.75f))
         goto timer;
 blocked:
-    *(int *)(mobyVars + 0x2C) = 1;
+    *(int *)(moby_vars + 0x2C) = 1;
 timer:
     {
         char *hero = g_hero_state;
@@ -468,41 +468,41 @@ timer:
     case 0:
         D_L01_001AFCE0 = moby;
         *(unsigned char *)(moby + 0x20) = 1;
-        *(int *)(mobyVars + 0x28) = 1;
-        *(int *)(mobyVars + 0x24) = 0;
+        *(int *)(moby_vars + 0x28) = 1;
+        *(int *)(moby_vars + 0x24) = 0;
         /* falls through */
     case 1: {
         char *hero = g_hero_state;
 
         if ((D_00138324 & *(int *)(hero + 0x1230)) && !*(unsigned char *)(hero + 0x22BC) &&
-            !*(int *)(mobyVars + 0x2C) && ready) {
+            !*(int *)(moby_vars + 0x2C) && ready) {
             if (weapon_spend_ammo(-1, 1)) {
                 *(short *)(hero + 0x1E0) = 120;
                 ForceClaimNotice(6, 0, 1);
                 *(short *)(hero + 0x1D2) = 0;
                 start_equipped_item_animation();
                 *(unsigned char *)(moby + 0x20) = 2;
-                *(int *)(mobyVars + 0x20) = 12;
-                *(int *)(mobyVars + 0x28) = 0;
+                *(int *)(moby_vars + 0x20) = 12;
+                *(int *)(moby_vars + 0x28) = 0;
             } else
                 PlayMobySound(0, 0, moby);
         }
         break;
     }
     case 2:
-        if (math_fast_float_d(mobyVars + 0x20)) {
-            char *effectMoby = spider_bot_spawn(pos, sweep);
+        if (math_fast_float_d(moby_vars + 0x20)) {
+            char *effect_moby = spider_bot_spawn(pos, sweep);
 
-            if (effectMoby)
-                *(char **)(effectMoby + 0xB8) = moby;
+            if (effect_moby)
+                *(char **)(effect_moby + 0xB8) = moby;
             PlayMobySound(1, 0, moby);
             cancel_hero_item_animation();
             *(unsigned char *)(moby + 0x20) = 3;
-            *(int *)(mobyVars + 0x20) = 5;
+            *(int *)(moby_vars + 0x20) = 5;
         }
         break;
     case 3:
-        if (math_fast_float_d(mobyVars + 0x20))
+        if (math_fast_float_d(moby_vars + 0x20))
             *(unsigned char *)(moby + 0x20) = 1;
         break;
     }

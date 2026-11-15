@@ -22,7 +22,7 @@ void breakable_l08_update(char *moby) {
     char *vars=*(char **)(moby+0x68);
     float hit;
     float offset[4] __attribute__((aligned(16)));
-    int effectId;
+    int effect_id;
     switch(*(u8 *)(moby+0x20)) {
     case 0:
         *(s16 *)(vars+0x24)=5;
@@ -49,8 +49,8 @@ void breakable_l08_update(char *moby) {
     case 2:
         set_moby_color(moby,*(u8 *)(vars+0x54),*(u8 *)(vars+0x55),*(u8 *)(vars+0x56));
         if(moby_count_group_not_in_state(*(u8 *)(moby+0x21),-1)==1) {
-            effectId=*(int *)((g_current_map_index << 2)+(char *)D_L08_002B35C0)*35-1;
-            part_spawn_bolt_pickups(moby,effectId,effectId,3,-1,math_random_int_range(1,3),0.0f);
+            effect_id=*(int *)((g_current_map_index << 2)+(char *)D_L08_002B35C0)*35-1;
+            part_spawn_bolt_pickups(moby,effect_id,effect_id,3,-1,math_random_int_range(1,3),0.0f);
         }
         *(u128 *)offset=0;
         offset[0]=0.11666667461395264f; offset[1]=0.06666667014360428f;

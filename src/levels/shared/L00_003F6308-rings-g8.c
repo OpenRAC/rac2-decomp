@@ -52,8 +52,8 @@ void vaporizer_bolt_draw_beam_rings(unsigned char *object)
     BeamVector vertices[3][20];
     BeamVector temp, side;
     unsigned char *vars = *(unsigned char **)(object + 0x68);
-    char *base = level_get_slot_body(0xc04 /* Vaporizer */, *(short *)(vars + 0x1a));
-    BeamRing *rings = (BeamRing *)(base + *level_get_slot_header(0xc04 /* Vaporizer */, *(short *)(vars + 0x1a)));
+    char *base = level_get_slot_body(MOBY_CLASS_VAPORIZER, *(short *)(vars + 0x1a));
+    BeamRing *rings = (BeamRing *)(base + *level_get_slot_header(MOBY_CLASS_VAPORIZER, *(short *)(vars + 0x1a)));
     int row, j;
     u32 primary, col, alpha;
     float side_u, fade, phase, u, next, phase2;

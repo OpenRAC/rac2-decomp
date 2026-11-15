@@ -13,8 +13,8 @@ extern s32 moby_count_of_class(s32);
 /* Totals three table lookups into one $-gp word and returns it. */
 s32 level_get_saved_count(void)
 {
-    s32 first = moby_count_of_class(0x96A /* Desert Crystal Shell */);
-    s32 second = moby_count_of_class(0x1002 /* Desert Dune Monster */);
+    s32 first = moby_count_of_class(MOBY_CLASS_DESERT_CRYSTAL_SHELL);
+    s32 second = moby_count_of_class(MOBY_CLASS_DESERT_DUNE_MONSTER);
     s32 sum = first + second + moby_count_of_class(0x8C4 /* moby class 2244 */);
 
     D_L08_001B1FA8 = sum;
@@ -97,7 +97,7 @@ void lock_on_target_tracker_update(u8 *moby)
     float offset[4] __attribute__((aligned(16)));
     u8 *vehicle;
     int *vars = *(int **)(moby + 0x68);
-    int holdFrames;
+    int hold_frames;
 
     switch (moby[0x20]) {
     case 0:
@@ -128,7 +128,7 @@ void lock_on_target_tracker_update(u8 *moby)
             if (D_L08_001B0318 == 0)
                 goto shift;
         }
-        if (*(s16 *)(g_hero_state.vehicle + 0xAA) == 0x905 /* Glider */) {
+        if (*(s16 *)(g_hero_state.vehicle + 0xAA) == MOBY_CLASS_GLIDER) {
             D_L08_001B0318->x0 = D_L08_001B0304;
             D_L08_001B0318->xC = -1.0f;
             D_L08_001B0318->x8 = -1.0f;
@@ -144,11 +144,11 @@ void lock_on_target_tracker_update(u8 *moby)
     if (D_L08_001B3490[2].owner == D_L08_001B3490[1].owner)
         D_L08_001B3490[1].unk1C = D_L08_001B3490[2].unk1C + 1;
     if (D_L08_001B3490[1].owner != D_L08_001B3490[0].owner && D_L08_001B3490[1].owner != 0) {
-        holdFrames = D_L08_001B3490[1].unk1C;
-        if (holdFrames < D_L08_001B02FC)
-            holdFrames = D_L08_001B02FC;
+        hold_frames = D_L08_001B3490[1].unk1C;
+        if (hold_frames < D_L08_001B02FC)
+            hold_frames = D_L08_001B02FC;
         D_L08_001B3490[0].unk18++;
-        if (D_L08_001B3490[0].unk18 >= holdFrames) {
+        if (D_L08_001B3490[0].unk18 >= hold_frames) {
             CopyTarget(&D_L08_001B3490[0], &D_L08_001B3490[1]);
             D_L08_001B3490[0].valid = 1;
         }

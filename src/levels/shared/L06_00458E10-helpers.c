@@ -13,8 +13,8 @@ extern int D_L06_001B3778[];
 char *moby_spawn_child_in_slot(char *object, char *direction, char *position, int index, float speed)
 {
     char *child = CreateMoby(0xFE5 /* moby class 4069 */);
-    char *childVars;
-    float flatLength;
+    char *child_vars;
+    float flat_length;
 
     if (child != 0) {
         *(u8 *)(child + 0x30) = 0xFF;
@@ -24,16 +24,16 @@ char *moby_spawn_child_in_slot(char *object, char *direction, char *position, in
         *(u64 *)(child + 0x38) = *(u64 *)(object + 0x38);
         qcopy(child + 0x10, position);
         D_L06_001B3760[index] = 1;
-        childVars = *(char **)(child + 0x68);
-        qcopy(childVars, direction);
-        *(u32 *)(childVars + 0x38) = 0xF0;
-        *(char **)(childVars + 0x3C) = object;
-        *(float *)(childVars + 0x40) = speed;
-        *(int *)(childVars + 0x48) = index;
-        *(int *)(childVars + 0x4C) = -1;
+        child_vars = *(char **)(child + 0x68);
+        qcopy(child_vars, direction);
+        *(u32 *)(child_vars + 0x38) = 0xF0;
+        *(char **)(child_vars + 0x3C) = object;
+        *(float *)(child_vars + 0x40) = speed;
+        *(int *)(child_vars + 0x48) = index;
+        *(int *)(child_vars + 0x4C) = -1;
         *(float *)(child + 0xF8) = mat_fast_helper_a(*(float *)direction, *(float *)(direction + 4));
-        flatLength = vec_length_xy(direction);
-        *(float *)(child + 0xF4) = -mat_fast_helper_a(flatLength, *(float *)(direction + 8));
+        flat_length = vec_length_xy(direction);
+        *(float *)(child + 0xF4) = -mat_fast_helper_a(flat_length, *(float *)(direction + 8));
         D_L06_001B3778[index] = -1;
     }
     return child;

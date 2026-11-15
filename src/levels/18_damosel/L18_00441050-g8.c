@@ -18,7 +18,7 @@ extern struct { char pad[0xA0]; unsigned char bits; } D_001395B8;
 /* Updates a breakable pickup (moby class 4773): it waits to be hit, then releases its item and an explosion, remembering that it was collected. */
 void breakable_pickup_update(u8 *moby) {
     u8 *vars=*(u8 **)(moby+0x68), *hit;
-    float pointA[4] __attribute__((aligned(16))), pointB[4] __attribute__((aligned(16)));
+    float point_a[4] __attribute__((aligned(16))), point_b[4] __attribute__((aligned(16)));
     float spread[4] __attribute__((aligned(16)));
     switch(moby[0x20]) {
     case 0: moby_set_state(moby,1,-1); break;
@@ -29,11 +29,11 @@ void breakable_pickup_update(u8 *moby) {
             spread[0]=3.0f;
             spread[1]=3.0f;
             *(float *)(hit+0x18)=1.0f;
-            FastVecScale(pointA,hit+0x10,math_random_float_range(6.0f,8.0f));
-            qcopy(pointB,pointA);
-            FastVecSub(pointA,pointA,spread);
-            FastVecAdd(pointB,pointB,spread);
-            part_explode_object_into_pieces(moby,pointA,&D_L18_001B1D18,&D_L18_001B1D10,65535,-1,D_L18_001B1D20,9,1,255,0);
+            FastVecScale(point_a,hit+0x10,math_random_float_range(6.0f,8.0f));
+            qcopy(point_b,point_a);
+            FastVecSub(point_a,point_a,spread);
+            FastVecAdd(point_b,point_b,spread);
+            part_explode_object_into_pieces(moby,point_a,&D_L18_001B1D18,&D_L18_001B1D10,65535,-1,D_L18_001B1D20,9,1,255,0);
             moby_set_state(moby,2,-1);
         }
         moby[0xA8]=255;

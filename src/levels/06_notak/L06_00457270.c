@@ -14,12 +14,12 @@ extern void moby_mark_spawned(void *);
 void rotating_trigger_burst_update(unsigned char *obj)
 {
     int *vars = *(int **)(obj + 0x68);
-    int stateId = obj[0x20];
+    int state_id = obj[0x20];
     float offset[4] __attribute__((aligned(16)));
     unsigned char *hit;
-    unsigned char *hitMoby;
+    unsigned char *hit_moby;
 
-    switch (stateId) {
+    switch (state_id) {
     case 0:
         *vars = 0;
         moby_set_state(obj, 1, -1);
@@ -28,9 +28,9 @@ void rotating_trigger_burst_update(unsigned char *obj)
         mat_apply_offset_to_object(obj, 0.0f, 0.0f, 0.017453296f);
         hit = part_find_owned_effect_slot(obj, 0x4010000, 0);
         if (hit != 0) {
-            hitMoby = *(unsigned char **)(hit + 0x20);
-            if (hitMoby != 0 && *(short *)(hitMoby + 0xAA) == 0x12C4 /* moby class 4804 */) {
-                *vars = stateId;
+            hit_moby = *(unsigned char **)(hit + 0x20);
+            if (hit_moby != 0 && *(short *)(hit_moby + 0xAA) == 0x12C4 /* moby class 4804 */) {
+                *vars = state_id;
             }
             moby_set_state(obj, 2, -1);
         }

@@ -38,7 +38,7 @@ extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
 extern void vec_random_direction(void *,float,float);
 /* Updates an orb with sparks circling it (moby classes 4330 and 4492): when it is hit it bursts with a sound and the sparks drift away and fade. */
 void spark_orb_update(char *moby) {
- P1078 tableA = D_L11_001B2930, tableB = D_L11_001B2938;
+ P1078 table_a = D_L11_001B2930, table_b = D_L11_001B2938;
  V1078 bounds[2], small, offset;
  V1078 temp, center, v, axis;
  char *vars=*(char **)(moby+0x68);
@@ -90,7 +90,7 @@ void spark_orb_update(char *moby) {
  } B(moby,0xa8)=255; break;
  }
  case 2:
- part_explode_object_into_pieces(moby,bounds,&tableB,&tableA,65535,0,-1,0,65535,255,0);
+ part_explode_object_into_pieces(moby,bounds,&table_b,&table_a,65535,0,-1,0,65535,255,0);
  part_l00_spawn_spark_burst(moby,&offset,0.1f,&small,0.15f,80,3,1,20,1);
  temp.quad=0;
  vec_local_offset_to_world(moby,&offset,0,0,18);

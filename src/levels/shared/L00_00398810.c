@@ -37,7 +37,7 @@ static __inline__ int projectile_upgraded_weapon(void) {
 }
 /* Creates a projectile and retires the oldest live entries when the shared list is full. */
 char *decoy_create_projectile(char *position, char *direction) {
-    char *actor = CreateMoby(0xCB /* Decoy */);
+    char *actor = CreateMoby(MOBY_CLASS_DECOY);
     char *state, *hero, *oldest;
     int i, count, age, oldestAge;
     if (actor) {
@@ -77,7 +77,7 @@ char *decoy_create_projectile(char *position, char *direction) {
             oldestAge = 0;
             for (i = 1; i <= D_L00_001B1FF0_list[0]; i++) {
                 char *candidate = (char *)(D_L00_001B1E9C_base + (D_L00_001B1FF0_list[i] << 8));
-                if (candidate && *(short *)(candidate + 0xAA) == 0xCB /* Decoy */ && *(unsigned char *)(candidate + 0x20) < 4) {
+                if (candidate && *(short *)(candidate + 0xAA) == MOBY_CLASS_DECOY && *(unsigned char *)(candidate + 0x20) < 4) {
                     age = *(int *)(*(char **)(candidate + 0x68) + 0x3C);
                     if (oldestAge <= age) { oldest = candidate; oldestAge = age; }
                 }

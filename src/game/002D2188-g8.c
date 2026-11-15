@@ -34,7 +34,7 @@ static __inline__ s32 hud_coord(f32 value, f32 scale, f32 half, s32 active)
 
 /* Draws the six-page viewer with its title, arrows, divider line and the text of the current page. */
 s32 page_viewer_draw_short(void) {
-    f32 z, scaleY, half;
+    f32 z, scale_y, half;
     s32 sprite;
     s32 center, one;
 
@@ -48,9 +48,9 @@ s32 page_viewer_draw_short(void) {
     sprite = table_find_by_id(D_001A8CFC + 0x8710, 0xE0);
     gfx_draw_scaled_object_two_axes(sprite, 0x55F0C070, (f32)(g_screen_width / 2), (f32)ref_002D2188_01, 1.0f, D_001B23A8, z);
     DrawMenuNavigationFramesAndLabels(ref_002D2188_02 != 0, ref_002D2188_02 != 5);
-    scaleY = D_001B23A4;
+    scale_y = D_001B23A4;
     half = 0.5f;
-    AppendScreenRectPacket(66, hud_coord(330.0f, scaleY, half, one), 463, hud_coord(332.0f, scaleY, half, one), 0x55F0C070, 0);
+    AppendScreenRectPacket(66, hud_coord(330.0f, scale_y, half, one), 463, hud_coord(332.0f, scale_y, half, one), 0x55F0C070, 0);
     center = g_screen_width / 2;
     text_draw_centered_small(center, 311, (u64)0x80F0F0F0, GetLocalizedString(D_001ABD68[ref_002D2188_02].text), -1);
     text_draw_centered_small(0x1B0, 0x177, (u64)0x80F0F0F0, GetLocalizedString(0x2D4F), -1);

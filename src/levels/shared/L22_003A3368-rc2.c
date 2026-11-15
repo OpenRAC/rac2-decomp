@@ -33,31 +33,31 @@ void lane_build_connection_masks(void *obj) {
     s32 j;
     s32 k;
     s32 *vars ;
-    s32 *laneIds;
-    void *laneA;
-    void *laneB;
+    s32 *lane_ids;
+    void *lane_a;
+    void *lane_b;
     f32 *point0;
     f32 *point1;
     f32 distances[4];
     f32 last_distance;
 
     vars = *(s32 **)((s8 *)obj + 0x68);
-    laneIds = vars + 0xA8;
+    lane_ids = vars + 0xA8;
     i = 0;
     do {
         j = 0;
-        laneA = ref_L22_003A3368_00[(u32)*(s32 *)((s32)laneIds + (i << 2))];
-        *(s32 *)((( *(s32 *)laneA) << 4) + (s32)laneA + 0xC) = 0;
-        *(s32 *)((s8 *)laneA + 0x1C) = 0;
+        lane_a = ref_L22_003A3368_00[(u32)*(s32 *)((s32)lane_ids + (i << 2))];
+        *(s32 *)((( *(s32 *)lane_a) << 4) + (s32)lane_a + 0xC) = 0;
+        *(s32 *)((s8 *)lane_a + 0x1C) = 0;
         do {
-            laneB = ref_L22_003A3368_00[(u32)*(s32 *)((s32)laneIds + (j << 2))];
-            if (laneA != laneB) {
-                point0 = (f32 *)((s8 *)laneA + 0x10);
-                point1 = (f32 *)((s8 *)laneB + 0x10);
+            lane_b = ref_L22_003A3368_00[(u32)*(s32 *)((s32)lane_ids + (j << 2))];
+            if (lane_a != lane_b) {
+                point0 = (f32 *)((s8 *)lane_a + 0x10);
+                point1 = (f32 *)((s8 *)lane_b + 0x10);
                 distances[0] = ref_L22_003A3368_01(point0, point1);
-                distances[1] = ref_L22_003A3368_01(point0, (f32 *)((s8 *)laneB + ((*(s32 *)laneB) << 4)));
-                distances[2] = ref_L22_003A3368_01((f32 *)((s8 *)laneA + ((*(s32 *)laneA) << 4)), point1);
-                last_distance = ref_L22_003A3368_01((f32 *)((s8 *)laneA + ((*(s32 *)laneA) << 4)), (f32 *)((s8 *)laneB + ((*(s32 *)laneB) << 4)));
+                distances[1] = ref_L22_003A3368_01(point0, (f32 *)((s8 *)lane_b + ((*(s32 *)lane_b) << 4)));
+                distances[2] = ref_L22_003A3368_01((f32 *)((s8 *)lane_a + ((*(s32 *)lane_a) << 4)), point1);
+                last_distance = ref_L22_003A3368_01((f32 *)((s8 *)lane_a + ((*(s32 *)lane_a) << 4)), (f32 *)((s8 *)lane_b + ((*(s32 *)lane_b) << 4)));
                 {
                     f32 limit_first ;
                     s32 mask_first ;
@@ -71,7 +71,7 @@ void lane_build_connection_masks(void *obj) {
                     do {
                         count0--;
                         if (*scan0 < limit_first) {
-                            *(s32 *)((s8 *)laneA + 0x1C) |= mask_first;
+                            *(s32 *)((s8 *)lane_a + 0x1C) |= mask_first;
                         }
                         scan0++;
                     } while (count0 >= 0);
@@ -79,7 +79,7 @@ void lane_build_connection_masks(void *obj) {
                 k = 2;
                 do {
                     if (distances[k] < 1.0f) {
-                        *(s32 *)((( *(s32 *)laneA) << 4) + (s32)laneA + 0xC) |= (s32)(1u << j);
+                        *(s32 *)((( *(s32 *)lane_a) << 4) + (s32)lane_a + 0xC) |= (s32)(1u << j);
                     }
                     k++;
                 } while (k < 4);

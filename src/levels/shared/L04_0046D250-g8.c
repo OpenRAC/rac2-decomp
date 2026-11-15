@@ -110,7 +110,7 @@ void UpdatePlayerRelativeCameraPosition(CameraObject *obj) {
     FastVecAdd(&obj->position, &g_hero_state.position, &velocity);
     if (CollLine(&old, &obj->position, 4, 0, 0)) {
         hit = D_L04_001BFAC0.hit;
-        if (!hit || (*(short *)(hit + 0xAA) != 0xB2D /* Enemy Hoverbike */ && *(short *)(hit + 0xAA) != 0xBBC /* moby class 3004 */ && *(short *)(hit + 0xAA) != 0xA1F /* moby class 2591 */)) {
+        if (!hit || (*(short *)(hit + 0xAA) != MOBY_CLASS_ENEMY_HOVERBIKE && *(short *)(hit + 0xAA) != 0xBBC /* moby class 3004 */ && *(short *)(hit + 0xAA) != 0xA1F /* moby class 2591 */)) {
             FastVecSub(&rotated, &D_L04_001BFAC0.point, &old);
             FastVecScale(&velocity, &rotated, 0.95f);
             FastVecAdd(&obj->position, &old, &velocity);
@@ -118,7 +118,7 @@ void UpdatePlayerRelativeCameraPosition(CameraObject *obj) {
     }
     if (CollLine(&g_hero_state.position, &obj->position, 2, 0, 0)) {
         hit = D_L04_001BFAC0.hit;
-        if (!hit || (*(short *)(hit + 0xAA) != 0xB2D /* Enemy Hoverbike */ && *(short *)(hit + 0xAA) != 0xBBC /* moby class 3004 */ && *(short *)(hit + 0xAA) != 0xA1F /* moby class 2591 */)) {
+        if (!hit || (*(short *)(hit + 0xAA) != MOBY_CLASS_ENEMY_HOVERBIKE && *(short *)(hit + 0xAA) != 0xBBC /* moby class 3004 */ && *(short *)(hit + 0xAA) != 0xA1F /* moby class 2591 */)) {
             FastVecSub(&rotated, &D_L04_001BFAC0.point, &g_hero_state.position);
             FastVecScale(&velocity, &rotated, 0.95f);
             FastVecAdd(&obj->position, &g_hero_state.position, &velocity);
@@ -126,6 +126,6 @@ void UpdatePlayerRelativeCameraPosition(CameraObject *obj) {
     }
     if (coll_test_point(&obj->position, 4, 0, 0.15f)) {
         hit = D_L04_001BFAC0.hit;
-        if (!hit || (*(short *)(hit + 0xAA) != 0xB2D /* Enemy Hoverbike */ && *(short *)(hit + 0xAA) != 0xBBC /* moby class 3004 */)) obj->position.q = D_L04_001BFAC0.position.q;
+        if (!hit || (*(short *)(hit + 0xAA) != MOBY_CLASS_ENEMY_HOVERBIKE && *(short *)(hit + 0xAA) != 0xBBC /* moby class 3004 */)) obj->position.q = D_L04_001BFAC0.position.q;
     }
 }

@@ -153,7 +153,7 @@ void UpdateCommandedMoby(u8 *object)
         mob->position[2] = coll_probe_ground_height_below((u8 *)mob->position, 0, 0.5f);
         vars->initial_height = mob->position[2];
         type = mob->type;
-        if (type == 0x964 /* Gadgebot */) {
+        if (type == MOBY_CLASS_GADGEBOT) {
             vars->child = CreateMoby(0x972);
             if (vars->child) {
                 moby_init_child_from_parent(vars->child, object);
@@ -180,7 +180,7 @@ void UpdateCommandedMoby(u8 *object)
             vars->collision_radius = 0.42f;
             mob->position[2] += 0.089f;
             break;
-        case 0x940 /* Bridgebot */:
+        case MOBY_CLASS_BRIDGEBOT:
             vars->collision_radius = 0.39f;
             mob->position[2] += 0.089f;
             vec_scale_to_length(&point, &mob->forward, -0.2f);
@@ -205,7 +205,7 @@ void UpdateCommandedMoby(u8 *object)
         moby_set_state(object, 1, 0);
         if (mob->animation)
             anim_start_blended(object, 0, math_random_int_below(ANIM_COUNT(object, 0x48)), 0);
-        if (mob->type == 0x940 /* Bridgebot */) {
+        if (mob->type == MOBY_CLASS_BRIDGEBOT) {
             for (i = 0; i < 8; i++) {
                 u16 *ids;
                 if (vars->groups[i] == -1) continue;
@@ -237,7 +237,7 @@ void UpdateCommandedMoby(u8 *object)
             D_L03_001AFEF8 = g_frame_l03_counter;
             FastVecAdd(&point, &point, mob->position);
             SpawnExplosion(mob->position,0,5,5,5,10,20,0,0.25f,20.0f,1,0,0,0);
-            if (mob->type == 0x964 /* Gadgebot */)
+            if (mob->type == MOBY_CLASS_GADGEBOT)
                 part_spawn_masked_debris((char *)object, 15, (float *)(state + 0x1B0), 3.0f, 6.0f, 3.0f, 6.0f, 255);
             moby_set_state(object, 4, 1);
             qzero(state + 0x1B0);
@@ -248,7 +248,7 @@ void UpdateCommandedMoby(u8 *object)
         mob->flags_A8 = 255;
     }
     if (mob->mode == 4) D_L03_001B2750.active++;
-    if (g_subtitle_history[39].count < 65535 && mob->type == 0x940 /* Bridgebot */ && mob->state != 1 && moby_find_entity_nearby(object)) {
+    if (g_subtitle_history[39].count < 65535 && mob->type == MOBY_CLASS_BRIDGEBOT && mob->state != 1 && moby_find_entity_nearby(object)) {
         if (g_subtitle_history[39].count != 0) {
             if (D_001A7390 - g_subtitle_history[39].tick > 1080 || g_subtitle_history[39].tick == 0)
                 subtitle_request_voice_line(0x9D0, 0x27);
@@ -284,7 +284,7 @@ void UpdateCommandedMoby(u8 *object)
     if (mob->state != 1 && vec_distance_xy(mob->position, g_hero_state.position) < 16.0f) {
         D_L03_001B2750.near_player++;
         switch (mob->type) {
-        case 0x940 /* Bridgebot */: D_L03_001B2750.near_940++; break;
+        case MOBY_CLASS_BRIDGEBOT: D_L03_001B2750.near_940++; break;
         case 0x93C: D_L03_001B2750.near_93C++; break;
         case 0xA59: D_L03_001B2750.near_A59++; break;
         }
@@ -311,7 +311,7 @@ void UpdateCommandedMoby(u8 *object)
         }
         break;
     case 3:
-        if (mob->mode == 2 || mob->type != 0x964 /* Gadgebot */) return;
+        if (mob->mode == 2 || mob->type != MOBY_CLASS_GADGEBOT) return;
         vars->target = moby_find_nearest_tilt_target(object);
         if (vars->target) {
             moby_set_state(object, 9, 2);
@@ -333,7 +333,7 @@ void UpdateCommandedMoby(u8 *object)
         }
         break;
     case 4:
-        if (mob->type != 0x964 /* Gadgebot */) return;
+        if (mob->type != MOBY_CLASS_GADGEBOT) return;
         vars->command_cooldown = 30;
         if (mob->mode != 3) {
             vars->target = moby_find_nearest_entity_a(object);
@@ -350,7 +350,7 @@ void UpdateCommandedMoby(u8 *object)
         }
         break;
     case 6:
-        if (mob->type != 0x940 /* Bridgebot */) return;
+        if (mob->type != MOBY_CLASS_BRIDGEBOT) return;
         vars->command_cooldown = 30;
         if (mob->mode != 4) {
             vars->target = moby_find_entity_nearby(object);
@@ -404,7 +404,7 @@ void UpdateCommandedMoby(u8 *object)
         }
         break;
     case 8:
-        if (mob->type == 0x964 /* Gadgebot */) {
+        if (mob->type == MOBY_CLASS_GADGEBOT) {
             if (mob->mode != 1) moby_set_state(object, 4, 1);
         } else moby_set_state(object, 6, 1);
         break;

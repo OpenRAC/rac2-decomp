@@ -205,7 +205,7 @@ int joba_rider_update(unsigned char *object)
                 ids = g_group_id_lists[BYTE(object, 0x21)];
                 for (;;) {
                     candidate = moby_at(group_entry_id(ids));
-                    if (moby_state(candidate) >= 0 && moby_class(candidate) == 0xcf5 /* Joba Tribesman */ &&
+                    if (moby_state(candidate) >= 0 && moby_class(candidate) == MOBY_CLASS_JOBA_TRIBESMAN &&
                         rider_kind(candidate) == 1) {
                         POINTER(state, 0x55c) = candidate;
                         break;
@@ -289,7 +289,7 @@ int joba_rider_update(unsigned char *object)
         char *attacker = POINTER(state, 0x38);
         if (attacker != 0) {
             kind = HALF(attacker, 0xaa);
-            if (kind != 0x47 /* moby class 71 */ && kind != 0xdd9 /* moby class 3545 */ && kind != 0xd1b /* moby class 3355 */ && kind != 0xce7 /* moby class 3303 */ && kind != 0xd07 /* Jobian Saur-Beast */ && kind != 0)
+            if (kind != 0x47 /* moby class 71 */ && kind != 0xdd9 /* moby class 3545 */ && kind != 0xd1b /* moby class 3355 */ && kind != 0xce7 /* moby class 3303 */ && kind != MOBY_CLASS_JOBIAN_SAUR_BEAST && kind != 0)
                 D_L11_001AED00 = 0;
         }
         if (BYTE(object, 0xbc) == 1 && result != 1) {
@@ -329,7 +329,7 @@ int joba_rider_update(unsigned char *object)
                 char *candidate;
                 id = *ids;
                 candidate = (char *)(g_moby_l11_table + (id & 0x7fff) * 0x100);
-                if (HALF(candidate, 0xaa) == 0xcf5 /* Joba Tribesman */ && WORD(POINTER(candidate, 0x68), 0x294) == 0) {
+                if (HALF(candidate, 0xaa) == MOBY_CLASS_JOBA_TRIBESMAN && WORD(POINTER(candidate, 0x68), 0x294) == 0) {
                     WORD(POINTER(candidate, 0x68), 0x294) = 1;
                     break;
                 }

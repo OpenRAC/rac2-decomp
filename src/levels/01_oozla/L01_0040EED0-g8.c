@@ -19,12 +19,12 @@ extern int moby_mark_spawned(char *);
 
 typedef struct { char pad0[0x31]; u8 active; u16 pad32; u16 flags; char pad36[0x62]; int target; } RetiringObject;
 /* Update for a breakable object: counts itself, waits to be hit, bursts with a sound and retires after a timer. */
-void breakable_object_update_timed(char *mobyArg)
+void breakable_object_update_timed(char *moby_arg)
 {
-    char *moby = mobyArg;
-    char *vars = *(char **)(mobyArg + 0x68);
+    char *moby = moby_arg;
+    char *vars = *(char **)(moby_arg + 0x68);
     float offset[4];
-    int activeCount;
+    int active_count;
 
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
@@ -41,7 +41,7 @@ void breakable_object_update_timed(char *mobyArg)
     case 2:
         FastVecScale((char *)offset, moby + 0xD0, -0.10000001f);
         if (*(u8 *)(moby + 0x31) != 0 && D_L01_001B2090 < 0.9f &&
-            D_L01_001B208C < 0.9f && (activeCount = D_L01_001B3468, activeCount < D_L01_001B15E0)) {
+            D_L01_001B208C < 0.9f && (active_count = D_L01_001B3468, active_count < D_L01_001B15E0)) {
             part_spawn_masked_debris(moby, 0x3FF, offset, 1.0f, 3.0f, 2.0f, 4.0f, 0xFF);
         } else {
             part_spawn_masked_debris(moby, 0xF, offset, 1.0f, 3.0f, 2.0f, 4.0f, 0xFF);

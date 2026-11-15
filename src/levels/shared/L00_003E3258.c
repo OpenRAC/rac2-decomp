@@ -124,47 +124,47 @@ extern char *func_002C16C0_1(float *, float *, int, int, unsigned, int, float, f
 /* Bursts of sparks fly out from a point, with two extra flashes if asked. */
 void part_l00_spawn_spark_burst_3(float *pos, int unused, int extra)
 {
-    float toCamera[4], velocity[4], spawnPos[4];
-    float cameraAngle, speed, scale, pitch, yaw;
-    int id, i, colorSeed;
-    char *particle, *extraData;
-    FastVecSub((char *)toCamera, g_camera_l00_position, (char *)pos);
-    cameraAngle = mat_fast_helper_a(toCamera[0], toCamera[1]);
+    float to_camera[4], velocity[4], spawn_pos[4];
+    float camera_angle, speed, scale, pitch, yaw;
+    int id, i, color_seed;
+    char *particle, *extra_data;
+    FastVecSub((char *)to_camera, g_camera_l00_position, (char *)pos);
+    camera_angle = mat_fast_helper_a(to_camera[0], to_camera[1]);
     for (i = 19; i >= 0; i--) {
         FastVecScale(velocity, D_0018A0E0, -(math_random_float_range(0.2f, 3.0f) * 0.01666666753590107f));
         id = FloatToInt(math_random_signed_float_range(1.0f, 2.0f));
         speed = math_random_float_range(0.3f, 0.75f) * 210000.0f;
-        spawnPos[0] = pos[0] + math_random_signed_float_range(0.0f, 0.2f);
-        spawnPos[1] = pos[1] + math_random_signed_float_range(0.0f, 0.2f);
-        spawnPos[2] = pos[2] + math_random_signed_float_range(0.0f, 0.2f);
-        particle = SpawnSpinningSparkParticle(spawnPos, 0.0f, 1.0f, id, velocity, 1.01f, speed, 0x7F202020, 1);
+        spawn_pos[0] = pos[0] + math_random_signed_float_range(0.0f, 0.2f);
+        spawn_pos[1] = pos[1] + math_random_signed_float_range(0.0f, 0.2f);
+        spawn_pos[2] = pos[2] + math_random_signed_float_range(0.0f, 0.2f);
+        particle = SpawnSpinningSparkParticle(spawn_pos, 0.0f, 1.0f, id, velocity, 1.01f, speed, 0x7F202020, 1);
         if (particle) {
             particle[3] = 68;
             *(short *)(particle + 10) = 90;
-            extraData = particle + 32;
+            extra_data = particle + 32;
             particle[9] = FloatToInt(4.0f) + 64;
-            *(float *)(extraData + 28) = IntToFloat(5);
-            *(int *)(extraData + 4) = 3;
-            extraData[10] = 48;
-            extraData[11] = particle[10];
+            *(float *)(extra_data + 28) = IntToFloat(5);
+            *(int *)(extra_data + 4) = 3;
+            extra_data[10] = 48;
+            extra_data[11] = particle[10];
         }
         scale = math_random_float_range(1.0f, 2.0f);
         pitch = math_random_float_range(0.0f, 1.396263599395752f);
-        yaw = FastAddRotations(cameraAngle, math_random_signed_float_range(0.0f, 1.396263599395752f));
+        yaw = FastAddRotations(camera_angle, math_random_signed_float_range(0.0f, 1.396263599395752f));
         vec_build_spherical_offset(velocity, scale * 0.01666666753590107f, yaw, pitch);
-        spawnPos[0] = pos[0] + math_random_signed_float_range(0.0f, 0.1f);
-        spawnPos[1] = pos[1] + math_random_signed_float_range(0.0f, 0.1f);
-        spawnPos[2] = pos[2] + math_random_signed_float_range(0.0f, 0.1f);
-        func_002C16C0_1(spawnPos, velocity, 30, 127, 0x7F7F7F, id,
+        spawn_pos[0] = pos[0] + math_random_signed_float_range(0.0f, 0.1f);
+        spawn_pos[1] = pos[1] + math_random_signed_float_range(0.0f, 0.1f);
+        spawn_pos[2] = pos[2] + math_random_signed_float_range(0.0f, 0.1f);
+        func_002C16C0_1(spawn_pos, velocity, 30, 127, 0x7F7F7F, id,
             math_random_float_range(0.1f, 0.5f) * 210000.0f, 500.0f, 1.0f, 0.0f, 1.0f);
     }
     if (extra == 1) {
         char *last;
         speed = 525000.0f;
-        colorSeed = math_random_int_below(255);
-        last = func_002C16C0_1(pos, (float *)D_L00_001A8F20_1, 5, 127, 0x207080, colorSeed, speed, 0.0f, 1.0f, 0.0f, 1.0f);
+        color_seed = math_random_int_below(255);
+        last = func_002C16C0_1(pos, (float *)D_L00_001A8F20_1, 5, 127, 0x207080, color_seed, speed, 0.0f, 1.0f, 0.0f, 1.0f);
         if (last) last[2] = *D_L00_001FEA14;
-        last = func_002C16C0_1(pos, (float *)D_L00_001A8F20_1, 5, 127, 0x207080, (colorSeed + 128) & 255, speed, 0.0f, 1.0f, 0.0f, 1.0f);
+        last = func_002C16C0_1(pos, (float *)D_L00_001A8F20_1, 5, 127, 0x207080, (color_seed + 128) & 255, speed, 0.0f, 1.0f, 0.0f, 1.0f);
         if (last) last[2] = *D_L00_001FEA14;
     }
 }
@@ -192,10 +192,10 @@ extern void part_spawn_burst(float *, float *, int, int, unsigned int, int,
 /* Sprays twenty small sparks from a point. */
 void part_spawn_small_spark_spray(float *pos)
 {
-    float toCamera[4];
+    float to_camera[4];
     float velocity[4];
-    float spawnPos[4];
-    float cameraAngle;
+    float spawn_pos[4];
+    float camera_angle;
     float yaw;
     float step;
     float pitch;
@@ -203,8 +203,8 @@ void part_spawn_small_spark_spray(float *pos)
     int id;
     int i;
 
-    FastVecSub((char *)toCamera, g_camera_l00_position, (char *)pos);
-    cameraAngle = mat_fast_helper_a(toCamera[0], toCamera[1]);
+    FastVecSub((char *)to_camera, g_camera_l00_position, (char *)pos);
+    camera_angle = mat_fast_helper_a(to_camera[0], to_camera[1]);
 
     for (i = 19; i >= 0; i--) {
         step = math_random_float_range(0.25f, 0.5f);
@@ -212,12 +212,12 @@ void part_spawn_small_spark_spray(float *pos)
         math_random_float_range(0.05f, 0.2f);
         speed = 210000.0f;
         pitch = math_random_float_range(0.0f, 1.396263599395752f);
-        yaw = FastAddRotations(cameraAngle, math_random_signed_float_range(0.0f, 1.396263599395752f));
+        yaw = FastAddRotations(camera_angle, math_random_signed_float_range(0.0f, 1.396263599395752f));
         vec_build_spherical_offset(velocity, step * 0.01666666753590107f, yaw, pitch);
-        spawnPos[0] = pos[0] + math_random_signed_float_range(0.0f, 0.075f);
-        spawnPos[1] = pos[1] + math_random_signed_float_range(0.0f, 0.075f);
-        spawnPos[2] = pos[2] + math_random_signed_float_range(0.0f, 0.075f);
-        part_spawn_burst(spawnPos, velocity, 15, 127, 0x007F7F7F, id,
+        spawn_pos[0] = pos[0] + math_random_signed_float_range(0.0f, 0.075f);
+        spawn_pos[1] = pos[1] + math_random_signed_float_range(0.0f, 0.075f);
+        spawn_pos[2] = pos[2] + math_random_signed_float_range(0.0f, 0.075f);
+        part_spawn_burst(spawn_pos, velocity, 15, 127, 0x007F7F7F, id,
                       math_random_float_range(0.05f, 0.2f) * speed, 500.0f, 1.0f, 0.0f, 1.0f);
     }
 }
@@ -227,18 +227,18 @@ void part_spawn_small_spark_spray(float *pos)
 void moby_update_color_scale(char *object)
 {
     char *data;
-    float scaleX;
-    float scaleY;
-    float scaleZ;
+    float scale_x;
+    float scale_y;
+    float scale_z;
 
     data = *(char **)(object + 104);
     func_002833F0_1(object + 192, object + 240);
-    scaleX = func_00283198_1(*(float *)(data + 4)) * 0.15f + 0.35000002f;
-    scaleY = func_00283198_1(*(float *)(data + 8)) * 0.15f + 0.35000002f;
-    scaleZ = func_00283198_1(*(float *)(data + 12)) * 0.15f + 0.35000002f;
-    func_00282D30_3(object + 192, object + 192, scaleX);
-    func_00282D30_3(object + 208, object + 208, scaleY);
-    func_00282D30_3(object + 224, object + 224, scaleZ);
+    scale_x = func_00283198_1(*(float *)(data + 4)) * 0.15f + 0.35000002f;
+    scale_y = func_00283198_1(*(float *)(data + 8)) * 0.15f + 0.35000002f;
+    scale_z = func_00283198_1(*(float *)(data + 12)) * 0.15f + 0.35000002f;
+    func_00282D30_3(object + 192, object + 192, scale_x);
+    func_00282D30_3(object + 208, object + 208, scale_y);
+    func_00282D30_3(object + 224, object + 224, scale_z);
     *(float *)(data + 4) = func_00283B98_3(*(float *)(data + 4), 0.5f);
     *(float *)(data + 8) = func_00283B98_3(*(float *)(data + 8), 0.5f);
     *(float *)(data + 12) = func_00283B98_3(*(float *)(data + 12), 0.5f);
@@ -278,11 +278,11 @@ extern char D_L00_001A8F20[] __attribute__((sda));
 /* Throws out bright particles in a short line from an object's position. */
 void part_spawn_line_at_moby(char *moby) {
     float origin[4];
-    float backOffset[4];
-    float upStep[4];
+    float back_offset[4];
+    float up_step[4];
     float jittered[4];
     char *table;
-    int colorSeed;
+    int color_seed;
     char *particle;
     char *vars;
     float size;
@@ -294,24 +294,24 @@ void part_spawn_line_at_moby(char *moby) {
     origin[1] = p[1];
     origin[2] = p[2]; }
     origin[3] = 0.0f;
-    FastVecScale(backOffset, moby + 0xD0, -0.1f);
-    FastVecAdd(origin, origin, backOffset);
-    FastVecScale(upStep, moby + 0xE0, 0.15f);
-    FastVecAdd(origin, origin, upStep);
-    FastVecScale(upStep, moby + 0xE0, -0.033333335f);
+    FastVecScale(back_offset, moby + 0xD0, -0.1f);
+    FastVecAdd(origin, origin, back_offset);
+    FastVecScale(up_step, moby + 0xE0, 0.15f);
+    FastVecAdd(origin, origin, up_step);
+    FastVecScale(up_step, moby + 0xE0, -0.033333335f);
     table = D_L00_001FE940;
     for (i = 8; i >= 0; i--) {
         jittered[0] = origin[0] + math_random_signed_float_range(0.0f, 0.1f);
         jittered[1] = origin[1] + math_random_signed_float_range(0.0f, 0.1f);
         jittered[2] = origin[2] + math_random_signed_float_range(0.0f, 0.1f);
-        colorSeed = math_random_int_below(0xFF);
+        color_seed = math_random_int_below(0xFF);
         size = 42000.0f;
-        part_spawn_gravity_fade(jittered, D_L00_001A8F20, 4, 0x808080, colorSeed, 0x7F, 0x7F, size, size, 0.0f, 1);
+        part_spawn_gravity_fade(jittered, D_L00_001A8F20, 4, 0x808080, color_seed, 0x7F, 0x7F, size, size, 0.0f, 1);
         size = 273000.0f;
-        particle = part_spawn_gravity_fade(origin, D_L00_001A8F20, 4, 0x406080, colorSeed, 0x10, 0x10, size, size, 0.0f, 1);
+        particle = part_spawn_gravity_fade(origin, D_L00_001A8F20, 4, 0x406080, color_seed, 0x10, 0x10, size, size, 0.0f, 1);
         if (particle != 0)
             *(unsigned char *)(particle + 2) = *(unsigned char *)(*(unsigned *)(table + 0xD4));
-        FastVecAdd(origin, origin, upStep);
+        FastVecAdd(origin, origin, up_step);
     }
 }
 
@@ -547,7 +547,7 @@ void moby_set_fading_alpha_color(int index, char *object)
 /* Works out a smooth point along a curve between two points. */
 void math_interpolate_curve_point(float *out, float *b, float *c, float *a, float *d, float t)
 {
-    float tSquared, tCubed, curveA, curveB, curveC;
+    float t_squared, t_cubed, curve_a, curve_b, curve_c;
 
     if (t == 0.0f) {
         qcopy(out, b);
@@ -557,23 +557,23 @@ void math_interpolate_curve_point(float *out, float *b, float *c, float *a, floa
         qcopy(out, c);
         return;
     }
-    tSquared = t * t;
-    tCubed = tSquared * t;
+    t_squared = t * t;
+    t_cubed = t_squared * t;
 
-    curveA = (d[0] - c[0]) - (a[0] - b[0]);
-    curveB = (a[0] - b[0]) - curveA;
-    curveC = c[0] - a[0];
-    out[0] = curveA * tCubed + curveB * tSquared + curveC * t + b[0];
+    curve_a = (d[0] - c[0]) - (a[0] - b[0]);
+    curve_b = (a[0] - b[0]) - curve_a;
+    curve_c = c[0] - a[0];
+    out[0] = curve_a * t_cubed + curve_b * t_squared + curve_c * t + b[0];
 
-    curveA = (d[1] - c[1]) - (a[1] - b[1]);
-    curveB = (a[1] - b[1]) - curveA;
-    curveC = c[1] - a[1];
-    out[1] = curveA * tCubed + curveB * tSquared + curveC * t + b[1];
+    curve_a = (d[1] - c[1]) - (a[1] - b[1]);
+    curve_b = (a[1] - b[1]) - curve_a;
+    curve_c = c[1] - a[1];
+    out[1] = curve_a * t_cubed + curve_b * t_squared + curve_c * t + b[1];
 
-    curveA = (d[2] - c[2]) - (a[2] - b[2]);
-    curveB = (a[2] - b[2]) - curveA;
-    curveC = c[2] - a[2];
-    out[2] = curveA * tCubed + curveB * tSquared + curveC * t + b[2];
+    curve_a = (d[2] - c[2]) - (a[2] - b[2]);
+    curve_b = (a[2] - b[2]) - curve_a;
+    curve_c = c[2] - a[2];
+    out[2] = curve_a * t_cubed + curve_b * t_squared + curve_c * t + b[2];
     out[3] = 0.0f;
 }
 

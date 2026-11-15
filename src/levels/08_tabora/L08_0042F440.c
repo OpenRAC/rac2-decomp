@@ -25,8 +25,8 @@ void emitter_update(char *spawner) {
     char *vars = *(char **)(spawner + 0x68);
     u8 state = *(u8 *)(spawner + 0x20);
     char *hit;
-    s32 childIndex;
-    u8 childState;
+    s32 child_index;
+    u8 child_state;
 
     switch (state) {
     case 0:
@@ -39,15 +39,15 @@ void emitter_update(char *spawner) {
             return;
         }
         *(u8 *)(spawner + 0xA8) = 0xFF;
-        childIndex = *(s32 *)(vars + 4);
-        if (childIndex > 0) {
-            char *child = (char *)(D_L08_001B29DC + (childIndex << 8));
+        child_index = *(s32 *)(vars + 4);
+        if (child_index > 0) {
+            char *child = (char *)(D_L08_001B29DC + (child_index << 8));
 
             if (child == 0) {
                 return;
             }
-            childState = *(u8 *)(child + 0x20);
-            if (childState == 0xFE || (childState == 0xFD || childState == 3)) {
+            child_state = *(u8 *)(child + 0x20);
+            if (child_state == 0xFE || (child_state == 0xFD || child_state == 3)) {
                 moby_set_state(spawner, 2, -1);
             }
         }

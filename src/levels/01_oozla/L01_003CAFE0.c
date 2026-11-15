@@ -76,13 +76,13 @@ void swamp_monster_release_attack_slot(u8 *moby)
 /* Cleans up the swamp monster arm timers when it is removed. */
 void swamp_monster_release_arm_timers(u8 *moby)
 {
-    u8 *mobyAlias = moby;
-    u8 *vars = *(u8 **)(mobyAlias + 0x68);
+    u8 *moby_alias = moby;
+    u8 *vars = *(u8 **)(moby_alias + 0x68);
 
     if (*(s32 *)(vars + 0x74) == 0)
         math_fast_float_d(vars + 0xC0);
-    if (*(u16 *)(mobyAlias + 0x96) < 0xFFFE)
-        *(u16 *)(mobyAlias + 0x96) = *(u16 *)(mobyAlias + 0x96) + 1;
+    if (*(u16 *)(moby_alias + 0x96) < 0xFFFE)
+        *(u16 *)(moby_alias + 0x96) = *(u16 *)(moby_alias + 0x96) + 1;
     math_fast_float_d(vars + 0xBC);
     math_fast_float_d(vars + 0xC4);
     FastDecTimer(vars + 0x26);
@@ -92,19 +92,19 @@ void swamp_monster_release_arm_timers(u8 *moby)
 
 /* Registers the object with the 0x04000009 descriptor and arms its 0x00 flag once. */
 /* Tests a swing between two points against the hero and plays a hit sound the first time. */
-void swamp_monster_test_attack_segment_hits_hero(u8 *moby, u32 segmentStart, u32 segmentEnd, u8 width, u8 *soundPlayed)
+void swamp_monster_test_attack_segment_hits_hero(u8 *moby, u32 segment_start, u32 segment_end, u8 width, u8 *sound_played)
 {
     u8 *attacker = moby;
-    u8 *soundFlag = soundPlayed;
+    u8 *sound_flag = sound_played;
 
-    if (func_3120A8(attacker, segmentStart, segmentEnd, 0x04000009, 0, 1, 1, (f32)width, 1.0f) == 0)
+    if (func_3120A8(attacker, segment_start, segment_end, 0x04000009, 0, 1, 1, (f32)width, 1.0f) == 0)
         return;
     if (D_L01_001BF918[0] != g_pHeroMoby[0])
         return;
-    if (*soundFlag == 0)
+    if (*sound_flag == 0)
         return;
     func_355780(3, 0, attacker);
-    *soundFlag = 1;
+    *sound_flag = 1;
 }
 
 
@@ -118,43 +118,43 @@ s32 swamp_monster_sync_linked_parts_health(u8 *moby)
 {
     u8 *vars;
     u8 *part;
-    u8 *partVars;
-    s32 *partIds;
+    u8 *part_vars;
+    s32 *part_ids;
     s32 i;
-    u8 *pathTable;
-    s32 sharedValue;
+    u8 *path_table;
+    s32 shared_value;
 
     vars = *(u8 **)(moby + 0x68);
     if (moby[0x95] == 6)
         return 0;
-    partIds = (s32 *)(vars + 0xA0);
+    part_ids = (s32 *)(vars + 0xA0);
     for (i = 0; i < 2; i++) {
-        if (partIds[i] == -1)
+        if (part_ids[i] == -1)
             continue;
-        part = D_L01_001B255C_sda[0] + (partIds[i] << 8);
-        partVars = *(u8 **)(part + 0x68);
-        if (moby[0x95] == 4 && *(s32 *)(partVars + 0x74) == 1)
+        part = D_L01_001B255C_sda[0] + (part_ids[i] << 8);
+        part_vars = *(u8 **)(part + 0x68);
+        if (moby[0x95] == 4 && *(s32 *)(part_vars + 0x74) == 1)
             script_queue_keyed_request(*(s32 *)(vars + 0xD0), *(s32 *)(vars + 0xD8));
         if (part[0x95] == 8)
             continue;
-        sharedValue = *(s32 *)(partVars + 0xC0);
-        if (sharedValue < *(s32 *)(vars + 0xBC))
-            sharedValue = *(s32 *)(vars + 0xBC);
-        *(s32 *)(vars + 0xBC) = sharedValue;
-        *(s32 *)(partVars + 0xC0) = sharedValue;
+        shared_value = *(s32 *)(part_vars + 0xC0);
+        if (shared_value < *(s32 *)(vars + 0xBC))
+            shared_value = *(s32 *)(vars + 0xBC);
+        *(s32 *)(vars + 0xBC) = shared_value;
+        *(s32 *)(part_vars + 0xC0) = shared_value;
         if (*(f32 *)(vars + 0x20) <= 0.0f) {
             if (moby[0x43] != 5)
                 anim_start_blended(moby, 5, 0, 10);
             *(f32 *)(vars + 0x20) = 0.0f;
-            *(f32 *)(partVars + 0x20) = 0.0f;
+            *(f32 *)(part_vars + 0x20) = 0.0f;
             if (part[0x43] != 4 && part[0x42] != 4)
                 anim_start_blended(part, 4, 0, 10);
             part[0x95] = 8;
             moby_set_state(moby, 0, 6);
         }
-        qcopy(vars + 0x80, partVars + 0x60);
-        pathTable = D_L01_001FE180[*(s32 *)(vars + 0xA8)];
-        math_closest_point_on_polygon_edge(vars + 0x70, partVars + 0x60, pathTable + 0x10, *(s32 *)pathTable);
+        qcopy(vars + 0x80, part_vars + 0x60);
+        path_table = D_L01_001FE180[*(s32 *)(vars + 0xA8)];
+        math_closest_point_on_polygon_edge(vars + 0x70, part_vars + 0x60, path_table + 0x10, *(s32 *)path_table);
     }
     return *(s32 *)(vars + 0xBC);
 }
@@ -183,11 +183,11 @@ void swamp_monster_init_linked_body_part(u8 *moby)
     *(s32 *)(vars + 0xC0) = -1;
     *(u8 *)(vars + 0x2A) = 8;
     if (*(s32 *)(vars + 0xCC) != -1) {
-        u8 *linkedPart = (u8 *)((*(s32 *)(vars + 0xCC) << 8) + (s32)D_L01_001B255C_sda[0]);
+        u8 *linked_part = (u8 *)((*(s32 *)(vars + 0xCC) << 8) + (s32)D_L01_001B255C_sda[0]);
 
-        if (*(u8 *)(linkedPart + 0x20) != 0xFE) {
-            if (*(u8 *)(linkedPart + 0x20) != 0xFD)
-                *(f32 *)(linkedPart + 0x18) = *(f32 *)(moby + 0x18);
+        if (*(u8 *)(linked_part + 0x20) != 0xFE) {
+            if (*(u8 *)(linked_part + 0x20) != 0xFD)
+                *(f32 *)(linked_part + 0x18) = *(f32 *)(moby + 0x18);
         }
     }
     if (*(s32 *)(vars + 0xA8) != -1)
@@ -247,41 +247,41 @@ void swamp_monster_apply_damage(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
     u8 *attacker;
-    u8 *hitSource;
-    u8 *groupMember;
-    u8 *hitRecord;
-    u16 *memberList;
+    u8 *hit_source;
+    u8 *group_member;
+    u8 *hit_record;
+    u16 *member_list;
     f32 damage;
-    f32 pushStrength;
-    s32 hitDuration;
-    u16 classId;
+    f32 push_strength;
+    s32 hit_duration;
+    u16 class_id;
 
     if (moby[0x95] >= 5 && moby[0x95] <= 6 && 0.0f < *(f32 *)(state + 0x20)) {
         attacker = part_find_owned_effect_slot(moby, 0x10000, 0);
-        hitSource = attacker;
+        hit_source = attacker;
         if (*(short *)(state + 0x26) >= 1)
-            hitSource = 0;
-        damage = moby_update_aim_target_strength(moby, hitSource);
-        if (hitSource != 0 && 0.0f < damage) {
+            hit_source = 0;
+        damage = moby_update_aim_target_strength(moby, hit_source);
+        if (hit_source != 0 && 0.0f < damage) {
             if (moby[0x21] != 0xFF && *(s32 *)(state + 0xA0) != -1) {
-                classId = *(u16 *)(*(u8 **)(hitSource + 0x20) + 0xAA);
-                hitDuration = (classId == 0xCE4 /* moby class 3300 */ || classId == 0xCE5 /* moby class 3301 */) ? 60 : 0;
-                for (memberList = D_L01_001FB020[moby[0x21]];
-                     moby[0x21] != 0xFF && moby[0x21] <= D_L01_001B2578[0] && memberList != 0 &&
-                     ((memberList != 0 && (short)memberList[-1] >= 0) || memberList == D_L01_001FB020[moby[0x21]]);
-                     memberList++) {
-                    groupMember = D_L01_001B255C_sda[0] + ((*memberList & 0x7FFF) << 8);
-                    if (groupMember == 0)
+                class_id = *(u16 *)(*(u8 **)(hit_source + 0x20) + 0xAA);
+                hit_duration = (class_id == 0xCE4 /* moby class 3300 */ || class_id == 0xCE5 /* moby class 3301 */) ? 60 : 0;
+                for (member_list = D_L01_001FB020[moby[0x21]];
+                     moby[0x21] != 0xFF && moby[0x21] <= D_L01_001B2578[0] && member_list != 0 &&
+                     ((member_list != 0 && (short)member_list[-1] >= 0) || member_list == D_L01_001FB020[moby[0x21]]);
+                     member_list++) {
+                    group_member = D_L01_001B255C_sda[0] + ((*member_list & 0x7FFF) << 8);
+                    if (group_member == 0)
                         break;
-                    hitRecord = moby_get_private_value_0(groupMember);
-                    if (hitRecord != 0) {
-                        *(u16 *)(hitRecord + 6) = hitDuration;
-                        *(f32 *)hitRecord = *(f32 *)hitRecord - damage;
-                        hitRecord[0x17] = state[0x37];
-                        *(s32 *)(hitRecord + 0x18) = *(s32 *)(state + 0x38);
-                        *(u16 *)(hitRecord + 0x1C) = *(u16 *)(state + 0x3C);
+                    hit_record = moby_get_private_value_0(group_member);
+                    if (hit_record != 0) {
+                        *(u16 *)(hit_record + 6) = hit_duration;
+                        *(f32 *)hit_record = *(f32 *)hit_record - damage;
+                        hit_record[0x17] = state[0x37];
+                        *(s32 *)(hit_record + 0x18) = *(s32 *)(state + 0x38);
+                        *(u16 *)(hit_record + 0x1C) = *(u16 *)(state + 0x3C);
                     }
-                    groupMember[0xA8] = 0xFF;
+                    group_member[0xA8] = 0xFF;
                 }
             } else {
                 *(f32 *)(state + 0x20) = *(f32 *)(state + 0x20) - damage;
@@ -307,10 +307,10 @@ void swamp_monster_apply_damage(u8 *moby)
             }
             if (0.1f < damage) {
                 FastVecSub(state + 0x90, moby + 0x10, g_hero_position);
-                pushStrength = (damage + damage + 3.0f) * 0.016666668f;
-                if (0.20000002f < pushStrength)
-                    pushStrength = 0.20000002f;
-                vec_scale_to_length(state + 0x90, state + 0x90, pushStrength);
+                push_strength = (damage + damage + 3.0f) * 0.016666668f;
+                if (0.20000002f < push_strength)
+                    push_strength = 0.20000002f;
+                vec_scale_to_length(state + 0x90, state + 0x90, push_strength);
                 *(s32 *)(state + 0x98) = 0;
             }
         }
@@ -336,7 +336,7 @@ void swamp_monster_apply_damage(u8 *moby)
 void cutscene_trigger_update(u8 *moby)
 {
     u8 *vars = *(u8 **)(moby + 0x68), *anchor;
-    int screenMode;
+    int screen_mode;
 
     switch (moby[0x20]) {
     case 0:
@@ -361,9 +361,9 @@ void cutscene_trigger_update(u8 *moby)
             part_spawn_sparkles_and_glow_rings(moby);
         break;
     case 2:
-        screenMode = D_L01_001A8F40;
+        screen_mode = D_L01_001A8F40;
         (*(u16 *)(moby + 0x96))++;
-        if (screenMode == 2) {
+        if (screen_mode == 2) {
             moby[0x31] = 0;
             *(u16 *)(moby + 0x34) |= 1;
         }

@@ -54,16 +54,16 @@ extern float D_L00_001B153C __attribute__((sda)), D_L00_001B154C __attribute__((
 /* Decides which pose the held weapon is in (idle, aiming, firing or putting away), based on what the hero is doing, and starts the blend into it. */
 void weapon_update_held_anim_state(char *moby)
 {
-    char *mobyVars = *(char **)(moby + 0x70);
-    Anim *s = (Anim *)(mobyVars + 0x60);
+    char *moby_vars = *(char **)(moby + 0x70);
+    Anim *s = (Anim *)(moby_vars + 0x60);
     if (D_L00_001B1588) { D_L00_001B1588 = 0; return; }
     if (s->state == 0) {
         if (g_hero_state.ctrl == 2 || g_hero_state.ctrl == 30) GO(1, D_L00_001B1530)
-        if (g_hero_state.state == 15) AIM(3, D_L00_001B1540, D_L00_001B1544, D_L00_001B154C, 1, mobyVars + 0x90, mobyVars + 0x70, mobyVars + 0x80)
+        if (g_hero_state.state == 15) AIM(3, D_L00_001B1540, D_L00_001B1544, D_L00_001B154C, 1, moby_vars + 0x90, moby_vars + 0x70, moby_vars + 0x80)
         if (g_hero_state.state == 12) GO(8, D_L00_001B1554)
-        if (g_hero_state.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 0, mobyVars + 0x90, mobyVars + 0x70, mobyVars + 0x80)
+        if (g_hero_state.state == 11) AIM(6, D_L00_001B1534, D_L00_001B1544, D_L00_001B153C, 0, moby_vars + 0x90, moby_vars + 0x70, moby_vars + 0x80)
         if ((unsigned)(g_hero_state.state - 13) < 2) {
-            AIM(5, D_L00_001B1550, D_L00_001B1554, D_L00_001B155C, 1, mobyVars + 0x90, mobyVars + 0x70, mobyVars + 0x80)
+            AIM(5, D_L00_001B1550, D_L00_001B1554, D_L00_001B155C, 1, moby_vars + 0x90, moby_vars + 0x70, moby_vars + 0x80)
         }
         if (g_hero_state.ctrl == 4) GO(2, D_L00_001B152C)
         return;

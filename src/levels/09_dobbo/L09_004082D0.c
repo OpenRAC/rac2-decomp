@@ -13,7 +13,7 @@ typedef int TQ_L09_004082D0 __attribute__((mode(TI)));
    and passes it to the ids of both of its lists. */
 void trigger_switch_update(u8 *obj) {
     char *vars;
-    s32 *secondList;
+    s32 *second_list;
     s32 i;
     s32 flag;
     s32 state;
@@ -62,7 +62,7 @@ update:
         else
             obj[0xBC] = 0;
         obj[0x20] = obj[0xBC] + 1;
-        secondList = (s32 *)(vars + 0x84);
+        second_list = (s32 *)(vars + 0x84);
         for (i = 0; i < 29; i++) {
             s32 id = ((s32 *)(vars + 0x10))[i];
             if (id != -1) {
@@ -70,7 +70,7 @@ update:
             }
         }
         for (i = 0; i < 14; i++) {
-            s32 id = secondList[i];
+            s32 id = second_list[i];
             if (id != -1) {
                 dobbo_apply_setting_by_index(obj, id, vars, flag);
             }

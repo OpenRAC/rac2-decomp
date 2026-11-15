@@ -28,20 +28,20 @@ extern void moby_set_state(char *, int, int);
 /* Counts one more press on the saved switch counter for this moby, then moves it to its next state. */
 void moby_increment_saved_switch_counter(char *moby)
 {
-    unsigned short indexWord = *(unsigned short *)(moby + 0xB2);
+    unsigned short index_word = *(unsigned short *)(moby + 0xB2);
 
-    if (indexWord & 1) {
-        char *counterPtr = (char *)(((short)indexWord >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
-        unsigned char counterByte = *(unsigned char *)counterPtr;
+    if (index_word & 1) {
+        char *counter_ptr = (char *)(((short)index_word >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        unsigned char counter_byte = *(unsigned char *)counter_ptr;
 
-        if (((counterByte >> 4) & 7) != 7)
-            *(unsigned char *)counterPtr = counterByte + 0x10;
+        if (((counter_byte >> 4) & 7) != 7)
+            *(unsigned char *)counter_ptr = counter_byte + 0x10;
     } else {
-        char *counterPtr = (char *)(((short)indexWord >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
-        unsigned char counterByte = *(unsigned char *)counterPtr;
+        char *counter_ptr = (char *)(((short)index_word >> 1) + (g_current_map_index << 10)) + (int)D_0019B4A8;
+        unsigned char counter_byte = *(unsigned char *)counter_ptr;
 
-        if ((counterByte & 7) != 7)
-            *(unsigned char *)counterPtr = counterByte + 1;
+        if ((counter_byte & 7) != 7)
+            *(unsigned char *)counter_ptr = counter_byte + 1;
     }
 
     if (*(unsigned char *)(moby + 0x21) != 0xFF)
@@ -149,10 +149,10 @@ void moby_release_and_reset_impact_slot(char *moby)
     char *owner = (char *)part_find_owned_effect_slot(moby, 0x10000, 0);
 
     if (owner != 0) {
-        char *ownerTarget = *(char **)(owner + 0x20);
+        char *owner_target = *(char **)(owner + 0x20);
 
-        if (ownerTarget != 0) {
-            if (*(short *)(ownerTarget + 0xAA) == 0x825 /* Dynamo */) {
+        if (owner_target != 0) {
+            if (*(short *)(owner_target + 0xAA) == MOBY_CLASS_DYNAMO) {
                 if (*(unsigned char *)(moby + 0x21) != 0xFF)
                     moby_set_byte_on_group(*(unsigned char *)(moby + 0x21), 2);
             }
@@ -337,7 +337,7 @@ extern char *D_L01_001C3980[];
 
 /* Updates up to 30 glow effects attached to other mobys: pulses their colour, throws sparks near them and frees them when the target is gone. */
 void part_update_attached_glow_effects(char *moby) {
-    float sparkA[4], sparkB[4];
+    float spark_a[4], spark_b[4];
     int i;
 
     qcopy_nc(moby + 0x10, g_hero_state);
@@ -381,7 +381,7 @@ void part_update_attached_glow_effects(char *moby) {
                 float y = math_random_angle();
                 float z = math_random_angle();
 
-                vec_build_spherical_offset(sparkA, x, y, z);
+                vec_build_spherical_offset(spark_a, x, y, z);
             }
             {
                 float scale = math_random_float_range(0.3f, 0.65f) * 0.0009764999849721789f;
@@ -389,11 +389,11 @@ void part_update_attached_glow_effects(char *moby) {
                 float y = math_random_angle();
                 float z = math_random_angle();
 
-                vec_build_spherical_offset(sparkB, x, y, z);
+                vec_build_spherical_offset(spark_b, x, y, z);
             }
             j = math_random_int_range(5, 15);
             count = math_random_int_range(15, 30);
-            tumbling_piece_spawn(moby, *(char **)(slot + 0x18), *(char **)(slot + 0x18), sparkA, sparkB, 0, j, count, slot, 0.0f);
+            tumbling_piece_spawn(moby, *(char **)(slot + 0x18), *(char **)(slot + 0x18), spark_a, spark_b, 0, j, count, slot, 0.0f);
         }
         if (dead) {
             target_apply_slot_color(slot);
@@ -402,9 +402,9 @@ void part_update_attached_glow_effects(char *moby) {
         }
         goto timer;
     collide:
-        vec_clear_128(sparkA);
-        tumbling_piece_spawn(moby, *(char **)(slot + 0x18), other, sparkA, sparkA, 1, 10, 30, slot, *(float *)(slot + 0x10));
-        tumbling_piece_spawn(moby, *(char **)(slot + 0x18), other, sparkA, sparkA, 0, 10, 30, slot, 0.0f);
+        vec_clear_128(spark_a);
+        tumbling_piece_spawn(moby, *(char **)(slot + 0x18), other, spark_a, spark_a, 1, 10, 30, slot, *(float *)(slot + 0x10));
+        tumbling_piece_spawn(moby, *(char **)(slot + 0x18), other, spark_a, spark_a, 0, 10, 30, slot, 0.0f);
         goto random_particles;
     timer:
         if (*(int *)(slot + 0x24) == 0) {

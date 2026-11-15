@@ -41,8 +41,8 @@ void part_update_moby_joint_effect(Effect2C43C8 *e) {
     Moby2C43C8 *target = at->moby;
     float size;
     float keep;
-    float spreadRange;
-    float offsetAmount;
+    float spread_range;
+    float offset_amount;
 
     if (target == 0 || target->uid != at->uid || target->state == 0xFE || target->state == 0xFD) {
         part_kill(e);
@@ -52,9 +52,9 @@ void part_update_moby_joint_effect(Effect2C43C8 *e) {
     keep = e->dir[3];
     moby_transform_joint_to_world(e->at.moby, at->joint, e->pos);
     moby_transform_joint_point(e->at.moby, at->joint, mtx);
-    spreadRange = IntToFloat(at->spread);
-    offsetAmount = math_random_float_range(-spreadRange, spreadRange);
-    vec_scale_to_length(off, mtx, (offsetAmount * 0.01f - 1.0f) * at->dist);
+    spread_range = IntToFloat(at->spread);
+    offset_amount = math_random_float_range(-spread_range, spread_range);
+    vec_scale_to_length(off, mtx, (offset_amount * 0.01f - 1.0f) * at->dist);
     FastVecAdd(e->dir, e->pos, off);
     e->pos[3] = size;
     e->dir[3] = keep;

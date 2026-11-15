@@ -19,20 +19,20 @@ extern float math_fabs(float);
 float moby_turn_by_damped_angle(char *object, char *state, TI128 *input, char *transform) {
     /* Rotation construction writes three full rows after the local vector. */
     struct { Vector vector; TI128 matrix[3]; float damping; } scratch;
-    TI128 *rotMatrix;
-    char *objectBasis;
-    float angleDelta;
+    TI128 *rot_matrix;
+    char *object_basis;
+    float angle_delta;
     scratch.vector.q = *input;
-    angleDelta = vec_get_heading_angle(object, scratch.vector.f, transform);
+    angle_delta = vec_get_heading_angle(object, scratch.vector.f, transform);
     scratch.damping = 0.0f;
-    math_approach_target_with_direction_mode(&scratch.damping, angleDelta, (float *)(state + 0xB4), 0,
+    math_approach_target_with_direction_mode(&scratch.damping, angle_delta, (float *)(state + 0xB4), 0,
                  *(float *)(state + 0x14), *(float *)(state + 0x18), 3.141592653589793f);
     qzero(&scratch.vector);
     scratch.vector.f[2] = *(float *)(state + 0xB4);
-    rotMatrix = scratch.matrix;
-    euler_rotation_basis(rotMatrix, &scratch.vector);
-    objectBasis = object + 0xC0;
-    multiply_matrix3x3(objectBasis, objectBasis, rotMatrix);
-    angleDelta = math_fabs(angleDelta);
-    return angleDelta - math_fabs(*(float *)(state + 0xB4));
+    rot_matrix = scratch.matrix;
+    euler_rotation_basis(rot_matrix, &scratch.vector);
+    object_basis = object + 0xC0;
+    multiply_matrix3x3(object_basis, object_basis, rot_matrix);
+    angle_delta = math_fabs(angle_delta);
+    return angle_delta - math_fabs(*(float *)(state + 0xB4));
 }

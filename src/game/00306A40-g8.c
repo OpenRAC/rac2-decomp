@@ -71,7 +71,7 @@ extern void gfx_register_overlay_draw_callback(void (*)(void *),void *);
    bursts on what it hit, then follows what it stuck to until it is destroyed. */
 void megaturret_update(ProjectileObject *self)
 {
-    Vec oldPos;
+    Vec old_pos;
     int filter[2];
     Vec direction, velocity, quaternion, axis;
     float matrix[12];
@@ -81,14 +81,14 @@ void megaturret_update(ProjectileObject *self)
     ProjectileData *vars = self->data;
     ProjectileObject *hit;
     float angle;
-    int hitResult, slotCounter;
+    int hit_result, slot_counter;
 
     switch (self->state) {
     case 0:
         self->state = 1;
-        slotCounter = D_001AEC0C;
-        vars->slot = slotCounter;
-        D_001AEC0C = (slotCounter + 1) % 100;
+        slot_counter = D_001AEC0C;
+        vars->slot = slot_counter;
+        D_001AEC0C = (slot_counter + 1) % 100;
         self->collision = 0;
         /* fall through */
     case 1:
@@ -100,14 +100,14 @@ void megaturret_update(ProjectileObject *self)
         quaternion.w = math_fast_sin_or_cos_a(angle);
         quaternion_to_rotation_basis(&quaternion, matrix);
         multiply_matrix3x3(self->transform, matrix, self->transform);
-        qcopy(&oldPos, &self->position);
+        qcopy(&old_pos, &self->position);
         FastVecAdd(&self->position, &self->position, vars);
         part_steer_effect_direction(vars->flightEffect, vars, 0);
         vec_add_object_direction_scaled(&self->position, vars, D_001AEC50 * 0.00027777778f);
         vec_transform_or_copy(&self->position, &self->position);
         filter[0] = 0;
         filter[1] = 0xc5a;
-        qcopy(&sweep.from, &oldPos);
+        qcopy(&sweep.from, &old_pos);
         qcopy(&sweep.to, &self->position);
         qcopy(&sweep.velocity, vars);
         sweep.object = self;
@@ -121,13 +121,13 @@ void megaturret_update(ProjectileObject *self)
         sweep.flag = 1;
         sweep.flag58 = 1;
         sweep.epsilon = 0.0962f;
-        hitResult = CollideSweptSphere(&sweep);
+        hit_result = CollideSweptSphere(&sweep);
         qcopy(&self->position, &sweep.to);
         qcopy(vars, &sweep.velocity);
-        if (hitResult != 2)
+        if (hit_result != 2)
             break;
         hit = sweep.object;
-        if (!hit || (hit->classId != 0xcb /* Decoy */ && hit->classId != 0x1366 /* Miniturret */ && hit->classId != 0x1367 /* Megaturret */)) {
+        if (!hit || (hit->classId != MOBY_CLASS_DECOY && hit->classId != MOBY_CLASS_MINITURRET && hit->classId != MOBY_CLASS_MEGATURRET)) {
             qzero_nc(vars);
             vars->attachment = hit;
             if (hit) {
@@ -135,8 +135,8 @@ void megaturret_update(ProjectileObject *self)
                 vars->attachY = hit->position.y;
                 vars->attachZ = hit->position.z;
             }
-            hitResult = weapon_get_group(sweep.surface);
-            if (hitResult == 2) {
+            hit_result = weapon_get_group(sweep.surface);
+            if (hit_result == 2) {
                 vars->velocity.z = -0.025000002f;
                 self->state = 7;
                 if (!sweep.surface) {
@@ -145,14 +145,14 @@ void megaturret_update(ProjectileObject *self)
                     if (hit)
                         hit->field23 = 0x70;
                 }
-            } else if (hitResult == 1) {
+            } else if (hit_result == 1) {
                 self->state = 8;
             } else {
                 vars->managerIndex = slot_list_add(&ref_00306A40_00, self);
                 projectile_cleanup_table_2();
                 if (ref_00306A40_00.active[vars->managerIndex]) {
                     self->state = 2;
-                    snd_play_from_class_bank(1, 0, self, 0x1367 /* Megaturret */);
+                    snd_play_from_class_bank(1, 0, self, MOBY_CLASS_MEGATURRET);
                     anim_start_blended_with_flags(self, 1, 0, 0, 0);
                 } else {
                     self->state = 6;
@@ -217,7 +217,7 @@ void megaturret_update(ProjectileObject *self)
     case 6:
         if (ref_00306A40_00.active[vars->managerIndex]) {
             self->state = 2;
-            snd_play_from_class_bank(1, 0, self, 0x1367 /* Megaturret */);
+            snd_play_from_class_bank(1, 0, self, MOBY_CLASS_MEGATURRET);
             anim_start_blended_with_flags(self, 1, 0, 0, 0);
             vars->effect48 = slot_alloc_for_object(self, 0);
         }
@@ -227,7 +227,7 @@ void megaturret_update(ProjectileObject *self)
         projectile_apply_random_push_2(self);
         break;
     case 8:
-        snd_play_from_class_bank(3, 0, self, 0x1367 /* Megaturret */);
+        snd_play_from_class_bank(3, 0, self, MOBY_CLASS_MEGATURRET);
         part_spawn_explosion_with_sparks(self, &self->position, -1, 0.5f, 13.0f);
         self->state = 9;
         self->flags |= 0x41;

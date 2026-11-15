@@ -35,15 +35,15 @@ void museum_effect_holder_update(s8 *moby) {
     s8 *vars;
     s8 *effect;
     s8 *holder;
-    s32 effectPos;
+    s32 effect_pos;
     s8 *table;
 
     table = ref_L30_004185E0_01;
     vars = *(s8 **)(moby + 0x68);
     effect = *(s8 **)(vars + 0x50);
-    effectPos = (s32)(effect + 0x10);
-    ref_L30_004185E0_02(effectPos, table, ref_L30_004185E0_00);
-    ref_L30_004185E0_03(effectPos, effectPos, table - 0x230);
+    effect_pos = (s32)(effect + 0x10);
+    ref_L30_004185E0_02(effect_pos, table, ref_L30_004185E0_00);
+    ref_L30_004185E0_03(effect_pos, effect_pos, table - 0x230);
     if (*(void **)(effect + 0x64) != 0) {
         holder = *(s8 **)(vars + 0x50);
         (*(void (**)(s8 *))(holder + 0x64))(effect);

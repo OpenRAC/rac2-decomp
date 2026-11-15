@@ -15,7 +15,7 @@ extern void moby_transform_joint_to_world(void *,int,void *),FastVecSub(void *,v
 /* Sets up a creature moby on creation: its stats and animations, then it spawns a helper moby
    (moby class 4427) with two small child mobies attached to it. */
 void InitStateDataWithPartner(u8 *creature) {
-    u8 *vars=*(u8 **)(creature+0x68), *spawned,*spawnedVars; InitBytes initBytes=D_L12_001B1848; float attachPos[4]; int childIndex,byteIndex; u8 *parameters; float acceleration; int animation=9; float slow=0.004166666883975267f;
+    u8 *vars=*(u8 **)(creature+0x68), *spawned,*spawned_vars; InitBytes init_bytes=D_L12_001B1848; float attach_pos[4]; int child_index,byte_index; u8 *parameters; float acceleration; int animation=9; float slow=0.004166666883975267f;
     *(float *)(creature+0x2C)*=D_L12_001B17F0;
     vars[0x60]=14;
     *(int *)(vars+0x98)=animation;
@@ -49,15 +49,15 @@ void InitStateDataWithPartner(u8 *creature) {
     vars[0x4D]=0;
     vars[0x2F]=8;
     vars[0x48]=FloatToInt(25.0f);vars[0x4A]=FloatToInt(16.0f);
-    { float valueA,valueB,valueC,valueD;
+    { float value_a,value_b,value_c,value_d;
     acceleration=D_L12_001B180C*0.00027777778450399637f;
     vars[0x1E8]=12;vars[0x1E9]=11;
-    valueB=D_L12_001B17F8*0.01666666753590107f;valueC=D_L12_001B1804*0.000004848137454391923f;
-    valueD=D_L12_001B1808*0.0002908882452175021f;valueA=D_L12_001B17F4*0.00027777778450399637f;
+    value_b=D_L12_001B17F8*0.01666666753590107f;value_c=D_L12_001B1804*0.000004848137454391923f;
+    value_d=D_L12_001B1808*0.0002908882452175021f;value_a=D_L12_001B17F4*0.00027777778450399637f;
     *(float *)(vars+0x100)=0.7f;*(float *)(vars+0x104)=0.5f;*(float *)(vars+0x108)=0.5f;*(float *)(vars+0x10C)=0.5f;
     *(float *)(vars+0x110)=0.7853982448577881f;*(float *)(vars+0x130)=0.349065899848938f;
     *(float *)(vars+0x12C)=acceleration;
-    moby_set_controller_speed_limits(creature,valueA,valueB,valueC,valueD); }
+    moby_set_controller_speed_limits(creature,value_a,value_b,value_c,value_d); }
     *(int *)(vars+0x138)|=0x80;*(int *)(vars+0x1DC)=0;*(float *)(vars+0x1D4)=3.0f;
     *(u16 *)(vars+0x1E4)=0;*(u16 *)(vars+0x1E2)=0;*(int *)(vars+0x1D0)=0;
     if(*(int *)(vars+0x2BC)!=-1)path_l01_compute_segment_lengths(D_L12_001FEAC0[*(int *)(vars+0x2BC)]);
@@ -69,25 +69,25 @@ void InitStateDataWithPartner(u8 *creature) {
         *(u64 *)(spawned+0x38)=*(u64 *)(creature+0x38);*(int *)(spawned+0x78)=*(int *)(creature+0x78);spawned[0x31]=1;
         *(float *)(spawned+0x2C)*=D_L12_001B17F0;
         moby_transform_joint_to_world(creature,0,spawned+0x10);qcopy(spawned+0xF0,creature+0xF0);
-        spawnedVars=*(u8 **)(spawned+0x68);*(InitBlock *)(spawnedVars+0x20)=*(InitBlock *)(vars+0x20);
-        *(float *)(spawnedVars+0x20)=*(float *)(vars+0x20);*(u16 *)(spawnedVars+0x24)=*(u16 *)(vars+0x24);spawnedVars[0x28]=vars[0x28];
-        *(float *)(spawnedVars+0x30)=0.7f;spawnedVars[0x2F]=4;spawnedVars[0x2A]=2;spawnedVars[0x4A]=3;spawnedVars[0x4D]=1;*(u8 **)(spawnedVars+0x70)=creature;
-        for(childIndex=0;childIndex<2;childIndex++) {
+        spawned_vars=*(u8 **)(spawned+0x68);*(InitBlock *)(spawned_vars+0x20)=*(InitBlock *)(vars+0x20);
+        *(float *)(spawned_vars+0x20)=*(float *)(vars+0x20);*(u16 *)(spawned_vars+0x24)=*(u16 *)(vars+0x24);spawned_vars[0x28]=vars[0x28];
+        *(float *)(spawned_vars+0x30)=0.7f;spawned_vars[0x2F]=4;spawned_vars[0x2A]=2;spawned_vars[0x4A]=3;spawned_vars[0x4D]=1;*(u8 **)(spawned_vars+0x70)=creature;
+        for(child_index=0;child_index<2;child_index++) {
             u8 *child;
-            moby_transform_joint_to_world(*(u8 **)(vars+0x2F8),childIndex,attachPos);FastVecSub(attachPos,attachPos,*(u8 **)(vars+0x2F8)+0x10);
-            child=part_spawn_flying_fragment(*(u8 **)(vars+0x2F8),0xD66,attachPos,D_L12_001A8F20,0,0,D_L12_001A8F20,D_L12_001A8F20,D_L12_001A8F20,0);
+            moby_transform_joint_to_world(*(u8 **)(vars+0x2F8),child_index,attach_pos);FastVecSub(attach_pos,attach_pos,*(u8 **)(vars+0x2F8)+0x10);
+            child=part_spawn_flying_fragment(*(u8 **)(vars+0x2F8),0xD66,attach_pos,D_L12_001A8F20,0,0,D_L12_001A8F20,D_L12_001A8F20,D_L12_001A8F20,0);
             if(child && *(s16 *)(child+0xAA)==0xD66 && child[0x20]!=254 && child[0x20]!=253) {
-                *(u16 *)(child+0x32)=*(u16 *)(creature+0x32);*(u8 **)(vars+0x2F0+childIndex*4)=child;*(u16 *)(child+0x34)|=2;
+                *(u16 *)(child+0x32)=*(u16 *)(creature+0x32);*(u8 **)(vars+0x2F0+child_index*4)=child;*(u16 *)(child+0x34)|=2;
             }
         }
-        parameters=spawnedVars+0x50;
-        for(byteIndex=0;byteIndex<10;byteIndex++)parameters[byteIndex]=initBytes.bytes[byteIndex];
+        parameters=spawned_vars+0x50;
+        for(byte_index=0;byte_index<10;byte_index++)parameters[byte_index]=init_bytes.bytes[byte_index];
         switch(func_001163B0()%3) {
         case 0:parameters[4]=FloatToInt((2.0f/ *(s16 *)(vars+0x24))*255.0f);parameters[8]=FloatToInt((1.0f/ *(s16 *)(vars+0x24))*255.0f);break;
         case 1:parameters[5]=FloatToInt((2.0f/ *(s16 *)(vars+0x24))*255.0f);parameters[9]=FloatToInt((1.0f/ *(s16 *)(vars+0x24))*255.0f);break;
         case 2:parameters[7]=FloatToInt((2.0f/ *(s16 *)(vars+0x24))*255.0f);break;
         }
-        part_spawn_damage_debris(*(u8 **)(vars+0x2F8),spawnedVars+0x50,spawnedVars+0x20);{ u8 *partner=*(u8 **)(vars+0x2F8);*(u16 *)(partner+0x7C)&=0xFCFF; }
+        part_spawn_damage_debris(*(u8 **)(vars+0x2F8),spawned_vars+0x50,spawned_vars+0x20);{ u8 *partner=*(u8 **)(vars+0x2F8);*(u16 *)(partner+0x7C)&=0xFCFF; }
     }
     if(vars[0x302] && !(vars[0x302]&2))vars[0x302]=1;
     enemy_select_path(creature,*(int *)(vars+0x2B4),-1);shared_counter_release(creature);**(int **)(vars+0x304)=0;

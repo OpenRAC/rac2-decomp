@@ -4,10 +4,10 @@ typedef struct {
     f32 rot[4];
     void *parent;
     f32 scale;
-    f32 spinAngle;
-    f32 spinSpeed;
-    f32 sizeFactor;
-    s32 extraArg;
+    f32 spin_angle;
+    f32 spin_speed;
+    f32 size_factor;
+    s32 extra_arg;
 } Pvar_3280C8;
 
 typedef struct {
@@ -33,7 +33,7 @@ extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 
 /* Spawn class 0xB7F at a position, owned by a parent, with a random spin. */
-Moby_3280C8 *part_spawn_spinning_effect_moby(Moby_3280C8 *parent, f32 *rot, f32 *pos, s32 unused, s32 extraValue, f32 scale)
+Moby_3280C8 *part_spawn_spinning_effect_moby(Moby_3280C8 *parent, f32 *rot, f32 *pos, s32 unused, s32 extra_value, f32 scale)
 {
     Moby_3280C8 *moby = CreateMoby(0xB7F /* moby class 2943 */);
     if (moby != 0) {
@@ -48,13 +48,13 @@ Moby_3280C8 *part_spawn_spinning_effect_moby(Moby_3280C8 *parent, f32 *rot, f32 
         qcopy(vars->rot, rot);
         vars->parent = parent;
         vars->scale = scale;
-        vars->spinAngle = math_random_angle();
-        vars->spinSpeed = math_random_float_range(0.20943955f, 0.6283186f);
-        vars->sizeFactor = 1.0f;
-        vars->extraArg = extraValue;
+        vars->spin_angle = math_random_angle();
+        vars->spin_speed = math_random_float_range(0.20943955f, 0.6283186f);
+        vars->size_factor = 1.0f;
+        vars->extra_arg = extra_value;
         moby->f23 = 0x5D;
         moby->flags |= 0x100;
-        moby->size = math_random_float_range(0.01f, 0.0125f) * vars->sizeFactor;
+        moby->size = math_random_float_range(0.01f, 0.0125f) * vars->size_factor;
     }
     return moby;
 }

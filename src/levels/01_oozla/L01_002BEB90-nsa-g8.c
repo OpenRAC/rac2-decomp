@@ -21,9 +21,9 @@ extern void value_set_entry_by_index(int, int);
 /* Once the level's mode word reaches 6 and the timer at D_L01_001AEC38 has run out, raises the
    one-shot flag and starts the sequence (mode 2 first rearms the timer to 0x42). A fresh
    object (state 0) clears its byte at +0x30. */
-void oozla_intro_sequence_trigger(char *effectObject) {
-    if (*(unsigned char *)(effectObject + 0x20) == 0)
-        *(unsigned char *)(effectObject + 0x30) = 0xFF;
+void oozla_intro_sequence_trigger(char *effect_object) {
+    if (*(unsigned char *)(effect_object + 0x20) == 0)
+        *(unsigned char *)(effect_object + 0x30) = 0xFF;
     if (D_L01_001B2088 == 2)
         D_L01_001AEC38 = 0x42;
     if (D_L01_001B2088 < 6)

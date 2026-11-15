@@ -52,41 +52,41 @@ extern LedgeProbeHit g_collision_result;
 /* Checks whether the hero can grab a ledge in front of it. Returns 1 and fills in the grab position if it can. */
 int hero_find_ledge_grab(void *position, void *unused, char *out)
 {
-    float probeBase[4], upperPoint[4], lowerPoint[4], stepOffset[4], scratchOffset[4], toLedge[4], ledgePoint[4], aboveLedge[4], behindLedge[4], probeStart[4], edgeStep[4], probeEnd[4], edgeNormal[4], sweepEndA[4], sweepEndB[4], nearOffset[4], farOffset[4], downOffset[4], sweepPoint[4], backOffset[4];
-    char *mobyData, *mobyInfo;
+    float probe_base[4], upper_point[4], lower_point[4], step_offset[4], scratch_offset[4], to_ledge[4], ledge_point[4], above_ledge[4], behind_ledge[4], probe_start[4], edge_step[4], probe_end[4], edge_normal[4], sweep_end_a[4], sweep_end_b[4], near_offset[4], far_offset[4], down_offset[4], sweep_point[4], back_offset[4];
+    char *moby_data, *moby_info;
     void *object;
-    int canGrab, found, i, kind, grabbable;
+    int can_grab, found, i, kind, grabbable;
     int edge, j;
     float height;
     float step, max;
-    float down, fwd, up, top, drop, rise, back, sweepDistance, length;
+    float down, fwd, up, top, drop, rise, back, sweep_distance, length;
     if (out) IN(out,0x28)=0;
     if (g_hero_state.cooldown) return 0;
-    canGrab=0;
+    can_grab=0;
     if (g_hero_state.vehicle==0) {
-        if ((g_hero_state.control==4 && (g_hero_state.pastApex || cam_get_view_space_height((char *)&g_hero_state+0xf0)<0.05833333730697632f)) || g_hero_state.control==2 || g_hero_state.state==8 || g_hero_state.state==25 || g_hero_state.state==26) canGrab=1;
-        if (g_hero_state.state==14 && g_hero_state.frame<37.0f) canGrab=0;
+        if ((g_hero_state.control==4 && (g_hero_state.pastApex || cam_get_view_space_height((char *)&g_hero_state+0xf0)<0.05833333730697632f)) || g_hero_state.control==2 || g_hero_state.state==8 || g_hero_state.state==25 || g_hero_state.state==26) can_grab=1;
+        if (g_hero_state.state==14 && g_hero_state.frame<37.0f) can_grab=0;
     }
     if (g_hero_state.vehicle==1) {
-        if ((g_hero_state.control==4 && g_hero_state.pastApex) || g_hero_state.control==2 || g_hero_state.state==75 || g_hero_state.state==73 || g_hero_state.state==74) canGrab=1;
+        if ((g_hero_state.control==4 && g_hero_state.pastApex) || g_hero_state.control==2 || g_hero_state.state==75 || g_hero_state.state==73 || g_hero_state.state==74) can_grab=1;
     }
-    if (out != (char *)&g_hero_state+0x550) canGrab=1;
-    if (!canGrab) return 0;
+    if (out != (char *)&g_hero_state+0x550) can_grab=1;
+    if (!can_grab) return 0;
     down=-0.7f; fwd=0.3f; up=1.5f; top=1.15f; drop=-1.43f; rise=1.8f; back=0.5f;
     found=0;
     if (g_hero_state.vehicle==1) { down=-0.4f; fwd=0.25f; up=0.725f; top=0.7f; drop=-0.71f; rise=0.7f; back=0.32f; }
-    qcopy(probeBase,position);
-    vec_scale_to_length(scratchOffset,(char *)&g_hero_state,g_hero_state.radius);
-    FastVecAdd(probeBase,probeBase,scratchOffset);
-    vec_scale_to_length(scratchOffset,(char *)&g_hero_state+0x20,up+0.15f);
-    FastVecAdd(upperPoint,probeBase,scratchOffset);
-    vec_scale_to_length(scratchOffset,(char *)&g_hero_state+0x20,-top);
-    FastVecAdd(lowerPoint,probeBase,scratchOffset);
-    vec_scale_to_length(stepOffset,(char *)&g_hero_state,fwd*0.25f);
+    qcopy(probe_base,position);
+    vec_scale_to_length(scratch_offset,(char *)&g_hero_state,g_hero_state.radius);
+    FastVecAdd(probe_base,probe_base,scratch_offset);
+    vec_scale_to_length(scratch_offset,(char *)&g_hero_state+0x20,up+0.15f);
+    FastVecAdd(upper_point,probe_base,scratch_offset);
+    vec_scale_to_length(scratch_offset,(char *)&g_hero_state+0x20,-top);
+    FastVecAdd(lower_point,probe_base,scratch_offset);
+    vec_scale_to_length(step_offset,(char *)&g_hero_state,fwd*0.25f);
     for(i=0; i<4; i++) {
-        FastVecAdd(upperPoint,upperPoint,stepOffset);
-        FastVecAdd(lowerPoint,lowerPoint,stepOffset);
-        if(CollLine(upperPoint,lowerPoint,4,g_hero_state.moby,0)) {
+        FastVecAdd(upper_point,upper_point,step_offset);
+        FastVecAdd(lower_point,lower_point,step_offset);
+        if(CollLine(upper_point,lower_point,4,g_hero_state.moby,0)) {
             kind=GetCollHitMaterial();
             if(kind!=9 && kind!=12 && kind!=0 && cam_get_view_space_angle(g_collision_result.normal)<0.349065899848938f) found=1;
         }
@@ -96,78 +96,78 @@ int hero_find_ledge_grab(void *position, void *unused, char *out)
     if(!found) goto fail;
     if(g_collision_result.moby) {
         grabbable=0;
-        mobyData=moby_get_private_value_0(g_collision_result.moby);
-        mobyInfo=moby_get_private_value_2(g_collision_result.moby);
-        if(mobyData && (*(unsigned short *)(mobyData+0x1e)&1)) grabbable=1;
-        else if(mobyInfo) grabbable=IN(mobyInfo,0x3c)&1;
+        moby_data=moby_get_private_value_0(g_collision_result.moby);
+        moby_info=moby_get_private_value_2(g_collision_result.moby);
+        if(moby_data && (*(unsigned short *)(moby_data+0x1e)&1)) grabbable=1;
+        else if(moby_info) grabbable=IN(moby_info,0x3c)&1;
         if(!grabbable) return 0;
         object=g_collision_result.moby;
     }
     if(out) *(void **)(out+0x38)=g_collision_result.moby;
-    qcopy(ledgePoint,g_collision_result.position);
-    FastVecSub(toLedge,ledgePoint,position);
-    if(up<cam_get_view_space_height(toLedge)) return 0;
-    vec_scale_to_length(aboveLedge,(char *)&g_hero_state+0x20,0.005f);
-    FastVecAdd(aboveLedge,aboveLedge,ledgePoint);
-    vec_scale_to_length(behindLedge,(char *)&g_hero_state,-1.0f);
-    FastVecAdd(behindLedge,behindLedge,aboveLedge);
-    if(CollLine(behindLedge,aboveLedge,2,g_hero_state.moby,0)) {
+    qcopy(ledge_point,g_collision_result.position);
+    FastVecSub(to_ledge,ledge_point,position);
+    if(up<cam_get_view_space_height(to_ledge)) return 0;
+    vec_scale_to_length(above_ledge,(char *)&g_hero_state+0x20,0.005f);
+    FastVecAdd(above_ledge,above_ledge,ledge_point);
+    vec_scale_to_length(behind_ledge,(char *)&g_hero_state,-1.0f);
+    FastVecAdd(behind_ledge,behind_ledge,above_ledge);
+    if(CollLine(behind_ledge,above_ledge,2,g_hero_state.moby,0)) {
         if(!g_collision_result.moby || g_collision_result.moby!=object) return 0;
     }
     if(out) {
-        vec_scale_to_length(probeStart,(char *)&g_hero_state+0x20,0.6f);
-        FastVecAdd(probeStart,probeStart,ledgePoint);
-        if(coll_test_point(probeStart,4,g_hero_state.moby,0.45f)) IN(out,0x34)|=1;
+        vec_scale_to_length(probe_start,(char *)&g_hero_state+0x20,0.6f);
+        FastVecAdd(probe_start,probe_start,ledge_point);
+        if(coll_test_point(probe_start,4,g_hero_state.moby,0.45f)) IN(out,0x34)|=1;
         else IN(out,0x34)&=~1;
     }
-    height=cam_get_view_space_height(toLedge);
+    height=cam_get_view_space_height(to_ledge);
     if(height+g_hero_state.groundHeight<rise || height<0.5f) return 0;
-    *(V4_Fbfdc087a *)probeEnd=0; FL(probeEnd,0)=1.0f; FL(probeEnd,8)=down;
-    matrix_mul_vec3(probeEnd,probeEnd,(char *)&g_hero_state);
+    *(V4_Fbfdc087a *)probe_end=0; FL(probe_end,0)=1.0f; FL(probe_end,8)=down;
+    matrix_mul_vec3(probe_end,probe_end,(char *)&g_hero_state);
     edge=0;
-    FastVecAdd(probeEnd,probeEnd,ledgePoint);
-    FastVecSub(probeStart,position,probeEnd);
-    cam_set_view_space_height(probeStart,probeStart,0.0f);
-    FastVecAdd(probeStart,probeStart,probeEnd);
-    vec_scale_to_length(edgeStep,(char *)&g_hero_state+0x20,-down*0.2f);
+    FastVecAdd(probe_end,probe_end,ledge_point);
+    FastVecSub(probe_start,position,probe_end);
+    cam_set_view_space_height(probe_start,probe_start,0.0f);
+    FastVecAdd(probe_start,probe_start,probe_end);
+    vec_scale_to_length(edge_step,(char *)&g_hero_state+0x20,-down*0.2f);
     for(j=0;j<5;j++) {
-        if(CollLine(probeStart,probeEnd,2,0,0)) {
-            vec_scale_to_length(edgeNormal,g_collision_result.normal,1.0f);
+        if(CollLine(probe_start,probe_end,2,0,0)) {
+            vec_scale_to_length(edge_normal,g_collision_result.normal,1.0f);
             edge=1;
-            cam_set_view_space_height(edgeNormal,edgeNormal,0.0f);
+            cam_set_view_space_height(edge_normal,edge_normal,0.0f);
             break;
         }
-        FastVecAdd(probeStart,probeStart,edgeStep);
-        FastVecAdd(probeEnd,probeEnd,edgeStep);
+        FastVecAdd(probe_start,probe_start,edge_step);
+        FastVecAdd(probe_end,probe_end,edge_step);
     }
     if(!edge) return 0;
-    length=FastVecDot((char *)&g_hero_state,edgeNormal);
+    length=FastVecDot((char *)&g_hero_state,edge_normal);
     if(!(length<math_fast_sin_or_cos_a(1.134464144706726f))) return 0;
     step=0.03f;
     max=2.4f;
-    qcopy(sweepPoint,ledgePoint);
-    vec_scale_to_length(downOffset,(char *)&g_hero_state+0x2c0,-0.05f);
-    vec_scale_to_length(farOffset,edgeNormal,step);
-    FastVecAdd(nearOffset,farOffset,downOffset);
-    FastVecSub(farOffset,farOffset,downOffset);
-    FastVecAdd(sweepEndA,sweepPoint,farOffset);
-    FastVecAdd(sweepEndB,sweepPoint,nearOffset);
-    for(sweepDistance=0.0f;sweepDistance<max;sweepDistance+=step) {
-        if(!CollLine(sweepEndB,sweepEndA,4,g_hero_state.moby,0)) {
+    qcopy(sweep_point,ledge_point);
+    vec_scale_to_length(down_offset,(char *)&g_hero_state+0x2c0,-0.05f);
+    vec_scale_to_length(far_offset,edge_normal,step);
+    FastVecAdd(near_offset,far_offset,down_offset);
+    FastVecSub(far_offset,far_offset,down_offset);
+    FastVecAdd(sweep_end_a,sweep_point,far_offset);
+    FastVecAdd(sweep_end_b,sweep_point,near_offset);
+    for(sweep_distance=0.0f;sweep_distance<max;sweep_distance+=step) {
+        if(!CollLine(sweep_end_b,sweep_end_a,4,g_hero_state.moby,0)) {
             if(out) {
-                qcopy(out+0x10,sweepPoint);
-                vec_scale_to_length(backOffset,edgeNormal,back);
+                qcopy(out+0x10,sweep_point);
+                vec_scale_to_length(back_offset,edge_normal,back);
                 vec_scale_to_length(out,(char *)&g_hero_state+0x2c0,-drop);
-                FastVecAdd(out,backOffset,out);
+                FastVecAdd(out,back_offset,out);
                 FastVecAdd(out,out+0x10,out);
-                FL(out,0x24)=mat_fast_helper_a(FL(edgeNormal,0),FL(edgeNormal,4));
+                FL(out,0x24)=mat_fast_helper_a(FL(edge_normal,0),FL(edge_normal,4));
                 IN(out,0x28)=1;
             }
             return 1;
         }
-        qcopy(sweepPoint,g_collision_result.position);
-        FastVecAdd(sweepEndB,sweepPoint,nearOffset);
-        FastVecAdd(sweepEndA,sweepPoint,farOffset);
+        qcopy(sweep_point,g_collision_result.position);
+        FastVecAdd(sweep_end_b,sweep_point,near_offset);
+        FastVecAdd(sweep_end_a,sweep_point,far_offset);
     }
 fail:
     return 0;

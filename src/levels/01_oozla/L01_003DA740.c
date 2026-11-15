@@ -185,18 +185,18 @@ void muckdweller_fire_spit_shot(u8 *obj, s32 skip) {
 
 /* Marks the records of type 0xA26 the object finds and collects them in a1. */
 /* Finds nearby objects of one kind, marks them and remembers up to 16 of them. */
-void muckdweller_mark_nearby_objects(u8 *obj, void *recordsOut, void *countOut) {
+void muckdweller_mark_nearby_objects(u8 *obj, void *records_out, void *count_out) {
     s32 i;
-    s32 foundCount;
-    u32 **out = recordsOut;
-    s32 *count = countOut;
+    s32 found_count;
+    u32 **out = records_out;
+    s32 *count = count_out;
 
     memset(out, 0, 4);
     *count = 0;
-    foundCount = coll_process_hit(3.0f, obj + 0x10, 1, obj, 0);
-    if (foundCount <= 0)
+    found_count = coll_process_hit(3.0f, obj + 0x10, 1, obj, 0);
+    if (found_count <= 0)
         return;
-    for (i = 0; i < foundCount; i++) {
+    for (i = 0; i < found_count; i++) {
         if (D_L01_001C3980[i] == 0)
             continue;
         if (*(s16 *)(D_L01_001C3980[i] + 0xAA) != 0xA26)
@@ -211,10 +211,10 @@ void muckdweller_mark_nearby_objects(u8 *obj, void *recordsOut, void *countOut) 
 }
 
 /* Clears the mark on every object that was collected before. */
-void muckdweller_clear_marked_objects(void **records, s32 *countPtr) {
+void muckdweller_clear_marked_objects(void **records, s32 *count_ptr) {
     s32 i;
 
-    for (i = 0; i < *countPtr; i++) {
+    for (i = 0; i < *count_ptr; i++) {
         *(s32 *)((u8 *)*records + 0x9C) = 0;
         records++;
     }
@@ -222,11 +222,11 @@ void muckdweller_clear_marked_objects(void **records, s32 *countPtr) {
 
 
 /* Slides the object towards the thing it is attached to, or snaps it back to a fallback spot. */
-void moby_follow_attached(void *mobyArg, void *fallback) {
+void moby_follow_attached(void *moby_arg, void *fallback) {
     f32 pos[4] __attribute__((aligned(16)));
     f32 delta[4] __attribute__((aligned(16)));
     f32 matrix[16] __attribute__((aligned(16)));
-    u8 *obj = mobyArg;
+    u8 *obj = moby_arg;
     u8 *state = *(u8 **)(obj+0x68);
     u8 *target;
     u8 *path;

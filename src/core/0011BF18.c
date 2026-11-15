@@ -90,31 +90,31 @@ extern void (*r1_D_0012FD00_A0A0[])(s32) __asm__("r1_D_0012FD00");
 /* Prints text with %d %u %x %o %c %s %f style codes, one character at a time, through the output hook. */
 int printf_format_to_hook(const char *fmt, va_list ap) {
     char buf[32];
-    char *padStart;
+    char *pad_start;
     char *cursor;
-    s32 lengthMod;
+    s32 length_mod;
     s32 width;
     unsigned long digit;
     u8 ch;
-    char nextChar;
+    char next_char;
     s64 value;
-    s32 wasEnabled;
+    s32 was_enabled;
 
-    wasEnabled = DIntr_A0A0();
+    was_enabled = DIntr_A0A0();
     for (; *fmt != 0; fmt++) {
         cursor = (char *)fmt;
-        padStart = 0;
-        lengthMod = 0;
+        pad_start = 0;
+        length_mod = 0;
         if (*fmt == '%') {
         again:
             fmt++;
             switch ((char)(*fmt - '0')) {
             case 0:
                 width = fmt[1] - '0';
-                nextChar = fmt[2];
+                next_char = fmt[2];
                 if ((u8)width < 10) {
-                    if ((u32)(nextChar - '0') < 10) {
-                        width = width * 10 + (nextChar - '0');
+                    if ((u32)(next_char - '0') < 10) {
+                        width = width * 10 + (next_char - '0');
                         fmt += 2;
                         if (width >= 32) {
                             width = 31;
@@ -122,7 +122,7 @@ int printf_format_to_hook(const char *fmt, va_list ap) {
                     } else {
                         fmt += 1;
                     }
-                    padStart = &buf[31 - width];
+                    pad_start = &buf[31 - width];
                     while (width > 0) {
                         buf[31 - width] = '0';
                         width--;
@@ -131,15 +131,15 @@ int printf_format_to_hook(const char *fmt, va_list ap) {
                 }
                 goto again;
             case 'l' - '0':
-                lengthMod = 'l';
+                length_mod = 'l';
                 goto again;
             case 'h' - '0':
-                lengthMod = 'h';
+                length_mod = 'h';
                 goto again;
             case 'o' - '0':
-                if (lengthMod == 'l') {
+                if (length_mod == 'l') {
                     value = (ap += 8, *(s64 *)(ap - 8));
-                } else if (lengthMod == 'h') {
+                } else if (length_mod == 'h') {
                     value = (ap += 8, *(u16 *)(ap - 8));
                 } else {
                     value = (ap += 8, *(u32 *)(ap - 8));
@@ -154,17 +154,17 @@ int printf_format_to_hook(const char *fmt, va_list ap) {
                         value = (u64)value >> 3;
                     } while (value != 0);
                 }
-                if (padStart != 0 && padStart < cursor) {
-                    cursor = padStart;
+                if (pad_start != 0 && pad_start < cursor) {
+                    cursor = pad_start;
                 }
                 while (*cursor != 0) {
                     r1_D_0012FD00_A0A0[0](*cursor++);
                 }
                 break;
             case 'x' - '0':
-                if (lengthMod == 'l') {
+                if (length_mod == 'l') {
                     value = (ap += 8, *(s64 *)(ap - 8));
-                } else if (lengthMod == 'h') {
+                } else if (length_mod == 'h') {
                     value = (ap += 8, *(u16 *)(ap - 8));
                 } else {
                     value = (ap += 8, *(u32 *)(ap - 8));
@@ -184,17 +184,17 @@ int printf_format_to_hook(const char *fmt, va_list ap) {
                         value = (u64)value >> 4;
                     } while (value != 0);
                 }
-                if (padStart != 0 && padStart < cursor) {
-                    cursor = padStart;
+                if (pad_start != 0 && pad_start < cursor) {
+                    cursor = pad_start;
                 }
                 while (*cursor != 0) {
                     r1_D_0012FD00_A0A0[0](*cursor++);
                 }
                 break;
             case 'd' - '0':
-                if (lengthMod == 'l') {
+                if (length_mod == 'l') {
                     value = (ap += 8, *(s64 *)(ap - 8));
-                } else if (lengthMod == 'h') {
+                } else if (length_mod == 'h') {
                     value = (ap += 8, *(s16 *)(ap - 8));
                 } else {
                     value = (ap += 8, *(s32 *)(ap - 8));
@@ -213,17 +213,17 @@ int printf_format_to_hook(const char *fmt, va_list ap) {
                         value = value / 10;
                     }
                 }
-                if (padStart != 0 && padStart < cursor) {
-                    cursor = padStart;
+                if (pad_start != 0 && pad_start < cursor) {
+                    cursor = pad_start;
                 }
                 while (*cursor != 0) {
                     r1_D_0012FD00_A0A0[0](*cursor++);
                 }
                 break;
             case 'u' - '0':
-                if (lengthMod == 'l') {
+                if (length_mod == 'l') {
                     value = (ap += 8, *(s64 *)(ap - 8));
-                } else if (lengthMod == 'h') {
+                } else if (length_mod == 'h') {
                     value = (ap += 8, *(u16 *)(ap - 8));
                 } else {
                     value = (ap += 8, *(u32 *)(ap - 8));
@@ -238,8 +238,8 @@ int printf_format_to_hook(const char *fmt, va_list ap) {
                         value = (u64)value / 10;
                     } while (value != 0);
                 }
-                if (padStart != 0 && padStart < cursor) {
-                    cursor = padStart;
+                if (pad_start != 0 && pad_start < cursor) {
+                    cursor = pad_start;
                 }
                 while (*cursor != 0) {
                     r1_D_0012FD00_A0A0[0](*cursor++);
@@ -247,11 +247,11 @@ int printf_format_to_hook(const char *fmt, va_list ap) {
                 break;
             case 'e' - '0':
             case 'f' - '0': {
-                f32 floatValue = (ap += 8, *(f32 *)(ap - 8));
-                if (floatValue == 0.0f) {
+                f32 float_value = (ap += 8, *(f32 *)(ap - 8));
+                if (float_value == 0.0f) {
                     r1_D_0012FD00_A0A0[0]('0');
                 } else {
-                    printfloat_A0A0(floatValue);
+                    printfloat_A0A0(float_value);
                 }
             } break;
             case 's' - '0': {
@@ -284,7 +284,7 @@ int printf_format_to_hook(const char *fmt, va_list ap) {
             r1_D_0012FD00_A0A0[0](*fmt);
         }
     }
-    if (wasEnabled != 0) {
+    if (was_enabled != 0) {
         EnableInterrupts_A0A0();
     }
 }

@@ -32,7 +32,7 @@ extern s8 D_00143180[];
 extern s8 D_0013B990[];
 
 /* Sends a command with extra data to the vibration (rumble) server. Returns 1 on success. */
-s32 dbc_send_vibration_command(s32 port, s32 command, s32 *sizePtr, u8 *data) {
+s32 dbc_send_vibration_command(s32 port, s32 command, s32 *size_ptr, u8 *data) {
     s32 i;
     s32 result;
     s8 *packet;
@@ -40,14 +40,14 @@ s32 dbc_send_vibration_command(s32 port, s32 command, s32 *sizePtr, u8 *data) {
     packet = D_00143180;
     *(s32 *)D_00143180 = port;
     *(s32 *)(packet + 4) = command;
-    *(s32 *)(packet + 8) = *sizePtr;
+    *(s32 *)(packet + 8) = *size_ptr;
     i = 0;
-    if (*sizePtr > 0) {
+    if (*size_ptr > 0) {
         packet += 0xC;
         do {
             packet[i] = data[i];
             i += 1;
-        } while (i < *sizePtr);
+        } while (i < *size_ptr);
     }
     if (sif_rpc_is_handle_valid(D_00143130, i) == 1) {
         return 0;

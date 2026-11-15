@@ -38,20 +38,20 @@ extern s32 sceSifCallRpc(s32, s32, s32, s32, s32, s32, s32, s32, s32);
 s32 sceMcFormat(s32 port, s32 slot) {
     s8 *client = D_00141B00;
     s8 *request;
-    s32 slotCopy = slot;
-    s32 portCopy;
+    s32 slot_copy = slot;
+    s32 port_copy;
     s32 result;
 
     if (*(s32 *)(client + 0x24) == 0) {
         return -0x64;
     }
-    portCopy = port;
+    port_copy = port;
     if (PollSema(D_00137E6C) < 0) {
         return -0xC8;
     }
     request = D_00141B80;
-    *(s32 *)(request + 4) = portCopy;
-    *(s32 *)(request + 8) = slotCopy;
+    *(s32 *)(request + 4) = port_copy;
+    *(s32 *)(request + 8) = slot_copy;
     result = sceSifCallRpc((s32)client, 0x10, 1, (s32)request, 0x30, (s32)D_001430C0, 4, 0, 0);
     if (result == 0) {
         D_00137E68 = 0x10;

@@ -126,7 +126,7 @@ void racer_update_bike_lean(unsigned char *moby, unsigned char *vars)
         func_002A05A8(*(void **)(vars + 0x8c));
         func_002A0F48(*(void **)(vars + 0x8c));
         *(unsigned short *)(*(unsigned char **)(vars + 0x8c) + 0x34) |= 6;
-    } else *(void **)(vars + 0x8c) = moby_spawn_at_parent_pose(moby, 0x8ef /* Enemy Hoverbike Racer */, 0.25f);
+    } else *(void **)(vars + 0x8c) = moby_spawn_at_parent_pose(moby, MOBY_CLASS_ENEMY_HOVERBIKE_RACER, 0.25f);
     if ((*(unsigned char **)(vars + 0x164))[0xbc] == 5) {
         if (vec_apply_scaled_value(moby, 20.0f) != -1) {
             gfx_add_draw_callback_third(bike_animate_boost_flame_streak, moby);
@@ -251,44 +251,44 @@ void debris_l04_piece_update(unsigned char *moby)
 
 /* A04-table-select-76 freshly exact-verified under family reservation */
 /* Gets how many times the player has won the current course (the table depends on the level). */
-BatchA_A04_u32 race_get_course_win_count(BatchA_A04_u8 *courseIndex) {
+BatchA_A04_u32 race_get_course_win_count(BatchA_A04_u8 *course_index) {
     BatchA_A04_u32 level = g_current_map_index[0];
     BatchA_A04_u32 count = 0;
-    if (level == 4) count = D_001395B8[(BatchA_A04_u32)courseIndex + 0x4D];
-    else if (level == 0xB) count = D_001395B8[(BatchA_A04_u32)courseIndex + 0x57];
+    if (level == 4) count = D_001395B8[(BatchA_A04_u32)course_index + 0x4D];
+    else if (level == 0xB) count = D_001395B8[(BatchA_A04_u32)course_index + 0x57];
     return count;
 }
 
 /* A04-table-select family, incrementing form: bumps the state-selected byte */
 /* Adds one to the number of wins stored for this course. */
-void race_increment_course_win_count(BatchA_A04_u8 *courseIndex)
+void race_increment_course_win_count(BatchA_A04_u8 *course_index)
 {
     BatchA_A04_u32 level = g_current_map_index[0];
 
-    if (level == 4) D_001395B8[(BatchA_A04_u32)courseIndex + 0x4D]++;
-    else if (level == 0xB) D_001395B8[(BatchA_A04_u32)courseIndex + 0x57]++;
+    if (level == 4) D_001395B8[(BatchA_A04_u32)course_index + 0x4D]++;
+    else if (level == 0xB) D_001395B8[(BatchA_A04_u32)course_index + 0x57]++;
 }
 
 /* shared native body of family A04-table-select: reads the state-selected byte */
 /* Gets how many times the player finished this course without winning. */
-unsigned int race_get_course_finish_count(unsigned char *courseIndex)
+unsigned int race_get_course_finish_count(unsigned char *course_index)
 {
     unsigned int level = g_current_map_index[0];
     unsigned int count = 0;
 
-    if (level == 4) count = D_001395B8[(unsigned int)courseIndex + 0x52];
-    else if (level == 0xB) count = D_001395B8[(unsigned int)courseIndex + 0x5C];
+    if (level == 4) count = D_001395B8[(unsigned int)course_index + 0x52];
+    else if (level == 0xB) count = D_001395B8[(unsigned int)course_index + 0x5C];
     return count;
 }
 
 /* A04-table-select family, incrementing form (second slot pair) */
 /* Adds one to the number of non-winning finishes stored for this course. */
-void race_increment_course_finish_count(BatchA_A04_u8 *courseIndex)
+void race_increment_course_finish_count(BatchA_A04_u8 *course_index)
 {
     BatchA_A04_u32 level = g_current_map_index[0];
 
-    if (level == 4) D_001395B8[(BatchA_A04_u32)courseIndex + 0x52]++;
-    else if (level == 0xB) D_001395B8[(BatchA_A04_u32)courseIndex + 0x5C]++;
+    if (level == 4) D_001395B8[(BatchA_A04_u32)course_index + 0x52]++;
+    else if (level == 0xB) D_001395B8[(BatchA_A04_u32)course_index + 0x5C]++;
 }
 
 extern BatchA_A04_u8 *D_001B26F0 __attribute__((sda));
@@ -313,8 +313,8 @@ void part_refresh_active_records(void)
 /* Resets a racer to its starting state and removes leftover effect objects. When keep is set, the race progress is kept. */
 void racer_reset_state(unsigned char *moby, int keep)
 {
-    unsigned char *vars = *(unsigned char **)(moby + 0x68), *otherMoby;
-    unsigned char *linkedRacer;
+    unsigned char *vars = *(unsigned char **)(moby + 0x68), *other_moby;
+    unsigned char *linked_racer;
     qzero(vars + 0x2b0);
     *(float *)(vars + 0x2b8) = 1.0f;
     qzero(vars + 0x290);
@@ -342,7 +342,7 @@ void racer_reset_state(unsigned char *moby, int keep)
     *(int *)(vars + 0x724) = 0;
     *(float *)(vars + 0x28c) = 90.0f;
     racer_release_sound_handles((int)moby, vars);
-    linkedRacer = (unsigned char *)g_moby_l04_pool + (*(int *)(vars + 0x1dc) << 8);
+    linked_racer = (unsigned char *)g_moby_l04_pool + (*(int *)(vars + 0x1dc) << 8);
     *(int *)(vars + 0x3a8) = 10;
     *(int *)(vars + 0x328) = -1;
     *(int *)(vars + 0x330) = -1;
@@ -364,7 +364,7 @@ void racer_reset_state(unsigned char *moby, int keep)
     *(int *)(vars + 0x368) = 0;
     *(int *)(vars + 0x4d8) = 0;
     *(int *)(vars + 0x4dc) = 0;
-    if (linkedRacer) anim_start_immediate(linkedRacer, 0, 0);
+    if (linked_racer) anim_start_immediate(linked_racer, 0, 0);
     *(short *)(vars + 0x34a) = -1;
     *(int *)(vars + 0x36c) = 0;
     /* This cleared vector has no scalar consumers in the surrounding resets. */
@@ -378,11 +378,11 @@ void racer_reset_state(unsigned char *moby, int keep)
         *(int *)(vars + 0x310) = 0;
         *(int *)(vars + 0x318) = 0;
     }
-    for (otherMoby = D_L04_001B24E8; otherMoby; otherMoby = *(unsigned char **)(otherMoby + 0x28)) {
-        unsigned short type = *(unsigned short *)(otherMoby + 0xaa);
+    for (other_moby = D_L04_001B24E8; other_moby; other_moby = *(unsigned char **)(other_moby + 0x28)) {
+        unsigned short type = *(unsigned short *)(other_moby + 0xaa);
         if ((unsigned int)(type - 0xb3d /* moby classes 2877-2880 */) < 4 || (short)type == 0x27f /* moby class 639 */ ||
             (short)type == 0x70 /* moby class 112 */ || (short)type == 0x7a /* moby class 122 */) {
-            moby_mark_spawned(otherMoby);
+            moby_mark_spawned(other_moby);
         }
     }
     *(int *)(vars + 0x388) = 0;
@@ -403,13 +403,13 @@ extern void func_40E248(char *a0, char *a1);
 /* Lets go of the racer sound handles and clears a state word on the racer and on the racer it is linked to. */
 void racer_release_link_state(char *moby, char *vars)
 {
-    char *mobyCopy = moby;
-    char *varsCopy = vars;
+    char *moby_copy = moby;
+    char *vars_copy = vars;
 
-    func_40E248(mobyCopy, varsCopy);
-    *(int *)(mobyCopy + 0x48) = 0;
-    if (*(int *)(varsCopy + 0x1DC) != -1) {
-        *(int *)((*(int *)(varsCopy + 0x1DC) << 8) + (int)g_moby_l04_pool + 0x48) = 0;
+    func_40E248(moby_copy, vars_copy);
+    *(int *)(moby_copy + 0x48) = 0;
+    if (*(int *)(vars_copy + 0x1DC) != -1) {
+        *(int *)((*(int *)(vars_copy + 0x1DC) << 8) + (int)g_moby_l04_pool + 0x48) = 0;
     }
 }
 
@@ -548,7 +548,7 @@ void racer_emit_exhaust_particles(char *moby)
     int i;
 
     for (i = 0; i < 4; i++) {
-        float rowFraction;
+        float row_fraction;
         float rise;
         float size;
 
@@ -560,10 +560,10 @@ void racer_emit_exhaust_particles(char *moby)
         FastVecScale(tmp, dir, emitters->row670[i]);
         FastVecAdd(vec3, vec3, tmp);
 
-        rowFraction = IntToFloat(i) * 0.25f;
-        rise = rowFraction * 0.1f;
+        row_fraction = IntToFloat(i) * 0.25f;
+        rise = row_fraction * 0.1f;
         vec3[2] = vec3[2] + rise;
-        size = rowFraction * -0.025f + 0.05f;
+        size = row_fraction * -0.025f + 0.05f;
         gfx_draw_flash_quad(vec3, size, 0.0f, 0.0f, 0.0f, 0.0025f, emitters->slot, 1);
         if (emitters->row670[i] < -0.2f) {
             emitters->row670[i] = -0.05f;
@@ -582,7 +582,7 @@ void racer_emit_exhaust_particles(char *moby)
         FastVecScale(tmp, dir, emitters->row690[i]);
         FastVecAdd(vec4, vec4, tmp);
         vec4[2] = vec4[2] + rise;
-        gfx_draw_flash_quad(vec4, rowFraction * -0.050000004f + 0.075f, 0.0f, 0.0f, 0.0f, 0.0025f, emitters->slot, 1);
+        gfx_draw_flash_quad(vec4, row_fraction * -0.050000004f + 0.075f, 0.0f, 0.0f, 0.0f, 0.0025f, emitters->slot, 1);
         if (emitters->row690[i] < -0.19f) {
             emitters->row690[i] = -0.05f;
         }
@@ -600,72 +600,72 @@ extern void snd_stop_voice(int handle);
    names a record of the callback table, and the one that belongs to this moby is
    handed to the release helper. Each slot is cleared afterwards. */
 /* Stops the sounds this racer has started and clears the handles it kept for them. */
-void racer_release_sound_handles(int mobyAddress, BatchA_A04_u8 *varsArg)
+void racer_release_sound_handles(int moby_address, BatchA_A04_u8 *vars_arg)
 {
-    int id = mobyAddress;
-    BatchA_A04_u8 *vars = varsArg;
-    int handleIndex;
+    int id = moby_address;
+    BatchA_A04_u8 *vars = vars_arg;
+    int handle_index;
     BatchA_A04_u8 *record;
 
-    handleIndex = *(int *)(vars + 0x748);
-    if (handleIndex != -1) {
-        record = g_sound_state + handleIndex * 0x70;
+    handle_index = *(int *)(vars + 0x748);
+    if (handle_index != -1) {
+        record = g_sound_state + handle_index * 0x70;
         if (*(int *)(record + 0x88) == id && record[0x74] != 0) {
-            snd_stop_voice(handleIndex);
+            snd_stop_voice(handle_index);
         }
     }
     *(int *)(vars + 0x748) = -1;
 
-    handleIndex = *(int *)(vars + 0x74C);
-    if (handleIndex != -1) {
-        record = g_sound_state + handleIndex * 0x70;
+    handle_index = *(int *)(vars + 0x74C);
+    if (handle_index != -1) {
+        record = g_sound_state + handle_index * 0x70;
         if (*(int *)(record + 0x88) == id && record[0x74] != 0) {
-            snd_stop_voice(handleIndex);
+            snd_stop_voice(handle_index);
         }
     }
     *(int *)(vars + 0x74C) = -1;
 
-    handleIndex = *(int *)(vars + 0x714);
-    if (handleIndex != -1) {
-        record = g_sound_state + handleIndex * 0x70;
+    handle_index = *(int *)(vars + 0x714);
+    if (handle_index != -1) {
+        record = g_sound_state + handle_index * 0x70;
         if (*(int *)(record + 0x88) == id && record[0x74] != 0) {
-            snd_stop_voice(handleIndex);
+            snd_stop_voice(handle_index);
         }
     }
     *(int *)(vars + 0x714) = -1;
 
-    handleIndex = *(int *)(vars + 0x3BC);
-    if (handleIndex != -1) {
-        record = g_sound_state + handleIndex * 0x70;
+    handle_index = *(int *)(vars + 0x3BC);
+    if (handle_index != -1) {
+        record = g_sound_state + handle_index * 0x70;
         if (*(int *)(record + 0x88) == id && record[0x74] != 0) {
-            snd_stop_voice(handleIndex);
+            snd_stop_voice(handle_index);
         }
     }
     *(int *)(vars + 0x3BC) = -1;
 
-    handleIndex = *(int *)(vars + 0x328);
-    if (handleIndex != -1) {
-        record = g_sound_state + handleIndex * 0x70;
+    handle_index = *(int *)(vars + 0x328);
+    if (handle_index != -1) {
+        record = g_sound_state + handle_index * 0x70;
         if (*(int *)(record + 0x88) == id && record[0x74] != 0) {
-            snd_stop_voice(handleIndex);
+            snd_stop_voice(handle_index);
         }
     }
     *(int *)(vars + 0x328) = -1;
 
-    handleIndex = *(int *)(vars + 0x330);
-    if (handleIndex != -1) {
-        record = g_sound_state + handleIndex * 0x70;
+    handle_index = *(int *)(vars + 0x330);
+    if (handle_index != -1) {
+        record = g_sound_state + handle_index * 0x70;
         if (*(int *)(record + 0x88) == id && record[0x74] != 0) {
-            snd_stop_voice(handleIndex);
+            snd_stop_voice(handle_index);
         }
     }
     *(int *)(vars + 0x330) = -1;
 
-    handleIndex = *(int *)(vars + 0x334);
-    if (handleIndex != -1) {
-        record = g_sound_state + handleIndex * 0x70;
+    handle_index = *(int *)(vars + 0x334);
+    if (handle_index != -1) {
+        record = g_sound_state + handle_index * 0x70;
         if (*(int *)(record + 0x88) == id && record[0x74] != 0) {
-            snd_stop_voice(handleIndex);
+            snd_stop_voice(handle_index);
         }
     }
     *(int *)(vars + 0x32C) = 0;
@@ -683,7 +683,7 @@ static inline void CallL00_00322AC0(void *state, float rate, int level, int slot
 void racer_update_boost(unsigned char *moby)
 {
     float delta[4], rotation[16];
-    unsigned char *pickupMoby, *boostMoby;
+    unsigned char *pickup_moby, *boost_moby;
     int red, green, blue;
     int period = 50;
     int alpha = 128;
@@ -757,42 +757,42 @@ void racer_update_boost(unsigned char *moby)
         UpdateViewContext();
     }
     if (*(int *)(vars + 0x25c) != -1) {
-        GetFirstMobyInGroup(&pickupMoby, *(int *)(vars + 0x25c), 0, 0);
-        if (pickupMoby) do {
-            if (*(short *)(pickupMoby + 0xaa) == 0xa99 /* moby class 2713 */) {
-                data = *(int **)(pickupMoby + 0x68);
-                FastVecSub(delta, pickupMoby + 0x10, moby + 0x10);
+        GetFirstMobyInGroup(&pickup_moby, *(int *)(vars + 0x25c), 0, 0);
+        if (pickup_moby) do {
+            if (*(short *)(pickup_moby + 0xaa) == 0xa99 /* moby class 2713 */) {
+                data = *(int **)(pickup_moby + 0x68);
+                FastVecSub(delta, pickup_moby + 0x10, moby + 0x10);
                 if (*data == 0 && *(int *)(vars + 0x33c) < 3 && func_L00_002EE290(delta) < 1.0f) {
                     ++*(int *)(vars + 0x33c);
                     if (moby[0x20] != 3) snd_play_from_class_bank(0, 0, moby, 0xa99);
-                    part_l04_spawn_burst((L04Quad *)(pickupMoby + 0x10), (L04Quad *)(vars + 0x290), 8, 0);
+                    part_l04_spawn_burst((L04Quad *)(pickup_moby + 0x10), (L04Quad *)(vars + 0x290), 8, 0);
                     *data = 300;
                 }
             }
-            GetNextMobyInGroup(&pickupMoby, pickupMoby, 0, 0);
-        } while (pickupMoby);
+            GetNextMobyInGroup(&pickup_moby, pickup_moby, 0, 0);
+        } while (pickup_moby);
     }
     if (*(int *)(vars + 0x254) != -1) {
-        GetFirstMobyInGroup(&boostMoby, *(int *)(vars + 0x254), 0, 0);
-        if (boostMoby) {
+        GetFirstMobyInGroup(&boost_moby, *(int *)(vars + 0x254), 0, 0);
+        if (boost_moby) {
             /* One four-term OR would be rebalanced by fold, so the terms join in steps. */
             unsigned int high = (alpha << 24) | (blue << 16);
             high |= green << 8;
             color = high | red;
             do {
-                if (*(short *)(boostMoby + 0xaa) == 0x474 /* moby class 1140 */) radius = 1.25f;
-                else if (*(short *)(boostMoby + 0xaa) == 0xcef /* moby class 3311 */) radius = 3.75f;
+                if (*(short *)(boost_moby + 0xaa) == 0x474 /* moby class 1140 */) radius = 1.25f;
+                else if (*(short *)(boost_moby + 0xaa) == 0xcef /* moby class 3311 */) radius = 3.75f;
                 else goto next;
-                *(unsigned short *)(boostMoby + 0x34) |= 16;
-                *(unsigned int *)(boostMoby + 0x78) = color;
-                if (!vec_fast_helper_a(boostMoby + 0xbc)) goto next;
-                FastVecSub(delta, boostMoby + 0x10, g_hero_position);
+                *(unsigned short *)(boost_moby + 0x34) |= 16;
+                *(unsigned int *)(boost_moby + 0x78) = color;
+                if (!vec_fast_helper_a(boost_moby + 0xbc)) goto next;
+                FastVecSub(delta, boost_moby + 0x10, g_hero_position);
                 if (FastVecDot(delta, delta) > 20.0f) goto next;
                 set_identity_matrix(rotation);
-                matrix_from_basis_rows(rotation, boostMoby + 0xc0);
+                matrix_from_basis_rows(rotation, boost_moby + 0xc0);
                 transform_vector(delta, delta, rotation);
                 if (!(math_fabs(delta[0]) < 2.8f) || !(math_fabs(delta[1]) < radius) || !(math_fabs(delta[2]) < 1.5f)) goto next;
-                data = *(int **)(boostMoby + 0x68);
+                data = *(int **)(boost_moby + 0x68);
                 *(int *)(vars + 0x278) += *data;
                 if (!snd_is_voice_playing_for_owner(moby, *(int *)(vars + 0x714))) {
                     if (moby[0x20] != 3) *(int *)(vars + 0x714) = PlayMobySound(15, 4, moby);
@@ -803,7 +803,7 @@ void racer_update_boost(unsigned char *moby)
                 }
                 if (moby[0x20] != 3) PlayMobySound(12, 0, moby);
                 *(int *)(vars + 0x650) = *data;
-                boostMoby[0xbc] = 60;
+                boost_moby[0xbc] = 60;
                 if (*(unsigned char **)(vars + 0x4c4)) {
                     unsigned char *child = *(unsigned char **)(vars + 0x4c4);
                     unsigned char *childState = *(unsigned char **)(child + 0x68);
@@ -818,8 +818,8 @@ void racer_update_boost(unsigned char *moby)
                     *(int *)(vars + 0x640) = 1;
                 }
 next:
-                GetNextMobyInGroup(&boostMoby, boostMoby, 0, 0);
-            } while (boostMoby);
+                GetNextMobyInGroup(&boost_moby, boost_moby, 0, 0);
+            } while (boost_moby);
         }
     }
 }

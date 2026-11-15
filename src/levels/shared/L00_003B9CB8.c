@@ -142,7 +142,7 @@ char *spark_move_projectile(char *moby)
     float remainder[4] __attribute__((aligned(16)));
     char *ctx = *(char **)(moby + 0x68);
     char *hit = 0;
-    char *hitObject;
+    char *hit_object;
     EffectLightRecord *light;
     int light_index;
     float dot;
@@ -158,9 +158,9 @@ char *spark_move_projectile(char *moby)
     if (FastVecLength(ctx) != 0.0f && FastVecLength(ctx + 0x20) != 0.0f)
         mat_build_rotation_toward_vector(ctx, ctx, ctx + 0x20, 0, 0.075f);
     if (coll_test_point(moby + 0x10, 0, moby, *(float *)(ctx + 0x4C))) {
-        hitObject = D_L00_001BF218;
-        if (hitObject && hitObject != g_hero_moby && *(short *)(hitObject + 0xAA) != 0x5CA /* Plasma Storm */)
-            hit = (*(unsigned short *)(hitObject + 0x34) & 0x1000) ? hitObject : 0;
+        hit_object = D_L00_001BF218;
+        if (hit_object && hit_object != g_hero_moby && *(short *)(hit_object + 0xAA) != MOBY_CLASS_PLASMA_STORM)
+            hit = (*(unsigned short *)(hit_object + 0x34) & 0x1000) ? hit_object : 0;
         qcopy(moby + 0x10, D_L00_001BF230);
         func_002EE178_1((char *)normal, D_L00_001BF230 + 0x10, 0.0009765625f);
         func_802EE3D0_1(normal, normal, 1.0f);
@@ -402,7 +402,7 @@ extern void func_00282C88_1(void *p);
    in their own variables, and the two owner words are stored in the order 0x9C, 0x98, so that
    cc1 keeps the table base and the output pointer in registers and fills the delay slots the
    way retail does. */
-void spark_spawn_orbit(char *moby, char *linkedValue)
+void spark_spawn_orbit(char *moby, char *linked_value)
 {
     Rac2Native_003BC998_Slot *base = D_L00_0023F060;
     Rac2Native_003BC998_Slot *slot;
@@ -440,8 +440,8 @@ void spark_spawn_orbit(char *moby, char *linkedValue)
         slot->f_94 = func_002A7878_2(3.25f, 4.75f) * 0.25f;
         func_00282C88_1(slot);
         func_00282C88_1((char *)slot + 0x10);
-        slot->w_9C = linkedValue;
-        slot->w_98 = linkedValue;
+        slot->w_9C = linked_value;
+        slot->w_98 = linked_value;
         r1 = math_random_angle();
         r2 = math_random_angle();
         func_002AF000_1(out, *(float *)(ctx + 0x4C), r1, r2);
@@ -525,7 +525,7 @@ void part_l00_spawn_spark_burst_2(float *position, float *direction, int count, 
 /* func_L00_003BD7E0 is in L00_003B9CB8-update.c. */
 
 /* Normalises and combines two temporary vectors from a state block, dispatches on the combined result and conditionally scales the output vector. */
-void coll_compute_surface_direction(char *moby, char *outVector, int keepSign)
+void coll_compute_surface_direction(char *moby, char *out_vector, int keep_sign)
 {
     float a[4];
     float b[4];
@@ -536,12 +536,12 @@ void coll_compute_surface_direction(char *moby, char *outVector, int keepSign)
     func_00282CC0_6(b, b, moby + 16);
 
     if (CollLine(a, b, 2, moby, 0))
-        func_00282F20_2(outVector, D_L00_001BF240, 1.0f);
+        func_00282F20_2(out_vector, D_L00_001BF240, 1.0f);
     else
-        func_00282F20_2(outVector, moby + 224, -1.0f);
+        func_00282F20_2(out_vector, moby + 224, -1.0f);
 
-    if (keepSign == 0)
-        func_00282D30_6(outVector, outVector, -1.0f);
+    if (keep_sign == 0)
+        func_00282D30_6(out_vector, out_vector, -1.0f);
 }
 
 /* Read the word at offset 0x 18 through the pointer stored at owner offset 0x 68. */
@@ -573,12 +573,12 @@ extern float math_fabs(float f);
    `char scratch[0x50]` gives retail's frame. The 16-byte clear is retail's `sq $zero,0($sp)`:
    with the scheduling barrier of zero_ti_store_barrier.py it takes retail's place, and so does
    the prologue's save order. */
-float moby_aim_at_target(char *moby, char *state, char *startBlock, char *extra)
+float moby_aim_at_target(char *moby, char *state, char *start_block, char *extra)
 {
     char scratch[0x50];
     float angle;
 
-    *(Rac2TI128 *)scratch = *(Rac2TI128 *)startBlock;
+    *(Rac2TI128 *)scratch = *(Rac2TI128 *)start_block;
     angle = vec_get_heading_angle(moby, (float *)scratch, extra);
     *(int *)(scratch + 0x40) = 0;
     math_approach_target_with_direction_mode(scratch + 0x40, angle, *(float *)(state + 0x14), *(float *)(state + 0x18), 3.14159274f, state + 0xB4, 0);
@@ -771,8 +771,8 @@ void part_l00_spawn_spark_shower(char *unused, char *position)
     float speed;
     int i;
     unsigned int shade;
-    unsigned int shadeHigh;
-    unsigned int colorBits;
+    unsigned int shade_high;
+    unsigned int color_bits;
     char *particle;
 
     i = 19;
@@ -782,9 +782,9 @@ void part_l00_spawn_spark_shower(char *unused, char *position)
         func_002A77E0_1(2);
         speed = func_002A7878_2(70000.0f, 150000.0f);
         shade = func_002A7820_1(10, 127);
-        shadeHigh = (shade << 8) | 0x7f000000U;
-        colorBits = (shade << 16) | shadeHigh;
-        shade = colorBits | shade;
+        shade_high = (shade << 8) | 0x7f000000U;
+        color_bits = (shade << 16) | shade_high;
+        shade = color_bits | shade;
         vec_random_direction(local, 1.6666668670950457453728e-05f,
                 6.6666672937572002410889e-03f);
         particle = SpawnSpinningSparkParticle(0.3f, 1.0f, 1.01f, speed, position, 0, local, shade, 1);

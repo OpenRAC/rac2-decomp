@@ -26,8 +26,8 @@
 
 typedef int TI __attribute__((mode(TI)));
 typedef struct {
-    TI toTarget;
-    TI movedPosition;
+    TI to_target;
+    TI moved_position;
 } Scratch;
 
 extern void ref_L02_00321C30_00(void *, void *, void *);
@@ -36,24 +36,24 @@ extern f32 ref_L02_00321C30_02(void *);
 extern void ref_L02_00321C30_03(void *, void *, f32);
 
 /* Moves a position toward a target, but by no more than a given limit. Returns how much of the distance was left over. */
-f32 vec_step_toward_target_limited(void *position, void *target, f32 maxStep) {
+f32 vec_step_toward_target_limited(void *position, void *target, f32 max_step) {
     Scratch scratch;
     f32 distance;
-    f32 stepLength;
-    f32 negMaxStep;
+    f32 step_length;
+    f32 neg_max_step;
 
-    ref_L02_00321C30_01(&scratch.toTarget, target, position);
-    stepLength = ref_L02_00321C30_02(&scratch.toTarget);
-    distance = stepLength;
-    if (maxStep < stepLength) {
-        stepLength = maxStep;
+    ref_L02_00321C30_01(&scratch.to_target, target, position);
+    step_length = ref_L02_00321C30_02(&scratch.to_target);
+    distance = step_length;
+    if (max_step < step_length) {
+        step_length = max_step;
     } else {
-        negMaxStep = -maxStep;
-        if (stepLength < negMaxStep) {
-            stepLength = negMaxStep;
+        neg_max_step = -max_step;
+        if (step_length < neg_max_step) {
+            step_length = neg_max_step;
         }
     }
-    ref_L02_00321C30_03(&scratch.toTarget, &scratch.toTarget, stepLength);
-    ref_L02_00321C30_00(&scratch.movedPosition, position, &scratch.toTarget);
-    return distance - stepLength;
+    ref_L02_00321C30_03(&scratch.to_target, &scratch.to_target, step_length);
+    ref_L02_00321C30_00(&scratch.moved_position, position, &scratch.to_target);
+    return distance - step_length;
 }

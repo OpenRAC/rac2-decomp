@@ -50,8 +50,8 @@ void vaporizer_bolt_start_trail_sample(Actor *self)
 
     source = self->source;
     if (D_0018C0B4 == 0x1D) return;
-    base = level_get_slot_body(0xC04 /* Vaporizer */, source->id);
-    slots = (Slot *)(base + *level_get_slot_header(0xC04 /* Vaporizer */, source->id));
+    base = level_get_slot_body(MOBY_CLASS_VAPORIZER, source->id);
+    slots = (Slot *)(base + *level_get_slot_header(MOBY_CLASS_VAPORIZER, source->id));
     vec_scale_to_length(&m, source, 1.0f);
     dir.q = 0;
     dir.f[2] = 1.0f;

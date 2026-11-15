@@ -19,13 +19,13 @@ typedef struct {
 void gauge_update_fade_counters(Gauge *gauge)
 {
     unsigned char *fades = gauge->counter;
-    int limitValue = *gauge->limit;
-    int currentValue = gauge->current;
+    int limit_value = *gauge->limit;
+    int current_value = gauge->current;
 
-    gauge->clamped = limitValue;
-    if (currentValue < limitValue)
-        gauge->clamped = currentValue;
-    else if (limitValue < 0)
+    gauge->clamped = limit_value;
+    if (current_value < limit_value)
+        gauge->clamped = current_value;
+    else if (limit_value < 0)
         gauge->clamped = 0;
     if (gauge->level >= 5) {
         gauge->level = 5;

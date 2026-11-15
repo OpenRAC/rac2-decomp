@@ -13,12 +13,12 @@ extern u8 g_sound_state[];
 void snd_set_default_group_volumes(void)
 {
     struct Layout { char reserved[0x48]; int group0Volume,group1Volume,group2Volume,group3Volume,group4Volume,group5Volume; };
-    struct Layout *soundState = (struct Layout *)g_sound_state;
-    int maxVolume = D_001A7BA0;
-    soundState->group0Volume = maxVolume * 7 / 10;
-    soundState->group1Volume = D_001A7B9C;
-    soundState->group2Volume = maxVolume;
-    soundState->group3Volume = maxVolume * 6 / 10;
-    soundState->group4Volume = 614;
-    soundState->group5Volume = maxVolume * 25 / 32;
+    struct Layout *sound_state = (struct Layout *)g_sound_state;
+    int max_volume = D_001A7BA0;
+    sound_state->group0Volume = max_volume * 7 / 10;
+    sound_state->group1Volume = D_001A7B9C;
+    sound_state->group2Volume = max_volume;
+    sound_state->group3Volume = max_volume * 6 / 10;
+    sound_state->group4Volume = 614;
+    sound_state->group5Volume = max_volume * 25 / 32;
 }

@@ -31,7 +31,7 @@ extern struct { s32 w0; s32 w1; s32 w2; } D_0018B6A8;
 /* Sets up a timer on first run, then resets it to 0x708 (1800 frames) and calls a helper when a condition is met. */
 void timer_trigger_update(void *moby) {
     s32 *vars;
-    void *hudState;
+    void *hud_state;
 
     vars = (*(s32 **)((s8 *)(moby) + (0x68)));
     if ((*(u8 *)((s8 *)(moby) + (0x20))) == 0) {
@@ -40,9 +40,9 @@ void timer_trigger_update(void *moby) {
         *vars = 0x708;
     }
     if ((*(u8 *)((s8 *)(moby) + (0x20))) == 1) {
-        hudState = (void *) D_0018B6A8.w0;
-        if ((ref_L22_00415A48_00(vars, moby) != 0) && ((*(s32 *)((s8 *)(hudState) + (8))) == 0)) {
-            if ((*(s32 *)((s8 *)(hudState) + (0xC))) == 0) {
+        hud_state = (void *) D_0018B6A8.w0;
+        if ((ref_L22_00415A48_00(vars, moby) != 0) && ((*(s32 *)((s8 *)(hud_state) + (8))) == 0)) {
+            if ((*(s32 *)((s8 *)(hud_state) + (0xC))) == 0) {
                 ref_L22_00415A48_01(0x9FD, 0x54);
                 *vars = 0x708;
             }

@@ -31,14 +31,14 @@ void ref_L00_003DFDC0_02(void *, s32, f32, s32, f32, s32, s32, f32);
 
 /* Throws out two bursts of particles from the object, sized by its scale and a stored value. */
 void part_spawn_bursts_at_moby(void *moby) {
-    f32 sizeA;
-    f32 sizeB;
-    f32 sizeC;
-    f32 sizeD;
-    s32 randomA;
-    s32 randomB;
-    s32 randomC;
-    s32 randomD;
+    f32 size_a;
+    f32 size_b;
+    f32 size_c;
+    f32 size_d;
+    s32 random_a;
+    s32 random_b;
+    s32 random_c;
+    s32 random_d;
     u8 state;
     void *position;
     void *position2;
@@ -49,21 +49,21 @@ void part_spawn_bursts_at_moby(void *moby) {
     switch (state) {                               
     case 0:
         position = moby + 0x10;
-        sizeA = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 45.0f);
-        randomA = ref_L00_003DFDC0_00(0x5F, 0x6F);
-        ref_L00_003DFDC0_02(position, 0x103080, sizeA, randomA, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
-        sizeB = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 22.5f);
-        randomB = ref_L00_003DFDC0_00(0x6F, 0x7F);
-        ref_L00_003DFDC0_02(position, 4144959, sizeB, randomB, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
+        size_a = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 45.0f);
+        random_a = ref_L00_003DFDC0_00(0x5F, 0x6F);
+        ref_L00_003DFDC0_02(position, 0x103080, size_a, random_a, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
+        size_b = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 22.5f);
+        random_b = ref_L00_003DFDC0_00(0x6F, 0x7F);
+        ref_L00_003DFDC0_02(position, 4144959, size_b, random_b, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
         return;
     case 1:
         position2 = moby + 0x10;
-        sizeC = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 45.0f);
-        randomC = ref_L00_003DFDC0_00(0x5F, 0x6F);
-        ref_L00_003DFDC0_02(position2, 0x103080, sizeC, randomC, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
-        sizeD = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 22.5f);
-        randomD = ref_L00_003DFDC0_00(0x6F, 0x7F);
-        ref_L00_003DFDC0_02(position2, 4144959, sizeD, randomD, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
+        size_c = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 45.0f);
+        random_c = ref_L00_003DFDC0_00(0x5F, 0x6F);
+        ref_L00_003DFDC0_02(position2, 0x103080, size_c, random_c, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
+        size_d = (*(f32 *)((char *)(moby) + (0x2C))) * ((*(f32 *)((char *)(vars) + (0x20))) * 22.5f);
+        random_d = ref_L00_003DFDC0_00(0x6F, 0x7F);
+        ref_L00_003DFDC0_02(position2, 4144959, size_d, random_d, ref_L00_003DFDC0_01(), 0xB, 2, 1.0f);
         return;
     }
 }

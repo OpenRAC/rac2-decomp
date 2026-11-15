@@ -210,7 +210,7 @@ void guard_l14_update(char *obj) {
         if (math_is_value_within_step(obj,13.0f)) {
             char *target=*(char **)(vars+0x200);
             int play=1;
-            if (target && H(target,0xAA)==0x964 /* Gadgebot */ && U(obj,0x96)<=59) play=0;
+            if (target && H(target,0xAA)==MOBY_CLASS_GADGEBOT && U(obj,0x96)<=59) play=0;
             if (play) coll_test_hit_at_bone(obj,1,0.75f,1.0f,0x4000001,1.0f,0,1,0);
         }
         if ((B(obj,0x60)&2) && vec_distance_xy(obj+0x10,vars+0x1F0)>1.25f) moby_set_state(obj,9,-1);

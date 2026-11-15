@@ -15,7 +15,7 @@ typedef int V4 __attribute__((mode(TI)));
 
 /* Creates a new object (moby class 3704) at a position with a start velocity and a random spin;
    returns it, or 0 if its first setup step fails. */
-s32 moby_spawn_spinning_object(void *owner, void *startPos, void *startVel, f32 turnSpeed, f32 moveSpeed)
+s32 moby_spawn_spinning_object(void *owner, void *start_pos, void *start_vel, f32 turn_speed, f32 move_speed)
 {
     u8 *moby;
     u8 *position;
@@ -32,10 +32,10 @@ s32 moby_spawn_spinning_object(void *owner, void *startPos, void *startVel, f32 
         *(u8 *)(moby + 0x95) = 0;
         *(u8 *)(moby + 0x20) = 0;
         *(u32 *)(vars + 0x18) = (u32)owner;
-        *(V4 *)position = *(V4 *)startPos;
-        *(V4 *)vars = *(V4 *)startVel;
-        *(f32 *)(vars + 0x14) = turnSpeed * 0.0002908882452175021f;
-        *(f32 *)(vars + 0x10) = moveSpeed * 0.00027777778450399637f;
+        *(V4 *)position = *(V4 *)start_pos;
+        *(V4 *)vars = *(V4 *)start_vel;
+        *(f32 *)(vars + 0x14) = turn_speed * 0.0002908882452175021f;
+        *(f32 *)(vars + 0x10) = move_speed * 0.00027777778450399637f;
         spin = func_3279B8();
         *(f32 *)(moby + 0xF0) = spin;
         spin = func_3279B8();

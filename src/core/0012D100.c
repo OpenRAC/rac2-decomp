@@ -63,19 +63,19 @@ extern void r1_func_0012C468_a(void *, void *) __asm__("r1_func_0012C468");
 /* Reads the quantizer matrix flags of an MPEG video header and tells the video chip to load the matrices. */
 void mpeg_read_quant_matrix_extension(void *decoder) {
     char *dec = (char *)decoder;
-    int loadFlag;
+    int load_flag;
 
-    loadFlag = mpeg_read_bits(dec, 1);        /* load_intra_quantizer_matrix */
-    *(int *)(dec + 0x840) = loadFlag;
-    if (loadFlag != 0) {
+    load_flag = mpeg_read_bits(dec, 1);        /* load_intra_quantizer_matrix */
+    *(int *)(dec + 0x840) = load_flag;
+    if (load_flag != 0) {
         mpeg_wait_ipu_idle(dec);
         mpeg_send_ipu_command(dec, 0x50000000);
         mpeg_wait_ipu_idle(dec);
     }
 
-    loadFlag = mpeg_read_bits(dec, 1);        /* load_non_intra_quantizer_matrix */
-    *(int *)(dec + 0x844) = loadFlag;
-    if (loadFlag != 0) {
+    load_flag = mpeg_read_bits(dec, 1);        /* load_non_intra_quantizer_matrix */
+    *(int *)(dec + 0x844) = load_flag;
+    if (load_flag != 0) {
         mpeg_wait_ipu_idle(dec);
         mpeg_send_ipu_command(dec, 0x58000000);
         mpeg_wait_ipu_idle(dec);
@@ -92,26 +92,26 @@ void mpeg_read_quant_matrix_extension(void *decoder) {
 
 /* rac1-decomp src/core/00125630.c: func_001293A8 */
 /* Reads the display offsets of an MPEG picture header into the video decoder. */
-void mpeg_read_picture_display_extension(void *decoderArg) {
-    State *dec = (State *)decoderArg;
-    int offsetCount;
+void mpeg_read_picture_display_extension(void *decoder_arg) {
+    State *dec = (State *)decoder_arg;
+    int offset_count;
     int i;
 
     if (dec->unk_13C != 0) {
         if (dec->unk_184 == 0) {
-            offsetCount = 1;
+            offset_count = 1;
         } else {
-            offsetCount = dec->unk_178 != 0 ? 3 : 2;
+            offset_count = dec->unk_178 != 0 ? 3 : 2;
         }
     } else {
         if (dec->unk_174 != 3) {
-            offsetCount = 1;
+            offset_count = 1;
         } else {
-            offsetCount = dec->unk_184 != 0 ? 3 : 2;
+            offset_count = dec->unk_184 != 0 ? 3 : 2;
         }
     }
 
-    for (i = 0; i < offsetCount; i++) {
+    for (i = 0; i < offset_count; i++) {
         dec->f1[i] = mpeg_read_bits(dec, 0x10);
         mpeg_read_bits(dec, 1);
         dec->f2[i] = mpeg_read_bits(dec, 0x10);
@@ -196,27 +196,27 @@ int mpeg_decode_picture_data(void *decoder) {
 
 /* rac1-decomp src/core/00125630.c: func_00129600 */
 /* Decodes the pending MPEG picture into its frame buffer and advances the decoder state. */
-void mpeg_finish_picture_decode(void *decoder, int sliceCount, int doDecode) {
+void mpeg_finish_picture_decode(void *decoder, int slice_count, int do_decode) {
     char *dec = (char *)decoder;
-    int bufA, bufB;
+    int buf_a, buf_b;
 
-    if (doDecode != 0) {
+    if (do_decode != 0) {
         if (*(int *)(dec + 0x174) == 3) {
             if (*(int *)(dec + 0x150) == 3) {
-                bufA = *(int *)(dec + 0x1C4);
+                buf_a = *(int *)(dec + 0x1C4);
             } else {
-                bufA = *(int *)(dec + 0x1B8);
+                buf_a = *(int *)(dec + 0x1B8);
             }
-            r1_func_00129E30(dec, bufA, sliceCount - 1);
+            r1_func_00129E30(dec, buf_a, slice_count - 1);
         } else {
             if (*(int *)(dec + 0x150) == 3) {
-                bufA = *(int *)(dec + 0x1D4);
-                bufB = *(int *)(dec + 0x1E4);
+                buf_a = *(int *)(dec + 0x1D4);
+                buf_b = *(int *)(dec + 0x1E4);
             } else {
-                bufA = *(int *)(dec + 0x1C8);
-                bufB = *(int *)(dec + 0x1D8);
+                buf_a = *(int *)(dec + 0x1C8);
+                buf_b = *(int *)(dec + 0x1D8);
             }
-            r1_func_00129F40(dec, bufA, bufB, sliceCount - 1);
+            r1_func_00129F40(dec, buf_a, buf_b, slice_count - 1);
         }
     }
     if (*(int *)(dec + 0xF8) == 1) {
@@ -230,21 +230,21 @@ void mpeg_finish_picture_decode(void *decoder, int sliceCount, int doDecode) {
 
 /* rac1-decomp src/core/00125630.c: func_0012D4B0 */
 /* Picks and prepares the next MPEG frame buffers, then fills in the picture record. Returns 1 when a picture is ready. */
-int mpeg_prepare_frame_buffers(void *p, int swapBuffers) {
+int mpeg_prepare_frame_buffers(void *p, int swap_buffers) {
     char *record;
     int ready;
-    int fieldCount;
-    char *swapTmp;
-    char *curBuf;
+    int field_count;
+    char *swap_tmp;
+    char *cur_buf;
 
     record = 0;
     ready = 0;
-    fieldCount = (PI_(0x174) == 3) ? 2 : 4;
+    field_count = (PI_(0x174) == 3) ? 2 : 4;
     if (PI_(0x150) == 3) {
         PP_(0x1C0) = PP_(0x1C4);
         PP_(0x1D0) = PP_(0x1D4);
         PP_(0x1E0) = PP_(0x1E4);
-        if (PI_(0xA0) + PI_(0xA4) >= fieldCount) {
+        if (PI_(0xA0) + PI_(0xA4) >= field_count) {
             PI_(0xE8) = 0;
             PI_(0x1A8) = 0;
             PI_(0x1A4) = 0;
@@ -272,16 +272,16 @@ int mpeg_prepare_frame_buffers(void *p, int swapBuffers) {
             }
         }
     } else {
-        if (swapBuffers == 0) {
-            swapTmp = PP_(0x1B8);
+        if (swap_buffers == 0) {
+            swap_tmp = PP_(0x1B8);
             PP_(0x1B8) = PP_(0x1BC);
-            PP_(0x1BC) = swapTmp;
-            swapTmp = PP_(0x1C8);
+            PP_(0x1BC) = swap_tmp;
+            swap_tmp = PP_(0x1C8);
             PP_(0x1C8) = PP_(0x1CC);
-            PP_(0x1CC) = swapTmp;
-            swapTmp = PP_(0x1D8);
+            PP_(0x1CC) = swap_tmp;
+            swap_tmp = PP_(0x1D8);
             PP_(0x1D8) = PP_(0x1DC);
-            PP_(0x1DC) = swapTmp;
+            PP_(0x1DC) = swap_tmp;
         }
         PP_(0x1C0) = PP_(0x1BC);
         PP_(0x1D0) = PP_(0x1CC);
@@ -291,8 +291,8 @@ int mpeg_prepare_frame_buffers(void *p, int swapBuffers) {
                 ready = 1;
             }
         } else {
-            curBuf = (PI_(0x174) == 1) ? PP_(0x1E0) : PP_(0x1D0);
-            if (PI_(0x150) != 2 || (swapBuffers != 0 && *(int *)(curBuf + 0x28) == 1) ||
+            cur_buf = (PI_(0x174) == 1) ? PP_(0x1E0) : PP_(0x1D0);
+            if (PI_(0x150) != 2 || (swap_buffers != 0 && *(int *)(cur_buf + 0x28) == 1) ||
                 (RDY_(0x1C8) == 1 && RDY_(0x1D8) == 1)) {
                 ready = 1;
             }

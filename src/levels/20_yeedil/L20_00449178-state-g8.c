@@ -20,14 +20,14 @@ extern void moby_mark_spawned(char *);
 /* Update handler for moby class 4713: it arms itself, waits for a trigger, then plays a burst effect and removes itself. */
 void triggered_l20_burst_update_2(char *moby)
 {
-    V4_F449178 burstPos;
+    V4_F449178 burst_pos;
     s32 *vars = *(s32 **)(moby + 0x68);
 
     switch (*(u8 *)(moby + 0x20)) {
     case 0:
-        burstPos.q = 0;
-        burstPos.f[2] = 2.0f;
-        part_spawn_object_following_effect(&burstPos, moby, 0x40204080, -1, 420000.0f, 1.0f, 1, -1, 0, -1);
+        burst_pos.q = 0;
+        burst_pos.f[2] = 2.0f;
+        part_spawn_object_following_effect(&burst_pos, moby, 0x40204080, -1, 420000.0f, 1.0f, 1, -1, 0, -1);
         moby_set_state(moby, 1, -1);
         return;
     case 1:
@@ -37,8 +37,8 @@ void triggered_l20_burst_update_2(char *moby)
         return;
     case 2:
         part_explode_object_into_pieces(moby, &D_L20_001B23B0, &D_L20_001B23A8, &D_L20_001B23A0, 0xFFFF, 0, -1, 0, 0xFFFF, 0xFF, 0);
-        moby_compute_local_point(moby, &burstPos, 0.0f, 0.0f, 2.0f);
-        SpawnExplosion(&burstPos, 0, 0x19, 0x14, 0.5f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0);
+        moby_compute_local_point(moby, &burst_pos, 0.0f, 0.0f, 2.0f);
+        SpawnExplosion(&burst_pos, 0, 0x19, 0x14, 0.5f, 20.0f, 0x14, 0x14, 0x2D, 1, 1, 1, 0, 0);
         moby_l00_spawn_child(moby, 0x126A, 0);
         moby_mark_spawned(moby);
         return;

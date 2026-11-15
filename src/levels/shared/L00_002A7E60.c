@@ -34,10 +34,10 @@ extern void part_spawn_object_following_effect(void *, void *, int, float, int, 
 void hero_update_item_glow(void)
 {
     u8 *moby;
-    s32 maxAlpha;
+    s32 max_alpha;
     f32 *phase;
-    f32 glowPos[4] __attribute__((aligned(16)));
-    f32 glowPos2[4] __attribute__((aligned(16)));
+    f32 glow_pos[4] __attribute__((aligned(16)));
+    f32 glow_pos2[4] __attribute__((aligned(16)));
 
     moby = HERO(u8 *, 0x1220);
     if (moby == NULL) {
@@ -52,14 +52,14 @@ void hero_update_item_glow(void)
     if (HERO(s32, 0x1240) < 0x17) {
         return;
     }
-    maxAlpha = HERO(s32, 0x1240) - 0xF;
-    if (maxAlpha > 0x40) {
-        maxAlpha = 0x40;
+    max_alpha = HERO(s32, 0x1240) - 0xF;
+    if (max_alpha > 0x40) {
+        max_alpha = 0x40;
     }
-    if (maxAlpha < 0) {
-        maxAlpha = 0;
+    if (max_alpha < 0) {
+        max_alpha = 0;
     }
-    maxAlpha = (maxAlpha << 24) | 0xFFFFFF;
+    max_alpha = (max_alpha << 24) | 0xFFFFFF;
     phase = &HERO(f32, 0x124C);
 
     switch (HERO(s32, 0x1248)) {
@@ -96,8 +96,8 @@ void hero_update_item_glow(void)
             color = 0x281414D2;
         }
         F(moby, s32, 0x78) = FastTweenColor(F(moby, s32, 0x78), color, 0.05f);
-        moby_transform_joint_to_world(moby, 0, glowPos);
-        hero_queue_glow_point(glowPos, F(moby, s32, 0x78), 0.1f, 0.03f);
+        moby_transform_joint_to_world(moby, 0, glow_pos);
+        hero_queue_glow_point(glow_pos, F(moby, s32, 0x78), 0.1f, 0.03f);
         break;
     }
     case 42:
@@ -106,25 +106,25 @@ void hero_update_item_glow(void)
             wave = FastAddRotations(*phase, 0.040724356f);
             *phase = wave;
             F(moby, s32, 0x78) = FastTweenColor(0xFF204090, 0xFF804040, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
-            *(TI128 *)glowPos = 0;
-            glowPos[2] = 0.1263f;
-            glowPos[0] = 0.423f;
-            glowPos[1] = -0.0555f;
-            part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & 0x40FFFFFF, 57750.0f, -1, 1, 0.15f, 2, 0, -1);
-            *(TI128 *)glowPos2 = 0;
-            glowPos2[0] = 0.423f;
-            glowPos2[1] = -0.0555f;
-            glowPos2[2] = -0.1263f;
-            part_spawn_object_following_effect(glowPos2, moby, F(moby, s32, 0x78) & 0x40FFFFFF, 57750.0f, -1, 1, 0.15f, 2, 0, -1);
+            *(TI128 *)glow_pos = 0;
+            glow_pos[2] = 0.1263f;
+            glow_pos[0] = 0.423f;
+            glow_pos[1] = -0.0555f;
+            part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & 0x40FFFFFF, 57750.0f, -1, 1, 0.15f, 2, 0, -1);
+            *(TI128 *)glow_pos2 = 0;
+            glow_pos2[0] = 0.423f;
+            glow_pos2[1] = -0.0555f;
+            glow_pos2[2] = -0.1263f;
+            part_spawn_object_following_effect(glow_pos2, moby, F(moby, s32, 0x78) & 0x40FFFFFF, 57750.0f, -1, 1, 0.15f, 2, 0, -1);
         } else {
             f32 wave;
             wave = FastAddRotations(*phase, 0.052359886f);
             *phase = wave;
             F(moby, s32, 0x78) = FastTweenColor(0xFF00FFFF, 0xFF104080, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = 0.333f;
-            glowPos[1] = -0.05f;
-            part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & 0x35FFFFFF, 73500.0f, -1, 1, 0.15f, 2, 0, -1);
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = 0.333f;
+            glow_pos[1] = -0.05f;
+            part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & 0x35FFFFFF, 73500.0f, -1, 1, 0.15f, 2, 0, -1);
         }
         break;
     case 30:
@@ -141,31 +141,31 @@ void hero_update_item_glow(void)
                 F(moby, s32, 0x78) = FastTweenColor(F(moby, s32, 0x78), FastTweenColor(0xFF0040AA, 0xFF104046, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f), 0.15f);
             }
             F(moby, s32, 0x78) = FastTweenColor(0xFF0020FF, 0xFF104080, math_fast_sin_or_cos_b(*phase) * 0.5f + 0.5f);
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = -0.059f;
-            glowPos[1] = -0.516f;
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = -0.059f;
+            glow_pos[1] = -0.516f;
             {
-                s32 alphaMask = 0x40FFFFFF;
-                if (maxAlpha < alphaMask) {
-                    alphaMask = maxAlpha;
+                s32 alpha_mask = 0x40FFFFFF;
+                if (max_alpha < alpha_mask) {
+                    alpha_mask = max_alpha;
                 }
-                part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 77700.0f, -1, 1, 0.2f, 2, 0, -1);
+                part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 77700.0f, -1, 1, 0.2f, 2, 0, -1);
             }
         } else {
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = 0.195f;
-            glowPos[1] = -0.317f;
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = 0.195f;
+            glow_pos[1] = -0.317f;
             if (HERO(u8, 0x22B8) != 0) {
                 f32 wave;
                 wave = FastAddRotations(*phase, 0.1163553f);
                 *phase = wave;
                 F(moby, s32, 0x78) = FastTweenColor(F(moby, s32, 0x78), FastTweenColor(0xFF0040FF, 0xFF10BEBE, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f), 0.22f);
                 {
-                    s32 alphaMask = 0x32FFFFFF;
-                    if (maxAlpha < alphaMask) {
-                        alphaMask = maxAlpha;
+                    s32 alpha_mask = 0x32FFFFFF;
+                    if (max_alpha < alpha_mask) {
+                        alpha_mask = max_alpha;
                     }
-                    part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 50400.0f, -1, 1, 0.15f, 2, 0, -1);
+                    part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 50400.0f, -1, 1, 0.15f, 2, 0, -1);
                 }
             } else {
                 f32 wave;
@@ -173,11 +173,11 @@ void hero_update_item_glow(void)
                 *phase = wave;
                 F(moby, s32, 0x78) = FastTweenColor(F(moby, s32, 0x78), FastTweenColor(0xFF0028C8, 0xFF10B4B4, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f), 0.15f);
                 {
-                    s32 alphaMask = 0x38FFFFFF;
-                    if (maxAlpha < alphaMask) {
-                        alphaMask = maxAlpha;
+                    s32 alpha_mask = 0x38FFFFFF;
+                    if (max_alpha < alpha_mask) {
+                        alpha_mask = max_alpha;
                     }
-                    part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 50400.0f, -1, 1, 0.15f, 2, 0, -1);
+                    part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 50400.0f, -1, 1, 0.15f, 2, 0, -1);
                 }
             }
         }
@@ -188,25 +188,25 @@ void hero_update_item_glow(void)
             wave = FastAddRotations(*phase, 0.040724356f);
             *phase = wave;
             F(moby, s32, 0x78) = FastTweenColor(0xFF00FFFF, 0xFF104080, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = -0.07f;
-            glowPos[1] = -0.67f;
-            part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & 0x30FFFFFF, 99750.0f, -1, 1, 0.15f, 2, 0, -1);
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = -0.07f;
+            glow_pos[1] = -0.67f;
+            part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & 0x30FFFFFF, 99750.0f, -1, 1, 0.15f, 2, 0, -1);
         } else {
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = 0.06f;
-            glowPos[1] = -0.509f;
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = 0.06f;
+            glow_pos[1] = -0.509f;
             if (HERO(u8, 0x22B8) != 0) {
                 f32 wave;
                 wave = FastAddRotations(*phase, 0.10762865f);
                 *phase = wave;
                 F(moby, s32, 0x78) = FastTweenColor(0xFF00FFFF, 0xFF104080, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
                 {
-                    s32 alphaMask = 0x28FFFFFF;
-                    if (maxAlpha < alphaMask) {
-                        alphaMask = maxAlpha;
+                    s32 alpha_mask = 0x28FFFFFF;
+                    if (max_alpha < alpha_mask) {
+                        alpha_mask = max_alpha;
                     }
-                    part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 57750.0f, -1, 1, 0.1f, 2, 0, -1);
+                    part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 57750.0f, -1, 1, 0.1f, 2, 0, -1);
                 }
             } else {
                 f32 wave;
@@ -214,11 +214,11 @@ void hero_update_item_glow(void)
                 *phase = wave;
                 F(moby, s32, 0x78) = FastTweenColor(0xFF00FFFF, 0xFF104080, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
                 {
-                    s32 alphaMask = 0x30FFFFFF;
-                    if (maxAlpha < alphaMask) {
-                        alphaMask = maxAlpha;
+                    s32 alpha_mask = 0x30FFFFFF;
+                    if (max_alpha < alpha_mask) {
+                        alpha_mask = max_alpha;
                     }
-                    part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 73500.0f, -1, 1, 0.1f, 2, 0, -1);
+                    part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 73500.0f, -1, 1, 0.1f, 2, 0, -1);
                 }
             }
         }
@@ -229,25 +229,25 @@ void hero_update_item_glow(void)
             wave = FastAddRotations(*phase, 0.040724356f);
             *phase = wave;
             F(moby, s32, 0x78) = FastTweenColor(0xFF00BFFF, 0xFF104080, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = 0.16f;
-            glowPos[1] = -0.41f;
-            part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & 0x30FFFFFF, 105000.0f, -1, 1, 0.15f, 2, 0, -1);
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = 0.16f;
+            glow_pos[1] = -0.41f;
+            part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & 0x30FFFFFF, 105000.0f, -1, 1, 0.15f, 2, 0, -1);
         } else {
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = 0.16f;
-            glowPos[1] = -0.41f;
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = 0.16f;
+            glow_pos[1] = -0.41f;
             if (HERO(u8, 0x22B8) != 0) {
                 f32 wave;
                 wave = FastAddRotations(*phase, 0.10762865f);
                 *phase = wave;
                 F(moby, s32, 0x78) = FastTweenColor(0xFF00BFEF, 0xFF104080, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
                 {
-                    s32 alphaMask = 0x28FFFFFF;
-                    if (maxAlpha < alphaMask) {
-                        alphaMask = maxAlpha;
+                    s32 alpha_mask = 0x28FFFFFF;
+                    if (max_alpha < alpha_mask) {
+                        alpha_mask = max_alpha;
                     }
-                    part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 94500.0f, -1, 1, 0.1f, 2, 0, -1);
+                    part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 94500.0f, -1, 1, 0.1f, 2, 0, -1);
                 }
             } else {
                 f32 wave;
@@ -255,11 +255,11 @@ void hero_update_item_glow(void)
                 *phase = wave;
                 F(moby, s32, 0x78) = FastTweenColor(0xFF00BFEF, 0xFF104080, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
                 {
-                    s32 alphaMask = 0x30FFFFFF;
-                    if (maxAlpha < alphaMask) {
-                        alphaMask = maxAlpha;
+                    s32 alpha_mask = 0x30FFFFFF;
+                    if (max_alpha < alpha_mask) {
+                        alpha_mask = max_alpha;
                     }
-                    part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 94500.0f, -1, 1, 0.1f, 2, 0, -1);
+                    part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 94500.0f, -1, 1, 0.1f, 2, 0, -1);
                 }
             }
         }
@@ -283,25 +283,25 @@ void hero_update_item_glow(void)
             wave = FastAddRotations(*phase, 0.046542123f);
             *phase = wave;
             F(moby, s32, 0x78) = FastTweenColor(0xFF5F5F5F, 0xFFEFEFEF, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = -0.158f;
-            glowPos[1] = -0.194f;
-            part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & 0x30FFFFFF, 109199.99f, -1, 1, 0.15f, 2, 0, -1);
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = -0.158f;
+            glow_pos[1] = -0.194f;
+            part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & 0x30FFFFFF, 109199.99f, -1, 1, 0.15f, 2, 0, -1);
         } else {
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = -0.158f;
-            glowPos[1] = -0.194f;
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = -0.158f;
+            glow_pos[1] = -0.194f;
             if (HERO(u8, 0x22B8) != 0) {
                 f32 wave;
                 wave = FastAddRotations(*phase, 0.10762865f);
                 *phase = wave;
                 F(moby, s32, 0x78) = FastTweenColor(0xFFFF2050, 0xFFFF2080, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
                 {
-                    s32 alphaMask = 0x28FFFFFF;
-                    if (maxAlpha < alphaMask) {
-                        alphaMask = maxAlpha;
+                    s32 alpha_mask = 0x28FFFFFF;
+                    if (max_alpha < alpha_mask) {
+                        alpha_mask = max_alpha;
                     }
-                    part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 98700.0f, -1, 1, 0.1f, 2, 0, -1);
+                    part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 98700.0f, -1, 1, 0.1f, 2, 0, -1);
                 }
             } else {
                 f32 wave;
@@ -309,11 +309,11 @@ void hero_update_item_glow(void)
                 *phase = wave;
                 F(moby, s32, 0x78) = FastTweenColor(0xFFFF2050, 0xFFFF2080, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
                 {
-                    s32 alphaMask = 0x30FFFFFF;
-                    if (maxAlpha < alphaMask) {
-                        alphaMask = maxAlpha;
+                    s32 alpha_mask = 0x30FFFFFF;
+                    if (max_alpha < alpha_mask) {
+                        alpha_mask = max_alpha;
                     }
-                    part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 98700.0f, -1, 1, 0.1f, 2, 0, -1);
+                    part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 98700.0f, -1, 1, 0.1f, 2, 0, -1);
                 }
             }
         }
@@ -324,25 +324,25 @@ void hero_update_item_glow(void)
             wave = FastAddRotations(*phase, 0.046542123f);
             *phase = wave;
             F(moby, s32, 0x78) = FastTweenColor(0xFF5F5F5F, 0xFFDFDFDF, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = 0.05f;
-            glowPos[1] = -0.35f;
-            part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & 0x15FFFFFF, 102900.0f, -1, 1, 0.15f, 2, 0, -1);
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = 0.05f;
+            glow_pos[1] = -0.35f;
+            part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & 0x15FFFFFF, 102900.0f, -1, 1, 0.15f, 2, 0, -1);
         } else {
-            *(TI128 *)glowPos = 0;
-            glowPos[0] = 0.05f;
-            glowPos[1] = -0.45f;
+            *(TI128 *)glow_pos = 0;
+            glow_pos[0] = 0.05f;
+            glow_pos[1] = -0.45f;
             if (HERO(u8, 0x22B8) != 0) {
                 f32 wave;
                 wave = FastAddRotations(*phase, 0.10762865f);
                 *phase = wave;
                 F(moby, s32, 0x78) = FastTweenColor(0xFF5F5F5F, 0xFFDFDFDF, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
                 {
-                    s32 alphaMask = 0x20FFFFFF;
-                    if (maxAlpha < alphaMask) {
-                        alphaMask = maxAlpha;
+                    s32 alpha_mask = 0x20FFFFFF;
+                    if (max_alpha < alpha_mask) {
+                        alpha_mask = max_alpha;
                     }
-                    part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 94500.0f, -1, 1, 0.1f, 2, 0, -1);
+                    part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 94500.0f, -1, 1, 0.1f, 2, 0, -1);
                 }
             } else {
                 f32 wave;
@@ -350,11 +350,11 @@ void hero_update_item_glow(void)
                 *phase = wave;
                 F(moby, s32, 0x78) = FastTweenColor(0xFF5F5F5F, 0xFFDFDFDF, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
                 {
-                    s32 alphaMask = 0x30FFFFFF;
-                    if (maxAlpha < alphaMask) {
-                        alphaMask = maxAlpha;
+                    s32 alpha_mask = 0x30FFFFFF;
+                    if (max_alpha < alpha_mask) {
+                        alpha_mask = max_alpha;
                     }
-                    part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 94500.0f, -1, 1, 0.1f, 2, 0, -1);
+                    part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 94500.0f, -1, 1, 0.1f, 2, 0, -1);
                 }
             }
         }
@@ -421,36 +421,36 @@ void hero_update_item_glow(void)
         break;
     case 23:
         if (ARMED(23)) {
-            moby_transform_joint_to_world(moby, 1, glowPos);
-            hero_queue_glow_point(glowPos, 0x7F1010FF, 0.14f, 0.03f);
-            *(TI128 *)glowPos2 = 0;
-            glowPos2[0] = 0.399f;
-            glowPos2[1] = 0.035f;
-            part_spawn_object_following_effect(glowPos2, moby, 0x7F1010FF, 42000.0f, -1, 1, 0.0f, 2, 0, -1);
+            moby_transform_joint_to_world(moby, 1, glow_pos);
+            hero_queue_glow_point(glow_pos, 0x7F1010FF, 0.14f, 0.03f);
+            *(TI128 *)glow_pos2 = 0;
+            glow_pos2[0] = 0.399f;
+            glow_pos2[1] = 0.035f;
+            part_spawn_object_following_effect(glow_pos2, moby, 0x7F1010FF, 42000.0f, -1, 1, 0.0f, 2, 0, -1);
         } else {
-            moby_transform_joint_to_world(moby, 2, glowPos);
-            hero_queue_glow_point(glowPos, 0x3500FF10, 0.1f, 0.03f);
-            moby_transform_joint_to_world(moby, 3, glowPos);
-            hero_queue_glow_point(glowPos, 0x3500FF10, 0.1f, 0.03f);
+            moby_transform_joint_to_world(moby, 2, glow_pos);
+            hero_queue_glow_point(glow_pos, 0x3500FF10, 0.1f, 0.03f);
+            moby_transform_joint_to_world(moby, 3, glow_pos);
+            hero_queue_glow_point(glow_pos, 0x3500FF10, 0.1f, 0.03f);
         }
         break;
     case 43: {
         f32 wave;
-        *(TI128 *)glowPos = 0;
-        glowPos[0] = -0.1245f;
-        glowPos[1] = -0.8f;
+        *(TI128 *)glow_pos = 0;
+        glow_pos[0] = -0.1245f;
+        glow_pos[1] = -0.8f;
         wave = FastAddRotations(*phase, 0.06399541f);
         *phase = wave;
         F(moby, s32, 0x78) = FastTweenColor(0xFF9F4F7F, 0xFFDFDFDF, math_fast_sin_or_cos_b(wave) * 0.5f + 0.5f);
         {
-            s32 alphaMask = 0x20FFFFFF;
-            if (maxAlpha < alphaMask) {
-                alphaMask = maxAlpha;
+            s32 alpha_mask = 0x20FFFFFF;
+            if (max_alpha < alpha_mask) {
+                alpha_mask = max_alpha;
             }
-            part_spawn_object_following_effect(glowPos, moby, F(moby, s32, 0x78) & alphaMask, 76650.0f, -1, 1, 0.1f, 2, 0, -1);
+            part_spawn_object_following_effect(glow_pos, moby, F(moby, s32, 0x78) & alpha_mask, 76650.0f, -1, 1, 0.1f, 2, 0, -1);
         }
-        moby_transform_joint_to_world(moby, 0, glowPos2);
-        hero_queue_glow_point(glowPos2, 0x421010FF, 0.031f, 0.03f);
+        moby_transform_joint_to_world(moby, 0, glow_pos2);
+        hero_queue_glow_point(glow_pos2, 0x421010FF, 0.031f, 0.03f);
         break;
     }
     case 44: {

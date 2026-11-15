@@ -31,7 +31,7 @@ void tutorial_draw_aim_marker_sprite(int unused, char *pos, int color, int first
     char sprite[144];
     float matrix[16];
     float rotation[4];
-    float midOffset[4];
+    float mid_offset[4];
     long long texture;
     float dx, dy;
 
@@ -61,11 +61,11 @@ void tutorial_draw_aim_marker_sprite(int unused, char *pos, int color, int first
                               D_L00_001B8C80.z - *(float *)(pos + 8));
     rotation[0] = math_random_angle();
     euler_to_matrix(matrix, rotation);
-    FastVecSub(midOffset, &D_L00_001B8C80.x, pos);
-    vec_scale_to_length(midOffset, midOffset, 0.5f);
-    matrix[12] = *(float *)(pos) + midOffset[0];
-    matrix[13] = *(float *)(pos + 4) + midOffset[1];
-    matrix[14] = *(float *)(pos + 8) + midOffset[2];
+    FastVecSub(mid_offset, &D_L00_001B8C80.x, pos);
+    vec_scale_to_length(mid_offset, mid_offset, 0.5f);
+    matrix[12] = *(float *)(pos) + mid_offset[0];
+    matrix[13] = *(float *)(pos + 4) + mid_offset[1];
+    matrix[14] = *(float *)(pos + 8) + mid_offset[2];
     matrix[15] = 1.0f;
     FastVecScale(sprite, sprite, scale);
     FastVecScale(sprite + 16, sprite + 16, scale);
@@ -139,7 +139,7 @@ void tutorial_prompt_trigger_update(unsigned char *object) {
         break;
     }
     g_hero_state.moby[0x7e]|=1;
-    { unsigned char *scanMoby; for(scanMoby=D_L00_001B1EA8;scanMoby;scanMoby=*(unsigned char **)(scanMoby+0x28)) if(*(short *)(scanMoby+0xaa)==0xac1) scanMoby[0x7e]|=1; }
+    { unsigned char *scan_moby; for(scan_moby=D_L00_001B1EA8;scan_moby;scan_moby=*(unsigned char **)(scan_moby+0x28)) if(*(short *)(scan_moby+0xaa)==0xac1) scan_moby[0x7e]|=1; }
     if(IsPointInCuboid(g_hero_position,zones[6]) || IsPointInCuboid(g_hero_position,zones[7])) g_hero_position[0x2470]=1;
     else g_hero_position[0x2470]=0;
 }
@@ -147,7 +147,7 @@ void tutorial_prompt_trigger_update(unsigned char *object) {
 /* Emits bursts of small particles from the object, waiting a random time between bursts. */
 void particle_burst_emitter_update(unsigned char *moby) {
     float velocity[4], pos[4];
-    float firstSize, secondRadius, z;
+    float first_size, secondRadius, z;
     int *vars = *(int **)(moby + 0x68);
     unsigned char *origin;
 
@@ -177,8 +177,8 @@ void particle_burst_emitter_update(unsigned char *moby) {
             qcopy(pos, origin);
             z = velocity[2];
             pos[2] += math_random_signed_float_range(z, 0.5f);
-            firstSize = math_random_float_range(0.1f, 3.0f);
-            aranos_spark_spawn(pos, velocity, 300, firstSize,
+            first_size = math_random_float_range(0.1f, 3.0f);
+            aranos_spark_spawn(pos, velocity, 300, first_size,
                              FloatToInt(math_random_signed_float_range(1.0f, 4.0f)), 0x40808080);
             qcopy(pos, origin);
             pos[2] += math_random_signed_float_range(z, 0.5f);
@@ -195,9 +195,9 @@ extern float D_L00_001B1AE8 __attribute__((sda));
 
 /* Sets a global value to 30 when the hero is inside the area, otherwise to 95. */
 void hero_proximity_value_update(void *moby) {
-    int heroInside = IsPointInCuboid(g_hero_position,
+    int hero_inside = IsPointInCuboid(g_hero_position,
                                *(int *)*(int *)((char *)moby + 0x68));
-    if (heroInside != 0) {
+    if (hero_inside != 0) {
         D_L00_001B1AE8 = 30.0f;
     } else {
         D_L00_001B1AE8 = 95.0f;
@@ -294,9 +294,9 @@ void aranos_controller_update(unsigned char *object)
         object[0x30] = 255;
         object[0x20] = 1;
         if (!D_L00_0021DDB0.collected[(short)*(unsigned short *)(object + 0xb2)]) {
-            int countByte = D_0019B4A8[((short)*(unsigned short *)(object + 0xb2) >> 1) + (g_current_map_index << 10)];
+            int count_byte = D_0019B4A8[((short)*(unsigned short *)(object + 0xb2) >> 1) + (g_current_map_index << 10)];
             /* One 3-bit count per nibble; the low bit of the number picks the nibble. */
-            if (!((*(unsigned short *)(object + 0xb2) & 1) ? (countByte >> 4) & 7 : countByte & 7)) {
+            if (!((*(unsigned short *)(object + 0xb2) & 1) ? (count_byte >> 4) & 7 : count_byte & 7)) {
                 return;
             }
         }
@@ -413,63 +413,63 @@ void aranos_controller_update(unsigned char *object)
 
 /* Marks the object as ready on its first frame by setting a flag. */
 void moby_init_on_first_frame_a(void *moby) {
-    unsigned char *mobyBytes = (unsigned char *)moby;
-    if (mobyBytes[0x20] == 0) {
-        mobyBytes[0x20] = 1;
-        *(unsigned short *)(mobyBytes + 0x34) |= 0x800;
+    unsigned char *moby_bytes = (unsigned char *)moby;
+    if (moby_bytes[0x20] == 0) {
+        moby_bytes[0x20] = 1;
+        *(unsigned short *)(moby_bytes + 0x34) |= 0x800;
     }
 }
 
 /* Marks the object as ready on its first frame by setting a flag. */
 void moby_init_on_first_frame_b(void *moby) {
-    unsigned char *mobyBytes = (unsigned char *)moby;
-    if (mobyBytes[0x20] == 0) {
-        mobyBytes[0x20] = 1;
-        *(unsigned short *)(mobyBytes + 0x34) |= 0x800;
+    unsigned char *moby_bytes = (unsigned char *)moby;
+    if (moby_bytes[0x20] == 0) {
+        moby_bytes[0x20] = 1;
+        *(unsigned short *)(moby_bytes + 0x34) |= 0x800;
     }
 }
 
 /* Marks the object as ready on its first frame by setting a flag. */
 void moby_init_on_first_frame_c(void *moby) {
-    unsigned char *mobyBytes = (unsigned char *)moby;
-    if (mobyBytes[0x20] == 0) {
-        mobyBytes[0x20] = 1;
-        *(unsigned short *)(mobyBytes + 0x34) |= 0x800;
+    unsigned char *moby_bytes = (unsigned char *)moby;
+    if (moby_bytes[0x20] == 0) {
+        moby_bytes[0x20] = 1;
+        *(unsigned short *)(moby_bytes + 0x34) |= 0x800;
     }
 }
 
 /* Marks the object as ready on its first frame by setting a flag. */
 void moby_init_on_first_frame_d(void *moby) {
-    unsigned char *mobyBytes = (unsigned char *)moby;
-    if (mobyBytes[0x20] == 0) {
-        mobyBytes[0x20] = 1;
-        *(unsigned short *)(mobyBytes + 0x34) |= 0x800;
+    unsigned char *moby_bytes = (unsigned char *)moby;
+    if (moby_bytes[0x20] == 0) {
+        moby_bytes[0x20] = 1;
+        *(unsigned short *)(moby_bytes + 0x34) |= 0x800;
     }
 }
 
 /* Marks the object as ready on its first frame by setting a flag. */
 void moby_init_on_first_frame_e(void *moby) {
-    unsigned char *mobyBytes = (unsigned char *)moby;
-    if (mobyBytes[0x20] == 0) {
-        mobyBytes[0x20] = 1;
-        *(unsigned short *)(mobyBytes + 0x34) |= 0x800;
+    unsigned char *moby_bytes = (unsigned char *)moby;
+    if (moby_bytes[0x20] == 0) {
+        moby_bytes[0x20] = 1;
+        *(unsigned short *)(moby_bytes + 0x34) |= 0x800;
     }
 }
 
 /* Marks the object as ready on its first frame by setting a flag. */
 void moby_init_on_first_frame_f(void *moby) {
-    unsigned char *mobyBytes = (unsigned char *)moby;
-    if (mobyBytes[0x20] == 0) {
-        mobyBytes[0x20] = 1;
-        *(unsigned short *)(mobyBytes + 0x34) |= 0x800;
+    unsigned char *moby_bytes = (unsigned char *)moby;
+    if (moby_bytes[0x20] == 0) {
+        moby_bytes[0x20] = 1;
+        *(unsigned short *)(moby_bytes + 0x34) |= 0x800;
     }
 }
 
 /* Marks the object as ready on its first frame by setting a flag. */
 void moby_init_on_first_frame_g(void *moby) {
-    unsigned char *mobyBytes = (unsigned char *)moby;
-    if (mobyBytes[0x20] == 0) {
-        mobyBytes[0x20] = 1;
-        *(unsigned short *)(mobyBytes + 0x34) |= 0x800;
+    unsigned char *moby_bytes = (unsigned char *)moby;
+    if (moby_bytes[0x20] == 0) {
+        moby_bytes[0x20] = 1;
+        *(unsigned short *)(moby_bytes + 0x34) |= 0x800;
     }
 }

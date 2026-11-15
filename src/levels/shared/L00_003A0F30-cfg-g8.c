@@ -30,7 +30,7 @@ void lancer_init(char *object)
     *(int *)(state + 44) = 0;
     *(int *)(state + 48) = 0;
     *(int *)(state + 60) = -1;
-    if (*(short *)(object + 0xAA) == 1490 /* Lancer */)
+    if (*(short *)(object + 0xAA) == MOBY_CLASS_LANCER)
         *(int *)(state + 52) = D_L00_001AF6C4;
     else
         *(int *)(state + 52) = D_L00_001AF6CC;
@@ -48,7 +48,7 @@ void lancer_init(char *object)
     kind = *(short *)(object + 0xAA);
     D_L00_001B2868 = 0.104719766f;
     range = 30.0f;
-    if (kind == 1490 /* Lancer */) {
+    if (kind == MOBY_CLASS_LANCER) {
         range = 20.0f;
         D_L00_001B286C = range;
     } else {

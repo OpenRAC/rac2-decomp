@@ -14,7 +14,7 @@ void group_layout_members_in_grid(char *obj)
     char *child, *parent;
     int off, choice, ordinal, i, count, row;
 
-    short entryWord;
+    short entry_word;
     if (D_L05_001FB220[*(unsigned char *)(obj + 0x21)] == 0) return;
     parent = func_379CA0(obj);
     ordinal = 1;
@@ -41,9 +41,9 @@ void group_layout_members_in_grid(char *obj)
                 }
             }
         }
-        entryWord = *(short *)entry;
+        entry_word = *(short *)entry;
         entry++;
-        if (entryWord < 0) break;
+        if (entry_word < 0) break;
         if (ordinal == *(int *)(parent + 0x18)) break;
-    } while (entryWord >= 0);
+    } while (entry_word >= 0);
 }

@@ -77,7 +77,7 @@ void shot_moby_update(char *self)
         for (i = 0; i < n; i++) {
             obj = ((Candidate *)D_001BF000)[i].item;
             data = moby_get_private_value_0(obj);
-            if (*(short *)(obj + 0xAA) == 0xC4A /* Plasma Coil */ || obj == ((PlayerRef *)g_hero_state)->player
+            if (*(short *)(obj + 0xAA) == MOBY_CLASS_PLASMA_COIL || obj == ((PlayerRef *)g_hero_state)->player
                 || !(*(short *)(obj + 0x34) & 0x1000))
                 continue;
             if (data) {

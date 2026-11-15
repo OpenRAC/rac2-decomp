@@ -44,7 +44,7 @@ extern char g_hero_position[];
 void swamp_monster_update_hit_reaction(F003C01C0obj *moby)
 {
     F003C01C0s *vars = *(F003C01C0s **)((char *)moby + 0x68);
-    int oldState = moby->f20;
+    int old_state = moby->f20;
 
     if (moby_apply_damage_to_object(moby, (char *)vars + 0x60, 0) || vars->f2e == 2) {
         if (vars->f20 <= 0.0f || vars->f2e == 2) {
@@ -74,7 +74,7 @@ void swamp_monster_update_hit_reaction(F003C01C0obj *moby)
         }
     }
     if (moby->f20 == 255) {
-        moby->f20 = oldState;
+        moby->f20 = old_state;
     }
     weapon_select_aim_target(moby, vars->f2f0, 0, 0, 0.0f, 0.0f);
     if (*(char **)((char *)vars + 0x2e4)) {

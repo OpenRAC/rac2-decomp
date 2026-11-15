@@ -8,13 +8,13 @@ extern u8 *g_hero_moby;
 
 /* Rejects a target using the state polygons and class-dependent height limits. */
 /* Says whether a target should be ignored because it is outside the arena or too low. */
-s32 arena_is_target_outside(u8 *controller, u8 *target, s32 skipOuterZone) {
+s32 arena_is_target_outside(u8 *controller, u8 *target, s32 skip_outer_zone) {
     float pos[4] __attribute__((aligned(16)));
     u8 *state = *(u8 **)(controller + 0x68);
     s16 result = !coll_point_inside_record_volume(target + 0x10, *(s32 *)(state + 0x1E4));
     if (*(s16 *)(target + 0xAA) != 0 && (*(u16 *)(target + 0x34) & 2)) return 0;
     if (result) return result;
-    if (!skipOuterZone) {
+    if (!skip_outer_zone) {
         if (*(s16 *)(target + 0xAA) == 0xD4B /* moby class 3403 */) {
             qcopy(pos, target + 0x10);
             pos[2] -= 0.8f;

@@ -33,11 +33,11 @@ extern void follower_start_push_from_target(unsigned char *);
 /* Per-frame update of a follower object: runs its helper steps, then acts on its state (flying out, orbiting, waiting, riding its target, being collected or dying). */
 void follower_update(unsigned char *owner)
 {
-    VecEDA moveVec, extraVec, frame[3], zero, up, basis[3], test, rotated;
+    VecEDA move_vec, extra_vec, frame[3], zero, up, basis[3], test, rotated;
     unsigned char *vars = (unsigned char *)moby_get_motion_data(owner);
     unsigned char *cam;
     unsigned char *target;
-    float spinDir;
+    float spin_dir;
     if (!vars) return;
     zero.q = 0;
     up.q = 0;
@@ -54,31 +54,31 @@ void follower_update(unsigned char *owner)
     cam = D_001B5390;
     switch(follower_get_state(owner)) {
     case 7:
-        vec_scale_to_length(&moveVec,PEDA(vars,0x120)+0xC0,-50.0f);
-        FastVecAdd(&moveVec,PEDA(vars,0x120)+0x10,&moveVec);
-        follower_set_push_vector(owner,&moveVec);
+        vec_scale_to_length(&move_vec,PEDA(vars,0x120)+0xC0,-50.0f);
+        FastVecAdd(&move_vec,PEDA(vars,0x120)+0x10,&move_vec);
+        follower_set_push_vector(owner,&move_vec);
         if(follower_has_reached_target(owner)) {
             follower_set_state(owner,8);
             IEDA(vars,0x130)=900;
-            spinDir = (func_001163B0()&1) ? -1.0f : 1.0f;
-            FEDA(vars,0x140)=spinDir;
-            FEDA(vars,0x134)=spinDir < 0.0f ? 1.5707964f : -1.5707964f;
+            spin_dir = (func_001163B0()&1) ? -1.0f : 1.0f;
+            FEDA(vars,0x140)=spin_dir;
+            FEDA(vars,0x134)=spin_dir < 0.0f ? 1.5707964f : -1.5707964f;
             FEDA(vars,0x144)=math_random_float_range(5.0f,15.0f);
         }
         break;
     case 8:
-        moveVec.f[2]=0.0f;
-        moveVec.f[0]=math_fast_sin_or_cos_b(FEDA(vars,0x134))*FEDA(vars,0x144);
-        moveVec.f[1]=-math_fast_sin_or_cos_a(FEDA(vars,0x134))*FEDA(vars,0x144);
-        moveVec.f[3]=0.0f;
+        move_vec.f[2]=0.0f;
+        move_vec.f[0]=math_fast_sin_or_cos_b(FEDA(vars,0x134))*FEDA(vars,0x144);
+        move_vec.f[1]=-math_fast_sin_or_cos_a(FEDA(vars,0x134))*FEDA(vars,0x144);
+        move_vec.f[3]=0.0f;
         FEDA(vars,0x134)=FastAddRotations(FEDA(vars,0x134),FEDA(vars,0x140)*0.013089972f);
         qcopy(&basis[2],cam+0x20);
         FastVecCross(&basis[1],&up,&basis[2]);
         vec_scale_to_length(&basis[1],&basis[1],1.0f);
         FastVecCross(&basis[0],&basis[2],&basis[1]);
-        matrix_mul_vec3(&moveVec,&moveVec,&basis[0]);
-        FastVecAdd(owner+0x10,PEDA(vars,0x120)+0x10,&moveVec);
-        follower_set_push_vector(owner,&moveVec);
+        matrix_mul_vec3(&move_vec,&move_vec,&basis[0]);
+        FastVecAdd(owner+0x10,PEDA(vars,0x120)+0x10,&move_vec);
+        follower_set_push_vector(owner,&move_vec);
         if(follower_try_place_at_saved_spot(owner)) follower_set_state(owner,9);
         if(!follower_has_reached_target(owner)) break;
         qcopy(&test,owner+0x10);
@@ -98,13 +98,13 @@ void follower_update(unsigned char *owner)
         break;
     case 4:
         if (!PEDA(vars,0x120)) { moby_release_motion_slot(owner); follower_set_state(owner,1); break; }
-        vec_scale_to_length(&moveVec,PEDA(vars,0x120)+0xC0,25.0f);
+        vec_scale_to_length(&move_vec,PEDA(vars,0x120)+0xC0,25.0f);
         if (IEDA(vars,0xFC)) {
             matrix_mul_vec3(&rotated,vars+0x70,PEDA(vars,0x120)+0xC0);
-            FastVecAdd(&moveVec,&rotated,&moveVec);
+            FastVecAdd(&move_vec,&rotated,&move_vec);
         }
-        FastVecAdd(&moveVec,PEDA(vars,0x120)+0x10,&moveVec);
-        follower_set_push_vector(owner,&moveVec);
+        FastVecAdd(&move_vec,PEDA(vars,0x120)+0x10,&move_vec);
+        follower_set_push_vector(owner,&move_vec);
         if (follower_has_reached_target(owner)) {
             follower_set_state(owner,5);
             IEDA(vars,0x130)=math_random_int_range(300,600);
@@ -112,26 +112,26 @@ void follower_update(unsigned char *owner)
         break;
     case 5:
         if (!PEDA(vars,0x120)) { moby_release_motion_slot(owner); follower_set_state(owner,1); break; }
-        vec_scale_to_length(&moveVec,PEDA(vars,0x120)+0xC0,5.0f);
+        vec_scale_to_length(&move_vec,PEDA(vars,0x120)+0xC0,5.0f);
         if (IEDA(vars,0xFC)) {
             matrix_mul_vec3(&rotated,vars+0x70,PEDA(vars,0x120)+0xC0);
-            FastVecAdd(&moveVec,&rotated,&moveVec);
+            FastVecAdd(&move_vec,&rotated,&move_vec);
         }
-        FastVecAdd(&moveVec,PEDA(vars,0x120)+0x10,&moveVec);
-        follower_set_push_vector(owner,&moveVec);
+        FastVecAdd(&move_vec,PEDA(vars,0x120)+0x10,&move_vec);
+        follower_set_push_vector(owner,&move_vec);
         if(follower_has_reached_target(owner)) { moby_release_motion_slot(owner); follower_set_state(owner,1); }
         break;
     case 6:
         if (!PEDA(vars,0x120)) { moby_release_motion_slot(owner); follower_set_state(owner,1); break; }
-        vec_scale_to_length(&moveVec,PEDA(vars,0x120)+0xC0,10.0f);
-        vec_scale_to_length(&extraVec,PEDA(vars,0x120)+0xE0,0.05f);
+        vec_scale_to_length(&move_vec,PEDA(vars,0x120)+0xC0,10.0f);
+        vec_scale_to_length(&extra_vec,PEDA(vars,0x120)+0xE0,0.05f);
         if (IEDA(vars,0xFC)) {
             matrix_mul_vec3(&rotated,vars+0x70,PEDA(vars,0x120)+0xC0);
-            FastVecAdd(&moveVec,&rotated,&moveVec);
+            FastVecAdd(&move_vec,&rotated,&move_vec);
         }
-        FastVecAdd(&moveVec,&extraVec,&moveVec);
-        FastVecAdd(&moveVec,PEDA(vars,0x120)+0x10,&moveVec);
-        follower_set_push_vector(owner,&moveVec);
+        FastVecAdd(&move_vec,&extra_vec,&move_vec);
+        FastVecAdd(&move_vec,PEDA(vars,0x120)+0x10,&move_vec);
+        follower_set_push_vector(owner,&move_vec);
         if(follower_has_reached_target(owner)) { moby_release_motion_slot(owner); follower_set_state(owner,1); }
         break;
     case 3:
@@ -140,9 +140,9 @@ void follower_update(unsigned char *owner)
         FastVecCross(&frame[1],&frame[0],&zero);
         vec_scale_to_length(&frame[1],&frame[1],1.0f);
         FastVecCross(&frame[2],&frame[1],&frame[0]);
-        matrix_mul_vec3(&moveVec,vars,&frame[0]);
-        FastVecAdd(&moveVec,target+0x10,&moveVec);
-        follower_set_push_vector(owner,&moveVec);
+        matrix_mul_vec3(&move_vec,vars,&frame[0]);
+        FastVecAdd(&move_vec,target+0x10,&move_vec);
+        follower_set_push_vector(owner,&move_vec);
         break;
     case 1:
         if(follower_has_reached_target(owner)) follower_start_random_push(owner);

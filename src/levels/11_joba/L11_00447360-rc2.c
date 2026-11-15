@@ -43,13 +43,13 @@ extern void ref_L11_00447360_12(void *);
 /* Goes through every game object in the world and calls the special update for its type (decoy, sheep, turrets, robots and so on). */
 void moby_update_class_specials(s32 param) {
     s8 *moby;
-    s16 classId;
+    s16 class_id;
 
     moby = ref_L11_00447360_00;
     if (moby != 0) {
         do {
-            classId = *(s16 *)(moby + 0xAA);
-            switch (classId) {
+            class_id = *(s16 *)(moby + 0xAA);
+            switch (class_id) {
             case 0xCB: /* Decoy */
                 ref_L11_00447360_02(moby, param, 0x10000, moby + 0x10, ref_L11_00447360_01, 100.0f);
                 break;

@@ -9,11 +9,11 @@ typedef float Vec000[4] __attribute__((aligned(16)));
 typedef struct {
     char pad0[0x30];
     float rot[4];   /* 0x30: Euler angles; x is eased and clamped here, y and z follow velocity */
-    float smoothRot[4]; /* 0x40 */
+    float smooth_rot[4]; /* 0x40 */
     char pad50[0x40];
     float velocity[4]; /* 0x90 */
     char padA0[0xA0];
-    float axisScale;   /* 0x140 */
+    float axis_scale;   /* 0x140 */
 } Obj002EE000;
 
 extern int follower_get_state(unsigned char *);
@@ -35,7 +35,7 @@ void UpdateBankedOrientation(unsigned char *owner)
     Vec000 temp;
     float sign;
     float speed;
-    float turnAmount;
+    float turn_amount;
 
     if (!obj)
         return;
@@ -47,10 +47,10 @@ void UpdateBankedOrientation(unsigned char *owner)
         obj->rot[2] = mat_fast_helper_a(obj->velocity[0], obj->velocity[1]);
         if (fast_subtract_rotations(obj->rot[2], old[2]) < 0.0f)
             sign = -1.0f;
-        turnAmount = FastDiffRots(old[2], obj->rot[2]);
+        turn_amount = FastDiffRots(old[2], obj->rot[2]);
         if (follower_get_state(owner) != 2 && follower_get_state(owner) != 12) {
             obj->rot[0] *= 0.98f;
-            obj->rot[0] += (turnAmount * -sign) * (D_001AC244 * 1.4137166738510132f) * 8.0f;
+            obj->rot[0] += (turn_amount * -sign) * (D_001AC244 * 1.4137166738510132f) * 8.0f;
             if (obj->rot[0] > 1.4137166738510132f)
                 obj->rot[0] = 1.4137166738510132f;
             else if (obj->rot[0] < -1.4137166738510132f)
@@ -59,13 +59,13 @@ void UpdateBankedOrientation(unsigned char *owner)
             quaternion_to_rotation_basis(temp, owner + 0xC0);
         } else {
             mat_build_rotation_from_angles(temp, obj->rot);
-            vec_fast_normalize3(obj->smoothRot, obj->smoothRot, temp, 0.0125f);
-            quaternion_to_rotation_basis(obj->smoothRot, owner + 0xC0);
+            vec_fast_normalize3(obj->smooth_rot, obj->smooth_rot, temp, 0.0125f);
+            quaternion_to_rotation_basis(obj->smooth_rot, owner + 0xC0);
         }
     } else {
         char *p = D_001B5390;
 
-        vec_scale_to_length(owner + 0xC0, p + 0x10, obj->axisScale);
+        vec_scale_to_length(owner + 0xC0, p + 0x10, obj->axis_scale);
         vec_scale_to_length(owner + 0xE0, p, -1.0f);
         vec_scale_to_length(owner + 0xD0, p + 0x20, -1.0f);
     }

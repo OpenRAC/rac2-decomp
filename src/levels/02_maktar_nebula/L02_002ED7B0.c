@@ -145,21 +145,21 @@ extern int PlayMobySound(int, int, char *);
 int armed_enemy_is_holding_in_attack(char *self, void *candidate) {
     int result = 0;
     if (*(int *)(*(char **)(self + 0x68) + 0x2E4) != 0) {
-        unsigned char stateByte = *(unsigned char *)(self + 0x20);
-        if (stateByte == 0x13 || stateByte == 4 || *(unsigned char *)(self + 0x95) == 4 ||
-            stateByte == 0x10 || stateByte == 0x11 || stateByte == 0x12)
+        unsigned char state_byte = *(unsigned char *)(self + 0x20);
+        if (state_byte == 0x13 || state_byte == 4 || *(unsigned char *)(self + 0x95) == 4 ||
+            state_byte == 0x10 || state_byte == 0x11 || state_byte == 0x12)
             result = 1;
     }
     return result;
 }
 
 /* Walks the enemy along its path toward a point and turns it to face the way it is going. Returns the path result. */
-int enemy_follow_path_toward_point(char *self, int targetPoint) {
-    float turnAngle;
+int enemy_follow_path_toward_point(char *self, int target_point) {
+    float turn_angle;
     char *state = *(char **)(self + 0x68);
-    int result = ComputeRegionRouteHeading(self + 0x10, targetPoint, &turnAngle, state + 0x290, *(short *)(state + 0x3B6),
+    int result = ComputeRegionRouteHeading(self + 0x10, target_point, &turn_angle, state + 0x290, *(short *)(state + 0x3B6),
                               state + 0x3B8, state + 0x3BC, 0.0f, *(float *)(state + 0x50));
-    moby_step_controller(self, targetPoint, turnAngle);
+    moby_step_controller(self, target_point, turn_angle);
     return result;
 }
 
@@ -252,15 +252,15 @@ void sky_shift_records_by_period(int flag, float limit) {
     }
     limit *= 1024.0f;
     for (i = 0; i < D_L02_001B3BD4; i++) {
-        L02_Record40 *wideRecord = &D_L02_001B3BD0[i];
-        int flagged = wideRecord->z < limit ? flag : !flag;
+        L02_Record40 *wide_record = &D_L02_001B3BD0[i];
+        int flagged = wide_record->z < limit ? flag : !flag;
 
         if (flagged) {
-            if (wideRecord->x > 0.0f)
-                wideRecord->x -= 2048000.0f;
+            if (wide_record->x > 0.0f)
+                wide_record->x -= 2048000.0f;
         } else {
-            if (wideRecord->x < 0.0f)
-                wideRecord->x += 2048000.0f;
+            if (wide_record->x < 0.0f)
+                wide_record->x += 2048000.0f;
         }
     }
 }
@@ -798,17 +798,17 @@ extern float math_fast_sin_or_cos_b(float);
 
 /* Same body as func_L02_003F1A88, with this function's own callees. */
 /* Picks a random spot a few steps away from the target point for the enemy to walk to. */
-void armed_enemy_pick_point_near_target(char *self, char *targetPoint) {
+void armed_enemy_pick_point_near_target(char *self, char *target_point) {
     char *state;
     float angle;
     float radius;
 
-    angle = mat_fast_helper_a(*(float *)(self + 0x10) - *(float *)targetPoint,
-                          *(float *)(self + 0x14) - *(float *)(targetPoint + 4));
+    angle = mat_fast_helper_a(*(float *)(self + 0x10) - *(float *)target_point,
+                          *(float *)(self + 0x14) - *(float *)(target_point + 4));
     angle += math_random_float_range(-0.78539824f, 0.78539824f);
     radius = math_random_float_range(-2.0f, 2.0f) + 8.0f;
     state = *(char **)(self + 0x68);
-    qcopy(state + 0x2D0, targetPoint);
+    qcopy(state + 0x2D0, target_point);
     *(float *)(state + 0x2D0) += radius * math_fast_sin_or_cos_a(angle);
     *(float *)(state + 0x2D4) += radius * math_fast_sin_or_cos_b(angle);
 }

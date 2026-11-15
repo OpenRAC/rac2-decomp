@@ -35,8 +35,8 @@ extern void SetHeroMoveState(int a0, int a1);
 /* Resets the hero when a new area starts: clears the old target, copies the spawn position from the spawn object and sets up the two attached objects. */
 void hero_reset_for_area_start(void) {
     char *hero;
-    char *heroMoby;
-    int attachedItem;
+    char *hero_moby;
+    int attached_item;
 
     attachment_reset_all();
     hero = g_hero_state;
@@ -58,16 +58,16 @@ void hero_reset_for_area_start(void) {
     }
     *(float *)(hero + 0xC24) = 1.0f;
     hero_clear_queued_anim();
-    heroMoby = *(char **)(hero + 0x2290);
-    if (*(unsigned char *)((char *)heroMoby + 0x42) != 0xFF) {
-        attachedItem = anim_copy_entry_data(heroMoby, *(unsigned char *)((char *)heroMoby + 0x42),
-                              *(unsigned char *)((char *)heroMoby + 0x40), D_L01_001B4B00);
-        *(int *)(*(char **)(hero + 0x2290) + 0x58) = attachedItem;
+    hero_moby = *(char **)(hero + 0x2290);
+    if (*(unsigned char *)((char *)hero_moby + 0x42) != 0xFF) {
+        attached_item = anim_copy_entry_data(hero_moby, *(unsigned char *)((char *)hero_moby + 0x42),
+                              *(unsigned char *)((char *)hero_moby + 0x40), D_L01_001B4B00);
+        *(int *)(*(char **)(hero + 0x2290) + 0x58) = attached_item;
     }
-    heroMoby = *(char **)(hero + 0x2290);
-    attachedItem = anim_copy_entry_data(heroMoby, *(unsigned char *)((char *)heroMoby + 0x43),
-                          *(unsigned char *)((char *)heroMoby + 0x41), D_L01_001B5100);
-    *(int *)(*(char **)(hero + 0x2290) + 0x5C) = attachedItem;
+    hero_moby = *(char **)(hero + 0x2290);
+    attached_item = anim_copy_entry_data(hero_moby, *(unsigned char *)((char *)hero_moby + 0x43),
+                          *(unsigned char *)((char *)hero_moby + 0x41), D_L01_001B5100);
+    *(int *)(*(char **)(hero + 0x2290) + 0x5C) = attached_item;
     if (*(int *)(hero + 0x2294) != 0x61 ||
         (D_001A8F40 != 2 && D_001A8F40 != 6))
         SetHeroMoveState(0, 1);

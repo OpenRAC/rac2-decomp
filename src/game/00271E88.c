@@ -34,8 +34,8 @@ void cam_update_grounded(void)
     bottom[2] -= 0.75f;
     for (i = 0; i < 6 && CollLine(top, bottom, 0x12, 0, 0); i++) {
         if (GetCollHitMaterial() == 0) {
-            f32 floorHeight = coll_get_ground_height_at_position(D_001BAFA0, 0) + 0.04f;
-            if (g_active_camera.pos[2] < floorHeight) {
+            f32 floor_height = coll_get_ground_height_at_position(D_001BAFA0, 0) + 0.04f;
+            if (g_active_camera.pos[2] < floor_height) {
                 g_active_camera.grounded = 1;
             } else {
                 g_active_camera.grounded = 0;

@@ -47,7 +47,7 @@ extern char D_L01_002A4C50[];
 /* Updates an object that sits on the water: it waits until water is present, then bobs along and reacts when the camera gets close. */
 void water_surface_update(L01_003C2680_OBJ *moby)
 {
-    char *mobyBytes = (char *)moby;
+    char *moby_bytes = (char *)moby;
     L01_003C2680_OWNED *vars = moby->f68;
     Quad frame[2];
 
@@ -55,15 +55,15 @@ void water_surface_update(L01_003C2680_OBJ *moby)
         func_002A6CF0(D_L01_002A4C50, moby->fAA, moby->fB2);
         return;
     }
-    qcopy(&frame[0], mobyBytes + 0x10);
-    qcopy(&frame[1], mobyBytes + 0xF0);
+    qcopy(&frame[0], moby_bytes + 0x10);
+    qcopy(&frame[1], moby_bytes + 0xF0);
     switch (moby->f20) {
     case 0:
-        if (level_get_water_height(mobyBytes + 0x10) > 0.0f) {
+        if (level_get_water_height(moby_bytes + 0x10) > 0.0f) {
             vars->f120 = math_random_angle();
             vars->f124 = math_random_angle();
             vars->f128 = 0.02f;
-            qcopy(&vars->f130, mobyBytes + 0xF0);
+            qcopy(&vars->f130, moby_bytes + 0xF0);
             qzero(&vars->f140);
             moby_set_state(moby, 1, -1);
         }
@@ -71,7 +71,7 @@ void water_surface_update(L01_003C2680_OBJ *moby)
         moby_init_controller_params(moby, (char *)vars + 0x60, 0, 0, &D_L01_001AFF40, 0, 0, 0, &D_L01_001AFF60, &D_L01_001AFF50, 0);
         return;
     case 1:
-        if (moby->f31 != 0 && vec_distance_xy(mobyBytes + 0x10, D_L01_001B94C0) < 32.0f) {
+        if (moby->f31 != 0 && vec_distance_xy(moby_bytes + 0x10, D_L01_001B94C0) < 32.0f) {
             vars->f68 = level_get_water_height() + D_L01_001AFF6C;
             moby_update_sway(moby, (char *)vars + 0x60, 0);
         }

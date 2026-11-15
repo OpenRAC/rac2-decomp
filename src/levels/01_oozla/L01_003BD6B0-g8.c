@@ -20,29 +20,29 @@ extern void moby_set_state(void *, int, int);
 void mutant_firefly_init(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    float radiusValue;
+    float radius_value;
     L01RadiusRecord *record;
 
     if (!D_L01_001B2088) **(int **)(vars + 0x250) = 0;
     qcopy(vars + 0x1D0, moby + 0x10);
     moby_update_floor_and_ceiling_heights(moby);
-    radiusValue = 0.0f;
+    radius_value = 0.0f;
     *(unsigned char *)(vars + 0x48) = FloatToInt(10.0f);
     *(unsigned char *)(vars + 0x4A) = FloatToInt(4.0f);
     *(unsigned char *)(vars + 0x200) = *(unsigned char *)(moby + 0x30);
     if (*(int *)(vars + 0x294) != -1) {
         record = D_L01_001B21C0;
         record += *(int *)(vars + 0x294);
-        radiusValue = record->radius;
+        radius_value = record->radius;
     }
-    if (radiusValue > 0.0f) *(unsigned char *)(moby + 0x30) = FloatToInt(radiusValue + 2.0f);
+    if (radius_value > 0.0f) *(unsigned char *)(moby + 0x30) = FloatToInt(radius_value + 2.0f);
     *(unsigned char *)(vars + 0x200) = *(unsigned char *)(vars + 0x201) = *(unsigned char *)(moby + 0x30);
     if (*(int *)(vars + 0x298) != -1) {
         record = D_L01_001B21C0;
         record += *(int *)(vars + 0x298);
-        radiusValue = record->radius;
+        radius_value = record->radius;
     }
-    if (radiusValue > 0.0f) *(unsigned char *)(vars + 0x200) = FloatToInt(radiusValue + 2.0f);
+    if (radius_value > 0.0f) *(unsigned char *)(vars + 0x200) = FloatToInt(radius_value + 2.0f);
     if (*(int *)(vars + 0x210) != -1) path_l01_compute_segment_lengths(D_L01_001FE180[*(int *)(vars + 0x210)]);
     if (*(int *)(vars + 0x214) != -1) path_l01_compute_segment_lengths(D_L01_001FE180[*(int *)(vars + 0x214)]);
     *(char **)(vars + 0x10) = vars + 0x50;

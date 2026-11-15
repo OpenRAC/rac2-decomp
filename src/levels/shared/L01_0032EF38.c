@@ -35,11 +35,11 @@ extern unsigned char *D_L01_001FF110;
 L01_EF38Particle *part_l01_spawn_glow(L01_EF38Quad *position, int color, int kind, float scale, float second, int life)
 {
     L01_EF38Particle *particle;
-    L01_EF38Payload *outPayload;
+    L01_EF38Payload *out_payload;
 
     particle = part_alloc(0x34);
     if (particle) {
-        outPayload = &particle->payload;
+        out_payload = &particle->payload;
         qcopy(&particle->position, position);
         particle->color = color;
         particle->b3 = 0x44;
@@ -50,11 +50,11 @@ L01_EF38Particle *part_l01_spawn_glow(L01_EF38Quad *position, int color, int kin
         particle->size = life;
         particle->life = scale * 210000.0f;
         particle->seed = math_random_int_below(255);
-        outPayload->color = color;
-        outPayload->kind = kind;
+        out_payload->color = color;
+        out_payload->kind = kind;
         particle->payload.scale = scale;
-        outPayload->second = second;
-        outPayload->rate = 1.0f / IntToFloat(life);
+        out_payload->second = second;
+        out_payload->rate = 1.0f / IntToFloat(life);
     }
     return particle;
 }

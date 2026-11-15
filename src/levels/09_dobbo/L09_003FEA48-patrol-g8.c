@@ -156,11 +156,11 @@ void patrol_drone_update(char *obj)
                         char *candidate = D_L09_001C3EC0[i];
                         char *hero = g_hero_state;
                         if (candidate != P(hero, 0x2290)) {
-                            int first = 0xCB /* Decoy */;
+                            int first = MOBY_CLASS_DECOY;
                             int kind;
                             if (!candidate) continue;
                             kind = H(candidate, 0xAA);
-                            if (kind != first && kind != 0x76C /* moby class 1900 */ && kind != 0xEB0 /* Dark Sheep */) continue;
+                            if (kind != first && kind != 0x76C /* moby class 1900 */ && kind != MOBY_CLASS_DARK_SHEEP) continue;
                         }
                         {
                             group_flag_peers(obj);

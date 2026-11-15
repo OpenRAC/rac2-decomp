@@ -21,7 +21,7 @@ void ship_build_joint_pointers(u8 *moby)
     u8 *vars = *(u8 **)(moby + 0x68);
     SibRecord128 *records;
     int index;
-    u8 *jointOut;
+    u8 *joint_out;
     u8 *end;
     int count;
     u8 *cursor;
@@ -38,15 +38,15 @@ void ship_build_joint_pointers(u8 *moby)
     tag = D_L07_00227E7F;
     end = cursor + 0x1400;
     count = 0;
-    jointOut = cursor + 0x15B0;
+    joint_out = cursor + 0x15B0;
     do {
         s16 id = *(s16 *)(cursor + 0x1F8);
         u8 *table = D_L07_001B2954;
         if (table[(id << 5) + 0x1D] == tag) {
-            *(u8 **)(cursor + 0x1F0) = jointOut;
+            *(u8 **)(cursor + 0x1F0) = joint_out;
             count++;
             cursor[0x1FE] = 0;
-            jointOut += 0x20;
+            joint_out += 0x20;
         }
         cursor += 0x50;
         if (count >= 8)

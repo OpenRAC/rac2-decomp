@@ -21,39 +21,39 @@ extern float func_002E35A0(float *);
 
 extern float swing_vector __asm__("D_L01_001B2EF0") MACRO_ADDR;
 /* Picks a new random wind direction and a delay before the next change, and how many particles to spawn. */
-void part_pick_random_wind_and_count(int weatherType)
+void part_pick_random_wind_and_count(int weather_type)
 {
-    float windSpeed, changeDelayMin, minCount, maxCount;
+    float wind_speed, change_delay_min, min_count, max_count;
 
-    if (weatherType == 0) {
-        windSpeed = 5.0f;
-        changeDelayMin = 2.0f;
-        maxCount = 8.0f;
-        minCount = 4.0f;
+    if (weather_type == 0) {
+        wind_speed = 5.0f;
+        change_delay_min = 2.0f;
+        max_count = 8.0f;
+        min_count = 4.0f;
     } else {
-        windSpeed = 2.5f;
-        changeDelayMin = 20.0f;
-        maxCount = 3.0f;
-        minCount = 2.0f;
+        wind_speed = 2.5f;
+        change_delay_min = 20.0f;
+        max_count = 3.0f;
+        min_count = 2.0f;
     }
 
     if (D_L01_001AF638 >= 0.0f)
-        minCount = D_L01_001AF638;
+        min_count = D_L01_001AF638;
     if (D_L01_001AF63C >= 0.0f)
-        maxCount = D_L01_001AF63C;
+        max_count = D_L01_001AF63C;
 
     {
-        float k = windSpeed * 0.01666666753590107f;
+        float k = wind_speed * 0.01666666753590107f;
         float v[4];
 
         D_L01_001B2EF0 = func_00310580(-k, k);
         D_L01_001B2EF4[0] = func_00310580(-k, k);
-        D_L01_001B2F00 = func_00310580(changeDelayMin, 10.0f);
+        D_L01_001B2F00 = func_00310580(change_delay_min, 10.0f);
         v[0] = k;
         v[1] = k;
         D_L01_001B2F04 = (int)((func_002E35D0((char *)&swing_vector) /
                             func_002E35A0(v)) *
-                               (maxCount - minCount) +
-                           minCount);
+                               (max_count - min_count) +
+                           min_count);
     }
 }

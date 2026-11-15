@@ -20,33 +20,33 @@ extern int g_game_time __attribute__((sda));
 void part_update_trailing_spark(char *particle)
 {
     char *motion = particle + 0x20;
-    float invLife;
+    float inv_life;
     float speed;
-    float savedPos[4] __attribute__((aligned(16)));
-    float sparkVel[4] __attribute__((aligned(16)));
-    float randomVec[4] __attribute__((aligned(16)));
+    float saved_pos[4] __attribute__((aligned(16)));
+    float spark_vel[4] __attribute__((aligned(16)));
+    float random_vec[4] __attribute__((aligned(16)));
 
     if (FastDecTimer((short *)(particle + 0xA))) {
         part_kill(particle);
         return;
     }
-    invLife = 1.0f / IntToFloat(*(short *)(motion + 0x18));
-    *(float *)(particle + 0xC) = IntToFloat(*(short *)(particle + 0xA)) * *(float *)(motion + 0x1C) * invLife;
-    *(int *)(particle + 4) = moby_forward_two_values_and_amount(*(int *)(motion + 0x14), *(int *)(motion + 0x10), IntToFloat(*(short *)(particle + 0xA)) * invLife);
+    inv_life = 1.0f / IntToFloat(*(short *)(motion + 0x18));
+    *(float *)(particle + 0xC) = IntToFloat(*(short *)(particle + 0xA)) * *(float *)(motion + 0x1C) * inv_life;
+    *(int *)(particle + 4) = moby_forward_two_values_and_amount(*(int *)(motion + 0x14), *(int *)(motion + 0x10), IntToFloat(*(short *)(particle + 0xA)) * inv_life);
     FastVecAdd((particle + 0x10), (particle + 0x10), motion);
     *(float *)(motion + 8) -= 0.001f;
-    qcopy(savedPos, particle + 0x10);
+    qcopy(saved_pos, particle + 0x10);
     if (*(short *)(motion + 0x1A) != 0 && (g_game_time & 1)) {
-        *(TI *)randomVec = 0;
-        randomVec[0] = math_random_float_range(-1.0f, 1.0f);
-        randomVec[1] = math_random_float_range(-1.0f, 1.0f);
-        randomVec[2] = math_random_float_range(-1.0f, 1.0f);
-        *(TI *)sparkVel = *(TI *)randomVec;
+        *(TI *)random_vec = 0;
+        random_vec[0] = math_random_float_range(-1.0f, 1.0f);
+        random_vec[1] = math_random_float_range(-1.0f, 1.0f);
+        random_vec[2] = math_random_float_range(-1.0f, 1.0f);
+        *(TI *)spark_vel = *(TI *)random_vec;
         speed = FastVecLength(motion);
-        vec_scale_to_length(sparkVel, sparkVel, speed * math_random_float_range(0.21f, 0.25f));
-        FastVecAdd(sparkVel, sparkVel, motion);
-        FastVecScale(sparkVel, sparkVel, math_random_float_range(0.75f, 0.95f));
-        part_spawn_trailing_spark((particle + 0x10), sparkVel, *(int *)(particle + 4), *(int *)(motion + 0x14), math_random_int_range(15, 20), 0, *(float *)(particle + 0xC));
+        vec_scale_to_length(spark_vel, spark_vel, speed * math_random_float_range(0.21f, 0.25f));
+        FastVecAdd(spark_vel, spark_vel, motion);
+        FastVecScale(spark_vel, spark_vel, math_random_float_range(0.75f, 0.95f));
+        part_spawn_trailing_spark((particle + 0x10), spark_vel, *(int *)(particle + 4), *(int *)(motion + 0x14), math_random_int_range(15, 20), 0, *(float *)(particle + 0xC));
     } else {
         FastVecScale(motion, motion, 0.96f);
     }

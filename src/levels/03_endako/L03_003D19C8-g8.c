@@ -75,7 +75,7 @@ void clank_scene_switch_update(char *moby)
                     I(existing, 0x98) = 0;
                     H(existing, 0x34) = (H(existing, 0x34) | 0x41) & ~0x1000;
                 }
-                spawned = func_3113F0(0x57 /* Clank */);
+                spawned = func_3113F0(MOBY_CLASS_CLANK);
                 func_32AA20(spawned, moby);
                 qcopy_nc(spawned + 0x10, D_L03_001B2B0C[I(vars, 4)].position);
                 qcopy_nc(spawned + 0xF0, D_L03_001B2B0C[I(vars, 4)].rotation);

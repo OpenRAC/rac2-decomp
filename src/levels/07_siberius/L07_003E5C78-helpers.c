@@ -10,11 +10,11 @@ extern void vec_scale_to_length(void *, void *, float);
 
 /* Sends an idle entity to a new spot and shrinks it to a tenth of its size, ready to be
    launched. */
-void entity_send_and_shrink(char *entity, char *newPos, char *homePos, char *platform)
+void entity_send_and_shrink(char *entity, char *new_pos, char *home_pos, char *platform)
 {
     char *ptr;
     unsigned short flags;
-    int rowsLeft;
+    int rows_left;
 
     if (*(unsigned char *)(entity + 0x20) != 8)
         return;
@@ -24,22 +24,22 @@ void entity_send_and_shrink(char *entity, char *newPos, char *homePos, char *pla
     *(int *)(entity + 0x98) = 0;
     moby_set_state((unsigned char *)entity, 9, 4);
 
-    qcopy(entity + 0x10, newPos);
-    qcopy(ptr + 0x230, homePos);
+    qcopy(entity + 0x10, new_pos);
+    qcopy(ptr + 0x230, home_pos);
     *(int *)(ptr + 0x260) = (int)platform;
     *(unsigned char *)(entity + 0x7F) = 0;
 
     if (platform != 0) {
-        FastVecSub(ptr + 0x220, homePos, platform + 0x10);
+        FastVecSub(ptr + 0x220, home_pos, platform + 0x10);
         vec_transform_by_object_or_given(platform, ptr + 0x220, ptr + 0x220, 0);
     }
     flags = *(unsigned short *)(entity + 0x34);
     ptr = entity + 0xC0;
-    rowsLeft = 2;
+    rows_left = 2;
     *(unsigned short *)(entity + 0x34) = flags | 0x100;
     do {
         vec_scale_to_length(ptr, ptr, 0.1f);
         ptr += 0x10;
-        rowsLeft--;
-    } while (rowsLeft >= 0);
+        rows_left--;
+    } while (rows_left >= 0);
 }

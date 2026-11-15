@@ -158,17 +158,17 @@ void mutant_squirrel_update(u8 *moby) {
     case 5: {
         u8 *position=moby+0x10;
         u8 *target=*(u8 **)(vars+0x368);
-        int animFlags;
+        int anim_flags;
         angle=mat_fast_helper_a(g_hero_state.position[0]-*(float *)(target+0x10),g_hero_state.position[1]-*(float *)(target+0x14));
         moby_step_controller(moby,position,angle);
-        animFlags=moby[0x60];
-        animFlags&=2;
-        if(animFlags) {
+        anim_flags=moby[0x60];
+        anim_flags&=2;
+        if(anim_flags) {
             moby_set_state(moby,6,-1);
             if(moby[0x43]!=7) anim_start_blended(moby,7,0,20);
         } else {
-            animFlags=*(u16 *)(moby+0x96);
-            if(animFlags==20) squirrel_alert_group(moby);
+            anim_flags=*(u16 *)(moby+0x96);
+            if(anim_flags==20) squirrel_alert_group(moby);
         }
         break; }
     case 6:
@@ -182,13 +182,13 @@ void mutant_squirrel_update(u8 *moby) {
             moby_set_state(moby,6,-1);
             if(moby[0x43]!=7) anim_start_blended(moby,7,0,10);
         } else {
-            float animTime;
-            u8 *yawField=moby+0xF8;
+            float anim_time;
+            u8 *yaw_field=moby+0xF8;
             u8 *target=*(u8 **)(vars+0x368);
             angle=mat_fast_helper_a(*(float *)(target+0x10)-*(float *)(moby+0x10),*(float *)(target+0x14)-*(float *)(moby+0x14));
-            StepAngleTowardTarget(yawField,0,angle,0.058177649974823f);
-            animTime=moby_get_anim_value(moby);
-            if(12.0f<=animTime && animTime<=14.0f) coll_test_hit_at_bone(moby,2,1,0,1,0,0.25f,vars[0x34],1.0f);
+            StepAngleTowardTarget(yaw_field,0,angle,0.058177649974823f);
+            anim_time=moby_get_anim_value(moby);
+            if(12.0f<=anim_time && anim_time<=14.0f) coll_test_hit_at_bone(moby,2,1,0,1,0,0.25f,vars[0x34],1.0f);
             moby_step_at_own_position(moby);
         }
         break;
@@ -211,15 +211,15 @@ void mutant_squirrel_update(u8 *moby) {
         }
         break;
     case 12: {
-        float animTime;
+        float anim_time;
         if(*(u8 **)(vars+0x374)) {
             moby_l01_turn_toward_target(moby,*(u8 **)(vars+0x374)+0x10);
-            animTime=moby_get_anim_value(moby);
-            if(11.0f<=animTime) {
+            anim_time=moby_get_anim_value(moby);
+            if(11.0f<=anim_time) {
                 int release=1;
                 matrix_mul_vec3(temp,D_L12_001B0A30,moby+0xC0);
                 FastVecAdd(temp,temp,moby+0x10);
-                if(!(14.0f<=animTime)) release=0;
+                if(!(14.0f<=anim_time)) release=0;
                 sub_object_start_move(*(u8 **)(vars+0x374),temp,moby+0xF0,release);
                 if(release) *(int *)(vars+0x374)=0;
             }

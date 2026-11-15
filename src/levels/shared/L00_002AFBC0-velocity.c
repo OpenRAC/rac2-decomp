@@ -52,10 +52,10 @@ extern float hero_get_speed_along_forward(void *);
 /* Moves the hero's velocity toward the requested one, accelerating harder when reversing. */
 void ApproachHeroVelocity(float rate)
 {
-    float wantedVel[4] __attribute__((aligned(16)));
-    float targetCopy[4] __attribute__((aligned(16)));
-    float flatVel[4] __attribute__((aligned(16)));
-    float angle, speed, dot, wantedLen, currentLen;
+    float wanted_vel[4] __attribute__((aligned(16)));
+    float target_copy[4] __attribute__((aligned(16)));
+    float flat_vel[4] __attribute__((aligned(16)));
+    float angle, speed, dot, wanted_len, current_len;
 
     switch (g_hero_state.moveMode) {
     case 0:
@@ -65,17 +65,17 @@ void ApproachHeroVelocity(float rate)
             speed = 0.0833333358f;
         if (g_hero_state.f34A && g_hero_state.f2294 == 14 && speed > 0.0166666675f)
             speed = 0.0166666675f;
-        wantedVel[0] = math_fast_sin_or_cos_a(angle) * speed;
-        wantedVel[1] = math_fast_sin_or_cos_b(angle) * speed;
-        wantedVel[2] = g_hero_state.velocity[2];
-        dot = -(g_hero_state.velocity[0] * wantedVel[0] + g_hero_state.velocity[1] * wantedVel[1]);
-        wantedLen = vec_length_xy(wantedVel);
-        currentLen = vec_length_xy(g_hero_state.velocity);
-        if (wantedLen == 0.0f || currentLen == 0.0f) {
+        wanted_vel[0] = math_fast_sin_or_cos_a(angle) * speed;
+        wanted_vel[1] = math_fast_sin_or_cos_b(angle) * speed;
+        wanted_vel[2] = g_hero_state.velocity[2];
+        dot = -(g_hero_state.velocity[0] * wanted_vel[0] + g_hero_state.velocity[1] * wanted_vel[1]);
+        wanted_len = vec_length_xy(wanted_vel);
+        current_len = vec_length_xy(g_hero_state.velocity);
+        if (wanted_len == 0.0f || current_len == 0.0f) {
             dot = 0.0f;
         } else {
-            dot /= wantedLen;
-            dot /= currentLen;
+            dot /= wanted_len;
+            dot /= current_len;
         }
         dot += 1.0f;
         dot *= 1.5f;
@@ -84,31 +84,31 @@ void ApproachHeroVelocity(float rate)
         if (dot < 1.0f)
             dot = 1.0f;
         rate *= dot;
-        FastVecSub(wantedVel, wantedVel, g_hero_state.velocity);
-        if (vec_length_xy(wantedVel) > rate)
-            vec_fast_normalize_helper(wantedVel, wantedVel, rate);
-        FastVecAdd(g_hero_state.velocity, g_hero_state.velocity, wantedVel);
+        FastVecSub(wanted_vel, wanted_vel, g_hero_state.velocity);
+        if (vec_length_xy(wanted_vel) > rate)
+            vec_fast_normalize_helper(wanted_vel, wanted_vel, rate);
+        FastVecAdd(g_hero_state.velocity, g_hero_state.velocity, wanted_vel);
         qcopy(g_hero_state.lastVelocity, g_hero_state.velocity);
-        *(Quad *)targetCopy = *(Quad *)g_hero_state.vecA60;
-        g_hero_state.f1B4 = g_hero_state.f178 - hero_get_speed_along_forward(targetCopy);
+        *(Quad *)target_copy = *(Quad *)g_hero_state.vecA60;
+        g_hero_state.f1B4 = g_hero_state.f178 - hero_get_speed_along_forward(target_copy);
         if (g_hero_state.f1454)
             g_hero_state.f1B4 = g_hero_state.f174;
         break;
     case 1:
     case 2:
-        *(Quad *)targetCopy = *(Quad *)g_hero_state.targetDir;
+        *(Quad *)target_copy = *(Quad *)g_hero_state.targetDir;
         speed = g_hero_state.inputSpeed;
-        cam_set_view_space_height(wantedVel, targetCopy, 0.0f);
-        vec_scale_to_length(wantedVel, wantedVel, speed);
-        cam_set_view_space_height(flatVel, g_hero_state.velocity, 0.0f);
-        dot = -FastVecDot(flatVel, wantedVel);
-        wantedLen = cam_get_view_space_vector_length(wantedVel);
-        currentLen = cam_get_view_space_vector_length(g_hero_state.velocity);
-        if (wantedLen == 0.0f || currentLen == 0.0f) {
+        cam_set_view_space_height(wanted_vel, target_copy, 0.0f);
+        vec_scale_to_length(wanted_vel, wanted_vel, speed);
+        cam_set_view_space_height(flat_vel, g_hero_state.velocity, 0.0f);
+        dot = -FastVecDot(flat_vel, wanted_vel);
+        wanted_len = cam_get_view_space_vector_length(wanted_vel);
+        current_len = cam_get_view_space_vector_length(g_hero_state.velocity);
+        if (wanted_len == 0.0f || current_len == 0.0f) {
             dot = 0.0f;
         } else {
-            dot /= wantedLen;
-            dot /= currentLen;
+            dot /= wanted_len;
+            dot /= current_len;
         }
         dot += 1.0f;
         dot *= 1.5f;
@@ -117,11 +117,11 @@ void ApproachHeroVelocity(float rate)
         if (dot < 1.0f)
             dot = 1.0f;
         rate *= dot;
-        FastVecSub(wantedVel, wantedVel, g_hero_state.velocity);
-        cam_set_view_space_height(wantedVel, wantedVel, 0.0f);
-        if (cam_get_view_space_vector_length(wantedVel) > rate)
-            cam_set_view_space_vector_length(wantedVel, wantedVel, rate);
-        FastVecAdd(g_hero_state.velocity, g_hero_state.velocity, wantedVel);
+        FastVecSub(wanted_vel, wanted_vel, g_hero_state.velocity);
+        cam_set_view_space_height(wanted_vel, wanted_vel, 0.0f);
+        if (cam_get_view_space_vector_length(wanted_vel) > rate)
+            cam_set_view_space_vector_length(wanted_vel, wanted_vel, rate);
+        FastVecAdd(g_hero_state.velocity, g_hero_state.velocity, wanted_vel);
         g_hero_state.f1B4 = g_hero_state.f178;
         if (g_hero_state.f1454)
             g_hero_state.f1B4 = g_hero_state.f174;

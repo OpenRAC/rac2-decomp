@@ -234,8 +234,8 @@ void hero_l07_update_state_machine(void) {
     f32 sp108;
     f32 sp10C;
     f32 sp110;
-    s32 movementStep;
-    s32 animationNow;
+    s32 movement_step;
+    s32 animation_now;
     s32 sp11C;
     f32 temp_f0;
     f32 temp_f0_10;
@@ -503,7 +503,7 @@ void hero_l07_update_state_machine(void) {
     void* temp_a1;
     void* temp_a1_2;
     void* temp_a1_6;
-    void* heroObject;
+    void* hero_object;
     void* hero7C;
     f32 turn24;
     f32 ang82;
@@ -550,9 +550,9 @@ void hero_l07_update_state_machine(void) {
     void* var_s1_5;
     void* var_v0_3;
 
-    movementStep = ((Hero *)g_hero_state)->i[0x2298/4];
-    heroObject = ((Hero *)g_hero_state)->ptr[0x2290/4];
-    animationNow = (s32) M2C_FIELD(heroObject, u8* , 0x43);
+    movement_step = ((Hero *)g_hero_state)->i[0x2298/4];
+    hero_object = ((Hero *)g_hero_state)->ptr[0x2290/4];
+    animation_now = (s32) M2C_FIELD(hero_object, u8* , 0x43);
     switch (((Hero *)g_hero_state)->u[0x2294/4]) {                              /* switch 1 */
     case 0x0:                                       /* switch 1 */
     case 0x1:                                       /* switch 1 */
@@ -751,7 +751,7 @@ void hero_l07_update_state_machine(void) {
         }
         var_v0_3 = ((Hero *)g_hero_state)->ptr[0xB10/4];
         if (var_v0_3 != 0) {
-            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(M2C_FIELD(var_v0_3, f32* , 0x10) - M2C_FIELD(heroObject, f32* , 0x10), M2C_FIELD(var_v0_3, f32* , 0x14) - M2C_FIELD(heroObject, f32* , 0x14));
+            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(M2C_FIELD(var_v0_3, f32* , 0x10) - M2C_FIELD(hero_object, f32* , 0x10), M2C_FIELD(var_v0_3, f32* , 0x14) - M2C_FIELD(hero_object, f32* , 0x14));
             hero_steer_heading(0, 0.02f, 0.15f, 0.10471977f);
         }
         break;
@@ -769,7 +769,7 @@ void hero_l07_update_state_machine(void) {
         }
         var_v0_3_u2 = ((Hero *)g_hero_state)->ptr[0xAA4/4];
         if (var_v0_3_u2 != 0) {
-            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(M2C_FIELD(var_v0_3_u2, f32* , 0x10) - M2C_FIELD(heroObject, f32* , 0x10), M2C_FIELD(var_v0_3_u2, f32* , 0x14) - M2C_FIELD(heroObject, f32* , 0x14));
+            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(M2C_FIELD(var_v0_3_u2, f32* , 0x10) - M2C_FIELD(hero_object, f32* , 0x10), M2C_FIELD(var_v0_3_u2, f32* , 0x14) - M2C_FIELD(hero_object, f32* , 0x14));
             hero_steer_heading(0, 0.02f, 0.15f, 0.10471977f);
         }
         break;
@@ -785,7 +785,7 @@ void hero_l07_update_state_machine(void) {
         if (temp_v1_16 == 0) {
             ApproachValue((s32) (((void*)g_hero_state) + 0xAA0), 0.45000002f, 0.022222223f);
             temp_v0_5 = ((Hero *)g_hero_state)->ptr[0xAA4/4];
-            var_f20_2 = mat_fast_helper_a(M2C_FIELD(temp_v0_5, f32* , 0x10) - M2C_FIELD(heroObject, f32* , 0x10), M2C_FIELD(temp_v0_5, f32* , 0x14) - M2C_FIELD(heroObject, f32* , 0x14));
+            var_f20_2 = mat_fast_helper_a(M2C_FIELD(temp_v0_5, f32* , 0x10) - M2C_FIELD(hero_object, f32* , 0x10), M2C_FIELD(temp_v0_5, f32* , 0x14) - M2C_FIELD(hero_object, f32* , 0x14));
             if (((Hero *)g_hero_state)->i[0x3A0/4] != 0) {
                 if (FastDiffRots(((Hero *)g_hero_state)->f[0x98/4], var_f20_2) > 1.5707964f) {
                     var_f20_2 = FastAddRotations(var_f20_2, 3.1415927f);
@@ -836,7 +836,7 @@ void hero_l07_update_state_machine(void) {
         FastVecSub((s32)(g_hero_state + 0xF0), (s32) ((TI128*)v20), (s32)(g_hero_state + 0x80));
         break;
     case 0x2B:                                      /* switch 1 */
-        if ((((Hero *)g_hero_state)->i[0xC28/4] & 2) && (M2C_FIELD(heroObject, u8* , 0x43) == 0x34)) {
+        if ((((Hero *)g_hero_state)->i[0xC28/4] & 2) && (M2C_FIELD(hero_object, u8* , 0x43) == 0x34)) {
             set_hero_animation(0x35, 0xA, 12.0f);
             ((Hero *)g_hero_state)->f[0xC20/4] = 0.3f;
         }
@@ -958,7 +958,7 @@ void hero_l07_update_state_machine(void) {
                 var_v0_4 = hero_get_speed_along_forward((s32) ((TI128*)v30)) > 0.0f;
             }
             if (var_v0_4 != 0) {
-                if (M2C_FIELD(heroObject, u8* , 0x43) != 0x35) {
+                if (M2C_FIELD(hero_object, u8* , 0x43) != 0x35) {
                     set_hero_animation(0x35, 6, 17.0f);
                     ((Hero *)g_hero_state)->h[0xAFC/2] = 1;
                 } else {
@@ -968,7 +968,7 @@ void hero_l07_update_state_machine(void) {
                         ((Hero *)g_hero_state)->h[0xAFC/2] = 0;
                     }
                 }
-            } else if (M2C_FIELD(heroObject, u8* , 0x43) != 0x35) {
+            } else if (M2C_FIELD(hero_object, u8* , 0x43) != 0x35) {
                 set_hero_animation(0x35, 0x15, 9.0f);
                 ((Hero *)g_hero_state)->h[0xAFC/2] = 2;
             } else {
@@ -2003,10 +2003,10 @@ void hero_l07_update_state_machine(void) {
         vec_clear_128((s32)(g_hero_state + 0xF0));
         break;
     }
-    if (movementStep != ((Hero *)g_hero_state)->i[0x2298/4]) {
+    if (movement_step != ((Hero *)g_hero_state)->i[0x2298/4]) {
         ((Hero *)g_hero_state)->i[0x1C0/4] = 0;
     }
-    if (animationNow != M2C_FIELD(heroObject, u8* , 0x43)) {
+    if (animation_now != M2C_FIELD(hero_object, u8* , 0x43)) {
         ((Hero *)g_hero_state)->i[0x1C4/4] = 0;
     }
 }

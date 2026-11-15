@@ -29,36 +29,36 @@ extern f32 square_root(f32);
 extern f32 math_fabs(f32);
 
 /* Solves a quadratic equation and returns how many real roots it has (0, 1 or 2), larger root first. */
-s32 math_solve_quadratic(f32 *rootHigh, f32 *rootLow, f32 a, f32 b, f32 c) {
-    f32 sqrtPart;
-    f32 lowRoot;
-    f32 fourAc;
-    f32 highRoot;
+s32 math_solve_quadratic(f32 *root_high, f32 *root_low, f32 a, f32 b, f32 c) {
+    f32 sqrt_part;
+    f32 low_root;
+    f32 four_ac;
+    f32 high_root;
     f32 discriminant;
-    f32 negB;
-    f32 twoA;
-    s32 rootCount;
+    f32 neg_b;
+    f32 two_a;
+    s32 root_count;
 
-    fourAc = a * (c * 4.0f);
-    discriminant = (b * b) - fourAc;
+    four_ac = a * (c * 4.0f);
+    discriminant = (b * b) - four_ac;
     if (discriminant == 0.0f) {
-        *rootHigh = -b / (2.0f * a);
+        *root_high = -b / (2.0f * a);
         return 1;
     }
-    sqrtPart = square_root(math_fabs(discriminant));
-    negB = -b;
-    twoA = 2.0f * a;
-    lowRoot = (negB - sqrtPart) / twoA;
-    *rootHigh = (negB + sqrtPart) / twoA;
-    *rootLow = lowRoot;
-    highRoot = *rootHigh;
-    if (highRoot < lowRoot) {
-        *rootLow = highRoot;
-        *rootHigh = lowRoot;
+    sqrt_part = square_root(math_fabs(discriminant));
+    neg_b = -b;
+    two_a = 2.0f * a;
+    low_root = (neg_b - sqrt_part) / two_a;
+    *root_high = (neg_b + sqrt_part) / two_a;
+    *root_low = low_root;
+    high_root = *root_high;
+    if (high_root < low_root) {
+        *root_low = high_root;
+        *root_high = low_root;
     }
-    rootCount = 0;
+    root_count = 0;
     if (discriminant > 0.0f) {
-        rootCount = 2;
+        root_count = 2;
     }
-    return rootCount;
+    return root_count;
 }

@@ -14,10 +14,10 @@ extern int point_in_path_xy(void *, void *, int);
 /* Tells whether the hero is inside the camera volume of this camera moby. */
 int cam_is_hero_in_volume(char *moby) {
     int force = 0;
-    char *cameraState = (char *)D_L06_001B9890;
+    char *camera_state = (char *)D_L06_001B9890;
     int idx = *(s16 *)(moby + 0x84);
     char *volume = D_L06_001B21C4[0][idx].st;
-    int disabled = *(s16 *)(cameraState + 0x86);
+    int disabled = *(s16 *)(camera_state + 0x86);
     if (disabled) return 0;
     if (*(s16 *)(volume+0x2C)==2 && D_0018C0BC==26 && *(s16 *)(volume+0x2E)>0) force=1;
     else if (*(s16 *)(volume+0x2C)==4 && D_0018C2C0==3) force=*(s16 *)(volume+0x2E)>0;

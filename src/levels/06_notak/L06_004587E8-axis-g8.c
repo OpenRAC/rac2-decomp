@@ -56,7 +56,7 @@ void trail_l06_projectile_update(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     char *hit;
     float *impact;
-    char *soundRecord;
+    char *sound_record;
     int snd, index, row, col;
     char *slot;
     int k, j, sign;
@@ -91,8 +91,8 @@ void trail_l06_projectile_update(char *moby) {
             part_emit_paired_spin(impact, 20);
             snd = *(int *)(vars + 0x4C);
             if (snd != -1) {
-                soundRecord = g_sound_state + snd * 0x70;
-                if (*(char **)(soundRecord + 0x88) == moby && *(unsigned char *)(soundRecord + 0x74)) snd_stop_voice(snd);
+                sound_record = g_sound_state + snd * 0x70;
+                if (*(char **)(sound_record + 0x88) == moby && *(unsigned char *)(sound_record + 0x74)) snd_stop_voice(snd);
             }
             *(int *)(vars + 0x4C) = -1;
             moby_set_state(moby, 1, -1);

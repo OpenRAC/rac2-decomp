@@ -81,9 +81,9 @@ extern void level_advance_checked_cursor(void);
 /* Every frame, tracks player stats and unlocks. It counts quick left-right stick flicks, counts long airborne times, and checks a few conditions that award skill points. */
 void hero_update_stat_trackers(void)
 {
-    float stick[4], stickMagnitude;
-    int isNegative,slot,itemCount;
-    State_b *heroState;
+    float stick[4], stick_magnitude;
+    int is_negative,slot,item_count;
+    State_b *hero_state;
     if((g_equipment_bits&0xbb50)==0xbb50 && !D_001A7A70[0xD]) {
         D_001A7A70[0xD]=1;
         (void)snd_play_from_global_bank(1,0,0);
@@ -94,45 +94,45 @@ void hero_update_stat_trackers(void)
         qzero_nc(stick);
         stick[0]=g_pad_state.x;
         stick[1]=g_pad_state.y;
-        stickMagnitude=math_fabs(stick[0]);
-        isNegative=stick[0]<0.0f;
-        heroState=&g_hero_state;
-        switch(heroState->f780) {
+        stick_magnitude=math_fabs(stick[0]);
+        is_negative=stick[0]<0.0f;
+        hero_state=&g_hero_state;
+        switch(hero_state->f780) {
         case 0:
-            if(stickMagnitude>0.8f) {
-                heroState->f784=isNegative;
-                heroState->f780=1;
-                heroState->f788=0;
-                heroState->f78c=0;
+            if(stick_magnitude>0.8f) {
+                hero_state->f784=is_negative;
+                hero_state->f780=1;
+                hero_state->f788=0;
+                hero_state->f78c=0;
             }
             break;
         case 1:
-            ++heroState->f788;
-            if(stickMagnitude<0.2f) {
-                if(heroState->f788>=11) { heroState->f78c=0; heroState->f780=2; } else
-                heroState->f780=0;
-            } else if(heroState->f784!=isNegative) {
-                if(heroState->f788>=11) { heroState->f78c=0; heroState->f780=3; } else
-                heroState->f780=0;
+            ++hero_state->f788;
+            if(stick_magnitude<0.2f) {
+                if(hero_state->f788>=11) { hero_state->f78c=0; hero_state->f780=2; } else
+                hero_state->f780=0;
+            } else if(hero_state->f784!=is_negative) {
+                if(hero_state->f788>=11) { hero_state->f78c=0; hero_state->f780=3; } else
+                hero_state->f780=0;
             }
             break;
         case 2:
-            ++heroState->f78c;
-            if(stickMagnitude>0.8f && isNegative!=heroState->f784) {
-                heroState->f78c=0; heroState->f780=3;
+            ++hero_state->f78c;
+            if(stick_magnitude>0.8f && is_negative!=hero_state->f784) {
+                hero_state->f78c=0; hero_state->f780=3;
                 break;
             }
             if(g_hero_state.f78c>120) g_hero_state.f780=0;
             break;
         case 3:
-            ++heroState->f78c;
-            if(heroState->f78c>40 && heroState->f78c>heroState->f788+20) {
+            ++hero_state->f78c;
+            if(hero_state->f78c>40 && hero_state->f78c>hero_state->f788+20) {
                 if(g_progress_statistics.f1e0<65535) ++g_progress_statistics.f1e0;
                 if(D_001A7390>g_progress_statistics.f1e4) g_progress_statistics.f1e4=D_001A7390;
                 { unsigned int bit = 1u << g_current_map_index; g_progress_statistics.f1e8=(g_progress_statistics.f1e8|bit)|0x80000000u; }
                 if(g_progress_statistics.f1e0>=2) subtitle_request_voice_line(0x9ca,0x21);
-                heroState->f780=0;
-            } else if(stickMagnitude<0.2f || isNegative==g_hero_state.f784) g_hero_state.f780=0;
+                hero_state->f780=0;
+            } else if(stick_magnitude<0.2f || is_negative==g_hero_state.f784) g_hero_state.f780=0;
             break;
         }
     }
@@ -140,11 +140,11 @@ void hero_update_stat_trackers(void)
         if(!g_subtitle_history.f2dc && !D_0018C84C[0]) {
             unsigned char *map=g_item_slot_to_record;
             CountedEntry *entries=g_weapon_l00_table;
-            itemCount=0;
+            item_count=0;
             for(slot=0;slot<56;slot++) {
-                if(!entries[*(unsigned char *)(slot+(unsigned int)map)].kind && slot!=10 && g_item_owned_flags[slot]) itemCount++;
+                if(!entries[*(unsigned char *)(slot+(unsigned int)map)].kind && slot!=10 && g_item_owned_flags[slot]) item_count++;
             }
-            if(itemCount>=9) subtitle_request_voice_line(0x9e6,0x3d);
+            if(item_count>=9) subtitle_request_voice_line(0x9e6,0x3d);
         }
         if(g_hero_state.f229c==17 && g_hero_state.f1bc>300 && !g_hero_state.f24fc && !g_subtitle_history.f5b8 && !g_hero_state.f1fe && *(int *)(*(char **)(g_hero_state.f2290+0x24)+0x134)) subtitle_request_voice_line(0xa23,0x7a);
         if(g_player_bolts[2]==80 && !g_subtitle_history.f66c) {

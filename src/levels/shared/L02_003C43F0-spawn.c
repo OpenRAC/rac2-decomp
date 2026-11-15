@@ -18,7 +18,7 @@ extern char *CreateMoby(int);
 extern void func_002A0F48(void *);
 
 /* Spawns a moby of class 2906 at a position and fills in its private values. Returns the new object, or 0 if none could be made. */
-char *part_spawn_trail_effect_moby(TI128 *position, TI128 *dataVec0, TI128 *dataVec10, unsigned char flag75,
+char *part_spawn_trail_effect_moby(TI128 *position, TI128 *data_vec0, TI128 *data_vec10, unsigned char flag75,
                         unsigned char flag76, unsigned char flag77, float value6C, float value68, float value64) {
     char *moby;
     char *vars;
@@ -34,8 +34,8 @@ char *part_spawn_trail_effect_moby(TI128 *position, TI128 *dataVec0, TI128 *data
     header->flags = 0xFF;
     header->mode = 0;
     vars = *(char **)(moby + 0x68);
-    qcopy(vars, dataVec0);
-    qcopy(vars + 0x10, dataVec10);
+    qcopy(vars, data_vec0);
+    qcopy(vars + 0x10, data_vec10);
     *(int *)(vars + 0x70) = 0x10E;
     *(unsigned char *)(vars + 0x75) = flag75;
     *(unsigned char *)(vars + 0x76) = flag76;

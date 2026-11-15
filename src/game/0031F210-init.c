@@ -40,7 +40,7 @@ int group_enemy_init_update(char *self)
     int changed, result;
     float pos[4];
     unsigned short *list;
-    char *peerObj, *peerVars;
+    char *peer_obj, *peer_vars;
     if (B(self,0x20)==0) {
         F(self,0x2C)*=1.1f;
         B(self,0x7E)|=1;
@@ -112,13 +112,13 @@ int group_enemy_init_update(char *self)
         if((result==4 || result==5 || changed) && B(self,0x21)<=D_001B1B78 && moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
             list=D_001EE5A0[B(self,0x21)];
             for (;;) {
-                peerObj=D_001B1B5C+((*list&0x7FFF)<<8);
-                if (*(short *)(peerObj+0xAA)==0xB0A) {
-                    peerVars=P(peerObj,0x68);
-                    if (!I(peerVars,0x294)) { I(peerVars,0x294)=1; break; }
-                } else if (*(short *)(peerObj+0xAA)==0xB0B) {
-                    peerVars=P(peerObj,0x68);
-                    if (!I(peerVars,0x294)) { I(peerVars,0x294)=1; goto done1; }
+                peer_obj=D_001B1B5C+((*list&0x7FFF)<<8);
+                if (*(short *)(peer_obj+0xAA)==0xB0A) {
+                    peer_vars=P(peer_obj,0x68);
+                    if (!I(peer_vars,0x294)) { I(peer_vars,0x294)=1; break; }
+                } else if (*(short *)(peer_obj+0xAA)==0xB0B) {
+                    peer_vars=P(peer_obj,0x68);
+                    if (!I(peer_vars,0x294)) { I(peer_vars,0x294)=1; goto done1; }
                 }
                 if ((short)*list++<0) goto done1;
             }
@@ -131,13 +131,13 @@ int group_enemy_init_update(char *self)
         if(moby_count_group_not_in_state(B(self,0x21),-1)>=2) {
             list=D_001EE5A0[B(self,0x21)];
             for (;;) {
-                peerObj=D_001B1B5C+((*list&0x7FFF)<<8);
-                if (*(short *)(peerObj+0xAA)==0xB0A) {
-                    peerVars=P(peerObj,0x68);
-                    if (!I(peerVars,0x294)) { I(peerVars,0x294)=1; break; }
-                } else if (*(short *)(peerObj+0xAA)==0xB0B) {
-                    peerVars=P(peerObj,0x68);
-                    if (!I(peerVars,0x294)) { I(peerVars,0x294)=1; goto done2; }
+                peer_obj=D_001B1B5C+((*list&0x7FFF)<<8);
+                if (*(short *)(peer_obj+0xAA)==0xB0A) {
+                    peer_vars=P(peer_obj,0x68);
+                    if (!I(peer_vars,0x294)) { I(peer_vars,0x294)=1; break; }
+                } else if (*(short *)(peer_obj+0xAA)==0xB0B) {
+                    peer_vars=P(peer_obj,0x68);
+                    if (!I(peer_vars,0x294)) { I(peer_vars,0x294)=1; goto done2; }
                 }
                 if ((short)*list++<0) goto done2;
             }

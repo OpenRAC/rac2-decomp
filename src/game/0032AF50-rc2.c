@@ -39,44 +39,44 @@ void part_update_trail_nodes(s8 *owner) {
     s8 *table ;
     s8 *node;
     s8 *velocity;
-    s8 *timerPtr;
+    s8 *timer_ptr;
     s8 *hero;
-    s32 ownerCount;
+    s32 owner_count;
     s32 count;
-    s32 fadeLeft;
+    s32 fade_left;
     f32 drift[3];
-    f32 lifeNow;
-    f32 lifeRatio;
+    f32 life_now;
+    f32 life_ratio;
 
     count = 0;
     table = g_trail_nodes;
-    timerPtr = table + 0x3C;
+    timer_ptr = table + 0x3C;
     velocity = table + 0x10;
     node = table;
     hero = g_hero_state;
-    ownerCount = *(s32 *)(owner + 0x68);
+    owner_count = *(s32 *)(owner + 0x68);
     do {
         count++;
         if ((s8 *)(s64)*(s32 *)(node + 0x44) == owner) {
-            lifeNow = IntToFloat(*(s32 *)(node + 0x3C));
-            lifeRatio = lifeNow / IntToFloat(*(s32 *)(node + 0x40));
-            *(s32 *)(node + 0x34) = FloatToInt(IntToFloat(*(s32 *)(node + 0x30)) * lifeRatio);
+            life_now = IntToFloat(*(s32 *)(node + 0x3C));
+            life_ratio = life_now / IntToFloat(*(s32 *)(node + 0x40));
+            *(s32 *)(node + 0x34) = FloatToInt(IntToFloat(*(s32 *)(node + 0x30)) * life_ratio);
             *(f32 *)(node + 0x2C) = FastAddRotations(*(f32 *)(node + 0x2C), *(f32 *)(node + 0x28));
             FastVecAdd(node, node, velocity);
             moby_get_facing_direction(*(s32 *)(hero + 0x2290) + 0x10, drift);
             FastVecScale(drift, drift, -0.00089999998454f);
             FastVecAdd(velocity, velocity, drift);
-            if (math_fast_float_d(timerPtr) != 0) {
-                fadeLeft = *(s32 *)(node + 0x34);
-                if (fadeLeft > 0) {
-                    *(s32 *)(node + 0x34) = fadeLeft - 1;
+            if (math_fast_float_d(timer_ptr) != 0) {
+                fade_left = *(s32 *)(node + 0x34);
+                if (fade_left > 0) {
+                    *(s32 *)(node + 0x34) = fade_left - 1;
                 } else {
                     *(s32 *)(node + 0x44) = 0;
-                    *(s32 *)ownerCount -= 1;
+                    *(s32 *)owner_count -= 1;
                 }
             }
         }
-        timerPtr += 0x50;
+        timer_ptr += 0x50;
         velocity += 0x50;
         node += 0x50;
     } while (count < 0x80);

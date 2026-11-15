@@ -15,8 +15,8 @@ s32 AimAtPathCursorAndAdvance(char *obj)
     char *vars = *(char **)(moby + 0x68);
     char *tbl = D_L12_001FEAC0;
     s32 path = *(s32 *)(tbl + *(s32 *)(vars + 0x110) * 4);
-    s32 pointOffset = *(s32 *)(vars + 0x224) << 4;
-    char *source = (char *)pointOffset;
+    s32 point_offset = *(s32 *)(vars + 0x224) << 4;
+    char *source = (char *)point_offset;
     char *point;
     int copy[4] __attribute__((aligned(16)));
     f32 dx;
@@ -27,7 +27,7 @@ s32 AimAtPathCursorAndAdvance(char *obj)
     source += path;
     source += 0x10;
     qcopy_nc(copy, source);
-    point = (char *)path + pointOffset;
+    point = (char *)path + point_offset;
     dx = *(f32 *)(point + 0x10) - *(f32 *)(moby + 0x10);
     dy = *(f32 *)(point + 0x14) - *(f32 *)(moby + 0x14);
     angle = mat_fast_helper_a(dx, dy);

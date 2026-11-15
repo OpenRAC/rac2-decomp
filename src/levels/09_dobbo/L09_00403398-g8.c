@@ -26,10 +26,10 @@ void dobbo_update_height_separation(u8 *obj)
 {
     u8 *state = *(u8 **)(obj + 0x68);
     f32 origin[4] __attribute__((aligned(16)));
-    f32 pushSum[4] __attribute__((aligned(16)));
+    f32 push_sum[4] __attribute__((aligned(16)));
     f32 offset[4] __attribute__((aligned(16)));
     u8 *ground;
-    u16 *groupList;
+    u16 *group_list;
     u8 *neighbor;
     f32 limit, current, len, weight;
     f32 height;
@@ -59,13 +59,13 @@ void dobbo_update_height_separation(u8 *obj)
                 *(f32 *)(state + 0x294) = current + (limit - current) * D_L09_001B13CC;
         }
         *(f32 *)(obj + 0x18) = *(f32 *)(state + 0x294);
-        qzero_nc(pushSum);
-        groupList = D_L09_001FB560[obj[0x21]];
+        qzero_nc(push_sum);
+        group_list = D_L09_001FB560[obj[0x21]];
         for (;
-             obj[0x21] != 0xFF && obj[0x21] <= D_L09_001B2878 && groupList != 0 &&
-             ((groupList != 0 && (s16)groupList[-1] >= 0) || groupList == D_L09_001FB560[obj[0x21]]);
-             groupList++) {
-            neighbor = D_L09_001B285C + ((*groupList & 0x7FFF) << 8);
+             obj[0x21] != 0xFF && obj[0x21] <= D_L09_001B2878 && group_list != 0 &&
+             ((group_list != 0 && (s16)group_list[-1] >= 0) || group_list == D_L09_001FB560[obj[0x21]]);
+             group_list++) {
+            neighbor = D_L09_001B285C + ((*group_list & 0x7FFF) << 8);
             if (neighbor == 0)
                 break;
             FastVecSub(offset, obj + 0x10, neighbor + 0x10);
@@ -77,9 +77,9 @@ void dobbo_update_height_separation(u8 *obj)
             weight = 1.0f - len / D_L09_001B13D0;
             math_square(weight);
             vec_scale_to_length(offset, offset, len * weight);
-            FastVecAdd(pushSum, pushSum, offset);
+            FastVecAdd(push_sum, push_sum, offset);
         }
-        FastVecAdd(obj + 0x10, obj + 0x10, pushSum);
+        FastVecAdd(obj + 0x10, obj + 0x10, push_sum);
         math_update_wrapped_angle_offset(obj, state + 0x278, state + 0x27C, 0.1f, 0.087266475f, *(f32 *)(obj + 0x18));
         moby_scale_owner_words_by_angles(obj, state + 0x280, state + 0x284, 0.13962635f, 0.026179943f, 0.026179943f);
     } else {

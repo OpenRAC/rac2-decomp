@@ -36,7 +36,7 @@ extern float D_L20_001B2164 __attribute__((sda));
 void yeedil_boss_frame_upkeep(char *moby) {
     char *self = moby;
     char *vars = *(char **)(moby + 0x68);
-    char *linkedMoby;
+    char *linked_moby;
     char *dst;
     char *src;
     TI128 before, after, delta;
@@ -57,13 +57,13 @@ void yeedil_boss_frame_upkeep(char *moby) {
             *(int *)(vars + 0x1810) = -1;
         }
     }
-    linkedMoby = *(char **)(vars + 0x1850);
-    if (linkedMoby != 0) {
-        if (*(short *)(linkedMoby + 0xAA) != 0x1316) {
+    linked_moby = *(char **)(vars + 0x1850);
+    if (linked_moby != 0) {
+        if (*(short *)(linked_moby + 0xAA) != 0x1316) {
             *(int *)(vars + 0x1850) = 0;
         } else {
-            if (*(unsigned char *)(linkedMoby + 0x20) != 0xFE) {
-                if (*(unsigned char *)(linkedMoby + 0x20) != 0xFD) {
+            if (*(unsigned char *)(linked_moby + 0x20) != 0xFE) {
+                if (*(unsigned char *)(linked_moby + 0x20) != 0xFD) {
                     goto copy;
                 }
             }

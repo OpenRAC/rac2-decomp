@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef signed int s32;
@@ -41,7 +42,7 @@ void arena_count_fighters(u8 *obj) {
             s16 id = *(s16 *)(record + 0xAA);
 
             if (id == 0xD98 /* Joba security robot */ || id == 0xDCF /* Joba smasher robot */ || id == 0xDF4 /* moby class 3572 */ || id == 0xDF7 /* moby class 3575 */ ||
-                id == 0xDF9 /* Joba fighter */ || id == 0xD37 /* moby class 3383 */ || id == 0xD4A /* moby class 3402 */ || id == 0xB3A /* Arachnoid */) {
+                id == 0xDF9 /* Joba fighter */ || id == 0xD37 /* moby class 3383 */ || id == 0xD4A /* moby class 3402 */ || id == MOBY_CLASS_ARACHNOID) {
                 *(s32 *)(state + 0x140) += 1;
                 *(f32 *)(state + 0x144) += *(f32 *)(*(u32 *)(record + 0x68) + 0x20);
             }

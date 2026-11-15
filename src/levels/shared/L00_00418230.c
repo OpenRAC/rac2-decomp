@@ -22,7 +22,7 @@ void gfx_l00_draw_trail_ribbon(char *object,int alpha,V *points,int count)
     unsigned color;
     V *previous;
     int i;
-    float uStart,uEnd;
+    float u_start,u_end;
     if(*(int *)(*(char **)(object+0x68)+4)==0) color=0x800000ff;
     else { int shade=D_L00_0025A9B8*10; color=((unsigned)alpha<<24)|((unsigned)shade<<16)|(unsigned)(255-shade); }
     narrow.texture=GetEffectTextureDescriptor(43);
@@ -82,10 +82,10 @@ void gfx_l00_draw_trail_ribbon(char *object,int alpha,V *points,int count)
         narrow.color[2]=narrow.color[3]=0x7f7f7f7f;
         wide.color[2]=wide.color[3]=color;
         draw_world_quad(&narrow,0,0);draw_world_quad(&wide,0,0);
-        uStart=IntToFloat(i)*.33f;uEnd=uStart+.33f;
-        if(uStart>=1){uStart-=1;uEnd-=1;}
-        wide.tex.uv[1][0]=wide.tex.uv[0][0]=uStart;
-        wide.tex.uv[3][0]=wide.tex.uv[2][0]=uEnd;
+        u_start=IntToFloat(i)*.33f;u_end=u_start+.33f;
+        if(u_start>=1){u_start-=1;u_end-=1;}
+        wide.tex.uv[1][0]=wide.tex.uv[0][0]=u_start;
+        wide.tex.uv[3][0]=wide.tex.uv[2][0]=u_end;
         qcopy(&narrow.vertex[0],&narrow.vertex[2]);qcopy(&narrow.vertex[1],&narrow.vertex[3]);
         qcopy(&wide.vertex[0],&wide.vertex[2]);qcopy(&wide.vertex[1],&wide.vertex[3]);
     }

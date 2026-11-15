@@ -10,10 +10,10 @@ extern void gold_bolt_glow_init(void *a0);
 
 /* Spawns a gold bolt moby at a position, already in its idle state, with random spin angles.
  * Adapted from the state 0 of RAC1's gold_bolt_update (GPL-3.0). */
-s32 SpawnGoldBolt(void *position, void *ownerA, void *ownerB, void *ownerC) {
+s32 SpawnGoldBolt(void *position, void *owner_a, void *owner_b, void *owner_c) {
     u8 *bolt;
     u8 *vars;
-    f32 value, spinX, spinY, spinZ;
+    f32 value, spin_x, spin_y, spin_z;
 
     bolt = (u8 *)func_305EE8(0x1250);
     if (bolt != 0) {
@@ -23,7 +23,7 @@ s32 SpawnGoldBolt(void *position, void *ownerA, void *ownerB, void *ownerC) {
         *(u16 *)(bolt + 0x32) = 0x5A;
         *(u8 *)(bolt + 0x30) = 0x40;
         *(u8 *)(bolt + 0x31) = 1;
-        *(u32 *)vars = (u32)ownerA;
+        *(u32 *)vars = (u32)owner_a;
         qcopy(vars + 0x10, bolt + 0x10);
         value = *(f32 *)(bolt + 0xF8);
         *(f32 *)(vars + 0x1C) = value;
@@ -34,15 +34,15 @@ s32 SpawnGoldBolt(void *position, void *ownerA, void *ownerB, void *ownerC) {
         value = func_310648();
         *(f32 *)(bolt + 0xF8) = value;
         value = func_310648();
-        spinX = D_L01_001B1A68;
-        spinY = D_L01_001B1A6C;
-        spinZ = D_L01_001B1A70;
+        spin_x = D_L01_001B1A68;
+        spin_y = D_L01_001B1A6C;
+        spin_z = D_L01_001B1A70;
         *(f32 *)(bolt + 0xFC) = value;
-        *(u32 *)(vars + 8) = (u32)ownerC;
-        *(u32 *)(vars + 4) = (u32)ownerB;
-        *(f32 *)(vars + 0x68) = spinX * 0.0002908882452175021f;
-        *(f32 *)(vars + 0x64) = spinY * 0.0002908882452175021f;
-        *(f32 *)(vars + 0x60) = spinZ * 0.0002908882452175021f;
+        *(u32 *)(vars + 8) = (u32)owner_c;
+        *(u32 *)(vars + 4) = (u32)owner_b;
+        *(f32 *)(vars + 0x68) = spin_x * 0.0002908882452175021f;
+        *(f32 *)(vars + 0x64) = spin_y * 0.0002908882452175021f;
+        *(f32 *)(vars + 0x60) = spin_z * 0.0002908882452175021f;
         *(u8 *)(bolt + 0x20) = 1;
         gold_bolt_glow_init(bolt);
     }

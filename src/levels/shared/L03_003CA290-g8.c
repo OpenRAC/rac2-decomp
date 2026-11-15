@@ -25,8 +25,8 @@ extern void part_spawn_masked_debris(void *, int, void *, int, float, float, flo
 extern int PlayMobySound(int, int, void *);
 /* Updates a breakable object (moby class 2418). It waits to be hit, then bursts into effects and sound and switches to its broken state. */
 void breakable_moby_update(u8 *moby) {
-    float burstPos[4] __attribute__((aligned(16)));
-    float burstVel[4] __attribute__((aligned(16)));
+    float burst_pos[4] __attribute__((aligned(16)));
+    float burst_vel[4] __attribute__((aligned(16)));
     switch (moby[0x20]) {
     case 0:
         if ((int)moby < (int)D_L03_001B2A20[0]) {
@@ -44,11 +44,11 @@ void breakable_moby_update(u8 *moby) {
                 (math_fast_sin_or_cos_b((g_frame_l03_counter[0] % 150) * 0.04188786819577217f - 3.14159f) + 1.0f) * 0.5f);
         }
         if (part_find_owned_effect_slot(moby, 0x10000, 0)) {
-            *(quadword *)burstPos = 0; *(quadword *)burstVel = 0;
-            burstVel[2] = 0.050000004f;
-            burstPos[2] = 0.5f;
-            FastVecAdd(burstPos, burstPos, moby+0x10);
-            SpawnTintedEffects(moby,burstPos,0.333000004f,3.0f,0.5f,1.0f,5,1,burstVel,0x504040c0,0);
+            *(quadword *)burst_pos = 0; *(quadword *)burst_vel = 0;
+            burst_vel[2] = 0.050000004f;
+            burst_pos[2] = 0.5f;
+            FastVecAdd(burst_pos, burst_pos, moby+0x10);
+            SpawnTintedEffects(moby,burst_pos,0.333000004f,3.0f,0.5f,1.0f,5,1,burst_vel,0x504040c0,0);
             part_spawn_masked_debris(moby,D_L03_001B0308,D_L03_001A8F20,255,D_L03_001B030C,D_L03_001B0310,D_L03_001B0314,D_L03_001B0318);
             PlayMobySound(0,0,moby);
             *(unsigned short *)(moby+0x7c) = D_L03_001B0304;

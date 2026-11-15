@@ -114,10 +114,10 @@ void moby_explode_and_hurt_nearby(char *object)
     SpawnExplosion(object + 0x10, 1.0f, 20.0f, 1, 25, 20, 20, 20, 45, 1, 1, 1, 0, D_001AD7EC);
     count = coll_process_hit(object + 0x10, 0, object, 0, 3.0f);
     if (count > 0) {
-        char **mobyList = D_001BF000;
+        char **moby_list = D_001BF000;
         remaining = count;
         do {
-            char *moby = *mobyList;
+            char *moby = *moby_list;
             if (*(short *)(*(char **)(moby + 0x24) + 0x46) == 5
                 || (*(unsigned short *)(moby + 0x34) & 0x4000)) {
                 float radius;
@@ -136,7 +136,7 @@ void moby_explode_and_hurt_nearby(char *object)
                 hit.oclass = *(short *)(moby + 0xAA);
                 QueueMobyImpact(moby, &hit);
             }
-            mobyList++;
+            moby_list++;
         } while (--remaining);
     }
     moby_mark_spawned(object);

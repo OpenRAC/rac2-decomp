@@ -49,22 +49,22 @@ extern void r1_func_00129600();
 /* rac1-decomp src/core/0012AC80.c: func_0012C0A0 */
 /* _decodeOrSkipField (libmpeg). Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Decodes or skips one video field and moves the field counters forward. */
-int mpeg_decode_field(void *mpeg, int fieldIndex, int fieldLimit)
+int mpeg_decode_field(void *mpeg, int field_index, int field_limit)
 {
   struct MpegHandle *wrapper = mpeg;
   struct MpegFieldDec *decoder;
-  int shouldDecode;
+  int should_decode;
   unsigned int ref;
-  int wantedMode;
+  int wanted_mode;
   long status;
   int result;
-  int hasReference;
-  shouldDecode = 0;
+  int has_reference;
+  should_decode = 0;
   decoder = wrapper->unk40;
   decoder->unk120 = 0;
-  if ((fieldLimit == (-1)) || (fieldIndex < fieldLimit))
+  if ((field_limit == (-1)) || (field_index < field_limit))
   {
-    shouldDecode = 1;
+    should_decode = 1;
   }
   if (decoder->unk8 == 0)
   {
@@ -72,7 +72,7 @@ int mpeg_decode_field(void *mpeg, int fieldIndex, int fieldLimit)
     decoder->unk8 = 1;
   }
   status = r1_func_00129690(decoder, 0);
-  if ((status != 0) && (shouldDecode != 0))
+  if ((status != 0) && (should_decode != 0))
   {
     r1_func_00129530(decoder);
   }
@@ -84,25 +84,25 @@ int mpeg_decode_field(void *mpeg, int fieldIndex, int fieldLimit)
     decoder->unk0 = 1;
     return 0;
   }
-  wantedMode = 2;
+  wanted_mode = 2;
   if (decoder->unkD4 != 1)
   {
-    wantedMode = 1;
+    wanted_mode = 1;
   }
-  if (decoder->unk174 != wantedMode)
+  if (decoder->unk174 != wanted_mode)
   {
     return -1;
   }
   ref = r1_func_00129690(decoder, 1);
-  hasReference = 0;
+  has_reference = 0;
   if (ref != 0)
   {
-    hasReference = 1;
+    has_reference = 1;
   }
   result = 0;
-  if (hasReference != 0)
+  if (has_reference != 0)
   {
-    if (shouldDecode == 0)
+    if (should_decode == 0)
     {
       goto out;
     }
@@ -119,7 +119,7 @@ int mpeg_decode_field(void *mpeg, int fieldIndex, int fieldLimit)
   wrapper->unk8 = decoder->unk118 - decoder->unkAC;
   decoder->unk118 = decoder->unk118 + 1;
   decoder->unk4 = (unsigned long long) (decoder->unk4 + 1);
-  if (shouldDecode == 0)
+  if (should_decode == 0)
   {
     mpeg_send_event_one((int)wrapper);
   }

@@ -76,16 +76,16 @@ void target_l00_follower_update(u8 *self)
     State_L00_003C27A0 *st = *(State_L00_003C27A0 **)(self + 0x68);
     Vec_L00_003C27A0 cols[2];
     Vec_L00_003C27A0 here;
-    u16 *mobyIds;
-    u16 *scanId;
-    u16 *clearIds;
-    u16 *zeroIds;
+    u16 *moby_ids;
+    u16 *scan_id;
+    u16 *clear_ids;
+    u16 *zero_ids;
     u8 *entry;
-    u8 *zeroEntry;
+    u8 *zero_entry;
     u8 *marker;
-    u8 *markerB;
+    u8 *marker_b;
     u8 *moby;
-    s32 mobyId;
+    s32 moby_id;
     s32 i;
 
     if (st->gate >= 0 && D_L00_001C9340 != st->gate)
@@ -109,21 +109,21 @@ void target_l00_follower_update(u8 *self)
         }
         BuildObjectAttachmentTransforms(self, st->track, 100, st->group_b, st->group, st->x18, 8, 0);
         if (g_current_map_index[0] == 2 && st->group_b != -1) {
-            mobyIds = D_L00_001FA920[st->group_b];
+            moby_ids = D_L00_001FA920[st->group_b];
             do {
-                mobyId = *mobyIds & 0x7FFF;
-                level_set_record_payload_by_key(st->track, 0, mobyId, *(u8 **)(D_L00_001B1E9C + (mobyId << 8) + 0x68) + 0x50);
-            } while ((s16)*mobyIds++ >= 0);
+                moby_id = *moby_ids & 0x7FFF;
+                level_set_record_payload_by_key(st->track, 0, moby_id, *(u8 **)(D_L00_001B1E9C + (moby_id << 8) + 0x68) + 0x50);
+            } while ((s16)*moby_ids++ >= 0);
         }
         if (st->moby != 0) {
             vec_clear_128(st->moby + 0xF0);
             st->target = 0;
-            for (scanId = D_L00_001A9014[st->group];
-                 scanId != 0 && ((s16)scanId[-1] >= 0 || scanId == D_L00_001A9014[st->group]); scanId++) {
-                entry = D_L00_001B251C + ((*scanId & 0x7FFF) << 6);
+            for (scan_id = D_L00_001A9014[st->group];
+                 scan_id != 0 && ((s16)scan_id[-1] >= 0 || scan_id == D_L00_001A9014[st->group]); scan_id++) {
+                entry = D_L00_001B251C + ((*scan_id & 0x7FFF) << 6);
                 if (entry == 0)
                     break;
-                marker = D_L00_001B2514 + ((*scanId & 0x7FFF) << 5);
+                marker = D_L00_001B2514 + ((*scan_id & 0x7FFF) << 5);
                 if (D_L00_00226900[marker[0x1D]] == 0xAB6 /* moby class 2742 */) {
                     st->target = entry;
                     break;
@@ -154,21 +154,21 @@ void target_l00_follower_update(u8 *self)
                 here = *(Vec_L00_003C27A0 *)(self + 0x10);
                 part_spawn_random_spark_rays((char *)st->moby, (char *)&here, 1.5f, 0.116666675f);
                 SpawnExplosion(st->moby + 0x10, 0, 25, 20, 20, 20, 45, 0, 0.85f, 20.0f, 1, 0, 0, 0);
-                for (clearIds = D_L00_001A9014[st->group];
-                     clearIds != 0 && ((s16)clearIds[-1] >= 0 || clearIds == D_L00_001A9014[st->group]); clearIds++) {
-                    markerB = D_L00_001B2514 + ((*clearIds & 0x7FFF) << 5);
-                    if (markerB == 0)
+                for (clear_ids = D_L00_001A9014[st->group];
+                     clear_ids != 0 && ((s16)clear_ids[-1] >= 0 || clear_ids == D_L00_001A9014[st->group]); clear_ids++) {
+                    marker_b = D_L00_001B2514 + ((*clear_ids & 0x7FFF) << 5);
+                    if (marker_b == 0)
                         break;
-                    markerB[0x1C] = 0;
+                    marker_b[0x1C] = 0;
                 }
-                for (zeroIds = D_L00_001A9014[st->group];
-                     zeroIds != 0 && ((s16)zeroIds[-1] >= 0 || zeroIds == D_L00_001A9014[st->group]); zeroIds++) {
-                    zeroEntry = D_L00_001B251C + ((*zeroIds & 0x7FFF) << 6);
-                    if (zeroEntry == 0)
+                for (zero_ids = D_L00_001A9014[st->group];
+                     zero_ids != 0 && ((s16)zero_ids[-1] >= 0 || zero_ids == D_L00_001A9014[st->group]); zero_ids++) {
+                    zero_entry = D_L00_001B251C + ((*zero_ids & 0x7FFF) << 6);
+                    if (zero_entry == 0)
                         break;
                     for (i = 0; i < 3; i++) {
-                        qzero_nc(zeroEntry);
-                        zeroEntry += 16;
+                        qzero_nc(zero_entry);
+                        zero_entry += 16;
                     }
                 }
                 PlayMobySound(0, 0, st->moby);

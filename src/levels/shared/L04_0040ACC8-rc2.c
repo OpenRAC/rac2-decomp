@@ -32,17 +32,17 @@ extern s32 ref_L04_0040ACC8_03 __attribute__((sda));
 /* Counts how often a player event happens in a row. Three times in a row sets a flag, and a long gap resets the count. */
 void racer_update_event_streak(void) {
     s8 *vars;
-    s32 newCount;
-    s32 eventFlag;
+    s32 new_count;
+    s32 event_flag;
 
     vars = *(s8 **)(ref_L04_0040ACC8_00 + 0x68);
     if (*(s32 *)(vars + 0x744) < 5) {
-        eventFlag = *(s32 *)(vars + 0x724);
+        event_flag = *(s32 *)(vars + 0x724);
         ref_L04_0040ACC8_01 = 1;
-        if (eventFlag != 0) {
-            newCount = ref_L04_0040ACC8_03 + 1;
-            ref_L04_0040ACC8_03 = newCount;
-            if (newCount == 3) {
+        if (event_flag != 0) {
+            new_count = ref_L04_0040ACC8_03 + 1;
+            ref_L04_0040ACC8_03 = new_count;
+            if (new_count == 3) {
                 ref_L04_0040ACC8_02 = 1;
             }
         }

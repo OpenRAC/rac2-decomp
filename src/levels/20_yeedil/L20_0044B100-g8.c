@@ -21,7 +21,7 @@ extern void part_l11_spawn_spark_ring(char *, int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 
 /* Creates a homing shot (moby class 4855) at a position, aimed at a target, and returns it. */
-char *homing_l20_shot_spawn(char *template, char *position, char *direction, char *targetPos, int travelFrames,
+char *homing_l20_shot_spawn(char *template, char *position, char *direction, char *target_pos, int travel_frames,
                         float power) {
     char *shot;
     char *state;
@@ -42,11 +42,11 @@ char *homing_l20_shot_spawn(char *template, char *position, char *direction, cha
         *(float *)(state + 0x24) = math_random_angle();
         *(float *)(state + 0x28) = math_random_float_range(0.052359886f, 0.10471977f);
         *(int *)(state + 0x30) = 0;
-        value = IntToFloat(travelFrames);
+        value = IntToFloat(travel_frames);
         *(float *)(state + 0x34) = 1.0f / value;
-        FastVecScale(&predicted, direction, (float)(travelFrames >> 1));
+        FastVecScale(&predicted, direction, (float)(travel_frames >> 1));
         FastVecAdd(&predicted, &predicted, position);
-        FastVecSub(state + 0x10, targetPos, &predicted);
+        FastVecSub(state + 0x10, target_pos, &predicted);
         value = FastVecLength(state);
         vec_scale_to_length(state + 0x10, state + 0x10, value);
         part_l11_spawn_spark_ring(pos, D_L20_001B246C);

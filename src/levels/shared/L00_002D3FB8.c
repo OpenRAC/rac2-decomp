@@ -7,19 +7,19 @@ extern unsigned char g_item_slot_to_record[];
 extern int g_item_ammo_counts[];
 
 /* Adds ammo to a weapon slot and caps it at the weapon limit. Returns how much did not fit. */
-int weapon_add_ammo(int slotIndex, int amount)
+int weapon_add_ammo(int slot_index, int amount)
 {
-    int idx = math_l00_return_argument_2(slotIndex);
-    int *slotPtr = &g_item_ammo_counts[idx];
+    int idx = math_l00_return_argument_2(slot_index);
+    int *slot_ptr = &g_item_ammo_counts[idx];
     Entry_262570 *entry;
-    int newTotal = *slotPtr + amount;
+    int new_total = *slot_ptr + amount;
 
-    *slotPtr = newTotal;
+    *slot_ptr = new_total;
     entry = &g_weapon_l00_table[g_item_slot_to_record[idx]];
     if (entry->f8E != 0) {
-        int overflow = newTotal - entry->f8E;
+        int overflow = new_total - entry->f8E;
         if (overflow <= 0) return 0;
-        *slotPtr = entry->f8E;
+        *slot_ptr = entry->f8E;
         return overflow;
     }
     return 0;

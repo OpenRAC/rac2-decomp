@@ -57,7 +57,7 @@ extern void moby_fade_out_update(void);
 void boss_part_handle_hit(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *hit;
-    s32 pieceCount;
+    s32 piece_count;
     s32 i;
     float vec[3];
 
@@ -82,11 +82,11 @@ void boss_part_handle_hit(u8 *moby) {
             if (*(s16 *)(*(u8 **)(hit + 0x20) + 0xAA) != 0x118F)
                 *(s16 *)(vars + 0x26) = 0x14;
             if (*(u16 *)(moby + 0x7C) != 0) {
-                float healthRatio;
+                float health_ratio;
 
-                healthRatio = *(float *)(vars + 0x20) / D_L23_001B36FC;
-                pieceCount = 10 - (s32)(healthRatio * 10.0f);
-                for (i = 0; i < pieceCount; i++) {
+                health_ratio = *(float *)(vars + 0x20) / D_L23_001B36FC;
+                piece_count = 10 - (s32)(health_ratio * 10.0f);
+                for (i = 0; i < piece_count; i++) {
                     s32 mask = *(u16 *)(moby + 0x7C);
 
                     if ((mask >> i) & 1) {

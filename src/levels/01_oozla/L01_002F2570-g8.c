@@ -1,4 +1,5 @@
 #include "names.h"
+#include "moby_classes.h"
 typedef int Quadword __attribute__((mode(TI)));
 /* The clear proves an 80-byte state span; this view covers that span. */
 typedef struct TrailCamera {
@@ -65,7 +66,7 @@ void oozla_intro_scene_update(void)
         }
         if (*(short *)(actor + 0xAA) == 0xD54 /* moby class 3412 */)
             UpdateEquipmentPieces(actor);
-        if (actor && *(short *)(actor + 0xAA) == 0xFA0 /* TV Screens */ && *(char **)(actor + 0x68))
+        if (actor && *(short *)(actor + 0xAA) == MOBY_CLASS_TV_SCREENS && *(char **)(actor + 0x68))
             math_store_angle_update_result(actor, (float *)(*(char **)(actor + 0x68) + 0xC),
                              0x80AAAAD2, 0x80396464, 0.061086535453796387f);
     }

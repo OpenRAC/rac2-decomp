@@ -15,12 +15,12 @@ extern s32 PlayMobySound(s32, s32, u8 *);
 extern void snd_stop_voice(s32);
 
 /* Waits for its trigger object to become active, then bobs the object out and back in a smooth wave with a sound, and repeats. */
-void pulsing_platform_linked_update(u8 *mobyArg) {
+void pulsing_platform_linked_update(u8 *moby_arg) {
     f32 offset[4] __attribute__((aligned(16)));
-    u8 *mobyTable = g_moby_l11_table;
-    u8 *entity = mobyArg;
+    u8 *moby_table = g_moby_l11_table;
+    u8 *entity = moby_arg;
     u8 *state = *(u8 **)(entity + 0x68);
-    u8 *target = mobyTable + *(s32 *)(state + 0x68) * 256;
+    u8 *target = moby_table + *(s32 *)(state + 0x68) * 256;
     switch (*(u8 *)(entity + 0x20)) {
     case 0:
         *(u32 *)(state + 0x5C) |= 4;
@@ -31,11 +31,11 @@ void pulsing_platform_linked_update(u8 *mobyArg) {
         qcopy(state + 0x80, entity + 0x10);
         /* fall through */
     case 1: {
-        u8 *soundSlot;
+        u8 *sound_slot;
         if (*(s32 *)(state + 0x60) && *(u8 *)(target + 0x20) == 2) {
-            soundSlot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
-            if (*(u8 **)(soundSlot + 0x88) == entity) {
-                if (!*(u8 *)(soundSlot + 0x74))
+            sound_slot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
+            if (*(u8 **)(sound_slot + 0x88) == entity) {
+                if (!*(u8 *)(sound_slot + 0x74))
                     *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
             } else {
                 *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
@@ -47,13 +47,13 @@ void pulsing_platform_linked_update(u8 *mobyArg) {
         break;
     }
     case 2: {
-        u8 *soundSlot;
+        u8 *sound_slot;
         *(f32 *)(state + 0x70) += 0.05235988646745682f;
         *(f32 *)(state + 0x6C) = FastAddRotations(*(f32 *)(state + 0x6C), 0.05235988646745682f);
         if (*(f32 *)(state + 0x70) >= 3.1415927410125732f) {
             if (*(s32 *)(state + 0x74) != -1) {
-                soundSlot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
-                if (*(u8 **)(soundSlot + 0x88) == entity && *(u8 *)(soundSlot + 0x74))
+                sound_slot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
+                if (*(u8 **)(sound_slot + 0x88) == entity && *(u8 *)(sound_slot + 0x74))
                     snd_stop_voice(*(s32 *)(state + 0x74));
             }
             *(s32 *)(state + 0x74) = -1;
@@ -65,11 +65,11 @@ void pulsing_platform_linked_update(u8 *mobyArg) {
         break;
     }
     case 3: {
-        u8 *soundSlot;
+        u8 *sound_slot;
         if (*(u8 *)(target + 0x20) != 2) {
-            soundSlot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
-            if (*(u8 **)(soundSlot + 0x88) == entity) {
-                if (!*(u8 *)(soundSlot + 0x74))
+            sound_slot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
+            if (*(u8 **)(sound_slot + 0x88) == entity) {
+                if (!*(u8 *)(sound_slot + 0x74))
                     *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
             } else {
                 *(s32 *)(state + 0x74) = PlayMobySound(0, 4, entity);
@@ -79,13 +79,13 @@ void pulsing_platform_linked_update(u8 *mobyArg) {
         break;
     }
     case 4: {
-        u8 *soundSlot;
+        u8 *sound_slot;
         *(f32 *)(state + 0x70) += 0.05235988646745682f;
         *(f32 *)(state + 0x6C) = FastAddRotations(*(f32 *)(state + 0x6C), 0.05235988646745682f);
         if (*(f32 *)(state + 0x70) >= 6.2831854820251465f) {
             if (*(s32 *)(state + 0x74) != -1) {
-                soundSlot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
-                if (*(u8 **)(soundSlot + 0x88) == entity && *(u8 *)(soundSlot + 0x74))
+                sound_slot = (u8 *)(*(s32 *)(state + 0x74) * 0x70 + (s32)g_sound_state);
+                if (*(u8 **)(sound_slot + 0x88) == entity && *(u8 *)(sound_slot + 0x74))
                     snd_stop_voice(*(s32 *)(state + 0x74));
             }
             *(s32 *)(state + 0x74) = -1;

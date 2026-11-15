@@ -43,16 +43,16 @@ void rotor_draw(char *obj)
 {
     Packet quad;
     float rotation[12];
-    float worldMatrix[16];
+    float world_matrix[16];
     float angle[4];
     float *state = *(float **)(obj + 0x68);
     float blend, intensity;
 
-    copy_matrix_rotation(worldMatrix, obj + 0xC0);
+    copy_matrix_rotation(world_matrix, obj + 0xC0);
     if (state[0] != 1.0f)
-        func_L03_002EFB60(worldMatrix, worldMatrix, state[0]);
-    qcopy(&worldMatrix[12], obj + 0x10);
-    worldMatrix[15] = 1.0f;
+        func_L03_002EFB60(world_matrix, world_matrix, state[0]);
+    qcopy(&world_matrix[12], obj + 0x10);
+    world_matrix[15] = 1.0f;
     blend = math_fast_sin_or_cos_b(state[1]) * 0.5f + 0.5f;
     intensity = math_fast_sin_or_cos_b(state[4]) * 0.5f + 0.5f;
     quad.tex = GetEffectTextureDescriptor(D_L03_001B0070);
@@ -84,7 +84,7 @@ void rotor_draw(char *obj)
             j = (i & 1) ? 2 : 0;
             matrix_mul_vec3(&quad.pos[j], &quad.pos[j], rotation);
             matrix_mul_vec3(&quad.pos[j+1], &quad.pos[j+1], rotation);
-            draw_world_quad(&quad, worldMatrix, 1);
+            draw_world_quad(&quad, world_matrix, 1);
         }
     }
     quad.tex = GetEffectTextureDescriptor(D_L03_001B0074);
@@ -115,7 +115,7 @@ void rotor_draw(char *obj)
             j = (i & 1) ? 2 : 0;
             matrix_mul_vec3(&quad.pos[j], &quad.pos[j], rotation);
             matrix_mul_vec3(&quad.pos[j+1], &quad.pos[j+1], rotation);
-            draw_world_quad(&quad, worldMatrix, 1);
+            draw_world_quad(&quad, world_matrix, 1);
         }
     }
     {
@@ -129,7 +129,7 @@ void rotor_draw(char *obj)
             j = (i & 1) ? 0 : 2;
             matrix_mul_vec3(&quad.pos[j], &quad.pos[j], rotation);
             matrix_mul_vec3(&quad.pos[j+1], &quad.pos[j+1], rotation);
-            draw_world_quad(&quad, worldMatrix, 1);
+            draw_world_quad(&quad, world_matrix, 1);
         }
     }
     quad.tex = GetEffectTextureDescriptor(D_L03_001B0078);
@@ -158,7 +158,7 @@ void rotor_draw(char *obj)
             j = (i & 1) ? 2 : 0;
             matrix_mul_vec3(&quad.pos[j], &quad.pos[j], rotation);
             matrix_mul_vec3(&quad.pos[j+1], &quad.pos[j+1], rotation);
-            draw_world_quad(&quad, worldMatrix, 1);
+            draw_world_quad(&quad, world_matrix, 1);
         }
     }
     angle[0] = state[3];
@@ -182,7 +182,7 @@ void rotor_draw(char *obj)
             j = (i & 1) ? 2 : 0;
             matrix_mul_vec3(&quad.pos[j], &quad.pos[j], rotation);
             matrix_mul_vec3(&quad.pos[j+1], &quad.pos[j+1], rotation);
-            draw_world_quad(&quad, worldMatrix, 1);
+            draw_world_quad(&quad, world_matrix, 1);
         }
     }
 }

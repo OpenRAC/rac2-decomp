@@ -73,13 +73,13 @@ extern void func_326368(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
    then rebuilds the sub-object's effect with both blend weights at zero. */
 void record_release_rebuild_effect(char *moby) {
     char *vars = *(char **)(moby + 0x68);
-    s16 recordIndex;
+    s16 record_index;
 
     if (func_323340(moby, vars + 0x160, 0) != 0) {
         if (D_L09_001A79F0 == 9) {
-            recordIndex = *(s16 *)(vars + 0x1D0);
-            if (recordIndex != -1) {
-                if (moby_is_hero_or_special(D_L09_001B285C + (recordIndex << 8)) == 0) {
+            record_index = *(s16 *)(vars + 0x1D0);
+            if (record_index != -1) {
+                if (moby_is_hero_or_special(D_L09_001B285C + (record_index << 8)) == 0) {
                     D_L09_001A9040 = 0;
                 }
                 *(s16 *)(vars + 0x1D0) = -1;
@@ -108,8 +108,8 @@ extern char D_L09_001B9A00[];
 void dobbo_update_release_record(char *moby) {
     char *self = moby;
     char *vars = *(char **)(self + 0x68);
-    s32 hitLevel;
-    s16 recordIndex;
+    s32 hit_level;
+    s16 record_index;
 
     if (*(u8 *)(self + 0x20) == 0) {
         dobbo_wandering_init_vars();
@@ -120,19 +120,19 @@ void dobbo_update_release_record(char *moby) {
             *(u8 *)(self + 0x6F) = 0x16;
         }
     }
-    hitLevel = moby_apply_damage_to_object(self, vars + 0x50, 0);
+    hit_level = moby_apply_damage_to_object(self, vars + 0x50, 0);
     if (g_current_map_index == 9) {
-        recordIndex = *(s16 *)(vars + 0xC0);
-        if (recordIndex != -1) {
-            if (moby_is_hero_or_special(D_L09_001B285C + (recordIndex << 8)) == 0) {
+        record_index = *(s16 *)(vars + 0xC0);
+        if (record_index != -1) {
+            if (moby_is_hero_or_special(D_L09_001B285C + (record_index << 8)) == 0) {
                 D_L09_001A9040 = 0;
             }
             *(s16 *)(vars + 0xC0) = -1;
         }
     }
-    if (hitLevel != 0) {
+    if (hit_level != 0) {
         dobbo_alert_wandering_group(self);
-        if (hitLevel >= 4) {
+        if (hit_level >= 4) {
             dobbo_destroy_with_debris(self);
         }
     }
@@ -151,8 +151,8 @@ extern void dobbo_alert_group_wake_first(char *a0, s32 a1);
 void dobbo_update_large_release_record(char *moby) {
     char *self = moby;
     char *vars = *(char **)(self + 0x68);
-    s32 hitLevel;
-    s16 recordIndex;
+    s32 hit_level;
+    s16 record_index;
 
     if (*(u8 *)(self + 0x20) == 0) {
         dobbo_init_enemy_vars();
@@ -163,17 +163,17 @@ void dobbo_update_large_release_record(char *moby) {
             *(u8 *)(self + 0x6F) = 0x2D;
         }
     }
-    hitLevel = moby_apply_damage_to_object(self, vars + 0x50, 0);
+    hit_level = moby_apply_damage_to_object(self, vars + 0x50, 0);
     if (g_current_map_index == 9) {
-        recordIndex = *(s16 *)(vars + 0xC0);
-        if (recordIndex != -1) {
-            if (moby_is_hero_or_special(D_L09_001B285C + (recordIndex << 8)) == 0) {
+        record_index = *(s16 *)(vars + 0xC0);
+        if (record_index != -1) {
+            if (moby_is_hero_or_special(D_L09_001B285C + (record_index << 8)) == 0) {
                 D_L09_001A9040 = 0;
             }
             *(s16 *)(vars + 0xC0) = -1;
         }
     }
-    dobbo_alert_group_wake_first(self, hitLevel);
+    dobbo_alert_group_wake_first(self, hit_level);
     weapon_select_aim_target(self, *(s32 *)(vars + 0x28C), 0, 0, *(f32 *)(vars + 0x24C), 0.0f);
 }
 
@@ -235,9 +235,9 @@ void dobbo_draw_pulsing_glows(u8 *a0);
 void dobbo_update_pulsing_tint(u8 *moby) {
     u8 *state = *(u8 **)(moby + 0x68);
     ColorPair color = D_L09_001B1400[0];
-    u16 *idPtr;
+    u16 *id_ptr;
     u8 *entity;
-    u8 *entityVars;
+    u8 *entity_vars;
     f32 angle;
     f32 wave;
 
@@ -247,19 +247,19 @@ void dobbo_update_pulsing_tint(u8 *moby) {
     *(f32 *)(state + 0x34C) = wave;
     ((TintedObject *)moby)->colour = FastTweenColor(color.a, color.b, wave);
     if (*(s32 *)(state + 0x350) != D_L09_001B2388) {
-        for (idPtr = D_L09_001FB560[moby[0x21]];
-             moby[0x21] != 0xFF && moby[0x21] <= D_L09_001B2878 && idPtr != 0 &&
-             ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == D_L09_001FB560[moby[0x21]]);
-             idPtr++) {
-            entity = D_L09_001B285C_1 + ((*idPtr & 0x7FFF) << 8);
+        for (id_ptr = D_L09_001FB560[moby[0x21]];
+             moby[0x21] != 0xFF && moby[0x21] <= D_L09_001B2878 && id_ptr != 0 &&
+             ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == D_L09_001FB560[moby[0x21]]);
+             id_ptr++) {
+            entity = D_L09_001B285C_1 + ((*id_ptr & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (entity[0x31] != 0 && *(s16 *)(entity + 0xAA) == 0xD90 /* moby class 3472 */) {
                 if (entity[0x20] != 0xFE) {
                     if (entity[0x20] != 0xFD) {
-                        entityVars = *(u8 **)(entity + 0x68);
-                        moby_transform_joint_point(entity, 0, entityVars + 0x240);
-                        *(s32 *)(entityVars + 0x350) = D_L09_001B2388;
+                        entity_vars = *(u8 **)(entity + 0x68);
+                        moby_transform_joint_point(entity, 0, entity_vars + 0x240);
+                        *(s32 *)(entity_vars + 0x350) = D_L09_001B2388;
                     }
                 }
             }
@@ -274,33 +274,33 @@ void dobbo_update_pulsing_tint(u8 *moby) {
    and hands the result to func_L00_00325AE8 with the +0x344 float scaled by 0.2. */
 void dobbo_draw_pulsing_glows(u8 *moby) {
     f32 point[4];
-    u16 *idPtr;
-    u16 *groupList;
+    u16 *id_ptr;
+    u16 *group_list;
     u8 *entity;
-    u8 *entityVars;
+    u8 *entity_vars;
     s32 color;
 
     if (moby[0x21] == 0xFF)
         return;
-    groupList = D_L09_001FB560[moby[0x21]];
-    if (groupList == 0)
+    group_list = D_L09_001FB560[moby[0x21]];
+    if (group_list == 0)
         return;
-    for (idPtr = groupList;
-         moby[0x21] != 0xFF && moby[0x21] <= D_L09_001B2878 && idPtr != 0 &&
-         ((idPtr != 0 && (s16)idPtr[-1] >= 0) || idPtr == D_L09_001FB560[moby[0x21]]);
-         idPtr++) {
-        entity = D_L09_001B285C_1 + ((*idPtr & 0x7FFF) << 8);
+    for (id_ptr = group_list;
+         moby[0x21] != 0xFF && moby[0x21] <= D_L09_001B2878 && id_ptr != 0 &&
+         ((id_ptr != 0 && (s16)id_ptr[-1] >= 0) || id_ptr == D_L09_001FB560[moby[0x21]]);
+         id_ptr++) {
+        entity = D_L09_001B285C_1 + ((*id_ptr & 0x7FFF) << 8);
         if (entity == 0)
             break;
         if (entity[0x31] != 0 && *(s16 *)(entity + 0xAA) == 0xD90 /* moby class 3472 */) {
             if (entity[0x20] != 0xFE) {
                 if (entity[0x20] != 0xFD) {
-                    entityVars = *(u8 **)(entity + 0x68);
-                    FastVecScale((char *)point, D_L09_001B1410, *(f32 *)(entityVars + 0x344));
-                    transform_vector((char *)point, (char *)point, (char *)(entityVars + 0x240));
+                    entity_vars = *(u8 **)(entity + 0x68);
+                    FastVecScale((char *)point, D_L09_001B1410, *(f32 *)(entity_vars + 0x344));
+                    transform_vector((char *)point, (char *)point, (char *)(entity_vars + 0x240));
                     color = FastTweenColor(D_L09_001B1420[0], D_L09_001B1420[1],
-                                      *(f32 *)(entityVars + 0x34C));
-                    gfx_l00_draw_billboard_quad((char *)point, color, *(f32 *)(entityVars + 0x344) * 0.2f, 0.08f);
+                                      *(f32 *)(entity_vars + 0x34C));
+                    gfx_l00_draw_billboard_quad((char *)point, color, *(f32 *)(entity_vars + 0x344) * 0.2f, 0.08f);
                 }
             }
         }
@@ -327,15 +327,15 @@ void dobbo_update_spin_direction(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     char *velocity;
     float dir[3];
-    int frameOffset;
+    int frame_offset;
     float scale;
-    int animId;
+    int anim_id;
     if (func_316A28(7)) {
-        animId = D_L09_001B15B8;
+        anim_id = D_L09_001B15B8;
     } else {
-        animId = D_L09_001B15B8_4[1];
+        anim_id = D_L09_001B15B8_4[1];
     }
-    func_31F4D0(moby, animId);
+    func_31F4D0(moby, anim_id);
     velocity = moby + 0xC0;
     *(float *)(vars + 0x10) = func_2EB478(*(float *)(vars + 0x10), D_L09_001B15C4 * 0.00029088825f);
     dir[0] = func_2EAA60(*(float *)(vars + 0x10)) * D_L09_001B15C0;
@@ -344,8 +344,8 @@ void dobbo_update_spin_direction(char *moby) {
     scale = (float)D_L09_001B15B4;
     *(float *)(moby + 0xF0) = dir[0];
     *(float *)(moby + 0xF4) = dir[1];
-    frameOffset = func_2EB5D0(scale * (*(float *)vars + *(float *)(vars + 4)) * 0.5f);
-    *(u8 *)(moby + 0x23) = D_L09_001B15B0 + frameOffset + func_316A68(-9, 9);
+    frame_offset = func_2EB5D0(scale * (*(float *)vars + *(float *)(vars + 4)) * 0.5f);
+    *(u8 *)(moby + 0x23) = D_L09_001B15B0 + frame_offset + func_316A68(-9, 9);
     *(u16 *)(moby + 0x34) |= 0x800;
     func_2EACD0(velocity, moby + 0xF0);
     func_2EA750(*(float *)vars, velocity, velocity);
@@ -362,30 +362,30 @@ extern void func_317B40(int a0, int a1, int a2, int a3);
 void dobbo_update_item_indicator(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     char *linked;
-    char *linkedVars;
-    int itemId;
+    char *linked_vars;
+    int item_id;
     int flags;
-    s32 linkedIndex = *(s32 *)(vars + 0x64);
+    s32 linked_index = *(s32 *)(vars + 0x64);
 
-    if (linkedIndex == -1)
+    if (linked_index == -1)
         return;
-    linked = (char *)((linkedIndex << 8) + (int)D_L09_001B285C);
+    linked = (char *)((linked_index << 8) + (int)D_L09_001B285C);
     if (*(u8 *)(linked + 0x20) == 0xFE)
         return;
     if (*(u8 *)(linked + 0x20) == 0xFD)
         return;
-    linkedVars = *(char **)(linked + 0x68);
-    if (*(s32 *)(linkedVars + 0x70) == -1)
+    linked_vars = *(char **)(linked + 0x68);
+    if (*(s32 *)(linked_vars + 0x70) == -1)
         return;
     if (*(s32 *)(vars + 0x50) != -1
-        && (itemId = *(u16 *)((*(s32 *)(vars + 0x50) << 8) + (int)D_L09_001B285C + 0xB2),
-            D_L09_0021E9F0.spent[(s16)itemId] != 0
-            || (flags = D_0019B4A8[((s16)itemId >> 1) + (g_current_map_index << 10)],
-                (itemId & 1) ? (flags >> 4) & 7 : flags & 7) != 0)) {
-        *(float *)((*(s32 *)(linkedVars + 0x70) << 7) + (int)D_L09_001B294C[0] + 0x38) = 325.25f;
+        && (item_id = *(u16 *)((*(s32 *)(vars + 0x50) << 8) + (int)D_L09_001B285C + 0xB2),
+            D_L09_0021E9F0.spent[(s16)item_id] != 0
+            || (flags = D_0019B4A8[((s16)item_id >> 1) + (g_current_map_index << 10)],
+                (item_id & 1) ? (flags >> 4) & 7 : flags & 7) != 0)) {
+        *(float *)((*(s32 *)(linked_vars + 0x70) << 7) + (int)D_L09_001B294C[0] + 0x38) = 325.25f;
         func_317B40(*(s32 *)(vars + 0x4C), 1, 1, 1);
     } else {
-        *(float *)((*(s32 *)(linkedVars + 0x70) << 7) + (int)D_L09_001B294C[0] + 0x38) = 325.0f;
+        *(float *)((*(s32 *)(linked_vars + 0x70) << 7) + (int)D_L09_001B294C[0] + 0x38) = 325.0f;
         func_317B40(*(s32 *)(vars + 0x4C), 0, 0, 0);
     }
 }
@@ -400,8 +400,8 @@ extern void dobbo_release_linked(char *a0);
 s32 dobbo_release_linked_if_ready(char *moby) {
     char *vars = *(char **)(moby + 0x68);
     s32 none;
-    s32 linkedIndex;
-    s32 itemId;
+    s32 linked_index;
+    s32 item_id;
 
     if (D_0018C0B4 == 0x31)
         return 0;
@@ -423,12 +423,12 @@ s32 dobbo_release_linked_if_ready(char *moby) {
             }
         }
     }
-    linkedIndex = *(s32 *)(vars + 0x50);
-    if (linkedIndex != -1) {
-        itemId = *(u16 *)((linkedIndex << 8) + (s32)D_L09_001B285C + 0xB2);
-        if (D_L09_0021E9F0.spent[(s16)itemId] == 0) {
-            s32 flags = D_0019B4A8[((s16)itemId >> 1) + (g_current_map_index << 10)];
-            if (itemId & 1)
+    linked_index = *(s32 *)(vars + 0x50);
+    if (linked_index != -1) {
+        item_id = *(u16 *)((linked_index << 8) + (s32)D_L09_001B285C + 0xB2);
+        if (D_L09_0021E9F0.spent[(s16)item_id] == 0) {
+            s32 flags = D_0019B4A8[((s16)item_id >> 1) + (g_current_map_index << 10)];
+            if (item_id & 1)
                 flags = (flags >> 4) & 7;
             else
                 flags = flags & 7;
@@ -437,14 +437,14 @@ s32 dobbo_release_linked_if_ready(char *moby) {
         }
     }
     none = -1;
-    linkedIndex = *(s32 *)(vars + 0x64);
-    if (linkedIndex != none) {
-        func_30C790((linkedIndex << 8) + D_L09_001B285C);
+    linked_index = *(s32 *)(vars + 0x64);
+    if (linked_index != none) {
+        func_30C790((linked_index << 8) + D_L09_001B285C);
         *(s32 *)(vars + 0x64) = none;
     }
-    linkedIndex = *(s32 *)(vars + 0x68);
-    if (linkedIndex != none) {
-        func_30C790((linkedIndex << 8) + D_L09_001B285C);
+    linked_index = *(s32 *)(vars + 0x68);
+    if (linked_index != none) {
+        func_30C790((linked_index << 8) + D_L09_001B285C);
         *(s32 *)(vars + 0x68) = none;
     }
     dobbo_release_linked(moby);

@@ -89,24 +89,24 @@ extern TransitionView D_001B9040;        /* view: +0xB0 float */
 /* Runs one frame of the transition scene: moves each object along its path and starts the next scene part when one ends. */
 int transition_update_scene(void)
 {
-    float scratchA[4], scratchB[4], mobyMatrix[16];
-    float fadeScale;
-    int i, nextIndex;
+    float scratch_a[4], scratch_b[4], moby_matrix[16];
+    float fade_scale;
+    int i, next_index;
 
     game_reset_frame_counters();
     {
-        float newFade = g_screen_fade - 0.25f;
+        float new_fade = g_screen_fade - 0.25f;
         g_scene_playback_state.tick = g_scene_playback_state.tick + 1;
         g_scene_playback_state.frame = g_scene_playback_state.frame + 1;
-        g_screen_fade = newFade;
-        if (newFade < 0.0f)
+        g_screen_fade = new_fade;
+        if (new_fade < 0.0f)
             g_screen_fade = 0.0f;
     }
     if (g_scene_playback_state.frame == 1) {
-        int soundIndex;
+        int sound_index;
         snd_set_current_buffer_flag();
-        soundIndex = g_hero_moby_default.index;
-        func_00132A10(D_001B2130[soundIndex], 0, 0x400, 0, 0, 0, 0, (int)D_001886D0 + soundIndex * 0x70);
+        sound_index = g_hero_moby_default.index;
+        func_00132A10(D_001B2130[sound_index], 0, 0x400, 0, 0, 0, 0, (int)D_001886D0 + sound_index * 0x70);
         snd_clear_flag_and_update();
         snd_Pump();
     }
@@ -115,11 +115,11 @@ int transition_update_scene(void)
     }
     /* the phase has ended */
     for (i = 0; i < g_scene_playback_state.count; i++) {
-        AnimationObject *animObject = (AnimationObject *)g_scene_playback_state.objects[i];
-        if (animObject != 0) {
-            animObject->definition->count--;
-            animObject->definition->animations[animObject->definition->count] = 0;
-            moby_mark_spawned(animObject);
+        AnimationObject *anim_object = (AnimationObject *)g_scene_playback_state.objects[i];
+        if (anim_object != 0) {
+            anim_object->definition->count--;
+            anim_object->definition->animations[anim_object->definition->count] = 0;
+            moby_mark_spawned(anim_object);
         }
     }
     if (D_001ABEB0 != 0) {
@@ -136,8 +136,8 @@ int transition_update_scene(void)
                 ;
         }
         if (g_hero_moby_default.phase == 0) {
-            int randomStep = ((func_001163B0() >> 16) % 3) + 1;
-            g_hero_moby_default.index = (g_hero_moby_default.index + randomStep) & 3;
+            int random_step = ((func_001163B0() >> 16) % 3) + 1;
+            g_hero_moby_default.index = (g_hero_moby_default.index + random_step) & 3;
         } else {
             g_hero_moby_default.index = 4;
             snd_set_current_buffer_flag();
@@ -189,64 +189,64 @@ after:
     cam_set_from_selected_record();
     {
         float current = D_001B9040.fov;
-        float minFov = D_001AC168[g_hero_moby_default.index];
-        if (current < minFov)
-            D_001B9040.fov = minFov;
+        float min_fov = D_001AC168[g_hero_moby_default.index];
+        if (current < min_fov)
+            D_001B9040.fov = min_fov;
     }
     UpdateViewContext();
-    fadeScale = 1.0f;
+    fade_scale = 1.0f;
     if (g_hero_moby_default.index == 4) {
-        fadeScale = (float)(g_scene_playback_state.duration - g_scene_playback_state.frame) / (float)g_scene_playback_state.duration;
-        FastVecScale(scratchA, D_001AC120, fadeScale);
-        FastVecAdd(D_001AC0D0, D_001AC0D0, scratchA);
+        fade_scale = (float)(g_scene_playback_state.duration - g_scene_playback_state.frame) / (float)g_scene_playback_state.duration;
+        FastVecScale(scratch_a, D_001AC120, fade_scale);
+        FastVecAdd(D_001AC0D0, D_001AC0D0, scratch_a);
     }
-    FastVecScale(&D_001B20D0, D_00261F30 + g_hero_moby_default.index * 16, (float)(g_scene_playback_state.frame - 0x78) * (fadeScale * 20.0f));
+    FastVecScale(&D_001B20D0, D_00261F30 + g_hero_moby_default.index * 16, (float)(g_scene_playback_state.frame - 0x78) * (fade_scale * 20.0f));
     D_001ABDD4 = D_001AC150[g_hero_moby_default.index];
-    for (i = 0; i < g_scene_playback_state.count; i = nextIndex) {
+    for (i = 0; i < g_scene_playback_state.count; i = next_index) {
         TransitionActor *actor;
-        int keyIndex, nextKeyIndex;
+        int key_index, next_key_index;
         float fraction;
         char *keys;
-        keyIndex = g_scene_playback_state.tick >> 1;
+        key_index = g_scene_playback_state.tick >> 1;
         actor = (TransitionActor *)g_scene_playback_state.objects[i];
-        nextIndex = i + 1;
+        next_index = i + 1;
         fraction = IntToFloat(g_scene_playback_state.tick & 1);
-        nextKeyIndex = keyIndex + 1;
+        next_key_index = key_index + 1;
         actor->blend = fraction * 0.5f;
         keys = (char *)actor->keys;
-        FastVecScale(scratchA, keys + keyIndex * 16, 1.0f - actor->blend);
-        FastVecScale(scratchB, keys + nextKeyIndex * 16, actor->blend);
-        FastVecAdd(actor->position, scratchA, scratchB);
+        FastVecScale(scratch_a, keys + key_index * 16, 1.0f - actor->blend);
+        FastVecScale(scratch_b, keys + next_key_index * 16, actor->blend);
+        FastVecAdd(actor->position, scratch_a, scratch_b);
         {
             char *definition = (char *)actor->definition;
             actor->current_anim = B(definition, 0xC) - 1;
             actor->next_anim = B(definition, 0xC) - 1;
-            actor->key = keyIndex;
-            actor->next_key = nextKeyIndex;
+            actor->key = key_index;
+            actor->next_key = next_key_index;
         }
         update_moby_animation_state(actor);
         actor->draw_flags = 0x1FF;
         if (actor->type == 0xD54 /* moby class 3412 */) {
             if (D_001B2148_first[0] != 0) {
-                moby_transform_joint_point(actor, 0, mobyMatrix);
+                moby_transform_joint_point(actor, 0, moby_matrix);
                 {
-                    int listIndex = 0;
+                    int list_index = 0;
                     actor->flags = 0;
                     actor->draw_flags = 0;
                     if (D_001B2148_first[0] != 0) {
                         do {
                             int k;
-                            B((char *)D_001B2148[listIndex], 0x63) = 0;
-                            H((char *)D_001B2148[listIndex], 0x32) = 0x1FF;
-                            qcopy((char *)D_001B2148[listIndex] + 0x10, actor->position);
+                            B((char *)D_001B2148[list_index], 0x63) = 0;
+                            H((char *)D_001B2148[list_index], 0x32) = 0x1FF;
+                            qcopy((char *)D_001B2148[list_index] + 0x10, actor->position);
                             for (k = 0; k < 3; k++) {
-                                ((MatrixEntity *)D_001B2148[listIndex])->basis[k].x = mobyMatrix[k * 4];
-                                ((MatrixEntity *)D_001B2148[listIndex])->basis[k].y = mobyMatrix[k * 4 + 1];
-                                ((MatrixEntity *)D_001B2148[listIndex])->basis[k].z = mobyMatrix[k * 4 + 2];
+                                ((MatrixEntity *)D_001B2148[list_index])->basis[k].x = moby_matrix[k * 4];
+                                ((MatrixEntity *)D_001B2148[list_index])->basis[k].y = moby_matrix[k * 4 + 1];
+                                ((MatrixEntity *)D_001B2148[list_index])->basis[k].z = moby_matrix[k * 4 + 2];
                             }
-                            func_002A10E8((void *)D_001B2148[listIndex]);
-                            listIndex = listIndex + 1;
-                        } while (D_001B2148[listIndex] != 0);
+                            func_002A10E8((void *)D_001B2148[list_index]);
+                            list_index = list_index + 1;
+                        } while (D_001B2148[list_index] != 0);
                     }
                 }
             } else {
@@ -269,16 +269,16 @@ after:
                 int duration = g_scene_playback_state.duration;
                 int frame = g_scene_playback_state.frame;
                 if (duration - 0x28 < frame) {
-                    float scaleFactor = (float)(duration - frame - 4) * 0.027777778f;
-                    if (scaleFactor < 0.0f)
-                        scaleFactor = 0.0f;
-                    actor->scale = F(definition, 0x24) * scaleFactor;
-                    D_001ABF10 = scaleFactor;
+                    float scale_factor = (float)(duration - frame - 4) * 0.027777778f;
+                    if (scale_factor < 0.0f)
+                        scale_factor = 0.0f;
+                    actor->scale = F(definition, 0x24) * scale_factor;
+                    D_001ABF10 = scale_factor;
                     if (D_001B2148_first[0] != 0) {
                         char *entity = (char *)D_001B2148_first[0];
-                        F(entity, 0x2C) = F((char *)W(entity, 0x24), 0x24) * scaleFactor;
+                        F(entity, 0x2C) = F((char *)W(entity, 0x24), 0x24) * scale_factor;
                     }
-                    actor->opacity = (int)(scaleFactor * 232.0f);
+                    actor->opacity = (int)(scale_factor * 232.0f);
                     if (actor->type == 0xD54 /* moby class 3412 */) {
                         if (D_001B2148_first[0] == 0) {
                             int j;
@@ -288,7 +288,7 @@ after:
                                 do {
                                     ScaleEntity *entity = g_equipment_pieces[j];
                                     j++;
-                                    entity->scale = entity->definition->scale * scaleFactor;
+                                    entity->scale = entity->definition->scale * scale_factor;
                                 } while (g_equipment_pieces[j] != 0);
                             }
                         }

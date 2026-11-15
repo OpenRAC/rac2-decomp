@@ -42,8 +42,8 @@ void patrol_drone_init(unsigned char *moby) {
   *(float *)(vars+0x3D0)=*(float *)(moby+0xF8); *(short *)(vars+0x3D4)=0; *(int *)(vars+0x3AC)=0;
   *(float *)(vars+0x3E8)=*(float *)(vars+0x3E4)=*(float *)(vars+0x3D8)=0.0f;
   moby_set_state(moby,1,-1);
-  {unsigned char *soundEntry=g_sound_state+*(int *)(vars+0x3F0)*0x70;
-   if (*(unsigned char **)(soundEntry+0x88)!=moby || !soundEntry[0x74]) *(int *)(vars+0x3F0)=PlayMobySound(D_L09_001B11B4,4,moby);
+  {unsigned char *sound_entry=g_sound_state+*(int *)(vars+0x3F0)*0x70;
+   if (*(unsigned char **)(sound_entry+0x88)!=moby || !sound_entry[0x74]) *(int *)(vars+0x3F0)=PlayMobySound(D_L09_001B11B4,4,moby);
   }
  }
 }

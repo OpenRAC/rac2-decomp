@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 /* func_L23_00428CF8 is a unit of its own: it needs the opt-in quadword-copy profile and its
@@ -85,7 +86,7 @@ void fast_shot_update(u8 *moby) {
                 if (*(u8 **)(base + 0x18) != 0) {
                     s16 hitClass = *(s16 *)(*(u8 **)(base + 0x18) + 0xAA);
 
-                    if (hitClass != 0x7E5 /* moby class 2021 */ && hitClass != 0xF7F /* Mothership Boss Part */ && hitClass != 0xF7E /* moby class 3966 */) {
+                    if (hitClass != 0x7E5 /* moby class 2021 */ && hitClass != MOBY_CLASS_MOTHERSHIP_BOSS_PART && hitClass != 0xF7E /* moby class 3966 */) {
                         *(TI128 *)vec = *(TI128 *)vars;
                         FastVecScale(vec, vec, 1.5f);
                         vec[2] = 1.0f;

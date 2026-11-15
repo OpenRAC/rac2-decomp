@@ -33,15 +33,15 @@ void UpdateHomingPickup(char *object)
             vec_spring_to_target(object + 0x10, (void *)(g_homing_pickup_target + 0x10), state + 0x40,
                          0.008888889104127884f, 0.0033333334140479565f, 1.0666667222976685f);
         } else if (distance < 60.0f) {
-            float *classData = *(float **)(object + 0x24);
-            float newScale = classData[9] * 0.02222222276031971f * distance;
+            float *class_data = *(float **)(object + 0x24);
+            float new_scale = class_data[9] * 0.02222222276031971f * distance;
 
-            *(float *)(object + 0x2C) = newScale;
+            *(float *)(object + 0x2C) = new_scale;
             {
-                float minScale = classData[9] * 0.30000001192092896f;
+                float min_scale = class_data[9] * 0.30000001192092896f;
 
-                if (newScale < minScale)
-                    *(float *)(object + 0x2C) = minScale;
+                if (new_scale < min_scale)
+                    *(float *)(object + 0x2C) = min_scale;
             }
             vec_spring_to_target(object + 0x10, (void *)(g_homing_pickup_target + 0x10), state + 0x40,
                          0.0055555556900799274f, 0.0016666667070239782f, 0.5f);

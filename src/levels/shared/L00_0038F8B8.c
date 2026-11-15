@@ -39,7 +39,7 @@ void visibomb_gun_update(char *actor) {
     if (D_L00_001A8F00[0] || D_L00_001A8F08[0] != -2 || !(g_pad_state.buttons & g_hero_state.buttons) || state[0] || state[1] || g_hero_state.busy) goto finish;
     if (g_hero_state.state == 7 || g_hero_state.state == 2 || g_hero_state.state == 3 || g_hero_state.state == 4 || g_hero_state.state == 5 || g_hero_state.state == 6 || g_hero_state.state == 16 || g_hero_state.state == 14 || g_hero_state.state == 9 || g_hero_state.state == 10 || g_hero_state.state == 11 || g_hero_state.state >= 13 || g_hero_state.level == 111 || g_hero_state.level == 98) goto finish;
     if ((g_follow_camera_object && *(short *)(g_follow_camera_object + 0x86) == 5) || !g_hero_state.grounded || g_hero_state.resource < 23) goto finish;
-    if (g_hero_state.support && (*(short *)(g_hero_state.support + 0xAA) == 0x13E /* moby class 318 */ || *(short *)(g_hero_state.support + 0xAA) == 0x46F /* Teleporter */) && ready) goto finish;
+    if (g_hero_state.support && (*(short *)(g_hero_state.support + 0xAA) == 0x13E /* moby class 318 */ || *(short *)(g_hero_state.support + 0xAA) == MOBY_CLASS_TELEPORTER) && ready) goto finish;
     if (!weapon_spend_ammo(-1, 1)) goto denied;
     pitch = 0.0f;
     heading = g_hero_state.heading;

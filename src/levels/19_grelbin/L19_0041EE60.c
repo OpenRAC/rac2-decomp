@@ -32,7 +32,7 @@ extern s32 math_fast_float_d(void *);
 void yeti_group_spawner_update(u8 *moby)
 {
     u8 *state;
-    s32 savedCount;
+    s32 saved_count;
 
     if (moby_is_in_selected_zone(moby + 0x10) == 0)
         return;
@@ -40,40 +40,40 @@ void yeti_group_spawner_update(u8 *moby)
     if (GROUP(0x120) == -1 ||
         (moby[0xB0] != 0xFF &&
          (D_L19_0021EA30.entries[(s16)*(u16 *)(moby + 0xB2)] != 0 ||
-          ((savedCount = *(u8 *)(D_0019B4A8 + (((s16) * (u16 *)(moby + 0xB2) >> 1) + (g_current_map_index << 10)))),
-           (*(u16 *)(moby + 0xB2) & 1) ? ((savedCount >> 4) & 7) != 0 : (savedCount & 7) != 0)))) {
+          ((saved_count = *(u8 *)(D_0019B4A8 + (((s16) * (u16 *)(moby + 0xB2) >> 1) + (g_current_map_index << 10)))),
+           (*(u16 *)(moby + 0xB2) & 1) ? ((saved_count >> 4) & 7) != 0 : (saved_count & 7) != 0)))) {
         moby_mark_spawned(moby);
         return;
     }
     switch (moby[0x20]) {
     case 0: {
         u16 *p;
-        u8 *otherMoby;
-        u8 *otherVars;
-        f32 groundHeight;
+        u8 *other_moby;
+        u8 *other_vars;
+        f32 ground_height;
 
-        groundHeight = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
-        groundHeight -= math_random_float_range(0.1f, 0.3f);
+        ground_height = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
+        ground_height -= math_random_float_range(0.1f, 0.3f);
         *(s16 *)(moby + 0x7C) = 0x1F;
         *(s32 *)(moby + 0x48) = 0;
-        *(f32 *)(moby + 0x18) = groundHeight;
+        *(f32 *)(moby + 0x18) = ground_height;
         FOR_EACH_ID(p, 0x120) {
-            otherMoby = g_moby_l19_array[0] + ((*p & 0x7FFF) << 8);
-            if (otherMoby == 0)
+            other_moby = g_moby_l19_array[0] + ((*p & 0x7FFF) << 8);
+            if (other_moby == 0)
                 break;
-            if (*(s16 *)(otherMoby + 0xAA) == 0x10D0 /* Y.E.T.I. */) {
-                otherVars = *(u8 **)(otherMoby + 0x68);
-                *(f32 *)(otherVars + 0x22C) = *(f32 *)(state + 0x128) + 10.0f;
-                *(s32 *)(otherVars + 0x26C) = 1;
-                *(s32 *)(otherVars + 0x274) = 1;
+            if (*(s16 *)(other_moby + 0xAA) == MOBY_CLASS_YETI) {
+                other_vars = *(u8 **)(other_moby + 0x68);
+                *(f32 *)(other_vars + 0x22C) = *(f32 *)(state + 0x128) + 10.0f;
+                *(s32 *)(other_vars + 0x26C) = 1;
+                *(s32 *)(other_vars + 0x274) = 1;
             }
         }
         moby_set_state(moby, 1, -1);
         break;
     }
     case 1: {
-        u8 *otherMoby;
-        f32 burstVec[4];
+        u8 *other_moby;
+        f32 burst_vec[4];
         s32 gone;
 
         weapon_select_aim_target(moby, -1, *(f32 *)(state + 0x128), *(f32 *)(state + 0x128), 0, 0);
@@ -81,15 +81,15 @@ void yeti_group_spawner_update(u8 *moby)
         if (GROUP(0x138) == -1) {
             gone = 1;
         } else {
-            otherMoby = g_moby_l19_array[0] + (GROUP(0x138) << 8);
-            if (otherMoby == 0 || otherMoby[0x20] == 0xFE || otherMoby[0x20] == 0xFD)
+            other_moby = g_moby_l19_array[0] + (GROUP(0x138) << 8);
+            if (other_moby == 0 || other_moby[0x20] == 0xFE || other_moby[0x20] == 0xFD)
                 gone = 1;
         }
         if (GROUP(0x64) == 1 && gone) {
-            qzero(burstVec);
-            burstVec[2] = 0.15f;
+            qzero(burst_vec);
+            burst_vec[2] = 0.15f;
             *(s16 *)(moby + 0x7C) = 0;
-            part_spawn_masked_debris(moby, 0x1F, burstVec, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
+            part_spawn_masked_debris(moby, 0x1F, burst_vec, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
             PlayMobySound(0, 0, moby);
             moby_set_state(moby, 3, -1);
         }
@@ -97,23 +97,23 @@ void yeti_group_spawner_update(u8 *moby)
     }
     case 3: {
         u16 *p;
-        u8 *otherMoby;
-        u8 *otherVars;
+        u8 *other_moby;
+        u8 *other_vars;
         s32 found = 0;
 
         FOR_EACH_ID(p, 0x120) {
-            otherMoby = g_moby_l19_array[0] + ((*p & 0x7FFF) << 8);
-            if (otherMoby == 0)
+            other_moby = g_moby_l19_array[0] + ((*p & 0x7FFF) << 8);
+            if (other_moby == 0)
                 break;
-            if (*(s16 *)(otherMoby + 0xAA) == 0x10D0 /* Y.E.T.I. */) {
-                otherVars = *(u8 **)(otherMoby + 0x68);
-                if (*(s32 *)(otherVars + 0x26C) == 1) {
-                    qcopy(otherMoby + 0x10, moby + 0x10);
-                    qcopy(otherVars + 0x210, moby + 0x10);
-                    *(f32 *)(otherMoby + 0x18) = coll_probe_ground_height_below(otherMoby + 0x10, 0, 1.0f);
+            if (*(s16 *)(other_moby + 0xAA) == MOBY_CLASS_YETI) {
+                other_vars = *(u8 **)(other_moby + 0x68);
+                if (*(s32 *)(other_vars + 0x26C) == 1) {
+                    qcopy(other_moby + 0x10, moby + 0x10);
+                    qcopy(other_vars + 0x210, moby + 0x10);
+                    *(f32 *)(other_moby + 0x18) = coll_probe_ground_height_below(other_moby + 0x10, 0, 1.0f);
                     found = 1;
-                    *(s32 *)(otherVars + 0x26C) = 0;
-                    *(u16 *)(otherMoby + 0x34) &= 0xFF7F;
+                    *(s32 *)(other_vars + 0x26C) = 0;
+                    *(u16 *)(other_moby + 0x34) &= 0xFF7F;
                     break;
                 }
             }
@@ -128,29 +128,29 @@ void yeti_group_spawner_update(u8 *moby)
     }
     case 2: {
         u16 *p;
-        u8 *otherMoby;
-        u8 *otherVars;
-        s32 idleCount;
+        u8 *other_moby;
+        u8 *other_vars;
+        s32 idle_count;
 
         weapon_select_aim_target(moby, -1, *(f32 *)(state + 0x128) + 10.0f, *(f32 *)(state + 0x128), 0, 0);
         if (GROUP(0x64) == 1) {
-            idleCount = 0;
+            idle_count = 0;
             FOR_EACH_ID(p, 0x120) {
-                otherMoby = g_moby_l19_array[0] + ((*p & 0x7FFF) << 8);
-                if (otherMoby == 0)
+                other_moby = g_moby_l19_array[0] + ((*p & 0x7FFF) << 8);
+                if (other_moby == 0)
                     break;
-                if (*(s16 *)(otherMoby + 0xAA) == 0x10D0 /* Y.E.T.I. */) {
-                    otherVars = *(u8 **)(otherMoby + 0x68);
-                    if (*(s32 *)(otherVars + 0x26C) == 0) {
-                        if (otherMoby[0x20] != 0xFE) {
-                            if (otherMoby[0x20] != 0xFD)
-                                idleCount++;
+                if (*(s16 *)(other_moby + 0xAA) == MOBY_CLASS_YETI) {
+                    other_vars = *(u8 **)(other_moby + 0x68);
+                    if (*(s32 *)(other_vars + 0x26C) == 0) {
+                        if (other_moby[0x20] != 0xFE) {
+                            if (other_moby[0x20] != 0xFD)
+                                idle_count++;
                         }
                     }
                 }
             }
             if (g_active_yeti_count < g_max_active_yetis) {
-                if (idleCount < 3) {
+                if (idle_count < 3) {
                     if (math_fast_float_d(state + 0x13C))
                         moby_set_state(moby, 3, -1);
                 }

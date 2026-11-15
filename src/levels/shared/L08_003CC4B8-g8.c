@@ -70,44 +70,44 @@ extern void water_init_object(L08SpawnBlock *);
    is the counter's low byte, doubled and/or inverted by the ring index. */
 void gfx_draw_glowing_spark_rings(char *moby)
 {
-    TI128 joint, velocity, step, ring, ringStep;
-    int sparkIndex;
-    int ringIndex;
-    int angleByte;
-    float ringAge;
-    float inverse255, half, baseSize;
-    int ringColor;
+    TI128 joint, velocity, step, ring, ring_step;
+    int spark_index;
+    int ring_index;
+    int angle_byte;
+    float ring_age;
+    float inverse255, half, base_size;
+    int ring_color;
 
     moby_transform_joint_to_world(moby, 0, &joint);
     if (math_random_int_below(4) == 0) {
         vec_random_direction(&velocity, D_L08_001AFEEC * 0.016666668f, D_L08_001AFEF0 * 0.016666668f);
-        angleByte = D_L08_001AFEFC;
-        part_spawn_hero_relative(&joint, &velocity, D_L08_001AFF00, angleByte, math_random_int_below(255), 0, D_L08_001AFF08);
-        for (sparkIndex = 2; sparkIndex >= 0; sparkIndex--) {
+        angle_byte = D_L08_001AFEFC;
+        part_spawn_hero_relative(&joint, &velocity, D_L08_001AFF00, angle_byte, math_random_int_below(255), 0, D_L08_001AFF08);
+        for (spark_index = 2; spark_index >= 0; spark_index--) {
             vec_random_direction(&step, D_L08_001AFEF4 * 0.016666668f, D_L08_001AFEF8 * 0.016666668f);
             FastVecAdd(&velocity, &velocity, &step);
-            angleByte = D_L08_001AFEFC;
-            part_spawn_hero_relative(&joint, &velocity, D_L08_001AFF04, angleByte, math_random_int_below(255), 0, D_L08_001AFF0C);
+            angle_byte = D_L08_001AFEFC;
+            part_spawn_hero_relative(&joint, &velocity, D_L08_001AFF04, angle_byte, math_random_int_below(255), 0, D_L08_001AFF0C);
         }
     }
     FastVecSub(&ring, D_L08_001B9B00, &joint);
     vec_scale_to_length(&ring, &ring, -0.3f);
-    vec_scale_to_length(&ringStep, &ring, 0.1f);
+    vec_scale_to_length(&ring_step, &ring, 0.1f);
     FastVecAdd(&ring, &ring, &joint);
     inverse255 = 0.003921569f;
     half = 0.5f;
-    baseSize = 3.0f;
-    for (ringIndex = 0; ringIndex < 4; ringIndex++) {
-        ringAge = IntToFloat(0xFF - ((D_L08_001B2508 + ringIndex * 20) & 0xFF));
-        ringColor = FastTweenColor(D_L08_001AFF10, D_L08_001AFF14, math_fabs(half - ringAge * inverse255));
-        angleByte = D_L08_001B2508 & 0xFF;
-        if (ringIndex & 2)
-            angleByte = angleByte * 2;
-        if (ringIndex & 1)
-            angleByte = 0xFF - angleByte;
-        part_spawn_fading(&ring, ringColor, angleByte, D_L08_001AFF20, D_L08_001AFF1C, 2, 0,
-                      (IntToFloat(ringIndex) + baseSize)
+    base_size = 3.0f;
+    for (ring_index = 0; ring_index < 4; ring_index++) {
+        ring_age = IntToFloat(0xFF - ((D_L08_001B2508 + ring_index * 20) & 0xFF));
+        ring_color = FastTweenColor(D_L08_001AFF10, D_L08_001AFF14, math_fabs(half - ring_age * inverse255));
+        angle_byte = D_L08_001B2508 & 0xFF;
+        if (ring_index & 2)
+            angle_byte = angle_byte * 2;
+        if (ring_index & 1)
+            angle_byte = 0xFF - angle_byte;
+        part_spawn_fading(&ring, ring_color, angle_byte, D_L08_001AFF20, D_L08_001AFF1C, 2, 0,
+                      (IntToFloat(ring_index) + base_size)
                           * (*(float *)(moby + 0x2C) / *(float *)(*(char **)(moby + 0x24) + 0x24)));
-        FastVecAdd(&ring, &ring, &ringStep);
+        FastVecAdd(&ring, &ring, &ring_step);
     }
 }

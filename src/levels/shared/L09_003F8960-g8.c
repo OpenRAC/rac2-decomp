@@ -34,7 +34,7 @@ void trooper_compute_aim_target(char *moby)
     float ofs[4] __attribute__((aligned(16)));
 
     if (*(u8 *)(vars + 0x30F) != 0 && (target = *(char **)(vars + 0x2F8)) != 0
-        && *(s16 *)(target + 0xAA) == 0xD0E /* Megacorp Trooper Torso */
+        && *(s16 *)(target + 0xAA) == MOBY_CLASS_MEGACORP_TROOPER_TORSO
         && *(u8 *)(target + 0x20) != 0xFE && *(u8 *)(target + 0x20) != 0xFD) {
         qcopy(pos, moby + 0x10);
         pos[2] += math_random_float_range(0.0f, 1.0f);

@@ -225,7 +225,7 @@ extern void joba_ring_effect_draw_sprites(void);
 void drone_update_timer(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    unsigned short frameCount;
+    unsigned short frame_count;
 
     gfx_update_color_fade(moby, vars + 0x50);
     if (*(short *)(vars + 0x50) == 0) {
@@ -236,9 +236,9 @@ void drone_update_timer(char *moby)
     } else {
         *(short *)(vars + 0x1FE) = 0;
     }
-    frameCount = *(unsigned short *)(moby + 0x96);
-    if (frameCount <= 0xFFFE)
-        *(unsigned short *)(moby + 0x96) = frameCount + 1;
+    frame_count = *(unsigned short *)(moby + 0x96);
+    if (frame_count <= 0xFFFE)
+        *(unsigned short *)(moby + 0x96) = frame_count + 1;
 }
 
 extern void func_002A7750_4b60();
@@ -407,10 +407,10 @@ void fighter_update_contacts(JobaObject *obj)
 /* Counts one more frame for the object and checks what it touches. */
 void fighter_count_frame_check_contact(char *moby)
 {
-    unsigned short frameCount = *(unsigned short *)(moby + 0x96);
+    unsigned short frame_count = *(unsigned short *)(moby + 0x96);
 
-    if (frameCount < 0xFFFF)
-        *(unsigned short *)(moby + 0x96) = frameCount + 1;
+    if (frame_count < 0xFFFF)
+        *(unsigned short *)(moby + 0x96) = frame_count + 1;
     coll_sweep_from_object(moby, moby + 0x10, 0x4000000, 1.6f, 1.0f, 1.0f, 0, 1, 0);
 }
 
@@ -465,17 +465,17 @@ void fighter_reset_to_idle(char *moby)
 
 /* Same body as func_L02_003F1A88, with this function's own callees. */
 /* Picks a random goal spot about eight units from the target and stores it. */
-void fighter_pick_goal_near_target(char *moby, char *targetPos) {
+void fighter_pick_goal_near_target(char *moby, char *target_pos) {
     char *state;
     float angle;
     float radius;
 
-    angle = mat_fast_helper_a(*(float *)(moby + 0x10) - *(float *)targetPos,
-                          *(float *)(moby + 0x14) - *(float *)(targetPos + 4));
+    angle = mat_fast_helper_a(*(float *)(moby + 0x10) - *(float *)target_pos,
+                          *(float *)(moby + 0x14) - *(float *)(target_pos + 4));
     angle += math_random_float_range(-0.78539824f, 0.78539824f);
     radius = math_random_float_range(-2.0f, 2.0f) + 8.0f;
     state = *(char **)(moby + 0x68);
-    qcopy(state + 0x230, targetPos);
+    qcopy(state + 0x230, target_pos);
     *(float *)(state + 0x230) += radius * math_fast_sin_or_cos_a(angle);
     *(float *)(state + 0x234) += radius * math_fast_sin_or_cos_b(angle);
 }
@@ -765,8 +765,8 @@ void vec_scale_four_alt(char *vectors, float scale)
 /* Builds a 144-byte packet, aims a quaternion at the level's vector from pos through three
    float helpers, derives an offset basis by a fourth, writes the last matrix row from pos
    plus that offset, then dispatches the packet. */
-void gfx_draw_aimed_packet(char *pos, int colorBase, int alpha, char *texture, int blendFlags,
-                       float scale, float roll, float offsetScale)
+void gfx_draw_aimed_packet(char *pos, int color_base, int alpha, char *texture, int blend_flags,
+                       float scale, float roll, float offset_scale)
 {
     char pkt[144];
     float m[16];
@@ -777,12 +777,12 @@ void gfx_draw_aimed_packet(char *pos, int colorBase, int alpha, char *texture, i
     part_reset_quad_record_c(pkt);
     r = GetEffectTextureDescriptor(texture);
 
-    *(long long *)(pkt + 136) = ((long long)blendFlags << 2) | 0x8000000040LL;
+    *(long long *)(pkt + 136) = ((long long)blend_flags << 2) | 0x8000000040LL;
     *(long long *)(pkt + 128) = 280993940374112LL;
-    *(int *)(pkt + 76) = colorBase + (alpha << 24);
-    *(int *)(pkt + 72) = colorBase + (alpha << 24);
-    *(int *)(pkt + 68) = colorBase + (alpha << 24);
-    *(int *)(pkt + 64) = colorBase + (alpha << 24);
+    *(int *)(pkt + 76) = color_base + (alpha << 24);
+    *(int *)(pkt + 72) = color_base + (alpha << 24);
+    *(int *)(pkt + 68) = color_base + (alpha << 24);
+    *(int *)(pkt + 64) = color_base + (alpha << 24);
     *(long long *)(pkt + 112) = 0LL;
     *(long long *)(pkt + 120) = r;
 
@@ -795,7 +795,7 @@ void gfx_draw_aimed_packet(char *pos, int colorBase, int alpha, char *texture, i
 
     euler_to_matrix(m, quat);
     FastVecSub(off, &D_L11_001BA780.x_140, pos);
-    vec_scale_to_length(off, off, offsetScale);
+    vec_scale_to_length(off, off, offset_scale);
 
     m[12] = *(float *)(pos + 0) + off[0];
     m[13] = *(float *)(pos + 4) + off[1];

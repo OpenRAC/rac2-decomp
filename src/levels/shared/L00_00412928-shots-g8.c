@@ -61,8 +61,8 @@ void lava_gun_update_blobs(char *object)
     char *hero;
     Entry *entry;
     char *target;
-    int hitCount, hitIndex, nextIndex;
-    ClassEntry *classEntry;
+    int hit_count, hit_index, nextIndex;
+    ClassEntry *class_entry;
 
     for (i = 0; i < *(int *)(state + 0x44); i++) {
         hero = g_hero_state;
@@ -101,8 +101,8 @@ void lava_gun_update_blobs(char *object)
                     FastVecSub(&direction, target + 0x10, object + 0x10);
                     vec_scale_to_length(&direction, &direction, 1);
                     vec_scale_to_length(&hit, &hit, 1);
-                    classEntry = &g_weapon_l00_table[g_item_slot_to_record[0x1d]];
-                    make_hit_descriptor(&hit, object, 0x910000, &direction, classEntry->direct);
+                    class_entry = &g_weapon_l00_table[g_item_slot_to_record[0x1d]];
+                    make_hit_descriptor(&hit, object, 0x910000, &direction, class_entry->direct);
                     hit.direction.q = direction.q;
                     hit.direction.f[3] = 5627.9248046875f;
                     hit.type = 9;
@@ -112,24 +112,24 @@ void lava_gun_update_blobs(char *object)
                     QueueMobyImpact(g_collision_result.target, &hit);
                     StartAttachedEffect(g_collision_result.target, 0x1d, object);
                     PlayMobySound(1, 0, object);
-                    hitCount = coll_process_hit(g_collision_result.target + 0x10, 0x10, object, 0, 1.5f);
-                    for (hitIndex = 0; hitIndex < hitCount; hitIndex++) {
-                        target = ((char **)g_area_hit_targets)[hitIndex];
+                    hit_count = coll_process_hit(g_collision_result.target + 0x10, 0x10, object, 0, 1.5f);
+                    for (hit_index = 0; hit_index < hit_count; hit_index++) {
+                        target = ((char **)g_area_hit_targets)[hit_index];
                         if (target == *(char **)(hero + 0x2290))
                             continue;
                         FastVecSub(&direction, target + 0x10, object + 0x10);
                         vec_scale_to_length(&direction, &direction, 1);
                         vec_scale_to_length(&hit, &hit, 1);
-                        classEntry = &g_weapon_l00_table[g_item_slot_to_record[0x1d]];
-                        make_hit_descriptor(&hit, object, 0x910000, &direction, classEntry->splash);
+                        class_entry = &g_weapon_l00_table[g_item_slot_to_record[0x1d]];
+                        make_hit_descriptor(&hit, object, 0x910000, &direction, class_entry->splash);
                         hit.direction.q = direction.q;
                         hit.direction.f[3] = 5627.9248046875f;
                         hit.type = 9;
                         hit.enabled = 1;
                         hit.flag = 1;
-                        hit.id = *(unsigned short *)(((char **)g_area_hit_targets)[hitIndex] + 0xaa);
-                        QueueMobyImpact(((char **)g_area_hit_targets)[hitIndex], &hit);
-                        StartAttachedEffect(((char **)g_area_hit_targets)[hitIndex], 0x1d, object);
+                        hit.id = *(unsigned short *)(((char **)g_area_hit_targets)[hit_index] + 0xaa);
+                        QueueMobyImpact(((char **)g_area_hit_targets)[hit_index], &hit);
+                        StartAttachedEffect(((char **)g_area_hit_targets)[hit_index], 0x1d, object);
                         PlayMobySound(1, 0, object);
                         /* The block must not end in the call: flow would pad it with a
                          * (use 0) insn, which lengthens the inner pointers' live ranges

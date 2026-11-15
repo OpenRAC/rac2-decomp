@@ -1,4 +1,5 @@
 #include "names.h"
+#include "moby_classes.h"
 /* func_L03_003A40A0 (716 bytes, 12 places). The turn call uses func_002AAA00's real prototype,
  * float (void *out, float, float, float, float, void *in, int), and func_L03_0043AC40 takes the
  * object. D_L03_001B2548 and D_001A79F0 are read in retail's absolute macro form (lui/lw into
@@ -59,7 +60,7 @@ void swingshot_node_update(unsigned char *object) {
         }
         break;
     case 1:
-        if (*(short *)(object + 0xAA) == 0x323 /* Swingshot Node */) {
+        if (*(short *)(object + 0xAA) == MOBY_CLASS_SWINGSHOT_NODE_2) {
             anglePointer = (float *)(object + 0xF8);
             angle = mat_fast_helper_a(((SwitchPlayer *)D_L03_00189E20)->x - *(float *)(object + 0x10),
                                   ((SwitchPlayer *)D_L03_00189E20)->y - *(float *)(object + 0x14));

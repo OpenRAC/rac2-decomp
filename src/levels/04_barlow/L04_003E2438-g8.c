@@ -101,16 +101,16 @@ void barlow_creature_update(u8 *moby) {
 
     switch (moby[0x95]) {
     case 0: {
-        s32 homeSlot;
+        s32 home_slot;
 
-        homeSlot = *(s32 *)(vars + 0x2F0);
-        if (homeSlot != -1)
+        home_slot = *(s32 *)(vars + 0x2F0);
+        if (home_slot != -1)
             break;
         if (flag_set_second_pending(moby) != 0) {
             moby_set_controller_speed_limits(moby, 0.0022222223f, 0.06666667f, 0.001163553f, 0.10471977f);
             if (*(f32 *)(vars + 0x2C0) < 0.2f)
                 object_set_linked_states(moby, 4, 3, 0, 0xC);
-            if (*(s32 *)(vars + 0x2CC) != homeSlot && *(s32 *)(vars + 0x2C4) == homeSlot) {
+            if (*(s32 *)(vars + 0x2CC) != home_slot && *(s32 *)(vars + 0x2C4) == home_slot) {
                 object_set_linked_states(moby, 5, 4, 0, 0xC);
                 moby_set_state(moby, 2, -1);
             }
@@ -189,18 +189,18 @@ void barlow_creature_update(u8 *moby) {
         }
         break;
     case 3: {
-        s32 moveFlags;
-        s32 homeSlot;
+        s32 move_flags;
+        s32 home_slot;
 
-        moveFlags = moby_dispatch_action_by_kind(moby, vars + 0x60);
-        if (moveFlags & 1) {
+        move_flags = moby_dispatch_action_by_kind(moby, vars + 0x60);
+        if (move_flags & 1) {
             SetDeathBits(moby, 0, 3);
             part_queue_moby_for_glow(moby, 0, 0);
             return;
         }
-        if (moveFlags & 2) {
-            homeSlot = *(s32 *)(vars + 0x2F0);
-            if (homeSlot != -1) {
+        if (move_flags & 2) {
+            home_slot = *(s32 *)(vars + 0x2F0);
+            if (home_slot != -1) {
                 object_set_linked_states(moby, 6, 5, 0, 0xA);
                 moby_set_state(moby, 7, 0);
                 *(s8 *)(vars + 0x307) = 0x78;
@@ -275,12 +275,12 @@ void barlow_creature_update(u8 *moby) {
         break;
     case 6: {
         {
-        f32 homePoint[4] __attribute__((aligned(16)));
+        f32 home_point[4] __attribute__((aligned(16)));
 
-        *(TI128 *)homePoint = *(TI128 *)(vars + 0x280);
+        *(TI128 *)home_point = *(TI128 *)(vars + 0x280);
         moby_set_controller_speed_limits(moby, 0.00044444445f, 0.02666667f, 0.001163553f, 0.10471977f);
-        moby_l01_turn_toward_target(moby, homePoint);
-        if (vec_distance_xy(moby + 0x10, homePoint) < 1.0f) {
+        moby_l01_turn_toward_target(moby, home_point);
+        if (vec_distance_xy(moby + 0x10, home_point) < 1.0f) {
             object_set_linked_states(moby, 1, 1, 0, 0xA);
             *(s16 *)(vars + 0x300) = math_random_int_range(0x4B0, 0xBB8);
             moby_set_state(moby, 5, -1);
@@ -290,16 +290,16 @@ void barlow_creature_update(u8 *moby) {
     }
     case 7: {
         {
-        f32 homePoint[4] __attribute__((aligned(16)));
+        f32 home_point[4] __attribute__((aligned(16)));
         f32 m;
 
-        *(TI128 *)homePoint = *(TI128 *)(vars + 0x280);
+        *(TI128 *)home_point = *(TI128 *)(vars + 0x280);
         moby_set_controller_speed_limits(moby, 0.0006666667f, 0.040000003f, 0.001163553f, 0.10471977f);
-        object_move_along_anim_sparks(moby, homePoint);
+        object_move_along_anim_sparks(moby, home_point);
         m = *(f32 *)(vars + 0x16C) * 30.0f;
         if (m < *(f32 *)(vars + 0x1E8))
             *(f32 *)(vars + 0x1E8) = m;
-        if (vec_distance_xy(moby + 0x10, homePoint) < 1.0f || *(s32 *)(vars + 0x1C0) >= 0x3D) {
+        if (vec_distance_xy(moby + 0x10, home_point) < 1.0f || *(s32 *)(vars + 0x1C0) >= 0x3D) {
             object_set_linked_states(moby, 1, 1, 0, 0xA);
             *(s16 *)(vars + 0x300) = math_random_int_range(0x4B0, 0xBB8);
             moby_set_state(moby, 5, -1);
@@ -451,11 +451,11 @@ void barlow_creature_update(u8 *moby) {
     case 23: {
         moby_set_controller_speed_limits(moby, 0.0011111111f, 0.033333335f, 0.001163553f, 0.10471977f);
         {
-        f32 homePoint[4] __attribute__((aligned(16)));
+        f32 home_point[4] __attribute__((aligned(16)));
 
-        vec_scale_to_length(homePoint, moby + 0xC0, -5.5f);
-        FastVecAdd(homePoint, homePoint, moby + 0x10);
-        moby_move_to_target_temp_limits(moby, homePoint, mat_fast_helper_a(homePoint[0] - *(f32 *)(moby + 0x10), homePoint[1] - *(f32 *)(moby + 0x14)), 0x10, -1.0f, -1.0f);
+        vec_scale_to_length(home_point, moby + 0xC0, -5.5f);
+        FastVecAdd(home_point, home_point, moby + 0x10);
+        moby_move_to_target_temp_limits(moby, home_point, mat_fast_helper_a(home_point[0] - *(f32 *)(moby + 0x10), home_point[1] - *(f32 *)(moby + 0x14)), 0x10, -1.0f, -1.0f);
         }
         if (*(u16 *)(moby + 0x96) >= 0x79) {
             *(f32 *)(vars + 0x164) = 0.00083333335f;

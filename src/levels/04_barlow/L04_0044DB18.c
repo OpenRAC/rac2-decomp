@@ -356,7 +356,7 @@ void tribesman_l04_update(u8 *object)
         }
         if ((u32)(object[0x42] - 26) < 2 && (object[0x60] & 2)) {
             if (object[0x43] != 29) anim_start_blended(object, 29, 0, 30);
-            if (*(s16 *)(P(0x56C) + 0xAA) == 0xFF8 /* Tribesman */) {
+            if (*(s16 *)(P(0x56C) + 0xAA) == MOBY_CLASS_TRIBESMAN) {
                 *(int *)(*(u8 **)(P(0x56C) + 0x68) + 0x564) = 1; I(0x564) = 2;
             }
         }
@@ -367,7 +367,7 @@ void tribesman_l04_update(u8 *object)
                 ids = g_moby_l04_group_lists[object[0x21]];
                 for (;;) {
                     entity = g_moby_l04_pool + ((*ids & 0x7FFF) << 8);
-                    if (*(s8 *)(entity + 0x20) >= 0 && *(s16 *)(entity + 0xAA) == 0xFF8 /* Tribesman */ &&
+                    if (*(s8 *)(entity + 0x20) >= 0 && *(s16 *)(entity + 0xAA) == MOBY_CLASS_TRIBESMAN &&
                         *(int *)(*(u8 **)((g_moby_l04_pool + ((*ids & 0x7FFF) << 8)) + 0x68) + 0x564) == 1) {
                         P(0x56C) = g_moby_l04_pool + ((*ids & 0x7FFF) << 8);
                         break;

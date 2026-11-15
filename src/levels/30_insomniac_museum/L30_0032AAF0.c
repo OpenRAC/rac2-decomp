@@ -214,17 +214,17 @@ void museum_draw_selected_exhibit_entry(char *obj) {
 /* Starts the countdown for the picked entry if nothing else is running; returns 1 if it did, 0 if not. */
 int museum_start_exhibit_entry_timer(char *obj) {
     char *vars = *(char **)(obj + 0x68);
-    char *gameState = (char *)g_music_state;
+    char *game_state = (char *)g_music_state;
     int idx;
 
-    if (*(int *)(gameState + 0x68) == 0 && *(int *)(gameState + 0x24) == -1) {
+    if (*(int *)(game_state + 0x68) == 0 && *(int *)(game_state + 0x24) == -1) {
         char *entry;
 
         idx = *(int *)(vars + 0x144);
         if (idx != -1) {
             entry = vars + idx * 4;
-            *(int *)(gameState + 0x24) = (*(int *)(entry + 0x70) & 0x3FFF) + 0xBB8;
-            *(int *)(gameState + 0x28) = 0;
+            *(int *)(game_state + 0x24) = (*(int *)(entry + 0x70) & 0x3FFF) + 0xBB8;
+            *(int *)(game_state + 0x28) = 0;
             return 1;
         }
     }
@@ -313,7 +313,7 @@ void projectile_step_thrown_sparks(unsigned char *obj) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L30_001C0200;
                 model = reread->hit;
@@ -394,7 +394,7 @@ void projectile_step_thrown(char *obj) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L30_001C0200;
             model = reread->hit;
@@ -437,20 +437,20 @@ finish:
 
 
 /* Reads the player's stick and button input into four numbers, keeping the stick values between -1 and 1. */
-void hover_read_inputs_basic(float *stickX, float *stickY, float *stickZ, float *button) {
-    *stickX = -g_hero_state.f1FB0;
-    *stickZ = -g_hero_state.f1FB4;
-    *stickY = func_321018(g_pad_state.f128) - func_321018(g_pad_state.f124);
+void hover_read_inputs_basic(float *stick_x, float *stick_y, float *stick_z, float *button) {
+    *stick_x = -g_hero_state.f1FB0;
+    *stick_z = -g_hero_state.f1FB4;
+    *stick_y = func_321018(g_pad_state.f128) - func_321018(g_pad_state.f124);
     *button = g_pad_state.f12C;
-    if (*stickX > 1.0f) {
-        *stickX = 1.0f;
-    } else if (*stickX < -1.0f) {
-        *stickX = -1.0f;
+    if (*stick_x > 1.0f) {
+        *stick_x = 1.0f;
+    } else if (*stick_x < -1.0f) {
+        *stick_x = -1.0f;
     }
-    if (*stickY > 1.0f) {
-        *stickY = 1.0f;
-    } else if (*stickY < -1.0f) {
-        *stickY = -1.0f;
+    if (*stick_y > 1.0f) {
+        *stick_y = 1.0f;
+    } else if (*stick_y < -1.0f) {
+        *stick_y = -1.0f;
     }
 }
 
@@ -496,30 +496,30 @@ void museum_info_stand_advance_state(char *obj) {
 extern int g_current_map_index MACRO_ADDR;
 
 /* Reads the player's controls for the hover vehicle into six numbers, keeping the stick values between -1 and 1. */
-void hover_read_inputs_full(float *stickX, float *stickY, float *stickZ, float *buttonA, float *strafe, float *buttonB) {
+void hover_read_inputs_full(float *stick_x, float *stick_y, float *stick_z, float *button_a, float *strafe, float *button_b) {
     int mode;
 
-    *stickX = -g_hero_state.f1FB0;
-    *stickZ = -g_hero_state.f1FB4;
-    *stickY = func_321018(g_pad_state.f128) - func_321018(g_pad_state.f124);
+    *stick_x = -g_hero_state.f1FB0;
+    *stick_z = -g_hero_state.f1FB4;
+    *stick_y = func_321018(g_pad_state.f128) - func_321018(g_pad_state.f124);
     mode = g_current_map_index;
     if (mode == 8 || mode == 0x10 || mode == 0x15 || mode == 0x1E) {
-        *buttonA = g_pad_state.f12C;
-        *buttonB = 0.0f;
+        *button_a = g_pad_state.f12C;
+        *button_b = 0.0f;
     } else {
-        *buttonB = g_pad_state.f12C;
-        *buttonA = 0.0f;
+        *button_b = g_pad_state.f12C;
+        *button_a = 0.0f;
     }
     *strafe = func_321018(g_pad_state.f138) - func_321018(g_pad_state.f13C);
-    if (*stickX > 1.0f) {
-        *stickX = 1.0f;
-    } else if (*stickX < -1.0f) {
-        *stickX = -1.0f;
+    if (*stick_x > 1.0f) {
+        *stick_x = 1.0f;
+    } else if (*stick_x < -1.0f) {
+        *stick_x = -1.0f;
     }
-    if (*stickY > 1.0f) {
-        *stickY = 1.0f;
-    } else if (*stickY < -1.0f) {
-        *stickY = -1.0f;
+    if (*stick_y > 1.0f) {
+        *stick_y = 1.0f;
+    } else if (*stick_y < -1.0f) {
+        *stick_y = -1.0f;
     }
     if (*strafe > 1.0f) {
         *strafe = 1.0f;

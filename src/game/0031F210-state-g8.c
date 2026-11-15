@@ -124,7 +124,7 @@ void thrown_object_update(char *object)
         if (CollLine(oldpos, object + 0x10, 2, object, 0)) {
             char *hitinfo = g_collision_hit;
             char *hit = *(char **)(hitinfo + 0x18);
-            if (hit && (hit == player->target || *(short *)(hit + 0xAA) == 0x907 /* Spiderbot Glove */)) break;
+            if (hit && (hit == player->target || *(short *)(hit + 0xAA) == MOBY_CLASS_SPIDERBOT_GLOVE)) break;
             qcopy(object + 0x10, hitinfo + 0x20);
             vec_clear_128(data);
             ForceClaimNotice(6, 0, 1);

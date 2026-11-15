@@ -33,7 +33,7 @@ extern struct Ord3 D_001A9EA0;
 
 /* Turns a rotation matrix into a quaternion. */
 void mat_to_quaternion(f32 *quat, f32 *matrix) {
-    struct Ord3 nextAxis = D_001A9EA0;
+    struct Ord3 next_axis = D_001A9EA0;
     f32 m[3][3];
     f32 trace;
     f32 scale;
@@ -66,8 +66,8 @@ void mat_to_quaternion(f32 *quat, f32 *matrix) {
         if (m[i][i] < matrix[10]) {
             i = 2;
         }
-        j = nextAxis.w[i];
-        k = nextAxis.w[j];
+        j = next_axis.w[i];
+        k = next_axis.w[j];
         scale = square_root(m[i][i] - (m[j][j] + m[k][k]) + 1.0f);
         quat[i] = scale * 0.5f;
         if (scale != 0.0f) {

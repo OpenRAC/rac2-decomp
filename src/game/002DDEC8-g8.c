@@ -80,8 +80,8 @@ void process_unlock_code_input(void) {
 }
 
 /* Plays a menu sound, but only when menu sounds are turned on. */
-void snd_play_menu_sound_if_enabled(int soundId, int soundParam)
+void snd_play_menu_sound_if_enabled(int sound_id, int sound_param)
 {
     if (ref_L00_002DF190_00 != 0)
-        snd_play_from_global_bank(soundId, soundParam, 0);
+        snd_play_from_global_bank(sound_id, sound_param, 0);
 }

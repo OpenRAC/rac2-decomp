@@ -58,7 +58,7 @@ extern float D_L01_001B053C __attribute__((sda));
 void gfx_draw_scrolling_ribbon(u8 *moby)
 {
     Quad q;
-    Vec origin,stepAlong,cursorPos,sideVec,offsetVec;
+    Vec origin,step_along,cursor_pos,side_vec,offset_vec;
     float phase;
     u8 *vars = *(u8 **)(moby+0x68);
     float width, step, t, v, angle, halfWidth, scroll;
@@ -79,51 +79,51 @@ void gfx_draw_scrolling_ribbon(u8 *moby)
     *(float *)(vars+0xB8) -= scroll;
     vec_scale_to_length(origin,moby+0xC0,halfWidth);
     FastVecAdd(origin,origin,vars+0x60);
-    vec_scale_to_length(stepAlong,moby+0xC0,width);
-    vec_scale_to_length(sideVec,moby+0xD0,-(D_L01_001B04DC*0.5f));
-    vec_scale_to_length(offsetVec,moby+0xD0,D_L01_001B04DC*((1.0f-D_L01_001B0530)*0.5f));
+    vec_scale_to_length(step_along,moby+0xC0,width);
+    vec_scale_to_length(side_vec,moby+0xD0,-(D_L01_001B04DC*0.5f));
+    vec_scale_to_length(offset_vec,moby+0xD0,D_L01_001B04DC*((1.0f-D_L01_001B0530)*0.5f));
     step = 1.0f / D_L01_001B04D8;
     for(i=0;i<5;i++) {
         v=0.0f;
         switch(i) {
         case 0:
             origin[2]+=D_L01_001B0528;
-            qcopy(cursorPos,origin);
+            qcopy(cursor_pos,origin);
             color=gfx_pack_color_floats(D_L01_001B04F8,D_L01_001B04FC,D_L01_001B0500,0.0f);
             q.color[2]=q.color[3]=color;
             v=SplitFloatFraction(&phase,*(float *)(vars+0xB8));
             break;
         case 1:
-            qcopy(cursorPos,origin);
+            qcopy(cursor_pos,origin);
             color=gfx_pack_color_floats(D_L01_001B0504,D_L01_001B0508,D_L01_001B050C,0.0f);
             q.color[2]=q.color[3]=color;
             v=SplitFloatFraction(&phase,*(float *)(vars+0xB8)+0.5f);
             break;
         case 2:
             origin[2]+=D_L01_001B0528;
-            qcopy(cursorPos,origin);
+            qcopy(cursor_pos,origin);
             color=gfx_pack_color_floats(D_L01_001B0510,D_L01_001B0514,D_L01_001B0518,0.0f);
             q.color[2]=q.color[3]=color;
-            vec_scale_to_length(sideVec,sideVec,D_L01_001B04DC*(D_L01_001B052C*0.5f));
+            vec_scale_to_length(side_vec,side_vec,D_L01_001B04DC*(D_L01_001B052C*0.5f));
             width*=D_L01_001B0530;
             step*=D_L01_001B0530;
-            vec_scale_to_length(stepAlong,moby+0xC0,width);
+            vec_scale_to_length(step_along,moby+0xC0,width);
             v=SplitFloatFraction(&phase,(D_L01_001B0534 * *(float *)(vars+0xB8))/D_L01_001B0530);
             break;
         case 3:
             v=SplitFloatFraction(&phase,(D_L01_001B0538 * *(float *)(vars+0xB8))/D_L01_001B0530);
             color=gfx_pack_color_floats(D_L01_001B051C,D_L01_001B0520,D_L01_001B0524,0.0f);
             q.color[2]=q.color[3]=color;
-            FastVecAdd(cursorPos,origin,offsetVec);
+            FastVecAdd(cursor_pos,origin,offset_vec);
             break;
         case 4:
-            FastVecSub(cursorPos,origin,offsetVec);
+            FastVecSub(cursor_pos,origin,offset_vec);
             break;
         }
-        FastVecSub(q.p[2],cursorPos,sideVec);
+        FastVecSub(q.p[2],cursor_pos,side_vec);
         t=step;
-        FastVecAdd(q.p[3],cursorPos,sideVec);
-        FastVecAdd(cursorPos,cursorPos,stepAlong);
+        FastVecAdd(q.p[3],cursor_pos,side_vec);
+        FastVecAdd(cursor_pos,cursor_pos,step_along);
         q.uv[2][0]=q.uv[0][0]=0.0f;
         q.uv[3][0]=q.uv[1][0]=1.0f;
         q.uv[1][1]=q.uv[0][1]=v;
@@ -136,10 +136,10 @@ void gfx_draw_scrolling_ribbon(u8 *moby)
             q.color[2]=q.color[3]=(q.color[0]&rgb)|(color<<24);
             qcopy(q.p[0],q.p[2]);
             qcopy(q.p[1],q.p[3]);
-            FastVecSub(q.p[2],cursorPos,sideVec);
+            FastVecSub(q.p[2],cursor_pos,side_vec);
             t+=step;
-            FastVecAdd(q.p[3],cursorPos,sideVec);
-            FastVecAdd(cursorPos,cursorPos,stepAlong);
+            FastVecAdd(q.p[3],cursor_pos,side_vec);
+            FastVecAdd(cursor_pos,cursor_pos,step_along);
             draw_world_quad(&q,0,1);
         }
     }

@@ -17,15 +17,15 @@ extern void moby_set_state(u8 *, s32, s32);
 void camera_point_actor_update(char *moby) {
     switch (*(u8 *)(moby + 0x20)) {
     case 0: {
-        EffectPositionView *heroBlock = &g_hero_state;
+        EffectPositionView *hero_block = &g_hero_state;
 
         float *source;
         char *dest;
-        heroBlock->effect_position[1] = 200.0f;
-        heroBlock->effect_position[0] = 500.0f;
-        heroBlock->effect_position[2] = 500.0f;
-        heroBlock->effect_position[3] = 1.0f;
-        source = heroBlock->effect_position;
+        hero_block->effect_position[1] = 200.0f;
+        hero_block->effect_position[0] = 500.0f;
+        hero_block->effect_position[2] = 500.0f;
+        hero_block->effect_position[3] = 1.0f;
+        source = hero_block->effect_position;
         dest = D_L02_001B3210;
         qcopy(dest, source);
         *(u8 *)(moby + 0x30) = 0xFF;

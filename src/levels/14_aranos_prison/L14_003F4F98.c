@@ -227,7 +227,7 @@ unsigned int moby_get_owner_vars_word(unsigned int owner)
 }
 
 /* Normalises and combines two temporary vectors from a state block, dispatches on the combined result and conditionally scales the output vector. */
-void path_compute_probe_direction(char *self, char *outDir, int keepDirection)
+void path_compute_probe_direction(char *self, char *out_dir, int keep_direction)
 {
     float a[4];
     float b[4];
@@ -238,12 +238,12 @@ void path_compute_probe_direction(char *self, char *outDir, int keepDirection)
     func_00282CC0_6(b, b, self + 16);
 
     if (CollLine(a, b, 2, self, 0))
-        func_00282F20_2(outDir, D_L14_001BF980, 1.0f);
+        func_00282F20_2(out_dir, D_L14_001BF980, 1.0f);
     else
-        func_00282F20_2(outDir, self + 224, -1.0f);
+        func_00282F20_2(out_dir, self + 224, -1.0f);
 
-    if (keepDirection == 0)
-        func_00282D30_6(outDir, outDir, -1.0f);
+    if (keep_direction == 0)
+        func_00282D30_6(out_dir, out_dir, -1.0f);
 }
 
 extern unsigned char *g_moby_l14_pool __attribute__((sda));
@@ -397,15 +397,15 @@ extern void func_803240F8(char *a0);
 void actor_restart_anim(char *self)
 {
     char *vars;
-    float fadeLimit;
-    float fadeSpeed;
+    float fade_limit;
+    float fade_speed;
 
     vars = *(char **)(self + 0x68);
-    fadeSpeed = 0.03f;
-    fadeLimit = 0.3f;
+    fade_speed = 0.03f;
+    fade_limit = 0.3f;
     func_80326928(self, vars + 0x50);
-    func_8032AA20(self, vars + 0x680, 1, fadeSpeed, fadeLimit);
-    func_8032AA20(self, vars + 0x600, 0, fadeSpeed, fadeLimit);
+    func_8032AA20(self, vars + 0x680, 1, fade_speed, fade_limit);
+    func_8032AA20(self, vars + 0x600, 0, fade_speed, fade_limit);
     if (*(unsigned short *)(self + 0x96) <= 0xFFFE)
         *(unsigned short *)(self + 0x96) = *(unsigned short *)(self + 0x96) + 1;
     *(unsigned short *)(vars + 0x776) = 0;
@@ -425,20 +425,20 @@ extern float func_2F62F0(float a, float b);
 extern float func_2F5DB0(float *p);
 
 /* Turns the actor to face a target point and works out how far to tilt its head. */
-void actor_aim_at_target(char *self, int targetPos)
+void actor_aim_at_target(char *self, int target_pos)
 {
-    float toTarget[4];
+    float to_target[4];
     char *vars;
     float angle;
 
     vars = *(char **)(self + 0x68);
     *(unsigned short *)(vars + 0x776) = 1;
-    func_318ED0(self, 2, toTarget);
-    func_2F5C68(toTarget, targetPos, toTarget);
-    angle = func_2F62F0(toTarget[0], toTarget[1]);
+    func_318ED0(self, 2, to_target);
+    func_2F5C68(to_target, target_pos, to_target);
+    angle = func_2F62F0(to_target[0], to_target[1]);
     *(float *)(vars + 0x744) = angle;
-    angle = func_2F5DB0(toTarget);
-    angle = -func_2F62F0(angle, toTarget[2]) * 0.5f;
+    angle = func_2F5DB0(to_target);
+    angle = -func_2F62F0(angle, to_target[2]) * 0.5f;
     *(float *)(vars + 0x6E4) = angle;
     *(float *)(vars + 0x664) = angle;
 }
@@ -702,12 +702,12 @@ extern void func_2EF6D8(int, int, int, int, int);
 void snd_queue_level_jingle(char *self)
 {
     char *vars;
-    int fadeColor;
+    int fade_color;
 
     vars = *(char **)(self + 0x68);
-    fadeColor = ((int)((1.0f - *(float *)(vars + 0x68)) * 128.0f)) << 24;
+    fade_color = ((int)((1.0f - *(float *)(vars + 0x68)) * 128.0f)) << 24;
     func_385CB8(0x42, 9);
-    func_2EF6D8(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], fadeColor);
+    func_2EF6D8(0, g_screen_adjust_offsets[0xA9], 0, g_screen_adjust_offsets[0xA8], fade_color);
 }
 
 

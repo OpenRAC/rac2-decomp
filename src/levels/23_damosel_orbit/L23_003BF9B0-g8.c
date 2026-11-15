@@ -169,7 +169,7 @@ extern void vec_negate_and_forward(void *, void *, s32);
 void flying_enemy_init_and_update(Moby_003BF9B0 *moby)
 {
     State_003BF9B0 *vars = moby->pVars;
-    f32 sizeFactor;
+    f32 size_factor;
 
     if (moby->state == 0) {
         f32 fps;
@@ -241,17 +241,17 @@ void flying_enemy_init_and_update(Moby_003BF9B0 *moby)
     if (moby->state == 13)
         return;
     moby_set_controller_speed_limits(moby, 0.0044444446f, 0.13333334f, 0.0017453295f, 0.20943955f);
-    sizeFactor = 1.4f;
+    size_factor = 1.4f;
     if (moby->state == 2)
-        sizeFactor = 0.7f;
-    moby->scale = moby->pClass->scale * sizeFactor;
+        size_factor = 0.7f;
+    moby->scale = moby->pClass->scale * size_factor;
     if (vars->child != 0) {
         vars->child->f32 = moby->f32;
         vars->child->f30 = moby->f30;
         vars->child->f38 = moby->f38;
         vars->child->f78 = moby->f78;
         vars->child->f31 = 1;
-        vars->child->scale = vars->child->pClass->scale * sizeFactor;
+        vars->child->scale = vars->child->pClass->scale * size_factor;
         if (vars->child->f31 != 0 && fast_vec_dist(vars->child->pos, g_camera_l23_position) < 24.0f) {
             moby_update_ground_check(vars->child);
             vars->child->f6F = 22;

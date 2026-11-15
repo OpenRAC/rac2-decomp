@@ -29,25 +29,25 @@ extern s32 ref_L07_003F90E8_00 __attribute__((sda));
 extern f32 ref_L07_003F90E8_01(s32);
 
 /* Blends smoothly between two values depending on where a global value sits between two limits. */
-f32 math_interpolate_between_limits(s32 lowLimit, s32 highLimit, f32 lowValue, f32 highValue) {
-    f32 highTerm;
-    f32 currentTerm;
-    f32 lowTerm;
+f32 math_interpolate_between_limits(s32 low_limit, s32 high_limit, f32 low_value, f32 high_value) {
+    f32 high_term;
+    f32 current_term;
+    f32 low_term;
 
-    if (lowLimit >= ref_L07_003F90E8_00) {
-        return lowValue;
+    if (low_limit >= ref_L07_003F90E8_00) {
+        return low_value;
     }
-    if (ref_L07_003F90E8_00 >= highLimit) {
-        return highValue;
+    if (ref_L07_003F90E8_00 >= high_limit) {
+        return high_value;
     }
-    currentTerm = ref_L07_003F90E8_01(ref_L07_003F90E8_00);
-    lowTerm = ref_L07_003F90E8_01(lowLimit);
-    highTerm = ref_L07_003F90E8_01(highLimit);
+    current_term = ref_L07_003F90E8_01(ref_L07_003F90E8_00);
+    low_term = ref_L07_003F90E8_01(low_limit);
+    high_term = ref_L07_003F90E8_01(high_limit);
     {
-        f32 den = highTerm - ref_L07_003F90E8_01(lowLimit);
-        f32 num = currentTerm - lowTerm;
-        f32 dif = highValue - lowValue;
+        f32 den = high_term - ref_L07_003F90E8_01(low_limit);
+        f32 num = current_term - low_term;
+        f32 dif = high_value - low_value;
         num = num / den;
-        return lowValue + (dif * num);
+        return low_value + (dif * num);
     }
 }

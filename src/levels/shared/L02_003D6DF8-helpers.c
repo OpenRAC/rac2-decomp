@@ -17,8 +17,8 @@ extern float D_L02_001B0380 __attribute__((sda));
 extern int D_L02_001B3FD8 NOT_SDA;
 
 /* Sets up a moving platform when it first appears: sets its turn speed, its timer and its starting state. */
-void platform_init(char *mobyArg) {
-    char *moby = mobyArg;
+void platform_init(char *moby_arg) {
+    char *moby = moby_arg;
     char *vars = *(char **)(moby + 0x68);
     TI128 rotation[2];
     float seconds;

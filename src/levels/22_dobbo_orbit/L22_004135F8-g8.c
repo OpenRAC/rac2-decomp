@@ -182,7 +182,7 @@ void homing_l22_shot_update(u8 *obj) {
         other = D_L22_001C00C0.f18;
         if (other != 0) {
             cls = *(u16 *)(other + 0xAA);
-            if (cls == 0xF7E || cls == 0xF7F /* Mothership Boss Part */ || (s16)cls == 0x120F) {
+            if (cls == 0xF7E || cls == MOBY_CLASS_MOTHERSHIP_BOSS_PART || (s16)cls == 0x120F) {
                 PlayMobySound(2, 0, obj);
                 flag = 1;
             }

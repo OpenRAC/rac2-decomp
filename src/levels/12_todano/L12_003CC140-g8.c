@@ -26,8 +26,8 @@ char *hero_find_aim_assist_target(char *moby,Vec *origin,float *yaw,float *pitch
     struct { Vec origin,offset,player; char *disabled[128]; Vec target,aim,ray,axis; } frame;
     Vec *start=&frame.origin;
     char *vars=*(char **)(moby+0x68),*selected,*candidate,*definition,*hit;
-    Vec *pos; int disabledCount,candidateIndex,accepted,visible,tries,i;
-    float bestDistance=D_L12_001B0274,heading,elevation,delta,distance,dot,length,angle,radius;
+    Vec *pos; int disabled_count,candidate_index,accepted,visible,tries,i;
+    float best_distance=D_L12_001B0274,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
     FastVecScale(&frame.offset,g_hero_state.object+0xE0,0.5f);
     selected=0;
@@ -36,8 +36,8 @@ char *hero_find_aim_assist_target(char *moby,Vec *origin,float *yaw,float *pitch
         qcopy(start,&D_L12_001C0260);
         return 0;
     }
-    disabledCount=0; candidateIndex=0;
-    while((candidate=D_L12_001FBD20[candidateIndex])!=0) {
+    disabled_count=0; candidate_index=0;
+    while((candidate=D_L12_001FBD20[candidate_index])!=0) {
         if(*(unsigned char *)(candidate+0x20)==0xFE) goto next;
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
         if(*(short *)(candidate+0xAA)==0xE7D /* moby class 3709 */ || *(short *)(candidate+0xAA)==0xEB0 /* moby class 3760 */) goto next;
@@ -72,7 +72,7 @@ char *hero_find_aim_assist_target(char *moby,Vec *origin,float *yaw,float *pitch
             }
         }
         if(accepted && !CollLine(start,&frame.target,6,g_hero_state.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
-        if((distance>bestDistance && candidate!=*(char **)(vars+0x10)) || distance>D_L12_001B0274) goto next;
+        if((distance>best_distance && candidate!=*(char **)(vars+0x10)) || distance>D_L12_001B0274) goto next;
         vec_build_spherical_offset(&frame.aim,distance,*yaw,*pitch+g_hero_state.pitch*0.5f);
         FastVecAdd(&frame.aim,&frame.aim,start);
         angle=fast_vec_dist(&frame.aim,&frame.target);
@@ -92,8 +92,8 @@ char *hero_find_aim_assist_target(char *moby,Vec *origin,float *yaw,float *pitch
                 hit=col->hit;
                 if(hit) {
                     if(*(short *)(hit+0xAA)==0xE7D /* moby class 3709 */ || *(short *)(hit+0xAA)==0xEB0 /* moby class 3760 */) {
-                        frame.disabled[disabledCount++]=hit; *(int *)(hit+0x98)=0;
-                        if(disabledCount>127) break;
+                        frame.disabled[disabled_count++]=hit; *(int *)(hit+0x98)=0;
+                        if(disabled_count>127) break;
                         qcopy(&frame.ray,&col->point);
                         continue;
                     }
@@ -101,11 +101,11 @@ char *hero_find_aim_assist_target(char *moby,Vec *origin,float *yaw,float *pitch
                 }
                 visible=0; break;
             }
-            if(visible) { *pitch=-elevation; bestDistance=distance; if(delta<0.17453295f) *yaw=heading; selected=candidate; if(candidate==*(char **)(vars+0x10)) return selected; }
+            if(visible) { *pitch=-elevation; best_distance=distance; if(delta<0.17453295f) *yaw=heading; selected=candidate; if(candidate==*(char **)(vars+0x10)) return selected; }
         }
 next:
-        ++candidateIndex;
+        ++candidate_index;
     }
-    for(i=0;i<disabledCount;++i) { char *m=frame.disabled[i]; *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10); }
+    for(i=0;i<disabled_count;++i) { char *m=frame.disabled[i]; *(int *)(m+0x98)=*(int *)(*(char **)(m+0x24)+0x10); }
     return selected;
 }

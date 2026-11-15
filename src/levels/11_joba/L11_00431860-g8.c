@@ -21,7 +21,7 @@ extern int hero_check_distance_zones(void *, void *, int, int, float, float, int
 #define B(o) (*(u8 *)(d+(o)))
 /* Runs the Saur-Beast's basic setup and per-frame checks: sets its stats on the first frame, keeps it on the ground, and reacts when it is hit. */
 void saur_beast_update_base(u8 *obj) {
- u8 *d=*(u8 **)(obj+0x68); int hitResult; u8 *attacker;
+ u8 *d=*(u8 **)(obj+0x68); int hit_result; u8 *attacker;
  if (!obj[0x20]) {
   float height;
   D_L11_001AED04++;
@@ -54,15 +54,15 @@ void saur_beast_update_base(u8 *obj) {
   *(float *)(obj+0x18)-=1.146666765f;
   if(*(float *)(obj+0x18)<height) *(float *)(obj+0x18)=height;
  }
- hitResult=moby_apply_damage_to_object(obj,d+0x60,0);
- if(hitResult) {
+ hit_result=moby_apply_damage_to_object(obj,d+0x60,0);
+ if(hit_result) {
   attacker=*(u8 **)(d+0x38);
-  if(attacker) {int attackerClass=*(short *)(attacker+0xaa); if(attackerClass!=0x47 /* moby class 71 */ && attackerClass!=0xdd9 /* moby class 3545 */ && attackerClass!=0xd1b /* moby class 3355 */ && attackerClass!=0xce7 /* moby class 3303 */ && attackerClass!=0xd07 /* Jobian Saur-Beast */ && attackerClass) D_L11_001AED00=0;}
+  if(attacker) {int attacker_class=*(short *)(attacker+0xaa); if(attacker_class!=0x47 /* moby class 71 */ && attacker_class!=0xdd9 /* moby class 3545 */ && attacker_class!=0xd1b /* moby class 3355 */ && attacker_class!=0xce7 /* moby class 3303 */ && attacker_class!=MOBY_CLASS_JOBIAN_SAUR_BEAST && attacker_class) D_L11_001AED00=0;}
   I(0x2a0)=0;
   if(I(0x2b0)>=0) {gfx_free_point_light(I(0x2b0));I(0x2b0)=-1;}
-  if(hitResult==5) {I(0xf0)=0;F(0xf4)=0.837758183f;}
+  if(hit_result==5) {I(0xf0)=0;F(0xf4)=0.837758183f;}
   if(I(0x27c)) {
-   switch(hitResult) {
+   switch(hit_result) {
    case 1: break;
    case 2: case 3: anim_start_blended(*(void **)(d+0x27c),8,0,3);break;
    case 4: case 5: anim_start_blended(*(void **)(d+0x27c),9,0,3); *(int *)(*(u8 **)(*(u8 **)(d+0x27c)+0x68)+0x26c)=0;break;

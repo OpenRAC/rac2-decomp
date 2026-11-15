@@ -67,11 +67,11 @@ void hero_update(void) {
             if (*(int *)(hero + 0x2294) == 0x5B) {
                 snd_update_slot_object(8, *(void **)(hero + 0x2290), 10);
             } else {
-                int effectSlot = *(int *)(hero + 0x242C);
-                if (effectSlot != -1) {
-                    char *entry = g_sound_state + effectSlot * 0x70;
+                int effect_slot = *(int *)(hero + 0x242C);
+                if (effect_slot != -1) {
+                    char *entry = g_sound_state + effect_slot * 0x70;
                     if (*(void **)(entry + 0x88) == *(void **)(hero + 0x2290) && *(u8 *)(entry + 0x74))
-                        snd_stop_voice(effectSlot);
+                        snd_stop_voice(effect_slot);
                 }
                 {
                     char *hero = (char *)&g_hero_state;

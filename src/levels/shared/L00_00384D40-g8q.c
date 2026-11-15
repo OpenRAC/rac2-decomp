@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 typedef int Q128 __attribute__((mode(TI)));
 
@@ -12,7 +13,7 @@ extern float D_L00_001AEE08 __attribute__((sda));
 /* Creates a Hoverbomb Projectile at a position, flying with the given velocity. */
 char *hoverbomb_create_projectile(char *owner, void *pos, void *vel)
 {
-    char *moby = CreateMoby(0x5D8 /* Hoverbomb Projectile */);
+    char *moby = CreateMoby(MOBY_CLASS_HOVERBOMB_PROJECTILE);
 
     if (moby != 0) {
         char *vars = *(char **)(moby + 0x68);

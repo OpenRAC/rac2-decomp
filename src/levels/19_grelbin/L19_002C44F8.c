@@ -671,7 +671,7 @@ s32 hero_l19_set_state(s32 action, s32 animate) {
             switch (*(s16 *)(PTR(0x2290) + 0xAA)) {
             case 0xEC0 /* moby class 3776 */: REAL(0x4C8) = 32.0f; REAL(0x4CC) = 37.0f; REAL(0x4D0) = 21.0f; break;
             case 0xED4 /* moby class 3796 */: REAL(0x4C8) = 4.25f; REAL(0x4CC) = 8.0f; REAL(0x4D0) = 3.5f; break;
-            case 0xEE1 /* Receiver Bot */: REAL(0x4C8) = 12.0f; REAL(0x4CC) = 17.0f; REAL(0x4D0) = 11.0f; break;
+            case MOBY_CLASS_RECEIVER_BOT: REAL(0x4C8) = 12.0f; REAL(0x4CC) = 17.0f; REAL(0x4D0) = 11.0f; break;
             }
             REAL(0x50C) = 2.55f; REAL(0x508) = 2.05f;
             HALF(0x518) = 5; REAL(0x520) = 0.006944444496f; REAL(0x504) = 0.010277777910232544f;

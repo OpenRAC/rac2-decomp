@@ -7,7 +7,7 @@ extern int func_001163B0(void);
 extern unsigned char **D_001F2550[];
 
 /* Creates a moving particle with its own colour and life, starting at a point with a velocity. */
-char *part_spawn_scaling(void *position, void *velocity, unsigned int color, int endColor, int life, int scale, int type, int additive)
+char *part_spawn_scaling(void *position, void *velocity, unsigned int color, int end_color, int life, int scale, int type, int additive)
 {
     char *particle = part_alloc(4);
     char *p;
@@ -28,7 +28,7 @@ char *part_spawn_scaling(void *position, void *velocity, unsigned int color, int
         *(short *)(particle + 0xA) = life;
         *(int *)(motion + 0x1C) = life;
         *(int *)(motion + 0x10) = color;
-        *(int *)(motion + 0x14) = endColor;
+        *(int *)(motion + 0x14) = end_color;
         *(short *)(motion + 0x18) = type;
         *(short *)(motion + 0x1A) = scale;
     }

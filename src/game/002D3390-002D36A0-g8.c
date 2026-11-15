@@ -46,18 +46,18 @@ extern void func_002A0F48(void *);
 /* Lets the player move through the model preview list with left and right, turns the shown model toward a set angle (or by the stick) and highlights the matching part. */
 int UpdateModelPreviewMenu(void)
 {
-    int result = 0, flags = g_pad_state.flags, oldSelection = D_001ABA74.selection;
+    int result = 0, flags = g_pad_state.flags, old_selection = D_001ABA74.selection;
     int i, color, type;
     float dx, dy;
     union { unsigned int q __attribute__((mode(TI))); float f[4]; } pos;
-    char *previewObj;
+    char *preview_obj;
     if (flags & 0x10) {
-        int callbackValue = *(int *)(g_pause_menu_state.source + 0xE0);
-        if (callbackValue) g_pause_menu_state.value = callbackValue;
-        else if (!g_pause_menu_state.fallback) { callbackValue = -1; goto callback_done; }
-        callbackValue = 0;
+        int callback_value = *(int *)(g_pause_menu_state.source + 0xE0);
+        if (callback_value) g_pause_menu_state.value = callback_value;
+        else if (!g_pause_menu_state.fallback) { callback_value = -1; goto callback_done; }
+        callback_value = 0;
 callback_done:
-        return callbackValue;
+        return callback_value;
     }
     if (flags & 0x900) { result = 1; goto done; }
     if (flags & 0x8000) {
@@ -70,7 +70,7 @@ callback_done:
         snd_play_from_global_bank(3, 0, 0);
         goto previous_done;
 previous_failed:
-        snd_play_from_global_bank(5, 0, 0); D_001ABA74.selection = oldSelection;
+        snd_play_from_global_bank(5, 0, 0); D_001ABA74.selection = old_selection;
 previous_done:
         if (D_001ABA74.selection < 0) D_001ABA74.selection = 0;
     }
@@ -84,7 +84,7 @@ previous_done:
         snd_play_from_global_bank(3, 0, 0);
         goto next_done;
 next_failed:
-        snd_play_from_global_bank(5, 0, 0); D_001ABA74.selection = oldSelection;
+        snd_play_from_global_bank(5, 0, 0); D_001ABA74.selection = old_selection;
 next_done:
         if (D_001ABA74.selection >= 13) D_001ABA74.selection = 12;
     }
@@ -113,7 +113,7 @@ default_rotation:
             g_pause_menu_state.z = -2.782352924346924f;
         }
     }
-    if (oldSelection != D_001ABA74.selection) {
+    if (old_selection != D_001ABA74.selection) {
         g_pause_menu_state.timer = 0;
         math_ping_pong_blend_values(-1, 0xff606060, 30, 1, 1);
         D_0025D478.timer = -580;
@@ -128,18 +128,18 @@ default_rotation:
     color = math_ping_pong_blend_values(0xffffff, 0x606060, 30, 1, 0);
     for (i = 0; i < g_pause_menu_state.count; i++) {
         float step = 0.0057142856530845165f;
-        previewObj = g_pause_menu_state.entries + i * 0x100;
-        *(PreviewQuad *)(previewObj + 0x10) = pos.q;
+        preview_obj = g_pause_menu_state.entries + i * 0x100;
+        *(PreviewQuad *)(preview_obj + 0x10) = pos.q;
         if (g_pause_menu_state.timer <= 0) {
-            F(previewObj, 0xf0) = FastAddRotations(F(previewObj, 0xf0), (g_pause_menu_state.x - F(previewObj, 0xf0)) * step);
-            F(previewObj, 0xf4) = FastAddRotations(F(previewObj, 0xf4), (g_pause_menu_state.y - F(previewObj, 0xf4)) * step);
-            F(previewObj, 0xf8) = FastAddRotations(F(previewObj, 0xf8), (g_pause_menu_state.z - F(previewObj, 0xf8)) * step);
+            F(preview_obj, 0xf0) = FastAddRotations(F(preview_obj, 0xf0), (g_pause_menu_state.x - F(preview_obj, 0xf0)) * step);
+            F(preview_obj, 0xf4) = FastAddRotations(F(preview_obj, 0xf4), (g_pause_menu_state.y - F(preview_obj, 0xf4)) * step);
+            F(preview_obj, 0xf8) = FastAddRotations(F(preview_obj, 0xf8), (g_pause_menu_state.z - F(preview_obj, 0xf8)) * step);
         } else {
-            F(previewObj, 0xf8) = FastAddRotations(F(previewObj, 0xf8), dx);
-            F(previewObj, 0xf4) = FastAddRotations(F(previewObj, 0xf4), dy);
+            F(preview_obj, 0xf8) = FastAddRotations(F(preview_obj, 0xf8), dx);
+            F(preview_obj, 0xf4) = FastAddRotations(F(preview_obj, 0xf4), dy);
         }
-        type = ((unsigned char *)previewObj)[0xbc];
-        F(previewObj, 0x2c) = F(*(char **)(previewObj + 0x24), 0x24);
+        type = ((unsigned char *)preview_obj)[0xbc];
+        F(preview_obj, 0x2c) = F(*(char **)(preview_obj + 0x24), 0x24);
         if ((type == 0 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x30) ||
             (type == 1 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x40) ||
             (type == 2 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x180) ||
@@ -148,9 +148,9 @@ default_rotation:
             (type == 5 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x1000) ||
             (type == 6 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0x2000) ||
             (type == 7 && D_0026CFD0[D_001ABA74.selection].selectionMask == 0xc000))
-            gfx_pack_render_command_fields(previewObj, color, 14, 14, 0);
-        else gfx_pack_render_command_fields(previewObj, 0x202020, 14, 14, 0);
-        func_002A0F48(previewObj);
+            gfx_pack_render_command_fields(preview_obj, color, 14, 14, 0);
+        else gfx_pack_render_command_fields(preview_obj, 0x202020, 14, 14, 0);
+        func_002A0F48(preview_obj);
     }
     if (__builtin_fabs((double)dx) > 9.999999747378752e-05 ||
         __builtin_fabs((double)dy) > 9.999999747378752e-05)

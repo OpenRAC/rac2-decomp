@@ -32,19 +32,19 @@ extern void math_approach_target_with_braking(void *, float, float, float, float
 extern int moby_turn_toward_target_and_step(void *, float *, float);
 
 /* Follow the camera height between the moby's home and the hero, never under the floor. */
-float entity_move_to_tracked_height(Moby_L07_003E5910 *moby, float *goalPos, float turnRate)
+float entity_move_to_tracked_height(Moby_L07_003E5910 *moby, float *goal_pos, float turn_rate)
 {
-    f32 homePos[4] __attribute__((aligned(16)));
+    f32 home_pos[4] __attribute__((aligned(16)));
     Vars_L07_003E5910 *vars = moby->vars;
     f32 lo, hi, h, floor;
 
     if (vars->target != 0) {
-        matrix_mul_vec3(homePos, vars->home, moby->rot);
-        FastVecAdd(homePos, homePos, vars->target + 0x10);
+        matrix_mul_vec3(home_pos, vars->home, moby->rot);
+        FastVecAdd(home_pos, home_pos, vars->target + 0x10);
     } else {
-        qcopy(homePos, vars->home);
+        qcopy(home_pos, vars->home);
     }
-    lo = homePos[2] - 2.0f;
+    lo = home_pos[2] - 2.0f;
     hi = lo + 5.0f;
     h = ((Hero *)g_hero_state)->f[0x2D8 / 4] + D_L07_001B0AA8;
     if (hi < h) h = hi;
@@ -53,6 +53,6 @@ float entity_move_to_tracked_height(Moby_L07_003E5910 *moby, float *goalPos, flo
     if (h < floor) h = floor;
     math_approach_target_with_braking(vars->cam, h - moby->pos[2], D_L07_001B0AA0 * 0.000277777785f, D_L07_001B0AA0 * 0.000277777785f,
                   D_L07_001B0AA4 * 0.0166666675f);
-    moby_turn_toward_target_and_step(moby, goalPos, turnRate);
+    moby_turn_toward_target_and_step(moby, goal_pos, turn_rate);
     return vars->f1EC;
 }

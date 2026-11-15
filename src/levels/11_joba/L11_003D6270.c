@@ -85,8 +85,8 @@ extern f32 math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
 
 /* Per-frame update for the Joba enemy. On the first frame it sets itself up; after that it
    runs damage, its state machine, its movement and its effects. */
-void arachnoid_update(u8 *mobyArg) {
-    u8 *moby = mobyArg;
+void arachnoid_update(u8 *moby_arg) {
+    u8 *moby = moby_arg;
     if (*(u8 *)(moby + 0x20) == 0) {
         joba_enemy_init();
     } else {
@@ -104,8 +104,8 @@ void arachnoid_update(u8 *mobyArg) {
     }
 }
 /* Sets up a new Joba enemy: fills in its starting values and puts it in its idle state. */
-void joba_enemy_init(u8 *mobyArg) {
-    u8 *moby = mobyArg;
+void joba_enemy_init(u8 *moby_arg) {
+    u8 *moby = moby_arg;
     u8 *vars = *(u8 **)(moby + 0x68);
     *(u8 *)(vars + 0x48) = FloatToInt(15.0f);
     *(u8 *)(vars + 0x4A) = FloatToInt(16.0f);
@@ -142,20 +142,20 @@ void joba_enemy_return_state(u8 *moby) {
 }
 
 /* Remembers the enemy's current state, then switches it to its hit reaction state. */
-void joba_enemy_enter_hit_reaction(u8 *mobyArg) {
-    u8 *moby = mobyArg;
+void joba_enemy_enter_hit_reaction(u8 *moby_arg) {
+    u8 *moby = moby_arg;
     s32 vars = *(s32 *)(moby + 0x68);
-    u8 oldState = *(u8 *)(moby + 0x20);
-    u8 savedValue = *(u8 *)(moby + 0x95);
-    *(u8 *)(moby + 0x94) = oldState;
-    *(u16 *)(vars + 0x294) = savedValue;
-    moby_set_state(mobyArg, 3, -1);
+    u8 old_state = *(u8 *)(moby + 0x20);
+    u8 saved_value = *(u8 *)(moby + 0x95);
+    *(u8 *)(moby + 0x94) = old_state;
+    *(u16 *)(vars + 0x294) = saved_value;
+    moby_set_state(moby_arg, 3, -1);
 }
 
 /* Reports the signed area of the triangle (arg0, arg1, arg2). */
-f32 math_signed_triangle_area(f32 *pointA, f32 *pointB, f32 *pointC) {
-    return (pointA[0] - pointC[0]) * (pointB[1] - pointC[1])
-         - (pointA[1] - pointC[1]) * (pointB[0] - pointC[0]);
+f32 math_signed_triangle_area(f32 *point_a, f32 *point_b, f32 *point_c) {
+    return (point_a[0] - point_c[0]) * (point_b[1] - point_c[1])
+         - (point_a[1] - point_c[1]) * (point_b[0] - point_c[0]);
 }
 
 
@@ -184,9 +184,9 @@ void joba_enemy_set_counters_one(u8 *moby) {
 
 /* Clears one pair of the enemy's counters, sets the other pair to 2 and starts its sound
    effect if it has none. */
-void joba_enemy_set_counters_two(u8 *mobyArg) {
+void joba_enemy_set_counters_two(u8 *moby_arg) {
     s32 i = 1;
-    u8 *moby = mobyArg;
+    u8 *moby = moby_arg;
     u8 *vars = *(u8 **)(moby + 0x68);
     u16 *counters = (u16 *)(vars + 0x278);
     do {
@@ -201,23 +201,23 @@ void joba_enemy_set_counters_two(u8 *mobyArg) {
 }
 
 /* Clears the enemy's counters and stops its sound effect. */
-void joba_enemy_clear_counters(u8 *mobyArg) {
+void joba_enemy_clear_counters(u8 *moby_arg) {
     s32 i = 1;
-    u8 *moby = mobyArg;
+    u8 *moby = moby_arg;
     u8 *vars = *(u8 **)(moby + 0x68);
     u16 *counters = (u16 *)(vars + 0x278);
-    s32 soundIndex;
+    s32 sound_index;
     do {
         counters[-2] = 0;
         counters[0] = 0;
         i--;
         counters++;
     } while (i >= 0);
-    soundIndex = *(s32 *)(vars + 0x290);
-    if (soundIndex != -1) {
-        u8 *sound = D_L11_00188660 + soundIndex * 0x70;
+    sound_index = *(s32 *)(vars + 0x290);
+    if (sound_index != -1) {
+        u8 *sound = D_L11_00188660 + sound_index * 0x70;
         if (*(u8 **)(sound + 0x88) == moby && *(u8 *)(sound + 0x74) != 0) {
-            snd_stop_voice(soundIndex);
+            snd_stop_voice(sound_index);
         }
     }
     *(s32 *)(vars + 0x290) = -1;
@@ -255,9 +255,9 @@ void joba_enemy_clear_counters(u8 *mobyArg) {
    places the linked table entity at this one's position, offset along two of its axes. */
 /* Swings a part of the object between a few angles and keeps a linked object attached in
    front of it. */
-void swinging_linked_moby_update(u8 *mobyArg) {
-    f32 frontOffset[4], sideOffset[4];
-    u8 *moby = mobyArg;
+void swinging_linked_moby_update(u8 *moby_arg) {
+    f32 front_offset[4], side_offset[4];
+    u8 *moby = moby_arg;
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *linked = g_moby_l11_table[0] + *(s32 *)vars * 256;
     u8 *pos;
@@ -322,10 +322,10 @@ void swinging_linked_moby_update(u8 *mobyArg) {
     }
     pos = linked + 0x10;
     qcopy(pos, moby + 0x10);
-    vec_scale_to_length(frontOffset, moby + 0xE0, 5.7f);
-    FastVecAdd(pos, pos, frontOffset);
-    vec_scale_to_length(sideOffset, moby + 0xD0, 0.35f);
-    FastVecAdd(pos, pos, sideOffset);
+    vec_scale_to_length(front_offset, moby + 0xE0, 5.7f);
+    FastVecAdd(pos, pos, front_offset);
+    vec_scale_to_length(side_offset, moby + 0xD0, 0.35f);
+    FastVecAdd(pos, pos, side_offset);
 }
 
 
@@ -334,8 +334,8 @@ void swinging_linked_moby_update(u8 *mobyArg) {
 /* Reports whether the helper found the measured resource and updates its timer. */
 /* Checks whether the enemy's damage source still exists and takes its damage off the
    enemy's health. */
-s32 joba_enemy_apply_source_damage(u8 *mobyArg) {
-    u8 *vars = *(u8 **)(mobyArg + 0x68);
+s32 joba_enemy_apply_source_damage(u8 *moby_arg) {
+    u8 *vars = *(u8 **)(moby_arg + 0x68);
     u8 *source = part_find_owned_effect_slot(*(s32 *)(vars + 0x280), 0x10000, 0);
     if (source != 0) {
         *(f32 *)(vars + 0x20) = *(f32 *)(vars + 0x20) - *(f32 *)(source + 0x2C);

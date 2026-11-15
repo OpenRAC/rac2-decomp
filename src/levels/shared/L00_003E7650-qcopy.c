@@ -1,4 +1,5 @@
 #include "names.h"
+#include "moby_classes.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 extern char *CreateMoby(int size);
@@ -18,7 +19,7 @@ char *mini_nuke_projectile_spawn(int shooter, TI128 *position, TI128 *velocity)
     float lo;
     float hi;
 
-    moby = CreateMoby(0xC07 /* Mini Nuke Projectile */);
+    moby = CreateMoby(MOBY_CLASS_MINI_NUKE_PROJECTILE);
     if (moby != 0) {
         short alphaValue = 0xFF;
 

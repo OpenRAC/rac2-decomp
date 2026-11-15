@@ -49,7 +49,7 @@ void DrawEffectRecordQuads(char *object)
     *(Quadword *)normal = 0;
     normal[2] = 1.0f;
     normal[3] = 1.0f;
-    base = level_get_slot_body(1483 /* Pulse Rifle */, *(short *)(*(char **)(object + 104) + 26));
+    base = level_get_slot_body(MOBY_CLASS_PULSE_RIFLE, *(short *)(*(char **)(object + 104) + 26));
     gfx_init_quad_packet_state(&first, 54, 0, 128);
     gfx_init_quad_packet_state(&second, 54, 1, 128);
     if (D_0018C0B4[0] == 29)

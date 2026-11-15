@@ -149,18 +149,18 @@ void hero_update_actions(void) {
     s32 sp6C;
     s32 sp70;
     s32 sp74w;
-    void *heroMoby;
-    s32 oldAction;
-    s32 oldStep;
-    s32 mobyState;
+    void *hero_moby;
+    s32 old_action;
+    s32 old_step;
+    s32 moby_state;
     s32 temp_a0_11;
     s32 temp_a0_31;
     s32 pad3C;
 
-    heroMoby = FLD(g_hero_state, void *, 0x2290);
-    oldAction = FLD(g_hero_state, s32, 0x229C);
-    oldStep = FLD(g_hero_state, s32, 0x2298);
-    mobyState = FLD(heroMoby, u8, 0x43);
+    hero_moby = FLD(g_hero_state, void *, 0x2290);
+    old_action = FLD(g_hero_state, s32, 0x229C);
+    old_step = FLD(g_hero_state, s32, 0x2298);
+    moby_state = FLD(hero_moby, u8, 0x43);
     if (hero_l22_apply_hazard_contact(1) != 0) {
         goto end;
     }
@@ -246,7 +246,7 @@ void hero_update_actions(void) {
                 anim_start_blended(obj, 1, 0, 0xC);
             }
         }
-        anim = math_l00_return_argument(FLD(heroMoby, u8, 0x43));
+        anim = math_l00_return_argument(FLD(hero_moby, u8, 0x43));
         if ((anim == shop_get_entry_for_state(0)) && notcrouch) {
             if (hero_choose_idle_anim(&sp40) != 0) {
                 u8 *rec;
@@ -748,7 +748,7 @@ void hero_update_actions(void) {
         s32 n;
         s32 turned;
         u32 st;
-        if ((FLD(g_hero_state, u8, 0x40E) != 0) && ((FLD(heroMoby, f32, 0x44) > 0.9f) || (FLD(heroMoby, u8, 0x42) != 0xFF))) {
+        if ((FLD(g_hero_state, u8, 0x40E) != 0) && ((FLD(hero_moby, f32, 0x44) > 0.9f) || (FLD(hero_moby, u8, 0x42) != 0xFF))) {
             FLD(g_hero_state, u8, 0x40E) = 0;
         }
         if ((FLD(g_hero_state, u8, 0x149A) != 0) && (FLD(g_hero_state, s16, 0x34C) == 0)) {
@@ -853,7 +853,7 @@ void hero_update_actions(void) {
             if ((FLD(g_pad_state, s32, 0x1D4) != 0) && (vec_length_xy(g_hero_state + 0xF0) < 0.0008333334f) && (FLD(g_hero_state, f32, 0x320) < 0.087266475f) && (hero_l22_set_action(0, 0) != 0)) {
                 set_hero_animation(shop_get_entry_for_state(0), 0, 17.0f);
             }
-            if (FLD(heroMoby, u8, 0x43) == 0x37) {
+            if (FLD(hero_moby, u8, 0x43) == 0x37) {
                 FLD(g_hero_state, f32, 0xC20) = (1.0f - FLD(g_hero_state, f32, 0x400)) * 2.0f;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.7f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.7f;
@@ -861,7 +861,7 @@ void hero_update_actions(void) {
                 if (FLD(g_hero_state, f32, 0xC20) < 0.75f) {
                     FLD(g_hero_state, f32, 0xC20) = 0.75f;
                 }
-            } else if (FLD(heroMoby, u8, 0x43) == 0x66) {
+            } else if (FLD(hero_moby, u8, 0x43) == 0x66) {
                 FLD(g_hero_state, f32, 0xC20) = FLD(g_hero_state, f32, 0x170) * 10.0f;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.1f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.1f;
@@ -1879,7 +1879,7 @@ void hero_update_actions(void) {
                 if (near == 0) {
                     s32 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 2;
                     if (FLD(g_hero_state, f32, 0xC38) < FLD(g_hero_state, f32, 0x4CC) - 1.5f) {
-                        set_hero_animation(math_l00_return_argument(FLD(heroMoby, u8, 0x43)), k, 7.0f);
+                        set_hero_animation(math_l00_return_argument(FLD(hero_moby, u8, 0x43)), k, 7.0f);
                     }
                 }
             }
@@ -1888,7 +1888,7 @@ void hero_update_actions(void) {
             FLD(g_hero_state, f32, 0xC20) = 1.0f;
         } else if (FLD(g_hero_state, u8, 0x49E) != 0) {
             s32 cur;
-            if ((s32)FLD(heroMoby, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
+            if ((s32)FLD(hero_moby, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
                 if ((FLD(g_hero_state, u32, 0x2294) == 0xE) && (FLD(g_hero_state, f32, 0xC38) < 37.0f)) {
                     ApproachValue((f32 *)(g_hero_state + 0xC20), 1.0f, 0.15f);
                 } else {
@@ -1898,7 +1898,7 @@ void hero_update_actions(void) {
                 if (near == 0) {
                     s32 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 2;
                     if (FLD(g_hero_state, f32, 0xC20) > 1.8f) {
-                        set_hero_animation(math_l00_return_argument(FLD(heroMoby, u8, 0x43)), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 3));
+                        set_hero_animation(math_l00_return_argument(FLD(hero_moby, u8, 0x43)), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 3));
                     }
                 }
                 if (FLD(g_hero_state, f32, 0xC20) < 0.2f) {
@@ -1909,7 +1909,7 @@ void hero_update_actions(void) {
                 }
             }
             cur = FLD(g_hero_state, u32, 0x2294);
-            if ((cur == 9) && ((FLD(g_hero_state, f32, 0x4CC) - FLD(g_hero_state, f32, 0xC38)) > 6.0f) && ((math_l00_return_argument(FLD(heroMoby, u8, 0x42)) == 8) || (math_l00_return_argument(FLD(heroMoby, u8, 0x42)) == cur)) && (FLD(heroMoby, u8, 0x42) == FLD(heroMoby, u8, 0x43)) && (FLD(g_hero_state, f32, 0x1B0) < D_L22_001A7DAC[1][1] * 0.0016666668f) && (FLD(g_hero_state, f32, 0x174) < 0.041666668f)) {
+            if ((cur == 9) && ((FLD(g_hero_state, f32, 0x4CC) - FLD(g_hero_state, f32, 0xC38)) > 6.0f) && ((math_l00_return_argument(FLD(hero_moby, u8, 0x42)) == 8) || (math_l00_return_argument(FLD(hero_moby, u8, 0x42)) == cur)) && (FLD(hero_moby, u8, 0x42) == FLD(hero_moby, u8, 0x43)) && (FLD(g_hero_state, f32, 0x1B0) < D_L22_001A7DAC[1][1] * 0.0016666668f) && (FLD(g_hero_state, f32, 0x174) < 0.041666668f)) {
                 f32 rate = 9.0f / FLD(g_hero_state, f32, 0xC20);
                 s32 at;
                 if (rate > 10.0f) {
@@ -2152,7 +2152,7 @@ void hero_update_actions(void) {
                 FLD(g_hero_state, u8, 0x49C) = 1;
                 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 3;
                 if (FLD(g_hero_state, f32, 0xC38) < FLD(g_hero_state, f32, 0x4CC)) {
-                    set_hero_animation(FLD(heroMoby, u8, 0x43), k, 6.0f);
+                    set_hero_animation(FLD(hero_moby, u8, 0x43), k, 6.0f);
                 }
             }
         }
@@ -2160,13 +2160,13 @@ void hero_update_actions(void) {
             FLD(g_hero_state, f32, 0xC20) = 1.0f;
         } else if (FLD(g_hero_state, u8, 0x49E) != 0) {
             s32 a;
-            if ((s32)FLD(heroMoby, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
+            if ((s32)FLD(hero_moby, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4D0))) {
                 s32 k;
                 FLD(g_hero_state, s16, 0x4AE) = FloatToInt(hero_find_collision_time(60.0f, FLD(g_hero_state, f32, 0x520), -1.0f));
                 AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4CC), (f32)FLD(g_hero_state, s16, 0x4AE), FLD(g_hero_state, f32, 0x514), -1.0f);
                 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 1;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.8f) {
-                    set_hero_animation(FLD(heroMoby, u8, 0x43), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 2));
+                    set_hero_animation(FLD(hero_moby, u8, 0x43), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 2));
                 }
                 if (FLD(g_hero_state, f32, 0xC20) < 0.2f) {
                     FLD(g_hero_state, f32, 0xC20) = 0.2f;
@@ -2496,7 +2496,7 @@ void hero_update_actions(void) {
                 FLD(D_L22_001B9B40, s32, 0x16C) = 0;
                 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 3;
                 if (FLD(g_hero_state, f32, 0xC38) < FLD(g_hero_state, f32, 0x4CC)) {
-                    set_hero_animation(FLD(heroMoby, u8, 0x43), k, 6.0f);
+                    set_hero_animation(FLD(hero_moby, u8, 0x43), k, 6.0f);
                 }
             }
         }
@@ -2504,13 +2504,13 @@ void hero_update_actions(void) {
             FLD(g_hero_state, f32, 0xC20) = 1.0f;
         } else if (FLD(g_hero_state, u8, 0x49E) != 0) {
             s32 a;
-            if ((s32)FLD(heroMoby, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4CC))) {
+            if ((s32)FLD(hero_moby, u8, 0x41) < FloatToInt(FLD(g_hero_state, f32, 0x4CC))) {
                 s32 k;
                 FLD(g_hero_state, s16, 0x4AE) = FloatToInt(hero_find_collision_time(90.0f, FLD(g_hero_state, f32, 0x520), -1.0f));
                 AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4CC), (f32)FLD(g_hero_state, s16, 0x4AE), FLD(g_hero_state, f32, 0x514), -1.0f);
                 k = FloatToInt(FLD(g_hero_state, f32, 0x4D0)) + 1;
                 if (FLD(g_hero_state, f32, 0xC20) > 1.8f) {
-                    set_hero_animation(FLD(heroMoby, u8, 0x43), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 2));
+                    set_hero_animation(FLD(hero_moby, u8, 0x43), k, (f32)(FLD(g_hero_state, s16, 0x4AE) + 2));
                 }
                 if (FLD(g_hero_state, f32, 0xC20) < 0.2f) {
                     FLD(g_hero_state, f32, 0xC20) = 0.2f;
@@ -2695,17 +2695,17 @@ void hero_update_actions(void) {
         break;
     }
 end:
-    if (oldAction != FLD(g_hero_state, s32, 0x229C)) {
+    if (old_action != FLD(g_hero_state, s32, 0x229C)) {
         hero_clear_tracked_slots();
     }
     temp_a0_31 = FLD(g_hero_state, s32, 0x22A0);
     if (((temp_a0_31 == 0x3C) && (FLD(g_hero_state, s32, 0x2294) != 0x3D)) || ((temp_a0_31 == 0x3D) && (FLD(g_hero_state, s32, 0x1854) != 0))) {
         hero_clear_target_flags();
     }
-    if (oldStep != FLD(g_hero_state, s32, 0x2298)) {
+    if (old_step != FLD(g_hero_state, s32, 0x2298)) {
         FLD(g_hero_state, s32, 0x1C0) = 0;
     }
-    if (mobyState != FLD(heroMoby, u8, 0x43)) {
+    if (moby_state != FLD(hero_moby, u8, 0x43)) {
         FLD(g_hero_state, s32, 0x1C4) = 0;
     }
 }

@@ -11,13 +11,13 @@ extern void part_spawn_explosion_with_sparks(void *, void *, int, float, float);
 extern void moby_mark_spawned(void *object);
 
 /* Shows a text message at the object and starts its effect. Does nothing if the object has no target. */
-void text_show_message_at_moby(u8 *moby, int unusedA, int unusedB) {
-    u8 *mobyCopy = moby;
+void text_show_message_at_moby(u8 *moby, int unused_a, int unused_b) {
+    u8 *moby_copy = moby;
     void *target;
     target = part_find_owned_effect_slot(moby, -1, 0);
     if (target == 0)
         return;
-    snd_play_from_class_bank(0xC + math_random_int_below(3), 0, mobyCopy, 0xE0B);
-    part_spawn_explosion_with_sparks(mobyCopy, mobyCopy + 0x10, -1, 2.0f, 13.0f);
-    moby_mark_spawned(mobyCopy);
+    snd_play_from_class_bank(0xC + math_random_int_below(3), 0, moby_copy, 0xE0B);
+    part_spawn_explosion_with_sparks(moby_copy, moby_copy + 0x10, -1, 2.0f, 13.0f);
+    moby_mark_spawned(moby_copy);
 }

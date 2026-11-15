@@ -41,24 +41,24 @@ static __inline__ int shop_item(int index)
 int menu_handle_unlockable_options_input(void)
 {
     int result = 0;
-    int entryCost;
+    int entry_cost;
     unsigned char *slot;
     int available = save_count_nonzero_flags();
     int flags = g_pad_state.flags;
 
     if (flags & 0x10) {
-        int value, returnCode;
+        int value, return_code;
         D_001AB9EC = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
         else if (g_pause_menu_state.fallback == 0) {
-            returnCode = -1;
+            return_code = -1;
             goto finish;
         }
-        returnCode = 0;
+        return_code = 0;
 finish:
-        return returnCode;
+        return return_code;
     }
     if (flags & 0x900) {
         D_001AB9EC = 0;
@@ -75,21 +75,21 @@ finish:
                     break;
             } while (1);
         } else if (flags & 0x4000) {
-            int nextIndex;
+            int next_index;
             ShopEntry *table;
             snd_play_from_global_bank(3, 0, 0);
-            nextIndex = D_001AB9EC;
+            next_index = D_001AB9EC;
             table = D_001ABCD0;
             do {
-                if (++nextIndex >= 12)
-                    nextIndex = 0;
-            } while (table[nextIndex].cost == 100);
-            D_001AB9EC = nextIndex;
+                if (++next_index >= 12)
+                    next_index = 0;
+            } while (table[next_index].cost == 100);
+            D_001AB9EC = next_index;
         }
         if (g_pad_state.flags & 0x40) {
             slot = (unsigned char *)D_001ABCD0;
-            entryCost = ((ShopEntry *)slot)[D_001AB9EC].cost;
-            if ((entryCost != 0x5A && entryCost <= available)
+            entry_cost = ((ShopEntry *)slot)[D_001AB9EC].cost;
+            if ((entry_cost != 0x5A && entry_cost <= available)
                 || (shop_cost(D_001AB9EC) == 0x5A && D_001A7A60[0] != 0)) {
                 snd_play_from_global_bank(4, 0, 0);
                 slot = &D_001A7A40[shop_entry(D_001AB9EC)->item];

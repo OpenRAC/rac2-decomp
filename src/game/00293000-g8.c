@@ -18,22 +18,22 @@ void UploadTextureImages(int base, int count, int palettes, UploadChunk *list)
     for (i = 0; i < count; i++, list++) {
         int addr = base + list->size;
         int packed = list->packed;
-        int vramPos = D_001A72D0;
+        int vram_pos = D_001A72D0;
         int w = packed & 0xffff;
         int h = packed >> 16;
         if (list->type == 0x13) {
             int dbw = w >> 6;
             int sz;
             if (dbw < 1) dbw = 1;
-            func_00126288(&image, vramPos >> 8, dbw, 0x13, 0, 0, w, h);
+            func_00126288(&image, vram_pos >> 8, dbw, 0x13, 0, 0, w, h);
             sz = w*h;
             if (sz < 0x100) sz = 0x100;
             D_001A72D0 += sz;
         } else if (list->type == 2) {
-            func_00126288(&image, vramPos >> 8, 1, 2, 0, 0, 16, 16);
+            func_00126288(&image, vram_pos >> 8, 1, 2, 0, 0, 16, 16);
             D_001A72D0 += 0x200;
         } else if (list->type == 0) {
-            func_00126288(&image, vramPos >> 8, 1, 0, 0, 0, 16, 16);
+            func_00126288(&image, vram_pos >> 8, 1, 0, 0, 0, 16, 16);
             D_001A72D0 += 0x400;
         }
         FlushCache(0);

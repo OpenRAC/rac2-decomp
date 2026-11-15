@@ -20,31 +20,31 @@ extern int func_001163B0(void);
 extern void SetDeathBits(void *, int, int);
 /* Moves the enemy each frame: it heads for its target or wanders when it has none, and drops into its fall state if it sinks too low. It also holds a linked helper object still while it does this. */
 void receiver_bot_move_toward_target(u8 *moby) {
-    float scaledVec[4] __attribute__((aligned(16)));
-    float aimVec[4] __attribute__((aligned(16)));
+    float scaled_vec[4] __attribute__((aligned(16)));
+    float aim_vec[4] __attribute__((aligned(16)));
     u8 *vars = *(u8 **)(moby + 0x68);
-    float savedLimit, savedRate;
-    int helperIndex = *(int *)(vars + 0x3B4);
-    if (helperIndex != -1) {
-        u8 *helper = (u8 *)((helperIndex << 8) + ref_L18_00428AE8_00);
+    float saved_limit, saved_rate;
+    int helper_index = *(int *)(vars + 0x3B4);
+    if (helper_index != -1) {
+        u8 *helper = (u8 *)((helper_index << 8) + ref_L18_00428AE8_00);
         if (((Obj *)helper)->h[0xAA/2] == 0x114D /* moby class 4429 */ && ((Obj *)helper)->b[0x20] != 0xFE && ((Obj *)helper)->b[0x20] != 0xFD)
             ((Obj *)helper)->i[0x98/4] = 0;
     }
     if (moby[0x95] == 13) {
-        vec_scale_to_length(scaledVec, g_moby_l18_table + (*(int *)(vars+0x3B4)<<8) + 0xC0, 5.0f);
-        add_vectors(aimVec, scaledVec, g_moby_l18_table + (*(int *)(vars+0x3B4)<<8) + 0x10);
-        scaledVec[2] = *(float *)(moby+0x18);
+        vec_scale_to_length(scaled_vec, g_moby_l18_table + (*(int *)(vars+0x3B4)<<8) + 0xC0, 5.0f);
+        add_vectors(aim_vec, scaled_vec, g_moby_l18_table + (*(int *)(vars+0x3B4)<<8) + 0x10);
+        scaled_vec[2] = *(float *)(moby+0x18);
         *(float *)(vars+0x128) *= 10.0f;
         *(float *)(vars+0x120) *= 10.0f;
-        savedLimit = *(float *)(vars+0x110);
-        savedRate = *(float *)(vars+0x10C);
+        saved_limit = *(float *)(vars+0x110);
+        saved_rate = *(float *)(vars+0x10C);
         *(float *)(vars+0x110) = 3.1415927f;
         *(float *)(vars+0x10C) = 0.5f;
-        moby_l01_turn_toward_target(moby,scaledVec);
+        moby_l01_turn_toward_target(moby,scaled_vec);
         *(float *)(vars+0x128) *= 0.1f;
         *(float *)(vars+0x120) *= 0.1f;
-        *(float *)(vars+0x110) = savedLimit;
-        *(float *)(vars+0x10C) = savedRate;
+        *(float *)(vars+0x110) = saved_limit;
+        *(float *)(vars+0x10C) = saved_rate;
         goto restore;
     } else {
         if (*(int *)(vars+0x38C) != -1) {
@@ -102,9 +102,9 @@ wander:
             moby_set_state(moby,12,10);
         }
 restore:
-        { int helperIndex2 = *(int *)(vars+0x3B4);
-        if (helperIndex2 != -1) {
-            u8 *helper = (u8 *)((helperIndex2 << 8) + ref_L18_00428AE8_00);
+        { int helper_index2 = *(int *)(vars+0x3B4);
+        if (helper_index2 != -1) {
+            u8 *helper = (u8 *)((helper_index2 << 8) + ref_L18_00428AE8_00);
             if (((Obj *)helper)->h[0xAA/2] == 0x114D /* moby class 4429 */ && ((Obj *)helper)->b[0x20] != 0xFE && ((Obj *)helper)->b[0x20] != 0xFD)
                 ((Obj *)helper)->i[0x98/4] = *(int *)(((Obj *)helper)->i[0x24/4]+0x10);
         } }

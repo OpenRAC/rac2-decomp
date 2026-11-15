@@ -51,7 +51,7 @@ void robot_update_behavior(u8 *object)
     u8 position[16] __attribute__((aligned(16)));
     u8 *state = PTR(object, 0x68);
     u8 *entity;
-    u16 *targetId;
+    u16 *target_id;
     float best, distance;
     int hit;
     switch (object[0x20]) {
@@ -158,10 +158,10 @@ enter_pause:
             if (object[0x43] != math_random_int_below(2)+6)
                 anim_start_blended(object, math_random_int_below(2)+6, 0, 10);
             best = 1000.0f;
-            for (targetId=D_L18_001FB320[WORD(state, 0x74C)];
-                 (WORD(state, 0x74C)&255)!=255 && WORD(state, 0x74C)<=D_L18_001B2838 && targetId &&
-                 ((targetId != 0 && (s16)targetId[-1]>=0) || targetId==D_L18_001FB320[WORD(state, 0x74C)]); targetId++) {
-                entity=g_moby_l18_table[0]+((*targetId&0x7FFF)<<8);
+            for (target_id=D_L18_001FB320[WORD(state, 0x74C)];
+                 (WORD(state, 0x74C)&255)!=255 && WORD(state, 0x74C)<=D_L18_001B2838 && target_id &&
+                 ((target_id != 0 && (s16)target_id[-1]>=0) || target_id==D_L18_001FB320[WORD(state, 0x74C)]); target_id++) {
+                entity=g_moby_l18_table[0]+((*target_id&0x7FFF)<<8);
                 if (!entity) break;
                 distance=vec_distance_squared_xy(object+0x10, entity+0x10);
                 if (distance<best) { PTR(state, 0x750)=entity; best=distance; }

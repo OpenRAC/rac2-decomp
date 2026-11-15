@@ -200,20 +200,20 @@ ASM_FUNC("asm/core", func_0011F048);
    pushed the loop test to $v1. */
 /* Sets up the console hardware tables at start-up and copies a small boot block into place. */
 int boot_init_hardware(void) {
-    int *initTable = r1_D_00130138;
+    int *init_table = r1_D_00130138;
     r1_D_00130138_pair *entry;
     unsigned int i;
     int old;
     int value;
 
-    r1_func_0011D3B8_v(initTable[0], initTable[1]);
+    r1_func_0011D3B8_v(init_table[0], init_table[1]);
     r1_func_0011D360((void *)0x80075000, r1_D_0012FDB8, 0x330);
     r1_func_00118D80(0);
     r1_func_00118D80(2);
-    r1_func_0011D3B8_v(initTable[2], initTable[3]);
-    r1_func_0011D3B8_v(initTable[4], initTable[5]);
+    r1_func_0011D3B8_v(init_table[2], init_table[3]);
+    r1_func_0011D3B8_v(init_table[4], init_table[5]);
 
-    entry = (r1_D_00130138_pair *)(initTable + 6);
+    entry = (r1_D_00130138_pair *)(init_table + 6);
     for (i = 3; i < 8; i++) {
         old = r1_func_0011D3A8(entry->a);
         r1_func_0011D3B8_v(entry->a, old);

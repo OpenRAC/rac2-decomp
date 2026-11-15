@@ -11,13 +11,13 @@ extern char *g_hero_moby;
    level's current object is excluded (its +0xAA id is 0xFB0, or it is the object at
    D_0018C0B0), copy the resident vector there and answer 1. */
 
-int moby_place_at_collision_point(char *self, void *previousPos)
+int moby_place_at_collision_point(char *self, void *previous_pos)
 {
-    char *currentObject;
+    char *current_object;
 
-    if (CollLine(previousPos, self + 0x10, 0, self, 0) != 0) {
-        currentObject = ref_L00_003286D0_00;
-        if (currentObject != 0 && (*(short *)(currentObject + 0xAA) == 0xFB0 /* Thermanator */ || currentObject == g_hero_moby))
+    if (CollLine(previous_pos, self + 0x10, 0, self, 0) != 0) {
+        current_object = ref_L00_003286D0_00;
+        if (current_object != 0 && (*(short *)(current_object + 0xAA) == MOBY_CLASS_THERMANATOR || current_object == g_hero_moby))
             return 0;
         qcopy(self + 0x10, ref_L00_003286D0_01);
         return 1;

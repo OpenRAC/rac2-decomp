@@ -26,7 +26,7 @@ extern float D_L14_001AFF0C __attribute__((sda));
 void swing_update(char *self) {
  char *vars = *(char **)(self+0x68);
  char *child;
- float maxAngle,delta,velocity,angle,restitution;
+ float max_angle,delta,velocity,angle,restitution;
  switch ((unsigned char)self[0x20]) {
  case 0:
   moby_set_state(self,1,-1);
@@ -60,14 +60,14 @@ void swing_update(char *self) {
   if(flag_set_first_pending(self))*(float *)(vars+0x84)=D_L14_001AFEFC*0.0002908882452175021f;
   delta=D_L14_001AFEF8*4.848137450608192e-06f;
   velocity=*(float *)(vars+0x84)-delta;
-  maxAngle=D_L14_001AFF04*0.01745329424738884f;
+  max_angle=D_L14_001AFF04*0.01745329424738884f;
   angle=*(float *)(vars+0x80);
   angle+=velocity;
   *(float *)(vars+0x84)=velocity;
   *(float *)(vars+0x80)=angle;
-  if(*(float *)(vars+0x80)>maxAngle) {
+  if(*(float *)(vars+0x80)>max_angle) {
    restitution=D_L14_001AFF00;
-   *(float *)(vars+0x80)=maxAngle;
+   *(float *)(vars+0x80)=max_angle;
    *(float *)(vars+0x84)*=restitution;
    PlayMobySound(0,0,self);
   } else if(*(float *)(vars+0x80)<0.0f) {

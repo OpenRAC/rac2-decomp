@@ -26,7 +26,7 @@ extern unsigned int D_L20_001B2F9C __attribute__((sda));
    its repeated test into a register known to be zero, which the loop still tests (retail's
    `daddu $t0,$zero,$zero` and `bnez $t0`). */
 int group_count_active_members(int group) {
-    unsigned short *idList = (unsigned short *)D_L20_001FBB20[group];
+    unsigned short *id_list = (unsigned short *)D_L20_001FBB20[group];
     int count = 0;
 
     if ((group & 0xFF) == 0xFF) {
@@ -35,11 +35,11 @@ int group_count_active_members(int group) {
     if (D_L20_001B2FB8 < group) {
         goto end;
     }
-    if (idList == 0) {
+    if (id_list == 0) {
         goto end;
     }
     for (;;) {
-        char *object = (char *)D_L20_001B2F9C + ((*idList & 0x7FFF) << 8);
+        char *object = (char *)D_L20_001B2F9C + ((*id_list & 0x7FFF) << 8);
 
         if (object == 0) {
             goto end;
@@ -47,20 +47,20 @@ int group_count_active_members(int group) {
         if (*(unsigned char *)(object + 0x20) != 6 && *(signed char *)(object + 0x20) >= 0) {
             count++;
         }
-        idList++;
+        id_list++;
         if ((group & 0xFF) == 0xFF) {
             goto end;
         }
         if (D_L20_001B2FB8 < group) {
             goto end;
         }
-        if (idList == 0) {
+        if (id_list == 0) {
             goto end;
         }
-        if (*(short *)(idList - 1) >= 0) {
+        if (*(short *)(id_list - 1) >= 0) {
             continue;
         }
-        if (idList == (unsigned short *)D_L20_001FBB20[group]) {
+        if (id_list == (unsigned short *)D_L20_001FBB20[group]) {
             continue;
         }
         break;
@@ -156,12 +156,12 @@ extern int math_random_int_below(int);
 /* Picks the next behaviour state for an enemy based on what it did last, and remembers the choice. */
 void enemy_choose_next_state(char *moby) {
     char *state = *(char **)(moby + 0x68);
-    int previousMode = *(int *)(state + 0x17F4);
+    int previous_mode = *(int *)(state + 0x17F4);
     int result;
 
-    if (previousMode == 2) goto other;
-    if (previousMode >= 3) goto other;
-    if (previousMode != 1) goto other;
+    if (previous_mode == 2) goto other;
+    if (previous_mode >= 3) goto other;
+    if (previous_mode != 1) goto other;
     result = yeedil_boss_find_group_target(moby);
     *(int *)(state + 0x17FC) = result;
     if (result == 0) {
@@ -214,12 +214,12 @@ extern void func_0039BDF0(char *, char *, int, int);
 /* Sets up the linked child moby at the target and returns it, or returns nothing if it is busy. */
 char *moby_activate_linked_child(char *moby, char *target) {
     char *state = *(char **)(moby + 0x68);
-    unsigned int childAddr = D_L20_001B2F9C + (*(int *)(state + 0x238) << 8);
+    unsigned int child_addr = D_L20_001B2F9C + (*(int *)(state + 0x238) << 8);
 
-    if (func_L20_00449AC8((char *)childAddr) != 0) {
-        moby_start_path_movement((char *)childAddr, moby, target);
-        func_0039BDF0((char *)childAddr, (char *)(childAddr + 0x10), 0x168, 0);
-        return (char *)childAddr;
+    if (func_L20_00449AC8((char *)child_addr) != 0) {
+        moby_start_path_movement((char *)child_addr, moby, target);
+        func_0039BDF0((char *)child_addr, (char *)(child_addr + 0x10), 0x168, 0);
+        return (char *)child_addr;
     }
     return 0;
 }
@@ -234,19 +234,19 @@ extern int moby_get_targeted_flag(char *);
 /* Tells whether a moby is a valid thing for this enemy to target. */
 int enemy_is_valid_target(char *moby, char *candidate) {
     char *state = *(char **)(moby + 0x68);
-    short classId;
+    short class_id;
 
     if (func_0033E808(candidate + 0x10, *(int *)(state + 0x220)) == 0) {
         goto ret0;
     }
-    classId = *(short *)(candidate + 0xAA);
-    if (classId < 0x1FF) {
+    class_id = *(short *)(candidate + 0xAA);
+    if (class_id < 0x1FF) {
         goto ret0;
     }
-    if (classId < 0x201) {
+    if (class_id < 0x201) {
         goto other;
     }
-    if (classId != 0x12D3) {
+    if (class_id != 0x12D3) {
         goto ret0;
     }
     if (func_L20_00449AC8(candidate) != 0) {
@@ -324,14 +324,14 @@ char *enemy_fire_projectile_along_aim(char *moby) {
     TI128 origin;
     TI128 direction;
     float spread;
-    float spreadCopy;
+    float spread_copy;
     int lifetime;
 
     spread = 1.0471977f;
     yeedil_boss_compute_shot_launch(moby, (char *)&origin, (char *)&direction, &spread);
-    spreadCopy = spread;
+    spread_copy = spread;
     lifetime = math_random_int_range(0x12C, 0x258);
-    return yeedil_projectile_spawn(moby, (char *)&origin, (char *)&direction, spreadCopy, lifetime, (float)*(unsigned char *)(state + 0x36));
+    return yeedil_projectile_spawn(moby, (char *)&origin, (char *)&direction, spread_copy, lifetime, (float)*(unsigned char *)(state + 0x36));
 }
 
 /* func_L20_00443DF0 is defined in L20_00443DF0.c (it needs -frac2-hazard-labels). */
@@ -355,12 +355,12 @@ extern float mat_fast_helper_a(float, float);
 extern float fast_subtract_rotations(float, float);
 
 /* Works out how far an enemy must turn to face a point and stores it, limited to about 60 degrees. */
-void enemy_compute_aim_turn_angle(char *moby, float *targetPos) {
+void enemy_compute_aim_turn_angle(char *moby, float *target_pos) {
     char *state = *(char **)(moby + 0x68);
     float angle;
 
-    angle = mat_fast_helper_a(targetPos[0] - *(float *)(moby + 0x10),
-                      targetPos[1] - *(float *)(moby + 0x14));
+    angle = mat_fast_helper_a(target_pos[0] - *(float *)(moby + 0x10),
+                      target_pos[1] - *(float *)(moby + 0x14));
     angle = fast_subtract_rotations(angle, *(float *)(moby + 0xF8));
     if (angle > 1.0471977f) {
         angle = 1.0471977f;
@@ -562,10 +562,10 @@ void elevator_l20_update(char *moby) {
     case 2:
         if (flag_set_first_pending(moby)) *(int *)(state+0x68)=0;
         if (math_fabs(*(float *)(state+0x60)-*(float *)(moby+0x14)) < 0.03f) {
-            int slotIndex=*(int *)(state+0x7C);
-            if (slotIndex != -1) {
-                SoundSlot *slot=(SoundSlot *)((char *)g_sound_state+slotIndex*0x70);
-                if (slot->owner==moby && slot->active) snd_stop_voice(slotIndex);
+            int slot_index=*(int *)(state+0x7C);
+            if (slot_index != -1) {
+                SoundSlot *slot=(SoundSlot *)((char *)g_sound_state+slot_index*0x70);
+                if (slot->owner==moby && slot->active) snd_stop_voice(slot_index);
             }
             *(int *)(state+0x7C)=-1;
             if (!moby_is_hit_by_player_or_aim(moby)) {
@@ -578,10 +578,10 @@ void elevator_l20_update(char *moby) {
     case 3:
         if (flag_set_first_pending(moby)) *(int *)(state+0x68)=0;
         if (math_fabs(*(float *)(moby+0x14)-*(float *)(state+0x64)) < 0.03f) {
-            int slotIndex=*(int *)(state+0x7C);
-            if (slotIndex != -1) {
-                SoundSlot *slot=(SoundSlot *)((char *)g_sound_state+slotIndex*0x70);
-                if (slot->owner==moby && slot->active) snd_stop_voice(slotIndex);
+            int slot_index=*(int *)(state+0x7C);
+            if (slot_index != -1) {
+                SoundSlot *slot=(SoundSlot *)((char *)g_sound_state+slot_index*0x70);
+                if (slot->owner==moby && slot->active) snd_stop_voice(slot_index);
             }
             *(int *)(state+0x7C)=-1;
             if (!moby_is_hit_by_player_or_aim(moby)) {
@@ -702,11 +702,11 @@ extern char D_L20_001C0430[];
 /* Moves, spins and bounces a piece of debris off walls, then fades it out and removes it. */
 void debris_l20_update(char *moby) {
     char *state = *(char **)(moby + 0x68);
-    float velocityZ, speed;
+    float velocity_z, speed;
     char bounce[0x10];
 
-    velocityZ = *(float *)(state + 8);
-    *(float *)(state + 8) = velocityZ - (velocityZ > 0.0f ? *(float *)(state + 0x20) * 4.0f : *(float *)(state + 0x20));
+    velocity_z = *(float *)(state + 8);
+    *(float *)(state + 8) = velocity_z - (velocity_z > 0.0f ? *(float *)(state + 0x20) * 4.0f : *(float *)(state + 0x20));
 
     FastVecAdd(moby + 0x10, moby + 0x10, state);
     *(float *)(moby + 0xF0) = FastAddRotations(*(float *)(moby + 0xF0), *(float *)(state + 0x10));
@@ -714,13 +714,13 @@ void debris_l20_update(char *moby) {
     *(float *)(moby + 0xF8) = FastAddRotations(*(float *)(moby + 0xF8), *(float *)(state + 0x18));
 
     if (coll_test_point(moby + 0x10, 0, moby, 1.5f) != 0) {
-        char *hitInfo = D_L20_001C0430;
+        char *hit_info = D_L20_001C0430;
 
-        qcopy(moby + 0x10, hitInfo);
-        if (FastVecDot(state, hitInfo + 0x10) < 0.0f) {
-            vec_scale_to_length(hitInfo + 0x10, hitInfo + 0x10, 1.0f);
+        qcopy(moby + 0x10, hit_info);
+        if (FastVecDot(state, hit_info + 0x10) < 0.0f) {
+            vec_scale_to_length(hit_info + 0x10, hit_info + 0x10, 1.0f);
             speed = FastVecLength(state);
-            FastVecScale(bounce, hitInfo + 0x10, -FastVecDot(state, hitInfo + 0x10) * 1.25f);
+            FastVecScale(bounce, hit_info + 0x10, -FastVecDot(state, hit_info + 0x10) * 1.25f);
             FastVecAdd(state, state, bounce);
             vec_scale_to_length(state, state, speed * 0.5f);
         }

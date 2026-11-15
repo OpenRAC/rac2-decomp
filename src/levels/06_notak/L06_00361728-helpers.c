@@ -25,7 +25,7 @@ int moby_find_nearest_target(char *moby, char *target, float distance)
     for (index = 1; index <= D_L06_001B2970[0]; index++) {
         char *candidate = D_L06_001B281C + (D_L06_001B2970[index] << 8);
         if (candidate &&
-            (*(short *)(candidate + 0xAA) == 0xCB /* Decoy */ ||
+            (*(short *)(candidate + 0xAA) == MOBY_CLASS_DECOY ||
              *(short *)(candidate + 0xAA) == 0x76C /* moby class 1900 */) &&
             *(unsigned char *)(candidate + 0x20) != 0xFE &&
             *(unsigned char *)(candidate + 0x20) != 0xFD &&

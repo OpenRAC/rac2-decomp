@@ -70,7 +70,7 @@ int FindHeroOrMobyTarget(char *source, SearchOutput *out, int *areas, int count,
     }
     for (j = 1; j <= D_L04_001B2630[0]; j++) {
         m = g_moby_l04_pool + (D_L04_001B2630[j] << 8);
-        if (m && (WSHORT(m, 0xAA) == 0xCB /* Decoy */ || WSHORT(m, 0xAA) == 0x76C /* moby class 1900 */) && WBYTE(m, 0x20) != 0xFE
+        if (m && (WSHORT(m, 0xAA) == MOBY_CLASS_DECOY || WSHORT(m, 0xAA) == 0x76C /* moby class 1900 */) && WBYTE(m, 0x20) != 0xFE
             && WBYTE(m, 0x20) != 0xFD && WBYTE(m, 0x20) == 3) {
             valid = 1;
             d = vec_distance_xy(source + 0x10, m + 0x10);

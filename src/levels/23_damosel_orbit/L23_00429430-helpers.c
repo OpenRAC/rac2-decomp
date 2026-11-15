@@ -86,7 +86,7 @@ void gfx_draw_fading_glowing_beam(s32 unused0, s32 unused1, s32 unused2, s32 unu
     float vtip[4];
     float vside[4];
     float vbase[4];
-    float uvOffset[2];
+    float uv_offset[2];
     float *rel;
     float *axis;
     float *tip;
@@ -94,23 +94,23 @@ void gfx_draw_fading_glowing_beam(s32 unused0, s32 unused1, s32 unused2, s32 unu
     float *base;
     L23BeamVars *vars;
     u8 *pos;
-    s32 fadeValue;
+    s32 fade_value;
     float angle;
-    float sinAngle;
-    float cosAngle;
+    float sin_angle;
+    float cos_angle;
     int i;
     int j;
 
     vars = *(L23BeamVars **)(obj + 0x68);
-    fadeValue = vars->fade;
-    D_L23_001B1B40 = fadeValue * 4;
+    fade_value = vars->fade;
+    D_L23_001B1B40 = fade_value * 4;
     if (D_L23_001B1B40 != 0) {
         D_L23_001B1B40--;
     }
-    D_L23_001B1B50 = fadeValue * 2;
-    D_L23_001B1B60 = fadeValue;
-    D_L23_001B1B70 = fadeValue;
-    D_L23_001B1B80 = fadeValue;
+    D_L23_001B1B50 = fade_value * 2;
+    D_L23_001B1B60 = fade_value;
+    D_L23_001B1B70 = fade_value;
+    D_L23_001B1B80 = fade_value;
     effect_init_transform_record(&q);
     pos = obj + 0x10;
     gfx_init_quad_packet_state(&q, D_L23_001B1B24, 1, 0x80);
@@ -180,13 +180,13 @@ void gfx_draw_fading_glowing_beam(s32 unused0, s32 unused1, s32 unused2, s32 unu
     q.uv[3][0] = 1.0f;
     q.uv[3][1] = 1.0f;
     angle = vars->spin;
-    sinAngle = math_fast_sin_or_cos_a(angle);
-    cosAngle = math_fast_sin_or_cos_b(angle);
+    sin_angle = math_fast_sin_or_cos_a(angle);
+    cos_angle = math_fast_sin_or_cos_b(angle);
     for (j = 0; j < 4; j++) {
-        uvOffset[0] = q.uv[j][0] - 0.5f;
-        uvOffset[1] = q.uv[j][1] - 0.5f;
-        q.uv[j][0] = uvOffset[0] * sinAngle - uvOffset[1] * cosAngle;
-        q.uv[j][1] = uvOffset[0] * cosAngle + uvOffset[1] * sinAngle;
+        uv_offset[0] = q.uv[j][0] - 0.5f;
+        uv_offset[1] = q.uv[j][1] - 0.5f;
+        q.uv[j][0] = uv_offset[0] * sin_angle - uv_offset[1] * cos_angle;
+        q.uv[j][1] = uv_offset[0] * cos_angle + uv_offset[1] * sin_angle;
         q.uv[j][0] += 0.5f;
         q.uv[j][1] += 0.5f;
     }

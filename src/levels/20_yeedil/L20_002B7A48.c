@@ -106,11 +106,11 @@ extern float math_spring_float_to_goal(float *, float *, float, float, float, fl
 /* func_L20_002B93E0 is defined in L20_002B7A48-g8.c (it reaches data through $gp). */
 
 /* Puts the hero into a new mode (on foot or riding) and attaches it to the given object. */
-void SetYeedilHeroVehicleMode(s32 newMode, s32 animation, char *attachObject)
+void SetYeedilHeroVehicleMode(s32 new_mode, s32 animation, char *attach_object)
 {
     char *D = g_hero_state;
-    s32 p0 = newMode;
-    char *p2 = attachObject;
+    s32 p0 = new_mode;
+    char *p2 = attach_object;
     s32 p1 = animation;
     char *block;
 

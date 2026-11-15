@@ -42,24 +42,24 @@ extern f32 g_001ABAC0 __attribute__((sda));
 
 /* Draws a small pop-up menu box with three layered title images and two lines of text with button hints. */
 s32 menu_popup_box_draw_simple(void) {
-    s32 yPos;
-    s32 xPos;
+    s32 y_pos;
+    s32 x_pos;
 
     SetupGifPaging(0);
     if (D_001A8CFC != 0) {
         gfx_draw_scaled_object(table_find_by_id(D_001A8CFC + 0x8710, 0x8B), 0x60442D00, (f32)g_001ABAB0, (f32)D_001ABAB4, D_001B23A8, g_001ABAC0);
         gfx_draw_scaled_object(table_find_by_id(D_001A8CFC + 0x8710, 0x8C), 0x55F0C070, (f32)g_001ABAB0, (f32)D_001ABAB4, D_001B23A8, g_001ABAC0);
         gfx_draw_scaled_object(table_find_by_id(D_001A8CFC + 0x8710, 0x8D), 0x80FFDE8D, (f32)g_001ABAB0, (f32)D_001ABAB4, D_001B23A8, 0.0f);
-        xPos = g_001ABAB0;
-        xPos = xPos + g_001ABAA8;
-        yPos = D_001ABAB4;
-        yPos = yPos + D_001ABAAC;
-        text_draw_centered_small(xPos, yPos, (u64)0x80F0F0F0, GetLocalizedString(0x2D61), -1);
-        xPos = g_001ABAB0;
-        xPos = xPos + g_001ABAB8;
-        yPos = D_001ABAB4;
-        yPos = yPos + D_001ABABC;
-        text_draw_centered_small(xPos, yPos, (u64)0x80F0F0F0, GetLocalizedString(0x2D4F), -1);
+        x_pos = g_001ABAB0;
+        x_pos = x_pos + g_001ABAA8;
+        y_pos = D_001ABAB4;
+        y_pos = y_pos + D_001ABAAC;
+        text_draw_centered_small(x_pos, y_pos, (u64)0x80F0F0F0, GetLocalizedString(0x2D61), -1);
+        x_pos = g_001ABAB0;
+        x_pos = x_pos + g_001ABAB8;
+        y_pos = D_001ABAB4;
+        y_pos = y_pos + D_001ABABC;
+        text_draw_centered_small(x_pos, y_pos, (u64)0x80F0F0F0, GetLocalizedString(0x2D4F), -1);
     }
     DoGifPaging();
     return 0;

@@ -123,7 +123,7 @@ void flying_l11_enemy_update(char *moby)
         vec_scale_to_length(zero,moby+0xE0,F(vars,0x104)+F(vars,0x100));
         FastVecAdd(delta,moby+0x10,zero);
         clear=1;
-        if (coll_test_point(delta,5,moby,F(vars,0x100)) && D_L11_001C0D18 && H(D_L11_001C0D18,0xAA)==0xB3A /* Arachnoid */) clear=0;
+        if (coll_test_point(delta,5,moby,F(vars,0x100)) && D_L11_001C0D18 && H(D_L11_001C0D18,0xAA)==MOBY_CLASS_ARACHNOID) clear=0;
         if (clear) {
             I(moby,0x98)=I(P(moby,0x24),0x10);
             moby_set_state(moby,5,2);

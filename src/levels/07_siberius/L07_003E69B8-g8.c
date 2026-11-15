@@ -32,7 +32,7 @@ int shooter_entity_base_update(unsigned char *moby)
     float from[4] __attribute__((aligned(16)));
     float to[4] __attribute__((aligned(16)));
     unsigned char *vars=*(unsigned char **)(moby+0x68);
-    char *hitRecord;
+    char *hit_record;
     float turn;
     if (!moby[0x20]) {
         vars[0x48]=FloatToInt(15.0f);
@@ -85,9 +85,9 @@ int shooter_entity_base_update(unsigned char *moby)
         moby_update_ground_check(moby);
         moby[0x6F]=22;
     }
-    hitRecord=part_find_owned_effect_slot(moby,0x10000,0);
-    if (hitRecord && *(char **)(hitRecord+0x20) && fast_vec_dist(*(char **)(hitRecord+0x20)+0x10,moby+0x10)<32.0f) {
-        qcopy(from,*(char **)(hitRecord+0x20)+0x10);
+    hit_record=part_find_owned_effect_slot(moby,0x10000,0);
+    if (hit_record && *(char **)(hit_record+0x20) && fast_vec_dist(*(char **)(hit_record+0x20)+0x10,moby+0x10)<32.0f) {
+        qcopy(from,*(char **)(hit_record+0x20)+0x10);
         from[2]+=0.5f;
         qcopy(to,moby+0x10);
         to[2]+=0.5f;

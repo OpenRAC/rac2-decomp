@@ -21,7 +21,7 @@ void tutorial_scene_objects_update(void) {
             char *obj=(char *)D_L00_001BCAC0.objects[i];
             if (obj && *(short *)(obj+0xAA)==0xE29 /* moby class 3625 */) *(unsigned short *)(obj+0x34)|=0x800;
             if (*(short *)(obj+0xAA)==0xD54 /* moby class 3412 */) UpdateEquipmentPieces(obj);
-            if (obj && *(short *)(obj+0xAA)==4000 /* TV Screens */ && *(char **)(obj+0x68)) {
+            if (obj && *(short *)(obj+0xAA)==MOBY_CLASS_TV_SCREENS && *(char **)(obj+0x68)) {
                 math_store_angle_update_result(obj,*(char **)(obj+0x68)+12,0x80AAAAD2,0x80396464,0.061086535f);
             }
     }

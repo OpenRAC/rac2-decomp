@@ -138,7 +138,7 @@ typedef union { u8 b[0x2600]; s16 h[0x1300]; u16 uh[0x1300]; s32 i[0x980]; u32 u
 /* Switches the player into a new action, such as jumping or gliding, and starts the matching animation. */
 s32 hero_l09_set_state(s32 action, s32 animate) {
     u8 *objectSnapshot;
-    u8 *hitA, *hitB, *hitC, *hitD, *hitE;
+    u8 *hit_a, *hit_b, *hit_c, *hit_d, *hit_e;
     s32 oldStep;
     u8 wasGliding;
     u8 oldWeapon;
@@ -154,7 +154,7 @@ s32 hero_l09_set_state(s32 action, s32 animate) {
     u32 animation16, animation21, animation22, animation41, animation43, animation53;
     f32 frames;
     f32 angle53;
-    f32 angleValue18, angleValue21, angleValue22, angleValue37;
+    f32 angle_value18, angle_value21, angle_value22, angle_value37;
     if (WORD(0x229C) == 0x14 && (action != 0x61 || animate != 2)) return 0;
     if ((D_L09_001A8F00 == 2 || D_L09_001A8F00 == 6) && animate != 2) return 0;
     if (WORD(0x24CC) == 0 && (WORD(0x229C) == 2 || WORD(0x229C) == 7)) {
@@ -268,8 +268,8 @@ s32 hero_l09_set_state(s32 action, s32 animate) {
     case 0x72: case 0x73:
         WORD(0x229C) = 7; BITS(0x24A0) = 0;
         hero_scale_saved_vectors(0.5f); BYTE(0x22B7) = 1; COPY_VECTOR(0xF0, 0x110);
-        hitA = part_find_owned_effect_slot(PTR(0x2290), 1, 0);
-        if (hitA) AdjustPlayerHealth(FloatToInt(*(f32 *)(hitA + 0x2C)));
+        hit_a = part_find_owned_effect_slot(PTR(0x2290), 1, 0);
+        if (hit_a) AdjustPlayerHealth(FloatToInt(*(f32 *)(hit_a + 0x2C)));
         else AdjustPlayerHealth(1);
         HALF(0x1DC) = 77;
         if (animate) {
@@ -326,8 +326,8 @@ s32 hero_l09_set_state(s32 action, s32 animate) {
         if (REAL(0x1B4) > 0.11666667461395264f) REAL(0x1B4) = 0.11666667461395264f;
         BYTE(0x40F) = 0;
         hero_resolve_stick_direction(0, 1.0f);
-        angleValue18 = FastDiffRots(REAL(0x98), REAL(0x1A0));
-        if (angleValue18 > 1.5707964897155762f &&
+        angle_value18 = FastDiffRots(REAL(0x98), REAL(0x1A0));
+        if (angle_value18 > 1.5707964897155762f &&
             (WORD(0x22A4) == 4 || WORD(0x22A0) == 3 || WORD(0x22AC) == 3)) REAL(0x1B4) = 0;
         WORD(0x1188) = 0x68;
         if (BYTE(0x149A)) {
@@ -374,8 +374,8 @@ s32 hero_l09_set_state(s32 action, s32 animate) {
         if (!animate) goto finish;
         animation21 = objectSnapshot[0x42];
         {
-            angleValue21 = REAL(0xC38); selected21 = 6;
-            if (math_l00_return_argument(animation21) == 4 && angleValue21 > 3.0f && angleValue21 < 16.0f) selected21 = 5;
+            angle_value21 = REAL(0xC38); selected21 = 6;
+            if (math_l00_return_argument(animation21) == 4 && angle_value21 > 3.0f && angle_value21 < 16.0f) selected21 = 5;
             set_hero_animation(selected21, 4, 9.0f);
             goto finish;
         }
@@ -384,8 +384,8 @@ s32 hero_l09_set_state(s32 action, s32 animate) {
         REAL(0x1B4) = cam_get_view_space_vector_length((char *)VEC(0x120)); COPY_VECTOR(0x160, 0x120);
         if (!animate) goto finish;
         animation22 = objectSnapshot[0x42]; {
-            angleValue22 = REAL(0xC38); selected22 = 6;
-            if (math_l00_return_argument(animation22) == 4 && angleValue22 > 3.0f && angleValue22 < 16.0f) selected22 = 5;
+            angle_value22 = REAL(0xC38); selected22 = 6;
+            if (math_l00_return_argument(animation22) == 4 && angle_value22 > 3.0f && angle_value22 < 16.0f) selected22 = 5;
             set_hero_animation(selected22, 4, 9.0f);
             goto finish;
         }
@@ -442,15 +442,15 @@ s32 hero_l09_set_state(s32 action, s32 animate) {
         D_0018C360[13].levels = (D_0018C360[13].levels | (1u << g_current_map_index)) | 0x80000000u; HALF(0xAFE) = 1;
         BITS(0xAE8) = 0; BYTE(0x22BC) = 1; PTR(0xAD4) = PTR(0xAD0);
         HALF(0xADC) = 0; HALF(0xAFC) = 0; BITS(0xAF4) = 0; BITS(0xAF8) = 0;
-        hitB = *(u8 **)(PTR(0xAD0) + 0x68);
-        REAL(0xAE0) = *(f32 *)(hitB + 4);
-        if (*(f32 *)(hitB + 0x10) == REAL(0xAE8)) *(f32 *)(hitB + 0x14) = *(f32 *)(hitB + 0xC);
-        else *(f32 *)(hitB + 0x14) = *(f32 *)(hitB + 0x10);
+        hit_b = *(u8 **)(PTR(0xAD0) + 0x68);
+        REAL(0xAE0) = *(f32 *)(hit_b + 4);
+        if (*(f32 *)(hit_b + 0x10) == REAL(0xAE8)) *(f32 *)(hit_b + 0x14) = *(f32 *)(hit_b + 0xC);
+        else *(f32 *)(hit_b + 0x14) = *(f32 *)(hit_b + 0x10);
         REAL(0xB04) = 0.025f; REAL(0xB08) = 0.33f; REAL(0xB0C) = 0.1833333373f;
         vec_clear_128((TI128 *)VEC(0xA0)); HALF(0x206) = 40;
-        if (*(f32 *)(hitB + 0x24) != 0.0f) REAL(0xB04) = *(f32 *)(hitB + 0x24);
-        if (*(f32 *)(hitB + 0x28) != 0.0f) REAL(0xB08) = *(f32 *)(hitB + 0x28);
-        if (*(f32 *)(hitB + 0x2C) != 0.0f) REAL(0xB0C) = *(f32 *)(hitB + 0x2C);
+        if (*(f32 *)(hit_b + 0x24) != 0.0f) REAL(0xB04) = *(f32 *)(hit_b + 0x24);
+        if (*(f32 *)(hit_b + 0x28) != 0.0f) REAL(0xB08) = *(f32 *)(hit_b + 0x28);
+        if (*(f32 *)(hit_b + 0x2C) != 0.0f) REAL(0xB0C) = *(f32 *)(hit_b + 0x2C);
         REAL(0xAEC) = mat_fast_helper_a(*(f32 *)(PTR(0xAD4) + 0x10) - REAL(0x80),
                                     *(f32 *)(PTR(0xAD4) + 0x14) - REAL(0x84));
         REAL(0xAE4) = fast_vec_dist(VEC(0x80), PTR(0xAD4) + 0x10);
@@ -515,8 +515,8 @@ s32 hero_l09_set_state(s32 action, s32 animate) {
         s32 n = -2;
         WORD(0x229C) = 30; BITS(0x24A0) = 0;
         if (WORD(0x22A0) != 0x16) {
-            angleValue37 = REAL(0x5B8); REAL(0x5B0) = 50.0f;
-            if (angleValue37 != 0.0f) { REAL(0x5B0) = angleValue37; REAL(0x5B8) = 0; }
+            angle_value37 = REAL(0x5B8); REAL(0x5B0) = 50.0f;
+            if (angle_value37 != 0.0f) { REAL(0x5B0) = angle_value37; REAL(0x5B8) = 0; }
         }
         BYTE(0x24EF) = 1; WORD(0x1188) = 0x68; WORD(0x7A8) = 0;
         HALF(0x5BE) = 0; WORD(0x5A8) = 0; WORD(0x5A4) = 0;
@@ -878,8 +878,8 @@ s32 hero_l09_set_state(s32 action, s32 animate) {
         WORD(0x229C) = 7; BITS(0x24A0) = 0;
         hero_scale_saved_vectors(0.5f); queue_copy_record_by_index(18); HALF(0x20E) = 45;
         COPY_VECTOR(0xF0, 0x120); vec_clamp_length((f32 *)VEC(0xF0), 0.1166666746f);
-        hitC = part_find_owned_effect_slot(PTR(0x2290), 1, 0);
-        if (hitC) AdjustPlayerHealth(FloatToInt(*(f32 *)(hitC + 0x2C)));
+        hit_c = part_find_owned_effect_slot(PTR(0x2290), 1, 0);
+        if (hit_c) AdjustPlayerHealth(FloatToInt(*(f32 *)(hit_c + 0x2C)));
         else AdjustPlayerHealth(1);
         HALF(0x1DC) = 77;
         if (!animate) goto finish;
@@ -889,8 +889,8 @@ s32 hero_l09_set_state(s32 action, s32 animate) {
     case 0x8C:
         WORD(0x229C) = 7; BITS(0x24A0) = 0; hero_scale_saved_vectors(0.5f);
         BYTE(0x22BC) = 1; queue_copy_record_by_index(18);
-        hitD = part_find_owned_effect_slot(PTR(0x2290), 8, 0);
-        if (hitD) AdjustPlayerHealth(FloatToInt(*(f32 *)(hitD + 0x2C)));
+        hit_d = part_find_owned_effect_slot(PTR(0x2290), 8, 0);
+        if (hit_d) AdjustPlayerHealth(FloatToInt(*(f32 *)(hit_d + 0x2C)));
         else AdjustPlayerHealth(1);
         HALF(0x1DC) = 77;
         if (!animate) goto finish;

@@ -17,7 +17,7 @@ void moving_beam_update(char *moby)
     float previous[4], midpoint[4];
     char *state = *(char **)(moby + 0x68);
     char *position;
-    if (!save_is_record_value(0x5CB /* Pulse Rifle */, *(short *)(state + 0x1A))) {
+    if (!save_is_record_value(MOBY_CLASS_PULSE_RIFLE, *(short *)(state + 0x1A))) {
         moby_mark_spawned(moby);
         return;
     }

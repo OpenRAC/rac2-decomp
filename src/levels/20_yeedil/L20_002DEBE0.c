@@ -75,38 +75,38 @@ extern void update_moby_animation_state(void *);
 extern void func_002A0F48(void *);
 
 /* Turns a moby into another class: copies the new class settings (animation, size, collision) from the class tables. */
-void moby_change_class_from_tables(void *moby, int classId)
+void moby_change_class_from_tables(void *moby, int class_id)
 {
-    unsigned char *typeData;
-    unsigned char *typeData2;
-    unsigned char *typeData3;
-    int extraValue;
+    unsigned char *type_data;
+    unsigned char *type_data2;
+    unsigned char *type_data3;
+    int extra_value;
 
-    *(short *)(moby + 0xAA) = (short)classId;
-    *(unsigned char *)(moby + 0x22) = D_L20_001DBA60[(short)classId];
+    *(short *)(moby + 0xAA) = (short)class_id;
+    *(unsigned char *)(moby + 0x22) = D_L20_001DBA60[(short)class_id];
     *(void **)(moby + 0x24) = D_L20_001DB100[*(unsigned char *)(moby + 0x22)];
     update_moby_animation_state(moby);
-    typeData = *(unsigned char **)(moby + 0x24);
-    *(unsigned char *)(moby + 0x62) = typeData[0xE];
-    *(float *)(moby + 0x2C) = *(float *)(typeData + 0x24);
-    *(int *)(moby + 0x98) = *(int *)(typeData + 0x10);
+    type_data = *(unsigned char **)(moby + 0x24);
+    *(unsigned char *)(moby + 0x62) = type_data[0xE];
+    *(float *)(moby + 0x2C) = *(float *)(type_data + 0x24);
+    *(int *)(moby + 0x98) = *(int *)(type_data + 0x10);
     *(unsigned char *)(moby + 0x61) = 0xFF;
-    if (typeData) {
-        extraValue = *(int *)(typeData + 0x40);
-        if (extraValue) {
+    if (type_data) {
+        extra_value = *(int *)(type_data + 0x40);
+        if (extra_value) {
             *(unsigned short *)(moby + 0x34) |= 0x10;
-            *(int *)(moby + 0x78) = *(int *)(typeData + 0x40);
+            *(int *)(moby + 0x78) = *(int *)(type_data + 0x40);
         }
-        typeData2 = *(unsigned char **)(moby + 0x24);
-        if (typeData2[0xF]) {
+        type_data2 = *(unsigned char **)(moby + 0x24);
+        if (type_data2[0xF]) {
             *(unsigned char *)(moby + 0x6F) = 0x18;
             *(unsigned short *)(moby + 0x34) |= 0x400;
             *(int *)(moby + 0x70) = 0;
             *(int *)(moby + 0x74) = 0;
             *(unsigned char *)(moby + 0xBD) = 0;
         }
-        typeData3 = *(unsigned char * volatile *)(moby + 0x24);
-        if (typeData3[6]) {
+        type_data3 = *(unsigned char * volatile *)(moby + 0x24);
+        if (type_data3[6]) {
             *(unsigned char *)(moby + 0x63) = 0x18;
         }
     }
@@ -153,23 +153,23 @@ void cutscene_start_scene(void)
 char *glow_effect_create(void *owner, void *position, int param1, int param2)
 {
     char *effect;
-    int posAddr;
-    int zeroAddr;
-    char *ownerRef;
+    int pos_addr;
+    int zero_addr;
+    char *owner_ref;
 
     effect = (char *)CreateMoby(0x12C2 /* moby class 4802 */);
     if (effect) {
         *(int *)(effect + 0xB8) = (int)owner;
         *(unsigned char *)(effect + 0x30) = 0xFF;
-        posAddr = (int)effect + 0x10;
-        qcopy((void *)posAddr, position);
+        pos_addr = (int)effect + 0x10;
+        qcopy((void *)pos_addr, position);
         *(int *)(owner + 0x98) = 0;
         *(float *)(effect + 0x18) = *(float *)(effect + 0x18) + 2.0f;
-        *(float *)(effect + 0x18) = coll_probe_ground_height_below((void *)posAddr, 0, 0.5f);
-        ownerRef = *(char **)(effect + 0xB8);
-        *(int *)(ownerRef + 0x98) = *(int *)(*(int *)(ownerRef + 0x24) + 0x10);
-        zeroAddr = (int)effect + 0xF0;
-        qzero_nc((void *)zeroAddr);
+        *(float *)(effect + 0x18) = coll_probe_ground_height_below((void *)pos_addr, 0, 0.5f);
+        owner_ref = *(char **)(effect + 0xB8);
+        *(int *)(owner_ref + 0x98) = *(int *)(*(int *)(owner_ref + 0x24) + 0x10);
+        zero_addr = (int)effect + 0xF0;
+        qzero_nc((void *)zero_addr);
         euler_rotation_basis((void *)((int)effect + 0xC0), (void *)((int)effect + 0xF0));
         {
             int *vars = *(int **)(effect + 0x68);

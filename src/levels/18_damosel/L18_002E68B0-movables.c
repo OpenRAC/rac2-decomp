@@ -77,7 +77,7 @@ void UpdateDamoselTimedExplosions(void)
         if (*(short *)(object + 0xAA) == 0xD54 /* moby class 3412 */) {
             UpdateEquipmentPieces(object);
         }
-        if (object && *(short *)(object + 0xAA) == 0xFA0 /* TV Screens */) {
+        if (object && *(short *)(object + 0xAA) == MOBY_CLASS_TV_SCREENS) {
             state = *(unsigned char **)(object + 0x68);
             if (state) {
                 math_store_angle_update_result(object, state + 0xC, 0x80AAAAD2, 0x80396464, 0.06108653545379639f);

@@ -252,9 +252,9 @@ int UpdatePlaybackScene(void)
                 for (resetIndex=0;g_equipment_pieces[resetIndex];resetIndex++) if (g_equipment_pieces[resetIndex]->mobyState) g_equipment_pieces[resetIndex]->mobyState=8;
             }
             {
-                char *scanMoby;
-                for (scanMoby=D_001B1B60[0];B(scanMoby,0x20)!=255;scanMoby+=0x100) {
-                    if (!(B(scanMoby,0x20)&0x80) && (H(scanMoby,0xAA)==0x4A /* moby class 74 */ || H(scanMoby,0xAA)==0xCB /* Decoy */)) UH(scanMoby,0x34)&=0xFF7F;
+                char *scan_moby;
+                for (scan_moby=D_001B1B60[0];B(scan_moby,0x20)!=255;scan_moby+=0x100) {
+                    if (!(B(scan_moby,0x20)&0x80) && (H(scan_moby,0xAA)==0x4A /* moby class 74 */ || H(scan_moby,0xAA)==MOBY_CLASS_DECOY)) UH(scan_moby,0x34)&=0xFF7F;
                 }
             }
             if (state->mode==0) {
@@ -296,7 +296,7 @@ int UpdatePlaybackScene(void)
             g_active_camera.forward[2]=-temp[10]; g_active_camera.right[2]=-temp[2]; g_active_camera.up[2]=temp[6];
             {
                 for (i=0;i<scene->objectCount;i++) {
-                    char *keyTable;
+                    char *key_table;
                     PlaybackMoby *object=scene->objects[i];
                     int half=scene->streamFrame>>1;
                     object->frame=half;
@@ -304,9 +304,9 @@ int UpdatePlaybackScene(void)
                     update_moby_animation_state(object);
                     object->animTime=IntToFloat(scene->streamFrame&1)*0.5f;
                     if (last && (scene->streamFrame&1)) object->animTime=1.0f;
-                    keyTable=object->keys;
-                    FastVecScale(temp,keyTable+object->frame*16,1.0f-object->animTime);
-                    FastVecScale(temp+4,keyTable+object->nextFrame*16,object->animTime);
+                    key_table=object->keys;
+                    FastVecScale(temp,key_table+object->frame*16,1.0f-object->animTime);
+                    FastVecScale(temp+4,key_table+object->nextFrame*16,object->animTime);
                     FastVecAdd(object->position,temp,temp+4);
                     transform_vector(object->position,object->position,matrix);
                     FastVecAdd(object->position,object->position,point);
@@ -329,19 +329,19 @@ int UpdatePlaybackScene(void)
                     if (object->classId==10) stub_empty_17(object);
                     if (object->classId==0) stub_empty_16(object,0);
                     if (object->classId==0xD54 /* moby class 3412 */) {
-                        PlaybackMoby *castMoby;
+                        PlaybackMoby *cast_moby;
                         int j, cast;
                         object->mobyState=4;
                         UpdateEquipmentPieces(object);
                         if (!D_001B2148 || H(D_001B2148,0xAA)==0xD54 /* moby class 3412 */) gfx_register_overlay_draw_callback(render_environment_mapped_object,object);
                         gfx_register_world_draw_callback(gfx_draw_ground_shadow,object);
-                        castMoby=0;
+                        cast_moby=0;
                         j=H(D_001A8C30,((g_equipment_bits[0]>>3)&2));
                         for(cast=0;g_equipment_pieces[cast];cast++) {
                             if(g_equipment_pieces[cast]->mobyState>=5) g_equipment_pieces[cast]->mobyState=4;
-                            if(j==g_equipment_pieces[cast]->classId) {castMoby=g_equipment_pieces[cast];break;}
+                            if(j==g_equipment_pieces[cast]->classId) {cast_moby=g_equipment_pieces[cast];break;}
                         }
-                        if(castMoby) {
+                        if(cast_moby) {
                             if(state->mode==0) {
                                 int offset,color;
                                 offset=D_0018C31C ? 144 : -18;
@@ -349,7 +349,7 @@ int UpdatePlaybackScene(void)
                                     color=(int)((scene->frame-(360.0f-offset))*1.5f);
                                     if(color>255) color=255;
                                     if(color<0) color=0;
-                                    castMoby->color=color | (color<<8) | (color<<16);
+                                    cast_moby->color=color | (color<<8) | (color<<16);
                                     if(scene->frame>420-offset) {
                                         object->effectScale=(int)((scene->frame-(420.0f-offset))*1.2f);
                                         object->partFlags=0;
@@ -360,17 +360,17 @@ int UpdatePlaybackScene(void)
                                         if(D_001B15A4>1.0f) D_001B15A4=1.0f;
                                     }
                                 } else {
-                                    castMoby->color=0xA0A0A0;
+                                    cast_moby->color=0xA0A0A0;
                                     D_001B15A4-=0.027f;
                                     if(D_001B15A4<0.0f) D_001B15A4=0.0f;
                                 }
                             } else {
                                 if(scene->frame<150) {
                                     int color=((150-scene->frame)*255)/150;
-                                    castMoby->color=color|(color<<8)|(color<<16);
+                                    cast_moby->color=color|(color<<8)|(color<<16);
                                 } else {
                                     int color=(int)(math_fast_sin_or_cos_a(IntToFloat((scene->frame&63)-32)*0.09817477f)*80.0f)+120;
-                                    castMoby->color=color|(color<<8)|(color<<16);
+                                    cast_moby->color=color|(color<<8)|(color<<16);
                                 }
                             }
                         }

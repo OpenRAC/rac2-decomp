@@ -73,15 +73,15 @@ void museum_projectile_draw_beam(int unused0, int unused1, int unused2, int unus
     float delta[4], offset[4], center[4], width[4], base[4], temp[4];
     BeamState *state = *(BeamState **)(moby + 0x68);
     float *vertices;
-    float *uCoords;
-    float *vCoords;
+    float *u_coords;
+    float *v_coords;
     float angle, cosine, sine, glow;
     int i, j;
     part_reset_quad_record_c(&quad);
     gfx_init_quad_packet_state(&quad, D_L30_001B1F44, 1, 0x80);
     vertices = quad.vertices[1];
-    uCoords = quad.tex.uv;
-    vCoords = quad.tex.uv + 1;
+    u_coords = quad.tex.uv;
+    v_coords = quad.tex.uv + 1;
     quad.colors[1] = D_L30_001B1F60 << 24;
     quad.colors[1] |= D_L30_001B1F5C << 16;
     quad.colors[1] |= D_L30_001B1F58 << 8;
@@ -101,12 +101,12 @@ void museum_projectile_draw_beam(int unused0, int unused1, int unused2, int unus
     quad.tex.uv[6] = 1;
     quad.tex.uv[7] = 1;
     {
-        float *uPtr = uCoords;
+        float *u_ptr = u_coords;
         for (i = 3; i >= 0; i--) {
-            *uPtr -= state->scroll;
-            if (*uPtr <= 7.0f)
-                *uPtr += 7.0f;
-            uPtr += 2;
+            *u_ptr -= state->scroll;
+            if (*u_ptr <= 7.0f)
+                *u_ptr += 7.0f;
+            u_ptr += 2;
         }
     }
     state->scroll += 0.1f;
@@ -145,17 +145,17 @@ void museum_projectile_draw_beam(int unused0, int unused1, int unused2, int unus
     cosine = math_fast_sin_or_cos_a(angle);
     sine = math_fast_sin_or_cos_b(angle);
     {
-        float *vPtr = vCoords;
-        float *uPtr = uCoords;
+        float *v_ptr = v_coords;
+        float *u_ptr = u_coords;
         for (j = 3; j >= 0; j--) {
-            temp[0] = *uPtr - 0.5f;
-            temp[1] = *vPtr - 0.5f;
-            *uPtr = temp[0] * cosine - temp[1] * sine;
-            *vPtr = temp[0] * sine + temp[1] * cosine;
-            *uPtr += 0.5f;
-            *vPtr += 0.5f;
-            uPtr += 2;
-            vPtr += 2;
+            temp[0] = *u_ptr - 0.5f;
+            temp[1] = *v_ptr - 0.5f;
+            *u_ptr = temp[0] * cosine - temp[1] * sine;
+            *v_ptr = temp[0] * sine + temp[1] * cosine;
+            *u_ptr += 0.5f;
+            *v_ptr += 0.5f;
+            u_ptr += 2;
+            v_ptr += 2;
         }
     }
     state->angle = FastAddRotations(state->angle, D_L30_001B1F38 * 0.017453294f);

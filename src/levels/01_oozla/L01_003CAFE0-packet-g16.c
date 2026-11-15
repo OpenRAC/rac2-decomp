@@ -38,17 +38,17 @@ void gfx_finish_wave_grid_packet(void)
     *(u32 *)(D_L01_001B2CC8[0] + 8) = 0x11000000;
     *(u32 *)(D_L01_001B2CC8[0] + 12) = 0x50000002;
     {
-        u8 *basePacket = D_L01_001B2CC8[0];
-        D_L01_001B2CC8[0] = basePacket + 16;
+        u8 *base_packet = D_L01_001B2CC8[0];
+        D_L01_001B2CC8[0] = base_packet + 16;
         {
-            u8 *nextPacket = basePacket + 16;
-            *(u64 *)(basePacket + 16) = 0x1000000000008001ULL;
-            *(u64 *)(nextPacket + 8) = 14;
-            *(u64 *)(nextPacket + 16) = (u64)*(s32 *)(state + 0x230) |
+            u8 *next_packet = base_packet + 16;
+            *(u64 *)(base_packet + 16) = 0x1000000000008001ULL;
+            *(u64 *)(next_packet + 8) = 14;
+            *(u64 *)(next_packet + 16) = (u64)*(s32 *)(state + 0x230) |
                 ((u64)*(s32 *)(state + 0x234) << 8) |
                 ((u64)*(s32 *)(state + 0x238) << 16);
-            *(u64 *)(nextPacket + 24) = 0x3D;
-            D_L01_001B2CC8_gp = basePacket + 48;
+            *(u64 *)(next_packet + 24) = 0x3D;
+            D_L01_001B2CC8_gp = base_packet + 48;
         }
     }
     func_00371A70();

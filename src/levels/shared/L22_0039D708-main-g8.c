@@ -220,11 +220,11 @@ void space_ship_update(s8 *moby) {
         struct { MatrixD708 basis; ScratchD708 rotation; QueryD708 query; } collision;
     } workspace;
 #define scratch workspace.vectors
-    ScratchD708 workVecA;
-    ScratchD708 workVecB;
-    s32 workInt0;
-    f32 workFloat;
-    s32 workInt1;
+    ScratchD708 work_vec_a;
+    ScratchD708 work_vec_b;
+    s32 work_int0;
+    f32 work_float;
+    s32 work_int1;
     s32 **ptr1;
     s32 **ptr2;
     f32 flt1;
@@ -307,7 +307,7 @@ void space_ship_update(s8 *moby) {
     s32 val41;
     s32 val42;
     s8 *ptr4;
-    s8 *posPtr;
+    s8 *pos_ptr;
     s8 *ptr5;
     s8 *ptr6;
     u16 val43;
@@ -727,16 +727,16 @@ void space_ship_update(s8 *moby) {
                         scratch[6].q = M2C_FIELD(D_L22_001B9EB0, s128 *, 0x20);
                         qzero_nc(&scratch[7].q);
                         mat_get_euler_angles(&workspace.pair.second, &scratch[0].q);
-                        posPtr = (moby + 0x10);
+                        pos_ptr = (moby + 0x10);
                         SetCamera5Pose(D_L22_001B9C80, &scratch[0].q, 1, 0, 0);
                         orbit_update(moby, 0xE, 0, 4, 3, 0.6f);
                         M2C_FIELD(vars, f32 *, 0x138) = 0.01f;
-                        FastVecSub(&scratch[7].q, vars + 0x3F0, posPtr);
+                        FastVecSub(&scratch[7].q, vars + 0x3F0, pos_ptr);
                         vec_scale_to_length(&scratch[6].q, &scratch[7].q, -(D_L22_001AF2F4 * 33.0f));
-                        FastVecAdd(&scratch[6].q, &scratch[6].q, posPtr);
+                        FastVecAdd(&scratch[6].q, &scratch[6].q, pos_ptr);
                         arena_push_point_out(&scratch[6].q, 2.0f);
                         vec_scale_to_length(&scratch[5].q, &scratch[7].q, -(D_L22_001AF2F4 * 55.0f));
-                        FastVecAdd(&scratch[5].q, &scratch[5].q, posPtr);
+                        FastVecAdd(&scratch[5].q, &scratch[5].q, pos_ptr);
                         arena_push_point_out(&scratch[5].q, D_L22_001AF2F4 * 45.0f);
                         vec_scale_to_length(&scratch[7].q, &scratch[7].q, 1.0f);
                         scratch[0].q = scratch[7].q;
@@ -778,23 +778,23 @@ void space_ship_update(s8 *moby) {
                         ptr20 = D_L22_001B9C80 + 0x240;
                         CollLine(D_L22_001B9C80, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         ptr21 = D_L22_001B9C80 + 0x250;
-                        FastVecScale(&workVecA, M2C_FIELD(ptr19, s32 *, 0x2290) + 0xE0, 4.0f);
-                        FastVecAdd(&workVecA, &workVecA, ptr19 + 0x80);
-                        CollLine(&workVecA, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        FastVecScale(&work_vec_a, M2C_FIELD(ptr19, s32 *, 0x2290) + 0xE0, 4.0f);
+                        FastVecAdd(&work_vec_a, &work_vec_a, ptr19 + 0x80);
+                        CollLine(&work_vec_a, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                         flt13 = D_L22_001AF2F4 * 6.875f;
                         flt14 = -flt13;
-                        FastVecScale(&workVecB, ptr20, flt13);
-                        FastVecAdd(&workVecB, &workVecB, D_L22_001B9C80);
-                        CollLine(&workVecB, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
-                        FastVecScale(&workVecB, ptr20, flt14);
-                        FastVecAdd(&workVecB, &workVecB, D_L22_001B9C80);
-                        CollLine(&workVecB, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
-                        FastVecScale(&workVecB, ptr21, flt13);
-                        FastVecAdd(&workVecB, &workVecB, D_L22_001B9C80);
-                        CollLine(&workVecB, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
-                        FastVecScale(&workVecB, ptr21, flt14);
-                        FastVecAdd(&workVecB, &workVecB, D_L22_001B9C80);
-                        CollLine(&workVecB, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        FastVecScale(&work_vec_b, ptr20, flt13);
+                        FastVecAdd(&work_vec_b, &work_vec_b, D_L22_001B9C80);
+                        CollLine(&work_vec_b, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        FastVecScale(&work_vec_b, ptr20, flt14);
+                        FastVecAdd(&work_vec_b, &work_vec_b, D_L22_001B9C80);
+                        CollLine(&work_vec_b, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        FastVecScale(&work_vec_b, ptr21, flt13);
+                        FastVecAdd(&work_vec_b, &work_vec_b, D_L22_001B9C80);
+                        CollLine(&work_vec_b, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
+                        FastVecScale(&work_vec_b, ptr21, flt14);
+                        FastVecAdd(&work_vec_b, &work_vec_b, D_L22_001B9C80);
+                        CollLine(&work_vec_b, M2C_FIELD(vars, s32 *, 0x440) + 0x10, 0x10, 0, &workspace.collision.query);
                     } else {
                         FadeToBlack(1);
                     }
@@ -1143,9 +1143,9 @@ block_184:
                         M2C_FIELD(vars, f32 *, 0x3A8) = 0.0f;
                     } else {
                         FastVecSub(&scratch[0].q, ptr17, (moby + 0x10));
-                        workInt0 = 0;
+                        work_int0 = 0;
                         flt18 = FastVecLength(&scratch[0].q);
-                        math_step_value_toward_target(&workInt0, vars + 0x3A8, flt18, 0.011111111f, 0.0055555557f, 0.33333334f);
+                        math_step_value_toward_target(&work_int0, vars + 0x3A8, flt18, 0.011111111f, 0.0055555557f, 0.33333334f);
                         vec_scale_to_length(&scratch[0].q, &scratch[0].q, M2C_FIELD(vars, f32 *, 0x3A8));
                         FastVecAdd((moby + 0x10), (moby + 0x10), &scratch[0].q);
                         if ((M2C_FIELD(moby, u8 *, 0x60) & 2) && (M2C_FIELD(moby, u8 *, 0x43) == 5)) {
@@ -1241,12 +1241,12 @@ block_184:
                                 }
                     }
                     if ((M2C_FIELD(vars, f32 *, 0x3DC) >= 38.0f) || (M2C_FIELD(vars, f32 *, 0x3DC) <= 32.0f)) {
-                        workInt1 = 0;
+                        work_int1 = 0;
                         if (M2C_FIELD(vars, f32 *, 0x3DC) > 32.0f) {
                             val34 = 3;
                             flt16 = math_fabs(M2C_FIELD(vars, f32 *, 0x3DC) - 35.0f);
                             if ((u16) M2C_FIELD(vars, u16 *, 0x3A4) >= 2U) {
-                                workInt1 = 1;
+                                work_int1 = 1;
                                 M2C_FIELD(vars, u16 *, 0x352) = (u16) -(s32) M2C_FIELD(vars, u16 *, 0x352);
                             }
                             val49 = 1;
@@ -1256,7 +1256,7 @@ block_184:
                             val2 = (s16) M2C_FIELD(vars, u16 *, 0x3A4);
 
                             if ((val2 != 0) && (val2 != 2)) {
-                                workInt1 = 1;
+                                work_int1 = 1;
                                 M2C_FIELD(vars, u16 *, 0x352) = (u16) -(s32) M2C_FIELD(vars, u16 *, 0x352);
                             }
                             val49 = 2;
@@ -1264,7 +1264,7 @@ block_184:
                         M2C_FIELD(vars, u16 *, 0x3A4) = val49;
                         if ((u16) M2C_FIELD(moby, u16 *, 0x96) < 0x3CU) {
                             ptr3 = (s32 *) D_L22_001FE940[((OwnerD708 *) vars)->paths[M2C_FIELD(vars, s16 *, 0x354)]];
-                            if (workInt1 == 0) {
+                            if (work_int1 == 0) {
                                 val40 = M2C_FIELD(vars, s16 *, 0x356) + 1;
                                 if (val40 >= *ptr3) {
                                     val40 = -1;
@@ -1322,7 +1322,7 @@ block_184:
                                 }
                             }
                         }
-                        if ((workInt1 != 0) || (near = ((s128 *) (vars + 0x360)), fast_vec_dist((moby + 0x10), near) < 2.0f)) {
+                        if ((work_int1 != 0) || (near = ((s128 *) (vars + 0x360)), fast_vec_dist((moby + 0x10), near) < 2.0f)) {
                             val1 = M2C_FIELD(vars, s16 *, 0x356) + M2C_FIELD(vars, s16 *, 0x352);
                             ptr14 = D_L22_001FE940[((OwnerD708 *) vars)->paths[M2C_FIELD(vars, s16 *, 0x354)]];
                             if (val1 < 0) {
@@ -1357,11 +1357,11 @@ block_184:
                         M2C_FIELD(vars, s16 *, 0x350) = 0;
                         M2C_FIELD(vars, f32 *, 0x3E4) = M2C_FIELD(vars, f32 *, 0x3E8) = 0.0f;
                     } else {
-                        workFloat = gravity_get_center_distance((moby + 0x10)) - D_L22_001B2AA4;
+                        work_float = gravity_get_center_distance((moby + 0x10)) - D_L22_001B2AA4;
                         scratch[1].q = *(s128 *)(moby + 0x10);
                         arena_push_point_out(&scratch[1].q, 0.0f);
                         FastVecSub(&scratch[0].q, &scratch[1].q, (moby + 0x10));
-                        math_step_value_toward_target(&workFloat, vars + 0x3A8, 0.0f, 0.011111111f, 0.011111111f, 0.33333334f);
+                        math_step_value_toward_target(&work_float, vars + 0x3A8, 0.0f, 0.011111111f, 0.011111111f, 0.33333334f);
                         vec_scale_to_length(&scratch[0].q, &scratch[0].q, -M2C_FIELD(vars, f32 *, 0x3A8));
                         FastVecAdd((moby + 0x10), (moby + 0x10), &scratch[0].q);
                     }

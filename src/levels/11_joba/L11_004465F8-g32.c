@@ -82,21 +82,21 @@ void DrawPointLoopRibbon(char *moby) {
         for (j = 0; j < 4; j++) {
             int index = FloatToInt(quad.uv[j][1] + 0.2f);
             float alpha;
-            u32 texColor;
+            u32 tex_color;
             quad.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xD8);
             alpha = math_fast_sin_or_cos_b(*(float *)(state + 0xD0) * 3.1415927410125732f);
-            texColor = D_L11_001B18A8[index];
-            quad.color[j] = FastTweenColor(texColor & mask, texColor, alpha);
+            tex_color = D_L11_001B18A8[index];
+            quad.color[j] = FastTweenColor(tex_color & mask, tex_color, alpha);
         }
         draw_world_quad(&quad, 0, 0);
         for (j = 0; j < 4; j++) {
             int index = FloatToInt(quad.uv[j][1] + 0.2f);
             float alpha;
-            u32 texColor;
+            u32 tex_color;
             quad.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xDC);
             alpha = math_fast_sin_or_cos_b(*(float *)(state + 0xD4) * 3.1415927410125732f);
-            texColor = D_L11_001B18A8[index];
-            quad.color[j] = FastTweenColor(texColor & 0xFFFFFF, texColor, alpha);
+            tex_color = D_L11_001B18A8[index];
+            quad.color[j] = FastTweenColor(tex_color & 0xFFFFFF, tex_color, alpha);
         }
         draw_world_quad(&quad, 0, 0);
     }
@@ -116,21 +116,21 @@ void DrawPointLoopRibbon(char *moby) {
     for (j = 0; j < 4; j++) {
         int index = FloatToInt(quad.uv[j][1] + 0.2f);
         float alpha;
-        u32 texColor;
+        u32 tex_color;
         quad.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xD8);
         alpha = math_fast_sin_or_cos_b(*(float *)(state + 0xD0) * 3.1415927410125732f);
-        texColor = D_L11_001B18A8[index];
-        quad.color[j] = FastTweenColor(texColor & 0xFFFFFF, texColor, alpha);
+        tex_color = D_L11_001B18A8[index];
+        quad.color[j] = FastTweenColor(tex_color & 0xFFFFFF, tex_color, alpha);
     }
     draw_world_quad(&quad, 0, 0);
     for (j = 0; j < 4; j++) {
         int index = FloatToInt(quad.uv[j][1] + 0.2f);
         float alpha;
-        u32 texColor;
+        u32 tex_color;
         quad.uv[j][0] = D_L11_001B18B0[j][0] + *(float *)(state + 0xDC);
         alpha = math_fast_sin_or_cos_b(*(float *)(state + 0xD4) * 3.1415927410125732f);
-        texColor = D_L11_001B18A8[index];
-        quad.color[j] = FastTweenColor(texColor & 0xFFFFFF, texColor, alpha);
+        tex_color = D_L11_001B18A8[index];
+        quad.color[j] = FastTweenColor(tex_color & 0xFFFFFF, tex_color, alpha);
     }
     draw_world_quad(&quad, 0, 0);
 }

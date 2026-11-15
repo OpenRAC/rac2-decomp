@@ -24,7 +24,7 @@ void racer_spawn_exhaust_effects(unsigned char *self)
     float velocity[4];
     float point[4], first[4], second[4], third[4];
     unsigned char *vars;
-    unsigned char *effectParams;
+    unsigned char *effect_params;
     float strength, scale, fade, spread;
     int i, handle;
 
@@ -47,8 +47,8 @@ void racer_spawn_exhaust_effects(unsigned char *self)
             unsigned char *m = object;
 
             for (i = 0; i < 3; i++) {
-                if (i == 1) effectParams = D_L04_002BDB20;
-                else effectParams = D_L04_002BDAC0;
+                if (i == 1) effect_params = D_L04_002BDB20;
+                else effect_params = D_L04_002BDAC0;
                 matrix_mul_vec3(point, &offsets[i], m + 0xc0);
                 FastVecAdd(point, point, m + 0x10);
                 point[3] = 0.0f;
@@ -76,13 +76,13 @@ void racer_spawn_exhaust_effects(unsigned char *self)
                     velocity[0] = -velocity[0];
                     velocity[0] *= scale;
                     velocity[0] *= fade;
-                    part_spawn_object_relative_particle(m, first, velocity, effectParams + 0x30, 1);
+                    part_spawn_object_relative_particle(m, first, velocity, effect_params + 0x30, 1);
                     velocity[0] = (func_0033BB18(1.0f, 2.25f) + strength * 3.0f) * 0.016666668f;
                     velocity[0] = -velocity[0];
                     velocity[0] *= scale;
                     velocity[0] *= fade;
-                    part_spawn_object_relative_particle(m, second, velocity, effectParams + 0x40, 1);
-                    part_spawn_object_relative_particle(m, point, velocity, effectParams + 0x50, 1);
+                    part_spawn_object_relative_particle(m, second, velocity, effect_params + 0x40, 1);
+                    part_spawn_object_relative_particle(m, point, velocity, effect_params + 0x50, 1);
                 } else {
                     handle = *(int *)(vars + 0x714);
                     if (handle != -1) {
@@ -93,15 +93,15 @@ void racer_spawn_exhaust_effects(unsigned char *self)
                     velocity[0] = (func_0033BB18(1.5f, 2.5f) + strength * 1.5f) * 0.016666668f;
                     velocity[0] = -velocity[0];
                     velocity[0] *= scale;
-                    part_spawn_object_relative_particle(m, first, velocity, effectParams, 1);
+                    part_spawn_object_relative_particle(m, first, velocity, effect_params, 1);
                     velocity[0] = (func_0033BB18(1.5f, 2.5f) + strength * 2.45f) * 0.016666668f;
                     velocity[0] = -velocity[0];
                     velocity[0] *= scale;
-                    part_spawn_object_relative_particle(m, second, velocity, effectParams + 0x10, 1);
+                    part_spawn_object_relative_particle(m, second, velocity, effect_params + 0x10, 1);
                     velocity[0] = (func_0033BB18(1.5f, 2.5f) + strength * 3.25f) * 0.016666668f;
                     velocity[0] = -velocity[0];
                     velocity[0] *= scale;
-                    part_spawn_object_relative_particle(m, third, velocity, effectParams + 0x20, 1);
+                    part_spawn_object_relative_particle(m, third, velocity, effect_params + 0x20, 1);
                 }
             }
         }

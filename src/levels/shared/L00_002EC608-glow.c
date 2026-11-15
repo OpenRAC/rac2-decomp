@@ -30,7 +30,7 @@ void part_draw_glow_quad(float *position, int tint)
     float offset[4];
     u32 color, white;
     float scale;
-    float deltaX, deltaY;
+    float delta_x, delta_y;
 
     quad.point[0][2] = -2.0f;
     quad.point[1][2] = 2.0f;
@@ -50,8 +50,8 @@ void part_draw_glow_quad(float *position, int tint)
     quad.point[3][0] = 0;
     gfx_init_quad_packet_state(&quad, 44, 1, 128);
     color = (u32)math_random_int_range(48, 64) << 24;
-    deltaX = D_L00_001B8C80[0].position[0] - position[0];
-    deltaY = D_L00_001B8C80[0].position[1] - position[1];
+    delta_x = D_L00_001B8C80[0].position[0] - position[0];
+    delta_y = D_L00_001B8C80[0].position[1] - position[1];
     quad.uv[0][0] = 0;
     quad.uv[0][1] = 0;
     color |= (u32)(tint >> 17) << 16;
@@ -68,7 +68,7 @@ void part_draw_glow_quad(float *position, int tint)
     quad.uv[1][0] = 0;
     quad.uv[2][1] = 0;
     rotation[3] = 0;
-    rotation[2] = mat_fast_helper_a(deltaX, deltaY);
+    rotation[2] = mat_fast_helper_a(delta_x, delta_y);
     rotation[1] = -mat_fast_helper_a(vec_distance_xy(position, D_L00_001B8C80[0].position),
                                 D_L00_001B8C80[0].position[2] - position[2]);
     rotation[0] = math_random_angle();

@@ -40,7 +40,7 @@ char *hero_l07_find_aim_target_in_cone(char *obj,Vec *origin,float *yaw,float *p
     while((candidate=D_L07_001FB120[index])!=0) {
         if(*(unsigned char *)(candidate+0x20)==0xFE) goto next;
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
-        if(*(short *)(candidate+0xAA)==0xE7D /* Sheep */ || *(short *)(candidate+0xAA)==0xEB0 /* Dark Sheep */) goto next;
+        if(*(short *)(candidate+0xAA)==MOBY_CLASS_SHEEP || *(short *)(candidate+0xAA)==MOBY_CLASS_DARK_SHEEP) goto next;
         { Vec *t=&frame.target; qcopy(t,candidate+0x10); }
         definition=moby_get_private_value_0(candidate);
         if(!definition || *(unsigned char *)(definition+0xE)==3) goto next;
@@ -91,7 +91,7 @@ char *hero_l07_find_aim_target_in_cone(char *obj,Vec *origin,float *yaw,float *p
                 col=&D_L07_001BF640;
                 hit=col->hit;
                 if(hit) {
-                    if(*(short *)(hit+0xAA)==0xE7D /* Sheep */ || *(short *)(hit+0xAA)==0xEB0 /* Dark Sheep */) {
+                    if(*(short *)(hit+0xAA)==MOBY_CLASS_SHEEP || *(short *)(hit+0xAA)==MOBY_CLASS_DARK_SHEEP) {
                         frame.disabled[n++]=hit; *(int *)(hit+0x98)=0;
                         if(n>127) break;
                         qcopy(&frame.ray,&col->point);

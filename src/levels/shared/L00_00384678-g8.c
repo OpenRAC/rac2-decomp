@@ -64,7 +64,7 @@ void sheep_board_update(char *owner)
     float vc[4] __attribute__((aligned(16)));
     int all, i, hit, chosen;
     int scan = 0, remaining, count;
-    float liftRate, half, one;
+    float lift_rate, half, one;
 
     board = *(Board_384678 **)(owner + 0x68);
     if (0.0f < board->drop)
@@ -137,12 +137,12 @@ void sheep_board_update(char *owner)
                 continue;
             one = 1.0f;
             half = 0.5f;
-            liftRate = one / ((float)(board->rounds + 1) * half);
-            if (1.0f < liftRate)
-                liftRate = 1.0f;
-            else if (liftRate < 0.0f)
-                liftRate = 0.0f;
-            board->liftTimer = math_lerp_int(1, 0xF0, liftRate);
+            lift_rate = one / ((float)(board->rounds + 1) * half);
+            if (1.0f < lift_rate)
+                lift_rate = 1.0f;
+            else if (lift_rate < 0.0f)
+                lift_rate = 0.0f;
+            board->liftTimer = math_lerp_int(1, 0xF0, lift_rate);
             va.q = 0;
             va.f[2] = 0.05f;
             matrix_mul_vec3(va.f, va.f, D_L00_00232A60[count] + 0xC0);

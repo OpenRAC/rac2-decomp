@@ -84,7 +84,7 @@ void tube_start_update(char *actor)
     unsigned int timer, oldTimer;
     unsigned char lifeByte;
     float angle, scale, alpha, speed, step, rate;
-    char *basisRow, *scaleFactor, *scalePtr, *velocityPtr;
+    char *basis_row, *scale_factor, *scalePtr, *velocityPtr;
     switch (B(actor,0x20)) {
     case 0:
         get_moby_color(actor,&red,&green,&blue);
@@ -167,11 +167,11 @@ void tube_start_update(char *actor)
         if ((!I(state,8) && !flag_is_third_pending_set(actor)) || (I(state,8) && D_001395C4[0])) {
             moby_set_state(actor,6,-1);
             H(actor,0x34)|=0x100;
-            basisRow=actor+0xC0; scaleFactor=state+0x34;
+            basis_row=actor+0xC0; scale_factor=state+0x34;
             for (countdown=2;countdown>=0;countdown--) {
-                F(scaleFactor,0)=0.02f;
+                F(scale_factor,0)=0.02f;
                 I(state,0x18)=0;
-                vec_scale_to_length(basisRow,basisRow,F(scaleFactor,0)); basisRow+=0x10; scaleFactor+=4;
+                vec_scale_to_length(basis_row,basis_row,F(scale_factor,0)); basis_row+=0x10; scale_factor+=4;
             }
             H(actor,0x34)=(H(actor,0x34)&0xFFBE)|0x1000;
             I(actor,0x98)=I(*(char **)(actor+0x24),0x10);
@@ -181,14 +181,14 @@ void tube_start_update(char *actor)
         step=D_L03_001B0400*0.000277777785f;
         rate=D_L03_001B03FC*0.0166666675f;
         if (flag_set_first_pending(actor)) PlayMobySound(1,0,actor);
-        scaleFactor=state+0x34;
+        scale_factor=state+0x34;
         one=1.0f;
-        i=0; basisRow=actor+0xC0; velocityPtr=state+0x24; scalePtr=scaleFactor;
-        for (;i<3;i++,basisRow+=16,velocityPtr+=4,scalePtr+=4,scaleFactor+=4) {
-            if (F(scaleFactor,0)<one && (!i || F(scaleFactor,-4)>D_L03_001B0404)) {
+        i=0; basis_row=actor+0xC0; velocityPtr=state+0x24; scalePtr=scale_factor;
+        for (;i<3;i++,basis_row+=16,velocityPtr+=4,scalePtr+=4,scale_factor+=4) {
+            if (F(scale_factor,0)<one && (!i || F(scale_factor,-4)>D_L03_001B0404)) {
                 math_step_value_toward_target(scalePtr,velocityPtr,1.0f,step,step,rate);
-                if (F(scaleFactor,0)>one) F(scaleFactor,0)=one;
-                vec_scale_to_length(basisRow,basisRow,F(scaleFactor,0));
+                if (F(scale_factor,0)>one) F(scale_factor,0)=one;
+                vec_scale_to_length(basis_row,basis_row,F(scale_factor,0));
             }
         }
         if (F(state,0x34)>=1.0f && F(state,0x38)>=1.0f && F(state,0x3C)>=1.0f) moby_set_state(actor,1,-1);

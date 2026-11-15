@@ -28,20 +28,20 @@ void breakable_l01_debris_update(char *moby)
     float position[4] __attribute__((aligned(16)));
     float rotation[4] __attribute__((aligned(16)));
     float dimensions[4] __attribute__((aligned(16)));
-    char *vars=*(char **)(moby+0x68), *hitMoby,*debrisPiece;
-    float step,scale,travelled,sizeRatio;
-    int i,j,saveByte,saveIndex;
+    char *vars=*(char **)(moby+0x68), *hit_moby,*debris_piece;
+    float step,scale,travelled,size_ratio;
+    int i,j,save_byte,save_index;
     float distance;
     if(*(unsigned char *)(moby+0x20)==0) {
         *(float *)(moby+0x2C)*=math_random_float_range(0.8f,1.1f);
         if(*(unsigned char *)(moby+0xB0)!=255) {
             if(D_L01_0021E4B0.collected[*(short *)(moby+0xB2)]) goto remove_initial;
-            saveByte=D_0019B4A8[(*(short *)(moby+0xB2)>>1)+(g_current_map_index<<10)];
+            save_byte=D_0019B4A8[(*(short *)(moby+0xB2)>>1)+(g_current_map_index<<10)];
             if(*(short *)(moby+0xB2)&1) {
-                if((saveByte>>4)&7) goto remove_initial;
+                if((save_byte>>4)&7) goto remove_initial;
                 goto initial_path;
             }
-            if(!(saveByte&7)) goto initial_path;
+            if(!(save_byte&7)) goto initial_path;
 remove_initial:
             moby_l00_spawn_child(moby,0xA29,0);
             moby_mark_spawned(moby);
@@ -61,10 +61,10 @@ initial_path:
         *(unsigned char *)(moby+0x20)=1;
     }
     else {
-    hitMoby=part_find_owned_effect_slot(moby,0x4010000,0);
-    if(hitMoby && *(float *)(hitMoby+0x2C)>0.0f) {
-        sizeRatio=*(float *)(moby+0x2C)/ *(float *)(*(char **)(moby+0x24)+0x24);
-        scale=sizeRatio;
+    hit_moby=part_find_owned_effect_slot(moby,0x4010000,0);
+    if(hit_moby && *(float *)(hit_moby+0x2C)>0.0f) {
+        size_ratio=*(float *)(moby+0x2C)/ *(float *)(*(char **)(moby+0x24)+0x24);
+        scale=size_ratio;
         qcopy(position,moby+0xF0);
         *(BC540Quad *)rotation=0;
         rotation[1]=-1.3790000f; rotation[2]=0.778f; rotation[3]=0.3f;
@@ -73,8 +73,8 @@ initial_path:
             moby_transform_joint_to_world(moby,i,delta);
             position[2]=math_random_angle();
             for(j=2;j>=0;j--) {
-                debrisPiece=debris_l01_spawn_piece(moby,0xA28 /* moby class 2600 */,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,rotation,0.0f);
-                *(float *)(debrisPiece+0x2C)*=scale;
+                debris_piece=debris_l01_spawn_piece(moby,0xA28 /* moby class 2600 */,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,rotation,0.0f);
+                *(float *)(debris_piece+0x2C)*=scale;
                 position[2]=FastAddRotations(position[2],2.0943954f);
             }
             scale*=0.85f;
@@ -84,18 +84,18 @@ initial_path:
         moby_transform_joint_to_world(moby,4,delta);
         qcopy(position,moby+0xF0);
         for(j=2;j>=0;j--) {
-            debrisPiece=debris_l01_spawn_piece(moby,0xA27 /* moby class 2599 */,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,dimensions,0.0f);
-            *(float *)(debrisPiece+0x2C)*=sizeRatio;
+            debris_piece=debris_l01_spawn_piece(moby,0xA27 /* moby class 2599 */,delta,position,0,1,D_L01_001A8F60,D_L01_001A8F60,dimensions,0.0f);
+            *(float *)(debris_piece+0x2C)*=size_ratio;
             position[2]=FastAddRotations(position[2],2.0943954f);
         }
         moby_l00_spawn_child(moby,0xA29,0);
         SetDeathBits(moby,0,3);
         if(*(short *)(moby+0xB2)&1) {
-            saveIndex=(*(short *)(moby+0xB2)>>1)+(g_current_map_index<<10);
-            if(((D_0019B4A8[saveIndex]>>4)&7)!=7) D_0019B4A8[saveIndex]+=16;
+            save_index=(*(short *)(moby+0xB2)>>1)+(g_current_map_index<<10);
+            if(((D_0019B4A8[save_index]>>4)&7)!=7) D_0019B4A8[save_index]+=16;
         } else {
-            saveIndex=(*(short *)(moby+0xB2)>>1)+(g_current_map_index<<10);
-            if((D_0019B4A8[saveIndex]&7)!=7) D_0019B4A8[saveIndex]++;
+            save_index=(*(short *)(moby+0xB2)>>1)+(g_current_map_index<<10);
+            if((D_0019B4A8[save_index]&7)!=7) D_0019B4A8[save_index]++;
         }
         moby_mark_spawned(moby);
     }

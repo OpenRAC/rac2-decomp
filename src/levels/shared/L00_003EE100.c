@@ -297,7 +297,7 @@ extern int math_fast_float_d(char *p);
 extern void blast_update_pool_records(char *rec);
 
 /* Updates every effect record that belongs to the given object and frees those whose timer has run out. */
-void effect_update_owner_records(char *ownerMoby)
+void effect_update_owner_records(char *owner_moby)
 {
     char *rec;
     int i;
@@ -308,7 +308,7 @@ void effect_update_owner_records(char *ownerMoby)
     do {
         i--;
         rec = (char *)(offset + (int)D_L00_001B2BB4_1);
-        if (*(int *)(rec + 0x30) == (int)ownerMoby) {
+        if (*(int *)(rec + 0x30) == (int)owner_moby) {
             if (math_fast_float_d(rec + 0x34) != 0 && *(int *)(rec + 0x38) == 0)
                 *(int *)(rec + 0x30) = 0;
             blast_update_pool_records(rec);
@@ -320,7 +320,7 @@ void effect_update_owner_records(char *ownerMoby)
 extern void part_respawn_owner_particles(char *rec);
 
 /* Goes through the effect records of the given object and draws each one. */
-void effect_draw_owner_records(char *ownerMoby)
+void effect_draw_owner_records(char *owner_moby)
 {
     char *rec;
     int i;
@@ -331,7 +331,7 @@ void effect_draw_owner_records(char *ownerMoby)
     do {
         i--;
         rec = (char *)(offset + (int)D_L00_001B2BB4_1);
-        if (*(int *)(rec + 0x30) == (int)ownerMoby)
+        if (*(int *)(rec + 0x30) == (int)owner_moby)
             part_respawn_owner_particles(rec);
         offset += 0x50;
     } while (i >= 0);
@@ -345,14 +345,14 @@ extern void ref_L00_003F09A0_00(char *rec, float f1, int a1, int a2, int a3,
                                 float f2, int a4, float f3);
 
 /* Finds all particles that belong to the given object and respawns them. */
-void part_respawn_owner_particles(char *ownerMoby)
+void part_respawn_owner_particles(char *owner_moby)
 {
     char *rec;
     int i;
 
     for (i = 0; i < 320; i++) {
         rec = (char *)(i * 128 + (int)D_L00_001B2BB8);
-        if (*(int *)(rec + 0x7C) == (int)ownerMoby)
+        if (*(int *)(rec + 0x7C) == (int)owner_moby)
             ref_L00_003F09A0_00(rec, *(float *)(rec + 0x48), *(int *)(rec + 0x68),
                                 *(int *)(rec + 0x60), 46, *(float *)(rec + 0x34),
                                 *(int *)(rec + 0x70), 0.25f);
@@ -434,26 +434,26 @@ extern Aimvec_F0b10 D_L00_001B8C80;
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
 /* Draws a flat sprite at a position that turns to face the camera. */
-void gfx_draw_camera_facing_sprite_d(char *pos, int colorBase, int alpha, char *texture, int flagBits,
+void gfx_draw_camera_facing_sprite_d(char *pos, int color_base, int alpha, char *texture, int flag_bits,
                        float size, float roll, float pull)
 {
     char packet[144];
     float matrix[16];
     float quat[4];
     float offset[4];
-    long long textureKey;
+    long long texture_key;
 
     ref_L00_003F0B10_00(packet);
-    textureKey = GetEffectTextureDescriptor(texture);
+    texture_key = GetEffectTextureDescriptor(texture);
 
-    *(long long *)(packet + 136) = ((long long)flagBits << 2) | 0x8000000040LL;
+    *(long long *)(packet + 136) = ((long long)flag_bits << 2) | 0x8000000040LL;
     *(long long *)(packet + 128) = 280993940374112LL;
-    *(int *)(packet + 76) = colorBase + (alpha << 24);
-    *(int *)(packet + 72) = colorBase + (alpha << 24);
-    *(int *)(packet + 68) = colorBase + (alpha << 24);
-    *(int *)(packet + 64) = colorBase + (alpha << 24);
+    *(int *)(packet + 76) = color_base + (alpha << 24);
+    *(int *)(packet + 72) = color_base + (alpha << 24);
+    *(int *)(packet + 68) = color_base + (alpha << 24);
+    *(int *)(packet + 64) = color_base + (alpha << 24);
     *(long long *)(packet + 112) = 0LL;
-    *(long long *)(packet + 120) = textureKey;
+    *(long long *)(packet + 120) = texture_key;
 
     quat[3] = 0.0f;
     quat[2] = mat_fast_helper_a(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
@@ -536,26 +536,26 @@ extern void ref_L00_003F1EB8_01(char *, float);
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B8C80 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
 /* Draws a flat sprite at a position that turns to face the camera. */
-void gfx_draw_camera_facing_sprite_copy(char *pos, int colorBase, int alpha, char *texture, int flagBits,
+void gfx_draw_camera_facing_sprite_copy(char *pos, int color_base, int alpha, char *texture, int flag_bits,
                        float size, float roll, float pull)
 {
     char packet[144];
     float matrix[16];
     float quat[4];
     float offset[4];
-    long long textureKey;
+    long long texture_key;
 
     ref_L00_003F1EB8_00(packet);
-    textureKey = GetEffectTextureDescriptor(texture);
+    texture_key = GetEffectTextureDescriptor(texture);
 
-    *(long long *)(packet + 136) = ((long long)flagBits << 2) | 0x8000000040LL;
+    *(long long *)(packet + 136) = ((long long)flag_bits << 2) | 0x8000000040LL;
     *(long long *)(packet + 128) = 280993940374112LL;
-    *(int *)(packet + 76) = colorBase + (alpha << 24);
-    *(int *)(packet + 72) = colorBase + (alpha << 24);
-    *(int *)(packet + 68) = colorBase + (alpha << 24);
-    *(int *)(packet + 64) = colorBase + (alpha << 24);
+    *(int *)(packet + 76) = color_base + (alpha << 24);
+    *(int *)(packet + 72) = color_base + (alpha << 24);
+    *(int *)(packet + 68) = color_base + (alpha << 24);
+    *(int *)(packet + 64) = color_base + (alpha << 24);
     *(long long *)(packet + 112) = 0LL;
-    *(long long *)(packet + 120) = textureKey;
+    *(long long *)(packet + 120) = texture_key;
 
     quat[3] = 0.0f;
     quat[2] = mat_fast_helper_a(D_L00_001B8C80.x_140 - *(float *)(pos + 0),
@@ -625,10 +625,10 @@ void color_l00_fade_update(char *moby)
     int group;
     int prev;
     int stamp;
-    int colorA, colorB;
+    int color_a, color_b;
     int target;
     float angle;
-    unsigned short *idList;
+    unsigned short *id_list;
     unsigned char *entity;
     int red, green, blue;
 
@@ -654,14 +654,14 @@ void color_l00_fade_update(char *moby)
             moby[0x20] = 1;
             return;
         }
-        colorA = vars[0x29] << 24 | vars[0x28] << 16;
-        colorA |= vars[0x27] << 8;
-        colorA |= vars[0x26];
-        *(int *)(vars + 0x30) = colorA;
-        colorB = vars[0x2D] << 24 | vars[0x2C] << 16;
-        colorB |= vars[0x2B] << 8;
-        colorB |= vars[0x2A];
-        *(int *)(vars + 0x34) = colorB;
+        color_a = vars[0x29] << 24 | vars[0x28] << 16;
+        color_a |= vars[0x27] << 8;
+        color_a |= vars[0x26];
+        *(int *)(vars + 0x30) = color_a;
+        color_b = vars[0x2D] << 24 | vars[0x2C] << 16;
+        color_b |= vars[0x2B] << 8;
+        color_b |= vars[0x2A];
+        *(int *)(vars + 0x34) = color_b;
         if (*(float *)(vars + 0x40) == 0.0f && *(float *)(vars + 0x44) == 0.0f &&
             *(float *)(vars + 0x48) == 0.0f)
             *(int *)(vars + 0x6C) = 1;
@@ -687,13 +687,13 @@ void color_l00_fade_update(char *moby)
         }
         if (*(int *)(vars + 0x10) == prev)
             return;
-        idList = D_L00_001A9014[*(int *)vars];
+        id_list = D_L00_001A9014[*(int *)vars];
         red = *(int *)(vars + 0x10) & 0xFF;
         green = (*(int *)(vars + 0x10) >> 8) & 0xFF;
         blue = (*(int *)(vars + 0x10) >> 16) & 0xFF;
-        for (; idList != 0 && ((short)idList[-1] >= 0 || idList == D_L00_001A9014[*(int *)vars]) &&
-               (entity = D_L00_001B2514 + ((*idList & 0x7FFF) << 5)) != 0;
-             idList++)
+        for (; id_list != 0 && ((short)id_list[-1] >= 0 || id_list == D_L00_001A9014[*(int *)vars]) &&
+               (entity = D_L00_001B2514 + ((*id_list & 0x7FFF) << 5)) != 0;
+             id_list++)
             func_L00_0036EF68((char *)entity, red, green, blue);
         return;
     case 2:
@@ -925,11 +925,11 @@ extern void ref_L00_003F5660_00(void (*handler)(char *), char *object);
 /* Updates the Vaporizer by running its three passes; it keeps running while any pass has work and ends when all are done. */
 void vaporizer_update_passes(char *moby)
 {
-    int chainActive = vaporizer_update_joint_chain(moby);
-    int passB = vaporizer_bolt_update_trail_sample(moby);
-    int recordCount = vaporizer_update_timed_records((int *)moby);
+    int chain_active = vaporizer_update_joint_chain(moby);
+    int pass_b = vaporizer_bolt_update_trail_sample(moby);
+    int record_count = vaporizer_update_timed_records((int *)moby);
 
-    if (chainActive == 0 && passB == 0 && recordCount == 0) {
+    if (chain_active == 0 && pass_b == 0 && record_count == 0) {
         if (*(unsigned char *)(moby + 0x20) == 2) {
             func_0029F338_1(moby);
         }
@@ -942,7 +942,7 @@ void vaporizer_update_passes(char *moby)
 /* Draws the Vaporizer effects, or removes the object if its table entry is gone. */
 void vaporizer_draw_effects(char *moby)
 {
-    if (save_is_record_value(3076 /* Vaporizer */, *(short *)(*(int *)(moby + 104) + 26)) == 0)
+    if (save_is_record_value(MOBY_CLASS_VAPORIZER, *(short *)(*(int *)(moby + 104) + 26)) == 0)
         func_0029F338_1(moby);
     else {
         RenderTwoLayerEffectStrip(moby);
@@ -975,8 +975,8 @@ int vaporizer_update_timed_records(int *moby)
     char *timer;
 
     entry = *(char **)((char *)moby + 104);
-    base = level_get_slot_body(3076 /* Vaporizer */, *(short *)(entry + 26));
-    base = base + *(int *)(level_get_slot_header(3076 /* Vaporizer */, *(short *)(entry + 26)) + 4);
+    base = level_get_slot_body(MOBY_CLASS_VAPORIZER, *(short *)(entry + 26));
+    base = base + *(int *)(level_get_slot_header(MOBY_CLASS_VAPORIZER, *(short *)(entry + 26)) + 4);
     timer = base + 16;
     entry = base;
 
@@ -1148,7 +1148,7 @@ void part_copy_color_to_linked_record(Obj_Fe48725c6 *link)
 {
     Node24_Fe48725c6 *node;
     Node16_Fe48725c6 *entry;
-    int blueByte;
+    int blue_byte;
 
     func_002A0488_1(link->f24, link->u.b.b4, link->u.b.b5, link->u.b.h6);
     node = link->f24;
@@ -1161,6 +1161,6 @@ void part_copy_color_to_linked_record(Obj_Fe48725c6 *link)
         return;
     entry->b4 = link->u.b.b4;
     entry->b5 = link->u.f4 >> 8;
-    blueByte = link->u.b.h6;
-    entry->b6 = blueByte;
+    blue_byte = link->u.b.h6;
+    entry->b6 = blue_byte;
 }

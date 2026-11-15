@@ -123,11 +123,11 @@ void museum_random_look_update(u8 *object) {
 
         *(float *)(state + 0xC) = height;
         if (index >= 13) {
-            short classId = *(short *)(object + 0xAA);
-            short extraId = *(short *)(object + 0xB2);
+            short class_id = *(short *)(object + 0xAA);
+            short extra_id = *(short *)(object + 0xB2);
             unsigned int ticks = T1_COUNT;
 
-            STUB_printf(D_L30_001AEE98, classId, extraId);
+            STUB_printf(D_L30_001AEE98, class_id, extra_id);
             func_001163A0(ticks);
             *(int *)state = math_random_int_below(13);
         }
@@ -204,11 +204,11 @@ void museum_info_stand_update(char *object) {
     case 4:
         break;
     case 5: {
-        char *heroBlock = g_hero_state;
+        char *hero_block = g_hero_state;
 
-        if (*(int *)(heroBlock + 0x2294) == 0x6F) {
-            *(unsigned char *)(heroBlock + 0x22B5) = 0;
-            hero_reset_position_and_direction(heroBlock + 0x80, heroBlock + 0x90, 0, 0);
+        if (*(int *)(hero_block + 0x2294) == 0x6F) {
+            *(unsigned char *)(hero_block + 0x22B5) = 0;
+            hero_reset_position_and_direction(hero_block + 0x80, hero_block + 0x90, 0, 0);
         }
         *(unsigned char *)(object + 0x20) = 3;
         break;

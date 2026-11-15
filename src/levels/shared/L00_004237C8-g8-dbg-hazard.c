@@ -19,7 +19,7 @@ int cam_follow_constrain_distance(char *object, void *input, int constrained, in
     char *vector = state + 0x160;
     char *controller = state + 0x1F0;
     char *transform = state + 0x60;
-    float oldLength = FastVecLength(vector);
+    float old_length = FastVecLength(vector);
     float length;
     float limit;
     FastVecSub(vector, input, state + 0xB0);
@@ -35,9 +35,9 @@ int cam_follow_constrain_distance(char *object, void *input, int constrained, in
         }
     }
     if (!constrained && ((Hero *)g_hero_state)->i[0x229C / 4] != 2) {
-        if (oldLength < length) {
-            FastVecScale(vector, vector, oldLength / length);
-            *(float *)(controller + 0x30) = *(float *)(vector + 0x2C) - oldLength;
+        if (old_length < length) {
+            FastVecScale(vector, vector, old_length / length);
+            *(float *)(controller + 0x30) = *(float *)(vector + 0x2C) - old_length;
             return preserve;
         }
     }

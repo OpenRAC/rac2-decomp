@@ -35,7 +35,7 @@ void guard_alert_group(void *arg0, s32 group) {
     s8 *table ;
     s8 *entry ;
     s8 *record;
-    s32 entryValue;
+    s32 entry_value;
 
     if (group != 0xFF) {
         table = ref_L12_00413EA8_00[group];
@@ -46,9 +46,9 @@ void guard_alert_group(void *arg0, s32 group) {
                 if (*(s8 *)(record + 0x20) >= 0 && *(s16 *)(record + 0xAA) == 0xF31 /* moby class 3889 */) {
                     *(u8 *)(*(s8 **)(record + 0x68) + 0x2EA) = 1;
                 }
-                entryValue = *(s16 *)entry;
+                entry_value = *(s16 *)entry;
                 entry += 2;
-            } while (entryValue >= 0);
+            } while (entry_value >= 0);
         }
     }
 }

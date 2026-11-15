@@ -144,7 +144,7 @@ void bot_update(u8 *object)
             if (flag_is_third_pending_set(SP(0x354))) {
                 type = *(s16 *)(object + 0xAA);
                 switch (type) {
-                case 0x940 /* Bridgebot */:
+                case MOBY_CLASS_BRIDGEBOT:
                     if (D_0018CB20[0] == 0) subtitle_request_voice_line(0x9CF, 0x26);
                     break;
                 case 0x93C /* moby class 2364 */:
@@ -153,7 +153,7 @@ void bot_update(u8 *object)
                 case 0xA59 /* moby class 2649 */:
                     if (D_0018CDCC[0] == 0) subtitle_request_voice_line(0xA08, 0x5F);
                     break;
-                case 0x964 /* Gadgebot */:
+                case MOBY_CLASS_GADGEBOT:
                 default:
                     if (D_0018CB4C[0] >= 0) subtitle_request_voice_line(0x9D2, 0x29);
                     break;
@@ -394,9 +394,9 @@ void bot_update(u8 *object)
             type = *(s16 *)(object + 0xAA);
             height = 0.8f;
             switch (type) {
-            case 0x964 /* Gadgebot */:
+            case MOBY_CLASS_GADGEBOT:
                 height = 0.3f;
-            case 0x940 /* Bridgebot */:
+            case MOBY_CLASS_BRIDGEBOT:
             case 0x93C /* moby class 2364 */:
             default:
                 do {

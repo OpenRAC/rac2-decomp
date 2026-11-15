@@ -111,11 +111,11 @@ static inline void SetShake(float amount)
 /* Per-frame update of the Blitz Cannon weapon (moby class 2801). It charges while fire is held, flashes and shakes the screen on firing, then hits nearby enemies and sends out 20 random damage bolts. */
 void UpdateSpreadWeapon(u8 *self)
 {
-    Vec4 localPos;
-    Vec4 worldPos;
+    Vec4 local_pos;
+    Vec4 world_pos;
     TurretState *st = *(TurretState **)(self + 0x68);
     int ready;
-    u8 *hitObject;
+    u8 *hit_object;
 
     if (self[0x20] == 0) {
         self[0x20] = 1;
@@ -208,58 +208,58 @@ void UpdateSpreadWeapon(u8 *self)
         }
         if (self[0x20] == 2 || self[0x20] == 3) {
             u8 *cannon = moby;
-            TurretState *shotState = state;
-            if (FastDecTimer(&shotState->t6)) {
+            TurretState *shot_state = state;
+            if (FastDecTimer(&shot_state->t6)) {
                 if (cannon[0x20] == 2) {
                     cannon[0x20] = 3;
-                    qcopy(shotState->q30, D_0018A580);
-                    localPos[0] = D_L00_001B0220;
-                    localPos[1] = D_L00_001B0224 - 0.25f;
-                    localPos[2] = D_L00_001B0228;
-                    localPos[3] = 1.0f;
-                    matrix_mul_vec3(worldPos, localPos, cannon + 0xC0);
-                    FastVecAdd(worldPos, worldPos, cannon + 0x10);
+                    qcopy(shot_state->q30, D_0018A580);
+                    local_pos[0] = D_L00_001B0220;
+                    local_pos[1] = D_L00_001B0224 - 0.25f;
+                    local_pos[2] = D_L00_001B0228;
+                    local_pos[3] = 1.0f;
+                    matrix_mul_vec3(world_pos, local_pos, cannon + 0xC0);
+                    FastVecAdd(world_pos, world_pos, cannon + 0x10);
                     {
-                        u8 *flash = part_spawn_pulled_particle(worldPos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
                         if (flash)
-                            *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
+                            *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
                     {
-                        u8 *flash = part_spawn_pulled_particle(worldPos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
                         if (flash)
-                            *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
+                            *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
                     {
-                        u8 *flash = part_spawn_pulled_particle(worldPos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
                         if (flash)
-                            *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
+                            *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
-                    localPos[2] = -localPos[2];
-                    matrix_mul_vec3(worldPos, localPos, cannon + 0xC0);
-                    FastVecAdd(worldPos, worldPos, cannon + 0x10);
+                    local_pos[2] = -local_pos[2];
+                    matrix_mul_vec3(world_pos, local_pos, cannon + 0xC0);
+                    FastVecAdd(world_pos, world_pos, cannon + 0x10);
                     {
-                        u8 *flash = part_spawn_pulled_particle(worldPos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, large, 0.4f, 8.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, 0, 0, 6, 0);
                         if (flash)
-                            *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
-                    }
-                    {
-                        u8 *flash = part_spawn_pulled_particle(worldPos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
-                        if (flash)
-                            *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
+                            *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
                     {
-                        u8 *flash = part_spawn_pulled_particle(worldPos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 12.0f, 0x3CFF1010, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
                         if (flash)
-                            *(TI128 *)(flash + 0x10) = *(TI128 *)(worldPos);
+                            *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
                     }
-                    localPos[2] = 0.0f;
-                    localPos[1] = D_L00_001B0224;
-                    matrix_mul_vec3(worldPos, localPos, cannon + 0xC0);
-                    FastVecAdd(shotState->v10, worldPos, cannon + 0x10);
-                    InitEffectStrips(cannon, shotState->v10, 0);
+                    {
+                        u8 *flash = part_spawn_pulled_particle(world_pos, small, 0.5f, 4.0f, 0x80FFFFFF, mode, none, D_L00_001A8F20, variant, 0, 6, 0);
+                        if (flash)
+                            *(TI128 *)(flash + 0x10) = *(TI128 *)(world_pos);
+                    }
+                    local_pos[2] = 0.0f;
+                    local_pos[1] = D_L00_001B0224;
+                    matrix_mul_vec3(world_pos, local_pos, cannon + 0xC0);
+                    FastVecAdd(shot_state->v10, world_pos, cannon + 0x10);
+                    InitEffectStrips(cannon, shot_state->v10, 0);
                     ref_L00_003D1D28_01(RenderRadialRingAndQuad, cannon);
                     PlayMobySound(0, 0, cannon);
-                    if (shotState->t40)
+                    if (shot_state->t40)
                         SetShake(0.12f);
                     else
                         SetShake(0.06f);
@@ -279,11 +279,11 @@ void UpdateSpreadWeapon(u8 *self)
                     Vec4 dir;
                     Vec4 from;
                     Vec4 to;
-                    int count, i, nearbyCount, nearbyIndex, clearIndex, restoreIndex;
+                    int count, i, nearby_count, nearby_index, clear_index, restore_index;
                     float angle, spread;
 
                     cannon[0x20] = 6;
-                    shotState->t4 = 0x1C;
+                    shot_state->t4 = 0x1C;
                     hit.flags = 0x10000;
                     hit.count = 1;
                     hit.b18 = 3;
@@ -291,17 +291,17 @@ void UpdateSpreadWeapon(u8 *self)
                     hit.oclass = *(u16 *)(cannon + 0xAA);
                     hit.damage = ((WeaponEntry *)((u8 *)g_weapon_l00_table + g_item_slot_to_record[0x1A] * 0xE0))->damage;
                     hit.source = cannon;
-                    FastVecScale(localPos, cannon + 0xD0, -1.35f);
-                    FastVecAdd(localPos, localPos, cannon + 0x10);
-                    FastVecScale(worldPos, cannon + 0xC0, 0.275f);
-                    FastVecAdd(localPos, localPos, worldPos);
-                    nearbyCount = coll_process_hit(1.5f, localPos, 1, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0);
-                    for (nearbyIndex = 0; nearbyIndex < nearbyCount; nearbyIndex++) {
-                        if (g_area_hit_targets[nearbyIndex] != ((Hero *)g_hero_state)->ptr[0x2290 / 4]) {
+                    FastVecScale(local_pos, cannon + 0xD0, -1.35f);
+                    FastVecAdd(local_pos, local_pos, cannon + 0x10);
+                    FastVecScale(world_pos, cannon + 0xC0, 0.275f);
+                    FastVecAdd(local_pos, local_pos, world_pos);
+                    nearby_count = coll_process_hit(1.5f, local_pos, 1, ((Hero *)g_hero_state)->ptr[0x2290 / 4], 0);
+                    for (nearby_index = 0; nearby_index < nearby_count; nearby_index++) {
+                        if (g_area_hit_targets[nearby_index] != ((Hero *)g_hero_state)->ptr[0x2290 / 4]) {
                             FastVecScale(hit.pos, cannon + 0xD0, -1.5f);
                             hit.pos[3] = 5627.925f;
-                            QueueMobyImpact(g_area_hit_targets[nearbyIndex], &hit);
-                            StartAttachedEffect(g_area_hit_targets[nearbyIndex], 0x44, cannon);
+                            QueueMobyImpact(g_area_hit_targets[nearby_index], &hit);
+                            StartAttachedEffect(g_area_hit_targets[nearby_index], 0x44, cannon);
                         }
                     }
                     euler_to_matrix(mtx, D_L00_001B0190);
@@ -318,13 +318,13 @@ void UpdateSpreadWeapon(u8 *self)
                         FastVecScale(fwd, ((Hero *)g_hero_state)->b + 0x750, -0.1f);
                         multiply_matrix3x3(basis, ((Hero *)g_hero_state)->b + 0x730, inv);
                     }
-                    qcopy(shotState->q30, up);
+                    qcopy(shot_state->q30, up);
                     spread = 1.0471977f;
                     count = 0;
                     angle = 0.0f;
-                    for (clearIndex = 0; clearIndex < 20; clearIndex++) {
-                        list[clearIndex] = 0;
-                        saved[clearIndex] = 0;
+                    for (clear_index = 0; clear_index < 20; clear_index++) {
+                        list[clear_index] = 0;
+                        saved[clear_index] = 0;
                     }
                     for (i = 0; i < 20; i++) {
                         math_build_axis_angle_quat(rot, side, math_random_float_range(0.01f, 0.52359885f));
@@ -337,19 +337,19 @@ void UpdateSpreadWeapon(u8 *self)
                         FastVecScale(dir, dir, 38.0f);
                         FastVecAdd(from, origin, offs);
                         FastVecAdd(to, from, dir);
-                        hitObject = ((u8 *)weapon_fire_damage_ray(cannon, from, to, &hit));
-                        if (hitObject) {
-                            saved[count] = *(int *)(hitObject + 0x98);
-                            list[count] = hitObject;
-                            *(int *)(hitObject + 0x98) = 0;
+                        hit_object = ((u8 *)weapon_fire_damage_ray(cannon, from, to, &hit));
+                        if (hit_object) {
+                            saved[count] = *(int *)(hit_object + 0x98);
+                            list[count] = hit_object;
+                            *(int *)(hit_object + 0x98) = 0;
                             count++;
                         }
                     }
-                    for (restoreIndex = 0; restoreIndex < count; restoreIndex++)
-                        *(int *)(list[restoreIndex] + 0x98) = saved[restoreIndex];
+                    for (restore_index = 0; restore_index < count; restore_index++)
+                        *(int *)(list[restore_index] + 0x98) = saved[restore_index];
                     {
                         WeaponEntry *w = (WeaponEntry *)((u8 *)g_weapon_l00_table + g_item_slot_to_record[0x1A] * 0xE0);
-                        shotState->timer = 1.0f / w->rate;
+                        shot_state->timer = 1.0f / w->rate;
                     }
                 }
             }

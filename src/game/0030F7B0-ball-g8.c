@@ -180,7 +180,7 @@ void draw_nanotech_ball(unsigned char *moby) {
         center[2] = *(float *)(moby + 0x18);
 
         rows = (short *)D_001AF210;
-        if (*(short *)(surface_owner + 0xAA) == 0x1F5 /* Nanotech Crate */)
+        if (*(short *)(surface_owner + 0xAA) == MOBY_CLASS_NANOTECH_CRATE)
             env_corners = D_00268C10;
         else
             env_corners = D_00268B10;

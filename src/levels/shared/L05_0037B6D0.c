@@ -242,19 +242,19 @@ int moby_is_in_use(char *obj)
 /* Frees an object from its parent and rearranges the remaining group members. */
 void moby_release_from_group(char *obj)
 {
-    int *parentVars = (int *)moby_get_motion_data(obj);
+    int *parent_vars = (int *)moby_get_motion_data(obj);
     char *child;
-    int *groupVars;
+    int *group_vars;
 
-    if (parentVars == 0)
+    if (parent_vars == 0)
         return;
     if (moby_get_link_value(obj) != 0)
         group_swap_with_free_member(obj);
-    child = (char *)parentVars[4];
-    groupVars = (int *)moby_get_motion_data(child);
-    groupVars[6] = groupVars[6] - 1;
+    child = (char *)parent_vars[4];
+    group_vars = (int *)moby_get_motion_data(child);
+    group_vars[6] = group_vars[6] - 1;
     moby_clear_links(obj);
-    if (groupVars[6] < D_L05_00221D28)
+    if (group_vars[6] < D_L05_00221D28)
         group_free_members_and_self(child);
     else
         group_layout_members_in_grid(child);
@@ -556,11 +556,11 @@ void moby_init_private_vars(char *object)
 /* func_L05_003CFAB8 is in L05_0037B6D0-g8.c. */
 
 /* Converts an object id into a table index. */
-int moby_class_id_to_table_index(int classId)
+int moby_class_id_to_table_index(int class_id)
 {
-    if (classId == 0x971)
+    if (class_id == 0x971)
         return 4;
-    return classId - 0x953;
+    return class_id - 0x953;
 }
 
 /* func_L05_003CFC48 is in L05_003CFC48-g8.c. */

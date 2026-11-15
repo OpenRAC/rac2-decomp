@@ -55,19 +55,19 @@ extern f32 math_fabs(f32);
 /* Turns the vector at a1 into the object's frame, then into the world with the matrix at
    a0 + 0xC0, and reports whether both of the first two coordinates stay below the two
    bounds. */
-s32 coll_is_point_inside_bounds(u8 *a0, TI128 *a1, f32 limitY, f32 limitX) {
-    Vec4 localPoint[1];
+s32 coll_is_point_inside_bounds(u8 *a0, TI128 *a1, f32 limit_y, f32 limit_x) {
+    Vec4 local_point[1];
     Vec4 mat[4];
-    Vec4 worldPoint[1];
+    Vec4 world_point[1];
     Vec4 out[1];
 
-    localPoint[0].q = *a1;
+    local_point[0].q = *a1;
     matrix_from_basis_rows(mat, a0 + 0xC0);
-    FastVecSub(&out[0].q, &localPoint[0].q, a0 + 0x10);
-    worldPoint[0].q = out[0].q;
-    transform_vector(&worldPoint[0].q, &worldPoint[0].q, mat);
-    if (math_fabs(worldPoint[0].f.x) < limitX) {
-        if (math_fabs(worldPoint[0].f.y) < limitY)
+    FastVecSub(&out[0].q, &local_point[0].q, a0 + 0x10);
+    world_point[0].q = out[0].q;
+    transform_vector(&world_point[0].q, &world_point[0].q, mat);
+    if (math_fabs(world_point[0].f.x) < limit_x) {
+        if (math_fabs(world_point[0].f.y) < limit_y)
             return 1;
     }
     return 0;
@@ -177,14 +177,14 @@ typedef struct {
 void grulch_activate_group_members(u8 *moby)
 {
     L17GroupState *state = *(L17GroupState **)(moby + 0x68);
-    u16 *groupIds;
+    u16 *group_ids;
     u8 *entity;
 
-    for (groupIds = D_L17_001FB720[state->group];
-         (state->group & 0xFF) != 0xFF && state->group <= D_L17_001B2C38[0] && groupIds != 0 &&
-         ((groupIds != 0 && (s16)groupIds[-1] >= 0) || groupIds == D_L17_001FB720[state->group]);
-         groupIds++) {
-        entity = D_L17_001B2C1C_base[0] + ((*groupIds & 0x7FFF) << 8);
+    for (group_ids = D_L17_001FB720[state->group];
+         (state->group & 0xFF) != 0xFF && state->group <= D_L17_001B2C38[0] && group_ids != 0 &&
+         ((group_ids != 0 && (s16)group_ids[-1] >= 0) || group_ids == D_L17_001FB720[state->group]);
+         group_ids++) {
+        entity = D_L17_001B2C1C_base[0] + ((*group_ids & 0x7FFF) << 8);
         if (entity == 0)
             break;
         state->mode = 0x57;
@@ -271,21 +271,21 @@ void grulch_release_slot(s32 moby)
 
 /* Picks a random point on the object's path that is more than 3 units away from it. */
 s32 grulch_pick_random_path_point(s32 moby) {
-    s32 pointIndex;
+    s32 point_index;
     s32 path = g_path_l17_table[*(s32 *)(*(s32 *)(moby + 0x68) + 0x684)];
-    s32 pointCount = *(s32 *)path;
+    s32 point_count = *(s32 *)path;
     s32 attempts = 0;
 
     do {
         s32 offset;
 
-        pointIndex = func_31B160(pointCount);
-        offset = (pointIndex << 4) + 0x10;
+        point_index = func_31B160(point_count);
+        offset = (point_index << 4) + 0x10;
         if (func_2EF0B0(moby + 0x10, path + offset) > 3.0f) {
-            return pointIndex;
+            return point_index;
         }
     } while (++attempts < 5);
-    return pointIndex;
+    return point_index;
 }
 
 /* Tells whether the way to the target is clear (1 if nothing blocks it). */

@@ -25,7 +25,7 @@ void thrown_l11_projectile_update_2(char *moby)
     float next[4], velocity[4], zero[4];
     char *vars = *(char **)(moby + 0x68);
     char *target;
-    float spreadA, spreadB;
+    float spread_a, spread_b;
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         *(float *)(moby + 0xF0) = FastAddRotations(*(float *)(moby + 0xF0), *(float *)(vars + 0x20) * 0.7f);
@@ -40,9 +40,9 @@ void thrown_l11_projectile_update_2(char *moby)
         qcopy(moby + 0x10, next);
         FastVecScale(velocity, vars, -0.5f);
         vec_clear_128(zero);
-        spreadA = math_random_float_range(2.5f, 3.0f) * 210000.0f;
-        spreadB = math_random_float_range(0.2f, 0.4f) * 210000.0f;
-        part_spawn_gravity_fade(moby + 0x10, velocity, 15, D_L11_001B22C0, 3, 80, 0, spreadA, spreadB, 0.0f, 0);
+        spread_a = math_random_float_range(2.5f, 3.0f) * 210000.0f;
+        spread_b = math_random_float_range(0.2f, 0.4f) * 210000.0f;
+        part_spawn_gravity_fade(moby + 0x10, velocity, 15, D_L11_001B22C0, 3, 80, 0, spread_a, spread_b, 0.0f, 0);
         if (*(float *)(vars + 0x24) < *(float *)(moby + 0x18) && *(float *)(vars + 0x24) > 0.0f)
             moby_set_state(moby, 2, -1);
         target = part_find_owned_effect_slot(moby, 0x10000, 0);

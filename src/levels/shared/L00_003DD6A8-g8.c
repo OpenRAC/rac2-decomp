@@ -124,7 +124,7 @@ void spider_bot_update(char *object)
         if (ref_L00_003DD6A8_04(oldpos, object + 0x10, 2, object, 0)) {
             char *hitinfo = g_collision_result;
             char *hit = *(char **)(hitinfo + 0x18);
-            if (hit && (hit == player->target || *(short *)(hit + 0xAA) == 0x907 /* Spiderbot Glove */)) break;
+            if (hit && (hit == player->target || *(short *)(hit + 0xAA) == MOBY_CLASS_SPIDERBOT_GLOVE)) break;
             qcopy(object + 0x10, hitinfo + 0x20);
             ref_L00_003DD6A8_17(data);
             ref_L00_003DD6A8_07(6, 0, 1);

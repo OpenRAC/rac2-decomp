@@ -12,22 +12,22 @@ typedef unsigned char u8;
    parameters, so nothing needed re-anchoring. */
 
 /* Stores a value from a received command into the client's result table. */
-s32 sif_cmd_store_value(s32 *command, s32 *clientData) {
+s32 sif_cmd_store_value(s32 *command, s32 *client_data) {
     s32 *dst;
     s32 index;
     s32 value;
 
     index = *(s32 *)((u8 *)command + 0x10);
-    dst = *(s32 **)((u8 *)clientData + 0x1C);
+    dst = *(s32 **)((u8 *)client_data + 0x1C);
     value = *(s32 *)((u8 *)command + 0x14);
     dst[index] = value;
 }
 
 /* Copies a value from a received command into the client data and returns it. */
-s32 sif_cmd_copy_value(s32 *command, s32 *clientData) {
+s32 sif_cmd_copy_value(s32 *command, s32 *client_data) {
     s32 value;
 
     value = *(s32 *)((u8 *)command + 0x10);
-    *(s32 *)((u8 *)clientData + 0x8) = value;
+    *(s32 *)((u8 *)client_data + 0x8) = value;
     return value;
 }

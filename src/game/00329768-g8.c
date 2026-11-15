@@ -32,7 +32,7 @@ extern void moby_do_nothing(void);
 /* Updates a flying chunk (class 3032): it drops under gravity, sprays sparks, lands on the ground, bounces and fades out. */
 void falling_chunk_update(char *moby)
 {
-    float previousPos[4] __attribute__((aligned(16)));
+    float previous_pos[4] __attribute__((aligned(16)));
     float hit[4], zero[4], random[4];
     float velocity[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
@@ -51,7 +51,7 @@ void falling_chunk_update(char *moby)
             g_music_state.kind=0xDB8;
         }
     case 1:
-        qcopy(previousPos, moby + 0x10);
+        qcopy(previous_pos, moby + 0x10);
         FastVecAdd(moby + 0x10, moby + 0x10, state);
         *(float *)(state + 8)-=0.003055555745959282f;
         *(float *)(moby + 0xF4)=FastAddRotations(*(float *)(moby + 0xF4), *(float *)(state + 0x14));
@@ -65,8 +65,8 @@ void falling_chunk_update(char *moby)
             FastVecAdd(random, random, moby + 0x10);
             part_spawn_drifting_2(random, state, math_random_int_range(20, 40));
         }
-        fast_vec_dist(previousPos, moby + 0x10);
-        if (moby_place_at_collision_point_mirror(moby, previousPos)) {
+        fast_vec_dist(previous_pos, moby + 0x10);
+        if (moby_place_at_collision_point_mirror(moby, previous_pos)) {
             hero_check_under_falling_object(moby);
             if (*(int *)(state + 0x38)==2) moby[0x20]=2;
             else {
@@ -84,7 +84,7 @@ void falling_chunk_update(char *moby)
         }
         break;
     case 2:
-        qcopy(previousPos, moby + 0x10);
+        qcopy(previous_pos, moby + 0x10);
         FastVecAdd(moby + 0x10, moby + 0x10, state);
         *(float *)(state + 8)-=0.003055555745959282f;
         *(float *)(moby + 0xF4)=FastAddRotations(*(float *)(moby + 0xF4), *(float *)(state + 0x14));
@@ -104,13 +104,13 @@ void falling_chunk_update(char *moby)
         break;
     case 3: {
         float one, low, high, scale;
-        qcopy(previousPos, moby + 0x10);
+        qcopy(previous_pos, moby + 0x10);
         FastVecAdd(moby + 0x10, moby + 0x10, state);
         FastVecScale(state, state, 0.8f);
         *(float *)(state + 8)-=0.002444444689899683f;
         *(float *)(moby + 0xF4)=FastAddRotations(*(float *)(moby + 0xF4), *(float *)(state + 0x14));
         *(float *)(moby + 0xF8)=FastAddRotations(*(float *)(moby + 0xF8), *(float *)(state + 0x18));
-        fast_vec_dist(previousPos, moby + 0x10);
+        fast_vec_dist(previous_pos, moby + 0x10);
         *(float *)(state + 0x14)*=0.8f;
         *(float *)(state + 0x18)*=0.8f;
         if ((unsigned char)moby[0x23] >= 3)

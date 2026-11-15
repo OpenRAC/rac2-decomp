@@ -61,12 +61,12 @@ void AmmoPickupUpdate(char *moby)
 {
     char *vars=*(char **)(moby+0x68);
     PickupResource *resource;
-    int j,i,canPickUp,changed,oldCount,delta,sound;
-    float speed,timeLeft,targetSpeed;
+    int j,i,can_pick_up,changed,old_count,delta,sound;
+    float speed,time_left,target_speed;
     float work[4] __attribute__((aligned(16)));
     float push[4] __attribute__((aligned(16)));
-    float toTarget[4] __attribute__((aligned(16)));
-    float axisCross[4] __attribute__((aligned(16)));
+    float to_target[4] __attribute__((aligned(16)));
+    float axis_cross[4] __attribute__((aligned(16)));
     float before[4] __attribute__((aligned(16)));
     float after[4] __attribute__((aligned(16)));
     float shift[4] __attribute__((aligned(16)));
@@ -88,32 +88,32 @@ void AmmoPickupUpdate(char *moby)
         cam_moby_update(moby);
         changed=0;
         if(fast_vec_dist(work,vars)>F(vars,0x48)*2.0f)changed=1;
-        canPickUp=1;
+        can_pick_up=1;
         if(B(vars,0x5c)||changed) {
             if(math_fast_float_d(vars+0x7c)) {
-                if(math_fabs(F(moby,0x18)-PLAYER->position[2])>PLAYER->height)canPickUp=0;
-                else if(vec_distance_xy(moby+0x10,PLAYER->position)>PLAYER->range)canPickUp=0;
+                if(math_fabs(F(moby,0x18)-PLAYER->position[2])>PLAYER->height)can_pick_up=0;
+                else if(vec_distance_xy(moby+0x10,PLAYER->position)>PLAYER->range)can_pick_up=0;
             }
         } else {
-            canPickUp=0;
+            can_pick_up=0;
             if(math_fabs(F(moby,0x18)-PLAYER->position[2])<PLAYER->height &&
                vec_distance_xy(moby+0x10,PLAYER->position)<PLAYER->range)I(vars,0x7c)=3;
         }
         if(g_item_ammo_counts[I(vars,0x68)] >=
-           ((PickupResource *)(g_item_slot_to_record[I(vars,0x68)] * 224 + (unsigned int)g_weapon_l00_table))->capacity)canPickUp=0;
+           ((PickupResource *)(g_item_slot_to_record[I(vars,0x68)] * 224 + (unsigned int)g_weapon_l00_table))->capacity)can_pick_up=0;
         if(D_L00_001A8FF0[0]) {
             if(gravity_get_center_distance(moby+0x10)<F(vars,0x78)-2.0f)goto force_pickup;
         } else if(F(moby,0x18)<F(vars,0x78)-2.0f)goto force_pickup;
         if(!PLAYER->override)goto check_enabled;
 force_pickup:
-        canPickUp=1;
+        can_pick_up=1;
 check_enabled:
-        if(!PLAYER->enabled)canPickUp=0;
-        if(canPickUp) {
-            i=I(vars,0x68);oldCount=g_item_ammo_counts[i];
+        if(!PLAYER->enabled)can_pick_up=0;
+        if(can_pick_up) {
+            i=I(vars,0x68);old_count=g_item_ammo_counts[i];
             weapon_add_ammo(i,I(vars,0x60));
-            if(oldCount<g_item_ammo_counts[i]) {
-                delta=g_item_ammo_counts[i]-oldCount;
+            if(old_count<g_item_ammo_counts[i]) {
+                delta=g_item_ammo_counts[i]-old_count;
                 if(delta==1) {
                     resource=&g_weapon_l00_table[g_item_slot_to_record[i]];
                     sound=resource->single_sound;
@@ -134,26 +134,26 @@ check_enabled:
     case 2:
         FastVecSub(work,moby+0x10,PLAYER->position);
         matrix_mul_vec3(work,work,PLAYER->matrix);
-        targetSpeed=8.0f;
-        if(work[2]>0.0f)targetSpeed=0.0f;
-        ApproachValue(vars+0x74,targetSpeed,0.0066666668f);
+        target_speed=8.0f;
+        if(work[2]>0.0f)target_speed=0.0f;
+        ApproachValue(vars+0x74,target_speed,0.0066666668f);
         vec_scale_to_length(push,PLAYER->axis,F(vars,0x74));
         FastVecAdd(moby+0x10,moby+0x10,push);
         FastVecAdd(moby+0x10,moby+0x10,PLAYER->motion);
         speed=FastVecLength(vars);
         ApproachValue(&speed,1.0666667f,0.0066666668f);
-        FastVecSub(toTarget,PLAYER->target,moby+0x10);
-        timeLeft=FastVecLength(toTarget)/speed;
-        if(timeLeft<30.0f)ApproachValue(moby+0x2c,0.0f,F(*(char **)(moby+0x24),0x24)*0.033333335f);
+        FastVecSub(to_target,PLAYER->target,moby+0x10);
+        time_left=FastVecLength(to_target)/speed;
+        if(time_left<30.0f)ApproachValue(moby+0x2c,0.0f,F(*(char **)(moby+0x24),0x24)*0.033333335f);
         if(F(moby,0x2c)==0.0f) {moby_mark_spawned(moby);return;}
-        if(timeLeft<=1.0f) {moby_mark_spawned(moby);return;}
-        vec_scale_to_length(vars,toTarget,speed);
+        if(time_left<=1.0f) {moby_mark_spawned(moby);return;}
+        vec_scale_to_length(vars,to_target,speed);
         FastVecAdd(moby+0x10,moby+0x10,vars);
-        FastVecCross(axisCross,PLAYER->axis,vars);
-        vec_set_direction_with_complement(axisCross,axisCross,0.087266475f);
+        FastVecCross(axis_cross,PLAYER->axis,vars);
+        vec_set_direction_with_complement(axis_cross,axis_cross,0.087266475f);
         *(Quadword *)up=0;up[2]=0.3f;
         matrix_mul_vec3(before,up,moby+0xc0);
-        quaternion_to_rotation_basis(axisCross,matrix);
+        quaternion_to_rotation_basis(axis_cross,matrix);
         multiply_matrix3x3(moby+0xc0,matrix,moby+0xc0);
         matrix_mul_vec3(after,up,moby+0xc0);
         FastVecSub(shift,after,before);

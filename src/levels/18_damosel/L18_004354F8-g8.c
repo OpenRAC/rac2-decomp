@@ -87,16 +87,16 @@ void two_child_fade_update(DamoselObject *moby) {
         break;
     case 3:
         if(flag_set_first_pending(moby)) {
-            int soundId;
+            int sound_id;
             moby->angle=D_L18_001B1638; moby->alpha=D_L18_001B163D;
             s->color[0]=D_L18_001B1670_GP; s->color[1]=D_L18_001B1670[1];
             moby->animation=(*(int *)(moby->config+16));
             if(!ACTIVE(4)) CHILD(4)->command=25;
             if(!ACTIVE(0)) CHILD(0)->command=25;
-            soundId=s->sound;
-            if(soundId!=-1) {
-                DamoselSound *sound = (DamoselSound *)(g_sound_state+soundId*0x70);
-                if(sound->owner==moby && sound->active) snd_stop_voice(soundId);
+            sound_id=s->sound;
+            if(sound_id!=-1) {
+                DamoselSound *sound = (DamoselSound *)(g_sound_state+sound_id*0x70);
+                if(sound->owner==moby && sound->active) snd_stop_voice(sound_id);
             }
             s->sound=-1;
         } else if(!ACTIVE(0)||!ACTIVE(4)) moby_set_state(moby,4,-1);

@@ -12,24 +12,24 @@ extern float D_001B1DC8;
 extern float D_001B1DD0;
 /* Moves a falling particle over the ground grid and removes it when it leaves the area or sinks below the ground. */
 void part_update_falling_ground(FallingParticle_C4B50 *self) {
-    ParticlePayload_C4B50 motion, sample, sampleAgain;
+    ParticlePayload_C4B50 motion, sample, sample_again;
     float *velocity = self->velocity_floor.lane;
     float floor = velocity[3];
-    int oldX, oldY;
+    int old_x, old_y;
     if (self->position.lane[0] < 0.0f || self->position.lane[1] < 0.0f ||
         self->position.lane[0] > 512.0f || self->position.lane[1] > 512.0f || self->position.lane[2] < floor)
         goto expired;
     motion.quad = self->velocity_floor.quad;
     motion.lane[3] = 0.0f;
-    oldX = (int)self->position.lane[0];
-    oldY = (int)self->position.lane[1];
+    old_x = (int)self->position.lane[0];
+    old_y = (int)self->position.lane[1];
     FastVecAdd(self->position.lane, self->position.lane, motion.lane);
     FastVecAdd(self->position.lane, self->position.lane, D_001B1DC0);
-    if (oldX != (int)self->position.lane[0] || oldY != (int)self->position.lane[1]) {
+    if (old_x != (int)self->position.lane[0] || old_y != (int)self->position.lane[1]) {
         sample.quad = self->position.quad;
         if (coll_get_heightmap_height(sample.lane) >= D_001B1DD0) {
-            sampleAgain.quad = self->position.quad;
-            floor = coll_get_heightmap_height(sampleAgain.lane);
+            sample_again.quad = self->position.quad;
+            floor = coll_get_heightmap_height(sample_again.lane);
         } else floor = D_001B1DD0;
         if (self->position.lane[2] < floor) goto expired;
     }

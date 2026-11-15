@@ -97,7 +97,7 @@ extern void hero_build_relative_point(void *, int, float, float, float), hero_ap
  * Each frame, advances the hero's timers and counters, pushes nearby objects away,
  * tracks whether the hero stands still, and refreshes the reach distance and height. */
 void hero_update_timers_and_reach_state(void) {
-    unsigned char *moby, *mobyPos, *heroPos;
+    unsigned char *moby, *moby_pos, *hero_pos;
     float sum[4], delta[4];
     int i, count, history_index, first_index, second_index;
     if (!D_L01_00189E20.tilt_disabled) hero_ease_lean_to_upright();
@@ -179,12 +179,12 @@ void hero_update_timers_and_reach_state(void) {
         for (i = 0;(moby = D_L01_001FB3E0[i]) != 0;i++) {
             if (moby_is_in_special_class_range(moby) || (moby && BP(moby, 0x24) && BS(BP(moby, 0x24), 0x46) == 22)) {
                 if ((D_001B2088&7) == (((int)moby>>8)&7) || !math_random_int_below(4)) {
-                    heroPos = (unsigned char *)&D_L01_00189E20+0x80;
-                    mobyPos = moby+0x10;
-                    if (fast_vec_dist(heroPos, mobyPos)<15.37f) {
-                        FastVecSub(sum, mobyPos, heroPos);
+                    hero_pos = (unsigned char *)&D_L01_00189E20+0x80;
+                    moby_pos = moby+0x10;
+                    if (fast_vec_dist(hero_pos, moby_pos)<15.37f) {
+                        FastVecSub(sum, moby_pos, hero_pos);
                         vec_scale_to_length(sum, sum, 1.7f);
-                        part_queue_impact_effect(moby, D_L01_00189E20.field_2290, 0x4000000, heroPos, sum, 1.0f);
+                        part_queue_impact_effect(moby, D_L01_00189E20.field_2290, 0x4000000, hero_pos, sum, 1.0f);
                     }
                 }
             }

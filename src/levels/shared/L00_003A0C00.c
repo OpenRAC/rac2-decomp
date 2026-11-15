@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 extern int D_0018C0B4;
@@ -29,12 +30,12 @@ void visibomb_missile_watcher_update(char *object)
     if (D_0018C0B4 != 0x1C)
         goto reset;
     for (node = D_L00_001B1EA8[0]; node != 0; node = *(char **)(node + 0x28)) {
-        if (*(short *)(node + 0xAA) == 0xAC /* Visibomb Missile */) {
+        if (*(short *)(node + 0xAA) == MOBY_CLASS_VISIBOMB_MISSILE) {
             target = node;
             break;
         }
     }
-    if (target == 0 || *(short *)(target + 0xAA) != 0xAC /* Visibomb Missile */) {
+    if (target == 0 || *(short *)(target + 0xAA) != MOBY_CLASS_VISIBOMB_MISSILE) {
 reset:
         *(int *)(state + 0x140) = 0;
         return;

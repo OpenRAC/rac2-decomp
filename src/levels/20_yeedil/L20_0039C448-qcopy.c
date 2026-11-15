@@ -31,13 +31,13 @@ void projectile_l20_update(char *moby) {
     char *position = moby + 0x10;
     char *vars = *(char **)(moby + 0x68);
     char *velocity;
-    char hitInfo[0x30];
+    char hit_info[0x30];
 
     *(TI128 *)vars = *(TI128 *)position;
     velocity = vars + 0x10;
     FastVecAdd(position, position, velocity);
-    make_hit_descriptor(hitInfo, (int)moby, 0x10001, velocity, *(float *)(vars + 0x2C));
-    if (CollLine(vars, position, 0, *(int *)(moby + 0xB8), hitInfo) != 0
+    make_hit_descriptor(hit_info, (int)moby, 0x10001, velocity, *(float *)(vars + 0x2C));
+    if (CollLine(vars, position, 0, *(int *)(moby + 0xB8), hit_info) != 0
         || math_fast_float_d(vars + 0x20) != 0) {
         part_l20_spawn_spark_burst(D_L20_001C0420, 0x14, 1);
         snd_play_from_class_bank(2, 0, moby, 0x12EF);

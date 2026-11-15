@@ -48,8 +48,8 @@ void gorn_ship_update_flight(char *object, int flag) {
     float up[4], point[4], matrix[16];
     char *vars = *(char **)(object + 0x68);
     GornOwner *owner;
-    char *shot, *shotVars, *route, *entry;
-    int i, j, routeIndex, partsLeft, sound;
+    char *shot, *shot_vars, *route, *entry;
+    int i, j, route_index, parts_left, sound;
     *(GornQuad *)up = 0;
     up[2] = 1.0f;
     owner = (GornOwner *)moby_get_motion_data((unsigned char *)object);
@@ -63,16 +63,16 @@ void gorn_ship_update_flight(char *object, int flag) {
             FastVecAdd(point, point, object + 0x10);
             shot = SpawnFreeLevelObjectById(0x957 /* moby class 2391 */, 1);
             if (shot) {
-                shotVars = (char *)moby_get_motion_data((unsigned char *)shot);
+                shot_vars = (char *)moby_get_motion_data((unsigned char *)shot);
                 qcopy_nc(shot + 0x10, point);
                 vec_scale_to_length(shot + 0xC0, object + 0xD0, *(int *)(vars + 0x440) ? -1.0f : 1.0f);
-                qcopy_nc(shotVars + 0x90, shot + 0xC0);
+                qcopy_nc(shot_vars + 0x90, shot + 0xC0);
                 FastVecCross(shot + 0xD0, shot + 0xC0, up);
                 vec_scale_to_length(shot + 0xD0, shot + 0xD0, 1.0f);
                 FastVecCross(shot + 0xE0, shot + 0xD0, shot + 0xC0);
-                FastVecScale(shotVars + 0x60, shot + 0xC0, 10.0f);
-                FastVecAdd(shotVars + 0x60, shot + 0x10, shotVars + 0x60);
-                *(int *)(shotVars + 0x130) = 500;
+                FastVecScale(shot_vars + 0x60, shot + 0xC0, 10.0f);
+                FastVecAdd(shot_vars + 0x60, shot + 0x10, shot_vars + 0x60);
+                *(int *)(shot_vars + 0x130) = 500;
             }
         }
         *(int *)(vars + 0x440) ^= 1;
@@ -87,9 +87,9 @@ void gorn_ship_update_flight(char *object, int flag) {
     gorn_ship_aim_parts(object);
     route = D_L15_001FE480[*(int *)(vars + 0x448)];
     if (follower_has_reached_target(object)) {
-        routeIndex = *(int *)(vars + 0x44C);
-        *(int *)(vars + 0x44C) = routeIndex + 1;
-        follower_set_push_vector(object, route + 16 + routeIndex * 16);
+        route_index = *(int *)(vars + 0x44C);
+        *(int *)(vars + 0x44C) = route_index + 1;
+        follower_set_push_vector(object, route + 16 + route_index * 16);
         owner->timer = 2000000;
         if (*(int *)(vars + 0x44C) >= *(int *)route) *(int *)(vars + 0x44C) = 0;
     }
@@ -124,16 +124,16 @@ void gorn_ship_update_flight(char *object, int flag) {
                 PlayMobySound(4, 0, object);
                 *(int *)(vars + 0x45C) = 1;
             }
-            partsLeft = FloatToInt(*(float *)(vars + 0x180) * 0.02f);
-            if (partsLeft < 7 && partsLeft != *(int *)(vars + 0x26C)) {
+            parts_left = FloatToInt(*(float *)(vars + 0x180) * 0.02f);
+            if (parts_left < 7 && parts_left != *(int *)(vars + 0x26C)) {
                 part_spawn_shockwave_burst(object + 0x10, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
-                moby_transform_joint_to_world(object, D_L15_001B17B0[7-partsLeft], matrix);
+                moby_transform_joint_to_world(object, D_L15_001B17B0[7-parts_left], matrix);
                 part_spawn_shockwave_burst(matrix, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
-                SpawnLinkedPart(object, partsLeft-1);
+                SpawnLinkedPart(object, parts_left-1);
             }
             gorn_ship_spawn_damage_effects(object);
-            *(int *)(vars + 0x26C) = partsLeft;
-            if (partsLeft > 0) *(short *)(object + 0x7C) = (1 << (partsLeft-1)) - 1;
+            *(int *)(vars + 0x26C) = parts_left;
+            if (parts_left > 0) *(short *)(object + 0x7C) = (1 << (parts_left-1)) - 1;
             else *(short *)(object + 0x7C) = 0;
         }
     }
@@ -144,16 +144,16 @@ void gorn_ship_update_flight(char *object, int flag) {
                 PlayMobySound(4, 0, object);
                 *(int *)(vars + 0x45C) = 1;
             }
-            partsLeft = FloatToInt(*(float *)(vars + 0x180) * 0.08f);
-            if (partsLeft < 7 && partsLeft != *(int *)(vars + 0x26C)) {
+            parts_left = FloatToInt(*(float *)(vars + 0x180) * 0.08f);
+            if (parts_left < 7 && parts_left != *(int *)(vars + 0x26C)) {
                 part_spawn_shockwave_burst(object + 0x10, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
-                moby_transform_joint_to_world(object, D_L15_001B17B0[7-partsLeft], matrix);
+                moby_transform_joint_to_world(object, D_L15_001B17B0[7-parts_left], matrix);
                 part_spawn_shockwave_burst(matrix, 0, 50, 2.5f, 30, 30, 30, 40, 1, 1, 0, 0);
-                SpawnLinkedPart(object, partsLeft-1);
+                SpawnLinkedPart(object, parts_left-1);
             }
             gorn_ship_spawn_damage_effects(object);
-            *(int *)(vars + 0x26C) = partsLeft;
-            if (partsLeft > 0) *(short *)(object + 0x7C) = (1 << (partsLeft-1)) - 1;
+            *(int *)(vars + 0x26C) = parts_left;
+            if (parts_left > 0) *(short *)(object + 0x7C) = (1 << (parts_left-1)) - 1;
             else *(short *)(object + 0x7C) = 0;
         }
     }

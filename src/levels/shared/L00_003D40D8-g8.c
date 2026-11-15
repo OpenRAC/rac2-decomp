@@ -68,7 +68,7 @@ void kilonoid_fire_shot(unsigned char *moby, EffectLauncherState *state)
                               D_L00_001B0250,
                               D_L00_001B0254 * 0.017453294f, D_L00_001B0258 * 0.017453294f);
     if (obj) {
-        if ((*(short *)(obj + 0xaa) == 0xee1 /* Receiver Bot */ || *(short *)(obj + 0xaa) == 0xec0 /* moby class 3776 */
+        if ((*(short *)(obj + 0xaa) == MOBY_CLASS_RECEIVER_BOT || *(short *)(obj + 0xaa) == 0xec0 /* moby class 3776 */
              || *(short *)(obj + 0xaa) == 0xed4 /* moby class 3796 */)
             && *(unsigned char *)(*(char **)(obj + 0x68) + 0x3b1) == 255) {
             state->target = 0;

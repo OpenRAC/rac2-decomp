@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char u8;
@@ -119,7 +120,7 @@ void sweeper_bot_mark_stream(u8 *entity) {
         u8 *q = base + ((*(unsigned short *)p & 0x7FFF) << 8);
 
         if (*(signed char *)(q + 0x20) >= 0) {
-            if (*(short *)(q + 0xAA) == 0xFF3 /* Megacorp Sweeper Bot */) {
+            if (*(short *)(q + 0xAA) == MOBY_CLASS_MEGACORP_SWEEPER_BOT) {
                 *(short *)(*(u8 **)(q + 0x68) + 0x2D6) = 1;
             }
         }
@@ -149,7 +150,7 @@ void rivet_bot_mark_stream(u8 *entity) {
         u8 *q = base + ((*(unsigned short *)p & 0x7FFF) << 8);
 
         if (*(signed char *)(q + 0x20) >= 0) {
-            if (*(short *)(q + 0xAA) == 0xFFC /* Megacorp Rivet Bot */) {
+            if (*(short *)(q + 0xAA) == MOBY_CLASS_MEGACORP_RIVET_BOT) {
                 *(short *)(*(u8 **)(q + 0x68) + 0x336) = 1;
             }
         }

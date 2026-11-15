@@ -27,30 +27,30 @@ extern u8 *D_001B251C;
 /* Clears the arena's 128 records of 0x60 bytes and then walks the entry's two-byte
    id list, flagging every live object of one class. */
 void hrugis_init_group_states(u8 *group) {
-    s32 *clearPtr;
+    s32 *clear_ptr;
     s32 i;
-    u8 *idList;
-    u16 *idPtr;
+    u8 *id_list;
+    u16 *id_ptr;
     u8 *moby;
 
     D_L10_001B0F44 = 0;
-    clearPtr = (s32 *)D_L10_00265BA0;
+    clear_ptr = (s32 *)D_L10_00265BA0;
     D_L10_001B0F48 = 0;
-    clearPtr = (s32 *)((u8 *)clearPtr + 0x2FE0);
+    clear_ptr = (s32 *)((u8 *)clear_ptr + 0x2FE0);
     for (i = 0x7F; i >= 0; i--) {
-        *clearPtr = 0;
-        clearPtr -= 0x18;
+        *clear_ptr = 0;
+        clear_ptr -= 0x18;
     }
-    idList = D_L10_001FB1E0[group[0x21]];
-    if (idList == 0)
+    id_list = D_L10_001FB1E0[group[0x21]];
+    if (id_list == 0)
         return;
-    idPtr = (u16 *)idList;
+    id_ptr = (u16 *)id_list;
     do {
-        moby = D_001B251C + ((*idPtr & 0x7FFF) << 8);
+        moby = D_001B251C + ((*id_ptr & 0x7FFF) << 8);
         moby[0x20] = 1;
-        if ((s16)*idPtr < 0)
+        if ((s16)*id_ptr < 0)
             break;
-        idPtr++;
+        id_ptr++;
     } while (1);
 }
 
@@ -61,38 +61,38 @@ extern void func_0032AF78(s32 a0);
    same arena records as func_L10_00417440, one record per id, and tears down the two
    effect slots at +0x2C4 and +0x2C0 of each record. */
 void hrugis_release_group_effects(u8 *group) {
-    u16 *idPtr;
+    u16 *id_ptr;
     u8 *moby;
     u8 *vars;
-    u8 *idList;
-    u32 childVars;
+    u8 *id_list;
+    u32 child_vars;
 
-    idList = D_L10_001FB1E0[group[0x21]];
-    if (idList == 0)
+    id_list = D_L10_001FB1E0[group[0x21]];
+    if (id_list == 0)
         return;
-    idPtr = (u16 *)idList;
+    id_ptr = (u16 *)id_list;
     do {
-        moby = D_001B251C + ((*idPtr & 0x7FFF) << 8);
+        moby = D_001B251C + ((*id_ptr & 0x7FFF) << 8);
         vars = *(u8 **)(moby + 0x68);
         if (*(u8 **)(vars + 0x2C4) != 0) {
             func_0032BD98((s32)*(u8 **)(vars + 0x2C4), vars + 0x370);
             func_0032BD98((s32)*(u8 **)(vars + 0x2C4), vars + 0x3B0);
-            childVars = *(u32 *)(*(u8 **)(*(u8 **)(vars + 0x2C4) + 0x68) + 0x18);
-            if (childVars != 0)
-                func_0032AF78(childVars);
+            child_vars = *(u32 *)(*(u8 **)(*(u8 **)(vars + 0x2C4) + 0x68) + 0x18);
+            if (child_vars != 0)
+                func_0032AF78(child_vars);
             func_0032AF78((s32)*(u8 **)(vars + 0x2C4));
             *(u32 *)(vars + 0x2C4) = 0;
         }
         if (*(u8 **)(vars + 0x2C0) != 0) {
             func_0032BD98((s32)*(u8 **)(vars + 0x2C0), vars + 0x2F0);
             func_0032BD98((s32)*(u8 **)(vars + 0x2C0), vars + 0x330);
-            childVars = *(u32 *)(*(u8 **)(*(u8 **)(vars + 0x2C0) + 0x68) + 0x18);
-            if (childVars != 0)
-                func_0032AF78(childVars);
+            child_vars = *(u32 *)(*(u8 **)(*(u8 **)(vars + 0x2C0) + 0x68) + 0x18);
+            if (child_vars != 0)
+                func_0032AF78(child_vars);
             func_0032AF78((s32)*(u8 **)(vars + 0x2C0));
             *(u32 *)(vars + 0x2C0) = 0;
         }
-    } while ((s16)*idPtr++ >= 0);
+    } while ((s16)*id_ptr++ >= 0);
 }
 
 /* The mission state (D_L10_00221CD0), as far as func_L10_00423500 resets it. */

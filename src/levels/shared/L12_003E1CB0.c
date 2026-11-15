@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
@@ -249,7 +250,7 @@ void tourist_increment_counters(s32 groupId) {
     do {
         u32 offset = (*(u16 *)ids & 0x7FFF) << 8;
 
-        if (*(s16 *)(mobyBase + offset + 0xAA) == 0xBB8 /* Space Tourist */) {
+        if (*(s16 *)(mobyBase + offset + 0xAA) == MOBY_CLASS_SPACE_TOURIST) {
             u8 *vars = (u8 *)*(u32 *)(mobyBase + offset + 0x68);
 
             *(u32 *)(vars + 0x798) = *(u32 *)(vars + 0x798) + 1;

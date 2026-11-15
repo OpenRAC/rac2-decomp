@@ -30,15 +30,15 @@ extern f32 ref_L18_00428338_02 __attribute__((sda));
 
 /* Lets the enemy aim at a target using two attachment points while in one state. Returns 0 in other states. */
 s32 enemy_aim_at_target(s8 *moby) {
-    s8 attachPointA[0x10];
-    s8 attachPointB[0x10];
+    s8 attach_point_a[0x10];
+    s8 attach_point_b[0x10];
     s8 *vars;
 
     vars = *(s8 **)(moby + 0x68);
     if (*(u8 *)(moby + 0x42) == 0xA) {
-        ref_L18_00428338_00(moby, 2, attachPointA);
-        ref_L18_00428338_00(moby, 3, attachPointB);
-        return ref_L18_00428338_01(moby, attachPointA, attachPointB, (*(u8 *)(moby + 0xBC) ^ 1) == 0 ? 0x4010000 : 0x4000001, 2, 3, 0, (f32) *(u8 *)(vars + 0x34), ref_L18_00428338_02);
+        ref_L18_00428338_00(moby, 2, attach_point_a);
+        ref_L18_00428338_00(moby, 3, attach_point_b);
+        return ref_L18_00428338_01(moby, attach_point_a, attach_point_b, (*(u8 *)(moby + 0xBC) ^ 1) == 0 ? 0x4010000 : 0x4000001, 2, 3, 0, (f32) *(u8 *)(vars + 0x34), ref_L18_00428338_02);
     }
     return 0;
 }

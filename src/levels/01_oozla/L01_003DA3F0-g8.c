@@ -31,13 +31,13 @@ extern void *part_spawn_trail(void *,void *,void *,int,int,int,int,int,int);
 extern void SpawnExplosionEffects(void *,void *,int,int,int,int,int,int,int,int,int, int, float, float,float, float,float, float,float);
 /* Emits randomized particle trails, then the owner's explosion effect. */
 /* Sprays random trails of particles, then starts the explosion effect. */
-void part_l01_spawn_explosion_particles(u8 *moby, void *baseVelocity)
+void part_l01_spawn_explosion_particles(u8 *moby, void *base_velocity)
 {
     float pos[4] __attribute__((aligned(16)));
     float vel[4] __attribute__((aligned(16)));
     float acc[4] __attribute__((aligned(16)));
     u8 *vars = *(u8 **)(moby + 0x68);
-    int i, j, startColor, endColor, particleLife;
+    int i, j, start_color, end_color, particle_life;
     float angle, speed, rise, spread, scale, lifetime, maximum, upperScale;
     u8 *position;
 
@@ -50,7 +50,7 @@ void part_l01_spawn_explosion_particles(u8 *moby, void *baseVelocity)
         speed = math_random_float_range(D_L01_001B0858, D_L01_001B085C);
         rise = math_random_float_range(D_L01_001B0860, D_L01_001B0864);
         spread = math_random_float_range(0.0f, D_L01_001B0890);
-        FastVecScale(vel, baseVelocity, spread * 0.016666668f);
+        FastVecScale(vel, base_velocity, spread * 0.016666668f);
         vel[0] += math_fast_sin_or_cos_a(angle) * 0.016666668f * speed;
         vel[1] += math_fast_sin_or_cos_b(angle) * 0.016666668f * speed;
         vel[2] += rise * 0.016666668f;
@@ -62,16 +62,16 @@ void part_l01_spawn_explosion_particles(u8 *moby, void *baseVelocity)
             acc[3] = scale * D_L01_001B0870;
             vec_add_random_offset(pos, D_L01_001B0850);
             vec_add_random_offset(acc, D_L01_001B0854 * 0.016666668f);
-            startColor = FastTweenColor(D_L01_001B0874, D_L01_001B087C,
+            start_color = FastTweenColor(D_L01_001B0874, D_L01_001B087C,
                               math_random_float_range(0.0f, 1.0f));
             upperScale = 2.5f;
-            endColor = FastTweenColor(D_L01_001B0878, D_L01_001B0880,
+            end_color = FastTweenColor(D_L01_001B0878, D_L01_001B0880,
                               math_random_float_range(0.0f, 1.0f));
             lifetime = (float)D_L01_001B088C;
             maximum = lifetime * upperScale;
-            particleLife = FloatToInt(math_random_float_range(lifetime * 0.5f, maximum));
-            part_spawn_trail(pos, vel, acc, startColor, endColor, D_L01_001B0884,
-                          D_L01_001B0888, particleLife, -1);
+            particle_life = FloatToInt(math_random_float_range(lifetime * 0.5f, maximum));
+            part_spawn_trail(pos, vel, acc, start_color, end_color, D_L01_001B0884,
+                          D_L01_001B0888, particle_life, -1);
         }
     }
     SpawnExplosionEffects(moby, vars, 0, 4, 0, 0, -1, 0, 0, -1, 1, 0x810001,

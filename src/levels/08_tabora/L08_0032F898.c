@@ -29,7 +29,7 @@ extern float vec_distance_xy(void *, void *);
    vector and two more vectors to `out` (or clears them) and returns 0 (none), 1 (a
    listed moby) or 2 (the starting candidate dropped). */
 /* Finds the closest decoy or sheep target near a point so the hero can lock on to it, and fills in the target data. Returns 0 for no target, 1 for a new target, 2 for dropping the current one. */
-int SelectNearestListedMoby(char *center, char *outData, int planeListIndex, int cornerBoxIndex, int faceBoxIndex, int edgeBoxIndex, float minimum, float limit)
+int SelectNearestListedMoby(char *center, char *out_data, int plane_list_index, int corner_box_index, int face_box_index, int edge_box_index, float minimum, float limit)
 {
     char *selected = g_hero_state.selected;
     int result = 0;
@@ -38,7 +38,7 @@ int SelectNearestListedMoby(char *center, char *outData, int planeListIndex, int
     if (g_hero_state.state == 0x18 || g_hero_state.mode == 0x6F) {
         selected = 0;
         result = 2;
-    } else if (!func_L08_0032E920((char *)&g_hero_state + 0x80, planeListIndex, cornerBoxIndex, faceBoxIndex, edgeBoxIndex)) {
+    } else if (!func_L08_0032E920((char *)&g_hero_state + 0x80, plane_list_index, corner_box_index, face_box_index, edge_box_index)) {
         if (limit < vec_distance_xy(center + 0x10, (char *)&g_hero_state + 0x80)) {
             selected = 0;
             result = 2;
@@ -46,8 +46,8 @@ int SelectNearestListedMoby(char *center, char *outData, int planeListIndex, int
     }
     for (i = 1; i <= D_L08_001B2B30[0]; i++) {
         char *object = D_L08_001B29DC[0] + (D_L08_001B2B30[i] << 8);
-        if (object && (*(short *)(object + 0xAA) == 0xCB /* Decoy */ || *(short *)(object + 0xAA) == 0x76C /* moby class 1900 */ ||
-                       *(short *)(object + 0xAA) == 0xEB0 /* Dark Sheep */) &&
+        if (object && (*(short *)(object + 0xAA) == MOBY_CLASS_DECOY || *(short *)(object + 0xAA) == 0x76C /* moby class 1900 */ ||
+                       *(short *)(object + 0xAA) == MOBY_CLASS_DARK_SHEEP) &&
             *(unsigned char *)(object + 0x20) != 0xFE && *(unsigned char *)(object + 0x20) != 0xFD &&
             *(unsigned char *)(object + 0x20) == 3) {
             float distance = vec_distance_xy(center + 0x10, object + 0x10);
@@ -55,7 +55,7 @@ int SelectNearestListedMoby(char *center, char *outData, int planeListIndex, int
             if (minimum <= distance)
                 valid = 0;
             else if (!(distance < limit)) {
-                if (!func_L08_0032E920(object + 0x10, planeListIndex, cornerBoxIndex, faceBoxIndex, edgeBoxIndex))
+                if (!func_L08_0032E920(object + 0x10, plane_list_index, corner_box_index, face_box_index, edge_box_index))
                     valid = 0;
             }
             if (valid) {
@@ -66,24 +66,24 @@ int SelectNearestListedMoby(char *center, char *outData, int planeListIndex, int
         }
     }
     if (selected) {
-        *(char **)(outData + 0x40) = selected;
-        qcopy(outData, selected + 0x10);
-        qcopy(outData + 0x10, selected + 0xF0);
+        *(char **)(out_data + 0x40) = selected;
+        qcopy(out_data, selected + 0x10);
+        qcopy(out_data + 0x10, selected + 0xF0);
         if (selected == g_hero_state.selected) {
-            qcopy(outData + 0x20, (char *)&g_hero_state + 0xD0);
-            qcopy(outData + 0x30, (char *)&g_hero_state + 0xE0);
+            qcopy(out_data + 0x20, (char *)&g_hero_state + 0xD0);
+            qcopy(out_data + 0x30, (char *)&g_hero_state + 0xE0);
         } else {
-            qcopy(outData + 0x30, outData);
-            *(float *)(outData + 0x38) += 0.6f;
-            qcopy(outData + 0x20, outData + 0x30);
+            qcopy(out_data + 0x30, out_data);
+            *(float *)(out_data + 0x38) += 0.6f;
+            qcopy(out_data + 0x20, out_data + 0x30);
         }
     } else {
-        *(int *)(outData + 0x40) = 0;
-        qzero(outData);
-        qzero(outData + 0x10);
-        qzero(outData + 0x30);
-        qzero(outData + 0x20);
+        *(int *)(out_data + 0x40) = 0;
+        qzero(out_data);
+        qzero(out_data + 0x10);
+        qzero(out_data + 0x30);
+        qzero(out_data + 0x20);
     }
-    *(int *)(outData + 0x44) = result;
+    *(int *)(out_data + 0x44) = result;
     return result;
 }

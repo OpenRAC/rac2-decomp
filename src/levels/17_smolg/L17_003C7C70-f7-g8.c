@@ -134,8 +134,8 @@ void trigger_l17_update(Thing *moby)
     case 3:
         if (game_is_either_mode_two() == 0) {
             if (vars->link != -1) {
-                char *linkedMoby = D_L17_001B2D0C + (vars->link << 7);
-                hero_reset_position_and_direction(linkedMoby + 0x30, linkedMoby + 0x70, 0, 1);
+                char *linked_moby = D_L17_001B2D0C + (vars->link << 7);
+                hero_reset_position_and_direction(linked_moby + 0x30, linked_moby + 0x70, 0, 1);
             }
             moby_set_state(moby, 4, -1);
         }
@@ -158,8 +158,8 @@ void trigger_l17_update(Thing *moby)
         }
         if (vars->count != 0 && (vars->tail.word & 0xFFFF0000)) {
             if (vars->link != -1) {
-                char *linkedMoby = D_L17_001B2D0C + (vars->link << 7);
-                level_capture_checkpoint_state(linkedMoby + 0x30, linkedMoby + 0x70);
+                char *linked_moby = D_L17_001B2D0C + (vars->link << 7);
+                level_capture_checkpoint_state(linked_moby + 0x30, linked_moby + 0x70);
             } else
                 level_capture_checkpoint_state(moby->pos, moby->dir);
         }
@@ -182,8 +182,8 @@ void trigger_l17_update(Thing *moby)
         }
         if (vars->count > 0 && (vars->tail.word & 0xFFFF0000)) {
             if (vars->link != -1) {
-                char *linkedMoby = D_L17_001B2D0C + (vars->link << 7);
-                level_capture_checkpoint_state(linkedMoby + 0x30, linkedMoby + 0x70);
+                char *linked_moby = D_L17_001B2D0C + (vars->link << 7);
+                level_capture_checkpoint_state(linked_moby + 0x30, linked_moby + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
         }

@@ -20,10 +20,10 @@ extern int ref_002F0FA0_06 __attribute__((sda));
 void gfx_reset_record_list(void)
 {
     Record002F0FA0 *entry = ref_002F0FA0_00;
-    int startValue = ref_002F0FA0_02;
+    int start_value = ref_002F0FA0_02;
     Record002F0FA0 *end = ref_002F0FA0_01;
 
-    ref_002F0FA0_03 = startValue;
+    ref_002F0FA0_03 = start_value;
     ref_002F0FA0_04 = 0;
     ref_002F0FA0_05 = 0;
     ref_002F0FA0_06 = 0;

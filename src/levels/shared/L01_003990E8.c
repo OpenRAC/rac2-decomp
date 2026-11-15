@@ -7,10 +7,10 @@ void moby_show_with_linked_parts(char *moby)
 {
     int i;
     char **part;
-    char *mobyClass;
+    char *moby_class;
 
-    mobyClass = *(char **)(moby + 0x24);
-    *(unsigned int *)(moby + 0x98) = *(unsigned int *)(mobyClass + 0x10);
+    moby_class = *(char **)(moby + 0x24);
+    *(unsigned int *)(moby + 0x98) = *(unsigned int *)(moby_class + 0x10);
     *(unsigned short *)(moby + 0x34) &= 0xFFFE;
     part = (char **)(*(char **)(moby + 0x68) + 0x14);
     *(unsigned char *)(moby + 0x31) = 1;

@@ -63,10 +63,10 @@ extern u8 D_L10_001C7800[];
    func_0029B3E0 call, which returns an int) or restarts state 0 through func_L10_00423DC8. */
 void mission_first_update(char *object)
 {
-    char **mobyList;
+    char **moby_list;
     int result;
     char *vars = *(char **)(object + 0x68);
-    char *targetMoby;
+    char *target_moby;
     int i;
     if (!g_mission_initialized) {
         typedef int Quad __attribute__((mode(TI)));
@@ -78,10 +78,10 @@ void mission_first_update(char *object)
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
-        mobyList = level_get_object_list();
+        moby_list = level_get_object_list();
         result = level_get_saved_value();
         for (i = 0; i < result; i++) {
-            if (*(short *)(mobyList[i] + 0xAA) == 0xF85 /* moby class 3973 */) entry_spawn_list_objects_with_flag(mobyList[i], 1);
+            if (*(short *)(moby_list[i] + 0xAA) == 0xF85 /* moby class 3973 */) entry_spawn_list_objects_with_flag(moby_list[i], 1);
         }
         cloud_destroy_leftover_objects();
         cloud_spawn_objects(75,16);
@@ -90,8 +90,8 @@ void mission_first_update(char *object)
         bv.f[0] = 476.13f; bv.f[1] = 415.41f; bv.f[2] = 502.79f;
         CreateEnergyStrip(&av,&bv,1,2000000,0x7F7F7F,0xFF1010,70,70,0.5f,0.2f,0.402f,1.12225f);
     }
-    targetMoby = level_find_object_by_class_id(0xF85 /* moby class 3973 */);
-    result = targetMoby ? group_count_alive(targetMoby) : 0;
+    target_moby = level_find_object_by_class_id(0xF85 /* moby class 3973 */);
+    result = target_moby ? group_count_alive(target_moby) : 0;
     if (!result) {
         entry_init_all_registered();
         if (D_L10_001B1444) {
@@ -118,12 +118,12 @@ void mission_first_update(char *object)
 /* Mission controller for the second challenge: sets it up on the first frame, then ends the
    round when the first target group is gone or the second group is cleared. */
 void mission_second_update(u8 *moby) {
-    u8 **mobyList;
-    int mobyCount;
+    u8 **moby_list;
+    int moby_count;
     int i;
     u8 *current;
-    void *targetMoby;
-    int targetsLeft;
+    void *target_moby;
+    int targets_left;
 
     if (g_mission_initialized == 0) {
         g_mission_initialized = 1;
@@ -131,28 +131,28 @@ void mission_second_update(u8 *moby) {
         music_Unpause();
         entry_init_all_registered();
         hero_set_state_value_a(0);
-        mobyList = level_get_object_list();
-        mobyCount = level_get_saved_value();
-        for (i = 0; i < mobyCount; i++) {
-            current = mobyList[i];
+        moby_list = level_get_object_list();
+        moby_count = level_get_saved_value();
+        for (i = 0; i < moby_count; i++) {
+            current = moby_list[i];
             switch (*(short *)(current + 0xAA)) {
             case 0xCBE /* moby class 3262 */:
                 entry_spawn_list_objects_with_flag(current, 1);
                 break;
             case 0xF93 /* moby class 3987 */:
                 entry_spawn_list_objects_with_flag(current, 1);
-                func_L05_0037CEE0(mobyList[i], D_001B2614 + D_L10_00221CD0.idx * 128 + 0x30, 64.0f);
-                func_L05_0037D608(mobyList[i], D_001B2614 + D_L10_00221CD0.idx * 128 + 0x30, 64.0f);
-                hrugis_set_group_states(mobyList[i]);
+                func_L05_0037CEE0(moby_list[i], D_001B2614 + D_L10_00221CD0.idx * 128 + 0x30, 64.0f);
+                func_L05_0037D608(moby_list[i], D_001B2614 + D_L10_00221CD0.idx * 128 + 0x30, 64.0f);
+                hrugis_set_group_states(moby_list[i]);
                 break;
             }
         }
         cloud_destroy_leftover_objects();
         cloud_spawn_objects(0x2D, 12);
     }
-    targetMoby = level_find_object_by_class_id(0xF93 /* moby class 3987 */);
-    targetsLeft = targetMoby ? group_count_alive(targetMoby) : 0;
-    if (targetsLeft == 0) {
+    target_moby = level_find_object_by_class_id(0xF93 /* moby class 3987 */);
+    targets_left = target_moby ? group_count_alive(target_moby) : 0;
+    if (targets_left == 0) {
         hrugis_finish_mission_reward(moby, 1);
     }
     if (list_count_ready_objects(level_find_object_by_class_id(0xCBE /* moby class 3262 */)) == 0) {

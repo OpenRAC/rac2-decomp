@@ -119,77 +119,77 @@ extern u8 *D_L01_001B264C;
 /* Updates the Swamp Monster II. It chases and attacks the player, can grab him and throw him, and is removed when it is defeated. */
 void swamp_monster_update(u8 *moby) {
     float scratch[20] __attribute__((aligned(16)));
-    f32 distanceToHero;
-    f32 angleToArena;
-    f32 handDistance;
-    f32 waterHeight;
-    f32 animFrame;
-    f32 turnA;
-    f32 velocityLength;
-    f32 turnToHero;
-    f32 angleMinus;
-    f32 pullProgress;
-    f32 anglePlus;
-    f32 grabAnimFrame;
-    f32 unusedFloat;
-    u8 *regionRow;
-    s32 hitFlags;
-    s32 rowOffset;
-    u8 *regionTable;
-    s32 hitResult;
-    s32 heldLinkId;
-    s32 regionId;
-    s32 heldLinkId2;
-    s32 linkedMobyId2;
-    s32 linkedMobyId;
-    s32 canAttack;
-    s32 extraBlend;
-    s32 jointStep;
-    s32 handFar;
-    s32 jointBase;
-    u8 *idleSoundHandle;
-    u8 *soundHandle;
-    u8 *mobyPosition;
-    u8 *unusedPtr3;
-    u8 attackStage;
-    u8 attackStageNow;
-    u8 mobyState;
-    u8 grabAnim;
-    u8 grabFlag;
-    u8 heldState;
-    u8 unusedByte3;
-    u8 unusedByte1;
-    u8 attackStage2;
-    u8 animNow;
-    u8 animNow2;
-    u8 animNow3;
-    u8 unusedByte2;
-    u8 *unusedPtr1;
-    u8 *effectPosition;
-    u8 *heldMoby;
-    u8 *rowPointer;
-    u8 *throwVelocity;
-    u8 *heldPosition;
-    u8 *heldVelocity;
-    u8 *throwVelocityPtr;
-    u8 *heldVars;
+    f32 distance_to_hero;
+    f32 angle_to_arena;
+    f32 hand_distance;
+    f32 water_height;
+    f32 anim_frame;
+    f32 turn_a;
+    f32 velocity_length;
+    f32 turn_to_hero;
+    f32 angle_minus;
+    f32 pull_progress;
+    f32 angle_plus;
+    f32 grab_anim_frame;
+    f32 unused_float;
+    u8 *region_row;
+    s32 hit_flags;
+    s32 row_offset;
+    u8 *region_table;
+    s32 hit_result;
+    s32 held_link_id;
+    s32 region_id;
+    s32 held_link_id2;
+    s32 linked_moby_id2;
+    s32 linked_moby_id;
+    s32 can_attack;
+    s32 extra_blend;
+    s32 joint_step;
+    s32 hand_far;
+    s32 joint_base;
+    u8 *idle_sound_handle;
+    u8 *sound_handle;
+    u8 *moby_position;
+    u8 *unused_ptr3;
+    u8 attack_stage;
+    u8 attack_stage_now;
+    u8 moby_state;
+    u8 grab_anim;
+    u8 grab_flag;
+    u8 held_state;
+    u8 unused_byte3;
+    u8 unused_byte1;
+    u8 attack_stage2;
+    u8 anim_now;
+    u8 anim_now2;
+    u8 anim_now3;
+    u8 unused_byte2;
+    u8 *unused_ptr1;
+    u8 *effect_position;
+    u8 *held_moby;
+    u8 *row_pointer;
+    u8 *throw_velocity;
+    u8 *held_position;
+    u8 *held_velocity;
+    u8 *throw_velocity_ptr;
+    u8 *held_vars;
     u8 *vars;
-    u8 *targetMoby;
-    u8 *arenaRow;
-    u8 *newHeldMoby;
-    u8 *heldMobyPtr;
-    u8 *unusedPtr2;
-    u8 *linkedMoby;
+    u8 *target_moby;
+    u8 *arena_row;
+    u8 *new_held_moby;
+    u8 *held_moby_ptr;
+    u8 *unused_ptr2;
+    u8 *linked_moby;
 
     vars = ((u8 *)((UView *)(moby))->p[0x1A]);
     swamp_monster_update_hit_reaction();
-    mobyState = ((UView *)(moby))->b[0x95];
-    switch (mobyState) {                              /* switch 1 */
+    moby_state = ((UView *)(moby))->b[0x95];
+    switch (moby_state) {                              /* switch 1 */
     case 0:                                         /* switch 1 */
         if ((((UView *)(moby))->b[0xB0] != 0xFF) && (D_0019B2E8[((UView *)(moby))->b[0xB0] + (g_current_map_index * 0x10)] & 0x80)) {
-            linkedMobyId = ((UView *)(vars))->i[0xC2];
-            if (linkedMobyId != -1) {
-                D_L01_001B255C_sda[(linkedMobyId << 8) + 0xBC] = 1;
+            linked_moby_id = ((UView *)(vars))->i[0xC2];
+            if (linked_moby_id != -1) {
+                D_L01_001B255C_sda[(linked_moby_id << 8) + 0xBC] = 1;
             }
             moby_mark_spawned(moby);
             return;
@@ -207,27 +207,27 @@ void swamp_monster_update(u8 *moby) {
         }
         break;
     case 2:                                         /* switch 1 */
-        distanceToHero = swamp_monster_move_around_arena(moby);
-        if (distanceToHero == -1000.0f) {
-            idleSoundHandle = ((u8 *)((UView *)(vars))->p[0xB9]);
-            if (idleSoundHandle != NULL) {
-                cam_end_override(idleSoundHandle);
+        distance_to_hero = swamp_monster_move_around_arena(moby);
+        if (distance_to_hero == -1000.0f) {
+            idle_sound_handle = ((u8 *)((UView *)(vars))->p[0xB9]);
+            if (idle_sound_handle != NULL) {
+                cam_end_override(idle_sound_handle);
                 ((u8 *)((UView *)(vars))->p[0xB9]) = NULL;
             }
             moby_set_state(moby, 0, 1);
             moby_set_animation_and_speed(moby, 0, 0, 0xA);
         } else {
-            targetMoby = ((u8 *)((UView *)(vars))->p[0x48]);
-            turnToHero = FastDiffRots(((UView *)(moby))->f[0x3E], mat_fast_helper_a(*(f32 *)(targetMoby + 0x10) - ((UView *)(moby))->f[0x4], *(f32 *)(targetMoby + 0x14) - ((UView *)(moby))->f[0x5]));
+            target_moby = ((u8 *)((UView *)(vars))->p[0x48]);
+            turn_to_hero = FastDiffRots(((UView *)(moby))->f[0x3E], mat_fast_helper_a(*(f32 *)(target_moby + 0x10) - ((UView *)(moby))->f[0x4], *(f32 *)(target_moby + 0x14) - ((UView *)(moby))->f[0x5]));
             switch (((UView *)(moby))->b[0xBC]) {                    /* switch 2 */
             case 0:                                 /* switch 2 */
-                if ((distanceToHero <= D_L01_001AFE5C) && (turnToHero < (D_L01_001AFEAC * 0.017453294f)) && (((UView *)(vars))->h[0x16E] == 0)) {
-                    canAttack = 1;
+                if ((distance_to_hero <= D_L01_001AFE5C) && (turn_to_hero < (D_L01_001AFEAC * 0.017453294f)) && (((UView *)(vars))->h[0x16E] == 0)) {
+                    can_attack = 1;
                     swamp_monster_start_claw_attack(moby);
                 } else {
-                    canAttack = D_L01_001AFECC < (s32) ((UView *)(moby))->uh[0x4B];
+                    can_attack = D_L01_001AFECC < (s32) ((UView *)(moby))->uh[0x4B];
                 }
-                if (canAttack != 0) {
+                if (can_attack != 0) {
                     moby_set_controller_speed_limits(moby, D_L01_001AFE74 * 0.00027777778f, D_L01_001AFE84 * 0.016666668f, D_L01_001AFE78 * 0.0000048481375f, D_L01_001AFE7C * 0.00029088825f);
                     ((UView *)(vars))->f[0xBB] = (f32) D_L01_001AFE5C;
                     ((UView *)(moby))->b[0xBC] = 1U;
@@ -248,11 +248,11 @@ void swamp_monster_update(u8 *moby) {
                 break;
             case 1:                                 /* switch 2 */
             case 2:                                 /* switch 2 */
-                attackStage2 = ((UView *)(moby))->b[0xBC];
-                extraBlend = 0;
-                switch (attackStage2) {                /* switch 3; irregular */
+                attack_stage2 = ((UView *)(moby))->b[0xBC];
+                extra_blend = 0;
+                switch (attack_stage2) {                /* switch 3; irregular */
                 case 1:                             /* switch 3 */
-                    if ((distanceToHero <= D_L01_001AFE5C) && (turnToHero < (D_L01_001AFEAC * 0.017453294f))) {
+                    if ((distance_to_hero <= D_L01_001AFE5C) && (turn_to_hero < (D_L01_001AFEAC * 0.017453294f))) {
                         if ((math_random_int_below(D_L01_001AFEC0 - 1) == 0) && (((UView *)(vars))->h[0x16E] == 0)) {
                             swamp_monster_start_claw_attack(moby);
                         } else {
@@ -260,7 +260,7 @@ void swamp_monster_update(u8 *moby) {
                         }
                     } else {
 block_36:
-                        if ((D_L01_001AFE5C < distanceToHero) && (distanceToHero <= D_L01_001AFE60) && (turnToHero < (D_L01_001AFEB0 * 0.017453294f))) {
+                        if ((D_L01_001AFE5C < distance_to_hero) && (distance_to_hero <= D_L01_001AFE60) && (turn_to_hero < (D_L01_001AFEB0 * 0.017453294f))) {
                             if ((math_random_int_below(D_L01_001AFEC4 - 1) == 0) && (((UView *)(vars))->h[0x16D] == 0)) {
                                 swamp_monster_start_attack_c(moby);
                             } else {
@@ -268,7 +268,7 @@ block_36:
                             }
                         } else {
 block_43:
-                            if (D_L01_001AFE68 < distanceToHero) {
+                            if (D_L01_001AFE68 < distance_to_hero) {
                                 ((UView *)(vars))->b[0x2E1] = 4U;
                                 ((UView *)(vars))->c[0x2E2] = 0x16;
                                 ((UView *)(vars))->c[0x2E0] = 0;
@@ -284,9 +284,9 @@ block_43:
                     }
                     break;
                 case 2:                             /* switch 3 */
-                    extraBlend = 0x3C;
+                    extra_blend = 0x3C;
                     ((UView *)(moby))->i[0x26] = 0;
-                    if ((distanceToHero <= D_L01_001AFE5C) && ((animNow = ((UView *)(moby))->b[0x42], (animNow == 0x16)) || (animNow == 0))) {
+                    if ((distance_to_hero <= D_L01_001AFE5C) && ((anim_now = ((UView *)(moby))->b[0x42], (anim_now == 0x16)) || (anim_now == 0))) {
                         ((UView *)(vars))->c[0x2E0] = 1;
                         ((UView *)(vars))->b[0x2E1] = 1U;
                         ((UView *)(vars))->c[0x2E2] = 0;
@@ -310,7 +310,7 @@ block_43:
                     moby_set_controller_speed_limits(moby, D_L01_001AFE74 * 0.00027777778f, D_L01_001AFE88 * 0.016666668f, D_L01_001AFE78 * 0.0000048481375f, D_L01_001AFE7C * 0.00029088825f);
                     ((UView *)(vars))->f[0xBB] = (f32) D_L01_001AFE54;
                     ((UView *)(moby))->b[0xBC] = 3U;
-                    moby_set_animation_and_speed(moby, 0x10, 0, extraBlend + 0xD);
+                    moby_set_animation_and_speed(moby, 0x10, 0, extra_blend + 0xD);
                     moby_set_state(moby, 0, 5);
                 }
                 break;
@@ -318,10 +318,10 @@ block_43:
             case 4:                                 /* switch 2 */
             case 5:                                 /* switch 2 */
             case 6:                                 /* switch 2 */
-                attackStage = ((UView *)(moby))->b[0xBC];
-                switch (attackStage) {                  /* switch 4; irregular */
+                attack_stage = ((UView *)(moby))->b[0xBC];
+                switch (attack_stage) {                  /* switch 4; irregular */
                 case 3:                             /* switch 4 */
-                    if ((distanceToHero <= D_L01_001AFE54) && (turnToHero < (D_L01_001AFEB4 * 0.017453294f)) && (((UView *)(vars))->h[0x16F] == 0)) {
+                    if ((distance_to_hero <= D_L01_001AFE54) && (turn_to_hero < (D_L01_001AFEB4 * 0.017453294f)) && (((UView *)(vars))->h[0x16F] == 0)) {
                         moby_set_controller_speed_limits(moby, D_L01_001AFE74 * 0.00027777778f, D_L01_001AFE8C * 0.016666668f, D_L01_001AFE78 * 0.0000048481375f, D_L01_001AFE7C * 0.00029088825f);
                         ((UView *)(vars))->f[0xBB] = (f32) D_L01_001AFE58;
                         ((UView *)(moby))->b[0xBC] = 4U;
@@ -335,13 +335,13 @@ block_43:
                     }
                     break;
                 case 4:                             /* switch 4 */
-                    if ((D_L01_001AFE5C < distanceToHero) && (distanceToHero <= D_L01_001AFE58) && (turnToHero < (D_L01_001AFEB8 * 0.017453294f)) && (((UView *)(vars))->h[0x16E] == 0)) {
+                    if ((D_L01_001AFE5C < distance_to_hero) && (distance_to_hero <= D_L01_001AFE58) && (turn_to_hero < (D_L01_001AFEB8 * 0.017453294f)) && (((UView *)(vars))->h[0x16E] == 0)) {
                         if (vec_fast_helper_a(vars + 0x2E3) != 0) {
                             moby_set_controller_speed_limits(moby, D_L01_001AFE74 * 0.00027777778f, D_L01_001AFEA0 * 0.016666668f, D_L01_001AFE78 * 0.0000048481375f, D_L01_001AFE7C * 0.00029088825f);
                             ((UView *)(moby))->b[0xBC] = 5U;
                             ((UView *)(vars))->c[0x2E0] = 0;
                             ((UView *)(vars))->f[0xBB] = (f32) D_L01_001AFE5C;
-                            ((UView *)(vars))->b[0x2E1] = attackStage;
+                            ((UView *)(vars))->b[0x2E1] = attack_stage;
                             ((UView *)(vars))->c[0x2E2] = 0x16;
                             ((UView *)(vars))->c[0x71] = 0xF;
                             ((UView *)(vars))->c[0x72] = 0xF;
@@ -353,10 +353,10 @@ block_43:
                     break;
                 case 5:                             /* switch 4 */
                     ((UView *)(moby))->i[0x26] = 0;
-                    if (distanceToHero <= D_L01_001AFE5C) {
-                        animNow2 = ((UView *)(moby))->b[0x42];
-                        if (animNow2 != 0x16) {
-                            if (animNow2 == 0) {
+                    if (distance_to_hero <= D_L01_001AFE5C) {
+                        anim_now2 = ((UView *)(moby))->b[0x42];
+                        if (anim_now2 != 0x16) {
+                            if (anim_now2 == 0) {
                                 goto block_72;
                             }
                         } else {
@@ -377,8 +377,8 @@ block_72:
                     break;
                 case 6:                             /* switch 4 */
                     ((UView *)(moby))->i[0x26] = (s32) *(s32 *)(((u8 *)((UView *)(moby))->p[0x9]) + 0x10);
-                    if ((distanceToHero <= D_L01_001AFE58) && (turnToHero < (D_L01_001AFEAC * 0.017453294f)) && (math_random_int_below(D_L01_001AFEC0 - 1) == 0) && (((UView *)(vars))->h[0x16E] == 0)) {
-                        if ((D_L01_001AFE5C < distanceToHero) && (func_001163B0() & 1)) {
+                    if ((distance_to_hero <= D_L01_001AFE58) && (turn_to_hero < (D_L01_001AFEAC * 0.017453294f)) && (math_random_int_below(D_L01_001AFEC0 - 1) == 0) && (((UView *)(vars))->h[0x16E] == 0)) {
+                        if ((D_L01_001AFE5C < distance_to_hero) && (func_001163B0() & 1)) {
                             swamp_monster_start_attack_b(moby);
                         } else {
                             swamp_monster_start_claw_attack(moby);
@@ -386,8 +386,8 @@ block_72:
                     }
                     break;
                 }
-                attackStageNow = ((UView *)(moby))->b[0xBC];
-                if ((attackStageNow != 5) && (attackStageNow < 7U) && (D_L01_001AFE68 < distanceToHero)) {
+                attack_stage_now = ((UView *)(moby))->b[0xBC];
+                if ((attack_stage_now != 5) && (attack_stage_now < 7U) && (D_L01_001AFE68 < distance_to_hero)) {
                     moby_set_controller_speed_limits(moby, D_L01_001AFE9C * 0.00027777778f, D_L01_001AFEA0 * 0.016666668f, D_L01_001AFEA4 * 0.0000048481375f, D_L01_001AFEA8 * 0.00029088825f);
                     ((UView *)(moby))->b[0xBC] = 5U;
                     ((UView *)(vars))->c[0x2E0] = 0;
@@ -411,7 +411,7 @@ block_72:
                 }
                 break;
             case 7:                                 /* switch 2 */
-                if ((distanceToHero <= D_L01_001AFE54) && (turnToHero < (D_L01_001AFEB4 * 0.017453294f)) && (((UView *)(vars))->h[0x16F] == 0)) {
+                if ((distance_to_hero <= D_L01_001AFE54) && (turn_to_hero < (D_L01_001AFEB4 * 0.017453294f)) && (((UView *)(vars))->h[0x16F] == 0)) {
                     ((UView *)(vars))->f[0xBB] = (f32) D_L01_001AFE5C;
                     ((UView *)(moby))->b[0xBC] = 9U;
                     ((UView *)(vars))->c[0x2E0] = 1;
@@ -425,10 +425,10 @@ block_72:
                 break;
             case 8:                                 /* switch 2 */
                 ((UView *)(moby))->i[0x26] = 0;
-                if (distanceToHero <= D_L01_001AFE5C) {
-                    animNow3 = ((UView *)(moby))->b[0x42];
-                    if (animNow3 != 0x16) {
-                        if (animNow3 == 0) {
+                if (distance_to_hero <= D_L01_001AFE5C) {
+                    anim_now3 = ((UView *)(moby))->b[0x42];
+                    if (anim_now3 != 0x16) {
+                        if (anim_now3 == 0) {
                             goto block_95;
                         }
                     } else {
@@ -449,7 +449,7 @@ block_95:
                 break;
             case 9:                                 /* switch 2 */
                 ((UView *)(moby))->i[0x26] = (s32) *(s32 *)(((u8 *)((UView *)(moby))->p[0x9]) + 0x10);
-                if ((distanceToHero <= D_L01_001AFE5C) && (turnToHero < (D_L01_001AFEAC * 0.017453294f))) {
+                if ((distance_to_hero <= D_L01_001AFE5C) && (turn_to_hero < (D_L01_001AFEAC * 0.017453294f))) {
                     if ((math_random_int_below(D_L01_001AFEC0 - 1) == 0) && (((UView *)(vars))->h[0x16E] == 0)) {
                         if (func_001163B0() & 1) {
                             swamp_monster_start_claw_attack(moby);
@@ -461,7 +461,7 @@ block_95:
                     }
                 } else {
 block_105:
-                    if ((D_L01_001AFE5C < distanceToHero) && (distanceToHero <= D_L01_001AFE60) && (turnToHero < (D_L01_001AFEB0 * 0.017453294f))) {
+                    if ((D_L01_001AFE5C < distance_to_hero) && (distance_to_hero <= D_L01_001AFE60) && (turn_to_hero < (D_L01_001AFEB0 * 0.017453294f))) {
                         if ((math_random_int_below(D_L01_001AFEC4 - 1) == 0) && (((UView *)(vars))->h[0x16D] == 0)) {
                             swamp_monster_start_attack_c(moby);
                         } else {
@@ -469,7 +469,7 @@ block_105:
                         }
                     } else {
 block_112:
-                        if (D_L01_001AFE68 < distanceToHero) {
+                        if (D_L01_001AFE68 < distance_to_hero) {
                             ((UView *)(vars))->b[0x2E1] = 4U;
                             ((UView *)(vars))->c[0x2E2] = 0x16;
                             ((UView *)(vars))->c[0x2E0] = 0;
@@ -492,24 +492,24 @@ block_112:
         }
         break;
     case 3:                                         /* switch 1 */
-        animFrame = moby_get_anim_value(moby);
+        anim_frame = moby_get_anim_value(moby);
         switch (((UView *)(moby))->b[0x20]) {                        /* switch 5; irregular */
         case 1:                                     /* switch 5 */
             moby_start_effect_from_entry(moby, mat_fast_helper_a(((HeroV *)g_hero_state)->x - ((UView *)(moby))->f[0x4], ((HeroV *)g_hero_state)->y - ((UView *)(moby))->f[0x5]));
-            if ((animFrame > 44.0f) && (animFrame < 68.0f)) {
-                grabAnim = ((UView *)(moby))->b[0x42];
-                jointBase = -1;
-                if (grabAnim == 6) {
-                    jointBase = 0;
-                } else if (grabAnim == 7) {
-                    jointBase = 4;
+            if ((anim_frame > 44.0f) && (anim_frame < 68.0f)) {
+                grab_anim = ((UView *)(moby))->b[0x42];
+                joint_base = -1;
+                if (grab_anim == 6) {
+                    joint_base = 0;
+                } else if (grab_anim == 7) {
+                    joint_base = 4;
                 }
-                if (jointBase >= 0) {
-                    moby_transform_joint_to_world(moby, jointBase, (scratch + 4));
-                    for (jointStep = 1; jointStep < 3; jointStep++) {
+                if (joint_base >= 0) {
+                    moby_transform_joint_to_world(moby, joint_base, (scratch + 4));
+                    for (joint_step = 1; joint_step < 3; joint_step++) {
                         part_init_effect_record((scratch + 8), (s32) moby, 1, (f32) ((UView *)(vars))->b[0x34]);
                         qcopy(scratch, scratch + 4);
-                        moby_transform_joint_to_world(moby, jointBase + jointStep, scratch + 4);
+                        moby_transform_joint_to_world(moby, joint_base + joint_step, scratch + 4);
                         coll_process_hit(0.5f, (s32) (scratch + 4), 0, (s32) moby, (s32) (scratch + 8));
                         scratch[4] += math_random_float_range(-0.3f, 0.3f);
                         scratch[5] += math_random_float_range(-0.3f, 0.3f);
@@ -530,16 +530,16 @@ block_112:
             }
             break;
         case 3:                                     /* switch 5 */
-            if ((animFrame > 34.0f) && (animFrame < 41.0f)) {
-                hitFlags = (func_001163B0() & 1) | 8;
-                coll_test_hit_at_bone(moby, 2.2f, (f32) ((UView *)(vars))->b[0x34], hitFlags, 1, 1.0f, 0, 1, 0);
+            if ((anim_frame > 34.0f) && (anim_frame < 41.0f)) {
+                hit_flags = (func_001163B0() & 1) | 8;
+                coll_test_hit_at_bone(moby, 2.2f, (f32) ((UView *)(vars))->b[0x34], hit_flags, 1, 1.0f, 0, 1, 0);
             }
             break;
         case 4:                                     /* switch 5 */
             moby_start_effect_from_entry(moby, mat_fast_helper_a(((HeroV *)g_hero_state)->x - ((UView *)(moby))->f[0x4], ((HeroV *)g_hero_state)->y - ((UView *)(moby))->f[0x5]));
             if (((UView *)(vars))->b[0x2F4] == 0) {
-                if (animFrame > 12.0f) {
-                    if (animFrame <= 17.0f) {
+                if (anim_frame > 12.0f) {
+                    if (anim_frame <= 17.0f) {
                         moby_transform_joint_to_world(moby, 0xC, scratch);
                         scratch[2] -= 2.4f;
                         if ((fast_vec_dist(scratch, &((HeroV *)g_hero_state)->x) < D_L01_001AFE6C) && (*(s32 *)(g_hero_state + 0x2294) != 0x6F)) {
@@ -550,13 +550,13 @@ block_112:
                     }
                 } else {
 block_149:
-                    if ((animFrame > 17.0f) && (animFrame < 19.0f)) {
+                    if ((anim_frame > 17.0f) && (anim_frame < 19.0f)) {
                         ((UView *)(moby))->i[0x26] = (s32) *(s32 *)(((u8 *)((UView *)(moby))->p[0x9]) + 0x10);
-                        hitFlags = (func_001163B0() & 1) | 0xC;
-                        coll_test_hit_at_bone(moby, 2.0f, (f32) ((UView *)(vars))->b[0x35], hitFlags, 1, 1.0f, 0, 1, 0);
+                        hit_flags = (func_001163B0() & 1) | 0xC;
+                        coll_test_hit_at_bone(moby, 2.0f, (f32) ((UView *)(vars))->b[0x35], hit_flags, 1, 1.0f, 0, 1, 0);
                     }
                 }
-            } else if (animFrame > 19.0f) {
+            } else if (anim_frame > 19.0f) {
                 ((HeroV *)g_hero_state)->a22b5 = 1;
             }
             break;
@@ -583,22 +583,22 @@ block_149:
         }
         break;
     case 4:                                         /* switch 1 */
-        grabAnimFrame = moby_get_anim_value(moby);
-        arenaRow = (u8 *)((((UView *)(vars))->i[0xB3] << 7) + (s32)D_L01_001B264C);
-        angleToArena = mat_fast_helper_a(*(f32 *)(arenaRow + 0x30) - ((UView *)(moby))->f[0x4], *(f32 *)(arenaRow + 0x34) - ((UView *)(moby))->f[0x5]);
-        anglePlus = FastAddRotations(angleToArena, 1.5707965f);
-        angleMinus = fast_subtract_rotations(angleToArena, 1.5707965f);
-        turnA = FastDiffRots(((UView *)(moby))->f[0x3E], anglePlus);
-        moby_start_effect_from_entry(moby, turnA < FastDiffRots(((UView *)(moby))->f[0x3E], angleMinus) ? anglePlus : angleMinus);
+        grab_anim_frame = moby_get_anim_value(moby);
+        arena_row = (u8 *)((((UView *)(vars))->i[0xB3] << 7) + (s32)D_L01_001B264C);
+        angle_to_arena = mat_fast_helper_a(*(f32 *)(arena_row + 0x30) - ((UView *)(moby))->f[0x4], *(f32 *)(arena_row + 0x34) - ((UView *)(moby))->f[0x5]);
+        angle_plus = FastAddRotations(angle_to_arena, 1.5707965f);
+        angle_minus = fast_subtract_rotations(angle_to_arena, 1.5707965f);
+        turn_a = FastDiffRots(((UView *)(moby))->f[0x3E], angle_plus);
+        moby_start_effect_from_entry(moby, turn_a < FastDiffRots(((UView *)(moby))->f[0x3E], angle_minus) ? angle_plus : angle_minus);
         if (((UView *)(moby))->b[0x42] == 0xB) {
-            handFar = 1;
+            hand_far = 1;
             moby_transform_joint_to_world(moby, 0xE, scratch);
-            handDistance = fast_vec_dist(scratch, &((Hero *)g_hero_state)->b[0x80]);
-            if (!(handDistance > 13.0f)) {
-                handFar = 0;
+            hand_distance = fast_vec_dist(scratch, &((Hero *)g_hero_state)->b[0x80]);
+            if (!(hand_distance > 13.0f)) {
+                hand_far = 0;
             }
             if (((UView *)(vars))->b[0x2F4] != 0) {
-                if (grabAnimFrame > 33.0f) {
+                if (grab_anim_frame > 33.0f) {
                     SetHeroMoveState(0x16, 1);
                     ((Hero *)g_hero_state)->i[0x2294 / 4] = 0x6F;
                     ((Hero *)g_hero_state)->i[0x24A0 / 4] = 0;
@@ -610,16 +610,16 @@ block_149:
                     swamp_monster_hold_hero(moby);
                 }
             }
-            if ((((UView *)(vars))->b[0x2F4] == 0) && (handFar == 0)) {
+            if ((((UView *)(vars))->b[0x2F4] == 0) && (hand_far == 0)) {
                 vec_scale_to_length((scratch + 4), moby + 0xC0, D_L01_001AFEEC);
                 vec_scale_to_length((scratch + 8), (scratch + 4), D_L01_001AFEF0 * 0.016666668f);
-                velocityLength = vec_length_xy((scratch + 8));
-                scratch[10] = velocityLength * (math_square(1.0f - (handDistance * 0.006666667f)) * 0.7f);
+                velocity_length = vec_length_xy((scratch + 8));
+                scratch[10] = velocity_length * (math_square(1.0f - (hand_distance * 0.006666667f)) * 0.7f);
                 qcopy(&((Hero *)g_hero_state)->b[0xF0], scratch + 8);
                 qcopy(&((Hero *)g_hero_state)->b[0x110], scratch + 8);
                 FastVecAdd(&((Hero *)g_hero_state)->b[0x80], &((Hero *)g_hero_state)->b[0x80], (scratch + 8));
             }
-            if (handFar != 0) {
+            if (hand_far != 0) {
                 ((UView *)(moby))->i[0x27] = (s32) (((UView *)(moby))->i[0x27] & ~0x30);
                 *(s32 *)(moby + 0x98) = (s32) *(s32 *)(((u8 *)((UView *)(moby))->p[0x9]) + 0x10);
                 if (D_0018C0B4 == 0x6F) {
@@ -637,9 +637,9 @@ block_149:
             }
         } else {
             if (((UView *)(moby))->b[0x95] == 4) {
-                grabFlag = ((UView *)(vars))->b[0x2F4];
-                if (grabFlag == 1) {
-                    D_0018C0D5 = grabFlag;
+                grab_flag = ((UView *)(vars))->b[0x2F4];
+                if (grab_flag == 1) {
+                    D_0018C0D5 = grab_flag;
                 }
             }
         }
@@ -652,10 +652,10 @@ block_149:
         }
         break;
     case 6:                                         /* switch 1 */
-        hitResult = moby_dispatch_action_by_kind(moby, vars + 0x60);
-        if (hitResult & 1) {
+        hit_result = moby_dispatch_action_by_kind(moby, vars + 0x60);
+        if (hit_result & 1) {
             moby_set_state(moby, 0, 7);
-        } else if (hitResult & 2) {
+        } else if (hit_result & 2) {
             moby_set_animation_and_speed(moby, (s32) ((UView *)(vars))->b[0x2E1], 0, 0xC);
             moby_set_state(moby, 0, 2);
         }
@@ -663,67 +663,67 @@ block_149:
     case 7:                                         /* switch 1 */
         ((UView *)(moby))->i[0x12] = 0;
         ((UView *)(moby))->uh[0x1A] = (u16) (((UView *)(moby))->uh[0x1A] | 0x41);
-        soundHandle = ((u8 *)((UView *)(vars))->p[0xB9]);
-        if (soundHandle != NULL) {
-            cam_end_override(soundHandle);
+        sound_handle = ((u8 *)((UView *)(vars))->p[0xB9]);
+        if (sound_handle != NULL) {
+            cam_end_override(sound_handle);
             ((u8 *)((UView *)(vars))->p[0xB9]) = NULL;
         }
-        mobyPosition = moby + 0x10;
-        newHeldMoby = SpawnGoldBolt(mobyPosition, 1, -1, -1);
-        ((u8 *)((UView *)(vars))->p[0xC0]) = newHeldMoby;
-        if (newHeldMoby != NULL) {
+        moby_position = moby + 0x10;
+        new_held_moby = SpawnGoldBolt(moby_position, 1, -1, -1);
+        ((u8 *)((UView *)(vars))->p[0xC0]) = new_held_moby;
+        if (new_held_moby != NULL) {
             SetHeroMoveState(0x6F, 1);
-            throwVelocity = vars + 0x2A0;
-            heldMobyPtr = ((u8 *)((UView *)(vars))->p[0xC0]);
-            *(f32 *)(heldMobyPtr + 0x18) = (f32) (*(f32 *)(heldMobyPtr + 0x18) - 0.5f);
-            FastVecSub(throwVelocity, mobyPosition, g_hero_position);
+            throw_velocity = vars + 0x2A0;
+            held_moby_ptr = ((u8 *)((UView *)(vars))->p[0xC0]);
+            *(f32 *)(held_moby_ptr + 0x18) = (f32) (*(f32 *)(held_moby_ptr + 0x18) - 0.5f);
+            FastVecSub(throw_velocity, moby_position, g_hero_position);
             ((UView *)(vars))->f[0xAA] = (f32) (((UView *)(vars))->f[0xAA] + 1.0f);
-            FastVecScale(throwVelocity, throwVelocity, 0.85f);
+            FastVecScale(throw_velocity, throw_velocity, 0.85f);
             ((UView *)(vars))->f[0xAB] = 1.0f;
             moby_set_state(moby, 0, 8);
         }
         break;
     case 8:                                         /* switch 1 */
-        heldLinkId = ((UView *)(vars))->i[0xBE];
-        pullProgress = ((UView *)(vars))->f[0xAB] - 0.00625f;
-        ((UView *)(vars))->f[0xAB] = pullProgress;
-        if (heldLinkId != -1) {
-            regionId = (*(s32 *)((u8 *)((*(u8 **)((u8 *)((heldLinkId << 8) + (s32)g_moby_l01_table) + 0x68))) + 0x28));
-            regionTable = D_L01_001B264C_sda;
-            if (regionId != -1) {
-                rowOffset = regionId << 7;
-                qcopy(g_hero_position, (u8 *)(rowOffset + (s32)regionTable) + 0x30);
-                rowPointer = (u8 *)(rowOffset + (s32)regionTable);
-                qcopy(g_hero_position + 0x10, (u8 *)rowPointer + 0x70);
+        held_link_id = ((UView *)(vars))->i[0xBE];
+        pull_progress = ((UView *)(vars))->f[0xAB] - 0.00625f;
+        ((UView *)(vars))->f[0xAB] = pull_progress;
+        if (held_link_id != -1) {
+            region_id = (*(s32 *)((u8 *)((*(u8 **)((u8 *)((held_link_id << 8) + (s32)g_moby_l01_table) + 0x68))) + 0x28));
+            region_table = D_L01_001B264C_sda;
+            if (region_id != -1) {
+                row_offset = region_id << 7;
+                qcopy(g_hero_position, (u8 *)(row_offset + (s32)region_table) + 0x30);
+                row_pointer = (u8 *)(row_offset + (s32)region_table);
+                qcopy(g_hero_position + 0x10, (u8 *)row_pointer + 0x70);
             }
         }
         if ((u8) *(u8 *)(((u8 *)((UView *)(vars))->p[0xC0]) + 0x20) < 2U) {
-            heldLinkId2 = ((UView *)(vars))->i[0xBE];
-            if (heldLinkId2 != -1) {
-                linkedMoby = (u8 *)((heldLinkId2 << 8) + (s32)D_L01_001B255C_sda);
-                if (*(u8 *)(linkedMoby + 0xBC) != 0) {
-                    *(u8 *)(linkedMoby + 0xBC) = 0U;
+            held_link_id2 = ((UView *)(vars))->i[0xBE];
+            if (held_link_id2 != -1) {
+                linked_moby = (u8 *)((held_link_id2 << 8) + (s32)D_L01_001B255C_sda);
+                if (*(u8 *)(linked_moby + 0xBC) != 0) {
+                    *(u8 *)(linked_moby + 0xBC) = 0U;
                     UpdateCameraPoseTrigger(g_moby_l01_table + (((UView *)(vars))->i[0xBE] << 8));
                 }
             }
-            throwVelocityPtr = vars + 0x2A0;
-            heldPosition = ((u8 *)((UView *)(vars))->p[0xC0]) + 0x10;
-            vec_scale_to_length(heldPosition, throwVelocityPtr, pullProgress * FastVecLength(throwVelocityPtr));
+            throw_velocity_ptr = vars + 0x2A0;
+            held_position = ((u8 *)((UView *)(vars))->p[0xC0]) + 0x10;
+            vec_scale_to_length(held_position, throw_velocity_ptr, pull_progress * FastVecLength(throw_velocity_ptr));
 
-            *(f32 *)((((u8 *)((UView *)(vars))->p[0xC0])) + 0x18) = (f32) (*(f32 *)((((u8 *)((UView *)(vars))->p[0xC0])) + 0x18) + (math_fast_sin_or_cos_b(pullProgress * 3.1415927f) * 4.0f));
-            effectPosition = ((u8 *)((UView *)(vars))->p[0xC0]) + 0x10;
-            FastVecAdd(effectPosition, effectPosition, g_hero_position);
-            heldVars = *(u8 **)(((u8 *)((UView *)(vars))->p[0xC0]) + 0x68);
-            heldVelocity = heldVars + 0x10;
-            FastVecSub(heldVelocity, moby + 0x10, g_hero_position);
-            vec_scale_to_length(heldVelocity, heldVelocity, 2.5f);
-            *(f32 *)(heldVars + 0x1C) = FastAddRotations(mat_fast_helper_a(*(f32 *)(heldVars + 0x10), *(f32 *)(heldVars + 0x14)), 3.1415927f);
-            FastVecAdd(heldVelocity, heldVelocity, g_hero_position);
+            *(f32 *)((((u8 *)((UView *)(vars))->p[0xC0])) + 0x18) = (f32) (*(f32 *)((((u8 *)((UView *)(vars))->p[0xC0])) + 0x18) + (math_fast_sin_or_cos_b(pull_progress * 3.1415927f) * 4.0f));
+            effect_position = ((u8 *)((UView *)(vars))->p[0xC0]) + 0x10;
+            FastVecAdd(effect_position, effect_position, g_hero_position);
+            held_vars = *(u8 **)(((u8 *)((UView *)(vars))->p[0xC0]) + 0x68);
+            held_velocity = held_vars + 0x10;
+            FastVecSub(held_velocity, moby + 0x10, g_hero_position);
+            vec_scale_to_length(held_velocity, held_velocity, 2.5f);
+            *(f32 *)(held_vars + 0x1C) = FastAddRotations(mat_fast_helper_a(*(f32 *)(held_vars + 0x10), *(f32 *)(held_vars + 0x14)), 3.1415927f);
+            FastVecAdd(held_velocity, held_velocity, g_hero_position);
             func_002A0F48(((u8 *)((UView *)(vars))->p[0xC0]));
-            ((UView *)(vars))->f[0xAB] = pullProgress;
+            ((UView *)(vars))->f[0xAB] = pull_progress;
         }
-        heldMoby = ((u8 *)((UView *)(vars))->p[0xC0]);
-        if ((heldMoby == NULL) || (*(s16 *)(heldMoby + 0xAA) != 0x1250 /* moby class 4688 */) || (heldState = *(u8 *)(heldMoby + 0x20), (heldState == 0xFE)) || (heldState == 0xFD)) {
+        held_moby = ((u8 *)((UView *)(vars))->p[0xC0]);
+        if ((held_moby == NULL) || (*(s16 *)(held_moby + 0xAA) != 0x1250 /* moby class 4688 */) || (held_state = *(u8 *)(held_moby + 0x20), (held_state == 0xFE)) || (held_state == 0xFD)) {
             SetDeathBits(moby, 0, 3);
 
             if ((((UView *)(moby))->b[0xB0]) != 0xFF) {
@@ -732,13 +732,13 @@ block_149:
             if (((UView *)(vars))->i[0xC1] != -1) {
                 FadeToBlack(0x10);
                 load_scene_chunk(0, 0);
-                regionRow = D_L01_001B264C + (((UView *)(vars))->i[0xC1] << 7);
-                hero_reset_position_and_direction(regionRow + 0x30, regionRow + 0x70, 0, 1);
+                region_row = D_L01_001B264C + (((UView *)(vars))->i[0xC1] << 7);
+                hero_reset_position_and_direction(region_row + 0x30, region_row + 0x70, 0, 1);
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
             }
-            linkedMobyId2 = ((UView *)(vars))->i[0xC2];
-            if (linkedMobyId2 != -1) {
-                (*(s8 *)((u8 *)((linkedMobyId2 << 8) + (s32)D_L01_001B255C_sda) + 0xBC)) = 1;
+            linked_moby_id2 = ((UView *)(vars))->i[0xC2];
+            if (linked_moby_id2 != -1) {
+                (*(s8 *)((u8 *)((linked_moby_id2 << 8) + (s32)D_L01_001B255C_sda) + 0xBC)) = 1;
             }
             script_queue_keyed_request(((UView *)(vars))->i[0xC5], ((UView *)(vars))->i[0xC7]);
             moby_mark_spawned(moby);
@@ -746,8 +746,8 @@ block_149:
         }
         break;
     }
-        waterHeight = level_get_water_height();
-        if ((((UView *)(moby))->b[0x95] != 0) && (((HeroV *)g_hero_state)->z < (waterHeight - 1.8f)) && (((HeroV *)g_hero_state)->z < (((UView *)(moby))->f[0x6] - 1.0f)) && (vec_distance_xy(moby + 0x10, &((HeroV *)g_hero_state)->x) < 10.0f)) {
+        water_height = level_get_water_height();
+        if ((((UView *)(moby))->b[0x95] != 0) && (((HeroV *)g_hero_state)->z < (water_height - 1.8f)) && (((HeroV *)g_hero_state)->z < (((UView *)(moby))->f[0x6] - 1.0f)) && (vec_distance_xy(moby + 0x10, &((HeroV *)g_hero_state)->x) < 10.0f)) {
             hero_record_play_counters();
         }
         swamp_monster_update_timers(moby);

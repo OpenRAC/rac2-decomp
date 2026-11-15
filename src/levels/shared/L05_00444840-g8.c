@@ -32,7 +32,7 @@ u8 *ship_find_lock_target(void *position, u8 **excluded, u8 *current)
     int i, kind, range;
     float dx, dy, distance;
     u8 **cursor, *object, *parameters;
-    int levelId;
+    int level_id;
     int n, j;
 
     gfx_convert_float_pair_bias_coords(position, &source_x, &source_y, 0);
@@ -73,7 +73,7 @@ scan1_done:
         distance = D_L05_001B1B18_gp;
         do {
             j = 0;
-            levelId = g_current_map_index[0];
+            level_id = g_current_map_index[0];
 scan2:
             if (D_L05_002B87F0[j].object_class == -1)
                 goto scan2_done;
@@ -85,7 +85,7 @@ scan2:
             goto scan2;
         } while (0);
 scan2_done:
-        if (levelId != 20 && distance < fast_vec_dist(D_L05_001B96C0, object + 0x10))
+        if (level_id != 20 && distance < fast_vec_dist(D_L05_001B96C0, object + 0x10))
             goto next;
         if (current && current == object && D_L05_001B2048[0] % 3 != 0)
             return object;

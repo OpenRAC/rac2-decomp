@@ -98,7 +98,7 @@ void projectile_l22_update_bouncing(unsigned char *moby) {
         Vec position, spread;
     } work;
     char *vars = *(char **)(moby + 0x68), *position = (char *)moby + 0x10;
-    int sparkCount, sparkLife;
+    int spark_count, spark_life;
     float angle, speed;
 
     work.velocity.q = 0;
@@ -142,17 +142,17 @@ void projectile_l22_update_bouncing(unsigned char *moby) {
             if (splash)
                 splash[0x23] = 0x70;
             spread = &work.spread;
-            sparkCount = 15;
+            spark_count = 15;
             do {
-                --sparkCount;
+                --spark_count;
                 angle = math_random_angle();
                 speed = math_random_float_range(0.0f, 0.050000004f);
                 work.spread.f[0] = math_fast_sin_or_cos_a(angle) * speed;
                 work.spread.f[1] = math_fast_sin_or_cos_b(angle) * speed;
                 work.spread.f[2] = math_random_float_range(0.050000004f, 0.10833334f);
-                sparkLife = math_random_int_range(90, 120);
-                part_spawn_spark_2(&work.position, spread, math_random_int_below(2), sparkLife);
-            } while (sparkCount >= 0);
+                spark_life = math_random_int_range(90, 120);
+                part_spawn_spark_2(&work.position, spread, math_random_int_below(2), spark_life);
+            } while (spark_count >= 0);
         } else {
             /* The hit branch re-reads the collision record through its own pointer and has its
                own copy of the response; jump optimization merges the two identical responses.
@@ -162,7 +162,7 @@ void projectile_l22_update_bouncing(unsigned char *moby) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = ((Collision *)&D_L22_001C00C0);
                 model = reread->hit;
@@ -243,7 +243,7 @@ void projectile_update_motion(char *moby) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = ((Collision *)&D_L22_001C00C0);
             model = reread->hit;
@@ -294,16 +294,16 @@ finish:
 
 /* Shows the message effect for this object and clears one of its flags. */
 void text_show_message_clear_flag(s32 moby) {
-    s32 varsPtr = *(u32 *)(moby + 0x68);
+    s32 vars_ptr = *(u32 *)(moby + 0x68);
 
-    text_show_message_at_moby(moby, varsPtr, varsPtr);
+    text_show_message_at_moby(moby, vars_ptr, vars_ptr);
     *(u8 *)(moby + 0x30) = 0xFF;
 }
 
 /* Shows a text message with a sound at the object and starts its effect. Does nothing if the object has no target. */
-void text_show_message_with_sound(s32 mobyAddr, s32 unused1, s32 unused2)
+void text_show_message_with_sound(s32 moby_addr, s32 unused1, s32 unused2)
 {
-    char *moby = (char *)mobyAddr;
+    char *moby = (char *)moby_addr;
     char *target = part_find_owned_effect_slot(moby, -1, 0);
     char offset[0x10];
 
@@ -320,9 +320,9 @@ void text_show_message_with_sound(s32 mobyAddr, s32 unused1, s32 unused2)
 
 /* Shows the message effect with sound for this object and clears one of its flags. */
 void text_show_message_sound_clear_flag(s32 moby) {
-    s32 varsPtr = *(u32 *)(moby + 0x68);
+    s32 vars_ptr = *(u32 *)(moby + 0x68);
 
-    text_show_message_with_sound(moby, varsPtr, varsPtr);
+    text_show_message_with_sound(moby, vars_ptr, vars_ptr);
     *(u8 *)(moby + 0x30) = 0xFF;
 }
 
@@ -333,22 +333,22 @@ void text_show_message_sound_clear_flag(s32 moby) {
 
 /* Updates the timers and animation of an object each frame, and ages it by one tick. */
 void flyer_update_timers_anim(s32 moby) {
-    s32 mobyCopy = moby;
-    s32 vars = *(u32 *)(mobyCopy + 0x68);
+    s32 moby_copy = moby;
+    s32 vars = *(u32 *)(moby_copy + 0x68);
 
     func_2F36F0(vars + 0x258);
     func_2F3720(vars + 0x25C);
-    if (*(u16 *)(mobyCopy + 0x96) <= 0xFFFE)
-        *(u16 *)(mobyCopy + 0x96) = *(u16 *)(mobyCopy + 0x96) + 1;
+    if (*(u16 *)(moby_copy + 0x96) <= 0xFFFE)
+        *(u16 *)(moby_copy + 0x96) = *(u16 *)(moby_copy + 0x96) + 1;
     if (*(u8 *)(vars + 0x211) == 0)
-        func_3167E8(mobyCopy, 7, vars + 0x210);
+        func_3167E8(moby_copy, 7, vars + 0x210);
     func_2F4788(vars + 0x220, 2, *(f32 *)(vars + 0x26C));
     *(f32 *)(vars + 0x26C) = func_2F4AD0(*(f32 *)(vars + 0x26C), 0.41597018f);
 }
 
 
 /* Steers an object toward a target position, scaled by speed and the frame time. */
-void moby_l22_steer_toward_target(s32 moby, s32 target, s32 useOffset, f32 speed) {
+void moby_l22_steer_toward_target(s32 moby, s32 target, s32 use_offset, f32 speed) {
     u8 steer[0x10];
     u8 adjusted[0x10];
     f32 step = speed;
@@ -356,7 +356,7 @@ void moby_l22_steer_toward_target(s32 moby, s32 target, s32 useOffset, f32 speed
     func_2F3AB0(steer, (void *)target, (void *)(moby + 0x10));
     step = step * 0.016666668f;
     func_2F3D60(steer, steer, step);
-    if (useOffset != 0) {
+    if (use_offset != 0) {
         func_2F3A80(adjusted, (void *)(moby + 0x10), steer);
         func_3A2988(adjusted, 7.2f);
         func_2F3AB0(steer, adjusted, (void *)(moby + 0x10));
@@ -436,25 +436,25 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
 
 /* Spawns two trail effects at the object's joints, flying away from an origin point. */
-void part_spawn_joint_trails(u8 *moby, f32 *origin, f32 sizeArg) {
-    f32 jointPos[4] __attribute__((aligned(16)));
+void part_spawn_joint_trails(u8 *moby, f32 *origin, f32 size_arg) {
+    f32 joint_pos[4] __attribute__((aligned(16)));
     f32 velocity[4] __attribute__((aligned(16)));
-    f32 size = sizeArg;
+    f32 size = size_arg;
 
     if (D_L22_001AF314[0] != 0 && *(f32 *)(*(u8 **)(D_L22_001AF314[0] + 0x68) + 0x20) <= 0.0f) {
         return;
     }
-    moby_transform_joint_to_world(moby, 2, jointPos);
+    moby_transform_joint_to_world(moby, 2, joint_pos);
     if (size == 0.0f) {
         size = D_L22_001B2A98;
     }
-    FastVecSub(velocity, origin, jointPos);
+    FastVecSub(velocity, origin, joint_pos);
     vec_scale_to_length(velocity, velocity, 0.6666667f);
-    part_spawn_trail_effect(jointPos, velocity, &size);
-    moby_transform_joint_to_world(moby, 3, jointPos);
-    FastVecSub(velocity, origin, jointPos);
+    part_spawn_trail_effect(joint_pos, velocity, &size);
+    moby_transform_joint_to_world(moby, 3, joint_pos);
+    FastVecSub(velocity, origin, joint_pos);
     vec_scale_to_length(velocity, velocity, 0.6666667f);
-    part_spawn_trail_effect(jointPos, velocity, &size);
+    part_spawn_trail_effect(joint_pos, velocity, &size);
 }
 
 typedef struct { u8 pad[0x18]; u8 *target; } G1C00C0;
@@ -467,14 +467,14 @@ extern void QueueMobyImpact(void *, void *);
 extern void part_start_random_scale_effect(void *, s32, s32);
 
 /* Checks whether the object hit something since its last position. If so it hurts the target, spawns the impact effect and goes to state 2. */
-void projectile_check_hit_explode(u8 *moby, u8 *oldPos) {
+void projectile_check_hit_explode(u8 *moby, u8 *old_pos) {
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 hitDir[16] __attribute__((aligned(16)));
-    u8 hitEvent[0x30] __attribute__((aligned(16)));
-    u8 impactPos[16] __attribute__((aligned(16)));
+    u8 hit_dir[16] __attribute__((aligned(16)));
+    u8 hit_event[0x30] __attribute__((aligned(16)));
+    u8 impact_pos[16] __attribute__((aligned(16)));
     u8 *target;
 
-    if (CollLine(oldPos, moby + 0x10, 0, moby, 0) == 0) {
+    if (CollLine(old_pos, moby + 0x10, 0, moby, 0) == 0) {
         return;
     }
     target = D_001C00C0.target;
@@ -490,16 +490,16 @@ void projectile_check_hit_explode(u8 *moby, u8 *oldPos) {
     if (*(f32 *)(vars + 0x1C) >= 50.0f) {
         *(f32 *)(vars + 0x1C) = 50.1f;
     }
-    vec_scale_to_length(hitDir, vars, 1.0f);
-    make_hit_descriptor(hitEvent, moby, 0x8B0003, hitDir, *(f32 *)(vars + 0x1C));
-    hitEvent[0x18] = 5;
-    hitEvent[0x19] = 3;
-    *(u16 *)(hitEvent + 0x1A) = *(u16 *)(moby + 0xAA);
-    QueueMobyImpact(D_001C00C0.target, hitEvent);
+    vec_scale_to_length(hit_dir, vars, 1.0f);
+    make_hit_descriptor(hit_event, moby, 0x8B0003, hit_dir, *(f32 *)(vars + 0x1C));
+    hit_event[0x18] = 5;
+    hit_event[0x19] = 3;
+    *(u16 *)(hit_event + 0x1A) = *(u16 *)(moby + 0xAA);
+    QueueMobyImpact(D_001C00C0.target, hit_event);
     part_start_random_scale_effect(moby + 0x10, 10, 1);
     if (D_001C00C0.target == 0) {
-        qcopy(impactPos, moby + 0x10);
-        part_start_random_scale_effect(impactPos, 15, 0);
+        qcopy(impact_pos, moby + 0x10);
+        part_start_random_scale_effect(impact_pos, 15, 0);
     }
     moby[0x20] = 2;
 }

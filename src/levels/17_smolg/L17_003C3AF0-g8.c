@@ -16,7 +16,7 @@ extern s32 FloatToInt(float);
 
 /* Scales the sub-object's angle by pi, takes the frame it names and measures the object's
    own height against the frame's, writing the difference into the sub-object. */
-void platform_place_on_path_by_timer(char *objectIn, char *pathIn, char *oldPositionIn)
+void platform_place_on_path_by_timer(char *object_in, char *path_in, char *old_position_in)
 {
     f32 delta[4];
     f32 wave;
@@ -25,10 +25,10 @@ void platform_place_on_path_by_timer(char *objectIn, char *pathIn, char *oldPosi
     f32 fraction;
     s32 index;
     s32 truncated;
-    char *path = pathIn;
-    char *moby = objectIn;
+    char *path = path_in;
+    char *moby = object_in;
     char *vars;
-    char *oldPosition = oldPositionIn;
+    char *old_position = old_position_in;
 
     vars = *(char **)(moby + 0x68);
     value = *(f32 *)(vars + 0xA8);
@@ -49,5 +49,5 @@ void platform_place_on_path_by_timer(char *objectIn, char *pathIn, char *oldPosi
         FastVecScale(delta, delta, fraction);
         FastVecAdd((f32 *)(moby + 0x10), delta, (f32 *)(path + (index * 16 + 0x10)));
     }
-    *(f32 *)(vars + 0xC0) = *(f32 *)(moby + 0x18) - *(f32 *)(oldPosition + 8);
+    *(f32 *)(vars + 0xC0) = *(f32 *)(moby + 0x18) - *(f32 *)(old_position + 8);
 }

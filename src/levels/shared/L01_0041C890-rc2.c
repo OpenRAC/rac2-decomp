@@ -33,17 +33,17 @@ extern void ref_L01_0041C890_02(void *);
 /* Moves a falling piece with gravity and spin, and finishes it when its countdown reaches zero. */
 void falling_l01_debris_update(s8 *moby) {
     s8 *vars;
-    s8 *positionPtr;
-    s8 *rotationPtr;
+    s8 *position_ptr;
+    s8 *rotation_ptr;
     s32 countdown;
 
-    positionPtr = moby + 0x10;
+    position_ptr = moby + 0x10;
     vars = *(s8 **)(moby + 0x68);
     *(f32 *)(moby + 0x2C) = *(f32 *)(*(s8 **)(moby + 0x24) + 0x24) * g_001B1B24;
     *(f32 *)(vars + 0x8) = *(f32 *)(vars + 0x8) - 0.0041666668839752674103f;
-    ref_L01_0041C890_00(positionPtr, positionPtr, vars);
-    rotationPtr = moby + 0xF0;
-    ref_L01_0041C890_00(rotationPtr, rotationPtr, vars + 0x10);
+    ref_L01_0041C890_00(position_ptr, position_ptr, vars);
+    rotation_ptr = moby + 0xF0;
+    ref_L01_0041C890_00(rotation_ptr, rotation_ptr, vars + 0x10);
     *(f32 *)(moby + 0xF0) = ref_L01_0041C890_01(*(f32 *)(moby + 0xF0), *(f32 *)(vars + 0x10));
     *(f32 *)(moby + 0xF4) = ref_L01_0041C890_01(*(f32 *)(moby + 0xF4), *(f32 *)(vars + 0x14));
     *(f32 *)(moby + 0xF8) = ref_L01_0041C890_01(*(f32 *)(moby + 0xF8), *(f32 *)(vars + 0x18));

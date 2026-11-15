@@ -12,7 +12,7 @@ void UpdateTaboraSlotStates(char *spawner) {
     s32 i;
     s32 k;
     s32 count;
-    s32 slotState;
+    s32 slot_state;
 
     switch (*(u8 *)(spawner + 0x20)) {
     case 0:
@@ -26,15 +26,15 @@ void UpdateTaboraSlotStates(char *spawner) {
     case 1:
         count = 0;
         for (i = 0; i < 3; i++) {
-            slotState = g_beam_slot_state[i];
-            if (slotState == 1) {
+            slot_state = g_beam_slot_state[i];
+            if (slot_state == 1) {
                 if (*(signed char *)(g_beam_slot_key[i] + 0x20) < 0) {
                     g_beam_slot_state[i] = 0;
                     g_beam_slot_key[i] = 0;
                 }
-            } else if (slotState == 4) {
+            } else if (slot_state == 4) {
                 beam_slot_release(i);
-            } else if (slotState != 0) {
+            } else if (slot_state != 0) {
                 update_slot_panes_and_effects(g_beam_slot_key[i], i);
                 count++;
                 g_beam_slot_state[i] = 4;

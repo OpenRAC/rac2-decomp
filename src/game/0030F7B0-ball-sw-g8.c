@@ -371,8 +371,8 @@ void nanotech_ball_update(Moby *m) {
                             o->pending--;
                             if ((signed char)o->pending < 0) o->pending = 0;
                         }
-                        if (d->special) snd_play_from_class_bank(1, 0x20, m, 0x200 /* Purple Nanotech Crate */);
-                        else snd_play_from_class_bank(1, 0x20, m, 0x1F5 /* Nanotech Crate */);
+                        if (d->special) snd_play_from_class_bank(1, 0x20, m, MOBY_CLASS_PURPLE_NANOTECH_CRATE);
+                        else snd_play_from_class_bank(1, 0x20, m, MOBY_CLASS_NANOTECH_CRATE);
                         d->h56 = 1;
                     }
                     part_kill(e);

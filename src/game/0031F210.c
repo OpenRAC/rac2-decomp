@@ -607,13 +607,13 @@ void enemy_spawn_child_parts(char *self, char **children, int first, int second)
 void pad_clamp_stick_to_vars(char *obj)
 {
     float buf[2];
-    char *padData = D_00189E20_9;
+    char *pad_data = D_00189E20_9;
     char *vars = *(char **)(obj + 104);
     float a, b, value;
 
-    a = -*(float *)(padData + 8112);
+    a = -*(float *)(pad_data + 8112);
     *(float *)(vars + 20) = a;
-    b = -*(float *)(padData + 8116);
+    b = -*(float *)(pad_data + 8116);
     *(float *)(vars + 16) = b;
 
     if (a > 1.0f) {

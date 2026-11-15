@@ -100,11 +100,11 @@ void lancer_update(char *moby)
     }
     horizontal = D_L00_001B2868;
     previousRange = D_L00_001B286C;
-    if (TYPE(moby) == 0x5D2 /* Lancer */)
+    if (TYPE(moby) == MOBY_CLASS_LANCER)
         D_L00_001B286C = 20.0f;
     else
         D_L00_001B286C = 30.0f;
-    if (TYPE(moby) == 0x5D2 /* Lancer */)
+    if (TYPE(moby) == MOBY_CLASS_LANCER)
         moby_transform_joint_to_world(moby, 0, muzzle);
     else {
         FastVecScale(muzzle, moby + 0xD0, -1.3f);
@@ -158,7 +158,7 @@ void lancer_update(char *moby)
                     *(char **)state = target;
                     *(short *)(state + 4) = *(short *)(target + 0xAA);
                     *(int *)(state + 8) = 0;
-                    *(short *)(state + 6) = TYPE(moby) == 0x5D2 /* Lancer */ ? D_L00_001AF6C0 : D_L00_001AF6C8;
+                    *(short *)(state + 6) = TYPE(moby) == MOBY_CLASS_LANCER ? D_L00_001AF6C0 : D_L00_001AF6C8;
                     component = moby_get_private_value_0(candidate);
                     if (component) {
                         *(float *)(state + 8) = component[4];
@@ -169,14 +169,14 @@ void lancer_update(char *moby)
                     }
                 }
             } else {
-                *(int *)(state + 0x34) = TYPE(moby) == 0x5D2 /* Lancer */ ? D_L00_001AF6C4 : D_L00_001AF6CC;
+                *(int *)(state + 0x34) = TYPE(moby) == MOBY_CLASS_LANCER ? D_L00_001AF6C4 : D_L00_001AF6CC;
             }
         } else {
             *(int *)state = 0;
             *(short *)(state + 4) = -1;
             *(int *)(state + 8) = 0;
             target = 0;
-            if (TYPE(moby) == 0x5D2 /* Lancer */)
+            if (TYPE(moby) == MOBY_CLASS_LANCER)
                 *(int *)(state + 0x34) = D_L00_001AF6C4;
             else
                 *(int *)(state + 0x34) = D_L00_001AF6CC;
@@ -220,7 +220,7 @@ void lancer_update(char *moby)
                 if (D_001A7390 > g_progress_statistics[33].maximum)
                     g_progress_statistics[33].maximum = D_001A7390;
                 g_progress_statistics[33].levels = (g_progress_statistics[33].levels | (1u << g_current_map_index)) | 0x80000000u;
-                if (TYPE(moby) == 0x5D2 /* Lancer */)
+                if (TYPE(moby) == MOBY_CLASS_LANCER)
                     EmitParticleTrailLayers(moby);
                 else
                     part_spawn_line_at_moby(moby);
@@ -234,11 +234,11 @@ void lancer_update(char *moby)
                     *(int *)(state + 0x24) = gfx_add_point_light(moby + 0x10, 0, 4.0f, 0.0f);
                 *(int *)(state + 0x28) = 10;
                 snd_play_from_class_bank(0, 0, moby, TYPE(moby));
-                if (TYPE(moby) == 0x5D2 /* Lancer */)
+                if (TYPE(moby) == MOBY_CLASS_LANCER)
                     slot_copy_records_to_free(D_L00_00294980);
                 else if (*(int *)(state + 0x3C) < 0)
                     *(int *)(state + 0x3C) = slot_copy_records_to_free(D_L00_00294A00);
-                if (TYPE(moby) == 0x5D2 /* Lancer */)
+                if (TYPE(moby) == MOBY_CLASS_LANCER)
                     CreateTargetedMovingEffect(muzzle, moby, target, previousRange);
                 else
                     SpawnAimedShot(muzzle, moby, target);
@@ -324,7 +324,7 @@ void lancer_update(char *moby)
                 b = IntToFloat(10);
                 ratio /= b;
                 /* Both weapons light the muzzle the same way. */
-                if (TYPE(moby) == 0x5D2 /* Lancer */) {
+                if (TYPE(moby) == MOBY_CLASS_LANCER) {
                     (*(int *)(state + 0x24) + D_L00_001C6F40)->radius = ratio;
                     (*(int *)(state + 0x24) + D_L00_001C6F40)->spread = ratio * 0.5f;
                     (*(int *)(state + 0x24) + D_L00_001C6F40)->power = (*(int *)(state + 0x24) + D_L00_001C6F40)->spread;

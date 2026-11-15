@@ -104,8 +104,8 @@ extern void part_spawn_fading(void *, int, int, int, int, int, int, float);
 
 /* Runs the scripted effects of the Tabora cutscene: sparks, screen shake, and glowing rings that change with each phase of the scene. */
 void tabora_cutscene_update_effects(void) {
-    float vecA[4] __attribute__((aligned(16)));
-    float vecB[4] __attribute__((aligned(16)));
+    float vec_a[4] __attribute__((aligned(16)));
+    float vec_b[4] __attribute__((aligned(16)));
     /* Adjacent in the frame: func_002833F0 fills all three as rows of one matrix. */
     float matrix[4] __attribute__((aligned(16)));
     float offset[4] __attribute__((aligned(16)));
@@ -121,7 +121,7 @@ void tabora_cutscene_update_effects(void) {
             moby = D_L08_001BD800.objects[j];
             if (moby && moby->classId==0xE29 /* moby class 3625 */) moby->flags |= 0x800;
             if (moby->classId==0xD54 /* moby class 3412 */) UpdateEquipmentPieces(moby);
-            if (moby && moby->classId==0xFA0 /* TV Screens */ && moby->vars)
+            if (moby && moby->classId==MOBY_CLASS_TV_SCREENS && moby->vars)
             math_store_angle_update_result(moby,moby->vars+12,0x80AAAAD2,0x80396464,0.061086535f);
         }
     }
@@ -133,9 +133,9 @@ void tabora_cutscene_update_effects(void) {
             for (j=0;j<4;++j) {
                 TaboraEffectEntry *entry=&D_L08_00288D10[j];
                 if (D_L08_001BD800.frame==entry->frame) {
-                    *(u128 *)vecA=*(u128 *)entry->position;
-                    FastVecAdd(vecA,vecA,D_L08_001A9430);
-                    SpawnExplosion(vecA,0,25,20,20,20,45,1,1,1,0,0,entry->radius,20.0f);
+                    *(u128 *)vec_a=*(u128 *)entry->position;
+                    FastVecAdd(vec_a,vec_a,D_L08_001A9430);
+                    SpawnExplosion(vec_a,0,25,20,20,20,45,1,1,1,0,0,entry->radius,20.0f);
                     if (entry->shake>0.0f) {
                         D_L08_001B99C0.duration0=55;
                         D_L08_001B99C0.duration2=70;
@@ -150,28 +150,28 @@ void tabora_cutscene_update_effects(void) {
         if (D_L08_001BD800.phase==1) moby_copy_group_word_to_members();
         if (D_L08_001BD800.phase==2) {
             TaboraObject *moby;
-            int burstCount;
+            int burst_count;
             int i;
             int colour, life, alpha, spin, packed;
             TaboraParticle *particle;
             float scale, size, angle, frameStep;
             moby=0;
             moby_copy_group_word_to_members();
-            burstCount=0;
+            burst_count=0;
             scale=1.0f;
-            if (D_L08_001BD800.frame==53) {moby=D_L08_001BD800.objects[1];scale=0.7f;burstCount=30;}
-            else if (D_L08_001BD800.frame==58) {moby=D_L08_001BD800.objects[0];burstCount=50;}
+            if (D_L08_001BD800.frame==53) {moby=D_L08_001BD800.objects[1];scale=0.7f;burst_count=30;}
+            else if (D_L08_001BD800.frame==58) {moby=D_L08_001BD800.objects[0];burst_count=50;}
             if (moby) {
-                *(u128 *)vecA = 0;
-                vecA[2]=0.01f;
-                vecA[3]=1.0f;
+                *(u128 *)vec_a = 0;
+                vec_a[2]=0.01f;
+                vec_a[3]=1.0f;
                 frameStep=0.008333334f;
-                for (i=0;i<burstCount;++i) {
+                for (i=0;i<burst_count;++i) {
                     life=math_random_int_range(90,117);
-                    qzero(vecB);
-                    vec_add_random_offset(vecB,scale*0.7f);
-                    vecB[2]*=0.3f;
-                    FastVecAdd(vecB,vecB,moby->position);
+                    qzero(vec_b);
+                    vec_add_random_offset(vec_b,scale*0.7f);
+                    vec_b[2]*=0.3f;
+                    FastVecAdd(vec_b,vec_b,moby->position);
                     alpha=math_random_int_range(64,112);
                     colour=math_random_int_range(64,127);
                     packed=(alpha<<24)|(FloatToInt((float)colour*0.3f)<<16);
@@ -180,11 +180,11 @@ void tabora_cutscene_update_effects(void) {
                     angle=math_random_float_range(1.0f,1.013f);
                     spin=math_random_int_range(-2,2);
                     size=math_random_float_range(0.1f,0.3f);
-                    vecA[0]=math_random_signed_float_range(0.0f,0.011666667f);
-                    vecA[1]=math_random_signed_float_range(0.0f,0.011666667f);
-                    vecA[2]=math_random_float_range(frameStep*0.1f,0.008333334f);
-                    FastVecScale(vecA,vecA,scale);
-                    particle=SpawnSpinningSparkParticle(vecB,0.1f,1.0f,angle,spin,vecA,colour,size*210000.0f,0);
+                    vec_a[0]=math_random_signed_float_range(0.0f,0.011666667f);
+                    vec_a[1]=math_random_signed_float_range(0.0f,0.011666667f);
+                    vec_a[2]=math_random_float_range(frameStep*0.1f,0.008333334f);
+                    FastVecScale(vec_a,vec_a,scale);
+                    particle=SpawnSpinningSparkParticle(vec_b,0.1f,1.0f,angle,spin,vec_a,colour,size*210000.0f,0);
                     if (particle) {
                         TaboraParticleData *particleData=&particle->data;
                         if (math_random_int_below(2)) particle->kind=0x44;
@@ -202,12 +202,12 @@ void tabora_cutscene_update_effects(void) {
     if (D_L08_001BD800.phase==3 && D_L08_001BD800.frame==D_L08_001A9420) {
         TaboraObject *first=D_L08_001BD800.objects[1];
         TaboraObject *second=D_L08_001BD800.objects[2];
-        qcopy(vecA,second->position);
-        vecA[2]+=0.8f;
-        FastVecSub(vecB,first->position,second->position);
-        vec_scale_to_length(vecB,vecB,0.035f);
-        vecB[2]=0.041666668f;
-        SpawnTintedEffects(0,vecA,40,0,vecB,0x39969696,0,0.75f,1.3f,0.2f,0.37f);
+        qcopy(vec_a,second->position);
+        vec_a[2]+=0.8f;
+        FastVecSub(vec_b,first->position,second->position);
+        vec_scale_to_length(vec_b,vec_b,0.035f);
+        vec_b[2]=0.041666668f;
+        SpawnTintedEffects(0,vec_a,40,0,vec_b,0x39969696,0,0.75f,1.3f,0.2f,0.37f);
         D_L08_001B99C0.amount2=0.047f;
         D_L08_001B99C0.duration2=35;
         D_L08_001B99C0.amount0=0.037f;
@@ -227,8 +227,8 @@ void tabora_cutscene_update_effects(void) {
         D_L08_001B2820[2]=0;
     }
     if ((unsigned)(D_L08_001BD800.frame-421)>=177) return;
-    *(u128 *)vecA=*(u128 *)D_L08_001BD800.objects[3]->position;
-    vecA[2]+=0.5f;
+    *(u128 *)vec_a=*(u128 *)D_L08_001BD800.objects[3]->position;
+    vec_a[2]+=0.5f;
     if (D_L08_001BD800.frame<568) {
         int j;
         int spin;
@@ -239,18 +239,18 @@ void tabora_cutscene_update_effects(void) {
         D_L08_001B2820[3]=FastAddRotations(D_L08_001B2820[3],D_L08_001A949C*0.00029088824f);
         euler_rotation_basis(matrix,D_L08_001B2820);
         for(j=0;j<4;++j) {
-            FastVecSub(start,D_L08_001B9B00,vecA);
+            FastVecSub(start,D_L08_001B9B00,vec_a);
             vec_scale_to_length(start,start,5.0f);
-            FastVecAdd(end,start,vecA);
+            FastVecAdd(end,start,vec_a);
             end[2]+=0.5f;
             spin=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
             matrix_mul_vec3(direction,D_L08_001A9450[j],matrix);
             vec_scale_to_length(direction,direction,3.5f);
             FastVecAdd(direction,direction,end);
-            FastVecSub(vecB,end,direction);
-            vec_scale_to_length(vecB,vecB,0.058333337f);
+            FastVecSub(vec_b,end,direction);
+            vec_scale_to_length(vec_b,vec_b,0.058333337f);
             size=math_random_float_range(0.2f,0.32f);
-            part_spawn_fading_drift(direction,vecB,60,0x804080,spin,0,63,6,size*210000.0f,147000.0f,0.0f);
+            part_spawn_fading_drift(direction,vec_b,60,0x804080,spin,0,63,6,size*210000.0f,147000.0f,0.0f);
         }
     }
     if (D_L08_001BD800.frame<=480) return;
@@ -262,21 +262,21 @@ void tabora_cutscene_update_effects(void) {
         int alpha;
         int j;
         int duration, lifeStep;
-        *(u128 *)vecB=*(u128 *)vecA;
-        vecB[2]+=1.0f;
+        *(u128 *)vec_b=*(u128 *)vec_a;
+        vec_b[2]+=1.0f;
         if (math_random_int_below(4)==0) {
-            FastVecSub(forward,D_L08_001B9B00,vecB);
+            FastVecSub(forward,D_L08_001B9B00,vec_b);
             timeScale=0.016666668f;
             frameStep=0.008333334f;
             vec_scale_to_length(forward,forward,5.0f);
-            FastVecAdd(vecB,forward,vecB);
+            FastVecAdd(vec_b,forward,vec_b);
             vec_random_direction(matrix,rate,rate);
             size=(D_L08_001BD800.frame-480);
             size*=0.06666667f;
             alpha=math_random_int_below(255)&255;
             duration=60;
             lifeStep=0;
-            part_spawn_hero_relative(vecB,matrix,0x50804080,duration,alpha,0,size);
+            part_spawn_hero_relative(vec_b,matrix,0x50804080,duration,alpha,0,size);
             for (j=0;j<1;++j) {
                 t=rate*timeScale;
                 vec_random_direction(offset,t,t);
@@ -284,7 +284,7 @@ void tabora_cutscene_update_effects(void) {
                 t=0.0f; /* Second set in the loop: keeps rate*timeScale from being hoisted and folded. */
                 scale=amount*frameStep*(D_L08_001BD800.frame-480);
                 alpha=math_random_int_below(255)&255;
-                part_spawn_hero_relative(vecB,matrix,0x40804080,duration,alpha,0,scale);
+                part_spawn_hero_relative(vec_b,matrix,0x40804080,duration,alpha,0,scale);
                 duration+=lifeStep;
             }
         }

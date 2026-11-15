@@ -66,7 +66,7 @@ static __inline__ void draw_icon(int tex, int x, int y, int size, unsigned int *
 void DrawAmmoSelectList(void)
 {
     int pulse, x;
-    int frameLeft, inset;
+    int frame_left, inset;
     int i, index, y, icon, overlay, kind, special, alpha0, alpha1;
     unsigned int color, colors[4];
     char *text;
@@ -75,13 +75,13 @@ void DrawAmmoSelectList(void)
     if (g_vendor_menu_state.scroll < 0) g_vendor_menu_state.scroll += 4;
     else if (g_vendor_menu_state.scroll > 0) g_vendor_menu_state.scroll -= 4;
     i = -5;
-    frameLeft = 233;
+    frame_left = 233;
     inset = 4;
     pulse = ((subtract_integer_with_clamp(((g_vendor_menu_state.tick*4)&63)-32)+64)*0x10202)|0x80000000;
-    DrawFramebufferRect(frameLeft-(D_001AD3A0+inset),screen_y(325-D_001AD3A4),D_001AD3A8+285,screen_y(D_001AD3AC+381),g_screen_width,g_screen_height,
+    DrawFramebufferRect(frame_left-(D_001AD3A0+inset),screen_y(325-D_001AD3A4),D_001AD3A8+285,screen_y(D_001AD3AC+381),g_screen_width,g_screen_height,
         pulse);
     inset = 2;
-    DrawFramebufferRect(frameLeft-(D_001AD3A0+inset),screen_y(327-D_001AD3A4),D_001AD3A8+283,screen_y(D_001AD3AC+379),g_screen_width,g_screen_height,0x80442d00);
+    DrawFramebufferRect(frame_left-(D_001AD3A0+inset),screen_y(327-D_001AD3A4),D_001AD3A8+283,screen_y(D_001AD3AC+379),g_screen_width,g_screen_height,0x80442d00);
     y = g_vendor_menu_state.scroll - 47;
     do {
         index = i + g_vendor_menu_state.selected;

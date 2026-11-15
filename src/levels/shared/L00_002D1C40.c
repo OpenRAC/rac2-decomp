@@ -18,28 +18,28 @@ extern void anim_start_blended(void *, int, int, int);
 /* Sets the animations of the two linked hero objects to match the hero's new animation. */
 void hero_sync_linked_object_anims(int seq, int frame, float f12)
 {
-    char *upperObj;
-    char *lowerObj;
-    int animA;
-    int animB;
+    char *upper_obj;
+    char *lower_obj;
+    int anim_a;
+    int anim_b;
     int flag;
     int rate;
     float speed = f12;
 
     if (g_hero_state.mode != 2)
         return;
-    upperObj = g_hero_state.p1310;
-    lowerObj = g_hero_state.p1314;
-    if (upperObj == 0)
+    upper_obj = g_hero_state.p1310;
+    lower_obj = g_hero_state.p1314;
+    if (upper_obj == 0)
         return;
-    if (lowerObj == 0)
+    if (lower_obj == 0)
         return;
 
-    if (hero_pick_linked_anim_pair(seq, &animA, &animB) != 0 && seq != 0) {
-        if ((unsigned char)upperObj[0x43] != animA) {
+    if (hero_pick_linked_anim_pair(seq, &anim_a, &anim_b) != 0 && seq != 0) {
+        if ((unsigned char)upper_obj[0x43] != anim_a) {
             rate = (int)speed;
-            anim_start_blended(upperObj, animA, frame, rate);
-            anim_start_blended(lowerObj, animB, frame, rate);
+            anim_start_blended(upper_obj, anim_a, frame, rate);
+            anim_start_blended(lower_obj, anim_b, frame, rate);
         }
         return;
     }
@@ -48,7 +48,7 @@ void hero_sync_linked_object_anims(int seq, int frame, float f12)
     {
 
         if (g_hero_state.action == 0) {
-            if (FindSlotTableKey((unsigned char)upperObj[0x43], &seq) != 0 && seq == 0)
+            if (FindSlotTableKey((unsigned char)upper_obj[0x43], &seq) != 0 && seq == 0)
                 flag = 0;
         }
         if (flag == 0)
@@ -60,8 +60,8 @@ void hero_sync_linked_object_anims(int seq, int frame, float f12)
                 rate = 0x13;
         }
     }
-    if ((unsigned char)upperObj[0x43] != 1)
-        anim_start_blended(upperObj, 1, 0, rate);
-    if ((unsigned char)lowerObj[0x43] != 1)
-        anim_start_blended(lowerObj, 1, 0, rate);
+    if ((unsigned char)upper_obj[0x43] != 1)
+        anim_start_blended(upper_obj, 1, 0, rate);
+    if ((unsigned char)lower_obj[0x43] != 1)
+        anim_start_blended(lower_obj, 1, 0, rate);
 }

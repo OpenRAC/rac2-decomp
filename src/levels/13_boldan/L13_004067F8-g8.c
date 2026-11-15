@@ -30,7 +30,7 @@ void UpdateBoldanClock(u8 *moby) {
     u8 *vars=P(moby,0x68), *a;
     u8 time[16];
     int slo, mlo, hlo, sec, min, hour, hour12;
-    float hourValue, hourAngle;
+    float hour_value, hour_angle;
     if (moby[0x20]==0) {
         int initialHour;
         H(moby,0x96)=0; moby[0x20]=1; moby[0x30]=255; H(moby,0x32)=800;
@@ -73,9 +73,9 @@ void UpdateBoldanClock(u8 *moby) {
         if(++I(vars,4)>=60) { I(vars,4)=0; ++I(vars,8); }
         if(I(vars,8)>=60) { I(vars,8)=0; ++I(vars,0); }
         if(I(vars,0)>=24) I(vars,0)=0;
-        hourValue=(float)I(vars,0); hour=FloatToInt(hourValue);
-        if(hourValue>12.0f) hourValue-=12.0f;
-        hour12=FloatToInt(hourValue);
+        hour_value=(float)I(vars,0); hour=FloatToInt(hour_value);
+        if(hour_value>12.0f) hour_value-=12.0f;
+        hour12=FloatToInt(hour_value);
         if(hour12==0 || hour12==2 || hour12==4 || hour12==6 || hour12==8 || hour12==10 || hour12==12) {
             ClockMoby *a=&D_L13_001B291C[I(vars,0x28)];
             int collision;
@@ -94,16 +94,16 @@ void UpdateBoldanClock(u8 *moby) {
             if(I(vars,0x24)!=-1) { u8 *a=P(D_L13_001B291C_gp+(I(vars,0x24)<<8),0x68); if(I(a,0x38)) I(a,0x38)=0; }
         }
         if(I(vars,4)==0 && I(vars,8)==0) {
-            I(vars,0x18)=snd_start_in_slot(0x10,0x21,moby); I(vars,0xC)=10; I(vars,0x20)=FloatToInt(hourValue);
+            I(vars,0x18)=snd_start_in_slot(0x10,0x21,moby); I(vars,0xC)=10; I(vars,0x20)=FloatToInt(hour_value);
         }
         H(moby,0x96)=0;
     }
     F(moby,0xF0)=(float)(I(vars,4)*6)*0.01745329424738884f;
     F(P(vars,0x10),0xF0)=((float)I(vars,8)*6.0f+(float)I(vars,4)*0.1f)*0.01745329424738884f;
-    hourAngle=(float)I(vars,0); if(hourAngle>12.0f) hourAngle-=12.0f;
-    hourAngle *= 30.0f;
-    hourAngle += (float)I(vars,8)*0.5f;
-    F(P(vars,0x14),0xF0)=hourAngle*0.01745329424738884f;
+    hour_angle=(float)I(vars,0); if(hour_angle>12.0f) hour_angle-=12.0f;
+    hour_angle *= 30.0f;
+    hour_angle += (float)I(vars,8)*0.5f;
+    F(P(vars,0x14),0xF0)=hour_angle*0.01745329424738884f;
     if(H(moby,0x96)<65535) ++H(moby,0x96);
     if(math_fast_float_d(vars+0xC) && I(vars,0x20) && !snd_is_voice_playing_for_owner(moby,I(vars,0x18))) {
         I(vars,0x18)=-1; snd_start_in_slot(0x11,0x21,moby); I(vars,0xC)=120; --I(vars,0x20);

@@ -80,23 +80,23 @@ void level_copy_data_blocks_to_objects(char *table)
     int i = 0;
 
     if (i < *(int *)table) {
-        int absoluteFlag = 1;
-        char *dataCursor = table + 8;
-        char *recordCursor = table + 4;
+        int absolute_flag = 1;
+        char *data_cursor = table + 8;
+        char *record_cursor = table + 4;
 
         do {
-            char *owner = record_find_by_id(*(short *)(recordCursor + 14), *(short *)(recordCursor + 12));
+            char *owner = record_find_by_id(*(short *)(record_cursor + 14), *(short *)(record_cursor + 12));
             if (owner != 0) {
                 char *dest;
-                if (*(short *)(recordCursor + 10) == absoluteFlag)
-                    dest = (char *)(*(int *)recordCursor + (int)owner);
+                if (*(short *)(record_cursor + 10) == absolute_flag)
+                    dest = (char *)(*(int *)record_cursor + (int)owner);
                 else
-                    dest = (char *)(*(int *)recordCursor + *(int *)(owner + 104));
-                func_00282AB0_1(dest, dataCursor, *(unsigned short *)(recordCursor + 8));
+                    dest = (char *)(*(int *)record_cursor + *(int *)(owner + 104));
+                func_00282AB0_1(dest, data_cursor, *(unsigned short *)(record_cursor + 8));
             }
             i++;
-            dataCursor += 16;
-            recordCursor += 16;
+            data_cursor += 16;
+            record_cursor += 16;
         } while (i < *(int *)table);
     }
 }
@@ -353,18 +353,18 @@ extern int g_copy_setup_data[];
 /* Moves to the next cutscene chunk if it holds data, and starts it playing. */
 int cutscene_start_next_chunk(int index)
 {
-    int nextIndex = index + 1;
+    int next_index = index + 1;
     int *sequence = D_L00_001BCAC0;
     int *base = g_copy_setup_data;
     int *table = (int *)((char *)base + 16040);
-    int rowOffset = sequence[12] * 332;
+    int row_offset = sequence[12] * 332;
     int hold = sequence[28];
-    int nextOffset = nextIndex * 4;
-    int current = *(int *)((char *)table + (rowOffset + index * 4));
-    int following = *(int *)((char *)table + (nextOffset + rowOffset));
+    int next_offset = next_index * 4;
+    int current = *(int *)((char *)table + (row_offset + index * 4));
+    int following = *(int *)((char *)table + (next_offset + row_offset));
 
-    rowOffset = following - current;
-    if (rowOffset > 0) {
+    row_offset = following - current;
+    if (row_offset > 0) {
         load_start_disc_read(hold, (char *)(current + base[3977]));
         snd_pump_music_and_disc_read(0);
     }

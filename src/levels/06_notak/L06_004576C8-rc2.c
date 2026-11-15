@@ -34,7 +34,7 @@ extern s32 ref_L06_004576C8_05(void *, void *, s32, void *, s32, s32);
 /* Sets up eight effect emitters around the object, each aimed in its own direction. */
 void part_spawn_radial_emitters(void *moby) {
     f32 *angles;
-    f32 pitchDeg;
+    f32 pitch_deg;
     f32 yaw;
     s32 *handles;
     s8 *dirs;
@@ -49,9 +49,9 @@ void part_spawn_radial_emitters(void *moby) {
     do {
         remaining -= 1;
         yaw = ref_L06_004576C8_03(angles[0] * 0.017453294f);
-        pitchDeg = angles[1];
+        pitch_deg = angles[1];
         angles += 2;
-        ref_L06_004576C8_04(dirs, 1.0f, yaw, ref_L06_004576C8_03(pitchDeg * 0.017453294f));
+        ref_L06_004576C8_04(dirs, 1.0f, yaw, ref_L06_004576C8_03(pitch_deg * 0.017453294f));
         dirs += 0x10;
         *handles = ref_L06_004576C8_05(&ref_L06_004576C8_01, &ref_L06_004576C8_02, 0x3C3C3C78, moby, 0x19, 0);
         handles += 1;

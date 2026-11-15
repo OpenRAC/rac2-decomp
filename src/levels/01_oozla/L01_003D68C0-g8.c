@@ -15,9 +15,9 @@ typedef struct {
     u8 pad36[0x32];
     OozlaCountdown *vars;
     u8 pad6c[0x2C];
-    int collisionDisable;
+    int collision_disable;
     u8 pad9c[12];
-    u8 hitSlot;
+    u8 hit_slot;
 } OozlaStateMoby;
 
 extern int D_L01_001AEC38 MACRO_ADDR;
@@ -51,7 +51,7 @@ void breakable_l01_object_update(OozlaStateMoby *moby)
             D_L01_001AEC38 = D_L01_001AEC38 - 1;
             moby_set_state(moby, 2, -1);
         }
-        moby->hitSlot = 255;
+        moby->hit_slot = 255;
         break;
     case 2:
         if (moby->visible && D_L01_001B2090 < 0.9f && D_L01_001B208C < 0.9f &&
@@ -68,7 +68,7 @@ void breakable_l01_object_update(OozlaStateMoby *moby)
         if (flag_set_first_pending(moby)) {
             moby->flags |= 1;
             moby->visible = 0;
-            moby->collisionDisable = 0;
+            moby->collision_disable = 0;
             vars->timer = 120;
             D_L01_001B3468++;
         }

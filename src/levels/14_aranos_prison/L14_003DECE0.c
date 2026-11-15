@@ -39,7 +39,7 @@ extern float vec_distance_xy(void *, void *);
  * the collision displacement and keeping the movement sound active. */
 /* Updates moby classes 2792 and 2793: a platform that rises and lowers between two heights when the player calls it, and carries the player. */
 void elevator_platform_update(char *self) {
-    Vec moveDelta, velocity;
+    Vec move_delta, velocity;
     char *vars = *(char **)(self + 0x68);
     float target, speed;
     int active, blocked;
@@ -117,21 +117,21 @@ void elevator_platform_update(char *self) {
             math_step_value_toward_target(self + 0x18, vars + 0x74, target, 0.00055555557f, speed, 0.166666672f);
             velocity.q = 0;
             velocity.f[2] = *(float *)(vars + 0x74);
-            moveDelta.q = velocity.q;
-            func_328DA8(vars + 0x20, &moveDelta, self + 0xF0, self + 0xF0);
+            move_delta.q = velocity.q;
+            func_328DA8(vars + 0x20, &move_delta, self + 0xF0, self + 0xF0);
         }
         break;
     }
     if (math_fabs(*(float *)(vars + 0x74)) > 0.01f) {
-        unsigned char *soundEntry = (unsigned char *)g_sound_state + *(int *)(vars + 0x78) * 0x70;
-        if (*(char **)(soundEntry + 0x88) != self || !soundEntry[0x74])
+        unsigned char *sound_entry = (unsigned char *)g_sound_state + *(int *)(vars + 0x78) * 0x70;
+        if (*(char **)(sound_entry + 0x88) != self || !sound_entry[0x74])
             *(int *)(vars + 0x78) = PlayMobySound(0, 4, self);
     } else {
-        int soundSlot = *(int *)(vars + 0x78);
-        if (soundSlot != -1) {
-            unsigned char *soundEntry = (unsigned char *)g_sound_state + soundSlot * 0x70;
-            if (*(char **)(soundEntry + 0x88) == self && soundEntry[0x74])
-                snd_stop_voice(soundSlot);
+        int sound_slot = *(int *)(vars + 0x78);
+        if (sound_slot != -1) {
+            unsigned char *sound_entry = (unsigned char *)g_sound_state + sound_slot * 0x70;
+            if (*(char **)(sound_entry + 0x88) == self && sound_entry[0x74])
+                snd_stop_voice(sound_slot);
         }
         *(int *)(vars + 0x78) = -1;
     }

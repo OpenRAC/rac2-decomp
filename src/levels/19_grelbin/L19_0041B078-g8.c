@@ -66,13 +66,13 @@ void yeti_update(char *obj)
     char *entity;
     float vec[4] __attribute__((aligned(16)));
     float distance, angle;
-    int aiMode, pathResult;
+    int ai_mode, path_result;
     if (!moby_is_in_selected_zone(obj+0x10) || D_0018C0B4==111) return;
     data=*(char **)(obj+0x68);
     if (yeti_init_stats(obj)) { moby_mark_spawned(obj); return; }
     if(B(obj,0x20)==1) H(obj)&=0xEFFF;
-    aiMode=B(obj,0x95);
-    switch(aiMode) {
+    ai_mode=B(obj,0x95);
+    switch(ai_mode) {
     case 0:
         if(I(data,0x278)==1 && I(data,0x26C)==0 && g_active_yeti_count<g_max_active_yetis) {
             if(I(data,0x264)==-1) {
@@ -111,10 +111,10 @@ void yeti_update(char *obj)
         } else { DISABLE_COLLISION(); }
         break;
     case 3:
-        pathResult=moby_dispatch_action_by_kind(obj,data+0x140);
-        if(pathResult&1) {
+        path_result=moby_dispatch_action_by_kind(obj,data+0x140);
+        if(path_result&1) {
             SetDeathBits(obj,0,3); part_queue_moby_for_glow(obj,0,0); g_active_yeti_count--;
-        } else if(pathResult&2) {
+        } else if(path_result&2) {
             if(I(data,0x204)==1 && g_active_yeti_count<=g_max_active_yetis) {
                 ANIM(3,0,10); moby_set_state(obj,14,2);
             } else {

@@ -80,7 +80,7 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
     ChargeWeaponVec velocity, origin, target, delta, point;
     int unused;
     char *hit = 0;
-    ChargeWeaponVars *weaponVars = obj->vars;
+    ChargeWeaponVars *weapon_vars = obj->vars;
     ChargeWeaponMaterial *material = &g_weapon_l00_table[D_00139584];
     float speed = material->speed * 0.016666668f;
     int i, enabled, count;
@@ -88,17 +88,17 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
     case 0: {
         int i;
         if (obj->animation != 0 || (obj->flags&2)) anim_start_blended(obj,1,0,0);
-        AttachManipulator(obj,0,&weaponVars->origin);
-        weaponVars->timer=0.36666667f;
-        weaponVars->unknown=-1;
-        weaponVars->charge=0;
-        weaponVars->angle=0;
+        AttachManipulator(obj,0,&weapon_vars->origin);
+        weapon_vars->timer=0.36666667f;
+        weapon_vars->unknown=-1;
+        weapon_vars->charge=0;
+        weapon_vars->angle=0;
         obj->state=1;
         D_L00_001B2B70.reticle=-1.0f;
         D_L00_001B06D0=0;
         D_L00_001B06B8=0;
-        weaponVars->handle=AcquireEntitySlot(obj,0,&unused);
-        weaponVars->anim=level_get_slot_body(H(obj,0xAA),weaponVars->handle);
+        weapon_vars->handle=AcquireEntitySlot(obj,0,&unused);
+        weapon_vars->anim=level_get_slot_body(H(obj,0xAA),weapon_vars->handle);
         for (i=0;i<4;i++) {
             D_L00_0024F7C0[i].values[0]=0; D_L00_0024F7C0[i].values[1]=0; D_L00_0024F7C0[i].values[2]=0;
             D_L00_0024F7C0[i].values[3]=math_random_signed_float_range(0.05f,0.3f);
@@ -130,7 +130,7 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
             if (!math_fast_float_d(&g_hero_state.timer)) enabled=0;
             {
                 unsigned int color;
-                if (weaponVars->timer!=0 && get_ammo(-1)) color=0x600000FF;
+                if (weapon_vars->timer!=0 && get_ammo(-1)) color=0x600000FF;
                 else color=0x600FFF0F;
                 hud_add_moby_marker(obj,color,1,0,0,38,-1,90,4);
             }
@@ -138,7 +138,7 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
         moby_transform_joint_to_world(obj,0,&origin);
         if (g_hero_state.held) vec_compute_object_to_target(g_hero_state.held,&origin,&velocity,speed);
         else hit=part_start_effect_in_front_of_hero(&g_hero_state.camera,1,0.17453295f,0.17453295f,20,0.7853982448577881f,0.7853982448577881f);
-        if (weaponVars->timer==0 && hit && get_ammo(-1)) {
+        if (weapon_vars->timer==0 && hit && get_ammo(-1)) {
             char *extra;
             /* The copy only writes target; no scalar local or source field aliases it. */
             qcopy_nc(&target,hit+0x10);
@@ -153,17 +153,17 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
                 hud_add_moby_marker(obj,0xFF0FFF0F,scale,&target,0,38,-1,90,4);
             }
         }
-        if (vec_fast_helper_b(weaponVars) && !g_hero_state.locked) {
+        if (vec_fast_helper_b(weapon_vars) && !g_hero_state.locked) {
             if ((g_pad_state.pressed&g_hero_state.mask) && enabled && !sheepinator_is_mode_four() && g_hero_state.frame>=23) {
                 if (weapon_spend_ammo(-1,1)) {
                     D_L00_001B2B70.active=1;
                     PlayMobySound(2,0,obj);
                     switch (D_L00_001B06D0) {
                     case 0:
-                        D_L00_001B06D0=1; weaponVars->charge=D_L00_001B06C4; weaponVars->timer=0.5f;
+                        D_L00_001B06D0=1; weapon_vars->charge=D_L00_001B06C4; weapon_vars->timer=0.5f;
                         break;
                     case 2:
-                        D_L00_001B06D0=1; weaponVars->timer=0.5f;
+                        D_L00_001B06D0=1; weapon_vars->timer=0.5f;
                         break;
                     }
                 } else if ((g_pad_state.released&g_hero_state.mask) || D_L00_001B2B70.active==1) {
@@ -173,14 +173,14 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
         }
         switch (D_L00_001B06D0) {
         case 0:
-            if (weaponVars->charge<D_L00_001B06C4) {
-                weaponVars->charge+=D_L00_001B06C8;
-                if (weaponVars->charge>D_L00_001B06C4) weaponVars->charge=D_L00_001B06C4;
+            if (weapon_vars->charge<D_L00_001B06C4) {
+                weapon_vars->charge+=D_L00_001B06C8;
+                if (weapon_vars->charge>D_L00_001B06C4) weapon_vars->charge=D_L00_001B06C4;
             }
             break;
         case 1:
-            weaponVars->charge+=D_L00_001B06BC;
-            if (weaponVars->charge>D_L00_001B06CC) {
+            weapon_vars->charge+=D_L00_001B06BC;
+            if (weapon_vars->charge>D_L00_001B06CC) {
                 moby_transform_joint_to_world(obj,0,&target);
                 if (g_hero_state.direction==1) vec_scale_to_length(&velocity,(char *)obj+0xD0,-speed);
                 else vec_scale_to_length(&velocity,&g_hero_state.camera,speed);
@@ -211,20 +211,20 @@ void UpdateChargedWeapon(ChargeWeaponMoby *obj) {
                     FastVecSub(&velocity,&delta,&target);
                     vec_scale_to_length(&velocity,&velocity,speed);
                 }
-                D_L00_001B06D4=SpawnParticlePoolMoby(obj,weaponVars->handle,&target,&velocity);
+                D_L00_001B06D4=SpawnParticlePoolMoby(obj,weapon_vars->handle,&target,&velocity);
                 if (D_L00_001B06D4) *(ChargeWeaponMoby **)(D_L00_001B06D4+0xB8)=obj;
                 D_L00_001B06D8=50; D_L00_001B06D0=2;
             }
             break;
         case 2:
-            weaponVars->charge-=D_L00_001B06C0;
-            if (weaponVars->charge<=D_L00_001B06C4) { weaponVars->charge=D_L00_001B06C4; D_L00_001B06D0=0; }
+            weapon_vars->charge-=D_L00_001B06C0;
+            if (weapon_vars->charge<=D_L00_001B06C4) { weapon_vars->charge=D_L00_001B06C4; D_L00_001B06D0=0; }
             break;
         }
         if (B(obj,0x31)) ref_L00_003E8180_00(plasma_coil_draw_beams,obj);
-        weaponVars->angle=fast_subtract_rotations(weaponVars->angle,weaponVars->charge*0.3141593f);
-        weaponVars->sine=math_fast_sin_or_cos_b(weaponVars->angle*0.5f);
-        weaponVars->cosine=math_fast_sin_or_cos_a(weaponVars->angle*0.5f);
+        weapon_vars->angle=fast_subtract_rotations(weapon_vars->angle,weapon_vars->charge*0.3141593f);
+        weapon_vars->sine=math_fast_sin_or_cos_b(weapon_vars->angle*0.5f);
+        weapon_vars->cosine=math_fast_sin_or_cos_a(weapon_vars->angle*0.5f);
         break;
     }
 }

@@ -58,17 +58,17 @@ void trigger_phase_update(char *obj)
         }
         break;
     case 3: {
-        int *handlePtr, *actionPtr; int i;
+        int *handle_ptr, *action_ptr; int i;
         if (*(u16 *)(obj + 0x96) >= 31) {
             if (state->phase) {
                 int invalid = -1;
-                actionPtr = state->actions; handlePtr = state->handles;
+                action_ptr = state->actions; handle_ptr = state->handles;
                 i = 3;
                 do {
-                    if (*handlePtr != invalid) moby_set_group_enabled(*actionPtr, 1);
-                    actionPtr++;
+                    if (*handle_ptr != invalid) moby_set_group_enabled(*action_ptr, 1);
+                    action_ptr++;
                     i--;
-                    handlePtr++;
+                    handle_ptr++;
                 } while (i >= 0);
                 D_L03_0021DDC0.entries[*(short *)(obj + 0xb2)] = *(u8 *)(obj + 0xb0) + 2;
                 { u32 idx = *(u8 *)(obj + 0xb0);
@@ -85,8 +85,8 @@ void trigger_phase_update(char *obj)
         break;
     }
     case 4: {
-        int triggered = 1, i; int invalid = -1; int *handlePtr = state->handles;
-        for (i = 3;i >= 0;i--, handlePtr++) if (*handlePtr != invalid && moby_count_group_not_in_state(*handlePtr, -1)) triggered = 0;
+        int triggered = 1, i; int invalid = -1; int *handle_ptr = state->handles;
+        for (i = 3;i >= 0;i--, handle_ptr++) if (*handle_ptr != invalid && moby_count_group_not_in_state(*handle_ptr, -1)) triggered = 0;
         if (triggered) { state->phase++; moby_set_state(obj, 2, -1); }
         break;
     }

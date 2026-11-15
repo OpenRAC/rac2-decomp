@@ -11,27 +11,27 @@ extern s32 D_L03_0029BCD0[];
 s32 path_puzzle_is_step_target(char *moby, s32 candidate)
 {
     char *vars = *(char **)(moby + 0x68);
-    s32 entryOffset;
+    s32 entry_offset;
     s32 kind;
     s32 i;
 
     if (*(s16 *)(vars + 0x5E) == D_L03_001B0B50 - 1)
         return 0;
-    entryOffset = *(s16 *)(vars + 0x62) * 16;
-    kind = *(s32 *)((char *)D_L03_0029BCD0 + entryOffset);
+    entry_offset = *(s16 *)(vars + 0x62) * 16;
+    kind = *(s32 *)((char *)D_L03_0029BCD0 + entry_offset);
     switch (kind) {
     case 1:
     case 2:
         i = *(s16 *)(vars + 0x64) + 1;
-        if (candidate != *(s32 *)((i * 4 + entryOffset) + (char *)D_L03_0029BCD0))
+        if (candidate != *(s32 *)((i * 4 + entry_offset) + (char *)D_L03_0029BCD0))
             break;
         return 1;
     case 3:
         if (*(s16 *)(vars + 0x64) != 0)
             return 0;
-        if (candidate == *(s32 *)((char *)D_L03_0029BCD0 + entryOffset + 4))
+        if (candidate == *(s32 *)((char *)D_L03_0029BCD0 + entry_offset + 4))
             return 1;
-        if (candidate == *(s32 *)((char *)D_L03_0029BCD0 + entryOffset + 8))
+        if (candidate == *(s32 *)((char *)D_L03_0029BCD0 + entry_offset + 8))
             return 1;
         break;
     }

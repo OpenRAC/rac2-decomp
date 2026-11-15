@@ -50,12 +50,12 @@ extern s32 D_L11_001FFA78[];
    the object when the timed effect is over. */
 /* Applies damage to the enemy, adds to a score counter, and removes the enemy when it runs
    out of health. */
-void joba_enemy_apply_damage(u8 *mobyArg) {
-    u8 *moby = mobyArg;
+void joba_enemy_apply_damage(u8 *moby_arg) {
+    u8 *moby = moby_arg;
     u8 *vars;
     u8 *attacker;
-    u8 *hitInfo;
-    u32 tableOffset;
+    u8 *hit_info;
+    u32 table_offset;
     f32 damage;
 
     if (*(u8 *)(moby + 0x20) == 0) {
@@ -69,13 +69,13 @@ void joba_enemy_apply_damage(u8 *mobyArg) {
             *(f32 *)(vars + 0x20) = *(f32 *)(vars + 0x20) - damage;
             /* The index is a byte offset into the table: keeping it in a variable leaves
                the constant out of the symbol's address, as the retail has it. */
-            tableOffset = *(u8 *)(vars + 0x37) * 4 + 0xE0;
-            *(s32 *)((u8 *)D_L11_001FFA78 + tableOffset) += (s32)(damage * 32.0f);
+            table_offset = *(u8 *)(vars + 0x37) * 4 + 0xE0;
+            *(s32 *)((u8 *)D_L11_001FFA78 + table_offset) += (s32)(damage * 32.0f);
             if (*(f32 *)(attacker + 0x2C) != 0.0f) {
-                hitInfo = vars + 0x70;
-                gfx_start_color_fade(moby, hitInfo);
+                hit_info = vars + 0x70;
+                gfx_start_color_fade(moby, hit_info);
                 if (*(f32 *)(attacker + 0x2C) >= D_L11_001B0570 || *(f32 *)(vars + 0x20) <= 0.0f) {
-                    gfx_start_color_fade(moby, hitInfo);
+                    gfx_start_color_fade(moby, hit_info);
                     moby_set_state(moby, 8, -1);
                 }
             }
@@ -96,8 +96,8 @@ void joba_enemy_apply_damage(u8 *mobyArg) {
 /* Retires the object and copies two measured state bytes into its state block. */
 /* Once the enemy has no pending counters, picks its next state (6 or 7) with a random
    roll. */
-void joba_enemy_choose_attack_state(u8 *mobyArg) {
-    u8 *moby = mobyArg;
+void joba_enemy_choose_attack_state(u8 *moby_arg) {
+    u8 *moby = moby_arg;
     s32 vars = *(s32 *)(moby + 0x68);
     if (*(u16 *)(vars + 0x278) >= 2)
         return;
@@ -140,44 +140,44 @@ extern u8 g_hero_state[];
 /* Places the measured point on the state's three vertices, then walks them: each one gets
    its angle to the shared origin and the class call its identifier names. */
 /* Puts three child objects in place and turns each one toward the player. */
-void joba_place_child_mobys(u8 *mobyArg) {
-    u8 *moby = mobyArg;
+void joba_place_child_mobys(u8 *moby_arg) {
+    u8 *moby = moby_arg;
     u8 *vars = *(u8 **)(moby + 0x68);
     u8 *part;
     u8 *hero;
-    f32 localPoint[4];
-    s32 offsetTotal;
+    f32 local_point[4];
+    s32 offset_total;
     s32 i;
 
-    localPoint[0] = 0.0f;
-    localPoint[1] = -9.0f;
-    localPoint[2] = -3.0f;
-    localPoint[3] = 0.0f;
-    matrix_mul_vec3(localPoint, localPoint, moby + 0xC0);
-    FastVecAdd(localPoint, localPoint, moby + 0x10);
+    local_point[0] = 0.0f;
+    local_point[1] = -9.0f;
+    local_point[2] = -3.0f;
+    local_point[3] = 0.0f;
+    matrix_mul_vec3(local_point, local_point, moby + 0xC0);
+    FastVecAdd(local_point, local_point, moby + 0x10);
 
     if (*(u8 **)(vars + 0x10) != 0) {
-        *(f32 *)(*(u8 **)(vars + 0x10) + 0x10) = localPoint[0] - 2.0f;
-        *(f32 *)(*(u8 **)(vars + 0x10) + 0x14) = localPoint[1];
-        *(f32 *)(*(u8 **)(vars + 0x10) + 0x18) = localPoint[2];
-        *(f32 *)(*(u8 **)(vars + 0x10) + 0x1C) = localPoint[3];
+        *(f32 *)(*(u8 **)(vars + 0x10) + 0x10) = local_point[0] - 2.0f;
+        *(f32 *)(*(u8 **)(vars + 0x10) + 0x14) = local_point[1];
+        *(f32 *)(*(u8 **)(vars + 0x10) + 0x18) = local_point[2];
+        *(f32 *)(*(u8 **)(vars + 0x10) + 0x1C) = local_point[3];
     }
     if (*(u8 **)(vars + 0x14) != 0) {
-        *(f32 *)(*(u8 **)(vars + 0x14) + 0x10) = localPoint[0];
-        *(f32 *)(*(u8 **)(vars + 0x14) + 0x14) = localPoint[1] + 1.0f;
-        *(f32 *)(*(u8 **)(vars + 0x14) + 0x18) = localPoint[2];
-        *(f32 *)(*(u8 **)(vars + 0x14) + 0x1C) = localPoint[3];
+        *(f32 *)(*(u8 **)(vars + 0x14) + 0x10) = local_point[0];
+        *(f32 *)(*(u8 **)(vars + 0x14) + 0x14) = local_point[1] + 1.0f;
+        *(f32 *)(*(u8 **)(vars + 0x14) + 0x18) = local_point[2];
+        *(f32 *)(*(u8 **)(vars + 0x14) + 0x1C) = local_point[3];
     }
     if (*(u8 **)(vars + 0x18) != 0) {
-        *(f32 *)(*(u8 **)(vars + 0x18) + 0x10) = localPoint[0];
-        *(f32 *)(*(u8 **)(vars + 0x18) + 0x14) = localPoint[1] - 1.0f;
-        *(f32 *)(*(u8 **)(vars + 0x18) + 0x18) = localPoint[2];
-        *(f32 *)(*(u8 **)(vars + 0x18) + 0x1C) = localPoint[3];
+        *(f32 *)(*(u8 **)(vars + 0x18) + 0x10) = local_point[0];
+        *(f32 *)(*(u8 **)(vars + 0x18) + 0x14) = local_point[1] - 1.0f;
+        *(f32 *)(*(u8 **)(vars + 0x18) + 0x18) = local_point[2];
+        *(f32 *)(*(u8 **)(vars + 0x18) + 0x1C) = local_point[3];
     }
 
     hero = g_hero_state;
     part = *(u8 **)(vars + 0x10);
-    offsetTotal = 0;
+    offset_total = 0;
     for (i = 0; i < 3; i++) {
         if (i == 1) {
             part = *(u8 **)(vars + 0x14);
@@ -196,26 +196,26 @@ void joba_place_child_mobys(u8 *mobyArg) {
         euler_rotation_basis(part + 0xC0, part + 0xF0);
         switch (*(s16 *)(part + 0xAA)) {
         case 0xD98: /* moby class 3480 */
-            security_robot_init(part, offsetTotal, 0);
+            security_robot_init(part, offset_total, 0);
             break;
         case 0xDCF: /* moby class 3535 */
-            smasher_robot_init(part, offsetTotal, 0);
+            smasher_robot_init(part, offset_total, 0);
             break;
         case 0xDF4: /* moby class 3572 */
-            flamethrower_robot_init(part, offsetTotal, 0);
+            flamethrower_robot_init(part, offset_total, 0);
             break;
         case 0xDF7: /* moby class 3575 */
             *(f32 *)(part + 0x18) += 0.5f;
-            drone_init_state(part, FloatToInt((f32)offsetTotal * 0.16666667f), 0);
+            drone_init_state(part, FloatToInt((f32)offset_total * 0.16666667f), 0);
             break;
         case 0xDF9: /* moby class 3577 */
-            path_mover_reset(part, offsetTotal);
+            path_mover_reset(part, offset_total);
             break;
         case 0xD37: /* moby class 3383 */
-            enemy_init_state(part, offsetTotal, 0);
+            enemy_init_state(part, offset_total, 0);
             break;
         }
-        offsetTotal += D_L11_001B0D9C;
+        offset_total += D_L11_001B0D9C;
     }
 
     *(u8 **)(vars + 0x10) = 0;

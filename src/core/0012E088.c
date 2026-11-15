@@ -17,12 +17,12 @@ extern void mpeg_start_ipu_to_memory_dma(void *, int);
  * (start, from-memory... actually to-memory chain/normal mode).
  */
 /* Starts a DMA transfer of arg1 bytes from the video chip to memory. */
-void mpeg_start_ipu_to_memory_dma(void *address, int byteCount) {
-    int intrState = r1_func_0011D960();
+void mpeg_start_ipu_to_memory_dma(void *address, int byte_count) {
+    int intr_state = r1_func_0011D960();
     D3_MADR = ((unsigned int)address & 0x0FFFFFFF) | 0x80000000;
-    D3_QWC = byteCount >> 4;
+    D3_QWC = byte_count >> 4;
     D3_CHCR = 0x100;
-    if (intrState != 0) {
+    if (intr_state != 0) {
         r1_func_0011D9A8();
     }
 }

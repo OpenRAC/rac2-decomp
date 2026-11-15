@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 /* Needs the quadword copy (-frac2-qcopy with the barrier) and -fno-gcse. The table base is an `sda` incomplete array so the assembler expands it as one `la` in the loop instead of cc1 hoisting the %hi out of it. */
@@ -33,9 +34,9 @@ void swamp_monster_spawn_splash(char *object, int bubbles, int drops, int splash
     int *timer = 0;
     int dropCount = drops;
     int currentFrame;
-    if (*(short *)(object + 0xAA) == 0xA8D /* Swamp Monster I Arm */) {
+    if (*(short *)(object + 0xAA) == MOBY_CLASS_SWAMP_MONSTER_I_ARM) {
         timer = (int *)(*(char **)(object + 0x68) + 0xF4);
-    } else if (*(short *)(object + 0xAA) == 0xA8E /* Swamp Monster I Eye */) {
+    } else if (*(short *)(object + 0xAA) == MOBY_CLASS_SWAMP_MONSTER_I_EYE) {
         timer = (int *)(*(char **)(object + 0x68) + 0xC8);
     }
     if (timer == 0)

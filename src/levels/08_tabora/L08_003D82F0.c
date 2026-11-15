@@ -10,8 +10,8 @@ extern float coll_find_ground_height_between(void *, float, float);
 void moby_store_ground_height(char *moby) {
     ti_word position;
     char *vars = *(char **)(moby + 0x68);
-    float baseHeight;
+    float base_height;
     qcopy(&position, moby + 0x10);
-    baseHeight = *(float *)(vars + 0x3E8);
-    *(float *)(vars + 0x434) = coll_find_ground_height_between(&position, baseHeight + 3.0f, baseHeight - 20.0f);
+    base_height = *(float *)(vars + 0x3E8);
+    *(float *)(vars + 0x434) = coll_find_ground_height_between(&position, base_height + 3.0f, base_height - 20.0f);
 }

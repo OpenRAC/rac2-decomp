@@ -75,7 +75,7 @@ extern void func_2E8450(char *a0, float *a1, float *a2, int a3, int a4, float f1
 /* Spawns red and white sparkle particles that float up from two joints of the object. */
 void part_spawn_joint_sparkles(char *obj) {
     EffectVector origin;
-    EffectVector jointPos;
+    EffectVector joint_pos;
     EffectVector velocity;
     EffectVector drift;
     int i;
@@ -91,15 +91,15 @@ void part_spawn_joint_sparkles(char *obj) {
         drift.value[2] = -(func_316AC0(3.5f, 4.5f) * 0.016666668f);
         velocity.bits = drift.bits;
         for (j = 0; j < 2; j++) {
-            func_30D8D0(obj, i, jointPos.value);
-            jointPos.value[2] += func_2EB5C0(j) * 0.015f + 0.5f;
+            func_30D8D0(obj, i, joint_pos.value);
+            joint_pos.value[2] += func_2EB5C0(j) * 0.015f + 0.5f;
             if (j & 1)
-                particle = func_32E560(jointPos.value, velocity.value, 0x77FF0000, 0x00FF0060, 0x13, 200, -100, 1);
+                particle = func_32E560(joint_pos.value, velocity.value, 0x77FF0000, 0x00FF0060, 0x13, 200, -100, 1);
             else
-                particle = func_32E560(jointPos.value, velocity.value, 0x77FF0060, 0x00FF0000, 0x15, 300, -100, 1);
+                particle = func_32E560(joint_pos.value, velocity.value, 0x77FF0060, 0x00FF0000, 0x15, 300, -100, 1);
             if (particle)
                 particle[9] = ((*(s16 *)(obj + 0x32) >> 5) << 4) + func_2EB5D0(0.0f);
-            particle = func_32E560(jointPos.value, velocity.value, 0x77FFFFFF, 0x00FF0000, 0xC, 100, -100, 1);
+            particle = func_32E560(joint_pos.value, velocity.value, 0x77FFFFFF, 0x00FF0000, 0xC, 100, -100, 1);
             if (particle)
                 particle[9] = ((*(s16 *)(obj + 0x32) >> 5) << 4) + func_2EB5D0(0.0f);
         }
@@ -114,20 +114,20 @@ void part_spawn_joint_sparkles(char *obj) {
 /* Tells every moby of class 3415 in the object's group to raise its alert flag. */
 void dobbo_alert_path_enemies(char *obj) {
     s16 *list;
-    s32 listPtr;
+    s32 list_ptr;
     char *member;
-    char *mobyTable;
+    char *moby_table;
     if (*(u8 *)(obj + 0x21) == 0xFF) {
         return;
     }
-    listPtr = (s32)D_L09_001FFFB560[*(u8 *)(obj + 0x21)];
-    if (listPtr == 0) {
+    list_ptr = (s32)D_L09_001FFFB560[*(u8 *)(obj + 0x21)];
+    if (list_ptr == 0) {
         return;
     }
-    list = (s16 *)listPtr;
-    mobyTable = D_L09_001B285C;
+    list = (s16 *)list_ptr;
+    moby_table = D_L09_001B285C;
     do {
-        member = mobyTable + ((*(u16 *)list & 0x7FFF) << 8);
+        member = moby_table + ((*(u16 *)list & 0x7FFF) << 8);
         if (*(s8 *)(member + 0x20) >= 0) {
             if (*(s16 *)(member + 0xAA) == 0xD57 /* moby class 3415 */) {
                 *(u16 *)(*(char **)(member + 0x68) + 0x270) = 1;
@@ -141,10 +141,10 @@ extern s32 moby_count_group_not_in_state(s32 a0, s32 a1);
 /* Alerts the group, and for modes 4 and 5 also makes the first idle group member start its next action. */
 void dobbo_alert_group_wake_first(char *obj, s32 mode) {
     char *self = obj;
-    char *mobyTable;
+    char *moby_table;
     u16 *list;
     char *member;
-    char *memberVars;
+    char *member_vars;
 
     if (mode == 0) {
         return;
@@ -159,14 +159,14 @@ void dobbo_alert_group_wake_first(char *obj, s32 mode) {
     if (moby_count_group_not_in_state(*(u8 *)(self + 0x21), -1) < 2) {
         return;
     }
-    mobyTable = D_L09_001B285C;
+    moby_table = D_L09_001B285C;
     list = (u16 *)D_L09_001FFFB560[*(u8 *)(self + 0x21)];
     do {
-        member = mobyTable + ((*list & 0x7FFF) << 8);
+        member = moby_table + ((*list & 0x7FFF) << 8);
         if (*(s16 *)(member + 0xAA) == 0xD57 /* moby class 3415 */) {
-            memberVars = *(char **)(member + 0x68);
-            if (*(s16 *)(memberVars + 0x26A) == 0) {
-                *(s16 *)(memberVars + 0x26A) = 1;
+            member_vars = *(char **)(member + 0x68);
+            if (*(s16 *)(member_vars + 0x26A) == 0) {
+                *(s16 *)(member_vars + 0x26A) = 1;
                 return;
             }
         }
@@ -221,20 +221,20 @@ void dobbo_tick_timers_effects(char *obj) {
 /* Tells every moby of class 3472 in the object's group to raise its alert flag. */
 void dobbo_alert_wandering_group(char *obj) {
     s16 *list;
-    s32 listPtr;
+    s32 list_ptr;
     char *member;
-    char *mobyTable;
+    char *moby_table;
     if (*(u8 *)(obj + 0x21) == 0xFF) {
         return;
     }
-    listPtr = (s32)D_L09_001FFFB560[*(u8 *)(obj + 0x21)];
-    if (listPtr == 0) {
+    list_ptr = (s32)D_L09_001FFFB560[*(u8 *)(obj + 0x21)];
+    if (list_ptr == 0) {
         return;
     }
-    list = (s16 *)listPtr;
-    mobyTable = D_L09_001B285C;
+    list = (s16 *)list_ptr;
+    moby_table = D_L09_001B285C;
     do {
-        member = mobyTable + ((*(u16 *)list & 0x7FFF) << 8);
+        member = moby_table + ((*(u16 *)list & 0x7FFF) << 8);
         if (*(s8 *)(member + 0x20) >= 0) {
             if (*(s16 *)(member + 0xAA) == 0xD90 /* moby class 3472 */) {
                 *(u16 *)(*(char **)(member + 0x68) + 0x336) = 1;
@@ -252,13 +252,13 @@ void dobbo_alert_wandering_group(char *obj) {
 /* func_L09_00405610 is defined in L09_00405610-g8.c (small data through $gp, and its own .rodata). */
 
 /* Sets the state byte of the linked object (a switch or door) with the given index. */
-void dobbo_set_linked_state(s32 mobyIndex, u8 newState) {
+void dobbo_set_linked_state(s32 moby_index, u8 new_state) {
     char *moby;
-    if (mobyIndex == -1) {
+    if (moby_index == -1) {
         return;
     }
     moby = D_L09_001B285C;
-    moby += mobyIndex << 8;
+    moby += moby_index << 8;
     if (moby == 0) {
         return;
     }
@@ -269,16 +269,16 @@ void dobbo_set_linked_state(s32 mobyIndex, u8 newState) {
         return;
     }
     if (*(s16 *)(moby + 0xAA) == 0x102 /* moby class 258 */ || *(s16 *)(moby + 0xAA) == 0xDE0 /* moby class 3552 */) {
-        *(u8 *)(moby + 0x95) = newState;
+        *(u8 *)(moby + 0x95) = new_state;
     }
 }
 
 /* Calls the linked-object helper unless the index is empty. */
-void dobbo_activate_linked_if_valid(s32 mobyIndex) {
-    if (mobyIndex == -1) {
+void dobbo_activate_linked_if_valid(s32 moby_index) {
+    if (moby_index == -1) {
         return;
     }
-    moby_set_group_flags(mobyIndex);
+    moby_set_group_flags(moby_index);
 }
 
 /* func_L09_00406BF8: 112 bytes against retail's 108, one saved register too many.
@@ -287,11 +287,11 @@ void dobbo_activate_linked_if_valid(s32 mobyIndex) {
 /* Marks the linked object as finished and clears the link. */
 void dobbo_release_linked(char *obj) {
     char *vars = *(char **)(obj + 0x68);
-    s32 linkIndex = *(s32 *)(vars + 0x5C);
-    if (linkIndex == -1) {
+    s32 link_index = *(s32 *)(vars + 0x5C);
+    if (link_index == -1) {
         return;
     }
-    *(u8 *)((char *)((linkIndex << 8) + (s32)D_L09_001B285C) + 0xBC) = 1;
+    *(u8 *)((char *)((link_index << 8) + (s32)D_L09_001B285C) + 0xBC) = 1;
     *(s32 *)(vars + 0x5C) = -1;
 }
 
@@ -302,29 +302,29 @@ void dobbo_release_linked(char *obj) {
 /* func_L09_00406FC8 is in L09_00406FC8-g8.c. */
 
 /* Sets an entity's colour key, or hands an off-kind entity to the shared body. */
-void dobbo_apply_setting_linked(char *controller, char *target, s32 enable, s32 activeMode, s32 modelMode)
+void dobbo_apply_setting_linked(char *controller, char *target, s32 enable, s32 active_mode, s32 model_mode)
 {
-    u8 byteValue;
+    u8 byte_value;
     s16 cls;
-    char *targetVars;
+    char *target_vars;
 
     if (target == 0) {
         return;
     }
-    byteValue = *(u8 *)(target + 0x20);
-    if (byteValue == 0xFE) {
+    byte_value = *(u8 *)(target + 0x20);
+    if (byte_value == 0xFE) {
         return;
     }
-    if (byteValue == 0xFD) {
+    if (byte_value == 0xFD) {
         return;
     }
     cls = *(s16 *)(target + 0xAA);
-    if (cls == 0xD0F /* Megacorp Trooper Legs */) {
-        targetVars = *(char **)(target + 0x68);
-        *(u8 *)(targetVars + 0x31C) = enable;
-        byteValue = *(u8 *)(target + 0x30);
-        if (byteValue != 0xFF) {
-            *(u8 *)(targetVars + 0x31E) = byteValue;
+    if (cls == MOBY_CLASS_MEGACORP_TROOPER_LEGS) {
+        target_vars = *(char **)(target + 0x68);
+        *(u8 *)(target_vars + 0x31C) = enable;
+        byte_value = *(u8 *)(target + 0x30);
+        if (byte_value != 0xFF) {
+            *(u8 *)(target_vars + 0x31E) = byte_value;
         }
         if (enable != 0) {
             *(u8 *)(target + 0x30) = 0xFF;
@@ -332,14 +332,14 @@ void dobbo_apply_setting_linked(char *controller, char *target, s32 enable, s32 
         return;
     }
     if (cls == 0xD09 /* moby class 3337 */ || cls == 0xCEA /* moby class 3306 */) {
-        dobbo_set_mode_flags(target, 0, activeMode, modelMode);
+        dobbo_set_mode_flags(target, 0, active_mode, model_mode);
         return;
     }
     if (cls == 0xDE0 /* moby class 3552 */) {
         *(u8 *)(target + 0x95) = *(u8 *)(controller + 0x95);
         return;
     }
-    dobbo_set_mode_flags(target, enable, activeMode, modelMode);
+    dobbo_set_mode_flags(target, enable, active_mode, model_mode);
 }
 
 /* Hands the record's colour key to every entry the index names, negating the
@@ -641,15 +641,15 @@ void door_init_slide_motion(char *obj) {
     char *self = obj;
     char *rotation = self + 0xC0;
     char *vars = *(char **)(self + 0x68);
-    f32 angleA, angleB;
+    f32 angle_a, angle_b;
     *(s32 *)(vars + 0x8) = 0;
     *(s32 *)(vars + 0xC) = 0;
     *(f32 *)(vars + 0x0) = 0.2f;
     *(f32 *)(vars + 0x4) = 0.2f;
     func_2EACD0(rotation, self + 0xF0);
-    angleA = func_2EA3E0(func_2EA578(rotation, D_L09_001B9C30));
-    angleB = func_2EA3E0(func_2EA578(self + 0xD0, D_L09_001B9C30));
-    if (angleB < angleA) {
+    angle_a = func_2EA3E0(func_2EA578(rotation, D_L09_001B9C30));
+    angle_b = func_2EA3E0(func_2EA578(self + 0xD0, D_L09_001B9C30));
+    if (angle_b < angle_a) {
         *(s32 *)(vars + 0x14) = 1;
     } else {
         *(s32 *)(vars + 0x14) = 0;

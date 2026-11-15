@@ -97,16 +97,16 @@ void message_l20_trigger_update(Thing *moby)
         missing = 1;
         if (D_L20_002AB830[g_current_map_index] != 0 && D_L20_002AB830[g_current_map_index][vars->idx] != 0) {
             for (i = 0; D_L20_002AB830[g_current_map_index][vars->idx][i] != -1; i++) {
-                int entryId = D_L20_002AB830[g_current_map_index][vars->idx][i];
+                int entry_id = D_L20_002AB830[g_current_map_index][vars->idx][i];
 
                 missing = 0;
                 if (vars->tail.b.quiet == 0) {
-                    int bit = 1 << (entryId & 0x1F);
-                    if (D_00139768[(unsigned int)entryId >> 2] & bit)
+                    int bit = 1 << (entry_id & 0x1F);
+                    if (D_00139768[(unsigned int)entry_id >> 2] & bit)
                         continue;
                 }
-                if (req_push_queue(D_L20_001C01C0, entryId) == 0 && i == 0) {
-                    STUB_printf(D_L20_002B5770, moby->id, moby->oclass, g_current_map_index, vars->idx, entryId);
+                if (req_push_queue(D_L20_001C01C0, entry_id) == 0 && i == 0) {
+                    STUB_printf(D_L20_002B5770, moby->id, moby->oclass, g_current_map_index, vars->idx, entry_id);
                     return;
                 }
                 fail = 0;

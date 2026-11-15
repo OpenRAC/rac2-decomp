@@ -96,7 +96,7 @@ typedef struct MuseumExhibit {
 } MuseumExhibit;
 /* Runs the Infiltrator lock (moby class 2857): waits for the player to press the button, plays the camera move, starts the puzzle and marks the lock as opened when it is solved. */
 void infiltrator_lock_update(char *obj) {
-    MuseumExhibit *lockVars = (MuseumExhibit *)P(obj,0x68);
+    MuseumExhibit *lock_vars = (MuseumExhibit *)P(obj,0x68);
     float vec[4] __attribute__((aligned(16)));
     float pos[4] __attribute__((aligned(16)));
     float rot[4] __attribute__((aligned(16)));
@@ -105,20 +105,20 @@ void infiltrator_lock_update(char *obj) {
     case 0: {
         int j, state;
         unsigned short id = U(obj,0xB2);
-        char *displayMoby;
+        char *display_moby;
         if (((MuseumCompletion *)D_L03_0021EA30)->complete[(short)id]
             || (state = D_0019B4A8[((short)id>>1)+(g_current_map_index<<10)], (id & 1) ? (state>>4)&7 : state&7)) {
             moby_set_state(obj,8,-1);
             moby_set_flag_bit(obj,1);
-            for (j=0;j<2;j++) if (lockVars->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(lockVars->childIds[j]<<8),1);
+            for (j=0;j<2;j++) if (lock_vars->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(lock_vars->childIds[j]<<8),1);
         } else {
             moby_set_state(obj,1,-1);
             infiltrator_ball_spawn_for_moby(obj);
-            displayMoby=(char *)lockVars->display;
-            qcopy(displayMoby+0x10,obj+0x10);
-            F(displayMoby,0x18)+=1.0f;
-            U(lockVars->display,0x34)|=1;
-            B(lockVars->display,0x31)=0;
+            display_moby=(char *)lock_vars->display;
+            qcopy(display_moby+0x10,obj+0x10);
+            F(display_moby,0x18)+=1.0f;
+            U(lock_vars->display,0x34)|=1;
+            B(lock_vars->display,0x31)=0;
         }
         break;
     }
@@ -130,7 +130,7 @@ void infiltrator_lock_update(char *obj) {
             break;
         }
         if (g_pad_state.buttons.words.high&0x10) {
-            lockVars->saved=g_hero_state.saved;
+            lock_vars->saved=g_hero_state.saved;
             g_hero_state.action=0x33;
             moby_set_state(obj,2,-1);
         }
@@ -155,7 +155,7 @@ void infiltrator_lock_update(char *obj) {
             FastVecSub(vec,D_L03_001B9980,g_hero_state.position);
             matrix_mul_vec3(vec,vec,g_hero_state.matrix40);
             SetCamera5Pose(D_L03_001B9980,D_L03_001B9980,3,120,0);
-            lockVars->fade=0;
+            lock_vars->fade=0;
         }
         matrix_mul_vec3(vec,D_L03_001B0C70_gp,obj+0xC0);
         FastVecAdd(vec,vec,obj+0x10);
@@ -176,8 +176,8 @@ void infiltrator_lock_update(char *obj) {
         object_copy_vector_to_selected(pos);cam_set_state_rotation(rot);
         if ((AdvanceMuseumTimer(obj)>=61)) {
             moby_set_state(obj,4,-1);
-            lockVars->resume=g_music_state.a==-1?g_music_state.b:g_music_state.a;
-            script_queue_keyed_request(lockVars->music,lockVars->volume);
+            lock_vars->resume=g_music_state.a==-1?g_music_state.b:g_music_state.a;
+            script_queue_keyed_request(lock_vars->music,lock_vars->volume);
         }
         break;
     case 4: {
@@ -190,9 +190,9 @@ void infiltrator_lock_update(char *obj) {
         g_hero_state.mode=3;
         if (g_hero_state.animationId!=0x6F) {gadget_reset_state(obj);moby_set_state(obj,1,-1);break;}
         if ((AdvanceMuseumTimer(obj)<21)) break;
-        ApproachValue(&lockVars->fade,1.0f,0.116666675f);
+        ApproachValue(&lock_vars->fade,1.0f,0.116666675f);
         elapsed=U(obj,0x96);
-        D_L03_001B2464=lockVars->fade;
+        D_L03_001B2464=lock_vars->fade;
         if (elapsed<31) break;
         D_L03_001B9C14=1.1243411f;
         cam_set_value_target(1,0,1.1243411f,0.005f,0.2f,0.0f);
@@ -207,52 +207,52 @@ void infiltrator_lock_update(char *obj) {
             D_L03_001B0B50=0;
             /* Pointer arithmetic, not trackIds[i]: an array field of a BLKmode struct would form lockVars+0xC in its own
              * register ahead of the loop's duplicated exit test. The scalar globals leave the loop through load_mems. */
-            for (i=0;i<14&&*(lockVars->trackIds+i)>=0;i++) {
-                D_L03_0029BCD0[i][0]=*(lockVars->trackIds+i);
+            for (i=0;i<14&&*(lock_vars->trackIds+i)>=0;i++) {
+                D_L03_0029BCD0[i][0]=*(lock_vars->trackIds+i);
                 D_L03_001B0B50++;
-                D_L03_001B0B5C=lockVars->duration;
-                D_L03_001B0B58=lockVars->duration+120;
-                D_L03_001B0B60=lockVars->limit;
-                lockVars->display->vars->settings=lockVars->settings;
+                D_L03_001B0B5C=lock_vars->duration;
+                D_L03_001B0B58=lock_vars->duration+120;
+                D_L03_001B0B60=lock_vars->limit;
+                lock_vars->display->vars->settings=lock_vars->settings;
             }
-            U(lockVars->display,0x34)&=~1;
-            B(lockVars->display,0x31)=1;
-            U(lockVars->display,0x34)&=~0x80;
+            U(lock_vars->display,0x34)&=~1;
+            B(lock_vars->display,0x31)=1;
+            U(lock_vars->display,0x34)&=~0x80;
             set_identity_rotation_rows(D_L03_001B9BB0);
-            vec_clear_128((char *)lockVars->display+0xF0);
-            F(lockVars->display,0xF4)=-1.5707964f;
-            euler_rotation_basis((char *)lockVars->display+0xC0,(char *)lockVars->display+0xF0);
+            vec_clear_128((char *)lock_vars->display+0xF0);
+            F(lock_vars->display,0xF4)=-1.5707964f;
+            euler_rotation_basis((char *)lock_vars->display+0xC0,(char *)lock_vars->display+0xF0);
             moby_set_state(obj,6,-1);
         } else if ((AdvanceMuseumTimer(obj)>=6)) {
             gadget_reset_state(obj);
-            script_queue_keyed_request(lockVars->resume,lockVars->volume);
+            script_queue_keyed_request(lock_vars->resume,lock_vars->volume);
             moby_set_state(obj,1,-1);
         }
         break;
     case 6:
         if (D_L03_001A8F00==7) {set_identity_rotation_rows(D_L03_001B9BB0);moby_update_attached_child(obj);break;}
         gadget_reset_state(obj);
-        script_queue_keyed_request(lockVars->resume,lockVars->volume);
-        if (lockVars->cleanupId!=-1) cam_reset_entry(lockVars->cleanupId);
-        if (lockVars->completed) {
+        script_queue_keyed_request(lock_vars->resume,lock_vars->volume);
+        if (lock_vars->cleanupId!=-1) cam_reset_entry(lock_vars->cleanupId);
+        if (lock_vars->completed) {
             moby_set_state(obj,7,-1);
             if (B(obj,0xB0)!=255) {
                 unsigned short id;
-                unsigned char *savedByte;
+                unsigned char *saved_byte;
                 id=U(obj,0xB2);
-                if (id&1) {savedByte=D_0019B4A8+(((short)id>>1)+(g_current_map_index<<10));if (((*savedByte>>4)&7)!=7) *savedByte+=16;}
-                else {savedByte=D_0019B4A8+(((short)id>>1)+(g_current_map_index<<10));if ((*savedByte&7)!=7) ++*savedByte;}
+                if (id&1) {saved_byte=D_0019B4A8+(((short)id>>1)+(g_current_map_index<<10));if (((*saved_byte>>4)&7)!=7) *saved_byte+=16;}
+                else {saved_byte=D_0019B4A8+(((short)id>>1)+(g_current_map_index<<10));if ((*saved_byte&7)!=7) ++*saved_byte;}
             }
             if (g_current_map_index==19) {
                 int j;
-                for (j=0;j<2;j++) if (lockVars->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(lockVars->childIds[j]<<8),1);
+                for (j=0;j<2;j++) if (lock_vars->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(lock_vars->childIds[j]<<8),1);
             }
         } else {hero_start_loader_state(0);moby_set_state(obj,1,-1);}
         break;
     case 7: {
         int j;
         moby_set_flag_bit(obj,1);
-        for (j=0;j<2;j++) if (lockVars->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(lockVars->childIds[j]<<8),1);
+        for (j=0;j<2;j++) if (lock_vars->childIds[j]!=-1) moby_set_flag_bit(D_L03_001B2A1C+(lock_vars->childIds[j]<<8),1);
         hero_start_loader_state(0);moby_set_state(obj,8,-1);
         break;
     }

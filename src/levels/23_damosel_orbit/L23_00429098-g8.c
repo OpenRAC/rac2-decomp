@@ -23,7 +23,7 @@ extern void part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, float, 
 
 /* Creates a second kind of child shot with a particle trail, launched from a parent object
    in a given direction. */
-u8 *fast_shot_create_child(u8 *parent, TI128 *direction, TI128 *position, s32 hitState, float radius) {
+u8 *fast_shot_create_child(u8 *parent, TI128 *direction, TI128 *position, s32 hit_state, float radius) {
     u8 *obj = CreateMoby(0x1237 /* moby class 4663 */);
     u8 *payload;
     float rotationRandom;
@@ -34,7 +34,7 @@ u8 *fast_shot_create_child(u8 *parent, TI128 *direction, TI128 *position, s32 hi
         obj[0x30] = 0xFF;
         *(s16 *)(obj + 0x32) = 0xFF;
         obj[0x31] = 1;
-        obj[0xBC] = hitState;
+        obj[0xBC] = hit_state;
         obj[0x20] = 0;
         *(s64 *)(obj + 0x38) = *(s64 *)(parent + 0x38);
         qcopy(obj + 0x10, position);

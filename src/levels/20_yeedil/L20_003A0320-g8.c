@@ -30,10 +30,10 @@ extern int math_fast_float_d(char *);
 extern void moby_mark_spawned(char *);
 
 /* Updates moby class 4890: waits for its trigger, puts out a burst of effects and a sound, then removes itself after a short timer. */
-void triggered_l20_burst_update(char *mobyArg) {
-    char *moby = mobyArg;
+void triggered_l20_burst_update(char *moby_arg) {
+    char *moby = moby_arg;
     char *vars;
-    f32 effectPos[4];
+    f32 effect_pos[4];
     f32 zero;
     f32 size;
     int value;
@@ -75,9 +75,9 @@ void triggered_l20_burst_update(char *mobyArg) {
     case 2:
         zero = 0.0f;
         size = 3.0f;
-        vec_local_offset_to_world(moby, (char *)effectPos, zero, zero, size);
+        vec_local_offset_to_world(moby, (char *)effect_pos, zero, zero, size);
         if (*(u8 *)(moby + 0x31) != 0 && D_L20_001B2ACC < 0.9f) {
-            SpawnExplosionEffects(moby, D_L20_001A8F20, effectPos, zero, zero, 10, 3, 16,
+            SpawnExplosionEffects(moby, D_L20_001A8F20, effect_pos, zero, zero, 10, 3, 16,
                           1.0f, 0.5f, 9.0f, *(f32 *)(moby + 0x2C) * 1.3f, -1, 15.0f,
                           0, 1, -1, 0, 0);
             part_spawn_masked_debris(moby, 1, (float *)D_L20_001A8F20_1, size, 6.0f, size, 6.0f, 0xFF);

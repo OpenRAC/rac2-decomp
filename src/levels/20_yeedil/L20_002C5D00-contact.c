@@ -77,7 +77,7 @@ extern void cam_scale_view_space_height(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
 /* Handles the hero touching a hurting object and, when asked, pushes the hero away and plays the hurt animation. Returns 1 if the hero was hit. */
-s32 hero_handle_hazard_contact(s32 applyPush) {
+s32 hero_handle_hazard_contact(s32 apply_push) {
     TI16 vec;
     Entry_002C5D00 *e;
     u8 *moby;
@@ -136,7 +136,7 @@ s32 hero_handle_hazard_contact(s32 applyPush) {
             *(s16 *)(m + 0x3BC) = 0;
         }
     }
-    if (applyPush == 0) {
+    if (apply_push == 0) {
         return 1;
     }
     flag = 0;

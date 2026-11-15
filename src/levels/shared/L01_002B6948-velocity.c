@@ -46,58 +46,58 @@ extern float hero_get_speed_along_forward(void *);
 
 /* Approach the requested velocity, increasing acceleration when reversing direction. */
 void hero_approach_velocity(float rate) {
-    float targetVelocity[4] __attribute__((aligned(16)));
-    float sourceVec[4] __attribute__((aligned(16)));
-    float currentDir[4] __attribute__((aligned(16)));
-    float angle,speed,alignment,targetLength,currentLength;
+    float target_velocity[4] __attribute__((aligned(16)));
+    float source_vec[4] __attribute__((aligned(16)));
+    float current_dir[4] __attribute__((aligned(16)));
+    float angle,speed,alignment,target_length,current_length;
     switch(g_hero_state.x22c3) {
     case 0:
         angle=g_hero_state.x1a0;speed=g_hero_state.x1b0;
         if(g_hero_state.x229c==4 && g_hero_state.x524 && g_hero_state.x287) speed=0.0833333358f;
         if(g_hero_state.x34a && g_hero_state.x2294==14 && speed>0.0166666675f) speed=0.0166666675f;
-        targetVelocity[0]=math_fast_sin_or_cos_a(angle)*speed;
-        targetVelocity[1]=math_fast_sin_or_cos_b(angle)*speed;
-        targetVelocity[2]=g_hero_state.xf8;
-        alignment=-(g_hero_state.xf0*targetVelocity[0]+g_hero_state.xf4*targetVelocity[1]);
-        targetLength=vec_length_xy(targetVelocity);currentLength=vec_length_xy((char *)&g_hero_state+0xf0);
-        if(targetLength==0.0f || currentLength==0.0f) alignment=0.0f;
+        target_velocity[0]=math_fast_sin_or_cos_a(angle)*speed;
+        target_velocity[1]=math_fast_sin_or_cos_b(angle)*speed;
+        target_velocity[2]=g_hero_state.xf8;
+        alignment=-(g_hero_state.xf0*target_velocity[0]+g_hero_state.xf4*target_velocity[1]);
+        target_length=vec_length_xy(target_velocity);current_length=vec_length_xy((char *)&g_hero_state+0xf0);
+        if(target_length==0.0f || current_length==0.0f) alignment=0.0f;
         else {
-            alignment/=targetLength;
-            alignment/=currentLength;
+            alignment/=target_length;
+            alignment/=current_length;
         }
         alignment+=1.0f;
         alignment*=1.5f;
         if(alignment>3.0f) alignment=3.0f;
         if(alignment<1.0f) alignment=1.0f;
         rate*=alignment;
-        FastVecSub(targetVelocity,targetVelocity,(char *)&g_hero_state+0xf0);
-        if(vec_length_xy(targetVelocity)>rate) vec_fast_normalize_helper(targetVelocity,targetVelocity,rate);
-        FastVecAdd((char *)&g_hero_state+0xf0,(char *)&g_hero_state+0xf0,targetVelocity);
-        *(VelocityQuad *)sourceVec=*(VelocityQuad *)((char *)&g_hero_state+0xa60);
-        g_hero_state.x1b4=g_hero_state.x178-hero_get_speed_along_forward(sourceVec);
+        FastVecSub(target_velocity,target_velocity,(char *)&g_hero_state+0xf0);
+        if(vec_length_xy(target_velocity)>rate) vec_fast_normalize_helper(target_velocity,target_velocity,rate);
+        FastVecAdd((char *)&g_hero_state+0xf0,(char *)&g_hero_state+0xf0,target_velocity);
+        *(VelocityQuad *)source_vec=*(VelocityQuad *)((char *)&g_hero_state+0xa60);
+        g_hero_state.x1b4=g_hero_state.x178-hero_get_speed_along_forward(source_vec);
         if(g_hero_state.x1454) g_hero_state.x1b4=g_hero_state.x174;
         break;
     case 1:case 2:
-        *(VelocityQuad *)sourceVec=*(VelocityQuad *)((char *)&g_hero_state+0x190);speed=g_hero_state.x1b0;
-        cam_set_view_space_height(targetVelocity,sourceVec,0.0f);
-        vec_scale_to_length(targetVelocity,targetVelocity,speed);
-        cam_set_view_space_height(currentDir,(char *)&g_hero_state+0xf0,0.0f);
-        alignment=-FastVecDot(currentDir,targetVelocity);
-        targetLength=cam_get_view_space_vector_length(targetVelocity);currentLength=cam_get_view_space_vector_length((char *)&g_hero_state+0xf0);
-        if(targetLength==0.0f || currentLength==0.0f) alignment=0.0f;
+        *(VelocityQuad *)source_vec=*(VelocityQuad *)((char *)&g_hero_state+0x190);speed=g_hero_state.x1b0;
+        cam_set_view_space_height(target_velocity,source_vec,0.0f);
+        vec_scale_to_length(target_velocity,target_velocity,speed);
+        cam_set_view_space_height(current_dir,(char *)&g_hero_state+0xf0,0.0f);
+        alignment=-FastVecDot(current_dir,target_velocity);
+        target_length=cam_get_view_space_vector_length(target_velocity);current_length=cam_get_view_space_vector_length((char *)&g_hero_state+0xf0);
+        if(target_length==0.0f || current_length==0.0f) alignment=0.0f;
         else {
-            alignment/=targetLength;
-            alignment/=currentLength;
+            alignment/=target_length;
+            alignment/=current_length;
         }
         alignment+=1.0f;
         alignment*=1.5f;
         if(alignment>3.0f) alignment=3.0f;
         if(alignment<1.0f) alignment=1.0f;
         rate*=alignment;
-        FastVecSub(targetVelocity,targetVelocity,(char *)&g_hero_state+0xf0);
-        cam_set_view_space_height(targetVelocity,targetVelocity,0.0f);
-        if(cam_get_view_space_vector_length(targetVelocity)>rate) cam_set_view_space_vector_length(targetVelocity,targetVelocity,rate);
-        FastVecAdd((char *)&g_hero_state+0xf0,(char *)&g_hero_state+0xf0,targetVelocity);
+        FastVecSub(target_velocity,target_velocity,(char *)&g_hero_state+0xf0);
+        cam_set_view_space_height(target_velocity,target_velocity,0.0f);
+        if(cam_get_view_space_vector_length(target_velocity)>rate) cam_set_view_space_vector_length(target_velocity,target_velocity,rate);
+        FastVecAdd((char *)&g_hero_state+0xf0,(char *)&g_hero_state+0xf0,target_velocity);
         g_hero_state.x1b4=g_hero_state.x178;
         if(g_hero_state.x1454) g_hero_state.x1b4=g_hero_state.x174;
         break;

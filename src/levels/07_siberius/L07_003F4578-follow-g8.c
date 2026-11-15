@@ -32,19 +32,19 @@ void boss_move_toward_target(u8 *obj,f32 limit)
 {
  f32 target[4],delta[4],move[4],accel[4];
  u8 *vars=*(u8 **)(obj+0x68);
- u8 *platformRoot;
- f32 rate,speed,distance,stepLength,angle,bank,turnRate,turnSpeed;
+ u8 *platform_root;
+ f32 rate,speed,distance,step_length,angle,bank,turnRate,turnSpeed;
  f32 *yaw;
  flyer_steer(obj);
  if(!obj[0x95]) {
   func_2E47D0(target,vars+0x3e0,*(u8 **)(vars+0x418)+0xc0);
   func_2E4310(target,target,*(u8 **)(vars+0x418)+0x10);
-  platformRoot=func_316FD8(*(u8 **)(vars+0x418));
+  platform_root=func_316FD8(*(u8 **)(vars+0x418));
   if(limit>=0.0f) {
-   qcopy(delta,platformRoot+0x10);
+   qcopy(delta,platform_root+0x10);
    func_316638(delta,limit);
    func_2E4310(obj+0x10,obj+0x10,delta);
-  } else func_2E4310(obj+0x10,obj+0x10,platformRoot+0x10);
+  } else func_2E4310(obj+0x10,obj+0x10,platform_root+0x10);
   *(f32 *)(obj+0xf8)=func_2E5318(*(f32 *)(*(u8 **)(vars+0x418)+0xf8),3.1415927f);
  } else {
   qcopy(target,vars+0x3e0);
@@ -56,10 +56,10 @@ void boss_move_toward_target(u8 *obj,f32 limit)
  rate=(obj[0x95]?D_L07_001B1078:D_L07_001B1070)*0.00027777778f;
  speed=(obj[0x95]?D_L07_001B107C:D_L07_001B1074)*(1.0f/60.0f);
  distance=func_2E4458(delta);
- stepLength=func_2E4248(distance*rate*0.5f);
+ step_length=func_2E4248(distance*rate*0.5f);
  if(limit>=0.0f && limit<speed) speed=limit;
- if(speed<stepLength) stepLength=speed;
- if(stepLength<distance) func_2E45F0(move,delta,stepLength);
+ if(speed<step_length) step_length=speed;
+ if(step_length<distance) func_2E45F0(move,delta,step_length);
  else qcopy(move,delta);
  func_2E4340(accel,move,vars+0x3f0);
  func_316638(accel,rate);

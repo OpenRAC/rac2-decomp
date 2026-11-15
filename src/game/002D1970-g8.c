@@ -18,8 +18,8 @@ extern void AppendScreenRectPacket(int, int, int, int, unsigned long, int);
 int extras_menu_draw(void)
 {
     int i, y = 125;
-    int *textIds = D_001ABD28;
-    int *enabledFlags = D_001ABA40;
+    int *text_ids = D_001ABD28;
+    int *enabled_flags = D_001ABA40;
     float z;
 
     SetupGifPaging(0);
@@ -37,10 +37,10 @@ int extras_menu_draw(void)
     AppendScreenRectPacket(312, 265, 451, 267, 0x55F0C070, 0);
     AppendScreenRectPacket(312, 128, 314, 265, 0x55F0C070, 0);
     AppendScreenRectPacket(449, 128, 451, 265, 0x55F0C070, 0);
-    for (i = 0; i < 5; i++, y += 31, textIds++, enabledFlags++) {
+    for (i = 0; i < 5; i++, y += 31, text_ids++, enabled_flags++) {
         unsigned long color = i == D_001ABA3C ? 0x7000FFFFUL : 0x80F0F0F0UL;
-        int textId = *enabledFlags ? *textIds : 0x2DC0;
-        text_draw_centered_small(165, y, color, GetLocalizedString(textId), -1);
+        int text_id = *enabled_flags ? *text_ids : 0x2DC0;
+        text_draw_centered_small(165, y, color, GetLocalizedString(text_id), -1);
     }
     DoGifPaging();
     return 0;

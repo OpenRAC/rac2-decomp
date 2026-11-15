@@ -25,7 +25,7 @@ void weapon_menu_update_entry(void)
     int selected;
     unsigned char *state;
     MapClass *record;
-    int isActive;
+    int is_active;
     unsigned short label;
     unsigned char *lookup;
 
@@ -35,8 +35,8 @@ void weapon_menu_update_entry(void)
     lookup = g_item_slot_to_record + selected;
     record = (MapClass *)(*lookup * 0xE0 + (unsigned int)g_weapon_table);
     label = record->label;
-    isActive = record->active;
-    if (selected != 0 && isActive != 0) {
+    is_active = record->active;
+    if (selected != 0 && is_active != 0) {
         D_001A8FB0.selected = selected;
         D_001A8FB0.handle = hud_set_slot_contents(0x10, label,
             menu_init_small_panel, gauge_update_fade_counters, hud_return_zero,

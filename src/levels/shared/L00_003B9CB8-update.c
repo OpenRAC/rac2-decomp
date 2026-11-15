@@ -74,8 +74,8 @@ void shooting_enemy_update(char *moby)
     char *tgt13, *tgt10, *tgt16;
     f32 *pos;
     s32 *path;
-    int slotIndex;
-    int m0, m2, flags, stateByte;
+    int slot_index;
+    int m0, m2, flags, state_byte;
     float h13, h12, floor12, y12, diff12, h5, diff5, dist10, dot, dist11, dist16, sx, sy, sz;
 
     if (((Hero_L00_003BD7E0 *)g_hero_state)->b[0x22B4] == 1)
@@ -421,19 +421,19 @@ void shooting_enemy_update(char *moby)
         break;
     }
 
-    stateByte = *(u8 *)(moby + 0x20);
-    if (stateByte == 12 || stateByte == 13 || stateByte == 14 || stateByte == 16) {
+    state_byte = *(u8 *)(moby + 0x20);
+    if (state_byte == 12 || state_byte == 13 || state_byte == 14 || state_byte == 16) {
         u8 *recA;
         recA = *(s32 *)(vars + 0x2C4) * 0x70 + g_sound_state;
         if (*(char **)(recA + 0x88) != moby || recA[0x74] == 0)
             *(s32 *)(vars + 0x2C4) = PlayMobySound(10, 4, moby);
     } else {
         u8 *recB;
-        slotIndex = *(s32 *)(vars + 0x2C4);
-        if (slotIndex != -1) {
-            recB = slotIndex * 0x70 + g_sound_state;
+        slot_index = *(s32 *)(vars + 0x2C4);
+        if (slot_index != -1) {
+            recB = slot_index * 0x70 + g_sound_state;
             if (*(char **)(recB + 0x88) == moby && recB[0x74] != 0)
-                snd_stop_voice(slotIndex);
+                snd_stop_voice(slot_index);
         }
         *(s32 *)(vars + 0x2C4) = -1;
     }

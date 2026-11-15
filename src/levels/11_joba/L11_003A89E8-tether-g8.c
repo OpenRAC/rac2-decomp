@@ -164,17 +164,17 @@ void gadget_l11_update_lock_on_tether(Moby *self)
     int locked = D_L11_00279BA0[g_item_slot_to_record.cur].on != 0;
     float reach = D_L11_001AF164 * 0.05f;
     Rope *st = self->rope;
-    float lockPointA[4] __attribute__((aligned(16)));
+    float lock_point_a[4] __attribute__((aligned(16)));
     float va[4] __attribute__((aligned(16)));
     float vb[4] __attribute__((aligned(16)));
     Hit hit1 __attribute__((aligned(16)));
-    float chainDirection[4] __attribute__((aligned(16)));
-    float segmentDelta[4] __attribute__((aligned(16)));
-    float segmentStep[4] __attribute__((aligned(16)));
-    float pullVector[4] __attribute__((aligned(16)));
-    float sparkOffset[4] __attribute__((aligned(16)));
+    float chain_direction[4] __attribute__((aligned(16)));
+    float segment_delta[4] __attribute__((aligned(16)));
+    float segment_step[4] __attribute__((aligned(16)));
+    float pull_vector[4] __attribute__((aligned(16)));
+    float spark_offset[4] __attribute__((aligned(16)));
     Tgt *held[128];
-    float tempVector[4] __attribute__((aligned(16)));
+    float temp_vector[4] __attribute__((aligned(16)));
     union {
         float q[16];
         struct { Hit r; } b;
@@ -232,14 +232,14 @@ void gadget_l11_update_lock_on_tether(Moby *self)
                         if (candidate->kind != 0xFE) {
                         if (candidate->kind != 0xFD) {
                             if (moby_get_private_value_0(candidate) != 0) {
-                                FastVecSub(lockPointA, candidate->pos, st);
+                                FastVecSub(lock_point_a, candidate->pos, st);
                                 if (D_L11_001A8FF0 != 0) {
-                                    proj = FastVecDot(lockPointA, g_hero_state.ent + 0xE0);
+                                    proj = FastVecDot(lock_point_a, g_hero_state.ent + 0xE0);
                                     FastVecScale(va, g_hero_state.ent + 0xE0, proj);
-                                    FastVecSub(vb, lockPointA, va);
+                                    FastVecSub(vb, lock_point_a, va);
                                     dist = FastVecLength(vb);
                                 } else {
-                                    dist = vec_length_xy(lockPointA);
+                                    dist = vec_length_xy(lock_point_a);
                                 }
                                 if (!(D_L11_001AF164 < dist)) {
                                     ang = FastDiffRots(D_L11_001BA780[0x158 / 4], mat_fast_helper_a(candidate->pos[0] - D_L11_001BA780[0x140 / 4], candidate->pos[1] - D_L11_001BA780[0x144 / 4]));
@@ -306,10 +306,10 @@ void gadget_l11_update_lock_on_tether(Moby *self)
     if (st->lockA != 0) {
         ia = moby_get_private_value_0(st->lockA);
         ta = st->lockA;
-        qcopy(lockPointA, ta->pos);
+        qcopy(lock_point_a, ta->pos);
         FastVecScale(va, (char *)ta + 0xE0, ia[4]);
-        FastVecAdd(lockPointA, lockPointA, va);
-        len = fast_vec_dist(st, lockPointA);
+        FastVecAdd(lock_point_a, lock_point_a, va);
+        len = fast_vec_dist(st, lock_point_a);
         reach = len * 0.05f;
     }
     if (st->lockB != 0) {
@@ -318,7 +318,7 @@ void gadget_l11_update_lock_on_tether(Moby *self)
         qcopy(va, tb->pos);
         FastVecScale(vb, (char *)tb + 0xE0, ib[4]);
         FastVecAdd(va, va, vb);
-        reach = (fast_vec_dist(lockPointA, va) + len) * 0.05f;
+        reach = (fast_vec_dist(lock_point_a, va) + len) * 0.05f;
     }
     if (locked)
         D_L11_001AF1C8 = 0x207F20;
@@ -331,14 +331,14 @@ void gadget_l11_update_lock_on_tether(Moby *self)
     hit1.tag = self->tag;
     st->count = 0x14;
     coll_process_hit(st, 0x10, g_hero_state.ent, &hit1, 0.3f);
-    FastVecSub(chainDirection, st->b, st);
-    vec_scale_to_length(chainDirection, chainDirection, 1.0f);
+    FastVecSub(chain_direction, st->b, st);
+    vec_scale_to_length(chain_direction, chain_direction, 1.0f);
     if (st->lockA != 0 || st->lockB != 0) {
-        FastVecCross(segmentDelta, chainDirection, (char *)&g_hero_state + 0x2C0);
-        math_apply_axis_rotation_to_quat(chainDirection, chainDirection, segmentDelta, 0.17453295f);
+        FastVecCross(segment_delta, chain_direction, (char *)&g_hero_state + 0x2C0);
+        math_apply_axis_rotation_to_quat(chain_direction, chain_direction, segment_delta, 0.17453295f);
     }
     got = 0;
-    FastVecScale(pullVector, chainDirection, reach);
+    FastVecScale(pull_vector, chain_direction, reach);
     nheld = 0;
     /* These named pointers, and the short locals below, are live but also steer: each adds
        insns that exist at gcse and die later (asm operands keep the copy; the sign extension
@@ -362,25 +362,25 @@ void gadget_l11_update_lock_on_tether(Moby *self)
         D_L11_0023B6D0[i] = height;
         D_L11_0023B450[0][i].f[2] = D_L11_0023B450[0][i].f[2] - old;
         vec_transform_or_copy(&D_L11_0023B450[0][i], &D_L11_0023B450[0][i]);
-        FastVecSub(segmentDelta, &D_L11_0023B450[0][i], D_L11_0023B440[i]);
-        lerp_vector(segmentStep, segmentDelta, pullVector, 0.85f);
+        FastVecSub(segment_delta, &D_L11_0023B450[0][i], D_L11_0023B440[i]);
+        lerp_vector(segment_step, segment_delta, pull_vector, 0.85f);
         {
-            float cm = FastVecLength(segmentStep);
+            float cm = FastVecLength(segment_step);
             if (cm == 0.0f) {
                 prev = &D_L11_0023B450[0][i - 1];
                 qcopy(&D_L11_0023B450[0][i], prev);
             } else {
-                FastVecScale(segmentStep, segmentStep, reach / cm);
-                FastVecAdd(&D_L11_0023B450[0][i], D_L11_0023B440[i], segmentStep);
-                qcopy(pullVector, segmentStep);
+                FastVecScale(segment_step, segment_step, reach / cm);
+                FastVecAdd(&D_L11_0023B450[0][i], D_L11_0023B440[i], segment_step);
+                qcopy(pull_vector, segment_step);
             }
         }
         D_L11_0023B450[0][i].f[2] = D_L11_0023B450[0][i].f[2] + height;
-        FastVecSub(segmentDelta, &D_L11_0023B450[0][i], D_L11_0023B440[i]);
+        FastVecSub(segment_delta, &D_L11_0023B450[0][i], D_L11_0023B440[i]);
         if (st->lockA != 0) {
             if (!locked || st->lockB == 0) {
-                FastVecSub(tempVector, lockPointA, &D_L11_0023B450[0][i]);
-                length = FastVecLength(tempVector);
+                FastVecSub(temp_vector, lock_point_a, &D_L11_0023B450[0][i]);
+                length = FastVecLength(temp_vector);
                 if (length != 0.0f) {
                     if (i == 0x13) {
                         blend = 0.5f;
@@ -392,15 +392,15 @@ void gadget_l11_update_lock_on_tether(Moby *self)
                     } else {
                         blend = 0.1f;
                     }
-                    FastVecScale(tempVector, tempVector, reach / length);
-                    lerp_vector(pullVector, pullVector, tempVector, blend);
+                    FastVecScale(temp_vector, temp_vector, reach / length);
+                    lerp_vector(pull_vector, pull_vector, temp_vector, blend);
                 }
             } else {
                 if (i >= 10)
-                    FastVecSub(tempVector, va, &D_L11_0023B450[0][i]);
+                    FastVecSub(temp_vector, va, &D_L11_0023B450[0][i]);
                 else
-                    FastVecSub(tempVector, lockPointA, &D_L11_0023B450[0][i]);
-                length = FastVecLength(tempVector);
+                    FastVecSub(temp_vector, lock_point_a, &D_L11_0023B450[0][i]);
+                length = FastVecLength(temp_vector);
                 if (length != 0.0f) {
                     if (i == 9 || i == 0x13) {
                         blend = 0.7f;
@@ -416,8 +416,8 @@ void gadget_l11_update_lock_on_tether(Moby *self)
                     } else {
                         blend = 0.2f;
                     }
-                    FastVecScale(tempVector, tempVector, reach / length);
-                    lerp_vector(pullVector, pullVector, tempVector, blend);
+                    FastVecScale(temp_vector, temp_vector, reach / length);
+                    lerp_vector(pull_vector, pull_vector, temp_vector, blend);
                 }
             }
         }
@@ -429,22 +429,22 @@ void gadget_l11_update_lock_on_tether(Moby *self)
             D_L11_0023B860[i] = height;
             D_L11_0023B450[1][i].f[2] = D_L11_0023B450[1][i].f[2] + height;
             {
-                float bearing = FastAddRotations(mat_fast_helper_a(segmentDelta[0], segmentDelta[1]), 1.5707965f);
+                float bearing = FastAddRotations(mat_fast_helper_a(segment_delta[0], segment_delta[1]), 1.5707965f);
                 {
                     float radial = D_L11_001AF194 * math_fast_sin_or_cos_a(angle);
-                    sparkOffset[0] = math_fast_sin_or_cos_a(bearing) * radial;
-                    sparkOffset[1] = math_fast_sin_or_cos_b(bearing) * radial;
-                    sparkOffset[2] = 0.0f;
-                    qcopy_nc(&D_L11_0023B720[i], sparkOffset);
+                    spark_offset[0] = math_fast_sin_or_cos_a(bearing) * radial;
+                    spark_offset[1] = math_fast_sin_or_cos_b(bearing) * radial;
+                    spark_offset[2] = 0.0f;
+                    qcopy_nc(&D_L11_0023B720[i], spark_offset);
                 }
             }
-            FastVecAdd(&D_L11_0023B450[1][i], &D_L11_0023B450[1][i], sparkOffset);
+            FastVecAdd(&D_L11_0023B450[1][i], &D_L11_0023B450[1][i], spark_offset);
         } else {
             fa2 = 0x15 - i;
             qcopy(&D_L11_0023B450[1][i], &D_L11_0023B450[0][i]);
             D_L11_0023B450[1][i].f[2] = D_L11_0023B450[1][i].f[2] + D_L11_0023B860[fa2];
             FastVecAdd(&D_L11_0023B450[1][i], &D_L11_0023B450[1][i], &D_L11_0023B720[fa2]);
-            qcopy(sparkOffset, &D_L11_0023B720[i]);
+            qcopy(spark_offset, &D_L11_0023B720[i]);
         }
         if (i >= 2 && (i == 0x13 || !(i & 1))) {
             FastVecSub(vb, &D_L11_0023B450[0][i], D_L11_001BA8C0);
@@ -452,8 +452,8 @@ void gadget_l11_update_lock_on_tether(Moby *self)
                 float cpj = FastVecDot(vb, g_hero_state.ent + 0xE0);
                 {
                     char *ax = g_hero_state.ent + 0xE0;
-                    FastVecScale(tempVector, ax, cpj);
-                    FastVecSub(vb, vb, tempVector);
+                    FastVecScale(temp_vector, ax, cpj);
+                    FastVecSub(vb, vb, temp_vector);
                 }
             } else {
                 *(int *)&vb[2] = 0;
@@ -503,17 +503,17 @@ void gadget_l11_update_lock_on_tether(Moby *self)
         qcopy(st->b, &D_L11_0023B580);
     if (st->lockA != 0 && (st->u.q & 0x0000FFFF0000FFFFUL) == 0) {
         tv = hb.q;
-        FastVecSub(tempVector, st->lockA->pos, D_L11_001BA8C0);
+        FastVecSub(temp_vector, st->lockA->pos, D_L11_001BA8C0);
         if (D_L11_001A8FF0 != 0) {
-            apj = FastVecDot(tempVector, g_hero_state.ent + 0xE0);
+            apj = FastVecDot(temp_vector, g_hero_state.ent + 0xE0);
             FastVecScale(tv, g_hero_state.ent + 0xE0, apj);
-            FastVecSub(tempVector, tempVector, tv);
+            FastVecSub(temp_vector, temp_vector, tv);
         } else {
-            *(int *)&tempVector[2] = 0;
+            *(int *)&temp_vector[2] = 0;
         }
-        vec_scale_to_length(tempVector, tempVector, 1.0f);
-        tempVector[3] = 5627.925f;
-        make_hit_descriptor(&hb.a.r, self, 0x210000, tempVector, (&D_L11_00279BA0[g_item_slot_to_record.cur])->f70);
+        vec_scale_to_length(temp_vector, temp_vector, 1.0f);
+        temp_vector[3] = 5627.925f;
+        make_hit_descriptor(&hb.a.r, self, 0x210000, temp_vector, (&D_L11_00279BA0[g_item_slot_to_record.cur])->f70);
         hb.a.r.kind = 5;
         hb.a.r.flag = 3;
         hb.a.r.tag = self->tag;
@@ -530,17 +530,17 @@ void gadget_l11_update_lock_on_tether(Moby *self)
         }
     }
     if (st->lockB != 0 && (st->u.q & 0xFFFF0000FFFF0000UL) == 0) {
-        FastVecSub(tempVector, st->lockB->pos, D_L11_001BA8C0);
+        FastVecSub(temp_vector, st->lockB->pos, D_L11_001BA8C0);
         if (D_L11_001A8FF0 != 0) {
-            bpj = FastVecDot(tempVector, g_hero_state.ent + 0xE0);
+            bpj = FastVecDot(temp_vector, g_hero_state.ent + 0xE0);
             FastVecScale(hb.q, g_hero_state.ent + 0xE0, bpj);
-            FastVecSub(tempVector, tempVector, hb.q);
+            FastVecSub(temp_vector, temp_vector, hb.q);
         } else {
-            *(int *)&tempVector[2] = 0;
+            *(int *)&temp_vector[2] = 0;
         }
-        vec_scale_to_length(tempVector, tempVector, 1.0f);
-        tempVector[3] = 5627.925f;
-        make_hit_descriptor(&hb.b.r, self, 0x210000, tempVector, (&D_L11_00279BA0[g_item_slot_to_record.cur])->f70);
+        vec_scale_to_length(temp_vector, temp_vector, 1.0f);
+        temp_vector[3] = 5627.925f;
+        make_hit_descriptor(&hb.b.r, self, 0x210000, temp_vector, (&D_L11_00279BA0[g_item_slot_to_record.cur])->f70);
         hb.b.r.kind = 5;
         hb.b.r.flag = 3;
         hb.b.r.tag = self->tag;
@@ -572,18 +572,18 @@ void gadget_l11_update_lock_on_tether(Moby *self)
             D_L11_001B3E50[k] = 0;
             angle0 = math_random_signed_float_range(0.52359885f, 1.0471977f);
             angle1 = math_random_float_range(-1.0471977f, 0.17453295f);
-            FastVecScale(tempVector, chainDirection, ksize);
-            math_apply_axis_rotation_to_quat(tempVector, tempVector, D_0018A560, angle1);
-            math_apply_axis_rotation_to_quat(tempVector, tempVector, D_0018A560 + 0x10, angle0);
+            FastVecScale(temp_vector, chain_direction, ksize);
+            math_apply_axis_rotation_to_quat(temp_vector, temp_vector, D_0018A560, angle1);
+            math_apply_axis_rotation_to_quat(temp_vector, temp_vector, D_0018A560 + 0x10, angle0);
             qcopy(&D_L11_0023B8B0[k].v[0], hb.q);
             ks = 1.0f;
-            FastVecAdd(&D_L11_0023B8B0[k].v[1], hb.q, tempVector);
+            FastVecAdd(&D_L11_0023B8B0[k].v[1], hb.q, temp_vector);
             for (j1 = 2; j1 < 5; j1++) {
                 FastVecSub(hb.q + 4, &D_L11_0023B8A0[k].p[j1 - 1], D_L11_001BA8C0);
                 kf = math_random_float_range(0.17453295f, 0.9599312f) * ks;
                 ks = -ks;
-                math_apply_axis_rotation_to_quat(tempVector, tempVector, hb.q + 4, kf);
-                FastVecAdd(D_L11_0023B8B0[k].v + j1, &D_L11_0023B8A0[k].p[j1 - 1], tempVector);
+                math_apply_axis_rotation_to_quat(temp_vector, temp_vector, hb.q + 4, kf);
+                FastVecAdd(D_L11_0023B8B0[k].v + j1, &D_L11_0023B8A0[k].p[j1 - 1], temp_vector);
             }
         } else {
             for (j2 = 1; j2 < 5; j2++) {
@@ -615,16 +615,16 @@ void gadget_l11_update_lock_on_tether(Moby *self)
     {
         angle0 = math_random_signed_float_range(0.52359885f, 1.0471977f);
         angle1 = math_random_float_range(-0.52359885f, 1.0471977f);
-        FastVecScale(tempVector, chainDirection, D_L11_001AF1F8);
-        math_apply_axis_rotation_to_quat(tempVector, tempVector, D_0018A560, angle1);
-        math_apply_axis_rotation_to_quat(tempVector, tempVector, D_0018A560 + 0x10, angle0);
+        FastVecScale(temp_vector, chain_direction, D_L11_001AF1F8);
+        math_apply_axis_rotation_to_quat(temp_vector, temp_vector, D_0018A560, angle1);
+        math_apply_axis_rotation_to_quat(temp_vector, temp_vector, D_0018A560 + 0x10, angle0);
         spin = math_random_int_range(1, 8);
         if (math_random_int_below(2) != 0)
             spin = -spin;
         tsize = math_random_float_range(0.2f, 0.6f);
-        part_spawn_ground_effect(st, 0xF, tsize * 0.3f, tsize, D_L11_001AF1C8 | 0x7F000000, 0, spin, tempVector, 1, 0.0f);
+        part_spawn_ground_effect(st, 0xF, tsize * 0.3f, tsize, D_L11_001AF1C8 | 0x7F000000, 0, spin, temp_vector, 1, 0.0f);
         spin = -spin;
-        part_spawn_ground_effect(st, 0xF, tsize * 0.15f, tsize * 0.5f, 0x307F7F7F, 0, spin, tempVector, 1, 0.0f);
+        part_spawn_ground_effect(st, 0xF, tsize * 0.15f, tsize * 0.5f, 0x307F7F7F, 0, spin, temp_vector, 1, 0.0f);
         spin = math_random_int_range(1, 8);
         if (math_random_int_below(2) != 0)
             spin = -spin;

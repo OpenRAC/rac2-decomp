@@ -86,7 +86,7 @@ extern char *CreateMoby(int);
 
 /* Spawns a class 0xD1B moby: its position is the first vector of its own state, which then
    takes the vectors at a (at +0x00) and b (at +0x20) and the float f (at +0x3C). */
-char *SpawnStateVectorMoby(char *obj, void *firstVector, void *secondVector, float value)
+char *SpawnStateVectorMoby(char *obj, void *first_vector, void *second_vector, float value)
 {
     typedef int Quadword __attribute__((mode(TI)));
     Quadword vectors[2];
@@ -94,8 +94,8 @@ char *SpawnStateVectorMoby(char *obj, void *firstVector, void *secondVector, flo
     char *moby;
     char *vars;
 
-    vectors[0] = *(Quadword *)firstVector;
-    *saved = *(Quadword *)secondVector;
+    vectors[0] = *(Quadword *)first_vector;
+    *saved = *(Quadword *)second_vector;
     moby = CreateMoby(0xD1B /* moby class 3355 */);
     if (moby != 0) {
         *(unsigned char *)(moby + 0x30) = 0xFF;
@@ -278,13 +278,13 @@ void enemy_count_frames_draw_glow(char *obj)
     float tmp[3];
     TI128 tmp2[2];
     char *state;
-    float secondValue, firstValue;
+    float second_value, first_value;
 
     tmp2[1] = 0;
     state = *(char **)(obj + 0x68);
-    firstValue = *(float *)(state + 0x100);
-    secondValue = *(float *)(state + 0x104);
-    *(float *)((char *)&tmp2[1] + 8) = secondValue + firstValue;
+    first_value = *(float *)(state + 0x100);
+    second_value = *(float *)(state + 0x104);
+    *(float *)((char *)&tmp2[1] + 8) = second_value + first_value;
     tmp2[0] = tmp2[1];
     matrix_mul_vec3((float *)&tmp2[0], (float *)&tmp2[0], (float *)((char *)obj + 0xC0));
     FastVecAdd((char *)tmp, (char *)obj + 0x10, (char *)&tmp2[0]);
@@ -992,16 +992,16 @@ extern float math_fast_sin_or_cos_b(float);
 
 /* Places out at src plus dist along the heading from src to out's old position, the heading
    and the distance each jittered at random; z comes from src. */
-void PlacePointWithPolarJitterFlat(float *out, TI128 *src, float distance, float angleJitter, float distJitter) {
+void PlacePointWithPolarJitterFlat(float *out, TI128 *src, float distance, float angle_jitter, float dist_jitter) {
     TI128 vec = *src;
     TI128 *p = &vec;
     float *v = (float *)&vec;
     float angle;
 
     angle = mat_fast_helper_a(out[0] - v[0], out[1] - v[1]);
-    angleJitter *= 0.017453294f;
-    angle += math_random_float_range(-angleJitter, angleJitter);
-    distance += math_random_float_range(-distJitter, distJitter);
+    angle_jitter *= 0.017453294f;
+    angle += math_random_float_range(-angle_jitter, angle_jitter);
+    distance += math_random_float_range(-dist_jitter, dist_jitter);
     qcopy(out, p);
     out[0] += distance * math_fast_sin_or_cos_a(angle);
     out[1] += distance * math_fast_sin_or_cos_b(angle);

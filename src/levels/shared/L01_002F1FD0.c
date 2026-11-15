@@ -14,20 +14,20 @@ extern float func_002E3618(void *a0, void *a1);
 /* Finds the TV Screens object nearest to a point. Returns it, or 0 if none is close enough. */
 u8 *tv_screen_find_nearest(float x, float y, float z)
 {
-    float queryPoint[4] __attribute__((aligned(16)));
+    float query_point[4] __attribute__((aligned(16)));
     u8 *closest;
-    float nearestDistance;
+    float nearest_distance;
     u8 *candidate;
 
-    *(L01_1FD0TI *)queryPoint = 0;
-    queryPoint[0] = x; queryPoint[1] = y; queryPoint[2] = z;
-    nearestDistance = 99999.0f;
+    *(L01_1FD0TI *)query_point = 0;
+    query_point[0] = x; query_point[1] = y; query_point[2] = z;
+    nearest_distance = 99999.0f;
     closest = 0;
     for (candidate = g_moby_l01_table; candidate < D_L01_001B2560; candidate += 0x100) {
-        if (*(s16 *)(candidate + 0xAA) == 0xFA0 /* TV Screens */) {
-            float dist = func_002E3618(queryPoint, candidate + 0x10);
-            if (dist < nearestDistance) {
-                nearestDistance = dist;
+        if (*(s16 *)(candidate + 0xAA) == MOBY_CLASS_TV_SCREENS) {
+            float dist = func_002E3618(query_point, candidate + 0x10);
+            if (dist < nearest_distance) {
+                nearest_distance = dist;
                 closest = candidate;
             }
         }

@@ -80,13 +80,13 @@ extern char *pickup_spawn_if_not_taken(void *, int, int, int);
    through one and shows a warning after too many misses. */
 void UpdateGateCourse(GateObject *controller)
 {
-    GateVec up, viewPos, toPlayer, toView;
+    GateVec up, view_pos, to_player, to_view;
     char *vars = controller->state, *player;
     GatePath *path;
     GateObject *gate;
-    GateObject **mobyList;
+    GateObject **moby_list;
     int count, i;
-    float playerDot, viewDot;
+    float player_dot, view_dot;
 
     up.q = 0;
     up.v.z = 1;
@@ -111,11 +111,11 @@ void UpdateGateCourse(GateObject *controller)
         hero_set_state_value_b(1);
         D_L10_00221CD0.field38 = *(int *)(vars + 0x20);
         hero_set_state_value_a(0);
-        mobyList = level_get_object_list();
+        moby_list = level_get_object_list();
         count = level_get_saved_value();
         for (i = 0; i < count; i++) {
-            if (mobyList[i]->classId == 0xf82 /* moby class 3970 */)
-                entry_spawn_list_objects_with_flag(mobyList[i], 1);
+            if (moby_list[i]->classId == 0xf82 /* moby class 3970 */)
+                entry_spawn_list_objects_with_flag(moby_list[i], 1);
         }
         path = D_L10_001FE340[*(int *)(vars + 0x20)];
         while ((!D_L10_001B1400 || !D_L10_001B1404) && D_L10_001B1418 != path->count) {
@@ -183,17 +183,17 @@ void UpdateGateCourse(GateObject *controller)
         return;
 
     player = D_L10_001B251C[0] + (*(int *)(vars + 0x24) << 8);
-    qcopy(&viewPos, D_L10_001B9680);
-    FastVecSub(&toView, &viewPos, &D_L10_001B1400->position);
-    vec_scale_to_length(&toView, &toView, 1);
-    FastVecSub(&toPlayer, player + 0x10, &D_L10_001B1400->position);
-    vec_scale_to_length(&toPlayer, &toPlayer, 1);
-    playerDot = FastVecDot(&D_L10_001B1400->forward, &toPlayer);
-    viewDot = FastVecDot(&D_L10_001B1400->forward, &toView);
+    qcopy(&view_pos, D_L10_001B9680);
+    FastVecSub(&to_view, &view_pos, &D_L10_001B1400->position);
+    vec_scale_to_length(&to_view, &to_view, 1);
+    FastVecSub(&to_player, player + 0x10, &D_L10_001B1400->position);
+    vec_scale_to_length(&to_player, &to_player, 1);
+    player_dot = FastVecDot(&D_L10_001B1400->forward, &to_player);
+    view_dot = FastVecDot(&D_L10_001B1400->forward, &to_view);
 
-    if ((playerDot != D_L10_001B140C && playerDot > 0) || (viewDot != D_L10_001B1410 && viewDot > 0)) {
+    if ((player_dot != D_L10_001B140C && player_dot > 0) || (view_dot != D_L10_001B1410 && view_dot > 0)) {
         path = D_L10_001FE340[*(int *)(vars + 0x20)];
-        if (fast_vec_dist(&viewPos, &D_L10_001B1400->position) <= 1.25f
+        if (fast_vec_dist(&view_pos, &D_L10_001B1400->position) <= 1.25f
             || fast_vec_dist(player + 0x10, &D_L10_001B1400->position) <= 1.25f) {
             snd_play_from_class_bank(15, 0, controller, 0xfbf);
             hero_add_clamped_stat(0.5f);
@@ -232,8 +232,8 @@ void UpdateGateCourse(GateObject *controller)
         }
     }
 
-    D_L10_001B140C = playerDot;
-    D_L10_001B1410 = viewDot;
+    D_L10_001B140C = player_dot;
+    D_L10_001B1410 = view_dot;
 
     if (D_L10_001B1400) {
         effect_set_enabled(D_L10_001B1400, 1);

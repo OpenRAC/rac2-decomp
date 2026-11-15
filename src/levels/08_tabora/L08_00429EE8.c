@@ -21,21 +21,21 @@ void beam_slots_draw(char *spawner) {
     VU1_addGSregister(0x47, 0x51001);
     for (i = 0; i < 3; i++) {
         float *phase = &D_L08_001B3A20[i];
-        int firstStrip, secondStrip, x, y;
+        int first_strip, second_strip, x, y;
         char *strip2;
 
         if (!g_beam_slot_key[i] || g_beam_slot_state[i] < 2) continue;
-        firstStrip = i * 2;
-        secondStrip = firstStrip + 1;
+        first_strip = i * 2;
+        second_strip = first_strip + 1;
         if (level_is_resident_flag_clear()) {
             *phase -= 0.2f;
             if (*phase <= -8.0f) *phase += 8.0f;
         }
-        strip2 = D_L08_002604A0 + secondStrip * 0x140;
+        strip2 = D_L08_002604A0 + second_strip * 0x140;
         DrawGlowBillboardPair(g_beam_slot_key[i], i);
         y = *(int *)(vars + 4) + 63;
         x = *(int *)vars + 63;
-        DrawRibbonStrips(y, x, D_L08_002604A0 + firstStrip * 0x140, 128, 64, i, -1);
+        DrawRibbonStrips(y, x, D_L08_002604A0 + first_strip * 0x140, 128, 64, i, -1);
         DrawRibbonStrips(y, x, strip2, 48, 16, i, math_random_int_range(1, 20));
     }
     gfx_append_vectors_to_packet(2, 0x47, 0x5340B, 0x42, 0x8000000044ULL);

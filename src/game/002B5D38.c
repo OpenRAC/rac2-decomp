@@ -19,7 +19,7 @@ int coll_resolve_wall_floor(char *self, char *ctl)
     Vec4Q_002B5D38 V;
     Vec4Q_002B5D38 B;
     Vec4Q_002B5D38 Z;
-    int probeKind;
+    int probe_kind;
     int hit;
     TI128_002B5D38 zero = 0;
     char *dst;
@@ -28,8 +28,8 @@ int coll_resolve_wall_floor(char *self, char *ctl)
     Z.f[2] = *(float *)(ctl + 4) + *(float *)ctl;
     B.q = Z.q;
     FastVecAdd(&V, self + 0x10, &B);
-    probeKind = (*(unsigned int *)(ctl + 0x38) & 2) ? 6 : 4;
-    hit = coll_test_point(&V, probeKind, self, *(float *)ctl);
+    probe_kind = (*(unsigned int *)(ctl + 0x38) & 2) ? 6 : 4;
+    hit = coll_test_point(&V, probe_kind, self, *(float *)ctl);
     if (hit != 0) {
         char *g = g_collision_hit;
 

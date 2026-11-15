@@ -15,12 +15,12 @@ typedef int V4 __attribute__((mode(TI)));
 /* Updates a particle that follows another object. It disappears when that object is gone or dying. */
 void part_update_following_moby(char *self)
 {
-    V4 prevPos;
+    V4 prev_pos;
     char *state = self + 0x30;
     char *target = *(char **)(self + 0x30);
-    float randomFactor;
-    float newSize;
-    float savedExtra;
+    float random_factor;
+    float new_size;
+    float saved_extra;
     int count;
 
     if (target == 0)
@@ -35,10 +35,10 @@ kill:
     part_kill(self);
     return;
 cont:
-    randomFactor = math_random_float_range(0.5f, 1.0f);
-    savedExtra = *(float *)(self + 0x2C);
-    newSize = *(float *)(state + 0xC) * randomFactor;
-    qcopy(&prevPos, self + 0x10);
+    random_factor = math_random_float_range(0.5f, 1.0f);
+    saved_extra = *(float *)(self + 0x2C);
+    new_size = *(float *)(state + 0xC) * random_factor;
+    qcopy(&prev_pos, self + 0x10);
     count = *(int *)(state + 4);
     if (count > 0) {
         moby_transform_joint_to_world(*(int *)(self + 0x30), count, self + 0x10);
@@ -46,10 +46,10 @@ cont:
         qcopy(self + 0x10, (char *)*(int *)(self + 0x30) + 0x10);
     }
     if (1.5f < fast_vec_dist(self + 0x10, self + 0x20)) {
-        FastVecSub(&prevPos, &prevPos, self + 0x10);
-        vec_scale_to_length(&prevPos, &prevPos, 1.5f);
-        FastVecAdd(self + 0x20, self + 0x10, &prevPos);
+        FastVecSub(&prev_pos, &prev_pos, self + 0x10);
+        vec_scale_to_length(&prev_pos, &prev_pos, 1.5f);
+        FastVecAdd(self + 0x20, self + 0x10, &prev_pos);
     }
-    *(float *)(self + 0x1C) = newSize;
-    *(float *)(self + 0x2C) = savedExtra;
+    *(float *)(self + 0x1C) = new_size;
+    *(float *)(self + 0x2C) = saved_extra;
 }

@@ -118,15 +118,15 @@ extern void hero_destroy_equipment_pieces(void);
    up the resource bases and hero, then waits for the dialog stream and three
    frames. */
 /* Starts a cutscene by its number. */
-void cutscene_start(int cutsceneId)
+void cutscene_start(int cutscene_id)
 {
-    int index, i, memTop;
-    char *bufferPtr, *moby;
+    int index, i, mem_top;
+    char *buffer_ptr, *moby;
 
-    if ((unsigned)cutsceneId < 0xB1)
-        *(D_00139768 + ((unsigned)cutsceneId >> 2)) |= 1 << (cutsceneId & 31);
+    if ((unsigned)cutscene_id < 0xB1)
+        *(D_00139768 + ((unsigned)cutscene_id >> 2)) |= 1 << (cutscene_id & 31);
     req_mark_queued_in_flag_table(D_001BAD40);
-    index = cutscene_map_id_to_index(cutsceneId);
+    index = cutscene_map_id_to_index(cutscene_id);
     if (index < 0)
         return;
     music_Pause(0);
@@ -138,10 +138,10 @@ void cutscene_start(int cutsceneId)
     mem_clear(D_001B2980 + 0x40, 0, 0x40);
     mem_clear(D_001B13D0, 0, 0x40);
     mem_clear(D_001B1410, 0, 0x40);
-    bufferPtr = D_0021F080;
+    buffer_ptr = D_0021F080;
     for (i = 0; i < 7; i++) {
-        char *entry = bufferPtr;
-        bufferPtr += 0x40;
+        char *entry = buffer_ptr;
+        buffer_ptr += 0x40;
         mem_clear(entry, 0, 0x40);
     }
     D_001A8C74 = 1.0f;
@@ -150,12 +150,12 @@ void cutscene_start(int cutsceneId)
     g_scene_playback_state.unk34 = 0;
     g_scene_playback_state.unk3C = 0;
     if (g_current_map_index == 20)
-        memTop = D_001B22B0[0] - 0x60000;
+        mem_top = D_001B22B0[0] - 0x60000;
     else
-        memTop = D_001B22B0[0] - 0x40000;
-    D_001B22B0[0] = memTop;
-    g_scene_playback_state.base6C = D_001BAEC0.baseC + memTop;
-    g_scene_playback_state.base70 = D_001BAEC0.base10 + memTop;
+        mem_top = D_001B22B0[0] - 0x40000;
+    D_001B22B0[0] = mem_top;
+    g_scene_playback_state.base6C = D_001BAEC0.baseC + mem_top;
+    g_scene_playback_state.base70 = D_001BAEC0.base10 + mem_top;
     subtitle_clear_state();
     g_screen_fade = 1.0f;
     g_current_game_mode = 2;
@@ -182,7 +182,7 @@ void cutscene_start(int cutsceneId)
     load_relocate_world_object_parts();
     gfx_empty_stub();
     for (moby = D_001B1B60; (unsigned char)moby[0x20] != 255; moby += 0x100) {
-        if (!((unsigned char)moby[0x20] & 0x80) && *(short *)(moby + 0xAA) == 0xCB /* Decoy */)
+        if (!((unsigned char)moby[0x20] & 0x80) && *(short *)(moby + 0xAA) == MOBY_CLASS_DECOY)
             *(unsigned short *)(moby + 0x34) |= 0x80;
     }
     g_music_state.id = g_scene_playback_state.id;
@@ -211,7 +211,7 @@ void cutscene_end(void)
     char *moby;
     CutsceneHero *hero;
     CutsceneState *cutscene;
-    float heroGroundZ, cutsceneGroundZ;
+    float hero_ground_z, cutscene_ground_z;
     int i;
 
     if ((unsigned short)(g_music_state.state - 6) >= 2)
@@ -235,24 +235,24 @@ void cutscene_end(void)
         }
     }
     for (moby = D_001B1B60; (unsigned char)moby[0x20] != 255; moby += 0x100) {
-        if (!((unsigned char)moby[0x20] & 0x80) && *(short *)(moby + 0xAA) == 0xCB /* Decoy */)
+        if (!((unsigned char)moby[0x20] & 0x80) && *(short *)(moby + 0xAA) == MOBY_CLASS_DECOY)
             *(unsigned short *)(moby + 0x34) &= 0xFF7F;
     }
     hero = &g_hero_state;
     if (hero->active) {
         stub_empty_9(1);
-        heroGroundZ = coll_probe_ground_height_below(hero->pos, 0, 0.5f);
-        if (2.0f < heroGroundZ) {
-            if (math_fabs(hero->pos[2] - heroGroundZ) < 4.5f)
-                hero->pos[2] = heroGroundZ;
+        hero_ground_z = coll_probe_ground_height_below(hero->pos, 0, 0.5f);
+        if (2.0f < hero_ground_z) {
+            if (math_fabs(hero->pos[2] - hero_ground_z) < 4.5f)
+                hero->pos[2] = hero_ground_z;
         }
         g_hero_state.flag = 0;
         stub_empty_4();
         cutscene = &g_scene_playback_state;
         if (cutscene->restore) {
-            cutsceneGroundZ = coll_probe_ground_height_below(cutscene->pos, 0, 0.5f);
-            if (2.0f < cutsceneGroundZ && math_fabs(cutscene->pos[2] - cutsceneGroundZ) < 2.0f)
-                cutscene->pos[2] = cutsceneGroundZ;
+            cutscene_ground_z = coll_probe_ground_height_below(cutscene->pos, 0, 0.5f);
+            if (2.0f < cutscene_ground_z && math_fabs(cutscene->pos[2] - cutscene_ground_z) < 2.0f)
+                cutscene->pos[2] = cutscene_ground_z;
             stub_empty_14(g_scene_playback_state.pos, g_scene_playback_state.rot, 0, 1);
         }
     }

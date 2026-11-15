@@ -73,7 +73,7 @@ void giant_clank_pad_update(u8 *obj)
     int tex;
     int n;
     int dir;
-    char *soundSlot;
+    char *sound_slot;
 
     r = math_random_float_range(D_L09_001B17B0, D_L09_001B17B4);
     pos[0] = math_fast_sin_or_cos_a(math_random_angle()) * r;
@@ -98,8 +98,8 @@ void giant_clank_pad_update(u8 *obj)
         vars[2] = -1;
         break;
     case 1:
-        soundSlot = g_sound_state + vars[2] * 0x70;
-        if (*(u8 **)(soundSlot + 0x88) != obj || *(u8 *)(soundSlot + 0x74) == 0)
+        sound_slot = g_sound_state + vars[2] * 0x70;
+        if (*(u8 **)(sound_slot + 0x88) != obj || *(u8 *)(sound_slot + 0x74) == 0)
             vars[2] = PlayMobySound(0, 4, obj);
         if (g_hero_state.standing != obj || g_hero_state.busy != 0)
             break;

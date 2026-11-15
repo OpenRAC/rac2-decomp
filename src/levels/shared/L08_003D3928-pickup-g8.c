@@ -43,19 +43,19 @@ void raritanium_pickup_update(u8 *object)
 {
     PickupState *vars = *(PickupState **)(object + 0x68);
     u8 *vehicle;
-    u8 *vehicleVars;
-    unsigned short pickupId;
-    float drainStep;
+    u8 *vehicle_vars;
+    unsigned short pickup_id;
+    float drain_step;
     float pull[4] __attribute__((aligned(16)));
     if (object[0xb0] != 255) {
-        pickupId = *(unsigned short *)(object + 0xb2);
+        pickup_id = *(unsigned short *)(object + 0xb2);
         {
-        int savedBits;
-        if (((Hist *)D_L08_0021EAF0)->x[(short)pickupId])
+        int saved_bits;
+        if (((Hist *)D_L08_0021EAF0)->x[(short)pickup_id])
             goto kill;
-        savedBits = D_0019B4A8[((short)pickupId >> 1) + (g_current_map_index[0] << 10)];
-        if (pickupId & 1) { if ((savedBits >> 4) & 7) goto kill; }
-        else if (savedBits & 7) goto kill;
+        saved_bits = D_0019B4A8[((short)pickup_id >> 1) + (g_current_map_index[0] << 10)];
+        if (pickup_id & 1) { if ((saved_bits >> 4) & 7) goto kill; }
+        else if (saved_bits & 7) goto kill;
         }
     }
     switch (object[0x20]) {
@@ -76,16 +76,16 @@ void raritanium_pickup_update(u8 *object)
     case 1: {
         float value;
         vehicle = g_hero_state.vehicle;
-        if (vehicle == 0 || *(short *)(vehicle + 0xaa) != 0xeef /* Mining Vehicle */ ||
+        if (vehicle == 0 || *(short *)(vehicle + 0xaa) != MOBY_CLASS_MINING_VEHICLE ||
             vehicle[0x20] == 254 || vehicle[0x20] == 253 ||
             g_hero_state.mode != 0x31)
             return;
-        vehicleVars = *(u8 **)(vehicle + 0x68);
-        *(u8 **)(vehicleVars + 0x1b0) = object;
+        vehicle_vars = *(u8 **)(vehicle + 0x68);
+        *(u8 **)(vehicle_vars + 0x1b0) = object;
         value = vec_distance_xy(object + 0x10, &g_hero_state.position);
-        if (value < *(float *)(vehicleVars + 0x68)) {
-            *(float *)(vehicleVars + 0x68) = value;
-            *(u8 **)(vehicleVars + 0x6c) = object;
+        if (value < *(float *)(vehicle_vars + 0x68)) {
+            *(float *)(vehicle_vars + 0x68) = value;
+            *(u8 **)(vehicle_vars + 0x6c) = object;
         }
         if (!(value < D_L08_001B031C) || !(*D_00138320 & 0x80))
             return;
@@ -99,7 +99,7 @@ void raritanium_pickup_update(u8 *object)
         FastVecAdd(object + 0x10, object + 0x10, pull);
         if (!math_fast_float_d(&vars->timer))
             return;
-        ((VData *)vehicleVars)->lock = 180;
+        ((VData *)vehicle_vars)->lock = 180;
         vars->timer = D_L08_001B0370;
         qcopy(object + 0x10, &g_hero_state.position);
         ((OView *)object)->held = 1;
@@ -119,23 +119,23 @@ void raritanium_pickup_update(u8 *object)
         *(float *)(object + 0x48) = value * 2.0f;
         qcopy(object + 0x10, &g_hero_state.position);
         if (math_fast_float_d(&vars->timer) || *(float *)(object + 0x2c) <= 0.0f) {
-            drainStep = D_L08_001B0330 * *(float *)(*(u8 **)(object + 0x24) + 0x24);
-            if (drainStep < *(float *)(object + 0x2c) || g_hero_state.world == 20 ||
+            drain_step = D_L08_001B0330 * *(float *)(*(u8 **)(object + 0x24) + 0x24);
+            if (drain_step < *(float *)(object + 0x2c) || g_hero_state.world == 20 ||
                 g_hero_state.world == 25 ||
                 g_hero_state.mode == 0x39 ||
                 g_hero_state.mode == 0x6f) {
-                *(float *)(object + 0x2c) -= drainStep;
+                *(float *)(object + 0x2c) -= drain_step;
             } else {
                 g_current_map_index[3]++;
-                { unsigned short pickupId2 = *(unsigned short *)(object + 0xb2);
-                if (pickupId2 & 1) {
-                    u8 *savedByte = &D_0019B4A8[((short)pickupId2 >> 1) + (g_current_map_index[0] << 10)];
-                    if (((*savedByte >> 4) & 7) != 7)
-                        *savedByte += 16;
+                { unsigned short pickup_id2 = *(unsigned short *)(object + 0xb2);
+                if (pickup_id2 & 1) {
+                    u8 *saved_byte = &D_0019B4A8[((short)pickup_id2 >> 1) + (g_current_map_index[0] << 10)];
+                    if (((*saved_byte >> 4) & 7) != 7)
+                        *saved_byte += 16;
                 } else {
-                    u8 *savedByte = &D_0019B4A8[((short)pickupId2 >> 1) + (g_current_map_index[0] << 10)];
-                    if ((*savedByte & 7) != 7)
-                        (*savedByte)++;
+                    u8 *saved_byte = &D_0019B4A8[((short)pickup_id2 >> 1) + (g_current_map_index[0] << 10)];
+                    if ((*saved_byte & 7) != 7)
+                        (*saved_byte)++;
                 } }
 kill:
                 moby_mark_spawned(object);

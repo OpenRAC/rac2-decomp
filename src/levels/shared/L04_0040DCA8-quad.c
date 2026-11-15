@@ -28,27 +28,27 @@ void gfx_l04_draw_billboard_sprite(B781AimQuad *position, int texture, int color
     /* scratch type shared with func_L30_0041B848, allowed by owner ruling */
     struct { float angles[4]; float rotation[3][4]; } scratch;
     Corner corners[4];
-    float cosAngle, sinAngle;
+    float cos_angle, sin_angle;
     float *out;
-    u8 *uPtr;
+    u8 *u_ptr;
     int i;
     gfx_init_quad_packet_state(&packet, texture, flags, 128);
     packet.state[0] = 5;
     packet.colors[0] = packet.colors[1] = packet.colors[2] = packet.colors[3] = color;
     packet.uv[0].u = 0; packet.uv[0].v = 0; packet.uv[1].u = 0; packet.uv[1].v = 1;
     packet.uv[2].u = 1; packet.uv[2].v = 0; packet.uv[3].u = 1; packet.uv[3].v = 1;
-    cosAngle = math_fast_sin_or_cos_a(angle);
-    sinAngle = math_fast_sin_or_cos_b(angle);
+    cos_angle = math_fast_sin_or_cos_a(angle);
+    sin_angle = math_fast_sin_or_cos_b(angle);
     {
         int k;
-        u8 *vPtr = (u8 *)&packet + 0x54;
-        for (uPtr = (u8 *)&packet + 0x50, k = 3; k >= 0; k--, uPtr += 8, vPtr += 8) {
-            tmp[0] = *(float *)uPtr - 0.5f;
-            tmp[1] = *(float *)vPtr - 0.5f;
-            *(float *)uPtr = tmp[0] * cosAngle - tmp[1] * sinAngle;
-            *(float *)vPtr = tmp[0] * sinAngle + tmp[1] * cosAngle;
-            *(float *)uPtr += 0.5f;
-            *(float *)vPtr += 0.5f;
+        u8 *v_ptr = (u8 *)&packet + 0x54;
+        for (u_ptr = (u8 *)&packet + 0x50, k = 3; k >= 0; k--, u_ptr += 8, v_ptr += 8) {
+            tmp[0] = *(float *)u_ptr - 0.5f;
+            tmp[1] = *(float *)v_ptr - 0.5f;
+            *(float *)u_ptr = tmp[0] * cos_angle - tmp[1] * sin_angle;
+            *(float *)v_ptr = tmp[0] * sin_angle + tmp[1] * cos_angle;
+            *(float *)u_ptr += 0.5f;
+            *(float *)v_ptr += 0.5f;
         }
     }
     qcopy(transform[3], position);

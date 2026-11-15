@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 extern unsigned char *D_L00_001B0CA0 __attribute__((sda));
@@ -148,7 +149,7 @@ void placement_object_update(char *obj)
             || state == 116 || state == 129) {
             *(int *)(ctx + 44) = 1;
         } else if (((attached = *(char **)(player + 0x33C)) != 0
-                    && (*(short *)(attached + 170) == 0x330 /* Taxi */ || *(short *)(attached + 170) == 0xB21 /* moby class 2849 */))
+                    && (*(short *)(attached + 170) == MOBY_CLASS_TAXI || *(short *)(attached + 170) == 0xB21 /* moby class 2849 */))
                    || (hit != 0 && (*(short *)(hit + 170) == 0xB21 /* moby class 2849 */ || *(short *)(hit + 170) == 0xB5B /* moby class 2907 */))) {
             *(int *)(ctx + 44) = 1;
         } else {

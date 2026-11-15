@@ -102,7 +102,7 @@ static __inline__ int label_y3(void *handle, float value, float scale, float hal
 s32 gorn_challenge_menu_draw(void) {
     char buf[128];
     f32 center, pulse, imageY;
-    s32 sprite, remainder, color, blink, centerX, headerX, reward;
+    s32 sprite, remainder, color, blink, center_x, headerX, reward;
     char *text;
 
     center = IntToFloat(g_screen_width) * 0.5f;
@@ -130,13 +130,13 @@ s32 gorn_challenge_menu_draw(void) {
     { s32 len;
     len = func_001157AC(buf);
     text_draw_centered_large(headerX, 46, 0x80F0F0F0ULL, buf, len); }
-    centerX = FloatToInt(center);
+    center_x = FloatToInt(center);
     switch (D_L15_001B15C8) {
     case 0:
         text = GetLocalizedString(0x2FF4);
         {
             s32 row = MenuY(101.0f, -2.0f);
-            text_draw_centered_small(centerX, row, 0x80F0F0F0ULL, text, func_001157AC(text));
+            text_draw_centered_small(center_x, row, 0x80F0F0F0ULL, text, func_001157AC(text));
         }
         text = GetLocalizedString(0x2FEF);
         {
@@ -171,7 +171,7 @@ s32 gorn_challenge_menu_draw(void) {
             text = GetLocalizedString(0x2FF5);
             {
                 s32 row = MenuY(101.0f, -2.0f);
-                text_draw_centered_small(centerX, row, 0x80F0F0F0ULL, text, func_001157AC(text));
+                text_draw_centered_small(center_x, row, 0x80F0F0F0ULL, text, func_001157AC(text));
             }
             {
                 s32 len;
@@ -200,9 +200,9 @@ s32 gorn_challenge_menu_draw(void) {
             {
                 s32 len;
                 s32 row;
-                row = label_y((void *)centerX, 170.0f, D_L15_001B2E84, 0.5f, 1);
+                row = label_y((void *)center_x, 170.0f, D_L15_001B2E84, 0.5f, 1);
                 len = func_001157AC(text);
-                text_draw_centered_large(centerX, row, 0x80F0F0F0ULL, text, len);
+                text_draw_centered_large(center_x, row, 0x80F0F0F0ULL, text, len);
             }
         }
         break;
@@ -211,7 +211,7 @@ s32 gorn_challenge_menu_draw(void) {
             text = GetLocalizedString(0x2FF6);
             {
                 s32 row = MenuY(101.0f, -2.0f);
-                text_draw_centered_small(centerX, row, 0x80F0F0F0ULL, text, func_001157AC(text));
+                text_draw_centered_small(center_x, row, 0x80F0F0F0ULL, text, func_001157AC(text));
             }
             {
                 s32 len;
@@ -240,9 +240,9 @@ s32 gorn_challenge_menu_draw(void) {
             {
                 s32 len;
                 s32 row;
-                row = label_y((void *)centerX, 170.0f, D_L15_001B2E84, 0.5f, 1);
+                row = label_y((void *)center_x, 170.0f, D_L15_001B2E84, 0.5f, 1);
                 len = func_001157AC(text);
-                text_draw_centered_large(centerX, row, 0x80F0F0F0ULL, text, len);
+                text_draw_centered_large(center_x, row, 0x80F0F0F0ULL, text, len);
             }
         }
         break;
@@ -251,7 +251,7 @@ s32 gorn_challenge_menu_draw(void) {
             text = GetLocalizedString(0x2FF7);
             {
                 s32 row = MenuY(101.0f, -2.0f);
-                text_draw_centered_small(centerX, row, 0x80F0F0F0ULL, text, func_001157AC(text));
+                text_draw_centered_small(center_x, row, 0x80F0F0F0ULL, text, func_001157AC(text));
             }
             text = GetLocalizedString(0x2FF2);
             {
@@ -280,9 +280,9 @@ s32 gorn_challenge_menu_draw(void) {
             {
                 s32 len;
                 s32 row;
-                row = label_y((void *)centerX, 170.0f, D_L15_001B2E84, 0.5f, 1);
+                row = label_y((void *)center_x, 170.0f, D_L15_001B2E84, 0.5f, 1);
                 len = func_001157AC(text);
-                text_draw_centered_large(centerX, row, 0x80F0F0F0ULL, text, len);
+                text_draw_centered_large(center_x, row, 0x80F0F0F0ULL, text, len);
             }
         }
         break;

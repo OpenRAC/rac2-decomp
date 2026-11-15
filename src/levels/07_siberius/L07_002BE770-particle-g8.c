@@ -60,9 +60,9 @@ typedef struct {
 void snowfall_update(Object *obj) {
     V pos, vel, tmp, point;
     Data *data = (Data *)obj->data;
-    int lastIndex, i, burstIndex;
-    float sideMin, sideMax;
-    V *heroPos;
+    int last_index, i, burst_index;
+    float side_min, side_max;
+    V *hero_pos;
 
     switch (obj->state) {
     case 0:
@@ -113,26 +113,26 @@ void snowfall_update(Object *obj) {
         }
         if (!D_L07_001ADAAC)
             break;
-        heroPos = D_L07_001B9200;
-        lastIndex = *(short *)(D_L07_001ADAAC + 0xAA) - 0x11D9;
-        sideMin = D_L07_001AEC10[lastIndex * 2];
-        sideMax = D_L07_001AEC14[lastIndex * 2];
-        for (burstIndex = 0; burstIndex < 6; burstIndex++) {
+        hero_pos = D_L07_001B9200;
+        last_index = *(short *)(D_L07_001ADAAC + 0xAA) - 0x11D9;
+        side_min = D_L07_001AEC10[last_index * 2];
+        side_max = D_L07_001AEC14[last_index * 2];
+        for (burst_index = 0; burst_index < 6; burst_index++) {
             FastVecScale(&tmp, &data->axisA, math_random_float_range(-25.0f, 25.0f));
             FastVecAdd(&pos, &tmp, &data->origin);
-            FastVecScale(&tmp, &data->axisB, math_random_float_range(sideMin, sideMax));
+            FastVecScale(&tmp, &data->axisB, math_random_float_range(side_min, side_max));
             FastVecAdd(&pos, &tmp, &pos);
-            FastVecAdd(&pos, &pos, heroPos);
+            FastVecAdd(&pos, &pos, hero_pos);
             FastVecSub(&pos, &pos, D_L07_001ADAAC + 0x10);
             pos.z -= D_L07_001B90C0[0x148 / 4] - *(float *)(D_L07_001ADAAC + 0x18);
             math_random_planar_offset(&vel, 1.0f / 24.0f);
             vel.z = data->fall * (math_random_float_range(0.8f, 1.2f) * (-1.0f / 120.0f));
             part_spawn_snow(&pos, &vel, 1, 0);
         }
-        FastVecSub(&D_L07_001B2550, heroPos, &data->previous);
+        FastVecSub(&D_L07_001B2550, hero_pos, &data->previous);
         FastVecScale(&tmp, D_L07_001ADAAC + 0xC0, 1.0f);
         FastVecAdd(&D_L07_001B2550, &tmp, &D_L07_001B2550);
-        qcopy_nc(&data->previous, heroPos);
+        qcopy_nc(&data->previous, hero_pos);
         break;
     }
 }

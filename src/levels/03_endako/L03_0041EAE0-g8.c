@@ -156,7 +156,7 @@ void laser_bot_init_check_hit(u8 *entity) {
     hit=part_find_owned_effect_slot(entity,0x10000,0);
     if(hit && *(u8 **)((u8 *)hit+0x20)) {
         u8 *other=*(u8 **)((u8 *)hit+0x20);
-        if(*(s16 *)(other+0xAA)==0xFFD /* Megacorp Laser Bot */ && *(float *)(other+0x18)<*(float *)(entity+0x18)+2) entity[0xA8]=0xFF;
+        if(*(s16 *)(other+0xAA)==MOBY_CLASS_MEGACORP_LASER_BOT && *(float *)(other+0x18)<*(float *)(entity+0x18)+2) entity[0xA8]=0xFF;
     }
     if(moby_apply_damage_to_object(entity,st->f60,0) && st->f20<=0) {
         matrix_mul_vec3(point,D_L03_001B1C30,entity+0xC0);

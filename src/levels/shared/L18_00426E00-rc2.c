@@ -28,11 +28,11 @@
 s32 shooter_is_enemy_alive(s8 *moby) {
     s32 result = 0;
     if (moby != 0) {
-        u8 stateId = *(u8 *)(moby + 0x20);
-        if (stateId != 0xFE) {
-            if (stateId != 0xFD) {
-                s16 classId = *(s16 *)(moby + 0xAA);
-                if (classId == 0xEC0 /* moby class 3776 */ || classId == 0xED4 /* moby class 3796 */ || classId == 0xEE1 /* Receiver Bot */) {
+        u8 state_id = *(u8 *)(moby + 0x20);
+        if (state_id != 0xFE) {
+            if (state_id != 0xFD) {
+                s16 class_id = *(s16 *)(moby + 0xAA);
+                if (class_id == 0xEC0 /* moby class 3776 */ || class_id == 0xED4 /* moby class 3796 */ || class_id == MOBY_CLASS_RECEIVER_BOT) {
                     result = 1;
                 }
             }

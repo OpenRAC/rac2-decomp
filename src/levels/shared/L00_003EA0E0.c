@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 extern int D_L00_001A8F00 __attribute__((sda));
@@ -536,7 +537,7 @@ void synthenoid_spawn_or_kilonoid(char *spawnPos, int classId)
     pos = spawnPos;
     cls = classId;
     do {
-        if (cls == 0xB02 /* Kilonoid */) {
+        if (cls == MOBY_CLASS_KILONOID) {
             if (kilonoid_spawn(g_hero_state.tbl, pos) != 0)
                 spawned = 1;
         } else {

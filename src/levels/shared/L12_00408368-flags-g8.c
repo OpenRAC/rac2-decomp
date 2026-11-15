@@ -92,7 +92,7 @@ void laser_beam_draw(s32 unused0, s32 unused1, s32 unused2, s32 unused3, s32 unu
     float vtip[4] __attribute__((aligned(16)));
     float vside[4] __attribute__((aligned(16)));
     float vbase[4] __attribute__((aligned(16)));
-    float uvOffset[2];
+    float uv_offset[2];
     float *rel;
     float *axis;
     float *tip;
@@ -177,10 +177,10 @@ void laser_beam_draw(s32 unused0, s32 unused1, s32 unused2, s32 unused3, s32 unu
     sine = math_fast_sin_or_cos_a(angle);
     cosine = math_fast_sin_or_cos_b(angle);
     for (j = 0; j < 4; j++) {
-        uvOffset[0] = q.uv[j][0] - 0.5f;
-        uvOffset[1] = q.uv[j][1] - 0.5f;
-        q.uv[j][0] = uvOffset[0] * sine - uvOffset[1] * cosine;
-        q.uv[j][1] = uvOffset[0] * cosine + uvOffset[1] * sine;
+        uv_offset[0] = q.uv[j][0] - 0.5f;
+        uv_offset[1] = q.uv[j][1] - 0.5f;
+        q.uv[j][0] = uv_offset[0] * sine - uv_offset[1] * cosine;
+        q.uv[j][1] = uv_offset[0] * cosine + uv_offset[1] * sine;
         q.uv[j][0] += 0.5f;
         q.uv[j][1] += 0.5f;
     }

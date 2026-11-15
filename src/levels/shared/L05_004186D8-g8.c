@@ -46,7 +46,7 @@ void DrawInterpolatedBeamLayers(char *object)
     float pos[4], direction[4], offset[4], offset2[4], offset3[4];
     float offsetX, offsetZ;
 
-    if (attachment && *(short *)(attachment + 0xAA) == 0x10D9 /* Spaceship Attachment */) {
+    if (attachment && *(short *)(attachment + 0xAA) == MOBY_CLASS_SPACESHIP_ATTACHMENT_6) {
         float factor, length, length2, width, height, width2, height2, extent, extent2;
         int count, count2, color, color2;
 

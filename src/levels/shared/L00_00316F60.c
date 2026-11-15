@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 #define RAC2_T_V4_F36D8A248
@@ -323,7 +324,7 @@ int moby_is_missing_or_class_502(const unsigned char *moby) {
    equality constant are measured; no original class or field-name claim. */
 /* Tells if an object is an Ammo pickup. */
 int moby_is_ammo(const unsigned char *moby) {
-    return *(const signed short *)(moby + 0xAA) == 0x0CDB /* Ammo */;
+    return *(const signed short *)(moby + 0xAA) == MOBY_CLASS_AMMO;
 }
 
 /* func_L00_003200F8 is defined in L00_003200F8.c. */

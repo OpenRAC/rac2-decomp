@@ -29,7 +29,7 @@ u8 *pool_alloc_owned_object(u8 *owner, SpawnQuad *position, float *direction)
     PoolSlotsPrefix *vars;
     u8 *part;
     u8 *result;
-    u8 *headPart;
+    u8 *head_part;
     int i;
     if (owner == 0)
         return 0;
@@ -40,9 +40,9 @@ u8 *pool_alloc_owned_object(u8 *owner, SpawnQuad *position, float *direction)
             continue;
         vars->activeCount++;
         {
-            u8 *newObject = child;
-            *(SpawnQuad *)(newObject + 0x10) = *position;
-            *(int *)(newObject + 0x1c) = 0;
+            u8 *new_object = child;
+            *(SpawnQuad *)(new_object + 0x10) = *position;
+            *(int *)(new_object + 0x1c) = 0;
         }
         child[0x20] = 0;
         child[0xbc] = 0;
@@ -71,9 +71,9 @@ u8 *pool_alloc_owned_object(u8 *owner, SpawnQuad *position, float *direction)
         *(int *)(child + 0xf0) = 0;
         *(int *)(child + 0xf4) = 0;
         *(float *)(child + 0xf8) = mat_fast_helper_a(direction[0], direction[1]);
-        headPart = (u8 *)moby_get_private_value_4(child);
-        if (headPart != 0)
-            *(SpawnQuad *)(headPart + 0x80) = *(SpawnQuad *)direction;
+        head_part = (u8 *)moby_get_private_value_4(child);
+        if (head_part != 0)
+            *(SpawnQuad *)(head_part + 0x80) = *(SpawnQuad *)direction;
         else
             STUB_printf(D_L08_001B0B68, *(short *)(child + 0xaa), *(short *)(child + 0xb2), D_L08_001B2508);
         if (vars->smallScale)

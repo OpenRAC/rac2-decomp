@@ -38,9 +38,9 @@ void swamp_monster_start_attack_b(L01_003C0760_OBJ *moby)
 {
     L01_003C0760_OBJ *obj = moby;
     L01_003C0760_OWNED *vars = obj->f68;
-    int blendFrames = math_random_int_range(7, 12);
+    int blend_frames = math_random_int_range(7, 12);
 
-    moby_set_animation_and_speed(obj, 8, 0, blendFrames);
+    moby_set_animation_and_speed(obj, 8, 0, blend_frames);
     moby_set_state(obj, 3, 3);
     vars->f2DC = D_L01_001AFED4;
 }
@@ -60,9 +60,9 @@ void swamp_monster_start_attack_c(L01_003C07C8_OBJ *moby)
 {
     L01_003C07C8_OBJ *obj = moby;
     L01_003C07C8_OWNED *vars = obj->f68;
-    int blendFrames = math_random_int_range(9, 11);
+    int blend_frames = math_random_int_range(9, 11);
 
-    moby_set_animation_and_speed(obj, 13, 0, blendFrames);
+    moby_set_animation_and_speed(obj, 13, 0, blend_frames);
     moby_set_state(obj, 2, 3);
     vars->f2DA = D_L01_001AFED8;
 }
@@ -84,9 +84,9 @@ void swamp_monster_start_grab_attack(L01_003C0830_OBJ *moby)
 {
     L01_003C0830_OBJ *obj = moby;
     L01_003C0830_OWNED *vars = obj->f68;
-    int blendFrames = math_random_int_range(7, 11);
+    int blend_frames = math_random_int_range(7, 11);
 
-    moby_set_animation_and_speed(obj, 14, 0, blendFrames);
+    moby_set_animation_and_speed(obj, 14, 0, blend_frames);
     moby_set_state(obj, 4, 3);
     obj->f9C = obj->f9C | 0x30;
     vars->f2DE = D_L01_001AFEDC;
@@ -107,10 +107,10 @@ void swamp_monster_start_claw_attack(L01_003C06E8_OBJ *moby)
 {
     L01_003C06E8_OBJ *obj = moby;
     L01_003C06E8_OWNED *vars = obj->f68;
-    int animIndex = (func_001163B0() & 1) + 6;
-    int blendFrames = math_random_int_range(10, 15);
+    int anim_index = (func_001163B0() & 1) + 6;
+    int blend_frames = math_random_int_range(10, 15);
 
-    moby_set_animation_and_speed(obj, animIndex, 0, blendFrames);
+    moby_set_animation_and_speed(obj, anim_index, 0, blend_frames);
     moby_set_state(obj, 1, 3);
     vars->f2DC = D_L01_001AFED4;
 }
@@ -161,7 +161,7 @@ void debris_l01_piece_update(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
     float pos[4] __attribute__((aligned(16)));
-    float savedHeight, driftScale, tilt;
+    float saved_height, drift_scale, tilt;
 
     qcopy(pos, moby + 0x10);
     switch (*(unsigned char *)(moby + 0x20)) {
@@ -191,12 +191,12 @@ void debris_l01_piece_update(char *moby)
     *(float *)(moby + 0xF0) += (*(float *)(vars + 0x44) - *(float *)(moby + 0xF0)) * 0.02f;
     if (*(unsigned char *)(moby + 0x20) != 2) {
         tilt = math_fast_sin_or_cos_a(*(float *)(vars + 0x40)) * 0.17453295f;
-        driftScale = D_L01_001AFE30;
+        drift_scale = D_L01_001AFE30;
         *(float *)(moby + 0xF4) = tilt;
-        savedHeight = *(float *)(vars + 8);
+        saved_height = *(float *)(vars + 8);
         *(float *)(vars + 8) = 0.0f;
-        FastVecScale(vars, vars, driftScale);
-        *(float *)(vars + 8) = savedHeight;
+        FastVecScale(vars, vars, drift_scale);
+        *(float *)(vars + 8) = saved_height;
         FastVecAdd(moby + 0x10, moby + 0x10, vars);
         *(float *)(vars + 8) -= *(float *)(vars + 0x38);
         if (*(float *)(vars + 8) < *(float *)(vars + 0x3C))

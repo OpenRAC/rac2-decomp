@@ -55,7 +55,7 @@ void electric_orb_draw_arms(unsigned char *object) {
         if (D_L20_001B38B0[k]) {
             alphaValue = FloatToInt(IntToFloat(D_L20_001B38C8[k]) * D_L20_001B3904[0]);
             colour = D_L20_001AED18;
-            if (*(short *)(object + 0xAA) == 0x1192 /* Tesla Barrier */) colour = D_L20_001AED1C;
+            if (*(short *)(object + 0xAA) == MOBY_CLASS_TESLA_BARRIER) colour = D_L20_001AED1C;
             DrawTwoLayerPolylineRibbon(D_L20_00235580[k], 23, 14, 10,
                              ((unsigned int)alphaValue << 24) | 0x7F7F7F,
                              ((unsigned int)alphaValue << 24) | colour, 0.0f, 4.0f, 0.0f);

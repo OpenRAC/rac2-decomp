@@ -13,7 +13,7 @@ char *fireball_spawn(int owner, char *position, char *velocity, int value, float
     char *object = CreateMoby(0xf9e /* moby class 3998 */);
     char *state;
     float angle;
-    float sizeFactor;
+    float size_factor;
     unsigned short timer;
     if (object != 0) {
         state = *(char **)(object + 0x68);
@@ -34,8 +34,8 @@ char *fireball_spawn(int owner, char *position, char *velocity, int value, float
         angle = mat_fast_helper_a(*(float *)velocity, *(float *)(velocity+4));
         *(float *)(object + 0xf8) = angle;
         *(float *)(state + 0x30) = extra;
-        sizeFactor = D_L18_001B191C;
-        *(float *)(object + 0x2c) = *(float *)(object + 0x2c) * sizeFactor;
+        size_factor = D_L18_001B191C;
+        *(float *)(object + 0x2c) = *(float *)(object + 0x2c) * size_factor;
         func_002A0F48(object);
     }
     return object;

@@ -141,12 +141,12 @@ void glow_resize_matching_mobys(u8 *object) {
         u8 *cur = out;
 
         if (cur[0x31] != 0) {
-            u32 *curVars = *(u32 **)(cur + 0x68);
+            u32 *cur_vars = *(u32 **)(cur + 0x68);
 
             if (*(s16 *)(cur + 0xAA) == *(s16 *)(object + 0xAA)) {
                 f32 ratio = *(f32 *)(object + 0x2C) / *(f32 *)(*(u32 *)(object + 0x24) + 0x24);
 
-                gfx_l00_draw_billboard_quad(cur + 0x10, curVars[1], scale * ratio, 0.5f);
+                gfx_l00_draw_billboard_quad(cur + 0x10, cur_vars[1], scale * ratio, 0.5f);
             }
         }
         GetNextMobyInGroup(&out, (u32)out, 0, 0);
@@ -353,7 +353,7 @@ void UpdateTodanoItemTradeNpc(u8 *self) {
 /* Raises the measured flag on every record of the object's own table. */
 /* Alerts every Mutant Test-Squirrel in the same group as this object. */
 void squirrel_alert_group(s32 object) {
-    s32 mobyBase;
+    s32 moby_base;
     s16 *entry;
     s16 *table;
 
@@ -363,13 +363,13 @@ void squirrel_alert_group(s32 object) {
     if (table == 0)
         return;
     entry = table;
-    mobyBase = D_L12_001B2E9C;
+    moby_base = D_L12_001B2E9C;
     do {
         u32 offset = (*(u16 *)entry & 0x7FFF) << 8;
 
-        if (*(s8 *)(mobyBase + offset + 0x20) >= 0) {
-            if (*(s16 *)(mobyBase + offset + 0xAA) == 0xFB4 /* Mutant Test-Squirrel */)
-                *(u16 *)(*(u32 *)(mobyBase + offset + 0x68) + 0x366) = 1;
+        if (*(s8 *)(moby_base + offset + 0x20) >= 0) {
+            if (*(s16 *)(moby_base + offset + 0xAA) == MOBY_CLASS_MUTANT_TEST_SQUIRREL)
+                *(u16 *)(*(u32 *)(moby_base + offset + 0x68) + 0x366) = 1;
         }
     } while (*entry++ >= 0);
 }
@@ -394,7 +394,7 @@ u8 *squirrel_alert_for_object(s32 index, u8 *obj)
     do {
         u8 *rec = (u8 *)D_L12_001B2E9C + (*entry & 0x7FFF) * 0x100;
 
-        if (*(s16 *)(rec + 0xAA) == 0xFB4 /* Mutant Test-Squirrel */) {
+        if (*(s16 *)(rec + 0xAA) == MOBY_CLASS_MUTANT_TEST_SQUIRREL) {
             u8 *vars = *(u8 **)(rec + 0x68);
             s32 *zone = D_L12_001FEAC0[*(s32 *)(vars + 0x138)];
 
@@ -446,7 +446,7 @@ u8 *squirrel_alert_for_object(s32 index, u8 *obj)
    its partner object and resets itself. */
 void guard_handle_hit_handover(u8 *moby) {
     u8 *vars = *(u8 **)(moby+0x68);
-    int oldState, hitResult;
+    int old_state, hit_result;
     if (!moby[0x95]) InitStateDataWithPartner(moby);
     if (moby[0xA8] == 255) {
         u8 *partner=*(u8 **)(vars+0x2F8);
@@ -462,12 +462,12 @@ void guard_handle_hit_handover(u8 *moby) {
             }
         }
     }
-    oldState=moby[0x20];
-    hitResult=moby_apply_damage_to_object(moby,vars+0x50,0);
-    if (hitResult) {
+    old_state=moby[0x20];
+    hit_result=moby_apply_damage_to_object(moby,vars+0x50,0);
+    if (hit_result) {
         enemy_apply_stored_values_helper(moby);
         if (*(u8 **)(vars+0x2F8)) {
-            if (hitResult==4) {
+            if (hit_result==4) {
                 u8 *p; int i; int alive;
                 *(u16 *)(moby+0x34)&=0xEFFF;
                 *(u16 *)(*(u8 **)(vars+0x2F8)+0x34)&=0xEFFF;
@@ -479,7 +479,7 @@ void guard_handle_hit_handover(u8 *moby) {
                 path_hand_state_to_nearest(moby);
                 SpawnExplosionEffects(*(u8 **)(vars+0x2F8),vars+0xD0,0,0,0,4,0,0,2,1,9,1,-1,0,0,0,-1,0,0x810001);
                 moby_destroy_linked(moby);
-                if (oldState>=4 && !math_random_int_below(2)) {
+                if (old_state>=4 && !math_random_int_below(2)) {
                     if (moby[0x43]!=17) anim_start_blended(moby,17,0,5);
                     *(float *)(vars+0xB0)=*(s8 *)(vars+0xBF);
                     *(float *)(vars+0xA4)=*(s8 *)(vars+0xBE);
@@ -549,21 +549,21 @@ void guard_aim_partner_hands(u8 *moby) {
         moby_update_eased_node(*(u8 **)(vars+0x2F8),vars+0x210,3,0.02f,0.3f);
         if(!vars[0x30F] && (*(u8 **)(vars+0x2F8))[0x42]>=8 && (*(u8 **)(vars+0x2F8))[0x42]<11) {
                 for(i=0;i<2;i++) {
-                    u8 *jointVars=vars+i*0x80;
+                    u8 *joint_vars=vars+i*0x80;
                     if((*(u16 *)(*(u8 **)(vars+0x2F8)+0x7C)>>(i+4))&1) {
                         moby_transform_joint_to_world(*(u8 **)(vars+0x2F8),i,offset);
                         FastVecSub(offset,vars+0x1F0,offset);
-                        *(float *)(jointVars+0x384)=-mat_fast_helper_a(vec_length_xy(offset),offset[2]);
-                        *(float *)(jointVars+0x388)=fast_subtract_rotations(mat_fast_helper_a(offset[0],offset[1]),*(float *)(*(u8 **)(vars+0x2F8)+0xF8));
-                        if(i) { if(*(float *)(jointVars+0x388)>0.087266475f) *(float *)(jointVars+0x388)=0.087266475f; }
+                        *(float *)(joint_vars+0x384)=-mat_fast_helper_a(vec_length_xy(offset),offset[2]);
+                        *(float *)(joint_vars+0x388)=fast_subtract_rotations(mat_fast_helper_a(offset[0],offset[1]),*(float *)(*(u8 **)(vars+0x2F8)+0xF8));
+                        if(i) { if(*(float *)(joint_vars+0x388)>0.087266475f) *(float *)(joint_vars+0x388)=0.087266475f; }
                         else { if(*(float *)(vars+0x388)<-0.087266475f) *(float *)(vars+0x388)=-0.087266475f; }
                     }
                 }
         } else if(vars[0x30F]) {
-            u8 *jointVars=vars;
-            for(i=1;i>=0;i--,jointVars+=0x80) {
-                *(float *)(jointVars+0x384)=math_random_float_range(-1.57079637f,1.57079637f)*0.5f;
-                *(float *)(jointVars+0x388)=math_random_float_range(-1.57079637f,1.57079637f)*0.5f;
+            u8 *joint_vars=vars;
+            for(i=1;i>=0;i--,joint_vars+=0x80) {
+                *(float *)(joint_vars+0x384)=math_random_float_range(-1.57079637f,1.57079637f)*0.5f;
+                *(float *)(joint_vars+0x388)=math_random_float_range(-1.57079637f,1.57079637f)*0.5f;
             }
         }
         for(i=0;i<2;i++) moby_update_eased_node(*(u8 **)(vars+0x2F8),vars+0x320+i*0x80,i+7,0.02f,0.3f);

@@ -65,67 +65,67 @@ extern void racer_reset_for_race(L04Moby *);
 void InitRaceParticipants(unsigned char *controller)
 {
     int used[10];
-    L04RaceState *raceState = *(L04RaceState **)(controller + 0x68);
+    L04RaceState *race_state = *(L04RaceState **)(controller + 0x68);
     int first;
     int count;
-    int i, j, startDelay;
+    int i, j, start_delay;
     L04RacePath *path;
-    L04RacerState *racerVars;
+    L04RacerState *racer_vars;
 
     count = 0;
     first = 0;
     for (i = 0; i < 21; i++)
-        if (raceState->slots[i] != -1)
+        if (race_state->slots[i] != -1)
             count++;
     for (i = 9; i >= 0; i--)
         used[i] = 0;
     for (i = 0; i < 21; i++) {
-        if (raceState->slots[i] != -1) {
-            racerVars = g_moby_l04_pool[raceState->slots[i]].vars;
+        if (race_state->slots[i] != -1) {
+            racer_vars = g_moby_l04_pool[race_state->slots[i]].vars;
             if (!first) {
-                int *dst = raceState->branches;
-                int *src = racerVars->branches;
+                int *dst = race_state->branches;
+                int *src = racer_vars->branches;
 
                 for (j = 0; j < 6; j++)
-                    raceState->links[j] = racerVars->links[j];
+                    race_state->links[j] = racer_vars->links[j];
                 for (j = 0; j < 4; j++)
                     dst[j] = src[j];
-                raceState->value = racerVars->value;
+                race_state->value = racer_vars->value;
                 first = 1;
             }
-            racerVars->count = count;
-            racerVars->owner = controller;
+            racer_vars->count = count;
+            racer_vars->owner = controller;
             j = math_random_int_range(0, 9);
             while (used[j] >= 4)
                 j = math_random_int_range(0, 9);
             used[j]++;
-            racerVars->group = j + 1;
-            startDelay = D_L04_002C63D4[g_current_race_index].delay;
-            racerVars->f2d0 = 0;
+            racer_vars->group = j + 1;
+            start_delay = D_L04_002C63D4[g_current_race_index].delay;
+            racer_vars->f2d0 = 0;
             if (g_is_pal_video.f00) {
-                startDelay = (int)((float)startDelay * 0.8333334f + 0.01f);
+                start_delay = (int)((float)start_delay * 0.8333334f + 0.01f);
                 if (g_current_race_index == 0)
-                    startDelay += race_get_course_finish_count(0) * 100;
-                racerVars->delay = (float)startDelay * 0.006666667f;
+                    start_delay += race_get_course_finish_count(0) * 100;
+                racer_vars->delay = (float)start_delay * 0.006666667f;
             } else {
                 if (g_current_race_index == 0)
-                    startDelay += race_get_course_finish_count(0) * 120;
-                racerVars->delay = (float)startDelay * 0.005555556f;
+                    start_delay += race_get_course_finish_count(0) * 120;
+                racer_vars->delay = (float)start_delay * 0.005555556f;
             }
-            path = g_route_path_table[raceState->path];
-            racerVars->duration = path->duration * (float)path->count;
-            D_L04_001B0928 = racerVars->duration;
-            racerVars->f1d4 = -1.0f;
-            racerVars->f1b8 = 0;
-            racerVars->f1c4 = -1;
-            racerVars->f1c8 = 0;
-            racerVars->f1cc = -1;
-            racerVars->f1d0 = -1;
-            racerVars->f1e0 = 0;
-            racerVars->f1d8 = 0;
-            racerVars->f1dc = 0;
-            racer_reset_for_race(&g_moby_l04_pool[raceState->slots[i]]);
-            g_moby_l04_pool[raceState->slots[i]].state = 1;
+            path = g_route_path_table[race_state->path];
+            racer_vars->duration = path->duration * (float)path->count;
+            D_L04_001B0928 = racer_vars->duration;
+            racer_vars->f1d4 = -1.0f;
+            racer_vars->f1b8 = 0;
+            racer_vars->f1c4 = -1;
+            racer_vars->f1c8 = 0;
+            racer_vars->f1cc = -1;
+            racer_vars->f1d0 = -1;
+            racer_vars->f1e0 = 0;
+            racer_vars->f1d8 = 0;
+            racer_vars->f1dc = 0;
+            racer_reset_for_race(&g_moby_l04_pool[race_state->slots[i]]);
+            g_moby_l04_pool[race_state->slots[i]].state = 1;
         }
     }
 }

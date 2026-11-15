@@ -3,30 +3,30 @@ extern unsigned char D_001AD030[27] __attribute__((sda));
 extern unsigned char D_001AD04B[] __attribute__((sda));
 
 /* Turns a cutscene number into a compact index by skipping the unused numbers in between. Numbers outside the normal range are shifted down. */
-unsigned long cutscene_map_id_to_index(int cutsceneId)
+unsigned long cutscene_map_id_to_index(int cutscene_id)
 {
     int i;
-    int firstGapEnd;
-    unsigned char gapSize;
-    int outOfRange = (unsigned int)(cutsceneId - 0x20) >= 0x91;
+    int first_gap_end;
+    unsigned char gap_size;
+    int out_of_range = (unsigned int)(cutscene_id - 0x20) >= 0x91;
 
-    if (!outOfRange) {
-        firstGapEnd = D_001AD04B[0];
-        if (cutsceneId >= firstGapEnd) {
-            cutsceneId -= firstGapEnd;
+    if (!out_of_range) {
+        first_gap_end = D_001AD04B[0];
+        if (cutscene_id >= first_gap_end) {
+            cutscene_id -= first_gap_end;
         } else {
             i = 0x1B;
         next:
             i--;
             if (i >= 0) {
-                gapSize = D_001AD030[i];
-                if (cutsceneId < gapSize)
+                gap_size = D_001AD030[i];
+                if (cutscene_id < gap_size)
                     goto next;
-                cutsceneId -= gapSize;
+                cutscene_id -= gap_size;
             }
         }
-    } else if (cutsceneId >= 0xB1) {
-        cutsceneId -= 0x91;
+    } else if (cutscene_id >= 0xB1) {
+        cutscene_id -= 0x91;
     }
-    return cutsceneId;
+    return cutscene_id;
 }

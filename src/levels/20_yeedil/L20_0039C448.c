@@ -59,11 +59,11 @@ extern float fast_subtract_rotations(float, float);
 extern float math_approach_target_with_direction_mode(char *, char *, float, float, float, float, int);
 
 /* Updates the trooper every frame: its body parts, its aim at the player, and its age counter. */
-void trooper_update_body(char *mobyIn) {
-    char *moby = mobyIn;
+void trooper_update_body(char *moby_in) {
+    char *moby = moby_in;
     char *vars;
-    f32 turnRate;
-    f32 angleDelta;
+    f32 turn_rate;
+    f32 angle_delta;
     u32 unused;
     u16 age;
 
@@ -73,11 +73,11 @@ void trooper_update_body(char *mobyIn) {
     if ((D_L20_001B2AC8 & 7) == (((s32)moby >> 8) & 7)) {
         trooper_count_closer_mates(moby);
     }
-    turnRate = 0.009696274995803833f;
-    angleDelta = fast_subtract_rotations(*(f32 *)(vars + 0x284), *(f32 *)(moby + 0xF8));
+    turn_rate = 0.009696274995803833f;
+    angle_delta = fast_subtract_rotations(*(f32 *)(vars + 0x284), *(f32 *)(moby + 0xF8));
     {
-        f32 turnRate2 = turnRate;
-        math_approach_target_with_direction_mode(vars + 0x288, vars + 0x28C, angleDelta, turnRate, turnRate2, 0.58177649974823f, 0);
+        f32 turn_rate2 = turn_rate;
+        math_approach_target_with_direction_mode(vars + 0x288, vars + 0x28C, angle_delta, turn_rate, turn_rate2, 0.58177649974823f, 0);
     }
     *(f32 *)(vars + 0x284) = *(f32 *)(moby + 0xF8);
     age = *(u16 *)(moby + 0x96);
@@ -91,13 +91,13 @@ void trooper_update_body(char *mobyIn) {
 extern void anim_start_blended(void *, int, int, int);
 
 /* Plays one animation on the trooper and on its torso part. */
-void trooper_play_anim_with_torso(char *moby, int animId, int blendTime, float frame) {
+void trooper_play_anim_with_torso(char *moby, int anim_id, int blend_time, float frame) {
     char *state = *(char **)(moby + 0x68);
 
-    if (*(unsigned char *)(moby + 0x43) != animId) {
-        anim_start_blended(moby, animId, (int)frame, blendTime);
+    if (*(unsigned char *)(moby + 0x43) != anim_id) {
+        anim_start_blended(moby, anim_id, (int)frame, blend_time);
     }
-    anim_start_blended(*(char **)(state + 0x254), animId, (int)frame, blendTime);
+    anim_start_blended(*(char **)(state + 0x254), anim_id, (int)frame, blend_time);
 }
 
 /* func_L20_0039DBC8 is defined in L20_0039DBC8-g8.c (it needs the -G8 profile). */
@@ -109,7 +109,7 @@ extern void moby_set_state(char *, int, int);
 /* Takes the trooper apart: resets it and deletes its torso and leg parts. */
 void trooper_destroy_parts(char *moby) {
     char *state = *(char **)(moby + 0x68);
-    char **slotPtr;
+    char **slot_ptr;
     int i;
 
     moby_set_state(moby, 6, 2);
@@ -119,13 +119,13 @@ void trooper_destroy_parts(char *moby) {
         moby_mark_spawned(*(int *)(state + 0x254));
         *(int *)(state + 0x254) = 0;
     }
-    slotPtr = (char **)(state + 0x258);
+    slot_ptr = (char **)(state + 0x258);
     for (i = 1; i >= 0; i--) {
-        if (*slotPtr != 0) {
-            moby_mark_spawned(*slotPtr);
-            *slotPtr = 0;
+        if (*slot_ptr != 0) {
+            moby_mark_spawned(*slot_ptr);
+            *slot_ptr = 0;
         }
-        slotPtr++;
+        slot_ptr++;
     }
 }
 
@@ -140,19 +140,19 @@ extern void func_00338830(void *, u32, int, int);
 extern void func_0032F2D0(void *, int, int, int);
 
 /* Creates the torso and leg parts if asked, then puts them on the trooper pose. Returns 0 if a part cannot be made. */
-int trooper_spawn_parts(char *mobyIn, int createParts) {
+int trooper_spawn_parts(char *moby_in, int create_parts) {
     char *part;
-    char *legSlot;
-    char *moby = mobyIn;
+    char *leg_slot;
+    char *moby = moby_in;
     char *vars;
     char *work;
-    int legIndex;
-    char *legSlotPtr;
-    int legBlend;
+    int leg_index;
+    char *leg_slot_ptr;
+    int leg_blend;
     int result;
 
     vars = *(char **)(moby + 0x68);
-    if (createParts != 0) {
+    if (create_parts != 0) {
         if (*(char **)(vars + 0x254) == 0) {
             part = (char *)func_00325040(0xD0E);
             if (part == 0) {
@@ -164,19 +164,19 @@ int trooper_spawn_parts(char *mobyIn, int createParts) {
             *(char **)(vars + 0x254) = part;
         }
         work = 0;
-        legSlot = vars + 0x258;
+        leg_slot = vars + 0x258;
         while ((int)work < 2) {
-            if (*(u32 *)legSlot == 0) {
+            if (*(u32 *)leg_slot == 0) {
                 part = (char *)func_00325040(0xD66);
                 if (part == 0) {
                     result = 0;
                     goto out;
                 }
                 func_0033E708(part, moby);
-                *(u32 *)legSlot = (u32)part;
+                *(u32 *)leg_slot = (u32)part;
             }
             work++;
-            legSlot += 4;
+            leg_slot += 4;
         }
     }
     work = (char *)func_00338198(moby);
@@ -189,16 +189,16 @@ int trooper_spawn_parts(char *mobyIn, int createParts) {
             func_0032F2D0(*(char **)(vars + 0x254), *(u8 *)(moby + 0x43), *(u8 *)(moby + 0x41), 0xA);
         }
     }
-    legIndex = 0;
-    legBlend = 6;
-    legSlotPtr = vars + 0x258;
-    while (legIndex < 2) {
-        if (*(u32 *)legSlotPtr != 0) {
-            func_00338830(*(char **)(vars + 0x254), *(u32 *)legSlotPtr, legIndex, (legIndex == 1) ? legBlend : 0);
-            func_003381E0(*(u32 *)legSlotPtr, work);
+    leg_index = 0;
+    leg_blend = 6;
+    leg_slot_ptr = vars + 0x258;
+    while (leg_index < 2) {
+        if (*(u32 *)leg_slot_ptr != 0) {
+            func_00338830(*(char **)(vars + 0x254), *(u32 *)leg_slot_ptr, leg_index, (leg_index == 1) ? leg_blend : 0);
+            func_003381E0(*(u32 *)leg_slot_ptr, work);
         }
-        legIndex++;
-        legSlotPtr += 4;
+        leg_index++;
+        leg_slot_ptr += 4;
     }
     result = 1;
 out:
@@ -303,22 +303,22 @@ void electric_orb_draw(char *moby) {
 /* Lowers every object of a group by 20 units, hides them, and remembers their old heights. */
 void group_lower_save_heights(char *moby) {
     s32 index = *(s32 *)(*(char **)(moby + 0x68));
-    u16 *idList = (u16 *)D_L20_001FBB20[index];
+    u16 *id_list = (u16 *)D_L20_001FBB20[index];
 
-    if (idList != 0) {
+    if (id_list != 0) {
         char *base = D_L20_001B2F9C;
         f32 twenty = 20.0f;
-        f32 *savedZ = D_L20_0023E670;
+        f32 *saved_z = D_L20_0023E670;
 
         do {
-            u16 entry = *idList;
+            u16 entry = *id_list;
             char *member = base + ((entry & 0x7FFF) << 8);
 
-            *savedZ = *(f32 *)(member + 0x18);
-            savedZ++;
+            *saved_z = *(f32 *)(member + 0x18);
+            saved_z++;
             *(u16 *)(member + 0x34) |= 0x41;
             *(f32 *)(member + 0x18) = *(f32 *)(member + 0x18) - twenty;
-        } while (*(s16 *)idList++ >= 0);
+        } while (*(s16 *)id_list++ >= 0);
     }
 }
 
@@ -329,30 +329,30 @@ extern float cubic_hermite_scalar(float, float, float, float, float);
 /* Lifts a group of objects back from their lowered height as a timer runs, then shows them again. */
 void group_raise_from_saved_heights(char *moby) {
     char *vars = *(char **)(moby + 0x68);
-    u16 *idList = (u16 *)D_L20_001FBB20[*(s32 *)vars];
-    f32 *savedZ;
+    u16 *id_list = (u16 *)D_L20_001FBB20[*(s32 *)vars];
+    f32 *saved_z;
     char *base;
     f32 scale;
 
-    if (idList == 0) {
+    if (id_list == 0) {
         return;
     }
     {
         f32 progress = IntToFloat(*(s32 *)(vars + 4)) * *(f32 *)(vars + 8);
         scale = cubic_hermite_scalar(-1.0f, 0.0f, 1.0f, 0.0f, 1.0f - progress);
     }
-    savedZ = D_L20_0023E670;
+    saved_z = D_L20_0023E670;
     base = D_L20_001B2F9C;
     do {
-        f32 oldZ = *savedZ;
-        u16 entry = *idList;
+        f32 old_z = *saved_z;
+        u16 entry = *id_list;
         char *member = base + ((entry & 0x7FFF) << 8);
-        f32 lowZ = oldZ - 20.0f;
+        f32 low_z = old_z - 20.0f;
 
-        savedZ++;
+        saved_z++;
         *(u16 *)(member + 0x34) &= 0xFFBE;
-        *(f32 *)(member + 0x18) = lowZ + (oldZ - lowZ) * scale;
-    } while (*(s16 *)idList++ >= 0);
+        *(f32 *)(member + 0x18) = low_z + (old_z - low_z) * scale;
+    } while (*(s16 *)id_list++ >= 0);
 }
 
 /* func_L20_003E6728 is defined in L20_003E6728.c. */
@@ -370,9 +370,9 @@ extern f32 vec_distance_xy(void *, void *);
 extern char *D_L20_001FEC80[];
 
 /* Tells whether this object is done or close enough to its goal point. */
-s32 moby_is_near_goal_point(char *mobyIn, s32 tableId) {
-    char *moby = mobyIn;
-    s32 id = tableId;
+s32 moby_is_near_goal_point(char *moby_in, s32 table_id) {
+    char *moby = moby_in;
+    s32 id = table_id;
     char *vars;
     s32 result;
     f32 distance;

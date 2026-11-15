@@ -20,7 +20,7 @@ extern char r1_D_00153130[];
 int load_check_build_number_file(void) {
     int fd;
     char buf[0x100];
-    char *writePtr;
+    char *write_ptr;
     unsigned int length;
 
     fd = r1_func_0011BF80(r1_D_00153130, 1);
@@ -28,10 +28,10 @@ int load_check_build_number_file(void) {
         return -1;
     }
     length = 0;
-    writePtr = buf;
+    write_ptr = buf;
     while (length < 0x100) {
-        r1_func_0011C5C0(fd, writePtr, 1);
-        if (*writePtr++ == 0) {
+        r1_func_0011C5C0(fd, write_ptr, 1);
+        if (*write_ptr++ == 0) {
             break;
         }
         length++;
@@ -64,25 +64,25 @@ extern int r1_func_00121D18(void);
 /* rac1-decomp src/core/00121D18.c: func_00125A20 */
 /* Fills a display settings structure for the given picture format, size and position, based on the TV mode. */
 void sceGsSetDefDispEnv(GsDispEnv *disp, short psm, short w, short h, short dx, short dy) {
-    GsGParam *gParam;
+    GsGParam *g_param;
     int dx1, dy1, dx2, dy2;
     int mode;
     short outMode;
     unsigned short interMode;
 
-    gParam = r1_func_00121D08();
-    if (gParam->outMode != 2 && gParam->outMode != 3 && r1_func_00121D18() != 0) {
-        r1_func_00121DB8(gParam->outMode, &dx1, &dy1, &dx2, &dy2);
+    g_param = r1_func_00121D08();
+    if (g_param->outMode != 2 && g_param->outMode != 3 && r1_func_00121D18() != 0) {
+        r1_func_00121DB8(g_param->outMode, &dx1, &dy1, &dx2, &dy2);
     } else {
         dy2 = 0;
         dx2 = 0;
         dy1 = 0;
         dx1 = 0;
     }
-    interMode = gParam->interMode;
+    interMode = g_param->interMode;
     disp->pmode = 0x66;
-    if (gParam->interMode != 0) {
-        if (gParam->ffMode != 0) {
+    if (g_param->interMode != 0) {
+        if (g_param->ffMode != 0) {
             disp->smode2 = 3;
         } else {
             disp->smode2 = 1;
@@ -92,14 +92,14 @@ void sceGsSetDefDispEnv(GsDispEnv *disp, short psm, short w, short h, short dx, 
     }
     disp->dispfb = ((unsigned long)(psm & 0xF) << 15) |
                    ((unsigned long)(((w + 63) >> 6) & 0x3F) << 9);
-    outMode = gParam->outMode;
+    outMode = g_param->outMode;
     if (outMode == 2) {
         if ((short)interMode == 1) {
             int magh = (w + 2559) / w;
             unsigned long dxo = (unsigned long)dx1 + 636;
             disp->display = ((((unsigned long)(magh - 1) << 23) |
                             (((dx * magh + dxo) & 0xFFF) |
-                             ((unsigned long)(gParam->ffMode ? (h << 1) - 1 : h - 1) << 44))) |
+                             ((unsigned long)(g_param->ffMode ? (h << 1) - 1 : h - 1) << 44))) |
                             (((unsigned long)(dy + dy1 + 50) & 0xFFF) << 12)) |
                             ((unsigned long)(magh * w - 1) << 32);
         } else {
@@ -118,7 +118,7 @@ void sceGsSetDefDispEnv(GsDispEnv *disp, short psm, short w, short h, short dx, 
             unsigned long dxo = (unsigned long)dx1 + 656;
             disp->display = ((((unsigned long)(magh - 1) << 23) |
                             (((dx * magh + dxo) & 0xFFF) |
-                             ((unsigned long)(gParam->ffMode ? (h << 1) - 1 : h - 1) << 44))) |
+                             ((unsigned long)(g_param->ffMode ? (h << 1) - 1 : h - 1) << 44))) |
                             (((unsigned long)(dy + dy1 + 72) & 0xFFF) << 12)) |
                             ((unsigned long)(magh * w - 1) << 32);
         } else {
@@ -149,9 +149,9 @@ void sceGsSetDefDispEnv(GsDispEnv *disp, short psm, short w, short h, short dx, 
  * offset 6 of the GParam block (r1_func_00121D08's return). */
 /* Writes the display settings to the graphics chip registers. */
 void sceGsPutDispEnv(GsDispEnv *env) {
-    GsGParam *gParam = r1_func_00121D08();
+    GsGParam *g_param = r1_func_00121D08();
 
-    if (gParam->version == 1) {
+    if (g_param->version == 1) {
         GS_PMODE = env->pmode;
         GS_DISPFB1 = env->dispfb;
         GS_DISPLAY1 = env->display;

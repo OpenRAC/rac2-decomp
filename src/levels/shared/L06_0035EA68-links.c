@@ -58,8 +58,8 @@ void link_watcher_update(unsigned char *moby) {
             } else STUB_printf(D_L06_001AF380,((char *)moby-D_L06_001B281C[0])>>8,i);
         }
         {
-            float sizeA=F14(vars,0),sizeB=F14(vars,4);
-            F14(moby,0x2c)=(sizeB>sizeA?sizeB:sizeA)*F14(*(char **)(moby+0x24),0x24);
+            float size_a=F14(vars,0),size_b=F14(vars,4);
+            F14(moby,0x2c)=(size_b>size_a?size_b:size_a)*F14(*(char **)(moby+0x24),0x24);
         }
         moby[0x20]=1;
         *(unsigned short *)(moby+0x34)|=0x100;

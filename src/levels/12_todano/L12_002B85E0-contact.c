@@ -76,7 +76,7 @@ extern void cam_scale_view_space_height(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 
 /* Checks whether the hero is touching something that pushes back and, if asked, shoves the hero away from it. */
-s32 hero_l12_apply_contact_push(s32 applyResponse) {
+s32 hero_l12_apply_contact_push(s32 apply_response) {
     TI16 vec;
     Entry_002B85E0 *e;
     u8 *moby;
@@ -119,7 +119,7 @@ s32 hero_l12_apply_contact_push(s32 applyResponse) {
         }
     }
     g_hero_state.f249C = e->f20;
-    if (applyResponse == 0) {
+    if (apply_response == 0) {
         return 1;
     }
     flag = 0;

@@ -30,8 +30,8 @@ extern unsigned char D_001395E3 NOT_SDA;
 void glow_marker_update(unsigned char *object)
 {
     float pos[4];
-    unsigned char *state = *(unsigned char **)(object + 0x68), *entry, *soundSlot;
-    int glow, soundId;
+    unsigned char *state = *(unsigned char **)(object + 0x68), *entry, *sound_slot;
+    int glow, sound_id;
     float distance;
 
     if (!state)
@@ -48,19 +48,19 @@ void glow_marker_update(unsigned char *object)
         moby_set_state(object, 1, -1);
         *(int *)(state + 0x14) = -1;
     } else if (object[0x20] == 1) {
-        soundSlot = g_sound_state + *(int *)(state + 0x14) * 112;
-        if (*(void **)(soundSlot + 0x88) != object || !soundSlot[0x74])
+        sound_slot = g_sound_state + *(int *)(state + 0x14) * 112;
+        if (*(void **)(sound_slot + 0x88) != object || !sound_slot[0x74])
             *(int *)(state + 0x14) = PlayMobySound(1, 4, object);
         moby_transform_joint_to_world(object, 0, pos);
         distance = vec_distance_xy(g_hero_state.pos, pos);
         *(int *)(state + 0xC) = 0;
         if (g_hero_state.owner == object && g_hero_state.active && distance < 0.5f) {
             moby_set_state(object, 2, -1);
-            soundId = *(int *)(state + 0x14);
-            if (soundId != -1) {
-                entry = g_sound_state + soundId * 112;
+            sound_id = *(int *)(state + 0x14);
+            if (sound_id != -1) {
+                entry = g_sound_state + sound_id * 112;
                 if (*(void **)(entry + 0x88) == object && entry[0x74])
-                    snd_stop_voice(soundId);
+                    snd_stop_voice(sound_id);
             }
             *(int *)(state + 0x14) = -1;
             PlayMobySound(0, 0, object);

@@ -75,12 +75,12 @@ void UpdateRacerRouteChoice(u8 *self)
 {
     float delta[4];
     u8 *s;
-    u8 *leaderVars;
+    u8 *leader_vars;
     int i; /* 1 while a branch route may still be picked this frame, then the branch index */
 
     s = P(self, 0x68);
     i = 1;
-    leaderVars = P(P(s, 0x164), 0x68);
+    leader_vars = P(P(s, 0x164), 0x68);
 
     if (I(s, 0x54) == -1) {
         return;
@@ -91,7 +91,7 @@ void UpdateRacerRouteChoice(u8 *self)
             START_ROUTE(0x7C, 4.0f);
         }
         if (I(s, 0x240) == 0 && I(s, 0x120) == -1 && I(s, 0x124) >= 0x2C && I(s, 0x124) < 0x33) {
-            u8 *rival = P(g_moby_l04_pool + (I(leaderVars, 0x1A4) << 8), 0x68);
+            u8 *rival = P(g_moby_l04_pool + (I(leader_vars, 0x1A4) << 8), 0x68);
 
             if (I(rival, 0x14) == 0) {
                 if (math_random_float_range(0.0f, 1.0f) < 0.9f - (float)(10 - I(s, 0x1A8)) * 0.03f) {
@@ -118,7 +118,7 @@ void UpdateRacerRouteChoice(u8 *self)
     }
     if ((int)ref_L04_00402D90_00 == 40 || g_current_map_index == 4) {
         if (P(s, 0x110) == g_route_path_table[I(s, 0x54)] && I(s, 0x124) >= 0x1AA && I(s, 0x124) < 0x1B3
-            && I(s, 0x1AC) >= 2 && IsPointInCuboid(self + 0x10, I(leaderVars, 0x1A0)) != 0) {
+            && I(s, 0x1AC) >= 2 && IsPointInCuboid(self + 0x10, I(leader_vars, 0x1A0)) != 0) {
             START_ROUTE(0x7C, 2.0f);
         }
         if (P(s, 0x110) == g_route_path_table[I(s, 0x6C)] && I(s, 0x124) >= 0xAB && I(s, 0x124) < 0xAF

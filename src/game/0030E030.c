@@ -57,7 +57,7 @@ void projectile_update(char *actor) {
         int collision;
         char *hit;
         float halfAngle;
-        short hitClass;
+        short hit_class;
         moby_get_facing_direction(actor + 0x10, scratch.desired.f);
         vec_scale_to_length(&scratch.forward, actor + 0xE0, 1.0f);
         FastVecCross(&scratch.axis, &scratch.forward, &scratch.desired);
@@ -91,8 +91,8 @@ void projectile_update(char *actor) {
         if (collision != 2) break;
         hit = scratch.phase.query.owner;
         if (hit) {
-            hitClass = *(short *)(hit + 0xAA);
-            if (hitClass == 0xCB /* Decoy */ || hitClass == 0x1366 /* Miniturret */ || hitClass == 0x1367 /* Megaturret */) goto accelerate;
+            hit_class = *(short *)(hit + 0xAA);
+            if (hit_class == MOBY_CLASS_DECOY || hit_class == MOBY_CLASS_MINITURRET || hit_class == MOBY_CLASS_MEGATURRET) goto accelerate;
             *(char **)(vars + 0x38) = hit;
         }
         {

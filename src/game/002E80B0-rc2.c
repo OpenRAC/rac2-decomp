@@ -38,15 +38,15 @@ extern s64 D_001B2168;
 /* Loads a data block for the next scene and keeps its first two values for drawing. */
 void scene_load_texture_block(void) {
     s64 values[4];
-    s32 levelIndex;
-    s32 clampedIndex;
+    s32 level_index;
+    s32 clamped_index;
     s32 archive;
     s32 loaded;
 
     archive = D_001A7288;
     if (*(s32 *)(archive + 0x50) != -1) {
-        levelIndex = D_001A7BB4 - 1;
-        clampedIndex = (levelIndex > -1) ? levelIndex : 0;
+        level_index = D_001A7BB4 - 1;
+        clamped_index = (level_index > -1) ? level_index : 0;
         FlushCache(0);
         fast_decompress(archive + *(s32 *)(archive + 0x50), g_dma_packet_cursor);
         FlushCache(0);
@@ -54,7 +54,7 @@ void scene_load_texture_block(void) {
         D_001A72D0 = D_001A72D4;
         UploadMipTexture(loaded + *(s32 *)(loaded + 4), values);
         D_001B2160 = values[0];
-        UploadMipTexture(loaded + *(s32 *)(loaded + clampedIndex * 4 + 8), values);
+        UploadMipTexture(loaded + *(s32 *)(loaded + clamped_index * 4 + 8), values);
         D_001B2168 = values[0];
         D_001A72D4 = D_001A72D0 + 0x2000;
     }

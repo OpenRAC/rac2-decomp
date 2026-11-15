@@ -40,10 +40,10 @@ void cloud_sparkle_field_update(char *moby) {
     } scratch;
     CloudVec points[18], temp;
     char *vars = *(char **)(moby + 0x68);
-    int pointCount, k = 0;
+    int point_count, k = 0;
     unsigned short *entry = 0;
     char *prim = 0, *transform = 0;
-    float yaw,pitch,cosPitch,elevation,weight;
+    float yaw,pitch,cos_pitch,elevation,weight;
     int color;
     switch ((unsigned char)moby[0x20]) {
     case 0: {
@@ -72,7 +72,7 @@ void cloud_sparkle_field_update(char *moby) {
         func_00309390(scratch.init.m[1],scratch.init.rotations+1);
         func_00309390(scratch.init.m[2],scratch.init.rotations+2);
         { int j; for(j=17;j>=0;j--) points[j].v.w=0; }
-        pointCount=0;
+        point_count=0;
         points[0].v.x=0; points[0].v.y=10; points[0].v.z=-4;
         func_00308FF0(points+1,points,scratch.init.m[1]);
         func_00308FF0(points+2,points,scratch.init.m[2]);
@@ -103,8 +103,8 @@ void cloud_sparkle_field_update(char *moby) {
                 k=D_L10_002273C0[(unsigned char)prim[0x1d]];
                 k=k==0xdf6 ? 0 : k==0xdf7 ? 6 : 12;
                 func_00308FF0(&temp,points+(i+k),transform);
-                func_00308B30(D_L10_0026CEA0+pointCount,transform+0x30,&temp);
-                pointCount++;
+                func_00308B30(D_L10_0026CEA0+point_count,transform+0x30,&temp);
+                point_count++;
             }
             entry = next;
             }
@@ -127,9 +127,9 @@ void cloud_sparkle_field_update(char *moby) {
             highStart=1.65806293f;
             upper=2.26892829f;
             pitch=func_00339730(*(float *)(vars+4)*0.581194639f);
-            cosPitch=func_00309138(pitch);
-            scratch.update.direction.v.x=cosPitch*func_00309120(yaw);
-            scratch.update.direction.v.y=cosPitch*func_00309138(yaw);
+            cos_pitch=func_00309138(pitch);
+            scratch.update.direction.v.x=cos_pitch*func_00309120(yaw);
+            scratch.update.direction.v.y=cos_pitch*func_00309138(yaw);
             scratch.update.direction.v.z=func_00309120(pitch);
             func_00308B78(&scratch.update.position,&scratch.update.temp,moby+0x10);
             func_00308E10(&scratch.update.position,&scratch.update.position,one);

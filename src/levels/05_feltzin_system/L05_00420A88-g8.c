@@ -39,7 +39,7 @@ void feltzin_mission_one_update(char *actor)
     char *state = *(char **)(actor + 0x68);
     char **objects;
     int count;
-    int secondCount;
+    int second_count;
 
     if (D_L05_001B1364 == 0) {
         D_L05_00221D10[11] = 0;
@@ -91,9 +91,9 @@ void feltzin_mission_one_update(char *actor)
         c.f[2] = 535.0f;
         ship_point_camera_at_target(&a, &c);
         objects = level_get_object_list();
-        secondCount = level_get_saved_value();
-        if (secondCount > 0) {
-            int remaining = secondCount;
+        second_count = level_get_saved_value();
+        if (second_count > 0) {
+            int remaining = second_count;
             do {
                 switch (*(short *)(*objects + 0xAA)) {
                 case 0x957 /* moby class 2391 */:

@@ -22,33 +22,33 @@ extern s32 level_set_game_state_pair(s32, void *, s32);
 void counter_meter_update(u8 *meter)
 {
     s32 *vars = *(s32 **)(meter + 0x68);
-    s32 liveCount;
-    s32 shownCount;
+    s32 live_count;
+    s32 shown_count;
 
     qcopy(meter + 0x10, &((Hero_003DB8E8 *)g_hero_state)->q[8]);
-    liveCount = mode_get_setting();
+    live_count = mode_get_setting();
     if (meter[0x20] == 0) {
         meter[0x20] = 1;
-        vars[0] = liveCount;
+        vars[0] = live_count;
         vars[1] = 0;
         meter[0x30] = 0xFF;
         D_L08_001B0488 = meter;
     }
     if (D_L08_001B2508 % 10 == 0) {
-        shownCount = vars[0];
-        if (shownCount < liveCount) {
+        shown_count = vars[0];
+        if (shown_count < live_count) {
             vars[1] = 0;
-            vars[0] = shownCount + 1;
-        } else if (liveCount < shownCount) {
-            vars[0] = shownCount - 1;
+            vars[0] = shown_count + 1;
+        } else if (live_count < shown_count) {
+            vars[0] = shown_count - 1;
         }
     }
-    if (liveCount > 0 && D_L08_001A8F00 != 2 && (meter[0x20] == 1 || meter[0x20] == 2)) {
+    if (live_count > 0 && D_L08_001A8F00 != 2 && (meter[0x20] == 1 || meter[0x20] == 2)) {
         meter[0x20] = 2;
         level_set_game_state_pair(0, counter_meter_draw, 2);
         return;
     }
-    if ((liveCount <= 0 || D_L08_001A8F00 == 2) && meter[0x20] == 2) {
+    if ((live_count <= 0 || D_L08_001A8F00 == 2) && meter[0x20] == 2) {
         level_set_game_state_pair(0, 0, 2);
         meter[0x20] = 1;
     }

@@ -39,50 +39,50 @@ struct Obj {
 /* Moves the selection around the four-column item grid and remembers the selected value. */
 void radial_menu_move_grid_selection(struct Obj *o, s32 flags) {
     if (flags & 0x1000) {
-        s32 minusOne;
-        s32 newPage;
-        s32 nextValue;
+        s32 minus_one;
+        s32 new_page;
+        s32 next_value;
         snd_play_from_global_bank(3, 0, 0);
-        minusOne = -1;
-        nextValue = o->page - 1;
-        newPage = (minusOne < nextValue) ? nextValue : 5;
-        o->page = newPage;
+        minus_one = -1;
+        next_value = o->page - 1;
+        new_page = (minus_one < next_value) ? next_value : 5;
+        o->page = new_page;
     } else if (flags & 0x4000) {
-        s32 nextValue;
+        s32 next_value;
         snd_play_from_global_bank(3, 0, 0);
-        nextValue = o->page + 1;
-        nextValue = (5 < nextValue) ? 0 : nextValue;
-        o->page = nextValue;
+        next_value = o->page + 1;
+        next_value = (5 < next_value) ? 0 : next_value;
+        o->page = next_value;
     } else if (flags & 0x8000) {
-        s32 nextValue;
-        s32 savedPage;
-        s32 pageOffset;
+        s32 next_value;
+        s32 saved_page;
+        s32 page_offset;
         snd_play_from_global_bank(3, 0, 0);
-        nextValue = o->column - 1;
-        o->column = nextValue;
-        if (nextValue < 0) {
-            savedPage = o->page;
+        next_value = o->column - 1;
+        o->column = next_value;
+        if (next_value < 0) {
+            saved_page = o->page;
             o->column = 3;
-            pageOffset = savedPage - 4;
-            if ((u32)pageOffset < 2) {
+            page_offset = saved_page - 4;
+            if ((u32)page_offset < 2) {
                 o->column = 2;
-                o->page = pageOffset;
+                o->page = page_offset;
                 o->flag = 1;
             }
         }
     } else if (flags & 0x2000) {
-        s32 nextValue;
-        s32 currentPage;
+        s32 next_value;
+        s32 current_page;
         snd_play_from_global_bank(3, 0, 0);
-        nextValue = o->column + 1;
-        o->column = nextValue;
-        if (nextValue >= 4) {
+        next_value = o->column + 1;
+        o->column = next_value;
+        if (next_value >= 4) {
             o->column = 0;
-            currentPage = o->page;
-            if (currentPage == 4) {
+            current_page = o->page;
+            if (current_page == 4) {
                 o->page = 0;
                 o->flag = 1;
-            } else if (currentPage == 5) {
+            } else if (current_page == 5) {
                 o->column = 1;
                 o->page = 1;
                 o->flag = 1;

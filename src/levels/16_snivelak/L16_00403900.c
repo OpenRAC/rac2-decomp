@@ -200,22 +200,22 @@ extern s32 D_L16_001B2B38[] __attribute__((sda));
 /* Tells the other objects in the same group that one of them has been woken. */
 void group_wake_members(u8 *moby)
 {
-    u16 *groupIds;
+    u16 *group_ids;
     u8 *other;
 
     if (moby[0x21] == 0xFF)
         return;
-    groupIds = D_L16_001FB660[moby[0x21]];
-    while (moby[0x21] != 0xFF && moby[0x21] <= D_L16_001B2B38[0] && groupIds != 0 &&
-           ((groupIds != 0 && (s16)groupIds[-1] >= 0) || groupIds == D_L16_001FB660[moby[0x21]])) {
-        other = D_L16_001B2B1C[0] + ((*groupIds & 0x7FFF) << 8);
+    group_ids = D_L16_001FB660[moby[0x21]];
+    while (moby[0x21] != 0xFF && moby[0x21] <= D_L16_001B2B38[0] && group_ids != 0 &&
+           ((group_ids != 0 && (s16)group_ids[-1] >= 0) || group_ids == D_L16_001FB660[moby[0x21]])) {
+        other = D_L16_001B2B1C[0] + ((*group_ids & 0x7FFF) << 8);
         if (other == 0)
             break;
         if (*(s16 *)(other + 0xAA) == 0xF35)
             *(s32 *)(*(u8 **)(other + 0x68) + 0x244) = 1;
         else if (*(s16 *)(other + 0xAA) == 0xEA3)
             *(s32 *)(*(u8 **)(other + 0x68) + 0x24C) = 1;
-        groupIds++;
+        group_ids++;
     }
 }
 
@@ -397,13 +397,13 @@ void RequestVoiceLine(u8 *moby, s32 idx)
     if (voice->active == 0) {
         if (voice->key == -1 && idx != *(s32 *)(vars + 0x354)) {
             if (idx < 20) {
-                s32 lineKey = *(s32 *)(vars + (idx << 2) + 0x280);
+                s32 line_key = *(s32 *)(vars + (idx << 2) + 0x280);
                 voice->selection = 0;
-                voice->key = (lineKey & 0x3FFF) + 0x7D0;
+                voice->key = (line_key & 0x3FFF) + 0x7D0;
             } else {
-                s32 lineKey = *(s32 *)(vars + ((idx - 20) << 2) + 0x2D0);
+                s32 line_key = *(s32 *)(vars + ((idx - 20) << 2) + 0x2D0);
                 voice->selection = 0;
-                voice->key = (lineKey & 0x3FFF) + 0x7D0;
+                voice->key = (line_key & 0x3FFF) + 0x7D0;
             }
             func_002A6170(D_L16_001B1888);
             *(u8 *)(vars + idx + 0x310) = 1;

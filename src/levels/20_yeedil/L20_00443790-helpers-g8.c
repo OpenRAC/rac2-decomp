@@ -19,13 +19,13 @@ extern int FloatToInt(float);
 extern void tumbling_debris_update(char *);
 
 /* Creates an object of the given class at the owner and throws it in an arc toward the target. Returns the new object. */
-char *yeedil_boss_spawn_lobbed_object(char *owner, int classId, char *aimTarget) {
-    char *obj = (char *)CreateMoby(classId);
+char *yeedil_boss_spawn_lobbed_object(char *owner, int class_id, char *aim_target) {
+    char *obj = (char *)CreateMoby(class_id);
     char *state;
     char *velocity;
     float speed;
     float acceleration;
-    float flightTime;
+    float flight_time;
     unsigned short flags;
 
     if (obj != 0) {
@@ -40,15 +40,15 @@ char *yeedil_boss_spawn_lobbed_object(char *owner, int classId, char *aimTarget)
         acceleration = D_L20_001B216C * 0.000277777785f;
         velocity = state + 0x10;
         *(unsigned short *)(obj + 0x34) = flags;
-        flightTime = 0.0f;
-        FastVecSub(state, aimTarget, obj + 0x10);
+        flight_time = 0.0f;
+        FastVecSub(state, aim_target, obj + 0x10);
         *(float *)(state + 8) = 0.0f;
         vec_scale_to_length(state, state, speed);
         FastVecCross(velocity, state, obj + 0xE0);
         vec_set_direction_with_complement((float *)velocity, (float *)velocity, math_fast_sin_or_cos_b(D_L20_001B2170 * 0.000290888245f));
-        *(float *)(state + 8) = weapon_compute_shot_launch_speed(obj + 0x10, aimTarget, &flightTime, speed, -acceleration);
+        *(float *)(state + 8) = weapon_compute_shot_launch_speed(obj + 0x10, aim_target, &flight_time, speed, -acceleration);
         *(float *)(state + 0x20) = acceleration;
-        *(int *)(state + 0x24) = FloatToInt(flightTime);
+        *(int *)(state + 0x24) = FloatToInt(flight_time);
         *(void (**)(char *))(obj + 0x64) = tumbling_debris_update;
     }
     return obj;

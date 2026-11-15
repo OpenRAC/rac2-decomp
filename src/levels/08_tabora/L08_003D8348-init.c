@@ -141,9 +141,9 @@ void herd_animal_init(InitObject *object)
 {
     InitState *vars = object->f68;
     float position[4], depth;
-    int linkedEntry;
-    unsigned short linkedFlag;
-    int flagBits;
+    int linked_entry;
+    unsigned short linked_flag;
+    int flag_bits;
     vars->f48 = FloatToInt(15.0f);
     vars->f4A = FloatToInt(9.6f);
     vars->f29 = 1;
@@ -159,18 +159,18 @@ void herd_animal_init(InitObject *object)
                 return;
         }
     }
-    linkedEntry = vars->f404;
-    if (linkedEntry != -1) {
+    linked_entry = vars->f404;
+    if (linked_entry != -1) {
         /* Entries are 0x100 bytes; the global holds their base address. */
-        linkedEntry = D_L08_001B29DC + (linkedEntry << 8);
-        if (((InitEntry *)linkedEntry)->fB0 != 255) {
-            linkedFlag = ((InitEntry *)linkedEntry)->fB2;
-            if (D_L08_0021EAF0.flags[(short)linkedFlag] ||
-                ((flagBits = (u8)D_0019B4A8[((short)linkedFlag >> 1) + (g_current_map_index << 10)]),
-                 (linkedFlag & 1) ? (flagBits >> 4) & 7 : flagBits & 7)) {
-                unsigned short savedFlag = object->fB2;
-                flagBits = (u8)D_0019B4A8[((short)savedFlag >> 1) + (g_current_map_index << 10)];
-                if ((savedFlag & 1) ? (flagBits >> 4) & 7 : flagBits & 7) {
+        linked_entry = D_L08_001B29DC + (linked_entry << 8);
+        if (((InitEntry *)linked_entry)->fB0 != 255) {
+            linked_flag = ((InitEntry *)linked_entry)->fB2;
+            if (D_L08_0021EAF0.flags[(short)linked_flag] ||
+                ((flag_bits = (u8)D_0019B4A8[((short)linked_flag >> 1) + (g_current_map_index << 10)]),
+                 (linked_flag & 1) ? (flag_bits >> 4) & 7 : flag_bits & 7)) {
+                unsigned short saved_flag = object->fB2;
+                flag_bits = (u8)D_0019B4A8[((short)saved_flag >> 1) + (g_current_map_index << 10)];
+                if ((saved_flag & 1) ? (flag_bits >> 4) & 7 : flag_bits & 7) {
                     moby_mark_spawned(object);
                     return;
                 }

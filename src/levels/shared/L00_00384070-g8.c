@@ -28,7 +28,7 @@ int sheep_board_create_objects(char *owner)
 
     FIELD(int, work, 0x68) = math_random_int_below(255);
     do {
-        *slot = CreateMoby(0xCB2 /* Synthenoid */);
+        *slot = CreateMoby(MOBY_CLASS_SYNTHENOID);
         moby_init_child_from_parent(*slot, 0);
         anim_start_immediate((signed char *)*slot, 1, 0);
         FIELD(unsigned short, *slot, 0x34) |= 0x4002;
@@ -47,7 +47,7 @@ int sheep_board_create_objects(char *owner)
     basis = &D_L00_001AED50;
     j = 23;
     do {
-        *slot = CreateMoby(0xE7D /* Sheep */);
+        *slot = CreateMoby(MOBY_CLASS_SHEEP);
         if (*slot) {
             moby_init_child_from_parent(*slot, 0);
             result = math_random_int_below(FIELD(unsigned char,

@@ -17,12 +17,12 @@ void group_spawn_member_effect(u8 *moby)
 {
     u8 *member;
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 framePos[16];
+    u8 frame_pos[16];
 
     member = moby_find_active_in_group(*(u8 **)(vars + 0x184));
     if (member == 0)
         return;
-    moby_transform_joint_to_world(moby, 0, framePos);
+    moby_transform_joint_to_world(moby, 0, frame_pos);
     PlayMobySound(5, 0, (char *)moby);
-    homing_bomb_init(member, moby, framePos, D_L07_001B23CC[*(s32 *)(vars + 0x174)].f38 + 0.5f);
+    homing_bomb_init(member, moby, frame_pos, D_L07_001B23CC[*(s32 *)(vars + 0x174)].f38 + 0.5f);
 }

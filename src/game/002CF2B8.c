@@ -10,15 +10,15 @@ extern void DoGifPaging(void);
 /* Draw centered text in scaled screen coordinates. */
 int menu_draw_centered_prompt_low(void)
 {
-    float unscaledY;
-    int screenY;
+    float unscaled_y;
+    int screen_y;
 
     SetupGifPaging(0);
     func_0029C530();
-    unscaledY = 256.0f;
-    screenY = (int)(D_001B23A4[0] * unscaledY + 0.5f);
+    unscaled_y = 256.0f;
+    screen_y = (int)(D_001B23A4[0] * unscaled_y + 0.5f);
     do {
-        text_draw_centered_small(0x1A5, screenY, 0x80F0F0F0ULL, (u8 *)GetLocalizedString(0x2D4F), -1);
+        text_draw_centered_small(0x1A5, screen_y, 0x80F0F0F0ULL, (u8 *)GetLocalizedString(0x2D4F), -1);
     } while (0);
     DoGifPaging();
     return 0;

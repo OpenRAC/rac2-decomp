@@ -81,33 +81,33 @@ extern s32 math_fast_float_d(s32 *counter);
    runs out. Returns 0 when there is none. */
 u8 *group_pick_random_active_entity(s32 group)
 {
-    u16 *idPtr;
-    u16 *idPtrB;
+    u16 *id_ptr;
+    u16 *id_ptr_b;
     u8 *entity;
-    s32 activeCount = 0;
-    s32 pickIndex;
+    s32 active_count = 0;
+    s32 pick_index;
 
-    for (idPtr = g_moby_l07_group_lists[group];
-         (group & 0xFF) != 0xFF && group <= D_L07_001B22F8[0] && idPtr != 0 &&
-         ((s16)idPtr[-1] >= 0 || idPtr == g_moby_l07_group_lists[group]);
-         idPtr++) {
-        entity = g_moby_l07_array[0] + ((*idPtr & 0x7FFF) << 8);
+    for (id_ptr = g_moby_l07_group_lists[group];
+         (group & 0xFF) != 0xFF && group <= D_L07_001B22F8[0] && id_ptr != 0 &&
+         ((s16)id_ptr[-1] >= 0 || id_ptr == g_moby_l07_group_lists[group]);
+         id_ptr++) {
+        entity = g_moby_l07_array[0] + ((*id_ptr & 0x7FFF) << 8);
         if (entity == 0)
             break;
         if (entity[0x20] == 1)
-            activeCount++;
+            active_count++;
     }
-    if (activeCount == 0)
+    if (active_count == 0)
         return 0;
-    pickIndex = math_random_int_below(activeCount);
-    for (idPtrB = g_moby_l07_group_lists[group];
-         (group & 0xFF) != 0xFF && group <= D_L07_001B22F8[0] && idPtrB != 0 &&
-         ((s16)idPtrB[-1] >= 0 || idPtrB == g_moby_l07_group_lists[group]);
-         idPtrB++) {
-        entity = g_moby_l07_array[0] + ((*idPtrB & 0x7FFF) << 8);
+    pick_index = math_random_int_below(active_count);
+    for (id_ptr_b = g_moby_l07_group_lists[group];
+         (group & 0xFF) != 0xFF && group <= D_L07_001B22F8[0] && id_ptr_b != 0 &&
+         ((s16)id_ptr_b[-1] >= 0 || id_ptr_b == g_moby_l07_group_lists[group]);
+         id_ptr_b++) {
+        entity = g_moby_l07_array[0] + ((*id_ptr_b & 0x7FFF) << 8);
         if (entity == 0)
             break;
-        if (entity[0x20] == 1 && math_fast_float_d(&pickIndex) != 0)
+        if (entity[0x20] == 1 && math_fast_float_d(&pick_index) != 0)
             return entity;
     }
     return 0;
@@ -285,23 +285,23 @@ extern f32 D_L07_001B3198 __attribute__((sda));
 /* Throws 200 sparks out of the object in random directions. */
 void part_l07_spawn_spark_burst(u8 *moby)
 {
-    f32 sparkVelocity[4];
-    f32 sparkPos[4];
+    f32 spark_velocity[4];
+    f32 spark_pos[4];
     s32 i;
-    f32 randomSpeed;
-    f32 randomY;
-    f32 randomX;
+    f32 random_speed;
+    f32 random_y;
+    f32 random_x;
 
     D_L07_001B3198 = D_L07_001AA698;
     D_L07_001AA698 = 0.99f;
     for (i = 0xC7; i >= 0; i--) {
-        func_310D80(sparkPos, 1.0f / 60.0f, 0.23333335f);
-        sparkPos[2] = func_2E4280(sparkPos[2]) + 1.0f / 12.0f;
-        randomX = func_310B30(-5.0f, 5.0f);
-        randomY = func_310B30(-5.0f, 5.0f);
-        randomSpeed = func_310B30(10.0f, 25.0f);
-        func_31AFD8(moby, sparkVelocity, randomX, randomY, randomSpeed);
-        func_335848(sparkVelocity, sparkPos, 0x1E0);
+        func_310D80(spark_pos, 1.0f / 60.0f, 0.23333335f);
+        spark_pos[2] = func_2E4280(spark_pos[2]) + 1.0f / 12.0f;
+        random_x = func_310B30(-5.0f, 5.0f);
+        random_y = func_310B30(-5.0f, 5.0f);
+        random_speed = func_310B30(10.0f, 25.0f);
+        func_31AFD8(moby, spark_velocity, random_x, random_y, random_speed);
+        func_335848(spark_velocity, spark_pos, 0x1E0);
     }
 }
 
@@ -319,8 +319,8 @@ extern f32 func_2E4508(void *a, void *b);
 /* Works out the heading and tilt of a path at a given distance along it, by looking a little behind and a little ahead. */
 void path_compute_heading_and_tilt(s32 *path, f32 *angles, f32 distance, f32 span)
 {
-    f32 aheadPoint[4];
-    f32 behindPoint[4];
+    f32 ahead_point[4];
+    f32 behind_point[4];
     f32 scratch[4];
     f32 behind = distance - span;
     f32 ahead;
@@ -330,10 +330,10 @@ void path_compute_heading_and_tilt(s32 *path, f32 *angles, f32 distance, f32 spa
     ahead = distance + span;
     if ((f32)path[0] < ahead)
         ahead = ahead - (f32)path[0];
-    func_338D68(path, 1, behindPoint, scratch, 0, behind);
-    func_338D68(path, 1, aheadPoint, scratch, 0, ahead);
-    angles[2] = func_2E49C8(behindPoint[0] - aheadPoint[0], behindPoint[1] - aheadPoint[1]);
-    angles[1] = -func_2E49C8(func_2E4508(aheadPoint, behindPoint), behindPoint[2] - aheadPoint[2]);
+    func_338D68(path, 1, behind_point, scratch, 0, behind);
+    func_338D68(path, 1, ahead_point, scratch, 0, ahead);
+    angles[2] = func_2E49C8(behind_point[0] - ahead_point[0], behind_point[1] - ahead_point[1]);
+    angles[1] = -func_2E49C8(func_2E4508(ahead_point, behind_point), behind_point[2] - ahead_point[2]);
 }
 
 /* func_L07_0040F0D0 is defined in L07_0040F0D0-g32.c. */
@@ -383,28 +383,28 @@ extern f32 func_2E44D0(void *a, void *b);
 /* For each of three paths, finds the middle of its points and stores it after the last point, along with the largest distance of any point from it. */
 void path_compute_centers_and_radii(void)
 {
-    s32 i, pointCount, j, testIndex, sumIndex;
+    s32 i, point_count, j, test_index, sum_index;
     f32 center[4];
     f32 distance;
 
     for (i = 0; i < 3; i++) {
-        pointCount = 0;
-        testIndex = 0;
-        sumIndex = 0;
+        point_count = 0;
+        test_index = 0;
+        sum_index = 0;
         qzero(center);
         /* separate counters for the test (testIndex) and the call (sumIndex); pointCount stays for after the loop */
-        while (D_L07_002A0100[i][testIndex].w == 1.0f) {
-            func_2E4310(center, center, &D_L07_002A0100[i][sumIndex]);
-            pointCount++;
-            sumIndex++;
-            testIndex++;
+        while (D_L07_002A0100[i][test_index].w == 1.0f) {
+            func_2E4310(center, center, &D_L07_002A0100[i][sum_index]);
+            point_count++;
+            sum_index++;
+            test_index++;
         }
-        func_2E4398(&D_L07_002A0100[i][pointCount], &D_L07_002A0100[i][pointCount], 1.0f / pointCount);
-        D_L07_002A0100[i][pointCount].w = 0.0f;
-        for (j = 0; j < pointCount; j++) {
-            distance = func_2E44D0(&D_L07_002A0100[i][j], &D_L07_002A0100[i][pointCount]) + 4.0f;
-            if (D_L07_002A0100[i][pointCount].w < distance)
-                D_L07_002A0100[i][pointCount].w = distance;
+        func_2E4398(&D_L07_002A0100[i][point_count], &D_L07_002A0100[i][point_count], 1.0f / point_count);
+        D_L07_002A0100[i][point_count].w = 0.0f;
+        for (j = 0; j < point_count; j++) {
+            distance = func_2E44D0(&D_L07_002A0100[i][j], &D_L07_002A0100[i][point_count]) + 4.0f;
+            if (D_L07_002A0100[i][point_count].w < distance)
+                D_L07_002A0100[i][point_count].w = distance;
         }
     }
 }
@@ -418,7 +418,7 @@ extern void func_2E47F8(void *, void *, void *);
 void path_upload_points_to_world(u8 *moby, s32 index)
 {
     f32 matrix[16];
-    f32 endPoint[4];
+    f32 end_point[4];
     u8 *state = *(u8 **)(moby + 0x68);
     s32 *dest;
     u8 *record;
@@ -437,10 +437,10 @@ void path_upload_points_to_world(u8 *moby, s32 index)
         func_2E47F8(dest + 4 + i * 4, D_L07_002A0100[index] + i, matrix);
         (*dest)++;
     }
-    qcopy(endPoint, &D_L07_002A0100[index][*dest]);
-    radius = endPoint[3];
-    endPoint[3] = 1.0f;
-    func_2E47F8(D_L07_001B1F40 + (*(s32 *)(state + 0xBC) * 0x30 + 0x20), endPoint, matrix);
+    qcopy(end_point, &D_L07_002A0100[index][*dest]);
+    radius = end_point[3];
+    end_point[3] = 1.0f;
+    func_2E47F8(D_L07_001B1F40 + (*(s32 *)(state + 0xBC) * 0x30 + 0x20), end_point, matrix);
     {
         u8 *table = D_L07_001B1F40;
         table += *(s32 *)(state + 0xBC) * 0x30;

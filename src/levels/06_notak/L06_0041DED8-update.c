@@ -44,14 +44,14 @@ extern void actor_aim_body_at_target(char *);
 void patrol_shooter_update(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    int *pathData;
-    int hitFlags;
+    int *path_data;
+    int hit_flags;
     float pos[4], target[4], direction[4];
-    float frame, savedW, groundHeight;
+    float frame, saved_w, ground_height;
     int i;
 
     actor_init_and_check_hits(moby);
-    pathData = g_path_list[*(int *)(vars + 0x23C)];
+    path_data = g_path_list[*(int *)(vars + 0x23C)];
     switch (*(unsigned char *)(moby + 0x95)) {
     case 0:
         if (*(int *)(vars + 0x228) == 1) {
@@ -78,20 +78,20 @@ void patrol_shooter_update(char *moby)
     case 2:
         if (*(int *)(vars + 0x228) != 1 && *(int *)(vars + 0x22C) != 1 && (moby[0x60] & 2)) {
             if (*(int *)(vars + 0x23C) != -1)
-                *(int *)(vars + 0x478) = pathData[0] - 1;
+                *(int *)(vars + 0x478) = path_data[0] - 1;
             *(float *)(vars + 0x494) = 2.0f;
             moby_set_state(moby, 14, 4);
             *(short *)(vars + 0x24A) = math_random_int_range(580, 600);
         }
         break;
     case 3:
-        hitFlags = moby_dispatch_action_by_kind(moby, vars + 0x60);
-        if (hitFlags & 1) {
+        hit_flags = moby_dispatch_action_by_kind(moby, vars + 0x60);
+        if (hit_flags & 1) {
             SetDeathBits(moby, 0, 3);
             func_L06_004294A0(moby, 0, 0);
             return;
         }
-        if (hitFlags & 2) {
+        if (hit_flags & 2) {
             if (*(int *)(vars + 0x228) == 1 || *(int *)(vars + 0x22C) == 1) {
                 if (FastDiffRots(*(float *)(moby + 0xF8),
                         mat_fast_helper_a(*(float *)(vars + 0x200) - *(float *)(moby + 0x10),
@@ -185,16 +185,16 @@ void patrol_shooter_update(char *moby)
             frame = moby_get_anim_value(moby);
             if ((unsigned char)moby[0x42] == (unsigned char)moby[0x43] &&
                 frame >= 4.0f && frame <= 22.0f) {
-                savedW = *(float *)(moby + 0x1C);
+                saved_w = *(float *)(moby + 0x1C);
                 pos[0] = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8)) * 0.16f;
                 pos[1] = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8)) * 0.16f;
                 pos[2] = 0.0f;
                 FastVecAdd(moby + 0x10, (char *)pos, moby + 0x10);
-                groundHeight = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
+                ground_height = coll_probe_ground_height_below(moby + 0x10, 0, 0.5f);
                 *(float *)(moby + 0x18) -= 0.1666666716337204f;
-                if (*(float *)(moby + 0x18) < groundHeight)
-                    *(float *)(moby + 0x18) = groundHeight;
-                *(float *)(moby + 0x1C) = savedW;
+                if (*(float *)(moby + 0x18) < ground_height)
+                    *(float *)(moby + 0x18) = ground_height;
+                *(float *)(moby + 0x1C) = saved_w;
             }
             qcopy(pos, moby + 0x10);
             pos[2] += 0.6f;
@@ -206,12 +206,12 @@ void patrol_shooter_update(char *moby)
             frame = moby_get_anim_value(moby);
             if ((unsigned char)moby[0x42] == (unsigned char)moby[0x43] &&
                 frame >= 4.0f && frame <= 22.0f) {
-                savedW = *(float *)(moby + 0x1C);
+                saved_w = *(float *)(moby + 0x1C);
                 pos[0] = math_fast_sin_or_cos_a(*(float *)(moby + 0xF8)) * 0.16f;
                 pos[1] = math_fast_sin_or_cos_b(*(float *)(moby + 0xF8)) * 0.16f;
                 pos[2] = 0.0f;
                 FastVecAdd(moby + 0x10, (char *)pos, moby + 0x10);
-                *(float *)(moby + 0x1C) = savedW;
+                *(float *)(moby + 0x1C) = saved_w;
             }
             qcopy(pos, moby + 0x10);
             pos[2] += 0.6f;
@@ -220,9 +220,9 @@ void patrol_shooter_update(char *moby)
             target[2] = 0.0f;
             FastVecAdd((char *)pos, (char *)target, (char *)pos);
             if (coll_test_point((char *)pos, 0, moby, 0.5f)) {
-                char *hitMoby = D_L06_001BFC98;
-                if (hitMoby && *(short *)(hitMoby + 0xAA) == 0xFDC /* moby class 4060 */)
-                    part_emit_spark_burst_remove(hitMoby);
+                char *hit_moby = D_L06_001BFC98;
+                if (hit_moby && *(short *)(hit_moby + 0xAA) == 0xFDC /* moby class 4060 */)
+                    part_emit_spark_burst_remove(hit_moby);
             }
         }
         break;
@@ -237,15 +237,15 @@ void patrol_shooter_update(char *moby)
         break;
     case 8:
         if (*(int *)(vars + 0x23C) != -1) {
-            char *waypoint = (char *)(pathData + 4) + *(int *)(vars + 0x478) * 16;
+            char *waypoint = (char *)(path_data + 4) + *(int *)(vars + 0x478) * 16;
             actor_steer_toward_goal(moby, waypoint,
                 mat_fast_helper_a(*(float *)(vars + 0x200) - *(float *)(moby + 0x10),
                             *(float *)(vars + 0x204) - *(float *)(moby + 0x14)),
                 8.0f, 0.25f, 0.0f);
-            if (vec_distance_xy(moby + 0x10, (char *)(pathData + 4) + *(int *)(vars + 0x478) * 16) < 1.5f)
+            if (vec_distance_xy(moby + 0x10, (char *)(path_data + 4) + *(int *)(vars + 0x478) * 16) < 1.5f)
                 ++*(int *)(vars + 0x478);
             {
-                int count = pathData[0];
+                int count = path_data[0];
                 if (*(int *)(vars + 0x478) >= count) {
                     *(int *)(vars + 0x5A0) = 0;
                     *(int *)(vars + 0x478) = count - 1;

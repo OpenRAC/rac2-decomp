@@ -25,9 +25,9 @@ extern void r1_func_0012BCC8(int);
  * 3, already matched in this file). func_0012C008 is decode_motion_vector.
  */
 /* Reads one motion vector (horizontal and vertical parts) from the video stream. */
-void mpeg_read_motion_vector(void *decoderPtr, int *PMV, int *dmvector, int h_r_size,
+void mpeg_read_motion_vector(void *decoder_ptr, int *PMV, int *dmvector, int h_r_size,
                     int v_r_size, int dmv, int mvscale, int full_pel_vector) {
-    char *s = (char *)decoderPtr;
+    char *s = (char *)decoder_ptr;
     int motion_code;
     int motion_residual;
 
@@ -54,21 +54,21 @@ void mpeg_read_motion_vector(void *decoderPtr, int *PMV, int *dmvector, int h_r_
 
 /* rac1-decomp src/core/00125630.c: func_00128560 */
 /* Sends a command to the video decoder chip and remembers how many bits it will use. */
-void mpeg_send_ipu_command(char *decoderPtr, unsigned int command) {
+void mpeg_send_ipu_command(char *decoder_ptr, unsigned int command) {
     IPU_CMD = command;
-    *(int *)(decoderPtr + 0x818) = r1_D_00132F70[command >> 28];
+    *(int *)(decoder_ptr + 0x818) = r1_D_00132F70[command >> 28];
 }
 
 /* rac1-decomp src/core/00125630.c: func_00128590 */
 /* Spins until the VIF1 DMA channel (D_CHCR 0x10002010) reports idle,
    nudging the IOP via r1_func_0012BCC8 every 5001 spins so a stalled
    stream cannot deadlock. Same wait loop documented on func_0012C680. */
-void mpeg_wait_ipu_idle(void *decoderPtr) {
+void mpeg_wait_ipu_idle(void *decoder_ptr) {
     int counter = 0;
 
     while ((((int)IPU_CTRL) & 0x80004000) == 0x80000000) {
         if (counter++ >= 0x1389) {
-            r1_func_0012BCC8(*(int *)((char *)decoderPtr + 0x858));
+            r1_func_0012BCC8(*(int *)((char *)decoder_ptr + 0x858));
             counter = 0;
         }
     }
@@ -88,12 +88,12 @@ void mpeg_wait_ipu_idle(void *decoderPtr) {
  * `volatile long *chcr` local made the compiler use the constant as an
  * absolute `ld` address instead (160 against 176 bytes).
  */
-long mpeg_wait_ipu_command_done(void *decoderPtr) {
+long mpeg_wait_ipu_command_done(void *decoder_ptr) {
     long v;
     int counter = 0;
     while ((v = ((long)IPU_CMD64)) < 0 && (((int)IPU_CTRL) & 0x4000) == 0) {
         if (counter++ >= 0x1389) {
-            r1_func_0012BCC8(*(int *)((char *)decoderPtr + 0x858));
+            r1_func_0012BCC8(*(int *)((char *)decoder_ptr + 0x858));
             counter = 0;
         }
     }

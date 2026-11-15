@@ -18,15 +18,15 @@ void yeedil_wake_group_troopers(unsigned char *moby) {
     q = D_L20_001FBB20[moby[0x21]];
     while (moby[0x21] != 0xFF && moby[0x21] <= D_L20_001B2FB8 && q != 0 &&
            ((q != 0 && (short)q[-1] >= 0) || q == D_L20_001FBB20[moby[0x21]])) {
-        char *trooperVars;
+        char *trooper_vars;
 
         member = D_L20_001B2F9C + ((*q & 0x7FFF) << 8);
         if (member == 0)
             break;
-        if (*(short *)(member + 0xAA) == 0xD0F /* Megacorp Trooper Legs */) {
-            trooperVars = *(char **)(member + 0x68);
-            if (trooperVars != 0 && (trooperVars[0x302] & 1) && *(int *)(trooperVars + 0x420) == 1) {
-                trooperVars[0x302] = 2;
+        if (*(short *)(member + 0xAA) == MOBY_CLASS_MEGACORP_TROOPER_LEGS) {
+            trooper_vars = *(char **)(member + 0x68);
+            if (trooper_vars != 0 && (trooper_vars[0x302] & 1) && *(int *)(trooper_vars + 0x420) == 1) {
+                trooper_vars[0x302] = 2;
                 *(unsigned short *)(member + 0x34) &= 0xFFFD;
             }
         }

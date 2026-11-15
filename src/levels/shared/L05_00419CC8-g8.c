@@ -25,12 +25,12 @@ char *moby_spawn_shot_effect(char *owner, void *pos, void *dir, int color1, int 
     *(EffectVector *)up = 0;
     up[2] = 1.0f;
     if (effect) {
-        float baseSpeed = D_L05_001B1030;
+        float base_speed = D_L05_001B1030;
         int life;
         float start, end;
         vars = *(char **)(effect + 0x68);
         *(int *)(vars+0x30) = kind;
-        speed = baseSpeed * (1.0f / 60.0f);
+        speed = base_speed * (1.0f / 60.0f);
         if (kind) speed = D_L05_001B1034 * (1.0f / 60.0f);
         effect[0x20] = 0;
         *(unsigned char *)(effect+0x30) = 0xFF;

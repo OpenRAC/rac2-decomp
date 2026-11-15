@@ -44,14 +44,14 @@ extern void math_trap_always(void);
  * around the camera. RAC1's draw_pokitaru_ocean is its counterpart. */
 void DrawOceanWaterSheet(unsigned char *owner)
 {
-    float edgeStart[4], edgeOffset[4], axisX[4], axisY[4], corner[4][4], topEdge[4], bottomEdge[4];
+    float edge_start[4], edge_offset[4], axis_x[4], axis_y[4], corner[4][4], top_edge[4], bottom_edge[4];
     WaterState *state;
     int layer;
     float saved22C;
     float saved228;
     int i, count, color;
-    int nearColor, farColor;
-    float range, heightAboveWater, waveLift, cellX, cellY, blend;
+    int near_color, far_color;
+    float range, height_above_water, wave_lift, cell_x, cell_y, blend;
 
     saved228 = D_L06_001BDD40.f228;
     state = *(WaterState **)(owner + 0x68);
@@ -76,101 +76,101 @@ void DrawOceanWaterSheet(unsigned char *owner)
         D_L06_001B3290[2][2] = 1;
         D_L06_001B3290[2][3] = 0;
         FastVecCross(D_L06_001B3290[0], D_L06_001B3290[2], D_L06_001B3290[1]);
-        axisX[0] = 1;
-        axisX[1] = 0;
-        axisX[2] = 0;
-        axisX[3] = 1;
-        matrix_mul_vec3(axisX, axisX, D_L06_001B3290);
-        axisY[0] = 0;
-        axisY[1] = 1;
-        axisY[2] = 0;
-        axisY[3] = 1;
-        matrix_mul_vec3(axisY, axisY, D_L06_001B3290);
+        axis_x[0] = 1;
+        axis_x[1] = 0;
+        axis_x[2] = 0;
+        axis_x[3] = 1;
+        matrix_mul_vec3(axis_x, axis_x, D_L06_001B3290);
+        axis_y[0] = 0;
+        axis_y[1] = 1;
+        axis_y[2] = 0;
+        axis_y[3] = 1;
+        matrix_mul_vec3(axis_y, axis_y, D_L06_001B3290);
     } else {
-        axisX[0] = 1;
-        axisX[1] = 0;
-        axisX[2] = 0;
-        axisX[3] = 1;
-        matrix_mul_vec3(axisX, axisX, D_L06_001B9A70);
-        axisY[0] = 0;
-        axisY[1] = 1;
-        axisY[2] = 0;
-        axisY[3] = 1;
-        matrix_mul_vec3(axisY, axisY, D_L06_001B9A70);
+        axis_x[0] = 1;
+        axis_x[1] = 0;
+        axis_x[2] = 0;
+        axis_x[3] = 1;
+        matrix_mul_vec3(axis_x, axis_x, D_L06_001B9A70);
+        axis_y[0] = 0;
+        axis_y[1] = 1;
+        axis_y[2] = 0;
+        axis_y[3] = 1;
+        matrix_mul_vec3(axis_y, axis_y, D_L06_001B9A70);
     }
     if (g_current_map_index != 16) {
-        axisX[2] = 0;
-        vec_scale_to_length(axisX, axisX, 1);
-        axisY[2] = 0;
-        vec_scale_to_length(axisY, axisY, 1);
+        axis_x[2] = 0;
+        vec_scale_to_length(axis_x, axis_x, 1);
+        axis_y[2] = 0;
+        vec_scale_to_length(axis_y, axis_y, 1);
     } else if (g_hero_state.f348 == 1) {
-        axisX[0] = 0;
-        axisX[1] = 1;
-        axisX[2] = 0;
-        axisX[3] = 1;
-        axisY[0] = -0.79706f;
-        axisY[1] = 0;
-        axisY[2] = -0.60389f;
-        axisY[3] = 1.00405f;
+        axis_x[0] = 0;
+        axis_x[1] = 1;
+        axis_x[2] = 0;
+        axis_x[3] = 1;
+        axis_y[0] = -0.79706f;
+        axis_y[1] = 0;
+        axis_y[2] = -0.60389f;
+        axis_y[3] = 1.00405f;
     }
     if (g_current_map_index != 16) {
-        vec_scale_to_length(edgeStart, axisX, -75);
-        vec_scale_to_length(edgeOffset, axisY, -87);
-        FastVecAdd(corner[0], edgeStart, edgeOffset);
-        vec_scale_to_length(edgeOffset, axisY, 87);
-        FastVecAdd(corner[2], edgeStart, edgeOffset);
-        vec_scale_to_length(edgeStart, axisX, state->reach);
-        vec_scale_to_length(edgeOffset, axisY, -750);
-        FastVecAdd(corner[1], edgeStart, edgeOffset);
-        vec_scale_to_length(edgeOffset, axisY, 750);
-        FastVecAdd(corner[3], edgeStart, edgeOffset);
+        vec_scale_to_length(edge_start, axis_x, -75);
+        vec_scale_to_length(edge_offset, axis_y, -87);
+        FastVecAdd(corner[0], edge_start, edge_offset);
+        vec_scale_to_length(edge_offset, axis_y, 87);
+        FastVecAdd(corner[2], edge_start, edge_offset);
+        vec_scale_to_length(edge_start, axis_x, state->reach);
+        vec_scale_to_length(edge_offset, axis_y, -750);
+        FastVecAdd(corner[1], edge_start, edge_offset);
+        vec_scale_to_length(edge_offset, axis_y, 750);
+        FastVecAdd(corner[3], edge_start, edge_offset);
     } else {
-        vec_scale_to_length(edgeStart, axisX, -150);
-        vec_scale_to_length(edgeOffset, axisY, -175);
-        FastVecAdd(corner[0], edgeStart, edgeOffset);
-        vec_scale_to_length(edgeOffset, axisY, 175);
-        FastVecAdd(corner[2], edgeStart, edgeOffset);
-        vec_scale_to_length(edgeStart, axisX, state->reach);
-        vec_scale_to_length(edgeOffset, axisY, -1500);
-        FastVecAdd(corner[1], edgeStart, edgeOffset);
-        vec_scale_to_length(edgeOffset, axisY, 1500);
-        FastVecAdd(corner[3], edgeStart, edgeOffset);
+        vec_scale_to_length(edge_start, axis_x, -150);
+        vec_scale_to_length(edge_offset, axis_y, -175);
+        FastVecAdd(corner[0], edge_start, edge_offset);
+        vec_scale_to_length(edge_offset, axis_y, 175);
+        FastVecAdd(corner[2], edge_start, edge_offset);
+        vec_scale_to_length(edge_start, axis_x, state->reach);
+        vec_scale_to_length(edge_offset, axis_y, -1500);
+        FastVecAdd(corner[1], edge_start, edge_offset);
+        vec_scale_to_length(edge_offset, axis_y, 1500);
+        FastVecAdd(corner[3], edge_start, edge_offset);
     }
     for (i = 0; i < 4; i++) {
-        float *cornerPoint = corner[i];
-        FastVecAdd(cornerPoint, cornerPoint, &g_camera_state.x);
-        cornerPoint[2] = g_water_surface_height;
+        float *corner_point = corner[i];
+        FastVecAdd(corner_point, corner_point, &g_camera_state.x);
+        corner_point[2] = g_water_surface_height;
     }
-    FastVecSub(topEdge, corner[1], corner[0]);
-    FastVecSub(bottomEdge, corner[3], corner[2]);
+    FastVecSub(top_edge, corner[1], corner[0]);
+    FastVecSub(bottom_edge, corner[3], corner[2]);
     blend = 10;
     for (i = 0; i < 12; i += 2) {
         float fraction = IntToFloat(i) * 0.1f;
         color = FastTweenColor(state->color0, state->color1, IntToFloat(i) / blend);
-        FastVecScale(edgeStart, topEdge, fraction);
+        FastVecScale(edge_start, top_edge, fraction);
         D_L06_0023E8A0[i] = color;
         D_L06_0023EDA0[i][0] = 0;
         D_L06_0023EDA0[i][1] = 0;
-        FastVecAdd(edgeStart, edgeStart, corner[0]);
-        D_L06_0023E5A0[i][0] = edgeStart[0];
-        D_L06_0023E5A0[i][1] = edgeStart[1];
-        D_L06_0023E5A0[i][2] = edgeStart[2];
-        FastVecScale(edgeStart, bottomEdge, fraction);
+        FastVecAdd(edge_start, edge_start, corner[0]);
+        D_L06_0023E5A0[i][0] = edge_start[0];
+        D_L06_0023E5A0[i][1] = edge_start[1];
+        D_L06_0023E5A0[i][2] = edge_start[2];
+        FastVecScale(edge_start, bottom_edge, fraction);
         D_L06_0023E8A0[i + 1] = color;
         D_L06_0023EDA0[i + 1][0] = 0;
         D_L06_0023EDA0[i + 1][1] = 0;
-        FastVecAdd(edgeStart, edgeStart, corner[2]);
-        D_L06_0023E5A0[i + 1][0] = edgeStart[0];
-        D_L06_0023E5A0[i + 1][1] = edgeStart[1];
-        D_L06_0023E5A0[i + 1][2] = edgeStart[2];
+        FastVecAdd(edge_start, edge_start, corner[2]);
+        D_L06_0023E5A0[i + 1][0] = edge_start[0];
+        D_L06_0023E5A0[i + 1][1] = edge_start[1];
+        D_L06_0023E5A0[i + 1][2] = edge_start[2];
     }
     part_draw_glint_effect(12, D_L06_0023E5A0, D_L06_0023E8A0, D_L06_0023EDA0, 1);
     VU1_addGSregister(0x42, 0x8000000048UL);
     VU1_addGSregister(8, 0);
     VU1_addGSregister(0x14, 0xFF9000000260UL);
     VU1_addGSregister(0x47, 0x513F1);
-    nearColor = state->color3;
-    farColor = state->color4;
+    near_color = state->color3;
+    far_color = state->color4;
     range = state->range;
     if (g_hero_state.currentState == 28 || D_L06_001A8A48) {
         if (range > 32)
@@ -178,49 +178,49 @@ void DrawOceanWaterSheet(unsigned char *owner)
     }
 
     for (layer = 0; layer < 2; layer++) {
-        int textureOffset = layer + 63;
-        VU1_addGSregister(6, GetEffectTextureDescriptor(state->texture + textureOffset));
-        for (cellY = range * -2; cellY < range * 2; cellY += range) {
+        int texture_offset = layer + 63;
+        VU1_addGSregister(6, GetEffectTextureDescriptor(state->texture + texture_offset));
+        for (cell_y = range * -2; cell_y < range * 2; cell_y += range) {
             count = 0;
-            heightAboveWater = g_camera_state.z - g_water_surface_height;
-            if (heightAboveWater < 10)
-                heightAboveWater = 10;
-            waveLift = heightAboveWater * range * 0.00002f;
-            if (waveLift < 0.125f)
-                waveLift = 0.125f;
-            for (cellX = range * -2; cellX < range * 2; cellX += range) {
-                D_L06_0023EFA0[count][0] = cellX / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
-                D_L06_0023EFA0[count][1] = cellY / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
-                D_L06_0023E9A0[count][0] = cellX + g_camera_state.x + 1;
-                D_L06_0023E9A0[count][1] = cellY + g_camera_state.y + 1;
-                D_L06_0023E9A0[count][2] = g_water_surface_height + waveLift;
+            height_above_water = g_camera_state.z - g_water_surface_height;
+            if (height_above_water < 10)
+                height_above_water = 10;
+            wave_lift = height_above_water * range * 0.00002f;
+            if (wave_lift < 0.125f)
+                wave_lift = 0.125f;
+            for (cell_x = range * -2; cell_x < range * 2; cell_x += range) {
+                D_L06_0023EFA0[count][0] = cell_x / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
+                D_L06_0023EFA0[count][1] = cell_y / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
+                D_L06_0023E9A0[count][0] = cell_x + g_camera_state.x + 1;
+                D_L06_0023E9A0[count][1] = cell_y + g_camera_state.y + 1;
+                D_L06_0023E9A0[count][2] = g_water_surface_height + wave_lift;
                 i = count + 1;
-                D_L06_0023EFA0[i][0] = cellX / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
-                D_L06_0023EFA0[i][1] = (cellY + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
-                D_L06_0023E9A0[i][0] = cellX + g_camera_state.x + 1;
-                D_L06_0023E9A0[i][1] = (cellY + range) + g_camera_state.y + 1;
-                D_L06_0023E9A0[i][2] = g_water_surface_height + waveLift;
+                D_L06_0023EFA0[i][0] = cell_x / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
+                D_L06_0023EFA0[i][1] = (cell_y + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
+                D_L06_0023E9A0[i][0] = cell_x + g_camera_state.x + 1;
+                D_L06_0023E9A0[i][1] = (cell_y + range) + g_camera_state.y + 1;
+                D_L06_0023E9A0[i][2] = g_water_surface_height + wave_lift;
                 i = count + 2;
-                D_L06_0023EFA0[i][0] = (cellX + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
-                D_L06_0023EFA0[i][1] = cellY / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
-                D_L06_0023E9A0[i][0] = (cellX + range) + g_camera_state.x + 1;
-                D_L06_0023E9A0[i][1] = cellY + g_camera_state.y + 1;
-                D_L06_0023E9A0[i][2] = g_water_surface_height + waveLift;
+                D_L06_0023EFA0[i][0] = (cell_x + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
+                D_L06_0023EFA0[i][1] = cell_y / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
+                D_L06_0023E9A0[i][0] = (cell_x + range) + g_camera_state.x + 1;
+                D_L06_0023E9A0[i][1] = cell_y + g_camera_state.y + 1;
+                D_L06_0023E9A0[i][2] = g_water_surface_height + wave_lift;
                 i = count + 3;
-                D_L06_0023EFA0[i][0] = (cellX + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
-                D_L06_0023EFA0[i][1] = (cellY + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
-                D_L06_0023E9A0[i][0] = (cellX + range) + g_camera_state.x + 1;
-                D_L06_0023E9A0[i][1] = (cellY + range) + g_camera_state.y + 1;
-                D_L06_0023E9A0[i][2] = g_water_surface_height + waveLift;
+                D_L06_0023EFA0[i][0] = (cell_x + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][0];
+                D_L06_0023EFA0[i][1] = (cell_y + range) / (range * 2) * D_L06_001B0060[layer] + D_L06_001B3270[layer][1];
+                D_L06_0023E9A0[i][0] = (cell_x + range) + g_camera_state.x + 1;
+                D_L06_0023E9A0[i][1] = (cell_y + range) + g_camera_state.y + 1;
+                D_L06_0023E9A0[i][2] = g_water_surface_height + wave_lift;
                 for (i = count; i < count + 4; i++) {
-                    edgeStart[0] = D_L06_0023E9A0[i][0] - g_camera_state.x;
-                    edgeStart[1] = D_L06_0023E9A0[i][1] - g_camera_state.y;
-                    edgeStart[2] = D_L06_0023E9A0[i][2] - g_camera_state.z;
-                    edgeStart[3] = 1;
-                    blend = vec_length_xy(edgeStart) / (range * 2);
+                    edge_start[0] = D_L06_0023E9A0[i][0] - g_camera_state.x;
+                    edge_start[1] = D_L06_0023E9A0[i][1] - g_camera_state.y;
+                    edge_start[2] = D_L06_0023E9A0[i][2] - g_camera_state.z;
+                    edge_start[3] = 1;
+                    blend = vec_length_xy(edge_start) / (range * 2);
                     if (blend > 1)
                         blend = 1;
-                    D_L06_0023ECA0[i] = FastTweenColor(nearColor, farColor, blend);
+                    D_L06_0023ECA0[i] = FastTweenColor(near_color, far_color, blend);
                 }
                 count += 4;
                 if (count >= 64)

@@ -18,15 +18,15 @@ extern s32 D_L11_001B0808 __attribute__((sda));
    its own state to 4.
    The two sound lookups are separate values, and the early exits return without stepping the
    shared counter, as retail does. */
-void pulsing_platform_trigger_update(u8 *mobyArg) {
+void pulsing_platform_trigger_update(u8 *moby_arg) {
     f32 offset[4];
-    u8 *mobyTable = g_moby_l11_table;
-    u8 *self = mobyArg;
+    u8 *moby_table = g_moby_l11_table;
+    u8 *self = moby_arg;
     u8 *vars = *(u8 **)(self+0x68);
-    u8 *target = mobyTable + *(s32 *)(vars+8)*256;
-    u8 *soundSlot;
+    u8 *target = moby_table + *(s32 *)(vars+8)*256;
+    u8 *sound_slot;
     s16 *victims;
-    s16 *groupList;
+    s16 *group_list;
     u8 *victim;
     switch (*(u8 *)(self+0x20)) {
     case 0:
@@ -50,8 +50,8 @@ void pulsing_platform_trigger_update(u8 *mobyArg) {
         *(f32 *)(vars+0x10) += 0.05235988646745682f;
         *(f32 *)(vars+0xC) = FastAddRotations(*(f32 *)(vars+0xC),0.05235988646745682f);
         handle = *(s32 *)(vars+0x30);
-        soundSlot = D_L11_00188660 + handle * 0x70;
-        if (*(u8 **)(soundSlot+0x88) != self || !*(u8 *)(soundSlot+0x74))
+        sound_slot = D_L11_00188660 + handle * 0x70;
+        if (*(u8 **)(sound_slot+0x88) != self || !*(u8 *)(sound_slot+0x74))
             *(s32 *)(vars+0x30) = PlayMobySound(0,4,self);
         if (*(f32 *)(vars+0x10) >= 6.2831854820251465f) {
             if (*(u8 *)(target+0x20) != 2) {
@@ -77,32 +77,32 @@ void pulsing_platform_trigger_update(u8 *mobyArg) {
         if (*(u8 *)(target+0x20) == 2) {
             if (*(s32 *)(vars+0x1C) == 0) {
                 *(s32 *)(vars+0x1C) = 1;
-                if (*(s32 *)(vars+0x14) == 255 || (groupList = g_group_id_lists[*(s32 *)(vars+0x14)]) == 0) {
+                if (*(s32 *)(vars+0x14) == 255 || (group_list = g_group_id_lists[*(s32 *)(vars+0x14)]) == 0) {
                     *(u8 *)(self+0x20) = 4;
                     return;
                 }
-                victims = groupList;
+                victims = group_list;
                 do {
                     victim = g_moby_l11_table + ((*victims & 0x7FFF) << 8);
                     if (*(s8 *)(victim+0x20) >= 0) {
                         s32 kind = *(s16 *)(victim+0xAA);
-                        if (kind == 0xCF5 /* Joba Tribesman */) *(u8 *)(victim+0x95) = 1;
+                        if (kind == MOBY_CLASS_JOBA_TRIBESMAN) *(u8 *)(victim+0x95) = 1;
                         else if (kind == 0xCF6 /* moby class 3318 */) *(u8 *)(victim+0x95) = 1;
-                        else if (kind == 0xD07 /* Jobian Saur-Beast */) *(u8 *)(victim+0x95) = 1;
+                        else if (kind == MOBY_CLASS_JOBIAN_SAUR_BEAST) *(u8 *)(victim+0x95) = 1;
                     }
                 } while (*victims++ >= 0);
-                if (*(s32 *)(vars+0x18) == 255 || (groupList = g_group_id_lists[*(s32 *)(vars+0x18)]) == 0) {
+                if (*(s32 *)(vars+0x18) == 255 || (group_list = g_group_id_lists[*(s32 *)(vars+0x18)]) == 0) {
                     *(u8 *)(self+0x20) = 4;
                     return;
                 }
-                victims = groupList;
+                victims = group_list;
                 do {
                     victim = g_moby_l11_table + ((*victims & 0x7FFF) << 8);
                     if (*(s8 *)(victim+0x20) >= 0) {
                         s32 kind = *(s16 *)(victim+0xAA);
-                        if (kind == 0xD07 /* Jobian Saur-Beast */) *(u8 *)(victim+0x95) = 1;
+                        if (kind == MOBY_CLASS_JOBIAN_SAUR_BEAST) *(u8 *)(victim+0x95) = 1;
                         else if (kind == 0xCF6 /* moby class 3318 */) *(u8 *)(victim+0x95) = 1;
-                        else if (kind == 0xCF5 /* Joba Tribesman */) *(u8 *)(victim+0x95) = 1;
+                        else if (kind == MOBY_CLASS_JOBA_TRIBESMAN) *(u8 *)(victim+0x95) = 1;
                     }
                 } while (*victims++ >= 0);
                 *(u8 *)(self+0x20) = 4;

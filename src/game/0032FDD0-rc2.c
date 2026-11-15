@@ -31,14 +31,14 @@ extern f32 g_stick_length;
 
 /* Reads the stick input stored in the hero data, limits each axis to the range -1 to 1, saves it in the object and stores the stick length. */
 void pad_read_clamped_stick(s8 *moby) {
-    s8 *heroData;
+    s8 *hero_data;
     s8 *vars;
-    f32 stickVec[2];
+    f32 stick_vec[2];
 
     vars = *(s8 **)(moby + 0x68);
-    heroData = g_hero_state;
-    (*(f32 *)((s8 *)(vars) + (0x54))) = -(*(f32 *)((s8 *)(heroData) + (0x1FB0)));
-    (*(f32 *)((s8 *)(vars) + (0x50))) = -(*(f32 *)((s8 *)(heroData) + (0x1FB4)));
+    hero_data = g_hero_state;
+    (*(f32 *)((s8 *)(vars) + (0x54))) = -(*(f32 *)((s8 *)(hero_data) + (0x1FB0)));
+    (*(f32 *)((s8 *)(vars) + (0x50))) = -(*(f32 *)((s8 *)(hero_data) + (0x1FB4)));
     if ((*(f32 *)((s8 *)(vars) + (0x54))) > 1.0f) {
         (*(f32 *)((s8 *)(vars) + (0x54))) = 1.0f;
     } else if ((*(f32 *)((s8 *)(vars) + (0x54))) < -1.0f) {
@@ -49,8 +49,8 @@ void pad_read_clamped_stick(s8 *moby) {
     } else if ((*(f32 *)((s8 *)(vars) + (0x50))) < -1.0f) {
         (*(f32 *)((s8 *)(vars) + (0x50))) = -1.0f;
     }
-    vec_clear_128(stickVec);
-    stickVec[0] = (*(f32 *)((s8 *)(vars) + (0x50)));
-    stickVec[1] = (*(f32 *)((s8 *)(vars) + (0x54)));
-    g_stick_length = FastVecLength(stickVec);
+    vec_clear_128(stick_vec);
+    stick_vec[0] = (*(f32 *)((s8 *)(vars) + (0x50)));
+    stick_vec[1] = (*(f32 *)((s8 *)(vars) + (0x54)));
+    g_stick_length = FastVecLength(stick_vec);
 }

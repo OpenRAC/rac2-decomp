@@ -157,17 +157,17 @@ void object_start_tumble(char *a0)
 void actor_aim_head_at_hero(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    float toHero[3];
+    float to_hero[3];
 
-    func_32D5F8((char *)toHero, D_L06_00189EA0, moby + 0x10);
-    func_365030(moby, (char *)toHero, (char *)toHero, 0);
-    *(float *)(vars + 0x2C0) = func_32DC80(toHero[0], toHero[1]);
+    func_32D5F8((char *)to_hero, D_L06_00189EA0, moby + 0x10);
+    func_365030(moby, (char *)to_hero, (char *)to_hero, 0);
+    *(float *)(vars + 0x2C0) = func_32DC80(to_hero[0], to_hero[1]);
     if (*(float *)(vars + 0x2C0) > 0.78539825f) {
         *(float *)(vars + 0x2C0) = 0.78539825f;
     } else if (*(float *)(vars + 0x2C0) < -0.78539825f) {
         *(float *)(vars + 0x2C0) = -0.78539825f;
     }
-    *(float *)(vars + 0x2C8) = -func_32DC80(func_32D740((char *)toHero), toHero[2]);
+    *(float *)(vars + 0x2C8) = -func_32DC80(func_32D740((char *)to_hero), to_hero[2]);
     if (*(float *)(vars + 0x2C8) > 0.52359885f) {
         *(float *)(vars + 0x2C8) = 0.52359885f;
     } else if (*(float *)(vars + 0x2C8) < -0.52359885f) {
@@ -275,7 +275,7 @@ extern void moby_mark_spawned(void *);
 void actor_init_and_check_hits(u8 *moby)
 {
     u8 *v = *(u8 **)(moby + 0x68);
-    int hitResult;
+    int hit_result;
 
     if (moby[0x20] == 0) {
         I(0x480) = path_build_route_nodes(moby, I(0x230), v + 0x260, 16);
@@ -330,11 +330,11 @@ void actor_init_and_check_hits(u8 *moby)
         moby_update_ground_check(moby);
         moby[0x6F] = 0x16;
     }
-    hitResult = moby_apply_damage_to_object(moby, v + 0x60, 0);
-    if (hitResult != 0) {
+    hit_result = moby_apply_damage_to_object(moby, v + 0x60, 0);
+    if (hit_result != 0) {
         if (B(0x37) == 10)
             B(0xD7) = 1;
-        if (hitResult == 5) {
+        if (hit_result == 5) {
             I(0xF0) = 0;
             F(0xF4) = 0.837758183f;
         }
@@ -357,49 +357,49 @@ void actor_init_and_check_hits(u8 *moby)
 
 /* Turns the actor toward its target and keeps the two angles it stores at +0x470 and
    +0x474 of its state; returns 1 when the actor's state changed. */
-int actor_steer_toward_goal(char *moby, char *goal, float defaultYaw, float speedScale, float slowDistance, float turnRate)
+int actor_steer_toward_goal(char *moby, char *goal, float default_yaw, float speed_scale, float slow_distance, float turn_rate)
 {
     char *vars = *(char **)(moby + 0x68);
-    float toGoal[4];
+    float to_goal[4];
     float step[4];
-    float nextPos[4];
+    float next_pos[4];
     float d = 0.0f;
-    float desiredYaw;
+    float desired_yaw;
     float distance;
-    float accelStep;
+    float accel_step;
     int changed = 0;
 
-    FastVecSub(toGoal, (float *)goal, (float *)(moby + 0x10));
-    toGoal[2] = 0.0f;
-    distance = FastVecLength(toGoal);
-    accelStep = speedScale * 0.0008333333535119891f;
-    if (slowDistance < distance) {
-        int pathCount = *(int *)(vars + 0x480);
+    FastVecSub(to_goal, (float *)goal, (float *)(moby + 0x10));
+    to_goal[2] = 0.0f;
+    distance = FastVecLength(to_goal);
+    accel_step = speed_scale * 0.0008333333535119891f;
+    if (slow_distance < distance) {
+        int path_count = *(int *)(vars + 0x480);
 
-        desiredYaw = 0.0f;
-        ComputeRegionRouteHeading(moby + 0x10, (int)goal, &desiredYaw, vars + 0x260, pathCount, vars + 0x488,
-                          vars + 0x48C, turnRate, 0.5f);
-        math_approach_target_with_direction_mode(moby + 0xF8, desiredYaw, 0.0037815470714122057f,
+        desired_yaw = 0.0f;
+        ComputeRegionRouteHeading(moby + 0x10, (int)goal, &desired_yaw, vars + 0x260, path_count, vars + 0x488,
+                          vars + 0x48C, turn_rate, 0.5f);
+        math_approach_target_with_direction_mode(moby + 0xF8, desired_yaw, 0.0037815470714122057f,
                       0.0037815470714122057f, 0.29670602083206177f, vars + 0x474, 0);
-        if (FastDiffRots(*(float *)(moby + 0xF8), desiredYaw) < 1.3089970350265503f) {
-            math_step_value_toward_target(&d, vars + 0x470, distance, accelStep, accelStep, speedScale * 0.01666666753590107f);
+        if (FastDiffRots(*(float *)(moby + 0xF8), desired_yaw) < 1.3089970350265503f) {
+            math_step_value_toward_target(&d, vars + 0x470, distance, accel_step, accel_step, speed_scale * 0.01666666753590107f);
         } else {
             *(float *)(vars + 0x470) = 0.0f;
         }
     } else {
-        math_approach_target_with_direction_mode(moby + 0xF8, defaultYaw, 0.0037815470714122057f,
+        math_approach_target_with_direction_mode(moby + 0xF8, default_yaw, 0.0037815470714122057f,
                       0.0037815470714122057f, 0.29670602083206177f, vars + 0x474, 0);
-        ApproachValue((float *)(vars + 0x470), 0.0f, accelStep);
+        ApproachValue((float *)(vars + 0x470), 0.0f, accel_step);
         if (*(float *)(vars + 0x470) == 0.0f) {
-            if (FastDiffRots(*(float *)(moby + 0xF8), defaultYaw) < 0.0872664749622345f) {
+            if (FastDiffRots(*(float *)(moby + 0xF8), default_yaw) < 0.0872664749622345f) {
                 *(float *)(vars + 0x474) = 0.0f;
                 changed = 1;
             }
         }
     }
     vec_scale_to_length(step, (float *)(moby + 0xC0), *(float *)(vars + 0x470));
-    FastVecAdd(nextPos, step, (float *)(moby + 0x10));
-    if (moby_move_over_ground(moby, moby + 0x10, (char *)nextPos, 0, 0.8999999761581421f, 1.0f, 0.5f,
+    FastVecAdd(next_pos, step, (float *)(moby + 0x10));
+    if (moby_move_over_ground(moby, moby + 0x10, (char *)next_pos, 0, 0.8999999761581421f, 1.0f, 0.5f,
                      0.7853982448577881f) == 0) {
         *(int *)(vars + 0x5A8) = *(int *)(vars + 0x5A8) + 1;
     }
@@ -765,63 +765,63 @@ void part_spawn_debris_mask(char *object, int mask, void *offset, int color,
 void wake_actors_trigger_update(unsigned char *moby)
 {
     char *vars;
-    char *hitMoby;
-    short *idList, *idCursor;
+    char *hit_moby;
+    short *id_list, *id_cursor;
     char *actor;
-    char *actorVars;
+    char *actor_vars;
     if (moby[0x20] == 0) {
         *(unsigned short *)(moby + 0x34) |= 0x800;
         moby[0x20] = 1;
     }
     vars = *(char **)(moby + 0x68);
-    hitMoby = (char *)func_35CBA0((char *)moby, 0x10000, 0);
-    if (hitMoby && *(short *)(*(char **)(hitMoby + 0x20) + 0xAA) != 0xFE5 /* moby class 4069 */) {
+    hit_moby = (char *)func_35CBA0((char *)moby, 0x10000, 0);
+    if (hit_moby && *(short *)(*(char **)(hit_moby + 0x20) + 0xAA) != 0xFE5 /* moby class 4069 */) {
         if (*(int *)vars == 255) { func_458138((char *)moby); return; }
         {
-            idList = D_L06_001FB3A0[*(int *)vars];
-            if (idList == 0) { func_458138((char *)moby); return; }
+            id_list = D_L06_001FB3A0[*(int *)vars];
+            if (id_list == 0) { func_458138((char *)moby); return; }
             {
-                idCursor = idList;
+                id_cursor = id_list;
                 do {
-                    actor = D_L06_001B281C[0] + ((*idCursor & 0x7FFF) << 8);
+                    actor = D_L06_001B281C[0] + ((*id_cursor & 0x7FFF) << 8);
                     if (*(signed char *)(actor + 0x20) >= 0 && *(short *)(actor + 0xAA) == 0xBBA /* moby class 3002 */) {
-                        actorVars = *(char **)(actor + 0x68);
-                        if (*(float *)(actorVars + 0x20) > 0.0f) {
-                            *(float *)(actorVars + 0x5A4) = func_35A780();
-                            qcopy(actorVars + 0x5B0, actorVars + 0x460);
-                            *(short *)(actorVars + 0x24C) = 0x10E;
+                        actor_vars = *(char **)(actor + 0x68);
+                        if (*(float *)(actor_vars + 0x20) > 0.0f) {
+                            *(float *)(actor_vars + 0x5A4) = func_35A780();
+                            qcopy(actor_vars + 0x5B0, actor_vars + 0x460);
+                            *(short *)(actor_vars + 0x24C) = 0x10E;
                             actor[0x20] = 4;
                             func_35A270(actor, 6, 0, 10);
-                            *(int *)(actorVars + 0x5A0) = 0;
-                            *(short *)(actorVars + 0x492) = 0;
+                            *(int *)(actor_vars + 0x5A0) = 0;
+                            *(short *)(actor_vars + 0x492) = 0;
                             actor[0x20] = 5;
                             actor[0x95] = 1;
                         }
                     }
-                } while (*idCursor++ >= 0);
+                } while (*id_cursor++ >= 0);
             }
         }
         if (*(int *)(vars + 4) == 255) goto destroy;
-        idList = D_L06_001FB3A0[*(int *)(vars + 4)];
-        if (idList == 0) {
+        id_list = D_L06_001FB3A0[*(int *)(vars + 4)];
+        if (id_list == 0) {
  destroy:
             func_458138((char *)moby); return;
         }
         {
-            idCursor = idList;
+            id_cursor = id_list;
             do {
-                actor = D_L06_001B281C[0] + ((*idCursor & 0x7FFF) << 8);
+                actor = D_L06_001B281C[0] + ((*id_cursor & 0x7FFF) << 8);
                 if (*(signed char *)(actor + 0x20) >= 0 && *(short *)(actor + 0xAA) == 0xBBA /* moby class 3002 */) {
-                    actorVars = *(char **)(actor + 0x68);
-                    *(float *)(actorVars + 0x5A4) = func_35A780();
-                    qcopy(actorVars + 0x5B0, actorVars + 0x460);
-                    *(short *)(actorVars + 0x24C) = 0x10E;
+                    actor_vars = *(char **)(actor + 0x68);
+                    *(float *)(actor_vars + 0x5A4) = func_35A780();
+                    qcopy(actor_vars + 0x5B0, actor_vars + 0x460);
+                    *(short *)(actor_vars + 0x24C) = 0x10E;
                     actor[0x20] = 4;
                     func_35A270(actor, 6, 0, 10);
                     actor[0x20] = 5;
                     actor[0x95] = 1;
                 }
-            } while (*idCursor++ >= 0);
+            } while (*id_cursor++ >= 0);
         }
         func_458138((char *)moby);
     }

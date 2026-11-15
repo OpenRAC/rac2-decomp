@@ -29,16 +29,16 @@ extern void helper_set_active_flag(void);
 
 /* Writes the object's state byte (7 when arg0 is zero, 5 otherwise), lets the shared
  * updater run, then writes the caller's value in the object's slot - 10 when it is -1. */
-void tracked_moby_set_state(int useFirstState, int slotValue)
+void tracked_moby_set_state(int use_first_state, int slot_value)
 {
     char *tracked = (char *)g_spider_bot_moby;
-    int value = slotValue;
+    int value = slot_value;
     char *vars;
 
     if (tracked == 0)
         return;
     vars = *(char **)(tracked + 0x68);
-    if (useFirstState != 0)
+    if (use_first_state != 0)
         tracked[0x20] = 5;
     else
         tracked[0x20] = 7;

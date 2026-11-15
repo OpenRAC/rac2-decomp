@@ -39,7 +39,7 @@ extern void marker_update_pulse(char *);
 void wandering_l06_creature_update(char *obj)
 {
     char *vars = *(char **)(obj + 0x68);
-    char aimVec[16];
+    char aim_vec[16];
     float angle, speed;
     int flags, anim;
     notak_enemy_update(obj);
@@ -159,8 +159,8 @@ void wandering_l06_creature_update(char *obj)
             if (B(obj,0x43)!=10) anim_start_blended(obj,10,0,5);
             I(vars,0x1BC) = D_L06_001B2348;
         }
-        vec_scale_to_length(aimVec,vars+0x1A0,1.0f);
-        actor_set_glow_effect(obj,aimVec,0);
+        vec_scale_to_length(aim_vec,vars+0x1A0,1.0f);
+        actor_set_glow_effect(obj,aim_vec,0);
         if (F(vars,0x190)>=F(obj,0x18)) {
             moby_set_state(obj,5,2);
             I(vars,0x138) &= ~0x11;

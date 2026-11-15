@@ -28,7 +28,7 @@ char *aim_find_target(char *moby,Vec *origin,float *yaw,float *pitch) {
     struct { Vec origin,offset,player; char *disabled[128]; Vec target,aim,ray,axis; } frame;
     Vec *start=&frame.origin;
     char *vars=*(char **)(moby+0x68),*selected,*candidate,*info,*hit;
-    Vec *pos; int disabledCount,index,accepted,visible,tries,i;
+    Vec *pos; int disabled_count,index,accepted,visible,tries,i;
     float best=D_L08_001B0584,heading,elevation,delta,distance,dot,length,angle,radius;
     start->q=origin->q;
     FastVecScale(&frame.offset,g_hero_state.object+0xE0,0.5f);
@@ -38,11 +38,11 @@ char *aim_find_target(char *moby,Vec *origin,float *yaw,float *pitch) {
         qcopy(start,&D_L08_001BFF60);
         return 0;
     }
-    disabledCount=0; index=0;
+    disabled_count=0; index=0;
     while((candidate=D_L08_001FBA20[index])!=0) {
         if(*(unsigned char *)(candidate+0x20)==0xFE) goto next;
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
-        if(*(short *)(candidate+0xAA)==0xE7D /* Sheep */ || *(short *)(candidate+0xAA)==0xEB0 /* Dark Sheep */) goto next;
+        if(*(short *)(candidate+0xAA)==MOBY_CLASS_SHEEP || *(short *)(candidate+0xAA)==MOBY_CLASS_DARK_SHEEP) goto next;
         { Vec *t=&frame.target; qcopy(t,candidate+0x10); }
         info=moby_get_private_value_0(candidate);
         if(!info || *(unsigned char *)(info+0xE)==3) goto next;
@@ -62,15 +62,15 @@ char *aim_find_target(char *moby,Vec *origin,float *yaw,float *pitch) {
                 FastVecScale(&frame.axis,g_hero_state.object+0xE0,dot);
                 FastVecSub(&frame.ray,&frame.ray,&frame.axis);
                 dot=FastVecDot(&frame.ray,g_hero_state.object+0xC0);
-                { float rayLength=FastVecLength(&frame.ray);
-                if(rayLength!=0.0f && 1.5707964f-math_fast_angle_helper(dot/rayLength)<1.0471977f) accepted=1; }
+                { float ray_length=FastVecLength(&frame.ray);
+                if(ray_length!=0.0f && 1.5707964f-math_fast_angle_helper(dot/ray_length)<1.0471977f) accepted=1; }
             }
             }
         } else {
             if(distance<2.5f) {
-                char *heroObject=g_hero_state.object;
+                char *hero_object=g_hero_state.object;
                 angle=mat_fast_helper_a(*(float *)(candidate+0x10)-g_hero_state.position.f[0],*(float *)(candidate+0x14)-g_hero_state.position.f[1]);
-                if(FastDiffRots(*(float *)(heroObject+0xF8),angle)<1.0471977f && math_fabs(start->f[2]-frame.target.f[2])<2.0f) accepted=1;
+                if(FastDiffRots(*(float *)(hero_object+0xF8),angle)<1.0471977f && math_fabs(start->f[2]-frame.target.f[2])<2.0f) accepted=1;
             }
         }
         if(accepted && !CollLine(start,&frame.target,6,g_hero_state.object,0)) { selected=candidate; *pitch=-elevation; *yaw=heading; break; }
@@ -93,9 +93,9 @@ char *aim_find_target(char *moby,Vec *origin,float *yaw,float *pitch) {
                 col=&D_L08_001BFF40;
                 hit=col->hit;
                 if(hit) {
-                    if(*(short *)(hit+0xAA)==0xE7D /* Sheep */ || *(short *)(hit+0xAA)==0xEB0 /* Dark Sheep */) {
-                        frame.disabled[disabledCount++]=hit; *(int *)(hit+0x98)=0;
-                        if(disabledCount>127) break;
+                    if(*(short *)(hit+0xAA)==MOBY_CLASS_SHEEP || *(short *)(hit+0xAA)==MOBY_CLASS_DARK_SHEEP) {
+                        frame.disabled[disabled_count++]=hit; *(int *)(hit+0x98)=0;
+                        if(disabled_count>127) break;
                         qcopy(&frame.ray,&col->point);
                         continue;
                     }
@@ -108,6 +108,6 @@ char *aim_find_target(char *moby,Vec *origin,float *yaw,float *pitch) {
 next:
         ++index;
     }
-    for(i=0;i<disabledCount;++i) { char *disabledObj=frame.disabled[i]; *(int *)(disabledObj+0x98)=*(int *)(*(char **)(disabledObj+0x24)+0x10); }
+    for(i=0;i<disabled_count;++i) { char *disabled_obj=frame.disabled[i]; *(int *)(disabled_obj+0x98)=*(int *)(*(char **)(disabled_obj+0x24)+0x10); }
     return selected;
 }

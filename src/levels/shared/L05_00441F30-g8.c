@@ -52,17 +52,17 @@ extern int math_fast_float_d(void *);
 /* Runs the player's ship each frame. It steers normally and handles the screen fades and resets between ship states. */
 void UpdateTimedTransformState(char *obj)
 {
-    int yawRate, pitchRate;
+    int yaw_rate, pitch_rate;
     char *input = P(obj, 0x70) + 0x50;
-    float yawParam0 = D_L05_001B1A4C, yawParam1 = D_L05_001B1A50, yawParam2 = D_L05_001B1A54;
-    float pitchParam0 = D_L05_001B1A58, pitchParam1 = D_L05_001B1A5C, pitchParam2 = D_L05_001B1A64;
+    float yaw_param0 = D_L05_001B1A4C, yaw_param1 = D_L05_001B1A50, yaw_param2 = D_L05_001B1A54;
+    float pitch_param0 = D_L05_001B1A58, pitch_param1 = D_L05_001B1A5C, pitch_param2 = D_L05_001B1A64;
 
-    F(input, 0) = yawParam0;
-    F(input, 4) = yawParam1;
-    F(input, 8) = yawParam2;
-    F(input, 12) = pitchParam0;
-    F(input, 16) = pitchParam1;
-    F(input, 20) = pitchParam2;
+    F(input, 0) = yaw_param0;
+    F(input, 4) = yaw_param1;
+    F(input, 8) = yaw_param2;
+    F(input, 12) = pitch_param0;
+    F(input, 16) = pitch_param1;
+    F(input, 20) = pitch_param2;
     D_L05_001B20CC = 2;
     if (!g_hero_state[0x22B5]) {
         I(P(g_hero_state, 0x2290), 0x98) = 0;
@@ -79,14 +79,14 @@ void UpdateTimedTransformState(char *obj)
 
     switch (g_ship_state) {
     case 0:
-        UpdateSteeringInput(obj, &yawRate, &pitchRate);
-        ship_apply_steering_rotation(obj, &yawRate, &pitchRate);
+        UpdateSteeringInput(obj, &yaw_rate, &pitch_rate);
+        ship_apply_steering_rotation(obj, &yaw_rate, &pitch_rate);
         cam_update_chase_position(obj);
         UpdateDrivenMobyTransform(obj);
         break;
     case 1:
-        UpdateSteeringInput(obj, &yawRate, &pitchRate);
-        ship_apply_steering_rotation(obj, &yawRate, &pitchRate);
+        UpdateSteeringInput(obj, &yaw_rate, &pitch_rate);
+        ship_apply_steering_rotation(obj, &yaw_rate, &pitch_rate);
         cam_update_chase_position(obj);
         UpdateDrivenMobyTransform(obj);
         D_L05_001B1F60_sda = D_L05_001B1F60 + 0.05f;
@@ -119,8 +119,8 @@ void UpdateTimedTransformState(char *obj)
         }
         break;
     case 2:
-        UpdateSteeringInput(obj, &yawRate, &pitchRate);
-        ship_apply_steering_rotation(obj, &yawRate, &pitchRate);
+        UpdateSteeringInput(obj, &yaw_rate, &pitch_rate);
+        ship_apply_steering_rotation(obj, &yaw_rate, &pitch_rate);
         cam_update_chase_position(obj);
         UpdateDrivenMobyTransform(obj);
         D_L05_001B1F60_sda = D_L05_001B1F60 - 0.05f;
@@ -135,9 +135,9 @@ void UpdateTimedTransformState(char *obj)
         if (math_fast_float_d(&g_ship_transition_timer)) {
             hero_record_play_counters();
         } else {
-            float resetSpeed = 0.13333334f;
-            if (g_current_map_index == 20) resetSpeed = 0.26666668f;
-            ship_update_record_transform(obj, resetSpeed);
+            float reset_speed = 0.13333334f;
+            if (g_current_map_index == 20) reset_speed = 0.26666668f;
+            ship_update_record_transform(obj, reset_speed);
             if (D_L05_001B1ADC - 20 < g_ship_transition_timer) {
                 slot_copy_records_to_free(D_L05_002B8770);
             }

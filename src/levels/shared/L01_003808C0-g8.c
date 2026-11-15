@@ -54,16 +54,16 @@ extern int request_begin_slot(int, int, void *, int, char *);
 void megacorp_vendor_update(unsigned char *moby) {
     unsigned char *vars=BP(moby,0x68);
     unsigned char *hero, *nearHero, *child;
-    int glowColor,logoColor;
+    int glow_color,logo_color;
     int i,canUse,show,accepted;
     float distance,height;
     float phase,amplitude;
     D_L01_001AEF30+=0.05f;
     if(D_L01_001AEF30>3.14f) D_L01_001AEF30=-3.14f;
-    glowColor=0x20100;logoColor=0x80F0F0B0;
-    if(BI(vars,0x94)==2) {glowColor=0x101;logoColor=0x8080;}
-    BI(moby,0x78)=glowColor*((int)(math_fast_sin_or_cos_b(D_L01_001AEF30)*24.0f)+96)|0x80000000;
-    if(BP(vars,0xC)) BI(BP(vars,0xC),0x78)=logoColor|0x80000000;
+    glow_color=0x20100;logo_color=0x80F0F0B0;
+    if(BI(vars,0x94)==2) {glow_color=0x101;logo_color=0x8080;}
+    BI(moby,0x78)=glow_color*((int)(math_fast_sin_or_cos_b(D_L01_001AEF30)*24.0f)+96)|0x80000000;
+    if(BP(vars,0xC)) BI(BP(vars,0xC),0x78)=logo_color|0x80000000;
     if(BI(vars,0x94)==3) {
         BU(moby,0x34)|=1;moby[0x31]=0;BI(moby,0x98)=0;
         if(BP(vars,0xC)) {BU(BP(vars,0xC),0x34)|=1;BP(vars,0xC)[0x31]=0;}
@@ -72,7 +72,7 @@ void megacorp_vendor_update(unsigned char *moby) {
 case 0:
         if(BI(vars,0x98) && !flag_is_byte_set()) {moby_mark_spawned(moby);return;}
         moby[0x20]=1;BI(vars,0)=0;BI(vars,4)=0;
-        BP(vars,0xC)=CreateMoby(0x477 /* Megacorp Vendor Logo */);
+        BP(vars,0xC)=CreateMoby(MOBY_CLASS_MEGACORP_VENDOR_LOGO);
         BU(BP(vars,0xC),0x34)|=2;
         BS(BP(vars,0xC),0x32)=0x40;
         BF(BP(vars,0xC),0x10)=BF(moby,0x10);

@@ -26,18 +26,18 @@ void hero_update_turn_from_anim(void)
         }
     }
     {
-        u8 *heroBlock=D_00189E20_1;
+        u8 *hero_block=D_00189E20_1;
         AnimBase *anim=&D_L00_001B8C80;
-        *(float *)(heroBlock+0x1a0)=anim->value;
-        *(float *)(heroBlock+0x1b4)*=factor;
-        qcopy_nc(heroBlock+0x190,&anim->vector);
-        *(float *)(heroBlock+0x1a4)=*(float *)(heroBlock+0x145c);
+        *(float *)(hero_block+0x1a0)=anim->value;
+        *(float *)(hero_block+0x1b4)*=factor;
+        qcopy_nc(hero_block+0x190,&anim->vector);
+        *(float *)(hero_block+0x1a4)=*(float *)(hero_block+0x145c);
         hero_steer_heading(0,0.037f,0.25f,0.2036217749118805f);
         {
-            float saved=*(float *)(heroBlock+0x1a4);
-            *(float *)(heroBlock+0x1a8)=0.0f;
-            *(float *)(heroBlock+0x145c)=saved;
+            float saved=*(float *)(hero_block+0x1a4);
+            *(float *)(hero_block+0x1a8)=0.0f;
+            *(float *)(hero_block+0x145c)=saved;
         }
-        *(float *)(heroBlock+0x1a4)=0.0f;
+        *(float *)(hero_block+0x1a4)=0.0f;
     }
 }

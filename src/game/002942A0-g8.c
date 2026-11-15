@@ -35,21 +35,21 @@ extern s32 load_start_disc_read_with_callback();
 extern void load_release_class_cache_slot();
 extern void load_continue_stream();
 
-s32 load_start_disc_entry(s32 entryIndex, s32 owner, s32 dest, s32 firstPartOnly) {
-    s32 oldSlot;
-    if (g_copy_setup_data.el[entryIndex].f8 != 0) {
-        oldSlot = D_001A9330;
-        if (oldSlot == -1) {
-            D_001A9330 = entryIndex;
+s32 load_start_disc_entry(s32 entry_index, s32 owner, s32 dest, s32 first_part_only) {
+    s32 old_slot;
+    if (g_copy_setup_data.el[entry_index].f8 != 0) {
+        old_slot = D_001A9330;
+        if (old_slot == -1) {
+            D_001A9330 = entry_index;
             D_001A9334[0] = owner;
             D_001A9334[1] = dest;
             if (owner >= 0) {
-                D_00152CD0.f34[owner] = oldSlot;
+                D_00152CD0.f34[owner] = old_slot;
             }
-            if (g_copy_setup_data.el[entryIndex].f10 != 0 && firstPartOnly == 0) {
-                return load_start_disc_read_with_callback(dest, g_copy_setup_data.el[entryIndex].fC + g_copy_setup_data.base, g_copy_setup_data.el[entryIndex].f10, load_continue_stream, &D_001A9330);
+            if (g_copy_setup_data.el[entry_index].f10 != 0 && first_part_only == 0) {
+                return load_start_disc_read_with_callback(dest, g_copy_setup_data.el[entry_index].fC + g_copy_setup_data.base, g_copy_setup_data.el[entry_index].f10, load_continue_stream, &D_001A9330);
             }
-            return load_start_disc_read_with_callback(dest, g_copy_setup_data.el[entryIndex].f4 + g_copy_setup_data.base, g_copy_setup_data.el[entryIndex].f8, load_release_class_cache_slot, &D_001A9330);
+            return load_start_disc_read_with_callback(dest, g_copy_setup_data.el[entry_index].f4 + g_copy_setup_data.base, g_copy_setup_data.el[entry_index].f8, load_release_class_cache_slot, &D_001A9330);
         }
         return 0;
     }

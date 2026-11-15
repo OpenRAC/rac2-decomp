@@ -22,7 +22,7 @@ void part_claim_debris_piece(void *owner)
 {
     Debris0032ABC0 *debris;
     int i;
-    float targetOffset[4];
+    float target_offset[4];
     TI_0032ABC0 delta;
     TI_0032ABC0 pos;
 
@@ -34,9 +34,9 @@ void part_claim_debris_piece(void *owner)
             debris->speed = math_random_signed_float_range(1200.0f, 1400.0f) * 0.00029088825f;
             debris->life = 0x25;
             debris->scale = math_random_float_range(0.3f, 0.4f);
-            moby_get_facing_direction(((Hero_0032ABC0 *)g_hero_state)->ptr[0x2290 / 4] + 0x10, targetOffset);
+            moby_get_facing_direction(((Hero_0032ABC0 *)g_hero_state)->ptr[0x2290 / 4] + 0x10, target_offset);
             qcopy(&pos, ((Hero_0032ABC0 *)g_hero_state)->ptr[0x2290 / 4] + 0x10);
-            FastVecAdd(&delta, &pos, targetOffset);
+            FastVecAdd(&delta, &pos, target_offset);
             FastVecCross(&pos, &pos, &delta);
             vec_scale_to_length(debris->dir, (float *)&pos, debris->scale);
             return;

@@ -16,11 +16,11 @@ extern char D_L00_00256BC0[];
 
 /* Claims the first free record of the forty-eight 0xD0-byte records at D_L00_00256BC0, keeps
    the owner and the caller's words in it, and fills it with eighteen drawn values. */
-void tumbling_piece_spawn(char *owner, int target, int other, char *pos, char *vel, int flag, int timeA, int timeB, int effectSlot, float scale)
+void tumbling_piece_spawn(char *owner, int target, int other, char *pos, char *vel, int flag, int time_a, int time_b, int effect_slot, float scale)
 {
     char *records = D_L00_00256BC0;
     char *record;
-    char *posOut;
+    char *pos_out;
     int i;
 
     for (i = 0; i < 48; i++) {
@@ -28,8 +28,8 @@ void tumbling_piece_spawn(char *owner, int target, int other, char *pos, char *v
         if (*(int *)(record + 0xAC) != 0)
             continue;
         *(char **)(record + 0xAC) = owner;
-        posOut = record + 0x40;
-        *(Q16_B0e5d8f83 *)posOut = *(Q16_B0e5d8f83 *)pos;
+        pos_out = record + 0x40;
+        *(Q16_B0e5d8f83 *)pos_out = *(Q16_B0e5d8f83 *)pos;
         *(Q16_B0e5d8f83 *)(record + 0x50) = *(Q16_B0e5d8f83 *)vel;
         *(float *)(record + 0x60) = func_002A7878_2(-3.14159274f, 3.14159274f);
         *(float *)(record + 0x64) = func_002A7878_2(-3.14159274f, 3.14159274f);
@@ -55,11 +55,11 @@ void tumbling_piece_spawn(char *owner, int target, int other, char *pos, char *v
         *(int *)(record + 0xB4) = target;
         *(int *)(record + 0xC4) = flag;
         *(float *)(record + 0xC8) = scale;
-        *(int *)(record + 0xBC) = timeA;
-        *(int *)(record + 0xB8) = timeA;
-        *(int *)(record + 0xA8) = timeB;
+        *(int *)(record + 0xBC) = time_a;
+        *(int *)(record + 0xB8) = time_a;
+        *(int *)(record + 0xA8) = time_b;
         *(int *)(record + 0xC0) = 0;
-        *(int *)(record + 0xCC) = effectSlot;
+        *(int *)(record + 0xCC) = effect_slot;
         break;
     }
 }

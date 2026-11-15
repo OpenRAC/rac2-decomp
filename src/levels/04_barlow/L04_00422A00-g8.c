@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char u8;
@@ -43,7 +44,7 @@ void gadgetron_hound_flag_group(u8 *object) {
     for (;;) {
         other = (char *)(mobyPool + (*idPtr & 0x7FFF) * 256);
         if ((s8)other[0x20] >= 0) {
-            if (*(s16 *)(other + 0xAA) == 0xFB6 /* Gadgetron Hound of Cuddly Death */) {
+            if (*(s16 *)(other + 0xAA) == MOBY_CLASS_GADGETRON_HOUND_OF_CUDDLY_DEATH) {
                 *(u16 *)(*(u32 *)(other + 0x68) + 0x306) = 1;
             }
         }
@@ -71,7 +72,7 @@ void tribesman_flag_group(u8 *object) {
     for (;;) {
         other = (char *)(mobyPool + (*idPtr & 0x7FFF) * 256);
         if ((s8)other[0x20] >= 0) {
-            if (*(s16 *)(other + 0xAA) == 0xFF8 /* Tribesman */) {
+            if (*(s16 *)(other + 0xAA) == MOBY_CLASS_TRIBESMAN) {
                 char *vars = *(char **)(other + 0x68);
                 *(u16 *)(vars + 0x276) = 1;
                 *(u32 *)(vars + 0x574) += 1;

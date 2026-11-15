@@ -178,7 +178,7 @@ void CrateUpdate(CrateMoby *moby)
         vec_clear_128(vars->f90);
         moby->state = 1;
         vars->fA8 = 0;
-        if (moby->oClass == 0x1FF /* Ammo Crate */) {
+        if (moby->oClass == MOBY_CLASS_AMMO_CRATE) {
             vars->frame++;
         }
         if (vars->fCC == 0) {
@@ -188,11 +188,11 @@ void CrateUpdate(CrateMoby *moby)
             }
         }
         vars->linked = 0;
-        if (moby->oClass == 0x1FF /* Ammo Crate */) {
+        if (moby->oClass == MOBY_CLASS_AMMO_CRATE) {
             vars->fC6 = 100;
-        } else if (moby->oClass == 0x1F5 /* Nanotech Crate */) {
+        } else if (moby->oClass == MOBY_CLASS_NANOTECH_CRATE) {
             vars->linked = moby_spawn_linked_child(moby, 0);
-        } else if (moby->oClass == 0x200 /* Purple Nanotech Crate */) {
+        } else if (moby->oClass == MOBY_CLASS_PURPLE_NANOTECH_CRATE) {
             vars->linked = moby_spawn_linked_child(moby, 1);
         }
         break;
@@ -200,7 +200,7 @@ void CrateUpdate(CrateMoby *moby)
         if (flag_set_first_pending(moby)) {
             vars->f100 = 0;
         }
-        if (moby->oClass == 0x1F9 /* Explosive Crate */ &&
+        if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE &&
             (HERO->f270 == moby || HERO->collHitMoby == moby ||
              (HERO->groundMoby == moby && HERO->airFrames == 0) ||
              HERO->ledgeMoby == moby || touched)) {
@@ -219,7 +219,7 @@ void CrateUpdate(CrateMoby *moby)
             if (moby->oClass == 0x1F6 /* moby class 502 */ && !(hit->flags & 0x20000)) {
                 doHit = 0;
             }
-            if (moby->oClass == 0x1F9 /* Explosive Crate */) {
+            if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE) {
                 moby->state = 5;
                 if (hit->flags & 0x20000) {
                     moby->command = 1;
@@ -230,7 +230,7 @@ void CrateUpdate(CrateMoby *moby)
                 doHit = 0;
             }
             if (doHit) {
-                DestroyCrate(moby, moby->oClass == 0x1F9 /* Explosive Crate */, hit);
+                DestroyCrate(moby, moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE, hit);
                 crate_drop_loot(moby);
             }
             moby->hitSlot = 255;
@@ -243,7 +243,7 @@ void CrateUpdate(CrateMoby *moby)
         }
         break;
     case 3:
-        if (moby->oClass == 0x1F9 /* Explosive Crate */ && vars->burstFrame < 21) {
+        if (moby->oClass == MOBY_CLASS_EXPLOSIVE_CRATE && vars->burstFrame < 21) {
             float radius;
             int target;
 

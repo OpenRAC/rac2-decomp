@@ -11,7 +11,7 @@ extern void anim_start_blended(void *, int, int, int);
 #define F(p,o) (*(float *)((p)+(o)))
 #define B(p,o) (*(unsigned char *)((p)+(o)))
 /* Switches the enemy and its partner to a new animation and sets how fast it turns and moves in that animation. */
-void enemy_set_animation_state(char *object, int state, int startFrame, int blendTime) {
+void enemy_set_animation_state(char *object, int state, int start_frame, int blend_time) {
     char *data = *(char **)(object+0x68);
     STUB_printf(D_L09_001B10A8, *(short *)(object+0xB2), state);
     if (state == 12) {
@@ -36,8 +36,8 @@ void enemy_set_animation_state(char *object, int state, int startFrame, int blen
         B(data,0xC2)=10; B(data,0xC3)=17; B(data,0xC6)=0;
     }
     if ((I(data,0x428) || (I(data,0x2DC)!=-1 && I(data,0x2DC)==I(data,0x2B0))) && state!=15) {
-        if (B(object,0x43)!=14) anim_start_blended(object,14,startFrame,blendTime);
-    } else if (B(object,0x43)!=state) anim_start_blended(object,state,startFrame,blendTime);
+        if (B(object,0x43)!=14) anim_start_blended(object,14,start_frame,blend_time);
+    } else if (B(object,0x43)!=state) anim_start_blended(object,state,start_frame,blend_time);
     { char *partner=*(char **)(data+0x2F8);
-    if (partner && B(partner,0x43)!=state) anim_start_blended(partner,state,startFrame,blendTime); }
+    if (partner && B(partner,0x43)!=state) anim_start_blended(partner,state,start_frame,blend_time); }
 }

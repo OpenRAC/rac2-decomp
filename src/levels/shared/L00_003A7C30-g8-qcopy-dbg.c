@@ -36,7 +36,7 @@ char *beam_spawn_moving(void *position, void *velocity, int handle, int mode)
     char *moby;
     BeamState *state;
     float speed;
-    if (handle == -1 || !save_is_record_value(0x5CB /* Pulse Rifle */, handle))
+    if (handle == -1 || !save_is_record_value(MOBY_CLASS_PULSE_RIFLE, handle))
         return 0;
     moby = CreateMoby(0x5D6 /* moby class 1494 */);
     if (moby != 0) {
@@ -52,7 +52,7 @@ char *beam_spawn_moving(void *position, void *velocity, int handle, int mode)
         state->frames = FloatToInt(128.0f / speed);
         state->rate = 1.0f / IntToFloat(state->frames);
         state->handle = handle;
-        state->target = level_get_slot_body(0x5CB /* Pulse Rifle */, handle);
+        state->target = level_get_slot_body(MOBY_CLASS_PULSE_RIFLE, handle);
         cam_compute_view_direction(moby + 0x10, (char *)normal, 1);
         FastVecScale(normal, normal, -1.0f);
         moby_build_axis_vectors(moby, (char *)normal);

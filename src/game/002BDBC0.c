@@ -37,8 +37,8 @@ extern int func_001163B0(void);
 void part_spawn_growing_puff(void *pos, void *dir, u32 color, s32 flags, s32 frames, f32 size) {
     Puff2BDBC0 *puff;
     Effect2BDBC0 *effect;
-    f32 lifeFrames;
-    f32 sizeGrowth;
+    f32 life_frames;
+    f32 size_growth;
 
     effect = part_alloc(0x16);
     if (effect != 0) {
@@ -52,11 +52,11 @@ void part_spawn_growing_puff(void *pos, void *dir, u32 color, s32 flags, s32 fra
         effect->f2 = *D_001F2598[0];
         effect->frames = frames;
         puff->frames = frames;
-        lifeFrames = IntToFloat(frames);
-        sizeGrowth = size - effect->size;
+        life_frames = IntToFloat(frames);
+        size_growth = size - effect->size;
         puff->color = color;
         puff->flags = flags;
-        puff->fade = sizeGrowth / lifeFrames;
+        puff->fade = size_growth / life_frames;
         qcopy(puff, dir);
         qcopy(effect->pos, pos);
         puff->decay = 0.00034444444f;

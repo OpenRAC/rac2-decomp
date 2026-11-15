@@ -57,30 +57,30 @@ extern u8 *g_moby_l11_table __attribute__((sda));
 s32 joba_group_has_three_live_objects(u8 *object)
 {
     u8 *pool;
-    u8 *idList;
-    u16 *idPtr;
+    u8 *id_list;
+    u16 *id_ptr;
     u8 *entity;
     s32 count;
 
     if (object[0x21] == 0xFF)
         return 0;
-    idList = g_group_id_lists[object[0x21]];
-    if (idList == 0)
+    id_list = g_group_id_lists[object[0x21]];
+    if (id_list == 0)
         return 0;
-    idPtr = (u16 *)idList;
+    id_ptr = (u16 *)id_list;
     pool = g_moby_l11_table;
     count = 0;
     for (;;) {
-        entity = pool + (*idPtr & 0x7FFF) * 256;
+        entity = pool + (*id_ptr & 0x7FFF) * 256;
         if (entity != 0 && entity[0x20] != 0xFE && entity[0x20] != 0xFD && *(s16 *)(entity + 0xAA) == 0xD98 /* moby class 3480 */
             && entity[0x95] == 6 && *(s16 *)(*(char **)(entity + 0x68) + 0x366) == 1) {
             count++;
             if (count >= 3)
                 return 1;
         }
-        if ((s16)*idPtr < 0)
+        if ((s16)*id_ptr < 0)
             break;
-        idPtr++;
+        id_ptr++;
     }
     return 0;
 }

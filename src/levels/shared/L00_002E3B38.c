@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 extern unsigned char D_001A7A0A;
@@ -37,7 +38,7 @@ void moby_scale_by_difficulty(char *object)
     {
         short classId = *(short *)(object + 0xAA);
 
-        if (classId == 0x1F4 /* Crate */ || classId == 0x1F6 /* moby class 502 */ || classId == 0x1F9 /* Explosive Crate */ || classId == 0x200 /* Purple Nanotech Crate */)
+        if (classId == MOBY_CLASS_CRATE || classId == 0x1F6 /* moby class 502 */ || classId == MOBY_CLASS_EXPLOSIVE_CRATE || classId == MOBY_CLASS_PURPLE_NANOTECH_CRATE)
             return;
     }
     if (g_current_map_index >= 0x1C)

@@ -34,15 +34,15 @@ void cam_swingshot_update(char *camera)
  char unit[16] __attribute__((aligned(16)));
  float axis[4] __attribute__((aligned(16)));
  char *vars=*(char **)(camera+0x70),*cfg=vars+0xA0,*part=vars+0x40,*angle=vars+0xB8;
- char *swing,*bestNode,*node,*turn;
- float height,dist,aimDot,score,closest;
+ char *swing,*best_node,*node,*turn;
+ float height,dist,aim_dot,score,closest;
  short *list;
  if(D_00189E20_6.swing && D_00189E20_6.state==0x2B) {
-  float aimDot=*(float *)(D_00189E20_6.swing+0x18)-D_00189E20_6.z;
-  if(aimDot>D_00189E20_6.max_height) aimDot=D_00189E20_6.max_height;
-  else if(aimDot<0.0f) aimDot=0.0f;
-  aimDot/=D_00189E20_6.max_height;
-  height=aimDot+3.65f; dist=aimDot+aimDot;
+  float aim_dot=*(float *)(D_00189E20_6.swing+0x18)-D_00189E20_6.z;
+  if(aim_dot>D_00189E20_6.max_height) aim_dot=D_00189E20_6.max_height;
+  else if(aim_dot<0.0f) aim_dot=0.0f;
+  aim_dot/=D_00189E20_6.max_height;
+  height=aim_dot+3.65f; dist=aim_dot+aim_dot;
  } else {height=4.64f;dist=2.0f;}
  ApproachValue(*(char **)(D_L00_001B8C80_1.follow+0x70)+0xA0,height,0.13333334f);
  ApproachValue(*(char **)(D_L00_001B8C80_1.follow+0x70)+0xB0,dist,0.06666667f);
@@ -51,22 +51,22 @@ void cam_swingshot_update(char *camera)
   if((g_current_map_index!=14 && g_current_map_index!=7 && g_current_map_index!=9) || (D_00189E20_6.swing && *(unsigned char *)(D_00189E20_6.swing+0x21)==255)) {
    *(float *)angle=math_step_spring_damper_stored(*(float *)angle,D_00189E20_6.yaw,angle+4,0.00125f,0.175f,0.0f);
   } else {
-   turn=angle+4; bestNode=0; closest=1000.0f;
+   turn=angle+4; best_node=0; closest=1000.0f;
    swing=D_00189E20_6.swing;
    list=D_L00_001FA920[*(unsigned char *)(swing+0x21)];
    if(list) do {
     node=D_L00_001B1E9C+(*list&0x7FFF)*0x100;
-    if(node!=swing && (*(short *)(node+0xAA)==0x323 /* Swingshot Node */ || *(short *)(node+0xAA)==0x2F6 /* Swingshot Node */)) {
+    if(node!=swing && (*(short *)(node+0xAA)==MOBY_CLASS_SWINGSHOT_NODE_2 || *(short *)(node+0xAA)==MOBY_CLASS_SWINGSHOT_NODE)) {
      FastVecSub(diff,node+0x10,swing+0x10);
      vec_scale_to_length(unit,diff,1.0f);
      axis[0]=math_fast_sin_or_cos_a(D_00189E20_6.yaw);
      axis[1]=math_fast_sin_or_cos_b(D_00189E20_6.yaw);axis[2]=0.0f;
-     aimDot=FastVecDot(unit,(char *)axis);
-     if(aimDot>0.0f) {score=FastVecLength(diff)-aimDot*10.0f;if(score<closest){bestNode=node;closest=score;}}
+     aim_dot=FastVecDot(unit,(char *)axis);
+     if(aim_dot>0.0f) {score=FastVecLength(diff)-aim_dot*10.0f;if(score<closest){best_node=node;closest=score;}}
     }
    } while(*list++>=0);
-   if(bestNode) {
-    FastVecSub(diff,bestNode+0x10,swing+0x10);
+   if(best_node) {
+    FastVecSub(diff,best_node+0x10,swing+0x10);
     *(float *)angle=math_step_spring_damper_stored(*(float *)angle,mat_fast_helper_a(*(float *)diff,*(float *)(diff+4)),turn,0.00125f,0.175f,0.0f);
    } else if(*(int *)(part+0x40)==1)
     *(float *)angle=math_step_spring_damper_stored(*(float *)angle,*(float *)(*(char **)(part+0x44)+0xF8),turn,0.00125f,0.175f,0.0f);

@@ -23,31 +23,31 @@ extern void vec_scale_to_length(void *, void *, float);
 /* Moves the turret toward its target spot, works out how far it must turn, and returns the distance still to go. */
 float turret_move_toward_target(char *moby) {
     char *state = *(char **)(moby + 0x68);
-    char *savedPos = state + 0x180;
+    char *saved_pos = state + 0x180;
     char *position = moby + 0x10;
-    float toTarget[4] __attribute__((aligned(16)));
-    float aimDelta[4] __attribute__((aligned(16)));
+    float to_target[4] __attribute__((aligned(16)));
+    float aim_delta[4] __attribute__((aligned(16)));
     float speed;
     float distance;
     float yaw;
-    float turnGain;
+    float turn_gain;
     float pitch;
 
-    FastVecSub(toTarget, state + 0x190, state + 0x180);
+    FastVecSub(to_target, state + 0x190, state + 0x180);
     speed = FastVecLength(state + 0xF0);
-    distance = FastVecLength(toTarget);
+    distance = FastVecLength(to_target);
     math_approach_target_with_braking(&speed, distance, D_L20_001B2444 * 0.00027777778f,
                   D_L20_001B2444 * 0.00027777778f,
                   D_L20_001B2448 * 0.016666668f);
-    vec_scale_to_length(state + 0xF0, toTarget, speed);
-    qcopy(position, savedPos);
+    vec_scale_to_length(state + 0xF0, to_target, speed);
+    qcopy(position, saved_pos);
     hero_set_control_motion_and_step(moby, state + 0xF0);
-    qcopy(savedPos, position);
-    vec_transform_by_object_or_given(moby, aimDelta, state + 0xF0, 0);
-    turnGain = D_L20_001B244C;
-    yaw = aimDelta[1] * -turnGain;
+    qcopy(saved_pos, position);
+    vec_transform_by_object_or_given(moby, aim_delta, state + 0xF0, 0);
+    turn_gain = D_L20_001B244C;
+    yaw = aim_delta[1] * -turn_gain;
     *(float *)(state + 0x1A8) = yaw;
-    *(float *)(state + 0x1AC) = aimDelta[0] * turnGain;
+    *(float *)(state + 0x1AC) = aim_delta[0] * turn_gain;
     if (yaw > 0.78539824f) {
         *(float *)(state + 0x1A8) = 0.78539824f;
     } else if (yaw < -0.78539824f) {

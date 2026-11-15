@@ -29,27 +29,27 @@ extern s8 *ref_L04_0040A5C0_00;
 /* Wakes up every racer linked to this one: sets a flag in its variables and puts it in state 2. */
 void racer_activate_linked(s8 *moby) {
     s8 *vars;
-    s32 *slotPtr;
-    s32 racerIndex;
+    s32 *slot_ptr;
+    s32 racer_index;
     s32 remaining;
-    s32 noRacer;
-    s32 flagOn;
-    s32 activeState;
+    s32 no_racer;
+    s32 flag_on;
+    s32 active_state;
 
     vars = *(s8 **)(moby + 0x68);
-    noRacer = -1;
-    flagOn = 1;
-    activeState = 2;
+    no_racer = -1;
+    flag_on = 1;
+    active_state = 2;
 
-    slotPtr = (s32 *)(vars + 0x1E4);
+    slot_ptr = (s32 *)(vars + 0x1E4);
     remaining = 0x14;
     do {
-        racerIndex = *slotPtr;
+        racer_index = *slot_ptr;
         remaining -= 1;
-        if (racerIndex != noRacer) {
-            *(s8 *)(*(s8 **)((s32)((racerIndex << 8) + (s32)ref_L04_0040A5C0_00) + 0x68) + 0xA0) = flagOn;
-            *(s8 *)((s32)((*slotPtr << 8) + (s32)ref_L04_0040A5C0_00) + 0x20) = activeState;
+        if (racer_index != no_racer) {
+            *(s8 *)(*(s8 **)((s32)((racer_index << 8) + (s32)ref_L04_0040A5C0_00) + 0x68) + 0xA0) = flag_on;
+            *(s8 *)((s32)((*slot_ptr << 8) + (s32)ref_L04_0040A5C0_00) + 0x20) = active_state;
         }
-        slotPtr += 1;
+        slot_ptr += 1;
     } while (remaining >= 0);
 }

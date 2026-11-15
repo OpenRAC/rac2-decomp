@@ -30,12 +30,12 @@ extern s8 *D_001B188C;
 /* Fills a HUD element from the table entry that matches the given id. */
 void hud_load_element_from_table(s8 *dest, s32 key) {
     s32 index;
-    u16 firstWord;
+    u16 first_word;
 
     index = hud_find_entry_index(key);
-    firstWord = *(u16 *)(D_001B188C + index * 8);
+    first_word = *(u16 *)(D_001B188C + index * 8);
     (*(s16 *)((s8 *)(dest) + (0x40))) = index;
-    (*(s32 *)((s8 *)(dest) + (0))) = firstWord;
+    (*(s32 *)((s8 *)(dest) + (0))) = first_word;
     (*(u8 *)((s8 *)(dest) + (0x42))) = *(u8 *)(D_001B188C + index * 8 + 6);
     (*(s32 *)((s8 *)(dest) + (0x44))) = *(u16 *)(D_001B188C + index * 8 + 4);
 }

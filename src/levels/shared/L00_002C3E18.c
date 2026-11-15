@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 typedef int Vector __attribute__((mode(TI)));
 typedef struct {
@@ -39,7 +40,7 @@ int hero_find_active_swingshot_node(void)
         for (node = D_L00_001B1EA8; node; node = *(unsigned char **)(node + 0x28)) {
             char *data;
             float horizontal, vertical, heading, range, score;
-            if (*(short *)(node + 0xAA) != 0x2F6 /* Swingshot Node */) continue;
+            if (*(short *)(node + 0xAA) != MOBY_CLASS_SWINGSHOT_NODE) continue;
             if (*(unsigned short *)(node + 0x34) & 1) continue;
             if ((*(unsigned short *)(node + 0x34) & 0x1000) == 0) continue;
             data = *(char **)(node + 0x68);

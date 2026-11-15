@@ -8,14 +8,14 @@ extern float ref_L00_00360ED0_00 MACRO_ADDR;
 extern int ref_L00_00360ED0_01 MACRO_ADDR;
 extern int ref_L00_00360ED0_02 __attribute__((sda));
 
-typedef struct { char pad00[0x0C]; int rangeStart; int rangeEnd; } World2E71B8;
+typedef struct { char pad00[0x0C]; int range_start; int range_end; } World2E71B8;
 
 typedef struct {
     char pad00[0x34];
     int frame;
     char pad38[0x34];
-    int startWindow;
-    int destinationWindow;
+    int start_window;
+    int destination_window;
 } State2E71B8;
 
 extern World2E71B8 ref_L00_00360ED0_03;
@@ -35,8 +35,8 @@ void scene_init_playback_state(void)
     gfx_select_packet_buffer_setup();
 
     base = ref_L00_00360ED0_01 - 0x60000;
-    ref_L00_00360ED0_04.startWindow = ref_L00_00360ED0_03.rangeStart + base;
-    ref_L00_00360ED0_04.destinationWindow = ref_L00_00360ED0_03.rangeEnd + base;
+    ref_L00_00360ED0_04.start_window = ref_L00_00360ED0_03.range_start + base;
+    ref_L00_00360ED0_04.destination_window = ref_L00_00360ED0_03.range_end + base;
     ref_L00_00360ED0_02 = base;
     level_transition_scene_start(3);
     ref_L00_00360ED0_04.frame = 1;

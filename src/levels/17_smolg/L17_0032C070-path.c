@@ -142,8 +142,8 @@ int UpdatePathFollowerChain(char *obj)
     float fraction, length, phase, angle;
     float low, middle, high;
     char *vars = *(char **)(obj + 0x68);
-    char *nextLink = *(char **)(vars + 0x1C);
-    char *path, *nextVars;
+    char *next_link = *(char **)(vars + 0x1C);
+    char *path, *next_vars;
 
     if (*(int *)vars == -1)
         return 0;
@@ -174,42 +174,42 @@ int UpdatePathFollowerChain(char *obj)
     matrix_mul_vec3(&anchor, &anchor, obj + 0xC0);
     FastVecAdd(&anchor, &anchor, obj + 0x10);
 
-    while (nextLink) {
+    while (next_link) {
         float *nextHeading, *nextPitch;
         low = 0.00087266474f;
         middle = 0.0017453295f;
         high = 0.10471977f;
-        flash = (D_L17_001B2748[0] + *(short *)(nextLink + 0xB2)) % 60 < 15;
-        *(int *)(nextLink + 0x78) = flash ? 0x80FFFFFF : 0x80404040;
-        nextVars = *(char **)(nextLink + 0x68);
+        flash = (D_L17_001B2748[0] + *(short *)(next_link + 0xB2)) % 60 < 15;
+        *(int *)(next_link + 0x78) = flash ? 0x80FFFFFF : 0x80404040;
+        next_vars = *(char **)(next_link + 0x68);
         qzero(&other);
         other.f[1] = -*(float *)(vars + 0x24);
-        nextHeading = (float *)(nextLink + 0xF8);
-        nextPitch = (float *)(nextLink + 0xF4);
-        matrix_mul_vec3(&other, &other, nextLink + 0xC0);
-        FastVecAdd(&other, &other, nextLink + 0x10);
+        nextHeading = (float *)(next_link + 0xF8);
+        nextPitch = (float *)(next_link + 0xF4);
+        matrix_mul_vec3(&other, &other, next_link + 0xC0);
+        FastVecAdd(&other, &other, next_link + 0x10);
         FastVecSub(&desired, &other, &anchor);
         vec_fast_normalize_helper(&desired, &desired, *(float *)(vars + 0x20));
         FastVecAdd(&desired, &desired, &anchor);
         desired.f[2] = anchor.f[2];
-        FastVecSub(&delta, &desired, nextLink + 0x10);
+        FastVecSub(&delta, &desired, next_link + 0x10);
         vec_scale_to_length(&delta, &delta, FastVecLength(&delta) - *(float *)(vars + 0x24));
-        FastVecAdd(nextLink + 0x10, &delta, nextLink + 0x10);
-        angle = FastAddRotations(mat_fast_helper_a(desired.f[0] - *(float *)(nextLink + 0x10),
-                                          desired.f[1] - *(float *)(nextLink + 0x14)), 1.5707965f);
-        math_approach_target_with_direction_mode(nextHeading, angle, nextVars + 0x18, 0, low, middle, high);
-        angle = mat_fast_helper_a(vec_distance_xy(nextLink + 0x10, &desired),
-                             desired.f[2] - *(float *)(nextLink + 0x18));
-        func_002AAA00_pitch(nextPitch, angle, nextVars + 0x14, low, middle, high, 0);
-        func_002A05A8(nextLink);
-        func_002A0F48(nextLink);
-        *(int *)(nextVars + 0x34) = 1;
-        *(short *)(nextLink + 0x34) |= 4;
+        FastVecAdd(next_link + 0x10, &delta, next_link + 0x10);
+        angle = FastAddRotations(mat_fast_helper_a(desired.f[0] - *(float *)(next_link + 0x10),
+                                          desired.f[1] - *(float *)(next_link + 0x14)), 1.5707965f);
+        math_approach_target_with_direction_mode(nextHeading, angle, next_vars + 0x18, 0, low, middle, high);
+        angle = mat_fast_helper_a(vec_distance_xy(next_link + 0x10, &desired),
+                             desired.f[2] - *(float *)(next_link + 0x18));
+        func_002AAA00_pitch(nextPitch, angle, next_vars + 0x14, low, middle, high, 0);
+        func_002A05A8(next_link);
+        func_002A0F48(next_link);
+        *(int *)(next_vars + 0x34) = 1;
+        *(short *)(next_link + 0x34) |= 4;
         qzero_nc(&anchor);
         anchor.f[1] = *(float *)(vars + 0x24);
-        matrix_mul_vec3(&anchor, &anchor, nextLink + 0xC0);
-        FastVecAdd(&anchor, &anchor, nextLink + 0x10);
-        nextLink = *(char **)(nextVars + 0x1C);
+        matrix_mul_vec3(&anchor, &anchor, next_link + 0xC0);
+        FastVecAdd(&anchor, &anchor, next_link + 0x10);
+        next_link = *(char **)(next_vars + 0x1C);
     }
     return 1;
 }

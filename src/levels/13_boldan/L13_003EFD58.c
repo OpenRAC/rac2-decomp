@@ -11,7 +11,7 @@ extern void moby_set_state(u8 *, s32, s32);
 void swinging_update(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
     u16 ticks;
-    s32 nextTicks;
+    s32 next_ticks;
     u32 state = moby[0x20];
 
     switch (state) {
@@ -29,7 +29,7 @@ void swinging_update(u8 *moby) {
                       0.10471977f, 0);
         ticks = *(u16 *)(moby + 0x96);
         if (ticks < 0x79) {
-            nextTicks = ticks + 1;
+            next_ticks = ticks + 1;
             break;
         }
         moby_set_state(moby, 3, -1);
@@ -42,7 +42,7 @@ void swinging_update(u8 *moby) {
                       0.00087266474f, 0.10471977f, 0);
         ticks = *(u16 *)(moby + 0x96);
         if (ticks < 0x79) {
-            nextTicks = ticks + 1;
+            next_ticks = ticks + 1;
             break;
         }
         moby_set_state(moby, 1, -1);
@@ -54,5 +54,5 @@ void swinging_update(u8 *moby) {
     default:
         return;
     }
-    *(u16 *)(moby + 0x96) = nextTicks;
+    *(u16 *)(moby + 0x96) = next_ticks;
 }

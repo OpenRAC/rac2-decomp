@@ -29,20 +29,20 @@ extern s32 ref_L09_00406BF8_00(s8 *, s32);
 extern void ref_L09_00406BF8_01(s32, s32);
 
 /* Checks whether the hero has hit the given trigger, records the result for a slot, and returns 1 if it was hit. */
-s32 dobbo_check_hero_trigger(s32 triggerId, s32 slot) {
-    s32 resultCode;
+s32 dobbo_check_hero_trigger(s32 trigger_id, s32 slot) {
+    s32 result_code;
     s32 triggered;
 
-    resultCode = 0;
+    result_code = 0;
     triggered = 0;
-    if (triggerId != -1) {
-        if (ref_L09_00406BF8_00(g_hero_position, triggerId) != 0) {
-            resultCode = triggered;
+    if (trigger_id != -1) {
+        if (ref_L09_00406BF8_00(g_hero_position, trigger_id) != 0) {
+            result_code = triggered;
             triggered = 1;
         } else {
-            resultCode = 2;
+            result_code = 2;
         }
     }
-    ref_L09_00406BF8_01(slot, resultCode);
+    ref_L09_00406BF8_01(slot, result_code);
     return triggered;
 }

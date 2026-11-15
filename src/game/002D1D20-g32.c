@@ -23,18 +23,18 @@ int page_viewer_handle_input_long(void)
 
     if (flags & 0x10) {
         int value;
-        int returnCode;
+        int return_code;
         D_001ABA58 = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
         else if (g_pause_menu_state.fallback == 0) {
-            returnCode = -1;
+            return_code = -1;
             goto finish;
         }
-        returnCode = 0;
+        return_code = 0;
 finish:
-        return returnCode;
+        return return_code;
     }
     if (flags & 0x900) {
         D_001ABA58 = 0;

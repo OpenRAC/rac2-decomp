@@ -34,7 +34,7 @@ extern s32 D_001B187C;
 extern s8 *volatile g_dma_packet_cursor;
 
 /* Draws a picture on the screen, turned by an angle around its centre. */
-void DrawRotatedSprite(s32 texWidth, s32 texHeight, s64 textureWord, f32 centerX, f32 centerY, f32 halfHeight, f32 halfWidth, f32 angle) {
+void DrawRotatedSprite(s32 tex_width, s32 tex_height, s64 texture_word, f32 center_x, f32 center_y, f32 half_height, f32 half_width, f32 angle) {
     s8 vec[0x68];
     s64 rt1 ;
     s64 ra1 ;
@@ -43,19 +43,19 @@ void DrawRotatedSprite(s32 texWidth, s32 texHeight, s64 textureWord, f32 centerX
     s32 s3;
     s32 s4;
     s32 t2;
-    s8 *oldCursor;
+    s8 *old_cursor;
     s8 *packet;
     s64 c1;
     s64 c2;
     s64 c3;
     s64 c4;
 
-    *(f32 *)(vec + 0x20) = centerX;
-    *(f32 *)(vec + 0x24) = centerY;
-    *(f32 *)(vec + 0x0) = halfWidth * math_fast_sin_or_cos_b(angle);
-    *(f32 *)(vec + 0x4) = halfWidth * math_fast_sin_or_cos_a(angle);
-    *(f32 *)(vec + 0x10) = -halfHeight * math_fast_sin_or_cos_a(angle);
-    *(f32 *)(vec + 0x14) = halfHeight * math_fast_sin_or_cos_b(angle);
+    *(f32 *)(vec + 0x20) = center_x;
+    *(f32 *)(vec + 0x24) = center_y;
+    *(f32 *)(vec + 0x0) = half_width * math_fast_sin_or_cos_b(angle);
+    *(f32 *)(vec + 0x4) = half_width * math_fast_sin_or_cos_a(angle);
+    *(f32 *)(vec + 0x10) = -half_height * math_fast_sin_or_cos_a(angle);
+    *(f32 *)(vec + 0x14) = half_height * math_fast_sin_or_cos_b(angle);
     FastVecAdd(vec + 0x30, vec + 0x20, vec);
     FastVecSub(vec + 0x30, vec + 0x30, vec + 0x10);
     FastVecAdd(vec + 0x40, vec + 0x20, vec);
@@ -67,20 +67,20 @@ void DrawRotatedSprite(s32 texWidth, s32 texHeight, s64 textureWord, f32 centerX
 
     (*(s32 *)((s8 *)(g_dma_packet_cursor) + (0))) = 0x10000007;
     rt1 = ((s64)0xB400 << 48) | 0x8001;
-    s3 = texWidth << 4;
+    s3 = tex_width << 4;
     (*(s32 *)((s8 *)(g_dma_packet_cursor) + (4))) = 0;
     ra1 = ((((s64)0xA6A6 << 16) | 0xA6A6) << 11) | 0x106;
     r154 = 0x154;
     rt0 = ((s64)0x807F << 16) | 0x7F7F;
-    s4 = texHeight << 20;
+    s4 = tex_height << 20;
     t2 = s4 + s3;
     (*(s32 *)((s8 *)(g_dma_packet_cursor) + (8))) = 0;
     (*(s32 *)((s8 *)(g_dma_packet_cursor) + (0xC))) = 0x50000007;
-    oldCursor = g_dma_packet_cursor;
-    packet = oldCursor + 0x10;
+    old_cursor = g_dma_packet_cursor;
+    packet = old_cursor + 0x10;
     g_dma_packet_cursor = packet;
-    (*(s64 *)((s8 *)(oldCursor) + (0x10))) = rt1;
-    (*(s64 *)((s8 *)(packet) + (0x10))) = textureWord;
+    (*(s64 *)((s8 *)(old_cursor) + (0x10))) = rt1;
+    (*(s64 *)((s8 *)(packet) + (0x10))) = texture_word;
     (*(s64 *)((s8 *)(packet) + (0x28))) = s3;
     (*(s64 *)((s8 *)(packet) + (8))) = ra1;
     (*(s64 *)((s8 *)(packet) + (0x18))) = r154;

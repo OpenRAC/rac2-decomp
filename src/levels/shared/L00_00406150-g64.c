@@ -92,7 +92,7 @@ extern int CollLine(void *, void *, int, void *, void *);
 /* Moves and bends the Sheepinator beam toward its target, adds sparks along it, and moves three travelling sparks. */
 void sheepinator_update_beam_shape(char *object)
 {
-    float sag[4], segment[4], ringOffset[4], beamEnd[4], temp[4];
+    float sag[4], segment[4], ring_offset[4], beam_end[4], temp[4];
     char *disabled[128];
     float edge[4], side[4];
     char *obj;
@@ -101,26 +101,26 @@ void sheepinator_update_beam_shape(char *object)
     int n, tries, j = 0, k = 0, kk = 0, q = 0, sign = 0, seg = 0;
     Particle *p = 0;
 
-    ringOffset[3] = 1.0f;
+    ring_offset[3] = 1.0f;
     obj = *(char **)(object + 0x68);
-    *(int *)ringOffset = 0;
+    *(int *)ring_offset = 0;
     sheepinator_reset_beam(object);
     D_L00_001B2C84 = math_wrap_angle_to_pi(D_L00_001B2C84 + D_L00_001B0E54);
     FastVecScale(sag, object + 0xD0, -D_L00_001B2C80);
     if (*(char **)(obj + 0x10) != 0 && (def = moby_get_private_value_0(*(char **)(obj + 0x10))) != 0) {
         FastVecScale(temp, *(char **)(obj + 0x10) + 0xE0, *(float *)(def + 0x10));
-        FastVecAdd(beamEnd, *(char **)(obj + 0x10) + 0x10, temp);
+        FastVecAdd(beam_end, *(char **)(obj + 0x10) + 0x10, temp);
     } else {
         float x = *(float *)(obj + 0x48), y = *(float *)(obj + 0x4C);
-        vec_build_spherical_offset(beamEnd, D_L00_001B0E38, x, y);
-        FastVecAdd(beamEnd, beamEnd, obj);
+        vec_build_spherical_offset(beam_end, D_L00_001B0E38, x, y);
+        FastVecAdd(beam_end, beam_end, obj);
     }
     n = 0;
     dist = D_L00_001B0E38;
     tries = 0;
     if (*(char **)(obj + 0x10) == 0) {
         qcopy(temp, obj);
-        while (CollLine(temp, beamEnd, 0x14, g_hero_state.object, 0)) {
+        while (CollLine(temp, beam_end, 0x14, g_hero_state.object, 0)) {
             Collision *col;
             char *hit;
             if (++tries >= 7) break;
@@ -193,11 +193,11 @@ void sheepinator_update_beam_shape(char *object)
         FastVecCross(m[2], m[1], m[0]);
         radius = D_L00_001B0E88 + (D_L00_001B0E8C - D_L00_001B0E88) * progress;
         angle = math_wrap_angle_to_pi(D_L00_001B2C84 + D_L00_001B0E58 * IntToFloat(i));
-        ringOffset[1] = radius * math_fast_sin_or_cos_b(angle);
-        ringOffset[2] = radius * math_fast_sin_or_cos_a(angle);
-        transform_vector(&D_L00_00254B20[i], ringOffset, m);
-        ringOffset[2] = -ringOffset[2];
-        transform_vector(&D_L00_00254BE0[i], ringOffset, m);
+        ring_offset[1] = radius * math_fast_sin_or_cos_b(angle);
+        ring_offset[2] = radius * math_fast_sin_or_cos_a(angle);
+        transform_vector(&D_L00_00254B20[i], ring_offset, m);
+        ring_offset[2] = -ring_offset[2];
+        transform_vector(&D_L00_00254BE0[i], ring_offset, m);
         }
     }
     }

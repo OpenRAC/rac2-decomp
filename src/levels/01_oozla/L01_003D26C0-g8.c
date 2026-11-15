@@ -15,17 +15,17 @@ extern void mat_combine_and_store(void *a0, void *a1, void *a2, void *a3);
 void launched_projectile_update(u8 *moby)
 {
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *launcherVars = *(u8 **)(*(u8 **)(vars + 0x70) + 0x68);
-    u8 *pathTable;
-    u8 *soundHandle;
-    f32 moveDelta[4];
+    u8 *launcher_vars = *(u8 **)(*(u8 **)(vars + 0x70) + 0x68);
+    u8 *path_table;
+    u8 *sound_handle;
+    f32 move_delta[4];
 
     *(f32 *)(moby + 0x2C) = *(f32 *)(*(u8 **)(moby + 0x24) + 0x24) * D_L01_001B0540;
     qcopy(vars + 0x60, moby + 0x10);
-    pathTable = D_L01_001FE180[*(s32 *)(vars + 0x74)];
+    path_table = D_L01_001FE180[*(s32 *)(vars + 0x74)];
     *(s32 *)(vars + 0x78) =
-        AdvancePointAlongPolyline(moby, pathTable, moby + 0x10, *(s32 *)(vars + 0x78), 1,
-                          *(f32 *)(launcherVars + 0x20) * 0.016666668f);
+        AdvancePointAlongPolyline(moby, path_table, moby + 0x10, *(s32 *)(vars + 0x78), 1,
+                          *(f32 *)(launcher_vars + 0x20) * 0.016666668f);
     if (*(f32 *)(moby + 0x18) < *(f32 *)(vars + 0x68)) {
         if (!(*(u16 *)(vars + 0x7C) & 0x80)) {
             PlayMobySound(1, 0, moby);
@@ -33,15 +33,15 @@ void launched_projectile_update(u8 *moby)
         }
         g_moby_l01_table[(*(s32 *)(*(u8 **)(*(u8 **)(vars + 0x70) + 0x68) + 0xC) << 8) + 0xBC] = 1;
     }
-    soundHandle = g_sound_state + *(s16 *)(vars + 0x7E) * 0x70;
-    if (*(u8 **)(soundHandle + 0x88) != moby || soundHandle[0x74] == 0)
+    sound_handle = g_sound_state + *(s16 *)(vars + 0x7E) * 0x70;
+    if (*(u8 **)(sound_handle + 0x88) != moby || sound_handle[0x74] == 0)
         *(s16 *)(vars + 0x7E) = PlayMobySound(0, 4, moby);
-    if (*(s32 *)(vars + 0x78) == *(s32 *)pathTable - 1) {
+    if (*(s32 *)(vars + 0x78) == *(s32 *)path_table - 1) {
         g_moby_l01_table[(*(s32 *)(*(u8 **)(*(u8 **)(vars + 0x70) + 0x68) + 0xC) << 8) + 0xBC] = 0;
         moby_mark_spawned(moby);
     } else {
-        FastVecSub(moveDelta, moby + 0x10, vars + 0x60);
-        mat_combine_and_store(vars + 0x20, moveDelta, moby + 0xF0, moby + 0xF0);
+        FastVecSub(move_delta, moby + 0x10, vars + 0x60);
+        mat_combine_and_store(vars + 0x20, move_delta, moby + 0xF0, moby + 0xF0);
         qcopy(vars + 0x60, moby + 0x10);
     }
 }

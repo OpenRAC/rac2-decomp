@@ -35,7 +35,7 @@ void burst_debris_update(char *moby)
 {
     float velocity[4] __attribute__((aligned(16)));
     int i;
-    float childParamA, childParamB;
+    float child_param_a, child_param_b;
     char *child;
 
     switch (*(unsigned char *)(moby + 0x20)) {
@@ -58,9 +58,9 @@ void burst_debris_update(char *moby)
             velocity[1] = math_random_float_range(D_L07_001B0C00[1], D_L07_001B0C00[5]) * 0.016666667f;
             velocity[2] = math_random_float_range(D_L07_001B0C00[2], D_L07_001B0C00[6]) * 0.016666667f;
             matrix_mul_vec3(velocity, velocity, moby + 0xC0);
-            childParamA = math_random_signed_float_range(D_L07_001B0C30[0], D_L07_001B0C30[1]);
-            childParamB = math_random_float_range(D_L07_001B0C30_gp[2], D_L07_001B0C30[3]);
-            child = cam_moby_create(moby, 2, *(short *)(moby + 0xAA), i, moby + 0x10, moby + 0xF0, velocity, 255, childParamA, childParamB);
+            child_param_a = math_random_signed_float_range(D_L07_001B0C30[0], D_L07_001B0C30[1]);
+            child_param_b = math_random_float_range(D_L07_001B0C30_gp[2], D_L07_001B0C30[3]);
+            child = cam_moby_create(moby, 2, *(short *)(moby + 0xAA), i, moby + 0x10, moby + 0xF0, velocity, 255, child_param_a, child_param_b);
             if (child) {
                 *(void (**)(char *))(child + 0x64) = burst_debris_update;
                 *(unsigned short *)(child + 0x34) |= 0x2000;

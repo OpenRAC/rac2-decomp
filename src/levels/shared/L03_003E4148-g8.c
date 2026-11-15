@@ -18,32 +18,32 @@ extern void draw_world_quad(void *,void *,int);
 extern u32 FastTweenColor(u32,u32,float);
 extern void lerp_vector(void *,void *,void *,float);
 /* Draws a curved glowing strip between two points on the puzzle ball, fading from one colour to another. */
-void path_puzzle_draw_link_strip(u8 *moby,u32 startColor,u32 endColor,void *startPoint,void *endPoint,float phase,int innerColor)
+void path_puzzle_draw_link_strip(u8 *moby,u32 start_color,u32 end_color,void *start_point,void *end_point,float phase,int innerColor)
 {
- Packet packet,innerPacket; Vec matrix[4],axis,step,quat,rotation[3];
+ Packet packet,inner_packet; Vec matrix[4],axis,step,quat,rotation[3];
  float distance,angle,dt,shrink; int count,i,j,segment;
  gfx_init_quad_packet_state(&packet,D_L03_001B0C1C,0,128);
  copy_matrix_rotation(matrix,moby+0xc0);qcopy(matrix[3],moby+0x10);
- FastVecCross(axis,startPoint,endPoint);count=1;distance=FastVecDot(startPoint,endPoint);
+ FastVecCross(axis,start_point,end_point);count=1;distance=FastVecDot(start_point,end_point);
  angle=FastVecLength(axis);distance=mat_fast_helper_a(distance,angle);
  {int n=FloatToInt(distance*11.45915412902832f);int z=0;if(n>z)count=n;}
  distance/=count;distance*=0.5f;
  vec_scale_to_length(quat,axis,math_fast_sin_or_cos_b(distance));quat[3]=math_fast_sin_or_cos_a(distance);
  quaternion_to_rotation_basis(quat,rotation);vec_scale_to_length(step,axis,D_L03_001B0C20);
  for(i=0;i<4;i++){
-  packet.color[i]=startColor;packet.uv[i][0]=D_L03_001B0C28[i*2]+phase;packet.uv[i][1]=D_L03_001B0C2C[i*2];
-  vec_scale_to_length(packet.v[i],startPoint,D_L03_001B0C24);
+  packet.color[i]=start_color;packet.uv[i][0]=D_L03_001B0C28[i*2]+phase;packet.uv[i][1]=D_L03_001B0C2C[i*2];
+  vec_scale_to_length(packet.v[i],start_point,D_L03_001B0C24);
   if(i&1)FastVecAdd(packet.v[i],packet.v[i],step);else FastVecSub(packet.v[i],packet.v[i],step);
   packet.v[i][3]=1.0f;
  }
  matrix_mul_vec3(packet.v[2],packet.v[2],rotation);matrix_mul_vec3(packet.v[3],packet.v[3],rotation);
  phase=0;dt=1.0f/count;
- if(innerColor){innerPacket=packet;{int k;for(k=3;k>=0;k--)innerPacket.color[k]=innerColor;}}
+ if(innerColor){inner_packet=packet;{int k;for(k=3;k>=0;k--)inner_packet.color[k]=innerColor;}}
  for(segment=0;segment<count;segment++){
-  packet.color[0]=packet.color[1]=FastTweenColor(startColor,endColor,phase);phase+=dt;
-  packet.color[2]=packet.color[3]=FastTweenColor(startColor,endColor,phase);
+  packet.color[0]=packet.color[1]=FastTweenColor(start_color,end_color,phase);phase+=dt;
+  packet.color[2]=packet.color[3]=FastTweenColor(start_color,end_color,phase);
   draw_world_quad(&packet,matrix,0);
-  if(innerColor){shrink=math_random_float_range(0.3f,0.9f);lerp_vector(innerPacket.v[2],packet.v[2],packet.v[3],shrink);lerp_vector(innerPacket.v[3],packet.v[2],packet.v[3],shrink-0.2f);draw_world_quad(&innerPacket,matrix,0);{int k;for(k=0;k<2;k++)qcopy(innerPacket.v[k],innerPacket.v[k+2]);}}
+  if(innerColor){shrink=math_random_float_range(0.3f,0.9f);lerp_vector(inner_packet.v[2],packet.v[2],packet.v[3],shrink);lerp_vector(inner_packet.v[3],packet.v[2],packet.v[3],shrink-0.2f);draw_world_quad(&inner_packet,matrix,0);{int k;for(k=0;k<2;k++)qcopy(inner_packet.v[k],inner_packet.v[k+2]);}}
   {Vec *v=packet.v;for(j=3;j>=0;j--){matrix_mul_vec3(*v,*v,rotation);v++;}}
  }
 }

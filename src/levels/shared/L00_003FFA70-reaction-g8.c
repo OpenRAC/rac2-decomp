@@ -161,13 +161,13 @@ void charging_weapon_update(char *object)
                 }
             }
             if (list[i] && B(list[i], 32) != 254 && B(list[i], 32) != 253) {
-                if (*(short *)(list[i] + 0xaa) == 0xa8d /* Swamp Monster I Arm */) {
+                if (*(short *)(list[i] + 0xaa) == MOBY_CLASS_SWAMP_MONSTER_I_ARM) {
                     B(list[i], 0x95) = 9;
                 }
-                if (*(short *)(list[i] + 0xaa) == 0xa8e /* Swamp Monster I Eye */) {
+                if (*(short *)(list[i] + 0xaa) == MOBY_CLASS_SWAMP_MONSTER_I_EYE) {
                     B(list[i], 0x95) = 7;
                 }
-                if (*(short *)(list[i] + 0xaa) == 0x1002 /* Desert Dune Monster */) {
+                if (*(short *)(list[i] + 0xaa) == MOBY_CLASS_DESERT_DUNE_MONSTER) {
                     B(list[i], 32) = 7;
                 }
             }

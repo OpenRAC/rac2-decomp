@@ -58,7 +58,7 @@ void glowing_orb_update(UpdateObject *object)
     UpdateContext *ctx=object->context;
     UpdateObject *hero_object=g_hero_state.field1220;
     float fraction;
-    if((!hero_object || hero_object->classId!=0xC0 /* Bomb Glove */) && !object->state) { moby_mark_spawned(object); return; }
+    if((!hero_object || hero_object->classId!=MOBY_CLASS_BOMB_GLOVE) && !object->state) { moby_mark_spawned(object); return; }
     if(g_hero_state.field22b4 && !object->state) { moby_mark_spawned(object); return; }
     if((g_hero_state.field22b5 || g_hero_state.field22bf) && !object->state) object->flags|=0x41;
     else object->flags&=~0x41;

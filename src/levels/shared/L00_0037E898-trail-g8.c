@@ -70,7 +70,7 @@ char *miniturret_spawn_shot(Vector4 *position, Vector4 *velocity)
 {
     Vector4 direction, forward, quaternion, axis;
     Vector4 rotation[3];
-    char *object = CreateMoby(0x1366 /* Miniturret */);
+    char *object = CreateMoby(MOBY_CLASS_MINITURRET);
     TrailWork *work;
     float angle;
     if (object) {
@@ -122,7 +122,7 @@ char *megaturret_spawn_shot(void *owner, Vector4 *position, Vector4 *velocity)
 {
     Vector4 direction, forward, quaternion, axis;
     Vector4 rotation[3];
-    char *object = CreateMoby(0x1367 /* Megaturret */);
+    char *object = CreateMoby(MOBY_CLASS_MEGATURRET);
     TrailWork *work;
     float angle;
     if (object) {

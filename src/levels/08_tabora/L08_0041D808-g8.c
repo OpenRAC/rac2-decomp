@@ -172,8 +172,8 @@ int DrawLevelStatusHud(void)
     struct Palette { unsigned int a,b; } palette;
     char text[64];
     int hero = (int)g_hero_state;
-    unsigned char *heroMoby = *(unsigned char **)(hero + 0x1830);
-    unsigned char *vars = *(unsigned char **)(heroMoby + 0x68);
+    unsigned char *hero_moby = *(unsigned char **)(hero + 0x1830);
+    unsigned char *vars = *(unsigned char **)(hero_moby + 0x68);
     int mask = -1;
 
     if (*(float *)(hero + 0x183C) < *(float *)(hero + 0x1840) * 0.25f)
@@ -244,7 +244,7 @@ int DrawLevelStatusHud(void)
         if (*(short *)(vars + 0x8E)) {
             float ratio, scale, alpha;
             int color;
-            if (*(short *)(vars + 0x8E) == 1) snd_play_from_class_bank(3,0,heroMoby,0x85C);
+            if (*(short *)(vars + 0x8E) == 1) snd_play_from_class_bank(3,0,hero_moby,0x85C);
             ratio = IntToFloat(180-*(short *)(vars + 0x8E)) / IntToFloat(180);
             scale = D_L08_001B1ABC + (D_L08_001B1AC0-D_L08_001B1AAC)*math_ease_out_quad(ratio);
             alpha = IntegerPower(3,1.0f-ratio)*127.0f;
@@ -324,7 +324,7 @@ int DrawLevelStatusHud(void)
                 hud_draw_sprite_gradient(tex,x,y,a,b,colors);
             }
         }
-        radar_draw(heroMoby);
+        radar_draw(hero_moby);
     }
     gfx_append_vectors_to_packet(2,0x47,0x5340B,0x42,0x8000000044ULL);
     *(float *)(vars + 0x68)=1000000.0f;

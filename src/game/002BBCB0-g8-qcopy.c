@@ -16,7 +16,7 @@ char *part_spawn_firework_spark(void *pos,void *velocity,int color,int endcolor,
 {
     char *particle; MotionBCB0 *motion;
     float scatter[4] __attribute__((aligned(16)));
-    float randomDir[4] __attribute__((aligned(16)));
+    float random_dir[4] __attribute__((aligned(16)));
     if(!life) return 0;
     {
         if ((D_001B168C>0.85f || D_001B1690>0.85f) && !math_random_int_below(3)) return 0;
@@ -34,11 +34,11 @@ char *part_spawn_firework_spark(void *pos,void *velocity,int color,int endcolor,
         motion=(MotionBCB0 *)(particle+32);
         particle[8]=func_001163B0();
         particle[2]=D_001F256C[0][0];
-        *(TI128 *)randomDir=0;
-        randomDir[0]=math_random_float_range(-1.0f,1.0f);
-        randomDir[1]=math_random_float_range(-1.0f,1.0f);
-        randomDir[2]=math_random_float_range(-1.0f,1.0f);
-        *(TI128 *)scatter=*(TI128 *)randomDir;
+        *(TI128 *)random_dir=0;
+        random_dir[0]=math_random_float_range(-1.0f,1.0f);
+        random_dir[1]=math_random_float_range(-1.0f,1.0f);
+        random_dir[2]=math_random_float_range(-1.0f,1.0f);
+        *(TI128 *)scatter=*(TI128 *)random_dir;
         vec_scale_to_length(scatter,scatter,jitter);
         FastVecAdd(motion,velocity,scatter);
         motion->v[3]=jitter*0.75f;

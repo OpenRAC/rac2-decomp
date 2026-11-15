@@ -33,34 +33,34 @@ extern f32 ref_L04_003A0C40_03;
 void water_fill_grid_points(void *origin) {
     s32 row;
     s32 col;
-    f32 *srcPtr;
-    f32 *outPtr;
-    f32 srcVal;
-    f32 xPos;
-    f32 yPos;
-    s32 nextRow;
+    f32 *src_ptr;
+    f32 *out_ptr;
+    f32 src_val;
+    f32 x_pos;
+    f32 y_pos;
+    s32 next_row;
 
-    outPtr = (f32 *)0x70002000;
+    out_ptr = (f32 *)0x70002000;
     row = 0;
-    yPos = (*(f32 *)((s8 *)(origin) + (4))) + ref_L04_003A0C40_01;
+    y_pos = (*(f32 *)((s8 *)(origin) + (4))) + ref_L04_003A0C40_01;
     do {
-        nextRow = row + 1;
-        xPos = (*(f32 *)((s8 *)(origin) + (0))) + ref_L04_003A0C40_00;
-        srcPtr = (f32 *)((s8 *)0x70000010 + nextRow * 0x60);
+        next_row = row + 1;
+        x_pos = (*(f32 *)((s8 *)(origin) + (0))) + ref_L04_003A0C40_00;
+        src_ptr = (f32 *)((s8 *)0x70000010 + next_row * 0x60);
         col = 0x10;
         do {
-            *outPtr = xPos;
+            *out_ptr = x_pos;
             col -= 1;
-            outPtr += 1;
-            *outPtr = yPos;
-            outPtr += 1;
-            srcVal = *srcPtr;
-            srcPtr += 1;
-            *outPtr = srcVal + (*(f32 *)((s8 *)(origin) + (8)));
-            outPtr += 1;
-            xPos += ref_L04_003A0C40_02;
+            out_ptr += 1;
+            *out_ptr = y_pos;
+            out_ptr += 1;
+            src_val = *src_ptr;
+            src_ptr += 1;
+            *out_ptr = src_val + (*(f32 *)((s8 *)(origin) + (8)));
+            out_ptr += 1;
+            x_pos += ref_L04_003A0C40_02;
         } while (col >= 0);
-        row = nextRow;
-        yPos += ref_L04_003A0C40_03;
+        row = next_row;
+        y_pos += ref_L04_003A0C40_03;
     } while (row < 0x11);
 }

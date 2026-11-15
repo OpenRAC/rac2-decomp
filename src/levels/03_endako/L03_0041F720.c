@@ -35,7 +35,7 @@ void object_group_pulse_colors(u8 *moby)
     u8 *state = *(u8 **)(moby + 0x68);
     u16 *p;
     u8 *member;
-    u8 *memberVars;
+    u8 *member_vars;
 
     switch (moby[0x20]) {
     case 0:
@@ -53,10 +53,10 @@ void object_group_pulse_colors(u8 *moby)
                 if (member == 0)
                     break;
                 *(u16 *)(member + 0x34) |= 0x10;
-                memberVars = *(u8 **)(member + 0x68);
-                *(s32 *)(memberVars + 4) = 0x80A0A0A0;
-                *(s32 *)(memberVars + 8) = 0x80000000;
-                *(f32 *)(memberVars + 0xC) = math_fast_float_g((f32)(*(s32 *)memberVars * 30) * 0.017453294f);
+                member_vars = *(u8 **)(member + 0x68);
+                *(s32 *)(member_vars + 4) = 0x80A0A0A0;
+                *(s32 *)(member_vars + 8) = 0x80000000;
+                *(f32 *)(member_vars + 0xC) = math_fast_float_g((f32)(*(s32 *)member_vars * 30) * 0.017453294f);
                 *(u16 *)(member + 0x32) = 0x1FF;
                 member[0x30] = 0xFF;
             }
@@ -71,11 +71,11 @@ void object_group_pulse_colors(u8 *moby)
             member = D_L03_001B2A1C[0] + ((*p & 0x7FFF) << 8);
             if (member == 0)
                 break;
-            memberVars = *(u8 **)(member + 0x68);
-            *(f32 *)(memberVars + 0xC) = FastAddRotations(*(f32 *)(memberVars + 0xC), *(f32 *)(state + 4));
+            member_vars = *(u8 **)(member + 0x68);
+            *(f32 *)(member_vars + 0xC) = FastAddRotations(*(f32 *)(member_vars + 0xC), *(f32 *)(state + 4));
             *(s32 *)(member + 0x78) =
-                FastTweenColor(*(s32 *)(memberVars + 4), *(s32 *)(memberVars + 8),
-                              math_fast_sin_or_cos_b(*(f32 *)(memberVars + 0xC)) * 0.5f + 0.5f);
+                FastTweenColor(*(s32 *)(member_vars + 4), *(s32 *)(member_vars + 8),
+                              math_fast_sin_or_cos_b(*(f32 *)(member_vars + 0xC)) * 0.5f + 0.5f);
         }
         break;
     }

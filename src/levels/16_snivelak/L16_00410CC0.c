@@ -16,32 +16,32 @@ extern float vec_distance_xy(void *, void *);
    measured pair in the handle and the winning row in the handle's second half. */
 void snivelak_find_closest_path_point(u8 *moby, u8 *point)
 {
-    TI128 bestPoint;
+    TI128 best_point;
     TI128 work;
     u32 *vars;
     u8 *path;
     s32 next;
-    u8 *bestOut;
+    u8 *best_out;
     f32 best;
     f32 along;
     f32 dist;
     s32 row;
     s32 count;
     s16 neighbor;
-    s16 *rowPtr;
+    s16 *row_ptr;
 
     vars = *(u32 **)(moby + 0x68);
     best = 2001.0f;
     path = *(u8 **)(D_L16_001FE7C0 + vars[92]);
-    qcopy(&bestPoint, point);
-    bestOut = (u8 *)vars + 0x200;
+    qcopy(&best_point, point);
+    best_out = (u8 *)vars + 0x200;
     for (row = 0; row < 8; row = next) {
         count = 0;
         neighbor = D_L16_001B1710.row[row][0];
         next = row + 1;
         if (neighbor == -1)
             continue;
-        rowPtr = D_L16_001B1710.row[row];
+        row_ptr = D_L16_001B1710.row[row];
         do {
             if (neighbor >= row) {
                 along = math_closest_point_on_segment(&work, path + (row * 16 + 0x10), path + (neighbor * 16 + 0x10), point);
@@ -51,17 +51,17 @@ void snivelak_find_closest_path_point(u8 *moby, u8 *point)
                     vars[0x7E] = neighbor;
                     *(f32 *)((u8 *)vars + 0x1FC) = along;
                     vars[0x7D] = row;
-                    qcopy(&bestPoint, &work);
+                    qcopy(&best_point, &work);
                 }
             }
             count++;
-            rowPtr++;
+            row_ptr++;
             if (count >= 4)
                 break;
-            neighbor = *rowPtr;
+            neighbor = *row_ptr;
         } while (neighbor != -1);
     }
-    qcopy(bestOut, &bestPoint);
+    qcopy(best_out, &best_point);
 }
 
 /* Picks which two path points the boss should walk between next when it has moved onto a different part of the path. */

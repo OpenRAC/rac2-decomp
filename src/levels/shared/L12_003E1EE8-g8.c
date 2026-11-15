@@ -14,7 +14,7 @@ extern float coll_probe_ground_height_below(void *, int, float);
 /* Moves the enemy along a path toward the next point and says when it has reached the end. */
 int AdvanceAlongPath(u8 *moby, u8 *route) {
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *homePath = *(u8 **)(D_L12_001FEAC0 + (*(s32 *)(vars + 0x158) << 2));
+    u8 *home_path = *(u8 **)(D_L12_001FEAC0 + (*(s32 *)(vars + 0x158) << 2));
     float entry[4];
     float dir[4];
     float rot[4];
@@ -27,7 +27,7 @@ int AdvanceAlongPath(u8 *moby, u8 *route) {
         src += 0x10;
     }
     else
-        src = homePath + 0x10;
+        src = home_path + 0x10;
     qcopy(entry, src);
     if (*(s32 *)(vars + 0x168) > 0) {
         FastVecSub(rot, route + ((*(s32 *)(vars + 0x168) << 4) + 0x10),
@@ -38,7 +38,7 @@ int AdvanceAlongPath(u8 *moby, u8 *route) {
             vec_scale_to_length(dir, dir, D_L12_001B0B10 * 0.016666668f);
         FastVecAdd(moby + 0x10, moby + 0x10, dir);
     } else {
-        FastVecSub(rot, homePath + 0x10, route + (*(s32 *)route << 4));
+        FastVecSub(rot, home_path + 0x10, route + (*(s32 *)route << 4));
         *(qword *)dir = *(qword *)rot;
         len = FastVecLength(dir);
         if (D_L12_001B0B10 * 0.016666668f < len)
@@ -46,19 +46,19 @@ int AdvanceAlongPath(u8 *moby, u8 *route) {
         FastVecAdd(moby + 0x10, moby + 0x10, dir);
     }
     if (fast_vec_dist(moby + 0x10, entry) <= 0.5f) {
-        s32 pointIndex = *(s32 *)(vars + 0x168);
+        s32 point_index = *(s32 *)(vars + 0x168);
 
-        if (pointIndex == -1)
+        if (point_index == -1)
             return 1;
-        if (*(s32 *)route - 1 == pointIndex) {
-            float groundHeight;
+        if (*(s32 *)route - 1 == point_index) {
+            float ground_height;
 
             *(s32 *)(vars + 0x168) = -1;
-            groundHeight = coll_probe_ground_height_below(homePath + 0x10, 0, 0.5f);
-            if (*(float *)(homePath + 0x18) - groundHeight < 10.0f)
-                *(float *)(homePath + 0x18) = groundHeight + 0.5f;
+            ground_height = coll_probe_ground_height_below(home_path + 0x10, 0, 0.5f);
+            if (*(float *)(home_path + 0x18) - ground_height < 10.0f)
+                *(float *)(home_path + 0x18) = ground_height + 0.5f;
         } else {
-            *(s32 *)(vars + 0x168) = pointIndex + 1;
+            *(s32 *)(vars + 0x168) = point_index + 1;
         }
     }
     return 0;

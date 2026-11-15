@@ -49,10 +49,10 @@ void RenderTwoLayerEffectStrip(char *object)
     char *base, *point;
     int i;
     unsigned int innerA, innerB, outerA, outerB;
-    float fade, step, stripRatio, zero, scroll;
+    float fade, step, strip_ratio, zero, scroll;
     if (*(short *)(state + 0x20) <= 1 || *(short *)(state + 0x22) == 0)
         return;
-    base = *(char **)(level_get_slot_body(0xC04 /* Vaporizer */, *(short *)(state + 0x1A)) + *(short *)(state + 0x18) * 4);
+    base = *(char **)(level_get_slot_body(MOBY_CLASS_VAPORIZER, *(short *)(state + 0x1A)) + *(short *)(state + 0x18) * 4);
     gfx_init_quad_packet_state((QuadPacket *)&inner, D_L00_001B0974, 1, 0x80);
     scroll = D_L00_001B096C;
     inner.tex.uv[0] = 0.0f;
@@ -103,9 +103,9 @@ void RenderTwoLayerEffectStrip(char *object)
         FastVecScale(&offset, &offset, D_L00_001B0968);
         FastVecAdd(&outer.vertices[2], point, &offset);
         FastVecSub(&outer.vertices[3], point, &offset);
-        stripRatio = IntToFloat(i) * step;
-        inner.colors[2] = inner.colors[3] = FastTweenColor(innerA, innerB, stripRatio);
-        outer.colors[2] = outer.colors[3] = FastTweenColor(outerA, outerB, stripRatio);
+        strip_ratio = IntToFloat(i) * step;
+        inner.colors[2] = inner.colors[3] = FastTweenColor(innerA, innerB, strip_ratio);
+        outer.colors[2] = outer.colors[3] = FastTweenColor(outerA, outerB, strip_ratio);
         draw_world_quad(&inner, 0, 0);
         draw_world_quad(&outer, 0, 0);
         qcopy(&inner.vertices[0], &inner.vertices[2]);

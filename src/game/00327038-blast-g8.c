@@ -125,7 +125,7 @@ void blast_update(Blast *self)
                 for (; i < count; i++) {
                     if ((*(unsigned long long *)((char *)list[i] + 0x30) & 0x500000000000ULL) &&
                         (char *)list[i] != g_hero_state.object &&
-                        *(short *)((char *)list[i] + 0xAA) != 3303 /* moby class 3303 */ && *(short *)((char *)list[i] + 0xAA) != 3000 /* Space Tourist */) {
+                        *(short *)((char *)list[i] + 0xAA) != 3303 /* moby class 3303 */ && *(short *)((char *)list[i] + 0xAA) != MOBY_CLASS_SPACE_TOURIST) {
                         FastVecSub(v, (char *)list[i] + 0x10, &g_hero_state.pos);
                         vec_scale_to_length(v, v, 1.0f);
                         vec_scale_to_length(info, info, 1.0f);

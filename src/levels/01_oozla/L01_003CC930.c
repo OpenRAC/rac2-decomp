@@ -92,14 +92,14 @@ extern void swamp_monster_test_attack_segment_hits_hero(u8 *, void *, void *, u8
 /* Updates the swamp monster arm. It reaches for the hero, swings and sparks on a hit, then goes back to rest. */
 void swamp_monster_arm_update(u8 *moby)
 {
-    f32 vecA[4];
-    f32 vecB[4];
-    f32 vecC[4];
-    f32 vecD[4];
-    f32 vecE[4];
-    f32 vecF[4];
-    f32 vecG[4];
-    f32 vecH[4];
+    f32 vec_a[4];
+    f32 vec_b[4];
+    f32 vec_c[4];
+    f32 vec_d[4];
+    f32 vec_e[4];
+    f32 vec_f[4];
+    f32 vec_g[4];
+    f32 vec_h[4];
     u8 *vars = 0;
     u8 *e1 = 0;
     u8 *e2 = 0;
@@ -119,7 +119,7 @@ void swamp_monster_arm_update(u8 *moby)
     s32 a = 0;
     s32 b = 0;
     s32 c = 0;
-    f32 animFrame = 0.0f;
+    f32 anim_frame = 0.0f;
     f32 f5 = 0.0f;
     f32 f6a = 0.0f;
     f32 f6 = 0.0f;
@@ -130,8 +130,8 @@ void swamp_monster_arm_update(u8 *moby)
     f32 dir6b = 0.0f;
     u8 *e0 = 0;
     u8 *e3 = 0;
-    u8 *heroTarget = 0;
-    u8 *heroTarget6 = 0;
+    u8 *hero_target = 0;
+    u8 *hero_target6 = 0;
     s32 level = 0;
     f32 rnd = 0.0f;
     f32 ra = 0.0f;
@@ -279,31 +279,31 @@ void swamp_monster_arm_update(u8 *moby)
             qcopy(vars + 0x90, vars + 0x80);
             tgt5 = vars + 0x90;
         }
-        heroTarget = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
-        if (*(u8 **)(vars + 0x70) == heroTarget) {
-            func_002E34E0(vecA, &((Hero *)g_hero_state)->b[0x110], D_L01_001B0390);
-            func_002E3470(vecA, vecA, *(u8 **)(vars + 0x70) + 0x10);
+        hero_target = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
+        if (*(u8 **)(vars + 0x70) == hero_target) {
+            func_002E34E0(vec_a, &((Hero *)g_hero_state)->b[0x110], D_L01_001B0390);
+            func_002E3470(vec_a, vec_a, *(u8 **)(vars + 0x70) + 0x10);
         } else {
-            qcopy(vecA, *(u8 **)(vars + 0x70) + 0x10);
+            qcopy(vec_a, *(u8 **)(vars + 0x70) + 0x10);
         }
         pos5 = moby + 0x10;
-        func_002E34A0(vecB, tgt5, pos5);
-        func_002E34E0(vecB, vecB, 0.05f);
-        func_002E37D0(vecB, vecB, 0.050000004f);
-        vecB[2] = 0.0f;
-        func_002E3470(pos5, pos5, vecB);
+        func_002E34A0(vec_b, tgt5, pos5);
+        func_002E34E0(vec_b, vec_b, 0.05f);
+        func_002E37D0(vec_b, vec_b, 0.050000004f);
+        vec_b[2] = 0.0f;
+        func_002E3470(pos5, pos5, vec_b);
         dir5a = 0.09599312f;
         if (vars[0xDD] != 0)
             dir5a = -0.09599312f;
         yaw5a = func_002E4460(*(f32 *)(moby + 0xF8), dir5a);
         *(f32 *)(moby + 0xF8) = yaw5a;
-        f5 = func_002E3B10(vecA[0] - *(f32 *)(moby + 0x10), vecA[1] - *(f32 *)(moby + 0x14));
+        f5 = func_002E3B10(vec_a[0] - *(f32 *)(moby + 0x10), vec_a[1] - *(f32 *)(moby + 0x14));
         func_00310D28(moby, vars + 0xCC, f5, 0.002327106f, 0.1f, 0.13962637f);
         if (moby[0x60] & 2)
             *(f32 *)(moby + 0x48) = func_00310580(0.8f, 1.2f);
         if (D_L01_001A8F40 != 2 && ((Hero *)g_hero_state)->i[0x2294 / 4] != 0x6F && *(s32 *)(vars + 0xC4) == 0 &&
             (moby[0x21] == 0xFF || **(s32 **)(vars + 0xD8) <= 0) && func_002E3650(pos5, vars + 0x60) < 35.0f &&
-            (f5 = func_002E3B10(vecA[0] - *(f32 *)(moby + 0x10), vecA[1] - *(f32 *)(moby + 0x14)),
+            (f5 = func_002E3B10(vec_a[0] - *(f32 *)(moby + 0x10), vec_a[1] - *(f32 *)(moby + 0x14)),
              func_002E4548(*(f32 *)(moby + 0xF8), f5) < 0.034906588f)) {
             vars[0xDC] = 1;
             if (moby[0x21] != 0xFF)
@@ -326,56 +326,56 @@ void swamp_monster_arm_update(u8 *moby)
         break;
     case 6:
         pos6 = moby + 0x10;
-        animFrame = func_00306448(moby);
-        func_002E34A0(vecA, vars + 0x90, pos6);
-        func_002E34E0(vecA, vecA, 0.05f);
-        func_002E37D0(vecA, vecA, 0.050000004f);
-        vecA[2] = 0.0f;
-        func_002E3470(pos6, pos6, vecA);
-        if (animFrame > 46.0f && animFrame < 56.0f) {
+        anim_frame = func_00306448(moby);
+        func_002E34A0(vec_a, vars + 0x90, pos6);
+        func_002E34E0(vec_a, vec_a, 0.05f);
+        func_002E37D0(vec_a, vec_a, 0.050000004f);
+        vec_a[2] = 0.0f;
+        func_002E3470(pos6, pos6, vec_a);
+        if (anim_frame > 46.0f && anim_frame < 56.0f) {
             for (i1 = 1; i1 < 8; i1++) {
-                func_00307390(moby, i1, vecB);
-                func_00307390(moby, i1 + 1, vecD);
-                func_002E3738(vecF, moby + 0xD0, 0.3f);
-                func_002E3738(vecG, moby + 0xD0, 0.3f);
-                func_002E3470(vecC, vecB, vecF);
-                func_002E3470(vecE, vecD, vecG);
-                func_002E34A0(vecB, vecB, vecF);
-                func_002E34A0(vecD, vecD, vecG);
-                swamp_monster_test_attack_segment_hits_hero(moby, vecB, vecD, vars[0x34], vars + 0xDE);
-                swamp_monster_test_attack_segment_hits_hero(moby, vecC, vecE, vars[0x34], vars + 0xDE);
+                func_00307390(moby, i1, vec_b);
+                func_00307390(moby, i1 + 1, vec_d);
+                func_002E3738(vec_f, moby + 0xD0, 0.3f);
+                func_002E3738(vec_g, moby + 0xD0, 0.3f);
+                func_002E3470(vec_c, vec_b, vec_f);
+                func_002E3470(vec_e, vec_d, vec_g);
+                func_002E34A0(vec_b, vec_b, vec_f);
+                func_002E34A0(vec_d, vec_d, vec_g);
+                swamp_monster_test_attack_segment_hits_hero(moby, vec_b, vec_d, vars[0x34], vars + 0xDE);
+                swamp_monster_test_attack_segment_hits_hero(moby, vec_c, vec_e, vars[0x34], vars + 0xDE);
             }
-            func_00307390(moby, 6, vecB);
-            qcopy(vecC, vecB);
-            vecB[2] += 0.5f;
-            vecD[2] += 2.0f;
-            vecC[2] += 2.0f;
-            vecE[2] += 0.5f;
-            swamp_monster_test_attack_segment_hits_hero(moby, vecB, vecD, vars[0x34], vars + 0xDE);
-            swamp_monster_test_attack_segment_hits_hero(moby, vecC, vecE, vars[0x34], vars + 0xDE);
+            func_00307390(moby, 6, vec_b);
+            qcopy(vec_c, vec_b);
+            vec_b[2] += 0.5f;
+            vec_d[2] += 2.0f;
+            vec_c[2] += 2.0f;
+            vec_e[2] += 0.5f;
+            swamp_monster_test_attack_segment_hits_hero(moby, vec_b, vec_d, vars[0x34], vars + 0xDE);
+            swamp_monster_test_attack_segment_hits_hero(moby, vec_c, vec_e, vars[0x34], vars + 0xDE);
         }
-        if (animFrame >= 56.0f && vars[0xDE] == 0) {
+        if (anim_frame >= 56.0f && vars[0xDE] == 0) {
             func_00355780(2, 0, moby);
             vars[0xDE] = 1;
         }
         level = func_002D9308(moby[0xB0]);
         D_L01_001B03D0 = D_L01_001B03D8[level - 1];
-        if (animFrame < (f32)D_L01_001B03D0 &&
-            (animFrame < 20.0f || (((Hero *)g_hero_state)->i[0x340 / 4] != 0 && ((Hero *)g_hero_state)->h[0x34E / 2] == 0 &&
+        if (anim_frame < (f32)D_L01_001B03D0 &&
+            (anim_frame < 20.0f || (((Hero *)g_hero_state)->i[0x340 / 4] != 0 && ((Hero *)g_hero_state)->h[0x34E / 2] == 0 &&
                            ((Hero *)g_hero_state)->i[0x229C / 4] != 4))) {
             dir6a = 0.09599312f;
             if (vars[0xDD] != 0)
                 dir6a = -0.09599312f;
             yaw6a = func_002E4460(*(f32 *)(moby + 0xF8), dir6a);
             *(f32 *)(moby + 0xF8) = yaw6a;
-            heroTarget6 = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
-            if (*(u8 **)(vars + 0x70) == heroTarget6) {
-                func_002E34E0(vecB, &((Hero *)g_hero_state)->b[0x110], 55.0f - animFrame);
-                func_002E3470(vecB, vecB, *(u8 **)(vars + 0x70) + 0x10);
+            hero_target6 = ((Hero *)g_hero_state)->ptr[0x2290 / 4];
+            if (*(u8 **)(vars + 0x70) == hero_target6) {
+                func_002E34E0(vec_b, &((Hero *)g_hero_state)->b[0x110], 55.0f - anim_frame);
+                func_002E3470(vec_b, vec_b, *(u8 **)(vars + 0x70) + 0x10);
             } else {
-                qcopy(vecB, *(u8 **)(vars + 0x70) + 0x10);
+                qcopy(vec_b, *(u8 **)(vars + 0x70) + 0x10);
             }
-            f6a = func_002E3B10(vecB[0] - *(f32 *)(moby + 0x10), vecB[1] - *(f32 *)(moby + 0x14));
+            f6a = func_002E3B10(vec_b[0] - *(f32 *)(moby + 0x10), vec_b[1] - *(f32 *)(moby + 0x14));
             func_00310D28(moby, vars + 0xCC, f6a, 0.002327106f, 0.1f, 0.13962637f);
             dir6b = 0.09599312f;
             if (vars[0xDD] != 0)
@@ -383,46 +383,46 @@ void swamp_monster_arm_update(u8 *moby)
             yaw6b = func_002E44A8(*(f32 *)(moby + 0xF8), dir6b);
             *(f32 *)(moby + 0xF8) = yaw6b;
         }
-        if (animFrame > 55.0f && animFrame < 58.0f) {
-            if (animFrame <= 56.0f) {
+        if (anim_frame > 55.0f && anim_frame < 58.0f) {
+            if (anim_frame <= 56.0f) {
                 D_L01_001B9380.f160 = 0.2f;
                 D_L01_001B9380.i168 = 0x14;
                 D_L01_001B9380.i16C = 0;
             }
             f6 = *(f32 *)(moby + 0x18);
             for (i2 = 1; i2 < 8; i2++) {
-                func_00307390(moby, i2, vecB);
-                f6 = func_00311A00(vecB, 2, 0.5f);
+                func_00307390(moby, i2, vec_b);
+                f6 = func_00311A00(vec_b, 2, 0.5f);
                 mode6 = func_002D77E8();
                 if (mode6 != 3)
                     break;
             }
-            vecB[2] = f6;
-            func_00307390(moby, 8, vecC);
-            vecC[2] = f6;
-            func_002E34A0(vecC, vecC, vecB);
-            qzero(vecH);
-            vecH[3] = D_L01_001B03BC;
+            vec_b[2] = f6;
+            func_00307390(moby, 8, vec_c);
+            vec_c[2] = f6;
+            func_002E34A0(vec_c, vec_c, vec_b);
+            qzero(vec_h);
+            vec_h[3] = D_L01_001B03BC;
             for (j = 0; j < D_L01_001B03CC; j++) {
                 rnd = func_00310580(0.0f, 1.0f);
-                func_002E34E0(vecD, vecC, rnd);
-                func_00316348(vecD, 0.1f);
-                func_002E3470(vecD, vecD, vecB);
+                func_002E34E0(vec_d, vec_c, rnd);
+                func_00316348(vec_d, 0.1f);
+                func_002E3470(vec_d, vec_d, vec_b);
                 spinx = func_00310580(-(D_L01_001B03C4 * 0.016666668f), D_L01_001B03C4 * 0.016666668f);
-                func_002E3738(vecF, moby + 0xD0, spinx);
+                func_002E3738(vec_f, moby + 0xD0, spinx);
                 spiny = func_00310580(-(D_L01_001B03C8 * 0.016666668f), D_L01_001B03C8 * 0.016666668f);
-                func_002E3738(vecG, moby + 0xC0, spiny);
-                func_002E3470(vecE, vecF, vecG);
+                func_002E3738(vec_g, moby + 0xC0, spiny);
+                func_002E3470(vec_e, vec_f, vec_g);
                 rise = func_00310580(0.0f, D_L01_001B03C0 * 0.016666668f);
-                vecE[2] = rise;
-                vecE[3] = D_L01_001B03B8;
+                vec_e[2] = rise;
+                vec_e[3] = D_L01_001B03B8;
                 ra = func_00310580(D_L01_001B03A0, D_L01_001B03A4);
                 a = func_002E45B8(ra);
                 rb = func_00310580(D_L01_001B03A8, D_L01_001B03AC);
                 b = func_002E45B8(rb);
                 rc = func_00310580(D_L01_001B03B0, D_L01_001B03B4);
                 c = func_002E45B8(rc);
-                particle = func_00327360(vecD, vecE, vecH, D_L01_001B0398, D_L01_001B039C, a, b, c, -1);
+                particle = func_00327360(vec_d, vec_e, vec_h, D_L01_001B0398, D_L01_001B039C, a, b, c, -1);
                 if (particle != 0 && (func_001163B0() & 1))
                     particle[3] = 0x48;
             }
@@ -440,17 +440,17 @@ void swamp_monster_arm_update(u8 *moby)
     case 7:
         moby[0xA8] = 0xFF;
         pos7 = moby + 0x10;
-        func_002E3470(vecA, pos7, vars + 0xA0);
+        func_002E3470(vec_a, pos7, vars + 0xA0);
         tbl7a = D_L01_001FE180[*(s32 *)(vars + 0xB8)];
-        hit7 = func_00311B48(vecA, tbl7a + 0x10, *(s32 *)tbl7a);
+        hit7 = func_00311B48(vec_a, tbl7a + 0x10, *(s32 *)tbl7a);
         if (hit7 != 0) {
-            qcopy(pos7, vecA);
+            qcopy(pos7, vec_a);
         } else {
             tbl7b = D_L01_001FE180[*(s32 *)(vars + 0xB8)];
-            func_00337A60(pos7, vecA, tbl7b + 0x10, *(s32 *)tbl7b);
-            func_002E34A0(vecB, vars + 0x80, pos7);
-            func_002E3738(vecB, vecB, 0.033333335f);
-            func_002E3470(pos7, pos7, vecB);
+            func_00337A60(pos7, vec_a, tbl7b + 0x10, *(s32 *)tbl7b);
+            func_002E34A0(vec_b, vars + 0x80, pos7);
+            func_002E3738(vec_b, vec_b, 0.033333335f);
+            func_002E3470(pos7, pos7, vec_b);
         }
         f7 = func_002E35A0((vars + 0xA0)) - 0.0030555557f;
         if (f7 < 0.0f) {

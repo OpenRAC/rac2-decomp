@@ -180,17 +180,17 @@ extern void math_store_angle_update_result(int, float *, int, int, float);
 /* Moves a point sideways, by the distance given, relative to the current camera or view mode. */
 void cam_offset_point_by_side_direction(V4_F6a70b950 *out, V4_F6a70b950 *in, float scale)
 {
-    char *heroBase = D_00189E20_19;
-    unsigned char viewMode;
+    char *hero_base = D_00189E20_19;
+    unsigned char view_mode;
     float zero;
 
-    viewMode = *(unsigned char *)(heroBase + 8899);
+    view_mode = *(unsigned char *)(hero_base + 8899);
 
-    switch (viewMode) {
+    switch (view_mode) {
     case 0:
         *out = *in;
-        *(float *)out += func_00283180_6(*(float *)(*(int *)(heroBase + 8848) + 248)) * scale;
-        *(float *)((char *)out + 4) += func_00283198_6(*(float *)(*(int *)(heroBase + 8848) + 248)) * scale;
+        *(float *)out += func_00283180_6(*(float *)(*(int *)(hero_base + 8848) + 248)) * scale;
+        *(float *)((char *)out + 4) += func_00283198_6(*(float *)(*(int *)(hero_base + 8848) + 248)) * scale;
         break;
     case 1:
     case 2: {
@@ -201,7 +201,7 @@ void cam_offset_point_by_side_direction(V4_F6a70b950 *out, V4_F6a70b950 *in, flo
         v[0] = func_00283180_6(zero) * scale;
         v[1] = func_00283198_6(zero) * scale;
         v[2] = zero;
-        func_00283410_4(m, (char *)*(int *)(heroBase + 8848) + 240);
+        func_00283410_4(m, (char *)*(int *)(hero_base + 8848) + 240);
         func_002830C0_6(v, v, m);
         func_00282CC0_16(out, in, v);
         break;
@@ -213,24 +213,24 @@ void cam_offset_point_by_side_direction(V4_F6a70b950 *out, V4_F6a70b950 *in, flo
 /* Offsets a point by the given amount along the view height direction, turned by the current view mode. */
 void cam_offset_point_in_view_space(V4_Fe23fe324 *out, V4_Fe23fe324 *in, float amount)
 {
-    char *heroBase = D_00189E20_33;
-    unsigned char modeByte = heroBase[8899];
-    int viewMode = modeByte;
+    char *hero_base = D_00189E20_33;
+    unsigned char mode_byte = hero_base[8899];
+    int view_mode = mode_byte;
     float matrix[4][4];
     float offset[4];
 
-    if (viewMode == 0) {
+    if (view_mode == 0) {
         *out = *in;
         ((float *)out)[2] += amount;
         return;
     }
-    if (viewMode < 0)
+    if (view_mode < 0)
         return;
-    if (viewMode >= 3)
+    if (view_mode >= 3)
         return;
     func_00282C88_6(offset);
     offset[2] = amount;
-    func_00283410_10(matrix, *(int *)(heroBase + 8848) + 240);
+    func_00283410_10(matrix, *(int *)(hero_base + 8848) + 240);
     func_002830C0_11(offset, offset, matrix);
     func_00282CC0_37(out, in, offset);
 }
@@ -240,24 +240,24 @@ void cam_offset_point_in_view_space(V4_Fe23fe324 *out, V4_Fe23fe324 *in, float a
 void cam_project_vector_onto_view_plane(char *dst, char *src)
 {
     char projected[16];
-    char *heroBase;
+    char *hero_base;
     float dot;
 
-    heroBase = D_00189E20_14;
-    switch (*(unsigned char *)(heroBase + 8899)) {
+    hero_base = D_00189E20_14;
+    switch (*(unsigned char *)(hero_base + 8899)) {
     case 0:
         *(V4_Fc186f630 *)dst = *(V4_Fc186f630 *)src;
         *(int *)(dst + 8) = 0;
         break;
     case 1:
-        func_00282F20_5(projected, heroBase + 672, 1.0f);
+        func_00282F20_5(projected, hero_base + 672, 1.0f);
         dot = func_00282DB0_2(projected, src);
         func_00282D30_11(projected, projected, dot);
         func_00282CF0_8(dst, src, projected);
         break;
     case 2:
-        dot = func_00282DB0_2(heroBase + 704, src);
-        func_00282D30_11(projected, heroBase + 704, dot);
+        dot = func_00282DB0_2(hero_base + 704, src);
+        func_00282D30_11(projected, hero_base + 704, dot);
         func_00282CF0_8(dst, src, projected);
         break;
     }
@@ -270,16 +270,16 @@ float cam_get_view_space_vector_length(char *vec)
     char matrix[64];
     char inverse[64];
     char result[16];
-    unsigned char *heroBase = D_00189E20_4;
-    int viewMode = heroBase[8899];
+    unsigned char *hero_base = D_00189E20_4;
+    int view_mode = hero_base[8899];
 
-    if (viewMode == 0)
+    if (view_mode == 0)
         return func_00282E20_1(vec);
-    if (viewMode < 0)
+    if (view_mode < 0)
         return 0.0f;
-    if (viewMode >= 3)
+    if (view_mode >= 3)
         return 0.0f;
-    func_00283410_2(matrix, (char *)(*(int *)(heroBase + 8848) + 240));
+    func_00283410_2(matrix, (char *)(*(int *)(hero_base + 8848) + 240));
     func_00283698_1(inverse, matrix);
     func_002830C0_1(result, vec, inverse);
     return func_00282E20_1(result);
@@ -290,17 +290,17 @@ extern void matrix_mul_vec3(void *a, void *b, void *c);
 /* Returns the height part of a vector after turning it into the current view mode space. */
 float cam_get_view_space_height(char *in)
 {
-    char *heroBase = (char *)&D_00189E20_11;
-    int viewMode = *(unsigned char *)(heroBase + 8899);
+    char *hero_base = (char *)&D_00189E20_11;
+    int view_mode = *(unsigned char *)(hero_base + 8899);
     float rotated[4];
 
-    if (viewMode == 0)
+    if (view_mode == 0)
         return *(float *)(in + 8);
-    if (viewMode < 0)
+    if (view_mode < 0)
         return 0.0f;
-    if (viewMode >= 3)
+    if (view_mode >= 3)
         return 0.0f;
-    matrix_mul_vec3(rotated, in, heroBase + 64);
+    matrix_mul_vec3(rotated, in, hero_base + 64);
     return rotated[2];
 }
 
@@ -309,85 +309,85 @@ extern void transform_vector(void *a, void *b, void *c);
 /* Copies a vector into view space, sets its height to the given value, and turns it back. */
 void cam_set_view_space_height(V4_F6a70b950 *dst, V4_F6a70b950 *src, float k)
 {
-    char *heroBase = (char *)&D_00189E20_11;
-    int viewMode = *(unsigned char *)(heroBase + 8899);
+    char *hero_base = (char *)&D_00189E20_11;
+    int view_mode = *(unsigned char *)(hero_base + 8899);
 
-    if (viewMode == 0) {
+    if (view_mode == 0) {
         *dst = *src;
         ((float *)dst)[2] = k;
         return;
     }
-    if (viewMode < 0)
+    if (view_mode < 0)
         return;
-    if (viewMode >= 3)
+    if (view_mode >= 3)
         return;
-    transform_vector(dst, src, heroBase + 64);
+    transform_vector(dst, src, hero_base + 64);
     ((float *)dst)[2] = k;
-    transform_vector(dst, dst, heroBase);
+    transform_vector(dst, dst, hero_base);
 }
 
 /* reads a mode byte from a global block; when zero it forwards the arguments to one helper, otherwise it range-checks the byte and drives two helpers with the object and block pointers */
 /* Sets a vector to a given length in view space, then turns it back to world space. */
 void cam_set_view_space_vector_length(char *vec, int source, float length)
 {
-    unsigned char *heroBase = D_00189E20_18;
-    float savedLength;
-    int viewMode;
+    unsigned char *hero_base = D_00189E20_18;
+    float saved_length;
+    int view_mode;
 
-    savedLength = length;
-    viewMode = heroBase[8899];
-    if (viewMode == 0) {
+    saved_length = length;
+    view_mode = hero_base[8899];
+    if (view_mode == 0) {
         vec_fast_normalize_helper(vec, source, length);
         return;
     }
-    if (viewMode < 0)
+    if (view_mode < 0)
         return;
-    if (viewMode >= 3)
+    if (view_mode >= 3)
         return;
-    func_002830C0_5(vec, source, (char *)heroBase + 64);
-    vec_fast_normalize_helper(vec, vec, savedLength);
-    func_002830C0_5(vec, vec, (char *)heroBase);
+    func_002830C0_5(vec, source, (char *)hero_base + 64);
+    vec_fast_normalize_helper(vec, vec, saved_length);
+    func_002830C0_5(vec, vec, (char *)hero_base);
 }
 
 /* Flag-gated record update: copies 16 bytes src->dst and scales dst+8 by k when a byte flag is zero, otherwise runs two helper calls with DATA0+64 and DATA0 offsets and scales the same field between them. */
 /* Scales the height part of a vector in view space, then turns it back to world space. */
 void cam_scale_view_space_height(char *dst, char *src, float k)
 {
-    char *heroBase = D_00189E20_31;
-    int viewMode = *(unsigned char *)(heroBase + 8899);
+    char *hero_base = D_00189E20_31;
+    int view_mode = *(unsigned char *)(hero_base + 8899);
 
-    if (viewMode == 0) {
+    if (view_mode == 0) {
         *(V4_Fd337d953 *)dst = *(V4_Fd337d953 *)src;
         *(float *)(dst + 8) = *(float *)(dst + 8) * k;
         return;
     }
-    if (viewMode < 0)
+    if (view_mode < 0)
         return;
-    if (viewMode >= 3)
+    if (view_mode >= 3)
         return;
-    func_002830C0_9(dst, src, heroBase + 64);
+    func_002830C0_9(dst, src, hero_base + 64);
     *(float *)(dst + 8) = *(float *)(dst + 8) * k;
-    func_002830C0_9(dst, dst, heroBase);
+    func_002830C0_9(dst, dst, hero_base);
 }
 
 /* dispatches on one byte of a global table with a three-case switch: case 0 scales two floats of the destination by the incoming scale, cases 1 and 2 first run a helper over the destination with a table at +64, scale the same two floats and then run a second helper with the destination as both source and destination */
 /* Scales the sideways parts of a vector in view space, then turns it back to world space. */
 void cam_scale_view_space_sideways(float *dst, void *src, float scale)
 {
-    char *heroBase = D_00189E20_32;
-    int viewMode = *(unsigned char *)(heroBase + 8899);
+    char *hero_base = D_00189E20_32;
+    int view_mode = *(unsigned char *)(hero_base + 8899);
 
-    switch (viewMode) {
+    switch (view_mode) {
     case 0:
         dst[0] = dst[0] * scale;
         dst[1] = dst[1] * scale;
         break;
     case 1:
     case 2:
-        func_002830C0_10(dst, src, heroBase + 64);
+        func_002830C0_10(dst, src, hero_base + 64);
         dst[0] = dst[0] * scale;
         dst[1] = dst[1] * scale;
-        func_002830C0_10(dst, dst, heroBase);
+        func_002830C0_10(dst, dst, hero_base);
         break;
     }
 
@@ -414,18 +414,18 @@ extern int D_L00_00139688[];
 extern int D_0018B068;
 
 /* Spends the given amount of ammo for a weapon slot if there is enough. Returns 1 on success and 0 if there is not enough. */
-int weapon_spend_ammo(int slotIndex, int cost)
+int weapon_spend_ammo(int slot_index, int cost)
 {
-    int slot = slotIndex;
-    unsigned char typeIndex;
+    int slot = slot_index;
+    unsigned char type_index;
     Entry_262570 *entry;
     int current;
 
     if (slot == -1)
         slot = D_0018B068;
-    typeIndex = D_L00_00139568[slot];
+    type_index = D_L00_00139568[slot];
 
-    entry = &g_weapon_l00_table[typeIndex];
+    entry = &g_weapon_l00_table[type_index];
     if (entry->f8E == 0)
         return 1;
     current = D_L00_00139688[slot];
@@ -465,17 +465,17 @@ extern int D_L00_00139688[];
 extern int D_0018B068;
 
 /* Returns how much ammo a weapon slot has, or 1 if that weapon has no ammo limit. */
-int get_ammo(int slotIndex)
+int get_ammo(int slot_index)
 {
-    int slot = slotIndex;
-    unsigned char typeIndex;
+    int slot = slot_index;
+    unsigned char type_index;
     Entry_262570 *entry;
 
     if (slot == -1)
         slot = D_0018B068;
-    typeIndex = D_L00_00139568[slot];
+    type_index = D_L00_00139568[slot];
 
-    entry = &g_weapon_l00_table[typeIndex];
+    entry = &g_weapon_l00_table[type_index];
     if (entry->f8E == 0)
         return 1;
     return D_L00_00139688[slot];
@@ -486,16 +486,16 @@ extern void hero_l00_set_action(int, int);
 /* Stores a target, a mode and a time on the hero, and starts hero state 98 unless the hero is already in states 98 to 100. */
 void hero_start_target_state(V4_F6a70b950 *vec, int mode, float time)
 {
-    char *heroBase = (char *)&D_00189E20_11 + 0x18A0;
-    int heroState;
+    char *hero_base = (char *)&D_00189E20_11 + 0x18A0;
+    int hero_state;
 
-    *(V4_F6a70b950 *)heroBase = *vec;
+    *(V4_F6a70b950 *)hero_base = *vec;
     /* rebase the copy destination (base + 0x18A0) back to the record base */
-    heroBase -= 0x18A0;
-    heroState = *(int *)(heroBase + 0x2294);
-    *(int *)(heroBase + 0x18B0) = mode;
-    *(float *)(heroBase + 0x18AC) = time;
-    if ((unsigned)(heroState - 98) >= 3)
+    hero_base -= 0x18A0;
+    hero_state = *(int *)(hero_base + 0x2294);
+    *(int *)(hero_base + 0x18B0) = mode;
+    *(float *)(hero_base + 0x18AC) = time;
+    if ((unsigned)(hero_state - 98) >= 3)
         hero_l00_set_action(98, 2);
 }
 
@@ -708,10 +708,10 @@ extern int func_003425F8(int, float, char *, char *);
 /* Runs a check on the hero and, if it succeeds, sets a hero field to 4. */
 void hero_check_timed_condition(void)
 {
-    char *heroBase = (char *)&D_00189E20_11;
+    char *hero_base = (char *)&D_00189E20_11;
 
-    if (func_003425F8(*(short *)(heroBase + 0x24FE), *(float *)(heroBase + 0x264), heroBase + 0x80, heroBase + 0x80)) {
-        *(short *)(heroBase + 0x216) = 4;
+    if (func_003425F8(*(short *)(hero_base + 0x24FE), *(float *)(hero_base + 0x264), hero_base + 0x80, hero_base + 0x80)) {
+        *(short *)(hero_base + 0x216) = 4;
     }
 }
 
@@ -735,15 +735,15 @@ void level_fade_glow_colors(void)
     if (node != 0) {
         if (D_L00_001A8F00 != 2) {
             float angle;
-            int targetColor;
+            int target_color;
 
             angle = func_00283B98_4(D_00189E20_11.f2510, 0.049451004713773727f);
             D_00189E20_11.f2510 = angle;
-            targetColor = 0x1ee628;
+            target_color = 0x1ee628;
             if (angle > 0.0f && angle < 1.9198623895645142f) {
-                targetColor = 0x1e1ed2;
+                target_color = 0x1e1ed2;
             }
-            node->field120 = func_00283D38_1(node->field120, targetColor, 0.070000000298023224f);
+            node->field120 = func_00283D38_1(node->field120, target_color, 0.070000000298023224f);
         } else {
             D_00189E20_11.f2510 = func_00283B98_4(D_00189E20_11.f2510, 0.026179943233728409f);
             node->field120 = func_00283D38_1(0x1e1ed2, 0x1e1e50,
@@ -773,25 +773,25 @@ extern void update_hero_item_mobys(char *);
    the two level entry points on the argument. */
 /* Creates the glow object for the level effect if it does not exist yet, then runs the two level update steps. */
 void level_spawn_glow_object(char *object) {
-    char *heroBase = D_00189E20_4D98;
-    char *glowObject;
+    char *hero_base = D_00189E20_4D98;
+    char *glow_object;
 
-    *(int *)(heroBase + 0x12E8) = 0x2F;
-    if (*(int *)(heroBase + 0x12C0) == 0) {
-        glowObject = CreateMoby(0x50A);
-        if (glowObject != 0) {
-            *(unsigned short *)(glowObject + 0x32) = 0x20;
-            *(unsigned short *)(glowObject + 0x34) =
-                *(unsigned short *)(glowObject + 0x34) | 2;
-            *(unsigned char *)(glowObject + 0x31) = 1;
-            *(unsigned long *)(glowObject + 0x38) = 0x20202000000000UL;
-            *(int *)(glowObject + 0x64) = 0;
-            if (*(unsigned char *)(*(int *)(glowObject + 0x24) + 6) != 0)
-                *(unsigned char *)(glowObject + 0x63) = 0x10;
-            *(unsigned short *)(glowObject + 0x34) =
-                *(unsigned short *)(glowObject + 0x34) | 0x800;
-            *(int *)(heroBase + 0x12C0) = (int)glowObject;
-            *(int *)(heroBase + 0x12E4) = 2;
+    *(int *)(hero_base + 0x12E8) = 0x2F;
+    if (*(int *)(hero_base + 0x12C0) == 0) {
+        glow_object = CreateMoby(0x50A);
+        if (glow_object != 0) {
+            *(unsigned short *)(glow_object + 0x32) = 0x20;
+            *(unsigned short *)(glow_object + 0x34) =
+                *(unsigned short *)(glow_object + 0x34) | 2;
+            *(unsigned char *)(glow_object + 0x31) = 1;
+            *(unsigned long *)(glow_object + 0x38) = 0x20202000000000UL;
+            *(int *)(glow_object + 0x64) = 0;
+            if (*(unsigned char *)(*(int *)(glow_object + 0x24) + 6) != 0)
+                *(unsigned char *)(glow_object + 0x63) = 0x10;
+            *(unsigned short *)(glow_object + 0x34) =
+                *(unsigned short *)(glow_object + 0x34) | 0x800;
+            *(int *)(hero_base + 0x12C0) = (int)glow_object;
+            *(int *)(hero_base + 0x12E4) = 2;
         }
     }
     part_spawn_effect_from_record(object);
@@ -819,7 +819,7 @@ extern int D_001A7A0C __attribute__((sda));
    live at the exit, which keeps the load of D_001A7A0C out of the exit branch's delay slot
    (a void function gives that slot to the load, as a $gp access). */
 /* Adds up table entries until the running total passes a limit. Reports the totals through the three pointers. */
-int math_sum_table_entries_under_limit(int *lastSumOut, int *totalOut, int *bonusOut) {
+int math_sum_table_entries_under_limit(int *last_sum_out, int *total_out, int *bonus_out) {
     int sum = 0;
     int i = 0;
     short *second = &D_L00_00262260[1];
@@ -827,10 +827,10 @@ int math_sum_table_entries_under_limit(int *lastSumOut, int *totalOut, int *bonu
 
     for (; i < 77 && *first >= 0 && (sum += *first) <= (D_001A7A0C >> 5);
          i++, second += 2, first += 2) {
-        *bonusOut += *second;
-        *lastSumOut = sum;
+        *bonus_out += *second;
+        *last_sum_out = sum;
     }
-    *totalOut = sum;
+    *total_out = sum;
 }
 
 extern int D_001A7908 __attribute__((sda));

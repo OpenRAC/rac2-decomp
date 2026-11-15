@@ -47,15 +47,15 @@ int cam_clear_override_slots(void)
 {
     unsigned char *slot = D_L00_001BB9F0;
     int i;
-    int noSelection = -1;
+    int no_selection = -1;
 
     slot += 0x7DD;
     for (i = 31; i >= 0; i--) {
         *slot = 0;
         slot -= 64;
     }
-    D_L00_001B1884 = noSelection;
-    return noSelection;
+    D_L00_001B1884 = no_selection;
+    return no_selection;
 }
 
 /* Partial 64-byte pool record, measured from the retail loads and stores. */

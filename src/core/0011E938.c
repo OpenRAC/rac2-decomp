@@ -27,8 +27,8 @@ extern int r1_D_0012FDA8;
 extern int r1_func_0011CDE0();
 
 struct SifLoadCmd {
-    int moduleAddr;
-    int argLen;
+    int module_addr;
+    int arg_len;
 };
 
 #define SIFCMD ((struct SifLoadCmd *) r1_D_00158300)
@@ -107,34 +107,34 @@ int iop_loadfile_reset_state(void) {
 /* rac1-decomp src/core/0011CCE0.c: func_0011CE70 */
 /* _sceSifLoadModuleBuffer. Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Asks the IOP to load a module from a buffer and returns the module result. */
-int sceSifLoadModuleBuffer(int moduleAddr, int argLen, int args, void *outArg) {
-    int *resultOut = outArg;
-    int errorCode;
-    int moduleResult;
+int sceSifLoadModuleBuffer(int module_addr, int arg_len, int args, void *out_arg) {
+    int *result_out = out_arg;
+    int error_code;
+    int module_result;
 
-    errorCode = 0xFFFF0000;
+    error_code = 0xFFFF0000;
     if (iop_loadfile_bind_server() < 0) {
-        return errorCode;
+        return error_code;
     }
     if (r1_func_0011CDE0() != 0) {
         return 0xFFFEFFFC;
     }
-    SIFCMD->moduleAddr = moduleAddr;
+    SIFCMD->module_addr = module_addr;
     if (args != 0) {
-        if (argLen >= 0xFD) {
+        if (arg_len >= 0xFD) {
             memcpy(r1_D_00158300 + 0x104, (void *) args, 0xFC);
-            SIFCMD->argLen = 0xFC;
+            SIFCMD->arg_len = 0xFC;
         } else {
-            memcpy(r1_D_00158300 + 0x104, (void *) args, argLen);
-            SIFCMD->argLen = argLen;
+            memcpy(r1_D_00158300 + 0x104, (void *) args, arg_len);
+            SIFCMD->arg_len = arg_len;
         }
     } else {
-        SIFCMD->argLen = 0;
+        SIFCMD->arg_len = 0;
     }
     if (r1_func_0011B4C8(r1_D_00158500, 6, 0, r1_D_00158300, 0x200, r1_D_00158300, 8, 0, 0) < 0) {
         return 0xFFFEFFFF;
     }
-    moduleResult = SIFCMD->moduleAddr;
-    *resultOut = SIFCMD->argLen;
-    return moduleResult;
+    module_result = SIFCMD->module_addr;
+    *result_out = SIFCMD->arg_len;
+    return module_result;
 }

@@ -48,15 +48,15 @@ extern void *ref_L04_0040BED0_09(s32, void *, s32, s32, s32);
 void part_spawn_spark_and_smoke_burst(s32 owner, rc2_qword *position, s32 quiet, s32 offset, f32 intensity) {
     Stack_0040BED0 sp;
     TI copyValue  = *(TI *)position;
-    s32 sparkIndex = 0;
-    s32 puffIndex;
+    s32 spark_index = 0;
+    s32 puff_index;
     void *puff;
 
     sp.v10 = copyValue;
     ref_L04_0040BED0_01(&sp, owner, offset + 0x10);
     ref_L04_0040BED0_03(&sp, &sp, 0.01f);
-    while (sparkIndex < ref_L04_0040BED0_04(intensity * 30.0f)) {
-        sparkIndex += 1;
+    while (spark_index < ref_L04_0040BED0_04(intensity * 30.0f)) {
+        spark_index += 1;
         sp.f0 += ref_L04_0040BED0_07(0.01f, 0.03f);
         sp.f4 += ref_L04_0040BED0_07(0.01f, 0.015f);
         sp.f8 += ref_L04_0040BED0_07(0.01f, 0.02f);
@@ -65,9 +65,9 @@ void part_spawn_spark_and_smoke_burst(s32 owner, rc2_qword *position, s32 quiet,
         ref_L04_0040BED0_08(owner, &sp, 0xF, 0.0027777778f, intensity, 0x7FFFFFFF);
     }
     if (quiet == 0) {
-        puffIndex = 0;
-        while (puffIndex < ref_L04_0040BED0_04(intensity * 5.0f)) {
-            puffIndex += 1;
+        puff_index = 0;
+        while (puff_index < ref_L04_0040BED0_04(intensity * 5.0f)) {
+            puff_index += 1;
             puff = ref_L04_0040BED0_09(owner, &sp, ref_L04_0040BED0_05(30, 60), 0, 0);
             *(f32 *)((u8 *)puff + 0x2C) *= ref_L04_0040BED0_06(0.2f, 0.4f);
         }

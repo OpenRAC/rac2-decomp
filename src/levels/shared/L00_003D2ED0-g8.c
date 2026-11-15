@@ -32,7 +32,7 @@ void RenderRadialRingAndQuad(char *object)
     EffectVector position, axis, direction;
     struct { EffectVector points[20], offset, center, radial, rotated; int color; } effect;
     int color;
-    int pointIndex, remaining;
+    int point_index, remaining;
     short *indices = D_L00_001B2AF0;
     char *records = D_L00_00247310;
     char *context = *(char **)(object + 0x68);
@@ -55,12 +55,12 @@ void RenderRadialRingAndQuad(char *object)
         spread = (1.0f - fade) * 0.5f;
         FastVecScale(&effect.offset, D_0018A580, (1.0f - fade)* 32.0f);
         FastVecAdd(&effect.center, &position, &effect.offset);
-        for (pointIndex = 0; pointIndex < 20; pointIndex++) {
-            math_build_axis_angle_quat(&effect.rotated, &direction, IntToFloat(pointIndex)* 0.3141593f);
+        for (point_index = 0; point_index < 20; point_index++) {
+            math_build_axis_angle_quat(&effect.rotated, &direction, IntToFloat(point_index)* 0.3141593f);
             vec_rotate_by_quaternion(&effect.radial, &axis, &effect.rotated);
             FastVecScale(&effect.radial, &effect.radial, radius);
             vec_add_random_offset(&effect.radial, spread);
-            FastVecAdd(&effect.points[pointIndex], &effect.center, &effect.radial);
+            FastVecAdd(&effect.points[point_index], &effect.center, &effect.radial);
         }
         DrawScrollingRibbonWithFadedEnds(effect.points, effect.color, effect.color, 20, 0.3f, 1.2f, 0.2f);
     }

@@ -45,9 +45,9 @@ typedef struct {
 
 void UpdateAutoTargetFire(char *self, State3EB8E8 *st)
 {
-    float pos[4], toPlayer[4], target[4], dir[4];
-    char *candidate, *spark, *targetInfo;
-    int sparkSeed;
+    float pos[4], to_player[4], target[4], dir[4];
+    char *candidate, *spark, *target_info;
+    int spark_seed;
     float dot;
     char *entry;
 
@@ -59,7 +59,7 @@ void UpdateAutoTargetFire(char *self, State3EB8E8 *st)
                             D_L00_001B0750 * 0.01745329424738884f, D_L00_001B0748,
                             D_L00_001B074C * 0.01745329424738884f, D_L00_001B0750 * 0.01745329424738884f);
     if (candidate) {
-        if ((*(short *)(candidate + 0xAA) == 0xEE1 /* Receiver Bot */ || *(short *)(candidate + 0xAA) == 0xEC0 /* moby class 3776 */ || *(short *)(candidate + 0xAA) == 0xED4 /* moby class 3796 */) &&
+        if ((*(short *)(candidate + 0xAA) == MOBY_CLASS_RECEIVER_BOT || *(short *)(candidate + 0xAA) == 0xEC0 /* moby class 3776 */ || *(short *)(candidate + 0xAA) == 0xED4 /* moby class 3796 */) &&
             *(unsigned char *)(*(char **)(candidate + 0x68) + 0x3B1) == 255) {
             st->target = 0;
             return;
@@ -71,21 +71,21 @@ void UpdateAutoTargetFire(char *self, State3EB8E8 *st)
         st->target = candidate;
         if (*(unsigned char *)(self + 0x43) != 2)
             anim_start_blended(self, 2, 0, 5);
-        FastVecSub(toPlayer, self + 0x10, g_hero_position);
-        dot = FastVecDot(toPlayer, self + 0xE0);
+        FastVecSub(to_player, self + 0x10, g_hero_position);
+        dot = FastVecDot(to_player, self + 0xE0);
         if (D_L00_001A8F00[0] != 2 && *(unsigned char *)(self + 0x42) == *(unsigned char *)(self + 0x43) &&
             *(unsigned char *)(self + 0x42) == 2 && dot > 1.1f) {
             qcopy_nc(target, candidate + 0x10);
-            targetInfo = moby_get_private_value_0(candidate);
-            if (targetInfo)
-                target[2] += *(float *)(targetInfo + 0x10);
+            target_info = moby_get_private_value_0(candidate);
+            if (target_info)
+                target[2] += *(float *)(target_info + 0x10);
             else
                 target[2] += D_L00_001B0758;
-            sparkSeed = math_random_int_below(255);
-            spark = part_spawn_gravity_fade(pos, D_L00_001A8F20, 3, 0x202080, sparkSeed, 127, 16, 420000.0f, 420000.0f, 0.0f, 0);
+            spark_seed = math_random_int_below(255);
+            spark = part_spawn_gravity_fade(pos, D_L00_001A8F20, 3, 0x202080, spark_seed, 127, 16, 420000.0f, 420000.0f, 0.0f, 0);
             if (spark)
                 spark[2] = *D_L00_001FEA14;
-            spark = part_spawn_gravity_fade(pos, D_L00_001A8F20, 3, 0x601080, (sparkSeed + 128) % 255, 127, 16,
+            spark = part_spawn_gravity_fade(pos, D_L00_001A8F20, 3, 0x601080, (spark_seed + 128) % 255, 127, 16,
                                  420000.0f, 420000.0f, 0.0f, 0);
             if (spark)
                 spark[2] = *D_L00_001FEA14;

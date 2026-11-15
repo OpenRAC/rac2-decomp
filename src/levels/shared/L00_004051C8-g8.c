@@ -38,7 +38,7 @@ char *sheepinator_find_target(char *obj,Vec *origin,float *yaw,float *pitch) {
     while((candidate=D_L00_001FACE0[index])!=0) {
         if(*(unsigned char *)(candidate+0x20)==0xFE) goto next;
         if(*(unsigned char *)(candidate+0x20)==0xFD) goto next;
-        if(*(short *)(candidate+0xAA)==0xE7D /* Sheep */ || *(short *)(candidate+0xAA)==0xEB0 /* Dark Sheep */) goto next;
+        if(*(short *)(candidate+0xAA)==MOBY_CLASS_SHEEP || *(short *)(candidate+0xAA)==MOBY_CLASS_DARK_SHEEP) goto next;
         { Vec *t=&frame.target; pos=(Vec *)(candidate+0x10); qcopy(t,pos); }
         definition=moby_get_private_value_0(candidate);
         if(!definition || *(unsigned char *)(definition+0xE)==3) goto next;

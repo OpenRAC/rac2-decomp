@@ -33,12 +33,12 @@ void moby_steer_heading_to_aim(char *obj)
     float aim[4] __attribute__((aligned(16)));
     float projection[4] __attribute__((aligned(16)));
     float target[4] __attribute__((aligned(16)));
-    float turnAxis[4] __attribute__((aligned(16)));
-    float turnQuat[4] __attribute__((aligned(16)));
-    float turnMatrix[12] __attribute__((aligned(16)));
+    float turn_axis[4] __attribute__((aligned(16)));
+    float turn_quat[4] __attribute__((aligned(16)));
+    float turn_matrix[12] __attribute__((aligned(16)));
     char *vars = *(char **)(obj + 0x68);
     char *heading, *facing;
-    float angleCos;
+    float angle_cos;
 
     aim[0] = *(float *)(vars + 0x50);
     aim[1] = *(float *)(vars + 0x54);
@@ -51,24 +51,24 @@ void moby_steer_heading_to_aim(char *obj)
         facing = obj + 0xC0;
         vec_scale_to_length(aim, aim, 1.0f);
         matrix_mul_vec3(aim, aim, D_001B5570);
-        angleCos = FastVecDot(aim, heading);
-        FastVecScale(projection, heading, angleCos);
+        angle_cos = FastVecDot(aim, heading);
+        FastVecScale(projection, heading, angle_cos);
         FastVecSub(aim, aim, projection);
         vec_scale_to_length(aim, aim, 1.0f);
         vec_scale_to_length(target, aim, 10.0f);
         FastVecAdd(target, target, obj + 0x10);
-        FastVecCross(turnAxis, facing, aim);
-        if (FastVecLength(turnAxis) == 0.0f)
-            qcopy(turnAxis, facing);
-        angleCos = FastVecDot(facing, aim);
-        D_001B2854_1 = 1.0f - angleCos;
-        if (angleCos > 0.75f)
+        FastVecCross(turn_axis, facing, aim);
+        if (FastVecLength(turn_axis) == 0.0f)
+            qcopy(turn_axis, facing);
+        angle_cos = FastVecDot(facing, aim);
+        D_001B2854_1 = 1.0f - angle_cos;
+        if (angle_cos > 0.75f)
             D_001B2850 = 1;
-        angleCos = 1.5707964f - math_fast_angle_helper(angleCos);
-        angleCos = angleCos * 0.1f;
-        FastVecScale(turnQuat, turnAxis, math_fast_sin_or_cos_b(angleCos));
-        turnQuat[3] = math_fast_sin_or_cos_a(angleCos);
-        quaternion_to_rotation_basis(turnQuat, turnMatrix);
-        multiply_matrix3x3(facing, turnMatrix, facing);
+        angle_cos = 1.5707964f - math_fast_angle_helper(angle_cos);
+        angle_cos = angle_cos * 0.1f;
+        FastVecScale(turn_quat, turn_axis, math_fast_sin_or_cos_b(angle_cos));
+        turn_quat[3] = math_fast_sin_or_cos_a(angle_cos);
+        quaternion_to_rotation_basis(turn_quat, turn_matrix);
+        multiply_matrix3x3(facing, turn_matrix, facing);
     }
 }

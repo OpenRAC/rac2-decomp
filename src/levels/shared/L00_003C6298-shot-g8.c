@@ -53,14 +53,14 @@ extern char *SelectBestTargetInCone(void *, void *, float, float, int *, void *,
 /* Per-frame update of a thrown shot. It flies forward, sticks to or hits things it touches, explodes to damage nearby enemies, plays its sound and removes itself when its time runs out. */
 void thrown_shot_update(char *self)
 {
-    char prevPos[16] __attribute__((aligned(16)));
+    char prev_pos[16] __attribute__((aligned(16)));
     union { char v[16]; QueryParams params; } scratch __attribute__((aligned(16)));
     union {
         char raw[32];
         struct { char *targets[4]; QueryExclude exclude; } query;
     } message __attribute__((aligned(16)));
-    int count, i, j, hitCount;
-    char *vars = *(char **)(self + 0x68), *hitObject, *hitInfo;
+    int count, i, j, hit_count;
+    char *vars = *(char **)(self + 0x68), *hit_object, *hit_info;
 
     vec_transform_or_copy(self + 0x10, self + 0x10);
     switch (*(unsigned char *)(self + 0x20)) {
@@ -69,24 +69,24 @@ void thrown_shot_update(char *self)
         *(int *)(vars + 0x20) = -1;
         *(int *)(vars + 0x24) = -1;
     case 1:
-        qcopy(prevPos, self + 0x10);
+        qcopy(prev_pos, self + 0x10);
         part_steer_effect_direction(*(int *)(vars + 0x44), vars, 0);
         FastVecAdd(self + 0x10, self + 0x10, vars);
         snd_set_voice_pitch_bend(*(int *)(vars + 0x20), *(int *)(vars + 0x24) + math_random_int_range(-200, 200));
-        hitCount = coll_process_hit(self + 0x10, 0, self, 0, 0.45f);
-        for (i = 0; i < hitCount; i++) {
-            hitObject = ((Candidate *)g_area_hit_targets)[i].item;
-            hitInfo = moby_get_private_value_0(hitObject);
-            if (*(short *)(hitObject + 0xAA) == 0xC4A /* Plasma Coil */ || hitObject == ((PlayerRef *)g_hero_state)->player
-                || !(*(short *)(hitObject + 0x34) & 0x1000))
+        hit_count = coll_process_hit(self + 0x10, 0, self, 0, 0.45f);
+        for (i = 0; i < hit_count; i++) {
+            hit_object = ((Candidate *)g_area_hit_targets)[i].item;
+            hit_info = moby_get_private_value_0(hit_object);
+            if (*(short *)(hit_object + 0xAA) == MOBY_CLASS_PLASMA_COIL || hit_object == ((PlayerRef *)g_hero_state)->player
+                || !(*(short *)(hit_object + 0x34) & 0x1000))
                 continue;
-            if (hitInfo) {
-                qcopy(self + 0x10, hitObject + 0x10);
-                moby_forward_position_call(hitObject, scratch.v, 1);
-                FastVecScale(scratch.v, scratch.v, *(float *)(hitInfo + 0x10));
+            if (hit_info) {
+                qcopy(self + 0x10, hit_object + 0x10);
+                moby_forward_position_call(hit_object, scratch.v, 1);
+                FastVecScale(scratch.v, scratch.v, *(float *)(hit_info + 0x10));
                 FastVecAdd(self + 0x10, self + 0x10, scratch.v);
             }
-            *(char **)(vars + 0x38) = hitObject;
+            *(char **)(vars + 0x38) = hit_object;
             *(int *)(vars + 0x10) = 15;
             *(unsigned char *)(self + 0x20) = 2;
             qcopy(scratch.v, vars);
@@ -97,18 +97,18 @@ void thrown_shot_update(char *self)
             *(unsigned char *)(message.raw + 24) = 1;
             *(unsigned char *)(message.raw + 25) = 3;
             *(short *)(message.raw + 26) = *(short *)(self + 0xAA);
-            QueueMobyImpact(hitObject, message.raw);
+            QueueMobyImpact(hit_object, message.raw);
             part_spawn_hit_sparks(self + 0x10, 10, 1);
-            StartAttachedEffect(hitObject, 28, *(int *)(self + 0xB8));
+            StartAttachedEffect(hit_object, 28, *(int *)(self + 0xB8));
             break;
         }
         if (!*(char **)(vars + 0x38)) {
-            int didHit;
-            if (CollLine(prevPos, self + 0x10, 2, self, 0))
-                didHit = 1;
+            int did_hit;
+            if (CollLine(prev_pos, self + 0x10, 2, self, 0))
+                did_hit = 1;
             else
-                didHit = coll_test_point(self + 0x10, 2, self, 0.1f) != 0;
-            if (didHit == 1) {
+                did_hit = coll_test_point(self + 0x10, 2, self, 0.1f) != 0;
+            if (did_hit == 1) {
                 qcopy(self + 0x10, D_L00_001BF220);
                 FastVecScale(scratch.v, D_L00_001BF220 + 0x20, 0.0009765625f);
                 vec_scale_to_length(scratch.v, scratch.v, 0.1f);
@@ -124,12 +124,12 @@ void thrown_shot_update(char *self)
         }
         break;
     case 2: {
-        char *hitInfo;
+        char *hit_info;
         if (*(char **)(vars + 0x38)) {
-            hitInfo = moby_get_private_value_0(*(char **)(vars + 0x38));
-            if (hitInfo) {
+            hit_info = moby_get_private_value_0(*(char **)(vars + 0x38));
+            if (hit_info) {
                 moby_forward_position_call(*(char **)(vars + 0x38), scratch.v, 1);
-                FastVecScale(scratch.v, scratch.v, *(float *)(hitInfo + 0x10));
+                FastVecScale(scratch.v, scratch.v, *(float *)(hit_info + 0x10));
                 FastVecAdd(self + 0x10, scratch.v, *(char **)(vars + 0x38) + 0x10);
             }
         }
@@ -151,16 +151,16 @@ void thrown_shot_update(char *self)
     case 3:
         break;
     case 4: {
-        char *hitInfo;
+        char *hit_info;
         if (*(char **)(vars + 0x38)) {
             if (!D_L00_001B0134) {
                 D_L00_001B0134 = 1;
                 PlayMobySound(3, 0, self);
             }
-            hitInfo = moby_get_private_value_0(*(char **)(vars + 0x38));
-            if (hitInfo) {
+            hit_info = moby_get_private_value_0(*(char **)(vars + 0x38));
+            if (hit_info) {
                 moby_forward_position_call(*(char **)(vars + 0x38), scratch.v, 1);
-                FastVecScale(scratch.v, scratch.v, *(float *)(hitInfo + 0x10));
+                FastVecScale(scratch.v, scratch.v, *(float *)(hit_info + 0x10));
                 FastVecAdd(self + 0x10, scratch.v, *(char **)(vars + 0x38) + 0x10);
             }
         }
@@ -177,12 +177,12 @@ void thrown_shot_update(char *self)
         if (!snd_is_voice_playing_for_owner(self, *(int *)(vars + 0x20)))
             *(int *)(vars + 0x20) = PlayMobySound(0, 4, self);
         if (*(int *)(vars + 0x24) == -1) {
-            char *soundEntry = g_sound_state + *(int *)(vars + 0x20) * 112;
-            *(int *)(vars + 0x24) = ((SoundRecord *)soundEntry)->value;
+            char *sound_entry = g_sound_state + *(int *)(vars + 0x20) * 112;
+            *(int *)(vars + 0x24) = ((SoundRecord *)sound_entry)->value;
         }
     } else if (*(int *)(vars + 0x20) != -1) {
-        char *soundEntry = g_sound_state + *(int *)(vars + 0x20) * 112;
-        if (*(char **)(soundEntry + 0x88) == self && *(unsigned char *)(soundEntry + 0x74))
+        char *sound_entry = g_sound_state + *(int *)(vars + 0x20) * 112;
+        if (*(char **)(sound_entry + 0x88) == self && *(unsigned char *)(sound_entry + 0x74))
             snd_stop_voice(*(int *)(vars + 0x20));
         *(int *)(vars + 0x20) = -1;
     }

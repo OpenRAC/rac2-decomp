@@ -44,28 +44,28 @@ typedef struct {
 /* Marks every actor in the object's group as alerted. */
 void actor_alert_group(u8 *moby)
 {
-    char *mobyBase;
-    u8 *idCursor;
-    u8 *idList;
+    char *moby_base;
+    u8 *id_cursor;
+    u8 *id_list;
 
     if (moby[0x21] == 0xFF)
         return;
-    idList = D_L06_001FB3A0[moby[0x21]];
-    if (idList == 0)
+    id_list = D_L06_001FB3A0[moby[0x21]];
+    if (id_list == 0)
         return;
-    idCursor = idList;
-    mobyBase = D_L06_001B281C;
+    id_cursor = id_list;
+    moby_base = D_L06_001B281C;
     for (;;) {
-        char *other = mobyBase + ((*(unsigned short *)idCursor & 0x7FFF) << 8);
+        char *other = moby_base + ((*(unsigned short *)id_cursor & 0x7FFF) << 8);
 
         if (*(signed char *)(other + 0x20) >= 0) {
             if (*(short *)(other + 0xAA) == 0xBBA /* moby class 3002 */) {
                 *(int *)(*(char **)(other + 0x68) + 0x258) = 1;
             }
         }
-        if (*(short *)idCursor < 0)
+        if (*(short *)id_cursor < 0)
             break;
-        idCursor += 2;
+        id_cursor += 2;
     }
 }
 
@@ -101,10 +101,10 @@ extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
 void notak_enemy_update(u8 *moby)
 {
     u8 *v = *(u8 **)(moby + 0x68);
-    int hitResult;
+    int hit_result;
 
     if (moby[0x20] == 0) {
-        char *pathRecord;
+        char *path_record;
 
         if (D_L06_001B2838 < moby[0x21]) {
             STUB_printf(D_L06_002E20C8);
@@ -139,9 +139,9 @@ void notak_enemy_update(u8 *moby)
         H(0x1E4) = 180;
         F(0x1D4) = 3.0f;
         F(0x1D0) = D_L06_001B1090 * 0.0166666675f;
-        pathRecord = D_L06_001B2480 + I(0x210) * 0x30;
-        if (*(short *)(pathRecord + 0x30) != 0)
-            I(0x13C) = **(int **)(pathRecord + 0x3C);
+        path_record = D_L06_001B2480 + I(0x210) * 0x30;
+        if (*(short *)(path_record + 0x30) != 0)
+            I(0x13C) = **(int **)(path_record + 0x3C);
         F(0x328) = math_random_angle();
         if (I(0x214) != 0) {
             *(int *)(moby + 0x98) = 0;
@@ -159,10 +159,10 @@ void notak_enemy_update(u8 *moby)
         moby_update_ground_check(moby);
         moby[0x6F] = 0x16;
     }
-    hitResult = moby_apply_damage_to_object((char *)moby, (char *)(v + 0x50), 0);
-    if (hitResult != 0) {
+    hit_result = moby_apply_damage_to_object((char *)moby, (char *)(v + 0x50), 0);
+    if (hit_result != 0) {
         actor_alert_group_and_markers(moby);
-        if (hitResult >= 4)
+        if (hit_result >= 4)
             moby_l06_explode_and_remove((char *)moby);
     }
     if (*(float *)(moby + 0x18) < 48.0f) {
@@ -266,9 +266,9 @@ void marker_update_pulse(L06Obj *self)
 {
     L06Cfg *vars = self->cfg;
     L06ColorPair colors = D_L06_001B1098[0];
-    unsigned short *idCursor;
+    unsigned short *id_cursor;
     L06Obj *entity;
-    L06Cfg *entityVars;
+    L06Cfg *entity_vars;
     float angle;
     float blend;
 
@@ -278,11 +278,11 @@ void marker_update_pulse(L06Obj *self)
     vars->blend = blend;
     self->tint = FastTweenColor(colors.a, colors.b, blend);
     if (vars->stamp != D_L06_001B2348) {
-        for (idCursor = (unsigned short *)D_L06_001FB3A0[self->group];
-             self->group != 0xFF && self->group <= D_L06_001B2838 && idCursor != 0 &&
-             ((idCursor != 0 && (short)idCursor[-1] >= 0) || idCursor == (unsigned short *)D_L06_001FB3A0[self->group]);
-             idCursor++) {
-            entity = (L06Obj *)(D_L06_001B281C_base[0] + ((*idCursor & 0x7FFF) << 8));
+        for (id_cursor = (unsigned short *)D_L06_001FB3A0[self->group];
+             self->group != 0xFF && self->group <= D_L06_001B2838 && id_cursor != 0 &&
+             ((id_cursor != 0 && (short)id_cursor[-1] >= 0) || id_cursor == (unsigned short *)D_L06_001FB3A0[self->group]);
+             id_cursor++) {
+            entity = (L06Obj *)(D_L06_001B281C_base[0] + ((*id_cursor & 0x7FFF) << 8));
             if (entity == 0)
                 break;
             if (entity->live != 0) {
@@ -290,9 +290,9 @@ void marker_update_pulse(L06Obj *self)
                     /* two tests, as retail has them: `!= 0xFE && != 0xFD` is folded into one */
                     if (entity->kind != 0xFE) {
                         if (entity->kind != 0xFD) {
-                            entityVars = entity->cfg;
-                            moby_transform_joint_point(entity, 0, &entityVars->vec);
-                            entityVars->stamp = D_L06_001B2348;
+                            entity_vars = entity->cfg;
+                            moby_transform_joint_point(entity, 0, &entity_vars->vec);
+                            entity_vars->stamp = D_L06_001B2348;
                         }
                     }
                 }
@@ -374,8 +374,8 @@ void object_ring_spin_update(char *moby)
     float v0[4];
     float v1[4];
     char *vars = *(char **)(moby + 0x68);
-    char *pointPtr = vars + 0xA0;
-    char *objPtr = vars + 0x80;
+    char *point_ptr = vars + 0xA0;
+    char *obj_ptr = vars + 0x80;
     char *center = moby + 0x10;
     float step = 0.000290888245f;
     float one = 1.0f;
@@ -387,16 +387,16 @@ void object_ring_spin_update(char *moby)
     *(float *)(vars + 0x128) = func_32E5D0(*(float *)(vars + 0x128), D_L06_001B18D8 * step);
     func_32DE28(axes, vars + 0x120);
     for (i = 7; i >= 0; i--) {
-        func_32DA88(v0, pointPtr, axes);
-        pointPtr += 0x10;
+        func_32DA88(v0, point_ptr, axes);
+        point_ptr += 0x10;
         func_32D650((char *)v0, (char *)v0, 3.0f);
         func_32D650((char *)v1, (char *)v0, 3.3333335f);
         func_32D5C8((char *)v0, (char *)v0, center);
         func_32D5C8((char *)v1, (char *)v1, center);
         v0[3] = one;
         v1[3] = two;
-        moby_init_between_points(*(u8 **)objPtr, v0, v1);
-        objPtr += 4;
+        moby_init_between_points(*(u8 **)obj_ptr, v0, v1);
+        obj_ptr += 4;
     }
 }
 
@@ -404,7 +404,7 @@ void object_ring_spin_update(char *moby)
 int follower_init_and_check_hits(unsigned char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    int hitResult, oldMode;
+    int hit_result, old_mode;
     if (moby[0x20] == 0) {
         if ((D_0019B2E8[moby[0xB0] + (g_current_map_index << 4)] & 0x80) && *(int *)(vars + 0x33C)) return 1;
         *(int *)(vars + 0x2AC) = 0;
@@ -435,13 +435,13 @@ int follower_init_and_check_hits(unsigned char *moby)
     }
     *(int *)(vars + 0x258) = actor_choose_path_goal((char *)moby);
     *(float *)(moby + 0x2C) = *(float *)(*(char **)(moby + 0x24) + 0x24);
-    oldMode = moby[0x95];
-    hitResult = moby_apply_damage_to_object((char *)moby, vars + 0x60, 0);
-    if (hitResult) {
+    old_mode = moby[0x95];
+    hit_result = moby_apply_damage_to_object((char *)moby, vars + 0x60, 0);
+    if (hit_result) {
         trigger_linked_object((char *)moby);
-        if (hitResult < 4) PlayMobySound(2, 0, (char *)moby);
-        if (oldMode == 1) *(int *)(vars + 0x24C) = math_random_int_range(300, 360);
-        if ((unsigned int)(hitResult - 4) < 2) moby_set_state((char *)moby, 8, -1);
+        if (hit_result < 4) PlayMobySound(2, 0, (char *)moby);
+        if (old_mode == 1) *(int *)(vars + 0x24C) = math_random_int_range(300, 360);
+        if ((unsigned int)(hit_result - 4) < 2) moby_set_state((char *)moby, 8, -1);
     }
     if (*(unsigned short *)(vars + 0x98) & 3) *(int *)(moby + 0x98) = 0;
     math_update_wrapped_angle_offset((char *)moby, vars + 0x280, vars + 0x284, .3f, .02327106148f, -1);

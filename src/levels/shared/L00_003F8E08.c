@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 /* Measured partial layouts; original type and game roles are unknown. */
@@ -204,7 +205,7 @@ extern int bouncer_spawn_debris_object(int, int, int);
 /* Spawns a piece of debris and remembers which object launched it. */
 int bouncer_spawn_debris(int owner, int position, int velocity)
 {
-    int debris = bouncer_spawn_debris_object(position, velocity, *(short *)(owner + 0xAA) == 0xE9E /* Heavy Bouncer */);
+    int debris = bouncer_spawn_debris_object(position, velocity, *(short *)(owner + 0xAA) == MOBY_CLASS_HEAVY_BOUNCER);
 
     if (debris != 0) {
         *(int *)(debris + 0xB8) = owner;

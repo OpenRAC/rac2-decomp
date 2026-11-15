@@ -74,7 +74,7 @@ void fireball_update(u8 *obj) {
     float temp[4] __attribute__((aligned(16)));
     u8 *st=OBJ->p[0x1a], *p, *other;
     u8 **targets;
-    int i, hitCount, mode=obj[0x20], amount, red,green,blue;
+    int i, hit_count, mode=obj[0x20], amount, red,green,blue;
     float fade, radius, minimum;
     switch(mode) {
     case 0: case 1:
@@ -160,12 +160,12 @@ bounce_done:
         if(D_L18_001B192C+D_L18_001B1930<OBJ->u[0x4b]) {moby_mark_spawned(obj);return;}
         radius=D_L18_001B1934;
         if(OBJ->u[0x4b]<D_L18_001B192C) radius=radius*(float)OBJ->u[0x4b]/(float)D_L18_001B192C;
-        hitCount=coll_process_hit(obj+0x10,0,obj,0,radius);
-        if(!hitCount) break;
-        if(hitCount>0) {
+        hit_count=coll_process_hit(obj+0x10,0,obj,0,radius);
+        if(!hit_count) break;
+        if(hit_count>0) {
         int remaining;
         targets=g_nearby_hit_targets;
-        remaining=hitCount;
+        remaining=hit_count;
         do {
             u8 *other=*targets;
             int valid=0;

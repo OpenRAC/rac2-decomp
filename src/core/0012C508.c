@@ -10,12 +10,12 @@ extern void r1_func_0012BCC8(int);
 
 typedef struct {
     unsigned char pad0[0x11C];
-    int errorFlag;
+    int error_flag;
     unsigned char pad120[0x6F8];
-    int cmdInfo;
+    int cmd_info;
     unsigned char pad81C[0x1C];
-    int bitWindow;
-    int bitsLeft;
+    int bit_window;
+    int bits_left;
     unsigned char pad840[0x18];
     void *cbData;
 } MpegVdec;
@@ -29,8 +29,8 @@ extern int mpeg_read_bits(void *, int);
 /* rac1-decomp src/core/00125630.c: func_001286E8 */
 /* _ipuVdec (libmpeg). Adapted from Lombyte (GPL-3.0) for PAL. */
 /* Reads one code from the video stream using one of the chip lookup tables, and sets the error flag if nothing matched. */
-short mpeg_read_ipu_vlc_code(int decoderAddr, int tbl) {
-    MpegVdec *d = (MpegVdec *)decoderAddr;
+short mpeg_read_ipu_vlc_code(int decoder_addr, int tbl) {
+    MpegVdec *d = (MpegVdec *)decoder_addr;
     int i;
     int j;
     unsigned int cmd;
@@ -48,7 +48,7 @@ short mpeg_read_ipu_vlc_code(int decoderAddr, int tbl) {
     }
     cmd = (tbl << 26) | 0x30000000;
     IPU_CMD = cmd;
-    d->cmdInfo = r1_D_00132F70[(int)cmd >> 28];
+    d->cmd_info = r1_D_00132F70[(int)cmd >> 28];
     r = IPU_CMD64;
     while (r < 0) {
         if (i++ > 5000) {
@@ -59,13 +59,13 @@ short mpeg_read_ipu_vlc_code(int decoderAddr, int tbl) {
     }
     bp = IPU_BP;
     top = IPU_TOP;
-    d->bitWindow = top;
+    d->bit_window = top;
     if (top < 0) {
-        d->bitsLeft = -(bp & 0x1F) & 0x1F;
+        d->bits_left = -(bp & 0x1F) & 0x1F;
     } else {
-        d->bitsLeft = 32;
+        d->bits_left = 32;
     }
-    d->errorFlag = (int)r == 0;
+    d->error_flag = (int)r == 0;
     return (short)r;
 }
 extern int mpeg_peek_bits(void *arg, int count);
@@ -79,8 +79,8 @@ extern long r1_func_00128638(void *arg0);
    consuming them, refilling the 32-bit window from the IPU (FDEC) when
    it runs short and nudging the callback while the IPU stays busy.
    Adapted from Lombyte's project (GPL-3.0) for PAL. */
-int mpeg_peek_bits(void *decoderPtr, int count) {
-    char *ctx = decoderPtr;
+int mpeg_peek_bits(void *decoder_ptr, int count) {
+    char *ctx = decoder_ptr;
     int counter;
 
     if (*(int *)(ctx + 0x818) == 0 && *(int *)(ctx + 0x83C) >= count) {
@@ -123,21 +123,21 @@ extern long r1_func_00128638();
  * The stores go in source order 0x838 then 0x83C.
  */
 /* Skips a given number of bits in the video stream. */
-void mpeg_skip_bits(void *decoderPtr, int bitCount) {
+void mpeg_skip_bits(void *decoder_ptr, int bit_count) {
     int counter = 0;
     unsigned int cmd;
 
     while ((((int)IPU_CTRL) & 0x80004000) == 0x80000000) {
         if (counter++ >= 0x1389) {
-            r1_func_0012BCC8(*(int *)((char *)decoderPtr + 0x858));
+            r1_func_0012BCC8(*(int *)((char *)decoder_ptr + 0x858));
             counter = 0;
         }
     }
-    cmd = bitCount | 0x40000000;
+    cmd = bit_count | 0x40000000;
     IPU_CMD = cmd;
-    *(int *)((char *)decoderPtr + 0x818) = r1_D_00132F70[cmd >> 28];
-    *(int *)((char *)decoderPtr + 0x838) = r1_func_00128638(decoderPtr);
-    *(int *)((char *)decoderPtr + 0x83C) = 0x20;
+    *(int *)((char *)decoder_ptr + 0x818) = r1_D_00132F70[cmd >> 28];
+    *(int *)((char *)decoder_ptr + 0x838) = r1_func_00128638(decoder_ptr);
+    *(int *)((char *)decoder_ptr + 0x83C) = 0x20;
 }
 
 extern int mpeg_read_bits(void *arg0, int n);
@@ -152,8 +152,8 @@ extern int mpeg_read_bits(void *arg0, int n);
  * computed before the command store, or the allocator swaps $v1 and $a0.
  */
 /* Reads the given number of bits from the video stream and moves past them. */
-int mpeg_read_bits(void *decoderPtr, int n) {
-    char *s = (char *)decoderPtr;
+int mpeg_read_bits(void *decoder_ptr, int n) {
+    char *s = (char *)decoder_ptr;
     int counter = 0;
     unsigned int cmd;
     unsigned int idx;

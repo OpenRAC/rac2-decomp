@@ -639,7 +639,7 @@ void group_pick_nearest_target(u8 *self)
 
 
 /* Works out which way to push the object, away from a wall if one is just ahead. */
-void moby_compute_push_direction(char *self, char *outDir, int flip)
+void moby_compute_push_direction(char *self, char *out_dir, int flip)
 {
     float a[4];
     float b[4];
@@ -650,12 +650,12 @@ void moby_compute_push_direction(char *self, char *outDir, int flip)
     F669d6320_FUN_00282CC0(b, b, self + 16);
 
     if (F669d6320_FUN_002761F8(a, b, 2, self, 0))
-        F669d6320_FUN_00282F20(outDir, F669d6320_D_001BAFC0, 1.0f);
+        F669d6320_FUN_00282F20(out_dir, F669d6320_D_001BAFC0, 1.0f);
     else
-        F669d6320_FUN_00282F20(outDir, self + 224, -1.0f);
+        F669d6320_FUN_00282F20(out_dir, self + 224, -1.0f);
 
     if (flip == 0)
-        F669d6320_FUN_00282D30(outDir, outDir, -1.0f);
+        F669d6320_FUN_00282D30(out_dir, out_dir, -1.0f);
 }
 
 extern void FastVecSub(void *, void *, void *);

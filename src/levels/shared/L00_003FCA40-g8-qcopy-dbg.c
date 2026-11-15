@@ -26,11 +26,11 @@ char *large_spark_trail_create(char *origin, char *direction, Quad_3fca40 *posit
 {
     Quad_3fca40 local;
     char *object;
-    char *positionPtr;
+    char *position_ptr;
     int *vars;
     char *velocity;
     int lifetime;
-    float lifetimeFloat;
+    float lifetime_float;
 
     object = (char *)CreateMoby(0xD9C /* moby class 3484 */);
     if (object != 0) {
@@ -41,17 +41,17 @@ char *large_spark_trail_create(char *origin, char *direction, Quad_3fca40 *posit
         *(unsigned short *)(object + 0x34) |= 0x41;
         *(unsigned char *)(object + 0x20) = 0;
         velocity = (char *)vars + 0x20;
-        positionPtr = object + 0x10;
+        position_ptr = object + 0x10;
         vec_scale_to_length(velocity, direction, 0.33333334f);
-        *(Quad_3fca40 *)positionPtr = *position;
+        *(Quad_3fca40 *)position_ptr = *position;
         vec_scale_to_length(&local, velocity, -0.25f);
         FastVecAdd((char *)vars + 0x50, origin, &local);
         lifetime = (int)D_L00_001B0BB4;
         *(int *)((char *)vars + 0x38) = lifetime;
-        lifetimeFloat = IntToFloat(lifetime);
+        lifetime_float = IntToFloat(lifetime);
         *(int *)((char *)vars + 0x34) = owner;
-        *(float *)((char *)vars + 0x3C) = 1.0f / lifetimeFloat;
-        ref_L00_003FCA40_00(positionPtr);
+        *(float *)((char *)vars + 0x3C) = 1.0f / lifetime_float;
+        ref_L00_003FCA40_00(position_ptr);
         ref_L00_003FCA40_01(ref_L00_003FCA40_02, object);
     }
     return object;

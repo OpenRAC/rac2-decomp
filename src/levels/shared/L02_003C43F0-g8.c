@@ -70,22 +70,22 @@ void part_spawn_fading_spark(void *owner)
 {
     void *object = owner;
     void *direction = (char *)object + 0xE0;
-    TI128 spawnPoint;
-    TI128 toCamera;
+    TI128 spawn_point;
+    TI128 to_camera;
     float dot;
-    int colorWord;
+    int color_word;
     int alpha;
 
-    FastVecScale(&spawnPoint, direction, D_L02_001B0180);
-    FastVecAdd(&spawnPoint, &spawnPoint, (char *)object + 0x10);
-    FastVecSub(&toCamera, g_camera_l02_position, (char *)object + 0x10);
-    vec_scale_to_length(&toCamera, &toCamera, 1.0f);
-    dot = FastVecDot(&toCamera, direction);
+    FastVecScale(&spawn_point, direction, D_L02_001B0180);
+    FastVecAdd(&spawn_point, &spawn_point, (char *)object + 0x10);
+    FastVecSub(&to_camera, g_camera_l02_position, (char *)object + 0x10);
+    vec_scale_to_length(&to_camera, &to_camera, 1.0f);
+    dot = FastVecDot(&to_camera, direction);
     if (D_L02_001B0188 < dot) {
-        colorWord = D_L02_001B0184;
+        color_word = D_L02_001B0184;
         dot = dot * dot;
-        alpha = (int)(dot * (float)(colorWord >> 24));
-        func_L00_00325AE8_1(&spawnPoint, (colorWord & 0xFFFFFF) | (alpha << 24), D_L02_001B0178,
+        alpha = (int)(dot * (float)(color_word >> 24));
+        func_L00_00325AE8_1(&spawn_point, (color_word & 0xFFFFFF) | (alpha << 24), D_L02_001B0178,
                             D_L02_001B017C);
     }
 }
@@ -234,20 +234,20 @@ extern void moby_mark_flag_and_append_to_list(int);
 void portal_update(char *obj) {
     char *vars = *(char **)(obj + 0x68);
     float delta[4];
-    int destLevel;
+    int dest_level;
 
     switch (*(unsigned char *)(obj + 0x20)) {
     case 0: {
-        int levelRow;
+        int level_row;
         if (*(unsigned char *)(obj + 0x43) != 2) anim_start_blended(obj, 2, 0, 1);
         moby_set_state(obj, 1, -1);
         *(unsigned char *)(obj + 0x30) = 255;
         if (g_current_map_index[0] == 26) *(short *)(obj + 0x32) = 255;
         qcopy(vars + 0x20, obj + 0x10);
         qcopy(vars + 0x30, obj + 0xf0);
-        levelRow = g_current_map_index[0] << 4;
-        *(short *)(vars + 0x1e) = D_0019B2E8[*(unsigned char *)(obj + 0xb0) + levelRow] >> 7;
-        if (D_0019B2E8[*(unsigned char *)(obj + 0xb0) + levelRow] & 0x80) {
+        level_row = g_current_map_index[0] << 4;
+        *(short *)(vars + 0x1e) = D_0019B2E8[*(unsigned char *)(obj + 0xb0) + level_row] >> 7;
+        if (D_0019B2E8[*(unsigned char *)(obj + 0xb0) + level_row] & 0x80) {
             if (*(int *)(vars + 4)) moby_set_flag_bit(g_moby_l02_pool + (*(int *)(vars + 4) << 8), 1);
         }
         if (g_current_map_index[0] == 2 && D_001395B8[0x71] == 26) {
@@ -269,17 +269,17 @@ void portal_update(char *obj) {
                 int currentLevel;
                 currentLevel = g_current_map_index[0];
                 g_hero_state.state = 2;
-                destLevel = 2;
+                dest_level = 2;
                 if (currentLevel == 26) {
                     TryClaimNotice(8, 0x27b1, 1);
                 } else {
                     TryClaimNotice(8, D_0019B2E8[*(unsigned char *)(obj + 0xb0) + (currentLevel << 4)] & 0x80 ? 0x27cd : 0x27b0, 1);
-                    destLevel = 26;
+                    dest_level = 26;
                 }
                 if (D_00138324 & 0x10) {
                     level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
-                    data_set_small_value_and_refresh(destLevel, 1);
-                    if (destLevel == 26) D_001395B8[1] = 1;
+                    data_set_small_value_and_refresh(dest_level, 1);
+                    if (dest_level == 26) D_001395B8[1] = 1;
                 }
             }
         }

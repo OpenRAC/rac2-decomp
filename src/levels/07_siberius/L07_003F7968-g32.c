@@ -26,7 +26,7 @@ void boss_start_move_tier(u8 *obj, void *target, s32 tier)
 {
     u8 *state = *(u8 **)(obj + 0x68);
     f32 duration, start, end;
-    s32 tierIndex;
+    s32 tier_index;
 
     *(u16 *)(obj + 0x34) = (*(u16 *)(obj + 0x34) & 0xFFBE) | 0x1000;
     *(s32 *)(obj + 0x98) = *(s32 *)(*(u8 **)(obj + 0x24) + 0x10);
@@ -44,10 +44,10 @@ void boss_start_move_tier(u8 *obj, void *target, s32 tier)
         *(u16 *)(*(u8 **)(state + 0x414) + 0x34) &= 0xFF7F;
     }
     if (target) {
-        tierIndex = tier;
-        if (tier >= 2) tierIndex = 1;
-        else if (tier < 0) tierIndex = 0;
-        qcopy(state + 0x3E0, D_L07_001B1020 + tierIndex * 16);
+        tier_index = tier;
+        if (tier >= 2) tier_index = 1;
+        else if (tier < 0) tier_index = 0;
+        qcopy(state + 0x3E0, D_L07_001B1020 + tier_index * 16);
         *(void **)(state + 0x418) = target;
         moby_set_state(obj, 3, 0);
     } else {

@@ -31,24 +31,24 @@ extern Global_6C78C D_0018C750_6C78;
 typedef struct { char pad[0x20]; short count, active, timer; } TransitionState;
 typedef int CameraQuad __attribute__((mode(TI)));
 /* Checks every frame whether the hero is hitting a trigger the right way. Counts the hits, and after 7 in a row it fires the trigger. It also nudges the camera while a hit is in progress. */
-int cam_check_trigger_hit(char *triggerObj, char *otherObj)
+int cam_check_trigger_hit(char *trigger_obj, char *other_obj)
 {
     float scratch[4] __attribute__((aligned(16)));
-    char dirA[16] __attribute__((aligned(16)));
-    char dirB[16] __attribute__((aligned(16)));
-    TransitionState *transition = *(TransitionState **)(D_L00_001B1844[0].table + *(short *)(triggerObj + 0x84)*32 + 28);
+    char dir_a[16] __attribute__((aligned(16)));
+    char dir_b[16] __attribute__((aligned(16)));
+    TransitionState *transition = *(TransitionState **)(D_L00_001B1844[0].table + *(short *)(trigger_obj + 0x84)*32 + 28);
     char *owner;
     char *blocker;
-    int heroIdentity;
+    int hero_identity;
     int otherType, ownerType;
-    float lengthProduct, dotValue;
+    float length_product, dot_value;
     if (ref_L00_00426C78_00) { ref_L00_00426C78_00 = 0; return 0; }
-    heroIdentity = D_00189E20_6C78.identity;
-    { int identity = *(short *)(triggerObj + 0x86);
+    hero_identity = D_00189E20_6C78.identity;
+    { int identity = *(short *)(trigger_obj + 0x86);
     ref_L00_00426C78_00 = 0;
-    if (heroIdentity == identity || heroIdentity == 0x51) {
+    if (hero_identity == identity || hero_identity == 0x51) {
         owner = g_follow_camera_object;
-        otherType = *(short *)(otherObj + 0x86);
+        otherType = *(short *)(other_obj + 0x86);
         if (!(otherType == 0 || otherType == 10 || otherType == 14 || otherType == 2)) goto clear;
         ownerType = *(short *)(owner + 0x86);
         if (!(ownerType == 0 || ownerType == 10 || ownerType == 14 || ownerType == 2)) goto clear;
@@ -59,7 +59,7 @@ int cam_check_trigger_hit(char *triggerObj, char *otherObj)
         transition->active = 1;
         transition->count++;
         if (transition->count >= 7) {
-            if (*(short *)(owner + 0x86) == 0) *(char *)(triggerObj + 0x7C) = 5;
+            if (*(short *)(owner + 0x86) == 0) *(char *)(trigger_obj + 0x7C) = 5;
             return 1;
         }
         scratch[0] = math_fast_sin_or_cos_a(D_00189E20_6C78.angle);
@@ -80,19 +80,19 @@ clear:
     if (D_0018C750_6C78.count < 65535) ++D_0018C750_6C78.count;
     if (D_001A7390[0] > D_0018C750_6C78.time) D_0018C750_6C78.time = D_001A7390[0];
     D_0018C750_6C78.flags = (D_0018C750_6C78.flags | (1U << g_current_map_index[0])) | 0x80000000U;
-    dotValue = FastVecDot(D_L00_001B8C80_6C78.axis, D_L00_001B8C80_6C78.owner);
-    FastVecScale((char *)scratch, D_L00_001B8C80_6C78.axis, dotValue);
-    FastVecSub(dirA, D_L00_001B8C80_6C78.owner, (char *)scratch);
-    dotValue = FastVecDot(D_L00_001B8C80_6C78.axis, D_00189E20_6C78.owner + 0xC0);
-    FastVecScale((char *)scratch, D_L00_001B8C80_6C78.axis, dotValue);
-    FastVecSub(dirB, D_00189E20_6C78.owner + 0xC0, (char *)scratch);
-    lengthProduct = FastVecLength(dirB);
-    if (lengthProduct != 0.0f) {
-        lengthProduct *= FastVecLength(dirA);
+    dot_value = FastVecDot(D_L00_001B8C80_6C78.axis, D_L00_001B8C80_6C78.owner);
+    FastVecScale((char *)scratch, D_L00_001B8C80_6C78.axis, dot_value);
+    FastVecSub(dir_a, D_L00_001B8C80_6C78.owner, (char *)scratch);
+    dot_value = FastVecDot(D_L00_001B8C80_6C78.axis, D_00189E20_6C78.owner + 0xC0);
+    FastVecScale((char *)scratch, D_L00_001B8C80_6C78.axis, dot_value);
+    FastVecSub(dir_b, D_00189E20_6C78.owner + 0xC0, (char *)scratch);
+    length_product = FastVecLength(dir_b);
+    if (length_product != 0.0f) {
+        length_product *= FastVecLength(dir_a);
     }
-    if (lengthProduct != 0.0f) {
-        do { dotValue = math_fast_angle_helper(FastVecDot(dirB, dirA) / lengthProduct); } while (0);
-        if (1.3962636f <= 1.5707964f - dotValue) { cam_reset_default(); return 0; }
+    if (length_product != 0.0f) {
+        do { dot_value = math_fast_angle_helper(FastVecDot(dir_b, dir_a) / length_product); } while (0);
+        if (1.3962636f <= 1.5707964f - dot_value) { cam_reset_default(); return 0; }
     }
     transition->timer = 30;
 timer:

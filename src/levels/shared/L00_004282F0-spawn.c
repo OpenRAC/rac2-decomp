@@ -19,7 +19,7 @@ extern s16 D_L00_001B8F10 __attribute__((nosda));
 
 /* Creates a new camera that follows the given target and sets up its starting blend values. Returns the new camera. */
 void *cam_follow_create(u8 *target) {
-    u8 *targetObj = target;
+    u8 *target_obj = target;
     u8 *camera;
     u8 *state;
     f32 zero;
@@ -27,7 +27,7 @@ void *cam_follow_create(u8 *target) {
     camera = moby_find_record_by_handle_id(6);
     D_L00_001B8F10 = 0;
     cam_switch_active(camera);
-    cam_follow_update_target(camera, targetObj);
+    cam_follow_update_target(camera, target_obj);
     state = *(u8 **)(camera + 0x70);
     qcopy(state + 0xB0, state + 0x80);
     zero = 0.0f;

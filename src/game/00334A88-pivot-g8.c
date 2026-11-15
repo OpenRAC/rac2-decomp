@@ -20,7 +20,7 @@ extern void cam_compute_offset(void *,int,float);
 /* Updates the camera pivot state each frame: follows the camera axis, runs the pivot state machine and writes the resulting vector to the output. */
 void cam_update_pivot_state(char *moby, void *result)
 {
-    V651 baseVec, tempVec;
+    V651 base_vec, temp_vec;
 
     char *camera = D_001B53A0;
     char *state = *(char **)(moby+0x70)+0x60;
@@ -62,19 +62,19 @@ void cam_update_pivot_state(char *moby, void *result)
             }
         }
     }
-    hero_copy_vector_to_out((int)moby,&baseVec.q);
+    hero_copy_vector_to_out((int)moby,&base_vec.q);
     if (g_hero_state.i2294==0x74) {
         FastVecScale(result,axis,FastVecDot(state,axis));
         FastVecSub(state,state,result);
         FastVecScale(result,axis,FastVecDot(axis,state+0x60));
         qcopy(state+0x10,result);
         if (B651(state,0xC4)!=11) {
-            char *modeData;
+            char *mode_data;
             B651(state,0xC4)=11;
             qcopy(moby+0x40,moby);
-            modeData=*(char **)(moby+0x70)+0x20;
-            H651(modeData,0)=D_001B11D8;
-            F651(modeData,0x24)=1.0f/IntToFloat(H651(modeData,0));
+            mode_data=*(char **)(moby+0x70)+0x20;
+            H651(mode_data,0)=D_001B11D8;
+            F651(mode_data,0x24)=1.0f/IntToFloat(H651(mode_data,0));
         }
         return;
     }
@@ -88,20 +88,20 @@ void cam_update_pivot_state(char *moby, void *result)
         }
         blocked=0;
         if (g_hero_state.h34C && (!g_hero_state.b49E || g_hero_state.h4AE>=16)) blocked=1;
-        else if (cam_resolve_position(&tempVec,1)!=1) blocked=1;
+        else if (cam_resolve_position(&temp_vec,1)!=1) blocked=1;
         else {
-            scalar=FastVecDot(&tempVec,axis);
+            scalar=FastVecDot(&temp_vec,axis);
             if (scalar<FastVecLength(state+0x10)) blocked=1;
         }
         if (blocked) {
             qcopy(result,state+0x10);
-            scalar=FastVecDot(&baseVec,axis);
-            FastVecScale(&tempVec,axis,scalar);
-            FastVecSub(state,&baseVec,&tempVec);
+            scalar=FastVecDot(&base_vec,axis);
+            FastVecScale(&temp_vec,axis,scalar);
+            FastVecSub(state,&base_vec,&temp_vec);
         } else {
-            cam_resolve_position(&tempVec,1);
-            FastVecScale(result,axis,FastVecDot(&tempVec,axis));
-            FastVecSub(state,&tempVec,result);
+            cam_resolve_position(&temp_vec,1);
+            FastVecScale(result,axis,FastVecDot(&temp_vec,axis));
+            FastVecSub(state,&temp_vec,result);
         }
         break;
     }
@@ -111,15 +111,15 @@ void cam_update_pivot_state(char *moby, void *result)
             qcopy(state+0x30,state+0x10); B651(state,0xD7)=1;
         }
         qcopy(result,state+0x10);
-        scalar=FastVecDot(&baseVec,axis);
-        FastVecScale(&tempVec,axis,scalar);
-        FastVecSub(state,&baseVec,&tempVec);
+        scalar=FastVecDot(&base_vec,axis);
+        FastVecScale(&temp_vec,axis,scalar);
+        FastVecSub(state,&base_vec,&temp_vec);
         if (FastDecTimer(state+0xD4)) {
             if (B651(state,0xC4)==9) {
                 B651(state,0xC4)=10; H651(state,0xD4)=D_001B1220;
                 qcopy(state+0x20,state+0x10);
-                FastVecScale(&tempVec,axis,F651(state,0xD0));
-                FastVecSub(state+0x30,state+0x20,&tempVec);
+                FastVecScale(&temp_vec,axis,F651(state,0xD0));
+                FastVecSub(state+0x30,state+0x20,&temp_vec);
             } else if (B651(state,0xC4)==6) {
                 B651(state,0xC4)=7; H651(state,0xD4)=D_001B11F4;
                 qcopy(state+0x30,state+0x20); qcopy(state+0x20,state+0x10);
@@ -131,18 +131,18 @@ void cam_update_pivot_state(char *moby, void *result)
         break;
     case 8:
         qcopy(result,state+0x10);
-        scalar=FastVecDot(&baseVec,axis);
-        FastVecScale(&tempVec,axis,scalar);
-        FastVecSub(state,&baseVec,&tempVec);
+        scalar=FastVecDot(&base_vec,axis);
+        FastVecScale(&temp_vec,axis,scalar);
+        FastVecSub(state,&base_vec,&temp_vec);
         break;
     case 9: case 10:
-        FastVecScale(result,axis,FastVecDot(&baseVec,axis));
-        FastVecSub(state,&baseVec,result);
+        FastVecScale(result,axis,FastVecDot(&base_vec,axis));
+        FastVecSub(state,&base_vec,result);
         lerp_vector(result,result,state+0x20,D_001B1234);
         break;
     default:
-        FastVecScale(result,axis,FastVecDot(&baseVec,axis));
-        FastVecSub(state,&baseVec,result);
+        FastVecScale(result,axis,FastVecDot(&base_vec,axis));
+        FastVecSub(state,&base_vec,result);
         break;
     }
 }

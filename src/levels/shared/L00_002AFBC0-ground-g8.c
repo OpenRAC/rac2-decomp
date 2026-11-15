@@ -85,16 +85,16 @@ extern float math_fabs(float);
 
 /* Finds the ground under the hero, and records its slope, height and what it is made of. It also checks the ground at the sides. */
 void hero_l00_update_ground_contact(void) {
-    Vec4 rayEnd, rayStart, scratchVec, sideStart, sideEnd, sideSlope, sideNormal;
-    s32 surfaceType;
+    Vec4 ray_end, ray_start, scratch_vec, side_start, side_end, side_slope, side_normal;
+    s32 surface_type;
     s32 i;
     f32 angle;
     u8 *data;
     Vec4 *normal;
     HeroGround *hero;
 
-    s32 probeMode;
-    f32 probeDepth;
+    s32 probe_mode;
+    f32 probe_depth;
 
     g_hero_state.xF278 = 1.0f;
     g_hero_state.u30e.U++;
@@ -110,19 +110,19 @@ void hero_l00_update_ground_contact(void) {
     if (g_hero_state.xI2f8 != 0) {
         g_hero_state.xI2f8++;
     }
-    probeMode = 1;
-    probeDepth = g_hero_state.xF234 * 2.2f;
+    probe_mode = 1;
+    probe_depth = g_hero_state.xF234 * 2.2f;
     if (g_hero_state.xI208c == 2) {
-        probeDepth = g_hero_state.xF234 * 2.9f;
+        probe_depth = g_hero_state.xF234 * 2.9f;
     }
-    if (hero_is_in_special_kind_or_mode()) probeDepth = 0.0f;
-    BuildOffsetVectorPair(&rayStart, &rayEnd, probeMode, probeDepth, -48.0f);
-    if (CollLine(&rayStart, &rayEnd, 2, g_hero_state.xI2080, 0) == 0) {
+    if (hero_is_in_special_kind_or_mode()) probe_depth = 0.0f;
+    BuildOffsetVectorPair(&ray_start, &ray_end, probe_mode, probe_depth, -48.0f);
+    if (CollLine(&ray_start, &ray_end, 2, g_hero_state.xI2080, 0) == 0) {
         goto tail;
     }
-    surfaceType = func_L00_002E2048();
+    surface_type = func_L00_002E2048();
 
-    g_hero_state.xB12ed = surfaceType;
+    g_hero_state.xB12ed = surface_type;
     if (g_collision_result.i18 != 0) g_hero_state.xB12ed = 0;
     if (g_current_map_index == 7 && g_collision_result.i18 != 0) g_hero_state.xB12ed = 1;
     g_hero_state.xH12e0 = GetCollHitMaterial();
@@ -131,23 +131,23 @@ void hero_l00_update_ground_contact(void) {
         if (g_hero_state.xF88 < g_hero_state.xF2f0 && g_hero_state.xI2f8 <= 0) {
             g_hero_state.xI2f8 = 1;
         }
-        if (CollLine(&rayStart, &rayEnd, 0x24, g_hero_state.xI2080, 0) == 0) {
+        if (CollLine(&ray_start, &ray_end, 0x24, g_hero_state.xI2080, 0) == 0) {
             goto tail;
         }
-        surfaceType = func_L00_002E2048();
-        g_hero_state.xB12ed = surfaceType;
+        surface_type = func_L00_002E2048();
+        g_hero_state.xB12ed = surface_type;
     }
     if (g_hero_state.xH12e0 == 0xD) {
         g_hero_state.xF2f0 = g_collision_result.v20.f[2];
-        rayStart.f[2] = g_collision_result.v20.f[2] - 0.01f;
-        if (CollLine(&rayStart, &rayEnd, 4, g_hero_state.xI2080, 0) == 0) {
+        ray_start.f[2] = g_collision_result.v20.f[2] - 0.01f;
+        if (CollLine(&ray_start, &ray_end, 4, g_hero_state.xI2080, 0) == 0) {
             goto tail;
         }
     }
     if (g_hero_state.xH12e0 == 3) {
         g_hero_state.xF2f4 = g_collision_result.v20.f[2];
-        rayStart.f[2] = g_collision_result.v20.f[2] - 0.01f;
-        if (CollLine(&rayStart, &rayEnd, 4, g_hero_state.xI2080, 0) == 0) {
+        ray_start.f[2] = g_collision_result.v20.f[2] - 0.01f;
+        if (CollLine(&ray_start, &ray_end, 4, g_hero_state.xI2080, 0) == 0) {
             goto tail;
         }
     }
@@ -178,8 +178,8 @@ void hero_l00_update_ground_contact(void) {
         func_001290E0((u8 *)&g_hero_state + 0x2A0, (u8 *)&g_collision_result.f40);
         g_hero_state.u2e0.F = cam_get_view_space_angle((u8 *)&g_collision_result.f40);
         g_hero_state.xF2ec = mat_fast_helper_a(g_collision_result.f40, g_collision_result.f44);
-        FastVecSub(&scratchVec, ((u8 *)&g_hero_state + 0x2D0), (u8 *)&g_hero_state + 0x80);
-        if (0.0f < FastVecDot(&scratchVec, (u8 *)&g_hero_state + 0x2A0)) {
+        FastVecSub(&scratch_vec, ((u8 *)&g_hero_state + 0x2D0), (u8 *)&g_hero_state + 0x80);
+        if (0.0f < FastVecDot(&scratch_vec, (u8 *)&g_hero_state + 0x2A0)) {
             g_hero_state.xF2dc = -g_hero_state.xF2dc;
         }
         if (g_hero_state.xF2dc < 0.02f) {
@@ -236,33 +236,33 @@ tail:
     if (!(g_hero_state.xI208c == 0 || g_hero_state.xI208c == 12 || g_hero_state.xI208c == 9 || g_hero_state.xI208c == 7 || (g_hero_state.xI208c == 4 && *(u8 *)((u8 *)&g_hero_state + 0x49c)) || g_hero_state.xI208c == 1)) {
         return;
     }
-    hero_compute_angles_to_local_dir((u8 *)&g_hero_state + 0x2A0, &scratchVec);
-    if (-0.785398244f < scratchVec.f[1] && scratchVec.f[1] < 0.785398244f) {
-        g_hero_state.u2e4.F = scratchVec.f[1];
+    hero_compute_angles_to_local_dir((u8 *)&g_hero_state + 0x2A0, &scratch_vec);
+    if (-0.785398244f < scratch_vec.f[1] && scratch_vec.f[1] < 0.785398244f) {
+        g_hero_state.u2e4.F = scratch_vec.f[1];
     }
-    if (-0.785398244f < scratchVec.f[0] && scratchVec.f[0] < 0.785398244f) {
-        g_hero_state.u2e8.F = scratchVec.f[0];
+    if (-0.785398244f < scratch_vec.f[0] && scratch_vec.f[0] < 0.785398244f) {
+        g_hero_state.u2e8.F = scratch_vec.f[0];
     }
     for (i = 0; i < 2; i++) {
         angle = 1.57079649f;
         if (i == 1) {
             angle = -angle;
         }
-        hero_build_relative_offset(&sideStart, 0.2f, angle, 0.45f, 1);
-        hero_build_relative_offset(&sideEnd, 0.2f, angle, -0.45f, 1);
-        if (CollLine(&sideStart, &sideEnd, 0x22, g_hero_state.xI2080, 0)) {
+        hero_build_relative_offset(&side_start, 0.2f, angle, 0.45f, 1);
+        hero_build_relative_offset(&side_end, 0.2f, angle, -0.45f, 1);
+        if (CollLine(&side_start, &side_end, 0x22, g_hero_state.xI2080, 0)) {
             if (D_001A8FF0) g_hero_state.a2c0.f[i] = gravity_get_center_distance(&g_collision_result.v20) - gravity_get_center_distance((u8 *)&g_hero_state + 0x2d0);
             else g_hero_state.a2c0.f[i] = g_collision_result.v20.f[2] - g_hero_state.u2d8.F;
             if (0.4f < math_fabs(g_hero_state.a2c0.f[i])) {
                 g_hero_state.a2c0.f[i] = 0.0f;
             }
-            func_001290E0(&sideNormal, (u8 *)&g_collision_result.f40);
-            hero_compute_angles_to_local_dir(&sideNormal, &sideSlope);
-            if (-0.785398244f < sideSlope.f[1] && sideSlope.f[1] < 0.785398244f) {
-                g_hero_state.a2c8.f[i] = sideSlope.f[1];
+            func_001290E0(&side_normal, (u8 *)&g_collision_result.f40);
+            hero_compute_angles_to_local_dir(&side_normal, &side_slope);
+            if (-0.785398244f < side_slope.f[1] && side_slope.f[1] < 0.785398244f) {
+                g_hero_state.a2c8.f[i] = side_slope.f[1];
             }
-            if (-0.785398244f < sideSlope.f[0] && sideSlope.f[0] < 0.785398244f) {
-                g_hero_state.a2d0.f[i] = sideSlope.f[0];
+            if (-0.785398244f < side_slope.f[0] && side_slope.f[0] < 0.785398244f) {
+                g_hero_state.a2d0.f[i] = side_slope.f[0];
             }
         } else {
             g_hero_state.a2c0.i[i] = 0;

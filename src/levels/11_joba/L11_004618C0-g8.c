@@ -70,7 +70,7 @@ void UpdateJobaPurchaseController(u8 *object) {
     u8 *vars = *(u8 **)(object + 0x68);
     int index, tracking;
     float rate;
-    float yaw, pitch, distance, yawOffset, pitchOffset, heading;
+    float yaw, pitch, distance, yaw_offset, pitch_offset, heading;
     moby_reset_matching_effects_alt(object);
     switch (object[0x20]) {
     case 0:
@@ -176,10 +176,10 @@ void UpdateJobaPurchaseController(u8 *object) {
         }
         if (math_fast_float_d(vars + 0x118)) {
             *(int *)(vars + 0x118) = FloatToInt(math_random_float_range(180.0f, 300.0f));
-            yawOffset = math_random_float_range(-90.0f, 90.0f);
-            heading = FastAddRotations(*(float *)(object + 0xF8), yawOffset * 0.017453294f);
-            pitchOffset = math_random_float_range(0, 30.0f);
-            vec_build_spherical_offset((float *)(vars + 0x100), 6.0f, heading, pitchOffset * 0.017453294f);
+            yaw_offset = math_random_float_range(-90.0f, 90.0f);
+            heading = FastAddRotations(*(float *)(object + 0xF8), yaw_offset * 0.017453294f);
+            pitch_offset = math_random_float_range(0, 30.0f);
+            vec_build_spherical_offset((float *)(vars + 0x100), 6.0f, heading, pitch_offset * 0.017453294f);
             FastVecAdd((float *)(vars + 0x100), (float *)(vars + 0x100), (float *)(object + 0x10));
         }
         if (*(int *)(vars + 0x114)) {

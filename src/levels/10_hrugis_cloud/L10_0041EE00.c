@@ -27,7 +27,7 @@ extern char *moby_get_motion_data(void *);
 /* Draw a pulsing glow at every live moby of this moby's group. */
 void pulsing_light_draw_group_glows(u8 *moby)
 {
-    f32 glowPos[4] __attribute__((aligned(16)));
+    f32 glow_pos[4] __attribute__((aligned(16)));
     u16 *first = D_L10_001FB1E0[moby[0x21]];
     u16 *list;
     Moby_L10_0041EE00 *target;
@@ -40,10 +40,10 @@ void pulsing_light_draw_group_glows(u8 *moby)
             target = (Moby_L10_0041EE00 *)(D_L10_001B251C[0] + ((*list & 0x7FFF) << 8));
             if (*(s32 *)(moby_get_motion_data(target) + 0x110) != 0) {
                 vars = target->vars;
-                FastVecScale(glowPos, target->axis, 0.25f);
-                FastVecAdd(glowPos, target->pos, glowPos);
+                FastVecScale(glow_pos, target->axis, 0.25f);
+                FastVecAdd(glow_pos, target->pos, glow_pos);
                 color = (FloatToInt((math_fast_sin_or_cos_a(vars->phase) + 1.0f) * 0.5f * 64.0f) << 24) | 0x63B4FF;
-                gfx_draw_billboard_quad(glowPos, 0x31, color, 1, 7.5f, 2.0f, math_random_angle());
+                gfx_draw_billboard_quad(glow_pos, 0x31, color, 1, 7.5f, 2.0f, math_random_angle());
             }
         } while ((s16)*list++ >= 0);
     }

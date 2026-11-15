@@ -28,7 +28,7 @@ extern AnimationResident D_00189E20_2;
 extern float ApproachValue(float *, float, float);
 
 /* Works out how fast the hero animation should play so it reaches a wanted frame in a set time. */
-float AdjustHeroAnimationSpeedForTargetFrame(float frame, float duration, float amount, float blendRate)
+float AdjustHeroAnimationSpeedForTargetFrame(float frame, float duration, float amount, float blend_rate)
 {
     float threshold = D_00189E20_2.threshold;
     float step;
@@ -53,11 +53,11 @@ float AdjustHeroAnimationSpeedForTargetFrame(float frame, float duration, float 
             scale = *D_00189E20_2.owner->scale;
         {
             float value = (amount * step) / (duration * scale);
-            if (blendRate == negone) {
+            if (blend_rate == negone) {
                 D_00189E20_2.value = value;
                 return negone;
             }
-            return ApproachValue(&D_00189E20_2.value, value, blendRate);
+            return ApproachValue(&D_00189E20_2.value, value, blend_rate);
         }
     }
     return 0.0f;

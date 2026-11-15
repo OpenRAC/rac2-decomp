@@ -132,9 +132,9 @@ extern struct {
 /* Main update for the Siberius ship objects (moby classes 4569 to 4573): starts them, runs the ride along the path, and plays the final crash sequence. */
 void siberius_ship_update(ShipObject *ship)
 {
-    Vector savedPos, savedRot, v, w, x, y;
+    Vector saved_pos, saved_rot, v, w, x, y;
     ShipState *vars = ship->vars;
-    float bounceSpeed, spin, offsetX, fadeState;
+    float bounce_speed, spin, offset_x, fade_state;
     int i;
 
     if (!vars)
@@ -192,14 +192,14 @@ void siberius_ship_update(ShipObject *ship)
             if (vars->f110 <= -1.0f) {
                 timer_start_countdown(1, 10.0f);
                 if (D_L07_001B1D20 >= 1.0f) {
-                    savedPos.q = 0;
-                    savedRot.q = 0;
-                    savedPos.f[0] = 191.5800018310547f;
-                    savedPos.f[1] = 501.15f;
-                    savedPos.f[2] = 457.69000244140625f;
-                    savedRot.f[2] = 3.1415927f;
+                    saved_pos.q = 0;
+                    saved_rot.q = 0;
+                    saved_pos.f[0] = 191.5800018310547f;
+                    saved_pos.f[1] = 501.15f;
+                    saved_pos.f[2] = 457.69000244140625f;
+                    saved_rot.f[2] = 3.1415927f;
                     load_scene_chunk(1, 0);
-                    hero_reset_position_and_direction(&savedPos, &savedRot, 0, 1);
+                    hero_reset_position_and_direction(&saved_pos, &saved_rot, 0, 1);
                 }
             }
         } else {
@@ -214,8 +214,8 @@ void siberius_ship_update(ShipObject *ship)
             D_L07_001B9330 = 0;
             snd_resume_music_stream();
         }
-        savedPos.q = *(TI128 *)ship->pos;
-        savedRot.q = *(TI128 *)ship->rot;
+        saved_pos.q = *(TI128 *)ship->pos;
+        saved_rot.q = *(TI128 *)ship->rot;
         if (vars->f16B8 > 0.0f) {
             math_step_value_toward_target(ship->pos, &vars->f11C, 400.0f, 0.0f, D_L07_001B1748 * 0.00027777778f,
                           D_L07_001B1744 * 0.016666668f);
@@ -223,14 +223,14 @@ void siberius_ship_update(ShipObject *ship)
             ship->rot[2] = math_lerp_float(D_L07_001B1750, 0.0f, vars->f16B8);
             ship->rot[0] = math_lerp_float(0.7853975296020508f, 0.0f, vars->f16B8);
             ship->pos[2] = 213.0f - vars->f16B8 * 3.0f;
-        } else if ((fadeState = D_L07_001B1D20) == 0.0f) {
+        } else if ((fade_state = D_L07_001B1D20) == 0.0f) {
             matrix_mul_vec3(&v, D_L07_001B1760, ship->mtx);
             vars->f16B4 += ship->rot[0] * 7.272206130437553e-05f + 7.272206130437553e-05f;
             ship->rot[0] += vars->f16B4;
             if (ship->rot[0] > 1.5707964f) {
                 ship->rot[0] = 1.5707964f;
-                bounceSpeed = math_fabs(vars->f16B4);
-                if (bounceSpeed < 0.0005817764904350042f)
+                bounce_speed = math_fabs(vars->f16B4);
+                if (bounce_speed < 0.0005817764904350042f)
                     timer_start_countdown(1, 15.0f);
                 else
                     vars->f16B4 *= -0.333f;
@@ -245,18 +245,18 @@ void siberius_ship_update(ShipObject *ship)
             matrix_mul_vec3(&w, D_L07_001B1760, ship->mtx);
             FastVecSub(&v, &w, &v);
             FastVecSub(ship->pos, ship->pos, &v);
-        } else if (fadeState >= 1.0f) {
+        } else if (fade_state >= 1.0f) {
             boss_enter_second_phase(ship);
             break;
         }
 
         D_L07_001B2024.f4 = 1;
         ApproachValue(&vars->f16B0, 1.0f, D_L07_001B174C * 0.00027777778f);
-        offsetX = vars->f11C + vars->f16B0;
-        if (offsetX > 0.0f)
-            offsetX = 0.0f;
+        offset_x = vars->f11C + vars->f16B0;
+        if (offset_x > 0.0f)
+            offset_x = 0.0f;
         v.q = *(TI128 *)D_L07_001B9200;
-        v.f[0] += offsetX;
+        v.f[0] += offset_x;
         v.f[2] += D_L07_001B175C * 0.016666668f;
         func_L07_00423B28(&v);
 
@@ -274,8 +274,8 @@ void siberius_ship_update(ShipObject *ship)
         for (i = 0; i < 8; i++)
             *(float *)((u8 *)vars + 0x15B4 + i * 0x20) = FastAddRotations(*(float *)((u8 *)vars + 0x15B4 + i * 0x20), spin);
 
-        FastVecSub(&y, ship->pos, &savedPos);
-        mat_combine_and_store((u8 *)vars + 0x20, &y, &savedRot, ship->rot);
+        FastVecSub(&y, ship->pos, &saved_pos);
+        mat_combine_and_store((u8 *)vars + 0x20, &y, &saved_rot, ship->rot);
         break;
     }
 }

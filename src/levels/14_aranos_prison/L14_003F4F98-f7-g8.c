@@ -96,16 +96,16 @@ void item_check_trigger_update(Thing *trigger)
         missing = 1;
         if (D_L14_002A71A0[g_current_map_index] != 0 && D_L14_002A71A0[g_current_map_index][vars->idx] != 0) {
             for (index = 0; D_L14_002A71A0[g_current_map_index][vars->idx][index] != -1; index++) {
-                int itemId = D_L14_002A71A0[g_current_map_index][vars->idx][index];
+                int item_id = D_L14_002A71A0[g_current_map_index][vars->idx][index];
 
                 missing = 0;
                 if (vars->tail.b.quiet == 0) {
-                    int bit = 1 << (itemId & 0x1F);
-                    if (D_00139768[(unsigned int)itemId >> 2] & bit)
+                    int bit = 1 << (item_id & 0x1F);
+                    if (D_00139768[(unsigned int)item_id >> 2] & bit)
                         continue;
                 }
-                if (req_push_queue(D_L14_001BF700, itemId) == 0 && index == 0) {
-                    STUB_printf(D_L14_002AA2C0, trigger->id, trigger->oclass, g_current_map_index, vars->idx, itemId);
+                if (req_push_queue(D_L14_001BF700, item_id) == 0 && index == 0) {
+                    STUB_printf(D_L14_002AA2C0, trigger->id, trigger->oclass, g_current_map_index, vars->idx, item_id);
                     return;
                 }
                 fail = 0;
@@ -133,8 +133,8 @@ void item_check_trigger_update(Thing *trigger)
     case 3:
         if (game_is_either_mode_two() == 0) {
             if (vars->link != -1) {
-                char *linkedEntry = D_L14_001B268C + (vars->link << 7);
-                hero_reset_position_and_direction(linkedEntry + 0x30, linkedEntry + 0x70, 0, 1);
+                char *linked_entry = D_L14_001B268C + (vars->link << 7);
+                hero_reset_position_and_direction(linked_entry + 0x30, linked_entry + 0x70, 0, 1);
             }
             moby_set_state(trigger, 4, -1);
         }
@@ -157,8 +157,8 @@ void item_check_trigger_update(Thing *trigger)
         }
         if (vars->count != 0 && (vars->tail.word & 0xFFFF0000)) {
             if (vars->link != -1) {
-                char *linkedEntry = D_L14_001B268C + (vars->link << 7);
-                level_capture_checkpoint_state(linkedEntry + 0x30, linkedEntry + 0x70);
+                char *linked_entry = D_L14_001B268C + (vars->link << 7);
+                level_capture_checkpoint_state(linked_entry + 0x30, linked_entry + 0x70);
             } else
                 level_capture_checkpoint_state(trigger->pos, trigger->dir);
         }
@@ -181,8 +181,8 @@ void item_check_trigger_update(Thing *trigger)
         }
         if (vars->count > 0 && (vars->tail.word & 0xFFFF0000)) {
             if (vars->link != -1) {
-                char *linkedEntry = D_L14_001B268C + (vars->link << 7);
-                level_capture_checkpoint_state(linkedEntry + 0x30, linkedEntry + 0x70);
+                char *linked_entry = D_L14_001B268C + (vars->link << 7);
+                level_capture_checkpoint_state(linked_entry + 0x30, linked_entry + 0x70);
             } else
                 level_capture_checkpoint_state(g_hero_position, g_hero_position + 0x10);
         }

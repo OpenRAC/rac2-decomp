@@ -48,7 +48,7 @@ extern char glowing_trail_update[];
 void UpdateHomingMissile(char *missile)
 {
     float scratch[4], previous[4], delta[4], temp[4];
-    unsigned char damageInfo[48];
+    unsigned char damage_info[48];
     float particle[4];
     char *vars = *(char **)(missile + 0x68);
     char *target;
@@ -56,7 +56,7 @@ void UpdateHomingMissile(char *missile)
     char *effect;
     float *tracking_delta;
     float length, speed, scale;
-    int randomValue, i;
+    int random_value, i;
 
     if (!save_is_record_value(*(int *)(vars + 0x18), *(int *)(vars + 0x14))) {
         table_clear_entry_flag(*(int *)(vars + 0x34));
@@ -104,17 +104,17 @@ target_done:
         *(float *)(missile + 0xF4) = FastAddRotations(*(float *)(missile + 0xF4), *(float *)(vars + 0x48));
         *(float *)(missile + 0xF8) = FastAddRotations(*(float *)(missile + 0xF8), *(float *)(vars + 0x4C));
         moby_update_color_scale(missile);
-        *(char **)(damageInfo + 0x10) = missile;
-        *(int *)(damageInfo + 0x14) = 0x10000;
-        *(float *)(damageInfo + 0x1C) = ((B2510Entry *)((unsigned char)g_item_slot_to_record[0x1E] * 0xE0 + (char *)g_weapon_l00_table))->value;
-        *(int *)(damageInfo + 0x20) = 1;
-        qcopy(damageInfo, vars + 0x20);
-        vec_scale_to_length(damageInfo, damageInfo, 1.0f);
-        *(float *)(damageInfo + 0xC) = 5627.925f;
-        *(short *)(damageInfo + 0x1A) = *(unsigned short *)(missile + 0xAA);
-        damageInfo[0x18] = 1;
-        damageInfo[0x19] = 1;
-        if (CollLine(previous, missile + 0x10, 0, g_hero_moby, damageInfo)) {
+        *(char **)(damage_info + 0x10) = missile;
+        *(int *)(damage_info + 0x14) = 0x10000;
+        *(float *)(damage_info + 0x1C) = ((B2510Entry *)((unsigned char)g_item_slot_to_record[0x1E] * 0xE0 + (char *)g_weapon_l00_table))->value;
+        *(int *)(damage_info + 0x20) = 1;
+        qcopy(damage_info, vars + 0x20);
+        vec_scale_to_length(damage_info, damage_info, 1.0f);
+        *(float *)(damage_info + 0xC) = 5627.925f;
+        *(short *)(damage_info + 0x1A) = *(unsigned short *)(missile + 0xAA);
+        damage_info[0x18] = 1;
+        damage_info[0x19] = 1;
+        if (CollLine(previous, missile + 0x10, 0, g_hero_moby, damage_info)) {
             if (!g_collision_result.target) part_l00_spawn_spark_burst_3(g_collision_result.position, 15, 0);
             else if (*(int *)(g_collision_result.target + 0x98)) {
                 part_l00_spawn_spark_burst_3(g_collision_result.position, 10, 1);
@@ -132,23 +132,23 @@ target_done:
             *(unsigned short *)(missile + 0x34) |= 0x41;
             *(int *)(vars + 0x38) = 6;
         }
-        randomValue = math_random_int_below(255);
-        effect = part_spawn_gravity_fade(missile + 0x10, D_L00_001A8F20, 2, 0x202080, randomValue, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        random_value = math_random_int_below(255);
+        effect = part_spawn_gravity_fade(missile + 0x10, D_L00_001A8F20, 2, 0x202080, random_value, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
         if (effect) effect[2] = *D_L00_001FEA14;
-        effect = part_spawn_gravity_fade(missile + 0x10, D_L00_001A8F20, 2, 0x202080, (randomValue + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
+        effect = part_spawn_gravity_fade(missile + 0x10, D_L00_001A8F20, 2, 0x202080, (random_value + 128) % 255, 64, 16, 420000.0f, 420000.0f, 0.0f, 1);
         if (effect) effect[2] = *D_L00_001FEA14;
-        randomValue = (int)delta;
-        FastVecSub((void *)randomValue, missile + 0x10, previous);
-        FastVecScale((char *)randomValue, (char *)randomValue, 0.2f);
+        random_value = (int)delta;
+        FastVecSub((void *)random_value, missile + 0x10, previous);
+        FastVecScale((char *)random_value, (char *)random_value, 0.2f);
         qcopy(temp, previous);
-        tracking_delta = (float *)randomValue;
+        tracking_delta = (float *)random_value;
         for (i = 4; i >= 0; i--) {
-            randomValue = math_random_int_below(255);
+            random_value = math_random_int_below(255);
             scale = math_random_float_range(0.1f, 0.3f);
             particle[0] = temp[0] + math_random_signed_float_range(0.0f, 0.1f);
             particle[1] = temp[1] + math_random_signed_float_range(0.0f, 0.1f);
             particle[2] = temp[2] + math_random_signed_float_range(0.0f, 0.1f);
-            part_spawn_gravity_fade(particle, D_L00_001A8F20, 15, 0x808080, randomValue, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
+            part_spawn_gravity_fade(particle, D_L00_001A8F20, 15, 0x808080, random_value, 32, 0, scale * 210000.0f, scale * 42000.0f, 0.0f, 1);
             FastVecAdd(temp, temp, tracking_delta);
         }
         if (g_frame_l00_counter % 10 == 0) {

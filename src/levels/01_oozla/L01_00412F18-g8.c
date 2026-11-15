@@ -17,10 +17,10 @@ extern void matrix_mul_vec3(void *,void *,void *);
 extern void SpawnTintedEffects(void *,void *,f32,s32,s32,void *,f32,u32,s32,f32,f32);
 extern void moby_mark_spawned(void *);
 /* Waits for a hit, then bursts into sparks and sound and removes itself or stays in a final state. */
-void spark_l01_burst_update(void *mobyArg) {
+void spark_l01_burst_update(void *moby_arg) {
     BurstVec offset, tmp, up;
     f32 direction[4] __attribute__((aligned(16)));
-    u8 *obj=mobyArg;
+    u8 *obj=moby_arg;
     u8 *state=*(u8 **)(obj+0x68);
     s32 i;
     tmp.q=0;

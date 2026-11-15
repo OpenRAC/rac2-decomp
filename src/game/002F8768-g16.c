@@ -3,7 +3,7 @@
 /* Level reset: frees the two sound handles, restores the camera pose from the 16-byte
    default (a quadword copy of the small-data vector, so this unit is built with -G16). */
 #include "common.h"
-typedef struct { char pad[0x28]; char *obj; char pad2[0x60 - 0x2C]; int f60; char pad3[0x78 - 0x64]; int soundHandle1; int soundHandle2; char pad4[0x8C - 0x80]; int f8C; } Reset2F8768;
+typedef struct { char pad[0x28]; char *obj; char pad2[0x60 - 0x2C]; int f60; char pad3[0x78 - 0x64]; int sound_handle1; int sound_handle2; char pad4[0x8C - 0x80]; int f8C; } Reset2F8768;
 typedef struct { float v[4]; } Vec4_2F8768 __attribute__((aligned(16)));
 typedef struct { char pad[0x72]; unsigned short mode; } Mode2F8768;
 extern Reset2F8768 g_vendor_menu_state;
@@ -32,12 +32,12 @@ void shop_reset_menu_camera(void)
     float dir[4];
     Vec4_2F8768 in;
 
-    if (g_vendor_menu_state.soundHandle2 != -1)
-        set_animation_parameter(g_vendor_menu_state.soundHandle2, 0);
-    if (g_vendor_menu_state.soundHandle1 != -1)
-        set_animation_parameter(g_vendor_menu_state.soundHandle1, 0);
-    g_vendor_menu_state.soundHandle2 = -1;
-    g_vendor_menu_state.soundHandle1 = -1;
+    if (g_vendor_menu_state.sound_handle2 != -1)
+        set_animation_parameter(g_vendor_menu_state.sound_handle2, 0);
+    if (g_vendor_menu_state.sound_handle1 != -1)
+        set_animation_parameter(g_vendor_menu_state.sound_handle1, 0);
+    g_vendor_menu_state.sound_handle2 = -1;
+    g_vendor_menu_state.sound_handle1 = -1;
     hud_tick_countdown();
     g_current_game_mode = 0;
     stub_empty_8(0, 1);

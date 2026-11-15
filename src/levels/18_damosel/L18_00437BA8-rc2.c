@@ -47,28 +47,28 @@ extern s32 ref_L18_00437BA8_12 __attribute__((sda));
 
 /* Spawns a ring of small sparks around a point, each flying outward at its own random speed. */
 void part_l18_spawn_ring_of_sparks(void *position, s32 count) {
-    f32 radialSpeed;
-    f32 angleStep;
+    f32 radial_speed;
+    f32 angle_step;
     f32 angle;
-    s32 randomBit;
+    s32 random_bit;
     s32 remaining;
-    s32 randomOffset;
+    s32 random_offset;
     Vec3 velocity;
 
-    angleStep = 6.2831855f / ref_L18_00437BA8_03(count);
+    angle_step = 6.2831855f / ref_L18_00437BA8_03(count);
     angle = ref_L18_00437BA8_06(-3.1415927f, 3.1415927f);
     if (count > 0) {
         remaining = count;
         do {
             remaining -= 1;
-            radialSpeed = ref_L18_00437BA8_06(ref_L18_00437BA8_08, ref_L18_00437BA8_09) * 0.016666668f;
-            velocity.x = radialSpeed * ref_L18_00437BA8_00(angle);
-            velocity.y = radialSpeed * ref_L18_00437BA8_01(angle);
+            radial_speed = ref_L18_00437BA8_06(ref_L18_00437BA8_08, ref_L18_00437BA8_09) * 0.016666668f;
+            velocity.x = radial_speed * ref_L18_00437BA8_00(angle);
+            velocity.y = radial_speed * ref_L18_00437BA8_01(angle);
             velocity.z = ref_L18_00437BA8_06(ref_L18_00437BA8_10, ref_L18_00437BA8_11) * 0.016666668f;
-            randomBit = ref_L18_00437BA8_04(2);
-            randomOffset = ref_L18_00437BA8_05(-2, 2);
-            ref_L18_00437BA8_07(position, &velocity, &ref_L18_00437BA8_12, randomBit, randomOffset);
-            angle = ref_L18_00437BA8_02(angle, angleStep);
+            random_bit = ref_L18_00437BA8_04(2);
+            random_offset = ref_L18_00437BA8_05(-2, 2);
+            ref_L18_00437BA8_07(position, &velocity, &ref_L18_00437BA8_12, random_bit, random_offset);
+            angle = ref_L18_00437BA8_02(angle, angle_step);
         } while (remaining != 0);
     }
 }

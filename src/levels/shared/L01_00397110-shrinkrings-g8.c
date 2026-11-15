@@ -36,7 +36,7 @@ void DrawShrinkingMobyRings(char *moby)
     float transform[12];
     float rot[4];
     char *vars=*(char **)(moby+0x68);
-    float alpha,halfHeight;
+    float alpha,half_height;
     int j,k;
     copy_matrix_rotation(mat,moby+0xc0);
     qcopy(pos,moby+0x10);
@@ -49,7 +49,7 @@ void DrawShrinkingMobyRings(char *moby)
         q[j].g[3]|=0x8000L<<24;
         q[j].g[0]=0;
     }
-    halfHeight=0.1f;
+    half_height=0.1f;
     alpha=(1.95f-F(vars,0x34))*2.0f;
     if(alpha>1) alpha=1; else if(alpha<0) alpha=0;
     if(F(vars,0x34)<1.15f) {
@@ -62,7 +62,7 @@ void DrawShrinkingMobyRings(char *moby)
         shrink=F(vars,0x34);
         t=1.15f-shrink; if(t<0)t=0;
         {float fade=(0.2f-shrink)*5; if(fade<0)fade=0; D_L01_001B1FA4=fade;}
-        halfHeight=t+0.1f;
+        half_height=t+0.1f;
         if(B(moby,0x20)!=7 && B(moby,0x20)!=8) {
             if(shrink<0.65f) {
                 float v=shrink*1.5384615659713745f;
@@ -88,17 +88,17 @@ void DrawShrinkingMobyRings(char *moby)
             {float radius=F(vars,0x34); if(i)radius+=0.01f; q[i].v[k][0]=radius;}
             if(k&1) {
                 switch(i) {
-                case 0:row[i].v[0][2]+=D_L01_001AF618+halfHeight;break;
+                case 0:row[i].v[0][2]+=D_L01_001AF618+half_height;break;
                 case 1:row[i].v[0][2]+=D_L01_001AF618+D_L01_001AF620;break;
-                case 2:row[i].v[0][2]+=(D_L01_001AF618-halfHeight*scale)+D_L01_001AF620;break;
-                case 3:row[i].v[0][2]+=(D_L01_001AF618+halfHeight*scale)+D_L01_001AF620;break;
+                case 2:row[i].v[0][2]+=(D_L01_001AF618-half_height*scale)+D_L01_001AF620;break;
+                case 3:row[i].v[0][2]+=(D_L01_001AF618+half_height*scale)+D_L01_001AF620;break;
                 }
             } else {
                 switch(i) {
-                case 0:row[i].v[0][2]+=D_L01_001AF618-halfHeight;break;
+                case 0:row[i].v[0][2]+=D_L01_001AF618-half_height;break;
                 case 1:row[i].v[0][2]+=D_L01_001AF618-D_L01_001AF620;break;
-                case 2:row[i].v[0][2]+=(D_L01_001AF618-halfHeight*scale)-D_L01_001AF620;break;
-                case 3:row[i].v[0][2]+=(D_L01_001AF618+halfHeight*scale)-D_L01_001AF620;break;
+                case 2:row[i].v[0][2]+=(D_L01_001AF618-half_height*scale)-D_L01_001AF620;break;
+                case 3:row[i].v[0][2]+=(D_L01_001AF618+half_height*scale)-D_L01_001AF620;break;
                 }
             }
         }

@@ -16,8 +16,8 @@ int vaporizer_bolt_update_trail_sample(char *object)
     TI128 step;
     int index;
     char *state = *(char **)(object + 0x68);
-    char *base = level_get_slot_body(0xc04 /* Vaporizer */,*(short *)(state + 0x1a));
-    base += *(int *)level_get_slot_header(0xc04 /* Vaporizer */,*(short *)(state + 0x1a));
+    char *base = level_get_slot_body(MOBY_CLASS_VAPORIZER,*(short *)(state + 0x1a));
+    base += *(int *)level_get_slot_header(MOBY_CLASS_VAPORIZER,*(short *)(state + 0x1a));
     if (*(short *)(RECORD + 0x50) == 0) return 0;
     if (FastDecTimer(RECORD + 0x52) != 0) {
         *(short *)(RECORD + 0x50) = 0;

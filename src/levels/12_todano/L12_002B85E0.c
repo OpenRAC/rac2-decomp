@@ -219,7 +219,7 @@ void hero_l12_update_state_machine(void) {
     f32 k02;
     s32 cntA40;
 
-    f32 vecLength;
+    f32 vec_length;
     f32 spE4;
     f32 spE8;
     f32 spEC;
@@ -501,7 +501,7 @@ void hero_l12_update_state_machine(void) {
     void* temp_a1;
     void* temp_a1_2;
     void* temp_a1_6;
-    void* currentObject;
+    void* current_object;
     void* hero7C;
     f32 turn24;
     f32 ang82;
@@ -549,8 +549,8 @@ void hero_l12_update_state_machine(void) {
     void* var_v0_3;
 
     sp114 = ((Hero *)g_hero_state)->i[0x2298/4];
-    currentObject = ((Hero *)g_hero_state)->ptr[0x2290/4];
-    sp118 = (s32) M2C_FIELD(currentObject, u8* , 0x43);
+    current_object = ((Hero *)g_hero_state)->ptr[0x2290/4];
+    sp118 = (s32) M2C_FIELD(current_object, u8* , 0x43);
     switch (((Hero *)g_hero_state)->u[0x2294/4]) {                              /* switch 1 */
     case 0x0:
     case 0x1:
@@ -956,13 +956,13 @@ block_198:
             }
             vec_build_spherical_offset((s32)(g_hero_state + 0xF0), var_f12_7, ((Hero *)g_hero_state)->f[0x98/4], temp_f21);
         } else if (temp_v1_13 == 0x33) {
-            vecLength = FastVecLength((s32) (((void*)g_hero_state) + 0x160));
+            vec_length = FastVecLength((s32) (((void*)g_hero_state) + 0x160));
             if (((Hero *)g_hero_state)->i[0x22A0/4] == 0x34) {
-                ApproachValue((s32) &vecLength, 0.0f, 0.0022222223f);
+                ApproachValue((s32) &vec_length, 0.0f, 0.0022222223f);
             } else {
-                ApproachValue((s32) &vecLength, 0.0f, 0.0011111111f);
+                ApproachValue((s32) &vec_length, 0.0f, 0.0011111111f);
             }
-            vec_scale_to_length((s32)(g_hero_state + 0x160), (s32)(g_hero_state + 0x160), vecLength);
+            vec_scale_to_length((s32)(g_hero_state + 0x160), (s32)(g_hero_state + 0x160), vec_length);
             qcopy(&((Hero *)g_hero_state)->q[0xF0/16], &((Hero *)g_hero_state)->q[0x160/16]);
         }
         DeflectHeroOffSteepSurface(0);
@@ -1159,7 +1159,7 @@ block_224:
         }
         var_v0_3 = ((Hero *)g_hero_state)->ptr[0xB10/4];
         if (var_v0_3 != 0) {
-            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(M2C_FIELD(var_v0_3, f32* , 0x10) - M2C_FIELD(currentObject, f32* , 0x10), M2C_FIELD(var_v0_3, f32* , 0x14) - M2C_FIELD(currentObject, f32* , 0x14));
+            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(M2C_FIELD(var_v0_3, f32* , 0x10) - M2C_FIELD(current_object, f32* , 0x10), M2C_FIELD(var_v0_3, f32* , 0x14) - M2C_FIELD(current_object, f32* , 0x14));
             hero_steer_heading(0, 0.02f, 0.15f, 0.10471977f);
         }
         break;
@@ -1177,7 +1177,7 @@ block_224:
         }
         var_v0_3_u2 = ((Hero *)g_hero_state)->ptr[0xAA4/4];
         if (var_v0_3_u2 != 0) {
-            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(M2C_FIELD(var_v0_3_u2, f32* , 0x10) - M2C_FIELD(currentObject, f32* , 0x10), M2C_FIELD(var_v0_3_u2, f32* , 0x14) - M2C_FIELD(currentObject, f32* , 0x14));
+            ((Hero *)g_hero_state)->f[0x1A0/4] = mat_fast_helper_a(M2C_FIELD(var_v0_3_u2, f32* , 0x10) - M2C_FIELD(current_object, f32* , 0x10), M2C_FIELD(var_v0_3_u2, f32* , 0x14) - M2C_FIELD(current_object, f32* , 0x14));
             hero_steer_heading(0, 0.02f, 0.15f, 0.10471977f);
         }
         break;
@@ -1193,7 +1193,7 @@ block_224:
         if (temp_v1_16 == 0) {
             ApproachValue((s32) (((void*)g_hero_state) + 0xAA0), 0.45000002f, 0.022222223f);
             temp_v0_5 = ((Hero *)g_hero_state)->ptr[0xAA4/4];
-            var_f20_2 = mat_fast_helper_a(M2C_FIELD(temp_v0_5, f32* , 0x10) - M2C_FIELD(currentObject, f32* , 0x10), M2C_FIELD(temp_v0_5, f32* , 0x14) - M2C_FIELD(currentObject, f32* , 0x14));
+            var_f20_2 = mat_fast_helper_a(M2C_FIELD(temp_v0_5, f32* , 0x10) - M2C_FIELD(current_object, f32* , 0x10), M2C_FIELD(temp_v0_5, f32* , 0x14) - M2C_FIELD(current_object, f32* , 0x14));
             if (((Hero *)g_hero_state)->i[0x3A0/4] != 0) {
                 if (FastDiffRots(((Hero *)g_hero_state)->f[0x98/4], var_f20_2) > 1.5707964f) {
                     var_f20_2 = FastAddRotations(var_f20_2, 3.1415927f);
@@ -1244,7 +1244,7 @@ block_224:
         FastVecSub((s32)(g_hero_state + 0xF0), (s32) ((TI128*)v20), (s32)(g_hero_state + 0x80));
         break;
     case 0x2B:
-        if ((((Hero *)g_hero_state)->i[0xC28/4] & 2) && (M2C_FIELD(currentObject, u8* , 0x43) == 0x34)) {
+        if ((((Hero *)g_hero_state)->i[0xC28/4] & 2) && (M2C_FIELD(current_object, u8* , 0x43) == 0x34)) {
             set_hero_animation(0x35, 0xA, 12.0f);
             ((Hero *)g_hero_state)->f[0xC20/4] = 0.3f;
         }
@@ -1366,7 +1366,7 @@ block_224:
                 var_v0_4 = hero_get_speed_along_forward((s32) ((TI128*)vB0)) > 0.0f;
             }
             if (var_v0_4 != 0) {
-                if (M2C_FIELD(currentObject, u8* , 0x43) != 0x35) {
+                if (M2C_FIELD(current_object, u8* , 0x43) != 0x35) {
                     set_hero_animation(0x35, 6, 17.0f);
                     ((Hero *)g_hero_state)->h[0xAFC/2] = 1;
                 } else {
@@ -1376,7 +1376,7 @@ block_224:
                         ((Hero *)g_hero_state)->h[0xAFC/2] = 0;
                     }
                 }
-            } else if (M2C_FIELD(currentObject, u8* , 0x43) != 0x35) {
+            } else if (M2C_FIELD(current_object, u8* , 0x43) != 0x35) {
                 set_hero_animation(0x35, 0x15, 9.0f);
                 ((Hero *)g_hero_state)->h[0xAFC/2] = 2;
             } else {
@@ -2012,7 +2012,7 @@ block_224:
         cam_set_limits_second(0.04f, 0.2f);
         cam_set_limits_third(0.04f, 0.2f);
         cam_set_limits_fourth(0.02f, 0.2f);
-        temp_v1_25 = M2C_FIELD(currentObject, u8* , 0x43);
+        temp_v1_25 = M2C_FIELD(current_object, u8* , 0x43);
         if (temp_v1_25 == 0x37) {
             var_f0_6 = 1.4f;
             var_f20_9 = ((Hero *)g_hero_state)->f[0x1A8/4];
@@ -2819,7 +2819,7 @@ block_224:
     if (sp114 != ((Hero *)g_hero_state)->i[0x2298/4]) {
         ((Hero *)g_hero_state)->i[0x1C0/4] = 0;
     }
-    if (sp118 != M2C_FIELD(currentObject, u8* , 0x43)) {
+    if (sp118 != M2C_FIELD(current_object, u8* , 0x43)) {
         ((Hero *)g_hero_state)->i[0x1C4/4] = 0;
     }
 }

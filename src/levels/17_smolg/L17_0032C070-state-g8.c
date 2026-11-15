@@ -13,11 +13,11 @@ typedef unsigned int StateQuad __attribute__((mode(TI)));
 /* Updates an object that falls to the ground. When it is hit it turns into its next form and
    later disappears. */
 void falling_breakable_update(char *moby) {
-    union { StateQuad q; float f[4]; } oldPosition, delta;
+    union { StateQuad q; float f[4]; } old_position, delta;
     char *vars = *(char **)(moby + 0x68);
     float ground;
-    unsigned char modelIndex;
-    oldPosition.q = *(StateQuad *)(moby + 0x10);
+    unsigned char model_index;
+    old_position.q = *(StateQuad *)(moby + 0x10);
     switch (*(unsigned char *)(moby + 0x20)) {
     case 0:
         if (*(int *)(vars + 0x90) != -1) {
@@ -35,8 +35,8 @@ void falling_breakable_update(char *moby) {
     case 1:
         if (*(unsigned char *)(moby + 0x42) == 1 && (*(unsigned char *)(moby + 0x60) & 2)) {
             *(short *)(moby + 0xAA) = 0x921;
-            modelIndex = D_L17_001DBF81[0];
-            *(unsigned char *)(moby + 0x22) = modelIndex;
+            model_index = D_L17_001DBF81[0];
+            *(unsigned char *)(moby + 0x22) = model_index;
             *(char **)(moby + 0x24) = D_L17_001DAD00[*(unsigned char *)(moby + 0x22)];
             *(int *)(moby + 0x98) = *(int *)(*(char **)(moby + 0x24) + 0x10);
             func_0031ACD8(moby, 0, 0);
@@ -51,6 +51,6 @@ void falling_breakable_update(char *moby) {
         }
         break;
     }
-    func_002EEEE8(&delta, moby + 0x10, &oldPosition);
+    func_002EEEE8(&delta, moby + 0x10, &old_position);
     func_00323370(vars + 0x50, &delta, moby + 0xF0, moby + 0xF0);
 }

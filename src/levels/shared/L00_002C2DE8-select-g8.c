@@ -39,7 +39,7 @@ int hero_find_blue_swingshot_target(void)
         do {
             float horizontal, vertical, heading;
             int flags, active;
-            if (*(short *)(node + 0xAA) != 0x99D /* Blue Swingshot Target */) continue;
+            if (*(short *)(node + 0xAA) != MOBY_CLASS_BLUE_SWINGSHOT_TARGET) continue;
             flags = *(unsigned short *)(node + 0x34);
             if (flags & 1) continue;
             if (flag_is_third_pending_set(node)) continue;

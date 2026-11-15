@@ -22,17 +22,17 @@ void moby_wait_no_active_trigger_event(s32 moby)
         moby_set_state((u8 *)moby, 1, -1);
         break;
     case 1: {
-        s32 activeFound = 0;
+        s32 active_found = 0;
         s32 other = D_L22_001B2128;
 
         while (other != 0) {
             if (*(s16 *)(other + 0xAA) == 0xD3D /* moby class 3389 */) {
                 if (*(u8 *)(other + 0x20) != 3)
-                    activeFound = 1;
+                    active_found = 1;
             }
             other = *(s32 *)(other + 0x28);
         }
-        if (activeFound != 0)
+        if (active_found != 0)
             break;
         if (D_001A7A78 == 0) {
             D_001A7A78 = 1;

@@ -10,15 +10,15 @@ extern void func_3238E0(void *, void *, int, int, float);
 /* Ticks two timers in the object's data, counts up its age, and refreshes its attached effect. */
 void moby_update_timers_attachment(char *moby)
 {
-    char *mobyPtr = moby;
-    int varsAddr = *(int *)(mobyPtr + 0x68);
+    char *moby_ptr = moby;
+    int vars_addr = *(int *)(moby_ptr + 0x68);
 
-    func_2EB590(varsAddr + 0x230);
-    func_2EB590(varsAddr + 0x234);
-    if (*(unsigned short *)(mobyPtr + 0x96) < 0xFFFF) {
-        *(unsigned short *)(mobyPtr + 0x96) += 1;
+    func_2EB590(vars_addr + 0x230);
+    func_2EB590(vars_addr + 0x234);
+    if (*(unsigned short *)(moby_ptr + 0x96) < 0xFFFF) {
+        *(unsigned short *)(moby_ptr + 0x96) += 1;
     }
-    func_3238E0(mobyPtr, varsAddr + 0x2A0, 1, 1, D_L19_001B1D28);
+    func_3238E0(moby_ptr, vars_addr + 0x2A0, 1, 1, D_L19_001B1D28);
 }
 
 extern int D_L19_001A8F00 __attribute__((sda));
@@ -184,16 +184,16 @@ void UpdateHomingCollectible(u8 *object)
             g_hero_state.state == 0x39 || g_hero_state.state == 0x6F) {
             if (*(u8 **)(vars + 4)) {
                 u8 *linked = *(u8 **)(vars + 4);
-                int flagIndex = *(unsigned short *)(linked + 0xB2);
-                if (flagIndex & 1) {
-                    unsigned char *flagByte = &D_0019B4A8[((short)flagIndex >> 1) + (g_current_map_index[0] << 10)];
-                    if (((*flagByte >> 4) & 7) != 7) {
-                        *flagByte += 0x10;
+                int flag_index = *(unsigned short *)(linked + 0xB2);
+                if (flag_index & 1) {
+                    unsigned char *flag_byte = &D_0019B4A8[((short)flag_index >> 1) + (g_current_map_index[0] << 10)];
+                    if (((*flag_byte >> 4) & 7) != 7) {
+                        *flag_byte += 0x10;
                     }
                 } else {
-                    unsigned char *flagByte = &D_0019B4A8[((short)flagIndex >> 1) + (g_current_map_index[0] << 10)];
-                    if ((*flagByte & 7) != 7) {
-                        *flagByte += 1;
+                    unsigned char *flag_byte = &D_0019B4A8[((short)flag_index >> 1) + (g_current_map_index[0] << 10)];
+                    if ((*flag_byte & 7) != 7) {
+                        *flag_byte += 1;
                     }
                 }
                 moby_mark_spawned(*(u8 **)(vars + 4));

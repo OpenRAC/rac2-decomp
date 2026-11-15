@@ -39,28 +39,28 @@ void part_update_tethered(s32 effect) {
     s32 scaled[4];
     TI result;
     s32 target;
-    u8 targetState;
-    s32 pointB;
-    s32 pointA;
+    u8 target_state;
+    s32 point_b;
+    s32 point_a;
 
     target = (*(s32 *)((s8 *)(effect) + (0x30)));
-    if (target == 0 || (targetState = (*(u8 *)((s8 *)(target) + (0x20))), targetState == 0xFE) || targetState == 0xFD || FastDecTimer(effect + 0xA) != 0) {
+    if (target == 0 || (target_state = (*(u8 *)((s8 *)(target) + (0x20))), target_state == 0xFE) || target_state == 0xFD || FastDecTimer(effect + 0xA) != 0) {
         part_kill(effect);
         return;
     }
-    pointA = effect + 0x10;
-    FastVecSub(&result, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10, pointA);
-    pointB = effect + 0x20;
+    point_a = effect + 0x10;
+    FastVecSub(&result, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10, point_a);
+    point_b = effect + 0x20;
     *(TI *)scaled = result;
     FastVecScale(scaled, scaled, (D_001AA364 - 1.0f) + 1.0f);
     FastVecAdd(&result, scaled, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10);
     (*(TI *)((s8 *)(effect) + (0x10))) = result;
-    FastVecSub(&result, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10, pointB);
+    FastVecSub(&result, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10, point_b);
     *(TI *)scaled = result;
     FastVecScale(scaled, scaled, (D_001AA368 - 1.0f) + 1.0f);
     FastVecAdd(&result, scaled, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10);
     (*(TI *)((s8 *)(effect) + (0x20))) = result;
-    if (fast_vec_dist(pointA, pointB) < 0.1f || fast_vec_dist(pointA, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10) < 1.0f) {
+    if (fast_vec_dist(point_a, point_b) < 0.1f || fast_vec_dist(point_a, (*(s32 *)((s8 *)(effect) + (0x30))) + 0x10) < 1.0f) {
         part_kill(effect);
     }
 }

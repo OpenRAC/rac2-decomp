@@ -47,12 +47,12 @@ extern void multiply_quaternions(void *, void *, void *);
 void ComputePathPuzzleTurn(u8 *moby) {
     f32 matrix[12];
     Vec4 neg, v, axis, turn, test;
-    PuzzlePath *pathState = *(PuzzlePath **)(moby + 0x68);
+    PuzzlePath *path_state = *(PuzzlePath **)(moby + 0x68);
     f32 angle = -1.0f;
     f32 best, x, y;
     int i, n;
 
-    matrix_mul_vec3(&v, &D_L03_0029BBF0[pathState->current], moby + 0xC0);
+    matrix_mul_vec3(&v, &D_L03_0029BBF0[path_state->current], moby + 0xC0);
     FastVecScale(&neg, &D_L03_001B9BB0[0], angle);
     best = angle;
     FastVecCross(&axis, &v, &neg);
@@ -63,10 +63,10 @@ void ComputePathPuzzleTurn(u8 *moby) {
     quaternion_to_rotation_basis(&axis, matrix);
     multiply_matrix3x3(moby + 0xC0, matrix, moby + 0xC0);
 
-    if (pathState->facing[pathState->length] == 255) {
+    if (path_state->facing[path_state->length] == 255) {
         i = 0;
         do {
-            n = D_0024A7B0[pathState->current][i];
+            n = D_0024A7B0[path_state->current][i];
             if (n != -1) {
                 matrix_mul_vec3(&test, &D_L03_0029BBF0[n], moby + 0xC0);
                 x = FastVecDot(&test, &D_L03_001B9BB0[2]);
@@ -74,13 +74,13 @@ void ComputePathPuzzleTurn(u8 *moby) {
                 if (x > best) {
                     mat_fast_helper_a(x, y);
                     best = x;
-                    pathState->facing[pathState->length] = n;
+                    path_state->facing[path_state->length] = n;
                 }
             }
         } while (++i < 6);
     }
 
-    matrix_mul_vec3(&test, &D_L03_0029BBF0[pathState->facing[pathState->length]], moby + 0xC0);
+    matrix_mul_vec3(&test, &D_L03_0029BBF0[path_state->facing[path_state->length]], moby + 0xC0);
     x = FastVecDot(&test, &D_L03_001B9BB0[2]);
     y = FastVecDot(&test, &D_L03_001B9BB0[1]);
     angle = mat_fast_helper_a(x, y) * 0.5f;

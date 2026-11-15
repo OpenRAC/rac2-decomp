@@ -54,15 +54,15 @@ void platform_update_bob_sway(char *moby)
    shared bound and the object's own height is within two of the fixed point's. */
 int platform_is_player_inside_footprint(char *moby)
 {
-    float localPoint[4];
+    float local_point[4];
     float matrix[12];
 
-    FastVecSub(localPoint, g_hero_position, moby + 0x10);
+    FastVecSub(local_point, g_hero_position, moby + 0x10);
     mat_fast_helper_c(matrix, moby + 0xC0);
-    matrix_mul_vec3(localPoint, localPoint, matrix);
-    if (!(math_fabs(localPoint[0]) <= D_L17_001B0360))
+    matrix_mul_vec3(local_point, local_point, matrix);
+    if (!(math_fabs(local_point[0]) <= D_L17_001B0360))
         return 0;
-    if (!(math_fabs(localPoint[1]) <= D_L17_001B0360))
+    if (!(math_fabs(local_point[1]) <= D_L17_001B0360))
         return 0;
     if (math_fabs(g_hero_position[2] - *(float *)(moby + 0x18)) < 2.0f)
         return 1;
@@ -79,17 +79,17 @@ void flashing_update(s32 moby)
     s32 frame = D_001B2748;
     s32 period = 60;
     s32 value = *(short *)(moby + 0xB2);
-    s32 dimColor = 0x80404040;
-    s32 brightColor = 0x80FFFFFF;
+    s32 dim_color = 0x80404040;
+    s32 bright_color = 0x80FFFFFF;
     s32 color;
     s32 vars;
 
     frame = frame + value;
     value = frame % period;
     if (value >= 15)
-        color = dimColor;
+        color = dim_color;
     else
-        color = brightColor;
+        color = bright_color;
     *(s32 *)(moby + 0x78) = color;
     vars = *(s32 *)(moby + 0x68);
     *(u32 *)(vars + 0x8C) |= 1;

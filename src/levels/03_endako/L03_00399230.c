@@ -152,9 +152,9 @@ void ant_ring_update(char *moby)
         s32 active = *(s32 *)vars;
 
         if (active != 0) {
-            char *soundSlot = D_L03_00188660 + *(s32 *)(vars + 8) * 0x70;
+            char *sound_slot = D_L03_00188660 + *(s32 *)(vars + 8) * 0x70;
 
-            if (*(char **)(soundSlot + 0x88) != self || *(u8 *)(soundSlot + 0x74) == 0)
+            if (*(char **)(sound_slot + 0x88) != self || *(u8 *)(sound_slot + 0x74) == 0)
                 *(s32 *)(vars + 8) = func_360A80(0, 4, self);
         }
         *(f32 *)(self + 0xF8) = func_2F0000(*(f32 *)(self + 0xF8),
@@ -207,11 +207,11 @@ void break_on_hit_update(char *moby)
         break;
     case 1: {
         char *hit = (char *)func_31DD78(moby, 0x10000, 0);
-        s32 hitMoby;
+        s32 hit_moby;
 
         if (func_32AB10(moby) != 0
-            || (hit != 0 && (hitMoby = *(s32 *)(hit + 0x20)) != 0
-                && *(s16 *)(hitMoby + 0xAA) == 0xB1B /* moby class 2843 */)) {
+            || (hit != 0 && (hit_moby = *(s32 *)(hit + 0x20)) != 0
+                && *(s16 *)(hit_moby + 0xAA) == 0xB1B /* moby class 2843 */)) {
             part_emit_debris_burst(moby);
             func_360A80(0, 0, moby);
             func_311758(moby);

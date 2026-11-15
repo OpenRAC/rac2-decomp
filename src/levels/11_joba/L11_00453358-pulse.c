@@ -9,7 +9,7 @@ extern void gfx_draw_spinning_glow_sprites(char *);
 void UpdateJobaPulseController(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    unsigned short frameCount;
+    unsigned short frame_count;
     int fade;
     int old, current;
 
@@ -39,7 +39,7 @@ void UpdateJobaPulseController(char *moby)
         }
         break;
     }
-    frameCount = *(unsigned short *)(moby + 0x96);
-    if (frameCount <= 0xFFFE)
-        *(unsigned short *)(moby + 0x96) = frameCount + 1;
+    frame_count = *(unsigned short *)(moby + 0x96);
+    if (frame_count <= 0xFFFE)
+        *(unsigned short *)(moby + 0x96) = frame_count + 1;
 }

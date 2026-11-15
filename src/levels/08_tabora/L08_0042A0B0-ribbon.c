@@ -50,7 +50,7 @@ void DrawRibbonStrips(int texture0, int texture1, TaboraVec *points,
     char *spark, *settings, *settings2, *visual, *base;
     char **owner;
     int entry = slot, row = slot;
-    float baseWidth;
+    float base_width;
     int mode = 0, flags = 0;
     TaboraVec *path = points;
     int segment = particleSegment;
@@ -79,7 +79,7 @@ void DrawRibbonStrips(int texture0, int texture1, TaboraVec *points,
     q.uv[0] = u; q.uv[1] = 0; q.uv[2] = u; q.uv[3] = 1;
     q.uv[4] = u + 1; q.uv[5] = 0; q.uv[6] = u + 1; q.uv[7] = 1;
     if (*(s16 *)(((char **)g_beam_slot_key)[slot] + 0xAA) == 0x1C /* moby class 28 */) width = 0.3f;
-    baseWidth = width;
+    base_width = width;
     *(TaboraTI *)offsets[0] = 0;
     *(TaboraTI *)offsets[1] = 0;
     offsets[0][3] = 1; offsets[0][2] = width;
@@ -185,7 +185,7 @@ void DrawRibbonStrips(int texture0, int texture1, TaboraVec *points,
             q.uv[0] = u2; q.uv[1] = 0; q.uv[2] = u2; q.uv[3] = 1;
             q.uv[4] = u2 + 1; q.uv[5] = 0; q.uv[6] = u2 + 1; q.uv[7] = 1;
         }
-        offsets[0][2] = baseWidth + (0.05f - baseWidth) * t;
+        offsets[0][2] = base_width + (0.05f - base_width) * t;
         offsets[1][2] = offsets[0][2] + offsets[0][2];
     }
 }

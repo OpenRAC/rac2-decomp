@@ -33,41 +33,41 @@ extern s32 *g_path_table[];
 typedef int TI __attribute__((mode(TI)));
 
 /* Checks how close a spot is to the hero and returns 2 for the near zone, 1 for the far zone or 0 for neither. */
-s32 hero_check_distance_zones(void *object, s32 *outHero, s32 nearIndex, s32 farIndex, void *posOverride, f32 nearDistance, f32 farDistance) {
+s32 hero_check_distance_zones(void *object, s32 *out_hero, s32 near_index, s32 far_index, void *pos_override, f32 near_distance, f32 far_distance) {
     TI position;
     f32 distance;
     s32 hero;
-    s32 *nearZone;
-    s32 *farZone;
+    s32 *near_zone;
+    s32 *far_zone;
 
-    if (posOverride != 0) {
-        position = *(TI *)posOverride;
+    if (pos_override != 0) {
+        position = *(TI *)pos_override;
     } else {
         position = *(TI *)((s8 *)object + 0x10);
     }
     hero = g_hero_moby.w0;
-    *outHero = hero;
+    *out_hero = hero;
     if (g_current_game_mode != 0) {
         return 0;
     }
     distance = vec_distance_xy(&position, hero + 0x10);
-    if (nearIndex != -1) {
-        nearZone = g_path_table[nearIndex];
-        if (point_in_path_xy(*outHero + 0x10, (s8 *)nearZone + 0x10, *nearZone) != 0) {
+    if (near_index != -1) {
+        near_zone = g_path_table[near_index];
+        if (point_in_path_xy(*out_hero + 0x10, (s8 *)near_zone + 0x10, *near_zone) != 0) {
             return 2;
         }
     } else {
-        if (distance < nearDistance) {
+        if (distance < near_distance) {
             return 2;
         }
     }
-    if (farIndex != -1) {
-        farZone = g_path_table[farIndex];
-        if (point_in_path_xy(*outHero + 0x10, (s8 *)farZone + 0x10, *farZone) != 0) {
+    if (far_index != -1) {
+        far_zone = g_path_table[far_index];
+        if (point_in_path_xy(*out_hero + 0x10, (s8 *)far_zone + 0x10, *far_zone) != 0) {
             return 1;
         }
     } else {
-        if (distance < farDistance) {
+        if (distance < far_distance) {
             return 1;
         }
     }

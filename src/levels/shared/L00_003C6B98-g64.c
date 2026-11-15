@@ -92,13 +92,13 @@ extern int CollLine(void *, void *, int, void *, void *);
 /* Per-frame update of the lightning beam weapon. It finds where the beam ends, bends a chain of 12 points toward it, builds the glowing ribbon around each point, spawns sparks, and moves three travelling light pulses along the chain. */
 void lightning_l00_beam_update(char *owner)
 {
-    float pull[4], segment[4], spin[4], endPoint[4], scratch[4];
+    float pull[4], segment[4], spin[4], end_point[4], scratch[4];
     char *disabled[128];
     float delta[4], sideways[4];
     char *vars;
-    char *targetInfo = 0;
-    float dist, fraction = 0.0f, blend, radius, angle, along, segLength = 0.0f, scale;
-    int disabledCount, tries, j = 0, sparkSlot = 0, sparkIndex = 0, index = 0, sign = 0, segmentIndex = 0;
+    char *target_info = 0;
+    float dist, fraction = 0.0f, blend, radius, angle, along, seg_length = 0.0f, scale;
+    int disabled_count, tries, j = 0, spark_slot = 0, spark_index = 0, index = 0, sign = 0, segment_index = 0;
     Particle *particle = 0;
 
     spin[3] = 1.0f;
@@ -107,28 +107,28 @@ void lightning_l00_beam_update(char *owner)
     ResetBeamChainAndPulseState(owner);
     D_L00_001B2A14 = math_wrap_angle_to_pi(D_L00_001B2A14 + D_L00_001AFFD4);
     vec_scale_to_length(pull, owner + 0xD0, -D_L00_001B2A10);
-    if (*(char **)(vars + 0x10) != 0 && (targetInfo = moby_get_private_value_0(*(char **)(vars + 0x10))) != 0) {
-        FastVecScale(scratch, *(char **)(vars + 0x10) + 0xE0, *(float *)(targetInfo + 0x10));
-        FastVecAdd(endPoint, *(char **)(vars + 0x10) + 0x10, scratch);
+    if (*(char **)(vars + 0x10) != 0 && (target_info = moby_get_private_value_0(*(char **)(vars + 0x10))) != 0) {
+        FastVecScale(scratch, *(char **)(vars + 0x10) + 0xE0, *(float *)(target_info + 0x10));
+        FastVecAdd(end_point, *(char **)(vars + 0x10) + 0x10, scratch);
     } else {
         float x = *(float *)(vars + 0x48), y = *(float *)(vars + 0x4C);
-        vec_build_spherical_offset(endPoint, D_L00_001AFFA4, x, y);
-        FastVecAdd(endPoint, endPoint, vars);
+        vec_build_spherical_offset(end_point, D_L00_001AFFA4, x, y);
+        FastVecAdd(end_point, end_point, vars);
     }
-    disabledCount = 0;
+    disabled_count = 0;
     dist = D_L00_001AFFA4;
     tries = 0;
     if (*(char **)(vars + 0x10) == 0) {
         qcopy(scratch, vars);
-        while (CollLine(scratch, endPoint, 0x14, g_hero_state.object, 0)) {
+        while (CollLine(scratch, end_point, 0x14, g_hero_state.object, 0)) {
             Collision *col;
             char *hit;
             if (++tries >= 7) break;
             col = &g_collision_result;
-            if (g_collision_result.hit != 0 && (*(short *)(g_collision_result.hit + 0xAA) == 0xE7D /* Sheep */ || *(short *)(g_collision_result.hit + 0xAA) == 0xEB0 /* Dark Sheep */)) {
-                disabled[disabledCount++] = g_collision_result.hit;
+            if (g_collision_result.hit != 0 && (*(short *)(g_collision_result.hit + 0xAA) == MOBY_CLASS_SHEEP || *(short *)(g_collision_result.hit + 0xAA) == MOBY_CLASS_DARK_SHEEP)) {
+                disabled[disabled_count++] = g_collision_result.hit;
                 *(int *)(g_collision_result.hit + 0x98) = 0;
-                if (disabledCount < 128) {
+                if (disabled_count < 128) {
                     qcopy(scratch, &g_collision_result.point);
                     continue;
                 }
@@ -143,7 +143,7 @@ void lightning_l00_beam_update(char *owner)
             }
             break;
         }
-        for (index = 0; index < disabledCount; index++) {
+        for (index = 0; index < disabled_count; index++) {
             *(int *)(disabled[index] + 0x98) = *(int *)(*(char **)(disabled[index] + 0x24) + 0x10);
         }
     } else {
@@ -170,11 +170,11 @@ void lightning_l00_beam_update(char *owner)
             lerp_vector(pull, pull, scratch, 0.2f);
         }
         lerp_vector(scratch, segment, pull, blend);
-        segLength = FastVecLength(scratch);
-        if (segLength == 0.0f) {
+        seg_length = FastVecLength(scratch);
+        if (seg_length == 0.0f) {
             qcopy(&D_L00_002403C0[i], &D_L00_002403C0[i - 1]);
         } else {
-            FastVecScale(scratch, scratch, D_L00_001B2A10 / segLength);
+            FastVecScale(scratch, scratch, D_L00_001B2A10 / seg_length);
             FastVecAdd(&D_L00_002403C0[i], &D_L00_002403C0[i - 1], scratch);
         }
         FastVecSub(delta, &D_L00_002403C0[i], &D_L00_002403C0[i - 1]);
@@ -247,51 +247,51 @@ void lightning_l00_beam_update(char *owner)
     }
     if (math_fast_float_d(&D_L00_001B2ACC)) {
         D_L00_001B2ACC = D_L00_001B0020;
-        for (sparkSlot = 0; sparkSlot < 3; sparkSlot++) {
-            if (D_L00_001B2AC0[sparkSlot] == 0) {
-                D_L00_001B2AC0[sparkSlot] = 1;
-                D_L00_001B2A80[sparkSlot] = D_L00_001B0028;
-                D_L00_001B2AA0[sparkSlot] = 0;
-                D_L00_001B2AB0[sparkSlot] = D_L00_001B0038;
-                D_L00_001B2A90[sparkSlot] = IntToFloat(D_L00_001B003F);
-                qcopy(&D_L00_001B2A20[sparkSlot], vars);
+        for (spark_slot = 0; spark_slot < 3; spark_slot++) {
+            if (D_L00_001B2AC0[spark_slot] == 0) {
+                D_L00_001B2AC0[spark_slot] = 1;
+                D_L00_001B2A80[spark_slot] = D_L00_001B0028;
+                D_L00_001B2AA0[spark_slot] = 0;
+                D_L00_001B2AB0[spark_slot] = D_L00_001B0038;
+                D_L00_001B2A90[spark_slot] = IntToFloat(D_L00_001B003F);
+                qcopy(&D_L00_001B2A20[spark_slot], vars);
                 FastVecSub(sideways, &D_L00_002403C0[1], &D_L00_002403C0[0]);
-                vec_scale_to_length(&D_L00_001B2A50[sparkSlot], sideways, 1.0f);
+                vec_scale_to_length(&D_L00_001B2A50[spark_slot], sideways, 1.0f);
                 break;
             }
         }
     }
     {
-    for (sparkIndex = 0; sparkIndex < 3; sparkIndex++) {
-        if (D_L00_001B2AC0[sparkIndex] != 0) {
-            if (math_fast_float_d(&D_L00_001B2A80[sparkIndex]) != 0) {
-                D_L00_001B2AC0[sparkIndex] = 0;
+    for (spark_index = 0; spark_index < 3; spark_index++) {
+        if (D_L00_001B2AC0[spark_index] != 0) {
+            if (math_fast_float_d(&D_L00_001B2A80[spark_index]) != 0) {
+                D_L00_001B2AC0[spark_index] = 0;
             } else {
                 float step, u, rem, inv;
                 float offset[4];
-                if (D_L00_001B2A80[sparkIndex] < D_L00_001B002C) D_L00_001B2A90[sparkIndex] -= D_L00_001B0044;
+                if (D_L00_001B2A80[spark_index] < D_L00_001B002C) D_L00_001B2A90[spark_index] -= D_L00_001B0044;
                 step = D_L00_001B0024 * 0.016666668f;
-                D_L00_001B2AA0[sparkIndex] += step;
-                u = D_L00_001B2AA0[sparkIndex] / D_L00_001AFFA4;
+                D_L00_001B2AA0[spark_index] += step;
+                u = D_L00_001B2AA0[spark_index] / D_L00_001AFFA4;
                 if (u > 1.0f) u = 1.0f;
-                D_L00_001B2AB0[sparkIndex] = D_L00_001B0038 + (D_L00_001B0034 - D_L00_001B0038) * u;
-                if (D_L00_001B2AA0[sparkIndex] >= D_L00_001AFFA4) {
-                    FastVecScale(sideways, &D_L00_001B2A50[sparkIndex], step);
-                    FastVecAdd(&D_L00_001B2A20[sparkIndex], &D_L00_001B2A20[sparkIndex], sideways);
+                D_L00_001B2AB0[spark_index] = D_L00_001B0038 + (D_L00_001B0034 - D_L00_001B0038) * u;
+                if (D_L00_001B2AA0[spark_index] >= D_L00_001AFFA4) {
+                    FastVecScale(sideways, &D_L00_001B2A50[spark_index], step);
+                    FastVecAdd(&D_L00_001B2A20[spark_index], &D_L00_001B2A20[spark_index], sideways);
                 } else {
-                    segmentIndex = FloatToInt(D_L00_001B2AA0[sparkIndex] / D_L00_001B2A10);
-                    rem = D_L00_001B2AA0[sparkIndex] - IntToFloat(segmentIndex) * D_L00_001B2A10;
-                    qcopy(&D_L00_001B2A20[sparkIndex], &D_L00_002403C0[segmentIndex]);
-                    if (segmentIndex == 11) FastVecSub(sideways, &D_L00_002403C0[segmentIndex], &D_L00_002403C0[segmentIndex + -1]);
-                    else FastVecSub(sideways, &D_L00_002403C0[segmentIndex + 1], &D_L00_002403C0[segmentIndex]);
+                    segment_index = FloatToInt(D_L00_001B2AA0[spark_index] / D_L00_001B2A10);
+                    rem = D_L00_001B2AA0[spark_index] - IntToFloat(segment_index) * D_L00_001B2A10;
+                    qcopy(&D_L00_001B2A20[spark_index], &D_L00_002403C0[segment_index]);
+                    if (segment_index == 11) FastVecSub(sideways, &D_L00_002403C0[segment_index], &D_L00_002403C0[segment_index + -1]);
+                    else FastVecSub(sideways, &D_L00_002403C0[segment_index + 1], &D_L00_002403C0[segment_index]);
                     inv = FastVecLength(sideways);
                     if (inv != 0.0f) {
                         inv = 1.0f / inv;
                         FastVecScale(offset, sideways, rem * inv);
-                        FastVecAdd(&D_L00_001B2A20[sparkIndex], &D_L00_001B2A20[sparkIndex], offset);
+                        FastVecAdd(&D_L00_001B2A20[spark_index], &D_L00_001B2A20[spark_index], offset);
                         vec_scale_to_length(offset, sideways, inv);
-                        lerp_vector(&D_L00_001B2A50[sparkIndex], &D_L00_001B2A50[sparkIndex], offset, 0.1f);
-                        vec_scale_to_length(&D_L00_001B2A50[sparkIndex], &D_L00_001B2A50[sparkIndex], 1.0f);
+                        lerp_vector(&D_L00_001B2A50[spark_index], &D_L00_001B2A50[spark_index], offset, 0.1f);
+                        vec_scale_to_length(&D_L00_001B2A50[spark_index], &D_L00_001B2A50[spark_index], 1.0f);
                     }
                 }
             }

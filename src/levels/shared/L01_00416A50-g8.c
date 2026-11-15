@@ -48,13 +48,13 @@ extern void gfx_draw_glow_rings(Obj_416A50 *);
 void bobbing_l01_moby_update_2(Obj_416A50 *moby)
 {
     State_416A50 *vars = moby->st;
-    float bobSine;
+    float bob_sine;
 
     moby->f2C = moby->cls->f24 * D_L01_001B1A58;
 
     if (moby->b20 == 1) {
-        bobSine = math_fast_sin_or_cos_b(moby->fFC);
-        moby->f18 = vars->f18 + D_L01_001B1A5C + D_L01_001B1A60 * bobSine;
+        bob_sine = math_fast_sin_or_cos_b(moby->fFC);
+        moby->f18 = vars->f18 + D_L01_001B1A5C + D_L01_001B1A60 * bob_sine;
         moby->fF0 = FastAddRotations(moby->fF0, vars->f68);
         moby->fF4 = FastAddRotations(moby->fF4, vars->f64);
         moby->fF8 = FastAddRotations(moby->fF8, vars->f60);

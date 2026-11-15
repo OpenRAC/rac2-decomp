@@ -86,7 +86,7 @@ done:
 }
 
 /* Loads a sound bank by id and waits for the answer. */
-unsigned int snd_BankLoadFromIOP(int bankId) {
+unsigned int snd_BankLoadFromIOP(int bank_id) {
     unsigned int reply;
     unsigned int busy;
 
@@ -97,7 +97,7 @@ unsigned int snd_BankLoadFromIOP(int bankId) {
         printf(D_001A7730);
         return 0;
     }
-    D_001A71C0 = bankId;
+    D_001A71C0 = bank_id;
     D_001A7180 = -1u;
     while (sif_rpc_is_handle_valid(&D_001A7140) != 0) {
         if (D_001A74F8 == 0)

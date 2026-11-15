@@ -151,7 +151,7 @@ void UpdateCollidingTrailProjectile(char *self)
             if (obj != 0) {
                 char *hero;
                 if ((*(long long *)(obj + 0x30) & ((long long)0xA000 << 31)) && obj != (hero = g_hero_moby)
-                    && *(short *)(obj + 0xAA) != 0x5C9 /* Lava Gun */) {
+                    && *(short *)(obj + 0xAA) != MOBY_CLASS_LAVA_GUN) {
                     FastVecSub(a30, obj + 0x10, hero + 0x10);
                     vec_scale_to_length(a30, a30, 1.0f);
                     vec_scale_to_length(&hit, &hit, 0.116666675f);

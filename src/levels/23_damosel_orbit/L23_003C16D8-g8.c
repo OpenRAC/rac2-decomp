@@ -32,13 +32,13 @@ extern void FastVecSub(void *, void *, void *);
 
 /* Turns the helper object to face the right way each frame, twisting it by a timed amount. */
 void child_update_orientation(char *moby) {
-    TI128 baseVec[1], matrix[3], twistVec[1], scratchVec[1], matrix2[3], pushVec[1];
-    float unusedOut0, unusedOut1;
+    TI128 base_vec[1], matrix[3], twist_vec[1], scratch_vec[1], matrix2[3], push_vec[1];
+    float unused_out0, unused_out1;
     char *vars = *(char **)(moby + 0x68);
     float angle;
-    float rateA;
-    float rateB;
-    float rateC;
+    float rate_a;
+    float rate_b;
+    float rate_c;
 
     if (*(unsigned char *)(moby + 0x95) == 2 || *(short *)(vars + 0x2A6) != 0)
         moby_transform_joint_to_world(moby, 1, *(char **)(vars + 0x2A0) + 0x10);
@@ -47,22 +47,22 @@ void child_update_orientation(char *moby) {
     if (*(unsigned char *)(moby + 0x95) == 2) {
         if (*(short *)(vars + 0x2A6) == 0)
             *(int *)(vars + 0x2AC) = 0;
-        FastVecSub(baseVec, g_hero_position, *(char **)(vars + 0x2A0) + 0x10);
-        angle = vec_get_heading_angle(*(char **)(vars + 0x2A0), baseVec, 0);
-        rateB = *(float *)(vars + 0x68) + *(float *)(vars + 0x68);
-        rateA = *(float *)(vars + 0x64);
-        rateC = *(float *)(vars + 0x6C);
-        unusedOut0 = 0;
-        math_approach_target_with_direction_mode(&unusedOut0, angle, rateA, rateB, rateC, vars + 0x2AC, 0);
-        qzero_nc(twistVec);
-        ((float *)twistVec)[2] = *(float *)(vars + 0x2AC);
-        euler_rotation_basis(matrix, twistVec);
+        FastVecSub(base_vec, g_hero_position, *(char **)(vars + 0x2A0) + 0x10);
+        angle = vec_get_heading_angle(*(char **)(vars + 0x2A0), base_vec, 0);
+        rate_b = *(float *)(vars + 0x68) + *(float *)(vars + 0x68);
+        rate_a = *(float *)(vars + 0x64);
+        rate_c = *(float *)(vars + 0x6C);
+        unused_out0 = 0;
+        math_approach_target_with_direction_mode(&unused_out0, angle, rate_a, rate_b, rate_c, vars + 0x2AC, 0);
+        qzero_nc(twist_vec);
+        ((float *)twist_vec)[2] = *(float *)(vars + 0x2AC);
+        euler_rotation_basis(matrix, twist_vec);
         multiply_matrix3x3(*(char **)(vars + 0x2A0) + 0xC0, *(char **)(vars + 0x2A0) + 0xC0, matrix);
         func_002A05A8(*(char **)(vars + 0x2A0));
         *(unsigned short *)(*(char **)(vars + 0x2A0) + 0x34) |= 0x106;
         func_002A0F48(*(char **)(vars + 0x2A0));
-        FastVecScale(scratchVec, vars + 0x280, -1.0f);
-        mat_align_to_dir(*(char **)(vars + 0x2A0) + 0xC0, scratchVec, 0);
+        FastVecScale(scratch_vec, vars + 0x280, -1.0f);
+        mat_align_to_dir(*(char **)(vars + 0x2A0) + 0xC0, scratch_vec, 0);
         *(short *)(vars + 0x2A6) = D_L23_001AFA64;
         return;
     }
@@ -72,27 +72,27 @@ void child_update_orientation(char *moby) {
         if (timer != 0) {
             if (timer == D_L23_001AFA64)
                 *(int *)(vars + 0x2AC) = 0;
-            *baseVec = 0;
-            ((float *)baseVec)[0] = 1.0f;
-            ((float *)baseVec)[3] = 1.0f;
+            *base_vec = 0;
+            ((float *)base_vec)[0] = 1.0f;
+            ((float *)base_vec)[3] = 1.0f;
             moby_transform_joint_point(moby, 1, matrix);
-            qzero_nc(twistVec);
-            matrix_mul_vec3(baseVec, baseVec, matrix);
-            angle = vec_get_heading_angle(*(char **)(vars + 0x2A0), baseVec, 0);
-            rateA = *(float *)(vars + 0x64) + *(float *)(vars + 0x64);
-            rateC = *(float *)(vars + 0x6C);
-            rateB = *(float *)(vars + 0x68) * 4.0f;
-            unusedOut1 = 0;
-            math_approach_target_with_direction_mode(&unusedOut1, angle, rateA, rateB, rateC, vars + 0x2AC, 0);
-            qzero_nc(scratchVec);
-            ((float *)scratchVec)[2] = *(float *)(vars + 0x2AC);
-            euler_rotation_basis(matrix2, scratchVec);
+            qzero_nc(twist_vec);
+            matrix_mul_vec3(base_vec, base_vec, matrix);
+            angle = vec_get_heading_angle(*(char **)(vars + 0x2A0), base_vec, 0);
+            rate_a = *(float *)(vars + 0x64) + *(float *)(vars + 0x64);
+            rate_c = *(float *)(vars + 0x6C);
+            rate_b = *(float *)(vars + 0x68) * 4.0f;
+            unused_out1 = 0;
+            math_approach_target_with_direction_mode(&unused_out1, angle, rate_a, rate_b, rate_c, vars + 0x2AC, 0);
+            qzero_nc(scratch_vec);
+            ((float *)scratch_vec)[2] = *(float *)(vars + 0x2AC);
+            euler_rotation_basis(matrix2, scratch_vec);
             multiply_matrix3x3(*(char **)(vars + 0x2A0) + 0xC0, *(char **)(vars + 0x2A0) + 0xC0, matrix2);
             func_002A05A8(*(char **)(vars + 0x2A0));
             *(unsigned short *)(*(char **)(vars + 0x2A0) + 0x34) |= 0x106;
             func_002A0F48(*(char **)(vars + 0x2A0));
-            FastVecScale(pushVec, vars + 0x280, -1.0f);
-            mat_align_to_dir(*(char **)(vars + 0x2A0) + 0xC0, pushVec, 0);
+            FastVecScale(push_vec, vars + 0x280, -1.0f);
+            mat_align_to_dir(*(char **)(vars + 0x2A0) + 0xC0, push_vec, 0);
             FastDecTimer((short *)(vars + 0x2A6));
         }
     }

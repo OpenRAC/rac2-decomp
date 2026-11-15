@@ -55,10 +55,10 @@ extern void part_spawn_two_glow_effects(void *);
 /* Update handler for moby class 4855, a homing shot: it steers and moves each frame, leaves a particle trail, and explodes when it hits something. */
 void homing_l20_shot_update(char *moby) {
     char *state = *(char **)(moby + 0x68);
-    float newPos[4] __attribute__((aligned(16)));
+    float new_pos[4] __attribute__((aligned(16)));
     float step[4] __attribute__((aligned(16)));
-    float sparkVelocity[4] __attribute__((aligned(16)));
-    float sparkScratch[4] __attribute__((aligned(16)));
+    float spark_velocity[4] __attribute__((aligned(16)));
+    float spark_scratch[4] __attribute__((aligned(16)));
     u8 mode;
 
     if (D_L20_001A8F00 == 2) {
@@ -70,8 +70,8 @@ void homing_l20_shot_update(char *moby) {
     case 0: {
         char *base;
         float speed = *(float *)(state + 0x28);
-        float startSize;
-        float endSize;
+        float start_size;
+        float end_size;
 
         base = moby + 0x10;
         *(float *)(moby + 0xF0) =
@@ -83,8 +83,8 @@ void homing_l20_shot_update(char *moby) {
         lerp_vector(step, state, state + 0x10,
                       *(float *)(state + 0x30));
         ApproachValue((float *)(state + 0x30), 1.0f, *(float *)(state + 0x34));
-        FastVecAdd(newPos, base, step);
-        if (coll_test_point(newPos, 0, moby, D_L20_001B2468) != 0) {
+        FastVecAdd(new_pos, base, step);
+        if (coll_test_point(new_pos, 0, moby, D_L20_001B2468) != 0) {
             int id = D_L20_001C0418;
 
             if (id != 0 && id != *(int *)(moby + 0xB8)) {
@@ -92,12 +92,12 @@ void homing_l20_shot_update(char *moby) {
                 break;
             }
         }
-        qcopy(moby + 0x10, newPos);
-        FastVecScale(sparkVelocity, state, -0.5f);
-        vec_clear_128(sparkScratch);
-        startSize = math_random_float_range(2.5f, 3.0f) * 210000.0f;
-        endSize = math_random_float_range(0.2f, 0.4f) * 210000.0f;
-        part_spawn_gravity_fade(moby + 0x10, sparkVelocity, startSize, endSize, 0.0f, 0xF,
+        qcopy(moby + 0x10, new_pos);
+        FastVecScale(spark_velocity, state, -0.5f);
+        vec_clear_128(spark_scratch);
+        start_size = math_random_float_range(2.5f, 3.0f) * 210000.0f;
+        end_size = math_random_float_range(0.2f, 0.4f) * 210000.0f;
+        part_spawn_gravity_fade(moby + 0x10, spark_velocity, start_size, end_size, 0.0f, 0xF,
                       D_L20_001B2460, 3, 0x50, 0, 0);
     } break;
     case 1: {

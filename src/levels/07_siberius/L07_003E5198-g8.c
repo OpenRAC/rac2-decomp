@@ -27,7 +27,7 @@ extern struct PlayerState1310 g_hero_state;
    its goals. */
 void group_entity_update(unsigned char *moby)
 {
-    float goalPos[4] __attribute__((aligned(16)));
+    float goal_pos[4] __attribute__((aligned(16)));
     float lengths[2];
     char *vars=*(char **)(moby+0x68);
     int i;
@@ -44,10 +44,10 @@ void group_entity_update(unsigned char *moby)
     case 1:
         if (flag_set_first_pending(moby) && moby[0x43]) anim_start_blended(moby,0,0,20);
         if (*(char **)(vars+0x260)) {
-            matrix_mul_vec3(goalPos,vars+0x220,*(char **)(vars+0x260)+0xC0);
-            FastVecAdd(goalPos,goalPos,*(char **)(vars+0x260)+0x10);
-        } else qcopy(goalPos,vars+0x220);
-        entity_move_to_tracked_height(moby,goalPos,0,1);
+            matrix_mul_vec3(goal_pos,vars+0x220,*(char **)(vars+0x260)+0xC0);
+            FastVecAdd(goal_pos,goal_pos,*(char **)(vars+0x260)+0x10);
+        } else qcopy(goal_pos,vars+0x220);
+        entity_move_to_tracked_height(moby,goal_pos,0,1);
         break;
     case 3:
         if(flag_set_first_pending(moby)) *(float *)(vars+0x250)=math_random_signed_float_range(D_L07_001B0A98[0],D_L07_001B0A98[1])*0.01745329424738884f;
@@ -73,10 +73,10 @@ void group_entity_update(unsigned char *moby)
         break;
     case 9: {
         float tolerance=0.08333333582f;
-        FastVecSub(goalPos,vars+0x230,moby+0x10);
-        if(FastVecLength(goalPos)>tolerance) vec_clamp_length(goalPos,tolerance);
+        FastVecSub(goal_pos,vars+0x230,moby+0x10);
+        if(FastVecLength(goal_pos)>tolerance) vec_clamp_length(goal_pos,tolerance);
         else moby_set_state(moby,10,-1);
-        FastVecAdd(moby+0x10,moby+0x10,goalPos);
+        FastVecAdd(moby+0x10,moby+0x10,goal_pos);
         entity_spawn_particle_pair(moby);
         break;
     }

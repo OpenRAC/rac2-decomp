@@ -28,32 +28,32 @@ extern f32 IntToFloat();
 extern s32 FloatToInt(f32);
 
 /* Fades a sound volume from loud to quiet as the distance grows from the near limit to the far limit. */
-s32 snd_compute_falloff(s32 curve, f32 distance, f32 nearDistance, f32 farDistance) {
+s32 snd_compute_falloff(s32 curve, f32 distance, f32 near_distance, f32 far_distance) {
     f32 remaining;
     f32 span;
-    f32 volumeRange;
-    f32 remainingLinear;
+    f32 volume_range;
+    f32 remaining_linear;
     f32 var_f1;
 
     if ((*(u8 *)((s8 *)(curve) + (0x19))) & 1) {
-        if (distance <= nearDistance) {
+        if (distance <= near_distance) {
             return (*(s32 *)((s8 *)(curve) + (0xC)));
         }
-        if (farDistance <= distance) {
+        if (far_distance <= distance) {
             return (*(s32 *)((s8 *)(curve) + (8)));
         }
-        volumeRange = IntToFloat((*(s32 *)((s8 *)(curve) + (0xC))) - (*(s32 *)((s8 *)(curve) + (8))));
-        remaining = farDistance - distance;
-        span = farDistance - nearDistance;
-        return (*(s32 *)((s8 *)(curve) + (8))) + FloatToInt(((remaining * remaining) * volumeRange) / (span * span));
+        volume_range = IntToFloat((*(s32 *)((s8 *)(curve) + (0xC))) - (*(s32 *)((s8 *)(curve) + (8))));
+        remaining = far_distance - distance;
+        span = far_distance - near_distance;
+        return (*(s32 *)((s8 *)(curve) + (8))) + FloatToInt(((remaining * remaining) * volume_range) / (span * span));
     }
-    if (distance <= nearDistance) {
+    if (distance <= near_distance) {
         return (*(s32 *)((s8 *)(curve) + (0xC)));
     }
-    if (!(farDistance <= distance)) {
-        volumeRange = IntToFloat((*(s32 *)((s8 *)(curve) + (0xC))) - (*(s32 *)((s8 *)(curve) + (8))));
-        remainingLinear = farDistance - distance;
-        return (*(s32 *)((s8 *)(curve) + (8))) + FloatToInt((remainingLinear * volumeRange) / (farDistance - nearDistance));
+    if (!(far_distance <= distance)) {
+        volume_range = IntToFloat((*(s32 *)((s8 *)(curve) + (0xC))) - (*(s32 *)((s8 *)(curve) + (8))));
+        remaining_linear = far_distance - distance;
+        return (*(s32 *)((s8 *)(curve) + (8))) + FloatToInt((remaining_linear * volume_range) / (far_distance - near_distance));
     }
     return (*(s32 *)((s8 *)(curve) + (8)));
 }

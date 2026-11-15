@@ -14,7 +14,7 @@ extern unsigned char *D_001F2634;
 void part_update_joint_following_glow(char *particle)
 {
     char *motion;
-    float jointPos[4], offset[4];
+    float joint_pos[4], offset[4];
     float limit;
 
     if (!particle)
@@ -62,8 +62,8 @@ void part_update_joint_following_glow(char *particle)
     *(int *)(particle + 4) = (*(int *)(particle + 4) & 0xffffff) +
         (FloatToInt(*(float *)(motion + 4) * 256.0f) << 24);
     *(float *)(motion + 20) += (1.0f - *(float *)(motion + 20)) * 0.175f;
-    moby_transform_joint_to_world(*(void **)motion, *(short *)(motion + 14), jointPos);
-    FastVecSub(offset, g_camera_eye_state, jointPos);
+    moby_transform_joint_to_world(*(void **)motion, *(short *)(motion + 14), joint_pos);
+    FastVecSub(offset, g_camera_eye_state, joint_pos);
     vec_scale_to_length(offset, offset, *(float *)(motion + 20));
-    FastVecAdd(particle + 16, (char *)jointPos, (char *)offset);
+    FastVecAdd(particle + 16, (char *)joint_pos, (char *)offset);
 }

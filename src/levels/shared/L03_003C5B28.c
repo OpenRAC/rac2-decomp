@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char u8;
@@ -392,7 +393,7 @@ extern void euler_rotation_basis(u8 *, u8 *);
 /* Creates an Infiltrator Ball, links it to this object and remembers it in this object's data. */
 void infiltrator_ball_spawn_for_moby(u8 *moby) {
     u8 *vars = *(u8 **)(moby + 0x68);
-    u8 *child = CreateMoby(0xB28 /* Infiltrator Ball */);
+    u8 *child = CreateMoby(MOBY_CLASS_INFILTRATOR_BALL);
 
     if (child == 0)
         return;

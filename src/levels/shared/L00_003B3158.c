@@ -187,20 +187,20 @@ void pair_game_destroy_objects(NODE *object)
 
 
 /* Wraps two coordinates around to the opposite side when they go past the edge of the play area. */
-void pair_game_wrap_coordinates(float *valueA, float *valueB)
+void pair_game_wrap_coordinates(float *value_a, float *value_b)
 {
-    if (func_2EE048(*valueA) > ref_L00_003B7190_00) {
-        if (*valueA < -ref_L00_003B7190_00)
-            *valueA = ref_L00_003B7190_00;
-        else if (*valueA > ref_L00_003B7190_00)
-            *valueA = -ref_L00_003B7190_00;
+    if (func_2EE048(*value_a) > ref_L00_003B7190_00) {
+        if (*value_a < -ref_L00_003B7190_00)
+            *value_a = ref_L00_003B7190_00;
+        else if (*value_a > ref_L00_003B7190_00)
+            *value_a = -ref_L00_003B7190_00;
     }
 
-    if (func_2EE048(*valueB) > ref_L00_003B7190_01) {
-        if (*valueB < -ref_L00_003B7190_01)
-            *valueB = ref_L00_003B7190_01;
-        else if (*valueB > ref_L00_003B7190_01)
-            *valueB = -ref_L00_003B7190_01;
+    if (func_2EE048(*value_b) > ref_L00_003B7190_01) {
+        if (*value_b < -ref_L00_003B7190_01)
+            *value_b = ref_L00_003B7190_01;
+        else if (*value_b > ref_L00_003B7190_01)
+            *value_b = -ref_L00_003B7190_01;
     }
 }
 
@@ -285,7 +285,7 @@ Moby *SelectCurrentOrPreferredTarget(void *origin, void *direction, Moby *prefer
         for (i = 0; i < count; ++i) {
             candidate = candidates[i];
             if (candidate && candidate->state != 0xFE && candidate->state != 0xFD
-                && candidate == preferred && candidate->oClass == 0xEE1 /* Receiver Bot */) {
+                && candidate == preferred && candidate->oClass == MOBY_CLASS_RECEIVER_BOT) {
                 vars = candidate->vars;
                 if ((vars->flags3B1 & 0x80) && vars->f20 > 0.0f) {
                     if (vars->maxDistance == 0.0f
@@ -300,7 +300,7 @@ Moby *SelectCurrentOrPreferredTarget(void *origin, void *direction, Moby *prefer
     for (j = 0; j < count; ++j) {
         fallback = candidates[j];
         if (fallback && fallback->state != 0xFE && fallback->state != 0xFD
-            && fallback->oClass == 0xEE1 /* Receiver Bot */) {
+            && fallback->oClass == MOBY_CLASS_RECEIVER_BOT) {
             fallbackVars = fallback->vars;
             if ((fallbackVars->flags3B1 & 0x80) && fallbackVars->f20 > 0.0f) {
                 if (fallbackVars->maxDistance == 0.0f

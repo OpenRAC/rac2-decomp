@@ -38,9 +38,9 @@ extern f32 g_001B3AAC __attribute__((sda));
 /* Swings an object to a set angle with a bounce, then stops once it has settled. */
 void swing_to_angle_update(s8 *moby) {
     f32 angle;
-    f32 finalSpeed;
-    f32 targetAngle;
-    f32 newSpeed;
+    f32 final_speed;
+    f32 target_angle;
+    f32 new_speed;
     u8 state;
 
     state = *(u8 *)(moby + 0x20);
@@ -53,16 +53,16 @@ void swing_to_angle_update(s8 *moby) {
         }
         break;
     case 1:
-        newSpeed = ref_L16_0041EBE8_08 + (ref_L16_0041EBE8_06 * 0.00000484813745060819201171398162841796875f);
-        targetAngle = ref_L16_0041EBE8_05 * 0.0174532942473888397216796875f;
-        angle = ref_L16_0041EBE8_04 + newSpeed;
-        ref_L16_0041EBE8_08 = newSpeed;
+        new_speed = ref_L16_0041EBE8_08 + (ref_L16_0041EBE8_06 * 0.00000484813745060819201171398162841796875f);
+        target_angle = ref_L16_0041EBE8_05 * 0.0174532942473888397216796875f;
+        angle = ref_L16_0041EBE8_04 + new_speed;
+        ref_L16_0041EBE8_08 = new_speed;
         ref_L16_0041EBE8_04 = angle;
-        if (targetAngle <= angle) {
-            ref_L16_0041EBE8_04 = targetAngle;
-            finalSpeed = newSpeed * ref_L16_0041EBE8_07;
-            g_001B3AAC = finalSpeed;
-            if (ref_L16_0041EBE8_02(finalSpeed) < 0.000290888245217502117156982421875f) {
+        if (target_angle <= angle) {
+            ref_L16_0041EBE8_04 = target_angle;
+            final_speed = new_speed * ref_L16_0041EBE8_07;
+            g_001B3AAC = final_speed;
+            if (ref_L16_0041EBE8_02(final_speed) < 0.000290888245217502117156982421875f) {
                 ref_L16_0041EBE8_01(moby, 2, -1);
             }
         }

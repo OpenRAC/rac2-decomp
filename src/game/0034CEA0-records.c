@@ -32,7 +32,7 @@ typedef struct {
 } RecordSet;
 
 /* Sets up the records screen: the record row texts, the ammo and bolt HUD, and the other panels. */
-void records_screen_init(void *object, void *fontData, void *context)
+void records_screen_init(void *object, void *font_data, void *context)
 {
     RecordSet *set = object;
     char *record = (char *)0x8710;
@@ -54,7 +54,7 @@ void records_screen_init(void *object, void *fontData, void *context)
         record += 0x48;
     } while (record < end);
     record = set->f1D30;
-    hud_ammo_bolt_init(set->f7A0, fontData, context);
+    hud_ammo_bolt_init(set->f7A0, font_data, context);
     object_init_derived_c(record, D_001AE720, context);
     colour = object_get_fourth_field(record);
     *(float *)colour = 2155905152.0f;

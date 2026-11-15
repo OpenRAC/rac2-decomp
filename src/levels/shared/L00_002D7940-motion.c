@@ -30,21 +30,21 @@ void ResolveCameraMovementCollisions(char *pos, float step)
 {
     float delta[4];
     float previous[4];
-    char *camObj;
+    char *cam_obj;
     float *src;
     int steps;
     int i;
     int j;
 
-    camObj = D_L00_001B8C80.active;
-    src = (float *)(camObj + 0x64);
+    cam_obj = D_L00_001B8C80.active;
+    src = (float *)(cam_obj + 0x64);
     previous[0] = src[0];
     previous[1] = src[1];
     previous[2] = src[2];
     previous[3] = 0.0f;
-    if (*(short *)(camObj + 0x8A) != 0) {
+    if (*(short *)(cam_obj + 0x8A) != 0) {
         qcopy(D_L00_001B8C80.position, pos);
-        *(short *)(camObj + 0x8A) = 0;
+        *(short *)(cam_obj + 0x8A) = 0;
         return;
     }
     FastVecSub(delta, pos, previous);

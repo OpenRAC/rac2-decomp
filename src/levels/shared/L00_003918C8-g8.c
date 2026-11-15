@@ -97,7 +97,7 @@ void visibomb_missile_update(Moby *actor) {
         ((Hero *)g_hero_state)->i[0x229C / 4] == 2 || ((Hero *)g_hero_state)->i[0x229C / 4] == 4 || ((Hero *)g_hero_state)->i[0x229C / 4] == 3 || ((Hero *)g_hero_state)->i[0x229C / 4] > 12 ||
         ((Hero *)g_hero_state)->i[0x229C / 4] == 7 || ((Hero *)g_hero_state)->i[0x229C / 4] == 10 || ((Hero *)g_hero_state)->i[0x229C / 4] == 16 || ((Hero *)g_hero_state)->i[0x229C / 4] == 5 ||
         ((Hero *)g_hero_state)->i[0x2294 / 4] == 0x62 || !((Hero *)g_hero_state)->i[0x340 / 4] ||
-        ((mount = ((Hero *)g_hero_state)->ptr[0x33C / 4]) && (mount->objectClass == 0x13E /* moby class 318 */ || mount->objectClass == 0x46F /* Teleporter */)) || D_001A7428) {
+        ((mount = ((Hero *)g_hero_state)->ptr[0x33C / 4]) && (mount->objectClass == 0x13E /* moby class 318 */ || mount->objectClass == MOBY_CLASS_TELEPORTER)) || D_001A7428) {
         tether_release(actor, state); return;
     }
     if (timer < 0) {

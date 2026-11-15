@@ -27,7 +27,7 @@ extern void level_update_glow_objects(char *);
 /* Sets up the glow effects on a level object, either spawning the glow object or attaching the glow records and running the level update. */
 void level_setup_glow_effects(char *object, int spawn)
 {
-    Manipulator4E58 *glowRecord;
+    Manipulator4E58 *glow_record;
     int i;
 
     if (D_001A7A40[1])
@@ -57,13 +57,13 @@ void level_setup_glow_effects(char *object, int spawn)
         return;
     }
     if (D_0018B090[0]) {
-        glowRecord = D_L00_001B2D80;
-        for (i = 0; i < 2; i++, glowRecord++) {
-            if (glowRecord->initialized == 0) {
-                AttachManipulator(object, i + 22, glowRecord);
-                glowRecord->scale[0] = 0.01f;
-                glowRecord->scale[1] = 0.01f;
-                glowRecord->scale[2] = 0.01f;
+        glow_record = D_L00_001B2D80;
+        for (i = 0; i < 2; i++, glow_record++) {
+            if (glow_record->initialized == 0) {
+                AttachManipulator(object, i + 22, glow_record);
+                glow_record->scale[0] = 0.01f;
+                glow_record->scale[1] = 0.01f;
+                glow_record->scale[2] = 0.01f;
             }
         }
     }

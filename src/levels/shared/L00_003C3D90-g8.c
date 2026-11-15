@@ -113,7 +113,7 @@ void tesla_barrier_update(Moby *self)
         if(!snd_is_voice_playing_for_owner(self,ctx->sound))
             ctx->sound=PlayMobySound(3,4,self);
     } else if(snd_is_voice_playing_for_owner(self,ctx->sound)) clearSound(self,ctx);
-    if(g_weapon_l00_table[g_item_slot_to_record[0x2d]].active && self->oclass==0xa5c /* Shield Charger */ ) {
+    if(g_weapon_l00_table[g_item_slot_to_record[0x2d]].active && self->oclass==MOBY_CLASS_SHIELD_CHARGER ) {
         int saved=D_L00_001AFF98;
         D_L00_001AFF98=0;
         if(CreateTrailOwnerMoby(1)) {
@@ -141,7 +141,7 @@ void tesla_barrier_update(Moby *self)
         ctx->timer=D_L00_001AFF90;
     }
     ratio=IntToFloat(ctx->timer)/IntToFloat(D_L00_001AFF90);
-    if(self->oclass==0xa5c /* Shield Charger */ ) ctx->colour=FastTweenColor(ratio,D_L00_001AFF10,D_L00_001AFF14);
+    if(self->oclass==MOBY_CLASS_SHIELD_CHARGER ) ctx->colour=FastTweenColor(ratio,D_L00_001AFF10,D_L00_001AFF14);
     else ctx->colour=FastTweenColor(ratio,D_L00_001AFF18,D_L00_001AFF1C);
     FastDecTimer(&ctx->timer);
     FastVecScale(offset,D_00189E20_13.moby+0xe0,0.75f);
@@ -224,7 +224,7 @@ void tesla_barrier_update(Moby *self)
             }
         }
     }
-    if(!D_L00_001A8F00 && slot && self->oclass==0x1192 /* Tesla Barrier */  && !ctx->lock && !D_00189E20_13.busy && D_00189E20_13.upgrades>=23) {
+    if(!D_L00_001A8F00 && slot && self->oclass==MOBY_CLASS_TESLA_BARRIER  && !ctx->lock && !D_00189E20_13.busy && D_00189E20_13.upgrades>=23) {
         int hits=coll_process_hit(&self->x,1,D_00189E20_13.moby,0,D_L00_001AFF40);
         if(hits) for(j=0;j<hits;j++) {
             float *health=0;

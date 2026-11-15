@@ -156,7 +156,7 @@ void moby_init_effect_from_table(char *object)
 {
     char *sub = *(char **)(object + 0x68);
     char *table;
-    float distance, angleA, angleB;
+    float distance, angle_a, angle_b;
 
     *(unsigned char *)(object + 0x20) = 1;
     *(unsigned short *)(object + 0x34) = *(unsigned short *)(object + 0x34) | 0x100;
@@ -168,9 +168,9 @@ void moby_init_effect_from_table(char *object)
     *(int *)(sub + 0x1C4) = -1;
     *(float *)(sub + 0x180) = 1.0f;
     distance = math_random_float_range(0.0f, *(float *)table);
-    angleA = math_random_angle();
-    angleB = math_random_angle();
-    vec_build_spherical_offset(object + 0x10, distance, angleA, angleB);
+    angle_a = math_random_angle();
+    angle_b = math_random_angle();
+    vec_build_spherical_offset(object + 0x10, distance, angle_a, angle_b);
     FastVecAdd(object + 0x10, table + 0x30, object + 0x10);
     *(int *)(sub + 0x1B8) = 0;
     *(float *)(object + 0x2C) = 0.02f;
@@ -284,7 +284,7 @@ void glow_l05_ring_init_state(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     float *cursor = (float *)vars;
-    int *wordPtr;
+    int *word_ptr;
     int i;
     int j;
     int value;
@@ -296,11 +296,11 @@ void glow_l05_ring_init_state(char *object)
     *(float *)(vars + 0x18) = 1.25f;
     *(float *)(vars + 0x1C) = 2.5f;
     j = 3;
-    wordPtr = (int *)(vars + 0x2C);
+    word_ptr = (int *)(vars + 0x2C);
     value = 0xFF;
     for (; j >= 0; j--) {
-        *wordPtr = value;
-        wordPtr = (int *)((char *)wordPtr - 4);
+        *word_ptr = value;
+        word_ptr = (int *)((char *)word_ptr - 4);
         value -= 0x40;
     }
     *(float *)(vars + 0x30) = 3.0f;
@@ -320,7 +320,7 @@ void glow_l05_ring_init_state_2(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     float *cursor = (float *)vars;
-    int *wordPtr;
+    int *word_ptr;
     int i;
     int j;
     int value;
@@ -332,11 +332,11 @@ void glow_l05_ring_init_state_2(char *object)
     *(float *)(vars + 0x18) = 1.25f;
     *(float *)(vars + 0x1C) = 2.5f;
     j = 3;
-    wordPtr = (int *)(vars + 0x2C);
+    word_ptr = (int *)(vars + 0x2C);
     value = 0xFF;
     for (; j >= 0; j--) {
-        *wordPtr = value;
-        wordPtr = (int *)((char *)wordPtr - 4);
+        *word_ptr = value;
+        word_ptr = (int *)((char *)word_ptr - 4);
         value -= 0x40;
     }
     *(float *)(vars + 0x30) = 2.8f;
@@ -517,7 +517,7 @@ void glow_l05_ring_init_state_3(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     float *cursor = (float *)vars;
-    int *wordPtr;
+    int *word_ptr;
     int i;
     int j;
     int value;
@@ -529,11 +529,11 @@ void glow_l05_ring_init_state_3(char *object)
     *(float *)(vars + 0x18) = 1.25f;
     *(float *)(vars + 0x1C) = 2.5f;
     j = 3;
-    wordPtr = (int *)(vars + 0x2C);
+    word_ptr = (int *)(vars + 0x2C);
     value = 0xFF;
     for (; j >= 0; j--) {
-        *wordPtr = value;
-        wordPtr = (int *)((char *)wordPtr - 4);
+        *word_ptr = value;
+        word_ptr = (int *)((char *)word_ptr - 4);
         value -= 0x40;
     }
     *(float *)(vars + 0x30) = 2.4f;
@@ -588,7 +588,7 @@ void glow_l05_ring_init(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     float *cursor = (float *)vars;
-    int *wordPtr;
+    int *word_ptr;
     int i;
     int j;
     int value;
@@ -600,11 +600,11 @@ void glow_l05_ring_init(char *object)
     *(float *)(vars + 0x18) = 1.25f;
     *(float *)(vars + 0x1C) = 2.5f;
     j = 3;
-    wordPtr = (int *)(vars + 0x2C);
+    word_ptr = (int *)(vars + 0x2C);
     value = 0xFF;
     for (; j >= 0; j--) {
-        *wordPtr = value;
-        wordPtr = (int *)((char *)wordPtr - 4);
+        *word_ptr = value;
+        word_ptr = (int *)((char *)word_ptr - 4);
         value -= 0x40;
     }
     *(float *)(vars + 0x30) = 2.0f;
@@ -658,7 +658,7 @@ void glow_l05_ring_init_2(char *object)
 {
     char *vars = *(char **)(object + 0x68);
     float *cursor = (float *)vars;
-    int *wordPtr;
+    int *word_ptr;
     int i;
     int j;
     int value;
@@ -670,11 +670,11 @@ void glow_l05_ring_init_2(char *object)
     *(float *)(vars + 0x18) = 1.25f;
     *(float *)(vars + 0x1C) = 2.5f;
     j = 3;
-    wordPtr = (int *)(vars + 0x2C);
+    word_ptr = (int *)(vars + 0x2C);
     value = 0xFF;
     for (; j >= 0; j--) {
-        *wordPtr = value;
-        wordPtr = (int *)((char *)wordPtr - 4);
+        *word_ptr = value;
+        word_ptr = (int *)((char *)word_ptr - 4);
         value -= 0x40;
     }
     *(float *)(vars + 0x30) = 2.5f;

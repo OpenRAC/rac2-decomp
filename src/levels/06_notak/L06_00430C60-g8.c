@@ -47,8 +47,8 @@ static __inline__ unsigned int L06StatLevelMask(unsigned int flags, int level)
 void skill_point_zone_update(char *obj)
 {
     char *vars = *(char **)(obj+0x68), *other;
-    unsigned short slotIndex;
-    int slotBits;
+    unsigned short slot_index;
+    int slot_bits;
     unsigned int now;
     switch (B(obj,0x20)) {
     case 0:
@@ -62,10 +62,10 @@ void skill_point_zone_update(char *obj)
             else if (g_subtitle_history[54].timestamp<now) g_subtitle_history[54].timestamp=now;
         }
         if (IsPointInCuboid((char *)HERO->position,I(vars,0))) {
-            slotIndex=*(unsigned short *)(obj+0xb2);
-            if (!((L06TriggerFlags *)D_L06_0021E830)->flag[(short)slotIndex]) {
-                slotBits=D_0019B4A8[g_current_map_index][(short)slotIndex>>1];
-                if (!((slotIndex&1) ? (slotBits>>4)&7 : slotBits&7)) {
+            slot_index=*(unsigned short *)(obj+0xb2);
+            if (!((L06TriggerFlags *)D_L06_0021E830)->flag[(short)slot_index]) {
+                slot_bits=D_0019B4A8[g_current_map_index][(short)slot_index>>1];
+                if (!((slot_index&1) ? (slot_bits>>4)&7 : slot_bits&7)) {
                     if(HERO->mode24B4==0x27) {
                         unsigned short slot;
                         I(vars,0x30)=1;

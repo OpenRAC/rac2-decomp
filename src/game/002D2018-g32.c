@@ -21,42 +21,42 @@ int page_viewer_handle_input_short(void)
 {
     int result = 0;
     int flags = ((CallbackMenuState *)&g_pad_state)->flags;
-    int oldCursor = D_001ABA60;
+    int old_cursor = D_001ABA60;
 
     if (flags & 0x10) {
         int value;
-        int returnCode;
+        int return_code;
         D_001ABA60 = 0;
         value = *(int *)(g_pause_menu_state.source + 0xE0);
         if (value != 0)
             g_pause_menu_state.value = value;
         else if (g_pause_menu_state.fallback == 0) {
-            returnCode = -1;
+            return_code = -1;
             goto finish;
         }
-        returnCode = 0;
+        return_code = 0;
 finish:
-        return returnCode;
+        return return_code;
     }
     if (flags & 0x900) {
         D_001ABA60 = 0;
         result = 1;
     } else if (flags & 0x8000) {
-        if (oldCursor > 0)
+        if (old_cursor > 0)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
         if (--D_001ABA60 < 0)
             D_001ABA60 = 0;
     } else if (flags & 0x2000) {
-        if (oldCursor < 5)
+        if (old_cursor < 5)
             snd_play_from_global_bank(3, 0, 0);
         else
             snd_play_from_global_bank(5, 0, 0);
         if (++D_001ABA60 > 5)
             D_001ABA60 = 5;
     }
-    if (oldCursor != D_001ABA60)
+    if (old_cursor != D_001ABA60)
         D_0025CAA0[0].timer = -300;
     D_0025CB50[0] = D_001ABA60;
     D_0025CAA0[0].text = D_001ABD6A[D_001ABA60].text;

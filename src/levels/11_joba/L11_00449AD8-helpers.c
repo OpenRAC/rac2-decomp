@@ -15,13 +15,13 @@ void security_robot_pick_wander_point(char *object, char *point)
         float dy = *(float *)(object + 0x14) - *(float *)(point + 0x4);
         float base = mat_fast_helper_a(dx, dy) + math_random_float_range(-0.17453295f, 0.17453295f);
         float scale = 15.0f;
-        float heightJitter;
+        float height_jitter;
 
         qcopy((state + 0x330), point);
         *(float *)(state + 0x330) += math_fast_sin_or_cos_a(base) * scale;
         *(float *)(state + 0x334) += math_fast_sin_or_cos_b(base) * scale;
-        heightJitter = math_random_float_range(-4.0f, 4.0f);
-        *(float *)(state + 0x338) = *(float *)(object + 0x18) + heightJitter;
+        height_jitter = math_random_float_range(-4.0f, 4.0f);
+        *(float *)(state + 0x338) = *(float *)(object + 0x18) + height_jitter;
     } else {
         float dx = *(float *)(object + 0x10) - *(float *)(point + 0x0);
         float dy = *(float *)(object + 0x14) - *(float *)(point + 0x4);

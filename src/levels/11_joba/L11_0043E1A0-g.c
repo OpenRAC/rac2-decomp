@@ -78,7 +78,7 @@ void arena_update_loss_history(u8 *object)
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 total += hp->health;
                 if (hp->health > 0.0f) active++;
-            } else if (kind == 0xb3a /* Arachnoid */) {
+            } else if (kind == MOBY_CLASS_ARACHNOID) {
                 MemberHealth *hp = *(MemberHealth **)(member+0x68);
                 active++;
                 total += hp->health;

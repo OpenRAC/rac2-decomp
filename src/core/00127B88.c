@@ -104,8 +104,8 @@ int sceMcSync(int mode, int *cmd, int *result) {
 
 /* rac1-decomp src/core/001236F0.c: func_00124010 */
 /* Copies the card type, free space and format state out of the reply to the caller's variables. */
-void mc_copy_get_info_reply(int replyAddr) {
-    char *reply = (char *)(replyAddr | 0x20000000);
+void mc_copy_get_info_reply(int reply_addr) {
+    char *reply = (char *)(reply_addr | 0x20000000);
     if (r1_D_00159B28 != 0) *r1_D_00159B28 = *(int *)(reply + 0x0);
     if (r1_D_00159B2C != 0) *r1_D_00159B2C = *(int *)(reply + 0x4);
     if (r1_D_00159B30 != 0) *r1_D_00159B30 = *(int *)(reply + 0x90);
@@ -117,7 +117,7 @@ void mc_copy_get_info_reply(int replyAddr) {
    reply lands in r1_D_0015A000 and func_00127C68 copies it out. */
 /* Asks the memory card for its type, free space and format state. */
 int sceMcGetInfo(int port, int slot, int *type, int *free, int *format) {
-    int rpcResult;
+    int rpc_result;
 
     {
         char *client = r1_D_00159B00;
@@ -150,13 +150,13 @@ int sceMcGetInfo(int port, int slot, int *type, int *free, int *format) {
     r1_D_00159B2C = free;
     r1_D_00159B30 = format;
     r1_func_0011AD70(r1_D_0015A000, 0xC0);
-    rpcResult = r1_func_0011B4C8(r1_D_00159B00, 1, 1, r1_D_00159B80_a, 0x30, r1_D_0015B0C0, 4, mc_copy_get_info_reply, r1_D_0015A000);
-    if (rpcResult == 0) {
+    rpc_result = r1_func_0011B4C8(r1_D_00159B00, 1, 1, r1_D_00159B80_a, 0x30, r1_D_0015B0C0, 4, mc_copy_get_info_reply, r1_D_0015A000);
+    if (rpc_result == 0) {
         r1_D_00132EA8 = 1;
     } else {
         r1_func_00118C90(r1_D_00132EAC);
     }
-    return rpcResult;
+    return rpc_result;
 }
 
 
@@ -173,7 +173,7 @@ int sceMcGetInfo(int port, int slot, int *type, int *free, int *format) {
 int sceMcDelete(int port, int slot, char *fname) {
     char *client = r1_D_00159B00;
     char *request;
-    int rpcResult;
+    int rpc_result;
 
     if (*(int *)(client + 0x24) == 0) {
         return -100;
@@ -191,13 +191,13 @@ int sceMcDelete(int port, int slot, char *fname) {
     *(int *)(request + 0x4) = slot;
     request[0x413] = 0;
     *(int *)(request + 0x8) = 0;
-    rpcResult = r1_func_0011B4C8(client, 0xF, 1, request, 0x414, r1_D_0015B0C0, 4, 0, 0);
-    if (rpcResult == 0) {
+    rpc_result = r1_func_0011B4C8(client, 0xF, 1, request, 0x414, r1_D_0015B0C0, 4, 0, 0);
+    if (rpc_result == 0) {
         r1_D_00132EA8 = 0xF;
     } else {
         r1_func_00118C90(r1_D_00132EAC);
     }
-    return rpcResult;
+    return rpc_result;
 }
 
 /* rac1-decomp src/core/001236F0.c: func_00124528 */
@@ -206,7 +206,7 @@ int sceMcDelete(int port, int slot, char *fname) {
 int sceMcUnformat(int port, int slot) {
     char *client = r1_D_00159B00;
     int *request;
-    int rpcResult;
+    int rpc_result;
 
     if (*(int *)(client + 0x24) == 0) {
         return -100;
@@ -217,13 +217,13 @@ int sceMcUnformat(int port, int slot) {
     request = &r1_D_00159B80;
     request[1] = port;
     request[2] = slot;
-    rpcResult = r1_func_0011B4C8(client, 0x11, 1, request, 0x30, r1_D_0015B0C0, 4, 0, 0);
-    if (rpcResult == 0) {
+    rpc_result = r1_func_0011B4C8(client, 0x11, 1, request, 0x30, r1_D_0015B0C0, 4, 0, 0);
+    if (rpc_result == 0) {
         r1_D_00132EA8 = 0x11;
     } else {
         r1_func_00118C90(r1_D_00132EAC);
     }
-    return rpcResult;
+    return rpc_result;
 }
 
 /* rac1-decomp src/core/001236F0.c: func_001245F8 */

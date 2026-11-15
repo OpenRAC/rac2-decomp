@@ -39,18 +39,18 @@ extern void draw_world_quad(void *, int, int);
 void DrawVendorEffects(char *moby)
 {
     char *vars = *(char **)(moby + 0x68);
-    BeamQuad beamQuad;
-    long primTag[4];
+    BeamQuad beam_quad;
+    long prim_tag[4];
     float q[4][4];
     float euler[4];
     float mtx[3][4];
-    char *camBlock, *camBlockAgain;
+    char *cam_block, *cam_block_again;
     float scroll;
-    int k, i0, i1, i2, i3, glowColor;
+    int k, i0, i1, i2, i3, glow_color;
     float *q0, *q1, *q2, *q3;
 
-    camBlock = D_L01_001B9380;
-    euler[2] = *(float *)(camBlock + 0x158);
+    cam_block = D_L01_001B9380;
+    euler[2] = *(float *)(cam_block + 0x158);
     euler[0] = 0.0f;
     euler[1] = 0.0f;
     euler_rotation_basis(mtx, euler);
@@ -60,10 +60,10 @@ void DrawVendorEffects(char *moby)
         D_L01_001AEF20 = D_L01_001AEF20 - 1.0f;
     }
 
-    primTag[2] = 1;
-    primTag[3] = 0x4000000044L;
-    primTag[0] = 0;
-    primTag[1] = GetEffectTextureDescriptor(0x18);
+    prim_tag[2] = 1;
+    prim_tag[3] = 0x4000000044L;
+    prim_tag[0] = 0;
+    prim_tag[1] = GetEffectTextureDescriptor(0x18);
 
     q0 = q[0];
     q1 = q[1];
@@ -75,18 +75,18 @@ void DrawVendorEffects(char *moby)
         matrix_mul_vec3(q2, D_L01_00290030[D_L01_001AEEE8[k][0]], mtx);
         matrix_mul_vec3(q3, D_L01_00290030[D_L01_001AEEEC[k][0]], mtx);
 
-        beamQuad.v[0][0] = *(float *)(moby + 0x10) + q[0][0] * *(float *)(vars + 0x90);
-        beamQuad.v[0][1] = *(float *)(moby + 0x14) + q[0][1] * *(float *)(vars + 0x90);
-        beamQuad.v[0][2] = *(float *)(moby + 0x18) + q[0][2] - 1.0f;
-        beamQuad.v[1][0] = *(float *)(moby + 0x10) + q[1][0] * *(float *)(vars + 0x90);
-        beamQuad.v[1][1] = *(float *)(moby + 0x14) + q[1][1] * *(float *)(vars + 0x90);
-        beamQuad.v[1][2] = *(float *)(moby + 0x18) + q[1][2] - 1.0f;
-        beamQuad.v[2][0] = *(float *)(moby + 0x10) + q[2][0] * *(float *)(vars + 0x90);
-        beamQuad.v[2][1] = *(float *)(moby + 0x14) + q[2][1] * *(float *)(vars + 0x90);
-        beamQuad.v[2][2] = *(float *)(moby + 0x18) + q[2][2] - 1.0f;
-        beamQuad.v[3][0] = *(float *)(moby + 0x10) + q[3][0] * *(float *)(vars + 0x90);
-        beamQuad.v[3][1] = *(float *)(moby + 0x14) + q[3][1] * *(float *)(vars + 0x90);
-        beamQuad.v[3][2] = *(float *)(moby + 0x18) + q[3][2] - 1.0f;
+        beam_quad.v[0][0] = *(float *)(moby + 0x10) + q[0][0] * *(float *)(vars + 0x90);
+        beam_quad.v[0][1] = *(float *)(moby + 0x14) + q[0][1] * *(float *)(vars + 0x90);
+        beam_quad.v[0][2] = *(float *)(moby + 0x18) + q[0][2] - 1.0f;
+        beam_quad.v[1][0] = *(float *)(moby + 0x10) + q[1][0] * *(float *)(vars + 0x90);
+        beam_quad.v[1][1] = *(float *)(moby + 0x14) + q[1][1] * *(float *)(vars + 0x90);
+        beam_quad.v[1][2] = *(float *)(moby + 0x18) + q[1][2] - 1.0f;
+        beam_quad.v[2][0] = *(float *)(moby + 0x10) + q[2][0] * *(float *)(vars + 0x90);
+        beam_quad.v[2][1] = *(float *)(moby + 0x14) + q[2][1] * *(float *)(vars + 0x90);
+        beam_quad.v[2][2] = *(float *)(moby + 0x18) + q[2][2] - 1.0f;
+        beam_quad.v[3][0] = *(float *)(moby + 0x10) + q[3][0] * *(float *)(vars + 0x90);
+        beam_quad.v[3][1] = *(float *)(moby + 0x14) + q[3][1] * *(float *)(vars + 0x90);
+        beam_quad.v[3][2] = *(float *)(moby + 0x18) + q[3][2] - 1.0f;
 
         i0 = D_L01_001AEEE0[k][0];
         i1 = D_L01_001AEEE4[k][0];
@@ -98,41 +98,41 @@ void DrawVendorEffects(char *moby)
 
             if (*(int *)(vars + 0x94) == 2)
                 o += 36;
-            beamQuad.col[0] = *(int *)((char *)D_L01_00290108 + o);
+            beam_quad.col[0] = *(int *)((char *)D_L01_00290108 + o);
         }
         {
             u32 o = i1 * 4;
 
             if (*(int *)(vars + 0x94) == 2)
                 o += 36;
-            beamQuad.col[1] = *(int *)((char *)D_L01_00290108 + o);
+            beam_quad.col[1] = *(int *)((char *)D_L01_00290108 + o);
         }
         {
             u32 o = i2 * 4;
 
             if (*(int *)(vars + 0x94) == 2)
                 o += 36;
-            beamQuad.col[2] = *(int *)((char *)D_L01_00290108 + o);
+            beam_quad.col[2] = *(int *)((char *)D_L01_00290108 + o);
         }
         {
             u32 o = i3 * 4;
 
             if (*(int *)(vars + 0x94) == 2)
                 o += 36;
-            beamQuad.col[3] = *(int *)((char *)D_L01_00290108 + o);
+            beam_quad.col[3] = *(int *)((char *)D_L01_00290108 + o);
         }
-        beamQuad.uv[0][0] = D_L01_002900C0[i0][0];
-        beamQuad.uv[0][1] = D_L01_002900C0[i0][1] + scroll;
-        beamQuad.uv[1][0] = D_L01_002900C0[i1][0];
-        beamQuad.uv[1][1] = D_L01_002900C0[i1][1] + scroll;
-        beamQuad.uv[2][0] = D_L01_002900C0[i2][0];
-        beamQuad.uv[2][1] = D_L01_002900C0[i2][1] + scroll;
-        beamQuad.uv[3][0] = D_L01_002900C0[i3][0];
-        beamQuad.uv[3][1] = D_L01_002900C0[i3][1] + scroll;
-        draw_world_quad(&beamQuad, 0, 1);
+        beam_quad.uv[0][0] = D_L01_002900C0[i0][0];
+        beam_quad.uv[0][1] = D_L01_002900C0[i0][1] + scroll;
+        beam_quad.uv[1][0] = D_L01_002900C0[i1][0];
+        beam_quad.uv[1][1] = D_L01_002900C0[i1][1] + scroll;
+        beam_quad.uv[2][0] = D_L01_002900C0[i2][0];
+        beam_quad.uv[2][1] = D_L01_002900C0[i2][1] + scroll;
+        beam_quad.uv[3][0] = D_L01_002900C0[i3][0];
+        beam_quad.uv[3][1] = D_L01_002900C0[i3][1] + scroll;
+        draw_world_quad(&beam_quad, 0, 1);
     }
 
-    primTag[1] = GetEffectTextureDescriptor(0x1B);
+    prim_tag[1] = GetEffectTextureDescriptor(0x1B);
 
     D_L01_001AEF24 = D_L01_001AEF24 + 0.01f;
     if (1.0f < D_L01_001AEF24) {
@@ -168,8 +168,8 @@ void DrawVendorEffects(char *moby)
         c[2].q = t2.q;
         c[3].q = t3.q;
 
-        camBlockAgain = D_L01_001B9380;
-        rz = *(float *)(camBlockAgain + 0x158);
+        cam_block_again = D_L01_001B9380;
+        rz = *(float *)(cam_block_again + 0x158);
         euler[0] = 0.0f;
         euler[2] = rz;
         euler[1] = 0.0f;
@@ -180,30 +180,30 @@ void DrawVendorEffects(char *moby)
         matrix_mul_vec3(q3, &c[3], mtx);
     }
 
-    glowColor = ((int)((1.0f - D_L01_001AEF24) * 128.0f) << 24) | 0x808080;
-    beamQuad.v[0][0] = *(float *)(moby + 0x10) + q[0][0];
-    beamQuad.v[0][1] = *(float *)(moby + 0x14) + q[0][1];
-    beamQuad.v[0][2] = *(float *)(moby + 0x18) + q[0][2] - 1.0f;
-    beamQuad.v[1][0] = *(float *)(moby + 0x10) + q[1][0];
-    beamQuad.v[1][1] = *(float *)(moby + 0x14) + q[1][1];
-    beamQuad.v[1][2] = *(float *)(moby + 0x18) + q[1][2] - 1.0f;
-    beamQuad.v[2][0] = *(float *)(moby + 0x10) + q[2][0];
-    beamQuad.v[2][1] = *(float *)(moby + 0x14) + q[2][1];
-    beamQuad.v[2][2] = *(float *)(moby + 0x18) + q[2][2] - 1.0f;
-    beamQuad.v[3][0] = *(float *)(moby + 0x10) + q[3][0];
-    beamQuad.v[3][1] = *(float *)(moby + 0x14) + q[3][1];
-    beamQuad.v[3][2] = *(float *)(moby + 0x18) + q[3][2] - 1.0f;
-    beamQuad.col[0] = glowColor;
-    beamQuad.col[1] = glowColor;
-    beamQuad.col[2] = glowColor;
-    beamQuad.col[3] = glowColor;
-    beamQuad.uv[0][0] = 0.0f;
-    beamQuad.uv[0][1] = 0.0f;
-    beamQuad.uv[1][0] = 1.0f;
-    beamQuad.uv[1][1] = 0.0f;
-    beamQuad.uv[2][0] = 0.0f;
-    beamQuad.uv[2][1] = 1.0f;
-    beamQuad.uv[3][0] = 1.0f;
-    beamQuad.uv[3][1] = 1.0f;
-    draw_world_quad(&beamQuad, 0, 1);
+    glow_color = ((int)((1.0f - D_L01_001AEF24) * 128.0f) << 24) | 0x808080;
+    beam_quad.v[0][0] = *(float *)(moby + 0x10) + q[0][0];
+    beam_quad.v[0][1] = *(float *)(moby + 0x14) + q[0][1];
+    beam_quad.v[0][2] = *(float *)(moby + 0x18) + q[0][2] - 1.0f;
+    beam_quad.v[1][0] = *(float *)(moby + 0x10) + q[1][0];
+    beam_quad.v[1][1] = *(float *)(moby + 0x14) + q[1][1];
+    beam_quad.v[1][2] = *(float *)(moby + 0x18) + q[1][2] - 1.0f;
+    beam_quad.v[2][0] = *(float *)(moby + 0x10) + q[2][0];
+    beam_quad.v[2][1] = *(float *)(moby + 0x14) + q[2][1];
+    beam_quad.v[2][2] = *(float *)(moby + 0x18) + q[2][2] - 1.0f;
+    beam_quad.v[3][0] = *(float *)(moby + 0x10) + q[3][0];
+    beam_quad.v[3][1] = *(float *)(moby + 0x14) + q[3][1];
+    beam_quad.v[3][2] = *(float *)(moby + 0x18) + q[3][2] - 1.0f;
+    beam_quad.col[0] = glow_color;
+    beam_quad.col[1] = glow_color;
+    beam_quad.col[2] = glow_color;
+    beam_quad.col[3] = glow_color;
+    beam_quad.uv[0][0] = 0.0f;
+    beam_quad.uv[0][1] = 0.0f;
+    beam_quad.uv[1][0] = 1.0f;
+    beam_quad.uv[1][1] = 0.0f;
+    beam_quad.uv[2][0] = 0.0f;
+    beam_quad.uv[2][1] = 1.0f;
+    beam_quad.uv[3][0] = 1.0f;
+    beam_quad.uv[3][1] = 1.0f;
+    draw_world_quad(&beam_quad, 0, 1);
 }

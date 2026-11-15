@@ -29,8 +29,8 @@ Moby_38D530 *part_l00_spawn_spinning_debris(TI128 *position, TI128 *velocity)
 {
     Moby_38D530 *moby;
     char *vars;
-    float minAngle;
-    float maxAngle;
+    float min_angle;
+    float max_angle;
 
     moby = CreateMoby(0x79 /* moby class 121 */);
     if (moby != 0) {
@@ -41,14 +41,14 @@ Moby_38D530 *part_l00_spawn_spinning_debris(TI128 *position, TI128 *velocity)
         moby->state20 = 0;
         qcopy(&moby->position, position);
         *(TI128 *)vars = *velocity;
-        minAngle = -3.1415927f;
-        maxAngle = 3.1415927f;
+        min_angle = -3.1415927f;
+        max_angle = 3.1415927f;
         *(int *)(vars + 0x14) = 0;
         *(int *)(vars + 0x10) = 0x1E;
         *(int *)(vars + 0x18) = 0x12C;
-        moby->spin[0] = math_random_float_range(minAngle, maxAngle);
-        moby->spin[1] = math_random_float_range(minAngle, maxAngle);
-        moby->spin[2] = math_random_float_range(minAngle, maxAngle);
+        moby->spin[0] = math_random_float_range(min_angle, max_angle);
+        moby->spin[1] = math_random_float_range(min_angle, max_angle);
+        moby->spin[2] = math_random_float_range(min_angle, max_angle);
         moby->spinTime = 0;
         func_002A0F48(moby);
         *(int *)(vars + 0x1C) = part_alloc_effect_slot(moby, 0, 1.0f, 1.0f, 1.0f);

@@ -25,80 +25,80 @@ void moby_spring_away_from_player(char *obj)
     char *hero = g_hero_state;
     short flag = *(short *)(hero + 0x202);
     float up[4] __attribute__((aligned(16)));
-    float toObject[4] __attribute__((aligned(16)));
-    float sideOffset[4] __attribute__((aligned(16)));
-    float alongUp[4] __attribute__((aligned(16)));
-    float probeBelow[4] __attribute__((aligned(16)));
-    float probeAbove[4] __attribute__((aligned(16)));
-    float groundPoint[4] __attribute__((aligned(16)));
-    float groundAlong[4] __attribute__((aligned(16)));
+    float to_object[4] __attribute__((aligned(16)));
+    float side_offset[4] __attribute__((aligned(16)));
+    float along_up[4] __attribute__((aligned(16)));
+    float probe_below[4] __attribute__((aligned(16)));
+    float probe_above[4] __attribute__((aligned(16)));
+    float ground_point[4] __attribute__((aligned(16)));
+    float ground_along[4] __attribute__((aligned(16)));
     float push[4] __attribute__((aligned(16)));
-    float groundToObject[4] __attribute__((aligned(16)));
-    float pushAmount;
+    float ground_to_object[4] __attribute__((aligned(16)));
+    float push_amount;
     float projection;
     int mode;
-    float heightAlong, sideDistance, step, groundGap, newSpeed;
+    float height_along, side_distance, step, ground_gap, new_speed;
 
     if (*(int *)(vars + 0x44) == 0 && flag == 0)
         return;
     moby_get_facing_direction(obj + 0x10, up);
-    groundGap = 0.0f;
-    FastVecSub(toObject, obj + 0x10, hero + 0x80);
-    projection = FastVecDot(toObject, up);
-    FastVecScale(alongUp, up, projection);
-    FastVecSub(sideOffset, toObject, alongUp);
-    heightAlong = FastVecLength(alongUp);
-    sideDistance = FastVecLength(sideOffset);
-    FastVecScale(probeBelow, up, -2.5f);
-    FastVecAdd(probeBelow, obj + 0x10, probeBelow);
-    FastVecScale(probeAbove, up, 0.5f);
-    FastVecAdd(probeAbove, obj + 0x10, probeAbove);
-    if (CollLine(probeAbove, probeBelow, 2, 0, 0)) {
-        qcopy(groundPoint, ref_0030E8A8_00);
+    ground_gap = 0.0f;
+    FastVecSub(to_object, obj + 0x10, hero + 0x80);
+    projection = FastVecDot(to_object, up);
+    FastVecScale(along_up, up, projection);
+    FastVecSub(side_offset, to_object, along_up);
+    height_along = FastVecLength(along_up);
+    side_distance = FastVecLength(side_offset);
+    FastVecScale(probe_below, up, -2.5f);
+    FastVecAdd(probe_below, obj + 0x10, probe_below);
+    FastVecScale(probe_above, up, 0.5f);
+    FastVecAdd(probe_above, obj + 0x10, probe_above);
+    if (CollLine(probe_above, probe_below, 2, 0, 0)) {
+        qcopy(ground_point, ref_0030E8A8_00);
         mode = 0;
     } else {
         mode = 1;
     }
     if (mode == 0) {
-        FastVecSub(push, groundPoint, obj + 0x10);
+        FastVecSub(push, ground_point, obj + 0x10);
         projection = FastVecDot(push, up);
-        FastVecScale(groundAlong, up, projection);
-        groundGap = FastVecLength(groundAlong);
+        FastVecScale(ground_along, up, projection);
+        ground_gap = FastVecLength(ground_along);
     }
     if (*(int *)(vars + 0x44) == 0) {
-        if (!(sideDistance < 1.0f))
+        if (!(side_distance < 1.0f))
             return;
-        if (!(heightAlong < 1.3f))
+        if (!(height_along < 1.3f))
             return;
         *(int *)(vars + 0x44) = 1;
     }
-    qcopy(push, sideOffset);
-    pushAmount = sideDistance - 1.4f;
-    if (pushAmount > 0.0f)
-        pushAmount = 0.0f;
+    qcopy(push, side_offset);
+    push_amount = side_distance - 1.4f;
+    if (push_amount > 0.0f)
+        push_amount = 0.0f;
     if (flag == 0)
-        pushAmount = 0.0f;
+        push_amount = 0.0f;
     step = 0.02f;
-    math_spring_float_to_goal(&pushAmount, 0.0f, (float *)(vars + 0x48), step, 0.3f, 0.06666667f);
-    if (pushAmount == 0.0f && *(float *)(vars + 0x48) == 0.0f && groundGap < step)
+    math_spring_float_to_goal(&push_amount, 0.0f, (float *)(vars + 0x48), step, 0.3f, 0.06666667f);
+    if (push_amount == 0.0f && *(float *)(vars + 0x48) == 0.0f && ground_gap < step)
         *(int *)(vars + 0x44) = 0;
-    if (sideDistance < *(float *)(vars + 0x48))
-        *(float *)(vars + 0x48) = sideDistance;
-    if (*(float *)(vars + 0x48) < sideDistance)
+    if (side_distance < *(float *)(vars + 0x48))
+        *(float *)(vars + 0x48) = side_distance;
+    if (*(float *)(vars + 0x48) < side_distance)
         vec_scale_to_length(push, push, *(float *)(vars + 0x48));
     moby_move_and_collide(obj, push, 0.5f, 0.4f, 0.0f, 0);
     if (mode == 0) {
-        if (FastVecDot(groundAlong, up) > 0.0f) {
-            qcopy(obj + 0x10, groundPoint);
+        if (FastVecDot(ground_along, up) > 0.0f) {
+            qcopy(obj + 0x10, ground_point);
             *(float *)(vars + 0x4C) = 0.0f;
         } else {
-            newSpeed = *(float *)(vars + 0x4C) - 0.0066666668f;
-            *(float *)(vars + 0x4C) = newSpeed;
-            FastVecScale(push, up, newSpeed);
+            new_speed = *(float *)(vars + 0x4C) - 0.0066666668f;
+            *(float *)(vars + 0x4C) = new_speed;
+            FastVecScale(push, up, new_speed);
             FastVecAdd(obj + 0x10, push, obj + 0x10);
-            FastVecSub(groundToObject, groundPoint, obj + 0x10);
-            if (FastVecDot(groundToObject, up) > 0.0f) {
-                qcopy(obj + 0x10, groundPoint);
+            FastVecSub(ground_to_object, ground_point, obj + 0x10);
+            if (FastVecDot(ground_to_object, up) > 0.0f) {
+                qcopy(obj + 0x10, ground_point);
                 *(float *)(vars + 0x4C) = 0.0f;
             }
         }

@@ -167,29 +167,29 @@ extern BatchA_A03_s32 D_001A7B90_1[] __attribute__((sda));
 void part_l00_update_fading_effect_2(char *effect)
 {
     char delta[16];
-    char *effectBase = effect;
+    char *effect_base = effect;
     char *params;
-    int packedWord;
-    int newAlpha;
-    char *effectPos;
+    int packed_word;
+    int new_alpha;
+    char *effect_pos;
 
     if (func_00282978_1(effect + 10) != 0) {
         func_002B9180_1(effect);
         return;
     }
     params = effect + 32;
-    packedWord = *(int *)(effectBase + 4);
-    newAlpha = (packedWord >> 24) + *(unsigned char *)(params + 20);
-    *(int *)(effectBase + 4) = (packedWord & 0x00ffffff) | (newAlpha << 24);
-    effectPos = effectBase + 16;
-    *(float *)(delta + 0) = *(float *)(effectBase + 32);
+    packed_word = *(int *)(effect_base + 4);
+    new_alpha = (packed_word >> 24) + *(unsigned char *)(params + 20);
+    *(int *)(effect_base + 4) = (packed_word & 0x00ffffff) | (new_alpha << 24);
+    effect_pos = effect_base + 16;
+    *(float *)(delta + 0) = *(float *)(effect_base + 32);
     *(float *)(delta + 4) = *(float *)(params + 4);
     *(float *)(delta + 8) = *(float *)(params + 8);
     *(int *)(delta + 12) = 0;
-    func_00282CC0_1(effectPos, effectPos, delta);
+    func_00282CC0_1(effect_pos, effect_pos, delta);
     *(float *)(params + 8) = *(float *)(params + 8) - *(float *)(params + 12);
-    *(unsigned char *)(effectBase + 8) = *(unsigned char *)(effectBase + 8) + *(unsigned char *)(params + 21);
-    *(float *)(effectBase + 12) = *(float *)(effectBase + 12) + *(float *)(params + 16);
+    *(unsigned char *)(effect_base + 8) = *(unsigned char *)(effect_base + 8) + *(unsigned char *)(params + 21);
+    *(float *)(effect_base + 12) = *(float *)(effect_base + 12) + *(float *)(params + 16);
 }
 
 
@@ -208,29 +208,29 @@ void part_remove_finished_effect(char *effect)
 void part_l00_update_fading_effect_3(char *effect)
 {
     char delta[16];
-    char *effectBase = effect;
+    char *effect_base = effect;
     char *params;
-    int packedWord;
-    int newAlpha;
-    char *effectPos;
+    int packed_word;
+    int new_alpha;
+    char *effect_pos;
 
     if (func_00282978_1(effect + 10) != 0) {
         func_002B9180_1(effect);
         return;
     }
     params = effect + 32;
-    packedWord = *(int *)(effectBase + 4);
-    newAlpha = (packedWord >> 24) + *(unsigned char *)(params + 20);
-    *(int *)(effectBase + 4) = (packedWord & 0x00ffffff) | (newAlpha << 24);
-    effectPos = effectBase + 16;
-    *(float *)(delta + 0) = *(float *)(effectBase + 32);
+    packed_word = *(int *)(effect_base + 4);
+    new_alpha = (packed_word >> 24) + *(unsigned char *)(params + 20);
+    *(int *)(effect_base + 4) = (packed_word & 0x00ffffff) | (new_alpha << 24);
+    effect_pos = effect_base + 16;
+    *(float *)(delta + 0) = *(float *)(effect_base + 32);
     *(float *)(delta + 4) = *(float *)(params + 4);
     *(float *)(delta + 8) = *(float *)(params + 8);
     *(int *)(delta + 12) = 0;
-    func_00282CC0_1(effectPos, effectPos, delta);
+    func_00282CC0_1(effect_pos, effect_pos, delta);
     *(float *)(params + 8) = *(float *)(params + 8) - *(float *)(params + 12);
-    *(unsigned char *)(effectBase + 8) = *(unsigned char *)(effectBase + 8) + *(unsigned char *)(params + 21);
-    *(float *)(effectBase + 12) = *(float *)(effectBase + 12) + *(float *)(params + 16);
+    *(unsigned char *)(effect_base + 8) = *(unsigned char *)(effect_base + 8) + *(unsigned char *)(params + 21);
+    *(float *)(effect_base + 12) = *(float *)(effect_base + 12) + *(float *)(params + 16);
 }
 
 
@@ -248,24 +248,24 @@ void part_l00_update_fading_effect_3(char *effect)
 void part_update_shrinking_effect(char *effect)
 {
     char *params = effect + 32;
-    char *effectPos = effect + 16;
-    float ratio, total, startValue, jitter;
-    int alphaByte, colorByte;
+    char *effect_pos = effect + 16;
+    float ratio, total, start_value, jitter;
+    int alpha_byte, color_byte;
 
     ratio = IntToFloat(*(short *)(effect + 10));
     total = IntToFloat(*(int *)(params + 24));
     ratio = ratio / total;
-    startValue = IntToFloat(*(int *)(params + 16));
-    alphaByte = func_00283CF0_2(startValue * ratio);
-    colorByte = func_00283D38_1(0, *(int *)(params + 20), ratio * 0.5f);
+    start_value = IntToFloat(*(int *)(params + 16));
+    alpha_byte = func_00283CF0_2(start_value * ratio);
+    color_byte = func_00283D38_1(0, *(int *)(params + 20), ratio * 0.5f);
     *(char *)(effect + 8) = *(unsigned char *)(effect + 8) + 1;
     jitter = func_002A7878_3(0.004f, 0.012f);
     *(float *)(effect + 12) = *(float *)(effect + 12) + jitter * 210000.0f;
-    func_00282CC0_13(effectPos, effectPos, params);
+    func_00282CC0_13(effect_pos, effect_pos, params);
     func_00282D30_13(params, params, 0.99f);
-    func_00300190_1(effectPos, effectPos);
+    func_00300190_1(effect_pos, effect_pos);
     shop_trigger_current_state_effect(params, params);
-    *(int *)(effect + 4) = colorByte | (alphaByte << 24);
+    *(int *)(effect + 4) = color_byte | (alpha_byte << 24);
     if (func_00282978_3(effect + 10) != 0) {
         func_002B9180_6(effect);
     }
@@ -293,27 +293,27 @@ s32 path_advance_index(const s32 *count, s32 index, s32 delta, s32 wrap) {
 
 /* copies two 16-byte records into locals; when the float threshold is positive it passes the difference of their third components through a float leaf returning the absolute value and, if that is below the threshold, calls one leaf with both records, otherwise the shared alternative leaf */
 /* Measures how far apart two points are, using a quicker check when they are close in height. */
-float vec_measure_distance_with_height(void *vecA, void *vecB, float scale)
+float vec_measure_distance_with_height(void *vec_a, void *vec_b, float scale)
 {
-    V4_F61e33ad9 copyA;
-    V4_F61e33ad9 copyB;
-    float *floatsA;
-    float *floatsB;
-    float zA;
-    float zB;
+    V4_F61e33ad9 copy_a;
+    V4_F61e33ad9 copy_b;
+    float *floats_a;
+    float *floats_b;
+    float z_a;
+    float z_b;
 
-    copyA = *(V4_F61e33ad9 *)vecA;
-    copyB = *(V4_F61e33ad9 *)vecB;
-    floatsA = (float *)&copyA;
-    floatsB = (float *)&copyB;
+    copy_a = *(V4_F61e33ad9 *)vec_a;
+    copy_b = *(V4_F61e33ad9 *)vec_b;
+    floats_a = (float *)&copy_a;
+    floats_b = (float *)&copy_b;
     if (0.0f < scale) {
-        zA = floatsA[2];
-        zB = floatsB[2];
-        if (func_00282C48_4(zA - zB) < scale) {
-            return vec_distance_xy(floatsA, floatsB);
+        z_a = floats_a[2];
+        z_b = floats_b[2];
+        if (func_00282C48_4(z_a - z_b) < scale) {
+            return vec_distance_xy(floats_a, floats_b);
         }
     }
-    return fast_vec_dist(floatsA, floatsB);
+    return fast_vec_dist(floats_a, floats_b);
 }
 
 

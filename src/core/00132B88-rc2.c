@@ -28,7 +28,7 @@
 extern s32 snd_queue_command(s32 a, s32 b, void *p, s32 c, s32 d);
 
 /* Sends sound command 0x21 with six values and a reply callback. */
-void snd_send_cmd21_callback(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4, s32 p5, s32 callback, s32 callbackData) {
+void snd_send_cmd21_callback(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4, s32 p5, s32 callback, s32 callback_data) {
     s32 payload[6];
 
     payload[0] = p0;
@@ -37,5 +37,5 @@ void snd_send_cmd21_callback(s32 p0, s32 p1, s32 p2, s32 p3, s32 p4, s32 p5, s32
     payload[2] = p2;
     payload[3] = p3;
     payload[5] = p5;
-    snd_queue_command(0x21, 0x18, payload, callback, callbackData);
+    snd_queue_command(0x21, 0x18, payload, callback, callback_data);
 }

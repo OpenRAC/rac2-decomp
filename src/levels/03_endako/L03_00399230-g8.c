@@ -148,13 +148,13 @@ void ant_bridge_update(char *moby)
         }
         break;
     case 2: {
-        char *soundSlot;
+        char *sound_slot;
 
         if (flag_is_third_pending_set(D_L03_001B2A1C + *(s32 *)(vars + 0x70) * 0x100) == 0) {
             break;
         }
-        soundSlot = g_sound_state + *(s32 *)(vars + 0x7C) * 0x70;
-        if (*(char **)(soundSlot + 0x88) != self || *(u8 *)(soundSlot + 0x74) == 0) {
+        sound_slot = g_sound_state + *(s32 *)(vars + 0x7C) * 0x70;
+        if (*(char **)(sound_slot + 0x88) != self || *(u8 *)(sound_slot + 0x74) == 0) {
             *(s32 *)(vars + 0x7C) = PlayMobySound(0, 4, self);
         }
         moby_set_state_in_list(*(u8 *)(self + 0x21), 4);
@@ -162,8 +162,8 @@ void ant_bridge_update(char *moby)
         break;
     }
     case 3: {
-        char *soundSlot;
-        char *anchorPos;
+        char *sound_slot;
+        char *anchor_pos;
         f32 angle;
         f32 rate;
 
@@ -174,8 +174,8 @@ void ant_bridge_update(char *moby)
         if (1.69646013f < angle) {
             if (*(s32 *)(vars + 0x78) < 5) {
                 if (*(s32 *)(vars + 0x7C) != -1) {
-                    soundSlot = g_sound_state + *(s32 *)(vars + 0x7C) * 0x70;
-                    if (*(char **)(soundSlot + 0x88) == self && *(u8 *)(soundSlot + 0x74) != 0) {
+                    sound_slot = g_sound_state + *(s32 *)(vars + 0x7C) * 0x70;
+                    if (*(char **)(sound_slot + 0x88) == self && *(u8 *)(sound_slot + 0x74) != 0) {
                         snd_stop_voice(*(s32 *)(vars + 0x7C));
                     }
                 }
@@ -192,9 +192,9 @@ void ant_bridge_update(char *moby)
                 moby_set_state(self, 5, -1);
             }
         }
-        anchorPos = D_L03_001B2A1C + *(s32 *)(vars + 0x70) * 0x100 + 0x10;
-        matrix_mul_vec3(anchorPos, vars + 0x60, self + 0xC0);
-        FastVecAdd(anchorPos, anchorPos, self + 0x10);
+        anchor_pos = D_L03_001B2A1C + *(s32 *)(vars + 0x70) * 0x100 + 0x10;
+        matrix_mul_vec3(anchor_pos, vars + 0x60, self + 0xC0);
+        FastVecAdd(anchor_pos, anchor_pos, self + 0x10);
         break;
     }
     case 4: {
@@ -298,13 +298,13 @@ extern void cam_set_mode_state(s32 a0);
 void camera_trigger_area_update(char *moby)
 {
     L03_22C8State *vars = *(L03_22C8State **)(moby + 0x68);
-    f32 targetPos[4] __attribute__((aligned(16)));
-    f32 targetAngles[4] __attribute__((aligned(16)));
+    f32 target_pos[4] __attribute__((aligned(16)));
+    f32 target_angles[4] __attribute__((aligned(16)));
     f32 offset[4] __attribute__((aligned(16)));
-    f32 followRate;
+    f32 follow_rate;
     f32 len;
     f32 one;
-    f32 turnRate;
+    f32 turn_rate;
 
     if (D_L03_001B0674 != 0) {
         return;
@@ -323,18 +323,18 @@ void camera_trigger_area_update(char *moby)
         }
         break;
     case 2:
-        followRate = 0.0027777778450399637f;
-        cam_compute_aim_and_angles(moby, targetPos, targetAngles);
+        follow_rate = 0.0027777778450399637f;
+        cam_compute_aim_and_angles(moby, target_pos, target_angles);
         one = 1.0f;
-        FastVecSub(offset, targetPos, D_L03_001B9980);
-        turnRate = 0.0008726647356525064f;
+        FastVecSub(offset, target_pos, D_L03_001B9980);
+        turn_rate = 0.0008726647356525064f;
         len = FastVecLength(offset);
-        math_approach_target_with_braking(&vars->f18, len, followRate, followRate, one);
+        math_approach_target_with_braking(&vars->f18, len, follow_rate, follow_rate, one);
         vec_scale_to_length(offset, offset, vars->f18);
         FastVecAdd(D_L03_001B9980, offset, D_L03_001B9980);
         object_copy_vector_to_selected(D_L03_001B9980);
-        math_approach_target_with_direction_mode(D_L03_001B9980 + 0x14, &vars->f1C, targetAngles[1], turnRate, turnRate, one, 0);
-        math_approach_target_with_direction_mode(D_L03_001B9980 + 0x18, &vars->f20, targetAngles[2], turnRate, turnRate, one, 0);
+        math_approach_target_with_direction_mode(D_L03_001B9980 + 0x14, &vars->f1C, target_angles[1], turn_rate, turn_rate, one, 0);
+        math_approach_target_with_direction_mode(D_L03_001B9980 + 0x18, &vars->f20, target_angles[2], turn_rate, turn_rate, one, 0);
         cam_set_state_rotation(D_L03_001B9980 + 0x10);
         if (point_in_path_xy(g_hero_position, ((u8 *)D_L03_001FE700[vars->index] + 0x10), D_L03_001FE700[vars->index]->field00) == 0) {
             cam_set_mode_state(1);

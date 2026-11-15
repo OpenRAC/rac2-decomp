@@ -38,22 +38,22 @@ void moby_move_with_collision(char *object) {
 
 /* Wakes up every swamp beast in the same group as this object, so they all notice the player. */
 void swamp_beast_alert_group(u8 *object) {
-    char *mobyBase;
+    char *moby_base;
     u8 *entry;
-    u8 *groupList;
+    u8 *group_list;
 
     if (object[0x21] == 0xFF)
         return;
-    groupList = D_L01_001FB020[object[0x21]];
-    if (groupList == 0)
+    group_list = D_L01_001FB020[object[0x21]];
+    if (group_list == 0)
         return;
-    entry = groupList;
-    mobyBase = g_moby_l01_table;
+    entry = group_list;
+    moby_base = g_moby_l01_table;
     for (;;) {
-        char *other = mobyBase + ((*(unsigned short *)entry & 0x7FFF) << 8);
+        char *other = moby_base + ((*(unsigned short *)entry & 0x7FFF) << 8);
 
         if (*(signed char *)(other + 0x20) >= 0) {
-            if (*(short *)(other + 0xAA) == 0x9A2 /* Mutant Swamp Beast */) {
+            if (*(short *)(other + 0xAA) == MOBY_CLASS_MUTANT_SWAMP_BEAST) {
                 *(int *)(*(char **)(other + 0x68) + 0x350) = 1;
             }
         }

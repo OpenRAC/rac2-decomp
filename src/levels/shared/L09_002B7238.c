@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef signed char s8;
@@ -530,7 +531,7 @@ void trooper_clear_value_self_torso(char *object)
     parent = *(char **)(vars + 0x2F8);
     if (parent == 0)
         return;
-    if (*(short *)(parent + 170) != 3342 /* Megacorp Trooper Torso */)
+    if (*(short *)(parent + 170) != MOBY_CLASS_MEGACORP_TROOPER_TORSO)
         return;
     if (*(unsigned char *)(parent + 32) == 254)
         return;
@@ -565,7 +566,7 @@ void trooper_copy_owner_value_self_torso(char *moby)
     linked = *(char **)(vars + 760);
     if (linked == 0)
         return;
-    if (*(short *)(linked + 170) != 3342 /* Megacorp Trooper Torso */)
+    if (*(short *)(linked + 170) != MOBY_CLASS_MEGACORP_TROOPER_TORSO)
         return;
     if (*(unsigned char *)(linked + 32) == 254)
         return;
@@ -644,7 +645,7 @@ void trooper_flag_legs_in_group(char *unused, int index)
     do {
         char *target = D_L09_001B285C + ((idList[0] & 0x7FFF) << 8);
 
-        if (*(signed char *)(target + 0x20) >= 0 && *(short *)(target + 0xAA) == 0xD0F /* Megacorp Trooper Legs */)
+        if (*(signed char *)(target + 0x20) >= 0 && *(short *)(target + 0xAA) == MOBY_CLASS_MEGACORP_TROOPER_LEGS)
             *(unsigned char *)(*(int *)(target + 0x68) + 0x2EA) = 1;
     } while ((short)*idList++ >= 0);
 }

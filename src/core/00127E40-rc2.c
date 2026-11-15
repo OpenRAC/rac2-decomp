@@ -41,7 +41,7 @@ extern s8 D_00141BB0[];
 extern s8 D_001430C0[];
 
 /* Changes the information stored with a file on a memory card. */
-s32 sceMcSetFileInfo(s32 port, s32 slot, s8 *fname, s32 flags, s32 blockCount, s32 bufferAddr) {
+s32 sceMcSetFileInfo(s32 port, s32 slot, s8 *fname, s32 flags, s32 block_count, s32 buffer_addr) {
     s8 *client;
     s8 *request;
     s32 result;
@@ -61,12 +61,12 @@ s32 sceMcSetFileInfo(s32 port, s32 slot, s8 *fname, s32 flags, s32 blockCount, s
     request = D_00141BB0;
     *(s32 *)(request + 4) = slot;
     *(s32 *)(request + 8) = flags;
-    *(s32 *)(request + 0xC) = blockCount;
-    *(s32 *)(request + 0x10) = bufferAddr;
+    *(s32 *)(request + 0xC) = block_count;
+    *(s32 *)(request + 0x10) = buffer_addr;
     strncpy(request + 0x14, fname, 0x3FF);
     request[0x413] = 0;
-    if (blockCount >= 0) {
-        sif_process_cmd_queue_b(bufferAddr, blockCount << 6);
+    if (block_count >= 0) {
+        sif_process_cmd_queue_b(buffer_addr, block_count << 6);
     }
     result = sceSifCallRpc(client, 13, 1, request, 0x414, D_001430C0, 4, 0, 0);
     if (result == 0) {

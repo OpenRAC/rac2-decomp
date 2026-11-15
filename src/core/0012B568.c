@@ -30,8 +30,8 @@ extern int mpeg_decode_picture(void *);
 
 /* rac1-decomp src/core/00125630.c: func_00127748 */
 /* Reads how many macroblocks to advance, adding 33 for each escape code in the stream. */
-int mpeg_read_mb_address_increment(void *decoderPtr) {
-    char *dec = (char *)decoderPtr;
+int mpeg_read_mb_address_increment(void *decoder_ptr) {
+    char *dec = (char *)decoder_ptr;
     unsigned int code;
     int val = 0;
     int cont;
@@ -70,21 +70,21 @@ int mpeg_read_mb_address_increment(void *decoderPtr) {
 
 /* rac1-decomp src/core/00125630.c: func_00127858 */
 /* Decodes every macroblock of one picture and returns 1 on success, 0 on a stream error. */
-int mpeg_decode_picture(void *decoderPtr) {
-    char *dec = (char *)decoderPtr;
-    int mbCount;
+int mpeg_decode_picture(void *decoder_ptr) {
+    char *dec = (char *)decoder_ptr;
+    int mb_count;
     int ret;
 
     *(int *)(dec + 0x810) = 0;
     *(int *)(dec + 0x814) = 0;
 
-    mbCount = *(int *)(dec + 0x12C) * *(int *)(dec + 0x130);
+    mb_count = *(int *)(dec + 0x12C) * *(int *)(dec + 0x130);
     if (*(int *)(dec + 0x174) != 3) {
-        mbCount >>= 1;
+        mb_count >>= 1;
     }
 
     do {
-        ret = mpeg_decode_slice_macroblocks(dec, mbCount);
+        ret = mpeg_decode_slice_macroblocks(dec, mb_count);
     } while (ret == 1 || ret == 3);
 
     mpeg_wait_ipu_idle(dec);

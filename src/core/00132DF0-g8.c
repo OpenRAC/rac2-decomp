@@ -36,16 +36,16 @@ extern int snd_Pump(void);
 extern void snd_commit_queued_command(void);
 
 /* Queues a sound command with its data and an optional reply callback. Waits if the queue is full. */
-void snd_queue_command(int command, int size, unsigned char *data, int callback, long callbackData)
+void snd_queue_command(int command, int size, unsigned char *data, int callback, long callback_data)
 {
-    int paddedSize;
-    int waitCount;
-    int heldFlag;
+    int padded_size;
+    int wait_count;
+    int held_flag;
     int i;
-    int bufIdx;
+    int buf_idx;
     unsigned char *dest;
 
-    heldFlag = 0;
+    held_flag = 0;
     if (D_001A74C4 == 0 && D_001A7480 == 0 && size == 0 && callback == 0) {
         snd_prepare_reply_buffer(D_001A7080, 1);
         while (sif_rpc_is_handle_valid(D_001A7040) != 0) {
@@ -57,23 +57,23 @@ void snd_queue_command(int command, int size, unsigned char *data, int callback,
         sceSifCallRpc(D_001A7040, command, 1, 0, 0, D_001A7080, 0xC, 0, 0);
         return;
     }
-    paddedSize = size + 4;
-    waitCount = 0;
-    if (paddedSize % 4 != 0)
-        paddedSize += 4 - paddedSize % 4;
-    while (*D_001A74A0[D_001A74C0] == 0x100 || D_001A74A8[D_001A74C0] < paddedSize) {
+    padded_size = size + 4;
+    wait_count = 0;
+    if (padded_size % 4 != 0)
+        padded_size += 4 - padded_size % 4;
+    while (*D_001A74A0[D_001A74C0] == 0x100 || D_001A74A8[D_001A74C0] < padded_size) {
         if (D_001A74C4 != 0) {
             D_001A74C4 = 0;
-            heldFlag = 1;
+            held_flag = 1;
         }
         snd_Pump();
-        if (waitCount == 1 && D_001A74F8 == 0)
+        if (wait_count == 1 && D_001A74F8 == 0)
             printf(D_0013BFF8, D_001A74C0, *D_001A74A0[D_001A74C0]);
-        waitCount++;
+        wait_count++;
     }
-    if (waitCount != 0 && D_001A74F8 == 0)
-        printf(D_001A78D0, waitCount);
-    if (heldFlag != 0)
+    if (wait_count != 0 && D_001A74F8 == 0)
+        printf(D_001A78D0, wait_count);
+    if (held_flag != 0)
         D_001A74C4 = 1;
     dest = (unsigned char *)D_001A74A0[D_001A74C0] - (D_001A74A8[D_001A74C0] - 0x1000);
     *(short *)dest = command;
@@ -82,9 +82,9 @@ void snd_queue_command(int command, int size, unsigned char *data, int callback,
     dest += 2;
     for (i = 0; i < size; i++)
         dest[i] = data[i];
-    D_001A74A8[D_001A74C0] -= paddedSize;
-    bufIdx = D_001A74C0;
-    D_001A74B0[bufIdx][*D_001A74A0[bufIdx]].fn = callback;
-    D_001A74B0[bufIdx][*D_001A74A0[bufIdx]].data = callbackData;
+    D_001A74A8[D_001A74C0] -= padded_size;
+    buf_idx = D_001A74C0;
+    D_001A74B0[buf_idx][*D_001A74A0[buf_idx]].fn = callback;
+    D_001A74B0[buf_idx][*D_001A74A0[buf_idx]].data = callback_data;
     snd_commit_queued_command();
 }

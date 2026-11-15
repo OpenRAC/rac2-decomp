@@ -165,18 +165,18 @@ extern unsigned char *D_001F2560;
 
 /* Stores the incoming handle into the record's first word and, for a non-negative index, into the next slot of a 112-byte-stride table, then either bumps a state short from 1 to 2 or passes three shorts and one word of a global block to a helper. */
 /* Called when a loading request gets its result. It stores the result in the request and moves the request on to its next step. */
-void request_store_result_and_advance(void *result, long requestAddr)
+void request_store_result_and_advance(void *result, long request_addr)
 {
-    Rec_F4ec78016 *request = (Rec_F4ec78016 *)requestAddr;
+    Rec_F4ec78016 *request = (Rec_F4ec78016 *)request_addr;
     Slot_F4ec78016 *slot;
-    int slotIndex;
+    int slot_index;
 
     if (request == 0)
         return;
     request->f0 = (int)result;
-    slotIndex = request->f32;
-    if (slotIndex >= 0) {
-        slot = D_00188660_1 + slotIndex;
+    slot_index = request->f32;
+    if (slot_index >= 0) {
+        slot = D_00188660_1 + slot_index;
         *(int *)((char *)slot + 112) = (int)result;
     }
     if (result != 0) {
@@ -188,9 +188,9 @@ void request_store_result_and_advance(void *result, long requestAddr)
 }
 
 /* Called when a loading request gets its result. It stores the result and moves the request on to its next step. */
-void request_store_result_and_advance_alt(s32 result, long requestAddr)
+void request_store_result_and_advance_alt(s32 result, long request_addr)
 {
-    s32 request = (s32)requestAddr;
+    s32 request = (s32)request_addr;
     if (request == 0)
         return;
     *(s32 *)request = result;
@@ -206,17 +206,17 @@ void request_store_result_and_advance_alt(s32 result, long requestAddr)
 }
 
 /* Called when a request gets its result. A good result moves the request to state 4, and a zero result resets it. */
-void request_store_result_move_to_done(int result, long requestAddr)
+void request_store_result_move_to_done(int result, long request_addr)
 {
-    short *request = (short *)(int)requestAddr;
-    short oldState;
+    short *request = (short *)(int)request_addr;
+    short old_state;
     if (request != 0) {
         *(int *)request = result;
         if (result != 0) {
-            oldState = request[5];
-            if (oldState == 1) {
+            old_state = request[5];
+            if (old_state == 1) {
                 request[5] = 4;
-                if (request[8] != 0) D_001A63D4 = oldState;
+                if (request[8] != 0) D_001A63D4 = old_state;
             }
         } else {
             request[5] = 0;
@@ -226,8 +226,8 @@ void request_store_result_move_to_done(int result, long requestAddr)
 
 /* rac1-decomp src/game/stream.c: func_00217970 */
 /* Called when a request gets its result. A pending request in state 9 is moved to state 4, and a zero result resets it. */
-void request_resume_pending_result(int result, long requestAddr) {
-    short *request = (short *)(int)requestAddr;
+void request_resume_pending_result(int result, long request_addr) {
+    short *request = (short *)(int)request_addr;
     if (request != 0) {
         if (result < 0) {
             *(int *)request = result;
@@ -246,8 +246,8 @@ void request_resume_pending_result(int result, long requestAddr) {
 }
 
 /* Called when a request gets its result. A request in state 1 moves to state 8, and a zero result resets it. */
-void request_store_result_move_to_end(int result, long requestAddr) {
-    short *request = (short *)(int)requestAddr;
+void request_store_result_move_to_end(int result, long request_addr) {
+    short *request = (short *)(int)request_addr;
 
     if (request != 0) {
         *(int *)request = result;
@@ -361,42 +361,42 @@ void part_update_falling(char *particle)
 {
     float *fields = (float *)particle;
     float *motion = fields + 0xC;
-    float floorHeight = motion[3];
+    float floor_height = motion[3];
     float step[4] __attribute__((aligned(16)));
     TI pos1, pos2;
-    int oldX, oldY;
-    float groundHeight;
+    int old_x, old_y;
+    float ground_height;
 
     if (g_current_map_index == 15) {
-        if (fields[6] < floorHeight) {
+        if (fields[6] < floor_height) {
             part_kill(particle);
             return;
         }
-    } else if (fields[6] < floorHeight || fields[4] < 0.0f || fields[5] < 0.0f || fields[4] > 1024.0f || fields[5] > 1024.0f) {
+    } else if (fields[6] < floor_height || fields[4] < 0.0f || fields[5] < 0.0f || fields[4] > 1024.0f || fields[5] > 1024.0f) {
         part_kill(particle);
         return;
     }
-    oldX = (int)fields[8];
-    oldY = (int)fields[9];
+    old_x = (int)fields[8];
+    old_y = (int)fields[9];
     FastVecAdd((char *)step, (char *)motion, (char *)D_001B1DC0);
     FastVecAdd((char *)(fields + 8), (char *)(fields + 8), (char *)step);
     FastVecAdd((char *)(fields + 4), (char *)(fields + 4), (char *)step);
-    if (*(short *)(particle + 0xA) != 2 && (oldX != (int)fields[8] || oldY != (int)fields[9])) {
+    if (*(short *)(particle + 0xA) != 2 && (old_x != (int)fields[8] || old_y != (int)fields[9])) {
         pos1 = *(TI *)(fields + 8);
-        groundHeight = coll_get_heightmap_height(&pos1);
-        if (groundHeight >= D_001B1DC0[4]) {
+        ground_height = coll_get_heightmap_height(&pos1);
+        if (ground_height >= D_001B1DC0[4]) {
             pos2 = *(TI *)(fields + 8);
-            floorHeight = coll_get_heightmap_height(&pos2);
+            floor_height = coll_get_heightmap_height(&pos2);
         } else {
-            floorHeight = D_001B1DC0[4];
+            floor_height = D_001B1DC0[4];
         }
-        if (fields[10] < floorHeight) {
+        if (fields[10] < floor_height) {
             part_kill(particle);
             return;
         }
     }
     motion[2] -= 0.0027222223f;
-    motion[3] = floorHeight + D_001B1DC0[2];
+    motion[3] = floor_height + D_001B1DC0[2];
 }
 
 /* Fades a particle in and out over its short life and steps through its texture frames. */
@@ -424,16 +424,16 @@ void part_update_noop_a(void) {
 void part_update_scaling(char *particle)
 {
     char *motion = particle + 32;
-    int totalLife;
-    int scaledLife;
-    int timeLeft;
+    int total_life;
+    int scaled_life;
+    int time_left;
     float size;
 
-    totalLife = *(int *)(motion + 28);
-    timeLeft = *(short *)(particle + 10);
-    scaledLife = *(short *)(motion + 24) * (totalLife - timeLeft) / totalLife + *(short *)(motion + 26);
+    total_life = *(int *)(motion + 28);
+    time_left = *(short *)(particle + 10);
+    scaled_life = *(short *)(motion + 24) * (total_life - time_left) / total_life + *(short *)(motion + 26);
 
-    size = Fe617c30b_FUN_00283CE0(scaledLife) * 1000.0f;
+    size = Fe617c30b_FUN_00283CE0(scaled_life) * 1000.0f;
     *(float *)(particle + 12) = size;
     Fe617c30b_FUN_00282D30(motion, motion, 9.8000001907348632812500e-01f);
     Fe617c30b_FUN_00282CC0(particle + 16, particle + 16, motion);
@@ -491,7 +491,7 @@ void part_update_color_blend(char *particle)
     char *head = particle;
     char *motion = particle + 32;
     unsigned int color;
-    float totalLife;
+    float total_life;
 
     Fe617c30b_FUN_00282CC0(head + 16, head + 16, motion);
     if (Fe617c30b_FUN_00282978(head + 10) != 0) {
@@ -499,9 +499,9 @@ void part_update_color_blend(char *particle)
         return;
     }
     *(float *)(head + 12) = *(float *)(head + 12) + *(float *)(motion + 0x1C);
-    totalLife = Fe617c30b_FUN_00283CE0(*(int *)(motion + 0x18));
+    total_life = Fe617c30b_FUN_00283CE0(*(int *)(motion + 0x18));
     color = FastTweenColor(*(int *)(motion + 0x14), *(int *)(motion + 0x10),
-                      (float)*(short *)(head + 0xA) / totalLife);
+                      (float)*(short *)(head + 0xA) / total_life);
     *(int *)(head + 4) = color;
     if (*(short *)(head + 0xA) < 6) {
         *(int *)(head + 4) = (color & 0xFFFFFF) | (((int)(*(short *)(head + 0xA) * (color >> 24))) / 6 << 24);
@@ -514,13 +514,13 @@ void part_update_color_blend(char *particle)
 void part_update_sparkle(char *particle)
 {
     char *motion = particle + 32;
-    float fadeLeft;
+    float fade_left;
     int blue, alpha;
-    int oldColor;
+    int old_color;
 
-    fadeLeft = *(float *)(motion + 28) + (-0.04f);
-    *(float *)(motion + 28) = fadeLeft;
-    if (fadeLeft <= 0.0f || func_00282978_4(particle + 10) != 0) {
+    fade_left = *(float *)(motion + 28) + (-0.04f);
+    *(float *)(motion + 28) = fade_left;
+    if (fade_left <= 0.0f || func_00282978_4(particle + 10) != 0) {
         func_002B9180_8(particle);
         return;
     }
@@ -530,8 +530,8 @@ void part_update_sparkle(char *particle)
     }
     blue = func_00283CF0_4(*(float *)(motion + 24) * 255.0f) & 0xff;
     alpha = func_00283CF0_4(*(float *)(motion + 28) * 255.0f);
-    oldColor = *(unsigned short *)(particle + 4);
-    *(int *)(particle + 4) = oldColor | (blue << 16) | (alpha << 24);
+    old_color = *(unsigned short *)(particle + 4);
+    *(int *)(particle + 4) = old_color | (blue << 16) | (alpha << 24);
     func_00282CC0_14(particle + 16, particle + 16, motion);
     func_00282D30_14(motion, motion, 0.9f);
     *(char *)(particle + 8) = *(unsigned char *)(particle + 8) - 1;
@@ -578,8 +578,8 @@ void part_update_flash(char *particle)
 {
     char *motion = particle + 32;
     int expired;
-    int alphaByte;
-    float fadeScale;
+    int alpha_byte;
+    float fade_scale;
 
     *(unsigned char *)(particle + 8) = *(unsigned char *)(particle + 8) + *(unsigned char *)(motion + 8);
     *(float *)(particle + 24) = *(float *)(particle + 24) + *(float *)(motion + 16);
@@ -591,18 +591,18 @@ void part_update_flash(char *particle)
             *(short *)(particle + 10) = 30;
             *(int *)(particle + 4) = *(int *)(motion + 20) | 0x7f000000;
         } else {
-            fadeScale = (float)(10 - *(short *)(particle + 10)) * 9.6000003814697265625000e+00f;
-            alphaByte = Fd1c348f5_FUN_00283CF0(fadeScale);
-            *(int *)(particle + 4) = ((alphaByte + 32) << 24) | *(int *)(motion + 20);
+            fade_scale = (float)(10 - *(short *)(particle + 10)) * 9.6000003814697265625000e+00f;
+            alpha_byte = Fd1c348f5_FUN_00283CF0(fade_scale);
+            *(int *)(particle + 4) = ((alpha_byte + 32) << 24) | *(int *)(motion + 20);
         }
     } else {
         expired = Fd1c348f5_FUN_00282978(particle + 10);
         if (expired != 0) {
             Fd1c348f5_FUN_002B9180(particle);
         } else {
-            fadeScale = (float)*(short *)(particle + 10) * 4.2333333492279052734375e+00f;
-            alphaByte = Fd1c348f5_FUN_00283CF0(fadeScale);
-            *(int *)(particle + 4) = (alphaByte << 24) | *(int *)(motion + 20);
+            fade_scale = (float)*(short *)(particle + 10) * 4.2333333492279052734375e+00f;
+            alpha_byte = Fd1c348f5_FUN_00283CF0(fade_scale);
+            *(int *)(particle + 4) = (alpha_byte << 24) | *(int *)(motion + 20);
         }
     }
 }
@@ -651,15 +651,15 @@ void part_update_pulsing(OBJ_F3c007b59 *particle)
 /* Moves two points of a streak particle along a velocity, fades it and removes it when it is invisible. */
 void part_update_streak(char *particle)
 {
-    char *posA = particle + 16;
-    char *posB = particle + 32;
+    char *pos_a = particle + 16;
+    char *pos_b = particle + 32;
     char *velocity = particle + 48;
     int color;
 
-    FastVecAdd(posA, posA, velocity);
-    FastVecAdd(posB, posB, velocity);
-    vec_transform_or_copy(posA, posA);
-    vec_transform_or_copy(posB, posB);
+    FastVecAdd(pos_a, pos_a, velocity);
+    FastVecAdd(pos_b, pos_b, velocity);
+    vec_transform_or_copy(pos_a, pos_a);
+    vec_transform_or_copy(pos_b, pos_b);
     color = *(int *)(particle + 4) - (FloatToInt(*(float *)(velocity + 12)) << 24);
     *(int *)(particle + 4) = color;
     *(int *)(particle + 12) = color;

@@ -31,7 +31,7 @@ extern void snd_stop_voice(int);
 /* Fires the ship's guns when the player presses fire. This covers the twin shots, the four special weapons and the held beam with its ammo recharge. */
 void UpdateShipWeapons(char *moby, char *driver)
 {
-    ShotVector aim, base, muzzleLeft, shotDir, muzzleRight, kick;
+    ShotVector aim, base, muzzle_left, shot_dir, muzzle_right, kick;
     char *driverState = P(driver, 0x70);
     char *vars = P(moby, 0x68);
     char *shot;
@@ -47,40 +47,40 @@ void UpdateShipWeapons(char *moby, char *driver)
         FastVecAdd(&base, &aim, driver + 0x30);
         mode = D_L05_002A1940[0];
         if (mode)
-            matrix_mul_vec3(&muzzleLeft, &D_L05_001B1B50, moby + 0xc0);
+            matrix_mul_vec3(&muzzle_left, &D_L05_001B1B50, moby + 0xc0);
         else
-            matrix_mul_vec3(&muzzleLeft, &D_L05_001B1B30, moby + 0xc0);
-        FastVecAdd(&muzzleLeft, &muzzleLeft, moby + 0x10);
-        FastVecSub(&shotDir, &base, &muzzleLeft);
+            matrix_mul_vec3(&muzzle_left, &D_L05_001B1B30, moby + 0xc0);
+        FastVecAdd(&muzzle_left, &muzzle_left, moby + 0x10);
+        FastVecSub(&shot_dir, &base, &muzzle_left);
         PlayMobySound(3, 0, moby);
-        shot = moby_spawn_shot_effect(moby, &muzzleLeft, -1.0f, &shotDir, 0x2020ff, 0x20207f, 0, mode, 0);
+        shot = moby_spawn_shot_effect(moby, &muzzle_left, -1.0f, &shot_dir, 0x2020ff, 0x20207f, 0, mode, 0);
         if (shot) {
-            char *shotVars = P(shot, 0x68);
-            I(shotVars, 0x28) = 0;
-            F(shotVars, 0x10) += F(driverState, 0x30);
-            F(shotVars, 0x14) += F(driverState, 0x34);
-            F(shotVars, 0x18) += F(driverState, 0x38);
+            char *shot_vars = P(shot, 0x68);
+            I(shot_vars, 0x28) = 0;
+            F(shot_vars, 0x10) += F(driverState, 0x30);
+            F(shot_vars, 0x14) += F(driverState, 0x34);
+            F(shot_vars, 0x18) += F(driverState, 0x38);
             if (mode) {
-                FastVecScale(&muzzleRight, moby + 0xd0, D_L05_001B1B70 * 0.01666666753590107f);
-                FastVecAdd(shotVars + 0x10, shotVars + 0x10, &muzzleRight);
+                FastVecScale(&muzzle_right, moby + 0xd0, D_L05_001B1B70 * 0.01666666753590107f);
+                FastVecAdd(shot_vars + 0x10, shot_vars + 0x10, &muzzle_right);
             }
         }
         if (mode)
-            matrix_mul_vec3(&muzzleRight, &D_L05_001B1B60, moby + 0xc0);
+            matrix_mul_vec3(&muzzle_right, &D_L05_001B1B60, moby + 0xc0);
         else
-            matrix_mul_vec3(&muzzleRight, &D_L05_001B1B40, moby + 0xc0);
-        FastVecAdd(&muzzleRight, &muzzleRight, moby + 0x10);
-        FastVecSub(&shotDir, &base, &muzzleRight);
-        shot = moby_spawn_shot_effect(moby, &muzzleRight, 1.0f, &shotDir, 0x2020ff, 0x20207f, 0, mode, 0);
+            matrix_mul_vec3(&muzzle_right, &D_L05_001B1B40, moby + 0xc0);
+        FastVecAdd(&muzzle_right, &muzzle_right, moby + 0x10);
+        FastVecSub(&shot_dir, &base, &muzzle_right);
+        shot = moby_spawn_shot_effect(moby, &muzzle_right, 1.0f, &shot_dir, 0x2020ff, 0x20207f, 0, mode, 0);
         if (shot) {
-            char *shotVars = P(shot, 0x68);
-            I(shotVars, 0x28) = 0;
-            F(shotVars, 0x10) += F(driverState, 0x30);
-            F(shotVars, 0x14) += F(driverState, 0x34);
-            F(shotVars, 0x18) += F(driverState, 0x38);
+            char *shot_vars = P(shot, 0x68);
+            I(shot_vars, 0x28) = 0;
+            F(shot_vars, 0x10) += F(driverState, 0x30);
+            F(shot_vars, 0x14) += F(driverState, 0x34);
+            F(shot_vars, 0x18) += F(driverState, 0x38);
             if (mode) {
                 FastVecScale(&kick, moby + 0xd0, -(D_L05_001B1B70 * 0.01666666753590107f));
-                FastVecAdd(shotVars + 0x10, shotVars + 0x10, &kick);
+                FastVecAdd(shot_vars + 0x10, shot_vars + 0x10, &kick);
             }
         }
     }
@@ -132,16 +132,16 @@ void UpdateShipWeapons(char *moby, char *driver)
             PlayMobySound(2, 0, moby);
             projectile_spawn_with_target(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[10].upgrade, 1);
             if (D_L05_002A1800[10].upgrade) {
-                muzzleLeft.q = 0;
-                muzzleLeft.f[1] = -0.275f;
-                muzzleLeft.f[3] = 1.0f;
-                matrix_mul_vec3(&base, &muzzleLeft, moby + 0xc0);
+                muzzle_left.q = 0;
+                muzzle_left.f[1] = -0.275f;
+                muzzle_left.f[3] = 1.0f;
+                matrix_mul_vec3(&base, &muzzle_left, moby + 0xc0);
                 FastVecAdd(&base, &base, moby + 0x10);
                 projectile_spawn_with_target(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[10].upgrade, 0);
-                shotDir.q = 0;
-                shotDir.f[1] = 0.275f;
-                shotDir.f[3] = 1.0f;
-                matrix_mul_vec3(&base, &shotDir, moby + 0xc0);
+                shot_dir.q = 0;
+                shot_dir.f[1] = 0.275f;
+                shot_dir.f[3] = 1.0f;
+                matrix_mul_vec3(&base, &shot_dir, moby + 0xc0);
                 FastVecAdd(&base, &base, moby + 0x10);
                 projectile_spawn_with_target(&base, moby + 0xc0, I(vars, 0x18), moby, D_L05_002A1800[10].upgrade, 0);
             }
@@ -169,8 +169,8 @@ void UpdateShipWeapons(char *moby, char *driver)
 
     index = slot_find_active_in_chain(7);
     if (index >= 0 && D_L05_002A1800[index].ammo != 0 && (D_00138320[0] & 0x80)) {
-        char *shotVars = (char *)(D_L05_001B1AFC * 112 + (int)g_sound_state);
-        if (P(shotVars, 0x88) != moby || !B(shotVars, 0x74))
+        char *shot_vars = (char *)(D_L05_001B1AFC * 112 + (int)g_sound_state);
+        if (P(shot_vars, 0x88) != moby || !B(shot_vars, 0x74))
             D_L05_001B1AFC = snd_play_from_class_bank(0x11, 4, moby, 0xfbf);
         if (++I(vars, 0x34) >= 8) {
             I(vars, 0x34) = 8;
@@ -178,8 +178,8 @@ void UpdateShipWeapons(char *moby, char *driver)
         }
     } else {
         if (D_L05_001B1AFC != -1) {
-            char *shotVars = (char *)(D_L05_001B1AFC * 112 + (int)g_sound_state);
-            if (P(shotVars, 0x88) == moby && B(shotVars, 0x74))
+            char *shot_vars = (char *)(D_L05_001B1AFC * 112 + (int)g_sound_state);
+            if (P(shot_vars, 0x88) == moby && B(shot_vars, 0x74))
                 snd_stop_voice(D_L05_001B1AFC);
         }
         D_L05_001B1AFC = -1;

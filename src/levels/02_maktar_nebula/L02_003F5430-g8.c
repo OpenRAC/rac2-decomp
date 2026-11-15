@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 extern float D_L02_001B1030 __attribute__((sda));
@@ -667,11 +668,11 @@ void actor_update_helper_offsets(u8 *moby) {
             u8 *attended = *(u8 **)(vars + 0xD0);
 
             if (attended != 0) {
-                if (*(s16 *)(attended + 0xAA) == 0x9F8 /* Chainblade */) {
+                if (*(s16 *)(attended + 0xAA) == MOBY_CLASS_CHAINBLADE) {
                     obj->x = D_L02_001B1240;
                     (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = D_L02_001B1244;
                     (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = D_L02_001B1248;
-                } else if (*(s16 *)(attended + 0xAA) == 0xA44 /* B2 Brawler Legs */) {
+                } else if (*(s16 *)(attended + 0xAA) == MOBY_CLASS_B2_BRAWLER_LEGS) {
                     obj->x = D_L02_001B124C;
                     (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->y = D_L02_001B1250;
                     (*(L02_003FC9C0_Vec3 **)(vars + 0xC0))->z = D_L02_001B1254;

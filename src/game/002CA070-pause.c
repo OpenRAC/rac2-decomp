@@ -135,8 +135,8 @@ extern void select_moby_context(int);
 void menu_enter_pause_state(void)
 {
     int queued = 0;
-    int s, j, k, n, gsBase, gsAfterBackground;
-    int *bufferPtr;
+    int s, j, k, n, gs_base, gs_after_background;
+    int *buffer_ptr;
     void (*upd)(void);
 
     g_collision_hit[4] |= 0x80000000;
@@ -241,36 +241,36 @@ void menu_enter_pause_state(void)
     D_001B1598_sda = D_001B1598[0] + 1;
 
     if (queued) {
-        int areaA, areaB, areaC, areaD;
-        areaA = D_001BAEC0.fC + 0x30000;
-        areaB = D_001BAEC0.f10 + 0x30000;
-        areaC = areaA + 0x3C000;
-        areaD = areaB + 0xE0000;
-        g_pause_menu_state.unk10C = areaC + 0x11800;
+        int area_a, area_b, area_c, area_d;
+        area_a = D_001BAEC0.fC + 0x30000;
+        area_b = D_001BAEC0.f10 + 0x30000;
+        area_c = area_a + 0x3C000;
+        area_d = area_b + 0xE0000;
+        g_pause_menu_state.unk10C = area_c + 0x11800;
         D_001B22B0[0] = 0x30000;
-        g_pause_menu_state.unk114 = areaA;
-        g_pause_menu_state.unk20 = areaB;
-        g_pause_menu_state.unk118 = areaC;
-        g_pause_menu_state.unk11C = areaD;
-        g_pause_menu_state.unk110 = areaD;
+        g_pause_menu_state.unk114 = area_a;
+        g_pause_menu_state.unk20 = area_b;
+        g_pause_menu_state.unk118 = area_c;
+        g_pause_menu_state.unk11C = area_d;
+        g_pause_menu_state.unk110 = area_d;
         menu_stream_chunk_table_init(0);
     } else {
-        int areaA, areaB, areaC, areaD, areaE, areaF;
-        areaA = D_001BAEC0.fC + 0x60000;
-        areaB = D_001BAEC0.f10 + 0x60000;
-        areaB = areaB + 0xC000;
-        areaA = areaA + 0xC000;
-        areaC = areaA + 0x30000;
-        areaD = areaB + 0xE0000;
-        areaE = areaC + 0xC1000;
-        areaF = areaD + 0x60800;
-        g_pause_menu_state.unk10C = areaE;
+        int area_a, area_b, area_c, area_d, area_e, area_f;
+        area_a = D_001BAEC0.fC + 0x60000;
+        area_b = D_001BAEC0.f10 + 0x60000;
+        area_b = area_b + 0xC000;
+        area_a = area_a + 0xC000;
+        area_c = area_a + 0x30000;
+        area_d = area_b + 0xE0000;
+        area_e = area_c + 0xC1000;
+        area_f = area_d + 0x60800;
+        g_pause_menu_state.unk10C = area_e;
         D_001B22B0[0] = 0x60000;
-        g_pause_menu_state.unk114 = areaA;
-        g_pause_menu_state.unk20 = areaB;
-        g_pause_menu_state.unk118 = areaC;
-        g_pause_menu_state.unk11C = areaD;
-        g_pause_menu_state.unk110 = areaF;
+        g_pause_menu_state.unk114 = area_a;
+        g_pause_menu_state.unk20 = area_b;
+        g_pause_menu_state.unk118 = area_c;
+        g_pause_menu_state.unk11C = area_d;
+        g_pause_menu_state.unk110 = area_f;
         menu_stream_chunk_table_init(1);
     }
     D_001A8BC0 = 0x2000;
@@ -289,26 +289,26 @@ void menu_enter_pause_state(void)
     } else {
         menu_upload_pause_background_to_gs();
     }
-    gsBase = D_001A72D4[0];
-    g_pause_menu_state.unk28 = gsBase;
+    gs_base = D_001A72D4[0];
+    g_pause_menu_state.unk28 = gs_base;
     if (queued) {
-        g_map_overlay_state.unk24C = gsBase;
-        gsAfterBackground = gsBase + 0x40000;
-        g_map_overlay_state.unk250 = gsAfterBackground;
-        D_001A72D4[0] = gsAfterBackground + 0x400;
+        g_map_overlay_state.unk24C = gs_base;
+        gs_after_background = gs_base + 0x40000;
+        g_map_overlay_state.unk250 = gs_after_background;
+        D_001A72D4[0] = gs_after_background + 0x400;
         for (j = 0; j < 4; j++) {
-            int bufferAddr = D_001A72D4[0];
-            g_map_overlay_state.bufs[j] = bufferAddr;
-            D_001A72D4[0] = bufferAddr + 0x4000;
+            int buffer_addr = D_001A72D4[0];
+            g_map_overlay_state.bufs[j] = buffer_addr;
+            D_001A72D4[0] = buffer_addr + 0x4000;
         }
     } else {
-        int bufferIndex;
+        int buffer_index;
         g_map_overlay_state.unk24C = 0;
         g_map_overlay_state.unk250 = 0;
-        bufferPtr = &g_map_overlay_state.bufs[3];
-        for (bufferIndex = 0; bufferIndex < 4; bufferIndex++) {
-            *bufferPtr = 0;
-            bufferPtr--;
+        buffer_ptr = &g_map_overlay_state.bufs[3];
+        for (buffer_index = 0; buffer_index < 4; buffer_index++) {
+            *buffer_ptr = 0;
+            buffer_ptr--;
         }
     }
     select_moby_context(1);

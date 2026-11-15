@@ -32,34 +32,34 @@ extern void mpeg_read_gop_header(s8 *);
 extern void mpeg_dispatch_callback(s32, void *);
 
 /* Reads headers from the video stream until a picture begins, then returns its type. Returns 0 at the end of the stream. */
-s32 mpeg_read_headers_until_picture(s8 *decoderPtr) {
+s32 mpeg_read_headers_until_picture(s8 *decoder_ptr) {
     struct {
         s32 a;
         s32 pad;
         s64 b;
         s64 c;
     } blk;
-    u32 startCode;
+    u32 start_code;
 
     for (;;) {
-        mpeg_skip_to_start_code(decoderPtr);
-        startCode = mpeg_read_bits(decoderPtr, 0x20);
-        switch (startCode) {
+        mpeg_skip_to_start_code(decoder_ptr);
+        start_code = mpeg_read_bits(decoder_ptr, 0x20);
+        switch (start_code) {
         case 0x1B3:
-            mpeg_read_sequence_header(decoderPtr);
+            mpeg_read_sequence_header(decoder_ptr);
             break;
         case 0x1B8:
-            mpeg_read_gop_header(decoderPtr);
+            mpeg_read_gop_header(decoder_ptr);
             break;
         case 0x100:
-            mpeg_read_picture_header(decoderPtr);
+            mpeg_read_picture_header(decoder_ptr);
             blk.a = 5;
             blk.b = -1;
             blk.c = -1;
-            mpeg_dispatch_callback(*(s32 *)(decoderPtr + 0x858), &blk);
-            *(s64 *)(decoderPtr + 0x830) = blk.c;
-            *(s64 *)(decoderPtr + 0x828) = blk.b;
-            return *(s32 *)(decoderPtr + 0x150);
+            mpeg_dispatch_callback(*(s32 *)(decoder_ptr + 0x858), &blk);
+            *(s64 *)(decoder_ptr + 0x830) = blk.c;
+            *(s64 *)(decoder_ptr + 0x828) = blk.b;
+            return *(s32 *)(decoder_ptr + 0x150);
         case 0x1B7:
             return 0;
         }

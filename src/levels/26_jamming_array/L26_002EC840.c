@@ -117,7 +117,7 @@ void hero_update_part_objects(void) {
             ((Object *)object)->flags |= 0x800;
         }
         if (((Object *)object)->id == 0xD54 /* moby class 3412 */) UpdateEquipmentPieces(object);
-        if (object && *(short *)(object + 0xAA) == 4000 /* TV Screens */ && *(char **)(object + 0x68))
+        if (object && *(short *)(object + 0xAA) == MOBY_CLASS_TV_SCREENS && *(char **)(object + 0x68))
             math_store_angle_update_result(object, (float *)(*(char **)(object + 0x68) + 0xC),
                               (int)0x80AAAAD2, (int)0x80396464, 0.061086535f);
     }
@@ -147,19 +147,19 @@ void hero_update_part_objects(void) {
 }
 
 /* Samples the record's plane at its own position and returns the resident height. */
-float coll_sample_height_at_position(u8 *moby, void *planeIn, void *planeOut) {
+float coll_sample_height_at_position(u8 *moby, void *plane_in, void *plane_out) {
     float sample[4];
 
-    func_002EE358(sample, planeIn, moby + 0x10);
-    func_00324530(moby, sample, sample, planeOut);
+    func_002EE358(sample, plane_in, moby + 0x10);
+    func_00324530(moby, sample, sample, plane_out);
     return func_002EE9C8(sample[0], sample[1]);
 }
 
 /* Scales the three vertices of the record's triangle, ordering the middle pair
    by the caller's flag. */
-void vec_scale_triangle_vertices(u8 *tri, int swapOrder) {
+void vec_scale_triangle_vertices(u8 *tri, int swap_order) {
     func_002EE5F0(tri, tri, 1.0f);
-    if (swapOrder != 0)
+    if (swap_order != 0)
         func_002EE440(tri + 0x10, tri + 0x20, tri);
     else
         func_002EE440(tri + 0x10, tri, tri + 0x20);
@@ -250,7 +250,7 @@ void projectile_update_thrown(unsigned char *moby) {
             hit = collision->hit;
             if (hit) {
                 Collision *reread;
-                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) > 0x121)
+                if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) > 0x121)
                     goto finish;
                 reread = &D_L26_001BEFC0;
                 model = reread->hit;
@@ -331,7 +331,7 @@ void projectile_update_bouncing_aged(char *moby) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(vars + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(vars + 0x18) >= 0x122)
                 goto finish;
             reread = &D_L26_001BEFC0;
             model = reread->hit;

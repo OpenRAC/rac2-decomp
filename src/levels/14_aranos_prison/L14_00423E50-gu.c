@@ -26,7 +26,7 @@ int actor_group_has_active_non_tourist(unsigned char *self)
     base = g_moby_l14_pool;
     for (;;) {
         e = base + ((*p & 0x7FFF) << 8);
-        if ((signed char)e[0x20] >= 0 && *(short *)(e + 0xAA) != 0xF91 /* Space Tourist */)
+        if ((signed char)e[0x20] >= 0 && *(short *)(e + 0xAA) != MOBY_CLASS_SPACE_TOURIST_2)
             return 1;
         if ((short)*p < 0)
             break;

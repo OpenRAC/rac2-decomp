@@ -17,20 +17,20 @@ extern struct { char pad[0x230]; int selected; } D_L24_001C8CA0;
 
 /* Fills the menu rows from the level list and selects the entry that matches the current owner. */
 int menu_build_owner_rows(char *menu) {
-    int i, currentEntry;
-    int *ownerList;
+    int i, current_entry;
+    int *owner_list;
     for (i = 0; i < 28 && D_00139948[i]; i++) {
         D_L24_0021C7F0[i].kind = 3;
         D_L24_0021C7F0[i].payload = D_L24_002868E0;
         D_L24_0021C7F0[i].id = D_L24_0028AE20[D_00139948[i]].id;
         D_L24_0021C7F0[i].value = D_L24_0028AE20[D_00139948[i]].value;
     }
-    ownerList = D_L24_001AA770;
+    owner_list = D_L24_001AA770;
     D_L24_0021C7F0[i].id = 0;
     *(int *)(menu + 0x40) = 0;
     *(unsigned int *)(menu + 0x30) |= 0x8000;
-    for (i = 0, currentEntry = ownerList[0]; currentEntry; currentEntry = D_L24_001AA770[++i]) {
-        if (D_L24_001C8CA0.selected == currentEntry) {
+    for (i = 0, current_entry = owner_list[0]; current_entry; current_entry = D_L24_001AA770[++i]) {
+        if (D_L24_001C8CA0.selected == current_entry) {
             *(int *)(menu + 0x40) = i;
             break;
         }

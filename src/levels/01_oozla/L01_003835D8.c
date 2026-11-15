@@ -75,17 +75,17 @@ void hit_relay_helper_update(u8 *object) {
 }
 
 /* Reads how far the player is tilting and gives two numbers, each kept between -1 and 1. */
-void hero_get_clamped_stick_tilt(float *outX, float *outY) {
-    *outX = -g_hero_state.f1FB0;
-    *outY = -g_hero_state.f1FB4;
-    if (*outX > 1.0f)
-        *outX = 1.0f;
-    else if (*outX < -1.0f)
-        *outX = -1.0f;
-    if (*outY > 1.0f)
-        *outY = 1.0f;
-    else if (*outY < -1.0f)
-        *outY = -1.0f;
+void hero_get_clamped_stick_tilt(float *out_x, float *out_y) {
+    *out_x = -g_hero_state.f1FB0;
+    *out_y = -g_hero_state.f1FB4;
+    if (*out_x > 1.0f)
+        *out_x = 1.0f;
+    else if (*out_x < -1.0f)
+        *out_x = -1.0f;
+    if (*out_y > 1.0f)
+        *out_y = 1.0f;
+    else if (*out_y < -1.0f)
+        *out_y = -1.0f;
 }
 
 
@@ -107,15 +107,15 @@ extern void *D_L01_001C3980[];
 /* Finds up to 16 nearby creatures of one kind, marks them and remembers them in a list. */
 void swamp_beast_collect_nearby(void *object, void **list, int *found) {
     int i;
-    int hitCount;
+    int hit_count;
     void *other;
 
     memset(list, 0, 4);
     *found = 0;
-    hitCount = coll_process_hit(3.5f, (char *)object + 0x10, 1, (char *)object, 0);
-    if (hitCount <= 0)
+    hit_count = coll_process_hit(3.5f, (char *)object + 0x10, 1, (char *)object, 0);
+    if (hit_count <= 0)
         return;
-    for (i = 0; i < hitCount; i++) {
+    for (i = 0; i < hit_count; i++) {
         other = D_L01_001C3980[i];
         if (other == 0)
             continue;
@@ -166,8 +166,8 @@ int swamp_beast_claim_group_slot(u8 *object) {
 
     if (object[0x21] != 0xFF) {
         if (*(int *)(vars + 0x340) == 0) {
-            int *groupCount = *(int **)(vars + 0x33C);
-            *groupCount = *groupCount + 1;
+            int *group_count = *(int **)(vars + 0x33C);
+            *group_count = *group_count + 1;
         }
     }
     *(int *)(vars + 0x340) = result;
@@ -252,22 +252,22 @@ extern float vec_distance_xy(void *, void *);
    func_002A89A8's value for it at +0x8. A position is the 16-byte record at +0x30 of the
    index's 0x80-byte entry in the D_L01_001B264C table. */
 void swamp_beast_find_best_patrol_position(u8 *object, u8 *result) {
-    s32 *indexList = (s32 *)(*(u8 **)(object + 0x68) + 0x310);
+    s32 *index_list = (s32 *)(*(u8 **)(object + 0x68) + 0x310);
     u8 pos[16] __attribute__((aligned(16)));
     s32 count = 4;
     f32 rating;
 
     *(f32 *)(result + 0xC) = 0.0f;
     while (--count >= 0) {
-        if (*indexList != -1) {
-            qcopy(pos, D_L01_001B264C + *indexList * 0x80 + 0x30);
+        if (*index_list != -1) {
+            qcopy(pos, D_L01_001B264C + *index_list * 0x80 + 0x30);
             rating = vec_distance_xy(pos, g_hero_position);
             if (*(f32 *)(result + 0xC) < rating) {
                 qcopy(result, pos);
                 *(f32 *)(result + 0xC) = rating;
             }
         }
-        indexList++;
+        index_list++;
     }
     *(f32 *)(result + 0x8) = coll_probe_ground_height_below(result, 0, 10.0f);
 }

@@ -51,7 +51,7 @@ int render_configured_text_label(unsigned char *label) {
     char *text = D_001AB988;
     unsigned char *glyphs = D_00263B50;
     int font;
-    int fontFlags, contentFlags, g, f, content, variant = 0, centerY, centerX, colour, t, wflags;
+    int font_flags, content_flags, g, f, content, variant = 0, center_y, center_x, colour, t, wflags;
     /* func_0027C878's TEX0 is 64 bits, and FontPrintWindow reads all of them: on the console the
        register keeps them whatever the C says, on a PC an int keeps only the low half. */
     long tex;
@@ -59,27 +59,27 @@ int render_configured_text_label(unsigned char *label) {
     int k;       /* FAKEMATCH: shift stand-in, then the 0x20000 mask (s0) */
 
     font = 1;
-    fontFlags = *(int *)(label + 0x30);
-    if (fontFlags & 8) {
+    font_flags = *(int *)(label + 0x30);
+    if (font_flags & 8) {
         font = 3;
         glyphs = D_00264290;
     }
-    if (fontFlags & 0x10) {
+    if (font_flags & 0x10) {
         font = 2;
         glyphs = D_00263EF0;
     }
     VU1_addGSregister(0x42, 0x44);
     ((void (*)(int, long))VU1_addGSregister)(0x47, 0x2004B);
 
-    contentFlags = *(int *)(label + 0x30);
-    if (contentFlags & 0x20) {
+    content_flags = *(int *)(label + 0x30);
+    if (content_flags & 0x20) {
         content = g_current_map_index - 1;
         if ((unsigned int)content >= 0x12) {
             content = -1;
         }
-    } else if (contentFlags & 0x40) {
+    } else if (content_flags & 0x40) {
         content = D_001C51D0 - 1;
-    } else if (contentFlags & 4) {
+    } else if (content_flags & 4) {
         t = D_001AA440;
         if (*(int *)(label + 0x44) < t) {
             *(int *)(label + 0x44) = D_001AA440;
@@ -87,12 +87,12 @@ int render_configured_text_label(unsigned char *label) {
         content = 0;
         *(int *)(label + 0x48) = 0;
         *(int *)(label + 0x4C) = 0;
-    } else if (contentFlags & 0x80) {
+    } else if (content_flags & 0x80) {
         content = *(int *)(ST + 0x40);
-        if (contentFlags & 0x8000) {
+        if (content_flags & 0x8000) {
             variant = g_is_pal_video[0] != 0;
         }
-    } else if (contentFlags & 0x100) {
+    } else if (content_flags & 0x100) {
         char *cell;
         content = *(int *)(ST + 0x3C);
         cell = *(char **)(ST + 0x48) + content * 10;
@@ -105,7 +105,7 @@ int render_configured_text_label(unsigned char *label) {
             content = -1;
             t = 0;
         }
-    } else if (contentFlags & 0x1000) {
+    } else if (content_flags & 0x1000) {
         char *st = ST;
         content = *(int *)(st + 0x40);
         id = *(short *)(*(char **)(st + 0x34) + content * 12);
@@ -183,12 +183,12 @@ int render_configured_text_label(unsigned char *label) {
         }
     }
     f = *(int *)(label + 0x30);
-    centerX = *(int *)(label + 0x18) + *(int *)(label + 0x20) / 2;
-    centerY = *(int *)(label + 0x1C) + *(int *)(label + 0x24) / 2;
+    center_x = *(int *)(label + 0x18) + *(int *)(label + 0x20) / 2;
+    center_y = *(int *)(label + 0x1C) + *(int *)(label + 0x24) / 2;
     if ((f & 0x4004) == 0x4004 && *(int *)(label + 0x34) == 0x112D) {
         menu_list_active_entries((int *)0x70000000, (unsigned int *)&helpResult, 0, 0);
         if (helpResult < 0) text = TEXT(0x112C);
-        centerY += 8;
+        center_y += 8;
     }
     if (*(int *)(label + 0x30) & 0x800) if (D_001A7A60[content] == 0) {
         text = TEXT(0x2DC0);
@@ -200,23 +200,23 @@ int render_configured_text_label(unsigned char *label) {
     wflags = 8;
     if (f & 1) {
         wflags = 9;
-        centerX = *(int *)(label + 0x20) / 2;
+        center_x = *(int *)(label + 0x20) / 2;
     }
     if (f & 2) {
         wflags |= 2;
-        centerY = *(int *)(label + 0x24) / 2;
+        center_y = *(int *)(label + 0x24) / 2;
     }
 
     SetupGifPaging(0);
     tex = GetEffectTextureDescriptor(font);
-    if (D_001F2854 == D_0025A498 || D_001AB9A8 != 0) { originY = centerY; originX = centerX + 1; } else { originX = 1; originY = D_001AB974; }
+    if (D_001F2854 == D_0025A498 || D_001AB9A8 != 0) { originY = center_y; originX = center_x + 1; } else { originX = 1; originY = D_001AB974; }
     memset(&tmp, 0, 0x18);
     tmp.s[0] = originY;
     tmp.s[1] = *(unsigned short *)(label + 0x24) + originY;
     tmp.s[2] = originX;
     tmp.s[3] = translated_edge(*(unsigned short *)(label + 0x20), originX - 4);
-    tmp.s[4] = centerX;
-    tmp.s[5] = centerY - (*(int *)(label + 0x3C) >> 4);
+    tmp.s[4] = center_x;
+    tmp.s[5] = center_y - (*(int *)(label + 0x3C) >> 4);
     tmp.s[8] = *(int *)&D_001AB984;
     tmp.s[9] = wflags;
     tmp.s[11] = -(*(unsigned short *)(label + 0x3C) & 0xF);
@@ -242,7 +242,7 @@ int render_configured_text_label(unsigned char *label) {
 
     id = *(int *)(label + 0x3C);
     id >>= 4;
-    id = centerY - id;
+    id = center_y - id;
     set_anchor(&win, id);
     /* FAKEMATCH: dead shift/unshift on stand-in globals (RAC1 win_shift/win_unshift without the
        shadow DRAW); combine cancels it and leaves USE(g)/USE(k) at the block head, and g/k are

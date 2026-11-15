@@ -21,32 +21,32 @@ typedef union {
    sub-object's 0x42C word, func_L09_003FD128 for flag 2. */
 void child_objects_draw(unsigned char *moby)
 {
-    unsigned char *mobyBytes = moby;
-    unsigned char *vars = *(unsigned char **)(mobyBytes + 0x68);
-    int clearValue = -1;
+    unsigned char *moby_bytes = moby;
+    unsigned char *vars = *(unsigned char **)(moby_bytes + 0x68);
+    int clear_value = -1;
     int i;
     Vec4_L09 sphere;
 
     for (i = 19; i >= 0; i--) {
-        D_L09_00257110[i] = clearValue;
+        D_L09_00257110[i] = clear_value;
     }
     i = 0;
     if (*(short *)(vars + 0x424) > 0) {
         int *table = D_L09_00257110;
-        int noneId = -1;
-        int *tableSlot = table;
+        int none_id = -1;
+        int *table_slot = table;
         do {
-            char *child = (char *)track_find_farthest_entry(mobyBytes[0x21], table);
-            unsigned char *childVars;
-            *tableSlot = *(short *)(child + 0xB2);
-            tableSlot++;
+            char *child = (char *)track_find_farthest_entry(moby_bytes[0x21], table);
+            unsigned char *child_vars;
+            *table_slot = *(short *)(child + 0xB2);
+            table_slot++;
             qcopy(&sphere, child + 0x10);
             sphere.f[3] = 4.0f;
-            if (math_fast_helper_a(&sphere, IntToFloat(*(short *)(child + 0x32))) != noneId) {
-                childVars = *(unsigned char **)(child + 0x68);
-                if (*(int *)(childVars + 0x42C) & 8)
+            if (math_fast_helper_a(&sphere, IntToFloat(*(short *)(child + 0x32))) != none_id) {
+                child_vars = *(unsigned char **)(child + 0x68);
+                if (*(int *)(child_vars + 0x42C) & 8)
                     gfx_draw_spinning_layered_quads(child);
-                if (*(int *)(childVars + 0x42C) & 2)
+                if (*(int *)(child_vars + 0x42C) & 2)
                     light_ring_draw(child);
             }
             i++;

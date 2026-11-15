@@ -41,8 +41,8 @@ extern void ref_L16_003D6D00_09(s32, s32);
 void hero_pull_and_hurt_on_contact(s8 *moby) {
     s32 *vars;
     s8 *hero;
-    s8 *heroBase;
-    s8 *heroPos;
+    s8 *hero_base;
+    s8 *hero_pos;
     s8 offset[0x10];
 
     vars = (*(s32 **)((s8 *)(moby) + (0x68)));
@@ -52,19 +52,19 @@ void hero_pull_and_hurt_on_contact(s8 *moby) {
     }
     hero = g_hero_position;
     if (ref_L16_003D6D00_02(hero, *vars) != 0) {
-        heroBase = hero - 0x80;
-        if ((*(s32 *)((s8 *)(heroBase) + (0x229C))) != 0xF) {
-            heroPos = hero + 0x270;
-            ref_L16_003D6D00_03(heroPos, ref_L16_003D6D00_00 + (*vars << 7) + 0x30, hero);
-            ref_L16_003D6D00_04(heroPos, heroPos, 1.0f);
-            (*(f32 *)((s8 *)(heroBase) + (0x2FC))) = 2.0f;
-            (*(s16 *)((s8 *)(heroBase) + (0x218))) = 5;
-            (*(s32 *)((s8 *)(heroBase) + (0x2F8))) = 0;
-            if ((*(s32 *)((s8 *)(heroBase) + (0x340))) != 0 && (*(s32 *)((s8 *)(heroBase) + (0x2294))) != 0x38) {
-                ref_L16_003D6D00_05(offset, hero, heroPos);
-                if (ref_L16_003D6D00_06(hero + 0x60, offset, 0, (*(s32 *)((s8 *)(heroBase) + (0x2290))), 0) != 0 && ref_L16_003D6D00_07() != 2 && ref_L16_003D6D00_01.w0 == 0) {
+        hero_base = hero - 0x80;
+        if ((*(s32 *)((s8 *)(hero_base) + (0x229C))) != 0xF) {
+            hero_pos = hero + 0x270;
+            ref_L16_003D6D00_03(hero_pos, ref_L16_003D6D00_00 + (*vars << 7) + 0x30, hero);
+            ref_L16_003D6D00_04(hero_pos, hero_pos, 1.0f);
+            (*(f32 *)((s8 *)(hero_base) + (0x2FC))) = 2.0f;
+            (*(s16 *)((s8 *)(hero_base) + (0x218))) = 5;
+            (*(s32 *)((s8 *)(hero_base) + (0x2F8))) = 0;
+            if ((*(s32 *)((s8 *)(hero_base) + (0x340))) != 0 && (*(s32 *)((s8 *)(hero_base) + (0x2294))) != 0x38) {
+                ref_L16_003D6D00_05(offset, hero, hero_pos);
+                if (ref_L16_003D6D00_06(hero + 0x60, offset, 0, (*(s32 *)((s8 *)(hero_base) + (0x2290))), 0) != 0 && ref_L16_003D6D00_07() != 2 && ref_L16_003D6D00_01.w0 == 0) {
                     ref_L16_003D6D00_08(hero + 0x244C, 0, (s32)((f32)D_001A7A00 * 0.333f));
-                    if ((*(s32 *)((s8 *)(heroBase) + (0x24CC))) != 0) {
+                    if ((*(s32 *)((s8 *)(hero_base) + (0x24CC))) != 0) {
                         ref_L16_003D6D00_09(0x38, 1);
                     }
                 }

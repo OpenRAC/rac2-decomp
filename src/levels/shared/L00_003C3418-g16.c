@@ -103,7 +103,7 @@ void hoverbomb_gun_update(unsigned char *object) {
         object[0x20] = 3;
     } else {
         member = state->target;
-        if ((member == 0 || *(s16 *)(member + 0xAA) != 0x5D8 /* Hoverbomb Projectile */ || (u8)member[0x20] == 0xFE ||
+        if ((member == 0 || *(s16 *)(member + 0xAA) != MOBY_CLASS_HOVERBOMB_PROJECTILE || (u8)member[0x20] == 0xFE ||
              (u8)member[0x20] == 0xFD) && !(PAD->u[104] & H->u[1164])) {
             state->target = 0;
             object[0x20] = 1;

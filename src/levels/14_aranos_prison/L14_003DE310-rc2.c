@@ -30,7 +30,7 @@ void moby_clear_dead_linked(s8 *moby) {
     s32 remaining;
     s8 **slot;
     s8 *linked;
-    s8 *linkedVars;
+    s8 *linked_vars;
 
     remaining = 3;
     slot = (s8 **)((*(s8 **)((char *)(moby) + (0x68))) + 0xE0);
@@ -38,11 +38,11 @@ void moby_clear_dead_linked(s8 *moby) {
         linked = *slot;
         remaining -= 1;
         if (linked != 0) {
-            linkedVars = (*(s8 **)((char *)(linked) + (0x68)));
+            linked_vars = (*(s8 **)((char *)(linked) + (0x68)));
             if ((*(s8 *)((char *)(linked) + (0x20))) < 0) {
                 goto store;
             }
-            if ((*(f32 *)((char *)(linkedVars) + (0x40))) <= 0.0f) {
+            if ((*(f32 *)((char *)(linked_vars) + (0x40))) <= 0.0f) {
             store:
                 *slot = 0;
             }

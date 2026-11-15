@@ -12,6 +12,6 @@ struct _reent;
 extern long _strtol_r(struct _reent *, const char *, char **, int);
 
 /* Turns a text string into a whole number, using the library state record. */
-long strtol(int text, int endPtr, int base) {
-    return _strtol_r(D_00133E74, (const char *)text, (char **)endPtr, base);
+long strtol(int text, int end_ptr, int base) {
+    return _strtol_r(D_00133E74, (const char *)text, (char **)end_ptr, base);
 }

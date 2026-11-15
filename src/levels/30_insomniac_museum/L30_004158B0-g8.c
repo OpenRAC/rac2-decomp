@@ -34,7 +34,7 @@ extern char *SpawnSpinningSparkParticle(void *, float, float, float, int, void *
 
 /* Spawns all the particles of a museum explosion: flash, sparks, smoke, debris and a shock ring. */
 void EmitMuseumExplosionParticles(char *moby) {
-    float particlePos[4] __attribute__((aligned(16)));
+    float particle_pos[4] __attribute__((aligned(16)));
     float velocity[4] __attribute__((aligned(16)));
     float temp[4] __attribute__((aligned(16)));
     ExplosionState *state = *(ExplosionState **)(moby + 0x68);
@@ -72,9 +72,9 @@ void EmitMuseumExplosionParticles(char *moby) {
         angle = mat_fast_helper_a(D_L30_001B9C80.position[0] - *(float *)(moby+0x10), D_L30_001B9C80.position[1] - *(float *)(moby+0x14));
         n = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
         life = math_random_int_range(30, 50);
-        particlePos[0] = *(float *)(moby+0x10) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
-        particlePos[1] = *(float *)(moby+0x14) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
-        particlePos[2] = *(float *)(moby+0x18) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+        particle_pos[0] = *(float *)(moby+0x10) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+        particle_pos[1] = *(float *)(moby+0x14) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+        particle_pos[2] = *(float *)(moby+0x18) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
         size = math_random_float_range(0.6f, 1.0f)*state->scale;
         speed = math_random_float_range(9.0f, 12.0f)*state->scale;
         direction = FastAddRotations(angle, math_random_signed_float_range(0.0f, 1.396263599395752f));
@@ -83,9 +83,9 @@ void EmitMuseumExplosionParticles(char *moby) {
         velocity[2] = 0.0f;
         speed = math_random_float_range(0.0f, 12.0f)*state->scale;
         velocity[2] = speed*(1.0f/60.0f);
-        part_spawn_fading_drift(particlePos,velocity,life,state->color,n,127,127,size*210000.0f,state->scale*2100.0f,0.004055555909872055f,1);
+        part_spawn_fading_drift(particle_pos,velocity,life,state->color,n,127,127,size*210000.0f,state->scale*2100.0f,0.004055555909872055f,1);
         n *= 2;
-        particle = part_spawn_fading_drift(particlePos,velocity,life,state->color&0xFFFFFF,-n,48,48,size*1260000.0f,state->scale*4200.0f,0.004055555909872055f,0);
+        particle = part_spawn_fading_drift(particle_pos,velocity,life,state->color&0xFFFFFF,-n,48,48,size*1260000.0f,state->scale*4200.0f,0.004055555909872055f,0);
         if (particle) particle[2] = D_L30_001FF940[0xD4/4][0];
     }
     for (i = 0; i < state->count1; i++) {
@@ -95,9 +95,9 @@ void EmitMuseumExplosionParticles(char *moby) {
         angle = mat_fast_helper_a(D_L30_001B9C80.position[0] - *(float *)(moby+0x10), D_L30_001B9C80.position[1] - *(float *)(moby+0x14));
         n = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
         life = math_random_int_range(30, 50);
-        particlePos[0] = *(float *)(moby+0x10) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
-        particlePos[1] = *(float *)(moby+0x14) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
-        particlePos[2] = *(float *)(moby+0x18) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+        particle_pos[0] = *(float *)(moby+0x10) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+        particle_pos[1] = *(float *)(moby+0x14) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+        particle_pos[2] = *(float *)(moby+0x18) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
         size = math_random_float_range(0.75f, 1.5f)*state->scale;
         speed = math_random_float_range(9.0f, 12.0f)*state->scale;
         direction = FastAddRotations(angle, math_random_signed_float_range(0.0f, 1.396263599395752f));
@@ -106,7 +106,7 @@ void EmitMuseumExplosionParticles(char *moby) {
         velocity[2] = 0.0f;
         speed = math_random_float_range(0.0f, 12.0f)*state->scale;
         velocity[2] = speed*(1.0f/60.0f);
-        part_spawn_fading_drift(particlePos,velocity,life,state->color&0xFFFFFF,n,127,127,size*210000.0f,state->scale*2100.0f,0.004055555909872055f,5);
+        part_spawn_fading_drift(particle_pos,velocity,life,state->color&0xFFFFFF,n,127,127,size*210000.0f,state->scale*2100.0f,0.004055555909872055f,5);
     }
     for (i = 0; i < state->count2; i++) {
         float angle, direction, size, speed;
@@ -115,9 +115,9 @@ void EmitMuseumExplosionParticles(char *moby) {
         angle = mat_fast_helper_a(D_L30_001B9C80.position[0] - *(float *)(moby+0x10), D_L30_001B9C80.position[1] - *(float *)(moby+0x14));
         n = FloatToInt(math_random_signed_float_range(2.0f, 5.0f));
         life = math_random_int_range(30, 50);
-        particlePos[0] = *(float *)(moby+0x10) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
-        particlePos[1] = *(float *)(moby+0x14) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
-        particlePos[2] = *(float *)(moby+0x18) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+        particle_pos[0] = *(float *)(moby+0x10) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+        particle_pos[1] = *(float *)(moby+0x14) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
+        particle_pos[2] = *(float *)(moby+0x18) + math_random_signed_float_range(0.0f, 0.1f)*state->scale;
         size = math_random_float_range(0.6f, 1.0f)*state->scale;
         speed = math_random_float_range(9.0f, 12.0f)*state->scale;
         direction = FastAddRotations(angle, math_random_signed_float_range(0.0f, 1.396263599395752f));
@@ -126,16 +126,16 @@ void EmitMuseumExplosionParticles(char *moby) {
         velocity[2] = 0.0f;
         speed = math_random_float_range(0.0f, 12.0f)*state->scale;
         velocity[2] = speed*(1.0f/60.0f);
-        part_spawn_fading_drift(particlePos,velocity,life,state->color&0xFFFFFF,n,127,127,size*210000.0f,state->scale*2100.0f,0.004055555909872055f,3);
+        part_spawn_fading_drift(particle_pos,velocity,life,state->color&0xFFFFFF,n,127,127,size*210000.0f,state->scale*2100.0f,0.004055555909872055f,3);
     }
     for (i = 0; i < state->count4; i++) {
         float x, y;
         char *particle;
-        FastVecScale(particlePos,moby+0xC0,math_random_float_range(15.0f,20.0f)*state->scale*(1.0f/60.0f));
+        FastVecScale(particle_pos,moby+0xC0,math_random_float_range(15.0f,20.0f)*state->scale*(1.0f/60.0f));
         x = math_random_signed_float_range(0.2617994248867035f,1.396263599395752f);
         y = math_random_signed_float_range(0.2617994248867035f,1.396263599395752f);
         math_build_axis_angle_quat(temp,moby+0xD0,x);
-        vec_rotate_by_quaternion(velocity,particlePos,temp);
+        vec_rotate_by_quaternion(velocity,particle_pos,temp);
         math_build_axis_angle_quat(temp,moby+0xC0,y);
         vec_rotate_by_quaternion(velocity,velocity,temp);
         particle = part_spawn_trail_2(moby+0x10,velocity,math_random_int_range(20,35),0.004055555909872055f);
@@ -144,8 +144,8 @@ void EmitMuseumExplosionParticles(char *moby) {
     if (state->count5) {
         *(Quadword *)velocity = 0;
         velocity[2] = state->scale*(2.0f/15.0f);
-        *(Quadword *)particlePos = *(Quadword *)velocity;
-        part_spawn_shockwave_ring(moby,moby+0x10,particlePos,16,state->scale*3.5f,(unsigned char)state->color,(unsigned char)(state->color>>8),(unsigned char)(state->color>>16),45);
+        *(Quadword *)particle_pos = *(Quadword *)velocity;
+        part_spawn_shockwave_ring(moby,moby+0x10,particle_pos,16,state->scale*3.5f,(unsigned char)state->color,(unsigned char)(state->color>>8),(unsigned char)(state->color>>16),45);
     }
     SpawnExplosionEffects(moby,D_L30_001A8F20,moby+0x10,0.0f,0.0f,0,0,0,0.0f,0.0f,9.0f,0.0f,-1,state->scale*20.0f,0,0,-1,0,0x810001);
     sign = 1;
@@ -153,15 +153,15 @@ void EmitMuseumExplosionParticles(char *moby) {
     for (i = 0; i < state->count3; i++) {
         float size, x, y;
         char *particle;
-        particlePos[0] = *(float *)(moby+0x10) + math_random_signed_float_range(0.0f,1.0f)*state->scale;
+        particle_pos[0] = *(float *)(moby+0x10) + math_random_signed_float_range(0.0f,1.0f)*state->scale;
         sign = -sign;
-        particlePos[1] = *(float *)(moby+0x14) + math_random_signed_float_range(0.0f,1.0f)*state->scale;
-        particlePos[2] = *(float *)(moby+0x18) + math_random_signed_float_range(0.0f,1.0f)*state->scale;
+        particle_pos[1] = *(float *)(moby+0x14) + math_random_signed_float_range(0.0f,1.0f)*state->scale;
+        particle_pos[2] = *(float *)(moby+0x18) + math_random_signed_float_range(0.0f,1.0f)*state->scale;
         size = math_random_float_range(1.0f/60.0f,1.0f/30.0f)*state->scale;
         x = math_random_signed_float_range(0.0f,1.396263599395752f);
         y = math_random_signed_float_range(0.0f,1.5707964897155762f);
         vec_build_spherical_offset(velocity,size,FastAddRotations(angle,y),x);
-        particle = SpawnSpinningSparkParticle(particlePos,0.0f,1.0f,1.01f,sign,velocity,state->scale*315000.0f,state->color|0x7F0000,0);
+        particle = SpawnSpinningSparkParticle(particle_pos,0.0f,1.0f,1.01f,sign,velocity,state->scale*315000.0f,state->color|0x7F0000,0);
         if (particle) {
             char *sub = particle + 0x20;
             *(short *)(particle+10) = math_random_int_range(40,70);

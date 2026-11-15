@@ -23,41 +23,41 @@ void lift_keep_height(u8 *moby)
 {
     u8 *state = *(u8 **)(moby + 0x68);
     u8 *lift = g_moby_l07_array[0] + (*(s32 *)(state + 0xE8) << 8);
-    f32 heightDiff = *(f32 *)(moby + 0x14) - D_L07_001B23CC[0][*(s32 *)(state + 0xEC)].y;
-    f32 step, savedYaw;
-    f32 maxStep = 1.0f/6.0f;
-    u8 *liftParent;
+    f32 height_diff = *(f32 *)(moby + 0x14) - D_L07_001B23CC[0][*(s32 *)(state + 0xEC)].y;
+    f32 step, saved_yaw;
+    f32 max_step = 1.0f/6.0f;
+    u8 *lift_parent;
     if (*(f32 *)(lift + 0x18) < 218.5f) {
-        step = heightDiff + 4.0f;
+        step = height_diff + 4.0f;
         if (math_fabs(step) < D_L07_001B0F3C) {
             if (step < 0.0f) step = -(step + D_L07_001B0F3C);
             else step = D_L07_001B0F3C - step;
-            if (step > maxStep) step = 1.0f/6.0f;
-            else if (step < -maxStep) step = -maxStep;
+            if (step > max_step) step = 1.0f/6.0f;
+            else if (step < -max_step) step = -max_step;
             *(f32 *)(moby + 0x14) += step;
             *(f32 *)(state + 0x54) = 0.0f;
             *(f32 *)(state + 0x64) += step;
         }
     }
     if (*(f32 *)(lift + 0x18) > 199.7f) {
-        step = heightDiff - 4.0f;
+        step = height_diff - 4.0f;
         if (math_fabs(step) < D_L07_001B0F3C) {
             if (step < 0.0f) step = -(step + D_L07_001B0F3C);
             else step = D_L07_001B0F3C - step;
-            if (step > maxStep) step = 1.0f/6.0f;
-            else if (step < -maxStep) step = -maxStep;
+            if (step > max_step) step = 1.0f/6.0f;
+            else if (step < -max_step) step = -max_step;
             *(f32 *)(moby + 0x14) += step;
             *(f32 *)(state + 0x54) = 0.0f;
             *(f32 *)(state + 0x64) += step;
         }
     }
     if (*(f32 *)(lift + 0x18) > 202.0f && *(f32 *)(lift + 0x18) < 204.0f && D_L07_00189E20.platform == lift) {
-        liftParent = moby_get_private_value_2(lift);
-        if (liftParent != 0 && *(f32 *)(liftParent + 0x18) > 0.0f && !IsPointInCuboid(D_L07_001B9200, *(s32 *)(state + 0xEC))) {
-            savedYaw = D_L07_00189E20.rotation[2];
+        lift_parent = moby_get_private_value_2(lift);
+        if (lift_parent != 0 && *(f32 *)(lift_parent + 0x18) > 0.0f && !IsPointInCuboid(D_L07_001B9200, *(s32 *)(state + 0xEC))) {
+            saved_yaw = D_L07_00189E20.rotation[2];
             D_L07_00189E20.rotation[2] = mat_fast_helper_a(D_L07_00189E20.position[0] - *(f32 *)(lift + 0x10), D_L07_00189E20.position[1] - *(f32 *)(lift + 0x14));
             hero_reset_position_and_direction(D_L07_00189E20.position, D_L07_00189E20.rotation, 0x6F, 1);
-            D_L07_00189E20.rotation[2] = savedYaw;
+            D_L07_00189E20.rotation[2] = saved_yaw;
             hero_reset_position_and_direction(D_L07_00189E20.position, D_L07_00189E20.rotation, 0, 0);
         }
     }

@@ -55,7 +55,7 @@ extern void DrawMirroredRibbons(char *);
 void tether_update(char *actor) {
     char *state = *(char **)(actor + 0x68);
     char *target = g_moby_l02_pool + *(int *)state * 0x100;
-    float effectPoint[4] __attribute__((aligned(16)));
+    float effect_point[4] __attribute__((aligned(16)));
     switch (*(unsigned char *)(actor + 0x20)) {
     case 0:
         *(float *)(state + 0x48) = *(float *)(actor + 0xF8);
@@ -151,8 +151,8 @@ void tether_update(char *actor) {
         *(int *)(state + 0x58) = -1;
     }
     if (*(char **)(state + 0x54)) {
-        matrix_mul_vec3(effectPoint, effectOffset003E87D8, actor + 0xC0);
-        FastVecAdd(*(char **)(state + 0x54) + 0x10, effectPoint, actor + 0x10);
+        matrix_mul_vec3(effect_point, effectOffset003E87D8, actor + 0xC0);
+        FastVecAdd(*(char **)(state + 0x54) + 0x10, effect_point, actor + 0x10);
         *(float *)(*(char **)(state + 0x54) + 0xF8) = *(float *)(actor + 0xF8);
         *(float *)(*(char **)(state + 0x54) + 0x2C) = *(float *)(*(char **)(*(char **)(state + 0x54) + 0x24) + 0x24) * D_L02_001B0BF0[3];
     }

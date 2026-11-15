@@ -59,7 +59,7 @@ u8 *moby_l01_spawn_child(u8 *owner, void *pos, void *vel, int cls, int index)
 /* Flags every Mutant Muckdweller in a linked list so that it reacts. */
 void muckdweller_flag_group(s32 index)
 {
-    u16 *idPtr;
+    u16 *id_ptr;
     u32 slot;
     u8 *base;
     u8 *entry;
@@ -69,13 +69,13 @@ void muckdweller_flag_group(s32 index)
     slot = D_L01_001FB020[index];
     if (slot == 0)
         return;
-    idPtr = (u16 *)slot;
+    id_ptr = (u16 *)slot;
     base = g_moby_l01_table;
     do {
-        entry = base + ((*idPtr & 0x7FFF) << 8);
-        if (*(s8 *)(entry + 0x20) >= 0 && *(s16 *)(entry + 0xAA) == 0xB2B /* Mutant Muckdweller */)
+        entry = base + ((*id_ptr & 0x7FFF) << 8);
+        if (*(s8 *)(entry + 0x20) >= 0 && *(s16 *)(entry + 0xAA) == MOBY_CLASS_MUTANT_MUCKDWELLER)
             *(u16 *)(*(u8 **)(entry + 0x68) + 0x3DA) = 1;
-    } while (*(s16 *)idPtr++ >= 0);
+    } while (*(s16 *)id_ptr++ >= 0);
 }
 
 extern int g_current_map_index;
@@ -161,7 +161,7 @@ typedef struct {
 void bursting_pod_update(u8 *moby)
 {
     HandlerState *state = *(HandlerState **)(moby + 0x68);
-    u8 *linkedMoby;
+    u8 *linked_moby;
     u8 *entry;
     int flag, hit, i, color, persist_id;
     float size;
@@ -215,11 +215,11 @@ void bursting_pod_update(u8 *moby)
             break;
         }
         if (state->parentIndex != -1) {
-            linkedMoby = g_moby_l01_table + (state->parentIndex << 8);
-            if (linkedMoby) {
-                moby[0x40] = linkedMoby[0x40];
-                moby[0x41] = linkedMoby[0x41];
-                *(float *)(moby + 0x44) = *(float *)(linkedMoby + 0x44);
+            linked_moby = g_moby_l01_table + (state->parentIndex << 8);
+            if (linked_moby) {
+                moby[0x40] = linked_moby[0x40];
+                moby[0x41] = linked_moby[0x41];
+                *(float *)(moby + 0x44) = *(float *)(linked_moby + 0x44);
                 update_moby_animation_state(moby);
             }
         }
@@ -299,12 +299,12 @@ void bursting_pod_update(u8 *moby)
         case 3:
             *(int *)(moby + 0x98) = 0;
             if (state->parentIndex != -1) {
-                linkedMoby = g_moby_l01_table + (state->parentIndex << 8);
-                if (!linkedMoby || linkedMoby[0x20] == 254 || linkedMoby[0x20] == 253) {
+                linked_moby = g_moby_l01_table + (state->parentIndex << 8);
+                if (!linked_moby || linked_moby[0x20] == 254 || linked_moby[0x20] == 253) {
                     level_record_moby_collected(moby);
                 } else {
-                    qcopy(moby + 0x10, linkedMoby + 0x10);
-                    qcopy(moby + 0xF0, linkedMoby + 0xF0);
+                    qcopy(moby + 0x10, linked_moby + 0x10);
+                    qcopy(moby + 0xF0, linked_moby + 0xF0);
                 }
             }
             if (IsPointInCuboid(g_hero_position, state->hitIndex)) {

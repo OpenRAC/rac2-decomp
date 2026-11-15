@@ -176,7 +176,7 @@ extern s32 hero_get_weapon_anim_id(s32);
 extern void ClipHeroVelocityAgainstWall(s32);
 /* Runs every frame for the player and handles whatever the current action is (walking, jumping, swinging, gliding and so on). */
 void hero_l09_update_state_machine(void) {
-    f32 frameSlot1;
+    f32 frame_slot1;
     s32 lim67;
     s32 *cnt32;
     Hero *hp32;
@@ -215,22 +215,22 @@ void hero_l09_update_state_machine(void) {
     f32 k02;
     s32 cntA40;
 
-    f32 frameSlot2;
-    f32 frameSlot3;
-    f32 frameSlot4;
-    f32 frameSlot5;
-    f32 frameSlot6;
-    f32 frameSlot7;
-    f32 frameSlot8;
-    s32 frameSlot9;
-    f32 frameSlot10;
-    s32 frameSlot11;
-    f32 frameSlot12;
-    f32 frameSlot13;
-    f32 frameSlot14;
-    s32 frameSlot15;
-    s32 frameSlot16;
-    s32 frameSlot17;
+    f32 frame_slot2;
+    f32 frame_slot3;
+    f32 frame_slot4;
+    f32 frame_slot5;
+    f32 frame_slot6;
+    f32 frame_slot7;
+    f32 frame_slot8;
+    s32 frame_slot9;
+    f32 frame_slot10;
+    s32 frame_slot11;
+    f32 frame_slot12;
+    f32 frame_slot13;
+    f32 frame_slot14;
+    s32 frame_slot15;
+    s32 frame_slot16;
+    s32 frame_slot17;
     f32 scalar2;
     f32 scalar3;
     f32 scalar4;
@@ -544,9 +544,9 @@ void hero_l09_update_state_machine(void) {
     void* ptr60;
     void* ptr61;
 
-    frameSlot15 = ((Hero *)g_hero_state)->i[0x2298/4];
+    frame_slot15 = ((Hero *)g_hero_state)->i[0x2298/4];
     ptr21 = ((Hero *)g_hero_state)->ptr[0x2290/4];
-    frameSlot16 = (s32) M2C_FIELD(ptr21, u8* , 0x43);
+    frame_slot16 = (s32) M2C_FIELD(ptr21, u8* , 0x43);
     switch (((Hero *)g_hero_state)->u[0x2294/4]) {                              /* switch 1 */
     case 0x0:                                       /* switch 1 */
     case 0x1:                                       /* switch 1 */
@@ -911,13 +911,13 @@ block_198:
             }
             vec_build_spherical_offset((s32)(g_hero_state + 0xF0), scalar121, ((Hero *)g_hero_state)->f[0x98/4], scalar75);
         } else if (value86 == 0x33) {
-            frameSlot2 = FastVecLength((s32) (((void*)g_hero_state) + 0x160));
+            frame_slot2 = FastVecLength((s32) (((void*)g_hero_state) + 0x160));
             if (((Hero *)g_hero_state)->i[0x22A0/4] == 0x34) {
-                ApproachValue((s32) &frameSlot2, 0.0f, 0.0022222223f);
+                ApproachValue((s32) &frame_slot2, 0.0f, 0.0022222223f);
             } else {
-                ApproachValue((s32) &frameSlot2, 0.0f, 0.0011111111f);
+                ApproachValue((s32) &frame_slot2, 0.0f, 0.0011111111f);
             }
-            vec_scale_to_length((s32)(g_hero_state + 0x160), (s32)(g_hero_state + 0x160), frameSlot2);
+            vec_scale_to_length((s32)(g_hero_state + 0x160), (s32)(g_hero_state + 0x160), frame_slot2);
             qcopy(&((Hero *)g_hero_state)->q[0xF0/16], &((Hero *)g_hero_state)->q[0x160/16]);
         }
         ClipHeroVelocityAgainstWall(0);
@@ -963,9 +963,9 @@ block_198:
         break;
     case 0x67:                                      /* switch 1 */
     case 0x7F:                                      /* switch 1 */
-        frameSlot3 = FastVecLength((s32)(g_hero_state + 0x160));
-        ApproachValue((s32) &frameSlot3, 0.0f, 0.0011111111f);
-        vec_scale_to_length((s32)(g_hero_state + 0x160), (s32)(g_hero_state + 0x160), frameSlot3);
+        frame_slot3 = FastVecLength((s32)(g_hero_state + 0x160));
+        ApproachValue((s32) &frame_slot3, 0.0f, 0.0011111111f);
+        vec_scale_to_length((s32)(g_hero_state + 0x160), (s32)(g_hero_state + 0x160), frame_slot3);
         qcopy(&((Hero *)g_hero_state)->q[0xF0/16], &((Hero *)g_hero_state)->q[0x160/16]);
         if (math_fast_float_d((s32) (((void*)(g_hero_state + 0x160)) + 0x8D0)) == 2) {
             ptr37 = ((void*)(g_hero_state + 0x160)) - 0x160;
@@ -1140,8 +1140,8 @@ block_224:
         } else if (value38 == 1) {
             ApproachValue((s32) (((void*)g_hero_state) + 0xAA0), 0.0f, 0.011666667f);
         }
-        if ((math_solve_quadratic((s32) &frameSlot4, (s32) &frameSlot5, -0.0058333334f, ((Hero *)g_hero_state)->f[0xAA0/4], 1.9f - ((Hero *)g_hero_state)->f[0xAB0/4]) > 0) && (frameSlot4 > 0.0f)) {
-            ((Hero *)g_hero_state)->f[0xAAC/4] = frameSlot4;
+        if ((math_solve_quadratic((s32) &frame_slot4, (s32) &frame_slot5, -0.0058333334f, ((Hero *)g_hero_state)->f[0xAA0/4], 1.9f - ((Hero *)g_hero_state)->f[0xAB0/4]) > 0) && (frame_slot4 > 0.0f)) {
+            ((Hero *)g_hero_state)->f[0xAAC/4] = frame_slot4;
             ((Hero *)g_hero_state)->i[0x2298/4] = 1;
         }
         ((Hero *)g_hero_state)->h[0x226/2] = 3;
@@ -1251,10 +1251,10 @@ block_224:
             if (ptr22 != 0) {
                 scalar31 = FastVecLength((s32) ptr31);
                 scalar32 = M2C_FIELD(ptr22, f32* , 0xC);
-                frameSlot6 = scalar31;
+                frame_slot6 = scalar31;
                 if (scalar32 < scalar31) {
-                    ApproachValue((s32) &frameSlot6, scalar32, 0.004166667f);
-                    vec_scale_to_length((s32) ptr31, (s32) ptr31, frameSlot6);
+                    ApproachValue((s32) &frame_slot6, scalar32, 0.004166667f);
+                    vec_scale_to_length((s32) ptr31, (s32) ptr31, frame_slot6);
                 }
             }
         }
@@ -1281,9 +1281,9 @@ block_224:
         if ((((Hero *)g_hero_state)->h[0xAFE/2] != 0) && (value69 != 0)) {
             min2B = 0.23333335f;
             scalar5 = vec_length_xy((s32) ptr43);
-            frameSlot7 = scalar5;
+            frame_slot7 = scalar5;
             if (scalar5 < min2B) {
-                math_spring_float_to_goal((s32) &frameSlot7, (s32) (((void*)g_hero_state) + 0xAF4), min2B, 0.047f, 0.3f, 0.0f);
+                math_spring_float_to_goal((s32) &frame_slot7, (s32) (((void*)g_hero_state) + 0xAF4), min2B, 0.047f, 0.3f, 0.0f);
                 v30[0] = math_fast_sin_or_cos_a(((Hero *)g_hero_state)->f[0xAEC/4]) * ((Hero *)g_hero_state)->f[0xAF4/4];
                 scalar6 = math_fast_sin_or_cos_b(((Hero *)g_hero_state)->f[0xAEC/4]);
                 v30[2] = 0.0f;
@@ -1390,9 +1390,9 @@ block_224:
         lim3 = 0xE;
         if (value39 < 9) {
             ptr23 = ((void*)g_hero_state) + 0xF0;
-            frameSlot8 = cam_get_view_space_height((s32) ptr23);
-            ApproachValue((s32) &frameSlot8, scalar144, 0.041666668f);
-            cam_set_view_space_height((s32) ptr23, (s32) ptr23, frameSlot8);
+            frame_slot8 = cam_get_view_space_height((s32) ptr23);
+            ApproachValue((s32) &frame_slot8, scalar144, 0.041666668f);
+            cam_set_view_space_height((s32) ptr23, (s32) ptr23, frame_slot8);
         } else if (value39 > lim3) {
             ptr32 = ((void*)g_hero_state) + 0xF0;
             hero_apply_mode_transform((s32) ptr32, (s32) ptr32, 0.036111113f);
@@ -2052,15 +2052,15 @@ block_224:
             scalar153 = scalar42;
         }
         ptr27 = ((void*)g_hero_state) + 0xF0;
-        frameSlot14 = cam_get_view_space_height((s32) ptr27);
+        frame_slot14 = cam_get_view_space_height((s32) ptr27);
         hero_resolve_stick_direction(scalar152, 0);
         hero_steer_heading(0, 0.025f, 0.3f, 0.20943955f);
         hero_approach_speed(0.004166667f, 0.0019444445f);
         hero_compute_push_direction(99999.0f);
         hero_apply_mode_pose_offsets();
         cam_project_vector_onto_view_plane((s32) ptr27, (s32) ptr27);
-        math_spring_float_to_goal((s32) &frameSlot14, (s32) (((void*)g_hero_state) + 0xA98), -scalar152 * scalar153, 0.025f, 0.3f, 0.28333336f);
-        hero_apply_mode_transform((s32) ptr27, (s32) ptr27, -frameSlot14);
+        math_spring_float_to_goal((s32) &frame_slot14, (s32) (((void*)g_hero_state) + 0xA98), -scalar152 * scalar153, 0.025f, 0.3f, 0.28333336f);
+        hero_apply_mode_transform((s32) ptr27, (s32) ptr27, -frame_slot14);
         scalar36 = ((Hero *)g_hero_state)->f[0x88/4];
         if (scalar36 < ((Hero *)g_hero_state)->f[0x490/4]) {
             ApproachValue((s32) (((void*)g_hero_state) + 0x490), scalar36, 0.06666667f);
@@ -2270,7 +2270,7 @@ block_224:
             ((Hero *)g_hero_state)->f[0x1A0/4] = (f32) ((Hero *)g_hero_state)->f[0x18AC/4];
             ((Hero *)g_hero_state)->f[0x1B0/4] = 0.0f;
         }
-        frameSlot1 = 1.0f;
+        frame_slot1 = 1.0f;
         if (((Hero *)g_hero_state)->b[0x22B4] == 3) {
             hero_steer_heading(0, 0.03f, 0.3f, 0.093084246f);
         } else if (((Hero *)g_hero_state)->b[0x22B4] == 1) {
@@ -2281,7 +2281,7 @@ block_224:
         if (((Hero *)g_hero_state)->b[0x22B4] == 0) {
             hero_apply_mode_pose_offsets();
         }
-        hero_approach_speed(frameSlot1 * 0.005f, 0.0055555557f);
+        hero_approach_speed(frame_slot1 * 0.005f, 0.0055555557f);
         hero_compute_push_direction(99999.0f);
         if (((Hero *)g_hero_state)->b[0x22B4] == 0) {
             ClipHeroVelocityAgainstWall(1);
@@ -2332,10 +2332,10 @@ block_224:
         vec_clear_128((s32)(g_hero_state + 0xF0));
         break;
     }
-    if (frameSlot15 != ((Hero *)g_hero_state)->i[0x2298/4]) {
+    if (frame_slot15 != ((Hero *)g_hero_state)->i[0x2298/4]) {
         ((Hero *)g_hero_state)->i[0x1C0/4] = 0;
     }
-    if (frameSlot16 != M2C_FIELD(ptr21, u8* , 0x43)) {
+    if (frame_slot16 != M2C_FIELD(ptr21, u8* , 0x43)) {
         ((Hero *)g_hero_state)->i[0x1C4/4] = 0;
     }
 }

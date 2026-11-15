@@ -1,4 +1,5 @@
 #include "names.h"
+#include "moby_classes.h"
 typedef int TI128 __attribute__((mode(TI)));
 
 extern int moby_get_private_value_0(char *);
@@ -155,7 +156,7 @@ char *SelectBestTargetInCone(float *origin, float *direction, float angle, float
                 char *target = g_collision_hit.target;
                 if (!target)
                     goto next;
-                if (*(short *)(target + 0xAA) == 0xC20 /* Turret */)
+                if (*(short *)(target + 0xAA) == MOBY_CLASS_TURRET)
                     goto found;
             }
             {

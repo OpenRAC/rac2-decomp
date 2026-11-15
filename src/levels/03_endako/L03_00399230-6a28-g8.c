@@ -62,11 +62,11 @@ extern char D_L03_003C7010[];
 void camera_console_update(char *obj)
 {
     char mat[0x40] __attribute__((aligned(16)));
-    float localPos[4] __attribute__((aligned(16)));
+    float local_pos[4] __attribute__((aligned(16)));
     float rotation[4] __attribute__((aligned(16)));
     float position[4] __attribute__((aligned(16)));
-    float cameraPos[4] __attribute__((aligned(16)));
-    float cameraRot[4] __attribute__((aligned(16)));
+    float camera_pos[4] __attribute__((aligned(16)));
+    float camera_rot[4] __attribute__((aligned(16)));
     char *vars = *(char **)(obj + 0x68);
 
     switch (*(u8 *)(obj + 0x20)) {
@@ -86,11 +86,11 @@ void camera_console_update(char *obj)
     case 2:
         if (vec_distance_xy(obj + 0x10, g_hero_position) < 6.0f && *(int *)(g_hero_position + 0x2C0)) {
             matrix_from_basis_rows(mat, obj + 0xC0);
-            FastVecSub(localPos, g_hero_position, obj + 0x10);
-            matrix_mul_vec3(localPos, localPos, mat);
+            FastVecSub(local_pos, g_hero_position, obj + 0x10);
+            matrix_mul_vec3(local_pos, local_pos, mat);
             if (*(u8 *)(obj + 0x20) == 1 && flag_is_third_pending_set(obj))
                 moby_set_state(obj, 2, -1);
-            if (localPos[0] < 4.0f && localPos[0] > 0.0f && localPos[1] < 2.5f && localPos[1] > -2.5f) {
+            if (local_pos[0] < 4.0f && local_pos[0] > 0.0f && local_pos[1] < 2.5f && local_pos[1] > -2.5f) {
                 if (*(u8 *)(obj + 0x20) == 1) {
                     TryClaimNotice(8, 0x27BE, 1);
                     break;
@@ -106,8 +106,8 @@ void camera_console_update(char *obj)
                     rotation[2] = FastAddRotations(*(float *)(obj + 0xF8), 3.14159f);
                     hero_reset_position_and_direction(position, rotation, 0x31, 1);
                     D_0018B650 = D_L03_001B2A1C + (*(int *)vars << 8);
-                    camera_select_remote_view(obj, cameraPos, cameraRot);
-                    SetCamera5Pose(cameraPos, cameraRot, 1, 0, 0);
+                    camera_select_remote_view(obj, camera_pos, camera_rot);
+                    SetCamera5Pose(camera_pos, camera_rot, 1, 0, 0);
                     console_start_remote_view(D_L03_001B2A1C + (*(int *)vars << 8));
                 }
             }

@@ -46,7 +46,7 @@ int moby_update_ground_motion(char *object,char *state)
     } scratch;
     float rayEnd[4], impact[4];
     float speed, root1, root2, length;
-    float fallTime, groundHeight, animSpeedTarget, bounceScale, distance;
+    float fall_time, ground_height, anim_speed_target, bounce_scale, distance;
     int flags=0;
     int fallback;
     char *record;
@@ -65,10 +65,10 @@ int moby_update_ground_motion(char *object,char *state)
     offset[2]=BF(state,0x34);
     matrix_mul_vec3(offset,offset,(object+0xc0));
     FastVecAdd(original,offset,(object+0x10));
-    groundHeight=coll_probe_ground_height_below(original,0.5f,0);
+    ground_height=coll_probe_ground_height_below(original,0.5f,0);
     if (!GetCollHitMaterial()) {
-        if (!BU(state,0x1b) && groundHeight<=original[2] && original[2]+BF(state,0x88)<groundHeight) BU(state,0x1b)=1;
-        groundHeight=coll_get_ground_height_under_object((object+0x10));
+        if (!BU(state,0x1b) && ground_height<=original[2] && original[2]+BF(state,0x88)<ground_height) BU(state,0x1b)=1;
+        ground_height=coll_get_ground_height_under_object((object+0x10));
     }
     if (BU(state,0x1b)) {
         if (BU(state,0x1b)<4) FastVecScale((state+0x80),(state+0x80),0.7f);
@@ -85,14 +85,14 @@ int moby_update_ground_motion(char *object,char *state)
                 distance=moby_get_anim_value(object);
                 numerator=BF(state,0x54)-distance;
                 numerator=numerator+numerator;
-                animSpeedTarget=numerator/flightTime;
-                if (0.0f<animSpeedTarget) ApproachValue((float *)(object+0x48),animSpeedTarget,0.2f);
+                anim_speed_target=numerator/flightTime;
+                if (0.0f<anim_speed_target) ApproachValue((float *)(object+0x48),anim_speed_target,0.2f);
             }
             break;
         }
         case 1:
             if (BF(state,0x60)<=moby_get_anim_value(object)) { BF(object,0x48)=0; break; }
-            else if (BU(state,0x15)!=255 && (groundHeight==0.0f || groundHeight<BF(state,0x40) || 10.0f<BF(object,0x18)-groundHeight)) {
+            else if (BU(state,0x15)!=255 && (ground_height==0.0f || ground_height<BF(state,0x40) || 10.0f<BF(object,0x18)-ground_height)) {
                 if (BU(object,0x43)!=BU(state,0x15)) anim_start_blended(object,BU(state,0x15),0,5);
                 if (0.004166666883975267f<BF(state,0x50)) BF(state,0x50)=0.004166666883975267f;
                 break;
@@ -100,16 +100,16 @@ int moby_update_ground_motion(char *object,char *state)
             {
                 float numerator;
                 float halfGravity=BF(state,0x50)*-0.5f;
-                fallTime=60.0f;
-                if (math_solve_quadratic(&root1,&root2,halfGravity,BF(state,0x88)-halfGravity,BF(object,0x18)-groundHeight)>0 && 0.0f<root1 && root1<fallTime) fallTime=root1;
-                if (fallTime<0.0001f) fallTime=0.0001f;
+                fall_time=60.0f;
+                if (math_solve_quadratic(&root1,&root2,halfGravity,BF(state,0x88)-halfGravity,BF(object,0x18)-ground_height)>0 && 0.0f<root1 && root1<fall_time) fall_time=root1;
+                if (fall_time<0.0001f) fall_time=0.0001f;
                 distance=moby_get_anim_value(object);
                 numerator=BF(state,0x60)-distance;
                 numerator=numerator+numerator;
-                animSpeedTarget=numerator/fallTime;
-                if (2.0f<animSpeedTarget) animSpeedTarget=2.0f;
-                else if (animSpeedTarget<0.0f) animSpeedTarget=0.0f;
-                ApproachValue((float *)(object+0x48),animSpeedTarget,0.2f);
+                anim_speed_target=numerator/fall_time;
+                if (2.0f<anim_speed_target) anim_speed_target=2.0f;
+                else if (anim_speed_target<0.0f) anim_speed_target=0.0f;
+                ApproachValue((float *)(object+0x48),anim_speed_target,0.2f);
             }
             break;
         case 2:
@@ -138,8 +138,8 @@ int moby_update_ground_motion(char *object,char *state)
     flags|=4;
     if (fallback) qcopy((object+0x10),&g_collision_hit.point);
     else FastVecSub((object+0x10),&g_collision_hit.offset,offset);
-    bounceScale=1.0f;
-    vec_scale_to_length(scratch.collision.normal,&g_collision_hit.normal,bounceScale);
+    bounce_scale=1.0f;
+    vec_scale_to_length(scratch.collision.normal,&g_collision_hit.normal,bounce_scale);
     if (0.7070000171661377f<=scratch.collision.normal[2]) {
         float projection=FastVecDot((state+0x80),scratch.collision.normal);
         if (projection<0.0f) {
@@ -169,7 +169,7 @@ int moby_update_ground_motion(char *object,char *state)
     } else {
         float dot=FastVecDot((state+0x80),scratch.collision.normal);
         if (dot<0.0f) {
-            dot=dot*-(BF(state,0x3c)+bounceScale);
+            dot=dot*-(BF(state,0x3c)+bounce_scale);
             vec_scale_to_length(scratch.collision.work,scratch.collision.normal,dot);
             FastVecAdd((state+0x80),(state+0x80),scratch.collision.work);
         }

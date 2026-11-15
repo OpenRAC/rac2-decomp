@@ -225,22 +225,22 @@ void cam_reset_mode_state(char *camera)
 /* Starts the aligned camera mode and clears its blend values. */
 void cam_aligned_start(char *camera)
 {
-    char *camState = D_L00_001B8C80_1;
-    char *camStateAgain;
-    short phase = *(short *)(camState + 0x290);
+    char *cam_state = D_L00_001B8C80_1;
+    char *cam_state_again;
+    short phase = *(short *)(cam_state + 0x290);
 
     if (phase != 0) {
-        *(short *)(camState + 0x290) = 2;
+        *(short *)(cam_state + 0x290) = 2;
     } else {
-        *(short *)(camState + 0x290) = 1;
+        *(short *)(cam_state + 0x290) = 1;
     }
-    camStateAgain = D_L00_001B8C80_1;
-    *(char *)(camStateAgain + 0x293) = 0;
-    *(float *)(camStateAgain + 0x2B4) = 0.075f;
-    *(float *)(camStateAgain + 0x2A8) = 0.075f;
+    cam_state_again = D_L00_001B8C80_1;
+    *(char *)(cam_state_again + 0x293) = 0;
+    *(float *)(cam_state_again + 0x2B4) = 0.075f;
+    *(float *)(cam_state_again + 0x2A8) = 0.075f;
     cam_reset_mode_state(camera);
-    if (*(int *)(camStateAgain + 0x264) != 0) {
-        func_0035F3A8(0, 0, *(int *)(camStateAgain + 0x264));
+    if (*(int *)(cam_state_again + 0x264) != 0) {
+        func_0035F3A8(0, 0, *(int *)(cam_state_again + 0x264));
     }
 }
 
@@ -278,13 +278,13 @@ extern float math_fast_angle_helper(float f);
 void cam_choose_state_from_hero_angle(char *camera)
 {
     char scaled[16];
-    char cameraVec[16];
-    char heroVec[16];
-    char *camState;
-    char *camStateAgain;
-    float cameraDot;
-    float heroDot;
-    float lengthProduct;
+    char camera_vec[16];
+    char hero_vec[16];
+    char *cam_state;
+    char *cam_state_again;
+    float camera_dot;
+    float hero_dot;
+    float length_product;
     float dot;
     float angle;
 
@@ -294,42 +294,42 @@ void cam_choose_state_from_hero_angle(char *camera)
     if (D_00189E20_20.identity_24a0 == 4) {
         return;
     }
-    camState = D_L00_001B8C80_1;
-    if (*(short *)(camState + 0x290) == 0) {
-        *(char *)(camState + 0x293) = 0;
+    cam_state = D_L00_001B8C80_1;
+    if (*(short *)(cam_state + 0x290) == 0) {
+        *(char *)(cam_state + 0x293) = 0;
         *(short *)(camera + 0x7E) = 2;
-        *(float *)(camState + 0x2B4) = 0.018f;
-        *(float *)(camState + 0x2A8) = 0.018f;
+        *(float *)(cam_state + 0x2B4) = 0.018f;
+        *(float *)(cam_state + 0x2A8) = 0.018f;
         return;
     }
-    cameraDot = FastVecDot(camState + 0x1D0, camera);
-    FastVecScale(scaled, camState + 0x1D0, cameraDot);
-    FastVecSub(cameraVec, camera, scaled);
-    heroDot = FastVecDot(camState + 0x1D0, D_00189E20_20.ptr_2290 + 0xC0);
-    FastVecScale(scaled, camState + 0x1D0, heroDot);
-    FastVecSub(heroVec, D_00189E20_20.ptr_2290 + 0xC0, scaled);
-    lengthProduct = FastVecLength(heroVec);
-    if (lengthProduct == 0.0f) {
+    camera_dot = FastVecDot(cam_state + 0x1D0, camera);
+    FastVecScale(scaled, cam_state + 0x1D0, camera_dot);
+    FastVecSub(camera_vec, camera, scaled);
+    hero_dot = FastVecDot(cam_state + 0x1D0, D_00189E20_20.ptr_2290 + 0xC0);
+    FastVecScale(scaled, cam_state + 0x1D0, hero_dot);
+    FastVecSub(hero_vec, D_00189E20_20.ptr_2290 + 0xC0, scaled);
+    length_product = FastVecLength(hero_vec);
+    if (length_product == 0.0f) {
         goto small;
     }
-    lengthProduct = lengthProduct * FastVecLength(cameraVec);
-    if (lengthProduct == 0.0f) {
+    length_product = length_product * FastVecLength(camera_vec);
+    if (length_product == 0.0f) {
         goto small;
     }
-    dot = FastVecDot(heroVec, cameraVec);
-    angle = math_fast_angle_helper(dot / lengthProduct);
+    dot = FastVecDot(hero_vec, camera_vec);
+    angle = math_fast_angle_helper(dot / length_product);
     if (1.3962636f <= 1.5707964f - angle) {
-        *(short *)(camState + 0x290) = 0;
+        *(short *)(cam_state + 0x290) = 0;
         *(short *)(camera + 0x7E) = 4;
         return;
     }
 small:
-    camStateAgain = D_L00_001B8C80_1;
+    cam_state_again = D_L00_001B8C80_1;
 
-    *(char *)(camStateAgain + 0x293) = 0;
+    *(char *)(cam_state_again + 0x293) = 0;
     *(short *)(camera + 0x7E) = 2;
-    *(float *)(camStateAgain + 0x2B4) = 0.018f;
-    *(float *)(camStateAgain + 0x2A8) = 0.018f;
+    *(float *)(cam_state_again + 0x2B4) = 0.018f;
+    *(float *)(cam_state_again + 0x2A8) = 0.018f;
 }
 
 extern void func_002EE0D0(void *);
@@ -339,15 +339,15 @@ extern void func_002EEBD8(void *, void *);
 /* Sets up the camera blend speeds and resets its position and turning state. */
 void cam_init_blend_settings(unsigned char *camera) {
     unsigned char rotation[0x40];
-    unsigned char *positionSettings;
+    unsigned char *position_settings;
 
     *(int *)(*(unsigned char **)(camera + 0x70) + 0xC0) = 4;
-    positionSettings = *(unsigned char **)(camera + 0x70) + 0x30;
-    *(float *)(positionSettings + 0x20) = 0.05f;
-    *(float *)(positionSettings + 0x24) = 0.3f;
-    *(float *)(positionSettings + 0x28) = 1.0f;
-    *(unsigned short *)(positionSettings + 0x2C) = 1;
-    func_002EE0D0(positionSettings);
+    position_settings = *(unsigned char **)(camera + 0x70) + 0x30;
+    *(float *)(position_settings + 0x20) = 0.05f;
+    *(float *)(position_settings + 0x24) = 0.3f;
+    *(float *)(position_settings + 0x28) = 1.0f;
+    *(unsigned short *)(position_settings + 0x2C) = 1;
+    func_002EE0D0(position_settings);
     {
         unsigned char *vars = *(unsigned char **)(camera + 0x70);
 
@@ -478,7 +478,7 @@ void cam_mode_noop_b(void)
 /* Turns the camera angles toward their targets and rebuilds the camera matrix. */
 void cam_update_angles_to_target(char *camera)
 {
-    float matrixSource[16];
+    float matrix_source[16];
     char *transition = *(char **)(camera + 112);
 
     transition += 176;
@@ -489,8 +489,8 @@ void cam_update_angles_to_target(char *camera)
     *(float *)(camera + 72) = func_00283B98_6(3.14159265f, *(float *)(camera + 80));
     *(float *)(camera + 72) = func_00283B98_6(*(float *)(camera + 72), *(float *)(camera + 96));
     *(int *)(camera + 76) = 0;
-    func_00283410_5((char *)matrixSource, camera + 64);
-    copy_matrix3x4(camera, (char *)matrixSource);
+    func_00283410_5((char *)matrix_source, camera + 64);
+    copy_matrix3x4(camera, (char *)matrix_source);
 }
 
 extern void func_L00_002D7958_1(float *, void *, float);
@@ -543,20 +543,20 @@ void cam_l00_init_blend_values_2(char *camera)
 /* Checks how far the hero has turned from the camera and picks the next camera state. */
 void cam_pick_state_from_hero_turn(char *camera)
 {
-    char *camState = D_L00_001B8C80_1;
+    char *cam_state = D_L00_001B8C80_1;
     char *hero = D_00189E20_3;
-    float *heroPos = *(float **)(hero + 8848);
-    float value = FastDiffRots(*(float *)(camState + 344),
-                      func_00283248_1(heroPos[4] - *(float *)(camState + 320),
-                              heroPos[5] - *(float *)(camState + 324)));
+    float *hero_pos = *(float **)(hero + 8848);
+    float value = FastDiffRots(*(float *)(cam_state + 344),
+                      func_00283248_1(hero_pos[4] - *(float *)(cam_state + 320),
+                              hero_pos[5] - *(float *)(cam_state + 324)));
 
     if (value < 0.5585054f) {
-        value = fast_vec_dist(hero + 128, camState + 320);
+        value = fast_vec_dist(hero + 128, cam_state + 320);
         if (value < 8.0f) {
-            *(char *)(camState + 659) = 0;
+            *(char *)(cam_state + 659) = 0;
             *(short *)(camera + 126) = 2;
-            *(float *)(camState + 692) = 0.018f;
-            *(float *)(camState + 680) = 0.018f;
+            *(float *)(cam_state + 692) = 0.018f;
+            *(float *)(cam_state + 680) = 0.018f;
         } else {
             *(short *)(camera + 126) = 4;
         }
@@ -645,10 +645,10 @@ int cam_is_hero_in_trigger(char *camera, char *unused)
     } else if (*(int *)(entry + 0x08) >= 0) {
         if (r1_func_L00_00260B68((float *)g_hero_position, *(int *)(entry + 0x08))) return 1;
     } else if (*(int *)(entry + 0x14) >= 0) {
-        int nodeIndex = *(int *)(entry + 0x14);
+        int node_index = *(int *)(entry + 0x14);
         if (r1_func_L00_0025A778((float *)g_hero_position,
-                                  (float *)(r1_D_L10_001B0C30[nodeIndex] + 0x10),
-                                  *(int *)r1_D_L10_001B0C30[nodeIndex])) return 1;
+                                  (float *)(r1_D_L10_001B0C30[node_index] + 0x10),
+                                  *(int *)r1_D_L10_001B0C30[node_index])) return 1;
     } else if (entry[0x38] != 0 && entry[0x39] == 0) {
         return 1;
     }
@@ -855,26 +855,26 @@ extern char D_00189003[];
 /* rac1-decomp src/overlays/shared/music_box_voices.c: func_L00_0042B038 */
 /* reverb box sound update: starts or stops the sound as the listener enters or leaves the box */
 void snd_update_reverb_box(char *moby) {
-    float localPos[4];
-    float boxPos[4];
-    unsigned char *soundData = *(unsigned char **)(moby + 8);
-    r1_func_001F9BF0(localPos, D_00189003 + 0xE9D, moby + 0x40);
-    localPos[3] = 0;
-    r1_func_001F9EC0(boxPos, localPos, moby + 0x50);
-    if (r1_func_001F9B88(boxPos[0]) <= 1.0f && r1_func_001F9B88(boxPos[1]) <= 1.0f && r1_func_001F9B88(boxPos[2]) <= 1.0f) {
-        float blend = (boxPos[0] + 1.0f) * 0.5f;
-        int volume = r1_func_001FA898(r1_func_001FA888(*(int *)(soundData + 4)) * blend);
-        int limit = *(int *)(soundData + 4);
+    float local_pos[4];
+    float box_pos[4];
+    unsigned char *sound_data = *(unsigned char **)(moby + 8);
+    r1_func_001F9BF0(local_pos, D_00189003 + 0xE9D, moby + 0x40);
+    local_pos[3] = 0;
+    r1_func_001F9EC0(box_pos, local_pos, moby + 0x50);
+    if (r1_func_001F9B88(box_pos[0]) <= 1.0f && r1_func_001F9B88(box_pos[1]) <= 1.0f && r1_func_001F9B88(box_pos[2]) <= 1.0f) {
+        float blend = (box_pos[0] + 1.0f) * 0.5f;
+        int volume = r1_func_001FA898(r1_func_001FA888(*(int *)(sound_data + 4)) * blend);
+        int limit = *(int *)(sound_data + 4);
         if (!(limit < volume)) limit = volume;
-        r1_func_L01_002A2C90((int)moby, soundData[0], limit, soundData[1], soundData[2]);
-        soundData[3] = 1;
-    } else if (soundData[3] != 0) {
-        if (boxPos[0] > 0.0f) {
-            r1_func_L01_002A2C90(0, soundData[0], *(int *)(soundData + 4), soundData[1], soundData[2]);
+        r1_func_L01_002A2C90((int)moby, sound_data[0], limit, sound_data[1], sound_data[2]);
+        sound_data[3] = 1;
+    } else if (sound_data[3] != 0) {
+        if (box_pos[0] > 0.0f) {
+            r1_func_L01_002A2C90(0, sound_data[0], *(int *)(sound_data + 4), sound_data[1], sound_data[2]);
         } else {
             r1_func_L01_002A2C90((int)moby, 0, 0, 0, 0);
         }
-        soundData[3] = 0;
+        sound_data[3] = 0;
     }
 }
 

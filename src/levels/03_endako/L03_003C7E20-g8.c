@@ -69,7 +69,7 @@ typedef struct {
 /* Per-frame update of moby class 2380 (Explosive Crate) and the two classes that share its code (2949 and 3324): they sit, get knocked up, fall, flash, then blow up and respawn. */
 void explosive_crate_update(char *moby)
 {
-    char tempPos[0x10] __attribute__((aligned(16)));
+    char temp_pos[0x10] __attribute__((aligned(16)));
     char direction[0x10] __attribute__((aligned(16)));
     char hit[0x10] __attribute__((aligned(16)));
     Actor7E20 *actor=(Actor7E20 *)moby;
@@ -98,10 +98,10 @@ void explosive_crate_update(char *moby)
                 moby_set_state(moby,3,-1);
         }
         if (actor->type==0xCFC /* moby class 3324 */) {
-            char *hitMoby=part_find_owned_effect_slot(moby,0x10001,0);
-            if (hitMoby) {
+            char *hit_moby=part_find_owned_effect_slot(moby,0x10001,0);
+            if (hit_moby) {
                 moby_set_state(moby,4,-1);
-                if (*(char **)(hitMoby+0x20) && *(s16 *)(*(char **)(hitMoby+0x20)+0xAA)==0xB85)
+                if (*(char **)(hit_moby+0x20) && *(s16 *)(*(char **)(hit_moby+0x20)+0xAA)==0xB85)
                     vars->delay=1;
                 else vars->delay=10;
             }
@@ -114,30 +114,30 @@ void explosive_crate_update(char *moby)
                 qcopy((char *)actor->position,D_L03_001B2B0C[vars->index].position);
                 id=(u16)actor->uid;
                 if (id&1) {
-                    u8 *packedByte=&D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
-                    if (((*packedByte>>4)&7)!=7) *packedByte+=16;
+                    u8 *packed_byte=&D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
+                    if (((*packed_byte>>4)&7)!=7) *packed_byte+=16;
                 } else {
-                    u8 *packedByte=&D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
-                    if ((*packedByte&7)!=7) *packedByte+=1;
+                    u8 *packed_byte=&D_0019B4A8[((s16)id>>1)+(g_current_map_index<<10)];
+                    if ((*packed_byte&7)!=7) *packed_byte+=1;
                 }
             } else path_push_point_away(vars->effect,(char *)actor->position,(char *)actor->position,2.5f);
         }
         break;
     }
     case 2: {
-        f32 pullLength;
+        f32 pull_length;
         f32 offset=2.3f;
         vars->displacement[2]+=offset;
-        pullLength=FastVecLength((char *)&vars->displacement);
-        if (pullLength!=0.0f) {
-            math_approach_target_with_braking(&vars->damping,pullLength,0.00027777778f,0.00027777778f,0.016666668f);
-            pullLength-=vars->damping;
-            if (pullLength<0.0f) pullLength=0.0f;
-            vec_scale_to_length((char *)&vars->displacement,(char *)&vars->displacement,pullLength);
+        pull_length=FastVecLength((char *)&vars->displacement);
+        if (pull_length!=0.0f) {
+            math_approach_target_with_braking(&vars->damping,pull_length,0.00027777778f,0.00027777778f,0.016666668f);
+            pull_length-=vars->damping;
+            if (pull_length<0.0f) pull_length=0.0f;
+            vec_scale_to_length((char *)&vars->displacement,(char *)&vars->displacement,pull_length);
         }
         vars->displacement[2]-=offset;
-        moby_transform_joint_to_world(vars->node,2,tempPos);
-        FastVecAdd((char *)actor->position,tempPos,(char *)&vars->displacement);
+        moby_transform_joint_to_world(vars->node,2,temp_pos);
+        FastVecAdd((char *)actor->position,temp_pos,(char *)&vars->displacement);
         break;
     }
     case 3: {
@@ -169,16 +169,16 @@ void explosive_crate_update(char *moby)
         break;
     case 5: {
         char *position=(char *)actor->position;
-        qcopy(tempPos,position);
-        *(f32 *)(tempPos+8)+=1.0f;
+        qcopy(temp_pos,position);
+        *(f32 *)(temp_pos+8)+=1.0f;
         snd_play_from_class_bank(1,0,moby,0xCFC);
-        FastVecSub(direction,D_L03_001B9980,tempPos);
+        FastVecSub(direction,D_L03_001B9980,temp_pos);
         vec_scale_to_length(direction,direction,1.0f);
         *(TI128 *)(hit)=0;
         *(f32 *)(hit+8)=1.0f;
         FastVecAdd(hit,hit,position);
         coll_sweep_from_object(moby,hit,0x10001,0,1,0,4.0f,4.0f,1.0f);
-        part_spawn_blast_effect_moby(moby,tempPos,direction,0.0f);
+        part_spawn_blast_effect_moby(moby,temp_pos,direction,0.0f);
         actor->collision=0;
         actor->flags=(actor->flags|0x41)&~0x1000;
         moby_set_state(moby,6,-1);
@@ -188,10 +188,10 @@ void explosive_crate_update(char *moby)
         if (flag_set_first_pending(moby)) vars->respawnDelay=60;
         if (FastDecTimer((char *)&vars->respawnDelay)) {
             qcopy((char *)actor->position,(char *)&vars->home);
-            qcopy(tempPos,(char *)actor->position);
-            *(f32 *)(tempPos+8)+=1.3f;
-            if (!coll_test_point(tempPos,0,moby,1.2f) &&
-                (*(f32 *)(tempPos+8)+=1.0f,!coll_test_point(tempPos,0,moby,1.2f))) {
+            qcopy(temp_pos,(char *)actor->position);
+            *(f32 *)(temp_pos+8)+=1.3f;
+            if (!coll_test_point(temp_pos,0,moby,1.2f) &&
+                (*(f32 *)(temp_pos+8)+=1.0f,!coll_test_point(temp_pos,0,moby,1.2f))) {
                 moby_set_state(moby,1,-1);
                 actor->drawFlags=vars->drawFlags;
                 actor->flags=(actor->flags&~0x41)|0x1000;

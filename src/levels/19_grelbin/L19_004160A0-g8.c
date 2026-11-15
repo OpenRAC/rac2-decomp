@@ -72,17 +72,17 @@ extern void moby_tick_timers_age(void *);
 /* Updates the Arctic Leviathan every frame. It turns toward its target, walks, fires and bursts in turn, and blows apart when it is destroyed. */
 void leviathan_update(char *moby)
 {
-    float burstVel[4] __attribute__((aligned(16)));
-    float particleVel[4] __attribute__((aligned(16)));
-    char hitMatrix[0x30] __attribute__((aligned(16)));
-    char bodyMatrix[0x40] __attribute__((aligned(16)));
+    float burst_vel[4] __attribute__((aligned(16)));
+    float particle_vel[4] __attribute__((aligned(16)));
+    char hit_matrix[0x30] __attribute__((aligned(16)));
+    char body_matrix[0x40] __attribute__((aligned(16)));
     float offset[4] __attribute__((aligned(16)));
     float delta[4] __attribute__((aligned(16)));
-    char *oldChild;
+    char *old_child;
     char *vars;
     char *spawnedActor=0;
-    int canAct,i=0,count=0;
-    float sizeScale=0.0f;
+    int can_act,i=0,count=0;
+    float size_scale=0.0f;
     u16 flags;
 
     if (((GrelbinContext *)g_hero_state)->mode == 0x6F) return;
@@ -110,15 +110,15 @@ void leviathan_update(char *moby)
     case 0:
     {
         char *idleTarget;
-        canAct=1;
+        can_act=1;
         if (B(moby,0x21)!=0xFF && D_L19_001FB5A0[B(moby,0x21)]) {
-            if (moby_count_group_not_in_state(W(vars,0x308),-1)) canAct=0;
+            if (moby_count_group_not_in_state(W(vars,0x308),-1)) can_act=0;
         }
         if (W(vars,0x30C)!=-1) {
             idleTarget=g_moby_l19_array+(W(vars,0x30C)<<8);
-            if (idleTarget && B(idleTarget,0x20)!=0xFE && B(idleTarget,0x20)!=0xFD) canAct=0;
+            if (idleTarget && B(idleTarget,0x20)!=0xFE && B(idleTarget,0x20)!=0xFD) can_act=0;
         }
-        if (canAct) {
+        if (can_act) {
             if (W(vars,0x2FC)==1) {
                 moby_set_state(moby,4,2);
                 if (B(moby,0x43)) anim_start_blended(moby,0,0,10);
@@ -216,22 +216,22 @@ void leviathan_update(char *moby)
             W(moby,0x98)=W(P(moby,0x24),0x10);W(vars,0x304)=1;
             for (j=0;j<5;j++) {
                 char *effect,*src;
-                vec_random_direction(burstVel,0.2833333611f,0.3500000238f);
-                burstVel[2]=math_fabs(burstVel[2])*6.5f;
-                if (burstVel[2]>1.2500001192f) burstVel[2]=1.2500001192f;
-                FastVecAdd(burstVel,burstVel,D_L19_001A8F20);
+                vec_random_direction(burst_vel,0.2833333611f,0.3500000238f);
+                burst_vel[2]=math_fabs(burst_vel[2])*6.5f;
+                if (burst_vel[2]>1.2500001192f) burst_vel[2]=1.2500001192f;
+                FastVecAdd(burst_vel,burst_vel,D_L19_001A8F20);
                 src=P(vars,0x2F0);
-                effect=cam_moby_create(src,1,S(src,0xAA),j,src+0x10,src+0xF0,burstVel,0xFF,180.0f,45.0f);
+                effect=cam_moby_create(src,1,S(src,0xAA),j,src+0x10,src+0xF0,burst_vel,0xFF,180.0f,45.0f);
                 P(effect,0x64)=(char *)moby_fade_out_update;
             }
             newActor=CreateMoby(0x1208 /* moby class 4616 */);
             if (newActor) {
                 moby_init_child_from_parent(newActor,P(vars,0x2F0));
                 H(newActor,0x32)=H(moby,0x32);B(newActor,0x30)=B(moby,0x30);
-                oldChild=P(vars,0x2F0);
+                old_child=P(vars,0x2F0);
                 {
                     int row;
-                    for (row=0;row<4;row++) qcopy_nc(newActor+0xC0+row*16,oldChild+0xC0+row*16);
+                    for (row=0;row<4;row++) qcopy_nc(newActor+0xC0+row*16,old_child+0xC0+row*16);
                 }
                 moby_mark_spawned(P(vars,0x2F0));P(vars,0x2F0)=newActor;
             }
@@ -281,30 +281,30 @@ void leviathan_update(char *moby)
     {
         char *particle;
         gfx_add_draw_callback_first(DrawGrelbinBeamEffect,moby);
-        qcopy(burstVel,D_L19_001BFEA0);
+        qcopy(burst_vel,D_L19_001BFEA0);
         for (i=9;i>=0;i--) {
-            part_spawn_random_direction_effect(particleVel,0.2333333492f,0.2666666806f);
-            if (particleVel[2]<0.0f) particleVel[2]=-particleVel[2];
+            part_spawn_random_direction_effect(particle_vel,0.2333333492f,0.2666666806f);
+            if (particle_vel[2]<0.0f) particle_vel[2]=-particle_vel[2];
             count=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
-            sizeScale=math_random_float_range(0.6f,1.0f);
-            part_spawn_fading_drift(vars+0x2C0,particleVel,20,0x804020,count,127,127,210000.0f*sizeScale,2100.0f,0.00405555591f,D_L19_001B1BF8);
+            size_scale=math_random_float_range(0.6f,1.0f);
+            part_spawn_fading_drift(vars+0x2C0,particle_vel,20,0x804020,count,127,127,210000.0f*size_scale,2100.0f,0.00405555591f,D_L19_001B1BF8);
             count=FloatToInt(math_random_signed_float_range(2.0f,5.0f));
-            sizeScale=math_random_float_range(0.6f,1.0f);
-            particle=part_spawn_fading_drift(vars+0x2C0,particleVel,20,0x804040,count,48,48,630000.0f*sizeScale,4200.0f,0.00405555591f,0);
+            size_scale=math_random_float_range(0.6f,1.0f);
+            particle=part_spawn_fading_drift(vars+0x2C0,particle_vel,20,0x804040,count,48,48,630000.0f*size_scale,4200.0f,0.00405555591f,0);
             if (particle) {
                 char *g=D_L19_001FF5C0;
                 B(particle,2)=B(P(g,0xD4),0);
             }
         }
-        make_hit_descriptor(hitMatrix,moby,0x10001,D_L19_001A8F20,(float)B(vars,0x34));
-        moby_transform_joint_point(moby,0,bodyMatrix);
-        qcopy(particleVel,bodyMatrix+0x30);
-        vec_scale_to_length(offset,bodyMatrix,0.25f);
-        FastVecAdd(particleVel,particleVel,offset);
-        FastVecSub(delta,vars+0x2E0,particleVel);
+        make_hit_descriptor(hit_matrix,moby,0x10001,D_L19_001A8F20,(float)B(vars,0x34));
+        moby_transform_joint_point(moby,0,body_matrix);
+        qcopy(particle_vel,body_matrix+0x30);
+        vec_scale_to_length(offset,body_matrix,0.25f);
+        FastVecAdd(particle_vel,particle_vel,offset);
+        FastVecSub(delta,vars+0x2E0,particle_vel);
         vec_scale_to_length(delta,delta,F(vars,0x238)*60.0f);
-        FastVecAdd(delta,delta,particleVel);
-        CollLine(particleVel,delta,0,moby,hitMatrix);
+        FastVecAdd(delta,delta,particle_vel);
+        CollLine(particle_vel,delta,0,moby,hit_matrix);
         if (H(moby,0x96)>40) {
             F(vars,0x234)-=0.05f;
             if (F(vars,0x234)<=0.0f) {
@@ -328,7 +328,7 @@ void leviathan_update(char *moby)
     {
         char *finalTarget;
         finalTarget=P(vars,0x200);
-        if (finalTarget && S(finalTarget,0xAA)==0x10D0 /* Y.E.T.I. */) moby_start_effect_from_entry(P(vars,0x200),mat_fast_helper_a(F(moby,0x10)-F(finalTarget,0x10),F(moby,0x14)-F(finalTarget,0x14)));
+        if (finalTarget && S(finalTarget,0xAA)==MOBY_CLASS_YETI) moby_start_effect_from_entry(P(vars,0x200),mat_fast_helper_a(F(moby,0x10)-F(finalTarget,0x10),F(moby,0x14)-F(finalTarget,0x14)));
         if (B(moby,0x60)&2) {
             F(vars,0x2D0)=F(vars,0x2D8)-4.0f;
             if (W(vars,0x2FC)!=1 && W(vars,0x2F8)!=1) {

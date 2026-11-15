@@ -828,7 +828,7 @@ void scenery_ship_draw_group_glows(unsigned char *controller) {
             scale_vector(bounds, entity, 0.0009765625f);
             bounds[3] *= 1.1f;
             if (math_fast_helper_a(bounds, (float)*(int *)(vars + 0x98)) != -1 &&
-                !(*(unsigned short *)(entity + 0x34) & 1) && *(short *)(entity + 0xAA) == 0x9B7 /* Scenery Ship */ &&
+                !(*(unsigned short *)(entity + 0x34) & 1) && *(short *)(entity + 0xAA) == MOBY_CLASS_SCENERY_SHIP &&
                 entity[0x20] == 1) {
                 if (animate != 0) {
                     *(float *)(vars + 0x1C) -= 0.1f;
@@ -1117,9 +1117,9 @@ void nanotech_crate_init(char *moby) {
     moby[0x20] = 1;
     *(unsigned int *)(vars + 0x100) = 0;
     classId = *(short *)(moby + 0xAA);
-    if (classId == 0x1F5 /* Nanotech Crate */) {
+    if (classId == MOBY_CLASS_NANOTECH_CRATE) {
         *(unsigned int *)(vars + 0xFC) = moby_spawn_linked_child(moby, 0);
-    } else if (classId == 0x200 /* Purple Nanotech Crate */) {
+    } else if (classId == MOBY_CLASS_PURPLE_NANOTECH_CRATE) {
         *(unsigned int *)(vars + 0xFC) = moby_spawn_linked_child(moby, 1);
     }
     moby[0x7F] = 0;

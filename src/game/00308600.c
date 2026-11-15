@@ -25,16 +25,16 @@ extern u8 *SpawnSpinningSparkParticle(V4 *, f32, f32, f32, f32, s32, V4 *, u32, 
 /* Spawns the smoke and spark particles that trail behind the beam at the player's hand. */
 void beam_spawn_trail_particles(X *moby) {
     V4 velocity;
-    V4 emitPos;
-    V4 trailDelta;
-    V4 midPoint;
+    V4 emit_pos;
+    V4 trail_delta;
+    V4 mid_point;
     N *vars;
     f32 spacing;
-    f32 sizeFactor;
+    f32 size_factor;
     u32 color;
     s32 i;
     s32 count;
-    s32 heroWeapon;
+    s32 hero_weapon;
     u8 *particle;
 
     vars = moby->f68;
@@ -44,32 +44,32 @@ void beam_spawn_trail_particles(X *moby) {
     velocity.f[2] = -math_random_float_range(0.01f, 0.03f);
     matrix_mul_vec3(&velocity, &velocity, &moby->vC0);
     FastVecAdd(&velocity, &velocity, &g_hero_state.v150);
-    qcopy(&emitPos, &moby->v10);
+    qcopy(&emit_pos, &moby->v10);
     if (g_hero_state.i2294 == 0x7B) {
         if (g_game_time % 3 == 0) {
-            part_spawn_trailing_spark(&emitPos, &velocity, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
+            part_spawn_trailing_spark(&emit_pos, &velocity, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
         }
     } else {
-        part_spawn_trailing_spark(&emitPos, &velocity, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
+        part_spawn_trailing_spark(&emit_pos, &velocity, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
     }
     if (vars->f0C) {
-        spacing = fast_vec_dist(&vars->v10, &emitPos) * 0.5f;
-        FastVecSub(&trailDelta, &vars->v10, &emitPos);
+        spacing = fast_vec_dist(&vars->v10, &emit_pos) * 0.5f;
+        FastVecSub(&trail_delta, &vars->v10, &emit_pos);
         for (i = 1; i < 2; i++) {
-            vec_scale_to_length(&midPoint, &trailDelta, spacing * (f32)i);
-            FastVecAdd(&midPoint, &emitPos, &midPoint);
-            part_spawn_trailing_spark(&midPoint, &velocity, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
+            vec_scale_to_length(&mid_point, &trail_delta, spacing * (f32)i);
+            FastVecAdd(&mid_point, &emit_pos, &mid_point);
+            part_spawn_trailing_spark(&mid_point, &velocity, 0x4F007FFF, 0x1FFFFFFF, 10, 1, 10000.0f);
         }
     }
     vars->f00 = math_random_int_below(10);
-    sizeFactor = 1.075f;
+    size_factor = 1.075f;
     color = 0x808080;
     velocity.f[0] = 0.0f;
     velocity.f[1] = 0.0f;
     velocity.f[2] = -0.3f;
     velocity.f[3] = 1.0f;
     matrix_mul_vec3(&velocity, &velocity, &moby->vC0);
-    FastVecAdd(&emitPos, &moby->v10, &velocity);
+    FastVecAdd(&emit_pos, &moby->v10, &velocity);
     velocity.f[3] = 1.0f;
     velocity.f[2] = -0.075f;
     velocity.f[0] = 0.0f;
@@ -79,31 +79,31 @@ void beam_spawn_trail_particles(X *moby) {
     FastVecAdd(&velocity, &velocity, &g_hero_state.v150);
     if (g_hero_state.i2294 == 8) {
         color = 0xA0A0A0;
-        sizeFactor = 1.0165f;
+        size_factor = 1.0165f;
         velocity.f[2] -= 0.0833333358f;
     }
     if (g_hero_state.i2294 == 0x7B) {
         color = 0xA0A0A0;
-        sizeFactor = 1.037f;
+        size_factor = 1.037f;
         velocity.f[2] -= 0.0500000045f;
     }
-    particle = SpawnSpinningSparkParticle(&emitPos, 0.05f, 1.01f, sizeFactor, 30000.0f, 6, &velocity, color, 0);
+    particle = SpawnSpinningSparkParticle(&emit_pos, 0.05f, 1.01f, size_factor, 30000.0f, 6, &velocity, color, 0);
     if (particle) particle[3] = 0x44;
     if (vars->f0C) {
-        spacing = fast_vec_dist(&vars->v10, &emitPos) * 0.16667f;
-        FastVecSub(&trailDelta, &vars->v10, &emitPos);
-        heroWeapon = g_hero_state.i2294;
+        spacing = fast_vec_dist(&vars->v10, &emit_pos) * 0.16667f;
+        FastVecSub(&trail_delta, &vars->v10, &emit_pos);
+        hero_weapon = g_hero_state.i2294;
         count = 4;
-        if (heroWeapon == 8) count = 2;
-        if (heroWeapon == 0x7B) count = 1;
+        if (hero_weapon == 8) count = 2;
+        if (hero_weapon == 0x7B) count = 1;
         for (i = 1; i < count; i++) {
-            vec_scale_to_length(&midPoint, &trailDelta, spacing * (f32)i);
-            FastVecAdd(&midPoint, &emitPos, &midPoint);
-            particle = SpawnSpinningSparkParticle(&midPoint, 0.05f, 1.01f, sizeFactor, 30000.0f, 6, &velocity, color, 0);
+            vec_scale_to_length(&mid_point, &trail_delta, spacing * (f32)i);
+            FastVecAdd(&mid_point, &emit_pos, &mid_point);
+            particle = SpawnSpinningSparkParticle(&mid_point, 0.05f, 1.01f, size_factor, 30000.0f, 6, &velocity, color, 0);
             if (particle) particle[3] = 0x44;
         }
     }
-    qcopy(&vars->v10, &emitPos);
+    qcopy(&vars->v10, &emit_pos);
     vars->f0C = 1;
 }
 

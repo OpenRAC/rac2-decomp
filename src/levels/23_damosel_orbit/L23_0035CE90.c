@@ -118,7 +118,7 @@ void shell_update_thrown(char *obj) {
         if (hit) {
             Collision *reread;
             char *model;
-            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == 0xC0 /* Bomb Glove */) && *(int *)(ctx + 0x18) >= 0x122)
+            if ((hit == g_hero_moby || *(short *)(hit + 0xAA) == MOBY_CLASS_BOMB_GLOVE) && *(int *)(ctx + 0x18) >= 0x122)
                 goto finish;
             reread = &g_last_ray_hit;
             model = reread->hit;
@@ -185,13 +185,13 @@ void moby_tick_timers(char *moby) {
 extern void func_323FF0(char *, int, int, int);
 
 /* Plays an animation on an object and/or on the object it is linked to, chosen by the bits of a flag. */
-void moby_play_anim_and_link(char *moby, int animId, int arg2, int arg3, int targetBits, float arg5) {
+void moby_play_anim_and_link(char *moby, int anim_id, int arg2, int arg3, int target_bits, float arg5) {
     char *state = *(char **)(moby + 0x68);
 
-    if (targetBits & 1)
-        func_323FF0(moby, animId, 0, 4);
-    if (targetBits & 2)
-        func_323FF0(*(char **)(state + 0x2A0), animId, 0, 4);
+    if (target_bits & 1)
+        func_323FF0(moby, anim_id, 0, 4);
+    if (target_bits & 2)
+        func_323FF0(*(char **)(state + 0x2A0), anim_id, 0, 4);
 }
 
 extern void func_367150(int);
@@ -263,14 +263,14 @@ void SelectNearestPathNode(char *arg0, int arg1) {
 extern int func_419CA0(int);
 
 /* Lists the numbers of all bits that are set in a 64-bit mask, optionally skipping the ones that are not allowed. Returns how many were found. */
-int math_list_set_bit_indices(int arg0, unsigned long long mask, int *outIds, int onlyAllowed) {
-    int *dest = outIds;
+int math_list_set_bit_indices(int arg0, unsigned long long mask, int *out_ids, int only_allowed) {
+    int *dest = out_ids;
     int i = 0;
     int count = 0;
 
     while (i < 0x40) {
         if (mask & 1) {
-            if (onlyAllowed == 0 || func_419CA0(i) != 0) {
+            if (only_allowed == 0 || func_419CA0(i) != 0) {
                 *dest = i;
                 count++;
                 dest++;
@@ -292,32 +292,32 @@ extern int func_419070(long long v, char *arg);
 
 /* Tells which end of a path piece the object is at. Returns 0 for the start, or the last point number for the other end. */
 int path_get_piece_end(int arg0, int index, char *arg) {
-    int pieceA;
-    int pieceB;
-    int lastPoint;
+    int piece_a;
+    int piece_b;
+    int last_point;
 
-    pieceA = D_L23_001B36A8[index];
-    if (func_419070(*(long long *)(g_path_end_masks + (pieceA << 4)), arg) != 0)
+    piece_a = D_L23_001B36A8[index];
+    if (func_419070(*(long long *)(g_path_end_masks + (piece_a << 4)), arg) != 0)
         return 0;
-    pieceB = D_L23_001B36A8[index];
-    lastPoint = *g_path_lists[pieceB] - 1;
-    func_419070(*(long long *)(g_path_end_masks + (pieceB << 4) + 8), arg);
-    return lastPoint;
+    piece_b = D_L23_001B36A8[index];
+    last_point = *g_path_lists[piece_b] - 1;
+    func_419070(*(long long *)(g_path_end_masks + (piece_b << 4) + 8), arg);
+    return last_point;
 }
 
 /* Remembers a new path piece as the current one and pushes the three earlier ones down a short history list. */
-void path_push_piece_history(char *moby, int newPiece) {
+void path_push_piece_history(char *moby, int new_piece) {
     char *state = *(char **)(moby + 0x68);
     short slot = *(short *)(state + 0x2BE);
-    unsigned short oldPiece = *(unsigned short *)(state + 0x2B4);
+    unsigned short old_piece = *(unsigned short *)(state + 0x2B4);
     int offset;
-    int nextSlot;
+    int next_slot;
 
-    nextSlot = (slot + 1) % 3;
-    offset = nextSlot * 2;
-    *(short *)(state + 0x2BE) = nextSlot;
-    *(short *)(state + offset + 0x2B8) = oldPiece;
-    *(short *)(state + 0x2B4) = newPiece;
+    next_slot = (slot + 1) % 3;
+    offset = next_slot * 2;
+    *(short *)(state + 0x2BE) = next_slot;
+    *(short *)(state + offset + 0x2B8) = old_piece;
+    *(short *)(state + 0x2B4) = new_piece;
 }
 
 extern const int D_L23_001B1688 __attribute__((sda));
@@ -480,17 +480,17 @@ extern void func_31A108(int);
 
 /* Stops the two effects held by an object and empties their slots. */
 void moby_stop_effects(char *moby) {
-    int *effectSlot = (int *)(*(int *)(moby + 0x68) + 0x328);
+    int *effect_slot = (int *)(*(int *)(moby + 0x68) + 0x328);
     int i;
 
     for (i = 1; i >= 0; i--) {
-        int effect = *effectSlot;
+        int effect = *effect_slot;
 
         if (effect != 0) {
             func_31A108(effect);
-            *effectSlot = 0;
+            *effect_slot = 0;
         }
-        effectSlot++;
+        effect_slot++;
     }
 }
 

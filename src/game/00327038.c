@@ -146,20 +146,20 @@ void hero_check_hit_by_object(char *self)
 {
     unsigned char *player = D_001BAF98[0];
     char *vars = *(char **)(self + 0x68);
-    unsigned char *playerVars;
-    char *gameState;
+    unsigned char *player_vars;
+    char *game_state;
     if (player == 0)
         return;
     if (*(short *)(*(char **)(player + 0x24) + 0x46) != 18)
         return;
-    playerVars = *(unsigned char **)(player + 0x68);
-    if (playerVars != 0) {
-        if (*(short *)(playerVars + 0x16) == 0) {
-            if (playerVars[0x14] != 0) {
+    player_vars = *(unsigned char **)(player + 0x68);
+    if (player_vars != 0) {
+        if (*(short *)(player_vars + 0x16) == 0) {
+            if (player_vars[0x14] != 0) {
                 player[0xBC] += 2;
                 if (player[0xBC] >= 25) {
-                    gameState = g_music_state;
-                    if (*(short *)(gameState + 0x72) == 3 && *(short *)(gameState + 0x6C) < 6000)
+                    game_state = g_music_state;
+                    if (*(short *)(game_state + 0x72) == 3 && *(short *)(game_state + 0x6C) < 6000)
                         snd_resume_music_stream();
                 }
                 if (player[0x21] != 255)
@@ -200,26 +200,26 @@ void part_claim_spark_record(char *self)
 /* Moves the owner's spark records around it and frees each one after it has turned a full circle. */
 void part_update_orbiting_sparks(char *owner)
 {
-    int tableAddr = (int)g_spark_records;
-    char *sparkPos = (char *)(tableAddr + 0x10);
-    char *sparkAux = (char *)(tableAddr + 0x20);
+    int table_addr = (int)g_spark_records;
+    char *spark_pos = (char *)(table_addr + 0x10);
+    char *spark_aux = (char *)(table_addr + 0x20);
     int left = 99;
-    char *sparkBase = (char *)tableAddr;
+    char *spark_base = (char *)table_addr;
     char *vars = *(char **)(owner + 0x68);
     do {
-        if (*(char **)(sparkPos + 0x24) == owner) {
-            matrix_mul_vec3(sparkPos, sparkBase, owner + 0xC0);
-            vec_scale_to_length((float *)sparkAux, (float *)sparkPos, 1.0f);
-            FastVecAdd(sparkPos, sparkPos, owner + 0x10);
-            *(float *)(sparkPos + 0x20) += 0.6283186078071594f;
-            if (*(float *)(sparkPos + 0x20) >= 6.2831854820251465f) {
-                *(int *)(sparkPos + 0x24) = 0;
+        if (*(char **)(spark_pos + 0x24) == owner) {
+            matrix_mul_vec3(spark_pos, spark_base, owner + 0xC0);
+            vec_scale_to_length((float *)spark_aux, (float *)spark_pos, 1.0f);
+            FastVecAdd(spark_pos, spark_pos, owner + 0x10);
+            *(float *)(spark_pos + 0x20) += 0.6283186078071594f;
+            if (*(float *)(spark_pos + 0x20) >= 6.2831854820251465f) {
+                *(int *)(spark_pos + 0x24) = 0;
                 --*(int *)(vars + 0x48);
             }
         }
-        sparkBase += 0x40;
-        sparkAux += 0x40;
-        sparkPos += 0x40;
+        spark_base += 0x40;
+        spark_aux += 0x40;
+        spark_pos += 0x40;
     } while (--left >= 0);
 }
 
@@ -268,26 +268,26 @@ void gfx_scale_draw_packet_corners(char *packet, float scale)
 }
 
 /* Draws a sprite at a position, facing the camera, with a given color, brightness, size and tilt. */
-void gfx_draw_facing_sprite(char *pos, int color, int alpha, char *textureId, int blendMode,
+void gfx_draw_facing_sprite(char *pos, int color, int alpha, char *texture_id, int blend_mode,
                                         char *direction, float size, float roll)
 {
     char packet[144];
     float matrix[16];
     float rotation[4];
     float offset[4];
-    long long textureReg;
+    long long texture_reg;
 
     F8411efa9_FUN_00328CA8(packet);
-    textureReg = F8411efa9_FUN_0027C878(textureId);
+    texture_reg = F8411efa9_FUN_0027C878(texture_id);
 
     *(int *)(packet + 76) = color + (alpha << 24);
     *(int *)(packet + 72) = color + (alpha << 24);
     *(int *)(packet + 68) = color + (alpha << 24);
     *(int *)(packet + 64) = color + (alpha << 24);
     *(long long *)(packet + 112) = 0LL;
-    *(long long *)(packet + 120) = textureReg;
+    *(long long *)(packet + 120) = texture_reg;
     *(long long *)(packet + 128) = 280993940374112LL;
-    *(long long *)(packet + 136) = ((long long)blendMode << 2) | 0x8000000040LL;
+    *(long long *)(packet + 136) = ((long long)blend_mode << 2) | 0x8000000040LL;
 
     rotation[3] = 0.0f;
     rotation[2] = F8411efa9_FUN_00283248(*(float *)(direction + 0), *(float *)(direction + 4));
@@ -352,17 +352,17 @@ void part_update_object_particles(void *owner) {
     F328Particle *particle;
     F328Owner *vars = *(F328Owner **)((char *)owner + 0x68);
     int i;
-    float timeRatio;
-    float halfValue = 0.5f;
+    float time_ratio;
+    float half_value = 0.5f;
 
     for (i = 0; i < 300; i++) {
         particle = &particles[i];
         if (particle->t.owner != owner)
             continue;
-        timeRatio = IntToFloat(particle->t.f30);
-        timeRatio /= IntToFloat(particle->t.f34);
-        particle->t.f28 = FloatToInt((float)particle->t.f24 * timeRatio);
-        particle->t.f20 = FastTweenColor(timeRatio * halfValue, 0, particle->t.f1C);
+        time_ratio = IntToFloat(particle->t.f30);
+        time_ratio /= IntToFloat(particle->t.f34);
+        particle->t.f28 = FloatToInt((float)particle->t.f24 * time_ratio);
+        particle->t.f20 = FastTweenColor(time_ratio * half_value, 0, particle->t.f1C);
         particle->t.f14 = FastAddRotations(particle->t.f14, particle->t.f10);
         particle->t.f18 += math_random_float_range(0.001f, 0.003f);
         FastVecAdd(particle, particle, &particle->t);
@@ -384,13 +384,13 @@ void part_draw_object_particle(char *self)
     char packet[144];
     float matrix[16];
     float rotation[4];
-    long long textureReg;
+    long long texture_reg;
     int color;
 
     F8411efa9_FUN_00328CA8(packet);
-    textureReg = GetEffectTextureDescriptor((char *)0x2E);
+    texture_reg = GetEffectTextureDescriptor((char *)0x2E);
 
-    *(long long *)(packet + 0x78) = textureReg;
+    *(long long *)(packet + 0x78) = texture_reg;
     *(long long *)(packet + 0x80) = 280993940374112LL;
     *(long long *)(packet + 0x88) = ((long long)*(int *)(self + 0x3C) << 2) | 0x8000000040LL;
     color = *(int *)(self + 0x30) + (*(unsigned char *)(self + 0x38) << 24);
@@ -431,7 +431,7 @@ void part_emit_spark_burst(char *self)
     float speed;
     int i;
     int lifetime;
-    int sparkType;
+    int spark_type;
 
     for (i = 47; i >= 0; i--) {
         angle = math_random_angle();
@@ -440,8 +440,8 @@ void part_emit_spark_burst(char *self)
         velocity[1] = math_fast_sin_or_cos_b(angle) * speed;
         velocity[2] = func_002A7878_1(0.050000004f, 1.0833334177732467651367e-01f);
         lifetime = math_random_int_range(90, 120);
-        sparkType = math_random_int_below(2);
-        part_spawn_spark_2(self + 16, velocity, sparkType, lifetime);
+        spark_type = math_random_int_below(2);
+        part_spawn_spark_2(self + 16, velocity, spark_type, lifetime);
     }
 }
 
@@ -460,46 +460,46 @@ extern int stub_empty_30(void);
 /* Checks whether the player is under the falling object and, if so, hurts him or locks on to him. */
 void hero_check_under_falling_object(char *self)
 {
-    unsigned char *heroSlot = D_001BAF98[0];
+    unsigned char *hero_slot = D_001BAF98[0];
     char *vars = *(char **)(self + 0x68);
     unsigned char *player;
-    unsigned char *playerVars;
-    char *playerVars2;
-    float auxVec[4];
-    float groundVec[4];
-    char *gameState;
-    int lockMode;
+    unsigned char *player_vars;
+    char *player_vars2;
+    float aux_vec[4];
+    float ground_vec[4];
+    char *game_state;
+    int lock_mode;
 
-    if (heroSlot == 0) {
+    if (hero_slot == 0) {
         if (*(int *)(vars + 0x38) != 2)
             return;
     }
-    lockMode = *(int *)(vars + 0x38);
-    player = heroSlot;
-    if (lockMode == 2)
+    lock_mode = *(int *)(vars + 0x38);
+    player = hero_slot;
+    if (lock_mode == 2)
         player = *(unsigned char **)(vars + 0x48);
     if (*(short *)(*(char **)(player + 0x24) + 0x46) == 18) {
-        playerVars = *(unsigned char **)(player + 0x68);
-        if (playerVars != 0) {
-            if (*(short *)(playerVars + 0x16) == 0) {
-                *(int *)&groundVec[0] = 0;
-                if (lockMode != 2)
-                    SampleSurfaceHeightMap(groundVec, auxVec, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
+        player_vars = *(unsigned char **)(player + 0x68);
+        if (player_vars != 0) {
+            if (*(short *)(player_vars + 0x16) == 0) {
+                *(int *)&ground_vec[0] = 0;
+                if (lock_mode != 2)
+                    SampleSurfaceHeightMap(ground_vec, aux_vec, *(float *)(self + 0x10), *(float *)(self + 0x14), *(float *)(self + 0x18));
                 else
-                    SampleSurfaceHeightMap(groundVec, auxVec, *(float *)(vars + 0x20), *(float *)(vars + 0x24), *(float *)(vars + 0x28));
-                playerVars2 = *(char **)(player + 0x68);
-                if (*(float *)(self + 0x18) > groundVec[0] && *(float *)(playerVars2 + 0xC) == 0.0f) {
+                    SampleSurfaceHeightMap(ground_vec, aux_vec, *(float *)(vars + 0x20), *(float *)(vars + 0x24), *(float *)(vars + 0x28));
+                player_vars2 = *(char **)(player + 0x68);
+                if (*(float *)(self + 0x18) > ground_vec[0] && *(float *)(player_vars2 + 0xC) == 0.0f) {
                     *(unsigned char **)(vars + 0x48) = player;
                     *(int *)(vars + 0x38) = 2;
                     return;
                 }
-                if (playerVars[0x14] == 0) {
+                if (player_vars[0x14] == 0) {
                     RippleDisturb(g_surface_height_tiles[0], D_001B22D8[0], 1, *(float *)(self + 0x10), *(float *)(self + 0x14), 0.5f, -0.03f);
                     if (stub_empty_30() == 0) {
                         player[0xBC] += 1;
                         if (player[0xBC] >= 25) {
-                            gameState = g_music_state;
-                            if (*(short *)(gameState + 0x72) == 3 && *(short *)(gameState + 0x6C) < 6000)
+                            game_state = g_music_state;
+                            if (*(short *)(game_state + 0x72) == 3 && *(short *)(game_state + 0x6C) < 6000)
                                 snd_resume_music_stream();
                         }
                         if (player[0x21] != 255)
@@ -592,26 +592,26 @@ void gfx_scale_draw_packet_corners_copy(char *packet, float scale)
 }
 
 /* Builds a 144-byte packet, aims a quaternion at the shared 0x001B5200 vector from pos through three float helpers, derives an offset basis by a fourth, writes the last matrix row from pos plus that offset, then dispatches the packet. */
-void gfx_draw_facing_sprite_copy(char *pos, int color, int alpha, char *textureId, int blendMode,
-                   float size, float roll, float cameraShift)
+void gfx_draw_facing_sprite_copy(char *pos, int color, int alpha, char *texture_id, int blend_mode,
+                   float size, float roll, float camera_shift)
 {
     char packet[144];
     float matrix[16];
     float rotation[4];
     float offset[4];
-    long long textureReg;
+    long long texture_reg;
 
     gfx_reset_draw_packet_copy(packet);
-    textureReg = GetEffectTextureDescriptor(textureId);
+    texture_reg = GetEffectTextureDescriptor(texture_id);
 
-    *(long long *)(packet + 136) = ((long long)blendMode << 2) | 0x8000000040LL;
+    *(long long *)(packet + 136) = ((long long)blend_mode << 2) | 0x8000000040LL;
     *(long long *)(packet + 128) = 280993940374112LL;
     *(int *)(packet + 76) = color + (alpha << 24);
     *(int *)(packet + 72) = color + (alpha << 24);
     *(int *)(packet + 68) = color + (alpha << 24);
     *(int *)(packet + 64) = color + (alpha << 24);
     *(long long *)(packet + 112) = 0LL;
-    *(long long *)(packet + 120) = textureReg;
+    *(long long *)(packet + 120) = texture_reg;
 
     rotation[3] = 0.0f;
     rotation[2] = mat_fast_helper_a(g_active_camera.x_140 - *(float *)(pos + 0),
@@ -622,7 +622,7 @@ void gfx_draw_facing_sprite_copy(char *pos, int color, int alpha, char *textureI
 
     euler_to_matrix(matrix, rotation);
     FastVecSub(offset, &g_active_camera.x_140, pos);
-    vec_scale_to_length(offset, offset, cameraShift);
+    vec_scale_to_length(offset, offset, camera_shift);
 
     matrix[12] = *(float *)(pos + 0) + offset[0];
     matrix[13] = *(float *)(pos + 4) + offset[1];
@@ -634,26 +634,26 @@ void gfx_draw_facing_sprite_copy(char *pos, int color, int alpha, char *textureI
 }
 
 /* Draws a sprite at a position, nudged toward the camera, with a given color, brightness, size and tilt. */
-void gfx_draw_facing_sprite_near_cam(char *pos, int color, int alpha, char *textureId, int blendMode,
-                   float size, float roll, float cameraShift)
+void gfx_draw_facing_sprite_near_cam(char *pos, int color, int alpha, char *texture_id, int blend_mode,
+                   float size, float roll, float camera_shift)
 {
     char packet[144];
     float matrix[16];
     float rotation[4];
     float offset[4];
-    long long textureReg;
+    long long texture_reg;
 
     gfx_reset_draw_packet(packet);
-    textureReg = GetEffectTextureDescriptor(textureId);
+    texture_reg = GetEffectTextureDescriptor(texture_id);
 
-    *(long long *)(packet + 136) = ((long long)blendMode << 2) | 0x8000000040LL;
+    *(long long *)(packet + 136) = ((long long)blend_mode << 2) | 0x8000000040LL;
     *(long long *)(packet + 128) = 280993940374112LL;
     *(int *)(packet + 76) = color + (alpha << 24);
     *(int *)(packet + 72) = color + (alpha << 24);
     *(int *)(packet + 68) = color + (alpha << 24);
     *(int *)(packet + 64) = color + (alpha << 24);
     *(long long *)(packet + 112) = 0LL;
-    *(long long *)(packet + 120) = textureReg;
+    *(long long *)(packet + 120) = texture_reg;
 
     rotation[3] = 0.0f;
     rotation[2] = mat_fast_helper_a(g_active_camera.x_140 - *(float *)(pos + 0),
@@ -664,7 +664,7 @@ void gfx_draw_facing_sprite_near_cam(char *pos, int color, int alpha, char *text
 
     euler_to_matrix(matrix, rotation);
     FastVecSub(offset, &g_active_camera.x_140, pos);
-    vec_scale_to_length(offset, offset, cameraShift);
+    vec_scale_to_length(offset, offset, camera_shift);
 
     matrix[12] = *(float *)(pos + 0) + offset[0];
     matrix[13] = *(float *)(pos + 4) + offset[1];

@@ -539,11 +539,11 @@ void part_start_effect_if_active(unsigned char *effect) {
 
 
 /* Sets up an effect record with the same value in its first four slots and default scales. */
-void part_l03_init_effect_record(unsigned char *effect, int paramA, int paramB, int fillValue) {
+void part_l03_init_effect_record(unsigned char *effect, int param_a, int param_b, int fill_value) {
     unsigned char *record = effect;
-    int value = fillValue;
+    int value = fill_value;
 
-    func_2ECA50(effect, paramA, paramB, 0x80);
+    func_2ECA50(effect, param_a, param_b, 0x80);
     *(int *)(record + 0x4C) = value;
     *(int *)(record + 0x48) = value;
     *(int *)(record + 0x44) = value;
@@ -615,13 +615,13 @@ int moby_l03_is_state_one(unsigned char *object) { return object[0x20] == 1; }
 float bot_compute_speed_from_turn(unsigned char *);
 
 /* Asks where a bot should go next and moves it that way, returning the result of the check. */
-int bot_move_toward_waypoint(unsigned char *object, int index, int useExtra) {
+int bot_move_toward_waypoint(unsigned char *object, int index, int use_extra) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     float extra = 0.0f;
     float out;
     int result;
 
-    if (useExtra != 0)
+    if (use_extra != 0)
         extra = bot_compute_speed_from_turn(object);
     result = func_419B10(*(void **)(state + 0x220), object + 0x10, index, &out, state + 0x368, state + 0x36C, extra,
                     *(float *)(state + 0x110));
@@ -660,9 +660,9 @@ extern char D_L00_00189F00[];
 /* Every so often picks a new random head tilt for the bot, or makes it look toward a fixed point. */
 void bot_update_head_tilt(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
-    float tiltYaw;
-    float tiltPitch;
-    int lookAtPoint;
+    float tilt_yaw;
+    float tilt_pitch;
+    int look_at_point;
 
     if (math_fast_float_d(state + 0x384) != 0) {
         if (object[0x95] == 2) {
@@ -673,9 +673,9 @@ void bot_update_head_tilt(unsigned char *object) {
         } else {
             *(float *)(state + 0x388) = math_random_signed_float_range(5.0f, 20.0f) * 0.017453294f;
             *(float *)(state + 0x38C) = math_random_float_range(-15.0f, 5.0f) * 0.017453294f;
-            lookAtPoint = (math_random_int_below(4) == 0);
-            *(int *)(state + 0x390) = lookAtPoint;
-            if (lookAtPoint) {
+            look_at_point = (math_random_int_below(4) == 0);
+            *(int *)(state + 0x390) = look_at_point;
+            if (look_at_point) {
                 *(int *)(state + 0x384) = math_random_int_range(180, 300);
             } else {
                 *(int *)(state + 0x384) = math_random_int_range(60, 120);
@@ -686,14 +686,14 @@ void bot_update_head_tilt(unsigned char *object) {
     if (*(int *)(state + 0x390) != 0) {
         ref_L03_003C4BD8_00(object, D_L00_00189F00);
     } else {
-        tiltYaw = *(float *)(state + 0x38C);
-        tiltPitch = *(float *)(state + 0x388);
+        tilt_yaw = *(float *)(state + 0x38C);
+        tilt_pitch = *(float *)(state + 0x388);
         /* This cc1 emits the two pairs of stores in the opposite order to the source, so the
            pair at 0x324 comes first here to land them at 0x2A4 as the retail has them. */
-        *(float *)(state + 0x324) = tiltYaw;
-        *(float *)(state + 0x328) = tiltPitch;
-        *(float *)(state + 0x2A4) = tiltYaw;
-        *(float *)(state + 0x2A8) = tiltPitch;
+        *(float *)(state + 0x324) = tilt_yaw;
+        *(float *)(state + 0x328) = tilt_pitch;
+        *(float *)(state + 0x2A4) = tilt_yaw;
+        *(float *)(state + 0x2A8) = tilt_pitch;
     }
 }
 
@@ -726,19 +726,19 @@ extern float math_fabs(float);
    within 1.5 of the object's and that func_L03_00419BD8 accepts, or 0. */
 unsigned char *moby_find_nearest_tilt_target(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
-    unsigned short *idList;
+    unsigned short *id_list;
     unsigned char *entity;
     unsigned char *best = 0;
-    float bestDistance = 15.0f;
+    float best_distance = 15.0f;
     float distance;
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (idList = D_L03_001FB5A0[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && idList != 0 &&
-             ((short)idList[-1] >= 0 || idList == D_L03_001FB5A0[vars->ids[i]]);
-             idList++) {
-            entity = D_L03_001B2A1C + ((*idList & 0x7FFF) << 8);
+        for (id_list = D_L03_001FB5A0[vars->ids[i]];
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
+             ((short)id_list[-1] >= 0 || id_list == D_L03_001FB5A0[vars->ids[i]]);
+             id_list++) {
+            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (entity[0x20] == 0xFE)
@@ -750,8 +750,8 @@ unsigned char *moby_find_nearest_tilt_target(unsigned char *object) {
                     if (math_fabs(*(float *)(object + 0x18) - *(float *)(entity + 0x18)) < 1.5f) {
                         if (route_check_points(vars->ref220, object + 0x10, entity + 0x10)) {
                             distance = vec_distance_xy(object + 0x10, entity + 0x10);
-                            if (distance < bestDistance) {
-                                bestDistance = distance;
+                            if (distance < best_distance) {
+                                best_distance = distance;
                                 best = entity;
                             }
                         }
@@ -767,27 +767,27 @@ unsigned char *moby_find_nearest_tilt_target(unsigned char *object) {
    (func_L03_004197A8 and func_L03_00419BD8 must both accept it), or 0. */
 unsigned char *moby_find_nearest_entity_a(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
-    unsigned short *idList;
+    unsigned short *id_list;
     unsigned char *entity;
     unsigned char *best = 0;
-    float bestDistance = 15.0f;
+    float best_distance = 15.0f;
     float distance;
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (idList = D_L03_001FB5A0[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && idList != 0 &&
-             ((short)idList[-1] >= 0 || idList == D_L03_001FB5A0[vars->ids[i]]);
-             idList++) {
-            entity = D_L03_001B2A1C + ((*idList & 0x7FFF) << 8);
+        for (id_list = D_L03_001FB5A0[vars->ids[i]];
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
+             ((short)id_list[-1] >= 0 || id_list == D_L03_001FB5A0[vars->ids[i]]);
+             id_list++) {
+            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (*(short *)(entity + 0xAA) == 0xEF9 /* moby class 3833 */) {
                 if (moby_get_count_in_state_two(entity)) {
                     if (route_check_points(vars->ref220, object + 0x10, entity + 0x10)) {
                         distance = vec_distance_xy(object + 0x10, entity + 0x10);
-                        if (distance < bestDistance) {
-                            bestDistance = distance;
+                        if (distance < best_distance) {
+                            best_distance = distance;
                             best = entity;
                         }
                     }
@@ -807,17 +807,17 @@ extern unsigned int moby_check_against_stored_value(unsigned char *, unsigned ch
    out of the walk, as in retail. */
 unsigned char *moby_find_entity_nearby(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
-    unsigned short **groupTable = D_L03_001FB5A0;
-    unsigned short *idList;
+    unsigned short **group_table = D_L03_001FB5A0;
+    unsigned short *id_list;
     unsigned char *entity;
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (idList = groupTable[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && idList != 0 &&
-             ((short)idList[-1] >= 0 || idList == groupTable[vars->ids[i]]);
-             idList++) {
-            entity = D_L03_001B2A1C + ((*idList & 0x7FFF) << 8);
+        for (id_list = group_table[vars->ids[i]];
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
+             ((short)id_list[-1] >= 0 || id_list == group_table[vars->ids[i]]);
+             id_list++) {
+            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (*(short *)(entity + 0xAA) == 0x97A /* moby class 2426 */) {
@@ -837,26 +837,26 @@ extern int moby_is_first_state(unsigned char *);
    among its eight groups, or 0. */
 unsigned char *moby_find_nearest_entity_b(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
-    unsigned short *idList;
+    unsigned short *id_list;
     unsigned char *entity;
     unsigned char *best = 0;
-    float bestDistance = 14.0f;
+    float best_distance = 14.0f;
     float distance;
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (idList = D_L03_001FB5A0[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && idList != 0 &&
-             ((short)idList[-1] >= 0 || idList == D_L03_001FB5A0[vars->ids[i]]);
-             idList++) {
-            entity = D_L03_001B2A1C + ((*idList & 0x7FFF) << 8);
+        for (id_list = D_L03_001FB5A0[vars->ids[i]];
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
+             ((short)id_list[-1] >= 0 || id_list == D_L03_001FB5A0[vars->ids[i]]);
+             id_list++) {
+            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (*(unsigned short *)(entity + 0xAA) == 0xE87 /* moby class 3719 */ || *(unsigned short *)(entity + 0xAA) == 0xE88 /* moby class 3720 */) {
                 if (moby_is_first_state(entity)) {
                     distance = vec_distance_xy(object + 0x10, entity + 0x10);
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
+                    if (distance < best_distance) {
+                        best_distance = distance;
                         best = entity;
                     }
                 }
@@ -874,34 +874,34 @@ extern int moby_is_in_state_one(unsigned char *);
    what leaves 0xFE out of loop.c's budget for hoisting the walk's constants, as in retail. */
 unsigned char *moby_find_nearest_pickup_target(unsigned char *object) {
     L03GroupState *vars = *(L03GroupState **)(object + 0x68);
-    unsigned short **groupTable = D_L03_001FB5A0;
-    unsigned short *idList;
+    unsigned short **group_table = D_L03_001FB5A0;
+    unsigned short *id_list;
     unsigned char *entity;
     unsigned char *best = 0;
-    float bestDistance = 10.0f;
+    float best_distance = 10.0f;
     float distance;
-    int classId;
+    int class_id;
     int i;
 
     for (i = 0; i < 8; i++) {
-        for (idList = groupTable[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && idList != 0 &&
-             ((short)idList[-1] >= 0 || idList == groupTable[vars->ids[i]]);
-             idList++) {
-            entity = D_L03_001B2A1C + ((*idList & 0x7FFF) << 8);
+        for (id_list = group_table[vars->ids[i]];
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
+             ((short)id_list[-1] >= 0 || id_list == group_table[vars->ids[i]]);
+             id_list++) {
+            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (entity[0x20] == 0xFE)
                 continue;
             if (entity[0x20] == 0xFD)
                 continue;
-            classId = *(short *)(entity + 0xAA);
-            if (classId == 0xB10 /* moby class 2832 */ || classId == 0xF4D /* moby class 3917 */) {
-                if (classId == 0xF4D && moby_is_in_state_one(entity) == 0)
+            class_id = *(short *)(entity + 0xAA);
+            if (class_id == 0xB10 /* moby class 2832 */ || class_id == 0xF4D /* moby class 3917 */) {
+                if (class_id == 0xF4D && moby_is_in_state_one(entity) == 0)
                     continue;
                 distance = vec_distance_xy(object + 0x10, entity + 0x10);
-                if (distance < bestDistance) {
-                    bestDistance = distance;
+                if (distance < best_distance) {
+                    best_distance = distance;
                     best = entity;
                 }
             }
@@ -927,42 +927,42 @@ typedef struct {
 /* Picks the object's target or a nearer reachable entity (type 0x972) from its eight groups,
    then copies that entity's position to a1 (height set by func_002A89A8) and its 0xF0 vector
    to a2. */
-void ChooseVisibleGroupTarget(unsigned char *object, float *outPosition, float *outForward) {
+void ChooseVisibleGroupTarget(unsigned char *object, float *out_position, float *out_forward) {
     L03SeekState *vars = *(L03SeekState **)(object + 0x68);
     unsigned char *chosen;
     unsigned char *reachable;
     unsigned char *entity;
-    unsigned short *idList;
-    float bestDistance;
+    unsigned short *id_list;
+    float best_distance;
     float distance;
     float lifted[4] __attribute__((aligned(16)));
-    int canReach;
+    int can_reach;
     int i;
 
-    bestDistance = fast_vec_dist(object + 0x10, vars->target + 0x10);
+    best_distance = fast_vec_dist(object + 0x10, vars->target + 0x10);
     chosen = vars->target;
     if (route_check_points(vars->ref220, object + 0x10, chosen + 0x10))
         reachable = vars->target;
     else
         reachable = 0;
     for (i = 0; i < 8; i++) {
-        for (idList = D_L03_001FB5A0[vars->ids[i]];
-             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && idList != 0 &&
-             ((short)idList[-1] >= 0 || idList == D_L03_001FB5A0[vars->ids[i]]);
-             idList++) {
-            entity = D_L03_001B2A1C + ((*idList & 0x7FFF) << 8);
+        for (id_list = D_L03_001FB5A0[vars->ids[i]];
+             (vars->ids[i] & 0xFF) != 0xFF && vars->ids[i] <= D_L03_001B2A38[0] && id_list != 0 &&
+             ((short)id_list[-1] >= 0 || id_list == D_L03_001FB5A0[vars->ids[i]]);
+             id_list++) {
+            entity = D_L03_001B2A1C + ((*id_list & 0x7FFF) << 8);
             if (entity == 0)
                 break;
             if (*(short *)(entity + 0xAA) == 0x972 /* moby class 2418 */) {
                 distance = vec_distance_xy(object + 0x10, entity + 0x10);
-                if (distance < bestDistance) {
+                if (distance < best_distance) {
                     qcopy(lifted, entity + 0x10);
                     lifted[2] += 1.0f;
                     if (coll_test_point(lifted, 0, object, 0.5f) == 0) {
                         chosen = entity;
-                        canReach = route_check_points(vars->ref220, object + 0x10, entity + 0x10);
-                        bestDistance = distance;
-                        if (canReach)
+                        can_reach = route_check_points(vars->ref220, object + 0x10, entity + 0x10);
+                        best_distance = distance;
+                        if (can_reach)
                             reachable = chosen;
                     }
                 }
@@ -971,9 +971,9 @@ void ChooseVisibleGroupTarget(unsigned char *object, float *outPosition, float *
     }
     if (reachable)
         chosen = reachable;
-    qcopy(outForward, chosen + 0xF0);
-    qcopy_nc(outPosition, chosen + 0x10);
-    outPosition[2] = coll_probe_ground_height_below(outPosition, 0, 0.5f);
+    qcopy(out_forward, chosen + 0xF0);
+    qcopy_nc(out_position, chosen + 0x10);
+    out_position[2] = coll_probe_ground_height_below(out_position, 0, 0.5f);
 }
 
 

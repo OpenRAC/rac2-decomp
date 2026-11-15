@@ -169,7 +169,7 @@ void InitRailGroupMembers(struct Object *owner, int group) {
                 source++;
             }
         }
-        if (object->kind == 0x9B7 /* Scenery Ship */) {
+        if (object->kind == MOBY_CLASS_SCENERY_SHIP) {
             int k;
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
@@ -271,7 +271,7 @@ void InitRailGroupMembers(struct Object *owner, int group) {
             FastVecScale(vectors[1], vectors[1], data->scale);
             qcopy(data->primary[1], vectors[1]);
         }
-        if (object->kind == 0xD5C /* Train with Rail */) {
+        if (object->kind == MOBY_CLASS_TRAIN_WITH_RAIL) {
             *(TI128 *)vectors[0] = 0;
             *(TI128 *)vectors[1] = 0;
             vectors[0][0] = -3.677999973297119f;

@@ -169,13 +169,13 @@ void infiltrator_ball_update(char *moby)
     if (*(unsigned char *)(moby + 0x20) != 5 && vars->field6a)
         FastDecTimer(&vars->field68);
     if (vars->field6a && vars->field68) {
-        char *soundSlot = g_sound_state + vars->sound * 0x70;
-        if (*(char **)(soundSlot + 0x88) != moby || !*(unsigned char *)(soundSlot + 0x74))
+        char *sound_slot = g_sound_state + vars->sound * 0x70;
+        if (*(char **)(sound_slot + 0x88) != moby || !*(unsigned char *)(sound_slot + 0x74))
             vars->sound = PlayMobySound(3, 4, moby);
     } else {
         if (vars->sound != -1) {
-            char *soundSlot = g_sound_state + vars->sound * 0x70;
-            if (*(char **)(soundSlot + 0x88) == moby && *(unsigned char *)(soundSlot + 0x74))
+            char *sound_slot = g_sound_state + vars->sound * 0x70;
+            if (*(char **)(sound_slot + 0x88) == moby && *(unsigned char *)(sound_slot + 0x74))
                 snd_stop_voice(vars->sound);
         }
         vars->sound = -1;

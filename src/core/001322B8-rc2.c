@@ -31,18 +31,18 @@ extern s32 D_001A7484 __attribute__((sda));
 /* Sets up a reply buffer for the next sound request and flushes it from the cache. */
 void snd_prepare_reply_buffer(s32 *buffer, s32 count) {
     s8 *base;
-    s32 byteOffset;
-    s32 endAddr;
+    s32 byte_offset;
+    s32 end_addr;
 
     D_001A7484 = count;
     base = (s8 *)(buffer);
-    byteOffset = count * 4;
-    endAddr = byteOffset + base;
+    byte_offset = count * 4;
+    end_addr = byte_offset + base;
     D_001A7480 = base;
     (*(s32 *)((s8 *)(&((s32 *)base)[count]) + (4))) = 0;
     *(s32 *)base = 0;
     kernel_process_request_b(buffer, base + 3);
-    byteOffset += 4;
-    base += byteOffset;
+    byte_offset += 4;
+    base += byte_offset;
     kernel_process_request_b(base, base + 3);
 }

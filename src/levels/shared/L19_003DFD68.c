@@ -134,18 +134,18 @@ void train_l19_update(char *moby)
     f32 vecs[3][4] __attribute__((aligned(16)));
     PvVars *vars;
     char *path;
-    char *linkRec;
+    char *link_rec;
     ClassRec *records;
     ClassRec *records2;
     char *src;
     char *sound;
     char *target;
-    int hitCount;
+    int hit_count;
     int i;
     int row;
-    int linkIndex;
-    int savedState;
-    int hitIndex;
+    int link_index;
+    int saved_state;
+    int hit_index;
     float speed;
     float force;
     float scale;
@@ -174,7 +174,7 @@ void train_l19_update(char *moby)
             qcopy(moby + 0x10, path + 0x10);
             vars->iE0 = -1;
         }
-        if (*(s16 *)(moby + 0xAA) != 0xD9B /* Train */ && *(s16 *)(moby + 0xAA) != 0x11CF /* moby class 4559 */) {
+        if (*(s16 *)(moby + 0xAA) != MOBY_CLASS_TRAIN && *(s16 *)(moby + 0xAA) != 0x11CF /* moby class 4559 */) {
             vars->i8 = 0;
         }
         if (vars->iC8 != -1) {
@@ -218,9 +218,9 @@ void train_l19_update(char *moby)
                 records2 = g_moby_l19_array[0];
                 *(u16 *)(moby + 0x34) = records2[vars->iC8].h34;
                 *(int *)(moby + 0x98) = records2[vars->iC8].i98;
-                linkIndex = vars->iC8;
+                link_index = vars->iC8;
                 for (row = 0; row < 4; row++) {
-                    qcopy(moby + 0xC0 + row * 16, records2[linkIndex].mat[row]);
+                    qcopy(moby + 0xC0 + row * 16, records2[link_index].mat[row]);
                 }
                 matrix_mul_vec3(vecs[0], vars->vA0, moby + 0xC0);
                 FastVecAdd(moby + 0x10, vecs[0], g_moby_l19_array[0][vars->iC8].pos);
@@ -230,7 +230,7 @@ void train_l19_update(char *moby)
             if (vars->iE4 == -1
                 || *(char **)((sound = (char *)g_sound_state + vars->iE4 * 0x70) + 0x88) != moby
                 || *(u8 *)(sound + 0x74) == 0) {
-                vars->iE4 = snd_play_from_class_bank(0, 4, moby, 0xD5C /* Train with Rail */);
+                vars->iE4 = snd_play_from_class_bank(0, 4, moby, MOBY_CLASS_TRAIN_WITH_RAIL);
             }
             if (vars->iB8 != -1 && vars->iC8 == -1 && IsPointInCuboid(moby + 0x10, vars->iB8) != 0) {
                 if (vars->iE4 != -1) {
@@ -240,20 +240,20 @@ void train_l19_update(char *moby)
                     }
                 }
                 vars->iE4 = -1;
-                if (*(s16 *)(moby + 0xAA) == 0xD9B /* Train */ || *(s16 *)(moby + 0xAA) == 0x11CF /* moby class 4559 */) {
+                if (*(s16 *)(moby + 0xAA) == MOBY_CLASS_TRAIN || *(s16 *)(moby + 0xAA) == 0x11CF /* moby class 4559 */) {
                     moby_set_state(moby, 5, -1);
                 } else {
                     moby_set_state(moby, 6, -1);
                 }
             }
         }
-        if (*(s16 *)(moby + 0xAA) == 0xD9B /* Train */) {
+        if (*(s16 *)(moby + 0xAA) == MOBY_CLASS_TRAIN) {
             matrix_mul_vec3(vecs[0], D_L19_001B0B60, moby + 0xC0);
             FastVecAdd(vecs[0], vecs[0], moby + 0x10);
-            hitCount = coll_process_hit(D_L19_001B0B70, vecs[0], 0, moby, 0);
-            if (hitCount != 0) {
-                for (hitIndex = 0; hitIndex < hitCount; hitIndex++) {
-                    target = D_L19_001C3F00[hitIndex];
+            hit_count = coll_process_hit(D_L19_001B0B70, vecs[0], 0, moby, 0);
+            if (hit_count != 0) {
+                for (hit_index = 0; hit_index < hit_count; hit_index++) {
+                    target = D_L19_001C3F00[hit_index];
                     if (target == ((Hero *)g_hero_state)->ptr[0x2290 / 4]) {
                         FastVecScale(vecs[1], moby + 0xC0, -D_L19_001B0B78);
                         vecs[1][2] = D_L19_001B0B78 * 4.0f;
@@ -302,7 +302,7 @@ void train_l19_update(char *moby)
             FastVecAdd(vars->v90, moby + 0x10, vars->v90);
             vec_scale_to_length(vars->v80, moby + 0xC0, D_L19_001B0BB4 * 0.016666668f);
             *(u16 *)(moby + 0x34) |= 8;
-            snd_play_from_class_bank(1, 0, moby, 0xD5C /* Train with Rail */);
+            snd_play_from_class_bank(1, 0, moby, MOBY_CLASS_TRAIN_WITH_RAIL);
             if (*(u8 *)(moby + 0x31) != 0) {
                 part_spawn_spray(moby);
             }
@@ -357,7 +357,7 @@ void train_l19_update(char *moby)
             if (*(u8 *)(moby + 0x31) != 0) {
                 part_spawn_spray(moby);
             }
-            snd_play_from_class_bank(1, 0, moby, 0xD5C /* Train with Rail */);
+            snd_play_from_class_bank(1, 0, moby, MOBY_CLASS_TRAIN_WITH_RAIL);
         } else if (*(u8 *)(moby + 0xBC) == 1) {
             FastVecScale(moby + 0xC0, moby + 0xC0, 1.0f / (1.0f - D_L19_001B0BD8[g_is_pal_video[0] != 0] * 0.016666668f));
             vars->fC0 = D_L19_001B0C20[0] + (D_L19_001B0C1C[0] - D_L19_001B0C20[0]) * (IntToFloat(moby_timer(moby)) / D_L19_001B0BE0);
@@ -382,7 +382,7 @@ void train_l19_update(char *moby)
         if (vars->iE4 == -1
             || *(char **)((sound = (char *)g_sound_state + vars->iE4 * 0x70) + 0x88) != moby
             || *(u8 *)(sound + 0x74) == 0) {
-            vars->iE4 = snd_play_from_class_bank(0, 4, moby, 0xD5C /* Train with Rail */);
+            vars->iE4 = snd_play_from_class_bank(0, 4, moby, MOBY_CLASS_TRAIN_WITH_RAIL);
         }
         if (*(u8 *)(moby + 0x31) != 0) {
             gfx_queue_draw_callback(D_L19_003E1C98, moby);
@@ -393,12 +393,12 @@ void train_l19_update(char *moby)
         break;
     case 2:
         if (vars->iD4 != -1 && coll_point_inside_region(D_L19_001B9A40, vars->iD4) == 0) {
-            linkRec = *(char **)(moby + 0x24);
-            savedState = *(u8 *)(moby + 0x94);
+            link_rec = *(char **)(moby + 0x24);
+            saved_state = *(u8 *)(moby + 0x94);
             *(u16 *)(moby + 0x34) = (*(u16 *)(moby + 0x34) & 0xFFBE) | 0x1000;
-            *(int *)(moby + 0x98) = *(int *)(linkRec + 0x10);
-            *(int *)(moby + 0x98) = *(int *)(linkRec + 0x10);
-            *(u8 *)(moby + 0x20) = savedState;
+            *(int *)(moby + 0x98) = *(int *)(link_rec + 0x10);
+            *(int *)(moby + 0x98) = *(int *)(link_rec + 0x10);
+            *(u8 *)(moby + 0x20) = saved_state;
         }
         break;
     }

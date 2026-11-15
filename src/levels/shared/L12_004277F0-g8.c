@@ -85,7 +85,7 @@ struct L12Private277 {
 /* Sets up the hopping enemy on its first frame, then handles its hit reactions and its distance check to the hero. */
 void hopping_enemy_init_react(char *obj) {
     struct L12Private277 *vars = *(struct L12Private277 **)(obj+0x68);
-    int hitResult;
+    int hit_result;
 
     if (!B(obj,0x20)) {
         if (D_L12_001A79F0[0] == 2 && F(obj,0x18) > 400.0f) {
@@ -142,10 +142,10 @@ void hopping_enemy_init_react(char *obj) {
     if(B(obj,0x31) && fast_vec_dist(obj+0x10,D_L12_001B9E00)<24.0f) {
         moby_update_ground_check(obj); B(obj,0x6F)=22;
     }
-    hitResult=moby_apply_damage_to_object(obj,(char *)vars+0x50,0);
-    if(hitResult) {
+    hit_result=moby_apply_damage_to_object(obj,(char *)vars+0x50,0);
+    if(hit_result) {
         hopping_enemy_alert_group(obj);
-        if(hitResult>=4) moby_set_state(obj,12,-1);
+        if(hit_result>=4) moby_set_state(obj,12,-1);
     }
     if((unsigned)(B(obj,0x95)-3)>=2)
         vars->f334=weapon_select_aim_target(obj,vars->f230,0,0,16.0f,0.0f);

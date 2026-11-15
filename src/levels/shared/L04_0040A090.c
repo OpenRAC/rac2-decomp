@@ -10,7 +10,7 @@ void path_measure_segments(int n, int (*pts)[2], float (*dirs)[4], float *lens, 
     float delta[4] __attribute__((aligned(16)));
     float from[4] __attribute__((aligned(16)));
     float to[4] __attribute__((aligned(16)));
-    float segLength;
+    float seg_length;
     int i;
     int next;
 
@@ -24,10 +24,10 @@ void path_measure_segments(int n, int (*pts)[2], float (*dirs)[4], float *lens, 
         to[1] = pts[next][1];
         to[2] = 0.0f;
         FastVecSub(delta, to, from);
-        segLength = FastVecLength(delta);
-        lens[i] = segLength;
+        seg_length = FastVecLength(delta);
+        lens[i] = seg_length;
         starts[i] = *total;
-        *total = *total + segLength;
-        FastVecScale(dirs[i], delta, 1.0f / segLength);
+        *total = *total + seg_length;
+        FastVecScale(dirs[i], delta, 1.0f / seg_length);
     }
 }

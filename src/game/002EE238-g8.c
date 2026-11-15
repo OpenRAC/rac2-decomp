@@ -26,7 +26,7 @@ void follower_move_toward_target(char *owner)
     char *pull;
     char *pos;
     V4_2EE238 temp;
-    float heightErr, scale, speed;
+    float height_err, scale, speed;
 
     if (vars == 0)
         return;
@@ -39,13 +39,13 @@ void follower_move_toward_target(char *owner)
     vec_scale_to_length(temp, pull, D_001AC240);
     FastVecAdd(vel, temp, vel);
     qcopy(temp, pos);
-    heightErr = (*(float *)(vars + 0x124) - D_001AC248 * 0.5f) / D_001AC248;
-    scale = math_fabs(heightErr);
+    height_err = (*(float *)(vars + 0x124) - D_001AC248 * 0.5f) / D_001AC248;
+    scale = math_fabs(height_err);
     if (scale < D_001AC240)
         scale = D_001AC240;
     if (D_001AC244 < scale)
         scale = D_001AC244;
-    if (0.0f < heightErr)
+    if (0.0f < height_err)
         scale = -scale;
     vec_scale_to_length(temp, temp, scale);
     FastVecAdd(vel, temp, vel);

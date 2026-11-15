@@ -218,7 +218,7 @@ void UpdateEndakoRespawningEnemy(u8 *moby) {
                 a.f[2]=coll_probe_ground_height_below(&a,0,0.5f); qcopy(&b,&a);
                 b.f[2]+=F(vars,0x50)+0.1f;
                 coll_test_point(&b,0,moby,F(vars,0x50));
-                if(!D_L03_001BFDD8 || H(D_L03_001BFDD8,0xaa)!=0xff3 /* Megacorp Sweeper Bot */) {
+                if(!D_L03_001BFDD8 || H(D_L03_001BFDD8,0xaa)!=MOBY_CLASS_MEGACORP_SWEEPER_BOT) {
                     moby_set_flag_bit(moby,0); I(vars,0x8c)=-1; sweeper_bot_reset_delays(moby);moby_set_state(moby,9,-1);
                     U(moby,0x34)=(U(moby,0x34)&0xffbe)|0x1000; I(moby,0x98)=I(P(moby,0x24),0x10);
                     if(moby[0x43])anim_start_blended(moby,0,0,0);

@@ -1,4 +1,5 @@
 #include "include_asm.h"
+#include "moby_classes.h"
 #include "names.h"
 
 typedef unsigned char u8;
@@ -301,7 +302,7 @@ void sweeper_bot_reset_delays(u8 *entity) {
     do {
         record = D_L03_001B2A1C + ((p->raw & 0x7FFF) << 8);
         if (*(signed char *)(record + 0x20) >= 0) {
-            if (*(short *)(record + 0xAA) == 0xFF3 /* Megacorp Sweeper Bot */) {
+            if (*(short *)(record + 0xAA) == MOBY_CLASS_MEGACORP_SWEEPER_BOT) {
                 u8 *owner = *(u8 **)(record + 0x68);
 
                 *(int *)(owner + 0x2D8) = func_31BA30(0x28, 0x32);

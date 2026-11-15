@@ -139,11 +139,11 @@ s32 nearest_rail_point(s8 *, void **, s128 *, void *, void *, s32 *, void *, s32
 
 /* Decides what the hero does next on this level: it looks at the current hero state and the buttons pressed, and switches to the matching new state. */
 void hero_l08_update_state_transitions(void) {
-    f32 jointPosA[4] __attribute__((aligned(16)));
-    f32 jointPosB[4] __attribute__((aligned(16)));
-    f32 velocityVec[4] __attribute__((aligned(16)));
-    s32 selectedSlot;
-    s32 foundValue;
+    f32 joint_pos_a[4] __attribute__((aligned(16)));
+    f32 joint_pos_b[4] __attribute__((aligned(16)));
+    f32 velocity_vec[4] __attribute__((aligned(16)));
+    s32 selected_slot;
+    s32 found_value;
     s32 sp48;
     f32 sp4C;
     void *sp50;
@@ -152,21 +152,21 @@ void hero_l08_update_state_transitions(void) {
     s32 sp5C;
     s32 sp60;
     s32 sp64;
-    s32 rampValue;
+    s32 ramp_value;
     s32 sp6C;
     s32 sp70;
     void *target;
-    s32 prevParamB;
-    s32 prevParamA;
-    s32 prevAnimation;
+    s32 prev_param_b;
+    s32 prev_param_a;
+    s32 prev_animation;
     s32 temp_a0_11;
-    s32 nextMode;
-    s32 padFlags;
+    s32 next_mode;
+    s32 pad_flags;
 
     target = FLD(g_hero_state, void *, 0x2290);
-    prevParamB = FLD(g_hero_state, s32, 0x229C);
-    prevParamA = FLD(g_hero_state, s32, 0x2298);
-    prevAnimation = FLD(target, u8, 0x43);
+    prev_param_b = FLD(g_hero_state, s32, 0x229C);
+    prev_param_a = FLD(g_hero_state, s32, 0x2298);
+    prev_animation = FLD(target, u8, 0x43);
     if (hero_check_surface_contact(1) != 0) {
         goto end;
     }
@@ -248,11 +248,11 @@ void hero_l08_update_state_transitions(void) {
         }
         anim = math_l00_return_argument(FLD(target, u8, 0x43));
         if ((anim == hero_get_weapon_animation_id(0)) && notcrouch) {
-            if (hero_choose_idle_anim(&selectedSlot) != 0) {
+            if (hero_choose_idle_anim(&selected_slot) != 0) {
                 u8 *rec;
                 FLD(g_hero_state, s16, 0x208) = 0x78;
-                FLD(g_hero_state, s32, 0x248C) = selectedSlot;
-                rec = D_L08_00266380 + selectedSlot * 0x70;
+                FLD(g_hero_state, s32, 0x248C) = selected_slot;
+                rec = D_L08_00266380 + selected_slot * 0x70;
                 FLD(rec, s32, 0x60) = FLD(rec, f32, 0x5C) * 60.0f;
                 if (FLD(rec, s32, 0x44) != 0) {
                     hero_l08_enter_state(0x3C, 1);
@@ -275,8 +275,8 @@ void hero_l08_update_state_transitions(void) {
             }
         }
         if (FLD(g_hero_state, s32, 0x1B8) >= 0xB) {
-            u8 *otherEntity = FLD(g_hero_state, u8 *, 0x1314);
-            if ((otherEntity != NULL) && (FLD(otherEntity, u8, 0x43) == 1) && (math_fast_float_d(g_hero_state + 0x24E8) != 0) && (FLD(D_L08_00266590, f32, 0x258) < 0.5585054f) && (FLD(D_L08_00266590, f32, 0x254) < 0.3490659f) && (FLD(g_hero_state, s32, 0x1334) == 2)) {
+            u8 *other_entity = FLD(g_hero_state, u8 *, 0x1314);
+            if ((other_entity != NULL) && (FLD(other_entity, u8, 0x43) == 1) && (math_fast_float_d(g_hero_state + 0x24E8) != 0) && (FLD(D_L08_00266590, f32, 0x258) < 0.5585054f) && (FLD(D_L08_00266590, f32, 0x254) < 0.3490659f) && (FLD(g_hero_state, s32, 0x1334) == 2)) {
                 FLD(g_hero_state, s32, 0x24E8) = math_random_int_range(0x6E, 0x10E);
                 hero_set_linked_objects_anim();
             }
@@ -364,7 +364,7 @@ void hero_l08_update_state_transitions(void) {
             hero_l08_enter_state(1, 1);
             break;
         }
-        if ((FLD(g_hero_state, s16, 0x34E) != 0) || ((padFlags = FLD(g_pad_state, s32, 0x1A0)) & 0x40) || (padFlags & 8)) {
+        if ((FLD(g_hero_state, s16, 0x34E) != 0) || ((pad_flags = FLD(g_pad_state, s32, 0x1A0)) & 0x40) || (pad_flags & 8)) {
             hero_l08_enter_state(0x3D, 1);
             break;
         }
@@ -911,14 +911,14 @@ void hero_l08_update_state_transitions(void) {
                     break;
                 }
             }
-            *(s128 *)velocityVec = 0;
-            velocityVec[0] = -0.083333336f;
-            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x16, (s8 *)jointPosA);
-            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x17, (s8 *)jointPosB);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), jointPosA, velocityVec, (s32 *)D_L08_001A7CA0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), jointPosA, velocityVec, (s32 *)D_L08_001A7CB0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), jointPosB, velocityVec, (s32 *)D_L08_001A7CA0, 1);
-            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), jointPosB, velocityVec, (s32 *)D_L08_001A7CB0, 1);
+            *(s128 *)velocity_vec = 0;
+            velocity_vec[0] = -0.083333336f;
+            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x16, (s8 *)joint_pos_a);
+            moby_transform_joint_to_world(FLD(g_hero_state, s8 *, 0x2290), 0x17, (s8 *)joint_pos_b);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), joint_pos_a, velocity_vec, (s32 *)D_L08_001A7CA0, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), joint_pos_a, velocity_vec, (s32 *)D_L08_001A7CB0, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), joint_pos_b, velocity_vec, (s32 *)D_L08_001A7CA0, 1);
+            part_spawn_object_relative_particle(FLD(g_hero_state, s8 *, 0x2290), joint_pos_b, velocity_vec, (s32 *)D_L08_001A7CB0, 1);
         }
         break;
     }
@@ -951,7 +951,7 @@ void hero_l08_update_state_transitions(void) {
     case 0x65:
     {
         s32 n = FLD(g_hero_state, s32, 0x18C0);
-        if ((n < 3) && (((n * 7) + 0xA) < FLD(g_hero_state, s32, 0x1B8)) && (PadPressedWithin(0x40, 7, &foundValue) != 0)) {
+        if ((n < 3) && (((n * 7) + 0xA) < FLD(g_hero_state, s32, 0x1B8)) && (PadPressedWithin(0x40, 7, &found_value) != 0)) {
             hero_l08_enter_state(0x66, 1);
         }
         if (FLD(g_hero_state, f32, 0x88) < (FLD(g_hero_state, f32, 0x334) - 1.2f)) {
@@ -1164,10 +1164,10 @@ void hero_l08_update_state_transitions(void) {
         }
         if (FLD(g_hero_state, f32, 0x24B8) > 0.5f) {
             if (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) < 0.78539824f) {
-                qcopy(jointPosA, g_hero_state + 0x80);
-                jointPosA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
-                jointPosA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
-                if (ProbeLedgeGrab((s8 *)jointPosA, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
+                qcopy(joint_pos_a, g_hero_state + 0x80);
+                joint_pos_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
+                joint_pos_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), 1.5707965f)) * 0.3f;
+                if (ProbeLedgeGrab((s8 *)joint_pos_a, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
                     hero_l08_enter_state(0x19, 1);
                 }
                 break;
@@ -1175,10 +1175,10 @@ void hero_l08_update_state_transitions(void) {
         }
         if (FLD(g_hero_state, f32, 0x24B8) > 0.5f) {
             if (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) < 0.78539824f) {
-                qcopy(jointPosA, g_hero_state + 0x80);
-                jointPosA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
-                jointPosA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
-                if (ProbeLedgeGrab((s8 *)jointPosA, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
+                qcopy(joint_pos_a, g_hero_state + 0x80);
+                joint_pos_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
+                joint_pos_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), -1.5707965f)) * 0.3f;
+                if (ProbeLedgeGrab((s8 *)joint_pos_a, (s8 *)(g_hero_state + 0x90), NULL) != 0) {
                     hero_l08_enter_state(0x1A, 1);
                 }
             }
@@ -1188,15 +1188,15 @@ void hero_l08_update_state_transitions(void) {
     case 0x1A:
     {
         f32 side;
-        *(s128 *)jointPosA = FLD(g_hero_state + 0x80, s128, 0);
+        *(s128 *)joint_pos_a = FLD(g_hero_state + 0x80, s128, 0);
         side = 1.5707965f;
         if (FLD(g_hero_state, u32, 0x2294) == 0x1A) {
             side = -1.5707965f;
         }
-        jointPosA[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
-        jointPosA[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
+        joint_pos_a[0] += math_fast_sin_or_cos_a(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
+        joint_pos_a[1] += math_fast_sin_or_cos_b(FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) * 0.3f;
         hero_resolve_stick_direction(0, 1.0f);
-        if ((FLD(g_hero_state, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) > 0.78539824f) || (ProbeLedgeGrab((s8 *)jointPosA, (s8 *)(g_hero_state + 0x90), NULL) == 0)) {
+        if ((FLD(g_hero_state, f32, 0x24B8) < 0.5f) || (FastDiffRots(FLD(g_hero_state, f32, 0x1A0), FastAddRotations(FLD(g_hero_state, f32, 0x98), side)) > 0.78539824f) || (ProbeLedgeGrab((s8 *)joint_pos_a, (s8 *)(g_hero_state + 0x90), NULL) == 0)) {
             if (FLD(g_hero_state, s32, 0xC28) & 2) {
                 hero_l08_enter_state(0x18, 1);
                 break;
@@ -1510,8 +1510,8 @@ void hero_l08_update_state_transitions(void) {
                     AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x438), left, FLD(g_hero_state, f32, 0x514), -1.0f);
                 }
             } else if (FLD(g_hero_state, u32, 0x2294) != 0xE) {
-                EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &rampValue, FLD(g_hero_state, f32, 0x520));
-                AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)rampValue, FLD(g_hero_state, f32, 0x514), -1.0f);
+                EvaluateQuantizedHeight((f32 *)(g_hero_state + 0x80), (f32 *)(g_hero_state + 0xF0), &ramp_value, FLD(g_hero_state, f32, 0x520));
+                AdjustHeroAnimationSpeedForTargetFrame(FLD(g_hero_state, f32, 0x4C8), (f32)ramp_value, FLD(g_hero_state, f32, 0x514), -1.0f);
                 if (FLD(g_hero_state, f32, 0xC20) > 1.5f) {
                     FLD(g_hero_state, f32, 0xC20) = 1.5f;
                 }
@@ -1753,17 +1753,17 @@ void hero_l08_update_state_transitions(void) {
         break;
     }
 end:
-    if (prevParamB != FLD(g_hero_state, s32, 0x229C)) {
+    if (prev_param_b != FLD(g_hero_state, s32, 0x229C)) {
         hero_clear_tracked_slots();
     }
-    nextMode = FLD(g_hero_state, s32, 0x22A0);
-    if (((nextMode == 0x3C) && (FLD(g_hero_state, s32, 0x2294) != 0x3D)) || ((nextMode == 0x3D) && (FLD(g_hero_state, s32, 0x1854) != 0))) {
+    next_mode = FLD(g_hero_state, s32, 0x22A0);
+    if (((next_mode == 0x3C) && (FLD(g_hero_state, s32, 0x2294) != 0x3D)) || ((next_mode == 0x3D) && (FLD(g_hero_state, s32, 0x1854) != 0))) {
         hero_clear_target_flags();
     }
-    if (prevParamA != FLD(g_hero_state, s32, 0x2298)) {
+    if (prev_param_a != FLD(g_hero_state, s32, 0x2298)) {
         FLD(g_hero_state, s32, 0x1C0) = 0;
     }
-    if (prevAnimation != FLD(target, u8, 0x43)) {
+    if (prev_animation != FLD(target, u8, 0x43)) {
         FLD(g_hero_state, s32, 0x1C4) = 0;
     }
 }

@@ -29,7 +29,7 @@ void held_platform_move_by_input(char *moby)
     float a[4],b[4],c[4];
     union { float m[12]; struct { float pad[4], d[4]; } v; } scratch;
     char *vars=*(char **)(moby+0x68);
-    char *heldMoby;
+    char *held_moby;
     int slot;
     if(*(u8 *)(moby+0x20)==2) {
         *(TI128 *)c=0;
@@ -38,38 +38,38 @@ void held_platform_move_by_input(char *moby)
         euler_rotation_basis(scratch.m,b);
         qcopy(a,D_0018BDD0.vec);
         if(FastVecLength(a)>0.0f && D_0018BDD0.mode==0x31) {
-            L03ControlEntry *controlEntry=(L03ControlEntry *)(g_sound_state+*(int *)(vars+0x108)*0x70);
-            if(controlEntry->owner!=moby || !controlEntry->active)
+            L03ControlEntry *control_entry=(L03ControlEntry *)(g_sound_state+*(int *)(vars+0x108)*0x70);
+            if(control_entry->owner!=moby || !control_entry->active)
                 *(int *)(vars+0x108)=PlayMobySound(0,4,moby);
         } else {
             slot=*(int *)(vars+0x108);
             if(slot!=-1) {
-                L03ControlEntry *controlEntry=(L03ControlEntry *)(g_sound_state+slot*0x70);
-                if(controlEntry->owner==moby && controlEntry->active) snd_stop_voice(slot);
+                L03ControlEntry *control_entry=(L03ControlEntry *)(g_sound_state+slot*0x70);
+                if(control_entry->owner==moby && control_entry->active) snd_stop_voice(slot);
             }
             *(int *)(vars+0x108)=-1;
         }
         a[0]=-a[0];
         matrix_mul_vec3(a,a,scratch.m);
-        heldMoby=*(char **)(vars+0xf0);
-        if(heldMoby) {
-            if(*(short *)(heldMoby+0xaa)==0xb85 /* moby class 2949 */) FastVecScale(a,a,D_L03_001B01AC*(1.0f/60.0f));
+        held_moby=*(char **)(vars+0xf0);
+        if(held_moby) {
+            if(*(short *)(held_moby+0xaa)==0xb85 /* moby class 2949 */) FastVecScale(a,a,D_L03_001B01AC*(1.0f/60.0f));
             else FastVecScale(a,a,D_L03_001B01B4*(1.0f/60.0f));
         } else FastVecScale(a,a,D_L03_001B01A4*(1.0f/60.0f));
     } else {
         slot=*(int *)(vars+0x108);
         if(slot!=-1) {
-            L03ControlEntry *controlEntry=(L03ControlEntry *)(g_sound_state+slot*0x70);
-            if(controlEntry->owner==moby && controlEntry->active) snd_stop_voice(slot);
+            L03ControlEntry *control_entry=(L03ControlEntry *)(g_sound_state+slot*0x70);
+            if(control_entry->owner==moby && control_entry->active) snd_stop_voice(slot);
         }
         *(int *)(vars+0x108)=-1;
         vec_clear_128(a);
     }
     FastVecSub(b,a,vars+0xe0);
     b[2]=0;
-    heldMoby=*(char **)(vars+0xf0);
-    if(heldMoby) {
-        if(*(short *)(heldMoby+0xaa)==0xb85 /* moby class 2949 */) vec_clamp_length(b,D_L03_001B01B0*0.000277777785f);
+    held_moby=*(char **)(vars+0xf0);
+    if(held_moby) {
+        if(*(short *)(held_moby+0xaa)==0xb85 /* moby class 2949 */) vec_clamp_length(b,D_L03_001B01B0*0.000277777785f);
         else vec_clamp_length(b,D_L03_001B01B8*0.000277777785f);
     } else {
         vec_clamp_length(b,D_L03_001B01A8*0.000277777785f);

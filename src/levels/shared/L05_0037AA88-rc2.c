@@ -30,25 +30,25 @@ extern s8 ref_L05_0037AA88_00[];
 s32 slot_find_active_in_chain(s32 index) {
     s32 stride ;
     s32 active ;
-    s8 *nextField;
-    s8 *activeField;
+    s8 *next_field;
+    s8 *active_field;
     s32 current;
     s32 offset;
 
     stride = 0x28;
-    nextField = ref_L05_0037AA88_00;
-    activeField = nextField - 4;
+    next_field = ref_L05_0037AA88_00;
+    active_field = next_field - 4;
     current = index;
 loop_1:
     if (current < 0) {
         goto end_1;
     }
     offset = current * stride;
-    active = *(s32 *)(offset + (s32)activeField);
+    active = *(s32 *)(offset + (s32)active_field);
     if (active != 0) {
         return current;
     }
-    current = *(s32 *)(offset + (s32)nextField);
+    current = *(s32 *)(offset + (s32)next_field);
     goto loop_1;
 end_1:
     return -1;

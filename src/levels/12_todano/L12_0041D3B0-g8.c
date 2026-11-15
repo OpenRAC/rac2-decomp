@@ -54,14 +54,14 @@ Destroy0:
         break;
     }
     case 1: {
-        s32 *childIds;
+        s32 *child_ids;
         s32 i;
 
         ready = 1;
-        childIds = (s32 *)vars;
+        child_ids = (s32 *)vars;
         for (i = 0; i < 3; i++) {
-            if (childIds[i] != -1) {
-                if (!linked_moby_is_finished(D_L12_001B2E9C_gp + (childIds[i] << 8)))
+            if (child_ids[i] != -1) {
+                if (!linked_moby_is_finished(D_L12_001B2E9C_gp + (child_ids[i] << 8)))
                     ready = 0;
             }
         }
@@ -71,15 +71,15 @@ Destroy0:
     }
     case 4: {
         u8 *base = D_L12_001B2E9C;
-        s32 *childIds;
+        s32 *child_ids;
         s32 i;
 
         *(f32 *)(vars + 0xC) += 0.0013888889f;
         *(f32 *)(self + 0x18) += *(f32 *)(vars + 0xC);
-        childIds = (s32 *)vars;
+        child_ids = (s32 *)vars;
         for (i = 0; i < 3; i++) {
-            if (childIds[i] != -1)
-                *(f32 *)((childIds[i] << 8) + (u32)base + 0x18) += *(f32 *)(vars + 0xC);
+            if (child_ids[i] != -1)
+                *(f32 *)((child_ids[i] << 8) + (u32)base + 0x18) += *(f32 *)(vars + 0xC);
         }
         if (*(f32 *)(vars + 0x10) + 8.0f < *(f32 *)(self + 0x18))
             self[0x20] = 5;
@@ -91,9 +91,9 @@ Destroy0:
         break;
 
     case 3: {
-        s32 *childIds;
+        s32 *child_ids;
         s32 i;
-        s32 *childIds2;
+        s32 *child_ids2;
         s32 j;
 
         if (math_fast_float_d(vars + 0x14)) {
@@ -106,19 +106,19 @@ Destroy0:
             vec_scale_to_length(temp, temp, 0.10000001f);
             part_spawn_masked_debris(self, 0xFFF, temp, 0xFF, 3.0f, 6.0f, 3.0f, 6.0f);
             moby_set_state(self, 5, -1);
-            childIds = (s32 *)vars;
+            child_ids = (s32 *)vars;
             for (i = 0; i < 3; i++) {
-                if (childIds[i] != -1) {
-                    D_L12_001B2E9C_gp[(childIds[i] << 8) + 0x20] = 4;
-                    linked_moby_trigger_burst(D_L12_001B2E9C + (childIds[i] << 8));
+                if (child_ids[i] != -1) {
+                    D_L12_001B2E9C_gp[(child_ids[i] << 8) + 0x20] = 4;
+                    linked_moby_trigger_burst(D_L12_001B2E9C + (child_ids[i] << 8));
                 }
             }
         }
         if (*(s32 *)(vars + 0x14) == D_L12_001B1DC0 / 2) {
-            childIds2 = (s32 *)vars;
+            child_ids2 = (s32 *)vars;
             for (j = 0; j < 3; j++) {
-                if (childIds2[j] != -1)
-                    D_L12_001B2E9C_gp[(childIds2[j] << 8) + 0x20] = 4;
+                if (child_ids2[j] != -1)
+                    D_L12_001B2E9C_gp[(child_ids2[j] << 8) + 0x20] = 4;
             }
         }
         break;
@@ -126,16 +126,16 @@ Destroy0:
     case 5: {
         u8 *base, *child, *counter;
         u16 id;
-        s32 *childIds;
+        s32 *child_ids;
         s32 i;
 
-        childIds = (s32 *)vars;
+        child_ids = (s32 *)vars;
         for (i = 0; i < 3; i++) {
-            if (childIds[i] != -1) {
+            if (child_ids[i] != -1) {
                 base = D_L12_001B2E9C_gp;
-                child = (u8 *)((childIds[i] << 8) + (u32)base);
+                child = (u8 *)((child_ids[i] << 8) + (u32)base);
                 *(u16 *)(child + 0x34) &= 0xEFFF;
-                moby_mark_spawned(base + (childIds[i] << 8));
+                moby_mark_spawned(base + (child_ids[i] << 8));
             }
         }
         id = *(u16 *)(self + 0xB2);

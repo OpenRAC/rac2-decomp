@@ -39,7 +39,7 @@ typedef struct {
 /* Draws the glowing streak behind the homing shot. */
 void homing_shot_draw_trail(char *object) {
     EffectPacket packet;
-    EffectVector cameraDelta;
+    EffectVector camera_delta;
     EffectVector segment;
     EffectVector midpoint;
     EffectVector normal;
@@ -59,10 +59,10 @@ void homing_shot_draw_trail(char *object) {
     state->scroll += 0.1f;
     if (state->scroll >= 4.0f) state->scroll -= 4.0f;
     position = object + 0x10;
-    FastVecSub(&cameraDelta, position, g_camera_l00_position);
+    FastVecSub(&camera_delta, position, g_camera_l00_position);
     vec_scale_to_length(&segment, &state->axis, -2.0f);
     FastVecAdd(&midpoint, position, &segment);
-    FastVecCross(&normal, &cameraDelta, &segment);
+    FastVecCross(&normal, &camera_delta, &segment);
     vec_scale_to_length(&normal, &normal, 0.1f);
     FastVecAdd(VERTEX(packet,0), position, &normal);
     FastVecSub(VERTEX(packet,1), position, &normal);

@@ -30,7 +30,7 @@ int enemy_try_notice_player(u8 *moby) {
         return 0;
     case 0xED4 /* moby class 3796 */:
         range = D_L18_001B1280;
-    case 0xEE1 /* Receiver Bot */:
+    case MOBY_CLASS_RECEIVER_BOT:
         if (func_00308AD0(moby + 0x10, state + 0x220) < range && !*(s16 *)(state + 0x396) && !D_L18_001AFBB0 && D_L18_00189E20.mode != 0x6F) {
             moby_start_or_forward_anim(moby, 10, 0, 10.0f);
             func_00335668(moby, 6, -1);

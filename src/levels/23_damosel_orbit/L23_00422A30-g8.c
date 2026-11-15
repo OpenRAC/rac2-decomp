@@ -52,20 +52,20 @@ extern s32 PlayMobySound(s32, s32, u8 *);
    the aim test, dropping the target when the aim, the range or the helper says so. */
 /* Creates a homing shot. It chooses a target (given, the hero, or none), points the shot
    at it, and drops the target if it is too far, off to the side or blocked. */
-u8 *SpawnTrackingEffect(u8 *src, TI16 *pos, u8 *target, s32 trackMoby, s32 trackPoint) {
+u8 *SpawnTrackingEffect(u8 *src, TI16 *pos, u8 *target, s32 track_moby, s32 track_point) {
     u8 *obj;
     u8 *vars;
     TI16 loc[4];
-    float targetValue;
-    float sourceValue;
+    float target_value;
+    float source_value;
     float distance;
-    float aimDot;
-    s32 tooFarOff;
+    float aim_dot;
+    s32 too_far_off;
     u8 *hero;
     TI16 row0;
     TI16 row1;
     TI16 row2;
-    TI16 *backDir;
+    TI16 *back_dir;
 
     obj = CreateMoby(0x118F /* moby class 4495 */);
     if (obj != 0) {
@@ -84,8 +84,8 @@ u8 *SpawnTrackingEffect(u8 *src, TI16 *pos, u8 *target, s32 trackMoby, s32 track
         qcopy(obj + 0x10, pos);
         *(s32 *)(vars + 0x14) = 0x96;
         *(float *)(obj + 0x2C) = *(float *)(obj + 0x2C) + *(float *)(obj + 0x2C);
-        vars[0x28] = trackMoby;
-        vars[0x29] = trackPoint;
+        vars[0x28] = track_moby;
+        vars[0x29] = track_point;
         hero = g_mothership_boss_moby;
         if (target != 0) {
             *(u8 **)(vars + 0x18) = target;
@@ -93,7 +93,7 @@ u8 *SpawnTrackingEffect(u8 *src, TI16 *pos, u8 *target, s32 trackMoby, s32 track
         } else {
             if (hero != 0) {
                 *(u8 **)(vars + 0x18) = hero;
-                if (*(s16 *)(hero + 0xAA) == 0xF7F /* Mothership Boss Part */) {
+                if (*(s16 *)(hero + 0xAA) == MOBY_CLASS_MOTHERSHIP_BOSS_PART) {
                     *(s32 **)(vars + 0x2C) = &D_L23_001B36E0;
                 } else {
                     *(u8 **)(vars + 0x2C) = hero + 0x10;
@@ -116,29 +116,29 @@ u8 *SpawnTrackingEffect(u8 *src, TI16 *pos, u8 *target, s32 trackMoby, s32 track
             qcopy(&loc[1], obj + 0x10);
             mothership_project_point_onto_surface(&loc[1], 0.0f);
             FastVecSub(&loc[2], &loc[0], &loc[1]);
-            tooFarOff = 0;
+            too_far_off = 0;
             vec_scale_to_length(&loc[2], &loc[2], 1.0f);
             vec_scale_to_length(vars + 0x30, vars + 0x30, 1.0f);
-            sourceValue = gravity_get_center_distance(src + 0x10);
-            targetValue = gravity_get_center_distance(*(u8 **)(vars + 0x2C));
+            source_value = gravity_get_center_distance(src + 0x10);
+            target_value = gravity_get_center_distance(*(u8 **)(vars + 0x2C));
             distance = fast_vec_dist(&loc[0], &loc[1]);
             if (distance < 5.0f) {
-                if (math_fabs(sourceValue - targetValue) > 10.0f) {
-                    tooFarOff = 1;
+                if (math_fabs(source_value - target_value) > 10.0f) {
+                    too_far_off = 1;
                 }
             }
             qcopy(&loc[3], obj + 0xC0);
-            aimDot = FastVecDot(&loc[2], &loc[3]);
+            aim_dot = FastVecDot(&loc[2], &loc[3]);
             if ((src == g_hero_state.f2290 && *(*(u8 **)(vars + 0x18) + 0x31) == 0) ||
-                aimDot < D_L23_001B1928 || 50.0f < distance || tooFarOff != 0 || mothership_is_held() != 0) {
+                aim_dot < D_L23_001B1928 || 50.0f < distance || too_far_off != 0 || mothership_is_held() != 0) {
                 *(s32 *)(vars + 0x18) = 0;
             }
             if (src == g_hero_state.f2290) {
                 if (*(s32 *)(vars + 0x18) != 0) {
                     g_hero_state.f188C = vars + 0x30;
                 } else if (g_hero_state.f2294 == 0x5B) {
-                    backDir = (TI16 *)(src + 0xE0);
-                    qcopy(&D_L23_001B1FB0, backDir);
+                    back_dir = (TI16 *)(src + 0xE0);
+                    qcopy(&D_L23_001B1FB0, back_dir);
                     FastVecScale(&D_L23_001B1FB0, &D_L23_001B1FB0, -1.0f);
                     g_hero_state.f188C = (u8 *)&D_L23_001B1FB0;
                     qcopy(vars + 0x30, &D_L23_001B1FB0);

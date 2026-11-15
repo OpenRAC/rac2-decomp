@@ -100,10 +100,10 @@ extern void level_run_callbacks(void),UpdateSoundVoices(void);
 /* Advances the purchase menu and its model previews, then runs the shared update. */
 void UpdatePurchaseMenuAndPreview(void)
 {
-    int i, itemId;
+    int i, item_id;
     char *m;
     float x, y;
-    double stickMagnitude;
+    double stick_magnitude;
     float vec[4];
 
     switch (g_purchase_menu_model[0].f00) {
@@ -125,11 +125,11 @@ void UpdatePurchaseMenuAndPreview(void)
         if (g_purchase_menu_model[0].f08) {
             g_purchase_menu_model[0].f08 = 0;
             if (g_purchase_menu_model[0].fa0 >= 0) {
-                itemId = g_copy_setup_data[0].entries[g_purchase_menu_model[0].fa0].value;
+                item_id = g_copy_setup_data[0].entries[g_purchase_menu_model[0].fa0].value;
                 snd_pump_music_and_disc_read(1);
-                LoadClassIntoFreeCacheSlot(itemId);
+                LoadClassIntoFreeCacheSlot(item_id);
                 snd_pump_music_and_disc_read(1);
-                SwitchCachedDiscAsset(itemId);
+                SwitchCachedDiscAsset(item_id);
             } else {
                 D_00152CE4 = -1;
             }
@@ -181,7 +181,7 @@ void UpdatePurchaseMenuAndPreview(void)
                 matrix_mul_vec3(m + 16, MENU + 0xC0, (char *)g_purchase_menu_model[0].f28 + 0xC0);
                 FastVecAdd(m + 16, m + 16, (char *)g_purchase_menu_model[0].f28 + 16);
                 MF(0x2C) = *(float *)(*(char **)(m + 0x24) + 0x24) * g_purchase_menu_model[0].f98;
-                if (*(short *)(m + 0xAA) == 0x10E3 /* Spaceship Attachment */)
+                if (*(short *)(m + 0xAA) == MOBY_CLASS_SPACESHIP_ATTACHMENT_15)
                     m[0x23] = g_purchase_menu_model[0].f94 / 2;
                 else
                     m[0x23] = g_purchase_menu_model[0].f94;
@@ -204,15 +204,15 @@ void UpdatePurchaseMenuAndPreview(void)
                     MF(0xF0) = g_purchase_menu_model[0].fb4;
                     MF(0xF4) = g_purchase_menu_model[0].fb8;
                     MF(0xF8) = g_purchase_menu_model[0].fbc;
-                    stickMagnitude = x;
-                    if (stickMagnitude < 0.0)
-                        stickMagnitude = 0.0 - stickMagnitude;
-                    if (stickMagnitude > (double)0.0001f)
+                    stick_magnitude = x;
+                    if (stick_magnitude < 0.0)
+                        stick_magnitude = 0.0 - stick_magnitude;
+                    if (stick_magnitude > (double)0.0001f)
                         goto moved;
-                    stickMagnitude = y;
-                    if (stickMagnitude < 0.0)
-                        stickMagnitude = 0.0 - stickMagnitude;
-                    if (stickMagnitude > (double)0.0001f) {
+                    stick_magnitude = y;
+                    if (stick_magnitude < 0.0)
+                        stick_magnitude = 0.0 - stick_magnitude;
+                    if (stick_magnitude > (double)0.0001f) {
                     moved:
                         g_purchase_menu_model[0].fa4 = 180;
                     }
