@@ -142,6 +142,7 @@ extern float func_002A89A8(void *, int, float);
 extern void func_002E5CF8(int, int, CrateMoby *);
 extern void func_002A0488(CrateMoby *, int, int, int);
 
+/* Moby update: Crate (class 500, PS3 name); Nanotech Crate (class 501, PS3 name); Explosive Crate (class 505, PS3 name); Ammo Crate (class 511, PS3 name); Purple Nanotech Crate (class 512, PS3 name). */
 void func_00310E98(CrateMoby *moby)
 {
     CrateBurst burst;

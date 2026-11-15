@@ -43,6 +43,7 @@ extern int func_002829D8(void *);
 extern void func_L00_003EE8E8(void *);
 extern void ref_L00_003EE4C0_00(void (*)(void *), void *);
 
+/* Moby update: Gravity Bomb (class 3299). */
 void func_L00_003EE4C0(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *target;

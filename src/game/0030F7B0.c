@@ -70,6 +70,7 @@ extern void func_002A7470(void *, int, int, int);
 extern void func_0029F338(void *);
 extern void func_002A10E8(void *);
 
+/* Moby update: Swingshot Hook (class 209, PS3 name). */
 void func_00310A40(unsigned char *self)
 {
     static void *cases[8] = {&&c0, &&c1, &&c2, &&c3, &&c4, &&c5, &&c6, &&c7};

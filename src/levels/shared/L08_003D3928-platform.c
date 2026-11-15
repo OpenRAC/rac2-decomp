@@ -20,6 +20,7 @@ extern void func_002AD6F0(void *, void *, void *, void *);
 #define E_F(p,o) (*(float *)((u8 *)(p)+(o)))
 typedef struct { u8 pad[0x60]; TI128 pos; TI128 rot; int index; float duration; float progress; u8 pad2[2]; u8 trigger; u8 side; int sound; } EPlatform;
 typedef struct { u8 pad[0xf0]; float rx, ry, rz; } EMob;
+/* Moby update: Elevator (class 2730, PS3 name). */
 void func_L08_003E5BB8(u8 *m)
 {
     TI128 oldpos, oldrot, delta;

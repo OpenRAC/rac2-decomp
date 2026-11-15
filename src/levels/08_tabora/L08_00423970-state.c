@@ -54,6 +54,7 @@ extern void func_L08_003D3928(char *, void *);
    below the height at +0x1C4, patrol and attack, recover
    from a hit, and on death spawn a replacement moby and clear its saved flag bits.
    Case 0 of the patrol switch repeats case 4's attack check; jump2 cross-jumps them. */
+/* Moby update: Desert Dune Monster (class 4098, PS3 name). */
 void func_L08_00426730(char *actor) {
     char *p;
     float local[4] __attribute__((aligned(16)));

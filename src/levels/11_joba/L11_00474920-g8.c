@@ -20,6 +20,7 @@ extern float func_00283248(float, float);
 extern float func_00283C80(float, float);
 extern float func_00283B98(float, float);
 
+/* Moby update: Arena Crowd (class 4718, PS3 name). */
 void func_L11_00474920(u8 *object) {
     float bounds[4];
     float center[4];

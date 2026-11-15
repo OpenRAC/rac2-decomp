@@ -26,6 +26,7 @@ extern void func_002B0A18(int,int),func_0029B3E0(int,int),func_002E5CF8(int,int,
 extern void func_L00_002D2168(int,int,float),func_L00_002B9D60(void*,void*,int,int),func_003355A8(int);
 extern int func_00282948(void*);
 
+/* Moby update: Platinum Bolt (class 1134, PS3 name). */
 void func_L01_003973A0(unsigned char *m)
 {
     char *p = *(char **)(m+0x68);

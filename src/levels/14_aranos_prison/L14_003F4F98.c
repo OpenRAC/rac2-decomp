@@ -324,6 +324,7 @@ extern void func_423358();
 extern void func_423B30();
 extern void func_423BD8();
 
+/* Moby update: Space Tourist (class 3985, PS3 name). */
 void func_L14_00422FA0(char *a0)
 {
     if (*(unsigned char *)(a0 + 0x20) == 0) {

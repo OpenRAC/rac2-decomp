@@ -59,6 +59,7 @@ extern int func_002F5D10(void);
    18 and moves on when bit 0x10 of D_00138324 is set and D_L00_001A8FB4 is 4; 2 waits for
    func_00288AA0 on D_L09_001BFC00; 3 and 4 finish it. The frame counter at +0x96 saturates.
    The vector clear is qzero_nc: retail clears through a register address. */
+/* Moby update: Giant Clank Pad (class 3712, PS3 name). */
 void func_L09_00410200(u8 *obj)
 {
     float pos[4];

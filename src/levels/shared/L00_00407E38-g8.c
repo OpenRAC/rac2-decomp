@@ -41,6 +41,7 @@ typedef int AI_Quad __attribute__((mode(TI)));
 #define AI_P(p,n) (*(char **)((char *)(p)+(n)))
 #define AI_B(p,n) (*(unsigned char *)((char *)(p)+(n)))
 
+/* Moby update: Dark Sheep (class 3760, PS3 name). */
 void func_L00_00407E38(char *object)
 {
     float end[4], offset[4], scratch[4], front[4], back[4], matrix[4];

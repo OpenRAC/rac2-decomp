@@ -91,6 +91,7 @@ extern void func_00291450(int);
 
 
 /* Acquires a stable target, fires and drives the short muzzle light. */
+/* Moby update: Minirocket Tube (class 1487). */
 void func_L00_003A48D0(Moby *moby)
 {
     TurretVars *vars = moby->vars;

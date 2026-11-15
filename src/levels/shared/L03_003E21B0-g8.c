@@ -38,6 +38,7 @@ typedef struct {
     int sound;
 } PathRecord;
 
+/* Moby update: Infiltrator Ball (class 2856, PS3 name). */
 void func_L03_003E21B0(u8 *p) {
     u8 *q = *(u8 **)(p + 0x68);
     PathRecord *path = (PathRecord *)q;

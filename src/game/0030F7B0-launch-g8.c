@@ -61,6 +61,7 @@ extern void func_00316248(void *);
 /* Update of the lock-on launcher: 0 clears the effect slots, 1 aims at the nearest target and
    waits for the fire button, 2 launches at it and starts three effects, 3 and 4 time the
    cool-down. */
+/* Moby update: Dynamo (class 2085). */
 void func_00315E20(u8 *obj)
 {
     float dir[4];

@@ -75,6 +75,7 @@ extern void func_003058C8(void *);
 #define PP(p,o) (*(unsigned char **)((p)+(o)))
 #define PV(p,o) (*(ProjectileVector *)((p)+(o)))
 
+/* Moby update: Miniturret (class 4966, PS3 name). */
 void func_00304210(unsigned char *object) {
     unsigned char *state = PP(object, 0x68);
     unsigned char *attached, *created;

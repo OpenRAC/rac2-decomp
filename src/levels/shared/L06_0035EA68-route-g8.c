@@ -71,6 +71,7 @@ typedef struct {
     u8 route;
 } RouteMoby;
 #define M ((RouteMoby *)moby)
+/* Moby update: Taxi (class 816, PS3 name). */
 void func_L06_003E3F28(char *moby)
 {
     float oldpos[4] __attribute__((aligned(16)));

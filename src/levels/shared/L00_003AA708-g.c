@@ -62,6 +62,7 @@ extern void func_0029F338(void *);
 #define P(p, o) (*(char **)((char *)(p) + (o)))
 #define B(p, o) (*(u8 *)((char *)(p) + (o)))
 
+/* Moby update: Seeker Projectile (class 1497, PS3 name). */
 void func_L00_003AA708(char *moby)
 {
     struct {

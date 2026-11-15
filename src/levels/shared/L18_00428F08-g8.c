@@ -94,6 +94,7 @@ extern s32 func_L18_004283F0(void *);
 extern void func_L18_00428738(void *);
 extern void func_L18_00428AE8(void *);
 
+/* Moby update: Receiver Bot (class 3809, PS3 name). */
 void func_L18_00428F08(u8 *a0) {
     float ref[4] __attribute__((aligned(16)));
     float a[4] __attribute__((aligned(16)));

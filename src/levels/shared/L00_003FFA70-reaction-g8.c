@@ -64,6 +64,7 @@ extern char D_L00_001B8FF0[];
 #define F(p, n) (*(float *)((char *)(p) + (n)))
 #define B(p, n) (*(unsigned char *)((char *)(p) + (n)))
 
+/* Moby update: Zodiac (class 3784). */
 void func_L00_00408E58(char *o)
 {
     char *q = *(char **)(o + 104);

@@ -96,6 +96,7 @@ extern void func_002A9288(void *, float);
 #define STATE(p) (*(unsigned char *)((p) + 0x20))
 
 /* Advances launch, grounded movement, falling and teardown states of a timed actor. */
+/* Moby update: Turret Spider Bot (class 3705, PS3 name). */
 void func_L00_003FFBA0(char *obj)
 {
     /* The query and attachment transform use the same workspace in separate phases. */

@@ -65,6 +65,7 @@ extern void func_L02_0040B4B0(u8 *);
 extern void func_L00_002E6EF8(void (*)(u8 *), void *);
 
 /* Update the sentry's patrol, alert state and close-range flame effect. */
+/* Moby update: Megacorp Security Robot - Flamethrower (class 3131, PS3 name). */
 void func_L02_0040A4A8(u8 *object)
 {
     ActorVector target;

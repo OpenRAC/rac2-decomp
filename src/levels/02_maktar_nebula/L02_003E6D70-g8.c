@@ -47,6 +47,7 @@ typedef struct {
    and 4 hand over to their own updates; 5 destroys it, with a blast and two prizes when the word at
    +0xA4 is set. Every state but 5 then takes a hit: a hard one from a class other than 0 and 0x47
    destroys it, and in state 1 one from class 0x47 spends ten bolts and starts a spin. */
+/* Moby update: Slot Machine (class 2716). */
 void func_L02_003E6D70(char *actor) {
     char *state = *(char **)(actor + 0x68);
     float point[4];

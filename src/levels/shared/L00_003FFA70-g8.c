@@ -109,6 +109,7 @@ extern void func_L00_00402DD8(char *arg);
    object types, or a ground normal too steep), then 0/1 wait for the player's input to
    start (player+0x1E0 = 120 and a sound), 2 spawns a func_L00_004005B0 object after the
    ctx+32 timer, 3 returns to 1 after the timer; D_00189E20 is the player block */
+/* Moby update: Tankbot Glove (class 3706). */
 void func_L00_004029E8(char *obj)
 {
     float pos[4], offset[4], normal[4];

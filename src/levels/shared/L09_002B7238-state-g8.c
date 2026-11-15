@@ -21,6 +21,7 @@ extern void func_L09_003E99E0(void *);
 extern void func_L09_003EA360(void *);
 extern void func_L09_003E9AA0(void *);
 extern void func_L09_003EA9D0(void *);
+/* Moby update: Megacorp Hover Tank (class 3260, PS3 name). */
 void func_L09_003EAB20(char *object)
 {
     char *state;

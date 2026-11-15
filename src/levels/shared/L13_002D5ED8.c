@@ -124,6 +124,7 @@ extern float func_00283B98(float, float);
 
 /* State 0 opens the trigger; state 1 reacts to the hero being on the object, or being in state
  * 0x82 inside its cuboid. Then pulses the object's colour, in the channel the flag selects. */
+/* Moby update: Levitator Pad (class 2274, PS3 name). */
 void func_L13_003C5908(char *obj)
 {
     char *rig = *(char **)(obj + 0x68);

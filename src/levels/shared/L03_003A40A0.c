@@ -27,6 +27,7 @@ extern void func_002C3150(void *, void *, int, int, int, int, float);
 extern void func_L03_0043AD30(void *);
 extern int func_L02_002EF388(void *, void *, void *, int, int);
 
+/* Moby update: Swingshot Node (classes 758, 803, PS3 name). */
 void func_L03_003A40A0(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *related;

@@ -50,6 +50,7 @@ extern s32 D_L12_001A903C;
 #define REST(o) { I(o,0x98)=0; U(o,0x34)=(U(o,0x34)|0x41)&0xEFFF; }
 /* Waypoint-following state machine for a level 12 object: walks a path of 0x80-byte
  * waypoints, looks at targets, and counts hits in D_L12_001B09F0 (50/100/150/200). */
+/* Moby update: Space Tourist (class 3000, PS3 name). */
 void func_L12_003DF9A0(u8 *o) {
     u8 *s=*(u8 **)(o+0x68);
     f32 v[4] __attribute__((aligned(16)));

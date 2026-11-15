@@ -79,6 +79,7 @@ typedef struct {
     float w2;
 } KilonoidObjectView;
 
+/* Moby update: Kilonoid (class 2818). */
 void func_L00_003D4A20(unsigned char *object)
 {
     float temp[4];

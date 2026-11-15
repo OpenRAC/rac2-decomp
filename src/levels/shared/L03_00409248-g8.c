@@ -37,6 +37,7 @@ extern int func_002B49E0(int,int,u8 *,int,int);
 extern void func_00282CF0(void *,void *,void *);
 extern float func_00282DF0(void *);
 extern void func_00282FB8(void *,void *,float);
+/* Moby update: Slim Cognito Button (class 3548, PS3 name). */
 void func_L03_00409248(u8 *e) {
  float v[4], angle, delta, interpolated[4];
  u8 *s=*(u8 **)(e+0x68), *other, *p, *cam;

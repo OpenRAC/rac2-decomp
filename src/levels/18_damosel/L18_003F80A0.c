@@ -242,6 +242,7 @@ extern void func_L18_00430E58(u8 *a0);
 extern void func_L18_00432070(u8 *a0);
 extern void func_L18_00432310(u8 *a0);
 
+/* Moby update: Extermibot Legs (class 3850, PS3 name). */
 void func_L18_00430248(u8 *a0) {
     u8 v = *(u8 *)(a0 + 0x20);
     if (v == 0) {

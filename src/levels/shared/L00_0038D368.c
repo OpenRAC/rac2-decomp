@@ -5,6 +5,7 @@ extern int func_00282978(short *);
 extern void func_0029F338(void *);
 
 
+/* Moby update: Explosion Effect (class 1192, PS3 name). */
 void func_L00_0038D368(char *object)
 {
     char *data = *(char **)(object + 0x68);

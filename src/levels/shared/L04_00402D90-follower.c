@@ -31,6 +31,7 @@ extern void func_L04_00410518(u8 *, u8 *, void *, void *, void *, void *);
    phases; state 2 runs its behaviours while the leader is not waiting; state 3 walks to the
    nearest path node and, after 300 frames, leaves for the leader once it is 5 units away and
    out of sight; state 4 drops both targets. The leader's own state can hold it entirely. */
+/* Moby update: Enemy Hoverbike (class 2861, PS3 name). */
 void func_L04_004045E0(u8 *obj)
 {
     u8 *st = *(u8 **)(obj + 0x68);

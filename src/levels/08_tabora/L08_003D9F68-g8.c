@@ -48,6 +48,7 @@ extern MobyFlags D_L08_0021DE80, D_L08_0021EAF0;
 extern u8 D_L08_001B2840[] MACRO_ADDR;
 extern u8 D_0019B2E8[],D_0019B4A8[];
 extern int D_001A79F0 MACRO_ADDR;
+/* Moby update: Spitting Dune Crawler (class 2502, PS3 name). */
 void func_L08_003D9F68(u8 *object)
 {
     u8 *state=P(object,0x68);

@@ -88,6 +88,7 @@ extern void func_L01_003CC210(u8 *);
 extern void func_L01_003CC280(u8 *);
 extern void func_L01_003CC898(u8 *, void *, void *, u8, void *);
 
+/* Moby update: Swamp Monster I Arm (class 2701, PS3 name). */
 void func_L01_003CC930(u8 *self)
 {
     f32 v10[4];

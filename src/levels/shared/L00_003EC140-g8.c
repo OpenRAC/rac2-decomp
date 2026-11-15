@@ -131,6 +131,7 @@ extern void func_002C2210(void *, int, int,int, int, void *, int,float, float,fl
 
 /* Update the three object states, emit fading particles, and orient the object
  * from the camera basis and its three stored angles. */
+/* Moby update: Synthenoid (class 3250). */
 void func_L00_003EC140(Object *object)
 {
     Vec vector, matrix;

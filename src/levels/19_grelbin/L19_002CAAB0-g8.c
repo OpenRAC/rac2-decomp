@@ -55,6 +55,7 @@ typedef struct {
     int sound;
 } GrelbinState;
 
+/* Moby update: Infiltrator Ball (class 2856, PS3 name). */
 void func_L19_003D2E38(char *m)
 {
     GrelbinState *p;

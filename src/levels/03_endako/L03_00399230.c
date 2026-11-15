@@ -133,6 +133,7 @@ void func_L03_003C85F8(char *a0, s32 a1)
 
 /* Picks the actor's next motion slot: case 0 draws a random turn rate, case 1
    re-checks the 0x70-stride table entry before refreshing the aim. */
+/* Moby update: Ant Ring (class 2452). */
 void func_L03_003CBD70(char *a0)
 {
     char *s0 = a0;

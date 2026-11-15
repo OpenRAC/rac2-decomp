@@ -49,6 +49,7 @@ extern void func_L00_003FE490(void *);
 
 typedef struct { char *target; int pad04; float timer; s16 delay; s16 repeat; } BeamState;
 
+/* Moby update: Hoverbomb Gun (class 2651). */
 void func_L00_003C3418(unsigned char *object) {
     float origin[4];
     AimEntry *entry;

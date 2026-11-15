@@ -34,6 +34,7 @@ extern void func_L00_003959C0(void);
 /* func_L00_002E6EF8 in most levels; its address differs per level. */
 extern void ref_L00_00395428_00(void *, void *);
 
+/* Moby update: Walloper (class 180). */
 void func_L00_00395428(char *object)
 {
     Vector origin, random, difference, offsets[5];

@@ -16,6 +16,7 @@ extern Vector4 D_L00_001AEC90[2] __attribute__((sda));
 extern float D_L00_001AEC88[2] __attribute__((sda));
 extern float D_L00_001AEC80[2] __attribute__((sda));
 extern int D_L00_001AECB0 __attribute__((sda));
+/* Moby update: Lamp (class 4858, PS3 name). */
 void func_L00_00382910(unsigned char *object)
 {
     Vector4 velocity,zero,acceleration;

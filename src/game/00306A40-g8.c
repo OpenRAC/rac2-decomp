@@ -69,6 +69,7 @@ extern void func_003073E0(void *),func_00307440(void *),func_00307BF0(void *);
 extern void func_0027CFD0(void (*)(void *),void *);
 /* The state machine of an object fired at a surface: flies and sweeps for a hit, sticks or
    bursts on what it hit, then follows what it stuck to until it is destroyed. */
+/* Moby update: Megaturret (class 4967, PS3 name). */
 void func_00306A40(ProjectileObject *self)
 {
     Vec old;

@@ -81,6 +81,7 @@ extern void func_00283098(void *, void *, void *);
 #define HERO ((Hero *)D_00189E20)
 #define TYPE(m) (*(short *)((m) + 0xAA))
 
+/* Moby update: Lancer (class 1490). */
 void func_L00_003A6C30(char *moby)
 {
     Vector muzzle, targetPosition, playerPoint, offset, direction;

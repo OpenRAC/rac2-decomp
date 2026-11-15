@@ -21,6 +21,7 @@ extern void func_002AFFD8(void *,void *,int),func_00282DD8(void *,void *,void *)
 extern void func_00283958(void *,void *),func_00283738(void *,void *,void *);
 extern void func_00335370(void *),func_002AB6D8(float *,float *),func_003353C8(void *);
 #define F(p,o) (*(float *)((char *)(p)+(o)))
+/* Moby update: Electrolyzer (class 2160). */
 void func_L00_003B58B8(unsigned char *object)
 {
     Vector position,angles;

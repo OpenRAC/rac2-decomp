@@ -115,6 +115,7 @@ extern u8 D_0019B2E8[] NOT_SDA;
 extern u8 *D_L01_001B255C;
 extern u8 *D_L01_001B264C;
 
+/* Moby update: Swamp Monster II (class 2644, PS3 name). */
 void func_L01_003C09C0(u8 *arg0) {
     float sp[20] __attribute__((aligned(16)));
     f32 temp_f0;

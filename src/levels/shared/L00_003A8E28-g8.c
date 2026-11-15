@@ -135,6 +135,7 @@ extern void ref_L00_003B1270_0(int,int,int,void *,int);
    state 2 spawns a particle at the hero when the hero's button word has a bit of D_00138320 set
    (recording it in a new slot when RecordHeroTrailNode gives one); then hands both slot cursors to
    ref_L00_003B1270_0. */
+/* Moby update: Fireboot Weapon (class 2080, PS3 name). */
 void func_L00_003B1270(char *m)
 {
     int stop = 0, result;

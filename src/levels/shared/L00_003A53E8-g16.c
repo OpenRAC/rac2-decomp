@@ -81,6 +81,7 @@ static inline void SetCameraPulse(CameraView *camera, float amount, int ticks)
 }
 
 /* Control the two-stage blast and trace its individual fan rays. */
+/* Moby update: Blitz Gun (class 1489). */
 void func_L00_003A53E8(char *moby)
 {
     char *state = *(char **)(moby + 0x68);

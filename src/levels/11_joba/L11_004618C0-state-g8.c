@@ -34,6 +34,7 @@ extern void func_002B0990(void *, float *, float, int, int);
 /* Level-11 creature update, a state machine on object[0x20]: wanders between random points
  * near its spawn, follows a path from D_L11_001FF580, or turns away from the hero; when hit it
  * bursts into 14 pieces (func_L11_00396DC8), counts towards D_L11_001AED08 and deletes itself. */
+/* Moby update: Joba Bird (class 4357, PS3 name). */
 void func_L11_004702F0(u8 *object) {
     float motion[4], previous[4];
     u8 *vars;

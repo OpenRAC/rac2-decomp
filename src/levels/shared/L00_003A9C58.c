@@ -39,6 +39,7 @@ typedef struct {
 extern Pad9C58 D_00138180;
 extern char D_00188660[];
 extern int D_L00_001ADB2C __attribute__((sda));
+/* Moby update: Hoverbomb Projectile (class 1496, PS3 name). */
 void func_L00_003A9C58(char *m)
 {
  float old[4],direction[4],a[4],b[4],c[4];

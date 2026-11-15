@@ -592,6 +592,7 @@ void func_L03_0038B408(Moby *object)
 
 
 
+/* Moby update: Clank (class 87, PS3 name). */
 void func_L03_00393228(unsigned char *a0) {
     unsigned char *g = D_L03_00189E20;
 

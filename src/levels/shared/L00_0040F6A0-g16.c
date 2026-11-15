@@ -105,6 +105,7 @@ extern void func_L00_00410178(Moby *, Vector *);
 #define HERO ((Hero *)D_00189E20)
 
 /* Charges and fires the blaster: target acquisition, charge sparks and release. */
+/* Moby update: Megarocket Cannon (class 4100). */
 void func_L00_0040F6A0(Moby *moby)
 {
     BlasterVars *vars = moby->vars;

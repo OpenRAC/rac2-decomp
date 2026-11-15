@@ -43,6 +43,7 @@ extern void ref_L00_00392530_00(void (*)(void *), void *), func_002E59F8(int);
 extern void func_L00_002AF568(void), func_L00_002AF7D0(void), func_00291450(int);
 
 /* Maintains two beam targets, their acquisition delays, ammunition and the light/sound state. */
+/* Moby update: Tesla Claw (class 177). */
 void func_L00_00392530(char *actor) {
     Vector direction, offset;
     float local[4] __attribute__((aligned(16)));

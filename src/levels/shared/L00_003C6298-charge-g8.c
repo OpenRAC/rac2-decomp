@@ -105,6 +105,7 @@ static __inline__ void MarkTarget(void *moby, float alpha, unsigned int color, v
     func_00273318(moby, alpha, color, position, kind, a, b, c, d);
 }
 
+/* Moby update: RYNO II (class 2663). */
 void func_L00_003C8A90(Moby *moby)
 {
     Vars *vars = moby->vars;

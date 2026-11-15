@@ -126,6 +126,7 @@ extern void func_L18_003FCC48(char *);
 extern void func_L18_003FCD70(char *);
 extern void func_L18_002E0070(int, int);
 
+/* Moby update: Train with Rail (class 3420, PS3 name); Train (class 3483, PS3 name). */
 void func_L18_003FB708(char *m)
 {
     f32 pos[4] __attribute__((aligned(16)));

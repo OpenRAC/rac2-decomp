@@ -85,6 +85,7 @@ extern void func_00291450(int);
 extern void func_002E59F8(int);
 extern void func_002A75E0(void *, int, int, int, int);
 
+/* Moby update: Sheepinator (class 2653). */
 void func_L00_003C6298(char *owner)
 {
     Vec direction;

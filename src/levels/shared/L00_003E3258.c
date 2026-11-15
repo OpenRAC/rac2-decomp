@@ -258,6 +258,7 @@ int func_L00_003E39B8(char *object)
 
 /* func_L00_003E4508 is defined in L00_003E4508-g8.c. */
 
+/* Moby update: Heavy Lancer (class 3077). */
 void func_L00_003E4948(void)
 {
     ref_L00_003E4948_00();

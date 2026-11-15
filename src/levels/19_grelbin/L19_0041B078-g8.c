@@ -59,6 +59,7 @@ typedef struct { char pad[0x34]; u16 flags; } GrelbinObjectFlags;
       I(data,0x230)=timer; D_L19_001B1D20=active-1; } }
 #define DISABLE_COLLISION() { B(obj,0x31)=1; H(obj)&=0xFFFE; I(obj,0x98)=I(*(char **)(obj+0x24),0x10); SOLID(); }
 
+/* Moby update: Y.E.T.I. (class 4304, PS3 name). */
 void func_L19_0041B078(char *obj)
 {
     char *data;

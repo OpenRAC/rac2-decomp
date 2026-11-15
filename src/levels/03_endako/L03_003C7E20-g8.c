@@ -66,6 +66,7 @@ typedef struct {
    the private pointer live across the whole switch.
    &p->displacement and &p->velocity are written out each time: gcse keeps the first computation
    in a saved register. */
+/* Moby update: Explosive Crate (class 2380, PS3 name). */
 void func_L03_003C7E20(char *a0)
 {
     char buf[0x10] __attribute__((aligned(16)));

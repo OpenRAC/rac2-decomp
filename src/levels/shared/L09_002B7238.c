@@ -463,6 +463,7 @@ void func_L09_003EAF60(char *object)
 
 /* Defined in L09_003F65E0.c. */
 
+/* Moby update: Megacorp Trooper Torso (class 3342, PS3 name); Extermibot Torso (class 3851, PS3 name). */
 void func_L09_003F7158(char *object)
 {
     if (*(unsigned char *)(object + 0x31) != 0) {

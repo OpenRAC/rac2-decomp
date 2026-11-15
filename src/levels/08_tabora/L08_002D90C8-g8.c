@@ -89,6 +89,7 @@ extern void func_L04_003A1FE0(L08SpawnBlock *);
    D_00189E20+0x1830, kind 0x45) is alive while the mode word at +0x2294 is 0x31. The count
    is the state's +0x10 plus an entry of D_L08_001B01B8 picked by +0x18 (1 when -1); state
    0 sets the object up first and then shares state 1's step, state 2 has its own. */
+/* Moby update: Water (class 2312, PS3 name). */
 void func_L08_003CFE68(char *object)
 {
     L08SpawnBlock block;

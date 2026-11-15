@@ -445,6 +445,7 @@ int func_L06_00420230(unsigned char *obj)
     return 0;
 }
 
+/* Moby update: Therm Water (class 4018). */
 void func_L06_00456BB0(unsigned char *obj)
 {
     char *d;

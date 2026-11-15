@@ -61,6 +61,7 @@ extern void ref_L00_003A0F30_00(void (*)(void *), void *);
 extern float func_00283B98(float, float), func_00283198(float), func_00283180(float);
 
 /* Initialize the beam oscillators and update the weapon's charge cycle. */
+/* Moby update: Plasma Storm (class 1482). */
 void func_L00_003A0F30(char *moby)
 {
     float velocity[4], origin[4], query[4];

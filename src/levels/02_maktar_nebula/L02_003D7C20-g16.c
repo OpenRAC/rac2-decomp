@@ -131,6 +131,7 @@ extern void func_L02_003D9608(Actor *);
 #define PROXY (D_L02_001B359C + self->state->proxy)
 
 /* Drive this actor's emergence, movement, attacks and destruction. */
+/* Moby update: B2 Brawler Legs (class 2628, PS3 name). */
 void func_L02_003D7C20(Actor *self)
 {
     SentryState *state;

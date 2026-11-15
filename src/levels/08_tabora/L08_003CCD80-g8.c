@@ -72,6 +72,7 @@ extern void func_L08_003D0010(float, float, float, float);
 extern void func_002C19D8(void *, int, int, float, float);
 extern void func_002BAA28(void *, void *, void *, int, int, int, int, int, int);
 
+/* Moby update: Waterfall (class 2294, PS3 name); Waterfall (frozen) (classes 2295-2297, PS3 name). */
 void func_L08_003CCD80(char * object) {
     char * state = FIELD(object, char *, 0x68), *sound;
     int rotationDelta;

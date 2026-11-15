@@ -72,6 +72,7 @@ extern void func_00291450(int);
 extern void func_002E59F8(int);
 extern void func_002A75E0(void *,int,int,int,int);
 
+/* Moby update: Black Sheepinator (class 3757). */
 void func_L00_00405808(char *object)
 {
     Vec offset;

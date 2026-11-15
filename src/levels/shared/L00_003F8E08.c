@@ -25,6 +25,7 @@ extern int func_2EDD48(void *);
 extern void func_31A658(void *, int, int);
 extern void func_L00_003F9570(void);
 
+/* Moby update: Unknown Thief's Weapon (class 3397, PS3 name). */
 void func_L00_003F94F8(char *self)
 {
     char *s0 = *(char **)(self + 0x68);
@@ -45,6 +46,7 @@ void func_L00_003F94F8(char *self)
 
 
 
+/* Moby update: Enemy Hoverbike Racer (class 2287, PS3 name); Spaceship Attachment (classes 4308, 4309, 4310, 4311, 4312, 4313, 4314, 4315, 4316, 4317, 4318, 4319, 4320, 4321, 4325, PS3 name). */
 void func_L00_003FC100(void)
 {
 }

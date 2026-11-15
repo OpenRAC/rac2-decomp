@@ -10,6 +10,7 @@ extern void func_L03_003CC478(u8 *, void *, void *, s32);
 extern s32 func_00282948(void *);
 extern void func_0029F338(u8 *);
 
+/* Moby update: Factory Door (class 2467); Factory Bot Door (class 2468); Res Bot Door (class 2470). */
 void func_L03_003CC238(u8 *object)
 {
     Vector position, velocity;

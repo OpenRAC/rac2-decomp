@@ -24,6 +24,7 @@ extern void func_0029F338(void *);
 
 /* Steps the owner state, moving along its path and releasing expired objects.
  * Separate unit for the jump table and small-data entity-base access. */
+/* Moby update: Swamp Monster I Eye (class 2702, PS3 name). */
 void func_L01_003CE228(u8 *a0)
 {
     u8 *state = *(u8 **)(a0 + 0x68);

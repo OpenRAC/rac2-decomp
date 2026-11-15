@@ -78,6 +78,7 @@ extern void func_00291450(s32);
 extern s32 func_002B50E0(u8 *, void *, f32);
 extern void func_L11_0042EF90(u8 *arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4);
 
+/* Moby update: Jobian Saur-Beast (class 3335, PS3 name). */
 void func_L11_0042F018(u8 *arg0) {
     u8 *data;
 

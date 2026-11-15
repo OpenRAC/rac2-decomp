@@ -78,6 +78,7 @@ extern void ref_L07_00416510_00(void);
 #define UP(p,o) (*(unsigned char **)((p)+(o)))
 
 /* Updates the held weapon, target damage requests, sound and beam effects. */
+/* Moby update: Lava Gun (class 1481). */
 void func_L07_00416510(unsigned char *object)
 {
     UpdateVector vector, delta;

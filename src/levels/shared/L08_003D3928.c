@@ -153,6 +153,7 @@ void func_L08_003D3928(void *owner, void *pos)
 
 /* One resident word, two states, and a 16-byte table entry: hands the entry to
    func_L00_00326048 with an alpha of 0x3D7A35E0. */
+/* Moby update: Glider Pad (class 2440, PS3 name). */
 void func_L08_003D3EB8(u8 *a0)
 {
     s32 v = *(s32 *)(a0 + 0x68);
@@ -317,6 +318,7 @@ void func_L08_00435990(L08Thing *a0)
 /* An interaction state machine at byte 0x20: offers an item for its price while
    the quantity at D_001A7A00+0x1A covers it, then buys the remaining quantity back
    at 1000 (10000 with the flag at D_001A7A00+0xA) each; afterwards aims the head at the hero. */
+/* Moby update: The Mystic (class 3646, PS3 name). */
 void func_L08_00435A78(u8 *self)
 {
     float dest[4] __attribute__((aligned(16)));

@@ -475,6 +475,7 @@ typedef struct BounceState {
 } BounceState;
 
 /* Per-frame update of a bouncing object: runs its timed phases, then moves and bounces it. */
+/* Moby update: Crystal Shell Shard (classes 2413-2415, PS3 name). */
 void func_L00_003DD2B8(BounceObject *object)
 {
     float point[4];

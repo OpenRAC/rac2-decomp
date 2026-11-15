@@ -44,6 +44,7 @@ extern int func_002829D8(void *);
 extern void func_L00_003C33E0(void *);
 extern void ref_L00_003C2FC8_00(void (*)(void *), void *);
 
+/* Moby update: Mini-Nuke (class 2650). */
 void func_L00_003C2FC8(unsigned char *object) {
     unsigned char *state = *(unsigned char **)(object + 0x68);
     unsigned char *target;

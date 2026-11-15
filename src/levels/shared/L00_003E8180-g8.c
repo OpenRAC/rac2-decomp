@@ -75,6 +75,7 @@ extern void ref_L00_003E8180_00(void *,void *),func_L00_003E8A98(void);
 extern float func_00283BE0(float,float),func_00283198(float),func_00283180(float);
 typedef struct { float timer; int handle, anim, unknown; float charge, angle; char pad[8]; ChargeWeaponVec origin; float gap, sine, gap2, cosine; } ChargeWeaponVars;
 typedef struct { char position[0x20]; unsigned char state; char pad21[0x22]; unsigned char animation; char pad44[0x1C]; unsigned char flags; char pad61[7]; ChargeWeaponVars *vars; } ChargeWeaponMoby;
+/* Moby update: Plasma Coil (class 3146). */
 void func_L00_003E8180(ChargeWeaponMoby *obj) {
     ChargeWeaponVec velocity, origin, target, delta, point;
     int unused;

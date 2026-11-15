@@ -632,6 +632,7 @@ extern void func_L02_0038DA00(void *arg0);
    past 89 or the resident word is 0x74. State 0 runs InitRailGroupMembers; state 1 switches the
    whole group off (+0x31 cleared, bit 0 of +0x34 set) when the record test passes, then runs
    func_L02_0038C998 and queues func_L02_0038DA00; state 2 switches the group back on. */
+/* Moby update: Scenery Ship (class 2487, PS3 name). */
 void func_L02_0038BA28(unsigned char *arg0) {
     unsigned char *o = *(unsigned char **)(arg0 + 0x68);
 

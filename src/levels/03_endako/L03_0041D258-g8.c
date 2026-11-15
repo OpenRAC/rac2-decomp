@@ -27,6 +27,7 @@ extern float D_L03_001B1BD4 __attribute__((sda));
 extern u8 D_L03_001B1BE0[16] __attribute__((sda));
 
 /* Advance the path actor's behaviour, movement, animation and attack effects. */
+/* Moby update: Megacorp Rivet Bot (class 4092, PS3 name). */
 void func_L03_0041D258(u8 *entity)
 {
     u8 *state = *(u8 **)(entity + 0x68);

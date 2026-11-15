@@ -78,6 +78,7 @@ extern int func_00277F48(float, void *, int, Moby *, int);
 extern void func_002A9850(void *, Vector *, int *, int, int, int, int, int, float, float, float);
 extern void func_002ACB48(float *, float), func_L00_003914E0(Moby *, int), func_002AFFD8(Vector *, Vector *, int), func_00282DD8(void *, void *, void *);
 /* Updates the flying tether's steering, sweep collision, impact burst and attached pieces. */
+/* Moby update: Visibomb Missile (class 172, PS3 name). */
 void func_L00_003918C8(Moby *actor) {
     Vector previous, blast, blastNormal, velocity, contactEdge, scratch;
     DamageRecord damage;

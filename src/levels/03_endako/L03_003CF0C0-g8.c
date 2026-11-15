@@ -44,6 +44,7 @@ extern float func_00283198(float), func_00282DB0(void *, void *), func_00282DF0(
 extern float func_002A78D8(float, float), func_002A7878(float, float), func_002A7940(void);
 /* Initializes the triggered motion, sheds debris while moving, and emits the
  * final twenty-object burst when the collision magnitude reaches its threshold. */
+/* Moby update: Trash Can (class 2481, PS3 name). */
 void func_L03_003CF0C0(char *obj)
 {
     float target[4] __attribute__((aligned(16)));

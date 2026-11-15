@@ -86,6 +86,7 @@ extern int D_L17_001B0EC0 __attribute__((sda));
 extern int D_L17_001B0EC4 __attribute__((sda));
 extern float D_L17_001B0EC8 __attribute__((sda));
 
+/* Moby update: Two-headed Smolgian snapper (class 3019, PS3 name). */
 void func_L17_003E7068(u8 *self) {
     Hit h;
     u8 *st = ((u8 *)((UView *)(self))->p[0x1A]);

@@ -53,6 +53,7 @@ extern void func_003BE4D0(u8 *);
 extern void func_003BE628(u8 *);
 extern void func_003E9CF8(u8 *, s32, s32);
 
+/* Moby update: Mutant Firefly (class 2633, PS3 name). */
 void func_L01_003BEA08(u8 *moby)
 {
     f32 vec[4] __attribute__((aligned(16)));

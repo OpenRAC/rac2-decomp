@@ -92,6 +92,7 @@ extern u8 D_L01_001AC5A0[] MACRO_ADDR;
 #define STATE_POINTER(o) (((u8 **)state)[(o)/4])
 
 /* Updates this creature's idle, pursuit, airborne, attack and recovery phases. */
+/* Moby update: Mutant Swamp Beast (class 2466, PS3 name). */
 void func_L01_003B5878(u8 *object)
 {
     /* Label tables for the phase and pursuit-action dispatches. */

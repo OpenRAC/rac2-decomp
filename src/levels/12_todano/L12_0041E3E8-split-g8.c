@@ -16,6 +16,7 @@ extern int func_00282948(void *);
 extern float func_002AA548(void *, void *, float, float, float, float);
 extern void func_00282D30(float, void *, void *);
 
+/* Moby update: Secret Door (class 4057). */
 void func_L12_0041EDB8(u8 *a0)
 {
     s32 *s = *(s32 **)(a0 + 0x68);

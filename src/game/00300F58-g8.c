@@ -80,6 +80,7 @@ extern void func_00301D10(void *);
 extern int func_002E5CF8(int,int,void *);
 
 /* Update a bolt pickup through initialization, falling, hopping, idle and collection. */
+/* Moby update: Bolt (classes 13-19, PS3 name). */
 void func_00300F58(PickupMoby *m)
 {
     /* The matrix scratch overlaps vectors used in mutually exclusive states. */

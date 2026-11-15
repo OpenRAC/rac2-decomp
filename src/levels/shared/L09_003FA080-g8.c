@@ -61,6 +61,7 @@ extern void func_L09_003F9970(void *);
 extern void func_L09_003F9A70(void *);
 extern int func_L09_003F9D08(void *);
 
+/* Moby update: Megacorp Trooper Legs (class 3343, PS3 name). */
 void func_L09_003FA080(char *self)
 {
     char *vars;

@@ -8,6 +8,7 @@ extern void func_L04_003F8FA0(unsigned char *a0);
 
 extern void func_L04_003F9078(unsigned char *a0);
 
+/* Moby update: Hoverbike Race Item Box (class 2744, PS3 name). */
 void func_L04_003F9270(unsigned char *a0) {
     unsigned char *obj = *(unsigned char **)(a0 + 0x68);
     int idx = *(int *)(obj + 8);

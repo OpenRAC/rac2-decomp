@@ -23,6 +23,7 @@ extern int func_002E5CF8(int index, int kind, char *object);
 extern void func_00282CF0(void *out, void *a, void *b);
 extern void func_002AD6F0(void *matrix, void *offset, void *a, void *b);
 
+/* Moby update: Elevator Dam (class 4056). */
 void func_L12_0041EA18(u8 *object)
 {
     LiftQuad oldPosition;

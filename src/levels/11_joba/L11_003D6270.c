@@ -83,6 +83,7 @@ extern f32 func_002AA548(void *, void *, f32, f32, f32, f32);
 
 /* Defined in L11_003DD068-g8.c. */
 
+/* Moby update: Arachnoid (class 2874, PS3 name). */
 void func_L11_003F1C68(u8 *arg0) {
     u8 *s0 = arg0;
     if (*(u8 *)(s0 + 0x20) == 0) {

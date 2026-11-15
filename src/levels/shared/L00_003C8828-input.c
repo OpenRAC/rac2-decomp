@@ -31,6 +31,7 @@ extern void func_L00_002AF7D0(void);
 extern void ref_L00_003C8828_00(void (*)(void *), void *);
 extern void func_L00_003C8A58(void *);
 
+/* Moby update: Megaturret Glove (class 2661). */
 void func_L00_003C8828(char *owner)
 {
     InputVector origin, target;

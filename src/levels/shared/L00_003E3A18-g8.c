@@ -97,6 +97,7 @@ typedef struct {
  * Debug labels reproduce retail division padding; keep the tuning lookup and
  * the reciprocal on separate lines.
  */
+/* Moby update: Vaporizer (class 3076). */
 void func_L00_003E3A18(u8 *object)
 {
     UpdateVector position, first, second;

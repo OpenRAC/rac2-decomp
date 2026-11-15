@@ -37,6 +37,7 @@ struct LiftMoby {
 };
 extern struct LiftPoint *ref_L02_003EB8F8_00 __attribute__((sda));
 extern struct LiftPoint *ref_L02_003EB8F8_01 MACRO_ADDR;
+/* Moby update: Elevator Factory (class 2434); Elevator - Res (class 2435). */
 void func_L02_003EB8F8(struct LiftMoby *obj) {
     struct LiftData *data = obj->data;
     int oldpos[4] __attribute__((aligned(16)));

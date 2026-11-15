@@ -50,6 +50,7 @@ extern void func_0029FCC0(char *, int, void *);
 extern char *func_L00_003DBF50(char *, int, void *, void *);
 extern void ref_L00_003EA540_00(void *, char *);
 
+/* Moby update: Meteor Gun (class 3161). */
 void func_L00_003EA540(char *self)
 {
     float v[4];

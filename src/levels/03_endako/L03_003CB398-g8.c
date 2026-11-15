@@ -72,6 +72,7 @@ extern float D_L03_001B0404 __attribute__((sda));
 #define B(p,o) (*(unsigned char *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
 
+/* Moby update: Tube Start (class 2437). */
 void func_L03_003CB398(char *actor)
 {
     float pos[4], rot[4];

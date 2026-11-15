@@ -75,6 +75,7 @@ typedef struct {
  u8 pad6C[0x50]; u8 command; u8 padBD[3]; u8 matrix[0x30]; f32 rot[4];
 } TurretMoby;
 
+/* Moby update: Turret (class 3104, PS3 name). */
 void func_L11_00411D40(TurretMoby *moby) {
     TurretVec seat;
     TurretVec offset;

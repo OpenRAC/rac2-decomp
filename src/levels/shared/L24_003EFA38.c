@@ -76,6 +76,7 @@ typedef struct BeamVars {
     int disabled;
 } BeamVars;
 
+/* Moby update: Thermanator (class 4016). */
 void func_L24_003EFA38(Target *obj)
 {
     BeamVars *v = obj->vars;

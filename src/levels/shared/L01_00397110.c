@@ -281,6 +281,7 @@ extern void func_L00_00326048(char *, char *, float, int, int);
 
 extern int D_L01_001A8F40 __attribute__((sda));
 
+/* Moby update: TV Screens (class 4000, PS3 name). */
 void func_L01_004110E0(char *a0)
 {
     unsigned char v = *(unsigned char *)(a0 + 0x20);

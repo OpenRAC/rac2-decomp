@@ -57,6 +57,7 @@ extern void func_L03_00425108(u8 *);
 /* A three-state object: state 0 arms it (and on level 5 finds the entity of class 0xFBF),
    state 1 spins its four angles and throws four particles each frame until the player (or that
    entity on level 5) comes near, state 2 marks its slot done and removes it. */
+/* Moby update: Nanotech Upgrade (class 4548, PS3 name). */
 void func_L03_00424C40(u8 *e) {
     u8 *vars = *(u8 **)(e + 0x68);
     f32 mat[12];

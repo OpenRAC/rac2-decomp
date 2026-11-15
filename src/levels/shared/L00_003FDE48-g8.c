@@ -66,6 +66,7 @@ extern void func_L00_003FE490(void *);
 
 /* Coordinate the multi-object interaction and its repeat/cooldown timers. */
 
+/* Moby update: Bouncer (class 3604); Heavy Bouncer (class 3742). */
 void func_L00_003FDE48(unsigned char *object) {
     float origin[4];
     float aim[4];

@@ -54,6 +54,7 @@ extern void func_L00_003FE490(void *);
 
 typedef struct { float timer; s16 delay; s16 repeat; int index; int pad0C; char *list[0]; } BeamState;
 
+/* Moby update: Tetrabomb Gun (class 3631). */
 void func_L00_003FE4C8(unsigned char *object) {
     float origin[4];
     float destination[4];

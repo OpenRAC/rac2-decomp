@@ -176,6 +176,7 @@ typedef struct { char *entry[5]; } LinkTable;
 #define PLAYER (HERO->player)
 #define PLAYER_POS ((char *)HERO->position)
 
+/* Moby update: Mothership Boss Part (class 3967, PS3 name). */
 void func_L23_00416388(u8 *object)
 {
     char direction[16] __attribute__((aligned(16)));

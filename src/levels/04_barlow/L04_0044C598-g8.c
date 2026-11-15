@@ -44,6 +44,7 @@ extern void func_L04_0044D428(char *);
 extern void func_L04_0044D6A0(u8 *);
 extern void func_0029F338(void *);
 
+/* Moby update: Gadgetron Hound of Cuddly Death (class 4022, PS3 name). */
 void func_L04_0044C598(u8 *object)
 {
     char *vars;

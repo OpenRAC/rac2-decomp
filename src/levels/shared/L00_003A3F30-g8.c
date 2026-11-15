@@ -26,6 +26,7 @@ extern int func_002E5CF8(int, int, char *);
 extern char *func_L00_003AB8B8(void *, void *);
 
 /* Update the firing effect and its input-controlled cooldown. */
+/* Moby update: Seeker Gun (class 1486). */
 void func_L00_003A3F30(char *moby)
 {
     float position[4];

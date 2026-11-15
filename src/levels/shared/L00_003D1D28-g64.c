@@ -108,6 +108,7 @@ static inline void SetShake(float amount)
     D_L00_001B8C80.i16C = 0;
 }
 
+/* Moby update: Blitz Cannon (class 2801). */
 void func_L00_003D1D28(u8 *self)
 {
     Vec4 a;

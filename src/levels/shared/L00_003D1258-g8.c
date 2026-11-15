@@ -56,6 +56,7 @@ extern void func_002ACE78(void *,void *,float);
 extern void func_00283958(void *,void *);
 extern void func_00283738(void *,void *,void *);
 extern int func_00282ED8(void *,void *);
+/* Moby update: Ammo (class 3291, PS3 name). */
 void func_L00_003D1258(char *m)
 {
     char *d=*(char **)(m+0x68);

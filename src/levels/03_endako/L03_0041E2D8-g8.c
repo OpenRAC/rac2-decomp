@@ -50,6 +50,7 @@ extern int func_002B5278(void *,float);
 extern int func_002A8C28(void *,void *,int,float,float,float,int,int,int);
 extern int func_L02_002EF388(void *,void *,void *,void *,int);
 
+/* Moby update: Megacorp Laser Bot (class 4093, PS3 name). */
 void func_L03_0041E2D8(u8 *entity) {
     u8 *state = *(u8 **)(entity + 0x68);
     int flags;

@@ -37,6 +37,7 @@ extern void func_L08_003D3EF8(u8 *object);
 typedef struct { u8 p[0x464]; u8 x[1]; } Hist;
 typedef struct { u8 p[0x8e]; short lock; } VData;
 typedef struct { u8 p[0x31]; u8 held; u8 p2[2]; u16 flags; u8 p3[0x12]; float scale; } OView;
+/* Moby update: Raritanium (class 2458, PS3 name). */
 void func_L08_003D4190(u8 *object)
 {
     PickupState *data = *(PickupState **)(object + 0x68);

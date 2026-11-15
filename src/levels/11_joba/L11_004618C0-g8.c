@@ -62,6 +62,7 @@ extern float func_00283BE0(float, float);
 extern float func_00282E20(void *);
 extern void func_002AEC48(char *, u8 *, char *, float, float);
 
+/* Moby update: Shady Salesman (class 3733, PS3 name). */
 void func_L11_004618C0(u8 *object) {
     float destination[4] __attribute__((aligned(16)));
     float origin[4] __attribute__((aligned(16)));

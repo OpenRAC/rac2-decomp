@@ -135,6 +135,7 @@ static inline int rider_kind(char *moby)
 #define PLAY(p, animation, start, blend) \
     (BYTE((p), 0x43) != (animation) ? func_002A7470((p), (animation), (start), (blend)) : (void)0)
 
+/* Moby update: Joba Tribesman (class 3317, PS3 name). */
 void func_L11_00420C88(unsigned char *object)
 {
     Vector offset, side, point;

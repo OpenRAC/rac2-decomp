@@ -37,6 +37,7 @@ extern void func_002A8D70(u8 *,int,int,int,int,int,float,float,float);
 extern void func_002B5258(u8 *);
 extern void func_00283098(void *,void *,void *);
 extern void func_L12_003E0A38(void *,void *,void *,int);
+/* Moby update: Mutant Test-Squirrel (class 4020, PS3 name). */
 void func_L12_003E0BF0(u8 *o) {
     u8 *d=*(u8 **)(o+0x68);
     float temp[4] __attribute__((aligned(16)));

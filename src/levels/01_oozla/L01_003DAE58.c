@@ -52,6 +52,7 @@ typedef unsigned int UpdateQuad __attribute__((mode(TI)));
 
 /* Runs the moby's state machine on obj[0x95]; from state 3 on, except 5, it then eases the
    rotation at 0xF4 and 0xF0 towards a direction, each angle clamped to 40 degrees. */
+/* Moby update: Mutant Muckdweller (class 2859, PS3 name). */
 void func_L01_003DAE58(u8 *obj)
 {
     f32 delta[4] __attribute__((aligned(16)));

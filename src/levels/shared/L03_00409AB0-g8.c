@@ -8,6 +8,7 @@ extern f32 D_L03_001B1650 __attribute__((sda));
 extern f32 D_L03_001B1654 __attribute__((sda));
 extern f32 D_L03_001B1658 __attribute__((sda));
 
+/* Moby update: Slim Cognito Ship (class 3597, PS3 name). */
 void func_L03_00409AB0(u8 *object)
 {
     u8 *vars = *(u8 **)(object + 0x68);

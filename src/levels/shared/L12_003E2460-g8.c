@@ -97,6 +97,7 @@ extern void *func_002C2210(void *, int, float, float, int, int, int, void *, int
 extern void func_00282CF0(void *, void *, void *);
 extern u8 *func_L12_00408050(void *, void *, void *, int, float);
 
+/* Moby update: Megacorp Robot Guard (class 3007, PS3 name). */
 void func_L12_003E2460(u8 *obj) {
     u8 *state = *(u8 **)(obj + 0x68);
     L12Vector pos;

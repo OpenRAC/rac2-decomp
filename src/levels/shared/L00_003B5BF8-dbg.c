@@ -42,6 +42,7 @@ extern int func_L00_002B3998(float);
 extern void func_L00_002AF568(void),func_L00_00311080(void *,void *,int,int,int,int);
 extern void func_L00_002D3F30(int,int),func_002E5CF8(int,int,void *);
 extern char *func_L00_0041C2D0(void *,void *,int,void *,int,int);
+/* Moby update: Chopper (class 2169); Multi-Star (class 2806). */
 void func_L00_003B5BF8(unsigned char *object)
 {
     int existing;

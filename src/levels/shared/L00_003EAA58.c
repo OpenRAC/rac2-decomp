@@ -26,6 +26,7 @@ extern int func_002FE5A0(void *, void *, void *, void *, char *, int, int, float
 extern int func_00282948(void *), func_L00_002D3F30(int, int);
 extern void func_L00_002AF568(void), func_002E5CF8(int, int, char *), func_L00_002AF7D0(void), ref_L00_003EAA58_00(void *, char *);
 extern char *func_L00_00387CA8(void *, void *);
+/* Moby update: Miniturret Glove (class 3162). */
 void func_L00_003EAA58(char *self)
 {
     char a[16], b[16];

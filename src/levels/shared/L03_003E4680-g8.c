@@ -94,6 +94,7 @@ typedef struct MuseumExhibit {
     float fade;
     int resume;
 } MuseumExhibit;
+/* Moby update: Infiltrator Lock (class 2857, PS3 name). */
 void func_L03_003E4680(char *obj) {
     MuseumExhibit *st = (MuseumExhibit *)P(obj,0x68);
     float vec[4] __attribute__((aligned(16)));

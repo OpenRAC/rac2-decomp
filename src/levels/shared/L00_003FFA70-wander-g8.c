@@ -42,6 +42,7 @@ extern float func_002A89A8(void *,int,float);
 #define AI_I(p,n) (*(int *)((char *)(p)+(n)))
 #define AI_B(p,n) (*(unsigned char *)((char *)(p)+(n)))
 
+/* Moby update: Sheep (class 3709, PS3 name). */
 void func_L00_00402E50(char *object)
 {
     float dest[4] __attribute__((aligned(16)));

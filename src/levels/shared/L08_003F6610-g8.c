@@ -37,6 +37,7 @@ extern u8 *func_L08_003F6018(void *,void *,void *);
 extern int func_L06_0035EA68(void *,void *);
 extern void func_002ABBB8(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 typedef struct { u8 pad[0x120]; float speed; int path,object; u16 delay, timer; u8 limit,count,nearest,pad2; int children[2]; int pad3; int targets[4]; } FVars;
+/* Moby update: Spawner (class 3098, PS3 name). */
 void func_L08_003F6610(u8 *m)
 {
     void *found;

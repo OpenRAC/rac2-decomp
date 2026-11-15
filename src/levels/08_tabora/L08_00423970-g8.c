@@ -71,6 +71,7 @@ extern void func_002A7750(char *, int, int);
 extern void func_0029F338(char *);
 
 /* Apply the height gates, dispatch the actor state, and update timers and bounds. */
+/* Moby update: Mutant Sandfly (class 4095, PS3 name). */
 void func_L08_00423970(char *actor) {
     char *p;
     int ready;

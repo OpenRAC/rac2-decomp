@@ -13,6 +13,7 @@ extern void func_0029F978(char *, int, char *);
 extern float func_002A7940(void);
 
 /* grows a moby out of the ground the first time, then spins it down */
+/* Moby update: Megacorp Vendor Logo (class 1143, PS3 name). */
 void func_L01_00399170(char *a0)
 {
     char *s1 = *(char **)(a0 + 0x68);
@@ -400,6 +401,7 @@ extern int D_L01_001A8F48 MACRO_ADDR;
 extern int D_L01_001A9034 MACRO_ADDR;
 extern int D_00138324 NOT_SDA;
 
+/* Moby update: Spiderbot Glove (class 2311). */
 void func_L01_003B2598(char *m) {
     float pos[4], sweep_storage[4], normal[4];
     float *sweep;

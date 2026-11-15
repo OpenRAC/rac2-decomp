@@ -20,6 +20,7 @@ extern void *func_002A9640(void *, int, int);
 extern void func_00282CC0(void *, void *, void *);
 extern void func_002A7750(void *, int, int);
 
+/* Moby update: Hoverbike Race Bomb (class 2679, PS3 name). */
 void func_L11_003DCEB0(u8 *a0) {
     u8 vec[16] __attribute__((aligned(16)));
     u8 *s0 = *(u8 **)(a0 + 0x68);

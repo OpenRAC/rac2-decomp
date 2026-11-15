@@ -12,6 +12,7 @@ extern float func_00282C48(float);
 extern void func_002E5CF8(int, int, void *);
 extern void func_L08_003D0040(void *);
 
+/* Moby update: Seesaw Beam (class 2317, PS3 name). */
 void func_L08_003D00C8(char *object) {
     char *state = *(char **)(object + 0x68);
     float delta, previous, magnitude;

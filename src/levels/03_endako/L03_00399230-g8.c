@@ -8,6 +8,7 @@ extern s32  func_31BA30(s32 a0, s32 a1);
 extern s32  func_31B9F0(s32 a0);
 extern f32  func_2F0000(f32 a0, f32 a1);
 
+/* Moby update: Fan (class 2425). */
 void func_L03_003CA938(char *a0)
 {
     if (*(u8 *)(a0 + 0x31) == 0) {
@@ -123,6 +124,7 @@ extern f32  D_L03_001B043C __attribute__((sda));
 /* The actor's per-frame update: state 0 spawns it and aims, state 2 looks the
    target up, states 3 and 4 turn it by a rate that decays; every other state
    does nothing.  The actor's angle is at 0xF4, its rate at 0x74 of the state. */
+/* Moby update: Ant Bridge (class 2453). */
 void func_L03_003CBE58(char *a0)
 {
     char *s2 = a0;

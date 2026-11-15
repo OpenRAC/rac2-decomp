@@ -33,6 +33,7 @@ extern void func_002AFFD8(char *, char *, int);
 extern void func_002AB668(void *, int, float);
 extern void func_002ACDE8(void *, void *, void *);
 
+/* Moby update: HK-22 (class 3310). */
 void func_L00_003F3D70(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     ShotVector aim, velocity, position, direction, rotation, rotated;

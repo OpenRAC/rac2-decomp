@@ -53,6 +53,7 @@ typedef struct {
 extern JobaPlayerView D_00189E20;
 extern char D_00189F00[];
 
+/* Moby update: Deser Rider (Joba) (class 2940, PS3 name). */
 void func_L11_003F8510(unsigned char *moby) {
     float target[4] __attribute__((aligned(16)));
     float origin[4] __attribute__((aligned(16)));

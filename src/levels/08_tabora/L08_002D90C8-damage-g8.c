@@ -23,6 +23,7 @@ extern void *func_0029EFD0(int);
 extern void func_002A0F48(void *),func_002AB650(void *),func_002AF000(void *,float,float,float);
 extern void func_00282CC0(void *,void *,void *),func_L08_0040F9D0(void *,void *,void *,float,float);
 /* Applies damage, updates hit effects, and spawns debris when health reaches zero. */
+/* Moby update: Desert Crystal Shell (class 2410, PS3 name). */
 void func_L08_003D2F50(char *o) {
     char *p=F(o,char *,0x68), *hit, *spawn, *health, *effect;
     float impact, z, angle, speed, t;

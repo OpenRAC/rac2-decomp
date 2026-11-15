@@ -23,6 +23,7 @@ extern void func_002A7470(void *, int, int, int), func_L00_002F46C8(void);
 extern char *func_L00_00390FF8(char *, char *, float, float);
 extern int func_002E5CF8(int, int, char *);
 /* Starts the tether when the shared input and movement gates permit it. */
+/* Moby update: Visibomb Gun (class 163). */
 void func_L00_0038F8B8(char *actor) {
     int *state;
     int ready;

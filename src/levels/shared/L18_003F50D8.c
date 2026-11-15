@@ -8,6 +8,7 @@ extern void func_L18_003F5650(void *);
 extern void func_L18_003F6CA8(void *);
 extern void func_L18_003F7198(void *);
 
+/* Moby update: Protopet (class 2921, PS3 name). */
 void func_L18_003F50D8(char *a0)
 {
     char *s0 = a0;

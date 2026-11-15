@@ -183,6 +183,7 @@ extern f32 func_002A89A8(f32 *, s32, f32);
 
 extern f32 func_00283B98(f32, f32);
 
+/* Moby update: Blue Swingshot Target (class 2461, PS3 name). */
 void func_L03_003CC1D8(u8 *a0) {
     if (*(u8 *)(a0 + 0x31) == 0)
         return;
@@ -570,6 +571,7 @@ s32 func_L03_00419C58(u32 a0, f32 *a1) {
     return out;
 }
 
+/* Moby update: Spaceship Attachment (class 4323, PS3 name). */
 void func_L03_0041B848(void)
 {
 }

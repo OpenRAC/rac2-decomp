@@ -169,6 +169,7 @@ void func_L00_00426340(int object)
     func_L00_00425CD0(object);
     follow_camera_build_view(object);
 }
+/* Moby update: Spaceship Attachment (classes 4308, 4309, 4310, 4311, 4312, 4313, 4314, 4315, 4316, 4317, 4318, 4319, 4320, 4321, 4323, 4325, PS3 name). */
 void func_L00_00426478(void)
 {
 }
@@ -459,6 +460,7 @@ void func_L00_00427AE0(char *a0)
     }
 }
 
+/* Moby update: Spaceship Attachment (class 4323, PS3 name). */
 void func_L00_00427B38(void)
 {
 }
@@ -558,6 +560,7 @@ int func_L00_004284A8(void) {
 
 /* func_L00_004284B0 is defined in L00_004284B0-helpers.c. */
 
+/* Moby update: Spaceship Attachment (class 4323, PS3 name). */
 void func_L00_00428580(void)
 {
 }
@@ -805,6 +808,7 @@ int func_L00_0042AB40(char *owner) {
     return -1;
 }
 
+/* Moby update: Spaceship Attachment (classes 4308, 4309, 4310, 4311, 4312, 4313, 4314, 4315, 4316, 4317, 4318, 4319, 4320, 4321, 4325, PS3 name). */
 void func_L00_0042AB48(void)
 {
 }

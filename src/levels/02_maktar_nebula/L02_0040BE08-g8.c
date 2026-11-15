@@ -55,6 +55,7 @@ extern void *func_002C2210(float, float, float, void *, s32, u32, s32, s32, floa
 extern void func_L02_0040CEE8(u8 *);
 
 /* Follow the patrol path, handle landing and contact states, then emit the trail. */
+/* Moby update: PX6 BladeBall (class 3134, PS3 name). */
 void func_L02_0040BE08(u8 *object)
 {
     PatrolVector target;

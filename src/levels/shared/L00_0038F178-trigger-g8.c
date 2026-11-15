@@ -15,6 +15,7 @@ extern void func_002A0430(unsigned int);
 extern float func_002A89A8(void *, int, float), func_00282C48(float);
 extern void func_002DF3F8(void *, void *), func_002B0A18(int, int);
 /* Applies a regional activation trigger and records its checkpoint flags. */
+/* Moby update: Spawn Point (class 805, PS3 name). */
 void func_L00_0039E7A8(char *actor) {
     int *state = *(int **)(actor + 0x68);
     unsigned long long flags;

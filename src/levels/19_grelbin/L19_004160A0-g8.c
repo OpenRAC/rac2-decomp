@@ -69,6 +69,7 @@ extern void func_00282CF0(void *,void *,void *);
 extern int func_002761F8(void *,void *,int,void *,void *);
 extern void func_L19_00417A00(void *);
 
+/* Moby update: Arctic Leviathan (class 3927, PS3 name). */
 void func_L19_004160A0(char *obj)
 {
     float v[4] __attribute__((aligned(16)));

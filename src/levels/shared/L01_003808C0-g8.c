@@ -50,6 +50,7 @@ extern void func_L01_003801B8(void);
 extern int func_002B0C28(int, int, int);
 extern int func_002B49E0(int, int, void *, int, char *);
 
+/* Moby update: Megacorp Vendor (class 11, PS3 name). */
 void func_L01_003808C0(unsigned char *m) {
     unsigned char *s=BP(m,0x68);
     unsigned char *hero, *nearHero, *child;

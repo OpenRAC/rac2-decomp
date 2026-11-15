@@ -54,6 +54,7 @@ extern int func_L02_00332630(char *, void *);
 /* The integer and floating argument banks retain their independent order. */
 extern int func_002A8C28(void *, float, float *, int, float, float, int, int, int);
 
+/* Moby update: Megacorp Chickenbot (class 2638, PS3 name). */
 void func_L02_003CD970(char *o)
 {
     char *p = *(char **)(o + 0x68);

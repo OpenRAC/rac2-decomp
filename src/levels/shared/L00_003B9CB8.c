@@ -115,6 +115,7 @@ extern char *func_002BDCE8(float fa, float fb, float fc, float fd, char *p, int 
 extern char D_00189E20_13[];
 
 /* Pass the owner and its pointer at offset 0x68 to the explicitly bound helper; original game role is unknown. */
+/* Moby update: Hypnomatic (class 2384). */
 void func_L00_003B9CB8(Rac2Native_86f665335d9cb905_AnalysisOwner *owner)
 {
     func_L00_003B9310(owner, owner->context_68);
@@ -124,6 +125,7 @@ extern void func_003182C0(char *);
 
 /* Calls the measured callee with the object it was given. OpenRAC: the decompilation's
    (void) left a0 unset; the console's a0 still held the moby, the host's held anything. */
+/* Moby update: Heavy Lancer (class 3077). */
 void func_L00_003BAAD0(char *self)
 {
     func_003182C0(self);

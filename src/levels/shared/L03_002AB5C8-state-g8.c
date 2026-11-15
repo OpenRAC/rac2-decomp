@@ -82,6 +82,7 @@ extern void func_002B5258(char *), func_L03_003C4468(u8 *), func_002A677C(u8 *);
 #define ANIM_FRAMES(off) (*(u8 *)(*(u8 **)(*(u8 **)(object + 0x24) + (off)) + 0x10))
 
 
+/* Moby update: Bridgebot (class 2368, PS3 name); Gadgebot (class 2404, PS3 name). */
 void func_L03_003C1BF0(u8 *object)
 {
     MotionVector point, other, delta;

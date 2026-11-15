@@ -63,6 +63,7 @@ extern void func_00282CD8(void *,void *,void *);
 extern float func_00283B98(float,float);
 extern void func_002A7CA0(char *,float,float *,float,float,float);
 
+/* Moby update: Grulch (class 2952, PS3 name). */
 void func_L17_003E31E8(char *object)
 {
     float movement[4], position[4];

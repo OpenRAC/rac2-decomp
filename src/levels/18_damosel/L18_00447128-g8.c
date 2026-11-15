@@ -79,6 +79,7 @@ extern void func_L00_0041BAE8(void *);
 extern void func_L00_002E6EF8(void (*)(char *), void *);
 extern void func_L00_0041AE28(char *);
 
+/* Moby update: Lava Gun (class 1481). */
 void func_L18_00447128(u8 *obj)
 {
     float velocity[4] __attribute__((aligned(16)));

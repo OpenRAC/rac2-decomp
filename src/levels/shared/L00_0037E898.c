@@ -304,6 +304,7 @@ void func_L00_00381F78(void)
 
 extern void ref_L00_003827C0_00(void);
 
+/* Moby update: Heavy Lancer (class 3077). */
 void func_L00_003827C0(void)
 {
     ref_L00_003827C0_00();

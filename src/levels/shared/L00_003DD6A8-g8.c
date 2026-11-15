@@ -49,6 +49,7 @@ extern void ref_L00_003DD6A8_37(char *, char *);
 extern int ref_L00_003DD6A8_38(char *, char *, char *, char *, char *, char *);
 extern void ref_L00_003DD6A8_39(char *, char *), ref_L00_003DD6A8_40(char *, float);
 
+/* Moby update: Spider Bot (class 2904, PS3 name). */
 void func_L00_003DD6A8(char *object)
 {
     char oldpos[16], ahead[16], behind[16];

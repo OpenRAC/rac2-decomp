@@ -75,6 +75,7 @@ extern void func_L02_003D46B8(char *);
 #define SET_MODE(m,r) func_002A7750((u8 *)self,(m),(r))
 
 /* Drive the large Maktar sentry's locomotion and paired throw sequences. */
+/* Moby update: Chainblade (class 2552, PS3 name). */
 void func_L02_003D2DE0(char *self)
 {
     char *state=*(char **)(self+0x68);

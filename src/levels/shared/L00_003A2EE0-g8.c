@@ -87,6 +87,7 @@ extern void func_L00_003A8508(int);
 #define HERO ((Hero *)D_00189E20)
 #define GAME ((GameState *)D_00138180)
 
+/* Moby update: Pulse Rifle (class 1483). */
 void func_L00_003A2EE0(u8 *moby)
 {
     ScopeState *st = *(ScopeState **)(moby + 0x68);

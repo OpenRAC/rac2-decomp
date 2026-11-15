@@ -885,6 +885,7 @@ void func_L00_003F51A0(char *obj, char *arg)
 
 /* func_L00_003F5390 is in L00_003F5390-g8.c. */
 
+/* Moby update: Enemy Hoverbike Racer (class 2287, PS3 name); Spaceship Attachment (classes 4308, 4309, 4310, 4311, 4312, 4313, 4314, 4315, 4316, 4317, 4318, 4319, 4320, 4321, 4325, PS3 name). */
 void func_L00_003F5658(void)
 {
 }

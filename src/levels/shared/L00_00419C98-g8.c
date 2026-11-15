@@ -55,6 +55,7 @@ extern void ref_L00_00419C98_01(void *, char *);
 
 /* Initializes the effect tables on first update, processes nearby targets while active,
    and advances the emission vector and scrolling phases. */
+/* Moby update: Lava Gun (class 1481). */
 void func_L00_00419C98(char *object)
 {
     float vector[4];

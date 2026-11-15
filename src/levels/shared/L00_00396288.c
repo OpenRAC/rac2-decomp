@@ -33,6 +33,7 @@ extern void func_002E59F8(int);
 extern int func_002E5CF8(int, int, void *);
 extern float func_00283CE0(int);
 /* Maintains the beam's endpoint, light fade and looping sound state. */
+/* Moby update: Tractor Beam (class 188). */
 void func_L00_00396288(u8 *actor) {
     Vector offset;
     BeamState *beam = *(BeamState **)(actor + 0x68);

@@ -127,6 +127,7 @@ extern float func_00282E48();
 
 extern void func_002A93B0();
 
+/* Moby update: B2 Brawler Head (class 2635, PS3 name). */
 void func_L02_003DBE60(char *arg0) {
     if (*(unsigned char *)(arg0 + 0x31) != 0) {
         if (fast_vec_dist(arg0 + 0x10, &D_L02_001BA500) < 64.0f) {

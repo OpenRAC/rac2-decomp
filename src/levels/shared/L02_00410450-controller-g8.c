@@ -51,6 +51,7 @@ extern float D_L02_001B1A5C __attribute__((sda));
 extern float D_L02_001B1A60 __attribute__((sda));
 
 /* Run the control's activation, orbit and captured-object transition states. */
+/* Moby update: Teleporter (class 3168, PS3 name). */
 void func_L02_00410450(u8 *object)
 {
     OrbitState *state=*(OrbitState **)(object+0x68);

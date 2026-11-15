@@ -100,6 +100,7 @@ static __inline__ void clearSound(Moby *self,EffectContext *ctx)
     }
     ctx->sound=-1;
 }
+/* Moby update: Shield Charger (class 2652); Tesla Barrier (class 4498). */
 void func_L00_003C3D90(Moby *self)
 {
     float offset[4],origin[4],position[4];

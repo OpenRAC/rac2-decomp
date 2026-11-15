@@ -91,6 +91,7 @@ typedef struct BeamMoby {
     unsigned short oClass;
 } BeamMoby;
 
+/* Moby update: Clank Zapper (class 3800). */
 void func_L00_0040BA30(BeamMoby *self)
 {
     float old0[4];

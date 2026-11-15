@@ -31,6 +31,7 @@ extern void func_00283658(void *, void *), func_002AB6D8(float *, float *), func
 /* Retail returns a boolean, despite a legacy caller declaring this helper void. */
 extern int func_002AD0E0(int, int, void *, void *, void *, void *);
 /* Steers a moving projectile, resolves its collision, then follows a struck actor. */
+/* Moby update: Decoy (class 203, PS3 name). */
 void func_L00_00398150(char *actor) {
     /* The 96-byte collision query and following attachment transform have
      * disjoint lifetimes and occupy the same measured stack workspace. */

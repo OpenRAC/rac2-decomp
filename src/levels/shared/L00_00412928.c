@@ -247,6 +247,7 @@ void func_L00_00413298(char *object)
     *(int *)(state + 0x8) = 0;
 }
 
+/* Moby update: Spaceship Attachment (classes 4308, 4309, 4310, 4311, 4312, 4313, 4314, 4315, 4316, 4317, 4318, 4319, 4320, 4321, 4325, PS3 name). */
 void func_L00_00414018(void)
 {
 }

@@ -66,6 +66,7 @@ extern void func_002830C0(void *,void *,void *);
 extern int func_L03_0041D1D8(void *);
 extern void func_L03_0041CEB0(void *);
 /* Updates the actor's combat and movement states, including hiding and respawning. */
+/* Moby update: Megacorp Sweeper Bot (class 4083, PS3 name). */
 void func_L03_0041BE50(u8 *e) {
     u8 *s=P(e,0x68);
     Vec a,b;

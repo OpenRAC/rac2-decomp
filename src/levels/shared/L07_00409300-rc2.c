@@ -29,6 +29,7 @@ extern s32 ref_L07_00409300_00 __attribute__((sda));
 extern void ref_L07_00409300_01(s8 *, s32, s32);
 extern void ref_L07_00409300_02(s8 *, s8 *, s32, s32, f32);
 
+/* Moby update: TV Screens (class 4000, PS3 name). */
 void func_L07_00409300(s8 *arg0) {
     s8 *s;
     u8 t;

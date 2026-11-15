@@ -48,6 +48,7 @@ typedef struct {
     BounceVector point, normal, offset;
 } BounceWorkspace;
 
+/* Moby update: Mini Nuke Projectile (class 3079, PS3 name). */
 void func_L00_003E7270(unsigned char *object) {
     char *state = *(char **)(object + 0x68);
     BounceWorkspace work;

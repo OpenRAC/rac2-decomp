@@ -181,6 +181,7 @@ void func_L19_0041C328(u8 *object)
 }
 
 /* A separate no-op moby handler, entered by fifteen class records. */
+/* Moby update: Spaceship Attachment (classes 4308, 4309, 4310, 4311, 4312, 4313, 4314, 4315, 4316, 4317, 4318, 4319, 4320, 4321, 4325, PS3 name). */
 void func_L19_0041C3D0(void *object)
 {
 }

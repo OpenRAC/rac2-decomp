@@ -36,6 +36,7 @@ extern s32 func_00310960(s32 arg0, f32 fparg0);
 extern void func_0030F408(char *);
 
 
+/* Moby update: Swingshot (class 208). */
 void func_0030F7B0(u8 *self)
 {
     FollowVars *data;

@@ -296,6 +296,7 @@ extern void func_00282948(void *);
 #define EFFECT_LIVE(i) (EFFECT(i)->owner == moby && EFFECT(i)->active)
 
 /* Update the rideable hovering vehicle and its player-control state. */
+/* Moby update: Mining Vehicle (class 3823, PS3 name). */
 void func_L08_0041EBF8(VehicleMoby *moby)
 {
     VehicleVars *p = moby->pVars;

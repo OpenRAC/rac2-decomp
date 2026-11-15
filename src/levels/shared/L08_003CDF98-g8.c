@@ -150,6 +150,7 @@ extern PlayerCDF98 D_00189E20;
 #define OB(o) (*(u8 *)(obj + (o)))
 #define OH(o) (((u16 *)obj)[(o) / 2])
 
+/* Moby update: Glider (class 2309, PS3 name). */
 void func_L08_003CDF98(u8 *obj)
 {
     Vec saved;

@@ -62,6 +62,7 @@ extern void func_L04_00451018(char *);
 #define OF(o) (*(float *)(object + (o)))
 
 /* Updates the beast's rider mode, route following and close-range action states. */
+/* Moby update: Tribesman (class 4088, PS3 name). */
 void func_L04_0044DB18(u8 *object)
 {
     BeastVector offset, target, lateral;

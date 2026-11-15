@@ -55,6 +55,7 @@ typedef struct {
  float x34;
  int x38, x3C, x40, x44, x48, x4C, x50;
 } CarryData;
+/* Moby update: Teleporter (class 1135, PS3 name). */
 void func_L01_003980D0(char *m)
 {
  CarryData *d = *(CarryData **)(m+0x68);

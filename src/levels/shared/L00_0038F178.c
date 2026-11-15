@@ -393,6 +393,7 @@ char *func_L00_00395240(char *arg)
 /* func_L00_003973E8 is defined in L00_003973E8-g8.c. */
 
 /* Selects an aim target before advancing the projectile launcher state. */
+/* Moby update: Bomb Glove (class 192). */
 void func_L00_00397E60(char *actor)
 {
     char *state = *(char **)(actor + 0x68);
@@ -458,6 +459,7 @@ void func_L00_00398118(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 
 
 /* Aims and launches the actor's projectile in response to the shared input gate. */
+/* Moby update: Decoy Glove (class 562). */
 void func_L00_0039D110(char *actor)
 {
     char *state = *(char **)(actor + 0x68);
@@ -510,6 +512,7 @@ void func_L00_0039D340(Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner *owner)
 
 /* The mode word at 0x18C0B4 must be 8 and the object's byte 0x43 must not be 6; the
  * helper then takes the object with mode 6, zero and ten. */
+/* Moby update: Helipack (class 607). */
 void func_L00_0039D378(char *object)
 {
     if (D_18C0B4 == 8) {

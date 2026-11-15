@@ -556,6 +556,7 @@ extern void func_00288308(s32);
 extern void func_002B0A18(s32, s32);
 extern void func_0029B3E0(s32, s32);
 
+/* Moby update: Glider (class 3675, PS3 name). */
 void func_L08_0040E9B8(u8 *self) {
     u8 *st = *(u8 **)(self + 0x68);
     u8 *ent;

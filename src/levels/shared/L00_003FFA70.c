@@ -26,6 +26,7 @@ extern char D_00189EA0_2[];
 extern unsigned char D_001A7B2E __attribute__((sda));
 
 /* two-state update on a record: state 0 marks a byte with 255 and either runs a shared two-call teardown when a global latch byte is set and a sub-object field is non-zero, or plays a mode/value pair plus a call; state 1 runs a setup call and two float queries against a stored table and, when both are below 2.0, plays three fixed calls and either tears down or writes 120 into a sub-object field */
+/* Moby update: Charge Boots (class 3696). */
 void func_L00_003FFA70(char *arg)
 {
     int *object = *(int **)(arg + 104);

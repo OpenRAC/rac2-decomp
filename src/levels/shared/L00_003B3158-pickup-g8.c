@@ -29,6 +29,7 @@ extern int D_L00_001A8F08 MACRO_ADDR;
 extern int D_L00_001A8FF4 MACRO_ADDR;
 extern int D_00138324 NOT_SDA;
 
+/* Moby update: Spiderbot Glove (class 2311). */
 void func_L00_003B7D48(char *m) {
     float pos[4], sweep_storage[4], normal[4];
     float *sweep;
