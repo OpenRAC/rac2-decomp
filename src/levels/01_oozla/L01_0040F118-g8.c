@@ -12,10 +12,10 @@ extern char D_L01_001A8F60[] NOT_SDA;
 extern s32 math_fast_float_d(char *);
 extern void moby_mark_spawned(char *);
 extern void moby_set_state(char *, s32, s32);
-extern s32 part_find_owned_effect_slot(char *, s32, s32);
+extern void *part_find_owned_effect_slot(char *, s32, s32);
 extern void part_spawn_masked_debris(char *, s32, char *, float, float, float, float, s32);
 extern s32 flag_set_first_pending(char *);
-extern void PlayMobySound(s32, s32, char *);
+extern int PlayMobySound(s32, s32, char *);
 extern void part_spawn_scaled_bolts(char *, s32, float);
 
 /* Counts the objects of its kind: arms on the first tick, waits for the trigger, plays the sound on the third and retires once its timer runs out. */

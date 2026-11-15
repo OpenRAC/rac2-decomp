@@ -55,7 +55,7 @@ extern int snd_play_from_global_bank(int, int, void *);
 extern void func_US2_002B1880(int, int);
 extern void part_queue_moby_for_glow(char *, int, void (*)(char *));
 extern void chainblade_reset_to_idle(char *);
-extern void moby_step_at_own_position_factor(u8 *, float);
+extern int moby_step_at_own_position_factor(u8 *, float);
 extern void chainblade_pick_wander_goal(char *);
 extern int FastDecTimer(short *);
 extern int chainblade_should_land(char *);

@@ -28,7 +28,7 @@ unsigned int menu_get_second_value(void)
 extern int request_is_current_slot(int);
 extern void snd_send_cmd23(int);
 extern void music_Unpause(void);
-extern void snd_Pump(void);
+extern int snd_Pump(void);
 extern void pad_clear_port_state(void);
 
 /* Ends the menu: undoes the pause sounds when needed and clears the saved menu state. */

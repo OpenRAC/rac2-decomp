@@ -12,7 +12,7 @@ extern int FloatToInt(float);
 extern float mat_fast_helper_a(float,float), FastDiffRots(float,float);
 extern int IsPointInCuboid(void *,int);
 extern void *group_find_entity_in_state(int);
-extern void math_step_value_toward_target(float *,float *,float,float,float,float);
+extern float math_step_value_toward_target(float *,float *,float,float,float,float);
 extern void path_sample_position(void *,int,void *,void *,int,float);
 extern float coll_probe_ground_height_below(void *,int,float);
 extern int PlayMobySound(int,int,void *);
@@ -25,7 +25,7 @@ extern void *part_find_owned_effect_slot(void *,u32,s32);
 extern float func_PAL_002AA108(void *,void *);
 extern void func_PAL_002B15D8(char *,int,void *,u8,float,float,float,float);
 extern void vec_scale_to_length(void *,void *,float);
-extern void func_PAL_0032F3B8(void *,void *,void *,float);
+extern char *func_PAL_0032F3B8(void *,void *,void *,float);
 
 void func_PAL_L02_00405F90(char *e) {
     float old[4] __attribute__((aligned(16))), temp[4] __attribute__((aligned(16)));

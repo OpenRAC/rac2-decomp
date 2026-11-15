@@ -7,8 +7,8 @@ extern float vec_spring_to_target(void *, void *, void *, float, float, float);
 extern float FastAddRotations(float, float);
 extern int table_find_last_used_entry(int);
 extern int math_random_int_below(int);
-extern int GetLocalizedString(int);
-extern void func_US2_L00_0030EFB8(int, int);
+extern char *GetLocalizedString(int);
+extern int func_US2_L00_0030EFB8(int, int);
 typedef struct L05Slot40 {
     int state;
     int next;

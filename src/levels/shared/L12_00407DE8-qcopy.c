@@ -11,7 +11,7 @@ extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern int coll_process_hit(void *, int, void *, void *, float);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern void moby_mark_spawned(void *);
 extern void ref_L12_00407DE8_00(void *, void *);
 extern void blast_projectile_draw_glow(void *);

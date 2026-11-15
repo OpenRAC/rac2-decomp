@@ -13,7 +13,7 @@ extern L01RadiusRecord *D_L01_001B21C0;
 extern char D_L01_001AFE38[] SDATA(D_L01_001AFE38);
 extern void moby_update_floor_and_ceiling_heights(void *);
 extern int FloatToInt(float);
-extern void path_l01_compute_segment_lengths(void *);
+extern float path_l01_compute_segment_lengths(void *);
 extern void moby_set_state(void *, int, int);
 
 /* Sets up a Mutant Firefly when it first appears: size, starting height, random spin, timers and its first animation. */

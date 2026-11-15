@@ -4,7 +4,7 @@
 #include "common.h"
 
 extern void joba_menu_draw_help_prompts(char *, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern long long GetEffectTextureDescriptor(int);
 extern void FontPrintScaled(float, float, long long, char *, float, int, long long, char *);
 extern void FontSetWindow(char *, int, int, int, int, int, int, int, int);

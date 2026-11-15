@@ -14,7 +14,7 @@ typedef struct {
 } CallbackState;
 extern MenuGameState g_pad_state;
 extern CallbackState g_pause_menu_state;
-extern void func_0029C5D0(int);
+extern int func_0029C5D0(int);
 
 int func_US2_002D43B0(void)
 {

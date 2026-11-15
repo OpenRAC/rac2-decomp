@@ -113,7 +113,7 @@ void func_PAL_L00_002B1E88(void)
 
 extern void func_PAL_L00_002AF6C0(void);
 extern void func_PAL_L00_002B1E88(void);
-extern void hud_set_slot_contents(int, int, char *, char *, char *, int, int);
+extern int hud_set_slot_contents(int, int, char *, char *, char *, int, int);
 extern void level_release_slot_list(char *);
 extern void hero_set_objects_flag_bit(void);
 extern void hero_clear_tracked_slots(void);
@@ -121,8 +121,8 @@ extern void attachment_reset_all(void);
 extern void func_PAL_L00_002B3210(void);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(char *);
-extern void func_PAL_L00_002C4480(int, int);
-extern void level_run_slot_callback(int);
+extern int func_PAL_L00_002C4480(int, int);
+extern int level_run_slot_callback(int);
 extern int D_00138320[];
 extern char D_L00_002F8588[];
 extern char D_L00_002F85D0[];

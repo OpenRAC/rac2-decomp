@@ -19,7 +19,7 @@ extern L05HudCamera D_L05_001B96C0;
 extern u64 GetEffectTextureDescriptor(int);
 extern void AppendSubpixelTexturedScreenQuad(float,float,float,float,int,int,int,int,u64,u64);
 extern int level_get_saved_value(void);
-extern s32 moby_get_motion_data(u8 *);
+extern char *moby_get_motion_data(u8 *);
 extern float fast_vec_dist(void *,void *);
 extern void euler_rotation_basis(void *,void *);
 extern void FastVecSub(void *,void *,void *);

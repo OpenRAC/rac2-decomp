@@ -11,7 +11,7 @@ extern float D_L16_001B1708 __attribute__((sda));
 extern float D_L16_00189EF8 __attribute__((nosda));
 extern void anim_start_blended(void *, s32, s32, void *);
 extern s32 FloatToInt(float);
-extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 FastDecTimer(void *);
 extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
 extern s32 math_random_int_range(s32, s32);

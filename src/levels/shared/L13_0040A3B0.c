@@ -10,7 +10,7 @@ extern float vec_get_heading_angle(char *a0, void *out, char *a2);
 
 /* The four floats are declared before the two other arguments, which sets the order this caller
    evaluates them in (the registers are the same either way), as for func_L00_003BFF68. */
-extern void math_approach_target_with_direction_mode(void *out, float f12, float f13, float f14, float f15, char *in, int a2);
+extern float math_approach_target_with_direction_mode(void *out, float f12, float f13, float f14, float f15, char *in, int a2);
 
 extern void euler_rotation_basis(void *out, void *in);
 

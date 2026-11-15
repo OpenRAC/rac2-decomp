@@ -43,7 +43,7 @@ extern int AcquireEntitySlot(void *, int, void *);
 extern char *level_get_slot_body(int, int);
 extern float math_random_signed_float_range(float, float), math_random_float_range(float, float);
 extern void vec_clear_128(VectorBits *);
-extern void hero_l00_set_action(int, int);
+extern s32 hero_l00_set_action(int, int);
 extern int get_ammo(int);
 extern void hud_add_moby_marker(void *, unsigned int, int, int, int, int, float, float, float);
 extern int vec_fast_helper_b(void *);

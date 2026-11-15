@@ -38,7 +38,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
-extern void part_spawn_spark_2(void *, void *, int, int);
+extern void *part_spawn_spark_2(void *, void *, int, int);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_fast_float_d(char *);

@@ -20,7 +20,7 @@ typedef struct {
 } OozlaSpawnState;
 
 extern s32 FloatToInt(f32);
-extern void path_l01_compute_segment_lengths(u32);
+extern float path_l01_compute_segment_lengths(u32);
 extern void anim_start_immediate(u8 *, s32, s32);
 extern void moby_set_state(u8 *, s32, s32);
 extern int D_L01_001B2088[] __attribute__((sda));

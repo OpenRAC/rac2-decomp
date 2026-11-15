@@ -8,7 +8,7 @@ extern float func_00282E80_3(char *arg, char *table);
 extern float func_00282C48_10(float value);
 extern void value_set_entry_by_index(int arg, int value);
 extern void help_unlock_entry(int arg);
-extern void moby_handle_request_slot_state(int arg);
+extern int moby_handle_request_slot_state(int arg);
 extern void func_0029F338_4(char *arg);
 extern char D_00189EA0_2[];
 extern unsigned char D_001A7B2E __attribute__((sda));

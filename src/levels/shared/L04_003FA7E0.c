@@ -42,7 +42,7 @@ extern unsigned char *part_spawn_burst(void *, void *, int, int, int, int, float
 extern unsigned char *bike_find_aim_target(void *, void *, void *, void *, void *, void *, float, float);
 extern void projectile_steer_around_walls(void *, void *, void *);
 extern void racer_update_event_streak(void);
-extern int SweepProjectileCollision(void *, void *, void *, void *, void *, void *, void *);
+extern void *SweepProjectileCollision(void *, void *, void *, void *, void *, void *, void *);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern int coll_process_hit(void *, int, void *, float, int);
 extern void moby_queue_knockback_for_nodes(void *, void *, void *, int, int, int, int, int, float, float, float);

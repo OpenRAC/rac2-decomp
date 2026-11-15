@@ -12,7 +12,7 @@ void empty_function(void) {
 }
 
 extern void *malloc(unsigned int);
-extern int memset(unsigned char *, int, int);
+extern void *memset(unsigned char *, int, int);
 extern void call_terminate_handler(void);
 
 /* Allocates and clears a new 24-byte record for exception handling. */

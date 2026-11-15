@@ -8,7 +8,7 @@ extern float math_fabs(float);
 extern void BuildOffsetVectorPair(void *, void *, int, float, float);
 extern int CollLine(void *, void *, int, void *, int);
 extern short GetCollHitMaterial(void);
-extern void hero_l18_set_action(int, int);
+extern int hero_l18_set_action(int, int);
 extern int hero_play_sound(int, int);
 
 /* Same body as func_L00_002C8E10 plus a mode-4 early exit before the resident checks. */

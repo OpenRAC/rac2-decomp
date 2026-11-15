@@ -78,7 +78,7 @@ int func_US2_L00_0034DCA8(void)
     return 0;
 }
 
-extern int tab_menu_get_selected_value(int x);
+extern void *tab_menu_get_selected_value(int x);
 
 /* When a global flag is set, derives a pointer from that global plus a fixed offset, runs it through one callee and stores the callee result into a field of the argument. */
 int func_US2_L00_0034F738(int *obj)

@@ -55,7 +55,7 @@ extern float fast_vec_dist(void *, void *);
 extern void make_hit_descriptor(void *, u8 *, s32, void *, float);
 extern s32 CollLine(void *, void *, s32, void *, s32);
 extern void *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float, s32, s32, s32, s32);
-extern void part_create_flash(void *, s32, s32, s32, s32, s32, s32, s32, float, s32, s32);
+extern char *part_create_flash(void *, s32, s32, s32, s32, s32, s32, s32, float, s32, s32);
 extern void cam_play_effect_on_target(u8 *, s32, s32, void *, s32, s32);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void gfx_add_draw_callback_third(void *, void *);

@@ -28,7 +28,7 @@ typedef struct VideoBuffer_351578 {
 
 
 extern int WaitSema(int);
-extern int SignalSema(int);
+extern void SignalSema(int);
 static inline int ts_dist(int a, int size) {
     return a % size;
 }

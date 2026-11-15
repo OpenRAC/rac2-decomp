@@ -5,7 +5,7 @@ extern int D_L00_001BCAF4;
 extern unsigned char D_001A7BB1 __attribute__((sda));
 extern float math_fast_sin_or_cos_a(float);
 extern int FastTweenColor(float, int, int);
-extern unsigned char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int text_draw_centered_medium(int, int, long, unsigned char *, int);
 
 void func_PAL_0027D9A0(void)

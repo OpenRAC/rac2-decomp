@@ -37,7 +37,7 @@ extern int PlayMobySound(int,int,void *);
 extern void func_PAL_002A7650(void *,int,int);
 extern void moby_set_state(void *,int,int);
 extern void func_PAL_002A7E68(void *,int,int,int);
-extern void ApproachValue(void *,float,float);
+extern f32 ApproachValue(void *,float,float);
 extern float FastAddRotations(float,float);
 extern int func_PAL_L01_00323068(void *,void *);
 extern void gfx_add_draw_callback_first(void *,void *);

@@ -366,7 +366,7 @@ extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(void *, void *, void *);
-extern int moby_get_private_value_2(void *);
+extern char *moby_get_private_value_2(void *);
 extern int CollLine(void *, void *, int, void *, int);
 extern int GetCollHitMaterial(void);
 extern int math_fast_float_d(int *);

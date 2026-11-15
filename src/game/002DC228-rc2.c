@@ -28,8 +28,8 @@ extern s8 *D_001F2854;
 extern s8 D_00262BE0[];
 extern void SetupGifPaging(s32);
 extern void DoGifPaging(void);
-extern void text_draw_centered_small(s32, s32, u64, s32, s32);
-extern s32 GetLocalizedString(s32);
+extern int text_draw_centered_small(s32, s32, u64, s32, s32);
+extern char *GetLocalizedString(s32);
 
 /* Shows a message in the middle of the screen. With no item chosen it shows one line, otherwise two lines for the chosen item. */
 s32 menu_entry_message_draw(s8 *menu) {

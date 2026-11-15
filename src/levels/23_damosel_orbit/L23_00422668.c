@@ -46,7 +46,7 @@ extern void make_hit_descriptor(float, L23Hit *, u8 *, s32, L23Vec *);
 
 extern void QueueMobyImpact(u8 *, L23Hit *);
 
-extern void queue_copy_record_by_index(s32);
+extern int queue_copy_record_by_index(s32);
 
 extern void part_start_random_scale_effect(void *, s32, s32);
 

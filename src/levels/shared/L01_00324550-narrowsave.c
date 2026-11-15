@@ -2,7 +2,7 @@
 /* func_L01_00324550: variadic, built with -mastra-quad-saves and -frac2-narrow-saves-below.
    register_precision keeps $ra's save at 64 bits; the narrower save takes the lower slot. */
 #include "common.h"
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void text_expand_number_template(char *, char *, int *);
 extern void hud_play_sound_effect(int);
 extern void STUB_printf(const char *, ...);

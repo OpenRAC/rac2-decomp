@@ -39,10 +39,10 @@ void func_PAL_00348728(char *a0)
 }
 
 
-extern void F5a9e4f98_FUN_003361A8(char *p);
-extern void F5a9e4f98_FUN_003363D0(char *p);
-extern void F5a9e4f98_FUN_00336968(char *p);
-extern void F5a9e4f98_FUN_003366D0(char *p);
+extern void *F5a9e4f98_FUN_003361A8(char *p);
+extern void *F5a9e4f98_FUN_003363D0(char *p);
+extern char *F5a9e4f98_FUN_00336968(char *p);
+extern void *F5a9e4f98_FUN_003366D0(char *p);
 
 void *func_PAL_003487C8(char *p)
 {

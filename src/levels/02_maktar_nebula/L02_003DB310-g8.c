@@ -99,7 +99,7 @@ extern unsigned short *g_entity_group_lists[];
 
 extern char g_hero_state[];
 
-extern int moby_get_private_value_2(char *);
+extern char *moby_get_private_value_2(char *);
 
 extern void mat_combine_and_store(void *, void *, void *, void *);
 
@@ -283,7 +283,7 @@ extern void part_explode_object_into_pieces(void *, void *, void *, void *, int,
 
 extern void part_spawn_scaled_bolts(void *, int, float);
 
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 /* Per-frame update for moby class 2724. One step of an actor, by its state byte (+0x20). State 0 marks the actor (+0x30), moves it to
    state 1 and lowers the counter D_L02_001AEC78 when its private word is set. Unless
@@ -338,7 +338,7 @@ extern float coll_probe_ground_height_below(void *, int, float);
 
 extern float math_random_float_range(float, float);
 
-extern void part_spawn_puff(void *, int, float, float);
+extern void *part_spawn_puff(void *, int, float, float);
 
 extern float D_L02_001B0530 __attribute__((sda));
 

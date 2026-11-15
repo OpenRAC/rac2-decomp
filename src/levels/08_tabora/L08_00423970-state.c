@@ -20,7 +20,7 @@ extern int moby_handle_is_past_early_state(int);
 extern void anim_start_blended(char *, int, int, int);
 extern void moby_set_state(char *, int, int);
 extern int flag_set_first_pending(char *);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern float math_step_value_toward_target(void *, float, void *, float, float, float);
 extern void part_spawn_dust_burst_motion(char *, void *, int, float, float, float, float, float, float);
 extern void creature_pick_random_target(char *);

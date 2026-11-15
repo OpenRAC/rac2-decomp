@@ -7,11 +7,11 @@ extern float math_random_float_range(float,float);
 extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
-extern void part_spawn_timed_effect_between_points(void *,void *);
+extern char *part_spawn_timed_effect_between_points(void *,void *);
 extern int math_random_int_below(int);
 extern int FloatToInt(float);
 extern void gorn_part_spawn_spark_burst(void *,int,int);
-extern void snd_play_from_class_bank(int,int,void *,int);
+extern int snd_play_from_class_bank(int,int,void *,int);
 extern void hero_apply_damage(float);
 /* Updates the backdrop and spawns sparks and bursts as the tracked object passes certain heights. */
 void backdrop_update_effects(char *self) {

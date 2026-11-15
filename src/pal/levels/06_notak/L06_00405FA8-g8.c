@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "common.h"
 extern void moby_set_state(void *, int, int);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int,
                                int, int, int);
 extern void moby_compute_local_point(char *, float *, float, float, float);

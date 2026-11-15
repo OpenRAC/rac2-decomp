@@ -20,7 +20,7 @@ extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
 extern void math_update_wrapped_angle_offset(void *, void *, void *, float, float, float);
 extern void func_PAL_002AC3C0(void *, void *);
-extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 FastDecTimer(void *);
 extern float func_PAL_002AA108(void *, void *);
 extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);

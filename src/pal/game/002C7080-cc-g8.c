@@ -8,8 +8,8 @@ extern float D_L00_001AA704 __attribute__((sda));
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern float IntToFloat(int);
-extern void part_spawn_drifting(char *, int, int, float, float);
-extern void func_PAL_002C0838(char *, char *, int, int);
+extern void *part_spawn_drifting(char *, int, int, float, float);
+extern void *func_PAL_002C0838(char *, char *, int, int);
 
 #ifndef RAC2_T_V4_G8
 #define RAC2_T_V4_G8

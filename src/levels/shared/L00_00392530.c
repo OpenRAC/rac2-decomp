@@ -37,7 +37,8 @@ extern int PlayMobySound(int, int, char *), snd_is_voice_playing_for_owner(void 
 extern float mat_fast_helper_a(float, float), FastDiffRots(float, float), fast_vec_dist(void *, void *), IntToFloat(int);
 extern void cam_compute_view_direction(void *, void *, int), FastVecScale(void *, void *, float), FastVecAdd(void *, void *, void *);
 extern char *moby_get_private_value_0(char *);
-extern void moby_transform_joint_to_world(void *, int, void *), matrix_mul_vec3(void *, void *, void *), vec_scale_to_length(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *), vec_scale_to_length(void *, void *, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
 extern void InitializeElectricWaterBoltEffect(char *), hero_tether_beam_update(char *), beam_draw_ribbons(void *);
 extern void ref_L00_00392530_00(void (*)(void *), void *), snd_stop_voice(int);
 extern void start_equipped_item_animation(void), cancel_hero_item_animation(void), gfx_free_point_light(int);

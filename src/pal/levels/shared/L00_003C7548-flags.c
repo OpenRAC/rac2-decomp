@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void math_random_int_below(int a);
+extern s32 math_random_int_below(int a);
 extern float math_random_float_range(float a, float b);
 extern unsigned int math_random_int_range(int a, int b);
 extern void vec_random_direction(char *p, float a, float b);

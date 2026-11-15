@@ -195,13 +195,15 @@ void dobbo_restore_saved_height(char *obj) {
 /* func_L09_00404C50 is in L09_00404C50-g8.c. */
 
 /* Moves the object toward a point, using one of two movement helpers depending on the mode. */
-void dobbo_move_toward_point(char *obj, char *dest, s32 mode) {
+int dobbo_move_toward_point(char *obj, char *dest, s32 mode) {
     char *vars = *(char **)(obj + 0x68);
+    int result;
     if (mode == 0) {
-        moby_l01_turn_toward_target(obj, dest);
+        result = moby_l01_turn_toward_target(obj, dest);
     } else {
-        moby_turn_toward_target_and_step(obj, (float *)dest, *(f32 *)(vars + 0x33C));
+        result = moby_turn_toward_target_and_step(obj, (float *)dest, *(f32 *)(vars + 0x33C));
     }
+    return result;
 }
 
 /* Counts down the object's two timers, bumps its frame counter and updates its two effects. */
@@ -399,7 +401,7 @@ extern void moby_reset_vars_defaults(char *);
 extern int IsPointInCuboid(char *, int);
 extern int req_push_queue(char *, int);
 extern void level_apply_index_for_key(char *);
-extern void req_launch_queued(char *);
+extern s32 req_launch_queued(char *);
 extern int game_is_either_mode_two(void);
 extern void hero_reset_position_and_direction(char *, char *, int, int);
 extern int flag_is_third_pending_set(char *);
@@ -411,7 +413,7 @@ extern void snd_play_indexed(int);
 extern void record_add_or_update_entry(char *, int, char *, int, char *);
 extern void moby_mark_table_entry_flagged(int);
 extern void level_capture_checkpoint_state(char *, char *);
-extern void MemcardSave(int, int);
+extern int MemcardSave(int, int);
 /* Per-frame update of the bolt-trading character (moby class 3600): it talks to the hero, offers a deal for bolts, and takes the payment when he accepts. */
 void UpdateDobboPaidOfferNpc(u8 *obj)
 {

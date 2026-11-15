@@ -16,10 +16,10 @@ extern char *SpawnSpinningSparkParticle(char *, float, float, float, int, char *
 
 extern char D_L06_002AA500[];
 
-extern void func_32D268(char *);
+extern int func_32D268(char *);
 extern void func_366160(char *, char *, float, int, int);
-extern void func_36C158();
-extern void func_36C1B0(float);
+extern int func_36C158();
+extern int func_36C1B0(float);
 extern void func_3BFBB8(char *, int);
 
 extern char D_L06_00189EA0[];
@@ -80,8 +80,8 @@ extern float FastVecLength(float *);
 extern void vec_scale_to_length(float *, float *, float);
 extern int moby_move_over_ground(char *, char *, char *, int, float, float, float, float);
 extern float ApproachValue(float *, float, float);
-extern void math_step_value_toward_target(float *, char *, float, float, float, float);
-extern void math_approach_target_with_direction_mode(char *, float, float, float, float, char *, int);
+extern float math_step_value_toward_target(float *, char *, float, float, float, float);
+extern f32 math_approach_target_with_direction_mode(char *, float, float, float, float, char *, int);
 extern float FastDiffRots(float, float);
 extern int ComputeRegionRouteHeading(char *, int, float *, char *, int, char *, char *, float,
                              float);
@@ -597,15 +597,17 @@ done:
 /* func_L06_00443A38 is defined in L06_0041DED8-g8.c. */
 
 /* Starts or stops the actor's glow effect. */
-void actor_set_glow_effect(char *moby, int unused, int mode)
+int actor_set_glow_effect(char *moby, int unused, int mode)
 {
     char *vars = *(char **)(moby + 0x68);
+    int result;
 
     if (mode == 0) {
-        func_36C158();
+        result = func_36C158();
     } else {
-        func_36C1B0(*(float *)(vars + 0x31C));
+        result = func_36C1B0(*(float *)(vars + 0x31C));
     }
+    return result;
 }
 
 /* Counts down the actor's timers, ages it by one frame and updates its effects. */

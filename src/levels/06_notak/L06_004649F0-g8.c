@@ -2,7 +2,7 @@
 typedef unsigned int Quad __attribute__((mode(TI)));
 extern void moby_set_state(char *, int, int);
 extern float math_random_float_range(float,float);
-extern char *func_0035CBA0(char *,int,int);
+extern int func_0035CBA0(char *,int,int);
 extern void FastVecAdd(void *,void *,void *);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void func_00350388(char *);
@@ -13,7 +13,7 @@ extern float moby_update_aim_target_strength(char *,char *);
 extern void gfx_start_color_fade(char *,void *);
 extern void gfx_update_color_fade(char *,void *);
 extern int flag_set_first_pending(char *);
-extern void SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
+extern char *SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 extern int func_003A0948(int,int,char *);
 extern float FastAddRotations(float,float);
 extern int coll_sweep_from_object(char *,void *,float,float,float,int,int,int,int);

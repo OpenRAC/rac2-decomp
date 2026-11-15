@@ -44,7 +44,7 @@ extern AranosMoby *cam_moby_create(void *, int, int, int, void *, void *, void *
 extern char g_hero_position[];
 extern int IsPointInCuboid(char *, unsigned int);
 extern void moby_mark_spawned(void *);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(void *, void *, void *);
@@ -91,7 +91,7 @@ extern void euler_rotation_basis(void *, void *);
 extern int math_random_int_range(int, int);
 extern int math_fast_float_d(void *);
 extern float math_random_signed_float_range(float, float);
-extern void math_spring_float_to_goal(float *, float *, float, float, float, float);
+extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 
 void func_PAL_L00_003D38F8(char *obj) {
     char *ctx;

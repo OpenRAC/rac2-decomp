@@ -17,11 +17,11 @@ void func_PAL_002BE880(struct Vec4 *a, struct Vec4 *b, u32 c, s32 d, s32 e, f32 
 void FastVecAdd(struct Vec4 *a, struct Vec4 *b, struct Vec4 *c);
 f32 mat_fast_helper_a(f32 a, f32 b);
 f32 math_random_signed_float_range(f32 a, f32 b);
-void FloatToInt(f32 a);
+int FloatToInt(f32 a);
 f32 FastAddRotations(f32 a, f32 b);
 f32 math_fast_sin_or_cos_a(f32 a);
 f32 math_fast_sin_or_cos_b(f32 a);
-void func_PAL_002C8BD0(struct Vec4 *a, struct Vec4 *b, s32 c);
+unsigned char *func_PAL_002C8BD0(struct Vec4 *a, struct Vec4 *b, s32 c);
 void moby_release_slot_by_id(struct Obj *a);
 void moby_mark_spawned(struct Obj *a);
 

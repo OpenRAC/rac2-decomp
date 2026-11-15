@@ -21,8 +21,8 @@ extern int math_random_int_range(int, int);
 extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int, int, int, float);
 extern char *func_PAL_003096D0(char *, char *, char *, int, float, u8, u8, u8, u8);
 extern int math_fast_helper_a(void *, float);
-extern void moby_spawn_template_effect(void *, void *, int, int);
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern char *moby_spawn_template_effect(void *, void *, int, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
 /* Called with a constant radius: each ring loads it afresh instead of sharing one register. */
 static __inline__ void spawn_ring(char *obj, char *pos, char *velocity, float radius, int type,
                                   u8 r, u8 g, u8 b, u8 a)

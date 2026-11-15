@@ -80,7 +80,7 @@ extern int flag_is_third_pending_set(void *);
 extern int flag_set_first_pending(void *);
 extern int hero_get_target_state_kind(void);
 extern int hero_is_on_moby(void *);
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void hero_start_target_state(void *, int, float);
 extern int PlayMobySound(int, int, void *);

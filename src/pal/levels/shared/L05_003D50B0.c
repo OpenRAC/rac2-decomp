@@ -14,7 +14,7 @@ struct Sub_003D15E8 {
 };
 extern char *D_L05_001B251C MACRO_ADDR;
 extern char g_sound_state[];
-extern int state_get_stored_pointer_value(char *);
+extern void *state_get_stored_pointer_value(char *);
 extern struct Sub_003D15E8 *moby_get_motion_data(char *);
 extern void func_PAL_L05_003D5628(char *);
 extern void vec_clear_128(void *);
@@ -22,7 +22,7 @@ extern void level_append_object(char *, void *, int, int);
 extern void moby_l00_update_empty_3(void);
 extern void AttachManipulator(char *, int, void *);
 extern void func_PAL_L05_0037E8E0(char *);
-extern void moby_process_collision_hit(char *, int, int, int);
+extern int moby_process_collision_hit(char *, int, int, int);
 extern void moby_check_player_in_view_and_range(char *, int, float);
 extern float fast_vec_dist(void *, void *);
 extern int math_random_int_below(int);
@@ -35,7 +35,7 @@ extern int moby_can_take_next_step(char *);
 extern int list_count_objects_matching_value(char *, int);
 extern void moby_l05_set_state_value(char *, int);
 extern void func_PAL_L05_0037DE20(char *);
-extern void math_fast_float_d(void *);
+extern int math_fast_float_d(void *);
 extern void func_PAL_L05_003D5800(char *);
 
 /* The object's update: on its first frame it sets itself up; afterwards, while its record is

@@ -5,7 +5,7 @@ extern int D_L05_001AC4D8 __attribute__((sda));
 extern char *D_L05_001B251C;
 extern int D_L05_00225DD0[];
 extern int D_L05_001FB220[];
-extern int moby_get_motion_data(char *object);
+extern char *moby_get_motion_data(char *object);
 extern void func_PAL_L05_0037D610(char *object, int flag);
 
 /* Finds the free entry of the level list that belongs to id and spawns it there. */

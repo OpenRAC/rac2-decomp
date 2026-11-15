@@ -38,7 +38,7 @@ void func_PAL_0033EAF0(char *object)
 }
 
 extern void func_PAL_0033CE70();
-extern void DrawMenuPreviewImage();
+extern int DrawMenuPreviewImage();
 extern void func_PAL_00338770();
 extern void hud_draw_colored_quad_widget();
 extern void gfx_draw_screen_element_stored();

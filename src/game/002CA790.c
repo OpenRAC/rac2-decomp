@@ -34,7 +34,7 @@ extern void snd_send_cmd23(int);
 extern int flag_is_word_set(void);
 extern void music_Unpause(void);
 extern int snd_Pump(void);
-extern void UpdateSoundVoices(void);
+extern s32 UpdateSoundVoices(void);
 extern s16 snd_pump_music_and_disc_read(int);
 extern void pad_clear_port_state(void);
 

@@ -11,7 +11,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_add_random_offset(void *, float);
 extern float math_random_float_range(float, float);
-extern void part_spawn_object_relative_particle(char *, void *, void *, void *, int);
+extern void *part_spawn_object_relative_particle(char *, void *, void *, void *, int);
 
 /* Builds a unit vector pointing back along the object's -0.8 axis, rotated into the world, then
    fires three bursts, one from each of three copies of it, each with a random upward kick

@@ -7,7 +7,7 @@ extern void SetupGifPaging(int);
 extern void func_US2_0029D2F8(void);
 extern int D_US2_001AB9E0 __attribute__((sda));
 extern int D_US2_001AB9E4;
-extern s32 GetLocalizedString(s32);
+extern char *GetLocalizedString(s32);
 extern void text_draw_right_aligned_small(int, int, u64, u8 *, int);
 extern void DoGifPaging(void);
 

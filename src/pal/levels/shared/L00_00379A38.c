@@ -23,7 +23,7 @@ typedef struct {
     char pad88[0xBC];
     struct { int price; int rest[6]; } cells[0]; /* Variable-length trailing table. */
 } UpgradeModel;
-extern int func_PAL_002802D8(int, int, unsigned long long, unsigned char *, int, int, float);
+extern void func_PAL_002802D8(int, int, unsigned long long, unsigned char *, int, int, float);
 extern unsigned char D_001A7BB4 __attribute__((sda));
 extern void hud_draw_sprite(int, int, int, int, int, int);
 
@@ -31,10 +31,10 @@ extern char g_purchase_menu_model[];
 extern float D_L00_001B25E0 __attribute__((sda));
 extern int g_player_bolts __attribute__((sda));
 extern int g_is_pal_video __attribute__((sda));
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void text_draw_right_aligned_medium(int, int, unsigned long long, unsigned char *, int);
 extern int GetIconFrame(int, int);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
 extern void func_PAL_002FAB40(char *, int);
 extern void text_draw_medium(int, int, unsigned long long, unsigned char *, int);
 extern unsigned int level_get_native_table_entry(int);

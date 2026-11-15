@@ -24,7 +24,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(char *, char *, Vec4 *);
 extern void path_clamp_move_to_area(Vec4 *, char *, char *, int, float);
-extern void math_closest_point_on_segment(Vec4 *, char *, char *, u8 *);
+extern float math_closest_point_on_segment(Vec4 *, char *, char *, u8 *);
 extern float vec_distance_xy(void *, u8 *);
 
 /* Builds the actor's target point: the path's middle point plus an offset of `len` (the distance

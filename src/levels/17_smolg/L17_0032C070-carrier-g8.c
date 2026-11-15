@@ -52,7 +52,8 @@ extern float FastAddRotations(float,float), fast_vec_dist(void *,void *), vec_di
 extern void matrix_mul_vec3(void *,void *,void *), FastVecAdd(void *,void *,void *), add_vectors(void *,void *,void *);
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int,int,void *), flag_set_first_pending(void *), platform_is_waiting(void *);
-extern void snd_play_from_class_bank(int,int,void *,int), DrawIndexedRibbonSegments(void *);
+extern void DrawIndexedRibbonSegments(void *);
+extern int snd_play_from_class_bank(int,int,void *,int);
 extern void gfx_add_draw_callback_first(void *,void *), STUB_printf(void *), vec_build_spherical_offset(void *,float,float,float);
 
 /* -ffast-math: combine folds K - (-x) to K + x with K first, retail's add.s order. It would also

@@ -16,7 +16,7 @@ extern float FastAddRotations(float angle, float step);
 extern int moby_dispatch_action_by_kind(char *, char *);
 extern void snd_stop_voice(int);
 extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern void func_PAL_002A7650(void *, int, int);
 extern float math_fast_sin_or_cos_b(float);
 extern float coll_probe_ground_height_below(void *, int, float);

@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef int Quad128 __attribute__((mode(TI)));
-extern int level_get_slot_body(int,int);
+extern u8 *level_get_slot_body(int,int);
 extern void table_clear_entry_flag(int);
 extern void moby_mark_spawned(void *);
 extern void vec_transform_or_copy(void *,void *);

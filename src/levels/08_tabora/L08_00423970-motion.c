@@ -10,7 +10,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern float vec_distance_xy(void *, void *);
 extern void moby_transform_joint_point(void *, int, void *);
 extern int CollLine(void *, void *, int, void *, void *);
-extern void TransitionTaboraSlot(void *, void *, void *);
+extern s32 TransitionTaboraSlot(void *, void *, void *);
 extern struct { char pad[0x1830]; char *object; char pad1834[0xA60]; int state; } g_hero_state;
 extern char *D_L08_001BFF58;
 extern volatile float D_L08_001B1D24[] __attribute__((sda));

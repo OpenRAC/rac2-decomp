@@ -17,7 +17,7 @@ static inline void WrapLow(int *index, int last)
         *index = last;
 }
 
-int func_PAL_0034A148(SelectionMenu *object, int flags)
+void *func_PAL_0034A148(SelectionMenu *object, int flags)
 {
     int direction = 0;
     int last;

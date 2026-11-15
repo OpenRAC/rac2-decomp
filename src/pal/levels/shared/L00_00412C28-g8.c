@@ -31,7 +31,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern u8 *part_spawn_fading_drift(void *, void *, int, int, int, int, int, float, float, float, int);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void part_spawn_shockwave_ring(void *, void *, void *, int, int, int, int, int, float);
+extern char *part_spawn_shockwave_ring(void *, void *, void *, int, int, int, int, int, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 typedef struct BurstPayload {
     u8 pad00[4];

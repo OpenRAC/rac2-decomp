@@ -2,7 +2,7 @@
 #include "names.h"
 
 typedef unsigned char u8;
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 
 void func_US2_L02_00412BE8(u8 *a0) {
     int v = *(int *)(*(void **)(a0 + 0x68) + 0x10);

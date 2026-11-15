@@ -6,8 +6,8 @@ extern void transform_vector(float *, float *, char *);
 extern void matrix_mul_vec3(float *, float *, char *);
 extern float math_ease_out_quad(float);
 extern float math_fabs(float);
-extern void moby_move_and_collide(char *, float *, int, float, float, float);
-extern void MobySpringTurn(char *, float, char *, float, float, float);
+extern int moby_move_and_collide(char *, float *, int, float, float, float);
+extern float MobySpringTurn(char *, float, char *, float, float, float);
 
 int func_PAL_L06_00424AE0(char *obj, char *unused, char *mat, char *inv,
                         float yaw, float blend, float posSpeed, float posAccel,

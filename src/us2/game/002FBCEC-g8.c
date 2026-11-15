@@ -22,7 +22,7 @@ extern CardStatus g_memcard_state;
 extern int D_001A7A20;
 extern void shop_set_message_text(char *);
 extern void shop_mark_bought_special_items_owned(void);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 
 /* func_US2_002FBCEC, the v2.00 copy of func_002FAE68: the same state machine, where the
  * prompts are looked up in the text table. */

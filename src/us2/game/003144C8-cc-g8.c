@@ -66,7 +66,7 @@ extern unsigned char D_001A7A44[] MACRO_ADDR;
 extern unsigned char D_001A7A0A;
 extern int D_001AD7EC, g_game_time;
 extern int D_001AF11C __attribute__((sda)), D_001AF1A0 __attribute__((sda));
-extern void moby_transform_point_by_attachment(void *,void *,void *,void *);
+extern int moby_transform_point_by_attachment(void *,void *,void *,void *);
 extern int moby_is_state_six(void *), moby_is_in_selected_zone(void *);
 extern void moby_set_state(void *,int,int), func_US2_0029C510(int);
 extern float D_001AF130 __attribute__((sda));

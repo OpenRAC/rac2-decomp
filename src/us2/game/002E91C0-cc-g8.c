@@ -27,7 +27,7 @@ extern void snd_send_cmd8(void);
 extern void scene_load_texture_block(void);
 extern void mem_clear(void *, int, int);
 extern void load_select_segment_update_world(int);
-extern void cam_set_from_selected_record(void);
+extern int cam_set_from_selected_record(void);
 extern void UpdateViewContext(void);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);

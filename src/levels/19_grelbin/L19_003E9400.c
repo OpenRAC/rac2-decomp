@@ -15,7 +15,7 @@
 
 extern void func_2EB590();
 
-extern void func_2EB5C0();
+extern float func_2EB5C0();
 
 extern float func_3183D8(float, float);
 
@@ -202,7 +202,7 @@ extern u8 D_0019B2E8[];
 extern u8 *g_moby_l19_array[] __attribute__((sda));
 extern char g_sound_state[];
 extern float D_L19_001A8F20[] MACRO_ADDR;
-extern void vec_spring_to_target(void *, void *, void *, float, float, float);
+extern float vec_spring_to_target(void *, void *, void *, float, float, float);
 extern int PlayMobySound(int, int, void *);
 extern float fast_vec_dist(void *, void *);
 extern void gfx_add_draw_callback_first(void (*)(void *), void *);

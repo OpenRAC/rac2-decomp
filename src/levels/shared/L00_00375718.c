@@ -8,7 +8,7 @@ extern int D_L00_001AD698[6] __attribute__((sda));
 extern void gfx_set_scissor_clamped(int, int, int, int);
 extern unsigned int func_001157AC(const char *);
 extern int math_random_int_below(int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void shop_set_message_text(void *);
 extern void draw_large_text_edge_faded(float, float, unsigned long long, unsigned char *, int, float);
 

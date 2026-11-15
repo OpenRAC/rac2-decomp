@@ -127,7 +127,7 @@ extern void stub_empty_3(void), part_update_all(void), gfx_select_packet_buffer_
 extern void load_select_segment_update_world(int), FadeToBlack(int), UpdateViewContext(void);
 extern void moby_mark_spawned(void *), update_moby_animation_state(void *), func_002A0F48(void *);
 extern int request_begin_slot(int,int,int,int,int);
-extern void request_end_slot(int,int);
+extern int request_end_slot(int,int);
 extern void mat_get_euler_angles(void *,void *), euler_to_matrix(void *,void *);
 extern float coll_probe_ground_height_below(void *,int,float);
 extern void transform_vector(void *,void *,void *), FastVecAdd(void *,void *,void *);
@@ -139,15 +139,16 @@ extern void stub_empty_18(void *), stub_empty_17(void *,int), UpdateEquipmentPie
 extern void gfx_register_overlay_draw_callback(void *,void *), gfx_register_world_draw_callback(void *,void *);
 extern void render_environment_mapped_object(void), gfx_draw_ground_shadow(void), part_draw_glow_quads(void);
 extern float math_fast_sin_or_cos_a(float);
-extern void music_Pause(int), UpdateSoundVoices(void);
+extern void music_Pause(int);
+extern s32 UpdateSoundVoices(void);
 extern short snd_pump_music_and_disc_read(int);
 extern int sceGsSyncV(int);
-extern void snd_resume_music_stream(void);
+extern s32 snd_resume_music_stream(void);
 extern PlaybackMoby *CreateMoby(int);
 extern void SetCamera5Pose(void *,void *,int,int,int);
 extern float mat_fast_helper_a(float,float), math_fabs(float);
 extern float fast_vec_dist(void *,void *), vec_distance_xy(void *,void *);
-extern void math_step_value_toward_target(void *,void *,float,float,float,float);
+extern float math_step_value_toward_target(void *,void *,float,float,float,float);
 extern void lerp_vector(void *,void *,void *,float), vec_clear_128(void *);
 extern void object_copy_vector_to_selected(void *), cam_set_state_rotation(void *);
 extern void copy_matrix3x4(void *,void *), func_002A10E8(void *);

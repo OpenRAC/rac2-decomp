@@ -56,7 +56,7 @@ extern void func_00282CC0_11(float *dst, float *src, float *arg);
 
 extern int D_L00_001A8FF0_1 __attribute__((sda));
 
-extern void cam_moby_create(char *self, int a1, int a2, int a3, char *p4, char *p5,
+extern char *cam_moby_create(char *self, int a1, int a2, int a3, char *p4, char *p5,
                     float *buf, int b3, float fa, float fb);
 
 typedef int s32;
@@ -177,13 +177,13 @@ float math_get_even_angle(int index, int count)
 
 extern float math_get_even_angle(int, int);
 extern float math_fast_sin_or_cos_b(float);
-extern void FastTweenColor(int, int, float);
+extern int FastTweenColor(int, int, float);
 /* Fades between two colours using a smooth wave that follows the step number. */
-void gfx_blend_colors_by_cycle(int index, int count, int colorA, int colorB)
+int gfx_blend_colors_by_cycle(int index, int count, int colorA, int colorB)
 {
     float phase = math_get_even_angle(index, count);
     phase = math_fast_sin_or_cos_b(phase);
-    FastTweenColor(colorA, colorB, phase * 0.5f + 0.5f);
+    return FastTweenColor(colorA, colorB, phase * 0.5f + 0.5f);
 }
 
 
@@ -211,7 +211,7 @@ void value_set_and_smooth(void *owner, float *state, float value, int param, int
 /* Looks up an entry by index and passes it on with one more value. */
 void value_set_entry_by_index(int first, int second)
 {
-    extern int GetLocalizedString(int);
+    extern char *GetLocalizedString(int);
     extern void func_0029CC98(int, int);
     func_0029CC98(GetLocalizedString(first), second);
 }

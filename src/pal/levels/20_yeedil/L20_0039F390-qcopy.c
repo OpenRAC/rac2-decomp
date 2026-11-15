@@ -6,7 +6,7 @@ extern void FastVecAdd(char *, char *, char *);
 extern void make_hit_descriptor(char *, int, int, void *, float);
 extern int CollLine(void *, void *, int, int, void *);
 extern int math_fast_float_d(void *);
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 extern void gfx_add_draw_callback_third(void *, int);
 extern void func_PAL_L20_0039F518(char *);
 extern void func_PAL_L20_0039F810(char *, int, int);

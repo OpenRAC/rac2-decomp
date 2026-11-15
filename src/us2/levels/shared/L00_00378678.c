@@ -28,8 +28,8 @@ typedef struct { char prefix[0x144]; ShopItem items[0]; } ShopModel;
 extern ShopModel g_purchase_menu_model;
 extern float D_L00_001B25E0 __attribute__((sda));
 extern int GetIconFrame(int, int);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
-extern int GetLocalizedString(int);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
+extern char *GetLocalizedString(int);
 extern void text_draw_right_aligned_medium(int, int, unsigned long long, unsigned char *, int);
 
 /* Layouts measured from the selected-item panel. */
@@ -119,7 +119,7 @@ typedef struct {
     char pad88[0xBC];
     struct { int price; int rest[6]; } cells[0]; /* Variable-length trailing table. */
 } UpgradeModel;
-extern int func_US2_00280440(int, int, unsigned long long, unsigned char *, int, int, float);
+extern void func_US2_00280440(int, int, unsigned long long, unsigned char *, int, int, float);
 extern void hud_draw_sprite(int, int, int, int, int, int);
 
 /* func_US2_L00_00379928, the v2.00 copy of func_L00_00378578: the same panel, with its prompts drawn

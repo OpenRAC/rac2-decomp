@@ -25,7 +25,7 @@
  */
 #include "common.h"
 
-extern s32 object_reset_type_and_free();
+extern void object_reset_type_and_free();
 
 /* Runs the shared base cleanup. */
 void object_call_base_cleanup(void) {

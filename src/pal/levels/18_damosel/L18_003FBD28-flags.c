@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_PAL_002B5E30(void *,float);
-extern void func_PAL_002B5E10(void *);
+extern int func_PAL_002B5E30(void *,float);
+extern int func_PAL_002B5E10(void *);
 extern int ComputeRegionRouteHeading(void *,void *,void *,void *,int,void *,void *,float,float);
 extern int func_PAL_002B5C98(void *,void *,float);
 extern int func_PAL_002B5BA8(void *,void *,float);

@@ -30,7 +30,7 @@ typedef struct {
 } L00FadeRecord;
 extern L00FadeRecord D_L00_001BD2C0;
 
-extern void math_fast_float_d(void *);
+extern int math_fast_float_d(void *);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern void UpdateViewContext(void);

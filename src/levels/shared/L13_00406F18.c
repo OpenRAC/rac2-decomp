@@ -96,7 +96,7 @@ extern int math_fast_float_d(void *);
 
 extern int moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
 
-extern int value_set_and_smooth(void *, void *, int, int, float);
+extern void value_set_and_smooth(void *, void *, int, int, float);
 
 extern void moby_rotate_toward_dir(char *a0, char *a1, char *a2);
 
@@ -288,7 +288,7 @@ void moby_probe_ground(char *object, char *state)
 }
 
 typedef union { Vector128 q; float f[4]; } MotionVector;
-extern void creature_turn_toward_target(char *, char *, char *, int);
+extern float creature_turn_toward_target(char *, char *, char *, int);
 extern float moby_measure_step_angle(char *, Vector128 *, char *);
 extern void moby_build_forward_vector(char *, float *, float);
 extern void vec_transform_and_set_height(char *, char *, char *, float, char *);

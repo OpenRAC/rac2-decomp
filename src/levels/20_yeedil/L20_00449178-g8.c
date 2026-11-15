@@ -39,9 +39,9 @@ extern float vec_length_xy(void *vec);
 
 extern void vec_fast_normalize_helper(char *a, char *b);
 
-extern void path_push_point_away(char *a, char *b, char *c, float f);
+extern int path_push_point_away(char *a, char *b, char *c, float f);
 
-extern void part_spawn_blast_effect_moby(char *, char *, void *, float);
+extern char *part_spawn_blast_effect_moby(char *, char *, void *, float);
 
 /* func_002A8C28 returns a value here: retail keeps $v0 live after the call,
    and only a non-void prototype gives the flag word $v1 instead of $v0. */

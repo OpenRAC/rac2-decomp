@@ -119,7 +119,7 @@ extern void func_PAL_002BEF58(void *, void *, int, float);
 extern void path_sample_position(char *, int, void *, void *, int, float);
 extern void snd_stop_voice(int);
 extern int snd_play_from_class_bank(int, int, char *, int);
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void func_PAL_L00_002B3000(void);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern int coll_point_inside_region(void *, int);
@@ -127,7 +127,7 @@ extern void gfx_queue_draw_callback(void *, void *);
 extern void protopet_start_enter_anim(char *, int);
 extern void func_PAL_L18_00400ED0(char *);
 extern void func_PAL_L18_00400FF8(char *);
-extern void func_PAL_L19_002C45D0(int, int);
+extern s32 func_PAL_L19_002C45D0(int, int);
 
 void func_PAL_L19_003E4048(char *m)
 {

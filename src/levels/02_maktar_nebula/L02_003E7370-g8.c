@@ -7,7 +7,7 @@ extern float math_random_signed_float_range(float, float);
 extern void matrix_mul_vec3(float *, float *, float *);
 extern void FastVecAdd(float *, float *, float *);
 extern char *cam_moby_create(char *, int, int, int, char *, char *, float *, int, float, float);
-extern int moby_spawn_bolt_pickup(char *, float *, float *, int, int, int);
+extern void *moby_spawn_bolt_pickup(char *, float *, float *, int, int, int);
 extern int D_L02_001B096C __attribute__((sda));
 
 /* Spawns five particles at the actor (the ids 0xCA5 to 0xCA9, each with a random velocity in a

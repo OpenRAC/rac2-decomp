@@ -47,7 +47,7 @@ extern HeroGroundFlags g_hero_state;
 extern unsigned char D_001A7B0B __attribute__((sda));
 extern void mem_fast_helper_b(void *, int);
 extern float math_fabs(float);
-extern void hero_l04_enter_state(int, int);
+extern s32 hero_l04_enter_state(int, int);
 
 /* Checks what kind of ground the hero stands on (ice, water, slippery) and sets the matching flags. */
 void UpdateHeroGroundMaterialFlags(void)

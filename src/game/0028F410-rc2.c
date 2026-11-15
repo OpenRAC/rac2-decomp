@@ -24,8 +24,8 @@
  */
 #include "common.h"
 
-extern s32 FastVecAdd(s8 *, s8 *, s8 *);
-extern s32 FastVecSub(s8 *, s8 *, s8 *);
+extern void FastVecAdd(s8 *, s8 *, s8 *);
+extern void FastVecSub(s8 *, s8 *, s8 *);
 extern f32 math_fast_sin_or_cos_a(f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 extern s32 g_screen_offset_x;

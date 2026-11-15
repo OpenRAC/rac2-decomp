@@ -18,7 +18,7 @@ extern void func_PAL_003456B0(void *a0);
 extern void func_PAL_00345640(void *a0);
 extern int UpdateListSelection(void *a0, int a1);
 
-void func_PAL_003457F0(char *self, int arg)
+int func_PAL_003457F0(char *self, int arg)
 {
     f32_F7036ef03 *v;
     char *sub = self + 712;
@@ -35,5 +35,5 @@ void func_PAL_003457F0(char *self, int arg)
     menu_list_set_position(sub, D_L04_001AE4C8 + v[0], D_L04_001AE4CC + v[1]);
     func_PAL_003456B0(self);
     func_PAL_00345640(self);
-    *(int *)(self + 416) = UpdateListSelection(sub, arg);
+    return *(int *)(self + 416) = UpdateListSelection(sub, arg);
 }

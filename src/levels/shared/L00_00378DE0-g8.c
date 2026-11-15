@@ -17,7 +17,7 @@ extern int D_L00_001AD7A4;
 
 extern int save_count_items_above_baseline(void);
 
-extern unsigned char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 
 extern int text_draw_centered_medium(int, int, long, unsigned char *, int);
 

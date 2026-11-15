@@ -22,9 +22,9 @@ extern int D_001A7290 __attribute__((sda));
 extern int D_001A72C0 __attribute__((sda));
 extern int g_save_menu_flags __attribute__((sda));
 extern int g_hero_moby_default[];
-extern void mem_compute_sized_offset(int, void *);
+extern int mem_compute_sized_offset(int, void *);
 extern int snd_pump_music_and_disc_read(int);
-extern void load_read_disc_with_pause(int, int, int);
+extern int load_read_disc_with_pause(int, int, int);
 extern void mem_copy_aligned(void *, void *, int);
 extern void save_load_packet(char *);
 

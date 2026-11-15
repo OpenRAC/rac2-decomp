@@ -27,7 +27,7 @@ extern HelpEntry D_L02_00264A70[];
 extern u8 *D_L02_001B1190[] SDATA(D_L02_001B1190);
 
 extern void gfx_append_draw_list_packet_c(void);
-extern int table_find_by_id(u8 *, int);
+extern void *table_find_by_id(u8 *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, float, int, float, float, float, float);
 extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
 extern int arena_get_challenge_save_index(int);

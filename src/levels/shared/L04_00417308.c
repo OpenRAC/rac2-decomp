@@ -137,7 +137,7 @@ f32 math_smooth_step(f32 value) {
 
 extern void func_33B9B0(char *a0, int a1, int a2);
 
-extern int func_33E6B0(char *a0, int a1, int a2);
+extern void *func_33E6B0(char *a0, int a1, int a2);
 
 extern void func_348788(char *a0, int a1, float f12);
 

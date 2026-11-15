@@ -10,8 +10,8 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
-extern void part_spawn_drifting(void *, void *, int, float, float);
-extern void func_PAL_002C0838(void *, void *, int, int);
+extern void *part_spawn_drifting(void *, void *, int, float, float);
+extern void *func_PAL_002C0838(void *, void *, int, int);
 
 void func_PAL_L01_003A96A8(char *object)
 {

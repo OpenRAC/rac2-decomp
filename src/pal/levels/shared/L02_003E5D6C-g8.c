@@ -46,13 +46,13 @@ extern int FastTweenColor(int,int,float);
 extern int math_random_int_range(int,int);
 extern void vec_clear_128(void *);
 extern float IntToFloat(int);
-extern void part_spawn_hero_relative(void *,void *,int,float,int,int,int);
+extern void *part_spawn_hero_relative(void *,void *,int,float,int,int,int);
 extern void hero_start_target_state(void *,int,float);
 extern float vec_distance_xy(void *,void *),math_fabs(float);
 extern int flag_set_first_pending(void *);
 extern int PlayMobySound(int,int,char *);
 extern void value_set_entry_by_index(int,int);
-extern void snd_resume_music_stream(void);
+extern s32 snd_resume_music_stream(void);
 typedef struct {
     int other, first, second; char pad0[8]; int auxiliary;
     float angle, angle2, fade; char pad1[4]; int color0, color1, alpha;

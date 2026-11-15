@@ -7,7 +7,7 @@ extern float math_fast_sin_or_cos_a(float a);
 extern float math_fast_sin_or_cos_b(float a);
 extern int math_random_int_range(int a, int b);
 extern int math_random_int_below(int a);
-extern void func_PAL_002C0838(char *p, float *q, int a, int b);
+extern void *func_PAL_002C0838(char *p, float *q, int a, int b);
 
 /* func_00329768 uses small data in 00329768-g8.c. */
 

@@ -55,9 +55,9 @@ extern u8 D_001A7A60[] __attribute__((sda));
 extern s32 D_001A903C[] __attribute__((sda));
 extern s32 D_0018CC18;
 extern s32 IsPointInCuboid(void *a0, s32 a1);
-extern void snd_play_from_global_bank(s32 a0, s32 a1, s32 a2);
+extern int snd_play_from_global_bank(s32 a0, s32 a1, s32 a2);
 extern void func_PAL_002B1588(s32 a0, s32 a1);
-extern void func_PAL_00289730(s32 a0, s32 a1);
+extern int func_PAL_00289730(s32 a0, s32 a1);
 
 /* func_PAL_L13_003EC9C0, the PAL copy of func_L13_003E8850: the same C, where the frame counter is scaled to 50 Hz and 0x69780 becomes 0x57E40. */
 void func_PAL_L13_003EC9C0(u8 *self)

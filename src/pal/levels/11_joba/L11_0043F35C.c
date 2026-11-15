@@ -8,7 +8,7 @@ extern void moby_set_controller_speed_limits(char *, float, float, float, float)
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void func_PAL_L11_004400D0(char *);
-extern void func_PAL_002B1A50(char *, char *, int);
+extern int func_PAL_002B1A50(char *, char *, int);
 extern int weapon_select_aim_target(char *, int, int, int, float, float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(char *);

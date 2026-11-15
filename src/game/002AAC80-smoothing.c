@@ -3,7 +3,7 @@
 
 extern float math_fabs(float);
 extern float square_root(float);
-extern void ApproachValue(float *, float, float);
+extern float ApproachValue(float *, float, float);
 
 /* Moves a value toward a target: it speeds up, brakes early enough, and stops on the target. */
 void math_approach_target_with_braking(float *value, float target, float accel, float brake, float limit)

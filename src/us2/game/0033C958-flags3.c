@@ -74,7 +74,7 @@ void func_US2_0033E9B8(char *object)
 }
 
 extern void func_US2_0033BF90();
-extern void DrawMenuPreviewImage();
+extern int DrawMenuPreviewImage();
 extern void func_US2_003378A0();
 extern void hud_draw_colored_quad_widget();
 extern void gfx_draw_screen_element_stored();

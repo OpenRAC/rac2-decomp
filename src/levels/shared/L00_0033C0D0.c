@@ -13,7 +13,7 @@ extern float IntToFloat(int);
 extern float vec_distance_xy(void *,void *);
 extern float math_random_float_range(float,float);
 extern int math_random_int_below(int);
-extern s32 moby_get_private_value_0(u8 *);
+extern char *moby_get_private_value_0(u8 *);
 extern void FastVecSub(float *,void *,void *);
 extern void matrix_from_basis_rows(void *,void *);
 extern void transform_vector(float *,float *,void *);

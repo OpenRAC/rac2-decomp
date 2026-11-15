@@ -9,11 +9,11 @@ extern void *g_hero_moby;
 extern void cam_compute_view_direction(void *, void *, int);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
-extern void coll_process_hit(void *, int, float, void *, void *);
+extern int coll_process_hit(void *, int, float, void *, void *);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
 extern float math_random_signed_float_range(float, float);
-extern void part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, float, int);
+extern void *part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, float, int);
 
 /* Emits impact effects using the current selection's effect configuration. */
 void SpawnConfiguredImpactEffects(char *object, void *point)

@@ -11,8 +11,8 @@ extern void attachment_reset_all(void);
 extern void hero_update_collision_capsule(void);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(char *);
-extern void hero_l00_set_action(int, int);
-extern void level_run_slot_callback(int);
+extern int hero_l00_set_action(int, int);
+extern int level_run_slot_callback(int);
 extern int D_00138320[];
 extern char D_L00_002F8588[];
 extern char D_L00_002F85D0[];
@@ -90,7 +90,7 @@ extern void func_00283788_3(M4_F6b9e759f *, M4_F6b9e759f *, V4_F6b9e759f *);
 
 extern void func_002AB6D8_3(M4_F6b9e759f *, V4_F6b9e759f *);
 
-extern int transform_vector(float *, char *, char *);
+extern void transform_vector(float *, char *, char *);
 
 extern float func_00283248_1(float, float);
 
@@ -187,7 +187,7 @@ extern HeroItemDefinition g_weapon_l00_table[];
 extern void SwitchCachedDiscAsset(int);
 extern HeroItemMoby *CreateMoby(int);
 extern void mem_clear(void *, int, int);
-extern void tether_create_holder(int);
+extern char *tether_create_holder(int);
 
 /* calls three measured no-argument functions in sequence */
 /* Runs the three per-frame hero item updates one after another. */
@@ -500,7 +500,7 @@ typedef struct {
 
 extern D00189E20_Overlay g_hero_state;
 
-extern void ApproachValue(float *, float, float);
+extern f32 ApproachValue(float *, float, float);
 
 /* The level's own dispatch table: 31 absolute code addresses, five of them (the cases
  * 14, 26, 27, 43 and 44) pointing at the arm that writes the two shorts and the rest at

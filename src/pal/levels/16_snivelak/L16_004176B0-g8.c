@@ -8,15 +8,15 @@ extern s32 D_L16_001B18E0 __attribute__((sda));
 extern s32 D_L16_001B1704 __attribute__((sda));
 extern char D_L16_00189E20[] __attribute__((nosda));
 extern s32 FloatToInt(float);
-extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 FastDecTimer(void *);
 extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
 extern char D_L16_001A63A8[] __attribute__((nosda));
 extern char D_L16_001B1850[] __attribute__((nosda));
 extern char D_L16_001B1870[] __attribute__((nosda));
 extern void STUB_printf(void *);
-extern void snd_resume_music_stream(void);
-extern void math_fast_float_d(void *);
+extern s32 snd_resume_music_stream(void);
+extern int math_fast_float_d(void *);
 extern void snd_play_unplayed_voice_line(void *, s32, s32);
 extern s32 math_random_int_range(s32, s32);
 

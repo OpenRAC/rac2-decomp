@@ -24,7 +24,9 @@ extern void func_002A0F48(void *), moby_copy_joint_transform_to_object(void *,vo
 extern float fast_vec_dist(void *,void *);
 extern void moby_update_ground_check(void *),linked_children_free(void *),func_PAL_002AD288(void *,void *,int,float,float);
 extern int func_PAL_002B1A50(void *,void *,int);
-extern void moby_transform_joint_to_world(void *,int,void *),func_PAL_L04_00456C90(void *,int),PlayMobySound(int,int,void *);
+extern void func_PAL_L04_00456C90(void *,int);
+extern void moby_transform_joint_to_world(void *,int,void *);
+extern int PlayMobySound(int,int,void *);
 extern void func_PAL_002AC290(void *,void *),tribesman_flag_group(void *),func_PAL_002A7650(void *,int,int);
 extern int moby_count_group_not_in_state(int,int),hero_check_distance_zones(void *,void *,int,int,int,float,float);
 extern int weapon_select_aim_target(void *,void *,float,float,int,int);

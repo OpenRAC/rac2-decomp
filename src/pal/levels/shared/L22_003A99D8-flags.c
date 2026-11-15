@@ -13,7 +13,7 @@ extern f32 fast_vec_dist(void *a0, void *a1);
 extern int FloatToInt(f32);
 extern int math_fast_float_d(void *);
 extern void moby_mark_spawned(void *);
-extern void coll_sweep_from_object(void *, void *, int, f32, f32, f32, int, int, int);
+extern int coll_sweep_from_object(void *, void *, int, f32, f32, f32, int, int, int);
 extern void moby_mark_spawned(void *object);
 extern f32 math_random_float_range(f32 low, f32 high);
 

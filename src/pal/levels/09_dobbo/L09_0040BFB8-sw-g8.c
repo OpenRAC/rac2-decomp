@@ -25,7 +25,7 @@ extern void moby_mark_spawned(char *);
 extern void state_set_flag_one(void);
 extern void func_PAL_L00_002B9CD8(char *, char *, s32, s32);
 extern void moby_set_flags_by_index(s32, s32, s32, s32);
-extern void MemcardSave(s32, s32);
+extern int MemcardSave(s32, s32);
 extern void moby_set_state(char *, s32, s32);
 extern s32 flag_set_first_pending(char *);
 extern void script_queue_keyed_request(s32, s32);

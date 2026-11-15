@@ -59,7 +59,7 @@ extern float ApproachValue(float *,float,float);
 extern void release_moby_animation_slot(void *,void *);
 extern SlotAED68 *allocate_moby_animation_slot(void *,int);
 extern void AdvanceAndDecodeAnimationFrames(void *,void *);
-extern int math_l00_return_argument(int);
+extern unsigned long math_l00_return_argument(int);
 extern int hero_get_item_aim_adjustment(int,float *);
 extern int hero_get_value_or_default(void *,int);
 /* Fades the two item display slots in and out and blends between old and new item pictures. */

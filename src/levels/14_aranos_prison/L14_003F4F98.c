@@ -53,7 +53,7 @@ extern float math_wrap_angle_full_turn(float);
 extern void part_draw_spark_quads(void *);
 extern int prisonStartSound(int, int, void *) __asm__("func_002E5CF8");
 typedef struct { char pad[0x74]; unsigned char active; char gap[0x13]; void *owner; } PrisonSoundAnchor;
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern int math_fast_float_d(void *);
 extern void group_sync_counter(void *, void *);
 extern void FastVecSub(void *, void *, void *);
@@ -341,13 +341,13 @@ void space_l14_tourist_update(char *self)
 
 /* func_L14_00423358 lives in L14_00423358-g8.c (small-data accesses). */
 
-extern void moby_step_at_own_position_factor(char *object, float factor);
+extern int moby_step_at_own_position_factor(char *object, float factor);
 
-extern void moby_step_at_own_position(char *object);
+extern int moby_step_at_own_position(char *object);
 
-extern void moby_step_controller(char *object, char *bone, float factor);
+extern int moby_step_controller(char *object, char *bone, float factor);
 
-extern void moby_turn_toward_target_and_step(char *object, char *bone, float factor);
+extern int moby_turn_toward_target_and_step(char *object, char *bone, float factor);
 
 /* The level's own jump table (the label of the data blob at 0x002AA360). */
 extern void *jtbl_002AA360[];
@@ -518,7 +518,7 @@ extern void lift_request_start(void *);
 extern void moby_mark_spawned(void *);
 extern void lift_set_moving_state(void *);
 extern void moby_set_state(void *, int, int);
-extern void hero_l00_set_action(int, int);
+extern s32 hero_l00_set_action(int, int);
 extern int math_fast_float_d(void *);
 extern float math_fast_sin_or_cos_b(float);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);

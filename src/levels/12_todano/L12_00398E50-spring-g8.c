@@ -4,7 +4,7 @@ extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_b(float);
 extern int FloatToInt(float);
 extern void moby_set_state(char *, int, int);
-extern void part_spawn_object_following_effect(void *, char *, int, float, int, int, float, int, int, int);
+extern void *part_spawn_object_following_effect(void *, char *, int, float, int, int, float, int, int, int);
 extern int flag_is_third_pending_set(char *);
 extern int PlayMobySound(int, int, void *);
 extern void vec_scale_to_length(void *, void *, float);

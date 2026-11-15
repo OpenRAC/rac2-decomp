@@ -3,12 +3,12 @@
 
 extern char g_hero_state[];
 
-extern void hero_l22_set_action(int mode, int flag);
+extern int hero_l22_set_action(int mode, int flag);
 
 /* Loads the level's tuning constants and starts the two subsystems. */
 /* func_L22_002A8B98 is defined in L22_002A8B98-init.c. */
 
-extern void ApproachValue(float *, float, float);
+extern float ApproachValue(float *, float, float);
 extern int D_00138320;
 /* the two calls whose targets differ between levels 22 and 23 */
 typedef struct {
@@ -72,8 +72,8 @@ typedef float f32;
    live across the calls; the three table entries are the routines the tuning
    table points at, whose places differ from level to level. */
 extern float vec_distance_xy(void *, void *);
-extern void ApproachValue(float *, float, float);
-extern void math_spring_float_to_goal(float *, float *, float, float, float, float);
+extern float ApproachValue(float *, float, float);
+extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 
 void func_PAL_L22_002B7B08(void) {
     char *g = g_hero_state;
@@ -132,7 +132,7 @@ void func_PAL_L22_002B7B08(void) {
     }
 }
 
-extern void hero_l22_set_action(int a0, int a1);
+extern int hero_l22_set_action(int a0, int a1);
 
 /* plays one of three resident messages, picked by the type byte; the second argument
    is 1 or 2 depending on the caller's flag */

@@ -11,7 +11,7 @@ extern float math_random_signed_float_range(float, float);
 extern int FloatToInt(float);
 extern void part_spawn_random_direction_effect(void *, float, float);
 extern void gfx_draw_billboard_quad(void *, int, int, float, int, float, float);
-extern void part_spawn_fading_drift(void *, void *, int, int, int, int, int, int, float, float, float);
+extern char *part_spawn_fading_drift(void *, void *, int, int, int, int, int, int, float, float, float);
 
 void func_PAL_L19_0041CE18(char *obj)
 {

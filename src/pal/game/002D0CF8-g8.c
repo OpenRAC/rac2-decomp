@@ -3,7 +3,7 @@
 #include "common.h"
 extern void SetupGifPaging(long);
 extern void DoGifPaging(void);
-extern int table_find_by_id(char *, int);
+extern void *table_find_by_id(char *, int);
 extern void gfx_draw_scaled_object_two_axes(int, int, float, float, float, float, float);
 extern char *GetLocalizedString(int);
 extern int text_draw_centered_small(int, int, u64, char *, int);
@@ -24,7 +24,7 @@ extern int D_001AB9FC __attribute__((sda));
 extern int D_001ABA00 __attribute__((sda));
 extern unsigned char D_001A7A60[] MACRO_ADDR;
 extern short D_0026CF18[][3];
-extern int text_draw_small(int, int, u64, char *, int);
+extern void text_draw_small(int, int, u64, char *, int);
 
 int func_PAL_002D0CF8(void) {
     char buf[64];

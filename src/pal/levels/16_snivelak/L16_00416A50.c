@@ -7,7 +7,7 @@
 extern s32 math_random_int_below(s32);
 extern void moby_transform_joint_to_world(void *, s32, void *);
 extern float math_random_float_range(float, float);
-extern void part_spawn_spinning_fragment(void *, void *, void *, s32, float, float);
+extern char *part_spawn_spinning_fragment(void *, void *, void *, s32, float, float);
 
 void func_PAL_L16_00417020(u8 *owner)
 {

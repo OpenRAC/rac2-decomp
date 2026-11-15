@@ -8,7 +8,7 @@ extern float vec_distance_xy(void *, void *);
 extern void func_US2_002B1880(int, int);
 extern void help_unlock_entry(int);
 extern void moby_set_flag_bit(void *, int);
-extern void moby_handle_request_slot_state(int);
+extern int moby_handle_request_slot_state(int);
 extern float D_L12_001B12B0 __attribute__((sda));
 extern float D_L12_001B12B4 __attribute__((sda));
 extern float D_L12_001B12B8 __attribute__((sda));

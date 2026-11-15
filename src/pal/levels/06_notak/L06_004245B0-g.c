@@ -8,8 +8,8 @@ extern void vec_scale_to_length(float *, float *, float);
 extern void FastVecScale(void *, void *, float);
 extern int PlayMobySound(int, int, void *);
 extern float math_ease_out_quad(float);
-extern void moby_move_and_collide(void *, void *, int, float, float, float);
-extern void MobySpringTurn(void *, float, float, float, float, void *);
+extern int moby_move_and_collide(void *, void *, int, float, float, float);
+extern float MobySpringTurn(void *, float, float, float, float, void *);
 extern char D_L06_00188660[];
 
 /* Steps the follower's weight toward its goal and blends the state vectors; returns 1 on arrival. */

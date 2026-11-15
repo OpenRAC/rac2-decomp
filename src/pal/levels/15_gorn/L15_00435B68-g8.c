@@ -19,12 +19,12 @@ extern void snd_stop_voice(int);
 extern int math_fast_float_d(void *);
 extern void FadeToBlack(int);
 extern void func_PAL_0029C0F0(int, void *);
-extern void func_PAL_L15_00435B68(void);
+extern s32 func_PAL_L15_00435B68(void);
 extern void snd_clamp_copy_volumes(void);
-extern void MemcardSave(int,int);
+extern int MemcardSave(int,int);
 extern void hero_set_state_value_c(int);
 extern void ResetGornStageCounters(void *);
-extern void request_begin_slot(int,int,int,int,int);
+extern int request_begin_slot(int,int,int,int,int);
 
 void func_PAL_L15_00436118(char *self, int stage)
 {

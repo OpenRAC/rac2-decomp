@@ -17,7 +17,7 @@ extern s32 moby_apply_damage_to_object(void *, void *, s32);
 extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
 extern u8 *D_L16_001B2B1C[] __attribute__((sda));
 extern s32 D_L16_001B2B38[] __attribute__((sda));
-extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 coll_test_point(void *, s32, void *, float);
 
 /* Steers the object toward the next point of its path (the state's table and cursor at

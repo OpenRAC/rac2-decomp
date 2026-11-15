@@ -1,6 +1,6 @@
 #include "common.h"
 extern u8 *g_moby_l07_array __attribute__((sda));
-extern void moby_get_attachment_rotation_angles(u8 *,u8 *,u8 *,u8 *,u8 *,u8 *);
+extern int moby_get_attachment_rotation_angles(u8 *,u8 *,u8 *,u8 *,u8 *,u8 *);
 /* Places each of the four attached parts relative to the object. */
 void boss_place_attached_parts(u8 *moby)
 {

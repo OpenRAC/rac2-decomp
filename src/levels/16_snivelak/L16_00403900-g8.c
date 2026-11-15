@@ -52,7 +52,7 @@ extern void math_update_wrapped_angle_offset(void *, void *, void *, float, floa
 
 extern void gfx_update_color_fade(void *, void *);
 
-extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 
 extern s32 FastDecTimer(void *);
 
@@ -74,7 +74,7 @@ extern void moby_init_child_from_parent(void *, void *);
 
 extern void math_approach_target_with_braking(void *, float, float, float, float);
 
-extern void SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float,
+extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float,
                           s32, s32, s32, s32);
 
 extern char D_L16_001A63A8[] __attribute__((nosda));
@@ -85,9 +85,9 @@ extern char D_L16_001B1870[] __attribute__((nosda));
 
 extern void STUB_printf(void *);
 
-extern void snd_resume_music_stream(void);
+extern s32 snd_resume_music_stream(void);
 
-extern void math_fast_float_d(void *);
+extern int math_fast_float_d(void *);
 
 extern void snd_play_unplayed_voice_line(void *, s32, s32);
 
@@ -269,7 +269,7 @@ extern void follow_camera_set_height(float, float);
 extern float IntToFloat(s32);
 extern void hud_start_overlay(s32, s32, float);
 extern s32 D_L16_001B2648[] __attribute__((sda));
-extern void snivelak_spawn_rock_projectile(void *, s32);
+extern u8 *snivelak_spawn_rock_projectile(void *, s32);
 extern s32 moby_pack_handle(void *);
 extern void moby_set_light_color(void *, s32);
 extern void value_set_and_smooth(void *, void *, s32, s32, float);
@@ -277,7 +277,7 @@ extern void moby_transform_joint_point(void *, s32, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern void SpawnEA7Moby(void *, void *, void *, s32, float);
+extern char *SpawnEA7Moby(void *, void *, void *, s32, float);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);

@@ -15,7 +15,7 @@ extern float func_PAL_002AA108(char *,char *);
 extern void func_PAL_002AC290(char *,void *);
 extern void func_PAL_002AC3C0(char *,void *);
 extern int flag_set_first_pending(char *);
-extern void func_PAL_L00_003FB330(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
+extern char *func_PAL_L00_003FB330(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 extern int PlayMobySound(int,int,char *);
 extern float FastAddRotations(float,float);
 extern int coll_sweep_from_object(char *,void *,float,float,float,int,int,int,int);

@@ -23,7 +23,7 @@ extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void euler_rotation_basis(void *, void *);
-extern void part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, float, float, float, s32);
+extern void *part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, float, float, float, s32);
 
 /* Creates a child shot with a particle trail, launched from a parent object in a given
    direction. */

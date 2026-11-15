@@ -62,7 +62,7 @@ extern float func_00282E20_4(float *p);
 
 extern float func_00283248_7(float a, float b);
 
-extern void func_00283BE0_5(float a, float b);
+extern float func_00283BE0_5(float a, float b);
 
 extern float func_00282DF0_3(float *p);
 
@@ -84,18 +84,18 @@ extern int Fdb046c5d_FUN_00274BA8(void *, void *, void *, float, float);
 
 extern int Fdb046c5d_FUN_002E5CF8(int, int, void *);
 
-extern void Fdb046c5d_FUN_00274768(void *, int, void *);
+extern unsigned int Fdb046c5d_FUN_00274768(void *, int, void *);
 
-extern void Fdb046c5d_FUN_002E5F00(int, void *);
+extern int Fdb046c5d_FUN_002E5F00(int, void *);
 
 extern char Fdb046c5d_D_001BAFC0[];
 
 extern char D_001BAEC0[];
 extern int D_001A72DC[] __attribute__((sda));
-extern void fast_decompress(int, void *);
-extern int FlushCache(int);
+extern int fast_decompress(int, void *);
+extern void FlushCache(int);
 extern void gfx_reset_packet_buffer(void);
-extern void tex_upload_blocks_return_setup(void *, int, int, int);
+extern long long tex_upload_blocks_return_setup(void *, int, int, int);
 extern void gfx_write_clear_color_packets(void);
 extern void PutDrawBufferSmall(void);
 extern void gfx_queue_second_strip_packet(void);
@@ -362,7 +362,7 @@ void stub_empty_31(void)
 /* func_0026F810 is in 0026EA00-actuator.c (jump table and float pool). */
 
 
-extern int FlushCache(int);
+extern void FlushCache(int);
 extern int gfx_wait_paths_idle(int, int);
 
 /* Uploads a PIF image (header arg0, CLUT at +0x20 of 0x200 bytes when +0x14 is set, else

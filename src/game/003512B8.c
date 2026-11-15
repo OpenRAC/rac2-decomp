@@ -8,14 +8,14 @@ typedef unsigned char u8;
 /* func_003512B8 : rounds a field to a multiple of 2048 under a semaphore */
 extern s32 WaitSema(s32);
 
-extern s32 SignalSema(s32);
+extern void SignalSema(s32);
 
 /* func_00351268 : waits, then combines two fields shifted by 11 */
 extern s32 WaitSema(s32 a0);
 
-extern s32 SignalSema(s32 a0);
+extern void SignalSema(s32 a0);
 
-extern void sceMpegAddStrCallback();
+extern int sceMpegAddStrCallback();
 
 extern void mpeg_vibuf_get_free_regions(int *owner, int *first_address, int *first_count,
                          int *second_address, int *second_count);
@@ -28,7 +28,7 @@ extern int voBufIsFull(unsigned char *);
 
 extern s32 DIntr(void);
 
-extern s32 func_0011F628(void);
+extern void func_0011F628(void);
 
 /* Rounds the waiting byte count up to a whole 2048-byte sector. */
 void mpeg_vibuf_align_pending_bytes(u8 *buf) {
@@ -146,7 +146,7 @@ void mpeg_dec_add_pending_bytes(char *object, s32 count) {
 /* Sets the video decoder's state to 0. */
 void mpeg_dec_reset_state(u8 *decoder) { *(s32 *)(decoder + 0xa8) = 0; }
 
-extern void mpeg_vibuf_stop_dma(void *);
+extern int mpeg_vibuf_stop_dma(void *);
 extern int mpeg_return_one(void *);
 
 /* Shuts down the video decoder's buffer and then the decoder itself. */
@@ -230,7 +230,7 @@ extern int mpeg_has_no_pictures_decoded(void *);
 
 
 
-extern void mpeg_vibuf_reset(void *);
+extern int mpeg_vibuf_reset(void *);
 extern void mpeg_vobuf_reset(u8 *);
 extern int mpeg_dec_run_loop(void *);
 /* Starts the video decoder: resets its buffer, runs the decode loop, and waits until it is told to stop. */
@@ -307,14 +307,14 @@ int mpeg_dec_callback_add_dma(void)
 {
     extern void mpeg_start_decoder_dma(void);
     extern char *g_movie_player_state[] __attribute__((sda));
-    extern void viBufAddDMA(void *);
+    extern int viBufAddDMA(void *);
     mpeg_start_decoder_dma();
     viBufAddDMA(g_movie_player_state[0] + 0xD9090);
     return 1;
 }
 
 extern char *g_movie_player_state[] __attribute__((sda));
-extern void mpeg_save_ipu_dma_state(void *);
+extern int mpeg_save_ipu_dma_state(void *);
 
 /* Video decoder callback that saves the DMA and IPU state. */
 int mpeg_dec_callback_save_state(void) {
@@ -323,7 +323,7 @@ int mpeg_dec_callback_save_state(void) {
 }
 
 extern char *g_movie_player_state[] __attribute__((sda));
-extern void mpeg_restore_ipu_dma_state(void *);
+extern int mpeg_restore_ipu_dma_state(void *);
 
 /* Video decoder callback that restores the DMA and IPU state. */
 int mpeg_dec_callback_restore_state(void) {
@@ -332,7 +332,7 @@ int mpeg_dec_callback_restore_state(void) {
 }
 
 extern char *g_movie_player_state[] __attribute__((sda));
-extern void VideoBufferTakeTimestamp(void *, void *);
+extern int VideoBufferTakeTimestamp(void *, void *);
 
 /* Video decoder callback that fetches the timestamp of the frame being decoded. */
 int mpeg_dec_callback_get_timestamp(void *unusedArg, void *reply) {

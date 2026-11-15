@@ -6,7 +6,7 @@ extern float D_001AB9E0 __attribute__((sda));
 extern float D_001B23A8 __attribute__((sda));
 extern char *D_001A8CFC;
 extern struct { int w0, w1, w2; } D_00138340;
-extern int table_find_by_id(void *, int);
+extern void *table_find_by_id(void *, int);
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern void AppendScreenRectPacket(int, int, int, int, u64, int);
 extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);

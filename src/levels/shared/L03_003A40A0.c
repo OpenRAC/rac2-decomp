@@ -26,7 +26,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int FloatToInt(float);
 extern int math_random_int_below(int);
-extern void part_spawn_hero_relative(void *, void *, int, int, int, int, float);
+extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
 extern void cam_update_aim_target_candidate(void *);
 extern int moby_fuse_linked_objects(void *, void *, void *, int, int);
 

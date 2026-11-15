@@ -24,7 +24,7 @@ extern int math_fast_float_d(void *);
 extern int weapon_spend_ammo(int, int);
 extern void func_PAL_L00_002AF458(void);
 extern int PlayMobySound(int, int, void *);
-extern void func_PAL_L00_0038D7E8(void *, void *, void *);
+extern char *func_PAL_L00_0038D7E8(void *, void *, void *);
 extern void func_PAL_L00_002AF6C0(void);
 extern void ref_L00_003C8828_00(void (*)(void *), void *);
 extern void func_PAL_L00_003CC908(void *);

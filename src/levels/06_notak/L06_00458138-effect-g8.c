@@ -2,13 +2,13 @@
 typedef unsigned int Quad __attribute__((mode(TI)));
 extern void moby_set_state(char *, int, int);
 extern float math_random_float_range(float,float);
-extern char *func_0035CBA0(char *,int,int);
+extern int func_0035CBA0(char *,int,int);
 extern void FastVecScale(void *,void *,float);
 extern void FastVecSub(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void func_00350388(char *);
-extern void part_spawn_object_following_effect(void *,void *,unsigned int,int,int,int,int,int,float,float);
+extern void *part_spawn_object_following_effect(void *,void *,unsigned int,int,int,int,int,int,float,float);
 extern void part_explode_object_into_pieces(void *,void *,void *,void *,int,int,int,int,int,int,int);
 extern void part_spawn_scaled_bolts(char *,int,float);
 extern void moby_compute_local_point(char *,void *,float,float,float);

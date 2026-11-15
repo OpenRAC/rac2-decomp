@@ -60,7 +60,7 @@ int list_menu_update(char *self, int arg)
     list_menu_noop_hook(self);
     return *(int *)(self + 0x16C);
 }
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern char D_001ADC10[], D_001ADC18[];
 extern char *D_001A8CFC[] __attribute__((sda));
@@ -69,7 +69,7 @@ extern void object_init_derived_arrays(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void list_menu_reset_attach_items(void *, void *);
-extern void list_menu_set_selection(void *, int);
+extern int list_menu_set_selection(void *, int);
 /* Sets up a small list menu: its position, two panels and its scrolling list. */
 void small_list_menu_init(char *object, void *argument)
 {
@@ -105,7 +105,7 @@ extern char D_001ADC20[], D_001ADFC0[], D_001AE0C0[];
 extern int D_001AE138 __attribute__((sda));
 extern void object_init_derived_c(void *, void *, void *);
 extern void hud_set_widget_value_pair(void *, int, int);
-extern void memset(void *, int, int);
+extern void *memset(void *, int, int);
 extern void menu_set_selected_index(void *, int);
 extern void object_set_second_float4(void *, float, float, float, float);
 /* Sets up a level object: it allocates the pair of positions at +0x180 and puts

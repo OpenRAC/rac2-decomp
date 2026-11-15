@@ -5,7 +5,7 @@ extern void door_init_slide_motion(char *);
 extern void dobbo_update_spin_direction(char *);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
-extern void math_step_value_toward_target(float *, float *, float, float, float, float);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern float D_L09_001B15A8 __attribute__((sda));
 extern float D_L09_001B15AC __attribute__((sda));
 extern char g_sound_state[];

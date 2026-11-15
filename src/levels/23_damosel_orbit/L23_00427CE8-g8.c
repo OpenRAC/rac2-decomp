@@ -102,7 +102,7 @@ extern s32 CollLine(void *, void *, s32, void *, s32);
    call keeps `$v0 = 1`'s stack store tied to the next `lq $v0`, and sched2 issues it early */
 extern void *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float, s32, s32, s32, s32);
 
-extern void part_create_flash(void *, s32, s32, s32, s32, s32, s32, s32, float, s32, s32);
+extern char *part_create_flash(void *, s32, s32, s32, s32, s32, s32, s32, float, s32, s32);
 
 extern void cam_play_effect_on_target(u8 *, s32, s32, void *, s32, s32);
 

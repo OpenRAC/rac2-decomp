@@ -42,7 +42,7 @@ extern void func_00282D30_7(char *local, int value, float scale);
 
 extern float func_002A7878_1(float low, float high);
 
-extern void part_spawn_bubble(char *object, char *local, float amount, float base);
+extern void *part_spawn_bubble(char *object, char *local, float amount, float base);
 
 /* Measured partial layouts; original type and game roles are unknown. */
 typedef struct Rac2Native_b1b523716b470b36_FamilyNative192Vector {
@@ -150,7 +150,7 @@ extern unsigned int ref_L00_0036F480_00(void);
 
 extern void game_reset_frame_counters(void);
 
-extern void UpdateSoundVoices();
+extern int UpdateSoundVoices();
 
 extern L00_0037F7E8_u8 *func_002A08A0(void);
 

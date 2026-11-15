@@ -73,7 +73,7 @@ extern void BuildShopChannelList(void);
 extern void shop_build_vendor_list_by_flags(void);
 extern void snd_send_cmd22(int);
 extern void music_Pause(int);
-extern void snd_Pump(void);
+extern int snd_Pump(void);
 extern void weapon_menu_reset(void);
 extern void level_forward_value(int);
 extern void level_forward_pair(int, int);

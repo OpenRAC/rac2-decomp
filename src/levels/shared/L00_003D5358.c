@@ -4,7 +4,7 @@ typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float v[4]; } Vector;
 extern float math_random_float_range(float low, float high);
 extern void moby_transform_joint_to_world(char *object, int joint, void *out);
-extern void part_spawn_object_relative_particle(char *object, void *position, void *velocity, void *parameters, int mode);
+extern void *part_spawn_object_relative_particle(char *object, void *position, void *velocity, void *parameters, int mode);
 extern char D_L00_001B02E8 __attribute__((sda));
 extern char D_L00_001B02F8 __attribute__((sda));
 extern char D_L00_001B0308 __attribute__((sda));
@@ -28,7 +28,7 @@ extern float D_L00_001B03D4 __attribute__((sda));
 extern float D_L00_001B03DC __attribute__((sda));
 extern float D_L00_001B03E0 __attribute__((sda));
 extern float D_L00_001B03E4 __attribute__((sda));
-extern int SelectBestEligibleTarget(void *axis, int mode, int flag, float value, float z, float low, float high);
+extern char *SelectBestEligibleTarget(void *axis, int mode, int flag, float value, float z, float low, float high);
 extern void CalculateAimedLaunchVelocity(void *velocity, void *position, int handle, int mode, float a, float b, float c, float d);
 extern void math_apply_axis_rotation_to_quat(void *out, void *source, void *axis, float angle);
 

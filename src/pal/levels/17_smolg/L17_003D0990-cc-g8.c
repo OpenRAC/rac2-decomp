@@ -7,7 +7,7 @@
 
 extern int FloatToInt(f32);
 
-extern s32 part_l17_spawn_fading(f32, s32, s32, s32);
+extern u8 *part_l17_spawn_fading(f32, s32, s32, s32);
 
 extern f32 D_L17_001B04B8 __attribute__((sda));
 

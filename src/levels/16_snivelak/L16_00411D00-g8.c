@@ -15,8 +15,8 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float math_random_float_range(float, float);
 extern float weapon_compute_shot_launch_speed(void *, void *, s32, float, float);
-extern s32 SpawnExplosion(void *, s32, s32, s32, float, float, s32, s32, s32, s32, s32, s32, s32, s32);
-extern void part_spawn_spinning_fragment(s32, void *, void *, s32, float, float);
+extern char *SpawnExplosion(void *, s32, s32, s32, float, float, s32, s32, s32, s32, s32, s32, s32, s32);
+extern char *part_spawn_spinning_fragment(s32, void *, void *, s32, float, float);
 
 /* Fires the object's spark: builds a short ray from its frame, tilts it by the resident angle and hands it to the effect spawner. */
 void snivelak_fire_lobbed_shot(char *moby)

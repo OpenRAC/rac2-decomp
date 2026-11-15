@@ -36,7 +36,7 @@ typedef struct {
 } Player_2B44C0;
 
 extern Player_2B44C0 g_hero_state;
-extern void memset(void *, int, int);
+extern void *memset(void *, int, int);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_transform_by_object_or_given(char *, void *, void *, void *);

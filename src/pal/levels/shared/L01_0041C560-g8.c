@@ -16,7 +16,7 @@ extern void FastVecScale(void *, void *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void vec_random_direction(void *, float, float);
 extern int math_random_int_below(int);
-extern void part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
+extern void *part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);

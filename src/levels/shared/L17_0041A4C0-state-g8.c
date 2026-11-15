@@ -7,12 +7,12 @@ extern s32 D_L17_001B1EE8 __attribute__((sda));
 extern s32 D_L17_001B1EF0 __attribute__((sda));
 extern s32 D_L17_001B1F10 __attribute__((sda));
 extern void moby_set_state(char *, s32, s32);
-extern s32 part_find_owned_effect_slot(char *, s32, s32);
+extern void *part_find_owned_effect_slot(char *, s32, s32);
 extern void vec_local_to_world(char *, void *, float, float, float);
-extern void part_spawn_object_following_effect(void *, char *, s32, s32, float, float, s32, s32, s32, s32);
+extern void *part_spawn_object_following_effect(void *, char *, s32, s32, float, float, s32, s32, s32, s32);
 extern void part_explode_object_into_pieces(char *, s32 *, s32 *, s32 *, s32, s32, s32, s32, s32, s32, s32);
 extern void vec_local_offset_to_world(char *, void *, float, float, float);
-extern void SpawnExplosion(void *, s32, s32, s32, float, float, s32, s32, s32, s32, s32, s32, s32, s32);
+extern char *SpawnExplosion(void *, s32, s32, s32, float, float, s32, s32, s32, s32, s32, s32, s32, s32);
 extern void moby_mark_spawned(char *);
 
 /* The func_L20_00449178 three-state effect for level 17: the start point is taken from the

@@ -27,9 +27,9 @@ extern void FastVecSub(char *, char *, char *);
 
 extern void vec_scale_to_length(char *, char *, float);
 
-extern void fast_shot_create_child(char *, char *, char *, int, float);
+extern unsigned char *fast_shot_create_child(char *, char *, char *, int, float);
 
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
 
 /* Fills the stack vectors v.a, v.b, v.c and v.d from the table at D_00189E20, the owner's helper and a
    unit vector (0, 1, 0, 1) whose second float is negated when arg2 is set, scales v.d by

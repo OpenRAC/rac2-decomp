@@ -4,7 +4,7 @@
 #include "common.h"
 typedef int GornQuad __attribute__((mode(TI)));
 extern char *D_L15_001FE480[];
-extern int moby_get_motion_data(unsigned char *);
+extern char *moby_get_motion_data(unsigned char *);
 extern int math_fast_float_d(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);

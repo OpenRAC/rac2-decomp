@@ -10,7 +10,7 @@ extern float gravity_get_center_distance(void *);
 extern void vec_clear_128(void *);
 extern void FastVecAdd(char *, char *, char *);
 typedef union { Vector128 q; float f[4]; } MotionVector;
-extern void func_PAL_L13_0040ED20(char *, char *, char *, int);
+extern float func_PAL_L13_0040ED20(char *, char *, char *, int);
 extern float moby_measure_step_angle(char *, Vector128 *, char *);
 extern void moby_build_forward_vector(char *, float *, float);
 extern void vec_transform_and_set_height(char *, char *, char *, float, char *);

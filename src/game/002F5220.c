@@ -379,7 +379,7 @@ extern void mc_update_state(void);
 extern int load_read_disc_with_pause(char *,int,int);
 extern int mpeg_play_movie_2(void *,void *,char *,char *,int,int);
 extern int req_pop_queue(void *,int *,int *);
-extern void func_00126DC0(void *);
+extern int func_00126DC0(void *);
 extern void gfx_reset_record_list(void);
 extern int request_begin_slot(int,int,int,int,unsigned char *);
 void mpeg_play_movie(void)
@@ -616,7 +616,7 @@ mark_available:
 }
 typedef struct { unsigned char pad0[0x3C]; char *destination; unsigned char pad1[0x24]; int clear; } Func_002F88D8State;
 extern Func_002F88D8State ref_L00_002F88D8_00;
-extern void sprintf(char *, const char *, ...);
+extern int sprintf(char *, const char *, ...);
 extern const char D_001AD2B8[];
 
 /* Puts a line of text into the shop's message box. */
@@ -649,7 +649,7 @@ extern unsigned short D_001A7AF2;
 extern void gfx_select_packet_buffer_setup(void);
 extern int PlayMobySound(int, int, void *);
 extern void tex_load_level_pack(int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_0029CC98(int, int);
 extern void load_disc_table_entry_for_draw(int);
 extern void LoadDiscTableTexture(int);

@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern void vec_fast_helper_a(void *);
+extern int vec_fast_helper_a(void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int math_random_int_below(int);
@@ -51,7 +51,7 @@ extern char D_L00_001A8F20[] __attribute__((sda));
 
 extern void func_0029FCC0_1(int a, int b, void *c);
 
-extern int projectile_spawn_targeted(int a, void *b, int c, char *d, float e, float f, float g, float h);
+extern void *projectile_spawn_targeted(int a, void *b, int c, char *d, float e, float f, float g, float h);
 
 extern void func_00282F20_1(char *, char *, float);
 

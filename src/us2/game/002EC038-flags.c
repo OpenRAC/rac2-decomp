@@ -70,7 +70,7 @@ extern float g_screen_fade MACRO_ADDR;
 extern void game_reset_frame_counters(void);
 extern void scene_update_backdrop_quads(void);
 extern int snd_resume_music_stream(void);
-extern void snd_pump_music_and_disc_read(int);
+extern s16 snd_pump_music_and_disc_read(int);
 extern void moby_spawn_model_parts(void);
 extern int scene_load_chunk_data(int);
 extern int cutscene_apply_camera_key(void);
@@ -83,7 +83,7 @@ extern void render_environment_mapped_object(void);
 extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void func_002A0F48(void *);
 extern void stub_empty_17(void *, int);
-extern void UpdateSoundVoices(void);
+extern s32 UpdateSoundVoices(void);
 extern void UpdateLightingEnvironment(void);
 extern void game_update_idle_frame_counters(void);
 

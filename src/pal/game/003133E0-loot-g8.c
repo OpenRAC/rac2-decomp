@@ -5,7 +5,7 @@ extern int math_random_int_below(int);
 extern int D_001AF0FC __attribute__((sda));
 extern void func_PAL_002A7650(void *, int, int);
 extern int PickAmmoDropItem(void *, int *);
-extern void func_PAL_00321958(void *, int, int, int);
+extern char *func_PAL_00321958(void *, int, int, int);
 
 /* Selects the object's drop kind, emits the requested count, and resets its
  * halfword at +0xB4 before handing it to the state helper. */

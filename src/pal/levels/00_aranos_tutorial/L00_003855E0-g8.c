@@ -5,7 +5,7 @@ typedef int TI128 __attribute__((mode(TI)));
 extern unsigned char *D_L00_001B1E9C __attribute__((sda));
 extern void moby_set_state(char *, int, int);
 extern void func_PAL_002B15D8(char *, int, void *, unsigned char, float, float, float, float);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern void moby_mark_spawned(char *);
 
 void func_PAL_L00_003855E0(char *obj) {

@@ -46,7 +46,7 @@ extern int F6eb4f363_FUN_002A77E0(int mode);
 extern float F6eb4f363_FUN_002A90F8(char *object, char *local);
 extern void F6eb4f363_FUN_00282D30(char *local, int value, float scale);
 extern float F6eb4f363_FUN_002A7878(float low, float high);
-extern void F6eb4f363_FUN_002BF728(char *object, char *local, float amount, float base);
+extern void *F6eb4f363_FUN_002BF728(char *object, char *local, float amount, float base);
 
 /* func_00303568 is defined in 00303568.c. */
 
@@ -92,7 +92,7 @@ extern ParticleUpdateColors D_L00_001AF010;
 extern float math_random_float_range(float, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern int gfx_swap_packed_color_channels(int, int);
-extern void part_spawn_scaling(void *, void *, int, int, int, int, int, int);
+extern char *part_spawn_scaling(void *, void *, int, int, int, int, int, int);
 extern float FastAddRotations(float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void moby_mix_on_inner_data(void *, void *, void *, float);

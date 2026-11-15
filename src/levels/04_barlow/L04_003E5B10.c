@@ -12,7 +12,7 @@ extern void vec_random_direction(void *, float, float);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int moby_step_at_own_position_factor(void *, float);
 extern char *SpawnSpinningSparkParticle(void *, int, float, float, void *, float, int, int, float);
-extern void moby_l01_turn_toward_target(void *, void *);
+extern int moby_l01_turn_toward_target(void *, void *);
 extern float D_L04_002AF630[];
 
 /* Moves the object along its animation toward a target point and turns it to face that point. On two key frames it also sprays a burst of sparks. */

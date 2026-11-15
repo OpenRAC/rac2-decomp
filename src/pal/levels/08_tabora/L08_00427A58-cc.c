@@ -20,7 +20,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int FastTweenColor(int, int, float);
 extern int FloatToInt(float);
-extern void part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
+extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 void func_PAL_L08_00427A58(char *arg0, char *arg1) {
     float a[4];

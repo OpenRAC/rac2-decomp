@@ -55,11 +55,11 @@ extern void func_PAL_0029C0F0(int,int);
 extern void SetCamera5Pose(void *,void *,int,int,int);
 extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
-extern void func_PAL_L18_002E01E0(int,int);
+extern s32 func_PAL_L18_002E01E0(int,int);
 extern float vec_distance_xy(void *,void *);
 extern void moby_set_flag_bit(void *,int);
 extern void func_PAL_L18_0042BA90(void *,int,int,float);
-extern void TryClaimNotice(int,int,int);
+extern int TryClaimNotice(int,int,int);
 /* Refreshes targeting and combat reactions, including the player capture transition. */
 void func_PAL_L18_0042C768(u8 *o) {
     EnemyStateView *s = *(EnemyStateView **)(o + 0x68);

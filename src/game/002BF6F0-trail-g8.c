@@ -14,7 +14,7 @@ extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecScale(void *,void *,float);
 extern int math_random_int_range(int,int);
 extern int FloatToInt(float);
-extern void part_spawn_spark(void *,void *,int,int,int,int,int,int,int,float);
+extern void *part_spawn_spark(void *,void *,int,int,int,int,int,int,int,float);
 /* Fades a trail particle along its colour ramp and drifts it forward. Now and then it throws off a small spark that flies away. */
 void UpdateParticleTrail(char *self) {
     SplitVector saved, motion, random;

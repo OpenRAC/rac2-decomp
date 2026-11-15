@@ -83,7 +83,7 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern u8 *part_spawn_fading_drift(void *, void *, int, int, int, int, int, float, float, float, int);
 extern u8 *part_spawn_size_changing(void *, void *, int, int, int, int, int, float, float, float, int);
-extern u8 *part_spawn_growing_puff(void *, void *, int, int, float, int);
+extern void part_spawn_growing_puff(void *, void *, int, int, float, int);
 
 /* Runs the cutscene effects: marks some actors and spawns sparks and bursts at set frames of the scene. */
 void UpdateCutsceneEffects(void)

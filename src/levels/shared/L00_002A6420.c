@@ -96,7 +96,7 @@ extern char D_00189E20_20[];
 
 extern float func_002A7878_6(float a0, float a1);
 
-extern void part_spawn_drifting(float *a0, float *a1, int a2, float a3, float a4);
+extern void *part_spawn_drifting(float *a0, float *a1, int a2, float a3, float a4);
 
 extern int func_002A77E0_2(char *a0);
 

@@ -5,13 +5,13 @@ extern void moby_mark_spawned(void *);
 extern void anim_start_blended(void *, int, int, int);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void SpawnDirectedEffectObject(void *, void *, void *, int);
+extern void *SpawnDirectedEffectObject(void *, void *, void *, int);
 extern float math_random_float_range(float, float);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int math_random_int_range(int, int);
-extern void part_spawn_velocity_particle(void *, void *, int, int, float);
+extern u8 *part_spawn_velocity_particle(void *, void *, int, int, float);
 
 /* family c459a266b43242d6 - 352 bytes, 2 placements
    levels/19_grelbin @0x00412F70, levels/8_tabora @0x0041E630
@@ -80,7 +80,8 @@ extern void moby_disable_object_list_flags(void), moby_reset_vars_defaults(void 
 extern int hero_is_reachable_for_count(void *, int, float);
 extern void level_apply_index_for_key(void *), text_print_localized_formatted(int, ...);
 extern int req_push_queue(void *, int), game_is_either_mode_two(void);
-extern void req_launch_queued(void *), moby_set_byte_on_group(int, int), moby_restore_object_list_flags(void);
+extern void moby_set_byte_on_group(int, int), moby_restore_object_list_flags(void);
+extern s32 req_launch_queued(void *);
 extern void STUB_printf(const char *, ...);
 extern int MemcardSave(int, int);
 extern int snd_play_from_class_bank(int, int, void *, int);

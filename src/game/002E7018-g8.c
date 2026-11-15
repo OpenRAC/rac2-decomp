@@ -201,7 +201,7 @@ extern struct State2EB598 g_scene_playback_state;
 extern struct Moby2EB598 *ref_L00_002EB598_00 __attribute__((sda));
 
 extern void FlushCache(int);
-extern void fast_decompress(int, int);
+extern int fast_decompress(int, int);
 extern struct Moby2EB598 *CreateMoby(int);
 extern void moby_init_instance(struct Moby2EB598 *, int);
 

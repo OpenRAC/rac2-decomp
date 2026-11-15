@@ -2,7 +2,7 @@
 
 extern void gfx_update_color_fade(u8 *a0, void *a1);
 
-extern void FastDecTimer(void *a0);
+extern int FastDecTimer(void *a0);
 
 extern void anim_start_blended(u8 *a0, u32 a1, u32 a2, u32 a3);
 
@@ -35,10 +35,10 @@ extern void saur_beast_draw_beam_quad_overlay(u8 *a0, f32 *a1);
 
 extern float FastVecLength(void *);
 extern void FastVecSub(void *, void *, void *);
-extern void ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *, f32, f32);
-extern void math_approach_target_with_direction_mode(void *, f32, f32, f32, f32, void *, int);
+extern int ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *, f32, f32);
+extern f32 math_approach_target_with_direction_mode(void *, f32, f32, f32, f32, void *, int);
 extern f32 FastDiffRots(f32, f32);
-extern void math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
+extern float math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
 extern f32 ApproachValue(f32 *, f32, f32);
 extern void vec_scale_to_length(void *, void *, f32);
 extern int moby_move_over_ground(void *, void *, void *, f32, f32, f32, f32, int);

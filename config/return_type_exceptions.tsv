@@ -1,0 +1,33 @@
+# Functions whose declarations may keep another return type class: tests/check_return_types.py.
+# name<TAB>tolerated declaration classes<TAB>reason. Only the listed classes are tolerated, never in
+# the definition; any other disagreement still fails. Remove a row when its conflict is gone.
+func_00116300	void	void prototypes in 001166C8.c, 00117108.c: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_0011C820	void	void prototypes in 0012672C-exec.c: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_00122B00	int32	libgcc soft-double helper (double in $v0); L19_0041C3D8-rc2.c matched with the helpers called explicitly through integer prototypes: rewriting it as double arithmetic is a rematch
+func_00122DA8	int32	libgcc soft-double helper (double in $v0); L19_0041C3D8-rc2.c matched with the helpers called explicitly through integer prototypes: rewriting it as double arithmetic is a rematch
+func_001234F0	int32	libgcc soft-double helper (double in $v0); L19_0041C3D8-rc2.c matched with the helpers called explicitly through integer prototypes: rewriting it as double arithmetic is a rematch
+func_0012FA98	void	void prototypes in 0012CAB0-rc2.c: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_001338F0	void	void prototypes in 0034CEA0.c: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_0027C878	int32	64-bit definition (its doubleword moves and shifts need the long type); callers read only the low 32 bits of $v0 through int prototypes, and a long prototype adds the truncation they do not have
+func_0027FAA8	void	void prototypes in 002D50F0-rc2.c and the PAL/v2.00 copies: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_0028B950	int32	void definition (hud_init_counter_values); L00_002F74F0.c and its PAL copy keep an int prototype and ignore the result: a void prototype changes their register allocation
+func_0028E640	int32	64-bit definition (its doubleword moves and shifts need the long type); callers read only the low 32 bits of $v0 through int prototypes, and a long prototype adds the truncation they do not have
+func_002A0048	int32	void definition that leaves the DMA cursor in $v0; tex_run_upload_and_setup (0029DE38.c) returns it: an explicit return in the definition changes its allocation
+func_002A7CA0	void	void prototypes in 17 AI and wander units: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_002AA2E8	void	void prototypes in 002BF6F0.c and PAL 002BF6A0-flags.c: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_002AA800	float	void definition; 7 level units keep a float prototype and ignore the result: a void prototype changes their register allocation
+func_002B1C20	int32	64-bit definition (its doubleword moves and shifts need the long type); callers read only the low 32 bits of $v0 through int prototypes, and a long prototype adds the truncation they do not have
+func_002ED578	void	void prototypes in the level 05/10/15 units: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_002FC748	int32	void definition; 002E3820-rc2.c calls it as (void) through an int prototype: a void prototype changes its register allocation
+func_00334710	void	128-bit (TI) return; six callers ignore it through void prototypes, and the compiler crashes on a TI-returning prototype in those units
+func_00338040	int32	void definition ending on a void layout call (incidental $v0); the L00_002FC7A0.c wrapper returns it: unwrapping or returning changes their code
+func_003387A0	int32	void definition ending on a void layout call (incidental $v0); the L00 module-handler wrappers (and PAL/v2.00 copies) return it: unwrapping or returning changes their code
+func_L00_002A4EF0	int32	64-bit definition (its doubleword moves and shifts need the long type); callers read only the low 32 bits of $v0 through int prototypes, and a long prototype adds the truncation they do not have
+func_L00_002D3FB0	int32	64-bit definition (its doubleword moves and shifts need the long type); callers read only the low 32 bits of $v0 through int prototypes, and a long prototype adds the truncation they do not have
+func_L00_0030DD70	void	void prototypes in the level 11/14 units: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_L12_00427C58	int32	void definition that passes the movement helper's flags through in $v0, which the L12 callers test (&0x80); every int form tried (returns, result variable) reorders its blocks: needs a rematch
+func_PAL_002B27B8	int32	64-bit definition (its doubleword moves and shifts need the long type); callers read only the low 32 bits of $v0 through int prototypes, and a long prototype adds the truncation they do not have
+func_PAL_002EE490	void	void prototypes in PAL L10/L15 units: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_PAL_L00_0030FBC0	void	void prototypes in PAL L14_0042C5AC-g8.c: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)
+func_PAL_L12_0042D200	int32	void definition that passes the movement helper's flags through in $v0, which the L12 callers test (&0x80); every int form tried (returns, result variable) reorders its blocks: needs a rematch
+func_US2_L00_0030EFB8	void	void prototypes in v2.00 L14_004284F4-g8.c: the callers ignore the result, and they match only with a call that has no value (a value-returning prototype changes their register allocation)

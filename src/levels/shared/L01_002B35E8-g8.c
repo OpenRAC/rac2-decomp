@@ -30,7 +30,7 @@ extern void hero_clear_queued_anim(void);
 
 extern int anim_copy_entry_data(char *a0, int a1, int a2, char *a3);
 
-extern void SetHeroMoveState(int a0, int a1);
+extern s32 SetHeroMoveState(int a0, int a1);
 
 /* Resets the hero when a new area starts: clears the old target, copies the spawn position from the spawn object and sets up the two attached objects. */
 void hero_reset_for_area_start(void) {

@@ -5,7 +5,7 @@
 
 
 #include "common.h"
-extern void vec_fast_helper_a(void *);
+extern int vec_fast_helper_a(void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int math_random_int_below(int);
@@ -84,7 +84,7 @@ void func_PAL_L00_003A77D8(char *moby)
 
 extern char D_L00_001A8F20[] __attribute__((sda));
 extern void func_0029FCC0_1(int a, int b, void *c);
-extern int projectile_spawn_targeted(int a, void *b, int c, char *d, float e, float f, float g, float h);
+extern void *projectile_spawn_targeted(int a, void *b, int c, char *d, float e, float f, float g, float h);
 
 /* Runs one helper over the object and a stack buffer, then builds a second call from the object's field 104 sub-object - its field 24 as a float, the constants 2.0f/5.0f/0.6f and a bound data address - and stores the object into field 184 of the returned pointer when it is non-null. */
 void func_PAL_L00_003A8978(int a0)
@@ -119,7 +119,7 @@ extern int CollLine(void *,void *,int,void *,void *);
 extern float fast_vec_dist(void *, void *);
 extern char *func_PAL_L00_00400968(char *, char *, char *, int);
 extern void QueueMobyImpact(int, void *);
-extern void func_PAL_0032F0B8(int, int, char *);
+extern int func_PAL_0032F0B8(int, int, char *);
 extern int g_hero_moby;
 extern unsigned char D_00139582;
 extern L00AimState g_collision_result;

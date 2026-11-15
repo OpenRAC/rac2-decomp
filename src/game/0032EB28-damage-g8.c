@@ -33,12 +33,12 @@ extern unsigned char g_item_slot_to_record[];
 extern DamageData g_weapon_table[];
 
 extern int coll_process_hit(float, void *, int, void *, int);
-extern int moby_get_private_value_0(void *);
+extern char *moby_get_private_value_0(void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(void *, void *);
-extern void StartAttachedEffect(void *, int, int);
+extern int StartAttachedEffect(void *, int, int);
 
 /* Hurts every enemy and breakable thing near the object, pushing it away from the blast. It skips the player's own vehicle. */
 void QueueRadialMobyImpacts(char *object)

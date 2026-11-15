@@ -7,7 +7,7 @@ typedef union { Quadword whole; float f[4] __attribute__((aligned(16))); } Vecto
 typedef struct { unsigned char prefix[0x18]; char *object; int polygon; Vector point, offset, normal; } CollisionView;
 extern unsigned char D_L06_001BFC80[];
 #define COLLISION (*(CollisionView *)D_L06_001BFC80)
-extern void vec_fast_helper_a(unsigned char *);
+extern int vec_fast_helper_a(unsigned char *);
 extern int FastDecTimer(unsigned char *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);

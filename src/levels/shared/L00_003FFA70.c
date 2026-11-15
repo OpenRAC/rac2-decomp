@@ -17,7 +17,7 @@ extern void value_set_entry_by_index(int arg, int value);
 
 extern void help_unlock_entry(int arg);
 
-extern void moby_handle_request_slot_state(int arg);
+extern int moby_handle_request_slot_state(int arg);
 
 extern void func_0029F338_4(char *arg);
 
@@ -153,7 +153,7 @@ extern void sheep_shot_resolve_hit(char *arg, void *p);
 
 /* func_L00_00404168 is matched in L00_00404168-por.c (-frac2-zero-ti-por). */
 
-extern void blue_explosion_spawn(void *pos, int a, int b, int c, int d, int e, int f, int g, int h,
+extern char *blue_explosion_spawn(void *pos, int a, int b, int c, int d, int e, int f, int g, int h,
                               int k, float scale);
 extern float math_random_float_range(float lo, float hi);
 extern float math_random_angle(void);
@@ -163,7 +163,7 @@ extern void vec_build_spherical_offset(void *out, float x, float y, float z);
 extern void FastVecSub(void *out, void *a, void *b);
 extern void FastVecAdd(void *out, void *a, void *b);
 extern void vec_scale_to_length(void *out, void *a, float scale);
-extern void part_spawn_spinning_particle(void *pos, void *velocity, float speed, float size,
+extern void *part_spawn_spinning_particle(void *pos, void *velocity, float speed, float size,
                               unsigned int colour, unsigned int colour2, int life, int a, int b,
                               int c, int d);
 extern char g_camera_l00_position[];

@@ -5,14 +5,14 @@
 extern void vec_clear_128(char *block);
 extern int math_random_int_below(int kind);
 extern char *moby_get_motion_data(char *object);
-extern int state_get_stored_pointer_value(char *object);
+extern void *state_get_stored_pointer_value(char *object);
 extern void level_append_object(char *object, int a1, int a2, int a3);
 extern void func_PAL_L05_0037E8E0(char *object);
-extern void moby_process_collision_hit(char *object, int a1, int a2, int a3);
+extern int moby_process_collision_hit(char *object, int a1, int a2, int a3);
 extern void moby_check_player_in_view_and_range(char *object, int a1, float a2);
 extern int moby_can_take_next_step(char *object);
 extern void func_PAL_L05_0037DE20(char *object);
-extern void math_fast_float_d(char *block);
+extern int math_fast_float_d(char *block);
 extern char *D_L05_001B251C __attribute__((sda));
 extern char g_sound_state[];
 extern int snd_play_from_class_bank(int, int, char *, int);

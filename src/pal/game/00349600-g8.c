@@ -7,7 +7,7 @@ extern void object_set_first_float4(void *,float,float,float,float);
 extern void gfx_draw_screen_element_stored(void *),text_label_draw(void *),hud_draw_colored_quad_widget(void *);
 extern void hud_set_widget_value_pair(void *,int,int);
 extern void hud_set_widget_field_b(void *,int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_PAL_002802D8(int,int,unsigned long,int,int,int,float);
 typedef struct {int x,y;} MenuIntegerPair;
 extern MenuIntegerPair ref_00347468_00[];

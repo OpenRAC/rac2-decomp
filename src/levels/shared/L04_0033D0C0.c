@@ -1,7 +1,7 @@
 #include "common.h"
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern void moby_move_toward_target(char *,char *,float *,float *,float);
+extern int moby_move_toward_target(char *,char *,float *,float *,float);
 /* Looks at a point 100 units in front of an object and passes it on. */
 void coll_probe_ahead_of_moby(char *src_moby, char *other_moby)
 {

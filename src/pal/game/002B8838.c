@@ -1,6 +1,6 @@
 #include "include_asm.h"
 
-extern void func_002B7CE0_1(int);
+extern short func_002B7CE0_1(int);
 extern int func_002B7B18_1(char *, int, int);
 
 /* Calls one callee with the argument 1, then a second callee with (first, second, third argument) keeping its result, calls the first callee again with 1, and returns the kept result. */

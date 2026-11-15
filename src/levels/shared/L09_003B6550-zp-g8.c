@@ -6,11 +6,11 @@ typedef union EffectVector { Quadword bits; float value[4]; } EffectVector;
 extern int math_random_int_below(int);
 extern void anim_start_immediate(void *, int, int);
 extern void moby_set_state(void *, int, int);
-extern int part_find_owned_effect_slot(void *, int, int);
-extern void PlayMobySound(int, int, void *);
+extern void *part_find_owned_effect_slot(void *, int, int);
+extern int PlayMobySound(int, int, void *);
 extern u8 *moby_l00_spawn_child(void *, int, int);
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int, int, int, int);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void SpawnTintedEffects(void *, void *, int, int, void *, unsigned int, void *, float, float, float, float);
 extern void moby_mark_spawned(void *);
 /* Required component/range reads do not establish the complete owning allocations. */

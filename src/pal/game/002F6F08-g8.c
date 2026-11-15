@@ -46,7 +46,7 @@ extern void func_PAL_00299898(void);
 extern int func_PAL_002B8838(char *,int,int);
 extern int func_PAL_00351140(void *,void *,char *,char *,int,int);
 extern int req_pop_queue(void *,int *,int *);
-extern void func_00126DC0(void *);
+extern int func_00126DC0(void *);
 extern void gfx_reset_record_list(void);
 extern int request_begin_slot(int,int,int,int,unsigned char *);
 void func_PAL_002F6F08(void)

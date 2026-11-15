@@ -4,7 +4,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern void vec_random_direction(char *, float, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void func_PAL_L02_0032D5F8(char *, int, char *, char *, int, int, float *, void *, void *, float);
+extern char *func_PAL_L02_0032D5F8(char *, int, char *, char *, int, int, float *, void *, void *, float);
 extern void moby_mark_spawned(char *);
 extern char D_L02_001A8F20[] __attribute__((sda));
 
@@ -31,7 +31,7 @@ extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void set_moby_color(char *, int, int, int);
 extern int func_PAL_002B3F18(char *, char *, char *);
-extern void moby_spawn_linked(char *, int, float, float);
+extern int moby_spawn_linked(char *, int, float, float);
 extern void get_moby_color(char *, int *, int *, int *);
 extern u16 *g_group_id_lists[];
 extern u8 *g_moby_l11_table __attribute__((sda));

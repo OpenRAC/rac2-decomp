@@ -44,7 +44,7 @@ extern void help_unlock_entry(int);
 extern void func_US2_002AFF10(int);
 extern void moby_mark_table_entry_flagged(int);
 extern void level_capture_checkpoint_state(void *, void *);
-extern void MemcardSave(int, int);
+extern int MemcardSave(int, int);
 extern void moby_mark_spawned(void *);
 
 /* Advances the conversation states and turns the two manipulators toward the

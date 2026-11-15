@@ -16,13 +16,13 @@ void list_page_draw(char *object)
     option_list_draw_rows(p);
 }
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void prompt_bar_init(void *, void *, void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts(void *, int, int, int);
 extern void prompt_bar_set_text_offsets(void *, float, float, float, float, float, float);
-extern void simple_page_update(void *, int);
+extern int simple_page_update(void *, int);
 extern int D_001ADEF0[2] __attribute__((sda));
 /* Sets up a simple menu page with a title. */
 void simple_page_init(char *object, void *argument)

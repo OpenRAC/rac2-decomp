@@ -198,7 +198,7 @@ extern void FastVecAdd(u8 *a, u8 *b, u8 *c);
 
 /* func_L07_003F8AB0 is defined in L07_003F4578-qcopy.c (this unit needs the grouped quadword copy). */
 
-extern void SpawnBallisticMoby(u8 *a, u8 *b, void *c, void *d, f32 e);
+extern char *SpawnBallisticMoby(u8 *a, u8 *b, void *c, void *d, f32 e);
 
 
 extern u8 *moby_find_active_in_group(u8 *a);

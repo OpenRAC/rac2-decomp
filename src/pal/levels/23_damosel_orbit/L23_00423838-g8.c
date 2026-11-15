@@ -18,7 +18,7 @@ extern s32 D_L23_001A8AB0[4] __attribute__((sda));
 extern s32 D_L23_001A8AC0[4] __attribute__((sda));
 extern s32 D_L23_001B3714;
 extern s32 D_L23_001B13E8 __attribute__((sda));
-extern void PlayMobySound(int, int, u8 *);
+extern int PlayMobySound(int, int, u8 *);
 extern s32 math_random_int_below(s32);
 extern s32 D_L23_001A8AB4[3] __attribute__((sda));
 extern s32 D_L23_001A8AC4[3] __attribute__((sda));

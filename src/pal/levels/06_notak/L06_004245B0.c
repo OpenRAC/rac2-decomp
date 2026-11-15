@@ -79,17 +79,19 @@ done:
 
 
 
-extern void func_36C158();
-extern void func_36C1B0(float);
+extern int func_36C158();
+extern int func_36C1B0(float);
 
-void func_PAL_L06_00448968(char *a0, int a1, int a2)
+int func_PAL_L06_00448968(char *a0, int a1, int a2)
 {
     char *p = *(char **)(a0 + 0x68);
+    int result;
 
     if (a2 == 0) {
-        func_36C158();
+        result = func_36C158();
     } else {
-        func_36C1B0(*(float *)(p + 0x31C));
+        result = func_36C1B0(*(float *)(p + 0x31C));
     }
+    return result;
 }
 

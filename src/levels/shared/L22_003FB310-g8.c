@@ -3,7 +3,7 @@ extern u8 g_hero_state[];
 extern f32 fast_vec_dist(void *, void *);
 extern void cam_compute_view_direction(void *, void *, int);
 extern int flag_set_first_pending(void *);
-extern void snd_start_in_slot(int, int, int);
+extern int snd_start_in_slot(int, int, int);
 extern void euler_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
 extern void vec_negate_and_forward(void *, void *, int);

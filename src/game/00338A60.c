@@ -7,9 +7,9 @@ extern void func_L00_0042E388_1(char *a0);
 
 extern void func_L00_0042E138_1(char *a0);
 
-extern void func_L00_0042BAD0_10(void *p);
+extern char *func_L00_0042BAD0_10(void *p);
 
-extern void func_L00_0042C290_10(void *p);
+extern char *func_L00_0042C290_10(void *p);
 
 extern void func_00336320_1(char *a);
 
@@ -74,7 +74,7 @@ typedef struct {
 extern void object_set_first_float4(void *, float, float, float, float);
 /* The retail callee hands a value back in v0; the declaration says so because v0
    then stays the call's return register and is not handed to the tail's reloads. */
-extern int text_format_location_name(void *, int);
+extern char *text_format_location_name(void *, int);
 
 /* The three position pairs live in the program's own data, so they have no address
    of their own: each program reads them from its own bytes. */
@@ -136,7 +136,7 @@ void mission_screen_draw_parts(char *screen)
 /* Shuts down the mission screen's parts and returns the screen. */
 char *mission_screen_shutdown(char *screen)
 {
-    extern void prompt_bar_destroy(void *);
+    extern int prompt_bar_destroy(void *);
     extern void *object_construct_derived_a(void *);
     prompt_bar_destroy(screen + 8);
     object_construct_derived_a(screen + 0x2A8);

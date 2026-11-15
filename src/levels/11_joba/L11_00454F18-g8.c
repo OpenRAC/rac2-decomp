@@ -101,7 +101,7 @@ extern void fighter_update_contacts(void *);
 extern void fighter_count_frame_check_contact(void *);
 extern int joba_turn_toward_group_entity(void *);
 extern void joba_fighter_walk_dust(void *, void *);
-extern void MobySpringTurn(void *, float, float, float, float *, float);
+extern float MobySpringTurn(void *, float, float, float, float *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void joba_damage_objects_in_radius(void *, int, float, float, float, float, float, float, float);
 extern float math_fast_sin_or_cos_a(float);

@@ -168,7 +168,7 @@ int group_pass_lead_token(char *self)
 
 extern int D_001B2758;
 extern void gfx_draw_lightning_bolt_ribbon(char *, char *);
-extern char *math_random_int_range(int, int);
+extern int math_random_int_range(int, int);
 extern float math_random_angle(void);
 extern void gfx_draw_glow_sprite(char *, unsigned int, float, char *, float, int, int);
 

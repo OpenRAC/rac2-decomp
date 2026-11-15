@@ -9,7 +9,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern void *func_PAL_L00_003FB330(void *, s32, s32, s32, s32, s32, s32, s32, float, float, s32, s32, s32, s32);
-extern void moby_transform_point_by_attachment(void *, void *, void *, void *);
+extern int moby_transform_point_by_attachment(void *, void *, void *, void *);
 extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
 extern void moby_set_state(u8 *, int, int);
 extern void moby_mark_spawned(void *);

@@ -2,11 +2,11 @@
 #include "names.h"
 
 typedef unsigned char u8;
-extern void object_construct_derived_a(u8 *);
-extern void hud_construct_widget_base(u8 *);
-extern void hud_construct_widget_base(u8 *);
-extern void menu_return_argument(u8 *);
-extern void object_construct_derived_c(u8 *);
+extern void *object_construct_derived_a(u8 *);
+extern char *hud_construct_widget_base(u8 *);
+extern char *hud_construct_widget_base(u8 *);
+extern unsigned long menu_return_argument(u8 *);
+extern void *object_construct_derived_c(u8 *);
 
 /* initialises eight in-place sub-records of one object by four routines, then returns the object pointer */
 u8 *func_PAL_00345268(u8 *a0) {
@@ -22,7 +22,7 @@ u8 *func_PAL_00345268(u8 *a0) {
 }
 
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC30[], D_001ADC88[], D_001AE0C0[];
 /* sda in this -G0 unit gives the one-instruction (macro) load of D_001A8CFC that retail has */
@@ -34,12 +34,12 @@ extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void hud_set_widget_field_b(void *, void *);
 extern void hud_set_widget_field_a(void *, int);
-extern const char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void menu_list_init(void *, void *);
 extern void menu_list_set_spacing(void *, float, float);
 extern void menu_list_set_icon_size(void *, float);
-extern void func_PAL_003457F0(void *, int);
+extern int func_PAL_003457F0(void *, int);
 extern void func_PAL_00345628(u8 *, unsigned int);
 
 /* func_PAL_003452C8, the PAL copy of func_00343260: the same C, where the sub-objects past +0x1F8 move,

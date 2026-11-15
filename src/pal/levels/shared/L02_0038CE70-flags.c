@@ -9,7 +9,7 @@ extern unsigned char D_001A7A6E __attribute__((nosda));
 extern unsigned char D_001A7A75 __attribute__((nosda));
 extern int D_L02_001A903C __attribute__((nosda));
 extern void moby_set_state(void *, int, int);
-extern void snd_play_from_global_bank(int, int, int);
+extern int snd_play_from_global_bank(int, int, int);
 extern void func_PAL_002B1588(int, int);
 
 void func_PAL_L02_0038CF08(unsigned char *object) {

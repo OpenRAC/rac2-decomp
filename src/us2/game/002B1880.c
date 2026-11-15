@@ -3,7 +3,7 @@
 
 void func_US2_002B1880(int first, int second)
 {
-    extern int GetLocalizedString(int);
+    extern char *GetLocalizedString(int);
     extern void func_0029CC98(int, int);
     func_0029CC98(GetLocalizedString(first), second);
 }

@@ -27,7 +27,7 @@ extern AnimationClass *D_001CDB80[];
 extern u8 D_001A7A0A[] __attribute__((sda));
 typedef struct { u8 pad[0x6c]; short count; u8 pad6e[4]; short phase; } Dialogue;
 extern Dialogue g_music_state;
-extern void fast_decompress(void *, void *);
+extern int fast_decompress(void *, void *);
 extern void relocate_asset_entry_pointers(AnimationClass *, int);
 extern int snd_resume_music_stream(void);
 extern void anim_start_blended(AnimationMoby *, int, int, int);

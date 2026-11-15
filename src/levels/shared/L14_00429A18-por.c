@@ -18,7 +18,7 @@ extern void FastVecAdd(TI128 *, TI128 *, char *);
 extern unsigned char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int,
                                     int, int, void *);
 
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 
 extern void vec_scale_to_length(TI128 *, TI128 *, float);
 

@@ -70,12 +70,12 @@ struct MpegFieldTransferState {
     struct MpegPictureTransfer *transfer;
 };
 
-extern void mpeg_get_pts_dts_flags(struct MpegFieldTransferState *, struct MpegPictureBuffer *, s64 *,
+extern s64 mpeg_get_pts_dts_flags(struct MpegFieldTransferState *, struct MpegPictureBuffer *, s64 *,
                           s64 *, s64 *);
 extern s32 mpeg_check_picture_fits_heap(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
 extern void mpeg_copy_picture_to_screen(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
 extern void mpeg_store_reference_image(struct MpegFieldTransferState *, struct MpegPictureBuffer *);
-extern void mpeg_finish_reference_image(struct MpegFieldTransferState *);
+extern s32 mpeg_finish_reference_image(struct MpegFieldTransferState *);
 
 /* Sends a pair of MPEG field pictures to the video output, with timestamps and flags for each. */
 void mpeg_output_field_pair(struct MpegFieldTransferState *state, struct MpegPictureBuffer *first,

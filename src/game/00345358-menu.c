@@ -6,10 +6,10 @@ extern void gfx_disable_screen_flag(void),gfx_enable_screen_flag(void);
 extern int hud_draw_widget_text(void *);
 extern void text_label_draw(void *);
 extern void gfx_draw_screen_rectangle(int,int,int,int,int,void *);
-extern int object_get_fourth_field(u8 *);
+extern int *object_get_fourth_field(u8 *);
 extern void object_set_second_float4(void *,float,float,float,float);
 extern void hud_set_widget_field_b(void *,int);
-extern int func_00288FB8_2(int);
+extern char *func_00288FB8_2(int);
 typedef struct {unsigned int first,second;} MenuColors;
 /* Draws the rows of an option list and marks the highlighted row with boxes behind its text. */
 void option_list_draw_rows(char *menu)

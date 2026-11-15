@@ -147,7 +147,7 @@ extern void vec_copy_helper_a(void *);
 extern void FastVecCross(void *, void *, void *);
 extern float FastVecLength(void *);
 extern void vec_fast_normalize_helper(void *, void *, float);
-extern int path_clamp_move_to_area(void *, char *, char *, int, float);
+extern void path_clamp_move_to_area(void *, char *, char *, int, float);
 
 /* The level's 0x80-byte placement records, whose direction sits at +0x30. */
 extern char *D_L02_001B368C;
@@ -222,7 +222,7 @@ extern void part_start_record_effect_by_index(int, int);
 extern void level_capture_checkpoint_state(void *, void *);
 extern void snd_play_indexed(int);
 extern void vec_transform_by_object_or_given(void *, void *, void *, int);
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 extern void data_set_small_value_and_refresh(int, int);
 extern int req_push_queue(void *, int);
 extern int req_launch_queued(void *);

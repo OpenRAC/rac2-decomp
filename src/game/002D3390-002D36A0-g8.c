@@ -36,7 +36,7 @@ extern PreviewDisplay D_0025D478;
 typedef struct { int selection; } PreviewSelection;
 extern PreviewSelection D_001ABA74 __attribute__((sda));
 extern unsigned int g_equipment_bits;
-extern void snd_play_from_global_bank(int, int, int);
+extern int snd_play_from_global_bank(int, int, int);
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern float FastAddRotations(float, float);
 extern void gfx_pack_render_command_fields(void *, int, int, int, int);

@@ -43,7 +43,7 @@ extern void swamp_monster_start_attack_b(void *);
 extern void swamp_monster_start_attack_c(void *);
 extern void swamp_monster_start_grab_attack(void *);
 extern void func_US2_L01_003C1CA8(void *);
-extern void moby_spawn_thrown_object(void *, void *, void *, float);
+extern u8 *moby_spawn_thrown_object(void *, void *, void *, float);
 extern void *SpawnGoldBolt(void *, int, int, int);
 extern void func_US2_L01_00395620(void *);
 extern int func_001163B0(void);

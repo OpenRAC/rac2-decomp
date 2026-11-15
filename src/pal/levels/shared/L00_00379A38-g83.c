@@ -27,13 +27,13 @@ extern int D_L00_001AD72C;
 extern int D_L00_001AD730 __attribute__((sda));
 extern int D_L00_001AD734;
 extern float D_L00_001B25E0;
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int sprintf(char *, char *, ...);
 extern int text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
 extern void func_PAL_002FAB40(char *, int);
 extern int GetIconFrame(int, int);
 extern int text_measure_width_second_set(unsigned char *, int);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
 extern int save_count_items_above_baseline(void);
 
 void func_PAL_L00_0037A140(void) {

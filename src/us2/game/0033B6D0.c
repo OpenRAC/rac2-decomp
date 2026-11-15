@@ -23,10 +23,10 @@ void func_US2_0033BA28(u8 *a0, s32 a1) { if (a1 < *(s32 *)(a0 + 0x208)) *(s32 *)
 void func_US2_0033BA40(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x21C) = a1; }
 
 extern int prompt_bar_destroy(int);
-extern void F7d9c8805_FUN_003361A8(int);
-extern void F7d9c8805_FUN_00336968(int);
+extern void *F7d9c8805_FUN_003361A8(int);
+extern char *F7d9c8805_FUN_00336968(int);
 
-int func_US2_0033BB98(int a0)
+void *func_US2_0033BB98(int a0)
 {
 	char *p = (char *)a0 + 12;
 	int i;

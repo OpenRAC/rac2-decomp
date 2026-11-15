@@ -158,8 +158,8 @@ extern int moby_count_group_side_toward_target(void *a0, float *a1, int a2);
 /* The shared lookup takes the record index as a third argument; the retail wrapper hands it
    only two, so the call goes through a two-parameter prototype. */
 /* Counts which side of the object its group members are on, looking toward the other object. */
-void moby_count_group_side_from_object(void *object, void *other) {
-    ((int (*)(void *, void *))moby_count_group_side_toward_target)(object, (char *)other + 0x10);
+int moby_count_group_side_from_object(void *object, void *other) {
+    return ((int (*)(void *, void *))moby_count_group_side_toward_target)(object, (char *)other + 0x10);
 }
 
 extern void euler_to_matrix(float *matrix, float *quat);
@@ -549,14 +549,14 @@ void coll_probe_ground_ahead(char *a0, char *a1) {
     }
 }
 
-extern void coll_update_controller(char *arg0, char *arg1, void *arg2);
+extern int coll_update_controller(char *arg0, char *arg1, void *arg2);
 
 /* Works out the offset from the object to a point and aims at it. */
-void moby_aim_at_target_offset(char *object, char *target) {
+int moby_aim_at_target_offset(char *object, char *target) {
     int offset[4];
 
     FastVecSub((float *)offset, (const float *)target, (const float *)(object + 0x10));
-    coll_update_controller(object, target, offset);
+    return coll_update_controller(object, target, offset);
 }
 
 /* func_L02_00333480 is matched in its own unit, L02_00333480.c. */
@@ -1104,7 +1104,7 @@ void moby_finish_release_child(char *moby) {
 
 /* Raises the object's flag word, copies a context field in and dispatches on the
    two-byte kind code. */
-extern int moby_spawn_linked_child(void *, int);
+extern u8 *moby_spawn_linked_child(void *, int);
 
 /* Sets up a crate object and attaches the child object for its class. */
 void nanotech_crate_init(char *moby) {

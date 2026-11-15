@@ -45,7 +45,7 @@ extern void snd_send_cmd23(int);
 extern int flag_is_word_set(void);
 extern void music_Unpause(void);
 extern int snd_Pump(void);
-extern void func_PAL_002E5898(void);
+extern s32 func_PAL_002E5898(void);
 extern s16 func_PAL_002B8898(int);
 extern void pad_clear_port_state(void);
 

@@ -25,7 +25,7 @@ extern void D_00126288(void *, short, short, int, int, int, short, short);
 
 extern void FlushCache(int);
 
-extern void sceGsExecLoadImage(void *, int);
+extern int sceGsExecLoadImage(void *, int);
 
 /* Paired-strip packet emitter, 396 bytes, placed in levels/10_hrugis_cloud and
    levels/5_feltzin_system.  The body writes a 16-byte GIF header into the

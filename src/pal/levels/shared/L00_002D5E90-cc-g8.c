@@ -74,7 +74,7 @@ extern void func_002A0F48(void *);
 extern char *level_get_table_entry_address(int);
 extern int hero_is_action_allowed(void);
 extern void copy_matrix_rotation(void *, void *);
-extern void ApproachValue(float *, float, float);
+extern f32 ApproachValue(float *, float, float);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern float FastAddRotations(float, float), math_fast_sin_or_cos_b(float);
 extern void transform_vector(void *, void *, void *), FastVecAdd(void *, void *, void *);

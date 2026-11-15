@@ -36,7 +36,7 @@ extern void moby_transform_joint_point(void *, int, void *);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void vec_scale_to_length(void *, void *, float);
-extern void museum_projectile_spawn(void *, void *, void *, int, float);
+extern char *museum_projectile_spawn(void *, void *, void *, int, float);
 extern void moby_mark_spawned(void *);
 extern char D_L30_001B1C38[];
 extern char D_L30_001B1C48[];

@@ -13,7 +13,7 @@ extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
 extern void moby_update_ground_check(char *);
 extern void *part_find_owned_effect_slot(char *, int, int);
-extern void moby_apply_damage_to_object(char *, char *, int);
+extern int moby_apply_damage_to_object(char *, char *, int);
 extern void armed_enemy_find_partner(char *);
 extern int armed_enemy_is_holding_in_attack(char *, void *);
 extern void part_spawn_dust_pairs(char *, int);

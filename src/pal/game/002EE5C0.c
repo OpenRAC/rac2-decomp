@@ -3,7 +3,7 @@
 
 typedef int s32;
 typedef unsigned char u8;
-extern int moby_get_motion_data(unsigned char *);
+extern char *moby_get_motion_data(unsigned char *);
 typedef struct { float lim; char pad[0x2c]; float v[4]; char pad2[0x40]; } Rec128;
 extern Rec128 *D_001B1C54[] __attribute__((sda));
 extern int D_00214F90[];
@@ -14,7 +14,7 @@ extern float FastVecLength(void *);
 extern void vec_fast_normalize(void *, void *, void *);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
-extern void part_spawn_ground_effect(void *, unsigned int, unsigned int, unsigned int, s32, float *, float, float, float, s32);
+extern void *part_spawn_ground_effect(void *, unsigned int, unsigned int, unsigned int, s32, float *, float, float, float, s32);
 extern unsigned int scene_get_state_word(void);
 extern int follower_get_state();
 

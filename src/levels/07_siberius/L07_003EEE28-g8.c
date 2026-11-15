@@ -1,7 +1,7 @@
 #include "common.h"
 #define F(p,o) (*(f32 *)((u8 *)(p)+(o)))
 typedef union { s32 q __attribute__((mode(TI))); f32 f[4]; } Vector;
-extern s32 moby_get_private_value_2(u8 *);
+extern char *moby_get_private_value_2(u8 *);
 extern void FastVecAdd(void *, void *, void *), matrix_mul_vec3(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, f32);
 extern f32 FastVecLength(void *), square_root(f32), FastVecDot(void *, void *);

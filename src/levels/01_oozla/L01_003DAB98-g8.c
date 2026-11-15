@@ -13,7 +13,7 @@ extern f32 level_get_water_height(void);
 /* EE argument banks retain three integer arguments and one float argument. */
 extern s32 coll_test_point(void *, s32, f32, s32);
 extern void part_l01_spawn_explosion_particles(void *, void *);
-extern void coll_cast_object_line(s32, void *, void *, f32, f32, s32, s32, s32, s32);
+extern int coll_cast_object_line(s32, void *, void *, f32, f32, s32, s32, s32, s32);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void moby_mark_spawned(void *);
 extern void part_queue_ground_shadow(void *, f32);

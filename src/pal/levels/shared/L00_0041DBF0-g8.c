@@ -31,7 +31,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern char *part_spawn_gravity_fade(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
 extern char *part_spawn_fading_drift(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
-extern void part_spawn_shockwave_ring(void *, void *, void *, int, int, int, int, int, float);
+extern char *part_spawn_shockwave_ring(void *, void *, void *, int, int, int, int, int, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern char *SpawnSpinningSparkParticle(void *, float, float, float, float, int, void *, unsigned int, int);
 

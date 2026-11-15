@@ -23,7 +23,7 @@ struct CD758Data {
     char *other;
 };
 
-extern void FastDecTimer(void *);
+extern int FastDecTimer(void *);
 
 extern void FastVecSub(float *, const float *, const float *);
 
@@ -67,11 +67,11 @@ extern float func_00283BE0_7(float, float);
 
 extern void func_002833F0_2(void *, void *);
 
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 
 extern void moby_transform_joint_to_world(char *, int, void *);
 
-extern int func_801234F0(float);
+extern void *func_801234F0(float);
 
 extern void STUB_printf(void *, int, int, int, int);
 
@@ -83,13 +83,13 @@ extern void SetDeathBits(void *, int, int);
 
 extern void data_set_small_value_and_refresh(int, int);
 
-extern void fade_reduce_value(float);
+extern f32 fade_reduce_value(float);
 
 extern int PadPressedWithin(int, int, int);
 
 extern void moby_set_state(void *, int, int);
 
-extern void snd_resume_music_stream(void);
+extern s32 snd_resume_music_stream(void);
 
 extern void anim_start_blended(void *, int, int, int);
 
@@ -99,7 +99,7 @@ extern void gfx_add_draw_callback_third(void *, void *);
 
 extern void part_spawn_fading_spark(void);
 
-extern void moby_aim_at_target_offset(char *, char *);
+extern int moby_aim_at_target_offset(char *, char *);
 
 extern int moby_l01_turn_toward_target(char *, char *);
 
@@ -589,7 +589,7 @@ void moby_set_group_state_timer(unsigned char *owner) {
 extern int g_current_map_index[] __attribute__((sda));
 extern char *D_L02_001B3200 __attribute__((sda));
 extern char D_L02_001B3210[] __attribute__((sda));
-extern void coll_get_ground_distance_below(void *, void *, void *);
+extern float coll_get_ground_distance_below(void *, void *, void *);
 extern void moby_update_ground_check(void *);
 extern int moby_apply_damage_to_object(void *, void *, int);
 extern void chickenbot_alert_group(void *);
@@ -677,15 +677,17 @@ void enemy_init(char *obj) {
 /* Runs the kind's entry hook: the first when the level flag is set, the second when the third
    argument is clear, the third with the object's own angle otherwise. */
 /* Runs one of three movement helpers on the object, depending on the level flag and the mode. */
-void moby_run_entry_hook_by_mode(char *moby, char *target, int mode) {
+int moby_run_entry_hook_by_mode(char *moby, char *target, int mode) {
     char *vars = *(char **)(moby + 0x68);
+    int result;
 
     if (D_L02_001A8FF0)
-        moby_aim_at_target_offset(moby, target);
+        result = moby_aim_at_target_offset(moby, target);
     else if (mode == 0)
-        moby_l01_turn_toward_target(moby, target);
+        result = moby_l01_turn_toward_target(moby, target);
     else
-        moby_turn_toward_target_and_step(moby, (float *)target, *(float *)(vars + 0x31C));
+        result = moby_turn_toward_target_and_step(moby, (float *)target, *(float *)(vars + 0x31C));
+    return result;
 }
 
 /* Clears the two angle words at +0x310 and +0x312 and counts up the +0x96 word, then runs the

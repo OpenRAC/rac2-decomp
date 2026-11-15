@@ -37,10 +37,10 @@ extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
 extern void text_draw_right_aligned_medium(int, int, unsigned long, char *, int);
 extern void text_draw_medium(int, int, unsigned long, char *, int);
 extern void text_format_number_with_separators(char *, int);
-extern void help_copy_record_at_depth(void *, int, int);
+extern int help_copy_record_at_depth(void *, int, int);
 extern int GetSelectedShopItemPrice(void);
 extern int GetIconFrame(int, int);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, void *);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, void *);
 
 /* Draws the selected vendor item, its price and the purchase/maximum-ammo prompt. */
 void DrawVendorPurchasePrompt(void)

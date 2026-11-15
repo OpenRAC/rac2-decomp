@@ -79,7 +79,7 @@ extern int D_00134DB8;
 
 extern int GetThreadId(void);
 
-extern void WaitSema(int arg0);
+extern int WaitSema(int arg0);
 
 /* Takes the memory lock. If another thread holds it, this waits; the same thread can take it again. */
 int malloc_lock_acquire(void) {

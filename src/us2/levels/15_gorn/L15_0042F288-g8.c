@@ -113,7 +113,7 @@ extern void func_US2_L15_004329F0(Moby *moby);
 extern void func_US2_L15_00432BA8(Moby *moby);
 extern void func_US2_0029C548(s32 a0, void (*callback)(void));
 extern s32 cam_is_mode_active(void);
-extern void func_US2_L15_0042F6D0(void);
+extern s32 func_US2_L15_0042F6D0(void);
 extern void func_US2_L10_00425104(void);
 extern void func_US2_L10_004251D0(void);
 extern s32 moby_l15_apply_hit_damage(Moby *moby, s32 keep);

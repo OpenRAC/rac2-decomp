@@ -4,7 +4,7 @@ extern unsigned char D_001A7B9E __attribute__((sda));
 extern unsigned char D_001A7BBA __attribute__((sda));
 
 
-extern void Ffb202470_FUN_0033AB50(char *p);
+extern int Ffb202470_FUN_0033AB50(char *p);
 
 char *func_US2_0033CD80(char *object)
 {
@@ -14,7 +14,7 @@ char *func_US2_0033CD80(char *object)
 
 extern void Fe524d931_FUN_0033AE28(char *p);
 extern void Fe524d931_FUN_0033B018(char *p, float x, float y);
-extern void Fe524d931_FUN_002E5E58(int a, int b, int c);
+extern int Fe524d931_FUN_002E5E58(int a, int b, int c);
 extern void Fe524d931_FUN_00284E40(void);
 extern short Fe524d931_D_001A6480[];
 
@@ -91,7 +91,7 @@ char *func_US2_0033DA00(char *object)
 
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
-extern void Fc558ca70_FUN_002E5E58(int a, int b, int c);
+extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern volatile unsigned char Fc558ca70_D_001A7B95 __attribute__((sda));
 extern volatile unsigned char Fc558ca70_D_001A7B94 __attribute__((sda));
 
@@ -127,11 +127,11 @@ int func_US2_0033DB60(char *a0, int a1)
 }
 
 
-extern void prompt_bar_destroy(int);
+extern int prompt_bar_destroy(int);
 
 char *func_US2_0033DDC8(char *object)
 {
-    extern void object_construct_derived_b(void *);
+    extern void *object_construct_derived_b(void *);
     prompt_bar_destroy((int)(object + 8));
     object_construct_derived_b(object + 0x2DC);
     object_construct_derived_b(object + 0x324);
@@ -217,7 +217,7 @@ int func_US2_0033E5E8 (char *object, int flags)
 }
 
 
-extern void text_draw_centered_small(int, int, unsigned long, char *, int);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
 void func_US2_0033E680(char *object)
 {
@@ -366,7 +366,7 @@ void func_US2_0033F3B8(unsigned char *owner, float *records)
 
 extern void func_US2_0033BE70(char *);
 extern void menu_set_anchor_pos(char *, float, float);
-extern char *func_US2_00348CB8(char *, int);
+extern int func_US2_00348CB8(char *, int);
 extern void func_US2_00348E28(char *, float, float);
 extern void func_US2_0033BE70(char *p);
 extern void menu_set_anchor_pos(char *p, float x, float y);
@@ -406,10 +406,10 @@ void func_US2_0033F670(int param_1) {
   prompt_bar_draw(param_1 + 8);
 }
 
-extern void func_0033AB50_1(void *);
-extern void cam_init_object_table_c(void *);
-extern void cam_init_object_table_d(void *);
-extern void cam_init_object_table_a(void *);
+extern int func_0033AB50_1(void *);
+extern char *cam_init_object_table_c(void *);
+extern char *cam_init_object_table_d(void *);
+extern char *cam_init_object_table_a(void *);
 
 /* Calls twelve sub-object handlers in sequence, each with the object base plus a fixed byte offset (8, 684, 744, 816, 888, 960, 1040, 1112, 1184, 1256, 1328, 1400), then returns the object pointer. */
 char *func_US2_0033F690(char *object)

@@ -38,8 +38,8 @@ s32 func_PAL_0034A2F0(u8 *a0) { return *(s32 *)(a0 + 0x60); }
 s32 func_PAL_0034A2F8(u8 *a0) { return *(s32 *)(a0 + 0xC0); }
 
 
-extern void Faac80289_FUN_003361A8(char *p);
-extern void Faac80289_FUN_00336968(char *p);
+extern void *Faac80289_FUN_003361A8(char *p);
+extern char *Faac80289_FUN_00336968(char *p);
 
 char *func_PAL_0034A690(char *a0)
 {

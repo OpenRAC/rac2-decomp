@@ -14,7 +14,7 @@ extern int D_L09_001A9040 __attribute__((sda));
 extern float fast_vec_dist(void *,void *);
 extern int moby_apply_damage_to_object(void *,void *,int),part_spawn_damage_debris(void *,void *,void *);
 extern int math_random_int_below(int),weapon_select_aim_target(void *,int,void *,int,float,float);
-extern u8 *moby_is_hero_or_special(void *);
+extern int moby_is_hero_or_special(void *);
 extern void trooper_legs_init(void *),enemy_apply_stored_values_helper(void *);
 extern void TransferStateToNearestEligibleObject(void *),part_spawn_small_burst(void *,float),moby_destroy_linked(void *);
 extern void trooper_compute_aim_target(void *),shared_counter_release(void *);

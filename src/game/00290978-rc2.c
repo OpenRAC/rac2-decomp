@@ -27,7 +27,7 @@
 
 extern void help_unlock_entry();
 extern s32 level_validate_item_list();
-extern s32 gfx_run_filter_over_all_slots(s32);
+extern void gfx_run_filter_over_all_slots(s32);
 extern s32 moby_handle_request_slot_state();
 extern volatile s32 D_001A7398;
 extern volatile s32 D_001A73A0;

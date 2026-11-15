@@ -33,7 +33,7 @@ extern float D_L20_001B2250[] MACRO_ADDR;
 extern float D_L20_001B2250_gp SDATA(D_L20_001B2250);
 extern float D_L20_001B2BE8 __attribute__((sda));
 
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern void moby_mark_spawned(void *);
 extern void vec_store_helper(void *);
 extern void vec_clear_128(void *);

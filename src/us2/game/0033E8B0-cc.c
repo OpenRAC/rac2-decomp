@@ -9,7 +9,7 @@
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
-extern void Fc558ca70_FUN_002E5E58(int a, int b, int c);
+extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern unsigned char D_US2_001A7BB8[] __attribute__((sda));
 
 int func_US2_0033E8B0(char *a0, int a1)

@@ -3,7 +3,7 @@
 extern void object_init_derived_arrays(void *, void *, void *);
 extern unsigned int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void hud_init_widget_defaults(void *, void *, void *);
 extern void object_set_flag_value(void *, int);

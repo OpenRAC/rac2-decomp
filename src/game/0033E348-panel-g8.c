@@ -3,7 +3,7 @@ extern int info_panel_update(char *, int);
 extern char D_001ADC88[];
 extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, void *);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void prompt_bar_init(void *, void *, void *);
 extern void hud_init_widget_defaults(void *, void *, void *);

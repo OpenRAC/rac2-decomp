@@ -6,7 +6,7 @@ extern s32 D_L09_001A79F0 __attribute__((sda));
 extern s32 D_L09_001A9040 __attribute__((sda));
 extern char *D_L09_001B285C __attribute__((sda));
 extern s32 func_323340(char *a0, char *a1, s32 a2);
-extern char *moby_is_hero_or_special(char *a0);
+extern int moby_is_hero_or_special(char *a0);
 extern s32 g_current_map_index;
 extern void dobbo_wandering_init_vars(void);
 extern float fast_vec_dist(char *a0, char *a1);

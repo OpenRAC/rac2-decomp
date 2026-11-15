@@ -6,7 +6,7 @@ extern int FloatToInt(float);
 extern float math_random_signed_float_range(float,float),math_random_float_range(float,float);
 extern float FastAddRotations(float,float),math_fast_sin_or_cos_a(float),math_fast_sin_or_cos_b(float);
 extern void *func_PAL_002735D0(void *,int,int,int,void *,void *,void *,int,float,float);
-extern void snd_play_from_global_bank(int,int,int);
+extern int snd_play_from_global_bank(int,int,int);
 extern struct {char pad[0x158];float angle;} g_active_camera __attribute__((nosda));
 extern float D_001AA030 __attribute__((sda));
 extern void func_PAL_003120C0(unsigned char *);

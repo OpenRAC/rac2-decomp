@@ -22,7 +22,7 @@ extern void vec_scale_to_length(void *,void *,float);
 extern int CollLine(char *,void *,int,char *,void *);
 extern void func_PAL_L00_003F97D0(char *,char *);
 extern int level_has_pending_inner_flag(char *);
-extern void func_PAL_00335DD0(char *,int,int);
+extern int func_PAL_00335DD0(char *,int,int);
 
 int func_PAL_L00_003F9678(char *object,char *source)
 {

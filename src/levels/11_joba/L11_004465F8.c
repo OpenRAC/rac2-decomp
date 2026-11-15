@@ -4,7 +4,7 @@
 extern char *CreateMoby(int id);
 extern float math_random_float_range(float a, float b);
 extern float math_random_angle(void);
-extern void part_spawn_ground_effect(void *, unsigned int, int, unsigned int, int, char *, float, float, float, int);
+extern void *part_spawn_ground_effect(void *, unsigned int, int, unsigned int, int, char *, float, float, float, int);
 extern char D_L11_001A8F20[] __attribute__((sda));
 
 
@@ -14,7 +14,7 @@ extern void moby_set_state(char *, int, int);
 extern void func_002A05A8(char *);
 extern void set_moby_color(char *, int, int, int);
 extern int part_spawn_damage_debris(char *, char *, char *);
-extern void moby_spawn_linked(char *, int, float, float);
+extern int moby_spawn_linked(char *, int, float, float);
 
 extern void get_moby_color(char *, int *, int *, int *);
 
@@ -214,7 +214,7 @@ void security_robot_update_pairing(u8 *self)
 
 extern float moby_get_anim_value(char *);
 extern void moby_transform_joint_to_world(char *, int, void *);
-extern void coll_project_point_on_segment(void *, void *, void *, void *);
+extern f32 coll_project_point_on_segment(void *, void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
 extern int coll_sweep_from_object(char *, void *, int, float, float, float, int, int, int);
@@ -512,9 +512,9 @@ void smasher_robot_init(char *object, int mode, int active) {
 }
 
 extern void arena_add_waiting_fighter(int, int);
-extern void SpawnExplosion(char *, int, int, int, int, int, int, int,
+extern char *SpawnExplosion(char *, int, int, int, int, int, int, int,
                          float, float, int, int, int, int);
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
 extern void vec_random_direction(void *, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void part_spawn_masked_debris(char *, int, void *, float, float, float, float, int);

@@ -121,7 +121,7 @@ extern void hud_load_banks(void);
 extern void func_PAL_00295820(void);
 extern void map_update_state_machine(void), func_PAL_00299898(void);
 extern void func_PAL_0029D6E0(void);
-extern void func_PAL_0029DE68(int, int);
+extern int func_PAL_0029DE68(int, int);
 extern int request_begin_slot(int, int, int, int, unsigned char *);
 extern void func_PAL_002B57D0(void);
 extern void snd_start_bank_load(int, int);

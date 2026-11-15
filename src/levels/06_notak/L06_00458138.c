@@ -80,7 +80,7 @@ extern int GetNextMobyInGroup(char **, char *, int, int);
 
 extern void anim_start_blended(char *, int, int, int);
 
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 
 extern int math_blend_scaled_count(char *, char *, int, int, float, float);
 
@@ -94,11 +94,11 @@ extern float math_fast_sin_or_cos_a(float);
 
 extern float math_fast_sin_or_cos_b(float);
 
-extern int part_find_owned_effect_slot(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 
 extern void part_spawn_debris_mask(char *, int, void *, int, float, float, float, float);
 
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 
 extern void part_spawn_scaled_bolts(char *, int, float);
 

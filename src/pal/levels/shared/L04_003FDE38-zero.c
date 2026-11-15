@@ -5,7 +5,7 @@ extern float func_002A7878_range(float,float) __asm__("func_002A7878");
 extern void vec_scale_to_length(char *,char *,float);
 extern void part_kill(void *);
 extern int math_random_int_range(int,int);
-extern void part_spawn_velocity_particle(void *,void *,int,int,float);
+extern u8 *part_spawn_velocity_particle(void *,void *,int,int,float);
 extern unsigned char *SpawnSpinningSparkParticle(void *,float,float,float,float,int,void *,int,int);
 /* func_PAL_L04_003FDE38, the PAL copy of func_L04_003F9C60: the same C, where two random
    float ranges grow by 6/5, the 10 to 15 range and the 50 to 80 value shrink by 5/6, and the

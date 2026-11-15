@@ -83,12 +83,12 @@ extern s32 math_fast_float_d(void *);
 extern void SpawnExplosionEffects(u8 *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                           float, float, float, float, float, float, float);
 
-extern void coll_process_hit(void *, s32, s32, void *, float);
+extern int coll_process_hit(void *, s32, s32, void *, float);
 
 extern void vec_turn_toward_target(void *, void *, void *, void *, void *, void *, float, float, float, float);
 
 /* EE ABI: retain integer and float argument order within their register banks. */
-extern void part_spawn_gravity_fade(void *, void *, s32, s32, s32, s32, s32, float, float, float, s32);
+extern void *part_spawn_gravity_fade(void *, void *, s32, s32, s32, s32, s32, float, float, float, s32);
 
 /* Per-frame update of a homing shot. It steers toward its target, leaves a spark trail,
    and blows up when it hits something or flies out of the level. */

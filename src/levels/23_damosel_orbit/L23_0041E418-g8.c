@@ -207,7 +207,7 @@ extern s32 D_L23_001B3714;
 
 extern s32 D_L23_001B13E8 __attribute__((sda));
 
-extern void PlayMobySound(int, int, u8 *);
+extern int PlayMobySound(int, int, u8 *);
 
 /* publishes the boot stamp once, seeding the shared state first */
 /* Starts the boss fight state once and remembers the starting time. */

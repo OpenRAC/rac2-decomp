@@ -12,7 +12,7 @@ extern void moby_set_state(void *, int, int);
 extern s32 PlayMobySound(s32, s32, s32);
 extern void moby_mark_spawned(void *);
 extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int, int, unsigned char, int);
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern u8 *D_L12_001B2E9C MACRO_ADDR;
 extern s32 D_L12_001B29C8 __attribute__((sda));
 extern u8 *D_L12_001B090C __attribute__((nosda));
@@ -25,7 +25,7 @@ extern int math_random_int_range(int, int);
 extern int func_PAL_00273A10(unsigned char *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 extern u8 *CreateMoby(int);
 extern void mem_copy_aligned(void *, void *, int);
 

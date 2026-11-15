@@ -16,7 +16,7 @@ extern void vec_random_direction(void *a, f32 b, f32 c);
 extern f32 math_fabs(f32 a);
 extern f32 math_random_float_range(f32 a, f32 b);
 extern void vec_local_offset_to_world(void *a, void *b, f32 c, f32 d, f32 e);
-extern void func_PAL_002C84A8(void *a, void *b, s32 c);
+extern char *func_PAL_002C84A8(void *a, void *b, s32 c);
 extern f32 D_L07_001AA698 __attribute__((sda));
 extern f32 D_L07_001B3198 __attribute__((sda));
 extern f32 func_2E4508(void *a, void *b);

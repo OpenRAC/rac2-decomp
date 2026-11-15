@@ -53,7 +53,7 @@ extern f32 D_L22_001A7CDC __attribute__((sda));
 extern f32 D_L22_0025FBA0[][25];
 extern s32 D_L22_0025FA10[][11];
 extern f32 math_fabs(f32);
-extern void Spline_AdvanceByDistance(s32, f32 *, s32 *, f32 *, s32, f32);
+extern int Spline_AdvanceByDistance(s32, f32 *, s32 *, f32 *, s32, f32);
 extern f32 FastVecDot(void *, void *);
 extern f32 FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, f32);

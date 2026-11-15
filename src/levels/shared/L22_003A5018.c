@@ -29,7 +29,7 @@ extern SubtitleHistory g_subtitle_history[];
 extern void moby_set_state(void *, int, int);
 extern f32 math_random_float_range(f32 low, f32 high);
 extern int PlayMobySound(int index, int a1, char *a2);
-extern void subtitle_request_voice_line(int, int);
+extern int subtitle_request_voice_line(int, int);
 extern f32 FastVecDot(void *, void *);
 extern void spark_emit_random(char *);
 extern void spark_lane_draw(u8 *);
@@ -173,7 +173,7 @@ void proximity_effect_update(u8 *moby) {
 extern int FloatToInt(f32);
 extern int math_fast_float_d(void *);
 extern void moby_mark_spawned(void *);
-extern void coll_sweep_from_object(void *, void *, int, f32, f32, f32, int, int, int);
+extern int coll_sweep_from_object(void *, void *, int, f32, f32, f32, int, int, int);
 
 /* Halves whatever the two floats say, doubles it back, rescales it by the
  * controller's rate, then hands the result to the placement call as the alpha;
@@ -385,7 +385,7 @@ void moby_trigger_explosion(u8 *moby) {
 
 extern f32 math_random_float_range(f32 low, f32 high);
 
-extern void SpawnExplosion(void *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
+extern char *SpawnExplosion(void *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
                           int a8, int a9, int a10, int a11, f32 f12, f32 f13);
 
 /* Starts an effect on the object with a random size between 0.8 and 1.2. */

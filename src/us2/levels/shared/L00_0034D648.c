@@ -23,7 +23,7 @@ typedef struct {
     int fallback;
 } CallbackStateL001FEC40;
 extern CallbackStateL001FEC40 D_L00_001FEC40;
-extern void module_l00_call_handler_with_arg_18(int);
+extern int module_l00_call_handler_with_arg_18(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_US2_L00_0034D678(void)
@@ -62,7 +62,7 @@ unsigned long long func_US2_L00_0034D700(void)
     return 0;
 }
 
-extern void module_l00_call_handler_with_arg_19(int);
+extern int module_l00_call_handler_with_arg_19(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_US2_L00_0034D730(void)

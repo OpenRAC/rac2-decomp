@@ -35,7 +35,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
-extern void part_spawn_spark_2(void *, void *, int, int);
+extern void *part_spawn_spark_2(void *, void *, int, int);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_fast_float_d(char *);
@@ -80,7 +80,7 @@ extern int func_334CB8(char *object, char *state, int value);
 
 extern void func_32AF08(char *object);
 
-extern void func_32E728(char *object, int flag, int *mode, char *out);
+extern int func_32E728(char *object, int flag, int *mode, char *out);
 
 extern void func_33B330(char *dst, float a, float b, float c);
 
@@ -175,7 +175,7 @@ extern void math_store_angle_update_result(char *, char *, int, int, float);
 extern void vec_fast_to_int_helper(char *, char *);
 extern void quaternion_to_rotation_basis(char *, char *);
 extern void moby_compute_local_point(char *, char *, float, float, float);
-extern void part_spawn_shockwave_burst(char *, int, int, int, int, int, int, int, int, int, int, float);
+extern char *part_spawn_shockwave_burst(char *, int, int, int, int, int, int, int, int, int, int, float);
 extern int math_random_int_below(int kind);
 extern float math_random_signed_float_range(float, float);
 extern char *moby_spawn_shot_effect(char *, char *, char *, int, int, int, int, int, float);

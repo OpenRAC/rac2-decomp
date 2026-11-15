@@ -4,7 +4,7 @@
 typedef unsigned char u8;
 typedef float f32;
 extern u8 D_00189E20_7[];
-extern void math_spring_float_to_goal(f32 *a, f32 *b, f32 c, f32 d, f32 e, f32 f);
+extern float math_spring_float_to_goal(f32 *a, f32 *b, f32 c, f32 d, f32 e, f32 f);
 extern f32 func_00282C48_1(f32 v);
 extern char g_hero_state[];
 extern float FastVecLength(char *arg0);

@@ -123,7 +123,7 @@ extern int GetFirstMobyInGroup(CrateMoby **, int, int, int);
 extern int GetNextMobyInGroup(CrateMoby **, CrateMoby *, int, int);
 extern float vec_distance_xy(void *, void *);
 extern float coll_probe_ground_height_below(void *, int, float);
-extern void PlayMobySound(int, int, CrateMoby *);
+extern int PlayMobySound(int, int, CrateMoby *);
 extern void set_moby_color(CrateMoby *, int, int, int);
 
 void func_US2_00311C90(CrateMoby *moby)

@@ -20,12 +20,13 @@ extern u8 *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, int,
 extern u8 *CreateMoby(int);
 extern void moby_init_child_from_parent(void *, void *), hero_copy_field_to_moby(void *), moby_fade_out_update(void *);
 extern float coll_probe_ground_height_below(void *, int, float);
-extern void func_PAL_L13_004170F0(void *, int, int, int, int, int, int, int, float, int, int);
+extern char *func_PAL_L13_004170F0(void *, int, int, int, int, int, int, int, float, int, int);
 extern void func_PAL_002A7650(void *, int, int), moby_mark_spawned(void *);
 extern int func_PAL_002AF6C0(void *, float);
-extern void moby_transform_joint_to_world(char *, int, char *), FastVecSub(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void moby_transform_joint_to_world(char *, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
-extern void func_PAL_L16_00418EE0(void *, void *, void *, int, float);
+extern u8 *func_PAL_L16_00418EE0(void *, void *, void *, int, float);
 extern int func_PAL_L09_0032B088(char *, int);
 extern float D_L16_001A8F20[] __attribute__((sda));
 /* Partial view of the shared effect controls: retail forms this base once. */

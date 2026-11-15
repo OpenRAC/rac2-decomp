@@ -208,7 +208,7 @@ extern unsigned char D_001A7960[];
 extern unsigned char D_001A7980[];
 extern unsigned char D_001A79A0[];
 extern unsigned char D_001A79D0[];
-extern void strncpy(void *, int, int);
+extern char *strncpy(void *, int, int);
 /* Builds the save file names from the game ID found in the source data and prepares the six name strings used for the memory card files. */
 void save_build_file_names(unsigned char *source)
 {
@@ -233,7 +233,7 @@ void save_build_file_names(unsigned char *source)
 }
 
 extern char D_001A9970[];
-extern void MemcardRestoreData(char *, int, int *);
+extern int MemcardRestoreData(char *, int, int *);
 extern void save_reset_slot_ids(void);
 extern void STUB_printf(void *);
 extern int D_00256138[];

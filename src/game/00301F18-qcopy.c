@@ -8,7 +8,7 @@ typedef union { ParticleWord word; float f[4]; } ParticleVector;
 extern void FastVecAdd(void *, void *, void *);
 extern int coll_test_point(void *, int, void *, float);
 extern int coll_apply_push_to_object(void *, void *, void *, void *, void *, void *);
-extern s32 moby_get_private_value_2(u8 *);
+extern char *moby_get_private_value_2(u8 *);
 extern void vec_clear_128(ParticleWord *);
 extern float FastAddRotations(float, float);
 extern float fast_subtract_rotations(float, float);

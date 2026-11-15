@@ -87,14 +87,14 @@ extern void moby_reset_vars_defaults(char *a0);
 extern s32 IsPointInCuboid(char *a0, s32 a1);
 extern s32 req_push_queue(char *a0, s32 a1);
 extern void level_apply_index_for_key(char *a0);
-extern void req_launch_queued(char *a0);
+extern s32 req_launch_queued(char *a0);
 extern s32 game_is_either_mode_two(void);
 extern void moby_mark_flag_and_append_to_list(s32 a0);
 extern void func_PAL_002AFC10(s32 a0);
 extern void func_PAL_L00_002B9CD8(char *a0, char *a1, s32 a2, s32 a3);
 extern void moby_mark_table_entry_flagged(s32 a0);
 extern void level_capture_checkpoint_state(char *a0, char *a1);
-extern void MemcardSave(s32 a0, s32 a1);
+extern int MemcardSave(s32 a0, s32 a1);
 
 void func_PAL_L19_00429220(char *a0)
 {

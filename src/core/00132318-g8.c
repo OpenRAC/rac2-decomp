@@ -33,7 +33,7 @@ extern char D_001A7760[];
 
 extern void printf(const void *, ...);
 extern int snd_CheckLoadInProgress(int);
-extern void snd_Pump(void);
+extern int snd_Pump(void);
 extern void FlushCache(int);
 extern int sif_rpc_is_handle_valid(const void *);
 extern int sceSifCallRpc(const void *, int, int, int *, int, unsigned int *, int, int, int);

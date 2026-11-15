@@ -24,7 +24,7 @@ extern void shop_clear_preview(void);
 extern void moby_mark_spawned(void *);
 extern void snd_send_cmd23(int);
 extern void music_Unpause(void);
-extern void snd_Pump(void);
+extern int snd_Pump(void);
 
 void shop_reset_menu_camera(void)
 {

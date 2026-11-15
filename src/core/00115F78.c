@@ -5,7 +5,7 @@
    with the argument retail passes; they ignore it. */
 extern void *D_00133E74;
 
-extern void func_00116300(void *arg0) __asm__("func_00116300");
+extern int func_00116300(void *arg0) __asm__("func_00116300");
 
 extern void FreeReentrant(void *arg0, int arg1);
 

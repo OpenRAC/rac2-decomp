@@ -13,8 +13,8 @@ extern int snd_play_from_class_bank(int, int, char *, int);
 extern void moby_mark_spawned(void *);
 extern void func_PAL_L05_004212A8(char *);
 extern int func_PAL_00289730(int, int);
-extern int GetLocalizedString(int);
-extern void func_PAL_L00_0030FBC0(int, int);
+extern char *GetLocalizedString(int);
+extern int func_PAL_L00_0030FBC0(int, int);
 
 /* Flies the object at the cached class-0xFBF moby. On arrival it plays a sound, bumps the
    player-stat counter and deletes itself; until then it keeps turning. */

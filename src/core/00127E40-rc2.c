@@ -28,7 +28,7 @@
 #define NULL 0
 #endif
 
-extern s32 strncpy(void *dst, s8 *src, s32 n);
+extern char *strncpy(void *dst, s8 *src, s32 n);
 extern void SignalSema(s32 h);
 extern s32 PollSema(s32 h);
 extern void sif_process_cmd_queue_b(s32 a, s32 b);

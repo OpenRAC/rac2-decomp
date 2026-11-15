@@ -21,11 +21,11 @@ extern int g_player_bolts;
 extern int arena_get_challenge_save_index(int);
 extern int arena_start_announcer_message(char *, int);
 extern void help_unlock_entry(int);
-extern void moby_handle_request_slot_state(int);
+extern int moby_handle_request_slot_state(int);
 extern int moby_compute_scaled_entry_value_shifted(int);
 extern int moby_compute_scaled_entry_value(int);
 extern void module_l00_call_handler_with_arg_4(int);
-extern void MemcardSave(int, int);
+extern int MemcardSave(int, int);
 
 /* With a1 == 0 and no count yet for func_L02_003F9B70(0), plays the hero's scene 7 with its
    word at +0x22C8 kept; otherwise picks the scene from a1 (6, 0xB or a random one), adds the

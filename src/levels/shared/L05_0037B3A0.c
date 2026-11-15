@@ -1,7 +1,7 @@
 #include "names.h"
 extern unsigned short *D_L05_001FB220[];
 extern unsigned char *D_L05_001B251C __attribute__((sda));
-extern int moby_get_motion_data(unsigned char *);
+extern char *moby_get_motion_data(unsigned char *);
 
 /* Count initialized entries in the tagged list; the last entry has bit15 set. */
 int list_count_ready_objects(unsigned char *object) {

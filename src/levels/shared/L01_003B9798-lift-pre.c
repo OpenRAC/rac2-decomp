@@ -34,7 +34,7 @@ extern void moby_set_state(void *, int, int);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern int IsPointInCuboid(void *, int);
 extern void mat_combine_and_store(void *, void *, void *, void *);
-extern void flag_set_first_pending(void *);
+extern s32 flag_set_first_pending(void *);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, void *);

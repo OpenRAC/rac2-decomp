@@ -2,7 +2,7 @@
 #include "names.h"
 
 
-extern int object_get_fourth_field(unsigned char *field);
+extern int *object_get_fourth_field(unsigned char *field);
 
 unsigned int func_PAL_0034EC30(unsigned char *owner)
 {
@@ -121,10 +121,10 @@ void func_PAL_0034EFF0(int *self, int value)
 
 
 
-extern void object_construct_derived_b(void *p);
-extern void func_PAL_0034D238(void *p);
-extern void object_construct_derived_c(void *p);
-extern void text_panel_shutdown(void *p);
+extern void *object_construct_derived_b(void *p);
+extern s32 func_PAL_0034D238(void *p);
+extern void *object_construct_derived_c(void *p);
+extern void *text_panel_shutdown(void *p);
 
 /* walks 26 consecutive 72-byte records calling one leaf per record, then calls four more leaves on fixed offsets of the same object and returns the object pointer */
 unsigned char *func_PAL_003501C8(unsigned char *a0)

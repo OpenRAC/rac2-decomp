@@ -70,7 +70,7 @@ extern void hero_build_relative_point(void *, s32, float, float, float);
 extern void func_002BEB90(unsigned long, unsigned long);
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern void AdjustPlayerHealth(s32);
-extern void hero_play_sound(s32, s32);
+extern int hero_play_sound(s32, s32);
 extern void hero_flatten_push_vector(void *, s32, float, float);
 extern void cam_scale_view_space_height(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);

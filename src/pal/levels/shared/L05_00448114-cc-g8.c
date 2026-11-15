@@ -39,7 +39,7 @@ extern void func_PAL_L05_00449A28(void *);
 extern void euler_rotation_basis(void *, void *);
 extern void func_PAL_L00_002B3000(void);
 extern void ship_update_record_transform(void *, float);
-extern void slot_copy_records_to_free(void *);
+extern int slot_copy_records_to_free(void *);
 extern void func_PAL_L05_00448790(void *);
 extern float hero_get_clamped_stat(void);
 extern int hero_get_state_value_c(void);

@@ -23,7 +23,7 @@ extern int g_game_time;
 extern char *D_001B1B68;
 extern float ref_L00_00327A60_00 __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
-extern void pickup_start_fly_if_idle(void *, void *);
+extern int pickup_start_fly_if_idle(void *, void *);
 
 /* The camera block the level keeps, with the fields this body writes. */
 typedef struct {

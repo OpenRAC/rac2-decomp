@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void hud_init_widget_defaults(void *, void *, void *);
@@ -12,7 +12,7 @@ extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void hud_set_widget_value_pair(void *, int, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int map_screen_update_layout(char *, int);
 extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[];
 extern char D_001ADD58[], D_001ADD60[], D_001ADD68[], D_001ADD70[], D_001ADD78[];

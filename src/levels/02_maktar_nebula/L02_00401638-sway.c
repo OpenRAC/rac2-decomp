@@ -10,7 +10,7 @@ extern int FloatToInt(float);
 extern float mat_fast_helper_a(float,float), FastDiffRots(float,float);
 extern int IsPointInCuboid(void *,int);
 extern void *group_find_entity_in_state(int);
-extern void math_step_value_toward_target(float *,float *,float,float,float,float);
+extern float math_step_value_toward_target(float *,float *,float,float,float,float);
 extern void path_sample_position(void *,int,void *,void *,int,float);
 extern float coll_probe_ground_height_below(void *,int,float);
 extern int PlayMobySound(int,int,void *);
@@ -23,7 +23,7 @@ extern void *part_find_owned_effect_slot(void *,u32,s32);
 extern float moby_update_aim_target_strength(void *,void *);
 extern void part_spawn_masked_debris(char *,int,void *,u8,float,float,float,float);
 extern void vec_scale_to_length(void *,void *,float);
-extern void part_spawn_blast_effect_moby(void *,void *,void *,float);
+extern char *part_spawn_blast_effect_moby(void *,void *,void *,float);
 /* Moves a swaying object along a preset path, drops a spawned item at the end, then lets the object fall apart and disappear. Update handler of moby class 2934. */
 void sway_path_update(char *moby) {
     float old_pos[4] __attribute__((aligned(16))), scratch[4] __attribute__((aligned(16)));

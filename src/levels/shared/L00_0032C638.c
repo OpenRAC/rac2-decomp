@@ -3,7 +3,7 @@
 
 /* Read the word at offset 0x 18 through the pointer stored at owner offset 0x 68. */
 /* Reads a value from the object's private data. */
-unsigned int moby_get_vars_word_18(unsigned int object)
+void *moby_get_vars_word_18(unsigned int object)
 {
     unsigned int vars;
     unsigned int result;

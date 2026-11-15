@@ -9,7 +9,7 @@ extern void func_00282D30_7(char *local, int value, float scale);
 
 extern float func_002A7878_1(float low, float high);
 
-extern void part_spawn_bubble(char *object, char *local, float amount, float base);
+extern void *part_spawn_bubble(char *object, char *local, float amount, float base);
 
 extern char *func_0029EFD0_1(int);
 
@@ -52,7 +52,7 @@ extern void func_002A0F48(char *object);
 
 extern void cam_pick_state_from_hero_turn(int value);
 
-extern void hero_l00_set_action(int a, int b);
+extern int hero_l00_set_action(int a, int b);
 
 extern void level_clear_second_table_entry(void);
 
@@ -159,7 +159,7 @@ extern ParticleUpdateColors D_L00_001AF010;
 extern float math_random_float_range(float, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern int gfx_swap_packed_color_channels(int, int);
-extern void part_spawn_scaling(void *, void *, int, int, int, int, int, int);
+extern char *part_spawn_scaling(void *, void *, int, int, int, int, int, int);
 extern float FastAddRotations(float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void moby_mix_on_inner_data(void *, void *, void *, float);

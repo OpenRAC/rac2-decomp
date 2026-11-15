@@ -145,7 +145,7 @@ extern void vec_build_spherical_offset(void *, float, float, float);
 
 extern char *part_spawn_ground_effect(void *, int, int, float, float, float, int, int, void *, int);
 
-extern void part_spawn_spinning_particle(void *, void *, int, int, float, float, int, int, int, int, int);
+extern void *part_spawn_spinning_particle(void *, void *, int, int, float, float, int, int, int, int, int);
 
 extern float D_L11_001B1FE0 __attribute__((sda));
 extern float D_L11_001B1FE4 __attribute__((sda));
@@ -506,4 +506,4 @@ extern char *CreateMoby(int);
 extern void part_l11_spawn_spark_ring(void *, int);
 extern float D_L11_001B22C4 __attribute__((sda));
 extern int D_L11_001B22CC __attribute__((sda));
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern int snd_play_from_class_bank(int, int, char *, int);

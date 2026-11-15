@@ -32,7 +32,7 @@ extern float mat_fast_helper_a(float,float);
 extern int moby_start_effect_from_entry(void *,float);
 extern int func_PAL_002AF6C0(void *,float);
 extern float FastDiffRots(float,float);
-extern void func_PAL_002B5BA8(void *,void *,float);
+extern int func_PAL_002B5BA8(void *,void *,float);
 extern float moby_get_anim_value(void *);
 extern int coll_test_hit_at_bone(float,float,float,void *,int,int,int,int,int);
 extern float FastAddRotations(float,float);

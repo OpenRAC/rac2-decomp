@@ -10,7 +10,7 @@ typedef struct {
 } CallbackState;
 extern CallbackState g_pause_menu_state;
 extern int D_00138344;
-extern void func_0029C760(int);
+extern int func_0029C760(int);
 
 int func_PAL_002D3DE8(void) {
     int result = 0;
@@ -50,7 +50,7 @@ unsigned long long func_PAL_002D3E70(void)
     return 0;
 }
 
-extern void func_0029C7D0(int);
+extern int func_0029C7D0(int);
 
 int func_PAL_002D3EA0(void) {
     int result = 0;
@@ -83,7 +83,7 @@ int func_PAL_002D3F28(void) {
     return 0;
 }
 
-extern void func_0029CA00(int);
+extern int func_0029CA00(int);
 
 int func_PAL_002D3F58(void) {
     int result = 0;
@@ -116,7 +116,7 @@ int func_PAL_002D3FE0(void) {
     return 0;
 }
 
-extern void func_0029C990(int);
+extern int func_0029C990(int);
 
 int func_PAL_002D4010(void) {
     int result = 0;

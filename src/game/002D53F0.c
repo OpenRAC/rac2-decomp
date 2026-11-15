@@ -3,7 +3,7 @@
 extern float D_001B23A4[] __attribute__((sda));
 extern void SetupGifPaging(int);
 extern void func_0029C530(void);
-extern s32 GetLocalizedString(s32);
+extern char *GetLocalizedString(s32);
 extern int text_draw_centered_small(int, int, u64, u8 *, int);
 extern void DoGifPaging(void);
 

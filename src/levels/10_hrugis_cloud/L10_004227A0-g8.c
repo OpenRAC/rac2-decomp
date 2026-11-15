@@ -12,7 +12,7 @@
 extern f32 IntToFloat(s32);
 extern s32 FloatToInt(f32);
 extern s32 FastTweenColor(s32, s32, f32);
-extern s32 table_find_by_id(u8 *, s32);
+extern void *table_find_by_id(u8 *, s32);
 extern void gfx_draw_scaled_object(void *, f32, f32, s32, f32, f32);
 extern void gfx_draw_scaled_object_two_axes(char *, s32, f32, f32, f32, f32, f32);
 extern char *GetLocalizedString(s32);

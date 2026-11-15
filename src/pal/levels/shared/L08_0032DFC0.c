@@ -6,7 +6,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float);
-extern int moby_get_private_value_0(void *);
+extern char *moby_get_private_value_0(void *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 struct LaunchState {

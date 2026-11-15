@@ -20,7 +20,7 @@ extern void moby_update_color_scale(char *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void part_l00_spawn_spark_burst_3(void *, int, int);
-extern void weapon_start_health_drain(void *, int, int);
+extern int weapon_start_health_drain(void *, int, int);
 extern int PlayMobySound(int, int, char *);
 extern int math_fast_float_d(void *);
 extern void part_spawn_small_spark_spray(void *);

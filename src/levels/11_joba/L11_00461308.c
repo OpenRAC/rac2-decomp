@@ -27,7 +27,7 @@ extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void func_002A05A8(char *);
 extern void func_002A0F48(char *);
-extern void part_spawn_object_relative_particle(char *, void *, void *, void *, int);
+extern void *part_spawn_object_relative_particle(char *, void *, void *, void *, int);
 extern int D_L11_001B089C[] NOT_SDA __attribute__((sda));
 typedef struct { int unused; int flags; char pad[56]; } Entry61308;
 extern Entry61308 D_L11_002B6D40[];

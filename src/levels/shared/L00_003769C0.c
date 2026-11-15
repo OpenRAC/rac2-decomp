@@ -18,8 +18,8 @@ extern MenuColor D_L00_0028E9F0[];
 extern void gfx_set_scissor_clamped(int, int, int, int);
 extern int subtract_integer_with_clamp(int);
 extern void DrawFramebufferRect(int,int,int,int,int,int,unsigned int);
-extern char *GetIconFrame(int,int);
-extern int hud_draw_sprite_gradient(char *,int,int,int,int,unsigned int *);
+extern int GetIconFrame(int,int);
+extern void hud_draw_sprite_gradient(char *,int,int,int,int,unsigned int *);
 #define MW(o) (D_L00_0022F7C0[0].words[(o)/4])
 #define MY(y) ((int)(D_L00_001B25E0[0]*(y)+0.5f)+(D_001A7B90[0]?4:0))
 static __inline__ int fade(int v)

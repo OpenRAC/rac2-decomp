@@ -5,7 +5,7 @@
    the one-instruction $gp form the retail code has. */
 
 extern void moby_set_state(void *, int, int);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int,
                                int, int, int);
 extern void moby_compute_local_point(char *, float *, float, float, float);
@@ -147,7 +147,7 @@ extern void UpdatePathMobySpacing(char *);
 extern int coll_point_inside_region(void *, int);
 extern int math_fast_float_d(void *);
 extern int math_random_int_below(int);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void euler_rotation_basis(void *, void *);
 extern void part_l01_spawn_spark_burst(float *, float *, int, int, int, float, float, float);
 

@@ -15,7 +15,7 @@ typedef union {
 
 extern s32 moby_process_collision_hit(u8 *,s32,s32,s32);
 extern void moby_check_player_in_view_and_range(u8 *,s32,f32);
-extern s32 state_get_stored_pointer_value(void);
+extern void *state_get_stored_pointer_value(void);
 extern void hrugis_boss_init(u8 *);
 extern void hrugis_init_group_states(u8 *);
 extern void hrugis_release_group_effects(u8 *);
@@ -46,7 +46,7 @@ extern void vec_scale_to_length(void *,void *,f32);
 extern void FastVecCross(void *,void *,void *);
 extern void moby_transform_joint_to_world(u8 *,s32,void *);
 extern void FastVecAdd(void *,void *,void *);
-extern void CreateEnergyStrip(void *,void *,s32,s32,u32,u32,f32,s32,s32,f32,f32,f32);
+extern void *CreateEnergyStrip(void *,void *,s32,s32,u32,u32,f32,s32,s32,f32,f32,f32);
 extern void moby_reset_action_state(u8 *);
 extern u8 *D_001B251C MACRO_ADDR;
 extern f32 D_L10_001B0F40 __attribute__((sda));

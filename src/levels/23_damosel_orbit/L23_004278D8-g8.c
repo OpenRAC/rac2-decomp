@@ -21,7 +21,7 @@ extern char D_L23_001BA500[];
 
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 
-extern void FastDecTimer(u8 *);
+extern int FastDecTimer(u8 *);
 
 extern s32 mothership_is_attack_state(void);
 

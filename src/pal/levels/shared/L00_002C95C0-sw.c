@@ -104,7 +104,7 @@ extern int PadPressedWithin(u32, int, int *);
 extern int moby_is_class_71(unsigned char *);
 extern void func_PAL_L00_002BA480(void);
 extern int FloatToInt(float);
-extern void func_PAL_L00_002C4480(int, int);
+extern s32 func_PAL_L00_002C4480(int, int);
 extern int get_ammo(int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern char *SelectBestEligibleTarget(void *, int, int, float, float, float, float);

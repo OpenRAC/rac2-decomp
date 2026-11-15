@@ -102,7 +102,8 @@ extern int D_0014B8AC, D_0014D11C;
 extern s16 D_001A63AC;
 extern int menu_stream_chunk_get_size(int), menu_stream_chunk_set_latch(int), menu_stream_chunk_clear_latch(int);
 extern int load_start_disc_read(int, int, int), log2dim(int);
-extern void fast_decompress(void *, void *), func_0029D0E0(void);
+extern void func_0029D0E0(void);
+extern int fast_decompress(void *, void *);
 extern u64 register_8bit_texture(int, int, void *, void *, int, int);
 
 /* Starts reading entry index into buffer (at its end when the entry is to be unpacked in

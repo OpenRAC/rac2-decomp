@@ -46,8 +46,8 @@ extern void DrawTexturedQuad(int, int, int, int, int, int, int, int, unsigned lo
 /* The EE assigns integer and float arguments to independent register banks. */
 extern void AppendRotatedSpriteQuad(float, float, float, float, float,
                               int, int, unsigned long, int, int, int, int, float, float);
-extern int GetLocalizedString(int);
-extern void text_draw_centered_medium(int, int, unsigned long, int, int);
+extern char *GetLocalizedString(int);
+extern int text_draw_centered_medium(int, int, unsigned long, int, int);
 
 static __inline__ unsigned long PackGaugeFlag(unsigned long flags,
                                               unsigned char value, int shift)

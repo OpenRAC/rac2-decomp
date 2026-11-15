@@ -241,7 +241,7 @@ extern float func_002A0558(void *, void *);
 extern s32 TryClaimNotice(s32, s32, s32);
 extern s32 level_set_game_state_pair(s32, void *, s32);
 extern void script_queue_keyed_request(s32, s32);
-extern void hero_l08_enter_state(s32, s32);
+extern s32 hero_l08_enter_state(s32, s32);
 extern void set_hero_animation(s32, s32, float);
 extern void snd_stop_voice(s32);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
@@ -274,7 +274,7 @@ extern s32 coll_test_point(void *, s32, void *, float);
 extern float FastVecDot(void *, void *);
 extern void part_spawn_ring(void *, void *, s32, float, float, float, float, float, float);
 extern void make_hit_descriptor(void *, void *, s32, void *, float);
-extern void coll_process_hit(void *, s32, void *, void *, float);
+extern int coll_process_hit(void *, s32, void *, void *, float);
 extern void vehicle_end_ride(void *);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, s32, s32, s32, float, float, float, float,
                           s32, float, s32, s32, s32, s32, s32);
@@ -286,9 +286,9 @@ extern void moby_store_position_private(void *, void *);
 extern void moby_mark_spawned(void *);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
-extern void part_fill_effect_record(void *, s32, s32, void *, float, float);
-extern void snd_fade_looping_by_distance(void *, void *, s32, s32, float);
-extern void math_fast_float_d(void *);
+extern s32 part_fill_effect_record(void *, s32, s32, void *, float, float);
+extern int snd_fade_looping_by_distance(void *, void *, s32, s32, float);
+extern int math_fast_float_d(void *);
 #define PLAYER D_00189E20_14
 #define HIT D_L08_001BFF40
 /* An effect record (0x70 bytes) still owned by this moby and active. */

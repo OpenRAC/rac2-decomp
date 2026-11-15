@@ -11,7 +11,7 @@ extern L00_0036FA68_Object *ref_L00_001AC0C0_00 __attribute__((sda));
 extern void SetBackgroundColor(int a, int b, int c);
 extern int request_begin_slot(int a, int b, int c, int d, int e);
 extern void game_reset_frame_counters(void);
-extern void UpdateSoundVoices(void);
+extern int UpdateSoundVoices(void);
 extern void part_update_all(void);
 extern void level_count_active_records(void);
 extern unsigned int ref_L00_0036FA68_00(void);

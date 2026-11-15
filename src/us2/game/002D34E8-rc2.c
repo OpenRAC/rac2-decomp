@@ -9,13 +9,13 @@ extern f32 D_001B23A8;
 extern struct { s32 w0; s32 w1; s32 w2; } D_00138340;
 void SetupGifPaging(s32);
 void DoGifPaging(void);
-s32 text_draw_right_aligned_small(s32, s32, u64, s32, s32);
+void text_draw_right_aligned_small(s32, s32, u64, s32, s32);
 s32 text_draw_centered_small(s32, s32, u64, s32, s32);
-s32 GetLocalizedString(s32);
+char *GetLocalizedString(s32);
 s32 math_ping_pong_blend_values(s32, s32, s32, s32, s32);
 void gfx_draw_scaled_object_two_axes(s32, s32, f32, f32, f32, f32, f32);
-s32 table_find_by_id(s32, s32);
-s32 text_draw_small(s32, s32, u64, s32, s32);
+void *table_find_by_id(s32, s32);
+void text_draw_small(s32, s32, u64, s32, s32);
 
 s32 func_US2_002D34E8(void) {
     s32 s0;

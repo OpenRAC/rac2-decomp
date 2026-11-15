@@ -1,8 +1,8 @@
 #include "names.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern float vec_fast_normalize_helper(void *, void *, float);
-extern void coll_process_hit(void *, int, int, void *, float);
+extern void vec_fast_normalize_helper(void *, void *, float);
+extern int coll_process_hit(void *, int, int, void *, float);
 extern int D_L00_0018C0B0;
 
 struct S {

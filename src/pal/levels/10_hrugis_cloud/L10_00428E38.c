@@ -33,7 +33,7 @@ extern void func_PAL_002AC290(Moby *moby, ColorFlash *flash);
 extern s32 math_fast_float_d(s32 *timer);
 extern f32 math_random_float_range(f32 min, f32 max);
 extern s32 FloatToInt(f32 value);
-extern void func_PAL_L05_0042A240(f32 *position, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
+extern char *func_PAL_L05_0042A240(f32 *position, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
                               s32 a6, s32 a7, s32 a8, s32 a9, s32 a10, f32 scale);
 extern void hrugis_drop_reward(Moby *moby, s32 bonus, s32 a2);
 extern s32 moby_is_in_use(Moby *moby);

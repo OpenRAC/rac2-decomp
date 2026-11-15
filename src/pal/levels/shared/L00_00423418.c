@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int level_get_slot_body(int id, int index);
+extern unsigned char *level_get_slot_body(int id, int index);
 extern void table_clear_entry_flag(int index);
 extern void moby_mark_spawned(void *object);
 extern int *level_get_slot_header(int id, int index);

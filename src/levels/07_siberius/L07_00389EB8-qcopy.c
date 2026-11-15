@@ -8,7 +8,7 @@
 /* The 16-byte vector the object and the entity keep. */
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void math_fast_float_d(char *);
+extern int math_fast_float_d(char *);
 
 extern void value_set_and_smooth(char *, char *, int, int, float);
 

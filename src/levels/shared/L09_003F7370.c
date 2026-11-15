@@ -1,6 +1,6 @@
 #include "include_asm.h"
 #include "common.h"
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 /* Spawns a small burst effect just above the object. */
 void part_spawn_small_burst(char *moby, float height_offset)

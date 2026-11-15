@@ -1,12 +1,12 @@
 #include "names.h"
 extern void prompt_bar_set_spacing(void *, float);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void prompt_bar_init(void *, void *, void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts(void *, int, int, int);
 extern void prompt_bar_set_text_offsets(void *, float, float, float, float, float, float);
-extern void single_toggle_a_update(void *, int);
+extern int single_toggle_a_update(void *, int);
 extern int D_001ADE78[2] __attribute__((sda));
 /* Sets up a menu page with a single on/off option. */
 void single_toggle_a_init(char *object, void *argument)
@@ -35,7 +35,7 @@ void single_toggle_a_init(char *object, void *argument)
     *(int *)(object + 0x2A8) = 0;
     single_toggle_a_update(object, 0);
 }
-extern void two_toggle_b_update(void *, int);
+extern int two_toggle_b_update(void *, int);
 extern int D_001ADE88[2] __attribute__((sda));
 /* Sets up a menu page with two on/off options. */
 void two_toggle_b_init(char *object, void *argument)
@@ -64,7 +64,7 @@ void two_toggle_b_init(char *object, void *argument)
     *(int *)(object + 0x2A8) = 0;
     two_toggle_b_update(object, 0);
 }
-extern void single_toggle_c_update(void *, int);
+extern int single_toggle_c_update(void *, int);
 extern int D_001ADE98[2] __attribute__((sda));
 /* Sets up another menu page with a single on/off option. */
 void single_toggle_c_init(char *object, void *argument)
@@ -94,7 +94,7 @@ void single_toggle_c_init(char *object, void *argument)
     single_toggle_c_update(object, 0);
 }
 
-extern void single_toggle_d_update(void *, int);
+extern int single_toggle_d_update(void *, int);
 extern int D_001ADEA8[2] __attribute__((sda));
 /* Sets up another menu page with a single on/off option. */
 void single_toggle_d_init(char *object, void *argument)
@@ -124,7 +124,7 @@ void single_toggle_d_init(char *object, void *argument)
     single_toggle_d_update(object, 0);
 }
 
-extern void single_toggle_e_update(void *, int);
+extern int single_toggle_e_update(void *, int);
 extern int D_001ADEB8[2] __attribute__((sda));
 /* Sets up another menu page with a single on/off option. */
 void single_toggle_e_init(char *object, void *argument)
@@ -154,7 +154,7 @@ void single_toggle_e_init(char *object, void *argument)
     single_toggle_e_update(object, 0);
 }
 
-extern void list_page_update(void *, int);
+extern int list_page_update(void *, int);
 extern int D_001ADEC8[2] __attribute__((sda));
 extern void list_menu_reset_attach_items(void *, void *);
 extern void menu_set_settings(void *, int, int);
@@ -191,7 +191,7 @@ void list_page_init(char *object, void *argument)
     list_page_update(object, 0);
 }
 
-extern void audio_menu_update(void *, int);
+extern int audio_menu_update(void *, int);
 extern int D_001ADE48[2] __attribute__((sda));
 extern char D_001ADC88[];
 extern void object_init_derived_b(void *, int, int, void *, void *);

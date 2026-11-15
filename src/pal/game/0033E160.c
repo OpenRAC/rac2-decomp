@@ -5,7 +5,7 @@ extern char *GetLocalizedString(int);
 extern void func_PAL_0033CF78(void *, char *, char *, char *);
 extern void func_PAL_0033CD50(char *p);
 extern void menu_set_anchor_pos(char *p, float x, float y);
-extern void snd_play_from_global_bank(int a, int b, int c);
+extern int snd_play_from_global_bank(int a, int b, int c);
 extern void UpdateViewContext(void);
 extern unsigned char D_001A7BB1;
 

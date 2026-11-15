@@ -10,7 +10,7 @@ extern int D_001A8C60 MACRO_ADDR;
 extern int D_001A8C60_1 __attribute__((sda));
 extern int g_notice_text_id MACRO_ADDR;
 extern int D_001B1D48_1 MACRO_ADDR;
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_0029CCD8(int, int);
 
 /* Tries to take the notice slot for an owner and show a text. */

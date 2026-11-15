@@ -26,7 +26,9 @@ extern void moby_set_state(u8 *, int, int), anim_start_blended(char *, int, int,
 extern int moby_l01_turn_toward_target(char *, char *);
 extern int moby_step_controller(void *, void *, float);
 extern int moby_turn_toward_target_and_step(char *, float *, float);
-extern void moby_step_at_own_position(char *), moby_step_at_own_position_factor(u8 *, float), AttachManipulator(u8 *, u32, u8 *), mem_clear(char *, int, int), vec_random_direction(float *, float, float);
+extern void AttachManipulator(u8 *, u32, u8 *), mem_clear(char *, int, int), vec_random_direction(float *, float, float);
+extern int moby_step_at_own_position_factor(u8 *, float);
+extern int moby_step_at_own_position(char *);
 extern unsigned long moby_dispatch_action_by_kind(void *, void *);
 /* This interleaving preserves the four integer and four FP argument banks. */
 extern void part_spawn_masked_debris(char *, int, float *, float, float, float, float, u8);

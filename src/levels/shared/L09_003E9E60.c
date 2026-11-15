@@ -15,7 +15,7 @@ extern void vec_fast_divide_helper(char *, char *, float);
 extern float FastDiffRots(float, float);
 extern float math_ease_out_quad(float);
 extern float FastVecLength(char *);
-extern void math_approach_target_with_direction_mode(char *, float, float, float, float, char *, int);
+extern float math_approach_target_with_direction_mode(char *, float, float, float, float, char *, int);
 extern void math_approach_target_with_braking(float *, float, float, float, float);
 extern float func_002EAB28(float, float);
 extern float func_002EB478(float, float);

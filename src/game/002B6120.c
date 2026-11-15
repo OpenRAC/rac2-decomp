@@ -12,7 +12,7 @@ extern int path_set_follower_nodes(void *, void *, int, int);
 
 extern float func_00283248_9(float, float);
 
-extern void moby_step_controller(void *, void *, float);
+extern int moby_step_controller(void *, void *, float);
 
 extern float func_00282E80_4(void *, void *);
 
@@ -28,7 +28,7 @@ extern void snd_send_cmd46(s32);
 
 typedef unsigned int u32;
 
-extern s32 snd_clear_flag_and_update(void);
+extern void snd_clear_flag_and_update(void);
 
 extern s32 snd_Pump(void);
 
@@ -85,11 +85,11 @@ extern s32 D_001A7434 __attribute__((sda));
 
 extern s32 CdStartRead(s32,s32,s32,CdMode *);
 
-extern void func_002B7CE0_1(int);
+extern short func_002B7CE0_1(int);
 
 extern int func_002B7B18_1(char *, int, int);
 
-extern s32 FlushCache(s32);
+extern void FlushCache(s32);
 
 extern s32 snd_get_cd_read_error(void);
 
@@ -226,8 +226,8 @@ void BuildFrameDmaChain(void *packet, int unusedMode)
 /* func_002B6658 is in 002B6120-g8.c (its list head is in small data). */
 
 extern char D_001A7248[] __attribute__((sda));
-extern void sceSifCallRpc(void *, int, int, int, int, int, int, int, int);
-extern void snd_send_cmd2a_once(int, int, int, int);
+extern int sceSifCallRpc(void *, int, int, int, int, int, int, int, int);
+extern int snd_send_cmd2a_once(int, int, int, int);
 
 /* Runs a short fixed sequence of three sound setup calls. */
 void snd_run_setup_sequence(void) {
@@ -268,7 +268,7 @@ void snd_start_bank_load(int source, int index) {
 /* func_002B68C8 is built from 002B68C8.c. */
 
 extern void load_on_disc_read_finished(s32);
-extern void func_001336D0(void (*)(s32));
+extern void *func_001336D0(void (*)(s32));
 
 /* Registers the disc read completion callback with the file system. */
 void load_register_disc_read_callback(void) {

@@ -13,7 +13,7 @@ extern char D_L12_001B9E00[];
 extern float D_L12_001B21C0 __attribute__((sda));
 extern int FloatToInt(float);
 extern float fast_vec_dist(void *, void *);
-extern void coll_get_ground_distance_below(void *, void *, void *);
+extern float coll_get_ground_distance_below(void *, void *, void *);
 extern void moby_mark_spawned(void *);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);

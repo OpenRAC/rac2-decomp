@@ -8,7 +8,7 @@ extern int D_L22_001B1C48;
 extern void anim_start_free_slot_in_range(void *,int,int), anim_start_slot(void *,int);
 extern int math_fast_float_d(void *),math_random_int_below(int);
 extern float vec_fast_helper_c(void *,void *);
-extern void snd_resume_music_stream(void);
+extern s32 snd_resume_music_stream(void);
 /* Chooses which animation the object should play next, based on its health, the player's state and a few level flags. */
 void anim_choose_next(u8 *obj) {
     u8 *ctl = *(u8 **)(obj + 0x68);

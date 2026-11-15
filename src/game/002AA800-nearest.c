@@ -1,12 +1,12 @@
 #include "include_asm.h"
 #include "names.h"
 typedef int V4_F876460d6 __attribute__((mode(TI)));
-extern int moby_get_private_value_0(void *);
+extern char *moby_get_private_value_0(void *);
 extern float moby_measure_target_reach(char *,char *,float,float,float,float,int *);
 extern unsigned int ref_002AF460_00[];
 
 /* Selects the eligible list entry with the smallest reach score. */
-int FindBestTargetByReach(V4_F876460d6 *pos, float p1, float p2, float p3, float p4)
+void *FindBestTargetByReach(V4_F876460d6 *pos, float p1, float p2, float p3, float p4)
 {
     V4_F876460d6 copy = *pos;
     char *cbuf = (char *)&copy;

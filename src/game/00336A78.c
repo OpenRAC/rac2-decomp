@@ -31,7 +31,7 @@ extern void D_00115E38_1(char *a0, int a1, char *a2);
 
 extern int text_measure_width_first_set(char *, int);
 
-extern void func_00115AC0_1(void *, int, int);
+extern char *func_00115AC0_1(void *, int, int);
 
 extern void func_00337E98_1(void *, int, int, float, float);
 
@@ -133,7 +133,7 @@ void text_set_alignment(u8 *label, s32 alignment) {
     *(s32 *)(label + 0x44) = alignment;
 }
 
-extern void func_00300618(void *);
+extern void *func_00300618(void *);
 
 /* Turns the offsets stored in a table into real pointers and prepares each entry. */
 void table_relocate_entries(char *table)
@@ -148,7 +148,7 @@ void table_relocate_entries(char *table)
 }
 
 /* Looks for an entry with the given id in a table and returns its data, or 0 if it is missing. */
-s32 table_find_by_id(u8 *table,s32 id) {
+void *table_find_by_id(u8 *table,s32 id) {
  s32 count=*(s32 *)(table+0x18); s32 i,result=0;u8 *entries=table+0x1c;
  for(i=0;i<count;i++) {
   s32 *entry=(s32 *)((i<<3)+(u32)entries);

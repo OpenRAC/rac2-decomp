@@ -39,7 +39,7 @@ void func_L05_00418200(char *object)
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int func_328508(int);
+extern char *func_328508(int);
 
 extern void func_3065F8(int);
 
@@ -374,7 +374,7 @@ extern void FastVecScale(void *, void *, float);
 extern int coll_test_point(void *, int, void *, float);
 extern void projectile_apply_impact_sparks(void *, void *, void *);
 extern void *part_spawn_shockwave_burst(void *, int, int, int, int, int, int, int, int, int, int, float);
-extern void func_L05_003D1E60(void *, int, int);
+extern unsigned char *func_L05_003D1E60(void *, int, int);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern char *part_spawn_trailing_spark(void *, void *, int, int, int, int, float);

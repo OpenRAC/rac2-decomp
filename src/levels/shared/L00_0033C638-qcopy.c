@@ -13,7 +13,7 @@ typedef struct {
 extern Particle *part_alloc(int);
 extern int FloatToInt(float);
 extern int math_random_int_below(int);
-extern int moby_get_private_value_0(unsigned char *);
+extern char *moby_get_private_value_0(unsigned char *);
 extern unsigned char *D_L00_001FEA78;
 
 /* Creates a particle with its start position, color, size, life and direction. It can also remember the object that owns it. */

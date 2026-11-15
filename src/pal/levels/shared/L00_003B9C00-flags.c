@@ -13,7 +13,8 @@ typedef struct {
 extern char g_hero_state[];
 extern int g_current_map_index MACRO_ADDR;
 extern Vector g_camera_l00_position;
-extern int FastDecTimer(void *),moby_get_private_value_0(unsigned char *);
+extern int FastDecTimer(void *);
+extern char *moby_get_private_value_0(unsigned char *);
 extern void FastVecScale(void *,void *,float),FastVecAdd(void *,void *,void *);
 extern void vec_build_spherical_offset(float *,float,float,float);
 extern unsigned char *moby_get_or_find_target(void *,void *,int,float,float,float,float,float);

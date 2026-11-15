@@ -43,7 +43,7 @@ extern int math_fast_float_d(char *);
 extern float IntToFloat(int);
 extern void math_blend_vector_sine_ease(char *, char *, char *, float);
 extern void math_blend_vec3_sine_ease(char *, char *, char *, float);
-extern void cam_compute_direction_angles(char *, char *, char *);
+extern int cam_compute_direction_angles(char *, char *, char *);
 extern float fast_subtract_rotations(float, float);
 extern float math_cosine_blend(float, float, float);
 extern float math_blend_scalar_toward_target(float, float, float);

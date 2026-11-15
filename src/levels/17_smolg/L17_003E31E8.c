@@ -44,24 +44,24 @@ extern int moby_dispatch_action_by_kind(char *,void *);
 extern void SetDeathBits(char *,int,int);
 extern void part_queue_moby_for_glow(char *,int,int);
 extern void moby_mark_spawned(char *);
-extern void ApproachValue(float *,float,float);
+extern f32 ApproachValue(float *,float,float);
 extern void moby_wander_around_home_point(char *,void *,float,float);
 extern float mat_fast_helper_a(float,float);
 extern void StepAngleTowardTarget(float *,int,float,float);
 extern int flag_set_first_pending(char *);
 extern float vec_distance_xy(void *,void *);
 extern int math_is_value_within_step(char *,float);
-extern void PlayMobySound(int,int,char *);
+extern int PlayMobySound(int,int,char *);
 extern int coll_sweep_from_object(char *,float,void *,int,float,float,int,int,int);
 extern void moby_set_controller_speed_limits(char *,float,float,float,float);
 extern void FastVecSub(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
-extern void moby_move_to_target_temp_limits(char *,void *,int,float,float,float);
+extern int moby_move_to_target_temp_limits(char *,void *,int,float,float,float);
 extern float math_fast_sin_or_cos_a(float),math_fast_sin_or_cos_b(float);
 extern void add_vectors(void *,void *,void *);
 extern float FastAddRotations(float,float);
-extern void MobySpringTurn(char *,float,float *,float,float,float);
+extern float MobySpringTurn(char *,float,float *,float,float,float);
 
 /* Updates a Grulch (moby class 2952): it wanders, notices the player, walks up, attacks and
    is removed when it dies or falls out of the level. */

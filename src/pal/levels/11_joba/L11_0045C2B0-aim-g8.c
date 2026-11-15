@@ -37,7 +37,7 @@ extern float fast_subtract_rotations(float, float);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
-extern int func_PAL_L11_0045BC60(void *, void *);
+extern void func_PAL_L11_0045BC60(void *, void *);
 extern int moby_get_busy_flag(void *);
 
 /* Looks for an entity of the object's group that is in range and inside its view cone, and if

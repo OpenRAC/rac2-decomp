@@ -184,11 +184,13 @@ extern char *CreateMoby(int);
 extern void set_identity_rotation_rows(void *);
 extern void func_PAL_0029C0F0(void *,void *);
 extern int level_call_helper_return_true(void);
-extern void DrawSpaceCombatHud(void);
+extern int DrawSpaceCombatHud(void);
 extern float fast_vec_dist(void *,void *);
 extern void moby_update_ground_check(void *),func_002A0F48(void *);
-extern void cam_compute_view_direction(void *,void *,int),vec_negate_and_forward(void *,void *,int),func_PAL_002B1A50(void *,void *,int);
-extern void moby_set_state(void *,int,int),func_PAL_L00_002AF6C0(void),release_moby_animation_slot(void *,void *),func_PAL_L22_002C99C8(int,int);
+extern void cam_compute_view_direction(void *,void *,int), vec_negate_and_forward(void *,void *,int);
+extern int func_PAL_002B1A50(void *,void *,int);
+extern void moby_set_state(void *,int,int), func_PAL_L00_002AF6C0(void), release_moby_animation_slot(void *,void *);
+extern s32 func_PAL_L22_002C99C8(int,int);
 
 /* Sets the record up on the first update (health scaled by difficulty, the object table
    scan, then the tuning block) and keeps the three child objects in step. The tuning

@@ -4,7 +4,7 @@
 
 extern float D_L06_001B234C __attribute__((sda));
 extern float D_001B2350 __attribute__((sda));
-extern int part_find_owned_effect_slot(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 extern void part_l01_spawn_ring_of_sparks(char *, int, float, float, float, float);
 extern int PlayMobySound(int, int, char *);
 

@@ -41,7 +41,7 @@ extern u8 D_L00_001B4A00[];
 extern u8 D_L00_001D98C0[];
 extern s32 D_L00_001A7DF8[2] __attribute__((sda));
 extern s32 moby_alloc_object_slot(void *);
-extern s32 func_PAL_002A2E30(void *, s32);
+extern void func_PAL_002A2E30(void *, s32);
 extern void FlushCache(s32);
 extern void update_moby_animation_state(void *);
 extern s32 anim_copy_entry_data(char *, s32, s32, s32);

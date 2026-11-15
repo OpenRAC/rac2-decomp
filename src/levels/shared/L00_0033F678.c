@@ -91,7 +91,7 @@ extern void func_0027C660_7(void);
 
 extern int D_L00_001A904C_3 __attribute__((sda));
 
-extern int tab_menu_get_selected_value(int x);
+extern void *tab_menu_get_selected_value(int x);
 
 extern void func_0027C540_6(long);
 
@@ -530,9 +530,9 @@ int return_l00_zero_9(void) {
 
 extern int D_00138344;
 
-extern void module_l00_call_handler_with_arg_15(int a);
+extern int module_l00_call_handler_with_arg_15(int a);
 
-extern void level_l00_call_module_handler_with_arg_11(int a);
+extern int level_l00_call_module_handler_with_arg_11(int a);
 
 extern void SetupGifPaging(int a);
 
@@ -545,7 +545,7 @@ extern void module_l00_call_handler_15(void);
 extern void module_l00_call_handler_19(void);
 
 
-extern void module_l00_call_handler_with_arg_9(int a);
+extern int module_l00_call_handler_with_arg_9(int a);
 
 /* Runs an update step using the saved input state and returns zero. */
 int pad_run_input_update_return_zero(void)
@@ -575,7 +575,7 @@ typedef struct {
 
 extern CallbackStateL001FEC40 D_L00_001FEC40;
 
-extern void module_l00_call_handler_with_arg_16(int);
+extern int module_l00_call_handler_with_arg_16(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
@@ -610,7 +610,7 @@ extern int g_pad_state[];
 extern int module_l00_call_handler_with_arg_12(int);
 extern int level_l00_call_module_handler_with_arg_2(int);
 extern int level_l00_call_module_handler_with_arg_5(int);
-extern int tab_menu_get_selected_entry(int);
+extern char *tab_menu_get_selected_entry(int);
 extern int list_page_get_selected_record(int);
 extern int list_menu_get_selected_record(int);
 extern void menu_start_action(int);
@@ -671,7 +671,7 @@ unsigned long long level_l00_run_setup_return_zero_long_3(void)
     return 0;
 }
 
-extern void module_l00_call_handler_with_arg_18(int);
+extern int module_l00_call_handler_with_arg_18(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
@@ -708,7 +708,7 @@ unsigned long long level_l00_run_setup_return_zero_long_4(void)
     return 0;
 }
 
-extern void module_l00_call_handler_with_arg_19(int);
+extern int module_l00_call_handler_with_arg_19(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
@@ -743,7 +743,7 @@ int level_l00_run_setup_return_zero_5(void)
     return 0;
 }
 
-extern void level_l00_call_module_handler_with_arg_4(int);
+extern int level_l00_call_module_handler_with_arg_4(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
@@ -781,7 +781,7 @@ int level_l00_run_setup_return_zero_6(void)
     return 0;
 }
 
-extern void level_l00_call_module_handler_with_arg_3(int);
+extern int level_l00_call_module_handler_with_arg_3(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */
@@ -831,7 +831,7 @@ int level_l00_run_setup_return_zero_8(void)
     return 0;
 }
 
-extern void level_l00_call_module_handler_with_arg(int);
+extern int level_l00_call_module_handler_with_arg(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 /* Checks the saved input state and runs an update step for it. */

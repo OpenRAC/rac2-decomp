@@ -6,7 +6,7 @@ extern float D_001AB9E8 __attribute__((sda));
 extern float D_001B23A8;
 extern char *D_001A8CFC;
 extern int g_pad_state[];
-extern int table_find_by_id(void *, int);
+extern void *table_find_by_id(void *, int);
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern void set_identity_matrix(void *);
 extern void FastVecScale(void *, void *, float);

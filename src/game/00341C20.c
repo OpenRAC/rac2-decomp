@@ -39,8 +39,8 @@ void tab_menu_draw(char *self)
 
 /* Sets up the three parts of a small list menu and returns it. */
 char *small_list_menu_construct(char *self) {
-    extern void menu_pass_through_handle(void *);
-    extern void object_construct_derived_a(char *);
+    extern unsigned long long menu_pass_through_handle(void *);
+    extern void *object_construct_derived_a(char *);
     menu_pass_through_handle(self + 0x10);
     object_construct_derived_a(self + 0xDC);
     object_construct_derived_a(self + 0x128);
@@ -72,11 +72,11 @@ void list_menu_set_records(unsigned char *owner, float *records)
     *(float **)(owner + 0xD8) = records;
 }
 
-extern char *UpdateMenuListSelection(char *, int);
+extern void *UpdateMenuListSelection(char *, int);
 extern void menu_set_position(char *, float, float);
 
 /* Sets the selected entry of the list and moves the list to the menu position. */
-long list_menu_set_selection(char *object, int arg)
+int list_menu_set_selection(char *object, int arg)
 {
     char *child = object + 0x10;
     UpdateMenuListSelection(child, arg);
@@ -87,9 +87,9 @@ long list_menu_set_selection(char *object, int arg)
 
 /* Sets up the parts of a list menu and returns it. */
 char *list_menu_construct_parts(char *object) {
-    extern void object_construct_derived_a(char *);
-    extern void object_construct_derived_c(char *);
-    extern void menu_pass_through_handle(void *);
+    extern void *object_construct_derived_a(char *);
+    extern void *object_construct_derived_c(char *);
+    extern unsigned long long menu_pass_through_handle(void *);
     object_construct_derived_a(object);
     object_construct_derived_a(object + 0x4C);
     object_construct_derived_a(object + 0x98);

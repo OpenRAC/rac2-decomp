@@ -14,8 +14,8 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
-extern void part_spawn_drifting(void *, void *, int, float, float);
-extern void part_spawn_spark_2(void *, void *, int, int);
+extern void *part_spawn_drifting(void *, void *, int, float, float);
+extern void *part_spawn_spark_2(void *, void *, int, int);
 extern float D_L01_001AFE18[];
 
 /* Same body as func_L01_003B4200, with this function's own callees. */

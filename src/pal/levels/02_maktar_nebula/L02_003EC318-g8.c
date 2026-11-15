@@ -15,7 +15,7 @@ extern void gfx_add_draw_callback_first(void *, void *);
 extern void DrawRotatingObjectGroupEffects();
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int, int, int, int);
 extern void part_spawn_scaled_bolts(void *, int, float);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 /* One step of an actor, by its state byte (+0x20). State 0 marks the actor (+0x30), moves it to
    state 1 and lowers the counter D_L02_001AEC78 when its private word is set. Unless

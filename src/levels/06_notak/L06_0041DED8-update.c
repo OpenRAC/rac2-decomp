@@ -34,10 +34,10 @@ extern int math_is_value_within_step(char *, float);
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern void *D_L06_001B3760[6];
 extern void part_spawn_colored_burst(float *, int);
-extern void moby_spawn_child_in_slot(char *, float *, float *, int, float);
+extern char *moby_spawn_child_in_slot(char *, float *, float *, int, float);
 extern void lerp_vector(void *, void *, void *, float);
 extern float fast_vec_dist(void *, void *);
-extern void coll_sweep_from_object(char *, void *, int, int, int, int, float, float, float);
+extern int coll_sweep_from_object(char *, void *, int, int, int, int, float, float, float);
 extern void actor_aim_body_at_target(char *);
 
 /* Updates the actor's alert mode, movement and attack animation states. */

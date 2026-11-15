@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 extern int math_blend_scaled_count(char *, char *, int, int, float, float);
 extern void FastVecScale(char *, char *, float);
 

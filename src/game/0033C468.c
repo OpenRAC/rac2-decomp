@@ -47,7 +47,7 @@ extern void *func_00336DA8_3(s32_Ff4eb83c9, void *);
 
 extern void func_0033ABD8_3(u8_Ff4eb83c9 *, void *, f32_Ff4eb83c9 *);
 
-extern void *func_00288FB8_2(s32_Ff4eb83c9);
+extern char *func_00288FB8_2(s32_Ff4eb83c9);
 
 extern void func_0033B050_2(u8_Ff4eb83c9 *, void *, void *, void *);
 

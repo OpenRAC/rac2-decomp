@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 void func_PAL_L09_003FBC48(char *a0, float f)
 {

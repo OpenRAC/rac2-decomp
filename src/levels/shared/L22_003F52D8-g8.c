@@ -16,7 +16,7 @@ extern f32 math_random_signed_float_range(f32 a0, f32 a1);
 extern f32 math_random_angle(void);
 extern void matrix_mul_vec3(void *a0, void *a1, void *a2);
 extern void FastVecAdd(void *a0, void *a1, void *a2);
-extern void bouncing_debris_create(void *a0, void *a1, void *a2);
+extern char *bouncing_debris_create(void *a0, void *a1, void *a2);
 
 /* Sprinkles particles along the object's height, scattered around it with random speeds. */
 void part_spray_height(u8 *moby)

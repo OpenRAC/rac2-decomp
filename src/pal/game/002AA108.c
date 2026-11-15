@@ -25,7 +25,7 @@ typedef struct Src_002A96A0 {
     float f2C;
 } Src_002A96A0;
 extern Rec_002A96A0 *moby_get_private_value_0(s32);
-extern u8 *moby_get_private_value_4(s32);
+extern char *moby_get_private_value_4(s32);
 extern u8 moby_get_kind_slot(u8 *);
 
 f32 func_PAL_002AA108(s32 a0, Src_002A96A0 *a1) {

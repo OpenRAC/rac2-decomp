@@ -19,7 +19,7 @@ extern u32 D_001A7390;
 extern int g_current_map_index[] __attribute__((sda));
 extern int D_0018C0B4 NOT_SDA;
 extern int IsPointInCuboid(void *, int);
-extern void math_fast_float_d(void *);
+extern int math_fast_float_d(void *);
 
 /* func_PAL_L12_003EF838, the PAL copy of func_L12_003EB470: the same C, where func_00288E18
    becomes func_PAL_00289730, the 0x438 and 0x2A30 frame counts become 0x384 and 0x2328, and

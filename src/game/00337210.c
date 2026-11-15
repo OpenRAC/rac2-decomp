@@ -4,7 +4,7 @@
 
 extern void meter_set_max(unsigned char *, int);
 extern void meter_set_value(char *, int);
-extern int object_get_fourth_field(void *);
+extern int *object_get_fourth_field(void *);
 extern void object_set_flag_value(void *, int);
 extern int object_is_flag_positive(void *);
 extern void object_set_first_float4(void *, float, float, float, float);
@@ -13,7 +13,7 @@ extern int hud_get_widget_value_int(void *);
 extern void hud_set_widget_field_b(int, unsigned int);
 extern void object_set_first_pair(void *, int, int);
 extern void shop_choose_item_colors(int, unsigned int *, unsigned int *, unsigned int *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern unsigned char g_item_owned_flags[] __attribute__((sda));
 extern unsigned char g_item_slot_to_record[];
 extern unsigned char D_001395B8[];

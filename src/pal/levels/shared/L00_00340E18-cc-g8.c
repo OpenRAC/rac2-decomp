@@ -17,7 +17,7 @@ extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecScale(void *,void *,float);
 extern int math_random_int_range(int,int);
-extern void func_PAL_002BD790(void *,void *,int,int,int,int,int,int,float,int);
+extern void *func_PAL_002BD790(void *,void *,int,int,int,int,int,int,float,int);
 extern int g_frame_l00_counter MACRO_ADDR;
 void func_PAL_L00_00340E18(char *p)
 {

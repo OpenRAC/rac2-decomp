@@ -5,7 +5,7 @@ extern char D_001ADBC8[];
 extern char D_US2_001ADF70[]; /* "%d/%d": sits where v1.01 has "%d" (D_001ADF98), but plain "%d" is elsewhere in v2.00 */
 extern int D_001ADF90 __attribute__((sda));
 extern char g_map_overlay_state[];
-extern const char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
 extern void hud_set_widget_field_a(char *, int);
 extern void func_US2_003378A0(char *);

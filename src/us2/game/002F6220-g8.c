@@ -60,7 +60,7 @@ extern char D_001B2980[], D_0021F080[];
 extern void req_mark_queued_in_flag_table(void *);
 extern int cutscene_map_id_to_index(int);
 extern void music_Pause(int);
-extern void snd_pump_music_and_disc_read(int);
+extern s16 snd_pump_music_and_disc_read(int);
 extern void mem_clear(void *, int, int);
 extern void subtitle_clear_state(void);
 extern unsigned int func_US2_0026F750(int, int);
@@ -68,7 +68,7 @@ extern void stub_empty_4(void);
 extern int load_chunk_part_from_disc(int);
 extern void load_relocate_world_object_parts(void);
 extern void gfx_empty_stub(void);
-extern void UpdateSoundVoices(void);
+extern s32 UpdateSoundVoices(void);
 extern int sceGsSyncV(int);
 extern int snd_resume_music_stream(void);
 

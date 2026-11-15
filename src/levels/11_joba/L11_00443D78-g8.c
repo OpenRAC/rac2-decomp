@@ -3,7 +3,7 @@
 #include "common.h"
 extern void joba_menu_draw_help_prompts(void *,int);
 extern int arena_get_challenge_title_text_id(int), arena_get_challenge_flag_index(int), func_L11_00442958(int), flag_is_byte_set(void);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int func_001157AC(char *);
 extern int sprintf(char *,char *,...);
 extern void text_draw_medium(int,int,u64,char *,int), text_draw_small(int,int,u64,char *,int);

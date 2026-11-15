@@ -46,7 +46,7 @@ extern void moby_set_controller_speed_limits(void *, float, float, float, float)
 extern void moby_set_state(void *, int, int);
 extern void anim_start_blended(void *, int, int, int);
 extern void FastVecAdd(void *, void *, void *);
-extern int path_clamp_move_to_area(void *, void *, void *, int, float);
+extern void path_clamp_move_to_area(void *, void *, void *, int, float);
 extern int moby_start_effect_from_entry(void *, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern int coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, float);

@@ -438,8 +438,8 @@ int moby_decrement_top_byte(int *packed, int amount) {
 extern float coll_probe_ground_height_below(void *, int, float);
 
 /* Looks up the ground height under an object. */
-void coll_get_ground_height_under_object(void *object) {
-    coll_probe_ground_height_below(object, 32, 0.5f);
+float coll_get_ground_height_under_object(void *object) {
+    return coll_probe_ground_height_below(object, 32, 0.5f);
 }
 
 
@@ -699,7 +699,7 @@ typedef struct Src_002A96A0 {
 } Src_002A96A0;
 
 extern Rec_002A96A0 *moby_get_private_value_0(s32);
-extern u8 *moby_get_private_value_4(s32);
+extern char *moby_get_private_value_4(s32);
 extern u8 moby_get_kind_slot(u8 *);
 
 /* Tracks which target the player is aiming at and returns an updated strength value, with a short delay before switching. */

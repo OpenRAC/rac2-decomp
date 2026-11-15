@@ -4,14 +4,14 @@ extern int flag_is_third_pending_set(char *);
 extern int flag_set_first_pending(char *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void part_spawn_blast_effect_moby(char *, void *, void *, float);
+extern char *part_spawn_blast_effect_moby(char *, void *, void *, float);
 extern void moby_set_state(char *, int, int);
 extern int PlayMobySound(int, int, char *);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern char *cam_moby_create(char *, int, int, int, void *, void *, void *, int, float, float);
 extern void moby_mark_spawned(char *);
-extern void cam_moby_update(char *);
+extern s32 cam_moby_update(char *);
 extern int math_random_int_range(int, int);
 
 /* The spawn bounds: minimum vector at +0x00, maximum vector at +0x10. An incomplete `sda` array

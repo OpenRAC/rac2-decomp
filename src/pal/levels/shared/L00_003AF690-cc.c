@@ -65,8 +65,8 @@ extern void func_PAL_L00_003B00B8(char *, void *, char *);
 extern void func_PAL_L00_003B0230(char *, void *);
 extern void moby_transform_offset_to_world(char *, void *);
 extern void shot_save_trail_transform(void);
-extern void func_PAL_0032F0B8(void *, int, int);
-extern void func_PAL_0032F3B8(char *, char *, void *, float);
+extern int func_PAL_0032F0B8(void *, int, int);
+extern char *func_PAL_0032F3B8(char *, char *, void *, float);
 
 /* A homing shot: follows its target (turning at most as far as its speed allows), records
    its path, tests the step for a hit and explodes on contact, out of the arena or too far

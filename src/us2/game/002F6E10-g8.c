@@ -54,7 +54,7 @@ extern void func_US2_00299CF0(void);
 extern int load_read_disc_with_pause(char *,int,int);
 extern int mpeg_play_movie_2(void *,void *,char *,char *,int,int);
 extern int req_pop_queue(void *,int *,int *);
-extern void func_00126DC0(void *);
+extern int func_00126DC0(void *);
 extern void gfx_reset_record_list(void);
 extern int request_begin_slot(int,int,int,int,unsigned char *);
 void func_US2_002F6E10(void)

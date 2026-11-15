@@ -59,10 +59,10 @@ extern f32 func_30FE88(f32 a, f32 b);
 extern f32 func_30FE40(f32 a, f32 b);
 extern float FastVecLength(void *);
 extern void FastVecSub(void *, void *, void *);
-extern void ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *, f32, f32);
-extern void math_approach_target_with_direction_mode(void *, f32, f32, f32, f32, void *, int);
+extern int ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *, f32, f32);
+extern f32 math_approach_target_with_direction_mode(void *, f32, f32, f32, f32, void *, int);
 extern f32 FastDiffRots(f32, f32);
-extern void math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
+extern float math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
 extern f32 ApproachValue(f32 *, f32, f32);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void FastVecAdd(void *, void *, void *);
@@ -110,7 +110,7 @@ int func_PAL_L11_0042A858(u8 *object, void *target, f32 desiredHeading, f32 spee
 
 typedef unsigned short u16;
 extern void func_PAL_002AC3C0(char *object, char *p);
-extern void FastDecTimer(char *p);
+extern int FastDecTimer(char *p);
 extern void moby_update_eased_node(char *object, char *p, int kind, float f12, float f13);
 extern void func_PAL_002B14F8(char *object, char *p, int kind, int a3, float f12);
 

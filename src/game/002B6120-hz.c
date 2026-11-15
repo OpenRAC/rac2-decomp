@@ -1,5 +1,5 @@
 #include "names.h"
-extern void *moby_get_private_value_4(void *);
+extern char *moby_get_private_value_4(void *);
 extern float gravity_get_center_distance(void *);
 extern int D_001A8CA0 __attribute__((sda));
 

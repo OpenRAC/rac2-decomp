@@ -13,7 +13,7 @@ extern void level_setup_lighting(u8 *a0, u32 a1, u32 a2);
 extern void water_process_patches(u8 *a0, u32 a1, u32 a2);
 extern void water_link_neighbor_patches(u8 *a0, u32 a1);
 extern void water_copy_halfword_to_patches(u8 *dst, u16 *src, s32 count);
-extern void water_register_model_header(u32 a0, u32 a1, u32 a2, u32 a3, s32 t0);
+extern int water_register_model_header(u32 a0, u32 a1, u32 a2, u32 a3, s32 t0);
 extern void water_select_table_slot(u32 a0, u32 a1, u32 a2);
 extern void water_start_ripple_patch(u32 a0, u32 a1, f32 f12, f32 f13, f32 f14,
                               f32 f15);

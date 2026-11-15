@@ -2,7 +2,7 @@
 #include "names.h"
 
 extern char D_00189E20_4[];
-extern void hero_l00_set_action(int a0, int a1);
+extern int hero_l00_set_action(int a0, int a1);
 extern void cancel_hero_item_animation(void);
 
 /* Gates the level transition on the shared block: the state word must be 0, 2 or 3, the byte at

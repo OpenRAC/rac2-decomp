@@ -18,7 +18,7 @@ extern int D_L10_001B1444 __attribute__((sda));
 extern int g_mission_completion_counts __attribute__((sda));
 extern int D_L10_001B1424 __attribute__((sda));
 extern char *D_L10_001B251C;
-extern void func_PAL_L10_003A0590(void *, void *, int, int, int, int, int, int, float, float, float, float);
+extern void *func_PAL_L10_003A0590(void *, void *, int, int, int, int, int, int, float, float, float, float);
 extern int math_fast_float_d(void *);
 extern void mission_store_completion_counts(void);
 extern int MemcardSave(int, int);

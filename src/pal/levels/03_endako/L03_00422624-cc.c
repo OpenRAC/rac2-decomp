@@ -5,7 +5,7 @@
 #include "common.h"
 
 typedef int Quad __attribute__((mode(TI)));
-extern void ApproachValue(void *, float, float);
+extern f32 ApproachValue(void *, float, float);
 extern void func_PAL_L03_00422F18(void *), func_PAL_L03_00423128(void *), func_PAL_L03_004233F0(void *);
 extern int flag_set_second_pending(void *), flag_set_first_pending(void *);
 extern int math_random_int_range(int, int), FastDecTimer(void *);
@@ -18,10 +18,11 @@ extern void part_spawn_effect_burst(void *, int, int, int, int, int, int, void *
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int), func_PAL_002A7650(void *, int, int), moby_mark_spawned(void *);
 /* Integer and FP arguments retain their independent EE register-bank order. */
-extern void math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
-extern void moby_transform_joint_to_world(void *, int, void *), moby_compute_local_point(void *, void *, float, float, float);
-extern void coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
-extern void func_PAL_L03_003D5A98(void *, void *, void *, int);
+extern f32 math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
+extern void moby_compute_local_point(void *, void *, float, float, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
+extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
+extern char *func_PAL_L03_003D5A98(void *, void *, void *, int);
 extern u8 g_hero_position[], D_L03_00188660[];
 extern u8 D_L03_001A8F20[] __attribute__((sda));
 extern float D_L03_001B1BCC __attribute__((sda));

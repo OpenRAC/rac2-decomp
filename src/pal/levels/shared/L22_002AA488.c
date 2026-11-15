@@ -3,7 +3,7 @@
 
 extern char g_hero_state[];
 extern void hero_clear_queued_anim(void);
-extern void hero_l22_set_action(int mode, int flag);
+extern int hero_l22_set_action(int mode, int flag);
 extern int D_00138320;
 extern void cancel_hero_item_animation(void);
 extern void UpdateHeroSlotCallbacks(void);
@@ -11,8 +11,8 @@ extern void level_release_slot_list(void *p);
 extern void hero_set_objects_flag_bit(void);
 extern void hero_clear_tracked_slots(void);
 extern void attachment_reset_all(void);
-extern void hud_set_slot_contents(int a0, int a1, void *a2, void *a3, void *a4, int a5, int a6);
-extern void level_run_slot_callback(int a0);
+extern int hud_set_slot_contents(int a0, int a1, void *a2, void *a3, void *a4, int a5, int a6);
+extern int level_run_slot_callback(int a0);
 extern void hero_l22_update_speed_targets(void);
 extern void func_002A677C(int a0);
 extern void ref_L22_002B70F8_00(void);
@@ -21,14 +21,14 @@ extern void ref_L22_002B70F8_02(void);
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef float f32;
-extern void hero_l22_set_action(int a0, int a1);
+extern int hero_l22_set_action(int a0, int a1);
 
 /* func_PAL_L22_002AA488, the PAL copy of func_L22_002AA678: the same C, where the fade rates
    0.07f and 0.13f become 0.08400001f and 0.156f, the timer 5 becomes 4, and the three call
    arguments 7, 8 and 9 become 6, 7 and 7. func_00282948 is declared int, as at its other call
    sites: the ignored result keeps $v0 from the base load after the call. */
 extern void hero_build_relative_point(void *, int, float, float, float);
-extern void ApproachValue(float *, float, float);
+extern f32 ApproachValue(float *, float, float);
 extern int D_00138320;
 extern int PadPressedWithin(int, int, int);
 extern int player_slot_has_object(void *);

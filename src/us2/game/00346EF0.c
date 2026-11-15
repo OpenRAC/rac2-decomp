@@ -39,14 +39,14 @@ void func_US2_00347550(char *a0)
 }
 
 
-extern void F449e2f67_FUN_003361A8(char *p);
-extern void F449e2f67_FUN_00336968(char *p);
-extern void F449e2f67_FUN_003366D0(char *p);
-extern void object_construct_derived_b(char *p);
-extern void hud_construct_widget_base(char *p);
-extern void object_construct_derived_c(char *p);
+extern void *F449e2f67_FUN_003361A8(char *p);
+extern char *F449e2f67_FUN_00336968(char *p);
+extern void *F449e2f67_FUN_003366D0(char *p);
+extern void *object_construct_derived_b(char *p);
+extern char *hud_construct_widget_base(char *p);
+extern void *object_construct_derived_c(char *p);
 
-extern void object_construct_derived_a(char *p);
+extern void *object_construct_derived_a(char *p);
 
 char *func_US2_003475F0(char *p)
 {

@@ -92,7 +92,7 @@ extern void vec_scale_to_length(char *, char *, float);
 
 extern void yeedil_boss_compute_shot_launch(char *, char *, char *, float *);
 
-extern void homing_l20_shot_spawn(char *, char *, char *, char *, int, float, int);
+extern char *homing_l20_shot_spawn(char *, char *, char *, char *, int, float, int);
 
 /* func_L20_00444088 is defined in L20_00444088-g8.c (it needs its own flags). */
 

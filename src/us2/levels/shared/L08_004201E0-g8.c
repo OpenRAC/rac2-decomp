@@ -275,7 +275,7 @@ extern s32 coll_test_point(void *, s32, void *, float);
 extern float FastVecDot(void *, void *);
 extern void part_spawn_ring(void *, void *, s32, float, float, float, float, float, float);
 extern void make_hit_descriptor(void *, void *, s32, void *, float);
-extern void coll_process_hit(void *, s32, void *, void *, float);
+extern int coll_process_hit(void *, s32, void *, void *, float);
 extern void func_US2_L08_00420068(void *);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, s32, s32, s32, float, float, float, float,
                           s32, float, s32, s32, s32, s32, s32);
@@ -287,9 +287,9 @@ extern void moby_store_position_private(void *, void *);
 extern void moby_mark_spawned(void *);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
-extern void part_fill_effect_record(void *, s32, s32, void *, float, float);
-extern void snd_fade_looping_by_distance(void *, void *, s32, s32, float);
-extern void math_fast_float_d(void *);
+extern s32 part_fill_effect_record(void *, s32, s32, void *, float, float);
+extern int snd_fade_looping_by_distance(void *, void *, s32, s32, float);
+extern int math_fast_float_d(void *);
 /* An effect record (0x70 bytes) still owned by this moby and active. */
 #define EFFECT(i) ((EffectSlot *)(D_00188660 + (i) * 0x70))
 #define EFFECT_LIVE(i) (EFFECT(i)->owner == moby && EFFECT(i)->active)

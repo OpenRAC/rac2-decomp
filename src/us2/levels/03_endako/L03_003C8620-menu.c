@@ -17,14 +17,14 @@ extern int D_L03_001B3280 __attribute__((sda));
 extern float D_L03_001B3284 __attribute__((sda));
 extern char D_L03_001B0190[], D_L03_001B0198[];
 extern unsigned char D_001A7A7C[] __attribute__((sda));
-extern int table_find_by_id(unsigned char *, int);
+extern void *table_find_by_id(unsigned char *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
-extern unsigned char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int sprintf(char *, char *, ...);
 extern int FloatToInt(float);
 extern int text_draw_centered_medium(int, int, unsigned long, unsigned char *, int);
-extern int sub_object_get_value_first(char *);
-extern int sub_object_get_value_second(char *);
+extern void sub_object_get_value_first(char *);
+extern void sub_object_get_value_second(char *);
 
 static __inline__ int label_y(void *handle, float value, float scale, float half, int active)
 {

@@ -28,7 +28,7 @@ extern int D_001B15A8 __attribute__((section(".sdata")));
 extern int D_001B15AC __attribute__((section(".sdata")));
 extern float g_screen_fade __attribute__((sda));
 extern void FadeToBlack(int);
-extern void func_PAL_002E5898(void);
+extern s32 func_PAL_002E5898(void);
 extern int sceGsSyncV(int);
 extern int snd_Pump(void);
 extern void UpdateViewContext(void);

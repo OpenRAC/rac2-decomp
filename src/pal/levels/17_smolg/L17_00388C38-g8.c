@@ -40,7 +40,7 @@ extern void FastVecScale(void *, void *, float);
 extern void transform_vector(void *, void *, void *);
 extern void add_vectors(void *, void *, void *);
 extern int math_random_int_below(int);
-extern void func_PAL_002C0FF0(void *, void *, int, void *, int, int);
+extern void *func_PAL_002C0FF0(void *, void *, int, void *, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void snd_stop_voice(int);
 

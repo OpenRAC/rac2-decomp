@@ -20,18 +20,18 @@ extern float FastDiffRots(float, float);
 extern float FastAddRotations(float, float);
 extern float vec_distance_xy(void *, void *);
 extern float coll_probe_ground_height_below(void *, int, float);
-extern void moby_start_effect_from_entry(void *, float);
+extern int moby_start_effect_from_entry(void *, float);
 extern int func_PAL_L02_00333638(void *, void *, int, float, float, float);
 extern void vec_transform_by_object_or_given(void *, void *, void *, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void coll_sweep_from_object(void *, void *, int, float, float, float, int, int,
+extern int coll_sweep_from_object(void *, void *, int, float, float, float, int, int,
                           int);
 extern void func_PAL_L00_0038C620(void *);
 extern void moby_raise_state_to_eight_copy(void *);
-extern void path_push_point_away(void *, void *, void *, float);
+extern int path_push_point_away(void *, void *, void *, float);
 
-void func_PAL_L20_00447BE0(char *obj) {
+int func_PAL_L20_00447BE0(char *obj) {
     char *state = *(char **)(obj + 0x68);
     char *basis;
     char *hero;
@@ -82,5 +82,5 @@ void func_PAL_L20_00447BE0(char *obj) {
             *(short *)((char *)&g_hero_state + 0x1F0) = 5;
         }
     }
-    path_push_point_away(*(void **)(state + 0x210), obj + 0x10, obj + 0x10, *(float *)(state + 0x50));
+    return path_push_point_away(*(void **)(state + 0x210), obj + 0x10, obj + 0x10, *(float *)(state + 0x50));
 }

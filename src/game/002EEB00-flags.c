@@ -7,7 +7,7 @@ extern unsigned char *g_dma_packet_cursor __attribute__((nosda));
 extern char D_001ACA60[];
 
 extern void VU1_addGSregister(unsigned int reg, unsigned long long value);
-extern int FlushCache(int);
+extern void FlushCache(int);
 extern void func_002F1010(void);
 extern void gfx_run_level_render_step(void);
 extern void func_002F35B0(void);

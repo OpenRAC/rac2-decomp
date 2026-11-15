@@ -3,7 +3,7 @@
    The fourth helper slot is a deliberately unused address of a reserved 16-byte local. */
 typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float f[4]; } Vector;
-extern unsigned int moby_get_vars_word_18(unsigned int);
+extern void *moby_get_vars_word_18(unsigned int);
 extern void coll_move_resolve_collisions(char *,char *,void *,void *,int);
 int moby_copy_vector_to_child(char *object, Quad *value)
 {

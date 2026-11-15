@@ -5,13 +5,13 @@ extern void Fe524d931_FUN_0033AE28(char *p);
 
 extern void Fe524d931_FUN_0033B018(char *p, float x, float y);
 
-extern void Fe524d931_FUN_002E5E58(int a, int b, int c);
+extern int Fe524d931_FUN_002E5E58(int a, int b, int c);
 
 extern void Fe524d931_FUN_00284E40(void);
 
 extern short Fe524d931_D_001A6480[];
 
-extern void Ffb202470_FUN_0033AB50(char *p);
+extern int Ffb202470_FUN_0033AB50(char *p);
 
 /* Updates the screen-adjust menu: moves the screen offset with the d-pad (within limits) and plays a sound when it changes. */
 int screen_adjust_menu_update(char *object, int mask)
@@ -81,7 +81,7 @@ extern char D_L00_001AE118[];
 extern void prompt_bar_draw(void *);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
-extern void text_draw_centered_small(int, int, unsigned long, char *, int);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
 /* Draws the on/off option menu: its prompt bar and one line of text showing the current setting. */
 void onoff_menu_draw(char *object)

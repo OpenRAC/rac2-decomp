@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int moby_get_motion_data(char *);
+extern char *moby_get_motion_data(char *);
 extern void follower_set_state(char *, int);
 extern int math_random_int_range(int, int);
 extern int func_001163B0(void);

@@ -13,7 +13,7 @@
 /* func_L07_003E56B8 is in L07_003E56B8-g8.c. */
 
 
-extern void FastDecTimer(char *);
+extern int FastDecTimer(char *);
 
 /* Clear the two resource slots and step the state counter while it has room. */
 /* Ticks two countdown timers and advances the object's frame counter. */
@@ -88,7 +88,7 @@ unsigned char *entity_find_last_idle_member(int group, int *count)
 
 /* func_L07_003E5FA8 is in L07_003E5FA8-g8.c. */
 
-extern void moby_transform_point_and_rotation_by_parent(char *, int, char *, char *, char *, char *);
+extern int moby_transform_point_and_rotation_by_parent(char *, int, char *, char *, char *, char *);
 
 /* Run the shared pass on both halves of the object, then again on the
    secondary half with a stack buffer when the state byte reads nine. */
@@ -209,10 +209,10 @@ extern void matrix_mul_vec3(TI128 *, TI128 *, char *);
 
 extern void FastVecAdd(TI128 *, TI128 *, char *);
 
-extern void SpawnExplosion(TI128 *, int, int, int, int, int, int, int, float, float, int, int, int,
+extern char *SpawnExplosion(TI128 *, int, int, int, int, int, int, int, float, float, int, int, int,
                           int);
 
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 
 extern void vec_scale_to_length(TI128 *, TI128 *, float);
 
@@ -248,7 +248,7 @@ extern void moby_set_state(int, int, int);
 
 extern int math_random_int_range(int, int);
 
-extern void part_spawn_between_points_depth_push(char *, int, int, char *, int, int, int);
+extern void *part_spawn_between_points_depth_push(char *, int, int, char *, int, int, int);
 
 /* Arm the object's mode ten and hand it to the shared launcher. */
 /* Throws a group member at a target and switches it to its launched state. */
@@ -267,7 +267,7 @@ void entity_launch_member_a(char *moby, int from_pos, int to_pos, int owner, int
 
 /* func_L07_003EB2C0 is in L07_003EB2C0-g8.c. */
 
-extern void math_fast_float_d(char *);
+extern int math_fast_float_d(char *);
 
 extern void value_set_and_smooth(char *, char *, int, int, float);
 

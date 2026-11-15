@@ -3,7 +3,7 @@
 
 extern void SetupGifPaging(int);
 extern void func_US2_L00_0030E7E0(void);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void text_draw_right_aligned_small(int, int, unsigned long long, unsigned char *, int);
 extern void DoGifPaging(void);
 extern int D_US2_L00_001ABD20 __attribute__((sda));

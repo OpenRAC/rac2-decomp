@@ -103,7 +103,7 @@ extern void mem_fast_helper_b(), mem_fast_helper_c(), moby_init_instance(), coun
 extern int fast_decompress(), log2dim();
 extern int load_read_disc_sectors_blocking(int, int, int);
 extern int snd_CheckLoadInProgress(int);
-extern int func_00132828(void);
+extern void func_00132828(void);
 extern void FlushCache(int);
 extern void load_copy_header_relocate_pointers(void *, void *);
 extern void func_00291DE0(void *, int);

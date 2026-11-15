@@ -230,7 +230,7 @@ typedef struct {
 } SpawnerState;
 
 extern int GetFirstMobyInGroup(Moby **, int, int, int);
-extern MobyPart *return_l00_zero(Moby *);
+extern unsigned int return_l00_zero(Moby *);
 extern void hero_copy_field_to_moby(Moby *);
 extern void func_002A0F48(Moby *);
 extern MobyRecord *moby_get_private_value_0(Moby *);
@@ -311,7 +311,7 @@ Moby *SpawnSpawnerChild(Moby *parent, Quad *position)
     return result;
 }
 
-extern int part_find_owned_effect_slot(char *a0, int a1, int a2);
+extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
 
 extern float moby_update_aim_target_strength(char *a0, int a1);
 

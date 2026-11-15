@@ -32,7 +32,7 @@ extern int D_L00_001B2ADC[] MACRO_ADDR;
 
 extern void *g_hero_moby NOT_SDA;
 extern void vec_store_helper(void *);
-extern void cam_moby_update(void *);
+extern s32 cam_moby_update(void *);
 extern float fast_vec_dist(void *,void *);
 extern int math_fast_float_d(void *);
 extern float math_fabs(float);
@@ -46,7 +46,7 @@ extern int subtract_integer_with_clamp(int);
 extern int PlayMobySound(int,int,void *);
 extern void FastVecSub(void *,void *,void *);
 extern void matrix_mul_vec3(void *,void *,void *);
-extern void ApproachValue(void *,float,float);
+extern f32 ApproachValue(void *,float,float);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
 extern float FastVecLength(void *);

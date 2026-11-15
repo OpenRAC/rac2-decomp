@@ -3,7 +3,7 @@ typedef int L30TI128 __attribute__((mode(TI)));
 
 extern void moby_set_state(char *, int, int);
 extern void anim_start_blended(char *, int, int, int);
-extern int part_find_owned_effect_slot(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 
 /* Moves a sliding object between its rest position and its moved position when triggered, and puts it back when its animation ends. */
 void sliding_object_update(char *moby) {

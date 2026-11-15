@@ -6,7 +6,7 @@ extern char *part_find_owned_effect_slot(void *,int,int);
 extern float moby_update_aim_target_strength(void *,void *);
 extern void gfx_start_color_fade(void *,void *);
 extern void gfx_update_color_fade(void *,void *);
-extern void PlayMobySound(int,int,void *);
+extern int PlayMobySound(int,int,void *);
 extern void set_moby_color(void *,int,int,int);
 extern int moby_count_group_not_in_state(int,int);
 extern int math_random_int_range(int,int);

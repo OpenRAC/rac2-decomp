@@ -4,8 +4,8 @@ extern s8 *D_001F2854;
 extern s8 D_00262BE0[];
 extern void SetupGifPaging(s32);
 extern void DoGifPaging(void);
-extern void text_draw_centered_small(s32, s32, u64, s32, s32);
-extern s32 GetLocalizedString(s32);
+extern int text_draw_centered_small(s32, s32, u64, s32, s32);
+extern char *GetLocalizedString(s32);
 
 s32 func_US2_002DCF58(s8 *a0) {
     s8 *v1;

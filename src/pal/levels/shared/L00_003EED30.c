@@ -24,10 +24,12 @@ typedef struct {
 extern HeroState g_hero_state;
 
 extern char g_pad_state[];
-extern void moby_transform_joint_to_world(char *, int, void *), CalculateAimedLaunchVelocity(void *, void *, float, float, float, float, int, int);
+extern void CalculateAimedLaunchVelocity(void *, void *, float, float, float, float, int, int);
+extern void moby_transform_joint_to_world(char *, int, void *);
 extern int func_PAL_002FF5F8(void *, void *, void *, void *, char *, int, int, float);
 extern int math_fast_float_d(void *), weapon_spend_ammo(int, int);
-extern void func_PAL_L00_002AF458(void), PlayMobySound(int, int, char *), func_PAL_L00_002AF6C0(void), ref_L00_003EAA58_00(void *, char *);
+extern void func_PAL_L00_002AF458(void), func_PAL_L00_002AF6C0(void), ref_L00_003EAA58_00(void *, char *);
+extern int PlayMobySound(int, int, char *);
 extern char *func_PAL_L00_0038ACC8(void *, void *);
 void func_PAL_L00_003EED30(char *self)
 {

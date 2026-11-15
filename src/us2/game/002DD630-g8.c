@@ -1,8 +1,8 @@
 #include "include_asm.h"
 #include "names.h"
-extern int menu_stream_chunk_table_init(int);
-extern int menu_stream_chunk_claim_free(int);
-extern int menu_clear_block_fields(void);
+extern void menu_stream_chunk_table_init(int);
+extern char *menu_stream_chunk_claim_free(int);
+extern void menu_clear_block_fields(void);
 extern void menu_clear_counter(void);
 extern void popup_set_flag_on(void *);
 extern volatile int D_001A8C88;
@@ -43,7 +43,7 @@ extern void SetupGifPaging(long);
 extern void DoGifPaging(void);
 extern char *GetLocalizedString(int);
 extern char *text_format_location_name(char *, int);
-extern void text_draw_centered_small(int, int, unsigned long, char *, int);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
 /* Menu line for the current slot: prints its name (and the follow-up line)
    while the menu is in its listing state. */

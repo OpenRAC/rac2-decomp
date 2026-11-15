@@ -21,7 +21,7 @@ extern int CollLine(void *,void *,int,void *,void *);
 extern float fast_vec_dist(void *, void *);
 extern char *large_spark_trail_create(char *, char *, char *, int);
 extern void QueueMobyImpact(int, void *);
-extern void StartAttachedEffect(int, int, char *);
+extern int StartAttachedEffect(int, int, char *);
 extern int g_hero_moby;
 extern unsigned char D_00139582;
 extern L00AimState g_collision_result;

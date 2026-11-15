@@ -58,7 +58,7 @@ extern s32 game_is_either_mode_two(void);
 extern void hero_reset_position_and_direction(u8 *, u8 *, s32, s32);
 extern void help_unlock_entry(s32);
 extern void func_US2_002B1880(s32, s32);
-extern void MemcardSave(s32, s32);
+extern int MemcardSave(s32, s32);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern f32 math_random_angle(void);

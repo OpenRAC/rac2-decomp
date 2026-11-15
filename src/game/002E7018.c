@@ -8,7 +8,7 @@ extern short D_00152C2A;
 
 extern void func_002B72E8_1();
 
-extern void UpdateSoundVoices();
+extern s32 UpdateSoundVoices();
 
 extern void subtitle_clear_state();
 
@@ -206,7 +206,7 @@ void load_run_async_and_wait(void *arg, int *status) {
 /* D_001B8840 is declared above func_002E7090 (List2E7090). */
 extern char g_copy_setup_data[];
 extern int load_start_disc_read(int, int, int);
-extern void snd_pump_music_and_disc_read(int);
+extern s16 snd_pump_music_and_disc_read(int);
 
 /* Loads the data for one chunk of the current scene. */
 int scene_load_chunk_data(int index)

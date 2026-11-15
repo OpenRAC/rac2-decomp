@@ -10,7 +10,7 @@ extern float fast_subtract_rotations(float, float);
 extern void moby_set_state(char *, s32, s32);
 extern int flag_is_third_pending_set(u8 *);
 extern int flag_set_first_pending(u8 *);
-extern void PlayMobySound(s32, s32, char *);
+extern int PlayMobySound(s32, s32, char *);
 extern void moby_mark_spawned(char *);
 extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);

@@ -21,16 +21,16 @@ extern int enemy_get_kind_index(void *);
 /* Argument layout of RAC1's spawn_explosion, with one more integer. */
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float,
                           int, float, int, int, int, int, int);
-extern void coll_process_hit(void *, int, void *, void *, float);
+extern int coll_process_hit(void *, int, void *, void *, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern float vec_distance_xy(void *, void *);
-extern int receiver_bot_spawn_streak_projectile(void *, void *, void *, int, int, float, float, float);
+extern char *receiver_bot_spawn_streak_projectile(void *, void *, void *, int, int, float, float, float);
 
 /* Fires from joint side + 2. When the sphere test at that point reports contact, it
    spawns an explosion there and sends a hit record to nearby objects; otherwise it
    launches a projectile along the facing, aimed at the target's height unless the
    byte at 0xBC is set. */
-int func_PAL_L18_0042D088(unsigned char *obj, int side) {
+u8 *func_PAL_L18_0042D088(unsigned char *obj, int side) {
     unsigned char *state = *(unsigned char **)(obj + 0x68);
     float range = D_L18_001B1280;
     float speed = D_L18_001B1288;

@@ -25,7 +25,7 @@ extern void moby_update_ground_check(void *);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern int moby_apply_damage_to_object(void *, void *, int);
 extern void gadgetron_hound_flag_group(void *);
-extern void weapon_select_aim_target(void *, int, void *, int, float, float);
+extern int weapon_select_aim_target(void *, int, void *, int, float, float);
 
 /* The 0x30-byte record func_L04_0033CB88 fills with its defaults. */
 typedef struct {

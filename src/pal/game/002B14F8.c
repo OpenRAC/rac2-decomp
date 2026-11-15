@@ -29,7 +29,7 @@ void func_PAL_002B14F8(void *a0, float *a1, float f12, int a2, int a3)
 
 void func_PAL_002B1588(int first, int second)
 {
-    extern int GetLocalizedString(int);
+    extern char *GetLocalizedString(int);
     extern void func_0029CC98(int, int);
     func_0029CC98(GetLocalizedString(first), second);
 }
@@ -47,7 +47,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern void matrix_mul_vec3(float *dst, float *src, char *table);
 extern void FastVecAdd(float *dst, float *src, float *arg);
 extern int D_L00_001A8FF0_1 __attribute__((sda));
-extern void func_PAL_002735D0(char *self, int a1, int a2, int a3, char *p4, char *p5,
+extern char *func_PAL_002735D0(char *self, int a1, int a2, int a3, char *p4, char *p5,
                     float *buf, int b3, float fa, float fb);
 
 /* Walks selected mask bits, evaluates three stored curve components, optionally transforms the vector, and dispatches one object operation per selected bit. */

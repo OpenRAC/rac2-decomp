@@ -19,7 +19,7 @@ extern void shop_trigger_current_state_effect(int, int);
 extern void part_steer_effect_direction(int, void *, int);
 extern void vec_add_object_direction_scaled(void *, float *, float);
 extern int CollideSweptSphere(BounceQuery *);
-extern int moby_get_private_value_0(unsigned char *);
+extern char *moby_get_private_value_0(unsigned char *);
 extern void moby_get_facing_direction(void *, float *);
 extern void FastVecScale(void *, void *, float);
 extern void vec_scale_to_length(void *, void *, float);

@@ -25,8 +25,8 @@ extern const float D_001AE760[10] __attribute__((section(".sdata")));
 
 extern void object_set_flag_value(void *, int);
 extern void object_set_value_float(void *, float);
-extern int object_get_first_field(void *);
-extern int object_get_fourth_field(void *);
+extern float *object_get_first_field(void *);
+extern int *object_get_fourth_field(void *);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern int snd_play_from_global_bank(int, int, void *);

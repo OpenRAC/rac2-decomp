@@ -10,7 +10,7 @@ typedef struct {
 } CallbackState;
 extern CallbackState g_pause_menu_state;
 extern int D_00138344;
-extern void func_0029C8B0(int);
+extern int func_0029C8B0(int);
 
 int func_PAL_002D4180(void) {
     int result = 0;
@@ -81,7 +81,7 @@ typedef struct {
     int flags;
 } MenuGameState;
 extern MenuGameState g_pad_state;
-extern void func_0029C5D0(int);
+extern int func_0029C5D0(int);
 
 int func_PAL_002D4378(void)
 {

@@ -116,7 +116,7 @@ extern int racer_is_in_jump_window(int, int, float);
 extern int func_PAL_L04_004169C0(void *, void *);
 extern void math_step_angle_offset(void *, void *, float, float);
 extern void trail_clear_by_owner(void *);
-extern void hud_draw_race_ruler(void);
+extern s32 hud_draw_race_ruler(void);
 extern void func_PAL_L04_0041D5F0(void *, void *);
 extern void func_PAL_L04_0041D788(void *, void *);
 extern void hoverbike_init_race_course(void *);
@@ -125,11 +125,11 @@ extern void race_set_state_flags_a(void);
 /* func_L04_0040AC98 in Barlow; Joba places its copy elsewhere. */
 extern void ref_L04_00419918_00(void);
 extern void race_set_state_flags_c(void);
-extern void race_draw_results_panel(void);
+extern int race_draw_results_panel(void);
 extern void racer_draw_glow_effects(void);
-extern void DrawRaceStandingsHud(void);
+extern s32 DrawRaceStandingsHud(void);
 extern void snd_send_cmd23(int);
-extern void snd_Pump(void);
+extern int snd_Pump(void);
 
 #define M_(p, t, o) (((struct { u8 pad[o]; t v; } *)(p))->v)
 #define I(p, o) M_(p, int, o)

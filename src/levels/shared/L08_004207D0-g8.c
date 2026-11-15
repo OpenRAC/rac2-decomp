@@ -16,7 +16,7 @@ extern u16 *D_L08_001FB660[];
 extern u8 D_L08_001B9D30[];
 extern s32 hero_begin_saved_float_hold(void), hero_end_saved_float_hold(void);
 extern void hero_set_saved_float_and_update(void);
-extern char *table_find_by_id(void *, s32);
+extern void *table_find_by_id(void *, s32);
 extern void gfx_draw_scaled_object_two_axes(char *, u32, f32, f32, f32, f32, f32);
 extern u64 GetEffectTextureDescriptor(s32);
 extern void AppendSubpixelTexturedScreenQuad(f32, f32, f32, f32, s32, s32, s32, s32, u64, u64);

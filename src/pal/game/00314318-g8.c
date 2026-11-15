@@ -17,7 +17,7 @@ extern float math_random_float_range(float, float);
 extern void FastVecScale(void *, void *, float);
 extern float math_random_angle(void);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
-extern void part_spawn_hero_relative(void *, void *, void *, int, int, int, float);
+extern void *part_spawn_hero_relative(void *, void *, void *, int, int, int, float);
 
 void func_PAL_00314558(unsigned char *object)
 {

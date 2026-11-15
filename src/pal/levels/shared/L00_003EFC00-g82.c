@@ -5,7 +5,7 @@ typedef int Quad __attribute__((mode(TI)));
 typedef union { Quad q; float v[4]; } Vector;
 extern float math_random_float_range(float low, float high);
 extern void moby_transform_joint_to_world(char *object, int joint, void *out);
-extern void part_spawn_object_relative_particle(char *object, void *position, void *velocity, void *parameters, int mode);
+extern void *part_spawn_object_relative_particle(char *object, void *position, void *velocity, void *parameters, int mode);
 extern char D_L00_001B02E8 __attribute__((sda));
 extern char D_L00_001B02F8 __attribute__((sda));
 extern char D_L00_001B0308 __attribute__((sda));

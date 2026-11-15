@@ -4,7 +4,9 @@
 #define B(p,o) (*(u8 *)((char *)(p)+(o)))
 #define H(p,o) (*(u16 *)((char *)(p)+(o)))
 #define F(p,o) (*(float *)((char *)(p)+(o)))
-extern void hover_enemy_init(void *),moby_update_ground_check(void *),moby_transform_joint_to_world(void *,int,void *),moby_transform_joint_point(void *,int,void *),vec_clear_128(void *),transform_vector(void *,void *,void *),FastVecAdd(void *,void *,void *),mat_get_euler_angles(void *,void *),moby_rotate_about_point(void *,void *,float,float,float),SetDeathBits(void *,int,int),moby_mark_spawned(void *),hover_enemy_alert_group(void *),weapon_select_aim_target(void *,int,int,int,float,float),group_pick_nearest_target(void *);
+extern void hover_enemy_init(void *), moby_update_ground_check(void *), moby_transform_joint_point(void *,int,void *), vec_clear_128(void *), transform_vector(void *,void *,void *), FastVecAdd(void *,void *,void *), mat_get_euler_angles(void *,void *), moby_rotate_about_point(void *,void *,float,float,float), SetDeathBits(void *,int,int), moby_mark_spawned(void *), hover_enemy_alert_group(void *), group_pick_nearest_target(void *);
+extern void moby_transform_joint_to_world(void *,int,void *);
+extern int weapon_select_aim_target(void *,int,int,int,float,float);
 extern float fast_vec_dist(void *,void *),coll_probe_ground_height_below(void *,int,float);
 extern int moby_apply_damage_to_object(void *,void *,int),CollLine(void *,void *,int,void *,int),moby_count_group_not_in_state(int,int);
 extern int GetCollHitMaterial(void);

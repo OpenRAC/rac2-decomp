@@ -11,7 +11,7 @@ typedef struct {
 } Entry262570b;
 extern void FastVecScale(void *, void *, float);
 extern int coll_process_hit(float, int, int, int, int);
-extern void func_PAL_0032F0B8(int, int, int);
+extern int func_PAL_0032F0B8(int, int, int);
 extern void moby_queue_knockback_for_nodes(void *, void *, int *, int, int, int, int, int, float, float, float);
 extern unsigned char g_item_slot_to_record[];
 extern Entry262570b g_weapon_l00_table[];

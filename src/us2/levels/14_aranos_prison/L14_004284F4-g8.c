@@ -46,7 +46,7 @@ extern float IntToFloat(int);
 extern float math_fast_sin_or_cos_b(float);
 extern float ApproachValue(float *, float, float);
 extern void moby_mark_spawned(void *a0);
-extern void *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_US2_L00_0030EFB8(void *, int);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void part_spawn_spark_side(void *);

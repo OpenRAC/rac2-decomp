@@ -5,7 +5,7 @@ extern int D_001A74C8 __attribute__((sda));
 
 extern int snd_Pump(void);
 extern int snd_SendCommandSync(int, int, void *);
-extern void snd_CheckLoadInProgress(int);
+extern int snd_CheckLoadInProgress(int);
 
 /* Sends sound command 0x2A with four values once, and remembers the answer so it is not sent twice. */
 int snd_send_cmd2a_once(int p0, int p1, int p2, int p3) {

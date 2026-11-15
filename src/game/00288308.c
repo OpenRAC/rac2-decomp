@@ -62,7 +62,7 @@ extern int menu_seek_chain_entry(int, int);
 
 extern int flag_is_byte_set(void);
 
-extern void help_store_id_in_slot_list(int);
+extern int help_store_id_in_slot_list(int);
 
 extern void help_queue_pending_id(int);
 

@@ -9,7 +9,7 @@ extern float math_fabs(float);
 extern void FastVecScale(void *, void *, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void bouncing_debris_create(void *, void *, void *);
+extern char *bouncing_debris_create(void *, void *, void *);
 
 /* Spawns a bounded set of random vectors outside the central rectangle. */
 /* Spawns random bursts around the object, skipping a box in the middle. */

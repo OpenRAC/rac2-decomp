@@ -4,7 +4,7 @@
    an sda word so each use is the assembler macro form (lui + lw), never hoisted. */
 typedef unsigned char u8;
 
-extern int moby_get_motion_data(unsigned char *);
+extern char *moby_get_motion_data(unsigned char *);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern void FastVecAdd(void *, void *, void *);

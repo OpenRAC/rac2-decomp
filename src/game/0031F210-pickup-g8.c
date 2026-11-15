@@ -96,7 +96,7 @@ extern int subtract_integer_with_clamp(int);
 extern int PlayMobySound(int, int, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
-extern void ApproachValue(void *, float, float);
+extern f32 ApproachValue(void *, float, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float FastVecLength(void *);

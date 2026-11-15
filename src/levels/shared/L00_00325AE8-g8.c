@@ -2,7 +2,7 @@
 
 typedef int V4_325AE8 __attribute__((mode(TI)));
 
-extern int GetEffectTextureDescriptor(int);
+extern long long GetEffectTextureDescriptor(int);
 extern void FastVecSub(char *, char *, char *);
 extern void vec_scale_to_length(float, char *, char *);
 extern void FastVecCross(char *, char *, char *);

@@ -21,7 +21,7 @@ typedef struct { int on; int pad; float pos[4]; } L05Hit;
 extern L05Hit D_L05_001BFB18;
 extern u8 D_L05_001A8F20[] MACRO_ADDR;
 extern int level_get_saved_value(void);
-extern s32 moby_get_motion_data(u8 *);
+extern char *moby_get_motion_data(u8 *);
 extern float math_random_float_range(float,float);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);

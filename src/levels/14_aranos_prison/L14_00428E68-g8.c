@@ -29,7 +29,7 @@ extern void part_fire_burst_sound(void *);
 extern void moby_mark_spawned(void *);
 extern void moby_set_state(void *, int, int);
 extern void anim_start_blended(void *, int, int, int);
-extern void moby_step_at_own_position(void *);
+extern int moby_step_at_own_position(void *);
 extern void moby_l14_set_state_value(void *, int);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void actor_update_walk_motion(void *);

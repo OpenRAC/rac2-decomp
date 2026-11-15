@@ -1,8 +1,8 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void object_construct_derived_a(void *p);
-extern void hud_construct_widget_base(void *p);
+extern void *object_construct_derived_a(void *p);
+extern char *hud_construct_widget_base(void *p);
 
 /* func_00338F58 is matched in 00338F58.c. */
 

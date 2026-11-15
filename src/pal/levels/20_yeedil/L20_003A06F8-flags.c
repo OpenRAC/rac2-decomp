@@ -8,7 +8,7 @@ extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, float, float, int);
-extern void snd_play_from_global_bank(int, int, int);
+extern int snd_play_from_global_bank(int, int, int);
 extern void moby_mark_spawned(void *);
 extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void func_PAL_003120C0(unsigned char *);

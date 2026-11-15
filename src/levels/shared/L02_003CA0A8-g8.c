@@ -21,7 +21,7 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern int FastTweenColor(int, int, float);
 extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float), FastAddRotations(float, float);
-extern void part_spawn_hero_relative(void *, void *, int, int, int, int, float);
+extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
 extern void FastVecScale(void *, void *, float);
 
 /* Spawns the effect's burst: 32 pairs of particles in a ring around the object. */

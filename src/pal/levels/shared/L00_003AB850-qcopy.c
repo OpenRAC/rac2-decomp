@@ -16,7 +16,7 @@ extern CollisionResultPrefix g_collision_result;
 extern void vec_scale_to_length(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void func_PAL_L00_003AB990(char *, void *);
-extern void func_PAL_00335DD0(void *, int, int);
+extern int func_PAL_00335DD0(void *, int, int);
 
 int func_PAL_L00_003AB850(char *object, void *target)
 {

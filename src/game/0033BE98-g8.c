@@ -1,12 +1,12 @@
 #include "names.h"
 extern void prompt_bar_set_spacing(void *, float);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void prompt_bar_init(void *, void *, void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts(void *, int, int, int);
 extern void prompt_bar_set_text_offsets(void *, float, float, float, float, float, float);
-extern void onoff_menu_update(void *, int);
+extern int onoff_menu_update(void *, int);
 extern int D_001ADDE0[2] __attribute__((sda));
 /* Sets up the on/off option menu: its button prompt bar, labels and position. */
 void onoff_menu_init(char *menu, void *owner)

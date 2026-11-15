@@ -88,7 +88,8 @@ extern char *D_L02_001B368C MACRO_ADDR;
 extern int g_frame_l02_counter MACRO_ADDR;
 extern void moby_set_state(void *,int,int);
 extern int level_get_table_entry_short(int),IsPointInCuboid(void *,int);
-extern void hud_queue_hint_message(int,int),func_PAL_00289730(int,int),func_PAL_L01_002EBFB8(int,int,int,int,int);
+extern void hud_queue_hint_message(int,int), func_PAL_L01_002EBFB8(int,int,int,int,int);
+extern int func_PAL_00289730(int,int);
 extern int arena_is_challenge_running(void *),math_fast_float_d(void *),chainblade_is_state_active(void *),flag_is_third_pending_set(void *);
 extern void state_set_flag_one(void),func_PAL_L00_002B9CD8(void *,void *,int,int);
 void func_PAL_L02_0040E800(char *e) {

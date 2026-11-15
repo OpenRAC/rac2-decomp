@@ -141,17 +141,17 @@ extern int func_L06_00382850_1(char *object, unsigned int entry, float value);
 
 extern int func_002B6228_1(char *object, unsigned int entry, int value, int flag);
 
-extern void FastDecTimer(void *p);
+extern int FastDecTimer(void *p);
 
-extern void vec_fast_helper_a(void *p);
+extern int vec_fast_helper_a(void *p);
 
-extern void PlayMobySound(int a, int b, char *c);
+extern int PlayMobySound(int a, int b, char *c);
 
 extern void SetDeathBits(char *a, int b, int c);
 
 extern void moby_mark_spawned(void *entry);
 
-extern void SpawnExplosion(void *p, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
+extern char *SpawnExplosion(void *p, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
                           float f1, float f2, int s1, int s2, int s3, int s4);
 
 extern float fast_vec_dist(char *a, char *b);
@@ -160,7 +160,7 @@ extern void moby_update_ground_check(void *object);
 
 extern char D_L09_001B9A00[];
 
-extern void math_fast_float_d(void *a0);
+extern int math_fast_float_d(void *a0);
 
 extern void get_moby_color(char *object, int *out0, int *out1, int *out2);
 

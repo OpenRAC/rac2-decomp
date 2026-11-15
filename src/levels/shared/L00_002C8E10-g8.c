@@ -7,7 +7,7 @@ extern float math_fabs(float);
 extern void BuildOffsetVectorPair(void *, void *, int, float, float);
 extern int CollLine(void *, void *, int, void *, int);
 extern short GetCollHitMaterial(void);
-extern void hero_l00_set_action(int, int);
+extern int hero_l00_set_action(int, int);
 extern int hero_play_sound(int, int);
 
 /* Decide whether the resident should transition after falling or leaving support. */

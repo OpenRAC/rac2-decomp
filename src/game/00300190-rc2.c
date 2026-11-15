@@ -27,7 +27,7 @@
 extern s32 D_001AD7EC;
 extern s8 D_001A8BD0;
 extern s32 g_hero_moby[];
-extern void moby_transform_point_and_rotation_by_parent(s32, s32, void *, void *, void *, void *);
+extern int moby_transform_point_and_rotation_by_parent(s32, s32, void *, void *, void *, void *);
 typedef int TI __attribute__((mode(TI)));
 
 /* Copies a 4-float vector, passing it through the current transform when one is set. */

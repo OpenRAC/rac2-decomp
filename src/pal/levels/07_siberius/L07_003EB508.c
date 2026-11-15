@@ -8,9 +8,9 @@ extern void group_destroy_attached_parts(char *, char *);
 extern void func_PAL_002A7650(char *, int, int);
 extern void matrix_mul_vec3(TI128 *, TI128 *, char *);
 extern void FastVecAdd(TI128 *, TI128 *, char *);
-extern void func_PAL_L00_003FB330(TI128 *, int, int, int, int, int, int, int, float, float, int, int, int,
+extern char *func_PAL_L00_003FB330(TI128 *, int, int, int, int, int, int, int, float, float, int, int, int,
                           int);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern void vec_scale_to_length(TI128 *, TI128 *, float);
 extern void func_PAL_002B15D8(char *, int, TI128 *, float, float, float, float, int);
 
@@ -42,7 +42,7 @@ void func_PAL_L07_003EB508(char *arg)
 
 extern void moby_set_state(int, int, int);
 extern int math_random_int_range(int, int);
-extern void part_spawn_between_points_depth_push(char *, int, int, char *, int, int, int);
+extern void *part_spawn_between_points_depth_push(char *, int, int, char *, int, int, int);
 extern void moby_set_state(int, int, int);
 
 /* Arm the object's mode ten and hand it to the shared launcher. */

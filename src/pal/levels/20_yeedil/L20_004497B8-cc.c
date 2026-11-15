@@ -23,7 +23,7 @@ extern unsigned int D_L20_001B2F9C __attribute__((sda));
    as in func_L20_0039E0A0. The bound D_L20_001B2FB8 does not change in the loop, so cc1 hoists
    its repeated test into a register known to be zero, which the loop still tests (retail's
    `daddu $t0,$zero,$zero` and `bnez $t0`). */
-extern void coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
+extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
                           int);
 /* func_L20_00440598 is defined in L20_00440598-g8.c (it reaches data through $gp and needs -frac2-hazard-labels). */
 
@@ -37,7 +37,7 @@ extern void coll_sweep_from_object(char *, char *, int, int, float, float, float
 
 /* func_L20_00442550 is defined in L20_00442550-g8.c. */
 
-extern void coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
+extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
                           int);
 
 /* func_L20_004429F0 is defined in L20_004429F0-g8.c. */
@@ -110,7 +110,7 @@ extern int flag_set_first_pending(char *);
 
 extern int flag_is_third_pending_set(char *);
 
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 
 extern int PlayMobySound(int, int, char *);
 
@@ -124,7 +124,7 @@ extern int flag_set_first_pending(char *);
 
 extern int flag_is_third_pending_set(char *);
 
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 
 extern unsigned char D_0019B2E8[];
 

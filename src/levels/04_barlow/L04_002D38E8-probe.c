@@ -88,7 +88,7 @@ extern float mat_fast_helper_a(float, float);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecDot(void *, void *);
 extern void vec_compute_flat_direction_from_point(void *, void *, int);
-extern void ApproachValue(void *, float, float);
+extern f32 ApproachValue(void *, float, float);
 extern void FastVecScale(void *, void *, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void hero_compute_angles_to_local_dir(void *, void *);

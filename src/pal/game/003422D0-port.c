@@ -3,7 +3,7 @@
 
 extern void func_0033AF48_2();
 
-extern void func_002DAF68_1();
+extern int func_002DAF68_1();
 
 extern void func_00336A78_5();
 
@@ -15,13 +15,13 @@ extern void info_panel_draw_counters();
 
 typedef unsigned char u8;
 
-extern void func_L00_0042BAD0_6(u8 *);
+extern char *func_L00_0042BAD0_6(u8 *);
 
-extern void func_L00_0042BFF8_5(u8 *);
+extern char *func_L00_0042BFF8_5(u8 *);
 
-extern void func_L00_0042C290_6(u8 *);
+extern char *func_L00_0042C290_6(u8 *);
 
-extern void func_00347EA0_1(u8 *);
+extern unsigned long long func_00347EA0_1(u8 *);
 
 typedef int s32;
 

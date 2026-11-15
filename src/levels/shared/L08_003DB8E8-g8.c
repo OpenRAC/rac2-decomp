@@ -12,7 +12,7 @@ extern s32 D_L08_001B2508;
 extern s32 D_L08_001A8F00;
 
 extern s32 mode_get_setting(void);
-extern void counter_meter_draw(void);
+extern s32 counter_meter_draw(void);
 extern s32 level_set_game_state_pair(s32, void *, s32);
 
 /* Keeps a counter meter object (moby class 2547) next to the hero, showing a count that

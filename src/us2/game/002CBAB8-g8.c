@@ -5,10 +5,10 @@ extern char g_pause_menu_state[];
 extern int D_001AB7A4 __attribute__((sda));
 extern char D_0025A190[];
 extern char D_00259198[];
-extern void menu_clear_saved_selection(int, int);
+extern int menu_clear_saved_selection(int, int);
 extern int func_US2_002CCAA0(void);
 extern void menu_refresh_unlock_icon_states(void);
-extern void snd_play_from_global_bank(int, unsigned int, void *);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 typedef struct Widget_2CAB00 {
     int (*update)(struct Widget_2CAB00 *);
     int unused;

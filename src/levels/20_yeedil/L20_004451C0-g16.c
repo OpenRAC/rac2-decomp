@@ -28,7 +28,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void add_vectors(void *, void *, void *);
 extern void protopet_launch_shot(void *, void *, void *);
 extern int math_random_int_range(int, int);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void part_spawn_masked_debris(void *, int, void *, float, float, float, float, int);
 extern void SetDeathBits(void *, int, int);
 extern void moby_mark_spawned(void *);

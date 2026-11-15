@@ -36,7 +36,7 @@ extern int D_001A8D40 __attribute__((sda));
 extern void UpdateViewContext(void);
 extern float IntToFloat(int);
 extern int FastTweenColor(int, int, float);
-extern char *table_find_by_id(char *, int);
+extern void *table_find_by_id(char *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
 extern void gfx_draw_colored_rectangle(int, int, int, int, unsigned long);
 

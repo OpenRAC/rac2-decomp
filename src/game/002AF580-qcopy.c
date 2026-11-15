@@ -2,7 +2,7 @@
 #include "moby_classes.h"
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int moby_get_private_value_0(char *);
+extern char *moby_get_private_value_0(char *);
 extern int moby_is_in_special_class_range(char *);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);

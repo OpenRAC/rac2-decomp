@@ -42,12 +42,12 @@ void func_PAL_L02_00411CB0(u8 *a0, int a1) {
 
 typedef signed int s32;
 extern char D_L02_00188660[];
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float,
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float,
                           int, int, int, int);
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 extern void func_002A05A8(void *);
-extern int snd_stop_voice(int);
-extern int IncrementMaktarTypeCounter(void *, int);
+extern void snd_stop_voice(int);
+extern void IncrementMaktarTypeCounter(void *, int);
 extern s32 req_push_queue(u8 *, s32);
 extern s32 req_launch_queued(u8 *);
 

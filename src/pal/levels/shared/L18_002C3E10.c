@@ -7,7 +7,7 @@ extern u8 g_hero_state[];
 extern u32 D_00138320;
 extern s32 D_L18_001AFBB0 MACRO_ADDR;
 extern void func_PAL_L00_002D2668(s32, s32, float);
-extern void func_PAL_L18_0042D088(u8 *, s32);
+extern u8 *func_PAL_L18_0042D088(u8 *, s32);
 #define H ((Hero *)D_00189E20)
 
 void func_PAL_L18_002C3E10(void)

@@ -105,7 +105,7 @@ extern int moby_is_class_71(unsigned char *);
 /* Matched helper definition takes no parameters. */
 extern void hero_setup_attached_object_transform(void);
 extern int FloatToInt(float);
-extern void hero_l00_set_action(int, int);
+extern s32 hero_l00_set_action(int, int);
 extern int get_ammo(int);
 extern int snd_play_from_class_bank(int, int, char *, int);
 extern char *SelectBestEligibleTarget(void *, int, int, float, float, float, float);

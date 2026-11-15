@@ -116,7 +116,7 @@ extern void part_spawn_white_flash(void *, void *, int, float);
 extern void path_sample_position(char *, int, void *, void *, int, float);
 extern void snd_stop_voice(int);
 extern int snd_play_from_class_bank(int, int, char *, int);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void hero_record_play_counters(void);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern int coll_point_inside_region(void *, int);
@@ -124,7 +124,7 @@ extern void gfx_queue_draw_callback(void *, void *);
 extern void protopet_start_enter_anim(char *, int);
 extern void part_spawn_upward(char *);
 extern void part_spawn_spray(char *);
-extern void hero_l19_set_state(int, int);
+extern s32 hero_l19_set_state(int, int);
 
 /* Updates a Train moby: it follows its path or linked object, gets launched or fades in and out in several states, pushes the hero and objects it hits, and spawns sparks. */
 void train_l19_update(char *moby)

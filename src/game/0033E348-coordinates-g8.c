@@ -8,7 +8,7 @@ extern char *text_format_location_name(char *, int);
 extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, void *);
 extern void info_panel_place_counters(void *);
-extern void DrawMapScreen(int);
+extern int DrawMapScreen(int);
 extern char g_map_overlay_state[], D_001ADC88[];
 extern int D_00258D70[];
 extern float D_001ADF28 __attribute__((sda));

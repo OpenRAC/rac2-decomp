@@ -1,10 +1,10 @@
 #include "common.h"
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vector;
-extern int state_get_stored_pointer_value(void);
+extern void *state_get_stored_pointer_value(void);
 extern void moby_init_effect_from_table(void *);
 extern void level_append_object(int, int, int, int);
 extern void func_L05_00417730(void *);
-extern int moby_get_motion_data(void *);
+extern char *moby_get_motion_data(void *);
 extern void follower_set_state(void *, unsigned int);
 extern void follower_set_push_vector(void *, void *);
 extern int follower_has_reached_target(void *);

@@ -110,7 +110,7 @@ extern char D_001B2980[], D_0021F080[];
 extern void req_mark_queued_in_flag_table(void *);
 extern int cutscene_map_id_to_index(int);
 extern void music_Pause(int);
-extern void func_PAL_002B8898(int);
+extern s16 func_PAL_002B8898(int);
 extern void mem_clear(void *, int, int);
 extern void subtitle_clear_state(void);
 extern unsigned int func_PAL_0026F5B8(int, int);
@@ -118,7 +118,7 @@ extern void stub_empty_4(void);
 extern int func_PAL_002945B8(int);
 extern void load_relocate_world_object_parts(void);
 extern void gfx_empty_stub(void);
-extern void func_PAL_002E5898(void);
+extern s32 func_PAL_002E5898(void);
 extern int sceGsSyncV(int);
 extern int snd_resume_music_stream(void);
 

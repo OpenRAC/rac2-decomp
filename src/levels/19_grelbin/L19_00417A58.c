@@ -11,7 +11,7 @@ extern int FloatToInt(float);
 extern void part_spawn_random_direction_effect(void *, float, float);
 /* The integer and floating argument banks retain their respective orders. */
 extern void gfx_draw_billboard_quad(void *, int, int, float, int, float, float);
-extern void part_spawn_fading_drift(void *, void *, int, int, int, int, int, int, float, float, float);
+extern char *part_spawn_fading_drift(void *, void *, int, int, int, int, int, int, float, float, float);
 
 /* Draws the Leviathan's charge-up flash in front of it and shoots sparks outward while the flash grows. */
 void leviathan_draw_charge_flash(char *moby)

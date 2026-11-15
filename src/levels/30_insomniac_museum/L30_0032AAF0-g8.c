@@ -64,7 +64,7 @@ extern char g_hero_state[];
 extern char *D_001B2D1C __attribute__((sda));
 extern void anim_start_blended(void *, int, int, int);
 extern void cam_reset_entry(int);
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
 extern void museum_info_stand_advance_state(char *);
 

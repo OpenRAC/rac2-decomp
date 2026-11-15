@@ -16,7 +16,7 @@ extern float D_L00_001B08F8 __attribute__((sda));
 extern float D_L00_0025C64C[];
 extern void ReleaseDeadOrExpiredSlots(void *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
-extern void func_PAL_L00_002C4480(int, int);
+extern s32 func_PAL_L00_002C4480(int, int);
 extern void hud_add_moby_marker(void *, unsigned int, int, int, int, int, float, float, float);
 extern int math_fast_float_d(void *);
 extern int vec_fast_helper_b(void *);

@@ -78,7 +78,7 @@ extern int D_L23_001AFA98 __attribute__((sda));
 extern int D_L23_001AFA9C __attribute__((sda));
 extern void func_PAL_L23_003C3258(Moby_003BF9B0 *);
 extern int boss_is_fight_state_four(void),boss_pick_random_ready_attack(void);
-extern int part_start_effect_default_table(int,int,int,int,float);
+extern void part_start_effect_default_table(int,int,int,int,float);
 extern void part_queue_impact_effect(int,int,int,int,int,float);
 extern int coll_sweep_from_object(void *,void *,int,int,int,int,float,float,float);
 extern u8 *func_PAL_L00_003FB330(void *,int,int,int,int,int,int,int,float,float,int,int,int,void *);

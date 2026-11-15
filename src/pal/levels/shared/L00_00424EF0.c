@@ -12,7 +12,7 @@ extern float math_random_signed_float_range(float a, float b);
 extern int FloatToInt(float a);
 extern float FastAddRotations(float a, float b);
 extern void vec_build_spherical_offset(float *p, float a, float b, float c);
-extern void func_PAL_002C23B8(float *out, float *in, int a2, int a3, unsigned int a4, int a5,
+extern void *func_PAL_002C23B8(float *out, float *in, int a2, int a3, unsigned int a4, int a5,
                            float f1, float f2, float f3, float f4, float f5);
 
 /* Points the level's fixed vector at the given position, then spawns twenty

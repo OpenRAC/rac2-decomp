@@ -12,7 +12,7 @@ extern LimitModel g_purchase_menu_model;
 extern int D_L00_001AD7A0 __attribute__((sda));
 extern int D_L00_001AD7A4;
 extern int save_count_items_above_baseline(void);
-extern unsigned char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int text_draw_centered_medium(int, int, long, unsigned char *, int);
 
 void func_US2_L00_0037A218(void)

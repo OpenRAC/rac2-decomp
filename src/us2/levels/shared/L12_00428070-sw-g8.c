@@ -40,7 +40,7 @@ extern int moby_check_target_point_from_offset(void *,void *);
 extern int moby_count_group_side_from_object(void *,int,int);
 extern void moby_turn_toward_target_limited(void *);
 extern float mat_fast_helper_a(float,float);
-extern void moby_start_effect_from_entry(void *,float);
+extern int moby_start_effect_from_entry(void *,float);
 extern int func_US2_002AF9C8(void *,float);
 extern int coll_test_hit_at_bone(void *,int,int,int,int,int,float,float,float);
 extern int coll_sweep_from_object(void *,void *,int,int,int,int,float,float,float);

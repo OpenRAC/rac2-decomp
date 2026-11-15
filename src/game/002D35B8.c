@@ -16,7 +16,7 @@ extern ClassRecord g_weapon_table[];
 
 extern void tab_menu_set_enabled(void *, int);
 extern int item_menu_get_selected_id(unsigned char *);
-extern char *item_menu_get_extra_value(char *);
+extern int item_menu_get_extra_value(char *);
 
 int menu_preview_copy_class_fields(char *object)
 {

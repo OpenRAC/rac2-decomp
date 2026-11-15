@@ -10,7 +10,7 @@ extern void gfx_draw_orbiting_sparks(char *);
 #define H(p,o) (*(short *)((char *)(p)+(o)))
 #define B(p,o) (*(unsigned char *)((char *)(p)+(o)))
 extern void FastVecScale(void *, void *, float);
-extern int part_spawn_object_following_effect(void *, void *, int, float, int, int, float, int, int, int);
+extern void *part_spawn_object_following_effect(void *, void *, int, float, int, int, float, int, int, int);
 extern float math_random_float_range(float,float);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *,float,float,float);
@@ -24,7 +24,7 @@ extern float vec_distance_xy(void *,void *);
 extern float fast_subtract_rotations(float,float);
 extern float math_random_signed_float_range(float,float);
 extern float fast_vec_dist(void *,void *);
-extern int part_find_owned_effect_slot(void *,int,int);
+extern void *part_find_owned_effect_slot(void *,int,int);
 extern void part_explode_object_into_pieces(void *,void *,void *,void *,int,int,int,int,int,int,int);
 extern void part_l00_spawn_spark_burst(void *,void *,float,void *,float,int,int,float,float,float);
 extern void SpawnExplosionEffects(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);

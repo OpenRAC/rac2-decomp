@@ -12,7 +12,8 @@ extern u8 *CreateMoby(int),*func_PAL_L02_0032D5F8(void *,int,void *,void *,int,i
 extern void moby_set_controller_speed_limits(u8 *,float,float,float,float);
 extern float path_l01_compute_segment_lengths(u8 *);
 extern int func_PAL_002B3F18(void *,void *,void *),enemy_select_path(void *,int,int);
-extern void moby_transform_joint_to_world(void *,int,void *),FastVecSub(void *,void *,void *),shared_counter_release(void *),moby_set_state(void *,int,int),func_PAL_L12_00417C90(void *,int,int,int);
+extern void FastVecSub(void *,void *,void *), shared_counter_release(void *), moby_set_state(void *,int,int), func_PAL_L12_00417C90(void *,int,int,int);
+extern void moby_transform_joint_to_world(void *,int,void *);
 void func_PAL_L12_004184A0(u8 *o) {
     u8 *d=*(u8 **)(o+0x68), *p,*pd; InitBytes bytes=D_L12_001B1848; float pos[4]; int i,j; u8 *parameters; float acceleration; int animation=9; float slow=0.006f;
     *(float *)(o+0x2C)*=D_L12_001B17F0;

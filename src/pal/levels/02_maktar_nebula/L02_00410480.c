@@ -47,9 +47,9 @@ void func_PAL_L02_00410480(u8 *a0, int a1) {
 }
 
 
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float,
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float,
                           int, int, int, int);
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 extern void vec_random_direction(void *, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);

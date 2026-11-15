@@ -40,7 +40,7 @@ extern void ref_L00_002B2CC8_0(int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern int FloatToInt(float);
 extern void func_PAL_L00_002A4D58(int);
-extern void hero_play_sound(int, int);
+extern int hero_play_sound(int, int);
 extern void hero_flatten_push_vector(void *, int, float, float);
 extern void cam_scale_view_space_height(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);

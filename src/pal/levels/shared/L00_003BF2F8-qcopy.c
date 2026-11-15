@@ -42,7 +42,7 @@ extern float IntToFloat(int ticks);
 extern int math_fast_float_d(void *timer);
 extern void make_hit_descriptor(void *packet, char *owner, int flags, void *direction, float amount);
 extern void QueueMobyImpact(char *target, void *packet);
-extern void func_PAL_0032F0B8(char *target, int kind, int value);
+extern int func_PAL_0032F0B8(char *target, int kind, int value);
 extern int PlayMobySound(int index, int mode, char *object);
 extern void func_PAL_L00_003C11A0(void *pos, void *direction, int count, unsigned int color);
 static inline Class3BBB68 *Class3BBB68At(int index)

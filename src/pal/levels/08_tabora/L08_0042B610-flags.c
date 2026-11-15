@@ -11,7 +11,7 @@ extern float FastVecLength(void *);
 extern float IntToFloat(int);
 extern float math_ease_out_quad(float);
 extern float math_turn_angle_toward_target(float,float,float,void *,float,float);
-extern void moby_move_and_collide(void *,void *,int,float,float,float);
+extern int moby_move_and_collide(void *,void *,int,float,float,float);
 
 int func_PAL_L08_0042B6D0(char *a,float accel,float speed,float turn,float blend,float angle) {
     float old[4] __attribute__((aligned(16)));

@@ -26,7 +26,7 @@ extern struct TtyInitState r1_D_00154B50;
 
 extern u8 r1_D_00154CC0[];
 
-extern s32 r1_func_00118D80();
+extern void r1_func_00118D80();
 
 extern s32 r1_func_00119868_tty(int) __asm__("func_0011BAC8");
 

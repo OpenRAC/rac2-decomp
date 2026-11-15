@@ -3,7 +3,7 @@
 typedef int Quad __attribute__((mode(TI)));
 typedef union { u8 b[0x2600]; s16 h[0x1300]; s32 i[0x980]; f32 f[0x980]; char *ptr[0x980]; Quad q[0x260]; } Hero;
 extern u8 g_hero_state[];
-extern float hero_resolve_stick_direction(int, float);
+extern void hero_resolve_stick_direction(int, float);
 /* The EE assigns the integer and floating arguments in separate register banks. */
 extern char *SelectBestTargetInCone(void *, void *, int *, int, int, int, float, float, float, float, float, int, void *);
 extern float mat_fast_helper_a(float, float);

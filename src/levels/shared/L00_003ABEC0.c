@@ -64,8 +64,8 @@ extern void homing_shot_spawn_explosion(char *, void *, char *);
 extern void part_emit_shot_trail(char *, void *);
 extern void moby_transform_offset_to_world(char *, void *);
 extern void shot_save_trail_transform(void);
-extern void StartAttachedEffect(void *, int, int);
-extern void part_spawn_blast_effect_moby(char *, char *, void *, float);
+extern int StartAttachedEffect(void *, int, int);
+extern char *part_spawn_blast_effect_moby(char *, char *, void *, float);
 
 /* A homing shot: follows its target (turning at most as far as its speed allows), records
    its path, tests the step for a hit and explodes on contact, out of the arena or too far

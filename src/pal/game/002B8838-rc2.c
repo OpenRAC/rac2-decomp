@@ -3,7 +3,7 @@
 extern s16 g_music_state[];
 extern void snd_update_music_system(void);
 extern void snd_clear_flag_and_update(void);
-extern void snd_Pump(void);
+extern int snd_Pump(void);
 extern void snd_set_current_buffer_flag(void);
 extern void mem_fast_helper_a(s32);
 

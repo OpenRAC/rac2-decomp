@@ -9,7 +9,7 @@ extern float math_random_signed_float_range(float, float);
 extern int FloatToInt(float);
 extern float FastAddRotations(float, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
-extern void func_PAL_002C23B8(float *, float *, int, int, unsigned int, int,
+extern void *func_PAL_002C23B8(float *, float *, int, int, unsigned int, int,
                           float, float, float, float, float);
 extern float math_random_float_range(float, float);
 

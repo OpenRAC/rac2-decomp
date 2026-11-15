@@ -55,7 +55,7 @@ extern int coll_test_point(void *, int, void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(char *, void *);
-extern void StartAttachedEffect(void *, int, int);
+extern int StartAttachedEffect(void *, int, int);
 extern void EmitRingAndDirectionalParticles(char *, int, void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
 extern float math_random_angle(void);

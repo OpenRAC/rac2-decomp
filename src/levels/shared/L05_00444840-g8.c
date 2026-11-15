@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern void gfx_convert_float_pair_bias_coords(void *, int *, int *, int);
-extern int moby_get_private_value_0(u8 *);
+extern char *moby_get_private_value_0(u8 *);
 extern int subtract_integer_with_clamp(int);
 extern float IntToFloat(int);
 extern float fast_vec_dist(void *, void *);

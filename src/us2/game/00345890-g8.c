@@ -5,7 +5,7 @@
 
 extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, char *);
-extern void sprintf(char *, const char *, ...);
+extern int sprintf(char *, const char *, ...);
 extern void hud_set_widget_field_a(void *, int);
 extern void func_US2_003378A0(void *);
 extern int func_US2_002B1C20(void);

@@ -38,17 +38,20 @@ extern int D_L16_001B16C0, D_L16_001A8FB4;
 extern int D_L16_001A8FB0 __attribute__((sda));
 extern int D_L16_001B1A80 __attribute__((sda));
 extern float D_L16_001B1A90 __attribute__((sda)), D_L16_001B1A94 __attribute__((sda));
-extern void moby_mark_spawned(char *), coll_get_ground_distance_below(char *, char *, char *), moby_set_state(char *, int, int);
-extern void func_PAL_00289730(int, int), matrix_mul_vec3(char *, char *, char *), FastVecAdd(char *, char *, char *);
+extern void moby_mark_spawned(char *), moby_set_state(char *, int, int);
+extern float coll_get_ground_distance_below(char *, char *, char *);
+extern void matrix_mul_vec3(char *, char *, char *), FastVecAdd(char *, char *, char *);
+extern int func_PAL_00289730(int, int);
 extern int flag_set_first_pending(char *), PlayMobySound(int, int, char *);
 extern void func_PAL_L00_002B9CD8(char *, char *, int, int), SetCamera5Pose(char *, char *, int, int, int);
 extern float math_fabs(float), vec_distance_xy(char *, char *), mat_fast_helper_a(float, float), FastAddRotations(float, float), fast_subtract_rotations(float, float), FastDiffRots(float, float);
-extern void math_step_value_toward_target(float *, float *, float, float, float, float);
-extern void math_approach_target_with_direction_mode(float *, float *, float, float, float, float, int);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
+extern f32 math_approach_target_with_direction_mode(float *, float *, float, float, float, float, int);
 extern void snd_stop_voice(int), turret_set_camera_matrices(char *), func_PAL_L16_0041C1F0(char *), cam_update_turret_follow(char *), func_PAL_L16_0041C470(char *), turret_reset_camera_state(char *), func_PAL_L16_0041BF40(char *);
 extern void hud_add_moby_marker(char *, unsigned, int, int, int, int, float, float, float);
 extern char *part_find_owned_effect_slot(char *, int, int);
-extern void ApproachValue(float *, float, float), func_PAL_L00_002A4D58(int), func_PAL_L00_0030E648(int);
+extern void func_PAL_L00_002A4D58(int), func_PAL_L00_0030E648(int);
+extern f32 ApproachValue(float *, float, float);
 extern int FloatToInt(float);
 
 void func_PAL_L16_0041B7E8(char *self) {

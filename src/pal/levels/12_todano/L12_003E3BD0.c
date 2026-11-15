@@ -23,7 +23,7 @@ extern u8 D_001A7A40 MACRO_ADDR;
 extern u32 D_001397DC, D_00138324;
 extern u8 D_L12_001C0000[];
 extern u8 *CreateMoby(int);
-extern u8 *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern s32 *D_L12_001FEAC0[];
 extern s32 point_in_path_xy(void *, void *, s32);
 

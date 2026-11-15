@@ -29,26 +29,26 @@ int snd_send_cmd36(int value)
 /* func_001336C0 is matched in its own unit, src/core/001336C0.c (-O2 -G8 -ffunction-sections). */
 
 
-extern int snd_queue_command(int, int, void *, int, int);
+extern void snd_queue_command(int, int, void *, int, int);
 
 /* Sends sound command 81 with two values. */
-int snd_send_cmd51(int first, int second) {
+void snd_send_cmd51(int first, int second) {
     int payload[4];
     payload[0] = first;
     payload[1] = second;
-    return snd_queue_command(81, 8, payload, 0, 0);
+    snd_queue_command(81, 8, payload, 0, 0);
 }
 
-extern int snd_queue_command(int, int, void *, int, int);
+extern void snd_queue_command(int, int, void *, int, int);
 
 /* Sends sound command 16 with four values. */
-int snd_send_cmd10(int first, int second, int third, int fourth) {
+void snd_send_cmd10(int first, int second, int third, int fourth) {
     int payload[4];
     payload[0] = first;
     payload[1] = second;
     payload[2] = third;
     payload[3] = fourth;
-    return snd_queue_command(16, 16, payload, 0, 0);
+    snd_queue_command(16, 16, payload, 0, 0);
 }
 
 

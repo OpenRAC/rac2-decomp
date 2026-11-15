@@ -25,7 +25,7 @@ extern int FloatToInt(float);
 extern int FastTweenColor(int, int, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void hero_queue_glow_point(void *, int, float, float);
-extern void part_spawn_object_following_effect(void *, void *, int, float, int, int, float, int, int, int);
+extern void *part_spawn_object_following_effect(void *, void *, int, float, int, int, float, int, int, int);
 
 #define ARMED(k) (F(D_L00_00262570 + D_00139568[k] * 0xE0, u8, 4) != 0)
 #define CAP(a, m) ((a) < (m) ? (a) : (m))

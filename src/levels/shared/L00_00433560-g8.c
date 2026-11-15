@@ -2,12 +2,12 @@
 #include "names.h"
 
 extern void prompt_bar_init(char *p, void *argument, void *table);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts(char *p, int a, int b, int c);
 extern void prompt_bar_set_text_offsets(char *p, float a, float b, float c, float d, float e, float f);
 extern void prompt_bar_set_spacing(char *p, float f);
 extern int *ui_return_second_arg(int size, int count);
-extern int pool_alloc_cell(void *argument);
+extern void *pool_alloc_cell(void *argument);
 
 extern int menu_update_two_part_flags_b(char *object, int flags);
 extern int menu_update_two_part_flags_c(char *object, int flags);

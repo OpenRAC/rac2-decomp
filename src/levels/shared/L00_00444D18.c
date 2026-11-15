@@ -13,9 +13,9 @@ extern int mpeg_is_audio_primed(char *);
 
 extern void mpeg_update_audio_if_active(int *);
 
-extern void mpeg_save_ipu_dma_state(char *);
+extern int mpeg_save_ipu_dma_state(char *);
 
-extern void mpeg_restore_ipu_dma_state(char *);
+extern int mpeg_restore_ipu_dma_state(char *);
 
 /* Loads the resident pointer word, adds 0xD9100, and calls the update helper with it. */
 int load_call_resident_update(void)

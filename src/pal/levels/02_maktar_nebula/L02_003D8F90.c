@@ -3,8 +3,8 @@
 
 
 typedef int TI128 __attribute__((mode(TI)));
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
-extern void math_approach_target_with_direction_mode(char *, char *, float, float, float, float, int);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_approach_target_with_direction_mode(char *, char *, float, float, float, float, int);
 extern void math_update_wrapped_angle_offset(char *, char *, char *, float, float, float);
 
 void func_PAL_L02_003D9090(char *arg0, TI128 *arg1, float arg2, float arg3) {

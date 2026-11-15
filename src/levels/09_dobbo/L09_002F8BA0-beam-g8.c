@@ -24,7 +24,7 @@ extern char *g_hero_moby NOT_SDA;
 extern float math_square(float);
 extern void moby_mark_spawned(void *);
 extern int ReleaseRecordSlot(void *);
-extern void UpdateBeamLinkRecord(void *, void *);
+extern int UpdateBeamLinkRecord(void *, void *);
 extern void moby_blend_pos_toward_target(unsigned char *, float);
 extern void moby_rescale_vector(unsigned char *);
 extern float vec_distance_xy(void *, void *);

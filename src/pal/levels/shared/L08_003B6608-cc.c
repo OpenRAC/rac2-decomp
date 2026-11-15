@@ -111,7 +111,7 @@ extern void moby_mark_spawned(void *);
 extern float FastVecLength(void *);
 extern u8 *part_spawn_velocity_particle(void *, void *, int, int, float);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
-extern void coll_process_hit(void *, float, int, void *, void *);
+extern int coll_process_hit(void *, float, int, void *, void *);
 void func_PAL_L08_003B6608(char *obj) {
     struct { Vec old; CollisionInput collision; Vec velocity, random; } frame;
     CollisionInput *input;

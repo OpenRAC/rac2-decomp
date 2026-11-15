@@ -5,14 +5,14 @@ extern char *D_L20_001B2F9C_1 __attribute__((sda));
 extern float D_L20_001B2ACC __attribute__((sda));
 extern char D_L20_001A8F20[];
 extern char D_L20_001A8F20_1[];
-extern int part_find_owned_effect_slot(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 extern void moby_set_state(char *, int, int);
 extern void vec_local_offset_to_world(char *, char *, f32, f32, f32);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
                          float, float, float, float, int, float, int, int, int, int, int);
 extern void func_PAL_002B15D8(char *, int, float *, float, float, float, float, unsigned char);
 extern void func_PAL_L00_003281C0(char *, int, f32);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern int flag_set_first_pending(char *);
 extern int math_fast_float_d(char *);
 extern void moby_mark_spawned(char *);

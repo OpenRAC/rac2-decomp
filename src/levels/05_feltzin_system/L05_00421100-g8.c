@@ -65,7 +65,7 @@ extern void func_0037ADD8(f32 a0);
 extern void func_003719A8(s32 a0, s32 a1, void *a2, s32 a3);
 extern void effect_set_enabled(void *moby, s32 a1);
 extern void effect_set_color(void *moby, u32 color);
-extern s32 pickup_spawn_if_not_taken(void *pos, s32 a1, s32 a2, s32 a3);
+extern char *pickup_spawn_if_not_taken(void *pos, s32 a1, s32 a2, s32 a3);
 
 /* Mission 3 of the Feltzin dispatcher: gates (class 0x114A) are spawned along the selected path,
    two at a time, each facing along the path. When the player's or the second tracked position's

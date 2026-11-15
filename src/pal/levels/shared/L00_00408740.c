@@ -28,7 +28,7 @@ extern int CollLine(void *, void *, int, void *, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, float, int, void *);
 extern void QueueMobyImpact(void *, void *);
-extern void func_PAL_0032F0B8(void *, int, int);
+extern int func_PAL_0032F0B8(void *, int, int);
 extern void func_PAL_L00_00408D50(void *, int, int);
 extern int snd_play_from_class_bank(int, int, void *, int);
 

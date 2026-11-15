@@ -3,7 +3,7 @@
 #include "common.h"
 extern s8 D_0026C550[];
 extern s8 coll_convert_packed_points_to_vectors(void *, s8 *, s32);
-extern void moby_get_joint_matrix(void *, s8 *, s8 *, s16);
+extern int moby_get_joint_matrix(void *, s8 *, s8 *, s16);
 extern s32 func_PAL_00273BB0(void *);
 extern s32 func_PAL_00273D38(void *);
 extern s32 stub_return_one_a(void *);

@@ -54,7 +54,7 @@ extern void level_capture_checkpoint_state(void *, void *);
 
 extern void moby_mark_spawned(void *);
 
-extern void MemcardSave(s32, s32);
+extern int MemcardSave(s32, s32);
 
 extern void snd_play_unplayed_voice_line(u8 *, s32, s32);
 extern void RequestVoiceLine(u8 *, s32);
@@ -131,7 +131,7 @@ extern void moby_set_controller_speed_limits(void *, float, float, float, float)
 extern s32 FloatToInt(float);
 extern s32 D_L16_001B2648 MACRO_ADDR;
 extern float math_fast_sin_or_cos_b(float);
-extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void snivelak_emit_fire_burst(u8 *);
 extern void moby_update_ground_check(void *);
 extern s32 moby_apply_damage_to_object(void *, void *, s32);
@@ -507,14 +507,14 @@ void snivelak_clean_up_boss_and_free(char *moby) {
 
 extern void quaternion_to_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
-extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 coll_test_point(void *, s32, void *, float);
-extern void part_spawn_blast_effect_moby(void *, void *, void *, float);
-extern void coll_sweep_from_object(void *, void *, s32, s32, s32, s32, float, float, float);
+extern char *part_spawn_blast_effect_moby(void *, void *, void *, float);
+extern int coll_sweep_from_object(void *, void *, s32, s32, s32, s32, float, float, float);
 extern void mat_get_euler_angles(void *, void *);
 extern void vec_random_direction(void *, float, float);
 extern float math_random_float_range(float, float);
-extern void cam_moby_create(void *, s32, s32, s32, void *, void *, void *, s32, float, float);
+extern char *cam_moby_create(void *, s32, s32, s32, void *, void *, void *, s32, float, float);
 
 /* State 0: moves by the state's velocity and frees itself when the state's timer (+0x30)
    runs out, unless +0x31 is set. State 2: moves, lowers the velocity's third component by

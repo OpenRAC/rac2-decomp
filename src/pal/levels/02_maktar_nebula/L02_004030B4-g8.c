@@ -86,7 +86,7 @@ extern void VU1_addGSregister(u32, u64);
 extern void gfx_append_draw_list_packet_c(void);
 extern void gfx_draw_scaled_object_two_axes(char *, f32, s32, f32, f32, f32, f32);
 extern void hud_draw_boss_health_bar(f32);
-extern char *table_find_by_id(s32, s32);
+extern void *table_find_by_id(s32, s32);
 extern s32 func_001157AC(char *);
 extern s32 sprintf(char *, char *, ...);
 

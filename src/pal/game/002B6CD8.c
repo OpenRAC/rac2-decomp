@@ -5,7 +5,7 @@ typedef struct { float x; float y; int pad[2]; } T16_Fd6e0d08a;
 extern void *func_L00_0032C638_1(void *, void *);
 extern int path_set_follower_nodes(void *, void *, int, int);
 extern float func_00283248_9(float, float);
-extern void moby_step_controller(void *, void *, float);
+extern int moby_step_controller(void *, void *, float);
 extern float func_00282E80_4(void *, void *);
 
 /* Computes the x/y difference between one 16-byte record of the second handle and the record after the first handle's base, dispatches through three helpers and walks a short counter field up or down by one when the last helper's float result stays under a stored threshold. */

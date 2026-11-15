@@ -5,7 +5,7 @@ extern u8 D_L19_001A8F20[] MACRO_ADDR;
 extern void moby_pick_random_point_around(void *, void *);
 extern int math_random_int_range(int, int);
 extern int FastTweenColor(int, int, float);
-extern void part_spawn_size_changing(void *, void *, int, int, int, int, int, float, float, float, int);
+extern char *part_spawn_size_changing(void *, void *, int, int, int, int, int, float, float, float, int);
 
 /* Makes puffs of dust around the object as its dust counter fills up. */
 void part_spawn_dust_puffs(char *moby)

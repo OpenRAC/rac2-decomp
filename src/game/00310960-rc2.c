@@ -24,7 +24,7 @@
  */
 #include "common.h"
 
-extern s32 CreateMoby();
+extern char *CreateMoby();
 extern void moby_transform_joint_to_world();
 extern void set_moby_color();
 extern void func_002A0F48();

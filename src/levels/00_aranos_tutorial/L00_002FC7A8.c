@@ -67,7 +67,7 @@ extern void set_moby_color(void *, unsigned char, unsigned char, unsigned char);
 extern char g_hero_position[];
 extern int IsPointInCuboid(char *, unsigned int);
 extern void moby_mark_spawned(void *);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 
 extern unsigned char D_00139574;
 extern void FastVecScale(void *, void *, float);
@@ -101,7 +101,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
-extern void part_spawn_spark_2(void *, void *, int, int);
+extern void *part_spawn_spark_2(void *, void *, int, int);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_fast_float_d(void *);
@@ -713,7 +713,7 @@ void aranos_drift_update(AranosMoby *obj) {
 /* func_L00_003CF610 is defined in L00_003CF610-update.c. */
 
 extern float math_random_signed_float_range(float, float);
-extern void math_spring_float_to_goal(float *, float *, float, float, float, float);
+extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 
 /* Slowly turns the object to random angles and pauses between turns. */
 void random_turner_update(char *obj) {

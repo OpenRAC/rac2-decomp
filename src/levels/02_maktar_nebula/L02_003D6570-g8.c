@@ -14,7 +14,7 @@ extern unsigned int D_L02_001B0330 __attribute__((sda));
 extern float D_L02_001B0334 __attribute__((sda));
 extern float g_camera_l02_position[4];
 
-extern void *moby_transform_joint_to_world(char *, int, void *);
+extern void moby_transform_joint_to_world(char *, int, void *);
 extern void moby_transform_joint_point(char *, int, void *);
 extern void transform_vector(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);

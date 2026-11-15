@@ -9,7 +9,7 @@ typedef struct {
     unsigned int first, second;
     int index, pending;
 } Handles_2DCB28;
-extern void snd_pump_music_and_disc_read(int);
+extern short snd_pump_music_and_disc_read(int);
 
 int func_PAL_002DAFF0(Handles_2DCB28 *object) {
     object->first = release_menu_stream_buffer(object->first);

@@ -25,7 +25,7 @@
  */
 #include "common.h"
 
-extern s32 snd_queue_command();
+extern void snd_queue_command();
 
 /* Sends sound command 0x15 with one value. */
 void snd_send_cmd15(s32 value) {

@@ -16,7 +16,7 @@ void hud_set_widget_value_pair(u8 *obj,s32 x,s32 y) {
 /* reads a float through double indirection and returns its integer value; byte-identical across all 27 levels. */
 s32 hud_get_widget_value_int(u8 *obj) { return (s32)*(f32 *)(*(u8 **)(obj + 0x34)); }
 
-extern void object_init_base(void *);
+extern void *object_init_base(void *);
 extern char D_001ADA18[] __attribute__((sda));
 
 /* Starts building a UI element and sets its type pointer. */
@@ -65,11 +65,11 @@ void hud_set_widget_field_b(int obj, unsigned int value)
   return;
 }
 
-extern void text_measure_width_scaled(void *a0, s32 a1, void *a2, f32 a3);
+extern int text_measure_width_scaled(void *a0, s32 a1, void *a2, f32 a3);
 
 /* Draws the element's text using its stored data and scale. */
-void hud_draw_widget_text(u8 *obj)
+int hud_draw_widget_text(u8 *obj)
 {
-    text_measure_width_scaled(*(void **)(obj + 0x40), -1, *(void **)(obj + 0x34), *(f32 *)*(void **)(obj + 4));
+    return text_measure_width_scaled(*(void **)(obj + 0x40), -1, *(void **)(obj + 0x34), *(f32 *)*(void **)(obj + 4));
 }
 

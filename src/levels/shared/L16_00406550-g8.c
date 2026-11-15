@@ -33,7 +33,7 @@ extern void FastVecScale(void *, void *, float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern u8 *part_spawn_trail_2(void *, void *, int, float);
-extern void part_spawn_shockwave_ring(void *, void *, void *, int, int, int, int, int, float);
+extern char *part_spawn_shockwave_ring(void *, void *, void *, int, int, int, int, int, float);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, int, int, int, int, int, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern u8 *SpawnSpinningSparkParticle(void *, float, float, int, void *, int, int, float, float);

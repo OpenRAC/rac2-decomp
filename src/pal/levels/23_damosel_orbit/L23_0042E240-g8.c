@@ -24,7 +24,7 @@ extern s32 coll_process_hit(float, void *, s32, u8 *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void vec_clear_128(void *);
 extern s32 snd_start_in_slot(s32, s32, s32);
-extern void SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float, s32, s32, s32, s32);
+extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float, s32, s32, s32, s32);
 extern void moby_mark_spawned(u8 *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void gfx_add_draw_callback_third(void *, u8 *);

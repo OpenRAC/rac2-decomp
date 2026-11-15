@@ -1,11 +1,11 @@
 #include "include_asm.h"
 #include "common.h"
-extern s32 part_l17_spawn_fading(f32, s32, s32, s32);
+extern u8 *part_l17_spawn_fading(f32, s32, s32, s32);
 extern f32 D_L17_001B04B8 __attribute__((sda));
 extern void moby_set_state(void *, s32, s32);
-extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
-extern void SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
+extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
 extern void moby_mark_spawned(void *);
 extern s32 D_L17_001B1E00 __attribute__((sda));
 extern s32 D_L17_001B1DE0 __attribute__((sda));
@@ -54,8 +54,8 @@ extern char *g_moby_l17_pool;
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float math_fabs(float);
-extern int moby_get_private_value_2(void *);
-extern void moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
+extern char *moby_get_private_value_2(void *);
+extern int moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecDot(void *, void *);

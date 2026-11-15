@@ -18,7 +18,7 @@ extern float math_random_float_range(float lo, float hi);
 extern void *part_spawn_gravity_fade(void *, void *, float, float, float, int, int, int, int, int,
                            int);
 extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int, int);
-extern void func_PAL_L00_003FB330(void *a0, int a1, int a2, int a3, int a4, int a5, int a6,
+extern char *func_PAL_L00_003FB330(void *a0, int a1, int a2, int a3, int a4, int a5, int a6,
                           int a7, float f12, float f13, int s1, int s2, int s3,
                           int s4);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);

@@ -3,7 +3,7 @@
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float coll_get_heightmap_height(void *);
-extern void snd_set_slot_field(int, int);
+extern int snd_set_slot_field(int, int);
 extern int snd_start_from_table_entry(int, int, void *, int);
 
 extern struct {

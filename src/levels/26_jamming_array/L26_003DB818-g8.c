@@ -25,7 +25,7 @@ extern int flag_set_first_pending(unsigned char *);
 extern int math_random_int_below(int);
 extern void anim_start_blended(void *, int, int, int);
 extern int moby_check_target_point_from_offset(char *, void *);
-extern void moby_aim_at_target_offset(char *, char *);
+extern int moby_aim_at_target_offset(char *, char *);
 extern float coll_sample_height_at_position(unsigned char *, void *, void *);
 extern float math_fabs(float);
 extern float moby_get_anim_value(char *);

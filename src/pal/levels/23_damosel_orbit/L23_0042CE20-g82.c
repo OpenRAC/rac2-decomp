@@ -7,7 +7,7 @@ extern s32 g_hero_moby __attribute__((nosda));
 extern float D_L23_001B36FC;
 extern char D_L23_001BA500[];
 extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
-extern void FastDecTimer(u8 *);
+extern int FastDecTimer(u8 *);
 extern s32 mothership_is_attack_state(void);
 extern s32 mothership_is_held(void);
 extern void func_PAL_L23_00423838(void);

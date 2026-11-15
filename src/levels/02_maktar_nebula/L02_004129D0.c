@@ -39,7 +39,7 @@ extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
 extern int math_random_int_range(int, int);
 extern void lerp_vector(void *, void *, void *, float);
-extern void part_spawn_hero_relative(void *, void *, int, int, int, int, float);
+extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
 
 /* Draw callback that func_L02_004124A0 registers while the actor's fade (+0xC of its block at
    +0x68) is nonzero. A point 1.5 in front of the actor (matrix at +0xC0, position at +0x10) is

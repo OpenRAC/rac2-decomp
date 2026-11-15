@@ -28,7 +28,7 @@ extern SubtitleHistory g_subtitle_history[];
 extern void moby_set_state(void *, int, int);
 extern f32 math_random_float_range(f32 low, f32 high);
 extern int PlayMobySound(int index, int a1, char *a2);
-extern void subtitle_request_voice_line(int, int);
+extern int subtitle_request_voice_line(int, int);
 extern f32 FastVecDot(void *, void *);
 extern void func_PAL_L22_003CD898(char *);
 extern void spark_lane_draw(u8 *);

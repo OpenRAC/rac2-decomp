@@ -33,7 +33,7 @@ extern int func_US2_00299960(void);
 extern int func_US2_00299968(void);
 extern void save_start_to_slot(int, int);
 extern void menu_set_confirm_pending(void);
-extern void menu_send_request(int, char *);
+extern int menu_send_request(int, char *);
 extern int request_begin_slot(int, int, int, int, int);
 extern int menu_get_counter(void);
 extern int menu_get_mode(void);

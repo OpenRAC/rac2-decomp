@@ -15,7 +15,7 @@ int func_US2_L00_0034FD48(void)
 }
 
 extern int D_00138344;
-extern void module_l00_call_handler_with_arg_9(int a);
+extern int module_l00_call_handler_with_arg_9(int a);
 
 int func_US2_L00_0034FDD0(void)
 {

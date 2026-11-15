@@ -70,7 +70,7 @@ extern void hero_check_targeting_triggers(void);
 extern void UpdateHeroAimAndTransitions(void);
 extern int hero_is_in_swing_or_grind_mode(void);
 extern void coll_clear_map_bits_around_pos(void *);
-extern int func_002A677C(void *);
+extern void func_002A677C(void *);
 extern void UpdateHeroBlinkAndItemTint(void);
 extern void UpdateHeroMobyProbedHeightBounds(void);
 

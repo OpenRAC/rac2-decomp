@@ -23,7 +23,7 @@ extern float moby_update_aim_target_strength(u8 *, void *);
 extern float ApproachValue(float *, float, float);
 extern void snd_stop_voice(int);
 extern void snivelak_play_voice_cues(u8 *);
-extern void weapon_select_aim_target(u8 *, int, void *, void *, float, float);
+extern int weapon_select_aim_target(u8 *, int, void *, void *, float, float);
 
 /* Initializes the boss hierarchy and applies damage, phase changes and speech. */
 void UpdateSnivelakBossDamage(u8 *moby)

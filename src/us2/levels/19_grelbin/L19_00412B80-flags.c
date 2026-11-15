@@ -16,7 +16,7 @@ typedef struct { u8 prefix[0x30]; float position[4]; u8 middle[0x30]; float rota
 extern Transform *g_waypoint_table MACRO_ADDR;
 extern u8 *g_moby_l18_table;
 extern int D_L18_001B9A80 NOT_SDA;
-extern int moby_set_state(void *,int,int);
+extern void moby_set_state(void *,int,int);
 extern int coll_point_inside_region(void *,int);
 extern void moby_mark_spawned(void *);
 extern int flag_is_third_pending_set(void *),flag_set_first_pending(void *);

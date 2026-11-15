@@ -2,9 +2,9 @@
 
 extern void SetupGifPaging(int);
 extern void DoGifPaging(void);
-extern s32 GetLocalizedString(s32);
+extern char *GetLocalizedString(s32);
 extern void func_PAL_0029CEC8(void);
-extern int text_draw_right_aligned_small(int v, int p7, unsigned long long k, char *r, int m1);
+extern void text_draw_right_aligned_small(int v, int p7, unsigned long long k, char *r, int m1);
 extern int D_PAL_001ABA98 __attribute__((sda));
 extern int D_PAL_001ABA9C[] __attribute__((sda));
 

@@ -37,7 +37,7 @@ typedef struct AnimationState310D30 {
 } AnimationState310D30;
 extern void level_build_data_block(AnimationState310D30 *, int, int, unsigned char *);
 extern void func_002A1130(unsigned char *, unsigned int, unsigned char *, int);
-extern int FlushCache(int);
+extern void FlushCache(int);
 extern void func_L00_00314D40(AnimationState310D30 *);
 void AdvanceAndDecodeAnimationFrames(void *unused, AnimationState310D30 *state)
 {

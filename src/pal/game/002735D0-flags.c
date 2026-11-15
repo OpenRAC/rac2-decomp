@@ -3,7 +3,7 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
 extern char *CreateMoby(int);
-extern unsigned char *moby_get_private_value_4(void *);
+extern char *moby_get_private_value_4(void *);
 extern void moby_init_child_from_parent(void *, void *);
 extern void moby_set_light_color(void *, unsigned int);
 extern void euler_rotation_basis(void *, void *);

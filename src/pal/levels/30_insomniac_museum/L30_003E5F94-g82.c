@@ -45,10 +45,10 @@ extern float D_L00_001B06BC __attribute__((sda)), D_L00_001B06C0 __attribute__((
 extern void func_PAL_002A7E68(void *,int,int,int);
 extern void AttachManipulator(void *,int,void *);
 extern int AcquireEntitySlot(void *,int,void *);
-extern int level_get_slot_body(int,int);
+extern u8 *level_get_slot_body(int,int);
 extern float math_random_signed_float_range(float,float), math_random_float_range(float,float);
 extern void vec_clear_128(void *), sheepinator_clear_records(void);
-extern void func_PAL_L00_002C4480(int,int);
+extern s32 func_PAL_L00_002C4480(int,int);
 extern int math_fast_float_d(void *), get_ammo(int);
 extern void hud_add_moby_marker(void *,unsigned int,float,void *,float,int,int,float,int);
 extern void moby_transform_joint_to_world(void *,int,void *);
@@ -59,7 +59,7 @@ extern void cam_compute_view_direction(void *,void *,int),moby_forward_position_
 extern void FastVecScale(void *,void *,float),FastVecAdd(void *,void *,void *);
 extern float fast_vec_dist(void *,void *),math_fabs(float);
 extern int vec_fast_helper_b(void *),sheepinator_is_mode_four(void),weapon_spend_ammo(int,int);
-extern void PlayMobySound(int,int,void *);
+extern int PlayMobySound(int,int,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern int coll_process_hit(void *,int,void *,int,float);
 extern void FastVecSub(void *,void *,void *);

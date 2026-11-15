@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void menu_update_entry_states(int *);
+extern int menu_update_entry_states(int *);
 extern int menu_list_active_entries(unsigned int, unsigned int, unsigned int, int);
 extern int D_001C51D0;
 typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;

@@ -39,7 +39,7 @@ extern int g_pad_state[];
 extern void snd_play_menu_sound_if_enabled(int, int);
 
 /* Qwen draft (branch qwen/autonomy, 385de342), checked by tools/check.py */
-void menu_process_request(short param_1, int param_2, int *param_3);
+int menu_process_request(short param_1, int param_2, int *param_3);
 
 /* func_002D7AC8: owner ABI/declaration review retained. */
 extern int D_001C51D4;
@@ -48,7 +48,7 @@ extern void F70997ba9_FUN_002FC560(int a, int b);
 
 extern void F70997ba9_FUN_0027C540(int a);
 
-extern void *F70997ba9_FUN_00288FB8(int id);
+extern char *F70997ba9_FUN_00288FB8(int id);
 
 extern int F70997ba9_FUN_0027F198(void *p, int i);
 
@@ -62,7 +62,7 @@ extern void F70997ba9_FUN_0027C660(void);
 
 typedef int s32;
 
-extern s32 menu_stream_chunk_claim_free (s32);
+extern char *menu_stream_chunk_claim_free (s32);
 
 /* Qwen draft (branch qwen/autonomy, f0b23b24), checked by tools/check.py */
 typedef unsigned long long undefined8;
@@ -92,15 +92,15 @@ extern signed char D_L01_001ABE90[];
 
 extern signed char D_L01_001ABE98[];
 
-extern int menu_stream_chunk_table_init(int);
+extern void menu_stream_chunk_table_init(int);
 
-extern int func_002DE550_1(int);
+extern char *func_002DE550_1(int);
 
-extern int menu_clear_block_fields(void);
+extern void menu_clear_block_fields(void);
 
-extern int level_clear_first_table_entry(void);
+extern void level_clear_first_table_entry(void);
 
-extern int popup_set_flag_on(int);
+extern void popup_set_flag_on(int);
 
 extern int D_L00_001A904C_8 __attribute__((sda));
 
@@ -155,7 +155,7 @@ int menu_cancel_map_selection(void)
     return 0;
 }
 
-extern void menu_update_entry_states(int *);
+extern int menu_update_entry_states(int *);
 extern int menu_list_active_entries(unsigned int, unsigned int, unsigned int, int);
 extern int D_001C51D0;
 typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;
@@ -683,7 +683,7 @@ typedef struct {
     int index, pending;
 } Handles_2DCB28;
 
-extern void snd_pump_music_and_disc_read(int);
+extern short snd_pump_music_and_disc_read(int);
 
 /* Resets the object stream handles and selection to -1 and starts a stream step. */
 int menu_stream_handles_reset(Handles_2DCB28 *object) {
@@ -747,7 +747,7 @@ typedef struct {
 extern unsigned char g_item_owned_flags[];
 extern unsigned char D_001395B8[];
 extern int request_is_current_slot(int);
-extern unsigned char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void SetupGifPaging(int);
 extern void DoGifPaging(void);
 extern void text_draw_window_medium(TextWindow2DA9A8 *, long, unsigned char *, int);

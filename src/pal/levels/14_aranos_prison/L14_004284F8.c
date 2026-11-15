@@ -20,10 +20,10 @@ void func_PAL_L14_004284F8(char *a0)
 }
 
 
-extern void moby_step_at_own_position_factor(char *object, float factor);
-extern void moby_step_at_own_position(char *object);
-extern void moby_step_controller(char *object, char *bone, float factor);
-extern void moby_turn_toward_target_and_step(char *object, char *bone, float factor);
+extern int moby_step_at_own_position_factor(char *object, float factor);
+extern int moby_step_at_own_position(char *object);
+extern int moby_step_controller(char *object, char *bone, float factor);
+extern int moby_turn_toward_target_and_step(char *object, char *bone, float factor);
 extern void *jtbl_002AA360[];
 
 /* Dispatches on the owner's animation step and plays the matching bone animation. */

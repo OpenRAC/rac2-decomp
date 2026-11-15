@@ -65,7 +65,7 @@ extern float math_random_signed_float_range(float, float);
 extern int FloatToInt(float);
 extern float FastAddRotations(float, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
-extern void part_spawn_burst(float *, float *, int, int, unsigned int, int,
+extern void *part_spawn_burst(float *, float *, int, int, unsigned int, int,
                           float, float, float, float, float);
 
 /* Fifteen times over: take the angle of the constant vector at D_L00_001B8DC0 and the point,
@@ -200,7 +200,7 @@ void trigger_linked_records_update(unsigned char *self)
 }
 
 
-extern int bouncer_spawn_debris_object(int, int, int);
+extern void *bouncer_spawn_debris_object(int, int, int);
 
 /* Spawns a piece of debris and remembers which object launched it. */
 int bouncer_spawn_debris(int owner, int position, int velocity)
@@ -219,7 +219,7 @@ extern void vec_random_direction(char *, float, float);
 extern char *SpawnSpinningSparkParticle(float, float, float, float, char *, int, char *,
                      unsigned int, int);
 extern void vec_scale_to_length(void *, void *, float);
-extern void moby_spawn_template_effect(void *, void *, void *, void *);
+extern char *moby_spawn_template_effect(void *, void *, void *, void *);
 extern char ref_L00_003FE310_00[];
 
 /* Twenty rounds that spawn a particle at the second argument: each round draws a radius

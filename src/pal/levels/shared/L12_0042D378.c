@@ -4,7 +4,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern void mat_get_euler_angles(void *, void *);
 extern void func_PAL_002A7650(void *, int, int);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_002AD288(void *, void *, int, float, float);

@@ -2,7 +2,7 @@
 
 extern void *moby_find_record_by_handle_id(int target);
 extern void cam_switch_active(void *target);
-extern void cam_follow_update_target(void *target, void *a1);
+extern int cam_follow_update_target(void *target, void *a1);
 extern void vec_copy5_blend_first(void *target, void *a1, f32 f12);
 extern void moby_zero_five_words(void *target);
 extern void cam_l00_init_blend_values_2(void *target);

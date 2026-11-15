@@ -9,7 +9,7 @@ extern void anim_start_startup_animations(void);
 extern void func_PAL_002E7270(char *);
 extern void math_store_angle_update_result(char *, char *, int, int, float);
 extern void moby_compute_local_point(char *, char *, float, float, float);
-extern void func_PAL_L05_0042A240(char *, int, int, int, int, int, int, int, int, int, int, float);
+extern char *func_PAL_L05_0042A240(char *, int, int, int, int, int, int, int, int, int, int, float);
 extern int math_random_int_below(int kind);
 extern float math_random_signed_float_range(float, float);
 extern void FastVecSub(void *, void *, void *);

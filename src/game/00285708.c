@@ -8,7 +8,7 @@ typedef unsigned char u8;
 /* lot10: privately byte-gated bodies. */
 extern s32 func_00126470(u8 *, s32, s32, s32, s32, s32, s32, s32);
 
-extern s32 FlushCache(s32);
+extern void FlushCache(s32);
 
 extern s32 func_00126730(u8 *, u8 *);
 

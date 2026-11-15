@@ -3,7 +3,7 @@ extern char g_hero_state[];
 extern void moby_transform_joint_point(void *, int, void *);
 extern void copy_matrix3x4(void *, void *);
 extern void mat_get_euler_angles(void *, void *);
-extern void *anim_copy_entry_data(void *, int, int, void *);
+extern int anim_copy_entry_data(void *, int, int, void *);
 extern void mem_copy_aligned(void *, void *, int);
 extern void func_002A0F48(void *);
 extern char D_L22_001B8EC0[];

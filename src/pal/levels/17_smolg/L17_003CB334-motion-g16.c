@@ -17,7 +17,7 @@ extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(void *, void *);
 extern float fast_vec_dist(void *, void *);
 extern void part_spawn_effect_burst(void *, int, int, int, int, int, int, void *);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 

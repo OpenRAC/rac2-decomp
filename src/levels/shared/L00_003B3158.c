@@ -37,7 +37,7 @@ typedef struct {
 extern Hero g_hero_state;
 extern u32 D_00138320[];        /* controller 1's held buttons (D_00138180 + 0x1A0) */
 extern float *moby_get_private_value_0(Moby *moby);
-extern int SelectBestTargetInCone(void *origin, void *direction, int *count, Moby **candidates, int capacity,
+extern char *SelectBestTargetInCone(void *origin, void *direction, int *count, Moby **candidates, int capacity,
                          int, int, void *config,
                          float angle0, float angle1, float range, float angle2, float angle3);
 extern float vec_distance_xy(void *from, void *to);

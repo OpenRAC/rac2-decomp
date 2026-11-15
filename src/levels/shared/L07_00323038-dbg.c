@@ -2,7 +2,7 @@
 /* func_L07_00323038 in its own unit (flags in config/cflags.txt: -O2 -G0 -ffunction-sections -g). */
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern unsigned int moby_get_vars_word_18(unsigned int);
+extern void *moby_get_vars_word_18(unsigned int);
 extern float mat_fast_helper_a(float, float);
 extern int moby_start_effect_from_entry(int, float);
 extern void coll_find_ground_below_object(void *, void *, float);

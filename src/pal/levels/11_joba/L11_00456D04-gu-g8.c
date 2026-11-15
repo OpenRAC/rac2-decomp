@@ -58,7 +58,7 @@ extern void flamethrower_robot_start_turn_around(u8 *);
 extern void func_PAL_L02_00335630(u8 *, void *);
 extern int func_PAL_L01_00323068(u8 *, void *);
 extern s32 arena_is_point_in_polygon(u8 *, u8 *);
-extern void func_PAL_002B5E30(u8 *, float);
+extern int func_PAL_002B5E30(u8 *, float);
 extern s32 FastDecTimer(void *);
 extern s32 CollLine(void *, void *, s32, void *, void *);
 extern s32 func_PAL_L11_00458CB0(u8 *);

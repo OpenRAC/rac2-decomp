@@ -33,7 +33,7 @@ extern unsigned int moby_dispatch_action_by_kind(void *,void *);
 extern void func_PAL_002A7650(void *,int,int);
 extern void part_queue_moby_for_glow(void *,int,int);
 extern float ApproachValue(float *,float,float);
-extern float func_PAL_002AF420(void *,void *,float,float);
+extern void func_PAL_002AF420(void *,void *,float,float);
 extern float mat_fast_helper_a(float,float);
 extern float FastAddRotations(float,float);
 extern float MobySpringTurn(void *,float,float *,float,float,float);

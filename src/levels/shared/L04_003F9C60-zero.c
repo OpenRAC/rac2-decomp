@@ -5,7 +5,7 @@ extern float func_002A7878_range(float,float) __asm__("func_002A7878");
 extern void vec_scale_to_length(char *,char *,float);
 extern void part_kill(void *);
 extern int math_random_int_range(int,int);
-extern void part_spawn_velocity_particle(void *,void *,int,int,float);
+extern u8 *part_spawn_velocity_particle(void *,void *,int,int,float);
 extern unsigned char *SpawnSpinningSparkParticle(void *,float,float,float,float,int,void *,int,int);
 /* Frees the 17 effects attached to the moby and, if asked, bursts sparks and puffs of smoke around it. */
 void moby_destroy_effects_with_burst(unsigned char *moby,int sparks) {

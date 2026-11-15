@@ -29,7 +29,7 @@ extern unsigned int moby_dispatch_action_by_kind(void *,void *);
 extern void SetDeathBits(void *,int,int);
 extern void part_queue_moby_for_glow(void *,int,int);
 extern float ApproachValue(float *,float,float);
-extern float moby_wander_around_home_point(void *,void *,float,float);
+extern void moby_wander_around_home_point(void *,void *,float,float);
 extern float mat_fast_helper_a(float,float);
 extern float FastAddRotations(float,float);
 extern float MobySpringTurn(void *,float,float *,float,float,float);

@@ -323,7 +323,7 @@ extern int snd_play_from_class_bank(int, int, char *, int);
 extern int coll_sweep_from_object(char *, char *, int, float, float, float, int, int, int);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern void part_spawn_blast_effect_moby(char *, char *, char *, float);
+extern char *part_spawn_blast_effect_moby(char *, char *, char *, float);
 extern void homing_bomb_tick_fuse(u8 *a);
 extern void homing_bomb_move_to_target(u8 *self, float *target);
 extern void part_spawn_falling_puff(u8 *a0);

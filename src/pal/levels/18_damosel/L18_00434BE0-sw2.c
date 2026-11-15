@@ -2,10 +2,10 @@
 
 #include "common.h"
 extern float FastDiffRots(float, float);
-extern void func_PAL_002B5E30(u8 *, float);
-extern void func_PAL_002B5E10(u8 *);
+extern int func_PAL_002B5E30(u8 *, float);
+extern int func_PAL_002B5E10(u8 *);
 extern float math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
-extern void ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *,
+extern int ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *,
                               float, float);
 extern int func_PAL_002B5C98(u8 *, void *, float);
 extern int func_PAL_002B5BA8(u8 *, void *, float);

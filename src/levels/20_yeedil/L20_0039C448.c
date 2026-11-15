@@ -16,7 +16,7 @@ extern int CollLine(void *, void *, int, int, void *);
 
 extern int math_fast_float_d(void *);
 
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 
 extern void gfx_add_draw_callback_third(void *, int);
 
@@ -209,7 +209,7 @@ extern int D_L20_001B2FB8;
 
 /* func_L20_0039E0A0 is defined in L20_0039E0A0-g8.c (it needs the -G8 profile). */
 
-extern void weapon_select_aim_target(char *, int, float, float, int, int);
+extern int weapon_select_aim_target(char *, int, float, float, int, int);
 
 extern char *FindLastGroupMemberInRange(char *, char *);
 

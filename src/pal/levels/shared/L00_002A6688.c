@@ -40,7 +40,7 @@ extern void func_PAL_L00_002A62B0(void);
 extern void func_PAL_L00_002D5680(void);
 extern int hero_is_in_swing_or_grind_mode(void);
 extern void coll_clear_map_bits_around_pos(void *);
-extern int func_002A677C(void *);
+extern void func_002A677C(void *);
 extern void func_PAL_L00_002A7390(void);
 extern void UpdateHeroMobyProbedHeightBounds(void);
 

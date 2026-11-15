@@ -31,7 +31,7 @@ extern void part_start_record_effect_by_index(int, int);
 extern void level_capture_checkpoint_state(void *, void *);
 extern void func_US2_002AFF10(int);
 extern void vec_transform_by_object_or_given(void *, void *, void *, int);
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 extern void data_set_small_value_and_refresh(int, int);
 extern int req_push_queue(void *, int);
 extern int req_launch_queued(void *);

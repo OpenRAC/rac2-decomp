@@ -2,7 +2,7 @@
 
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
-extern void math_fast_float_d(void *);
+extern int math_fast_float_d(void *);
 extern void snivelak_sync_child(u8 *);
 extern void AttachManipulator(u8 *, s32, void *);
 extern void build_axis_rotation_quaternion(void *, s32, float);

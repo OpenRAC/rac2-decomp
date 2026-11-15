@@ -22,7 +22,7 @@ typedef struct {
     struct TtyRing *queue;  /* func_0011BAC8's input ring */
 } TtyHandlerState;
 
-extern void r1_func_0011A690(const char *, ...);
+extern int r1_func_0011A690(const char *, ...);
 
 extern int r1_func_001197C0_r(int, char *, unsigned short) __asm__("r1_func_001197C0");
 
@@ -66,7 +66,7 @@ extern s32 r1_func_00119768(s32, s32);
 
 extern s32 r1_func_0011D960();
 
-extern s32 r1_func_0011D9A8();
+extern void r1_func_0011D9A8();
 
 extern void r1_func_00119798(s32);
 

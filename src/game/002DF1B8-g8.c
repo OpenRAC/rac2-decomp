@@ -4,7 +4,7 @@
 /* -G8 sibling for src/game/002DF1B8.c: the two argument words go out through
    $gp, so this body needs the small-data addressing mode. */
 
-extern void request_begin_slot(int, int, int, int, int);
+extern int request_begin_slot(int, int, int, int, int);
 
 extern void SetBackgroundColor(int, int, int);
 

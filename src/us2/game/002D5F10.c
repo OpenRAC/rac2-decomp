@@ -7,7 +7,7 @@ extern float D_001B23A4[] __attribute__((sda));
 extern int D_001B23A0[] __attribute__((sda));
 extern void SetupGifPaging(long);
 extern void func_US2_0029D368(void);
-extern s32 GetLocalizedString(s32);
+extern char *GetLocalizedString(s32);
 extern void text_draw_right_aligned_small(int, int, u64, u8 *, int);
 extern void DoGifPaging(void);
 
@@ -52,7 +52,7 @@ int func_US2_002D60E8(void)
 
 extern int D_00138344;
 extern int D_00138344;
-extern void func_US2_0029DD40(int);
+extern int func_US2_0029DD40(int);
 
 /* func_002D2918 is built from 002D2918-g8.c. */
 

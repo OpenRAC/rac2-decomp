@@ -13,7 +13,7 @@ extern int weapon_spend_ammo(int, int);
 extern int ForceClaimNotice(int, int, int);
 extern void func_PAL_L00_002AF458(void);
 extern void func_PAL_L00_002AF6C0(void);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern char *spider_bot_spawn(void *, void *);
 extern void ref_L00_003B7D48_00(void (*)(void *), void *);
 extern void func_PAL_L00_003BBD00(void *);

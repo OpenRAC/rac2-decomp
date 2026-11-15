@@ -9,10 +9,13 @@ typedef struct { char pad[0x18]; void *object; } Contact;
 extern Contact D_L17_001C0000;
 extern char D_L17_001C0040[];
 extern float mat_fast_helper_a(float,float), FastAddRotations(float,float);
-extern int FloatToInt(float), moby_get_private_value_2(void *);
-extern void MobySpringTurn(void *,void *,float,float,float,float), coll_probe_ahead_of_moby(void *,void *), path_push_point_away(int,void *,void *,float);
+extern int FloatToInt(float);
+extern char *moby_get_private_value_2(void *);
+extern void MobySpringTurn(void *,void *,float,float,float,float), coll_probe_ahead_of_moby(void *,void *);
+extern int path_push_point_away(int,void *,void *,float);
 extern float coll_probe_ground_height_below(void *,int,float);
-extern void moby_transform_point_and_rotation_by_parent(void *,void *,void *,void *,void *,void *), mat_build_axis_angle_rotation(void *,void *,float);
+extern void mat_build_axis_angle_rotation(void *,void *,float);
+extern int moby_transform_point_and_rotation_by_parent(void *,void *,void *,void *,void *,void *);
 
 /* Turns the creature toward its target and lets gravity pull it down onto the ground (or
    onto a moving object it lands on). */

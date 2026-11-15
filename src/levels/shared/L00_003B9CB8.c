@@ -18,7 +18,7 @@ extern EffectLightRecord D_L00_001C6F40[];
 extern float FastVecDot(void *, void *);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void part_l00_spawn_spark_burst_2(float *, float *, int, int);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern void spark_spawn_orbit(char *, char *);
 
 
@@ -101,7 +101,7 @@ typedef struct Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext {
 extern void func_002FDBD8_2(float scale, Rac2Native_9cdc323a4d0c2fbd_AnalysisConditionalContext *context,
                                     float *vector, int mode);
 
-extern void func_002A77E0_1(int a);
+extern s32 func_002A77E0_1(int a);
 
 extern float func_002A7878_2(float a, float b);
 

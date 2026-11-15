@@ -49,7 +49,7 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern s32 moby_move_to_target_temp_limits(u8 *, void *, f32, s32, f32, f32);
 extern f32 moby_get_anim_value(u8 *);
-extern void part_spawn_ground_effect(void *, u32, f32, f32, u32, u32, s32, void *, f32, s32);
+extern void *part_spawn_ground_effect(void *, u32, f32, f32, u32, u32, s32, void *, f32, s32);
 extern s32 coll_test_hit_at_bone(void *, f32, f32, s32, s32, f32, s32, s32, s32);
 extern s32 func_US2_002AF9C8(u8 *, f32);
 extern void moby_set_flag_bit(u8 *, s32);

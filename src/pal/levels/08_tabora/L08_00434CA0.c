@@ -10,7 +10,7 @@ extern void moby_set_state(char *a0, s32 a1, s32 a2);
 extern void func_PAL_002B15D8(char *a0, f32 f12, f32 f13, s32 a1, char *a2,
                         f32 f14, f32 f15, s32 a3);
 extern void func_PAL_L00_003281C0(char *a0, s32 a1, f32 f12);
-extern void PlayMobySound(s32 a0, s32 a1, char *a2);
+extern int PlayMobySound(s32 a0, s32 a1, char *a2);
 extern s32 flag_set_first_pending(char *a0);
 extern s32 math_fast_float_d(char *a0);
 extern void moby_mark_spawned(char *a0);

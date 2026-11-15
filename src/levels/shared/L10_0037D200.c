@@ -146,7 +146,7 @@ void lightning_build_strip_from_records(void *moby) {
 
 /* func_L10_004190F0 lives in L10_004190F0.c. */
 
-extern int moby_get_motion_data(void *);
+extern char *moby_get_motion_data(void *);
 
 extern int math_random_int_below(int);
 

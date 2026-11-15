@@ -11,7 +11,7 @@ extern int coll_scatter_points_in_shapes(void *, int, void *, void *, float);
 extern float math_random_angle(void);
 extern int math_random_int_range(int, int);
 extern void vec_build_spherical_offset(float *, float, float, float);
-extern void part_spawn_scaling(void *, void *, unsigned int, int, int, int, int, int);
+extern char *part_spawn_scaling(void *, void *, unsigned int, int, int, int, int, int);
 
 void func_PAL_002ABCB8(void *owner, char *offset, void *filter)
 {

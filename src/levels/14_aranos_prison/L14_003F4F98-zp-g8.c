@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int part_find_owned_effect_slot(char *a0, int a1, int a2);
+extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
 
 typedef int TI128 __attribute__((mode(TI)));
 extern char D_L14_001B1870[8] __attribute__((sda));
@@ -12,7 +12,7 @@ extern void vec_scale_to_length(void *out, void *in, float scale);
 extern void FastVecSub(void *out, void *in1, void *in2);
 extern void FastVecAdd(void *out, void *in1, void *in2);
 extern void part_explode_object_into_pieces(char *, void *, void *, void *, int, int, int, int, int, int, int);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern void moby_mark_spawned(char *a0);
 
 /* Finds a nearby object, fires a beam toward it with a sound, then removes itself. */

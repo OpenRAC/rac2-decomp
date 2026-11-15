@@ -31,7 +31,7 @@ extern void *table_find_by_id(void *, s32);
 extern void gfx_draw_scaled_object_two_axes(void *, u32, f32, f32, f32, f32, f32);
 extern s32 math_fast_float_d(void *);
 extern f32 IntToFloat(s32);
-extern void *GetIconFrame(s32, s32);
+extern int GetIconFrame(s32, s32);
 extern void hud_draw_sprite_gradient(void *, s32, s32, s32, s32, Block *);
 extern s32 sprintf(char *, const char *, ...);
 extern void text_draw_medium(s32, s32, u64, char *, s32);

@@ -141,7 +141,7 @@ extern float weapon_compute_shot_launch_speed(void *, void *, float *, float, fl
 extern void snivelak_launch_projectile(u8 *, void *, float);
 extern float math_random_signed_float_range(float, float), math_random_float_range(float, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void part_spawn_blast_effect_moby(u8 *, void *, void *, float);
+extern char *part_spawn_blast_effect_moby(u8 *, void *, void *, float);
 extern void transition_arm_shared(int, float, float);
 extern void SetMobyAndGroupsEnabled(u8 *, int);
 extern void snivelak_part_update(u8 *);

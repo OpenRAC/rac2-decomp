@@ -30,7 +30,9 @@ extern float vec_distance_xy(void*,void*);
 extern float math_fabs(float);
 extern int math_random_int_below(int);
 extern void func_PAL_L01_0039AD60(void*),func_PAL_L01_0039AE48(void*),func_PAL_L01_0039B2D0(void*),func_PAL_L01_0039A520(void*),cam_blend_moby_update(void*),func_PAL_L01_0039AC80(void*);
-extern void func_PAL_002B1588(int,int),MemcardSave(int,int),PlayMobySound(int,int,void*),moby_mark_spawned(void*),moby_set_state(void*,int,int),func_PAL_002A7E68(void*,int,int,int);
+extern void func_PAL_002B1588(int,int), moby_mark_spawned(void*), moby_set_state(void*,int,int), func_PAL_002A7E68(void*,int,int,int);
+extern int PlayMobySound(int,int,void*);
+extern int MemcardSave(int,int);
 extern void func_PAL_L00_002D2668(int,int,float),func_PAL_L00_002B9CD8(void*,void*,int,int),cam_set_mode_state(int);
 extern int math_fast_float_d(void*);
 

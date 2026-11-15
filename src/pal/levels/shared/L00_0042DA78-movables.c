@@ -14,7 +14,7 @@ extern CameraGlobals_4287E8 D_L00_001B8C80_1;
 extern char g_hero_position[];
 extern float math_step_spring_damper_stored(float, float, char *, float, float, float);
 extern void FastVecAdd(char *, char *, char *);
-extern void ApproachValue(char *,float,float);
+extern f32 ApproachValue(char *,float,float);
 extern void FastVecSub(char *,char *,char *);
 extern void vec_scale_to_length(char *,char *,float);
 extern float math_fast_sin_or_cos_a(float);

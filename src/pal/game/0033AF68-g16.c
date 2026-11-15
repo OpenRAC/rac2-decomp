@@ -1,7 +1,7 @@
 #include "names.h"
 /* func_PAL_0033AF68, the PAL copy of func_00339078: the same C, where the four labels from object + 0x138
    step 0x58 instead of 0x48, the fields after them move up by 0x40, and both label texts are looked up. */
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern float *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void func_PAL_00338688(void *, void *, void *);
@@ -9,7 +9,7 @@ extern void hud_set_widget_field_a(void *, int);
 extern unsigned int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void hud_set_widget_field_b(void *, void *);
-extern void *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int func_PAL_0033B218(void *, int);
 extern char *ref_L00_0042E9A8_00;
 extern char ref_L00_0042E9A8_01[];

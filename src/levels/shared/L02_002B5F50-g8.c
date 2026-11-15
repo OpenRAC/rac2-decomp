@@ -37,15 +37,15 @@ extern float math_fast_sin_or_cos_b(float x);
 extern float FastAddRotations(float a, float b);
 extern float fast_subtract_rotations(float a, float b);
 extern void path_sample_position(int *path, int seg, void *pos, void *rot, int flags, float t);
-extern int part_find_owned_effect_slot(void *e, int a1, int a2);
+extern void *part_find_owned_effect_slot(void *e, int a1, int a2);
 extern void part_explode_object_into_pieces(void *a0, void *a1, void *a2, void *a3, int t0, int t1, int t2, int t3,
                               int s0, int s1, int s2);
 extern void moby_compute_local_point(char *a0, float *a1, float f12, float f13, float f14);
-extern void PlayMobySound(int a0, int a1, void *a2);
+extern int PlayMobySound(int a0, int a1, void *a2);
 extern void SpawnExplosionEffects(void *a0, float f12, void *a1, float f13, void *a2, float f14, int a3,
                           float f15, int t0, int t1, float f16, float f17, int t2, float f18,
                           int t3, int s0, int s1, int s2, int s3);
-extern void ApproachValue(float *p, float a, float b);
+extern float ApproachValue(float *p, float a, float b);
 extern void UpdateLampGlowEffects(void *e);
 extern void blinking_lamp_update(void *e);
 extern void func_002A0F48(void *e);

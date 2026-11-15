@@ -32,7 +32,7 @@ extern void snd_set_default_group_volumes(void);
 extern int snd_pump_music_and_disc_read(int);
 extern void snd_send_cmd11_one_value(int);
 extern void load_data_and_setup_callback(void);
-extern void menu_send_request(int, char *);
+extern int menu_send_request(int, char *);
 extern void save_build_packet(char *);
 extern void menu_init_block_fields(void);
 extern int request_begin_slot(int, int, int, int, int);

@@ -69,7 +69,7 @@ extern int math_random_int_range(int a, int b);
 
 extern int math_random_int_below(int a);
 
-extern void part_spawn_spark_2(char *p, float *q, int a, int b);
+extern void *part_spawn_spark_2(char *p, float *q, int a, int b);
 
 extern void Fc936841d_FUN_00282CF0(char *local, char *first, char *second);
 

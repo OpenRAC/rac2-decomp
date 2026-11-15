@@ -11,7 +11,7 @@ extern s32 D_L07_001B1008;
 extern s32 D_L07_001B100C;
 extern s32 D_L07_001B1010 __attribute__((sda));
 extern void moby_set_state(u8 *a0, u8 a1, s32 a2);
-extern int part_find_owned_effect_slot(char *a0, int a1, int a2);
+extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
 extern int PlayMobySound(int index, int a1, char *a2);
 extern void part_explode_object_into_pieces(void *a0, void *a1, void *a2, void *a3, int a4, int a5,
                                int a6, int a7, int a8, u8 a9, int a10);

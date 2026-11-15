@@ -32,7 +32,7 @@ extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
 extern int math_fast_helper_a(void *, float);
 
-extern int moby_get_motion_data(char *);
+extern char *moby_get_motion_data(char *);
 
 extern void follower_set_state(char *, int);
 

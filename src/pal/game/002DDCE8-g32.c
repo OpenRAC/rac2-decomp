@@ -29,7 +29,7 @@ extern void snd_set_default_group_volumes(void);
 extern int func_PAL_002B8898(int);
 extern void snd_send_cmd11_one_value(int);
 extern void load_data_and_setup_callback(void);
-extern void func_PAL_002D6710(int, char *);
+extern int func_PAL_002D6710(int, char *);
 extern void save_build_packet(char *);
 extern void menu_init_block_fields(void);
 extern int request_begin_slot(int, int, int, int, int);

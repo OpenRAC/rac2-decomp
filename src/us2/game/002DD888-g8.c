@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void snd_play_from_global_bank(int, int, int);
+extern int snd_play_from_global_bank(int, int, int);
 extern char g_pad_state[];
 extern int D_001ABCA0 __attribute__((sda));
 extern short D_001B2028[] MACRO_ADDR;

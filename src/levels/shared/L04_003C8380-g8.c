@@ -118,7 +118,7 @@ extern void moby_update_ground_check(void *);
 extern void anim_start_blended(void *, int, int, int);
 extern int FastDecTimer(short *);
 extern int math_random_int_below(int);
-extern void FindHeroOrMobyTarget(void *, void *, void *, int, void *, int, float);
+extern int FindHeroOrMobyTarget(void *, void *, void *, int, void *, int, float);
 extern int math_random_int_range(int, int);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);

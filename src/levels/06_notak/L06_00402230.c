@@ -5,7 +5,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float math_random_float_range(float low, float high);
 extern void matrix_mul_vec3(float *out, float *in, char *matrix);
-extern void part_spawn_spark_moby(char *moby, float *position, float *velocity,
+extern char *part_spawn_spark_moby(char *moby, float *position, float *velocity,
                              int flags, float size, float life);
 
 /* Emit three rings of particles around the moby's local frame.

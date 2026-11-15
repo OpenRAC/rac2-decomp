@@ -20,7 +20,7 @@ extern void moby_copy_saved_point_below(u8 *, u8 *);
 extern void vec_scale_to_length(u8 *, u8 *, float);
 extern void FastVecAdd(u8 *, u8 *, u8 *);
 extern int moby_is_state_two(u8 *);
-extern void func_PAL_L18_003FF648(u8 *, int);
+extern s32 func_PAL_L18_003FF648(u8 *, int);
 extern int moby_dispatch_action_by_kind(u8 *, u8 *);
 extern void func_PAL_002A7650(u8 *, int, int);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);

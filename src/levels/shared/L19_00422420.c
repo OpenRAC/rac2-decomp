@@ -16,7 +16,7 @@ typedef struct { u8 pad[0x464]; u8 slot[1]; } SlotTable;
 extern SlotTable D_L19_0021DDC0;
 extern SlotTable D_L19_0021EA30;
 extern void vec_scale_to_length(void *, void *, float);
-extern unsigned long long set_moby_color(void *, int, int, int);
+extern void set_moby_color(void *, int, int, int);
 extern void moby_set_state(u8 *, u8, s32);
 extern int PlayMobySound(int, int, char *);
 extern void snd_stop_voice(s32);

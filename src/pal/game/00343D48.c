@@ -13,10 +13,10 @@ void func_PAL_00343F18(unsigned char *owner, float *records)
     *(float **)(owner + 0xE8) = records;
 }
 
-extern char *UpdateMenuListSelection(char *, int);
+extern void *UpdateMenuListSelection(char *, int);
 extern void menu_set_position(char *, float, float);
 
-long func_PAL_00343F50(char *object, int arg)
+int func_PAL_00343F50(char *object, int arg)
 {
     char *child = object + 0x10;
     UpdateMenuListSelection(child, arg);

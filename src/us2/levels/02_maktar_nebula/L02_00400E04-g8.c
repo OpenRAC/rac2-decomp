@@ -2,7 +2,7 @@
 #include "names.h"
 
 extern void arena_draw_menu_help_prompts(char *, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern long long GetEffectTextureDescriptor(int);
 extern void FontPrintScaled(float, float, long long, char *, float, int, long long, char *);
 extern void FontSetWindow(char *, int, int, int, int, int, int, int, int);

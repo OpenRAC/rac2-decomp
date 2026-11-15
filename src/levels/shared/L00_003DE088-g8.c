@@ -6,7 +6,7 @@ extern char *g_spider_bot_moby __attribute__((sda));
 extern int D_L00_001B2B4C;
 extern char *CreateMoby(int type);
 extern void euler_rotation_basis(void *out, void *vector);
-extern int func_002A0F48(void *object);
+extern void func_002A0F48(void *object);
 extern int part_alloc_effect_slot(void *object, int mode, float x, float y, float z);
 
 /* Spawns the object of type 0xB58 at position with velocity in its state, quarter size, and registers it as the shared one. */

@@ -42,9 +42,10 @@ extern void FastVecCross(void*,void*,void*),quaternion_to_rotation_basis(void*,v
 extern float FastVecLength(void*),square_root(float);
 extern int coll_process_hit(void*,int,void*,int,float);
 extern void moby_queue_knockback_for_nodes(void*,void*,void*,int,int,int,int,int,float,float,float);
-extern void SpawnExplosion(void*,int,int,int,int,int,int,int,int,int,int,int,float,float);
-extern void SpawnJointFollowParticle(void*,int,int,int,float),part_spawn_random_direction_effect(void*,float,float);
-extern void part_spawn_spark(void*,void*,int,int,int,int,int,int,int,float);
+extern char *SpawnExplosion(void*,int,int,int,int,int,int,int,int,int,int,int,float,float);
+extern void part_spawn_random_direction_effect(void*,float,float);
+extern void *SpawnJointFollowParticle(void*,int,int,int,float);
+extern void *part_spawn_spark(void*,void*,int,int,int,int,int,int,int,float);
 extern char *part_spawn_short_lived(void*,void*,int,void*);
 
 /* Per-frame update of a charged shot. While charging it gathers sparks and light, then it

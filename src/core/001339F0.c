@@ -18,10 +18,10 @@ void mem_copy_bytes_2(void *dest, const void *src, int n)
     } while (i < n);
 }
 
-extern void CdStartRead(int, int, void *, unsigned char *);
+extern int CdStartRead(int, int, void *, unsigned char *);
 extern void snd_clear_flag_and_update(void);
-extern void snd_Pump(void);
-extern void snd_CheckLoadInProgress(int);
+extern int snd_Pump(void);
+extern int snd_CheckLoadInProgress(int);
 
 /* Sets up a load request with fixed settings and starts it. */
 void load_start_request(int first, int second, void *third) {

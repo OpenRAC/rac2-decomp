@@ -4,7 +4,7 @@
 extern char *CreateMoby(int id);
 extern float math_random_float_range(float a, float b);
 extern float math_random_angle(void);
-extern void part_spawn_ground_effect(void *, unsigned int, int, unsigned int, int, char *, float, float, float, int);
+extern void *part_spawn_ground_effect(void *, unsigned int, int, unsigned int, int, char *, float, float, float, int);
 extern char D_L11_001A8F20[] __attribute__((sda));
 typedef int TI128 __attribute__((mode(TI)));
 

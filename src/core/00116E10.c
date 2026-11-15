@@ -25,7 +25,7 @@ typedef struct malloc_chunk *mbinptr;
 typedef u32 INTERNAL_SIZE_T;
 typedef void Void_t;
 
-extern void malloc_lock_acquire(struct _reent *);
+extern int malloc_lock_acquire(struct _reent *);
 extern void malloc_lock_release(struct _reent *);
 extern int malloc_trim_reentrant(struct _reent *, u32);
 

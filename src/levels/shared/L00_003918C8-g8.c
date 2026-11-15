@@ -64,7 +64,7 @@ extern int g_area_hit_targets[];
 extern void level_start_timed_object_once(void);
 extern int ForceClaimNotice(int, void *, int);
 extern void tether_release(Moby *, TetherState *), level_restore_lighting(Moby *, int), tether_attach_to_parent(Moby *, TetherState *);
-extern void cam_follow_update_target(Moby *, Moby *);
+extern int cam_follow_update_target(Moby *, Moby *);
 extern int FloatToInt(float), snd_set_voice_pitch_bend(int, int);
 extern float math_fabs(float), fast_subtract_rotations(float, float), coll_probe_ground_height_below(void *, int, float), ApproachValue(float *, float, float), mat_fast_helper_a(float, float);
 extern void math_build_axis_angle_quat(void *, void *, float), vec_rotate_by_quaternion(void *, void *, void *), part_steer_effect_direction(int, void *, void *), part_queue_ground_shadow(Moby *, float);

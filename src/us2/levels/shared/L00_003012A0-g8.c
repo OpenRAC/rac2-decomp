@@ -292,7 +292,7 @@ extern char *D_L00_001A8AA8 MACRO_ADDR;
 
 extern int load_read_disc_with_pause(void *, int, int);
 extern void FlushCache(int);
-extern void func_US2_0029E308(void *, void *);
+extern int func_US2_0029E308(void *, void *);
 extern void mem_clear(void *, int, int);
 extern void moby_clear_object_slots(void);
 extern void func_001163A0(int);

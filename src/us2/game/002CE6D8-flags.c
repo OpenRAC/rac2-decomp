@@ -70,7 +70,7 @@ after_first:
     return result;
 }
 
-extern void *grid_menu_get_selected_text_id(void *);
+extern int grid_menu_get_selected_text_id(void *);
 
 int func_US2_002CE830(char *object) {
     if (D_001A8CFC[0] != 0)

@@ -7,13 +7,13 @@ extern f32 D_L13_001AEBC8 __attribute__((sda));
 extern f32 D_L13_001AEBC0 __attribute__((sda));
 extern f32 D_L13_001AEBF4 __attribute__((nosda));
 extern f32 D_L13_001AEBF8 __attribute__((nosda));
-extern s32 part_find_owned_effect_slot(u8 *, s32, s32);
-extern s32 moby_set_state(u8 *, s32, s32);
-extern s32 moby_mark_spawned(u8 *);
-extern void part_spawn_object_following_effect(float, float, void *, u8 *, s32, s32, s32, s32, s32, s32);
+extern void *part_find_owned_effect_slot(u8 *, s32, s32);
+extern void moby_set_state(u8 *, s32, s32);
+extern void moby_mark_spawned(u8 *);
+extern void *part_spawn_object_following_effect(float, float, void *, u8 *, s32, s32, s32, s32, s32, s32);
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
 extern void moby_compute_local_point(u8 *, f32 *, f32, f32, f32);
-extern void SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                         float, float);
 
 /* Waits for a trigger, then plays a burst of sparks and removes itself. */

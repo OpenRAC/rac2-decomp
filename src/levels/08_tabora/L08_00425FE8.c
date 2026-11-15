@@ -9,7 +9,7 @@ extern float FastVecLength(void *);
 extern float IntToFloat(int);
 extern float math_ease_out_quad(float);
 extern float math_turn_angle_toward_target(float,float,float,void *,float,float);
-extern void moby_move_and_collide(void *,void *,int,float,float,float);
+extern int moby_move_and_collide(void *,void *,int,float,float,float);
 /* Moves the object toward its target point, speeding up and then slowing down to stop there.
    Returns 1 while it is braking. */
 int moby_move_to_target_braking(char *moby,float accel,float speed,float turn,float blend,float angle) {

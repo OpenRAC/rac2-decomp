@@ -17,7 +17,7 @@ void func_US2_0033B6D0(char *a0)
 }
 
 extern int *object_get_fourth_field(void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, int);
 extern void object_set_flag_value(char *, int);
 extern float math_fast_sin_or_cos_a(float);
@@ -26,7 +26,7 @@ extern void object_set_second_float4(char *, float, float, float, float);
 extern int *object_get_fourth_field(void *);
 extern void hud_draw_colored_quad_widget(char *);
 extern void hud_set_widget_value_pair(char *, int, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void text_label_draw(char *);
 extern float D_001ADD20 __attribute__((sda));
 extern float D_001ADD24;

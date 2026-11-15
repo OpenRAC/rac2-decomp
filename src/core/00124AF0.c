@@ -3,7 +3,7 @@
 
 extern int r1_D_001313E8;
 
-extern void r1_func_00118C90(int);
+extern s32 r1_func_00118C90(int);
 
 extern char r1_D_00132590[];
 

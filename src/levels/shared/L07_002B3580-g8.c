@@ -61,7 +61,7 @@ void part_spawn_falling_puff(u8 *moby)
 
 extern void moby_set_state(u8 *a0, u8 a1, s32 a2);
 
-extern int part_find_owned_effect_slot(char *a0, int a1, int a2);
+extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
 
 extern int PlayMobySound(int index, int a1, char *a2);
 

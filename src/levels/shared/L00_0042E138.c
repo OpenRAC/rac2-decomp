@@ -4,13 +4,13 @@ extern unsigned char D_001A7B96 __attribute__((sda));
 
 extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 
-extern void prompt_bar_destroy(char *p);
+extern int prompt_bar_destroy(char *p);
 
 extern void func_0033AE28_2(char *p);
 
 extern void func_L00_00430948_3(char *p, float a, float b);
 
-extern void func_002E5E58_3(int a, int b, int c);
+extern int func_002E5E58_3(int a, int b, int c);
 
 extern volatile unsigned char D_001A7B95 __attribute__((sda));
 
@@ -26,7 +26,7 @@ extern void func_0033AE28_1(char *p);
 
 extern void func_L00_00430948_2(char *p, float a, float b);
 
-extern void func_002E5E58_2(int a, int b, int c);
+extern int func_002E5E58_2(int a, int b, int c);
 
 extern volatile unsigned char D_001A7BB2_1 __attribute__((sda));
 

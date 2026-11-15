@@ -3,7 +3,7 @@
 
 extern int ref_L00_00300248_00 __attribute__((sda));
 extern unsigned char g_hero_moby[];
-extern void moby_get_parent_transformed_point(int, int, int, int);
+extern int moby_get_parent_transformed_point(int, int, int, int);
 
 typedef int s32;
 

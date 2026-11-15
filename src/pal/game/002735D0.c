@@ -63,8 +63,8 @@ extern void Fdb046c5d_FUN_00274A88(void *, void *, void *);
 extern void Fdb046c5d_FUN_002AFFD8(void *, void *, int);
 extern int Fdb046c5d_FUN_00274BA8(void *, void *, void *, float, float);
 extern int Fdb046c5d_FUN_002E5CF8(int, int, void *);
-extern void Fdb046c5d_FUN_00274768(void *, int, void *);
-extern void Fdb046c5d_FUN_002E5F00(int, void *);
+extern unsigned int Fdb046c5d_FUN_00274768(void *, int, void *);
+extern int Fdb046c5d_FUN_002E5F00(int, void *);
 extern char Fdb046c5d_D_001BAFC0[];
 
 int func_PAL_00273BB0(char *obj)

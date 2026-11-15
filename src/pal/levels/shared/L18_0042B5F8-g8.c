@@ -17,7 +17,7 @@ extern s32 D_L18_001B12D4 __attribute__((sda)), D_L18_001B12D8 __attribute__((sd
 extern s32 D_L18_001B12DC __attribute__((sda)), D_L18_001B12E0 __attribute__((sda));
 extern s32 D_L18_001B12E4 __attribute__((sda)), D_L18_001B12E8 __attribute__((sda));
 extern char D_L18_001B1300[];
-extern s32 table_find_by_id(u8 *, s32);
+extern void *table_find_by_id(u8 *, s32);
 extern void gfx_draw_scaled_object_two_axes(char *, s32, float, float, float, float, float);
 extern float IntToFloat(s32);
 extern s32 FastTweenColor(s32, s32, float);

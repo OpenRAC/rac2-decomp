@@ -11,7 +11,7 @@ extern int FloatToInt(float);
 extern float FastAddRotations(float,float);
 extern void func_PAL_0034EF38(void *,int,float);
 extern int hud_is_open_done(void);
-extern void hud_screen_position(void *,int *,int *);
+extern int hud_screen_position(void *,int *,int *);
 extern int sprintf(char *,char *,...);
 extern unsigned int FastTweenColor(unsigned int,unsigned int,float);
 extern void func_PAL_00280218(int,int,unsigned int,char *,int,float);

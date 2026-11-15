@@ -14,7 +14,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern void FastVecScale(void *, void *, float);
 extern float FastVecDot(void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void part_l04_spawn_spinning(void *, void *, void *, int, int, float, float, float);
+extern char *part_l04_spawn_spinning(void *, void *, void *, int, int, float, float, float);
 extern void racer_start_trail(void *, void *, void *, void *);
 
 /* Spawns a line of trail particles from a position along a direction, with a few special coloured ones. */

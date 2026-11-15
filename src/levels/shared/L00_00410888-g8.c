@@ -10,7 +10,7 @@ extern float FastAddRotations(float, float);
 extern void FastVecScale(void *, void *, float);
 extern int math_random_int_range(int, int);
 extern float math_random_signed_float_range(float, float);
-extern void part_spawn_trail_2(void *, void *, int, float);
+extern char *part_spawn_trail_2(void *, void *, int, float);
 extern float math_fabs(float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);

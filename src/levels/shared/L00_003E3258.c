@@ -90,7 +90,7 @@ extern int math_fast_float_d(void *p);
 
 extern int func_001163B0(void);
 
-extern void AllocateOwnedEffectParticle(char *rec, int a, float b, float c, int d);
+extern char *AllocateOwnedEffectParticle(char *rec, int a, float b, float c, int d);
 
 extern void part_update_owned_effect(char *rec);
 
@@ -183,7 +183,7 @@ extern float FastAddRotations(float, float);
 
 extern void vec_build_spherical_offset(float *, float, float, float);
 
-extern void part_spawn_burst(float *, float *, int, int, unsigned int, int,
+extern void *part_spawn_burst(float *, float *, int, int, unsigned int, int,
                           float, float, float, float, float);
 
 /* Twenty rounds that spawn a particle at the point: each round draws a step and a random

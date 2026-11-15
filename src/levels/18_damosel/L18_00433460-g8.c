@@ -16,7 +16,7 @@ extern float mat_fast_helper_a(float a, float b);
 
 extern void func_002A0F48(void *a);
 
-extern int moby_set_state(void *, int, int);
+extern void moby_set_state(void *, int, int);
 
 extern void *part_find_owned_effect_slot(void *, s32, s32);
 
@@ -25,7 +25,7 @@ extern void moby_mark_spawned(void *);
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32, s32, s32, s32,
                               s32, s32, s32);
 
-extern void SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float,
+extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float,
                           s32, s32, s32, s32);
 
 extern float D_L18_001B1D30 __attribute__((sda));

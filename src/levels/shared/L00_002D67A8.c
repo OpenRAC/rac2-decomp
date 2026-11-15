@@ -23,7 +23,7 @@ typedef int BatchA_A07_s32;
 
 extern BatchA_A07_s32 g_current_map_index[] __attribute__((sda));
 
-extern int level_run_mode_update_three(void);
+extern s32 level_run_mode_update_three(void);
 
 extern int D_0018C0B4_1;
 

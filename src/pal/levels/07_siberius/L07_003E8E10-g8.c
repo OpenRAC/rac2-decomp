@@ -3,7 +3,7 @@
 #include "common.h"
 typedef unsigned int u128 __attribute__((mode(TI)));
 extern float coll_get_ground_distance_below(void *, void *, void *);
-extern int moby_get_private_value_2(void *);
+extern char *moby_get_private_value_2(void *);
 extern int IsPointInCuboid(void *, int);
 extern int flag_is_third_pending_set(void *);
 extern void moby_set_state(void *, int, int);
@@ -22,7 +22,7 @@ extern float FastAddRotations(float, float);
 extern void gfx_add_draw_callback_first(void (*)(char *), void *);
 extern void entity_draw_glow_disc(char *);
 extern int math_random_int_below(int);
-extern void moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
+extern int moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
 extern float math_random_angle(void);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
@@ -30,7 +30,7 @@ extern float math_random_float_range(float, float);
 extern int FastTweenColor(int, int, float);
 extern int math_random_int_range(int, int);
 extern float IntToFloat(int);
-extern void part_spawn_hero_relative(void *, void *, int, float, int, int, int);
+extern void *part_spawn_hero_relative(void *, void *, int, float, int, int, int);
 struct Collision1310 { char pad[0x18]; void *object; };
 extern struct Collision1310 D_L07_001BF640;
 extern char g_hero_position[];

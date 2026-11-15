@@ -22,9 +22,9 @@ extern float fast_vec_dist(char *a, char *b);
 extern void moby_update_ground_check(void *object);
 extern char D_L09_001B9A00[];
 extern int moby_apply_damage_to_object(char *object, char *frame, int flag);
-extern char *moby_is_hero_or_special(char *entry);
+extern int moby_is_hero_or_special(char *entry);
 extern void moby_set_state(char *object, int a1, int a2);
-extern void weapon_select_aim_target(char *object, int a1, int a2, int a3, f32 f12, f32 f13);
+extern int weapon_select_aim_target(char *object, int a1, int a2, int a3, f32 f12, f32 f13);
 
 extern void moby_transform_joint_to_world(char *object, int joint, void *out);
 extern float vec_distance_xy(void *a, void *b);

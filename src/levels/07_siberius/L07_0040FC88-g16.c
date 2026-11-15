@@ -44,7 +44,7 @@ extern void moby_attach_to_parent(void *,void *,void *,void *);
 extern void moby_set_flag_bit(void *,int);
 extern void entity_set_state_five(void *);
 extern void boss_start_move_tier(void *,void *,int);
-extern int boss_get_attack_mode(void *);
+extern u8 *boss_get_attack_mode(void *);
 extern float math_approach_target_with_direction_mode(void *,float,void *,int,float,float,float);
 extern void moby_steer_aim_yaw(void *);
 extern void timer_start_countdown(int,float);

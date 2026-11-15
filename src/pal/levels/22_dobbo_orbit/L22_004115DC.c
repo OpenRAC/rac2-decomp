@@ -13,7 +13,7 @@ extern u8 D_L22_001A7A78 __attribute__((sda));
 extern s32 D_L22_001A903C __attribute__((sda));
 extern s32 D_L22_0018B6A8 __attribute__((sda));
 extern s32 math_fast_float_d(s32);
-extern void FastDecTimer();
+extern int FastDecTimer();
 extern void build_axis_rotation_quaternion(s32, s32, f32);
 extern f32 fast_subtract_rotations(f32, f32);
 extern void AttachManipulator(s32, s32, s32);
@@ -71,9 +71,9 @@ void func_PAL_L22_004128B8(u8 *a0, f32 *a1, f32 f12) {
 }
 
 
-extern void moby_copy_vector_to_child();
+extern int moby_copy_vector_to_child();
 extern void FastVecAdd(void *, void *, void *);
-extern void moby_check_target_point_from_offset(s32, s32);
+extern int moby_check_target_point_from_offset(s32, s32);
 extern void arena_push_point_out(void *, f32);
 
 void func_PAL_L22_004129D8(s32 a0, s32 a1, s32 a2, f32 f12) {

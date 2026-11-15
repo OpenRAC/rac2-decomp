@@ -8,8 +8,8 @@ typedef unsigned int u32;
 typedef unsigned short u16;
 extern f32 func_2F9748(f32, f32);
 extern s32 func_32A4D0(u8 *, s32);
-extern s32 func_31A718(u8 *);
-extern s32 func_3248E0(u8 *, s32, s32);
+extern void func_31A718(u8 *);
+extern void func_3248E0(u8 *, s32, s32);
 extern s32 func_2AF870(u8 *);
 extern f32 D_L13_001B2568 __attribute__((sda));
 extern u32 D_L13_001B291C[] __attribute__((sda));
@@ -34,8 +34,8 @@ extern s32 snd_start_in_slot(s32, s32, u8 *);
 extern s32 math_fast_float_d(u8 *);
 extern s32 IsPointInCuboid(u8 *, s32);
 extern u8 D_001395B8[];
-extern void PlayMobySound(s32, s32, u8 *);
-extern void math_step_value_toward_target(f32 *, f32 *, f32, f32, f32, f32);
+extern int PlayMobySound(s32, s32, u8 *);
+extern float math_step_value_toward_target(f32 *, f32 *, f32, f32, f32, f32);
 extern s32 func_2AF870(u8 *);
 extern u8 D_L13_001B1E60[];
 
@@ -61,8 +61,8 @@ void func_PAL_L13_00431420(u8 *a0) {
 }
 
 
-extern s32 STUB_printf(u8 *);
-extern s32 STUB_printf(u8 *);
+extern void STUB_printf(u8 *);
+extern void STUB_printf(u8 *);
 
 void func_PAL_L13_00431518(u8 *a0) {
     u8 *ptr = *(u8 **)(a0 + 0x68);

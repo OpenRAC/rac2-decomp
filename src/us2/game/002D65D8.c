@@ -13,7 +13,7 @@ extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern int stub_empty_25(void);
 extern int stub_empty_25(void);
 extern void data_set_small_value_and_refresh(int, int);
-extern void request_begin_slot(int, int, int, int, int);
+extern int request_begin_slot(int, int, int, int, int);
 extern int func_US2_0029D248(int);
 extern int stub_empty_24(void);
 

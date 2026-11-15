@@ -23,7 +23,7 @@ static inline void WrapLow(int *index, int last)
 }
 
 /* Moves the menu selection up or down, wrapping around and skipping empty entries. */
-int UpdateMenuListSelection(SelectionMenu *object, int flags)
+void *UpdateMenuListSelection(SelectionMenu *object, int flags)
 {
     int direction = 0;
     int last;

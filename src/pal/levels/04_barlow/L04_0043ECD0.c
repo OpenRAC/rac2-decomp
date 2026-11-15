@@ -44,7 +44,7 @@ extern void conversation_clear_target_on_talk(void *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void add_vectors(void *, void *, void *);
 extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void settings_store_four(int, int, int, int);
 extern void menu_set_size_limits(int, int);
 extern int request_begin_slot(int, int, int, int, unsigned char *);

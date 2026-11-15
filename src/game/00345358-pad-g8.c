@@ -4,7 +4,7 @@ typedef struct { char pad[0x48c]; int column, row, selected, state; } SelectionO
 typedef struct { char pad[6]; short material; char tail[216]; } MaterialRecord;
 typedef struct { char pad[0x44]; int selected; } EquipmentState;
 
-extern void snd_play_from_global_bank(int, int, int);
+extern int snd_play_from_global_bank(int, int, int);
 extern unsigned char g_item_owned_flags[] __attribute__((section(".sdata")));
 extern unsigned char g_item_slot_to_record[];
 extern MaterialRecord g_weapon_table[];

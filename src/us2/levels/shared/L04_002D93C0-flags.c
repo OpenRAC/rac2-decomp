@@ -11,10 +11,10 @@ extern float fade_reduce_value(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(f32 *,f32 *,f32 *);
 extern void hero_build_relative_point(void *,int,float,float,float);
-extern void func_US2_L04_002E7F28(int,int);
+extern s32 func_US2_L04_002E7F28(int,int);
 extern char *part_find_owned_effect_slot(void *,int,int);
 extern void func_US2_L00_002A4EF8(int);
-extern void hero_play_sound(int,int);
+extern int hero_play_sound(int,int);
 extern void hero_flatten_push_vector(void *,int,float,float);
 extern void cam_scale_view_space_height(void *,void *,float);
 #define AB(p,o) (*(unsigned char *)((char *)(p)+(o)))

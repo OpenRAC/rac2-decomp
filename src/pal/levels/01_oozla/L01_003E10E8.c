@@ -24,7 +24,7 @@ extern s32 FloatToInt(f32);
 extern u8 *part_spawn_trail(void *, void *, void *, u32, u32, s32, s32, s32, s32);
 extern void moby_follow_attached(void *, void *);
 extern s32 moby_l01_turn_toward_target(void *, void *);
-extern s32 func_310648();
+extern f32 func_310648();
 extern f32 func_310580(f32 x, f32 y);
 extern s32 func_310528(s32 a, s32 b);
 extern f32 func_2E3A48(f32 x);

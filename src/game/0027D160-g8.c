@@ -6,7 +6,7 @@ typedef struct { FRow pos; FRow dir; } LightRec;
 extern float D_001A87A0 __attribute__((sda));
 extern LightRec D_001BA640[];
 extern int D_001B163C;
-extern int GetEffectTextureDescriptor(int);
+extern long long GetEffectTextureDescriptor(int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void draw_world_quad(void *, int, int);
 /* Draws the glowing light sprites that face the camera. */

@@ -224,7 +224,7 @@ void UpdateOozlaTiltingLift(Object0041C970 *obj) {
 
 extern s32 FloatToInt(f32);
 extern f32 math_random_signed_float_range(f32, f32);
-extern void path_l01_compute_segment_lengths(void *);
+extern float path_l01_compute_segment_lengths(void *);
 extern void moby_set_controller_speed_limits(void *, f32, f32, f32, f32);
 extern s32 math_random_int_range(s32, s32);
 extern void anim_start_blended(void *, s32, s32, s32);

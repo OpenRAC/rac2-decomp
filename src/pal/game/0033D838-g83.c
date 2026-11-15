@@ -2,13 +2,13 @@
 #include "names.h"
 
 extern void func_PAL_0033CFD0(void *, float);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void func_PAL_0033CB00(void *, void *, void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_PAL_0033CF78(void *, int, int, int);
 extern void func_PAL_0033CF58(void *, float, float, float, float, float, float);
-extern void func_PAL_0033EEF8(void *, int);
+extern int func_PAL_0033EEF8(void *, int);
 extern int D_001ADE48[2] __attribute__((sda));
 extern char D_001ADC88[];
 extern void object_init_derived_b(void *, int, int, void *, void *);
@@ -67,7 +67,7 @@ void func_PAL_0033EC98(char *object, void *argument)
     func_PAL_0033EEF8(object, 0);
 }
 
-extern void func_PAL_00340348(void *, int);
+extern int func_PAL_00340348(void *, int);
 extern int D_001ADEC8[2] __attribute__((sda));
 extern void func_PAL_0034A090(void *, void *);
 extern void func_PAL_0034A2A0(void *, int, int);
@@ -119,7 +119,7 @@ void func_PAL_00340418(char *object)
     func_PAL_0034A300(p);
 }
 
-extern void func_PAL_003405B0(void *, int);
+extern int func_PAL_003405B0(void *, int);
 extern int D_001ADEF0[2] __attribute__((sda));
 
 void func_PAL_003404B0(char *object, void *argument)

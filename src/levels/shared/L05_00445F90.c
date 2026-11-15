@@ -5,7 +5,7 @@ typedef struct {
     char *row;
 } TableEntry;
 
-extern void hero_l00_set_action(int, int);
+extern s32 hero_l00_set_action(int, int);
 extern void hero_set_objects_flag_bit(void);
 extern int D_00221D94;
 extern int g_current_map_index MACRO_ADDR;

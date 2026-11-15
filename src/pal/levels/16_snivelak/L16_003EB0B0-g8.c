@@ -7,7 +7,7 @@ extern int D_L16_001B0CA8 __attribute__((sda));
 extern int D_L16_001B0CAC __attribute__((sda));
 extern char *D_L16_001BFF58[];
 extern char D_L16_001A8F20[] __attribute__((sda));
-extern void coll_sweep_from_object(float, float, float, void *, void *, int, int, int, int);
+extern int coll_sweep_from_object(float, float, float, void *, void *, int, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void make_hit_descriptor(void *, void *, int, void *, float);

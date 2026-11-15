@@ -105,7 +105,7 @@ extern void mat_get_euler_angles(void *,void *);
 extern int GetCollHitMaterial(void);
 extern int coll_process_triangles(void *,float);
 extern int coll_test_point(void *,int,void *,float);
-extern void coll_process_hit(void *,int,void *,void *,float);
+extern int coll_process_hit(void *,int,void *,void *,float);
 /* Moves the hover vehicle for one frame from the player's steering, speed, height and what it bumps into. */
 void UpdateHoverVehicleMotion(MoveObject *object,int input)
 {

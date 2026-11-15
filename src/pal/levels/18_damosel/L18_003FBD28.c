@@ -89,7 +89,7 @@ void func_PAL_L18_003FBD90(u8 *object) {
 
 typedef int u128 __attribute__((mode(TI)));
 extern char *part_find_owned_effect_slot(char *, int, int);
-extern void func_PAL_002B1A50(char *, char *, int);
+extern int func_PAL_002B1A50(char *, char *, int);
 extern void func_PAL_002A7650(char *, int, int);
 extern void moby_mark_spawned(char *);
 extern void FastVecAdd(void *, void *, void *);

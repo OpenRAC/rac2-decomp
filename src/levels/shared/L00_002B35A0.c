@@ -1,6 +1,6 @@
 #include "common.h"
 extern u8 D_00189E20_1[];
-extern void FastDecTimer(char *);
+extern int FastDecTimer(char *);
 typedef int AnimQuad __attribute__((mode(TI)));
 typedef struct { u8 pad[0x158]; float value; u8 gap[0x370-0x15c]; AnimQuad vector; } AnimBase;
 extern AnimBase D_L00_001B8C80;

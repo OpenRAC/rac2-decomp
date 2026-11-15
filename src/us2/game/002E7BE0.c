@@ -6,7 +6,7 @@ extern char D_00189E20_9[];
 extern char D_001A63A8_3[];
 extern short D_00152C2A;
 extern void func_002B72E8_1();
-extern void UpdateSoundVoices();
+extern int UpdateSoundVoices();
 extern void subtitle_clear_state();
 extern void level_transition_scene_start();
 

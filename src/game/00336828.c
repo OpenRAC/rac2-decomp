@@ -7,7 +7,7 @@ extern int D_L04_001ADC70 __attribute__((sda));
 
 extern int GetIconFrame(int a, int b);
 
-extern int hud_draw_sprite_gradient(int a, int b, int c, int d, int e, int *p);
+extern void hud_draw_sprite_gradient(int a, int b, int c, int d, int e, int *p);
 
 /* Draws a coloured quad for a UI element if it is visible, using the element's colour and corner points. */
 void hud_draw_colored_quad_widget(int *widget)

@@ -43,9 +43,10 @@ extern void FastVecCross(void*,void*,void*),quaternion_to_rotation_basis(void*,v
 extern float FastVecLength(void*),square_root(float);
 extern int coll_process_hit(void*,int,void*,int,float);
 extern void moby_queue_knockback_for_nodes(void*,void*,void*,int,int,int,int,int,float,float,float);
-extern void func_PAL_L00_003FB330(void*,int,int,int,int,int,int,int,int,int,int,int,float,float);
-extern void SpawnJointFollowParticle(void*,int,int,int,float),part_spawn_random_direction_effect(void*,float,float);
-extern void func_PAL_002BD790(void*,void*,int,int,int,int,int,int,int,float);
+extern char *func_PAL_L00_003FB330(void*,int,int,int,int,int,int,int,int,int,int,int,float,float);
+extern void part_spawn_random_direction_effect(void*,float,float);
+extern void *SpawnJointFollowParticle(void*,int,int,int,float);
+extern void *func_PAL_002BD790(void*,void*,int,int,int,int,int,int,int,float);
 extern char *func_PAL_L08_0034C4A8(void*,void*,int,void*);
 
 void func_PAL_L23_00428A98(unsigned char *obj)

@@ -7,7 +7,7 @@
    copy on their own side of it. */
 
 typedef int V4 __attribute__((mode(TI)));
-extern int moby_get_motion_data(unsigned char *owner);
+extern char *moby_get_motion_data(unsigned char *owner);
 extern unsigned int scene_get_state_word(void);
 extern void FastVecSub(void *a0, void *a1, void *a2);
 extern float FastVecLength(char *a0);

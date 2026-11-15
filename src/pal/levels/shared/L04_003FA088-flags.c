@@ -9,7 +9,7 @@ extern void FastVecAdd(float *, float *, float *);
 extern int math_fast_float_d(void *);
 extern float IntToFloat(int);
 extern float math_fabs(float);
-extern void *FastTweenColor(unsigned int, unsigned int, float);
+extern int FastTweenColor(unsigned int, unsigned int, float);
 extern int FloatToInt(float);
 extern void *part_spawn_fading(void *, void *, int, int, int, int, int, float);
 typedef struct { char pad[0x10]; float phase[4]; float rate[4]; int alpha[4]; float size[4]; } GlowState;

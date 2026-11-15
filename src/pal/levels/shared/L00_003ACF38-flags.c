@@ -5,7 +5,7 @@ typedef int s32;
 typedef float f32;
 extern s32 coll_process_hit(f32, s32, s32, s32, s32);
 extern void vec_scale_to_length(void *, void *, float);
-extern void func_PAL_0032F0B8(int, int, int);
+extern int func_PAL_0032F0B8(int, int, int);
 extern int g_hero_moby;
 extern unsigned char g_item_slot_to_record[];
 extern unsigned char g_weapon_l00_table[];

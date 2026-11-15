@@ -39,9 +39,9 @@ void func_PAL_00347438(char *obj)
 }
 
 
-extern void F449e2f67_FUN_003361A8(char *p);
-extern void F449e2f67_FUN_00336968(char *p);
-extern void F449e2f67_FUN_003366D0(char *p);
+extern void *F449e2f67_FUN_003361A8(char *p);
+extern char *F449e2f67_FUN_00336968(char *p);
+extern void *F449e2f67_FUN_003366D0(char *p);
 
 char *func_PAL_003474E0(char *p)
 {
@@ -66,7 +66,7 @@ char *func_PAL_003474E0(char *p)
 /* func_PAL_00347570, the PAL copy of func_00345490: the same C with the fields moved
  * and the text ids renumbered, plus the func_00336A30 calls, the two stores at 0x220 + 0x48 and the
  * 0.8 scale on the items at 0x310 and 0x2b8. */
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void func_PAL_00338688(void *, void *, void *);
@@ -77,8 +77,8 @@ extern void object_set_flag_value(void *, int);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void hud_set_widget_field_b(void *, void *);
 extern void hud_set_widget_field_a(void *, int);
-extern void *GetLocalizedString(int);
-extern void func_PAL_003480C8(void *, int, void *);
+extern char *GetLocalizedString(int);
+extern int func_PAL_003480C8(void *, int, void *);
 extern char *D_001A8CFC[] __attribute__((sda));
 extern char D_001ADC10[];
 extern char D_001ADC18[];

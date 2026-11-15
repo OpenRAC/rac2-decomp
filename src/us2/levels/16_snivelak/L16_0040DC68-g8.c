@@ -19,12 +19,13 @@ extern u8 *cam_moby_create(void *, int, int, int, void *, void *, void *, int, f
 extern u8 *CreateMoby(int);
 extern void moby_init_child_from_parent(void *, void *), hero_copy_field_to_moby(void *), moby_fade_out_update(void *);
 extern float coll_probe_ground_height_below(void *, int, float);
-extern void part_l13_spawn_flash(void *, int, int, int, int, int, int, int, float, int, int);
+extern char *part_l13_spawn_flash(void *, int, int, int, int, int, int, int, float, int, int);
 extern void func_US2_002A7AA8(void *, int, int), moby_mark_spawned(void *);
 extern int func_US2_002AF9C8(void *, float);
-extern void moby_transform_joint_to_world(char *, int, char *), FastVecSub(void *, void *, void *);
+extern void FastVecSub(void *, void *, void *);
+extern void moby_transform_joint_to_world(char *, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
-extern void snivelak_spawn_spark_projectile(void *, void *, void *, int, float);
+extern u8 *snivelak_spawn_spark_projectile(void *, void *, void *, int, float);
 extern int path_check_entry_for_moby(char *, int);
 extern float D_L16_001A8F20[] __attribute__((sda));
 extern struct {

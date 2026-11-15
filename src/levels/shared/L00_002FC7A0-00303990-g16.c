@@ -116,7 +116,7 @@ extern void func_00291DE0(void *, int);
 extern void level_load_quadword_block(char *);
 extern void tex_rebase_pack_fill_ranges(void *, char *, void *, int);
 extern void STUB_printf(const char *, ...);
-extern int LoadLevelData(int);
+extern char *LoadLevelData(int);
 extern void tutorial_reset_record_values(void);
 extern void level_update_object_visibility(int);
 extern void RestoreSavedHeroState(void);

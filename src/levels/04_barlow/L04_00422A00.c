@@ -41,7 +41,7 @@ extern s32 req_push_queue(u8 *a0, s32 a1);
 extern s32 req_launch_queued(void *a0);
 extern void game_set_slowdown_factor(void);
 extern float math_spring_float_to_goal(float *a0, float *a1, float f12, float f13, float f14, float f15);
-extern void PlayMobySound(s32 a0, s32 a1, char *a2);
+extern int PlayMobySound(s32 a0, s32 a1, char *a2);
 
 extern u8 D_0019B2E8[];
 extern int g_current_map_index __attribute__((sda));
@@ -374,10 +374,10 @@ void linked_children_free(char *object) {
 /* Defined in L04_004502D0-g8.c. */
 extern float FastVecLength(void *);
 extern void FastVecSub(void *, void *, void *);
-extern void ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *, f32, f32);
-extern void math_approach_target_with_direction_mode(void *, f32, f32, f32, f32, void *, int);
+extern int ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *, f32, f32);
+extern f32 math_approach_target_with_direction_mode(void *, f32, f32, f32, f32, void *, int);
 extern f32 FastDiffRots(f32, f32);
-extern void math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
+extern float math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
 extern f32 ApproachValue(f32 *, f32, f32);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void FastVecAdd(void *, void *, void *);

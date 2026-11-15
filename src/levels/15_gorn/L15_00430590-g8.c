@@ -19,12 +19,12 @@ extern void snd_stop_voice(int);
 extern int math_fast_float_d(void *);
 extern void FadeToBlack(int);
 extern void level_store_value_pair(int, void *);
-extern void gorn_reward_panel_draw(void);
+extern s32 gorn_reward_panel_draw(void);
 extern void snd_clamp_copy_volumes(void);
-extern void MemcardSave(int,int);
+extern int MemcardSave(int,int);
 extern void hero_set_state_value_c(int);
 extern void ResetGornStageCounters(void *);
-extern void request_begin_slot(int,int,int,int,int);
+extern int request_begin_slot(int,int,int,int,int);
 /* Ends a Gorn challenge stage: stops its sound, pays the reward, shows the reward panel and then picks the next menu entry. */
 void gorn_finish_challenge_stage(char *moby, int stage_num)
 {

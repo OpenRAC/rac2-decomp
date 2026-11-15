@@ -11,7 +11,7 @@ extern int g_gauge_popup_color_a __attribute__((sda));
 extern int g_gauge_popup_color_b __attribute__((sda));
 extern int gauge_popup_poll_input(void);
 extern int gauge_popup_draw(void);
-extern void level_set_table_entry(int (*)(void), int (*)(void), int);
+extern int level_set_table_entry(int (*)(void), int (*)(void), int);
 extern float math_step_int_toward_target(int *, int, int);
 
 /* Shows the gauge pop-up in the given mode with two bar colours and a fill amount. */

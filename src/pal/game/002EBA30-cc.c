@@ -104,7 +104,7 @@ extern void mem_fast_helper_b(), mem_fast_helper_c(), func_PAL_0029FA60(), count
 extern int func_PAL_0029DE68(), log2dim();
 extern int load_read_disc_sectors_blocking(int, int, int);
 extern int snd_CheckLoadInProgress(int);
-extern int snd_send_cmd8(void);
+extern void snd_send_cmd8(void);
 extern void FlushCache(int);
 extern void load_copy_header_relocate_pointers(void *, void *);
 extern void func_00291DE0(void *, int);

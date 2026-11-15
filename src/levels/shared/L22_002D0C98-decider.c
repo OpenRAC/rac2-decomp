@@ -51,13 +51,13 @@ f32 math_fast_sin_or_cos_b(f32);
 f32 FastAddRotations(f32 a0, f32 a1);
 f32 FastDiffRots(f32 a0, f32 a1);
 s32 FloatToInt(f32);
-void hud_set_slot_contents(s32, s32, void *, void *, void *, s32, s32);
+int hud_set_slot_contents(s32, s32, void *, void *, void *, s32, s32);
 void menu_init_panel_layout(u8 *object);
 void weapon_wheel_update_select(s8 *);
 s32 weapon_wheel_draw(s8 *);
 void weapon_wheel_init(void *a0);
 void UpdateRadialMenuSelection(u8 *object);
-void DrawRadialSelectorPanel();
+int DrawRadialSelectorPanel();
 void moby_transform_joint_to_world(s8 *a0, s32 a1, s8 *a2);
 void anim_start_blended(u8 *object, s32 animation, s32 frame, s32 rate);
 s32 math_random_int_range(s32 a0, s32 a1);
@@ -70,7 +70,7 @@ u32 math_l00_return_argument(u32 param_1);
 void hero_play_footstep_effect(void);
 void hero_play_footstep_sound_dust(s32 kind, s32 side, s32 play_sound, s32 duration);
 void hero_clear_tracked_slots(void);
-void AdjustHeroAnimationSpeedForTargetFrame(f32 arg0, f32 arg1, f32 arg2, f32 arg3);
+float AdjustHeroAnimationSpeedForTargetFrame(f32 arg0, f32 arg1, f32 arg2, f32 arg3);
 void part_emit_hero_dust_and_debris(s32 dust, s32 debris, s32 model);
 s32 hero_test_reach_blend(f32 *out, f32 scale, f32 amount);
 s32 hero_find_ledge_grab(s8 *, s8 *, s8 *);
@@ -127,7 +127,7 @@ s32 nearest_rail_point(s8 *, void **, s128 *, void *, void *, s32 *, void *, s32
 
 extern char D_L22_0025DE90[];
 extern char D_L22_001B9B40[];
-extern void coll_sweep_from_object(char *, char *, int, int, float, float, float, int, int);
+extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int, int);
 s32 player_slot_has_object(u32 a0);
 /* Per-frame update of the player: checks what the player is doing and moves it to the next
    action when buttons, hits or timers say so. */

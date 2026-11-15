@@ -28,7 +28,7 @@ extern char D_L23_001BA500[];
 
 extern char *part_find_owned_effect_slot(char *, int, int);
 
-extern void FastDecTimer(char *);
+extern int FastDecTimer(char *);
 
 extern int mothership_is_held(void);
 

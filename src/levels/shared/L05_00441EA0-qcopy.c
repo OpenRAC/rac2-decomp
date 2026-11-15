@@ -10,7 +10,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 extern char *D_L05_001B1EC4 MACRO_ADDR;
-extern int euler_rotation_basis(void *, void *);
+extern void euler_rotation_basis(void *, void *);
 
 typedef struct {
     float x;

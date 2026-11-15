@@ -4,7 +4,7 @@ extern char *CreateMoby(int);
 extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern void part_l11_spawn_spark_ring(void *, int);
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
 
 extern float D_L11_001B22C4 __attribute__((sda));
 extern int D_L11_001B22CC __attribute__((sda));

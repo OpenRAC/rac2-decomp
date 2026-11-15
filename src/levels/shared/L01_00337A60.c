@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern s32 coll_find_outside_edge_index(void *, void *, s32);
-extern void math_closest_point_on_segment(void *, char *, char *, void *);
+extern float math_closest_point_on_segment(void *, char *, char *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
 

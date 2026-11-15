@@ -5,7 +5,7 @@ typedef int BurstQuad __attribute__((mode(TI)));
 typedef union { BurstQuad q; float f[4]; } BurstVector;
 extern void func_PAL_L05_003D7130(char *);
 extern float fast_vec_dist(void *,void *);
-extern void snd_play_from_class_bank(int,int,void *,int);
+extern int snd_play_from_class_bank(int,int,void *,int);
 extern int math_fast_float_d(void *);
 extern void vec_scale_to_length(void *,void *,float),FastVecAdd(void *,void *,void *);
 extern float math_random_float_range(float,float),math_random_angle(void);

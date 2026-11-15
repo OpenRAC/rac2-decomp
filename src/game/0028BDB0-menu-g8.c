@@ -9,7 +9,7 @@ extern unsigned char g_hero_state[];
 typedef struct { int active; int selected; int handle; int busy; } MapMenuGlobals;
 extern MapMenuGlobals D_001A8FB0 MACRO_ADDR;
 extern int D_001A8FB0_gp SDATA(D_001A8FB0);
-extern int gauge_update_fade_counters(char *);
+extern void gauge_update_fade_counters(char *);
 extern int menu_draw_progress_bar_panel(char *);
 extern int weapon_get_usable_selected(void);
 extern int hud_set_slot_contents(int, int, void *, void *, void *, int, int);

@@ -25,7 +25,7 @@ int func_PAL_L00_002D6A08(float *a0, float *a1, float *a2)
     return 0;
 }
 
-extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);

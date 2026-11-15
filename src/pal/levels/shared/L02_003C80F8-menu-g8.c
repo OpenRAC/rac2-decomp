@@ -6,12 +6,12 @@
    text ids. Both header labels are drawn at x 254 with func_0027FAA8 and move up one pixel when
    the display mode is 1; in that mode the bottom label moves down two pixels. */
 
-extern char *table_find_by_id(char *, int);
+extern void *table_find_by_id(char *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
 extern void VU1_addGSregister(int, unsigned long);
 extern char *GetLocalizedString(int);
-extern void text_draw_centered_small(int, int, u64, char *, int);
-extern void text_draw_centered_large(int, int, u64, char *, int);
+extern int text_draw_centered_small(int, int, u64, char *, int);
+extern int text_draw_centered_large(int, int, u64, char *, int);
 extern char *D_L02_001A904C;
 extern float D_L02_001B3E04;
 extern int D_L02_001B3E00;

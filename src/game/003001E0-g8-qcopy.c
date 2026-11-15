@@ -9,7 +9,7 @@ extern int ref_L00_003001E0_00 __attribute__((sda));
 
 extern unsigned char g_hero_moby[];
 
-extern void moby_transform_point_by_attachment(void *, void *, void *, void *);
+extern int moby_transform_point_by_attachment(void *, void *, void *, void *);
 
 extern void FastVecAdd(void *, void *, void *);
 

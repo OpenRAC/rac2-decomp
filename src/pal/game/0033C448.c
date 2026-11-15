@@ -7,10 +7,10 @@
 typedef struct { float x, y, width, height; } TitlePosition;
 extern void object_init_derived_c(void *, void *, void *);
 extern void object_set_second_float4(void *, float, float, float, float);
-extern int object_get_fourth_field(void *);
+extern int *object_get_fourth_field(void *);
 extern void func_PAL_00338688(void *, void *, void *);
 extern int *ui_return_second_arg(int, int);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern char D_001ADC88[];
 extern float D_001B23A4 __attribute__((sda));
 void func_PAL_0033C448(unsigned char *obj, void *arg)

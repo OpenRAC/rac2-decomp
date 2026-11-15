@@ -24,7 +24,7 @@ extern f32 mat_fast_helper_a(f32,f32);
 extern f32 fast_vec_dist(void *,void *);
 extern f32 IntToFloat(s32);
 extern void vec_clear_128(void *);
-extern void SetHeroMoveState(s32,s32);
+extern s32 SetHeroMoveState(s32,s32);
 extern void hero_reset_position_and_direction(void *,void *,s32,s32);
 /* Starts a camera path: resets its motion and mark records, measures both
  * paths' segment lengths, primes both springs and copies the template transform. */

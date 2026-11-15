@@ -22,7 +22,7 @@ extern PromptBounds D_001ABB80[] MACRO_ADDR;
 extern PromptBounds D_001ABB80_gp[] SDATA(D_001ABB80) __attribute__((sda));
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void SetupGifPaging(int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void text_draw_window_medium(unsigned short *, unsigned long, unsigned char *, int);
 extern void gfx_draw_screen_rectangle(int, int, int, int, int, void *);
 extern void DoGifPaging(void);

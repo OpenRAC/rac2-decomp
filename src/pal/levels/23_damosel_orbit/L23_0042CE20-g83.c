@@ -18,7 +18,7 @@ extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void euler_rotation_basis(void *, void *);
-extern void part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, float, float, float, s32);
+extern void *part_spawn_ground_effect(void *, s32, s32, s32, s32, void *, float, float, float, s32);
 
 u8 *func_PAL_L23_0042D620(u8 *parent, TI128 *a1, TI128 *a2, s32 b, float f) {
     u8 *obj = CreateMoby(0x1230);

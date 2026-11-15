@@ -3,7 +3,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void weapon_select_aim_target(char *, int, float, float, int, int);
+extern int weapon_select_aim_target(char *, int, float, float, int, int);
 extern char *FindLastGroupMemberInRange(char *, char *);
 
 /* Chooses what the trooper aims at: the nearest valid target, or its owner if there is none. */

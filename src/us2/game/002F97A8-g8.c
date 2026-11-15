@@ -32,7 +32,7 @@ extern unsigned short D_001A7AF2;
 extern void gfx_select_packet_buffer_setup(void);
 extern int PlayMobySound(int, int, void *);
 extern void func_US2_00292C70(int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_US2_0029DAD0(int, int);
 extern void load_disc_table_entry_for_draw(int);
 extern void LoadDiscTableTexture(int);

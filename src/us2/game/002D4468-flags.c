@@ -13,7 +13,7 @@ extern unsigned char g_item_slot_to_record[];
 extern ClassRecord g_weapon_table[];
 extern void func_US2_00342460(void *, int);
 extern int func_US2_00344480(unsigned char *);
-extern char *func_US2_003444C8(char *);
+extern int func_US2_003444C8(char *);
 
 int func_US2_002D4568(char *object)
 {

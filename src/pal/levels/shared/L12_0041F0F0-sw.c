@@ -23,7 +23,7 @@ extern int math_random_int_below(int);
 extern void func_PAL_002A7E68(void *,int,int,int);
 extern int enemy_claim_attack_turn(void *,int);
 extern int func_PAL_002B5E30(void *,float);
-extern void snd_resume_music_stream(void);
+extern s32 snd_resume_music_stream(void);
 extern void tourist_increment_counters(int);
 extern int path_find_next_stop_point(void *,int);
 extern int func_PAL_L12_0041F710(void *);

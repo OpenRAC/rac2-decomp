@@ -75,7 +75,7 @@ extern void matrix_mul_vec3(char *, char *, char *);
 
 extern void FastVecAdd(char *, char *, char *);
 
-extern void SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 extern char g_hero_state[];
 
@@ -556,7 +556,7 @@ extern void vec_scale_to_length(float *, float *, float);
 
 extern void cam_play_effect_on_target(void *, int, int, TI128 *, float *, int);
 
-extern int slot_effect_create(void *, void *, int, int, int, int, int, int, float, int, int, int, int, int);
+extern void *slot_effect_create(void *, void *, int, int, int, int, int, int, float, int, int, int, int, int);
 
 /* Runs the boss's charged blast: waits for the hero to charge, fires the blast, and pushes the hero back if close. */
 void mothership_update_charged_blast(C0E8Moby *boss) {

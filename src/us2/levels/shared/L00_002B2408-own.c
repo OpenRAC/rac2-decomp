@@ -23,7 +23,7 @@ typedef struct {
 extern unsigned char D_001A7B00[] __attribute__((sda));
 extern int math_fast_float_d(void *);
 extern Obj2318 *D_L00_001FACE0[];
-extern int moby_get_private_value_0(void *);
+extern char *moby_get_private_value_0(void *);
 extern float vec_length_xy(void *);
 typedef struct {
     char pad[9];
@@ -39,7 +39,7 @@ typedef struct {
     char pad2[224 - 0x5c];
 } Record2318;
 extern Record2318 g_weapon_l00_table[];
-extern void clank_zapper_spawn(void *, int, void *, int);
+extern void *clank_zapper_spawn(void *, int, void *, int);
 extern float mat_fast_helper_a(float, float);
 extern float FastDiffRots(float, float);
 extern void moby_transform_joint_to_world(void *, int, void *);

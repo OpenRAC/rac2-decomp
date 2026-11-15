@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 part_find_owned_effect_slot(u8 *, s32, s32);
+extern void *part_find_owned_effect_slot(u8 *, s32, s32);
 extern f32 func_PAL_002AA108(u8 *, s32);
 extern f32 ApproachValue(f32 *, f32, f32);
 extern void moby_set_state(u8 *, u8, s32);

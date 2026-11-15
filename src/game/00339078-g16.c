@@ -1,5 +1,5 @@
 #include "names.h"
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern float *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void hud_init_widget_defaults(void *, void *, void *);
@@ -7,7 +7,7 @@ extern void hud_set_widget_field_a(void *, int);
 extern unsigned int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void hud_set_widget_field_b(void *, void *);
-extern void *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int mission_screen_place_parts(void *, int);
 extern char *ref_L00_0042E9A8_00;
 extern char ref_L00_0042E9A8_01[];

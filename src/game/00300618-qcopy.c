@@ -7,7 +7,7 @@ extern void *CreateMoby(int id);
 extern void func_002A0F48(char *object);
 
 /* Finds the object with the fixed id, marks it and gives it the caller's position. */
-int moby_place_fixed_id_object(void *object)
+void *moby_place_fixed_id_object(void *object)
 {
     void *found = CreateMoby(0x3EF /* moby class 1007 */);
 

@@ -82,11 +82,11 @@ extern void cancel_hero_item_animation(void);
 
 extern void release_moby_animation_slot(int, void *);
 
-extern void hero_l22_set_action(int, int);
+extern s32 hero_l22_set_action(int, int);
 
 extern void gfx_update_color_fade(void *, void *);
 
-extern void part_spawn_damage_debris(void *, void *, void *);
+extern int part_spawn_damage_debris(void *, void *, void *);
 
 extern void moby_transform_joint_point(void *, int, void *);
 

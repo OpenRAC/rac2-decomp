@@ -23,7 +23,7 @@ void FastVecCross(void *,void *,void *);
 float math_fast_sin_or_cos_b(float);
 float math_fast_sin_or_cos_a(float);
 void UpdateViewContext(void);
-void hero_l00_set_action(int,int);
+s32 hero_l00_set_action(int,int);
 int Spline_AdvanceByDistance(void *,void *,int *,float *,float,int);
 int FastDecTimer(void *);
 float math_cosine_blend(float,float,float);

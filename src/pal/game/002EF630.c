@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int moby_get_motion_data(unsigned char *owner);
+extern char *moby_get_motion_data(unsigned char *owner);
 extern int coll_is_point_inside_unit_sphere(unsigned char *a, int b);
 extern void moby_release_motion_slot(unsigned char *owner);
 extern void follower_start_push_from_target(char *a0);

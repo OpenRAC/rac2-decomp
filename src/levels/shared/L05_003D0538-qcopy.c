@@ -13,7 +13,7 @@ extern void matrix_mul_vec3(void *, void *, char *);
 extern void FastVecAdd(void *, void *, char *);
 extern void vec_add_random_offset(void *, float);
 extern float math_random_float_range(float, float);
-extern void part_spawn_object_relative_particle(char *, void *, void *, void *, s32);
+extern void *part_spawn_object_relative_particle(char *, void *, void *, void *, s32);
 
 /* Spawns three trail marks at the object's tail unless the game is in state 2. */
 /* Leaves three small trail marks behind the object's tail unless the game is in a paused mode. */

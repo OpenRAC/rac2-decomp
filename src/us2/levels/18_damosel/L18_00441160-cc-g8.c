@@ -8,8 +8,10 @@ extern u8 D_001395B8[], g_hero_position[];
 extern u8 g_item_owned_flags[] __attribute__((sda));
 extern u8 *g_moby_l18_table;
 extern float FastAddRotations(float, float), math_random_float_range(float, float), math_random_angle(void), math_random_signed_float_range(float, float), vec_distance_xy(void *, void *);
-extern int math_random_int_below(int), moby_set_state(void *, int, int);
-extern void vec_build_spherical_offset(void *, float, float, float), moby_mark_spawned(void *), func_US2_002B1880(int, int), func_US2_00289840(int, int);
+extern int math_random_int_below(int);
+extern void moby_set_state(void *, int, int);
+extern void vec_build_spherical_offset(void *, float, float, float), moby_mark_spawned(void *), func_US2_002B1880(int, int);
+extern int func_US2_00289840(int, int);
 extern void *part_spawn_ground_effect(void *, int, int, int, int, void *, float, float, float, int);
 
 /* State 0: unless already collected, spin and emit two particle pairs per frame;

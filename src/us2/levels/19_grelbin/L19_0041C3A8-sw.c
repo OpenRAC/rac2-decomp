@@ -31,7 +31,7 @@ extern float mat_fast_helper_a(float,float);
 extern int moby_start_effect_from_entry(void *,float);
 extern int func_US2_002AF9C8(void *,float);
 extern float FastDiffRots(float,float);
-extern void moby_turn_toward_target_and_step(void *,void *,float);
+extern int moby_turn_toward_target_and_step(void *,void *,float);
 extern float moby_get_anim_value(void *);
 extern int coll_test_hit_at_bone(float,float,float,void *,int,int,int,int,int);
 extern float FastAddRotations(float,float);

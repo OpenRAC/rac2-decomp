@@ -5,7 +5,7 @@
    the last text fitted to a maximum width (func_PAL_00338770 reads both fields).
    func_PAL_00341C18 returns int: its call is v0's next set, so sched2 issues the v0 pair last, after
    the v1 pair, and the two stores come out in the opposite order to the source. */
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, char *, void *);
 extern void func_PAL_00338688(void *, char *, void *);
@@ -13,7 +13,7 @@ extern void object_init_derived_c(void *, char *, void *);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void object_set_first_float4(void *, float, float, float, float);
 extern unsigned int *object_get_fourth_field(void *);
-extern void *object_get_second_field(void *);
+extern float *object_get_second_field(void *);
 extern void object_change_first_value(void *, void *);
 extern void object_set_helper_result(void *, char *, int);
 extern void object_set_flag_value(void *, int);
@@ -21,7 +21,7 @@ extern int sprintf(char *, char *, ...);
 extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern unsigned int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, unsigned int);
 extern void object_init_derived_b(void *, int, int, char *, void *);
 extern void widget_set_pos_y(void *, int);

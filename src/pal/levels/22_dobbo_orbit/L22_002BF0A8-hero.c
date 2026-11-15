@@ -42,7 +42,7 @@ extern void func_PAL_L00_002AA638(int, int);
 extern void func_PAL_L00_002AA820(int, int, int);
 extern void func_PAL_L00_002AAAC8(int, int, int);
 extern void func_PAL_L00_002AACE8(void);
-extern void AdjustHeroAnimationSpeedForTargetFrame(float, float, float, float);
+extern float AdjustHeroAnimationSpeedForTargetFrame(float, float, float, float);
 extern void hero_start_pose_offset(float, float, float);
 extern int hero_slot_item_id(int);
 extern int func_PAL_L00_002ACE70(void *, void *, void *);

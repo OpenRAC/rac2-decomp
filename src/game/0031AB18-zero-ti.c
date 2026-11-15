@@ -2,7 +2,7 @@
 typedef int Rac2TI128 __attribute__((mode(TI)));
 
 extern float vec_get_heading_angle(char *a0, float *src, char *third);
-extern void math_approach_target_with_direction_mode(void *out, float f12, float f13, float f14, float f15, char *in, int a2);
+extern float math_approach_target_with_direction_mode(void *out, float f12, float f13, float f14, float f15, char *in, int a2);
 extern void euler_rotation_basis(void *out, void *in);
 extern void multiply_matrix3x3(char *a0, char *a1, void *a2);
 extern float math_fabs(float f);

@@ -177,9 +177,9 @@ extern s32 CollLine(void *, void *, s32, s32, void *);
 extern s32 math_fast_float_d(void *);
 extern void func_PAL_002AC718(u8 *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                           float, float, float, float, float, float, float);
-extern void coll_process_hit(void *, s32, s32, void *, float);
+extern int coll_process_hit(void *, s32, s32, void *, float);
 extern void vec_turn_toward_target(void *, void *, void *, void *, void *, void *, float, float, float, float);
-extern void part_spawn_gravity_fade(void *, void *, s32, s32, s32, s32, s32, float, float, float, s32);
+extern void *part_spawn_gravity_fade(void *, void *, s32, s32, s32, s32, s32, float, float, float, s32);
 
 void func_PAL_L23_004281E8(u8 *obj) {
     float up[4] __attribute__((aligned(16)));

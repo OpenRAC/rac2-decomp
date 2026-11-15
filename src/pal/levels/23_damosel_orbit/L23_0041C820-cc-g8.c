@@ -197,7 +197,7 @@ extern int L23_DrawEncounterHud(void);
 extern void func_PAL_L00_002AF6C0(void);
 extern void release_moby_animation_slot(void *, void *);
 extern int func_PAL_L22_002C99C8(int, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int func_PAL_L00_0030FBC0(int, int);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void vec_negate_and_forward(void *, void *, void *);

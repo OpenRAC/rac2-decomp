@@ -3,7 +3,7 @@
 #include "common.h"
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern void func_PAL_L04_0033EB40(char *,char *,float *,float *,float);
+extern int func_PAL_L04_0033EB40(char *,char *,float *,float *,float);
 
 void func_PAL_L04_0033F000(char *a0, char *a1)
 {

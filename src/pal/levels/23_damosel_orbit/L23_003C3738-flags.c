@@ -17,8 +17,8 @@ extern void moby_transform_joint_point(char *, int, char *);
 extern void transform_vector(char *, char *, char *);
 extern void FastVecSub(char *, char *, char *);
 extern void vec_scale_to_length(char *, char *, float);
-extern void func_PAL_L23_0042E5E0(char *, char *, char *, int, float);
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern unsigned char *func_PAL_L23_0042E5E0(char *, char *, char *, int, float);
+extern int snd_play_from_class_bank(int, int, char *, int);
 
 /* Fills the stack vectors v.a, v.b, v.c and v.d from the table at D_00189E20, the owner's helper and a
    unit vector (0, 1, 0, 1) whose second float is negated when arg2 is set, scales v.d by

@@ -39,7 +39,7 @@ extern int moby_is_spot_free_of_blockers(char *);
 extern void vec_transform_by_object_or_given(char *,char *,char *,char *);
 extern void FastVecSub(void *,void *,void *);
 extern float FastVecDot(void *,void *);
-extern void hero_l16_enter_state(int,int);
+extern s32 hero_l16_enter_state(int,int);
 extern void cam_start_blend_to_target(char *);
 extern float math_fabs(float);
 extern void cam_set_mode_state(int);

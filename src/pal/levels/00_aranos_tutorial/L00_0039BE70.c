@@ -3,8 +3,8 @@
 
 /* func_PAL_L00_0039BE70, level 00's copy of func_PAL_0030FB38: the same C. */
 extern char *part_find_owned_effect_slot(char *, int, int);
-extern void math_fast_float_d(int *);
-extern void PlayMobySound(int, int, char *);
+extern int math_fast_float_d(int *);
+extern int PlayMobySound(int, int, char *);
 extern void func_PAL_002AC290(char *, char *);
 extern void vec_add_random_offset(float *, float);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int,
@@ -60,7 +60,7 @@ extern float FastVecLength(float *);
 extern void vec_scale_to_length(float *, float *, float);
 extern int CollLine(float *, float *, int, int, int);
 extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
-extern void moby_move_and_collide(char *, float *, float, float, float, int);
+extern int moby_move_and_collide(char *, float *, float, float, float, int);
 
 void func_PAL_L00_0039C018(char *obj)
 {

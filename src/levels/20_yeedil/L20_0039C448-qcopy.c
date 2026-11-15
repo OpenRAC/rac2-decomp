@@ -12,7 +12,7 @@ extern int CollLine(void *, void *, int, int, void *);
 
 extern int math_fast_float_d(void *);
 
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 
 extern void gfx_add_draw_callback_third(void *, int);
 

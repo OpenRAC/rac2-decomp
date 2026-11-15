@@ -12,7 +12,7 @@ extern void moby_set_state(void *,int,int);
 extern void part_explode_object_into_pieces(void *,float *,float *,float *,int,int,int,int,int,u8,void *);
 extern void *SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 extern int PlayMobySound(int,int,void *);
-extern void moby_l00_spawn_child(void *,int,int);
+extern char *moby_l00_spawn_child(void *,int,int);
 extern int flag_set_first_pending(void *);
 extern void SpawnParticleBurst(void *,void *,void *,void *,void *,int,int);
 extern void lerp_vector(void *,void *,void *,float);

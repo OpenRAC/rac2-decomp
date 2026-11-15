@@ -12,7 +12,7 @@ extern void FastVecSub(char *, char *, char *);
 extern char *FindIntersectingGridPrimitive(char *, float);
 extern void cam_set_strength_and_steer(char *, float, float);
 extern void cam_reset_default(void);
-extern void FastDecTimer(char *);
+extern int FastDecTimer(char *);
 typedef struct { char *table; } Table_b0898;
 extern Table_b0898 D_L00_001B1844[] __attribute__((section(".sdata")));
 extern int ref_L00_00426C78_00 __attribute__((sda));

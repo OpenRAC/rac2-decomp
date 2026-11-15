@@ -30,7 +30,7 @@ extern float math_fabs(float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern int math_fast_float_d(void *);
-extern void slot_copy_records_to_free(void *);
+extern int slot_copy_records_to_free(void *);
 extern void func_PAL_L05_0044B738(void *, void *);
 extern void ship_update_aim_point(void *, void *);
 extern void moby_sync_equipment_parts(void *);

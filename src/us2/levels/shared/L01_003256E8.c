@@ -1,7 +1,7 @@
 #include "common.h"
 #include "include_asm.h"
 
-extern int strncpy(char *dst, char *src, int len);
+extern char *strncpy(char *dst, char *src, int len);
 extern void text_format_number_separators(char *dst, int x, int idx);
 extern unsigned char D_US2_001A7BBC MACRO_ADDR;
 

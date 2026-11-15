@@ -2,7 +2,7 @@
 #include "names.h"
 extern void menu_set_settings(void *, int, int);
 extern void object_set_value_float(void *, float);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern char D_001ADC10[], D_001ADC18[];
 extern char *D_001A8CFC[] __attribute__((sda));
@@ -11,7 +11,7 @@ extern void object_init_derived_arrays(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void list_menu_reset_attach_items(void *, void *);
-extern void list_menu_set_selection(void *, int);
+extern int list_menu_set_selection(void *, int);
 
 void func_US2_00342BF0(char *object, void *argument)
 {

@@ -63,7 +63,8 @@ extern int part_alloc_effect_slot(void *,int,float,float,float),slot_alloc_for_o
 extern void megaturret_update_fall(void *),projectile_apply_random_push_2(void *);
 extern void part_spawn_explosion_with_sparks(void *,void *,int,float,float);
 extern void slot_free(int),slot_list_remove(void *,int),moby_mark_spawned(void *);
-extern void matrix_mul_vec3(void *,void *,void *),part_advance_grow_effect_2(void *),vec_fast_helper_b(void *);
+extern void matrix_mul_vec3(void *,void *,void *), part_advance_grow_effect_2(void *);
+extern int vec_fast_helper_b(void *);
 extern int math_fast_float_d(void *);
 extern void projectile_check_hit_break_2(void *),moby_follow_attached_motion_2(void *),projectile_draw_effects_2(void *);
 extern void gfx_register_overlay_draw_callback(void (*)(void *),void *);

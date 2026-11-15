@@ -5,7 +5,7 @@ extern int D_L04_001BFAD8 __attribute__((nosda));
 extern int g_hero_moby __attribute__((nosda));
 extern char D_L04_001A8F20[1];
 extern int D_L04_001B0CF8 __attribute__((sda));
-extern void coll_sweep_from_object(void *, void *, int, int, float, float, float, int, int);
+extern int coll_sweep_from_object(void *, void *, int, int, float, float, float, int, int);
 extern int coll_test_point(void *, int, float, void *);
 extern void func_PAL_002ABCB8(void *owner, char *offset, void *filter);
 extern int math_fast_float_d(void *);

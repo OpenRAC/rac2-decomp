@@ -24,7 +24,7 @@ extern int g_screen_height;
 
 extern int math_ping_pong_blend_values(int a, int b, int c, int d, int e);
 
-extern int DrawFramebufferRect(int a, int b, int c, int d, int e, int f, int g);
+extern void DrawFramebufferRect(int a, int b, int c, int d, int e, int f, int g);
 
 /* Draws the coloured frame around a menu panel at its current position. */
 void menu_panel_draw_frame(VEC_F6bf9ce42 **positionPtr)

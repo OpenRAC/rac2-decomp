@@ -11,13 +11,13 @@ typedef int s32_F09f721e0;
 typedef float f32_F09f721e0;
 #endif
 
-extern s32_F09f721e0 pool_alloc_cell (s32_F09f721e0, s32_F09f721e0);
+extern void *pool_alloc_cell (s32_F09f721e0, s32_F09f721e0);
 
-extern s32_F09f721e0 ui_return_second_arg (s32_F09f721e0, s32_F09f721e0);
+extern void *ui_return_second_arg (s32_F09f721e0, s32_F09f721e0);
 
 extern void prompt_bar_init (s32_F09f721e0, s32_F09f721e0, const void *);
 
-extern s32_F09f721e0 GetLocalizedString (s32_F09f721e0);
+extern char *GetLocalizedString (s32_F09f721e0);
 
 extern void prompt_bar_set_texts (s32_F09f721e0, s32_F09f721e0, s32_F09f721e0, s32_F09f721e0);
 
@@ -25,7 +25,7 @@ extern void prompt_bar_set_text_offsets (s32_F09f721e0, f32_F09f721e0, f32_F09f7
 
 extern void prompt_bar_set_spacing (s32_F09f721e0, f32_F09f721e0);
 
-extern void screen_adjust_menu_update (s32_F09f721e0, s32_F09f721e0);
+extern int screen_adjust_menu_update (s32_F09f721e0, s32_F09f721e0);
 
 extern s32_F09f721e0 D_L04_001AE040 __attribute__ ((sda));
 

@@ -4,7 +4,7 @@ extern int FloatToInt(float);
 extern void moby_store_ground_height(void *);
 extern void moby_mark_spawned(void *);
 extern float coll_point_depth_in_volumes(void *, int, int, int, int);
-extern void path_l01_compute_segment_lengths(void *);
+extern float path_l01_compute_segment_lengths(void *);
 extern void anim_start_blended(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int func_001163B0(void);

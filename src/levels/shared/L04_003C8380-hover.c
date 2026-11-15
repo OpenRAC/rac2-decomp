@@ -45,7 +45,7 @@ extern void vec_build_spherical_offset(float *, float, float, float);
 extern int ResolveVehicleMovementCollisions(u8 *, u8 *, u8 *, u8 *, Vec *, Vec *, Vec *, u8 *, int, int *,
                              float, float, float, float, float);
 extern int racer_is_in_jump_window(int a0, int a1, float f12);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern void anim_start_blended(void *, int, int, int);
 extern float math_random_float_range(float, float);
 extern float math_random_angle(void);

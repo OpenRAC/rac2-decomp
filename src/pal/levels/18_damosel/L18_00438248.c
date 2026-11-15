@@ -20,7 +20,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float weapon_compute_shot_launch_speed(void *, void *, int, float, float);
 extern u8 *fireball_spawn(void *, void *, void *, int, float, float);
-extern void PlayMobySound(s32 arg0, s32 arg1, u8 *arg2);
+extern int PlayMobySound(s32 arg0, s32 arg1, u8 *arg2);
 extern void moby_transform_joint_to_world(s32 arg0, s32 arg1, void *arg2);
 
 void func_PAL_L18_00438248(u8 *a)

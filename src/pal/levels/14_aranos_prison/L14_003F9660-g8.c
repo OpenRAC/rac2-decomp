@@ -7,7 +7,7 @@ extern int hero_is_current_selected_id(char *self);
 extern void moby_set_flag_bit(int table, int mode);
 extern void moby_set_state(char *self, int state, int mode);
 extern int flag_set_first_pending(char *self);
-extern void PlayMobySound(int a, int b, char *self);
+extern int PlayMobySound(int a, int b, char *self);
 extern float FastAddRotations(float a, float b);
 extern float math_fast_sin_or_cos_b(float a);
 extern int FastTweenColor(int a, int b, float c);

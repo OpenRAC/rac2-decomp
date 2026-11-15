@@ -297,7 +297,7 @@ extern int arena_start_announcer_message(char *, int);
 
 extern void help_unlock_entry(int);
 
-extern void moby_handle_request_slot_state(int);
+extern int moby_handle_request_slot_state(int);
 
 extern int moby_compute_scaled_entry_value_shifted(int);
 
@@ -305,7 +305,7 @@ extern int moby_compute_scaled_entry_value(int);
 
 extern void module_l00_call_handler_with_arg_4(int);
 
-extern void MemcardSave(int, int);
+extern int MemcardSave(int, int);
 
 /* With a1 == 0 and no count yet for func_L02_003F9B70(0), plays the hero's scene 7 with its
    word at +0x22C8 kept; otherwise picks the scene from a1 (6, 0xB or a random one), adds the
@@ -369,7 +369,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_random_float_range(float, float);
 extern s32 math_random_int_range(s32, s32);
-extern void part_spawn_scaling(void *, void *, u32, s32, s32, s32, s32, s32);
+extern char *part_spawn_scaling(void *, void *, u32, s32, s32, s32, s32, s32);
 
 /* Two passes, over the two 16-byte vectors at D_L02_001B1730 in turn.  Each combines the vector
    with the object's vectors at +0xC0 and +0x10 (func_00283098, func_00282CC0) into v0, builds v1
@@ -478,7 +478,7 @@ typedef struct {
 
 extern L02_003FF9A0_Rec D_L02_00264A70[];
 
-extern void hero_l00_set_action(s32, s32);
+extern s32 hero_l00_set_action(s32, s32);
 extern s32 PadPressedWithin(s32, s32, s32 *);
 extern s32 arena_get_challenge_save_index(s32);
 extern s32 flag_is_byte_set(void);

@@ -44,7 +44,7 @@ extern void hero_reset_speeds_and_vectors(void);
 extern void level_release_slot_list(void *p);
 extern void func_PAL_L00_002AF6C0(void);
 extern void attachment_reset_all(void);
-extern void func_PAL_L00_002C4480(int a0, int a1);
+extern s32 func_PAL_L00_002C4480(int a0, int a1);
 extern void anim_start_object_at_frame(int a0, int a1);
 extern void hero_l00_update_ground_contact(void);
 extern float fast_vec_dist(void *a, void *b);

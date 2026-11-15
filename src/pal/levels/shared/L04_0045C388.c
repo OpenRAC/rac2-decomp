@@ -2,9 +2,9 @@
 #include "names.h"
 
 extern void moby_set_state(char *a0, int a1, int a2);
-extern int part_find_owned_effect_slot(char *a0, int a1, int a2);
+extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
 extern void func_PAL_L00_003281C0(char *a0, int a1, float f12);
-extern void PlayMobySound(int a0, int a1, char *a2);
+extern int PlayMobySound(int a0, int a1, char *a2);
 extern void debris_spawn_ring(char *a0, int a1, float f12, float f13, float f14, float f15);
 extern void moby_mark_spawned(char *a0);
 

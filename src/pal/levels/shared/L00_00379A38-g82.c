@@ -7,8 +7,8 @@ extern float D_L00_001B25E0[] __attribute__((sda));
 extern int D_001AD778 __attribute__((sda));
 extern int D_001AD780 __attribute__((sda));
 extern int D_001AD77C;
-extern unsigned char *GetLocalizedString(int);
-extern void text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
+extern char *GetLocalizedString(int);
+extern int text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
 
 void func_PAL_L00_0037AFB0(void)
 {

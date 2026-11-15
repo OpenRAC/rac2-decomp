@@ -8,7 +8,7 @@ typedef int s32;
 typedef short s16;
 
 extern u32 D_L15_001FB320[];
-extern s32 moby_get_motion_data(void *);
+extern char *moby_get_motion_data(void *);
 extern char *D_L15_001B261C_base[] __asm__("D_L15_001B261C") __attribute__((sda));
 
 /* func_L15_00315428 is defined in L15_00315428-effects-g8.c. */

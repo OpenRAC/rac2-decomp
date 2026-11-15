@@ -9,13 +9,14 @@ extern void part_steer_effect_direction(int,int *,int),table_clear_entry_flag(in
 extern void ref_L00_004045E8_00(void (*)(char *),char *);
 extern void shop_trigger_current_state_effect(void *,void *),vec_add_object_direction_scaled(void *,void *,float);
 extern void shot_handle_impact(void *,void *),part_spawn_spark_trail_between_points(void *,void *,void *),shot_draw_glow_sparks(char *);
-extern void explosion_spawn(void *,float,int,int,int,int,int,int,int,int,int);
+extern char *explosion_spawn(void *,float,int,int,int,int,int,int,int,int,int);
 extern int coll_process_hit(void *,int,void *,int,float);
 extern char *g_area_hit_targets[];
 extern char g_item_slot_to_record[],g_weapon_l00_table[],D_L00_001C6F40[];
 extern void FastVecSub(void *,void *,void *),vec_scale_to_length(void *,void *,float);
 extern void make_hit_descriptor(void *,void *,float,int,void *),QueueMobyImpact(void *,void *);
-extern void StartAttachedEffect(void *,int,int),gfx_free_point_light(int);
+extern void gfx_free_point_light(int);
+extern int StartAttachedEffect(void *,int,int);
 extern int part_l00_alloc_effect_slot_2(void *,float,float,float,float,float);
 
 /* Moves a projectile, applies its explosion hit to nearby objects, and updates

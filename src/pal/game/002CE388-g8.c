@@ -2,13 +2,13 @@
 
 extern void SetupGifPaging(int);
 extern void DoGifPaging(void);
-extern s32 GetLocalizedString(s32);
+extern char *GetLocalizedString(s32);
 extern void func_PAL_0029CB40(void);
 extern char *D_001A8CFC[] __attribute__((sda));
 extern int D_PAL_001ABA40 __attribute__((sda));
 extern int D_PAL_001ABA44[] __attribute__((sda));
 
-extern int text_draw_right_aligned_small(int v, int p7, unsigned long long k, char *r, int m1);
+extern void text_draw_right_aligned_small(int v, int p7, unsigned long long k, char *r, int m1);
 
 extern void DrawMobysSetup(void);
 

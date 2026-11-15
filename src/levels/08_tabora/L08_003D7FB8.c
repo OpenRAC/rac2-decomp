@@ -11,7 +11,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int FastTweenColor(int, int, float);
 extern int FloatToInt(float);
-extern void part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
+extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 /* Shoots out a burst of 200 yellow sparks from the object that inherit its movement. */
 void part_spawn_yellow_spark_burst(char *moby, char *baseVelocity) {

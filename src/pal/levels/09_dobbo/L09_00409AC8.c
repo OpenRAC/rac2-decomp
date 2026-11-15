@@ -10,16 +10,18 @@ extern s32 func_325E78(char *a0, s32 a1);
 extern f32 func_2EA578(char *a0, char *a1);
 extern f32 func_2EA3E0(f32 x);
 
-void func_PAL_L09_00409F00(char *a0, char *a1, s32 a2) {
+int func_PAL_L09_00409F00(char *a0, char *a1, s32 a2) {
     char *p = *(char **)(a0 + 0x68);
+    int result;
     if (a2 == 0) {
-        moby_l01_turn_toward_target(a0, a1);
+        result = moby_l01_turn_toward_target(a0, a1);
     } else {
-        moby_turn_toward_target_and_step(a0, (float *)a1, *(f32 *)(p + 0x33C));
+        result = moby_turn_toward_target_and_step(a0, (float *)a1, *(f32 *)(p + 0x33C));
     }
+    return result;
 }
 
-extern void FastDecTimer(char *p);
+extern int FastDecTimer(char *p);
 extern void moby_update_eased_node(char *a0, char *a1, s32 a2, f32 f12, f32 f13);
 extern void func_PAL_002B14F8(char *a0, char *a1, s32 a2, s32 a3, f32 f12);
 extern s32 moby_count_group_not_in_state(s32 a0, s32 a1);

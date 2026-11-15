@@ -84,7 +84,7 @@ extern int FastDecTimer(void *), math_fast_float_d(void *);
 extern void vec_clear_128(void *);
 extern int moby_is_in_special_class_range(void *), math_random_int_below(int);
 extern void FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float);
-extern int part_queue_impact_effect(void *, int, int, void *, void *, float);
+extern void part_queue_impact_effect(void *, int, int, void *, void *, float);
 extern void FastVecAdd(void *, void *, void *), FastVecScale(void *, void *, float);
 extern float cam_get_view_space_height(void *), FastVecLength(void *);
 extern float fast_vec_dist(void *, void *);

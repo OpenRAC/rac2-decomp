@@ -354,7 +354,7 @@ extern float D_001B23A4 __attribute__((sda));
 extern int FastTweenColor(int, int, float);
 extern int sprintf(char *, char *, ...);
 extern int func_001157AC(char *);
-extern int table_find_by_id(unsigned char *, int);
+extern void *table_find_by_id(unsigned char *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
 extern void text_draw_right_aligned_small(int, int, unsigned long long, unsigned char *, int);
 
@@ -540,7 +540,7 @@ extern int D_001B18B8;
 extern int D_001B18BC;
 extern int D_001B18C0;
 extern int gfx_upload_records_to_buffer_slot(int, int, int, int, int);
-extern void fast_decompress(int, int);
+extern int fast_decompress(int, int);
 /* Fetches the bank's stashed texture groups (handles at +0x94 on, sizes at +0x54 on) to dest at
  * a running offset and links each one. Groups 3 and 4 depend on mode: 0 takes 3, 1 takes 4, 2
  * takes both. */
@@ -684,7 +684,7 @@ void hud_finish_element_setup(char *element)
 
 typedef struct { unsigned char pad00[0x64]; int key; unsigned char pad68[0x28]; } SearchRow_28B5D0;
 extern SearchRow_28B5D0 g_hud_elements[];
-extern void hud_set_slot_contents(int, int, int, int, int, int, int);
+extern int hud_set_slot_contents(int, int, int, int, int, int, int);
 
 /* Resets all 13 HUD elements. */
 void hud_reset_elements(void)
@@ -828,7 +828,7 @@ void hud_init_counter_values(u8 *element) {
 void hud_init_counter_element(HudElem *element) { element->visibleTimer = 0xD2; element->unk48 = 0; element->unk4A = 0; hud_init_counter_values((u8 *)element); }
 
 extern float square_root(float);
-extern void func_0028DF80(void *);
+extern s32 func_0028DF80(void *);
 
 /* Per-frame update of a HUD counter: counts the shown number toward the real value and fades it in and out. */
 void hud_update_counter_element(HudElem *element)
@@ -879,7 +879,7 @@ void hud_update_counter_element(HudElem *element)
 
 
 extern void func_0029CCD8(int, int);
-extern void ForceClaimNotice(int, int, int);
+extern int ForceClaimNotice(int, int, int);
 
 /* Calls two sound helpers, the second with sound number 13. */
 void hud_play_sound_effect(int arg) {

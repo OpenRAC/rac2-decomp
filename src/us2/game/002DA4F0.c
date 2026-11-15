@@ -2,7 +2,7 @@
 
 extern void F70997ba9_FUN_002FC560(int a, int b);
 extern void F70997ba9_FUN_0027C540(int a);
-extern void *F70997ba9_FUN_00288FB8(int id);
+extern char *F70997ba9_FUN_00288FB8(int id);
 extern int F70997ba9_FUN_0027F198(void *p, int i);
 extern void F70997ba9_FUN_0027F120(void);
 extern void F70997ba9_FUN_0027F5B8(int a, int b, long c, void *d, int e);

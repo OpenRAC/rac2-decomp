@@ -4,7 +4,7 @@
 /* The resident flag is small data: this file is built with -G8. Its address
    differs from program to program, so it has no level in its name. */
 extern int ref_L00_002DF190_00 __attribute__((sda));
-extern void snd_play_from_global_bank(int, int, int);
+extern int snd_play_from_global_bank(int, int, int);
 
 extern char g_pad_state[];
 extern int D_001ABCA0 __attribute__((sda));

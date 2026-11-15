@@ -78,7 +78,8 @@ extern char *D_L02_001B368C MACRO_ADDR;
 extern int g_frame_l02_counter MACRO_ADDR;
 extern void moby_set_state(void *,int,int);
 extern int level_get_table_entry_short(int),IsPointInCuboid(void *,int);
-extern void hud_queue_hint_message(int,int),subtitle_request_voice_line(int,int),TriggerSubtitleInCuboid(int,int,int,int,int);
+extern void hud_queue_hint_message(int,int), TriggerSubtitleInCuboid(int,int,int,int,int);
+extern int subtitle_request_voice_line(int,int);
 extern int arena_is_challenge_running(void *),math_fast_float_d(void *),chainblade_is_state_active(void *),flag_is_third_pending_set(void *);
 extern void state_set_flag_one(void),hero_reset_position_and_direction(void *,void *,int,int);
 /* Watches how the player is doing and shows a help hint or message when the player seems stuck and has not seen it recently. Update handler of moby class 3108. */

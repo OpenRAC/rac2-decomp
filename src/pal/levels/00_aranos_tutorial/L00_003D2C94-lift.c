@@ -81,7 +81,7 @@ extern LiftMoby *CreateMoby(int);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
-extern void math_spring_float_to_goal(float *, void *, float, float, float, float);
+extern float math_spring_float_to_goal(float *, void *, float, float, float, float);
 extern int snd_play_from_class_bank(int, int, void *, int);
 #define PLAYER_POSITION D_00189E20.position
 #define STOP_SOUND()                                                                  \

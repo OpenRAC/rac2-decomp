@@ -42,7 +42,7 @@ extern s32 hero_slot_item_id(s32 index);
 
 extern void weapon_wheel_init(void);
 extern void UpdateRadialMenuSelection(void);
-extern void DrawRadialSelectorPanel(void);
+extern int DrawRadialSelectorPanel(void);
 extern s32 hud_set_slot_contents(s32, s32, void *, void *, void *, s32, s32);
 extern void cancel_hero_item_animation(void);
 extern void UpdateHeroSlotCallbacks(void);
@@ -50,7 +50,7 @@ extern void level_release_slot_list(char *);
 extern void hero_set_objects_flag_bit(void);
 extern void hero_clear_tracked_slots(void);
 extern void attachment_reset_all(void);
-extern void level_run_slot_callback(s32);
+extern int level_run_slot_callback(s32);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(s32);
 extern s32 hero_l20_set_state(s32, s32);

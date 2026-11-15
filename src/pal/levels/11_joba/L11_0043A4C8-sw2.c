@@ -25,9 +25,14 @@ extern void moby_set_state(void *,int,int),func_PAL_002A7E68(void *,int,int,int)
 extern int math_random_int_below(int),flag_set_second_pending(void *),flag_set_first_pending(void *),moby_dispatch_action_by_kind(void *,void *);
 extern float vec_get_heading_angle(void *,void *,void *),mat_fast_helper_a(float,float),FastDiffRots(float,float),fast_vec_dist(void *,void *),vec_distance_xy(void *,void *),moby_get_anim_value(void *),math_random_float_range(float,float);
 extern void FastVecSub(void *,void *,void *),FastVecAdd(void *,void *,void *),vec_scale_to_length(void *,void *,float),FastVecScale(void *,void *,float),euler_rotation_basis(void *,void *),mat_get_euler_angles(void *,void *);
-extern void moby_set_controller_speed_limits(void *,float,float,float,float),func_PAL_L01_00323068(void *,void *),func_PAL_L02_00335630(void *,void *),func_PAL_002B5BA8(void *,void *,float),func_PAL_002B5C98(void *,void *,float),func_PAL_002B5E30(void *,float),hero_set_control_motion_and_step(void *,void *),moby_rotate_about_point(void *,void *,float,float,float);
+extern void moby_set_controller_speed_limits(void *,float,float,float,float), func_PAL_L02_00335630(void *,void *), moby_rotate_about_point(void *,void *,float,float,float);
+extern int func_PAL_L01_00323068(void *,void *);
+extern int func_PAL_002B5E30(void *,float);
+extern int func_PAL_002B5BA8(void *,void *,float);
+extern int hero_set_control_motion_and_step(void *,void *);
+extern int func_PAL_002B5C98(void *,void *,float);
 extern int coll_test_point(void *,int,void *,float);
-extern void coll_test_hit_at_bone(void *,int,int,int,int,int,float,float,float);
+extern int coll_test_hit_at_bone(void *,int,int,int,int,int,float,float,float);
 static __inline__ void SetAnimation(char *p, int animation, int mode, int blend)
 {
     if (ANIM(p) != animation) func_PAL_002A7E68(p, animation, mode, blend);

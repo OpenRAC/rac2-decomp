@@ -10,7 +10,7 @@ typedef struct {
     int fallback;
 } CallbackStateL001FEC40;
 extern CallbackStateL001FEC40 D_L00_001FEC40;
-extern void module_l00_call_handler_with_arg_18(int);
+extern int module_l00_call_handler_with_arg_18(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_PAL_L00_0034E9A0(void)
@@ -49,7 +49,7 @@ unsigned long long func_PAL_L00_0034EA28(void)
     return 0;
 }
 
-extern void module_l00_call_handler_with_arg_19(int);
+extern int module_l00_call_handler_with_arg_19(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_PAL_L00_0034EA58(void)
@@ -87,7 +87,7 @@ int func_PAL_L00_0034EAE0(void)
     return 0;
 }
 
-extern void level_l00_call_module_handler_with_arg_4(int);
+extern int level_l00_call_module_handler_with_arg_4(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_PAL_L00_0034EB10(void)
@@ -124,7 +124,7 @@ int func_PAL_L00_0034EB98(void)
     return 0;
 }
 
-extern void level_l00_call_module_handler_with_arg_3(int);
+extern int level_l00_call_module_handler_with_arg_3(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_PAL_L00_0034EBC8(void)

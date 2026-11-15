@@ -26,7 +26,7 @@ extern Res_189E20 g_hero_state;
 extern char D_L00_001B8FF0[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_compute_object_to_target(void *, void *, void *, int, float);
-extern void func_US2_L00_003AB8F8(void *, void *, void *, void *, int);
+extern char *func_US2_L00_003AB8F8(void *, void *, void *, void *, int);
 
 void func_US2_L00_003ACCF0(char *a0, char *a1) {
     float buf[4];

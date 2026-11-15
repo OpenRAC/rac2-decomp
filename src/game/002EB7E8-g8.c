@@ -6,7 +6,8 @@ extern float g_screen_fade MACRO_ADDR, D_001A8C74 MACRO_ADDR, D_001A8C78 MACRO_A
 extern int D_001B15A4 __attribute__((sda));
 extern int cutscene_map_id_to_index(int);
 extern void mem_clear(void *, int, int);
-extern void FadeToBlack(int), moby_spawn_model_parts(void), level_select_data_bank(void), UpdateSoundVoices(void);
+extern void FadeToBlack(int), moby_spawn_model_parts(void), level_select_data_bank(void);
+extern s32 UpdateSoundVoices(void);
 extern short snd_pump_music_and_disc_read(int);
 extern int snd_resume_music_stream(void);
 typedef struct { char pad[0x30]; int selected, frame, tick, chunk; short end, h42, count, h46, wait; char pad4a[0x2]; int p4c; char pad50[8]; int done; char pad5c[0x10]; int start, dest; char pad74[0x118]; char *objects[17]; } Scene;

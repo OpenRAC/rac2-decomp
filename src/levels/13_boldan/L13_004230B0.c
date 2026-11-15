@@ -21,7 +21,7 @@ extern void cam_end_override(void *);
 extern void moby_set_state(void *,int,int);
 extern int coll_test_point(void *,int,void *,float);
 extern int PlayMobySound(int,int,void *);
-extern void math_step_value_toward_target(float *,float *,float,float,float,float);
+extern float math_step_value_toward_target(float *,float *,float,float,float,float);
 extern void FastVecSub(void *,void *,void *);
 extern void mat_combine_and_store(void *,void *,void *,void *);
 void UpdateBoldanVerticalPlatform(u8 *moby) {

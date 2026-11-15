@@ -3,7 +3,7 @@
 /* func_PAL_L16_00411E88, the PAL copy of func_L16_0040CF98: the same C, where the lead doubling
    becomes 2 * 5/6 and the turn rates take a 6/5 squared correction at 50 Hz. */
 
-extern void math_fast_float_d(void *);
+extern int math_fast_float_d(void *);
 extern s32 FastDecTimer(void *);
 extern void moby_transform_joint_to_world(void *, s32, void *);
 extern float fast_vec_dist(void *, void *);

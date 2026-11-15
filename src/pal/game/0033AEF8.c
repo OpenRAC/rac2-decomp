@@ -1,8 +1,8 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void object_construct_derived_a(void *p);
-extern void hud_construct_widget_base(void *p);
+extern void *object_construct_derived_a(void *p);
+extern char *hud_construct_widget_base(void *p);
 
 /* func_00338F58 is matched in 00338F58.c. */
 
@@ -32,7 +32,7 @@ typedef struct {
 } Statistics_0033B218;
 
 extern void object_set_first_float4(void *, float, float, float, float);
-extern int text_format_location_name(void *, int);
+extern char *text_format_location_name(void *, int);
 
 extern Float2_0033B218 ref_L00_0042EC50_00;
 extern Float2_0033B218 ref_L00_0042EC50_01;
@@ -106,7 +106,7 @@ void func_PAL_0033B698(unsigned char *owner, int value)
 /* Measured target: byte-identical across all 27 levels. */
 void func_PAL_0033B6B8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x328) = a1; }
 
-extern int func_00288FB8_3(int);
+extern char *func_00288FB8_3(int);
 extern void prompt_bar_set_texts(char *, int, int, int);
 extern void prompt_bar_set_spacing(char *, float);
 
@@ -123,8 +123,8 @@ void func_PAL_0033B6C0(char *p)
 
 
 
-extern void func_L00_0042BAD0_1(char *object);
-extern void func_L00_0042C290_1(char *object);
+extern char *func_L00_0042BAD0_1(char *object);
+extern char *func_L00_0042C290_1(char *object);
 
 /* calls two one-argument functions on a sequence of sub-objects of the argument (four at 8..236 stride 76, nine at 312..888 stride 72) and returns the argument */
 char *func_PAL_0033B960(char *object)
@@ -151,7 +151,7 @@ typedef struct {
 
 extern void *memset(void *, int, int);
 extern void object_set_second_float4(void *, float, float, float, float);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, int);
 extern Point2_0033BE50 D_001ADCE0, D_001ADCE8, D_001ADCF0, D_001ADCF8;
 extern Point2_0033BE50 D_001ADD00 __attribute__((sda));
@@ -224,7 +224,7 @@ int func_PAL_0033BE50(char *obj, int unused)
 extern void F8ad956d6_FUN_00336320(char *target);
 extern void F8ad956d6_FUN_002FC560(int marker, int code);
 extern void F8ad956d6_FUN_00295F60(int first, int second);
-extern void F8ad956d6_FUN_002DAF68(char *target);
+extern int F8ad956d6_FUN_002DAF68(char *target);
 extern void F8ad956d6_FUN_00336A78(char *target);
 
 void func_PAL_0033C308(char *object)

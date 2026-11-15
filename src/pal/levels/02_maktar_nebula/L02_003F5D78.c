@@ -56,8 +56,8 @@ extern void vec_random_direction(char *, float, float);
 extern void func_PAL_002B15D8(char *, int, char *, float, float, float, float, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void IncrementMaktarTypeCounter(int, int);
-extern void func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern char *func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
 
 /* Tears the actor down: stops its effect, clears its sub-objects, resets flags. */
 void func_PAL_L02_003F5EB0(char *arg0) {

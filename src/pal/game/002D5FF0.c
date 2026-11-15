@@ -30,9 +30,9 @@ int func_PAL_002D60C8(void)
 }
 
 extern int D_00138344;
-extern void func_0029CF08(int);
+extern int func_0029CF08(int);
 extern int D_00138344;
-extern void func_0029CF08(int);
+extern int func_0029CF08(int);
 
 int func_PAL_002D60F0(void) {
     func_0029CF08(D_00138344);
@@ -146,7 +146,7 @@ extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern int stub_empty_25(void);
 extern int stub_empty_25(void);
 extern void data_set_small_value_and_refresh(int, int);
-extern void request_begin_slot(int, int, int, int, int);
+extern int request_begin_slot(int, int, int, int, int);
 extern int func_PAL_0029CDA8(int);
 extern int stub_empty_24(void);
 
@@ -212,10 +212,10 @@ int func_PAL_002D66E0(void) {
 
 extern int func_PAL_002D6730(int, int, int *);
 
-void func_PAL_002D6710(int first, int second) {
+int func_PAL_002D6710(int first, int second) {
     int result[4];
     result[0] = 0;
-    func_PAL_002D6730(first, second, result);
+    return func_PAL_002D6730(first, second, result);
 }
 
 

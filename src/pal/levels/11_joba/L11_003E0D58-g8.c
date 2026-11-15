@@ -9,7 +9,7 @@ extern u8 D_L11_001C0D20[];
 extern u8 D_L11_001A8F20[] __attribute__((sda));
 extern s32 CollLine(void *, void *, s32, void *, s32);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
-extern void PlayMobySound(s32, s32, u8 *);
+extern int PlayMobySound(s32, s32, u8 *);
 extern void moby_mark_spawned(u8 *);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern void FastVecAdd(void *, void *, void *);

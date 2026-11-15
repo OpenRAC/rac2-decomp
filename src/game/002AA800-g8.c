@@ -27,8 +27,8 @@ extern float math_random_angle(void), math_fast_sin_or_cos_a(float), math_fast_s
 extern void vec_scale_to_length(float *, float *, float);
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
 extern int math_solve_quadratic(float *, float *, float, float, float);
-extern void SegmentCrossPolyline(int, void *, void *, void *);
-extern void moby_spawn_bolt_pickup(void *, void *, void *, int, int, int);
+extern int SegmentCrossPolyline(int, void *, void *, void *);
+extern void *moby_spawn_bolt_pickup(void *, void *, void *, int, int, int);
 
 /* Spawns a burst of bolt pickups from an object, with the total amount split into coin sizes. */
 void moby_spawn_bolt_pickups(char *object, int low, int high, int flags, int surface, int maximum, float height)

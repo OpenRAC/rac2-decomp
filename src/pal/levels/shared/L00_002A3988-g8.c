@@ -112,7 +112,7 @@ extern void func_PAL_002F6F08(void), func_PAL_L00_00372EA8(void), func_PAL_0027C
 extern void func_PAL_002CB710(void), func_PAL_L00_002E7610(void), func_PAL_00287018(void), func_PAL_0027C990(void);
 extern void func_PAL_L00_003776E8(void), func_PAL_L00_0037D348(void), func_PAL_002EB800(void);
 extern int func_PAL_002EA0B0(void);
-extern int func_PAL_L00_002FE148(void), func_PAL_L00_002FE168(void);
+extern void func_PAL_L00_002FE148(void), func_PAL_L00_002FE168(void);
 extern void math_trap_always(void), level_decrement_counter_clamped(void), math_add_wrapping_counter(void);
 extern void func_PAL_00299898(void), map_update_state_machine(void), SetupGifPaging(int);
 extern void VU1_addGSregister(unsigned int, unsigned long long);

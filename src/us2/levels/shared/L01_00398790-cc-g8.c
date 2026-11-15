@@ -24,7 +24,9 @@ extern float vec_distance_xy(void*,void*);
 extern float math_fabs(float);
 extern int math_random_int_below(int);
 extern void moby_init_randomized_vars(void*),part_draw_bolt_glow_rings(void*),part_spawn_sparkle_trail_above_ground(void*),teleporter_start_arrival(void*),cam_blend_moby_update(void*),bobbing_l01_moby_update(void*);
-extern void func_US2_002B1880(int,int),MemcardSave(int,int),PlayMobySound(int,int,void*),moby_mark_spawned(void*),moby_set_state(void*,int,int),anim_start_blended(void*,int,int,int);
+extern void func_US2_002B1880(int,int), moby_mark_spawned(void*), moby_set_state(void*,int,int), anim_start_blended(void*,int,int,int);
+extern int PlayMobySound(int,int,void*);
+extern int MemcardSave(int,int);
 extern void set_hero_animation(int,int,float),hero_reset_position_and_direction(void*,void*,int,int),cam_set_mode_state(int);
 extern int math_fast_float_d(void*);
 

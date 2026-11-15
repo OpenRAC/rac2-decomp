@@ -65,7 +65,7 @@ extern s32 D_L09_001A9040 __attribute__((sda));
 extern char *D_L09_001B285C __attribute__((sda));
 
 extern s32 func_323340(char *a0, char *a1, s32 a2);
-extern char *moby_is_hero_or_special(char *a0);
+extern int moby_is_hero_or_special(char *a0);
 extern void group_flag_peers(char *a0);
 extern void func_326368(char *a0, s32 a1, s32 a2, s32 a3, f32 f12, f32 f13);
 

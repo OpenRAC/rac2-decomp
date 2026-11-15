@@ -9,9 +9,9 @@ extern u8 D_001A7A60[] __attribute__((sda));
 extern s32 D_001A903C[] __attribute__((sda));
 extern s32 D_0018CC18;
 extern s32 IsPointInCuboid(void *a0, s32 a1);
-extern void snd_play_from_global_bank(s32 a0, s32 a1, s32 a2);
+extern int snd_play_from_global_bank(s32 a0, s32 a1, s32 a2);
 extern void value_set_entry_by_index(s32 a0, s32 a1);
-extern void subtitle_request_voice_line(s32 a0, s32 a1);
+extern int subtitle_request_voice_line(s32 a0, s32 a1);
 
 /* Watches the player entering two trigger boxes and, on the second, unlocks a story event with a sound. Also plays a one-time hint when the player enters the main box. */
 void trigger_hint_update(u8 *moby)

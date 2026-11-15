@@ -62,7 +62,7 @@ extern void slot_list_remove(void *, int);
 extern void moby_mark_spawned(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void moby_l00_advance_child_blend(void *);
-extern void vec_fast_helper_b(void *);
+extern int vec_fast_helper_b(void *);
 extern int math_fast_float_d(void *);
 extern void UpdateOwnedParticleTrails(void *);
 extern void projectile_check_hit_break(void *);

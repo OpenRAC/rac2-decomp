@@ -19,11 +19,11 @@ typedef float f32;
 
 extern u8 D_00189E20_7[];
 
-extern void math_spring_float_to_goal(f32 *a, f32 *b, f32 c, f32 d, f32 e, f32 f);
+extern float math_spring_float_to_goal(f32 *a, f32 *b, f32 c, f32 d, f32 e, f32 f);
 
 extern f32 func_00282C48_1(f32 v);
 
-extern void ApproachValue(f32 *p, f32 v, f32 w);
+extern f32 ApproachValue(f32 *p, f32 v, f32 w);
 
 #ifndef RAC2_T_RES_F458C670E
 #define RAC2_T_RES_F458C670E
@@ -178,7 +178,7 @@ int hero_classify_input_direction(void)
 
 extern unsigned char D_0018C0D4[];
 
-extern void hero_l00_set_action(int a0, int a1);
+extern s32 hero_l00_set_action(int a0, int a1);
 
 /* Picks the variant of the shared loader the current game state selects. */
 void hero_start_loader_state(int useAlternate)

@@ -13,7 +13,7 @@ extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern s32 func_PAL_002B1A50(u8 *, u8 *, s32);
 extern void func_PAL_002A7650(u8 *, s32, s32);
 extern s32 math_random_int_below(s32);
-extern void func_PAL_002B3F18(u8 *, u8 *, u8 *);
+extern int func_PAL_002B3F18(u8 *, u8 *, u8 *);
 extern u8 *CreateMoby(s32);
 extern void func_002A0F48(u8 *);
 extern void func_PAL_002A7E68(u8 *, s32, s32, s32);

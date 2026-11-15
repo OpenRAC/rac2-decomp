@@ -5,10 +5,10 @@ typedef struct { int colors[6]; } Colors1043;
 extern Colors1043 ref_L00_002AC728_00, ref_L00_002AC728_01;
 extern float ref_L00_002AC728_02[];
 extern int math_random_int_below(int);
-extern void part_spawn_firework_spark(void *, void *, int, int, float, int, int, float, int, int);
-extern void part_spawn_shockwave_ring(void *, void *, void *, int, int, int, int, int, float);
-extern void PlayMobySound(int, int, void *);
-extern void moby_spawn_template_effect(void *, void *, int, int);
+extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int, float, int, int);
+extern char *part_spawn_shockwave_ring(void *, void *, void *, int, int, int, int, int, float);
+extern int PlayMobySound(int, int, void *);
+extern char *moby_spawn_template_effect(void *, void *, int, int);
 
 extern float math_shortest_angle_delta (float x, int a1, float y);
 
@@ -265,14 +265,14 @@ void vec_add_along_axis(float *out, float *vector, float *axis, float amount)
 }
 
 /* Returns the first value stored in the object's private data, or 0 if it has none. */
-s32 moby_get_private_value_0(u8 *moby) {
+char *moby_get_private_value_0(u8 *moby) {
  if(moby==0) return 0;
  if((*(unsigned short *)(moby+0x34)&0x20)!=0) return (*(s32 **)(moby+0x68))[0];
  return 0;
 }
 
 /* Returns the fifth value stored in the object's private data, or 0 if it has none. */
-s32 moby_get_private_value_4(u8 *moby) {
+char *moby_get_private_value_4(u8 *moby) {
  if(moby==0) return 0;
  if((*(unsigned short *)(moby+0x34)&0x20)!=0) return (*(s32 **)(moby+0x68))[4];
  return 0;
@@ -282,7 +282,7 @@ extern int coll_scatter_points_in_shapes(void *, int, void *, void *, float);
 extern float math_random_angle(void);
 extern int math_random_int_range(int, int);
 extern void vec_build_spherical_offset(float *, float, float, float);
-extern void part_spawn_scaling(void *, void *, unsigned int, int, int, int, int, int);
+extern char *part_spawn_scaling(void *, void *, unsigned int, int, int, int, int, int);
 
 /* Spawns small glowing sparks at several points around an object. */
 void part_spawn_sparks_around_moby(void *owner, char *offset, void *filter)
@@ -632,7 +632,7 @@ void vec_set_direction_with_complement(float *out, float *dir, float x) { vec_sc
 
 
 /* Returns the third value stored in the object's private data, or 0 if it has none. */
-s32 moby_get_private_value_2(u8 *moby) {
+char *moby_get_private_value_2(u8 *moby) {
  if(moby==0) return 0;
  if((*(unsigned short *)(moby+0x34)&0x20)==0) return 0;
  return (*(s32 **)(moby+0x68))[2];
@@ -942,7 +942,7 @@ extern const Table_002AF0A8 D_0026CB30;
 
 extern void value_set_entry_by_index(int, int);
 
-extern void ForceClaimNotice(int, int, int);
+extern int ForceClaimNotice(int, int, int);
 
 /* Plays the entry of the 21-entry table the clamped index picks; entry 3 goes through the
    other player. */

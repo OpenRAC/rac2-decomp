@@ -13,7 +13,7 @@ extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern int FloatToInt(float);
 /* EE integer and floating-point argument banks retain their independent order. */
-extern void aranos_spark_spawn(void *, void *, int, float, int, int);
+extern void *aranos_spark_spawn(void *, void *, int, float, int, int);
 
 void func_PAL_L00_003EEF94(unsigned char *p) {
     float v[4], pos[4];

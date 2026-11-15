@@ -22,8 +22,8 @@ extern s32 math_random_int_below(s32);
 extern void vec_add_random_offset(void *, f32);
 extern f32 level_get_water_height(void);
 extern f32 math_random_float_range(f32, f32);
-extern void part_spawn_drifting(void *, void *, u32, f32, f32);
-extern void weapon_select_aim_target(void *, s32, s32, s32, f32, f32);
+extern void *part_spawn_drifting(void *, void *, u32, f32, f32);
+extern int weapon_select_aim_target(void *, s32, s32, s32, f32, f32);
 extern f32 fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
 

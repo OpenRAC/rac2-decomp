@@ -78,7 +78,7 @@ extern void gfx_draw_scaled_object(void *, f32, f32, s32, f32, f32);
 extern s32 table_find_last_used_entry(s32);
 extern s32 FastTweenColor(u32, u32, f32);
 extern void gfx_draw_screen_rectangle(s32, s32, s32, s32, s32, u32 *);
-extern void *GetIconFrame(s32, s32);
+extern int GetIconFrame(s32, s32);
 extern void hud_draw_sprite_gradient(void *, s32, s32, s32, s32, Block *);
 extern void text_draw_small(s32, s32, u64, char *, s32);
 extern void level_set_counter_plus_one(s32);

@@ -41,7 +41,7 @@ extern void set_identity_rotation_rows(void *);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern void func_001290E0(void *, void *);
-extern void math_closest_point_on_segment(void *, void *, void *, void *);
+extern float math_closest_point_on_segment(void *, void *, void *, void *);
 
 /* Rebuilds the frame at D_L04_001B3190 from a segment, keeping the previous direction
    when the new one is degenerate or reversed. */

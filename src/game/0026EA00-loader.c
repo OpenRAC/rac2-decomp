@@ -108,7 +108,7 @@ extern void hud_load_banks(void);
 extern void map_setup_screen(void);
 extern void map_update_state_machine(void), mc_update_state(void);
 extern void level_init_callbacks(void);
-extern void fast_decompress(int, int);
+extern int fast_decompress(int, int);
 extern int request_begin_slot(int, int, int, int, unsigned char *);
 extern int request_end_slot(int, int);
 extern void mode_apply_pending_change(void);

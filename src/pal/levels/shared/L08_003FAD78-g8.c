@@ -21,7 +21,7 @@ extern void moby_mark_spawned(void *);
 extern int GetFirstMobyInGroup(void **,int,int,int);
 extern int FastDecTimer(void *);
 extern int math_random_int_below(int);
-extern void FindHeroOrMobyTarget(void *,void *,void *,int,void *,int,float);
+extern int FindHeroOrMobyTarget(void *,void *,void *,int,void *,int,float);
 extern int list_count_entries(void *,void *);
 extern void anim_start_blended(void *,int,int,int);
 extern int func_PAL_002AF6C0(void *,float);

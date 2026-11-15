@@ -31,7 +31,7 @@ extern float D_001B23A4 __attribute__((sda));
 extern int FastTweenColor(int, int, float);
 extern int sprintf(char *, char *, ...);
 extern int func_001157AC(char *);
-extern int table_find_by_id(unsigned char *, int);
+extern void *table_find_by_id(unsigned char *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
 extern void text_draw_right_aligned_small(int, int, unsigned long long, unsigned char *, int);
 

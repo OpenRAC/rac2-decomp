@@ -36,14 +36,14 @@ extern char *GetLocalizedString(int);
 extern char *strcpy(char *, char *);
 extern int sprintf(char *, char *, ...);
 extern int text_draw_centered_medium(int, int, unsigned long, char *, int);
-extern int func_PAL_002803E8(int, int, unsigned long, char *, int, float);
+extern void func_PAL_002803E8(int, int, unsigned long, char *, int, float);
 extern void text_draw_right_aligned_medium(int, int, unsigned long, char *, int);
 extern void text_draw_medium(int, int, unsigned long, char *, int);
 extern void func_PAL_002FAB40(char *, int);
-extern void help_copy_record_at_depth(void *, int, int);
+extern int help_copy_record_at_depth(void *, int, int);
 extern int GetSelectedShopItemPrice(void);
 extern int GetIconFrame(int, int);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, void *);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, void *);
 
 /* Draws the selected vendor item, its price and the purchase/maximum-ammo prompt. */
 void func_PAL_L00_00379A38(void)

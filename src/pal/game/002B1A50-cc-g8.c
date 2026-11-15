@@ -9,7 +9,7 @@ extern void func_PAL_002AC3C0(void *,void *);
 extern char *part_find_owned_effect_slot(void *,int,int);
 extern int FastDecTimer(void *);
 extern float func_PAL_002AA108(void *,void *);
-extern void func_PAL_002B3F18(void *,void *,void *);
+extern int func_PAL_002B3F18(void *,void *,void *);
 extern char *D_001B1B5C;
 typedef struct { int frame; } DamageClock;
 extern DamageClock g_game_time;

@@ -16,7 +16,8 @@ extern int D_001AB8D0[1] __attribute__((sda));
 extern int D_002614E8[];
 extern unsigned char g_hero_state[];
 extern int stub_empty_23(void), stub_empty_24(void), stub_empty_25(void), stub_empty_27(void), stub_empty_28(void), stub_empty_29(void), stub_empty_30(void), menu_always_return_true(void);
-extern void func_US2_003492A8(char *, int), func_US2_003492B0(char *, int), menu_load_sprites_from_values(char *, int *), func_US2_00349368(char *, int, int), func_US2_00349378(char *, int, int *), func_US2_00349728(char *, int);
+extern void func_US2_003492A8(char *, int), func_US2_003492B0(char *, int), menu_load_sprites_from_values(char *, int *), func_US2_00349368(char *, int, int), func_US2_00349378(char *, int, int *);
+extern int func_US2_00349728(char *, int);
 void func_US2_002CBED0(void)
 {
     if (!D_001A8CFC[0]) return;

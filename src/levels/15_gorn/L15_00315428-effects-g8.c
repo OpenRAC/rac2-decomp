@@ -28,19 +28,19 @@ extern void math_store_angle_update_result(void *, void *, int, int, float);
 extern void vec_fast_to_int_helper(void *, void *);
 extern void quaternion_to_rotation_basis(void *, void *);
 extern void moby_compute_local_point(void *, void *, float, float, float);
-extern void part_spawn_shockwave_burst(void *, int, int, int, int, int, int, int, int, int, int, float);
+extern char *part_spawn_shockwave_burst(void *, int, int, int, int, int, int, int, int, int, int, float);
 extern int math_random_int_below(int);
 extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern void moby_spawn_shot_effect(void *, void *, void *, int, int, int, int, int, float);
+extern char *moby_spawn_shot_effect(void *, void *, void *, int, int, int, int, int, float);
 extern void moby_transform_joint_point(void *, int, void *);
 extern void copy_matrix3x4(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_add_random_offset(void *, float);
-extern void part_spawn_object_relative_particle(void *, void *, void *, void *, int);
+extern void *part_spawn_object_relative_particle(void *, void *, void *, void *, int);
 
 /* Updates the stage objects and emits effects at the scripted frame counts. */
 void UpdateGornStageEffects(void)

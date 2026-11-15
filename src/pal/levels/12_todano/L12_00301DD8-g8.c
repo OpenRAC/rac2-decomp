@@ -71,16 +71,16 @@ extern void moby_transform_joint_to_world(void *, int, void *);
 extern void lerp_vector(void *, void *, void *, float);
 extern float math_random_float_range(float, float);
 extern int math_random_int_range(int, int);
-extern void part_spawn_scaling(void *, void *, unsigned int, int, int, int, int, int);
+extern char *part_spawn_scaling(void *, void *, unsigned int, int, int, int, int, int);
 extern void moby_mark_spawned(void *);
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void func_PAL_0032F3B8(void *, void *, void *, float);
+extern char *func_PAL_0032F3B8(void *, void *, void *, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void vec_add_random_offset(void *, float);
 extern void FastVecSub(void *, void *, void *);
-extern void func_PAL_L00_00342480(void *, void *, int);
+extern unsigned char *func_PAL_L00_00342480(void *, void *, int);
 
 void func_PAL_L12_00301DD8(void)
 {

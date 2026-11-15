@@ -10,14 +10,14 @@ extern float D_L02_001B04D4 __attribute__((sda));
 extern float D_L02_001B04D8 __attribute__((sda));
 extern int g_moby_l02_pool;
 extern float g_camera_l02_position[4];
-extern void *moby_transform_joint_to_world(char *, int, void *);
+extern void moby_transform_joint_to_world(char *, int, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_add_random_offset(void *, float);
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
-extern void enemy_spawn_record(void *, void *, void *, int, int);
+extern void *enemy_spawn_record(void *, void *, void *, int, int);
 
 void func_PAL_L02_003DF388(char *arg0) {
     float a[4];

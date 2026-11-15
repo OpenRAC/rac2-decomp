@@ -43,24 +43,24 @@ extern int moby_dispatch_action_by_kind(char *,void *);
 extern void func_PAL_002A7650(char *,int,int);
 extern void part_queue_moby_for_glow(char *,int,int);
 extern void moby_mark_spawned(char *);
-extern void ApproachValue(float *,float,float);
+extern f32 ApproachValue(float *,float,float);
 extern void func_PAL_002AF420(char *,void *,float,float);
 extern float mat_fast_helper_a(float,float);
 extern void StepAngleTowardTarget(float *,int,float,float);
 extern int flag_set_first_pending(char *);
 extern float vec_distance_xy(void *,void *);
 extern int func_PAL_002AF6C0(char *,float);
-extern void PlayMobySound(int,int,char *);
+extern int PlayMobySound(int,int,char *);
 extern int coll_sweep_from_object(char *,float,void *,int,float,float,int,int,int);
 extern void moby_set_controller_speed_limits(char *,float,float,float,float);
 extern void FastVecSub(void *,void *,void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
-extern void func_PAL_L02_00333638(char *,void *,int,float,float,float);
+extern int func_PAL_L02_00333638(char *,void *,int,float,float,float);
 extern float math_fast_sin_or_cos_a(float),math_fast_sin_or_cos_b(float);
 extern void add_vectors(void *,void *,void *);
 extern float FastAddRotations(float,float);
-extern void MobySpringTurn(char *,float,float *,float,float,float);
+extern float MobySpringTurn(char *,float,float *,float,float,float);
 
 void func_PAL_L17_003E79D8(char *object)
 {

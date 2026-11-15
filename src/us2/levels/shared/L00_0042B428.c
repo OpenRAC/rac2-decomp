@@ -27,7 +27,7 @@ extern float FastVecDot(char *, char *), FastVecLength(char *);
 extern void FastVecScale(char *, char *, float);
 extern void func_00282CC0_4(char *, char *, char *);
 extern int cam_claim_request_slot(char *);
-extern void cam_release_request_slot(char *);
+extern int cam_release_request_slot(char *);
 extern int cam_test_trigger_volumes(char *);
 extern int D_00138320;
 extern int g_frame_l00_counter __attribute__((section(".sdata")));

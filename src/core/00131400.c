@@ -2,7 +2,7 @@
 #include "names.h"
 
 /* Qwen draft (branch qwen/autonomy, 3d350393), checked by tools/check.py */
-extern void __cmpdf2(long long, long long);
+extern int __cmpdf2(long long, long long);
 
 /* Handles a square root error by calling a helper with the stored value, then reports no error handled. */
 int math_handle_sqrt_error(void *exception)

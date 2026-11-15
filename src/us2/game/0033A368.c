@@ -10,7 +10,7 @@ typedef struct {
     unsigned int levels;
 } Statistics_00339320;
 extern void object_set_first_float4(void *, float, float, float, float);
-extern int text_format_location_name(void *, int);
+extern char *text_format_location_name(void *, int);
 extern Float2_00339320 ref_L00_0042EC50_00;
 extern Float2_00339320 ref_L00_0042EC50_01;
 extern Float2_00339320 ref_L00_0042EC50_02;

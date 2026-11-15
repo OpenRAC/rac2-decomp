@@ -19,7 +19,7 @@ extern int D_L00_001AD4F0[] SDATA(D_L00_001AD4F0);
 extern void ref_L00_00373F48_00(void);
 extern int save_count_items_above_baseline(void);
 extern int PlayMobySound(int, int, char *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void shop_set_message_text(void *);
 extern int level_try_spend_counter(int);
 extern void level_spawn_on_second_mode(int);

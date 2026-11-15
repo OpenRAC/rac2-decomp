@@ -28,27 +28,29 @@ extern int GetCollHitMaterial(void);
 extern int ForceClaimNotice(int, int, int);
 extern float math_random_angle(void), math_random_signed_float_range(float, float);
 extern void func_US2_0029C548(int, void (*)(void));
-extern void hud_draw_timer(void), moby_call_setup_b(void), helper_set_active_flag(void);
+extern void moby_call_setup_b(void), helper_set_active_flag(void);
+extern int hud_draw_timer(void);
 extern void part_steer_effect_direction(char *, char *, int);
 extern void vec_transform_or_copy(char *, char *), shop_trigger_current_state_effect(char *, char *);
 extern void vec_add_object_direction_scaled(char *, char *, float);
 extern void vec_clear_128(char *);
-extern void func_US2_L00_002C4560(int, int);
+extern s32 func_US2_L00_002C4560(int, int);
 extern void part_setup_object_effect_entry(char *, char *, char *);
 extern void anim_start_blended(char *, int, int, int);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern void func_US2_00327AB0(char *), moby_steer_heading_to_target(char *), moby_move_with_friction(char *), moby_find_nearby_same_kind(char *);
 extern void snd_play_on_threshold_cross(void);
 extern int math_fast_float_d(char *), CollideSweptSphere(char *), weapon_get_group(int);
 extern float FastVecLength(char *);
-extern void part_spawn_blast_effect_moby(char *, char *, char *, float);
+extern char *part_spawn_blast_effect_moby(char *, char *, char *, float);
 extern void DamageNearbyMobys(char *), table_clear_entry_flag(int), moby_mark_spawned(char *);
 extern void gfx_register_final_draw_callback(void (*)(char *), char *), ring_update_if_below_threshold(char *);
 extern void copy_matrix_rotation(char *, char *);
 extern void mat_get_euler_angles(char *, char *);
 extern int moby_transform_point_and_rotation_by_parent(char *, char *, char *, char *, char *, char *);
 extern void euler_rotation_basis(char *, char *), part_queue_ground_shadow(char *, float);
-extern void hud_draw_timer(void), ref_US2_L00_003DEAF8_00(void), helper_set_active_flag(void);
+extern void ref_US2_L00_003DEAF8_00(void), helper_set_active_flag(void);
+extern int hud_draw_timer(void);
 
 void func_US2_L00_003DEAF8(char *object)
 {

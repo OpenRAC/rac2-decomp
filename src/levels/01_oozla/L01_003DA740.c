@@ -31,7 +31,7 @@ extern void muckdweller_clear_marked_objects(void **, s32 *);
 extern s32 moby_l01_turn_toward_target(void *, void *);
 extern void enemy_update_wander_heading(void *, void *, void *);
 
-extern s32 func_310648();
+extern f32 func_310648();
 
 extern f32 func_310580(f32 x, f32 y);
 
@@ -45,7 +45,7 @@ extern void func_2E3470(void *a, void *b, void *c);
 
 extern void func_32EF38(void *buf, s32 a1, s32 a2, s32 a3, f32 x, f32 y);
 
-extern void memset(void *buf, s32 value, s32 count);
+extern void *memset(void *buf, s32 value, s32 count);
 
 extern s32 coll_process_hit(f32 radius, void *pos, s32 flag, void *obj, s32 arg);
 
@@ -283,7 +283,7 @@ void moby_follow_attached(void *moby_arg, void *fallback) {
 /* func_L01_003DD6A8 */
 extern void gfx_update_color_fade(void *, void *);
 
-extern void FastDecTimer(void *);
+extern int FastDecTimer(void *);
 
 extern s32 math_fast_float_d(void *);
 

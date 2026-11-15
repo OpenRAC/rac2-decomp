@@ -9,7 +9,7 @@ extern short D_001ABD00[] MACRO_ADDR;
 extern float D_001B23A8;
 extern void SetupGifPaging(long);
 extern void DoGifPaging(void);
-extern char *table_find_by_id(char *, int);
+extern void *table_find_by_id(char *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
 extern char *GetLocalizedString(int);
 extern int text_draw_centered_small(int, int, unsigned long, char *, int);

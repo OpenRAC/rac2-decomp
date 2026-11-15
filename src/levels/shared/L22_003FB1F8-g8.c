@@ -2,7 +2,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern int CreateMoby(int);
+extern char *CreateMoby(int);
 extern f32 math_random_angle(void);
 extern void set_identity_rotation_rows(void *);
 extern void part_init_effect_slots(void *);

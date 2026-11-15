@@ -24,8 +24,8 @@
  */
 #include "common.h"
 
-extern void memset(s8 *, s32, s32);
-extern s32 GetLocalizedString(s32);
+extern void *memset(s8 *, s32, s32);
+extern char *GetLocalizedString(s32);
 extern s32 *object_get_fourth_field(s8 *);
 extern void object_set_second_float4(s8 *, f32, f32, f32, f32);
 extern void object_init_derived_arrays(s8 *, s8 *, s8 *);
@@ -36,7 +36,7 @@ extern void hud_set_widget_value_pair(s8 *, s32, s32);
 extern void hud_init_widget_defaults(s8 *, s8 *, s8 *);
 extern void hud_set_widget_field_b(s8 *, s32);
 extern s8 *ui_return_second_arg(s32, s32);
-extern s32 pool_alloc_cell(s8 *);
+extern void *pool_alloc_cell(s8 *);
 extern void list_menu_reset_attach_items(s8 *, s8 *);
 extern s32 D_001A8CFC;
 extern s8 D_001ADC10[];

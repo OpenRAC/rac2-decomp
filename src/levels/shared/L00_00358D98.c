@@ -34,8 +34,8 @@ extern int D_L00_001B1BB8[] __attribute__((sda));
 extern int g_screen_width __attribute__((sda));
 extern int D_001A79FC __attribute__((sda));
 extern int GetIconFrame(int, int);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
-extern int GetLocalizedString(int);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
+extern char *GetLocalizedString(int);
 extern void text_draw_right_aligned_medium(int, int, unsigned long long, unsigned char *, int);
 extern void text_format_number_with_separators(char *, int);
 extern void text_draw_medium(int, int, unsigned long long, unsigned char *, int);
@@ -340,9 +340,9 @@ void pickup_update_interactive(unsigned char *object) {
 }
 
 
-extern void load_start_disc_read(int value, char *target);
+extern int load_start_disc_read(int value, char *target);
 
-extern void snd_pump_music_and_disc_read(int value);
+extern s16 snd_pump_music_and_disc_read(int value);
 
 extern int D_L00_001BCAC0[];
 
@@ -386,7 +386,7 @@ extern void *r1_D_0012F86C_00367720 NOT_SDA;
 
 /* rac1-decomp src/core/001138A8.c: func_001138A8 */
 /* Returns a stored pointer value as a number. */
-int state_get_stored_pointer_value(void) {
+void *state_get_stored_pointer_value(void) {
     return (int)r1_D_0012F86C_00367720;
 }
 
@@ -442,7 +442,7 @@ extern int request_begin_slot(int a, int b, int c, int d, int e);
 
 extern void game_reset_frame_counters(void);
 
-extern void UpdateSoundVoices(void);
+extern s32 UpdateSoundVoices(void);
 
 extern void part_update_all(void);
 

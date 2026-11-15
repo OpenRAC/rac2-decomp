@@ -89,7 +89,7 @@ extern float math_approach_target_with_direction_mode(void *, void *, float, flo
 extern void timer_start_countdown(int, float);
 extern void load_scene_chunk(int, int);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
-extern void snd_resume_music_stream(void);
+extern s32 snd_resume_music_stream(void);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern float math_lerp_float(float, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);

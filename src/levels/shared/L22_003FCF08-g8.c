@@ -13,7 +13,7 @@ extern f32 math_random_signed_float_range(f32, f32);
 extern void vec_build_spherical_offset(f32 *, f32, f32, f32);
 extern void FastVecScale(char *, char *, f32);
 extern void add_vectors(char *, char *, char *);
-extern void part_spawn_ground_effect(char *, int, int, int, int, char *, int, f32, f32, f32);
+extern void *part_spawn_ground_effect(char *, int, int, int, int, char *, int, f32, f32, f32);
 
 /* The level's spray settings, all read through $gp. */
 extern f32 D_L22_001B0D08 __attribute__((sda));

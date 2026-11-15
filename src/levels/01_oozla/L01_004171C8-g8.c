@@ -10,7 +10,7 @@ extern void gold_bolt_glow_init(void *a0);
 
 /* Spawns a gold bolt moby at a position, already in its idle state, with random spin angles.
  * Adapted from the state 0 of RAC1's gold_bolt_update (GPL-3.0). */
-s32 SpawnGoldBolt(void *position, void *owner_a, void *owner_b, void *owner_c) {
+void *SpawnGoldBolt(void *position, void *owner_a, void *owner_b, void *owner_c) {
     u8 *bolt;
     u8 *vars;
     f32 value, spin_x, spin_y, spin_z;

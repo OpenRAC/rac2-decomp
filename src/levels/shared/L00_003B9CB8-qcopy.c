@@ -99,7 +99,7 @@ extern float func_00283CE0_8(int ticks);
 extern int func_00282948_8(void *timer);
 extern void func_002A8C00_8(void *packet, char *owner, int flags, void *direction, float amount);
 extern void func_002A8E20_8(char *target, void *packet);
-extern void func_0032D758_8(char *target, int kind, int value);
+extern int func_0032D758_8(char *target, int kind, int value);
 extern int func_002E5CF8_8(int index, int mode, char *object);
 extern void part_l00_spawn_spark_burst_2(void *pos, void *direction, int count, unsigned int color);
 

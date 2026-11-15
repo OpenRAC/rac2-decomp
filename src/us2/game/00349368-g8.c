@@ -8,8 +8,8 @@
 
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern void gfx_draw_screen_element_stored(char *);
-extern int object_get_first_field(char *);
-extern int object_get_fourth_field(char *);
+extern float *object_get_first_field(char *);
+extern int *object_get_fourth_field(char *);
 extern float D_001AE5F0 __attribute__((sda));
 extern float D_001B23A4[] MACRO_ADDR;
 extern int g_screen_height[] MACRO_ADDR;

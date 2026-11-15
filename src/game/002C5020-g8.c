@@ -2,7 +2,7 @@
 #include "names.h"
 
 extern int D_001AA3B4 __attribute__((sda));
-extern void moby_decrement_top_byte(void *, int);
+extern int moby_decrement_top_byte(void *, int);
 extern int FastDecTimer(void *);
 extern void part_kill(void *);
 

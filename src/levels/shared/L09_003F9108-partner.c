@@ -5,7 +5,7 @@ extern void level_apply_colour_tint(char *);
 extern void moby_copy_color(char *, char *);
 extern void trooper_draw_flame_sprays(char *);
 extern void moby_transform_joint_to_world(char *, int, void *);
-extern void math_approach_target_with_direction_mode(void *, void *, int, float, float,float, float);
+extern f32 math_approach_target_with_direction_mode(void *, void *, int, float, float,float, float);
 extern void FastVecSub(void *, void *,void *);
 extern float vec_length_xy(void *);
 extern float mat_fast_helper_a(float, float);

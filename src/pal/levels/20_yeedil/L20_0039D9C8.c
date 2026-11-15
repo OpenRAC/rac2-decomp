@@ -12,7 +12,7 @@ typedef struct YeedilEffectState {
 } YeedilEffectState;
 extern YeedilEffectState D_L20_001BDCC0;
 extern int D_L20_001A8F00[] __attribute__((sda));
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int,
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int,
                          int, int, int, int, float, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern float math_random_float_range(float, float);

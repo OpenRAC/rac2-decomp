@@ -52,7 +52,8 @@ extern float vec_length_xy(void *), func_002A0558(char *,char *), FastAddRotatio
 extern int TryClaimNotice(int,int,int), math_random_int_below(int), flag_set_first_pending(char *);
 extern int func_PAL_L00_002C4480(int,int);
 extern void func_PAL_L30_00411310(char *,int), func_PAL_L00_002D2668(int,int,float), moby_mark_in_range(char *);
-extern void moby_set_state(char *,int,int), moby_transform_joint_to_world(char *,int,void *), moby_update_ground_check(char *), gfx_add_draw_callback_third(void (*)(char *),void *);
+extern void moby_set_state(char *,int,int), moby_update_ground_check(char *), gfx_add_draw_callback_third(void (*)(char *),void *);
+extern void moby_transform_joint_to_world(char *,int,void *);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern void moby_scale_owner_words_by_angles(char *,void *,void *,float,float,float);
 extern void *memcpy(void *,const void *,unsigned int);

@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern void moby_step_at_own_position_factor(void *,float);
-extern void moby_step_at_own_position(void *);
+extern int moby_step_at_own_position_factor(void *,float);
+extern int moby_step_at_own_position(void *);
 extern int ComputeRegionRouteHeading(void *,void *,void *,void *,int,void *,void *,float,float);
 extern int moby_step_controller(void *,void *,float);
 extern int moby_turn_toward_target_and_step(void *,void *,float);

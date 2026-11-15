@@ -43,7 +43,7 @@ extern float D_001AE2B0 __attribute__((sda));
 extern float D_001AE2B4;
 extern float D_001AE2B8 __attribute__((sda));
 extern float D_001AE2BC;
-extern void menu_seek_chain_entry(int, int);
+extern int menu_seek_chain_entry(int, int);
 extern void grid_menu_handle_input_first_group(char *, unsigned int);
 extern void grid_menu_handle_input_single_choice(char *, unsigned int);
 extern void grid_menu_handle_input_main_grid(char *, unsigned int);

@@ -8,7 +8,7 @@ extern void SetBackgroundColor(int, int, int);
 extern int request_begin_slot(int, int, int, int, int);
 extern unsigned int ref_L00_0036F480_00(void);
 extern void game_reset_frame_counters(void);
-extern void UpdateSoundVoices();
+extern int UpdateSoundVoices();
 extern L00_0037F7E8_u8 *func_002A08A0(void);
 extern L00_0037F7E8_u8 *D_L00_001B1EA8 __attribute__((sda));
 extern void func_002A05A8(char *);

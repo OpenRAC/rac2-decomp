@@ -33,8 +33,8 @@ void func_PAL_00343C88(char *a0)
 }
 
 char *func_PAL_00343CF8(char *p) {
-    extern void menu_pass_through_handle(void *);
-    extern void object_construct_derived_a(char *);
+    extern unsigned long long menu_pass_through_handle(void *);
+    extern void *object_construct_derived_a(char *);
     menu_pass_through_handle(p + 0x10);
     object_construct_derived_a(p + 0xEC);
     object_construct_derived_a(p + 0x138);

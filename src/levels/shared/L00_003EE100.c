@@ -241,7 +241,7 @@ extern void func_00282F20_2(char *, char *, float);
 extern void func_00282CC0_2(char *, char *, char *);
 extern void func_00282DD8_2(char *, char *, char *);
 extern float math_random_angle(void);
-extern void func_L00_003F0198_2(char *, int, float, float, int);
+extern void *func_L00_003F0198_2(char *, int, float, float, int);
 extern float func_00283B98_4(float, float);
 
 /* The record is reached through three handles (entry for the header and the first trail,
@@ -996,7 +996,7 @@ int vaporizer_update_timed_records(int *moby)
 }
 
 
-extern void moby_transform_point_and_rotation_by_parent(char *a0, char *a1, char *a2, char *a3, char *a4, char *a5);
+extern int moby_transform_point_and_rotation_by_parent(char *a0, char *a1, char *a2, char *a3, char *a4, char *a5);
 
 extern void moby_mark_spawned(char *a0);
 

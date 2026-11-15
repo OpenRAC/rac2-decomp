@@ -68,7 +68,7 @@ extern void func_3739C0(int);
 extern int PlayMobySound(int, int, char *);
 extern float IntToFloat(int);
 extern float math_lerp_float(float, float, float);
-extern void ApproachValue(float *, float, float);
+extern f32 ApproachValue(float *, float, float);
 extern float FastVecDot(void *, void *);
 extern float fast_vec_dist(void *, void *);
 
@@ -331,7 +331,7 @@ extern void anim_start_blended(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void func_002A05A8(char *);
 extern void set_moby_color(char *, int, int, int);
-extern void moby_spawn_linked(char *, int, float, float);
+extern int moby_spawn_linked(char *, int, float, float);
 
 /* Sets up an enemy when it appears: clears its lock, picks its look (active or resting) and starts its animation. */
 void enemy_init_state(char *object, int mode, int active) {
@@ -376,9 +376,9 @@ void enemy_init_state(char *object, int mode, int active) {
 
 extern void arena_add_waiting_fighter(unsigned char *object, int class_id);
 
-extern void SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 
 extern void anim_start_blended(void *, int, int, int);
 
@@ -561,7 +561,7 @@ extern void FastVecCross(void *a, void *b, void *c);
 
 extern void mat_get_euler_angles(char *a, char *b);
 
-extern void math_approach_target_with_direction_mode(char *a, char *b, int c, float d, float e, float f, float g);
+extern f32 math_approach_target_with_direction_mode(char *a, char *b, int c, float d, float e, float f, float g);
 
 /* Builds the measured three-axis basis of the object and hands it to the three slots. */
 /* Turns the object smoothly so it faces a given direction. */
@@ -870,7 +870,7 @@ int chain_creature_pick_move_state(char *moby)
 
 extern int FloatToInt(float);
 extern void drone_kill_with_effects(char *);
-extern void moby_apply_damage_to_object(char *, char *, int);
+extern int moby_apply_damage_to_object(char *, char *, int);
 extern int weapon_select_aim_target(char *, int, int, int, float, float);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(char *);

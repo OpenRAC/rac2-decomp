@@ -16,7 +16,7 @@ extern s32 vec_fast_helper_b(char *);
 extern void FastVecSub(char *, char *, char *);
 extern s32 math_random_int_range(s32, s32);
 extern s32 func_00313EA0(s32);
-extern s32 part_spawn_hero_relative(char *, char *, u32, u32, f32, u32, u32);
+extern void *part_spawn_hero_relative(char *, char *, u32, u32, f32, u32, u32);
 extern s32 FloatToInt(f32);
 
 /* spawns the level's score pickup effect for this object */

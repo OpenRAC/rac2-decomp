@@ -34,7 +34,7 @@ extern void FastVecScale(void *, void *, float);
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern u8 *func_PAL_002C7B18(void *, void *, int, float);
-extern void func_PAL_003096D0(void *, void *, void *, int, int, int, int, int, float);
+extern char *func_PAL_003096D0(void *, void *, void *, int, int, int, int, int, float);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, int, int, int, int, int, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern u8 *func_PAL_002BE9A8(void *, float, float, int, void *, int, int, float, float);

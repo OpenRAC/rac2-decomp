@@ -3,7 +3,7 @@
 
 extern char D_00189E20_9[];
 extern unsigned char D_PAL_001A7ACC MACRO_ADDR;
-extern float func_00282C88_1(float *buf);
+extern void func_00282C88_1(float *buf);
 extern float FastVecLength(float *buf);
 
 /* func_PAL_00328438, the PAL copy of func_00326CB8: the same C, where the first value is negated

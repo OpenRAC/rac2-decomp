@@ -63,7 +63,7 @@ extern BatchA_A10_u8 D_L03_001FF8C0[];
 
 extern BatchA_A10_u8 D_L03_001FFAC0[];
 
-extern int func_00288FB8_1 ();
+extern char *func_00288FB8_1 ();
 
 extern void text_draw_medium (int v, int p7, long k, int r, int m1);
 
@@ -219,7 +219,7 @@ extern int g_weapon_table[];
 extern unsigned char g_item_slot_to_record[];
 extern int request_end_slot(int, int);
 extern int request_begin_slot(int, int, int, int, void *);
-extern void snd_pump_music_and_disc_read(int);
+extern s16 snd_pump_music_and_disc_read(int);
 extern void LoadClassIntoFreeCacheSlot(int);
 
 typedef struct {
@@ -296,7 +296,7 @@ extern int menu_run_action_by_index(int);
 
 extern int menu_handle_command(int);
 
-extern void snd_play_from_global_bank(int, unsigned int, void *);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 
 typedef struct {
     char reserved00[0x44];

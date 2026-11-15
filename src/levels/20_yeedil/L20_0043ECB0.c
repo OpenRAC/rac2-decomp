@@ -83,7 +83,7 @@ void moby_enter_state_six(char *moby) {
 }
 extern void FastVecAdd(char *, char *, char *);
 extern void FastVecScale(char *, char *, float);
-extern void coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
+extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
                           int);
 extern int math_fast_float_d(char *);
 extern void moby_mark_spawned(char *);
@@ -122,14 +122,14 @@ void gfx_start_screen_effect(void) {
 
 /* func_L20_00442550 is defined in L20_00442550-g8.c. */
 
-extern void coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
+extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
                           int);
 
 extern float vec_distance_xy(char *, char *);
 
-extern void moby_step_controller(char *, char *, float);
+extern int moby_step_controller(char *, char *, float);
 
-extern void moby_l01_turn_toward_target(char *, char *);
+extern int moby_l01_turn_toward_target(char *, char *);
 
 /* Draws an effect at the moby, then moves it toward a target if it is close enough, or uses the other approach when it is far away. */
 void moby_chase_target_update(char *moby, char *target, float speed) {
@@ -149,7 +149,7 @@ void moby_chase_target_update(char *moby, char *target, float speed) {
 
 extern int math_random_int_range(int, int);
 
-extern int yeedil_boss_find_group_target(char *);
+extern char *yeedil_boss_find_group_target(char *);
 
 extern int math_random_int_below(int);
 
@@ -393,7 +393,7 @@ extern int flag_set_first_pending(char *);
 
 extern int flag_is_third_pending_set(char *);
 
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 
 extern int PlayMobySound(int, int, char *);
 
@@ -463,7 +463,7 @@ extern int flag_set_first_pending(char *);
 
 extern int flag_is_third_pending_set(char *);
 
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 
 extern unsigned char D_0019B2E8[];
 

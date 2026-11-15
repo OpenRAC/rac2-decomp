@@ -53,7 +53,7 @@ extern int D_001AE0C8 __attribute__((sda));
 extern char D_002652F0[];
 extern void menu_set_selected_index(void *, int);
 extern void menu_set_entry_table(unsigned char *, float *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, unsigned int);
 extern void object_set_value_float(void *, float);
 

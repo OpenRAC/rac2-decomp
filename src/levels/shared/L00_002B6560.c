@@ -6,7 +6,7 @@ extern float cam_get_view_space_height(void *);
 extern void cam_set_view_space_height(void *, void *, float);
 extern void cam_offset_point_in_view_space(void *, void *, float);
 extern void FastVecSub(void *, void *, void *);
-extern void ApproachValue(float *, float, float);
+extern f32 ApproachValue(float *, float, float);
 extern float square_root(float);
 extern void snd_update_slot_object(int, int, int);
 extern void snd_stop_voice(int);

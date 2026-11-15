@@ -8,7 +8,7 @@ extern void moby_set_state(void *, int, int);
 
 extern void moby_set_animation_and_speed(void *, int, int, int);
 
-extern void FastDecTimer(void *);
+extern int FastDecTimer(void *);
 
 extern void gfx_update_color_fade(void *, void *);
 

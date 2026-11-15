@@ -368,7 +368,7 @@ extern void cancel_hero_item_animation(void);
 
 extern void attachment_reset_all(void);
 
-extern void hero_l00_set_action(int a0, int a1);
+extern s32 hero_l00_set_action(int a0, int a1);
 
 extern void anim_start_object_at_frame(int a0, int a1);
 

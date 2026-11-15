@@ -14,7 +14,7 @@ extern float FastDiffRots(float, float);
 extern float fast_subtract_rotations(float, float);
 extern void math_apply_axis_rotation_to_quat(float *, float *, char *, float);
 extern void FastVecAdd(float *, float *, u8 *);
-extern void moby_l01_turn_toward_target(char *, float *);
+extern int moby_l01_turn_toward_target(char *, float *);
 extern float vec_distance_xy(char *, void *);
 
 /* Looks for a nearby enemy in front of the moby, and turns toward it, offset by a small angle. Returns 1 if one was found. */

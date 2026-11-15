@@ -8,7 +8,7 @@ extern void transform_vector(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void SpawnEA7Moby(void *, void *, void *, s32, float);
+extern char *SpawnEA7Moby(void *, void *, void *, s32, float);
 extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);

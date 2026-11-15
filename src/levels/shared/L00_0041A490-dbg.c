@@ -16,7 +16,7 @@ extern int FloatToInt(f32);
 
 /* Rounds a value up to the next multiple of sixteen; an already aligned value is returned
    unchanged. */
-s32 mem_align_up_sixteen_alt(s32 value)
+unsigned char *mem_align_up_sixteen_alt(s32 value)
 {
     s32 divisor = 16;
     f32 fdiv;

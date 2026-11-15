@@ -2,7 +2,7 @@
 #include "names.h"
 typedef int Quad __attribute__((mode(TI)));
 extern char D_L00_001B8E20[];
-extern void cam_resolve_position(void *, int);
+extern int cam_resolve_position(void *, int);
 extern float FastVecDot(void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecSub(void *, void *, void *);

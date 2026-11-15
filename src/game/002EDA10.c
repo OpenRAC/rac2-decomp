@@ -2,7 +2,7 @@
 typedef int QuadEDA __attribute__((mode(TI)));
 typedef union VecEDA { QuadEDA q; float f[4]; } VecEDA;
 extern unsigned char *D_001B5390;
-extern int moby_get_motion_data(unsigned char *);
+extern char *moby_get_motion_data(unsigned char *);
 extern int follower_get_state(unsigned char *);
 extern void follower_clamp_range_spawn_sparks(unsigned char *);
 extern void follower_check_hazard_contact(unsigned char *);
@@ -15,7 +15,7 @@ extern void vec_scale_to_length(void *,void *,float);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void follower_set_push_vector(unsigned char *,void *);
 extern int follower_has_reached_target(unsigned char *);
-extern int follower_try_place_at_saved_spot(unsigned char *);
+extern s64 follower_try_place_at_saved_spot(unsigned char *);
 extern void follower_set_state(unsigned char *,int);
 extern int func_001163B0(void);
 extern float math_random_float_range(float,float);

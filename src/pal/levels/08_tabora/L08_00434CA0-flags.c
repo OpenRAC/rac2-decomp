@@ -8,7 +8,7 @@ extern char *part_find_owned_effect_slot(void *,int,int);
 extern float func_PAL_002AA108(void *,void *);
 extern void func_PAL_002AC290(void *,void *);
 extern void func_PAL_002AC3C0(void *,void *);
-extern void PlayMobySound(int,int,void *);
+extern int PlayMobySound(int,int,void *);
 extern void set_moby_color(void *,int,int,int);
 extern int moby_count_group_not_in_state(int,int);
 extern int math_random_int_range(int,int);

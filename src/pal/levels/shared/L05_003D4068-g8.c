@@ -4,7 +4,7 @@ extern int g_current_map_index;
 extern char *moby_get_motion_data(char *object);
 extern void SpawnSpaceProjectile(char *, int, int, int, float, float, float, float, int, int, int);
 extern int math_random_int_below(int);
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
 
 /* Spawns the object's effect once its guards clear, then runs the timer and marks the run.
  * The two words of the effect's parameters are the same in both calls, so the compiler

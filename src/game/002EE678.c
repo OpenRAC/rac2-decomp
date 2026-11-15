@@ -2,7 +2,7 @@
 #include "names.h"
 
 /* func_002EE6A8: owner ABI/declaration review retained. */
-extern int moby_get_motion_data(unsigned char *owner);
+extern char *moby_get_motion_data(unsigned char *owner);
 
 #ifndef RAC2_T_V4_FB6552688
 #define RAC2_T_V4_FB6552688

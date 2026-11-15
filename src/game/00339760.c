@@ -7,13 +7,13 @@ typedef unsigned char u8;
 
 extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 
-extern int func_00288FB8_3(int);
+extern char *func_00288FB8_3(int);
 
 extern void prompt_bar_set_texts(char *, int, int, int);
 
 extern void prompt_bar_set_spacing(char *, float);
 
-extern void *func_00288FB8_5(int);
+extern char *func_00288FB8_5(int);
 
 extern void func_0033B050_1(void *, void *, void *, void *);
 

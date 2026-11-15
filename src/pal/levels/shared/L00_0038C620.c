@@ -15,7 +15,7 @@ extern int F6eb4f363_FUN_002A77E0(int mode);
 extern float F6eb4f363_FUN_002A90F8(char *object, char *local);
 extern void F6eb4f363_FUN_00282D30(char *local, int value, float scale);
 extern float F6eb4f363_FUN_002A7878(float low, float high);
-extern void F6eb4f363_FUN_002BF728(char *object, char *local, float amount, float base);
+extern void *F6eb4f363_FUN_002BF728(char *object, char *local, float amount, float base);
 
 /* func_00303568 is defined in 00303568.c. */
 

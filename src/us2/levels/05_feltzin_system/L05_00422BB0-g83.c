@@ -54,10 +54,10 @@ extern void vec_scale_to_length(void *dst, void *src, f32 scale);
 extern f32 FastVecDot(void *a, void *b);
 extern f32 fast_vec_dist(void *a, void *b);
 extern void hero_add_clamped_stat(f32 a0);
-extern void snd_play_from_class_bank(s32 a0, s32 a1, void *a2, s32 a3);
+extern int snd_play_from_class_bank(s32 a0, s32 a1, void *a2, s32 a3);
 extern void effect_set_enabled(void *moby, s32 a1);
 extern void effect_set_color(void *moby, u32 color);
-extern s32 pickup_spawn_if_not_taken(void *pos, s32 a1, s32 a2, s32 a3);
+extern char *pickup_spawn_if_not_taken(void *pos, s32 a1, s32 a2, s32 a3);
 
 /* Mission 3 of the Feltzin dispatcher: gates (class 0x114A) are spawned along the selected path,
    two at a time, each facing along the path. When the player's or the second tracked position's

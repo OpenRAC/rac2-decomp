@@ -6,10 +6,10 @@ extern void gfx_enable_screen_flag(void);
 extern int hud_draw_widget_text(void *);
 extern void func_US2_003378A0(void *);
 extern void gfx_draw_screen_rectangle(int,int,int,int,int,void *);
-extern int object_get_fourth_field(u8 *);
+extern int *object_get_fourth_field(u8 *);
 extern void object_set_second_float4(void *,float,float,float,float);
 extern void hud_set_widget_field_b(void *,int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 typedef struct {unsigned int first,second;} MenuColors;
 /* func_US2_00348E70, the USA v2.00 copy of func_00348138: the same C, where the fields move 0x10 on,
    text id 0x31E4 becomes 0x307A and the call to func_0027F120 at the top is gone. */

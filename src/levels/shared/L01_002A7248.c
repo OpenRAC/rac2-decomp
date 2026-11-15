@@ -7,7 +7,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int FloatToInt(float);
 extern unsigned char *D_L01_001FF164;
-extern int strncpy(char *, char *, int);
+extern char *strncpy(char *, char *, int);
 extern void cancel_hero_item_animation(void);
 extern void UpdateHeroSlotCallbacks(void);
 extern void hero_set_objects_flag_bit(void);
@@ -476,7 +476,7 @@ extern int get_ammo(int);
 extern int hero_slot_item_id(int);
 extern void initialize_moby_animation_blend(void *, void *, int, int, int, int);
 extern void AdvanceAndDecodeAnimationFrames(void *, void *);
-extern void ApproachValue(void *, float, float);
+extern f32 ApproachValue(void *, float, float);
 extern void release_moby_animation_slot(void *, void *);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *, void *, void *);
@@ -637,7 +637,7 @@ extern void hero_clear_tracked_slots(void);
 extern void attachment_reset_all(void);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(int a0);
-extern void SetHeroMoveState(int a0, int a1);
+extern s32 SetHeroMoveState(int a0, int a1);
 extern void hero_l01_update_blend_channels(void);
 extern char g_hero_state[];
 
@@ -1293,7 +1293,7 @@ void text_format_number_separators(char *dst, int number, int idx)
 }
 
 
-extern int strncpy(char *dst, char *src, int len);
+extern char *strncpy(char *dst, char *src, int len);
 
 /* Expands a template: copies src into the scratchpad, then writes it to out, replacing %d (next number) and %<n>d (n-th number) with the numbers listed in nums (every second int, up to ten, stopped by -1). */
 void text_expand_number_template(char *out, char *src, int *nums)

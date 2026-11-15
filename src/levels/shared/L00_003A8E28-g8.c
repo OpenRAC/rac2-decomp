@@ -129,7 +129,7 @@ extern float D_L00_001AF848[4];
 extern void node_free_slot(int);
 extern char *RecordHeroTrailNode(void *);
 extern int func_001163B0(void);
-extern int part_spawn_debris_two_mode(void *,int,int,int,int,int,void *,float,float);
+extern void *part_spawn_debris_two_mode(void *,int,int,int,int,int,void *,float,float);
 extern void ref_L00_003B1270_0(int,int,int,void *,int);
 
 /* Releases slot-table entries taken 480 or more frames ago, steps the moby's state 0, 1, 2, and in

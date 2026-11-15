@@ -12,7 +12,7 @@ extern char g_hero_state[];
 extern char *D_001B2D1C __attribute__((sda));
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void cam_reset_entry(int);
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 extern void func_PAL_L00_002B9CD8(void *, void *, int, int);
 extern void museum_info_stand_advance_state(char *);
 

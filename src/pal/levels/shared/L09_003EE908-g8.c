@@ -2,7 +2,8 @@
 /* func_PAL_L09_003EE908, the PAL copy of func_L09_003EA360: the same C, where the frame time
  * 0.016666668f becomes 0.020000001f, the three int cooldown settings are scaled by 5/6 and the
  * two aim channel values by 1.44f, and the projectile spawner is the PAL function. */
-extern void moby_transform_joint_to_world(void *,int,void *),moby_transform_joint_point(void *,int,void *);
+extern void moby_transform_joint_point(void *,int,void *);
+extern void moby_transform_joint_to_world(void *,int,void *);
 extern float fast_vec_dist(void *,void *),vec_distance_xy(void *,void *),vec_length_xy(void *);
 extern float mat_fast_helper_a(float,float),fast_subtract_rotations(float,float),math_random_float_range(float,float);
 extern float IntToFloat(int),math_wrap_angle_to_pi(float),math_fast_sin_or_cos_b(float);

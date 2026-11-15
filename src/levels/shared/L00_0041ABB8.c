@@ -296,7 +296,7 @@ void gfx_draw_directional_glow_sprite(void *unused, float *b, float *a, int k, f
 
 
 
-extern int level_get_slot_body(int id, int index);
+extern unsigned char *level_get_slot_body(int id, int index);
 
 extern void table_clear_entry_flag(int index);
 
@@ -392,7 +392,7 @@ extern float FastAddRotations(float a, float b);
 
 extern void vec_build_spherical_offset(float *p, float a, float b, float c);
 
-extern void part_spawn_burst(float *out, float *in, int a2, int a3, unsigned int a4, int a5,
+extern void *part_spawn_burst(float *out, float *in, int a2, int a3, unsigned int a4, int a5,
                            float f1, float f2, float f3, float f4, float f5);
 
 /* Points the level's fixed vector at the given position, then spawns twenty

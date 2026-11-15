@@ -50,7 +50,7 @@ void flying_l00_shot_update(char *arg)
     ref_L00_00403D58_00(smoky_spark_effect_update, arg);
 }
 
-extern void snd_play_from_class_bank(int a, int b, void *c, int d);
+extern int snd_play_from_class_bank(int a, int b, void *c, int d);
 extern int CollLine(void *a, void *b, int c, void *d, int e);
 extern void moby_mark_spawned(char *arg);
 extern TI128 D_L00_001BF220;

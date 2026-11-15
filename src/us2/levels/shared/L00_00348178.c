@@ -12,7 +12,7 @@ typedef struct {
 extern CallbackStateL001FEC40 D_L00_001FEC40;
 extern int g_pad_state[];
 extern int module_l00_call_handler_with_arg_12(int);
-extern int tab_menu_get_selected_entry(int);
+extern char *tab_menu_get_selected_entry(int);
 extern void menu_start_action(int);
 
 int func_US2_L00_00348178(void)

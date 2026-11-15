@@ -9,8 +9,8 @@
 extern float math_fabs(float);
 extern float moby_get_anim_value(void *);
 extern int flag_set_first_pending(void *);
-extern void PlayMobySound(int, int, void *);
-extern void math_step_value_toward_target(void *, float, void *, float, float, float);
+extern int PlayMobySound(int, int, void *);
+extern float math_step_value_toward_target(void *, float, void *, float, float, float);
 extern void part_spawn_dust_burst(void *, void *, int, float, float, float, float, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int coll_test_point(void *, float, int, void *);
@@ -25,7 +25,7 @@ extern int sandfly_move_toward_target(void *, float, float, float, float, float,
 extern void sandfly_pick_random_target(void *);
 extern float vec_distance_xy(void *, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void coll_sweep_from_object(void *, void *, float, float, float, int, int, int, int);
+extern int coll_sweep_from_object(void *, void *, float, float, float, int, int, int, int);
 extern void snd_stop_queued(void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);

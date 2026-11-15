@@ -26,7 +26,9 @@ extern void moby_set_state(u8 *, int, int), func_PAL_002A7E68(char *, int, int, 
 extern int func_PAL_L01_00323068(char *, char *);
 extern int func_PAL_002B5C98(void *, void *, float);
 extern int func_PAL_002B5BA8(char *, float *, float);
-extern void func_PAL_002B5E10(char *), func_PAL_002B5E30(u8 *, float), AttachManipulator(u8 *, u32, u8 *), mem_clear(char *, int, int), vec_random_direction(float *, float, float);
+extern void AttachManipulator(u8 *, u32, u8 *), mem_clear(char *, int, int), vec_random_direction(float *, float, float);
+extern int func_PAL_002B5E30(u8 *, float);
+extern int func_PAL_002B5E10(char *);
 extern unsigned long moby_dispatch_action_by_kind(void *, void *);
 /* This interleaving preserves the four integer and four FP argument banks. */
 extern void func_PAL_002B15D8(char *, int, float *, float, float, float, float, u8);

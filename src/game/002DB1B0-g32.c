@@ -11,7 +11,7 @@ extern float g_screen_fade __attribute__((sda));
 extern unsigned char D_001B1F10_sda __attribute__((sda));
 extern unsigned char D_001B1F10;
 extern void snd_play_menu_sound_if_enabled(int, int);
-extern void request_begin_slot(int, int, int, int, int);
+extern int request_begin_slot(int, int, int, int, int);
 extern void FadeToBlack(int);
 
 /* Handles input for a list menu: moves the cursor, toggles the chosen entry, or starts a short fade for special entries. */

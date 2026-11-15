@@ -196,7 +196,7 @@ extern int L23_DrawEncounterHud(void);
 extern void cancel_hero_item_animation(void);
 extern void release_moby_animation_slot(void *, void *);
 extern int hero_l22_set_action(int, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int level_l00_call_module_handler_with_arg_9(int, int);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void vec_negate_and_forward(void *, void *, void *);

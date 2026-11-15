@@ -13,7 +13,8 @@ extern int D_001A93B0[8] __attribute__((sda));
 extern char *D_001A7278[] __attribute__((sda));
 extern int D_001B22A0 NOT_SDA;
 extern int D_001B22B0[] __attribute__((sda));
-extern void gfx_wait_for_dma_status_bits(int),func_PAL_00294EF8(int,int),func_0029CFB0(void *,void *,int),snd_send_cmd6(int),snd_send_cmd8(void);
+extern void gfx_wait_for_dma_status_bits(int), func_PAL_00294EF8(int,int), func_0029CFB0(void *,void *,int), snd_send_cmd6(int);
+extern void snd_send_cmd8(void);
 extern int snd_Pump(void),snd_BankLoadFromIOP(char *);
 extern void STUB_printf(char *,int),load_cached_moby_class(int,int,void *);
 

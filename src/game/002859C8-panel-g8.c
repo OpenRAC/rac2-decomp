@@ -125,7 +125,7 @@ extern int func_001157AC(unsigned char *);
 extern void level_forward_draw_args(MenuBox *, int, void *, int, int, int, int, char *, char *, char *);
 extern int GetIconFrame(int, int);
 extern void hud_draw_sprite(int, int, int, int, int, int);
-extern int GetFrameTexture(int);
+extern unsigned long long GetFrameTexture(int);
 extern void DrawRotatedSprite(float, float, float, float, float, int, int, long long);
 extern void *memset(void *, int, int);
 extern int flag_get_word(void);

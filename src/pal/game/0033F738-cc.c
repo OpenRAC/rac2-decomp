@@ -8,7 +8,7 @@
 
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
-extern void Fc558ca70_FUN_002E5E58(int a, int b, int c);
+extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern unsigned char D_PAL_001A7C38[] __attribute__((sda));
 
 int func_PAL_0033F738(char *a0, int a1)

@@ -40,15 +40,18 @@ extern void FastVecAdd(void *, void *, void *);
 extern s32 CollLine(void *, void *, s32, void *, void *);
 extern void make_hit_descriptor(void *, void *, s32, f32, void *);
 
-extern s32 second_tracked_object_is_open(void), part_find_owned_effect_slot(void *, s32, s32), flag_set_first_pending(void *), math_fast_float_d(s32 *);
+extern s32 second_tracked_object_is_open(void), flag_set_first_pending(void *), math_fast_float_d(s32 *);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern f32 fast_vec_dist(void *, void *), vec_distance_xy(void *, void *), FastAddRotations(f32, f32);
 extern f32 math_random_float_range(f32, f32), math_fast_sin_or_cos_b(f32), math_fast_sin_or_cos_a(f32), math_random_angle(void);
 extern s32 FloatToInt(f32), FastTweenColor(s32, s32, f32), math_random_int_below(s32);
-extern void PlayMobySound(s32, s32, void *), math_step_value_toward_target(f32 *, f32 *, f32, f32, f32, f32), ApproachValue(f32 *, f32, f32);
+extern f32 ApproachValue(f32 *, f32, f32);
+extern int PlayMobySound(s32, s32, void *);
+extern float math_step_value_toward_target(f32 *, f32 *, f32, f32, f32, f32);
 extern void vec_scale_to_length(void *, void *, f32), vec_random_direction(void *, f32, f32);
 /* The EE keeps integer and FP argument banks independent in this interleaving. */
 extern void *part_spawn_hero_relative(void *, void *, s32, f32, u8, u8, s32);
-extern void part_spawn_flying_fragment(void *, s32, void *, void *, s32, s32, void *, void *, void *, f32);
+extern char *part_spawn_flying_fragment(void *, s32, void *, void *, s32, s32, void *, void *, void *, f32);
 extern void global_object_start(s32, s32);
 
 typedef struct {

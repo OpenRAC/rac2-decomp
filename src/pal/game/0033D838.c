@@ -15,7 +15,7 @@ extern void FontSetWindow(void *, int, int, int, int, int, int, int, int);
 extern void text_draw_window_small(void *, unsigned long, char *, int);
 extern short g_screen_adjust_offsets[];
 
-extern void Ffb202470_FUN_0033AB50(char *p);
+extern int Ffb202470_FUN_0033AB50(char *p);
 
 char *func_PAL_0033DC60(char *object)
 {
@@ -128,7 +128,7 @@ char *func_PAL_0033E888(char *object)
 
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
-extern void Fc558ca70_FUN_002E5E58(int a, int b, int c);
+extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern volatile unsigned char Fc558ca70_D_001A7B95 __attribute__((sda));
 extern volatile unsigned char Fc558ca70_D_001A7B94 __attribute__((sda));
 
@@ -165,11 +165,11 @@ int func_PAL_0033E9E8(char *a0, int a1)
 
 
 
-extern void func_PAL_0033CA78(int);
+extern void *func_PAL_0033CA78(int);
 
 char *func_PAL_0033EC50(char *object)
 {
-    extern void object_construct_derived_b(void *);
+    extern void *object_construct_derived_b(void *);
     func_PAL_0033CA78((int)(object + 8));
     object_construct_derived_b(object + 0x2DC);
     object_construct_derived_b(object + 0x324);
@@ -262,7 +262,7 @@ int func_PAL_0033F470 (char *object, int flags)
 }
 
 
-extern void text_draw_centered_small(int, int, unsigned long, char *, int);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
 void func_PAL_0033F508(char *object)
 {
@@ -418,7 +418,7 @@ int func_PAL_003402B8(int owner)
 
 
 
-extern char *func_PAL_0034A148(char *, int);
+extern void *func_PAL_0034A148(char *, int);
 extern void func_PAL_0034A2B8(char *, float, float);
 
 /* func_PAL_00340348, the PAL copy of func_0033E3A0: the same C, with the three-string setup added and the second child moved. */
@@ -451,10 +451,10 @@ void func_PAL_00340610(int param_1) {
   prompt_bar_draw(param_1 + 8);
 }
 
-extern void func_0033AB50_1(void *);
-extern void cam_init_object_table_c(void *);
-extern void cam_init_object_table_d(void *);
-extern void cam_init_object_table_a(void *);
+extern int func_0033AB50_1(void *);
+extern char *cam_init_object_table_c(void *);
+extern char *cam_init_object_table_d(void *);
+extern char *cam_init_object_table_a(void *);
 
 /* Calls twelve sub-object handlers in sequence, each with the object base plus a fixed byte offset (8, 684, 744, 816, 888, 960, 1040, 1112, 1184, 1256, 1328, 1400), then returns the object pointer. */
 char *func_PAL_00340630(char *object)

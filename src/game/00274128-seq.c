@@ -45,15 +45,15 @@ extern int g_screen_width __attribute__((sda));
 extern float g_screen_fade __attribute__((sda));
 /* The level's state word, a per-level external (see func_002799A8 in 00274128.c). */
 extern int ref_L00_002E38F0_00 __attribute__((sda));
-extern void request_end_slot(int, int);
+extern int request_end_slot(int, int);
 extern void table_set_slot_values(int, int, int, int, int, int, int, int, int, int, unsigned);
 extern int load_start_disc_read(int, int, int);
 extern int math_fast_float_d(void *);
 extern void load_relocate_data_table_offsets(void);
 extern int data_advance_to_next_item_group(void);
 extern int data_query_shared_block(void);
-extern void ApproachValue(float *p, float a, float b);
-extern void UpdateSoundVoices(void);
+extern float ApproachValue(float *p, float a, float b);
+extern int UpdateSoundVoices(void);
 
 /* Runs the disc-streamed picture sequence: loads rows and frames from disc step by step and times each one. */
 void seq_update_disc_player(void)

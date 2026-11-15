@@ -37,7 +37,7 @@ extern void UpdateDrivenMobyTransform(void *);
 extern void euler_rotation_basis(void *, void *);
 extern void hero_record_play_counters(void);
 extern void ship_update_record_transform(void *, float);
-extern void slot_copy_records_to_free(void *);
+extern int slot_copy_records_to_free(void *);
 extern void ship_respawn_at_best_saved_slot(void *);
 extern float hero_get_clamped_stat(void);
 extern int hero_get_state_value_c(void);

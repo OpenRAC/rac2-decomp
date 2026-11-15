@@ -49,7 +49,8 @@ extern float vec_length_xy(void *), func_002A0558(char *,char *), FastAddRotatio
 extern int TryClaimNotice(int,int,int), math_random_int_below(int), flag_set_first_pending(char *);
 extern int hero_l00_set_action(int,int);
 extern void UpdateHoverVehicleMotion(char *,int), set_hero_animation(int,int,float), moby_mark_in_range(char *);
-extern void moby_set_state(char *,int,int), moby_transform_joint_to_world(char *,int,void *), moby_update_ground_check(char *), gfx_add_draw_callback_third(void (*)(char *),void *);
+extern void moby_set_state(char *,int,int), moby_update_ground_check(char *), gfx_add_draw_callback_third(void (*)(char *),void *);
+extern void moby_transform_joint_to_world(char *,int,void *);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern void moby_scale_owner_words_by_angles(char *,void *,void *,float,float,float);
 extern void *memcpy(void *,const void *,unsigned int);

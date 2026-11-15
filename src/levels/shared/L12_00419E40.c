@@ -23,7 +23,7 @@ extern void anim_start_blended(void *,int,int,int);
 extern int enemy_claim_attack_turn(void *,int);
 /* The wrapper leaves func_002B50E0's integer status in the return register. */
 extern int moby_step_at_own_position_factor(void *,float);
-extern void snd_resume_music_stream(void);
+extern s32 snd_resume_music_stream(void);
 extern void tourist_increment_counters(int);
 extern int path_find_next_stop_point(void *,int);
 extern int AimAtPathCursorAndAdvance(void *);

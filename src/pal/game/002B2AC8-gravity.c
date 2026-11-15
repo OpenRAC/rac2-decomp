@@ -11,7 +11,7 @@ extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void ApproachValue(void *, float, float);
+extern f32 ApproachValue(void *, float, float);
 extern float gravity_get_center_distance(void *);
 extern float math_fabs(float);
 extern float moby_get_anim_value(void *);

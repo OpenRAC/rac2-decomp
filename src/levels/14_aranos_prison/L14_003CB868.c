@@ -13,7 +13,7 @@ extern float math_random_float_range(float a, float b);
 extern float square_root(float a);
 extern void FastVecScale(void *dst, void *src, float s);
 extern void entity_start_launch_to_target(char *e, void *v, float a, float b, float c);
-extern void hero_l00_set_action(int a0, int a1);
+extern s32 hero_l00_set_action(int a0, int a1);
 extern unsigned short *g_group_entity_lists[];
 extern unsigned char *g_moby_l14_pool MACRO_ADDR;
 extern int D_L14_001B25B8 __attribute__((sda));

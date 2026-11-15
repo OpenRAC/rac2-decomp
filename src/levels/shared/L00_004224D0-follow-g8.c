@@ -5,7 +5,7 @@ extern char D_00189F00[];
 extern int D_0018A160 NOT_SDA;
 extern float D_L00_001B14C4 __attribute__((sda));
 
-extern void FastDecTimer(void *timer);
+extern int FastDecTimer(void *timer);
 extern void FastVecSub(void *out, void *a, void *b);
 extern void lerp_vector(void *out, void *a, void *b, float t);
 extern void FastVecScale(void *out, void *v, float k);

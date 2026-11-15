@@ -2,12 +2,12 @@
 
 extern void SetupGifPaging(int);
 extern void DoGifPaging(void);
-extern s32 GetLocalizedString(s32);
+extern char *GetLocalizedString(s32);
 extern void func_PAL_L00_0030F3E8(void);
 extern int D_PAL_001ABD48 __attribute__((sda));
 extern int D_PAL_001ABD4C[] __attribute__((sda));
 
-extern int text_draw_right_aligned_small(int, int, u64, char *, int);
+extern void text_draw_right_aligned_small(int, int, u64, char *, int);
 
 /* func_PAL_L00_00349574, the PAL copy of func_002CDA20: the same shape, where the
  * text position comes from two PAL words in place of 0x1A5 and the scaled 293,

@@ -24,7 +24,7 @@ typedef union { Quad q; float f[4]; } Vec;
 struct DobboMoby;
 extern void counter_tick_release_sounds(unsigned char *);
 extern void func_PAL_L09_003F49E8(unsigned char *);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void moby_mark_spawned(void *);
 extern void SetDeathBits(void *, int, int);

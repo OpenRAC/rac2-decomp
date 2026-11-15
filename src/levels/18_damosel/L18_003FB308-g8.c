@@ -9,7 +9,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void moby_set_state(u8 *, int, int);
 extern int flag_set_first_pending(u8 *);
-extern void snd_play_from_class_bank(int, int, u8 *, int);
+extern int snd_play_from_class_bank(int, int, u8 *, int);
 extern void part_spawn_trail_particles(u8 *);
 
 /* Slides the object out and back by a fixed step each frame, moving a linked object

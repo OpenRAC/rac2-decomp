@@ -30,7 +30,7 @@ extern int follower_has_reached_target(char *);
 extern void follower_set_push_vector(char *, char *);
 extern void follower_set_state(char *, int);
 extern void moby_update_movement_state(char *);
-extern void moby_process_collision_hit(char *, int, int, int);
+extern int moby_process_collision_hit(char *, int, int, int);
 typedef struct GornPathPoint {
     float position[3];
     float action;
@@ -47,7 +47,7 @@ extern void path_start_following(void);
 
 /* ---- shared declarations ---- */
 
-extern int moby_get_motion_data(unsigned char *owner);
+extern char *moby_get_motion_data(unsigned char *owner);
 extern void moby_init_spawned_sub_object(char *object, int flag);
 extern void level_set_object_state_field(int arg0, int value);
 extern void gfx_add_draw_callback_second(void *, void *);
@@ -88,14 +88,14 @@ extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
 extern float FastAddRotations(float, float);
-extern int state_get_stored_pointer_value(void);
+extern void *state_get_stored_pointer_value(void);
 extern void level_append_object(void *, void *, int, int);
 extern void moby_reset_action_state(void *);
 extern void gorn_ship_init(char *);
 extern void gorn_ship_update_flight(void *, int);
 extern void ResetGroupToPathStart(void);
 extern void gorn_ship_spawn_damage_effects(void *);
-extern void part_spawn_shockwave_burst(void *, int, int, int, int, int, int, int, float, int, int, int);
+extern char *part_spawn_shockwave_burst(void *, int, int, int, int, int, int, int, float, int, int, int);
 extern int math_random_int_below(int);
 extern void moby_mark_spawned(void *);
 extern void euler_rotation_basis(void *, void *);
@@ -199,7 +199,7 @@ extern s32 PlayMobySound(s32 a, s32 b, void *c);
 extern s32 math_random_int_below(s32 a);
 extern f32 math_random_float_range(f32 a, f32 b);
 extern void moby_transform_joint_to_world(void *obj, s32 a, void *out);
-extern void CreateEnergyStrip(void *a, void *b, s32 c, s32 d, f32 e, f32 f, f32 g, f32 h, s32 i, s32 j, s32 k, s32 l);
+extern void *CreateEnergyStrip(void *a, void *b, s32 c, s32 d, f32 e, f32 f, f32 g, f32 h, s32 i, s32 j, s32 k, s32 l);
 extern s32 FloatToInt(f32 a);
 extern void gorn_part_spawn_puff(char *object, int a1, int joint, float radius);
 /* The particle helper has a different catalogue body in PAL. */

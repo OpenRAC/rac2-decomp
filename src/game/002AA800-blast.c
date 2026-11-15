@@ -14,7 +14,7 @@ extern int math_random_int_below(int);
 extern char *part_spawn_firework_spark(void *, void *, int, int, float, int, int, float, int, int);
 extern char *part_spawn_shockwave_ring(void *, void *, void *, float, int, int, int, int, int);
 extern int PlayMobySound(int, int, void *);
-extern void moby_spawn_template_effect(void *, void *, int, int);
+extern char *moby_spawn_template_effect(void *, void *, int, int);
 
 typedef struct { int colors[6]; } __attribute__((packed)) BurstColors;
 typedef struct {

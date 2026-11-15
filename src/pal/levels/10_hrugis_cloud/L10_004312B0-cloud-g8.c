@@ -23,7 +23,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_angle_helper(float);
 extern float math_smooth_step(float);
-extern void part_spawn_effect_record(void *, int, float);
+extern void *part_spawn_effect_record(void *, int, float);
 
 /* Two-state update. State 0 builds three z rotations (0, 2pi/3, -2pi/3), eighteen local
    points, and for each entry of the object's D_L10_001A9014 list transforms six of them

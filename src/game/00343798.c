@@ -37,7 +37,7 @@ extern void menu_update_empty_label(void *a0);
 extern int UpdateListSelection(void *a0, int a1);
 
 /* Moves every part of the item menu to its place, refreshes the labels and updates the list. */
-void item_menu_update(char *self, int buttons)
+int item_menu_update(char *self, int buttons)
 {
     f32_F7036ef03 *position;
     char *list = self + 664;
@@ -54,7 +54,7 @@ void item_menu_update(char *self, int buttons)
     stub_store_two_floats(list, D_L04_001AE4C8 + position[0], D_L04_001AE4CC + position[1]);
     menu_update_title_text(self);
     menu_update_empty_label(self);
-    *(int *)(self + 416) = UpdateListSelection(list, buttons);
+    return *(int *)(self + 416) = UpdateListSelection(list, buttons);
 }
 
 
@@ -62,7 +62,7 @@ extern void gfx_draw_screen_element_stored(void *a0);
 extern void text_label_draw(void *a0);
 extern void menu_list_draw_entries(void *a0);
 extern int menu_list_get_selected_id(void *a0);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *a0, int a1);
 extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_table[];

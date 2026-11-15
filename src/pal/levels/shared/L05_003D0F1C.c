@@ -37,7 +37,7 @@ extern void FastVecAdd(float *, float *, float *);
 extern int math_fast_float_d(void *);
 extern float IntToFloat(int);
 extern float math_fabs(float);
-extern void *FastTweenColor(unsigned int, unsigned int, float);
+extern int FastTweenColor(unsigned int, unsigned int, float);
 extern int FloatToInt(float);
 typedef struct { unsigned char pad[9]; unsigned char fade; } Sprite_L05_003CD598;
 extern Sprite_L05_003CD598 *part_spawn_fading(void *, void *, int, int, int, int, int, float);

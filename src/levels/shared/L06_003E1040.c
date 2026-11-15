@@ -4,7 +4,7 @@
 typedef int s32;
 
 extern s32 D_0029CAE0[];
-extern void ForceClaimNotice(int, int, int);
+extern int ForceClaimNotice(int, int, int);
 
 /* Shows the pickup message for the item kind stored in the moby. */
 void hud_show_pickup_notice(char *moby)

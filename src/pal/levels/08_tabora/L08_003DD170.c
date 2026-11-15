@@ -176,14 +176,14 @@ void func_PAL_L08_003DD368(Ent *a0)
 
 
 
-extern void coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, float);
+extern int coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, float);
 extern void copy_matrix_rotation(void *, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int D_0018C0BC;
 extern void FastVecAdd(void *, void *, void *);
-extern void effect_create_timed(void *, void *, int, int, int, int, int, float);
-extern void coll_cast_object_line(void *, void *, void *, int, int, int, int, float, float);
+extern unsigned char *effect_create_timed(void *, void *, int, int, int, int, int, float);
+extern int coll_cast_object_line(void *, void *, void *, int, int, int, int, float, float);
 extern float FastAddRotations(float, float);
 extern int FloatToInt(float);
 extern char *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);

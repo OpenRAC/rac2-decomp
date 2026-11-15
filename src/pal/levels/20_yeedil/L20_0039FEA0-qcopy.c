@@ -24,7 +24,7 @@ extern void trooper_choose_stand_point(void *);
 extern float mat_fast_helper_a(float, float);
 extern int moby_start_effect_from_entry(int, float);
 extern float FastDiffRots(float, float);
-extern void func_PAL_L01_00323068(char *, char *);
+extern int func_PAL_L01_00323068(char *, char *);
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void FastVecSub(void *, const void *, const void *);
 extern void vec_scale_to_length(void *, const void *, float);

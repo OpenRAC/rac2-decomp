@@ -58,8 +58,8 @@ extern unsigned int D_001A7390[] __attribute__((sda));
 extern int math_fast_float_d(int *);
 extern void subtitle_init_state(void);
 extern void text_mark_entry_recent(int);
-extern void ForceClaimNotice(int, int, int);
-extern void snd_resume_music_stream(void);
+extern int ForceClaimNotice(int, int, int);
+extern s32 snd_resume_music_stream(void);
 extern int Help_FindIndex(int);
 
 #define RECORD_SUBTITLE_TIME() { \

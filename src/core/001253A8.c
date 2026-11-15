@@ -5,7 +5,7 @@ extern int r1_D_001313EC;
 
 extern int r1_func_0011B4C8();
 
-extern void r1_func_00118C90(int);
+extern s32 r1_func_00118C90(int);
 
 extern char r1_D_00132E08[];
 
@@ -55,7 +55,7 @@ extern int r1_D_001313E8;
 extern int r1_D_001313F0;
 extern int r1_func_0011B4C8();
 extern int r1_func_00120D28(int);
-extern void r1_func_00118C90(int);
+extern s32 r1_func_00118C90(int);
 extern char r1_D_00132590[];
 extern void r1_func_0011A6C8();
 extern int r1_D_001313D0;

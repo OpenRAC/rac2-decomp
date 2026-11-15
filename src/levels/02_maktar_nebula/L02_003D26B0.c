@@ -545,9 +545,9 @@ void turret_update_linked_object(char *self) {
 }
 
 
-extern void *moby_transform_joint_to_world(char *, int, void *);
+extern void moby_transform_joint_to_world(char *, int, void *);
 
-extern void coll_project_point_on_segment(void *, void *, void *, char *);
+extern float coll_project_point_on_segment(void *, void *, void *, char *);
 
 extern void FastVecSub(void *, void *, void *);
 

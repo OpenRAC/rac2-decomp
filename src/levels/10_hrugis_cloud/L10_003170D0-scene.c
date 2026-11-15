@@ -20,7 +20,7 @@ extern void vec_fast_to_int_helper(void *,void *);
 extern void moby_compute_local_point(u8 *,void *,f32,f32,f32);
 extern void func_L10_00425930(void *,s32,f32,s32,s32,s32,s32,s32,s32,s32,s32,s32);
 extern f32 math_random_signed_float_range(f32,f32);
-extern void moby_spawn_shot_effect(u8 *,void *,void *,s32,s32,s32,s32,s32,f32);
+extern char *moby_spawn_shot_effect(u8 *,void *,void *,s32,s32,s32,s32,s32,f32);
 extern u8 D_L10_00296F00[];
 
 /* Per-frame effects for the level 10 story scene: marks some objects as always drawn,

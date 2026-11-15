@@ -32,7 +32,7 @@ extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
 extern float FastVecDot(void *, void *);
-extern int AllocateOwnedEffectParticle(char *, int, float, float, void *);
+extern char *AllocateOwnedEffectParticle(char *, int, float, float, void *);
 extern void draw_world_quad(void *, int, int);
 /* func_L00_003E6030 builds and submits the 143 quads listed in D_L00_0029A090: each corner is
    scaled, pushed along its own z by a ripple, moved to OBJECT and summed for the quad's centre. A

@@ -2,8 +2,8 @@
 typedef int SpawnQuad __attribute__((mode(TI)));
 extern int GetFirstMobyInGroup(u8 **out, int index, int activate, int reset);
 extern float mat_fast_helper_a(float x, float y);
-extern int moby_get_private_value_4(u8 *object);
-extern int moby_get_private_value_0(u8 *object);
+extern char *moby_get_private_value_4(u8 *object);
+extern char *moby_get_private_value_0(u8 *object);
 extern void STUB_printf(const char *format, ...);
 extern void update_moby_animation_state(u8 *object);
 extern void hero_copy_field_to_moby(u8 *object);

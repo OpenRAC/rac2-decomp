@@ -124,7 +124,7 @@ extern float weapon_compute_shot_launch_speed(void *, void *, float *, float, fl
 extern void func_PAL_L16_004188D0(u8 *, void *, float);
 extern float math_random_signed_float_range(float, float), math_random_float_range(float, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void func_PAL_0032F3B8(u8 *, void *, void *, float);
+extern char *func_PAL_0032F3B8(u8 *, void *, void *, float);
 extern void transition_arm_shared(int, float, float);
 extern void SetMobyAndGroupsEnabled(u8 *, int);
 extern void snivelak_part_update(u8 *);

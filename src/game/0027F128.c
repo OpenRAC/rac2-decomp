@@ -31,7 +31,7 @@ extern s32 g_widescreen_flag __attribute__((sda));
 
 extern s32 func_00124418(void);
 
-extern s32 sceGsResetGraph(s32,s32,s32,s32);
+extern void sceGsResetGraph(s32,s32,s32,s32);
 
 typedef struct { u8 before[0x158]; short a,b,c; u8 gap[10]; short d,e; } DisplayState;
 

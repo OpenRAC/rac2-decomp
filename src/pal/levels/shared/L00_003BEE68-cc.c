@@ -20,7 +20,7 @@ extern EffectLightRecord D_L00_001C6F40[];
 extern float FastVecDot(void *, void *);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void func_PAL_L00_003C11A0(float *, float *, int, int);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern void spark_spawn_orbit(char *, char *);
 
 extern void func_802EE138_1(float *off, float *v, char *p);

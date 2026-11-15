@@ -14,7 +14,7 @@ extern void func_PAL_002A7E68(void *, s32, s32, s32);
 extern f32 func_PAL_L01_003BEB40(void);
 extern s32 coll_test_point(void *, s32, f32, s32);
 extern void func_PAL_L01_003DE970(void *, void *);
-extern void coll_cast_object_line(s32, void *, void *, f32, f32, s32, s32, s32, s32);
+extern int coll_cast_object_line(s32, void *, void *, f32, f32, s32, s32, s32, s32);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void moby_mark_spawned(void *);
 extern void part_queue_ground_shadow(void *, f32);

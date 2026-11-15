@@ -11,7 +11,8 @@ extern u8 *CreateMoby(int),*part_spawn_flying_fragment(void *,int,void *,void *,
 extern void moby_set_controller_speed_limits(u8 *,float,float,float,float);
 extern float path_l01_compute_segment_lengths(u8 *);
 extern int part_spawn_damage_debris(void *,void *,void *),enemy_select_path(void *,int,int);
-extern void moby_transform_joint_to_world(void *,int,void *),FastVecSub(void *,void *,void *),shared_counter_release(void *),moby_set_state(void *,int,int),guard_switch_animation(void *,int,int,int);
+extern void FastVecSub(void *,void *,void *), shared_counter_release(void *), moby_set_state(void *,int,int), guard_switch_animation(void *,int,int,int);
+extern void moby_transform_joint_to_world(void *,int,void *);
 /* Sets up a creature moby on creation: its stats and animations, then it spawns a helper moby
    (moby class 4427) with two small child mobies attached to it. */
 void InitStateDataWithPartner(u8 *creature) {

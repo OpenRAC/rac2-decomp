@@ -19,7 +19,7 @@ extern void FastVecScale(void *, void *, float);
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern void vec_random_direction(void *, float, float);
-extern void part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
+extern void *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void func_PAL_L00_003E74D8(void *, int, int);
 extern void moby_set_state(void *, int, int);

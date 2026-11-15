@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern float vec_length_xy(void *);
-extern void ApproachValue(float *,float,float);
+extern f32 ApproachValue(float *,float,float);
 extern void vec_fast_normalize_helper(void *,void *,float);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *,void *,void *);
@@ -25,7 +25,7 @@ extern int coll_sweep_from_object(void *,float,void *,int,float,float,int,int,in
 extern int coll_test_point(void *,float,int,void *);
 extern char *moby_get_private_value_0(void *);
 extern void part_start_effect_default_table(void *,int,int,void *,float);
-extern void path_push_point_away(int,void *,void *,float);
+extern int path_push_point_away(int,void *,void *,float);
 extern void euler_rotation_basis(void *,void *);
 extern void multiply_matrix3x3(void *,void *,void *);
 extern float FastAddRotations(float,float);

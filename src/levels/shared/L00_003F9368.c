@@ -13,7 +13,7 @@ extern float FastAddRotations(float, float);
 
 /* The bodies the retail calls reach, at 0x2D5940 and 0x33E220 in level 00. */
 extern void FastVecScale(void *, void *, float);
-extern void part_spawn_object_following_effect(void *, void *, int, int, int, float, float, int, int, int);
+extern void *part_spawn_object_following_effect(void *, void *, int, int, int, float, float, int, int, int);
 
 /* Grows the object with its parent and spawns two glowing trails each frame. */
 void twin_trail_effect_update(char *self)

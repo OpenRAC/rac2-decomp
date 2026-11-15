@@ -30,7 +30,7 @@ typedef struct {
 } SoundSlot003CFF90;
 
 extern ObjCommon003CFF90 *moby_get_motion_data(char *);
-extern int state_get_stored_pointer_value(void);
+extern void *state_get_stored_pointer_value(void);
 extern void moby_init_reach_and_position(char *);
 extern void vec_clear_128(void *);
 extern void level_append_object(char *, void *, int, int);

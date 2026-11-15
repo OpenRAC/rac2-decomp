@@ -11,7 +11,7 @@ extern float D_L19_001B2628 __attribute__((sda));
 extern int D_L19_001C9FC0;
 extern int IsPointInCuboid(void *, int);
 extern void moby_set_state(void *, int, int);
-extern void subtitle_request_voice_line(int,int);
+extern int subtitle_request_voice_line(int,int);
 extern int flag_set_first_pending(void *);
 extern float mat_fast_helper_a(float,float);
 extern float math_fast_sin_or_cos_b(float);
@@ -19,7 +19,7 @@ extern void FastVecSub(void *,void *,void *);
 extern void FastVecScale(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
 extern int math_fast_float_d(void *);
-extern void MemcardSave(int,int);
+extern int MemcardSave(int,int);
 #define I(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
 /* Per-frame update for a moby of class 3125. It moves a linked object along a smooth arc between two other objects until it arrives. */

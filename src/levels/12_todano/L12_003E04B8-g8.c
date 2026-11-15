@@ -10,7 +10,8 @@ extern void FastVecSub(void *, void *, void *), matrix_mul_vec3(void *, void *, 
 extern int path_build_route_nodes(void *, int, void *, int);
 extern void anim_start_blended(void *, int, int, int), moby_update_ground_check(void *);
 extern float fast_vec_dist(void *, void *);
-extern void moby_apply_damage_to_object(void *, void *, int), gfx_add_draw_callback_third(void (*)(u8 *), void *);
+extern void gfx_add_draw_callback_third(void (*)(u8 *), void *);
+extern int moby_apply_damage_to_object(void *, void *, int);
 extern void gfx_add_two_glow_sprites(u8 *);
 
 typedef struct TodanoInitState {

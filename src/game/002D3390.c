@@ -87,7 +87,7 @@ typedef struct {
 
 extern MenuGameState g_pad_state;
 extern CallbackState g_pause_menu_state;
-extern void func_0029C5D0(int);
+extern int func_0029C5D0(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the current message to the page handler. */
 int menu_page_update_pass_message(void)
@@ -168,7 +168,7 @@ extern int __cmpdf2(double, double);
 extern double __subdf3(double, double);
 extern double __muldf3(double, double);
 extern int __fixdfsi(double);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, int *);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, int *);
 typedef struct {
     int value, displayChoice, selectionMask, requiredBits, icon;
 } PreviewChoice;
@@ -193,7 +193,7 @@ static __inline__ int scaled_screen_size(int mode, float value, int adjust)
 
 /* Draws the icon of preview choice `index` at column `x`, fading its left and right edges by their
    distance from the middle of the 512-wide screen. */
-int DrawPreviewChoiceIcon(int index, int x)
+void DrawPreviewChoiceIcon(int index, int x)
 {
     int colors[4];
     int leftAlpha;
@@ -229,7 +229,7 @@ int DrawPreviewChoiceIcon(int index, int x)
     mode = D_001B23A0[0];
     y = scaled_screen_coord(mode, 334.0f, 4.0f);
     height = scaled_screen_size(mode, 40.0f, 0);
-    return hud_draw_sprite_gradient(texture, left, y, 40, height, colors);
+    hud_draw_sprite_gradient(texture, left, y, 40, height, colors);
 }
 
 /* func_002D3FA0 is defined in 002D3FA0-options-g8.c. */
@@ -289,7 +289,7 @@ int menu_preview_data_init(void)
 }
 
 extern int D_00138344;
-extern void func_0029CF08(int);
+extern int func_0029CF08(int);
 
 /* Runs the common menu button handling with the current pressed buttons. */
 int menu_handle_buttons(void) {
@@ -298,7 +298,7 @@ int menu_handle_buttons(void) {
 }
 
 extern int D_00138344;
-extern void func_0029CF08(int);
+extern int func_0029CF08(int);
 
 /* Runs the common menu button handling with the current pressed buttons. */
 int menu_handle_buttons_alt(void) {

@@ -25,7 +25,7 @@ extern void *func_00336DA8_1(s32_Fe9770b1e, void *);
 
 extern void func_0033ABD8_1(u8_Fe9770b1e *, void *, f32_Fe9770b1e *);
 
-extern void *func_00288FB8_1(s32_Fe9770b1e);
+extern char *func_00288FB8_1(s32_Fe9770b1e);
 
 extern void func_0033B050_1(u8_Fe9770b1e *, void *, void *, void *);
 
@@ -33,7 +33,7 @@ extern void func_0033B030_1(u8_Fe9770b1e *, f32_Fe9770b1e, f32_Fe9770b1e, f32_Fe
 
 extern void func_0033B0A8_1(u8_Fe9770b1e *, f32_Fe9770b1e);
 
-extern void menu_handle_page_input_a(u8_Fe9770b1e *, s32_Fe9770b1e);
+extern int menu_handle_page_input_a(u8_Fe9770b1e *, s32_Fe9770b1e);
 
 /* Sets up a menu with a button prompt bar, its labels and position, then runs its first update. */
 void prompt_menu_init(u8_Fe9770b1e *self, void *arg) {

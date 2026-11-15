@@ -3,7 +3,7 @@
 
 extern int D_00138344;
 extern int D_00138344;
-extern void func_US2_L00_0030F258(int);
+extern int func_US2_L00_0030F258(int);
 
 /* func_002D2918 is built from 002D2918-g8.c. */
 

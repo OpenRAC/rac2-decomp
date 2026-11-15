@@ -16,13 +16,13 @@ void func_US2_0033F478(char *object)
     func_US2_00348E70(p);
 }
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void func_US2_0033BC20(void *, void *, void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_US2_0033C098(void *, int, int, int);
 extern void func_US2_0033C078(void *, float, float, float, float, float, float);
-extern void func_US2_0033F610(void *, int);
+extern int func_US2_0033F610(void *, int);
 extern int D_001ADEF0[2] __attribute__((sda));
 
 void func_US2_0033F510(char *object, void *argument)
@@ -50,7 +50,7 @@ void func_US2_0033F510(char *object, void *argument)
 }
 
 extern void func_US2_0033C0F0(void *, float);
-extern void func_US2_0033F3F0(void *, int);
+extern int func_US2_0033F3F0(void *, int);
 extern int D_001ADEC8[2] __attribute__((sda));
 extern void func_US2_00348BF8(void *, void *);
 extern void func_US2_00348E10(void *, int, int);
@@ -87,7 +87,7 @@ void func_US2_0033F200(char *object, void *argument)
     func_US2_0033F3F0(object, 0);
 }
 
-extern void func_US2_0033E8B0(void *, int);
+extern int func_US2_0033E8B0(void *, int);
 extern int D_001ADDE0[2] __attribute__((sda));
 
 extern int D_US2_001ADE60[2] __attribute__((sda));
@@ -121,7 +121,7 @@ void func_US2_0033E788(char *object, void *argument)
 
 
 
-extern void func_US2_0033EC80(void *, int);
+extern int func_US2_0033EC80(void *, int);
 
 extern int D_US2_001ADE70[2] __attribute__((sda));
 
@@ -154,7 +154,7 @@ void func_US2_0033EB58(char *object, void *argument)
 
 
 
-extern void func_US2_0033EF30(void *, int);
+extern int func_US2_0033EF30(void *, int);
 
 extern int D_US2_001ADE80[2] __attribute__((sda));
 
@@ -187,7 +187,7 @@ void func_US2_0033EE08(char *object, void *argument)
 
 
 
-extern void func_US2_0033F128(void *, int);
+extern int func_US2_0033F128(void *, int);
 
 extern int D_US2_001ADE90[2] __attribute__((sda));
 

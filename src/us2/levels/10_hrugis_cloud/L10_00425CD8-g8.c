@@ -21,7 +21,7 @@ extern int D_L10_001B13FC __attribute__((sda));
 extern int D_L10_001B1444 __attribute__((sda));
 extern int D_L10_001B1424 __attribute__((sda));
 extern char *D_L10_001B251C;
-extern void CreateEnergyStrip(void *, void *, int, int, int, int, int, int, float, float, float, float);
+extern void *CreateEnergyStrip(void *, void *, int, int, int, int, int, int, float, float, float, float);
 extern int math_fast_float_d(void *);
 extern void moby_set_flag_bit(void *, int);
 extern void moby_mark_flag_and_append_to_list(int);

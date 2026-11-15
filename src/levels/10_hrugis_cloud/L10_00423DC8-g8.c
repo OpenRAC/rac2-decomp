@@ -26,12 +26,12 @@ extern void func_00373410(s32);
 extern s32 math_fast_float_d(void *);
 extern void FadeToBlack(s32);
 extern void level_store_value_pair(s32, void *);
-extern void menu_draw_reward_panel(void);
+extern s32 menu_draw_reward_panel(void);
 extern void mission_store_completion_counts(void);
-extern void MemcardSave(s32, s32);
+extern int MemcardSave(s32, s32);
 extern void hero_set_state_value_c(s32);
 extern void hrugis_reset_mission_state(u8 *);
-extern void request_begin_slot(s32, s32, s32, s32, s32);
+extern int request_begin_slot(s32, s32, s32, s32, s32);
 
 /* Stops the owner's effect. Unless state D_L10_001A8F00 is 2, once func_00282948(s + 0x58)
    reports done, the first pass with D_L10_001A904C set adds the kind's reward (times 10

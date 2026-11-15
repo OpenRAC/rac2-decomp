@@ -27,7 +27,7 @@ extern float FastVecLength(void *);
 extern int FloatToInt(float);
 extern float IntToFloat(int);
 extern void projectile_init_direction(char *);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern void func_002A0F48(char *);
 
 /* Integer arguments stay pos, owner, dir, a, b ($a0-$t0) and float arguments f, range, c, d

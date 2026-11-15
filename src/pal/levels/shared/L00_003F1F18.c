@@ -9,7 +9,7 @@ extern float math_random_signed_float_range(float, float);
 extern int FloatToInt(float);
 extern float FastAddRotations(float, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
-extern void func_PAL_002C23B8(float *, float *, int, int, unsigned int, int,
+extern void *func_PAL_002C23B8(float *, float *, int, int, unsigned int, int,
                           float, float, float, float, float);
 extern void FastVecSub(char *local, char *first, char *second);
 extern float mat_fast_helper_a(float a, float b);
@@ -22,7 +22,7 @@ extern float FastAddRotations(float a, float b);
 extern void vec_build_spherical_offset(float *p, float a, float b, float c);
 extern char *func_PAL_002BE9A8(char *p, float fa, float fb, float fc, float fd, int v, char *local,
                             unsigned int color, int flag);
-extern void func_PAL_002C23B8(float *out, float *dir, int a, int b, unsigned int color, int id,
+extern void *func_PAL_002C23B8(float *out, float *dir, int a, int b, unsigned int color, int id,
                            float fa, float fb, float fc, float fd, float fe);
 extern char g_camera_l00_position[];
 extern char D_0018A0E0[];

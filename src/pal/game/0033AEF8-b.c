@@ -1,13 +1,13 @@
 #include "include_asm.h"
 #include "names.h"
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void hud_init_widget_defaults(void *, void *, void *);
 extern void hud_set_widget_field_a(void *, int);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, int);
 extern int list_screen_layout(void *, int);
 extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[], D_001ADC30[];
@@ -17,8 +17,8 @@ extern char *D_001A8CFC[] __attribute__((sda));
 extern char D_001ADCA0[8] __attribute__((sda));
 extern char *D_001A8CFC[] __attribute__((sda));
 extern int *object_get_fourth_field(void *);
-extern int GetLocalizedString(int);
-extern int pool_alloc_cell(void *);
+extern char *GetLocalizedString(int);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void hud_init_widget_defaults(void *, void *, void *);

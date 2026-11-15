@@ -7,7 +7,7 @@ extern int D_L00_001B208C;
 extern int ref_L00_0032A258_00 __attribute__((sda));
 extern void func_PAL_L00_003281C0(void *,int,float);
 extern void moby_get_anim_entry_count(void *,int *,int *);
-extern void PlayMobySound(int,int,void *);
+extern int PlayMobySound(int,int,void *);
 extern float math_random_float_range(float,float);
 extern float math_random_signed_float_range(float,float);
 extern void matrix_mul_vec3(void *,void *,void *);

@@ -17,7 +17,7 @@ extern u32 D_L18_001A903C[] __attribute__((sda));
 typedef int u128 __attribute__((mode(TI)));
 
 extern char *part_find_owned_effect_slot(char *, int, int);
-extern void moby_apply_damage_to_object(char *, char *, int);
+extern int moby_apply_damage_to_object(char *, char *, int);
 extern void SetDeathBits(char *, int, int);
 extern void moby_mark_spawned(char *);
 extern void FastVecAdd(void *, void *, void *);

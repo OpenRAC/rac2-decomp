@@ -95,7 +95,7 @@ extern void func_PAL_L11_0045B9E8(void *);
 extern void fighter_count_frame_check_contact(void *);
 extern int func_PAL_L11_0045C2B0(void *);
 extern void func_PAL_L11_0045BC60(void *, void *);
-extern void MobySpringTurn(void *, float, float, float, float *, float);
+extern float MobySpringTurn(void *, float, float, float, float *, float);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void joba_damage_objects_in_radius(void *, int, float, float, float, float, float, float, float);
 extern float math_fast_sin_or_cos_a(float);

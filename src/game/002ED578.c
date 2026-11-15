@@ -10,7 +10,7 @@ typedef int s32;
 typedef unsigned char u8;
 
 /* func_002EE6A8: owner ABI/declaration review retained. */
-extern int moby_get_motion_data(unsigned char *owner);
+extern char *moby_get_motion_data(unsigned char *owner);
 
 /* func_002ED870: owner ABI/declaration review retained. */
 extern unsigned int D_00214FCC;
@@ -42,7 +42,7 @@ int math_split_time_into_parts(int value, int *outHours, int *outMinutes, int *o
 
 
 /* Returns the object-specific data pointer of an object, or nothing if it has none. */
-s32 moby_get_motion_data(u8 *a0) {
+char *moby_get_motion_data(u8 *a0) {
  if((*(unsigned short *)(a0+0x34)&0x20)==0) return 0;
  return (*(s32 **)(a0+0x68))[5];
 }

@@ -15,7 +15,7 @@ extern s32 PlayMobySound(s32, s32, s32);
 extern void moby_mark_spawned(void *);
 extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int, int, unsigned char, int);
 extern void vec_local_offset_to_world(void *, void *, float, float, float);
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern u8 *D_L12_001B2E9C MACRO_ADDR;
 extern s32 D_L12_001B29C8 __attribute__((sda));
 extern u8 *D_L12_001B090C __attribute__((nosda));

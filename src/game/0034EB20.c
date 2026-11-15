@@ -3,7 +3,7 @@ extern void gfx_wait_for_dma_status_bits(int);
 extern int func_00126288(void *, short, short, short, short, short, short, short);
 extern int sceGsExecLoadImage(void *, void *);
 extern int gfx_wait_paths_idle(int, int);
-extern int FlushCache(int);
+extern void FlushCache(int);
 
 typedef struct {
     short value;

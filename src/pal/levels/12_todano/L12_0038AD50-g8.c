@@ -5,11 +5,11 @@ extern double D_L13_001AEC00 __attribute__((sda));
 extern double D_L13_001AEC08 __attribute__((sda));
 extern double D_L13_001AEC10 __attribute__((sda));
 extern void moby_set_state(unsigned char *, int, int);
-extern int part_find_owned_effect_slot(unsigned char *, int, int);
+extern void *part_find_owned_effect_slot(unsigned char *, int, int);
 extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int, int, int, int);
 extern int D_L13_001AEC30 __attribute__((sda));
-extern void PlayMobySound(int, int, void *);
-extern void moby_l00_spawn_child(void *, int, int);
+extern int PlayMobySound(int, int, void *);
+extern char *moby_l00_spawn_child(void *, int, int);
 extern void moby_mark_spawned(void *);
 
 void func_PAL_L12_0038AD50(unsigned char *a0) {

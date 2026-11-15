@@ -14,7 +14,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern void FastVecScale(void *, void *, float);
 extern float FastVecDot(void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void func_PAL_L04_00365B68(void *, void *, void *, int, int, float, float, float);
+extern char *func_PAL_L04_00365B68(void *, void *, void *, int, int, float, float, float);
 extern void func_PAL_L04_0041A660(void *, void *, void *, void *);
 
 void func_PAL_L04_0041AB08(char *owner, void *pos, void *dir, float length)

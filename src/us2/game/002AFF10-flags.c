@@ -4,7 +4,7 @@
 typedef struct { int items[21]; } Table_002AF0A8;
 extern const Table_002AF0A8 D_0026CB30;
 extern void func_US2_002B1880(int, int);
-extern void ForceClaimNotice(int, int, int);
+extern int ForceClaimNotice(int, int, int);
 
 /* Plays the entry of the 21-entry table the clamped index picks; entry 3 goes through the
    other player. */

@@ -64,7 +64,7 @@ extern int r1_D_001313EC;
    $v0 instead of retail's $v1. */
 extern int r1_func_00118C80_i(int) __asm__("r1_func_00118C80");
 
-extern void r1_func_00118C90(int);
+extern s32 r1_func_00118C90(int);
 
 extern void r1_func_0011AA68(int);
 

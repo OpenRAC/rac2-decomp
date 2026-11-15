@@ -8,7 +8,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern float math_random_float_range(float, float);
 extern void math_random_planar_offset(float *, float);
-extern void func_PAL_L07_00338B98(float *, float *, s32, s32);
+extern char *func_PAL_L07_00338B98(float *, float *, s32, s32);
 
 /* Scatter 200 particles around the camera target, then set the moby's position 4 ahead of it. */
 void func_PAL_L07_0037BC50(u8 *m)

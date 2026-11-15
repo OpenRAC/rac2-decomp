@@ -2,7 +2,7 @@
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vec4;
 extern void part_spawn_sparks_around_moby(void *, void *, void *);
 extern float vec_length_xy(void *);
-extern void ApproachValue(float *, float, float);
+extern f32 ApproachValue(float *, float, float);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int GetCollHitMaterial(void);
@@ -13,7 +13,7 @@ extern void FastVecScale(void *, void *, float);
 extern float math_fabs(float);
 extern float moby_get_anim_value(void *);
 extern int math_solve_quadratic(float *, float *, float, float, float);
-extern void MobySpringTurn(void *, void *, float, float, float, float);
+extern float MobySpringTurn(void *, void *, float, float, float, float);
 extern int coll_process_hit(float, void *, int, void *, void *);
 extern float IntToFloat(int);
 extern int moby_is_in_special_class_range(void *);

@@ -26,7 +26,7 @@ extern int math_fast_float_d(void *);
 extern int weapon_spend_ammo(int, int);
 extern void start_equipped_item_animation(void);
 extern int PlayMobySound(int, int, void *);
-extern void megaturret_spawn_shot(void *, void *, void *);
+extern char *megaturret_spawn_shot(void *, void *, void *);
 extern void cancel_hero_item_animation(void);
 extern void ref_L00_003C8828_00(void (*)(void *), void *);
 extern void owner_effect_draw_active(void *);

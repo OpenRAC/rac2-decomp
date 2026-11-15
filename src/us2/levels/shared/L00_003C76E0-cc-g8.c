@@ -59,7 +59,7 @@ extern void anim_start_blended(void *, int, int, int);
 extern void start_equipped_item_animation(void);
 extern void cancel_hero_item_animation(void);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void func_US2_L00_002C4560(int, int);
+extern s32 func_US2_L00_002C4560(int, int);
 extern void copy_matrix3x4(void *, void *);
 extern void matrix_from_basis_rows(void *, void *);
 extern void transform_vector(void *, void *, void *);

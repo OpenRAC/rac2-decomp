@@ -17,7 +17,7 @@ extern void FlushCache(int);
 extern int log2dim(int);
 extern short snd_pump_music_and_disc_read(int);
 extern void gfx_wait_for_dma_status_bits(int);
-extern void load_read_disc_with_pause(void *, int, int);
+extern int load_read_disc_with_pause(void *, int, int);
 extern int func_00126288(void *, short, short, short, short, short, short, short);
 extern int sceGsExecLoadImage(void *, void *);
 extern int gfx_wait_paths_idle(int, unsigned short);

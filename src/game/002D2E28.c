@@ -64,7 +64,7 @@ typedef struct {
 extern CallbackState g_pause_menu_state;
 extern int D_00138344;
 
-extern void func_0029C760(int);
+extern int func_0029C760(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. */
 int menu_page_update(void) {

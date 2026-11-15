@@ -73,7 +73,7 @@ extern void vehicle_compute_height_limits(Ent *);
 extern int D_L08_001B2508[] __attribute__((sda));
 extern void *D_L08_001FE7C0[];
 extern float coll_point_depth_in_volumes(void *, int, int, int, int);
-extern void path_l01_compute_segment_lengths(void *);
+extern float path_l01_compute_segment_lengths(void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void sandfly_pick_random_target(Ent *);

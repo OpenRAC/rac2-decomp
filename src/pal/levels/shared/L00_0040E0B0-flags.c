@@ -41,7 +41,7 @@ extern void ref_L00_0040A4A8_00(void (*)(void *), void *);
 extern void func_PAL_L00_0040FC40(void *, void *);
 extern int CollLine(void *, void *, int, void *, void *);
 extern int math_random_int_below(int);
-extern void coll_probe_ground_height_below(void *, int, float);
+extern float coll_probe_ground_height_below(void *, int, float);
 extern void *func_PAL_L00_00418F28(void *, float, int, int, int, int, int, int, int, int, int, int, void *);
 extern void shot_draw_impact_beam(void *, void *, void *);
 extern void moby_mark_spawned(void *);

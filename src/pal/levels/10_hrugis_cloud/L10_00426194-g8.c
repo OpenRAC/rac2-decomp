@@ -120,7 +120,7 @@ extern void func_PAL_L10_00429D08(Moby *moby);
 extern void func_PAL_L10_00429E20(Moby *moby);
 extern void level_store_value_pair(s32 a0, void (*callback)(void));
 extern s32 cam_is_mode_active(void);
-extern void func_PAL_L10_00426618(void);
+extern s32 func_PAL_L10_00426618(void);
 extern void func_PAL_L10_00428C8C(void);
 extern void func_PAL_L10_00428D58(void);
 extern s32 func_PAL_L10_00428E38(Moby *moby, s32 keep);

@@ -14,7 +14,7 @@ extern void vec_random_direction(void *, float, float);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern int func_PAL_002B5E30(void *, float);
 extern char *func_PAL_002BE9A8(void *, int, float, float, void *, float, int, int, float);
-extern void func_PAL_L01_00323068(void *, void *);
+extern int func_PAL_L01_00323068(void *, void *);
 extern float D_L04_002AF630[];
 
 void func_PAL_L04_003E99C0(char *o, float *dest)

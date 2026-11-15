@@ -35,12 +35,12 @@ extern float square_root(float);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern int CollLine(void *, void *, int, void *, int);
 extern void moby_compute_throw_velocity(void *, void *, void *, float, float, float);
-extern void vec_fast_helper_b(void *);
-extern void math_fast_float_d(void *);
-extern void stub_empty_8(int, int);
+extern int vec_fast_helper_b(void *);
+extern int math_fast_float_d(void *);
+extern unsigned int stub_empty_8(int, int);
 extern int stub_empty_5(int, int);
 extern void stub_empty_10(int);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern int stub_empty_6(int);
 extern void stub_empty_11();
 extern float moby_get_anim_value(void *);
@@ -50,7 +50,7 @@ extern void *thrown_item_spawn(void *, void *, void *);
 #define THROW_FLOAT(p,o) (*(float *)((char *)(p)+(o)))
 #define THROW_INT(p,o) (*(int *)((char *)(p)+(o)))
 #define THROW_PTR(p,o) (*(unsigned char **)((char *)(p)+(o)))
-extern void func_PAL_0026F5B8(int, int);
+extern unsigned int func_PAL_0026F5B8(int, int);
 extern void stub_empty_12();
 extern int stub_empty_7(int);
 

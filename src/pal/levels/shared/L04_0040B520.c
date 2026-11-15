@@ -21,7 +21,7 @@ extern float FastVecLength(void *);
 extern int FloatToInt(float);
 extern void euler_rotation_basis(void *, void *);
 extern void func_PAL_L00_00322198(void *, void *, float, float, int);
-extern void func_PAL_L00_003FB330(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
+extern char *func_PAL_L00_003FB330(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
 extern void moby_mark_spawned(void *);
 extern int coll_test_point(void *, int, float, void *);
 extern void math_build_axis_angle_quat(void *, void *, float);

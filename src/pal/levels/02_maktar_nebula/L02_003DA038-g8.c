@@ -3,7 +3,7 @@
 #include "common.h"
 extern void transform_vector(void *, void *, void *);
 extern void moby_transform_joint_point(char *, int, void *);
-extern void *moby_transform_joint_to_world(char *, int, void *);
+extern void moby_transform_joint_to_world(char *, int, void *);
 extern int math_random_int_below(int);
 extern float D_L02_001B02C0[4] SDATA(D_L02_001B02C0);
 extern float D_L02_001B0200[4] SDATA(D_L02_001B0200);

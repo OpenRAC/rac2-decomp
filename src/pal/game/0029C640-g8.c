@@ -4,7 +4,7 @@
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
 extern int g_current_game_mode[] __attribute__((sda));
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void func_PAL_0029C498(void);
+extern int func_PAL_0029C498(void);
 extern unsigned int level_get_word_a(void);
 extern void func_PAL_L00_0030E780(void);
 typedef int (*Fn)(void);

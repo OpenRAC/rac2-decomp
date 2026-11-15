@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void flare_spawn(float *p, float a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern char *flare_spawn(float *p, float a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 
 extern void FastVecSub(char *local, char *first, char *second);
 

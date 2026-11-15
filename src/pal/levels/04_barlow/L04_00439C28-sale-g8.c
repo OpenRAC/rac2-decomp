@@ -49,7 +49,7 @@ extern int func_PAL_00289730(int,int);
 extern int IsPointInCuboid(void *,int);
 extern void func_L00_0030C710(int);
 extern void func_PAL_002B1588(int,int);
-extern void MemcardSave(int,int);
+extern int MemcardSave(int,int);
 extern void text_print_localized_formatted(int,int,int);
 extern void moby_update_eased_node(void *,void *,int,float,float);
 extern float vec_distance_xy(void *,void *);
@@ -66,7 +66,7 @@ extern float FastVecLength(void *);
 extern void help_unlock_entry(int);
 extern float fast_subtract_rotations(float,float);
 extern void vec_build_spherical_offset(float *,float,float,float);
-extern void moby_handle_request_slot_state(int);
+extern int moby_handle_request_slot_state(int);
 
 /* Offers the item in slot 0x27 of D_00139568 for sale: compares the currency with
    its cost, and on purchase plays a cutscene, charges the cost and clears the

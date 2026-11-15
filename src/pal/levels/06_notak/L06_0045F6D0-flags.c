@@ -4,9 +4,9 @@
 extern void moby_set_state(char *, int, int);
 extern void moby_mark_spawned(char *);
 extern void FastVecScale(char *, char *, float);
-extern int part_find_owned_effect_slot(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 extern void func_PAL_L06_0045CD20(char *, int, void *, int, float, float, float, float);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern void func_PAL_L00_003281C0(char *, int, float);
 
 void func_PAL_L06_004610E0(unsigned char *a0)

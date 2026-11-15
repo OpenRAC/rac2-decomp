@@ -5,9 +5,9 @@ extern void transform_vector(float *, float *, char *);
 extern void matrix_mul_vec3(float *, float *, char *);
 extern float math_ease_out_quad(float);
 extern float math_fabs(float);
-extern void moby_move_and_collide(char *, float *, int, float, float, float);
+extern int moby_move_and_collide(char *, float *, int, float, float, float);
 /* The integer and FP argument banks keep their own order in the EE ABI. */
-extern void MobySpringTurn(char *, float, char *, float, float, float);
+extern float MobySpringTurn(char *, float, char *, float, float, float);
 /* Moves the actor toward its goal using the given side-to-side and forward limits, and turns it to face the yaw; returns 1 when both directions have slowed to a stop. */
 int actor_move_local_axes(char *moby, char *unused, char *mat, char *inv,
                         float yaw, float blend, float posSpeed, float posAccel,

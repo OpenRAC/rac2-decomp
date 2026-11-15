@@ -14,7 +14,7 @@ typedef unsigned int u32;
 
 extern s32 DIntr(void);
 
-extern s32 func_0011F628(void);
+extern void func_0011F628(void);
 
 extern void F0b028b34_FUN_00350878(char *a, unsigned int b, int c, int d);
 
@@ -23,12 +23,12 @@ extern void F0b028b34_FUN_00350808(int a);
 /* func_003512B8 : rounds a field to a multiple of 2048 under a semaphore */
 extern s32 WaitSema(s32);
 
-extern s32 SignalSema(s32);
+extern void SignalSema(s32);
 
 /* func_00351268 : waits, then combines two fields shifted by 11 */
 extern s32 WaitSema(s32 a0);
 
-extern s32 SignalSema(s32 a0);
+extern void SignalSema(s32 a0);
 
 extern void mpeg_vibuf_get_free_regions(int *owner, int *first_address, int *first_count,
                          int *second_address, int *second_count);

@@ -53,11 +53,11 @@ extern void level_store_value_pair(int,int);
 extern void SetCamera5Pose(void *,void *,int,int,int);
 extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
-extern void hero_l18_set_action(int,int);
+extern s32 hero_l18_set_action(int,int);
 extern float vec_distance_xy(void *,void *);
 extern void moby_set_flag_bit(void *,int);
 extern void moby_start_or_forward_anim(void *,int,int,float);
-extern void TryClaimNotice(int,int,int);
+extern int TryClaimNotice(int,int,int);
 /* Refreshes targeting and combat reactions, including the player capture transition. */
 void receiver_bot_update_targeting(u8 *moby) {
     EnemyStateView *state = *(EnemyStateView **)(moby + 0x68);

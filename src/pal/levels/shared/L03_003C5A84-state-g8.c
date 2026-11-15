@@ -77,7 +77,8 @@ extern float math_step_value_toward_target(void *, void *, float, float, float, 
 extern float coll_probe_ground_height_below(u8 *, int, float);
 extern int route_check_object_points(void *, void *, void *);
 extern void euler_rotation_basis(void *, void *);
-extern void func_PAL_002B5E10(char *), func_PAL_L03_003C8478(u8 *), func_002A677C(u8 *);
+extern void func_PAL_L03_003C8478(u8 *), func_002A677C(u8 *);
+extern int func_PAL_002B5E10(char *);
 #define SF(o) (*(float *)(state + (o)))
 #define SI(o) (*(int *)(state + (o)))
 #define SP(o) (*(u8 **)(state + (o)))

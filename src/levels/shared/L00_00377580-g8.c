@@ -27,13 +27,13 @@ extern int D_L00_001AD72C;
 extern int D_L00_001AD730 __attribute__((sda));
 extern int D_L00_001AD734;
 extern float D_L00_001B25E0;
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int sprintf(char *, char *, ...);
 extern int text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
 extern void text_format_number_with_separators(char *, int);
 extern int GetIconFrame(int, int);
 extern int text_measure_width_second_set(unsigned char *, int);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
 extern int save_count_items_above_baseline(void);
 
 /* Draws the upgrade name, its price and the player's current amount, each with a bolt icon, unless the upgrade is already owned. */

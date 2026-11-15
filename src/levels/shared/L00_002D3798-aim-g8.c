@@ -59,7 +59,7 @@ extern float fast_subtract_rotations(float,float),FastAddRotations(float,float);
 /* EE argument banks are independent: target is $f12, output is $a0,
  * followed by the three $f13-$f15 rates/limit arguments. */
 extern void math_approach_target_with_braking(float target, float *output, float rate, float acceleration, float limit);
-extern void ApproachValue(float *,float,float);
+extern f32 ApproachValue(float *,float,float);
 extern void vec_build_spherical_offset(void *,float,float,float), mat_build_rotation_from_angles(void *,void *);
 extern void hero_steer_heading(int,float,float,float);
 #define HF(o) (*(float *)(hero + (o)))

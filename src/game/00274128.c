@@ -91,7 +91,7 @@ extern float func_00282DF0_5(void *a);
 
 extern float func_00282DB0_3(void *a, void *b);
 
-extern void func_002AA2E8_2(float *p, float a, float b);
+extern f32 func_002AA2E8_2(float *p, float a, float b);
 
 extern void func_00282F20_16(void *a, void *b, float f);
 
@@ -873,7 +873,7 @@ extern int gfx_wait_paths_idle(int, int);
 extern void SetupFS_AA_buffer(int, int, int, int, int, int);
 extern void gfx_append_draw_list_header(void);
 extern void gfx_append_draw_list_buffer_tag(int);
-extern void gfx_query_display_buffer(void);
+extern int gfx_query_display_buffer(void);
 extern int func_00126288(GsLoadImage *, s16, s16, s16, s16, s16, s16, s16);
 extern int sceGsExecLoadImage(GsLoadImage *, unsigned char *);
 

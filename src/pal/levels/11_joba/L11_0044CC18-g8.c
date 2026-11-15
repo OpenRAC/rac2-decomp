@@ -15,7 +15,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern void func_PAL_L11_00465B28(void *, void *, void *, float, float, float, float);
+extern char *func_PAL_L11_00465B28(void *, void *, void *, float, float, float, float);
 extern TI128 g_hero_position;
 extern s32 D_L11_001B19A8 __attribute__((sda));
 extern s32 D_L11_001B19AC __attribute__((sda));

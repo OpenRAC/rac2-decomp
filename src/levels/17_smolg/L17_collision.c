@@ -8,7 +8,7 @@ extern void matrix_from_basis_rows(void *, void *);
 extern void transform_vector(void *, void *, void *);
 extern int coll_process_hit(void *, int, void *, int, float);
 extern void *func_001153D4(void *, const void *, unsigned int);
-extern int part_start_effect_default_table(void *, void *, int, void *, float);
+extern void part_start_effect_default_table(void *, void *, int, void *, float);
 extern char *D_L17_001C4080[];
 
 /* Finds objects touching its box and hits each one (collision test for the box). */

@@ -8,10 +8,10 @@ extern void moby_set_state(char *, int, int);
 extern void FastVecScale(void *, void *, float);
 extern void vec_clear_128(void *);
 extern float math_random_float_range(float, float);
-extern void part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
+extern void *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
 extern char *part_find_owned_effect_slot(char *, int, int);
-extern void coll_sweep_from_object(void *, void *, float, int, float, float, int, int, int);
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern int coll_sweep_from_object(void *, void *, float, int, float, float, int, int, int);
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void moby_mark_spawned(char *);
 extern void gfx_add_draw_callback_third(void *, void *);
 extern void part_spawn_two_glow_effects(void);
@@ -68,7 +68,7 @@ void func_PAL_L11_004657E0(char *p)
 extern char *CreateMoby(int);
 extern float math_random_angle(void);
 extern void func_PAL_L11_00465FD0(void *, int);
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
 extern float D_L11_001B22C4 __attribute__((sda));
 extern int D_L11_001B22CC __attribute__((sda));
 typedef struct {

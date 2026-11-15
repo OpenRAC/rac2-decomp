@@ -74,7 +74,7 @@ extern unsigned char g_item_slot_to_record[];
 typedef struct { char pad[0x46]; short text; char pad48[0x98]; } PreviewInfo;
 extern PreviewInfo g_weapon_table[];
 extern void shop_clear_preview(void), shop_set_message_text(char *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_PAL_00292CD0(void *), func_PAL_00292FC8(int);
 extern float mat_fast_helper_a(float, float), FastAddRotations(float, float), fast_subtract_rotations(float, float);
 extern void func_PAL_0029FA60(void *, int), gfx_pack_render_command_fields(void *, int, int, int, int);

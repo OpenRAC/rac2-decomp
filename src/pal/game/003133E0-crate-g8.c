@@ -62,7 +62,7 @@ extern float ApproachValue(void *value, float target, float step);
 extern float FastVecLength(void *vector);
 extern void func_PAL_00313538(Moby *moby, int, int);
 extern void func_PAL_003133E0(Moby *moby);
-extern void coll_apply_push_to_object(Moby *moby, void *attachment, void *position, void *rotation,
+extern int coll_apply_push_to_object(Moby *moby, void *attachment, void *position, void *rotation,
                           void *outPosition, void *outRotation);
 extern void mat_combine_and_store(void *, void *movement, void *previousRotation, void *rotation);
 extern AttachmentInfo *moby_get_private_value_2(void *attachment);

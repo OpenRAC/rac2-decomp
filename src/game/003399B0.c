@@ -11,9 +11,9 @@ extern void func_0033AF48_1(int *p);
 
 extern void gfx_draw_screen_element_stored(int *p);
 
-extern void func_L00_0042BAD0_1(char *object);
+extern char *func_L00_0042BAD0_1(char *object);
 
-extern void func_L00_0042C290_1(char *object);
+extern char *func_L00_0042C290_1(char *object);
 
 extern void F8ad956d6_FUN_00336320(char *target);
 
@@ -21,15 +21,15 @@ extern void F8ad956d6_FUN_002FC560(int marker, int code);
 
 extern void F8ad956d6_FUN_00295F60(int first, int second);
 
-extern void F8ad956d6_FUN_002DAF68(char *target);
+extern int F8ad956d6_FUN_002DAF68(char *target);
 
 extern void F8ad956d6_FUN_00336A78(char *target);
 
-extern void func_L00_0042BAD0_5(void *);
+extern char *func_L00_0042BAD0_5(void *);
 
-extern void func_L00_0042BFF8_4(void *);
+extern char *func_L00_0042BFF8_4(void *);
 
-extern void func_L00_0042C290_5(void *);
+extern char *func_L00_0042C290_5(void *);
 
 typedef float f32;
 
@@ -39,9 +39,9 @@ typedef int s32;
 
 extern int prompt_bar_destroy(int);
 
-extern void F7d9c8805_FUN_003361A8(int);
+extern void *F7d9c8805_FUN_003361A8(int);
 
-extern void F7d9c8805_FUN_00336968(int);
+extern char *F7d9c8805_FUN_00336968(int);
 
 extern void prompt_bar_set_texts_enabled(unsigned char *owner, int value);
 
@@ -88,8 +88,8 @@ typedef struct {
 extern void *memset(void *, int, int);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void object_set_first_float4(void *, float, float, float, float);
-extern int text_format_location_name(void *, int);
-extern int GetLocalizedString(int);
+extern char *text_format_location_name(void *, int);
+extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, int);
 extern Point2_00339F28 D_001ADCE0, D_001ADCE8, D_001ADCF0, D_001ADCF8, D_001ADD00;
 extern char g_map_overlay_state[];
@@ -204,10 +204,10 @@ void *title_screen_destroy(char *screen)
 
 typedef struct { float x, y, width, height; } TitlePosition;
 extern void object_init_derived_c(void *, void *, void *);
-extern int object_get_fourth_field(void *);
+extern int *object_get_fourth_field(void *);
 extern void hud_init_widget_defaults(void *, void *, void *);
 extern int *ui_return_second_arg(int, int);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern float D_001B23A4 __attribute__((sda));
 /* Allocate the title position (scaled y, rounded) and set up its two labels.
  * The scale is read after the x store: retail issues 300.0 before it. */

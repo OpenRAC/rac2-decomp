@@ -316,7 +316,7 @@ s32 text_find_level_by_key(s32 key)
     return 0;
 }
 
-extern void func_2EDD48(void *);
+extern int func_2EDD48(void *);
 extern char ref_L00_001BC228_00[];
 
 /* Thin forwarder: hands one global to the shared handler. */

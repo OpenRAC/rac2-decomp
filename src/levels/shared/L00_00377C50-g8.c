@@ -12,7 +12,7 @@ extern ActionClass g_weapon_l00_table[];
 extern int g_player_bolts;
 extern int g_is_pal_video;
 extern float D_L00_001B25E0;
-extern int GetLocalizedString(int id);
+extern char *GetLocalizedString(int id);
 extern int GetSelectedShopItemPrice(void);
 extern int text_draw_centered_medium(int x, int y, unsigned long style, u8 *text, int length);
 

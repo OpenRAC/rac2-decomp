@@ -15,7 +15,7 @@ extern void euler_rotation_basis(char *a, char *b);
 extern int slot_alloc_for_object(char *a, int b);
 extern void vec_clear_128(char *a);
 extern int part_alloc_effect_slot(char *a, int b, float x, float y, float z);
-extern int func_002A0F48(char *a);
+extern void func_002A0F48(char *a);
 extern float g_hero_state[];
 extern char *D_L00_001B0CA0 __attribute__((sda));
 extern int D_L00_001B2C28;

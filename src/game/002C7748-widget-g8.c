@@ -14,7 +14,8 @@ extern int D_001AB8D0[1] __attribute__((sda));
 extern int D_002614E8[];
 extern unsigned char g_hero_state[];
 extern int stub_empty_22(void), stub_empty_23(void), stub_empty_24(void), stub_empty_25(void), stub_empty_26(void), stub_empty_27(void), stub_empty_28(void), menu_always_return_true(void);
-extern void menu_set_field_448(char *, int), menu_set_field_44c(char *, int), menu_load_sprites_from_values(char *, int *), menu_set_table_slot(char *, int, int), menu_set_icon_count_and_icons(char *, int, int *), UpdateMenuChoiceListWidgets(char *, int);
+extern void menu_set_field_448(char *, int), menu_set_field_44c(char *, int), menu_load_sprites_from_values(char *, int *), menu_set_table_slot(char *, int, int), menu_set_icon_count_and_icons(char *, int, int *);
+extern int UpdateMenuChoiceListWidgets(char *, int);
 #define MENU (D_001A8CFC[0] + 0x39140)
 /* Sets up the choices shown in the menu list, depending on what the game is doing. */
 void ConfigureMenuChoiceList(void)

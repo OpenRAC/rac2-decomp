@@ -50,7 +50,7 @@ extern HeroRotationBlends D_L00_0025BE10;
 extern unsigned char D_001A7A43,  D_001A7A41;
 extern float D_L00_001A7CF4 __attribute__((sda));
 extern float D_L00_001A7CF8 __attribute__((sda));
-extern void ApproachValue(float *, float, float);
+extern float ApproachValue(float *, float, float);
 extern int math_random_int_range(int, int);
 extern int math_fast_float_d(int *);
 extern float math_random_float_range(float, float);

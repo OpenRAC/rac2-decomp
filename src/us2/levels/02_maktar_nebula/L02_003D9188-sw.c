@@ -110,7 +110,7 @@ extern int snd_is_voice_playing_for_owner(Actor *, int);
 extern void snd_stop_voice(int);
 extern void boss_spawn_joint_sparks(Actor *);
 extern float IntToFloat(int);
-extern void part_spawn_flying_fragment(Actor *, int, void *, void *, int, int, void *, void *, void *, float);
+extern char *part_spawn_flying_fragment(Actor *, int, void *, void *, int, int, void *, void *, void *, float);
 extern void part_spawn_green_glitter(Actor *, void *);
 extern void moby_mark_spawned(Actor *);
 extern int snd_play_from_class_bank(int, int, Actor *, int);

@@ -9,7 +9,7 @@ extern int g_weapon_table[];
 extern unsigned char g_item_slot_to_record[];
 extern int request_end_slot(int, int);
 extern int request_begin_slot(int, int, int, int, void *);
-extern void func_PAL_002B8898(int);
+extern s16 func_PAL_002B8898(int);
 extern void LoadClassIntoFreeCacheSlot(int);
 typedef struct {
     char pad00[0x1C];

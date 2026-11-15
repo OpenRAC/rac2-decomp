@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern int r1_D_0015EDC4 __attribute__((sda));
-extern void snd_Pump(void);
+extern int snd_Pump(void);
 
 /* Clears a sound flag and runs the sound update. */
 void snd_clear_flag_and_update(void) {

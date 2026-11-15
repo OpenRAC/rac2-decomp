@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int part_find_owned_effect_slot(char *a0, int a1, int a2);
+extern void *part_find_owned_effect_slot(char *a0, int a1, int a2);
 extern float moby_update_aim_target_strength(char *a0, int a1);
 extern void gfx_start_color_fade(char *a0, char *a1);
 extern void SetDeathBits(char *a0, int a1, int a2);

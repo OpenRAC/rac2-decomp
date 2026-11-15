@@ -26,7 +26,7 @@ extern unsigned char g_item_slot_to_record[];
 
 extern MappedClassEntry g_weapon_l00_table[];
 
-extern s32 memset(u8 *, s32, s32);
+extern void *memset(u8 *, s32, s32);
 
 extern void req_reset_queue(unsigned char *);
 

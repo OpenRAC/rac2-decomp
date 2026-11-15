@@ -58,7 +58,7 @@ extern char *moby_spawn_scaled_effect(void *, float);
 extern float math_random_float_range(float, float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern void part_spawn_spark_2(void *, void *, int, int);
+extern void *part_spawn_spark_2(void *, void *, int, int);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_fast_float_d(char *);
@@ -71,7 +71,7 @@ extern void FastVecAdd(char *, char *, char *);
 /* Resident (boot) bodies that are placed in every level program: their addresses differ
    from level to level, so they are named by their boot catalogue name. */
 extern int FastDecTimer(unsigned short *);
-extern void vec_fast_helper_a(unsigned short *);
+extern int vec_fast_helper_a(unsigned short *);
 
 /* same resident body, called here with three arguments */
 extern void func_002A7750_3(unsigned char *, int, int);
@@ -486,7 +486,7 @@ typedef struct {
 } DobboLimits;
 extern DobboLimits D_L09_001C9F80;
 extern void dobbo_handle_damage(unsigned char *);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void moby_mark_spawned(void *);
 extern void SetDeathBits(void *, int, int);

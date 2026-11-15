@@ -24,7 +24,7 @@ extern s32 arena_get_state_word(char *);
 extern void func_PAL_L02_004009A0(char *, int, int);
 extern int coll_point_inside_record_volume(void *, int);
 extern int cam_hook_return_minus_one(char *);
-extern void func_PAL_L01_00323068(char *, char *);
+extern int func_PAL_L01_00323068(char *, char *);
 extern void gfx_add_draw_callback_first(void (*)(void *), void *);
 extern void widget_submit_effects(char *);
 extern float vec_distance_xy(void *, void *);

@@ -8,8 +8,8 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
-extern void part_spawn_drifting(void *, void *, int, float, float);
-extern void part_spawn_spark_2(void *, void *, int, int);
+extern void *part_spawn_drifting(void *, void *, int, float, float);
+extern void *part_spawn_spark_2(void *, void *, int, int);
 /* Makes a water splash at the object: a few big ripples and many small droplets that fly up. */
 void OozlaSpawnSplashParticles(char *object)
 {

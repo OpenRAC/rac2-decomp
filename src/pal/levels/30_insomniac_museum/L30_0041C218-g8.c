@@ -9,7 +9,7 @@ extern float math_random_angle(void);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void euler_rotation_basis(void *, void *);
 extern float math_random_float_range(float, float);
-extern void part_spawn_ground_effect(void *, int, int, float, float, int, int, void *, float, int);
+extern void *part_spawn_ground_effect(void *, int, int, float, float, int, int, void *, float, int);
 extern float D_L30_001B1FAC __attribute__((sda));
 extern int D_L30_001B1F08 __attribute__((sda)), D_L30_001B1F0C __attribute__((sda));
 extern char D_L30_001A8F20[] __attribute__((sda)) NOT_SDA;

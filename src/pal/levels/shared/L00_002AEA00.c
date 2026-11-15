@@ -5,7 +5,7 @@
 
 
 
-extern void *hero_get_weapon_or_form_id(void *p);
+extern int hero_get_weapon_or_form_id(void *p);
 extern void set_hero_animation(void *a, void *b, float f);
 extern unsigned char D_00189E20_26[];
 
@@ -93,7 +93,7 @@ extern HeldAnimationItem g_weapon_l00_table[];
 extern HeldMatrixBuffers D_L00_001B7400[];
 extern int hero_slot_item_id(int);
 extern int get_ammo(int);
-extern void ApproachValue(float *, float, float);
+extern float ApproachValue(float *, float, float);
 extern float mat_fast_helper_a(float, float);
 extern float FastAddRotations(float, float);
 extern void euler_rotation_basis(void *, void *);

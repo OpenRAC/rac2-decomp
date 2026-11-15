@@ -12,7 +12,7 @@ extern void vec_build_spherical_offset(void *, float, float, float);
 extern void add_vectors(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
 /* Integer and float arguments keep their order within each EE register bank. */
-extern void part_spawn_ground_effect(void *, int, unsigned int, int, int, void *, float, float, float, int);
+extern void *part_spawn_ground_effect(void *, int, unsigned int, int, int, void *, float, float, float, int);
 
 extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
@@ -77,7 +77,7 @@ void bike_animate_boost_flame_streak(void *moby) {
 
 typedef unsigned int B781AimQuad __attribute__((mode(TI)));
 extern float math_fabs(float);
-extern void math_approach_with_velocity(void *, void *, float, float, float, float, int);
+extern float math_approach_with_velocity(void *, void *, float, float, float, float, int);
 extern void anim_start_blended(void *, int, int, int);
 extern void func_002A05A8(void *);
 extern void func_002A0F48(void *);
@@ -85,7 +85,7 @@ extern void *moby_spawn_at_parent_pose(void *, int, float);
 extern int vec_apply_scaled_value(void *, float);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void bike_animate_boost_flame_streak(void *);
-extern void part_spawn_object_following_effect(void *, void *, unsigned int, float, int, int, float, int, int, int);
+extern void *part_spawn_object_following_effect(void *, void *, unsigned int, float, int, int, float, int, int, int);
 extern void FastVecSub(void *, void *, void *);
 extern float func_L00_002EE290(void *);
 extern void EmitTrailEffects(void *, void *, void *, float);
@@ -167,7 +167,7 @@ extern float FastVecLength(void *);
 extern int FloatToInt(float);
 extern void euler_rotation_basis(void *, void *);
 extern void part_l00_spawn_explosion_burst(void *, void *, float, float, int);
-extern void SpawnExplosion(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
+extern char *SpawnExplosion(void *, float, float, int, int, int, int, int, int, int, int, int, int, int);
 extern void moby_mark_spawned(void *);
 extern int coll_test_point(void *, int, float, void *);
 extern void math_build_axis_angle_quat(void *, void *, float);

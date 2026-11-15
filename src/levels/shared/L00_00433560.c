@@ -9,11 +9,11 @@ extern int func_002E5E58_1(int a, int b, int c);
 
 extern volatile unsigned char D_001A7BB2 __attribute__((sda));
 
-extern void prompt_bar_destroy(char *p);
+extern int prompt_bar_destroy(char *p);
 
 void* menu_init_two_sub_objects(void* param_1);
 
-extern void func_0033AB50_1(int);
+extern int func_0033AB50_1(int);
 
 extern unsigned long long func_00347EA0_1(unsigned long long);
 
@@ -21,11 +21,11 @@ extern int menu_list_get_selected_id(unsigned char *owner);
 
 extern void menu_list_clear_state(unsigned char *owner);
 
-extern void cam_init_object_table_a(char *p);
+extern char *cam_init_object_table_a(char *p);
 
-extern void cam_init_object_table_d(char *p);
+extern char *cam_init_object_table_d(char *p);
 
-extern void cam_init_object_table_c(char *p);
+extern char *cam_init_object_table_c(char *p);
 
 /* Calls two helpers on object-plus-8 using the pointer at plus-684; when flag bit 6 is set and the plus-680 word is zero, calls a third helper and normalizes the measured byte cell to 0 or 1; returns flag bit 6. */
 int menu_update_two_part_flags_a(char *object, int flags)
@@ -117,12 +117,12 @@ char *menu_visit_two_sub_objects(char *a0) {
 }
 
 
-extern int prompt_bar_draw(char *p);
+extern void prompt_bar_draw(char *p);
 
 /* Asks the sub-object 8 bytes in for a value and passes it back. */
-int menu_get_sub_object_value(char *p)
+void menu_get_sub_object_value(char *p)
 {
-    return prompt_bar_draw(p + 8);
+    prompt_bar_draw(p + 8);
 }
 
 
@@ -269,20 +269,20 @@ void stub_l00_noop_2(void)
 {
 }
 
-extern int text_panel_update_mode(char *p);
+extern void text_panel_update_mode(char *p);
 
 /* Asks a sub-object for a value and passes it back. */
-int sub_object_get_value_first(char *p)
+void sub_object_get_value_first(char *p)
 {
-    return text_panel_update_mode(p + 0x1D6C);
+    text_panel_update_mode(p + 0x1D6C);
 }
 
-extern int text_panel_draw_scaled(char *p);
+extern void text_panel_draw_scaled(char *p);
 
 /* Asks the same sub-object for a different value and passes it back. */
-int sub_object_get_value_second(char *p)
+void sub_object_get_value_second(char *p)
 {
-    return text_panel_draw_scaled(p + 0x1D6C);
+    text_panel_draw_scaled(p + 0x1D6C);
 }
 
 /* Return the complete supplied unsigned-long 64-bit value unchanged. */
@@ -319,20 +319,20 @@ int stub_l00_return_one_2(void) {
 }
 
 
-extern int mpeg_vibuf_get_free_regions(char *p);
+extern void mpeg_vibuf_get_free_regions(char *p);
 
 /* Asks a sub-object for a value and passes it back. */
-int sub_object_get_value_a(char *p)
+void sub_object_get_value_a(char *p)
 {
-    return mpeg_vibuf_get_free_regions(p + 0x48);
+    mpeg_vibuf_get_free_regions(p + 0x48);
 }
 
-extern int mpeg_vibuf_add_pending_bytes(char *p);
+extern void mpeg_vibuf_add_pending_bytes(char *p);
 
 /* Asks the same sub-object for another value and passes it back. */
-int sub_object_get_value_b(char *p)
+void sub_object_get_value_b(char *p)
 {
-    return mpeg_vibuf_add_pending_bytes(p + 0x48);
+    mpeg_vibuf_add_pending_bytes(p + 0x48);
 }
 
 extern int mpeg_vibuf_get_queued_bytes(char *p);

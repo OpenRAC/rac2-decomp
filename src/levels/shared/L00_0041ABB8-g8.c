@@ -19,7 +19,7 @@ extern float D_L00_001B1528 __attribute__((sda));
 
 extern int FastDecTimer(short *p);
 
-extern void cam_offset_point_by_vector(char *obj, char *arg1, float *local, unsigned char index);
+extern int cam_offset_point_by_vector(char *obj, char *arg1, float *local, unsigned char index);
 
 extern void cam_ease_vector_toward(char *obj, float *a1, float *a2, float f12, float f13, float f14);
 

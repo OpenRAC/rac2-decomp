@@ -39,7 +39,7 @@ extern void level_restart_keep_progress(int);
 extern void save_clear_slot_and_start(int, int);
 extern void load_data_and_setup_callback(void);
 extern void save_load_game_data_reset_menu(void);
-extern void menu_send_request(int, char *);
+extern int menu_send_request(int, char *);
 extern int request_begin_slot(int, int, int, int, int);
 extern int menu_get_counter(void);
 extern int menu_get_mode(void);

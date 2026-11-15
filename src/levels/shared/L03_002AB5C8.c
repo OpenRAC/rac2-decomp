@@ -192,7 +192,7 @@ void hero_copy_value_to_held_object(void) {
 
 
 extern float ApproachValue(float *, float, float);
-extern void math_spring_float_to_goal(float *, float *, float, float, float, float);
+extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 extern float vec_distance_xy(void *, void *);
 
 /* Picks target values for the hero's camera settings from the hero's state, then eases the current values toward them. */

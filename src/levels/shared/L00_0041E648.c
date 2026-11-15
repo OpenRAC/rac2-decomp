@@ -5,7 +5,7 @@ typedef struct { Quad128 vertices[4]; unsigned int colors[4]; float uv[4][2]; lo
 typedef union { QuadPacket raw; StripPayload view; } StripPacket;
 typedef unsigned int Rac2Native_9da4b6b15b3cf4a0_RecordWord180;
 typedef unsigned long long Rac2Native_9da4b6b15b3cf4a0_RecordValue180;
-extern int level_get_slot_body(int id, int index);
+extern u8 *level_get_slot_body(int id, int index);
 extern void table_clear_entry_flag(int);
 extern void moby_mark_spawned(void *);
 extern void VU1_addGSregister(Rac2Native_9da4b6b15b3cf4a0_RecordWord180,Rac2Native_9da4b6b15b3cf4a0_RecordValue180);

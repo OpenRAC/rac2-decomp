@@ -6,7 +6,7 @@ extern void set_moby_color(void *a0, int a1, int a2, int a3);
 extern float math_random_float_range(float a, float b);
 extern void anim_start_blended(void *a0, int a1, int a2, int a3);
 extern void vec_clear_128(void *);
-extern void moby_spawn_linked(char *, int, float, float);
+extern int moby_spawn_linked(char *, int, float, float);
 
 /* Aims the object's stage, re-arms its effect and stores the new heading. */
 void func_PAL_L11_0045A848(char *p, int a1, int a2)
@@ -53,8 +53,8 @@ void func_PAL_L11_0045A848(char *p, int a1, int a2)
 extern void func_002A05A8(void *a0);
 extern void arena_add_waiting_fighter(char *p, int id);
 extern void snd_stop_voice(int index);
-extern void snd_play_from_class_bank(int index, int value, char *object, int kind);
-extern void SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int,
+extern int snd_play_from_class_bank(int index, int value, char *object, int kind);
+extern char *SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int,
                          int, int, int);
 extern char g_sound_state[];
 

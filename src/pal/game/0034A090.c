@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern void *ui_return_second_arg(int, int);
-extern void *hud_init_widget_defaults(void *, void *, void *);
+extern void hud_init_widget_defaults(void *, void *, void *);
 extern char D_001AE5A8[];
 
 void func_PAL_0034A090(char *object, void *data)

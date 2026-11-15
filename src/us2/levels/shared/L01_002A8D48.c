@@ -13,7 +13,7 @@ extern void hero_update_subsystems(void);
 extern void func_2C7CA8(void);
 extern void UpdateHeroInputAndHistory(void);
 extern void hero_read_input_command_flags(void);
-extern void ProbeLedgeGrab(char *a0, char *a1, char *a2);
+extern int ProbeLedgeGrab(char *a0, char *a1, char *a2);
 extern void func_US2_L01_002C3B08(void);
 extern void func_2C8628(void);
 extern void hero_clear_objects_flag_bit(void);

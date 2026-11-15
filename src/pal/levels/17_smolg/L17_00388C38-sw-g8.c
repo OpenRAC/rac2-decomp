@@ -79,10 +79,10 @@ extern void STUB_printf(const char *, ...);
 extern void moby_set_state(void *, int, int);
 extern int func_PAL_L17_003C07C0(void *);
 extern int func_PAL_L17_003C0A50(void *);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern int flag_set_first_pending(void *);
 extern int math_fast_float_d(int *);
-extern void func_PAL_L00_003FB330(void *, float, int, int, int, int, int, int, int, int,
+extern char *func_PAL_L00_003FB330(void *, float, int, int, int, int, int, int, int, int,
                           int, int, int, float);
 extern void func_PAL_002B15D8(void *, int, void *, float, float, float, float, int);
 extern Moby *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, int, float, float);

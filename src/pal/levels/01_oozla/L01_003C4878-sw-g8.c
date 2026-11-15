@@ -44,7 +44,7 @@ extern void func_PAL_L01_003C45C8(void *);
 extern void func_PAL_L01_003C4650(void *);
 extern void func_PAL_L01_003C46D8(void *);
 extern void func_PAL_L01_003C4768(void *);
-extern void moby_spawn_thrown_object(void *, void *, void *, float);
+extern u8 *moby_spawn_thrown_object(void *, void *, void *, float);
 extern void *func_PAL_L01_0041C698(void *, int, int, int);
 extern void func_PAL_L01_00397578(void *);
 extern int func_001163B0(void);

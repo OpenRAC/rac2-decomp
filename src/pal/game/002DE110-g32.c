@@ -36,7 +36,7 @@ extern void func_PAL_002DF760(int);
 extern void func_PAL_002DF6D0(int, int);
 extern void load_data_and_setup_callback(void);
 extern void save_load_game_data_reset_menu(void);
-extern void func_PAL_002D6710(int, char *);
+extern int func_PAL_002D6710(int, char *);
 extern int request_begin_slot(int, int, int, int, int);
 extern int menu_get_counter(void);
 extern int menu_get_mode(void);

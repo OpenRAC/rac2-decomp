@@ -12,11 +12,11 @@ extern void func_PAL_002AC3C0(char *, char *);
 extern void *part_find_owned_effect_slot(char *, int, int);
 extern int FastDecTimer(void *);
 extern f32 func_PAL_002AA108(char *, char *);
-extern void func_PAL_002B3F18(char *, char *, char *);
+extern int func_PAL_002B3F18(char *, char *, char *);
 extern void vec_scale_to_length(f32 *, char *, f32);
 extern void FastVecAdd(f32 *, f32 *, f32 *);
 extern void moby_mark_spawned(char *);
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int,
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int,
                           f32, f32);
 
 void func_PAL_L13_003F1070(char *a0)

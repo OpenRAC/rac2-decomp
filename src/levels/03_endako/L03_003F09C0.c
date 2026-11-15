@@ -26,7 +26,7 @@ extern u8 D_L03_00188660[];
 extern void func_31B920(void *entity, int a, int b);
 extern int func_31B9F0(int id);
 extern void func_320318(void *entity, void *target);
-extern void func_2EEC20(void *target);
+extern int func_2EEC20(void *target);
 extern void func_326730(void *entity, void *target, int a, int b, float scale);
 extern void func_312550(void *entity, int id, void *target);
 extern void func_2EFD00(void *target, int a, float f);
@@ -91,7 +91,7 @@ extern void part_start_record_effect_by_index(s32, s32);
 extern void help_unlock_entry(s32);
 extern s32 moby_handle_request_slot_state(s32);
 extern void moby_mark_spawned(u8 *);
-extern void MemcardSave(s32, s32);
+extern int MemcardSave(s32, s32);
 
 /* Two flag bytes of the boot's state block, reached as members of one object: the stores
  * are then `lui $at ; sb` pairs that stay out of the call's delay slot, as in retail (a

@@ -35,7 +35,8 @@ extern void moby_init_child_from_parent(void *,void *);
 extern float ApproachValue(float *,float,float);
 extern void sway_start(void *),sway_update_decaying(void *),moby_toggle_linked_by_distance(void *);
 extern void multiply_matrix3x3(void *,void *,void *),moby_update_attached_transforms(void *,void *);
-extern void snd_start_in_slot(int,int,int),part_spray_height(void *),part_emit_column(void *,int);
+extern void part_spray_height(void *), part_emit_column(void *,int);
+extern int snd_start_in_slot(int,int,int);
 extern void SpawnRandomKindAt(void *,int),ref_L22_003F45D8_13(void *,int);
 
 typedef unsigned int Qword __attribute__((mode(TI)));

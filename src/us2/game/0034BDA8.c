@@ -2,7 +2,7 @@
 #include "names.h"
 
 
-extern int object_get_fourth_field(unsigned char *field);
+extern int *object_get_fourth_field(unsigned char *field);
 
 unsigned int func_US2_0034D7A8(unsigned char *owner)
 {
@@ -122,10 +122,10 @@ void func_US2_0034DB68(int *self, int value)
 
 
 
-extern void object_construct_derived_b(void *p);
-extern void func_US2_0034BDB0(void *p);
-extern void object_construct_derived_c(void *p);
-extern void text_panel_shutdown(void *p);
+extern void *object_construct_derived_b(void *p);
+extern s32 func_US2_0034BDB0(void *p);
+extern void *object_construct_derived_c(void *p);
+extern void *text_panel_shutdown(void *p);
 
 /* walks 26 consecutive 72-byte records calling one leaf per record, then calls four more leaves on fixed offsets of the same object and returns the object pointer */
 unsigned char *func_US2_0034ED28(unsigned char *a0)

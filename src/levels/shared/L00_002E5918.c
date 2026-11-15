@@ -11,7 +11,7 @@ extern float func_00283BE0_6(float b, float a);
 
 extern float func_00282C48_8(float t);
 
-extern void func_00283B98_10(float a, float c);
+extern float func_00283B98_10(float a, float c);
 
 /* Calls the engine routine at 0x00284EA8 with no arguments. */
 void gfx_call_engine_routine(void) {
@@ -181,12 +181,12 @@ int text_measure_width_third_set(char *text, int length) {
  return measure_text_width(text, length, D_L00_0028CCD0);
 }
 
-extern void text_measure_width_scaled(void *a0, void *a1, void *a2);
+extern int text_measure_width_scaled(void *a0, void *a1, void *a2);
 extern char D_L00_0028C590[];
 
 /* Runs a text helper on two buffers with the first character set. */
-void text_run_helper_first_set(void *first, void *second) {
- text_measure_width_scaled(first, second, D_L00_0028C590);
+int text_run_helper_first_set(void *first, void *second) {
+ return text_measure_width_scaled(first, second, D_L00_0028C590);
 }
 
 
@@ -373,7 +373,7 @@ ASM_FUNC("asm/levels", func_L00_002EE4D8);
 ASM_FUNC("asm/levels", func_L00_002EE660);
 
 /* Takes three floats, computes a value from the second and first, negates the third when that value is not positive, clamps the third against that value and its negation (recomputing it in each branch), then calls a helper with the first and the clamped third. */
-void math_clamp_angle_step(float angle, float other, float amount)
+float math_clamp_angle_step(float angle, float other, float amount)
 {
     float limit = func_00283BE0_6(other, angle);
 
@@ -383,7 +383,7 @@ void math_clamp_angle_step(float angle, float other, float amount)
         amount = func_00282C48_8(limit);
     else if (amount < -func_00282C48_8(limit))
         amount = -func_00282C48_8(limit);
-    func_00283B98_10(angle, amount);
+    return func_00283B98_10(angle, amount);
 }
 
 

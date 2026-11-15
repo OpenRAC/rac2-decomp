@@ -7,7 +7,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void *moby_transform_joint_to_world(char *, int, void *);
+extern void moby_transform_joint_to_world(char *, int, void *);
 
 extern void moby_transform_joint_point(char *, int, void *);
 
@@ -15,13 +15,13 @@ extern void vec_scale_to_length(char *, char *, float);
 
 extern void FastVecAdd(void *, void *, void *);
 
-extern void coll_project_point_on_segment(char *, char *, char *, char *);
+extern float coll_project_point_on_segment(char *, char *, char *, char *);
 
 extern void FastVecSub(void *, void *, void *);
 
 extern float FastVecLength(void *);
 
-extern void coll_sweep_from_object(char *, char *, int, float, float, float, int, int, int);
+extern int coll_sweep_from_object(char *, char *, int, float, float, float, int, int, int);
 
 /* Starts a blade swing hit along a joint towards the hero, stronger the closer the hero is. */
 void chainblade_start_swing_hit(char *self, int joint) {

@@ -19,11 +19,11 @@ extern void func_002B9180_17();
 
 typedef unsigned char u8;
 
-extern int func_00282D30_2(void *, void *, float);
+extern void func_00282D30_2(void *, void *, float);
 
-extern int func_00282CC0_3(void *, void *, void *);
+extern void func_00282CC0_3(void *, void *, void *);
 
-extern int func_002B9180_1(void *);
+extern void func_002B9180_1(void *);
 
 /* Calls one routine twice with two different ids and a two-int scratch area, short-circuiting to a zero result if either fails, and otherwise returns whether a third routine's difference of the two ints is below a fourth incoming integer. */
 /* Tells whether two pad buttons were pressed within a few frames of each other. */

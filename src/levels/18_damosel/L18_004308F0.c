@@ -22,7 +22,7 @@ extern u8 *part_find_owned_effect_slot(u8 *, s32, s32);
 extern s32 moby_apply_damage_to_object(u8 *, u8 *, s32);
 extern void SetDeathBits(u8 *, s32, s32);
 extern s32 math_random_int_below(s32);
-extern void part_spawn_damage_debris(u8 *, u8 *, u8 *);
+extern int part_spawn_damage_debris(u8 *, u8 *, u8 *);
 extern u8 *CreateMoby(s32);
 extern void func_002A0F48(u8 *);
 extern void anim_start_blended(u8 *, s32, s32, s32);

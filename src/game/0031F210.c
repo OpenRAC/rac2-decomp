@@ -24,7 +24,7 @@ extern signed char g_active_camera[];
 
 extern char D_00189E20_9[];
 
-extern float func_00282C88_1(float *buf);
+extern void func_00282C88_1(float *buf);
 
 extern float FastVecLength(float *buf);
 

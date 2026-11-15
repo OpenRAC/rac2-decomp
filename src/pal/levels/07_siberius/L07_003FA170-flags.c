@@ -11,7 +11,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
 extern int PlayMobySound(int, int, char *);
-extern void *func_PAL_L03_003DDB50(void *, void *, void *, s32);
+extern u8 *func_PAL_L03_003DDB50(void *, void *, void *, s32);
 extern f32 D_L07_001B0FA0 __attribute__((sda));
 extern s32 D_L07_001B0FA8 __attribute__((sda));
 extern Vector D_L07_001B0FB0 __attribute__((sda));

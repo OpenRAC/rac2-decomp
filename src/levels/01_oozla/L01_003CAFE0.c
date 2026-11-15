@@ -5,9 +5,9 @@
 /* Quadword copies and clears, the spelling that reaches lq/sq. */
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void math_fast_float_d(void *a0);
+extern int math_fast_float_d(void *a0);
 
-extern void FastDecTimer(void *a0);
+extern int FastDecTimer(void *a0);
 
 extern void moby_mark_spawned(void *a0);
 
@@ -41,16 +41,16 @@ extern u32 D_001A7390 __attribute__((sda));
 extern float FastAddRotations(float, float);
 extern int IsPointInCuboid(void *, int);
 extern int req_push_queue(void *, int);
-extern void req_launch_queued(void *);
+extern s32 req_launch_queued(void *);
 extern void part_spawn_sparkles_and_glow_rings(void *);
 extern int game_is_either_mode_two(void);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
 extern void help_unlock_entry(int);
-extern void moby_handle_request_slot_state(int);
+extern int moby_handle_request_slot_state(int);
 extern void value_set_entry_by_index(int, int);
-extern void MemcardSave(int, int);
+extern int MemcardSave(int, int);
 extern void cam_lock_entry(int);
-extern void subtitle_request_voice_line(int, int);
+extern int subtitle_request_voice_line(int, int);
 
 /* func_L01_003CAFE0 is in L01_003CAFE0-ctx-g16.c. */
 
@@ -161,7 +161,7 @@ s32 swamp_monster_sync_linked_parts_health(u8 *moby)
 
 /* Sends the timer string and steps the 0x2E/0x28/0x2A state fields of the owner. */
 extern s32 FloatToInt(f32 a0);
-extern void path_l01_compute_segment_lengths(void *a0);
+extern float path_l01_compute_segment_lengths(void *a0);
 extern void anim_start_immediate(void *a0, s32 a1, s32 a2);
 
 /* Seeds the state block (random timers, the saved position, its mode bytes), lets the table

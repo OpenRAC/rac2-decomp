@@ -2,7 +2,7 @@
 #include "names.h"
 #include "include_asm.h"
 
-extern void WaitSema(int value);
+extern int WaitSema(int value);
 
 extern void func_00350808_1(int value);
 

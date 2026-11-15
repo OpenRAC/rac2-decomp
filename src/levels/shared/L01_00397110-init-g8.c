@@ -2,7 +2,8 @@
 extern float math_fast_sin_or_cos_a(float), math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float), fast_subtract_rotations(float, float);
 extern void FastVecAdd(void *, void *, void *), vec_clear_128(void *);
-extern void FadeToBlack(int), hero_reset_for_area_start(int), hero_reset_position_and_direction(void *, void *, int, int), PlayMobySound(int, int, void *);
+extern void FadeToBlack(int), hero_reset_for_area_start(int), hero_reset_position_and_direction(void *, void *, int, int);
+extern int PlayMobySound(int, int, void *);
 extern void SetCamera5Pose(void *, void *, int, int, int), object_copy_vector_to_selected(void *), cam_set_state_rotation(void *);
 extern void anim_start_blended(void *, int, int, int), set_hero_animation(int, int, float);
 

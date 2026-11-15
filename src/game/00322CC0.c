@@ -17,7 +17,7 @@ extern char D_001B0020[];
 
 extern int group_enemy_init_update(char *);
 extern void moby_mark_spawned(void *);
-extern void moby_step_at_own_position_factor(char *object, float factor);
+extern int moby_step_at_own_position_factor(char *object, float factor);
 extern int flag_set_second_pending(char *);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern int math_fast_float_d(void *);
@@ -36,7 +36,7 @@ extern void *SpawnExplosion(void *, int, int, int, int, int, int, int, float, fl
 extern void vec_scale_to_length(void *, void *, float);
 extern void part_spawn_masked_debris(char *, int, float *, float, float, float, float, unsigned char);
 extern void SetDeathBits(char *, int, int);
-extern void coll_sweep_from_object(char *, char *, int, int, int, int, float, float, float);
+extern int coll_sweep_from_object(char *, char *, int, int, int, int, float, float, float);
 extern void part_spawn_explosion_with_sparks(char *, char *, float, float, int);
 extern int moby_step_at_own_position(char *);
 extern float ApproachValue(void *, float, float);

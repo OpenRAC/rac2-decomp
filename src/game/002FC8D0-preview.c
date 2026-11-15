@@ -73,7 +73,7 @@ extern void EmitParticlesBeforeCamera(char *);
 extern char *part_spawn_mode_effect_object(char *);
 extern void menu_advance_chain_entry(int);
 extern void help_show_message_for_id(int);
-extern void moby_handle_request_slot_state(int);
+extern int moby_handle_request_slot_state(int);
 extern int request_begin_slot(int, int, int, int, int);
 
 /* Steps the object preview through its eight states: wait for the subtitle

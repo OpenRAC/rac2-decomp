@@ -2,7 +2,8 @@
 
 extern char g_hero_state[], D_L01_001AFF00[];
 extern int D_L01_001B2088[] __attribute__((sda));
-extern void SetHeroMoveState(int, int), set_hero_animation(int, int, float);
+extern void set_hero_animation(int, int, float);
+extern s32 SetHeroMoveState(int, int);
 extern void STUB_printf(const char *, ...);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void FastVecSub(void *, void *, void *), vec_clamp_length(void *, float);

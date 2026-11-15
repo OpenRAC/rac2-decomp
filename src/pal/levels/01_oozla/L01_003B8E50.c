@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void math_fast_float_d();
+extern int math_fast_float_d();
 extern int math_random_int_range(int, int);
 extern void func_PAL_002B14F8(u8 *, u8 *, s32, s32, f32);
 extern u8 *D_L01_001B264C __attribute__((sda));

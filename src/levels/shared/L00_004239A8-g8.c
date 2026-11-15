@@ -15,7 +15,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern float FastVecDot(void *, void *);
 extern int coll_find_nearby_shape_points(void *, float);
 extern int coll_test_point(void *, float, void *, void *);
-extern void *cam_follow_constrain_distance(char *, void *, int, int);
+extern int cam_follow_constrain_distance(char *, void *, int, int);
 
 /* Probes up to three positions from the owner block's blend point, records which probe
    succeeded, classifies the view direction into the +0x38 flag and hands the result on. */

@@ -5,7 +5,9 @@ extern int D_L30_001AEC90 __attribute__((sda));
 extern char g_hero_position[];
 extern struct { char pad[0x24]; int pending; char gap[0x40]; int busy; short timer; char gap2[4]; unsigned short mode; } g_music_state;
 extern int D_00138324 NOT_SDA;
-extern void moby_set_state(void *,int,int),ForceClaimNotice(int,int,int),snd_resume_music_stream(void);
+extern void moby_set_state(void *,int,int);
+extern s32 snd_resume_music_stream(void);
+extern int ForceClaimNotice(int,int,int);
 extern int museum_find_active_exhibit_entry(void *),museum_start_exhibit_entry_timer(void *),museum_schedule_next_exhibit_entry(void *),IsPointInCuboid(void *,int);
 extern void gfx_queue_draw_callback(void *,void *),func_PAL_L30_00387518(char *);
 

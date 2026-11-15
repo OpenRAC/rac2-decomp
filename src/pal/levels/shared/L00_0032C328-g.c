@@ -10,7 +10,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void matrix_from_basis_rows(void *, void *);
 extern void func_PAL_L00_003281C0(void *, int, float);
 extern void moby_get_anim_entry_count(void *, void *, void *);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern float math_random_float_range(float, float);
 extern char *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, int, float, float);
 extern void transform_vector(void *, void *, void *);

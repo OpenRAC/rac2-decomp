@@ -333,7 +333,7 @@ void part_update_smoke_wisp(char *self)
 extern int CollLine(void *, void *, int, void *, void *);
 extern int GetCollHitMaterial(void);
 extern void *part_spawn_drifting(void *, float, void *, float, int);
-extern void part_spawn_puff(void *, int, float, float);
+extern void *part_spawn_puff(void *, int, float, float);
 typedef union { unsigned char b[0x2600]; int i[0x980]; float f[0x980]; } L_BFC50Hero;
 extern char g_hero_state[];
 extern void *D_001A9E74 __attribute__((section(".sdata")));

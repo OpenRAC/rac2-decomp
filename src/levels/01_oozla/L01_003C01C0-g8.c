@@ -29,7 +29,7 @@ typedef struct {
 
 extern int moby_apply_damage_to_object(void *, void *, int);
 extern int ApplyObjectReaction(void *, void *, void *, int);
-extern void weapon_select_aim_target(void *, int, int, int, float, float);
+extern int weapon_select_aim_target(void *, int, int, int, float, float);
 extern void FastVecSub(void *, void *, void *);
 extern float IntToFloat(int);
 extern void hud_start_overlay(int, int, float);

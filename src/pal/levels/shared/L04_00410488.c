@@ -7,7 +7,7 @@ extern float math_random_signed_float_range(float, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern void add_vectors(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
-extern void part_spawn_ground_effect(void *, int, unsigned int, int, int, void *, float, float, float, int);
+extern void *part_spawn_ground_effect(void *, int, unsigned int, int, int, void *, float, float, float, int);
 typedef unsigned int L04Quad __attribute__((mode(TI)));
 extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);

@@ -220,7 +220,7 @@ extern void vec_random_direction(f32 *, f32, f32);
 
 extern void FastVecAdd(void *, void *, void *);
 
-extern void part_spawn_ground_effect(void *, u32, u32, u32, s32, s32, s32, f32, f32, f32);
+extern void *part_spawn_ground_effect(void *, u32, u32, u32, s32, s32, s32, f32, f32, f32);
 
 /* Spawns two puffs of particles with random size and speed, used by the particle emitter. */
 void part_spawn_emitter_pair(u8 *moby, s32 matrix, s32 color) {

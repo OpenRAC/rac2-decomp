@@ -5,12 +5,12 @@ extern void moby_set_state(int, int, int);
 extern void *jtbl_002B5960[];
 extern int flag_set_first_pending(char *);
 extern int flag_is_third_pending_set(char *);
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 extern int PlayMobySound(int, int, char *);
 extern unsigned char D_0019B2E8[];
 extern int flag_set_first_pending(char *);
 extern int flag_is_third_pending_set(char *);
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 extern unsigned char D_0019B2E8[];
 extern int PlayMobySound(int, int, char *);
 

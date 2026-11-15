@@ -8,13 +8,13 @@
 
 
 
-extern void coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
+extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
                           int);
-extern void coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
+extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int,
                           int);
 extern float vec_distance_xy(char *, char *);
-extern void moby_step_controller(char *, char *, float);
-extern void moby_l01_turn_toward_target(char *, char *);
+extern int moby_step_controller(char *, char *, float);
+extern int moby_l01_turn_toward_target(char *, char *);
 
 void func_PAL_L20_00448200(char *arg0, char *arg1, float f) {
     char *state = *(char **)(arg0 + 0x68);
@@ -33,7 +33,7 @@ void func_PAL_L20_00448200(char *arg0, char *arg1, float f) {
 #include "common.h"
 extern void moby_set_state(int, int, int);
 extern int math_random_int_range(int, int);
-extern int yeedil_boss_find_group_target(char *);
+extern char *yeedil_boss_find_group_target(char *);
 extern int math_random_int_below(int);
 
 void func_PAL_L20_00448650(char *arg0) {

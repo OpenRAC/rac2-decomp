@@ -61,7 +61,7 @@ extern f32 FastVecLength(void *);
 extern f32 math_fabs(f32);
 extern s32 CollLine(void *, void *, s32, void *, void *);
 extern s32 IsPointInCuboid(void *, s32);
-extern void moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
+extern int moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
 extern void FastVecScale(void *, void *, f32);
 extern void make_hit_descriptor(void *, void *, s32, void *, f32);
 extern void QueueMobyImpact(void *, void *);

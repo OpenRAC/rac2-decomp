@@ -160,7 +160,7 @@ int menu_page_text_init_second(void)
 }
 
 extern int D_00138344;
-extern void func_0029C3A0(int);
+extern int func_0029C3A0(int);
 
 /* Draws a menu page using the current button state. */
 int menu_page_draw_with_pad_state(void) {
@@ -201,7 +201,7 @@ extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern int stub_empty_23(void);
 extern int stub_empty_24(void);
 extern void data_set_small_value_and_refresh(int, int);
-extern void request_begin_slot(int, int, int, int, int);
+extern int request_begin_slot(int, int, int, int, int);
 extern int func_0029C410(int);
 
 /* Reads the buttons on the page-select menu: cancel closes, confirm picks the highlighted page and plays a sound or starts the change. */
@@ -268,10 +268,10 @@ int menu_page_draw_fifth(void) {
 extern int menu_process_request(int, int, int *);
 
 /* Sends a menu request and ignores the result. */
-void menu_send_request(int first, int second) {
+int menu_send_request(int first, int second) {
     int result[4];
     result[0] = 0;
-    menu_process_request(first, second, result);
+    return menu_process_request(first, second, result);
 }
 
 typedef struct {
@@ -415,6 +415,6 @@ int menu_process_selected_row_request(char *object, int arg, int *result)
 }
 
 /* Runs the request stored in one menu entry. */
-void menu_process_entry_request(char *object, int *result) {
-    menu_process_request(*(short *)(object + 2), *(int *)(object + 4), result);
+int menu_process_entry_request(char *object, int *result) {
+    return menu_process_request(*(short *)(object + 2), *(int *)(object + 4), result);
 }

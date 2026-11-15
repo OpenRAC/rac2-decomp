@@ -32,7 +32,7 @@ extern char D_0025DA38[];
 extern void func_PAL_0033B6B8(char *, int);
 extern void save_start_to_slot(int, int);
 extern void menu_set_confirm_pending(void);
-extern void func_PAL_002D6710(int, char *);
+extern int func_PAL_002D6710(int, char *);
 extern int request_begin_slot(int, int, int, int, int);
 extern int menu_get_counter(void);
 extern int menu_get_mode(void);

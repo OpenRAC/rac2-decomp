@@ -18,7 +18,7 @@ extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, char *);
 extern float IntToFloat(int);
 extern float math_lerp_float(float, float, float);
-extern void ApproachValue(float *, float, float);
+extern f32 ApproachValue(float *, float, float);
 extern float FastVecDot(void *, void *);
 extern float fast_vec_dist(void *, void *);
 

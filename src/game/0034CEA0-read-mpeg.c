@@ -11,7 +11,7 @@ typedef struct { char pad[0x1a0]; union { unsigned long long held; int words[2];
 extern MoviePad g_pad_state;
 typedef struct { char pad[0x5c]; int f5C; } MovieVoice;
 extern MovieVoice g_sound_state;
-extern s32 FlushCache(s32);
+extern void FlushCache(s32);
 extern int sceGsSyncV(int);
 extern void pad_poll_ports(void);
 extern void mpeg_dec_set_state_running(char *);
@@ -32,7 +32,7 @@ extern int func_00351A38(char *);
 extern void mpeg_clear_flag(void);
 extern void mpeg_stop_audio_playback(u8 *);
 extern void snd_send_cmd9(int, int);
-extern void snd_Pump(void);
+extern int snd_Pump(void);
 extern int mpeg_is_audio_buffer_full(void);
 extern int mpeg_vobuf_is_empty(char *);
 

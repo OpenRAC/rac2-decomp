@@ -32,9 +32,9 @@ int menu_blend_highlight_color(int start, int first, int second)
     return FastTweenColor(first, second, fraction);
 }
 
-extern int menu_stream_chunk_table_init(int);
-extern int menu_stream_chunk_claim_free(int);
-extern int menu_clear_block_fields(void);
+extern void menu_stream_chunk_table_init(int);
+extern char *menu_stream_chunk_claim_free(int);
+extern void menu_clear_block_fields(void);
 extern void menu_clear_counter(void);
 extern void popup_set_flag_on(void *);
 extern volatile int D_001A8C88;
@@ -274,7 +274,7 @@ extern char D_001BAD40[];
 extern int map_find_table_index(int);
 extern void map_set_current_and_refresh(int);
 extern int snd_play_from_global_bank(int, int, void *);
-extern void menu_update_entry_states(void);
+extern int menu_update_entry_states(void);
 extern int menu_list_active_entries(int *, int *, int *, int);
 extern void menu_restore_saved_screen_image(int);
 extern int req_push_queue(char *, int);

@@ -77,7 +77,7 @@ typedef struct {
 } MenuShopClass;
 extern char g_weapon_l00_table[];
 extern void module_l00_call_handler_with_arg_2(int);
-extern void snd_pump_music_and_disc_read(int);
+extern s16 snd_pump_music_and_disc_read(int);
 extern void LoadClassIntoFreeCacheSlot(int);
 extern void SwitchCachedDiscAsset(int);
 extern void game_reset_frame_counters(void),moby_update_visible_objects(void),snd_run_callbacks(void);
@@ -95,7 +95,8 @@ extern void FastVecScale(void *,void *,float);
 extern void BindVendorPreviewModel(void),PrepareVendorSelectionPreview(void);
 extern void menu_dispatch_by_mode(void),shop_dispatch_purchase_confirm(void);
 extern void module_l00_call_handler_with_arg_3(int),module_l00_call_handler_with_arg(int,int),func_L00_0030C710(int);
-extern void level_run_callbacks(void),UpdateSoundVoices(void);
+extern void level_run_callbacks(void);
+extern s32 UpdateSoundVoices(void);
 #define MF(o) (*(float *)(m + (o)))
 /* Advances the purchase menu and its model previews, then runs the shared update. */
 void UpdatePurchaseMenuAndPreview(void)

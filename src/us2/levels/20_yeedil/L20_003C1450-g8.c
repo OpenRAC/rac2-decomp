@@ -3,7 +3,7 @@
 #include "common.h"
 extern void moby_mark_spawned(void *);
 extern int flag_is_third_pending_set(void *);
-extern int moby_mark_table_entry_flagged(u8);
+extern void moby_mark_table_entry_flagged(u8);
 extern float IntToFloat(int);
 extern int math_fast_float_d(void *);
 extern void group_raise_from_saved_heights(void *);

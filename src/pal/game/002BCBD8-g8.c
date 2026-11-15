@@ -3,7 +3,7 @@
 #include "common.h"
 extern void FastVecAdd(char *out, char *a, char *b);
 extern float FastVecLength(char *v);
-extern void math_step_value_toward_target(char *out, float *res, float a, float b, float c, float d);
+extern float math_step_value_toward_target(char *out, float *res, float a, float b, float c, float d);
 extern void vec_scale_to_length(char *out, char *v, float scale);
 extern float IntToFloat(int n);
 extern int FastTweenColor(int from, int to, float t);

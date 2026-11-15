@@ -42,7 +42,8 @@ extern void feltzin_mission_one_update(void *), feltzin_mission_two_update(void 
 extern void feltzin_mission_three_update(void *), UpdateFeltzinGateCourse(void *);
 extern void level_store_value_pair(int, void *);
 extern int cam_is_mode_active(void);
-extern void feltzin_challenge_reset_free_records(void), feltzin_challenge_shutdown(void), DrawFeltzinCombatHud(void);
+extern void feltzin_challenge_reset_free_records(void), feltzin_challenge_shutdown(void);
+extern s32 DrawFeltzinCombatHud(void);
 extern int feltzin_target_damage(char *, int);
 extern int D_L05_001B1360 __attribute__((sda));
 extern int D_L05_001B13B0 __attribute__((sda));

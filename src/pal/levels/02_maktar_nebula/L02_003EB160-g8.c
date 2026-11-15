@@ -7,7 +7,7 @@ extern float math_random_signed_float_range(float, float);
 extern void matrix_mul_vec3(float *, float *, float *);
 extern void FastVecAdd(float *, float *, float *);
 extern char *func_PAL_002735D0(char *, int, int, int, char *, char *, float *, int, float, float);
-extern int func_PAL_00303578(char *, float *, float *, int, int, int);
+extern void *func_PAL_00303578(char *, float *, float *, int, int, int);
 extern int D_L02_001B096C __attribute__((sda));
 
 /* Spawns five particles at the actor (the ids 0xCA5 to 0xCA9, each with a random velocity in a

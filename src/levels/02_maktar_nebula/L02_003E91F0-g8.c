@@ -15,7 +15,7 @@ typedef union { char b[0x2600]; float f[0x980]; Quad q[0x260]; } Hero;
 extern char g_hero_state[];
 extern char D_L02_001A8F20[] __attribute__((sda));
 extern float FastAddRotations(float, float), fast_subtract_rotations(float, float);
-extern int moby_get_private_value_0(void *);
+extern char *moby_get_private_value_0(void *);
 extern float fast_vec_dist(void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);

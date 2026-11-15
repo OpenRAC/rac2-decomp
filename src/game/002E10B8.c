@@ -54,7 +54,7 @@ extern char F391de845_D_001B5340[];
 
 extern float F391de845_FUN_00282E48(char *a, char *b);
 
-extern float F391de845_FUN_002E45C8(void *self, float d, float x, float y);
+extern int snd_compute_falloff(void *curve, float distance, float near_distance, float far_distance);
 
 typedef int s32;
 
@@ -81,7 +81,7 @@ extern char F29eece9b_D_00188660[];
 
 typedef struct { u8 before[0x1730]; s32 count; u8 *table; } CallbackGlobals;
 
-extern s32 snd_clear_flag_and_update(void);
+extern void snd_clear_flag_and_update(void);
 
 extern s32 snd_Pump(void);
 
@@ -233,12 +233,12 @@ void snd_probe_listener_occlusion_point(void *object)
 
 
 /* Works out how loud a sound should be from its distance to the listener. */
-float snd_compute_voice_volume_from_distance(char *voice, char *position)
+int snd_compute_voice_volume_from_distance(char *voice, char *position)
 {
     float distance = F391de845_FUN_00282E48(position, F391de845_D_001B5340);
     float *range = *(float **)(voice + 8);
 
-    return F391de845_FUN_002E45C8(range, distance, range[0], range[1]);
+    return snd_compute_falloff(range, distance, range[0], range[1]);
 }
 
 extern float g_camera_l00_position[];
@@ -251,7 +251,7 @@ extern float fast_subtract_rotations(float a, float b);
 extern int FloatToInt(float a);
 
 /* Works out the left-right pan of a sound from its direction, smoothing the angle between frames. */
-void snd_compute_voice_pan(void *voice, void *position)
+int snd_compute_voice_pan(void *voice, void *position)
 {
     struct AngleState { char reserved[0x40]; float angle; };
     struct AngleState *state = (struct AngleState *)voice;
@@ -279,7 +279,7 @@ void snd_compute_voice_pan(void *voice, void *position)
     } else {
         state->angle = -1.0f;
     }
-    FloatToInt(angleToSource * 57.2957763671875f);
+    return FloatToInt(angleToSource * 57.2957763671875f);
 }
 
 /* func_002E48E8 is defined in 002E10B8-sound.c. */

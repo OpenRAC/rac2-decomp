@@ -5,7 +5,7 @@ typedef int TI128 __attribute__((mode(TI)));
 extern unsigned char *D_L00_001B1E9C __attribute__((sda));
 extern void moby_set_state(char *, int, int);
 extern void part_spawn_masked_debris(char *, int, void *, unsigned char, float, float, float, float);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern void moby_mark_spawned(char *);
 
 /* Waits until the two linked objects are gone, then plays a spark effect and removes itself. */

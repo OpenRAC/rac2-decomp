@@ -23,10 +23,10 @@ extern float fade_reduce_value(float);
 extern void hero_clear_tracked_slots(void);
 extern void FastVecSub(f32 *,f32 *,f32 *);
 extern void hero_build_relative_point(void *,int,float,float,float);
-extern void hero_l04_enter_state(int,int);
+extern s32 hero_l04_enter_state(int,int);
 extern char *part_find_owned_effect_slot(void *,int,int);
 extern void AdjustPlayerHealth(int);
-extern void hero_play_sound(int,int);
+extern int hero_play_sound(int,int);
 extern void hero_flatten_push_vector(void *,int,float,float);
 extern void cam_scale_view_space_height(void *,void *,float);
 #define AB(p,o) (*(unsigned char *)((char *)(p)+(o)))
@@ -698,7 +698,7 @@ void MoveCtl_Init(char *settings)
 extern s32 GetFirstMobyInGroup(u32 *out, s32 kind, s32 arg2, s32 arg3);
 extern s32 GetNextMobyInGroup(u32 *out, u32 value, s32 arg2, s32 arg3);
 /* Looks up the object linked to this one and returns it, or 0 if none. */
-s32 moby_find_linked_object(u8 *src_obj) {
+u8 *moby_find_linked_object(u8 *src_obj) {
     u32 out = 0;
     if (GetFirstMobyInGroup(&out, *(u8 *)(src_obj + 0x21), 0, 0) == -1)
         return 0;
@@ -711,12 +711,12 @@ s32 moby_find_linked_object(u8 *src_obj) {
 
 
 extern void scale_vector(void *buf, u32 value, float scale);
-extern void math_fast_helper_a(void *buf, float value);
+extern int math_fast_helper_a(void *buf, float value);
 /* Turns a number into a vector and passes it on with a value. */
-void vec_apply_scaled_value(u32 value, float f) {
+int vec_apply_scaled_value(u32 value, float f) {
     u8 buf[16];
     scale_vector(buf, value, 0.0009765625f);
-    math_fast_helper_a(buf, f);
+    return math_fast_helper_a(buf, f);
 }
 
 /* func_L04_00344568 is in L04_002CC748-axis.c. */
@@ -984,7 +984,7 @@ void part_l04_update_streak(char *self) {
 /* func_L04_003A0FC8 is in L04_003A0FC8-g8.c. */
 
 
-extern void memset(void *dst, s32 value, s32 size);
+extern void *memset(void *dst, s32 value, s32 size);
 
 /* the header of one 0x1190-byte ripple patch */
 typedef struct {

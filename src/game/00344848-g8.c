@@ -3,7 +3,7 @@
 
 extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, char *);
-extern void sprintf(char *, const char *, ...);
+extern int sprintf(char *, const char *, ...);
 extern void hud_set_widget_field_a(void *, int);
 extern void text_label_draw(void *);
 extern int save_count_filled_slots(void);

@@ -71,12 +71,12 @@ extern int math_random_int_range(int, int);
 extern int FloatToInt(float);
 extern int math_fast_float_d(int *);
 extern int PlayMobySound(int, int, void *);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern float IntToFloat(int);
 extern void math_update_wrapped_angle_offset(void *, float *, float *, float, float, float);
 extern void moby_scale_owner_words_by_angles(void *, float *, float *, float, float, float);
 extern void snd_stop_voice(int);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int,
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int,
                           int, int, int, float, float);
 extern void part_spawn_masked_debris(void *, int, void *, int, float, float, float, float);
 extern void part_spawn_scaled_bolts(void *, int, float);

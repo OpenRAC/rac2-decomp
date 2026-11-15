@@ -1,13 +1,13 @@
 #include "names.h"
 /* func_PAL_0033CB00, the PAL copy of func_0033ABD8: the same C, where rename func_003369A8 becomes func_PAL_00338688; swap locals *record *vel278; swap locals *rec198 *vel280. */
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void func_PAL_00338688(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern char *D_001A8CFC[] __attribute__((sda));
 /* Binds the screen to its owner: allocates the 16-byte position block, initialises the four
    76-byte and nine 72-byte widgets by name ("0".."3", "title", "missions", ...), sets their
@@ -23,7 +23,7 @@ extern void object_set_first_float4(char *, float, float, float, float);
 extern char *D_001A8CFC[] __attribute__((sda));
 extern char D_001ADC88[];
 extern int *object_get_fourth_field(void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 typedef struct { int first, second, color; float angle; short id; short pad; int text; } Entry_0033A6D8;
 #define ENTRY_0033A6D8 (*(Entry_0033A6D8 **)self)[i]
 
@@ -39,13 +39,13 @@ typedef struct { int first, second, color; float angle; short id; short pad; int
    induction variable and which register the compiler picks. */
 #undef ENTRY_0033A6D8
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void func_PAL_00338688(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
-extern void memset(void *, int, int);
+extern void *memset(void *, int, int);
 extern char D_001ADC80[], D_001ADC88[];
 extern int D_001ADD40[2] __attribute__((sda));
 

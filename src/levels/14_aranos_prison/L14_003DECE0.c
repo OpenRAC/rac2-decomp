@@ -19,14 +19,14 @@ extern void func_321F58();
 extern void func_328DA8(void *, void *, void *, void *);
 extern float math_fabs(float);
 extern int IsPointInCuboid(void *, int);
-extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
 extern void moby_mark_spawned(void *);
 extern void gfx_draw_moby_edge_lines(char *, int);
 extern void lift_clamp_group_riders(char *);
 extern int group_is_linked_to_owner(char *), group_is_misaligned(char *);
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 extern unsigned int D_00138324 NOT_SDA;
 /* Retail reads the same projection-table pointer absolutely in state 1 and
  * through $gp in state 2. Both declarations bind the same storage. */

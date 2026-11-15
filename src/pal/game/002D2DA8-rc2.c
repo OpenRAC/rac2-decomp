@@ -3,11 +3,11 @@
 #include "common.h"
 extern void SetupGifPaging(s32);
 extern void DoGifPaging(void);
-extern void text_draw_centered_small(s32, s32, u64, s32, s32);
-extern s32 GetLocalizedString(s32);
+extern int text_draw_centered_small(s32, s32, u64, s32, s32);
+extern char *GetLocalizedString(s32);
 extern void DrawMenuNavigationFramesAndLabels(s32, s32);
 extern void gfx_draw_scaled_object_two_axes(s32, s32, f32, f32, f32, f32, f32);
-extern s32 table_find_by_id(s32, s32);
+extern void *table_find_by_id(s32, s32);
 extern s32 D_001A8CFC;
 extern s32 g_screen_width;
 extern f32 D_001B23A8;

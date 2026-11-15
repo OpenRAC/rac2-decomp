@@ -13,7 +13,7 @@ extern void FastVecScale(void *, void *, float);
 extern void multiply_matrix(char *, char *, char *);
 extern void func_002EF480(void);
 extern void gfx_build_render_list_markers(void);
-extern unsigned int gfx_write_register_with_sync(void *, unsigned int, unsigned int);
+extern void gfx_write_register_with_sync(void *, unsigned int, unsigned int);
 
 void gfx_begin_render_frame(void)
 {

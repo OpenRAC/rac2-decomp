@@ -17,9 +17,9 @@ extern u8 *g_moby_l18_table[] __attribute__((sda));
 extern s32 D_L18_001B2838[] __attribute__((sda));
 extern u8 D_00190000[];
 extern void snd_stop_voice(s32 arg0);
-extern void PlayMobySound(s32 arg0, s32 arg1, u8 *arg2);
+extern int PlayMobySound(s32 arg0, s32 arg1, u8 *arg2);
 extern void moby_mark_spawned(void *arg0);
-extern void SpawnExplosion(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5,
+extern char *SpawnExplosion(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5,
                            s32 arg6, s32 arg7, float arg8, float arg9, s32 arg10, s32 arg11,
                            s32 arg12, s32 arg13);
 

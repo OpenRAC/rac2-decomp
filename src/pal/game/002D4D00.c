@@ -7,7 +7,7 @@ extern int __cmpdf2(double, double);
 extern double __subdf3(double, double);
 extern double __muldf3(double, double);
 extern int __fixdfsi(double);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, int *);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, int *);
 typedef struct {
     int value, displayChoice, selectionMask, requiredBits, icon;
 } PreviewChoice;
@@ -15,7 +15,7 @@ extern PreviewChoice D_0026CFD0[];
 
 /* func_PAL_002D4D00, the PAL copy of func_002D3D88: the same C, where the display-scaled y and height
    become the fixed 334 and 40. */
-int func_PAL_002D4D00(int index, int x)
+void func_PAL_002D4D00(int index, int x)
 {
     int colors[4];
     int leftAlpha;
@@ -45,7 +45,7 @@ int func_PAL_002D4D00(int index, int x)
     right <<= 24;
     colors[2] = colors[0] = leftAlpha | baseColor;
     colors[3] = colors[1] = right | baseColor;
-    return hud_draw_sprite_gradient(texture, left, 334, 40, 40, colors);
+    hud_draw_sprite_gradient(texture, left, 334, 40, 40, colors);
 }
 
 /* func_PAL_002D4EA0 lives in 002D4EA0-g8.c. */

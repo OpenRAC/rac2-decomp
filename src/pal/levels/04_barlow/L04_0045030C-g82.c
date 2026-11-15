@@ -10,10 +10,10 @@ extern f32 FastAddRotations(f32, f32);
 extern void MobySpringTurn(void *, float *, f32, f32, f32, f32);
 extern int FloatToInt(f32);
 extern void func_PAL_L04_0033F000(void *, void *);
-extern void path_push_point_away(int, void *, void *, f32);
-extern void moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
+extern int path_push_point_away(int, void *, void *, f32);
+extern int moby_transform_point_and_rotation_by_parent(void *, void *, void *, void *, void *, void *);
 extern f32 coll_probe_ground_height_below(void *, int, f32);
-extern int moby_get_private_value_2(void *);
+extern char *moby_get_private_value_2(void *);
 extern void mat_build_axis_angle_rotation(void *, void *, f32);
 typedef struct {
     u8 pad0[0x140]; int steps; f32 time;

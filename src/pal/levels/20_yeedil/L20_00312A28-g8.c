@@ -68,7 +68,7 @@ extern void InitializeBoltPointChain(void *);
 extern void beam_update_chain_points(void *);
 extern void gfx_add_draw_callback_third(void (*)(void *),void *);
 extern void beam_draw_ribbons_level(void *);
-extern void part_spawn_blast_effect_moby(void *,void *,void *,float);
+extern char *part_spawn_blast_effect_moby(void *,void *,void *,float);
 extern void EmitScaledObjectParticles(void *);
 extern void *SpawnExplosion(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 

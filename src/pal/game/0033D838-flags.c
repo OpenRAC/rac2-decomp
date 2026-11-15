@@ -7,7 +7,7 @@ extern char D_L00_001AE118[];
 extern void func_PAL_0033CE70(void *);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
-extern void text_draw_centered_small(int, int, unsigned long, char *, int);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
 void func_PAL_0033E248(char *object)
 {
@@ -42,7 +42,7 @@ void func_PAL_0033FBE0(char *object)
 }
 
 extern void *func_PAL_0033CA78(void *);
-extern void *menu_pass_through_handle(void *);
+extern unsigned long long menu_pass_through_handle(void *);
 
 void *func_PAL_00340118(char *object) {
     func_PAL_0033CA78(object + 0x8);

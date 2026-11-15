@@ -1,10 +1,10 @@
 #include "common.h"
 
 extern float FastDiffRots(float, float);
-extern void moby_step_at_own_position_factor(u8 *, float);
-extern void moby_step_at_own_position(u8 *);
+extern int moby_step_at_own_position_factor(u8 *, float);
+extern int moby_step_at_own_position(u8 *);
 extern float math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
-extern void ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *,
+extern int ComputeRegionRouteHeading(void *, void *, void *, void *, int, void *, void *,
                               float, float);
 extern int moby_step_controller(u8 *, void *, float);
 extern int moby_turn_toward_target_and_step(u8 *, void *, float);

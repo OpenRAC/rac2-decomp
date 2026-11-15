@@ -16,7 +16,7 @@ extern CollisionResultPrefix g_collision_result;
 extern void vec_scale_to_length(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void SpawnConfiguredImpactEffects(char *, void *);
-extern void weapon_start_health_drain(void *, int, int);
+extern int weapon_start_health_drain(void *, int, int);
 
 /* Checks if the beam hits something on its way, and if so shows the impact and returns 1. */
 int beam_test_segment_hit(char *object, void *target)

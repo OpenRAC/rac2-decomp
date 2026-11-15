@@ -9,7 +9,7 @@
 
 extern unsigned char D_L20_0018C0D4;
 
-extern void hero_l20_set_state(int a0, int a1);
+extern int hero_l20_set_state(int a0, int a1);
 
 /* Picks the variant of the shared loader the current game state selects. */
 void hero_load_state_by_game_mode(int flag)

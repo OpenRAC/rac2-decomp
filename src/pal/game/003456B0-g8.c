@@ -5,10 +5,10 @@ typedef unsigned char u8;
 
 extern void object_set_flag_value(u8 *, int);
 extern void object_set_first_float4(void *, float, float, float, float);
-extern const char *GetLocalizedString(int);
-extern void sprintf(char *, const char *, ...);
+extern char *GetLocalizedString(int);
+extern int sprintf(char *, const char *, ...);
 extern unsigned int func_001157AC(const char *);
-extern void strncpy(void *, int, int);
+extern char *strncpy(void *, int, int);
 extern char D_001ADBC8[];
 extern float D_001AE218 __attribute__((sda));
 extern float D_001AE21C;

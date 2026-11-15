@@ -2,7 +2,7 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef int s32;
-extern s32 moby_get_motion_data(u8 *);
+extern char *moby_get_motion_data(u8 *);
 extern void moby_init_spawned_sub_object(char *, int);
 extern void follower_start_random_push(unsigned char *);
 

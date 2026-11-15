@@ -5,7 +5,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 extern s32 ref_L00_003F5870_00 MACRO_ADDR;
 extern float ref_L00_003F5870_01 __attribute__((sda));
-extern int cam_compute_view_direction(void *, void *, int);
+extern void cam_compute_view_direction(void *, void *, int);
 extern float math_fabs(float);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);

@@ -34,7 +34,7 @@ extern int FastTweenColor(int, int, float);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern void vec_clear_128(void *);
-extern void part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
+extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 /* Emits randomly positioned particles outside the central rectangle, each with colours blended
    at random between two pairs, a random size from the table and random lifetimes. */

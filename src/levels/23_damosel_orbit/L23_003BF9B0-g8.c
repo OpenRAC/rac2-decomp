@@ -159,7 +159,7 @@ extern void moby_update_ground_check(Moby_003BF9B0 *);
 
 extern Found_003BF9B0 *part_find_owned_effect_slot(Moby_003BF9B0 *, s32, s32);
 
-extern void moby_apply_damage_to_object(Moby_003BF9B0 *, void *, s32);
+extern int moby_apply_damage_to_object(Moby_003BF9B0 *, void *, s32);
 
 extern void cam_compute_view_direction(void *, void *, s32);
 

@@ -58,7 +58,7 @@ extern void anim_start_blended(void *, int, int, int);
 extern void start_equipped_item_animation(void);
 extern void cancel_hero_item_animation(void);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void hero_l00_set_action(int, int);
+extern s32 hero_l00_set_action(int, int);
 extern void copy_matrix3x4(void *, void *);
 extern void matrix_from_basis_rows(void *, void *);
 extern void transform_vector(void *, void *, void *);

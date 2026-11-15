@@ -3,10 +3,10 @@
 
 
 
-extern void SpawnExplosion(void *a0, int a1, int a2, int a3, int a4, int a5, int a6,
+extern char *SpawnExplosion(void *a0, int a1, int a2, int a3, int a4, int a5, int a6,
                           int a7, float f12, float f13, int s1, int s2, int s3,
                           int s4);
-extern void coll_sweep_from_object(char *, char *, int, int, float, float, float, int, int);
+extern int coll_sweep_from_object(char *, char *, int, int, float, float, float, int, int);
 extern void moby_mark_spawned(char *object);
 
 /* func_L20_00449FD0 is defined in L20_00449178-g8.c (this unit has no $gp access for it). */

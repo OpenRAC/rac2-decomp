@@ -17,7 +17,7 @@ extern L19UtilityQueueView D_L19_001BFC40;
 typedef union { u8 b[0x2600]; s32 i[0x980]; f32 f[0x980]; Quadword q[0x260]; } Hero;
 extern u8 g_hero_state[];
 extern void mystic_glow_all(void);
-extern void func_US2_L19_0042BBF8(void);
+extern int func_US2_L19_0042BBF8(void);
 extern int text_sum_subtitle_lengths(void);
 extern void moby_mark_spawned(void *);
 extern void moby_set_state(u8 *,u8,int);

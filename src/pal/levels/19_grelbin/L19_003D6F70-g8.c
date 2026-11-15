@@ -25,16 +25,16 @@ extern int D_L19_001B06F8 __attribute__((sda));
 extern float D_L19_001B070C __attribute__((sda));
 
 extern void moby_set_state(char *, int, int);
-extern void ApproachValue(void *, float, float);
+extern f32 ApproachValue(void *, float, float);
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, void *);
-extern void snd_set_voice_pitch_bend(int, int);
+extern s32 snd_set_voice_pitch_bend(int, int);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
-extern void FastDecTimer(void *);
+extern int FastDecTimer(void *);
 extern void moby_mark_spawned(void *);
 extern int flag_set_first_pending(void *);
-extern void request_end_slot(int, int);
+extern int request_end_slot(int, int);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void func_PAL_L03_003E8000(void);
 extern void moby_set_flag_on(void *);
@@ -45,7 +45,7 @@ extern void func_PAL_L03_003E7C78(void *);
 extern void path_puzzle_choose_next_node(void *);
 extern void func_PAL_L03_003E8B88(void *);
 extern int path_puzzle_select_node_from_stick(void *);
-extern void func_PAL_00289730(int, int);
+extern int func_PAL_00289730(int, int);
 
 typedef struct {
     char pad[0x40];

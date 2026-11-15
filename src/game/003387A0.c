@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void strncpy(void *, int, int);
+extern char *strncpy(void *, int, int);
 
 extern void LayoutTextBoxLines(void *, int, int, float, float);
 

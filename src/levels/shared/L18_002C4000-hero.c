@@ -11,7 +11,7 @@ extern u8 g_hero_state[];
 extern u32 D_00138320;
 extern s32 D_L18_001AFBB0 MACRO_ADDR;
 extern void set_hero_animation(s32, s32, float);
-extern void shooter_fire_shot(u8 *, s32);
+extern u8 *shooter_fire_shot(u8 *, s32);
 #define H ((Hero *)D_00189E20)
 /* Handles the player grabbing and letting go of a held object, and triggers its pickup effect. */
 void hero_update_held_grab(void)

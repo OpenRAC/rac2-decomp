@@ -38,7 +38,7 @@ extern float FastVecLength(void *);
 extern float math_fabs(float);
 extern float FastAddRotations(float, float);
 extern float fast_subtract_rotations(float, float);
-extern void chained_segment_spawn(char *);
+extern char *chained_segment_spawn(char *);
 extern int snd_is_voice_playing_for_owner(char *, int);
 extern void snd_stop_voice(int);
 

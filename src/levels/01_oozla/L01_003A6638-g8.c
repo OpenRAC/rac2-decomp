@@ -55,7 +55,7 @@ extern void multiply_matrix(void *,void *,void *);
 extern void mat_get_euler_angles(void *,void *);
 extern void matrix_from_basis_rows(void *,void *);
 extern void transform_vector(void *,void *,void *);
-extern void func_L00_002EE4D8(void *,void *,float);
+extern s32 func_L00_002EE4D8(void *,void *,float);
 extern void SpawnExplosionEffects(char *owner, void *direction, float *position,
     float radius, float damage, int sparks, int flashes, int smoke,
     float glow, float white, float cutoff, float scale, int sound, float blast,

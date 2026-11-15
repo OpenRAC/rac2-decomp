@@ -41,7 +41,7 @@ extern void swamp_monster_start_attack_b(void *);
 extern void swamp_monster_start_attack_c(void *);
 extern void swamp_monster_start_grab_attack(void *);
 extern void swamp_monster_hold_hero(void *);
-extern void moby_spawn_thrown_object(void *, void *, void *, float);
+extern u8 *moby_spawn_thrown_object(void *, void *, void *, float);
 extern void *SpawnGoldBolt(void *, int, int, int);
 extern void UpdateCameraPoseTrigger(void *);
 extern int func_001163B0(void);

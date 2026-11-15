@@ -45,12 +45,12 @@ extern void add_vectors(void *, void *, void *);
 extern int math_random_int_range(int, int);
 extern int FastTweenColor(int, int, float);
 extern int func_001163B0(void);
-extern void part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, int, float);
+extern void *part_spawn_ground_effect(void *, int, float, float, int, int, int, void *, int, float);
 extern void moby_set_state(void *, int, int);
 extern int PlayMobySound(int, int, void *);
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 extern int req_push_queue(void *, int);
-extern void req_launch_queued(void *);
+extern s32 req_launch_queued(void *);
 extern void data_set_small_value_and_refresh(int, int);
 extern int game_is_either_mode_two(void);
 

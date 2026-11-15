@@ -132,7 +132,7 @@ extern void moby_set_controller_speed_limits(Moby_003BF9B0 *, f32, f32, f32, f32
 extern f32 fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(Moby_003BF9B0 *);
 extern Found_003BF9B0 *part_find_owned_effect_slot(Moby_003BF9B0 *, s32, s32);
-extern void func_PAL_002B1A50(Moby_003BF9B0 *, void *, s32);
+extern int func_PAL_002B1A50(Moby_003BF9B0 *, void *, s32);
 extern void cam_compute_view_direction(void *, void *, s32);
 extern void vec_negate_and_forward(void *, void *, s32);
 

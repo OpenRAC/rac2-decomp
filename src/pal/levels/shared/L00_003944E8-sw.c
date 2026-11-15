@@ -36,7 +36,8 @@ extern int PlayMobySound(int, int, char *), snd_is_voice_playing_for_owner(void 
 extern float mat_fast_helper_a(float, float), FastDiffRots(float, float), fast_vec_dist(void *, void *), IntToFloat(int);
 extern void cam_compute_view_direction(void *, void *, int), FastVecScale(void *, void *, float), FastVecAdd(void *, void *, void *);
 extern char *moby_get_private_value_0(char *);
-extern void moby_transform_joint_to_world(void *, int, void *), matrix_mul_vec3(void *, void *, void *), vec_scale_to_length(void *, void *, float);
+extern void matrix_mul_vec3(void *, void *, void *), vec_scale_to_length(void *, void *, float);
+extern void moby_transform_joint_to_world(void *, int, void *);
 extern void func_PAL_0030B4E0(char *), func_PAL_L00_00396350(char *), func_PAL_0030CE20(void *);
 extern void ref_L00_00392530_00(void (*)(void *), void *), snd_stop_voice(int);
 extern void func_PAL_L00_002AF458(void), func_PAL_L00_002AF6C0(void), gfx_free_point_light(int);

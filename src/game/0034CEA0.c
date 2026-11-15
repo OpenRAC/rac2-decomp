@@ -18,13 +18,13 @@ typedef struct MovieAdpcmDecoder {
 } MovieAdpcmDecoder;
 
 
-extern void func_L00_0042BCF8_1(void *p);
+extern char *func_L00_0042BCF8_1(void *p);
 
-extern void hud_construct(void *p);
+extern int hud_construct(void *p);
 
-extern void func_L00_0042BFF8_7(void *p);
+extern char *func_L00_0042BFF8_7(void *p);
 
-extern void text_panel_shutdown(void *p);
+extern void *text_panel_shutdown(void *p);
 
 extern char *F476e86a4_FUN_00335E10(char *p);
 
@@ -69,7 +69,7 @@ extern void snd_send_cmd3e(s32, s32, s32, s32, s32);
 
 extern s32 snd_send_cmd3d(void);
 
-extern s32 FlushCache(s32);
+extern void FlushCache(s32);
 
 extern s32 sceSifSetDma(s32 *, s32);
 
@@ -81,44 +81,44 @@ extern volatile unsigned int D_L00_001AEB10 __attribute__((sda));
 
 typedef struct { int pos; int used; int size; } Ring;
 
-extern void ui_return_self(void *);
+extern void *ui_return_self(void *);
 extern void table_relocate_entries(void *);
 extern void pool_init_cells(void *, int, void *, int);
-extern void load_read_disc_with_pause(void *, void *, int);
-extern void memset(void *, int, int);
+extern int load_read_disc_with_pause(void *, void *, int);
+extern void *memset(void *, int, int);
 extern char *D_001A8CFC[] __attribute__((sda));
 typedef struct { char pad0[0x36C]; int offset; char pad370[0x1348]; char *data; int size; } InitData;
 extern InitData g_copy_setup_data;
-extern void menu_init_seven_labels(void *);
-extern void menu_screen_large_init_parts(void *);
-extern void menu_screen_init_parts(void *);
-extern void grid_menu_init_widgets(void *);
-extern void radial_menu_construct(void *);
-extern void list_screen_destroy(void *);
-extern void mission_screen_init_parts(void *);
-extern void map_screen_destroy(void *);
-extern void frame_text_page_destroy(void *);
-extern void tab_menu_construct(void *);
-extern void menu_init_widgets(void *);
-extern void simple_list_page_destroy(void *);
-extern void small_menu_construct(void *);
-extern void menu_return_object(void *);
-extern void mission_screen_shutdown(void *);
-extern void single_toggle_b_destroy(void *);
-extern void onoff_menu_destroy(void *);
-extern void four_option_menu_destroy(void *);
-extern void two_toggle_a_destroy(void *);
-extern void single_toggle_a_destroy(void *);
-extern void map_screen_destroy_prompt_bar(void *);
-extern void screen_adjust_menu_destroy(void *);
-extern void menu_pass_through_handle(void *);
-extern void list_menu_construct_parts(void *);
-extern void small_list_menu_construct(void *);
-extern void two_toggle_b_destroy(void *);
-extern void single_toggle_c_destroy(void *);
-extern void single_toggle_d_destroy(void *);
-extern void list_page_destroy(void *);
-extern void title_screen_destroy(void *);
+extern char *menu_init_seven_labels(void *);
+extern void *menu_screen_large_init_parts(void *);
+extern char *menu_screen_init_parts(void *);
+extern char *grid_menu_init_widgets(void *);
+extern char *radial_menu_construct(void *);
+extern char *list_screen_destroy(void *);
+extern void *mission_screen_init_parts(void *);
+extern char *map_screen_destroy(void *);
+extern char *frame_text_page_destroy(void *);
+extern u8 *tab_menu_construct(void *);
+extern u8 *menu_init_widgets(void *);
+extern char *simple_list_page_destroy(void *);
+extern u8 *small_menu_construct(void *);
+extern void *menu_return_object(void *);
+extern char *mission_screen_shutdown(void *);
+extern char *single_toggle_b_destroy(void *);
+extern char *onoff_menu_destroy(void *);
+extern char *four_option_menu_destroy(void *);
+extern char *two_toggle_a_destroy(void *);
+extern char *single_toggle_a_destroy(void *);
+extern char *map_screen_destroy_prompt_bar(void *);
+extern char *screen_adjust_menu_destroy(void *);
+extern unsigned long long menu_pass_through_handle(void *);
+extern char *list_menu_construct_parts(void *);
+extern char *small_list_menu_construct(void *);
+extern char *two_toggle_b_destroy(void *);
+extern char *single_toggle_c_destroy(void *);
+extern char *single_toggle_d_destroy(void *);
+extern void *list_page_destroy(void *);
+extern void *title_screen_destroy(void *);
 extern void records_screen_init(void *, void *, void *);
 extern void menu_page_construct_with_rows(void *, void *);
 extern void item_grid_menu_init(void *, void *);

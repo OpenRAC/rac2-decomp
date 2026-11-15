@@ -106,7 +106,7 @@ extern void mat_get_euler_angles(void *,void *);
 extern int GetCollHitMaterial(void);
 extern int coll_process_triangles(void *,float);
 extern int coll_test_point(void *,int,void *,float);
-extern void coll_process_hit(void *,int,void *,void *,float);
+extern int coll_process_hit(void *,int,void *,void *,float);
 
 void func_PAL_L30_00411310(MoveObject *object,int input)
 {

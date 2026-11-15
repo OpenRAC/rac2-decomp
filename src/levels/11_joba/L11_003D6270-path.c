@@ -1,7 +1,7 @@
 #include "common.h"
 extern void moby_set_state(u8 *, s32, s32);
 extern s32 FloatToInt(f32);
-extern void math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
+extern float math_step_value_toward_target(void *, void *, f32, f32, f32, f32);
 extern u8 *D_L11_001FF580[];
 extern s32 math_fast_float_d(void *);
 extern void lerp_vector(void *, void *, void *, f32);

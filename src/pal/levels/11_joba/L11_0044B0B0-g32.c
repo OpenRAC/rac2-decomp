@@ -7,7 +7,7 @@
  * its true 24 bytes: -G32 rather than the template's -G8. */
 
 extern void joba_menu_draw_help_prompts(char *, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern long long GetEffectTextureDescriptor(int);
 extern void func_PAL_0027FB48(float, float, long long, char *, float, int, long long, char *);
 extern void FontSetWindow(char *, int, int, int, int, int, int, int, int);

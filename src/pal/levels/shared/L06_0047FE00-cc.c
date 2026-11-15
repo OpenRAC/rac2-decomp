@@ -37,7 +37,7 @@ extern char D_0018A0E0[];
 extern s32 D_00138320[];
 extern PadSt g_pad_state;
 extern int cam_claim_request_slot(void *);
-extern void cam_release_request_slot(void *);
+extern int cam_release_request_slot(void *);
 extern f32 FastDiffRots(f32, f32);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void FastVecScale(void *, void *, f32);

@@ -70,7 +70,7 @@ extern float g_screen_fade MACRO_ADDR;
 extern void game_reset_frame_counters(void);
 extern void scene_update_backdrop_quads(void);
 extern int snd_resume_music_stream(void);
-extern void func_PAL_002B8898(int);
+extern s16 func_PAL_002B8898(int);
 extern void moby_spawn_model_parts(void);
 extern int func_PAL_002EC070(int);
 extern int func_PAL_002F6A48(void);
@@ -83,7 +83,7 @@ extern void func_PAL_002EDA88(void);
 extern void gfx_register_overlay_draw_callback(void *, void *);
 extern void func_002A0F48(void *);
 extern void stub_empty_17(void *, int);
-extern void func_PAL_002E5898(void);
+extern s32 func_PAL_002E5898(void);
 extern void UpdateLightingEnvironment(void);
 extern void func_PAL_002F6208(void);
 

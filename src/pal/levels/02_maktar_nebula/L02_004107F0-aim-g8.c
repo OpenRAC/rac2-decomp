@@ -14,7 +14,7 @@ extern float FastDiffRots(float, float);
 extern float fast_subtract_rotations(float, float);
 extern void math_apply_axis_rotation_to_quat(float *, float *, char *, float);
 extern void FastVecAdd(float *, float *, u8 *);
-extern void func_PAL_L01_00323068(char *, float *);
+extern int func_PAL_L01_00323068(char *, float *);
 extern float vec_distance_xy(char *, void *);
 
 int func_PAL_L02_004107F0(char *self) {

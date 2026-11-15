@@ -72,7 +72,7 @@ extern float FastVecDot(char *, char *), FastVecLength(char *);
 extern void FastVecScale(char *, char *, float);
 extern void FastVecAdd(char *, char *, char *);
 extern int cam_claim_request_slot(char *);
-extern void cam_release_request_slot(char *);
+extern int cam_release_request_slot(char *);
 extern int func_PAL_L00_0042F238(char *);
 extern int D_00138320;
 extern void follow_camera_set_distance(int, float, float);

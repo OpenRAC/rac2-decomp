@@ -6,7 +6,7 @@ typedef union { int q __attribute__((mode(TI))); float f[4]; } TI128;
 extern int math_fast_float_d(void *);
 extern void surface_grid_random_point(void *, void *);
 extern float coll_get_distance_if_in_field(void *, float);
-extern void part_spawn_size_changing(void *, void *, int, int, float, int, int, float, float, int, int);
+extern char *part_spawn_size_changing(void *, void *, int, int, float, int, int, float, float, int, int);
 
 /* The address the buffer is copied from; its value differs from program to program. */
 extern char ref_00304128_00[];

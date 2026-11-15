@@ -9,7 +9,7 @@
  * `i == 8` inside it, and the colour load is scheduled into the label's y. */
 extern void joba_menu_draw_help_prompts(char *,int);
 extern int arena_get_challenge_title_text_id(int), arena_get_challenge_flag_index(int), func_L11_00442958(int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int func_001157AC(char *);
 extern int sprintf(char *,char *,...);
 extern void FontSetWindow(void *,int,int,int,int,int,int,int,int);

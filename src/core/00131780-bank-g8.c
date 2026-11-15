@@ -16,7 +16,7 @@ extern long D_001A74D0_1[] __attribute__((sda));
 extern int D_001A7140 MACRO_ADDR;
 extern char D_001A7578[];
 extern void printf(const void *, ...);
-extern void snd_Pump(void);
+extern int snd_Pump(void);
 extern void FlushCache(int);
 extern int sif_rpc_is_handle_valid(const void *);
 extern int sceSifCallRpc(const void *, int, int, int *, int, unsigned int *, int, int, int);

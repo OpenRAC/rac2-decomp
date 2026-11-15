@@ -45,7 +45,7 @@ extern int snd_play_from_class_bank(int, int, char *, int);
 extern int coll_sweep_from_object(char *, char *, int, float, float, float, int, int, int);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern void func_PAL_0032F3B8(char *, char *, char *, float);
+extern char *func_PAL_0032F3B8(char *, char *, char *, float);
 extern void func_PAL_L07_003FB4A0(u8 *a);
 extern void func_PAL_L07_003FB570(u8 *self, float *target);
 extern void func_PAL_L07_003FB6B0(u8 *a0);

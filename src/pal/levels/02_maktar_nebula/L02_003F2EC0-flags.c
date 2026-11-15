@@ -14,7 +14,7 @@ extern void moby_set_state(char *, int, int);
 extern int path_is_hero_near_point(char *);
 extern float path_update_progress(char *);
 extern void func_PAL_L02_003F3358(char *);
-extern void ApproachValue(float *, float, float);
+extern float ApproachValue(float *, float, float);
 extern int g_frame_l02_counter __attribute__((sda));
 extern Pad003EE938 g_pad_state;
 

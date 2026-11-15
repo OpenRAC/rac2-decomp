@@ -6,7 +6,7 @@ extern s32 coll_process_hit(f32, s32, s32, s32, s32);
 
 extern void vec_scale_to_length(void *, void *, float);
 
-extern void StartAttachedEffect(int, int, int);
+extern int StartAttachedEffect(int, int, int);
 
 extern int g_hero_moby;
 

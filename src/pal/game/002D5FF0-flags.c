@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-void func_PAL_002D6730(short param_1, int param_2, int *param_3);
+int func_PAL_002D6730(short param_1, int param_2, int *param_3);
 
 void func_PAL_002D6A70(int param_1)
 {
@@ -47,7 +47,7 @@ int func_PAL_002D7AA8(void)
     return 0;
 }
 
-extern void menu_update_entry_states(int *);
+extern int menu_update_entry_states(int *);
 extern int menu_list_active_entries(unsigned int, unsigned int, unsigned int, int);
 extern int D_001C51D0;
 typedef struct { char pad[0x34]; int f34; int f38; int f3C; } Base2D75E8;
@@ -83,9 +83,9 @@ unsigned int func_PAL_002D6540(void)
 }
 
 extern int D_00138344;
-extern void func_PAL_0029CD38(int);
+extern int func_PAL_0029CD38(int);
 extern int D_00138344;
-extern void func_PAL_0029CD38(int);
+extern int func_PAL_0029CD38(int);
 
 int func_PAL_002D64D0(void) {
     func_PAL_0029CD38(D_00138344);

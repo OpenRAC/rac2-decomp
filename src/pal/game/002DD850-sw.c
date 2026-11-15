@@ -27,7 +27,7 @@ extern AnimationClass *D_001CDB80[];
 extern u8 D_001A7A0A[] __attribute__((sda));
 typedef struct { u8 pad[0x6c]; short count; u8 pad6e[4]; short phase; } Dialogue;
 extern Dialogue g_music_state;
-extern void func_PAL_0029DE68(void *, void *);
+extern int func_PAL_0029DE68(void *, void *);
 extern void relocate_asset_entry_pointers(AnimationClass *, int);
 extern int snd_resume_music_stream(void);
 extern void func_PAL_002A7E68(AnimationMoby *, int, int, int);

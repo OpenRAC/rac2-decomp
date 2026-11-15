@@ -130,9 +130,9 @@ typedef struct LvlSlotCtx {
     LvlSlotNode  *head;          /* +0x50 */
 } LvlSlotCtx;
 
-extern void load_start_disc_read(int value, char *target);
+extern int load_start_disc_read(int value, char *target);
 
-extern void snd_pump_music_and_disc_read(int value);
+extern s16 snd_pump_music_and_disc_read(int value);
 
 extern int D_L00_001BCAC0[];
 
@@ -1619,7 +1619,7 @@ extern void mem_fast_helper_b(void *buf, int size);
 
 extern void mem_copy_aligned(void *target, void *base, int len);
 
-extern int FlushCache(int code);
+extern void FlushCache(int code);
 
 /* The record the table entry points at: three shorts and an array of 64-bit slots. */
 typedef struct L110E8Rec {

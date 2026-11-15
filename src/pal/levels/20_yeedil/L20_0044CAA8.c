@@ -10,11 +10,11 @@ typedef union {
 extern void FastVecSub(void *, void *, void *);
 extern int flag_set_first_pending(char *);
 extern int flag_is_third_pending_set(char *);
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 extern int PlayMobySound(int, int, char *);
 extern int flag_set_first_pending(char *);
 extern int flag_is_third_pending_set(char *);
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 extern int hero_is_current_selected_id(char *);
 extern float math_fabs(float);
 extern int snd_is_voice_playing_for_owner(char *, int);

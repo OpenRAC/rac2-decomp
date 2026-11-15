@@ -22,7 +22,7 @@ extern float fast_vec_dist(void *, void *);
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void cam_set_transition_frames(float);
 extern float math_cosine_blend(float, float, float);
-extern void SetHeroMoveState(int, int);
+extern s32 SetHeroMoveState(int, int);
 
 void UpdateSplinePathCamera(unsigned char *camera)
 {

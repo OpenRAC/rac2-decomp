@@ -2,11 +2,11 @@
 #include "names.h"
 
 typedef unsigned char u8;
-extern void object_construct_derived_a(u8 *);
-extern void hud_construct_widget_base(u8 *);
-extern void hud_construct_widget_base(u8 *);
-extern void menu_return_argument(u8 *);
-extern void object_construct_derived_c(u8 *);
+extern void *object_construct_derived_a(u8 *);
+extern char *hud_construct_widget_base(u8 *);
+extern char *hud_construct_widget_base(u8 *);
+extern unsigned long menu_return_argument(u8 *);
+extern void *object_construct_derived_c(u8 *);
 
 /* initialises eight in-place sub-records of one object by four routines, then returns the object pointer */
 u8 *func_US2_00344110(u8 *a0) {
@@ -22,7 +22,7 @@ u8 *func_US2_00344110(u8 *a0) {
 }
 
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC30[], D_001ADC88[], D_001AE0C0[];
 extern char *D_001A8CFC[] __attribute__((sda));
@@ -33,12 +33,12 @@ extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void hud_set_widget_field_a(void *, int);
 extern void hud_set_widget_field_b(void *, void *);
-extern const char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void menu_list_init(void *, void *);
 extern void menu_list_set_spacing(void *, float, float);
 extern void menu_list_set_icon_size(void *, float);
-extern void item_menu_update(void *, int);
+extern int item_menu_update(void *, int);
 extern void func_US2_003444D0(u8 *, unsigned int);
 
 /* func_US2_00344170, the v2.00 copy of func_00343260: the same C with the object's fields moved, a

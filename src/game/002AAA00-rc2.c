@@ -28,7 +28,7 @@
 extern f32 square_root(f32);
 extern f32 math_fabs(f32);
 extern f32 FastAddRotations(f32, f32);
-extern void ApproachValue(f32 *, f32, f32);
+extern f32 ApproachValue(f32 *, f32, f32);
 extern f32 math_shortest_angle_delta(s32, f32, f32);
 extern void StepAngleTowardTarget(f32 *, s32, f32, f32);
 

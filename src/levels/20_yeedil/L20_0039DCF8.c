@@ -14,7 +14,7 @@ extern int math_random_int_range(int, int);
 extern void func_002A0F48(void *);
 extern int trooper_spawn_parts(char *, int);
 extern void trooper_destroy_parts(char *);
-extern void moby_fuse_linked_objects(void *, void *, void *, L20_0039DCF8_Args *, int);
+extern int moby_fuse_linked_objects(void *, void *, void *, L20_0039DCF8_Args *, int);
 
 /* Sets up a spawned object at pos/rot; if it finds its slot it passes the three link words on. */
 int trooper_init_spawned(char *obj, char *pos, char *rot)

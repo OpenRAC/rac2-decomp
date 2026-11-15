@@ -17,7 +17,7 @@ extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern float FastAddRotations(float, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
-extern void func_PAL_L16_00412A98(void *, void *, s32);
+extern u8 *func_PAL_L16_00412A98(void *, void *, s32);
 extern s32 CollLine(void *, void *, s32, void *, s32);
 
 void func_PAL_L16_00416A50(u8 *arg)

@@ -17,8 +17,8 @@ extern float math_approach_target_with_direction_mode(float *, float *, int, flo
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int func_PAL_L01_00323068(char *, char *);
-extern void func_PAL_002B5E30(unsigned char *, float);
-extern void func_PAL_002B5E10(char *);
+extern int func_PAL_002B5E30(unsigned char *, float);
+extern int func_PAL_002B5E10(char *);
 extern int func_PAL_002B5BA8(char *, float *, float);
 extern void moby_set_state(unsigned char *, int, int);
 extern float func_L00_002EE290(void *);

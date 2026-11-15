@@ -12,7 +12,7 @@ extern u8 g_hero_position[];
 extern s32 moby_is_state_six(u8 *obj);
 extern void nanotech_crate_init(u8 *obj);
 extern f32 fast_vec_dist(u8 *a, u8 *b);
-extern void moby_fuse_linked_objects(u8 *obj, u8 *pos, u8 *vel, s32 a3, s32 t0);
+extern int moby_fuse_linked_objects(u8 *obj, u8 *pos, u8 *vel, s32 a3, s32 t0);
 
 /* Every 64th tick: when one of the 56 tracked entries is below a tenth of its limit, wakes the
    objects listed for the state that are in range. */

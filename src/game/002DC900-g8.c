@@ -26,7 +26,7 @@ extern void SetupGifPaging(long);
 extern void DoGifPaging(void);
 extern char *GetLocalizedString(int);
 extern char *text_format_location_name(char *, int);
-extern void text_draw_centered_small(int, int, unsigned long, char *, int);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
 /* Menu line for the current slot: prints its name (and the follow-up line)
    while the menu is in its listing state. */

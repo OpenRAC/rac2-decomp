@@ -17,7 +17,7 @@ extern void boss_draw_joint_four_glow_facing_cam(void *);
 extern void gfx_update_color_fade(void *, void *);
 extern void set_moby_color(void *, void *, void *, void *);
 extern void value_set_and_smooth(void *, void *, int, int, float);
-extern void coll_sweep_from_object(void *, void *, int, float, float, float, int, int, int);
+extern int coll_sweep_from_object(void *, void *, int, float, float, float, int, int, int);
 extern void gfx_draw_two_layer_glow_sprite(void *, void *, float, int, int, int);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern void anim_start_blended(void *, int, int, int);
@@ -37,16 +37,16 @@ extern void func_31E3C0(void *, int, int, int);
 extern void func_316220(void *);
 extern void func_366830(int);
 extern void func_3FC1B0(int, int);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float,
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float,
                           int, int, int, int);
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 extern void vec_random_direction(void *, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void part_spawn_masked_debris(void *, int, void *, float, float, float, float, int);
 extern void anim_start_blended(void *, int, int, int);
 extern void func_002A05A8(void *);
-extern int snd_stop_voice(int);
-extern int IncrementMaktarTypeCounter(void *, int);
+extern void snd_stop_voice(int);
+extern void IncrementMaktarTypeCounter(void *, int);
 extern int arena_take_enemy_quota(void *, int);
 extern int weapon_select_aim_target(void *, u32, float, float, int, int);
 

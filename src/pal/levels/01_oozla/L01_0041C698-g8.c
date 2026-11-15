@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern s32 CreateMoby(s32 size);
+extern char *CreateMoby(s32 size);
 extern f32 math_random_angle(void);
 extern u32 g_pHeroMoby[];
 extern f32 D_L01_001B1A68 __attribute__((sda));
@@ -11,7 +11,7 @@ extern void func_PAL_L01_0041BFF0(void *a0);
 
 /* Spawns a gold bolt moby at a position, already in its idle state, with random spin angles.
  * Adapted from the state 0 of RAC1's gold_bolt_update (GPL-3.0). */
-s32 func_PAL_L01_0041C698(void *a0, void *a1, void *a2, void *a3) {
+void *func_PAL_L01_0041C698(void *a0, void *a1, void *a2, void *a3) {
     u8 *m;
     u8 *st;
     f32 t, x, y, z;

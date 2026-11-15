@@ -4,7 +4,7 @@ extern void gfx_draw_screen_element_stored(void *a0);
 extern void text_label_draw(void *a0);
 extern void menu_list_draw_entries(void *a0);
 extern int menu_list_get_selected_id(void *a0);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *a0, int a1);
 extern unsigned char g_item_slot_to_record[];
 extern char g_weapon_table[];

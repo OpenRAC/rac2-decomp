@@ -2,7 +2,7 @@
 #include "names.h"
 
 extern int D_00138344;
-extern void level_l00_call_module_handler_with_arg_11(int a);
+extern int level_l00_call_module_handler_with_arg_11(int a);
 
 int func_PAL_L00_00350CA8(void)
 {

@@ -7,7 +7,7 @@ typedef unsigned long long u64;
 extern int D_001A7BA0, D_001A7B9C, D_001A7B98;
 extern void SetupGifPaging(long);
 extern void DoGifPaging(void);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int GetIconFrame(int, int);
 extern void text_draw_right_aligned_small(int, int, u64, u8 *, int);
 extern void text_draw_small(int, int, u64, u8 *, int);

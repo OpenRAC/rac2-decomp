@@ -76,7 +76,7 @@ extern int CollLine(void *, void *, int, void *, int);
 #undef IN
 
 typedef int HeroQuad __attribute__((mode(TI)));
-extern void ApproachValue(void *, float, float);
+extern f32 ApproachValue(void *, float, float);
 
 typedef struct MobyModel {
     char pad00[0x10];

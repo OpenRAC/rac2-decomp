@@ -6,7 +6,7 @@ extern float D_L23_001B13CC __attribute__((sda));
 extern char *g_mothership_boss_moby __attribute__((sda));
 extern char D_L23_001BA500[];
 extern char *part_find_owned_effect_slot(char *, int, int);
-extern void FastDecTimer(char *);
+extern int FastDecTimer(char *);
 extern int mothership_is_held(void);
 extern void func_PAL_L23_00423838(void);
 extern void func_PAL_002AC290(char *, char *);

@@ -30,7 +30,7 @@ extern void hero_update_moby_from_hero(void);
 extern void gfx_fade_screen_effect(void);
 extern void ApplyHeroAxisScales(void);
 extern void coll_clear_map_bits_around_pos(void *a0);
-extern void receiver_bot_start_sequence(void *a0);
+extern s32 receiver_bot_start_sequence(void *a0);
 extern void UpdateHeroMobyProbedHeightBounds(void);
 extern void func_002A677C(int a0);
 

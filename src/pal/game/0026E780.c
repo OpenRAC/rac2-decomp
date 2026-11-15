@@ -34,10 +34,10 @@ void func_PAL_0026E780(void)
 typedef struct { char prefix[20]; int *data; } SplashState;
 extern char D_001BAEC0[];
 extern int D_001A72DC[] __attribute__((sda));
-extern void func_PAL_0029DE68(int, void *);
-extern int FlushCache(int);
+extern int func_PAL_0029DE68(int, void *);
+extern void FlushCache(int);
 extern void gfx_reset_packet_buffer(void);
-extern void tex_upload_blocks_return_setup(void *, int, int, int);
+extern long long tex_upload_blocks_return_setup(void *, int, int, int);
 extern void gfx_write_clear_color_packets(void);
 extern void gfx_set_clear_color_packet(int, int, int, int);
 extern void PutDrawBufferSmall(void);

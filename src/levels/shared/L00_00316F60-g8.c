@@ -38,7 +38,7 @@ extern int D_L00_001A8FB0;
 extern int D_L00_001B2084;
 extern int D_L00_001B2084_1 __attribute__((sda));
 extern void level_l00_call_module_handler_9(void);
-extern void hud_close_element_by_key(int);
+extern int hud_close_element_by_key(int);
 
 /* If the value matches the current one, resets that state and releases the resource, returning 1. */
 int level_release_matching_resource(int value) {
@@ -57,7 +57,7 @@ int level_release_matching_resource(int value) {
 
 extern unsigned char *D_L00_001B1F9C;
 
-extern int func_2EE138(void *, void *, void *);
+extern void func_2EE138(void *, void *, void *);
 extern void func_2EE5B0(void *, void *, void *);
 extern float func_2EE268(void *);
 

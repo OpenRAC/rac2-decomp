@@ -9,7 +9,7 @@ extern unsigned int D_001B00A4 __attribute__((nosda));
 
 extern int FastDecTimer(void *);
 extern s16 math_random_int_range(int, unsigned int);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 
 void func_PAL_L02_003CEF50(char *a0) {
     char *s0 = *(char **)(a0 + 0x68);

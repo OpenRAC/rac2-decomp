@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void F449e2f67_FUN_003361A8(char *p);
-extern void F449e2f67_FUN_00336968(char *p);
-extern void F449e2f67_FUN_003366D0(char *p);
+extern void *F449e2f67_FUN_003361A8(char *p);
+extern char *F449e2f67_FUN_00336968(char *p);
+extern void *F449e2f67_FUN_003366D0(char *p);
 
 char *func_PAL_003459F8(char *p)
 {
@@ -25,7 +25,7 @@ char *func_PAL_003459F8(char *p)
 }
 
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void func_PAL_00338688(void *, void *, void *);
@@ -34,7 +34,7 @@ extern void hud_set_widget_field_a(void *, int);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void object_set_helper_result(void *, void *, int);
 extern void object_init_derived_c(void *, void *, void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, int);
 extern int func_PAL_00346528();
 extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC28[], D_001ADFC0[], D_001ADFC8[];

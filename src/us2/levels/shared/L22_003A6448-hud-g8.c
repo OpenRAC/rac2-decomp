@@ -71,7 +71,7 @@ extern u8 ref_L22_003A5018_42[] SDATA(ref_L22_003A5018_42);
 extern int ref_L22_003A5018_43 __attribute__((sda));
 extern int ref_L22_003A5018_44 __attribute__((sda));
 
-extern int table_find_by_id(void *, int);
+extern void *table_find_by_id(void *, int);
 extern void gfx_draw_scaled_object_two_axes(void *, unsigned int, float, float, float, float, float);
 extern int GetIconFrame(int, int);
 extern void hud_draw_sprite_gradient(void *, int, int, int, int, void *);

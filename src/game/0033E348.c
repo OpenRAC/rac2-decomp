@@ -8,13 +8,13 @@ extern int menu_get_selected_index(unsigned char *);
 /* Qwen draft (branch qwen/autonomy, 4419d477), checked by tools/check.py */
 void prompt_bar_draw(int);
 
-extern void func_0033AB50_1(void *);
+extern int func_0033AB50_1(void *);
 
-extern void cam_init_object_table_c(void *);
+extern char *cam_init_object_table_c(void *);
 
-extern void cam_init_object_table_d(void *);
+extern char *cam_init_object_table_d(void *);
 
-extern void cam_init_object_table_a(void *);
+extern char *cam_init_object_table_a(void *);
 
 /* Returns the index of the selected entry in the menu list. */
 int list_menu_get_selected_index(int owner)
@@ -32,7 +32,7 @@ void list_page_set_records(unsigned char *owner, float *records)
 
 extern void prompt_bar_update(char *);
 extern void menu_set_anchor_pos(char *, float, float);
-extern char *UpdateMenuListSelection(char *, int);
+extern void *UpdateMenuListSelection(char *, int);
 extern void menu_set_position(char *, float, float);
 
 /* Handles input for the list menu page and keeps the list in place. */
@@ -52,7 +52,7 @@ int list_page_update(char *object, int flags)
 
 
 
-extern void prompt_bar_destroy(void *);
+extern int prompt_bar_destroy(void *);
 extern void *hud_construct_widget_base(void *);
 
 /* Cleans up a menu page that has a list. */

@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern void *part_find_owned_effect_slot(void *, int, int);
-extern char *math_random_int_below(int);
+extern s32 math_random_int_below(int);
 extern int snd_play_from_class_bank(char *, int, void *, int);
 extern void func_PAL_002AD288(void *, void *, int, float, float);
 extern void moby_mark_spawned(void *object);

@@ -8,7 +8,7 @@ extern void gfx_update_color_fade(void *,void *);
 extern char *part_find_owned_effect_slot(void *,int,int);
 extern int FastDecTimer(void *);
 extern float moby_update_aim_target_strength(void *,void *);
-extern void part_spawn_damage_debris(void *,void *,void *);
+extern int part_spawn_damage_debris(void *,void *,void *);
 extern char *D_001B1B5C;
 typedef struct { int frame; } DamageClock;
 extern DamageClock g_game_time;

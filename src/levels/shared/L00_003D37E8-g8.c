@@ -184,12 +184,12 @@ extern int CollLine(void *, void *, int, void *, void *);
 extern int coll_test_point(void *, int, void *, float);
 extern int coll_sweep_from_object(int, float, void *, int, float, float, int, int, int);
 extern void moby_set_state(void *, int, int);
-extern void moby_transform_point_by_attachment(void *, int, void *, void *);
+extern int moby_transform_point_by_attachment(void *, int, void *, void *);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern void *part_spawn_gravity_fade(void *, void *, int, unsigned int, int, int, int, float, float, float, int);
-extern void moby_transform_point_and_rotation_by_parent(void *, int, void *, void *, void *, void *);
-extern void moby_get_parent_transformed_point(void *, int, void *, void *);
+extern int moby_transform_point_and_rotation_by_parent(void *, int, void *, void *, void *, void *);
+extern int moby_get_parent_transformed_point(void *, int, void *, void *);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int,
                           float, int, int, int, int, int);
 extern void moby_mark_spawned(void *);

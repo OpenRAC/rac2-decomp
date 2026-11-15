@@ -77,7 +77,7 @@ extern void func_PAL_00300EA8(char *);
 extern char *func_PAL_00300C98(char *);
 extern void menu_advance_chain_entry(int);
 extern void func_PAL_00288E20(int);
-extern void moby_handle_request_slot_state(int);
+extern int moby_handle_request_slot_state(int);
 extern int request_begin_slot(int, int, int, int, int);
 
 /* Steps the object preview through its eight states: wait for the subtitle

@@ -6,7 +6,7 @@ extern float D_001AEC64 __attribute__((sda));
 extern SpawnParams D_001AEC70;
 extern void moby_get_facing_direction(void *, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern int SelectBestTargetInCone(void *, void *, float, float, void *, int, int, int, float, float, float, int, void *);
+extern char *SelectBestTargetInCone(void *, void *, float, float, void *, int, int, int, float, float, float, int, void *);
 extern void FastVecCross(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void mat_get_euler_angles(void *, void *);

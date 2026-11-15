@@ -19,7 +19,7 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int), flag_set_first_pending(void *);
 extern void anim_start_blended(void *, int, int, int);
 extern void func_L00_0030C710(int);
-extern int STUB_printf(char *, ...);
+extern void STUB_printf(char *, ...);
 extern int math_is_value_within_step(char *, float);
 extern int PlayMobySound(int, int, void *);
 extern void slot_machine_update_reels(void *), slot_machine_award_prize(void *), snd_stop_voice(int);

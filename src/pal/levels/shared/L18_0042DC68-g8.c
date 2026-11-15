@@ -62,11 +62,11 @@ extern float math_wrap_angle_to_pi(float);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, s32, s32, s32, float, float,
                           float, float, s32, float, s32, s32, s32, s32, s32);
 extern s32 moby_is_in_selected_zone(void *);
-extern void TryClaimNotice(s32, s32, s32);
+extern int TryClaimNotice(s32, s32, s32);
 extern s32 moby_dispatch_action_by_kind(void *, void *);
 extern s32 flag_set_second_pending(void *);
 extern s32 func_PAL_002B5E10(void *);
-extern void func_PAL_002B5E30(void *, float);
+extern int func_PAL_002B5E30(void *, float);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void snd_stop_voice(s32);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
@@ -76,7 +76,7 @@ extern void cam_set_mode_state(s32);
 extern s32 func_001163B0(void);
 extern s32 coll_point_inside_region(void *, s32);
 extern s32 moby_fuse_linked_objects(void *, void *, void *, void *, s32);
-extern void moby_aim_move_record_at_target(void *, void *, float, float);
+extern int moby_aim_move_record_at_target(void *, void *, float, float);
 extern s32 func_PAL_L07_00324F58(void *, float, float, float);
 extern void func_PAL_L18_002CFC50(s32, s32, void *);
 extern void func_PAL_L18_002CFE30(s32);
@@ -95,7 +95,7 @@ extern void shooter_flag_group(void *, s32);
 extern void func_PAL_L18_0042C768(void *);
 extern void func_PAL_L18_0042CC40(void *);
 extern s32 enemy_get_kind_index(void *);
-extern void func_PAL_L18_0042D3B8(void *);
+extern int func_PAL_L18_0042D3B8(void *);
 extern void func_PAL_L18_0042D7E0(void *);
 
 void func_PAL_L18_0042DC68(u8 *a0) {

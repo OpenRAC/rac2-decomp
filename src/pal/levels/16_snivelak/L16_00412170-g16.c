@@ -18,18 +18,19 @@ extern float D_L16_001B1658[3] __attribute__((sda));
 extern float D_L16_001B1664 __attribute__((sda));
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int), func_PAL_002A7E68(void *, int, int, int);
-extern void math_step_value_toward_target(float *, float *, float, float, float, float);
+extern float math_step_value_toward_target(float *, float *, float, float, float, float);
 extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float), vec_scale_to_length(void *, void *, float);
 extern float mat_fast_helper_a(float, float), math_random_signed_float_range(float, float), math_random_float_range(float, float);
-extern void StepAngleTowardTarget(float *, int, float, float), func_PAL_L16_00412C28(u8 *);
+extern void func_PAL_L16_00412C28(u8 *);
+extern void StepAngleTowardTarget(float *, int, float, float);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern u8 *func_PAL_002735D0(void *, int, int, int, void *, void *, void *, int, float, float);
 extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, void *);
 extern void moby_mark_spawned(void *), moby_set_state(void *, int, int);
 extern int CollLine(void *, void *, int, void *, void *);
 extern int coll_test_point(void *, int, void *, float);
-extern void func_PAL_0032F3B8(void *, void *, void *, float);
+extern char *func_PAL_0032F3B8(void *, void *, void *, float);
 extern int coll_sweep_from_object(void *, void *, float, int, int, float, float, int, int);
 
 /* The sound handle indexes 0x70-byte resident records. The sound owner and

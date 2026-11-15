@@ -10,7 +10,7 @@ typedef int s32;
 typedef unsigned char u8;
 
 /* func_002EE6A8: owner ABI/declaration review retained. */
-extern int moby_get_motion_data(unsigned char *owner);
+extern char *moby_get_motion_data(unsigned char *owner);
 
 /* func_002ED870: owner ABI/declaration review retained. */
 /* Decomposes a float returned by a bound producer into hours, minutes and hundredths written through three pointer arguments, rounding each step with a bound helper and clamping the last field at 99. */
@@ -38,7 +38,7 @@ int func_PAL_002EE490(int a0, int *p0, int *p1, int *p2)
     return e;
 }
 
-s32 moby_get_motion_data(u8 *a0);
+char *moby_get_motion_data(u8 *a0);
 
 /* func_002ED6B0 is in 002ED6B0.c: its call to func_002ED870 has to be an external one. */
 

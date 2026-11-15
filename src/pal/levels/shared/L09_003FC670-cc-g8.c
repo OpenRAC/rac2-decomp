@@ -11,7 +11,8 @@ extern u8 *CreateMoby(int),*func_PAL_L02_0032D5F8(void *,int,void *,void *,int,i
 extern void moby_set_controller_speed_limits(u8 *,float,float,float,float);
 extern float path_l01_compute_segment_lengths(void *);
 extern int func_PAL_002B3F18(void *,void *,void *),enemy_select_path(void *,int,int);
-extern void moby_transform_joint_to_world(void *,int,void *),moby_transform_joint_point(void *,int,void *),copy_matrix3x4(void *,void *),func_002A0F48(void *),mat_normalize_columns(void *),func_002A10E8(void *);
+extern void moby_transform_joint_point(void *,int,void *), copy_matrix3x4(void *,void *), func_002A0F48(void *), mat_normalize_columns(void *), func_002A10E8(void *);
+extern void moby_transform_joint_to_world(void *,int,void *);
 extern void FastVecSub(void *,void *,void *),shared_counter_release(void *),moby_set_state(void *,int,int),func_PAL_L09_003FBDF0(void *,int,int,int);
 extern float coll_probe_ground_height_below(void *,int,float);
 void func_PAL_L09_003FC670(u8 *o) {

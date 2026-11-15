@@ -1,9 +1,9 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern void *ui_return_second_arg(int, int);
-extern void *func_US2_003377B0(void *, void *, void *);
+extern void func_US2_003377B0(void *, void *, void *);
 extern char D_001AE5A8[];
 
 /* func_US2_00348BF8, the USA v2.00 copy of func_00347EC8: the same C, where the fields move 0x10 on
@@ -75,8 +75,8 @@ void func_US2_00348E28(u8 *a0,f32 f0,f32 f1) {
 
 /* func_US2_00348E70 is built from 00348E70-menu.c. */
 
-extern void Faac80289_FUN_003361A8(char *p);
-extern void Faac80289_FUN_00336968(char *p);
+extern void *Faac80289_FUN_003361A8(char *p);
+extern char *Faac80289_FUN_00336968(char *p);
 
 /* func_00348138 is built from 00345358-menu.c. */
 

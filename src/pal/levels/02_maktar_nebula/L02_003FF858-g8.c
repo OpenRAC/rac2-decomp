@@ -26,7 +26,7 @@ extern s32 D_L02_001B1214 __attribute__((sda));
 
 extern void func_PAL_L02_00405040(char *, s32, f32, f32);
 
-extern void snd_start_in_slot(s32, s32, s32);
+extern int snd_start_in_slot(s32, s32, s32);
 
 extern s32 FastDecTimer(char *);
 

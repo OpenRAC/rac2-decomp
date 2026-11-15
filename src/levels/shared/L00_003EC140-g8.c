@@ -99,7 +99,7 @@ extern int D_L00_001B076C __attribute__((sda)), D_L00_001B0770 __attribute__((sd
 extern float D_L00_001B0774 __attribute__((sda)), D_L00_001B0778 __attribute__((sda));
 extern float D_L00_001B077C __attribute__((sda)), D_L00_001B0784 __attribute__((sda));
 extern int D_L00_001B0780 __attribute__((sda));
-extern int kilonoid_spawn(void *, void *);
+extern char *kilonoid_spawn(void *, void *);
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, void *);
 extern void anim_start_blended(void *, int, int,int);
@@ -127,7 +127,7 @@ extern void vec_rotate_by_quaternion(void *, void *,void *);
 
 extern int func_001163B0(void);
 extern void vec_add_random_offset(void *, float);
-extern void part_spawn_ground_effect(void *, int, int,int, int, void *, int,float, float,float);
+extern void *part_spawn_ground_effect(void *, int, int,int, int, void *, int,float, float,float);
 
 /* Update the three object states, emit fading particles, and orient the object
  * from the camera basis and its three stored angles. */

@@ -16,7 +16,7 @@ extern void FastVecScale(f32 *, f32 *, f32);
 extern void FastVecAdd(void *, void *, void *);
 extern s32 math_random_int_below(s32);
 extern f32 math_random_float_range(f32, f32);
-extern void part_spawn_ground_effect(void *, u32, u32, u32, s32, s32, s32, f32, f32, f32);
+extern void *part_spawn_ground_effect(void *, u32, u32, u32, s32, s32, s32, f32, f32, f32);
 
 /* Adds the score of the kill class a0 + 0xAA (1, 5, 20, 50, 100, 500 or 1000 for classes
    0xD..0x13, 1 for any other) to the running total, and to the player's row of the table when

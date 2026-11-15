@@ -6,7 +6,7 @@ extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void set_moby_color(char *, int, int, int);
-extern void moby_spawn_linked(char *, int, float, float);
+extern int moby_spawn_linked(char *, int, float, float);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void moby_set_state(void *, int, int);

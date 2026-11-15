@@ -7,7 +7,7 @@ extern int D_L00_001AF6C4 __attribute__((sda));
 extern int D_L00_001AF6CC __attribute__((sda));
 extern int AcquireEntitySlot(char *, int, void *);
 extern char *level_get_slot_body(int, int);
-extern int mem_round_up_to_16(int);
+extern char *mem_round_up_to_16(int);
 
 /* Sets up a new Lancer-class (or similar) object: clears its state, picks its sound table and sets the turn rates. */
 void lancer_init(char *object)

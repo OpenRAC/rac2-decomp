@@ -31,21 +31,23 @@ void func_PAL_L02_003D1828(unsigned char *arg0) {
 }
 
 #include "common.h"
-extern void moby_aim_at_target_offset(char *, char *);
+extern int moby_aim_at_target_offset(char *, char *);
 extern int moby_l01_turn_toward_target(char *, char *);
 extern int moby_turn_toward_target_and_step(char *, float *, float);
 extern int D_L02_001A8FF0 __attribute__((sda));
 
 /* Runs the kind's entry hook: the first when the level flag is set, the second when the third
    argument is clear, the third with the object's own angle otherwise. */
-void func_PAL_L02_003D2898(char *a0, char *a1, int a2) {
+int func_PAL_L02_003D2898(char *a0, char *a1, int a2) {
     char *p = *(char **)(a0 + 0x68);
+    int result;
 
     if (D_L02_001A8FF0)
-        moby_aim_at_target_offset(a0, a1);
+        result = moby_aim_at_target_offset(a0, a1);
     else if (a2 == 0)
-        moby_l01_turn_toward_target(a0, a1);
+        result = moby_l01_turn_toward_target(a0, a1);
     else
-        moby_turn_toward_target_and_step(a0, (float *)a1, *(float *)(p + 0x31C));
+        result = moby_turn_toward_target_and_step(a0, (float *)a1, *(float *)(p + 0x31C));
+    return result;
 }
 

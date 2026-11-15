@@ -7,7 +7,7 @@ extern int func_001163B0(void);
 extern char g_hero_position[];
 extern char *D_L08_001FE7BC;
 extern char *D_L08_001B29DC[] __attribute__((sda));
-extern void math_closest_point_on_polygon_edge(void *, void *, void *, int);
+extern s32 math_closest_point_on_polygon_edge(void *, void *, void *, int);
 extern int coll_test_point_against_shapes(void *, int, int, int, int);
 
 /* Picks the next point the Spitting Dune Crawler wants to walk to, following its path or wandering around the hero. */

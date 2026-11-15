@@ -73,7 +73,7 @@ extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
 extern int func_PAL_002B1A50(void *, void *, int);
 extern void gadgetron_hound_flag_group(void *);
-extern void weapon_select_aim_target(void *, int, void *, int, float, float);
+extern int weapon_select_aim_target(void *, int, void *, int, float, float);
 typedef struct {
     s32 i00;
     f32 f04;

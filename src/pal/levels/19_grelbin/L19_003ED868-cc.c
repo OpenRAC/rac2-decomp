@@ -13,7 +13,7 @@ extern float D_L19_001B2628 __attribute__((sda));
 extern int D_L19_001C9FC0;
 extern int IsPointInCuboid(void *, int);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_00289730(int,int);
+extern int func_PAL_00289730(int,int);
 extern int flag_set_first_pending(void *);
 extern float mat_fast_helper_a(float,float);
 extern float math_fast_sin_or_cos_b(float);
@@ -21,7 +21,7 @@ extern void FastVecSub(void *,void *,void *);
 extern void FastVecScale(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
 extern int math_fast_float_d(void *);
-extern void MemcardSave(int,int);
+extern int MemcardSave(int,int);
 #define I(p,o) (*(int *)((p)+(o)))
 #define F(p,o) (*(float *)((p)+(o)))
 void func_PAL_L19_003ED868(u8 *obj)

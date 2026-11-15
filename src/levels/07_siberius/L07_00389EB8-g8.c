@@ -24,7 +24,7 @@ extern float FastAddRotations(float, float);
 extern float math_fast_sin_or_cos_b(float);
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_clamp_length(void *, float);
-extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern float D_L07_001B0C60 __attribute__((sda));

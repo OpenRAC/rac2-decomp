@@ -23,7 +23,7 @@ typedef struct {
 extern L16VoiceState g_music_state;
 extern int D_L16_001B1888[];
 extern void STUB_printf(void *);
-extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 coll_test_point(void *, s32, void *, float);
 
 /* Asks the engine to load voice line idx, from the first table below 20 and the second from 20 up,
@@ -93,7 +93,7 @@ extern void func_PAL_L02_003294D8(s32, s32);
 extern void script_queue_keyed_request(s32, s32);
 extern void moby_set_flag_bit(void *, s32);
 extern void level_capture_checkpoint_state(void *, void *);
-extern void MemcardSave(s32, s32);
+extern int MemcardSave(s32, s32);
 extern void func_PAL_L16_00417DC0(u8 *, s32, s32);
 extern void snivelak_clean_up_arena_mobys(u8 *);
 extern void SetMobyAndGroupsEnabled(u8 *, s32);
@@ -167,12 +167,12 @@ extern float D_L16_001B9B00[];
 extern u16 *D_L16_001FB660[];
 extern void quaternion_to_rotation_basis(void *, void *);
 extern void multiply_matrix3x3(void *, void *, void *);
-extern void func_PAL_0032F3B8(void *, void *, void *, float);
-extern void coll_sweep_from_object(void *, void *, s32, s32, s32, s32, float, float, float);
+extern char *func_PAL_0032F3B8(void *, void *, void *, float);
+extern int coll_sweep_from_object(void *, void *, s32, s32, s32, s32, float, float, float);
 extern void mat_get_euler_angles(void *, void *);
 extern void vec_random_direction(void *, float, float);
 extern float math_random_float_range(float, float);
-extern void func_PAL_002735D0(void *, s32, s32, s32, void *, void *, void *, s32, float, float);
+extern char *func_PAL_002735D0(void *, s32, s32, s32, void *, void *, void *, s32, float, float);
 
 /* State 0: moves by the state's velocity and frees itself when the state's timer (+0x30)
    runs out, unless +0x31 is set. State 2: moves, lowers the velocity's third component by

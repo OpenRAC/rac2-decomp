@@ -49,11 +49,11 @@ extern void func_US2_0029C548(int,int);
 extern void SetCamera5Pose(void *,void *,int,int,int);
 extern void object_copy_vector_to_selected(void *);
 extern void cam_set_state_rotation(void *);
-extern void func_US2_L18_002E02E8(int,int);
+extern s32 func_US2_L18_002E02E8(int,int);
 extern float vec_distance_xy(void *,void *);
 extern void moby_set_flag_bit(void *,int);
 extern void moby_start_or_forward_anim(void *,int,int,float);
-extern void TryClaimNotice(int,int,int);
+extern int TryClaimNotice(int,int,int);
 
 /* Refreshes targeting and combat reactions, including the player capture transition. */
 void func_US2_L18_004290D0(u8 *o) {

@@ -16,10 +16,10 @@ extern int D_L12_001B12F8 __attribute__((sda)),D_L12_001B12FC __attribute__((sda
 extern float D_L12_001B1300[4] __attribute__((sda));
 extern int D_L12_001B29C8 MACRO_ADDR;
 extern void vec_random_direction(void *,float,float);
-extern void part_spawn_hero_relative(void *,void *,int,int,int,int,float);
+extern void *part_spawn_hero_relative(void *,void *,int,int,int,int,float);
 extern float IntToFloat(int),math_fabs(float);
 extern int FastTweenColor(int,int,float);
-extern void part_spawn_fading(void *,int,int,int,int,int,int,float);
+extern unsigned char *part_spawn_fading(void *,int,int,int,int,int,int,float);
 extern void func_00282E70(void *,void *,void *);
 
 void func_PAL_L12_004075B8(u8 *o) {

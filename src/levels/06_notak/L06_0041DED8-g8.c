@@ -11,7 +11,7 @@ extern int PlayMobySound(int, int, char *);
 extern int g_current_map_index;
 extern unsigned char D_0019B2E8[];
 extern char *g_path_list[];
-extern void path_l01_compute_segment_lengths(char *);
+extern float path_l01_compute_segment_lengths(char *);
 extern void mem_clear(char *, int, int);
 extern int actor_choose_path_goal(char *);
 extern int moby_apply_damage_to_object(char *, char *, int);
@@ -34,7 +34,7 @@ extern void snd_stop_voice(int);
 extern void water_init_object(void *), water_update_controller(void *), water_advance_controller_state(void *), water_update_ripple_patches(void *);
 extern void water_add_splash_entry(char *, float);
 extern float math_fabs(float);
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 extern int IsPointInCuboid(char *, int);
 typedef struct {
     int kind, count; char *items, *models, *data; int *states; char *aux, *more;

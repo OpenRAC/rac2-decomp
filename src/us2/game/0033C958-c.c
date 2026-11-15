@@ -1,13 +1,13 @@
 #include "include_asm.h"
 #include "names.h"
 extern void prompt_bar_set_spacing(void *, float);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void prompt_bar_init(void *, void *, void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void prompt_bar_set_texts(void *, int, int, int);
 extern void prompt_bar_set_text_offsets(void *, float, float, float, float, float, float);
-extern void audio_menu_update(void *, int);
+extern int audio_menu_update(void *, int);
 extern int D_001ADE48[2] __attribute__((sda));
 extern char D_001ADC88[];
 extern void object_init_derived_b(void *, int, int, void *, void *);

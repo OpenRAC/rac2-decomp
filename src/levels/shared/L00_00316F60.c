@@ -119,7 +119,7 @@ extern f32 func_00283198_4(f32);
 
 extern f32 func_00283B98_4(f32, f32);
 
-extern void func_00283D38_2(s32, s32, f32);
+extern int func_00283D38_2(s32, s32, f32);
 
 extern void moby_update_ground_check(void);
 

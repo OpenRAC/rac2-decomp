@@ -27,7 +27,7 @@ extern int math_fast_helper_a(void *, float);
 extern void gfx_add_draw_callback_third(void *, void *);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern int PlayMobySound(int, int, void *);
-extern void math_fast_float_d(void *);
+extern int math_fast_float_d(void *);
 extern void snd_stop_voice(int);
 typedef struct {
     float radius;

@@ -12,7 +12,7 @@ extern float FastVecLength(float *);
 extern void vec_scale_to_length(float *, float *, float);
 extern int CollLine(float *, float *, int, int, int);
 extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
-extern void moby_move_and_collide(char *, float *, float, float, float, int);
+extern int moby_move_and_collide(char *, float *, float, float, float, int);
 
 void func_PAL_0030FCE8(char *obj)
 {

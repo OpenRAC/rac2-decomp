@@ -22,8 +22,8 @@ extern void moby_set_state(void *entity, int a, int b);
 extern int math_random_int_below(int id);
 
 /* The engine's particle and light helpers, called with the level's own copies. */
-extern void math_fast_float_d(void *target);
-extern void FastDecTimer(void *target);
+extern int math_fast_float_d(void *target);
+extern int FastDecTimer(void *target);
 extern void moby_update_eased_node(void *entity, void *target, int a, float f0, float f1);
 extern void vec_transform_by_object_or_given(void *entity, void *out, void *target, int a);
 extern void moby_transform_joint_to_world(void *entity, int a, void *out);

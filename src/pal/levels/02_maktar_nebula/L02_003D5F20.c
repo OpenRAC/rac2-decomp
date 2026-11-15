@@ -5,7 +5,7 @@ typedef int TI128 __attribute__((mode(TI)));
 extern void armed_enemy_release_held_object(char *, TI128 *);
 extern void vec_random_direction(char *, float, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void func_PAL_L02_0032D5F8(char *, int, char *, char *, int, int, float *, void *, void *, float);
+extern char *func_PAL_L02_0032D5F8(char *, int, char *, char *, int, int, float *, void *, void *, float);
 extern void moby_mark_spawned(char *);
 extern char D_L02_001A8F20[] __attribute__((sda));
 

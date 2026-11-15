@@ -7,9 +7,9 @@ typedef unsigned char QwenRecovery_84e23fd54f9f_AbiByte16;
 extern int moby_step_controller(QwenRecovery_84e23fd54f9f_AbiByte16 *owner, QwenRecovery_84e23fd54f9f_AbiByte16 *input, float factor);
 
 /* Runs the movement step on an object using its own position and the given factor. */
-void moby_step_at_own_position_factor(QwenRecovery_84e23fd54f9f_AbiByte16 *owner, float factor)
+int moby_step_at_own_position_factor(QwenRecovery_84e23fd54f9f_AbiByte16 *owner, float factor)
 {
-    moby_step_controller(owner, owner + 0x10, factor);
+    return moby_step_controller(owner, owner + 0x10, factor);
 }
 
 

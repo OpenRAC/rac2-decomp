@@ -19,7 +19,7 @@ extern float math_random_float_range(float, float);
 extern int math_random_int_below(int), flag_set_first_pending(void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_L00_0030C710(int);
-extern int STUB_printf(char *, ...);
+extern void STUB_printf(char *, ...);
 extern int func_PAL_002AF6C0(char *, float);
 extern int PlayMobySound(int, int, void *);
 extern void func_PAL_L02_003EB998(void *), func_PAL_L02_003EBBD0(void *), snd_stop_voice(int);

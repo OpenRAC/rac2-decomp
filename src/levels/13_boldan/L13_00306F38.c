@@ -10,8 +10,8 @@ typedef short s16;
 
 extern f32 func_2F9748(f32, f32);
 extern s32 func_32A4D0(u8 *, s32);
-extern s32 func_31A718(u8 *);
-extern s32 func_3248E0(u8 *, s32, s32);
+extern void func_31A718(u8 *);
+extern void func_3248E0(u8 *, s32, s32);
 extern void func_337400(s32, s32);
 extern s32 func_2AF870(u8 *);
 extern void func_327D00(f32 *, f32 *, f32, f32, f32, f32);
@@ -155,7 +155,7 @@ void moby_spin_yaw_small(u8 *moby) {
    (radians) and an integer, in that order. */
 extern f32 vec_distance_xy(void *, void *);
 extern f32 fast_vec_dist(void *, void *);
-extern void math_approach_target_with_direction_mode(void *, void *, f32, f32, f32, f32, s32);
+extern f32 math_approach_target_with_direction_mode(void *, void *, f32, f32, f32, f32, s32);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void FastVecAdd(void *, void *, void *);
 
@@ -452,8 +452,8 @@ void boldan_set_progress_flags_from_triggers(u8 *moby) {
    "addiu $sp,$sp,0x190 ; nop" tail). Not a function start — left as retail asm. */
 
 
-extern void PlayMobySound(s32, s32, u8 *);
-extern void math_step_value_toward_target(f32 *, f32 *, f32, f32, f32, f32);
+extern int PlayMobySound(s32, s32, u8 *);
+extern float math_step_value_toward_target(f32 *, f32 *, f32, f32, f32, f32);
 
 /* Waits for another object to reach its active state, then lifts this object up to its top height. */
 void rising_l13_platform_update(u8 *moby) {

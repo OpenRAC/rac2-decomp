@@ -45,7 +45,7 @@ extern CollResult g_collision_result __attribute__((aligned(16)));
 extern char g_camera_l00_position[];
 extern f32 D_L00_001B1470 __attribute__((sda));
 
-extern int level_get_slot_body(int id, int index);
+extern u8 *level_get_slot_body(int id, int index);
 extern int *level_get_slot_header(int id, int index);
 extern void cam_compute_view_direction(void *, void *, int);
 extern void vec_transform_or_copy(void *, void *);
@@ -73,7 +73,7 @@ extern char *SelectBestTargetInCone(void *, void *, int *, float, float, int, in
 extern int CollLine(void *, void *, int, void *, void *);
 extern void part_l00_spawn_hit_sparks(void *, int, int);
 extern int PlayMobySound(int, int, void *);
-extern void StartAttachedEffect(char *, int, int);
+extern int StartAttachedEffect(char *, int, int);
 extern char *guided_rocket_create(int, void *, int, int, int, int);
 extern float missile_steer_toward_target(char *, void *, void *);
 extern void part_steer_effect_direction(int, void *, int);

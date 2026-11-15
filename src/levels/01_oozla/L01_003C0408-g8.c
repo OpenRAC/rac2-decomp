@@ -17,7 +17,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void moby_set_animation_and_speed(void *, int, int, int);
 extern int moby_l01_turn_toward_target(void *, void *);
-extern void moby_step_at_own_position_factor(void *, float);
+extern int moby_step_at_own_position_factor(void *, float);
 
 /* 128-byte arena rows with a full 16-byte centre at +0x30. */
 typedef struct {

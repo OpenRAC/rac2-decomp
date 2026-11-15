@@ -9,10 +9,10 @@ typedef struct { f32 x, y, z, w; } BurstPoint;
 extern BurstPoint D_L16_001B1BB0[];
 extern s32 math_fast_float_d(char *);
 extern void moby_set_state(char *, s32, s32);
-extern s32 part_find_owned_effect_slot(char *, u32, s32);
+extern void *part_find_owned_effect_slot(char *, u32, s32);
 extern void func_PAL_L00_0032C328(char *, char *, char *, char *, s32, s32, s32, s32, s32, s32, s32);
 extern void vec_local_offset_to_world(char *, char *, f32, f32, f32);
-extern void func_PAL_L00_003FB330(char *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, f32, f32);
+extern char *func_PAL_L00_003FB330(char *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, f32, f32);
 extern void moby_mark_spawned(char *);
 
 /* Alternates its hit color, then emits the three configured destruction bursts. */

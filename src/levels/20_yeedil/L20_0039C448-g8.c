@@ -48,9 +48,9 @@ extern void anim_start_blended(char *, s32, s32, s32);
 extern void moby_transform_joint_to_world(char *, s32, char *);
 extern void moby_transform_joint_point(char *, s32, char *);
 extern void vec_scale_to_length(char *, char *, float);
-extern void projectile_l09_spawn(char *, char *, char *, s32, s32, float, float, float, float);
+extern char *projectile_l09_spawn(char *, char *, char *, s32, s32, float, float, float, float);
 extern void FastVecSub(char *, void *, char *);
-extern void part_spawn_blast_effect_moby(char *, char *, char *, float);
+extern char *part_spawn_blast_effect_moby(char *, char *, char *, float);
 extern void SetDeathBits(char *, s32, s32);
 extern void moby_mark_spawned(char *);
 

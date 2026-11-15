@@ -14,7 +14,7 @@ extern float fast_vec_dist(void *, void *);
 extern int g_current_map_index[] __attribute__((sda));
 extern char *D_L02_001B3200 __attribute__((sda));
 extern char D_L02_001B3210[] __attribute__((sda));
-extern void coll_get_ground_distance_below(void *, void *, void *);
+extern float coll_get_ground_distance_below(void *, void *, void *);
 extern void moby_update_ground_check(void *);
 extern int func_PAL_002B1A50(void *, void *, int);
 extern void chickenbot_alert_group(void *);
@@ -97,7 +97,7 @@ void func_PAL_L02_003D24B8(char *obj) {
     if (*(short *)(d + 0x338)) cam_compute_view_direction(obj + 0x10, d + 0x300, 0);
 }
 
-extern void FastDecTimer(void *);
+extern int FastDecTimer(void *);
 extern void moby_update_eased_node(void *, void *, int, float, float);
 extern void func_PAL_002B14F8(void *, void *, int, float, int);
 

@@ -5,7 +5,7 @@ typedef unsigned char u8;
 
 void func_PAL_0034A7F8(u8 *a0, s32 a1, s32 a2) { a0 += a1 * 4; *(s32 *)(a0 + 0x488) = a2; }
 
-extern int func_00288FB8_2(int a);
+extern char *func_00288FB8_2(int a);
 extern void func_L00_0042C360_1(char *a, int b);
 
 /* stores the count in a field, then loops count times calling one helper on each successive 72-byte slot and passing the result to a second helper. */

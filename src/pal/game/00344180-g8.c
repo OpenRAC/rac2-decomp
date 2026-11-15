@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 extern void object_set_value_float(void *, float);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern char D_001ADC10[], D_001ADC18[];
 extern char *D_001A8CFC[] __attribute__((sda));
@@ -13,7 +13,7 @@ extern char D_001ADC20[], D_001ADFC0[], D_001AE0C0[];
 extern int D_001AE138 __attribute__((sda));
 extern void object_init_derived_c(void *, void *, void *);
 extern void hud_set_widget_value_pair(void *, int, int);
-extern void memset(void *, int, int);
+extern void *memset(void *, int, int);
 extern void menu_set_selected_index(void *, int);
 extern void object_set_second_float4(void *, float, float, float, float);
 

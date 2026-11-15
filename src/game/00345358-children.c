@@ -4,16 +4,16 @@
    on the function's insn count. Retail's spill slots need the table of 93 buckets, which needs the
    string arguments unprecomputed (-fno-expensive-optimizations) and the row pointer walked. */
 typedef unsigned char u8;
-extern int object_get_fourth_field(u8 *);
+extern int *object_get_fourth_field(u8 *);
 extern void *ui_return_second_arg(int, int);
-extern int pool_alloc_cell(void *);
-extern void *hud_init_widget_defaults(void *, void *, void *);
+extern void *pool_alloc_cell(void *);
+extern void hud_init_widget_defaults(void *, void *, void *);
 extern void object_set_helper_result(char *, char *, int);
 extern void menu_set_field_44c(u8 *, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void hud_set_widget_field_b(void *, int);
 extern void object_set_second_float4(void *, float, float, float, float);
-extern void UpdateMenuChoiceListWidgets(void *, int);
+extern int UpdateMenuChoiceListWidgets(void *, int);
 extern char *D_001A8CFC[] __attribute__((sda));
 extern char ref_003486A8_00[];
 extern char ref_003486A8_01[];

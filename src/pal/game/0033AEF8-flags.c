@@ -10,7 +10,7 @@ void *func_PAL_0033B520(char *object) {
     return object;
 }
 
-extern void *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_PAL_0033CF78(void *, void *, void *, void *);
 extern void func_PAL_0033CFD0(void *, float);
 

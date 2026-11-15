@@ -2,9 +2,9 @@
 
 extern f32 FastAddRotations(f32, f32);
 extern s32 flag_set_first_pending(u8 *);
-extern void PlayMobySound(s32, s32, u8 *);
+extern int PlayMobySound(s32, s32, u8 *);
 /* Integer and FP argument banks retain their own order on EE. */
-extern void math_approach_target_with_direction_mode(f32 *, f32, u8 *, f32, f32, f32, s32);
+extern f32 math_approach_target_with_direction_mode(f32 *, f32, u8 *, f32, f32, f32, s32);
 extern void moby_set_state(u8 *, s32, s32);
 
 /* Turns the object back and forth between two angles, pausing at each end for a couple of seconds, with a turning sound. */

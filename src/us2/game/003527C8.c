@@ -3,9 +3,9 @@
 
 typedef unsigned char u8;
 extern char *g_movie_player_state[] __attribute__((sda));
-extern void mpeg_vibuf_reset(void *);
+extern int mpeg_vibuf_reset(void *);
 extern void mpeg_vobuf_reset(u8 *);
-extern void mpeg_dec_run_loop(void *);
+extern int mpeg_dec_run_loop(void *);
 extern char *g_movie_player_state[] __attribute__((sda));
 extern char *g_movie_player_state[] __attribute__((sda));
 extern char *g_movie_player_state[] __attribute__((sda));

@@ -16,7 +16,7 @@ extern void FadeToBlack(int);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
 extern void load_scene_chunk(int, int);
 extern int req_push_queue(void *, int);
-extern void req_launch_queued(void *);
+extern s32 req_launch_queued(void *);
 extern void game_set_slowdown_factor(void);
 extern int game_is_either_mode_two(void);
 extern void moby_mark_flag_and_append_to_list(int);
@@ -26,7 +26,7 @@ extern void level_capture_checkpoint_state(void *, void *);
 extern void hero_start_move_state_walk_or_run(int);
 extern void ref_US2_L01_0040153C_00(int, int);
 extern void script_queue_keyed_request(int, int);
-extern void MemcardSave(int, int);
+extern int MemcardSave(int, int);
 extern unsigned char D_0019B2E8[];
 extern char g_hero_position[];
 

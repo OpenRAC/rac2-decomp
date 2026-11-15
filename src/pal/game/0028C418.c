@@ -29,7 +29,7 @@ void func_PAL_0028C418(HudElem *a0) { a0->unk7C = 0xB4; a0->unk48 = 0; a0->unk4A
 extern float IntToFloat(int);
 extern int FloatToInt(float);
 extern float square_root(float);
-extern void func_PAL_0028E800(void *);
+extern int func_PAL_0028E800(void *);
 
 void func_PAL_0028C450(HudElem *p)
 {

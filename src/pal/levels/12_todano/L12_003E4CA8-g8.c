@@ -4,7 +4,7 @@
 extern u8 *D_L12_001B2E9C __attribute__((sda));
 extern u16 *D_L12_001FB960[];
 extern s32 D_L12_001B09F4 __attribute__((sda));
-extern s32 func_PAL_002A7E68(void *arg0, s32 arg1, s32 arg2, s32 arg3);
+extern void func_PAL_002A7E68(void *arg0, s32 arg1, s32 arg2, s32 arg3);
 extern void moby_set_state(void *arg0, s32 arg1, s32 arg2);
 extern void FastVecSub(f32 *buf, u8 *arg1, u8 *arg2);
 extern void vec_clamp_length(f32 *buf, f32 x);

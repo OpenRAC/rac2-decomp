@@ -11,7 +11,7 @@ extern void func_PAL_L12_00418BD8(u8 *);
 extern void moby_destroy_linked(u8 *);
 extern void guard_update_aim_point(u8 *);
 extern int func_PAL_002B1A50(u8 *, void *, int);
-extern void func_PAL_002B3F18(u8 *, void *, void *);
+extern int func_PAL_002B3F18(u8 *, void *, void *);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
 extern int math_random_int_below(int);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
@@ -37,7 +37,7 @@ extern u8 D_001A7A40 MACRO_ADDR;
 extern u32 D_001397DC, D_00138324;
 extern u8 D_L12_001C0000[];
 extern u8 *CreateMoby(int);
-extern u8 *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern s32 *D_L12_001FEAC0[];
 extern s32 point_in_path_xy(void *, void *, s32);
 extern void func_PAL_002A7E68(void *, s32, s32, s32);
@@ -128,10 +128,10 @@ void func_PAL_L12_00419120(u8 *o) {
 }
 
 
-extern int moby_transform_joint_to_world(u8 *,int,void *);
+extern void moby_transform_joint_to_world(u8 *,int,void *);
 extern void moby_update_eased_node(void *,void *,int,float,float);
 extern void moby_copy_color(u8 *,u8 *);
-extern void math_approach_target_with_direction_mode(void *,void *,int,float,float,float,float);
+extern f32 math_approach_target_with_direction_mode(void *,void *,int,float,float,float,float);
 extern void func_PAL_L12_00417F48(u8 *);
 extern void FastVecSub(void *,void *,void *);
 extern float vec_length_xy(void *);

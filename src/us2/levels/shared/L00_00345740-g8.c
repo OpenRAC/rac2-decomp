@@ -13,7 +13,8 @@ extern int ref_US2_L00_00345740_11[];
 extern unsigned char g_hero_state[];
 extern int level_is_mode_twenty_five(void), level_is_mode_in_set(void), level_run_mode_update_zero(void), level_is_special_global_value(void), level_is_special_mode_active(void), level_get_global_word(void), stub_l00_return_one(void);
 extern int ref_US2_L00_00345740_07(void);
-extern void func_US2_003492A8(char *, int), func_US2_003492B0(char *, int), menu_load_sprites_from_values(char *, int *), func_US2_00349368(char *, int, int), func_US2_00349378(char *, int, int *), func_US2_00349728(char *, int);
+extern void func_US2_003492A8(char *, int), func_US2_003492B0(char *, int), menu_load_sprites_from_values(char *, int *), func_US2_00349368(char *, int, int), func_US2_00349378(char *, int, int *);
+extern int func_US2_00349728(char *, int);
 void func_US2_L00_00345740(void)
 {
     if (!D_001A8CFC[0]) return;

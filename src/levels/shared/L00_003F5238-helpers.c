@@ -21,7 +21,7 @@ extern void vec_scale_to_length(void *,void *,float);
 extern int CollLine(char *,void *,int,char *,void *);
 extern void ApplyAreaHitOrEmitParticles(char *,char *);
 extern int level_has_pending_inner_flag(char *);
-extern void weapon_start_health_drain(char *,int,int);
+extern int weapon_start_health_drain(char *,int,int);
 /* Checks whether the bolt hit anything during its last step. If so it applies the hit effect
    and damage. Returns 1 when the bolt should stop. */
 int vaporizer_bolt_test_hit(char *object,char *source)

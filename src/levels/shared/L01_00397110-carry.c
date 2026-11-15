@@ -34,7 +34,7 @@ extern void moby_show_with_linked_parts(char *), level_apply_table_entry(char *)
 extern void moby_set_state(char *, int, int);
 extern char *CreateMoby(int);
 extern float FastAddRotations(float, float);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern void hero_start_target_state(void *, int, float);
 extern int coll_sweep_from_object(char *, void *, int, int, int, int, float, float, float);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);

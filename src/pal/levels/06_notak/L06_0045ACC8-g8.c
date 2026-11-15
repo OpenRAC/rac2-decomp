@@ -17,7 +17,7 @@ extern void snd_stop_voice(int);
 extern void func_PAL_L04_003A47C0(void *), func_PAL_L04_003A49E0(void *), water_advance_controller_state(void *), water_update_ripple_patches(void *);
 extern void water_add_splash_entry(char *, float);
 extern float math_fabs(float);
-extern void math_step_value_toward_target(char *, char *, float, float, float, float);
+extern float math_step_value_toward_target(char *, char *, float, float, float, float);
 extern int IsPointInCuboid(char *, int);
 typedef struct {
     int kind, count; char *items, *models, *data; int *states; char *aux, *more;

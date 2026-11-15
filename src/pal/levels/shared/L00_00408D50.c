@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern void func_002E6EF8(void (*f)(char *), char *arg);
-extern void func_PAL_L00_0041D8A8(void *pos, int a, int b, int c, int d, int e, int f, int g, int h,
+extern char *func_PAL_L00_0041D8A8(void *pos, int a, int b, int c, int d, int e, int f, int g, int h,
                               int k, float scale);
 extern float math_random_float_range(float lo, float hi);
 extern float math_random_angle(void);
@@ -12,7 +12,7 @@ extern void vec_build_spherical_offset(void *out, float x, float y, float z);
 extern void FastVecSub(void *out, void *a, void *b);
 extern void FastVecAdd(void *out, void *a, void *b);
 extern void vec_scale_to_length(void *out, void *a, float scale);
-extern void func_PAL_L00_00340CA0(void *pos, void *velocity, float speed, float size,
+extern void *func_PAL_L00_00340CA0(void *pos, void *velocity, float speed, float size,
                               unsigned int colour, unsigned int colour2, int life, int a, int b,
                               int c, int d);
 extern char g_camera_l00_position[];
@@ -55,13 +55,14 @@ extern void part_steer_effect_direction(int,int *,int),table_clear_entry_flag(in
 extern void ref_L00_004045E8_00(void (*)(char *),char *);
 extern void shop_trigger_current_state_effect(void *,void *),vec_add_object_direction_scaled(void *,void *,float);
 extern void shot_handle_impact(void *,void *),func_PAL_L00_004098C0(void *,void *,void *),shot_draw_glow_sparks(char *);
-extern void func_PAL_L00_0041A788(void *,float,int,int,int,int,int,int,int,int,int);
+extern char *func_PAL_L00_0041A788(void *,float,int,int,int,int,int,int,int,int,int);
 extern int coll_process_hit(void *,int,void *,int,float);
 extern char *g_area_hit_targets[];
 extern char g_item_slot_to_record[],g_weapon_l00_table[],D_L00_001C6F40[];
 extern void FastVecSub(void *,void *,void *),vec_scale_to_length(void *,void *,float);
 extern void make_hit_descriptor(void *,void *,float,int,void *),QueueMobyImpact(void *,void *);
-extern void func_PAL_0032F0B8(void *,int,int),gfx_free_point_light(int);
+extern void gfx_free_point_light(int);
+extern int func_PAL_0032F0B8(void *,int,int);
 extern int part_l00_alloc_effect_slot_2(void *,float,float,float,float,float);
 
 /* Moves a projectile, applies its explosion hit to nearby objects, and updates

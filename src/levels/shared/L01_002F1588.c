@@ -10,7 +10,7 @@ extern float D_L01_001A90C4[] SDATA(D_L01_001A90C4);
 extern float D_L01_001B2DC4[] __attribute__((sda));
 extern unsigned char D_L01_001BD9C0[];
 extern void UpdateViewContext(void);
-extern int table_find_by_id(void *, int);
+extern void *table_find_by_id(void *, int);
 extern void gfx_draw_scaled_object_two_axes(void *, int, float, float, float, float, float);
 extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
 extern float IntToFloat(int);

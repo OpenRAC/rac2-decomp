@@ -67,11 +67,11 @@ extern CollisionResult g_collision_result;
 extern WeaponEntry D_00262570[];
 extern u8 D_0029FCC8[];
 
-extern void hero_l00_set_action(int, int);
+extern s32 hero_l00_set_action(int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecScale(void *, void *, float);
-extern void vec_fast_helper_b(void *);
+extern int vec_fast_helper_b(void *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern int get_ammo(int);
 extern void hud_add_moby_marker(void *, float, unsigned int, void *, int, float, int, float, int);

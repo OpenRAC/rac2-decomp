@@ -2,14 +2,14 @@
 
 extern void vec_random_direction(void *, float, float);
 extern int math_random_int_below(int);
-extern void part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
+extern void *part_spawn_hero_relative(void *, void *, int, unsigned char, unsigned char, int, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float IntToFloat(int);
 extern float math_fabs(float);
 extern int FastTweenColor(int, int, float);
-extern void part_spawn_fading(void *, int, int, int, int, int, int, float);
+extern unsigned char *part_spawn_fading(void *, int, int, int, int, int, int, float);
 typedef unsigned int Quadword __attribute__((mode(TI)));
 typedef union { Quadword whole; float f[4]; } Vector;
 extern Vector D_L01_001B94C0;

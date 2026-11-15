@@ -48,7 +48,7 @@ extern u8 D_001A7A00[] __attribute__((sda));
 extern u8 D_001A7B08[] __attribute__((sda));
 extern void synthenoid_spawn_or_kilonoid(Vector *, int);
 extern int weapon_spend_ammo(int, int);
-extern void func_PAL_L00_003C77F0(int);
+extern unsigned char *func_PAL_L00_003C77F0(int);
 extern int PadPressedWithin(u32, int, int *);
 extern int hero_is_action_allowed(void);
 extern int hero_is_in_special_kind_or_mode(void);

@@ -7,7 +7,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern void gorn_path_mover_init(char *);
 /* ---- shared declarations ---- */
 
-extern int moby_get_motion_data(unsigned char *owner);
+extern char *moby_get_motion_data(unsigned char *owner);
 /* Sets the level's four effect blocks up: the screen context first, then, when
    the level's own record says the object is idle, the four blocks of the
    effect data, each with its own size and colour. */

@@ -7,7 +7,7 @@
 
 typedef int TI128 __attribute__((mode(TI)));
 
-extern void *moby_transform_joint_to_world(char *, int, void *);
+extern void moby_transform_joint_to_world(char *, int, void *);
 
 extern void moby_transform_joint_point(char *, int, void *);
 

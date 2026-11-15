@@ -74,7 +74,7 @@ extern HeroItemDefinition g_weapon_l00_table[];
 extern void func_PAL_00295298(int);
 extern HeroItemMoby *CreateMoby(int);
 extern void mem_clear(void *, int, int);
-extern void tether_create_holder(int);
+extern char *tether_create_holder(int);
 #define ITEM_DEF(id) (&D_L00_00262570[D_00139568[id]])
 #define HERO_ITEMS (&D_00189E20_items)
 extern int D_L00_001B18D8[] __attribute__((sda));

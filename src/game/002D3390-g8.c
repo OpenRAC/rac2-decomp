@@ -29,10 +29,10 @@ extern int D_001ABA9C;
 extern float D_001B23A8;
 extern void SetupGifPaging(long);
 extern void DoGifPaging(void);
-extern int table_find_by_id(int, int);
+extern void *table_find_by_id(int, int);
 extern void gfx_draw_scaled_object(char *, int, float, float, float, float);
 extern char *GetLocalizedString(int);
-extern void text_draw_centered_small(long long, long long, long long, char *, long long);
+extern int text_draw_centered_small(long long, long long, long long, char *, long long);
 extern void text_draw_right_aligned_small(long long, long long, long long, char *, long long);
 
 /* Draws a small pop-up menu box with three layered title images and two lines of text with button hints. */

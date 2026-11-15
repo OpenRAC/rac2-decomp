@@ -3,7 +3,7 @@
 extern void F5a19df7a_FUN_002FC560(unsigned int a, unsigned long b);
 extern void F5a19df7a_FUN_0031E2A0(char *p);
 extern void F5a19df7a_FUN_0031E560(char *p);
-extern char *F5a19df7a_FUN_002A7820(int a, int b);
+extern int F5a19df7a_FUN_002A7820(int a, int b);
 extern float F5a19df7a_FUN_002A7940(void);
 extern void F5a19df7a_FUN_0031EB00(char *a, int b, float e, char *c, float f, int d, int g);
 

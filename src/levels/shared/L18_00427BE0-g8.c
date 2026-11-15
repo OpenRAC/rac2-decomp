@@ -32,9 +32,9 @@ extern f32 D_L18_001B1C40 __attribute__((sda));
 
 extern s32 math_random_int_range(s32, s32);
 
-extern void FastDecTimer(void *);
+extern int FastDecTimer(void *);
 
-extern void math_fast_float_d(s32);
+extern int math_fast_float_d(s32);
 
 extern void value_set_and_smooth(void *, void *, s32, s32, f32);
 

@@ -3,14 +3,14 @@
 
 typedef int s32_F09f721e0;
 typedef float f32_F09f721e0;
-extern s32_F09f721e0 pool_alloc_cell (s32_F09f721e0, s32_F09f721e0);
-extern s32_F09f721e0 ui_return_second_arg (s32_F09f721e0, s32_F09f721e0);
+extern void *pool_alloc_cell (s32_F09f721e0, s32_F09f721e0);
+extern void *ui_return_second_arg (s32_F09f721e0, s32_F09f721e0);
 extern void func_PAL_0033CB00 (s32_F09f721e0, s32_F09f721e0, const void *);
-extern s32_F09f721e0 GetLocalizedString (s32_F09f721e0);
+extern char *GetLocalizedString (s32_F09f721e0);
 extern void func_PAL_0033CF78 (s32_F09f721e0, s32_F09f721e0, s32_F09f721e0, s32_F09f721e0);
 extern void func_PAL_0033CF58 (s32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0, f32_F09f721e0);
 extern void func_PAL_0033CFD0 (s32_F09f721e0, f32_F09f721e0);
-extern void func_PAL_0033DDC0 (s32_F09f721e0, s32_F09f721e0);
+extern int func_PAL_0033DDC0 (s32_F09f721e0, s32_F09f721e0);
 extern s32_F09f721e0 D_L04_001AE040 __attribute__ ((sda));
 
 void func_PAL_0033DC98 (s32_F09f721e0 self, s32_F09f721e0 arg)

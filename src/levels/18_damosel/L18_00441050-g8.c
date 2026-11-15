@@ -1,6 +1,6 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern int moby_set_state(void *, int, int);
+extern void moby_set_state(void *, int, int);
 extern void *part_find_owned_effect_slot(void *, int, int);
 extern float math_random_float_range(float, float);
 extern void FastVecScale(void *, void *, float);

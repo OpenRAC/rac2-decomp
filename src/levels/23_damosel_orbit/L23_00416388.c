@@ -13,9 +13,9 @@ typedef unsigned long long u64;
 
 /* func_L23_004177F8 is matched in L23_004177F8-g8.c. */
 
-extern void math_fast_float_d(char *);
+extern int math_fast_float_d(char *);
 
-extern void FastDecTimer(char *);
+extern int FastDecTimer(char *);
 
 /* Refreshes two measured state pairs and advances the two counters under their limits. */
 void mothership_tick_timers(char *moby) {

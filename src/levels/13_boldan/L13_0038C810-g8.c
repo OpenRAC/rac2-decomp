@@ -6,11 +6,11 @@ typedef union { TI128 q; float f[4]; } V4_F38c810;
 extern float D_L13_001A8F20;
 
 extern void moby_set_state(char *, s32, s32);
-extern s32 part_find_owned_effect_slot(char *, s32, s32);
-extern void part_spawn_object_following_effect(void *, char *, s32, s32, float, float, s32, s32, s32, s32);
-extern void PlayMobySound(s32, s32, char *);
+extern void *part_find_owned_effect_slot(char *, s32, s32);
+extern void *part_spawn_object_following_effect(void *, char *, s32, s32, float, float, s32, s32, s32, s32);
+extern int PlayMobySound(s32, s32, char *);
 extern void part_spawn_scaled_bolts(char *, s32, float);
-extern void SpawnExplosion(void *, s32, s32, s32, float, float, s32, s32, s32, s32, s32, s32, s32, s32);
+extern char *SpawnExplosion(void *, s32, s32, s32, float, float, s32, s32, s32, s32, s32, s32, s32, s32);
 extern float FastAddRotations(float, float);
 extern void euler_rotation_basis(void *, void *);
 extern void part_spawn_masked_debris(char *, s32, float *, float, float, float, float, s32);

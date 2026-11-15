@@ -58,13 +58,13 @@ void moby_restart_anim_when_ready(u8 *object) {
 
 extern void moby_set_state(char *, s32, s32);
 
-extern s32 part_find_owned_effect_slot(char *, s32, s32);
+extern void *part_find_owned_effect_slot(char *, s32, s32);
 
 extern void part_spawn_random_bursts_outside_box(char *);
 
 extern void EmitParticlesOutsideCentralBox(char *);
 
-extern void PlayMobySound(s32, s32, char *);
+extern int PlayMobySound(s32, s32, char *);
 
 extern void moby_mark_spawned(char *);
 

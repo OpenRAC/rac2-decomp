@@ -52,7 +52,7 @@ extern int rps_judge_round(void *);
 extern int func_PAL_L13_00410C98(void *);
 extern void guard_alt_update_hit_timer(void *);
 extern u8 *func_PAL_L12_0040CBA0(void *, void *, void *, int, float);
-extern void func_PAL_002B5E10(void *);
+extern int func_PAL_002B5E10(void *);
 extern int flag_set_second_pending(void *);
 extern void moby_mark_spawned(void *);
 extern int func_PAL_L13_0040DF68(char *, char *);

@@ -7,12 +7,14 @@
 typedef int BC540Quad __attribute__((mode(TI)));
 
 extern float math_random_float_range(float, float), math_random_angle(void), FastAddRotations(float, float);
-extern void moby_l00_spawn_child(void *, int, int), moby_mark_spawned(void *);
+extern void moby_mark_spawned(void *);
+extern char *moby_l00_spawn_child(void *, int, int);
 extern void vec_scale_to_length(void *, void *, float), FastVecAdd(void *, void *, void *);
-extern void breakable_spawn_copy(void *, void *);
+extern void *breakable_spawn_copy(void *, void *);
 extern int PlayMobySound(int, int, void *);
 extern char *part_find_owned_effect_slot(void *, int, int);
-extern void moby_transform_joint_to_world(void *, int, void *), func_PAL_002A7650(void *, int, int);
+extern void func_PAL_002A7650(void *, int, int);
+extern void moby_transform_joint_to_world(void *, int, void *);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern char *func_PAL_L01_003C05E8(char *, int, void *, void *, int, int, void *, void *, void *, float);
 

@@ -10,9 +10,9 @@ extern u8 D_001A7A60[] __attribute__((sda));
 extern s32 D_001A903C[] __attribute__((sda));
 extern s32 D_0018CC18;
 extern s32 IsPointInCuboid(void *a0, s32 a1);
-extern void snd_play_from_global_bank(s32 a0, s32 a1, s32 a2);
+extern int snd_play_from_global_bank(s32 a0, s32 a1, s32 a2);
 extern void func_US2_002B1880(s32 a0, s32 a1);
-extern void func_US2_00289840(s32 a0, s32 a1);
+extern int func_US2_00289840(s32 a0, s32 a1);
 
 void func_US2_L13_003E9D48(u8 *self)
 {

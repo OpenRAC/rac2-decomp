@@ -7,7 +7,8 @@ extern int D_L18_001B124C __attribute__((sda)), D_L18_001B1250 __attribute__((sd
 extern u32 D_00138320[];
 extern char D_L18_001B1360[];
 extern float vec_distance_xy(void *, void *), mat_fast_helper_a(float, float);
-extern void moby_step_at_own_position(void *), moby_step_at_own_position_factor(void *, float);
+extern int moby_step_at_own_position_factor(void *, float);
+extern int moby_step_at_own_position(void *);
 extern int moby_l01_turn_toward_target(void *, void *), enemy_aim_at_target(void *);
 extern int FastDecTimer(short *), vec_fast_helper_a(u8 *);
 extern void SetDeathBits(void *, int, int), moby_set_state(void *, int, int);

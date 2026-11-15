@@ -14,7 +14,7 @@ extern void vec_clear_128(void *);
 extern float math_random_float_range(float, float);
 extern s32 math_random_int_below(s32);
 extern s32 math_random_int_range(s32, s32);
-extern void enemy_spawn_record(void *, void *, void *, s32, s32);
+extern void *enemy_spawn_record(void *, void *, void *, s32, s32);
 extern s32 D_L11_001B1950 __attribute__((sda));
 extern s32 D_L11_001B1954 __attribute__((sda));
 extern s32 D_L11_001B1958 __attribute__((sda));

@@ -16,7 +16,7 @@ extern float math_fabs(float);
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
 extern int beam_get_glow_color(void);
-extern void part_spawn_ground_effect(void *, float, float, s32, s32, s32, s32, void *, float, s32);
+extern void *part_spawn_ground_effect(void *, float, float, s32, s32, s32, s32, void *, float, s32);
 
 /* Sprays a burst of small coloured spark particles from just in front of the object. */
 void SpawnEffectBurst(u8 *moby, int count)

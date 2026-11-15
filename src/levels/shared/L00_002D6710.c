@@ -25,12 +25,12 @@ s32 level_is_mode_in_set(void) {
 
 /* calls the measured integer callee with zero */
 /* Runs the mode update with 0. */
-void level_run_mode_update_zero(void) {
- level_is_tracked_object_of_selected_class(0);
+s32 level_run_mode_update_zero(void) {
+ return level_is_tracked_object_of_selected_class(0);
 }
 
 /* calls the measured integer callee with three */
 /* Runs the mode update with 3. */
-void level_run_mode_update_three(void) {
- level_is_tracked_object_of_selected_class(3);
+s32 level_run_mode_update_three(void) {
+ return level_is_tracked_object_of_selected_class(3);
 }

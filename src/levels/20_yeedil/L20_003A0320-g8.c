@@ -8,7 +8,7 @@ extern float D_L20_001B2ACC __attribute__((sda));
 extern char D_L20_001A8F20[];
 extern char D_L20_001A8F20_1[];
 
-extern int part_find_owned_effect_slot(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 
 extern void func_0032F5B0(char *, int, int);
 
@@ -21,7 +21,7 @@ extern void part_spawn_masked_debris(char *, int, float *, float, float, float, 
 
 extern void part_spawn_scaled_bolts(char *, int, f32);
 
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 
 extern int flag_set_first_pending(char *);
 

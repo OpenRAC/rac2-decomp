@@ -16,7 +16,7 @@ extern char D_001B0020[];
 
 extern int func_PAL_00326010(char *);
 extern void moby_mark_spawned(void *);
-extern void func_PAL_002B5E30(char *object, float factor);
+extern int func_PAL_002B5E30(char *object, float factor);
 extern int flag_set_second_pending(char *);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern int math_fast_float_d(void *);
@@ -35,7 +35,7 @@ extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, fl
 extern void vec_scale_to_length(void *, void *, float);
 extern void func_PAL_002B15D8(char *, int, float *, float, float, float, float, unsigned char);
 extern void func_PAL_002A7650(char *, int, int);
-extern void coll_sweep_from_object(char *, char *, int, int, int, int, float, float, float);
+extern int coll_sweep_from_object(char *, char *, int, int, int, int, float, float, float);
 extern void func_PAL_002AD288(char *, char *, float, float, int);
 extern int func_PAL_002B5E10(char *);
 extern float ApproachValue(void *, float, float);

@@ -3,7 +3,7 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 extern unsigned char *CreateMoby(int);
-extern int set_moby_color(void *, int, int, int);
+extern void set_moby_color(void *, int, int, int);
 extern float math_random_float_range(float, float);
 extern void func_002A0F48(void *);
 

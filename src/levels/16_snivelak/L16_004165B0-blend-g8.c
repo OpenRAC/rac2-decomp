@@ -8,18 +8,18 @@ extern f32 D_L16_001B1C40_gp[] SDATA(D_L16_001B1C40);
 extern f32 D_L16_001B1C50_gp[] SDATA(D_L16_001B1C50);
 extern f32 D_L16_001B1C5C __attribute__((sda));
 extern char D_L16_001B9B00[];
-extern void math_step_value_toward_target(char *, char *, f32, f32, f32, f32);
+extern float math_step_value_toward_target(char *, char *, f32, f32, f32, f32);
 extern void FastVecSub(char *, char *, char *);
 extern void FastVecScale(char *, char *, f32);
 extern void FastVecAdd(char *, char *, char *);
 extern void EmitSnivelakFallingParticles(char *);
-extern s32 part_find_owned_effect_slot(char *, u32, s32);
-extern void SpawnExplosion(char *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, f32, f32);
+extern void *part_find_owned_effect_slot(char *, u32, s32);
+extern char *SpawnExplosion(char *, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, f32, f32);
 extern void moby_mark_spawned(char *);
 extern s32 coll_test_point(char *, s32, char *, f32);
 extern void moby_set_state(char *, s32, s32);
 extern void vec_scale_to_length(char *, char *, f32);
-extern void part_spawn_blast_effect_moby(char *, char *, char *, f32);
+extern char *part_spawn_blast_effect_moby(char *, char *, char *, f32);
 extern s32 coll_sweep_from_object(char *, char *, f32, u32, s32, s32, s32, f32, f32);
 
 /* Blends three motion segments and finishes with the object's destruction effect. */

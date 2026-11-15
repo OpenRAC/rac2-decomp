@@ -4,7 +4,7 @@
 
 typedef struct { float x, y, z, w; } MmiPoint;
 typedef float TrailVector[4] __attribute__((aligned(16)));
-extern s32 moby_get_private_value_4(u8 *);
+extern char *moby_get_private_value_4(u8 *);
 extern int coll_scatter_points_in_shapes(float, char *, int, MmiPoint *, int);
 extern float math_random_angle(void);
 extern float math_random_float_range(float, float);

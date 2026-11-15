@@ -37,10 +37,10 @@ extern int func_PAL_002AF6C0(char *, float);
 extern void moby_transform_joint_to_world(char *, int, void *);
 extern void *D_L06_001B3760[6];
 extern void func_PAL_L06_00423B78(float *, int);
-extern void func_PAL_L06_0045DF30(char *, float *, float *, int, float);
+extern char *func_PAL_L06_0045DF30(char *, float *, float *, int, float);
 extern void lerp_vector(void *, void *, void *, float);
 extern float fast_vec_dist(void *, void *);
-extern void coll_sweep_from_object(char *, void *, int, int, int, int, float, float, float);
+extern int coll_sweep_from_object(char *, void *, int, int, int, int, float, float, float);
 extern void func_PAL_L06_004238A0(char *);
 
 /* Updates the actor's alert mode, movement and attack animation states. */

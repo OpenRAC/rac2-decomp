@@ -16,13 +16,15 @@ extern int FloatToInt(float),math_random_int_range(int,int);
 extern void moby_set_state(void *,int,int),func_PAL_L08_003D0280(void *);
 extern void *part_find_owned_effect_slot(void *,int,int);
 extern float func_PAL_002AA108(void *,void *);
-extern void func_PAL_002AC290(void *,void *),func_PAL_002AC3C0(void *,void *),moby_transform_joint_to_world(void *,int,void *),anim_start_immediate(void *,int,int);
+extern void func_PAL_002AC290(void *,void *), func_PAL_002AC3C0(void *,void *), anim_start_immediate(void *,int,int);
+extern void moby_transform_joint_to_world(void *,int,void *);
 extern void func_PAL_002AC718(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 extern void part_spawn_effect_burst(void *,int,int,int,int,int,int,void *);
 extern int PlayMobySound(int,int,void *);
 extern void *CreateMoby(int);
 extern void func_002A0F48(void *),hero_copy_field_to_moby(void *),vec_build_spherical_offset(void *,float,float,float);
-extern void FastVecAdd(void *,void *,void *),func_PAL_L08_00414850(void *,void *,void *,float,float);
+extern void FastVecAdd(void *,void *,void *);
+extern s32 func_PAL_L08_00414850(void *,void *,void *,float,float);
 
 /* Applies damage, updates hit effects, and spawns debris when health reaches zero. */
 void func_PAL_L08_003D6F88(char *o) {

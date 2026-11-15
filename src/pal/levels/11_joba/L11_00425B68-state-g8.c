@@ -90,7 +90,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int moby_move_over_ground(void *, void *, void *, float, float, float, float, int);
-extern int moby_find_linked_object(unsigned char *);
+extern u8 *moby_find_linked_object(unsigned char *);
 extern int func_PAL_L01_00323068(char *, char *);
 extern float moby_turn_toward_position(struct family_27f9_object *, float *, float *, float, float, float);
 extern float MobySpringTurn(struct family_27f9_object *, float *, float, float, float, float);

@@ -26,11 +26,11 @@ extern void F6402b823_FUN_00345178(char *a);
 
 extern void F6402b823_FUN_00344938(char *a);
 
-extern void F449e2f67_FUN_003361A8(char *p);
+extern void *F449e2f67_FUN_003361A8(char *p);
 
-extern void F449e2f67_FUN_00336968(char *p);
+extern char *F449e2f67_FUN_00336968(char *p);
 
-extern void F449e2f67_FUN_003366D0(char *p);
+extern void *F449e2f67_FUN_003366D0(char *p);
 
 extern void Fd1c2476b_FUN_00336320(char *p);
 
@@ -42,17 +42,17 @@ extern void Fd1c2476b_FUN_003463C8(char *p);
 
 extern void Fd1c2476b_FUN_003464D0(char *p);
 
-extern void F5a9e4f98_FUN_003361A8(char *p);
+extern void *F5a9e4f98_FUN_003361A8(char *p);
 
-extern void F5a9e4f98_FUN_003363D0(char *p);
+extern void *F5a9e4f98_FUN_003363D0(char *p);
 
-extern void F5a9e4f98_FUN_00336968(char *p);
+extern char *F5a9e4f98_FUN_00336968(char *p);
 
-extern void F5a9e4f98_FUN_003366D0(char *p);
+extern void *F5a9e4f98_FUN_003366D0(char *p);
 
 extern unsigned long long menu_pass_through_handle(unsigned long long);
 
-extern unsigned long long hud_construct_widget_base(unsigned long long);
+extern char *hud_construct_widget_base(unsigned long long);
 
 typedef int s32;
 
@@ -64,15 +64,15 @@ extern void menu_set_entry_table(unsigned char *owner, float *records);
 
 extern int menu_get_selected_index(unsigned char *);
 
-extern void Faac80289_FUN_003361A8(char *p);
+extern void *Faac80289_FUN_003361A8(char *p);
 
-extern void Faac80289_FUN_00336968(char *p);
+extern char *Faac80289_FUN_00336968(char *p);
 
 extern char *D_L00_001A904C_3 __attribute__((sda));
 
 extern void object_set_helper_result(char *dst, char *src, int value);
 
-extern int func_00288FB8_2(int a);
+extern char *func_00288FB8_2(int a);
 
 extern void func_L00_0042C360_1(char *a, int b);
 
@@ -128,7 +128,7 @@ extern unsigned char D_0018C0D4[];
 extern void func_00349630_2(char *, int);
 
 /* func_0034CA68: owner ABI/declaration review retained. */
-extern int object_get_fourth_field(unsigned char *field);
+extern int *object_get_fourth_field(unsigned char *field);
 
 extern void F72a1dff5_FUN_00349AB8(char *p, int a);
 
@@ -301,9 +301,9 @@ unsigned long long menu_pass_through_handle(unsigned long long handle)
     return handle;
 }
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern void *ui_return_second_arg(int, int);
-extern void *hud_init_widget_defaults(void *, void *, void *);
+extern void hud_init_widget_defaults(void *, void *, void *);
 extern char D_001AE5A8[];
 
 /* Resets a list menu to its start state and attaches its item data. */
@@ -641,8 +641,8 @@ void fade_start_backward(u8 *fade,s32 startEmpty) {
 /* Sets the current amount of a fade. */
 void fade_set_amount(u8 *fade, f32 amount) { *(f32 *)(fade + 0x18) = amount; }
 
-extern void object_construct_derived_a(char *);
-extern void object_construct_derived_b(char *);
+extern void *object_construct_derived_a(char *);
+extern void *object_construct_derived_b(char *);
 extern char *object_init_type_pointer(char *);
 extern char D_001AD908[] __attribute__((sda));
 extern char D_001AD928[] __attribute__((sda));

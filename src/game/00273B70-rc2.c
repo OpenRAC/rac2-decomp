@@ -26,7 +26,7 @@
 
 extern s8 D_0026C550[];
 extern s8 coll_convert_packed_points_to_vectors(void *, s8 *, s32);
-extern void moby_get_joint_matrix(void *, s8 *, s8 *, s16);
+extern int moby_get_joint_matrix(void *, s8 *, s8 *, s16);
 extern s32 target_seeker_update(void *);
 extern s32 cam_moby_update_colliding(void *);
 extern s32 stub_return_one_a(void *);

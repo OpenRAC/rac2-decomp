@@ -10,7 +10,7 @@ extern int menu_stream_chunk_get_size(int key);
 extern void mem_clear(void *data, unsigned int tag, int size);
 
 /* Takes the next free stream chunk of the wanted kind, marks it used and returns its key. Returns 0 if none is free. */
-int menu_stream_chunk_claim_free(int mode)
+char *menu_stream_chunk_claim_free(int mode)
 {
     int i;
     int size;

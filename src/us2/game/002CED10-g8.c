@@ -22,7 +22,7 @@ extern int D_001B23A0;
 extern char D_001AB9C0[], D_001AB9C8[], D_001AB9D8[];
 extern int math_ping_pong_blend_values(int, int, int, int, int);
 extern void SetupGifPaging(long), DoGifPaging(void);
-extern char *table_find_by_id(char *, int);
+extern void *table_find_by_id(char *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
 extern char *GetLocalizedString(int);
 extern void text_draw_medium(int, int, u64, char *, int);

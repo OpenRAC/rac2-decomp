@@ -19,7 +19,7 @@ extern void hero_clear_tracked_slots(void);
 extern void attachment_reset_all(void);
 extern void hero_clear_queued_anim(void);
 extern void func_002A677C(int a0);
-extern void func_PAL_L01_002BEC60(int a0, int a1);
+extern s32 func_PAL_L01_002BEC60(int a0, int a1);
 extern void func_PAL_L01_002B3C40(void);
 extern char g_hero_state[];
 

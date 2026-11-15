@@ -37,7 +37,7 @@ extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern u8 *part_spawn_fading_drift(void *, void *, int, int, int, int, int, float, float, float, int);
 extern u8 *part_spawn_size_changing(void *, void *, int, int, int, int, int, float, float, float, int);
-extern u8 *func_PAL_002BE880(void *, void *, int, int, float, int);
+extern void func_PAL_002BE880(void *, void *, int, int, float, int);
 extern float math_random_angle(void);
 extern float math_random_float_range(float, float);
 extern int math_random_int_range(int, int);

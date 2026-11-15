@@ -7,7 +7,7 @@ extern u8 D_001A63A8_4[];
 extern u8 g_hero_state[];
 extern f32 fast_vec_dist(void *a0, void *a1);
 extern f32 math_random_float_range(f32 low, f32 high);
-extern void SpawnExplosion(void *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
+extern char *SpawnExplosion(void *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
                           int a8, int a9, int a10, int a11, f32 f12, f32 f13);
 
 void func_PAL_L22_00413048(u8 *a0) {

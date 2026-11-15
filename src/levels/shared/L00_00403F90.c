@@ -32,7 +32,7 @@ extern int CollLine(void *, void *, int, void *, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, float, int, void *);
 extern void QueueMobyImpact(void *, void *);
-extern void StartAttachedEffect(void *, int, int);
+extern int StartAttachedEffect(void *, int, int);
 extern void sheep_shot_spawn_hit_sparks(void *, int, int);
 extern int snd_play_from_class_bank(int, int, void *, int);
 

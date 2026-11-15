@@ -15,7 +15,7 @@ extern char D_L22_001B1920[];
 
 extern void hero_clear_queued_anim(void);
 
-extern void hero_l22_set_action(int mode, int flag);
+extern int hero_l22_set_action(int mode, int flag);
 
 extern void trail_reset_slots(void);
 
@@ -26,7 +26,7 @@ extern int hero_slot_item_id(int index);
 
 
 extern void hero_build_relative_point(void *, int, float, float, float);
-extern void ApproachValue(float *, float, float);
+extern float ApproachValue(float *, float, float);
 extern int D_00138320;
 extern int PadPressedWithin(int, int, int);
 extern int player_slot_has_object(void *);
@@ -34,7 +34,7 @@ extern void release_moby_animation_slot(void *, void *);
 extern void *allocate_moby_animation_slot(void *, int);
 extern void initialize_moby_animation_blend(void *, void *, int, int, int, int);
 extern void AdvanceAndDecodeAnimationFrames(void *, void *);
-extern void math_fast_float_d(void *);
+extern int math_fast_float_d(void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void vec_add_transformed_point(void *, void *, float, float, float);
 /* the two calls whose targets differ between levels 22 and 23 */
@@ -179,9 +179,9 @@ extern void hero_clear_tracked_slots(void);
 
 extern void attachment_reset_all(void);
 
-extern void hud_set_slot_contents(int a0, int a1, void *a2, void *a3, void *a4, int a5, int a6);
+extern int hud_set_slot_contents(int a0, int a1, void *a2, void *a3, void *a4, int a5, int a6);
 
-extern void level_run_slot_callback(int a0);
+extern int level_run_slot_callback(int a0);
 
 extern void hero_l22_update_speed_targets(void);
 
@@ -263,8 +263,8 @@ void hero_restart_in_mode(int mode, int entryId, void *mobyArg) {
 
 
 extern float vec_distance_xy(void *, void *);
-extern void ApproachValue(float *, float, float);
-extern void math_spring_float_to_goal(float *, float *, float, float, float, float);
+extern float ApproachValue(float *, float, float);
+extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 
 /* Sets the hero's movement speed targets for the current mode and eases the current speeds toward them. */
 void hero_l22_update_speed_targets(void) {
@@ -328,7 +328,7 @@ void hero_l22_update_speed_targets(void) {
 
 extern unsigned char D_0018C0D4;
 
-extern void hero_l22_set_action(int a0, int a1);
+extern int hero_l22_set_action(int a0, int a1);
 
 /* plays one of three resident messages, picked by the type byte; the second argument
    is 1 or 2 depending on the caller's flag */

@@ -3,7 +3,7 @@
 
 extern int moby_class_id_to_table_index(int);
 extern float D_L05_001AFB68 __attribute__((sda));
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
 extern void func_L05_003CFB90(char *, char *);
 extern float fast_vec_dist(void *, void *);
 typedef struct {

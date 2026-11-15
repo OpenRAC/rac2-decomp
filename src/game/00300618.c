@@ -114,7 +114,7 @@ extern void F6eb4f363_FUN_00282D30(char *local, int value, float scale);
 
 extern float F6eb4f363_FUN_002A7878(float low, float high);
 
-extern void F6eb4f363_FUN_002BF728(char *object, char *local, float amount, float base);
+extern void *F6eb4f363_FUN_002BF728(char *object, char *local, float amount, float base);
 
 extern float F9e2cd219_FUN_002A7798(float value);
 

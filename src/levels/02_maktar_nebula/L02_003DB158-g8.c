@@ -14,7 +14,7 @@ extern f32 D_L02_001B0474 __attribute__((sda));
 extern f32 D_L02_001B0478 __attribute__((sda));
 extern s32 D_L02_001B0480 __attribute__((sda));
 
-extern void *moby_transform_joint_to_world(char *, int, void *);
+extern void moby_transform_joint_to_world(char *, int, void *);
 extern void moby_transform_joint_point(char *, int, void *);
 extern void transform_vector(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);

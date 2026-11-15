@@ -38,7 +38,7 @@ extern void DrawFramebufferRect(int,int,int,int,int,int,unsigned int);
 extern int GetIconFrame(int,int);
 extern unsigned int ui_get_item_color(int);
 extern void hud_draw_sprite_gradient(int,int,int,int,int,unsigned int *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int text_measure_width_small_scaled(char *,int,float);
 static __inline__ int screen_y(int y) { int result = (int)((float)y * D_001B2280[0] + 0.5f); if (g_is_pal_video) result += 4; return result; }
 extern int D_001AD39C MACRO_ADDR;

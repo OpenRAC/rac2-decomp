@@ -17,7 +17,7 @@ extern void moby_mark_spawned(void *);
 extern void music_Unpause(void);
 extern s32 level_get_saved_value(void);
 extern Moby430C80 **level_get_object_list(void);
-extern int level_find_object_by_class_id(int arg);
+extern void *level_find_object_by_class_id(int arg);
 extern void hero_set_state_value_a(int);
 extern void entry_init_all_registered(void);
 extern void func_PAL_L05_0037D9D0(void *object, int handler);

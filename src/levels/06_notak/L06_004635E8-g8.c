@@ -6,7 +6,7 @@ extern int func_0035CBA0(char *, int, int);
 extern void func_00350388(char *);
 extern void part_explode_object_into_pieces(char *, void *, void *, void *, int, int, int, int, int, int, int);
 extern void moby_compute_local_point(char *, void *, float, float, float);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void SpawnTintedEffects(char *, void *, int, float, int, void *, float, unsigned int, float, float, int);
 extern float D_L06_001B1CB8 __attribute__((sda));

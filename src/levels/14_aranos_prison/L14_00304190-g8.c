@@ -35,7 +35,7 @@ extern int flag_is_third_pending_set();
 
 extern int func_3322A0();
 
-extern void func_369AD0();
+extern int func_369AD0();
 
 extern void func_2F5C10();
 

@@ -18,7 +18,7 @@ extern void moby_get_pos_rel_parent(u8 *a, void *b);
 
 extern u8 *beam_spawn(u8 *a0, u8 *a1, void *a2, void *a3, f32 a4);
 
-extern void PlayMobySound(s32 a, s32 b, u8 *c);
+extern int PlayMobySound(s32 a, s32 b, u8 *c);
 
 extern void moby_transform_joint_to_world(u8 *a, s32 b, void *c);
 

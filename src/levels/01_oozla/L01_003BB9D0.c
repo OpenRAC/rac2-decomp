@@ -4,7 +4,7 @@ extern int coll_test_point_against_shapes(void *, int, int, int, int);
 extern int func_001163B0(void);
 extern float vec_distance_xy(void *, void *);
 extern int math_random_int_below(int);
-extern void math_closest_point_on_polygon_edge(void *, void *,void *,int);
+extern s32 math_closest_point_on_polygon_edge(void *, void *,void *,int);
 extern int CollLine(void *, void *, int, void *, int);
 extern char *D_L01_001FE180[];
 extern char g_coll_line_hit_point[];
@@ -79,7 +79,7 @@ extern float math_random_angle(void);
 
 extern int math_random_int_range(int, int);
 
-extern void part_l01_spawn_glow(void *, int, int, float, float, int);
+extern void *part_l01_spawn_glow(void *, int, int, float, float, int);
 
 extern void anim_start_blended();
 

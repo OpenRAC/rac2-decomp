@@ -2,7 +2,7 @@
 extern void FastVecAdd(void *,void *,void *),FastVecScale(void *,void *,float),make_hit_descriptor(void *,u8 *,int,void *,float),moby_set_state(u8 *,u8,int),part_l00_spawn_spark_burst_3(void *,int,int),vec_random_direction(float *,float,float),moby_mark_spawned(u8 *);
 extern int CollLine(void *,void *,int,int,void *),FastDecTimer(void *),math_random_int_below(int);
 extern float math_random_float_range(float,float);
-extern void part_spawn_gravity_fade(void *,void *,int,int,int,int,int,float,float,float,int);
+extern void *part_spawn_gravity_fade(void *,void *,int,int,int,int,int,float,float,float,int);
 extern u8 D_L03_001A8F20[] __attribute__((sda));
 extern u8 D_L03_001BFDE0[];
 /* Moves a fired shot, leaves sparkles behind it, and removes it when it hits something or runs out of time. */

@@ -38,7 +38,7 @@ typedef struct {
 extern HeroFrame g_hero_state;
 extern char D_0018BE50[];
 extern InputState g_pad_state;
-extern void FastDecTimer(void *);
+extern int FastDecTimer(void *);
 extern int func_PAL_L00_002D3928(void);
 extern float vec_length_xy(void *);
 extern void func_PAL_L00_002BA750(void);

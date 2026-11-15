@@ -5,9 +5,9 @@ typedef unsigned char u8;
 typedef int s32;
 typedef float f32;
 extern u8 D_00189E20_7[];
-extern void math_spring_float_to_goal(f32 *a, f32 *b, f32 c, f32 d, f32 e, f32 f);
+extern float math_spring_float_to_goal(f32 *a, f32 *b, f32 c, f32 d, f32 e, f32 f);
 extern f32 math_fabs(f32 v);
-extern void ApproachValue(f32 *p, f32 v, f32 w);
+extern f32 ApproachValue(f32 *p, f32 v, f32 w);
 typedef struct {
     u8 pad000[0x88];
     f32 f088;
@@ -92,7 +92,7 @@ void func_PAL_L00_002C95C0(void)
 
 
 extern char D_00189E20_4[];
-extern void hero_l00_set_action(int a0, int a1);
+extern s32 hero_l00_set_action(int a0, int a1);
 extern int PadPressedWithin(int, int, int *);
 extern int hero_get_step_offset_from_direction(void);
 extern int pad_presses_within_frames(int, int, int, int);

@@ -25,9 +25,9 @@
  */
 #include "common.h"
 
-extern s32 snd_queue_command();
+extern void snd_queue_command();
 
 /* Sends sound command 24, which has no data. */
-s32 snd_send_cmd18(void) {
-    return snd_queue_command(24, 0, 0, 0, 0);
+void snd_send_cmd18(void) {
+    snd_queue_command(24, 0, 0, 0, 0);
 }

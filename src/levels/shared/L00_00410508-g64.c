@@ -25,10 +25,10 @@ typedef struct {
 } Obj_410508;
 
 extern int get_ammo(int);
-extern void weapon_spend_ammo(int, int);
+extern int weapon_spend_ammo(int, int);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern int projectile_spawn_targeted(int a, void *b, int c, char *d, float e, float f, float g, float h);
+extern void *projectile_spawn_targeted(int a, void *b, int c, char *d, float e, float f, float g, float h);
 extern float D_L00_001B12C0[4][4] __attribute__((sda));
 extern int D_L00_001B2D58 __attribute__((nosda));
 

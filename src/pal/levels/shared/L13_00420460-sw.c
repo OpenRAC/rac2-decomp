@@ -2,7 +2,7 @@
 #include "names.h"
 
 typedef unsigned char u8;
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 
 /* The func_L02_004114A0 message pick for the five level-13 states. Each case calls on
    its own: with one shared body the five labels would collapse into three ranges and

@@ -2,12 +2,12 @@
 #include "names.h"
 typedef int s32_Fee27d7bc;
 typedef float f32_Fee27d7bc;
-extern s32_Fee27d7bc func_00336E40_2 (s32_Fee27d7bc, s32_Fee27d7bc);
-extern s32_Fee27d7bc func_00336DA8_2 (s32_Fee27d7bc, s32_Fee27d7bc);
+extern void *func_00336E40_2 (s32_Fee27d7bc, s32_Fee27d7bc);
+extern void *func_00336DA8_2 (s32_Fee27d7bc, s32_Fee27d7bc);
 extern void func_0033ABD8_2 (s32_Fee27d7bc, s32_Fee27d7bc, const void *);
 extern void func_0033B030_2 (s32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc, f32_Fee27d7bc);
 extern void object_init_derived_arrays (s32_Fee27d7bc, const void *, s32_Fee27d7bc);
-extern s32_Fee27d7bc func_00335E20_2 (s32_Fee27d7bc);
+extern int *func_00335E20_2 (s32_Fee27d7bc);
 extern void object_set_helper_result (s32_Fee27d7bc, const void *, s32_Fee27d7bc);
 extern void popup_init_texts_hidden (s32_Fee27d7bc);
 extern char D_L04_001ADF08[];

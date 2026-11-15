@@ -10,7 +10,7 @@ extern int D_L22_001B1C48;
 extern void func_PAL_L22_003A9880(void *,int,int), func_PAL_L22_003A9808(void *,int);
 extern int math_fast_float_d(void *),math_random_int_below(int);
 extern float vec_fast_helper_c(void *,void *);
-extern void snd_resume_music_stream(void);
+extern s32 snd_resume_music_stream(void);
 
 void func_PAL_L22_003A95C8(u8 *obj) {
     u8 *ctl = *(u8 **)(obj + 0x68);

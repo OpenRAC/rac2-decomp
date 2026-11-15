@@ -28,8 +28,8 @@ extern float math_random_angle(void), math_fast_sin_or_cos_a(float), math_fast_s
 extern void vec_scale_to_length(float *, float *, float);
 extern void FastVecAdd(void *, void *, void *), FastVecSub(void *, void *, void *);
 extern int math_solve_quadratic(float *, float *, float, float, float);
-extern void SegmentCrossPolyline(int, void *, void *, void *);
-extern void func_PAL_00303578(void *, void *, void *, int, int, int);
+extern int SegmentCrossPolyline(int, void *, void *, void *);
+extern void *func_PAL_00303578(void *, void *, void *, int, int, int);
 
 void func_PAL_L00_00323918(char *object, int low, int high, int flags, int surface, int maximum, float height)
 {

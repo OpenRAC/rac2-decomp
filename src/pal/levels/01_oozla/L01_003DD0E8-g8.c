@@ -28,7 +28,7 @@ extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
 extern float func_PAL_L01_003BEB40(void);
 extern void *part_spawn_drifting(void *position, float size, void *owner, float spin, int color);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern void func_PAL_L01_003DD0E8(void *, int, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_L01_003DCCC8(void *);

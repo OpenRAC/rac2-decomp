@@ -85,7 +85,7 @@ extern void func_US2_00293138(void);
 extern void func_US2_002957C0(void);
 extern void map_update_state_machine(void), func_US2_00299CF0(void);
 extern void func_US2_0029DB80(void);
-extern void func_US2_0029E308(int, int);
+extern int func_US2_0029E308(int, int);
 extern int request_begin_slot(int, int, int, int, unsigned char *);
 extern int request_end_slot(int, int);
 extern void func_US2_002B5B38(void);

@@ -6,7 +6,7 @@ typedef union { Quad_3f9368 q; float f[4]; } Vec_3f9368;
 extern void moby_set_state(void *, int, int);
 extern float FastAddRotations(float, float);
 extern void FastVecScale(void *, void *, float);
-extern void part_spawn_object_following_effect(void *, void *, int, int, int, float, float, int, int, int);
+extern void *part_spawn_object_following_effect(void *, void *, int, int, int, float, float, int, int, int);
 
 void func_PAL_L00_003FD928(char *self)
 {

@@ -8,7 +8,7 @@ typedef struct {
 
 extern char *CreateMoby(int);
 extern void euler_rotation_basis(void *, void *);
-extern int cam_compute_view_direction(void *, void *, int);
+extern void cam_compute_view_direction(void *, void *, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
 extern float FastVecDot(void *, void *);

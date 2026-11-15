@@ -15,7 +15,7 @@ extern float math_random_float_range(char *, float, float);
 extern s32 math_random_int_range(s32, s32);
 extern void FastVecAdd(void *, void *, char *);
 extern void moby_transform_joint_to_world(char *, s32, void *);
-extern void part_spawn_scaling(void *, void *, s32, s32, s32, s32, s32, s32);
+extern char *part_spawn_scaling(void *, void *, s32, s32, s32, s32, s32, s32);
 
 /* Sprays the flame sprites of the object's grabbed target: while the target is the live flame moby it draws two bursts at each of its two hand points. */
 void func_PAL_L12_00417F48(char *obj)

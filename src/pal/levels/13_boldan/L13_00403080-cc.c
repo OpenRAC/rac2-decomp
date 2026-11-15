@@ -13,7 +13,7 @@ extern s32 g_current_map_index __attribute__((sda));
 extern int g_current_map_index __attribute__((sda));
 extern f32 vec_distance_xy(void *, void *);
 extern f32 fast_vec_dist(void *, void *);
-extern void math_approach_target_with_direction_mode(void *, void *, f32, f32, f32, f32, s32);
+extern f32 math_approach_target_with_direction_mode(void *, void *, f32, f32, f32, f32, s32);
 extern void vec_scale_to_length(void *, void *, f32);
 extern void FastVecAdd(void *, void *, void *);
 extern u8 g_hero_position[];

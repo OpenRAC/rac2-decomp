@@ -49,7 +49,7 @@ extern void fade_tick_timer(void);
 extern int snd_is_voice_playing_for_owner(void *,int);
 extern int PlayMobySound(int,int,void *);
 extern void snd_stop_voice(int);
-extern int CreateTrailOwnerMoby(int);
+extern unsigned char *CreateTrailOwnerMoby(int);
 extern float fade_get_value(void);
 extern int weapon_can_use_held(float);
 extern void fade_reset_level(void);

@@ -1,13 +1,13 @@
 #include "common.h"
 typedef int DobboQuad __attribute__((mode(TI)));
 extern void vec_local_offset_to_world(void *, void *, float, float, float);
-extern void moby_create_configured(void *, void *, int, void *, int, int);
+extern u8 *moby_create_configured(void *, void *, int, void *, int, int);
 extern void FastVecScale(void *, void *, float);
-extern void part_spawn_object_following_effect(void *, void *, int, int, int, int, int, int, float, float);
+extern void *part_spawn_object_following_effect(void *, void *, int, int, int, int, int, int, float, float);
 extern void moby_set_state(void *, int, int);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int, int, int, int);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern void SpawnExplosionEffects(void *, void *, void *, int, int, int, int, float, float, float, float, int, int, int, int, int, float, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void SpawnTintedEffects(void *, void *, int, int, void *, float, float, float, float, int, int);

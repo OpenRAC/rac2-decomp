@@ -14,7 +14,7 @@ typedef struct {
 
 extern L11_00445990_Rec D_L11_00279BA0[];
 
-extern void hero_l11_enter_state(s32, s32);
+extern s32 hero_l11_enter_state(s32, s32);
 extern s32 PadPressedWithin(s32, s32, s32 *);
 extern s32 arena_get_challenge_flag_index(s32);
 extern s32 flag_is_byte_set(void);

@@ -5,20 +5,20 @@ extern u8 g_hero_state[];
 extern u8 D_L20_001B5600[], D_L20_001B5C00[];
 extern s32 D_L20_001A8F00[] __attribute__((sda));
 extern void moby_mark_spawned(void *);
-extern s32 moby_get_private_value_0(u8 *);
+extern char *moby_get_private_value_0(u8 *);
 extern void func_US2_0029C548(s32, s32);
 extern void hero_reset_speeds_and_vectors(void);
 extern void attachment_reset_all(void);
 extern void menu_init_panel_layout(u8 *);
 extern void weapon_wheel_update_select(u8 *);
-extern void weapon_wheel_draw(u8 *);
+extern int weapon_wheel_draw(u8 *);
 extern s32 hud_set_slot_contents(s32, s32, void (*)(u8 *), void (*)(u8 *), void (*)(u8 *), s32, s32);
 extern s32 level_run_slot_callback(u32);
 extern void hero_clear_tracked_slots(void);
 extern void hero_clear_queued_anim(void);
 extern s32 anim_copy_entry_data(char *, s32, s32, s32);
 extern void cam_reset_default(void);
-extern void func_US2_L20_002D79B0(s32, s32);
+extern s32 func_US2_L20_002D79B0(s32, s32);
 
 /* Apart from the leading state-1 block this is the same code as func_L18_002CFF48
    (src/levels/shared/L18_002CFD68-qcopy.c), and it needs the same grouped-copy profile.

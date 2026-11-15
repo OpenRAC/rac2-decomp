@@ -186,6 +186,6 @@ int moby_turn_toward_target_and_step(char *self, float *target, float amount)
 extern int moby_step_controller(void *, void *, float);
 
 /* Runs the movement step on an object using its own position and heading. */
-void moby_step_at_own_position(char *moby) {
-    moby_step_controller(moby, moby + 0x10, *(float *)(moby + 0xF8));
+int moby_step_at_own_position(char *moby) {
+    return moby_step_controller(moby, moby + 0x10, *(float *)(moby + 0xF8));
 }

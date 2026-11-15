@@ -13,7 +13,7 @@ extern char D_0014B540_1[];
 
 extern short D_00152CE4[];
 
-void load_start_disc_entry(int, int, int, int);
+int load_start_disc_entry(int, int, int, int);
 
 typedef int s32;
 
@@ -91,9 +91,9 @@ extern const char D_L00_001A9AA0[];
 
 extern const char D_L00_001A9AA8[];
 
-extern const unsigned char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 
-extern void sprintf(char *, const char *, ...);
+extern int sprintf(char *, const char *, ...);
 
 /* scans a 48-entry table of 20-byte records for a record whose first word equals an argument, and when the scan succeeds stores the found index into a short counter and calls a helper with (index, -1, second argument, 1). */
 void load_start_disc_entry_by_id(int id, int destBuffer)

@@ -3,7 +3,7 @@
 #include "common.h"
 extern u8 *D_001B251C __attribute__((sda));
 extern u8 D_L10_00188660[];
-extern u8 *state_get_stored_pointer_value(u8 *arg0);
+extern void *state_get_stored_pointer_value(u8 *arg0);
 extern void func_PAL_L10_0041D788(u8 *arg0);
 extern void vec_clear_128(u8 *a0);
 extern void level_append_object(u8 *arg0, s32 a1, s32 a2, s32 a3);
@@ -16,7 +16,7 @@ extern void moby_check_player_in_view_and_range(u8 *a0, s32 a1, f32 f12);
 extern void func_PAL_L10_0041D888(u8 *arg0);
 extern s32 moby_can_take_next_step(u8 *a0);
 extern void func_PAL_L05_0037DE20(u8 *a0);
-extern void math_fast_float_d(u8 *a0);
+extern int math_fast_float_d(u8 *a0);
 extern void func_PAL_L10_0041D950(u8 *arg0);
 extern void snd_stop_moby_effect(u8 *arg0);
 

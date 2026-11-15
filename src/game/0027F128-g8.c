@@ -44,7 +44,7 @@ int text_measure_width_scaled(u8 *text, int length, u8 *table, float scale) {
 extern s32 g_widescreen_flag;
 extern s32 g_is_pal_video;
 extern s32 func_00124418(void);
-extern s32 sceGsResetGraph(s32,s32,s32,s32);
+extern void sceGsResetGraph(s32,s32,s32,s32);
 
 /* Updates the display mode when the screen type changes. */
 void gfx_update_display_mode_from_screen_type(void) {

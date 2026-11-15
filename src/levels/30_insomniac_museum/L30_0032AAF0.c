@@ -37,7 +37,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
-extern void part_spawn_spark_2(void *, void *, int, int);
+extern void *part_spawn_spark_2(void *, void *, int, int);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_fast_float_d(char *);
@@ -51,7 +51,7 @@ extern char g_hero_position[];
 extern char D_00233A60[];
 extern char g_museum_water_grid_points[];
 
-extern void memset(char *, int, int);
+extern void *memset(char *, int, int);
 extern int IsPointInCuboid(char *, int);
 extern void anim_start_blended(char *, int, int, int);
 extern void cam_reset_entry(int);

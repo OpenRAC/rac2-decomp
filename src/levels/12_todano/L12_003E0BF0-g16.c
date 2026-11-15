@@ -29,12 +29,12 @@ extern void FastVecAdd(void *,void *,void *);
 extern int moby_l01_turn_toward_target(u8 *,void *);
 extern int math_random_int_below(int);
 extern float mat_fast_helper_a(float,float);
-extern void moby_step_controller(u8 *,void *,float);
+extern int moby_step_controller(u8 *,void *,float);
 extern void squirrel_alert_group(u8 *);
 extern void StepAngleTowardTarget(void *,int,float,float);
 extern float moby_get_anim_value(u8 *);
-extern void coll_test_hit_at_bone(u8 *,int,int,int,int,int,float,float,float);
-extern void moby_step_at_own_position(u8 *);
+extern int coll_test_hit_at_bone(u8 *,int,int,int,int,int,float,float,float);
+extern int moby_step_at_own_position(u8 *);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void sub_object_start_move(void *,void *,void *,int);
 /* Updates a Mutant Test-Squirrel. It idles and wanders, walks to an object, picks it up and

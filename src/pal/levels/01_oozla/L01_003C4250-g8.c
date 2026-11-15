@@ -10,7 +10,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void moby_set_animation_and_speed(void *, int, int, int);
 extern int func_PAL_L01_00323068(void *, void *);
-extern void func_PAL_002B5E30(void *, float);
+extern int func_PAL_002B5E30(void *, float);
 typedef struct {
     u8 prefix[0x30];
     float centre[4];

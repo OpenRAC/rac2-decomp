@@ -27,7 +27,7 @@ extern void multiply_quaternions(void *,void *,void *);
 extern void make_hit_descriptor(char *,int,int,float,Quad16 *);
 extern int coll_test_point(void *,int,void *,float);
 extern int coll_process_hit(void *,int,void *,void *,float);
-extern void func_PAL_L00_003FB330(void *,int,int,int,int,int,int,int,int,int,int,int,float,float);
+extern char *func_PAL_L00_003FB330(void *,int,int,int,int,int,int,int,int,int,int,int,float,float);
 extern void moby_mark_spawned(void *);
 extern void ref_L16_00413850_00(void *);
 extern void ref_L16_00413850_01(void (*)(void *),void *);

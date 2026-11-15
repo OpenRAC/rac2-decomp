@@ -16,7 +16,7 @@ extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecScale(void *,void *,float);
 extern int math_random_int_range(int,int);
-extern void part_spawn_spark(void *,void *,int,int,int,int,int,int,float,int);
+extern void *part_spawn_spark(void *,void *,int,int,int,int,int,int,float,int);
 extern int g_frame_l00_counter MACRO_ADDR;
 /* Moves a particle and fades its color over its life. It can also throw off small sparks in random directions. */
 void part_update_spark_shedder(char *p)

@@ -4,17 +4,17 @@
 
 extern int FloatToInt(f32);
 
-extern s32 part_l17_spawn_fading(f32, s32, s32, s32);
+extern u8 *part_l17_spawn_fading(f32, s32, s32, s32);
 
 extern f32 D_L17_001B04B8 __attribute__((sda));
 
 extern void moby_set_state(void *, s32, s32);
 
-extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, s32, s32, s32, s32, s32, s32, s32);
 
-extern void SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
+extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, f32, f32, s32, s32, s32, s32);
 
 extern void moby_mark_spawned(void *);
 
@@ -342,11 +342,11 @@ extern f32 math_fast_sin_or_cos_b(f32);
 extern f32 math_random_angle(void);
 extern s32 flag_set_first_pending(void *);
 extern s32 IsPointInCuboid(void *, s32);
-extern void ForceClaimNotice(s32, s32, s32);
+extern int ForceClaimNotice(s32, s32, s32);
 extern s32 PlayMobySound(s32, s32, void *);
 extern void moby_set_flag_bit(void *, s32);
 extern void cam_lock_entry(s32);
-extern void hero_change_action(s32, s32);
+extern s32 hero_change_action(s32, s32);
 
 /* func_L17_0041EAA8's state record. */
 typedef struct {

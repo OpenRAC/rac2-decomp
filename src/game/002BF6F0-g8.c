@@ -9,8 +9,8 @@ extern float D_L00_001AA704 __attribute__((sda));
 extern float math_random_float_range(float, float);
 extern int math_random_int_below(int);
 extern float IntToFloat(int);
-extern void part_spawn_drifting(char *, int, int, float, float);
-extern void part_spawn_spark_2(char *, char *, int, int);
+extern void *part_spawn_drifting(char *, int, int, float, float);
+extern void *part_spawn_spark_2(char *, char *, int, int);
 
 #ifndef RAC2_T_V4_G8
 #define RAC2_T_V4_G8
@@ -60,7 +60,7 @@ extern int D_001AA39C __attribute__((sda));
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
-extern void part_spawn_spark(char *, char *, int, int, int, int, int, int, int, float);
+extern void *part_spawn_spark(char *, char *, int, int, int, int, int, int, int, float);
 
 /* Moves a falling particle. When it hits the floor it breaks into smaller particles that fly off and then disappears. */
 void part_update_bouncing_split(char *self)

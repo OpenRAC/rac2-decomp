@@ -30,7 +30,7 @@ extern unsigned char g_item_slot_to_record[];
 extern char D_L00_00262620[];
 
 /* One byte of the resident table, scaled by 0xE0 into the level's own table. */
-int level_get_table_entry_address(int index)
+char *level_get_table_entry_address(int index)
 {
     return g_item_slot_to_record[index] * 0xE0 + (int)D_L00_00262620;
 }

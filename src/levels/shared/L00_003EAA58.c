@@ -22,10 +22,12 @@ typedef struct {
 extern HeroState g_hero_state;
 
 extern char g_pad_state[];
-extern void moby_transform_joint_to_world(char *, int, void *), CalculateAimedLaunchVelocity(void *, void *, float, float, float, float, int, int);
+extern void CalculateAimedLaunchVelocity(void *, void *, float, float, float, float, int, int);
+extern void moby_transform_joint_to_world(char *, int, void *);
 extern int coll_trace_projectile_to_impact(void *, void *, void *, void *, char *, int, int, float);
 extern int math_fast_float_d(void *), weapon_spend_ammo(int, int);
-extern void start_equipped_item_animation(void), PlayMobySound(int, int, char *), cancel_hero_item_animation(void), ref_L00_003EAA58_00(void *, char *);
+extern void start_equipped_item_animation(void), cancel_hero_item_animation(void), ref_L00_003EAA58_00(void *, char *);
+extern int PlayMobySound(int, int, char *);
 extern char *miniturret_spawn_shot(void *, void *);
 /* Updates the Miniturret Glove: it aims, then shoots a miniturret after a short wind-up. */
 void miniturret_l00_glove_update(char *self)

@@ -70,11 +70,11 @@ extern void vec_scale_to_length(void *, void *, float);
 
 extern int D_00138344;
 
-extern void func_0029C640(int);
+extern int func_0029C640(int);
 
 extern void func_0029C610(void);
 
-extern void func_0029C6B0(int);
+extern int func_0029C6B0(int);
 
 /*
  * Disassembled at 0x002cd220

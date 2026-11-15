@@ -23,7 +23,7 @@ extern void func_PAL_L01_002A8368(void);
 extern void func_2C7CA8(void);
 extern void func_PAL_L00_002B3608(void);
 extern void hero_read_input_command_flags(void);
-extern void func_PAL_L01_002AE010(char *a0, char *a1, char *a2);
+extern int func_PAL_L01_002AE010(char *a0, char *a1, char *a2);
 extern void func_PAL_L01_002C3A10(void);
 extern void func_2C8628(void);
 extern void hero_clear_objects_flag_bit(void);

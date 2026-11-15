@@ -42,7 +42,7 @@ extern void part_emit_hero_trail_spark(int, int);
 extern void EmitHeroRandomizedMotionEffects(int, int, int);
 extern void part_emit_hero_dust_and_debris(int, int, int);
 extern void EmitHeroTimedEffects(void);
-extern void AdjustHeroAnimationSpeedForTargetFrame(float, float, float, float);
+extern float AdjustHeroAnimationSpeedForTargetFrame(float, float, float, float);
 extern void hero_start_pose_offset(float, float, float);
 extern int hero_slot_item_id(int);
 extern int hero_find_ledge_grab(void *, void *, void *);

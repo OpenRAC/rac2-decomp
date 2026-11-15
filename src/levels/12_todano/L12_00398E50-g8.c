@@ -212,7 +212,7 @@ typedef struct {
     unsigned short count, pad;
     unsigned int time, levels;
 } SubtitleHistory;
-extern void subtitle_request_voice_line(int,int);
+extern int subtitle_request_voice_line(int,int);
 
 /* Plays subtitle lines, each gated on its record in the subtitle history (the record index is
    the second argument of func_00288E18). */
@@ -224,7 +224,7 @@ extern u32 D_001A7390;
 extern int g_current_map_index[] __attribute__((sda));
 extern int D_0018C0B4 NOT_SDA;
 extern int IsPointInCuboid(void *,int);
-extern void math_fast_float_d(void *);
+extern int math_fast_float_d(void *);
 
 /* Plays subtitle lines, each gated on its record in the subtitle history (the record index is
    the second argument of func_00288E18). */

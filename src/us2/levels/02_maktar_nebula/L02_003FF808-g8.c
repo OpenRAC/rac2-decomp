@@ -7,7 +7,7 @@
  * D_001A7BB4. Each table starts where v1.01 kept that label's single x, and keeps its name. */
 extern void arena_draw_menu_help_prompts(char *,int);
 extern int arena_get_challenge_name_text(int), arena_get_challenge_save_index(int), moby_compute_scaled_entry_value(int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int func_001157AC(char *);
 extern int sprintf(char *,char *,...);
 extern void FontSetWindow(void *,int,int,int,int,int,int,int,int);

@@ -26,8 +26,8 @@
 
 extern s32 func_00115544(s32, s32);
 extern s32 func_001157AC(s32);
-extern s32 eh_read_uleb128(s32, s32);
-extern s32 eh_read_sleb128(s32, s32);
+extern unsigned char *eh_read_uleb128(s32, s32);
+extern unsigned char *eh_read_sleb128(s32, s32);
 
 extern s8 D_0013B060[];
 extern s8 D_0013B068[];

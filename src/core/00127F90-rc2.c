@@ -30,7 +30,7 @@ extern s8 D_00141B80[];
 extern s8 D_001430C0[];
 extern s32 D_00137E6C;
 extern s32 D_00137E68;
-extern s32 SignalSema(s32);
+extern void SignalSema(s32);
 extern s32 PollSema(s32);
 extern s32 sceSifCallRpc(s32, s32, s32, s32, s32, s32, s32, s32, s32);
 

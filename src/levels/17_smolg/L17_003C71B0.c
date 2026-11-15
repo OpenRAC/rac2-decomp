@@ -7,7 +7,7 @@ typedef unsigned short u16;
 typedef short s16;
 typedef int s32;
 
-extern s32 part_spawn_effect_burst(void *, s32, s32, s32, s32, s32, s32, void *);
+extern void part_spawn_effect_burst(void *, s32, s32, s32, s32, s32, s32, void *);
 extern s32 PlayMobySound(s32, s32, void *);
 extern char D_L17_001A8F20[];
 

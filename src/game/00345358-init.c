@@ -1,5 +1,5 @@
 #include "names.h"
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void object_init_derived_arrays(void *, void *, void *);
 extern void hud_init_widget_defaults(void *, void *, void *);
@@ -9,8 +9,8 @@ extern void object_set_helper_result(void *, void *, int);
 extern void object_set_flag_value(void *, int);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void hud_set_widget_field_b(void *, void *);
-extern void *GetLocalizedString(int);
-extern void selection_menu_update_layout(void *, int, void *);
+extern char *GetLocalizedString(int);
+extern int selection_menu_update_layout(void *, int, void *);
 extern char *D_001A8CFC[] __attribute__((sda));
 extern char D_001ADC10[];
 extern char D_001ADC18[];

@@ -7,8 +7,8 @@ extern void gfx_set_clamped_view_distance(float value);
 extern float math_fabs(float value);
 extern char D_L00_001D9F00[];
 extern char D_L00_001DA860[];
-int kilonoid_spawn(char *a, char *b);
-int SpawnCB2Moby(char *a, char *b);
+char *kilonoid_spawn(char *a, char *b);
+char *SpawnCB2Moby(char *a, char *b);
 void func_L00_0035F180(char *a, int b, int c, char *d, int e);
 
 typedef struct Rac2Native_9cdc323a4d0c2fbd_AnalysisOwner {
@@ -74,7 +74,7 @@ extern float FastAddRotations(float, float);
 
 extern void vec_build_spherical_offset(float *, float, float, float);
 
-extern void part_spawn_burst(float *, float *, int, int, unsigned int, int,
+extern void *part_spawn_burst(float *, float *, int, int, unsigned int, int,
                           float, float, float, float, float);
 
 /* Measured partial layouts; original type and game roles are unknown. */
@@ -577,7 +577,7 @@ extern void vec_build_spherical_offset(float *p, float a, float b, float c);
 extern char *SpawnSpinningSparkParticle(char *p, float fa, float fb, float fc, float fd, int v, char *local,
                             unsigned int color, int flag);
 
-extern void part_spawn_burst(float *out, float *dir, int a, int b, unsigned int color, int id,
+extern void *part_spawn_burst(float *out, float *dir, int a, int b, unsigned int color, int id,
                            float fa, float fb, float fc, float fd, float fe);
 
 extern char g_camera_l00_position[];

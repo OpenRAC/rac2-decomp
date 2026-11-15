@@ -67,7 +67,7 @@ extern void FastVecSub(void *,void *,void *);
 extern void FastVecAdd(void *,void *,void *);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void moby_mark_spawned(char *);
-extern void part_spawn_object_following_effect(void *,void *,unsigned int,int,int,int,int,int,float,float);
+extern void *part_spawn_object_following_effect(void *,void *,unsigned int,int,int,int,int,int,float,float);
 extern void func_PAL_L00_0032C328(void *,void *,void *,void *,int,int,int,int,int,int,int);
 extern void func_PAL_L00_003281C0(char *,int,float);
 extern void moby_compute_local_point(char *,void *,float,float,float);

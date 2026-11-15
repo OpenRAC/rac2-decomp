@@ -10,7 +10,7 @@ extern int D_001B1658;
 extern int D_001B22B4;
 extern u8 *D_001B22A0[];
 extern void gfx_capture_screen_rect(int, int, int, int, void *);
-extern void gfx_wait_paths_idle(int, int);
+extern int gfx_wait_paths_idle(int, int);
 extern void ComputeRegionThresholdRatio(void *, int);
 
 /* Copies the marked screen regions into spare buffers, one at a time, and clears each mark when done. */

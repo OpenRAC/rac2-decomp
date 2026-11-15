@@ -8,7 +8,7 @@ extern int PlayMobySound(int, int, char *);
 extern int g_current_map_index;
 extern unsigned char D_0019B2E8[];
 extern char *g_path_list[];
-extern void path_l01_compute_segment_lengths(char *);
+extern float path_l01_compute_segment_lengths(char *);
 extern void mem_clear(char *, int, int);
 extern int actor_choose_path_goal(char *);
 extern int func_PAL_002B1A50(char *, char *, int);

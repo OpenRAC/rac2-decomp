@@ -114,7 +114,7 @@ extern void lerp_vector(void *out, void *from, void *to, float t);
 extern void make_hit_descriptor(void *packet, char *owner, int flags, void *direction, float amount);
 extern void QueueMobyImpact(char *target, void *packet);
 extern void func_PAL_00320D00(void *pos, int count, int mode);
-extern void func_PAL_0032F0B8(char *target, int kind, int value);
+extern int func_PAL_0032F0B8(char *target, int kind, int value);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecSub(void *dst, void *a, void *b);

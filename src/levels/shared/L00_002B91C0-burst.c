@@ -16,7 +16,7 @@ extern float math_random_angle(void);
 extern int FloatToInt(float);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
-extern void part_spawn_scaling(void *, void *, unsigned, int, int, int, int, int);
+extern char *part_spawn_scaling(void *, void *, unsigned, int, int, int, int, int);
 
 /* Emit ten particles radially around the hero, using the saved height outside level 6. */
 void part_emit_hero_radial_particles(void)

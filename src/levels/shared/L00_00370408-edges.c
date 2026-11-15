@@ -35,11 +35,11 @@ extern void UpdateLightingEnvironment(void);
 extern void gfx_compute_light_direction(void);
 
 extern int D_L00_001BCAC0[];
-extern void snd_pump_music_and_disc_read(int);
+extern s16 snd_pump_music_and_disc_read(int);
 extern void game_reset_frame_counters(void);
 extern void part_update_all(void);
 extern int load_queue_level_data_chunk(int);
-extern void UpdateSoundVoices(void);
+extern s32 UpdateSoundVoices(void);
 extern void game_update_idle_frame_counters(void);
 
 typedef struct {

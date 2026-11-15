@@ -8,7 +8,8 @@ extern void FastVecAdd(void *, void *, void *), matrix_mul_vec3(void *, void *, 
 extern int follower_get_state(char *);
 extern void func_PAL_002EE5C0(char *), func_PAL_002EF630(char *), follower_move_toward_target(char *), follower_limit_speed(char *), UpdateBankedOrientation(char *);
 extern void follower_set_push_vector(char *, void *), follower_set_state(char *, int);
-extern int follower_has_reached_target(char *), follower_try_place_at_saved_spot(char *);
+extern int follower_has_reached_target(char *);
+extern s64 follower_try_place_at_saved_spot(char *);
 extern void moby_release_motion_slot(char *), func_PAL_002EF708(char *), func_PAL_002EF800(char *);
 extern float math_fast_sin_or_cos_b(float), math_fast_sin_or_cos_a(float), FastAddRotations(float, float);
 extern void vec_scale_to_length(void *, void *, float), FastVecCross(void *, void *, void *);

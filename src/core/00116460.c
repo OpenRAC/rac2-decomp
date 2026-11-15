@@ -55,7 +55,7 @@ extern unsigned long long max_total_mem;
 
 extern struct mallinfo_116460 current_mallinfo;
 
-extern char *sbrk_reentrant(void *, unsigned int);
+extern void *sbrk_reentrant(void *, unsigned int);
 
 extern void FreeReentrant(void *, void *);
 

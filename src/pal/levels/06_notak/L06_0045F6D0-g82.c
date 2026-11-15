@@ -4,11 +4,11 @@
 typedef unsigned int u128 __attribute__((mode(TI)));
 extern char *part_spawn_object_following_effect(void *, void *, unsigned int, int, int, int, int, float, float, int);
 extern void moby_set_state(char *, int, int);
-extern int part_find_owned_effect_slot(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 extern void moby_mark_spawned(char *);
 extern void func_PAL_L00_0032C328(char *, void *, void *, void *, int, int, int, int, int, int, int);
 extern void moby_compute_local_point(char *, void *, float, float, float);
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void func_PAL_L00_00328480(char *, void *, int, float, int, void *, float, unsigned int, float, float, int);
 extern float D_L06_001B1CB8 __attribute__((sda));

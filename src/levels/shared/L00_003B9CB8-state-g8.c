@@ -55,9 +55,9 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, float, void *);
 
 extern void QueueMobyImpact(void *, void *);
-extern void StartAttachedEffect(void *, int, int);
+extern int StartAttachedEffect(void *, int, int);
 /* The integer and FP register banks retain their own argument order. */
-extern void SelectBestTargetInCone(void *, float, void *, float, float, float, void *,
+extern char *SelectBestTargetInCone(void *, float, void *, float, float, float, void *,
                           void *, int, int, float, int, void *);
 extern int pair_is_owner_key_free(void *, void *);
 extern void KeyOwnerTableInsert(void *, void *, int);
@@ -67,7 +67,7 @@ extern int math_fast_float_d(void *);
 extern float IntToFloat(int);
 extern float math_random_float_range(float, float);
 extern void vec_clear_128(void *);
-extern void part_spawn_ground_effect(void *, float, float, int, unsigned int, int, int,
+extern void *part_spawn_ground_effect(void *, float, float, int, unsigned int, int, int,
                           void *, float, int);
 extern void moby_get_facing_direction(void *, void *);
 extern void part_l00_spawn_spark_burst_2(void *, void *, int, int);

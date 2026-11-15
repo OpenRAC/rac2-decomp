@@ -9,7 +9,7 @@
 #include "include_asm.h"
 #include "names.h"
 extern void object_set_flag_value(void *,int);
-extern int object_get_fourth_field(void *);
+extern int *object_get_fourth_field(void *);
 extern void object_set_first_float4(void *,float,float,float,float);
 extern void gfx_draw_screen_element_stored(void *),text_label_draw(void *),hud_draw_colored_quad_widget(void *);
 extern void hud_set_widget_value_pair(void *,int,int);

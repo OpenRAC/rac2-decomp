@@ -120,7 +120,7 @@ extern struct RenderGlobals g_hero_state;
 extern struct Moby *D_001B159C __attribute__((sda));
 
 extern void FlushCache(int);
-extern void fast_decompress(int, int);
+extern int fast_decompress(int, int);
 extern struct Moby *CreateMoby(int);
 extern void moby_init_instance(struct Moby *, int);
 

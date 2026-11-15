@@ -2,7 +2,7 @@
 #include "names.h"
 
 typedef int TI128 __attribute__((mode(TI)));
-extern void math_fast_float_d(char *);
+extern int math_fast_float_d(char *);
 extern void func_PAL_002B14F8(char *, char *, int, int, float);
 extern int D_L07_001C9780;
 extern void RideMobyBelow(char *);

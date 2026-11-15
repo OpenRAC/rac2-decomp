@@ -6,7 +6,7 @@ extern void moby_set_state();
 extern void moby_forward_transform_to_handler();
 extern int flag_is_third_pending_set();
 extern int flag_set_first_pending();
-extern void PlayMobySound();
+extern int PlayMobySound();
 extern void vec_copy_helper_a();
 extern void FastVecAdd(void *dst, void *src, void *src2);
 extern void FastVecCross(void *dst, void *src, void *mtx);

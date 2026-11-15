@@ -7,7 +7,7 @@ extern float math_random_angle(void);
 extern float math_random_signed_float_range(float, float);
 extern void vec_build_spherical_offset(float *, float, float, float);
 extern void FastVecAdd(float *, float *, int);
-extern void part_spawn_ground_effect(float *, int, int, int, int, float *, int, float, float, float);
+extern void *part_spawn_ground_effect(float *, int, int, int, int, float *, int, float, float, float);
 
 void func_PAL_00327028(float *self, int unused, int a2)
 {

@@ -34,12 +34,12 @@ extern void FastVecAdd(void *,void *,void *);
 extern int func_PAL_L01_00323068(u8 *,void *);
 extern int math_random_int_below(int);
 extern float mat_fast_helper_a(float,float);
-extern void func_PAL_002B5C98(u8 *,void *,float);
+extern int func_PAL_002B5C98(u8 *,void *,float);
 extern void squirrel_alert_group(u8 *);
 extern void StepAngleTowardTarget(void *,int,float,float);
 extern float moby_get_anim_value(u8 *);
-extern void coll_test_hit_at_bone(u8 *,int,int,int,int,int,float,float,float);
-extern void func_PAL_002B5E10(u8 *);
+extern int coll_test_hit_at_bone(u8 *,int,int,int,int,int,float,float,float);
+extern int func_PAL_002B5E10(u8 *);
 extern void matrix_mul_vec3(void *,void *,void *);
 extern void func_PAL_L12_003E4CA8(void *,void *,void *,int);
 void func_PAL_L12_003E4E5C(u8 *o) {

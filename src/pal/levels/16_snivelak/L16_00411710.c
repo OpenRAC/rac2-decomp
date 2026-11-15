@@ -18,7 +18,7 @@ extern s32 weapon_select_aim_target(void *, s32, float, float, s32, s32);
 extern float D_L16_001B9B00[];
 extern u8 *D_L16_001B2B1C[] __attribute__((sda));
 extern s32 D_L16_001B2B38[] __attribute__((sda));
-extern s32 part_find_owned_effect_slot(void *, s32, s32);
+extern void *part_find_owned_effect_slot(void *, s32, s32);
 extern s32 coll_test_point(void *, s32, void *, float);
 
 /* Object update: on the first frame (+0x20 still zero) sets the state's defaults and

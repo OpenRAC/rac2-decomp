@@ -4,7 +4,7 @@
 typedef int Q128 __attribute__((mode(TI)));
 extern void moby_transform_joint_to_world(void *entity, int a, void *out);
 extern void vec_scale_to_length(void *, void *, float);
-extern void level_build_spawn_record(void *, void *, void *, void *, void *, void *, int, int, int);
+extern void *level_build_spawn_record(void *, void *, void *, void *, void *, void *, int, int, int);
 extern void turret_start_swinging(char *);
 extern char *group_pick_random_active_entity(int);
 

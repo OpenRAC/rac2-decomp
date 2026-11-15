@@ -38,7 +38,7 @@ void func_US2_0029C818(void) {
 
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
 extern int g_current_game_mode[] __attribute__((sda));
-extern void func_US2_0029C8F0(void);
+extern int func_US2_0029C8F0(void);
 extern unsigned int menu_get_saved_state(void);
 extern void func_US2_0029C648(void);
 typedef int (*Fn)(void);

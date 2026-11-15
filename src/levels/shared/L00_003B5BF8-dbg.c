@@ -33,14 +33,16 @@ extern WeaponEntry g_weapon_l00_table[];
 extern void weapon_update_target_lock(void *), weapon_release_shot_slots(void);
 extern int get_ammo(int);
 extern void hud_add_moby_marker(void *,float,unsigned int,void *,int,float,int,float,int);
-extern void *AcquireEntitySlot(void *,void (*)(void),int *);
-extern char *level_get_slot_body(int,void *),*mem_round_up_to_16(void *);
+extern int AcquireEntitySlot(void *,void (*)(void),int *);
+extern char*level_get_slot_body(int,void *);
+extern char *mem_round_up_to_16(void *);
 extern AllocationOffsets *level_get_slot_header(int,void *);
 extern void mem_fast_helper_b(void *,int);
 extern int math_fast_float_d(int *),vec_fast_helper_b(float *);
 extern int math_is_below_plane_within_depth(float);
 extern void start_equipped_item_animation(void),initialize_moby_animation_blend(void *,void *,int,int,int,int);
-extern void weapon_spend_ammo(int,int),PlayMobySound(int,int,void *);
+extern int weapon_spend_ammo(int,int);
+extern int PlayMobySound(int,int,void *);
 extern char *guided_rocket_create(void *,void *,int,void *,int,int);
 /* Runs the Chopper and Multi-Star weapon: sets up its shot slots, then fires when the button is pressed and the weapon is ready. */
 void chopper_update(unsigned char *object)

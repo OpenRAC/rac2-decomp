@@ -49,11 +49,11 @@ extern float math_fast_sin_or_cos_b(float);
 extern int FloatToInt(float);
 extern char *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 extern int func_001163B0(void);
-extern void coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, float);
+extern int coll_test_hit_at_bone(void *, int, int, int, int, int, float, float, float);
 extern void copy_matrix_rotation(void *, void *);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void effect_create_timed(void *, void *, int, int, int, int, int, float);
-extern void coll_cast_object_line(void *, void *, void *, int, int, int, int, float, float);
+extern unsigned char *effect_create_timed(void *, void *, int, int, int, int, int, float);
+extern int coll_cast_object_line(void *, void *, void *, int, int, int, int, float, float);
 extern float FastAddRotations(float, float);
 extern int D_0018C0BC;
 
@@ -142,7 +142,7 @@ typedef struct {
 } Sub24;
 
 extern s32 func_2F9A60();
-extern void func_2F9A90();
+extern int func_2F9A90();
 extern void func_328A38(s32, s32);
 extern s32 func_327898(s32, s32);
 extern s32 func_2EA300(void *, void *, s32, s32, s32);
@@ -559,7 +559,7 @@ extern s32 game_is_either_mode_two(void);
 extern void hero_reset_position_and_direction(u8 *, u8 *, s32, s32);
 extern void help_unlock_entry(s32);
 extern void value_set_entry_by_index(s32, s32);
-extern void MemcardSave(s32, s32);
+extern int MemcardSave(s32, s32);
 
 /* Updates the Glider moby (class 3675): it rises into place, turns slowly, and when the hero is near it plays a sound and removes itself. */
 void glider_update(u8 *self) {
@@ -711,7 +711,7 @@ extern s32 math_random_int_range(s32, s32);
 extern f32 math_fast_sin_or_cos_a(f32);
 extern f32 math_fast_sin_or_cos_b(f32);
 extern void FastVecAdd(void *, void *, void *);
-extern void part_l01_spawn_glow(void *, int, int, float, float, int);
+extern void *part_l01_spawn_glow(void *, int, int, float, float, int);
 
 /* five rounds: each picks a direction, two spreads and a life time */
 /* Drops five small sparkles around the creature that float up from the ground. */
@@ -776,7 +776,7 @@ extern char D_L08_001BFF60[];
 extern void FastVecSub(void *, void *, void *);
 extern char *D_L08_001FE7BC;
 extern char *D_L08_001B29DC[] __attribute__((sda));
-extern void math_closest_point_on_polygon_edge(void *, void *, void *, int);
+extern s32 math_closest_point_on_polygon_edge(void *, void *, void *, int);
 extern int coll_test_point_against_shapes(void *, int, int, int, int);
 extern float coll_probe_ground_height_below(void *, int, float);
 

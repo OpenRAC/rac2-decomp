@@ -7,7 +7,7 @@ extern void moby_set_state(char *, int, int);
 extern void func_PAL_002A0F68(char *);
 extern void set_moby_color(char *, int, int, int);
 extern int func_PAL_002B3F18(char *, char *, char *);
-extern void moby_spawn_linked(char *, int, float, float);
+extern int moby_spawn_linked(char *, int, float, float);
 extern u16 *g_group_id_lists[];
 extern u8 *g_moby_l11_table __attribute__((sda));
 
@@ -53,9 +53,9 @@ void func_PAL_L11_00458828(char *object, int mode, int active) {
 extern void vec_random_direction(void *a0, float f12, float f13);
 extern void func_PAL_002B15D8(char *a0, int a1, void *a2, float f12, float f13, float f14,
                         float f15, int a3);
-extern void func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int,
+extern char *func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int,
                          float, float, int, int, int, int);
-extern void snd_play_from_class_bank(int, int, char *, int);
+extern int snd_play_from_class_bank(int, int, char *, int);
 extern void vec_random_direction(void *, float, float);
 extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_002B15D8(char *, int, void *, float, float, float, float, int);

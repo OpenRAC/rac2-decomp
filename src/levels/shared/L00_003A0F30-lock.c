@@ -70,7 +70,7 @@ extern void hud_add_moby_marker(void *, float, unsigned int, void *, int, float,
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern Moby *moby_get_or_find_target(void *, void *, float, float, float, float, float, int);
-extern int moby_get_private_value_0(Moby *);
+extern char *moby_get_private_value_0(Moby *);
 extern int moby_is_in_special_class_range(Moby *);
 extern float fast_vec_dist(void *, void *);
 extern float math_fabs(float);

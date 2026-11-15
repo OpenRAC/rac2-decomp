@@ -8,7 +8,7 @@ extern int D_001AE0C8 __attribute__((sda));
 extern char D_002652F0[];
 extern void func_PAL_0034A2E0(void *, int);
 extern void func_PAL_0034A230(unsigned char *, float *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void hud_set_widget_field_b(void *, unsigned int);
 extern void object_set_value_float(void *, float);
 

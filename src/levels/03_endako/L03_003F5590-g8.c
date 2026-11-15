@@ -62,11 +62,11 @@ extern void *part_find_owned_effect_slot(void *, int, int);
 extern float moby_update_aim_target_strength(void *, void *);
 extern int PlayMobySound(int, int, void *);
 extern void gfx_start_color_fade(void *, void *);
-extern void ApproachValue(void *, float, float);
+extern f32 ApproachValue(void *, float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern u8 *cam_moby_create(void *, int, int, int, void *, void *, void *, int, float, float);
 extern void moby_fade_out_update(void);
-extern void weapon_select_aim_target(void *, int, int, int, float, float);
+extern int weapon_select_aim_target(void *, int, int, int, float, float);
 extern void endako_boss_play_voice_lines(void *);
 /* Incomplete arrays: retail reaches these two with `lui` + `lw`, not through $gp. */
 extern u8 *D_L03_001B2A1C[] __attribute__((sda));

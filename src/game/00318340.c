@@ -33,7 +33,7 @@ extern void moby_mark_spawned(void *);
 extern float moby_get_anim_value(void *);
 extern void SetDeathBits(void *, int, int);
 extern int math_random_int_below(int);
-extern void moby_turn_toward_position(void *, void *, void *, float, float, float);
+extern float moby_turn_toward_position(void *, void *, void *, float, float, float);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);
@@ -100,7 +100,7 @@ extern void lerp_vector(void *out, void *from, void *to, float t);
 extern void make_hit_descriptor(void *packet, char *owner, int flags, void *direction, float amount);
 extern void QueueMobyImpact(char *target, void *packet);
 extern void part_spawn_hit_sparks(void *pos, int count, int mode);
-extern void StartAttachedEffect(char *target, int kind, int value);
+extern int StartAttachedEffect(char *target, int kind, int value);
 
 extern char F669d6320_D_001BAFC0[];
 
@@ -120,7 +120,7 @@ extern void F5a19df7a_FUN_0031E2A0(char *p);
 
 extern void F5a19df7a_FUN_0031E560(char *p);
 
-extern char *F5a19df7a_FUN_002A7820(int a, int b);
+extern s32 F5a19df7a_FUN_002A7820(int a, int b);
 
 extern float F5a19df7a_FUN_002A7940(void);
 

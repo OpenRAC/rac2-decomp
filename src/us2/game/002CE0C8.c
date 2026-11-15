@@ -13,7 +13,7 @@ extern int menu_handle_step_simple(int);
 extern int menu_handle_mode_action(int);
 extern int menu_run_action_by_index(int);
 extern int func_US2_002CC908(int);
-extern void snd_play_from_global_bank(int, unsigned int, void *);
+extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern unsigned int stub_empty_24(void);
 extern unsigned int stub_empty_25(void);
 extern unsigned int stub_empty_28(void);

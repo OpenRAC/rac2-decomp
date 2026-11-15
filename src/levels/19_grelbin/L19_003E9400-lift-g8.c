@@ -8,7 +8,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float vec_distance_xy(void *, void *);
 extern void moby_set_state(void *, int, int);
 extern int flag_set_first_pending(void *);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 typedef struct { u8 *other; float angle, height, time; } LiftState;
 /* Lowers and rotates the lift, waits for the linked object to leave, then resets it. */
 void grelbin_lift_update(u8 *moby)

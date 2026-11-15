@@ -19,23 +19,23 @@ extern void func_PAL_L00_0040DF78(char *);
 extern void ref_L00_00408E58_00(int, int);
 extern void anim_start_blended_with_flags(char *, int, int, int, int);
 extern void FastVecAdd(void *, void *, void *);
-extern void vec_fast_helper_b(void *);
+extern int vec_fast_helper_b(void *);
 extern void mem_fast_helper_b(void *, int);
 extern int math_fast_float_d(void *);
 extern int get_ammo(int);
 extern void func_PAL_L00_002AF458(void);
 extern int slot_copy_records_to_free(void *);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern void vec_scale_to_length(void *, void *, float);
 extern char *func_PAL_L00_0041C0E0(void *, int, char *);
 extern void func_002E6EF8(void (*)(char *), char *);
 extern void gfx_draw_screen_flash_fade(char *);
 extern void ReleaseDeadOrExpiredSlots(char *);
-extern void SelectBestTargetInCone(void *, void *, int *, void *, int, int, float, float, float, float, float, int, int);
+extern char *SelectBestTargetInCone(void *, void *, int *, void *, int, int, float, float, float, float, float, int, int);
 extern char *moby_get_private_value_0(char *);
 extern void func_PAL_002A7650(char *, int, int);
 extern void func_00310440(char *);
-extern void weapon_spend_ammo(int, int);
+extern int weapon_spend_ammo(int, int);
 
 extern struct {
     char pad0[0x1230];

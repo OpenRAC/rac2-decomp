@@ -24,7 +24,7 @@
  */
 #include "common.h"
 
-extern s32 STUB_printf();
+extern void STUB_printf();
 
 extern s8 D_001AD538[];
 extern s8 D_001AD550[];

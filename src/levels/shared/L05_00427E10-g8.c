@@ -18,7 +18,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void QueueMobyImpact(void *, Impact *);
 extern void *part_spawn_limited_blast(void *, void *, int, int, int, int, int, int,
                             int, int, int, int, int, float);
-extern void coll_process_hit(void *, int, int, void *, float);
+extern int coll_process_hit(void *, int, int, void *, float);
 
 /* Makes an explosion: hurts every living object in the level except a few excluded ones, then plays the blast effect. */
 void moby_explode_damage_nearby(unsigned char *object)

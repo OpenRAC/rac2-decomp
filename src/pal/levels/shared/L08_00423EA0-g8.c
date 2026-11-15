@@ -239,7 +239,7 @@ extern float func_002A0558(void *, void *);
 extern s32 TryClaimNotice(s32, s32, s32);
 extern s32 func_PAL_L08_0031ACF8(s32, void *, s32);
 extern void script_queue_keyed_request(s32, s32);
-extern void func_PAL_L08_002D3078(s32, s32);
+extern s32 func_PAL_L08_002D3078(s32, s32);
 extern void func_PAL_L00_002D2668(s32, s32, float);
 extern void snd_stop_voice(s32);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
@@ -272,7 +272,7 @@ extern s32 coll_test_point(void *, s32, void *, float);
 extern float FastVecDot(void *, void *);
 extern void func_PAL_L08_004239F0(void *, void *, s32, float, float, float, float, float, float);
 extern void make_hit_descriptor(void *, void *, s32, void *, float);
-extern void coll_process_hit(void *, s32, void *, void *, float);
+extern int coll_process_hit(void *, s32, void *, void *, float);
 extern void func_PAL_L08_00423D30(void *);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, s32, s32, s32, float, float, float, float,
                           s32, float, s32, s32, s32, s32, s32);
@@ -284,9 +284,9 @@ extern void moby_store_position_private(void *, void *);
 extern void moby_mark_spawned(void *);
 extern float fast_vec_dist(void *, void *);
 extern void moby_update_ground_check(void *);
-extern void func_PAL_L08_0033B2D0(void *, s32, s32, void *, float, float);
-extern void snd_fade_looping_by_distance(void *, void *, s32, s32, float);
-extern void math_fast_float_d(void *);
+extern s32 func_PAL_L08_0033B2D0(void *, s32, s32, void *, float, float);
+extern int snd_fade_looping_by_distance(void *, void *, s32, s32, float);
+extern int math_fast_float_d(void *);
 /* An effect record (0x70 bytes) still owned by this moby and active. */
 #define EFFECT(i) ((EffectSlot *)(D_00188660 + (i) * 0x70))
 #define EFFECT_LIVE(i) (EFFECT(i)->owner == moby && EFFECT(i)->active)

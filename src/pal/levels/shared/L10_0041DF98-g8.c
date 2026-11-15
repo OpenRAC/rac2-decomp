@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int moby_get_motion_data(void *);
+extern char *moby_get_motion_data(void *);
 extern int math_random_int_below(int);
 extern int PlayMobySound(int, int, char *);
 extern void SpawnSpaceProjectile(float, float, float, void *, int, int, int, float, int, int, int);

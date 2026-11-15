@@ -44,7 +44,7 @@ typedef struct {
     unsigned char f22b5;
 } Hero4140;
 extern Hero4140 D_00189E20_4140;
-extern void IntToFloat(int);
+extern f32 IntToFloat(int);
 typedef struct {
     unsigned char pad0[60];
     int flags;
@@ -59,7 +59,7 @@ extern int moby_get_attachment_rotation_angles(int, int, void *, void *, void *,
 extern int coll_apply_push_to_object(int, int, void *, void *, void *, void *);
 extern void vec_clear_128(void *);
 extern float vec_length_xy(void *);
-extern void ApproachValue(float *, float, float);
+extern f32 ApproachValue(float *, float, float);
 extern void FastVecSub(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float mat_fast_helper_a(float, float);

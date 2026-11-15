@@ -1,6 +1,6 @@
 #include "common.h"
 /* Adapted from RAC1 walloper_and_beam_effects.c (OpenRAC, GPL-3.0). */
-extern int GetEffectTextureDescriptor(int);
+extern long long GetEffectTextureDescriptor(int);
 extern void FastVecSub(void*,void*,void*), FastVecCross(void*,void*,void*), FastVecAdd(void*,void*,void*);
 extern float FastVecLength(void*);
 extern void FastVecScale(void*,void*,float), draw_world_quad(void*,void*,int), VU1_addGSregister(int,long);

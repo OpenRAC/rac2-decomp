@@ -10,7 +10,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float vec_distance_xy(void *, void *);
 extern float FastAddRotations(float, float);
 extern float math_fabs(float);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern void moby_attach_parts(void *);
 
 /* Seesaw beam: tilts when the hero stands on either end and rocks back toward level, playing a creak sound as it moves. */

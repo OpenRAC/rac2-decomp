@@ -23,12 +23,12 @@ extern int PlayMobySound(int, int, char *);
 extern void entity_launch_member_a(char *, void *, void *, char *, int);
 extern void entity_launch_member_b(char *, void *, void *, char *, int);
 extern float ApproachValue(void *, float, float);
-extern int part_find_owned_effect_slot(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 extern float moby_update_aim_target_strength(char *, int);
 extern void part_spawn_masked_debris(char *, int, void *, int, float, float, float, float);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern void part_spawn_blast_effect_moby(char *, void *, void *, float);
+extern char *part_spawn_blast_effect_moby(char *, void *, void *, float);
 
 extern char g_hero_position[];
 extern char D_L07_001B9200[];

@@ -10,7 +10,7 @@ extern s32 func_0037D390(u8 *arg0, s32 a1, s32 a2, s32 a3);
 extern s32 func_00335200(s32 a0, s32 a1);
 extern void cloud_puff_init(u8 *arg0);
 extern void part_spawn_large_tail_trail(u8 *arg0);
-extern int state_get_stored_pointer_value(void);
+extern void *state_get_stored_pointer_value(void);
 extern void moby_l00_update_empty_4(void);
 extern void level_append_object(s32 a0, s32 a1, s32 a2, s32 a3);
 extern s32 moby_process_collision_hit(u8 *arg0, s32 a1, s32 a2, s32 a3);

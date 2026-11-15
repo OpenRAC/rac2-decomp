@@ -10,7 +10,7 @@ typedef unsigned char u8;
 typedef unsigned int u32;
 
 /* Returns the next free video output frame, or 0 if there is none. */
-int mpeg_vobuf_get_next_frame(int *pool)
+void *mpeg_vobuf_get_next_frame(int *pool)
 {
     int result;
     long isFull;

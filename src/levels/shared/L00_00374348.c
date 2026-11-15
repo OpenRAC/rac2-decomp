@@ -29,7 +29,7 @@ typedef struct {
 extern PlayerProgress g_player_bolts __attribute__((sda));
 extern int g_pad_state[];
 extern int D_L00_001B25A4 __attribute__((sda));
-extern void PlayMobySound(int, int, int);
+extern int PlayMobySound(int, int, int);
 extern void shop_build_vendor_list_by_flags(void);
 extern void PrepareVendorSelectionPreview(void);
 

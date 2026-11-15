@@ -26,7 +26,7 @@ extern void moby_mark_spawned(void *);
 extern float moby_get_anim_value(void *);
 extern void func_US2_002A7AA8(void *, int, int);
 extern int math_random_int_below(int);
-extern void moby_turn_toward_position(void *, void *, void *, float, float, float);
+extern float moby_turn_toward_position(void *, void *, void *, float, float, float);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);

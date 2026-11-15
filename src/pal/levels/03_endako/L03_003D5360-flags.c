@@ -1,7 +1,7 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern void MemcardSave(s32 a0, s32 a1);
+extern int MemcardSave(s32 a0, s32 a1);
 extern s32  func_32AB10(char *a0);
 extern s32  func_360A80(s32 a0, s32 a1, char *a2);
 extern void moby_mark_spawned(void *a0);
@@ -21,7 +21,7 @@ extern u8   D_001A7B34;
 extern void hero_reset_carried_objects(s32 a0);
 extern void moby_mark_table_entry_flagged(s32 a0);
 extern void level_capture_checkpoint_state(char *a0, char *a1);
-extern void MemcardSave(s32 a0, s32 a1);
+extern int MemcardSave(s32 a0, s32 a1);
 extern u8 *D_L03_001B2A1C_tbl[] __asm__("D_L03_001B2A1C") __attribute__((sda));
 
 void func_PAL_L03_003D6298(char *a0)

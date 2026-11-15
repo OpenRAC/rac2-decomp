@@ -6,7 +6,8 @@ extern float math_random_float_range(float,float);
 extern char g_camera_eye_state[];
 extern char *part_spawn_firework_spark(void *,void *,int,int,int,int,int,float,int,float);
 extern float square_root(float), fast_vec_dist(void *,void *), IntToFloat(int);
-extern void FastVecScale(void *,void *,float), vec_fast_helper_a(void *);
+extern void FastVecScale(void *,void *,float);
+extern int vec_fast_helper_a(void *);
 extern int math_random_int_range(int,int);
 extern float D_001B168C MACRO_ADDR;
 /* Updates a firework shell. It rises, splits into sparks near the end of its life, then flares and fades out. */

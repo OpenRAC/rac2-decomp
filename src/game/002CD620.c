@@ -178,7 +178,7 @@ after_first:
 }
 
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void *grid_menu_get_selected_text_id(void *);
+extern int grid_menu_get_selected_text_id(void *);
 
 /* Points the object at the menu panel data, if a panel exists. */
 int menu_set_object_panel_pointer(char *object) {

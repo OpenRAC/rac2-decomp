@@ -23,10 +23,10 @@ extern Res_189E20 g_hero_state;
 extern char D_L00_001B8FF0[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_compute_object_to_target(void *, void *, void *, int, float);
-extern void effect_spawn_owned_moby(void *, void *, void *, void *);
+extern char *effect_spawn_owned_moby(void *, void *, void *, void *);
 
 /* Fires a weapon effect from the hero in the direction the hero is facing. */
-void hero_fire_effect_from_facing(char *position, char *moby) {
+char *hero_fire_effect_from_facing(char *position, char *moby) {
     float velocity[4];
     float angle;
     AngleRecord_262570 *timing;
@@ -48,7 +48,7 @@ void hero_fire_effect_from_facing(char *position, char *moby) {
         vec_compute_object_to_target(hero->pBF8, position, velocity, 0, angle);
         owner = hero->pBF8;
     }
-    effect_spawn_owned_moby(position, velocity, moby, owner);
+    return effect_spawn_owned_moby(position, velocity, moby, owner);
 }
 
 

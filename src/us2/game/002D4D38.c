@@ -7,14 +7,14 @@ extern int __cmpdf2(double, double);
 extern double __subdf3(double, double);
 extern double __muldf3(double, double);
 extern int __fixdfsi(double);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, int *);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, int *);
 typedef struct {
     int value, displayChoice, selectionMask, requiredBits, icon;
 } PreviewChoice;
 extern PreviewChoice D_0026CFD0[];
 
 /* func_US2_002D4D38, the USA v2.00 copy of func_002D3D88: the same C, without the display scaling. */
-int func_US2_002D4D38(int index, int x)
+void func_US2_002D4D38(int index, int x)
 {
     int colors[4];
     int leftAlpha;
@@ -44,7 +44,7 @@ int func_US2_002D4D38(int index, int x)
     right <<= 24;
     colors[2] = colors[0] = leftAlpha | baseColor;
     colors[3] = colors[1] = right | baseColor;
-    return hud_draw_sprite_gradient(texture, left, 334, 40, 40, colors);
+    hud_draw_sprite_gradient(texture, left, 334, 40, 40, colors);
 }
 
 /* func_US2_002D4ED8 lives in 002D4ED8-g8.c. */

@@ -1,5 +1,5 @@
 #include "common.h"
-extern int moby_get_private_value_2(u8 *);
+extern char *moby_get_private_value_2(u8 *);
 extern float math_fabs(float);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);

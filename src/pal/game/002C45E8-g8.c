@@ -10,7 +10,7 @@ extern int D_001AA39C __attribute__((sda));
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
-extern void func_PAL_002BD790(char *, char *, int, int, int, int, int, int, int, float);
+extern void *func_PAL_002BD790(char *, char *, int, int, int, int, int, int, int, float);
 
 void func_PAL_002C45E8(char *self)
 {

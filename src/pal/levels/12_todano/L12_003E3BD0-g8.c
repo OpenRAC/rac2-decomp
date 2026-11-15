@@ -12,7 +12,8 @@ extern void FastVecSub(void *, void *, void *), matrix_mul_vec3(void *, void *, 
 extern int path_build_route_nodes(void *, int, void *, int);
 extern void func_PAL_002A7E68(void *, int, int, int), moby_update_ground_check(void *);
 extern float fast_vec_dist(void *, void *);
-extern void func_PAL_002B1A50(void *, void *, int), gfx_add_draw_callback_third(void (*)(u8 *), void *);
+extern void gfx_add_draw_callback_third(void (*)(u8 *), void *);
+extern int func_PAL_002B1A50(void *, void *, int);
 extern void gfx_add_two_glow_sprites(u8 *);
 typedef struct TodanoInitState {
     u8 pad0[0x28];

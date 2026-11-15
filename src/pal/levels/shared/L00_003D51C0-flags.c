@@ -18,7 +18,7 @@ extern int CollLine(void *,void *,int,void *,void *);
 extern float fast_vec_dist(void *, void *);
 extern char *func_PAL_L00_004012A0(char *, char *, char *, int);
 extern void QueueMobyImpact(int, void *);
-extern void func_PAL_0032F0B8(int, int, char *);
+extern int func_PAL_0032F0B8(int, int, char *);
 extern int g_hero_moby;
 extern unsigned char D_00139582;
 extern L00AimState g_collision_result;

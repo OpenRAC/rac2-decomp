@@ -52,7 +52,7 @@ extern int moby_turn_toward_target_and_step(void *, void *, float);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern char *part_spawn_ground_effect(void *, float, float, int, unsigned int, int, int, void *, float, int);
 extern int moby_l01_turn_toward_target(void *, void *);
-extern void moby_aim_at_target_offset(void *, void *);
+extern int moby_aim_at_target_offset(void *, void *);
 extern int hero_set_control_motion_and_step(void *, void *);
 extern u8 *arena_get_center_point(u8 *);
 extern int arena_is_point_in_polygon(u8 *, void *);

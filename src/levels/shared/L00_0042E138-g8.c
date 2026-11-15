@@ -1,13 +1,13 @@
 #include "names.h"
 /* The level geometry block the model is bound to: the data the model is set up from lives in
    the level's literal pool and is read through $gp. */
-extern int pool_alloc_cell(int value);
+extern void *pool_alloc_cell(int value);
 
 extern int *ui_return_second_arg(int size, int pool);
 
 extern void prompt_bar_init(void *object, int value, const void *data);
 
-extern int GetLocalizedString(int text);
+extern char *GetLocalizedString(int text);
 
 extern void prompt_bar_set_texts(void *object, int first, int second, int third);
 

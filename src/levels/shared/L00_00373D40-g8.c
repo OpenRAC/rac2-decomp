@@ -20,7 +20,7 @@ extern int D_L00_001AD500 __attribute__((sda));
 extern int D_L00_001AD4F8 __attribute__((sda));
 extern int D_L00_001AD4FC __attribute__((sda));
 extern int PlayMobySound(int, int, char *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void shop_set_message_text(void *);
 extern void shop_close_sub_menu(void);
 extern void PrepareVendorSelectionPreview(void);

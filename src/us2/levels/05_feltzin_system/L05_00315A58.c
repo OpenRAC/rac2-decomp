@@ -13,7 +13,7 @@ extern void math_store_angle_update_result(char *, char *, int, int, float);
 extern void vec_fast_to_int_helper(char *, char *);
 extern void quaternion_to_rotation_basis(char *, char *);
 extern void moby_compute_local_point(char *, char *, float, float, float);
-extern void part_spawn_shockwave_burst(char *, int, int, int, int, int, int, int, int, int, int, float);
+extern char *part_spawn_shockwave_burst(char *, int, int, int, int, int, int, int, int, int, int, float);
 extern int math_random_int_below(int kind);
 extern float math_random_signed_float_range(float, float);
 extern char *moby_spawn_shot_effect(char *, char *, char *, int, int, int, int, int, float);

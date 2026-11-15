@@ -9,7 +9,7 @@ extern void func_PAL_L01_003E05D0(void *);
 extern void func_PAL_L01_003E1DB0(void *);
 extern void muckdweller_find_farthest_anchor(void *, void *);
 extern void func_PAL_L01_003E1448(void *, void *);
-extern void func_PAL_L01_003E14E0(void *, void *);
+extern s32 func_PAL_L01_003E14E0(void *, void *);
 extern void func_PAL_L01_003E0710(void *, s32);
 extern void part_spawn_puffs_around_point(void *, s32);
 extern void part_queue_moby_for_glow(void *, s32, s32);
@@ -40,7 +40,7 @@ extern void matrix_from_basis_rows(void *, void *);
 extern f32 weapon_compute_shot_launch_speed(void *, void *, void *, f32, f32);
 extern void MobySpringTurn(void *, f32, f32, f32, f32, void *);
 extern f32 math_approach_target_with_direction_mode(void *, f32, f32, f32, f32, void *, s32);
-extern void coll_test_hit_at_bone(void *, s32, s32, s32, s32, s32, f32, f32, f32);
+extern int coll_test_hit_at_bone(void *, s32, s32, s32, s32, s32, f32, f32, f32);
 extern u8 g_hero_state[];
 extern u8 D_L01_001AC5A0[] MACRO_ADDR;
 

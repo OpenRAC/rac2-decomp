@@ -7,10 +7,10 @@ extern void gfx_disable_screen_flag(void),gfx_enable_screen_flag(void);
 extern int hud_draw_widget_text(void *);
 extern void func_PAL_00338770(void *);
 extern void gfx_draw_screen_rectangle(int,int,int,int,int,void *);
-extern int object_get_fourth_field(u8 *);
+extern int *object_get_fourth_field(u8 *);
 extern void object_set_second_float4(void *,float,float,float,float);
 extern void hud_set_widget_field_b(void *,int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 typedef struct {unsigned int first,second;} MenuColors;
 
 void func_PAL_0034A300(char *o)

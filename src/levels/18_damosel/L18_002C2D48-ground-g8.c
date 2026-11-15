@@ -70,7 +70,7 @@ extern u8 *moby_get_private_value_0(int);
 extern u8 *moby_get_private_value_2(int);
 extern float gravity_get_center_distance(void *);
 extern void vec_compute_flat_direction_from_point(void *, void *, int);
-extern void ApproachValue(float *, float, float);
+extern f32 ApproachValue(float *, float, float);
 extern float fast_vec_dist(void *, void *);
 extern void func_001290E0(void *, void *);
 extern float cam_get_view_space_angle(void *), mat_fast_helper_a(float, float);

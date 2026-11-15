@@ -12,7 +12,7 @@ extern int D_L05_001B251C;
 /* The game's counters, of which the third counts the objects in flight. */
 extern int D_L05_00221D10[];
 
-extern int moby_get_motion_data(char *);
+extern char *moby_get_motion_data(char *);
 extern void follower_set_state(char *, int);
 extern void vec_clear_128(int);
 

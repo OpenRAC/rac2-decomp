@@ -22,7 +22,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_random_float_range(float, float);
 extern s32 math_random_int_range(s32, s32);
-extern void part_spawn_scaling(void *, void *, u32, s32, s32, s32, s32, s32);
+extern char *part_spawn_scaling(void *, void *, u32, s32, s32, s32, s32, s32);
 
 /* func_PAL_L02_00406698, the PAL copy of func_L02_00401D38: the same C, where 1/60 becomes 1/50
    and the three picks of func_002A7820 are scaled to 50 Hz. Retail shows no interblock motion in

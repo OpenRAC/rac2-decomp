@@ -31,7 +31,7 @@ extern void FastVecCross(void *, void *, void *);
 extern float fast_vec_dist(void *, void *);
 extern float math_fabs(float);
 extern int CollLine(void *, void *, int, void *, void *);
-extern void math_spring_float_to_goal(float *, float, float *, float, float, float);
+extern float math_spring_float_to_goal(float *, float, float *, float, float, float);
 extern int snd_is_voice_playing_for_owner(void *, int);
 extern int PlayMobySound(int, int, void *);
 extern void snd_stop_voice(int);
@@ -48,7 +48,7 @@ extern void moby_scale_owner_words_by_angles(char *, char *, char *, float, floa
 extern void math_build_axis_angle_quat(void *, void *, float);
 extern void vec_rotate_by_quaternion(void *, void *, void *);
 extern void part_queue_ground_shadow(char *, float);
-extern void coll_project_point_on_segment(void *, void *, void *, void *);
+extern f32 coll_project_point_on_segment(void *, void *, void *, void *);
 extern int coll_test_point(void *, int, void *, float);
 extern void table_clear_entry_flag(int);
 extern void moby_mark_spawned(void *);

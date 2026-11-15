@@ -10,7 +10,7 @@ extern s32 math_fast_float_d(u8 *a0);
 extern s32 func_0030CBA8(s32 a0);
 extern u8 **func_00379EB8(void);
 extern s32 func_00379EC8(void);
-extern s32 state_get_stored_pointer_value(u8 *a0);
+extern void *state_get_stored_pointer_value(u8 *a0);
 extern void level_append_object(u8 *a0, s32 a1, s32 a2, s32 a3);
 extern s32 moby_process_collision_hit(u8 *a0, s32 a1, s32 a2, s32 a3);
 extern s32 list_count_ready_objects(u8 *a0);

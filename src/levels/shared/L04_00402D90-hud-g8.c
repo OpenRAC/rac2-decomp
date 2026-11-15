@@ -26,7 +26,7 @@ static __inline__ int hud_coord(float value, float scale, float half, int active
 extern int FastTweenColor(int,int,float);
 extern float math_fast_sin_or_cos_b(float),math_fast_sin_or_cos_a(float);
 extern void UpdateViewContext(void);
-extern int table_find_by_id(char *,int);
+extern void *table_find_by_id(char *,int);
 /* Typed interleaving (docs/build/compiler-notes.md, "Source methods shared with RAC1"): the same two
    integer and five float arguments, in the same order within each register bank. */
 extern void gfx_draw_scaled_object_two_axes(int,float,int,float,float,float,float);

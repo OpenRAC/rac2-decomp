@@ -8,7 +8,7 @@ extern void matrix_mul_vec3(TI128 *, TI128 *, char *);
 extern void FastVecAdd(TI128 *, TI128 *, char *);
 extern unsigned char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int,
                                     int, int, void *);
-extern void PlayMobySound(int, int, char *);
+extern int PlayMobySound(int, int, char *);
 extern void vec_scale_to_length(TI128 *, TI128 *, float);
 extern void func_PAL_002B15D8(char *, int, TI128 *, float, float, float, float, int);
 

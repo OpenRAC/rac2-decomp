@@ -44,9 +44,9 @@ extern void func_PAL_L23_004217B0(char *);
 extern void moby_set_state(void *, int, int);
 extern void func_PAL_L00_002AF6C0(void);
 extern void release_moby_animation_slot(int, void *);
-extern void func_PAL_L22_002C99C8(int, int);
+extern s32 func_PAL_L22_002C99C8(int, int);
 extern void func_PAL_002AC3C0(void *, void *);
-extern void func_PAL_002B3F18(void *, void *, void *);
+extern int func_PAL_002B3F18(void *, void *, void *);
 extern void moby_transform_joint_point(void *, int, void *);
 
 /* the boss shield: while it is down, takes the hits of the shots that reach it; while it is up,

@@ -24,7 +24,7 @@ extern float func_PAL_002AA108(u8 *, void *);
 extern float ApproachValue(float *, float, float);
 extern void snd_stop_voice(int);
 extern void func_PAL_L16_00417C58(u8 *);
-extern void weapon_select_aim_target(u8 *, int, void *, void *, float, float);
+extern int weapon_select_aim_target(u8 *, int, void *, void *, float, float);
 
 /* Initializes the boss hierarchy and applies damage, phase changes and speech. */
 void func_PAL_L16_00415760(u8 *moby)

@@ -76,7 +76,7 @@ extern void lift_request_start(void *);
 extern void moby_mark_spawned(void *);
 extern void lift_set_moving_state(void *);
 extern void moby_set_state(void *, int, int);
-extern void func_PAL_L00_002C4480(int, int);
+extern s32 func_PAL_L00_002C4480(int, int);
 extern int math_fast_float_d(void *);
 extern float math_fast_sin_or_cos_b(float);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);

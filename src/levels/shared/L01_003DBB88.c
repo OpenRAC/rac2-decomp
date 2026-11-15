@@ -7,7 +7,7 @@ extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(void *, void *, void *);
 extern float math_random_angle(void);
 extern int math_random_int_range(int, int);
-extern void part_l01_spawn_glow(void *, int, int, float, float, int);
+extern void *part_l01_spawn_glow(void *, int, int, float, float, int);
 
 /* The func_L01_003BD410 puffs, `count` of them around the state's +0x380 point. */
 void part_spawn_puffs_around_point(char *object, int count)

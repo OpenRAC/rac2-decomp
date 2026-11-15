@@ -26,7 +26,7 @@ extern int D_L01_001B2088 MACRO_ADDR;
 extern void moby_update_ground_check(void *);
 extern int weapon_select_aim_target(void *,int,int,int,float,float);
 extern float vec_distance_xy(void *,void *);
-extern s32 moby_get_private_value_0(u8 *);
+extern char *moby_get_private_value_0(u8 *);
 extern int func_PAL_002B1A50(void *,void *,int);
 extern void swamp_beast_release_group_slot(void *);
 extern float mat_fast_helper_a(float,float);

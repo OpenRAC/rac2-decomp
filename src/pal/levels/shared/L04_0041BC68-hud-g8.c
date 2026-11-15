@@ -85,7 +85,7 @@ extern int PlayMobySound(int, int, void *);
 extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void gfx_draw_scaled_object_two_axes(void *, float, int, float, float, float, float);
 extern void DrawNativeQuads(void *, float, float, int, float, void *);
-extern s32 table_find_by_id(void *, int);
+extern void *table_find_by_id(void *, int);
 extern void hud_draw_race_banner(u8 *);
 extern void menu_draw_box_two_labels();
 extern void DrawRaceTimerHud(u8 *);

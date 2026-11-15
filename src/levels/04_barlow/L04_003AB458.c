@@ -3,7 +3,7 @@
 
 typedef unsigned short u16;
 
-extern void FastDecTimer(void *);
+extern int FastDecTimer(void *);
 extern void set_moby_color(void *, int, int, int);
 extern void anim_start_blended(void *, int, int, int);
 extern void gfx_update_color_fade(void *, void *);
@@ -39,7 +39,7 @@ typedef struct {
     TI2338 position;
     char pad40[0x40];
 } Record2338;
-extern void memset(void *, int, int);
+extern void *memset(void *, int, int);
 extern void math_trap_always(void);
 extern int math_random_int_range(int, int);
 extern char *D_L04_001B25CC __attribute__((sda));

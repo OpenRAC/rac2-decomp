@@ -8,7 +8,7 @@ extern void gfx_set_clear_color_packet(int, int, int, int);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, char *, ...);
 extern void gfx_draw_rounded_box(int, int, int, int, int, int);
-extern void text_draw_centered_small(int, int, unsigned long, char *, int);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
 /* Draws the level select list, one text row per planet, and highlights the chosen one. */
 void menu_draw_level_select_list(void)

@@ -64,7 +64,7 @@ extern int D_L00_001B0238 __attribute__((sda));
 
 extern s32 FastDecTimer(s16 *);
 extern int math_fast_float_d(void *);
-extern void vec_fast_helper_b(void *);
+extern int vec_fast_helper_b(void *);
 extern void ref_L00_003D1D28_00(int, int);
 extern int get_ammo(int);
 extern int weapon_spend_ammo(int, int);
@@ -87,7 +87,7 @@ extern u8 *part_spawn_pulled_particle(void *, int, float, float, u32, int, int, 
 extern void InitEffectStrips(u8 *, void *, int);
 extern s32 coll_process_hit(f32, void *, s32, void *, s32);
 extern void QueueMobyImpact(u8 *, Hit *);
-extern void StartAttachedEffect(u8 *, int, u8 *);
+extern int StartAttachedEffect(u8 *, int, u8 *);
 extern void euler_to_matrix(void *, void *);
 extern void copy_matrix3x4(void *, void *);
 extern void moby_transform_joint_to_world(u8 *, int, void *);

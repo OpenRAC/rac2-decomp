@@ -22,8 +22,8 @@ extern int coll_test_hit_at_bone(void *, float, float, int, int, float, int, int
 extern float ApproachValue(void *, float, float);
 extern int moby_dispatch_action_by_kind(void *, void *);
 extern int flag_set_first_pending(void *);
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
-extern void moby_aim_move_record_at_target(void *, void *, float, float);
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern int moby_aim_move_record_at_target(void *, void *, float, float);
 extern int func_PAL_L07_00324F58(void *, float, float, float);
 extern void extermibot_set_aim_toward_point(void *, void *, int);
 extern int extermibot_is_position_short(void *, void *);

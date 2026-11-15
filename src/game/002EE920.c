@@ -2,7 +2,7 @@
 #include "names.h"
 
 typedef int V4_Fb6552688 __attribute__((mode(TI)));
-extern int moby_get_motion_data(unsigned char *owner);
+extern char *moby_get_motion_data(unsigned char *owner);
 extern unsigned int follower_get_state(unsigned char *owner);
 extern void follower_clamp_push_vector(char *);
 

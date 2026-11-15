@@ -9,7 +9,7 @@ extern void gfx_reset_record_list();
 extern void func_002F0468();
 extern void level_relocate_header_blocks();
 extern void initialize_tfrag_render_data();
-extern void fast_decompress();
+extern int fast_decompress();
 extern void FlushCache();
 extern int load_read_disc_with_pause(char *, int, int);
 extern void level_flush_table_entry_offsets();

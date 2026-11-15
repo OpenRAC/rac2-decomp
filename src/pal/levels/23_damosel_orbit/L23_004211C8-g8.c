@@ -5,7 +5,7 @@ extern int PlayMobySound(int index, int a1, char *a2);
 typedef int TI128 __attribute__((mode(TI)));
 extern void matrix_mul_vec3(char *, char *, char *);
 extern void FastVecAdd(char *, char *, char *);
-extern void SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern char g_hero_state[];
 extern void FastVecAdd(char *, char *, char *);
 
@@ -69,11 +69,11 @@ extern void FastVecSub(float *, float *, float *);
 
 extern void vec_scale_to_length(float *, float *, float);
 
-extern void func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *func_PAL_L00_003FB330(char *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 extern void func_PAL_L23_00423898(void *, int, int, TI128 *, float *, int);
 
-extern int func_PAL_L23_0042B658(void *, void *, int, int, int, int, int, int, float, int, int, int, int, int);
+extern void *func_PAL_L23_0042B658(void *, void *, int, int, int, int, int, int, float, int, int, int, int, int);
 
 /* func_PAL_L23_004211C8, the PAL copy of func_L23_0041C0E8: the same C, with every timer limit scaled to 50 Hz.
    The two wait extensions scale their sum, and D_L23_001B1694 is stored before D_L23_001B16A8 is cleared. */

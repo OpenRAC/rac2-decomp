@@ -26,7 +26,7 @@ extern f32 mat_fast_helper_a(f32,f32);
 extern f32 fast_vec_dist(void *,void *);
 extern f32 IntToFloat(s32);
 extern void vec_clear_128(void *);
-extern void func_PAL_L01_002BEC60(s32,s32);
+extern s32 func_PAL_L01_002BEC60(s32,s32);
 extern void func_PAL_L00_002B9CD8(void *,void *,s32,s32);
 /* Starts a camera path: resets its motion and mark records, measures both
  * paths' segment lengths, primes both springs and copies the template transform. */

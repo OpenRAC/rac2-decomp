@@ -11,7 +11,7 @@ extern int PlayMobySound(int, int, void *);
 extern int hero_is_current_selected_id(void *);
 extern void moby_set_state(void *, int, int);
 extern int coll_test_point(void *, int, void *, float);
-extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void FastVecSub(void *, void *, void *);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 

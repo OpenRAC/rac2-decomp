@@ -15,13 +15,15 @@ extern int FloatToInt(float),math_random_int_range(int,int);
 extern void moby_set_state(void *,int,int),gfx_draw_glowing_spark_rings(void *);
 extern void *part_find_owned_effect_slot(void *,int,int);
 extern float moby_update_aim_target_strength(void *,void *);
-extern void gfx_start_color_fade(void *,void *),gfx_update_color_fade(void *,void *),moby_transform_joint_to_world(void *,int,void *),anim_start_immediate(void *,int,int);
+extern void gfx_start_color_fade(void *,void *), gfx_update_color_fade(void *,void *), anim_start_immediate(void *,int,int);
+extern void moby_transform_joint_to_world(void *,int,void *);
 extern void SpawnExplosionEffects(void *,void *,void *,float,float,int,int,int,float,float,float,float,int,float,int,int,int,int,int);
 extern void part_spawn_effect_burst(void *,int,int,int,int,int,int,void *);
 extern int PlayMobySound(int,int,void *);
 extern void *CreateMoby(int);
 extern void func_002A0F48(void *),hero_copy_field_to_moby(void *),vec_build_spherical_offset(void *,float,float,float);
-extern void FastVecAdd(void *,void *,void *),moby_spawn_spinning_object(void *,void *,void *,float,float);
+extern void FastVecAdd(void *,void *,void *);
+extern s32 moby_spawn_spinning_object(void *,void *,void *,float,float);
 /* Applies damage, updates hit effects, and spawns debris when health reaches zero. */
 void crystal_shell_update_damage(char *o) {
     char *p=F(o,char *,0x68), *hit, *spawn, *health, *effect;

@@ -19,7 +19,7 @@ extern void set_identity_rotation_rows(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void arena_push_point_out(void *, float);
 extern void moby_mark_spawned(void *);
-extern void snd_start_in_slot(int, int, int);
+extern int snd_start_in_slot(int, int, int);
 extern int flag_set_first_pending(void *);
 extern int math_random_int_below(int);
 extern int CollLine(void *, void *, int, int, int);

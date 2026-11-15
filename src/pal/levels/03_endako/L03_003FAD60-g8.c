@@ -8,7 +8,7 @@ extern u8 *func_PAL_L00_002D7850(s32 a0);
 extern f32 mat_fast_helper_a(f32 a, f32 b);
 extern f32 FastAddRotations(f32 a, f32 b);
 extern f32 fast_subtract_rotations(f32 a, f32 b);
-extern void math_approach_target_with_direction_mode(void *a0, void *a1, f32 a3, f32 a4, f32 a5, f32 a6, void *a2);
+extern f32 math_approach_target_with_direction_mode(void *a0, void *a1, f32 a3, f32 a4, f32 a5, f32 a6, void *a2);
 extern f32 D_L03_001B1090 __attribute__((sda));
 extern f32 D_L03_001B1094 __attribute__((sda));
 typedef struct { u8 pad[0x80]; f32 x, y; } Hero;

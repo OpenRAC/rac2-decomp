@@ -277,7 +277,7 @@ extern float FastAddRotations(float,float);
 extern int CollLine(void *,void *,int,void *,int);
 extern int moby_is_in_special_class_range(void *);
 extern char *moby_get_private_value_2(void *);
-extern void moby_get_attachment_rotation_angles(void *,void *,void *,void *,void *,void *);
+extern int moby_get_attachment_rotation_angles(void *,void *,void *,void *,void *,void *);
 extern int GetFirstMobyInGroup(void *,int,int,int);
 extern int GetNextMobyInGroup(void *,void *,int,int);
 extern void math_trap_always(void);

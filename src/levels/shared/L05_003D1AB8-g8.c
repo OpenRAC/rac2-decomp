@@ -6,7 +6,7 @@ extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern void vec_add_random_offset(void *, float);
 extern float math_random_float_range(float, float);
-extern void part_spawn_object_relative_particle(void *, void *, void *, void *, int);
+extern void *part_spawn_object_relative_particle(void *, void *, void *, void *, int);
 extern float D_L05_001AFC60[] SDATA(D_L05_001AFC60);
 extern float D_L05_001AFC70[] SDATA(D_L05_001AFC70);
 extern float D_L05_001AFC80[] SDATA(D_L05_001AFC80);

@@ -31,7 +31,7 @@ extern char D_0025DA38[];
 extern void popup_set_row(char *, int);
 extern void save_start_to_slot(int, int);
 extern void menu_set_confirm_pending(void);
-extern void menu_send_request(int, char *);
+extern int menu_send_request(int, char *);
 extern int request_begin_slot(int, int, int, int, int);
 extern int menu_get_counter(void);
 extern int menu_get_mode(void);

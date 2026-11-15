@@ -7,7 +7,7 @@
  * label x positions come from per-language tables indexed by D_001A7BB4. */
 extern void arena_draw_menu_help_prompts(char *,int);
 extern int arena_get_challenge_name_text(int), arena_get_challenge_save_index(int), moby_compute_scaled_entry_value(int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int func_001157AC(char *);
 extern int sprintf(char *,char *,...);
 extern void FontSetWindow(void *,int,int,int,int,int,int,int,int);

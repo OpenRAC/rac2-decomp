@@ -17,7 +17,7 @@ extern s32 func_342228(void *a0, void *a1);
 extern s32 req_push_queue(u8 *a0, s32 a1);
 extern s32 req_launch_queued(void *a0);
 extern float math_spring_float_to_goal(float *a0, float *a1, float f12, float f13, float f14, float f15);
-extern void PlayMobySound(s32 a0, s32 a1, char *a2);
+extern int PlayMobySound(s32 a0, s32 a1, char *a2);
 extern u8 D_0019B2E8[];
 extern u8 D_L04_001BF880[];
 extern u8 D_L04_001B9680[];

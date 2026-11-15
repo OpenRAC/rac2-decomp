@@ -119,7 +119,7 @@ extern void scene_trigger_update(Moby *moby);
 extern void gorn_path_marker_course_update(Moby *moby);
 extern void level_store_value_pair(s32 a0, void (*callback)(void));
 extern s32 cam_is_mode_active(void);
-extern void DrawGornStageHud(void);
+extern s32 DrawGornStageHud(void);
 extern void func_L15_0042FDD8(void);
 extern void func_L15_0042FED0(void);
 extern s32 moby_l15_apply_hit_damage(Moby *moby, s32 keep);

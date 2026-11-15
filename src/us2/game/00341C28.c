@@ -79,10 +79,10 @@ int func_US2_00341F40(char *self, unsigned int buttons, MenuEntry *table)
 }
 
 
-extern void func_L00_0042BAD0_6(u8 *);
-extern void func_L00_0042BFF8_5(u8 *);
-extern void func_L00_0042C290_6(u8 *);
-extern void func_00347EA0_1(u8 *);
+extern char *func_L00_0042BAD0_6(u8 *);
+extern char *func_L00_0042BFF8_5(u8 *);
+extern char *func_L00_0042C290_6(u8 *);
+extern unsigned long long func_00347EA0_1(u8 *);
 
 /* initialises eight in-place sub-records of one object by four routines, then returns the object pointer */
 u8 *func_US2_003420D0(u8 *a0) {

@@ -176,7 +176,7 @@ void searchlight_update(PrisonLight *object)
 }
 
 extern float D_L14_001B16B0 __attribute__((sda));
-extern void moby_apply_damage_to_object(char *a0, char *a1, int a2);
+extern int moby_apply_damage_to_object(char *a0, char *a1, int a2);
 extern void part_spawn_explosion_with_sparks(char *a0, char *a1, float f12, float f13, int a2);
 extern void SetDeathBits(char *a0, int a1, int a2);
 

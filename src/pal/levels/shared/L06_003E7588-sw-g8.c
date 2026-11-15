@@ -28,7 +28,7 @@ extern RouteLevelState D_L06_0021E830;
 extern void moby_mark_spawned(void *);
 extern int taxi_is_flying(void *);
 extern void table_set_entry_field(void *, int);
-extern void effect_create_timed(void *, void *, int, int, int, int, int, float);
+extern unsigned char *effect_create_timed(void *, void *, int, int, int, int, int, float);
 extern float mat_fast_helper_a(float, float);
 extern int moby_fuse_linked_objects(void *, void *, void *, int, int);
 extern int IsPointInCuboid(void *, int);

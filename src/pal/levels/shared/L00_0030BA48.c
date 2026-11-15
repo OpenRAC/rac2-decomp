@@ -16,7 +16,7 @@ extern unsigned char D_001A7960[];
 extern unsigned char D_001A7980[];
 extern unsigned char D_001A79A0[];
 extern unsigned char D_001A79D0[];
-extern void strncpy(void *, int, int);
+extern char *strncpy(void *, int, int);
 
 void func_PAL_L00_0030BA80(unsigned char *source)
 {

@@ -152,7 +152,7 @@ typedef struct {
 extern unsigned char g_item_owned_flags[];
 extern unsigned char D_001395B8[];
 extern int request_is_current_slot(int);
-extern unsigned char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void SetupGifPaging(int);
 extern void DoGifPaging(void);
 extern void text_draw_window_medium(TextWindow2DA9A8 *, long, unsigned char *, int);

@@ -11,7 +11,7 @@ extern u8 *cam_alloc_override_slot(s32 a0);
 extern f32 mat_fast_helper_a(f32 a, f32 b);
 extern f32 FastAddRotations(f32 a, f32 b);
 extern f32 fast_subtract_rotations(f32 a, f32 b);
-extern void math_approach_target_with_direction_mode(void *a0, void *a1, f32 a3, f32 a4, f32 a5, f32 a6, void *a2);
+extern f32 math_approach_target_with_direction_mode(void *a0, void *a1, f32 a3, f32 a4, f32 a5, f32 a6, void *a2);
 
 /* The level's own two floats. */
 extern f32 D_L03_001B1090 __attribute__((sda));

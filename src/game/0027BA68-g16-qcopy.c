@@ -43,7 +43,8 @@ extern void pad_vib_routine_g(void *, void *, float);
 extern void pad_vib_routine_e(void *, void *, float);
 extern void gfx_build_view_matrices(void);
 extern void gfx_pack_render_command_fields(void *, int, int, int, int);
-extern void UpdateViewContext(void), gfx_append_vu1_preset_a(void), mem_restore_scratch_area(void), tex_upload_main_textures(void);
+extern void UpdateViewContext(void), mem_restore_scratch_area(void), tex_upload_main_textures(void);
+extern void gfx_append_vu1_preset_a(void);
 extern int tex_run_upload_and_setup(void);
 extern void draw_world_quad(void *, int, int);
 

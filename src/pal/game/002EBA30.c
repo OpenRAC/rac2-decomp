@@ -6,7 +6,7 @@ typedef struct { char pad[0x30]; int selected; char gap[0x3C]; int destination; 
 extern State2EB158 g_scene_playback_state;
 extern char g_copy_setup_data[];
 extern int load_start_disc_read(int, int, int);
-extern void snd_pump_music_and_disc_read(int);
+extern short snd_pump_music_and_disc_read(int);
 
 int func_PAL_002EC070(int index)
 {

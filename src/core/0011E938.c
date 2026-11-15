@@ -95,7 +95,7 @@ int iop_loadfile_buffers_equal(void) {
 
 extern int D_00134748;
 extern char D_00140528[];
-extern void memset(void *, int, int);
+extern void *memset(void *, int, int);
 
 /* Marks the module loader as not ready and clears its saved buffer. */
 int iop_loadfile_reset_state(void) {

@@ -18,16 +18,16 @@ extern u32 D_001A7390 __attribute__((sda));
 extern float FastAddRotations(float, float);
 extern int IsPointInCuboid(void *, int);
 extern int req_push_queue(void *, int);
-extern void req_launch_queued(void *);
+extern s32 req_launch_queued(void *);
 extern void func_PAL_L01_003D2C38(void *);
 extern int game_is_either_mode_two(void);
 extern void hero_reset_position_and_direction(void *, void *, int, int);
 extern void help_unlock_entry(int);
-extern void moby_handle_request_slot_state(int);
+extern int moby_handle_request_slot_state(int);
 extern void value_set_entry_by_index(int, int);
-extern void MemcardSave(int, int);
+extern int MemcardSave(int, int);
 extern void cam_lock_entry(int);
-extern void subtitle_request_voice_line(int, int);
+extern int subtitle_request_voice_line(int, int);
 
 void func_PAL_L01_003D2EF0(u8 *a0)
 {

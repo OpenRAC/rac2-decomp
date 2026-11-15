@@ -8,12 +8,12 @@ extern s32 D_L20_001B23A8 __attribute__((sda));
 extern s32 D_L20_001B23B0 __attribute__((sda));
 
 extern void moby_set_state(char *, s32, s32);
-extern s32 part_find_owned_effect_slot(char *, s32, s32);
-extern void part_spawn_object_following_effect(void *, char *, s32, s32, float, float, s32, s32, s32, s32);
-extern s32 part_explode_object_into_pieces(char *, s32 *, s32 *, s32 *, s32, s32, s32, s32, s32, s32, s32);
+extern void *part_find_owned_effect_slot(char *, s32, s32);
+extern void *part_spawn_object_following_effect(void *, char *, s32, s32, float, float, s32, s32, s32, s32);
+extern void part_explode_object_into_pieces(char *, s32 *, s32 *, s32 *, s32, s32, s32, s32, s32, s32, s32);
 extern void moby_compute_local_point(char *, void *, float, float, float);
-extern void SpawnExplosion(void *, s32, s32, s32, float, float, s32, s32, s32, s32, s32, s32, s32, s32);
-extern void moby_l00_spawn_child(char *, s32, s32);
+extern char *SpawnExplosion(void *, s32, s32, s32, float, float, s32, s32, s32, s32, s32, s32, s32, s32);
+extern char *moby_l00_spawn_child(char *, s32, s32);
 extern void moby_mark_spawned(char *);
 
 /* Three-state effect object: arms its emitter, waits for the trigger, then plays the burst and retires. */

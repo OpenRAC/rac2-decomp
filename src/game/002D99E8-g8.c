@@ -18,7 +18,7 @@ extern int g_map_overlay_state[];
 extern void SetupGifPaging(int);
 extern int menu_list_active_entries(int *, int *, int *, int);
 extern void VU1_addGSregister(unsigned int, unsigned long);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void text_draw_small(int, int, long, signed char *, int);
 extern void *memset(void *, int, unsigned int);
 extern void gfx_draw_rounded_box(int, int, int, int, int, int);

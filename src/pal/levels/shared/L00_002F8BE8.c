@@ -3,13 +3,13 @@
 #include "common.h"
 extern int hud_init_counter_values(void *);
 
-int func_PAL_L00_002F8BE8(char *self) {
+void func_PAL_L00_002F8BE8(char *self) {
     *(short *)(self + 0x48) = 0;
     *(short *)(self + 0x4A) = 0;
     *(int *)(self + 0x58) = 0x20;
     *(int *)(self + 0x7C) = 0x26;
     *(int *)(self + 0x5C) = 0x20;
-    return hud_init_counter_values(self);
+    hud_init_counter_values(self);
 }
 
 

@@ -9,13 +9,13 @@ extern float D_L01_001B2090 __attribute__((sda));
 extern int D_L01_001B15E0 __attribute__((nosda));
 extern int D_L01_001B3468 SDATA(D_L01_001B3468);
 extern void moby_set_state(char *, int, int);
-extern int part_find_owned_effect_slot(char *, int, int);
+extern void *part_find_owned_effect_slot(char *, int, int);
 extern void FastVecScale(char *, char *, float);
 extern void part_spawn_masked_debris(char *, int, void *, float, float, float, float, int);
 extern void part_spawn_scaled_bolts(char *, float, int);
 extern int PlayMobySound(int, int, char *);
 extern int flag_set_first_pending(char *);
-extern int moby_mark_spawned(char *);
+extern void moby_mark_spawned(char *);
 
 typedef struct { char pad0[0x31]; u8 active; u16 pad32; u16 flags; char pad36[0x62]; int target; } RetiringObject;
 /* Update for a breakable object: counts itself, waits to be hit, bursts with a sound and retires after a timer. */

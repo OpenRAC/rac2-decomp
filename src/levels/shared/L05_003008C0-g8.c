@@ -53,7 +53,7 @@ extern int D_L05_001AC4D8 __attribute__((sda));
 extern int D_L05_00225DD0[];
 
 /* Returns the first live object with the given class id, or 0. */
-int level_find_object_by_class_id(int classId) {
+void *level_find_object_by_class_id(int classId) {
     int i;
 
     for (i = 0; i < D_L05_001AC4D8; i++) {

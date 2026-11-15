@@ -31,12 +31,12 @@ extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern int moby_check_target_point_from_offset(char *, void *);
 extern float mat_fast_helper_a(float, float);
-extern void moby_step_at_own_position_factor(char *, float);
+extern int moby_step_at_own_position_factor(char *, float);
 extern int moby_count_group_side_from_object(char *, void *, int);
 extern void moby_turn_toward_target_limited(char *);
-extern void moby_start_effect_from_entry(char *, float);
+extern int moby_start_effect_from_entry(char *, float);
 extern int func_US2_002AF9C8(char *, float);
-extern void coll_test_hit_at_bone(char *, int, int, int, int, int, float, float, float);
+extern int coll_test_hit_at_bone(char *, int, int, int, int, int, float, float, float);
 extern void dobbo_tick_timers_effects(char *);
 extern void dobbo_update_pulsing_tint(char *);
 #define BYTE(p,o) (*(u8 *)((p)+(o)))

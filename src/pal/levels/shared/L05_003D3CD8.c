@@ -27,7 +27,7 @@ typedef struct {
     char pad8C[0x54];
 } SoundSlot003CFF90;
 extern ObjCommon003CFF90 *moby_get_motion_data(char *);
-extern int state_get_stored_pointer_value(void);
+extern void *state_get_stored_pointer_value(void);
 extern void func_PAL_L05_003D4068(char *);
 extern void vec_clear_128(void *);
 extern void level_append_object(char *, void *, int, int);

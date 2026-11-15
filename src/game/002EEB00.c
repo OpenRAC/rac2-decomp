@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern int moby_get_motion_data();
+extern char *moby_get_motion_data();
 
 extern int follower_get_state();
 

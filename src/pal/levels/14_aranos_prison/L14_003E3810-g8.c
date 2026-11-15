@@ -5,7 +5,7 @@ typedef int TI128 __attribute__((mode(TI)));
 typedef union { TI128 q; float f[4]; } Vector;
 extern char *D_L14_001B268C __attribute__((sda));
 extern char g_sound_state[];
-extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void mat_combine_and_store(void *, void *, void *, void *);
 extern float math_fabs(float);
 extern int PlayMobySound(int, int, void *);

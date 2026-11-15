@@ -19,7 +19,7 @@ extern f32 math_random_float_range(f32, f32);
 extern s32 math_random_int_below(s32);
 extern void vec_random_direction(f32 *, f32, f32);
 extern void FastVecAdd(void *, void *, void *);
-extern void part_spawn_ground_effect(void *, u32, u32, u32, s32, s32, s32, f32, f32, f32);
+extern void *part_spawn_ground_effect(void *, u32, u32, u32, s32, s32, s32, f32, f32, f32);
 extern u32 D_0024A7B0;
 extern s32 ref_L03_003E3750_00(u8 *, u32);
 extern u8 *CreateMoby(s32);

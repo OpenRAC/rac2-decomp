@@ -28,8 +28,8 @@ extern int math_random_int_below(int);
 extern char *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void homing_l00_shot_spawn(void *, char *, char *);
-extern void PlayMobySound(int, int, char *);
+extern char *homing_l00_shot_spawn(void *, char *, char *);
+extern int PlayMobySound(int, int, char *);
 extern float math_random_float_range(float, float);
 
 typedef struct {

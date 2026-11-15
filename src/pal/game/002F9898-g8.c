@@ -32,7 +32,7 @@ extern unsigned short D_001A7AF2;
 extern void gfx_select_packet_buffer_setup(void);
 extern int PlayMobySound(int, int, void *);
 extern void func_PAL_00292CD0(int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_PAL_0029D630(int, int);
 extern void func_PAL_00292F00(int);
 extern void func_PAL_00292FC8(int);

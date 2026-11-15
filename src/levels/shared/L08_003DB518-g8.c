@@ -26,12 +26,13 @@ extern s32 g_screen_height MACRO_ADDR;
 extern Style D_L08_001B0490;
 extern char D_L08_001B04A0[];
 
-extern void gfx_append_draw_list_packet_b(void), hero_begin_saved_float_hold(void), hero_set_saved_float_and_update(void);
-extern void hero_end_saved_float_hold(void);
-extern s32 table_find_by_id(void *, s32);
+extern void gfx_append_draw_list_packet_b(void), hero_set_saved_float_and_update(void);
+extern s32 hero_begin_saved_float_hold(void);
+extern s32 hero_end_saved_float_hold(void);
+extern void *table_find_by_id(void *, s32);
 extern void gfx_draw_scaled_object_two_axes(char *, s32, f32, f32, f32, f32, f32);
 extern s32 mode_get_selector(void), GetIconFrame(s32, s32), FloatToInt(f32);
-extern int hud_draw_sprite_gradient(s32, s32, s32, s32, s32, void *);
+extern void hud_draw_sprite_gradient(s32, s32, s32, s32, s32, void *);
 extern s32 sprintf(char *, char *, ...);
 extern u32 func_001157AC(char *);
 extern s32 text_draw_centered_small(s32, s32, u64, void *, s32);

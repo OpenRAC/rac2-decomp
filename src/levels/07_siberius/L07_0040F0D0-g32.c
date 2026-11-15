@@ -7,7 +7,7 @@ extern void func_31F9E0(void *,void *);
 extern void func_2E4B70(void *,void *);
 extern void func_2E47F8(void *,void *,void *);
 extern void func_2E4EB8(void *,void *,void *);
-extern void func_308EE8(void *);
+extern float func_308EE8(void *);
 extern void func_2E4340(void *,void *,void *);
 extern void func_3152C0(void *,void *);
 extern void func_317618(void *,void *,void *,void *);

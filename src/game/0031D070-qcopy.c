@@ -13,7 +13,7 @@ extern void vec_build_spherical_offset(float *, float, float, float);
 extern float math_random_signed_float_range(float, float);
 /* The three floats come before the last int: retail sets up $f14 before $t2 at every call
    (here, and in func_003258C0 and func_L03_003D0FC8). */
-extern void part_spawn_ground_effect(float *, int, int, int, int, float *, float, float, float, int);
+extern void *part_spawn_ground_effect(float *, int, int, int, int, float *, float, float, float, int);
 
 /* Throws `count` sparks from the position: each is a random direction and a random drift of
    the position itself, and goes out as a pair of particles, one of each sign. */

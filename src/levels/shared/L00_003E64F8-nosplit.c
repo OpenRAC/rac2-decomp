@@ -9,7 +9,7 @@ extern void vec_scale_to_length(char *a, char *b, float c);
 extern void FastVecCross(char *a, char *b, char *c);
 
 extern float math_random_angle(void);
-extern void AllocateOwnedEffectParticle(char *, int, float, float, int);
+extern char *AllocateOwnedEffectParticle(char *, int, float, float, int);
 extern void FastVecAdd(void *, void *, void *);
 
 extern float FastAddRotations(float a, float b);

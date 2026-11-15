@@ -1,6 +1,6 @@
 #include "include_asm.h"
 #include "common.h"
-extern int moby_get_motion_data(unsigned char *);
+extern char *moby_get_motion_data(unsigned char *);
 extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float D_L00_001AC588 __attribute__((sda));

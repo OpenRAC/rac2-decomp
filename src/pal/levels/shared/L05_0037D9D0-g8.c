@@ -4,7 +4,7 @@ extern char *D_L05_001B251C;
 extern int D_L05_00225DD0[];
 extern int D_L05_00225E50[];
 extern int D_L05_001FB220[];
-extern int moby_get_motion_data(char *object);
+extern char *moby_get_motion_data(char *object);
 extern int level_get_saved_value(void);
 extern void moby_init_spawned_sub_object(char *object, int flag);
 

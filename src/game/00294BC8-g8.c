@@ -20,7 +20,7 @@ typedef struct {
 extern Quad16 D_00255ED0[];
 
 /* Returns the map scaling values for a level; on level 20 it picks one of two special sets. */
-int map_get_coefficients(int levelIndex)
+float *map_get_coefficients(int levelIndex)
 {
     if (g_current_map_index == 20) {
         int value = D_001C4F40;

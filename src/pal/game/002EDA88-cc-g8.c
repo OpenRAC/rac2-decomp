@@ -15,7 +15,7 @@ extern short D_00152C20 NOT_SDA;
 extern unsigned long long GetEffectTextureDescriptor(int);
 extern void moby_transform_joint_point(void *, int, void *);
 extern float math_fabs(float);
-extern void math_fast_float_d(int *);
+extern int math_fast_float_d(int *);
 extern float IntToFloat(int);
 extern void transform_vector(void *, void *, void *);
 extern void FastVecSub(void *, void *, void *);

@@ -29,11 +29,11 @@ typedef struct {
 } L03_003C8698_Body;
 
 extern void part_init_effect_record(void *moby, void *a1, u32 a2, f32 a3);
-extern void coll_sweep_from_object(void *moby, void *a1, s32 a2, f32 a3, f32 a4, f32 a5,
+extern int coll_sweep_from_object(void *moby, void *a1, s32 a2, f32 a3, f32 a4, f32 a5,
                           s32 a6, s32 a7, s32 a8);
 extern void copy_matrix_rotation(void *moby, void *a1);
 extern void transform_vector(void *moby, void *a1, void *a2);
-extern void CollLine(void *moby, void *a1, void *a2, void *a3, void *a4);
+extern s32 CollLine(void *moby, void *a1, void *a2, void *a3, void *a4);
 extern L03_V4 D_L03_0029A8D0[];
 
 /* Seeds the actor's effect: the state, the aim, the effect track and then the

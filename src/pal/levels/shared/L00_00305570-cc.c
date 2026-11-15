@@ -117,7 +117,7 @@ extern void func_00291DE0(void *, int);
 extern void level_load_quadword_block(char *);
 extern void tex_rebase_pack_fill_ranges(void *, char *, void *, int);
 extern void STUB_printf(const char *, ...);
-extern int func_PAL_L00_003021B0(int);
+extern char *func_PAL_L00_003021B0(int);
 extern void tutorial_reset_record_values(void);
 extern void level_update_object_visibility(int);
 extern void func_PAL_L00_0035B058(void);

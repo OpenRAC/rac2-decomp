@@ -9,15 +9,15 @@ extern void moby_set_state(char *,int,int);
 extern void anim_start_blended(char *,int,int,int);
 extern char *part_find_owned_effect_slot(char *,int,int);
 extern float moby_update_aim_target_strength(char *,char *);
-extern void ApproachValue(char *,float,float);
+extern f32 ApproachValue(char *,float,float);
 extern int req_push_queue(char *,int);
-extern void req_launch_queued(char *);
+extern s32 req_launch_queued(char *);
 extern void SetDeathBits(char *,int,int);
 extern void game_set_stored_value_pair(void (*)(int),char *);
 extern void moby_start_screen_effect_state(int);
 extern void group_activate_waiting_members(int,float);
 /* EE keeps integer and floating arguments in independent register banks. */
-extern void weapon_select_aim_target(char *,int,float,float,int,int);
+extern int weapon_select_aim_target(char *,int,float,float,int,int);
 extern void euler_rotation_basis(char *,char *);
 extern const float D_L20_001B2030 __attribute__((sda));
 extern const float D_L20_001B2034 __attribute__((sda));

@@ -18,7 +18,7 @@ extern int FloatToInt(float);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern char *part_spawn_ground_effect(void *, int, int, float, float, float, int, int, void *, int);
-extern void part_spawn_spinning_particle(void *, void *, int, int, float, float, int, int, int, int, int);
+extern void *part_spawn_spinning_particle(void *, void *, int, int, float, float, int, int, int, int, int);
 extern char D_L11_001BA8C0[];
 extern float D_L11_001B1FE0 __attribute__((sda));
 extern float D_L11_001B1FE4 __attribute__((sda));

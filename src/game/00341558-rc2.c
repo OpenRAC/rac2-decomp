@@ -26,7 +26,7 @@
 
 extern s8 D_00265290[];
 /* Returns the value of the selected entry of the current tab, or 0 when it is locked. */
-s32 tab_menu_get_selected_value(s32 self) {
+void *tab_menu_get_selected_value(s32 self) {
     s32 tab;
     s32 result;
     s32 base;

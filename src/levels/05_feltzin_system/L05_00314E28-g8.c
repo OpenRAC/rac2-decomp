@@ -84,10 +84,10 @@ extern int math_random_int_below(int kind);
 
 extern float math_random_float_range(float a, float b);
 
-extern void func_L05_00398F18(void *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
+extern char *func_L05_00398F18(void *a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
                               float f8);
 
-extern void part_spawn_shockwave_burst(void *a0, void *a1, int a2, int a3, int a4, int a5, int a6, int a7,
+extern char *part_spawn_shockwave_burst(void *a0, void *a1, int a2, int a3, int a4, int a5, int a6, int a7,
                               int a8, int a9, int a10, float f12);
 
 extern void func_L05_00421908(char *a0, int a1, int a2);

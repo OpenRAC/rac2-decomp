@@ -3,7 +3,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 extern float fast_vec_dist(void *, void *);
-extern void find_nearest_path_point(int, TI128 *, TI128 *, float, float, float, int *, float *, int);
+extern int find_nearest_path_point(int, TI128 *, TI128 *, float, float, float, int *, float *, int);
 extern short path_step_along_entry(char *, int, TI128 *, int, int, float);
 extern int path_move_moby_turn_speed(char *, TI128 *, float);
 extern int D_L09_001FE6C0[];

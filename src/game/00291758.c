@@ -66,7 +66,7 @@ extern void snd_print_status(void);
 extern void snd_load_first_bank(void);
 extern void snd_load_bank_entry(int);
 /* The callee at 0x00132828 (the catalogue names it func_00132818). */
-extern int func_00132828(void);
+extern void func_00132828(void);
 /* As in RAC1: the disc wait-frame count, a flag set once the load has
    been stepped back, and a mode word that is 1 until then. */
 extern int D_001A7430 __attribute__((sda));
@@ -135,9 +135,9 @@ typedef int s32;
 
 typedef unsigned char u8;
 
-extern void F46b43b72_FUN_002B7B18(int value, char *target);
+extern int F46b43b72_FUN_002B7B18(int value, char *target);
 
-extern void F46b43b72_FUN_002B7CE0(int value);
+extern short F46b43b72_FUN_002B7CE0(int value);
 
 extern int F46b43b72_D_001B8840[];
 
@@ -752,7 +752,7 @@ void load_clear_class_cache_table(void)
 
 
 
-extern void load_start_disc_entry(int, int, int, int);
+extern s32 load_start_disc_entry(int, int, int, int);
 
 /* Looks the id up in the class table and starts loading it into the given cache slot if it is not already there. */
 void load_class_into_cache_slot(int id, int index)

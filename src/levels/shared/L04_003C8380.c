@@ -7,7 +7,7 @@ extern void func_002A05A8(void *);
 
 #include "include_asm.h"
 
-extern int part_find_owned_effect_slot(unsigned char *a0, int a1, int a2);
+extern void *part_find_owned_effect_slot(unsigned char *a0, int a1, int a2);
 
 extern void gfx_start_color_fade(unsigned char *a0, unsigned char *a1);
 

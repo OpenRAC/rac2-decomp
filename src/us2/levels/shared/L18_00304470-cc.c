@@ -46,7 +46,7 @@ extern BatchA_A18_s32 ref_L18_002E4090_00(BatchA_A18_s32 a0, BatchA_A18_s32 a1);
 
 /* func_L18_002F1098 is matched in its own unit, L18_002F1098-g8.c. */
 
-extern void text_measure_width_scaled(void *a0, void *a1, const char *a2);
+extern int text_measure_width_scaled(void *a0, void *a1, const char *a2);
 extern char D_L18_00296510[];
 
 void func_US2_L18_00304470(void *a0, void *a1) {
@@ -96,7 +96,7 @@ extern float mat_fast_helper_a(float, float);
    retail holds 0x3FC90FDC).  Measured by sweeping spellings, COMPILER-NOTES. */
 extern BatchA_A18_s32 math_random_int_below(BatchA_A18_s32 a0);
 
-extern BatchA_A18_s32 protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
+extern u8 *protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
 
 /* runs the 0x1E gate and, when it clears, the record query into a local buffer;
    answers whether the query found anything */
@@ -118,7 +118,7 @@ extern int D_L18_001B2838[] __attribute__((sda));
 /* Counts the entities of kind 0xB69 in state 1 that the group's id list names, stores the count
    through a1 and returns the last of them (0 when there is none). Retail compares the state with
    0xFE and 0xFD before testing it for 1. */
-BatchA_A18_s32 protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
+u8 *protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
 
 /* func_L18_003F76F0 lives in L18_003F76F0-copy.c. */
 
@@ -219,10 +219,10 @@ BatchA_A18_s32 protopet_try_use_counter(BatchA_A18_u8 *s);
 /* store -1 into field 0x74 of the object at s[0x68] */
 /* func_L18_00426E48 lives in L18_00426E48-g8.c. */
 
-extern void math_fast_float_d(void *a0);
+extern int math_fast_float_d(void *a0);
 
 /* the object's scale angles are re-submitted in degrees, then the matrix is rebuilt */
-extern void math_fast_float_d(void *a0);
+extern int math_fast_float_d(void *a0);
 
 extern BatchA_A18_s32 path_measure_moby_against_entry(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, float f12);
 extern BatchA_A18_s32 path_apply_entry_to_moby(BatchA_A18_u8 *a0, BatchA_A18_s32 a1,

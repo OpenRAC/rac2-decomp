@@ -3,7 +3,7 @@
 typedef int TI128 __attribute__((mode(TI)));
 extern char *moby_find_record_by_handle_id(int);
 extern void cam_switch_active(void *);
-extern void cam_compute_direction_angles(void *, void *, void *);
+extern int cam_compute_direction_angles(void *, void *, void *);
 extern char g_camera_eye_state[];
 extern float g_hero_position[];
 

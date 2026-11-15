@@ -34,11 +34,11 @@ extern void func_PAL_L00_002FE768(void);
 extern void UpdateLightingEnvironment(void);
 extern void gfx_compute_light_direction(void);
 extern int D_L00_001BCAC0[];
-extern void func_PAL_002B8898(int);
+extern s16 func_PAL_002B8898(int);
 extern void game_reset_frame_counters(void);
 extern void part_update_all(void);
 extern int func_PAL_L00_003062B0(int);
-extern void func_PAL_002E5898(void);
+extern s32 func_PAL_002E5898(void);
 extern void func_PAL_002F6208(void);
 typedef struct {
     char prefix[0x34];

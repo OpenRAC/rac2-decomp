@@ -7,7 +7,7 @@ extern void func_002A05A8(void *);
 
 #include "include_asm.h"
 
-extern int part_find_owned_effect_slot(unsigned char *a0, int a1, int a2);
+extern void *part_find_owned_effect_slot(unsigned char *a0, int a1, int a2);
 
 extern void gfx_start_color_fade(unsigned char *a0, unsigned char *a1);
 
@@ -318,7 +318,7 @@ typedef struct {
 extern int math_fast_float_d(void *);
 extern int FloatToInt(float);
 extern void moby_mark_spawned(void *);
-extern float StepAngleTowardTarget(void *, int, float, float);
+extern void StepAngleTowardTarget(void *, int, float, float);
 extern void snd_stop_voice(int);
 extern void gfx_add_draw_callback_second(void *, void *);
 extern void func_PAL_L04_003FFB98(unsigned char *, void *);

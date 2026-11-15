@@ -9,7 +9,7 @@ typedef int s32;
 typedef float f32;
 extern s32 D_L12_001B2E9C __attribute__((sda));
 extern s32 D_L12_001A8FF0 __attribute__((sda));
-extern void FastDecTimer(s32);
+extern int FastDecTimer(s32);
 extern void moby_update_eased_node(s32, s32, s32, f32, f32);
 extern void func_PAL_002B14F8(s32, s32, s32, s32, f32);
 

@@ -100,7 +100,7 @@ extern s32 D_L11_001CAE40;
 extern u8 D_001395B8[];
 extern s32 D_L11_001AA170 __attribute__((sda));
 extern u8 g_hero_position[];
-extern void arena_queue_voice_line(u8 *, s32);
+extern s32 arena_queue_voice_line(u8 *, s32);
 extern void func_PAL_L11_00446A20(u8 *);
 extern void moby_set_state(u8 *, s32, s32);
 extern void cam_end_override(s32);

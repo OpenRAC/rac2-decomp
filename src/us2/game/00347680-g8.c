@@ -25,25 +25,25 @@
 /* func_US2_00347680, the USA v2.00 copy of func_00346710: the same C for a smaller object. */
 #include "common.h"
 
-extern s32 GetLocalizedString();
-extern s32 object_get_fourth_field();
-extern s32 object_set_second_float4(s32, f32, f32, f32, f32);
-extern s32 object_init_derived_arrays();
-extern s32 object_set_helper_result();
-extern s32 object_init_derived_b();
-extern s32 object_set_first_pair();
-extern s32 object_set_second_pair();
-extern s32 object_init_derived_c();
-extern s32 func_US2_003377B0();
-extern s32 hud_set_widget_field_a();
-extern s32 hud_set_widget_field_b();
-extern s32 func_US2_00337A38();
-extern s32 meter_set_value();
-extern s32 widget_store_field();
-extern s32 widget_set_pos_y();
-extern s32 text_set_alignment();
-extern s32 ui_return_second_arg();
-extern s32 pool_alloc_cell();
+extern char *GetLocalizedString();
+extern int *object_get_fourth_field();
+extern void object_set_second_float4(s32, f32, f32, f32, f32);
+extern void object_init_derived_arrays();
+extern void object_set_helper_result();
+extern void object_init_derived_b();
+extern void object_set_first_pair();
+extern void object_set_second_pair();
+extern void object_init_derived_c();
+extern void func_US2_003377B0();
+extern void hud_set_widget_field_a();
+extern void hud_set_widget_field_b();
+extern void func_US2_00337A38();
+extern void meter_set_value();
+extern void widget_store_field();
+extern void widget_set_pos_y();
+extern void text_set_alignment();
+extern void *ui_return_second_arg();
+extern void *pool_alloc_cell();
 extern s32 func_US2_00347B88();
 extern s32 D_001A8CFC;
 extern s8 D_001AE4D8[];

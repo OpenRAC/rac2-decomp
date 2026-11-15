@@ -28,7 +28,7 @@ extern float D_L00_001AFECC __attribute__((sda));
 extern int D_L00_001B28E8;
 extern void moby_transform_joint_to_world(char *, int, char *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
-extern int moby_get_private_value_0(unsigned char *);
+extern char *moby_get_private_value_0(unsigned char *);
 extern int math_fast_float_d(void *);
 extern unsigned char *SelectBestTargetInCone(void *, void *, void *, float, float, int, int, int, float, float, float, int, AimQueryConfig *);
 extern void CalculateAimedLaunchVelocity(void *, void *, void *, int, float, float, float, float);

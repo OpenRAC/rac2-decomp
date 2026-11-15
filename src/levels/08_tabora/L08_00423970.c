@@ -142,7 +142,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern void FastVecCross(void *, void *, void *);
 extern f32 FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, f32);
-extern void math_closest_point_on_polygon_edge(void *, void *, void *, s32);
+extern s32 math_closest_point_on_polygon_edge(void *, void *, void *, s32);
 extern int *D_L08_001FE7C0[];
 
 /* The actor's per-frame world transform: the record's own position goes through the

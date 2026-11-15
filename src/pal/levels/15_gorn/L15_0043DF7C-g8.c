@@ -9,11 +9,11 @@ extern float math_random_float_range(float,float);
 extern void math_apply_axis_rotation_to_quat(void *,void *,void *,float);
 extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecAdd(void *,void *,void *);
-extern void func_PAL_L15_00437CD0(void *,void *);
+extern char *func_PAL_L15_00437CD0(void *,void *);
 extern int math_random_int_below(int);
 extern int FloatToInt(float);
 extern void func_PAL_L15_0043E840(void *,int,int);
-extern void snd_play_from_class_bank(int,int,void *,int);
+extern int snd_play_from_class_bank(int,int,void *,int);
 extern void func_PAL_L05_0037D3D0(float);
 
 void func_PAL_L15_0043DF7C(char *self) {

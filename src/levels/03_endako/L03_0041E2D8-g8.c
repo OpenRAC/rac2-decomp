@@ -36,7 +36,7 @@ extern int PlayMobySound(int,int,void *);
 extern void SetDeathBits(void *,int,int);
 extern void moby_set_state(void *,int,int);
 extern void anim_start_blended(void *,int,int,int);
-extern void ApproachValue(void *,float,float);
+extern f32 ApproachValue(void *,float,float);
 extern float FastAddRotations(float,float);
 extern int moby_l01_turn_toward_target(void *,void *);
 extern void gfx_add_draw_callback_first(void *,void *);

@@ -40,7 +40,7 @@ extern void gfx_start_color_fade(Moby *moby, ColorFlash *flash);
 extern s32 math_fast_float_d(s32 *timer);
 extern f32 math_random_float_range(f32 min, f32 max);
 extern s32 FloatToInt(f32 value);
-extern void part_spawn_shockwave_burst(f32 *position, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
+extern char *part_spawn_shockwave_burst(f32 *position, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5,
                               s32 a6, s32 a7, s32 a8, s32 a9, s32 a10, f32 scale);
 /* Defined with (object, bonus) in L10_00424028-reward-g8.c; this call also passes 10. */
 extern void hrugis_drop_reward(Moby *moby, s32 bonus, s32 a2);

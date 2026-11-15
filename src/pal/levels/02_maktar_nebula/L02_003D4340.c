@@ -10,7 +10,7 @@ extern int math_random_int_below(int);
 extern float math_random_float_range(float, float);
 extern void moby_update_ground_check(char *);
 extern void *part_find_owned_effect_slot(char *, int, int);
-extern void func_PAL_002B1A50(char *, char *, int);
+extern int func_PAL_002B1A50(char *, char *, int);
 extern void armed_enemy_find_partner(char *);
 extern int armed_enemy_is_holding_in_attack(char *, void *);
 extern void func_PAL_L02_003D5FF0(char *, int);

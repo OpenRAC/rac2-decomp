@@ -18,12 +18,12 @@ extern void part_spawn_radial_dust_puffs(void *,void *,int,float,float,float,flo
 extern int crawler_move_toward_goal(void *,float,float,float,float,float,float,float);
 extern int coll_check_object_inside_polygon(void *),moby_dispatch_action_by_kind(void *,void *);
 extern int moby_l01_turn_toward_target(void *,void *);
-extern void moby_step_at_own_position_factor(void *,float);
+extern int moby_step_at_own_position_factor(void *,float);
 extern void FastVecAdd(void *,void *,void *),FastVecSub(void *,void *,void *),vec_scale_to_length(void *,void *,float);
 extern int CollLine(void *,void *,int,void *,int),coll_test_point(void *,int,void *,float);
 extern void vec_fast_normalize(void *,void *,void *),FastVecScale(void *,void *,float);
 extern float vec_distance_xy(void *,void *),mat_fast_helper_a(float,float),FastDiffRots(float,float);
-extern void math_closest_point_on_polygon_edge(void *,void *,void *,int);
+extern s32 math_closest_point_on_polygon_edge(void *,void *,void *,int);
 extern u8 D_L08_002B5270[];
 typedef struct { u8 pad[0x18]; u8 *moby; u32 pad1C; float point[4], adjusted[4], normal[4]; } Collision;
 extern Collision D_L08_001BFF40;

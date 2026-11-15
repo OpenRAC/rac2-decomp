@@ -25,10 +25,10 @@
 #include "common.h"
 
 extern s32 CollLine();
-extern s32 FastVecAdd();
-extern s32 FastVecSub();
-extern s32 FastVecScale(s32, s32, f32);
-extern s32 vec_fast_divide_helper(s32, s32, f32);
+extern void FastVecAdd();
+extern void FastVecSub();
+extern void FastVecScale(s32, s32, f32);
+extern void vec_fast_divide_helper(s32, s32, f32);
 
 extern s8 g_camera_eye_state[];
 /* Tests whether something blocks the line between a sound and a listener point. */

@@ -12,7 +12,7 @@ extern int weapon_spend_ammo(int, int);
 extern int ForceClaimNotice(int, int, int);
 extern void start_equipped_item_animation(void);
 extern void cancel_hero_item_animation(void);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern char *spider_bot_spawn(void *, void *);
 extern void ref_L00_003B7D48_00(void (*)(void *), void *);
 extern void helper_update_hit_test(void *);

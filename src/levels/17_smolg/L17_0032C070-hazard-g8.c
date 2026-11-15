@@ -88,10 +88,10 @@ extern void STUB_printf(const char *, ...);
 extern void moby_set_state(void *, int, int);
 extern int PlacePathFollowerChainAtStart(void *);
 extern int UpdatePathFollowerChain(void *);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern int flag_set_first_pending(void *);
 extern int math_fast_float_d(int *);
-extern void SpawnExplosion(void *, float, int, int, int, int, int, int, int, int,
+extern char *SpawnExplosion(void *, float, int, int, int, int, int, int, int, int,
                           int, int, int, float);
 extern void part_spawn_masked_debris(void *, int, void *, float, float, float, float, int);
 extern Moby *cam_moby_create(void *, int, int, int, void *, void *, void *, int, float, float);

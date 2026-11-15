@@ -39,7 +39,7 @@ extern float FastVecLength(void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern float FastAddRotations(float, float);
 extern int math_fast_float_d(void *);
-extern void func_L05_003D1E60(void *, int, int);
+extern unsigned char *func_L05_003D1E60(void *, int, int);
 extern void moby_mark_spawned(void *);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern int CollLine(void *, void *, int, void *, int);
@@ -51,7 +51,7 @@ extern int coll_process_hit(void *, float, int, char *, void *);
 extern int GetCollHitMaterial(void);
 extern int coll_test_point(void *, float, int, void *);
 extern void SubmitFlightStateHitRecord(char *, char *, char *);
-extern void func_PAL_L05_0042A240(char *, int, int, int, int, int, int, int, int, int, int, float);
+extern char *func_PAL_L05_0042A240(char *, int, int, int, int, int, int, int, int, int, int, float);
 
 /* Moves the projectile along its velocity, slowing it and spinning its two angles. When its life
    runs out or it leaves the 2..1021 box it releases all twenty-four records, bursts and removes

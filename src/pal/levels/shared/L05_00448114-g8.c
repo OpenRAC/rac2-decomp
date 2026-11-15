@@ -14,7 +14,7 @@ extern ModelRecord *D_L05_001B251C MACRO_ADDR;
 extern char D_L05_001B3620[] __attribute__((aligned(16))) MACRO_ADDR;
 extern char D_L05_001B3610[] __attribute__((aligned(16))) MACRO_ADDR;
 extern int g_current_map_index MACRO_ADDR;
-extern void func_L05_003D1E60(void *,int,int);
+extern unsigned char *func_L05_003D1E60(void *,int,int);
 extern void ship_update_record_transform(void *,float);
 extern void mat_get_euler_angles(void *,void *);
 

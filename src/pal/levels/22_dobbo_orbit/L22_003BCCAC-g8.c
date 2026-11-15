@@ -50,7 +50,7 @@ extern void arena_push_point_out(void *,float);
 extern int coll_process_hit(void *,int,void *,int,float);
 extern void moby_queue_knockback_for_nodes(void *,void *,void *,int,int,int,int,int,float,float,float);
 extern char *func_PAL_L00_003FB330(void *,int,int,int,float,float,int,int,int,int,int,int,int,void *);
-extern void SpawnJointFollowParticle(void *,int,int,int,float);
+extern void *SpawnJointFollowParticle(void *,int,int,int,float);
 extern void part_spawn_random_direction_effect(void *,float,float);
 /* Same registers as its definition: integers a0-t3 then one stack word, the float in $f12. */
 extern void *func_PAL_002BD790(void *,void *,int,int,float,int,int,int,int,int);

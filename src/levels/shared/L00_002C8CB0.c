@@ -11,7 +11,7 @@ typedef union { Quad q; float v[4]; } Vector;
 extern char g_hero_state[];
 extern int D_00138320;
 extern int D_L00_001B9080;
-extern void hero_l00_set_action(int mode, int flag);
+extern s32 hero_l00_set_action(int mode, int flag);
 extern int CollLine(void *start, void *end, int flags, void *object, int mode);
 /* Decides which ledge-grab or climb move the hero starts when close to a ledge, if any. */
 int hero_try_start_ledge_move(void)

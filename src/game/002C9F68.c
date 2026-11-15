@@ -22,10 +22,10 @@ extern s32 g_screen_height MACRO_ADDR;
 extern s32 D_001A72D4 __attribute__((sda));
 extern void gfx_wait_for_dma_status_bits(s32);
 extern int sceGsSyncV(s32);
-extern void func_00126470(void *, s16, s32, s32, s32, s32, s32, s32);
+extern s32 func_00126470(void *, s16, s32, s32, s32, s32, s32, s32);
 extern void FlushCache(s32);
-extern void func_00126730(void *, s32);
-extern void gfx_wait_paths_idle(s32, s32);
+extern s32 func_00126730(void *, s32);
+extern int gfx_wait_paths_idle(s32, s32);
 
 void menu_upload_pause_background_to_gs(void) {
     TI128 buf[7];

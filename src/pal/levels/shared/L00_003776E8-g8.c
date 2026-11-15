@@ -79,7 +79,7 @@ typedef struct {
 } MenuShopClass;
 extern char g_weapon_l00_table[];
 extern void module_l00_call_handler_with_arg_2(int);
-extern void func_PAL_002B8898(int);
+extern s16 func_PAL_002B8898(int);
 extern int ForceClaimNotice(int, int, int);
 extern void LoadClassIntoFreeCacheSlot(int);
 extern void func_PAL_00295298(int);
@@ -98,7 +98,8 @@ extern void FastVecScale(void *,void *,float);
 extern void BindVendorPreviewModel(void),func_PAL_002FC1D0(void);
 extern void func_PAL_L00_00377668(void),func_PAL_L00_003771D8(void);
 extern void module_l00_call_handler_with_arg_3(int),module_l00_call_handler_with_arg(int,int),func_L00_0030C710(int);
-extern void level_run_callbacks(void),func_PAL_002E5898(void);
+extern void level_run_callbacks(void);
+extern s32 func_PAL_002E5898(void);
 #define MF(o) (*(float *)(m + (o)))
 /* Advances the purchase menu and its model previews, then runs the shared update. */
 void func_PAL_L00_003776E8(void)

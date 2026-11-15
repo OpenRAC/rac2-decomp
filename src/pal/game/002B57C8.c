@@ -38,7 +38,7 @@ int func_PAL_002B5BA8(char *self, float *target, float amount)
 }
 
 
-void func_PAL_002B5E10(char *m) {
-    moby_step_controller(m, m + 0x10, *(float *)(m + 0xF8));
+int func_PAL_002B5E10(char *m) {
+    return moby_step_controller(m, m + 0x10, *(float *)(m + 0xF8));
 }
 

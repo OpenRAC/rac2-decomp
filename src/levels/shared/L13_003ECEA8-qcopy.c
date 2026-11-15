@@ -19,7 +19,7 @@ extern int FastDecTimer(void *);
 
 extern f32 moby_update_aim_target_strength(char *, char *);
 
-extern void part_spawn_damage_debris(char *, char *, char *);
+extern int part_spawn_damage_debris(char *, char *, char *);
 
 extern void vec_scale_to_length(f32 *, char *, f32);
 
@@ -27,7 +27,7 @@ extern void FastVecAdd(f32 *, f32 *, f32 *);
 
 extern void moby_mark_spawned(char *);
 
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int,
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int,
                           f32, f32);
 
 /* Updates an enemy that loses health over time, and makes a small explosion and removes it when its health runs out. */

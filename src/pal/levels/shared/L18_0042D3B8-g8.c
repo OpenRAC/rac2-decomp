@@ -7,8 +7,10 @@ extern int D_L18_001B124C __attribute__((sda)), D_L18_001B1250 __attribute__((sd
 extern u32 D_00138320[];
 extern char D_L18_001B1360[];
 extern float vec_distance_xy(void *, void *), mat_fast_helper_a(float, float);
-extern void func_PAL_002B5E10(void *), func_PAL_002B5E30(void *, float);
-extern int func_PAL_L01_00323068(void *, void *), enemy_aim_at_target(void *);
+extern int func_PAL_002B5E30(void *, float);
+extern int func_PAL_002B5E10(void *);
+extern int enemy_aim_at_target(void *);
+extern int func_PAL_L01_00323068(void *, void *);
 extern int FastDecTimer(short *), vec_fast_helper_a(u8 *);
 extern void func_PAL_002A7650(void *, int, int), moby_set_state(void *, int, int);
 extern void func_PAL_L18_0042BA90(void *, int, int, float), func_PAL_L18_0042BAE0(void *);

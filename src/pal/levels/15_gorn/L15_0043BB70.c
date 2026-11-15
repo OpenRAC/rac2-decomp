@@ -26,7 +26,7 @@ extern int follower_has_reached_target(char *);
 extern void follower_set_push_vector(char *, char *);
 extern void follower_set_state(char *, int);
 extern void func_PAL_L05_0037E8E0(char *);
-extern void moby_process_collision_hit(char *, int, int, int);
+extern int moby_process_collision_hit(char *, int, int, int);
 typedef struct GornPathPoint {
     float position[3];
     float action;
@@ -39,11 +39,11 @@ typedef struct GornPath {
 extern char *D_L15_001FE480[];
 extern void func_PAL_L15_0043C8B8(char *);
 extern void func_PAL_L15_0043C978(void);
-extern int moby_get_motion_data(unsigned char *owner);
+extern char *moby_get_motion_data(unsigned char *owner);
 extern int math_fast_float_d(void *);
 extern int FloatToInt(float);
 extern float math_random_float_range(float, float);
-extern int state_get_stored_pointer_value(void);
+extern void *state_get_stored_pointer_value(void);
 extern void level_append_object(void *, void *, int, int);
 extern int math_random_int_below(int);
 extern s32 D_L15_001AEE20[] __attribute__((sda));

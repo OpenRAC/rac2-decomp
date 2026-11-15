@@ -66,7 +66,7 @@ extern char D_001BAD40[];
 extern int map_find_table_index(int);
 extern void map_set_current_and_refresh(int);
 extern int snd_play_from_global_bank(int, int, void *);
-extern void menu_update_entry_states(void);
+extern int menu_update_entry_states(void);
 extern int func_US2_0029E960(int *, int *, int *, int);
 extern void menu_restore_saved_screen_image(int);
 extern int req_push_queue(char *, int);

@@ -25,7 +25,7 @@
  */
 #include "common.h"
 
-extern s32 object_destroy_array();
+extern void object_destroy_array();
 extern s8 D_001AD9F8[];
 
 /* Sets the object type pointer and runs the shared base cleanup. */

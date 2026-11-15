@@ -20,7 +20,7 @@ void func_PAL_00339B88(char *p, int a1, int a2, float f12, float f13)
     *(float *)(*(int *)(p + 4)) = 1.0f;
 }
 
-extern void strncpy(void *, int, int);
+extern char *strncpy(void *, int, int);
 extern void func_PAL_00339BF8(void *, int, int, float, float);
 
 /* clamps a caller-supplied terminator value (-1 meaning unset) to 360, then runs two callees on two sub-objects of one handle, the second with a float pair */

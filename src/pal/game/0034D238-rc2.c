@@ -27,13 +27,13 @@
 /* func_PAL_0034D238, the PAL copy of func_0034B070: the same C, where the members after +0x100 move
  * and the spilled pointers take their stack slots in a different declaration order. */
 
-extern s32 object_init_type_pointer();
-extern s32 object_construct_derived_a();
-extern s32 object_construct_derived_c();
-extern s32 hud_construct_widget_base();
-extern s32 menu_clear_sixteen_words();
-extern s32 effect_clear_row_groups();
-extern s32 meter_screen_init_parts();
+extern void *object_init_type_pointer();
+extern void *object_construct_derived_a();
+extern void *object_construct_derived_c();
+extern char *hud_construct_widget_base();
+extern u8 *menu_clear_sixteen_words();
+extern u8 *effect_clear_row_groups();
+extern char *meter_screen_init_parts();
 
 extern s8 D_001AD928[];
 extern s8 D_001AD908[];

@@ -3,7 +3,7 @@
 extern char *g_moby_l02_pool;
 extern float vec_distance_xy(const void *, const void *);
 extern void euler_rotation_basis(void *, void *);
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 extern void FastVecSub(float *, const float *, const float *);
 extern void vec_scale_to_length(float *, const float *, float);
 extern void FastVecAdd(void *, void *, void *);

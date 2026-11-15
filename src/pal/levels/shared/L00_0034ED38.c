@@ -10,7 +10,7 @@ typedef struct {
     int fallback;
 } CallbackStateL001FEC40;
 extern CallbackStateL001FEC40 D_L00_001FEC40;
-extern void level_l00_call_module_handler_with_arg(int);
+extern int level_l00_call_module_handler_with_arg(int);
 
 /* Guarded callback update: with the pending-input bit set, refreshes the value from its source and reports it (or the fallback's -1), otherwise reports a configured input or runs the setup call. */
 int func_PAL_L00_0034ED38(void)
@@ -119,7 +119,7 @@ int func_PAL_L00_0034EFB8(void)
     return 0;
 }
 
-extern int tab_menu_get_selected_value(int x);
+extern void *tab_menu_get_selected_value(int x);
 
 /* When a global flag is set, derives a pointer from that global plus a fixed offset, runs it through one callee and stores the callee result into a field of the argument. */
 int func_PAL_L00_00350A48(int *obj)

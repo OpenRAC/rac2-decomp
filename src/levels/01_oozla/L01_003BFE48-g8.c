@@ -81,8 +81,8 @@ typedef struct {
 
 extern int FloatToInt(float);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
-extern void path_l01_compute_segment_lengths(void *);
-extern void moby_spawn_linked_helper(void *, void *, int, float, float);
+extern float path_l01_compute_segment_lengths(void *);
+extern void *moby_spawn_linked_helper(void *, void *, int, float, float);
 extern void moby_set_state(void *, int, int);
 extern void moby_set_animation_and_speed(void *, int, int, int);
 extern char *D_L01_001FE180[];

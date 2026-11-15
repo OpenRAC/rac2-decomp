@@ -20,7 +20,7 @@ extern f32 D_L03_001B9840[];
 extern void vec_clear_128(TI128 *moby);
 extern f32  mat_fast_helper_a(f32 moby, f32 a1);
 extern void euler_to_matrix(void *moby, void *a1);
-extern s32  GetEffectTextureDescriptor(s32 moby);
+extern long long GetEffectTextureDescriptor(s32 moby);
 extern void draw_world_quad(void *moby, void *a1, s32 a2);
 
 /* Builds the actor's effect track: the aim, the four corners of the level's

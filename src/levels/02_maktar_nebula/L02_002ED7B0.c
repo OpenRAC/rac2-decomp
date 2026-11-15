@@ -36,7 +36,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
-extern void part_spawn_spark_2(void *, void *, int, int);
+extern void *part_spawn_spark_2(void *, void *, int, int);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_fast_float_d(char *);
@@ -124,7 +124,7 @@ extern float moby_get_anim_value(char *);
 
 extern void moby_transform_joint_to_world(char *, int, void *);
 
-extern void coll_project_point_on_segment(void *, void *, void *, void *);
+extern f32 coll_project_point_on_segment(void *, void *, void *, void *);
 
 extern void FastVecSub(void *, void *, void *);
 
@@ -594,7 +594,7 @@ extern void moby_update_ground_check(char *);
 
 extern void *part_find_owned_effect_slot(char *, int, int);
 
-extern void moby_apply_damage_to_object(char *, char *, int);
+extern int moby_apply_damage_to_object(char *, char *, int);
 
 extern void part_spawn_dust_pairs(char *, int);
 

@@ -22,16 +22,16 @@ extern unsigned short D_L19_001B06F8 __attribute__((sda));
 extern float D_L19_001B070C __attribute__((sda));
 
 extern void moby_set_state(char *, int, int);
-extern void ApproachValue(void *, float, float);
+extern f32 ApproachValue(void *, float, float);
 extern void snd_stop_voice(int);
 extern int PlayMobySound(int, int, void *);
-extern void snd_set_voice_pitch_bend(int, int);
+extern s32 snd_set_voice_pitch_bend(int, int);
 extern float IntToFloat(int);
 extern int FloatToInt(float);
-extern void FastDecTimer(void *);
+extern int FastDecTimer(void *);
 extern void moby_mark_spawned(void *);
 extern int flag_set_first_pending(void *);
-extern void request_end_slot(int, int);
+extern int request_end_slot(int, int);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern void DrawPathPuzzleHud(void);
 extern void moby_set_flag_on(void *);
@@ -42,7 +42,7 @@ extern void func_L19_003D4308(void *);
 extern void func_L19_003D40C0(void *);
 extern void func_L19_003D5218(void *);
 extern int func_L19_003D4490(void *);
-extern void subtitle_request_voice_line(int, int);
+extern int subtitle_request_voice_line(int, int);
 
 typedef struct {
     char pad[0x40];

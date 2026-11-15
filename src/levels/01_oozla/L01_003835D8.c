@@ -30,7 +30,7 @@ typedef struct {
 
 extern D00189E20_View g_hero_state;
 
-extern void math_fast_float_d();
+extern int math_fast_float_d();
 
 /* func_L01_003835D8 is defined in L01_003835D8-match.c. */
 
@@ -98,7 +98,7 @@ void hero_get_clamped_stick_tilt(float *out_x, float *out_y) {
 /* func_L01_003B4480 lives in L01_003B4480.c: its 128-bit copy needs the grouped
    copy profile, which is a per-file flag. */
 
-extern void memset(void *, int, int);
+extern void *memset(void *, int, int);
 
 extern int coll_process_hit(float, char *, int, char *, int);
 
@@ -183,7 +183,7 @@ extern int math_random_int_range(int, int);
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern void FastVecAdd(void *, void *, void *);
-extern void part_l01_spawn_glow(void *, int, int, float, float, int);
+extern void *part_l01_spawn_glow(void *, int, int, float, float, int);
 extern void value_set_and_smooth(u8 *, u8 *, s32, s32, f32);
 
 /* Throws a number of small particles around the object at the given height. A height of -1 means use the height of what it stands on. */

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs.h"
 
-extern void r1_func_00118C90(int);
+extern s32 r1_func_00118C90(int);
 
 extern int r1_D_00132EAC;
 
@@ -19,7 +19,7 @@ extern int r1_D_00132EA8;
 
 extern char r1_D_0015A000[];
 
-extern int r1_func_0011AD70(void *, int);
+extern void r1_func_0011AD70(void *, int);
 
 extern void mc_copy_read_edge_bytes(void *);
 

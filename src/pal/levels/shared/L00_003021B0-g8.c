@@ -292,7 +292,7 @@ extern char *D_L00_001A8AA8 MACRO_ADDR;
 
 extern int func_PAL_002B8838(void *, int, int);
 extern void FlushCache(int);
-extern void func_PAL_0029DE68(void *, void *);
+extern int func_PAL_0029DE68(void *, void *);
 extern void mem_clear(void *, int, int);
 extern void moby_clear_object_slots(void);
 extern void func_001163A0(int);

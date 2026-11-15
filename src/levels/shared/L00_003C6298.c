@@ -94,7 +94,7 @@ extern int PlayMobySound(int index, int value, void *object);
 
 extern char g_hero_position[];
 
-extern int GetEffectTextureDescriptor(int);
+extern long long GetEffectTextureDescriptor(int);
 
 extern float mat_fast_helper_a(float, float);
 

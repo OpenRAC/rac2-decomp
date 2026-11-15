@@ -58,7 +58,7 @@ extern void hero_apply_mode_transform_reversed(ContactVector3 *, ContactVector3 
 extern void FastVecAdd(void *, void *, void *);
 extern int func_PAL_L00_002ACE70(void *, void *, void *);
 extern int hero_test_reach_blend(float *, float, float);
-extern int moby_get_private_value_2(unsigned char *);
+extern char *moby_get_private_value_2(unsigned char *);
 extern void hero_build_relative_offset(float *output, float scale, float angle, float height, int flag);
 extern int CollLine(void *, void *, unsigned int, void *, void *);
 extern int GetCollHitMaterial(void);

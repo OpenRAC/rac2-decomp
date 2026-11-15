@@ -59,7 +59,7 @@ extern int g_game_time;
 extern char *D_001B1B68;
 extern float ref_L00_00330BC0_00 __attribute__((sda));
 extern float fast_vec_dist(void *, void *);
-extern void pickup_start_fly_if_idle(void *, void *);
+extern int pickup_start_fly_if_idle(void *, void *);
 
 /* Pushes nearby objects of one kind away from this object while the effect is on. */
 void moby_push_nearby_away(char *object)
@@ -153,7 +153,7 @@ extern float ref_L00_00331718_03 __attribute__((sda));
 extern float ref_L00_00331718_04;
 
 extern float moby_get_anim_value(int *);
-extern void PlayMobySound(int, int, int *);
+extern int PlayMobySound(int, int, int *);
 
 /* Plays a sound whenever a tracked value crosses one of eight set levels. */
 void snd_play_on_threshold_crossing(void)

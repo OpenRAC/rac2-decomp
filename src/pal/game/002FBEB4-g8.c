@@ -31,7 +31,7 @@
  * label list keeps each C branch available; it is not read by the program. */
 extern void *D_0026DBE0[];
 
-extern s8 *GetLocalizedString(s32 id);
+extern char *GetLocalizedString(s32 id);
 extern void shop_set_message_text(s8 *a);
 extern void shop_mark_bought_special_items_owned(void);
 

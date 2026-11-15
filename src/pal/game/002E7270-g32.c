@@ -64,7 +64,7 @@ extern float vec_distance_xy(void *, void *);
 extern int CollLine(void *, void *, int, int, int);
 extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void moby_transform_joint_point(void *, int, void *), moby_transform_joint_to_world(void *, int, void *);
 extern void matrix_mul_vec3(void *, void *, void *), mat_get_euler_angles(void *, void *), func_002A10E8(void *);
 extern void mat_combine_and_store(void *, void *, void *, void *), func_PAL_002B5050(void *, void *, void *);

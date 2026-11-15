@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 extern void VU1_addGSregister(unsigned int, unsigned long long);
-extern int FlushCache(int);
+extern void FlushCache(int);
 extern void mem_restore_scratch_area(void);
 extern void mem_save_scratch_area(void);
 extern int func_002A4E68(void *, void *, int, int);

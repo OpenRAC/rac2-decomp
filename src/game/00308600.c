@@ -135,8 +135,8 @@ void beam_spawn_trail_particles(X *moby) {
 
 
 extern char *part_find_owned_effect_slot(char *, int, int);
-extern void math_fast_float_d(int *);
-extern void PlayMobySound(int, int, char *);
+extern int math_fast_float_d(int *);
+extern int PlayMobySound(int, int, char *);
 extern void gfx_start_color_fade(char *, char *);
 extern void vec_add_random_offset(float *, float);
 /* Integer and float arguments have separate register banks. This interleaving

@@ -32,12 +32,12 @@ extern float fast_vec_dist(void *, void *);
 extern float vec_distance_xy(void *, void *);
 extern int moby_check_target_point_from_offset(char *, void *);
 extern float mat_fast_helper_a(float, float);
-extern void func_PAL_002B5E30(char *, float);
+extern int func_PAL_002B5E30(char *, float);
 extern int moby_count_group_side_from_object(char *, void *, int);
 extern void moby_turn_toward_target_limited(char *);
-extern void moby_start_effect_from_entry(char *, float);
+extern int moby_start_effect_from_entry(char *, float);
 extern int func_PAL_002AF6C0(char *, float);
-extern void coll_test_hit_at_bone(char *, int, int, int, int, int, float, float, float);
+extern int coll_test_hit_at_bone(char *, int, int, int, int, int, float, float, float);
 extern void func_PAL_L09_00409F38(char *);
 extern void func_PAL_L09_0040A268(char *);
 

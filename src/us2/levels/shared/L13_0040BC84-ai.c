@@ -50,7 +50,7 @@ extern int rps_judge_round(void *);
 extern int guard_alt_init_check(void *);
 extern void guard_alt_update_hit_timer(void *);
 extern u8 *blast_projectile_spawn(void *, void *, void *, int, float);
-extern void moby_step_at_own_position(void *);
+extern int moby_step_at_own_position(void *);
 extern int flag_set_second_pending(void *);
 extern void moby_mark_spawned(void *);
 extern int creature_move_along_ground(char *, char *);

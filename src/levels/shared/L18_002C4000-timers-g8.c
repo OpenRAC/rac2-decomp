@@ -91,12 +91,12 @@ extern float D_L18_001B2260, D_L18_001B2264;
 /* The equipment flag at 0x1A7AFF: a small-data object at a nonzero offset, length 2 for reorg. */
 extern unsigned char D_001A7A70[] __attribute__((sda));
 extern void hero_ease_lean_to_upright(void), hero_queue_glow_draw_routine(void), hero_update_landing_slide(void), hero_record_play_counters(void);
-extern void hero_l18_set_action(int, int);
+extern s32 hero_l18_set_action(int, int);
 extern int FastDecTimer(void *), math_fast_float_d(void *);
 extern void vec_clear_128(void *);
 extern int moby_is_in_special_class_range(void *), math_random_int_below(int);
 extern void FastVecSub(void *, void *, void *), vec_scale_to_length(void *, void *, float);
-extern int part_queue_impact_effect(void *, int, int, void *, void *, float);
+extern void part_queue_impact_effect(void *, int, int, void *, void *, float);
 extern void FastVecAdd(void *, void *, void *), FastVecScale(void *, void *, float);
 extern float cam_get_view_space_height(void *), FastVecLength(void *);
 extern float fast_vec_dist(void *, void *);

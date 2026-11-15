@@ -17,7 +17,7 @@ extern void euler_rotation_basis(void *, void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern char *part_find_owned_effect_slot(char *, int, int);
-extern void math_approach_target_with_direction_mode(void *, void *, int, float, float, float, float);
+extern f32 math_approach_target_with_direction_mode(void *, void *, int, float, float, float, float);
 extern void update_moby_animation_state(char *);
 extern int flag_set_first_pending(char *);
 extern int math_random_int_range(int, int);

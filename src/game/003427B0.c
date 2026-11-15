@@ -66,11 +66,11 @@ s32 menu_list_get_selected_id(u8 *list) {
 /* The table of ids the engine accepts, at the boot's resident data. */
 extern u8 g_item_owned_flags[] __attribute__((sda));
 
-extern void UpdateListSelection(void *owner, int flags);
+extern int UpdateListSelection(void *owner, int flags);
 
 /* Collects the ids of the list's entries the engine's table accepts into the
    owner's array at 0x28, then hands the owner to the walker with half the count. */
-void menu_list_build_ids(char *owner, char *list)
+int menu_list_build_ids(char *owner, char *list)
 {
     s16 id;
     int i;
@@ -91,7 +91,7 @@ void menu_list_build_ids(char *owner, char *list)
         }
     }
     *(s32 *)(owner + 0x14) = *(s32 *)(owner + 0x10) / 2;
-    UpdateListSelection(owner, 0);
+    return UpdateListSelection(owner, 0);
 }
 
 

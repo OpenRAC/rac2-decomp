@@ -3,7 +3,7 @@
 
 extern int hud_draw_widget_text(void *);
 
-extern int func_0027C878_2(int);
+extern long long func_0027C878_2(int);
 
 extern void FontPrintScaled(float, float, float, int, int, int, int, int);
 
@@ -31,7 +31,7 @@ extern void D_00115E38_1(char *a0, int a1, char *a2);
 
 extern int text_measure_width_first_set(char *, int);
 
-extern void func_00115AC0_1(void *, int, int);
+extern char *func_00115AC0_1(void *, int, int);
 
 extern void func_00337E98_1(void *, int, int, float, float);
 
@@ -66,7 +66,7 @@ extern void text_box_draw_frame(char *, unsigned int, unsigned int, float, float
 /* Complete boot bodies from liolu PRs #72 and #75; refreshed in one combined batch. */
 void func_PAL_003388E8(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x40) = a1; }
 
-extern void func_00300618(void *);
+extern void *func_00300618(void *);
 
 extern int g_selected_item_material __attribute__((sda));
 

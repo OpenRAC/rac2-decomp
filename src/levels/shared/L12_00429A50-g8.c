@@ -22,7 +22,7 @@ extern int coll_test_point(void *, int, void *, float);
 extern void FastVecScale(void *, void *, float);
 extern int coll_process_hit(void *, int, void *, void *, float);
 extern void vec_clear_128(void *);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern void moby_mark_spawned(void *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);

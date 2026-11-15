@@ -2,7 +2,7 @@
 
 #include "common.h"
 extern void moby_set_state(void *, int, int);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int,
                                int, int, int);
 extern void moby_compute_local_point(char *, float *, float, float, float);
@@ -15,7 +15,7 @@ extern void func_PAL_L06_00401D78(char *);
 extern int coll_point_inside_region(void *, int);
 extern int math_fast_float_d(void *);
 extern int math_random_int_below(int);
-extern void func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void euler_rotation_basis(void *, void *);
 extern void func_PAL_L01_002E2968(float *, float *, int, int, int, float, float, float);
 extern int D_L06_001B2838 __attribute__((sda));

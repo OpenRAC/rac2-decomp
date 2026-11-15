@@ -4,7 +4,7 @@ extern char D_001B9380[];
 
 extern char g_hero_position[];
 
-extern void cam_compute_direction_angles(void *, void *, void *);
+extern int cam_compute_direction_angles(void *, void *, void *);
 
 /* The levels' short form of the camera mode change func_00335438 (src/game/0032EB28-camera.c):
    mode 3 restarts the transition from D_00189EA0, modes 2 and 3 set its duration. */

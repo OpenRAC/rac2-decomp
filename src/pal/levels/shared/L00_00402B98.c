@@ -9,7 +9,7 @@ extern void vec_random_direction(char *, float, float);
 extern char *func_PAL_002BE9A8(float, float, float, float, char *, int, char *,
                      unsigned int, int);
 extern void vec_scale_to_length(void *, void *, float);
-extern void moby_spawn_template_effect(void *, void *, void *, void *);
+extern char *moby_spawn_template_effect(void *, void *, void *, void *);
 extern char ref_L00_003FE310_00[];
 
 /* Twenty rounds that spawn a particle at the second argument: each round draws a radius

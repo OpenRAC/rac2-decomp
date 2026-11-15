@@ -42,7 +42,7 @@ extern float moby_get_anim_value(void *);
 extern float math_fast_sin_or_cos_b(float);
 extern float IntToFloat(int);
 /* Integer and FP parameters retain their order within each EE argument bank. */
-extern void math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
+extern f32 math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
 extern void anim_start_blended(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int PlayMobySound(int, int, void *);

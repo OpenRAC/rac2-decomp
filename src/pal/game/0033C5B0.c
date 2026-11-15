@@ -23,10 +23,10 @@ void func_PAL_0033C908(u8 *a0, s32 a1) { if (a1 < *(s32 *)(a0 + 0x208)) *(s32 *)
 void func_PAL_0033C920(u8 *a0, s32 a1) { *(s32 *)(a0 + 0x21C) = a1; }
 
 extern int prompt_bar_destroy(int);
-extern void F7d9c8805_FUN_003361A8(int);
-extern void F7d9c8805_FUN_00336968(int);
+extern void *F7d9c8805_FUN_003361A8(int);
+extern char *F7d9c8805_FUN_00336968(int);
 
-int func_PAL_0033CA78(int a0)
+void *func_PAL_0033CA78(int a0)
 {
 	char *p = (char *)a0 + 12;
 	int i;

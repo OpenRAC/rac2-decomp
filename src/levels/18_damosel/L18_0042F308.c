@@ -2,8 +2,8 @@
 
 extern void math_update_wrapped_angle_offset(void *, void *, void *, float, float, float);
 extern void moby_scale_owner_words_by_angles(void *, void *, void *, float, float, float);
-extern void ApproachValue(void *, float, float);
-extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern f32 ApproachValue(void *, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern float vec_distance_xy(void *, void *);
 extern float mat_fast_helper_a(float, float);
 extern float math_approach_target_with_direction_mode(void *, void *, float, float, float, float, int);

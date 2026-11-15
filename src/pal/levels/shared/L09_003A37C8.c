@@ -46,11 +46,11 @@ extern void FastVecAdd(void *dst, void *a, void *b);
 extern void vec_scale_to_length(void *dst, void *src, float scale);
 extern int CollLine(void *from, void *to, int mode, int filter, void *hit);
 extern int coll_test_point(float radius, void *pos, int mode, int filter);
-extern void PlayMobySound(int a, int b, void *object);
+extern int PlayMobySound(int a, int b, void *object);
 extern int FloatToInt(float x);
 extern void func_PAL_002AC718(void *, void *, void *, float, float, int, int, int, float, float, float, float,
                           int, float, int, int, int, int, int);
-extern void coll_process_hit(void *pos, int kind, int filter, void *hit, float amount);
+extern int coll_process_hit(void *pos, int kind, int filter, void *hit, float amount);
 extern int math_fast_float_d(void *timer);
 extern void moby_mark_spawned(void *object);
 extern void func_PAL_L09_003B26B8(void *object);

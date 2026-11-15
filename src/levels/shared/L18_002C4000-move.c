@@ -16,8 +16,8 @@ extern float math_approach_target_with_direction_mode(float *, float *, int, flo
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
 extern int moby_l01_turn_toward_target(char *, char *);
-extern void moby_step_at_own_position_factor(unsigned char *, float);
-extern void moby_step_at_own_position(char *);
+extern int moby_step_at_own_position_factor(unsigned char *, float);
+extern int moby_step_at_own_position(char *);
 extern int moby_turn_toward_target_and_step(char *, float *, float);
 extern void moby_set_state(unsigned char *, int, int);
 extern float func_L00_002EE290(void *);

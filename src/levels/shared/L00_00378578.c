@@ -14,7 +14,7 @@ extern float D_L00_001B25E0 __attribute__((sda));
 extern int D_001A79FC __attribute__((sda));
 extern char D_L00_001AD788[7];
 extern char D_L00_001AD790[5];
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int text_draw_centered_medium(int, int, unsigned long long, unsigned char *, int);
 extern int GetIconFrame(int, int);
 extern void hud_draw_sprite(int, int, int, int, int, int);

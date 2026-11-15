@@ -2,7 +2,7 @@
 
 extern void SetupGifPaging(long);
 extern void DoGifPaging(void);
-extern int table_find_by_id(char *, int);
+extern void *table_find_by_id(char *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
 extern char *GetLocalizedString(int);
 extern int text_draw_centered_small(int, int, u64, char *, int);

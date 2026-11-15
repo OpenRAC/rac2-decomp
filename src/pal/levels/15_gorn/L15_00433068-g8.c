@@ -113,7 +113,7 @@ extern void func_PAL_L15_00436870(Moby *moby);
 extern void func_PAL_L15_00436A10(Moby *moby);
 extern void func_PAL_0029C0F0(s32 a0, void (*callback)(void));
 extern s32 cam_is_mode_active(void);
-extern void func_PAL_L15_004334B0(void);
+extern s32 func_PAL_L15_004334B0(void);
 extern void func_PAL_L10_00428C8C(void);
 extern void func_PAL_L10_00428D58(void);
 extern s32 moby_l15_apply_hit_damage(Moby *moby, s32 keep);

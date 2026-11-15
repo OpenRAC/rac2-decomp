@@ -25,8 +25,8 @@ extern int D_001B18E4;
 extern char ref_L00_0028AB70_00[];
 extern char *D_001B18DC_1 __attribute__((sda));
 extern char *hud_alloc_mem(int, int, char *, int);
-extern void hud_set_slot_contents(int, int, int, int, int, int, int);
-extern char *mem_fast_helper_b(char *, int);
+extern int hud_set_slot_contents(int, int, int, int, int, int, int);
+extern void mem_fast_helper_b(char *, int);
 extern void weapon_menu_init_slots(void);
 extern void hud_reset_bolt_counter_display(void);
 

@@ -124,7 +124,7 @@ extern TI128 D_001A8F20;
 /* func_L03_002ADC00 is in its dedicated zero-vector profile unit. */
 
 extern float ApproachValue(float *, float, float);
-extern void math_spring_float_to_goal(float *, float *, float, float, float, float);
+extern float math_spring_float_to_goal(float *, float *, float, float, float, float);
 extern float vec_distance_xy(void *, void *);
 
 void func_PAL_L03_002B8C28(void) {

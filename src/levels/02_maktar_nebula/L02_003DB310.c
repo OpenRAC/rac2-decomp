@@ -225,7 +225,7 @@ extern void part_spawn_bolt_pickups(char *, int, int, int, int, int, float);
 extern int PickAmmoDropItem(char *, int *);
 extern char *SpawnWeaponAmmoPickup(float *, int, int, int);
 extern void FastVecScale(char *, char *, float);
-extern void moby_create_effect_at_position(float *, int);
+extern u8 *moby_create_effect_at_position(float *, int);
 extern void STUB_printf(const char *, ...);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern void value_set_entry_by_index(int, int);
@@ -644,7 +644,7 @@ void swaying_actor_update(char *actor) {
 
 extern void value_set_and_smooth(char *, char *, float, int, int);
 
-extern void coll_sweep_from_object(char *, char *, int, float, float, float, int, int, int);
+extern int coll_sweep_from_object(char *, char *, int, float, float, float, int, int, int);
 
 /* Counts up a timer and checks the actor for hits every frame. */
 void actor_update_hit_timer(char *actor) {

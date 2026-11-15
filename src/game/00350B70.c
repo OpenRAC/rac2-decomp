@@ -9,12 +9,12 @@ typedef unsigned char u8;
 /* func_003512B8 : rounds a field to a multiple of 2048 under a semaphore */
 extern s32 WaitSema(s32);
 
-extern s32 SignalSema(s32);
+extern void SignalSema(s32);
 
 /* func_00351268 : waits, then combines two fields shifted by 11 */
 extern s32 WaitSema(s32 a0);
 
-extern s32 SignalSema(s32 a0);
+extern void SignalSema(s32 a0);
 
 typedef struct ViBuf {
     int base;               /* 0x0 */

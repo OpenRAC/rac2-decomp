@@ -26,7 +26,7 @@ extern void snd_wait_for_music_idle(void);
 extern void FadeToBlack(int);
 extern int snd_CheckLoadInProgress(int);
 extern int func_00126288(void *,short,short,short,short,short,short,short);
-extern void func_00126DC0(void *);
+extern int func_00126DC0(void *);
 extern void gfx_reset_packet_buffer(void);
 extern int gfx_wait_paths_idle(int,int);
 extern int sceGsSyncV(int);

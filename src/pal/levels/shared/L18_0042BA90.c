@@ -10,7 +10,7 @@ extern BatchA_A18_s32 D_001FE480[];
 extern BatchA_A18_s32 D_001FE480[];
 extern BatchA_A18_s32 protopet_is_in_either_active_state(BatchA_A18_u8 *s);
 extern BatchA_A18_s32 math_random_int_below(BatchA_A18_s32 a0);
-extern BatchA_A18_s32 protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
+extern u8 *protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
 extern void func_00335388(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 a2,
                           BatchA_A18_s32 a3);
 extern void func_002EC9C8(BatchA_A18_u8 *a0, BatchA_A18_s32 a1);
@@ -30,8 +30,8 @@ void func_PAL_L18_0042BA90(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18_s32 
 }
 
 extern void moby_set_controller_speed_limits(BatchA_A18_u8 *, float, float, float, float);
-extern void math_fast_float_d(void *a0);
-extern void math_fast_float_d(void *a0);
+extern int math_fast_float_d(void *a0);
+extern int math_fast_float_d(void *a0);
 
 /* the object's scale angles are re-submitted in degrees, then the matrix is rebuilt */
 void func_PAL_L18_0042BAE0(BatchA_A18_u8 *a0) {

@@ -14,7 +14,7 @@ typedef struct { char prefix[0x54]; float fireRate; char tail[0x88]; } WeaponEnt
 extern WeaponEntry g_weapon_l00_table[];
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern void ReleaseDeadOrExpiredSlots(void *);
-extern void func_PAL_L00_002C4480(int, int);
+extern s32 func_PAL_L00_002C4480(int, int);
 extern int get_ammo(int);
 extern void hud_add_moby_marker(void *, unsigned int, int, int, int, int, float, float, float);
 extern int math_fast_float_d(void *);

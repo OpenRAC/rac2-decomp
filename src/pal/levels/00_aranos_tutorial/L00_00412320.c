@@ -15,7 +15,7 @@ extern void moby_mark_spawned(void *);
 extern void enemy_spawn_child_parts(int, void *, int, int);
 extern void func_PAL_003273B8(int, float, void *, int, void *);
 extern float FastAddRotations(float, float);
-extern void PlayMobySound(int, int, void *);
+extern int PlayMobySound(int, int, void *);
 extern void STUB_printf(void *);
 typedef struct { char pad[0x20]; unsigned char state; char pad2[3]; char *classData; char pad3[0xC]; unsigned short flags; char pad4[0x62]; int field98; } ControllerMoby10;
 

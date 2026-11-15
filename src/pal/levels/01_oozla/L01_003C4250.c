@@ -5,7 +5,8 @@
 /* func_PAL_L01_003C4768, the PAL copy of func_L01_003C08A0: the same C, without the func_0026FEB8
  * call, with 8.0f for 10.0f and 0.080000006f for 0.06666667f (the 50 Hz scale). */
 extern char g_hero_state[];
-extern void func_PAL_L01_002BEC60(int, int), func_PAL_L00_002D2668(int, int, float);
+extern void func_PAL_L00_002D2668(int, int, float);
+extern s32 func_PAL_L01_002BEC60(int, int);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void FastVecSub(void *, void *, void *), vec_clamp_length(void *, float);
 extern void FastVecAdd(void *, void *, void *), vec_clear_128(void *);

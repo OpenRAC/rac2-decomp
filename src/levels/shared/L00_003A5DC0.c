@@ -21,14 +21,14 @@ extern int CollLine(void *,void *,int,void *,void *);
 extern float fast_vec_dist(void *, void *);
 extern char *spark_trail_create(char *, char *, char *, int);
 extern void QueueMobyImpact(int, void *);
-extern void StartAttachedEffect(int, int, char *);
+extern int StartAttachedEffect(int, int, char *);
 extern int g_hero_moby;
 extern unsigned char D_00139582;
 extern L00AimState g_collision_result;
 extern L00AimEntry g_weapon_l00_table[];
 
 /* Shoots a beam from start to end. Whatever it hits takes less damage the farther the hit is from the start. */
-int beam_trace_and_apply_damage(char *source, char *start, char *end, char *impactInfo)
+char *beam_trace_and_apply_damage(char *source, char *start, char *end, char *impactInfo)
 {
     char ray[16];
     float distance;

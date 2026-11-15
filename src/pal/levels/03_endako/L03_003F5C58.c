@@ -11,7 +11,7 @@ extern void part_start_record_effect_by_index(s32, s32);
 extern void help_unlock_entry(s32);
 extern s32 moby_handle_request_slot_state(s32);
 extern void moby_mark_spawned(u8 *);
-extern void MemcardSave(s32, s32);
+extern int MemcardSave(s32, s32);
 extern u8 D_001A7B08[0x40] __attribute__((sda));
 extern s32 D_L03_001B2A38[] __attribute__((sda));
 

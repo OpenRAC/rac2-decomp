@@ -3,8 +3,8 @@
 
 
 
-extern void load_start_disc_read(int value, char *target);
-extern void snd_pump_music_and_disc_read(int value);
+extern int load_start_disc_read(int value, char *target);
+extern short snd_pump_music_and_disc_read(int value);
 extern int D_L00_001BCAC0[];
 extern int g_copy_setup_data[];
 

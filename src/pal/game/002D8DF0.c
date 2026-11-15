@@ -148,7 +148,7 @@ extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void SetupGifPaging(int);
 extern void *memset(void *, int, int);
 extern unsigned long GetEffectTextureDescriptor(int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void gfx_disable_screen_flag(void), gfx_enable_screen_flag(void), DoGifPaging(void);
 extern void func_PAL_002804A8(short *, unsigned long, int, int, float, unsigned long, char *);
 extern int D_PAL_001ABBA4 SDATA(D_PAL_001ABBA4);

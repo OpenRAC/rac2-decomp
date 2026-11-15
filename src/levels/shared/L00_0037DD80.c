@@ -55,10 +55,10 @@ s32 pair_find_owner_key_value(u32 key,u32 owner) {
 }
 
 extern int pair_is_owner_key_free(int a0, int a1);
-extern int pair_pick_owner_lowest_score(char *a0, char **a1, int a2, int a3);
+extern char *pair_pick_owner_lowest_score(char *a0, char **a1, int a2, int a3);
 
 /* Picks an owner from the list that is not yet paired with the key, or falls back to the one with the best score. */
-int pair_choose_owner_for_key(char *key, char **candidates, int count, int *outFreePick, int kind)
+char *pair_choose_owner_for_key(char *key, char **candidates, int count, int *outFreePick, int kind)
 {
     int i;
 

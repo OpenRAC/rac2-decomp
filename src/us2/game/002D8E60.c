@@ -146,7 +146,7 @@ extern void VU1_addGSregister(unsigned int, unsigned long long);
 extern void SetupGifPaging(int);
 extern void *memset(void *, int, int);
 extern unsigned long func_US2_0027CED8(int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void gfx_disable_screen_flag(void), gfx_enable_screen_flag(void), DoGifPaging(void);
 extern void func_US2_00280550(short *, unsigned long, int, int, unsigned long, char *, float);
 extern void DrawMenuCheckBox(int, int, int);

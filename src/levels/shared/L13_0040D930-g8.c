@@ -1,14 +1,14 @@
 #include "common.h"
 typedef int Quad __attribute__((mode(TI)));
-extern void coll_sweep_from_object(char *, float, char *, int, float, float, int, int, int);
+extern int coll_sweep_from_object(char *, float, char *, int, float, float, int, int, int);
 extern void moby_set_state(char *, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void make_hit_descriptor(void *, char *, int, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void FastVecScale(void *, void *, float);
-extern void coll_process_hit(void *, int, void *, void *, float);
+extern int coll_process_hit(void *, int, void *, void *, float);
 extern void vec_clear_128(void *);
-extern void part_l13_spawn_flash(float, char *, int, int, int, int, int, int, int, int, int);
+extern char *part_l13_spawn_flash(float, char *, int, int, int, int, int, int, int, int, int);
 extern void moby_mark_spawned(char *);
 extern void math_apply_axis_rotation_to_quat(void *, void *, void *, float);
 extern void ref_L13_0040D930_01(void *, char *);

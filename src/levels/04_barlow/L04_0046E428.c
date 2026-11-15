@@ -13,7 +13,7 @@ extern int FloatToInt(float);
 extern int math_fast_float_d(int *);
 extern int snd_start_from_table_entry(int,int,void *,int);
 extern int math_random_int_below(int);
-extern void snd_set_slot_field(int,int);
+extern int snd_set_slot_field(int,int);
 extern void FastVecAdd(float *,float *,void *);
 extern void snd_stop_voice(int);
 typedef struct { int sound, minTime, maxTime, timer, handle, target; float start, end; } AmbientState;

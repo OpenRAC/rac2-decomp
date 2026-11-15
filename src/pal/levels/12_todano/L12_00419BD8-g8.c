@@ -12,7 +12,7 @@ extern s32 guard_is_line_of_sight_blocked(void *, s32, s32, s32);
 extern void moby_transform_joint_to_world(void *, s32, void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, f32);
-extern void moby_spawn_aimed_effect(void *, void *, f32, void *);
+extern char *moby_spawn_aimed_effect(void *, void *, f32, void *);
 
 typedef struct { char pad[0x2F0]; u8 *slots[2]; } SlotVars;
 

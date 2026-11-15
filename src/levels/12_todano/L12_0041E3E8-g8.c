@@ -19,7 +19,7 @@ extern s32 PlayMobySound(s32, s32, s32);
 extern void moby_mark_spawned(void *);
 extern void part_explode_object_into_pieces(void *, void *, void *, void *, int, int, int, int, int, unsigned char, int);
 extern void vec_local_offset_to_world(void *, void *, float, float, float);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 
 /* Waits until the hero hits it, then shows a flash, a burst of sparks and a sound before removing itself. */
 void hit_l12_burst_update(u8 *self)
@@ -113,7 +113,7 @@ extern int math_random_int_range(int, int);
 extern int cam_moby_update(unsigned char *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 extern u8 *CreateMoby(int);
 extern void mem_copy_aligned(void *, void *, int);
 

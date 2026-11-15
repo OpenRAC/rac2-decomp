@@ -14,7 +14,7 @@ extern s32 D_L11_001AA170 __attribute__((sda));
 
 extern u8 g_hero_position[];
 
-extern void arena_queue_voice_line(u8 *, s32);
+extern s32 arena_queue_voice_line(u8 *, s32);
 
 extern void arena_run_member_handlers(u8 *);
 

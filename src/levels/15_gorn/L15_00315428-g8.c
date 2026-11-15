@@ -34,7 +34,7 @@ extern void gfx_start_color_fade(char *a0, char *a1);
 extern int snd_play_from_class_bank(int index, int value, char *object, int kind);
 /* The effect call is declared as returning int on purpose: its (unused) result
    stays in $v0, which is what keeps the $gp load below out of $v0. */
-extern int part_spawn_shockwave_burst(void *a0, void *a1, int a2, int a3, int a4, int a5, int a6, int a7,
+extern char *part_spawn_shockwave_burst(void *a0, void *a1, int a2, int a3, int a4, int a5, int a6, int a7,
                              int a8, int a9, int a10, float f12);
 extern void func_L05_00421908(char *a0, int a1, int a2);
 extern int moby_is_in_use(char *a0);

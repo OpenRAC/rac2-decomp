@@ -27,7 +27,7 @@ extern int D_L00_001A8FF0;
 extern float D_L00_001AF0E4 __attribute__((sda));
 extern float D_L00_001BF220[4];
 extern char *CreateMoby(int);
-extern s32 moby_get_private_value_2(u8 *);
+extern char *moby_get_private_value_2(u8 *);
 extern float FastVecLength(void *);
 extern void level_save_and_dim_lighting(void *), func_002A0F48(void *);
 extern char *cam_follow_create(void *);

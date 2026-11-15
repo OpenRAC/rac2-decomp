@@ -53,7 +53,7 @@ extern int coll_test_point(void *, int, void *, float);
 extern void FastVecSub(void *, void *, void *);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(char *, void *);
-extern void func_PAL_0032F0B8(void *, int, int);
+extern int func_PAL_0032F0B8(void *, int, int);
 extern void func_PAL_L00_003E05B0(char *, int, void *, void *, float);
 extern void FastVecCross(void *, void *, void *);
 extern float math_random_angle(void);

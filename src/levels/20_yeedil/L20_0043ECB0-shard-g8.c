@@ -31,9 +31,9 @@ extern float math_random_float_range(float, float), vec_length_xy(void *), FastV
 extern int math_fast_float_d(void *), subtract_integer_with_clamp(int);
 extern void moby_set_state(void *, int, int);
 extern int CollLine(void *, void *, int, void *, int);
-extern void coll_sweep_from_object(void *, void *, float, float, int, float, int, int, int);
-extern void part_spawn_blast_effect_moby(void *, void *, void *, float);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
+extern int coll_sweep_from_object(void *, void *, float, float, int, float, int, int, int);
+extern char *part_spawn_blast_effect_moby(void *, void *, void *, float);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern int PlayMobySound(int, int, void *);
 extern void gfx_add_draw_callback_third(void (*)(void *), void *);
 extern void part_spawn_shard(char *), part_add_moby_glow_trail(void *);

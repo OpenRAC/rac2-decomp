@@ -2,7 +2,7 @@
 #include "names.h"
 
 extern void arena_draw_menu_help_prompts(char *, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern long long GetEffectTextureDescriptor(int);
 extern void FontPrintScaled(float, float, long long, char *, float, int, long long, char *);
 extern void FontSetWindow(char *, int, int, int, int, int, int, int, int);
@@ -125,7 +125,7 @@ typedef struct {
     char pad1[0xDB];
 } L02_003FF9A0_Rec;
 extern L02_003FF9A0_Rec D_L02_00264A70[];
-extern void func_PAL_L00_002C4480(s32, s32);
+extern s32 func_PAL_L00_002C4480(s32, s32);
 extern s32 PadPressedWithin(s32, s32, s32 *);
 extern s32 arena_get_challenge_save_index(s32);
 extern s32 flag_is_byte_set(void);

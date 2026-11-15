@@ -123,7 +123,7 @@ extern void func_US2_L10_00426130(Moby *moby);
 extern void func_US2_L10_00426260(Moby *moby);
 extern void func_US2_0029C548(s32 a0, void (*callback)(void));
 extern s32 cam_is_mode_active(void);
-extern void func_US2_L10_00422CA8(void);
+extern s32 func_US2_L10_00422CA8(void);
 extern void func_US2_L10_00425104(void);
 extern void func_US2_L10_004251D0(void);
 extern s32 ProcessObjectCollisionDamage(Moby *moby, s32 keep);

@@ -24,7 +24,7 @@ extern float fast_vec_dist(void *, void *);
 extern void cam_set_value_target(int, int, float, float, float, float);
 extern void cam_set_transition_frames(float);
 extern float math_cosine_blend(float, float, float);
-extern void func_PAL_L01_002BEC60(int, int);
+extern s32 func_PAL_L01_002BEC60(int, int);
 
 void func_PAL_L01_00432438(unsigned char *camera)
 {

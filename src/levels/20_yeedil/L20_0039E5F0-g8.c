@@ -4,7 +4,7 @@
 extern void moby_change_class_from_tables(void *, int);
 extern void moby_set_state(void *, int, int);
 extern s32 weapon_select_aim_target(void *, s32, s32, float, float, s32);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern float moby_update_aim_target_strength(void *, int);
 
 extern const float D_L20_001AED00 __attribute__((sda));

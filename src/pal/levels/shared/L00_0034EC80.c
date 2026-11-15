@@ -11,7 +11,7 @@ typedef struct {
 extern CallbackState g_pause_menu_state;
 extern int D_00138344;
 extern int D_00138344;
-extern void func_PAL_L00_0030F768(int);
+extern int func_PAL_L00_0030F768(int);
 extern void ref_PAL_L00_0034EC80_00(int);
 
 int func_PAL_L00_0034EC80(void) {

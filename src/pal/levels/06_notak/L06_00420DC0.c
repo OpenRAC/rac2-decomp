@@ -9,8 +9,8 @@ extern float FastVecLength(float *);
 extern void vec_scale_to_length(float *, float *, float);
 extern int moby_move_over_ground(char *, char *, char *, int, float, float, float, float);
 extern float ApproachValue(float *, float, float);
-extern void math_step_value_toward_target(float *, char *, float, float, float, float);
-extern void math_approach_target_with_direction_mode(char *, float, float, float, float, char *, int);
+extern float math_step_value_toward_target(float *, char *, float, float, float, float);
+extern f32 math_approach_target_with_direction_mode(char *, float, float, float, float, char *, int);
 extern float FastDiffRots(float, float);
 extern int ComputeRegionRouteHeading(char *, int, float *, char *, int, char *, char *, float,
                              float);

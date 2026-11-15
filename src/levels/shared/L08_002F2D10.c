@@ -31,7 +31,7 @@ extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern int math_random_int_range(int, int);
 extern int math_random_int_below(int);
-extern void part_spawn_spark_2(void *, void *, int, int);
+extern void *part_spawn_spark_2(void *, void *, int, int);
 extern void vec_fast_normalize(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int math_fast_float_d(char *);
@@ -261,7 +261,7 @@ void vec_resolve_direction(u8 *input, f32 *out_angle, f32 *out_scale_a, f32 *out
 extern float math_fast_sin_or_cos_a(float);
 extern float math_fast_sin_or_cos_b(float);
 extern float FastAddRotations(float, float);
-extern int moby_get_private_value_0(void *);
+extern char *moby_get_private_value_0(void *);
 extern void anim_start_blended_with_flags(void *, int, int, int, int);
 extern void anim_start_blended(void *, int, int, int);
 struct LaunchState {
@@ -620,7 +620,7 @@ extern void moby_mark_spawned(void *);
 extern float FastVecLength(void *);
 extern u8 *part_spawn_velocity_particle(void *, void *, int, int, float);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float, int, float, int, int, int, int, int);
-extern void coll_process_hit(void *, float, int, void *, void *);
+extern int coll_process_hit(void *, float, int, void *, void *);
 /* Updates a flying bolt effect moby: moves it, plays a near-miss sound, and bursts into sparks when it hits something. */
 void bolt_effect_update(char *moby) {
     struct { Vec old; CollisionInput collision; Vec velocity, random; } frame;

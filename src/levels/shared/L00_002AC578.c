@@ -60,7 +60,7 @@ extern void hero_apply_mode_transform_reversed(ContactVector3 *, ContactVector3 
 extern void FastVecAdd(void *, void *, void *);
 extern int hero_find_ledge_grab(void *, void *, void *);
 extern int hero_test_reach_blend(float *, float, float);
-extern int moby_get_private_value_2(unsigned char *);
+extern char *moby_get_private_value_2(unsigned char *);
 /* EE argument banks: a0 = output, a1 = flag, f12/f13/f14 = scale/angle/height.
  * The floating arguments retain their order independently of the integer bank. */
 extern void hero_build_relative_offset(float *output, float scale, float angle, float height, int flag);

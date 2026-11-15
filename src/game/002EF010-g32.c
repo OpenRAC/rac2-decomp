@@ -3,7 +3,7 @@ extern unsigned char D_001AD030[27] __attribute__((sda));
 extern unsigned char D_001AD04B[] __attribute__((sda));
 
 /* Turns a cutscene number into a compact index by skipping the unused numbers in between. Numbers outside the normal range are shifted down. */
-unsigned long cutscene_map_id_to_index(int cutscene_id)
+int cutscene_map_id_to_index(int cutscene_id)
 {
     int i;
     int first_gap_end;

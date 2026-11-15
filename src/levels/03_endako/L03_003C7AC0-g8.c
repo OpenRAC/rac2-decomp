@@ -19,7 +19,7 @@ extern void vec_clear_128(void *);
 extern void FastVecSub(void *,void *,void *);
 extern void vec_clamp_length(void *,float);
 extern void FastVecAdd(void *,void *,void *);
-extern void path_push_point_away(int,void *,void *,float);
+extern int path_push_point_away(int,void *,void *,float);
 extern void moby_transform_joint_to_world(void *,int,void *);
 extern int CollLine(void *,void *,int,void *,int);
 extern void moby_update_ground_check(void *);

@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void prompt_bar_destroy(char *p);
+extern int prompt_bar_destroy(char *p);
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_PAL_L00_00436E20(char *object)
@@ -10,7 +10,7 @@ char *func_PAL_L00_00436E20(char *object)
     return object;
 }
 
-extern void Ffb202470_FUN_0033AB50(char *p);
+extern int Ffb202470_FUN_0033AB50(char *p);
 
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
@@ -44,7 +44,7 @@ char *func_PAL_L00_00437A48(char *object)
 
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
-extern void Fc558ca70_FUN_002E5E58(int a, int b, int c);
+extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern volatile unsigned char Fc558ca70_D_001A7B95 __attribute__((sda));
 extern volatile unsigned char Fc558ca70_D_001A7B94 __attribute__((sda));
 
@@ -113,7 +113,7 @@ char *func_PAL_L00_00438B60(char *object)
 }
 
 
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_PAL_0033CF78(void *, int, int, int);
 extern void func_PAL_0033CD50(void *);
 extern void mem_store_two_floats_through_cell(void *, float, float);
@@ -215,7 +215,7 @@ int func_PAL_L00_004391F8(char *object, int flags)
 }
 
 extern void *func_PAL_0033CA78(void *);
-extern void *menu_pass_through_handle(void *);
+extern unsigned long long menu_pass_through_handle(void *);
 
 void *func_PAL_L00_004392D8(char *object) {
     func_PAL_0033CA78(object + 0x8);
@@ -233,10 +233,10 @@ void *func_PAL_L00_00439630(char *object) {
 }
 
 
-extern int prompt_bar_draw(char *p);
+extern void prompt_bar_draw(char *p);
 
-int func_PAL_L00_004397D0(char *p)
+void func_PAL_L00_004397D0(char *p)
 {
-    return prompt_bar_draw(p + 8);
+    prompt_bar_draw(p + 8);
 }
 

@@ -5,35 +5,14 @@ extern unsigned char D_001A7BE8[] __attribute__((sda));
 extern char D_00188660[], D_001A63A8_3[], D_00152C00[], D_001393E0[], D_001B9040[], D_001BAF80[], D_001BADC0[], D_001AC1E0[], D_001C5540[], D_00240450[], D_001B8840_raw[] __asm__("D_001B8840");
 extern int g_equipment_pieces[];
 extern int D_001ABEB0 __attribute__((sda)), D_001ABF0C __attribute__((sda));
-extern void mem_clear(void *, int, int), FlushCache(int), snd_pump_music_and_disc_read(int);
+extern void mem_clear(void *, int, int), FlushCache(int);
+extern s16 snd_pump_music_and_disc_read(int);
 extern void *snd_set_stop_callback(void (*)(s32));
-extern int snd_Pump(void), snd_CheckLoadInProgress(int), sceGsSyncV(int), CreateMoby(int), func_US2_002EA0C0(void), ServiceLevelArchiveLoad(void);
-extern void moby_clear_object_slots(),
-    func_00133700(),
-    func_00133230(),
-    func_002E5FE0(),
-    func_002B7170(),
-    func_00132858(),
-    func_00132818(),
-    func_0026FEB8(),
-    func_00284E18(),
-    func_US2_00299CF0(),
-    func_00298178(),
-    func_002939D0(),
-    func_002FCDA8(),
-    func_0027D330(),
-    func_00133AA0(),
-    func_002E6178(),
-    func_002ED260(),
-    func_002FC280(),
-    func_002FC220(),
-    func_00284FC0(),
-    func_00285338(),
-    func_00284EA8(),
-    func_002B9000(),
-    func_002FC3C0(),
-    func_002EAB18(),
-    func_US2_002EB740();
+extern int snd_Pump(void), snd_CheckLoadInProgress(int), sceGsSyncV(int), func_US2_002EA0C0(void), ServiceLevelArchiveLoad(void);
+extern char *CreateMoby(int);
+extern void moby_clear_object_slots(), func_00133700(), func_00133230(), func_002E5FE0(), func_002B7170(), func_00132858(), func_0026FEB8(), func_00284E18(), func_US2_00299CF0(), func_00298178(), func_002FCDA8(), func_0027D330(), func_00133AA0(), func_002E6178(), func_002ED260(), func_002FC280(), func_002FC220(), func_00284FC0(), func_00285338(), func_00284EA8(), func_002B9000(), func_002FC3C0(), func_002EAB18(), func_US2_002EB740();
+extern int func_002939D0();
+extern void func_00132818();
 extern int D_001B1680[] __attribute__((sda));
 extern int g_current_map_index[] __attribute__((sda));
 extern int g_current_game_mode[] __attribute__((sda));

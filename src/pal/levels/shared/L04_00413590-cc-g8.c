@@ -62,7 +62,7 @@ extern int math_fast_float_d(void *);
 extern void moby_transform_joint_to_world(void *,int,void *);
 extern void vec_build_spherical_offset(void *,float,float,float);
 extern void add_vectors(void *,void *,void *);
-extern void func_PAL_L04_003FD4F8(void *,void *,void *,int);
+extern unsigned char *func_PAL_L04_003FD4F8(void *,void *,void *,int);
 extern int PlayMobySound(int,int,void *);
 extern unsigned char *bike_find_aim_target(void *,void *,void *,void *,void *,void *,float,float);
 extern int queue_copy_record_by_index(int);

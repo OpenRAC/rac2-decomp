@@ -56,7 +56,7 @@ extern float g_hero_position[];
 
 extern void F7242f0a4_FUN_00282D30(char *out, void *source, float value);
 
-extern void F7242f0a4_FUN_00334730(char *buffer, int mode);
+extern int F7242f0a4_FUN_00334730(char *buffer, int mode);
 
 extern f32 math_random_signed_float_range(f32 low, f32 high);
 extern f32 D_001A8BD0[] __attribute__((sda));
@@ -96,7 +96,7 @@ extern int F7242f0a4_D_001B53A0[];
 
 extern s32 FastTweenColor(s32, s32, f32);
 
-extern int object_get_fourth_field(unsigned char *field);
+extern int *object_get_fourth_field(unsigned char *field);
 
 extern void pool_free_cell(int a, int b);
 
@@ -114,7 +114,7 @@ extern void *F36efd143_FUN_00336DA8(int size, void *b);
 
 extern void F081de6c9_FUN_00335FC8(char *s, int a1, char *a2);
 
-extern int F081de6c9_FUN_00336E40(int x);
+extern void *F081de6c9_FUN_00336E40(int x);
 
 extern int *F081de6c9_FUN_00336DA8(int n, int x);
 
@@ -170,7 +170,7 @@ extern void *object_init_base(void *);
 
 extern char D_001ADA58[] __attribute__((sda));
 
-extern int table_find_by_id(int, int);
+extern void *table_find_by_id(int, int);
 
 extern char D_001AD9F8[] __attribute__((sda));
 
@@ -597,13 +597,13 @@ int object_get_stored_counter(void) {
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 object_get_first_field(u8 *a0) { return *(s32 *)(a0 + 0x0); }
+float *object_get_first_field(u8 *a0) { return *(s32 *)(a0 + 0x0); }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 object_get_second_field(u8 *a0) { return *(s32 *)(a0 + 0x4); }
+float *object_get_second_field(u8 *a0) { return *(s32 *)(a0 + 0x4); }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 object_get_fourth_field(u8 *a0) { return *(s32 *)(a0 + 0xc); }
+int *object_get_fourth_field(u8 *a0) { return *(s32 *)(a0 + 0xc); }
 
 /* Stores four numbers in the first array of an object. */
 void object_set_first_float4(u8 *a0,f32 f0,f32 f1,f32 f2,f32 f3) {
@@ -772,7 +772,7 @@ void object_init_derived_arrays(char *obj)
 
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 object_get_field_a(u8 *a0) { return *(s32 *)(a0 + 0x38); }
+float *object_get_field_a(u8 *a0) { return *(s32 *)(a0 + 0x38); }
 
 /* Stores the result of a helper call in the object. */
 void object_set_helper_result(char *object, int first, int second) {
@@ -859,4 +859,4 @@ void object_init_derived_c(char *s1, int a1, char *a2)
 }
 
 /* Measured target: byte-identical across all 27 levels. */
-s32 object_get_field_b(u8 *a0) { return *(s32 *)(a0 + 0x34); }
+void *object_get_field_b(u8 *a0) { return *(s32 *)(a0 + 0x34); }

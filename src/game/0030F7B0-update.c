@@ -139,7 +139,7 @@ extern int GetFirstMobyInGroup(CrateMoby **, int, int, int);
 extern int GetNextMobyInGroup(CrateMoby **, CrateMoby *, int, int);
 extern float vec_distance_xy(void *, void *);
 extern float coll_probe_ground_height_below(void *, int, float);
-extern void PlayMobySound(int, int, CrateMoby *);
+extern int PlayMobySound(int, int, CrateMoby *);
 extern void set_moby_color(CrateMoby *, int, int, int);
 
 /* Updates a crate each frame. It handles hits, breaking, detonating, and coming back after a while. */

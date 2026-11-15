@@ -6,10 +6,10 @@
 typedef int TI128 __attribute__((mode(TI)));
 
 extern void cam_offset_point_by_side_direction(TI128 *, TI128 *, float);
-extern void FastVecDot(TI128 *, TI128 *);
+extern float FastVecDot(TI128 *, TI128 *);
 
 /* Compares a vector with the hero forward direction and returns how much it points that way. */
-void hero_get_speed_along_forward(TI128 *vec)
+float hero_get_speed_along_forward(TI128 *vec)
 {
     TI128 buf[2];
     TI128 *copy;
@@ -20,5 +20,5 @@ void hero_get_speed_along_forward(TI128 *vec)
     qzero_nc(&buf[1]);
     result = &buf[1];
     cam_offset_point_by_side_direction(result, result, 1.0f);
-    FastVecDot(copy, result);
+    return FastVecDot(copy, result);
 }

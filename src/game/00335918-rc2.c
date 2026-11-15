@@ -25,7 +25,7 @@
  */
 #include "common.h"
 
-extern s32 object_reset_type_and_free();
+extern void object_reset_type_and_free();
 
 extern s8 D_001AD988[];
 

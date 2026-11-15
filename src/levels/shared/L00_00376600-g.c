@@ -12,7 +12,7 @@ extern double __extendsfdf2(float);
 extern int __cmpdf2(double, double);
 extern double __subdf3(double, double);
 extern int __fixdfsi(double);
-extern int hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
+extern void hud_draw_sprite_gradient(int, int, int, int, int, unsigned int *);
 
 /* Draws the row of item icons with a pulsing highlight box around the selected one, fading them at the edges. */
 void shop_draw_item_icon_strip(void) {

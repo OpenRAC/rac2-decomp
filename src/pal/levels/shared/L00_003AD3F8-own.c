@@ -18,7 +18,7 @@ extern int CollLine(void *,void *,int,void *,int),coll_test_point(void *,int,int
 extern int PlayMobySound(int,int,void *);
 extern void snd_stop_voice(int),cam_flag_entry_for_hero_mode(void),table_clear_entry_flag(int),moby_mark_spawned(void *),vec_transform_or_copy(void *,void *),part_queue_ground_shadow(void *,float);
 extern void projectile_damage_nearby_on_hit(void *,void *,void *,int);
-extern void SpawnExplosion(void *,int,int,int,int,int,int,int,int,int,int,int,float,float);
+extern char *SpawnExplosion(void *,int,int,int,int,int,int,int,int,int,int,int,float,float);
 typedef struct { char pad0[10]; union { short lifetime; unsigned char bytes[2]; } age; } Particle9C58;
 typedef struct { char pad0[4]; int type; char pad8[2]; unsigned char alpha,life; } Payload9C58;
 extern char D_L00_001A8F20[] MACRO_ADDR;

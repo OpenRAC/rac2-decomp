@@ -21,7 +21,7 @@ extern void FastVecSub(void *, void *, void *);
 extern float FastVecLength(void *);
 extern void FastVecScale(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void moby_steer_toward_nearby(void *, void *, void *, float, float, float);
+extern int moby_steer_toward_nearby(void *, void *, void *, float, float, float);
 extern float vec_length_xy(void *);
 extern void vec_fast_normalize_helper(void *, void *, float);
 extern float mat_fast_helper_a(float, float);

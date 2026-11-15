@@ -32,7 +32,7 @@ extern void func_PAL_L14_0042F200(void *);
 extern void moby_mark_spawned(void *);
 extern void moby_set_state(void *, int, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
-extern void func_PAL_002B5E10(void *);
+extern int func_PAL_002B5E10(void *);
 extern void moby_l14_set_state_value(void *, int);
 extern void moby_transform_joint_to_world(void *, int, void *);
 extern void func_PAL_L14_0042F0D8(void *);

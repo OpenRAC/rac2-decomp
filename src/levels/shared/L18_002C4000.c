@@ -209,12 +209,12 @@ void snd_start_mode_sound(BatchA_A18_s32 a0) {
 
 /* func_L18_002F1098 is matched in its own unit, L18_002F1098-g8.c. */
 
-extern void text_measure_width_scaled(void *a0, void *a1, const char *a2);
+extern int text_measure_width_scaled(void *a0, void *a1, const char *a2);
 extern char D_L18_00296510[];
 
 /* Draws a fixed text string for the caller. */
-void text_draw_fixed(void *a0, void *a1) {
-    text_measure_width_scaled(a0, a1, D_L18_00296510);
+int text_draw_fixed(void *a0, void *a1) {
+    return text_measure_width_scaled(a0, a1, D_L18_00296510);
 }
 
 /* func_L18_003044B8 is defined in L18_003044B8.c. */
@@ -409,7 +409,7 @@ int protopet_is_target_close_front(char *a0, float *a1)
 
 extern BatchA_A18_s32 math_random_int_below(BatchA_A18_s32 a0);
 
-extern BatchA_A18_s32 protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
+extern u8 *protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
 
 /* runs the 0x1E gate and, when it clears, the record query into a local buffer;
    answers whether the query found anything */
@@ -480,7 +480,7 @@ extern int D_L18_001B2838[] __attribute__((sda));
 /* Counts the entities of kind 0xB69 in state 1 that the group's id list names, stores the count
    through a1 and returns the last of them (0 when there is none). Retail compares the state with
    0xFE and 0xFD before testing it for 1. */
-BatchA_A18_s32 protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1) {
+u8 *protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1) {
     unsigned short *entry;
     unsigned char *entity;
     unsigned char *last;
@@ -999,7 +999,7 @@ void moby_start_or_forward_anim(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, BatchA_A18
 }
 
 extern void moby_set_controller_speed_limits(BatchA_A18_u8 *, float, float, float, float);
-extern void math_fast_float_d(void *a0);
+extern int math_fast_float_d(void *a0);
 
 /* the object's scale angles are re-submitted in degrees, then the matrix is rebuilt */
 void moby_rebuild_scale_matrix(BatchA_A18_u8 *a0) {
@@ -1016,7 +1016,7 @@ void moby_rebuild_scale_matrix(BatchA_A18_u8 *a0) {
     *(BatchA_A18_u8 *)(p + 0x39F) = 0;
 }
 
-extern void math_fast_float_d(void *a0);
+extern int math_fast_float_d(void *a0);
 
 /* Releases the shared resource used by the object, if it holds one. */
 void moby_release_shared_resource(BatchA_A18_u8 *a0) {

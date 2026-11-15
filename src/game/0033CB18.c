@@ -19,13 +19,13 @@ extern void Fc558ca70_FUN_0033AE28(char *p);
 
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
 
-extern void Fc558ca70_FUN_002E5E58(int a, int b, int c);
+extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 
 extern volatile unsigned char Fc558ca70_D_001A7B95 __attribute__((sda));
 
 extern volatile unsigned char Fc558ca70_D_001A7B94 __attribute__((sda));
 
-extern void Ffb202470_FUN_0033AB50(char *p);
+extern int Ffb202470_FUN_0033AB50(char *p);
 
 extern void F5979c03f_FUN_0033AE28 (char *object);
 
@@ -37,7 +37,7 @@ extern void Fb7feb893_FUN_0033AE28(char *p);
 
 extern void Fb7feb893_FUN_0033B018(char *p, float a, float b);
 
-extern void Fb7feb893_FUN_002E5E58(int a, int b, int c);
+extern int Fb7feb893_FUN_002E5E58(int a, int b, int c);
 
 extern volatile unsigned char Fb7feb893_D_001A7BB2 __attribute__((sda));
 
@@ -53,7 +53,7 @@ extern volatile unsigned char Fb1bbe20c_D_001A7BB2 __attribute__((sda));
 
 void* list_page_destroy(void* param_1);
 
-extern void prompt_bar_destroy(int);
+extern int prompt_bar_destroy(int);
 
 extern unsigned long long menu_pass_through_handle(unsigned long long);
 
@@ -94,7 +94,7 @@ int two_toggle_a_update(char *object, int flags)
 /* Cleans up the two-switch option menu. */
 char *two_toggle_a_destroy(char *object)
 {
-    extern void object_construct_derived_b(void *);
+    extern void *object_construct_derived_b(void *);
     prompt_bar_destroy((int)(object + 8));
     object_construct_derived_b(object + 0x2AC);
     object_construct_derived_b(object + 0x2F4);
@@ -173,7 +173,7 @@ extern char D_L00_001AE118[];
 extern void prompt_bar_draw(void *);
 extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
-extern void text_draw_centered_small(int, int, unsigned long, char *, int);
+extern int text_draw_centered_small(int, int, unsigned long, char *, int);
 
 /* Draws the one-switch option line with its current on/off text. */
 void single_toggle_a_draw(char *object)

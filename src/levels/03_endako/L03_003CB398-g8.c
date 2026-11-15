@@ -3,15 +3,15 @@
 extern void get_moby_color(void *, int *, int *, int *);
 extern void moby_set_state(void *, int, int);
 extern float vec_distance_xy(void *, void *);
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 extern int hero_is_allowed_for_mode(int);
 extern int PlayMobySound(int, int, void *);
 extern float FastAddRotations(float, float);
 extern void hero_start_target_state(void *, int, float);
-extern void coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
+extern int coll_sweep_from_object(void *, void *, int, int, int, int, float, float, float);
 extern int flag_is_third_pending_set(void *);
 extern int hero_get_target_state_kind(void);
-extern void hero_l03_enter_state(int, int);
+extern s32 hero_l03_enter_state(int, int);
 extern void FastVecSub(void *, void *, void *);
 extern float FastVecDot(void *, void *);
 extern void hero_start_loader_state(int);

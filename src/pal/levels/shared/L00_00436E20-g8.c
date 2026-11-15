@@ -2,13 +2,13 @@
 #include "names.h"
 
 extern void func_PAL_0033CFD0(void *, float);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void func_PAL_0033CB00(void *, void *, void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_PAL_0033CF78(void *, int, int, int);
 extern void func_PAL_0033CF58(void *, float, float, float, float, float, float);
-extern void func_PAL_L00_004388F8(void *, int);
+extern int func_PAL_L00_004388F8(void *, int);
 extern int D_001ADDE0[2] __attribute__((sda));
 
 extern int D_PAL_001AE200[2] __attribute__((sda));
@@ -42,7 +42,7 @@ void func_PAL_L00_004387D0(char *object, void *argument)
 
 
 
-extern void func_PAL_L00_00438FB8(void *, int);
+extern int func_PAL_L00_00438FB8(void *, int);
 
 extern int D_PAL_001AE220[2] __attribute__((sda));
 
@@ -75,7 +75,7 @@ void func_PAL_L00_00438E90(char *object, void *argument)
 
 
 
-extern void func_PAL_L00_004391F8(void *, int);
+extern int func_PAL_L00_004391F8(void *, int);
 
 extern int D_PAL_001AE230[2] __attribute__((sda));
 

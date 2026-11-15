@@ -3,7 +3,7 @@
 extern unsigned char D_001A7B9E __attribute__((sda));
 extern unsigned char D_001A7BBA __attribute__((sda));
 
-extern void prompt_bar_destroy(char *p);
+extern int prompt_bar_destroy(char *p);
 
 /* Calls a helper with a pointer to the second 16-byte field of the record and returns the record pointer. */
 char *func_US2_L00_00432D98(char *object)
@@ -35,7 +35,7 @@ char *func_US2_L00_00433A18(char *object)
 
 extern void func_0033AE28_2(char *p);
 extern void func_L00_00430948_3(char *p, float a, float b);
-extern void func_002E5E58_3(int a, int b, int c);
+extern int func_002E5E58_3(int a, int b, int c);
 extern volatile unsigned char D_001A7B95 __attribute__((sda));
 extern volatile unsigned char D_001A7B94 __attribute__((sda));
 
@@ -114,7 +114,7 @@ char *func_US2_L00_00434768(char *object)
 
 extern void Fc558ca70_FUN_0033AE28(char *p);
 extern void Fc558ca70_FUN_0033B018(char *p, float a, float b);
-extern void Fc558ca70_FUN_002E5E58(int a, int b, int c);
+extern int Fc558ca70_FUN_002E5E58(int a, int b, int c);
 extern volatile unsigned char Fc558ca70_D_001A7B95 __attribute__((sda));
 extern volatile unsigned char Fc558ca70_D_001A7B94 __attribute__((sda));
 
@@ -150,7 +150,7 @@ int func_US2_L00_004348C8(char *a0, int a1)
 }
 
 
-extern void Ffb202470_FUN_0033AB50(char *p);
+extern int Ffb202470_FUN_0033AB50(char *p);
 
 /* func_0033B540 is matched in 0033AE20-g8.c (-G8 small data). */
 
@@ -252,7 +252,7 @@ int func_US2_L00_00435140 (char *object, int flags)
 
 
 extern void *func_US2_0033BB98(void *);
-extern void *menu_pass_through_handle(void *);
+extern unsigned long long menu_pass_through_handle(void *);
 
 void *func_US2_L00_004351D8(char *object) {
     func_US2_0033BB98(object + 0x8);
@@ -270,10 +270,10 @@ void *func_US2_L00_004354E8(char *object) {
 }
 
 
-extern int prompt_bar_draw(char *p);
+extern void prompt_bar_draw(char *p);
 
-int func_US2_L00_00435688(char *p)
+void func_US2_L00_00435688(char *p)
 {
-    return prompt_bar_draw(p + 8);
+    prompt_bar_draw(p + 8);
 }
 

@@ -26,7 +26,7 @@ extern int coll_test_point(void *, int, void *, float);
 extern int CollLine(void *, void *, int, void *, int);
 extern void moby_build_timer_vectors_from_matrix(void *,void *,void *,void *,float,float,float);
 extern void func_PAL_L05_003D50B0(void *,void *,void *);
-extern void snd_play_from_class_bank(int,int,void *,int);
+extern int snd_play_from_class_bank(int,int,void *,int);
 extern void moby_mark_spawned(void *);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *,float,float,float);

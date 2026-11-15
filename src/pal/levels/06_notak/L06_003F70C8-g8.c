@@ -9,7 +9,7 @@ extern void func_PAL_L06_003F6F58(char *, char *);
 extern int FastDecTimer(void *);
 extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
-extern void FindHeroOrMobyTarget(void *, void *, void *, int, void *, int, float);
+extern int FindHeroOrMobyTarget(void *, void *, void *, int, void *, int, float);
 extern int flock_count_members_find_free(void *, void *);
 extern char *g_path_list[];
 extern char *D_L06_001B290C __attribute__((sda));
@@ -34,7 +34,7 @@ extern char *func_PAL_L06_003F77D8(void *, void *, void *, int, int);
 extern int PlayMobySound(int, int, void *);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, int, int, int, float, float, float, float,
                          int, float, int, int, int, int, int);
-extern void snd_play_from_class_bank(int, int, void *, int);
+extern int snd_play_from_class_bank(int, int, void *, int);
 extern void *part_spawn_flying_fragment(void *, int, void *, void *, int, int, float, void *, void *, void *);
 extern void moby_mark_spawned(void *);
 extern int GetFirstMobyInGroup(void *, int, int, int);

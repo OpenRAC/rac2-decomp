@@ -133,7 +133,7 @@ extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
 extern float level_get_water_height(void);
 extern void *part_spawn_drifting(void *position, float size, void *owner, float spin, int color);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern void part_spawn_water_splash(void *, int, int, int);
 extern void anim_start_blended(void *, int, int, int);
 extern void part_l01_spawn_burst(void *);

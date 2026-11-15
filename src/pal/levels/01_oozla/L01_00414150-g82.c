@@ -12,10 +12,10 @@ extern char D_L01_001A8F60[] NOT_SDA;
 extern s32 math_fast_float_d(char *);
 extern void moby_mark_spawned(char *);
 extern void moby_set_state(char *, s32, s32);
-extern s32 part_find_owned_effect_slot(char *, s32, s32);
+extern void *part_find_owned_effect_slot(char *, s32, s32);
 extern void func_PAL_002B15D8(char *, s32, char *, float, float, float, float, s32);
 extern s32 flag_set_first_pending(char *);
-extern void PlayMobySound(s32, s32, char *);
+extern int PlayMobySound(s32, s32, char *);
 extern void func_PAL_L00_003281C0(char *, s32, float);
 typedef struct { char pad0[0x31]; u8 active; u16 pad32; u16 flags; char pad36[0x62]; int target; } RetiringObject;
 

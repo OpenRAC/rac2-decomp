@@ -28,7 +28,7 @@ extern int math_random_int_below(int);
 extern int math_random_int_range(int, int);
 extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
-extern void moby_turn_toward_position(void *, void *, void *, float, float, float);
+extern float moby_turn_toward_position(void *, void *, void *, float, float, float);
 extern float coll_probe_ground_height_below(void *, int, float);
 extern float math_spring_float_to_goal(void *, float, void *, float, float, float);
 extern float math_step_value_toward_target(void *, void *, float, float, float, float);

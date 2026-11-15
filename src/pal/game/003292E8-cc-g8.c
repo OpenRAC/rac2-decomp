@@ -14,12 +14,12 @@ extern B40Class g_weapon_table[];
 typedef struct { char pad[0x2290]; char *object; } ContextB40;
 extern ContextB40 g_hero_state;
 extern int coll_process_hit(void *, int, void *, int, float);
-extern int moby_get_private_value_0(void *);
+extern char *moby_get_private_value_0(void *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void make_hit_descriptor(void *, void *, int, void *, float);
 extern void QueueMobyImpact(void *, void *);
-extern void func_PAL_0032F0B8(void *, int, int);
+extern int func_PAL_0032F0B8(void *, int, int);
 
 typedef struct {
     char pad0[0x10];

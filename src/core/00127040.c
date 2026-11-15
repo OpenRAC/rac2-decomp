@@ -30,7 +30,7 @@ extern void r1_func_0011D9A8(void);
 
 extern int sceDmaPause(void *);
 
-extern void r1_func_00118C90(int);
+extern s32 r1_func_00118C90(int);
 
 extern int r1_D_00132EAC;
 
@@ -156,7 +156,7 @@ typedef struct {
 extern int r1_func_00118C70(void *);
 extern int r1_func_00123F30(int, int *, int *);
 extern int r1_func_00118CB0(int);
-extern int r1_func_0011AE20(int);
+extern void r1_func_0011AE20(int);
 extern int r1_func_0011B2F8(void *, int, int);
 extern void r1_func_0011A6C8(char *);
 extern char r1_D_00159B80[];

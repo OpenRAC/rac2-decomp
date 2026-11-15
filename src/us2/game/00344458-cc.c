@@ -6,7 +6,7 @@ typedef unsigned char u8;
 /* Measured partial C views; original types and object ownership are unknown. */
 typedef unsigned char QwenRecovery_a2544d80ec96_AbiByte22;
 
-extern void menu_list_build_ids(QwenRecovery_a2544d80ec96_AbiByte22 *owner, const QwenRecovery_a2544d80ec96_AbiByte22 *table);
+extern int menu_list_build_ids(QwenRecovery_a2544d80ec96_AbiByte22 *owner, const QwenRecovery_a2544d80ec96_AbiByte22 *table);
 
 typedef int s32;
 

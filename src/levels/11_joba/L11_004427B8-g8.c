@@ -24,7 +24,7 @@ extern int arena_queue_voice_line(char *, int);
 
 extern void help_unlock_entry(int);
 
-extern void moby_handle_request_slot_state(int);
+extern int moby_handle_request_slot_state(int);
 
 extern int math_random_int_below(int);
 
@@ -38,7 +38,7 @@ extern int snd_play_from_global_bank(int, unsigned int, void *);
 
 extern void value_set_entry_by_index(int, int);
 
-extern void MemcardSave(int, int);
+extern int MemcardSave(int, int);
 
 /* Starts the next scene for a1 and counts the entry, as func_L02_003FCCA0 does in level 2. For
    a1 == 0 and a1 == 1 with no count yet it plays scene 1 or 3 and keeps the hero's word at

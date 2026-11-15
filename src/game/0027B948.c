@@ -266,7 +266,7 @@ extern float math_fast_sin_or_cos_a(float);
 
 extern int FastTweenColor(float, int, int);
 
-extern unsigned char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 
 extern int text_draw_centered_medium(int, int, long, unsigned char *, int);
 

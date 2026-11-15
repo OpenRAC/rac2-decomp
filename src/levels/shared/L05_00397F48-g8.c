@@ -19,7 +19,7 @@ typedef struct {
 } SpawnRecord97F48;
 
 extern void vec_scale_to_length(SpawnRecord97F48 *a, SpawnRecord97F48 *b, f32 c);
-extern void coll_process_hit(char *a, s32 b, s32 c, SpawnRecord97F48 *d, f32 e);
+extern int coll_process_hit(char *a, s32 b, s32 c, SpawnRecord97F48 *d, f32 e);
 
 /* Build and submit the projectile hit record from its owner and flight state. */
 void SubmitFlightStateHitRecord(s32 owner, char *state, char *position)

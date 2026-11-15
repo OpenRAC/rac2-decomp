@@ -16,8 +16,8 @@ extern void FastVecAdd(f32 *, f32 *, f32 *);
 extern f32 FastDiffRots(f32, f32);
 extern int moby_move_over_ground(char *, char *, char *, f32, f32, f32, f32, int);
 extern f32 ApproachValue(f32 *, f32, f32);
-extern void math_step_value_toward_target(f32 *, char *, f32, f32, f32, f32);
-extern void math_approach_target_with_direction_mode(char *, f32, f32, f32, f32, char *, int);
+extern float math_step_value_toward_target(f32 *, char *, f32, f32, f32, f32);
+extern f32 math_approach_target_with_direction_mode(char *, f32, f32, f32, f32, char *, int);
 extern int ComputeRegionRouteHeading(char *, int, f32 *, char *, int, char *, char *, f32, f32);
 
 /* Turns the object toward the point the caller names: it measures the angle between the

@@ -23,9 +23,15 @@ extern void moby_set_state(void *,int,int),anim_start_blended(void *,int,int,int
 extern int math_random_int_below(int),flag_set_second_pending(void *),flag_set_first_pending(void *),moby_dispatch_action_by_kind(void *,void *);
 extern float vec_get_heading_angle(void *,void *,void *),mat_fast_helper_a(float,float),FastDiffRots(float,float),fast_vec_dist(void *,void *),vec_distance_xy(void *,void *),moby_get_anim_value(void *),math_random_float_range(float,float);
 extern void FastVecSub(void *,void *,void *),FastVecAdd(void *,void *,void *),vec_scale_to_length(void *,void *,float),FastVecScale(void *,void *,float),euler_rotation_basis(void *,void *),mat_get_euler_angles(void *,void *);
-extern void moby_set_controller_speed_limits(void *,float,float,float,float),moby_l01_turn_toward_target(void *,void *),moby_aim_at_target_offset(void *,void *),moby_turn_toward_target_and_step(void *,void *,float),moby_step_controller(void *,void *,float),moby_step_at_own_position_factor(void *,float),hero_set_control_motion_and_step(void *,void *),moby_rotate_about_point(void *,void *,float,float,float);
+extern void moby_set_controller_speed_limits(void *,float,float,float,float), moby_rotate_about_point(void *,void *,float,float,float);
+extern int moby_aim_at_target_offset(void *,void *);
+extern int moby_l01_turn_toward_target(void *,void *);
+extern int moby_step_at_own_position_factor(void *,float);
+extern int moby_turn_toward_target_and_step(void *,void *,float);
+extern int hero_set_control_motion_and_step(void *,void *);
+extern int moby_step_controller(void *,void *,float);
 extern int coll_test_point(void *,int,void *,float);
-extern void coll_test_hit_at_bone(void *,int,int,int,int,int,float,float,float);
+extern int coll_test_hit_at_bone(void *,int,int,int,int,int,float,float,float);
 static __inline__ void SetAnimation(char *moby, int animation, int mode, int blend)
 {
     if (ANIM(moby) != animation) anim_start_blended(moby, animation, mode, blend);

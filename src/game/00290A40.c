@@ -21,7 +21,7 @@ extern unsigned short *func_002F0B78(unsigned short *, unsigned short *, int, Pa
 
 extern int help_is_id_value_in_mapping_range(int a, char *b);
 
-extern void help_store_id_in_slot_list(int a);
+extern int help_store_id_in_slot_list(int a);
 
 /* Qwen draft (branch qwen/autonomy, d969a356), checked by tools/check.py */
 void cam_init_scene_state(void);
@@ -95,13 +95,13 @@ void InitMemSlots(void)
     state[0x98 / 4] = 0x07200000;
 }
 
-extern void func_00124418(void);
-extern void sceDmaReset(int);
+extern int func_00124418(void);
+extern int sceDmaReset(int);
 extern void gfx_update_display_mode_from_screen_type(void);
 extern void func_0029D050(void);
 extern void SetPalMode(int);
 extern void EnableCache(int);
-extern void func_00126DC0(int (*)(void));
+extern int func_00126DC0(int (*)(void));
 extern int timer_update_vsync_counters(void);
 extern void gfx_select_packet_buffer_setup(void);
 extern void gfx_reset_packet_buffer(void);
@@ -113,21 +113,21 @@ extern int sceSifRebootIop(char *);
 extern int iop_is_reset_done(void);
 extern void STUB_printf(char *);
 extern void sceSifInitRpc(int);
-extern void DIntr(void);
+extern int DIntr(void);
 extern void func_0011E7A0(void);
 extern void func_0011F628(void);
-extern void iop_loadfile_reset_state(void);
-extern void sceCdMmode(int);
-extern void iop_file_reset_state(void);
+extern int iop_loadfile_reset_state(void);
+extern int sceCdMmode(int);
+extern int iop_file_reset_state(void);
 extern void load_start_request(int, int, void *);
 extern void FlushCache(int);
 extern void save_build_file_names(void *);
 extern void gfx_start_dma_channel0_and_wait(void *);
 /* Takes an address in retail's call, though its body (src/core/001339F0.c) never reads it. */
 extern void load_default_copy_setup(void *);
-extern void fast_decompress(void *, void *);
+extern int fast_decompress(void *, void *);
 extern int iop_remote_cmd_send3(int, int, int);
-extern void iop_remote_cmd_send1(int);
+extern int iop_remote_cmd_send1(int);
 extern void iop_init_remote_buffer_server(void);
 extern void pad_init_ports(void);
 extern void mc_show_message_on_problem(void);
@@ -138,9 +138,9 @@ extern void InitFileLoadSystem(void);
 extern void load_clear_class_cache_table(void);
 extern int func_00131628(void);
 extern void mem_clear(void *, int, int);
-extern void func_00126288(void *, int, int, int, int, int, int, int);
-extern void sceGsExecLoadImage(void *, void *);
-extern void gfx_wait_paths_idle(int, int);
+extern int func_00126288(void *, int, int, int, int, int, int, int);
+extern int sceGsExecLoadImage(void *, void *);
+extern int gfx_wait_paths_idle(int, int);
 extern void tex_load_pif_from_disc_table(void);
 extern void req_reset_queue(void *);
 

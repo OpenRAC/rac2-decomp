@@ -46,7 +46,7 @@ extern void vec_clear_128(void *);
 
 extern s32 snd_start_in_slot(s32, s32, s32);
 
-extern void SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float, s32, s32, s32, s32);
+extern char *SpawnExplosion(void *, s32, s32, s32, s32, s32, s32, s32, float, float, s32, s32, s32, s32);
 
 extern void moby_mark_spawned(u8 *);
 

@@ -3,9 +3,9 @@
 
 
 
-extern void F449e2f67_FUN_003361A8(char *p);
-extern void F449e2f67_FUN_00336968(char *p);
-extern void F449e2f67_FUN_003366D0(char *p);
+extern void *F449e2f67_FUN_003361A8(char *p);
+extern char *F449e2f67_FUN_00336968(char *p);
+extern void *F449e2f67_FUN_003366D0(char *p);
 
 char *func_PAL_L00_0043EBB8(char *p)
 {

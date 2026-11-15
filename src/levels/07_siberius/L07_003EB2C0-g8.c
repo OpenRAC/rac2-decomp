@@ -6,7 +6,7 @@ extern int FloatToInt(float);
 extern int math_random_int_below(int);
 extern void moby_set_state(void *,int,int);
 extern void anim_start_blended(void *,int,int,int);
-extern void coll_get_ground_distance_below(void *,void *,void *);
+extern float coll_get_ground_distance_below(void *,void *,void *);
 extern float fast_vec_dist(void *,void *);
 extern void moby_update_ground_check(void *);
 extern char *part_find_owned_effect_slot(void *,int,int);

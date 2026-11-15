@@ -7,7 +7,7 @@ extern int math_random_int_below(int mode);
 extern float coll_get_ground_height_at_position(char *object, char *local);
 extern void func_00282D30_7(char *local, int value, float scale);
 extern float func_002A7878_1(float low, float high);
-extern void part_spawn_bubble(char *object, char *local, float amount, float base);
+extern void *part_spawn_bubble(char *object, char *local, float amount, float base);
 
 /* Family 6eb4f363e5305bed: seed body at func_PAL_L00_0038A408. */
 void func_PAL_L00_0038A408(char *object)

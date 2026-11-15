@@ -16,7 +16,7 @@ extern f32 IntToFloat(s32);
 extern int FloatToInt(f32);
 
 /* Adjust a non-aligned value through the integer/float conversion helpers. */
-s32 mem_round_up_to_16(s32 value) {
+char *mem_round_up_to_16(s32 value) {
     s32 divisor = 16;
 
     if (value % divisor != 0) {

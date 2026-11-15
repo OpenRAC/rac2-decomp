@@ -20,7 +20,7 @@ extern void DrawGadgebotSpawnContainer(void);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern float math_fast_sin_or_cos_b(float);
 extern int FastTweenColor(int, int, float);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void func_PAL_L00_00328480(void *, void *, float, float, float, float, int, int, void *, int, int);
 extern void func_PAL_002B15D8(void *, int, void *, int, float, float, float, float);

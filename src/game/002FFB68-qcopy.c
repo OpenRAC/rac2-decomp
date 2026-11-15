@@ -16,7 +16,7 @@ extern void shop_setup_preview_object(void);
 extern void moby_mark_spawned(void *);
 extern s32 load_is_class_cached(s32);
 extern void LoadClassIntoFreeCacheSlot(s32);
-extern void snd_pump_music_and_disc_read(s32);
+extern s16 snd_pump_music_and_disc_read(s32);
 extern void SwitchCachedDiscAsset(s32);
 extern char *part_init_shared_effect_object(s32, s32);
 

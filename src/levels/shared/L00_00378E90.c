@@ -5,7 +5,7 @@ extern float D_L00_001B25E0 __attribute__((sda));
 extern int D_001A79FC __attribute__((sda));
 extern void gfx_set_scissor_clamped(int, int, int, int);
 extern void *memset(void *, int, unsigned int);
-extern unsigned char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 /* Retail consumes a 24-byte layout and the complete 64-bit color word. */
 extern void text_draw_window_medium(TextLayout *, unsigned long long, unsigned char *, int);
 

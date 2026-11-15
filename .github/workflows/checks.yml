@@ -32,6 +32,11 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Catalogues and sources
         run: python tests/check_repository.py
+      - name: Return types agree across files
+        # clang ships with the ubuntu-latest runner image; its MIPS front end parses the sources
+        run: |
+          clang --version | head -1
+          python tests/check_return_types.py --jobs 4
       - name: Compile tools
         run: |
           python - <<'PY'

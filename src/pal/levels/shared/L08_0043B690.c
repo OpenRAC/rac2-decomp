@@ -24,7 +24,8 @@ extern void moby_disable_object_list_flags(void), moby_reset_vars_defaults(void 
 extern int hero_is_reachable_for_count(void *, int, float);
 extern void level_apply_index_for_key(void *), text_print_localized_formatted(int, ...);
 extern int req_push_queue(void *, int), game_is_either_mode_two(void);
-extern void req_launch_queued(void *), moby_set_byte_on_group(int, int), moby_restore_object_list_flags(void);
+extern void moby_set_byte_on_group(int, int), moby_restore_object_list_flags(void);
+extern s32 req_launch_queued(void *);
 extern void STUB_printf(const char *, ...);
 extern int MemcardSave(int, int);
 extern int snd_play_from_class_bank(int, int, void *, int);

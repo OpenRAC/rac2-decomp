@@ -12,7 +12,7 @@ extern void func_002A0F48(void *);
 extern void FastVecSub(void *,void *,void *);
 extern void mat_get_euler_angles(void *,void *);
 extern void mat_combine_and_store(void *,void *,void *,void *);
-extern void ApproachValue(void *,f32,f32);
+extern f32 ApproachValue(void *,f32,f32);
 extern void snd_stop_voice(s32);
 extern u8 g_sound_state[];
 typedef struct { f32 v[4]; } Vec;

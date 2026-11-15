@@ -23,11 +23,11 @@ typedef struct {
 
 extern void func_00282D30_2(char *dst, char *src, float scale);
 
-extern void coll_update_controller(char *a, char *b, char *c);
+extern int coll_update_controller(char *a, char *b, char *c);
 
 extern float square_root(float a);
 
-extern void FloatToInt(float a);
+extern int FloatToInt(float a);
 
 extern int math_random_int_range(int lo, int hi);
 
@@ -54,7 +54,7 @@ extern float D_L11_001BA780[];
 
 extern int IsPointInCuboid(void *a, int b);
 
-extern void vec_fast_helper_b(void *a);
+extern int vec_fast_helper_b(void *a);
 
 extern unsigned char D_L11_00189EA0[];
 
@@ -63,9 +63,9 @@ extern unsigned char D_L11_00189EA0[];
 /* func_L11_002CDE10 lives in L11_002CDE10-motion.c. */
 
 /* Passes the object and two data blocks inside it (at +0x10 and +0xC0) to a shared helper. */
-void moby_call_helper_with_blocks(char *moby)
+int moby_call_helper_with_blocks(char *moby)
 {
-    coll_update_controller(moby, moby + 0x10, moby + 0xC0);
+    return coll_update_controller(moby, moby + 0x10, moby + 0xC0);
 }
 
 /* func_L11_00397C08 lives in L11_00397C08-helpers.c. */
@@ -119,11 +119,11 @@ void vec_l11_scale_four_3(char *vectors, float scale)
 }
 
 /* Works out how long a thrown object takes to land, from the height gap, its launch speed and gravity. */
-void projectile_compute_flight_time(float start_height, float end_height, float launch_speed, float gravity)
+int projectile_compute_flight_time(float start_height, float end_height, float launch_speed, float gravity)
 {
     float height_term = (gravity + gravity) * (start_height - end_height);
 
-    FloatToInt((launch_speed + square_root(launch_speed * launch_speed + height_term)) / gravity);
+    return FloatToInt((launch_speed + square_root(launch_speed * launch_speed + height_term)) / gravity);
 }
 
 /* func_L11_0044FFA0 lives in L11_0044FFA0-g8.c. */

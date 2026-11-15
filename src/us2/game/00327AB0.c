@@ -6,7 +6,7 @@
 
 extern char D_00189E20_9[];
 extern unsigned char D_US2_001A7A4C MACRO_ADDR;
-extern float func_00282C88_1(float *buf);
+extern void func_00282C88_1(float *buf);
 extern float FastVecLength(float *buf);
 
 void func_US2_00327AB0(char *obj)

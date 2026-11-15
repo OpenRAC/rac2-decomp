@@ -4,7 +4,7 @@
 extern int ref_L00_0030CDB0_00[] __attribute__((sda));
 extern int g_current_game_mode[] __attribute__((sda));
 extern char *D_001A8CFC[] __attribute__((sda));
-extern void UpdateMissionSelectionMenu(void);
+extern int UpdateMissionSelectionMenu(void);
 extern unsigned int menu_get_saved_state(void);
 extern void level_run_update(void);
 

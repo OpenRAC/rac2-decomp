@@ -5,7 +5,7 @@ extern char *D_001A8CFC[] __attribute__((sda));
 extern void popup_set_box_value(void *, int);
 extern char *D_001A8CFC[] __attribute__((sda));
 extern void popup_set_box_value(void *, int);
-extern int func_00288FB8_1 ();
+extern char *func_00288FB8_1 ();
 extern void text_draw_medium (int v, int p7, long k, int r, int m1);
 extern void text_draw_right_aligned_medium (int v, int p7, long k, int r, int m1);
 extern void SetupGifPaging(long);

@@ -62,7 +62,7 @@ extern s32 D_001B1680 __attribute__((sda));
 extern s32 g_save_menu_flags;
 extern s32 D_001B1680_1;
 extern void flag_clear_word(void);
-extern void MemcardSave(s32, s32);
+extern int MemcardSave(s32, s32);
 
 /* Stores a new value in the small data words and, when asked, resets the related state. */
 void data_set_small_value_and_refresh(int newValue, int refresh)

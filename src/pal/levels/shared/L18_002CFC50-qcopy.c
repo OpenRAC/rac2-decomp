@@ -20,7 +20,7 @@ extern u8 g_hero_state[];
 extern u8 g_hero_state[];
 extern u8 D_L18_001B4E00[], D_L18_001B5400[];
 extern s32 D_L18_001A8F00[] __attribute__((sda));
-extern s32 moby_get_private_value_0(u8 *);
+extern char *moby_get_private_value_0(u8 *);
 extern void attachment_reset_all(void);
 extern s32 hud_set_slot_contents(s32, s32, void (*)(u8 *), void (*)(u8 *), void (*)(u8 *), s32, s32);
 extern s32 level_run_slot_callback(u32);

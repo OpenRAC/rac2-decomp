@@ -61,7 +61,7 @@ extern void func_PAL_002A7E68(void *, int, int, int);
 extern void func_PAL_L00_002AF458(void);
 extern void func_PAL_L00_002AF6C0(void);
 extern void moby_transform_joint_to_world(void *, int, void *);
-extern void func_PAL_L00_002C4480(int, int);
+extern s32 func_PAL_L00_002C4480(int, int);
 extern void copy_matrix3x4(void *, void *);
 extern void matrix_from_basis_rows(void *, void *);
 extern void transform_vector(void *, void *, void *);

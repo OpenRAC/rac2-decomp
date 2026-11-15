@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 typedef int Quad __attribute__((mode(TI)));
-extern unsigned int moby_get_vars_word_18(unsigned int);
+extern void *moby_get_vars_word_18(unsigned int);
 extern float vec_length_xy(void *);
 extern void coll_apply_velocity_and_resolve(void *, void *, void *, void *);
 

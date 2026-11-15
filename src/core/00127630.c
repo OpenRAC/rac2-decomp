@@ -5,7 +5,7 @@ extern int r1_D_00132EA8;
 
 extern int sceMcOpen(int, int, int, int);
 
-extern void r1_func_00118C90(int);
+extern s32 r1_func_00118C90(int);
 
 extern int r1_D_00132EAC;
 

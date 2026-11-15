@@ -10,10 +10,13 @@ typedef struct { char pad[0x18]; void *object; } Contact;
 extern Contact D_L17_001C0000;
 extern char D_L17_001C0040[];
 extern float mat_fast_helper_a(float,float), FastAddRotations(float,float);
-extern int FloatToInt(float), moby_get_private_value_2(void *);
-extern void MobySpringTurn(void *,void *,float,float,float,float), func_PAL_L04_0033F000(void *,void *), path_push_point_away(int,void *,void *,float);
+extern int FloatToInt(float);
+extern char *moby_get_private_value_2(void *);
+extern void MobySpringTurn(void *,void *,float,float,float,float), func_PAL_L04_0033F000(void *,void *);
+extern int path_push_point_away(int,void *,void *,float);
 extern float coll_probe_ground_height_below(void *,int,float);
-extern void moby_transform_point_and_rotation_by_parent(void *,void *,void *,void *,void *,void *), mat_build_axis_angle_rotation(void *,void *,float);
+extern void mat_build_axis_angle_rotation(void *,void *,float);
+extern int moby_transform_point_and_rotation_by_parent(void *,void *,void *,void *,void *,void *);
 
 void func_PAL_L17_003E8D68(char *obj) {
     float tmp[4] __attribute__((aligned(16)));

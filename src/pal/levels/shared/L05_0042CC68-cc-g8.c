@@ -19,7 +19,7 @@ extern void FastVecScale(void *, void *, float);
 extern int coll_test_point(void *, int, void *, float);
 extern void func_PAL_L05_0042D118(void *, void *, void *);
 extern void *func_PAL_L05_0042A240(void *, int, int, int, int, int, int, int, int, int, int, float);
-extern void func_L05_003D1E60(void *, int, int);
+extern unsigned char *func_L05_003D1E60(void *, int, int);
 extern float math_random_angle(void);
 extern void vec_build_spherical_offset(void *, float, float, float);
 extern char *part_spawn_trailing_spark(void *, void *, int, int, int, int, float);

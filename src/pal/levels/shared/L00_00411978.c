@@ -1,7 +1,7 @@
 #include "include_asm.h"
 #include "names.h"
 
-extern void func_PAL_L00_004128E0(float *p, float a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern char *func_PAL_L00_004128E0(float *p, float a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 extern void FastVecSub(char *local, char *first, char *second);
 extern float mat_fast_helper_a(float a, float b);
 extern void FastVecScale(char *dst, char *src, float scale);

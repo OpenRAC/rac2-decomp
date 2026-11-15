@@ -9,7 +9,7 @@ typedef signed int s32;
 extern void moby_set_state();
 extern float math_fast_sin_or_cos_b(float);
 extern char D_L02_00188660[];
-extern int snd_stop_voice(int);
+extern void snd_stop_voice(int);
 extern int math_random_int_below(int);
 extern float fast_vec_dist(void *, void *);
 extern void *part_find_owned_effect_slot(void *, int, int);

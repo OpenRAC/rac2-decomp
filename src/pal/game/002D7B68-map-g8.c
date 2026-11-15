@@ -76,18 +76,20 @@ extern unsigned char D_001A7AFD, D_001A7BE8[];
 extern char D_0018D278[];
 extern int map_update_overlay_pan_zoom(void);
 extern void map_set_current_and_refresh(int);
-extern void menu_update_entry_states(void);
-extern void snd_play_from_global_bank(int, int, int), menu_restore_saved_screen_image(int);
+extern int menu_update_entry_states(void);
+extern void menu_restore_saved_screen_image(int);
+extern int snd_play_from_global_bank(int, int, int);
 extern int req_push_queue(void *, int), req_launch_queued(void *);
 extern int map_find_table_index(int), map_find_cache_slot_by_id(int), map_choose_slot_to_reuse(void);
-extern void map_move_cache_slot(int, int), func_PAL_0029DE68(int, void *);
+extern void map_move_cache_slot(int, int);
+extern int func_PAL_0029DE68(int, void *);
 extern int func_PAL_002DF328(int), release_menu_stream_buffer(int);
 extern void compose_bitmap_from_mask(void *, void *, void *, void *);
 extern void map_decode_occlusion(int, void *, void *), map_build_mask_bitmap(int, void *, void *);
 extern long register_8bit_texture(int, int, void *, void *, int, int);
 extern void func_0029D0E0(void), func_0029DEA8(int, int);
 extern int map_select_first_usable_slot(void), PickNextMap(void);
-extern void gfx_upload_records_to_buffer_slot(int, void *, int, int, int);
+extern s32 gfx_upload_records_to_buffer_slot(int, void *, int, int, int);
 extern int load_start_disc_read(int, int, int);
 
 int func_PAL_002D7B68(int arg)

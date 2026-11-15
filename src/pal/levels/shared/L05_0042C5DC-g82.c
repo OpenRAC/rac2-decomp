@@ -18,7 +18,7 @@ extern void vec_scale_to_length(void *, void *, float);
 extern void QueueMobyImpact(void *, Impact *);
 extern void *func_PAL_L05_0042DA18(void *, void *, int, int, int, int, int, int,
                             int, int, int, int, int, float);
-extern void coll_process_hit(void *, int, int, void *, float);
+extern int coll_process_hit(void *, int, int, void *, float);
 
 void func_PAL_L05_0042D860(unsigned char *object)
 {

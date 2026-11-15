@@ -12,10 +12,12 @@ typedef struct {int active;char pad[0x20];int id;} TutorialPromptState;
 extern TutorialPromptState D_L00_0027D848;
 extern float fast_vec_dist(void *,void *);
 extern int moby_is_state_one(void *);
-extern void subtitle_request_voice_line(int,int);
+extern int subtitle_request_voice_line(int,int);
 extern int IsPointInCuboid(void *,int);
-extern int moby_count_group_not_in_state(int,int),flag_is_byte_set(void),GetLocalizedString(int);
-extern void settings_store_four(int,int,int,int),menu_set_size_limits(int,int),request_begin_slot(int,int,int,int,int);
+extern int moby_count_group_not_in_state(int,int), flag_is_byte_set(void);
+extern char *GetLocalizedString(int);
+extern void settings_store_four(int,int,int,int), menu_set_size_limits(int,int);
+extern int request_begin_slot(int,int,int,int,int);
 extern int IsPointInCuboid(void *a0, int a1);
 extern char g_hero_position[];
 

@@ -75,7 +75,7 @@ extern int D_L23_001B1768 __attribute__((sda));
 extern int D_L23_001B176C __attribute__((sda));
 extern int D_L23_001B1780 __attribute__((sda));
 
-extern int table_find_by_id(unsigned char *, int);
+extern void *table_find_by_id(unsigned char *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, int, float, float, float, float, float);
 extern int GetIconFrame(int, int);
 extern void hud_draw_sprite_gradient(int, int, int, int, int, int *);
@@ -83,7 +83,7 @@ extern void gfx_draw_screen_rectangle(int, int, int, int, int, void *);
 extern int sprintf(char *, char *, ...);
 extern int func_001157AC(char *);
 extern int text_draw_centered_medium(int, int, U64, unsigned char *, int);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int func_PAL_L00_0030FBC0(int, int);
 extern void func_PAL_0029D5E8(int, int, int);
 extern int math_fast_float_d(void *);

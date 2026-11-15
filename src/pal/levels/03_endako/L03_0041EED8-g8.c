@@ -13,7 +13,7 @@ extern void moby_set_state(void *,int,int);
 extern void func_PAL_L00_0032C328(void *,float *,float *,float *,int,int,int,int,int,u8,void *);
 extern void *func_PAL_L00_003FB330(void *,int,int,int,int,int,int,int,float,float,int,int,int,int);
 extern int PlayMobySound(int,int,void *);
-extern void moby_l00_spawn_child(void *,int,int);
+extern char *moby_l00_spawn_child(void *,int,int);
 extern int flag_set_first_pending(void *);
 extern void func_PAL_L03_002EE460(void *,void *,void *,void *,void *,int,int);
 extern void lerp_vector(void *,void *,void *,float);

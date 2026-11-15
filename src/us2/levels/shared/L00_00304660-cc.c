@@ -117,7 +117,7 @@ extern void func_US2_00292650(void *, int);
 extern void level_load_quadword_block(char *);
 extern void tex_rebase_pack_fill_ranges(void *, char *, void *, int);
 extern void STUB_printf(const char *, ...);
-extern int func_US2_L00_003012A0(int);
+extern char *func_US2_L00_003012A0(int);
 extern void tutorial_reset_record_values(void);
 extern void level_update_object_visibility(int);
 extern void RestoreSavedHeroState(void);

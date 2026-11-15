@@ -26,7 +26,7 @@ extern char *GetLocalizedString(int);
 extern int sprintf(char *,char *,...);
 extern void text_draw_medium(int,int,u64,char *,int);
 extern void text_draw_small(int,int,u64,char *,int);
-extern char *table_find_by_id(char *,int);
+extern void *table_find_by_id(char *,int);
 extern float IntToFloat(int);
 extern void gfx_draw_scaled_object(char *,float,float,int,float,float);
 extern int table_find_last_used_entry(int);

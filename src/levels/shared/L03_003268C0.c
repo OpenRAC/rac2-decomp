@@ -12,7 +12,7 @@ extern void FastVecAdd(void *, void *, void *);
 extern float math_fabs(float);
 extern int math_random_int_below(int);
 extern int coll_scatter_points_in_shapes(void *, int, void *, int, float);
-extern void part_spawn_flying_fragment(void *, int, void *, void *, int, int, void *, void *, void *, float);
+extern char *part_spawn_flying_fragment(void *, int, void *, void *, int, int, void *, void *, void *, float);
 
 /* Launches a burst of small effect objects from an object, some at set places and some at random nearby points. */
 void part_spawn_effect_burst(unsigned char *object, int first, int count, int randomFirst,

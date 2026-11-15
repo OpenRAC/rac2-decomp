@@ -38,7 +38,7 @@ extern BoltCollectionTable D_00210D40, D_002119B0;
 extern unsigned char D_001B19A0[] MACRO_ADDR, D_0019B2E8[] MACRO_ADDR;
 extern int D_001B1A80;
 extern void moby_count_kill_or_event(RewardMoby *, int);
-extern int STUB_printf(char *, int, int, int);
+extern void STUB_printf(char *, int, int, int);
 extern int stat_scale_by_nibble_lookup(char *, int, int);
 extern char *moby_get_private_value_0(RewardMoby *);
 extern void func_US2_0029C510(int);

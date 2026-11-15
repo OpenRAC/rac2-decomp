@@ -17,7 +17,7 @@ extern float math_random_signed_float_range(float, float);
 extern float math_random_float_range(float, float);
 extern float FastAddRotations(float, float);
 extern void vec_build_spherical_offset(void *, float, float, float);
-extern void snivelak_spawn_shot_from_matrix(void *, void *, s32);
+extern u8 *snivelak_spawn_shot_from_matrix(void *, void *, s32);
 extern s32 CollLine(void *, void *, s32, void *, s32);
 
 /* Fires a shot from the boss's current arm toward the player with a small random spread, then switches to the other arm. */

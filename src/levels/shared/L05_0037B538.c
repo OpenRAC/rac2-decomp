@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern int moby_get_motion_data(u8 *);
+extern char *moby_get_motion_data(u8 *);
 extern int coll_test_point(void *, int, void *, float);
 extern void FastVecScale(void *, void *, float);
 extern void vec_scale_to_length(void *, void *, float);

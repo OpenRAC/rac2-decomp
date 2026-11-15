@@ -67,7 +67,7 @@ extern void vec_set_direction_with_complement(void *, void *, float);
 extern void quaternion_to_rotation_basis(void *, void *);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
-extern char *table_find_by_id(void *, int);
+extern void *table_find_by_id(void *, int);
 extern void gfx_draw_scaled_object_two_axes(char *, u32, float, float, float, float, float);
 extern float IntToFloat(int);
 extern float math_fast_sin_or_cos_b(float);

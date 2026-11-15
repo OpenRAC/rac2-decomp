@@ -16,7 +16,7 @@ extern void vec_scale_to_length(void *,void *,float);
 extern void FastVecScale(void *,void *,float);
 extern int math_random_int_range(int,int);
 extern int FloatToInt(float);
-extern void func_PAL_002BD790(void *,void *,int,int,int,int,int,int,int,float);
+extern void *func_PAL_002BD790(void *,void *,int,int,int,int,int,int,int,float);
 void func_PAL_002C7D8C(char *self) {
     SplitVector saved, motion, random;
     char *p = self + 0x20;

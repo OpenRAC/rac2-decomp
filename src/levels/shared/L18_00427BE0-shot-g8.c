@@ -22,13 +22,13 @@ extern void func_0033A400(void *, void *, void *, float, float, int, int, int, f
 extern void func_002FB998(void *, int, void *, void *, float);
 extern void func_00308BD8(void *, void *, float);
 extern float func_00308AD0(void *, void *);
-extern int receiver_bot_spawn_streak_projectile(void *, void *, void *, int, int, float, float, float);
+extern char *receiver_bot_spawn_streak_projectile(void *, void *, void *, int, int, float, float, float);
 
 /* Fires from joint side + 2. When the sphere test at that point reports contact, it
    spawns an explosion there and sends a hit record to nearby objects; otherwise it
    launches a projectile along the facing, aimed at the target's height unless the
    byte at 0xBC is set. */
-int shooter_fire_shot(unsigned char *obj, int side) {
+u8 *shooter_fire_shot(unsigned char *obj, int side) {
     unsigned char *state = *(unsigned char **)(obj + 0x68);
     float range = D_L18_001B1280;
     float speed = D_L18_001B1288;

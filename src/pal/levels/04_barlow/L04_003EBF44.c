@@ -39,7 +39,7 @@ extern float fast_subtract_rotations(float, float);
 extern float moby_get_anim_value(void *);
 extern float math_fast_sin_or_cos_b(float);
 extern float IntToFloat(int);
-extern void math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
+extern f32 math_approach_target_with_direction_mode(void *, float, void *, float, float, float, int);
 extern void func_PAL_002A7E68(void *, int, int, int);
 extern void moby_set_state(void *, int, int);
 extern int PlayMobySound(int, int, void *);

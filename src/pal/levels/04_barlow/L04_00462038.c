@@ -1,8 +1,8 @@
 #include "include_asm.h"
 
 #include "common.h"
-extern int part_find_owned_effect_slot(unsigned char *obj, int a1, int a2);
-extern void PlayMobySound(int a0, int a1, unsigned char *obj);
+extern void *part_find_owned_effect_slot(unsigned char *obj, int a1, int a2);
+extern int PlayMobySound(int a0, int a1, unsigned char *obj);
 extern void vec_random_direction(float *vec, float f12, float f13);
 extern float math_fabs(float value);
 extern void func_PAL_L00_00328480(unsigned char *obj, float *pos, int a2, int a3, float *vel, float f12, float f13, float f14, float f15, int color, int t2);

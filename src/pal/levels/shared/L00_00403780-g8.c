@@ -34,7 +34,7 @@ extern void LerpVector4(void *, void *, void *, float);
 extern int CollideSweptSphere(void *);
 extern int weapon_get_group(int);
 extern int coll_process_hit(void *, int, void *, void *, float);
-extern void StartAttachedEffect(void *, int, void *);
+extern int StartAttachedEffect(void *, int, void *);
 extern int PlayMobySound(int, int, void *);
 extern void shot_spawn_fragments(void *);
 extern void part_queue_ground_shadow(void *, float);

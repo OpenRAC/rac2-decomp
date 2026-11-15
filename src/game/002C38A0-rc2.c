@@ -26,7 +26,7 @@
 #include "common.h"
 
 extern s32 FastDecTimer();
-extern s32 part_kill();
+extern void part_kill();
 
 /* Removes a particle when its timer runs out. */
 void part_update_timer(s32 particle) {

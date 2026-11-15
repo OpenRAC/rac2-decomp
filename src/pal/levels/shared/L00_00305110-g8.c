@@ -11,7 +11,7 @@ extern void gfx_reset_record_list();
 extern void func_002F0468();
 extern void level_relocate_header_blocks();
 extern void initialize_tfrag_render_data();
-extern void func_PAL_0029DE68();
+extern int func_PAL_0029DE68();
 extern void FlushCache();
 extern int func_PAL_002B8838(char *, int, int);
 extern void level_flush_table_entry_offsets();

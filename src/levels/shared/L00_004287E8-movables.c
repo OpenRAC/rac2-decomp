@@ -14,7 +14,7 @@ extern char g_hero_position[];
 /* Bank order as the callers set it up: the object pointer travels in a0 either way. */
 extern float math_step_spring_damper_stored(float, float, char *, float, float, float);
 extern void func_00282CC0_4(char *, char *, char *);
-extern void ApproachValue(char *,float,float);
+extern f32 ApproachValue(char *,float,float);
 extern void FastVecSub(char *,char *,char *);
 extern void vec_scale_to_length(char *,char *,float);
 extern float math_fast_sin_or_cos_a(float);

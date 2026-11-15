@@ -17,7 +17,7 @@ extern void FlushCache(int);
 extern int log2dim(int);
 extern short func_PAL_002B8898(int);
 extern void gfx_wait_for_dma_status_bits(int);
-extern void func_PAL_002B8838(void *, int, int);
+extern int func_PAL_002B8838(void *, int, int);
 extern int func_00126288(void *, short, short, short, short, short, short, short);
 extern int sceGsExecLoadImage(void *, void *);
 extern int gfx_wait_paths_idle(int, unsigned short);

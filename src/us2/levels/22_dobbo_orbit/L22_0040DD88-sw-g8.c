@@ -26,11 +26,11 @@ extern void FastVecSub(void *, void *, void *), FastVecAdd(void *, void *, void 
 extern int WalkPathIsClear(void *, void *, void *), flag_set_second_pending(void *), moby_dispatch_action_by_kind(void *, void *);
 extern void arena_push_point_out(void *, float);
 extern int coll_test_point(void *, int, void *, float);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern void moby_mark_spawned(void *);
 extern int math_random_int_below(int), math_random_int_range(int, int);
 extern void part_spawn_joint_trails(void *, void *, float), moby_l22_steer_toward_target(void *, void *, int, float);
-extern void moby_check_target_point_from_offset(void *, void *);
+extern int moby_check_target_point_from_offset(void *, void *);
 extern int snd_start_in_slot(int, int, int);
 extern int moby_is_counter_below_limit(void);
 extern void stored_object_forward(void *, int), vec_random_direction(void *, float, float);

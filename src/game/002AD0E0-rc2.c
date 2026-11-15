@@ -11,7 +11,7 @@ typedef int TI128 __attribute__((mode(TI)));
 
 typedef struct { char pad[64]; } Matrix64_002AD0E0;
 
-extern int moby_get_private_value_2(unsigned char *a);
+extern char *moby_get_private_value_2(unsigned char *a);
 extern void euler_to_matrix(char *dst, char *src);
 extern void matrix_from_basis_rows(char *dst, char *src);
 extern void matrix_mul_vec3(char *a, char *b, char *c);

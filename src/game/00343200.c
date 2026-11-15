@@ -3,18 +3,18 @@
 
 typedef unsigned char u8;
 
-extern void func_L00_0042BAD0_3(u8 *);
+extern char *func_L00_0042BAD0_3(u8 *);
 
-extern void func_L00_0042BFF8_2(u8 *);
+extern char *func_L00_0042BFF8_2(u8 *);
 
-extern void func_L00_0042C290_3(u8 *);
+extern char *func_L00_0042C290_3(u8 *);
 
-extern void func_L00_004380E0_1(u8 *);
+extern unsigned long func_L00_004380E0_1(u8 *);
 
 /* Measured partial C views; original types and object ownership are unknown. */
 typedef unsigned char QwenRecovery_a2544d80ec96_AbiByte22;
 
-extern void menu_list_build_ids(QwenRecovery_a2544d80ec96_AbiByte22 *owner, const QwenRecovery_a2544d80ec96_AbiByte22 *table);
+extern int menu_list_build_ids(QwenRecovery_a2544d80ec96_AbiByte22 *owner, const QwenRecovery_a2544d80ec96_AbiByte22 *table);
 
 extern int menu_list_get_selected_id(unsigned char *owner);
 
@@ -37,7 +37,7 @@ u8 *menu_init_widgets(u8 *menu) {
     return menu;
 }
 
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern char D_001ADC10[], D_001ADC18[], D_001ADC20[], D_001ADC30[], D_001ADC88[], D_001AE0C0[];
 /* sda in this -G0 unit gives the one-instruction (macro) load of D_001A8CFC that retail has; a plain
@@ -49,12 +49,12 @@ extern void object_init_derived_c(void *, void *, void *);
 extern int *object_get_fourth_field(void *);
 extern void object_set_helper_result(void *, void *, int);
 extern void hud_set_widget_field_b(void *, void *);
-extern const char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void object_set_second_float4(void *, float, float, float, float);
 extern void menu_list_init(void *, void *);
 extern void menu_list_set_spacing(void *, float, float);
 extern void menu_list_set_icon_size(void *, float);
-extern void item_menu_update(void *, int);
+extern int item_menu_update(void *, int);
 extern void item_menu_set_title_mode(u8 *, u32);
 
 /* constructor: stores the owner at +0x28C, allocates the 16-byte position at +0x288 and initialises the

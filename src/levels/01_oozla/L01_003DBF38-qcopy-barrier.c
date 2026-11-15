@@ -8,7 +8,7 @@ extern void vec_add_random_offset(float *v, float f);
 extern float level_get_water_height(void);
 extern float math_random_float_range(float a, float b);
 extern int math_random_int_below(int a);
-extern void part_spawn_drifting(char *a0, int a1, int a2, float f12, float f13);
+extern void *part_spawn_drifting(char *a0, int a1, int a2, float f12, float f13);
 extern float FastVecLength(void *a0);
 extern f32 D_L01_001AFE18[];
 

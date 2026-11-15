@@ -55,11 +55,11 @@ extern float math_wrap_angle_to_pi(float);
 extern void SpawnExplosionEffects(void *, void *, void *, float, float, s32, s32, s32, float, float,
                           float, float, s32, float, s32, s32, s32, s32, s32);
 extern s32 moby_is_in_selected_zone(void *);
-extern void TryClaimNotice(s32, s32, s32);
+extern int TryClaimNotice(s32, s32, s32);
 extern s32 moby_dispatch_action_by_kind(void *, void *);
 extern s32 flag_set_second_pending(void *);
 extern s32 moby_step_at_own_position(void *);
-extern void moby_step_at_own_position_factor(void *, float);
+extern int moby_step_at_own_position_factor(void *, float);
 extern void moby_set_controller_speed_limits(void *, float, float, float, float);
 extern void snd_stop_voice(s32);
 extern s32 snd_play_from_class_bank(s32, s32, void *, s32);
@@ -69,13 +69,13 @@ extern void cam_set_mode_state(s32);
 extern s32 func_001163B0(void);
 extern s32 coll_point_inside_region(void *, s32);
 extern s32 moby_fuse_linked_objects(void *, void *, void *, void *, s32);
-extern void moby_aim_move_record_at_target(void *, void *, float, float);
+extern int moby_aim_move_record_at_target(void *, void *, float, float);
 extern s32 hero_adjust_jump_speed_to_target(void *, float, float, float);
 extern void hero_attach_to_object(s32, s32, void *);
 extern void func_US2_L18_002D0050(s32);
 extern s32 moby_run_slot_handler(void *, s32, s32);
 extern float path_find_best_point_by_id(void *, void *, void *, s32, float);
-extern void hud_draw_timer_bar(void);
+extern s32 hud_draw_timer_bar(void);
 extern void moby_reset_color_grey(void *);
 extern s32 shooter_is_enemy_alive(void *);
 extern s32 moby_is_target_in_sight(void *, void *);
@@ -88,7 +88,7 @@ extern void shooter_flag_group(void *, s32);
 extern void func_US2_L18_004290D0(void *);
 extern void enemy_tick_timers(void *);
 extern s32 enemy_get_kind_index(void *);
-extern void shooter_update_ranged_attack(void *);
+extern int shooter_update_ranged_attack(void *);
 extern void receiver_bot_move_toward_target(void *);
 
 void func_US2_L18_0042A3F8(u8 *a0) {

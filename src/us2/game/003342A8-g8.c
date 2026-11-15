@@ -16,7 +16,7 @@ extern void STUB_printf(const char *, ...);
 extern int req_push_queue(void *, int);
 extern int req_launch_queued(void *);  /* its result is tested elsewhere */
 extern void data_set_small_value_and_refresh(int, int);
-extern void MemcardSave(int, int);
+extern int MemcardSave(int, int);
 extern void moby_mark_spawned(void *);
 extern void moby_mark_table_entry_flagged(int);
 extern void moby_set_state(void *, int, int);

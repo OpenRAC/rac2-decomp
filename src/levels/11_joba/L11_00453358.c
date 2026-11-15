@@ -109,7 +109,7 @@ extern void func_00282D30_2(char *dst, char *src, float scale);
 extern void moby_set_state(void *a0, int a1, int a2);
 extern void gfx_update_color_fade(void *a0, void *a1);
 extern void set_moby_color(void *a0, int a1, int a2, int a3);
-extern void coll_sweep_from_object(void *a0, void *a1, int a2, float f12, float f13, float f14,
+extern int coll_sweep_from_object(void *a0, void *a1, int a2, float f12, float f13, float f14,
                           int a3, int t0, int t1);
 extern void gfx_l11_draw_beam_strips();
 extern void gfx_l11_draw_billboard_flare();
@@ -131,14 +131,14 @@ extern int weapon_select_aim_target(void *a0, int a1, int a2, int a3, float f12,
 
 extern void moby_set_controller_speed_limits(void *a0, float f12, float f13, float f14, float f15);
 
-extern float math_random_int_range(int a0, int a1);
+extern s32 math_random_int_range(int a0, int a1);
 
 extern float math_random_angle(void);
 
 extern void gfx_draw_billboard_quad(void *a0, void *a1, void *a2, float f12, float f13,
                           float f14, int a3);
 
-extern void part_spawn_damage_debris(void *a0, void *a1, void *a2, int a3);
+extern int part_spawn_damage_debris(void *a0, void *a1, void *a2, int a3);
 
 extern void func_002A0F48(void *a0);
 
@@ -152,7 +152,7 @@ extern void transform_vector(void *, void *, void *);
 extern u8 *hoverbike_bomb_spawn(u8 *, u8 *, u8 *, float);
 extern float FastAddRotations(float, float);
 extern void FastVecScale(void *, void *, float);
-extern void part_spawn_object_relative_particle(char *, void *, void *, void *, int);
+extern void *part_spawn_object_relative_particle(char *, void *, void *, void *, int);
 extern char g_hero_position[];
 extern int D_L11_001B089C[] NOT_SDA __attribute__((sda));
 /* 64-byte records indexed by D_L11_001B089C[0]. */
@@ -202,14 +202,14 @@ extern void vec_scale_to_length(float *dst, float *src, float scale);
 extern void draw_world_quad(char *pkt, float *matrix, int mode);
 extern void snd_stop_voice(int index);
 
-extern void snd_play_from_class_bank(int index, int value, char *object, int kind);
+extern int snd_play_from_class_bank(int index, int value, char *object, int kind);
 
-extern void SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int,
+extern char *SpawnExplosion(char *, int, int, int, int, int, int, int, float, float, int,
                          int, int, int);
 
 extern void vec_clear_128(void *);
 
-extern void moby_spawn_linked(char *, int, float, float);
+extern int moby_spawn_linked(char *, int, float, float);
 
 extern char g_sound_state[];
 

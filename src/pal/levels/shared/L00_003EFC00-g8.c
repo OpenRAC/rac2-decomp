@@ -26,8 +26,8 @@ extern int math_random_int_below(int);
 extern char *part_spawn_gravity_fade(void *, void *, int, int, int, int, int, float, float, float, int);
 extern void vec_scale_to_length(void *, void *, float);
 extern void FastVecAdd(void *, void *, void *);
-extern void func_PAL_L00_003F10D8(void *, char *, char *);
-extern void PlayMobySound(int, int, char *);
+extern char *func_PAL_L00_003F10D8(void *, char *, char *);
+extern int PlayMobySound(int, int, char *);
 extern float math_random_float_range(float, float);
 typedef struct {
     char pad[0x24];

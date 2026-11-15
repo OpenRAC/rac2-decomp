@@ -130,7 +130,7 @@ extern void mission_third_update(Moby *moby);
 extern void UpdateGateCourse(Moby *moby);
 extern void level_store_value_pair(s32 a0, void (*callback)(void));
 extern s32 cam_is_mode_active(void);
-extern void DrawHrugisMissionHud(void);
+extern s32 DrawHrugisMissionHud(void);
 extern void mission_reset_counters(void);
 extern void mission_reset_counters_alt(void);
 extern s32 ProcessObjectCollisionDamage(Moby *moby, s32 keep);

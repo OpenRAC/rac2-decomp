@@ -100,12 +100,12 @@ extern float math_random_float_range(float, float);
 extern float math_random_signed_float_range(float, float);
 extern void vec_random_direction(void *, float, float);
 extern void vec_add_random_offset(void *, float);
-extern void SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
+extern char *SpawnExplosion(void *, int, int, int, int, int, int, int, int, int, int, int, float, float);
 extern TaboraParticle *SpawnSpinningSparkParticle(void *, float, float, float, int, void *, int, float, int);
 extern void SpawnTintedEffects(int, void *, int, int, void *, int, int, float, float, float, float);
-extern void part_spawn_fading_drift(void *, void *, int, int, int, int, int, int, float, float, float);
-extern void part_spawn_hero_relative(void *, void *, int, int, int, int, float);
-extern void part_spawn_fading(void *, int, int, int, int, int, int, float);
+extern char *part_spawn_fading_drift(void *, void *, int, int, int, int, int, int, float, float, float);
+extern void *part_spawn_hero_relative(void *, void *, int, int, int, int, float);
+extern unsigned char *part_spawn_fading(void *, int, int, int, int, int, int, float);
 
 void func_US2_L08_003093B8(void) {
     float v[4] __attribute__((aligned(16)));

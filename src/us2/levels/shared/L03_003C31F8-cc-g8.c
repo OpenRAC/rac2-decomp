@@ -76,7 +76,8 @@ extern float math_step_value_toward_target(void *, void *, float, float, float, 
 extern float coll_probe_ground_height_below(u8 *, int, float);
 extern int route_check_object_points(void *, void *, void *);
 extern void euler_rotation_basis(void *, void *);
-extern void moby_step_at_own_position(char *), bot_update_timers_and_path(u8 *), func_002A677C(u8 *);
+extern void bot_update_timers_and_path(u8 *), func_002A677C(u8 *);
+extern int moby_step_at_own_position(char *);
 
 void func_US2_L03_003C31F8(u8 *object)
 {

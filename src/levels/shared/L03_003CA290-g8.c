@@ -18,7 +18,7 @@ extern void DrawGadgebotSpawnContainer(void);
 extern void gfx_add_draw_callback_first(void *, void *);
 extern float math_fast_sin_or_cos_b(float);
 extern int FastTweenColor(int, int, float);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void SpawnTintedEffects(void *, void *, float, float, float, float, int, int, void *, int, int);
 extern void part_spawn_masked_debris(void *, int, void *, int, float, float, float, float);

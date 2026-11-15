@@ -12,7 +12,7 @@ extern void shop_setup_preview_object(void);
 extern void moby_mark_spawned(void *);
 extern s32 load_is_class_cached(s32);
 extern void LoadClassIntoFreeCacheSlot(s32);
-extern void func_PAL_002B8898(s32);
+extern s16 func_PAL_002B8898(s32);
 extern void func_PAL_00295298(s32);
 extern char *part_init_shared_effect_object(s32, s32);
 

@@ -3,11 +3,11 @@
    2000000 becomes 1666667 and both random 180..240 delays are scaled by 5/6 for 50 Hz. */
 #include "common.h"
 typedef union { int q __attribute__((mode(TI))); float f[4]; } Vector;
-extern int state_get_stored_pointer_value(void);
+extern void *state_get_stored_pointer_value(void);
 extern void func_PAL_L05_0041C138(void *);
 extern void level_append_object(int, int, int, int);
 extern void func_L05_00417730(void *);
-extern int moby_get_motion_data(void *);
+extern char *moby_get_motion_data(void *);
 extern void follower_set_state(void *, unsigned int);
 extern void follower_set_push_vector(void *, void *);
 extern int follower_has_reached_target(void *);

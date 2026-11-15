@@ -26,7 +26,7 @@ extern s32 D_L07_001B1E90;
 extern u8 *cam_alloc_override_slot(s32);
 extern f32 mat_fast_helper_a(f32 a, f32 b);
 extern f32 fast_subtract_rotations(f32 a, f32 b);
-extern void math_approach_target_with_direction_mode(void *a0, void *a1, f32 a2, f32 a3, f32 a4, f32 a5, s32 a6);
+extern f32 math_approach_target_with_direction_mode(void *a0, void *a1, f32 a2, f32 a3, f32 a4, f32 a5, s32 a6);
 extern f32 D_L07_001B17D4 __attribute__((sda));
 extern f32 D_L07_001B17D8 __attribute__((sda));
 extern u8 *D_L07_001B9250 __attribute__((nosda));

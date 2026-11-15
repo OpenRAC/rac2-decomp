@@ -8,7 +8,7 @@ extern f32 D_L03_001B1A9C __attribute__((sda));
 extern s32 D_L03_001B1A94 __attribute__((sda));
 extern f32 D_L03_001B1A98 __attribute__((sda));
 
-extern void effect_create_timed(Vec4 *, u8 *, s32, s32, f32, s32, s32, s32);
+extern unsigned char *effect_create_timed(Vec4 *, u8 *, s32, s32, f32, s32, s32, s32);
 
 /* Draws a small marker sprite just above the object. */
 void moby_draw_marker_sprite(u8 *object)

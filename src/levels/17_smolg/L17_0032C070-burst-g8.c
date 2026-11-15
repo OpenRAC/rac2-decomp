@@ -11,7 +11,7 @@ extern void FastVecScale(void *, void *, float);
 extern void transform_vector(void *, void *, void *);
 extern void add_vectors(void *, void *, void *);
 extern int math_random_int_below(int);
-extern void part_spawn_scaled_smoke(void *, void *, int, void *, int, int);
+extern void *part_spawn_scaled_smoke(void *, void *, int, void *, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void snd_stop_voice(int);
 /* Updates the moby that sprays a burst of randomly scattered particles: it waits, sprays for a

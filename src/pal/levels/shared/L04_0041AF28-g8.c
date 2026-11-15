@@ -56,7 +56,7 @@ extern Object1006 *D_L04_001B08F4 __attribute__((sda));
 extern void func_PAL_002A0F68(void *);
 extern void func_002A0F48(void *);
 extern void func_PAL_002A7E68(void *,int,int,int);
-extern void math_fast_float_d(void *);
+extern int math_fast_float_d(void *);
 extern void FastVecSub(void *,void *,void *);
 extern float func_L00_002EE290(void *);
 extern void moby_update_eased_node(void *,void *,int,float,float);

@@ -62,9 +62,9 @@ extern Res_189E20 g_hero_state;
 extern char D_L00_001B8FF0[];
 extern void vec_scale_to_length(void *, void *, float);
 extern void vec_compute_object_to_target(void *, void *, void *, int, float);
-extern void func_PAL_L00_003ADC68(void *, void *, void *, void *);
+extern char *func_PAL_L00_003ADC68(void *, void *, void *, void *);
 
-void func_PAL_L00_003AF088(char *a0, char *a1) {
+char *func_PAL_L00_003AF088(char *a0, char *a1) {
     float buf[4];
     float angle;
     AngleRecord_262570 *e;
@@ -86,7 +86,7 @@ void func_PAL_L00_003AF088(char *a0, char *a1) {
         vec_compute_object_to_target(g->pBF8, a0, buf, 0, angle);
         p = g->pBF8;
     }
-    func_PAL_L00_003ADC68(a0, buf, a1, p);
+    return func_PAL_L00_003ADC68(a0, buf, a1, p);
 }
 
 

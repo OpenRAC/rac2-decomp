@@ -43,7 +43,7 @@ extern unsigned char *func_PAL_002C23B8(void *, void *, int, int, int, int, floa
 extern unsigned char *bike_find_aim_target(void *, void *, void *, void *, void *, void *, float, float);
 extern void func_PAL_L04_003FE558(void *, void *, void *);
 extern void racer_update_event_streak(void);
-extern int func_PAL_L04_003FE0D8(void *, void *, void *, void *, void *, void *, void *);
+extern void *func_PAL_L04_003FE0D8(void *, void *, void *, void *, void *, void *, void *);
 extern int snd_play_from_class_bank(int, int, void *, int);
 extern int coll_process_hit(void *, int, void *, float, int);
 extern void moby_queue_knockback_for_nodes(void *, void *, void *, int, int, int, int, int, float, float, float);

@@ -9,7 +9,7 @@ typedef struct {
 } HandlerState;
 extern void moby_set_state(void *, int, int);
 extern int hero_is_current_selected_id(void *);
-extern void TryClaimNotice(int, int, int);
+extern int TryClaimNotice(int, int, int);
 extern int D_00138324[];
 extern int D_L19_001A8FB4 __attribute__((sda));
 extern HandlerState g_hero_state;

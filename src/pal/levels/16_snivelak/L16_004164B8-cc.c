@@ -23,7 +23,7 @@ extern void RequestVoiceLine(u8 *, s32);
 extern s32 FloatToInt(float);
 extern s32 D_L16_001B2648 MACRO_ADDR;
 extern float math_fast_sin_or_cos_b(float);
-extern void math_step_value_toward_target(void *, void *, float, float, float, float);
+extern float math_step_value_toward_target(void *, void *, float, float, float, float);
 extern void func_PAL_L16_004180B0(u8 *);
 extern void group_wake_members(u8 *);
 /* Object update: on the first frame (+0x20 still zero) sets the state's defaults and

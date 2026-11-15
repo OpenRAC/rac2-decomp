@@ -5,7 +5,7 @@ extern int scePad2GetState(int socket);
 extern int pad_read_button_mask(int socket, void *profile);
 extern int pad_send_command(int socket, void *profile);
 extern int pad_read_record(int socket, void *data);
-extern void sceVibSetActParam(int socket, int profile_size, void *profile, int data_size, void *data);
+extern int sceVibSetActParam(int socket, int profile_size, void *profile, int data_size, void *data);
 extern void ClearPadInput(void *pad);
 extern void func_PAL_002B94A8(void *pad, void *data, int size);
 extern int D_001A7428;

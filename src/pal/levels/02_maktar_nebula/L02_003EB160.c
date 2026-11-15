@@ -14,7 +14,7 @@ extern void part_spawn_bolt_pickups(char *, int, int, int, int, int, float);
 extern int PickAmmoDropItem(char *, int *);
 extern char *SpawnWeaponAmmoPickup(float *, int, int, int);
 extern void FastVecScale(char *, char *, float);
-extern void moby_create_effect_at_position(float *, int);
+extern u8 *moby_create_effect_at_position(float *, int);
 extern void STUB_printf(const char *, ...);
 extern int snd_play_from_global_bank(int, unsigned int, void *);
 extern void value_set_entry_by_index(int, int);

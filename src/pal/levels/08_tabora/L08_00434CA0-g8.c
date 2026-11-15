@@ -3,13 +3,13 @@
 #include "common.h"
 typedef int TI128 __attribute__((mode(TI)));
 extern void moby_set_state(void *, int, int);
-extern int part_find_owned_effect_slot(void *, int, int);
+extern void *part_find_owned_effect_slot(void *, int, int);
 extern void FastVecAdd(void *, void *, void *);
 extern void *func_PAL_L00_003FB330(void *, int, int, int, int, int, int, int, float, float, int, int, int, int);
 extern void func_PAL_L00_0032C328(void *, void *, void *, void *, int, int, int, int,
                               int, int, int);
 extern void func_PAL_L00_003281C0(void *, int, float);
-extern void moby_l00_spawn_child(void *, int, int);
+extern char *moby_l00_spawn_child(void *, int, int);
 extern void moby_mark_spawned(void *);
 extern float D_L08_001B1EE0 __attribute__((sda));
 extern float D_L08_001B1EE8 __attribute__((sda));

@@ -69,8 +69,8 @@ extern void mat_fast_helper_c(void *, void *);
 extern void add_vectors(void *, void *, void *);
 extern void snd_stop_voice(int);
 extern void water_stop_effect(float, float, float, float);
-extern void part_spawn_drifting(void *, int, int, float, float);
-extern void part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
+extern void *part_spawn_drifting(void *, int, int, float, float);
+extern void *part_spawn_trail(void *, void *, void *, int, int, int, int, int, int);
 
 /* Waterfall: opens and closes with its linked switch, spins its texture, and sprays mist and drops while flowing. */
 void UpdateWaterfall(char * moby) {

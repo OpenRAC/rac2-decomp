@@ -23,7 +23,8 @@ extern int coll_process_hit(void *,int,void *,int,float),level_has_pending_inner
 extern void FastVecSub(void *,void *,void *),FastVecScale(void *,void *,float),vec_scale_to_length(void *,void *,float);
 extern float FastVecDot(void *,void *),math_fast_angle_helper(float),math_fabs(float);
 extern void FastVecCross(void *,void *,void *),math_apply_axis_rotation_to_quat(void *,void *,void *,float);
-extern int func_PAL_L00_004295B8(void *),cam_check_noop(void *),cam_follow_probe_collision(void *);
+extern int func_PAL_L00_004295B8(void *), cam_check_noop(void *);
+extern void *cam_follow_probe_collision(void *);
 extern int FastDecTimer(short *);
 extern float IntToFloat(int),math_cosine_blend(float,float,float);
 extern void FastVecAdd(void *,void *,void *);

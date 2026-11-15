@@ -12,7 +12,7 @@ extern int D_001ADF84;
 extern int D_001ADF88 __attribute__((sda));
 extern int D_001ADF8C;
 extern int D_001ADF90 __attribute__((sda));
-extern const char *GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern int sprintf(char *, const char *, ...);
 extern void hud_set_widget_field_a(char *, int);
 extern void func_PAL_00338770(char *);

@@ -25,7 +25,7 @@ extern s32 CollLine(char *, char *, s32, char *, s32);
 extern void AttachManipulator(char *, s32, char *);
 extern void moby_start_fall_state(char *, char *);
 extern void laser_bot_set_state_copy_vector(char *, char *);
-extern void math_step_value_toward_target(f32 *, f32 *, f32, f32, f32, f32);
+extern float math_step_value_toward_target(f32 *, f32 *, f32, f32, f32, f32);
 extern void func_PAL_L03_003CBB00(char *);
 extern void moby_set_flag_bit(char *, s32);
 extern f32 vec_distance_xy(char *, char *);

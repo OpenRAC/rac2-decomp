@@ -13,7 +13,7 @@ extern float math_random_float_range(float, float);
 extern void matrix_mul_vec3(void *, void *, void *);
 extern void FastVecAdd(void *, void *, void *);
 extern unsigned int FastTweenColor(unsigned int, unsigned int, float);
-extern void part_spawn_trail(void *, void *, void *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, int);
+extern void *part_spawn_trail(void *, void *, void *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, int);
 void func_PAL_L03_00387350(char *m)
 {
     float point[4], position[4], velocity[4], params[4];

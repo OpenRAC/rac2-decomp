@@ -11,7 +11,7 @@ extern float FastAddRotations(float a, float b);
 extern void vec_build_spherical_offset(float *p, float a, float b, float c);
 extern char *SpawnSpinningSparkParticle(char *p, float fa, float fb, float fc, float fd, int v, char *local,
                             unsigned int color, int flag);
-extern void part_spawn_burst(float *out, float *dir, int a, int b, unsigned int color, int id,
+extern void *part_spawn_burst(float *out, float *dir, int a, int b, unsigned int color, int id,
                            float fa, float fb, float fc, float fd, float fe);
 extern char D_L20_001B9FC0[];
 extern char D_0018A0E0[];

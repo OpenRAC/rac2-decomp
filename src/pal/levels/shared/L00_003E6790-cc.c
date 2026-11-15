@@ -22,7 +22,7 @@ extern void moby_update_color_scale(char *);
 extern void vec_scale_to_length(void *, void *, float);
 extern int CollLine(void *, void *, int, void *, void *);
 extern void func_PAL_L00_003E74D8(void *, int, int);
-extern void func_PAL_00335DD0(void *, int, int);
+extern int func_PAL_00335DD0(void *, int, int);
 extern int PlayMobySound(int, int, char *);
 extern int math_fast_float_d(void *);
 extern void func_PAL_L00_003E78E8(void *);

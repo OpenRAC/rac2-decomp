@@ -18,7 +18,7 @@ extern f32 D_L22_001AFF5C NOT_SDA;
 
 extern void gfx_set_gs_register_constant(void);
 
-extern s32 gfx_draw_billboard_quad_with_uv(f32 *, f32, s32, f32, f32, s32);
+extern void gfx_draw_billboard_quad_with_uv(f32 *, f32, s32, f32, f32, s32);
 
 extern void matrix_mul_vec3(f32 *, f32 *, u8 *);
 

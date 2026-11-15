@@ -10,7 +10,7 @@ extern BatchA_A18_s32 D_001FE480[];
 extern BatchA_A18_s32 D_001FE480[];
 extern BatchA_A18_s32 protopet_is_in_either_active_state(BatchA_A18_u8 *s);
 extern BatchA_A18_s32 math_random_int_below(BatchA_A18_s32 a0);
-extern BatchA_A18_s32 protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
+extern u8 *protopet_count_group(BatchA_A18_s32 a0, BatchA_A18_u8 *a1);
 extern BatchA_A18_s32 path_measure_moby_against_entry(BatchA_A18_u8 *a0, BatchA_A18_s32 a1, float f12);
 extern BatchA_A18_s32 path_apply_entry_to_moby(BatchA_A18_u8 *a0, BatchA_A18_s32 a1,
                                         BatchA_A18_s32 a2, BatchA_A18_s32 a3);

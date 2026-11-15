@@ -14,13 +14,13 @@ typedef struct { char pad[8]; short n; void (*fn)(char *); } ENTRY_F624a0727;
 
 typedef float f32;
 
-extern void F8b17817c_FUN_003361A8(char *block);
+extern void *F8b17817c_FUN_003361A8(char *block);
 
-extern void F8b17817c_FUN_00336968(char *block);
+extern char *F8b17817c_FUN_00336968(char *block);
 
-extern void F8b17817c_FUN_003366D0(char *block);
+extern void *F8b17817c_FUN_003366D0(char *block);
 
-extern void Ffb202470_FUN_0033AB50(char *p);
+extern int Ffb202470_FUN_0033AB50(char *p);
 
 /* Measured target: byte-identical across all 27 levels. */
 /* Turns the extra labels of the button prompt bar on or off. */

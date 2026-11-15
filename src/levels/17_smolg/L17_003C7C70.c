@@ -4,7 +4,7 @@
 extern s32 g_path_l17_table[];
 
 extern void func_2EEAF8(s32);
-extern void func_2EEB28(s32);
+extern int func_2EEB28(s32);
 extern void func_320B58(s32, s32);
 extern void func_327E68(s32, s32, s32, s32, f32);
 extern s32 func_31B160(s32);

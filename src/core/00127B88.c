@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs.h"
 
-extern void r1_func_00118C90(int);
+extern s32 r1_func_00118C90(int);
 
 extern int r1_func_0011B6B8(void *);
 
@@ -31,7 +31,7 @@ extern int r1_func_00118CC0(int);
 
 extern char r1_D_0015A000[];
 
-extern int r1_func_0011AD70(void *, int);
+extern void r1_func_0011AD70(void *, int);
 
 extern int r1_D_00159B80_a[] __asm__("r1_D_00159B80");
 
@@ -45,7 +45,7 @@ extern int r1_D_0015B180;
 
 extern void r1_func_0011A6C8();
 
-extern int r1_func_0011AE20(int);
+extern void r1_func_0011AE20(int);
 
 extern int r1_func_0011B2F8(void *, int, int);
 

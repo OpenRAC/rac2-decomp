@@ -5,7 +5,7 @@ extern int sceCdSyncS(int);
 
 extern int r1_D_001313E8;
 
-extern void r1_func_00118C90(int);
+extern s32 r1_func_00118C90(int);
 
 typedef struct {
     char pad[0x24];
@@ -388,7 +388,7 @@ extern int r1_D_001313EC;
 extern int r1_D_001313EC;
 
 
-extern void r1_func_00118C90();
+extern s32 r1_func_00118C90();
 
 extern int r1_func_0011B4C8();
 

@@ -24,7 +24,7 @@
  */
 #include "common.h"
 
-extern s32 malloc(s32);
+extern void *malloc(s32);
 extern s32 *eh_sort_fde_vector(void *, s32);
 extern s32 eh_count_fde_records(s32);
 extern void eh_collect_fde_records(s32, void *, void *, void *);

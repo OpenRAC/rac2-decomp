@@ -64,7 +64,7 @@ typedef struct {
 extern CallbackState g_pause_menu_state;
 extern int D_00138344;
 
-extern void func_0029C7D0(int);
+extern int func_0029C7D0(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. */
 int menu_page_update_2(void) {
@@ -99,7 +99,7 @@ int menu_page_draw_4(void) {
     return 0;
 }
 
-extern void func_0029CA00(int);
+extern int func_0029CA00(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. */
 int menu_page_update_3(void) {
@@ -134,7 +134,7 @@ int menu_page_draw_5(void) {
     return 0;
 }
 
-extern void func_0029C990(int);
+extern int func_0029C990(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. */
 int menu_page_update_4(void) {
@@ -170,7 +170,7 @@ int menu_page_draw_6(void) {
 }
 
 extern int func_0029C840(int);
-extern void menu_process_request(short, int, int *);
+extern int menu_process_request(short, int, int *);
 
 /* Handles button input for a menu page and, when the page handler says so, sends a menu request message. */
 int menu_page_update_send_request(void) {
@@ -213,7 +213,7 @@ int menu_page_draw_7(void) {
     return 0;
 }
 
-extern void func_0029C8B0(int);
+extern int func_0029C8B0(int);
 
 /* Handles button input for a menu page: reports cancel or accept, and otherwise passes the buttons to the page handler. */
 int menu_page_update_5(void) {

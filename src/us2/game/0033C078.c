@@ -23,9 +23,9 @@ void func_US2_0033C098(int object, unsigned int a1, unsigned int a2, unsigned in
 /* Measured target: byte-identical across all 27 levels. */
 void func_US2_0033C0F0(u8 *a0, f32 a1) { *(f32 *)(a0 + 0x2A4) = a1; }
 
-extern void F8b17817c_FUN_003361A8(char *block);
-extern void F8b17817c_FUN_00336968(char *block);
-extern void F8b17817c_FUN_003366D0(char *block);
+extern void *F8b17817c_FUN_003361A8(char *block);
+extern char *F8b17817c_FUN_00336968(char *block);
+extern void *F8b17817c_FUN_003366D0(char *block);
 
 char *func_US2_0033C100(char *object)
 {

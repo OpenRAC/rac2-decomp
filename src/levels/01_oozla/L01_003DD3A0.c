@@ -8,7 +8,7 @@ extern char *g_moby_l01_table __attribute__((sda));
 extern float fast_vec_dist(void *, void *), vec_distance_xy(void *, void *), level_get_water_height(void);
 extern void moby_update_ground_check(void *), muckdweller_alert_group(int), part_spawn_moving_bubbles(void *);
 extern int moby_apply_damage_to_object(void *, void *, int), math_random_int_below(int);
-extern void weapon_select_aim_target(void *, int, void *, int, float, float);
+extern int weapon_select_aim_target(void *, int, void *, int, float, float);
 extern int GetFirstMobyInGroup(char **, int, int, int), GetNextMobyInGroup(char **, char *, int, int);
 
 /* Refresh linked targets and choose the nearest live member of the object's group. */

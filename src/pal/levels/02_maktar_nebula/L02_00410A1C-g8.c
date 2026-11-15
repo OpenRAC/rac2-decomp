@@ -40,7 +40,7 @@ extern s32 flag_set_second_pending(u8 *);
 extern void moby_set_controller_speed_limits(u8 *, float, float, float, float);
 extern s32 arena_get_state_word(char *);
 extern s32 coll_point_inside_record_volume(void *, s32);
-extern void func_PAL_L01_00323068(char *, char *);
+extern int func_PAL_L01_00323068(char *, char *);
 extern void FastVecSub(void *, void *, void *);
 extern void vec_scale_to_length(void *, void *, float);
 extern void func_002A677C(void *);

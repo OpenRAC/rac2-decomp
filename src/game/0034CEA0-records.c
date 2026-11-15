@@ -4,7 +4,7 @@ extern char *D_001A8CFC __attribute__((sda));
 extern char D_001AE710[];
 extern char D_001AE720[];
 
-extern int table_find_by_id(int, int);
+extern void *table_find_by_id(int, int);
 extern void object_init_derived_b(void *, int, int, void *, void *);
 extern void widget_set_pos_y(void *, int);
 extern void meter_set_max(void *, int);

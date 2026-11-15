@@ -13,7 +13,7 @@ extern int get_ammo(int);
 extern int hero_slot_item_id(int);
 extern void initialize_moby_animation_blend(void *, void *, int, int, int, int);
 extern void AdvanceAndDecodeAnimationFrames(void *, void *);
-extern void ApproachValue(void *, float, float);
+extern f32 ApproachValue(void *, float, float);
 extern void release_moby_animation_slot(void *, void *);
 extern void vec_clear_128(void *);
 extern void matrix_mul_vec3(void *, void *, void *);

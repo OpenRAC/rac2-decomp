@@ -2,13 +2,13 @@
 #include "names.h"
 
 extern void func_PAL_0033CFD0(void *, float);
-extern int pool_alloc_cell(void *);
+extern void *pool_alloc_cell(void *);
 extern int *ui_return_second_arg(int, int);
 extern void func_PAL_0033CB00(void *, void *, void *);
-extern int GetLocalizedString(int);
+extern char *GetLocalizedString(int);
 extern void func_PAL_0033CF78(void *, int, int, int);
 extern void func_PAL_0033CF58(void *, float, float, float, float, float, float);
-extern void func_PAL_0033E160(void *, int);
+extern int func_PAL_0033E160(void *, int);
 extern int D_001ADDE0[2] __attribute__((sda));
 
 void func_PAL_0033E038(char *object, void *argument)
@@ -38,7 +38,7 @@ void func_PAL_0033E038(char *object, void *argument)
     func_PAL_0033E160(object, 0);
 }
 
-extern void func_PAL_0033E460(void *, int);
+extern int func_PAL_0033E460(void *, int);
 
 extern int D_PAL_001ADE68[2] __attribute__((sda));
 
@@ -71,7 +71,7 @@ void func_PAL_0033E338(char *object, void *argument)
 
 
 
-extern void func_PAL_0033E9E8(void *, int);
+extern int func_PAL_0033E9E8(void *, int);
 
 extern int D_PAL_001ADEB0[2] __attribute__((sda));
 
@@ -104,7 +104,7 @@ void func_PAL_0033E8C0(char *object, void *argument)
 
 
 
-extern void func_PAL_0033F470(void *, int);
+extern int func_PAL_0033F470(void *, int);
 
 extern int D_PAL_001ADEF0[2] __attribute__((sda));
 
@@ -137,7 +137,7 @@ void func_PAL_0033F348(char *object, void *argument)
 
 
 
-extern void func_PAL_0033F738(void *, int);
+extern int func_PAL_0033F738(void *, int);
 
 extern int D_PAL_001ADF00[2] __attribute__((sda));
 
@@ -170,7 +170,7 @@ void func_PAL_0033F610(char *object, void *argument)
 
 
 
-extern void func_PAL_0033FB00(void *, int);
+extern int func_PAL_0033FB00(void *, int);
 
 extern int D_PAL_001ADF10[2] __attribute__((sda));
 
@@ -203,7 +203,7 @@ void func_PAL_0033F9D8(char *object, void *argument)
 
 
 
-extern void func_PAL_0033FDF8(void *, int);
+extern int func_PAL_0033FDF8(void *, int);
 
 extern int D_PAL_001ADF20[2] __attribute__((sda));
 
@@ -236,7 +236,7 @@ void func_PAL_0033FCD0(char *object, void *argument)
 
 
 
-extern void func_PAL_00340038(void *, int);
+extern int func_PAL_00340038(void *, int);
 
 extern int D_PAL_001ADF30[2] __attribute__((sda));
 
