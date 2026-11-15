@@ -27,6 +27,7 @@ Every doc of this repository, by folder. New here? Read [building.md](build/buil
 | [assert-message-names.md](game/assert-message-names.md) | Names from assert messages ([table](game/assert-message-names.tsv)) |
 | [moby-dispatch-tables.md](game/moby-dispatch-tables.md) | Moby dispatch tables ([table](game/moby-dispatch.tsv)) |
 | [vu-microprograms.md](game/vu-microprograms.md) | VU microprograms |
+| [refactor-plan.md](game/refactor-plan.md) | Refactor plan: readable C with the same bytes |
 | [community-engine-reference.md](game/community-engine-reference.md) | Community research on the engine |
 
 ## research/: other builds and games
